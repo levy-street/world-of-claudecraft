@@ -797,11 +797,14 @@ export class SocialService {
   // Guilds
   // -------------------------------------------------------------------------
 
-  async guildCreate(actor: SocialActor, rawName: string): Promise<void> {
+  // Returns true ONLY on the committed success arm; false on every refusal.
+  // The caller reserved the creation fee at its dispatch gate (reserve-at-gate,
+  // Guild Bank Phase 3 QA) and refunds it when this reports false (or throws).
+  async guildCreate(actor: SocialActor, rawName: string): Promise<boolean> {
     const name = validateGuildName(rawName);
     if (!name) {
       this.err(actor.characterId, 'Guild names are 3-24 letters (spaces allowed).');
-      return;
+      return false;
     }
     const result = await this.db.createGuildWithLeader(name, actor.characterId);
     if ('error' in result) {
@@ -811,7 +814,7 @@ export class SocialService {
           ? `A guild named '${name}' already exists.`
           : 'You are already in a guild.',
       );
-      return;
+      return false;
     }
     // Founder is seated as leader in the same transaction as the create: stamp
     // the live sim before any push resolves (the guild bank rank gate).
@@ -821,8 +824,9 @@ export class SocialService {
       rank: 'leader',
     });
     // Same success arm, right after the stamp: seed the empty book into the
-    // live sim and charge the creation fee (create-then-charge; the transport
-    // owner does both). A refused create above must never reach this.
+    // live sim and consume the gate-reserved creation fee (the create_fee
+    // ledger row; the transport owner does both). A refused create above must
+    // never reach this.
     this.tx.onGuildCreated(actor.characterId, result.guildId);
     // Founder credit rides the transport seam: soc_guild_founded reads the
     // guildsFounded deed stat, which only this success arm may ever produce
@@ -834,6 +838,7 @@ export class SocialService {
       '#40ff7f',
     );
     this.push(actor.characterId);
+    return true;
   }
 
   async guildInvite(actor: SocialActor, name: string): Promise<void> {

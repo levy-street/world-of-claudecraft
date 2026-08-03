@@ -1940,18 +1940,22 @@ describe('guild bank persistence hooks (Guild Bank Phase 3)', () => {
   });
 
   it('onGuildCreated fires once, in the committed success arm only, AFTER the founder stamp', async () => {
-    await h.svc.guildCreate(h.actor(1), 'no'); // invalid name: refused
+    // The boolean is the reserve-at-gate refund signal (Guild Bank Phase 3
+    // QA): FALSE on every refusal arm (the dispatch gate refunds the reserved
+    // fee), TRUE only on the committed success arm (the hook consumed it).
+    await expect(h.svc.guildCreate(h.actor(1), 'no')).resolves.toBe(false); // invalid name
     expect(h.tx.created).toEqual([]);
-    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    await expect(h.svc.guildCreate(h.actor(1), 'Iron Vanguard')).resolves.toBe(true);
     expect(h.tx.created).toEqual([{ id: 1, guildId: 1 }]);
     // Ordering: the membership stamp (the authorization input) landed BEFORE
     // the seed/fee hook, in the same synchronous success arm.
     expect(h.tx.membershipStamps).toEqual([
       { id: 1, membership: { guildId: 1, guildName: 'Iron Vanguard', rank: 'leader' } },
     ]);
-    // Refusals after: duplicate name, already guilded. No further hook calls.
-    await h.svc.guildCreate(h.actor(2), 'iron vanguard');
-    await h.svc.guildCreate(h.actor(1), 'Second Banner');
+    // Refusals after: duplicate name, already guilded. No further hook calls,
+    // and both report false so the gate refunds.
+    await expect(h.svc.guildCreate(h.actor(2), 'iron vanguard')).resolves.toBe(false);
+    await expect(h.svc.guildCreate(h.actor(1), 'Second Banner')).resolves.toBe(false);
     expect(h.tx.created).toEqual([{ id: 1, guildId: 1 }]);
   });
 

@@ -18,6 +18,14 @@
 // an EMPTY book (a disbanded guild: the disband guard proves both were zero)
 // but skips the purchased reconciliation (expansions survive to the last row).
 //
+// OPERATOR CAVEAT: run against a QUIESCED realm (or accept false positives).
+// The ledger rows are written fire-and-forget at op time while the book rows
+// land later on the fenced escrow save, so a live realm's unflushed window
+// shows as transient ledger/book mismatches; a fenced-out session's rolled-
+// back ops also leave their ledger rows behind by design (the evidence trail
+// for the incident the loud fence-out log records). Findings on a quiesced
+// realm are real.
+//
 // Structure: PURE exported functions (unit-tested directly) plus a main() that
 // only runs when the file is executed directly. main() talks to Postgres via pg;
 // auditBank is pure and DB-free.

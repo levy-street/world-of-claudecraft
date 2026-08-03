@@ -31,7 +31,7 @@ import {
 import { devTierIndexForMergedPrs } from '../src/sim/dev_tier';
 import { parseRelayCommand } from '../src/sim/discord_relay';
 import { specialRoleChatTag } from '../src/sim/discord_roles';
-import { GUILD_CREATION_FEE_COPPER } from '../src/sim/guild_bank';
+import { GUILD_CREATION_FEE_COPPER, type GuildBankOpDelta } from '../src/sim/guild_bank';
 import {
   isInJailCage,
   JAIL_CENTER,
@@ -795,6 +795,16 @@ export interface ClientSession {
   // cleared per guild after a SUCCESSFUL save only if the seq is unchanged, so
   // an op landing mid-save keeps the book scheduled for the next save.
   dirtyGuildBanks: Map<number, number>;
+  // The UNFLUSHED book deltas behind those dirty marks, in op order (guild id
+  // -> the diffGuildBankOp output of every successful op not yet committed by
+  // an escrow save). Consumed from the front when a save commits; when this
+  // session's escrow can never commit again (fence-out, or the leave flush
+  // exhausted its retries) and another live session still holds legitimate
+  // unflushed ops on the same book, these are surgically REVERTED from the
+  // live book (Sim.revertGuildBankDeltas) instead of evict-and-reload, so the
+  // dead session's orphaned ops can never ride another officer's save (the
+  // Phase 3 QA dupe fix) while the live session's ops survive.
+  unflushedGuildBankOps: Map<number, GuildBankOpDelta[]>;
   // IP address at join time (from requestMetadata); used for per-IP session counting.
   ip: string;
   userAgent: string;
@@ -1393,6 +1403,18 @@ export class GameServer {
   private readonly ipBlockList = new IpBlockList();
   private readonly socialDb = new PgSocialDb(pool);
   readonly social: SocialService;
+  // Guild creation fees reserved at the guild_create dispatch gate (Guild Bank
+  // Phase 3 QA, reserve-at-gate), keyed by character id and consumed by
+  // exactly one of: the create's committed success arm (onGuildCreated writes
+  // the create_fee ledger row) or the refusal/error arm
+  // (refundGuildCreateFee returns the copper). A character can hold at most
+  // one reservation; the gate refuses a second guild_create while one is
+  // pending, so a pipelined double-create can never double-charge or
+  // double-refund.
+  private readonly pendingGuildCreateFees = new Map<
+    number,
+    { accountId: number; amount: number }
+  >();
   private readonly moderation: ModerationService<ClientSession>;
   private wireCache = new Map<number, EntityWireCache>();
   // partyFrameAggroTargets / partyFrameIncomingHeals scan the whole entity set and
@@ -2013,17 +2035,25 @@ export class GameServer {
         // restart), so without this seed the founder's bank would be silently
         // inert until a realm restart boot-loads it.
         this.sim.loadGuildBank(guildId, null);
-        const s = this.sessionByCharacterId(id);
-        if (!s) return; // founder vanished mid-flight: free guild, never lost gold
-        // CREATE-THEN-CHARGE (state.md): the guild row committed FIRST; only
-        // now is the fee deducted from the sim purse, so a crash between the
-        // two yields a free guild, never gold lost to a guild that does not
-        // exist. Never charge first. The dispatch gate already refused a poor
-        // founder before any DB work; the sim clamps a mid-flight shortfall.
-        const charged = this.sim.chargeGuildCreationFeeFor(s.pid);
-        if (charged > 0) {
-          recordGuildBankDeltas('create_fee', s, guildId, [guildCreateFeeDelta(charged)]);
+        // RESERVE-AT-GATE (Phase 3 QA, revising create-then-charge): the fee
+        // was already deducted synchronously at the guild_create dispatch
+        // gate, so this success arm only consumes the pending reservation:
+        // it writes the create_fee ledger row and schedules the escrow save.
+        // A founder who vanished mid-flight already paid at the gate (their
+        // leave flush persists the charged purse), so the fee can no longer
+        // be dodged by logging out before the commit.
+        const fee = this.pendingGuildCreateFees.get(id);
+        this.pendingGuildCreateFees.delete(id);
+        if (fee && fee.amount > 0) {
+          recordGuildBankDeltas(
+            'create_fee',
+            { characterId: id, accountId: fee.accountId },
+            guildId,
+            [guildCreateFeeDelta(fee.amount)],
+          );
         }
+        const s = this.sessionByCharacterId(id);
+        if (!s) return; // paid at the gate; the seeded empty book boot-loads as empty
         // Persist the charged purse and the seeded (empty) book together
         // through the fenced escrow save.
         this.markGuildBankDirty(s, guildId);
@@ -2034,17 +2064,37 @@ export class GameServer {
       // Disband committed (the empty-bank guard passed): evict the book so the
       // map stays bounded and a re-created guild id can never inherit a stale
       // book. The guild_banks row cascaded away with the guilds DELETE. Every
-      // session's pending dirty mark for the guild clears too: with the book
-      // evicted the null-serialize skip already keeps saves from writing it,
-      // but a cleared mark also stops re-serialization attempts against a
-      // guild id whose row no longer exists.
+      // session's pending dirty mark (and unflushed-op log) for the guild
+      // clears too: with the book evicted the null-serialize skip already
+      // keeps saves from writing it, but a cleared mark also stops
+      // re-serialization attempts against a guild id whose row no longer
+      // exists. (With the fail-closed holdings read below, a disband can no
+      // longer commit while any session holds a mark, so this loop is
+      // belt-and-suspenders.)
       onGuildDisbanded: (guildId) => {
         this.sim.evictGuildBank(guildId);
-        for (const s of this.clients.values()) s.dirtyGuildBanks.delete(guildId);
+        for (const s of this.sessionsByCharacterId.values()) {
+          s.dirtyGuildBanks.delete(guildId);
+          s.unflushedGuildBankOps.delete(guildId);
+        }
       },
       // The disband guard's read: the LIVE sim book's holdings (null with no
-      // loaded book; the guard fails closed on null).
-      guildBankHoldings: (guildId) => this.sim.guildBankHoldings(guildId),
+      // loaded book; the guard fails closed on null). ALSO fails closed (null)
+      // while ANY session holds an unflushed dirty mark for the guild: the
+      // live book proves only live state, and a disband would cascade-delete
+      // the DURABLE row while the ops that emptied it are not yet durable (a
+      // crash before that session's save would then destroy the escrow value
+      // outright). Scanned over sessionsByCharacterId, not clients, because a
+      // mid-leave session's flush is still in flight and its books must keep
+      // the guard closed until the flush commits. Self-heals within one
+      // autosave interval; the guard's refusal line already tells the actor
+      // to retry.
+      guildBankHoldings: (guildId) => {
+        for (const s of this.sessionsByCharacterId.values()) {
+          if (s.dirtyGuildBanks.has(guildId)) return null;
+        }
+        return this.sim.guildBankHoldings(guildId);
+      },
       isBlocking: (recipientId, senderCharacterId) => {
         const s = this.sessionByCharacterId(recipientId);
         return s ? s.blockedIds.has(senderCharacterId) : false;
@@ -3052,6 +3102,7 @@ export class GameServer {
       blockListLoaded: false,
       guildStampSeq: 0,
       dirtyGuildBanks: new Map(),
+      unflushedGuildBankOps: new Map(),
       ignoredIds: new Set(),
       lastWhisperFrom: null,
       rememberedChat: { channel: 'say' },
@@ -3429,6 +3480,15 @@ export class GameServer {
       } catch (err) {
         if (attempt === LEAVE_SAVE_MAX_ATTEMPTS) {
           console.error(`save on leave failed after ${attempt} attempts for ${session.name}:`, err);
+          // This session will never save again, so any guild books it
+          // dirtied are permanently unflushable: the live book is ahead of
+          // durable truth with no session left to converge it, and the
+          // disband guard (which scans session marks) loses sight of it the
+          // moment this session tears down. Reconcile now, exactly like the
+          // fence-out arm (Guild Bank Phase 3 QA).
+          if (session.dirtyGuildBanks.size > 0) {
+            await this.reconcileUnflushableGuildBooks(session, [...session.dirtyGuildBanks.keys()]);
+          }
           return;
         }
         const retryMs = Math.min(
@@ -3503,14 +3563,27 @@ export class GameServer {
         // save (their commit is self-consistent for the book, while this
         // character half is not yet durable). That cross-officer skew window
         // is the same structural risk the World Market accepts today
-        // (accepted, documented in docs/guild-bank/state.md); the one arm
-        // that would make it a RELIABLE dupe (a fenced-out session leaving
-        // the live book permanently ahead of durable truth) is closed by
-        // reconcileFencedOutGuildBooks below.
+        // (accepted, documented in docs/guild-bank/state.md); the arms that
+        // would make it a RELIABLE dupe (a session leaving the live book
+        // permanently ahead of durable truth after a fence-out or an
+        // exhausted leave flush) are closed by
+        // reconcileUnflushableGuildBooks.
         const carriedGuildBankSeqs: [number, number][] = [];
+        // How many unflushed-op log entries per guild this save's snapshot
+        // includes (captured with the serialization): a commit consumes
+        // exactly that many from the front of each log, so a mid-save op's
+        // entry survives alongside its surviving dirty mark.
+        const carriedGuildBankOpCounts = new Map<number, number>();
         const collectBooks = () => {
           carriedGuildBankSeqs.length = 0;
-          for (const entry of session.dirtyGuildBanks) carriedGuildBankSeqs.push(entry);
+          carriedGuildBankOpCounts.clear();
+          for (const entry of session.dirtyGuildBanks) {
+            carriedGuildBankSeqs.push(entry);
+            carriedGuildBankOpCounts.set(
+              entry[0],
+              session.unflushedGuildBankOps.get(entry[0])?.length ?? 0,
+            );
+          }
           return collectGuildBankSaves(
             (guildId) => this.sim.serializeGuildBank(guildId),
             carriedGuildBankSeqs.map(([guildId]) => guildId),
@@ -3568,8 +3641,9 @@ export class GameServer {
           // whose character half just rolled back: the sim is now AHEAD of
           // durable state, and another officer's later save could persist the
           // book half without its paired character half (the dupe shape).
-          // Reload those books from durable truth where it is safe to do so.
-          await this.reconcileFencedOutGuildBooks(
+          // Reload those books from durable truth, or surgically revert this
+          // session's orphaned ops where another session is dirty.
+          await this.reconcileUnflushableGuildBooks(
             session,
             carriedGuildBankSeqs.map(([guildId]) => guildId),
           );
@@ -3588,10 +3662,17 @@ export class GameServer {
         session.lastSave = Date.now();
         // The carried books are durable too: release their dirty marks, but
         // only where the seq is unchanged (a mid-save op re-dirtied the book
-        // with state this commit did not include).
+        // with state this commit did not include), and consume the committed
+        // prefix of each unflushed-op log (a mid-save op's entry survives).
         for (const [guildId, seq] of carriedGuildBankSeqs) {
           if (session.dirtyGuildBanks.get(guildId) === seq) {
             session.dirtyGuildBanks.delete(guildId);
+          }
+          const committed = carriedGuildBankOpCounts.get(guildId) ?? 0;
+          const log = session.unflushedGuildBankOps.get(guildId);
+          if (log) {
+            log.splice(0, committed);
+            if (log.length === 0) session.unflushedGuildBankOps.delete(guildId);
           }
         }
         // The blob is durable: publish every unlock it contains. A rejected
@@ -3737,31 +3818,67 @@ export class GameServer {
     session.dirtyGuildBanks.set(guildId, (session.dirtyGuildBanks.get(guildId) ?? 0) + 1);
   }
 
-  // After a fence-out (a same-account takeover), the character half of the
-  // escrow rolled back but this session's guild-book mutations remain in the
-  // LIVE book. Where no OTHER live session holds a dirty mark for the guild,
-  // evict the book and reload it from the DB row, returning live state to
-  // durable truth (ops in the brief evicted window refuse silently and never
-  // lazily create a book; an oversized or malformed row stays unloaded, the
-  // boot rule). Where another session IS dirty, the live book is left alone:
-  // that session's own escrow save flushes it, and discarding it would
-  // destroy their legitimate unflushed ops; the displaced session's orphaned
-  // mutation riding that flush is the accepted market-precedent skew
-  // documented in docs/guild-bank/state.md.
-  private async reconcileFencedOutGuildBooks(
-    fenced: ClientSession,
+  // The refusal/error arm of the reserve-at-gate creation fee: return the
+  // reserved copper to the founder's purse. Consumes the pending reservation
+  // exactly once (the success arm consumed it instead when the create
+  // committed). A founder who left before the refusal arm ran cannot be
+  // refunded in the live sim; that arm is logged LOUDLY for operator
+  // compensation (rare: it needs a refused create racing a logout).
+  private refundGuildCreateFee(characterId: number): void {
+    const fee = this.pendingGuildCreateFees.get(characterId);
+    if (!fee) return; // already consumed by the success arm
+    this.pendingGuildCreateFees.delete(characterId);
+    if (fee.amount <= 0) return;
+    const s = this.sessionsByCharacterId.get(characterId);
+    const refunded = s ? this.sim.refundGuildCreationFeeFor(s.pid, fee.amount) : 0;
+    if (refunded !== fee.amount) {
+      console.error(
+        `guild create fee refund could not be applied for character ${characterId}: reserved ${fee.amount}, refunded ${refunded}; operator compensation needed`,
+      );
+    }
+  }
+
+  // When this session's escrow can never commit again, its guild-book
+  // mutations remain in the LIVE book while the character half rolled back
+  // (fence-out: a same-account takeover) or never landed (the leave flush
+  // exhausted its retries). Two arms, both returning live state to what the
+  // next durable commit will contain:
+  // - Where no OTHER session holds a dirty mark for the guild, evict the book
+  //   and reload it from the DB row, returning live state to durable truth
+  //   (ops in the brief evicted window refuse silently and never lazily
+  //   create a book; an oversized or malformed row stays unloaded, the boot
+  //   rule).
+  // - Where another session IS dirty, an evict would destroy that session's
+  //   legitimate unflushed ops, so instead the dead session's own unflushed
+  //   deltas are surgically REVERTED from the live book (the recorded
+  //   unflushedGuildBankOps log, newest first), leaving the other session's
+  //   ops intact. Without the revert, the orphaned ops would ride the other
+  //   session's next save: a deterministic, attacker-timable dupe (Phase 3
+  //   QA BLOCKING). The residue where another officer already consumed the
+  //   un-durable value before this reconcile is the narrowed accepted risk
+  //   in docs/guild-bank/state.md.
+  // Both scans run over sessionsByCharacterId, not clients: a mid-leave
+  // session's flush is still in flight and still commits its own books.
+  private async reconcileUnflushableGuildBooks(
+    dead: ClientSession,
     guildIds: number[],
   ): Promise<void> {
     for (const guildId of guildIds) {
       let anotherSessionDirty = false;
-      for (const s of this.clients.values()) {
-        if (s !== fenced && s.dirtyGuildBanks.has(guildId)) {
+      for (const s of this.sessionsByCharacterId.values()) {
+        if (s !== dead && s.dirtyGuildBanks.has(guildId)) {
           anotherSessionDirty = true;
           break;
         }
       }
-      if (anotherSessionDirty) continue;
-      fenced.dirtyGuildBanks.delete(guildId);
+      const deadOps = dead.unflushedGuildBankOps.get(guildId) ?? [];
+      dead.dirtyGuildBanks.delete(guildId);
+      dead.unflushedGuildBankOps.delete(guildId);
+      if (anotherSessionDirty) {
+        // Surgical revert: undo ONLY the dead session's unflushed ops.
+        this.sim.revertGuildBankDeltas(guildId, deadOps);
+        continue;
+      }
       // Evict FIRST: if the reload read fails, an inert (absent) book is the
       // fail-safe state; a book known to be ahead of durable truth is not.
       this.sim.evictGuildBank(guildId);
@@ -3801,6 +3918,21 @@ export class GameServer {
     const guildId = this.sim.meta(pid)?.guildMembership?.guildId;
     if (guildId === undefined) return;
     this.markGuildBankDirty(session, guildId);
+    // Record the op in the session's unflushed log (consumed by the escrow
+    // save's commit; reverted by reconcileUnflushableGuildBooks when this
+    // session can never commit again while another session is dirty).
+    const log = session.unflushedGuildBankOps.get(guildId) ?? [];
+    for (const d of deltas) {
+      log.push({
+        op,
+        itemId: d.itemId,
+        count: d.count,
+        instance: (d.instance ?? null) as GuildBankOpDelta['instance'],
+        craftedRecipeId: d.craftedRecipeId ?? null,
+        copperDelta: d.copperDelta,
+      });
+    }
+    session.unflushedGuildBankOps.set(guildId, log);
     recordGuildBankDeltas(op, session, guildId, deltas);
   }
 
@@ -5252,12 +5384,18 @@ export class GameServer {
           // The creation-fee gate, BEFORE any DB work (Guild Bank Phase 3):
           // a founder whose sim purse cannot cover GUILD_CREATION_FEE_COPPER
           // is refused right here, so a refused create never touches the
-          // database. The charge itself happens in the create's success arm
-          // (onGuildCreated), AFTER the guild row commits: create-then-charge,
-          // because a crash between the two must yield a free guild, never
-          // gold lost to a guild that does not exist. The English literal is
-          // re-localized client-side (src/ui/server_i18n.ts guild.createFee,
-          // pinned byte-for-byte in tests/server_i18n.test.ts).
+          // database. RESERVE-AT-GATE (Phase 3 QA, revising the original
+          // create-then-charge decision in state.md): the fee is deducted
+          // SYNCHRONOUSLY here, in the same tick as the gate check, and
+          // refunded on every refusal arm (guildCreate returning false) or
+          // error. Charging after the commit left a deterministic exploit: a
+          // client could pipeline guild_create with a spend so the deferred
+          // clamped charge collected residue, or log out before the commit
+          // and pay nothing. A crash between this reserve and the commit
+          // loses at most the fee for at most one autosave window, the
+          // deliberate trade. The English literal is re-localized client-side
+          // (src/ui/server_i18n.ts guild.createFee, pinned byte-for-byte in
+          // tests/server_i18n.test.ts).
           const meta = this.sim.meta(pid);
           if (!meta || meta.copper < GUILD_CREATION_FEE_COPPER) {
             // 10,000 copper to the gold; the whole-gold amount keeps the
@@ -5266,7 +5404,24 @@ export class GameServer {
             this.sendChatNotice(session, `You need ${goldAmount} gold to found a guild.`);
             break;
           }
-          void this.social.guildCreate(this.actorFor(session), msg.name).catch(logSocialErr);
+          // At most one reservation per character: a pipelined second create
+          // while one is in flight is dropped (the double-click race), so the
+          // success/refund arms can never mismatch reservations.
+          if (this.pendingGuildCreateFees.has(session.characterId)) break;
+          const charged = this.sim.chargeGuildCreationFeeFor(pid);
+          this.pendingGuildCreateFees.set(session.characterId, {
+            accountId: session.accountId,
+            amount: charged,
+          });
+          void this.social
+            .guildCreate(this.actorFor(session), msg.name)
+            .then((created) => {
+              if (!created) this.refundGuildCreateFee(session.characterId);
+            })
+            .catch((err) => {
+              logSocialErr(err);
+              this.refundGuildCreateFee(session.characterId);
+            });
         }
         break;
       case 'guild_invite':
