@@ -106,15 +106,21 @@ const branch =
   spawnSync('git', ['branch', '--show-current'], { encoding: 'utf8', shell }).stdout?.trim() ?? '';
 const releaseTier = branch.startsWith('release/');
 // Base env for every step. Per-step overlays (e.g. pretest skip on vitest) merge on top.
-const baseEnv = releaseTier ? { ...process.env, I18N_RELEASE_TIER: '1' } : { ...process.env };
+// The release tier is NOT applied here. It rides on the one dedicated vitest step
+// buildFullGateSteps adds for a release branch (lib/gate_steps.mjs), mirroring the
+// release-i18n job in ci.yml: the full suite stays at PR tier so a red there always
+// means a real regression, never an outstanding locale fill (issue #2820).
+const baseEnv = { ...process.env };
 
 // Shared step list (Phase 2 generate-once + Phase 8 turbo cacheable pure steps).
 // The bot build rides inside buildFullGateSteps (scripts/lib/gate_steps.mjs), so
 // the packet's R7 step stays in every consumer of the shared list.
-const steps = buildFullGateSteps(workers);
+const steps = buildFullGateSteps(workers, { releaseTier });
 
 if (releaseTier) {
-  console.log(`[gate] release branch "${branch}": running release-tier (I18N_RELEASE_TIER=1)`);
+  console.log(
+    `[gate] release branch "${branch}": adding the release-tier i18n step (I18N_RELEASE_TIER=1)`,
+  );
 }
 
 for (const { name, cmd, args, hint, env: envOverlay } of steps) {

@@ -201,8 +201,10 @@ Dry-run the release gate locally with `I18N_RELEASE_TIER=1 npm test`.
    `src/admin/i18n.locales/` for the admin app).
 3. `npm run i18n:build && npm run i18n:admin && npm run i18n:scan` to regenerate
    the resolved tables and the status registry.
-4. Commit, then ship from a `release/**` branch where the release-tier gate
-   enforces `pending = 0`.
+4. Commit, then ship from a `release/**` branch where the release-tier gate enforces
+   `pending = 0`. That gate is its own CI job (`release-i18n`) and its own local gate
+   step (`vitest (release-tier i18n)`), split out from the full test run by #2820 so an
+   outstanding fill can never mask a real test failure.
 
 ## Admin parity
 
