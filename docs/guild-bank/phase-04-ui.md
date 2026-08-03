@@ -68,6 +68,20 @@ STEP 5 - ACCEPTANCE:
 - [ ] Every action round-trips through the facet; refusals surface localized.
 - [ ] View-core suite green in Node; architecture + budget guards green; screenshots
       committed and referenced.
+- [ ] (Phase 3 QA carried-forward) NO new client command or server path mutates a guild
+      book outside the existing five guild_bank_* tokens: every server-side book mutation
+      MUST flow through runGuildBankOp (server/game.ts), whose before/after diff feeds
+      BOTH the bank_ledger rows and the per-session unflushed-delta log that the
+      fence-out revert (Sim.revertGuildBankDeltas) depends on. A mutation that bypasses
+      the observer silently breaks the anti-dupe guarantee.
+- [ ] (Phase 3 QA carried-forward) A pipe-refused (dormant) slot arrives with a
+      publicInstanceView projection and is refused in both directions: the Guild tab
+      must render it visibly distinct (unwithdrawable), because such a slot also blocks
+      disband forever (the documented v1 limitation in state.md); do not hide it.
+- [ ] (Phase 3 QA carried-forward) The disband/last-member-leave refusal line can fire
+      transiently while an emptying op is still unflushed (fail-closed guard, self-heals
+      within one autosave interval): surface the server line as-is, no special client
+      error state.
 
 STEP 6 - DOCS: update progress.md + state.md ledger (modules, keys, screenshots).
 

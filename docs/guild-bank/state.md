@@ -21,9 +21,20 @@ Current phase: Phase 3 complete (2026-08-02); Phase 3 QA next.
   in BOTH directions (withdraw refuses too, so a tampered/legacy row can never complete
   a laundering; the copy stays dormant in the book). Instanced stacks move whole
   (`moveBetweenContainers`); items are never destroyed by any load or refusal path.
-- Disband refused while the bank holds any copper or item.
-- Creation fee ordering: create the guild in the DB first, then deduct the fee in the sim
-  and save; a crash between them yields a free guild, never lost gold. Never charge first.
+- Disband refused while the bank holds any copper or item, AND (Phase 3 QA) while any
+  session still holds an unflushed dirty mark for the guild's book: the guard proves live
+  state only, and the cascade destroys the DURABLE row, so an unflushed emptying op must
+  flush before a disband can pass (self-heals within one autosave interval).
+- Creation fee ordering (REVISED by Phase 3 QA; supersedes the original create-then-charge
+  line): RESERVE-AT-GATE. The fee is deducted synchronously at the guild_create dispatch
+  gate, before any DB work, and refunded on every refusal arm (guildCreate returns the
+  committed-success boolean; the error arm refunds too). The success arm consumes the
+  reservation (create_fee ledger row + escrow save). Rationale: charging after the commit
+  left a deterministic exploit (pipeline guild_create with a spend and found the guild for
+  the clamped residue, or log out before the commit and pay nothing, unaudited); the new
+  ordering's crash window loses at most the fee for at most one autosave interval, the
+  right trade. At most one reservation per character; a refund whose founder already left
+  is logged loudly for operator compensation.
 - Ledger: same `bank_ledger` table, `container = 'guild'`, `container_id = guild id`, ops
   `deposit_gold | withdraw_gold | deposit | withdraw | buy_slots | create_fee`.
   Keep-forever retention re-affirmed with an explicit comment at the retention-sweep
@@ -261,18 +272,111 @@ Current phase: Phase 3 complete (2026-08-02); Phase 3 QA next.
   - i18n: `guild.createFee` (parameterized, + RULES row) and `guild.bankNotEmpty`
     (exact) in `src/ui/server_i18n.ts` (14 blocks) and `server_i18n.newlocales.ts`
     (8 blocks); byte-bound sample pins in `tests/server_i18n.test.ts`.
+  - Phase 3 QA drift (fresh auditor; fixes landed as four fix commits on top of
+    4a7d3c2b6):
+    - `SocialService.guildCreate` returns `Promise<boolean>`: true ONLY on the committed
+      success arm (after `onGuildCreated` consumed the fee reservation); false on every
+      refusal. The dispatch gate charges the fee synchronously BEFORE calling it
+      (reserve-at-gate, see the revised locked decision above) and refunds on
+      false/throw via `GameServer.refundGuildCreateFee` + `Sim.refundGuildCreationFeeFor`;
+      `pendingGuildCreateFees` (character id -> reservation) allows one in-flight create
+      per character and is consumed exactly once by success OR refund.
+    - New sim surface: `revertGuildBankDeltas` / `refundGuildCreationFee` free functions
+      (+ facade delegates) and the `GuildBankOpDelta` type; `BankOpDelta` (server) gained
+      optional `craftedRecipeId`, populated for guild item deltas only (not a ledger
+      column; the revert path restores provenance with it).
+    - `ClientSession.unflushedGuildBankOps` mirrors `dirtyGuildBanks` with the actual
+      deltas; the escrow save consumes the committed prefix per guild; every guild bank
+      mutation MUST flow through `runGuildBankOp` so the log stays complete (a mutation
+      that bypasses the observer breaks the revert guarantee AND the ledger).
+    - `reconcileFencedOutGuildBooks` renamed `reconcileUnflushableGuildBooks`; it also
+      runs from the exhausted leave flush, scans `sessionsByCharacterId` (not `clients`,
+      which loses mid-leave sessions), and its another-session-dirty arm REVERTS the dead
+      session's deltas instead of skipping.
+    - The transport `guildBankHoldings` fails closed (null) while ANY session holds an
+      unflushed dirty mark for the guild; both guild-deleting guards inherit it.
+    - `onGuildDisbanded` clears every session's dirty mark AND unflushed-op log (pinned).
+    - Escrow snapshot consistency (the database-review BLOCKING): `saveCharacter`
+      re-serializes the character INSIDE the queued serial-writer thunk (applyFixups +
+      fresh serialize) so both escrow halves capture ONE instant; an op dispatched
+      during the queue wait can no longer land in both halves (deposit) or neither
+      (withdraw). Covers the market sibling's same latent shape.
+    - Hot-path bounds: `server/guild_bank_op_guard.ts` (burst 10, refill 2/s, drops
+      tally into the abuse window; WS_DROP_CAUSES += 'guild_bank', pins updated);
+      `GUILD_BANK_UNFLUSHED_OP_CAP` = 500 per guild per session (overflow drops the
+      surgical revert: `revertLostGuildBanks` forces the evict-and-reload arm);
+      reconcile reads retry 3x like the boot load; `loadGuildBankRows` keyset-batches
+      (`GUILD_BANK_BOOT_BATCH` = 500) with ONE octet_length evaluation (LATERAL) on the
+      heavy statement allowance and surfaces `dataBytes` (soft size warn at a quarter
+      of the hard bound); `collectGuildBankSaves` sorts ascending (global row-lock
+      order); the shared market writer warns at queue depth 16.
+    - Revert-path provenance (the architecture review): the guild differ keys slots by
+      itemId + instance + craftedRecipeId (`countByGuildKey`; the personal `slotKey`
+      keeps two dimensions), the deposit-undo matches all three dimensions, the
+      withdraw-undo grants through `addStacked` (stack caps + provenance-keyed merge),
+      and instance equality is canonical sorted-key JSON (a JSONB round trip reorders
+      keys). The sim/server op vocabularies are pinned in lockstep both ways.
+    - The fee gate refuses (and refunds) a SHORT charge (`charged <
+      GUILD_CREATION_FEE_COPPER`): a meta-only pid can never found a free or
+      discounted guild.
 - Phase 4 UI modules / i18n keys / screenshots:
 
-## Accepted risks and operational assumptions (Phase 3 review outcomes)
-- Cross-officer escrow skew (ACCEPTED, market precedent): the escrow TRANSACTION is
-  atomic, but the book is shared multi-writer state, so officer B's save can persist
-  the live book (including officer A's not-yet-durable op) before A's character half
-  commits; a crash in that window tears A's escrow. The World Market has the same
-  structural window today. The one arm that made it a RELIABLE dupe, a fenced-out
-  session leaving the live book permanently ahead of durable truth, is CLOSED:
-  `reconcileFencedOutGuildBooks` (server/game.ts) evicts and reloads the touched
-  books from the DB after a fence-out unless another live session holds a dirty mark
-  (then that session's own escrow flush covers the book).
+## Accepted risks and operational assumptions (Phase 3 review + Phase 3 QA outcomes)
+- Cross-officer escrow skew (ACCEPTED, market precedent, NARROWED by Phase 3 QA to the
+  genuinely crash-windowed arm): the escrow TRANSACTION is atomic, but the book is shared
+  multi-writer state, so officer B's save can persist the live book (including officer
+  A's not-yet-durable op) before A's character half commits; a CRASH in that window tears
+  A's escrow. The World Market has the same structural window today. Both arms that made
+  it a RELIABLE (attacker-timable) dupe are CLOSED:
+  - A fenced-out session leaving the live book permanently ahead of durable truth:
+    `reconcileUnflushableGuildBooks` (server/game.ts) evicts and reloads the touched
+    books from the DB after a fence-out (and after an exhausted leave flush).
+  - The former skip arm (another live session holds a dirty mark, so the book could not
+    be evicted): the dead session's ops are now surgically REVERTED from the live book
+    via its per-session unflushed-delta log (`Sim.revertGuildBankDeltas`), so they can
+    never ride another officer's save. Was the Phase 3 QA privacy-security BLOCKING
+    (a two-account self-takeover dupe with no crash needed).
+  Residue, accepted: when another officer CONSUMED the un-durable value inside the window
+  (withdrew the copper or the copy before the depositor's reconcile ran), the inverse
+  clamps at zero / no-ops on the missing copy rather than clawing back from the consumer;
+  reaching it needs two officer accounts interleaving ops with a fence-out inside one
+  autosave interval, and the fenced-out op's ledger rows remain as the evidence trail.
+- Ledger rows for fenced-out (reverted) ops remain in bank_ledger by design: the audit
+  script may flag them against the book; that finding points at the incident the loud
+  fence-out log recorded (see the operator caveat in scripts/bank_audit.mjs: audit a
+  quiesced realm).
+- Dormant pipe-refused slots can make a bank permanently non-emptiable (DEFERRED, v1
+  limitation): an item a later content update flags soulbound/noMarketList is refused in
+  BOTH directions (anonymous-pipe policy), so it can never be withdrawn, and the disband
+  guard then refuses forever. Known and deliberate for v1 (items are never destroyed);
+  requires an admin escape hatch (an operator tool that mails the dormant copy back to
+  its depositor or archives the book) before it can bite a real guild. Tracked in
+  progress.md deferrals; the future PR body must call it out.
+- reconcileUnflushableGuildBooks' dirty-scan pair (the another-session-dirty check and
+  the mark/log consumption) runs synchronously before its first await; any future edit
+  that splits them across an await reopens a mark-release race. Same trap class for the
+  collectBooks capture inside the queued save closure.
+- A create-fee reservation whose refund arm finds the founder gone (refused create racing
+  a clean logout) cannot refund in the live sim; it is logged loudly for operator
+  compensation, and no create_fee ledger row is written for it. Watch item: a refund
+  landing on a RECONNECTED session's freshly loaded purse is correct only because the
+  leave flush persists the charged purse first (the mismatch arm logs loudly).
+- During a reconcile's evict-and-reload window (up to ~1s, longer on a sick DB), that
+  guild's ops refuse SILENTLY and guildBankInfoFor reads null: the sim's host-wiring
+  silence, now host-created at runtime, accepted (self-heals when the reload lands; the
+  Phase 4 tab simply shows no guild bank for the moment).
+- `GuildBankSimPort` exposes the raw `Sim.guildBanks` map read-only for the boot has()
+  verification (the one facade bypass, read-only and test-visible); a future
+  `Sim.hasGuildBank` could remove it.
+- Deferred from the Phase 3 QA database review (recorded, not fixed; escalation
+  triggers named): per-guild autosave serializer if the shared-writer depth warn fires
+  in production; keyset pagination + realm/container filters for scripts/bank_audit.mjs
+  once bank_ledger reaches millions of rows; bank_ledger index calculus (the created_at
+  index has no reader under keep-forever; no (container, container_id) index until a
+  per-guild reader exists); gameMetricsCounters for escrow-save failures / fence-outs /
+  reconciles / unloaded books (console.error is the current signal); the O(live
+  sessions) guildBankHoldings scan (client-triggerable but cheap; refcount it if
+  profiling ever shows it).
 - Single-writer assumption: guild_banks rows carry NO optimistic-concurrency stamp
   (no version column); correctness rests on one realm process owning a guild's book
   (the repo's one-process-per-realm model) plus the per-process market serial writer.

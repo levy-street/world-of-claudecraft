@@ -7,7 +7,7 @@
 | Phase 2: ops and wire | Done | 2026-08-02 | 2026-08-02 |
 | Phase 2 QA | Done (PASS-WITH-FOLLOWUPS) | 2026-08-02 | 2026-08-02 |
 | Phase 3: persistence | Done | 2026-08-02 | 2026-08-02 |
-| Phase 3 QA | Not started | | |
+| Phase 3 QA | Done (PASS-WITH-FOLLOWUPS) | 2026-08-02 | 2026-08-02 |
 | Phase 4: UI | Not started | | |
 | Phase 4 QA (final, offers teardown) | Not started | | |
 
@@ -43,8 +43,9 @@
       fence; rollback on fence miss; round-trip + crash-shape tests.
 - [x] Ledger observer for guild ops (`container='guild'`), `create_fee` row, audit script
       compatibility; keep-forever comment at the retention registration site.
-- [x] Creation fee at `guild_create` dispatch (create-then-charge ordering) + refusal when
-      poor; disband guard while bank non-empty; tests for both.
+- [x] Creation fee at `guild_create` dispatch (create-then-charge ordering, REVISED to
+      reserve-at-gate by Phase 3 QA, see state.md) + refusal when poor; disband guard
+      while bank non-empty; tests for both.
 
 ## Phase 4 deliverables
 - [ ] Guild tab in the bank window (renders only when `guildBankInfo` is present), view
@@ -61,6 +62,60 @@
 Phase 1 QA: both lines verified and closed on 2026-08-02 (see Notes).
 
 ## Notes
+Phase 3 QA (2026-08-02), fresh auditor, verdict PASS-WITH-FOLLOWUPS (after fixes):
+- The three reviewer lenses the implementer had only self-reviewed (progress note
+  below) were RE-DISPATCHED fresh, serially: privacy-security-review CHANGES
+  REQUESTED (1 BLOCKING, 3 SHOULD-FIX, 8 NOTE), database-performance-reviewer
+  CHANGES REQUESTED (1 BLOCKING, 6 SHOULD-FIX, 6 NOTE), architecture-reviewer
+  CHANGES REQUESTED (0 BLOCKING, 5 SHOULD-FIX, 8 NOTE). Every BLOCKING and every
+  cheap SHOULD-FIX was fixed in this pass (four fix commits); the scale-dependent
+  SHOULD-FIX remainders are recorded as deferrals with escalation triggers in
+  state.md. All five 328d31ffa migration-safety fixes were confirmed in the
+  committed code; the one missing decisive test (onGuildDisbanded clearing every
+  session's dirty mark) was added.
+- Security BLOCKING fixed: the fence-out reconcile's skip arm (another session
+  dirty) left a deterministic two-account dupe (alt parks a dirty mark, main
+  deposits, main self-takeover fences out, alt's save persists the orphaned book
+  half). Sessions now log their unflushed deltas and the reconcile surgically
+  REVERTS the dead session's ops (Sim.revertGuildBankDeltas); two-session
+  regression pinned. The accepted-risk record in state.md was narrowed to the
+  genuinely crash-windowed arm.
+- Security SHOULD-FIX fixed: the fee moved to RESERVE-AT-GATE (charged
+  synchronously at dispatch, refunded on every refusal arm, guildCreate returns
+  the committed-success boolean), closing the pipelined-spend and logout fee
+  dodges; the locked state.md decision was revised with the new rationale. A
+  short gate charge refuses and refunds (no free guild for a meta-only pid).
+- Database BLOCKING fixed: saveCharacter serialized the character BEFORE the
+  serial-writer wait and the book INSIDE it, so an op dispatched during the wait
+  committed two instants (deposit in both halves, withdraw in neither); both
+  halves now snapshot in one synchronous step inside the queued thunk, pinned by
+  a writer-held-busy regression.
+- Database SHOULD-FIX fixed: per-session guild-bank op token bucket
+  (server/guild_bank_op_guard.ts; every allowed op is a keep-forever ledger row),
+  the unflushed-op log cap with evict-and-reload fallback, reconcile read retries,
+  keyset-batched boot read with single octet_length evaluation on the heavy
+  allowance, ascending-guild-id upsert order, writer queue-depth warn, soft
+  row-size watch, audit-script statement timeout + bank-slice-only character read.
+- Architecture SHOULD-FIX fixed: the guild ledger differ and the revert path are
+  provenance-exact (craftedRecipeId as a third key dimension; deposit-undo
+  matches it; withdraw-undo grants through addStacked so stack caps hold) and
+  instance equality is canonical sorted-key JSON (JSONB round trips reorder
+  keys). Sim/server op vocabularies pinned in lockstep; stale create-then-charge
+  narration corrected everywhere; src/sim/CLAUDE.md module row updated.
+- My own atomicity lens (beyond the reviewers): exactly ONE guild_banks write
+  statement exists, fenced at both call sites; the empty-bank disband guard
+  proved LIVE state while the cascade destroys DURABLE state, so the transport
+  holdings read now fails closed while ANY session (including mid-leave, via
+  sessionsByCharacterId) holds an unflushed mark; an exhausted leave flush
+  reconciles its unflushable books; both fixes pinned.
+- Deferred (state.md records each with its trigger): per-guild autosave
+  serializer, audit pagination, ledger index calculus, metrics counters, the
+  holdings scan refcount, the dormant-slot admin escape hatch (v1 limitation:
+  a pipe-refused slot blocks disband forever), the reconcile-window silence.
+- Validation: tsc clean; the 15-suite matrix 471 passed / 3 skipped; npm run
+  build:server green; npm run ci:changed exit 0; scripts/bank_audit.mjs exit 0
+  against the dev DB.
+
 Phase 3 review (2026-08-02): migration-safety ran as a dispatched agent and reported
 2 BLOCKING + 1 BLOCKING-class escrow finding + 5 SHOULD-FIX + 3 NOTE; the other three
 reviewer agents (database-performance, privacy-security, architecture) were lost to
