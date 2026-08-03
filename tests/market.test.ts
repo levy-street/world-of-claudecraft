@@ -541,6 +541,44 @@ describe('the World Market — the Merchant', () => {
     expect(sim.marketInfoFor(seller)?.collectionCopper).toBe(95);
   });
 
+  it('the rename sweep also re-keys the SIGNER inside escrowed listings and collections', () => {
+    // The owner rekey above renames who OWNS the row. Since #2507 an instanced
+    // copy can be escrowed IN the row, and its signer is a separate string that
+    // the owner rekey never touched: cancelling the listing after a rename used
+    // to hand back a copy signed by a name that no longer exists.
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    standAtMerchant(sim, seller);
+    sim.addItemInstance('wolf_fang', { signer: 'Seller' }, seller, 1);
+    sim.marketListInstance('wolf_fang', 500, { signer: 'Seller' }, seller);
+    const listing = listingBy(sim, (l) => !!l.instance, 'instanced listing');
+    const internals = sim.market as unknown as {
+      marketCollections: Map<
+        string,
+        { copper: number; items: { instance?: { signer?: string } }[] }
+      >;
+    };
+    internals.marketCollections.set('99', {
+      copper: 0,
+      items: [{ itemId: 'wolf_fang', count: 1, instance: { signer: 'Seller' } } as never],
+    });
+
+    expect(sim.rekeyMarketSeller(77, 'Seller', 'Renamed')).toBe(true);
+    expect(listing.instance?.signer).toBe('Renamed');
+    expect(internals.marketCollections.get('99')?.items[0].instance?.signer).toBe('Renamed');
+  });
+
+  it('the rename sweep leaves a foreign signer in an escrowed listing alone', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    standAtMerchant(sim, seller);
+    sim.addItemInstance('wolf_fang', { signer: 'Someone Else' }, seller, 1);
+    sim.marketListInstance('wolf_fang', 500, { signer: 'Someone Else' }, seller);
+    const listing = listingBy(sim, (l) => !!l.instance, 'instanced listing');
+    sim.rekeyMarketSeller(77, 'Seller', 'Renamed');
+    expect(listing.instance?.signer).toBe('Someone Else');
+  });
+
   it('rejects a purchase the buyer cannot afford', () => {
     const sim = makeWorld();
     const seller = sim.addPlayer('warrior', 'Seller');

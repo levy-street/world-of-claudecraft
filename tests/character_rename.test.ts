@@ -1,6 +1,6 @@
 // Force-rename instance-signer sweep (src/sim/character_rename.ts):
-// the rewrite matrix over carried inventory, bank inventory, and the
-// equipped-instance map, the never-merges guarantee for slots the sweep
+// the rewrite matrix over carried inventory, bank inventory, vendor buyback,
+// and the equipped-instance map, the never-merges guarantee for slots the sweep
 // leaves byte-equal, and the behavior-follows pins: the #1145 self-signed
 // crafting discount and Battlefield Experience attribution both fire under
 // the NEW name over a swept state, through the real predicates.
@@ -176,5 +176,50 @@ describe('rekeyInstanceSigner (force-rename sweep)', () => {
     skills = emptyCraftSkills();
     expect(observe()).toBe(BATTLEFIELD_XP_TRICKLE);
     expect(skills.alchemy).toBe(BATTLEFIELD_XP_TRICKLE);
+  });
+});
+
+describe('the sweep reaches every container that can hold a payload', () => {
+  it('rewrites vendorBuyback alongside inventory, bank, and equipped', () => {
+    // vendorBuyback is a full InvSlot[] on CharacterState like the other two
+    // stores (items.ts recordVendorBuyback keeps the sold copy's payload
+    // verbatim so a buyback returns the SAME copy, #2412), so a rename that
+    // skips it hands back a piece signed by a name that no longer exists:
+    // the #1145 self-signed discount stops recognising it and it no longer
+    // stacks with its byte-equal peers.
+    const state = st({
+      inventory: [{ itemId: 'a', count: 1, instance: { signer: 'Oldname' } }],
+      bank: { inventory: [{ itemId: 'b', count: 1, instance: { signer: 'Oldname' } }] },
+      vendorBuyback: [
+        { itemId: 'c', count: 1, instance: { signer: 'Oldname', rolled: { masterwork: true } } },
+      ],
+      equipmentInstance: { chest: { signer: 'Oldname' } },
+    });
+    expect(rekeyInstanceSigner(state, 'Oldname', 'Newname')).toBe(true);
+    expect(state.inventory[0].instance?.signer).toBe('Newname');
+    expect(state.bank?.inventory[0].instance?.signer).toBe('Newname');
+    expect(state.vendorBuyback?.[0].instance?.signer).toBe('Newname');
+    expect(state.equipmentInstance?.chest?.signer).toBe('Newname');
+    // Nothing but the signer moves.
+    expect(state.vendorBuyback?.[0].instance?.rolled?.masterwork).toBe(true);
+  });
+
+  it('reports changed for a buyback-only match, so the caller still saves', () => {
+    // The return value gates the persist. A rename whose only stale signer sits
+    // in buyback must not read as "nothing to do".
+    const state = st({
+      inventory: [],
+      vendorBuyback: [{ itemId: 'c', count: 1, instance: { signer: 'Oldname' } }],
+    });
+    expect(rekeyInstanceSigner(state, 'Oldname', 'Newname')).toBe(true);
+  });
+
+  it('leaves a foreign signer in buyback alone', () => {
+    const state = st({
+      inventory: [],
+      vendorBuyback: [{ itemId: 'c', count: 1, instance: { signer: 'Somebody' } }],
+    });
+    expect(rekeyInstanceSigner(state, 'Oldname', 'Newname')).toBe(false);
+    expect(state.vendorBuyback?.[0].instance?.signer).toBe('Somebody');
   });
 });

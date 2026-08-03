@@ -15,7 +15,7 @@ import {
   MAIL_POSTAGE,
 } from '../src/sim/mail/post_office';
 import { Sim } from '../src/sim/sim';
-import { type SimEvent, type WorldContent } from '../src/sim/types';
+import type { SimEvent, WorldContent } from '../src/sim/types';
 
 // Mailboxes are system-owned and still spawn with this fixture. Ambient camps,
 // NPCs and quest objects are irrelevant to delivery/index invariants and would
@@ -688,5 +688,57 @@ describe('persistence and rename', () => {
     const row = save.mail.find((m) => m.subject === 'Hi');
     expect(row?.recipientKey).toBe('777');
     expect(row?.recipientName).toBe('Newname');
+  });
+
+  it('the rename sweep also re-keys the SIGNER inside an escrowed parcel', () => {
+    // The recipient rekey above renames who the letter is FOR. Since #2507 an
+    // instanced copy rides the raven, and its signer is a separate string the
+    // recipient rekey never touched, so a rename mid-flight used to deliver a
+    // copy signed by a name that no longer exists.
+    const sim = makeWorld();
+    const alice = sim.addPlayer('warrior', 'Alice');
+    sim.addPlayer('mage', 'Bob');
+    const aliceMeta = sim.meta(alice);
+    if (!aliceMeta) throw new Error('no meta');
+    aliceMeta.copper = 10_000;
+    moveToMailbox(sim, alice);
+    sim.addItemInstance('roasted_boar', { signer: 'Alice' }, alice, 1);
+    sim.drainEvents();
+    sim.mailSend(
+      'Bob',
+      'Signed',
+      'mine',
+      0,
+      [{ itemId: 'roasted_boar', count: 1, instance: { signer: 'Alice' } }],
+      alice,
+    );
+    const letter = sim.postOffice.mail.find((m) => m.subject === 'Signed');
+    expect(letter?.items[0]?.instance?.signer).toBe('Alice');
+
+    expect(sim.rekeyMailOwner(555, 'Alice', 'Alicia')).toBe(true);
+    expect(letter?.items[0]?.instance?.signer).toBe('Alicia');
+  });
+
+  it('the rename sweep leaves a foreign signer in an escrowed parcel alone', () => {
+    const sim = makeWorld();
+    const alice = sim.addPlayer('warrior', 'Alice');
+    sim.addPlayer('mage', 'Bob');
+    const aliceMeta = sim.meta(alice);
+    if (!aliceMeta) throw new Error('no meta');
+    aliceMeta.copper = 10_000;
+    moveToMailbox(sim, alice);
+    sim.addItemInstance('roasted_boar', { signer: 'Someone Else' }, alice, 1);
+    sim.drainEvents();
+    sim.mailSend(
+      'Bob',
+      'Foreign',
+      'theirs',
+      0,
+      [{ itemId: 'roasted_boar', count: 1, instance: { signer: 'Someone Else' } }],
+      alice,
+    );
+    const letter = sim.postOffice.mail.find((m) => m.subject === 'Foreign');
+    sim.rekeyMailOwner(555, 'Alice', 'Alicia');
+    expect(letter?.items[0]?.instance?.signer).toBe('Someone Else');
   });
 });
