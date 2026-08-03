@@ -533,7 +533,7 @@ describe('the voyage cinematic', () => {
       outCastOff: {
         start: { x: 0, y: 0, z: 0, yaw: 0 },
         end: { x: 22, y: 0, z: 7, yaw: 0 },
-        duration: 5.8,
+        duration: 6.8,
         ease: 'linear',
       },
       outOpenWater: {
@@ -551,7 +551,7 @@ describe('the voyage cinematic', () => {
       backCastOff: {
         start: { x: 0, y: 0, z: 0, yaw: 0 },
         end: { x: 22, y: 0, z: -7, yaw: 0 },
-        duration: 5.8,
+        duration: 6.8,
         ease: 'linear',
       },
       backOpenWater: {
@@ -575,22 +575,23 @@ describe('the voyage cinematic', () => {
     expect(back).toBeDefined();
     expect(q0).toBeDefined();
     if (!out || !back || !q0) return;
-    expect(out.duration).toBeCloseTo(28.35, 8);
-    expect(back.duration).toBeCloseTo(28.35, 8);
-    expect(q0.duration).toBeCloseTo(35.9, 8);
+    expect(out.duration).toBeCloseTo(27.15, 8);
+    expect(back.duration).toBeCloseTo(27.15, 8);
+    expect(q0.duration).toBeCloseTo(34.7, 8);
     const cameraTimes = (scene: typeof out): number[] =>
       scene.ops.flatMap((op) => (op.kind === 'camera' ? [op.at] : []));
-    expect(cameraTimes(out)).toEqual([expect.closeTo(2, 8), 7, 13, 19.05, 26.3]);
-    expect(cameraTimes(back)).toEqual([expect.closeTo(2, 8), 7, 13, 19.05, 26.3]);
-    expect(cameraTimes(q0)).toEqual([expect.closeTo(2, 8), 7, 13, 19.05, 26.95, 33.85]);
+    expect(cameraTimes(out)).toEqual([0, 7, 13, 19.05, 26.3]);
+    expect(cameraTimes(back)).toEqual([0, 7, 13, 19.05, 26.3]);
+    expect(cameraTimes(q0)).toEqual([0, 7, 13, 19.05, 26.95, 33.85]);
 
     for (const scene of [out, back, q0]) {
-      expect(scene.ops.filter((op) => op.at === 0 && op.kind === 'fade')).toEqual([
-        { at: 0, kind: 'fade', to: 'black', dur: 1.5 },
-      ]);
+      // Owner pass three: the scene opens on a hard cut, no fade at 0.
+      expect(scene.ops.filter((op) => op.at === 0 && op.kind === 'fade')).toEqual([]);
       const finalFade = scene.ops.filter((op) => op.kind === 'fade').at(-1);
       expect(finalFade).toMatchObject({ kind: 'fade', to: 'clear', dur: 2 });
-      expect(finalFade?.at).toBeCloseTo(scene === q0 ? 33.9 : 26.35, 8);
+      // The LAST fade in the whole scene is the second journey fade's
+      // reveal (the toll cut's for Q0): everything after is fade-free.
+      expect(finalFade?.at).toBeCloseTo(scene === q0 ? 27.45 : 13.5, 8);
     }
 
     const shotKinds = (scene: typeof out): string[] =>
@@ -776,32 +777,22 @@ describe('the voyage cinematic', () => {
     expect(back.ops.some((op) => op.kind === 'line')).toBe(false);
 
     for (const scene of [out, back]) {
-      const parkFade = scene.ops.flatMap((op) =>
-        op.kind === 'fade' && op.to === 'black' && op.at > 13 && op.at < 19.05
-          ? [{ at: op.at, dur: op.dur }]
-          : [],
+      // Owner pass three: the park transition is a HARD CUT, not a fade.
+      // No fade op lands between the arrival cut's reveal and the release.
+      const lateFades = scene.ops.filter((op) => op.kind === 'fade' && op.at > 13.5);
+      expect(lateFades).toEqual([]);
+      const parkShot = scene.ops.find(
+        (op) => op.kind === 'camera' && Math.abs(op.at - 19.05) < 1e-8,
       );
-      expect(parkFade).toHaveLength(1);
-      expect(parkFade.map((op) => op.dur)).toEqual([1.5]);
-      expect(parkFade[0]?.at).toBeCloseTo(17.05, 8);
+      expect(parkShot).toMatchObject({ kind: 'camera', shot: { kind: 'dolly', entry: 'snap' } });
     }
 
     const arrivalCutKinds = (scene: typeof out) =>
       scene.ops
         .filter((op) => Math.abs(op.at - 19.05) < 1e-8)
         .map((op) => (op.kind === 'prop' ? `${op.kind}/${op.cue}` : op.kind));
-    expect(arrivalCutKinds(out)).toEqual([
-      `prop/${LB_PROP_CUE_PARK}`,
-      'playerWalk',
-      'fade',
-      'camera',
-    ]);
-    expect(arrivalCutKinds(back)).toEqual([
-      `prop/${LB_PROP_CUE_PARK}`,
-      'playerWalk',
-      'fade',
-      'camera',
-    ]);
+    expect(arrivalCutKinds(out)).toEqual([`prop/${LB_PROP_CUE_PARK}`, 'playerWalk', 'camera']);
+    expect(arrivalCutKinds(back)).toEqual([`prop/${LB_PROP_CUE_PARK}`, 'playerWalk', 'camera']);
 
     const q0Lines = q0.ops.flatMap((op) =>
       op.kind === 'line' ? [{ at: op.at, key: op.key, dur: op.dur }] : [],

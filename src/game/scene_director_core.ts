@@ -108,7 +108,9 @@ export function sceneShotEasesFromLivePose(shot: SceneActiveShot): boolean {
     case 'focus':
     case 'dolly':
     case 'attach':
-      return true;
+      // A snap-entry shot holds its own frame from the first tick; only
+      // easing shots glide in from the live pose.
+      return shot.entry !== 'snap';
   }
 }
 

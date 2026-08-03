@@ -12,16 +12,10 @@
 
 import { GULLHAVEN_HARBOR, type HarborDef, MAINLAND_HARBOR } from '../harbor_layout';
 import { registerScenario } from '../scenarios/registry';
-import {
-  beat,
-  buildScene,
-  coveredCut,
-  fadeInTail,
-  type SceneTimelineEntry,
-} from '../scenes/authoring';
+import { beat, buildScene, coveredCut, type SceneTimelineEntry } from '../scenes/authoring';
 import { registerChoice } from '../scenes/choices';
 import { registerScene, type SceneAttachShotDef, type SceneDollyShotDef } from '../scenes/registry';
-import { DT, type MobTemplate, type NpcDef, type QuestDef } from '../types';
+import type { MobTemplate, NpcDef, QuestDef } from '../types';
 import {
   LAST_BELL_VOYAGE_SEGMENT_IDS,
   type LastBellPropPathSegmentId,
@@ -210,11 +204,14 @@ const LAST_BELL_PLINTH_LINE_SECONDS = 7.5;
 const LAST_BELL_TOLL_LINE_SECONDS = 6.5;
 const LANDING_SHOT_SECONDS = 6;
 
-// Owner pass two pacing: film-grade fades. Classic feature scene fades run
-// 36 to 48 frames at 24 fps (1.5 to 2 seconds) with a real beat of black
-// between, and the fade-up traditionally runs a touch longer than the
-// fade-down, so the reveal breathes: 1.5 s down, 1 s of black, 2 s up. The
-// fade-in starts half the hold after the cut, so the boat is already
+// Owner pass three grammar: exactly TWO fades in the whole voyage. The scene
+// opens on a hard cut straight into the cast-off shot (the boat visibly gets
+// under way from the first frame), a film fade carries cast-off to the
+// open-water leg and another carries open water to the arrival glide, and
+// everything after that is fade-free: a hard cut to the landing dolly with
+// the ship already parked, and a visible ease back to gameplay. The fades
+// themselves keep the film shape: 1.5 s down, 1 s of black, 2 s up, with the
+// fade-in starting half the hold after the cut so the boat is already
 // composed and under way in its new position before anything is visible.
 const VOYAGE_FADE_OUT_SECONDS = 1.5;
 const VOYAGE_FADE_IN_SECONDS = 2;
@@ -224,14 +221,12 @@ const VOYAGE_CUT = {
   fadeInSeconds: VOYAGE_FADE_IN_SECONDS,
   holdSeconds: VOYAGE_HOLD_SECONDS,
 } as const;
-// The opening cut's fade lead starts exactly at scene start.
-const VOYAGE_OPEN_CUT_SECONDS = VOYAGE_FADE_OUT_SECONDS + VOYAGE_HOLD_SECONDS / 2;
 
-// openWater and seaArrival sit later than the J2 layout so every shot still
-// holds fully clear for a real beat between the slower fade pairs.
+// openWater and seaArrival sit late enough that every shot holds fully clear
+// for a real beat between the two fade pairs.
 const VOYAGE_CORE_BEATS = {
-  open: VOYAGE_OPEN_CUT_SECONDS,
-  castOff: 1.2,
+  open: 0,
+  castOff: 0,
   openWater: 7,
   seaArrival: 13,
   park: 19.05,
@@ -444,7 +439,14 @@ function arrivalTimeline(
       dur: LAST_BELL_HARBOR_LINE_SECONDS,
     });
   } else {
-    timeline.push(coveredCut('park', direction.landingShot, VOYAGE_CUT));
+    // A hard cut, not a fade (owner pass three): the arrival glide ends with
+    // the ship exactly at her parked pose before the park beat, so the cut
+    // lands on a composed landing frame with nothing left to hide.
+    timeline.push({
+      at: 'park',
+      kind: 'camera',
+      shot: { ...direction.landingShot, entry: 'snap' },
+    });
   }
   return timeline;
 }
@@ -458,20 +460,24 @@ function voyageTimeline(
     { at: 0, kind: 'letterbox', on: true },
     { at: 0, kind: 'inputLock', on: true },
     { at: 0, kind: 'music', directive: 'lb_harbor_ambience' },
-    // The scene opens under its own fade straight onto the journey frame,
-    // riding the departure ship. The cast-off cue lands during the black
-    // hold, so the fade-in reveals her whole, already under way, the berth
-    // sliding astern.
-    coveredCut(
-      'open',
-      attachShot(
-        direction.departureTarget,
-        direction.departureHarbor,
-        journey.offset,
-        journey.lookAt,
-      ),
-      VOYAGE_CUT,
-    ),
+    // The scene opens on a HARD CUT straight into the journey frame (no
+    // fade, owner pass three): the shot snaps so the first cinematic frame
+    // is already composed, and the cast-off cue fires at the same instant,
+    // so the player's deck stand-in exists from frame one and the boat
+    // visibly gets under way with the berth sliding astern.
+    {
+      at: 'open',
+      kind: 'camera',
+      shot: {
+        ...attachShot(
+          direction.departureTarget,
+          direction.departureHarbor,
+          journey.offset,
+          journey.lookAt,
+        ),
+        entry: 'snap',
+      },
+    },
     {
       at: 'castOff',
       kind: 'prop',
@@ -574,18 +580,12 @@ function q0StoryTimeline(): SceneTimelineEntry<Q0StoryBeat>[] {
 
 function releaseTimeline(direction: VoyageDirection): SceneTimelineEntry<ReleaseBeat>[] {
   return [
-    {
-      at: beat('release', -(VOYAGE_FADE_OUT_SECONDS + DT)),
-      kind: 'fade',
-      to: 'black',
-      dur: VOYAGE_FADE_OUT_SECONDS,
-    },
-    { at: 'release', kind: 'fade', to: 'black', dur: 0 },
-    // The walk moved the player to the destination gangplank, so the release
-    // hands back the AUTHORED pose (pier side, clear line to the player)
-    // instead of the pre-scene yaw the mast used to block.
+    // No fade (owner pass three): the release EASES visibly from the landing
+    // dolly's final frame to the authored gameplay pose (pier side, clear
+    // line to the player, aligned with the dolly's gaze so the ease is a
+    // settle, not a swing). The walk moved the player to the destination
+    // gangplank, which is why the pose is authored at all.
     { at: 'release', kind: 'camera', shot: { kind: 'release', pose: direction.releasePose } },
-    fadeInTail(beat('release', DT), VOYAGE_FADE_IN_SECONDS),
     { at: 'end', kind: 'letterbox', on: false },
     { at: 'end', kind: 'inputLock', on: false },
   ];
