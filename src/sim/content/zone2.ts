@@ -321,6 +321,32 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     scale: 1.0,
     color: 0x7fb3d5,
   },
+  drowned_warlord: {
+    id: 'drowned_warlord',
+    name: 'The Drowned Warlord',
+    minLevel: 12,
+    maxLevel: 12,
+    family: 'undead',
+    elite: true,
+    hpBase: 60,
+    hpPerLevel: 22,
+    dmgBase: 9,
+    dmgPerLevel: 2.5,
+    attackSpeed: 2.2,
+    armorPerLevel: 16,
+    moveSpeed: 6.5,
+    aggroRadius: 12,
+    lifeleech: { healFrac: 0.5, chance: 0.4, name: 'Drowning Grasp' },
+    // Bog Rot: a fevered, clammy grip that wastes the living from within (Stamina drain).
+    plague: { chance: 0.35, sta: 14, duration: 12, name: 'Bog Rot' },
+    loot: [
+      { copper: 120, chance: 1 },
+      { itemId: 'bone_fragments', chance: 1 },
+      { itemId: 'cracked_fetish', chance: 0.6 },
+    ],
+    scale: 1.3,
+    color: 0x3a6ea5,
+  },
   fen_troll: {
     id: 'fen_troll',
     name: 'Mirefen Troll',
@@ -980,11 +1006,16 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     name: 'No Rest in the Reeds',
     giverNpcId: 'brother_aldric_fen',
     turnInNpcId: 'brother_aldric_fen',
-    text: 'The rite on those censers binds the drowned to rise wherever the marsh touches them — and the marsh touches everything. There will be no rest in these reeds until the dead outnumber the living. We cannot unmake the rite yet, but we can empty it of soldiers. Lay 14 more of the Drowned Dead to rest.',
+    text: 'The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, $N, and the rest will scatter back into the mire.',
     completionText:
       'You give the dead more mercy than their masters ever did. Take this — you have more than earned it.',
     objectives: [
-      { type: 'kill', targetMobId: 'drowned_dead', count: 14, label: 'Drowned Dead laid to rest' },
+      {
+        type: 'kill',
+        targetMobId: 'drowned_warlord',
+        count: 1,
+        label: 'The Drowned Warlord slain',
+      },
     ],
     xpReward: 1500,
     copperReward: 550,
@@ -1253,6 +1284,8 @@ export const ZONE2_CAMPS: CampDef[] = [
   { mobId: 'drowned_dead', center: { x: 90, z: 420 }, radius: 20, count: 8 },
   { mobId: 'drowned_dead', center: { x: 115, z: 450 }, radius: 16, count: 6 },
   { mobId: 'sloomtooth_the_drowned', center: { x: 118, z: 455 }, radius: 5, count: 1 },
+  // Quest capstone: an elite Drowned Warlord risen at the Drowned Chapel (q_no_rest)
+  { mobId: 'drowned_warlord', center: { x: 98, z: 432 }, radius: 3, count: 1 },
   // Trolls: barrow-mounds in the southeast
   { mobId: 'fen_troll', center: { x: -80, z: 420 }, radius: 22, count: 7 },
   { mobId: 'fen_troll', center: { x: -105, z: 455 }, radius: 18, count: 6 },
