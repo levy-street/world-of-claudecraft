@@ -31,9 +31,82 @@ export interface GuildBankInfo {
   nextExpansionPrice: number | null;
 }
 
+// ---------------------------------------------------------------------------
+// The guild bank ACTIVITY LOG: the social trust mechanism the officer-only
+// design rests on. Every guild bank op already writes an append-only
+// `bank_ledger` row; this read is what lets the guild SEE those rows, so a
+// quiet drain by one officer is visible to the rest instead of being knowledge
+// that exists only in the operator's database.
+//
+// COLD DATA. It is fetched on demand when the log view opens (the
+// guildBankLog() read requests it), never on the 20 Hz snapshot stream: it is
+// identical for every officer of a guild, it changes only when the book does,
+// and 50 rows of prose have no business riding a movement frame.
+//
+// What a player is shown is deliberately NARROWER than what the ledger holds:
+// the internal anomaly ops (`escrow_deficit`, `counterparty_orphan`) are
+// operator forensics, not guild history, and never reach the client at all.
+// ---------------------------------------------------------------------------
+
+/** The ops a guild can SEE. A strict subset of the `bank_ledger` op vocabulary
+ *  (server/db.ts BankLedgerRow['op']): the two diagnostic anomaly ops are never
+ *  projected here, so a client can never render one. */
+export type GuildBankLogOp =
+  | 'deposit' // an item went into the book
+  | 'withdraw' // an item came out of it
+  | 'deposit_gold' // copper into the treasury
+  | 'withdraw_gold' // copper out of it
+  | 'buy_slots' // a treasury-paid expansion rung
+  | 'open_bank' // ladder rung 0, opened from the officer's own purse
+  | 'create_fee' // the founder's charter fee (a purse payment, not a treasury move)
+  | 'admin_purge'; // an operator removed a stuck item; NEVER a guildmate's doing
+
+/** One rendered line of guild bank history. Carries no account id, no character
+ *  id, no realm, and no IP: an actor is a DISPLAY NAME or nothing at all. */
+export interface GuildBankLogEntry {
+  /** The `bank_ledger` row id: monotonic, the stable ordering and de-dupe key.
+   *  Not an account-scoped identifier and not addressable by any other route. */
+  id: number;
+  /** Epoch milliseconds the row was written; rendered through the i18n
+   *  date formatter at the painter boundary, never pre-formatted server-side. */
+  at: number;
+  /** The acting character's display name (player-authored text: the painter
+   *  splices it verbatim into an escaping sink, never through t()).
+   *  NULL means no guildmate acted, which has exactly two shapes: an
+   *  `admin_purge` (whose ledger character column is only the escrow CARRIER, a
+   *  bystander who did not order the removal, so naming them would be a lie),
+   *  and the unreachable-in-practice deleted-character row. */
+  actor: string | null;
+  op: GuildBankLogOp;
+  /** The item id the op moved, or null for a money/ladder op. */
+  itemId: string | null;
+  /** How many copies moved (a positive magnitude; the op names the direction). */
+  count: number | null;
+  /** RAW copper the op moved, a positive magnitude (the op names the
+   *  direction); null for an item op. Formatted through the i18n formatMoney at
+   *  the painter boundary, never here. */
+  copper: number | null;
+}
+
+/** The whole log read. `loading` is the in-flight state (entries hold whatever
+ *  the last successful response carried, so a refresh never blanks the pane);
+ *  `refused` means the server declined the read (a member, a demotion mid-view,
+ *  a lost guild), which the pane must say out loud rather than showing an
+ *  empty list that reads as "no officer has ever done anything". */
+export interface GuildBankLogView {
+  state: 'loading' | 'ready' | 'refused';
+  entries: readonly GuildBankLogEntry[];
+}
+
 export interface IWorldGuildBank {
   // Non-null only while an officer-plus guild member stands at a banker NPC.
   guildBankInfo: GuildBankInfo | null;
+  /** The guild bank activity log, fetched ON DEMAND: calling this while the log
+   *  view is open is what REQUESTS it (there is no snapshot key for it). The
+   *  call is idempotent while a request is in flight and while an installed
+   *  response is still fresh, so a per-frame repaint cannot become a poll.
+   *  The offline Sim has no guild and always answers an empty ready view. */
+  guildBankLog(): GuildBankLogView;
   guildBankDepositGold(amount: number): void;
   guildBankWithdrawGold(amount: number): void;
   guildBankDeposit(slotIndex: number, count?: number): void;

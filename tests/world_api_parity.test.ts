@@ -284,6 +284,7 @@ export const IWORLD_MEMBERS = [
   { name: 'guildBankDeposit', kind: 'method' },
   { name: 'guildBankWithdraw', kind: 'method' },
   { name: 'guildBankBuySlots', kind: 'method' },
+  { name: 'guildBankLog', kind: 'method' },
   // --- dungeons + delves commands and reads ---
   { name: 'enterDungeon', kind: 'method' },
   { name: 'leaveDungeon', kind: 'method' },
@@ -524,10 +525,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // so client-side swept-landing and click-to-move pathing can treat
     // rift walls as solid, leaving 281. The Guild Bank foundation adds the six
     // IWorldGuildBank members (guildBankInfo, one data read, plus five
-    // commands), leaving 287.
-    expect(IWORLD_MEMBERS.length).toBe(287);
+    // commands), leaving 287. The guild bank ACTIVITY LOG adds one read member
+    // (guildBankLog, a method because reading it is what requests the cold
+    // payload on demand: it has no snapshot key), leaving 288.
+    expect(IWORLD_MEMBERS.length).toBe(288);
     expect(DATA_MEMBERS.length).toBe(74);
-    expect(METHOD_MEMBERS.length).toBe(213);
+    expect(METHOD_MEMBERS.length).toBe(214);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -649,6 +652,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'guildBankDeposit',
       'guildBankDepositGold',
       'guildBankInfo',
+      'guildBankLog',
       'guildBankWithdraw',
       'guildBankWithdrawGold',
       'guildCreate',
@@ -988,6 +992,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'guildBankBuySlots',
       'guildBankDeposit',
       'guildBankDepositGold',
+      'guildBankLog',
       'guildBankWithdraw',
       'guildBankWithdrawGold',
       'guildCreate',
@@ -1470,6 +1475,7 @@ const FACET_GUILD_BANK = [
   'guildBankDeposit',
   'guildBankWithdraw',
   'guildBankBuySlots',
+  'guildBankLog',
 ] as const satisfies readonly (keyof IWorldGuildBank)[];
 type _ExhaustGuildBank = AssertNever<
   Exclude<keyof IWorldGuildBank, (typeof FACET_GUILD_BANK)[number]>
@@ -1680,8 +1686,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(287);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(287);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(288);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(288);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

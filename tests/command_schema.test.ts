@@ -39,9 +39,11 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // (reins are items); recharge_tool_effect joined (the acquisition craft);
 // profiler invulnerability joined as a dev-only dispatch token (no send).
 // 176 send / 188 dispatch on release/v0.34.0, +5 on BOTH sides for the
-// guild_bank_* cluster (Guild Bank Phase 2).
-const EXPECTED_SEND_COUNT = 181;
-const EXPECTED_DISPATCH_COUNT = 193;
+// guild_bank_* cluster (Guild Bank Phase 2), +1 on both for guild_bank_log
+// (the activity log's on-demand READ request; its answer comes back on its own
+// one-shot 'gbanklog' frame, not the snapshot).
+const EXPECTED_SEND_COUNT = 182;
+const EXPECTED_DISPATCH_COUNT = 194;
 const EXPECTED_DISPATCH_ONLY_COUNT = 12;
 
 // The chat sub-channel routing switch (server/game.ts `switch

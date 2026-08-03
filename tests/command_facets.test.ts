@@ -338,6 +338,9 @@ const GUILD_BANK_TAGS: Readonly<Record<string, string>> = {
   guild_bank_deposit: 'IWorldGuildBank',
   guild_bank_withdraw: 'IWorldGuildBank',
   guild_bank_buy_slots: 'IWorldGuildBank',
+  // The activity log READ request. Tagged like the mutations because it is the
+  // same facet's surface; unlike them it answers on its own one-shot frame.
+  guild_bank_log: 'IWorldGuildBank',
 };
 
 describe('command facet tags (guild bank)', () => {
@@ -350,11 +353,12 @@ describe('command facet tags (guild bank)', () => {
   });
 
   it('keeps the guild-bank cluster distinct from the personal bank_* tokens', () => {
-    // The five wire strings, pinned literally: a rename is a protocol break.
+    // The six wire strings, pinned literally: a rename is a protocol break.
     expect(Object.keys(GUILD_BANK_TAGS).sort()).toEqual([
       'guild_bank_buy_slots',
       'guild_bank_deposit',
       'guild_bank_deposit_gold',
+      'guild_bank_log',
       'guild_bank_withdraw',
       'guild_bank_withdraw_gold',
     ]);

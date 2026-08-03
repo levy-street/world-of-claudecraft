@@ -105,6 +105,8 @@ import {
   type DuelInfo,
   type FriendInfo,
   type GuildBankInfo,
+  type GuildBankLogEntry,
+  type GuildBankLogView,
   type GuildLeaderboardPage,
   type IWorld,
   isOverheadEmoteId,
@@ -141,6 +143,7 @@ import type {
   SalvageResultView,
 } from '../world_api/professions';
 import { computeBackoffDelay } from './backoff';
+import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log_wire';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
 import { optimisticQuestState } from './quest_state_optimistic';
@@ -1486,6 +1489,17 @@ export class ClientWorld implements IWorld {
   // the server), so it only rides the wire for an officer actually standing
   // at a bursar. ---
   guildBankInfo: GuildBankInfo | null = null;
+  // The guild bank ACTIVITY LOG mirror. Deliberately NOT a snapshot key: it is
+  // cold, identical for every officer of the guild, and 50 rows wide, so it
+  // rides its own on-demand request/response pair (`guild_bank_log` ->
+  // `gbanklog`) that the guildBankLog() read below issues while the log view is
+  // open. `guildBankLogAt` is the SEND time of the last request and is the ONE
+  // gate on re-requesting: it makes a per-frame repaint idempotent, ages a
+  // response that never arrived back into a retry (so a dropped frame cannot
+  // wedge the pane on 'loading'), and bounds this client to one request per TTL.
+  private guildBankLogEntries: readonly GuildBankLogEntry[] = [];
+  private guildBankLogState: 'idle' | 'ready' | 'refused' = 'idle';
+  private guildBankLogAt = 0;
   // --- IWorldDeeds: the Book of Deeds self mirror, from the snapshot self
   // (`s.deeds`/`s.dstats` heavy-gated, `s.renown`/`s.atitle` per-tick diffed).
   // PRESENTATION-ONLY EVENTS: `deedUnlocked` rides the events queue for HUD
@@ -2256,6 +2270,18 @@ export class ClientWorld implements IWorld {
       }
       Object.assign(this.moveInput, emptyMoveInput());
       this.mouselookFacing = null;
+      return;
+    }
+    if (msg.t === 'gbanklog') {
+      // The one-shot answer to a `guild_bank_log` request. A refusal keeps the
+      // pane honest ("you are not allowed to read this") instead of showing an
+      // empty history; a success installs the decoded rows wholesale, because
+      // the server always answers the full most-recent window and never a delta.
+      const frame = decodeGuildBankLogFrame(msg);
+      if (frame) {
+        this.guildBankLogState = frame.refused ? 'refused' : 'ready';
+        this.guildBankLogEntries = frame.entries;
+      }
       return;
     }
     if (msg.t === 'censor') {
@@ -3254,7 +3280,15 @@ export class ClientWorld implements IWorld {
       // `guildBank` follows the same delta contract; the server encodes null
       // away from a banker, on death, for member rank, and outside a guild
       // (the proximity + officer-plus gate lives in sim guildBankInfoFor).
-      if (s.guildBank !== undefined) this.guildBankInfo = s.guildBank;
+      if (s.guildBank !== undefined) {
+        this.guildBankInfo = s.guildBank;
+        // Losing the gate (walked away, died, demoted to member, left or
+        // switched guild) invalidates the activity log too: those rows are one
+        // guild's history read under a rank this client may no longer hold, so
+        // they are dropped rather than left to paint into the next pane that
+        // opens. Re-arms the request gate, so a re-approach refetches.
+        if (this.guildBankInfo === null) this.resetGuildBankLog();
+      }
       // --- IWorldDeeds self-decode: `deeds`/`dstats` are heavy-gated,
       // `renown`/`atitle` per-tick diffed (all four delta-omitted: a missing
       // key keeps the prior mirror). The wire carries plain objects/arrays
@@ -4568,6 +4602,37 @@ export class ClientWorld implements IWorld {
   }
   guildBankBuySlots(): void {
     this.cmd({ cmd: 'guild_bank_buy_slots' });
+  }
+  /** The activity log, fetched ON DEMAND. The pane calls this only while the
+   *  log view is open, and this send is the whole fetch trigger: there is no
+   *  snapshot key and no polling timer.
+   *
+   *  Idempotence is the send-time gate, not a separate in-flight flag: a repaint
+   *  inside the TTL sends nothing, and a request whose answer never arrived
+   *  ages out on the same clock into exactly one retry. A background refresh
+   *  keeps serving the installed rows ('ready'), so only a client that has
+   *  never had an answer shows the loading state, and a REFUSAL keeps saying so
+   *  until a fresh answer replaces it, never silently degrading to an empty
+   *  log (which would read as "no officer has ever done anything"). */
+  guildBankLog(): GuildBankLogView {
+    const now = Date.now();
+    if (now - this.guildBankLogAt >= GUILD_BANK_LOG_TTL_MS) {
+      this.guildBankLogAt = now;
+      this.cmd({ cmd: 'guild_bank_log' });
+    }
+    return {
+      state: this.guildBankLogState === 'idle' ? 'loading' : this.guildBankLogState,
+      entries: this.guildBankLogEntries,
+    };
+  }
+  /** Drop the installed log and re-arm the request gate. Called when the guild
+   *  bank mirror goes null (walked away, demoted, left or switched guild): the
+   *  rows belong to a guild and a rank this client may no longer have, so they
+   *  must never survive into the next pane that opens. */
+  private resetGuildBankLog(): void {
+    this.guildBankLogEntries = [];
+    this.guildBankLogState = 'idle';
+    this.guildBankLogAt = 0;
   }
   // --- IWorldDeeds: title selection. No optimistic local write (the bank
   // precedent): the mirror updates from the `atitle` snapshot echo once the

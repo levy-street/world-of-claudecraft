@@ -190,7 +190,12 @@ export type {
   DungeonFinderQueueView,
 } from './world_api/dungeon_finder';
 export type { RaidLockout, RiftFloorView } from './world_api/dungeons';
-export type { GuildBankInfo } from './world_api/guild_bank';
+export type {
+  GuildBankInfo,
+  GuildBankLogEntry,
+  GuildBankLogOp,
+  GuildBankLogView,
+} from './world_api/guild_bank';
 export type { WorldInteractionOutcome } from './world_api/interaction';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
@@ -519,6 +524,12 @@ export const COMMAND_NAMES = [
   'guild_bank_deposit',
   'guild_bank_withdraw',
   'guild_bank_buy_slots',
+  // The guild bank ACTIVITY LOG request (the officer-visible history of the
+  // append-only bank_ledger rows). A pure READ token: it mutates nothing, and
+  // its answer comes back on its own one-shot 'gbanklog' frame rather than the
+  // 20 Hz snapshot, because the payload is cold, identical for every officer of
+  // the guild, and 50 rows wide. Sent only while the log view is open.
+  'guild_bank_log',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -779,6 +790,7 @@ export const COMMAND_FACETS = {
   guild_bank_deposit: 'IWorldGuildBank',
   guild_bank_withdraw: 'IWorldGuildBank',
   guild_bank_buy_slots: 'IWorldGuildBank',
+  guild_bank_log: 'IWorldGuildBank',
   // IWorldValeCup: the Vale Cup boarball queue. cupInfo is a snapshot read (no
   // send); vcup_practice starts a private instanced practice bout (online + off).
   vcup_queue: 'IWorldValeCup',

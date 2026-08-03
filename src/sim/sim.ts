@@ -1736,6 +1736,16 @@ function freshCounters(): RewardCounters {
   };
 }
 
+// The offline guild bank log answer: a FROZEN empty ready view. Offline play
+// never has a guild (guilds live in the server social DB) and there is no
+// bank_ledger to read, so the log is empty rather than loading or refused. One
+// shared frozen instance so the inert facet arm can never be mutated by a
+// caller into a per-Sim divergence.
+const OFFLINE_GUILD_BANK_LOG: import('../world_api').GuildBankLogView = Object.freeze({
+  state: 'ready' as const,
+  entries: Object.freeze([]) as readonly import('../world_api').GuildBankLogEntry[],
+});
+
 // isPetClass relocated to types.ts (P1b; imported in the './types' block above). The
 // cast-toggle predicates (isFormToggle/isToggleBuff/isStealthToggle/preservesStealth/
 // isShamanShock/ignoresDamagePushback) live in combat/casting_lifecycle.ts (C4a).
@@ -9128,6 +9138,13 @@ export class Sim {
   guildBankDeposit(_slotIndex: number, _count?: number): void {}
   guildBankWithdraw(_slotIndex: number, _count?: number): void {}
   guildBankBuySlots(): void {}
+  /** Offline has no guild and no bank_ledger, so the log is EMPTY and READY,
+   *  never 'loading' (nothing is ever in flight) and never 'refused' (nothing
+   *  declined it). The Guild pane never renders offline anyway, so this is the
+   *  inert-arm answer that keeps the facet total: no request, no wire send. */
+  guildBankLog(): import('../world_api').GuildBankLogView {
+    return OFFLINE_GUILD_BANK_LOG;
+  }
   searchCharacters(_query: string): Promise<import('../world_api').CharacterSearchResult[]> {
     return Promise.resolve([]);
   }
