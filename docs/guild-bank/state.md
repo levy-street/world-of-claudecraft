@@ -522,20 +522,41 @@ Teardown of docs/guild-bank/ awaits the user's explicit confirmation.
   flags soulbound/noMarketList is refused in BOTH directions (anonymous-pipe policy), so
   it can never be withdrawn, and the disband guard then refused forever. The operator
   escape hatch is now `POST /admin/api/guilds/:id/bank/purge-slot` (permission
-  `guildbank.purge`) -> `GameServer.adminPurgeGuildBankSlot` -> the sim's
-  `purgeDormantGuildBankSlot`, which removes exactly ONE slot the pipe actually refuses
-  (an ordinary withdrawable copy is refused, pinned by test) and rides `runGuildBankOp`
-  like every other book mutation: `bank_ledger` op `admin_purge` carrying item id, count
-  and the real instance payload as evidence, the per-session unflushed delta (so a
-  fence-out reverts it), and the same fenced escrow save. Removing the last dormant slot
-  unblocks disband end to end (pinned).
-  Two accepted limits: the purge needs a live session OF THAT GUILD to carry the escrow
+  `guildbank.purge`, SUPERADMIN-ONLY: it destroys player property with no in-game undo,
+  so it sits in `SUPERADMIN_ONLY_PERMISSIONS` beside `staff.manage` and no
+  dashboard-grantable role reaches it) -> `GameServer.adminPurgeGuildBankSlot` -> the
+  sim's `purgeDormantGuildBankSlot`, which removes exactly ONE slot the pipe actually
+  refuses (an ordinary withdrawable copy is refused, pinned by test) and rides
+  `runGuildBankOp` like every other book mutation: `bank_ledger` op `admin_purge`
+  carrying item id, count and the real instance payload as evidence, the per-session
+  unflushed delta (so a fence-out reverts it), and the same fenced escrow save. Removing
+  the last dormant slot unblocks disband end to end (pinned).
+  ACCOUNTABILITY (the privacy-security review's line): the request requires a moderation
+  REASON held to the same bar as the guild rename beside it, plus the itemId the operator
+  believes sits at that index (a confirmation token: a purge splices the slot out, so
+  every higher index shifts down and a stale listing would otherwise destroy the wrong
+  dormant copy). The `bank_ledger` row's ACCOUNT is the acting operator, never the
+  carrier's owner (its character column is the carrier, because the column is NOT NULL
+  and an operator may hold no character: an `admin_purge` row is the one shape where
+  account and character belong to different people, which is the signal). A
+  `guild_moderation_actions` row with `action = 'guild_bank_purge'` records who, why, and
+  what, so a purge shows up in the realm moderation history like every other admin act;
+  that table gained an additive `action` column defaulting to `guild_rename` (the literal
+  the history union used to hardcode).
+  DURABILITY IS AWAITED: a fenced-out escrow save REVERTS the purge, so the endpoint
+  confirms the removal survived its save and answers 503 `save_failed` otherwise, rather
+  than telling an operator a slot is cleared while the copy is on its way back.
+  Three accepted limits: the purge needs a live session OF THAT GUILD to carry the escrow
   save (books never persist standalone), so it refuses `no_carrier` when nobody from the
-  guild is online; and it PURGES rather than mailing the copy back (the book keeps no
-  depositor identity, and the mail pipe refuses the same copy). The admin dashboard
-  control is a follow-up: a usable UI needs a guild-bank read surface (slot list with
-  indices + dormant flags) the admin API does not have yet; the four operator error
-  strings already carry their ADMIN_ERROR_KEYS matcher rows.
+  guild is online (the carrier is chosen off the session membership stamp, so a stale
+  ex-member can still carry: harmless, it only lends its escrow transaction and is never
+  charged, credited, or named as the actor); it PURGES rather than mailing the copy back
+  (the book keeps no depositor identity, and the mail pipe refuses the same copy); and
+  there is no admin READ surface yet, so an operator discovers slot indices out of band
+  (SQL on `guild_banks`) until the UI follow-up. The admin dashboard control is that
+  follow-up: it needs a guild-bank read endpoint (slot list with indices + dormant flags)
+  plus a confirm flow; the operator error strings already carry their ADMIN_ERROR_KEYS
+  matcher rows and English catalog entries so it is drop-in.
 - Guild bank incidents are metered (2026-08-03): `woc_guild_bank_incidents_total{kind}`
   over the fixed five `GUILD_BANK_INCIDENTS` (escrow_save_failed, save_fenced_out,
   reconcile, book_unloaded, ledger_write_failed) through the `gameMetricsCounters` seam,

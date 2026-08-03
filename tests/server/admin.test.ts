@@ -3361,65 +3361,121 @@ describe('account flair (AI mark + streamer links)', () => {
 // ---------------------------------------------------------------------------
 
 describe('guild bank dormant-slot purge', () => {
-  it('purges the named slot and answers with what was removed', async () => {
-    const adminPurgeGuildBankSlot = vi.fn(() => ({
+  const OK_BODY = {
+    slot: 3,
+    itemId: 'wolf_fang',
+    reason: 'stuck rift-gear copy, guild disbanding',
+  };
+
+  it('purges the named slot, writes the audited row, and answers with what was removed', async () => {
+    const adminPurgeGuildBankSlot = vi.fn(async () => ({
       ok: true as const,
       removed: { itemId: 'wolf_fang', count: 2 },
       carrierCharacterId: 11,
     }));
-    authedAdminDb({});
+    const recordAdminGuildBankPurge = vi.fn(async () => {});
+    authedAdminDb({ recordAdminGuildBankPurge });
     installAdminRuntime({ adminPurgeGuildBankSlot });
 
     const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
       headers: { authorization: BEARER },
       params: { id: '913' },
-      body: { slot: 3 },
+      body: OK_BODY,
     });
 
-    expect(adminPurgeGuildBankSlot).toHaveBeenCalledWith(913, 3);
+    // The acting OPERATOR's account id is threaded to the game, not the carrier's.
+    expect(adminPurgeGuildBankSlot).toHaveBeenCalledWith(913, 3, 'wolf_fang', ADMIN_ACCOUNT_ID);
+    // ...and the audited moderation row carries who, why, and what.
+    expect(recordAdminGuildBankPurge).toHaveBeenCalledWith({
+      guildId: 913,
+      reason: OK_BODY.reason,
+      adminAccountId: ADMIN_ACCOUNT_ID,
+      itemId: 'wolf_fang',
+      count: 2,
+      slotIndex: 3,
+    });
     expect(r.status).toBe(200);
     expect(r.body).toEqual({
       success: true,
-      data: { guildId: 913, slotIndex: 3, itemId: 'wolf_fang', count: 2 },
+      data: { guildId: 913, slotIndex: 3, itemId: 'wolf_fang', count: 2, audited: true },
       error: null,
     });
   });
 
-  it('denies a moderator BEFORE touching the live sim (its own permission)', async () => {
-    // moderation.act reaches the guild rename; it must NOT reach this.
-    const adminPurgeGuildBankSlot = vi.fn();
+  it('reports audited:false (never a 500) when only the audit insert fails', async () => {
+    // The item is already gone; a failed audit row cannot un-remove it, so the
+    // operator is told the purge landed AND that the log row did not.
     authedAdminDb({
-      adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
+      recordAdminGuildBankPurge: vi.fn(async () => {
+        throw new Error('audit db down');
+      }),
     });
-    installAdminRuntime({ adminPurgeGuildBankSlot });
-
+    installAdminRuntime({
+      adminPurgeGuildBankSlot: vi.fn(async () => ({
+        ok: true as const,
+        removed: { itemId: 'wolf_fang', count: 1 },
+        carrierCharacterId: 11,
+      })),
+    });
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
       headers: { authorization: BEARER },
       params: { id: '913' },
-      body: { slot: 0 },
+      body: OK_BODY,
     });
-
-    expect(r.status).toBe(403);
-    expect(adminPurgeGuildBankSlot).not.toHaveBeenCalled();
+    errSpy.mockRestore();
+    expect(r.status).toBe(200);
+    expect((r.body as { data: { audited: boolean } }).data.audited).toBe(false);
   });
 
-  it('rejects a malformed slot without calling the game at all', async () => {
+  it('denies every dashboard-grantable role BEFORE touching the live sim', async () => {
+    // guildbank.purge is superadmin-only: moderator reaches the guild rename,
+    // and even `admin` (otherwise everything) must NOT reach this.
+    for (const roles of [['moderator'], ['admin'], ['viewer']]) {
+      const adminPurgeGuildBankSlot = vi.fn();
+      const recordAdminGuildBankPurge = vi.fn();
+      authedAdminDb({
+        adminRolesForAccount: async () => ({ username: 'op', roles }),
+        recordAdminGuildBankPurge,
+      });
+      installAdminRuntime({ adminPurgeGuildBankSlot });
+
+      const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
+        headers: { authorization: BEARER },
+        params: { id: '913' },
+        body: OK_BODY,
+      });
+
+      expect(r.status, roles[0]).toBe(403);
+      expect(adminPurgeGuildBankSlot, roles[0]).not.toHaveBeenCalled();
+      expect(recordAdminGuildBankPurge, roles[0]).not.toHaveBeenCalled();
+    }
+  });
+
+  it('rejects a malformed slot, a missing itemId, and a missing reason, calling nothing', async () => {
     const adminPurgeGuildBankSlot = vi.fn();
     authedAdminDb({});
     installAdminRuntime({ adminPurgeGuildBankSlot });
 
-    for (const slot of [undefined, 'first', -1, 1.5, null]) {
+    const cases: Array<[Record<string, unknown>, string]> = [
+      [{ ...OK_BODY, slot: undefined }, 'a slot index is required'],
+      [{ ...OK_BODY, slot: 'first' }, 'a slot index is required'],
+      [{ ...OK_BODY, slot: -1 }, 'a slot index is required'],
+      [{ ...OK_BODY, slot: 1.5 }, 'a slot index is required'],
+      [{ ...OK_BODY, itemId: undefined }, 'the item id in that slot is required'],
+      [{ ...OK_BODY, itemId: '   ' }, 'the item id in that slot is required'],
+      [{ ...OK_BODY, reason: undefined }, 'a moderation reason is required (500 chars max)'],
+      [{ ...OK_BODY, reason: '  ' }, 'a moderation reason is required (500 chars max)'],
+      [{ ...OK_BODY, reason: 'x'.repeat(501) }, 'a moderation reason is required (500 chars max)'],
+    ];
+    for (const [body, error] of cases) {
       const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
         headers: { authorization: BEARER },
         params: { id: '913' },
-        body: { slot },
+        body,
       });
-      expect(r.status, String(slot)).toBe(400);
-      expect(r.body).toEqual({
-        success: false,
-        data: null,
-        error: 'a slot index is required',
-      });
+      expect(r.status, JSON.stringify(body)).toBe(400);
+      expect(r.body, JSON.stringify(body)).toEqual({ success: false, data: null, error });
     }
     expect(adminPurgeGuildBankSlot).not.toHaveBeenCalled();
   });
@@ -3433,20 +3489,48 @@ describe('guild bank dormant-slot purge', () => {
         error: 'no member of that guild is online to persist the change',
       },
       { reason: 'not_dormant', status: 400, error: 'that slot is not a stuck item' },
+      {
+        reason: 'save_failed',
+        status: 503,
+        error: 'the change could not be saved and was rolled back',
+      },
     ] as const;
     for (const c of cases) {
-      authedAdminDb({});
+      const recordAdminGuildBankPurge = vi.fn();
+      authedAdminDb({ recordAdminGuildBankPurge });
       installAdminRuntime({
-        adminPurgeGuildBankSlot: vi.fn(() => ({ ok: false as const, reason: c.reason })),
+        adminPurgeGuildBankSlot: vi.fn(async () => ({ ok: false as const, reason: c.reason })),
       });
       const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
         headers: { authorization: BEARER },
         params: { id: '913' },
-        body: { slot: 0 },
+        body: OK_BODY,
       });
       expect(r.status, c.reason).toBe(c.status);
       expect(r.body, c.reason).toEqual({ success: false, data: null, error: c.error });
+      // A refused purge never logs a moderation row.
+      expect(recordAdminGuildBankPurge, c.reason).not.toHaveBeenCalled();
     }
+  });
+
+  it('fails CLOSED on an unrecognized refusal reason instead of faking success', async () => {
+    // A reason added to the game later must never fall through the switch into
+    // the success return (which would read `removed` off a refusal).
+    authedAdminDb({});
+    installAdminRuntime({
+      adminPurgeGuildBankSlot: vi.fn(async () => ({ ok: false, reason: 'future_reason' })),
+    });
+    const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '913' },
+      body: OK_BODY,
+    });
+    expect(r.status).toBe(500);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'the guild bank change was refused',
+    });
   });
 
   it('401s an unauthenticated caller before the sim is reached', async () => {
@@ -3454,9 +3538,20 @@ describe('guild bank dormant-slot purge', () => {
     installAdminRuntime({ adminPurgeGuildBankSlot });
     const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
       params: { id: '913' },
-      body: { slot: 0 },
+      body: OK_BODY,
     });
     expect(r.status).toBe(401);
     expect(adminPurgeGuildBankSlot).not.toHaveBeenCalled();
+  });
+
+  it('both dispatch arms run the SAME shared body (the dual-edit rule)', () => {
+    // The legacy ladder arm and the RouteDef handler must not drift, so pin
+    // that neither carries its own logic: both call the one shared helper.
+    const source = readFileSync(join(process.cwd(), 'server/admin.ts'), 'utf8');
+    const calls = source.match(/purgeGuildBankSlotOutcome\(/g) ?? [];
+    // one declaration + two call sites
+    expect(calls.length).toBe(3);
+    expect(source).toContain('const guildBankPurgeMatch =');
+    expect(source).toContain("path: '/admin/api/guilds/:id/bank/purge-slot'");
   });
 });

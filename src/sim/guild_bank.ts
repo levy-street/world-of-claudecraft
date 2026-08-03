@@ -840,6 +840,7 @@ export function purgeDormantGuildBankSlot(
   ctx: SimContext,
   guildId: number,
   slotIndex: number,
+  expectItemId: string,
 ): InvSlot | null {
   const book = ctx.guildBanks.get(guildId);
   if (!book) return null;
@@ -847,9 +848,14 @@ export function purgeDormantGuildBankSlot(
     return null;
   }
   const slot = book.inventory[slotIndex];
-  // The one gate: only a copy the pipe actually refuses is purgeable. Direction
-  // is irrelevant here (the refusal SET is direction-independent), so the
-  // default read is the right one.
+  // CONFIRMATION TOKEN, not decoration: a purge splices the slot out, so every
+  // higher index shifts down by one, and an operator working from a stale
+  // listing would otherwise destroy a DIFFERENT dormant copy than the one they
+  // read. The caller must name the item it believes sits at that index.
+  if (typeof expectItemId !== 'string' || slot.itemId !== expectItemId) return null;
+  // The one policy gate: only a copy the pipe actually refuses is purgeable.
+  // Direction is irrelevant here (the refusal SET is direction-independent), so
+  // the default read is the right one.
   if (guildBankPipeRefusal(slot) === null) return null;
   const removed = cloneInvSlot(slot);
   book.inventory.splice(slotIndex, 1);

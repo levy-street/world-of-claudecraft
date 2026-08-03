@@ -83,9 +83,47 @@ Three independent slices, one commit each.
         same copy, so v1 purges; (b) the ADMIN DASHBOARD control: a usable UI needs a
         guild-bank READ surface the admin API does not have (slot list with indices +
         dormant flags) plus a confirm flow, which is a second endpoint and a new panel,
-        so the API + tests shipped and the UI is a follow-up. The four operator error
+        so the API + tests shipped and the UI is a follow-up. Until it lands an operator
+        discovers slot indices out of band (SQL on `guild_banks`). The six operator error
         strings already carry their `ADMIN_ERROR_KEYS` matcher rows and English catalog
         entries so the UI follow-up is drop-in.
+
+- [x] **Slice 3 review pass** (privacy-security-review CHANGES REQUESTED 0 BLOCKING /
+      3 SHOULD-FIX / 8 NIT; architecture-reviewer 0 BLOCKING / 5 SHOULD-FIX / 6 NOTE).
+      Everything BLOCKING/SHOULD-FIX was fixed in the same commit; the theme was that a
+      property-destroying endpoint had WEAKER accountability than the cosmetic rename
+      beside it.
+      - ATTRIBUTION: the `admin_purge` ledger row now books the ACTING OPERATOR's
+        account (`runGuildBankOp`'s operator arm takes `actorAccountId`), not the
+        carrier's owner. Its character column stays the carrier, because the column is
+        NOT NULL and an operator may hold no character; that mixed row is the signal.
+      - AUDIT: a moderation REASON is now required and validated at the same
+        `ADMIN_GUILD_REASON_MAX` bar as the rename, and `recordAdminGuildBankPurge`
+        writes a `guild_moderation_actions` row (`action = 'guild_bank_purge'`, the
+        operator, the reason, and what was removed) so a purge appears in the realm
+        moderation history. That table gained an ADDITIVE `action TEXT NOT NULL DEFAULT
+        'guild_rename'` column (the literal the history union used to hardcode), so
+        every pre-existing row backfills correctly. A failed audit insert cannot
+        un-remove the item, so it is reported as `audited: false`, never thrown.
+      - DURABILITY: the endpoint no longer answers 200 optimistically. It AWAITS the
+        fenced escrow save and confirms the removal survived (a fence-out reverts it),
+        answering 503 `save_failed` otherwise; both the throw arm and the fence-out
+        revert arm are pinned by test.
+      - PERMISSION (the maintainer's design call): `guildbank.purge` moved into
+        `SUPERADMIN_ONLY_PERMISSIONS`, so no dashboard-grantable role reaches it,
+        `admin` included. Easy to relax; an item removed under a too-broad grant cannot
+        be un-destroyed.
+      - INDEX-SHIFT SAFETY (architecture SHOULD-FIX): the request must also name the
+        `itemId` it expects at that index, and the sim refuses on a mismatch. A purge
+        splices the slot out, so every higher index shifts down by one and an operator
+        working from a stale listing could otherwise destroy the wrong dormant copy.
+      - Fail-closed default on the refusal switch (a future reason 500s rather than
+        falling through to the success return); the ladder arm's position AFTER the
+        central permission gate is now source-pinned, as is the fact that both dispatch
+        arms run the ONE shared helper; the whole-item-table dormant parity sweep now
+        exercises BOTH direction arms; the evidence-clone test was made decisive
+        (identity assertions, not just absence); the stale-membership-stamp carrier case
+        is documented and pinned (the carrier is never charged, credited, or named).
 
 ## Pricing redesign (2026-08-03, user-directed)
 - [x] `GUILD_CREATION_FEE_COPPER` 100_000 -> 10_000 (1 gold); pure constant change,

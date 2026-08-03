@@ -1216,12 +1216,14 @@ function seatDormant(server: GameServer, slot: Record<string, unknown> = DORMANT
 }
 
 describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
+  const OPERATOR = 4242; // the acting admin account id
+
   it('purges through runGuildBankOp: ledger row, dirty mark, and the fenced escrow save', async () => {
     const server = new GameServer();
     const { session } = joinServer(server, 1, 'Officer');
     officerSetup(server, session);
     seatDormant(server);
-    const result = server.adminPurgeGuildBankSlot(GUILD_ID, 0);
+    const result = await server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'wolf_fang', OPERATOR);
     expect(result).toEqual({
       ok: true,
       removed: { itemId: 'wolf_fang', count: 2 },
@@ -1242,24 +1244,15 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
       itemId: 'wolf_fang',
       count: 2,
       copperDelta: 0,
+      // ATTRIBUTION: the acting OPERATOR's account, never the carrier's owner.
+      accountId: OPERATOR,
       characterId: session.characterId,
     });
     // Evidence: the REAL instance payload, not the wire projection.
     expect(rows[0].instance).toEqual({ boundTo: 424242 });
-    expect(session.unflushedGuildBankOps.get(GUILD_ID)).toEqual([
-      {
-        op: 'admin_purge',
-        itemId: 'wolf_fang',
-        count: 2,
-        instance: { boundTo: 424242 },
-        craftedRecipeId: null,
-        copperDelta: 0,
-      },
-    ]);
-    // And it rode the SAME fenced escrow save (never a standalone book write):
-    // the purge schedules one fire-and-forget, so this second call is only a
-    // BARRIER (the per-character save queue serializes them).
-    await priv(server).saveCharacter(session);
+    expect(session.unflushedGuildBankOps.get(GUILD_ID) ?? []).toEqual([]); // consumed by the save
+    // It rode the SAME fenced escrow save (never a standalone book write), and
+    // the call awaited it: the mark is already released when the call returns.
     expect(dbMock.saveCharacterAndGuildBankState).toHaveBeenCalledTimes(1);
     const [, , , books] = dbMock.saveCharacterAndGuildBankState.mock.calls[0] as never[];
     expect(books).toEqual([
@@ -1268,12 +1261,28 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
     expect(session.dirtyGuildBanks.has(GUILD_ID)).toBe(false);
   });
 
+  it('books the ledger row to the OPERATOR even when the carrier is a different account', async () => {
+    // The bystander test: the carrier lends its escrow transaction and nothing
+    // else. Its account must never be recorded as the actor.
+    const server = new GameServer();
+    const { session } = joinServer(server, 77, 'Carrier');
+    officerSetup(server, session);
+    seatDormant(server);
+    await server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'wolf_fang', OPERATOR);
+    await bankLedgerIdle();
+    const row = (
+      dbMock.insertBankLedgerRow.mock.calls as unknown as Record<string, unknown>[][]
+    )[0][0];
+    expect(row.accountId).toBe(OPERATOR);
+    expect(row.accountId).not.toBe(session.accountId);
+  });
+
   it('REFUSES an ordinary withdrawable slot: no mutation, no ledger row, no mark', async () => {
     const server = new GameServer();
     const { session } = joinServer(server, 1, 'Officer');
     officerSetup(server, session);
     seatDormant(server, { itemId: 'wolf_fang', count: 5 }); // plain, withdrawable
-    expect(server.adminPurgeGuildBankSlot(GUILD_ID, 0)).toEqual({
+    expect(await server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'wolf_fang', OPERATOR)).toEqual({
       ok: false,
       reason: 'not_dormant',
     });
@@ -1285,22 +1294,44 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
     expect(session.dirtyGuildBanks.size).toBe(0);
   });
 
+  it('REFUSES when the named item does not match the slot (the index-shift guard)', async () => {
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'Officer');
+    officerSetup(server, session);
+    seatDormant(server);
+    expect(await server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'reins_grag_bear', OPERATOR)).toEqual({
+      ok: false,
+      reason: 'not_dormant',
+    });
+    expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toHaveLength(1);
+    expect(session.dirtyGuildBanks.size).toBe(0);
+  });
+
   it('refuses an unloaded book and an out-of-range index without mutating anything', async () => {
     const server = new GameServer();
     const { session } = joinServer(server, 1, 'Officer');
     officerSetup(server, session);
     seatDormant(server);
-    expect(server.adminPurgeGuildBankSlot(GUILD_ID + 1, 0)).toEqual({
+    expect(await server.adminPurgeGuildBankSlot(GUILD_ID + 1, 0, 'wolf_fang', OPERATOR)).toEqual({
       ok: false,
       reason: 'no_book',
     });
-    expect(server.adminPurgeGuildBankSlot(GUILD_ID, 7)).toEqual({
+    // A non-positive / malformed guild id refuses on the same fail-closed arm,
+    // which is what keeps the two dispatch arms equivalent on a degenerate id.
+    for (const bad of [0, -1, 1.5, Number.NaN]) {
+      expect(
+        await server.adminPurgeGuildBankSlot(bad, 0, 'wolf_fang', OPERATOR),
+        String(bad),
+      ).toEqual({ ok: false, reason: 'no_book' });
+    }
+    expect(await server.adminPurgeGuildBankSlot(GUILD_ID, 7, 'wolf_fang', OPERATOR)).toEqual({
       ok: false,
       reason: 'not_dormant',
     });
     expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toHaveLength(1);
     await bankLedgerIdle();
     expect(dbMock.insertBankLedgerRow).not.toHaveBeenCalled();
+    expect(session.dirtyGuildBanks.size).toBe(0);
   });
 
   it('refuses with no carrier when nobody from the guild is online', async () => {
@@ -1314,7 +1345,7 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
       inventory: [{ ...DORMANT_SLOT }],
       purchasedSlots: 24,
     });
-    expect(server.adminPurgeGuildBankSlot(GUILD_ID, 0)).toEqual({
+    expect(await server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'wolf_fang', OPERATOR)).toEqual({
       ok: false,
       reason: 'no_carrier',
     });
@@ -1323,7 +1354,7 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
     expect(dbMock.insertBankLedgerRow).not.toHaveBeenCalled();
   });
 
-  it('prefers an officer-plus carrier over a plain member', () => {
+  it('prefers an officer-plus carrier over a plain member', async () => {
     const server = new GameServer();
     const member = joinServer(server, 1, 'Grunt').session;
     const officer = joinServer(server, 2, 'Boss').session;
@@ -1334,14 +1365,14 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
       inventory: [{ ...DORMANT_SLOT }],
       purchasedSlots: 24,
     });
-    const result = server.adminPurgeGuildBankSlot(GUILD_ID, 0);
+    const result = await server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'wolf_fang', OPERATOR);
     expect(result.ok && result.carrierCharacterId).toBe(officer.characterId);
-    // The mark landed on the officer's session, not the member's.
-    expect(officer.dirtyGuildBanks.has(GUILD_ID)).toBe(true);
+    // Neither session keeps a mark: the awaited save released the officer's.
+    expect(officer.dirtyGuildBanks.has(GUILD_ID)).toBe(false);
     expect(member.dirtyGuildBanks.has(GUILD_ID)).toBe(false);
   });
 
-  it('a member-only guild still gets a carrier (the fallback)', () => {
+  it('a member-only guild still gets a carrier (the fallback)', async () => {
     const server = new GameServer();
     const member = joinServer(server, 1, 'Grunt').session;
     server.sim.setPlayerGuildMembership(member.pid, { guildId: GUILD_ID, rank: 'member' });
@@ -1350,14 +1381,49 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
       inventory: [{ ...DORMANT_SLOT }],
       purchasedSlots: 24,
     });
-    const result = server.adminPurgeGuildBankSlot(GUILD_ID, 0);
+    const result = await server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'wolf_fang', OPERATOR);
     expect(result.ok && result.carrierCharacterId).toBe(member.characterId);
   });
 
-  it('a fence-out REVERTS the purge like any other unflushed op (the copy comes back)', async () => {
-    // The purge rides the same unflushed-delta log, so a save that never lands
-    // must put the copy back rather than leaving the book ahead of durable
-    // truth. Another session is dirty here, which is the surgical-revert arm.
+  it('a STALE membership stamp can still carry, and the carrier is never charged', async () => {
+    // The carrier is chosen off the SESSION stamp, so a player kicked from the
+    // guild since login can still lend their escrow transaction. That is
+    // harmless by design: pin that the carrier's own purse and bags are
+    // untouched and that the row names the operator, not them.
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'ExMember');
+    officerSetup(server, session);
+    seatDormant(server);
+    const meta = server.sim.players.get(session.pid);
+    if (!meta) throw new Error('missing meta');
+    const purse = meta.copper;
+    const bags = JSON.stringify(meta.inventory);
+    const result = await server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'wolf_fang', OPERATOR);
+    expect(result.ok).toBe(true);
+    expect(meta.copper).toBe(purse);
+    expect(JSON.stringify(meta.inventory)).toBe(bags);
+  });
+
+  it('reports save_failed (never a bare success) when the escrow save throws', async () => {
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'Thrower');
+    officerSetup(server, session);
+    seatDormant(server);
+    dbMock.saveCharacterAndGuildBankState.mockRejectedValueOnce(new Error('db down'));
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const result = await server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'wolf_fang', OPERATOR);
+    errSpy.mockRestore();
+    expect(result).toEqual({ ok: false, reason: 'save_failed' });
+    // The live book is still purged and the mark survives, so a later save
+    // converges; the operator is simply not told it is done.
+    expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toEqual([]);
+    expect(session.dirtyGuildBanks.has(GUILD_ID)).toBe(true);
+  });
+
+  it('reports save_failed when a fence-out REVERTS the purge (the copy comes back)', async () => {
+    // The optimism trap the awaited durability check exists to close: the purge
+    // rides the same unflushed-delta log, so a save that never lands puts the
+    // copy back. The operator must not be told the slot is cleared.
     const server = new GameServer();
     const a = joinServer(server, 1, 'FencedA').session;
     const b = joinServer(server, 2, 'DirtyB').session;
@@ -1370,15 +1436,14 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
     dispatch(server, b, { cmd: 'guild_bank_deposit_gold', amount: 1_000 }); // B stays dirty
     expect(b.dirtyGuildBanks.has(GUILD_ID)).toBe(true);
     seatDormant(server);
-    // Arm the fence-out BEFORE the purge: the purge schedules its own escrow
-    // save, and that is the save that must fail here.
     a.leaseNonce = 'stale-nonce';
     dbMock.saveCharacterAndGuildBankState.mockResolvedValueOnce(false);
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    expect(server.adminPurgeGuildBankSlot(GUILD_ID, 0).ok).toBe(true);
-    expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toEqual([]);
-    await priv(server).saveCharacter(a); // barrier: drains the scheduled save
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const result = await server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'wolf_fang', OPERATOR);
     warnSpy.mockRestore();
+    errSpy.mockRestore();
+    expect(result).toEqual({ ok: false, reason: 'save_failed' });
     // Surgically restored, with B's legitimate op intact and no reload.
     expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toEqual([DORMANT_SLOT]);
     expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(101_000);
@@ -1397,11 +1462,11 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
     expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toHaveLength(1); // refused
     expect(priv(server).social.tx.guildBankHoldings(GUILD_ID)).toEqual({ copper: 0, items: 1 });
 
-    expect(server.adminPurgeGuildBankSlot(GUILD_ID, 0).ok).toBe(true);
-    // The dirty mark keeps the guard fail-closed until the escrow save commits
-    // (an emptying op must be durable before the cascade destroys the row).
-    expect(priv(server).social.tx.guildBankHoldings(GUILD_ID)).toBeNull();
-    await priv(server).saveCharacter(session);
+    expect((await server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'wolf_fang', OPERATOR)).ok).toBe(
+      true,
+    );
+    // The awaited escrow save already committed, so the fail-closed disband
+    // guard is open the moment the call returns.
     expect(priv(server).social.tx.guildBankHoldings(GUILD_ID)).toEqual({ copper: 0, items: 0 });
   });
 });

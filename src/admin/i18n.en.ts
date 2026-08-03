@@ -495,6 +495,10 @@ export const en = {
     'A member of this guild must be online before the change can be saved.',
   'error.guildBankSlotNotStuck':
     'That slot holds an ordinary item the guild can withdraw itself, so it cannot be removed here.',
+  'error.guildBankItemRequired': 'Enter the item id you expect that slot to hold.',
+  'error.guildBankSaveFailed':
+    'The change could not be saved and was rolled back. Try again in a moment.',
+  'error.guildBankPurgeRefused': 'The guild bank change was refused.',
   'moderation.title': 'Moderation',
   'moderation.reportsTitle': 'Reports',
   'moderation.queueTitle': 'Report queue',

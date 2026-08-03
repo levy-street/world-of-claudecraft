@@ -1289,7 +1289,7 @@ export async function listModerationActions(
                 NULL::int AS account_id,
                 NULL::text AS username,
                 NULL::text AS ip,
-                'guild_rename' AS action,
+                guild_action.action,
                 guild_action.reason,
                 guild_action.created_at,
                 NULL::timestamptz AS expires_at,

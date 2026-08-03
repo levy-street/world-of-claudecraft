@@ -205,9 +205,12 @@ const ADMIN_ERROR_KEYS: Record<string, string> = {
   'guild member limit exceeded': 'error.guildMemberLimit',
   // The guild bank dormant-slot escape hatch (server/admin.ts).
   'a slot index is required': 'error.guildBankSlotRequired',
+  'the item id in that slot is required': 'error.guildBankItemRequired',
   'that guild has no loaded bank': 'error.guildBankNotLoaded',
   'no member of that guild is online to persist the change': 'error.guildBankNoCarrier',
   'that slot is not a stuck item': 'error.guildBankSlotNotStuck',
+  'the change could not be saved and was rolled back': 'error.guildBankSaveFailed',
+  'the guild bank change was refused': 'error.guildBankPurgeRefused',
   'guild name must be 3-24 letters with single spaces': 'error.guildNameInvalid',
   'invalid streamer link': 'error.invalidStreamerLink',
   'admin accounts cannot be chat muted': 'error.cannotChatMuteAdmin',

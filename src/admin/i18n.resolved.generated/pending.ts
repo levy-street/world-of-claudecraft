@@ -11,123 +11,183 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "error.guildBankItemRequired",
     "error.guildBankNoCarrier",
     "error.guildBankNotLoaded",
+    "error.guildBankPurgeRefused",
+    "error.guildBankSaveFailed",
     "error.guildBankSlotNotStuck",
     "error.guildBankSlotRequired"
   ],
   "es_ES": [
+    "error.guildBankItemRequired",
     "error.guildBankNoCarrier",
     "error.guildBankNotLoaded",
+    "error.guildBankPurgeRefused",
+    "error.guildBankSaveFailed",
     "error.guildBankSlotNotStuck",
     "error.guildBankSlotRequired"
   ],
   "fr_FR": [
+    "error.guildBankItemRequired",
     "error.guildBankNoCarrier",
     "error.guildBankNotLoaded",
+    "error.guildBankPurgeRefused",
+    "error.guildBankSaveFailed",
     "error.guildBankSlotNotStuck",
     "error.guildBankSlotRequired"
   ],
   "fr_CA": [
+    "error.guildBankItemRequired",
     "error.guildBankNoCarrier",
     "error.guildBankNotLoaded",
+    "error.guildBankPurgeRefused",
+    "error.guildBankSaveFailed",
     "error.guildBankSlotNotStuck",
     "error.guildBankSlotRequired"
   ],
   "en_CA": [],
   "it_IT": [
+    "error.guildBankItemRequired",
     "error.guildBankNoCarrier",
     "error.guildBankNotLoaded",
+    "error.guildBankPurgeRefused",
+    "error.guildBankSaveFailed",
     "error.guildBankSlotNotStuck",
     "error.guildBankSlotRequired"
   ],
   "de_DE": [
+    "error.guildBankItemRequired",
     "error.guildBankNoCarrier",
     "error.guildBankNotLoaded",
+    "error.guildBankPurgeRefused",
+    "error.guildBankSaveFailed",
     "error.guildBankSlotNotStuck",
     "error.guildBankSlotRequired"
   ],
   "zh_CN": [
+    "error.guildBankItemRequired",
     "error.guildBankNoCarrier",
     "error.guildBankNotLoaded",
+    "error.guildBankPurgeRefused",
+    "error.guildBankSaveFailed",
     "error.guildBankSlotNotStuck",
     "error.guildBankSlotRequired"
   ],
   "zh_TW": [
+    "error.guildBankItemRequired",
     "error.guildBankNoCarrier",
     "error.guildBankNotLoaded",
+    "error.guildBankPurgeRefused",
+    "error.guildBankSaveFailed",
     "error.guildBankSlotNotStuck",
     "error.guildBankSlotRequired"
   ],
   "ko_KR": [
+    "error.guildBankItemRequired",
     "error.guildBankNoCarrier",
     "error.guildBankNotLoaded",
+    "error.guildBankPurgeRefused",
+    "error.guildBankSaveFailed",
     "error.guildBankSlotNotStuck",
     "error.guildBankSlotRequired"
   ],
   "ja_JP": [
+    "error.guildBankItemRequired",
     "error.guildBankNoCarrier",
     "error.guildBankNotLoaded",
+    "error.guildBankPurgeRefused",
+    "error.guildBankSaveFailed",
     "error.guildBankSlotNotStuck",
     "error.guildBankSlotRequired"
   ],
   "pt_BR": [
+    "error.guildBankItemRequired",
     "error.guildBankNoCarrier",
     "error.guildBankNotLoaded",
+    "error.guildBankPurgeRefused",
+    "error.guildBankSaveFailed",
     "error.guildBankSlotNotStuck",
     "error.guildBankSlotRequired"
   ],
   "ru_RU": [
+    "error.guildBankItemRequired",
     "error.guildBankNoCarrier",
     "error.guildBankNotLoaded",
+    "error.guildBankPurgeRefused",
+    "error.guildBankSaveFailed",
     "error.guildBankSlotNotStuck",
     "error.guildBankSlotRequired"
   ],
   "cs_CZ": [
+    "error.guildBankItemRequired",
     "error.guildBankNoCarrier",
     "error.guildBankNotLoaded",
+    "error.guildBankPurgeRefused",
+    "error.guildBankSaveFailed",
     "error.guildBankSlotNotStuck",
     "error.guildBankSlotRequired"
   ],
   "nl_NL": [
+    "error.guildBankItemRequired",
     "error.guildBankNoCarrier",
     "error.guildBankNotLoaded",
+    "error.guildBankPurgeRefused",
+    "error.guildBankSaveFailed",
     "error.guildBankSlotNotStuck",
     "error.guildBankSlotRequired"
   ],
   "pl_PL": [
+    "error.guildBankItemRequired",
     "error.guildBankNoCarrier",
     "error.guildBankNotLoaded",
+    "error.guildBankPurgeRefused",
+    "error.guildBankSaveFailed",
     "error.guildBankSlotNotStuck",
     "error.guildBankSlotRequired"
   ],
   "id_ID": [
+    "error.guildBankItemRequired",
     "error.guildBankNoCarrier",
     "error.guildBankNotLoaded",
+    "error.guildBankPurgeRefused",
+    "error.guildBankSaveFailed",
     "error.guildBankSlotNotStuck",
     "error.guildBankSlotRequired"
   ],
   "tr_TR": [
+    "error.guildBankItemRequired",
     "error.guildBankNoCarrier",
     "error.guildBankNotLoaded",
+    "error.guildBankPurgeRefused",
+    "error.guildBankSaveFailed",
     "error.guildBankSlotNotStuck",
     "error.guildBankSlotRequired"
   ],
   "sv_SE": [
+    "error.guildBankItemRequired",
     "error.guildBankNoCarrier",
     "error.guildBankNotLoaded",
+    "error.guildBankPurgeRefused",
+    "error.guildBankSaveFailed",
     "error.guildBankSlotNotStuck",
     "error.guildBankSlotRequired"
   ],
   "vi_VN": [
+    "error.guildBankItemRequired",
     "error.guildBankNoCarrier",
     "error.guildBankNotLoaded",
+    "error.guildBankPurgeRefused",
+    "error.guildBankSaveFailed",
     "error.guildBankSlotNotStuck",
     "error.guildBankSlotRequired"
   ],
   "da_DK": [
+    "error.guildBankItemRequired",
     "error.guildBankNoCarrier",
     "error.guildBankNotLoaded",
+    "error.guildBankPurgeRefused",
+    "error.guildBankSaveFailed",
     "error.guildBankSlotNotStuck",
     "error.guildBankSlotRequired"
   ]

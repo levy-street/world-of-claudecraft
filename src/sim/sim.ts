@@ -9527,8 +9527,12 @@ export class Sim {
     return guildBankMod.guildBankInfoForGuild(this.ctx, guildId);
   }
 
-  purgeDormantGuildBankSlot(guildId: number, slotIndex: number): InvSlot | null {
-    return guildBankMod.purgeDormantGuildBankSlot(this.ctx, guildId, slotIndex);
+  purgeDormantGuildBankSlot(
+    guildId: number,
+    slotIndex: number,
+    expectItemId: string,
+  ): InvSlot | null {
+    return guildBankMod.purgeDormantGuildBankSlot(this.ctx, guildId, slotIndex, expectItemId);
   }
 
   // -------------------------------------------------------------------------

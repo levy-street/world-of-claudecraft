@@ -1881,7 +1881,7 @@ describe('purgeDormantGuildBankSlot (the admin escape hatch)', () => {
     for (const slot of DORMANT) {
       const sim = makeOfficerSim();
       book(sim).inventory.push({ itemId: 'wolf_fang', count: 3 }, { ...slot } as never);
-      const removed = sim.purgeDormantGuildBankSlot(GUILD_ID, 1);
+      const removed = sim.purgeDormantGuildBankSlot(GUILD_ID, 1, slot.itemId);
       expect(removed, JSON.stringify(slot)).toEqual(slot);
       // Only the dormant slot left; the ordinary stack beside it is untouched.
       expect(book(sim).inventory).toEqual([{ itemId: 'wolf_fang', count: 3 }]);
@@ -1890,13 +1890,40 @@ describe('purgeDormantGuildBankSlot (the admin escape hatch)', () => {
 
   it('the returned evidence is a CLONE, not a live reference into the book', () => {
     const sim = makeOfficerSim();
-    book(sim).inventory.push({ itemId: 'wolf_fang', count: 1, instance: { boundTo: 7 } });
-    const removed = sim.purgeDormantGuildBankSlot(GUILD_ID, 0);
+    book(sim).inventory.push(
+      { itemId: 'wolf_fang', count: 1, instance: { boundTo: 7 } },
+      { itemId: 'wolf_fang', count: 1, instance: { boundTo: 8 } },
+    );
+    const live = book(sim).inventory[0];
+    const removed = sim.purgeDormantGuildBankSlot(GUILD_ID, 0, 'wolf_fang');
     if (!removed?.instance) throw new Error('expected an instance payload');
+    // Decisive: a live reference would be the SAME object, and mutating the
+    // evidence would reach the payload the surviving book slot still shares.
+    expect(removed).not.toBe(live);
+    expect(removed.instance).not.toBe(live.instance);
     removed.instance.boundTo = 999;
-    // Mutating the evidence cannot reach the sim (the slot is gone), and a
-    // second purge of the same index finds nothing.
-    expect(sim.purgeDormantGuildBankSlot(GUILD_ID, 0)).toBeNull();
+    expect(book(sim).inventory[0]).toEqual({
+      itemId: 'wolf_fang',
+      count: 1,
+      instance: { boundTo: 8 },
+    });
+  });
+
+  it('REFUSES when the named itemId does not match the slot (the index-shift guard)', () => {
+    // A purge splices the slot out, so every higher index shifts down by one.
+    // An operator working from a stale listing must not destroy a different
+    // dormant copy than the one they read.
+    const sim = makeOfficerSim();
+    book(sim).inventory.push(
+      { itemId: 'reins_grag_bear', count: 1 },
+      { itemId: 'riding_training', count: 1 },
+    );
+    const before = fingerprint(sim);
+    expect(sim.purgeDormantGuildBankSlot(GUILD_ID, 1, 'reins_grag_bear')).toBeNull();
+    expect(sim.purgeDormantGuildBankSlot(GUILD_ID, 0, '')).toBeNull();
+    expect(fingerprint(sim)).toBe(before);
+    // The matching name still purges.
+    expect(sim.purgeDormantGuildBankSlot(GUILD_ID, 1, 'riding_training')).not.toBeNull();
   });
 
   it('REFUSES an ordinary withdrawable slot: this is not a delete-any-item tool', () => {
@@ -1906,8 +1933,8 @@ describe('purgeDormantGuildBankSlot (the admin escape hatch)', () => {
       { itemId: 'iron_sword', count: 1, craftedRecipeId: 'smith_iron_sword' },
     );
     const before = fingerprint(sim);
-    expect(sim.purgeDormantGuildBankSlot(GUILD_ID, 0)).toBeNull();
-    expect(sim.purgeDormantGuildBankSlot(GUILD_ID, 1)).toBeNull();
+    expect(sim.purgeDormantGuildBankSlot(GUILD_ID, 0, 'wolf_fang')).toBeNull();
+    expect(sim.purgeDormantGuildBankSlot(GUILD_ID, 1, 'iron_sword')).toBeNull();
     expect(fingerprint(sim)).toBe(before);
   });
 
@@ -1916,11 +1943,14 @@ describe('purgeDormantGuildBankSlot (the admin escape hatch)', () => {
     book(sim).inventory.push({ itemId: 'reins_grag_bear', count: 1 });
     const before = fingerprint(sim);
     for (const bad of [-1, 1, 99, 0.5, Number.NaN, Number.POSITIVE_INFINITY]) {
-      expect(sim.purgeDormantGuildBankSlot(GUILD_ID, bad), String(bad)).toBeNull();
+      expect(
+        sim.purgeDormantGuildBankSlot(GUILD_ID, bad, 'reins_grag_bear'),
+        String(bad),
+      ).toBeNull();
     }
     expect(fingerprint(sim)).toBe(before);
     // No book for that guild at all: refuse, never mint one.
-    expect(sim.purgeDormantGuildBankSlot(GUILD_ID + 1, 0)).toBeNull();
+    expect(sim.purgeDormantGuildBankSlot(GUILD_ID + 1, 0, 'reins_grag_bear')).toBeNull();
     expect(sim.guildBanks.has(GUILD_ID + 1)).toBe(false);
   });
 
@@ -1930,7 +1960,7 @@ describe('purgeDormantGuildBankSlot (the admin escape hatch)', () => {
     const sim = makeOfficerSim({ treasury: 0 });
     book(sim).inventory.push({ itemId: 'reins_grag_bear', count: 1 });
     expect(sim.guildBankHoldings(GUILD_ID)).toEqual({ copper: 0, items: 1 });
-    expect(sim.purgeDormantGuildBankSlot(GUILD_ID, 0)).not.toBeNull();
+    expect(sim.purgeDormantGuildBankSlot(GUILD_ID, 0, 'reins_grag_bear')).not.toBeNull();
     expect(sim.guildBankHoldings(GUILD_ID)).toEqual({ copper: 0, items: 0 });
   });
 
@@ -1945,8 +1975,8 @@ describe('purgeDormantGuildBankSlot (the admin escape hatch)', () => {
     expect(draws).toBe(1); // positive control
     draws = 0;
     sim.guildBankInfoForGuild(GUILD_ID);
-    sim.purgeDormantGuildBankSlot(GUILD_ID, 0); // the success arm
-    sim.purgeDormantGuildBankSlot(GUILD_ID, 0); // and a refusal
+    sim.purgeDormantGuildBankSlot(GUILD_ID, 0, 'reins_grag_bear'); // the success arm
+    sim.purgeDormantGuildBankSlot(GUILD_ID, 0, 'reins_grag_bear'); // and a refusal
     expect(draws).toBe(0);
     sim.rng.setObserver(null);
   });

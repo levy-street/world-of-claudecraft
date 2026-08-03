@@ -92,6 +92,24 @@ describe('admin route permission map', () => {
     expect(permissionForAdminRoute('POST', '/admin/api/staff/roles')).toBe('staff.manage');
   });
 
+  it('serves the guild bank purge ladder arm AFTER the central permission gate', () => {
+    // The legacy arm has no per-route auth of its own: it relies on the ONE
+    // central gate in handleAdminApi's preamble. An arm placed above that gate
+    // (the way /admin/api/login deliberately is) would be unauthenticated, so
+    // pin the ordering rather than trusting it transitively.
+    const source = readFileSync('server/admin.ts', 'utf8');
+    const gate = source.indexOf(
+      'const routePermission = permissionForAdminRoute(req.method, path);',
+    );
+    const purgeArm = source.indexOf('const guildBankPurgeMatch =');
+    expect(gate).toBeGreaterThan(-1);
+    expect(purgeArm).toBeGreaterThan(gate);
+    // The only route handled before the gate stays the login endpoint.
+    const preamble = source.slice(0, gate);
+    const early = [...preamble.matchAll(/path === '(\/admin\/api\/[^']+)'/g)].map((m) => m[1]);
+    expect(early).toEqual(['/admin/api/login']);
+  });
+
   it('distinguishes wrong-method hits from unknown paths', () => {
     expect(permissionForAdminRoute('POST', '/admin/api/overview')).toBeNull();
     expect(adminPathKnown('/admin/api/overview')).toBe(true);

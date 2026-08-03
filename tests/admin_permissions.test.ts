@@ -101,16 +101,15 @@ describe('admin permission vocabulary', () => {
     expect(isAdminRole('root')).toBe(false);
   });
 
-  it('keeps guildbank.purge out of the moderator and viewer bundles', () => {
-    // The guild bank escape hatch destroys player property, so it is an
-    // admin/superadmin tool, not part of everyday moderation.
+  it('keeps guildbank.purge SUPERADMIN-only: no dashboard-grantable role reaches it', () => {
+    // The escape hatch destroys player property with no in-game undo, so it is
+    // deliberately outside every assignable role, `admin` included.
+    expect(SUPERADMIN_ONLY_PERMISSIONS).toContain('guildbank.purge');
     for (const role of ADMIN_ROLES) {
       const grants = new Set(ROLE_PERMISSIONS[role]).has('guildbank.purge');
-      expect(grants, `${role} grants guildbank.purge`).toBe(
-        role === 'admin' || role === SUPERADMIN_ROLE,
-      );
+      expect(grants, `${role} grants guildbank.purge`).toBe(role === SUPERADMIN_ROLE);
     }
-    expect(permissionsForRoles(['moderator', 'viewer']).has('guildbank.purge')).toBe(false);
+    expect(permissionsForRoles([...ASSIGNABLE_ADMIN_ROLES]).has('guildbank.purge')).toBe(false);
   });
 
   it('keeps the client permission mirror byte-identical to the server vocabulary', () => {
