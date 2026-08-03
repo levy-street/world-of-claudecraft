@@ -133,6 +133,9 @@ describe('Sim.equipItemToSlot', () => {
   });
 });
 
+// Kept bespoke on purpose (issue #2088): a dynamic import plus a hand-picked
+// field subset (`cmd` only). tests/helpers/bare_client.ts bareClient() is the
+// default for a new suite that just needs a bare ClientWorld.
 describe('ClientWorld equipItemToSlot (wire)', () => {
   it('sends the aimed slot on the same additive equip command', async () => {
     const { ClientWorld } = await import('../src/net/online');

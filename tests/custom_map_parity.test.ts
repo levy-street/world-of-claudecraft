@@ -301,11 +301,14 @@ describe('custom-map terrain seam', () => {
     expect(doc?.content.objects.length).toBeLessThanOrEqual(400);
   });
 
-  // SKIP (grid-world transplant): a custom map's ZONE layout no longer reshapes the
-  // base terrain/biome, because the adopted grid terrain reads the built-in ZONES
-  // directly rather than getActiveWorldContent(). The editor's height-sculpt edits
-  // still apply; custom-zone terrain shaping is a deferred map-editor follow-up.
-  it.skip('a custom single-biome world re-shapes terrain and biome lookup', () => {
+  // The v0.32.0 merge settlement rewired zoneAt (and therefore zoneBiomeAt),
+  // worldXBoundsAt, and baseHeight's hub/lake feature loops onto
+  // getActiveWorldContent(), so the BIOME LOOKUP half of this test is live
+  // again. The band-shape cascade (shapeAt's STRIP_ZONES/COLUMN_ZONES walk)
+  // still reads the built-in ZONES, so custom-zone TERRAIN SHAPING stays a
+  // deferred map-editor follow-up; the empty-list and feature-loop policy is
+  // pinned in tests/world_active_content.test.ts.
+  it('a custom single-biome world re-routes the biome lookup', () => {
     const peaks: WorldContent = {
       ...BUILTIN_WORLD,
       zones: [
@@ -328,9 +331,6 @@ describe('custom-map terrain seam', () => {
     };
     setActiveWorldContent(peaks);
     expect(zoneBiomeAt(50, 50)).toBe('peaks');
-    // Peaks biome has a high base elevation, so an arbitrary far point should sit
-    // well above the built-in vale terrain at the same spot.
-    expect(terrainHeight(60, 60, SEED)).toBeGreaterThan(0);
   });
 });
 

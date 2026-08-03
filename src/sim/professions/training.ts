@@ -26,7 +26,7 @@
 
 import { recipeById } from '../content/recipes';
 import type { PlayerMeta } from '../sim';
-import type { StationDef } from '../types';
+import type { StationDef, StationType } from '../types';
 import { isRecipeKnown } from './crafting';
 import { isAtStation, stationTypeForCraft } from './stations';
 import type { ProfessionRecipeRecord } from './types';
@@ -36,9 +36,20 @@ import { type CraftSkills, tierForSkill } from './wheel';
 // copper: common (tier 0) is free, uncommon (tier 1) is 25 silver, rare
 // (tier 2) is 1 gold, then a 4x geometric step per tier: tier 3 is 4 gold,
 // tier 4 is 16 gold. Tiers beyond the table still
-// clamp to the last entry. Behavior-neutral for shipped wave-one content: no
-// trainer-taught recipe sits above tier 2 (the skillReq 75/150 recipes are
-// all grandfathered pre-training entries with no 'trainer' acquisition).
+// clamp to the last entry.
+//
+// The top two rungs are LIVE now, and they were not when this table was
+// written. The two crafted fishing rods (content/recipes.ts ROD_RECIPES) are
+// the first trainer-taught recipes to reach them: skillReq 75 lands on recipe
+// tier 3 and pays 4 gold, and skillReq 125 lands on recipe tier 5, which is
+// past the end of this table and so clamps to its last entry, 16 gold. Everything else taught by a
+// trainer still sits at 0, 25 silver or 1 gold, and the six crafted LAND tools
+// escape the table entirely because they predate training and carry no
+// acquisition list, so they are known rather than learned. The derived rod
+// fees (4 gold and 16 gold) are SETTLED (ruling R8 in
+// docs/design/professions-tuning-packet-review.md): the curve stays
+// exception-free, so moving a fee means moving this curve or the recipe's
+// skillReq, never a special case.
 export const TRAINING_FEE_BY_TIER: readonly number[] = Object.freeze([
   0, 2500, 10000, 40000, 160000,
 ]);
@@ -59,6 +70,27 @@ export function trainingFeeFor(recipe: ProfessionRecipeRecord): number {
  *  orthogonal gates, see crafting.ts isRecipeKnown). */
 export function teachTierMet(recipe: ProfessionRecipeRecord, craftSkills: CraftSkills): boolean {
   return tierForSkill(craftSkills[recipe.professionId] ?? 0) >= tierForSkill(recipe.skillReq);
+}
+
+/**
+ * The station where a trainer-taught recipe is learned: the recipe's OWN
+ * station binding when it has one, else the station serving its home craft.
+ * One definition, three readers (resolveTrain's range arm, the trainer
+ * window's teach list in src/ui/hud/vendor/train_view.ts, and the crafting
+ * window's where-to-learn hint in src/ui/crafting_view.ts), so what the UI
+ * lists and what the sim teaches can never name different masters.
+ *
+ * The fallback order matters for the crafts with no physical station
+ * (enchanting/jewelcrafting/inscription, stations.ts stationTypeForCraft):
+ * their recipes are teachable exactly when they carry an explicit
+ * `stationType` (the tool-effect charms bind to the toolworks: the charms
+ * are Enchanter work SOLD as tool upgrades, so the tool master teaches
+ * them). For every recipe of a stationed craft the two arms agree today
+ * (each such recipe's stationType, when present, IS its craft's station),
+ * so this is a widening, not a change, for shipped content.
+ */
+export function trainingStationTypeFor(recipe: ProfessionRecipeRecord): StationType | undefined {
+  return recipe.stationType ?? stationTypeForCraft(recipe.professionId);
 }
 
 // Stable deny reasons, not player-facing prose (the client renders localized
@@ -114,7 +146,7 @@ export function resolveTrain(
   if (!recipe.acquisition?.includes('trainer')) {
     return { ok: false, recipeId, reason: 'train_not_taught_here', fee };
   }
-  const stationType = stationTypeForCraft(recipe.professionId);
+  const stationType = trainingStationTypeFor(recipe);
   if (!stationType || !pos || !isAtStation(stations, pos, stationType)) {
     return { ok: false, recipeId, reason: 'train_out_of_range', fee };
   }
@@ -179,4 +211,50 @@ export function grandfatherKnownRecipes(
     for (const id of PRE_TRAINING_RECIPE_IDS) knownRecipes.add(id);
   }
   return true;
+}
+
+// The known-recipes load bound (phase 16). The grandfathered model DEPENDS on
+// ids the current catalog no longer names surviving a load (a retired recipe
+// keeps working forever), so a catalog allowlist here would be wrong; the
+// bound is SHAPE only. No shipped recipe id approaches this length (the
+// longest today is under 40 characters), so anything longer is a hand-edited
+// or corrupted row riding every future save at full length, and non-strings
+// have no legal writer at all.
+export const MAX_KNOWN_RECIPE_ID_LENGTH = 64;
+
+/**
+ * The COUNT half of the same bound. The catalog ships well under a hundred
+ * recipes, and the grandfather contract only ever adds PRE_TRAINING_RECIPE_IDS
+ * on top, so a stored array anywhere near this size is corruption; without a
+ * cap, one row of ten thousand well-shaped ids rides every autosave forever.
+ * The bound is on the PERSISTED array, not on the live Set: the grandfather
+ * union runs after this filter and may legitimately push a capped set a few
+ * entries past it, which the next save then re-caps.
+ */
+export const MAX_KNOWN_RECIPE_IDS = 512;
+
+/**
+ * Load-side shape filter for a persisted knownRecipes value: strings within
+ * the id-length bound survive byte-faithfully and IN ORDER (retired ids
+ * included, the grandfather contract), everything else drops, and at most
+ * MAX_KNOWN_RECIPE_IDS survive.
+ *
+ * TOTAL on `unknown`, which is the contract and not a convenience: this runs
+ * inside Sim.addPlayer, so a stored value that is not an array (a JSON string
+ * is the shape a hand-edit or a bad admin write produces) used to throw
+ * `filter is not a function` there and lock that character out of the game
+ * permanently, on every host, with no way back in. A corrupt value loads as
+ * NO known recipes instead. A character not yet grandfathered still gets the
+ * pre-training set unioned in on that same load; one already past the cut
+ * loses what the corrupt row held, which was unreadable either way. Pure.
+ */
+export function sanitizeKnownRecipeIds(ids: unknown): string[] {
+  if (!Array.isArray(ids)) return [];
+  const out: string[] = [];
+  for (const id of ids) {
+    if (typeof id !== 'string' || id.length > MAX_KNOWN_RECIPE_ID_LENGTH) continue;
+    out.push(id);
+    if (out.length === MAX_KNOWN_RECIPE_IDS) break;
+  }
+  return out;
 }

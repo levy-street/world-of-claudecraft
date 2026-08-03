@@ -113,7 +113,233 @@
       "sourcePack": "_Missing_Icons_Rouge",
       "sourceFile": "49.png",
       "output": "blind.webp"
+    },
+    {
+      "abilityId": "blade_flurry",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/rogue/blade_flurry.png",
+      "output": "blade_flurry.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Twin mirrored sabers producing a tight circular speed blur around the rogue.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/slice_and_dice.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/rogue/evasion.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for rogue\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Mirrored Blades (blade_flurry)\nCanonical mechanic: Mirrored Blades increases attack speed by 20% for 12 sec; 120 sec cooldown. Current mechanics do not cleave.\nSubject: Twin mirrored sabers producing a tight circular speed blur around the rogue.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "cloak_of_shadows",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/rogue/cloak_of_shadows.png",
+      "output": "cloak_of_shadows.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A hooded rogue beneath a violet mantle that catches and dissolves incoming bolts.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/vanish.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/rogue/evasion.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for rogue\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Shadecloak (cloak_of_shadows)\nCanonical mechanic: Shadecloak is off-GCD and absorbs 420 damage for 5 sec; 90 sec cooldown. It is not full magic immunity.\nSubject: A hooded rogue beneath a violet mantle that catches and dissolves incoming bolts.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "cold_blood",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/rogue/cold_blood.png",
+      "output": "cold_blood.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A motionless dagger poised over a stilled pulse, with one precise critical star at its tip.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/deadly_poison.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/rogue/vanish.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for rogue\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Killer's Calm (cold_blood)\nCanonical mechanic: Killer's Calm makes the next attack critically strike; the armed effect lasts up to 60 sec and has a 120 sec cooldown.\nSubject: A motionless dagger poised over a stilled pulse, with one precise critical star at its tip.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "ghostly_strike",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/rogue/ghostly_strike.png",
+      "output": "ghostly_strike.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A spectral dagger passing through a target while the rogue's pale afterimage bends aside.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/vanish.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/rogue/slice_and_dice.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for rogue\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Wraith Strike (ghostly_strike)\nCanonical mechanic: Wraith Strike deals weapon damage plus 18, grants 15 percentage points of dodge for 7 sec, and awards 1 combo point; 20 sec cooldown.\nSubject: A spectral dagger passing through a target while the rogue's pale afterimage bends aside.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "hemorrhage",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/rogue/hemorrhage.png",
+      "output": "hemorrhage.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A dagger drawing a crimson ribbon through a wound into a vulnerability sigil.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/deadly_poison.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/rogue/slice_and_dice.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for rogue\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Red Ribbon (hemorrhage)\nCanonical mechanic: Red Ribbon strikes for weapon damage plus 16, deals 36 bleed damage over 12 sec in 3 sec ticks, increases bleed damage taken by 40% for 12 sec, and awards 1 combo point.\nSubject: A dagger drawing a crimson ribbon through a wound into a vulnerability sigil.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "kick",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/rogue/kick.png",
+      "output": "kick.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A boot smashing through an active spell rune.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/evasion.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/rogue/slice_and_dice.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for rogue\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Boot (kick)\nCanonical mechanic: Boot interrupts a melee target and locks that spell school for 4 sec; 10 sec cooldown.\nSubject: A boot smashing through an active spell rune.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "preparation",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/rogue/preparation.png",
+      "output": "preparation.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "An open thief's kit with three rewinding clock sigils over boot, eye, and smoke tools.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/vanish.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/rogue/evasion.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for rogue\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Contingency (preparation)\nCanonical mechanic: Contingency is off-GCD and clears the cooldowns of Sprint, Evasion, and Vanish; 300 sec cooldown.\nSubject: An open thief's kit with three rewinding clock sigils over boot, eye, and smoke tools.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "shadowstep",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/rogue/shadowstep.png",
+      "output": "shadowstep.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A rogue dissolving at one footprint and reappearing behind an enemy with dagger raised.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/vanish.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/rogue/evasion.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for rogue\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Shadeslip (shadowstep)\nCanonical mechanic: Shadeslip performs swept target-directed shadow movement up to 24 yd without breaking Duskveil; 24 sec cooldown.\nSubject: A rogue dissolving at one footprint and reappearing behind an enemy with dagger raised.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "smoke_screen",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/rogue/smoke_screen.png",
+      "output": "smoke_screen.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A crouched rogue in dense smoke while a blade passes through an afterimage.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/vanish.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/rogue/evasion.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for rogue\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Smoke Screen (smoke_screen)\nCanonical mechanic: Smoke Screen increases dodge chance by 30 percentage points for 8 sec; 30 sec cooldown. It does not grant invisibility.\nSubject: A crouched rogue in dense smoke while a blade passes through an afterimage.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
     }
   ],
-  "deferredStayProcedural": {}
+  "deferredStayProcedural": {},
+  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 entries are project-generated and explicitly override it."
 }

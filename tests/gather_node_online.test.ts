@@ -8,6 +8,9 @@ import { ClientWorld } from '../src/net/online';
 // the ClientWorld-only edges that fixture doesn't: the unset-before-any-
 // snapshot default and a cooldown clearing on a later snapshot.
 describe('ClientWorld.nodeHarvestableByMe', () => {
+  // Kept bespoke on purpose (issue #2088): this suite needs the truly UNSET
+  // prototype (no nodeCooldowns), unlike the shared tests/helpers/bare_client.ts
+  // bareClient(), which always initializes it.
   function bareClient(): ClientWorld {
     return Object.create(ClientWorld.prototype);
   }
@@ -38,5 +41,60 @@ describe('ClientWorld.nodeHarvestableByMe', () => {
     // reflects that node clearing, not decrementing to zero.
     (client as any).nodeCooldowns = new Map();
     expect(client.nodeHarvestableByMe('node_a')).toBe(true);
+  });
+});
+
+// The countdown read of the same mirror (the UX pass's respawn tooltip
+// line): the map entry IS the remaining seconds, so the read is a lookup,
+// and it answers null exactly where nodeHarvestableByMe answers true.
+describe('ClientWorld.nodeRespawnSeconds', () => {
+  function bareClient(): ClientWorld {
+    return Object.create(ClientWorld.prototype);
+  }
+
+  it('answers null (no throw) before any snapshot has been applied', () => {
+    expect(bareClient().nodeRespawnSeconds('any_node')).toBeNull();
+  });
+
+  it('answers the mirrored remaining seconds while cooling, null otherwise', () => {
+    const client = bareClient();
+    (client as any).nodeCooldowns = new Map([['node_a', 12.5]]);
+    expect(client.nodeRespawnSeconds('node_a')).toBe(12.5);
+    expect(client.nodeRespawnSeconds('node_b')).toBeNull();
+    (client as any).nodeCooldowns = new Map();
+    expect(client.nodeRespawnSeconds('node_a')).toBeNull();
+  });
+
+  it('agrees with nodeHarvestableByMe: null exactly when the node reads ready', () => {
+    const client = bareClient();
+    (client as any).nodeCooldowns = new Map([['node_a', 3]]);
+    for (const nodeId of ['node_a', 'node_b']) {
+      expect(client.nodeRespawnSeconds(nodeId) === null).toBe(client.nodeHarvestableByMe(nodeId));
+    }
+  });
+});
+
+// The R40 consent on the WIRE, sender side: confirmEffectUse true rides as
+// confirmUse: true; omitted or false sends the byte-identical pre-flow
+// frame (no key at all). The server half is pinned through the real router
+// in tests/gather_node_harvest.test.ts.
+describe('ClientWorld.harvestNode confirm flag (sender)', () => {
+  it('sends confirmUse only when explicitly true', () => {
+    const client = Object.create(ClientWorld.prototype) as ClientWorld;
+    const sent: Record<string, unknown>[] = [];
+    (
+      client as unknown as { cmdWithOutcome(msg: Record<string, unknown>): Promise<boolean> }
+    ).cmdWithOutcome = (msg) => {
+      sent.push(msg);
+      return Promise.resolve(true);
+    };
+    void client.harvestNode('node_a');
+    void client.harvestNode('node_a', false);
+    void client.harvestNode('node_a', true);
+    expect(sent).toHaveLength(3);
+    expect('confirmUse' in sent[0]).toBe(false);
+    expect('confirmUse' in sent[1]).toBe(false);
+    expect(sent[2].confirmUse).toBe(true);
+    expect(sent[2]).toMatchObject({ cmd: 'harvest_node', node: 'node_a' });
   });
 });

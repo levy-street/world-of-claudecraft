@@ -26,7 +26,6 @@ vi.mock('../server/db', () => ({
 
 import { GameServer, wireEntity } from '../server/game';
 import { BOOL_SETTINGS } from '../src/game/settings';
-import { ClientWorld } from '../src/net/online';
 import { ABILITIES, CLASSES } from '../src/sim/content/classes';
 import { emptyModifiers } from '../src/sim/content/talents';
 import { recalcPlayerStats } from '../src/sim/entity';
@@ -36,6 +35,7 @@ import { stunDrCategory } from '../src/sim/stun_dr';
 import type { Aura } from '../src/sim/types';
 import { AVATAR_SCALE, SPELL_AOE_COEFF_MULT } from '../src/sim/types';
 import { targetOfTargetId } from '../src/ui/target_of_target';
+import { bareClient } from './helpers/bare_client';
 
 describe('rogue starting dual wield (classes.ts startOffhand)', () => {
   it('starts rogues with a rusty dagger in BOTH hands', () => {
@@ -364,55 +364,6 @@ describe('dev bots auto-accept party invites (party.ts partyInvite)', () => {
 // routing on the server 'cast' command, and the target-of-target `tgt` dynamic
 // field + its kind-based client resolution.
 // ---------------------------------------------------------------------------
-
-// A ClientWorld without the WebSocket plumbing (the snapshots.test.ts harness),
-// to drive the REAL applySnapshot decode directly.
-function bareClient(pid: number): ClientWorld {
-  const c = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass: 'warrior' };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.ownPlayerId = pid;
-  c.ownPlayerClass = 'warrior';
-  c.spectating = null;
-  c.cupInfo = null;
-  c.sportRole = null;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.honor = 0;
-  c.lifetimeHonor = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.selectedDungeonDifficulty = 'normal';
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.serverTickHz = null;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  c.spectateFacingPending = false;
-  c.pendingSpectateFacing = null;
-  c.nodeCooldowns = new Map();
-  return c as ClientWorld;
-}
 
 describe('mouseover cast settings + server target routing (game.ts case cast)', () => {
   it('defaults mouseoverCast on and showTargetOfTarget off', () => {

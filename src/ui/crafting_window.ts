@@ -95,6 +95,17 @@ export function renderCraftingWindow(
   // else, so carry its offset across too: a repaint the player did not ask
   // for must not scroll the craft they are reading off the screen.
   const tabScrollLeft = el.querySelector('.crafting-tabs')?.scrollLeft ?? 0;
+  // The identity card's capped skill list (264px, components.css) is the
+  // window's third scroll region and rebuilds with the rest, so carry its
+  // offset AND its focus across: a single craft repaints this window three
+  // times (optimistic, craftResult, the slow-band skill signature), and
+  // without the carry each one yanks a scrolled reader back to row one and
+  // drops keyboard focus to body. On mobile the CARD is the one scroller
+  // (hud.mobile.css lifts the list cap), so its offset carries too.
+  const oldSkillList = el.querySelector('.profession-skill-list');
+  const skillListScrollTop = oldSkillList?.scrollTop ?? 0;
+  const skillListHadFocus = oldSkillList !== null && document.activeElement === oldSkillList;
+  const cardScrollTop = el.querySelector('.profession-identity-card')?.scrollTop ?? 0;
   el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.crafting.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.crafting.close'))}">${svgIcon('close')}</button></div>`;
 
   if (identity) renderProfessionIdentityCard(el, identity);
@@ -188,13 +199,22 @@ export function renderCraftingWindow(
       const item = document.createElement('div');
       item.className = 'vendor-item crafting-recipe-item';
       const resultName = row.result ? itemDisplayName(row.result) : row.resultItemId;
+      // The fine-substitution suffix (the UX pass): stated in words on both
+      // the visible line and the aria fold, never color alone.
+      const fineSubText = (count: number): string =>
+        count > 0
+          ? ` ${t('hudChrome.crafting.reagentFineSub', {
+              count: formatNumber(count, { maximumFractionDigits: 0 }),
+            })}`
+          : '';
       const reagentLines = row.reagents
-        .map((r) =>
-          t('hudChrome.crafting.reagentLine', {
-            name: r.item ? itemDisplayName(r.item) : r.itemId,
-            have: formatNumber(r.have, { maximumFractionDigits: 0 }),
-            required: formatNumber(r.required, { maximumFractionDigits: 0 }),
-          }),
+        .map(
+          (r) =>
+            t('hudChrome.crafting.reagentLine', {
+              name: r.item ? itemDisplayName(r.item) : r.itemId,
+              have: formatNumber(r.have, { maximumFractionDigits: 0 }),
+              required: formatNumber(r.required, { maximumFractionDigits: 0 }),
+            }) + fineSubText(r.fineSubstituted),
         )
         .join(', ');
       // The inline reagent list marks each unsatisfied reagent (a class the
@@ -209,7 +229,11 @@ export function renderCraftingWindow(
                 have: formatNumber(r.have, { maximumFractionDigits: 0 }),
                 required: formatNumber(r.required, { maximumFractionDigits: 0 }),
               }),
-            )}</span>`,
+            )}${
+              r.fineSubstituted > 0
+                ? `<span class="crafting-fine-sub">${esc(fineSubText(r.fineSubstituted))}</span>`
+                : ''
+            }</span>`,
         )
         .join(', ');
       const comboLine = row.comboRequirement
@@ -358,4 +382,13 @@ export function renderCraftingWindow(
   el.querySelector('[data-close]')?.addEventListener('click', () => deps.onClose());
   el.style.display = 'flex';
   body.scrollTop = scrollTop;
+  // After display:flex like body.scrollTop above: a display:none subtree has
+  // no scroll extent, so an earlier write would clamp to 0.
+  const newSkillList = el.querySelector<HTMLElement>('.profession-skill-list');
+  if (newSkillList) {
+    newSkillList.scrollTop = skillListScrollTop;
+    if (skillListHadFocus) newSkillList.focus();
+  }
+  const newCard = el.querySelector<HTMLElement>('.profession-identity-card');
+  if (newCard) newCard.scrollTop = cardScrollTop;
 }

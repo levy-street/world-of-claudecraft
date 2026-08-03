@@ -17,6 +17,25 @@
 import { weaponTypeForItem } from '../content/weapon_skin_rules';
 import type { ItemDef } from '../types';
 
+// Which arcane material a disenchant yields, keyed by the disenchanted
+// item's rarity: a dedicated Enchanting material rather than a shared junk
+// item, feeding the same three tiers applyEnchant's reagents draw from. Only
+// strictly better than plain salvage.ts's generic yield from `rare` up
+// (arcane_dust and bone_fragments vendor near-identically at `common`; see
+// #1712 round-3 review point 12). Lives in THIS leaf rather than
+// enchanting.ts because R39 gave it a second consumer: the tool-effect
+// recharge (tools.ts, itself a pure leaf) prices in the arcane material of
+// the R30-resolved tool rarity rung, and reusing this exact table is what
+// keeps the two ladders from ever drifting apart. enchanting.ts re-exports it
+// for its existing importers.
+export const DISENCHANT_MATERIAL_BY_QUALITY: Readonly<Record<string, string>> = {
+  common: 'arcane_dust',
+  uncommon: 'arcane_dust',
+  rare: 'arcane_essence',
+  epic: 'arcane_shard',
+  legendary: 'arcane_shard',
+};
+
 // Armor class -> its resonant weave. Only cloth/leather/mail armor pieces carry
 // an armorType; jewelry (neck/ring, no armor class) falls through to no
 // secondary.

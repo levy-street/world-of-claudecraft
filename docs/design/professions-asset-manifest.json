@@ -2,14 +2,14 @@
   "meta": {
     "feature": "Professions 2.0",
     "date": "2026-07-16",
-    "purpose": "Every designer-replaceable art slot this feature ships. All slots ship with procedural placeholders (the game's icon compositor or existing GLBs), so nothing blocks on art. Designers replace slots by delivering files per deliveryFormat; the pipeline and fallback behavior below mirror the shipped deeds icon pipeline (docs/achievements/icon-brief.md is the precedent).",
+    "purpose": "Every designer-replaceable art slot this feature ships. Accepted committed WebPs and GLBs are the shipping source of truth; procedural recipes and existing models remain development fallbacks only while a declared slot has no final asset. The delivery pipeline below mirrors the shipped deeds icon pipeline (docs/achievements/icon-brief.md is the precedent).",
     "deliveryFormat": {
-      "icons": "512x512 transparent-background PNG, sRGB, painted style matching the existing item/deed icon sets, named exactly <asset id>.png. The converter downscales to a 128px square WebP (q82) served from public/ui/<set>/; WebP becomes the committed source of truth. Icons must read clearly at 46px (desktop button) and 40px (mobile).",
+      "icons": "512x512 sRGB PNG, named exactly <asset id>.png. Item-family sources use the opaque atmospheric backdrop of public/ui/items; deed and profession crest sources use transparency. The converter downscales to a 128px square WebP (q82) served from public/ui/<set>/; WebP becomes the committed source of truth. Icons must read clearly at 46px (desktop button) and 40px (mobile).",
       "worldProps": "GLB (glTF binary), CC0 or licensed with a CREDITS.md row, low-poly matching the KayKit-adjacent world style. The models/props asset-budget group allows 4 MiB total; every GLB needs a media-manifest regen and a registerPreload entry.",
       "chromeGlyphs": "Monochrome inline SVG (single path preferred), added to the svgIcon registry; used only for secondary controls, never primary destinations."
     },
     "pipeline": "Icons: drop PNGs into public/ui/professions/ (new set), run the professions converter (cloned from scripts/convert_item_icons_webp.mjs at Phase 5; regenerates the checked-in id set; a bijection test pins art to wiring). Item-family icons instead go to public/ui/items/ via npm run assets:items and ITEM_IMAGE_IDS. Deed crests go to public/ui/deeds/ via npm run assets:deeds.",
-    "fallback": "Every icon id has a procedural recipe (icons.ts r() helper) or an automatic kind/keyword fallback, so an unshipped slot renders a coherent placeholder, never a blank.",
+    "fallback": "Every icon id has a procedural recipe (icons.ts r() helper) or an automatic kind/keyword fallback, so an unshipped development slot renders coherently. Final declared item and deed art is committed and gate-pinned rather than relying on that fallback.",
     "styleNotes": "Classic dark-fantasy: blue-black grounds, antique gold accents, warm parchment light. No emoji-style art, no flat modern glyphs for painted slots, no text baked into icons (localization). Palette and mood notes per asset below.",
     "audioNote": "This manifest scopes ART only. Profession audio (station ambiences, craft/harvest/masterwork SFX) is out of scope here; its placeholder tracking lives on issue #2208."
   },
@@ -735,6 +735,14 @@
           "description": "Salvage 50: a heaped crate of reclaimed materials",
           "palette": "scrap bronze on workshop grey",
           "priority": 3
+        },
+        {
+          "id": "deed_prof_peaks_gatherer",
+          "deedId": "chr_peaks_gatherer",
+          "name": "Harvest of the Heights",
+          "description": "Thornpeak gathering triad: a banded osmium ore, cut Highpine log and golden Sunpetal bloom",
+          "palette": "icy peak blue, cobalt ore, amber wood and sunlit gold",
+          "priority": 1
         }
       ],
       "size": "512px source PNG, served 128px WebP"

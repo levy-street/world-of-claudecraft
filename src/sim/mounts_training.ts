@@ -28,7 +28,13 @@ import { QUESTS } from './data';
 import { forceDismount, forceTrainingMount } from './mounts';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { dist2d, type Entity, INTERACT_RANGE, type MountTrainingSession } from './types';
+import {
+  dist2d,
+  type Entity,
+  INTERACT_RANGE,
+  isNonSpellCast,
+  type MountTrainingSession,
+} from './types';
 
 // --- tuning (change numbers here, not inline) -------------------------------
 export const MOUNT_TRAIN_MIN_LEVEL = 20;
@@ -139,6 +145,14 @@ export function prepareRidingLessonRace(ctx: SimContext, meta: PlayerMeta, e: En
   }
   if (e.inCombat) {
     ctx.error(meta.entityId, "You can't do that while in combat.");
+    return false;
+  }
+  // The profession-cast interlock's fourth route: the race start mounts the
+  // lesson steed INSTANTLY (forceTrainingMount), so a live gather or fishing
+  // cast refuses here exactly as the reins click refuses through useItem's
+  // busy guard. Draw-free, before any session state is written.
+  if (isNonSpellCast(e.castingAbility)) {
+    ctx.error(meta.entityId, 'You are busy.');
     return false;
   }
   // The lesson itself is free: the only riding purchase is the 80g skill at

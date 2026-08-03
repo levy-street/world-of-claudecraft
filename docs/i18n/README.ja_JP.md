@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.33.1-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.34.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.ja_JP.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -92,7 +92,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and choose Play Offline
 ```
 
-キャラクターに名前をつけ、9つのクラスのいずれかを選ぶと、**Eastbrook Vale**（レベル1から7）からスタートします。ここは複数の拠点に囲まれた市場町です。北には狼の通り道、東にはイノシシの草原、西には the Sableweb の森、北西には Mirror Lake、南西には穴掘りだらけの銅鉱の採掘場、北東には安らげぬ死者の崩れた礼拝堂、そして南東には Gorrak の盗賊キャンプがあります。北の街道は山道を登って **Mirefen Marsh**（6から13、拠点 Fenbridge）へ、さらに **Thornpeak Heights**（13から20、拠点 Highwatch）へと続きます。世界のシードは `src/main.ts` で固定されているので、訪れるたびに同じ場所です。
+キャラクターに名前をつけ、9つのクラスのいずれかを選ぶと、**Eastbrook Vale**（レベル1から7）からスタートします。ここは複数の拠点に囲まれた市場町です。北には狼の通り道、東にはイノシシの草原、西には the Sableweb の森、北西には Mirror Lake、南西には穴掘りだらけの銅鉱の採掘場、北東には安らげぬ死者の崩れた礼拝堂、そして南東には Gorrak の盗賊キャンプがあります。北の街道は山道を登って **Mirefen Marsh**（6から13、拠点 Fenbridge）へ、さらに **Thornpeak Heights**（13から20、拠点 Highwatch）へと続きます。世界のシードは `src/sim/world_seed.ts` で固定されているので、訪れるたびに同じ場所です。
 
 ### Windows、Linux、macOS 向けデスクトップアプリ
 

@@ -30,11 +30,11 @@ vi.mock('../server/db', () => ({
 }));
 
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
-import { ClientWorld } from '../src/net/online';
 import { Sim } from '../src/sim/sim';
 import { dist2d, type PlayerClass } from '../src/sim/types';
 import { drawWeapon, toggleWeaponStow } from '../src/sim/weapon_stow';
 import { terrainHeight } from '../src/sim/world';
+import { bareClient } from './helpers/bare_client';
 
 function makeSim(cls: 'warrior' | 'mage' = 'warrior', seed = 42) {
   return new Sim({ seed, playerClass: cls, autoEquip: true });
@@ -185,51 +185,6 @@ function joinServer(
   if ('error' in session) throw new Error(session.error);
   session.blockListLoaded = true;
   return session;
-}
-
-// A ClientWorld without the WebSocket plumbing, to drive applySnapshot directly.
-function bareClient(pid: number): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass: 'warrior' };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.ownPlayerId = pid;
-  c.ownPlayerClass = 'warrior';
-  c.spectating = null;
-  c.cupInfo = null;
-  c.sportRole = null;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.selectedDungeonDifficulty = 'normal';
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.serverTickHz = null;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  c.spectateFacingPending = false;
-  c.pendingSpectateFacing = null;
-  return c;
 }
 
 describe('ClientWorld optimistic nudge', () => {

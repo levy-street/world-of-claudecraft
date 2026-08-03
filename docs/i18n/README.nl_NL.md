@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.33.1-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.34.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.nl_NL.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -92,7 +92,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and choose Play Offline
 ```
 
-Geef je personage een naam, kies een van de negen classes, en je begint in **Eastbrook Vale** (levels 1-7), een marktstad omringd door hubs: wolvenpaden in het noorden, everzwijnweiden in het oosten, de Sableweb-bossen in het westen, Mirror Lake in het noordwesten, een door burrowers vergeven kopergroeve in het zuidwesten en een verwoeste kapel met rusteloze doden in het noordoosten, met Gorrak's bandietenkamp in het zuidoosten. De noordweg klimt via een bergpas omhoog naar **Mirefen Marsh** (6-13, hub Fenbridge) en verder omhoog naar **Thornpeak Heights** (13-20, hub Highwatch). De wereld-seed staat vast in `src/main.ts`, dus het is bij elk bezoek dezelfde plek.
+Geef je personage een naam, kies een van de negen classes, en je begint in **Eastbrook Vale** (levels 1-7), een marktstad omringd door hubs: wolvenpaden in het noorden, everzwijnweiden in het oosten, de Sableweb-bossen in het westen, Mirror Lake in het noordwesten, een door burrowers vergeven kopergroeve in het zuidwesten en een verwoeste kapel met rusteloze doden in het noordoosten, met Gorrak's bandietenkamp in het zuidoosten. De noordweg klimt via een bergpas omhoog naar **Mirefen Marsh** (6-13, hub Fenbridge) en verder omhoog naar **Thornpeak Heights** (13-20, hub Highwatch). De wereld-seed staat vast in `src/sim/world_seed.ts`, dus het is bij elk bezoek dezelfde plek.
 
 ### Desktop-apps voor Windows, Linux en macOS
 

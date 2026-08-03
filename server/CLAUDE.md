@@ -59,14 +59,14 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
 | `deeds_board.ts` / `deeds.ts` | the Renown leaderboard's pure scoring core (account-level dedupe, entry floor, score-then-earliest tie-break; Renown values come from the content table, never SQL) / the `RouteDef` API surface (public rarity read, broadcast toggle), TTL-cached in `main.ts` |
 | `steam/` | the env-gated (`STEAM_ENABLED`, off by default) Steam achievements mirror: link-not-login ticket handshake, `achievement_map.ts` (deed id to `ACH_*`, hard cap 100), publisher Web API push + reconcile-on-link |
 | `daily_rewards.ts`/`daily_rewards_db.ts` | wallet-gated daily reward tasks + Discord winner announcements; participation bans are WRITTEN in `moderation_db.ts` (`setDailyRewardsBan`, permanent or timed via `durationHours`, recorded in the moderation audit; `tests/moderation_db.test.ts`), this pair owns only the eligibility read (`banForAccount`, `tests/daily_rewards_ban_db.test.ts`) |
-| `discord.ts` (+ `discord_oauth`/`discord_db`/`discord_relay`/`discord_activity`) | Discord integration: link/unlink OAuth shell + rewards, in-game `!` community-command relay, activity feed the bot drains |
+| `discord.ts` (+ `discord_oauth`/`discord_db`/`discord_relay`/`discord_activity`/`discord_link_changes`/`discord_status_cache`/`discord_bot_counters`/`http/discord_bot_metrics`) | Discord integration: link/unlink OAuth shell + rewards, in-game `!` community-command relay, activity feed the bot drains, the bounded linked-member change feed the outbox carries, the keyed `/api/discord` status cache busted on every write, and the bot's governor counters exposed as prometheus series |
 | `github.ts` (+ `github_oauth`/`github_db`/`github_contributors`) | GitHub contributor linking for the developer badge + merged-PR tally |
 | `oauth.ts`/`oauth_db.ts`, `character_sheet.ts`, `profile_page.ts`, `avatar.ts` | read-only companion API: OAuth code+PKCE and device grants (scope `character:read`), pure sheet normalizer, public SEO profile pages + generated avatars |
 | `maps.ts`/`maps_db.ts`/`maps_routes.ts`, `user_assets*.ts` | map editor: custom-map persistence with fork lineage / hardened player GLB uploads (both mirror the `SocialService`/`SocialDb` split) |
 | `tick_profiler.ts` / `tick_rate_meter.ts` | debugging the 50 ms budget: rolling per-phase loop timings, achieved wall-clock tick rate (the two can disagree, see the meter header) |
 | `mob_scan_tick_stats.ts` | folds the sim's per-tick mob-scan visit counters (`Sim.mobScanCounters`, observer-only) into the `PERF_TICK_LOG` heartbeat tokens (`aggroVisits=`/`threatVisits=`) and the admin tick-capture accumulators; `game.ts` keeps only the holder and the apply call |
 | `perf_report.ts` / `provider_usage.ts` | rate-limited client perf-report ingestion / process-local provider and usage telemetry for the admin dashboard |
-| `cached_read.ts` / `deeds_board_warm.ts` | the two shared-read cache shapes: single-key `createCachedRead` (TTL, single-flight, stale-on-error, joiner-refusing bust) / the extended `singleFlight(run, epochOf?)` for per-scope epoch-keyed board flights (see Hot paths) |
+| `cached_read.ts` / `deeds_board_warm.ts` / `discord_status_cache.ts` | the three shared-read cache shapes: single-key `createCachedRead` (TTL, single-flight, stale-on-error, joiner-refusing bust) / the extended `singleFlight(run, epochOf?)` for per-scope epoch-keyed board flights / the keyed bounded per-account cache behind `GET /api/discord` (see Hot paths) |
 | `retention_sweep.ts` | the advisory-locked, self-clocked nightly sweep of batched per-table prunes; every table that grows without bound registers here (see Hot paths) |
 | `concurrent_indexes.ts` | post-boot `CREATE INDEX CONCURRENTLY` seam for new indexes on big live tables |
 | `realm_readout_memo.ts` / `event_frame.ts` / `interest_candidates.ts` | broadcast build-once seams: per-pass realm readout memo (rides `maybeRaw`), serialize-once event frames (sent via `sendRaw`), per-cell shared interest gathering (see Hot paths) |
@@ -126,16 +126,19 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
 One process serves a whole realm, so per-request and per-tick cost is what scales.
 Three seams keep it flat; use them, never re-invent them.
 
-- **Shared (viewer-identical) reads are cached with single-flight.** Two shapes:
+- **Shared (viewer-identical) reads are cached with single-flight.** Three shapes:
   `createCachedRead(refresh, {ttlMs})` (`cached_read.ts`) for a single-key read (TTL,
-  single-flight, stale-on-error, and a bust that refuses in-flight joiners), and the
+  single-flight, stale-on-error, and a bust that refuses in-flight joiners), the
   extended `singleFlight(run, epochOf?)` (`deeds_board_warm.ts`) for per-scope board
   flights keyed on `() => boardEpoch`, so the existing `bustBoardCaches` epoch bump also
-  evicts readers that joined mid-refresh. Exemplars: `admin_overview_cache.ts` (dual-arm
+  evicts readers that joined mid-refresh, and the keyed bounded per-account
+  `discord_status_cache.ts` (a Map of CachedRead entries with LRU eviction) for the one
+  account-scoped hot read, `/api/discord`. Exemplars: `admin_overview_cache.ts` (dual-arm
   memo), `daily_rewards_board_cache.ts` (day-scoped), the leaderboard/guild/arena/deeds
   flights in `main.ts`; pinned by `tests/server/board_read_single_flight.test.ts`.
   Rules: a new endpoint whose response is identical for every caller (a board, a count,
-  an aggregate) reads through one of these two shapes, never a per-request `pool.query`;
+  an aggregate) reads through one of the first two shapes, never a per-request
+  `pool.query` (the keyed third shape is for an account-scoped hot read);
   anything a moderation action can change MUST be bust-wired in the same change (TTL
   alone delays enforcement); a deliberately non-busted read (a moderation-invariant
   COUNT) records why in a comment.

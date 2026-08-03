@@ -667,7 +667,7 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
       'reedwoven_trousers',
       // Gathering tools (#2343: every node harvest needs a matching tool, so
       // each zone hub stocks the tiers its own nodes use; Mirefen has tier-1
-      // and tier-2 nodes). Tiered rods stay a Trader Wilkes exclusive.
+      // and tier-2 nodes), and the rod its own water takes.
       'copper_mining_pick',
       'iron_mining_pick',
       'handaxe',
@@ -675,6 +675,12 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
       'gathering_sickle',
       'bronze_sickle',
       'simple_fishing_pole',
+      // The marsh's own water takes a tier-2 rod (professions/fishing_zones.ts),
+      // so the hub rule finally speaks to fishing: sell the rung this zone's
+      // water needs, where that water is. Without this the marsh is the one
+      // place in the world that demands a tool no local counter carries, and
+      // the Codfather sends a level-6 angler back to Eastbrook for it.
+      'ironreel_fishing_rod',
     ],
     greeting:
       'Dry boots, dry bread, dry powder — at Fenbridge you get two of the three on a good day.',
@@ -740,15 +746,11 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     // Professions 2.0: the Fenbridge tannery master runs the repeatable
     // leatherworking work order.
     questIds: ['q_prof_workorder_tannery'],
-    // Station stocking: thorium_ore is the premium reagent the
-    // tannery station's own recipe (recipe_duskhide_wraps) consumes.
-    vendorItems: [
-      'travelers_knapsack',
-      'tough_jerky',
-      'smoked_eel',
-      'tanning_agent',
-      'thorium_ore',
-    ],
+    // Station stocking: the tannery master sells its goods and the vendor-only
+    // tanning staple. thorium_ore, the premium reagent recipe_duskhide_wraps
+    // consumes, is NOT here: it is a node yield, and no NPC stocks a gathered
+    // material (professions.md, Locked rulings).
+    vendorItems: ['travelers_knapsack', 'tough_jerky', 'smoked_eel', 'tanning_agent'],
     greeting: 'A hide is only as good as its tanning, $C. The vats are ready when you are.',
   },
 };
@@ -823,7 +825,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     name: 'The Codfather',
     giverNpcId: 'provisioner_hale',
     turnInNpcId: 'provisioner_hale',
-    text: "The Codfather isn't just a fish, $N, he's a cold-blooded killer. Old-timers swear he eats Mire Prowlers for breakfast, and even the Mirefen Widows won't spin their webs near the Deepfen Shallows out of sheer terror. He rules those waters. Grab a fishing pole, drag that old devil out of his waters, and I will admit you have joined the family.",
+    text: "The Codfather isn't just a fish, $N, he's a cold-blooded killer. Old-timers swear he eats Mire Prowlers for breakfast, and even the Mirefen Widows won't spin their webs near the Deepfen Shallows out of sheer terror. He rules those waters, and marsh water takes an Ironreel Fishing Rod, no less; my counter sells them. Get one in hand, drag that old devil out of his waters, and I will admit you have joined the family.",
     completionText:
       'By the damp saints... The Codfather himself. Look at those whiskers. Fenbridge will eat stories off this catch for a year, $N.',
     objectives: [{ type: 'collect', itemId: 'the_codfather', count: 1, label: 'The Codfather' }],

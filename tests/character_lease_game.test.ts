@@ -34,6 +34,7 @@ import {
   saveCharacterAndMarketState,
   saveCharacterState,
 } from '../server/db';
+import { drainLinkChanges } from '../server/discord_link_changes';
 import { GameServer } from '../server/game';
 
 function fakeWs() {
@@ -64,6 +65,9 @@ const flushMicrotasks = () => new Promise((r) => setTimeout(r, 0));
 
 beforeEach(() => {
   vi.clearAllMocks();
+  // saveCharacter writes into the module-global linked-member change feed; start
+  // every test from an empty queue.
+  drainLinkChanges();
 });
 
 describe('character load lease, GameServer wiring', () => {
@@ -159,6 +163,60 @@ describe('character load lease, GameServer wiring', () => {
     expect(marketCall?.[5]).toBe('nonce-c');
   });
 
+  it('socketClosed with withMarket: false takes the plain save; the default keeps the market', async () => {
+    // The RECEIVING half of the mid-handshake re-check's market skip: the
+    // ws_auth suite pins what the caller passes and a source pin holds the
+    // parameter text, but only this proves game.ts actually routes the
+    // option through the real saveCharacter to the right db function
+    // (the fix-round audit: game.ts ignoring the option kept every test
+    // green).
+    const server = new GameServer();
+    const s = join(server, 103, 11, 'Dropper', 'nonce-d');
+    expect('error' in s).toBe(false);
+    vi.mocked(saveCharacterState).mockClear();
+    vi.mocked(saveCharacterAndMarketState).mockClear();
+    expect((server as any).socketClosed(s, s.ws, { withMarket: false })).toBe(true);
+    await new Promise((resolve) => setImmediate(resolve));
+    expect(saveCharacterAndMarketState).not.toHaveBeenCalled();
+    expect(saveCharacterState).toHaveBeenCalledTimes(1);
+
+    // The default arm, on its own session (the first is linkdead now): an
+    // ordinary drop keeps the realm-global market halves.
+    const s2 = join(server, 104, 12, 'Dropperb', 'nonce-e');
+    expect('error' in s2).toBe(false);
+    vi.mocked(saveCharacterState).mockClear();
+    vi.mocked(saveCharacterAndMarketState).mockClear();
+    expect((server as any).socketClosed(s2, s2.ws)).toBe(true);
+    await new Promise((resolve) => setImmediate(resolve));
+    expect(saveCharacterAndMarketState).toHaveBeenCalledTimes(1);
+    expect(saveCharacterState).not.toHaveBeenCalled();
+  });
+
+  it('enqueues a linked-member flex change only when the persisted level actually moves', async () => {
+    const server = new GameServer();
+    const s = join(server, 100, 7, 'Leveler', 'nonce-l');
+    expect('error' in s).toBe(false);
+
+    // Joining is not a transition, and neither is a save that moves no level.
+    await (server as any).saveCharacter(s);
+    expect(drainLinkChanges()).toEqual([]);
+
+    server.sim.setPlayerLevel(5, s.pid);
+    await (server as any).saveCharacter(s);
+    expect(drainLinkChanges()).toEqual([{ accountId: 100, kinds: ['flex'] }]);
+
+    // The 30 s autosave sweep re-saves every online session. Without the delta gate
+    // that alone would mint one item per online player per sweep, forever.
+    await (server as any).saveCharacter(s);
+    expect(drainLinkChanges()).toEqual([]);
+
+    // setPlayerLevel emits no levelup event, so a save like this one is the only
+    // notice the feed ever gets of a dev, GM-join or PBE-boost level move.
+    server.sim.setPlayerLevel(6, s.pid);
+    await (server as any).saveCharacter(s);
+    expect(drainLinkChanges()).toEqual([{ accountId: 100, kinds: ['flex'] }]);
+  });
+
   it('a fenced-out save (false) warns, freezes lastSave, keeps deed records queued, and kicks the displaced session', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     try {
@@ -171,6 +229,9 @@ describe('character load lease, GameServer wiring', () => {
       s.blockListLoaded = true;
       s.pendingDeedRecords.push('deed-a', 'deed-b');
       s.lastSave = 111;
+      // A real level move, so the change-feed assertion below is about the fence and
+      // not about there being nothing to report.
+      server.sim.setPlayerLevel(7, s.pid);
 
       // A same-account takeover reclaimed the lease: EVERY later fenced write from
       // this displaced session reports false, including its own leave save.
@@ -184,6 +245,9 @@ describe('character load lease, GameServer wiring', () => {
       expect(String(warn.mock.calls.at(-1)?.[0])).toMatch(/fenced out/);
       expect(s.lastSave).toBe(111);
       expect(s.pendingDeedRecords).toEqual(['deed-a', 'deed-b']);
+      // Same reasoning for the change feed: the level the bot reads off the row did
+      // not move, so an item here would make it re-push a member for nothing.
+      expect(drainLinkChanges()).toEqual([]);
 
       // The displaced session is not left playing unsaved: it gets the same explicit
       // takeover signal the in-process path sends, and the world slot clears so the
@@ -203,9 +267,11 @@ describe('character load lease, GameServer wiring', () => {
       expect('error' in healthy).toBe(false);
       healthy.pendingDeedRecords.push('deed-z');
       healthy.lastSave = 111;
+      server.sim.setPlayerLevel(7, healthy.pid);
       await (server as any).saveCharacter(healthy);
       expect(healthy.lastSave).not.toBe(111);
       expect(healthy.pendingDeedRecords).toEqual([]);
+      expect(drainLinkChanges()).toEqual([{ accountId: 200, kinds: ['flex'] }]);
     } finally {
       // Restore the factory defaults so later tests see the pre-test mock shape.
       vi.mocked(saveCharacterState).mockImplementation(async () => undefined as any);

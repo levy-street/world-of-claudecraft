@@ -7,6 +7,7 @@ import type {
   DailyRewardPayoutActor,
   DailyRewardPayoutAttemptClaimResult,
   DailyRewardPayoutClaimResult,
+  DailyRewardPayoutMarkOutcome,
   DailyRewardPayoutModerationResult,
   DailyRewardPayoutRow,
   DailyRewardScoreRow,
@@ -30,8 +31,8 @@ vi.mock('../server/woc_balance', () => ({
 }));
 
 import {
-  addRewardDays,
   currentDailyRewardDay,
+  DAILY_REWARD_WINNERS_TTL_MS,
   type DailyRewardRuntimeConfig,
   DailyRewardService,
   dailyRewardEligibility,
@@ -65,6 +66,17 @@ class FakeDailyRewardDb implements DailyRewardDb {
   dayFinalizedCalls = 0;
   scoreForAccountCalls = 0;
   leaderboardSnapshotCalls = 0;
+  // The winners TTL cache sits above this method, so its call count IS the
+  // number of Postgres reads a run of discordWinnerAnnouncements would cost.
+  unannouncedWinnerDaysCalls = 0;
+  unannouncedWinnerDaysLimits: number[] = [];
+  // When false, markWinnersAnnounced matches no row (the service's 404 arm).
+  markWinnersAnnouncedOk = true;
+  // What the two payout-moderation writes answer. Both default to the refusal
+  // arm, which is what every pre-existing case expects; a test that needs the
+  // successful arm (the winners-cache bust) scripts it.
+  voidPayoutResult: DailyRewardPayoutModerationResult = { outcome: 'not_found' };
+  restorePayoutResult: DailyRewardPayoutModerationResult = { outcome: 'not_found' };
   finalizedDays = new Set<string>();
   // When > 0, the next seedTasks call throws (and decrements), simulating the
   // seed transaction rolling back so the seed-gate retry path can be exercised.
@@ -225,17 +237,21 @@ class FakeDailyRewardDb implements DailyRewardDb {
   async pendingPayouts(): Promise<DailyRewardInternalPayoutRow[]> {
     return [];
   }
-  async unannouncedWinnerDays(): Promise<DailyRewardWinnerAnnouncement[]> {
+  async unannouncedWinnerDays(limit: number): Promise<DailyRewardWinnerAnnouncement[]> {
+    this.unannouncedWinnerDaysCalls++;
+    this.unannouncedWinnerDaysLimits.push(limit);
     return this.winnerAnnouncements;
   }
   async markWinnersAnnounced(): Promise<boolean> {
-    return true;
+    return this.markWinnersAnnouncedOk;
   }
-  async markPayout(): Promise<boolean> {
-    return true;
+  markPayoutOutcome: DailyRewardPayoutMarkOutcome = 'updated';
+  async markPayout(): Promise<DailyRewardPayoutMarkOutcome> {
+    return this.markPayoutOutcome;
   }
+  claimPayoutResult: DailyRewardPayoutClaimResult = { outcome: 'not_found' };
   async claimPayout(): Promise<DailyRewardPayoutClaimResult> {
-    return { outcome: 'not_found' };
+    return this.claimPayoutResult;
   }
   async claimPayoutResend(): Promise<DailyRewardPayoutAttemptClaimResult> {
     return { outcome: 'not_found' };
@@ -249,14 +265,14 @@ class FakeDailyRewardDb implements DailyRewardDb {
     _reason: string,
     _actor: DailyRewardPayoutActor,
   ): Promise<DailyRewardPayoutModerationResult> {
-    return { outcome: 'not_found' };
+    return this.voidPayoutResult;
   }
   async restorePayout(
     _day: string,
     _rank: number,
     _actor: DailyRewardPayoutActor,
   ): Promise<DailyRewardPayoutModerationResult> {
-    return { outcome: 'not_found' };
+    return this.restorePayoutResult;
   }
 }
 
@@ -578,6 +594,481 @@ describe('daily rewards', () => {
       }),
     ]);
     expect(vi.mocked(fetch)).toHaveBeenCalledTimes(2);
+  });
+
+  describe('the Discord winner-days read is TTL-cached', () => {
+    /** One unannounced day, built fresh per call so no pin compares a result to its source. */
+    function winnerDay(day: string): DailyRewardWinnerAnnouncement {
+      return {
+        day,
+        realm: 'Claudemoon',
+        prizePoolUsd: 150,
+        finalizedAt: '2026-07-01T00:00:00.000Z',
+        payouts: [],
+      };
+    }
+
+    /**
+     * A service over a hand-advanced clock. Never vitest fake timers: the cache
+     * captures its clock function once at construction, and a captured function
+     * does not begin moving when timers are faked afterwards, so the TTL arm
+     * would silently test nothing.
+     */
+    function cachedService(db: FakeDailyRewardDb) {
+      const clock = { ms: 1_000_000 };
+      return { service: new DailyRewardService(db, { now: () => clock.ms }), clock };
+    }
+
+    function dayNames(result: unknown): string[] {
+      return (result as { days: Array<{ day: string }> }).days.map((d) => d.day);
+    }
+
+    it('serves a second read inside the TTL from the snapshot, at ONE database read', async () => {
+      const db = new FakeDailyRewardDb();
+      db.winnerAnnouncements = [winnerDay('2026-06-30')];
+      const { service, clock } = cachedService(db);
+
+      const first = await service.discordWinnerAnnouncements(1);
+      clock.ms += DAILY_REWARD_WINNERS_TTL_MS - 1;
+      const second = await service.discordWinnerAnnouncements(1);
+
+      expect(db.unannouncedWinnerDaysCalls).toBe(1);
+      expect(second).toEqual(first);
+      // The refresh asks for the ceiling every time, which is what lets ONE
+      // snapshot serve every limit a caller can ask for.
+      expect(db.unannouncedWinnerDaysLimits).toEqual([5]);
+    });
+
+    it('refreshes once the TTL has elapsed', async () => {
+      const db = new FakeDailyRewardDb();
+      db.winnerAnnouncements = [winnerDay('2026-06-30')];
+      const { service, clock } = cachedService(db);
+
+      await service.discordWinnerAnnouncements(1);
+      clock.ms += DAILY_REWARD_WINNERS_TTL_MS - 1;
+      await service.discordWinnerAnnouncements(1);
+      expect(db.unannouncedWinnerDaysCalls).toBe(1);
+
+      clock.ms += 1;
+      await service.discordWinnerAnnouncements(1);
+      expect(db.unannouncedWinnerDaysCalls).toBe(2);
+    });
+
+    it('slices the cached snapshot to the asked limit instead of re-reading', async () => {
+      const db = new FakeDailyRewardDb();
+      db.winnerAnnouncements = ['2026-06-28', '2026-06-29', '2026-06-30'].map(winnerDay);
+      const { service } = cachedService(db);
+
+      expect(dayNames(await service.discordWinnerAnnouncements(1))).toEqual(['2026-06-28']);
+      expect(dayNames(await service.discordWinnerAnnouncements(3))).toEqual([
+        '2026-06-28',
+        '2026-06-29',
+        '2026-06-30',
+      ]);
+      expect(db.unannouncedWinnerDaysCalls).toBe(1);
+    });
+
+    it('hands out copies, so a caller mutating its result cannot poison the snapshot', async () => {
+      const db = new FakeDailyRewardDb();
+      const day = winnerDay('2026-06-30');
+      day.payouts = [{ rank: 1, username: 'Winner' } as never];
+      db.winnerAnnouncements = [day];
+      const { service } = cachedService(db);
+
+      const first = (await service.discordWinnerAnnouncements(1)) as {
+        days: Array<{ prizePoolUsd: number; payouts: Array<{ username: string }> }>;
+      };
+      first.days[0].prizePoolUsd = -1;
+      first.days[0].payouts[0].username = 'Tampered';
+
+      const second = (await service.discordWinnerAnnouncements(1)) as {
+        days: Array<{ prizePoolUsd: number; payouts: Array<{ username: string }> }>;
+      };
+      expect(db.unannouncedWinnerDaysCalls).toBe(1); // same cached snapshot
+      expect(second.days[0].prizePoolUsd).toBe(150);
+      expect(second.days[0].payouts[0].username).toBe('Winner');
+    });
+
+    it('busts on finalization, so a newly closed day is announced without waiting out the TTL', async () => {
+      const db = new FakeDailyRewardDb();
+      const { service, clock } = cachedService(db);
+
+      expect(dayNames(await service.discordWinnerAnnouncements(1))).toEqual([]);
+      expect(db.unannouncedWinnerDaysCalls).toBe(1);
+
+      // Finalizing is what puts the day into the unannounced set.
+      db.winnerAnnouncements = [winnerDay('2026-07-01')];
+      await expect(
+        service.finalizeRewardDay({ day: '2026-07-01' }, new Date('2026-07-02T22:00:00.000Z')),
+      ).resolves.toEqual({ ok: true, day: '2026-07-01', outcome: 'finalized' });
+
+      // One millisecond later, deep inside the TTL: without the bust this read
+      // would serve the empty snapshot and the day would go unannounced.
+      clock.ms += 1;
+      expect(dayNames(await service.discordWinnerAnnouncements(1))).toEqual(['2026-07-01']);
+      expect(db.unannouncedWinnerDaysCalls).toBe(2);
+    });
+
+    it('busts on a successful mark, so an announced day is not re-fetched for a TTL', async () => {
+      const db = new FakeDailyRewardDb();
+      db.winnerAnnouncements = [winnerDay('2026-06-30')];
+      const { service, clock } = cachedService(db);
+
+      expect(dayNames(await service.discordWinnerAnnouncements(1))).toEqual(['2026-06-30']);
+      await expect(service.markDiscordWinnersAnnounced({ day: '2026-06-30' })).resolves.toEqual({
+        ok: true,
+      });
+
+      // The marked day has left the set; the fake reflects that.
+      db.winnerAnnouncements = [];
+      clock.ms += 1;
+      expect(dayNames(await service.discordWinnerAnnouncements(1))).toEqual([]);
+      expect(db.unannouncedWinnerDaysCalls).toBe(2);
+    });
+
+    it('leaves the snapshot alone when the mark matched no row', async () => {
+      // The negative control for the bust's success guard: a 404 changed nothing
+      // in the database, so evicting a good snapshot would only cost a re-read.
+      const db = new FakeDailyRewardDb();
+      db.winnerAnnouncements = [winnerDay('2026-06-30')];
+      db.markWinnersAnnouncedOk = false;
+      const { service, clock } = cachedService(db);
+
+      await service.discordWinnerAnnouncements(1);
+      await expect(service.markDiscordWinnersAnnounced({ day: '2026-06-30' })).resolves.toEqual({
+        error: 'reward day not found',
+        status: 404,
+      });
+
+      clock.ms += 1;
+      await service.discordWinnerAnnouncements(1);
+      expect(db.unannouncedWinnerDaysCalls).toBe(1);
+    });
+
+    /** A payout row for the two moderation writes to answer with. */
+    function payoutRow(day: string, rank: number): DailyRewardInternalPayoutRow {
+      return {
+        day,
+        realm: REALM,
+        rank,
+        accountId: 42,
+        username: 'Winner',
+        walletPubkey: 'Wa11etPubKey1111111111111111111111111111111',
+        points: 4200,
+        prizePercent: 0.2,
+        prizeUsd: 30,
+        status: 'void',
+        txSignature: null,
+        paidAt: null,
+        voidReason: 'cheating',
+        voidedById: 'admin-1',
+        voidedByUsername: 'Admin',
+        voidedAt: '2026-07-01T00:00:00.000Z',
+        signedTransaction: null,
+      };
+    }
+
+    /** A well-formed payout-moderation body for the day and rank under test. */
+    const moderationBody = (day: string, rank: number) => ({
+      day,
+      rank,
+      reason: 'confirmed multi-boxing',
+      actorId: 'admin-1',
+      actorUsername: 'Admin',
+    });
+
+    it('busts on a void, so a moderated payout cannot be announced from the snapshot', async () => {
+      // A void edits the CONTENT of a day the snapshot may still be holding, and
+      // the announcement embeds that content, so 30 s of staleness here is a
+      // moderated payout announced publicly as if nothing happened.
+      const db = new FakeDailyRewardDb();
+      db.winnerAnnouncements = [winnerDay('2026-06-30')];
+      db.voidPayoutResult = { outcome: 'updated', payout: payoutRow('2026-06-30', 1) };
+      const { service, clock } = cachedService(db);
+
+      await service.discordWinnerAnnouncements(1);
+      await expect(service.voidPayout(moderationBody('2026-06-30', 1))).resolves.toMatchObject({
+        ok: true,
+      });
+
+      // One millisecond later, deep inside the TTL.
+      clock.ms += 1;
+      await service.discordWinnerAnnouncements(1);
+      expect(db.unannouncedWinnerDaysCalls).toBe(2);
+    });
+
+    it('busts on a restore, the other direction of the same payout edit', async () => {
+      const db = new FakeDailyRewardDb();
+      db.winnerAnnouncements = [winnerDay('2026-06-30')];
+      db.restorePayoutResult = { outcome: 'updated', payout: payoutRow('2026-06-30', 2) };
+      const { service, clock } = cachedService(db);
+
+      await service.discordWinnerAnnouncements(1);
+      await expect(service.restorePayout(moderationBody('2026-06-30', 2))).resolves.toMatchObject({
+        ok: true,
+      });
+
+      clock.ms += 1;
+      await service.discordWinnerAnnouncements(1);
+      expect(db.unannouncedWinnerDaysCalls).toBe(2);
+    });
+
+    it('busts when the payout runner claims a payout, the processing stamp', async () => {
+      // claimPayout stamps status and tx_signature on a payout row of a day the
+      // snapshot may still be holding (Phase 5 QA: this arm and the paid/failed
+      // mark below were the two content writers the bust doctrine missed).
+      const db = new FakeDailyRewardDb();
+      db.winnerAnnouncements = [winnerDay('2026-06-30')];
+      db.claimPayoutResult = { outcome: 'claimed', payout: payoutRow('2026-06-30', 1) };
+      const { service, clock } = cachedService(db);
+
+      await service.discordWinnerAnnouncements(1);
+      await expect(
+        service.markPayout({ day: '2026-06-30', rank: 1, status: 'processing', txSignature: 's1' }),
+      ).resolves.toMatchObject({ ok: true });
+
+      clock.ms += 1;
+      await service.discordWinnerAnnouncements(1);
+      expect(db.unannouncedWinnerDaysCalls).toBe(2);
+    });
+
+    it('busts when the payout runner marks a payout paid', async () => {
+      const db = new FakeDailyRewardDb();
+      db.winnerAnnouncements = [winnerDay('2026-06-30')];
+      const { service, clock } = cachedService(db);
+
+      await service.discordWinnerAnnouncements(1);
+      await expect(
+        service.markPayout({ day: '2026-06-30', rank: 1, status: 'paid', txSignature: 's1' }),
+      ).resolves.toMatchObject({ ok: true });
+
+      clock.ms += 1;
+      await service.discordWinnerAnnouncements(1);
+      expect(db.unannouncedWinnerDaysCalls).toBe(2);
+    });
+
+    it("does not bust on a claim retry that matched an already-claimed row ('existing')", async () => {
+      // claimPayout's 'existing' outcome is the runner's idempotent retry and
+      // writes NOTHING; busting on every retry would evict a healthy snapshot
+      // exactly when the runner is retrying (QA fresh-eyes round: the first shape
+      // of this fix busted here too).
+      const db = new FakeDailyRewardDb();
+      db.winnerAnnouncements = [winnerDay('2026-06-30')];
+      db.claimPayoutResult = { outcome: 'existing', payout: payoutRow('2026-06-30', 1) };
+      const { service, clock } = cachedService(db);
+
+      await service.discordWinnerAnnouncements(1);
+      await expect(
+        service.markPayout({ day: '2026-06-30', rank: 1, status: 'processing', txSignature: 's1' }),
+      ).resolves.toMatchObject({ ok: true });
+
+      clock.ms += 1;
+      await service.discordWinnerAnnouncements(1);
+      expect(db.unannouncedWinnerDaysCalls).toBe(1);
+    });
+
+    it("does not bust on a paid-mark replay that wrote nothing ('already')", async () => {
+      // markPayout answers 'already' for a re-posted paid mark with the same
+      // signature (a dropped response, retried). Nothing moved, so the snapshot
+      // stays; only a real 'updated' write busts.
+      const db = new FakeDailyRewardDb();
+      db.winnerAnnouncements = [winnerDay('2026-06-30')];
+      db.markPayoutOutcome = 'already';
+      const { service, clock } = cachedService(db);
+
+      await service.discordWinnerAnnouncements(1);
+      await expect(
+        service.markPayout({ day: '2026-06-30', rank: 1, status: 'paid', txSignature: 's1' }),
+      ).resolves.toMatchObject({ ok: true });
+
+      clock.ms += 1;
+      await service.discordWinnerAnnouncements(1);
+      expect(db.unannouncedWinnerDaysCalls).toBe(1);
+    });
+
+    it('does not bust on a resend stamp, which the announcement never reads', async () => {
+      // The resend arms write only the payout-ATTEMPTS table, which
+      // unannouncedWinnerDays never selects, so evicting the snapshot for them
+      // would be churn with nothing to converge on.
+      const db = new FakeDailyRewardDb();
+      db.winnerAnnouncements = [winnerDay('2026-06-30')];
+      const { service, clock } = cachedService(db);
+
+      await service.discordWinnerAnnouncements(1);
+      await expect(
+        service.markPayout({
+          day: '2026-06-30',
+          rank: 1,
+          status: 'resent',
+          txSignature: 's1',
+          operationId: 'resend-op-1',
+        }),
+      ).resolves.toMatchObject({ ok: true });
+
+      clock.ms += 1;
+      await service.discordWinnerAnnouncements(1);
+      expect(db.unannouncedWinnerDaysCalls).toBe(1);
+    });
+
+    it('clamps the ask at both edges and serves every limit from ONE snapshot', async () => {
+      // The clamp maths: 0 and NaN fall to the floor of 1, an over-ask is capped
+      // at the 5-day snapshot width. NaN is the treacherous one: unguarded,
+      // Math.max(1, Math.min(5, NaN)) is NaN and slice(0, NaN) is EMPTY, so a
+      // malformed limit would silently serve zero days.
+      const db = new FakeDailyRewardDb();
+      db.winnerAnnouncements = [
+        winnerDay('2026-06-25'),
+        winnerDay('2026-06-26'),
+        winnerDay('2026-06-27'),
+        winnerDay('2026-06-28'),
+        winnerDay('2026-06-29'),
+        winnerDay('2026-06-30'),
+      ];
+      const { service } = cachedService(db);
+
+      expect(dayNames(await service.discordWinnerAnnouncements(0))).toEqual(['2026-06-25']);
+      expect(dayNames(await service.discordWinnerAnnouncements(99))).toEqual([
+        '2026-06-25',
+        '2026-06-26',
+        '2026-06-27',
+        '2026-06-28',
+        '2026-06-29',
+      ]);
+      expect(dayNames(await service.discordWinnerAnnouncements(Number.NaN))).toEqual([
+        '2026-06-25',
+      ]);
+      // Infinity is an over-ask, so it clamps UP to the ceiling, not down to the
+      // floor (the NaN guard is NaN-only on purpose).
+      expect(
+        dayNames(await service.discordWinnerAnnouncements(Number.POSITIVE_INFINITY)),
+      ).toHaveLength(5);
+      // Every ask above was a slice of the same snapshot, never a second read.
+      expect(db.unannouncedWinnerDaysCalls).toBe(1);
+    });
+
+    it('collapses two concurrent cold reads into one database read (single-flight)', async () => {
+      // Pinned at the call site the outbox actually uses, not just at the
+      // createCachedRead factory: the second reader joins the first's in-flight
+      // refresh rather than issuing its own.
+      const db = new FakeDailyRewardDb();
+      db.winnerAnnouncements = [winnerDay('2026-06-30')];
+      const { service } = cachedService(db);
+
+      const [first, second] = await Promise.all([
+        service.discordWinnerAnnouncements(1),
+        service.discordWinnerAnnouncements(1),
+      ]);
+
+      expect(db.unannouncedWinnerDaysCalls).toBe(1);
+      expect(second).toEqual(first);
+    });
+
+    it('leaves the snapshot alone when a payout moderation matched no row', async () => {
+      // The negative control for both busts: the refusal arms changed nothing in
+      // the database, so evicting a good snapshot would only cost a re-read.
+      const db = new FakeDailyRewardDb();
+      db.winnerAnnouncements = [winnerDay('2026-06-30')];
+      const { service, clock } = cachedService(db);
+
+      await service.discordWinnerAnnouncements(1);
+      await expect(service.voidPayout(moderationBody('2026-06-30', 1))).resolves.toEqual({
+        error: 'payout not found',
+        status: 404,
+      });
+      await expect(service.restorePayout(moderationBody('2026-06-30', 1))).resolves.toEqual({
+        error: 'payout not found',
+        status: 404,
+      });
+
+      clock.ms += 1;
+      await service.discordWinnerAnnouncements(1);
+      expect(db.unannouncedWinnerDaysCalls).toBe(1);
+    });
+
+    it('refreshes after an exclusion bust, the handle the moderation hook calls', async () => {
+      // The daily-reward ban and IP-ban writes feed the
+      // daily_reward_excluded_accounts view that unannouncedWinnerDays filters
+      // its payouts through, so an exclusion removes a winner from a day the
+      // snapshot may still be holding. Those writes fire the post-moderation
+      // hook, which main.ts wires to bustDailyRewardWinnersCache, which calls
+      // exactly this method on the service singleton. Without it a just-banned
+      // winner's username and wallet pubkey stay announceable for a full TTL.
+      const db = new FakeDailyRewardDb();
+      db.winnerAnnouncements = [winnerDay('2026-06-30'), winnerDay('2026-07-01')];
+      const { service, clock } = cachedService(db);
+
+      expect(dayNames(await service.discordWinnerAnnouncements(2))).toEqual([
+        '2026-06-30',
+        '2026-07-01',
+      ]);
+
+      // The excluded winner's day drops out of the set entirely (its payouts were
+      // that one account), which is what the next read must see.
+      db.winnerAnnouncements = [winnerDay('2026-07-01')];
+      service.bustWinnersCache();
+
+      clock.ms += 1;
+      expect(dayNames(await service.discordWinnerAnnouncements(2))).toEqual(['2026-07-01']);
+      expect(db.unannouncedWinnerDaysCalls).toBe(2);
+    });
+
+    it('derives the task names ONCE per refresh, not once per call', async () => {
+      // The config lookups ride dailyRewardRuntimeConfig, a single-slot cache: a
+      // per-call derivation cost up to two fetches on EVERY outbox poll for a
+      // pending day (about 40 a minute at a 3 s poll) and evicted the slot the
+      // player-facing status and spin paths share. A warm winners snapshot must
+      // now cost zero database reads AND zero config fetches.
+      const db = new FakeDailyRewardDb();
+      db.winnerAnnouncements = [winnerDay('2026-06-30')];
+      const { service, clock } = cachedService(db);
+
+      await service.discordWinnerAnnouncements(1);
+      const fetchesAfterRefresh = vi.mocked(fetch).mock.calls.length;
+      // Non-vacuous: the refresh really did fetch (the day and its successor).
+      expect(fetchesAfterRefresh).toBeGreaterThan(0);
+
+      clock.ms += DAILY_REWARD_WINNERS_TTL_MS - 1;
+      await service.discordWinnerAnnouncements(1);
+      await service.discordWinnerAnnouncements(5);
+
+      expect(db.unannouncedWinnerDaysCalls).toBe(1);
+      expect(vi.mocked(fetch).mock.calls.length).toBe(fetchesAfterRefresh);
+    });
+
+    it('carries the derived task names through the cached snapshot', async () => {
+      // Moving the derivation into the refresh must not change what a caller
+      // reads: the names still ride each day, and a second call inside the TTL
+      // answers identically from the snapshot.
+      const db = new FakeDailyRewardDb();
+      db.winnerAnnouncements = [winnerDay('2026-06-30')];
+      const { service } = cachedService(db);
+
+      const result = (await service.discordWinnerAnnouncements(1)) as {
+        days: Array<{ day: string; taskName: string; nextTaskName: string }>;
+      };
+
+      expect(result.days).toHaveLength(1);
+      expect(typeof result.days[0].taskName).toBe('string');
+      expect(result.days[0].taskName.length).toBeGreaterThan(0);
+      expect(typeof result.days[0].nextTaskName).toBe('string');
+      expect(await service.discordWinnerAnnouncements(1)).toEqual(result);
+      expect(db.unannouncedWinnerDaysCalls).toBe(1);
+    });
+
+    it('leaves the snapshot alone when the day was already finalized', async () => {
+      const db = new FakeDailyRewardDb();
+      db.finalizedDays.add(JSON.stringify(['2026-07-01', REALM]));
+      const { service, clock } = cachedService(db);
+
+      await service.discordWinnerAnnouncements(1);
+      await expect(
+        service.finalizeRewardDay({ day: '2026-07-01' }, new Date('2026-07-02T22:00:00.000Z')),
+      ).resolves.toEqual({ ok: true, day: '2026-07-01', outcome: 'already_finalized' });
+
+      clock.ms += 1;
+      await service.discordWinnerAnnouncements(1);
+      expect(db.unannouncedWinnerDaysCalls).toBe(1);
+    });
   });
 
   it('awards quest task points using the online-time multiplier', async () => {

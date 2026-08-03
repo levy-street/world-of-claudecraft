@@ -96,6 +96,9 @@ describe('agent movement channel', () => {
   });
 
   it('sanitizes ClientWorld movement before it reaches the websocket sender', () => {
+    // Kept bespoke on purpose (issue #2088): only moveInput is needed here,
+    // unlike the shared tests/helpers/bare_client.ts bareClient(), which sets
+    // every declared field.
     const client: any = Object.create(ClientWorld.prototype);
     client.moveInput = {
       forward: false,

@@ -265,6 +265,15 @@ export const SPORT_KITS: Record<SportRole, readonly string[]> = {
 
 export const SPORT_ROLES: readonly SportRole[] = ['allrounder', 'striker', 'sweeper', 'keeper'];
 
+// Brackets at or below this size seat EVERY fighter as All-Rounder (PRD): no
+// dedicated keeper exists there, which is why the keeper deeds need 3v3+.
+// Shared by every threshold site so none can drift (issue 2767): the sim's
+// role normalization (normalizeRole / ensureSideKeeper in
+// src/sim/social/vale_cup.ts), the bot role picker (vale_cup_bots.ts), the
+// deed grant gates (hat trick / save / clean sheet in src/sim/deeds.ts), and
+// the window's small-bracket role note (src/ui/vale_cup_window_view.ts).
+export const VC_ALLROUNDER_ONLY_MAX_BRACKET = 2;
+
 /** The ONE shared sport-kit resolver (Sim swap + ClientWorld derived rebuild).
  *  Flat rank-1 entries with NO talent modifiers: a player's damage talents must
  *  never scale sport moves, and every class gets the identical kit. */

@@ -573,7 +573,7 @@ export const WRAITHWOOD_ESCORTS: Record<string, EscortDef> = {
       { x: 350, z: 1462 },
       // Stops on open ground at the village edge: the lantern-ring props
       // around Gallowmere pin the deeper approach (verified by the
-      // walkability sweep in tests/escort.test.ts).
+      // walkability sweep in tests/escort_quest.test.ts).
       { x: 357, z: 1447 },
     ],
     moveSpeed: 4.5,

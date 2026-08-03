@@ -98,6 +98,7 @@ import { diagonalMovementVisualFacing } from './game/movement_visual';
 import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
+import { padReelItemId } from './game/pad_reel';
 import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
@@ -224,6 +225,7 @@ import {
 } from './sim/data';
 import { canEquipItem } from './sim/equipment_rules';
 import { MARKET_HOUSE_STOCK } from './sim/market';
+import { bagOwnedMounts } from './sim/mounts';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { Sim } from './sim/sim';
 import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_target';
@@ -237,6 +239,7 @@ import {
   type WorldContent,
 } from './sim/types';
 import { zoneBiomeAt } from './sim/world';
+import { WORLD_SEED } from './sim/world_seed';
 import { startSitePresence } from './site_presence';
 import {
   accountPortalModel,
@@ -287,8 +290,11 @@ import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { showEntryGuardBanner } from './ui/entry_guard_banner';
 import { refreshEpicLinkStatus, wireEpicLink } from './ui/epic_link';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
-import { attachGatherNodeHoverTooltip, gatherNodeToolGateFor } from './ui/gather_node_tooltip';
-import { gatherToolNoNodeKey } from './ui/gathering_view';
+import {
+  attachGatherNodeHoverTooltip,
+  gatherNodeToolGateFor,
+} from './ui/gather_node_tooltip_controller';
+import { gatherEffectPrompt, gatherToolNoNodeKey } from './ui/gathering_view';
 import { loadHighscoresInto } from './ui/highscore_board';
 import { type ClaudiumHooks, Hud } from './ui/hud';
 import { resolveActionBarVisibility } from './ui/hud/action_bar/action_bar_visibility_core';
@@ -324,6 +330,7 @@ import {
 import { createLoadingTipRotation, type LoadingTipRotation } from './ui/loading_tips';
 import { applyMinimapOrnamentVars } from './ui/minimap_gilded_ornament';
 import { showMobileWalletLauncher } from './ui/mobile_wallet_launcher';
+import { mobileMountAction } from './ui/mount_quick_summon';
 import { applyNativeDeviceLanguage } from './ui/native_language';
 import { scheduleNativeUpdateCheck } from './ui/native_update_prompt';
 import { loadNewsInto } from './ui/news_feed';
@@ -360,7 +367,6 @@ import { buildWalletConnectionView } from './ui/wallet_connection_view';
 import { formatXp } from './ui/xp_bar';
 import type { IWorld, LeaderboardEntry } from './world_api';
 
-const WORLD_SEED = 20061; // fixed: World of ClaudeCraft is a persistent place
 const CLICK_MOVE_TURN_RATE = 4.2; // rad/sec; responsive turning while the camera stays decoupled from click spam
 const CLICK_MOVE_WAYPOINT_STOP = 0.8; // yards; intermediate A* corners should roll through, not stutter-stop
 const CLICK_MOVE_REROUTE_DISTANCE = 4; // yards; live entity targets can move this far before we recompute the path
@@ -1762,7 +1768,19 @@ async function startGame(
   const mobileControls = new MobileControls(input, {
     onCycleTarget: () => world.tabTarget(),
     onJump: () => input.triggerTouchJump(),
-    onInteract: () => interactKey(),
+    onInteract: () => {
+      // The touch twin of the pad reel arm (pad_reel.ts, the dispatch's
+      // 'interact' case below): mid fishing cast the Use press answers the
+      // bite with the carried implement instead of running the nearby scan
+      // over a live bobber (the phase 14 QA found the touch path still had
+      // the exact failure the pad arm closed).
+      const reelRod = padReelItemId(world.player.castingAbility, world.inventory);
+      if (reelRod !== null) {
+        world.useItem(reelRod);
+        return;
+      }
+      interactKey();
+    },
     onChat: () => openChat(),
     onChatOpen: () => openChatRead(),
     onChatClose: () => closeChat(),
@@ -1787,7 +1805,17 @@ async function startGame(
     onLeaderboard: () => hud.toggleLeaderboard(),
     onDailyRewards: () => hud.toggleDailyRewards(),
     onDeeds: () => hud.toggleDeeds(),
-    onMountToggle: () => world.toggleMounted(),
+    onMountToggle: () => {
+      // Dismount is the shared toggleMounted() path (unchanged); summoning an
+      // owned mount from a single tap goes through its reins item directly,
+      // since toggleMounted() itself never summons (src/ui/mount_quick_summon.ts).
+      // bagOwnedMounts (bags only, never bank) matches what useItem can
+      // actually summon: world.ownedMounts() includes bank-only reins that
+      // useItem would refuse (#2739 followup).
+      const action = mobileMountAction(world.player.mountKey, bagOwnedMounts(world.inventory));
+      if (action.kind === 'summon') world.useItem(action.itemId);
+      else world.toggleMounted();
+    },
     onProfessions: () => hud.toggleProfessions(),
     onNameplates: () => (renderer.showNameplates = !renderer.showNameplates),
     onMusic: () => {
@@ -1884,9 +1912,21 @@ async function startGame(
       case 'targetFriendlyNext':
         world.friendlyTabTarget();
         break;
-      case 'interact':
+      case 'interact': {
+        // The pad reel (the UX pass): mid fishing cast, the interact press
+        // answers the bite by re-using the rod (the sim's armed-window arm),
+        // instead of running a nearby scan over a live bobber and forcing
+        // the angler into cursor-mode bag clicks. Resolves the B-button
+        // interact conflict for pad anglers; keyboard anglers keep their
+        // hotbar/bags press unchanged.
+        const reelRod = padReelItemId(world.player.castingAbility, world.inventory);
+        if (reelRod !== null) {
+          world.useItem(reelRod);
+          break;
+        }
         interactKey();
         break;
+      }
       case 'bags':
         hud.toggleBags();
         break;
@@ -1941,6 +1981,44 @@ async function startGame(
       case 'professions':
         hud.toggleProfessions();
         break;
+      case 'crafting':
+        // The controller panel has always OFFERED this bind (it lists every
+        // edge keybind action); the dispatch dropped it silently.
+        hud.toggleCrafting();
+        break;
+      case 'petStop':
+        // The pet edges, the dungeon finder, and the sheathe toggle: the
+        // same offered-but-dropped sweep that found Crafting (the controller
+        // panel lists every edge keybind action), each wired to its exact
+        // keyboard handler.
+        world.setPetMode('passive');
+        break;
+      case 'petTaunt':
+        world.petTaunt();
+        break;
+      case 'petAttack':
+        world.petAttack();
+        break;
+      case 'petDefensive':
+        world.setPetMode('defensive');
+        break;
+      case 'petAggressive':
+        world.setPetMode('aggressive');
+        break;
+      case 'dungeonFinder':
+        hud.toggleDungeonFinder();
+        break;
+      case 'sheathe': {
+        // The keyboard arm's exact rule: the world owns the gate, the cue
+        // plays only when the state moved.
+        const wasStowed = world.player.weaponStowed;
+        world.toggleWeaponStow();
+        if (world.player.weaponStowed !== wasStowed) {
+          if (world.player.weaponStowed) audio.weaponSheathe();
+          else audio.weaponUnsheathe();
+        }
+        break;
+      }
       case 'chat':
         openChat();
         break;
@@ -2725,6 +2803,15 @@ async function startGame(
       }
     }
   }
+  // The R40 per-use effect confirm gate, shared by every gather entry point
+  // (world click, interact key, gathering-tool use): the pure question from
+  // the view core, the ask through the HUD's confirm-dialog family. The
+  // harvest proceeds on either answer; only the charge follows it.
+  const gatherEffectConfirm = {
+    needed: (nodeId: string) => gatherEffectPrompt(world, nodeId),
+    ask: (prompt: { effectId: string; charges: number }, proceed: (confirmed: boolean) => void) =>
+      hud.confirmToolEffectUse(prompt, proceed),
+  };
   function interactKey(): void {
     stopAutorunForInteraction(
       tryNearbyInteraction(
@@ -2736,6 +2823,8 @@ async function startGame(
         t('hudChrome.gathering.notReady'),
         t('questUi.errors.escortAway'),
         t('errors.nothingInteract'),
+        undefined,
+        gatherEffectConfirm,
       ),
       input,
       mobileControls,
@@ -2854,6 +2943,7 @@ async function startGame(
             t('questUi.errors.tooFar'),
             t('hudChrome.gathering.notReady'),
             gatherNodeToolGateFor(world, node),
+            gatherEffectConfirm,
           ),
           input,
           mobileControls,
@@ -3491,6 +3581,7 @@ async function startGame(
         t('questUi.errors.tooFar'),
         t('hudChrome.gathering.notReady'),
         gatherNodeToolGateFor(world, node),
+        gatherEffectConfirm,
       ),
       input,
       mobileControls,
@@ -3657,7 +3748,13 @@ async function startGame(
         );
         Object.assign(offlineSim.moveInput, mi);
         const stepFacing = movementFacing ?? facing;
-        if (stepFacing !== null) offlineSim.player.facing = stepFacing;
+        // A stun locks facing (issue #2426): stepPlayerMotion already blocks
+        // turnLeft/turnRight while stunned, but mouselook/controller facing is
+        // applied out of band, here, before tick(), and must honor the same gate
+        // or a stunned player can still turn to face away from a positional attack.
+        if (stepFacing !== null && !isStunned(offlineSim.player)) {
+          offlineSim.player.facing = stepFacing;
+        }
         offlineSim.updateFiestaBots(); // dev: steer Fiesta practice bots (no-op unless active)
         perf.markInputSent(performance.now());
         const simStart = perf.startTime();

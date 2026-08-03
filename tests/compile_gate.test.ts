@@ -3,6 +3,7 @@ import {
   awaitCompileGate,
   CompileGateQueue,
   type CompileGateScheduler,
+  settlePendingSwap,
 } from '../src/render/compile_gate';
 
 function fakeScheduler(): CompileGateScheduler & {
@@ -152,5 +153,33 @@ describe('CompileGateQueue', () => {
       timedOut: false,
     });
     expect(priorities).toEqual([40]);
+  });
+});
+
+describe('settlePendingSwap', () => {
+  it('clears the token when it still names the settling owner', () => {
+    const root = { id: 'bear' };
+    expect(settlePendingSwap(root, root)).toBeNull();
+  });
+
+  it('leaves an already-clear token alone', () => {
+    expect(settlePendingSwap(null, { id: 'bear' })).toBeNull();
+  });
+
+  it('does not clobber a newer pending swap: the classic druid form-dance race', () => {
+    // Bear form is built and gated first (token = bearRoot). Before its compile
+    // settles, the player reswaps to cat form, which is built and gated second
+    // (token = catRoot, overwriting bearRoot). When bear's gate finally settles,
+    // its callback must NOT clear cat's still-pending token, or cat would reveal
+    // one frame before its own shader actually finished linking: the exact
+    // freeze this gate exists to prevent, just relocated to a rapid form swap.
+    const bearRoot = { id: 'bear' };
+    const catRoot = { id: 'cat' };
+    let pending: typeof bearRoot | typeof catRoot | null = bearRoot;
+    pending = catRoot; // cat's build reassigns the shared token before bear settles
+    pending = settlePendingSwap(pending, bearRoot); // bear's onSettled fires late
+    expect(pending).toBe(catRoot);
+    pending = settlePendingSwap(pending, catRoot); // cat's own onSettled fires next
+    expect(pending).toBeNull();
   });
 });

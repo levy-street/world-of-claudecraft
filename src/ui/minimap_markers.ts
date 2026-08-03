@@ -34,9 +34,13 @@ import type { GatheringProfessionId } from '../sim/content/professions';
 import { GATHER_NODES, isDelvePos, isYumiMazePos, QUESTS, zoneAt } from '../sim/data';
 import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
 import { canGatherTier } from '../sim/professions/tools';
-import { isQuestTurnInNpc } from '../sim/types';
+import {
+  npcQuestMarkerKind,
+  type QuestMarkerKind,
+  strongerQuestMarker,
+} from '../sim/quests/quest_marker_kind';
 import type { IWorld } from '../world_api';
-import { viewerOwnedToolTier } from './gathering_view';
+import { viewerUsableToolTier } from './gathering_view';
 
 // Markers beyond (S/2 - RIM_INSET) from the centre are culled (entities) or pinned to
 // that rim as an arrow (party). Byte-faithful to the inline `S/2 - 7`.
@@ -55,14 +59,24 @@ export type MinimapMode = 'delve' | 'yumiMaze' | 'overworld';
 /** The NPC quest glyph: turn-in ready ('?') wins over available ('!'), else neutral. */
 export type NpcGlyph = '?' | '!' | '•';
 
+/** The '!' glyph's kinds, in glyph terms: gold first-offer, blue repeat, or
+ *  the dimmed cooldown (a work order inside its cadence window). 'none' is
+ *  the neutral dot; 'ready' is the gold '?'. The gray in-progress state is
+ *  nameplate-only, so the minimap folds it to the neutral dot. */
+export type NpcMarkerVariant = Exclude<QuestMarkerKind, 'active'>;
+
 /** One overworld minimap marker, in canvas-pixel space. A DISCRIMINATED union (not a
  *  flat struct): each variant carries exactly the fields its draw branch needs. */
 export type MinimapMarker =
   // An online friend/guild ally who is NOT in the party (party members are the
   // party-disc/arrow variants). Strangers get no marker.
   | { kind: 'ally'; mx: number; my: number; ally: 'friend' | 'guild' }
-  // A quest-giver NPC glyph.
-  | { kind: 'npc'; mx: number; my: number; glyph: NpcGlyph }
+  // A quest-giver NPC glyph. `marker` is the folded quest-marker state behind
+  // the glyph: the painter resolves gold for 'ready'/'available' (and the
+  // neutral 'none' dot), the repeat token for 'repeat', and the repeat token
+  // dimmed for 'cooldown'. Actionable info on every graphics tier (fairness
+  // invariant: never preset-gated), like every other marker here.
+  | { kind: 'npc'; mx: number; my: number; glyph: NpcGlyph; marker: NpcMarkerVariant }
   // A dungeon entrance/exit portal.
   | { kind: 'portal'; mx: number; my: number }
   // A lootable world object.
@@ -92,7 +106,8 @@ export type MinimapMarker =
   // harvestable-for-THIS-viewer from on-cooldown-for-this-viewer (per-player,
   // see IWorldProfessions#nodeHarvestableByMe; two viewers can see opposite
   // states for the same node id). `locked` is the SEPARATE tool-tier access
-  // dimension (Professions 2.0, per-viewer owned-best bag scan):
+  // dimension (Professions 2.0, the per-viewer WIELD-FILTERED usable-tool
+  // scan, viewerUsableToolTier):
   // the painter composes both, keeping the ready/cooldown silhouette while a
   // locked tint replaces the state color. Actionable info on every graphics
   // tier (fairness invariant: never preset-gated).
@@ -129,7 +144,8 @@ export function minimapMode(world: IWorld): MinimapMode {
 
 /**
  * Build an overworld minimap marker model with a reused container. Reads only IWorld
- * members (player / entities / partyInfo / socialInfo / questState), so the offline Sim
+ * members (player / entities / partyInfo / socialInfo / questState / questsDone /
+ * craftingIdentity), so the offline Sim
  * and the online ClientWorld mirror produce identical output. Every
  * position is projected to canvas pixels here; the painter only resolves colors +
  * strokes.
@@ -161,6 +177,15 @@ export function createMinimapMarkers(): MinimapMarkers {
       const guildNames = social?.guild ? new Set(social.guild.members.map((m) => m.name)) : null;
       const partyPids = world.partyInfo ? new Set(world.partyInfo.members.map((m) => m.pid)) : null;
 
+      // Quest-marker inputs (the shared quest_marker_kind rule), resolved
+      // lazily ONCE per build on the first in-rim NPC: craftingIdentity is a
+      // per-access allocation on the offline Sim, so the common no-nearby-NPC
+      // frame skips it entirely (the bestToolTiers memo shape below).
+      let questMarkerCtx: {
+        questsDone: ReadonlySet<string>;
+        cadenceBlocked: ReadonlySet<string> | undefined;
+      } | null = null;
+
       for (const e of world.entities.values()) {
         if (e.id === p.id) continue;
         const dx = -(e.pos.x - p.pos.x) * pxPerYard; // +X is map-left
@@ -175,13 +200,38 @@ export function createMinimapMarkers(): MinimapMarkers {
             markers.push({ kind: 'ally', mx, my, ally: isFriend ? 'friend' : 'guild' });
           }
         } else if (e.kind === 'npc') {
-          const hasAvail = e.questIds.some(
-            (q) => QUESTS[q].giverNpcId === e.templateId && world.questState(q) === 'available',
-          );
-          const hasReady = e.questIds.some(
-            (q) => isQuestTurnInNpc(QUESTS[q], e.templateId) && world.questState(q) === 'ready',
-          );
-          markers.push({ kind: 'npc', mx, my, glyph: hasReady ? '?' : hasAvail ? '!' : '•' });
+          if (!questMarkerCtx) {
+            const blocked = world.craftingIdentity?.cadenceBlockedQuests;
+            questMarkerCtx = {
+              questsDone: world.questsDone,
+              cadenceBlocked: blocked && blocked.length > 0 ? new Set(blocked) : undefined,
+            };
+          }
+          let folded: NpcMarkerVariant = 'none';
+          for (const q of e.questIds) {
+            const quest = QUESTS[q];
+            if (!quest) continue;
+            const kind = npcQuestMarkerKind(
+              quest,
+              e.templateId,
+              world.questState(q),
+              questMarkerCtx.questsDone,
+              questMarkerCtx.cadenceBlocked,
+            );
+            // The gray in-progress state is nameplate-only. Filtered PER
+            // QUEST before the fold (the map's questGiverNpcMarkers does the
+            // same), never folded then collapsed: 'active' outranks
+            // 'cooldown', so folding it in would swallow a cooldown mark
+            // this surface DOES draw whenever the same NPC also holds an
+            // in-progress turn-in (all four profession masters do).
+            if (kind === 'active') continue;
+            // No cast: the generic fold keeps the narrowed union, so removing
+            // the guard above is a compile error, not a comment violation.
+            folded = strongerQuestMarker<NpcMarkerVariant>(folded, kind);
+            if (folded === 'ready') break; // nothing outranks the '?'
+          }
+          const glyph: NpcGlyph = folded === 'ready' ? '?' : folded === 'none' ? '•' : '!';
+          markers.push({ kind: 'npc', mx, my, glyph, marker: folded });
         } else if (
           e.kind === 'object' &&
           (e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit')
@@ -252,12 +302,16 @@ export function createMinimapMarkers(): MinimapMarkers {
 
       // Gatherable world nodes (issue 1124): static content positions (never entities), each
       // classified ready/cooldown for THIS viewer only via nodeHarvestableByMe.
-      // `locked` memoizes the owned-best bag scan per profession,
+      // `locked` memoizes the wield-filtered usable-tool scan per profession,
       // lazily on the first in-rim node: the common no-nearby-node frame
       // skips the scan entirely at the minimap's 10Hz cadence. The memo is a
       // per-build temporary (like the membership Sets above), so a tool
       // picked up between frames re-resolves next build.
       let bestToolTiers: Map<GatheringProfessionId, number> | null = null;
+      // Resolved ONCE beside the memo: the offline gatheringProficiency
+      // getter copies the live map per access, so reading it per profession
+      // would allocate per build. Same lazy shape as the memo itself.
+      let proficiency: Readonly<Record<string, number>> | undefined;
       for (const node of GATHER_NODES) {
         const dx = -(node.pos.x - p.pos.x) * pxPerYard;
         const dz = -(node.pos.z - p.pos.z) * pxPerYard;
@@ -266,7 +320,8 @@ export function createMinimapMarkers(): MinimapMarkers {
         const professionId = NODE_HARVEST_TABLE[node.type].professionId;
         let best = bestToolTiers.get(professionId);
         if (best === undefined) {
-          best = viewerOwnedToolTier(world, professionId);
+          proficiency ??= world.gatheringProficiency;
+          best = viewerUsableToolTier(world, professionId, proficiency);
           bestToolTiers.set(professionId, best);
         }
         markers.push({

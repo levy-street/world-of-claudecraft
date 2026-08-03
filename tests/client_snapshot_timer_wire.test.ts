@@ -1,58 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { ClientWorld } from '../src/net/online';
+import type { ClientWorld } from '../src/net/online';
 import {
   snapshotTimerWireMode,
   stableCooldownRemaining,
   stableDeadlineRemaining,
 } from '../src/net/snapshot_timer_wire';
-import type { PlayerClass } from '../src/sim/types';
-
-function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWorld {
-  const client: any = Object.create(ClientWorld.prototype);
-  client.cfg = { seed: 20061, playerClass };
-  client.entities = new Map();
-  client.playerId = pid;
-  client.ownPlayerId = pid;
-  client.ownPlayerClass = playerClass;
-  client.spectating = null;
-  client.cupInfo = null;
-  client.sportRole = null;
-  client.moveInput = {};
-  client.inventory = [];
-  client.vendorBuyback = [];
-  client.equipment = {};
-  client.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  client.copper = 0;
-  client.honor = 0;
-  client.lifetimeHonor = 0;
-  client.xp = 0;
-  client.known = [];
-  client.questLog = new Map();
-  client.questsDone = new Set();
-  client.pendingQuestCommands = new Map();
-  client.partyInfo = null;
-  client.selectedDungeonDifficulty = 'normal';
-  client.tradeInfo = null;
-  client.duelInfo = null;
-  client.lastSnapAt = 0;
-  client.snapInterval = 50;
-  client.serverTickHz = null;
-  client.missingSince = new Map();
-  client.pendingFacingDelta = 0;
-  client.connected = true;
-  client.eventQueue = [];
-  client.mouselookFacing = null;
-  client.lastInputSentAt = 0;
-  client.lastInputSig = '';
-  client.inputSeq = 0;
-  client.pendingInputSeqSentAt = new Map();
-  client.ackedInputSeq = 0;
-  client.inputEchoSamples = [];
-  client.spectateFacingPending = false;
-  client.pendingSpectateFacing = null;
-  client.nodeCooldowns = new Map();
-  return client;
-}
+import { bareClient } from './helpers/bare_client';
 
 function playerWire(id: number, extra: Record<string, unknown> = {}): Record<string, unknown> {
   return {
@@ -128,6 +81,21 @@ describe('stable snapshot timer protocol', () => {
 
     expect(client.player.auras[0]).toMatchObject({ id: 'retained', remaining: 9 });
     expect(client.player.cooldowns.get('cast')).toBe(9);
+  });
+
+  it('ages the nodeRespawnSeconds countdown off the stable ncd deadlines', () => {
+    // The countdown read rides the same deadline set the readiness mirror
+    // does: ncd { ore: 12 } at stable time 10 is a deadline, so the remaining
+    // ages between snapshots without the wire resending it, and the read
+    // drains to null exactly when the readiness flips.
+    const client = bareClient(1);
+    apply(client, { tw: 2, time: 10, self: playerWire(1, { ncd: { ore: 12 } }) });
+    expect(client.nodeRespawnSeconds('ore')).toBe(2);
+    apply(client, { tw: 2, time: 11, self: playerWire(1) });
+    expect(client.nodeRespawnSeconds('ore')).toBe(1);
+    apply(client, { tw: 2, time: 13.1, self: playerWire(1) });
+    expect(client.nodeRespawnSeconds('ore')).toBeNull();
+    expect(client.nodeHarvestableByMe('ore')).toBe(true);
   });
 
   it('ages omitted v2 timers and preserves auras on moving lite records', () => {

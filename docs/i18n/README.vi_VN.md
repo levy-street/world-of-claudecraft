@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.33.1-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.34.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.vi_VN.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -92,7 +92,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and choose Play Offline
 ```
 
-Đặt tên cho nhân vật, chọn bất kỳ class nào trong chín class, và bạn bắt đầu ở **Eastbrook Vale** (cấp 1-7), một thị trấn chợ được bao quanh bởi các trung tâm: bãi sói ở phía bắc, đồng cỏ lợn rừng ở phía đông, rừng Sableweb ở phía tây, Mirror Lake ở phía tây bắc, một hầm khai thác đồng đầy burrower ở phía tây nam, và một nhà nguyện đổ nát đầy kẻ chết không yên ở phía đông bắc, cùng trại cướp của Gorrak ở phía đông nam. Con đường phía bắc leo qua một đèo núi vào **Mirefen Marsh** (6-13, trung tâm Fenbridge) và lên tiếp tới **Thornpeak Heights** (13-20, trung tâm Highwatch). Seed của thế giới được cố định trong `src/main.ts`, nên đây là cùng một nơi mỗi lần ghé thăm.
+Đặt tên cho nhân vật, chọn bất kỳ class nào trong chín class, và bạn bắt đầu ở **Eastbrook Vale** (cấp 1-7), một thị trấn chợ được bao quanh bởi các trung tâm: bãi sói ở phía bắc, đồng cỏ lợn rừng ở phía đông, rừng Sableweb ở phía tây, Mirror Lake ở phía tây bắc, một hầm khai thác đồng đầy burrower ở phía tây nam, và một nhà nguyện đổ nát đầy kẻ chết không yên ở phía đông bắc, cùng trại cướp của Gorrak ở phía đông nam. Con đường phía bắc leo qua một đèo núi vào **Mirefen Marsh** (6-13, trung tâm Fenbridge) và lên tiếp tới **Thornpeak Heights** (13-20, trung tâm Highwatch). Seed của thế giới được cố định trong `src/sim/world_seed.ts`, nên đây là cùng một nơi mỗi lần ghé thăm.
 
 ### Ứng dụng desktop cho Windows, Linux, và macOS
 

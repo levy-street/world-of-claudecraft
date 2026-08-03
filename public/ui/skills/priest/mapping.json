@@ -56,7 +56,233 @@
       "sourcePack": "_Missing_Priest",
       "sourceFile": "8.png",
       "output": "mind_flay.webp"
+    },
+    {
+      "abilityId": "desperate_prayer",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/priest/desperate_prayer.png",
+      "output": "desperate_prayer.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Clasped hands shielding a nearly empty heart that flares back to life.",
+      "references": [
+        {
+          "path": "public/ui/skills/priest/renew.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/priest/power_word_shield.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for priest\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Last Prayer (desperate_prayer)\nCanonical mechanic: Last Prayer instantly self-heals for 150 to 185; 90 sec cooldown.\nSubject: Clasped hands shielding a nearly empty heart that flares back to life.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "holy_nova",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/priest/holy_nova.png",
+      "output": "holy_nova.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A central priest with a white-gold ring passing through ally hearts and enemy skulls.",
+      "references": [
+        {
+          "path": "public/ui/skills/priest/renew.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/priest/power_word_shield.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for priest\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Holy Nova (holy_nova)\nCanonical mechanic: Holy Nova heals allies within 10 yd for 34 to 42 and damages enemies for 24 to 30. At level 20 the heal becomes 49 to 61 while damage remains 24 to 30.\nSubject: A central priest with a white-gold ring passing through ally hearts and enemy skulls.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "inner_focus",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/priest/inner_focus.png",
+      "output": "inner_focus.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A closed eye beneath a still halo with a spell rune passing through a zero-cost ring.",
+      "references": [
+        {
+          "path": "public/ui/skills/priest/power_word_shield.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/priest/mind_blast.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for priest\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Stilled Mind (inner_focus)\nCanonical mechanic: Stilled Mind makes the next spell free; the armed effect lasts up to 60 sec and has a 90 sec cooldown.\nSubject: A closed eye beneath a still halo with a spell rune passing through a zero-cost ring.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "mind_sear",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/priest/mind_sear.png",
+      "output": "mind_sear.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A violet eye-flame burning above a ground circle with three outward pulse rings.",
+      "references": [
+        {
+          "path": "public/ui/skills/priest/mind_flay.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/priest/mind_blast.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for priest\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Thoughtburn (mind_sear)\nCanonical mechanic: Thoughtburn channels for 3 sec over a ground area, dealing 24 to 28 Shadow damage each second within 8 yd.\nSubject: A violet eye-flame burning above a ground circle with three outward pulse rings.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "power_infusion",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/priest/power_infusion.png",
+      "output": "power_infusion.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A priest's hand placing a fast-spinning radiant halo over an ally.",
+      "references": [
+        {
+          "path": "public/ui/skills/priest/power_word_shield.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/priest/renew.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for priest\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Anointing (power_infusion)\nCanonical mechanic: Anointing grants a friendly target 20% spell haste for 15 sec; 120 sec cooldown.\nSubject: A priest's hand placing a fast-spinning radiant halo over an ally.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "prayer_of_healing",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/priest/prayer_of_healing.png",
+      "output": "prayer_of_healing.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Three allies beneath descending choir-like beams from one radiant crest.",
+      "references": [
+        {
+          "path": "public/ui/skills/priest/renew.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/priest/power_word_shield.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for priest\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Choirmend (prayer_of_healing)\nCanonical mechanic: Choirmend is a 3 sec cast healing allies within 30 yd for 100 to 122; at level 20 it heals 145 to 177.\nSubject: Three allies beneath descending choir-like beams from one radiant crest.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "psychic_scream",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/priest/psychic_scream.png",
+      "output": "psychic_scream.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A screaming shadow mask emitting circular waves that scatter enemy silhouettes.",
+      "references": [
+        {
+          "path": "public/ui/skills/priest/mind_blast.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/priest/mind_flay.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for priest\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Terror Canticle (psychic_scream)\nCanonical mechanic: Terror Canticle fears enemies within 8 yd for up to 4 sec; damage may break it; 30 sec cooldown.\nSubject: A screaming shadow mask emitting circular waves that scatter enemy silhouettes.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "shadowform",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/priest/shadowform.png",
+      "output": "shadowform.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A priest silhouette wrapped in a violet veil whose edges form shadow wings.",
+      "references": [
+        {
+          "path": "public/ui/skills/priest/mind_blast.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/priest/mind_flay.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for priest\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Gloamveil (shadowform)\nCanonical mechanic: Gloamveil is a long-lived toggle form granting 15% Shadow damage; casting a healing spell removes the form.\nSubject: A priest silhouette wrapped in a violet veil whose edges form shadow wings.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "silence",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/priest/silence.png",
+      "output": "silence.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Sealed lips over a violet spell rune whose sound waves terminate abruptly.",
+      "references": [
+        {
+          "path": "public/ui/skills/priest/mind_blast.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/priest/mind_flay.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for priest\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Hushword (silence)\nCanonical mechanic: Hushword silences a target at 30 yd for 4 sec; 30 sec cooldown.\nSubject: Sealed lips over a violet spell rune whose sound waves terminate abruptly.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
     }
   ],
-  "deferredStayProcedural": {}
+  "deferredStayProcedural": {},
+  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 entries are project-generated and explicitly override it."
 }

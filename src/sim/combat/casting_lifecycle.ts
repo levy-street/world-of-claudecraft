@@ -28,17 +28,18 @@
 // tests/architecture.test.ts.
 
 import { isDispellableAura } from '../aura_classify';
-import { ITEMS, isDelvePos, MOBS } from '../data';
+import { ITEMS, isDelvePos, MOBS, zoneAt } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { isShieldItem } from '../equipment_rules';
 import { instanceInfoAt } from '../instances/dungeons';
 import { forceDismount } from '../mounts';
-import { FISH_REEL_WINDOW_ROD_BONUS_SEC, FISH_REEL_WINDOW_SEC } from '../professions/fishing';
-import { bestOwnedGatherToolTier } from '../professions/tools';
+import { effectiveFishingBand, fishReelWindowSecFor } from '../professions/fishing';
+import { bestOwnedGatherToolFor } from '../professions/tools';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import { abilityScalingPower, channelTickBonus } from '../spell_scaling';
+import { hasEscapeStealth } from '../threat';
 import type { AbilityDef, AbilityEffect, Entity, Vec3 } from '../types';
 import {
   angleTo,
@@ -298,24 +299,46 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
   // direct-assigned fishing cast (the parity cancel drives, hidden state
   // inert) decays exactly as before. Draws no rng on any path.
   if (p.castingAbility === FISHING_CAST_ID) {
+    // The swim deny holds for the WHOLE session, not just the cast press: a
+    // cast pressed mid-leap over deep water passes the press-time deny (the
+    // airborne y-term sits above the surface) and used to splash down into a
+    // live session the deny could never have granted, because the vertical
+    // splash is not the move input the ordinary cancel watches (the round 7
+    // finder). Enforcement of the existing R25-family deny, not a new rule;
+    // draw-free (the bite delay was drawn at the press, cancel spends none).
+    if (ctx.isSwimming(p)) {
+      cancelCast(ctx, p);
+      return;
+    }
     if (p.fishBiteAtTick > 0 && ctx.tickCount >= p.fishBiteAtTick) {
       // The bite: text-free personal event (bobber bite state plus the
       // always-audible cue). The reel window re-scans the rod at bite time,
       // so the widened window follows the rod actually held at the bite.
       ctx.emit({ type: 'fishingBite', pid: p.id });
       p.fishBiteAtTick = 0;
-      const rodTier = bestOwnedGatherToolTier(meta.inventory, 'fishing', ITEMS);
-      const windowSec = FISH_REEL_WINDOW_SEC + FISH_REEL_WINDOW_ROD_BONUS_SEC * (rodTier - 1);
-      p.fishReelDeadlineTick = ctx.tickCount + Math.ceil(windowSec / DT);
+      // Both axes of the rod held at the BITE: its tier and its own rarity.
+      // Draw-free, same as the tier-only scan it replaces, so the bite arm
+      // still moves no rng and the two-draws-per-landed-session contract is
+      // untouched.
+      const rod = bestOwnedGatherToolFor(meta.inventory, 'fishing', ITEMS);
+      p.fishReelDeadlineTick =
+        ctx.tickCount + Math.ceil(fishReelWindowSecFor(rod.tier, rod.rarity) / DT);
     } else if (p.fishReelDeadlineTick > 0 && ctx.tickCount > p.fishReelDeadlineTick) {
       // The miss ("it got away"), firing at deadline + 1: the reel re-press
       // stays valid while tickCount <= deadline (startFishing's reel arm).
       // Ends the cast with zero draws and no loss; recast immediately.
-      ctx.emit({ type: 'fishingGotAway', pid: p.id });
+      // zoneId/band resolve BEFORE the fields clear, both draw-free.
+      ctx.emit({
+        type: 'fishingGotAway',
+        pid: p.id,
+        zoneId: p.fishCastZoneId || zoneAt(p.pos.x, p.pos.z).id,
+        band: effectiveFishingBand(meta),
+      });
       p.castingAbility = null;
       p.castRemaining = 0;
       p.fishBiteAtTick = 0;
       p.fishReelDeadlineTick = 0;
+      p.fishCastZoneId = '';
       ctx.emit({ type: 'castStop', entityId: p.id, success: false });
       return;
     }
@@ -377,9 +400,15 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
     // ticks a fishing cast out simply gets away, same shape as the miss arm
     // above. The catch table is never rolled here anymore.
     if (castId === FISHING_CAST_ID) {
-      ctx.emit({ type: 'fishingGotAway', pid: p.id });
+      ctx.emit({
+        type: 'fishingGotAway',
+        pid: p.id,
+        zoneId: p.fishCastZoneId || zoneAt(p.pos.x, p.pos.z).id,
+        band: effectiveFishingBand(meta),
+      });
       p.fishBiteAtTick = 0;
       p.fishReelDeadlineTick = 0;
+      p.fishCastZoneId = '';
       ctx.emit({ type: 'castStop', entityId: p.id, success: false });
       return;
     }
@@ -487,13 +516,17 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
   // an interrupted cast never completed, so its queued follow-up is dropped too
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
-  // Hidden per-cast fishing/gather state: unconditional inert writes (all three
+  // Hidden per-cast fishing/gather state: unconditional inert writes (all five
   // are already '' / 0 on every non-fishing/gather cancel path), so every
   // existing cancel stays byte-identical while a cancelled gather or fishing
-  // cast can never leak a stale node id or bite deadline into a later cast.
+  // cast can never leak a stale node id, start-time tool rarity, bite
+  // deadline, or pinned zone into a later cast.
   p.gatherCastNodeId = '';
+  p.gatherCastToolRarity = '';
+  p.gatherCastEffectConfirmed = false;
   p.fishBiteAtTick = 0;
   p.fishReelDeadlineTick = 0;
+  p.fishCastZoneId = '';
   ctx.emit({ type: 'castStop', entityId: p.id, success: false });
 }
 
@@ -642,8 +675,11 @@ export function castAbility(
       // Non-spell casts (fishing/gather) are exempt (like the silence/lockout
       // guards above): their completion paths never call fireQueuedCast, so a
       // press queued against one would strand and misfire on a later, unrelated
-      // cast. Demon Heal is deliberately NOT folded: its channel completion
-      // fires the queue, so queuing against it works today.
+      // cast. The session starts also clear any GCD-held slot loaded just
+      // before them (harvestNode/startFishing), closing the one load path
+      // that could survive into a session. Demon Heal is deliberately NOT
+      // folded: its channel completion fires the queue, so queuing against
+      // it works today.
       if (p.castRemaining <= CAST_QUEUE_WINDOW_SEC && !isNonSpellCast(p.castingAbility)) {
         p.queuedCastAbility = abilityId;
         p.queuedCastAim = aim ?? null;
@@ -794,7 +830,15 @@ export function castAbility(
     }
   } else if (ability.requiresTarget && ability.targetType === 'any') {
     target = p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null;
-    if (!target || target.dead || (!ctx.isHostileTo(p, target) && !ctx.isFriendlyTo(p, target))) {
+    if (
+      !target ||
+      target.dead ||
+      (!ctx.isHostileTo(p, target) && !ctx.isFriendlyTo(p, target)) ||
+      // Vanish (hasEscapeStealth) makes a HOSTILE target fully undetectable
+      // (issue #2426); a friendly cast (self/party heal) is unaffected, since
+      // allies can always perceive a stealthed party member.
+      (ctx.isHostileTo(p, target) && hasEscapeStealth(target))
+    ) {
       ctx.error(p.id, 'You have no target.', target?.dead ? 'target_dead' : undefined);
       return;
     }
@@ -813,7 +857,10 @@ export function castAbility(
       p.targetId !== null
         ? (ctx.entities.get(p.targetId) ?? null)
         : vanishedLowBlowFallbackTarget(ctx, p, ability);
-    if (!target || target.dead || !ctx.isHostileTo(p, target)) {
+    // Vanish (hasEscapeStealth) makes the target fully undetectable, same gate
+    // the mob AI already applies (mob/targeting.ts): a hostile cast against it
+    // is refused exactly like an out-of-range or dead target (issue #2426).
+    if (!target || target.dead || !ctx.isHostileTo(p, target) || hasEscapeStealth(target)) {
       ctx.error(p.id, 'You have no target.', target?.dead ? 'target_dead' : undefined);
       return;
     }
@@ -1023,7 +1070,7 @@ export function castAbility(
   // ability, so the charge must survive until then and be consumed there.
   if ((castTime === 0 || ability.channel) && !togglingOff) {
     if (canCastFree && consumeFreeCostFor(ctx, p, ability.id)) {
-      res = { ...res, cost: 0 };
+      res = { ...res, cost: 0, freeCast: true };
     } else if (res.cost > 0) {
       const cheap = consumeNextCastCheap(ctx, p, ability.id);
       if (cheap !== null) res = { ...res, cost: Math.ceil(res.cost * cheap) };
@@ -1457,7 +1504,9 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
   }
 
   const target = p.castTargetId !== null ? ctx.entities.get(p.castTargetId) : null;
-  if (!target || target.dead || !ctx.isHostileTo(p, target)) {
+  // A channel whose target vanishes mid-cast (Vanish, hasEscapeStealth) stops
+  // ticking on it, same as an out-of-range or dead target (issue #2426).
+  if (!target || target.dead || !ctx.isHostileTo(p, target) || hasEscapeStealth(target)) {
     cancelCast(ctx, p);
     return;
   }
@@ -1684,7 +1733,12 @@ function applyAbility(
     }
   } else if (ability.requiresTarget && ability.targetType === 'any') {
     target = castTarget !== null ? (ctx.entities.get(castTarget) ?? null) : null;
-    if (!target || target.dead || (!ctx.isHostileTo(p, target) && !ctx.isFriendlyTo(p, target))) {
+    if (
+      !target ||
+      target.dead ||
+      (!ctx.isHostileTo(p, target) && !ctx.isFriendlyTo(p, target)) ||
+      (ctx.isHostileTo(p, target) && hasEscapeStealth(target))
+    ) {
       ctx.error(p.id, 'You have no target.');
       return;
     }
@@ -1700,7 +1754,7 @@ function applyAbility(
     }
   } else if (ability.requiresTarget) {
     target = castTarget !== null ? (ctx.entities.get(castTarget) ?? null) : null;
-    if (!target || target.dead || !ctx.isHostileTo(p, target)) {
+    if (!target || target.dead || !ctx.isHostileTo(p, target) || hasEscapeStealth(target)) {
       ctx.error(p.id, 'You have no target.');
       return;
     }
@@ -1723,7 +1777,7 @@ function applyAbility(
     return;
   }
   if (canCastFree && !togglingOff && consumeFreeCostFor(ctx, p, ability.id)) {
-    res = { ...res, cost: 0 };
+    res = { ...res, cost: 0, freeCast: true };
   } else if (res.cost > 0 && !togglingOff) {
     const cheap = consumeNextCastCheap(ctx, p, ability.id);
     if (cheap !== null) res = { ...res, cost: Math.ceil(res.cost * cheap) };

@@ -95,6 +95,307 @@
       "sourceFile": "44.png",
       "output": "retribution_aura.webp",
       "confidence": "high"
+    },
+    {
+      "abilityId": "aura_surge",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/paladin/aura_surge.png",
+      "output": "aura_surge.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A dawnforged shield tracing a three-target ricochet with a sealed rune over the first target.",
+      "references": [
+        {
+          "path": "public/ui/skills/paladin/judgement.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/paladin/divine_protection.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Dawnward Ricochet (aura_surge)\nCanonical mechanic: Dawnward Ricochet hits the primary target for 100 to 120 Holy damage, bounces to 2 enemies at 75% per hop, and silences the primary for 2 sec; 20 sec cooldown.\nSubject: A dawnforged shield tracing a three-target ricochet with a sealed rune over the first target.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "avenging_wrath",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/paladin/avenging_wrath.png",
+      "output": "avenging_wrath.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Golden wings flanking a sword and spell orb, both ignited by one halo.",
+      "references": [
+        {
+          "path": "public/ui/skills/paladin/judgement.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/paladin/divine_protection.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Wrathwing (avenging_wrath)\nCanonical mechanic: Wrathwing grants 60 attack power and 30 spell power for 20 sec; 180 sec cooldown.\nSubject: Golden wings flanking a sword and spell orb, both ignited by one halo.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "cleansing_verdict",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/paladin/cleansing_verdict.png",
+      "output": "cleansing_verdict.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A radiant hand lifting a dark rune from an ally's heart and burning it away.",
+      "references": [
+        {
+          "path": "public/ui/skills/paladin/holy_light.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/paladin/judgement.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Cleansing Verdict (cleansing_verdict)\nCanonical mechanic: Cleansing Verdict removes one harmful magic effect from a friendly and heals them for 40 to 50; 30 yd, 8 sec cooldown.\nSubject: A radiant hand lifting a dark rune from an ally's heart and burning it away.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "crusader_strike",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/paladin/crusader_strike.png",
+      "output": "crusader_strike.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A cross-marked sword carving a bright diagonal holy arc.",
+      "references": [
+        {
+          "path": "public/ui/skills/paladin/judgement.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/paladin/hammer_of_justice.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Crusader Strike (crusader_strike)\nCanonical mechanic: Crusader Strike deals weapon damage plus 24 Holy damage; 4 sec cooldown.\nSubject: A cross-marked sword carving a bright diagonal holy arc.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "divine_shield",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/paladin/divine_shield.png",
+      "output": "divine_shield.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A sealed luminous dome around a kneeling paladin, layered like thick glass.",
+      "references": [
+        {
+          "path": "public/ui/skills/paladin/divine_protection.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/paladin/holy_light.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Lightward (divine_shield)\nCanonical mechanic: Lightward absorbs 900 damage for 8 sec; 300 sec cooldown. Current mechanics are a large absorb, not immunity.\nSubject: A sealed luminous dome around a kneeling paladin, layered like thick glass.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "hammer_of_wrath",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/paladin/hammer_of_wrath.png",
+      "output": "hammer_of_wrath.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A flying hammer descending onto a nearly empty health crescent.",
+      "references": [
+        {
+          "path": "public/ui/skills/paladin/hammer_of_justice.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/paladin/judgement.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Tolling Hammer (hammer_of_wrath)\nCanonical mechanic: Tolling Hammer deals 110 to 136 Holy damage at 30 yd and is usable only below 20% target health; 6 sec cooldown.\nSubject: A flying hammer descending onto a nearly empty health crescent.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "holy_shield",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/paladin/holy_shield.png",
+      "output": "holy_shield.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A flying radiant shield ricocheting through three enemies and returning as an armor halo.",
+      "references": [
+        {
+          "path": "public/ui/skills/paladin/divine_protection.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/paladin/judgement.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Hallowed Wall (holy_shield)\nCanonical mechanic: Hallowed Wall deals 90 to 110 Holy damage, bounces to 2 other enemies for 60 to 75 each, and grants the caster 150 armor for 10 sec; 8 sec cooldown.\nSubject: A flying radiant shield ricocheting through three enemies and returning as an armor halo.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "holy_shock",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/paladin/holy_shock.png",
+      "output": "holy_shock.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A split holy bolt branching toward a heart and a scorched enemy.",
+      "references": [
+        {
+          "path": "public/ui/skills/paladin/holy_light.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/paladin/judgement.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Holy Shock (holy_shock)\nCanonical mechanic: Holy Shock heals a friendly for 40 to 50 or damages an enemy for 40 to 50 at 30 yd; 8 sec cooldown. At level 20 the heal becomes 58 to 73 while damage remains 40 to 50.\nSubject: A split holy bolt branching toward a heart and a scorched enemy.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "holy_taunt",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/paladin/holy_taunt.png",
+      "output": "holy_taunt.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A radiant gauntlet pulling an enemy's eye and threat flame toward a shield.",
+      "references": [
+        {
+          "path": "public/ui/skills/paladin/hammer_of_justice.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/paladin/judgement.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Sacred Goad (holy_taunt)\nCanonical mechanic: Sacred Goad matches the target's highest threat and forces it to attack the paladin for 3 sec; 30 yd, off-GCD, 10 sec cooldown.\nSubject: A radiant gauntlet pulling an enemy's eye and threat flame toward a shield.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "holy_wrath",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/paladin/holy_wrath.png",
+      "output": "holy_wrath.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A paladin at the center of a white-gold sunburst striking a ring of enemies.",
+      "references": [
+        {
+          "path": "public/ui/skills/paladin/judgement.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/paladin/hammer_of_justice.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Saint's Ire (holy_wrath)\nCanonical mechanic: Saint's Ire deals 54 to 68 Holy damage to enemies within 10 yd; 20 sec cooldown.\nSubject: A paladin at the center of a white-gold sunburst striking a ring of enemies.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "rebuke",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/paladin/rebuke.png",
+      "output": "rebuke.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A golden gauntlet shattering a spell glyph at close range.",
+      "references": [
+        {
+          "path": "public/ui/skills/paladin/hammer_of_justice.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/paladin/judgement.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Reproach (rebuke)\nCanonical mechanic: Reproach interrupts a melee target and locks that spell school for 4 sec; 12 sec cooldown.\nSubject: A golden gauntlet shattering a spell glyph at close range.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "sacred_bulwark",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/paladin/sacred_bulwark.png",
+      "output": "sacred_bulwark.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A radiant bulwark intercepting a skull-marked blow while a broken heart refills to one-third.",
+      "references": [
+        {
+          "path": "public/ui/skills/paladin/divine_protection.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/paladin/holy_light.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for paladin\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Sacred Bulwark (sacred_bulwark)\nCanonical mechanic: Sacred Bulwark is off-GCD: for 10 sec the next enemy hit that would kill the paladin is denied and restores them to 35% health; 180 sec cooldown.\nSubject: A radiant bulwark intercepting a skull-marked blow while a broken heart refills to one-third.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
     }
-  ]
+  ],
+  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 entries are project-generated and explicitly override it."
 }

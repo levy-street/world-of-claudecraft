@@ -139,7 +139,10 @@ vi.mock('../server/db', () => ({
   ELIGIBLE_ACCOUNT_SQL: 'a.banned_at IS NULL',
   pool: { query: h.poolQuery, connect: h.connect },
 }));
-vi.mock('../server/realm', () => ({ REALM: 'test-realm' }));
+vi.mock('../server/realm', () => ({
+  REALM: 'test-realm',
+  REALM_DIRECTORY: [{ name: 'test-realm', url: '', type: 'Normal' }],
+}));
 
 import { PgDailyRewardDb } from '../server/daily_rewards_db';
 
@@ -331,7 +334,7 @@ describe('daily reward payout moderation persistence', () => {
 
     await expect(
       new PgDailyRewardDb().markPayout('2026-07-14', 1, 'paid', 'authoritative-signature', null),
-    ).resolves.toBe(true);
+    ).resolves.toBe('already');
     expect(h.state.row).toMatchObject({
       status: 'paid',
       tx_signature: 'authoritative-signature',

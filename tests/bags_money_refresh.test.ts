@@ -54,9 +54,9 @@ vi.mock('../server/db', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
-import { ClientWorld } from '../src/net/online';
-import type { Entity, PlayerClass } from '../src/sim/types';
+import type { Entity } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { bareClient } from './helpers/bare_client';
 
 const PROCEEDS = 54321;
 
@@ -87,57 +87,6 @@ function joinServer(
   if ('error' in session) throw new Error(session.error);
   session.blockListLoaded = true;
   return session;
-}
-
-// A ClientWorld without the WebSocket plumbing, to drive applySnapshot directly
-// (the tests/snapshots.test.ts idiom, copied per the repo's house pattern).
-function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.ownPlayerId = pid;
-  c.ownPlayerClass = playerClass;
-  c.spectating = null;
-  c.cupInfo = null;
-  c.lastVcupRemainder = null;
-  c.lastVcupShared = null;
-  c.sportRole = null;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.honor = 0;
-  c.lifetimeHonor = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.selectedDungeonDifficulty = 'normal';
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.serverTickHz = null;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  c.spectateFacingPending = false;
-  c.pendingSpectateFacing = null;
-  c.nodeCooldowns = new Map();
-  return c;
 }
 
 function merchant(sim: any): Entity {
