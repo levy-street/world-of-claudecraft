@@ -1178,18 +1178,21 @@ export const VISUALS: Record<string, VisualDef> = {
   // The Mirefen Marsh rare, replacing his stand-in generic-troll body. Only
   // the `grubjaw` template maps here (MOB_KEYS below), so every other troll
   // keeps mob_troll. Gait refs measured (tmp/dragonkin_gait_measure.mjs) at
-  // his template scale 1.3: walk 2.90 (wander 2.63 -> 0.91x), run 6.25
-  // (chase 7.5 -> 1.20x), both inside the matcher's clamps.
+  // his template scale 2.275: walk 4.36 (wander 2.63 -> 0.60x, exactly at the
+  // clamp floor, which is why the build slows his Walk clip) and run 10.94
+  // (chase 7.5 -> 0.69x). Both inside the matcher's clamps, so the feet plant.
   mob_grubjaw: {
     url: `${CREATURES}/grubjaw.glb`,
     height: 2.9,
     clips: GRUBJAW,
-    walkRef: 2.9,
-    runRef: 6.25,
-    // faint wash only, matching mob_troll: his own texture carries the
-    // colour and a heavy tint floods it with the template green
+    walkRef: 4.36,
+    runRef: 10.94,
+    // Barely-there wash. mob_troll tints 0.12 toward its template's BRIGHT
+    // green, which is what makes a stock Mirefen Troll pop; Grubjaw's own
+    // template colour is a dark 0x145a32, so the same strength only muddied
+    // his authored olive hide and read as near-black beside them.
     tint: 'entity',
-    tintStrength: 0.1,
+    tintStrength: 0.04,
   },
   mob_troll: {
     url: `${CREATURES}/orc.glb`,

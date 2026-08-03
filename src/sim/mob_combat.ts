@@ -84,6 +84,15 @@ export function combatProfileForMob(templateId: string, scale: number): MobComba
       meleeRange: scaledDefaultMobMeleeRange(2.85),
       desiredRange: 5.5,
     };
+  // Grubjaw the Glutton at scale 2.275: same treatment as the grown
+  // dragonkin, so the big body's swings land at visual contact instead of
+  // pawing from stock humanoid reach.
+  if (templateId === 'grubjaw')
+    return {
+      ...DEFAULT_MOB_COMBAT_PROFILE,
+      meleeRange: scaledDefaultMobMeleeRange(2.275),
+      desiredRange: 5,
+    };
   if (templateId === 'wildheart_beastmaster')
     return {
       ...DEFAULT_MOB_COMBAT_PROFILE,

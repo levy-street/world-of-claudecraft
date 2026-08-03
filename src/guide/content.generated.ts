@@ -10001,7 +10001,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "url": "models/creatures/grubjaw.glb",
     "idle": "Idle",
     "height": 2.9,
-    "tintStrength": 0.1
+    "tintStrength": 0.04
   },
   "mob_dark_caster": {
     "url": "models/chars/players/mage.glb",
