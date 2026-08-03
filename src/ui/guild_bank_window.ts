@@ -1,6 +1,7 @@
 // Guild tab pane painter for the Bank window (#bank-window): renders the
 // officer-plus pooled guild bank (treasury, slot grid, gold deposit/withdraw,
-// expansion purchase) from the structured GuildBankViewModel
+// expansion purchase; for an UNOPENED bank the treasury plus the purse-paid
+// open-the-bank row) from the structured GuildBankViewModel
 // (guild_bank_view.ts). The pure core decides slot flags (dormant, unknown),
 // capacity, action enablement and the buy panel; this thin consumer renders
 // that and wires every action back through the IWorldGuildBank facet commands.
@@ -34,7 +35,9 @@ import {
   buildGuildBankView,
   clampGoldAmount,
   coinFieldsToCopper,
+  type GuildBankOpenModel,
   type GuildBankSlotModel,
+  type GuildBankTreasuryModel,
   type GuildBankViewModel,
   guildBankGoldDepositMax,
   guildBankGoldWithdrawMax,
@@ -85,18 +88,29 @@ export class GuildBankTab {
   constructor(private readonly deps: GuildBankTabDeps) {}
 
   /** Build the guild pane model from the live world. Exposed so BankWindow can
-   *  branch on 'hidden' (tab fallback) without duplicating the core call. */
+   *  branch on 'hidden' (tab fallback) without duplicating the core call. The
+   *  purse rides in for the unopened pane's rung-0 (purse-paid) affordability
+   *  marker; the opened pane ignores it (snapshot-only enablement). */
   model(): GuildBankViewModel {
-    return buildGuildBankView(this.deps.world().guildBankInfo, (id) => ITEMS[id]);
+    const world = this.deps.world();
+    return buildGuildBankView(world.guildBankInfo, (id) => ITEMS[id], world.copper);
   }
 
-  /** Append the guild pane sections (capacity, treasury, grid, buy row) to the
-   *  window root. BankWindow has already painted the title + tab strip and
+  /** Append the guild pane sections (capacity, treasury, grid, buy row; for
+   *  an UNOPENED bank: treasury plus the open-the-bank row) to the window
+   *  root. BankWindow has already painted the title + tab strip and
    *  captured the .bank-scroll offset it restores after this returns; it hands
    *  the model it already built for the tab-visibility branch (one core call
    *  per paint, never two). */
   renderInto(el: HTMLElement, model: GuildBankViewModel): void {
-    if (model.kind !== 'guild') return; // raced null: BankWindow falls back next paint
+    if (model.kind === 'hidden') return; // raced null: BankWindow falls back next paint
+    if (model.kind === 'unopened') {
+      // No rung bought yet: the treasury works from day one, the item store
+      // does not exist until an officer opens it from their own purse.
+      el.appendChild(this.buildTreasuryRow(model.treasury));
+      el.appendChild(this.buildOpenRow(model.open));
+      return;
+    }
     const capacity = document.createElement('div');
     capacity.className = 'bank-capacity';
     const used = this.fmt(model.capacity.used);
@@ -104,7 +118,7 @@ export class GuildBankTab {
     capacity.textContent = t('hudChrome.bank.capacity', { used, total });
     capacity.setAttribute('aria-label', t('hudChrome.bank.guildCapacityAria', { used, total }));
     el.appendChild(capacity);
-    el.appendChild(this.buildTreasuryRow(model));
+    el.appendChild(this.buildTreasuryRow(model.treasury));
     if (model.hasDormant) {
       // The dormant legend is always-visible TEXT (never tooltip-only, the
       // mobile rule): these slots cannot leave and block disbanding the guild.
@@ -128,9 +142,11 @@ export class GuildBankTab {
   }
 
   // The treasury header row: label + coin readout + the two gold actions.
+  // Shared by the opened AND unopened panes (gold ops work from day one).
   // Enablement comes from the pure model (snapshot state only, never the live
-  // purse, so the window's purse-free refresh signature stays honest).
-  private buildTreasuryRow(model: GuildBankViewModel & { kind: 'guild' }): HTMLElement {
+  // purse, so the window's purse-free refresh signature stays honest; the
+  // unopened pane's OPEN row is the one purse-read exception, see buildOpenRow).
+  private buildTreasuryRow(treasury: GuildBankTreasuryModel): HTMLElement {
     const row = document.createElement('div');
     row.className = 'gbank-treasury';
     const label = document.createElement('span');
@@ -138,26 +154,87 @@ export class GuildBankTab {
     label.textContent = t('hudChrome.bank.guildTreasury');
     const amount = document.createElement('span');
     amount.className = 'gbank-treasury-amount';
-    amount.innerHTML = this.deps.moneyHtml(model.treasury.copper);
+    amount.innerHTML = this.deps.moneyHtml(treasury.copper);
     const actions = document.createElement('div');
     actions.className = 'gbank-treasury-actions';
     const deposit = document.createElement('button');
     deposit.type = 'button';
     deposit.className = 'gbank-gold-btn';
     deposit.textContent = t('hudChrome.bank.guildDepositGold');
-    deposit.disabled = !model.treasury.canDepositGold;
-    deposit.addEventListener('click', () => this.showGoldPrompt('deposit', model.treasury.copper));
+    deposit.disabled = !treasury.canDepositGold;
+    deposit.addEventListener('click', () => this.showGoldPrompt('deposit', treasury.copper));
     const withdraw = document.createElement('button');
     withdraw.type = 'button';
     withdraw.className = 'gbank-gold-btn';
     withdraw.textContent = t('hudChrome.bank.guildWithdrawGold');
-    withdraw.disabled = !model.treasury.canWithdrawGold;
-    withdraw.addEventListener('click', () =>
-      this.showGoldPrompt('withdraw', model.treasury.copper),
-    );
+    withdraw.disabled = !treasury.canWithdrawGold;
+    withdraw.addEventListener('click', () => this.showGoldPrompt('withdraw', treasury.copper));
     actions.append(deposit, withdraw);
     row.append(label, amount, actions);
     return row;
+  }
+
+  // The UNOPENED pane's one action row: "Open the guild bank" at rung 0's
+  // table price, paid from the CLICKING OFFICER'S OWN PURSE (never the
+  // treasury). Mirrors the expansion row's contract: never disabled on
+  // affordability (the sim refuses with its own localized 'Not enough
+  // money.'), an unaffordable price carries a visible text marker on top of
+  // the styling class, and the always-visible note says whose money it is.
+  private buildOpenRow(open: GuildBankOpenModel): HTMLElement {
+    const row = document.createElement('div');
+    row.className = 'bank-buy-row gbank-buy-row gbank-open-row';
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `bank-buy-btn${open.affordable ? '' : ' gbank-buy-short'}`;
+    const short = open.affordable
+      ? ''
+      : `<span class="gbank-buy-short-label">${esc(t('hudChrome.bank.guildPurseShort'))}</span>`;
+    btn.innerHTML =
+      `<span class="bank-buy-label">${esc(t('hudChrome.bank.guildOpenBank'))}</span>` +
+      this.deps.moneyHtml(open.price) +
+      short;
+    btn.addEventListener('click', () => this.showOpenBankPrompt(open.price));
+    row.appendChild(btn);
+    const note = document.createElement('div');
+    note.className = 'gbank-buy-note';
+    note.textContent = t('hudChrome.bank.guildOpenNote');
+    row.appendChild(note);
+    return row;
+  }
+
+  // The open-the-bank confirm: same chrome as the expansion confirm; the wire
+  // token is the same guildBankBuySlots (the sim decides the next rung and
+  // charges the PURSE for rung 0; the price is never client-supplied).
+  private showOpenBankPrompt(price: number): void {
+    this.deps.dismissPrompts();
+    const opener = document.activeElement as HTMLElement | null;
+    const stack = document.getElementById('prompt-stack');
+    if (!stack) return;
+    const prompt = document.createElement('div');
+    prompt.className = 'prompt panel bank-buy-prompt gbank-buy-prompt gbank-open-prompt';
+    prompt.innerHTML = `<div class="prompt-text">${esc(
+      t('hudChrome.bank.guildOpenConfirm', { price: formatMoney(price) }),
+    )}</div>`;
+    const confirm = document.createElement('button');
+    confirm.className = 'btn';
+    confirm.textContent = t('hudChrome.bank.guildOpenAccept');
+    const cancel = document.createElement('button');
+    cancel.className = 'btn';
+    cancel.textContent = t('itemUi.vendor.sellQuantityCancel');
+    prompt.append(confirm, cancel);
+    const { dismiss, dismissAndReturn } = this.deps.installPromptDialog(prompt, opener, () =>
+      prompt.remove(),
+    );
+    confirm.addEventListener('click', () => {
+      this.deps.world().guildBankBuySlots();
+      audio.coin();
+      dismiss();
+      this.deps.requestRender();
+      this.focusClose();
+    });
+    cancel.addEventListener('click', dismissAndReturn);
+    stack.appendChild(prompt);
+    window.setTimeout(() => confirm.focus(), 0);
   }
 
   private fillGrid(grid: HTMLElement, model: GuildBankViewModel & { kind: 'guild' }): void {

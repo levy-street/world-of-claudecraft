@@ -23,8 +23,19 @@
 // An UNKNOWN item id is a separate dormant-shaped state (a content update
 // removed the def): it renders distinct too, but the sim allows withdrawing it
 // (the recovery path), so it stays actionable.
+//
+// UNOPENED banks: a guild that has bought no ladder rung yet has 0 item
+// slots (purchasedSlots 0). The model's 'unopened' kind renders the treasury
+// section as normal plus the open-the-bank row (rung 0: 24 slots for the
+// PURSE-paid table price) instead of the slot grid; its affordability reads
+// the acting officer's live purse, the one deliberate purse read in this core.
 
-import { GUILD_BANK_EXPANSION_SLOTS, GUILD_BANK_TREASURY_CAP } from '../sim/guild_bank';
+import {
+  GUILD_BANK_EXPANSION_SLOTS,
+  GUILD_BANK_RUNG_PRICES,
+  GUILD_BANK_TREASURY_CAP,
+  guildBankRungsBought,
+} from '../sim/guild_bank';
 import { isTransferLockedInstance } from '../sim/item_instance_transfer';
 import type { InvSlot, ItemInstancePayload } from '../sim/types';
 import type { GuildBankInfo } from '../world_api';
@@ -109,11 +120,27 @@ export interface GuildBankBuySlotsModel {
   affordable: boolean;
 }
 
+/** The open-the-bank row of the UNOPENED pane: ladder rung 0's copper price
+ *  and whether the ACTING OFFICER'S OWN PURSE covers it right now (rung 0 is
+ *  purse-paid, unlike every later rung's treasury enablement; the marker is
+ *  informational styling only, the button never gates on it). */
+export interface GuildBankOpenModel {
+  price: number;
+  affordable: boolean;
+}
+
 /** The whole guild pane model: 'hidden' when guildBankInfo is null (member
- *  rank, offline, away, dead, or the book not loaded), else the populated
- *  grid + treasury + buy panel. */
+ *  rank, offline, away, dead, or the book not loaded); 'unopened' while the
+ *  guild has bought no ladder rung yet (0 item slots: the treasury section
+ *  renders as normal plus the open-the-bank row instead of the slot grid);
+ *  else the populated grid + treasury + buy panel. */
 export type GuildBankViewModel =
   | { kind: 'hidden' }
+  | {
+      kind: 'unopened';
+      treasury: GuildBankTreasuryModel;
+      open: GuildBankOpenModel;
+    }
   | {
       kind: 'guild';
       treasury: GuildBankTreasuryModel;
@@ -129,12 +156,32 @@ export type GuildBankViewModel =
 
 /** Map the gated guild bank snapshot to the render model. `info` is null
  *  whenever the tab must not render (both worlds), which yields 'hidden'.
+ *  `purseCopper` is the acting officer's LIVE purse, read only by the
+ *  unopened pane's rung-0 affordability (rung 0 is purse-paid); the opened
+ *  pane's enablement stays snapshot-only (purse-free) as before.
  *  Slot order and indices are preserved verbatim; nothing is dropped. */
 export function buildGuildBankView(
   info: GuildBankInfo | null,
   lookup: GuildBankItemLookup,
+  purseCopper: number,
 ): GuildBankViewModel {
   if (!info) return { kind: 'hidden' };
+  const treasury: GuildBankTreasuryModel = {
+    copper: info.treasury,
+    canDepositGold: info.treasury < GUILD_BANK_TREASURY_CAP,
+    canWithdrawGold: info.treasury > 0,
+  };
+  if (guildBankRungsBought(info.purchasedSlots) === 0) {
+    // No rung bought yet: the bank is unopened (0 item slots). Rung 0's price
+    // rides the same nextExpansionPrice field (defensively falling back to
+    // the table literal, unreachable off a real snapshot).
+    const price = info.nextExpansionPrice ?? GUILD_BANK_RUNG_PRICES[0];
+    return {
+      kind: 'unopened',
+      treasury,
+      open: { price, affordable: Math.floor(purseCopper) >= price },
+    };
+  }
   const slots: GuildBankSlotModel[] = info.slots.map((slot, slotIndex) => {
     const item = lookup(slot.itemId);
     return {
@@ -152,11 +199,7 @@ export function buildGuildBankView(
   const total = info.capacity;
   return {
     kind: 'guild',
-    treasury: {
-      copper: info.treasury,
-      canDepositGold: info.treasury < GUILD_BANK_TREASURY_CAP,
-      canWithdrawGold: info.treasury > 0,
-    },
+    treasury,
     capacity: {
       used,
       total,

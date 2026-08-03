@@ -358,7 +358,7 @@ export class BankWindow {
     // to Personal on this same paint; the whole-window walk-away close stays
     // refreshIfChanged's grace-close on bankInfo.
     const guildModel = this.guildPane.model();
-    const guildAvailable = guildModel.kind === 'guild';
+    const guildAvailable = guildModel.kind !== 'hidden'; // opened OR unopened pane
     if (!guildAvailable) this.tab = 'personal';
     el.innerHTML =
       `<div class="panel-title"><span>${esc(t('hudChrome.bank.title'))} <span class="panel-subtitle">${esc(t('hudChrome.bank.subtitle'))}</span></span>` +
@@ -520,7 +520,10 @@ export class BankWindow {
     // and the tab APPEARING or DISAPPEARING (rank change, reconcile window)
     // each repaint; null collapses the whole guild arm so the strip drops and
     // the pane falls back to Personal in render(). Deliberately purse-free
-    // (the guild enablement reads snapshot state only, see guild_bank_view.ts).
+    // (the guild enablement reads snapshot state only, see guild_bank_view.ts)
+    // with ONE exception: while the bank is UNOPENED (purchasedSlots 0), the
+    // open-the-bank row's shortfall marker reads the officer's own purse (rung
+    // 0 is purse-paid), so the purse joins the signature for that state only.
     // Nesting the guild arm under the bankInfo null-gate above is safe because
     // guildBankInfoFor's gate is a strict SUPERSET of bankInfoFor's (same
     // banker proximity, plus alive + officer-plus + a loaded book): guildBank
@@ -532,7 +535,14 @@ export class BankWindow {
       info.bonusSlots,
       info.nextExpansionCost,
       info.slots,
-      g && [g.treasury, g.capacity, g.purchasedSlots, g.nextExpansionPrice, g.slots],
+      g && [
+        g.treasury,
+        g.capacity,
+        g.purchasedSlots,
+        g.nextExpansionPrice,
+        g.slots,
+        g.purchasedSlots === 0 ? this.deps.world().copper : null,
+      ],
     ]);
     if (sig === this.lastSig) return;
     this.lastSig = sig;

@@ -8988,6 +8988,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Купить {count} дополнительных ячеек банка гильдии за {price} из казны гильдии?',
   'hudChrome.bank.guildBuyNote': 'Оплачивается из казны гильдии',
   'hudChrome.bank.guildTreasuryShort': 'В казне не хватает',
+  'hudChrome.bank.guildOpenBank': 'Открыть гильдейский банк',
+  'hudChrome.bank.guildOpenConfirm':
+    'Открыть гильдейский банк за {price}? Оплата спишется из ваших собственных денег.',
+  'hudChrome.bank.guildOpenAccept': 'Открыть',
+  'hudChrome.bank.guildOpenNote': 'Оплачивается из ваших собственных денег, а не из казны гильдии',
+  'hudChrome.bank.guildPurseShort': 'Недостаточно денег',
   'hudChrome.bank.guildDormantNote':
     'Заблокированные предметы нельзя забрать, и они не дают распустить гильдию.',
   'hudChrome.bank.guildDormantHint': 'Этот предмет заблокирован в банке гильдии, его нельзя забрать.',

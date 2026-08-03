@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { ITEMS as REAL_ITEMS } from '../src/sim/data';
 import {
-  GUILD_BANK_EXPANSION_PRICES,
   GUILD_BANK_EXPANSION_SLOTS,
+  GUILD_BANK_RUNG_PRICES,
   GUILD_BANK_TREASURY_CAP,
   guildBankPipeRefusal,
 } from '../src/sim/guild_bank';
@@ -42,28 +42,32 @@ const ITEMS: Record<
 };
 const lookup: GuildBankItemLookup = (id) => ITEMS[id];
 
+// The default snapshot models an OPENED bank (rung 0 bought: purchasedSlots
+// 24); the unopened-pane suite below overrides purchasedSlots to 0. The
+// capacity field rides through verbatim (the core never recomputes it), so
+// fixtures keep small capacities for compact empty-pad expectations.
 function guildInfo(over: Partial<GuildBankInfo> = {}): GuildBankInfo {
   return {
     treasury: 25_000,
     slots: [],
     capacity: 12,
-    purchasedSlots: 0,
-    nextExpansionPrice: GUILD_BANK_EXPANSION_PRICES[0],
+    purchasedSlots: 24,
+    nextExpansionPrice: GUILD_BANK_RUNG_PRICES[1],
     ...over,
   };
 }
 
 describe('buildGuildBankView', () => {
   it('reports hidden from a null snapshot (member / offline / away / dead / unloaded book)', () => {
-    expect(buildGuildBankView(null, lookup)).toEqual({ kind: 'hidden' });
+    expect(buildGuildBankView(null, lookup, 0)).toEqual({ kind: 'hidden' });
   });
 
   it('reports an empty guild bank with a full empty pad', () => {
-    const view = buildGuildBankView(guildInfo({ capacity: 12 }), lookup);
+    const view = buildGuildBankView(guildInfo({ capacity: 12 }), lookup, 0);
     if (view.kind !== 'guild') throw new Error('expected guild');
     expect(view.empty).toBe(true);
     expect(view.slots).toEqual([]);
-    expect(view.capacity).toEqual({ used: 0, total: 12, purchasedSlots: 0 });
+    expect(view.capacity).toEqual({ used: 0, total: 12, purchasedSlots: 24 });
     expect(view.emptyCells).toBe(12);
     expect(view.hasDormant).toBe(false);
   });
@@ -74,7 +78,7 @@ describe('buildGuildBankView', () => {
       { itemId: 'potion', count: 5 },
       { itemId: 'bread', count: 3 },
     ];
-    const view = buildGuildBankView(guildInfo({ slots, capacity: 12 }), lookup);
+    const view = buildGuildBankView(guildInfo({ slots, capacity: 12 }), lookup, 0);
     if (view.kind !== 'guild') throw new Error('expected guild');
     expect(view.slots.map((s) => s.slotIndex)).toEqual([0, 1, 2]);
     expect(view.slots.map((s) => s.itemId)).toEqual(['sword', 'potion', 'bread']);
@@ -94,7 +98,7 @@ describe('buildGuildBankView', () => {
       { itemId: 'sword', count: 1, instance: { bindOnTrade: true } },
       { itemId: 'sword', count: 1, instance: { boundTo: 7 } },
     ];
-    const view = buildGuildBankView(guildInfo({ slots, capacity: 12 }), lookup);
+    const view = buildGuildBankView(guildInfo({ slots, capacity: 12 }), lookup, 0);
     if (view.kind !== 'guild') throw new Error('expected guild');
     // Every slot stays visible at its wire index: dormant slots are flagged,
     // NEVER filtered out (the personal bank drops unknown ids; this must not).
@@ -107,6 +111,7 @@ describe('buildGuildBankView', () => {
     const view = buildGuildBankView(
       guildInfo({ slots: [{ itemId: 'gone_item', count: 2 }], capacity: 12 }),
       lookup,
+      0,
     );
     if (view.kind !== 'guild') throw new Error('expected guild');
     expect(view.slots[0].known).toBe(false);
@@ -121,21 +126,21 @@ describe('buildGuildBankView', () => {
     // round-trips to the sim's localized refusal instead. Pin the projection
     // shape so a future publicInstanceView change re-opens this decision.
     const projected: InvSlot = { itemId: 'sword', count: 1, instance: { signer: 'Ada' } };
-    const view = buildGuildBankView(guildInfo({ slots: [projected], capacity: 12 }), lookup);
+    const view = buildGuildBankView(guildInfo({ slots: [projected], capacity: 12 }), lookup, 0);
     if (view.kind !== 'guild') throw new Error('expected guild');
     expect(view.slots[0].dormant).toBe(false);
   });
 
   it('clamps the empty pad to zero for an over-capacity (tampered) book', () => {
     const slots: InvSlot[] = Array.from({ length: 14 }, () => ({ itemId: 'potion', count: 1 }));
-    const view = buildGuildBankView(guildInfo({ slots, capacity: 12 }), lookup);
+    const view = buildGuildBankView(guildInfo({ slots, capacity: 12 }), lookup, 0);
     if (view.kind !== 'guild') throw new Error('expected guild');
     expect(view.capacity.used).toBe(14);
     expect(view.emptyCells).toBe(0);
   });
 
   it('keeps the treasury RAW COPPER and derives purse-free gold enablement', () => {
-    const view = buildGuildBankView(guildInfo({ treasury: 123_456 }), lookup);
+    const view = buildGuildBankView(guildInfo({ treasury: 123_456 }), lookup, 0);
     if (view.kind !== 'guild') throw new Error('expected guild');
     expect(view.treasury.copper).toBe(123_456);
     expect(view.treasury.canDepositGold).toBe(true);
@@ -143,11 +148,11 @@ describe('buildGuildBankView', () => {
   });
 
   it('disables withdraw at exactly zero treasury and deposit at exactly the cap', () => {
-    const empty = buildGuildBankView(guildInfo({ treasury: 0 }), lookup);
+    const empty = buildGuildBankView(guildInfo({ treasury: 0 }), lookup, 0);
     if (empty.kind !== 'guild') throw new Error('expected guild');
     expect(empty.treasury.canWithdrawGold).toBe(false);
     expect(empty.treasury.canDepositGold).toBe(true);
-    const capped = buildGuildBankView(guildInfo({ treasury: GUILD_BANK_TREASURY_CAP }), lookup);
+    const capped = buildGuildBankView(guildInfo({ treasury: GUILD_BANK_TREASURY_CAP }), lookup, 0);
     if (capped.kind !== 'guild') throw new Error('expected guild');
     expect(capped.treasury.canDepositGold).toBe(false);
     expect(capped.treasury.canWithdrawGold).toBe(true);
@@ -155,14 +160,15 @@ describe('buildGuildBankView', () => {
     const nearCap = buildGuildBankView(
       guildInfo({ treasury: GUILD_BANK_TREASURY_CAP - 1 }),
       lookup,
+      0,
     );
     if (nearCap.kind !== 'guild') throw new Error('expected guild');
     expect(nearCap.treasury.canDepositGold).toBe(true);
   });
 
   it('carries the table price + block size and derives affordability both ways', () => {
-    const price = GUILD_BANK_EXPANSION_PRICES[0];
-    const afford = buildGuildBankView(guildInfo({ treasury: price }), lookup);
+    const price = GUILD_BANK_RUNG_PRICES[1]; // rung 1: the first treasury expansion
+    const afford = buildGuildBankView(guildInfo({ treasury: price }), lookup, 0);
     if (afford.kind !== 'guild') throw new Error('expected guild');
     expect(afford.buy).toEqual({
       nextPrice: price,
@@ -170,7 +176,7 @@ describe('buildGuildBankView', () => {
       maxed: false,
       affordable: true, // exactly the price affords (the sim accepts equality)
     });
-    const poor = buildGuildBankView(guildInfo({ treasury: price - 1 }), lookup);
+    const poor = buildGuildBankView(guildInfo({ treasury: price - 1 }), lookup, 0);
     if (poor.kind !== 'guild') throw new Error('expected guild');
     expect(poor.buy.affordable).toBe(false);
   });
@@ -179,16 +185,17 @@ describe('buildGuildBankView', () => {
     const view = buildGuildBankView(
       guildInfo({
         nextExpansionPrice: null,
-        purchasedSlots: GUILD_BANK_EXPANSION_PRICES.length * GUILD_BANK_EXPANSION_SLOTS,
-        capacity: 48,
+        purchasedSlots: 60,
+        capacity: 60,
       }),
       lookup,
+      0,
     );
     if (view.kind !== 'guild') throw new Error('expected guild');
     expect(view.buy.maxed).toBe(true);
     expect(view.buy.nextPrice).toBeNull();
     expect(view.buy.affordable).toBe(false);
-    expect(view.capacity.purchasedSlots).toBe(36);
+    expect(view.capacity.purchasedSlots).toBe(60);
   });
 
   it('passes the per-copy instance payload through to the slot model (tooltip lines)', () => {
@@ -196,6 +203,7 @@ describe('buildGuildBankView', () => {
     const view = buildGuildBankView(
       guildInfo({ slots: [{ itemId: 'sword', count: 1, instance }] }),
       lookup,
+      0,
     );
     if (view.kind !== 'guild') throw new Error('expected guild');
     expect(view.slots[0].instance).toBe(instance);
@@ -343,15 +351,77 @@ describe('ClientWorld-vs-Sim parity', () => {
         { itemId: 'potion', count: 9 },
         { itemId: 'mark', count: 1 },
       ],
-      capacity: 18,
-      purchasedSlots: 6,
-      nextExpansionPrice: GUILD_BANK_EXPANSION_PRICES[1],
+      capacity: 30,
+      purchasedSlots: 30,
+      nextExpansionPrice: GUILD_BANK_RUNG_PRICES[2],
     });
     const cliInfo = JSON.parse(JSON.stringify(simInfo)) as GuildBankInfo;
-    const simView = buildGuildBankView(simInfo, lookup);
-    const cliView = buildGuildBankView(cliInfo, lookup);
+    const simView = buildGuildBankView(simInfo, lookup, 0);
+    const cliView = buildGuildBankView(cliInfo, lookup, 0);
     expect(cliView).toEqual(simView);
     if (simView.kind !== 'guild') throw new Error('expected guild');
     expect(simView.hasDormant).toBe(true); // the mark slot
+  });
+
+  it('derives an identical UNOPENED model from both shapes (the purse rides outside the wire)', () => {
+    const simInfo = guildInfo({
+      treasury: 4_242,
+      slots: [],
+      capacity: 0,
+      purchasedSlots: 0,
+      nextExpansionPrice: GUILD_BANK_RUNG_PRICES[0],
+    });
+    const cliInfo = JSON.parse(JSON.stringify(simInfo)) as GuildBankInfo;
+    const simView = buildGuildBankView(simInfo, lookup, 100_000);
+    const cliView = buildGuildBankView(cliInfo, lookup, 100_000);
+    expect(cliView).toEqual(simView);
+    expect(simView.kind).toBe('unopened');
+  });
+});
+
+describe('the UNOPENED pane model (rung 0: purse-paid opening)', () => {
+  const unopened = (over: Partial<GuildBankInfo> = {}) =>
+    guildInfo({ capacity: 0, purchasedSlots: 0, nextExpansionPrice: 90_000, ...over });
+
+  it('reports unopened (no grid) with rung 0 as the open price', () => {
+    const view = buildGuildBankView(unopened(), lookup, 0);
+    if (view.kind !== 'unopened') throw new Error('expected unopened');
+    expect(view.open.price).toBe(90_000); // 9g, the rung-0 literal
+  });
+
+  it('treasury gold enablement works from day one, exactly like the opened pane', () => {
+    const rich = buildGuildBankView(unopened({ treasury: 5_000 }), lookup, 0);
+    if (rich.kind !== 'unopened') throw new Error('expected unopened');
+    expect(rich.treasury.copper).toBe(5_000);
+    expect(rich.treasury.canDepositGold).toBe(true);
+    expect(rich.treasury.canWithdrawGold).toBe(true);
+    const empty = buildGuildBankView(unopened({ treasury: 0 }), lookup, 0);
+    if (empty.kind !== 'unopened') throw new Error('expected unopened');
+    expect(empty.treasury.canWithdrawGold).toBe(false);
+  });
+
+  it('affordability reads the OFFICER PURSE (never the treasury), with the exact boundary', () => {
+    // A treasury-rich guild does not make the opening affordable: rung 0 is
+    // purse-paid.
+    const poor = buildGuildBankView(unopened({ treasury: 10_000_000 }), lookup, 89_999);
+    if (poor.kind !== 'unopened') throw new Error('expected unopened');
+    expect(poor.open.affordable).toBe(false);
+    // Exactly the price affords (the sim accepts equality).
+    const exact = buildGuildBankView(unopened({ treasury: 0 }), lookup, 90_000);
+    if (exact.kind !== 'unopened') throw new Error('expected unopened');
+    expect(exact.open.affordable).toBe(true);
+    // A fractional (hostile) purse floors before comparing.
+    const frac = buildGuildBankView(unopened(), lookup, 89_999.9);
+    if (frac.kind !== 'unopened') throw new Error('expected unopened');
+    expect(frac.open.affordable).toBe(false);
+  });
+
+  it('an opened bank never yields the unopened kind (the 24-slot boundary)', () => {
+    const opened = buildGuildBankView(
+      guildInfo({ capacity: 24, purchasedSlots: 24, nextExpansionPrice: 25_000 }),
+      lookup,
+      0,
+    );
+    expect(opened.kind).toBe('guild');
   });
 });

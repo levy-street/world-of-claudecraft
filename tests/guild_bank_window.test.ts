@@ -9,7 +9,7 @@ import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { stackSizeOf } from '../src/sim/bags';
 import { ITEMS } from '../src/sim/data';
-import { GUILD_BANK_EXPANSION_PRICES, GUILD_BANK_TREASURY_CAP } from '../src/sim/guild_bank';
+import { GUILD_BANK_RUNG_PRICES, GUILD_BANK_TREASURY_CAP } from '../src/sim/guild_bank';
 import type { InvSlot } from '../src/sim/types';
 import { BankWindow, type BankWindowDeps } from '../src/ui/bank_window';
 import type { BankInfo, GuildBankInfo, IWorld } from '../src/world_api';
@@ -37,13 +37,15 @@ function personalInfo(): BankInfo {
   };
 }
 
+// The default snapshot is an OPENED bank (rung 0 bought); the unopened-pane
+// suite overrides purchasedSlots to 0.
 function guildInfo(over: Partial<GuildBankInfo> = {}): GuildBankInfo {
   return {
     treasury: 60_000,
     slots: [],
     capacity: 12,
-    purchasedSlots: 0,
-    nextExpansionPrice: GUILD_BANK_EXPANSION_PRICES[0],
+    purchasedSlots: 24,
+    nextExpansionPrice: GUILD_BANK_RUNG_PRICES[1],
     ...over,
   };
 }
@@ -314,7 +316,7 @@ describe('guild pane rendering', () => {
   });
 
   it('marks an unaffordable expansion with visible text and keeps the button enabled (sim-authoritative refusal)', () => {
-    const price = GUILD_BANK_EXPANSION_PRICES[0];
+    const price = GUILD_BANK_RUNG_PRICES[1]; // rung 1: the first treasury expansion
     const h = harness(guildInfo({ treasury: price - 1 }));
     h.window.open();
     clickGuildTab(h);
@@ -353,7 +355,7 @@ describe('guild pane rendering', () => {
   });
 
   it('shows the maxed label once the ladder is exhausted', () => {
-    const h = harness(guildInfo({ nextExpansionPrice: null, purchasedSlots: 36, capacity: 48 }));
+    const h = harness(guildInfo({ nextExpansionPrice: null, purchasedSlots: 60, capacity: 60 }));
     h.window.open();
     clickGuildTab(h);
     expect(h.root.querySelector('.bank-buy-btn')).toBeNull();
@@ -550,5 +552,99 @@ describe('guild pane actions round-trip through the facet', () => {
     h.window.close();
     expect(document.querySelector('.gbank-gold-prompt')).toBeNull();
     expect(h.root.inert).toBe(false);
+  });
+});
+
+describe('the UNOPENED pane (rung 0: open the guild bank from the officer purse)', () => {
+  const unopened = (over: Partial<GuildBankInfo> = {}) =>
+    guildInfo({ capacity: 0, purchasedSlots: 0, nextExpansionPrice: 90_000, slots: [], ...over });
+
+  it('renders the treasury as normal plus the open row INSTEAD of the slot grid', () => {
+    const h = harness(unopened({ treasury: 60_000 }));
+    h.window.open();
+    clickGuildTab(h);
+    // The tab strip still exists (the pane is reachable) and the treasury
+    // section works from day one.
+    expect(h.root.querySelector('.bank-tabs')).not.toBeNull();
+    expect(h.root.querySelector('.gbank-treasury .money-inline')?.textContent).toBe('60000');
+    const [deposit, withdraw] = Array.from(
+      h.root.querySelectorAll<HTMLButtonElement>('.gbank-gold-btn'),
+    );
+    expect(deposit.disabled).toBe(false);
+    expect(withdraw.disabled).toBe(false);
+    // No grid, no capacity counter, no expansion note text: the open row
+    // replaces them.
+    expect(h.root.querySelector('.bank-grid')).toBeNull();
+    expect(h.root.querySelector('.bank-capacity')).toBeNull();
+    const open = h.root.querySelector('.gbank-open-row .bank-buy-btn') as HTMLButtonElement;
+    expect(open).not.toBeNull();
+    expect(open.textContent).toContain('Open the guild bank');
+    expect(open.querySelector('.money-inline')?.textContent).toBe('90000'); // 9g literal
+    // The payer note is always-visible text: this is the officer's own money.
+    expect(h.root.querySelector('.gbank-open-row .gbank-buy-note')?.textContent).toBe(
+      'Paid from your own money, not the guild treasury',
+    );
+  });
+
+  it('marks a purse-poor officer with visible text and keeps the button enabled (sim-authoritative refusal)', () => {
+    const h = harness(unopened({ treasury: 10_000_000 })); // treasury wealth must NOT count
+    h.world.copper = 89_999; // one copper short of 9g
+    h.window.open();
+    clickGuildTab(h);
+    const btn = h.root.querySelector<HTMLButtonElement>('.gbank-open-row .bank-buy-btn');
+    expect(btn?.disabled).toBe(false);
+    expect(btn?.classList.contains('gbank-buy-short')).toBe(true);
+    expect(btn?.querySelector('.gbank-buy-short-label')?.textContent).toBe('Not enough money');
+    // The affordable arm carries NO marker.
+    const rich = harness(unopened());
+    rich.world.copper = 90_000;
+    rich.window.open();
+    clickGuildTab(rich);
+    const richBtn = rich.root.querySelector<HTMLButtonElement>('.gbank-open-row .bank-buy-btn');
+    expect(richBtn?.classList.contains('gbank-buy-short')).toBe(false);
+    expect(richBtn?.querySelector('.gbank-buy-short-label')).toBeNull();
+  });
+
+  it('the open confirm sends guildBankBuySlots (the same token; the sim decides the rung)', () => {
+    const h = harness(unopened());
+    h.world.copper = 100_000;
+    h.window.open();
+    clickGuildTab(h);
+    (h.root.querySelector('.gbank-open-row .bank-buy-btn') as HTMLElement).click();
+    const prompt = document.querySelector('.gbank-open-prompt') as HTMLElement;
+    expect(prompt).not.toBeNull();
+    expect(prompt.textContent).toContain('paid from your own money');
+    (prompt.querySelector('.btn') as HTMLElement).click();
+    expect(h.calls).toContain('guildBankBuySlots');
+  });
+
+  it('a purse change repaints the unopened pane (the one purse read in the signature)', () => {
+    // The refresh signature is deliberately purse-free for the OPENED pane;
+    // while unopened, the shortfall marker reads the purse, so a purse change
+    // must repaint or the marker goes stale.
+    const h = harness(unopened());
+    h.world.copper = 89_999;
+    h.window.open();
+    clickGuildTab(h);
+    expect(
+      h.root.querySelector('.gbank-open-row .bank-buy-btn')?.classList.contains('gbank-buy-short'),
+    ).toBe(true);
+    h.world.copper = 90_000;
+    h.window.refreshIfChanged();
+    expect(
+      h.root.querySelector('.gbank-open-row .bank-buy-btn')?.classList.contains('gbank-buy-short'),
+    ).toBe(false);
+  });
+
+  it('after opening (the echo flips purchasedSlots to 24) the normal pane renders', () => {
+    const h = harness(unopened());
+    h.window.open();
+    clickGuildTab(h);
+    expect(h.root.querySelector('.bank-grid')).toBeNull();
+    h.world.guildBankInfo = guildInfo({ capacity: 24 }); // opened: 24 slots, rung-1 next
+    h.window.refreshIfChanged();
+    expect(h.root.querySelector('.gbank-open-row')).toBeNull();
+    expect(h.root.querySelector('.bank-grid')).not.toBeNull();
+    expect(h.root.querySelector('.bank-capacity')).not.toBeNull();
   });
 });

@@ -8841,6 +8841,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ギルド金庫から {price} でギルド銀行スロットを{count}個追加購入しますか？',
   'hudChrome.bank.guildBuyNote': 'ギルド金庫から支払われます',
   'hudChrome.bank.guildTreasuryShort': '金庫の資金不足',
+  'hudChrome.bank.guildOpenBank': 'ギルド銀行を開設する',
+  'hudChrome.bank.guildOpenConfirm':
+    '{price} でギルド銀行を開設しますか？この費用はあなた自身の所持金から支払われます。',
+  'hudChrome.bank.guildOpenAccept': '開設',
+  'hudChrome.bank.guildOpenNote': 'ギルド金庫ではなく、あなた自身の所持金から支払われます',
+  'hudChrome.bank.guildPurseShort': '所持金不足',
   'hudChrome.bank.guildDormantNote':
     'ロックされたアイテムは引き出せず、ギルドの解散もできなくなります。',
   'hudChrome.bank.guildDormantHint': 'このアイテムはギルド銀行にロックされており、引き出せません。',

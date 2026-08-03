@@ -8827,6 +8827,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '길드 금고에서 {price}(으)로 길드 은행 칸 {count}칸을 추가로 구매하시겠습니까?',
   'hudChrome.bank.guildBuyNote': '길드 금고에서 지불됩니다',
   'hudChrome.bank.guildTreasuryShort': '금고 부족',
+  'hudChrome.bank.guildOpenBank': '길드 은행 개설',
+  'hudChrome.bank.guildOpenConfirm':
+    '{price}(으)로 길드 은행을 개설하시겠습니까? 이 비용은 본인의 소지금에서 지불됩니다.',
+  'hudChrome.bank.guildOpenAccept': '개설',
+  'hudChrome.bank.guildOpenNote': '길드 금고가 아닌 본인의 소지금에서 지불됩니다',
+  'hudChrome.bank.guildPurseShort': '소지금 부족',
   'hudChrome.bank.guildDormantNote': '잠긴 아이템은 꺼낼 수 없으며 길드 해산을 막습니다.',
   'hudChrome.bank.guildDormantHint': '이 아이템은 길드 은행에 잠겨 있어 꺼낼 수 없습니다.',
   'hudChrome.bank.guildDormantAria': '{item}, 수량 {count}, 꺼낼 수 없음',

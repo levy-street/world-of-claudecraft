@@ -2528,6 +2528,16 @@ export const hudChromeStrings = {
       'Purchase {count} additional guild bank slots for {price} from the guild treasury?',
     guildBuyNote: 'Paid from the guild treasury',
     guildTreasuryShort: 'Treasury short',
+    // The UNOPENED pane (ladder rung 0): a new guild's bank has no item slots
+    // until an officer opens it, paid from the CLICKING OFFICER'S OWN PURSE
+    // (never the treasury). The row mirrors the expansion row's contract
+    // (never disabled; visible shortfall marker; always-visible payer note).
+    // (Wordy values, M16: the five non-Latin fills land in this same change.)
+    guildOpenBank: 'Open the guild bank',
+    guildOpenConfirm: 'Open the guild bank for {price}? This is paid from your own money.',
+    guildOpenAccept: 'Open',
+    guildOpenNote: 'Paid from your own money, not the guild treasury',
+    guildPurseShort: 'Not enough money',
     guildDormantNote: 'Locked items cannot be withdrawn and prevent disbanding the guild.',
     guildDormantHint: 'This item is locked in the guild bank and cannot be withdrawn.',
     guildDormantAria: '{item}, quantity {count}, cannot be withdrawn',
