@@ -11810,11 +11810,11 @@ export const en_CA: EnTranslations = {
       },
       "q_bones": {
         "title": "The Restless Dead",
-        "text": "The old ruin on the northwest hill was a chapel once, and its yard a resting place. Something has stirred the dead from their sleep. Grant them peace, {playerName} - return 8 Restless Bones to the earth.",
+        "text": "The old ruin on the northwest hill was a chapel once, and its yard a resting place. Something has stirred the dead from their sleep. Put them down and bring me a skull from each you lay to rest, {playerName}, eight in all, so I may speak the rites over them and grant the peace they were denied.",
         "completion": "May they rest now, and may the Light forgive whatever woke them.",
         "objectives": {
           "0": {
-            "label": "Restless Bones laid to rest"
+            "label": "Restless Skulls recovered"
           }
         }
       },

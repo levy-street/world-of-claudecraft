@@ -1575,6 +1575,13 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     questId: 'q_rite',
   },
+  restless_skull: {
+    id: 'restless_skull',
+    name: 'Restless Skull',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_bones',
+  },
   webwood_silk: {
     id: 'webwood_silk',
     name: 'Sableweb Silk Gland',

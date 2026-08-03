@@ -5241,14 +5241,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     'Esta letra veio do grimório de Morthen. A mesma mão guiou cada túmulo, {playerName}.',
   'entities.quests.q_cult_orders.objectives.0.label': 'Zelote do Culto do Wyrm abatido',
-  'entities.quests.q_cult_orders.objectives.1.label': 'Ordens do Culto do Wyrm',
   'entities.quests.q_necromancers.title': 'O anel de filactérios',
   'entities.quests.q_necromancers.text':
     'As ordens falam de um anel de filactérios, vasos de alma, {playerName}, ao redor do Santuário. Mate 8 necromantes e traga 3 intactos.',
   'entities.quests.q_necromancers.completion':
     'Que a Luz nos perdoe. Eles guardam os mortos do Vale e do pântano; nunca estavam erguendo um exército, {playerName}. Eram um dízimo.',
   'entities.quests.q_necromancers.objectives.0.label': 'Necromante do Culto do Wyrm abatido',
-  'entities.quests.q_necromancers.objectives.1.label': 'Filactério ritual',
   'entities.quests.q_revenants.title': 'Campos de revenantes',
   'entities.quests.q_revenants.text':
     'A leste da estrada há um velho campo de batalha. O culto ergueu seus ossos em placas enferrujadas. Ponha 12 de volta no chão, {playerName}.',

@@ -3848,14 +3848,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     '이 필체는 모르덴의 마법서에서 본 것입니다. 모든 무덤을 같은 손이 이끌었습니다, {playerName}.',
   'entities.quests.q_cult_orders.objectives.0.label': '고룡교단 광신도 처치',
-  'entities.quests.q_cult_orders.objectives.1.label': '고룡교단 명령서',
   'entities.quests.q_necromancers.title': '성물함의 고리',
   'entities.quests.q_necromancers.text':
     '명령서는 성소 둘레의 성물함 고리를 말합니다. 영혼 그릇입니다, {playerName}이여. 강령술사 8명을 죽이고 3개를 온전하게 가져오십시오.',
   'entities.quests.q_necromancers.completion':
     '빛이여 용서하소서. 계곡과 습지의 죽은 자들이 담겨 있습니다. {playerName}이여, 그들은 군대를 만든 것이 아니라 십일조를 거두고 있었습니다.',
   'entities.quests.q_necromancers.objectives.0.label': '고룡교단 강령술사 처치',
-  'entities.quests.q_necromancers.objectives.1.label': '의식 성물함',
   'entities.quests.q_revenants.title': '망령 들판',
   'entities.quests.q_revenants.text':
     '성소 길 동쪽에는 오래된 전장이 있습니다. 교단이 녹슨 갑옷의 뼈들을 일으켰습니다. {playerName}이여, 12구를 흙으로 돌려보내십시오.',

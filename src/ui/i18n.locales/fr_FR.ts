@@ -5743,14 +5743,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     'Cette écriture vient du grimoire de Morthen. La même main a guidé chaque tombe, {playerName}.',
   'entities.quests.q_cult_orders.objectives.0.label': 'Zélote du Culte du Wyrm tué',
-  'entities.quests.q_cult_orders.objectives.1.label': 'Ordres du Culte du Wyrm',
   'entities.quests.q_necromancers.title': "L'anneau des phylactères",
   'entities.quests.q_necromancers.text':
     "Les ordres parlent d'un anneau de phylactères, {playerName}, vases d'âme autour du Sanctuaire. Tuez 8 nécromanciens et rapportez-en 3 intacts.",
   'entities.quests.q_necromancers.completion':
     "Que la Lumière nous pardonne. Ils contiennent les morts du Val et du marais; ce n'était pas une armée qu'ils bâtissaient, {playerName}, c'était une dîme.",
   'entities.quests.q_necromancers.objectives.0.label': 'Nécromancien du Culte du Wyrm tué',
-  'entities.quests.q_necromancers.objectives.1.label': 'Phylactère rituel',
   'entities.quests.q_revenants.title': 'Les champs des revenants',
   'entities.quests.q_revenants.text':
     "À l'est de la route dort un vieux champ de bataille. Le culte a relevé ses os en armures rouillées. Remettez-en 12 en terre, {playerName}.",

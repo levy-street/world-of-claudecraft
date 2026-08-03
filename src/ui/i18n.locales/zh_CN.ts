@@ -3706,14 +3706,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     '这笔迹...我在东溪莫森的魔典里见过。每座坟后都是同一只手，{playerName}。',
   'entities.quests.q_cult_orders.objectives.0.label': '击败龙教狂热者',
-  'entities.quests.q_cult_orders.objectives.1.label': '龙教命令',
   'entities.quests.q_necromancers.title': '护命匣之环',
   'entities.quests.q_necromancers.text':
     '命令提到一圈护命匣，{playerName}，灵魂容器围着圣所供养它。杀8名死灵法师，带回3个完整护命匣。',
   'entities.quests.q_necromancers.completion':
     '愿圣光宽恕我们。里面装着谷地和湿地的死者，所有被收割的灵魂。{playerName}，他们从来不是在组建军队，而是在征收贡赋。',
   'entities.quests.q_necromancers.objectives.0.label': '击败龙教死灵法师',
-  'entities.quests.q_necromancers.objectives.1.label': '仪式护命匣',
   'entities.quests.q_revenants.title': '亡魂战场',
   'entities.quests.q_revenants.text':
     '圣所路东有片古战场，上一支攻山军的先锋已埋两百年。邪教叫醒了他们，穿着锈甲。{playerName}，让12个归土。',

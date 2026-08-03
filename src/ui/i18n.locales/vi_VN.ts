@@ -4020,7 +4020,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     'Lối chữ này... lần cuối ta thấy thứ tương tự là trong cuốn ma thư của Morthen, ở Eastbrook. Cùng một bàn tay đã dẫn dắt mọi nấm mồ mà chúng ta đã giành giật, {playerName}.',
   'entities.quests.q_cult_orders.objectives.0.label': 'Đã hạ Cuồng Tín Long Giáo',
-  'entities.quests.q_cult_orders.objectives.1.label': 'Mệnh Lệnh Long Giáo',
   'entities.quests.q_cult_orders.text':
     'Lũ cuồng tín giờ hành động có chủ đích - canh gác bố trí, quân nhu kiểm đếm, như binh lính trước một trận vây thành. Tín đồ biết tổ chức là tín đồ đang nhận lệnh, {playerName}. Hãy giết thêm tám tên nữa và mang cho ta bốn tập mệnh lệnh được viết của chúng. Ta muốn biết bàn tay nào đang chỉ huy chúng.',
   'entities.quests.q_cult_orders.title': 'Mệnh Lệnh Từ Bên Dưới',
@@ -4197,7 +4196,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_necromancers.completion':
     'Cầu Thánh Quang tha thứ cho chúng ta. Những thứ này chứa đựng người chết của Thung Lũng và đầm lầy - mọi xác chết mà bọn Kẻ Gọi Mộ từng triệu dậy, đều bị thu hoạch. Chúng chưa bao giờ xây dựng một đạo quân, {playerName}. Chúng đang gom góp một thứ cống nạp.',
   'entities.quests.q_necromancers.objectives.0.label': 'Đã hạ Pháp Sư Tử Linh Long Giáo',
-  'entities.quests.q_necromancers.objectives.1.label': 'Hồn Hộp Nghi Lễ',
   'entities.quests.q_necromancers.text':
     'Các mệnh lệnh nhắc đến một "vòng hồn hộp" - những bình chứa linh hồn, {playerName}, được đặt quanh Thánh Đường để nuôi dưỡng nó. Bọn pháp sư tử linh của giáo phái mang chúng như những thánh vật. Hãy giết tám pháp sư tử linh và mang về cho ta ba chiếc hồn hộp còn nguyên vẹn. Ta phải biết chúng giam giữ những linh hồn nào.',
   'entities.quests.q_necromancers.title': 'Vòng Hồn Hộp',

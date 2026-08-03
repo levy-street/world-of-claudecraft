@@ -3865,14 +3865,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     'この筆跡はモーセンの魔導書と同じです。すべての墓を導いた同じ手です、{playerName}。',
   'entities.quests.q_cult_orders.objectives.0.label': 'ワーム教団の狂信者を討伐',
-  'entities.quests.q_cult_orders.objectives.1.label': 'ワーム教団の命令書',
   'entities.quests.q_necromancers.title': '経箱の輪',
   'entities.quests.q_necromancers.text':
     '命令は経箱の輪を語っています。{playerName}、聖所を養う魂の器です。死霊術師を8人倒し、3つを壊さず持ってきてください。',
   'entities.quests.q_necromancers.completion':
     '光よ、赦したまえ。谷と湿地の死者が入っています。{playerName}、これは軍ではなく、貢ぎ物でした。',
   'entities.quests.q_necromancers.objectives.0.label': 'ワーム教団の死霊術師を討伐',
-  'entities.quests.q_necromancers.objectives.1.label': '儀式の経箱',
   'entities.quests.q_revenants.title': '亡霊の野',
   'entities.quests.q_revenants.text':
     '聖所道の東には古い戦場があります。教団は錆びた甲冑の骨を起こしました。{playerName}、12体を土へ戻してください。',

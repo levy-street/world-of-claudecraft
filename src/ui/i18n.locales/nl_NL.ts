@@ -4054,7 +4054,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     'Dit schrift... Ik zag het laatst in Morthens grimoire, in Oostbeek. Dezelfde hand heeft elk graf geleid waarover wij gevochten hebben, {playerName}.',
   'entities.quests.q_cult_orders.objectives.0.label': 'Wurmsekte-Dweper gedood',
-  'entities.quests.q_cult_orders.objectives.1.label': 'Wurmsekte-Bevelen',
   'entities.quests.q_cult_orders.text':
     'De dwepers bewegen nu doelgericht, wachten uitgezet, voorraden geteld, als soldaten voor een belegering. Sektariërs die zich organiseren, zijn sektariërs die bevelen opvolgen, {playerName}. Dood er acht meer en breng me vier sets van hun geschreven bevelen. Ik wil de hand kennen die hen aanvoert.',
   'entities.quests.q_cult_orders.title': 'Bevelen van Beneden',
@@ -4231,7 +4230,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_necromancers.completion':
     'Moge het Licht ons vergeven. Deze bevatten de doden van het Dal en het veen - elk lijk dat de Grafroepers ooit hebben opgewekt, geoogst. Ze bouwden nooit een leger, {playerName}. Ze inden een tiend.',
   'entities.quests.q_necromancers.objectives.0.label': 'Wurmsekte-Necromancer gedood',
-  'entities.quests.q_necromancers.objectives.1.label': 'Rituele Phylacterie',
   'entities.quests.q_necromancers.text':
     'De bevelen spreken van een "ring van phylacterieën" - zielenvaten, {playerName}, rond het Heiligdom geplaatst om het te voeden. De necromancers van de sekte dragen ze als heilige relikwieën. Dood acht necromancers en breng me drie ongebroken phylacterieën. Ik moet weten welke zielen ze bevatten.',
   'entities.quests.q_necromancers.title': 'De Phylacterie-Ring',

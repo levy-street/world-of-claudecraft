@@ -3894,14 +3894,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     'Этот почерк я видел в гримуаре Мортена. Одна рука вела каждую могилу, {playerName}.',
   'entities.quests.q_cult_orders.objectives.0.label': 'Фанатик Культа Вирма: убито',
-  'entities.quests.q_cult_orders.objectives.1.label': 'Приказы Культа Вирма',
   'entities.quests.q_necromancers.title': 'Кольцо филактерий',
   'entities.quests.q_necromancers.text':
     'В приказах сказано о кольце филактерий, сосудах душ, {playerName}, вокруг святилища. Убейте 8 некромантов и принесите 3 целыми.',
   'entities.quests.q_necromancers.completion':
     'Свет, прости нас. В них мертвые долины и топи. Это была не армия, {playerName}. Это была десятина.',
   'entities.quests.q_necromancers.objectives.0.label': 'Некромант Культа Вирма: убито',
-  'entities.quests.q_necromancers.objectives.1.label': 'Ритуальная филактерия',
   'entities.quests.q_revenants.title': 'Поля ревенантов',
   'entities.quests.q_revenants.text':
     'К востоку от дороги старое поле боя. Культ поднял кости в ржавых латах. Верните 12 в землю, {playerName}.',

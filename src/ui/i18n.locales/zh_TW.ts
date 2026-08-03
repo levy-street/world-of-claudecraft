@@ -3709,14 +3709,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     '這筆跡...我在東溪莫森的魔典裡見過。每座墳後都是同一隻手，{playerName}。',
   'entities.quests.q_cult_orders.objectives.0.label': '擊敗龍教狂熱者',
-  'entities.quests.q_cult_orders.objectives.1.label': '龍教命令',
   'entities.quests.q_necromancers.title': '護命匣之環',
   'entities.quests.q_necromancers.text':
     '命令提到一圈護命匣，{playerName}，靈魂容器圍著聖所供養它。殺8名死靈法師，帶回3個完整護命匣。',
   'entities.quests.q_necromancers.completion':
     '願聖光寬恕我們。裡面裝著谷地和濕地的死者，所有被收割的靈魂。他們從來不是在組建軍隊，{playerName}。他們是在收取貢稅。',
   'entities.quests.q_necromancers.objectives.0.label': '擊敗龍教死靈法師',
-  'entities.quests.q_necromancers.objectives.1.label': '儀式護命匣',
   'entities.quests.q_revenants.title': '亡魂戰場',
   'entities.quests.q_revenants.text':
     '聖所路東有片古戰場，上一支攻山軍的先鋒已埋兩百年。邪教叫醒了他們，穿著鏽甲。{playerName}，讓12個歸土。',

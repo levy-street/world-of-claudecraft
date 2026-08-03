@@ -3836,7 +3836,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     'Denne skrift... jeg så sidst dens lige i Morthens grimoire, i Østbæk. Den samme hånd har styret hver eneste grav, vi har kæmpet om, {playerName}.',
   'entities.quests.q_cult_orders.objectives.0.label': 'Ormekult-Zelot dræbt',
-  'entities.quests.q_cult_orders.objectives.1.label': 'Ormekult-Ordrer',
   'entities.quests.q_cult_orders.text':
     'Zeloterne bevæger sig med formål nu - vagter sat, forsyninger talt, som soldater før en belejring. Kultister, der organiserer sig, er kultister, der tager imod ordrer, {playerName}. Dræb otte til, og bring mig fire sæt af deres skrevne ordrer. Jeg vil kende den hånd, der befaler dem.',
   'entities.quests.q_cult_orders.title': 'Ordrer fra Det Dybe',
@@ -4012,7 +4011,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_necromancers.completion':
     'Lyset tilgive os. Disse rummer de døde fra Dalen og sumpen - hvert lig Gravkalderne nogensinde rejste, høstet. De byggede aldrig en hær, {playerName}. De indsamlede en tiende.',
   'entities.quests.q_necromancers.objectives.0.label': 'Ormekult-Nekromantiker dræbt',
-  'entities.quests.q_necromancers.objectives.1.label': 'Rituelt Fylakterie',
   'entities.quests.q_necromancers.text':
     'Ordrerne taler om en "ring af fylakterier" - sjælebeholdere, {playerName}, sat omkring Helligdommen for at nære den. Kultens nekromantikere bærer dem som hellige relikvier. Dræb otte nekromantikere og bring mig tre fylakterier ubrudte. Jeg må vide, hvilke sjæle de rummer.',
   'entities.quests.q_necromancers.title': 'Fylakterieringen',
