@@ -517,47 +517,73 @@ mechanism left: there is no shared snapshot to capture, nothing for a reload to 
 and no reload arm (nor cross-session scan, retry loop, or `revertLostGuildBanks`) left in
 the code. The reconcile is a synchronous undo of this session's own ops.
 
-What REMAINS accepted, restated to cover both its flavours:
+The residue this section used to accept is CLOSED too, and it was never a
+residue: it was an unbounded, attacker-triggered money printer, and this text
+described it as a 250-copper edge case. The full sequence: officer A deposits
+without flushing; officer B withdraws it; B's autosave committed its CHARACTER
+half while the book half could not be replayed; A then took itself over (an
+ordinary re-login), which fenced A and rolled A's deposit back. B kept the
+value, A's stake came back, repeatable on demand, for any amount and for items
+as well as copper.
 
-- **D5, the consume-then-fence residue (ACCEPTED, now AUDITABLE).** If officer B consumes
-  value officer A deposited but never made durable (withdraws the copper or the copy, or
-  spends it on a ladder rung) and B's book half can never land, B's character half is
-  durable while the book never lost the value. Two flavours, both pinned with exact
-  witnesses in `tests/audit_conservation_property.test.ts` (P4-RESIDUE):
-  - the CONSUMED-VALUE flavour: the withdrawn amount is minted (the pinned witness is
-    250 copper);
-  - the RUNG-0 LADDER flavour: the opener's purse-paid 24 slots survive when another
-    officer's expansion has pinned the ladder above them, because lowering it would
-    destroy the expander's paid rung and strand a non-ladder position (the pinned witness
-    is 90,000 of ladder value; `tests/audit_cap_probe.test.ts` G1 records the same residue
-    from the ladder side).
-  The forward replay never CLAMPS a shortfall away (clamping mints it permanently):
-  it applies what durable truth covers, carries the remainder as a residual, and retries
-  on later saves, which resolves every ordinary interleaving. Only when the shortfall can
-  never resolve (no other session holds unflushed work for that guild, or it has not
-  resolved within `GameServer.GUILD_BANK_DEFICIT_MAX_SKIPS` saves) is the remainder
-  dropped, and that path writes an `escrow_deficit` row into bank_ledger and logs loudly.
-  That row is the FIRST time this residue has been visible to `scripts/bank_audit.mjs`,
-  which reports every one of them as a finding and excludes them from the item, treasury,
-  and ladder replays. Closing the residue itself needs the escrow save to REFUSE rather
-  than carry a shortfall ("Strong Direction B", escrow-fix-plan.md section 5), which is
-  deliberately deferred: a save failing through no fault of its own cascades into a second
-  reconcile, and that failure handling is a larger design than the fix it would ride on.
-- **A transient book-behind window.** Between a save that carried a residual and that
-  session's next save, the durable book is behind the durable character half by the
-  carried amount. This is the same shape as (and strictly smaller than) the cross-officer
-  window the World Market accepts today, and unlike the old skew it self-heals on the very
-  next save instead of needing a reconcile.
+The rule that closes it is the one the whole feature rests on, and it is not
+negotiable:
+
+> If the book half cannot be applied, the CHARACTER half must not commit.
+
+A shortfall is never clamped away and never carried: the escrow transaction
+ROLLS BACK, character row included, and the save is retried. An anomaly ledger
+row is an audit trail, not a substitute for atomicity, and logging a mint is
+not preventing one. Concretely:
+
+- While another session still holds unflushed work for the guild, the refusal
+  is TRANSIENT: their commit is what makes the replay applicable and it lands
+  within an autosave interval. Nothing is consumed, and the marks and log are
+  exactly as they were.
+- When no session can ever make the missing value durable (or the retries run
+  out after `GameServer.GUILD_BANK_DEFICIT_MAX_SKIPS`), the session's live
+  state is ABANDONED: its own book ops come back off the live book, it is
+  quarantined so it can never persist again, ONE aggregate `escrow_deficit`
+  bank_ledger row records the incident with SIGNED numbers (so an operator can
+  tell work that was taking value out of the book from work that was putting
+  value in), and it is disconnected to reload from its durable row. Everything
+  it did since its last successful save is lost, which is exactly what a lease
+  fence-out already does, and it conserves precisely because none of it was
+  ever durable.
+
+The same rule covers the ladder: a rung is never granted from a durable base
+that has not reached it, and never granted without its charge. Both used to
+leave a "residue" (the opener's purse-paid 24 slots surviving above another
+officer's expansion, 90,000 of ladder value) and both are now refused.
+
+Measured, with the same generator, on 300 randomised instances of the exploit
+shape (`tests/audit_conservation_property.test.ts`, P4-EXPLOIT): 271/300
+durable conservation failures under carry-and-record, 0/300 under refusal;
+186/200 live-view failures before, 0/200 after. The property harness's
+P4-CONSUMED block pins the two named witnesses (250 copper, 90,000 ladder)
+as CONSERVED rather than as accepted mints, and P5's crash pin no longer
+tears.
+
+What remains accepted:
+
+- **A session can lose its unsaved progress to another officer's disappearance.**
+  If officer B consumed value officer A never made durable and A then vanishes,
+  B is rolled back and disconnected: up to one autosave interval of B's play is
+  discarded. That is an availability and fairness cost, not a conservation one,
+  and it is the same rollback a lease fence-out already applies. Two colluding
+  accounts can inflict it on each other; they gain nothing by it.
+- **A crash still loses whatever was not yet saved**, as it always did. The
+  difference is that a crash can no longer leave value in two durable places:
+  a save either committed both halves or committed neither.
 - Ledger rows for fenced-out (undone) ops remain in bank_ledger by design: the audit
   script may flag them against the book; that finding points at the incident the loud
   fence-out log recorded (see the operator caveat in scripts/bank_audit.mjs: audit a
   quiesced realm).
 - The guild-delete window (`beginGuildBankDelete` / `endGuildBankDelete`) refuses every
   guild bank op for a guild whose DELETE is in flight, spanning the empty-bank guard to
-  the DELETE and its post-commit hooks. Refusals inside that window are SILENT (two DB
-  round trips wide; the actor's own disband command reports its own outcome). Before it,
-  an op landing in that gap was destroyed outright by the FK cascade with its dirty mark
-  wiped by the post-commit hook.
+  the DELETE and its post-commit hooks, and tells the actor so
+  (`guild.bankClosing`). Before it, an op landing in that gap was destroyed outright by
+  the FK cascade with its dirty mark wiped by the post-commit hook.
 - Dormant pipe-refused slots can make a bank permanently non-emptiable (DEFERRED, v1
   limitation): an item a later content update flags soulbound/noMarketList is refused in
   BOTH directions (anonymous-pipe policy), so it can never be withdrawn, and the disband

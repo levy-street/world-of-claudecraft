@@ -32,6 +32,7 @@ import { enqueueLinkChange } from './discord_link_changes';
 import { bustDiscordStatus } from './discord_status_cache';
 import { GITHUB_SCHEMA } from './github_db';
 import {
+  GuildBankEscrowRefused,
   type GuildBankSave,
   type GuildBankWriteResult,
   mergeGuildBankRow,
@@ -3159,13 +3160,7 @@ export async function saveCharacterAndMarketState(
     // the character UPDATE above already passed the lease fence, so these can
     // never land for a displaced session, and a failure anywhere rolls back
     // the character, market, mail, and book halves together.
-    for (const gb of guildBanks ?? []) {
-      // NOT `results?.push(await ...)`: optional chaining short-circuits the
-      // whole call expression, so the write itself would be skipped whenever
-      // the caller omitted the out-parameter.
-      const written = await writeGuildBankRow(client, gb);
-      results?.push(written);
-    }
+    await writeGuildBankRows(client, guildBanks ?? [], results);
     await client.query('COMMIT');
     return true;
   } catch (err) {
@@ -3188,6 +3183,30 @@ export async function saveCharacterAndMarketState(
 // ---------------------------------------------------------------------------
 
 export type { GuildBankSave, GuildBankWriteResult } from './guild_bank_state';
+export { GuildBankEscrowRefused } from './guild_bank_state';
+
+// Write every carried book inside the already-fenced transaction, then decide
+// the transaction's fate on the result. A refused book half ABORTS the whole
+// thing, character row included: the two halves commit together or not at all,
+// and "commit the character and record that the book could not follow" is a
+// receipt for a mint, not a mitigation. The caller retries; see
+// server/game.ts handleGuildBankEscrowRefusal for what happens when a retry
+// can never succeed.
+async function writeGuildBankRows(
+  client: { query: (text: string, values: unknown[]) => Promise<unknown> },
+  guildBanks: readonly GuildBankSave[],
+  results?: GuildBankWriteResult[],
+): Promise<void> {
+  const written: GuildBankWriteResult[] = [];
+  for (const gb of guildBanks) {
+    written.push(await writeGuildBankRow(client, gb));
+  }
+  results?.push(...written);
+  if (written.some((r) => !r.written)) {
+    await client.query('ROLLBACK', []);
+    throw new GuildBankEscrowRefused(written);
+  }
+}
 
 // The one guild_banks write, only ever issued on a client that is inside the
 // fenced escrow transaction (see the section comment above), and always a
@@ -3291,12 +3310,7 @@ export async function saveCharacterAndGuildBankState(
       await client.query('ROLLBACK');
       return false;
     }
-    for (const gb of guildBanks) {
-      // See the sibling in saveCharacterAndMarketState: the await must not sit
-      // inside an optional-chained call.
-      const written = await writeGuildBankRow(client, gb);
-      results?.push(written);
-    }
+    await writeGuildBankRows(client, guildBanks, results);
     await client.query('COMMIT');
     return true;
   } catch (err) {

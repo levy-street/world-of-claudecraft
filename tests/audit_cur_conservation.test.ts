@@ -19,6 +19,8 @@ const dbMock = vi.hoisted(() => {
   const merge = {
     // biome-ignore lint/suspicious/noExplicitAny: bound to the real merge below
     fn: null as null | ((durable: unknown, deltas: any) => { data: unknown; result: any }),
+    // biome-ignore lint/suspicious/noExplicitAny: bound to the real error below
+    refused: null as null | (new (results: any[]) => Error),
   };
   const writeBooks = (
     // biome-ignore lint/suspicious/noExplicitAny: the delta payload shape
@@ -26,14 +28,23 @@ const dbMock = vi.hoisted(() => {
     // biome-ignore lint/suspicious/noExplicitAny: the write-result shape
     results?: any[],
   ) => {
+    // A refused book half aborts the whole transaction, character row
+    // included, exactly as server/db.ts does it.
+    // biome-ignore lint/suspicious/noExplicitAny: the write-result shape
+    const written: any[] = [];
+    const pending: [number, unknown][] = [];
     for (const b of books ?? []) {
       if (!merge.fn) throw new Error('merge not wired');
       const merged = merge.fn(durableBooks.get(b.guildId) ?? null, b.deltas);
-      if (merged.data !== null) {
-        durableBooks.set(b.guildId, JSON.parse(JSON.stringify(merged.data)));
-      }
-      results?.push({ guildId: b.guildId, ...merged.result });
+      if (merged.data !== null) pending.push([b.guildId, JSON.parse(JSON.stringify(merged.data))]);
+      written.push({ guildId: b.guildId, ...merged.result });
     }
+    results?.push(...written);
+    if (written.some((r) => !r.written)) {
+      if (!merge.refused) throw new Error('refusal not wired');
+      throw new merge.refused(written);
+    }
+    for (const [guildId, data] of pending) durableBooks.set(guildId, data);
   };
   return {
     durableBooks,
@@ -59,8 +70,8 @@ const dbMock = vi.hoisted(() => {
         results?: any[],
       ) => {
         if (fenceFor === characterId) return false; // lease fence: NOTHING lands
-        durableChars.set(characterId, JSON.parse(JSON.stringify(state)));
         writeBooks(books, results);
+        durableChars.set(characterId, JSON.parse(JSON.stringify(state)));
         return true;
       },
     ),
@@ -90,7 +101,7 @@ vi.mock('../server/db', () => ({
 import { auditBank, type BankLedgerAuditRow } from '../scripts/bank_audit.mjs';
 import { bankLedgerIdle } from '../server/bank_ledger';
 import { type ClientSession, GameServer } from '../server/game';
-import { mergeGuildBankRow } from '../server/guild_bank_state';
+import { GuildBankEscrowRefused, mergeGuildBankRow } from '../server/guild_bank_state';
 import { RIFT_GEAR_ITEM_IDS } from '../src/sim/content/rift/items';
 import {
   GUILD_BANK_TREASURY_CAP,
@@ -103,6 +114,7 @@ import type { Entity } from '../src/sim/types';
 
 // Wire the fake durable table to the REAL escrow merge (see dbMock.merge).
 dbMock.merge.fn = (durable, deltas) => mergeGuildBankRow(durable, deltas);
+dbMock.merge.refused = GuildBankEscrowRefused;
 
 const GUILD_ID = 913;
 const BANKERS = ['bursar_fernando', 'bursar_petra_vell', 'bursar_aldous_crane'];
@@ -303,11 +315,22 @@ describe("another officer's save can no longer launder an unflushed deposit into
 });
 
 // ---------------------------------------------------------------------------
-// The accepted "residue" arm, re-measured: another officer CONSUMES the
-// un-durable copy and commits it, so the surgical revert no-ops.
+// CONSUME-THEN-FENCE, the shape that used to be a full cross-account item dupe
+// and a repeatable copper printer. Officer A deposits without flushing,
+// officer B consumes it, B's save commits its character half, then A gets
+// itself fenced (an ordinary re-login) so nothing will ever make A's deposit
+// durable. B kept the value; A's stake came back.
+//
+// It is now impossible by construction: B's save cannot commit its character
+// half, because the book half it is paired with cannot be replayed onto
+// durable truth, so the whole transaction rolls back. B retries while A is
+// still around to make the deposit durable, and once A is gone B's live state
+// is abandoned wholesale: its own book ops come off the live book, it is
+// quarantined so it can never persist, and it reloads from a durable row that
+// never saw the withdrawal.
 // ---------------------------------------------------------------------------
-describe('ATTACK: consume-then-fence (the documented residue) is a full item dupe', () => {
-  it('duplicates an item across two accounts and the audit still reports clean', async () => {
+describe('consume-then-fence can no longer duplicate across two accounts', () => {
+  it("refuses the consumer's save and rolls it back rather than minting", async () => {
     const server = new GameServer();
     const a = joinServer(server, 1, 'DupeA');
     const b = joinServer(server, 2, 'DupeB');
@@ -318,45 +341,84 @@ describe('ATTACK: consume-then-fence (the documented residue) is a full item dup
     officer(server, b, 10_000);
     server.sim.addItem('wolf_fang', 4, a.pid);
     await priv(server).saveCharacter(a); // A's durable bags now hold 4 fangs
+    await priv(server).saveCharacter(b);
     stamp(server, a);
     stamp(server, b);
-    const aDurableFangs = countFangs(dbMock.durableChars.get(1));
-    expect(aDurableFangs).toBe(4);
+    expect(countFangs(dbMock.durableChars.get(1))).toBe(4);
 
-    // A deposits the fangs (live only), B withdraws them and commits.
+    // A deposits the fangs (live only), B withdraws them.
     const aMeta = server.sim.players.get(a.pid);
     if (!aMeta) throw new Error('missing meta');
     const idx = aMeta.inventory.findIndex((s) => s.itemId === 'wolf_fang');
     dispatch(server, a, { cmd: 'guild_bank_deposit', slot: idx, count: 4 });
     dispatch(server, b, { cmd: 'guild_bank_withdraw', slot: 0, count: 4 });
     expect(countFangs({ inventory: server.sim.players.get(b.pid)?.inventory })).toBe(4);
-    // B keeps a dirty mark (so the reconcile takes the SURGICAL REVERT arm)
-    // by leaving the mark unflushed; A then fences out.
+
+    // A fences itself out (an ordinary re-login), so A's deposit will never be
+    // durable and B's withdrawal can never be replayed.
     dbMock.setFence(1);
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
     await priv(server).saveCharacter(a);
-    warn.mockRestore();
-    // The revert found no copy to remove (B took it): it no-ops.
-    expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toEqual([]);
-    // Now B's save commits B's bags AND the book.
+    // B's save is REFUSED: no character half, no book half, nothing durable.
     await priv(server).saveCharacter(b);
+    warn.mockRestore();
+    err.mockRestore();
 
-    // A's durable bags still hold 4 (its half rolled back); B's durable bags
-    // hold 4 as well: eight fangs where four existed.
+    // B is quarantined and can never persist its live state...
+    expect(b.escrowQuarantined).toBe(true);
+    await priv(server).saveCharacter(b);
+    // ...so the four fangs exist in exactly ONE durable place: A's bags, where
+    // they were before any of this. Eight fangs where four existed is what the
+    // old carry-and-record behaviour produced here.
     expect(countFangs(dbMock.durableChars.get(1))).toBe(4);
-    expect(countFangs(dbMock.durableChars.get(2))).toBe(4);
-    await bankLedgerIdle();
-    const findings = auditBank({
-      ledgerRows: capturedLedgerRows(),
-      characters: [
-        { id: 1, realm: 'Claudemoon', state: { bank: null } },
-        { id: 2, realm: 'Claudemoon', state: { bank: null } },
-      ],
-      guildBanks: [
-        { guild_id: GUILD_ID, realm: 'Claudemoon', data: dbMock.durableBooks.get(GUILD_ID) },
-      ],
+    expect(countFangs(dbMock.durableChars.get(2))).toBe(0);
+    const durableBookFangs = countFangs({
+      inventory: (dbMock.durableBooks.get(GUILD_ID) as Book).inventory,
     });
-    expect(findings).not.toEqual([]); // the auditor never sees the dupe
+    expect(durableBookFangs).toBe(0);
+    // And the incident is on the record, once.
+    await bankLedgerIdle();
+    const anomalies = capturedLedgerRows().filter(
+      (r) => (r as unknown as { op: string }).op === 'escrow_deficit',
+    );
+    expect(anomalies).toHaveLength(1);
+    expect((anomalies[0] as unknown as { count: number }).count).toBe(-4);
+  });
+
+  it('REPEATING it gains nothing: every attempt rolls the consumer back', async () => {
+    // The exploit's value came from repeatability. Each round now costs the
+    // attacker their alt's whole unsaved session and yields nothing durable.
+    for (const round of [1, 2, 3]) {
+      dbMock.durableBooks.clear();
+      dbMock.durableChars.clear();
+      dbMock.setFence(null);
+      const server = new GameServer();
+      const a = joinServer(server, 1, `RoundA${round}`);
+      const b = joinServer(server, 2, `RoundB${round}`);
+      await settle();
+      server.sim.loadGuildBank(GUILD_ID, { treasury: 0, inventory: [], purchasedSlots: 24 });
+      dbMock.durableBooks.set(GUILD_ID, { treasury: 0, inventory: [], purchasedSlots: 24 });
+      officer(server, a, 500_000);
+      officer(server, b, 500_000);
+      await priv(server).saveCharacter(a);
+      await priv(server).saveCharacter(b);
+      stamp(server, a);
+      stamp(server, b);
+      const start = durablePurse(1) + durablePurse(2);
+      dispatch(server, a, { cmd: 'guild_bank_deposit_gold', amount: 400_000 });
+      dispatch(server, b, { cmd: 'guild_bank_withdraw_gold', amount: 400_000 });
+      dbMock.setFence(1);
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+      await priv(server).saveCharacter(a);
+      await priv(server).saveCharacter(b);
+      warn.mockRestore();
+      err.mockRestore();
+      const end =
+        durablePurse(1) + durablePurse(2) + (dbMock.durableBooks.get(GUILD_ID) as Book).treasury;
+      expect(`round ${round}: ${end - start}`).toBe(`round ${round}: 0`);
+    }
   });
 });
 

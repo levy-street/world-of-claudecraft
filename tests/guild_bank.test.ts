@@ -2048,7 +2048,7 @@ describe('applyGuildBankDeltasTo / revertGuildBankDeltasTo (the forward + invers
         const d = genDelta(rnd, probe);
         // Build the list against a running book so each delta's ladder
         // witness and item identities are the ones a real op would record.
-        if (applyGuildBankDeltasTo(probe, [d]).deficit !== null) break;
+        if (applyGuildBankDeltasTo(probe, [d]) !== null) break;
         deltas.push(d);
       }
       if (deltas.length === 0) continue;
@@ -2056,7 +2056,7 @@ describe('applyGuildBankDeltasTo / revertGuildBankDeltasTo (the forward + invers
       // The deficit arm is all-or-nothing (the caller discards the partially
       // mutated copy), so the identity only claims anything about clean
       // replays; the deficit itself is pinned decisively below.
-      if (applyGuildBankDeltasTo(forward, deltas).deficit !== null) continue;
+      if (applyGuildBankDeltasTo(forward, deltas) !== null) continue;
       revertGuildBankDeltasTo(forward, deltas);
       checked++;
       expect(`seed ${seed}: ${fingerprint(forward)}`).toBe(
@@ -2090,7 +2090,7 @@ describe('applyGuildBankDeltasTo / revertGuildBankDeltasTo (the forward + invers
     // trip on this base lowers the ladder. Not reachable in production: the
     // inverse only ever runs on the book the witness was recorded from.
     const ahead: GuildBankState = { treasury: 100_000, inventory: [], purchasedSlots: 30 };
-    expect(applyGuildBankDeltasTo(ahead, [expansion]).deficit).toBeNull();
+    expect(applyGuildBankDeltasTo(ahead, [expansion])).toBeNull();
     expect(ahead.purchasedSlots).toBe(30);
     revertGuildBankDeltasTo(ahead, [expansion]);
     expect(ahead.purchasedSlots).toBe(24);
@@ -2098,7 +2098,7 @@ describe('applyGuildBankDeltasTo / revertGuildBankDeltasTo (the forward + invers
     // rung; a later rung is what advanced the ladder) and the inverse's
     // compare-and-swap misses, so nothing is undone.
     const past: GuildBankState = { treasury: 100_000, inventory: [], purchasedSlots: 36 };
-    expect(applyGuildBankDeltasTo(past, [expansion]).deficit).toBeNull();
+    expect(applyGuildBankDeltasTo(past, [expansion])).toBeNull();
     expect(past.treasury).toBe(75_000);
     expect(past.purchasedSlots).toBe(36);
     revertGuildBankDeltasTo(past, [expansion]);
@@ -2124,10 +2124,7 @@ describe('applyGuildBankDeltasTo / revertGuildBankDeltasTo (the forward + invers
     for (const treasury of [0, 1, GUILD_BANK_RUNG_PRICES[1] - 1]) {
       const book: GuildBankState = { treasury, inventory: [], purchasedSlots: 24 };
       const r = applyGuildBankDeltasTo(book, [expansion]);
-      expect(`treasury ${treasury}: ${r.deficit?.kind}`).toBe(
-        `treasury ${treasury}: treasury_underflow`,
-      );
-      expect(r.residual).toBeNull(); // nothing partly applied
+      expect(`treasury ${treasury}: ${r?.kind}`).toBe(`treasury ${treasury}: treasury_underflow`);
       expect(book.purchasedSlots).toBe(24); // no free rung
       expect(book.treasury).toBe(treasury); // and no partial charge
     }
@@ -2197,25 +2194,25 @@ describe('applyGuildBankDeltasTo / revertGuildBankDeltasTo (the forward + invers
       const a = applyGuildBankDeltasTo(ordered, log);
       const b = applyGuildBankDeltasTo(netted, netGuildBankOpLogForReplay(log));
       const tag = log.map((d) => d.op).join(',');
-      expect(`${tag}: ${a.deficit?.kind ?? 'ok'}`).toBe(`${tag}: ok`);
-      expect(`${tag}: ${b.deficit?.kind ?? 'ok'}`).toBe(`${tag}: ok`);
+      expect(`${tag}: ${a?.kind ?? 'ok'}`).toBe(`${tag}: ok`);
+      expect(`${tag}: ${b?.kind ?? 'ok'}`).toBe(`${tag}: ok`);
       expect(`${tag}: ${fingerprint(netted)}`).toBe(`${tag}: ${fingerprint(ordered)}`);
     }
     // Decisively, on the exact shape the trap needs: 200_000 - 150_000 +
     // 300_000 = 350_000, and rung 0's 90_000 purse price is NOT among the
     // numbers the book moves. Netting it in would write 260_000 here.
     const netted = base();
-    expect(applyGuildBankDeltasTo(netted, netGuildBankOpLogForReplay(logs[0])).deficit).toBeNull();
+    expect(applyGuildBankDeltasTo(netted, netGuildBankOpLogForReplay(logs[0]))).toBeNull();
     expect(netted.treasury).toBe(350_000);
     expect(netted.purchasedSlots).toBe(24);
     // And the netted form ORDERS the single gold move last, which is the whole
     // point: the ordered replay of this same log stalls on the intermediate
     // dip below zero when the base is smaller.
     const small: GuildBankState = { treasury: 100_000, inventory: [], purchasedSlots: 0 };
-    expect(applyGuildBankDeltasTo({ ...small, inventory: [] }, logs[0]).deficit?.kind).toBe(
+    expect(applyGuildBankDeltasTo({ ...small, inventory: [] }, logs[0])?.kind).toBe(
       'treasury_underflow',
     );
-    expect(applyGuildBankDeltasTo(small, netGuildBankOpLogForReplay(logs[0])).deficit).toBeNull();
+    expect(applyGuildBankDeltasTo(small, netGuildBankOpLogForReplay(logs[0]))).toBeNull();
     expect(small.treasury).toBe(250_000);
   });
 
@@ -2228,14 +2225,14 @@ describe('applyGuildBankDeltasTo / revertGuildBankDeltasTo (the forward + invers
       for (let i = 0; i < 3; i++) {
         const d = genDelta(rnd, probe);
         if (d.op === 'open_bank' || d.op === 'buy_slots') continue;
-        if (applyGuildBankDeltasTo(probe, [d]).deficit !== null) break;
+        if (applyGuildBankDeltasTo(probe, [d]) !== null) break;
         deltas.push(d);
       }
       if (deltas.length < 2) continue;
       const a = clone(book);
       const b = clone(book);
-      if (applyGuildBankDeltasTo(a, deltas).deficit !== null) continue;
-      if (applyGuildBankDeltasTo(b, [...deltas].reverse()).deficit !== null) continue;
+      if (applyGuildBankDeltasTo(a, deltas) !== null) continue;
+      if (applyGuildBankDeltasTo(b, [...deltas].reverse()) !== null) continue;
       // Inventory ORDER can differ (addStacked appends), so compare the
       // conserved quantities: the treasury, the ladder, and the item multiset.
       expect(`seed ${seed}: ${fingerprint(a)}`).toBe(`seed ${seed}: ${fingerprint(b)}`);
@@ -2255,31 +2252,26 @@ describe('applyGuildBankDeltasTo / revertGuildBankDeltasTo (the forward + invers
       purchasedSlotsAfter: 30,
     };
     const book: GuildBankState = { treasury: 100_000, inventory: [], purchasedSlots: 24 };
-    expect(applyGuildBankDeltasTo(book, [expansion])).toEqual({
-      applied: 1,
-      residual: null,
-      deficit: null,
-    });
+    expect(applyGuildBankDeltasTo(book, [expansion])).toBeNull();
     expect(book.purchasedSlots).toBe(30);
     // Idempotent on the ladder: the second replay raises nothing. (It still
     // charges the treasury, which is why a save never replays a committed
     // delta; the pin is on the LADDER, the part a relative record would ruin.)
-    expect(applyGuildBankDeltasTo(book, [expansion])).toEqual({
-      applied: 1,
-      residual: null,
-      deficit: null,
-    });
+    expect(applyGuildBankDeltasTo(book, [expansion])).toBeNull();
     expect(book.purchasedSlots).toBe(30);
-    // And a base BEHIND the op's own `before` refuses rather than granting
-    // rungs nobody paid for: the escrow save skips the row and retries.
+    // A base BELOW the op's own `before` REFUSES: the officer who bought the
+    // lower rung has not committed, so raising here would grant rungs durable
+    // truth cannot justify. Nothing moves, and the save is retried.
     const behind: GuildBankState = { treasury: 100_000, inventory: [], purchasedSlots: 0 };
     expect(applyGuildBankDeltasTo(behind, [expansion])).toEqual({
-      applied: 0,
-      // A ladder the base has not reached applies NOTHING (no partial rung).
-      residual: null,
-      deficit: { kind: 'ladder_behind', op: 'buy_slots', itemId: null, shortfall: 24 },
+      kind: 'ladder_behind',
+      op: 'buy_slots',
+      itemId: null,
+      shortfall: 24,
+      copperDelta: -GUILD_BANK_RUNG_PRICES[1],
     });
     expect(behind.purchasedSlots).toBe(0);
+    expect(behind.treasury).toBe(100_000);
   });
 
   it('reports the DEFICIT rather than clamping when durable truth cannot satisfy the replay', () => {
@@ -2310,15 +2302,20 @@ describe('applyGuildBankDeltasTo / revertGuildBankDeltasTo (the forward + invers
       purchasedSlotsAfter: 0,
     };
     expect(applyGuildBankDeltasTo(empty(), [goldOut])).toEqual({
-      applied: 0,
-      // Nothing moved, so the entry stays in the log exactly as it is.
-      residual: null,
-      deficit: { kind: 'treasury_underflow', op: 'withdraw_gold', itemId: null, shortfall: 250 },
+      kind: 'treasury_underflow',
+      op: 'withdraw_gold',
+      itemId: null,
+      shortfall: 250,
+      // SIGNED, so an operator reading the anomaly row can tell a would-be
+      // mint (copper leaving the book) from a would-be destruction.
+      copperDelta: -250,
     });
     expect(applyGuildBankDeltasTo(empty(), [fangsOut])).toEqual({
-      applied: 0,
-      residual: null,
-      deficit: { kind: 'missing_items', op: 'withdraw', itemId: 'wolf_fang', shortfall: 4 },
+      kind: 'missing_items',
+      op: 'withdraw',
+      itemId: 'wolf_fang',
+      shortfall: 4,
+      copperDelta: 0,
     });
     // A partial shortfall is still a shortfall (2 of the 4 copies are there).
     const partial: GuildBankState = {
@@ -2327,11 +2324,11 @@ describe('applyGuildBankDeltasTo / revertGuildBankDeltasTo (the forward + invers
       purchasedSlots: 24,
     };
     const half = applyGuildBankDeltasTo(partial, [fangsOut]);
-    expect(half.deficit?.shortfall).toBe(2);
-    // ...the two copies durable truth DID hold move, and the leftover rides on
-    // as a residual: nothing is clamped away and nothing is applied twice.
-    expect(partial.inventory).toEqual([]);
-    expect(half.residual).toEqual({ ...fangsOut, count: 2 });
+    expect(half?.shortfall).toBe(2);
+    // ...and NOTHING moved: a partial withdraw would commit a character half
+    // that took more than the book gave up, which is the mint the refusal
+    // exists to prevent. The whole save is rolled back and retried instead.
+    expect(partial.inventory).toEqual([{ itemId: 'wolf_fang', count: 2 }]);
     // A deposit whose provenance does not match the book's stack is a fresh
     // slot, never a merge that launders the marker.
     const crafted: GuildBankState = {
@@ -2352,7 +2349,7 @@ describe('applyGuildBankDeltasTo / revertGuildBankDeltasTo (the forward + invers
           purchasedSlotsAfter: 0,
         },
       ]),
-    ).toEqual({ applied: 1, residual: null, deficit: null });
+    ).toBeNull();
     expect(crafted.inventory).toEqual([
       { itemId: 'iron_sword', count: 1 },
       { itemId: 'iron_sword', count: 1, craftedRecipeId: 'smith_iron_sword' },

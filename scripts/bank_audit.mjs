@@ -44,14 +44,19 @@ import { Pool } from 'pg';
 // ladder position.
 export const OPEN_BANK_SLOTS_AFTER = 24;
 
-// The ANOMALY op (server/bank_ledger.ts GUILD_BANK_ESCROW_DEFICIT_OP): an
-// escrow save whose own deltas could NOT be replayed onto durable truth,
-// recorded once the shortfall can never resolve. It is not an op a player
-// performed and no value moved under it, so it takes no part in the item,
-// treasury, or ladder replays; it is reported directly as a finding, because
-// it is the audit trail for the one residue the escrow design leaves open
-// (docs/guild-bank/state.md: another officer consumed value that never became
-// durable, so their purse durably gained what the book never durably lost).
+// The ANOMALY op (server/bank_ledger.ts GUILD_BANK_ESCROW_DEFICIT_OP): ONE row
+// per escrow ROLLBACK. A session's book half could not be replayed onto durable
+// truth, so the whole transaction was refused, the session was quarantined and
+// disconnected, and everything it had done since its last save was discarded.
+// Nothing was minted and nothing durable was lost, but reaching it needs one
+// officer to consume value another officer never made durable and then for that
+// officer to vanish, so an operator should see it. No value moved under the row,
+// so it takes no part in the item, treasury, or ladder replays.
+//
+// Its numbers are SIGNED, describing what the DISCARDED work would have moved
+// into the book: negative means the session was taking value OUT (the shape
+// that would have minted had it been allowed to commit), positive means it was
+// putting value IN. The report states the direction rather than assuming one.
 export const ESCROW_DEFICIT_OP = 'escrow_deficit';
 export const GUILD_BUY_POSITIONS = [30, 36, 42, 48, 54, 60];
 const GUILD_BUY_POSITION_SET = new Set(GUILD_BUY_POSITIONS);
@@ -215,17 +220,25 @@ function checkRowShape(row, findings) {
       });
     }
   } else if (row.op === ESCROW_DEFICIT_OP) {
+    const copper = Number(row.copper_delta) || 0;
+    const count = Number(row.count) || 0;
+    const parts = [];
+    if (copper !== 0) {
+      parts.push(`${Math.abs(copper)} copper ${copper < 0 ? 'out of' : 'into'} the book`);
+    }
+    if (row.item_id != null && count !== 0) {
+      parts.push(`${Math.abs(count)} x ${row.item_id} ${count < 0 ? 'out of' : 'into'} the book`);
+    }
     findings.push({
       ...base,
       kind: 'escrow_deficit',
       detail:
-        `escrow deficit row ${row.id}: a guild bank escrow save could not replay its own ` +
-        `deltas onto durable truth (${
-          row.item_id == null
-            ? `${Math.abs(Number(row.copper_delta))} copper`
-            : `${String(row.count)} x ${row.item_id}`
-        } was consumed but never durable). The consuming character kept the value; ` +
-        'the book never lost it.',
+        `escrow rollback row ${row.id}: a guild bank escrow save could not replay its own ` +
+        `deltas onto durable truth, so the whole save was refused and the session was ` +
+        `rolled back and disconnected. Discarded work: ${
+          parts.length > 0 ? parts.join(', ') : 'no net movement'
+        }. Nothing durable was minted or lost; reaching this needs one officer to consume ` +
+        'value another officer never made durable and then for that officer to vanish.',
     });
   } else if (row.op === 'create_fee') {
     // The founder's purse paid the (positive) creation fee; a newborn guild

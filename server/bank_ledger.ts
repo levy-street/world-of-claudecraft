@@ -354,64 +354,59 @@ export function recordGuildBankDeltas(
   }
 }
 
-// The ANOMALY op: an escrow save whose own deltas could not be replayed onto
-// durable truth, recorded once the deficit can never resolve (server/game.ts
-// resolveGuildBankDeficit). It is NOT an op a player performed: it is the
-// audit trail for the D5 consume-then-fence residue in
-// docs/guild-bank/state.md, which until the escrow root fix nothing in the
-// system could observe (the forward replay is the only code that knows both
-// durable truth and the intended delta). scripts/bank_audit.mjs reports every
-// one of these as a finding and excludes them from the item, treasury, and
-// ladder replays, since they describe work that did NOT land.
+// The ANOMALY op. Not an op a player performed: an escrow save whose own book
+// half could not be replayed onto durable truth, so the WHOLE transaction rolled
+// back (character row included) and the session was quarantined and
+// disconnected. Nothing was minted and nothing was lost that was ever durable,
+// but the incident is worth an operator's attention, because reaching it needs
+// one officer to consume value another officer never made durable and then for
+// that officer to vanish. scripts/bank_audit.mjs reports every one of these and
+// excludes them from the item, treasury, and ladder replays.
 export const GUILD_BANK_ESCROW_DEFICIT_OP = 'escrow_deficit';
 
-// Write one anomaly row, fire-and-forget on the shared FIFO tail like every
-// other ledger write. copper_delta carries a treasury shortfall as a NEGATIVE
-// number (copper that left a purse with no durable book decrement behind it);
-// item shortfalls ride item_id + count. purchased_slots_after is 0 and never
-// read: the auditor skips these rows in its monotonicity scan.
-export function recordGuildBankEscrowDeficit(
+// ONE row per rollback event, never one per delta: the log can hold up to
+// GUILD_BANK_UNFLUSHED_OP_CAP entries and bank_ledger is keep-forever, so a
+// per-delta row is an unbounded write amplifier on a table nothing prunes.
+//
+// The row carries SIGNED numbers, because direction is the first thing an
+// operator needs and the anomaly kind cannot supply it:
+//   copper_delta = the net copper the discarded deltas would have moved INTO
+//     the book (negative means the session was taking copper OUT of it, which
+//     is the shape that would have minted had it been allowed to commit);
+//   count        = the net item movement for the stalled identity, signed the
+//     same way (positive: deposits the book never received; negative: copies
+//     the session took that the book never held).
+export function recordGuildBankEscrowRollback(
   who: { characterId: number; accountId: number },
   guildId: number,
-  deficit: { kind: string; op: string; itemId: string | null; shortfall: number },
-): void {
-  const isItem = deficit.kind === 'missing_items';
-  recordGuildBankDeltas(GUILD_BANK_ESCROW_DEFICIT_OP as GuildBankLedgerOp, who, guildId, [
-    {
-      itemId: isItem ? deficit.itemId : null,
-      count: isItem ? deficit.shortfall : null,
-      instance: null,
-      copperDelta: isItem ? 0 : -deficit.shortfall,
-      purchasedSlotsBefore: 0,
-      purchasedSlotsAfter: 0,
-    },
-  ]);
-}
-
-// Record the residue a session ABANDONS: unflushed deltas whose character half
-// is already durable but whose book half never landed and never can, because
-// the session is gone (fenced out, or logged out with an escrow deficit still
-// outstanding). Same anomaly op and the same audit meaning as the deficit row
-// above; one row per abandoned delta, and there are normally one or two.
-export function recordGuildBankAbandonedDeltas(
-  who: { characterId: number; accountId: number },
-  guildId: number,
-  deltas: readonly {
+  discarded: readonly {
     op: string;
     itemId: string | null;
     count: number | null;
     copperDelta: number;
   }[],
+  deficit: { itemId: string | null } | null,
 ): void {
-  for (const d of deltas) {
-    const isItem = d.op === 'deposit' || d.op === 'withdraw';
-    recordGuildBankEscrowDeficit(who, guildId, {
-      kind: isItem ? 'missing_items' : 'treasury_underflow',
-      op: d.op,
-      itemId: isItem ? d.itemId : null,
-      shortfall: isItem ? Math.abs(Number(d.count) || 0) : Math.abs(d.copperDelta),
-    });
+  let copper = 0;
+  let items = 0;
+  for (const d of discarded) {
+    copper += Number(d.copperDelta) || 0;
+    if (d.itemId !== null && d.itemId === deficit?.itemId) {
+      const n = Math.max(0, Math.floor(Number(d.count)) || 0);
+      if (d.op === 'deposit') items += n;
+      else if (d.op === 'withdraw') items -= n;
+    }
   }
+  recordGuildBankDeltas(GUILD_BANK_ESCROW_DEFICIT_OP, who, guildId, [
+    {
+      itemId: deficit?.itemId ?? null,
+      count: deficit?.itemId ? items : null,
+      instance: null,
+      copperDelta: copper,
+      purchasedSlotsBefore: 0,
+      purchasedSlotsAfter: 0,
+    },
+  ]);
 }
 
 // The guild_create fee row (reserve-at-gate: the purse was charged at the

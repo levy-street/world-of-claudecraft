@@ -337,6 +337,11 @@ export interface GuildBankDeltaDeficit {
    *  treasury kinds, item copies for missing_items, ladder slots for
    *  ladder_behind. Always positive. */
   shortfall: number;
+  /** The stalled delta's own copper movement, SIGNED as the book would have
+   *  moved it (negative = copper that would have LEFT the book). Carried so an
+   *  operator reading the anomaly row can tell a would-be mint from a would-be
+   *  destruction; the kind alone cannot. */
+  copperDelta: number;
 }
 
 function clampTreasury(v: number): number {
@@ -435,39 +440,21 @@ function grantMatching(book: GuildBankState, d: GuildBankOpDelta, count: number)
   addStacked(book.inventory, d.itemId, count, d.instance ?? undefined, deltaRecipe(d));
 }
 
-/** The outcome of a forward replay. */
-export interface GuildBankApplyResult {
-  /** Leading deltas applied IN FULL, a prefix of the input. */
-  applied: number;
-  /** When the delta at index `applied` landed only PARTLY (durable truth held
-   *  some but not all of the copper or copies it moved), the leftover, shaped
-   *  as a delta of its own. The caller replaces that entry with this one and
-   *  retries it on a later save, by which time the other officer's commit has
-   *  landed. Null when the stalled delta moved NOTHING, in which case that
-   *  entry stays in the log exactly as it is. */
-  residual: GuildBankOpDelta | null;
-  /** Null when the whole list landed; otherwise why the replay stopped. */
-  deficit: GuildBankDeltaDeficit | null;
-}
-
 /** Replay a session's own deltas FORWARD onto a book, oldest first. This is
  *  the escrow save's payload builder: `sanitize(durable row)` then this, which
  *  is why a session can only ever persist ITS OWN work.
  *
- *  Applies the longest PREFIX it can and stops at the first delta durable
- *  truth cannot satisfy. Prefix rather than all-or-nothing because two
- *  officers' logs can legitimately depend on each other: officer A's deposit
- *  funds officer B's expansion while officer B's opening grants the slots
- *  officer A's expansion needs, and an all-or-nothing rule makes that pair
- *  deadlock, each waiting for a row the other cannot write.
+ *  ALL OR NOTHING. Returns null when every delta landed (the book is mutated
+ *  in place), or the FIRST deficit it hit, in which case the book is left
+ *  partially mutated and the caller MUST discard it AND refuse the write.
  *
- *  The book is left at that prefix PLUS at most one PARTLY applied delta, and
- *  a partly applied delta is always described by `residual`: the fungible arms
- *  (gold, item counts) move what durable truth can cover and hand the leftover
- *  back, because clamping the shortfall away would mint it. The two arms that
- *  are all-or-nothing are the slot ops (a rung must never be granted without
- *  its charge) and a delta whose base covers NONE of it (residual null, the
- *  entry stays in the log exactly as it is).
+ *  Refusing is the whole point, and it is not negotiable: a deficit means this
+ *  session took value out of the book that durable truth never held, so
+ *  writing anything less than the whole log while the paired CHARACTER half
+ *  commits mints exactly that difference. Carrying the shortfall forward and
+ *  recording it is not a substitute for atomicity, it is a receipt for a mint.
+ *  The escrow transaction therefore rolls the character half back too and the
+ *  save is retried; see server/game.ts handleGuildBankEscrowRefusal.
  *
  *  Deliberately does NOT re-check capacity: the book contract already
  *  tolerates over-capacity (capacity only blocks new deposits) and the live op
@@ -475,115 +462,85 @@ export interface GuildBankApplyResult {
 export function applyGuildBankDeltasTo(
   book: GuildBankState,
   deltas: readonly GuildBankOpDelta[],
-): GuildBankApplyResult {
-  let applied = 0;
-  const stop = (
-    deficit: GuildBankDeltaDeficit,
-    residual: GuildBankOpDelta | null = null,
-  ): GuildBankApplyResult => ({ applied, residual, deficit });
-  /** The leftover of a partly-applied treasury move, as a gold delta. */
-  const goldResidual = (copperDelta: number): GuildBankOpDelta => ({
-    op: copperDelta > 0 ? 'deposit_gold' : 'withdraw_gold',
-    itemId: null,
-    count: null,
-    instance: null,
-    craftedRecipeId: null,
-    copperDelta,
-    purchasedSlotsBefore: 0,
-    purchasedSlotsAfter: 0,
-  });
+): GuildBankDeltaDeficit | null {
+  const stop = (deficit: GuildBankDeltaDeficit): GuildBankDeltaDeficit => deficit;
   for (const d of deltas) {
     if (d.op === 'open_bank' || d.op === 'buy_slots') {
       // ABSOLUTE, never relative: the op moved the ladder from `before` to
-      // `after`, so the replay refuses unless durable truth is already at or
-      // past `before` (otherwise it would grant rungs nobody paid for), and
-      // then raises to at least `after`. Idempotent and commutative, because
-      // the ladder only ever goes up.
+      // `after`, so the replay RAISES TO AT LEAST `after` (idempotent and
+      // commutative, because the ladder only ever goes up) and only from a
+      // base that has actually reached `before`. A base below it means the
+      // officer who bought the lower rung has not committed, so raising here
+      // would grant rungs durable truth cannot justify: the SAME violation as
+      // moving copper the book never held, and refused the same way. The save
+      // retries once that officer commits, and is rolled back if they never
+      // can (server/game.ts handleGuildBankEscrowRefusal).
       if (book.purchasedSlots < d.purchasedSlotsBefore) {
         return stop({
           kind: 'ladder_behind',
           op: d.op,
           itemId: null,
           shortfall: d.purchasedSlotsBefore - book.purchasedSlots,
+          copperDelta: d.copperDelta,
         });
       }
       // Rung 0 (open_bank) was PURSE-paid, so it moves no treasury copper;
-      // rungs 1+ (buy_slots) spent the treasury and must move it here.
+      // rungs 1+ (buy_slots) spent the treasury and must move it here, and a
+      // treasury that cannot cover the price refuses the WHOLE delta: granting
+      // the rung without its charge would be a free rung in durable truth.
       if (d.op === 'buy_slots') {
         const next = book.treasury + d.copperDelta;
         if (next < 0 || next > GUILD_BANK_TREASURY_CAP) {
-          // ALL OR NOTHING, unlike the gold arm below: granting the rung while
-          // the treasury cannot cover its price would leave a FREE rung in
-          // durable truth, and if this session then died the charge would
-          // never arrive. The whole delta waits instead, and the retry applies
-          // the grant and the charge together once the other officer's deposit
-          // has landed.
           return stop({
             kind: next < 0 ? 'treasury_underflow' : 'treasury_overflow',
             op: d.op,
             itemId: null,
             shortfall: next < 0 ? -next : next - GUILD_BANK_TREASURY_CAP,
+            copperDelta: d.copperDelta,
           });
         }
         book.treasury = next;
       }
       book.purchasedSlots = Math.max(book.purchasedSlots, d.purchasedSlotsAfter);
-      applied++;
       continue;
     }
     if (d.op === 'deposit_gold' || d.op === 'withdraw_gold') {
       const next = book.treasury + d.copperDelta;
       if (next < 0 || next > GUILD_BANK_TREASURY_CAP) {
-        // Move what durable truth can cover and carry the rest: clamping the
-        // shortfall AWAY would mint it, because this session's purse durably
-        // gained what the book never durably lost.
-        const room = next < 0 ? -book.treasury : GUILD_BANK_TREASURY_CAP - book.treasury;
-        book.treasury = next < 0 ? 0 : GUILD_BANK_TREASURY_CAP;
-        return stop(
-          {
-            kind: next < 0 ? 'treasury_underflow' : 'treasury_overflow',
-            op: d.op,
-            itemId: null,
-            shortfall: Math.abs(d.copperDelta - room),
-          },
-          room === 0 ? null : goldResidual(d.copperDelta - room),
-        );
+        return stop({
+          kind: next < 0 ? 'treasury_underflow' : 'treasury_overflow',
+          op: d.op,
+          itemId: null,
+          shortfall: next < 0 ? -next : next - GUILD_BANK_TREASURY_CAP,
+          copperDelta: d.copperDelta,
+        });
       }
       book.treasury = next;
-      applied++;
       continue;
     }
     const count = typeof d.itemId === 'string' && d.itemId !== '' ? deltaCount(d) : 0;
-    if (count === 0) {
-      applied++;
-      continue;
-    }
+    if (count === 0) continue;
     if (d.op === 'deposit') {
       grantMatching(book, d, count);
-      applied++;
       continue;
     }
     // withdraw: the copies must actually be in durable truth. A shortfall
     // means another officer's un-durable deposit is what this session
-    // consumed, which is the one thing the forward replay must never paper
-    // over (papering over it is what mints the copy). Counted BEFORE removing
-    // anything, so a stop never leaves a delta half-applied.
+    // consumed, and papering over it is what mints the copy. Counted BEFORE
+    // removing anything, so a refused replay never half-empties a slot.
     const held = countMatching(book, d);
     if (held < count) {
-      // Take the copies durable truth does hold and carry the rest.
-      if (held > 0) removeMatching(book, d, held);
-      return stop(
-        { kind: 'missing_items', op: d.op, itemId: d.itemId, shortfall: count - held },
-        // A residual is only produced when the delta moved SOMETHING: an entry
-        // that moved nothing stays in the log verbatim, so the caller can tell
-        // "partly consumed, replaced" from "untouched, retry as is".
-        held === 0 ? null : { ...d, count: count - held },
-      );
+      return stop({
+        kind: 'missing_items',
+        op: d.op,
+        itemId: d.itemId,
+        shortfall: count - held,
+        copperDelta: 0,
+      });
     }
     removeMatching(book, d, count);
-    applied++;
   }
-  return { applied, residual: null, deficit: null };
+  return null;
 }
 
 /** Replay a session's own deltas BACKWARD onto a book, newest first: the exact

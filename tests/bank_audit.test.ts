@@ -628,10 +628,11 @@ describe('formatReport (guild rows)', () => {
   });
 });
 
-describe('the escrow-deficit anomaly row (the D5 residue, made auditable)', () => {
-  // Until the escrow root fix nothing in the system could observe this residue:
-  // the forward replay is the only code that knows both durable truth and a
-  // session's intended delta, so it is the only place a shortfall is visible.
+describe('the escrow-rollback anomaly row', () => {
+  // ONE row per rollback event, and its numbers are SIGNED: an operator has to
+  // be able to tell work that was taking value OUT of the book (the shape that
+  // would have minted, had the save been allowed to commit its character half
+  // without its book half) from work that was putting value IN.
   const guildRow = (o: Partial<BankLedgerAuditRow>): BankLedgerAuditRow =>
     L({ container: 'guild', container_id: 913, ...o });
 

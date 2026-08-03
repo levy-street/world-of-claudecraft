@@ -38,27 +38,38 @@ export interface GuildBankSave {
 // transaction so the session can release (or keep) its dirty mark honestly.
 export interface GuildBankWriteResult {
   guildId: number;
-  // false when nothing was written at all: either the FIRST of this session's
-  // deltas could not be replayed onto durable truth (deficit, below) or the
-  // stored row is oversized/malformed and must be preserved for a human.
+  // false when the row was NOT written, which always rolls the whole escrow
+  // transaction back: the character half must never commit without the book
+  // half it is paired with.
   written: boolean;
-  // How many of the session's carried deltas landed IN FULL, a prefix. The
-  // session consumes exactly this many from the front of its log; the rest
-  // stay for a later save (their character half is already durable, so the
-  // reconcile must never replay them backward).
-  applied: number;
-  // The leftover of a PARTLY applied delta (durable truth covered some of the
-  // copper or copies it moved). The session replaces that entry with this one
-  // and retries it later.
-  residual: GuildBankOpDelta | null;
-  // Non-null when the replay stopped short: another officer consumed value
-  // that is not durable yet, or the durable ladder is behind (the D5 residue
-  // class). The session keeps the remaining log and retries.
+  // Why the replay was refused: this session took value out of the book that
+  // durable truth never held (another officer's deposit is not durable yet).
   deficit: GuildBankDeltaDeficit | null;
-  // true when the row was skipped because it is oversized or structurally not
-  // a book: a preservation skip, NOT a deficit (nothing to retry).
+  // true when the stored row is oversized or structurally not a book, or the
+  // merged blob would cross the size bound. The row is PRESERVED for a human
+  // and the write is refused exactly like a deficit.
   rowUnusable: boolean;
 }
+
+// Refusing to write a book half must refuse the CHARACTER half with it, so the
+// db layer aborts the transaction and throws this rather than returning a
+// value the caller could mistake for a fence miss. Lives here, beside the
+// merge that raises it, so a test double that mocks server/db can still
+// construct and recognise it.
+export class GuildBankEscrowRefused extends Error {
+  constructor(readonly results: readonly GuildBankWriteResult[]) {
+    super('guild bank escrow refused: a book half could not be replayed onto durable truth');
+    this.name = 'GuildBankEscrowRefused';
+  }
+}
+
+// The merged blob a save may write, in bytes. The READ bound alone is not
+// enough: the replay deliberately skips the capacity re-check, so a book that
+// grew past the bound would become permanently unreadable and every later save
+// would refuse forever. Refusing the WRITE keeps the row inside the bound the
+// read enforces. A legitimate book is a few KB (60 slots at most), so this can
+// only fire on a tampered one.
+export const GUILD_BANK_MERGED_MAX_BYTES = 262_144;
 
 export interface GuildBankBootResult {
   // Guilds whose book was injected (their sim.guildBanks.has() verified true).
@@ -142,44 +153,40 @@ export function mergeGuildBankRow(
   opts: { oversized?: boolean } = {},
 ): { data: GuildBankState | null; result: Omit<GuildBankWriteResult, 'guildId'> } {
   if (opts.oversized || isMalformedGuildBankRow(durableRaw)) {
-    return {
-      data: null,
-      result: { written: false, applied: 0, residual: null, deficit: null, rowUnusable: true },
-    };
+    return { data: null, result: { written: false, deficit: null, rowUnusable: true } };
   }
   const base = sanitizeGuildBankState(durableRaw);
-  const { applied, residual, deficit } = applyGuildBankDeltasTo(base, deltas);
+  const deficit = applyGuildBankDeltasTo(base, deltas);
   if (deficit) {
-    // The ordered replay can stall on an artifact of CROSS-SESSION ordering
-    // rather than a real shortfall: this session's own withdraw ran while the
-    // live book still held another officer's copper, and the durable replay
-    // put that officer's whole log first. Retry from the same base with the
-    // log NETTED (same final book, every intermediate dip removed; see
-    // netGuildBankOpLogForReplay). Only a FULL netted replay is taken;
-    // otherwise the ordered prefix stands.
+    // Before refusing, retry from the same base with the log NETTED. The
+    // ordered replay can stall on an artifact of CROSS-SESSION ORDERING rather
+    // than on real missing value: this session withdrew while the live book
+    // still held another officer's copper, and the durable replay put that
+    // officer's whole log first, so an intermediate dip appears that the real
+    // sequence never had. Netting reaches the SAME final book with the dips
+    // removed (see netGuildBankOpLogForReplay), so taking it forgives only the
+    // ordering, never a genuine consume: if this session really took more than
+    // durable truth holds, the net is still short and the netted replay stalls
+    // too. Counted below so the frequency stays visible rather than silent.
     const netted = sanitizeGuildBankState(durableRaw);
-    const compacted = applyGuildBankDeltasTo(netted, netGuildBankOpLogForReplay(deltas));
-    if (!compacted.deficit) {
-      return {
-        data: netted,
-        result: {
-          written: true,
-          applied: deltas.length,
-          residual: null,
-          deficit: null,
-          rowUnusable: false,
-        },
-      };
+    if (applyGuildBankDeltasTo(netted, netGuildBankOpLogForReplay(deltas)) === null) {
+      guildBankNettedReplayRescues++;
+      return { data: netted, result: { written: true, deficit: null, rowUnusable: false } };
     }
+    return { data: null, result: { written: false, deficit, rowUnusable: false } };
   }
-  if (applied === 0 && residual === null) {
-    return {
-      data: null,
-      result: { written: false, applied: 0, residual: null, deficit, rowUnusable: false },
-    };
+  if (JSON.stringify(base).length > GUILD_BANK_MERGED_MAX_BYTES) {
+    return { data: null, result: { written: false, deficit: null, rowUnusable: true } };
   }
-  return { data: base, result: { written: true, applied, residual, deficit, rowUnusable: false } };
+  return { data: base, result: { written: true, deficit: null, rowUnusable: false } };
 }
+
+// How many times the netted retry above rescued a write the ordered replay
+// refused. Exported for operators and tests: a rising count is normal traffic
+// (officers using one book inside an autosave interval), a count that tracks
+// one guild is worth a look.
+let guildBankNettedReplayRescues = 0;
+export const nettedReplayRescueCount = (): number => guildBankNettedReplayRescues;
 
 // Collect the escrow-save half for the books a session dirtied: one entry per
 // guild carrying that session's OWN unflushed deltas. A guild whose serialize

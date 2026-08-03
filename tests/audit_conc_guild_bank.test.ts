@@ -42,6 +42,7 @@ vi.mock('../server/db', () => ({
 
 import { type ClientSession, GameServer } from '../server/game';
 import {
+  GuildBankEscrowRefused,
   type GuildBankSave,
   type GuildBankWriteResult,
   mergeGuildBankRow,
@@ -66,14 +67,19 @@ function installDurableStore(): void {
     books: readonly GuildBankSave[] | undefined,
     results: GuildBankWriteResult[] | undefined,
   ) => {
-    durable.chars.set(charId, JSON.parse(JSON.stringify(state)));
+    // A refused book half aborts the whole transaction, character row
+    // included, exactly as server/db.ts does it.
+    const written: GuildBankWriteResult[] = [];
+    const pending: [number, unknown][] = [];
     for (const b of books ?? []) {
       const merged = mergeGuildBankRow(durable.books.get(b.guildId) ?? null, b.deltas);
-      if (merged.data !== null) {
-        durable.books.set(b.guildId, JSON.parse(JSON.stringify(merged.data)));
-      }
-      results?.push({ guildId: b.guildId, ...merged.result });
+      if (merged.data !== null) pending.push([b.guildId, JSON.parse(JSON.stringify(merged.data))]);
+      written.push({ guildId: b.guildId, ...merged.result });
     }
+    results?.push(...written);
+    if (written.some((r) => !r.written)) throw new GuildBankEscrowRefused(written);
+    for (const [guildId, data] of pending) durable.books.set(guildId, data);
+    durable.chars.set(charId, JSON.parse(JSON.stringify(state)));
   };
   dbMock.saveCharacterState.mockImplementation(
     async (charId: number, _level: number, state: CharState, nonce?: string) => {
@@ -134,10 +140,13 @@ function fakeWs(): { sent: unknown[]; ws: unknown } {
   };
 }
 
+const sentBy = new Map<number, unknown[]>();
+
 function joinServer(server: GameServer, characterId: number, name: string): ClientSession {
   const fc = fakeWs();
   const session = server.join(fc.ws as never, characterId, characterId, name, 'warrior', null);
   if ('error' in session) throw new Error(session.error);
+  sentBy.set(characterId, fc.sent);
   session.blockListLoaded = true;
   // The join-time social snapshot resolves against the EMPTY mocked social DB
   // and would re-stamp membership null the first time this test awaits. Bump
@@ -571,6 +580,7 @@ describe('the guild-delete window (guard to DELETE)', () => {
       guildName: 'Iron Vanguard',
       rank: 'leader',
     });
+    const bSent = sentBy.get(2) ?? [];
     let landedInGap = false;
     social.db.guildMembers = async () => {
       restamp(server, b);
@@ -584,6 +594,11 @@ describe('the guild-delete window (guard to DELETE)', () => {
     expect(landedInGap).toBe(true); // vacuity guard: the op really was dispatched
     // Refused: the copper stayed in B's purse instead of being cascaded away.
     expect(server.sim.players.get(b.pid)?.copper).toBe(500_000);
+    // ...and B was TOLD, rather than watching a deposit do nothing at all.
+    // English on the wire, re-localized by the client matcher.
+    expect(
+      bSent.flatMap((m) => ((m as { list?: unknown[] }).list ?? []) as never[]),
+    ).toContainEqual({ type: 'error', text: 'The guild bank is closing. Try again in a moment.' });
     expect(b.dirtyGuildBanks.size).toBe(0);
     expect(server.sim.guildBanks.has(GUILD_ID)).toBe(false); // the disband committed
     await priv(server).saveCharacter(b);

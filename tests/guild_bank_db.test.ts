@@ -165,8 +165,8 @@ describe('saveCharacterAndGuildBankState (the game-loop escrow save)', () => {
       }),
     ]);
     expect(results).toEqual([
-      { guildId: 7, written: true, applied: 2, residual: null, deficit: null, rowUnusable: false },
-      { guildId: 9, written: true, applied: 1, residual: null, deficit: null, rowUnusable: false },
+      { guildId: 7, written: true, deficit: null, rowUnusable: false },
+      { guildId: 9, written: true, deficit: null, rowUnusable: false },
     ]);
     // Crash-shape: NOTHING leaks onto the bare pool, so the two halves can
     // never persist independently (they commit or vanish together).

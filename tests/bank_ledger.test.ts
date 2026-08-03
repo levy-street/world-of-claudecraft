@@ -332,7 +332,7 @@ import {
   type GuildBankLedgerOp,
   guildCreateFeeDelta,
   recordGuildBankDeltas,
-  recordGuildBankEscrowDeficit,
+  recordGuildBankEscrowRollback,
 } from '../server/bank_ledger';
 import type { GuildBankOpDelta } from '../src/sim/guild_bank';
 import type { GuildBankInfo } from '../src/world_api';
@@ -586,27 +586,25 @@ describe('recordGuildBankDeltas + guildCreateFeeDelta (the FIFO writer)', () => 
     expect(insertMock).not.toHaveBeenCalled();
   });
 
-  it('records an escrow-deficit ANOMALY row for a copper and an item shortfall', async () => {
-    // The D5 residue's audit trail: an escrow save whose own deltas could not
-    // be replayed onto durable truth (another officer consumed value that is
-    // not durable yet) and can never resolve. The forward replay is the only
-    // code in the system that can see it, so this row is the first time it has
-    // ever been visible to scripts/bank_audit.mjs.
-    recordGuildBankEscrowDeficit({ characterId: 42, accountId: 7 }, 913, {
-      kind: 'treasury_underflow',
-      op: 'withdraw_gold',
+  it('records ONE aggregate anomaly row per rollback, with SIGNED direction', async () => {
+    // One row per EVENT, never per delta: the log holds up to
+    // GUILD_BANK_UNFLUSHED_OP_CAP entries and bank_ledger is keep-forever, so
+    // per-delta rows are an unbounded write amplifier on a table nothing prunes.
+    const gold = (copperDelta: number) => ({
+      op: copperDelta > 0 ? 'deposit_gold' : 'withdraw_gold',
       itemId: null,
-      shortfall: 250,
+      count: null,
+      copperDelta,
     });
-    recordGuildBankEscrowDeficit({ characterId: 42, accountId: 7 }, 913, {
-      kind: 'missing_items',
-      op: 'withdraw',
-      itemId: 'wolf_fang',
-      shortfall: 4,
-    });
+    recordGuildBankEscrowRollback(
+      { characterId: 42, accountId: 7 },
+      913,
+      [gold(1_000), gold(-40_000)],
+      { itemId: null },
+    );
     await bankLedgerIdle();
-    expect(insertMock).toHaveBeenCalledTimes(2);
-    expect(insertMock).toHaveBeenNthCalledWith(1, {
+    expect(insertMock).toHaveBeenCalledTimes(1);
+    expect(insertMock).toHaveBeenCalledWith({
       realm: REALM,
       characterId: 42,
       accountId: 7,
@@ -614,25 +612,34 @@ describe('recordGuildBankDeltas + guildCreateFeeDelta (the FIFO writer)', () => 
       itemId: null,
       count: null,
       instance: null,
-      // Negative: copper reached a purse with no durable book decrement behind it.
-      copperDelta: -250,
+      // NEGATIVE: the discarded work was taking copper OUT of the book, which
+      // is the shape that would have minted had it been allowed to commit. An
+      // abandoned DEPOSIT reads positive, so the two are distinguishable.
+      copperDelta: -39_000,
       purchasedSlotsAfter: 0,
       container: 'guild',
       containerId: 913,
     });
-    expect(insertMock).toHaveBeenNthCalledWith(2, {
-      realm: REALM,
-      characterId: 42,
-      accountId: 7,
-      op: GUILD_BANK_ESCROW_DEFICIT_OP,
+  });
+
+  it('signs the ITEM movement the same way, so a mint and a loss differ', async () => {
+    const item = (op: 'deposit' | 'withdraw', count: number) => ({
+      op,
       itemId: 'wolf_fang',
-      count: 4,
-      instance: null,
+      count,
       copperDelta: 0,
-      purchasedSlotsAfter: 0,
-      container: 'guild',
-      containerId: 913,
     });
+    recordGuildBankEscrowRollback({ characterId: 42, accountId: 7 }, 913, [item('withdraw', 4)], {
+      itemId: 'wolf_fang',
+    });
+    recordGuildBankEscrowRollback({ characterId: 42, accountId: 7 }, 913, [item('deposit', 4)], {
+      itemId: 'wolf_fang',
+    });
+    await bankLedgerIdle();
+    const counts = insertMock.mock.calls.map(
+      (c) => (c[0] as unknown as { count: number | null }).count,
+    );
+    expect(counts).toEqual([-4, 4]);
   });
 
   it('is fire-and-forget: returns void and a rejecting insert never throws', async () => {
