@@ -360,12 +360,16 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned: the lockfile leaf is pnpm-lock.yaml after the local-gate-perf migration (previously package-lock.json at 0.33.1),
-      // a hashed input to every GLB source fingerprint, so the town, mailbox and
-      // noticeboard leaves all moved and this composite mints fresh (atop the v0.33
-      // render recovery's renderer integration leaf). Not one pipeline input or
-      // geometry value changed, and no capture was retaken.
-      fingerprint: 'fd1b2a46947d588aa6c0e62a04885a8039ed3fb1c2d1e281342f80168b16d590',
+      // Deliberately re-pinned, twice over now. First: the lockfile leaf is
+      // pnpm-lock.yaml after the local-gate-perf migration (previously
+      // package-lock.json at 0.33.1), a hashed input to every GLB source
+      // fingerprint, so the town, mailbox and noticeboard leaves all moved.
+      // Second: the Drakelands brood added its shout/flourish and
+      // attackByAbility wiring to src/render/renderer.ts, which is the
+      // rendererIntegration leaf, so that one moved too and the composite mints
+      // fresh again. Still not one pipeline input or geometry value changed, and
+      // no capture was retaken: Eastbrook itself is untouched by both.
+      fingerprint: '587e777b708fc2f9db35abe8391a28a3cdeac8ba9a36e4186df4642d58d5b23b',
       components: {
         captureContract: {
           id: 'polish-v2',

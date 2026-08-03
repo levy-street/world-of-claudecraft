@@ -251,7 +251,11 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
       { copper: 90, chance: 1 },
       { itemId: 'emberwing_scale', chance: 0.5, questId: 'q_dk_scales_of_the_maw' },
     ],
-    componentTags: ['hide', 'claw', 'fang'],
+    // Only MAPPED families (HARVEST_COMPONENT_ITEMS): claw and horn read well on
+    // a dragonkin but yield no item, so they would be dead weight that still
+    // inflates the concentration bonus (the denominator is the advertised tag
+    // count), which is the #2514 shape tests/mob_component_tags.test.ts guards.
+    componentTags: ['hide', 'fang'],
     offStreamIdle: true,
     // Playtest bump: 30% over the first cut. Still inside the stock melee
     // profile's honest reach (the bespoke-reach threshold is the scale-2
@@ -296,7 +300,8 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     // Menace scale: half again over the first cut. Its melee reach follows
     // through the bespoke combat profile (mob_combat.ts), never the visual
     // alone (the Wildheart whiff lesson).
-    componentTags: ['hide', 'claw', 'horn'],
+    // Mapped families only, same reasoning as the broodguard above.
+    componentTags: ['hide', 'fang'],
     scale: 2.25,
     color: 0x50392e,
     yells: {

@@ -397,11 +397,15 @@ describe('talented burst window (Monte Carlo 2026-07-24, designer round 2026-07-
 // measured). Pre-fix ratio at these seeds: ~2.8x, so both fire assertions
 // fail loudly on the old sim.
 describe('sustained parity, entire fight (Monte Carlo follow-up 2026-07-24)', () => {
-  // Five seeds: three was small enough for the parity floor below to flip on
-  // pure crit luck whenever the shared rng stream forks (any world-content
-  // change forks it). Nine-seed probes put fire at 1.05 to 1.08 over frost;
-  // five keeps the estimator honest at CI-friendly runtime.
-  const SUSTAINED_SEEDS = [41, 101, 115, 7, 57];
+  // Ten seeds. Three was small enough for the parity floor below to flip on pure
+  // crit luck whenever the shared rng stream forks (any world-content change
+  // forks it), and five turned out to be too, for the same reason: the
+  // Drakelands brood forked the stream and the five-seed mean landed 0.5% under
+  // parity (205.5 vs 206.6) while nine-seed probes had put fire at 1.05 to 1.08
+  // over frost. The floor is exact parity by owner ruling, so an estimator this
+  // noisy decides the verdict on proc luck rather than on balance; widening the
+  // pool is the fix, never discounting the floor.
+  const SUSTAINED_SEEDS = [41, 101, 115, 7, 57, 3, 11, 19, 23, 29];
   const SUSTAINED_CEILING = 1.25; // x talented frost, per duration
   // Owner ruling 2026-07-25: frost is the PvP-leaning spec, so fire must
   // NEVER fall below it in PvE damage, at any fight length. The floor is
