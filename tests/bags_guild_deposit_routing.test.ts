@@ -8,6 +8,7 @@
 // dispatch.
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
+import { guildBankPipeRefusal } from '../src/sim/guild_bank';
 import type { InvSlot } from '../src/sim/types';
 import { BagsWindow, type BagsWindowDeps } from '../src/ui/bags_window';
 import { ItemDragState } from '../src/ui/item_drag_state';
@@ -153,5 +154,21 @@ describe('guild-tab bag click routing (behavioral, real BagsWindow)', () => {
     clickCellFor(h.root, plainId);
     expect(h.calls).toEqual([]);
     expect(h.errors).toEqual([tSim('error.guildBankNoTransfer')]);
+  });
+
+  it('each pre-empt line IS the sim refusal wording (guildBankPipeRefusal cross-pin)', () => {
+    // Key identity alone would pass with a reworded catalog row; the whole
+    // point of pre-empting is voicing the EXACT line the sim would refuse
+    // with, so pin each key's resolved text to the sim gate's own return.
+    expect(tSim('error.bankQuestItem')).toBe(guildBankPipeRefusal({ itemId: questId, count: 1 }));
+    expect(tSim('error.guildBankSoulbound')).toBe(
+      guildBankPipeRefusal({ itemId: soulboundId, count: 1 }),
+    );
+    expect(tSim('error.guildBankNoTransfer')).toBe(
+      guildBankPipeRefusal({ itemId: noMarketId, count: 1 }),
+    );
+    expect(tSim('error.guildBankNoTransfer')).toBe(
+      guildBankPipeRefusal({ itemId: plainId, count: 1, instance: { boundTo: 7 } }),
+    );
   });
 });

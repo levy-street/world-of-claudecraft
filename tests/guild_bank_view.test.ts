@@ -304,12 +304,16 @@ describe('dormant predicate parity with the sim pipe', () => {
   // real def (the realistic content-update vector) fails here the day it
   // lands, plus the per-copy lock arms the def sweep cannot carry.
   it('agrees with guildBankPipeRefusal for every def in the merged item table', () => {
+    let dormantDefs = 0;
     for (const id of Object.keys(REAL_ITEMS)) {
       const slot: InvSlot = { itemId: id, count: 1 };
-      expect(guildBankSlotDormant(slot, REAL_ITEMS[id]), id).toBe(
-        guildBankPipeRefusal(slot) !== null,
-      );
+      const refused = guildBankPipeRefusal(slot) !== null;
+      if (refused) dormantDefs++;
+      expect(guildBankSlotDormant(slot, REAL_ITEMS[id]), id).toBe(refused);
     }
+    // Vacuity guard: the sweep must exercise REAL positives (the table carries
+    // quest/soulbound/noMarketList defs); an all-false sweep proves nothing.
+    expect(dormantDefs).toBeGreaterThan(0);
   });
 
   it('agrees on the per-copy transfer-lock arms and the unlocked instanced copy', () => {

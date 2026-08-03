@@ -9,7 +9,7 @@ import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { stackSizeOf } from '../src/sim/bags';
 import { ITEMS } from '../src/sim/data';
-import { GUILD_BANK_EXPANSION_PRICES } from '../src/sim/guild_bank';
+import { GUILD_BANK_EXPANSION_PRICES, GUILD_BANK_TREASURY_CAP } from '../src/sim/guild_bank';
 import type { InvSlot } from '../src/sim/types';
 import { BankWindow, type BankWindowDeps } from '../src/ui/bank_window';
 import type { BankInfo, GuildBankInfo, IWorld } from '../src/world_api';
@@ -58,6 +58,8 @@ interface Harness {
     copper: number;
   };
   calls: string[];
+  /** Tooltip factories in attach order (the escape pin renders them). */
+  tooltips: Array<() => string>;
 }
 
 function harness(guild: GuildBankInfo | null): Harness {
@@ -82,11 +84,14 @@ function harness(guild: GuildBankInfo | null): Harness {
     guildBankBuySlots: () => calls.push('guildBankBuySlots'),
   };
   const noop = (): void => {};
+  const tooltips: Array<() => string> = [];
   const deps: BankWindowDeps = {
     itemIcon: () => '<span class="item-icon"></span>',
     moneyHtml: (c: number) => `<span class="money-inline">${c}</span>`,
     itemTooltip: () => '',
-    attachTooltip: noop,
+    attachTooltip: (_el: HTMLElement, fn: () => string) => {
+      tooltips.push(fn);
+    },
     root: () => root,
     world: () => world as unknown as IWorld,
     closeOthers: noop,
@@ -97,7 +102,7 @@ function harness(guild: GuildBankInfo | null): Harness {
     onClosed: noop,
     onInventoryChanged: noop,
   };
-  return { window: new BankWindow(deps), root, world, calls };
+  return { window: new BankWindow(deps), root, world, calls, tooltips };
 }
 
 function clickGuildTab(h: Harness): void {
@@ -124,8 +129,8 @@ describe('guild_bank_window: no magic values (the bank_window twin)', () => {
   });
 
   it('uses no em or en dashes (ASCII separators only)', () => {
-    expect(painter.includes('—'), 'em dash found').toBe(false);
-    expect(painter.includes('–'), 'en dash found').toBe(false);
+    expect(painter.includes('\u2014'), 'em dash found').toBe(false);
+    expect(painter.includes('\u2013'), 'en dash found').toBe(false);
   });
 
   it('gives the tab strip and the gold buttons a tokenized :focus-visible ring', () => {
@@ -134,6 +139,19 @@ describe('guild_bank_window: no magic values (the bank_window twin)', () => {
     );
     expect(components).toMatch(
       /\.gbank-gold-btn:focus-visible \{\s*outline: 2px solid var\(--color-border-focus\);/,
+    );
+  });
+
+  it('pins the mobile touch floor for the guild tab controls and the gold-prompt coin fields', () => {
+    // The .gbank-* selectors match NEITHER anchor of bank_window.test.ts's
+    // generic >=40px mobile scan (it keys on .bank-*), so their presence is
+    // pinned here: deleting either rule must go red.
+    const mobileCss = readFileSync('src/styles/hud.mobile.css', 'utf8');
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #bank-window \.bank-tab,\s*body\.mobile-touch #bank-window \.gbank-gold-btn \{\s*min-height: 40px;/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch \.gbank-coin-row \.coininput \{\s*min-height: 40px;\s*font-size: 16px;/,
     );
   });
 });
@@ -189,6 +207,44 @@ describe('guild tab visibility', () => {
     expect(h.root.querySelector('.bank-capacity')).not.toBeNull(); // personal pane back
   });
 
+  it('guildTabActive goes false the INSTANT the mirror nulls, BEFORE any repaint', () => {
+    // The one-frame stale-mode window: between the mirror nulling and the
+    // slow-band repaint, a bag click must not route at guildBankDeposit. The
+    // getter's third conjunct (live guildBankInfo) closes it; this pin fails
+    // if that conjunct is dropped, because no render() has reset the tab yet.
+    const h = harness(guildInfo());
+    h.window.open();
+    clickGuildTab(h);
+    expect(h.window.guildTabActive).toBe(true);
+    h.world.guildBankInfo = null; // deliberately NO refreshIfChanged here
+    expect(h.window.guildTabActive).toBe(false);
+  });
+
+  it('keeps keyboard focus on the guild control across an EXTERNAL signature repaint', () => {
+    // Another officer's op echoes through refreshIfChanged while a keyboard
+    // user sits on a guild cell: focus must re-land on the SAME control in the
+    // rebuilt tree (data-focus-key), never yank to the close button.
+    const h = harness(guildInfo({ slots: [{ itemId: plainId, count: 5 }], treasury: 700 }));
+    h.window.open();
+    clickGuildTab(h);
+    const cell = h.root.querySelector('.bank-grid .bank-item') as HTMLButtonElement;
+    cell.focus();
+    expect(document.activeElement).toBe(cell);
+    h.world.guildBankInfo = guildInfo({ slots: [{ itemId: plainId, count: 5 }], treasury: 900 });
+    h.window.refreshIfChanged();
+    const fresh = h.root.querySelector('.bank-grid .bank-item') as HTMLButtonElement;
+    expect(fresh).not.toBe(cell); // the tree really was rebuilt
+    expect(document.activeElement).toBe(fresh);
+    // Same for the tab strip: focus parked on the Guild tab stays there.
+    const tab = h.root.querySelector('.bank-tab[data-tab="guild"]') as HTMLButtonElement;
+    tab.focus();
+    h.world.guildBankInfo = guildInfo({ slots: [{ itemId: plainId, count: 5 }], treasury: 950 });
+    h.window.refreshIfChanged();
+    expect((document.activeElement as HTMLElement | null)?.getAttribute('data-focus-key')).toBe(
+      'tab:guild',
+    );
+  });
+
   it('close() resets the pane to Personal for the next open', () => {
     const h = harness(guildInfo());
     h.window.open();
@@ -238,14 +294,23 @@ describe('guild pane rendering', () => {
   });
 
   it('disables withdraw-gold at zero treasury and deposit-gold at the cap', () => {
-    const h = harness(guildInfo({ treasury: 0 }));
-    h.window.open();
-    clickGuildTab(h);
+    const empty = harness(guildInfo({ treasury: 0 }));
+    empty.window.open();
+    clickGuildTab(empty);
     const [deposit, withdraw] = Array.from(
-      h.root.querySelectorAll<HTMLButtonElement>('.gbank-gold-btn'),
+      empty.root.querySelectorAll<HTMLButtonElement>('.gbank-gold-btn'),
     );
     expect(deposit.disabled).toBe(false);
     expect(withdraw.disabled).toBe(true);
+    // The cap arm, independently: deposit disables, withdraw stays live.
+    const full = harness(guildInfo({ treasury: GUILD_BANK_TREASURY_CAP }));
+    full.window.open();
+    clickGuildTab(full);
+    const [depositFull, withdrawFull] = Array.from(
+      full.root.querySelectorAll<HTMLButtonElement>('.gbank-gold-btn'),
+    );
+    expect(depositFull.disabled).toBe(true);
+    expect(withdrawFull.disabled).toBe(false);
   });
 
   it('marks an unaffordable expansion with visible text and keeps the button enabled (sim-authoritative refusal)', () => {
@@ -258,6 +323,33 @@ describe('guild pane rendering', () => {
     expect(btn?.classList.contains('gbank-buy-short')).toBe(true);
     expect(btn?.querySelector('.gbank-buy-short-label')?.textContent).toBe('Treasury short');
     expect(h.root.querySelector('.gbank-buy-note')).not.toBeNull();
+    // The affordable arm carries NO marker (a painter that always appends it
+    // must fail here).
+    const rich = harness(guildInfo({ treasury: price }));
+    rich.window.open();
+    clickGuildTab(rich);
+    const richBtn = rich.root.querySelector<HTMLButtonElement>('.bank-buy-btn');
+    expect(richBtn?.disabled).toBe(false);
+    expect(richBtn?.classList.contains('gbank-buy-short')).toBe(false);
+    expect(richBtn?.querySelector('.gbank-buy-short-label')).toBeNull();
+  });
+
+  it('escapes interpolated text: a hostile unknown item id cannot inject markup', () => {
+    const hostile = '<img src=x onerror="window.pwned=1">';
+    const h = harness(guildInfo({ slots: [{ itemId: hostile, count: 1 }] }));
+    h.window.open();
+    clickGuildTab(h);
+    // The cell itself renders no unescaped markup off the id.
+    expect(h.root.querySelector('.bank-grid img')).toBeNull();
+    // The tooltip factory interpolates the raw id (the only name a removed def
+    // has): render it and prove esc() is in the path.
+    const html = h.tooltips.map((fn) => fn()).join('');
+    expect(html).not.toContain('<img');
+    expect(html).toContain('&lt;img');
+    const probe = document.createElement('div');
+    probe.innerHTML = html;
+    expect(probe.querySelector('img')).toBeNull();
+    expect(probe.textContent).toContain(hostile);
   });
 
   it('shows the maxed label once the ladder is exhausted', () => {
@@ -332,7 +424,17 @@ describe('guild pane actions round-trip through the facet', () => {
     expect(h.calls.filter((c) => c.startsWith('guildBankDepositGold'))).toEqual([]);
     // The prompt stays open and voices the refusal in its live-region line.
     expect(document.querySelector('.gbank-gold-prompt')).not.toBeNull();
-    expect(document.querySelector('.gbank-gold-error')?.textContent).toBe('Not enough money.');
+    const err = document.querySelector('.gbank-gold-error');
+    expect(err?.textContent).toBe('Not enough money.');
+    // The line is a polite live region (screen readers hear the refusal).
+    expect(err?.getAttribute('role')).toBe('status');
+    expect(err?.getAttribute('aria-live')).toBe('polite');
+    // A REPEATED identical refusal re-announces: the text lands as a fresh
+    // child node each time (a same-text write is not a DOM change AT voices).
+    const firstNode = err?.firstChild;
+    (document.querySelector('.gbank-gold-prompt .btn') as HTMLElement).click();
+    expect(err?.textContent).toBe('Not enough money.');
+    expect(err?.firstChild).not.toBe(firstNode);
   });
 
   it('a deposit past the treasury headroom refuses with the treasury-cap sim line', () => {
@@ -375,7 +477,7 @@ describe('guild pane actions round-trip through the facet', () => {
     expect(h.calls).toContain('guildBankWithdrawGold:700');
   });
 
-  it('a zero-amount gold submit sends NOTHING (the sim treats 0 as malformed-silent)', () => {
+  it('a zero-amount gold submit sends NOTHING and cancels SILENTLY (dismiss, no error line)', () => {
     const h = harness(guildInfo());
     h.window.open();
     clickGuildTab(h);
@@ -383,6 +485,37 @@ describe('guild pane actions round-trip through the facet', () => {
     const prompt = document.querySelector('.gbank-gold-prompt') as HTMLElement;
     (prompt.querySelector('.btn') as HTMLElement).click(); // all fields still 0
     expect(h.calls.filter((c) => c.startsWith('guildBankDepositGold'))).toEqual([]);
+    // Cancel semantics: the prompt is gone (nothing was asked), never a
+    // refusal line left behind.
+    expect(document.querySelector('.gbank-gold-prompt')).toBeNull();
+  });
+
+  it('a gold withdraw with zero headroom refuses inline and keeps the prompt open', () => {
+    // The clampGoldAmount null arm: the integer-safe purse bound leaves no
+    // headroom (max 0), so the submit voices guildGoldCannotMove and sends
+    // nothing rather than dismissing or sending a malformed 0.
+    const h = harness(guildInfo({ treasury: 700 }));
+    h.world.copper = Number.MAX_SAFE_INTEGER;
+    h.window.open();
+    clickGuildTab(h);
+    (h.root.querySelectorAll('.gbank-gold-btn')[1] as HTMLElement).click();
+    const prompt = document.querySelector('.gbank-gold-prompt') as HTMLElement;
+    const inputs = Array.from(prompt.querySelectorAll<HTMLInputElement>('.coininput'));
+    inputs[0].value = '1'; // 1g asked, zero headroom to receive it
+    (prompt.querySelector('.btn') as HTMLElement).click();
+    expect(h.calls.filter((c) => c.startsWith('guildBankWithdrawGold'))).toEqual([]);
+    expect(document.querySelector('.gbank-gold-prompt')).not.toBeNull();
+    expect(document.querySelector('.gbank-gold-error')?.textContent).toBe(
+      'That amount cannot be moved right now.',
+    );
+  });
+
+  it('an unknown-id cell click still sends the withdraw (the recovery path)', () => {
+    const h = harness(guildInfo({ slots: [{ itemId: 'zz_removed_item', count: 2 }] }));
+    h.window.open();
+    clickGuildTab(h);
+    (h.root.querySelector('.bank-grid .gbank-unknown') as HTMLElement).click();
+    expect(h.calls).toContain('guildBankWithdraw:0');
   });
 
   it('the expansion confirm sends guildBankBuySlots (price is never client-supplied)', () => {
