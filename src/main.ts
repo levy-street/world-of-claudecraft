@@ -3486,7 +3486,15 @@ async function startGame(
 
   function frame(now: number): void {
     requestAnimationFrame(frame);
-    maybeWarmCurrentZone();
+    // maybeWarmCurrentZone() deliberately does NOT run here. It reads the
+    // player's position AND the scene director, and at the top of the frame
+    // those two disagree: a synchronous world command (the ferry fare answers
+    // through world.answerSceneChoice straight off the click) teleports the
+    // entity immediately while the 'scene' start op it queues only reaches
+    // the director when this frame drains events. Deciding here saw the
+    // destination with no scene covering it and raised the blocking loading
+    // screen mid-voyage. Each host calls it below, once its own events for
+    // this frame have landed.
     let frameDt = (now - last) / 1000;
     last = now;
     if (frameDt > 0.25) frameDt = 0.25;
@@ -3624,6 +3632,9 @@ async function startGame(
         sceneFacingInput.pendingReleaseFacing = null;
         acc -= DT;
       }
+      // Offline: the tick above drained this frame's events, so the scene
+      // director now agrees with the entity's position.
+      maybeWarmCurrentZone();
       const pp = offlineSim.player;
       perf.trace(
         'camera.follow',
@@ -3665,6 +3676,9 @@ async function startGame(
     }
 
     // online: inputs stream on a timer inside ClientWorld; here we mirror state
+    // Online: drainMirroredSceneInput above already applied this frame's scene
+    // ops, so the same position/scene agreement holds here.
+    maybeWarmCurrentZone();
     const net = online!;
     spectateBadge.update(net.spectating);
     const spectateFacing = net.consumeSpectateFacing();
