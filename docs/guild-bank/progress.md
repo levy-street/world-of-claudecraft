@@ -61,6 +61,49 @@
 Phase 1 QA: both lines verified and closed on 2026-08-02 (see Notes).
 
 ## Notes
+Phase 3 review (2026-08-02): migration-safety ran as a dispatched agent and reported
+2 BLOCKING + 1 BLOCKING-class escrow finding + 5 SHOULD-FIX + 3 NOTE; the other three
+reviewer agents (database-performance, privacy-security, architecture) were lost to
+infrastructure drops mid-run, so those three lenses were performed by the implementer
+directly against the committed diff (recorded here explicitly; Phase 3 QA should
+re-dispatch them fresh). Resolution:
+- BLOCKING fixed: the last-member arm of guildLeave deleted the guild with no bank
+  guard and no evict (a solo GM /gquit with a stocked bank destroyed the book via the
+  cascade); it now runs the same fail-closed holdings guard as guildDisband BEFORE
+  any row moves and fires onGuildDisbanded after the committed DELETE, pinned in
+  tests/social_system.test.ts (refused stocked/null; allowed empty deletes + evicts;
+  a non-last member is never trapped by the guard).
+- BLOCKING fixed: a fenced-out session left its book mutations live while the
+  character half rolled back (sim ahead of durable truth, a reproducible dupe).
+  reconcileFencedOutGuildBooks evicts and reloads the touched books from the DB
+  (loadGuildBankRow) unless another live session holds a dirty mark; the residual
+  cross-officer skew is ACCEPTED market-precedent risk, documented in state.md, and
+  the escrow comment in saveCharacter now states the guarantee's scope honestly.
+- SHOULD-FIX fixed: octet_length (uncompressed) replaces pg_column_size for the row
+  bound; a structurally-not-a-book row under the bound is skip-and-preserve
+  (isMalformedGuildBankRow) instead of salvage-to-empty; the boot load retries
+  transient failures then goes loudly inert; onGuildDisbanded clears every session's
+  dirty mark; a rollback-safety note at the DDL pins the both-paths-guarded contract.
+- NOTEs recorded in state.md: no optimistic concurrency on guild_banks (valid only
+  under one-process-per-realm), guild_banks.realm write-only, audit unpaginated.
+- Self-review lenses (implementer, in lieu of the lost agents): privacy-security:
+  every new statement parameterized (the one SET LOCAL interpolation is the
+  pre-existing server-constant idiom); the book write exists at exactly two fenced
+  call sites; the fee path is fully server-authoritative (constant-derived amount,
+  purse read from the sim, ledger rows from the info diff, never from msg fields);
+  refusals mutate nothing (pinned per path); no secrets or player data in new logs.
+  VERDICT: no findings. database-performance: boot read is one realm-scoped LEFT
+  JOIN (guilds_realm_name prefix + guild_banks PK), octet_length detoast cost is
+  boot-only; write amplification is one small PK upsert per DIRTY save; books share
+  the market serial writer by design (documented); transactions stay bounded by the
+  heavy statement timeout; bank_ledger growth is the documented keep-forever
+  decision; guild_banks is bounded by guild count and cascades. VERDICT: no
+  findings, notes recorded. architecture: sim additions are pure free functions over
+  SimContext with thin facade delegates (no new imports, no rng, guards green);
+  sim_context.ts untouched; the four client coordinators untouched; game.ts growth
+  is dispatch/transport/save-path glue that needs GameServer private state, with the
+  pure parts extracted (guild_bank_state.ts, bank_ledger.ts). VERDICT: no findings.
+
 Phase 3 (2026-08-02):
 - DDL landed in `SOCIAL_SCHEMA` (the family that owns guilds): `guild_banks` per the
   state.md shape, `ON DELETE CASCADE` off `guilds`, realm with NO interpolated default
