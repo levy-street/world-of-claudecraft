@@ -919,6 +919,23 @@ describe('/admin/api dispatch parity (legacy flag vs new flag)', () => {
       label: 'the antibot-config audit read',
     },
     { method: 'POST', url: '/admin/api/antibot-config', label: 'the antibot-config write' },
+    // Phase 15 arrivals: the R35 professions inspector and the two GM
+    // restores, bearer-gated like every other authed admin route.
+    {
+      method: 'GET',
+      url: '/admin/api/characters/5/professions',
+      label: 'the professions inspector read',
+    },
+    {
+      method: 'POST',
+      url: '/admin/api/moderation/characters/5/restore-item',
+      label: 'the GM item restore write',
+    },
+    {
+      method: 'POST',
+      url: '/admin/api/moderation/characters/5/restore-slot',
+      label: 'the GM slot restore write',
+    },
     { method: 'PUT', url: '/admin/api/overview', label: 'a wrong method (delegates to legacy)' },
     {
       method: 'HEAD',

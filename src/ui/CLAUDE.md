@@ -246,7 +246,9 @@ One recipe for a new window/panel or a per-frame frame/bar, and for migrating on
 `hud.ts` (the merge-conflict tax this pays down). Migrate one at a time, on the rule of three;
 follow the root `extract-and-test` skill for the move-not-rewrite mechanics. The UI parts:
 - **Pure view-core** `src/ui/<name>_view.ts` (or `_core.ts`): maps `IWorld` (+ raw inputs) to a
-  render model; DOM/Three/i18n-free; INSTANCE-PARAMETERIZED (a descriptor/id, no hardcoded
+  render model; DOM/Three-free (i18n imports are allowed for key/label selection, which is what
+  the architecture guard actually enforces; several registered cores already use them);
+  INSTANCE-PARAMETERIZED (a descriptor/id, no hardcoded
   element id); allocation-light if per-frame. NAME it `*_view`/`*_core` (NOT a bare name): the
   `architecture.test.ts` COMPLETENESS sweep asserts every on-disk `*_view`/`*_core` is registered,
   so the convention name is what makes a forgotten registration FAIL the guard instead of silently

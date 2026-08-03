@@ -94,7 +94,7 @@ pnpm install --frozen-lockfile
 pnpm run dev       # then open http://localhost:5173 and choose Play Offline
 ```
 
-Name your character, pick any of the nine classes, and you start in **Eastbrook Vale** (levels 1-7), a market town ringed by hubs: wolf runs to the north, boar meadows east, the Sableweb woods west, Mirror Lake northwest, a burrower-ridden copper dig southwest, and a ruined chapel of restless dead northeast, with Gorrak's bandit camp to the southeast. The north road climbs a mountain pass into **Mirefen Marsh** (6-13, hub Fenbridge) and on up to **Thornpeak Heights** (13-20, hub Highwatch). The world seed is fixed in `src/main.ts`, so it is the same place every visit.
+Name your character, pick any of the nine classes, and you start in **Eastbrook Vale** (levels 1-7), a market town ringed by hubs: wolf runs to the north, boar meadows east, the Sableweb woods west, Mirror Lake northwest, a burrower-ridden copper dig southwest, and a ruined chapel of restless dead northeast, with Gorrak's bandit camp to the southeast. The north road climbs a mountain pass into **Mirefen Marsh** (6-13, hub Fenbridge) and on up to **Thornpeak Heights** (13-20, hub Highwatch). The world seed is fixed in `src/sim/world_seed.ts`, so it is the same place every visit.
 
 ### Desktop apps for Windows, Linux, and macOS
 

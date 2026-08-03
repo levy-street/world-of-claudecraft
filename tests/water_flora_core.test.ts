@@ -32,14 +32,18 @@ describe('water flora placement core', () => {
     // The walk moved verbatim out of water_flora.ts; this census pins it so a
     // future edit cannot silently reshape the world's water dressing. Minted
     // from the shipped walk at seed 42; re-mint only for a deliberate,
-    // reviewed placement change.
-    expect(regions.length).toBe(9);
-    expect(regions.reduce((n, r) => n + r.lilies.length, 0)).toBe(72);
-    expect(regions.reduce((n, r) => n + r.reeds.length, 0)).toBe(126);
+    // reviewed placement change. Re-minted once for Gull Mere (R55, the
+    // farshore lagoon): one new region, 3 lilies and 5 reeds on the new
+    // water, and farshore_isle becomes the walk's last zone. The first-spot
+    // coordinate pin is untouched, so the pre-existing walk is proven
+    // unmoved.
+    expect(regions.length).toBe(10);
+    expect(regions.reduce((n, r) => n + r.lilies.length, 0)).toBe(75);
+    expect(regions.reduce((n, r) => n + r.reeds.length, 0)).toBe(131);
     const first = regions[0].lilies[0] ?? regions[0].reeds[0];
     expect(first.x).toBeCloseTo(-97.7536, 3);
     expect(first.z).toBeCloseTo(98.1021, 3);
-    expect(regions[regions.length - 1].zoneId).toBe('galecrest');
+    expect(regions[regions.length - 1].zoneId).toBe('farshore_isle');
   });
 
   it('places flora on the temperate lakes', () => {

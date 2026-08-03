@@ -16,7 +16,11 @@ function fakeWs() {
     sent,
     closes,
     ws: {
+      // OPEN mirrors the real ws instance constant beside readyState: the
+      // mid-handshake death re-check compares the two, and a fixture with
+      // readyState but no OPEN reads as died-mid-handshake on every join.
       readyState: 1,
+      OPEN: 1,
       send: (p: string) => sent.push(JSON.parse(p)),
       close: (code?: number, reason?: string) => closes.push({ code, reason }),
       on: () => {},
@@ -62,6 +66,9 @@ function makeDeps(opts: { joinResult?: any; hasSession?: boolean; acquireResult?
     hasSessionForCharacter: hasSessionSpy,
     join: joinSpy,
     clients: { size: 1 },
+    // Consumed by the mid-handshake death re-check on a socket that died
+    // during the awaits; a live-socket fixture never reaches it.
+    socketClosed: vi.fn(() => true),
   };
   const deps: any = {
     game,

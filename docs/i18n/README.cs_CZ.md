@@ -92,7 +92,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and choose Play Offline
 ```
 
-Pojmenuj svou postavu, vyber si kteroukoli z devíti tříd a začínáš v **Eastbrook Vale** (úrovně 1-7), tržním městečku obklopeném uzly: vlčí revíry na severu, kančí louky na východě, les Sableweb na západě, Mirror Lake na severozápadě, měděný důl zamořený hrabavci na jihozápadě a zřícená kaple neklidných mrtvých na severovýchodě, s Gorrakovým banditským táborem na jihovýchodě. Severní cesta stoupá horským průsmykem do **Mirefen Marsh** (6-13, uzel Fenbridge) a dál nahoru do **Thornpeak Heights** (13-20, uzel Highwatch). Seed světa je pevně dán v `src/main.ts`, takže je to při každé návštěvě stejné místo.
+Pojmenuj svou postavu, vyber si kteroukoli z devíti tříd a začínáš v **Eastbrook Vale** (úrovně 1-7), tržním městečku obklopeném uzly: vlčí revíry na severu, kančí louky na východě, les Sableweb na západě, Mirror Lake na severozápadě, měděný důl zamořený hrabavci na jihozápadě a zřícená kaple neklidných mrtvých na severovýchodě, s Gorrakovým banditským táborem na jihovýchodě. Severní cesta stoupá horským průsmykem do **Mirefen Marsh** (6-13, uzel Fenbridge) a dál nahoru do **Thornpeak Heights** (13-20, uzel Highwatch). Seed světa je pevně dán v `src/sim/world_seed.ts`, takže je to při každé návštěvě stejné místo.
 
 ### Desktopové aplikace pro Windows, Linux a macOS
 

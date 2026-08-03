@@ -403,7 +403,7 @@
         "maximumChordSpan": 6.5,
         "gateCount": 6,
         "gateWidth": 5,
-        "automatedEvidence": "tests/eastbrook_layout.test.ts: wall and road geometry"
+        "automatedEvidence": "tests/eastbrook_layout_suite.test.ts: wall and road geometry"
       },
       "runtimeBudgetVerification": {
         "trianglesPerInstance": 206,

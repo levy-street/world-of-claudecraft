@@ -68,7 +68,7 @@
 // game/net imports, no Math.random/Date.now, host-agnostic so it runs
 // offline, on the server, and in the headless RL env unchanged.
 
-import { bagCapacity, fitsAll, removeStacked } from '../bags';
+import { bagCapacity, countStacked, fitsAll, removeStacked } from '../bags';
 import { CRAFT_GOLD_SINK_COPPER_PER_BUDGET } from '../content/professions';
 import { recipeById } from '../content/recipes';
 import { ITEMS } from '../data';
@@ -81,6 +81,7 @@ import { comboEligibility } from './combo_eligibility';
 import { isCommissionEligible } from './commission';
 import { isSignableMaterialRarity, type MaterialRarity } from './gathering';
 import { masterworkBonusStats, masterworkBumpedQuality, masterworkProcChance } from './masterwork';
+import { countAcrossGrades, materialGradeIds, planGradeRemoval } from './material_grades';
 import { materialTierBonusForReagents } from './material_tier';
 import { isStationActive } from './mobile_station';
 import { craftActionXp } from './profession_xp';
@@ -229,17 +230,45 @@ export function holdsSelfSignedInstance(
 }
 
 /** Whether `meta` holds an inventory slot for `itemId` carrying a signed
- *  instance stamped with `meta`'s OWN name (a self-gathered signed material). */
+ *  instance stamped with `meta`'s OWN name (a self-gathered signed material).
+ *
+ *  Spans the reagent's grades (professions/material_grades.ts). The reason is
+ *  that the fine grade REPLACES the plain yield, so past the tier-1 tool a
+ *  player's self-gathered copper ore IS fine copper ore, and checking the
+ *  declared id alone would quietly stop the #1145 discount firing for exactly
+ *  the players who upgraded: using the better tool would cost them a perk.
+ *
+ *  Note the semantic this inherits and does not change: the discount is
+ *  keyed on HOLDING a self-signed copy, not on spending one, and
+ *  `planGradeRemoval` drains the base grade first. So a player holding both
+ *  grades earns the discount from the fine copy while the craft actually
+ *  spends plain ore. That hold-not-spend behavior predates the grades (the
+ *  check was always a `some`, and removeItem walks end-backward, so the
+ *  signed copy was never guaranteed to be the consumed one); the widening
+ *  extends it to a second id rather than introducing it. Pinned in
+ *  tests/material_grade_substitution.test.ts so the ruling is on record. */
 function hasSelfSignedInstance(meta: PlayerMeta, itemId: string): boolean {
-  return holdsSelfSignedInstance(meta.inventory, meta.name, itemId);
+  return materialGradeIds(itemId).some((gradeId) =>
+    holdsSelfSignedInstance(meta.inventory, meta.name, gradeId),
+  );
 }
 
 /** Whether `meta` holds an inventory slot for `itemId` carrying a signed
  *  instance with ANY signer (the crafter's own name included). Feeds the
  *  masterwork proc's signed-reagent term (2026-07-17 ruling); the #1145
- *  quantity discount keeps using the self-only check above. */
+ *  quantity discount keeps using the self-only check above.
+ *
+ *  Spans the reagent's grades for the same reason its sibling does. 26 shipped
+ *  masterwork-capable recipes declare a material that has a fine grade
+ *  (ironedge_longsword, thoriumscale_cuirass, goldweave_robe and the rest), and
+ *  a fine grade carries a signer exactly like its base: resolveHarvest mints
+ *  the signed instance on the RESOLVED id (gathering.ts). So a player who
+ *  out-tooled the material, holding only signed fine copies, would pay the
+ *  reagent line with one and still lose MASTERWORK_SIGNED_CHANCE, which is the
+ *  same inversion the sibling exists to prevent. */
 function hasSignedInstance(meta: PlayerMeta, itemId: string): boolean {
-  return meta.inventory.some((s) => s.itemId === itemId && !!s.instance?.signer);
+  const gradeIds = materialGradeIds(itemId);
+  return meta.inventory.some((s) => gradeIds.includes(s.itemId) && !!s.instance?.signer);
 }
 
 /** The result of resolving one reagent's required quantity: the final count
@@ -310,7 +339,10 @@ export function hasRecipeMaterials(
   const craftSkills = meta ? meta.craftSkills : {};
   return recipe.reagents.every(
     (r) =>
-      ctx.countItem(r.itemId, pid) >=
+      // Counted across the reagent's grades, in the same order the
+      // consumption below spends them, so the gate can never promise units the
+      // removal would not find.
+      countAcrossGrades(r.itemId, (id) => ctx.countItem(id, pid)) >=
       requiredReagentCount(meta, r, craftSkills, recipe.professionId).count,
   );
 }
@@ -459,7 +491,15 @@ export function resolveCraftForRecipe(
     const scratch = meta.inventory.map((s) => ({ ...s }));
     for (const reagent of recipe.reagents) {
       const required = requiredReagentCount(meta, reagent, craftSkills, recipe.professionId);
-      removeStacked(scratch, reagent.itemId, required.count);
+      // The SAME grade plan the real consumption applies below, computed from
+      // the scratch copy so a multi-reagent recipe sees earlier lines already
+      // taken. Modelling only the declared id would leave the gate reserving
+      // room against slots the craft never actually frees.
+      for (const take of planGradeRemoval(reagent.itemId, required.count, (id) =>
+        countStacked(scratch, id),
+      )) {
+        removeStacked(scratch, take.itemId, take.count);
+      }
     }
     // The grant shapes, mirroring the grant arms below field for field so the
     // modeled payloads merge exactly like the minted ones.
@@ -522,7 +562,11 @@ export function resolveCraftForRecipe(
     const required = requiredReagentCount(meta, reagent, craftSkills, recipe.professionId);
     if (required.selfSignedBonusApplied) selfSignedBonusApplied = true;
     if (meta && hasSignedInstance(meta, reagent.itemId)) signedReagentUsed = true;
-    ctx.removeItem(reagent.itemId, required.count, pid);
+    for (const take of planGradeRemoval(reagent.itemId, required.count, (id) =>
+      ctx.countItem(id, pid),
+    )) {
+      ctx.removeItem(take.itemId, take.count, pid);
+    }
   }
   // Masterwork proc draw: the single output-side rng draw, at the
   // exact position the retired quality roll occupied so the world's draw

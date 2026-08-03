@@ -20,6 +20,7 @@
 // and the headless RL env (enforced by tests/architecture.test.ts).
 
 import type { DelveCompanionInfo } from '../../world_api';
+import { bagsFullError } from '../bags';
 import type { DelveShopGate, DelveShopOffer } from '../data';
 import {
   COMPANION_UPGRADE_COSTS,
@@ -49,6 +50,7 @@ import { isLitanyModuleId, litanyModuleGeometry } from '../delve_litany_layout';
 import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from '../dungeon_layout';
 import { createGroundObject, createMob, recalcPlayerStats } from '../entity';
 import { restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';
+import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import { delveExitDropZ } from '../prop_layout';
 import { aurasSurvivingDeath } from '../resurrection';
 import { Rng } from '../rng';
@@ -394,6 +396,8 @@ export function enterDelve(ctx: SimContext, delveId: string, tierId: string, pid
   const slotIndex = ctx.partyMembersForKey(key).length;
   const pos = delveMemberSpawnPos(ctx, entry, slotIndex);
   const p = r.e;
+  // A live gather/fishing session never survives a delve teleport.
+  cancelProfessionSessionOnDisplacement(ctx, p);
   p.pos = pos;
   p.prevPos = { ...pos };
   ctx.rebucket(p);
@@ -429,6 +433,7 @@ export function leaveDelve(ctx: SimContext, pid?: number): void {
   if (run?.companion) ctx.despawnDelveCompanion(run);
   restorePetFromDelveStash(ctx, r.meta.entityId);
   const p = r.e;
+  cancelProfessionSessionOnDisplacement(ctx, p);
   p.pos = ctx.groundPos(delve.doorPos.x, delveExitDropZ(delve.doorPos.z, delve.id));
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
@@ -636,6 +641,8 @@ export function ejectToDelveDoor(
   const r = ctx.resolve(pid);
   if (!r) return;
   const p = r.e;
+  // A live free eject (nobody died) still displaces: end any session first.
+  cancelProfessionSessionOnDisplacement(ctx, p);
   p.dead = false;
   const door = ctx.groundPos(delve.doorPos.x, delveExitDropZ(delve.doorPos.z, delve.id));
   p.pos = delveMemberSpawnPos(ctx, door, slotIndex);
@@ -1001,6 +1008,7 @@ export function advanceDelveModule(ctx: SimContext, run: DelveRun): void {
   members.forEach((pid, i) => {
     const p = ctx.entities.get(pid);
     if (!p || p.dead) return;
+    cancelProfessionSessionOnDisplacement(ctx, p);
     const pos = delveMemberSpawnPos(ctx, entry, i);
     p.pos = pos;
     p.prevPos = { ...pos };
@@ -1628,6 +1636,14 @@ export function delveBuyShopItem(
   }
   if (meta.delveMarks < entry.marks) {
     ctx.error(meta.entityId, `You need ${entry.marks} Delve Marks to buy ${def.name}.`);
+    return;
+  }
+  // Capacity BEFORE the spend, the buyItem shape: the grant hub deliberately
+  // never capacity-caps (a mid-flight grant must not vanish), so without this
+  // gate a full-bag purchase landed PAST capacity, making the one counter
+  // every other buy path gates an overflow loophole.
+  if (!ctx.canAddItem(itemId, 1, meta.entityId)) {
+    bagsFullError(ctx, meta.entityId);
     return;
   }
   meta.delveMarks -= entry.marks;

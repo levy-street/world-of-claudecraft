@@ -773,18 +773,26 @@ describe('Vale Cup sites', () => {
     expect(h.deedsEarned.has('pvp_vcup_hat_trick')).toBe(true);
   });
 
-  it('pvp_vcup_first_save: fires only in a rated bout', () => {
+  it('pvp_vcup_first_save: fires only in a rated, bracket-3+ bout', () => {
     const sim = makeSim();
     const keeper = addMeta(sim, 'Keeper');
     onCupSaveForDeeds(
       sim.ctx,
-      cupMatch({ id: 1, rated: false, teamA: [keeper.entityId] }),
+      cupMatch({ id: 1, rated: false, bracket: 3, teamA: [keeper.entityId] }),
+      keeper.entityId,
+    );
+    expect(keeper.deedsEarned.has('pvp_vcup_first_save')).toBe(false);
+    // Rated but small-bracket: the description promises the 3v3 bracket or
+    // larger, enforced directly at the grant site (issue 2767 review round).
+    onCupSaveForDeeds(
+      sim.ctx,
+      cupMatch({ id: 1, rated: true, bracket: 2, teamA: [keeper.entityId] }),
       keeper.entityId,
     );
     expect(keeper.deedsEarned.has('pvp_vcup_first_save')).toBe(false);
     onCupSaveForDeeds(
       sim.ctx,
-      cupMatch({ id: 1, rated: true, teamA: [keeper.entityId] }),
+      cupMatch({ id: 1, rated: true, bracket: 3, teamA: [keeper.entityId] }),
       keeper.entityId,
     );
     expect(keeper.deedsEarned.has('pvp_vcup_first_save')).toBe(true);
@@ -794,6 +802,7 @@ describe('Vale Cup sites', () => {
     const sheet = (meta: PlayerMeta, over: Partial<CupMatchForDeeds>): CupMatchForDeeds =>
       cupMatch({
         id: 1,
+        bracket: 3,
         teamA: [meta.entityId],
         roles: { [meta.entityId]: 'keeper' },
         scoreA: 3,
@@ -842,6 +851,13 @@ describe('Vale Cup sites', () => {
       'A',
     );
     expect(concede.deedsEarned.has('pvp_vcup_clean_sheet')).toBe(false);
+
+    // Small bracket: the description promises the 3v3 bracket or larger,
+    // enforced directly at the grant site (issue 2767 review round).
+    const lowSim = makeSim();
+    const low = addMeta(lowSim, 'Keeper');
+    onCupStandingForDeeds(lowSim.ctx, sheet(low, { bracket: 2 }), low.entityId, 'A', 'A');
+    expect(low.deedsEarned.has('pvp_vcup_clean_sheet')).toBe(false);
 
     // All four satisfied: clean sheet.
     const winSim = makeSim();
@@ -1347,7 +1363,7 @@ describe('station-bound craft counter (prog_tools_of_the_trade)', () => {
     e.level = level;
     e.pos.x = toolworks.pos.x;
     e.pos.z = toolworks.pos.z;
-    sim.ctx.addItem('thorium_ore', 4, meta.entityId);
+    sim.ctx.addItem('fine_iron_ore', 4, meta.entityId);
     sim.ctx.addItem('mithril_mining_pick', 1, meta.entityId);
     return meta;
   }

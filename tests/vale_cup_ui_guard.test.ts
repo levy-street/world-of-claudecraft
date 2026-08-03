@@ -86,6 +86,37 @@ describe('vale_cup_window: WCAG chrome (focusable controls + focus-return)', () 
   });
 });
 
+describe('vale_cup gate notes: the unrated / small-bracket copy is actually rendered (issue 2767)', () => {
+  // The view cores pin the FLAGS (tests/vale_cup_window_view.test.ts,
+  // tests/vale_cup_briefing_view.test.ts), and the jsdom render suite
+  // (tests/vale_cup_gate_notes_render.test.ts) proves each gate POINTS the
+  // right way; these source pins additionally hold the gates' shape so an
+  // inverted ternary or a note relocated out of its gated builder cannot
+  // survive even the Node-only run.
+  it('window: renders the small-bracket role note in the TRUE arm of its view gate', () => {
+    expect(windowSrc).toMatch(
+      /view\.smallBracketRoles\s*\?\s*`<div class="vcup-note" id="vcup-roles-smallnote">/,
+    );
+  });
+
+  it('window: renders the practice unrated note inside practiceHtml, behind its early return', () => {
+    const practiceFn = windowSrc.slice(
+      windowSrc.indexOf('private practiceHtml('),
+      windowSrc.indexOf('private practicingHtml('),
+    );
+    expect(practiceFn).toContain("if (!show) return '';");
+    expect(practiceFn).toContain("t('hudChrome.vcup.practiceUnratedNote')");
+  });
+
+  it('briefing: renders the unrated rules row only when the rated flag is off', () => {
+    // The TRUE (rated) arm is the empty string; the note lives in the false arm.
+    expect(briefingSrc).toMatch(/view\.rated\s*\?\s*''/);
+    expect(briefingSrc).toMatch(
+      /view\.practice\s*\?\s*'hudChrome\.vcup\.briefing\.practiceUnratedNote'\s*:\s*'hudChrome\.vcup\.briefing\.unratedNote'/,
+    );
+  });
+});
+
 describe('vale_cup painters: no magic values', () => {
   it.each(ALL_PAINTERS)('%s carries no literal hex or rgb color in TS', (_name, code) => {
     const hex = code.match(/#[0-9a-fA-F]{3,8}\b/g) ?? [];

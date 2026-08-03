@@ -92,7 +92,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and choose Play Offline
 ```
 
-Nommez votre personnage, choisissez l'une des neuf classes, et vous démarrez à **Eastbrook Vale** (niveaux 1-7), une ville marchande entourée de pôles : les coulées de loups au nord, les prés de sangliers à l'est, les bois de Sableweb à l'ouest, Mirror Lake au nord-ouest, une mine de cuivre infestée de fouisseurs au sud-ouest, et une chapelle en ruine peuplée de morts agités au nord-est, avec le camp de bandits de Gorrak au sud-est. La route du nord grimpe par un col de montagne jusqu'à **Mirefen Marsh** (6-13, pôle Fenbridge) et continue jusqu'à **Thornpeak Heights** (13-20, pôle Highwatch). La graine du monde est fixée dans `src/main.ts`, c'est donc le même endroit à chaque visite.
+Nommez votre personnage, choisissez l'une des neuf classes, et vous démarrez à **Eastbrook Vale** (niveaux 1-7), une ville marchande entourée de pôles : les coulées de loups au nord, les prés de sangliers à l'est, les bois de Sableweb à l'ouest, Mirror Lake au nord-ouest, une mine de cuivre infestée de fouisseurs au sud-ouest, et une chapelle en ruine peuplée de morts agités au nord-est, avec le camp de bandits de Gorrak au sud-est. La route du nord grimpe par un col de montagne jusqu'à **Mirefen Marsh** (6-13, pôle Fenbridge) et continue jusqu'à **Thornpeak Heights** (13-20, pôle Highwatch). La graine du monde est fixée dans `src/sim/world_seed.ts`, c'est donc le même endroit à chaque visite.
 
 ### Applications de bureau pour Windows, Linux et macOS
 

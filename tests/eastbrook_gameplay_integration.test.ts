@@ -331,8 +331,52 @@ describe('Eastbrook authored gameplay data integration', () => {
       'weaver_ottilie',
       'tinker_gizzel',
     ]);
+    // Everything except pos/facing, hashed: the placement rebuild must not have
+    // touched any other NpcDef field. Re-minted deliberately when the gathered
+    // materials came off the station masters' vendorItems rows (the ruling that
+    // no NPC stocks a gathered material), which is a content change to this
+    // payload, not placement drift. Any UNEXPLAINED move here is the bug it
+    // was written to catch.
+    //
+    // Re-minted a second time when Eastbrook stopped stocking the tier-2 and
+    // tier-3 land tools, the hub rule that a zone sells the tiers its own
+    // nodes use (Eastbrook is entirely tier-1 ground). Exactly three of the 16
+    // payloads moved and all three moves are vendorItems rows: trader_wilkes
+    // (six tools dropped, both rods kept), forgemistress_darva (two picks
+    // dropped) and tinker_gizzel (four axes and sickles dropped). Nothing else
+    // in any def, and no placement field, changed. The three row assertions
+    // that follow re-check that those are still the rows this case owns.
+    // The three moved rows, asserted BEFORE the digest below so they actually
+    // run: a failing expect throws, so stating them after the hash meant they
+    // never evaluated in the one case they exist to describe. Ordered this way
+    // a drift in some OTHER field of some other NPC moves the hash while these
+    // three stay green, which is the diagnostic the digest alone cannot give.
+    expect(ZONE1_NPCS.trader_wilkes.vendorItems).toEqual([
+      'baked_bread',
+      'spring_water',
+      'roasted_boar',
+      'tough_jerky',
+      'minor_healing_potion',
+      'minor_mana_potion',
+      'linen_pouch',
+      'travelers_knapsack',
+      'copper_mining_pick',
+      'handaxe',
+      'gathering_sickle',
+      'ironreel_fishing_rod',
+      'silverstream_fishing_rod',
+    ]);
+    expect(ZONE1_NPCS.forgemistress_darva.vendorItems).toEqual([
+      'copper_mining_pick',
+      'smithing_flux',
+    ]);
+    expect(ZONE1_NPCS.tinker_gizzel.vendorItems).toEqual([
+      'handaxe',
+      'simple_fishing_pole',
+      'arcanite_bar',
+    ]);
     expect(createHash('sha256').update(JSON.stringify(stableTownNpcPayload())).digest('hex')).toBe(
-      '92c37779f6a29982ec3541169d995fc4365c9696a9b7a0e2fd32713094073db1',
+      '253d5927ed17e438faa5d66b57e031cc1ab3af61370b773e0d714bc3426226e8',
     );
     expect(ZONE1_TOWN_NPC_IDS).toHaveLength(15);
     for (const id of ZONE1_TOWN_NPC_IDS) {
@@ -821,7 +865,7 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
     const buyerMeta = sim.meta(first);
     if (!buyerMeta) throw new Error('missing buyer metadata');
     buyerMeta.copper = 10_000;
-    sim.buyItem(trader.id, 'baked_bread', first);
+    sim.buyItem(trader.id, 'baked_bread', undefined, first);
     expect(sim.countItem('baked_bread', first)).toBeGreaterThan(0);
 
     const marshal = npcEntity(sim, 'marshal_redbrook');

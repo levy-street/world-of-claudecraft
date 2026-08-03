@@ -17,6 +17,7 @@ import {
   activityQueueDepth,
   drainActivity,
   enqueueActivity,
+  MAX_RECENT_KEYS,
   type QueuedActivity,
   requeueActivity,
 } from '../../server/discord_activity';
@@ -168,10 +169,16 @@ describe('server activity queue: dedupe map sweep', () => {
     drainActivity();
   });
 
-  // 512 is a TRIGGER, not a hard cap: the sweep runs when the map grows past 512 but deletes
-  // ONLY entries whose age has reached the TTL, so an all-fresh population keeps growing past
-  // it. This test builds a mixed population so both halves of that claim are decidable, and it
-  // is the LAST block in the file because it leaves 600+ keys in the module-global map.
+  // MAX_RECENT_KEYS is a TRIGGER, not a hard cap: the sweep runs when the map grows past it
+  // but the expiry pass deletes ONLY entries whose age has reached the TTL, so a mixed
+  // population must lose exactly its expired members at the crossing. (The oldest-first
+  // overflow backstop BEHIND the expiry pass, for an all-live population at the cap, is
+  // pinned separately in tests/discord_activity_professions.test.ts.) This test builds a
+  // mixed population so the expiry half is decidable, and its probe order is load-bearing:
+  // a suppressed re-enqueue returns before touching the map, while an admitted one re-adds
+  // its key to a map sitting AT the cap and the backstop then evicts the oldest live entry,
+  // so every suppress-probe runs before the one admit-probe. It leaves 4096 keys in the
+  // module-global map, which is why it is the last dedupe block in the file.
   it('prunes only expired keys and leaves fresh ones (and the map) intact', () => {
     const OLD = 1_000_000;
     const FRESH = OLD + DEDUPE_TTL_MS; // ages the OLD stamp to exactly the TTL at sweep time
@@ -180,26 +187,31 @@ describe('server activity queue: dedupe map sweep', () => {
 
     enqueueActivity(activity(1), expiredKey, OLD); // age at FRESH is exactly TTL: eviction is >=
     enqueueActivity(activity(2), survivorKey, OLD + 1); // age at FRESH is TTL - 1: survives
-    // Enough fresh keys that the map is unambiguously past 512 whatever earlier blocks left in
-    // it, so the sweep genuinely fires rather than the test asserting over an untriggered path.
-    for (let i = 0; i < 600; i++) enqueueActivity(activity(3), `sweep-filler-${i}`, FRESH);
+    // MAX_RECENT_KEYS - 1 fresh fillers: with the two stamps above, the map crosses the
+    // trigger during this loop whatever earlier blocks left behind (their keys are ancient
+    // at FRESH, so the same expiry pass that drops expiredKey clears them), and after that
+    // one sweep the population sits at exactly the cap with no second crossing, so the
+    // backstop stays out of the arms below.
+    const fillers = MAX_RECENT_KEYS - 1;
+    for (let i = 0; i < fillers; i++) enqueueActivity(activity(3), `sweep-filler-${i}`, FRESH);
     drainActivity();
 
     // recentKeys is not exported, so removal and survival are proved BEHAVIOURALLY: a key that
-    // is gone gets admitted again, a key that is still there suppresses. The probe deliberately
-    // rewinds `now` to inside the expired key's original window, because that is the only point
-    // at which its eviction is observable at all (past its own expiry the TTL check would admit
+    // is gone gets admitted again, a key that is still there suppresses. The probes rewind
+    // `now` to inside the expired key's original window, because that is the only point at
+    // which its eviction is observable at all (past its own expiry the TTL check would admit
     // it either way, which would make the assertion constant-true).
-    enqueueActivity(activity(4), expiredKey, OLD + DEDUPE_TTL_MS - 1);
-    expect(activityQueueDepth()).toBe(1); // admitted, so the sweep really deleted it
-
     enqueueActivity(activity(5), survivorKey, OLD + DEDUPE_TTL_MS - 1);
-    expect(activityQueueDepth()).toBe(1); // still suppressed, so the sweep spared it
+    expect(activityQueueDepth()).toBe(0); // still suppressed, so the sweep spared it
 
-    // Both ends of the fresh population still suppress, so all 600 are still held: a sweep that
-    // pruned indiscriminately, or a hard 512-entry cap, would have dropped the earliest fillers.
+    // Both ends of the fresh population still suppress: a sweep that pruned indiscriminately
+    // at the crossing would have dropped the earliest fillers.
     enqueueActivity(activity(6), 'sweep-filler-0', FRESH + 1);
-    enqueueActivity(activity(7), 'sweep-filler-599', FRESH + 1);
+    enqueueActivity(activity(7), `sweep-filler-${fillers - 1}`, FRESH + 1);
+    expect(activityQueueDepth()).toBe(0);
+
+    // The admit-probe runs LAST (see the header): admitted, so the sweep really deleted it.
+    enqueueActivity(activity(4), expiredKey, OLD + DEDUPE_TTL_MS - 1);
     expect(activityQueueDepth()).toBe(1);
   });
 });

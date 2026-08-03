@@ -17,7 +17,7 @@ import { itemInstancePayloadsEqual } from '../sim/item_instance_merge';
 import type { InvSlot, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { markDialogRoot } from './dialog_root';
-import { itemDisplayName, tEntity } from './entity_i18n';
+import { itemDisplayName, knownLetterId, tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
 import { captureFormDraft, restoreFormDraft } from './form_draft';
@@ -284,12 +284,19 @@ export class MailboxWindow {
   }
 
   private senderLabel(row: MailInboxRow): string {
-    if (row.letterId) return tEntity({ kind: 'letter', id: row.letterId, field: 'sender' });
+    // Localized when THIS bundle ships the letter; an authored letter this
+    // bundle predates falls back to the WIRE-shipped English the server
+    // already sends beside the id (R34: raw ids are for ids, not prose).
+    if (row.letterId && knownLetterId(row.letterId)) {
+      return tEntity({ kind: 'letter', id: row.letterId, field: 'sender' });
+    }
     return row.senderName;
   }
 
   private subjectLabel(row: MailInboxRow): string {
-    if (row.letterId) return tEntity({ kind: 'letter', id: row.letterId, field: 'subject' });
+    if (row.letterId && knownLetterId(row.letterId)) {
+      return tEntity({ kind: 'letter', id: row.letterId, field: 'subject' });
+    }
     return row.subject.length > 0 ? row.subject : t('hudChrome.mailbox.noSubject');
   }
 
@@ -407,9 +414,10 @@ export class MailboxWindow {
   private renderReading(body: HTMLElement, opened: MailInboxRow & { body: string }): void {
     const sender = this.senderLabel(opened);
     const subject = this.subjectLabel(opened);
-    const letterBody = opened.letterId
-      ? tEntity({ kind: 'letter', id: opened.letterId, field: 'body' })
-      : opened.body;
+    const letterBody =
+      opened.letterId && knownLetterId(opened.letterId)
+        ? tEntity({ kind: 'letter', id: opened.letterId, field: 'body' })
+        : opened.body;
     body.innerHTML =
       `<div class="mail-reading">` +
       `<button type="button" class="mail-back" data-mail-back>${svgIcon('prev')}<span>${esc(t('hudChrome.mailbox.back'))}</span></button>` +

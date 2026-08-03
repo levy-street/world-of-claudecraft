@@ -109,7 +109,9 @@ describe('the one-time mastery reset through GameServer.join', () => {
     expect(meta.craftSkills.armorcrafting).toBe(0);
     expect(meta.craftSkills.cooking).toBe(0);
     expect(meta.gatheringProficiency.mining).toBe(0);
-    // The authoritative tick books the authored notice exactly once.
+    // The authoritative tick books the authored notice exactly once: the
+    // counter-gated sweep (phase 16) drains on the very NEXT tick, never a
+    // widened window a save-and-leave could lose the one-shot inside.
     server.sim.tick();
     expect(server.sim.mailUnreadFor(session.pid)).toBe(1);
     for (let i = 0; i < 40; i++) server.sim.tick();

@@ -48,9 +48,16 @@ volume is large, then regenerate once at the end.
 ## 3. Regenerate, verify
 
 1. `npm run i18n:gen` regenerates the resolved bundles and the status registry.
-2. **Stage the regenerated artifacts in the SAME commit as the fills.** The freshness gate
+2. **Biome-format every overlay file the fill touched** in the same change:
+   `npx @biomejs/biome check --write src/ui/i18n.locales/<touched>.ts ...`. CJK and other
+   wide-glyph fills blow the 100-column lineWidth silently (the line LOOKS short in an
+   editor but is over by bytes), and the changed-files biome gate then fails a later round
+   on a format diff you never saw (it cost the phase 13 closing gate its first round).
+   Note biome SIZE-SKIPS files over 1.0 MiB (ru_RU is there already): gate green is not
+   format evidence for those, and that is a known accepted state, not something to fix.
+3. **Stage the regenerated artifacts in the SAME commit as the fills.** The freshness gate
    diffs the regenerated output against the staged/committed copies; unstaged artifacts fail it.
-3. Prove completion: run the i18n steps release-tier,
+4. Prove completion: run the i18n steps release-tier,
    `I18N_RELEASE_TIER=1 npm run gate` (or at minimum `i18n:gen` + the guard tests), and
    confirm zero `pending` rows remain.
 

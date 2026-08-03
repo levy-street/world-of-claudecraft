@@ -92,7 +92,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and choose Play Offline
 ```
 
-Namnge din karaktär, välj någon av de nio klasserna, och du börjar i **Eastbrook Vale** (nivå 1-7), en marknadsstad omringad av nav: vargstråk i norr, vildsvinsängar i öster, Sableweb-skogarna i väster, Mirror Lake i nordväst, en burrower-drabbad koppargruva i sydväst och ett förfallet kapell med rastlösa döda i nordöst, med Gorraks banditläger i sydöst. Norra vägen klättrar uppför ett bergspass in i **Mirefen Marsh** (6-13, nav Fenbridge) och vidare upp till **Thornpeak Heights** (13-20, nav Highwatch). Världens seed är fast i `src/main.ts`, så det är samma plats vid varje besök.
+Namnge din karaktär, välj någon av de nio klasserna, och du börjar i **Eastbrook Vale** (nivå 1-7), en marknadsstad omringad av nav: vargstråk i norr, vildsvinsängar i öster, Sableweb-skogarna i väster, Mirror Lake i nordväst, en burrower-drabbad koppargruva i sydväst och ett förfallet kapell med rastlösa döda i nordöst, med Gorraks banditläger i sydöst. Norra vägen klättrar uppför ett bergspass in i **Mirefen Marsh** (6-13, nav Fenbridge) och vidare upp till **Thornpeak Heights** (13-20, nav Highwatch). Världens seed är fast i `src/sim/world_seed.ts`, så det är samma plats vid varje besök.
 
 ### Skrivbordsappar för Windows, Linux och macOS
 

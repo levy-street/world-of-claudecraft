@@ -1038,6 +1038,11 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // the same change so any future emit added here lands under the drift
     // guard from day one.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/item_instance_merge.ts'), 'utf8'),
+    // Phase 16: the load-side item-instance payload bound. Its only string is
+    // a dev-channel console.warn (never matched), but every new sim module
+    // joins the scan list in the same change so any future emit added here
+    // lands under the drift guard from day one.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/item_instance_load.ts'), 'utf8'),
     // Professions 2.0: the force-rename instance-signer sweep. It
     // emits no player text itself (pure signer bookkeeping the rename handler
     // consumes), but every new sim module joins the scan list in the same
@@ -1048,6 +1053,15 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // helpers (no SimContext, no emits), but every new sim module joins the scan
     // list in the same change so any future emit lands under the drift guard.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/cadence.ts'), 'utf8'),
+    // Professions 2.0: the shared displacement session teardown. It emits no
+    // player text itself (it delegates to ctx.cancelCast, whose castStop is
+    // text-free), but it takes a SimContext so ctx.error is one line away, and
+    // every new sim module joins the scan list in the same change.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/session_teardown.ts'), 'utf8'),
+    // Professions 2.0: the per-pair quested-hobby record (the tier_mail
+    // shape). It emits no player text itself, but every new sim module joins
+    // the scan list in the same change.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/hobby_memory.ts'), 'utf8'),
     // Professions 2.0: the tier-crossing master mail sweep. It emits no
     // inline player text (the congratulation is an authored letter in
     // content/letters.ts, localized by letterId through entity i18n), but every
@@ -1088,11 +1102,32 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // Mounts: the toggleMount/selectMount guard refusals and the ridingTrained
     // error (RIDING_UNTRAINED_MSG) that the riding-skill gate emits.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mounts.ts'), 'utf8'),
+    // Mount race: the 'Too far away.' start refusal. It localizes today only
+    // because the literal is byte-identical to an already-scanned emit; being
+    // in the corpus makes a reword fail HERE instead of shipping English.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mount_race.ts'), 'utf8'),
+    // Unstuck and escorts: no free-text emit today (unstuck refusals are the
+    // structured blocked event; escort lines ride quest text), scanned so a
+    // first literal added to either lands inside the gate, per this file's
+    // new-sim-module convention.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/unstuck.ts'), 'utf8'),
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/escort.ts'), 'utf8'),
     // Heroic anti-kite mob charge: the "unleashes" announce line (the mechanic
     // name doubles as the mob_charge_stun debuff, localized via AURA_NAME_KEY's
     // 'Charge' row like the other boss mechanics).
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/charge.ts'), 'utf8'),
     socialSrc,
+    // Whole-directory sweep (the phase 18 whole-branch review): EVERY
+    // src/sim/professions module is scanned, the same directory-glob treatment
+    // src/sim/social gets above, so a new module there (or a first emit added
+    // to one that predates this line: tool_effect_actions, fishing_zones,
+    // material_grades) sits under the drift guard from day one with no
+    // explicit entry. The per-file entries above are kept for their history
+    // notes; re-scanning a file only repeats a candidate, it cannot hide one.
+    socialSourceUnder(path.resolve(process.cwd(), 'src/sim/professions')),
+    // Quest-item presence probe (SimContext-holding, text-free today): the
+    // fourth module the whole-branch parity audit found outside the corpus.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/quests/quest_item_presence.ts'), 'utf8'),
   ].join('\n');
   // Hardened S3: also scan the authoritative server's player-facing emits. The
   // server (server/game.ts) is language-agnostic like the sim and re-localized

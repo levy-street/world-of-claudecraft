@@ -100,6 +100,25 @@ const charactersPage = {
   limit: 25,
 };
 
+const professionsSheet = {
+  characterId: 7,
+  name: 'Merlin',
+  class: 'mage',
+  level: 42,
+  accountId: 1,
+  username: 'alice',
+  live: false,
+  updatedAt: '2026-06-01T00:00:00Z',
+  preMigration: false,
+  archetype: { activeArchetype: null, pairedMajor: null, hobbyCraft: null },
+  gathering: [{ professionId: 'mining', proficiency: 12 }],
+  crafting: [{ craftId: 'alchemy', skill: 0, tier: 0 }],
+  knownRecipes: 0,
+  slots: [],
+  nodeTimers: [],
+  toolEffectIds: ['gatherers_cache'],
+};
+
 vi.mock('../../src/admin/api', () => ({
   ApiError: class ApiError extends Error {
     status: number;
@@ -112,6 +131,7 @@ vi.mock('../../src/admin/api', () => ({
     if (path.startsWith('/admin/api/accounts?')) return accountsPage;
     if (path === '/admin/api/accounts/1') return accountDetail;
     if (path.startsWith('/admin/api/characters?')) return charactersPage;
+    if (path === '/admin/api/characters/7/professions') return professionsSheet;
     throw new Error(`unexpected path ${path}`);
   }),
   apiPost: vi.fn(),
@@ -151,6 +171,17 @@ describe('Players pages', () => {
 
     await fireEvent.keyDown(window, { key: 'Escape' });
     await vi.waitFor(() => expect(accountLink).toHaveFocus());
+  });
+
+  it('opens the professions inspector modal from a character row', async () => {
+    grantPermissions();
+    render(Characters);
+    await screen.findByText('Merlin');
+    await fireEvent.click(screen.getByRole('button', { name: t('characters.professionsButton') }));
+    // The modal fetched the sheet and rendered its title: the row-to-modal
+    // wiring (inspected state -> CharacterProfessionsModal) is live.
+    expect(await screen.findByText(t('profInspect.title', { name: 'Merlin' }))).toBeInTheDocument();
+    expect((await screen.findAllByText('mining')).length).toBeGreaterThan(0);
   });
 
   it('renders the sortable characters directory', async () => {

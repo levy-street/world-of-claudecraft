@@ -2,9 +2,13 @@
 // main.ts behind an injected deps bag. These run in plain Node with no database
 // and no live server: ws_auth.ts imports only TYPES from ./db and ./game (erased
 // at compile time), so importing it never evaluates db.ts or main.ts. The only
-// runtime import beyond the module under test is the pure bufferHandshakeMessages.
+// runtime imports beyond the module under test are the pure
+// bufferHandshakeMessages and node:fs, which reads server/game.ts as TEXT (never
+// as a module) for the one cross-module contract pinned at the bottom.
 import { EventEmitter } from 'node:events';
+import * as fs from 'node:fs';
 import type * as http from 'node:http';
+import * as path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { WebSocket, WebSocketServer } from 'ws';
 import type { AccountModerationStatus, CharacterRow } from '../../server/db';
@@ -16,9 +20,22 @@ import { ONLINE_WORLD_AUTH_TYPE } from '../../src/world_api';
 // A fake socket: real EventEmitter wiring (on/once/off/emit) so the handshake
 // buffer and the post-join ws.on('message'|'close'|'error') handlers work, plus
 // spy send/close so we can assert the exact frames and their ordering.
+//
+// KNOWN FIDELITY LIMITS (fix-round audit; deliberate, comment so nobody
+// "fixes" a test into them unaware): close() is a bare spy and does NOT move
+// readyState, where real ws sets CLOSING synchronously, so an arm that wants
+// a dead socket must set readyState by hand; consequently every reject-path
+// case here leaves the socket OPEN and takes the flush's 'replay' branch,
+// where production takes 'discard' (harmless while reject paths attach no
+// message handler, but a regression that attached one there would not be
+// seen by these cases).
 class FakeWs extends EventEmitter {
   send = vi.fn();
   close = vi.fn();
+  // Mirrors the real ws instance constants the mid-handshake death re-check
+  // reads; OPEN by default so every existing case is unaffected.
+  readyState = 1;
+  OPEN = 1;
 }
 
 const asWs = (w: FakeWs): WebSocket => w as unknown as WebSocket;
@@ -157,6 +174,17 @@ function expectNoAdmissionWork({ deps, game }: ReturnType<typeof setup>): void {
 
 async function flushMicrotasks() {
   for (let i = 0; i < 20; i++) await Promise.resolve();
+}
+
+// server/game.ts cannot be imported here (it pulls in the database layer, and
+// running with none is this file's whole point), so the receiving half of the
+// socketClosed withMarket contract is pinned against its source text. Comments
+// are stripped first: a commented-out line leaves its text in place and would
+// keep a raw substring pin falsely green.
+function gameSourceCode(): string {
+  return fs
+    .readFileSync(path.resolve(process.cwd(), 'server/game.ts'), 'utf8')
+    .replace(/(^|[^:])\/\/.*$/gm, '$1');
 }
 
 describe('createWsAuth: authenticateWebSocket reject paths', () => {
@@ -1029,15 +1057,16 @@ describe('createWsAuth: onConnection', () => {
     errSpy.mockRestore();
   });
 
-  it('logs but sends no frame when the socket already closed during a rejected handshake', async () => {
+  it('logs but sends no frame when the socket closes during a rejected handshake', async () => {
     const { ws, deps, req } = setup();
+    // The socket is OPEN when the first frame lands (the pre-auth guard below
+    // owns the already-closed case) and dies while the handshake is in flight,
+    // so the rejection resolves against a socket that is no longer OPEN: the
+    // caller must not double-send onto a socket already torn down.
     deps.accountAndScopeForToken = vi.fn(async () => {
+      ws.readyState = 3; // CLOSED, mid-handshake
       throw new Error('db down');
     });
-    // Socket already closed (readyState CLOSED, not OPEN): the caller must not
-    // double-send onto a socket a reject path already tore down.
-    (ws as unknown as { readyState: number; OPEN: number }).readyState = 3;
-    (ws as unknown as { OPEN: number }).OPEN = 1;
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const { onConnection } = createWsAuth(deps);
     await onConnection(asWs(ws), req);
@@ -1048,6 +1077,110 @@ describe('createWsAuth: onConnection', () => {
     expect(ws.send).not.toHaveBeenCalled();
     expect(errSpy).toHaveBeenCalled();
     errSpy.mockRestore();
+  });
+
+  it('never starts a handshake for a first frame that arrives after the pre-auth reject', async () => {
+    const late = setup();
+    await createWsAuth(late.deps).onConnection(asWs(late.ws), late.req);
+    // The deadline fires: rejectHandshake sends its frame and closes the
+    // socket, which in the real ws leaves readyState CLOSING. The once-listener
+    // stays armed either way, so a slow client's first frame still arrives.
+    vi.advanceTimersByTime(10_000);
+    expectSendThenClose(late.ws, errorFrame('authentication timed out'));
+    late.ws.readyState = 2; // CLOSING
+    late.ws.emit('message', authRaw());
+    await flushMicrotasks();
+    // Not one step of the handshake ran on the rejected connection. Without the
+    // guard this frame buys the full ladder (token, moderation, character, the
+    // lease acquire, game.join), and the mid-handshake death re-check then
+    // hands the session it just created to socketClosed: a linkdead ghost
+    // holding a realm-cap slot and the character lease for the whole grace
+    // window, refusing the player's every re-login meanwhile.
+    expectNoAdmissionWork(late);
+    expect(late.ws.send).toHaveBeenCalledTimes(1); // no second frame either
+
+    // Negative arm, same sequence on a socket that is still OPEN when its late
+    // frame lands: the handshake DOES run, so the readyState guard is what
+    // stopped the case above, not the fired deadline.
+    const open = setup();
+    await createWsAuth(open.deps).onConnection(asWs(open.ws), open.req);
+    vi.advanceTimersByTime(10_000);
+    open.ws.emit('message', authRaw());
+    await flushMicrotasks();
+    expect(open.game.join).toHaveBeenCalledTimes(1);
+  });
+
+  it('a clean pre-auth close clears the deadline instead of firing it at a dead socket', async () => {
+    const closed = setup();
+    await createWsAuth(closed.deps).onConnection(asWs(closed.ws), closed.req);
+    // Exactly one pending timer: the 10s deadline onConnection just armed.
+    expect(vi.getTimerCount()).toBe(1);
+    closed.ws.emit('close');
+    // Cleared, not merely outrun: the client hung up before authenticating, so
+    // there is nothing left to time out.
+    expect(vi.getTimerCount()).toBe(0);
+    vi.advanceTimersByTime(60_000);
+    expect(closed.ws.send).not.toHaveBeenCalled();
+    expect(closed.ws.close).not.toHaveBeenCalled();
+
+    // Negative arm: without the close, the very same deadline still fires and
+    // rejects, so this pins the close listener rather than a disarmed timer.
+    const kept = setup();
+    await createWsAuth(kept.deps).onConnection(asWs(kept.ws), kept.req);
+    expect(vi.getTimerCount()).toBe(1);
+    vi.advanceTimersByTime(10_000);
+    expectSendThenClose(kept.ws, errorFrame('authentication timed out'));
+  });
+
+  it('discards handshake-buffered frames when the socket did not survive the handshake', async () => {
+    const { ws, game, deps, req } = setup();
+    // The socket dies during the handshake awaits. The join still lands and the
+    // re-check holds the session linkdead with its movement zeroed, so the
+    // frames captured meanwhile have no consumer: replaying them would push
+    // buffered input into a session nothing is driving, behind the re-check
+    // that just stopped it.
+    deps.adminRolesForAccount = vi.fn(async () => {
+      ws.readyState = 3; // CLOSED, mid-handshake
+      return null as { username: string; roles: string[] } | null;
+    });
+    const { onConnection } = createWsAuth(deps);
+    await onConnection(asWs(ws), req);
+
+    ws.emit('message', authRaw());
+    ws.emit('message', 'move-frame'); // captured by the handshake buffer
+    // Flushed twice: the buffer decision rides two more promise hops past
+    // game.join (the .catch, then the .finally).
+    await flushMicrotasks();
+    await flushMicrotasks();
+
+    expect(game.join).toHaveBeenCalledTimes(1);
+    expect(game.socketClosed).toHaveBeenCalledTimes(1);
+    // The decision HAS been made: the capture listener is off the socket, so
+    // only the permanent handler is left. Without this probe the assertion
+    // below would also pass on a flush that simply had not run yet.
+    expect(ws.listenerCount('message')).toBe(1);
+    // The permanent handler IS attached on this path, so a replay would reach
+    // handleMessage; nothing does.
+    expect(game.handleMessage).not.toHaveBeenCalled();
+  });
+
+  it('still replays handshake-buffered frames, in order, into a live session', async () => {
+    const { ws, game, session, deps, req } = setup();
+    const { onConnection } = createWsAuth(deps);
+    await onConnection(asWs(ws), req);
+
+    ws.emit('message', authRaw());
+    ws.emit('message', 'move-1');
+    ws.emit('message', 'move-2');
+    // Flushed twice for the same reason as the discard arm above.
+    await flushMicrotasks();
+    await flushMicrotasks();
+
+    // The live-socket path is byte-identical to before the discard arm: both
+    // captured frames reach the session, in arrival order.
+    const calls = game.handleMessage.mock.calls as unknown as unknown[][];
+    expect(calls.map((call) => call[1])).toEqual(['move-1', 'move-2']);
+    expect(calls.every((call) => call[0] === session)).toBe(true);
   });
 
   it('tears down quietly on a pre-auth socket error without throwing', async () => {
@@ -1119,5 +1252,103 @@ describe('createWsAuth: attachUpgrade', () => {
 
     expect(socket.destroy).toHaveBeenCalledTimes(1);
     expect(wss.handleUpgrade).not.toHaveBeenCalled();
+  });
+});
+
+describe('mid-handshake socket death cannot mint a permanent zombie session', () => {
+  // The phase 16 finding: a socket that dies during the handshake's awaits
+  // emits its close event BEFORE the post-join close handler exists, so the
+  // event is lost; the freshly-created session is then invisible to every
+  // reaper (not linkdead for the grace sweep, readyState not OPEN for the
+  // keepalive sweep, sendRaw drops its frames silently) while its lease
+  // heartbeat renews forever and planJoin refuses the character's every
+  // re-login. The re-check after the handlers are attached is the fix, and
+  // these arms are its decisive pins.
+  it('a socket already closed when the join lands is handed to socketClosed', async () => {
+    const s = setup();
+    const { authenticateWebSocket } = createWsAuth(s.deps);
+    // The socket dies while the handshake awaits are in flight: model the
+    // final state (the close event itself fired before any handler existed).
+    s.ws.readyState = 3; // CLOSED
+    await authenticateWebSocket(asWs(s.ws), authRaw(), s.req);
+    expect(s.game.join).toHaveBeenCalledTimes(1);
+    expect(s.game.socketClosed).toHaveBeenCalledTimes(1);
+    // The options bag rides this ONE call site (see the market-halves arm below).
+    expect(s.game.socketClosed).toHaveBeenCalledWith(s.session, s.ws, { withMarket: false });
+  });
+
+  it('a live socket is never pushed into linkdead by the re-check', async () => {
+    const s = setup();
+    const { authenticateWebSocket } = createWsAuth(s.deps);
+    await authenticateWebSocket(asWs(s.ws), authRaw(), s.req);
+    expect(s.game.join).toHaveBeenCalledTimes(1);
+    expect(s.game.socketClosed).not.toHaveBeenCalled();
+  });
+
+  it('a close AFTER the handlers attach rides the normal close handler, not the re-check', async () => {
+    const s = setup();
+    const { authenticateWebSocket } = createWsAuth(s.deps);
+    await authenticateWebSocket(asWs(s.ws), authRaw(), s.req);
+    expect(s.game.socketClosed).not.toHaveBeenCalled();
+    s.ws.readyState = 3;
+    s.ws.emit('close');
+    expect(s.game.socketClosed).toHaveBeenCalledTimes(1);
+    expect(s.game.socketClosed).toHaveBeenCalledWith(s.session, s.ws);
+  });
+
+  it('the re-check skips the market halves of the safety save; a real drop keeps them', async () => {
+    // The re-check fires exactly when the pool is exhausted, and socketClosed's
+    // safety flush defaults to the whole-realm market+mail transaction on the
+    // process-global market queue: one per dead handshake would feed back into
+    // the resource that killed them. A session that died mid-handshake
+    // processed ZERO input (game.join returns synchronously and the re-check
+    // runs before any message handling), so it cannot have touched the market
+    // or mail escrow and those halves are safely skipped.
+    const dead = setup();
+    dead.ws.readyState = 3;
+    await createWsAuth(dead.deps).authenticateWebSocket(asWs(dead.ws), authRaw(), dead.req);
+    expect(dead.game.socketClosed).toHaveBeenCalledWith(dead.session, dead.ws, {
+      withMarket: false,
+    });
+
+    // An ordinary dropped socket carries no options bag, so it keeps the
+    // default: that session played, and its bag flush must stay atomic with the
+    // Market escrow.
+    const dropped = setup();
+    const droppedAuth = createWsAuth(dropped.deps);
+    await droppedAuth.authenticateWebSocket(asWs(dropped.ws), authRaw(), dropped.req);
+    dropped.ws.readyState = 3;
+    dropped.ws.emit('close');
+    expect(dropped.game.socketClosed).toHaveBeenCalledWith(dropped.session, dropped.ws);
+    // The post-join socket-error path is the same contract.
+    const errored = setup();
+    const erroredAuth = createWsAuth(errored.deps);
+    await erroredAuth.authenticateWebSocket(asWs(errored.ws), authRaw(), errored.req);
+    errored.ws.emit('error', new Error('connection reset'));
+    expect(errored.game.socketClosed).toHaveBeenCalledWith(errored.session, errored.ws);
+  });
+
+  it('game.socketClosed threads withMarket through to the save (the receiving half)', () => {
+    // The arm above pins what ws_auth PASSES; without this, game.ts could
+    // ignore the option and the fix would be a no-op with every test green.
+    const gameSrc = gameSourceCode();
+    // Sliced to the socketClosed body: saveCharacter declares the same
+    // options shape, so a whole-file toContain would stay green if
+    // socketClosed lost its parameter (the fix-round audit caught the
+    // ambiguity).
+    const socketClosedStart = gameSrc.indexOf('\n  socketClosed(');
+    expect(socketClosedStart).toBeGreaterThan(-1);
+    const socketClosedBody = gameSrc.slice(
+      socketClosedStart,
+      gameSrc.indexOf('\n  }', socketClosedStart),
+    );
+    expect(socketClosedBody).toContain('opts: { withMarket?: boolean } = {}');
+    expect(socketClosedBody).toContain(
+      'this.saveCharacter(session, { withMarket: opts.withMarket ?? true })',
+    );
+    // The unconditional linkdead flush this replaced must not come back (the
+    // .catch suffix scopes the ban to that call site: the leave-path save,
+    // which is genuinely unconditional, is awaited and has no .catch).
+    expect(gameSrc).not.toContain('this.saveCharacter(session, { withMarket: true }).catch');
   });
 });

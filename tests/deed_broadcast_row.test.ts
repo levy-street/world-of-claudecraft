@@ -32,7 +32,7 @@ describe('deed broadcast row', () => {
     };
     const { row, toggle } = mount(seam);
     expect(row.querySelector('.set-name')?.textContent).toBe(
-      'Share deed unlocks with guild and friends',
+      'Share deed unlocks with guildmates and followers, and deed and masterwork cards with the Discord feed',
     );
     expect(toggle.disabled).toBe(true);
     expect(toggle.getAttribute('aria-busy')).toBe('true');
@@ -110,6 +110,8 @@ describe('deed broadcast row', () => {
   it('carries the accessible name on the toggle itself', async () => {
     const { toggle } = mount({ get: async () => true, set: async (v) => v });
     await settled();
-    expect(toggle.getAttribute('aria-label')).toBe('Share deed unlocks with guild and friends');
+    expect(toggle.getAttribute('aria-label')).toBe(
+      'Share deed unlocks with guildmates and followers, and deed and masterwork cards with the Discord feed',
+    );
   });
 });
