@@ -10,6 +10,31 @@
 | Phase 3 QA | Done (PASS-WITH-FOLLOWUPS) | 2026-08-02 | 2026-08-02 |
 | Phase 4: UI | Done | 2026-08-02 | 2026-08-02 |
 | Phase 4 QA (final, offers teardown) | Done (PASS-WITH-FOLLOWUPS) | 2026-08-02 | 2026-08-03 |
+| Pricing redesign (user-directed) | Done | 2026-08-03 | 2026-08-03 |
+
+## Pricing redesign (2026-08-03, user-directed)
+- [x] `GUILD_CREATION_FEE_COPPER` 100_000 -> 10_000 (1 gold); pure constant change,
+      reserve-at-gate machinery / refund arms / create_fee row untouched; every fee pin
+      and the server_i18n sample updated.
+- [x] The slot ladder is now 7 rungs (`GUILD_BANK_RUNG_SLOTS` / `GUILD_BANK_RUNG_PRICES`
+      / `GUILD_BANK_LADDER_POSITIONS`): a new guild's bank is UNOPENED (0 item slots,
+      treasury gold ops ungated); rung 0 (9g, PURSE-paid by the clicking officer) opens
+      it for 24 slots; rungs 1..6 are the unchanged treasury expansions (192g50s to 60
+      slots). `GUILD_BANK_BASE_SLOTS` and `GUILD_BANK_EXPANSION_PRICES` removed.
+      Sanitize floors purchasedSlots to a valid ladder position.
+- [x] Rung 0 gets its own `open_bank` ledger op (dispatch observer renames off the
+      BEFORE snapshot; sim delta union + revert arm + `bank_audit.mjs` shape checks and
+      treasury-replay exclusion). No new wire tokens and no GuildBankInfo field: the
+      client derives the unopened pane from `purchasedSlots === 0`.
+- [x] UI: `GuildBankViewModel` gained the 'unopened' kind (treasury as normal + the
+      "Open the guild bank" row with purse-shortfall marker + payer note; confirm
+      prompt); 5 new `hudChrome.bank.guildOpen*`/`guildPurseShort` keys with the five
+      non-Latin M16 fills; the bank window refresh signature reads the purse only while
+      unopened.
+- [x] Tests: ladder/fee/capacity pins rewalked; new rung-0 purse charge/refusal,
+      0-capacity deposit refusal, unopened holdings/disband, open_bank ledger + audit
+      rows, sanitize-floor sweep, and the UI unopened state (view + window + enablement
+      + purse-repaint).
 
 ## Phase 1 deliverables
 - [x] `src/sim/guild_bank.ts`: state type, constants (from state.md), capacity, sanitize,

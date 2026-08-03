@@ -38,20 +38,45 @@ Teardown of docs/guild-bank/ awaits the user's explicit confirmation.
   right trade. At most one reservation per character; a refund whose founder already left
   is logged loudly for operator compensation.
 - Ledger: same `bank_ledger` table, `container = 'guild'`, `container_id = guild id`, ops
-  `deposit_gold | withdraw_gold | deposit | withdraw | buy_slots | create_fee`.
+  `deposit_gold | withdraw_gold | deposit | withdraw | buy_slots | open_bank | create_fee`.
   Keep-forever retention re-affirmed with an explicit comment at the retention-sweep
   registration site in `server/main.ts` (it is the anti-dupe audit trail).
+- Purse-paid rung 0 (2026-08-03, user-directed pricing redesign): the guild bank is no
+  longer open by default. A new guild starts with a 0-slot bank; an officer OPENS it via
+  the existing `guild_bank_buy_slots` token (no new wire surface: the sim decides which
+  rung is next), paying rung 0's 90_000 copper from THEIR OWN PURSE, refusing purse-poor
+  with the existing 'Not enough money.' line. The dispatch observer renames the op to
+  `open_bank` (its own ledger op; `scripts/bank_audit.mjs` excludes it from the treasury
+  replay like create_fee and pins purchased_slots_after 24), and
+  `revertGuildBankDeltas`'s open_bank arm reverts ONLY the slot grant (never credits
+  the treasury: the purse charge rolled back with the dead session's character half).
+  Persistence shape unchanged (`purchasedSlots` already persists granted slots; the
+  sanitize floor onto ladder positions makes any pre-feature/old-ladder row load
+  sanely, and the no-row empty book now correctly means an UNOPENED bank). Item
+  deposit against the 0-capacity book refuses via the capacity check ('The guild bank
+  is full.'); an unopened bank with 0 treasury never blocks disband (the guard counts
+  copper and items only). UI: the Guild tab's 'unopened' view state renders the
+  treasury section as normal plus an "Open the guild bank" row (purse-shortfall
+  marker; enablement reads the PURSE for rung 0, the treasury for later rungs; the
+  window's refresh signature adds the purse ONLY while unopened).
 
 ## Constants (single source of truth for the plan; land in `src/sim/guild_bank.ts`)
-- `GUILD_CREATION_FEE_COPPER = 100_000` (10 gold).
-- `GUILD_BANK_BASE_SLOTS = 24` (revised 2026-08-03, user-directed: was 12; matches the
-  personal bank's free base).
+- `GUILD_CREATION_FEE_COPPER = 10_000` (1 gold; revised 2026-08-03, user-directed
+  pricing redesign: was 100_000/10g). Pure constant change: the reserve-at-gate
+  machinery, refund arms, and create_fee ledger row are untouched.
 - `GUILD_BANK_EXPANSION_SLOTS = 6`.
-- `GUILD_BANK_EXPANSION_PRICES = [25_000, 50_000, 100_000, 250_000, 500_000, 1_000_000]`
-  copper (2g50s, 5g, 10g, 25g, 50g, 100g; 192g50s total; max 60 slots; revised
-  2026-08-03 from the 440g/48-slot ladder). Price is ALWAYS a
-  table lookup indexed by purchased-expansion count, never client-supplied. Paid from the
-  treasury, not personal copper.
+- `GUILD_BANK_RUNG_SLOTS = [24, 6, 6, 6, 6, 6, 6]` and
+  `GUILD_BANK_RUNG_PRICES = [90_000, 25_000, 50_000, 100_000, 250_000, 500_000,
+  1_000_000]` copper (revised 2026-08-03, user-directed pricing redesign; supersedes
+  the separate `GUILD_BANK_BASE_SLOTS = 24` free base and the 6-entry
+  `GUILD_BANK_EXPANSION_PRICES`, both removed). A new guild's bank is UNOPENED
+  (0 item slots; treasury gold ops work from day one and are NOT gated on the
+  unlock): rung 0 (9g) OPENS the bank for the 24 base slots and is paid from the
+  CLICKING OFFICER'S OWN PURSE (one-click classic first-tab precedent); rungs 1..6
+  (2g50s..100g; 192g50s total) are the treasury-paid 6-slot expansions. Price is
+  ALWAYS a table lookup indexed by bought-rung count, never client-supplied.
+  `GUILD_BANK_LADDER_POSITIONS = [0, 24, 30, 36, 42, 48, 54, 60]` is the set of
+  valid purchasedSlots values; sanitize floors onto it (max 60 slots).
 - `GUILD_BANK_TREASURY_CAP = 1_000_000_000` copper (100,000 gold). Deposits that would
   exceed it are refused with an error, never truncated.
 
