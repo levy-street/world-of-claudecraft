@@ -646,6 +646,40 @@ describe('outbox channel routing', () => {
     expect(wired.marks).toEqual(['2026-07-31']);
   });
 
+  it('drops an unknown-kind activity item at the io seam, never posting an empty embed', async () => {
+    // buildActivityMessage answers null for a kind this build does not know (a
+    // newer server mid-deploy), and postActivity drops the null SILENTLY by
+    // design: the feed is at-most-once, so a drop loses a card, never state.
+    // The known item in the same batch still posts, so the drop is per item.
+    const wired = factoryIo(
+      CHANNELS,
+      envelope({
+        activity: {
+          items: [{ ...activityItem('Annthar'), kind: 'parade' as never }, activityItem('Bessa')],
+        },
+      }),
+    );
+    await runOutboxPoll(wired.io);
+    expect(wired.sent.map((s) => s.channelId)).toEqual(['activity-1']);
+    const embed = (wired.sent[0].payload.embeds as { title: string }[])[0];
+    expect(embed.title).toBe('Bessa hit level 20!');
+    expect(wired.errors).toEqual([]);
+
+    // The drop precedes the channel gate: with the activity channel UNSET, an
+    // unknown-kind item must fire neither the once-per-channel notice nor the
+    // per-item error report (a known item there does both, pinned elsewhere).
+    const unset = factoryIo(
+      { ...CHANNELS, activity: '' },
+      envelope({
+        activity: { items: [{ ...activityItem('Annthar'), kind: 'parade' as never }] },
+      }),
+    );
+    await runOutboxPoll(unset.io);
+    expect(unset.sent).toEqual([]);
+    expect(unset.missing).toEqual([]);
+    expect(unset.errors).toEqual([]);
+  });
+
   it('marks the announced day through the server client, by day string', async () => {
     const wired = factoryIo(CHANNELS, envelope({ winners: { days: [winnersDay('2026-07-30')] } }));
     await runOutboxPoll(wired.io);

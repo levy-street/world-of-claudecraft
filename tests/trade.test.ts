@@ -4,7 +4,11 @@
 // proves the trade logic is decoupled and exercises the swap, the guards, the
 // cancel path, and the updateTradesAndInvites invite-expiry + drift sweep.
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import * as bagsMod from '../src/sim/bags';
+import { ITEMS } from '../src/sim/data';
 import { canStackInstancePayloads } from '../src/sim/item_instance_merge';
 import type { SimContext } from '../src/sim/sim_context';
 import * as tradeMod from '../src/sim/social/trade';
@@ -240,13 +244,16 @@ describe('trade module (direct, no Sim)', () => {
         inv.push(slot);
       },
       // Merge-aware like the real Sim.addItemInstance (identical-payload
-      // stacking): byte-equal mergeable payloads share a stack up
-      // to the default cap of 20; everything else takes its own slot.
+      // stacking): byte-equal mergeable payloads share a stack up to the
+      // item's REAL cap (stackSizeOf: tools and charms cap at 1, so a charm
+      // copy always takes its own slot); everything else takes a fresh slot.
       addItemInstance: (itemId: string, inst: any, pid?: number) => {
         const inv = players.get(pid!).inventory;
         const target = inv.find(
           (s: any) =>
-            s.itemId === itemId && s.count < 20 && canStackInstancePayloads(s.instance, inst),
+            s.itemId === itemId &&
+            s.count < bagsMod.stackSizeOf(ITEMS[s.itemId]) &&
+            canStackInstancePayloads(s.instance, inst),
         );
         if (target) target.count += 1;
         else inv.push({ itemId, count: 1, instance: inst });
@@ -294,6 +301,213 @@ describe('trade module (direct, no Sim)', () => {
     // The bug this pins: a naive removeItem+addItem swap re-grants a PLAIN copy
     // and silently drops `instance`, destroying the enchant/signature/quality.
     expect(players.get(2).inventory[0].instance).toEqual(instance);
+  });
+
+  it('ships a foreign or unsigned charm copy before the seller: own self-signed goes last', () => {
+    // The copy-choice fix (the phase 12 QA hand-off): removePreferFungible
+    // used to walk highest-index-first signer-blind, so trading "one charm"
+    // could ship the seller's discount-bearing self-signed copy while a
+    // foreign copy sat beside it. Ayla (pid 1) holds her own signed copy
+    // ABOVE a foreign-signed one: the foreign copy must cross. Pinned on a
+    // real charm id: the predicate is scoped to use.type 'toolEffect'.
+    const selfSigned = { signer: 'Ayla' };
+    const foreign = { signer: 'Cedric' };
+    const { ctx, players } = makeInstancedTradeCtx(
+      [
+        { itemId: 'gatherers_cache', count: 1, instance: foreign },
+        { itemId: 'gatherers_cache', count: 1, instance: selfSigned },
+      ],
+      [],
+    );
+
+    tradeMod.tradeRequest(ctx, 2, 1);
+    tradeMod.tradeAccept(ctx, 2);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'gatherers_cache', count: 1 }], 0, 1);
+    tradeMod.tradeConfirm(ctx, 1);
+    tradeMod.tradeConfirm(ctx, 2);
+
+    expect(players.get(1).inventory).toHaveLength(1);
+    expect(players.get(1).inventory[0].instance).toEqual(selfSigned);
+    expect(players.get(2).inventory).toHaveLength(1);
+    expect(players.get(2).inventory[0].instance).toEqual(foreign);
+  });
+
+  it('a self-signed charm still ships when it is all the seller holds', () => {
+    // Deprioritized, never spared: the second pass takes it, so an offer the
+    // clamp accepted can never fail the removal.
+    const selfSigned = { signer: 'Ayla' };
+    const { ctx, players } = makeInstancedTradeCtx(
+      [{ itemId: 'gatherers_cache', count: 1, instance: selfSigned }],
+      [],
+    );
+
+    tradeMod.tradeRequest(ctx, 2, 1);
+    tradeMod.tradeAccept(ctx, 2);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'gatherers_cache', count: 1 }], 0, 1);
+    tradeMod.tradeConfirm(ctx, 1);
+    tradeMod.tradeConfirm(ctx, 2);
+
+    expect(players.get(1).inventory).toHaveLength(0);
+    expect(players.get(2).inventory).toHaveLength(1);
+    expect(players.get(2).inventory[0].instance).toEqual(selfSigned);
+  });
+
+  it('a two-charm offer drains the foreign copy first, then the self-signed remainder', () => {
+    // The two-pass partial fill: pass one takes the foreign copy, `left`
+    // carries into pass two, which finishes on the self-signed copy. Both
+    // cross in one transfer; the grants arm cannot under-ship.
+    const selfSigned = { signer: 'Ayla' };
+    const foreign = { signer: 'Cedric' };
+    const { ctx, players } = makeInstancedTradeCtx(
+      [
+        { itemId: 'gatherers_cache', count: 1, instance: selfSigned },
+        { itemId: 'gatherers_cache', count: 1, instance: foreign },
+      ],
+      [],
+    );
+
+    tradeMod.tradeRequest(ctx, 2, 1);
+    tradeMod.tradeAccept(ctx, 2);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'gatherers_cache', count: 2 }], 0, 1);
+    tradeMod.tradeConfirm(ctx, 1);
+    tradeMod.tradeConfirm(ctx, 2);
+
+    expect(players.get(1).inventory).toHaveLength(0);
+    const arrived = players.get(2).inventory.map((s: any) => s.instance);
+    // ORDER pinned, not membership (the fix-round review): charms land in
+    // distinct receiver slots in grant order, so a swapped pass pair would
+    // ship the self-signed copy first and this line reds.
+    expect(arrived).toEqual([foreign, selfSigned]);
+  });
+
+  it('signed NON-charm equipment keeps the plain highest-index walk (no deprioritization)', () => {
+    // The scope pin: crafting signs every rare-or-better output and every
+    // masterwork proc, and for equipment the seller's signature is the very
+    // thing the buyer trades for (a commission, a masterwork sale). The
+    // predicate must not reroute those: a non-toolEffect item ships
+    // highest-index-first exactly as before, self-signed included.
+    const selfSigned = { signer: 'Ayla', rolled: { power: 3 } };
+    const foreign = { signer: 'Cedric' };
+    const { ctx, players } = makeInstancedTradeCtx(
+      [
+        { itemId: 'wolf_fang', count: 1, instance: foreign },
+        { itemId: 'wolf_fang', count: 1, instance: selfSigned },
+      ],
+      [],
+    );
+
+    tradeMod.tradeRequest(ctx, 2, 1);
+    tradeMod.tradeAccept(ctx, 2);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 1 }], 0, 1);
+    tradeMod.tradeConfirm(ctx, 1);
+    tradeMod.tradeConfirm(ctx, 2);
+
+    // Highest index first: the freshly-signed self copy crosses, the foreign
+    // one stays, the pre-deprioritize order for everything but charms.
+    expect(players.get(1).inventory).toHaveLength(1);
+    expect(players.get(1).inventory[0].instance).toEqual(foreign);
+    expect(players.get(2).inventory).toHaveLength(1);
+    expect(players.get(2).inventory[0].instance).toEqual(selfSigned);
+  });
+
+  it('charm copies never merge (stack 1): the premise that keeps the two-pass capacity-neutral', () => {
+    // The load-bearing premise of the coupling closure: charms are kind
+    // 'tool' (stack size 1), so EVERY arriving charm copy costs exactly one
+    // fresh receiver slot regardless of which signer's copy the two-pass
+    // ships, and the copy-choice order cannot move a swap across the
+    // capacity boundary. If this pin ever fails (a future stackable charm),
+    // the fitsAfterSwap mirror stops being defence-in-depth and becomes
+    // load-bearing: re-derive the mergeable-payload overflow scenario before
+    // widening anything.
+    expect(bagsMod.stackSizeOf(ITEMS.gatherers_cache)).toBe(1);
+    expect(bagsMod.stackSizeOf(ITEMS.artisans_eye)).toBe(1);
+
+    // And behaviorally: a receiver holding a byte-equal same-signer stack
+    // still absorbs the arrival into its OWN slot, never a merge.
+    const foreign = { signer: 'Cedric' };
+    const { ctx, players } = makeInstancedTradeCtx(
+      [{ itemId: 'gatherers_cache', count: 1, instance: foreign }],
+      [{ itemId: 'gatherers_cache', count: 1, instance: { signer: 'Cedric' } }],
+    );
+    tradeMod.tradeRequest(ctx, 2, 1);
+    tradeMod.tradeAccept(ctx, 2);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'gatherers_cache', count: 1 }], 0, 1);
+    tradeMod.tradeConfirm(ctx, 1);
+    tradeMod.tradeConfirm(ctx, 2);
+    const stacks = players.get(2).inventory.filter((s: any) => s.itemId === 'gatherers_cache');
+    expect(stacks).toHaveLength(2);
+    expect(stacks.every((s: any) => s.count === 1)).toBe(true);
+  });
+
+  it('refuses a charm swap into a full receiver: one slot per copy, both walk orders agree', () => {
+    // Capacity arm over the deprioritized item class: the receiver is at
+    // full capacity, and since a charm arrival always needs a fresh slot
+    // (premise pin above), the model must refuse whichever copy the
+    // two-pass would ship.
+    const selfSigned = { signer: 'Ayla' };
+    const foreign = { signer: 'Cedric' };
+    const receiverInv = Array.from({ length: 16 }, (_, i) => ({
+      itemId: `filler_${i}`,
+      count: 1,
+    }));
+    const { ctx, players, events } = makeInstancedTradeCtx(
+      [
+        { itemId: 'gatherers_cache', count: 1, instance: selfSigned },
+        { itemId: 'gatherers_cache', count: 1, instance: foreign },
+      ],
+      receiverInv,
+    );
+    expect(players.get(2).inventory).toHaveLength(16);
+
+    tradeMod.tradeRequest(ctx, 2, 1);
+    tradeMod.tradeAccept(ctx, 2);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'gatherers_cache', count: 1 }], 0, 1);
+    tradeMod.tradeConfirm(ctx, 1);
+    tradeMod.tradeConfirm(ctx, 2);
+
+    expect(players.get(2).inventory).toHaveLength(16);
+    expect(players.get(1).inventory).toHaveLength(2);
+    expect(events.some((e) => e.type === 'error' && /not enough bag space/.test(e.text))).toBe(
+      true,
+    );
+  });
+
+  it('fitsAfterSwap consumes the SAME predicate and two-pass order as the removal (source pin)', () => {
+    // No behavioral arm can separate the model from the removal today (the
+    // premise pin above: charm arrivals are slot-per-copy, so order cannot
+    // move the capacity boundary), so the drift guard is structural: the
+    // model must build its walk from the same predicate definition and run
+    // the deprioritized pass. Comment-stripped so prose cannot satisfy it.
+    const src = readFileSync(join(__dirname, '../src/sim/social/trade.ts'), 'utf8').replace(
+      /\/\/[^\n]*|\/\*[\s\S]*?\*\//g,
+      '',
+    );
+    const start = src.indexOf('const fitsAfterSwap = (');
+    expect(start).toBeGreaterThan(-1);
+    const end = src.indexOf('fitsAfterSwap(metaA', start);
+    expect(end).toBeGreaterThan(start);
+    const body = src.slice(start, end);
+    expect(body).toContain('sellerSignedCharmDeprioritize(');
+    expect(body).toContain('ctx.resolve(giver.entityId)?.meta.name');
+    // The preferred pass runs BEFORE the deprioritized one, and the second
+    // pass stays guarded on a real remainder (the fix-round review: two
+    // independent toContains passed with the passes swapped).
+    expect(body.indexOf('modelPass(false)')).toBeGreaterThan(-1);
+    expect(body.indexOf('modelPass(false)')).toBeLessThan(body.indexOf('modelPass(true)'));
+    expect(body).toContain('deprioritize && remaining > 0 && !modelPass(true)');
+    expect(body).toContain('(deprioritize?.(g.instance) ?? false) !== takeDeprioritized');
+  });
+
+  it('sellerSignedCharmDeprioritize scopes to charms and a resolved seller name', () => {
+    // The predicate builder is the single definition both removeOffer and
+    // fitsAfterSwap consume; its three refusal arms are the scope contract.
+    expect(tradeMod.sellerSignedCharmDeprioritize(undefined, 'gatherers_cache')).toBeUndefined();
+    expect(tradeMod.sellerSignedCharmDeprioritize('Ayla', 'wolf_fang')).toBeUndefined();
+    const pred = tradeMod.sellerSignedCharmDeprioritize('Ayla', 'gatherers_cache');
+    expect(pred).toBeDefined();
+    expect(pred?.({ signer: 'Ayla' })).toBe(true);
+    expect(pred?.({ signer: 'Cedric' })).toBe(false);
+    expect(pred?.({})).toBe(false);
   });
 
   it('rejects a trade that would push the receiver over bag capacity via an instanced grant', () => {

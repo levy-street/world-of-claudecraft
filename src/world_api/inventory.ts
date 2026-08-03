@@ -1,5 +1,6 @@
 import type { PlayerEquipmentInstances } from '../sim/entity';
 import type { EquipSlot, InvSlot, ItemInstancePayload } from '../sim/types';
+import type { VendorBuyOptions } from '../sim/vendor_buy_stack';
 
 export interface IWorldInventory {
   inventory: InvSlot[];
@@ -29,12 +30,15 @@ export interface IWorldInventory {
   unequipBag(socket: number): void;
   useItem(itemId: string): void;
   discardItem(itemId: string, count?: number): void;
-  // `bulk` requests as many units as the buyer can currently afford in one
-  // purchase, capped at the item's bag stack size (VendorGoodsRow.bulkQuantity
-  // previews the count); the server re-derives and validates the final quantity
-  // (bulkBuyQuantity), never trusting the client's math. Omitted/false buys the
-  // ordinary single unit (or the food/drink staple stack), byte-identical to today.
-  buyItem(npcId: number, itemId: string, bulk?: boolean): void;
+  // The request rides an options bag (VendorBuyOptions, phase 21): `bulk`
+  // requests as many units as the buyer can currently afford in one purchase,
+  // capped at the item's bag stack size (VendorGoodsRow.bulkQuantity previews
+  // the count); `count` buys that many row units atomically, refuse-whole on
+  // any shortfall. The server re-derives and validates every quantity
+  // (vendor_buy_stack.ts), never trusting the client's math; the client sends
+  // at most one of the two fields. An empty/omitted bag buys the ordinary
+  // single unit (or the food/drink staple stack), byte-identical to today.
+  buyItem(npcId: number, itemId: string, opts?: VendorBuyOptions): void;
   sellItem(itemId: string, count?: number): void;
   // Sell every gray (poor-quality) item in the bags at once while a vendor is open.
   // Quest items and anything flagged noVendorSell are left untouched.

@@ -219,6 +219,41 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     document.body.appendChild(label);
     expectAtLeastFloor(select, '.qd-profession-choice select');
   });
+
+  it('the tool-effect slot/recharge buttons (the acquisition-craft row)', () => {
+    // Floor rule under test: body.mobile-touch .prof-effect-btn (hud.mobile.css),
+    // the class-scoped twin of the @media (pointer: coarse) rule this
+    // fine-pointer context can never match. Representative text: an empty
+    // flex button collapses to its padding and would not reflect lived size.
+    const btn = el('button', { class: 'btn prof-effect-btn' });
+    btn.textContent = 'Recharge (12c)';
+    document.body.appendChild(btn);
+    expectAtLeastFloor(btn, '.prof-effect-btn');
+  });
+
+  it('the "Ask each use" mode checkbox label (R40)', () => {
+    // The label IS the target (it wraps the checkbox); the floor must render
+    // on the label box, which a CSS-text scan cannot show.
+    const toggle = el('label', { class: 'prof-effect-mode-toggle' });
+    const box = el('input', { type: 'checkbox' });
+    toggle.appendChild(box);
+    toggle.appendChild(document.createTextNode(' Ask each use'));
+    document.body.appendChild(toggle);
+    expectAtLeastFloor(toggle, '.prof-effect-mode-toggle');
+  });
+
+  it('the per-use confirm dialog actions (R40 confirmToolEffectUse)', () => {
+    // The R40 dialog made #confirm-dialog a routine mobile surface; its
+    // action buttons carry the same 40px floor, scoped under the dialog id.
+    const dialog = el('div', { id: 'confirm-dialog' });
+    const actions = el('div', { class: 'cd-actions' });
+    const ok = el('button', { class: 'btn' });
+    ok.textContent = 'Spend a charge';
+    actions.appendChild(ok);
+    dialog.appendChild(actions);
+    document.body.appendChild(dialog);
+    expectAtLeastFloor(ok, '#confirm-dialog .cd-actions .btn');
+  });
 });
 
 // Desktop (fine-pointer, non-mobile) target-size: the dense list controls the WCAG row

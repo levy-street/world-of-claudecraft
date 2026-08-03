@@ -92,6 +92,8 @@ function harness(inventory: InvSlot[], guildTab: boolean): Harness {
     isTouchHud: () => false,
     markEquipDropTargets: noop,
     dropOnEquipSlot: noop,
+    dropOnActionSlot: noop,
+    dropOnActionRingSlot: noop,
     openItemActionMenu: noop,
   };
   new BagsWindow(deps).render();

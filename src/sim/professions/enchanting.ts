@@ -74,7 +74,7 @@ import {
 } from '../types';
 import { recordAction, withinActionThrottle } from './action_throttle';
 import { enchantingGainMultiplier } from './archetype';
-import { typedSecondaryFor } from './disenchant_reagents';
+import { DISENCHANT_MATERIAL_BY_QUALITY, typedSecondaryFor } from './disenchant_reagents';
 import { gainCraftSkill } from './wheel';
 
 // #1712 round-3 review: neither action previously called gainCraftSkill, so
@@ -114,19 +114,12 @@ const QUALITY_ORDER: readonly NonNullable<ItemDef['quality']>[] = [
   'legendary',
 ];
 
-// Which arcane material a disenchant yields, keyed by the disenchanted
-// item's rarity: a dedicated Enchanting material rather than a shared junk
-// item, feeding the same three tiers applyEnchant's reagents draw from. Only
-// strictly better than plain salvage.ts's generic yield from `rare` up
-// (arcane_dust and bone_fragments vendor near-identically at `common`; see
-// #1712 round-3 review point 12).
-export const DISENCHANT_MATERIAL_BY_QUALITY: Readonly<Record<string, string>> = {
-  common: 'arcane_dust',
-  uncommon: 'arcane_dust',
-  rare: 'arcane_essence',
-  epic: 'arcane_shard',
-  legendary: 'arcane_shard',
-};
+// The universal arcane ladder now lives in the disenchant_reagents.ts pure
+// leaf (R39 made it a two-consumer table: the disenchant yield here AND the
+// tool-effect recharge price in tools.ts, which as a pure leaf must not
+// import this SimContext module). Re-exported so this module stays the
+// enchanting-facing home every existing importer knows.
+export { DISENCHANT_MATERIAL_BY_QUALITY };
 
 /** The authoritative already-enchanted read for one instance payload: the
  *  explicit `enchant` marker (written by resolveApplyEnchant below), or, for

@@ -29,6 +29,23 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
   { method: 'GET', pattern: '/admin/api/perf/tick', permission: 'ops.perf' },
   { method: 'POST', pattern: '/admin/api/perf/tick/capture', permission: 'ops.perf' },
   { method: 'GET', pattern: '/admin/api/characters', permission: 'accounts.read' },
+  // R35 GM professions tooling: the inspector is a read; the two restores
+  // mint value onto a character, so they carry the audited-write permission.
+  {
+    method: 'GET',
+    pattern: /^\/admin\/api\/characters\/(\d+)\/professions$/,
+    permission: 'accounts.read',
+  },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/moderation\/characters\/(\d+)\/restore-item$/,
+    permission: 'moderation.act',
+  },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/moderation\/characters\/(\d+)\/restore-slot$/,
+    permission: 'moderation.act',
+  },
   { method: 'GET', pattern: '/admin/api/guilds', permission: 'accounts.read' },
   { method: 'GET', pattern: /^\/admin\/api\/guilds\/(\d+)$/, permission: 'accounts.read' },
   {

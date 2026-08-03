@@ -11,6 +11,7 @@ import {
   waterBodies,
   waterLevelAt,
 } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 import { mapCanvasHeight, paintTerrainRows } from '../src/ui/map_terrain';
 
 // #1518: water height must be terrain/feature-aware (declared lakes only), not
@@ -18,7 +19,7 @@ import { mapCanvasHeight, paintTerrainRows } from '../src/ui/map_terrain';
 // feature outside every declared lake must stay dry and walkable no matter how
 // deep it goes.
 
-const SEED = 20061; // matches the deep-lake-cell seed used in pathfind.test.ts
+const SEED = WORLD_SEED; // matches the deep-lake-cell seed used in pathfind.test.ts
 // Open ground in zone 1, well clear of the built-in lake (-92, 88, r30) and
 // clear of static colliders.
 const DRY_SPOT = { x: 30, z: 40 };

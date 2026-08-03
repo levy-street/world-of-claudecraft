@@ -149,6 +149,37 @@ export async function discordForAccount(
   return res.rows[0] ?? null;
 }
 
+/** The activity drain reads exactly these three columns; the projection is
+ *  deliberately NARROWER than DiscordLinkRow so the per-poll batch never
+ *  hauls emails or guild metadata into the feed path. */
+export interface DiscordTagRow {
+  account_id: number;
+  discord_user_id: string;
+  discord_avatar: string | null;
+}
+
+/**
+ * Batched form of discordForAccount for the activity drain: ONE query over
+ * the distinct account ids of a drained batch instead of a sequential
+ * per-participant lookup (most players are unlinked, so the N+1 mostly
+ * fetched nulls). Missing ids are simply absent from the map. Projects only
+ * the tag columns the drain renders (never discord_email).
+ */
+export async function discordForAccounts(
+  pool: Pool,
+  accountIds: readonly number[],
+): Promise<Map<number, DiscordTagRow>> {
+  const out = new Map<number, DiscordTagRow>();
+  if (accountIds.length === 0) return out;
+  const res = await pool.query(
+    `SELECT account_id, discord_user_id, discord_avatar
+       FROM discord_links WHERE account_id = ANY($1::int[])`,
+    [[...new Set(accountIds)]],
+  );
+  for (const row of res.rows) out.set(row.account_id, row);
+  return out;
+}
+
 /**
  * The subset of a link row the batched read below selects: the identity the outbox
  * drain enriches items with, and nothing else. It is deliberately NOT the full
@@ -166,8 +197,9 @@ export type DiscordOutboxLinkRow = Pick<
  * Called by the consolidated outbox drain (GET /internal/discord/outbox,
  * server/internal.ts), which resolves every drained relay issuer, activity
  * participant and link-change account to its Discord identity in one pass. The
- * per-item discordForAccount the relay and activity GETs run costs one round trip
- * per ITEM, and a full drain carries thousands; collapsing that N+1 into a single
+ * per-item discordForAccount the relay GET still runs costs one round trip per
+ * ITEM (the activity GET batches its own read via discordForAccounts above),
+ * and a full drain carries thousands; collapsing that N+1 into a single
  * statement is invariant D1.
  *
  * discord_email is NOT selected, and that is the one deliberate difference from

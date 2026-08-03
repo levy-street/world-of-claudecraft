@@ -8,6 +8,7 @@ import {
   createDiscordPendingLogin,
   type DiscordMemberMetaRecord,
   discordFlexRowsForDiscordIds,
+  discordForAccounts,
   discordIdsWithGuildFlair,
   discordLinksForAccounts,
   grantRewardPoints,
@@ -1005,6 +1006,59 @@ describe('discord pending logins', () => {
     expect(live.didRun('DELETE FROM discord_pending_logins')).toBe(true);
     const dead = makePool(() => NONE);
     expect(await consumeDiscordPendingLogin(dead.pool, 'tok')).toBeNull();
+  });
+});
+
+describe('discordForAccounts (the activity drain batch)', () => {
+  const linkRow = (id: number) => ({
+    account_id: id,
+    discord_user_id: `d${id}`,
+    discord_avatar: null,
+  });
+
+  it('issues ONE ANY(int[]) query over the deduplicated id set', async () => {
+    const { pool, calls } = makePool((s, params) =>
+      s.includes('FROM discord_links')
+        ? { rows: (params[0] as number[]).map(linkRow), rowCount: params[0].length }
+        : NONE,
+    );
+    const out = await discordForAccounts(pool, [7, 7, 3, 7, 3]);
+    expect(calls).toHaveLength(1);
+    // The load-bearing SQL shape: a single array-bound filter, never an
+    // interpolated list and never one query per id.
+    expect(calls[0].sql).toContain('WHERE account_id = ANY($1::int[])');
+    // Duplicate ids collapse BEFORE the query (the drain hands one id per
+    // participant, and a raid card repeats accounts).
+    expect(calls[0].params[0]).toEqual([7, 3]);
+    expect(out.get(7)?.discord_user_id).toBe('d7');
+    expect(out.get(3)?.discord_user_id).toBe('d3');
+  });
+
+  it('projects only the tag columns (never discord_email)', async () => {
+    const { pool, calls } = makePool((s, params) =>
+      s.includes('FROM discord_links')
+        ? { rows: (params[0] as number[]).map(linkRow), rowCount: 1 }
+        : NONE,
+    );
+    await discordForAccounts(pool, [5]);
+    expect(calls[0].sql).toContain('SELECT account_id, discord_user_id, discord_avatar FROM');
+    expect(calls[0].sql).not.toContain('discord_email');
+  });
+
+  it('an empty id list short-circuits with ZERO queries (the idle poll)', async () => {
+    const { pool, calls } = makePool(() => NONE);
+    const out = await discordForAccounts(pool, []);
+    expect(out.size).toBe(0);
+    expect(calls).toHaveLength(0);
+  });
+
+  it('keys the result map by account_id; unlinked ids are simply absent', async () => {
+    const { pool } = makePool((s) =>
+      s.includes('FROM discord_links') ? { rows: [linkRow(9)], rowCount: 1 } : NONE,
+    );
+    const out = await discordForAccounts(pool, [9, 10]);
+    expect(out.get(9)?.account_id).toBe(9);
+    expect(out.has(10)).toBe(false);
   });
 });
 

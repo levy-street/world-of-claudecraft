@@ -106,6 +106,11 @@ const FANOUT_ARMS: readonly string[] = [
   'this.bankWindow.render|this.bankWindow.isOpen',
   'this.deedsWindow.render|this.deedsWindow.isOpen',
   'this.professionsWindow.render|this.professionsWindow.isOpen',
+  // The crafting window's repaint memos are all text-independent (station
+  // set, reagent sig, profession surface sig), so an open window kept the
+  // previous locale until data moved; the forced rebuild re-runs every t(),
+  // identity card included (the phase 22 QA arm).
+  "this.renderCrafting|$('#crafting-window').style.display === 'flex'",
   'this.updateDeedTracker|',
   'this.charWindow.renderIfOpen|',
   'this.arenaWindow.relocalize|',
@@ -258,9 +263,9 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'hud/quest/quest_dialog_controller.ts',
-    memos: ['lastIntroHintVisible'],
+    memos: ['lastGossipRowSig', 'lastIntroHintVisible'],
     answer: 'this.questDialog.relocalize',
-    why: 'the profession intro hint visibility latch',
+    why: 'the profession intro hint visibility latch, and the offerable-row signature (quest ids and marker kinds, text-independent by design; the phase 23 cadence-lapse watch)',
   },
   {
     file: 'hud/rift/rift_floor_tracker_controller.ts',

@@ -7,9 +7,10 @@
 // tests/bank_view.test.ts. Mirrors the bags_view / mailbox_view pure-core split.
 
 import { BANK_EXPANSION_SLOTS, moveBetweenContainers } from '../sim/bank';
+import { isMaterialItem } from '../sim/material_taxonomy';
 import { cloneInvSlot, type InvSlot, type ItemInstancePayload } from '../sim/types';
 import type { BankInfo } from '../world_api';
-import { type ItemLookup, matchesCategory } from './bag_filter';
+import type { ItemLookup } from './bag_filter';
 import { bagQualityKey } from './bags_view';
 
 /** The item facts the bank grid needs from the item table: just the quality, so
@@ -183,8 +184,11 @@ export interface DepositAllPlan {
  *  capacity + stacking + instanced-slot behavior is byte-identical to what the server
  *  resolves, then returns the ordered sends the caller replays via bankDeposit.
  *
- *  Selection: every fungible OR instanced material stack (matchesCategory 'material' =
- *  junk/tool), NEVER a quest item (excluded by matchesCategory and re-guarded here).
+ *  Selection: every fungible OR instanced honest-material stack (isMaterialItem, the
+ *  derived taxonomy in src/sim/material_taxonomy.ts: node yields, grades, harvest
+ *  components, specimens, salvage returns, junk-kind reagents), NEVER a quest item
+ *  (kind-tool implements, grey trash, and trophies are excluded by the taxonomy; the
+ *  quest guard here is the belt to that suspenders).
  *  Each send is a WHOLE-stack deposit (the sim's all-or-nothing rule): a stack that
  *  does not FULLY fit is skipped, not partially deposited, and sets `full`. Partial
  *  deposits would have to re-derive the sim's countFit stacking math, which this must
@@ -212,8 +216,8 @@ export function planDepositAllMaterials(
     const slot = invClone[i];
     const item = lookup(slot.itemId);
     if (!item) continue; // unknown id: not a known material, leave it in the bags
-    if (item.kind === 'quest') continue; // never bank quest items (matchesCategory also excludes them)
-    if (!matchesCategory(item, 'material')) continue;
+    if (item.kind === 'quest') continue; // never bank quest items (the taxonomy also excludes them)
+    if (!isMaterialItem(item)) continue;
     const count = slot.count;
     const result = moveBetweenContainers(invClone, i, count, bankClone, capacity);
     if (result.refusal === 'no_fit') {
@@ -245,15 +249,15 @@ export function depositAllSummaryKey(
   return 'hudChrome.bank.depositAllDone';
 }
 
-/** True when the carried inventory holds at least one depositable material stack (a
- *  junk/tool item, never a quest item, which matchesCategory('material') excludes):
- *  the deposit-all button's enabled state. */
+/** True when the carried inventory holds at least one depositable material stack (an
+ *  honest material per isMaterialItem; tools, grey trash, trophies, and quest items
+ *  are all outside the taxonomy): the deposit-all button's enabled state. */
 export function hasDepositableMaterials(
   inventory: readonly InvSlot[],
   lookup: ItemLookup,
 ): boolean {
   return inventory.some((s) => {
     const item = lookup(s.itemId);
-    return !!item && matchesCategory(item, 'material');
+    return !!item && isMaterialItem(item);
   });
 }

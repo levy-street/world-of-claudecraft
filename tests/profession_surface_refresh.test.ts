@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { GATHERING_PROFESSION_IDS } from '../src/sim/content/professions';
+import { GATHERING_PROFESSION_IDS, GATHERING_PROFESSIONS } from '../src/sim/content/professions';
 import type { GatheringProficiencyRow } from '../src/ui/gathering_view';
 import { professionSurfaceRefreshSig } from '../src/ui/profession_identity_view';
 import type { CraftingIdentityView } from '../src/world_api/professions';
@@ -30,6 +30,7 @@ function gathering(values: Partial<Record<string, number>> = {}): GatheringProfi
     professionId,
     value: values[professionId] ?? 0,
     displayValue: Math.floor(values[professionId] ?? 0),
+    maxSkill: GATHERING_PROFESSIONS[professionId].maxSkill,
   }));
 }
 

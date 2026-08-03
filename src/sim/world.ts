@@ -29,6 +29,7 @@ import {
   WORLD_MIN_Z,
   worldXBoundsAt,
   ZONES,
+  zoneAt,
 } from './data';
 import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
 import { dungeonFloorLift } from './dungeon_floor';
@@ -2024,7 +2025,7 @@ export const EMBER_VOLCANOES = [
 // padK: where the flat melt floor ends, as a fraction of r. The default 0.95
 // keeps the whole model footprint on level ground; the Drakemaw vent keeps
 // the original tight eye (0.55) because its shore is the escape bench's
-// wade-out ramp (DRAKEMAW_ESCAPE), pinned by tests/terrain_escape.test.ts.
+// wade-out ramp (DRAKEMAW_ESCAPE), pinned by tests/terrain_escape_walkout.test.ts.
 export const EMBER_LAVA_POOLS = [
   { x: 390, z: 2320, r: 14, floor: 12, padK: 0.55 }, // the vent inside the Drakemaw crater
   { x: 446, z: 2220, r: 11, floor: -0.5 },
@@ -2037,7 +2038,7 @@ export const EMBER_LAVA_POOLS = [
   // the Moltenmaw: an open lava-lake field east of the caldera. The big eye
   // sits at (423, 2347) so its whole model footprint (r * 1.15) stays clear
   // of the Drakemaw escape bench ring (benchFade 23 from the vent), whose
-  // every-azimuth dry-shore guarantee is pinned by tests/terrain_escape.
+  // every-azimuth dry-shore guarantee is pinned by tests/terrain_escape_walkout.
   { x: 423, z: 2347, r: 16, floor: -1.2 },
   { x: 438, z: 2326, r: 10, floor: -1.2 },
 ] as const;
@@ -2079,7 +2080,7 @@ function emberShapingOffset(x: number, z: number, seed: number): number {
 //   never drains into it.
 // Both pull terrain TO their target (never only downward): a raise-and-cut
 // makes the shore and channel floors deterministic, with no one-way dips
-// where the old lip crossed the mouth. tests/terrain_escape.test.ts walks
+// where the old lip crossed the mouth. tests/terrain_escape_walkout.test.ts walks
 // a real player from the reported stranding spot around the ring and out.
 const DRAKEMAW_ESCAPE = {
   x: 390,
@@ -2824,26 +2825,37 @@ const TERRAIN_CAMP_BOUNDS = CAMPS.map((camp) => {
     maxZ: camp.center.z + reach,
   };
 });
-const TERRAIN_HUB_BOUNDS = ZONES.map((zone) => {
-  const reach = zone.hub.radius * 1.6 + 1;
-  return {
-    minX: zone.hub.x - reach,
-    maxX: zone.hub.x + reach,
-    minZ: zone.hub.z - reach,
-    maxZ: zone.hub.z + reach,
-  };
-});
+// Hub bounds derive per REBUILD from the ACTIVE content's zones, read RAW
+// with no empty-list fallback (the hub-plateau policy in baseHeight below;
+// pinned by tests/world_active_content.test.ts): unlike the static camp and
+// applier bounds, hubs are the one region-index input the active content
+// owns, so a custom map's hubs index and a zero-zone content indexes none.
+function terrainHubBounds(zones: readonly ZoneDef[]) {
+  return zones.map((zone) => {
+    const reach = zone.hub.radius * 1.6 + 1;
+    return {
+      minX: zone.hub.x - reach,
+      maxX: zone.hub.x + reach,
+      minZ: zone.hub.z - reach,
+      maxZ: zone.hub.z + reach,
+    };
+  });
+}
 
 let terrainRegionGeneration = -1;
 let terrainRegionIndex: TerrainRegionIndex | null = null;
+// The zone snapshot the live index's hubIndices resolve into; rebuilt with
+// the index so the two can never disagree mid-generation.
+let terrainHubZones: readonly ZoneDef[] = [];
 
 function terrainRegionAt(x: number, z: number): TerrainRegionCell {
   const generation = getContentGeneration();
   if (terrainRegionIndex === null || terrainRegionGeneration !== generation) {
+    terrainHubZones = getActiveWorldContent().zones;
     terrainRegionIndex = buildTerrainRegionIndex({
       applierBounds: TERRAIN_APPLIER_BOUNDS,
       campBounds: TERRAIN_CAMP_BOUNDS,
-      hubBounds: TERRAIN_HUB_BOUNDS,
+      hubBounds: terrainHubBounds(terrainHubZones),
     });
     terrainRegionGeneration = generation;
   }
@@ -2910,11 +2922,22 @@ function baseHeight(
   let h =
     (fbm2(x * HILL_SCALE + 100, z * HILL_SCALE + 100, seed, 4) - 0.5) * shape.hill + shape.base;
   h += (fbm2(x * DETAIL_SCALE, z * DETAIL_SCALE, seed + 7, 2) - 0.5) * 2.2;
-  // Flatten each zone's hub settlement into a plateau
+  // Flatten each zone's hub settlement into a plateau. The ACTIVE content's
+  // zones read RAW, exactly like the lake-carve loop below (no empty-list
+  // fallback on either): the hub and lake FEATURES follow the active content
+  // verbatim, so a hand-built zero-zone content flattens no builtin hubs
+  // just as it carves no builtin lakes. (The band-shape cascade in shapeAt
+  // above still reads the static STRIP_ZONES/COLUMN_ZONES, byte-identical on
+  // every shipped host and a known custom-map seam; zoneAt/worldXBoundsAt
+  // keep their builtin fallback because zone RESOLUTION must stay total.
+  // The policy split is pinned by tests/world_active_content.test.ts.)
   // A hub omitted by the coarse index is outside its complete squared gate
-  // plus a full guard cell, so skipping it is a bit-identical no-op.
+  // plus a full guard cell, so skipping it is a bit-identical no-op. The
+  // indices resolve into terrainHubZones, the SAME resolved snapshot the
+  // region index was built from (terrainRegionAt rebuilds both together on
+  // a content-generation bump).
   for (const zoneIndex of region.hubIndices) {
-    const zone = ZONES[zoneIndex];
+    const zone = terrainHubZones[zoneIndex];
     const dx = x - zone.hub.x,
       dz = z - zone.hub.z;
     // Conservative squared-distance gate (one spare yard of margin) before
@@ -4306,19 +4329,11 @@ function isExcludedDecoration(x: number, z: number): boolean {
 }
 
 export function zoneBiomeAt(x: number, z: number): BiomeId {
-  let fallback: { biome: BiomeId; zMax: number } | null = null;
-  let northmost = ZONES[0];
-  for (const zone of ZONES) {
-    if (zone.zMax > northmost.zMax) northmost = zone;
-    if (z >= zone.zMax) continue;
-    if (fallback === null || zone.zMax < fallback.zMax) {
-      fallback = { biome: zone.biome, zMax: zone.zMax }; // southmost band containing z
-    }
-    const x0 = zone.xMin ?? STRIP_MIN_X;
-    const x1 = zone.xMax ?? STRIP_MAX_X;
-    if (z >= zone.zMin && x >= x0 && x < x1) return zone.biome;
-  }
-  return fallback ? fallback.biome : northmost.biome;
+  // Delegates to zoneAt rather than repeating its rect walk over the static
+  // ZONES const: zoneAt resolves the ACTIVE content's zones (builtin
+  // fallback), and a private copy here was the one place the biome could
+  // disagree with every other zone read on a custom map.
+  return zoneAt(x, z).biome;
 }
 
 // Paint grid id -> biome. APPEND-ONLY: the id is persisted in map documents.

@@ -1,3 +1,4 @@
+import { WORLD_SEED } from '../sim/world_seed';
 // The CustomMap document: the editor's canonical, serializable map. The type and
 // its sanitizer live in src/sim/map_doc.ts (shared with the server, which
 // validates uploaded documents with the SAME code); this module adapts the
@@ -29,9 +30,9 @@ export type CustomMapMeta = MapDocMeta;
 // here; serialization casts back to the mutable MapDoc shape.
 export type CustomMap = Omit<MapDoc, 'content'> & { content: ZoneContent };
 
-// The game's fixed offline seed; a fresh map defaults to it so its built-in
-// derived terrain matches what the editor previews (mirrors DEFAULT_PLAYTEST_SEED).
-const DEFAULT_SEED = 20061;
+// The shipped world seed; a fresh map defaults to it so its built-in derived
+// terrain matches what the editor previews (mirrors DEFAULT_PLAYTEST_SEED).
+const DEFAULT_SEED = WORLD_SEED;
 
 function deepClone<T>(v: T): T {
   return JSON.parse(JSON.stringify(v)) as T;

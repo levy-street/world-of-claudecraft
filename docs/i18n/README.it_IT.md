@@ -92,7 +92,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and choose Play Offline
 ```
 
-Dai un nome al tuo personaggio, scegli una qualsiasi delle nove classi e parti in **Eastbrook Vale** (livelli 1-7), una città di mercato circondata da hub: i sentieri dei lupi a nord, i prati dei cinghiali a est, i boschi di Sableweb a ovest, Mirror Lake a nordovest, uno scavo di rame infestato dai burrower a sudovest e una cappella in rovina di morti senza pace a nordest, con l'accampamento dei banditi di Gorrak a sudest. La strada del nord risale un passo di montagna fino a **Mirefen Marsh** (6-13, hub Fenbridge) e prosegue su fino a **Thornpeak Heights** (13-20, hub Highwatch). Il seed del mondo è fissato in `src/main.ts`, quindi è lo stesso luogo a ogni visita.
+Dai un nome al tuo personaggio, scegli una qualsiasi delle nove classi e parti in **Eastbrook Vale** (livelli 1-7), una città di mercato circondata da hub: i sentieri dei lupi a nord, i prati dei cinghiali a est, i boschi di Sableweb a ovest, Mirror Lake a nordovest, uno scavo di rame infestato dai burrower a sudovest e una cappella in rovina di morti senza pace a nordest, con l'accampamento dei banditi di Gorrak a sudest. La strada del nord risale un passo di montagna fino a **Mirefen Marsh** (6-13, hub Fenbridge) e prosegue su fino a **Thornpeak Heights** (13-20, hub Highwatch). Il seed del mondo è fissato in `src/sim/world_seed.ts`, quindi è lo stesso luogo a ogni visita.
 
 ### App desktop per Windows, Linux e macOS
 

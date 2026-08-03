@@ -158,8 +158,10 @@ function installFakeRuntime(): void {
     takeOverCharacter: vi.fn(async () => 'not-online' as const),
     rekeyMarketSeller: vi.fn(() => false),
     saveMarket: vi.fn(async () => {}),
+    purgeMarketSeller: vi.fn(() => false),
     rekeyMailOwner: vi.fn(() => false),
     saveMail: vi.fn(async () => {}),
+    purgeMailOwner: vi.fn(() => false),
     // The fresh-character state is never serialized on the deny path; a bare object
     // is enough to satisfy the type for any handler that does run (negative control).
     initialCharacterState: vi.fn(

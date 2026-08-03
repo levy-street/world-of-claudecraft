@@ -325,9 +325,12 @@ const FISH_SPOT = { x: -104, z: 300 };
 // Eastbrook). An earlier version of this script mistakenly used the CAMERA'S
 // stand-near position as the target, which put the actual model off to the
 // side out of frame; these are the model's real position.
-const ORE_SPOT = { x: 72, z: 8 };
+// Hand-copied, so re-check them against gather_nodes.ts whenever a node moves.
+// ORE_SPOT was left behind by the earlier move of the ore trio off Boar Meadow
+// and pointed at empty ground 160 yards from any vein until this was corrected.
+const ORE_SPOT = { x: -70, z: -53 };
 const WOOD_SPOT = { x: -62, z: 8 };
-const HERB_SPOT = { x: -86, z: 90 };
+const HERB_SPOT = { x: -59, z: 91 };
 const MAILBOX_SPOT = { x: 7, z: -8 };
 const DELVE_PROP_SPOT = { x: 40, z: -60 };
 
@@ -353,8 +356,9 @@ const desktopShots = [
   },
   {
     file: 'gather-node-herb-desktop.png',
-    // The default NE stand offset puts the player in Mirror Lake next door;
-    // approach from the south instead to stay on dry ground.
+    // Keeps the south approach from when this patch sat in the lake itself. The
+    // patch is now on Mirror Lake's dry bank, 33 yards out from the centre, so
+    // the offset is a framing choice rather than a way to stay out of the water.
     place: (p) => standNextTo(p, HERB_SPOT.x, HERB_SPOT.z, { standOffX: -1, standOffZ: -5 }),
   },
   {
