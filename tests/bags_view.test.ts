@@ -28,6 +28,7 @@ const NO_MODE: BagMode = {
   marketSell: false,
   vendorOpen: false,
   bankDeposit: false,
+  guildBankDeposit: false,
   petFeed: false,
 };
 
@@ -57,6 +58,7 @@ describe('bagShiftLinks', () => {
     expect(bagShiftLinks({ ...NO_MODE, petFeed: true })).toBe(true);
     expect(bagShiftLinks({ ...NO_MODE, vendorOpen: true })).toBe(false);
     expect(bagShiftLinks({ ...NO_MODE, bankDeposit: true })).toBe(false);
+    expect(bagShiftLinks({ ...NO_MODE, guildBankDeposit: true })).toBe(false);
   });
 });
 
@@ -107,6 +109,7 @@ describe('bagDestroyAction', () => {
       'vendorOpen',
       'petFeed',
       'bankDeposit',
+      'guildBankDeposit',
     ] as const) {
       expect(bagDestroyAction(ITEMS.sword, { ...NO_MODE, [mode]: true })).toBe('none');
       // even a normally-blocked item is 'none' (not 'discardBlocked') in these modes.
@@ -243,10 +246,11 @@ describe('bag mode chain order pin (insertion guard)', () => {
     marketSell: true,
     vendorOpen: true,
     bankDeposit: true,
+    guildBankDeposit: true,
     petFeed: true,
   };
 
-  it('peels the action ladder one rung at a time: trade > mail-attach > market-sell > vendor > bank-deposit > pet-feed > kind fallbacks', () => {
+  it('peels the action ladder one rung at a time: trade > mail-attach > market-sell > vendor > guild-bank-deposit > bank-deposit > pet-feed > kind fallbacks', () => {
     let mode = { ...ALL_MODES };
     expect(bagItemAction(ITEMS.sword, mode)).toBe('trade');
     mode = { ...mode, tradeOpen: false };
@@ -256,6 +260,9 @@ describe('bag mode chain order pin (insertion guard)', () => {
     mode = { ...mode, marketSell: false };
     expect(bagItemAction(ITEMS.sword, mode)).toBe('vendorSell');
     mode = { ...mode, vendorOpen: false };
+    expect(bagItemAction(ITEMS.sword, mode)).toBe('guildBankDeposit');
+    expect(bagItemAction(ITEMS.questItem, mode)).toBe('guildBankDepositBlockedQuest');
+    mode = { ...mode, guildBankDeposit: false };
     expect(bagItemAction(ITEMS.sword, mode)).toBe('bankDeposit');
     expect(bagItemAction(ITEMS.questItem, mode)).toBe('bankDepositBlockedQuest');
     mode = { ...mode, bankDeposit: false };
@@ -265,6 +272,28 @@ describe('bag mode chain order pin (insertion guard)', () => {
     expect(mode).toEqual(NO_MODE);
     expect(bagItemAction(ITEMS.questItem, mode)).toBe('discardQuest');
     expect(bagItemAction(ITEMS.sword, mode)).toBe('use');
+  });
+
+  it('guild-bank-deposit pre-empts every pipe dimension in place (never falling to a lower rung)', () => {
+    const mode = { ...NO_MODE, guildBankDeposit: true };
+    // Allowed: an ordinary item, and an unlocked instanced copy.
+    expect(bagItemAction(ITEMS.sword, mode)).toBe('guildBankDeposit');
+    expect(bagItemAction(ITEMS.sword, mode, { signer: 'Ada' })).toBe('guildBankDeposit');
+    // Quest / soulbound / noMarketList / per-copy transfer lock each deny with
+    // their own arm (voicing the exact sim line at the consumer).
+    expect(bagItemAction(ITEMS.questItem, mode)).toBe('guildBankDepositBlockedQuest');
+    expect(bagItemAction(ITEMS.mark, mode)).toBe('guildBankDepositBlockedSoulbound');
+    expect(bagItemAction(ITEMS.bound, mode)).toBe('guildBankDepositBlockedNoTransfer');
+    expect(bagItemAction(ITEMS.sword, mode, { bindOnTrade: true })).toBe(
+      'guildBankDepositBlockedNoTransfer',
+    );
+    expect(bagItemAction(ITEMS.sword, mode, { boundTo: 7 })).toBe(
+      'guildBankDepositBlockedNoTransfer',
+    );
+    // Even with the pet-feed rung armed below, a deny blocks in place.
+    expect(bagItemAction(ITEMS.questItem, { ...mode, petFeed: true })).toBe(
+      'guildBankDepositBlockedQuest',
+    );
   });
 
   it('blocked variants block in place, they never fall through to a lower rung', () => {
@@ -282,6 +311,17 @@ describe('bag mode chain order pin (insertion guard)', () => {
     expect(bagItemAction(ITEMS.bound, { ...ALL_MODES, tradeOpen: false, mailAttach: false })).toBe(
       'marketSellBlockedNoMarket',
     );
+    // A quest item blocks in place at the GUILD bank rung; it must NOT fall
+    // through to the personal bank rung or pet-feed.
+    expect(
+      bagItemAction(ITEMS.questItem, {
+        ...ALL_MODES,
+        tradeOpen: false,
+        mailAttach: false,
+        marketSell: false,
+        vendorOpen: false,
+      }),
+    ).toBe('guildBankDepositBlockedQuest');
     // A quest item blocks in place at the bank; it must NOT fall through to pet-feed.
     expect(
       bagItemAction(ITEMS.questItem, {
@@ -290,6 +330,7 @@ describe('bag mode chain order pin (insertion guard)', () => {
         mailAttach: false,
         marketSell: false,
         vendorOpen: false,
+        guildBankDeposit: false,
       }),
     ).toBe('bankDepositBlockedQuest');
   });
@@ -305,6 +346,17 @@ describe('bag mode chain order pin (insertion guard)', () => {
     mode = { ...mode, marketSell: false };
     expect(bagTooltipHintKey(ITEMS.sword, mode)).toBe('itemUi.tooltip.clickSell');
     mode = { ...mode, vendorOpen: false };
+    // The guild tab carries its OWN hint keys (the consequences differ from
+    // the personal pane), and its cannot arm covers every pipe dimension,
+    // not only quest.
+    expect(bagTooltipHintKey(ITEMS.sword, mode)).toBe('hudChrome.bank.guildDepositHint');
+    expect(bagTooltipHintKey(ITEMS.questItem, mode)).toBe('hudChrome.bank.guildCannotDeposit');
+    expect(bagTooltipHintKey(ITEMS.mark, mode)).toBe('hudChrome.bank.guildCannotDeposit');
+    expect(bagTooltipHintKey(ITEMS.bound, mode)).toBe('hudChrome.bank.guildCannotDeposit');
+    expect(bagTooltipHintKey(ITEMS.sword, mode, { boundTo: 7 })).toBe(
+      'hudChrome.bank.guildCannotDeposit',
+    );
+    mode = { ...mode, guildBankDeposit: false };
     expect(bagTooltipHintKey(ITEMS.sword, mode)).toBe('hudChrome.bank.depositHint');
     expect(bagTooltipHintKey(ITEMS.questItem, mode)).toBe('hudChrome.bank.cannotDeposit');
     mode = { ...mode, bankDeposit: false };
@@ -316,10 +368,18 @@ describe('bag mode chain order pin (insertion guard)', () => {
 
   it('shift-to-chat-link stays vendor- and bank-owned even with every mode on', () => {
     expect(bagShiftLinks(ALL_MODES)).toBe(false);
-    // Vendor AND bank each own shift; turning off only one keeps it owned.
+    // Vendor AND both bank modes each own shift; turning off only some keeps it owned.
     expect(bagShiftLinks({ ...ALL_MODES, vendorOpen: false })).toBe(false);
     expect(bagShiftLinks({ ...ALL_MODES, bankDeposit: false })).toBe(false);
-    expect(bagShiftLinks({ ...ALL_MODES, vendorOpen: false, bankDeposit: false })).toBe(true);
+    expect(bagShiftLinks({ ...ALL_MODES, vendorOpen: false, bankDeposit: false })).toBe(false);
+    expect(
+      bagShiftLinks({
+        ...ALL_MODES,
+        vendorOpen: false,
+        bankDeposit: false,
+        guildBankDeposit: false,
+      }),
+    ).toBe(true);
   });
 });
 

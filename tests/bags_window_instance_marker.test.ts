@@ -53,6 +53,7 @@ function windowFor(inventory: InvSlot[]): HTMLElement {
     isMarketSell: () => false,
     isMailAttach: () => false,
     isBankOpen: () => false,
+    isGuildBankTab: () => false,
     pendingPetFeed: () => false,
     closeVendor: noop,
     closeBank: noop,

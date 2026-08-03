@@ -72,11 +72,18 @@ describe('bags_window: bank-deposit mode wiring', () => {
     // The mode flag is HUD state; the painter must read it via the dep each click,
     // never cache it, mirroring vendorOpen / isMailAttach.
     expect(painter).toContain('isBankOpen(): boolean;');
-    expect(painter).toContain('bankDeposit: this.deps.isBankOpen(),');
+    expect(painter).toContain('isGuildBankTab(): boolean;');
+    // At most ONE of the two bank modes: the guild tab claims the click while
+    // active, else the open bank deposits to the personal pane.
+    expect(painter).toContain(
+      'bankDeposit: this.deps.isBankOpen() && !this.deps.isGuildBankTab(),',
+    );
+    expect(painter).toContain('guildBankDeposit: this.deps.isGuildBankTab(),');
   });
 
   it('hud wires isBankOpen to the live bank-window open state', () => {
     expect(hud).toContain('isBankOpen: () => this.bankWindow.isOpen,');
+    expect(hud).toContain('isGuildBankTab: () => this.bankWindow.guildTabActive,');
   });
 
   it('resolves the deposit target by reference index, not itemId (the index command)', () => {
@@ -104,14 +111,18 @@ describe('bags_window: bank-deposit mode wiring', () => {
   });
 
   it('the deposit prompt re-resolves the live slot at submit and refuses on a mismatch', () => {
-    // The bags can repaint under the open prompt; submit must re-read inventory[index],
-    // refuse (null) rather than deposit the wrong item, and clamp otherwise.
+    // The bags can repaint under the open prompt; the shared builder's submit
+    // (bank_quantity_prompt.ts) calls resolveCount, whose bags closure re-reads
+    // inventory[index] and refuses (null) rather than deposit the wrong item,
+    // clamping otherwise. The null arm's dismiss lives in the builder.
     expect(painter).toContain('const live = this.deps.world().inventory[index];');
-    expect(painter).toContain(
-      'const count = resolveDepositSubmit(live, captured, Number(input.value) || 0, maxCount);',
-    );
-    expect(painter).toMatch(/if \(count === null\) \{\s*dismiss\(\);/);
+    expect(painter).toContain('return resolveDepositSubmit(live, captured, requested, maxCount);');
     expect(painter).toContain('this.deps.world().bankDeposit(index, count);');
+    const builder = readFileSync(
+      new URL('../src/ui/bank_quantity_prompt.ts', import.meta.url),
+      'utf8',
+    );
+    expect(builder).toMatch(/if \(count === null\) \{\s*dismiss\(\);/);
   });
 
   it('registers the deposit prompt class so close() tears it down (no orphaned modal)', () => {
@@ -125,7 +136,10 @@ describe('bags_window: bank-deposit mode wiring', () => {
     // The tooltip shows depositPartialHint ONLY on the deposit-hint arm (never on a
     // blocked quest item) and only for a splittable stack; without this line the
     // catalog key would be dead and the affordance undiscoverable.
-    expect(painter).toContain("key === 'hudChrome.bank.depositHint' && bankDepositOpensPrompt(s)");
+    expect(painter).toContain(
+      "(key === 'hudChrome.bank.depositHint' || key === 'hudChrome.bank.guildDepositHint') &&",
+    );
+    expect(painter).toContain('bankDepositOpensPrompt(s)');
     expect(painter).toContain("t('hudChrome.bank.depositPartialHint')");
     expect(painter).toContain('+ extra + partial + equipDrag + destroy + link');
   });

@@ -204,9 +204,9 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'bank_window.ts',
-    memos: ['lastSig'],
+    memos: ['lastRenderedTab', 'lastSig'],
     answer: 'this.bankWindow.render',
-    why: 'capacity, purchased and bonus slot counts, the next expansion cost and the stored slots. render() carries no self-gate, so the arm rebuilds',
+    why: 'capacity, purchased and bonus slot counts, the next expansion cost, the stored slots (both panes ride ONE sig, the guild arm appended), and lastRenderedTab, a text-independent pane latch that only scopes the scroll restore. render() carries no self-gate, so the arm rebuilds',
   },
   {
     file: 'calendar_window.ts',
