@@ -89,46 +89,18 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.buyStackAria"
   ],
   "zh_CN": [
-    "entities.items.reins_drakemaw_raptor.name",
-    "entities.mobs.dragonkin_broodguard.name",
-    "entities.mobs.dragonkin_egg.name",
-    "entities.mobs.dragonkin_whelp.name",
-    "entities.mobs.drakemaw_broodlord.name",
-    "hudChrome.mounts.desc_drakemaw_raptor",
-    "hudChrome.mounts.name_drakemaw_raptor",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "zh_TW": [
-    "entities.items.reins_drakemaw_raptor.name",
-    "entities.mobs.dragonkin_broodguard.name",
-    "entities.mobs.dragonkin_egg.name",
-    "entities.mobs.dragonkin_whelp.name",
-    "entities.mobs.drakemaw_broodlord.name",
-    "hudChrome.mounts.desc_drakemaw_raptor",
-    "hudChrome.mounts.name_drakemaw_raptor",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "ko_KR": [
-    "entities.items.reins_drakemaw_raptor.name",
-    "entities.mobs.dragonkin_broodguard.name",
-    "entities.mobs.dragonkin_egg.name",
-    "entities.mobs.dragonkin_whelp.name",
-    "entities.mobs.drakemaw_broodlord.name",
-    "hudChrome.mounts.desc_drakemaw_raptor",
-    "hudChrome.mounts.name_drakemaw_raptor",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "ja_JP": [
-    "entities.items.reins_drakemaw_raptor.name",
-    "entities.mobs.dragonkin_broodguard.name",
-    "entities.mobs.dragonkin_egg.name",
-    "entities.mobs.dragonkin_whelp.name",
-    "entities.mobs.drakemaw_broodlord.name",
-    "hudChrome.mounts.desc_drakemaw_raptor",
-    "hudChrome.mounts.name_drakemaw_raptor",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -146,13 +118,6 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.buyStackAria"
   ],
   "ru_RU": [
-    "entities.items.reins_drakemaw_raptor.name",
-    "entities.mobs.dragonkin_broodguard.name",
-    "entities.mobs.dragonkin_egg.name",
-    "entities.mobs.dragonkin_whelp.name",
-    "entities.mobs.drakemaw_broodlord.name",
-    "hudChrome.mounts.desc_drakemaw_raptor",
-    "hudChrome.mounts.name_drakemaw_raptor",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
