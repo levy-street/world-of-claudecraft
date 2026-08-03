@@ -3052,6 +3052,16 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   ),
   sanctum_key_shard: r('arcane', 'sky', ['gem'], ['sparkle', 'glow']),
   blessed_wax: r('holy', 'holyGold', [{ p: 'droplet', pal: 'holyGold' }], ['sparkle']),
+  // A pitch-filled bottle with a lit rag: a bottle body under a rising flame.
+  firebottle: r(
+    'fire',
+    'ember',
+    [
+      { p: 'potion', pal: 'ember' },
+      { p: 'flame', s: 0.5, y: -9 },
+    ],
+    ['glow'],
+  ),
   ghostly_essence: r('shadow', 'silverWhite', [{ p: 'flame', pal: 'silverWhite' }], ['sparkle']),
   webwood_silk: r('shadow', 'silverWhite', ['web']),
   supply_crate: r('wood', 'earthBrown', ['crate']),
