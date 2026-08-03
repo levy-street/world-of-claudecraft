@@ -181,7 +181,7 @@ describe('SceneOverlayWindow: cinematic-mode class toggle (C0 HUD hide)', () => 
       path.join(path.dirname(fileURLToPath(import.meta.url)), '../src/styles/hud.css'),
       'utf8',
     );
-    const withoutComments = css.replace(/\/\*[^]*?\*\//g, '');
+    const withoutComments = css.replace(/\/\*[\s\S]*?\*\//g, '');
     for (const selector of ['.scene-fade', '.scene-subtitle']) {
       const start = withoutComments.indexOf(`${selector} {`);
       expect(start, `${selector} rule present`).toBeGreaterThan(-1);
