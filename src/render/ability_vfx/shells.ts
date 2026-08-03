@@ -45,7 +45,10 @@ export class BuffShells {
         varying vec3 vNormal;
         varying vec3 vView;
         void main() {
-          float fres = pow(1.0 - abs(dot(normalize(vNormal), normalize(vView))), 2.2);
+          // max() guards pow() against a normalized dot product that overshoots
+          // 1.0 by an ulp: a negative base is NaN, and one NaN pixel spreads
+          // into a hard-edged black rectangle through the bloom blur.
+          float fres = pow(max(0.0, 1.0 - abs(dot(normalize(vNormal), normalize(vView)))), 2.2);
           float pulse = 0.85 + 0.15 * sin(uTime * 5.0);
           vec3 col = uColor * (0.25 + 1.9 * fres) * pulse;
           gl_FragColor = vec4(col, uOpacity * (0.12 + 0.88 * fres));
