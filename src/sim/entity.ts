@@ -178,6 +178,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     chaseStall: 0,
     evadeEpoch: 0,
     combatExitHoldUntil: 0,
+    chainPullInbound: false,
     fleeTimer: 0,
     fleeReturnTimer: 0,
     hasFled: false,

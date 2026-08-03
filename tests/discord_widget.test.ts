@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 //
 // Consolidated Discord entry point: the corner community tray's separate
 // "Discord" invite link (index.html #community-hud) was removed as a

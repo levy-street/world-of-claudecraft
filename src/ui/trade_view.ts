@@ -14,10 +14,28 @@
 // tradeOfferCeiling gives the trade window the same total.
 //
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
-import type { InvSlot } from '../sim/types';
+import { ITEMS } from '../sim/data';
+import type { InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 
 /** Total held count of `itemId` across every bag slot: the trade offer
  *  stepper's ceiling. */
 export function tradeOfferCeiling(inventory: InvSlot[], itemId: string): number {
   return inventory.filter((s) => s.itemId === itemId).reduce((n, s) => n + s.count, 0);
+}
+
+/** Resolves the bag-style tooltip target (item def + optional per-instance
+ *  payload) for the slot at `index` in a trade offer's item list. Both offer
+ *  sides render from the same `InvSlot[]` (`TradeOffer.items` in
+ *  `src/world_api/trade.ts`), so a trade slot's tooltip is exactly the item's
+ *  bag tooltip, instance detail included. Returns null for an out-of-range
+ *  index or an unrecognized item id (#2693). */
+export function tradeRowTooltipTarget(
+  items: InvSlot[],
+  index: number,
+): { item: ItemDef; instance?: ItemInstancePayload } | null {
+  const s = items[index];
+  if (!s) return null;
+  const item = ITEMS[s.itemId];
+  if (!item) return null;
+  return { item, instance: s.instance };
 }

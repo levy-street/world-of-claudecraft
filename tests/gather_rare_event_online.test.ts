@@ -239,7 +239,10 @@ describe('gathering-tool use over the live command path (#2343)', () => {
     expect(deliveredEvents(fcB).filter((e) => e.type === 'gatherToolNoNode')).toHaveLength(0);
 
     // Mirror leg: the exact events frames fcA received, replayed through the
-    // real ClientWorld.onMessage, land in the queue the HUD drains.
+    // real ClientWorld.onMessage, land in the queue the HUD drains. Kept
+    // bespoke on purpose (issue #2088): only eventQueue is needed here, unlike
+    // the shared tests/helpers/bare_client.ts bareClient(), which sets every
+    // declared field.
     const client: any = Object.create(ClientWorld.prototype);
     client.eventQueue = [];
     for (const frame of fcA.sent.filter((m) => m.t === 'events')) {

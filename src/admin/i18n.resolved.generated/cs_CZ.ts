@@ -44,6 +44,7 @@ export const cs_CZ: AdminTranslations = {
   "nav.primaryLabel": "Admin navigace",
   "nav.openMenu": "Otevřít navigaci",
   "nav.closeMenu": "Zavřít navigaci",
+  "theme.darkModeLabel": "Dark mode",
   "stats.onlineNow": "online teď",
   "stats.onlineAccounts": "online účty",
   "stats.siteUsersNow": "uživatelé webu teď",

@@ -7,14 +7,14 @@
 // after a change, get the diff.
 //
 //   npm run dev                                 # :5173  (always)
-//   ALLOW_DEV_COMMANDS=1 npm run server         # :8787  (only for the crowd scenario)
+//   ALLOW_DEV_COMMANDS=1 npm run server         # :8787  (crowd or --mode online)
 //   node scripts/profile.mjs <scenario> [opts]
 //
 // Scenarios:  fps | tour | combat | freeze | tiers | crowd | walk | play
 //   play = walk + RMB camera look + jump + cast every ability (finds first-cast
 //          ability VFX compiles and camera-reveal hitches a plain walk misses)
 // Options:
-//   --tier low|medium|high|ultra   force a tier (default: auto-detect)
+//   --tier low|medium|high|ultra|insane   force a tier (default: auto-detect)
 //   --dpr 1|2                       device pixel ratio (default 1)
 //   --mode offline|online          (crowd forces online; others default offline)
 //   --crowd N                      crowd size for the crowd scenario (default 40)
@@ -25,6 +25,8 @@
 //   BROWSER_PATH=/path/to/chrome   browser binary
 import fs from 'node:fs';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { resolveProfileMode } from './lib/profile_mode.mjs';
 import { Profiler } from './profiler/harness.mjs';
 import { diffMetrics } from './profiler/metrics.mjs';
 
@@ -44,6 +46,7 @@ const TIER = args.tier || undefined;
 const DPR = Number(args.dpr ?? 1);
 const MS = Number(args.ms ?? 4000);
 const CROWD = Number(args.crowd ?? 40);
+const PROFILE_MODE = resolveProfileMode(args.mode);
 
 // Open-world waypoints from the starting region outward (cross-biome traversal).
 const WAYPOINTS = [
@@ -54,8 +57,8 @@ const WAYPOINTS = [
   { x: 120, z: 80, facing: Math.PI / 2, name: 'east' },
 ];
 
-async function scenarioFps(p) {
-  await p.enter({ mode: 'offline', tier: TIER });
+export async function scenarioFps(p, mode = PROFILE_MODE) {
+  await p.enter({ mode, tier: TIER });
   const out = [];
   await p.teleport(0, -14, 0);
   out.push(await p.sample({ ms: MS, label: 'town-idle' }));
@@ -68,8 +71,8 @@ async function scenarioFps(p) {
   return out;
 }
 
-async function scenarioTour(p) {
-  await p.enter({ mode: 'offline', tier: TIER });
+export async function scenarioTour(p, mode = PROFILE_MODE) {
+  await p.enter({ mode, tier: TIER });
   const out = [];
   for (const wp of WAYPOINTS) {
     await p.teleport(wp.x, wp.z, wp.facing);
@@ -80,8 +83,8 @@ async function scenarioTour(p) {
   return out;
 }
 
-async function scenarioCombat(p) {
-  await p.enter({ mode: 'offline', tier: TIER });
+export async function scenarioCombat(p, mode = PROFILE_MODE) {
+  await p.enter({ mode, tier: TIER });
   const out = [];
   // a spot with hostile mobs near the start zone
   await p.teleport(30, 90, Math.PI);
@@ -93,8 +96,8 @@ async function scenarioCombat(p) {
   return out;
 }
 
-async function scenarioFreeze(p) {
-  await p.enter({ mode: 'offline', tier: TIER });
+export async function scenarioFreeze(p, mode = PROFILE_MODE) {
+  await p.enter({ mode, tier: TIER });
   const out = [];
   // cold traversal into ungenerated terrain - the classic streaming/compile stalls
   await p.teleport(0, 30, Math.PI);
@@ -104,10 +107,10 @@ async function scenarioFreeze(p) {
   return out;
 }
 
-async function scenarioTiers(p) {
+export async function scenarioTiers(p, mode = PROFILE_MODE) {
   const out = [];
-  for (const tier of ['low', 'medium', 'high', 'ultra']) {
-    await p.enter({ mode: 'offline', tier });
+  for (const tier of ['low', 'medium', 'high', 'ultra', 'insane']) {
+    await p.enter({ mode, tier });
     await p.teleport(0, 60, Math.PI);
     await p.setMove({ forward: true });
     out.push(await p.sample({ ms: MS, label: `tier-${tier}` }));
@@ -116,7 +119,7 @@ async function scenarioTiers(p) {
   return out;
 }
 
-async function scenarioCrowd(p) {
+export async function scenarioCrowd(p) {
   await p.enter({ mode: 'online', tier: TIER });
   const out = [];
   out.push(await p.sample({ ms: MS, label: 'solo' }));
@@ -134,16 +137,16 @@ async function scenarioCrowd(p) {
 
 // Walk continuously across the world on foot (no teleports), crossing zones, and
 // collect every freeze with its position + cause as it happens.
-async function scenarioWalk(p) {
-  await p.enter({ mode: TIER && args.mode === 'online' ? 'online' : 'offline', tier: TIER });
+export async function scenarioWalk(p, mode = PROFILE_MODE) {
+  await p.enter({ mode, tier: TIER });
   return [await p.walk({ ms: Number(args.ms ?? 70000), heading: Number(args.heading ?? 0) })];
 }
 
 // Realistic play session: walk + turn the camera (RMB look) + jump + cast every
 // ability. Surfaces first-cast ability VFX compiles and camera-reveal hitches that
 // a straight `walk` (camera fixed forward, no abilities) cannot.
-async function scenarioPlay(p) {
-  await p.enter({ mode: TIER && args.mode === 'online' ? 'online' : 'offline', tier: TIER });
+export async function scenarioPlay(p, mode = PROFILE_MODE) {
+  await p.enter({ mode, tier: TIER });
   return [await p.play({ ms: Number(args.ms ?? 60000), keys: String(args.keys ?? '1234567890') })];
 }
 
@@ -215,14 +218,15 @@ function fmtRow(s) {
   return [line1, line2, line3].filter(Boolean).join('\n');
 }
 
-async function main() {
+export async function main() {
   const run = SCENARIOS[scenario];
   if (!run) {
     console.error(`unknown scenario '${scenario}'. one of: ${Object.keys(SCENARIOS).join(', ')}`);
     process.exit(1);
   }
+  const effectiveMode = resolveProfileMode(PROFILE_MODE, scenario === 'crowd');
   console.log(
-    `profiler: scenario=${scenario} tier=${TIER ?? 'auto'} dpr=${DPR} ms=${MS} (HEADED, vsync OFF)`,
+    `profiler: scenario=${scenario} mode=${effectiveMode} tier=${TIER ?? 'auto'} dpr=${DPR} ms=${MS} (HEADED, vsync OFF)`,
   );
   const p = new Profiler({
     dpr: DPR,
@@ -242,6 +246,7 @@ async function main() {
 
   const payload = {
     scenario,
+    mode: effectiveMode,
     tier: TIER ?? 'auto',
     dpr: DPR,
     label: args.label ?? '',
@@ -287,7 +292,9 @@ async function main() {
   }
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+}

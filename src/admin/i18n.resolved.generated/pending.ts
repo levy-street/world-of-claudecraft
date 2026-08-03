@@ -70,7 +70,8 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "es_ES": [
     "auth.twoFactorHint",
@@ -132,7 +133,8 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "fr_FR": [
     "auth.twoFactorHint",
@@ -194,7 +196,8 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "fr_CA": [
     "auth.twoFactorHint",
@@ -256,7 +259,8 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "en_CA": [],
   "it_IT": [
@@ -319,7 +323,8 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "de_DE": [
     "auth.twoFactorHint",
@@ -381,7 +386,8 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "zh_CN": [
     "auth.twoFactorHint",
@@ -443,7 +449,8 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "zh_TW": [
     "auth.twoFactorHint",
@@ -505,7 +512,8 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "ko_KR": [
     "auth.twoFactorHint",
@@ -567,7 +575,8 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "ja_JP": [
     "auth.twoFactorHint",
@@ -629,7 +638,8 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "pt_BR": [
     "auth.twoFactorHint",
@@ -691,7 +701,8 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "ru_RU": [
     "auth.twoFactorHint",
@@ -753,7 +764,8 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "cs_CZ": [
     "auth.twoFactorHint",
@@ -815,7 +827,8 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "nl_NL": [
     "auth.twoFactorHint",
@@ -877,7 +890,8 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "pl_PL": [
     "auth.twoFactorHint",
@@ -939,7 +953,8 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "id_ID": [
     "auth.twoFactorHint",
@@ -1001,7 +1016,8 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "tr_TR": [
     "auth.twoFactorHint",
@@ -1063,7 +1079,8 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "sv_SE": [
     "auth.twoFactorHint",
@@ -1125,7 +1142,8 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "vi_VN": [
     "auth.twoFactorHint",
@@ -1187,7 +1205,8 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "da_DK": [
     "auth.twoFactorHint",
@@ -1249,6 +1268,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ]
 };

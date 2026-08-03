@@ -1,8 +1,14 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { buildFullGateSteps } from '../scripts/lib/gate_steps.mjs';
 
 const workflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
+const packageJson = JSON.parse(
+  readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
+) as { packageManager?: string };
 const gate = readFileSync(new URL('../scripts/gate.mjs', import.meta.url), 'utf8');
+// Shared step list (Phase 8): gate.mjs delegates here; pins below use both.
+const gateSteps = buildFullGateSteps(8);
 const viteConfig = readFileSync(new URL('../vite.config.ts', import.meta.url), 'utf8');
 const balancedSequencer = readFileSync(
   new URL('../scripts/ci_balanced_sequencer.mjs', import.meta.url),
@@ -12,6 +18,16 @@ const shardPartition = readFileSync(
   new URL('../scripts/ci_shard_partition.mjs', import.meta.url),
   'utf8',
 );
+
+// Exact pnpm version pinned in package.json packageManager (e.g. pnpm@10.34.5).
+const PNPM_VERSION = (() => {
+  const field = packageJson.packageManager ?? '';
+  const match = field.match(/^pnpm@(\d+\.\d+\.\d+)$/);
+  if (!match) {
+    throw new Error(`package.json packageManager must be pnpm@X.Y.Z, got ${JSON.stringify(field)}`);
+  }
+  return match[1];
+})();
 
 // Locked shard count for pr-gate and release-gate matrices (CI speed packet).
 // Supersedes the prior toolchain N=4 on this surface. Both test jobs share this
@@ -55,7 +71,7 @@ const CODE_PATH_GLOBS = [
   'bot/*',
   'scripts/*',
   'package.json',
-  'package-lock.json',
+  'pnpm-lock.yaml',
   'tsconfig.json',
   'tsconfig.admin.json',
   'vite.config.ts',
@@ -82,6 +98,28 @@ function jobSource(name: string): string {
 }
 
 describe('CI workflow parity', () => {
+  it('installs with pnpm frozen-lockfile and pins the packageManager version', () => {
+    // Full migration: no npm ci install path, cache and install are pnpm-only,
+    // and every pnpm/action-setup version matches package.json packageManager so
+    // CI cannot silently lag the local pin.
+    expect(workflow).not.toContain('run: npm ci');
+    expect(workflow).not.toContain('cache: npm');
+    expect(workflow).toContain('cache: pnpm');
+    expect(workflow).toContain('run: pnpm install --frozen-lockfile');
+    expect(workflow).toContain('uses: pnpm/action-setup@v4');
+    expect(workflow).toContain(`version: ${PNPM_VERSION}`);
+    const setupPins = workflow.match(
+      /uses: pnpm\/action-setup@v4\n {8}with:\n {10}version: [^\n]+/g,
+    );
+    expect(setupPins?.length).toBeGreaterThanOrEqual(4);
+    for (const pin of setupPins ?? []) {
+      expect(pin).toContain(`version: ${PNPM_VERSION}`);
+    }
+    // Lockfile path filter + tsc cache keys must hash pnpm-lock.yaml only.
+    expect(workflow).toContain('pnpm-lock.yaml');
+    expect(workflow).not.toContain('package-lock.json');
+  });
+
   it('cancels a superseded PR run without letting PR traffic cancel release pushes', () => {
     // Anchored above the first job so a future job named "concurrency" cannot
     // be mistaken for this block. D4: group includes event_name so pull_request
@@ -101,7 +139,12 @@ describe('CI workflow parity', () => {
     expect(jobSource('pr-gate')).not.toContain('run: npm run check:types');
     expect(jobSource('release-gate')).not.toContain('run: npm run check:types');
     expect(workflow).not.toContain('run: npx tsc --noEmit');
-    expect(gate).toContain("['typecheck', 'npm', ['run', 'check:types']]");
+    // Local gate runs typecheck through turbo (Phase 8); CI still uses npm run check:types.
+    expect(gate).toContain('buildFullGateSteps');
+    expect(gateSteps.some((s) => s.name === 'typecheck + env/server builds')).toBe(true);
+    expect(gateSteps.find((s) => s.name === 'typecheck + env/server builds')?.args).toEqual(
+      expect.arrayContaining(['turbo', 'run', 'check:types']),
+    );
   });
 
   it('provisions FFmpeg from the static npm packages instead of apt', () => {
@@ -119,7 +162,9 @@ describe('CI workflow parity', () => {
     const browserGate = jobSource('browser-gate');
     expect(browserGate).toContain('run: npx playwright install --with-deps chromium');
     expect(browserGate).toContain('run: npm run test:browser');
-    expect(gate).toContain("['browser regressions', 'npm', ['run', 'test:browser']]");
+    const browser = gateSteps.find((s) => s.name === 'browser regressions');
+    expect(browser?.cmd).toBe('npm');
+    expect(browser?.args).toEqual(['run', 'test:browser']);
   });
 
   it('keeps lint shallow, cancels superseded PR runs, and caches Playwright Chromium', () => {
@@ -250,11 +295,12 @@ describe('CI workflow parity', () => {
       expect(releaseChecks).toContain(step);
       expect(releaseGate).not.toContain(step);
     }
-    // Named-step count: checkout, setup-node, npm ci, plus nine check steps
-    // (i18n gen/summary/freshness, malware, tsc cache, typecheck, three builds).
-    // An accidental extra step on the checks job would otherwise stay green.
-    expect(releaseChecks.match(/\n {6}- name: /g)).toHaveLength(12);
-    expect(jobSource('pr-checks').match(/\n {6}- name: /g)).toHaveLength(12);
+    // Named-step count: checkout, setup-pnpm, setup-node, pnpm install, plus nine
+    // check steps (i18n gen/summary/freshness, malware, tsc cache, typecheck,
+    // three builds). An accidental extra step on the checks job would otherwise
+    // stay green.
+    expect(releaseChecks.match(/\n {6}- name: /g)).toHaveLength(13);
+    expect(jobSource('pr-checks').match(/\n {6}- name: /g)).toHaveLength(13);
     // tsc incremental cache (#2758) must land on both check jobs, never on a
     // matrixed test job (would N-way cache thrash or reintroduce shard-1 gates).
     for (const job of [releaseChecks, jobSource('pr-checks')]) {
@@ -372,8 +418,13 @@ describe('CI workflow parity', () => {
     // silently drop tests from the gate entirely, and dropping the worker
     // bound would reintroduce the documented core-contention flake mode.
     expect(gate).not.toContain('--shard');
-    expect(gate).toContain("'vitest (full suite)'");
-    expect(gate).toContain('--maxWorkers=');
+    const vitest = gateSteps.find((s) => s.name === 'vitest (full suite)');
+    expect(vitest?.cmd).toBe('npm');
+    expect(vitest?.args).toEqual(['test', '--', '--maxWorkers=8']);
+    expect(vitest?.env).toEqual({ WOC_SKIP_PRETEST: '1' });
+    // gate.mjs still binds workers into the shared step builder.
+    expect(gate).toContain('buildFullGateSteps(workers)');
+    expect(gate).toContain('computeGateWorkers');
     // Both check jobs stay single unsharded jobs: serialized checks run once.
     for (const job of [prChecks, releaseChecks]) {
       expect(job).not.toContain('strategy:');
@@ -391,11 +442,11 @@ describe('CI workflow parity', () => {
         String.raw`- name: Run tests \(release tier[^\n]*\n {8}run: npm test -- --shard=\$\{\{ matrix\.shard \}\}\/${SHARD_N}`,
       ),
     );
-    // Structural step counts: each test job is exactly checkout, setup-node,
-    // npm ci, and the sharded test run. An unconditioned addition would run
-    // N times per push; a dropped step shrinks the job silently.
-    expect(prGate.match(/\n {6}- name: /g)).toHaveLength(4);
-    expect(releaseGate.match(/\n {6}- name: /g)).toHaveLength(4);
+    // Structural step counts: each test job is exactly checkout, setup-pnpm,
+    // setup-node, pnpm install, and the sharded test run. An unconditioned
+    // addition would run N times per push; a dropped step shrinks the job silently.
+    expect(prGate.match(/\n {6}- name: /g)).toHaveLength(5);
+    expect(releaseGate.match(/\n {6}- name: /g)).toHaveLength(5);
   });
 
   it('keeps D11 path-matrix tooling available but unwired after two MISS approaches', () => {

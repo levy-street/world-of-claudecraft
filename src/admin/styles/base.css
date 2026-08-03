@@ -57,7 +57,7 @@
     border-color: var(--gold-dim);
     box-shadow:
       inset 0 1px 0 #ffffff0a,
-      0 0 0 2px #c8a83833;
+      0 0 0 2px var(--focus-glow);
   }
 
   :where(input, textarea)::placeholder {
@@ -69,7 +69,7 @@
   option {
     background-color: var(--control-bg);
     color: var(--text);
-    color-scheme: dark;
+    color-scheme: var(--native-color-scheme);
   }
 
   input:-webkit-autofill,
@@ -82,7 +82,7 @@
   :where(button:not(.nav-scrim):not(.nav-toggle):not(.nav-close):not(.word-del):not(.btn-link)) {
     min-height: 34px;
     padding: 6px 12px;
-    background: linear-gradient(#211b10, #151109);
+    background: linear-gradient(var(--btn-grad-from), var(--btn-grad-to));
     color: var(--text-soft);
     border: 1px solid var(--control-border);
     border-radius: 4px;
@@ -94,7 +94,7 @@
     button:not(.nav-scrim):not(.nav-toggle):not(.nav-close):not(.word-del):not(.btn-link)
   ):hover {
     color: var(--text);
-    background: linear-gradient(#2a2112, #18120a);
+    background: linear-gradient(var(--btn-grad-from-hover), var(--btn-grad-to-hover));
     border-color: var(--gold-dim);
   }
 
@@ -132,14 +132,16 @@
   input[type="datetime-local"],
   input[type="date"],
   input[type="time"] {
-    color-scheme: dark;
+    color-scheme: var(--native-color-scheme);
   }
   input[type="datetime-local"]::-webkit-calendar-picker-indicator,
   input[type="date"]::-webkit-calendar-picker-indicator,
   input[type="time"]::-webkit-calendar-picker-indicator {
     cursor: pointer;
-    /* tint the default dark glyph toward gold so it reads on the dark field */
-    filter: invert(72%) sepia(60%) saturate(450%) hue-rotate(2deg) brightness(95%);
+    /* Dark theme: tint the default dark glyph toward gold so it reads on the dark
+       field. Light theme's native glyph is already dark-on-light and legible, so
+       --calendar-icon-filter resolves to `none` there. */
+    filter: var(--calendar-icon-filter);
   }
 
   /* Mobile zoom prevention: operators are users too, and the dashboard ships to

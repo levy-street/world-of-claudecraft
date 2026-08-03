@@ -34,8 +34,8 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // forge commands, learn_riding, mount selection), and market_list_instance
 // (the instance-payload market pipe).
 const EXPECTED_SEND_COUNT = 177; // +3 battleground sends // mount_select left the wire (reins are items)
-const EXPECTED_DISPATCH_COUNT = 189; // +4 (dev_bg_start is dispatch-only) // mount_select left the wire (reins are items)
-const EXPECTED_DISPATCH_ONLY_COUNT = 12; // + dev_bg_start
+const EXPECTED_DISPATCH_COUNT = 190; // +4 battleground, +1 profiler invulnerability (both dev-only dispatch tokens)
+const EXPECTED_DISPATCH_ONLY_COUNT = 13; // + dev_bg_start + dev_profiler_invulnerable
 
 // The chat sub-channel routing switch (server/game.ts `switch
 // (session.rememberedChat.channel)`) is NOT a msg.cmd dispatch; its labels must

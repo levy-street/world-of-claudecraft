@@ -11,8 +11,13 @@ import { HEROIC_MARK_LETTER, QUEST_LETTERS, WELCOME_LETTER } from '../src/sim/co
 import { MAIL_ATTACHMENT_EXPIRY_SECONDS, MAIL_DELIVERY_SECONDS } from '../src/sim/mail/post_office';
 import { Sim } from '../src/sim/sim';
 import { DT, type SimEvent } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
-const makeWorld = () => new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+// Attachment-expiry cases only need PostOffice + players + mailbox positions.
+// Strip ambient camps/NPCs/objects so delivery ticks stay cheap (subsystem-world
+// pattern; mailboxes remain via BUILTIN_WORLD.services on EMPTY_TEST_WORLD).
+const makeWorld = () =>
+  new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: EMPTY_TEST_WORLD });
 
 function moveToMailbox(sim: Sim, pid: number): void {
   const box = sim.entities.get(sim.postOffice.mailboxIds[0]);

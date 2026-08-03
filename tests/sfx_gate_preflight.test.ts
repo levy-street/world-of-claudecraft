@@ -28,8 +28,9 @@ describe('SFX gate toolchain preflight', () => {
 
     expect(result.status).toBe(1);
     expect(result.stderr).toContain('missing required SFX audio tooling: ffmpeg, ffprobe');
-    expect(result.stderr).toContain('reinstall with npm ci');
-    expect(result.stderr).toContain('install FFmpeg (including ffprobe) on PATH');
+    expect(result.stderr).toContain('reinstall with');
+    expect(result.stderr).toContain('pnpm install --frozen-lockfile');
+    expect(result.stderr).toMatch(/install FFmpeg \(including ffprobe\) on\s*PATH/);
     expect(result.stdout).not.toContain('[gate] i18n artifacts');
   });
 

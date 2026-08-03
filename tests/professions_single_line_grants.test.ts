@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 // The single-line grant contract (#2430), tested through the REAL hud event
 // switch rather than through source-text pins.

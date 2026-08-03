@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { computeGateWorkers } from '../scripts/lib/gate_workers.mjs';
+import {
+  computeGateWorkers,
+  GATE_WORKER_TIER_CAPS,
+  parseGateWorkerTier,
+  resolveGateWorkerTierCap,
+} from '../scripts/lib/gate_workers.mjs';
 
 const GIB = 1024 * 1024 * 1024;
 const MIB = 1024 * 1024;
@@ -66,4 +71,88 @@ describe('computeGateWorkers: GATE_MAX_WORKERS override', () => {
       );
     },
   );
+
+  it('takes precedence over a tier cap as well', () => {
+    expect(
+      computeGateWorkers({
+        cpuCount: 16,
+        freeMemBytes: 32 * GIB,
+        envOverride: '6',
+        tierCap: 2,
+      }),
+    ).toBe(6);
+  });
+});
+
+describe('GATE_WORKER_TIER presets', () => {
+  it('exports fixed low/medium/high caps', () => {
+    expect(GATE_WORKER_TIER_CAPS).toEqual({ low: 2, medium: 4, high: 8 });
+  });
+
+  it.each([
+    ['low', 'low'],
+    ['MEDIUM', 'medium'],
+    [' High ', 'high'],
+  ] as const)('parseGateWorkerTier accepts %j', (raw, expected) => {
+    expect(parseGateWorkerTier(raw)).toBe(expected);
+  });
+
+  it('parseGateWorkerTier rejects unknown labels', () => {
+    expect(parseGateWorkerTier(null)).toBeNull();
+    expect(parseGateWorkerTier(undefined)).toBeNull();
+    expect(parseGateWorkerTier('')).toBeNull();
+    expect(parseGateWorkerTier('turbo')).toBeNull();
+    expect(parseGateWorkerTier('2')).toBeNull();
+  });
+
+  it('resolveGateWorkerTierCap maps labels and ignores invalid', () => {
+    expect(resolveGateWorkerTierCap('low')).toBe(2);
+    expect(resolveGateWorkerTierCap('medium')).toBe(4);
+    expect(resolveGateWorkerTierCap('high')).toBe(8);
+    expect(resolveGateWorkerTierCap('nope')).toBeUndefined();
+    expect(resolveGateWorkerTierCap(undefined)).toBeUndefined();
+  });
+
+  it('tierCap lowers workers after free-mem clamp, never raises them', () => {
+    // CPU/2 = 8, mem allows 8; low tier caps at 2.
+    expect(
+      computeGateWorkers({
+        cpuCount: 16,
+        freeMemBytes: 32 * GIB,
+        envOverride: undefined,
+        tierCap: 2,
+      }),
+    ).toBe(2);
+  });
+
+  it('free-mem clamp still wins when tighter than the tier cap', () => {
+    // memBound = floor(100MiB / 0.75GiB) = 1; medium tier cap 4 must not raise above 1.
+    expect(
+      computeGateWorkers({
+        cpuCount: 16,
+        freeMemBytes: 100 * MIB,
+        envOverride: undefined,
+        tierCap: 4,
+      }),
+    ).toBe(1);
+  });
+
+  it('ignores non-positive or non-finite tierCap values', () => {
+    expect(
+      computeGateWorkers({
+        cpuCount: 16,
+        freeMemBytes: 32 * GIB,
+        envOverride: undefined,
+        tierCap: 0,
+      }),
+    ).toBe(8);
+    expect(
+      computeGateWorkers({
+        cpuCount: 16,
+        freeMemBytes: 32 * GIB,
+        envOverride: undefined,
+        tierCap: Number.NaN,
+      }),
+    ).toBe(8);
+  });
 });

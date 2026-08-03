@@ -185,7 +185,7 @@ describe('insane terrain fragment shader', () => {
 
   it.each([
     ['medium', 'medium', 0, false],
-    ['high', 'high', 2, false],
+    ['high', 'high', 0, false],
     ['ultra', 'ultra', 2, true],
     ['advanced relief 1', 'high&gfxo=terrainRelief:1', 0, false],
   ] as const)(

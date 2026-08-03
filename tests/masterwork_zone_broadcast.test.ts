@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 // Masterwork zone broadcast (Professions 2.0): a masterwork proc in
 // the overworld emits one pid-scoped `masterworkZone` copy per player in the
@@ -174,7 +174,9 @@ describe('emit side (Sim.craftItem)', () => {
 // A ClientWorld with no constructor run (the bareClient idiom from
 // tests/masterwork_event_mirror.test.ts): lastMasterwork only exists once the
 // real event-apply path assigns it, so an accidental assignment from the zone
-// copy cannot hide behind an initializer default.
+// copy cannot hide behind an initializer default. Kept bespoke on purpose
+// (issue #2088): the shared tests/helpers/bare_client.ts bareClient() always
+// sets lastMasterwork, which would defeat this liveness point.
 function bareClient(): ClientWorld {
   const c = Object.create(ClientWorld.prototype) as ClientWorld;
   (c as unknown as { eventQueue: SimEvent[] }).eventQueue = [];

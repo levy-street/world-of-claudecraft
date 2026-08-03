@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 //
 // The touch arm of the bags drag: hold to pick a stack up, drag it to a paperdoll
 // socket or out onto the world, release to drop. The gesture has to coexist with two

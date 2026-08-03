@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { refreshStartSkinPickerPortraits } from '../src/ui/start_skin_picker_portraits';

@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 // Crafting window bag-freshness (issue #2375). The Craft gate is derived
 // entirely from the bag, but the window is a COLD painter: before this suite

@@ -44,6 +44,7 @@ export const nl_NL: AdminTranslations = {
   "nav.primaryLabel": "Beheerdersnavigatie",
   "nav.openMenu": "Navigatie openen",
   "nav.closeMenu": "Navigatie sluiten",
+  "theme.darkModeLabel": "Dark mode",
   "stats.onlineNow": "nu online",
   "stats.onlineAccounts": "online accounts",
   "stats.siteUsersNow": "sitegebruikers nu",

@@ -38,19 +38,22 @@ export interface TextureUploadTarget {
 export interface ChunkedTextureUploadOptions {
   maxChunkBytes?: number;
   beforeChunk?: () => Promise<void>;
+  uploadChunk?: (texture: THREE.Texture) => void | Promise<void>;
 }
 
 /**
- * Upload a DataTexture one bounded set of rows at a time. Three's DataTexture
- * updateRanges allocate the texture once, then issue texSubImage2D only for
- * selected rows. Yielding between batches prevents a 2k half-float HDRI from
- * becoming one 16 MB, frame-blocking driver call during zone streaming.
+ * Upload a DataTexture one bounded set of rows at a time when update ranges are
+ * available. Three's updateRanges allocate the texture once, then issue
+ * texSubImage2D only for selected rows. Pinned r165 lacks this API and must use
+ * one valid full upload; beforeChunk still paces its start, and uploadChunk lets
+ * the renderer serialize that indivisible call with other WebGL work.
  */
 export async function uploadDataTextureInChunks(
   target: TextureUploadTarget,
   texture: THREE.Texture,
   options: ChunkedTextureUploadOptions = {},
 ): Promise<number> {
+  const uploadChunk = options.uploadChunk ?? ((nextTexture) => target.initTexture(nextTexture));
   const dataTexture = texture as THREE.DataTexture;
   const image = dataTexture.image as
     | { data?: TexturePixelData; width?: number; height?: number }
@@ -67,7 +70,7 @@ export async function uploadDataTextureInChunks(
     Number(data.length) !== expectedComponents
   ) {
     await options.beforeChunk?.();
-    target.initTexture(texture);
+    await uploadChunk(texture);
     return 1;
   }
 
@@ -85,7 +88,7 @@ export async function uploadDataTextureInChunks(
   // Three version exposes the range API.
   if (!supportsUpdateRanges(dataTexture)) {
     await options.beforeChunk?.();
-    target.initTexture(dataTexture);
+    await uploadChunk(dataTexture);
     return 1;
   }
 
@@ -101,7 +104,7 @@ export async function uploadDataTextureInChunks(
       dataTexture.addUpdateRange(row * rowComponents, rowComponents);
     }
     dataTexture.needsUpdate = true;
-    target.initTexture(dataTexture);
+    await uploadChunk(dataTexture);
     chunks++;
   }
   return chunks;

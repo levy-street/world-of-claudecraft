@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 import { describe, expect, it, vi } from 'vitest';
 import { installWalletResumeHandlers } from '../src/net/wallet_resume';

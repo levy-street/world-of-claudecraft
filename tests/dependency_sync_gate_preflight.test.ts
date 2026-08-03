@@ -61,11 +61,13 @@ describe('dependency-sync gate preflight', () => {
       expect(result.status).toBe(1);
       expect(result.stderr).toContain('[gate] FAIL at "dependency sync"');
       expect(result.stderr).toContain(
-        'node_modules does not match what package-lock.json would install',
+        'node_modules does not match what pnpm-lock.yaml would install',
       );
       expect(result.stderr).toContain('invalid: fakepkg@2.0.0');
       expect(result.stderr).toContain('missing: missing-pkg@^1.0.0');
-      expect(result.stderr).toContain('Run `npm ci` to reinstall exactly what the lockfile pins');
+      expect(result.stderr).toContain(
+        'Run `pnpm install --frozen-lockfile` to reinstall exactly what the lockfile pins',
+      );
       expect(result.stdout).not.toContain('[gate] i18n artifacts');
       // Must be the dependency-sync message that wins the race, not the forced
       // ffmpeg failure further down the preflight chain.
@@ -96,7 +98,7 @@ describe('dependency-sync gate preflight', () => {
       });
 
       expect(result.stderr).not.toContain('dependency sync');
-      expect(result.stderr).not.toContain('does not match what package-lock.json');
+      expect(result.stderr).not.toContain('does not match what pnpm-lock.yaml');
       // Proves execution actually reached and ran the check (not merely skipped
       // it) and continued past it to the next preflight.
       expect(result.stderr).toContain(FFMPEG_FAIL_MESSAGE);

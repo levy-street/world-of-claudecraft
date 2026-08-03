@@ -2013,6 +2013,60 @@
     }
   }
 
+  /* On-bar action-bar key-binding mode (issue #1238): a plain banner (no window
+     chrome) anchored above the visible action bar(s) via #actionbar-stack's own
+     position: relative. Built/removed by hud.ts on enter/exit. */
+  #actionbar-bind-banner {
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    transform: translateX(-50%);
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: max-content;
+    max-width: 90vw;
+    padding: 8px 14px;
+    border: 2px solid var(--color-border-focus);
+    border-radius: 6px;
+    background: linear-gradient(170deg, #15131fee, #09080eee);
+    box-shadow: 0 2px 10px #000c;
+    color: var(--color-text-light);
+    font-family: var(--ui-font);
+    text-align: center;
+    z-index: 25;
+  }
+  .actionbar-bind-hint {
+    font-size: 13px;
+  }
+  .actionbar-bind-status {
+    min-height: 14px;
+    font-size: 12px;
+    color: var(--gold);
+  }
+  .actionbar-bind-actions {
+    display: flex;
+    gap: 8px;
+  }
+  /* The slot awaiting a keypress: a gold ring distinct from both the .used
+     (currently bound to the ability on the swing/cast state) and :hover looks,
+     so it reads clearly mid-capture. */
+  .action-btn.bind-selected {
+    border-color: var(--gold);
+    box-shadow:
+      0 0 10px #ffd100cc,
+      inset 0 0 0 2px var(--gold);
+  }
+  /* While the mode is active every slot is a click target, whether or not it
+     currently holds anything: a dashed hover ring is the only extra affordance
+     needed, the bar otherwise looks exactly as it does in normal play. */
+  body.actionbar-bind-active .action-btn:hover {
+    outline: 2px dashed var(--gold);
+    outline-offset: 1px;
+  }
+
   /* ---------- chat frame ---------- */
   /* width shrinks on narrower screens so the chat never overlaps the centred
      bottom bar (≈612px wide); caps at 370px when there's room. */
@@ -2064,6 +2118,22 @@
     color: var(--gold);
     border-color: #6f5a2a;
     background: linear-gradient(#2a2436, #161220);
+  }
+  /* Drag-to-reorder affordance, matching the bags' grab/drop-target language
+     (components.css `.bag-item[draggable="true"]` / `.bag-item.drop-target`)
+     so the gesture reads as intentional rather than a blind drop. */
+  /* Matches the specificity of the `#chatlog-tabs .chat-tab` cursor rule below
+     so the grab cursor actually wins instead of losing to it on ID weight. */
+  #chatlog-tabs .chat-tab[draggable="true"] {
+    cursor: var(--cursor-grab);
+  }
+  .chat-tab.chat-tab-dragging {
+    opacity: 0.45;
+  }
+  .chat-tab.drop-target {
+    outline: 2px dashed rgba(255, 218, 160, 0.85);
+    outline-offset: -2px;
+    box-shadow: 0 0 10px rgba(202, 164, 114, 0.45);
   }
   /* "add channel" (+) tab: square, icon-only, slightly de-emphasised. Sticks to
      the right edge so it stays inline and reachable even when the tabs scroll. */

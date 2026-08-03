@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 // Town Focus spells its numbers in the active locale (issue #2530).
 //

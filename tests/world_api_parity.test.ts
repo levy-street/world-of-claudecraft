@@ -327,6 +327,7 @@ export const IWORLD_MEMBERS = [
   { name: 'unbindItem', kind: 'method' },
   { name: 'raidLockouts', kind: 'method' }, // read-returning (5/6)
   { name: 'riftFloor', kind: 'data' }, // active procedural rift floor (null outside)
+  { name: 'riftCollisionToken', kind: 'data' }, // per-Sim rift collision registry key
   { name: 'riftBossDeathZones', kind: 'method' }, // live lethal zones on the boss floor
   { name: 'riftEventMsRemaining', kind: 'method' }, // ms until the rift event stops admitting parties
   { name: 'dungeonDifficulty', kind: 'method' }, // read-returning
@@ -504,14 +505,15 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // activeMasterLootRolls, leaving 274; the rift floor timer HUD adds
     // riftEventMsRemaining and the instance-payload pipes add
     // marketListInstance, leaving 276. Reactive aura timing adds
-    // reactiveAbilityWindowRemaining, leaving 277; the v0.34.0 release removes
-    // the renderer-only riftCollisionToken along with third-person camera
-    // collision, leaving 276. This branch (Thornhollow Fields) then adds the
-    // four battleground facet members on top of that base: the bgInfo data
-    // member plus the bgQueueJoin / bgQueueLeave / bgFlagAction commands,
-    // leaving 280.
-    expect(IWORLD_MEMBERS.length).toBe(280);
-    expect(DATA_MEMBERS.length).toBe(72);
+    // reactiveAbilityWindowRemaining, leaving 277; the v0.34.0 release removed
+    // the then-renderer-only riftCollisionToken with third-person camera
+    // collision (276) and later re-added it so client-side swept-landing and
+    // click-to-move pathing can treat rift walls as solid, leaving 277. This
+    // branch (Thornhollow Fields) adds the four battleground facet members on
+    // top of that base: the bgInfo data member plus the bgQueueJoin /
+    // bgQueueLeave / bgFlagAction commands, leaving 281.
+    expect(IWORLD_MEMBERS.length).toBe(281);
+    expect(DATA_MEMBERS.length).toBe(73);
     expect(METHOD_MEMBERS.length).toBe(208);
   });
   it('has no duplicate member names', () => {
@@ -742,6 +744,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'revivePet',
       'ridingTrained',
       'riftBossDeathZones',
+      'riftCollisionToken',
       'riftEventMsRemaining',
       'riftFloor',
       'salvageItem',
@@ -869,6 +872,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'recipeList',
       'renown',
       'restedXp',
+      'riftCollisionToken',
       'riftFloor',
       'socialInfo',
       'stationPlacements',
@@ -1449,6 +1453,7 @@ const FACET_DUNGEONS = [
   'leaveDungeon',
   'raidLockouts',
   'riftFloor',
+  'riftCollisionToken',
   'riftBossDeathZones',
   'riftEventMsRemaining',
   'dungeonDifficulty',
@@ -1644,8 +1649,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(280);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(280);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(281);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(281);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

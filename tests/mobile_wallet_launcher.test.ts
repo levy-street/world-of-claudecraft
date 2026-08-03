@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { FocusManager } from '../src/ui/focus_manager';

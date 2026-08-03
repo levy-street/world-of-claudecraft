@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { defaultAuraOverlayConfig } from '../src/ui/aura_overlay_config';
 import { AuraOverlaySettingsPanel } from '../src/ui/aura_overlay_settings';

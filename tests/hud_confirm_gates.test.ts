@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 // The two irreversible one-click actions gated behind Hud.confirmDialog: the
 // Pale Keeper revive (applies The Keeper's Toll) and Heroic Quartermaster

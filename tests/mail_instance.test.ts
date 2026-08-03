@@ -41,12 +41,16 @@ import {
 } from '../src/sim/mail/post_office';
 import { Sim } from '../src/sim/sim';
 import type { Entity, ItemInstancePayload, SimEvent } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const BOOTS = 'oiled_boots';
 const HIDE = 'pristine_hide';
 const SCALE = 'mudfin_scale';
 
-const makeWorld = () => new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+// Instanced-attachment mail only needs PostOffice + players + mailboxes.
+// Strip ambient camps/NPCs/objects (subsystem-world pattern; services stay).
+const makeWorld = () =>
+  new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: EMPTY_TEST_WORLD });
 
 function moveToMailbox(sim: Sim, pid: number): void {
   const box = sim.entities.get(sim.postOffice.mailboxIds[0]);

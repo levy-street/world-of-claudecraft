@@ -505,6 +505,9 @@ export const COMMAND_NAMES = [
   'bg_leave',
   'bg_flag',
   'dev_bg_start',
+  // Profiler-only server authority: idempotently prevents incoming damage while
+  // preserving normal outgoing damage and incoming hit presentation.
+  'dev_profiler_invulnerable',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -535,6 +538,7 @@ export const DISPATCH_ONLY_COMMANDS = [
   // abandon.
   'mount_train_answer',
   'mount_train_abort',
+  'dev_profiler_invulnerable',
 ] as const satisfies readonly CommandName[];
 
 export type DispatchOnlyCommand = (typeof DISPATCH_ONLY_COMMANDS)[number];

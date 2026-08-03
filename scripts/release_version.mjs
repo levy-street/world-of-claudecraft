@@ -18,7 +18,8 @@ const README_VERSION_BADGE_SOURCE = String.raw`img\.shields\.io/badge/version-(\
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const PATHS = {
   packageJson: 'package.json',
-  packageLock: 'package-lock.json',
+  // pnpm-lock.yaml does not store the package version (unlike package-lock.json),
+  // so release version surfaces do not rewrite or check a lockfile version field.
   gradle: 'android/app/build.gradle',
   pbxproj: 'ios/App/App.xcodeproj/project.pbxproj',
   desktopModule: 'src/game/desktop_download.ts',
@@ -78,15 +79,6 @@ export function setPackageVersion(packageJson, version) {
   return stringifyJson(pkg);
 }
 
-export function setPackageLockVersion(packageLock, version) {
-  const lock = parseJson(packageLock, 'package-lock.json');
-  lock.version = normalizeVersion(version);
-  if (lock.packages?.['']) {
-    lock.packages[''].version = normalizeVersion(version);
-  }
-  return stringifyJson(lock);
-}
-
 export function setDesktopDownloadVersion(html, version, path) {
   if (!MAC_DMG_RE.test(html)) {
     throw new Error(`${path} is missing a macOS desktop download URL`);
@@ -137,7 +129,6 @@ export function setReadmeVersionBadge(markdown, version, path) {
 export function planReleaseVersion({
   version,
   packageJson,
-  packageLock,
   gradle,
   pbxproj,
   desktopModule,
@@ -161,7 +152,6 @@ export function planReleaseVersion({
 
   return {
     packageJson: setPackageVersion(packageJson, normalized),
-    packageLock: setPackageLockVersion(packageLock, normalized),
     gradle: nativePlan.gradle,
     pbxproj: nativePlan.pbxproj,
     desktopModule: setDesktopModuleVersion(desktopModule, normalized, PATHS.desktopModule),
@@ -172,14 +162,6 @@ export function planReleaseVersion({
 
 function readPackageVersion(packageJson) {
   return parseJson(packageJson, 'package.json').version;
-}
-
-function readPackageLockVersions(packageLock) {
-  const lock = parseJson(packageLock, 'package-lock.json');
-  return {
-    root: lock.version,
-    packageRoot: lock.packages?.['']?.version,
-  };
 }
 
 function readGradleVersionName(gradle) {
@@ -199,7 +181,6 @@ function readGameVersion(html) {
 export function collectReleaseVersionFailures({
   version,
   packageJson,
-  packageLock,
   gradle,
   pbxproj,
   desktopModule,
@@ -212,16 +193,6 @@ export function collectReleaseVersionFailures({
   const pkgVersion = readPackageVersion(packageJson);
   if (pkgVersion !== expected) {
     failures.push(`package.json version is ${pkgVersion}, expected ${expected}`);
-  }
-
-  const lockVersions = readPackageLockVersions(packageLock);
-  if (lockVersions.root !== expected) {
-    failures.push(`package-lock.json root version is ${lockVersions.root}, expected ${expected}`);
-  }
-  if (lockVersions.packageRoot !== expected) {
-    failures.push(
-      `package-lock.json packages[""] version is ${lockVersions.packageRoot}, expected ${expected}`,
-    );
   }
 
   const gradleVersion = readGradleVersionName(gradle);
@@ -303,7 +274,6 @@ function readReleaseFiles() {
   const readmePaths = readReadmePaths();
   return {
     packageJson: readFileSync(resolve(ROOT, PATHS.packageJson), 'utf8'),
-    packageLock: readFileSync(resolve(ROOT, PATHS.packageLock), 'utf8'),
     gradle: readFileSync(resolve(ROOT, PATHS.gradle), 'utf8'),
     pbxproj: readFileSync(resolve(ROOT, PATHS.pbxproj), 'utf8'),
     desktopModule: readFileSync(resolve(ROOT, PATHS.desktopModule), 'utf8'),
@@ -318,7 +288,6 @@ function readReleaseFiles() {
 
 function writeReleaseFiles(plan) {
   writeFileSync(resolve(ROOT, PATHS.packageJson), plan.packageJson);
-  writeFileSync(resolve(ROOT, PATHS.packageLock), plan.packageLock);
   writeFileSync(resolve(ROOT, PATHS.gradle), plan.gradle);
   writeFileSync(resolve(ROOT, PATHS.pbxproj), plan.pbxproj);
   writeFileSync(resolve(ROOT, PATHS.desktopModule), plan.desktopModule);

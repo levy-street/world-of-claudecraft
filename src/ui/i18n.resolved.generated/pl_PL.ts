@@ -960,6 +960,18 @@ export const pl_PL: EnTranslations = {
       "petAggressive": "Zwierzę: Agresywne",
       "mount": "Dosiądź / Zsiądź"
     },
+    "actionBar": {
+      "editKeys": "Edit action bar keys",
+      "editKeysHint": "Click a slot on the action bar, then press a key to bind it.",
+      "bannerHint": "Click a slot, then press a key to bind it. Click Done when finished.",
+      "bannerCapturing": "Press a key to bind this slot...",
+      "boundToKey": "Bound to {key}.",
+      "reset": "Reset",
+      "done": "Done",
+      "cancel": "Cancel",
+      "resetConfirmTitle": "Reset action bar keys?",
+      "resetConfirmBody": "The first bar returns to its default keys. The second and third bars become unbound. This cannot be undone."
+    },
     "mounts": {
       "title": "Wierzchowce",
       "close": "Zamknij",
@@ -6284,6 +6296,7 @@ export const pl_PL: EnTranslations = {
         "add": "Dodaj kanał czatu",
         "addTitle": "Dodaj kanał",
         "close": "Zamknij kartę {channel}",
+        "moveHint": "Reorder {channel} tab: drag it, or use Alt+Left and Alt+Right",
         "sendingTo": "Wiadomość do {channel}",
         "names": {
           "say": "Mów",

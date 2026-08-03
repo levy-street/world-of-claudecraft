@@ -9,6 +9,7 @@ import {
   wireStreamerLinks,
 } from '../src/sim/account_flair';
 import { verifyChallenge } from '../src/sim/client_challenge';
+import { isStunned } from '../src/sim/combat/cc';
 import { damageTakenWithin } from '../src/sim/combat/damage_history';
 import { rewindHealAmount } from '../src/sim/combat/rewind';
 import { DEEDS } from '../src/sim/content/deeds';
@@ -4297,7 +4298,11 @@ export class GameServer {
       // A released spirit turns with the camera like the living; only a corpse that
       // has not yet released (dead and not a ghost) keeps its facing frozen. Without
       // this the server drops the ghost's mouselook facing and its run feels inverted.
-      if (frame.facing !== null && (!e.dead || e.ghost)) {
+      // A stun locks facing too (issue #2426): the offline kernel already blocks its
+      // own turnLeft/turnRight (player_motion.ts), but mouselook facing streams in on
+      // this out-of-band channel and must be rejected here, the authoritative side,
+      // not trusted to a client that could simply keep sending it.
+      if (frame.facing !== null && (!e.dead || e.ghost) && !isStunned(e)) {
         e.facing = frame.facing;
       }
       this.botDetector.observeInput(session.botTrackingContext, frame, receivedAtMs);
@@ -5567,6 +5572,13 @@ export class GameServer {
         if (process.env.ALLOW_DEV_COMMANDS === '1' && typeof msg.item === 'string') {
           const count = typeof msg.count === 'number' ? msg.count : 1;
           sim.addItem(msg.item, Math.max(1, Math.min(20, count | 0)), pid);
+        }
+        break;
+      }
+      case 'dev_profiler_invulnerable': {
+        if (process.env.ALLOW_DEV_COMMANDS === '1') {
+          const entity = sim.entities.get(pid);
+          if (entity) entity.profilerInvulnerable = true;
         }
         break;
       }

@@ -239,7 +239,7 @@
     font-family: var(--title-font);
     font-size: 21px;
     line-height: 1.2;
-    text-shadow: 1px 1px 2px #000;
+    text-shadow: var(--title-shadow);
   }
 
   .account-title {
