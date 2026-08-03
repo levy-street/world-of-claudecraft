@@ -4358,8 +4358,8 @@ export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 // art that is NOT listed here still fails. Do not add to this list to silence that failure;
 // commission the art.
 export const ITEM_ART_PENDING = new Set<string>([
-  // zone2.ts (Mirefen): uses the procedural firebottle recipe until art ships.
-  'firebottle',
+  // zone2.ts (Mirefen): a world-object label item (Mudfin Hut), never shown in bags.
+  'murloc_hut',
   // amberfall.ts
   'amberfall_sap_bucket',
   'gilded_sap_clot',

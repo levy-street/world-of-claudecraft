@@ -615,6 +615,13 @@
       "confidence": "medium"
     },
     {
+      "itemId": "firebottle",
+      "name": "Firebottle",
+      "sourcePack": "alchemist",
+      "sourceFile": "1.png",
+      "confidence": "high"
+    },
+    {
       "itemId": "footpad_jerkin",
       "name": "Cutpurse Jerkin",
       "sourcePack": "armor",
