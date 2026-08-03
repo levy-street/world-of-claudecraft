@@ -24,15 +24,14 @@ export const LAST_BELL_VOYAGE_SEGMENT_IDS = {
 } as const;
 
 export const LAST_BELL_PROP_PATH_SEGMENTS = {
-  // Cast-off glides run until the cut to open water is fully black, so the
-  // vessel never stops on camera; the pace is a gentle getting-under-way.
-  // Durations track the beat layout: the glide must still be moving when the
-  // next cut's slower fade reaches full black (openWater beat 7, black from
-  // 6.5), and it ends exactly as the cue switches.
+  // Cast-off glides start at scene open (the voyage cuts straight into the
+  // shot, no opening fade) and run until the cut to open water is fully
+  // black, so the vessel never stops on camera: cue at 0, black from 6.5,
+  // cue switch at 7.
   [LAST_BELL_VOYAGE_SEGMENT_IDS.out.castOff]: {
     start: { x: 0, y: 0, z: 0, yaw: 0 },
     end: { x: 22, y: 0, z: 7, yaw: 0 },
-    duration: 5.8,
+    duration: 6.8,
     ease: 'linear',
   },
   // The open-water legs ride the old crossing track (360,-8) to (470,34),
@@ -67,7 +66,7 @@ export const LAST_BELL_PROP_PATH_SEGMENTS = {
   [LAST_BELL_VOYAGE_SEGMENT_IDS.back.castOff]: {
     start: { x: 0, y: 0, z: 0, yaw: 0 },
     end: { x: 22, y: 0, z: -7, yaw: 0 },
-    duration: 5.8,
+    duration: 6.8,
     ease: 'linear',
   },
   [LAST_BELL_VOYAGE_SEGMENT_IDS.back.openWater]: {

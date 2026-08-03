@@ -3669,6 +3669,28 @@ async function startGame(
     if (!riftExit && renderer.isZoneReadyAt(player.pos.x, player.pos.z)) return;
     const zoneX = player.pos.x;
     const zoneZ = player.pos.z;
+    // A teleport that lands while a SCENE is running (the ferry fare moves
+    // the rider to the destination harbor before the voyage plays) must not
+    // raise the blocking loading screen: the scene's opening shots film the
+    // DEPARTURE harbor, which is already resident, and the destination has
+    // the whole crossing to stream in the background before the arrival
+    // shot needs it. Sim collision is procedural math, so the authoritative
+    // player standing on not-yet-rendered ground stays correct throughout.
+    const sceneCovered = !riftExit && sceneDirector.sceneActive();
+    if (sceneCovered) {
+      zoneWarmup = renderer
+        .prepareZoneAt(zoneX, zoneZ)
+        .then(() => renderer.prepareZonesAround(zoneX, zoneZ, ARRIVAL_NEIGHBOR_STREAM_RADIUS))
+        .then(() => renderer.prewarmZoneAt(zoneX, zoneZ, { background: true }))
+        .catch((err) => {
+          console.warn('Scene-covered zone warmup failed', err);
+          return new Promise<void>((resolve) => window.setTimeout(resolve, 5000));
+        })
+        .finally(() => {
+          zoneWarmup = null;
+        });
+      return;
+    }
     if (!riftExit && zoneWarmupMode(displacement) === 'background') {
       // A walked crossing: the visible-zone streaming lane normally has the
       // destination resident long before the boundary, so landing here means

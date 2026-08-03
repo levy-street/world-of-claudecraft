@@ -1073,6 +1073,9 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
             points: [{ x: 10, z: 0, height: 100 }],
             lookAt: { kind: 'point', point: { x: 10, z: 10, height: 100 } },
             dur: 1.6,
+            // Authored ease (the fixture disables the live-pose ease): an
+            // eased boundary must never jump, unlike a deliberate snap cut.
+            entry: 'ease',
           },
         },
       ],
@@ -1399,6 +1402,9 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
             ],
             lookAt: { kind: 'point', point: { x: 0, z: 10, height: 100 } },
             dur: 1.6,
+            // Authored ease with the live-pose ease disabled: an uncovered,
+            // non-snap first cut is exactly the unannounced pop this guards.
+            entry: 'ease',
           },
         },
       ],
@@ -1585,10 +1591,12 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
     onlyExpectedCheck: true,
   },
   {
+    // A mid-fade first cut is two defects at once under the pass-three
+    // grammar (an early cut AND a bad first transition), so this control
+    // pins the fadeSlack arm by substring rather than exclusivity.
     def: syntheticEarlyCutScene('scn_test_lint_fade_cut_early_bad'),
     expectedCheck: 'cut.fadeSlack',
     expectedMeasured: 'after co-timed cut ops',
-    onlyExpectedCheck: true,
   },
   {
     def: syntheticCameraScene('scn_test_lint_held_duration_bad', 1.2, [
@@ -2717,6 +2725,10 @@ function sightLineOcclusion(
   return worst;
 }
 
+// A cut counts as fully clear only below this overlay opacity: mid-fade cuts
+// (any visible veil) are never a legitimate transition.
+const FADE_OPACITY_EPSILON = 0.001;
+
 function opKind(op: SceneWireOp): string {
   return op.kind === 'camera' ? `camera/${op.shot.kind}` : op.kind;
 }
@@ -2842,25 +2854,42 @@ function lintFilmGrammar(
       cut.op.shot.kind !== 'release' &&
       sceneShotEasesFromLivePose(cut.op.shot) &&
       !scene.disableLivePoseEase;
-    if (cut.index === firstShot?.index && cutOpacity < FULL_BLACK_OPACITY && !easesFromLivePose) {
+    // A cut is legitimate at FULL BLACK (covered), or FULLY CLEAR when the
+    // transition is authored: a snap shot is a deliberate hard cut, an
+    // easing shot glides in continuously, and a release eases to gameplay
+    // by construction (cut.releaseDelta and cut.releaseSightLine own its
+    // quality). A cut MID-FADE is never legitimate, and an uncovered cut
+    // with no authored intent is the unreviewed pop this check exists for.
+    const snapCut = cut.op.shot.kind !== 'release' && cut.op.shot.entry === 'snap';
+    const clearCut =
+      cutOpacity <= FADE_OPACITY_EPSILON &&
+      (snapCut || easesFromLivePose || cut.op.shot.kind === 'release');
+    if (
+      cut.index === firstShot?.index &&
+      cutOpacity < FULL_BLACK_OPACITY &&
+      !easesFromLivePose &&
+      !(snapCut && cutOpacity <= FADE_OPACITY_EPSILON)
+    ) {
       report({
         sceneId: scene.id,
         check: 'cut.firstTransition',
         opIndex: cut.index,
         opKind: opKind(cut.op),
         time: cut.at,
-        threshold: 'full black at the first cut or a shot eased from the live camera pose',
+        threshold:
+          'full black at the first cut, an authored snap cut at fully clear, or a shot eased from the live camera pose',
         measured: `${opKind(cut.op)} without full black, fade ${cutOpacity.toFixed(3)}`,
       });
     }
-    if (cutOpacity < FULL_BLACK_OPACITY) {
+    if (cutOpacity < FULL_BLACK_OPACITY && !clearCut) {
       report({
         sceneId: scene.id,
         check: 'cut.fadeSlack',
         opIndex: cut.index,
         opKind: opKind(cut.op),
         time: cut.at,
-        threshold: 'full black at the camera cut after a perceptual fade-out',
+        threshold:
+          'full black at the camera cut, or a fully clear cut with an authored snap, ease, or release',
         measured: `fade ${cutOpacity.toFixed(3)} after co-timed cut ops`,
       });
     }
@@ -3790,7 +3819,18 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
         if (timed.op.cue === LB_PROP_CUE_PARK) {
           if (activeProps.has(target)) {
             const fullBlack = sceneOverlayView(overlay, timed.at).fadeOpacity >= FULL_BLACK_OPACITY;
-            if (!fullBlack) {
+            // A park cue that lands with the displaced ship EXACTLY at its
+            // parked pose swaps stand-in for real rig pixel-identically, so
+            // it needs no cover; anything short of the berth pose still does.
+            const handoffHarbor = HARBORS.find((candidate) => shipTarget(candidate) === target);
+            const atParkedPose =
+              handoffHarbor !== undefined &&
+              evaluateBerthPoseContinuity(
+                handoffHarbor,
+                shipFrameAt(handoffHarbor, timed.at, activeProps),
+                runtimeWaterLevel,
+              ).passing;
+            if (!fullBlack && !atParkedPose) {
               report({
                 sceneId: scene.id,
                 check: 'continuity.standInHandoff',
@@ -4204,7 +4244,10 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
       } else if (
         (positionStep > MAX_POSE_POSITION_STEP_YARDS ||
           orientationStep > MAX_POSE_ORIENTATION_STEP_DEG) &&
-        !fullBlack
+        !fullBlack &&
+        // An authored snap boundary is a deliberate hard cut; the check
+        // guards eased or unannotated boundaries, which must never jump.
+        activeShot?.entry !== 'snap'
       ) {
         report({
           sceneId: scene.id,
