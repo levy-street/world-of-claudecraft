@@ -25,11 +25,10 @@ export function parseCeilingEnv(name, raw) {
   return n;
 }
 
-// The composer pipeline tiers, where phase 01's draw_stats accumulator made the
-// draw counts real. Before it, every composer frame reported the final fullscreen
-// pass: 1 call / 1 triangle (brainstorm finding 19), so a crowd sample on these
-// tiers sitting at that floor means the instrument is dead, not the scene cheap.
-export const COMPOSER_TIERS = ['high', 'ultra'];
+// Every tier that uses the post composer or output-grade path must accumulate
+// renderer statistics across the whole logical frame. A sample at the final
+// fullscreen-pass floor means the instrument is dead, not the scene cheap.
+export const COMPOSER_TIERS = ['medium', 'high', 'ultra', 'insane'];
 export const FULLSCREEN_DRAW_FLOOR = 1;
 
 // Judges a crowd bench run. Every sample must carry finite evidence; samples that

@@ -81,6 +81,35 @@ function expectJoined(result: ClientSession | { error: string }): ClientSession 
 }
 
 describe('GameServer sessions', () => {
+  it('keeps profiler invulnerability gated and enables it idempotently', () => {
+    const previous = process.env.ALLOW_DEV_COMMANDS;
+    try {
+      delete process.env.ALLOW_DEV_COMMANDS;
+      const gatedServer = new GameServer();
+      const gatedSession = expectJoined(
+        gatedServer.join(fakeWs(), 10, 100, 'Profileoff', 'warrior', null),
+      );
+      gatedServer.handleMessage(
+        gatedSession,
+        JSON.stringify({ t: 'cmd', cmd: 'dev_profiler_invulnerable' }),
+      );
+      expect(gatedServer.sim.entities.get(gatedSession.pid)?.profilerInvulnerable).toBeFalsy();
+
+      process.env.ALLOW_DEV_COMMANDS = '1';
+      const enabledServer = new GameServer();
+      const enabledSession = expectJoined(
+        enabledServer.join(fakeWs(), 11, 101, 'Profileon', 'warrior', null),
+      );
+      const payload = JSON.stringify({ t: 'cmd', cmd: 'dev_profiler_invulnerable' });
+      enabledServer.handleMessage(enabledSession, payload);
+      enabledServer.handleMessage(enabledSession, payload);
+      expect(enabledServer.sim.entities.get(enabledSession.pid)?.profilerInvulnerable).toBe(true);
+    } finally {
+      if (previous === undefined) delete process.env.ALLOW_DEV_COMMANDS;
+      else process.env.ALLOW_DEV_COMMANDS = previous;
+    }
+  });
+
   it('keeps dev quest completion commands gated behind ALLOW_DEV_COMMANDS', () => {
     const previous = process.env.ALLOW_DEV_COMMANDS;
     delete process.env.ALLOW_DEV_COMMANDS;

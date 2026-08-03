@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PerfMonitor, PerfSnapshot } from '../src/game/perf';
+import { jitteredPerfReportDelay } from '../src/game/perf_report_schedule';
 import { perfReporterInternalsForTest, startPerfReporter } from '../src/game/perf_reporter';
 import { Settings } from '../src/game/settings';
 
@@ -729,7 +730,7 @@ describe('perf reporter worst-window drain', () => {
     (globalThis as any).window = {
       innerWidth: 1440,
       innerHeight: 900,
-      setTimeout: (fn: () => void, ms: number) => setTimeout(fn, ms),
+      setTimeout: vi.fn((fn: () => void, ms: number) => setTimeout(fn, ms)),
       clearTimeout: (id: ReturnType<typeof setTimeout>) => clearTimeout(id),
       addEventListener: () => {},
       removeEventListener: () => {},
@@ -740,7 +741,7 @@ describe('perf reporter worst-window drain', () => {
       removeEventListener: () => {},
     };
     (globalThis as any).sessionStorage = {
-      getItem: () => null,
+      getItem: () => 'reporter-test-session',
       setItem: () => {},
     };
     (globalThis as any).fetch = fetchImpl;
@@ -750,6 +751,10 @@ describe('perf reporter worst-window drain', () => {
     const drainWorstWindow = vi.fn();
     const perf = { report: () => snapshot(), drainWorstWindow } as unknown as PerfMonitor;
     return { perf, drainWorstWindow };
+  }
+
+  function lastScheduledDelay(): number | undefined {
+    return (globalThis as any).window.setTimeout.mock.lastCall?.[1];
   }
 
   async function runFirstReport(fetchImpl: unknown): Promise<ReturnType<typeof vi.fn>> {
@@ -762,9 +767,14 @@ describe('perf reporter worst-window drain', () => {
       characterIdProvider: () => null,
     });
     try {
-      // The first automatic report fires at 75 s; flush the send's fetch
-      // promise chain before reading the drain spy.
+      const firstDelay = jitteredPerfReportDelay(75_000, 'reporter-test-session', 0);
+      expect(firstDelay).toBeGreaterThan(75_000);
       await vi.advanceTimersByTimeAsync(75_000);
+      expect(fetchImpl).not.toHaveBeenCalled();
+      await vi.advanceTimersByTimeAsync(firstDelay - 75_000 - 1);
+      expect(fetchImpl).not.toHaveBeenCalled();
+      await vi.advanceTimersByTimeAsync(1);
+      expect(fetchImpl).toHaveBeenCalledTimes(1);
       await Promise.resolve();
       await Promise.resolve();
     } finally {
@@ -782,6 +792,8 @@ describe('perf reporter worst-window drain', () => {
     delete (globalThis as any).fetch;
     delete (globalThis as any).sessionStorage;
     delete (globalThis as any).document;
+    delete (globalThis as any).window;
+    delete (globalThis as any).location;
   });
 
   it('drains the worst window exactly once after a successful send', async () => {
@@ -801,6 +813,119 @@ describe('perf reporter worst-window drain', () => {
   it('keeps the worst window when the send fails at the network layer', async () => {
     const drain = await runFirstReport(vi.fn(async () => Promise.reject(new Error('offline'))));
     expect(drain).not.toHaveBeenCalled();
+  });
+
+  it('arms the next deterministic sequence after a successful report', async () => {
+    const fetchImpl = vi.fn(async () => ({ ok: true, status: 204, text: async () => '' }));
+    installReporterFlowGlobals(fetchImpl);
+    const { perf } = fakePerf();
+    const stop = startPerfReporter({
+      perf,
+      settings: new Settings(),
+      tokenProvider: () => null,
+      characterIdProvider: () => null,
+    });
+    try {
+      await vi.advanceTimersByTimeAsync(
+        jitteredPerfReportDelay(75_000, 'reporter-test-session', 0),
+      );
+      expect(fetchImpl).toHaveBeenCalledTimes(1);
+      expect(lastScheduledDelay()).toBe(
+        jitteredPerfReportDelay(300_000, 'reporter-test-session', 1),
+      );
+    } finally {
+      stop();
+    }
+  });
+
+  it('advances the jitter sequence when a hidden retry sends no request', async () => {
+    const fetchImpl = vi.fn(async () => ({ ok: true, status: 204, text: async () => '' }));
+    installReporterFlowGlobals(fetchImpl);
+    (globalThis as any).document.visibilityState = 'hidden';
+    const { perf } = fakePerf();
+    const stop = startPerfReporter({
+      perf,
+      settings: new Settings(),
+      tokenProvider: () => null,
+      characterIdProvider: () => null,
+    });
+    try {
+      await vi.advanceTimersByTimeAsync(
+        jitteredPerfReportDelay(75_000, 'reporter-test-session', 0),
+      );
+      expect(fetchImpl).not.toHaveBeenCalled();
+      const hiddenRetry = jitteredPerfReportDelay(300_000, 'reporter-test-session', 1);
+      expect(lastScheduledDelay()).toBe(hiddenRetry);
+
+      (globalThis as any).document.visibilityState = 'visible';
+      await vi.advanceTimersByTimeAsync(hiddenRetry);
+      expect(fetchImpl).toHaveBeenCalledTimes(1);
+      expect(lastScheduledDelay()).toBe(
+        jitteredPerfReportDelay(300_000, 'reporter-test-session', 2),
+      );
+    } finally {
+      stop();
+    }
+  });
+
+  it('advances the jitter sequence when renderer evidence is not ready', async () => {
+    const fetchImpl = vi.fn(async () => ({ ok: true, status: 204, text: async () => '' }));
+    installReporterFlowGlobals(fetchImpl);
+    let current = snapshot();
+    current.renderer = null;
+    const drainWorstWindow = vi.fn();
+    const perf = {
+      report: () => current,
+      drainWorstWindow,
+    } as unknown as PerfMonitor;
+    const stop = startPerfReporter({
+      perf,
+      settings: new Settings(),
+      tokenProvider: () => null,
+      characterIdProvider: () => null,
+    });
+    try {
+      await vi.advanceTimersByTimeAsync(
+        jitteredPerfReportDelay(75_000, 'reporter-test-session', 0),
+      );
+      expect(fetchImpl).not.toHaveBeenCalled();
+      const noRendererRetry = jitteredPerfReportDelay(300_000, 'reporter-test-session', 1);
+      expect(lastScheduledDelay()).toBe(noRendererRetry);
+
+      current = snapshot();
+      await vi.advanceTimersByTimeAsync(noRendererRetry);
+      expect(fetchImpl).toHaveBeenCalledTimes(1);
+      expect(lastScheduledDelay()).toBe(
+        jitteredPerfReportDelay(300_000, 'reporter-test-session', 2),
+      );
+    } finally {
+      stop();
+    }
+  });
+
+  it('keeps the local development trace on its fixed fast cadence', async () => {
+    const fetchImpl = vi.fn(async () => ({ ok: true, status: 204, text: async () => '' }));
+    installReporterFlowGlobals(fetchImpl);
+    (globalThis as any).location = {
+      search: '?perfTrace=1',
+      hostname: '127.0.0.1',
+    };
+    const { perf } = fakePerf();
+    const stop = startPerfReporter({
+      perf,
+      settings: new Settings(),
+      tokenProvider: () => null,
+      characterIdProvider: () => null,
+    });
+    try {
+      await vi.advanceTimersByTimeAsync(9_999);
+      expect(fetchImpl).not.toHaveBeenCalled();
+      await vi.advanceTimersByTimeAsync(1);
+      expect(fetchImpl).toHaveBeenCalledTimes(1);
+      expect(lastScheduledDelay()).toBe(15_000);
+    } finally {
+      stop();
+    }
   });
 });
 

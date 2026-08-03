@@ -5434,6 +5434,13 @@ export class GameServer {
         }
         break;
       }
+      case 'dev_profiler_invulnerable': {
+        if (process.env.ALLOW_DEV_COMMANDS === '1') {
+          const entity = sim.entities.get(pid);
+          if (entity) entity.profilerInvulnerable = true;
+        }
+        break;
+      }
       case 'dev_complete_quest': {
         if (process.env.ALLOW_DEV_COMMANDS === '1' && typeof msg.quest === 'string') {
           const beforeDone = sim.meta(pid)?.questsDone.has(msg.quest) ?? false;

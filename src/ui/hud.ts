@@ -4728,10 +4728,15 @@ export class Hud {
     };
     const showAt = (x: number, y: number, trigger: 'touch' | 'mouse' | 'focus') => {
       if (this.mobileHotbarDrag?.active) return;
+      // An empty body means this element has nothing to say right now, which a
+      // pooled node reused for a read-only row does hit (the meters panel's
+      // split rows). Show nothing rather than an empty styled box.
+      const content = html();
+      if (!content) return;
       // Touch-only path: showing the tooltip means the held control is being
       // inspected, so the release click should peek, not fire its action.
       this.peekGuard.tooltipShown(trigger);
-      const size = this.paintTooltipAt(html(), x, y);
+      const size = this.paintTooltipAt(content, x, y);
       // cache the measured box for the mousemove clamp below (no forced reflow)
       ttW = size.w;
       ttH = size.h;
