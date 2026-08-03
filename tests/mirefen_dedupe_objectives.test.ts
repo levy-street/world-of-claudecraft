@@ -150,7 +150,7 @@ describe('Mirefen quest de-duplication', () => {
       distance: 1,
       time: 100,
       bottleReadyAt: 0,
-      hutBurningUntil: 0,
+      alreadyBurned: false,
     };
     it('succeeds up against the hut, holding a ready bottle, on the quest', () => {
       expect(firebottleBurnCheck(base)).toEqual({ ok: true });
@@ -167,13 +167,13 @@ describe('Mirefen quest de-duplication', () => {
       });
       expect(firebottleBurnCheck({ ...base, distance: HUT_BURN_RANGE })).toEqual({ ok: true });
     });
-    it('enforces the 5s bottle cooldown and the hut relight', () => {
+    it('enforces the 5s bottle cooldown and blocks an already-burned hut', () => {
       expect(FIREBOTTLE_COOLDOWN_SECS).toBe(5);
       expect(firebottleBurnCheck({ ...base, bottleReadyAt: 101 })).toMatchObject({
         reason: 'onCooldown',
       });
-      expect(firebottleBurnCheck({ ...base, hutBurningUntil: 101 })).toMatchObject({
-        reason: 'alreadyBurning',
+      expect(firebottleBurnCheck({ ...base, alreadyBurned: true })).toMatchObject({
+        reason: 'alreadyBurned',
       });
     });
   });
@@ -208,7 +208,7 @@ describe('Mirefen quest de-duplication', () => {
       const { ctx, events } = makeCtx(hut, 100);
       const meta = onQuestMeta();
       throwFirebottleAtNearestHut(ctx, player, meta);
-      expect((hut.burnBurstUntil ?? 0) > 100).toBe(true);
+      expect(meta.questLog.get('q_deepfen_purge')?.burnedObjectIds).toContain(5);
       expect(meta.firebottleReadyAt).toBe(100 + FIREBOTTLE_COOLDOWN_SECS);
       expect(meta.questLog.get('q_deepfen_purge')?.counts[0]).toBe(1);
       expect(events.some((e) => e.type === 'worldObjectBurning')).toBe(true);
@@ -218,9 +218,23 @@ describe('Mirefen quest de-duplication', () => {
     it('errors and burns nothing when no hut is within range', () => {
       const hut = { id: 5, pos: { x: 99, z: 99 }, objectItemId: 'murloc_hut' } as unknown as Entity;
       const { ctx, events } = makeCtx(hut, 100);
-      throwFirebottleAtNearestHut(ctx, player, onQuestMeta());
-      expect(hut.burnBurstUntil).toBeUndefined();
+      const meta = onQuestMeta();
+      throwFirebottleAtNearestHut(ctx, player, meta);
+      expect(meta.questLog.get('q_deepfen_purge')?.burnedObjectIds ?? []).toHaveLength(0);
       expect(events.some((e) => e.type === 'error')).toBe(true);
+    });
+
+    it('will not burn the same hut twice: the second throw warns and does not re-credit', () => {
+      const hut = { id: 5, pos: { x: 0, z: 0 }, objectItemId: 'murloc_hut' } as unknown as Entity;
+      const meta = onQuestMeta();
+      throwFirebottleAtNearestHut(makeCtx(hut, 100).ctx, player, meta);
+      expect(meta.questLog.get('q_deepfen_purge')?.counts[0]).toBe(1);
+      // second throw at the same hut, past the bottle cooldown, is a warning only
+      const second = makeCtx(hut, 200);
+      throwFirebottleAtNearestHut(second.ctx, player, meta);
+      expect(meta.questLog.get('q_deepfen_purge')?.counts[0]).toBe(1);
+      expect(second.events.some((e) => e.type === 'error')).toBe(true);
+      expect(second.events.some((e) => e.type === 'worldObjectBurning')).toBe(false);
     });
   });
 

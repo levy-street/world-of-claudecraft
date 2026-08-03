@@ -2980,6 +2980,9 @@ export interface QuestProgress {
   state: 'active' | 'ready' | 'done';
   selection?: string;
   resolvedCounts?: number[];
+  // World-object ids already credited THIS quest run (e.g. burned murloc huts),
+  // so each object counts once. Fresh (empty) on accept; persisted with the run.
+  burnedObjectIds?: number[];
 }
 
 export function questObjectiveRequired(
@@ -3468,9 +3471,6 @@ export interface Entity extends ClientMirroredEntityFields {
   // of combat before despawning. updateMob starts the despawnTimer countdown when
   // the add leashes home and cancels it while the add is back in combat.
   leashDespawnSecs?: number;
-  // Torched murloc hut (q_deepfen_purge): sim time until which the hut is ablaze
-  // and cannot be re-lit. Transient, sim-internal (the burn VFX rides an event).
-  burnBurstUntil?: number;
   damageIdleDespawnTimer?: number;
   lootable: boolean;
   loot: CorpseLoot | null;
@@ -4018,12 +4018,11 @@ export type SimEvent = { pid?: number } & (
   | { type: 'noticeboard'; noticeboardId: string; state: 'empty' }
   | {
       // A world object (a torched murloc hut, q_deepfen_purge) bursts into flames.
-      // The renderer plays a fire burst at (x, z) for durationSecs. Visual-only.
+      // The renderer plays a fire burst at (x, z). Visual-only.
       type: 'worldObjectBurning';
       objectId: number;
       x: number;
       z: number;
-      durationSecs: number;
     }
   | { type: 'mailArrived'; senderName: string; letterId?: string }
   | { type: 'mailResult'; code: MailResultCode; value?: number; name?: string }
