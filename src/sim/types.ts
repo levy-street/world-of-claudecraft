@@ -1022,6 +1022,20 @@ export function cloneInvSlot<T extends InvSlot>(slot: T): T {
   return { ...slot, instance: cloneItemInstancePayload(slot.instance) };
 }
 
+/** ONE unit lifted out of an inventory slot, carrying BOTH provenance channels
+ *  the slot can hold: the per-instance `instance` payload and the plain-stack
+ *  `craftedRecipeId` marker. Any remover that reports what it consumed must
+ *  return this, never the bare payload: a plain crafted stack has no `instance`
+ *  at all, so a payload-only return silently drops its marker and the re-grant
+ *  launders the copy (the class the trade/market/mail/bank fixes each closed
+ *  at their own boundary). Consumed by items.ts removeVendorSellUnits and the
+ *  equip bridge, professions/enchanting.ts's victim walks, and
+ *  Sim.removeEnchantableItem. */
+export interface InventoryUnit {
+  instance: ItemInstancePayload | undefined;
+  craftedRecipeId: string | undefined;
+}
+
 export interface LootSlot extends InvSlot {
   // Quest corpse loot can be personal: each listed player can take one copy.
   personalFor?: number[];

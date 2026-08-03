@@ -1654,11 +1654,11 @@ describe('replaceVictimIndex / consumeEnchantedVictim (the shared victim walk)',
     expect(stacked[0].count).toBe(1);
     // Clone-on-survival: mutating the returned payload never reaches the
     // surviving stack's shared payload (the removeEnchantableItem contract).
-    consumed!.rolled!.stats!.str = 99;
+    consumed!.instance!.rolled!.stats!.str = 99;
     expect(stacked[0].instance?.rolled?.stats?.str).toBe(2);
 
     const single: InvSlot[] = [{ itemId: GEAR, count: 1, instance: { enchant: 'x' } }];
-    expect(consumeEnchantedVictim(single, GEAR)?.enchant).toBe('x');
+    expect(consumeEnchantedVictim(single, GEAR)?.instance?.enchant).toBe('x');
     expect(single).toHaveLength(0);
     expect(consumeEnchantedVictim([{ itemId: GEAR, count: 1 }], GEAR)).toBeUndefined();
   });

@@ -663,3 +663,113 @@ describe('online end-to-end (live GameServer, wire commands + self-deltas)', () 
     expect(client.lastSalvageResult?.ok).toBe(true);
   });
 });
+
+describe('apply-enchant keeps the crafted-provenance marker (the anti-farm gate)', () => {
+  const CHEST_ENCHANT = 'enchant_chest_stamina';
+  const reagentsFor = (sim: Sim, pid: number): void => {
+    sim.addItem('arcane_dust', 10, pid);
+    sim.addItem('arcane_essence', 10, pid);
+  };
+  const vest = (sim: Sim, pid: number) =>
+    simInv(sim, pid).find((s) => s.itemId === CRAFTED_COMMON_ARMOR);
+  const markerOf = (
+    slot: { craftedRecipeId?: string; instance?: { craftedRecipeId?: string } } | undefined,
+  ) => slot?.craftedRecipeId ?? slot?.instance?.craftedRecipeId;
+
+  it('a PLAIN crafted stack keeps its slot marker through the enchant mint', () => {
+    // The bug: a common crafted piece carries its provenance on the SLOT with no
+    // `instance` at all, and the mint rebuilt the copy from the consumed
+    // PAYLOAD only, so the marker had nowhere to survive.
+    const sim = new Sim({ seed: 20260901, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    grantVestMaterials(sim, pid);
+    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    expect(sim.lastCraftResult?.ok).toBe(true);
+    reagentsFor(sim, pid);
+
+    sim.applyEnchant(CRAFTED_COMMON_ARMOR, CHEST_ENCHANT, undefined, undefined, pid);
+    expect(sim.lastEnchantResultFor(pid)?.ok).toBe(true);
+    const after = vest(sim, pid);
+    expect(after?.instance?.enchant).toBe(CHEST_ENCHANT);
+    expect(markerOf(after)).toBe(CRAFTED_COMMON_ARMOR_RECIPE);
+  });
+
+  it('disenchanting that enchanted self-crafted piece still pays NO enchanting skill', () => {
+    // The behaviour the marker exists for. Without it, craft -> enchant ->
+    // disenchant is a self-serve skill loop on the player's own gear.
+    const sim = new Sim({ seed: 20260902, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    const meta = metaFor(sim, pid);
+    grantVestMaterials(sim, pid);
+    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    reagentsFor(sim, pid);
+    sim.applyEnchant(CRAFTED_COMMON_ARMOR, CHEST_ENCHANT, undefined, undefined, pid);
+    const afterApply = meta.craftSkills.enchanting;
+
+    sim.disenchantItem(
+      CRAFTED_COMMON_ARMOR,
+      pid,
+      simInv(sim, pid).findIndex((s) => s.itemId === CRAFTED_COMMON_ARMOR),
+    );
+    expect(sim.lastDisenchantResult?.ok).toBe(true);
+    expect(meta.craftSkills.enchanting - afterApply).toBe(0);
+  });
+
+  it('a FOUND piece still pays skill: the gate denies provenance, not enchanting', () => {
+    // The negative arm. If this ever went to 0 the fix would be over-broad,
+    // silently killing the legitimate disenchant faucet.
+    const sim = new Sim({ seed: 20260903, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    const meta = metaFor(sim, pid);
+    sim.addItem(CRAFTED_COMMON_ARMOR, 1, pid); // granted, never crafted: no marker
+    reagentsFor(sim, pid);
+    sim.applyEnchant(CRAFTED_COMMON_ARMOR, CHEST_ENCHANT, undefined, undefined, pid);
+    const afterApply = meta.craftSkills.enchanting;
+
+    sim.disenchantItem(
+      CRAFTED_COMMON_ARMOR,
+      pid,
+      simInv(sim, pid).findIndex((s) => s.itemId === CRAFTED_COMMON_ARMOR),
+    );
+    expect(sim.lastDisenchantResult?.ok).toBe(true);
+    expect(meta.craftSkills.enchanting - afterApply).toBeGreaterThan(0);
+  });
+
+  it('a masterwork crafted copy keeps seal, signer, AND marker through the mint', () => {
+    const sim = new Sim({ seed: 20260904, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    sim.addItemInstance(
+      CRAFTED_COMMON_ARMOR,
+      { signer: 'Ana', rolled: { masterwork: true, stats: { sta: 5 } } },
+      pid,
+      1,
+      { craftedRecipeId: CRAFTED_COMMON_ARMOR_RECIPE },
+    );
+    reagentsFor(sim, pid);
+
+    sim.applyEnchant(CRAFTED_COMMON_ARMOR, CHEST_ENCHANT, undefined, undefined, pid);
+    const after = vest(sim, pid);
+    expect(after?.instance?.signer).toBe('Ana');
+    expect(after?.instance?.rolled?.masterwork).toBe(true);
+    // The enchant's bonus sums ON TOP of the masterwork bake, not over it.
+    expect(after?.instance?.rolled?.stats?.sta).toBe(9);
+    expect(markerOf(after)).toBe(CRAFTED_COMMON_ARMOR_RECIPE);
+  });
+
+  it('the REPLACE arm keeps the marker too', () => {
+    const sim = new Sim({ seed: 20260905, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    grantVestMaterials(sim, pid);
+    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    reagentsFor(sim, pid);
+    sim.applyEnchant(CRAFTED_COMMON_ARMOR, CHEST_ENCHANT, undefined, undefined, pid);
+    reagentsFor(sim, pid);
+
+    // Replacing with a different chest enchant, explicitly confirmed.
+    sim.applyEnchant(CRAFTED_COMMON_ARMOR, 'enchant_chest_spirit', undefined, true, pid);
+    expect(sim.lastEnchantResultFor(pid)?.ok).toBe(true);
+    const after = vest(sim, pid);
+    expect(after?.instance?.enchant).toBe('enchant_chest_spirit');
+    expect(markerOf(after)).toBe(CRAFTED_COMMON_ARMOR_RECIPE);
+  });
+});
