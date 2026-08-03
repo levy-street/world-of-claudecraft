@@ -8689,7 +8689,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': '影跃蟾蜍卡玛影',
   'hudChrome.mounts.name_stormfeather_griffin': '凌天风暴之羽',
   'hudChrome.mounts.name_drakemaw_raptor': '龙喉迅猛龙',
-  'hudChrome.mounts.desc_drakemaw_raptor': '来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。',
+  'hudChrome.mounts.desc_drakemaw_raptor':
+    '来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆阔步大火鸡',
   'hudChrome.mounts.name_terrorspark_groundshaker': '惊雷撼地者',
   'hudChrome.mounts.desc_valorsteed': '一匹坚韧稳健的骏马，可提升旅行速度。',
