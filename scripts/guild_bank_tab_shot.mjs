@@ -286,10 +286,12 @@ async function loginAndEnter(page, username, charName, cls, { mobile = false, re
   await dismissCameraPrompt(page);
 }
 
-// Funds + founds + stocks the guild bank from the desktop session: sell dev-given
-// valuables at the merchant, found the guild (the 10g fee comes out at the gate),
-// then stock the treasury/slots through the REAL facet commands at the banker.
-async function buildScene(page) {
+// Funds + founds the guild from the acting session: sell dev-given valuables
+// at the merchant, found the guild (the 1g fee comes out at the gate), then
+// stand at the banker with materials in the bags. Under the pricing redesign
+// the guild bank is UNOPENED at this point (0 item slots; the treasury works),
+// which is exactly the state the unopened-pane shots capture.
+async function fundAndFound(page) {
   await page.evaluate(() => {
     const cmd = (p) => window.__game.online.cmd(p);
     cmd({ cmd: 'dev_level', level: 20 });
@@ -297,7 +299,8 @@ async function buildScene(page) {
     cmd({ cmd: 'dev_teleport', x: 0, z: 9.5 }); // the merchant stall
   });
   await sleep(1200);
-  // Sell the valuables (50_000 copper each): 10 sales fund the fee + treasury.
+  // Sell the valuables (50_000 copper each): 10 sales fund the fee, the
+  // purse-paid opening, and the treasury.
   for (let i = 0; i < 10; i++) {
     await page.evaluate(() => window.__game.world.sellItem('heart_of_the_rift', 1));
     await sleep(250);
@@ -323,11 +326,20 @@ async function buildScene(page) {
     timeout: 15000,
     polling: 300,
   });
-  // Stock through the REAL facet commands: gold in, one expansion bought from
-  // the treasury, a few material stacks deposited.
+}
+
+// Opens the bank (rung 0, paid from the acting officer's own purse) and stocks
+// it through the REAL facet commands: gold in, one treasury expansion, a few
+// material stacks deposited.
+async function openAndStock(page) {
+  await page.evaluate(() => window.__game.world.guildBankBuySlots()); // rung 0: opens
+  await page.waitForFunction(() => (window.__game.world.guildBankInfo?.capacity ?? 0) > 0, {
+    timeout: 10000,
+    polling: 300,
+  });
   await page.evaluate(() => window.__game.world.guildBankDepositGold(300000));
   await sleep(700);
-  await page.evaluate(() => window.__game.world.guildBankBuySlots());
+  await page.evaluate(() => window.__game.world.guildBankBuySlots()); // rung 1: treasury
   await sleep(700);
   for (const id of ['bone_fragments', 'wolf_fang', 'linen_scrap']) {
     await page.evaluate((itemId) => {
@@ -361,26 +373,7 @@ async function openBankOn(page, tab, mobile) {
   await sleep(600);
 }
 
-async function onlineStage() {
-  const username = `gbank_${uniq}`;
-  const charName = `Aurelia${alpha}`;
-
-  // Desktop: build the scene, shoot both tabs.
-  const desktopBrowser = await launchBrowser(false);
-  const desktop = await desktopBrowser.newPage();
-  await suppressGpuNotice(desktop);
-  await loginAndEnter(desktop, username, charName, 'paladin', { register: true });
-  await buildScene(desktop);
-  await openBankOn(desktop, 'personal', false);
-  await shootBankWindow(desktop, `${OUT}/after-desktop-personal.png`);
-  await openBankOn(desktop, 'guild', false);
-  await shootBankWindow(desktop, `${OUT}/after-desktop-guild.png`);
-  await shootBankWindow(desktop, `${OUT}/after-desktop-guild-full.png`, { fullFrame: true });
-  await desktopBrowser.close();
-
-  // Mobile: the SAME character (the desktop session is closed first, so the
-  // takeover fence never fires), already an officer at the banker with a
-  // stocked book: shoot the touch pairing on both tabs.
+async function newMobilePage() {
   const mobileBrowser = await launchBrowser(true);
   const mobile = await mobileBrowser.newPage();
   await suppressGpuNotice(mobile);
@@ -392,6 +385,10 @@ async function onlineStage() {
       { name: 'hover', value: 'none' },
     ],
   });
+  return { mobileBrowser, mobile };
+}
+
+async function loginMobile(mobile, username, charName) {
   try {
     await loginAndEnter(mobile, username, charName, 'paladin', { mobile: true, register: false });
   } catch (e) {
@@ -415,11 +412,59 @@ async function onlineStage() {
     timeout: 15000,
     polling: 300,
   });
-  await openBankOn(mobile, 'personal', true);
-  await shootBankWindow(mobile, `${OUT}/after-mobile-personal.png`, { fullFrame: true });
-  await openBankOn(mobile, 'guild', true);
-  await shootBankWindow(mobile, `${OUT}/after-mobile-guild.png`, { fullFrame: true });
-  await mobileBrowser.close();
+}
+
+async function onlineStage() {
+  const username = `gbank_${uniq}`;
+  const charName = `Aurelia${alpha}`;
+
+  // Session A (desktop): register, fund, found. The freshly founded guild's
+  // bank is UNOPENED (pricing redesign): shoot the open-the-bank pane.
+  {
+    const desktopBrowser = await launchBrowser(false);
+    const desktop = await desktopBrowser.newPage();
+    await suppressGpuNotice(desktop);
+    await loginAndEnter(desktop, username, charName, 'paladin', { register: true });
+    await fundAndFound(desktop);
+    await openBankOn(desktop, 'guild', false);
+    await shootBankWindow(desktop, `${OUT}/after-desktop-guild-unopened.png`);
+    await desktopBrowser.close();
+  }
+
+  // Session B (mobile, same character; the previous browser is closed first so
+  // the takeover fence never fires): shoot the unopened pane on touch, then
+  // open + stock the bank FROM THIS session (the facet commands are
+  // host-identical) and shoot the opened touch pairing on both tabs.
+  {
+    const { mobileBrowser, mobile } = await newMobilePage();
+    await loginMobile(mobile, username, charName);
+    await openBankOn(mobile, 'guild', true);
+    await shootBankWindow(mobile, `${OUT}/after-mobile-guild-unopened.png`, { fullFrame: true });
+    await openAndStock(mobile);
+    await sleep(800); // let the opened pane repaint off the snapshot echo
+    await shootBankWindow(mobile, `${OUT}/after-mobile-guild.png`, { fullFrame: true });
+    await openBankOn(mobile, 'personal', true);
+    await shootBankWindow(mobile, `${OUT}/after-mobile-personal.png`, { fullFrame: true });
+    await mobileBrowser.close();
+  }
+
+  // Session C (desktop, same character): the opened, stocked book on desktop.
+  {
+    const desktopBrowser = await launchBrowser(false);
+    const desktop = await desktopBrowser.newPage();
+    await suppressGpuNotice(desktop);
+    await loginAndEnter(desktop, username, charName, 'paladin', { register: false });
+    await desktop.waitForFunction(() => window.__game.world.guildBankInfo !== null, {
+      timeout: 15000,
+      polling: 300,
+    });
+    await openBankOn(desktop, 'personal', false);
+    await shootBankWindow(desktop, `${OUT}/after-desktop-personal.png`);
+    await openBankOn(desktop, 'guild', false);
+    await shootBankWindow(desktop, `${OUT}/after-desktop-guild.png`);
+    await shootBankWindow(desktop, `${OUT}/after-desktop-guild-full.png`, { fullFrame: true });
+    await desktopBrowser.close();
+  }
 }
 
 if (STAGE === 'offline') await offlineStage();
