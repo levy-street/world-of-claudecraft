@@ -611,8 +611,14 @@ function fakePlateCanvas(trace: PlateTrace): unknown {
       void plate.ops.push(`strokeText ${text} ${x} ${y} ${ctx.font} ${ctx.strokeStyle}`),
     fillText: (text: string, x: number, y: number): void =>
       void plate.ops.push(`fillText ${text} ${x} ${y} ${ctx.font} ${ctx.fillStyle}`),
+    // Deterministic stand-in for the real metrics: the label clamp reads the
+    // glyph-run width to keep names inside the plate, so the fake returns a
+    // width proportional to the text length (any stable function works; the
+    // deterministic-plate arm compares the resulting clamped coordinates).
+    measureText: (text: string) => ({ width: text.length * 7 }),
+    canvas: null as unknown,
   };
-  return {
+  const canvas = {
     set width(v: number) {
       plate.w = v;
     },
@@ -627,6 +633,8 @@ function fakePlateCanvas(trace: PlateTrace): unknown {
     },
     getContext: (kind: string): unknown => (kind === '2d' ? ctx : null),
   };
+  ctx.canvas = canvas;
+  return canvas;
 }
 
 function fakeMapCtx(trace: PlateTrace): CanvasRenderingContext2D {

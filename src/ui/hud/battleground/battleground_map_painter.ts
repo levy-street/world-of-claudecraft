@@ -578,10 +578,17 @@ export class BattlegroundMapPainter {
       const size = label.tier === 'region' ? regionPx : placePx;
       const text = t(LABEL_KEYS[label.id]);
       bctx.font = `bold ${size}px ${LABEL_FONT_FAMILY}`;
+      // The keeps anchor at the field ends, where the raw projection can put
+      // half the glyph run past the plate edge; clamp the text box inside the
+      // canvas so no landmark name is ever clipped by the plate boundary.
+      const halfW = bctx.measureText(text).width / 2 + LABEL_HALO_WIDTH;
+      const halfH = size * 0.62 + LABEL_HALO_WIDTH;
+      const lx = clamp(fx(label.x), halfW, bctx.canvas.width - halfW);
+      const lz = clamp(fy(label.z), halfH, bctx.canvas.height - halfH);
       bctx.strokeStyle = LABEL_HALO;
-      bctx.strokeText(text, fx(label.x), fy(label.z));
+      bctx.strokeText(text, lx, lz);
       bctx.fillStyle = colors.ink;
-      bctx.fillText(text, fx(label.x), fy(label.z));
+      bctx.fillText(text, lx, lz);
     }
     bctx.restore();
   }
