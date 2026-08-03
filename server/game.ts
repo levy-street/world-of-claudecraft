@@ -3593,7 +3593,7 @@ export class GameServer {
         // timer only persists the market every 30s. Without this, a crash right
         // after the leave-flush of bags would tear the escrow in half (item lost
         // or duplicated). saveCharacter(withMarket) writes both in one transaction.
-        await this.saveCharacter(session, { withMarket: true });
+        await this.saveCharacter(session, { withMarket: true, final: true });
         return;
       } catch (err) {
         if (attempt === LEAVE_SAVE_MAX_ATTEMPTS) {
@@ -3619,7 +3619,10 @@ export class GameServer {
     }
   }
 
-  async saveCharacter(session: ClientSession, opts: { withMarket?: boolean } = {}): Promise<void> {
+  async saveCharacter(
+    session: ClientSession,
+    opts: { withMarket?: boolean; final?: boolean } = {},
+  ): Promise<void> {
     // A quarantined session's live state was abandoned when its escrow was
     // rolled back: its character half is the half that would carry the value
     // its book half could not, so persisting it is exactly the mint the
@@ -3710,10 +3713,16 @@ export class GameServer {
         // What each book write actually did, filled by the db layer inside the
         // transaction (see GuildBankWriteResult).
         const guildBankResults: GuildBankWriteResult[] = [];
+        // Guilds the payload SKIPPED (no loaded book: unloaded, oversized, or
+        // malformed at boot). Their rows are not this process's to touch, so
+        // their marks and logs must survive the commit: releasing them would
+        // leave a character half durable with a book half never written.
+        const skippedGuildBanks = new Set<number>();
         const collectDeltas = () => {
           carriedGuildBankSeqs.length = 0;
           carriedGuildBankOpCounts.clear();
           guildBankResults.length = 0;
+          skippedGuildBanks.clear();
           session.inFlightGuildBankOps.clear();
           for (const entry of session.dirtyGuildBanks) {
             carriedGuildBankSeqs.push(entry);
@@ -3721,11 +3730,16 @@ export class GameServer {
             carriedGuildBankOpCounts.set(entry[0], carried);
             session.inFlightGuildBankOps.set(entry[0], carried);
           }
-          return collectGuildBankDeltas(
+          const saves = collectGuildBankDeltas(
             (guildId) => this.sim.serializeGuildBank(guildId),
             (guildId) => session.unflushedGuildBankOps.get(guildId) ?? [],
             carriedGuildBankSeqs.map(([guildId]) => guildId),
           );
+          const carriedIds = new Set(saves.map((save) => save.guildId));
+          for (const [guildId] of carriedGuildBankSeqs) {
+            if (!carriedIds.has(guildId)) skippedGuildBanks.add(guildId);
+          }
+          return saves;
         };
         if (opts.withMarket || session.dirtyGuildBanks.size > 0) {
           // Atomic on the leave path so a logout bag-flush can never tear away
@@ -3779,7 +3793,7 @@ export class GameServer {
             // the log is exactly as it was) and decide whether to retry or
             // roll the session back.
             if (err instanceof GuildBankEscrowRefused) {
-              this.handleGuildBankEscrowRefusal(session, err.results);
+              this.handleGuildBankEscrowRefusal(session, err.results, opts.final === true);
               return;
             }
             throw err;
@@ -3837,10 +3851,15 @@ export class GameServer {
         // committed prefix of each unflushed-op log (a mid-save op's entry
         // survives). A book whose write was SKIPPED keeps its mark and its log
         // for a later retry; see resolveGuildBankDeficit.
-        // Reaching here means the transaction COMMITTED, so every carried book
-        // half landed: a refused one aborts the whole transaction and throws
-        // (GuildBankEscrowRefused), so there is no partial arm to handle.
+        // Reaching here means the transaction COMMITTED, so every book half it
+        // CARRIED landed: a refused one aborts the whole transaction and throws
+        // (GuildBankEscrowRefused), so there is no partial arm to handle. A
+        // guild the payload SKIPPED is the one thing that still needs guarding:
+        // nothing was written for it, so nothing may be released.
         for (const [guildId, seq] of carriedGuildBankSeqs) {
+          if (skippedGuildBanks.has(guildId)) continue;
+          const written = guildBankResults.find((r) => r.guildId === guildId);
+          if (written && !written.written) continue; // defensive: a refusal throws
           const carried = carriedGuildBankOpCounts.get(guildId) ?? 0;
           if (session.dirtyGuildBanks.get(guildId) === seq) {
             session.dirtyGuildBanks.delete(guildId);
@@ -3937,7 +3956,9 @@ export class GameServer {
     if (reason !== 'shutdown') return;
     const stillDirty = sessions.filter((s) => s.dirtyGuildBanks.size > 0);
     for (const session of stillDirty) {
-      await this.saveCharacter(session).catch((err) =>
+      // FINAL: there is no pass three, so a refusal here resolves now rather
+      // than waiting for a retry that will never come.
+      await this.saveCharacter(session, { final: true }).catch((err) =>
         console.error(`${reason} retry failed for ${session.name}:`, err),
       );
     }
@@ -4135,6 +4156,12 @@ export class GameServer {
   private handleGuildBankEscrowRefusal(
     session: ClientSession,
     results: readonly GuildBankWriteResult[],
+    // True when this is the LAST save this session will ever get (the leave
+    // flush, or the shutdown flush's second pass). There is no later retry to
+    // wait for, so the refusal is resolved now rather than left to a save that
+    // will never come: otherwise the session would tear down with its progress
+    // discarded and no log line and no ledger row to say why.
+    final = false,
   ): void {
     let quarantine = false;
     for (const result of results) {
@@ -4142,13 +4169,19 @@ export class GameServer {
       const guildId = result.guildId;
       let anotherSessionDirty = false;
       for (const s of this.sessionsByCharacterId.values()) {
-        if (s !== session && s.dirtyGuildBanks.has(guildId)) {
+        // A quarantined or departing session's marks are NOT a reason to wait:
+        // it will never commit them, so counting it would burn every retry
+        // (blocking this session's character saves the whole time) before
+        // reaching the same rollback.
+        if (s === session || s.escrowQuarantined || s.left) continue;
+        if (s.dirtyGuildBanks.has(guildId)) {
           anotherSessionDirty = true;
           break;
         }
       }
       const skips = (session.guildBankDeficitSkips.get(guildId) ?? 0) + 1;
       const canResolve =
+        !final &&
         anotherSessionDirty &&
         !result.rowUnusable &&
         skips < GameServer.GUILD_BANK_DEFICIT_MAX_SKIPS;

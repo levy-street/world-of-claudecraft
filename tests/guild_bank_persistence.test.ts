@@ -50,6 +50,7 @@ import {
   type GuildBankWriteResult,
   loadGuildBanksIntoSim,
   mergeGuildBankRow,
+  nettedReplayRescueCount,
 } from '../server/guild_bank_state';
 import {
   applyGuildBankDeltasTo,
@@ -1355,6 +1356,119 @@ describe('the guild_create fee gate + the create/disband hooks', () => {
     // The escrow save commits: the guard opens (self-heals within one save).
     await priv(server).saveCharacter(session);
     expect(priv(server).social.tx.beginGuildBankDelete(GUILD_ID)).toEqual({ copper: 0, items: 0 });
+  });
+
+  it('the retry BOUND is reachable: a mutual deficit ends in a rollback, not a spin', async () => {
+    // Two sessions each consuming what the other has not made durable is the
+    // one shape that can never resolve on its own, so it is the one the bound
+    // exists for. Without it both would refuse forever and neither character
+    // would ever save again.
+    const server = new GameServer();
+    const a = joinServer(server, 1, 'MutualA').session;
+    const b = joinServer(server, 2, 'MutualB').session;
+    officerSetup(server, a, 0);
+    moveToBanker(server, b.pid);
+    server.sim.setPlayerGuildMembership(b.pid, { guildId: GUILD_ID, rank: 'officer' });
+    const bMeta = server.sim.players.get(b.pid);
+    if (!bMeta) throw new Error('missing meta');
+    bMeta.copper = 500_000;
+    // Each deposits, then each withdraws MORE than its own deposit, so every
+    // ordered and netted replay of either log is short by the difference.
+    dispatch(server, a, { cmd: 'guild_bank_deposit_gold', amount: 10_000 });
+    dispatch(server, b, { cmd: 'guild_bank_deposit_gold', amount: 10_000 });
+    server.sim.setPlayerGuildMembership(a.pid, { guildId: GUILD_ID, rank: 'officer' });
+    dispatch(server, a, { cmd: 'guild_bank_withdraw_gold', amount: 15_000 });
+    server.sim.setPlayerGuildMembership(b.pid, { guildId: GUILD_ID, rank: 'officer' });
+    dispatch(server, b, { cmd: 'guild_bank_withdraw_gold', amount: 5_000 });
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    // biome-ignore lint/suspicious/noExplicitAny: reading a private static pin
+    const cap = (GameServer as any).GUILD_BANK_DEFICIT_MAX_SKIPS as number;
+    expect(cap).toBeGreaterThan(1);
+    for (let i = 0; i < cap + 1 && !a.escrowQuarantined; i++) {
+      await priv(server).saveCharacter(a);
+      if (i === 0) expect(a.escrowQuarantined).toBe(false); // it RETRIES first
+    }
+    errSpy.mockRestore();
+    expect(a.escrowQuarantined).toBe(true); // ...and the bound ends it
+    expect(a.dirtyGuildBanks.size).toBe(0);
+    expect(durableChars.has(1)).toBe(false); // nothing of A's ever committed
+  });
+
+  it("a session's LAST save resolves a refusal instead of waiting for a retry", async () => {
+    // The leave flush and the shutdown flush's second pass are the last save a
+    // session gets. Choosing "retry" there discards the session's whole
+    // progress with no log line and no ledger row, because the retry never
+    // comes.
+    const server = new GameServer();
+    const a = joinServer(server, 1, 'LeaverA').session;
+    const b = joinServer(server, 2, 'DirtyB').session;
+    officerSetup(server, a, 0);
+    moveToBanker(server, b.pid);
+    server.sim.setPlayerGuildMembership(b.pid, { guildId: GUILD_ID, rank: 'officer' });
+    const bMeta = server.sim.players.get(b.pid);
+    if (!bMeta) throw new Error('missing meta');
+    bMeta.copper = 500_000;
+    dispatch(server, b, { cmd: 'guild_bank_deposit_gold', amount: 40_000 });
+    server.sim.setPlayerGuildMembership(a.pid, { guildId: GUILD_ID, rank: 'officer' });
+    dispatch(server, a, { cmd: 'guild_bank_withdraw_gold', amount: 40_000 });
+    // An ordinary save RETRIES (B is still there to make its deposit durable).
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await priv(server).saveCharacter(a);
+    expect(a.escrowQuarantined).toBe(false);
+    dbMock.insertBankLedgerRow.mockClear();
+    // The LAST one does not: there is no next save to wait for.
+    await priv(server).saveCharacterOnLeave(a);
+    errSpy.mockRestore();
+    await bankLedgerIdle();
+    expect(a.escrowQuarantined).toBe(true);
+    expect(durableChars.has(1)).toBe(false);
+    const rows = dbMock.insertBankLedgerRow.mock.calls.map((c) => (c as unknown[])[0]);
+    expect(rows).toContainEqual(
+      expect.objectContaining({
+        op: 'escrow_deficit',
+        characterId: 1,
+        containerId: GUILD_ID,
+        // SIGNED: A's discarded work was taking 40_000 OUT of the book.
+        copperDelta: -40_000,
+      }),
+    );
+  });
+
+  it('COUNTS the netted rescues, so the fallback is visible rather than silent', () => {
+    // The netted retry forgives an ORDERING artifact, never a genuine consume,
+    // but it is the one place a refusal is turned back into a write, so how
+    // often it fires is worth an operator's eye.
+    const gold = (copperDelta: number) => ({
+      op: copperDelta > 0 ? ('deposit_gold' as const) : ('withdraw_gold' as const),
+      itemId: null,
+      count: null,
+      instance: null,
+      craftedRecipeId: null,
+      copperDelta,
+      purchasedSlotsBefore: 0,
+      purchasedSlotsAfter: 0,
+    });
+    const before = nettedReplayRescueCount();
+    // Ordered: -500 underflows a base of 100. Netted: +400, which lands.
+    expect(
+      mergeGuildBankRow({ treasury: 100, inventory: [], purchasedSlots: 24 }, [
+        gold(-500),
+        gold(900),
+      ]).result.written,
+    ).toBe(true);
+    expect(nettedReplayRescueCount()).toBe(before + 1);
+    // A clean ordered replay does not touch the counter.
+    expect(
+      mergeGuildBankRow({ treasury: 100, inventory: [], purchasedSlots: 24 }, [gold(900)]).result
+        .written,
+    ).toBe(true);
+    expect(nettedReplayRescueCount()).toBe(before + 1);
+    // And a GENUINE consume is still refused, not rescued.
+    expect(
+      mergeGuildBankRow({ treasury: 100, inventory: [], purchasedSlots: 24 }, [gold(-500)]).result
+        .written,
+    ).toBe(false);
+    expect(nettedReplayRescueCount()).toBe(before + 1);
   });
 
   it('an unusable row refuses the WHOLE save and rolls the session back', async () => {

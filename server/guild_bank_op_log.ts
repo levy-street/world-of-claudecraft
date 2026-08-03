@@ -38,24 +38,12 @@
 //
 // Node-testable without the server: a pure function over plain deltas.
 
-import type { GuildBankOpDelta } from '../src/sim/guild_bank';
+import { type GuildBankOpDelta, guildBankDeltaIdentityKey } from '../src/sim/guild_bank';
 
-/** Key-order-independent serialization, so two structurally equal instance
- *  payloads (one of which may have round-tripped through JSONB) net together.
- *  Mirrors the sim's canonicalJson; kept local because src/sim does not export
- *  it and duplicating five lines beats widening the sim's public surface. */
-function canonicalJson(value: unknown): string {
-  if (value === null || typeof value !== 'object') return JSON.stringify(value) ?? 'null';
-  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
-  const keys = Object.keys(value as Record<string, unknown>).sort();
-  return `{${keys
-    .map((k) => `${JSON.stringify(k)}:${canonicalJson((value as Record<string, unknown>)[k])}`)
-    .join(',')}}`;
-}
-
-function identityKey(d: GuildBankOpDelta): string {
-  return `${d.itemId ?? ''}|${canonicalJson(d.instance ?? null)}|${d.craftedRecipeId ?? ''}`;
-}
+// The identity to net on is the sim's, imported rather than re-derived: a
+// second copy that canonicalized a payload even slightly differently would net
+// entries here that the replay and the inverse treat as distinct.
+const identityKey = guildBankDeltaIdentityKey;
 
 const isSlotOp = (d: GuildBankOpDelta): boolean => d.op === 'open_bank' || d.op === 'buy_slots';
 const isGoldOp = (d: GuildBankOpDelta): boolean =>

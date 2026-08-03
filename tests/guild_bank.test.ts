@@ -2067,14 +2067,14 @@ describe('applyGuildBankDeltasTo / revertGuildBankDeltasTo (the forward + invers
     expect(checked).toBeGreaterThan(200);
   });
 
-  it('the identity holds only while the LADDER WITNESS matches: the asymmetries, pinned', () => {
-    // The pair is an inverse on ONE book whose ladder stands where the delta's
-    // witness says. Forward runs on durable truth and backward on the live
-    // book, so a slot op can meet a ladder that has moved, and there the two
-    // are deliberately not symmetric. Both cases are correct in production
-    // (the forward one because another officer's committed rung must not be
-    // re-granted; the backward one because a paid rung must not be destroyed),
-    // and both are recorded here so neither reads as a surprise.
+  it('a ladder step replays ONLY onto the base its witness names, in both directions', () => {
+    // The forward and the inverse run the SAME compare-and-swap against the
+    // delta's own before/after witness, which is what makes them exact
+    // inverses on any base rather than only on the one the delta came from.
+    // A base that is not where the op left it moves NOTHING either way: a
+    // forward raise from a lower base would grant rungs durable truth cannot
+    // justify, and a forward charge onto a higher base would take treasury
+    // copper the inverse then declines to give back.
     const expansion: GuildBankOpDelta = {
       op: 'buy_slots',
       itemId: null,
@@ -2085,25 +2085,25 @@ describe('applyGuildBankDeltasTo / revertGuildBankDeltasTo (the forward + invers
       purchasedSlotsBefore: 24,
       purchasedSlotsAfter: 30,
     };
-    // Base ALREADY at the op's target: the raise is a no-op forwards (the rung
-    // is already there) but the inverse's compare-and-swap matches, so a round
-    // trip on this base lowers the ladder. Not reachable in production: the
-    // inverse only ever runs on the book the witness was recorded from.
-    const ahead: GuildBankState = { treasury: 100_000, inventory: [], purchasedSlots: 30 };
-    expect(applyGuildBankDeltasTo(ahead, [expansion])).toBeNull();
-    expect(ahead.purchasedSlots).toBe(30);
-    revertGuildBankDeltasTo(ahead, [expansion]);
-    expect(ahead.purchasedSlots).toBe(24);
-    // Base PAST the op's target: the charge lands (the guild did pay this
-    // rung; a later rung is what advanced the ladder) and the inverse's
-    // compare-and-swap misses, so nothing is undone.
-    const past: GuildBankState = { treasury: 100_000, inventory: [], purchasedSlots: 36 };
-    expect(applyGuildBankDeltasTo(past, [expansion])).toBeNull();
-    expect(past.treasury).toBe(75_000);
-    expect(past.purchasedSlots).toBe(36);
-    revertGuildBankDeltasTo(past, [expansion]);
-    expect(past.treasury).toBe(75_000);
-    expect(past.purchasedSlots).toBe(36);
+    for (const at of [0, 30, 36, 60]) {
+      const book: GuildBankState = { treasury: 100_000, inventory: [], purchasedSlots: at };
+      expect(`at ${at}: ${applyGuildBankDeltasTo(book, [expansion])?.kind}`).toBe(
+        `at ${at}: ladder_behind`,
+      );
+      expect(`at ${at}: ${book.purchasedSlots}/${book.treasury}`).toBe(`at ${at}: ${at}/100000`);
+      // ...and the inverse declines on exactly the same bases.
+      revertGuildBankDeltasTo(book, [expansion]);
+      expect(`at ${at} undone: ${book.purchasedSlots}/${book.treasury}`).toBe(
+        at === 30 ? 'at 30 undone: 24/125000' : `at ${at} undone: ${at}/100000`,
+      );
+    }
+    // On the base the witness names, both directions move, and the round trip
+    // is the identity.
+    const exact: GuildBankState = { treasury: 100_000, inventory: [], purchasedSlots: 24 };
+    expect(applyGuildBankDeltasTo(exact, [expansion])).toBeNull();
+    expect(exact).toEqual({ treasury: 75_000, inventory: [], purchasedSlots: 30 });
+    revertGuildBankDeltasTo(exact, [expansion]);
+    expect(exact).toEqual({ treasury: 100_000, inventory: [], purchasedSlots: 24 });
   });
 
   it('a rung is NEVER granted without its charge (all-or-nothing, unlike gold)', () => {
@@ -2239,9 +2239,10 @@ describe('applyGuildBankDeltasTo / revertGuildBankDeltasTo (the forward + invers
     }
   });
 
-  it('a slot op replays as RAISE-TO-N, so replaying it twice never double-grants', () => {
+  it('a slot op is recorded ABSOLUTELY, so a replay can never double-grant it', () => {
     // The whole point of recording slot ops absolutely. A relative "+6" record
-    // replayed onto a base that already advanced would grant the rung twice.
+    // replayed onto a base that already advanced would grant the rung twice;
+    // an absolute one refuses that base outright.
     const expansion: GuildBankOpDelta = {
       op: 'buy_slots',
       itemId: null,
@@ -2254,11 +2255,12 @@ describe('applyGuildBankDeltasTo / revertGuildBankDeltasTo (the forward + invers
     const book: GuildBankState = { treasury: 100_000, inventory: [], purchasedSlots: 24 };
     expect(applyGuildBankDeltasTo(book, [expansion])).toBeNull();
     expect(book.purchasedSlots).toBe(30);
-    // Idempotent on the ladder: the second replay raises nothing. (It still
-    // charges the treasury, which is why a save never replays a committed
-    // delta; the pin is on the LADDER, the part a relative record would ruin.)
-    expect(applyGuildBankDeltasTo(book, [expansion])).toBeNull();
+    expect(book.treasury).toBe(75_000);
+    // The second replay moves NOTHING: not the ladder (a relative record would
+    // have granted the rung twice) and not the treasury either.
+    expect(applyGuildBankDeltasTo(book, [expansion])?.kind).toBe('ladder_behind');
     expect(book.purchasedSlots).toBe(30);
+    expect(book.treasury).toBe(75_000);
     // A base BELOW the op's own `before` REFUSES: the officer who bought the
     // lower rung has not committed, so raising here would grant rungs durable
     // truth cannot justify. Nothing moves, and the save is retried.

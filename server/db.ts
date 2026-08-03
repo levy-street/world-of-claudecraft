@@ -3284,12 +3284,12 @@ export async function saveCharacterAndGuildBankState(
   state: CharacterState,
   guildBanks: readonly GuildBankSave[],
   leaseNonce?: string,
-  // Out-parameter: what each book write actually did (written, skipped for a
-  // deficit, skipped to preserve an unusable row). The caller reads it AFTER
-  // the transaction commits to decide whether to release a dirty mark or keep
-  // it and retry. An out-parameter rather than a richer return type because
-  // the boolean return IS the fence signal and every call site (and every
-  // test double) reads it as one.
+  // Out-parameter: what each book write did. A refused one aborts the whole
+  // transaction and throws GuildBankEscrowRefused (which carries these too),
+  // so on the COMMITTED path every entry reads written; the parameter exists
+  // for tests and for the defensive check at the call site. An out-parameter
+  // rather than a richer return type because the boolean return IS the fence
+  // signal and every call site (and every test double) reads it as one.
   results?: GuildBankWriteResult[],
 ): Promise<boolean> {
   const cleanState = sanitizeRemovedZone1Content(state).state;

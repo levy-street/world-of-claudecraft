@@ -390,7 +390,10 @@ export function recordGuildBankEscrowRollback(
   let copper = 0;
   let items = 0;
   for (const d of discarded) {
-    copper += Number(d.copperDelta) || 0;
+    // open_bank's copper is the acting officer's PURSE paying for rung 0, which
+    // the book never held; counting it would over-report book movement by the
+    // rung price on every log containing an opening.
+    if (d.op !== 'open_bank') copper += Number(d.copperDelta) || 0;
     if (d.itemId !== null && d.itemId === deficit?.itemId) {
       const n = Math.max(0, Math.floor(Number(d.count)) || 0);
       if (d.op === 'deposit') items += n;

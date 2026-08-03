@@ -556,7 +556,7 @@ export const SERVER_NEW = {
     'guild.createFee': 'Potrzebujesz {amount} złota, aby założyć gildię.',
     'guild.bankNotEmpty':
       'Bank gildii musi zostać opróżniony, zanim gildia będzie mogła zostać rozwiązana.',
-    'guild.bankClosing': 'Bankka gildii waa la xidhayaa. Isku day mar kale daqiiqad ka dib.',
+    'guild.bankClosing': 'Bank gildii jest zamykany. Spróbuj ponownie za chwilę.',
     'guild.notInYours': '{name} nie należy do twojej gildii.',
     'guild.nowRank': '{name} ma teraz rangę {rank}.',
     'guild.onlyGmChangeRanks': 'Tylko Mistrz Gildii może zmieniać rangi.',

@@ -140,13 +140,14 @@ export function loadGuildBanksIntoSim(
 // An oversized or structurally malformed row is PRESERVED, exactly like the
 // boot load: the caller must skip the write rather than overwrite it.
 //
-// A deficit means the replay stopped short: this session consumed value
-// another officer has not made durable yet (or its ladder step needs a rung
-// that officer has not committed). The applied PREFIX is still written, and
-// the caller keeps the remainder to retry on a later save, by which time the
-// other officer's commit has landed. The shortfall is never silently clamped
-// away: clamping mints it, because this session's character half durably
-// gained what the book never durably lost.
+// A deficit means the replay could not be satisfied: this session consumed
+// value another officer has not made durable yet (or its ladder step needs a
+// rung that officer has not committed). NOTHING is written then, and the whole
+// escrow transaction rolls back, character row included: writing what durable
+// truth could cover while the paired character half commits mints exactly the
+// difference, and recording that is a receipt for a mint rather than a
+// mitigation. The caller retries; see server/game.ts
+// handleGuildBankEscrowRefusal for what happens when a retry can never win.
 export function mergeGuildBankRow(
   durableRaw: unknown,
   deltas: readonly GuildBankOpDelta[],

@@ -463,26 +463,29 @@ export function applyGuildBankDeltasTo(
   book: GuildBankState,
   deltas: readonly GuildBankOpDelta[],
 ): GuildBankDeltaDeficit | null {
-  const stop = (deficit: GuildBankDeltaDeficit): GuildBankDeltaDeficit => deficit;
   for (const d of deltas) {
     if (d.op === 'open_bank' || d.op === 'buy_slots') {
       // ABSOLUTE, never relative: the op moved the ladder from `before` to
-      // `after`, so the replay RAISES TO AT LEAST `after` (idempotent and
-      // commutative, because the ladder only ever goes up) and only from a
-      // base that has actually reached `before`. A base below it means the
-      // officer who bought the lower rung has not committed, so raising here
-      // would grant rungs durable truth cannot justify: the SAME violation as
-      // moving copper the book never held, and refused the same way. The save
-      // retries once that officer commits, and is rolled back if they never
-      // can (server/game.ts handleGuildBankEscrowRefusal).
-      if (book.purchasedSlots < d.purchasedSlotsBefore) {
-        return stop({
+      // `after`, and it replays only onto a base standing EXACTLY at `before`.
+      // The same compare-and-swap the inverse uses, so the two are exact
+      // inverses on any base rather than only on the one the delta came from.
+      // A base BELOW it means the officer who bought the lower rung has not
+      // committed, so raising here would grant rungs durable truth cannot
+      // justify: the same violation as moving copper the book never held, and
+      // refused the same way. A base ABOVE it is unreachable in process (a
+      // later rung cannot commit before the rung under it) and would charge
+      // the treasury for a grant the inverse then declines to undo, so it is
+      // refused too. The save retries once the other officer commits, and is
+      // rolled back if they never can (server/game.ts
+      // handleGuildBankEscrowRefusal).
+      if (book.purchasedSlots !== d.purchasedSlotsBefore) {
+        return {
           kind: 'ladder_behind',
           op: d.op,
           itemId: null,
-          shortfall: d.purchasedSlotsBefore - book.purchasedSlots,
+          shortfall: Math.abs(d.purchasedSlotsBefore - book.purchasedSlots),
           copperDelta: d.copperDelta,
-        });
+        };
       }
       // Rung 0 (open_bank) was PURSE-paid, so it moves no treasury copper;
       // rungs 1+ (buy_slots) spent the treasury and must move it here, and a
@@ -491,29 +494,29 @@ export function applyGuildBankDeltasTo(
       if (d.op === 'buy_slots') {
         const next = book.treasury + d.copperDelta;
         if (next < 0 || next > GUILD_BANK_TREASURY_CAP) {
-          return stop({
+          return {
             kind: next < 0 ? 'treasury_underflow' : 'treasury_overflow',
             op: d.op,
             itemId: null,
             shortfall: next < 0 ? -next : next - GUILD_BANK_TREASURY_CAP,
             copperDelta: d.copperDelta,
-          });
+          };
         }
         book.treasury = next;
       }
-      book.purchasedSlots = Math.max(book.purchasedSlots, d.purchasedSlotsAfter);
+      book.purchasedSlots = d.purchasedSlotsAfter;
       continue;
     }
     if (d.op === 'deposit_gold' || d.op === 'withdraw_gold') {
       const next = book.treasury + d.copperDelta;
       if (next < 0 || next > GUILD_BANK_TREASURY_CAP) {
-        return stop({
+        return {
           kind: next < 0 ? 'treasury_underflow' : 'treasury_overflow',
           op: d.op,
           itemId: null,
           shortfall: next < 0 ? -next : next - GUILD_BANK_TREASURY_CAP,
           copperDelta: d.copperDelta,
-        });
+        };
       }
       book.treasury = next;
       continue;
@@ -530,13 +533,13 @@ export function applyGuildBankDeltasTo(
     // removing anything, so a refused replay never half-empties a slot.
     const held = countMatching(book, d);
     if (held < count) {
-      return stop({
+      return {
         kind: 'missing_items',
         op: d.op,
         itemId: d.itemId,
         shortfall: count - held,
         copperDelta: 0,
-      });
+      };
     }
     removeMatching(book, d, count);
   }
@@ -549,10 +552,10 @@ export function applyGuildBankDeltasTo(
  *  intact.
  *
  *  Inverses CLAMP rather than throw: if another officer already consumed the
- *  un-durable value (withdrew the copper or the copy), the inverse no-ops on
- *  the missing part. That residue is the D5 accepted risk in
- *  docs/guild-bank/state.md, not a silent failure: the forward applier reports
- *  the same shortfall as a deficit and the server records it. */
+ *  un-durable value on the LIVE book, the inverse no-ops on the missing part.
+ *  That is no longer a durable residue: the consuming officer's own save is
+ *  refused for the same reason and it is rolled back too, so the clamp only
+ *  ever describes a live book that is mid-repair. */
 export function revertGuildBankDeltasTo(
   book: GuildBankState,
   deltas: readonly GuildBankOpDelta[],
@@ -588,8 +591,10 @@ export function revertGuildBankDeltasTo(
 
 /** Key-order-independent identity for netting: the same three-dimensional
  *  (itemId, canonical instance payload, craft provenance) key the replay and
- *  the inverse match on. */
-function deltaIdentityKey(d: GuildBankOpDelta): string {
+ *  the inverse match on. EXPORTED so the server's log compactor
+ *  (server/guild_bank_op_log.ts) nets on exactly this key rather than a second
+ *  copy that could disagree about a payload's canonical form. */
+export function guildBankDeltaIdentityKey(d: GuildBankOpDelta): string {
   return `${d.itemId ?? ''}|${canonicalJson(d.instance ?? null)}|${d.craftedRecipeId ?? ''}`;
 }
 
@@ -604,6 +609,14 @@ function deltaIdentityKey(d: GuildBankOpDelta): string {
  *     applied last. open_bank's copperDelta is deliberately EXCLUDED, because
  *     rung 0 was purse-paid and the applier never moves it either: folding it
  *     in would destroy that copper on every netted replay.
+ *
+ *  Equal in CONSERVED CONTENT (treasury, ladder position, and the item
+ *  multiset), not necessarily in slot LAYOUT: removals walk newest-first while
+ *  grants fill oldest-first, so a netted run can leave the same copies in a
+ *  different slot order than the ordered run would. That is the same
+ *  indifference the book contract already has (slot order follows arrival and
+ *  the live and durable books diverge anyway between saves), and the pin in
+ *  tests/guild_bank.test.ts compares on exactly that basis.
  *
  *  Lives here, beside the applier it must agree with, rather than on the
  *  server side: the two drifting apart is a silent conservation break, so they
@@ -631,7 +644,7 @@ export function netGuildBankOpLogForReplay(log: readonly GuildBankOpDelta[]): Gu
     if (typeof d.itemId !== 'string' || d.itemId === '') continue;
     const count = deltaCount(d);
     if (count === 0) continue;
-    const key = deltaIdentityKey(d);
+    const key = guildBankDeltaIdentityKey(d);
     const entry = items.get(key) ?? { sample: d, net: 0 };
     entry.net += d.op === 'deposit' ? count : -count;
     items.set(key, entry);
