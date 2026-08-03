@@ -12,8 +12,8 @@
 // anonymous exchange pipe (officer A deposits, officer B withdraws), so item
 // conservation only holds across the whole guild, never per character. Guild
 // groups additionally replay the treasury (deposit_gold + withdraw_gold +
-// buy_slots copper deltas; create_fee is the founder's PERSONAL copper and is
-// excluded) and reconcile against the guild_banks book when it is provided. A
+// buy_slots copper deltas; create_fee and open_bank are PERSONAL purse copper
+// and are excluded) and reconcile against the guild_banks book when it is provided. A
 // guild with ledger rows but no book row reconciles items and treasury against
 // an EMPTY book (a disbanded guild: the disband guard proves both were zero)
 // but skips the purchased reconciliation (expansions survive to the last row).
@@ -156,6 +156,31 @@ function checkRowShape(row, findings) {
         detail: `withdraw_gold row ${row.id} has non-negative copper_delta ${String(row.copper_delta)}`,
       });
     }
+  } else if (row.op === 'open_bank') {
+    // Ladder rung 0: the acting officer's PURSE opened the item store (24
+    // slots). Purse-paid like create_fee, so it is excluded from the treasury
+    // replay below; the after-count is always the rung-0 grant.
+    if (row.count != null) {
+      findings.push({
+        ...base,
+        kind: 'count_on_open',
+        detail: `open_bank row ${row.id} carries a count ${String(row.count)}`,
+      });
+    }
+    if (Number(row.copper_delta) >= 0) {
+      findings.push({
+        ...base,
+        kind: 'nonnegative_open_cost',
+        detail: `open_bank row ${row.id} has copper_delta ${String(row.copper_delta)}`,
+      });
+    }
+    if (Number(row.purchased_slots_after) !== 24) {
+      findings.push({
+        ...base,
+        kind: 'bad_open_slots',
+        detail: `open_bank row ${row.id} has purchased_slots_after ${String(row.purchased_slots_after)}`,
+      });
+    }
   } else if (row.op === 'create_fee') {
     // The founder's purse paid the (positive) creation fee; a newborn guild
     // has no expansions yet.
@@ -174,11 +199,14 @@ function checkRowShape(row, findings) {
       });
     }
   }
-  // The gold and fee ops exist only for the guild container, and every guild
-  // row must name its guild (container_id is the group key).
+  // The gold, fee, and open ops exist only for the guild container, and every
+  // guild row must name its guild (container_id is the group key).
   const container = row.container ?? 'personal';
   const guildOnlyOp =
-    row.op === 'deposit_gold' || row.op === 'withdraw_gold' || row.op === 'create_fee';
+    row.op === 'deposit_gold' ||
+    row.op === 'withdraw_gold' ||
+    row.op === 'create_fee' ||
+    row.op === 'open_bank';
   if (guildOnlyOp && container !== 'guild') {
     findings.push({
       ...base,
@@ -297,7 +325,8 @@ export function auditBank({ ledgerRows, characters, guildBanks }) {
 
     if (group.container === 'guild') {
       // Treasury replay: deposit_gold, withdraw_gold, and buy_slots all move
-      // TREASURY copper; create_fee moved the founder's purse and is excluded.
+      // TREASURY copper; create_fee (the founder's purse) and open_bank (the
+      // opening officer's purse, ladder rung 0) are excluded.
       // The running balance must never fall below zero: more copper leaving
       // the treasury than ever entered it is a dupe/corruption signature.
       let treasury = 0;

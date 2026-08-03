@@ -46,7 +46,7 @@ describe('server-sent message localization', () => {
     // fee gate) and server/social.ts (the disband guard): byte-bound pins,
     // because both files are S3 blind spots and a drift between the emit
     // literal and these matchers ships English to every locale.
-    'You need 10 gold to found a guild.',
+    'You need 1 gold to found a guild.',
     'The guild bank must be emptied before the guild can be disbanded.',
     'You have been removed from <Knights>.',
     'Mira has been removed from the guild by Bob.',

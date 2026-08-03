@@ -4132,16 +4132,23 @@ export async function pruneChatLogsBatch(
 // SCHEMA above; realm is passed explicitly (the table carries no DEFAULT).
 // container discriminates the personal bank ('personal', container_id NULL)
 // from the guild bank ('guild', container_id = guild id; Guild Bank Phase 3).
-// The gold and create_fee ops exist only for the guild container. `instance`
-// is the item's per-instance payload (or null for a plain fungible stack / a
-// copper-only row), serialized the same way as characters.state.
+// The gold, create_fee, and open_bank ops exist only for the guild container.
+// `instance` is the item's per-instance payload (or null for a plain fungible
+// stack / a copper-only row), serialized the same way as characters.state.
 // ---------------------------------------------------------------------------
 
 export interface BankLedgerRow {
   realm: string;
   characterId: number;
   accountId: number;
-  op: 'deposit' | 'withdraw' | 'buy_slots' | 'deposit_gold' | 'withdraw_gold' | 'create_fee';
+  op:
+    | 'deposit'
+    | 'withdraw'
+    | 'buy_slots'
+    | 'deposit_gold'
+    | 'withdraw_gold'
+    | 'create_fee'
+    | 'open_bank';
   itemId: string | null;
   count: number | null;
   instance: unknown;

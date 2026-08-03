@@ -31,28 +31,59 @@ import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { cloneInvSlot, type InvSlot } from './types';
 
-/** One-time fee the founder pays when a guild is created (10 gold).
+/** One-time fee the founder pays when a guild is created (1 gold).
  *  RESERVE-AT-GATE (revised by Phase 3 QA): deducted synchronously at the
  *  guild_create dispatch gate BEFORE any DB work and refunded on every
  *  refusal arm; charging after the commit left a deterministic fee-dodge
  *  exploit (see chargeGuildCreationFee below and docs/guild-bank/state.md). */
-export const GUILD_CREATION_FEE_COPPER = 100_000;
+export const GUILD_CREATION_FEE_COPPER = 10_000;
 
-/** Slots every guild bank starts with, before any expansion (matches the
- *  personal bank's free base so a fresh guild is immediately useful). */
-export const GUILD_BANK_BASE_SLOTS = 24;
-
-/** Slots one treasury-bought expansion adds; also the granularity purchasedSlots
- *  stays on (sanitize floors to a whole expansion so price indexing stays coherent). */
+/** Slots one treasury-bought expansion (ladder rungs 1 and up) adds. */
 export const GUILD_BANK_EXPANSION_SLOTS = 6;
 
-/** Copper price of each successive expansion, ALWAYS looked up by
- *  purchased-expansion count (never client-supplied) and paid from the guild
- *  treasury, not personal copper. 2g50s, 5g, 10g, 25g, 50g, 100g; 192g50s
- *  total; max 60 slots (base 24 + 6 expansions of 6). */
-export const GUILD_BANK_EXPANSION_PRICES: readonly number[] = [
-  25_000, 50_000, 100_000, 250_000, 500_000, 1_000_000,
+/** The slot grant of every ladder rung. A new guild starts with a bank of
+ *  ZERO item slots (treasury gold ops work from day one; only the item store
+ *  is gated): rung 0 OPENS the bank and grants the 24 base slots, paid from
+ *  the CLICKING OFFICER'S OWN PURSE (the one-click classic first-tab
+ *  precedent), never the treasury; rungs 1 and up are the treasury-paid
+ *  6-slot expansions. */
+export const GUILD_BANK_RUNG_SLOTS: readonly number[] = [
+  24,
+  GUILD_BANK_EXPANSION_SLOTS,
+  GUILD_BANK_EXPANSION_SLOTS,
+  GUILD_BANK_EXPANSION_SLOTS,
+  GUILD_BANK_EXPANSION_SLOTS,
+  GUILD_BANK_EXPANSION_SLOTS,
+  GUILD_BANK_EXPANSION_SLOTS,
 ];
+
+/** Copper price of each ladder rung, ALWAYS looked up by bought-rung count
+ *  (never client-supplied). Rung 0 (9g, opens the bank) is PURSE-paid; rungs
+ *  1..6 (2g50s, 5g, 10g, 25g, 50g, 100g; 192g50s total) are TREASURY-paid.
+ *  Max 60 slots (24 on opening + 6 expansions of 6). */
+export const GUILD_BANK_RUNG_PRICES: readonly number[] = [
+  90_000, 25_000, 50_000, 100_000, 250_000, 500_000, 1_000_000,
+];
+
+/** Every VALID purchasedSlots value: the cumulative slot total after each
+ *  bought rung ([0, 24, 30, 36, 42, 48, 54, 60]). sanitizeGuildBankState
+ *  floors onto this table so price indexing stays coherent even on a
+ *  tampered save. */
+export const GUILD_BANK_LADDER_POSITIONS: readonly number[] = GUILD_BANK_RUNG_SLOTS.reduce<
+  number[]
+>((positions, grant) => [...positions, positions[positions.length - 1] + grant], [0]);
+
+/** How many ladder rungs a purchasedSlots value represents: the index of the
+ *  LARGEST ladder position at or below it (a non-position value floors down,
+ *  mirroring sanitizeGuildBankState, so a tampered count can never index a
+ *  price it did not pay for). */
+export function guildBankRungsBought(purchasedSlots: number): number {
+  let rungs = 0;
+  for (let i = 1; i < GUILD_BANK_LADDER_POSITIONS.length; i++) {
+    if (GUILD_BANK_LADDER_POSITIONS[i] <= purchasedSlots) rungs = i;
+  }
+  return rungs;
+}
 
 /** Treasury ceiling in copper (100,000 gold). A deposit that would exceed it is
  *  REFUSED with an error (Phase 2 op body), never truncated; only the load path
@@ -83,22 +114,25 @@ export interface GuildBankState {
   treasury: number;
   /** The pooled item list; capacity only blocks new deposits (bags.ts sense). */
   inventory: InvSlot[];
-  /** Treasury-bought slots, always a whole multiple of GUILD_BANK_EXPANSION_SLOTS. */
+  /** Granted slots across the bought ladder rungs, always a value from
+   *  GUILD_BANK_LADDER_POSITIONS: 0 while the bank is UNOPENED, 24 once rung 0
+   *  opened it, then +6 per treasury expansion. */
   purchasedSlots: number;
 }
 
-/** The bank's current slot budget. Over-capacity inventories are tolerated (a
+/** The bank's current slot budget: the sum of granted slots across bought
+ *  rungs (0 while unopened). Over-capacity inventories are tolerated (a
  *  tampered/legacy save may overflow); capacity only blocks new deposits,
  *  exactly like the personal bank. */
 export function guildBankCapacity(bank: GuildBankState): number {
-  return GUILD_BANK_BASE_SLOTS + bank.purchasedSlots;
+  return GUILD_BANK_LADDER_POSITIONS[guildBankRungsBought(bank.purchasedSlots)];
 }
 
-/** Copper price of the NEXT expansion (a table lookup indexed by
- *  purchased-expansion count), or null once every expansion is bought. */
+/** Copper price of the NEXT ladder rung (a table lookup indexed by
+ *  bought-rung count: rung 0 opens the bank, purse-paid; rungs 1+ expand it,
+ *  treasury-paid), or null once every rung is bought. */
 export function guildBankNextExpansionPrice(bank: GuildBankState): number | null {
-  const purchased = Math.floor(bank.purchasedSlots / GUILD_BANK_EXPANSION_SLOTS);
-  return GUILD_BANK_EXPANSION_PRICES[purchased] ?? null;
+  return GUILD_BANK_RUNG_PRICES[guildBankRungsBought(bank.purchasedSlots)] ?? null;
 }
 
 export function createEmptyGuildBankState(): GuildBankState {
@@ -110,7 +144,8 @@ export function createEmptyGuildBankState(): GuildBankState {
  *  unknown-but-string itemId stays as dormant recoverable data, the mail
  *  precedent); over-capacity inventories are tolerated (never truncated).
  *  treasury clamps into [0, GUILD_BANK_TREASURY_CAP]; purchasedSlots clamps
- *  into range and floors to a whole expansion so price indexing stays coherent. */
+ *  into range and floors to a VALID ladder position (0, 24, 30, ..., 60) so
+ *  price indexing stays coherent. */
 export function sanitizeGuildBankState(raw: unknown): GuildBankState {
   if (!raw || typeof raw !== 'object') return createEmptyGuildBankState();
   const r = raw as { treasury?: unknown; inventory?: unknown; purchasedSlots?: unknown };
@@ -142,12 +177,12 @@ export function sanitizeGuildBankState(raw: unknown): GuildBankState {
       inventory.push(cloneInvSlot(slot));
     }
   }
-  const maxPurchased = GUILD_BANK_EXPANSION_PRICES.length * GUILD_BANK_EXPANSION_SLOTS;
+  const maxPurchased = GUILD_BANK_LADDER_POSITIONS[GUILD_BANK_LADDER_POSITIONS.length - 1];
   let purchasedSlots = Math.max(
     0,
     Math.min(maxPurchased, Math.floor(Number(r.purchasedSlots)) || 0),
   );
-  purchasedSlots -= purchasedSlots % GUILD_BANK_EXPANSION_SLOTS;
+  purchasedSlots = GUILD_BANK_LADDER_POSITIONS[guildBankRungsBought(purchasedSlots)];
   const treasury = Math.max(
     0,
     Math.min(GUILD_BANK_TREASURY_CAP, Math.floor(Number(r.treasury)) || 0),
@@ -251,7 +286,7 @@ export function refundGuildCreationFee(ctx: SimContext, pid: number, amount: num
  *  unflushed ops on the same shared book, so an evict-and-reload from durable
  *  truth would destroy those). */
 export interface GuildBankOpDelta {
-  op: 'deposit_gold' | 'withdraw_gold' | 'deposit' | 'withdraw' | 'buy_slots';
+  op: 'deposit_gold' | 'withdraw_gold' | 'deposit' | 'withdraw' | 'buy_slots' | 'open_bank';
   itemId: string | null;
   count: number | null;
   instance: InvSlot['instance'] | null;
@@ -315,8 +350,21 @@ export function revertGuildBankDeltas(
       book.treasury = clampTreasury(book.treasury - d.copperDelta);
       continue;
     }
+    if (d.op === 'open_bank') {
+      // Rung 0 was PURSE-paid: undo only the slot grant (the dead session's
+      // character half, holding the purse charge, already rolled back by
+      // definition; crediting the treasury here would mint guild copper).
+      book.purchasedSlots = Math.max(0, book.purchasedSlots - GUILD_BANK_RUNG_SLOTS[0]);
+      continue;
+    }
     if (d.op === 'buy_slots') {
-      book.purchasedSlots = Math.max(0, book.purchasedSlots - GUILD_BANK_EXPANSION_SLOTS);
+      // An expansion (rungs 1+) only ever moves between valid ladder
+      // positions at or above the opened base, so the slot undo applies only
+      // while the result stays a valid position; the treasury refund applies
+      // regardless (clamped, the accepted residue).
+      if (book.purchasedSlots - GUILD_BANK_EXPANSION_SLOTS >= GUILD_BANK_RUNG_SLOTS[0]) {
+        book.purchasedSlots -= GUILD_BANK_EXPANSION_SLOTS;
+      }
       book.treasury = clampTreasury(book.treasury - d.copperDelta);
       continue;
     }
@@ -620,9 +668,11 @@ export function guildBankWithdraw(
   ctx.notice(meta.entityId, `You withdraw ${itemName} from the guild bank.`);
 }
 
-/** Buy the next 6-slot guild bank expansion, paid from the guild TREASURY
- *  (never personal copper), at the table price for the current purchase count
- *  (never client-supplied). Blocked at the ladder's end; no refusal mutates. */
+/** Buy the next ladder rung, at the table price for the current bought-rung
+ *  count (never client-supplied). Rung 0 OPENS the bank (24 slots) and is
+ *  paid from the CLICKING OFFICER'S OWN PURSE (the one-click classic
+ *  first-tab precedent); rungs 1+ are the treasury-paid 6-slot expansions.
+ *  Blocked at the ladder's end; no refusal mutates. */
 export function guildBankBuySlots(ctx: SimContext, pid: number): void {
   const r = resolveActor(ctx, pid);
   if (!r) return;
@@ -634,9 +684,21 @@ export function guildBankBuySlots(ctx: SimContext, pid: number): void {
   }
   const book = requireOfficerBook(ctx, meta);
   if (!book) return;
-  const price = guildBankNextExpansionPrice(book);
+  const rung = guildBankRungsBought(book.purchasedSlots);
+  const price = GUILD_BANK_RUNG_PRICES[rung] ?? null;
   if (price === null) {
     ctx.error(meta.entityId, 'The guild bank cannot be expanded further.');
+    return;
+  }
+  if (rung === 0) {
+    // Opening the bank: the officer's own purse pays, never the treasury.
+    if (meta.copper < price) {
+      ctx.error(meta.entityId, 'Not enough money.');
+      return;
+    }
+    meta.copper -= price;
+    book.purchasedSlots += GUILD_BANK_RUNG_SLOTS[0];
+    ctx.notice(meta.entityId, 'You open the guild bank.');
     return;
   }
   if (book.treasury < price) {
@@ -644,7 +706,7 @@ export function guildBankBuySlots(ctx: SimContext, pid: number): void {
     return;
   }
   book.treasury -= price;
-  book.purchasedSlots += GUILD_BANK_EXPANSION_SLOTS;
+  book.purchasedSlots += GUILD_BANK_RUNG_SLOTS[rung];
   ctx.notice(meta.entityId, 'You purchase additional guild bank slots.');
 }
 

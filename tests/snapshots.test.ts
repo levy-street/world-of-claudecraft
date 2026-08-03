@@ -3518,7 +3518,7 @@ function dirtyEveryDeltaField(): {
   sim.loadGuildBank(7, {
     treasury: 12345,
     inventory: [{ itemId: 'wolf_fang', count: 4 }],
-    purchasedSlots: 6,
+    purchasedSlots: 30, // opened (24) + one expansion: a valid ladder position
   });
 
   // Direct PlayerMeta fields.
@@ -3897,9 +3897,9 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.guildBankInfo).toEqual({
       treasury: 12345,
       slots: [{ itemId: 'wolf_fang', count: 4 }],
-      capacity: 18,
-      purchasedSlots: 6,
-      nextExpansionPrice: 100000,
+      capacity: 30,
+      purchasedSlots: 30,
+      nextExpansionPrice: 50000, // rung-2 literal
     });
     expect(client.activeLootRolls().map((r) => r.rollId)).toEqual([1]); // lroll -> lootRollPrompts
     // mloot -> masterLootPrompts, via the activeMasterLootRolls() accessor. Roll 2

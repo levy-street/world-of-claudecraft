@@ -51,7 +51,11 @@ const STATE = {
 } as unknown as CharacterState;
 const MARKET = { listings: [] } as unknown as MarketSave;
 const MAIL = { mail: [] } as unknown as MailSave;
-const BOOK = { treasury: 1500, inventory: [{ itemId: 'wolf_fang', count: 2 }], purchasedSlots: 6 };
+const BOOK = {
+  treasury: 1500,
+  inventory: [{ itemId: 'wolf_fang', count: 2 }],
+  purchasedSlots: 30,
+};
 
 describe('the guild_banks DDL (SOCIAL_SCHEMA, the family that owns guilds)', () => {
   it('is additive and idempotent with the state.md column set and the disband cascade', () => {

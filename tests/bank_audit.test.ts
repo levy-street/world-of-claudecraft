@@ -229,23 +229,50 @@ describe('auditBank (guild container)', () => {
     // item and buys an expansion from the treasury; the book matches the net.
     const findings = auditBank({
       ledgerRows: [
-        G({ id: 1, character_id: 1, op: 'create_fee', copper_delta: -100000 }),
-        G({ id: 2, character_id: 1, op: 'deposit_gold', copper_delta: 80000 }),
-        G({ id: 3, character_id: 1, op: 'deposit', item_id: 'wolf_fang', count: 5 }),
-        G({ id: 4, character_id: 2, op: 'withdraw', item_id: 'wolf_fang', count: 2 }),
+        G({ id: 1, character_id: 1, op: 'create_fee', copper_delta: -10000 }),
+        G({
+          id: 2,
+          character_id: 1,
+          op: 'open_bank',
+          copper_delta: -90000,
+          purchased_slots_after: 24,
+        }),
+        G({
+          id: 3,
+          character_id: 1,
+          op: 'deposit_gold',
+          copper_delta: 80000,
+          purchased_slots_after: 24,
+        }),
+        G({
+          id: 4,
+          character_id: 1,
+          op: 'deposit',
+          item_id: 'wolf_fang',
+          count: 5,
+          purchased_slots_after: 24,
+        }),
         G({
           id: 5,
           character_id: 2,
-          op: 'buy_slots',
-          copper_delta: -50000,
-          purchased_slots_after: 6,
+          op: 'withdraw',
+          item_id: 'wolf_fang',
+          count: 2,
+          purchased_slots_after: 24,
         }),
         G({
           id: 6,
           character_id: 2,
+          op: 'buy_slots',
+          copper_delta: -25000,
+          purchased_slots_after: 30,
+        }),
+        G({
+          id: 7,
+          character_id: 2,
           op: 'withdraw_gold',
           copper_delta: -10000,
-          purchased_slots_after: 6,
+          purchased_slots_after: 30,
         }),
       ],
       characters: [],
@@ -254,9 +281,9 @@ describe('auditBank (guild container)', () => {
           guild_id: 913,
           realm: 'Claudemoon',
           data: {
-            treasury: 20000,
+            treasury: 45000,
             inventory: [{ itemId: 'wolf_fang', count: 3 }],
-            purchasedSlots: 6,
+            purchasedSlots: 30,
           },
         },
       ],
@@ -298,19 +325,33 @@ describe('auditBank (guild container)', () => {
     expect(guildKindsFor(findings, 913)).toEqual(['negative_treasury']);
   });
 
-  it('create_fee is the founder purse, excluded from the treasury replay', () => {
+  it('create_fee and open_bank are PURSE copper, excluded from the treasury replay', () => {
     const findings = auditBank({
       ledgerRows: [
-        // If create_fee counted, the replay would start at -100000 and flag.
-        G({ id: 1, character_id: 1, op: 'create_fee', copper_delta: -100000 }),
-        G({ id: 2, character_id: 1, op: 'deposit_gold', copper_delta: 100 }),
+        // If either purse op counted, the replay would go negative and flag
+        // (and the final treasury would mismatch the book).
+        G({ id: 1, character_id: 1, op: 'create_fee', copper_delta: -10000 }),
+        G({
+          id: 2,
+          character_id: 1,
+          op: 'open_bank',
+          copper_delta: -90000,
+          purchased_slots_after: 24,
+        }),
+        G({
+          id: 3,
+          character_id: 1,
+          op: 'deposit_gold',
+          copper_delta: 100,
+          purchased_slots_after: 24,
+        }),
       ],
       characters: [],
       guildBanks: [
         {
           guild_id: 913,
           realm: 'Claudemoon',
-          data: { treasury: 100, inventory: [], purchasedSlots: 0 },
+          data: { treasury: 100, inventory: [], purchasedSlots: 24 },
         },
       ],
     });
@@ -436,6 +477,36 @@ describe('auditBank (guild container)', () => {
           count: 1,
           container_id: null,
         }),
+        // open_bank that charged nothing (or positive).
+        G({
+          id: 8,
+          character_id: 1,
+          op: 'open_bank',
+          copper_delta: 0,
+          purchased_slots_after: 24,
+          container_id: 75,
+        }),
+        // open_bank carrying a count.
+        G({
+          id: 9,
+          character_id: 1,
+          op: 'open_bank',
+          copper_delta: -90000,
+          count: 1,
+          purchased_slots_after: 24,
+          container_id: 76,
+        }),
+        // open_bank granting anything but the 24-slot rung-0 base.
+        G({
+          id: 10,
+          character_id: 1,
+          op: 'open_bank',
+          copper_delta: -90000,
+          purchased_slots_after: 30,
+          container_id: 77,
+        }),
+        // open_bank smuggled into the personal container.
+        L({ id: 11, character_id: 1, op: 'open_bank', copper_delta: -90000 }),
       ],
       characters: [],
     });
@@ -444,7 +515,12 @@ describe('auditBank (guild container)', () => {
     expect(guildKindsFor(findings, 72)).toEqual(['item_on_gold_op']);
     expect(guildKindsFor(findings, 73)).toEqual(['nonnegative_create_fee']);
     expect(guildKindsFor(findings, 74)).toEqual(['slots_on_create_fee']);
-    expect(findings.some((f) => f.kind === 'gold_op_outside_guild')).toBe(true);
+    expect(guildKindsFor(findings, 75)).toEqual(['nonnegative_open_cost']);
+    expect(guildKindsFor(findings, 76)).toEqual(['count_on_open']);
+    expect(guildKindsFor(findings, 77)).toEqual(['bad_open_slots']);
+    expect(findings.filter((f) => f.kind === 'gold_op_outside_guild').map((f) => f.detail)).toEqual(
+      [expect.stringContaining('deposit_gold row 6'), expect.stringContaining('open_bank row 11')],
+    );
     expect(findings.some((f) => f.kind === 'missing_container_id')).toBe(true);
   });
 });

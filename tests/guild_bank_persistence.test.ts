@@ -92,11 +92,12 @@ function moveToBanker(server: GameServer, pid: number): void {
   server.sim.rebucket(p);
 }
 
-// A fully authorized officer at a banker with a loaded book and copper.
+// A fully authorized officer at a banker with a loaded (OPENED: rung 0
+// bought, 24 slots) book and copper.
 function officerSetup(server: GameServer, session: ClientSession, treasury = 100_000): void {
   moveToBanker(server, session.pid);
   server.sim.setPlayerGuildMembership(session.pid, { guildId: GUILD_ID, rank: 'officer' });
-  server.sim.loadGuildBank(GUILD_ID, { treasury, inventory: [], purchasedSlots: 0 });
+  server.sim.loadGuildBank(GUILD_ID, { treasury, inventory: [], purchasedSlots: 24 });
   const meta = server.sim.players.get(session.pid);
   if (!meta) throw new Error('missing meta');
   meta.copper = 500_000;
@@ -129,7 +130,7 @@ describe('loadGuildBanksIntoSim (the boot load, against a REAL Sim)', () => {
     const book = {
       treasury: 777,
       inventory: [{ itemId: 'wolf_fang', count: 2 }],
-      purchasedSlots: 6,
+      purchasedSlots: 24,
     };
     const result = loadGuildBanksIntoSim(sim, [
       { guildId: 7, data: book, oversized: false },
@@ -268,6 +269,76 @@ describe('the dispatch observer: ledger rows + the dirty mark', () => {
     });
   });
 
+  it('opening the bank (rung 0) writes an open_bank row: purse charged, treasury untouched', async () => {
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'Opener');
+    moveToBanker(server, session.pid);
+    server.sim.setPlayerGuildMembership(session.pid, { guildId: GUILD_ID, rank: 'officer' });
+    server.sim.loadGuildBank(GUILD_ID, { treasury: 5_000, inventory: [], purchasedSlots: 0 });
+    const meta = server.sim.players.get(session.pid);
+    if (!meta) throw new Error('missing meta');
+    meta.copper = 100_000;
+    dispatch(server, session, { cmd: 'guild_bank_buy_slots' });
+    // The sim resolved rung 0: purse-paid, 24 slots granted, treasury as-was.
+    expect(meta.copper).toBe(10_000);
+    expect(server.sim.guildBanks.get(GUILD_ID)).toEqual({
+      treasury: 5_000,
+      inventory: [],
+      purchasedSlots: 24,
+    });
+    expect([...session.dirtyGuildBanks.keys()]).toEqual([GUILD_ID]);
+    // The observer renamed the op: open_bank, never buy_slots (the audit's
+    // treasury replay excludes purse-paid rows by this name).
+    expect(session.unflushedGuildBankOps.get(GUILD_ID)).toEqual([
+      {
+        op: 'open_bank',
+        itemId: null,
+        count: null,
+        instance: null,
+        craftedRecipeId: null,
+        copperDelta: -90_000,
+      },
+    ]);
+    await bankLedgerIdle();
+    expect(dbMock.insertBankLedgerRow).toHaveBeenCalledTimes(1);
+    expect((dbMock.insertBankLedgerRow.mock.calls[0] as unknown[])[0]).toMatchObject({
+      characterId: 1,
+      op: 'open_bank',
+      copperDelta: -90_000,
+      purchasedSlotsAfter: 24,
+      container: 'guild',
+      containerId: GUILD_ID,
+    });
+    // A later expansion still records plain buy_slots from the treasury.
+    dbMock.insertBankLedgerRow.mockClear();
+    meta.copper = 100_000; // refill the purse for the treasury top-up deposit
+    dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 30_000 });
+    dispatch(server, session, { cmd: 'guild_bank_buy_slots' });
+    await bankLedgerIdle();
+    const ops = dbMock.insertBankLedgerRow.mock.calls.map(
+      (c) => (c as unknown[])[0] as { op: string; copperDelta: number },
+    );
+    expect(ops.map((o) => o.op)).toEqual(['deposit_gold', 'buy_slots']);
+    expect(ops[1].copperDelta).toBe(-25_000); // rung 1, treasury-paid
+  });
+
+  it('a purse-poor rung-0 open is refused: no row, nothing dirty, nothing granted', async () => {
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'PoorOpener');
+    moveToBanker(server, session.pid);
+    server.sim.setPlayerGuildMembership(session.pid, { guildId: GUILD_ID, rank: 'officer' });
+    server.sim.loadGuildBank(GUILD_ID, { treasury: 10_000_000, inventory: [], purchasedSlots: 0 });
+    const meta = server.sim.players.get(session.pid);
+    if (!meta) throw new Error('missing meta');
+    meta.copper = 89_999; // treasury wealth must not substitute for the purse
+    dispatch(server, session, { cmd: 'guild_bank_buy_slots' });
+    expect(meta.copper).toBe(89_999);
+    expect(server.sim.guildBanks.get(GUILD_ID)?.purchasedSlots).toBe(0);
+    await bankLedgerIdle();
+    expect(dbMock.insertBankLedgerRow).not.toHaveBeenCalled();
+    expect(session.dirtyGuildBanks.size).toBe(0);
+  });
+
   it('a refused op (treasury short) writes NO row and marks nothing dirty', async () => {
     const server = new GameServer();
     const { session } = joinServer(server, 1, 'Poor');
@@ -301,7 +372,7 @@ describe('the escrow save arm (GameServer.saveCharacter)', () => {
     const [charId, , , books] = dbMock.saveCharacterAndGuildBankState.mock.calls[0] as never[];
     expect(charId).toBe(1);
     expect(books).toEqual([
-      { guildId: GUILD_ID, data: { treasury: 102_000, inventory: [], purchasedSlots: 0 } },
+      { guildId: GUILD_ID, data: { treasury: 102_000, inventory: [], purchasedSlots: 24 } },
     ]);
     // The plain single-statement save was NOT used (the book needs the txn)...
     expect(dbMock.saveCharacterState).not.toHaveBeenCalled();
@@ -339,7 +410,7 @@ describe('the escrow save arm (GameServer.saveCharacter)', () => {
     session.leaseNonce = 'stale-nonce';
     dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 2_000 });
     expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(102_000); // live, ahead
-    const durable = { treasury: 100_000, inventory: [], purchasedSlots: 0 };
+    const durable = { treasury: 100_000, inventory: [], purchasedSlots: 24 };
     dbMock.loadGuildBankRow.mockResolvedValueOnce({
       guildId: GUILD_ID,
       data: durable,
@@ -400,7 +471,7 @@ describe('the escrow save arm (GameServer.saveCharacter)', () => {
     const [savedCharId, , , books] = call;
     expect(savedCharId).toBe(2);
     expect(books).toEqual([
-      { guildId: GUILD_ID, data: { treasury: 101_000, inventory: [], purchasedSlots: 0 } },
+      { guildId: GUILD_ID, data: { treasury: 101_000, inventory: [], purchasedSlots: 24 } },
     ]);
   });
 
@@ -474,7 +545,7 @@ describe('the escrow save arm (GameServer.saveCharacter)', () => {
     expect(dbMock.saveCharacterAndMarketState).toHaveBeenCalledTimes(1);
     const call = dbMock.saveCharacterAndMarketState.mock.calls[0] as never[];
     expect(call[6]).toEqual([
-      { guildId: GUILD_ID, data: { treasury: 102_000, inventory: [], purchasedSlots: 0 } },
+      { guildId: GUILD_ID, data: { treasury: 102_000, inventory: [], purchasedSlots: 24 } },
     ]);
     expect(dbMock.saveCharacterAndGuildBankState).not.toHaveBeenCalled();
   });
@@ -587,7 +658,7 @@ describe('the unflushed-op log cap (bounded memory under a failing DB)', () => {
     // A fences out while B is dirty: with the revert lost, the reconcile must
     // NOT skip (that resurrects the dupe) and must NOT trust a partial log;
     // it falls back to evict-and-reload from durable truth.
-    const durable = { treasury: 100_000, inventory: [], purchasedSlots: 0 };
+    const durable = { treasury: 100_000, inventory: [], purchasedSlots: 24 };
     dbMock.loadGuildBankRow.mockResolvedValueOnce({
       guildId: GUILD_ID,
       data: durable,
@@ -627,7 +698,7 @@ describe('the reconcile read retry (one failed logout must not disable a bank)',
     const { session } = joinServer(server, 1, 'Retry');
     officerSetup(server, session);
     dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 2_000 });
-    const durable = { treasury: 100_000, inventory: [], purchasedSlots: 0 };
+    const durable = { treasury: 100_000, inventory: [], purchasedSlots: 24 };
     dbMock.loadGuildBankRow
       .mockRejectedValueOnce(new Error('transient'))
       .mockResolvedValueOnce({ guildId: GUILD_ID, data: durable, oversized: false });
@@ -657,7 +728,7 @@ describe('the guild_create fee gate + the create/disband hooks', () => {
     expect(events).toContainEqual({
       type: 'error',
       // Byte-identical to the server_i18n sample pin.
-      text: 'You need 10 gold to found a guild.',
+      text: 'You need 1 gold to found a guild.',
     });
   });
 
@@ -679,7 +750,7 @@ describe('the guild_create fee gate + the create/disband hooks', () => {
     const events = sent.flatMap((m) => ((m as { list?: unknown[] }).list ?? []) as never[]);
     expect(events).toContainEqual({
       type: 'error',
-      text: 'You need 10 gold to found a guild.',
+      text: 'You need 1 gold to found a guild.',
     });
   });
 
@@ -711,7 +782,7 @@ describe('the guild_create fee gate + the create/disband hooks', () => {
     });
     dispatch(server, session, { cmd: 'guild_create', name: 'Iron Vanguard' });
     // Charged exactly once, at the gate, synchronously.
-    expect(meta.copper).toBe(50_000);
+    expect(meta.copper).toBe(140_000);
     // The seed: ops never lazily create a book, so without this the founder's
     // bank would be silent-inert until a realm restart.
     await vi.waitFor(() => {
@@ -742,7 +813,7 @@ describe('the guild_create fee gate + the create/disband hooks', () => {
       { guildId: GUILD_ID, data: { treasury: 0, inventory: [], purchasedSlots: 0 } },
     ]);
     // No stray refund: the purse stays exactly one fee lighter.
-    expect(meta.copper).toBe(50_000);
+    expect(meta.copper).toBe(140_000);
   });
 
   it('a refused create REFUNDS the reserved fee exactly once, on every refusal arm', async () => {
@@ -761,7 +832,7 @@ describe('the guild_create fee gate + the create/disband hooks', () => {
       const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       dispatch(server, session, { cmd: 'guild_create', name: 'Iron Vanguard' });
       // Reserved synchronously at the gate...
-      expect(meta.copper).toBe(50_000);
+      expect(meta.copper).toBe(140_000);
       // ...and returned when the create reports failure.
       await vi.waitFor(() => {
         expect(meta.copper).toBe(150_000);
@@ -877,7 +948,7 @@ describe('the guild_create fee gate + the create/disband hooks', () => {
     officerSetup(server, session);
     dispatch(server, session, { cmd: 'guild_bank_withdraw_gold', amount: 40_000 });
     expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(60_000);
-    const durable = { treasury: 100_000, inventory: [], purchasedSlots: 0 };
+    const durable = { treasury: 100_000, inventory: [], purchasedSlots: 24 };
     dbMock.loadGuildBankRow.mockResolvedValueOnce({
       guildId: GUILD_ID,
       data: durable,

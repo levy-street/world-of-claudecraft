@@ -4025,7 +4025,14 @@ export class GameServer {
     const before = this.sim.guildBankInfoFor(pid);
     run();
     const after = this.sim.guildBankInfoFor(pid);
-    const deltas = diffGuildBankOp(op, before, after);
+    // Rung 0 of the ladder OPENS the bank from the acting officer's own PURSE
+    // (the sim decides which rung is next off the BEFORE book); it gets its
+    // own ledger op name so the audit's treasury replay can exclude the
+    // purse-paid copper like create_fee, and so the revert path never credits
+    // the treasury for money it never held.
+    const effectiveOp: GuildBankLedgerOp =
+      op === 'buy_slots' && before?.purchasedSlots === 0 ? 'open_bank' : op;
+    const deltas = diffGuildBankOp(effectiveOp, before, after);
     if (deltas.length === 0) return;
     // A successful op requires a stamped officer-plus membership, and the
     // stamp cannot change inside the synchronous run() above.
@@ -4038,7 +4045,7 @@ export class GameServer {
     const log = session.unflushedGuildBankOps.get(guildId) ?? [];
     for (const d of deltas) {
       log.push({
-        op,
+        op: effectiveOp,
         itemId: d.itemId,
         count: d.count,
         instance: (d.instance ?? null) as GuildBankOpDelta['instance'],
@@ -4054,7 +4061,7 @@ export class GameServer {
       session.revertLostGuildBanks.add(guildId);
     }
     session.unflushedGuildBankOps.set(guildId, log);
-    recordGuildBankDeltas(op, session, guildId, deltas);
+    recordGuildBankDeltas(effectiveOp, session, guildId, deltas);
   }
 
   async loadRifts(): Promise<void> {

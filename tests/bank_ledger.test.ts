@@ -455,9 +455,20 @@ describe('diffGuildBankOp (pure)', () => {
 
   it('buy_slots negates the BEFORE table price the treasury paid', () => {
     expect(
-      diffGuildBankOp('buy_slots', ginfo(60000, [], 0, 50000), ginfo(10000, [], 6, 100000)),
+      diffGuildBankOp('buy_slots', ginfo(60000, [], 24, 25000), ginfo(35000, [], 30, 50000)),
     ).toEqual([
-      { itemId: null, count: null, instance: null, copperDelta: -50000, purchasedSlotsAfter: 6 },
+      { itemId: null, count: null, instance: null, copperDelta: -25000, purchasedSlotsAfter: 30 },
+    ]);
+  });
+
+  it('open_bank (rung 0) negates the BEFORE table price the officer PURSE paid', () => {
+    // The 0 -> 24 opening: the row records the purse copper (the treasury
+    // never moved between the snapshots), and the audit's treasury replay
+    // excludes the op like create_fee.
+    expect(
+      diffGuildBankOp('open_bank', ginfo(60000, [], 0, 90000), ginfo(60000, [], 24, 25000)),
+    ).toEqual([
+      { itemId: null, count: null, instance: null, copperDelta: -90000, purchasedSlotsAfter: 24 },
     ]);
   });
 
@@ -465,7 +476,8 @@ describe('diffGuildBankOp (pure)', () => {
     expect(diffGuildBankOp('deposit_gold', ginfo(500), ginfo(500))).toEqual([]);
     expect(diffGuildBankOp('deposit', null, ginfo(500))).toEqual([]);
     expect(diffGuildBankOp('withdraw', ginfo(500), null)).toEqual([]);
-    expect(diffGuildBankOp('buy_slots', ginfo(500, [], 6), ginfo(500, [], 6))).toEqual([]);
+    expect(diffGuildBankOp('buy_slots', ginfo(500, [], 30), ginfo(500, [], 30))).toEqual([]);
+    expect(diffGuildBankOp('open_bank', ginfo(500, [], 0), ginfo(500, [], 0))).toEqual([]);
   });
 });
 

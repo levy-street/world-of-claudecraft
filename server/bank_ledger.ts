@@ -176,9 +176,11 @@ export function bankLedgerIdle(): Promise<void> {
 // bank_ledger table; the two gold ops record the TREASURY's copper delta
 // (positive on deposit_gold, negative on withdraw_gold), buy_slots the
 // negated table price the treasury paid, and item ops carry no copper, so a
-// guild's non-fee copper deltas replay to its live treasury (the audit
-// script's conservation check). create_fee is the one row with no diff: the
-// founder's personal copper, written by the guild_create success arm.
+// guild's treasury-moving copper deltas replay to its live treasury (the
+// audit script's conservation check). Two ops moved PURSE copper and are
+// excluded from that replay: create_fee (the founder's fee, the one row with
+// no diff, written by the guild_create success arm) and open_bank (ladder
+// rung 0, the officer's purse opening the item store).
 // The dispatch site needs the diff itself (a non-empty diff marks the book
 // dirty for the escrow save), so the differ is exported pure and the recorder
 // takes the computed deltas; both share the personal FIFO tail, preserving a
@@ -190,7 +192,8 @@ export type GuildBankLedgerOp =
   | 'withdraw_gold'
   | 'deposit'
   | 'withdraw'
-  | 'buy_slots';
+  | 'buy_slots'
+  | 'open_bank';
 
 // The guild multiset key: itemId + instance payload + craft provenance. The
 // third dimension exists because guild deltas feed the revert path
@@ -241,10 +244,13 @@ export function diffGuildBankOp(
     ];
   }
 
-  if (op === 'buy_slots') {
+  if (op === 'buy_slots' || op === 'open_bank') {
     if (after.purchasedSlots <= before.purchasedSlots) return [];
-    // The treasury paid exactly the BEFORE snapshot's next table price
+    // The payer covered exactly the BEFORE snapshot's next table price
     // (non-null by construction on a real purchase); guard null as 0.
+    // buy_slots moved TREASURY copper; open_bank (rung 0) moved the acting
+    // officer's PURSE, so the audit's treasury replay excludes it like
+    // create_fee.
     const price = before.nextExpansionPrice ?? 0;
     return [
       {

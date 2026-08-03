@@ -70,6 +70,7 @@ const baseEnTable = {
   'error.guildBankCarryCap': 'You cannot carry that much money.',
   'error.guildBankCannotAfford': 'Your guild cannot afford that expansion.',
   'error.guildBankMaxSlots': 'The guild bank cannot be expanded further.',
+  'log.guildBankOpened': 'You open the guild bank.',
   'log.guildBankSlotsPurchased': 'You purchase additional guild bank slots.',
   'log.guildBankDepositGold': 'You deposit {money} into the guild treasury.',
   'log.guildBankWithdrawGold': 'You withdraw {money} from the guild treasury.',

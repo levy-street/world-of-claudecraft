@@ -6,8 +6,10 @@ import type { InvSlot } from '../sim/types';
 // included): members get no data and no UI tab. guildBankInfo streams only
 // while an officer-plus stands at a banker NPC (the bankInfo pattern); offline
 // play never has a guild, so the offline Sim reads null and every command is
-// inert. The base 12 slots grow in treasury-bought 6-slot blocks
-// (GUILD_BANK_EXPANSION_PRICES in src/sim/guild_bank.ts); the treasury is
+// inert. A new guild's bank is UNOPENED (0 item slots; treasury gold ops work
+// from day one): ladder rung 0 opens it for 24 slots, paid from the clicking
+// officer's own purse, and rungs 1+ are treasury-bought 6-slot expansions
+// (GUILD_BANK_RUNG_PRICES in src/sim/guild_bank.ts); the treasury is
 // capped and deposits beyond the cap are refused, never truncated.
 //
 // The guild_bank_* wire tokens, dispatch, and the snapshot mirror are live:
@@ -19,10 +21,13 @@ import type { InvSlot } from '../sim/types';
 export interface GuildBankInfo {
   treasury: number; // copper the guild holds, within [0, GUILD_BANK_TREASURY_CAP]
   slots: InvSlot[]; // the pooled contents (a boundary clone, never a live sim reference)
-  capacity: number; // total slot budget: base + purchased
-  purchasedSlots: number; // treasury-bought slots, always a multiple of the 6-slot block
-  // Copper price of the NEXT expansion (table lookup, never client-supplied),
-  // null once every expansion is bought.
+  capacity: number; // total slot budget: the granted slots of every bought rung
+  // Granted slots across bought ladder rungs, always a value from
+  // GUILD_BANK_LADDER_POSITIONS: 0 while the bank is UNOPENED (the client
+  // derives the open-the-bank pane from this), 24 once opened, +6 per expansion.
+  purchasedSlots: number;
+  // Copper price of the NEXT ladder rung (table lookup, never client-supplied;
+  // rung 0 is purse-paid, rungs 1+ treasury-paid), null once the ladder is done.
   nextExpansionPrice: number | null;
 }
 

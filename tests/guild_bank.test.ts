@@ -21,9 +21,10 @@ import { sanitizeBankState } from '../src/sim/bank';
 import { BUILTIN_WORLD, ITEMS, QUESTS } from '../src/sim/data';
 import {
   createEmptyGuildBankState,
-  GUILD_BANK_BASE_SLOTS,
-  GUILD_BANK_EXPANSION_PRICES,
   GUILD_BANK_EXPANSION_SLOTS,
+  GUILD_BANK_LADDER_POSITIONS,
+  GUILD_BANK_RUNG_PRICES,
+  GUILD_BANK_RUNG_SLOTS,
   GUILD_BANK_TREASURY_CAP,
   GUILD_CREATION_FEE_COPPER,
   GUILD_RANKS,
@@ -31,16 +32,20 @@ import {
   type GuildRank,
   guildBankCapacity,
   guildBankNextExpansionPrice,
+  guildBankRungsBought,
   sanitizeGuildBankState,
 } from '../src/sim/guild_bank';
 import { Sim } from '../src/sim/sim';
 import type { Entity, WorldContent } from '../src/sim/types';
 import { META_EXCLUDE, samplePlayerMeta } from './parity/trace';
 
-// The 6-tier expansion ladder from docs/guild-bank/state.md, pinned as literals.
-const PRICES = [25000, 50000, 100000, 250000, 500000, 1000000];
-const LADDER_TOTAL = 1925000; // 192g50s across all six expansions
-const CAPS = [24, 30, 36, 42, 48, 54, 60]; // base 24 + 6 per purchased expansion
+// The 7-rung ladder from docs/guild-bank/state.md, pinned as literals: rung 0
+// OPENS the bank (24 slots, PURSE-paid); rungs 1..6 are the treasury-paid
+// 6-slot expansions.
+const PRICES = [90000, 25000, 50000, 100000, 250000, 500000, 1000000];
+const RUNGS = [24, 6, 6, 6, 6, 6, 6];
+const POSITIONS = [0, 24, 30, 36, 42, 48, 54, 60]; // every valid purchasedSlots value
+const EXPANSION_TOTAL = 1925000; // 192g50s across the six treasury expansions (rungs 1..6)
 
 const EMPTY: GuildBankState = { treasury: 0, inventory: [], purchasedSlots: 0 };
 
@@ -56,14 +61,18 @@ type _SimRankCoversServer = AssertExtends<ServerGuildRank, GuildRank>;
 type _ServerRankCoversSim = AssertExtends<GuildRank, ServerGuildRank>;
 
 describe('guild bank constants (state.md contract)', () => {
-  it('pins the creation fee, slot geometry, price ladder, and treasury cap', () => {
-    expect(GUILD_CREATION_FEE_COPPER).toBe(100000);
-    expect(GUILD_BANK_BASE_SLOTS).toBe(24);
+  it('pins the creation fee, rung geometry, price ladder, and treasury cap', () => {
+    expect(GUILD_CREATION_FEE_COPPER).toBe(10000); // founding costs 1 gold
     expect(GUILD_BANK_EXPANSION_SLOTS).toBe(6);
-    expect([...GUILD_BANK_EXPANSION_PRICES]).toEqual(PRICES);
+    expect([...GUILD_BANK_RUNG_SLOTS]).toEqual(RUNGS);
+    expect([...GUILD_BANK_RUNG_PRICES]).toEqual(PRICES);
+    expect([...GUILD_BANK_LADDER_POSITIONS]).toEqual(POSITIONS);
     // Reduce over the EXPORT (not the file-local literal) so the ladder-total claim is
-    // load-bearing against the shipped table, not a tautology.
-    expect(GUILD_BANK_EXPANSION_PRICES.reduce((a, b) => a + b, 0)).toBe(LADDER_TOTAL);
+    // load-bearing against the shipped table, not a tautology: the treasury
+    // expansions (rungs 1..6) total 192g50s; the whole ladder adds rung 0's
+    // 9g purse-paid opening on top.
+    expect(GUILD_BANK_RUNG_PRICES.slice(1).reduce((a, b) => a + b, 0)).toBe(EXPANSION_TOTAL);
+    expect(GUILD_BANK_RUNG_PRICES.reduce((a, b) => a + b, 0)).toBe(90000 + EXPANSION_TOTAL);
     expect(GUILD_BANK_TREASURY_CAP).toBe(1000000000);
   });
 
@@ -73,25 +82,42 @@ describe('guild bank constants (state.md contract)', () => {
 });
 
 describe('guildBankCapacity + guildBankNextExpansionPrice', () => {
-  it('walks the full ladder: capacity per tier and the next price at each step', () => {
-    for (let tier = 0; tier <= 6; tier++) {
-      const bank: GuildBankState = { treasury: 0, inventory: [], purchasedSlots: tier * 6 };
-      expect(guildBankCapacity(bank)).toBe(CAPS[tier]);
-      expect(guildBankNextExpansionPrice(bank)).toBe(tier < 6 ? PRICES[tier] : null);
+  it('walks the full ladder: capacity per rung count and the next price at each step', () => {
+    for (let rungs = 0; rungs <= 7; rungs++) {
+      const bank: GuildBankState = {
+        treasury: 0,
+        inventory: [],
+        purchasedSlots: POSITIONS[rungs],
+      };
+      expect(guildBankRungsBought(bank.purchasedSlots)).toBe(rungs);
+      expect(guildBankCapacity(bank)).toBe(POSITIONS[rungs]);
+      expect(guildBankNextExpansionPrice(bank)).toBe(rungs < 7 ? PRICES[rungs] : null);
     }
   });
 
+  it('an UNOPENED bank (no rung bought) has 0 slots and rung 0 as the next price', () => {
+    const unopened: GuildBankState = { treasury: 0, inventory: [], purchasedSlots: 0 };
+    expect(guildBankCapacity(unopened)).toBe(0);
+    expect(guildBankNextExpansionPrice(unopened)).toBe(90000); // the purse-paid opening
+  });
+
   it('maxed banks report 60 slots and no further price', () => {
-    const maxed: GuildBankState = { treasury: 0, inventory: [], purchasedSlots: 36 };
+    const maxed: GuildBankState = { treasury: 0, inventory: [], purchasedSlots: 60 };
     expect(guildBankCapacity(maxed)).toBe(60);
     expect(guildBankNextExpansionPrice(maxed)).toBeNull();
   });
 
-  it('floors a non-multiple purchasedSlots when pricing (defensive arm)', () => {
-    // Sanitize guarantees whole expansions, so this arm is defensive; pin it
-    // anyway so the floor cannot silently become a round-up (price skip).
+  it('floors a non-position purchasedSlots when pricing (defensive arm)', () => {
+    // Sanitize guarantees valid ladder positions, so this arm is defensive;
+    // pin it anyway so the floor cannot silently become a round-up (price
+    // skip): a count below the opened base indexes rung 0, a count between
+    // positions indexes the last rung actually reached.
     const odd: GuildBankState = { treasury: 0, inventory: [], purchasedSlots: 7 };
-    expect(guildBankNextExpansionPrice(odd)).toBe(50000); // tier 1 price, not tier 2
+    expect(guildBankNextExpansionPrice(odd)).toBe(90000); // rung 0: 7 never opened the bank
+    expect(guildBankCapacity(odd)).toBe(0);
+    const between: GuildBankState = { treasury: 0, inventory: [], purchasedSlots: 29 };
+    expect(guildBankNextExpansionPrice(between)).toBe(25000); // rung 1, not rung 2
+    expect(guildBankCapacity(between)).toBe(24);
   });
 });
 
@@ -129,15 +155,26 @@ describe('sanitizeGuildBankState (the ONE load path)', () => {
     expect(t(undefined)).toBe(0);
   });
 
-  it('floors purchasedSlots to a whole expansion within [0, 36]', () => {
+  it('floors purchasedSlots to a VALID ladder position within [0, 60]', () => {
     const ps = (v: unknown) => sanitizeGuildBankState({ purchasedSlots: v }).purchasedSlots;
-    expect(ps(0)).toBe(0);
-    expect(ps(6)).toBe(6);
-    expect(ps(7)).toBe(6);
+    // Every valid position round-trips unchanged.
+    for (const pos of POSITIONS) expect(ps(pos), String(pos)).toBe(pos);
+    // Hostile values floor DOWN to the nearest position, so price indexing
+    // stays coherent (a tampered save can never sit between rungs): old-ladder
+    // residue below the opened base (6, 12, 18) reads as UNOPENED.
+    expect(ps(6)).toBe(0);
+    expect(ps(7)).toBe(0);
+    expect(ps(23)).toBe(0);
+    expect(ps(25)).toBe(24);
+    expect(ps(29)).toBe(24);
     expect(ps(35)).toBe(30);
-    expect(ps(36)).toBe(36);
-    expect(ps(9999)).toBe(36);
+    expect(ps(59)).toBe(54);
+    expect(ps(61)).toBe(60);
+    expect(ps(9999)).toBe(60);
     expect(ps(-6)).toBe(0);
+    expect(ps(30.9)).toBe(30);
+    expect(ps(Number.NaN)).toBe(0);
+    expect(ps(Number.POSITIVE_INFINITY)).toBe(60);
     expect(ps('x')).toBe(0);
   });
 
@@ -248,14 +285,14 @@ describe('sanitizeGuildBankState (the ONE load path)', () => {
       purchasedSlots: 0,
     };
     const book = sanitizeGuildBankState(raw);
-    expect(book.inventory.length).toBe(60); // way past the 24-slot budget, all kept
-    expect(guildBankCapacity(book)).toBe(24);
+    expect(book.inventory.length).toBe(60); // an UNOPENED (0-slot) bank keeps them all
+    expect(guildBankCapacity(book)).toBe(0);
   });
 
   it('round-trips its own output unchanged and never aliases the raw slots', () => {
     const raw = {
       treasury: 123456,
-      purchasedSlots: 12,
+      purchasedSlots: 30,
       inventory: [
         { itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' }, craftedRecipeId: 'jerky' },
       ],
@@ -270,15 +307,15 @@ describe('sanitizeGuildBankState (the ONE load path)', () => {
 describe('the per-guild book map (Sim.guildBanks + load/serialize seam)', () => {
   it('loadGuildBank installs a sanitized book on the live Sim-owned map', () => {
     const sim = freshSim();
-    sim.loadGuildBank(3, { treasury: -50, purchasedSlots: 7, inventory: 'nope' });
-    expect(sim.guildBanks.get(3)).toEqual({ treasury: 0, inventory: [], purchasedSlots: 6 });
+    sim.loadGuildBank(3, { treasury: -50, purchasedSlots: 27, inventory: 'nope' });
+    expect(sim.guildBanks.get(3)).toEqual({ treasury: 0, inventory: [], purchasedSlots: 24 });
   });
 
   it('is load-once: a second load never clobbers a live book (unflushed deposits)', () => {
     const sim = freshSim();
     sim.loadGuildBank(3, {
       treasury: 500,
-      purchasedSlots: 6,
+      purchasedSlots: 24,
       inventory: [{ itemId: 'wolf_fang', count: 3 }],
     });
     const live = sim.guildBanks.get(3);
@@ -286,7 +323,7 @@ describe('the per-guild book map (Sim.guildBanks + load/serialize seam)', () => 
     expect(sim.guildBanks.get(3)).toBe(live); // same object: the reload was skipped
     expect(sim.guildBanks.get(3)).toEqual({
       treasury: 500,
-      purchasedSlots: 6,
+      purchasedSlots: 24,
       inventory: [{ itemId: 'wolf_fang', count: 3 }],
     });
     // Evict-then-load is the sanctioned reload path (Phase 3 disband/maintenance).
@@ -312,7 +349,7 @@ describe('the per-guild book map (Sim.guildBanks + load/serialize seam)', () => 
     const sim = freshSim();
     sim.loadGuildBank(5, {
       treasury: 777,
-      purchasedSlots: 6,
+      purchasedSlots: 24,
       inventory: [{ itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' } }],
     });
     const book = sim.guildBanks.get(5);
@@ -412,7 +449,7 @@ describe('the session-only guild membership stamp (PlayerMeta.guildMembership)',
     draws = 0;
     sim.loadGuildBank(3, {
       treasury: 500,
-      purchasedSlots: 6,
+      purchasedSlots: 24,
       inventory: [{ itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' } }],
     });
     sim.serializeGuildBank(3);
@@ -538,6 +575,8 @@ function moveFarFromBankers(sim: Sim, pid = sim.playerId): void {
 
 // An officer standing at a banker with their guild's book loaded: the fully
 // authorized baseline every dimension below degrades from one axis at a time.
+// The default book is OPENED (rung 0 bought, 24 slots); pass purchasedSlots: 0
+// for the unopened-bank arms.
 function makeOfficerSim(
   opts: { rank?: GuildRank; treasury?: number; purchasedSlots?: number } = {},
 ): Sim {
@@ -552,7 +591,7 @@ function makeOfficerSim(
   sim.loadGuildBank(GUILD_ID, {
     treasury: opts.treasury ?? 100_000,
     inventory: [],
-    purchasedSlots: opts.purchasedSlots ?? 0,
+    purchasedSlots: opts.purchasedSlots ?? 24,
   });
   return sim;
 }
@@ -698,8 +737,8 @@ describe('guild bank ops: the shared refusal dimensions (every op, one axis at a
     sim.guildBankWithdrawFor(sim.playerId, 0, 1);
     expect(book(sim).inventory).toEqual([{ itemId: 'wolf_fang', count: 2 }]);
     sim.guildBankBuySlotsFor(sim.playerId);
-    expect(book(sim).purchasedSlots).toBe(6);
-    expect(book(sim).treasury).toBe(76_500); // 101500 - 25000 (tier-1 price literal)
+    expect(book(sim).purchasedSlots).toBe(30); // opened base 24 + one 6-slot expansion
+    expect(book(sim).treasury).toBe(76_500); // 101500 - 25000 (rung-1 price literal)
   });
 });
 
@@ -1001,8 +1040,8 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
 
   it('deposit refuses when the guild bank is full, mutating nothing', () => {
     const sim = makeOfficerSim();
-    // Fill all 12 base slots with non-mergeable instanced singles.
-    for (let i = 0; i < GUILD_BANK_BASE_SLOTS; i++) {
+    // Fill all 24 opened base slots with non-mergeable instanced singles.
+    for (let i = 0; i < GUILD_BANK_RUNG_SLOTS[0]; i++) {
       book(sim).inventory.push({ itemId: 'wolf_fang', count: 1, instance: { signer: `S${i}` } });
     }
     sim.addItem('linen_scrap', 1);
@@ -1014,6 +1053,27 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     );
     expect(fingerprint(sim)).toBe(before);
     expect(hasErr(sim.drainEvents(), 'The guild bank is full.')).toBe(true);
+  });
+
+  it('deposit against an UNOPENED (0-capacity) bank refuses cleanly, mutating nothing', () => {
+    // The new-guild default: no rung bought, no item slots. The capacity
+    // check refuses with the same full-bank line; nothing is minted or lost.
+    const sim = makeOfficerSim({ purchasedSlots: 0 });
+    sim.addItem('linen_scrap', 1);
+    const before = fingerprint(sim);
+    sim.drainEvents();
+    sim.guildBankDepositFor(
+      sim.playerId,
+      meta(sim).inventory.findIndex((s) => s.itemId === 'linen_scrap'),
+    );
+    expect(fingerprint(sim)).toBe(before);
+    expect(hasErr(sim.drainEvents(), 'The guild bank is full.')).toBe(true);
+    // The mirror: a withdraw against the empty 0-capacity book is silently
+    // inert (no slot exists to name), the out-of-bounds shape arm.
+    sim.drainEvents();
+    sim.guildBankWithdrawFor(sim.playerId, 0);
+    expect(fingerprint(sim)).toBe(before);
+    expect(sim.drainEvents()).toEqual([]);
   });
 
   it('withdraw refuses when the bags are full, mutating nothing', () => {
@@ -1092,27 +1152,58 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
 });
 
 describe('guildBankBuySlotsFor', () => {
-  it('walks the whole ladder from the treasury at the literal prices', () => {
-    const sim = makeOfficerSim({ treasury: 1_925_000 }); // the 192g50s ladder total
-    const copperBefore = meta(sim).copper;
+  it('walks the whole ladder: rung 0 from the PURSE, rungs 1..6 from the treasury', () => {
+    const sim = makeOfficerSim({ treasury: 1_925_000, purchasedSlots: 0 }); // unopened
+    meta(sim).copper = 90_000; // exactly rung 0's purse price
     sim.drainEvents();
+    // Rung 0: opening. The purse pays 9g; the treasury never moves.
+    sim.guildBankBuySlotsFor(sim.playerId);
+    expect(meta(sim).copper).toBe(0);
+    expect(book(sim).treasury).toBe(1_925_000);
+    expect(book(sim).purchasedSlots).toBe(24);
+    expect(hasLog(sim.drainEvents(), 'You open the guild bank.')).toBe(true);
+    // Rungs 1..6: the 192g50s treasury expansions at the literal prices.
     const prices = [25_000, 50_000, 100_000, 250_000, 500_000, 1_000_000];
     let treasury = 1_925_000;
-    for (let tier = 0; tier < prices.length; tier++) {
+    for (let rung = 0; rung < prices.length; rung++) {
       sim.guildBankBuySlotsFor(sim.playerId);
-      treasury -= prices[tier];
+      treasury -= prices[rung];
       expect(book(sim).treasury).toBe(treasury);
-      expect(book(sim).purchasedSlots).toBe(6 * (tier + 1));
+      expect(book(sim).purchasedSlots).toBe(24 + 6 * (rung + 1));
     }
     expect(book(sim).treasury).toBe(0);
-    expect(book(sim).purchasedSlots).toBe(36); // 48-slot cap = 12 base + 36
-    // Paid from the TREASURY only: personal copper never moves.
-    expect(meta(sim).copper).toBe(copperBefore);
+    expect(book(sim).purchasedSlots).toBe(60); // the ladder cap
+    // Rungs 1+ are paid from the TREASURY only: the purse never moved again.
+    expect(meta(sim).copper).toBe(0);
     expect(hasLog(sim.drainEvents(), 'You purchase additional guild bank slots.')).toBe(true);
   });
 
+  it('rung 0 refuses a purse-poor officer even when the treasury is rich, mutating nothing', () => {
+    const sim = makeOfficerSim({ treasury: 10_000_000, purchasedSlots: 0 });
+    meta(sim).copper = 89_999; // one copper short of the 9g opening price
+    const before = fingerprint(sim);
+    sim.drainEvents();
+    sim.guildBankBuySlotsFor(sim.playerId);
+    expect(fingerprint(sim)).toBe(before); // treasury wealth must NOT substitute
+    expect(hasErr(sim.drainEvents(), 'Not enough money.')).toBe(true);
+  });
+
+  it('rung 0 charges the purse and leaves the treasury untouched on success', () => {
+    const sim = makeOfficerSim({ treasury: 555, purchasedSlots: 0 });
+    meta(sim).copper = 100_000;
+    sim.drainEvents();
+    sim.guildBankBuySlotsFor(sim.playerId);
+    expect(meta(sim).copper).toBe(10_000); // 100000 - 90000
+    expect(book(sim).treasury).toBe(555); // never the treasury
+    expect(book(sim).purchasedSlots).toBe(24);
+    expect(guildBankCapacity(book(sim))).toBe(24);
+    expect(hasLog(sim.drainEvents(), 'You open the guild bank.')).toBe(true);
+    // The NEXT purchase is rung 1: treasury-paid at 2g50s.
+    expect(guildBankNextExpansionPrice(book(sim))).toBe(25_000);
+  });
+
   it('refuses at the ladder end, mutating nothing', () => {
-    const sim = makeOfficerSim({ treasury: 10_000_000, purchasedSlots: 36 });
+    const sim = makeOfficerSim({ treasury: 10_000_000, purchasedSlots: 60 });
     const before = fingerprint(sim);
     sim.drainEvents();
     sim.guildBankBuySlotsFor(sim.playerId);
@@ -1121,7 +1212,7 @@ describe('guildBankBuySlotsFor', () => {
   });
 
   it('refuses when the treasury cannot afford the table price, mutating nothing', () => {
-    const sim = makeOfficerSim({ treasury: 24_999 });
+    const sim = makeOfficerSim({ treasury: 24_999 }); // opened: next is rung 1
     meta(sim).copper = 10_000_000; // personal wealth must NOT substitute
     const before = fingerprint(sim);
     sim.drainEvents();
@@ -1133,15 +1224,15 @@ describe('guildBankBuySlotsFor', () => {
 
 describe('guildBankInfoFor (the maybe(guildBank) stream read)', () => {
   it('returns the boundary-cloned view for an authorized officer at the banker', () => {
-    const sim = makeOfficerSim({ treasury: 12_345, purchasedSlots: 6 });
+    const sim = makeOfficerSim({ treasury: 12_345, purchasedSlots: 30 });
     book(sim).inventory.push({ itemId: 'wolf_fang', count: 2, instance: { signer: 'Ana' } });
     const info = sim.guildBankInfoFor(sim.playerId);
     expect(info).toEqual({
       treasury: 12_345,
       slots: [{ itemId: 'wolf_fang', count: 2, instance: { signer: 'Ana' } }],
       capacity: 30,
-      purchasedSlots: 6,
-      nextExpansionPrice: 50_000, // tier-2 literal
+      purchasedSlots: 30,
+      nextExpansionPrice: 50_000, // rung-2 literal
     });
     // Boundary clone: mutating the returned view never reaches the live book.
     if (!info) throw new Error('unreachable');
@@ -1152,9 +1243,22 @@ describe('guildBankInfoFor (the maybe(guildBank) stream read)', () => {
   });
 
   it('reports a null nextExpansionPrice once the ladder is exhausted', () => {
-    const sim = makeOfficerSim({ purchasedSlots: 36 });
+    const sim = makeOfficerSim({ purchasedSlots: 60 });
     expect(sim.guildBankInfoFor(sim.playerId)?.nextExpansionPrice).toBeNull();
     expect(sim.guildBankInfoFor(sim.playerId)?.capacity).toBe(60);
+  });
+
+  it('reports an UNOPENED bank as 0 capacity with rung 0 as the next price', () => {
+    // The client derives the open-the-bank pane from purchasedSlots 0; the
+    // treasury still streams (gold ops work from day one).
+    const sim = makeOfficerSim({ treasury: 4_242, purchasedSlots: 0 });
+    expect(sim.guildBankInfoFor(sim.playerId)).toEqual({
+      treasury: 4_242,
+      slots: [],
+      capacity: 0,
+      purchasedSlots: 0,
+      nextExpansionPrice: 90_000, // the purse-paid opening price literal
+    });
   });
 
   it('leader sees the bank; member sees null (the officer-plus gate)', () => {
@@ -1260,10 +1364,10 @@ describe('guild bank authorization: the rank allowlist and per-guild isolation',
     sim.loadGuildBank(OTHER_GUILD, {
       treasury: 777_000,
       inventory: [{ itemId: 'wolf_fang', count: 9 }],
-      purchasedSlots: 6,
+      purchasedSlots: 30,
     });
     sim.setPlayerGuildMembership(sim.playerId, { guildId: GUILD_ID, rank: 'officer' });
-    sim.loadGuildBank(GUILD_ID, { treasury: 100_000, inventory: [], purchasedSlots: 0 });
+    sim.loadGuildBank(GUILD_ID, { treasury: 100_000, inventory: [], purchasedSlots: 24 });
     const otherBefore = JSON.stringify(sim.guildBanks.get(OTHER_GUILD));
     meta(sim).copper = 5_000;
     sim.drainEvents();
@@ -1382,9 +1486,13 @@ describe('evictGuildBank (the sanctioned evict) + guildBankHoldings', () => {
     const idx = meta(sim).inventory.findIndex((s) => s.itemId === 'wolf_fang');
     sim.guildBankDepositFor(sim.playerId, idx, 3);
     expect(sim.guildBankHoldings(GUILD_ID)).toEqual({ copper: 300, items: 1 });
-    // An empty book reports zeros (a disband may proceed)...
+    // An empty book reports zeros (a disband may proceed). The no-row empty
+    // book IS the UNOPENED bank (purchasedSlots 0): an unopened bank with no
+    // treasury must never block a disband (the guard counts copper and items
+    // only, never the bought rungs).
     sim.evictGuildBank(GUILD_ID);
     sim.loadGuildBank(GUILD_ID, null);
+    expect(sim.guildBanks.get(GUILD_ID)?.purchasedSlots).toBe(0); // unopened
     expect(sim.guildBankHoldings(GUILD_ID)).toEqual({ copper: 0, items: 0 });
     // ...but NO book is null, which the server treats as fail-closed: an
     // unloaded book cannot prove the DB row is empty.
@@ -1407,8 +1515,8 @@ describe('chargeGuildCreationFeeFor (reserve-at-gate, the sim half)', () => {
   it('charges exactly the fee once when the purse covers it', () => {
     const sim = freshSim();
     meta(sim).copper = 150_000;
-    expect(sim.chargeGuildCreationFeeFor(sim.playerId)).toBe(100_000); // 10g, pinned literal
-    expect(meta(sim).copper).toBe(50_000);
+    expect(sim.chargeGuildCreationFeeFor(sim.playerId)).toBe(10_000); // 1g, pinned literal
+    expect(meta(sim).copper).toBe(140_000);
   });
 
   it('clamps to the purse on a shortfall (never negative); the GATE refuses a short charge', () => {
@@ -1416,8 +1524,8 @@ describe('chargeGuildCreationFeeFor (reserve-at-gate, the sim half)', () => {
     // block, refusing (and refunding) when the charge comes back short, so
     // the clamp here is defensive only.
     const sim = freshSim();
-    meta(sim).copper = 40_000;
-    expect(sim.chargeGuildCreationFeeFor(sim.playerId)).toBe(40_000);
+    meta(sim).copper = 4_000;
+    expect(sim.chargeGuildCreationFeeFor(sim.playerId)).toBe(4_000);
     expect(meta(sim).copper).toBe(0);
     // Nothing left charges nothing (and stays at zero, never negative).
     expect(sim.chargeGuildCreationFeeFor(sim.playerId)).toBe(0);
@@ -1450,9 +1558,9 @@ describe('refundGuildCreationFeeFor (the reserve-at-gate refusal arm)', () => {
     const sim = freshSim();
     meta(sim).copper = 150_000;
     const charged = sim.chargeGuildCreationFeeFor(sim.playerId);
-    expect(charged).toBe(100_000);
-    expect(meta(sim).copper).toBe(50_000);
-    expect(sim.refundGuildCreationFeeFor(sim.playerId, charged)).toBe(100_000);
+    expect(charged).toBe(10_000);
+    expect(meta(sim).copper).toBe(140_000);
+    expect(sim.refundGuildCreationFeeFor(sim.playerId, charged)).toBe(10_000);
     expect(meta(sim).copper).toBe(150_000);
   });
 
@@ -1567,18 +1675,39 @@ describe('revertGuildBankDeltas (the unflushable-session surgical undo)', () => 
     expect(book(sim).inventory).toEqual([{ itemId: 'mana_prism', count: 1, instance: other }]);
   });
 
-  it('undoes buy_slots (slots down one expansion, price back) and clamps at zero', () => {
-    const sim = makeOfficerSim({ treasury: 10_000, purchasedSlots: 6 });
+  it('undoes buy_slots (slots down one expansion, price back) and clamps at the opened base', () => {
+    const sim = makeOfficerSim({ treasury: 10_000, purchasedSlots: 30 });
     sim.revertGuildBankDeltas(GUILD_ID, [
-      { op: 'buy_slots', itemId: null, count: null, instance: null, copperDelta: -50_000 },
+      { op: 'buy_slots', itemId: null, count: null, instance: null, copperDelta: -25_000 },
     ]);
-    expect(book(sim).purchasedSlots).toBe(0);
+    expect(book(sim).purchasedSlots).toBe(24);
+    expect(book(sim).treasury).toBe(35_000);
+    // Reverting a buy_slots against the already-at-base ladder never dips
+    // below the opened position (a buy_slots can never have caused 24 -> 18);
+    // the treasury refund still applies (the clamped residue contract).
+    sim.revertGuildBankDeltas(GUILD_ID, [
+      { op: 'buy_slots', itemId: null, count: null, instance: null, copperDelta: -25_000 },
+    ]);
+    expect(book(sim).purchasedSlots).toBe(24);
     expect(book(sim).treasury).toBe(60_000);
-    // Reverting against an already-zero ladder clamps, never negative.
+  });
+
+  it('undoes open_bank (rung 0): the slot grant reverts, the treasury NEVER moves', () => {
+    // Rung 0 was purse-paid, and the dead session's character half (holding
+    // the purse charge) rolled back on its own: crediting the treasury here
+    // would mint guild copper out of thin air.
+    const sim = makeOfficerSim({ treasury: 10_000, purchasedSlots: 24 });
     sim.revertGuildBankDeltas(GUILD_ID, [
-      { op: 'buy_slots', itemId: null, count: null, instance: null, copperDelta: -50_000 },
+      { op: 'open_bank', itemId: null, count: null, instance: null, copperDelta: -90_000 },
+    ]);
+    expect(book(sim).purchasedSlots).toBe(0); // unopened again
+    expect(book(sim).treasury).toBe(10_000); // untouched
+    // Against an already-unopened book it clamps at zero, never negative.
+    sim.revertGuildBankDeltas(GUILD_ID, [
+      { op: 'open_bank', itemId: null, count: null, instance: null, copperDelta: -90_000 },
     ]);
     expect(book(sim).purchasedSlots).toBe(0);
+    expect(book(sim).treasury).toBe(10_000);
   });
 
   it('reverts newest-first over a mixed batch, draws no rng, and no-ops on an absent book', () => {
