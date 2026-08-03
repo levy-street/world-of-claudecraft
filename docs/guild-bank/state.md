@@ -486,30 +486,78 @@ Teardown of docs/guild-bank/ awaits the user's explicit confirmation.
   release); server/social.ts had 0 delta lines, so PR A has still not landed
   (the re-merge caveat above stands).
 
-## Accepted risks and operational assumptions (Phase 3 review + Phase 3 QA outcomes)
-- Cross-officer escrow skew (ACCEPTED, market precedent, NARROWED by Phase 3 QA to the
-  genuinely crash-windowed arm): the escrow TRANSACTION is atomic, but the book is shared
-  multi-writer state, so officer B's save can persist the live book (including officer
-  A's not-yet-durable op) before A's character half commits; a CRASH in that window tears
-  A's escrow. The World Market has the same structural window today. Both arms that made
-  it a RELIABLE (attacker-timable) dupe are CLOSED:
-  - A fenced-out session leaving the live book permanently ahead of durable truth:
-    `reconcileUnflushableGuildBooks` (server/game.ts) evicts and reloads the touched
-    books from the DB after a fence-out (and after an exhausted leave flush).
-  - The former skip arm (another live session holds a dirty mark, so the book could not
-    be evicted): the dead session's ops are now surgically REVERTED from the live book
-    via its per-session unflushed-delta log (`Sim.revertGuildBankDeltas`), so they can
-    never ride another officer's save. Was the Phase 3 QA privacy-security BLOCKING
-    (a two-account self-takeover dupe with no crash needed).
-  Residue, accepted: when another officer CONSUMED the un-durable value inside the window
-  (withdrew the copper or the copy before the depositor's reconcile ran), the inverse
-  clamps at zero / no-ops on the missing copy rather than clawing back from the consumer;
-  reaching it needs two officer accounts interleaving ops with a fence-out inside one
-  autosave interval, and the fenced-out op's ledger rows remain as the evidence trail.
-- Ledger rows for fenced-out (reverted) ops remain in bank_ledger by design: the audit
+## Accepted risks and operational assumptions (Phase 3 review + Phase 3 QA + the escrow root fix)
+
+CORRECTION (the escrow root fix, docs/guild-bank/escrow-fix-plan.md). This section
+previously claimed that BOTH reliably attacker-timable arms of the cross-officer escrow
+skew were CLOSED, leaving only a crash-windowed residue. Two of those three closure
+claims were disproven by the audit that preceded the fix, and are recorded here as
+disproven rather than quietly rewritten:
+
+- "The evict-and-reload reconcile closes the fenced-out arm" was FALSE whenever durable
+  truth was already AHEAD of the fenced session, which is exactly what another officer's
+  escrow save produced: the reload restored the fenced op out of a row that already
+  contained it, while the fenced character's own half had rolled back. No crash required.
+  (`tests/audit_conc_guild_bank.test.ts`, `tests/audit_cur_conservation.test.ts`.)
+- "The surgical revert closes the another-session-dirty arm" was FALSE because the revert
+  ran in the fenced session's continuation, which resumes strictly INSIDE the next save's
+  in-flight window, so that save committed the pre-revert book and released its own mark.
+  Live and durable then disagreed with nothing left to converge them, and a restart
+  promoted the skew into a permanent dupe.
+- The 500-op cap made it worse: dropping the undo log forced the reload arm even while
+  another session held legitimate unflushed ops, so the reload duplicated or vaporized
+  that session's work depending on direction.
+
+All three are removed at the ROOT rather than compensated for. An escrow save now
+persists DURABLE TRUTH PLUS THAT SESSION'S OWN DELTAS: the payload is the session's
+unflushed delta log and the row is rebuilt inside the fenced transaction
+(`SELECT ... FOR UPDATE`, `mergeGuildBankRow`, upsert) after the character UPDATE has
+passed. A session can only ever persist its own work, so the cross-officer skew has no
+mechanism left: there is no shared snapshot to capture, nothing for a reload to restore,
+and no reload arm (nor cross-session scan, retry loop, or `revertLostGuildBanks`) left in
+the code. The reconcile is a synchronous undo of this session's own ops.
+
+What REMAINS accepted, restated to cover both its flavours:
+
+- **D5, the consume-then-fence residue (ACCEPTED, now AUDITABLE).** If officer B consumes
+  value officer A deposited but never made durable (withdraws the copper or the copy, or
+  spends it on a ladder rung) and B's book half can never land, B's character half is
+  durable while the book never lost the value. Two flavours, both pinned with exact
+  witnesses in `tests/audit_conservation_property.test.ts` (P4-RESIDUE):
+  - the CONSUMED-VALUE flavour: the withdrawn amount is minted (the pinned witness is
+    250 copper);
+  - the RUNG-0 LADDER flavour: the opener's purse-paid 24 slots survive when another
+    officer's expansion has pinned the ladder above them, because lowering it would
+    destroy the expander's paid rung and strand a non-ladder position (the pinned witness
+    is 90,000 of ladder value; `tests/audit_cap_probe.test.ts` G1 records the same residue
+    from the ladder side).
+  The forward replay never CLAMPS a shortfall away (clamping mints it permanently):
+  it applies what durable truth covers, carries the remainder as a residual, and retries
+  on later saves, which resolves every ordinary interleaving. Only when the shortfall can
+  never resolve (no other session holds unflushed work for that guild, or it has not
+  resolved within `GameServer.GUILD_BANK_DEFICIT_MAX_SKIPS` saves) is the remainder
+  dropped, and that path writes an `escrow_deficit` row into bank_ledger and logs loudly.
+  That row is the FIRST time this residue has been visible to `scripts/bank_audit.mjs`,
+  which reports every one of them as a finding and excludes them from the item, treasury,
+  and ladder replays. Closing the residue itself needs the escrow save to REFUSE rather
+  than carry a shortfall ("Strong Direction B", escrow-fix-plan.md section 5), which is
+  deliberately deferred: a save failing through no fault of its own cascades into a second
+  reconcile, and that failure handling is a larger design than the fix it would ride on.
+- **A transient book-behind window.** Between a save that carried a residual and that
+  session's next save, the durable book is behind the durable character half by the
+  carried amount. This is the same shape as (and strictly smaller than) the cross-officer
+  window the World Market accepts today, and unlike the old skew it self-heals on the very
+  next save instead of needing a reconcile.
+- Ledger rows for fenced-out (undone) ops remain in bank_ledger by design: the audit
   script may flag them against the book; that finding points at the incident the loud
   fence-out log recorded (see the operator caveat in scripts/bank_audit.mjs: audit a
   quiesced realm).
+- The guild-delete window (`beginGuildBankDelete` / `endGuildBankDelete`) refuses every
+  guild bank op for a guild whose DELETE is in flight, spanning the empty-bank guard to
+  the DELETE and its post-commit hooks. Refusals inside that window are SILENT (two DB
+  round trips wide; the actor's own disband command reports its own outcome). Before it,
+  an op landing in that gap was destroyed outright by the FK cascade with its dirty mark
+  wiped by the post-commit hook.
 - Dormant pipe-refused slots can make a bank permanently non-emptiable (DEFERRED, v1
   limitation): an item a later content update flags soulbound/noMarketList is refused in
   BOTH directions (anonymous-pipe policy), so it can never be withdrawn, and the disband
@@ -517,19 +565,17 @@ Teardown of docs/guild-bank/ awaits the user's explicit confirmation.
   requires an admin escape hatch (an operator tool that mails the dormant copy back to
   its depositor or archives the book) before it can bite a real guild. Tracked in
   progress.md deferrals; the future PR body must call it out.
-- reconcileUnflushableGuildBooks' dirty-scan pair (the another-session-dirty check and
-  the mark/log consumption) runs synchronously before its first await; any future edit
-  that splits them across an await reopens a mark-release race. Same trap class for the
-  collectBooks capture inside the queued save closure.
+- `revertOwnGuildBookOps` is SYNCHRONOUS on purpose: it takes the session's log, its
+  settled-prefix count, and its marks in one step with no await between them. Any future
+  edit that splits those across an await reopens a mark-release race. Same trap class for
+  the `collectDeltas` capture inside the queued save closure, which must keep taking the
+  marks, the log COPY, and the carried counts at one instant (the log is appended to by
+  ops dispatched during the awaited write).
 - A create-fee reservation whose refund arm finds the founder gone (refused create racing
   a clean logout) cannot refund in the live sim; it is logged loudly for operator
   compensation, and no create_fee ledger row is written for it. Watch item: a refund
   landing on a RECONNECTED session's freshly loaded purse is correct only because the
   leave flush persists the charged purse first (the mismatch arm logs loudly).
-- During a reconcile's evict-and-reload window (up to ~1s, longer on a sick DB), that
-  guild's ops refuse SILENTLY and guildBankInfoFor reads null: the sim's host-wiring
-  silence, now host-created at runtime, accepted (self-heals when the reload lands; the
-  Phase 4 tab simply shows no guild bank for the moment).
 - `GuildBankSimPort` exposes the raw `Sim.guildBanks` map read-only for the boot has()
   verification (the one facade bypass, read-only and test-visible); a future
   `Sim.hasGuildBank` could remove it.
@@ -539,13 +585,16 @@ Teardown of docs/guild-bank/ awaits the user's explicit confirmation.
   once bank_ledger reaches millions of rows; bank_ledger index calculus (the created_at
   index has no reader under keep-forever; no (container, container_id) index until a
   per-guild reader exists); gameMetricsCounters for escrow-save failures / fence-outs /
-  reconciles / unloaded books (console.error is the current signal); the O(live
-  sessions) guildBankHoldings scan (client-triggerable but cheap; refcount it if
+  reconciles / unloaded books / escrow deficits (console.error is the current signal, and
+  the escrow_deficit ledger row for the permanent arm); the O(live sessions) dirty-mark
+  scan inside beginGuildBankDelete (client-triggerable but cheap; refcount it if
   profiling ever shows it).
-- Single-writer assumption: guild_banks rows carry NO optimistic-concurrency stamp
-  (no version column); correctness rests on one realm process owning a guild's book
-  (the repo's one-process-per-realm model) plus the per-process market serial writer.
-  Multi-process realms would need a version fence here first.
+- Single-writer assumption, NARROWED: guild_banks rows still carry no optimistic-
+  concurrency stamp, but the escrow write is now a read-modify-write under a
+  `SELECT ... FOR UPDATE` row lock, which is what makes it safe across PROCESSES rather
+  than only within one. A later commit can no longer discard an earlier one, so book
+  writes no longer NEED the market serial writer; taking the autosave arm off it is
+  recorded as a follow-up (escrow-fix-plan.md section 3.6), not done here.
 - guild_banks.realm is written on every upsert but never read by the load paths
   (which key off guilds.realm); kept for operator forensics and a future
   cross-realm audit dimension.
