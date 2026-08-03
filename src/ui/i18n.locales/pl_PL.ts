@@ -10946,4 +10946,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.riftTracker.closesIn': 'Zamyka się za {time}',
   'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
   'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
+  'hud.prompts.guildInviteCancelled':
+    'Oczekujące zaproszenie do gildii zostało anulowane, ponieważ gildia zmieniła nazwę.',
+  'hud.prompts.guildRenamed':
+    'Twoja gildia została przemianowana na {name} przez zespół moderacji.',
+  'hud.core.chatChannels.moveHint':
+    'Zmień kolejność karty {channel}: przeciągnij ją lub użyj Alt+Lewo i Alt+Prawo',
+  'itemUi.vendor.buyStack': 'Kup {count}',
+  'itemUi.vendor.buyStackAria': 'Kup {count} {item} za {price}',
 };

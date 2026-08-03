@@ -247,7 +247,8 @@ Skip if no `src/sim/content/` files are in scope.
   `npm run i18n:gen` then the i18n freshness check
   (`git diff --exit-code` over the generated i18n artifacts), `npm run security:gate`,
   `npm run ci:changed` (biome, changed files), `npm run sfx:check`,
-  `npm test`, `npx tsc --noEmit`, `npm run build:env`, `npm run build:server`, `npm run build`.
+  `npm test`, `npm run test:browser`, `npm run check:types`, `npm run build:env`,
+  `npm run build:server`, `npm run build:bot`, `npm run build`.
 - Biome gates CHANGED FILES ONLY (`npm run ci:changed`); it fails on errors and format diffs,
   not lint warnings. A stray whole-tree `biome --write` that drags an unrelated monolith into
   the diff is a `[FAIL]` (the global Biome chore is deferred; never reformat the legacy tree).

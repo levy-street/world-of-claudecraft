@@ -94,6 +94,7 @@ import {
 import { configureCommunityTestAccounts } from './community_test_accounts';
 import {
   bustDailyRewardBoardCache,
+  bustDailyRewardWinnersCache,
   dailyRewardEventsCutoffDay,
   handleDailyRewardApi,
   handleDailyRewardInternalApi,
@@ -201,6 +202,7 @@ import { setAttackSignalSink } from './http/attack_signals';
 import { registerBusinessMetrics } from './http/business_metrics';
 import { handleClientError } from './http/client_error';
 import { type Config, DEFAULT_DISPATCH, type DispatchMode, loadConfig } from './http/config';
+import { registerDiscordBotMetrics } from './http/discord_bot_metrics';
 import {
   type ApiDelegate,
   type ApiDispatcher,
@@ -757,6 +759,17 @@ function bustBoardCaches(): void {
   arenaLeaderboardCache['2v2'] = null;
   deedsBoardCache = null;
   bustDailyRewardBoardCache();
+  // Not a board: the Discord winner-announcement snapshot. The daily-reward ban
+  // and IP-ban writes fire this same hook, and they feed the
+  // daily_reward_excluded_accounts view that unannouncedWinnerDays filters its
+  // payouts through, so an exclusion is a content change a warm snapshot would
+  // hide. Without this a just-banned winner's username and wallet pubkey could
+  // still be announced publicly for up to the winners TTL. Scope, honestly: the
+  // bust is per process (the snapshot lives on this process's service singleton),
+  // so it is immediate on the process that served the moderation write; a peer
+  // realm process's warm snapshot converges within one TTL, the same fleet story
+  // every board cache above already has.
+  bustDailyRewardWinnersCache();
 }
 setOnAccountModerated(bustBoardCaches);
 
@@ -3040,6 +3053,11 @@ export async function startServer(): Promise<http.Server> {
   // must never touch liveGame() (a health probe constructing a GameServer is the bug
   // tests/server/game_boot_order.test.ts pins against).
   registerLivenessSource(gameStateSource);
+
+  // The Discord bot's own rate-limit and breaker health, pushed in on the presence
+  // request and cached process-locally. No collector and no query: the gauges read
+  // that cache at scrape time and the counters ride the push itself.
+  registerDiscordBotMetrics(httpMetrics.registry);
 
   // Business gauges use isolated, staggered, timeout-protected engagement and
   // funnel snapshots every 15 minutes. Scrapes publish only cached data and never

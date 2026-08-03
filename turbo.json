@@ -61,10 +61,12 @@
         "src/**",
         "server/**",
         "headless/**",
+        "bot/**",
         "tests/**",
         "private/**",
         "tsconfig.json",
         "tsconfig.admin.json",
+        "tsconfig.bot.json",
         "package.json"
       ],
       "outputs": ["node_modules/.cache/tsc/**"]
@@ -83,6 +85,10 @@
         "package.json"
       ],
       "outputs": ["dist-server/**"]
+    },
+    "build:bot": {
+      "inputs": ["bot/**", "src/**", "scripts/build_bot.mjs", "tsconfig.json", "package.json"],
+      "outputs": ["dist-bot/**"]
     },
     "build:bundle": {
       "dependsOn": ["i18n:gen", "wiki:content"],

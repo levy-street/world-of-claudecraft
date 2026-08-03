@@ -28,6 +28,8 @@ import { CONCURRENT_INDEX_MIGRATIONS } from './concurrent_indexes';
 import { CONTENT_MODERATION_SCHEMA } from './content_moderation_db';
 import type { RankedDeedsAccount } from './deeds_board';
 import { DISCORD_SCHEMA } from './discord_db';
+import { enqueueLinkChange } from './discord_link_changes';
+import { bustDiscordStatus } from './discord_status_cache';
 import { GITHUB_SCHEMA } from './github_db';
 import { isUniqueViolation } from './http_util';
 import { MAPS_SCHEMA } from './maps_db';
@@ -1555,6 +1557,10 @@ export async function createAccount(
       }
     }
     await client.query('COMMIT');
+    // The roster is inserted at its authored level, so the account has a top
+    // character from this moment. After COMMIT only: a rolled-back provisioning
+    // transaction inserted nothing and must not enqueue.
+    enqueueLinkChange({ accountId: account.id, kinds: ['flex'] }, Date.now());
     return account;
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
@@ -1686,10 +1692,14 @@ export async function updatePasswordHash(accountId: number, passwordHash: string
   // Setting a password always makes it a real, owner-chosen one, so mark the
   // account usable (a no-op for accounts that were already password_set = TRUE,
   // and the conversion step for a Discord-provisioned account).
-  await pool.query('UPDATE accounts SET password_hash = $2, password_set = TRUE WHERE id = $1', [
-    accountId,
-    passwordHash,
-  ]);
+  const res = await pool.query(
+    'UPDATE accounts SET password_hash = $2, password_set = TRUE WHERE id = $1',
+    [accountId, passwordHash],
+  );
+  // password_set rides the /api/discord payload (the unlink flow's "set a
+  // password first" gate reads it), so a real write busts the cached status
+  // core here, covering every caller of this chokepoint at once.
+  if ((res.rowCount ?? 0) > 0) bustDiscordStatus(accountId);
 }
 
 // Revoke every token for an account except (optionally) the one in hand.
@@ -1975,6 +1985,11 @@ export async function consumePasswordResetRequest(
     );
     await client.query('DELETE FROM auth_tokens WHERE account_id = $1', [row.account_id]);
     await client.query('COMMIT');
+    // This path writes password_set = TRUE in its OWN transaction (it does not
+    // call updatePasswordHash), so it carries its own /api/discord status bust,
+    // after COMMIT like the discord_db.ts sites. The expired/replayed-token arm
+    // returns above without writing and must not evict a healthy snapshot.
+    bustDiscordStatus(row.account_id);
     return { accountId: row.account_id };
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
@@ -2682,6 +2697,13 @@ export interface CharacterRow {
 // the ORDER BY uses a static JSONB expression literal (Postgres does not allow a
 // bound parameter for an ORDER BY expression), so the query string carries no
 // interpolation and there is no injection surface.
+//
+// LOCKSTEP: discordFlexRowsForDiscordIds (server/discord_db.ts) is the batched
+// read serving /internal/discord/flex-batch, and it repeats this ORDER BY inside
+// a LATERAL. Both endpoints stay live, so the two must agree on which character
+// is "top" or the bot renders a different one depending on which it called. The
+// ordering is restated there rather than shared because db.ts imports discord_db
+// (DISCORD_SCHEMA), so that module cannot import back from here.
 export async function highestCharacterForAccount(accountId: number): Promise<CharacterRow | null> {
   const res = await pool.query(
     `SELECT id, account_id, name, class, level, state, is_gm, force_rename
@@ -2854,6 +2876,12 @@ export async function createCharacterCapped(
     );
     await recordCharacterCreation(client, accountId, REALM);
     await client.query('COMMIT');
+    // A created character can become the account's top one, and its class is fixed
+    // here forever (no statement ever updates characters.class). Enqueued inside the
+    // db function rather than at the route so the RouteDef arm, its retained legacy
+    // twin in main.ts, and the PBE boost roster are all covered by one site. After
+    // COMMIT: a rolled-back create must never have enqueued.
+    enqueueLinkChange({ accountId, kinds: ['flex'] }, Date.now());
     return res.rows[0];
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
@@ -2881,7 +2909,7 @@ export async function reclaimDeactivatedName(name: string): Promise<boolean> {
   try {
     await client.query('BEGIN');
     const holder = await client.query(
-      `SELECT c.id, c.name, a.deactivated_at, a.banned_at
+      `SELECT c.id, c.name, c.account_id, a.deactivated_at, a.banned_at
          FROM characters c JOIN accounts a ON a.id = c.account_id
         WHERE c.realm = $1 AND lower(c.name) = lower($2)
         FOR UPDATE OF c`,
@@ -2909,6 +2937,11 @@ export async function reclaimDeactivatedName(name: string): Promise<boolean> {
       [row.id, freed],
     );
     await client.query('COMMIT');
+    // The archived character's name is bot-visible via the flex payload, and
+    // deactivation does not remove a discord link, so a still-linked holder needs
+    // a feed item. After COMMIT, on the released path only: every refusal above
+    // rolled back without touching the row (Phase 5 QA feed sweep).
+    enqueueLinkChange({ accountId: row.account_id, kinds: ['flex'] }, Date.now());
     bustAdminGuildListReads();
     return true;
   } catch (err) {
@@ -2925,6 +2958,10 @@ export async function deleteCharacter(accountId: number, characterId: number): P
     [characterId, accountId, REALM],
   );
   const deleted = (res.rowCount ?? 0) > 0;
+  // Only a delete that matched a row is a transition: deleting the top character
+  // promotes the next-ordered one (or none). A miss (wrong owner, wrong realm,
+  // already gone) changes nothing and must not enqueue.
+  if (deleted) enqueueLinkChange({ accountId, kinds: ['flex'] }, Date.now());
   if (deleted) bustAdminGuildListReads();
   return deleted;
 }
@@ -2979,9 +3016,17 @@ export async function renameCharacter(
      RETURNING id, account_id, name, class, level, state, is_gm, force_rename`,
     [characterId, accountId, name, REALM],
   );
-  const renamed = res.rows[0] ?? null;
-  if (renamed) bustAdminGuildListReads();
-  return renamed;
+  const row = res.rows[0] ?? null;
+  // The name rides the bot-visible flex payload (discordFlexForAccount ships
+  // character.name and a profileUrl derived from it), so a landed rename is a
+  // flex transition. Enqueued inside the db function so the RouteDef arm and any
+  // future caller are covered by one site; a null row (no sanctioned rename
+  // matched) must not enqueue. Found by the Phase 5 QA feed sweep: the original
+  // exclusion's stated reason ("the name is outside the flex definition") was
+  // wrong about the payload.
+  if (row) enqueueLinkChange({ accountId, kinds: ['flex'] }, Date.now());
+  if (row) bustAdminGuildListReads();
+  return row;
 }
 
 // Persist a character row. Returns true when the write landed. When a leaseNonce is

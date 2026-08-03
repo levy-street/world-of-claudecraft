@@ -10917,4 +10917,10 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.riftTracker.closesIn': 'Đóng sau {time}',
   'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
   'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
+  'hud.prompts.guildInviteCancelled':
+    'Lời mời gia nhập bang hội đang chờ xử lý đã bị hủy vì bang hội đã đổi tên.',
+  'hud.prompts.guildRenamed': 'Bang hội của bạn đã được đội kiểm duyệt đổi tên thành {name}.',
+  'hud.core.chatChannels.moveHint': 'Sắp xếp lại tab {channel}: kéo nó, hoặc dùng Alt+Trái và Alt+Phải',
+  'itemUi.vendor.buyStack': 'Mua {count}',
+  'itemUi.vendor.buyStackAria': 'Mua {count} {item} với giá {price}',
 };

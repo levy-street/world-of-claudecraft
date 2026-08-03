@@ -10288,4 +10288,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.heatingUp': '熱身',
   'hudChrome.auraOverlay.procs.arcaneCharge': '秘法充能',
   'hudChrome.auraOverlay.procs.aetherRush': '以太奔湧',
+  'itemUi.vendor.buyStack': '購買 {count} 個',
+  'itemUi.vendor.buyStackAria': '以 {price} 購買 {count} 個 {item}',
 };

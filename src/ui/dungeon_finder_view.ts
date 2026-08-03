@@ -206,6 +206,12 @@ export interface DungeonFinderViewInput {
   specRole: Role | null;
   // Derived from partyInfo by the painter (null = solo).
   party: { leader: number; size: number } | null;
+  // The current party leader's name (mine, if I lead), used only to recognize
+  // a board listing as MY OWN group when I am a non-leader member (the board
+  // carries no member pids, only class/level/role; character names are
+  // unique PER REALM, and the board is realm-scoped, so a name match is
+  // exact in production). Null when solo.
+  partyLeaderName: string | null;
   lockouts: RaidLockout[];
   // Painter-local UI state.
   tab: FinderTab;
@@ -431,6 +437,14 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
   for (const listing of board) {
     const activity = finderActivity(listing.activityId);
     if (!activity) continue;
+    const applied = info.myApplication?.listingId === listing.id;
+    const mine = info.myListing?.id === listing.id;
+    // Hide a listing for the group I am ALREADY part of, whether I lead it
+    // (mine) or I am one of the leader's party members browsing the same
+    // board (matched by leader name: the board carries no member pids).
+    const alreadyInGroup =
+      mine || (input.partyLeaderName !== null && listing.leaderName === input.partyLeaderName);
+    if (alreadyInGroup) continue;
     // Issue #2030: a listing for a dungeon/raid I am currently locked out of
     // is not something I can usefully apply to, and showing it invites a
     // player to join a group only to discover the lockout at the door. Hide
@@ -442,8 +456,6 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
     // while locked out, so its row (and withdraw control) keep existing:
     // otherwise a pending application could never be withdrawn once the
     // lockout landed.
-    const applied = info.myApplication?.listingId === listing.id;
-    const mine = info.myListing?.id === listing.id;
     if (!applied && !mine && lockoutMinutesFor(activity, input.lockouts) > 0) continue;
     const blocked = blockReasonFor(activity, level, specRole);
     const roleFit =

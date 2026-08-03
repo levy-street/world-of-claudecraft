@@ -10,9 +10,6 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "hud.core.chatChannels.moveHint",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
     "hudChrome.actionBar.bannerCapturing",
     "hudChrome.actionBar.bannerHint",
     "hudChrome.actionBar.boundToKey",
@@ -23,14 +20,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
-    "hudChrome.keybinds.mouseHint",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.keybinds.mouseHint"
   ],
   "es_ES": [
-    "hud.core.chatChannels.moveHint",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
     "hudChrome.actionBar.bannerCapturing",
     "hudChrome.actionBar.bannerHint",
     "hudChrome.actionBar.boundToKey",
@@ -41,14 +33,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
-    "hudChrome.keybinds.mouseHint",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.keybinds.mouseHint"
   ],
   "fr_FR": [
-    "hud.core.chatChannels.moveHint",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
     "hudChrome.actionBar.bannerCapturing",
     "hudChrome.actionBar.bannerHint",
     "hudChrome.actionBar.boundToKey",
@@ -59,14 +46,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
-    "hudChrome.keybinds.mouseHint",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.keybinds.mouseHint"
   ],
   "fr_CA": [
-    "hud.core.chatChannels.moveHint",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
     "hudChrome.actionBar.bannerCapturing",
     "hudChrome.actionBar.bannerHint",
     "hudChrome.actionBar.boundToKey",
@@ -77,15 +59,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
-    "hudChrome.keybinds.mouseHint",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.keybinds.mouseHint"
   ],
   "en_CA": [],
   "it_IT": [
-    "hud.core.chatChannels.moveHint",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
     "hudChrome.actionBar.bannerCapturing",
     "hudChrome.actionBar.bannerHint",
     "hudChrome.actionBar.boundToKey",
@@ -96,14 +73,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
-    "hudChrome.keybinds.mouseHint",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.keybinds.mouseHint"
   ],
   "de_DE": [
-    "hud.core.chatChannels.moveHint",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
     "hudChrome.actionBar.bannerCapturing",
     "hudChrome.actionBar.bannerHint",
     "hudChrome.actionBar.boundToKey",
@@ -114,34 +86,21 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
-    "hudChrome.keybinds.mouseHint",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.keybinds.mouseHint"
   ],
   "zh_CN": [
-    "hudChrome.actionBar.done",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.actionBar.done"
   ],
   "zh_TW": [
-    "hudChrome.actionBar.done",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.actionBar.done"
   ],
   "ko_KR": [
-    "hudChrome.actionBar.done",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.actionBar.done"
   ],
   "ja_JP": [
-    "hudChrome.actionBar.done",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.actionBar.done"
   ],
   "pt_BR": [
-    "hud.core.chatChannels.moveHint",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
     "hudChrome.actionBar.bannerCapturing",
     "hudChrome.actionBar.bannerHint",
     "hudChrome.actionBar.boundToKey",
@@ -152,19 +111,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
-    "hudChrome.keybinds.mouseHint",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.keybinds.mouseHint"
   ],
   "ru_RU": [
-    "hudChrome.actionBar.done",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.actionBar.done"
   ],
   "cs_CZ": [
-    "hud.core.chatChannels.moveHint",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
     "hudChrome.actionBar.bannerCapturing",
     "hudChrome.actionBar.bannerHint",
     "hudChrome.actionBar.boundToKey",
@@ -175,14 +127,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
-    "hudChrome.keybinds.mouseHint",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.keybinds.mouseHint"
   ],
   "nl_NL": [
-    "hud.core.chatChannels.moveHint",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
     "hudChrome.actionBar.bannerCapturing",
     "hudChrome.actionBar.bannerHint",
     "hudChrome.actionBar.boundToKey",
@@ -193,14 +140,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
-    "hudChrome.keybinds.mouseHint",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.keybinds.mouseHint"
   ],
   "pl_PL": [
-    "hud.core.chatChannels.moveHint",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
     "hudChrome.actionBar.bannerCapturing",
     "hudChrome.actionBar.bannerHint",
     "hudChrome.actionBar.boundToKey",
@@ -211,14 +153,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
-    "hudChrome.keybinds.mouseHint",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.keybinds.mouseHint"
   ],
   "id_ID": [
-    "hud.core.chatChannels.moveHint",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
     "hudChrome.actionBar.bannerCapturing",
     "hudChrome.actionBar.bannerHint",
     "hudChrome.actionBar.boundToKey",
@@ -229,14 +166,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
-    "hudChrome.keybinds.mouseHint",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.keybinds.mouseHint"
   ],
   "tr_TR": [
-    "hud.core.chatChannels.moveHint",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
     "hudChrome.actionBar.bannerCapturing",
     "hudChrome.actionBar.bannerHint",
     "hudChrome.actionBar.boundToKey",
@@ -247,14 +179,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
-    "hudChrome.keybinds.mouseHint",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.keybinds.mouseHint"
   ],
   "sv_SE": [
-    "hud.core.chatChannels.moveHint",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
     "hudChrome.actionBar.bannerCapturing",
     "hudChrome.actionBar.bannerHint",
     "hudChrome.actionBar.boundToKey",
@@ -265,14 +192,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
-    "hudChrome.keybinds.mouseHint",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.keybinds.mouseHint"
   ],
   "vi_VN": [
-    "hud.core.chatChannels.moveHint",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
     "hudChrome.actionBar.bannerCapturing",
     "hudChrome.actionBar.bannerHint",
     "hudChrome.actionBar.boundToKey",
@@ -283,14 +205,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
-    "hudChrome.keybinds.mouseHint",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.keybinds.mouseHint"
   ],
   "da_DK": [
-    "hud.core.chatChannels.moveHint",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
     "hudChrome.actionBar.bannerCapturing",
     "hudChrome.actionBar.bannerHint",
     "hudChrome.actionBar.boundToKey",
@@ -301,8 +218,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
-    "hudChrome.keybinds.mouseHint",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.keybinds.mouseHint"
   ]
 };

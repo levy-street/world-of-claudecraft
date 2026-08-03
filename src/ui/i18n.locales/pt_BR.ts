@@ -11012,4 +11012,11 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.riftTracker.closesIn': 'Fecha em {time}',
   'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
   'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
+  'hud.prompts.guildInviteCancelled':
+    'Um convite de guilda pendente foi cancelado porque a guilda foi renomeada.',
+  'hud.prompts.guildRenamed': 'Sua guilda foi renomeada para {name} pela equipe de moderação.',
+  'hud.core.chatChannels.moveHint':
+    'Reordenar a aba {channel}: arraste-a, ou use Alt+Esquerda e Alt+Direita',
+  'itemUi.vendor.buyStack': 'Comprar {count}',
+  'itemUi.vendor.buyStackAria': 'Comprar {count} {item} por {price}',
 };

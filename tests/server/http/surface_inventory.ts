@@ -2242,6 +2242,38 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: null,
   },
+  // The batched flex read the Discord bot's sweep uses instead of asking the
+  // per-id /internal/discord/flex once per online user. It is the first
+  // REGISTRY-ONLY internal route: born after the pipeline migration, so it has
+  // NO handleDiscordInternal arm and no legacy rollback twin by design (the
+  // new-route rule in server/http/CLAUDE.md), which is why the handler anchors
+  // on the exported RouteDef symbol rather than on a legacy ladder arm.
+  {
+    dispatcher: DISPATCH.internal,
+    method: 'POST',
+    path: '/internal/discord/flex-batch',
+    handler: 'server/internal.ts flexBatchHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.secretDiscord,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  // The consolidated bot poll: the relay, activity and linked-member change
+  // feeds drained together with the winner-day announcements, so the bot makes
+  // one request per interval instead of three plus a full member sweep. The
+  // second REGISTRY-ONLY internal route, same reason as flex-batch above (born
+  // after the migration, no handleDiscordInternal arm, so the handler anchors on
+  // the exported RouteDef symbol).
+  {
+    dispatcher: DISPATCH.internal,
+    method: 'GET',
+    path: '/internal/discord/outbox',
+    handler: 'server/internal.ts outboxHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.secretDiscord,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
   // Daily-rewards ops family (v0.19.0, server/daily_rewards.ts): served by the
   // handleDailyRewardInternalApi sub-dispatcher, which the /internal composite
   // delegate tries FIRST (before handleInternalApi, whose terminal 404 would

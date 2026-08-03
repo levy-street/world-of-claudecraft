@@ -143,6 +143,9 @@ export class DungeonFinderWindow {
       playerId: world.playerId,
       specRole: world.talentRole,
       party: party ? { leader: party.leader, size: party.members.length } : null,
+      partyLeaderName: party
+        ? (party.members.find((m) => m.pid === party.leader)?.name ?? null)
+        : null,
       lockouts: world.raidLockouts(),
       tab: this.tab,
       selectedActivityId: this.selectedActivityId,

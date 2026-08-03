@@ -154,6 +154,7 @@ import {
 } from './deeds_records';
 import { enqueueActivity } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
+import { enqueueLinkChange } from './discord_link_changes';
 import { enqueueRelay } from './discord_relay';
 import { formatDuration } from './duration';
 // Imported from the mirror modules DIRECTLY (not the ./steam or ./epic
@@ -681,6 +682,13 @@ export interface ClientSession {
   joinedAt: number;
   dbSessionId: number | null; // play_sessions row, set once the insert lands
   metricsMaxLevel: number;
+  // The level the characters row currently carries, as of the last save that
+  // actually landed. Seeded at join from the loaded blob (joining is not a
+  // transition) and compared against the SERIALIZED level after every successful
+  // save, so the linked-member change feed learns about a level move exactly once
+  // instead of once per 30 s autosave. A GM/PBE join-time setPlayerLevel raises the
+  // in-memory level above this seed, so its first save reports the move.
+  lastPersistedLevel: number;
   left: boolean; // set in leave(); guards against the open-session insert landing after disconnect
   // linkdead grace: true while the socket has dropped but the character is
   // held in-world awaiting a reconnect. graceUntil is the epoch-ms deadline
@@ -2925,6 +2933,10 @@ export class GameServer {
       joinedAt: Date.now(),
       dbSessionId: null,
       metricsMaxLevel: initialLevel,
+      // The PERSISTED level, not initialLevel: a GM or PBE join-time level raise has
+      // already moved the entity but not the row, so seeding from the loaded blob
+      // lets the first save report that move to the change feed.
+      lastPersistedLevel: state?.level ?? 1,
       left: false,
       linkdead: false,
       graceUntil: 0,
@@ -3436,6 +3448,25 @@ export class GameServer {
           { characterId: session.characterId, accountId: session.accountId },
           session.pendingDeedRecords.splice(0, recordUpTo),
         );
+        // Same durability ordering as the deed publish above: the level the bot can
+        // read only moved once this write landed. Delta-gated on the SERIALIZED level
+        // (never e.level, which a Fiesta bout temporarily raises), so this covers the
+        // autosave sweep, leave, shutdown, and every silent Sim.setPlayerLevel path
+        // (dev_level, the GM join arm, the PBE boost) while staying silent on the
+        // overwhelming majority of saves that move no level.
+        // DELIBERATE EXCLUSION: lifetimeXp-only movement is not enqueued. It can only
+        // flip the highestCharacterForAccount tiebreak between two same-level
+        // characters on one account, and it rises on nearly every save of an active
+        // player, so gating on it would turn the 30 s autosave sweep into a per-player
+        // metronome. The bot's periodic full resync heals that rare tiebreak flip.
+        if (state.level !== session.lastPersistedLevel) {
+          session.lastPersistedLevel = state.level;
+          // Date.now(), like every other enqueue site: the feed's dedupe window is
+          // measured against wall-clock now, so handing it a stamp coupled to the
+          // save bookkeeping buys nothing and a stale one would merge where it
+          // should mint.
+          enqueueLinkChange({ accountId: session.accountId, kinds: ['flex'] }, Date.now());
+        }
       }
     });
     this.characterSaveQueues.set(session.characterId, run);
@@ -6551,7 +6582,14 @@ export class GameServer {
       }
       if (ev.type === 'levelup' && ev.pid !== undefined) {
         const session = this.clients.get(ev.pid);
-        if (session) session.metricsMaxLevel = Math.max(session.metricsMaxLevel, ev.level);
+        if (session) {
+          session.metricsMaxLevel = Math.max(session.metricsMaxLevel, ev.level);
+          // EVERY levelup, not just the milestone arms below: this is the server's
+          // real-time knowledge of the move. The characters row the bot reads still
+          // carries the old level until the next save, which enqueues again from
+          // saveCharacter, so an early drain re-reads once the row catches up.
+          enqueueLinkChange({ accountId: session.accountId, kinds: ['flex'] }, now);
+        }
       }
       if (ev.type === 'levelup' && ev.level === 5 && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
