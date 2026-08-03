@@ -555,7 +555,10 @@ describe('the World Market: the Merchant', () => {
     listing.sellerKey = 'Seller';
     listing.sellerName = 'Seller';
     const internals = sim.market as unknown as {
-      marketCollections: Map<string, { copper: number; items: { instance?: { signer?: string } }[] }>;
+      marketCollections: Map<
+        string,
+        { copper: number; items: { instance?: { signer?: string } }[] }
+      >;
     };
     internals.marketCollections.set('77', {
       copper: 0,

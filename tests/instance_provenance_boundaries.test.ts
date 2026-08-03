@@ -26,8 +26,10 @@
 import { describe, expect, it } from 'vitest';
 import { moveBetweenContainers } from '../src/sim/bank';
 import { rekeyInstanceSigner } from '../src/sim/character_rename';
+import { MAIL_DELIVERY_SECONDS } from '../src/sim/mail/post_office';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { Entity, InvSlot, ItemInstancePayload } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // A crafted, masterwork-procced, enchanted, signed piece: every marker channel
 // at once. Deliberately an EQUIPPABLE armour piece so the equip/unequip and
@@ -225,7 +227,15 @@ describe('provenance survives every container boundary', () => {
   });
 
   it('mail: send -> take', () => {
-    const sim = makeSim(4105);
+    // The subsystem world (the mail-suite pattern): this row needs only the
+    // PostOffice, players, and mailboxes, and ticking the raven's flight on the
+    // FULL world costs seconds of unrelated camp/NPC simulation per run.
+    const sim = new Sim({
+      seed: 4105,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const sender = sim.addPlayer('warrior', SIGNER);
     const recipient = sim.addPlayer('mage', 'Rex');
     const box = sim.ctx.entities.get(sim.postOffice.mailboxIds[0]);
@@ -247,7 +257,8 @@ describe('provenance survives every container boundary', () => {
         .drainEvents()
         .some((e) => e.type === 'mailResult' && (e as { code?: string }).code === 'sent'),
     ).toBe(true);
-    for (let i = 0; i < 20 * 120; i++) sim.tick();
+    // Exactly the raven's flight plus a tick of slack, not a blanket 120s.
+    for (let i = 0; i < (MAIL_DELIVERY_SECONDS + 2) * 20; i++) sim.tick();
     sim.drainEvents();
 
     // By SENDER, not recipient: every new character is also sent the authored

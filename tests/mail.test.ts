@@ -1172,7 +1172,7 @@ describe('purgeMailOwner - deleting a character', () => {
     // scopes the sweep to the recipient arm; shipped untested, so pinned here.
     const sim = makeWorld();
     const alice = sim.addPlayer('warrior', 'Alice');
-    const bob = sim.addPlayer('mage', 'Bob');
+    sim.addPlayer('mage', 'Bob');
     const aliceMeta = sim.meta(alice);
     if (!aliceMeta) throw new Error('no meta');
     aliceMeta.copper = 10_000;
@@ -1188,14 +1188,14 @@ describe('purgeMailOwner - deleting a character', () => {
       alice,
     );
     const letter = sim.postOffice.mail.find((m) => m.subject === 'Signed');
-    expect(letter?.items[0]?.instance?.signer).toBe('Alice');
+    if (!letter) throw new Error('no letter');
+    expect(letter.items[0]?.instance?.signer).toBe('Alice');
 
-    // Rename BOB, the recipient: the parcel is his incoming holding, so the
-    // sweep reaches it. (Alice signed it; the signer string is what follows.)
-    letter!.recipientKey = 'Alice';
+    // The sweep is scoped to the recipient arm, so address the parcel to the
+    // character being renamed. (Alice signed it; the signer is what follows.)
+    letter.recipientKey = 'Alice';
     expect(sim.rekeyMailOwner(555, 'Alice', 'Alicia')).toBe(true);
-    expect(letter?.items[0]?.instance?.signer).toBe('Alicia');
-    expect(bob).toBeGreaterThan(0);
+    expect(letter.items[0]?.instance?.signer).toBe('Alicia');
   });
 
   it('the rename sweep leaves a parcel addressed to a STRANGER alone', () => {
@@ -1219,11 +1219,12 @@ describe('purgeMailOwner - deleting a character', () => {
       alice,
     );
     const letter = sim.postOffice.mail.find((m) => m.subject === 'Foreign');
-    letter!.recipientKey = 'somebody-else';
-    letter!.senderKey = 'somebody-else';
-    letter!.senderName = 'Somebody Else';
+    if (!letter) throw new Error('no letter');
+    letter.recipientKey = 'somebody-else';
+    letter.senderKey = 'somebody-else';
+    letter.senderName = 'Somebody Else';
 
     sim.rekeyMailOwner(555, 'Alice', 'Alicia');
-    expect(letter?.items[0]?.instance?.signer).toBe('Alice');
+    expect(letter.items[0]?.instance?.signer).toBe('Alice');
   });
 });
