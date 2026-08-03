@@ -107,6 +107,13 @@ describe('Mirefen quest de-duplication', () => {
     it('never gates an ordinary mob', () => {
       expect(questGateBlocksDamage(players(), player, widow)).toBe(false);
     });
+    it('blocks source-less (environmental/DoT) damage to a gated egg', () => {
+      expect(questGateBlocksDamage(players('active'), null, egg)).toBe(true);
+    });
+    it('blocks a wild mob (non-pet) from harming a gated egg', () => {
+      const wildMob = { kind: 'mob', id: 50, ownerId: null } as unknown as Entity;
+      expect(questGateBlocksDamage(players('active'), wildMob, egg)).toBe(true);
+    });
   });
 
   describe('Back to the Shallows becomes a firebottle burn (q_deepfen_purge)', () => {

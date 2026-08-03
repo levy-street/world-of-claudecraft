@@ -12,9 +12,13 @@ export function questGateBlocksDamage(
   source: Entity | null,
   target: Entity,
 ): boolean {
-  if (target.kind !== 'mob' || !source) return false;
+  if (target.kind !== 'mob') return false;
   const gateQuest = MOBS[target.templateId]?.requiresQuestId;
   if (!gateQuest) return false;
+  // ONLY a player (or that player's pet) with the quest active/ready may harm a
+  // quest-gated object. Everything else is blocked: no source at all
+  // (environmental/DoT with no owner), a wild mob, or a non-questing player/pet.
+  if (!source) return true;
   const attackerPid = source.kind === 'player' ? source.id : source.ownerId;
   const attacker = attackerPid !== null ? players.get(attackerPid) : undefined;
   const qp = attacker?.questLog.get(gateQuest);
