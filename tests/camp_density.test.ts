@@ -20,6 +20,22 @@ import {
  */
 const MAX_FAST_TRASH_PER_CLUSTER = 30;
 
+/**
+ * The mobs in a cluster a player can actually FARM. A puzzle-object shell
+ * (xpMult 0: the dragonkin egg clutches) pays no XP and no loot by design, so
+ * it cannot be farmed at any density: it is standing scenery for the ambush
+ * mechanic that hatches out of it. This cap governs farm density (see the
+ * killsPerHour/copperPerHour model in helpers/farm_yield.ts), so it counts only
+ * farmable mobs; FarmCluster.mobCount stays the honest standing total.
+ */
+function farmableMobCount(cluster: {
+  camps: { camp: { mobId: string; count: number } }[];
+}): number {
+  return cluster.camps
+    .filter((c) => MOBS[c.camp.mobId]?.xpMult !== 0)
+    .reduce((n, c) => n + c.camp.count, 0);
+}
+
 /** Below this a respawn counts as "fast" for density purposes. */
 const FAST_RESPAWN_SECONDS = 100;
 
@@ -112,8 +128,8 @@ describe('no farm cluster is overdense', () => {
 
   it('caps TOTAL mobs per cluster in every band, not just the fast one', () => {
     const offenders = worldFarmClusters()
-      .filter((c) => c.mobCount > MAX_MOBS_PER_CLUSTER)
-      .map((c) => `${c.zoneIds.join('+')} (${c.mobCount} mobs): ${c.mobIds.join(', ')}`);
+      .filter((c) => farmableMobCount(c) > MAX_MOBS_PER_CLUSTER)
+      .map((c) => `${c.zoneIds.join('+')} (${farmableMobCount(c)} mobs): ${c.mobIds.join(', ')}`);
     expect(offenders).toEqual([]);
   });
 

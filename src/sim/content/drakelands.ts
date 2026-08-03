@@ -180,6 +180,7 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     // Chain 5.5 (under the ring spacing) so shooting one egg ripples its
     // neighbors without a single roadside egg unzipping a whole scatter
     // field; proximity 3 means a boot practically ON the shell.
+    offStreamIdle: true,
     broodEgg: {
       chainRadius: 5.5,
       chainDelay: 0.3,
@@ -205,7 +206,11 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 4,
     moveSpeed: 10,
     aggroRadius: 12,
-    loot: [{ copper: 15, chance: 0.6 }],
+    // Coin is GUARANTEED, never a lottery: the economy curve
+    // (tests/economy_yield.test.ts) requires an unconditional copper drop on
+    // every camp-spawned combat mob, and a 60% chance failed that rule.
+    loot: [{ copper: 15, chance: 1 }],
+    componentTags: ['hide', 'fang'],
     scale: 0.85,
     color: 0x4e8a5f,
     // Swarm chaff: a sliver of kill XP each so a cracked clutch is a hazard,
@@ -218,6 +223,7 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     // distance at launch (speed = moveSpeed x leapSpeedMult, capped at
     // leapSeconds), triggered from anywhere inside leapRange, and loose
     // whelps re-pounce on aggro after a cooldown (dragonkin_brood.ts).
+    offStreamIdle: true,
     broodWhelp: {
       leapRange: 24,
       leapSpeedMult: 2.6,
@@ -245,6 +251,8 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
       { copper: 90, chance: 1 },
       { itemId: 'emberwing_scale', chance: 0.5, questId: 'q_dk_scales_of_the_maw' },
     ],
+    componentTags: ['hide', 'claw', 'fang'],
+    offStreamIdle: true,
     // Playtest bump: 30% over the first cut. Still inside the stock melee
     // profile's honest reach (the bespoke-reach threshold is the scale-2
     // wildheart case); the menace ladder reads whelp 0.85 -> guard 1.5 ->
@@ -275,6 +283,7 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 20,
     hardLeashRadius: 50,
     elite: true,
+    offStreamIdle: true,
     // Rare-flagged: the 4x respawn window (respawn_policy.ts) keeps the four
     // lords feeling like standing minibosses, and rare camp mobs feed the
     // 'slain:' deed credit (RARE_SLAIN_TEMPLATES).
@@ -287,6 +296,7 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     // Menace scale: half again over the first cut. Its melee reach follows
     // through the bespoke combat profile (mob_combat.ts), never the visual
     // alone (the Wildheart whiff lesson).
+    componentTags: ['hide', 'claw', 'horn'],
     scale: 2.25,
     color: 0x50392e,
     yells: {
@@ -407,6 +417,7 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 9,
     aggroRadius: 20,
     elite: true,
+    offStreamIdle: true,
     loot: [{ copper: 100, chance: 1 }],
     // The matriarch keeps her half-again margin over the grown broodlords
     // (reach profile beside theirs in mob_combat.ts).
@@ -812,29 +823,77 @@ export const DRAKELANDS_QUEST_CAMPS: CampDef[] = [
 // runtime (src/sim/mob/dragonkin_brood.ts).
 export const DRAKELANDS_BROOD_CAMPS: CampDef[] = [
   // the fourth broodlord: the southeast rim over the wargate approach
-  { mobId: 'drakemaw_broodlord', center: { x: 458, z: 2302 }, radius: 8, count: 1 },
+  {
+    mobId: 'drakemaw_broodlord',
+    center: { x: 458, z: 2302 },
+    radius: 8,
+    count: 1,
+    offStream: true,
+  },
   // egg clutches: a ring around each broodlord...
-  { mobId: 'dragonkin_egg', center: { x: 419, z: 2266 }, radius: 9, count: 7 },
-  { mobId: 'dragonkin_egg', center: { x: 288, z: 2278 }, radius: 9, count: 7 },
-  { mobId: 'dragonkin_egg', center: { x: 352, z: 2352 }, radius: 9, count: 7 },
-  { mobId: 'dragonkin_egg', center: { x: 458, z: 2302 }, radius: 9, count: 7 },
+  { mobId: 'dragonkin_egg', center: { x: 419, z: 2266 }, radius: 9, count: 7, offStream: true },
+  { mobId: 'dragonkin_egg', center: { x: 288, z: 2278 }, radius: 9, count: 7, offStream: true },
+  { mobId: 'dragonkin_egg', center: { x: 352, z: 2352 }, radius: 9, count: 7, offStream: true },
+  { mobId: 'dragonkin_egg', center: { x: 458, z: 2302 }, radius: 9, count: 7, offStream: true },
   // ...and the matriarch's own clutch in the crater
-  { mobId: 'dragonkin_egg', center: { x: 436, z: 2348 }, radius: 10, count: 8 },
+  { mobId: 'dragonkin_egg', center: { x: 436, z: 2348 }, radius: 10, count: 8, offStream: true },
   // loose scatter fields between the nests (sparser than the rings, so a
   // careless boot pops a local cascade, not the whole field). The first
   // field sits EAST of the crater-rim road terminus (390, 2298): centered on
   // the road it cascaded on every walk-by and read as pre-hatched.
-  { mobId: 'dragonkin_egg', center: { x: 404, z: 2318 }, radius: 10, count: 5 },
-  { mobId: 'dragonkin_egg', center: { x: 330, z: 2300 }, radius: 12, count: 5 },
-  { mobId: 'dragonkin_egg', center: { x: 430, z: 2380 }, radius: 12, count: 5 },
+  { mobId: 'dragonkin_egg', center: { x: 404, z: 2318 }, radius: 10, count: 5, offStream: true },
+  { mobId: 'dragonkin_egg', center: { x: 330, z: 2300 }, radius: 12, count: 5, offStream: true },
+  { mobId: 'dragonkin_egg', center: { x: 430, z: 2380 }, radius: 12, count: 5, offStream: true },
   // broodguard patrols: the caldera belt, Bloodglass, and the dune approach
-  { mobId: 'dragonkin_broodguard', center: { x: 378, z: 2242 }, radius: 9, count: 3 },
-  { mobId: 'dragonkin_broodguard', center: { x: 392, z: 2296 }, radius: 9, count: 3 },
-  { mobId: 'dragonkin_broodguard', center: { x: 352, z: 2282 }, radius: 8, count: 2 },
-  { mobId: 'dragonkin_broodguard', center: { x: 418, z: 2338 }, radius: 8, count: 2 },
-  { mobId: 'dragonkin_broodguard', center: { x: 302, z: 2302 }, radius: 9, count: 3 },
-  { mobId: 'dragonkin_broodguard', center: { x: 268, z: 2252 }, radius: 8, count: 2 },
-  { mobId: 'dragonkin_broodguard', center: { x: 438, z: 2384 }, radius: 8, count: 2 },
+  {
+    mobId: 'dragonkin_broodguard',
+    center: { x: 378, z: 2242 },
+    radius: 9,
+    count: 3,
+    offStream: true,
+  },
+  {
+    mobId: 'dragonkin_broodguard',
+    center: { x: 392, z: 2296 },
+    radius: 9,
+    count: 3,
+    offStream: true,
+  },
+  {
+    mobId: 'dragonkin_broodguard',
+    center: { x: 352, z: 2282 },
+    radius: 8,
+    count: 2,
+    offStream: true,
+  },
+  {
+    mobId: 'dragonkin_broodguard',
+    center: { x: 418, z: 2338 },
+    radius: 8,
+    count: 2,
+    offStream: true,
+  },
+  {
+    mobId: 'dragonkin_broodguard',
+    center: { x: 302, z: 2302 },
+    radius: 9,
+    count: 3,
+    offStream: true,
+  },
+  {
+    mobId: 'dragonkin_broodguard',
+    center: { x: 268, z: 2252 },
+    radius: 8,
+    count: 2,
+    offStream: true,
+  },
+  {
+    mobId: 'dragonkin_broodguard',
+    center: { x: 438, z: 2384 },
+    radius: 8,
+    count: 2,
+    offStream: true,
+  },
   // Guard clutches (playtest wave 2, appended at this list's tail so every
   // camp above keeps its world-gen draws): a loose scatter of eggs beside
   // each broodguard patrol, so the guards walk among shells and a fight in
@@ -842,13 +901,13 @@ export const DRAKELANDS_BROOD_CAMPS: CampDef[] = [
   // AND clear of the road lines (the crater-rim, north-rim, and dune-fork
   // legs), so no walk-by pops them; the guards themselves never can (only a
   // player inside proximityRadius springs a shell).
-  { mobId: 'dragonkin_egg', center: { x: 372, z: 2242 }, radius: 7, count: 4 },
-  { mobId: 'dragonkin_egg', center: { x: 401, z: 2303 }, radius: 7, count: 4 },
-  { mobId: 'dragonkin_egg', center: { x: 344, z: 2286 }, radius: 6, count: 3 },
-  { mobId: 'dragonkin_egg', center: { x: 421, z: 2334 }, radius: 7, count: 3 },
-  { mobId: 'dragonkin_egg', center: { x: 306, z: 2308 }, radius: 7, count: 4 },
-  { mobId: 'dragonkin_egg', center: { x: 264, z: 2258 }, radius: 7, count: 3 },
-  { mobId: 'dragonkin_egg', center: { x: 441, z: 2380 }, radius: 7, count: 3 },
+  { mobId: 'dragonkin_egg', center: { x: 372, z: 2242 }, radius: 7, count: 4, offStream: true },
+  { mobId: 'dragonkin_egg', center: { x: 401, z: 2303 }, radius: 7, count: 4, offStream: true },
+  { mobId: 'dragonkin_egg', center: { x: 344, z: 2286 }, radius: 6, count: 3, offStream: true },
+  { mobId: 'dragonkin_egg', center: { x: 421, z: 2334 }, radius: 7, count: 3, offStream: true },
+  { mobId: 'dragonkin_egg', center: { x: 306, z: 2308 }, radius: 7, count: 4, offStream: true },
+  { mobId: 'dragonkin_egg', center: { x: 264, z: 2258 }, radius: 7, count: 3, offStream: true },
+  { mobId: 'dragonkin_egg', center: { x: 441, z: 2380 }, radius: 7, count: 3, offStream: true },
 ];
 
 export const DRAKELANDS_PROPS: ZonePropsDef = {
