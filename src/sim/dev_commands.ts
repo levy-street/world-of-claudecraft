@@ -15,6 +15,8 @@ import { completeAllQuestsForDev } from './quests/dev_quest_commands';
 import { RIFT_RANK_BASE_LEVEL, riftRankForBaseLevel } from './rift/ranks';
 import { generateRiftPlan, isSetPieceSeed } from './rift/rift_gen';
 import { scenarioById, startScenario } from './scenarios/scenarios';
+import { registeredSceneIds } from './scenes/registry';
+import { playSceneForPlayer, requestSceneSkip } from './scenes/scenes';
 import type { SentChat } from './sim';
 import type { SimContext } from './sim_context';
 import { bgQueueJoin, bgQueueSize, devEndBg, devStartBg } from './social/battleground';
@@ -530,6 +532,43 @@ export function handleDevChat(
     }
     ctx.enterStoryInstance(storyId, pid);
     emitDevLog(ctx, pid, `[dev] Entering story instance ${storyId}.`);
+    return null;
+  }
+
+  // [dev] Watch a cinematic without playing up to its trigger: "/dev scene"
+  // lists every registered scene, "/dev scene <id>" plays one from where you
+  // stand. Ids match with or without underscores and on any unique substring,
+  // so "/dev scene voyage" finds scn_lb_q0_voyage. A scene already running
+  // holds this player's playback claim and would make playSceneForPlayer
+  // refuse, so a replay skips it first; the skip fast-forwards its remaining
+  // authoritative ops, which leaves world state where a watched scene would.
+  const sceneMatch = /^\/(?:dev\s+scene|devscene)(?:\s+(\S+))?\s*$/i.exec(raw);
+  if (sceneMatch) {
+    const ids = registeredSceneIds();
+    const query = sceneMatch[1];
+    if (query === undefined) {
+      emitDevLog(ctx, pid, `[dev] ${ids.length} scenes: ${ids.join(', ')}`);
+      return null;
+    }
+    const norm = (value: string): string => value.toLowerCase().replace(/_/g, '');
+    const target = norm(query);
+    const exact = ids.find((id) => norm(id) === target);
+    const matches = exact !== undefined ? [exact] : ids.filter((id) => norm(id).includes(target));
+    if (matches.length === 0) {
+      ctx.error(pid, `[dev] Unknown scene '${query}'.`);
+      return null;
+    }
+    if (matches.length > 1) {
+      ctx.error(pid, `[dev] Ambiguous scene '${query}': ${matches.join(', ')}`);
+      return null;
+    }
+    const sceneId = matches[0];
+    requestSceneSkip(ctx, pid);
+    if (playSceneForPlayer(ctx, pid, sceneId)) {
+      emitDevLog(ctx, pid, `[dev] Playing ${sceneId}.`);
+    } else {
+      ctx.error(pid, `[dev] Scene ${sceneId} refused to start.`);
+    }
     return null;
   }
 

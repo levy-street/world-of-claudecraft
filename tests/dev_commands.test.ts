@@ -165,6 +165,80 @@ describe('dev commands', () => {
     expect(sim.player.level).toBe(1);
     expect(devSpawns(sim)).toEqual([]);
   });
+
+  // "/dev scene": watch a cinematic without playing up to its trigger.
+  describe('/dev scene', () => {
+    /** Ids the scene director was told to START, in order (sceneId rides the
+     *  event, not the op; the op only carries the scene's duration). */
+    const startedScenes = (sim: Sim, events: ReturnType<Sim['tick']>): string[] =>
+      events
+        .filter(
+          (e): e is Extract<typeof e, { type: 'scene' }> =>
+            e.type === 'scene' && e.pid === sim.playerId && e.op.kind === 'start',
+        )
+        .map((e) => e.sceneId);
+
+    it('lists every registered scene when given no id', () => {
+      const sim = devSim();
+      sim.chat('/dev scene');
+      const lines = sim
+        .tick()
+        .filter((e) => e.type === 'log' && e.text.startsWith('[dev]'))
+        .map((e) => (e as { text: string }).text);
+      expect(lines).toHaveLength(1);
+      expect(lines[0]).toContain('scn_lb_q0_voyage');
+      expect(lines[0]).toContain('scn_lb_ferry_depart_out');
+    });
+
+    it('plays a scene by exact id and by unique substring', () => {
+      for (const command of ['/dev scene scn_lb_q0_voyage', '/dev scene voyage']) {
+        const sim = devSim();
+        sim.chat(command);
+        expect(startedScenes(sim, sim.tick()), command).toEqual(['scn_lb_q0_voyage']);
+      }
+    });
+
+    it('matches ids with underscores stripped', () => {
+      const sim = devSim();
+      sim.chat('/dev scene scnlbq0voyage');
+      expect(startedScenes(sim, sim.tick())).toEqual(['scn_lb_q0_voyage']);
+    });
+
+    it('refuses an unknown id and an ambiguous one, starting nothing', () => {
+      const unknown = devSim();
+      unknown.chat('/dev scene nope_not_a_scene');
+      expect(startedScenes(unknown, unknown.tick())).toEqual([]);
+
+      // "depart" hits both scn_lb_ferry_depart_out and _back.
+      const ambiguous = devSim();
+      ambiguous.chat('/dev scene depart');
+      expect(startedScenes(ambiguous, ambiguous.tick())).toEqual([]);
+    });
+
+    it('replays a scene that is already running', () => {
+      const sim = devSim();
+      sim.chat('/dev scene voyage');
+      expect(startedScenes(sim, sim.tick())).toEqual(['scn_lb_q0_voyage']);
+      // Without the skip, the live playback holds the claim and the second
+      // request would be silently refused.
+      sim.chat('/dev scene voyage');
+      expect(startedScenes(sim, sim.tick())).toEqual(['scn_lb_q0_voyage']);
+    });
+
+    it('draws no rng, so watching a cinematic cannot fork the world', () => {
+      const sim = devSim();
+      let draws = 0;
+      sim.rng.setObserver(() => draws++);
+      sim.chat('/dev scene voyage');
+      expect(draws).toBe(0);
+    });
+
+    it('is inert when dev commands are disabled', () => {
+      const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: false });
+      sim.chat('/dev scene voyage');
+      expect(startedScenes(sim, sim.tick())).toEqual([]);
+    });
+  });
 });
 
 describe('/dev bg (Thornhollow Fields force-start)', () => {
