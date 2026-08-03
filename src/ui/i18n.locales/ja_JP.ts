@@ -904,8 +904,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.endLog': 'ソーンホロウ平原終了、{crimson}:{azure}。レーティング{rating}({delta})。',
   'hudChrome.bg.map.crimsonKeep': '真紅の城塞',
   'hudChrome.bg.map.azureKeep': '蒼藍の城塞',
-  'hudChrome.bg.map.crimsonField': '真紅の平原',
-  'hudChrome.bg.map.azureField': '蒼藍の平原',
   'hudChrome.bg.map.ruinCourtyard': '廃墟の中庭',
   'hudChrome.bg.map.graveyard': '墓地',
   'guide.nav.ravenrift': 'ソーンホロウ平原',

@@ -904,12 +904,12 @@ export const hudChromeStrings = {
     // Landmark names written onto the M-key map's atlas plate. Each names a
     // rectangle the authored field itself declares, so they are the place names
     // a player calls out, not decoration: short proper nouns, painted on canvas
-    // at plate-build time (battleground_map_painter).
+    // at plate-build time (battleground_map_painter). Each keep name titles its
+    // whole END of the field (the keep plus the chamber in front of it), which
+    // is the one name a player calls that ground by.
     map: {
       crimsonKeep: 'Crimson Keep',
       azureKeep: 'Azure Keep',
-      crimsonField: 'Crimson Field',
-      azureField: 'Azure Field',
       ruinCourtyard: 'The Ruin Courtyard',
       graveyard: 'Graveyard',
     },

@@ -18,9 +18,9 @@ The Thornhollow Fields 5v5 capture-the-flag HUD surface behind the `index.ts` ba
 
 - `battleground_map_view.ts` + `battleground_map_painter.ts`: the M-key world
   map's Thornhollow surface. The view is the HONEST marker model (self plus
-  same-team mates, static flag stands and rune pads; never enemies, never live
-  flag positions). The painter owns the ATLAS PLATE: the static half of the
-  surface, rasterized once per (canvas size, team orientation, i18n revision)
+  same-team mates and the static flag stands; never enemies, never live flag
+  positions, and never rune pads). The painter owns the ATLAS PLATE: the static
+  half of the surface, rasterized once per (canvas size, team orientation, i18n revision)
   into an offscreen canvas and blitted, in the same hand-drawn atlas language
   `src/ui/map_terrain.ts` paints the overworld in. Its per-pixel work is the
   pure core `src/ui/bg_field_relief_core.ts` (`paintBgFieldAtlas`, sharing the

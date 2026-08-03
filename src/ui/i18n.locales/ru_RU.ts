@@ -906,8 +906,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.endLog': 'Терновая Лощина завершена, {crimson}:{azure}. Рейтинг {rating} ({delta}).',
   'hudChrome.bg.map.crimsonKeep': 'Багровая крепость',
   'hudChrome.bg.map.azureKeep': 'Лазурная крепость',
-  'hudChrome.bg.map.crimsonField': 'Багровое поле',
-  'hudChrome.bg.map.azureField': 'Лазурное поле',
   'hudChrome.bg.map.ruinCourtyard': 'Двор Руин',
   'hudChrome.bg.map.graveyard': 'Кладбище',
   'guide.nav.ravenrift': 'Терновая Лощина',

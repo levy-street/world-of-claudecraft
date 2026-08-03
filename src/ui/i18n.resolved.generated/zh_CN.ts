@@ -1079,8 +1079,6 @@ export const zh_CN: EnTranslations = {
       "map": {
         "crimsonKeep": "绯红要塞",
         "azureKeep": "蔚蓝要塞",
-        "crimsonField": "绯红原野",
-        "azureField": "蔚蓝原野",
         "ruinCourtyard": "废墟庭院",
         "graveyard": "墓地"
       }

@@ -49,6 +49,7 @@ import { buildPaint, SWATCHES } from '../scripts/assets/battleground/ground_pain
 import { bodyOffset, courseFit, r4, yaw } from '../scripts/assets/battleground/kit.mjs';
 import { makeHeightAt } from '../scripts/assets/battleground/stamp_chain.mjs';
 import { terrainStamps } from '../scripts/assets/battleground/terrain.mjs';
+import { bgAtlasMarks } from '../src/ui/hud/battleground/battleground_atlas_view';
 import { BattlegroundMapPainter } from '../src/ui/hud/battleground/battleground_map_painter';
 import type { BgMapModel } from '../src/ui/hud/battleground/battleground_map_view';
 import { setLanguage, t } from '../src/ui/i18n';
@@ -461,11 +462,13 @@ const mapPainterCode = MAP_PAINTER_SRC.replace(/\/\*[\s\S]*?\*\//g, '').replace(
 const TERRAIN_PALETTE_CONSTANTS = [
   // GROUP 1, the sampled field dressing: the built things standing on the
   // ground, sampled from the 3D field's own materials (flagstone keep floors,
-  // slate walls, graveyard dirt, the pale rune pads).
+  // slate walls). The graveyard dirt and the rune-pad fill were here too and
+  // are deliberately gone: the plots are painted GROUND in the relief core's
+  // raster now (their own surface family, so they take the plate's tinting,
+  // mottling, hillshade and inked edge instead of being a flat rectangle laid
+  // over the finished plate), and the rune pads are not drawn on the map at all.
   'KEEP_FLOOR',
-  'GRAVE_DIRT',
   'WALL_FILL',
-  'RUNE_FILL',
   // GROUP 2, the atlas plate's cartography, added with the M-map restyle. Same
   // map_terrain.ts precedent and one extra reason a token cannot serve: these
   // are painted into the CACHED PLATE, under and around a raster the pure core
@@ -483,6 +486,11 @@ const TERRAIN_PALETTE_CONSTANTS = [
   'CROWN_LIT',
   'BOULDER_FILL',
   'BOULDER_LIT',
+  // HEADSTONE_* are the same read at graveyard scale: the stipples that say
+  // what the plot's grave-ground surface is, paler and colder than the field's
+  // boulders so a plot never reads as a rock field.
+  'HEADSTONE_FILL',
+  'HEADSTONE_LIT',
   // LABEL_HALO is the parchment each landmark name is written on. Its partner
   // (the ink the name is written IN) is the --color-bg-map-ink TOKEN, which is
   // the split this rule exists to enforce: the halo is plate material, the ink
@@ -569,6 +577,9 @@ interface PlateTrace {
   /** Every text entry point used on the MAP context (labels belong to the
    *  plate, so this must stay empty). */
   mapText: string[];
+  /** Every shape op drawn on the MAP context per redraw, so what the live half
+   *  of the surface draws (and, decisively, what it does NOT) is assertable. */
+  mapOps: string[];
 }
 
 function fakePlateCanvas(trace: PlateTrace): unknown {
@@ -650,16 +661,18 @@ function fakeMapCtx(trace: PlateTrace): CanvasRenderingContext2D {
     translate: (): void => {},
     rotate: (): void => {},
     setLineDash: (): void => {},
-    beginPath: (): void => {},
-    moveTo: (): void => {},
-    lineTo: (): void => {},
-    closePath: (): void => {},
-    arc: (): void => {},
-    fill: (): void => {},
-    stroke: (): void => {},
-    fillRect: (): void => {},
-    strokeRect: (): void => {},
-    drawImage: (): void => {},
+    beginPath: (): void => void trace.mapOps.push('beginPath'),
+    moveTo: (x: number, y: number): void => void trace.mapOps.push(`moveTo ${x} ${y}`),
+    lineTo: (x: number, y: number): void => void trace.mapOps.push(`lineTo ${x} ${y}`),
+    closePath: (): void => void trace.mapOps.push('closePath'),
+    arc: (x: number, y: number, r: number): void => void trace.mapOps.push(`arc ${x} ${y} ${r}`),
+    fill: (): void => void trace.mapOps.push('fill'),
+    stroke: (): void => void trace.mapOps.push('stroke'),
+    fillRect: (x: number, y: number, w: number, h: number): void =>
+      void trace.mapOps.push(`fillRect ${x} ${y} ${w} ${h}`),
+    strokeRect: (x: number, y: number, w: number, h: number): void =>
+      void trace.mapOps.push(`strokeRect ${x} ${y} ${w} ${h}`),
+    drawImage: (): void => void trace.mapOps.push('drawImage'),
     createLinearGradient: () => ({ addColorStop: (): void => {} }),
     fillText: (text: string): void => void trace.mapText.push(`fillText:${text}`),
     strokeText: (text: string): void => void trace.mapText.push(`strokeText:${text}`),
@@ -698,15 +711,20 @@ function plateModel(myTeam: number): BgMapModel {
   return { active: true, myTeam, self: null, mates: [], halfX: HALF_X, halfZ: HALF_Z };
 }
 
-/** Paint once with a FRESH painter and hand back the plate it built. */
-function buildPlate(myTeam: number): { w: number; h: number; ops: PlateOp[] } {
-  const trace: PlateTrace = { plates: [], mapText: [] };
+/** Paint once with a FRESH painter and hand back the whole trace. */
+function paintOnce(myTeam: number): PlateTrace {
+  const trace: PlateTrace = { plates: [], mapText: [], mapOps: [] };
   installPlateGlobals(trace);
   const painter = new BattlegroundMapPainter();
   painter.paint(fakeMapCtx(trace), plateModel(myTeam), PLATE_CANVAS_SIZE);
   expect(trace.plates, 'exactly one plate per fresh painter').toHaveLength(1);
   expect(trace.mapText, 'labels belong to the cached plate, never the redraw').toEqual([]);
-  return trace.plates[0];
+  return trace;
+}
+
+/** Paint once with a FRESH painter and hand back the plate it built. */
+function buildPlate(myTeam: number): { w: number; h: number; ops: PlateOp[] } {
+  return paintOnce(myTeam).plates[0];
 }
 
 /** The label ops of a plate, in draw order. */
@@ -758,7 +776,7 @@ describe('Thornhollow Fields atlas plate: built once, and always the same plate'
   });
 
   it('caches per size, team and language, and rebuilds when any of the three moves', () => {
-    const trace: PlateTrace = { plates: [], mapText: [] };
+    const trace: PlateTrace = { plates: [], mapText: [], mapOps: [] };
     installPlateGlobals(trace);
     const painter = new BattlegroundMapPainter();
     const ctx = fakeMapCtx(trace);
@@ -783,11 +801,12 @@ describe('Thornhollow Fields atlas plate: built once, and always the same plate'
 
   it('writes every landmark the authored map names, from t(), on the plate only', () => {
     const labels = plateLabels(buildPlate(0));
+    // ONE title per end of the field: the keep name titles the keep AND the
+    // chamber in front of it, so the separate "Crimson Field" / "Azure Field"
+    // names are gone from the plate (and from the catalogue with them).
     expect(labels.map((l) => l.text).sort()).toEqual(
       [
-        t('hudChrome.bg.map.azureField'),
         t('hudChrome.bg.map.azureKeep'),
-        t('hudChrome.bg.map.crimsonField'),
         t('hudChrome.bg.map.crimsonKeep'),
         t('hudChrome.bg.map.graveyard'),
         t('hudChrome.bg.map.graveyard'),
@@ -802,6 +821,80 @@ describe('Thornhollow Fields atlas plate: built once, and always the same plate'
     const place = labels.find((l) => l.text === t('hudChrome.bg.map.graveyard'));
     expect(region && place, 'both label tiers drawn').toBeTruthy();
     expect(region?.font).not.toBe(place?.font);
+  });
+
+  it('draws NO rune pads: neither a disc nor a diamond survives anywhere', () => {
+    // The pads were static pips: whether a pad is UP is live state the map
+    // deliberately does not scout, so all they did was clutter the plate and
+    // collide with the landmark names. Pinned as an ABSENCE, per shape, on a
+    // marker-free redraw (no self, no mates): the sprint discs were the only
+    // arcs left on the map context, and the Battle/Ward diamonds the only
+    // closed paths besides the flag banners. Plus the source teeth, so a pad
+    // cannot come back on the cached PLATE instead.
+    expect(
+      SPEED_RUNES.length + POWER_RUNES.length,
+      'the field really does place pads this map is choosing not to draw',
+    ).toBeGreaterThan(3);
+    const ops = paintOnce(0).mapOps;
+    expect(
+      ops.filter((op) => op.startsWith('arc')),
+      'a rune disc is still drawn',
+    ).toEqual([]);
+    expect(
+      ops.filter((op) => op === 'closePath'),
+      'only the flag banners are closed paths',
+    ).toHaveLength(BASES.length);
+    // The source teeth, which also cover the cached PLATE (a pad drawn there
+    // would never appear in a redraw trace at all): the painter no longer names
+    // a rune symbol or reads a rune table.
+    expect(mapPainterCode, 'the painter still names a rune symbol').not.toMatch(/RUNE/);
+  });
+
+  it('stamps no flat graveyard rectangle over the finished plate', () => {
+    // The bug this fixed: each plot was a solid fill plus a team tint, drawn on
+    // the MAP context every redraw over the finished atlas ground, which read
+    // as a rendering error. The plot is plate ground now (its own surface
+    // family in the relief core), so the redraw's only rectangles are the two
+    // end washes and the two flag poles, and none of them is plot-sized.
+    const ops = paintOnce(0).mapOps.filter((op) => op.startsWith('fillRect'));
+    const s = (PLATE_CANVAS_SIZE - 36) / (HALF_Z * 2);
+    const plotW = GRAVEYARDS[0].hw * 2 * s;
+    const plotH = GRAVEYARDS[0].hd * 2 * s;
+    expect(plotW, 'a plot is a visible rectangle at this scale').toBeGreaterThan(5);
+    for (const op of ops) {
+      const [, , , w, h] = op.split(' ');
+      expect(
+        Math.abs(Number(w) - plotW) > 1 || Math.abs(Number(h) - plotH) > 1,
+        `a graveyard-sized fill survives the redraw: ${op}`,
+      ).toBe(true);
+    }
+    expect(ops, 'two end washes and one pole per flag stand, nothing else').toHaveLength(
+      2 + BASES.length,
+    );
+  });
+
+  it('stipples both graveyard plots with headstones, on the plate', () => {
+    // The other half of the same change: the plot reads as a graveyard because
+    // the atlas language says so (ground surface plus stone marks), not because
+    // a coloured rectangle was laid over it. Every headstone the pure core
+    // emits must land as a drawn mark at its own projected position.
+    const plate = buildPlate(0);
+    const s = (PLATE_CANVAS_SIZE - 36) / (HALF_Z * 2);
+    const arcs: Array<{ x: number; y: number }> = [];
+    for (const op of plate.ops) {
+      const m = /^arc (-?[\d.]+) (-?[\d.]+) /.exec(op);
+      if (m) arcs.push({ x: Number(m[1]), y: Number(m[2]) });
+    }
+    const stones = bgAtlasMarks().filter((mark) => mark.kind === 'headstone');
+    expect(stones.length).toBe(6 * GRAVEYARDS.length);
+    for (const stone of stones) {
+      const sx = 18 + (HALF_X - stone.x) * s;
+      const sy = 18 + (HALF_Z - stone.z) * s;
+      expect(
+        arcs.some((a) => Math.hypot(a.x - sx, a.y - sy) < 1),
+        `no headstone drawn for the stone at (${stone.x}, ${stone.z})`,
+      ).toBe(true);
+    }
   });
 
   it('turns the whole plate for the away team, labels upright and point-mirrored', () => {

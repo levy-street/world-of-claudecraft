@@ -1079,8 +1079,6 @@ export const ko_KR: EnTranslations = {
       "map": {
         "crimsonKeep": "크림슨 요새",
         "azureKeep": "애저 요새",
-        "crimsonField": "크림슨 평원",
-        "azureField": "애저 평원",
         "ruinCourtyard": "폐허 안뜰",
         "graveyard": "묘지"
       }

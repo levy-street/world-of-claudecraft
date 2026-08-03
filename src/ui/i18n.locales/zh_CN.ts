@@ -873,8 +873,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.endLog': '荆谷原野结束,{crimson}:{azure}。评分{rating}({delta})。',
   'hudChrome.bg.map.crimsonKeep': '绯红要塞',
   'hudChrome.bg.map.azureKeep': '蔚蓝要塞',
-  'hudChrome.bg.map.crimsonField': '绯红原野',
-  'hudChrome.bg.map.azureField': '蔚蓝原野',
   'hudChrome.bg.map.ruinCourtyard': '废墟庭院',
   'hudChrome.bg.map.graveyard': '墓地',
   'guide.nav.ravenrift': '荆谷原野',

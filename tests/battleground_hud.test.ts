@@ -453,9 +453,21 @@ describe('battleground map view (pure core)', () => {
     for (const plot of BG_GRAVEYARDS) {
       expect(inside(plot.x, plot.z, plot.hw, plot.hd), `graveyard ${plot.x},${plot.z}`).toBe(true);
     }
-    for (const pad of [...BG_SPEED_RUNES, ...BG_POWER_RUNES]) {
-      expect(inside(pad.x, pad.z)).toBe(true);
-    }
+  });
+
+  it('emits no rune-pad markers: the map does not scout which pads are up', () => {
+    // Pinned as an ABSENCE. The field really does place rune pads, and the map
+    // deliberately carries none of them: a pad's live state is exactly the kind
+    // of thing the no-scouting rule keeps off this surface, and a static pip for
+    // one is a lie dressed as information. The model's whole surface is checked
+    // rather than one field name, so a `pads` (or `runes`) table cannot be
+    // reintroduced under any spelling without failing here.
+    expect(BG_SPEED_RUNES.length + BG_POWER_RUNES.length).toBeGreaterThan(3);
+    const model = buildBgMapModel(worldSlice(0, baseMatch().players));
+    expect(model.active).toBe(true);
+    expect(Object.keys(model).sort()).toEqual(
+      ['active', 'halfX', 'halfZ', 'mates', 'myTeam', 'self'].sort(),
+    );
   });
 
   it('draws a wall plan that reaches both keeps, stays inside the rect, and is rotated', () => {

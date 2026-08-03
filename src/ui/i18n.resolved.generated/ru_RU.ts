@@ -1079,8 +1079,6 @@ export const ru_RU: EnTranslations = {
       "map": {
         "crimsonKeep": "Багровая крепость",
         "azureKeep": "Лазурная крепость",
-        "crimsonField": "Багровое поле",
-        "azureField": "Лазурное поле",
         "ruinCourtyard": "Двор Руин",
         "graveyard": "Кладбище"
       }

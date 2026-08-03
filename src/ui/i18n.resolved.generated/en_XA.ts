@@ -1079,8 +1079,6 @@ export const en_XA: EnTranslations = {
       "map": {
         "crimsonKeep": "[Çŕíɱšóñ Ķééþ]",
         "azureKeep": "[Ážúŕé Ķééþ]",
-        "crimsonField": "[Çŕíɱšóñ Ƒíéļð]",
-        "azureField": "[Ážúŕé Ƒíéļð]",
         "ruinCourtyard": "[Ţĥé Ŕúíñ Çóúŕţýáŕð]",
         "graveyard": "[Ĝŕáʋéýáŕð]"
       }

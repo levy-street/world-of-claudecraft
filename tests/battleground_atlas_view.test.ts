@@ -36,22 +36,47 @@ describe('bg atlas marks: the plate draws the field the map really placed', () =
     expect(bgAtlasMarks()).toBe(marks);
   });
 
-  it('draws only crowns and boulders, each with a real radius', () => {
+  it('draws only crowns, boulders and headstones, each with a real radius', () => {
     expect(marks.length).toBeGreaterThan(100);
     for (const mark of marks) {
-      expect(['crown', 'boulder']).toContain(mark.kind);
+      expect(['crown', 'boulder', 'headstone']).toContain(mark.kind);
       expect(mark.r).toBeGreaterThan(0);
       expect(Number.isFinite(mark.x) && Number.isFinite(mark.z)).toBe(true);
     }
-    // Both kinds are really present, so a filter that silently stopped matching
-    // one of the two asset families fails here.
+    // All three kinds are really present, so a filter that silently stopped
+    // matching one of the asset families fails here.
     expect(marks.some((m) => m.kind === 'crown')).toBe(true);
     expect(marks.some((m) => m.kind === 'boulder')).toBe(true);
+    expect(marks.some((m) => m.kind === 'headstone')).toBe(true);
+  });
+
+  it('stipples each graveyard plot with a fixed grid of headstones inside its rails', () => {
+    // The plot is drawn GROUND on the plate (its own surface family in the
+    // relief core), and these are the marks that say what that ground is. They
+    // are a deterministic grid read off the authored plot rectangle: no
+    // randomness, and never outside the rails, where they would read as loose
+    // rock on the field instead of as a graveyard.
+    const stones = marks.filter((m) => m.kind === 'headstone');
+    expect(stones.length).toBe(6 * TH_GRAVEYARDS.length);
+    for (const plot of TH_GRAVEYARDS) {
+      const mine = stones.filter(
+        (m) => Math.abs(m.x - plot.x) <= plot.hw && Math.abs(m.z - plot.z) <= plot.hd,
+      );
+      expect(mine, `headstones on the plot at (${plot.x}, ${plot.z})`).toHaveLength(6);
+      // Two rows of three, so the grid is a plot and not a line of pips.
+      expect(new Set(mine.map((m) => m.z)).size).toBe(2);
+      expect(new Set(mine.map((m) => m.x)).size).toBe(3);
+      // Small: a headstone must stipple, never blot out the plot it stands on.
+      for (const stone of mine) expect(stone.r).toBeLessThan(plot.hd / 4);
+    }
   });
 
   it('stands every mark on a real placement of the matching asset family', () => {
     // Decisive against invented dressing: each mark must sit exactly on a
-    // placement whose assetId is a tree (crown) or rock/rubble (boulder).
+    // placement whose assetId is a tree (crown) or rock/rubble (boulder). The
+    // headstones are the one drawn kind with no placement of its own: they come
+    // off the authored graveyard rectangles (arm above), so they are excluded
+    // here rather than exempted from being checked at all.
     const kindOf = new Map<string, string>();
     for (const p of TH_PLACEMENTS) {
       const kind = /^foliage\/(?:oak|pine|twisted)/.test(p.assetId)
@@ -62,6 +87,7 @@ describe('bg atlas marks: the plate draws the field the map really placed', () =
       if (kind) kindOf.set(`${p.x},${p.z}`, kind);
     }
     for (const mark of marks) {
+      if (mark.kind === 'headstone') continue;
       expect(kindOf.get(`${mark.x},${mark.z}`), `mark at (${mark.x}, ${mark.z})`).toBe(mark.kind);
     }
     // ...and it harvested the WOODED LIP outside the ramparts too, which is the
@@ -77,7 +103,7 @@ describe('bg atlas marks: the plate draws the field the map really placed', () =
   });
 
   it('is point-symmetric, so the away team sees the same wood', () => {
-    for (const kind of ['crown', 'boulder'] as const) {
+    for (const kind of ['crown', 'boulder', 'headstone'] as const) {
       const set = marks.filter((m) => m.kind === kind);
       for (const mark of set) {
         expect(hasMirror(set, mark.x, mark.z), `${kind} (${mark.x}, ${mark.z}) has no mirror`).toBe(
@@ -95,11 +121,12 @@ describe('bg atlas labels: the names the authored map itself declares', () => {
     expect(bgAtlasLabels()).toBe(labels);
     const counts = new Map<BgAtlasLabelId, number>();
     for (const l of labels) counts.set(l.id, (counts.get(l.id) ?? 0) + 1);
+    // ONE title per end of the field: the old separate "Crimson Field" and
+    // "Azure Field" names are gone, and the keep name titles the whole
+    // territory. A regression that re-added them shows up as an extra id here.
     expect(Object.fromEntries(counts)).toEqual({
       crimsonKeep: 1,
       azureKeep: 1,
-      crimsonField: 1,
-      azureField: 1,
       ruinCourtyard: 1,
       graveyard: TH_GRAVEYARDS.length,
     });
@@ -108,7 +135,9 @@ describe('bg atlas labels: the names the authored map itself declares', () => {
   it('resolves every region label against a LOCATION the map still declares', () => {
     // The anchors are read by NAME off a generated table. If the map renames or
     // drops one, the label silently disappears from the plate; this is where
-    // that shows up instead.
+    // that shows up instead. The two field chambers are still read (the merged
+    // keep title is anchored halfway to the chamber it owns), they are just no
+    // longer written on the plate under their own names.
     const names = new Set<string>(TH_LOCATIONS.map((l) => l.name));
     for (const name of [
       'Crimson Keep',
@@ -119,33 +148,48 @@ describe('bg atlas labels: the names the authored map itself declares', () => {
     ]) {
       expect(names.has(name), `${name} is no longer an authored LOCATION`).toBe(true);
     }
-    expect(labels.filter((l) => l.tier === 'region')).toHaveLength(5);
+    expect(labels.filter((l) => l.tier === 'region')).toHaveLength(3);
     expect(labels.filter((l) => l.tier === 'place')).toHaveLength(TH_GRAVEYARDS.length);
   });
 
-  it('anchors every label inside the field, and each keep label behind its flag', () => {
+  it('anchors every label inside the field, and titles each whole territory', () => {
     for (const l of labels) {
       expect(Math.abs(l.x)).toBeLessThanOrEqual(TH_HALF_X);
       expect(Math.abs(l.z)).toBeLessThanOrEqual(TH_HALF_Z);
     }
-    // The keep centre is the flag stand, and the stand's banner is the largest
-    // glyph on the map: the name sits BEHIND it, deeper into the keep.
-    for (const id of ['crimsonKeep', 'azureKeep'] as const) {
-      const keepName = id === 'crimsonKeep' ? 'Crimson Keep' : 'Azure Keep';
-      const rect = TH_LOCATIONS.find((l) => l.name === keepName);
+    // The merged title names the keep AND the chamber in front of it, so it
+    // sits midway between the two anchors it replaced: the old back-of-the-keep
+    // anchor (the keep rect's far end, inset past the flag stand's banner
+    // glyph) and the chamber rectangle's centre. Derived here from the same
+    // authored rectangles, so a moved keep or a moved chamber moves the title.
+    const KEEP_LABEL_INSET = 6;
+    for (const [id, keepName, fieldName] of [
+      ['crimsonKeep', 'Crimson Keep', 'Crimson Field'],
+      ['azureKeep', 'Azure Keep', 'Azure Field'],
+    ] as const) {
+      const keep = TH_LOCATIONS.find((l) => l.name === keepName);
+      const field = TH_LOCATIONS.find((l) => l.name === fieldName);
       const label = labels.find((l) => l.id === id);
-      expect(rect && label).toBeTruthy();
-      const centre = ((rect?.minZ ?? 0) + (rect?.maxZ ?? 0)) / 2;
-      expect(Math.abs(label?.z ?? 0)).toBeGreaterThan(Math.abs(centre));
-      expect(Math.sign(label?.z ?? 0)).toBe(Math.sign(centre));
+      expect(keep && field && label).toBeTruthy();
+      const keepCentre = ((keep?.minZ ?? 0) + (keep?.maxZ ?? 0)) / 2;
+      const keepAnchor =
+        (keepCentre < 0 ? (keep?.minZ ?? 0) : (keep?.maxZ ?? 0)) -
+        Math.sign(keepCentre) * KEEP_LABEL_INSET;
+      const fieldAnchor = ((field?.minZ ?? 0) + (field?.maxZ ?? 0)) / 2;
+      expect(label?.z).toBeCloseTo((keepAnchor + fieldAnchor) / 2, 9);
+      expect(label?.x).toBeCloseTo(((keep?.minX ?? 0) + (keep?.maxX ?? 0)) / 2, 9);
+      // It really moved OFF the keep, toward the field it now also names, and
+      // it stayed on its own end of the map.
+      expect(Math.abs(label?.z ?? 0)).toBeLessThan(Math.abs(keepAnchor));
+      expect(Math.abs(label?.z ?? 0)).toBeGreaterThan(Math.abs(fieldAnchor));
+      expect(Math.sign(label?.z ?? 0)).toBe(Math.sign(keepCentre));
     }
   });
 
-  it('keeps each graveyard name OUT of the plot the redraw repaints over it', () => {
-    // The plot's dirt and its side tint are drawn per redraw on top of the
-    // cached plate, so a name anchored inside the rails is buried on the next
-    // frame. The anchor has to clear the plot's own half-depth, on the field
-    // side of it.
+  it('keeps each graveyard name OUT of the plot the headstones stand on', () => {
+    // The plot is drawn ground with headstone stipples on it, so a name
+    // anchored inside the rails fights the stones for the same few pixels. The
+    // anchor has to clear the plot's own half-depth, on the field side of it.
     for (const plot of TH_GRAVEYARDS) {
       const label = bgAtlasLabels().find(
         (l) => l.id === 'graveyard' && Math.sign(l.z) === Math.sign(plot.z),
@@ -159,9 +203,10 @@ describe('bg atlas labels: the names the authored map itself declares', () => {
   });
 
   it('is point-symmetric as a SET, so the turned plate reads the same', () => {
-    // The two keeps mirror each other, the two fields mirror each other, and
-    // the two graveyards mirror each other: after the 180-degree turn every
-    // name lands where a name already was.
+    // The two territory titles mirror each other and the two graveyards mirror
+    // each other (the courtyard sits on the origin): after the 180-degree turn
+    // every name lands where a name already was. This is the mirror-honesty
+    // half of the merged titles: both ends read at the same distance in.
     for (const label of labels) {
       expect(
         hasMirror(labels, label.x, label.z),

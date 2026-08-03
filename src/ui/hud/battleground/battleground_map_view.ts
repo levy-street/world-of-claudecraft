@@ -1,9 +1,12 @@
 // Pure, host-agnostic model for the M-key world map's Thornhollow Fields surface: the
 // field schematic plus the HONEST marker set. Deliberately shown: the walls,
-// both flag STANDS (static), the graveyard plots, the rune pads, yourself,
-// and your TEAMMATES. Deliberately absent: enemies and live flag positions,
-// which the view-distance fog exists to hide (the map must never out-scout
-// walking there; see the Vision design in the PR/wiki).
+// both flag STANDS (static), the graveyard plots (drawn as ground on the atlas
+// plate), yourself, and your TEAMMATES. Deliberately absent: enemies, live flag
+// positions, and rune pads, which the view-distance fog and the no-scouting rule
+// exist to hide (the map must never out-scout walking there; see the Vision
+// design in the PR/wiki). This model therefore emits NO rune-pad markers of any
+// kind, and the painter draws none (tests/battleground_map_plan.test.ts pins the
+// absence on both sides).
 //
 // Coordinates are field-LOCAL yards, ORIENTED: your own keep always reads at
 // the BOTTOM of the map (the away half is up), so both teams get the same

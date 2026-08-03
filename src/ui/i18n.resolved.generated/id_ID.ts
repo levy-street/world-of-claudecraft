@@ -1079,8 +1079,6 @@ export const id_ID: EnTranslations = {
       "map": {
         "crimsonKeep": "Crimson Keep",
         "azureKeep": "Azure Keep",
-        "crimsonField": "Crimson Field",
-        "azureField": "Azure Field",
         "ruinCourtyard": "The Ruin Courtyard",
         "graveyard": "Graveyard"
       }

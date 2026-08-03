@@ -29,7 +29,8 @@
 // `paintBgFieldAtlas` is the M-map's plate, drawn once per size at several
 // times that scale, and it is the hand-drawn fantasy atlas plate the overworld
 // map paints (src/ui/map_terrain.ts): the field's AUTHORED ground paint as the
-// base colour, hypsometric tinting through the same ramp, fbm vegetation
+// base colour (plus the two graveyard plots, stamped over it as their own
+// surface family), hypsometric tinting through the same ramp, fbm vegetation
 // mottling, contour banding, inked edges where one authored surface meets
 // another, and two-axis hillshade lit from the northwest. Both share the ramp,
 // the height source, and the pixel-to-yards convention below, so the two map
@@ -45,7 +46,7 @@ import {
   bgFieldPaintCells,
 } from '../sim/battleground_field';
 import { fbm2 } from '../sim/rng';
-import { TH_PAINT_SWATCHES, TH_SEED } from '../sim/thornhollow_field.generated';
+import { TH_GRAVEYARDS, TH_PAINT_SWATCHES, TH_SEED } from '../sim/thornhollow_field.generated';
 
 /** One hypsometric stop: [field height in yards, r, g, b]. */
 type ReliefStop = readonly [number, number, number, number];
@@ -135,11 +136,19 @@ export function paintBgFieldRelief(
 // The atlas plate (the M-map's field surface).
 // ---------------------------------------------------------------------------
 
-/** The authored surface a cell was painted with, reduced to the three families
- *  the plate draws differently. Ordered so the value doubles as a palette index. */
+/** The authored surface a cell was painted with, reduced to the families the
+ *  plate draws differently. Ordered so the value doubles as a palette index. */
 export const BG_SURFACE_GRASS = 0;
 export const BG_SURFACE_FLAGSTONE = 1;
 export const BG_SURFACE_DIRT = 2;
+/** The two graveyard plots. Not an authored swatch: the 3D field dresses them
+ *  with the same worn ground as its lanes, and on the plate they have to read as
+ *  their own place, so they are STAMPED over the paint grid from the authored
+ *  plot rectangles below. Being a surface family rather than an overlay is the
+ *  point: the plot then takes the hypsometric tint, the mottle, the contours,
+ *  the hillshade and the inked boundary every other surface gets, instead of
+ *  sitting on the finished plate as a flat rectangle of colour. */
+export const BG_SURFACE_GRAVE = 3;
 
 // Which family an authored swatch belongs to, read off the swatch's TEXTURE
 // name rather than its numeric id, so a re-authored map that swaps one grass
@@ -177,6 +186,25 @@ function buildSurfaceGrid(): Uint8Array {
       out[r * SURFACE_COLS + c] = cell <= BG_SURFACE_DIRT ? cell : BG_SURFACE_GRASS;
     }
   }
+  // The graveyard plots, stamped over whatever the map painted under them. The
+  // plots are point-mirrored and the grid's cell centres are symmetric about the
+  // field origin, so the stamp is symmetric cell for cell: the away team's plate
+  // gets the identical ground (the fairness invariant the whole plate rests on).
+  for (const plot of TH_GRAVEYARDS) {
+    const c0 = Math.max(0, Math.ceil((plot.x - plot.hw - BG_PAINT_ORIGIN_X) / SURFACE_PITCH));
+    const c1 = Math.min(
+      SURFACE_COLS - 1,
+      Math.floor((plot.x + plot.hw - BG_PAINT_ORIGIN_X) / SURFACE_PITCH),
+    );
+    const r0 = Math.max(0, Math.ceil((plot.z - plot.hd - BG_PAINT_ORIGIN_Z) / SURFACE_PITCH));
+    const r1 = Math.min(
+      SURFACE_ROWS - 1,
+      Math.floor((plot.z + plot.hd - BG_PAINT_ORIGIN_Z) / SURFACE_PITCH),
+    );
+    for (let r = r0; r <= r1; r++) {
+      for (let c = c0; c <= c1; c++) out[r * SURFACE_COLS + c] = BG_SURFACE_GRAVE;
+    }
+  }
   return out;
 }
 
@@ -201,7 +229,8 @@ export function bgFieldSurfaceAt(lx: number, lz: number): number {
 const FAMILY_RGB: readonly (readonly [number, number, number])[] = [
   [100, 126, 74], // grass: the hollow's turf
   [154, 151, 144], // flagstone: the cobbled keeps, courts and gate aprons
-  [146, 118, 82], // dirt: the worn lanes and the graveyard plots
+  [146, 118, 82], // dirt: the worn lanes
+  [112, 100, 84], // grave: the turned ash-grey earth of the two plots
 ];
 
 // How much of the hypsometric ramp shows through the surface colour. High
@@ -212,8 +241,9 @@ const HYPSO_MIX = 0.28;
 
 // Vegetation mottling, per family: broad moisture patches plus a fine grain,
 // the thing that stops real ground ever being one flat colour (map_terrain.ts).
-// Paving barely mottles; turf mottles most.
-const MOTTLE_GAIN: readonly number[] = [1, 0.3, 0.6];
+// Paving barely mottles; turf mottles most, and turned grave earth nearly as
+// much, which is what keeps a plot from reading as a flat printed rectangle.
+const MOTTLE_GAIN: readonly number[] = [1, 0.3, 0.6, 0.8];
 const MOTTLE_BROAD_FREQ = 0.09;
 const MOTTLE_GRAIN_FREQ = 0.55;
 const MOTTLE_BROAD_GAIN = 0.3;

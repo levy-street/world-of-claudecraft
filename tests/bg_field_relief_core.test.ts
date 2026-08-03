@@ -15,11 +15,12 @@
 
 import { describe, expect, it } from 'vitest';
 import { BG_HALF_X, BG_HALF_Z } from '../src/sim/battleground_layout';
-import { TH_PAINT_SWATCHES } from '../src/sim/thornhollow_field.generated';
+import { TH_GRAVEYARDS, TH_PAINT_SWATCHES } from '../src/sim/thornhollow_field.generated';
 import {
   BG_SURFACE_DIRT,
   BG_SURFACE_FLAGSTONE,
   BG_SURFACE_GRASS,
+  BG_SURFACE_GRAVE,
   bgFieldSurfaceAt,
   paintBgFieldAtlas,
   paintBgFieldRelief,
@@ -204,12 +205,62 @@ describe('bg_field_relief_core: the authored ground paint the atlas plate reads'
 
   it('reads the real authored surface under named places on the field', () => {
     // Ground truth from the map: the heart ruin and the keep courts are paved,
-    // the graveyard plot is dirt, the open field chamber is turf. A grid read
-    // with the axes crossed would answer these three with each other's values.
+    // the graveyard plot is grave ground, the open field chamber is turf. A grid
+    // read with the axes crossed would answer these with each other's values.
     expect(bgFieldSurfaceAt(0, 0)).toBe(BG_SURFACE_FLAGSTONE); // the hollow heart ruin
     expect(bgFieldSurfaceAt(0, -118)).toBe(BG_SURFACE_FLAGSTONE); // the Crimson flag stand
-    expect(bgFieldSurfaceAt(33, -130)).toBe(BG_SURFACE_DIRT); // the Crimson graveyard plot
+    expect(bgFieldSurfaceAt(33, -130)).toBe(BG_SURFACE_GRAVE); // the Crimson graveyard plot
     expect(bgFieldSurfaceAt(0, -82)).toBe(BG_SURFACE_GRASS); // the Crimson field chamber
+    // The worn dirt lanes are still a family of their own: the graveyard stamp
+    // replaced the plots, not every scrap of dirt on the field.
+    const lanes: number[] = [];
+    for (let x = -48; x <= 48; x += 1) {
+      for (let z = -138; z <= 138; z += 1) lanes.push(bgFieldSurfaceAt(x, z));
+    }
+    expect(lanes.filter((f) => f === BG_SURFACE_DIRT).length).toBeGreaterThan(0);
+  });
+
+  it('stamps both graveyard plots as their own surface, edge to edge and no wider', () => {
+    // The plot is drawn GROUND on the plate rather than a flat rectangle laid
+    // over it, which is what earns it the hypsometric tint, the mottle, the
+    // hillshade and the inked boundary. Decisive on both sides: every cell
+    // inside the authored rails reads grave, and the ground a stride outside
+    // the rails does not (a stamp that leaked would swallow the keep terrace).
+    expect(TH_GRAVEYARDS.length).toBe(2);
+    for (const plot of TH_GRAVEYARDS) {
+      for (const dx of [-0.9, -0.5, 0, 0.5, 0.9]) {
+        for (const dz of [-0.9, -0.5, 0, 0.5, 0.9]) {
+          expect(
+            bgFieldSurfaceAt(plot.x + dx * plot.hw, plot.z + dz * plot.hd),
+            `inside the plot at (${plot.x}, ${plot.z})`,
+          ).toBe(BG_SURFACE_GRAVE);
+        }
+      }
+      for (const [ox, oz] of [
+        [plot.hw + 2, 0],
+        [-plot.hw - 2, 0],
+        [0, plot.hd + 2],
+        [0, -plot.hd - 2],
+      ]) {
+        expect(
+          bgFieldSurfaceAt(plot.x + ox, plot.z + oz),
+          `outside the plot at (${plot.x}, ${plot.z})`,
+        ).not.toBe(BG_SURFACE_GRAVE);
+      }
+    }
+    // and nowhere else on the field is grave ground.
+    let graveCells = 0;
+    for (let x = -50; x <= 50; x += 0.5) {
+      for (let z = -140; z <= 140; z += 0.5) {
+        if (bgFieldSurfaceAt(x, z) !== BG_SURFACE_GRAVE) continue;
+        graveCells++;
+        const plot = TH_GRAVEYARDS.find(
+          (p) => Math.abs(x - p.x) <= p.hw && Math.abs(z - p.z) <= p.hd,
+        );
+        expect(plot, `grave ground at (${x}, ${z}) is on no authored plot`).toBeTruthy();
+      }
+    }
+    expect(graveCells).toBeGreaterThan(100);
   });
 
   it('is point-symmetric, the fairness invariant the turned plate rests on', () => {
@@ -287,6 +338,44 @@ describe('bg_field_relief_core: the atlas plate raster', () => {
     expect(turf[1] - turf[0]).toBeGreaterThan(8);
     expect(Math.abs(paving[1] - paving[0])).toBeLessThan(8);
     expect(paving[2]).toBeGreaterThan(turf[2]);
+  });
+
+  it('draws the graveyard plot as ground, not as a flat rectangle of colour', () => {
+    // The bug this replaced: the plot was a solid fill stamped over the finished
+    // plate, which read as a rendering error. As a surface family it takes the
+    // whole atlas treatment, so what has to be true is (a) it is its own tone,
+    // not the turf beside it, (b) it is textured rather than flat, and (c) its
+    // boundary carries the same inked verge every other surface edge does.
+    const plot = TH_GRAVEYARDS[0];
+    const inside = atlas(10, 10, 1, plot.x + 5, plot.z + 5, 1);
+    const beside = atlas(10, 10, 1, plot.x + 5, plot.z + plot.hd + 14, 1);
+    const luma3 = (rgb: number[]): number => 0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2];
+    expect(bgFieldSurfaceAt(plot.x, plot.z)).toBe(BG_SURFACE_GRAVE);
+    expect(bgFieldSurfaceAt(plot.x, plot.z + plot.hd + 9)).toBe(BG_SURFACE_GRASS);
+    // Turned earth reads warm (red over green); the turf a few yards up the
+    // terrace reads green over red. Luma alone would not separate them.
+    const graveRgb = meanRgb(inside);
+    const turfRgb = meanRgb(beside);
+    expect(graveRgb[0] - graveRgb[1]).toBeGreaterThan(5);
+    expect(turfRgb[1] - turfRgb[0]).toBeGreaterThan(3);
+    // Textured: a flat fill would be exactly one colour over the whole window.
+    const tones = new Set<string>();
+    for (let i = 0; i < 100; i++) {
+      tones.add(`${inside[i * CHANNELS]},${inside[i * CHANNELS + 1]},${inside[i * CHANNELS + 2]}`);
+    }
+    expect(tones.size).toBeGreaterThan(20);
+    // Inked: a window straddling the rails carries pixels well darker than
+    // anything inside the plot.
+    const straddle = atlas(10, 10, 1, plot.x + 5, plot.z + plot.hd + 3, 1);
+    let darkestInside = Infinity;
+    for (let i = 0; i < 100; i++) {
+      darkestInside = Math.min(darkestInside, luma3(pixel(inside, 10, i % 10, (i / 10) | 0)));
+    }
+    let darkestStraddle = Infinity;
+    for (let i = 0; i < 100; i++) {
+      darkestStraddle = Math.min(darkestStraddle, luma3(pixel(straddle, 10, i % 10, (i / 10) | 0)));
+    }
+    expect(darkestStraddle).toBeLessThan(darkestInside * 0.9);
   });
 
   it('still reads elevation: the courtyard bowl is darker than a keep terrace', () => {

@@ -2,10 +2,12 @@
 // schematic's routing sibling): an illustrated field plan of THORNHOLLOW drawn
 // from the same authored map data the colliders and the terrain are built from
 // (the real wall boxes, the field heightfield, the authored ground paint, the
-// tree and boulder placements, the graveyard plots, the rune pads, the flag
-// stands), so the map can never drift from the ground a fighter walks, plus the
-// honest marker set the pure model provides (self + teammates only; the fog's
-// no-scouting rule owns everything else).
+// tree and boulder placements, the graveyard plots, the flag stands), so the map
+// can never drift from the ground a fighter walks, plus the honest marker set
+// the pure model provides (self + teammates only; the fog's no-scouting rule
+// owns everything else). Rune pads are deliberately NOT drawn: whether a pad is
+// up is live state the map does not scout, and a plate full of static pips
+// collided with the landmark names for no read a player acts on.
 //
 // THE PLATE. The static half of this surface is a hand-drawn fantasy atlas
 // plate, the same art language src/ui/map_terrain.ts paints the overworld map
@@ -14,12 +16,15 @@
 //   2. the tree crowns standing OUT there, painted blobs with a lit northwest
 //      side (map_terrain's clumped crowns, placed from the real trees),
 //   3. the field slab's cast shadow, thrown southeast onto that lip,
-//   4. the field itself: the authored ground paint as base colour, hypsometric
-//      tinting, fbm vegetation mottling, contour banding, inked edges where one
-//      surface meets another, and two-axis hillshade lit from the northwest
-//      (all of it in the pure core, bg_field_relief_core.paintBgFieldAtlas),
-//   5. the keep floors, the crowns standing inside the walls, and the boulder
-//      and rubble stipples,
+//   4. the field itself: the authored ground paint as base colour (the two
+//      graveyard plots included, stamped in as their own surface family so a
+//      plot is drawn GROUND rather than a flat rectangle laid over the plate),
+//      hypsometric tinting, fbm vegetation mottling, contour banding, inked
+//      edges where one surface meets another, and two-axis hillshade lit from
+//      the northwest (all of it in the pure core,
+//      bg_field_relief_core.paintBgFieldAtlas),
+//   5. the keep floors, the crowns standing inside the walls, the boulder and
+//      rubble stipples, and the headstones on the two plots,
 //   6. the wall plan: every real wall box, cast southeast and inked,
 //   7. the carved slab edge, the ink line where the field meets the lip,
 //   8. the landmark labels the map's own LOCATION rectangles name.
@@ -43,14 +48,7 @@
 // the map cannot drift from the HUD it belongs to. See MAP_COLOR_TOKENS /
 // MAP_CHROME_TOKENS below.
 
-import {
-  BG_BASES,
-  BG_FLAG_Z,
-  BG_GRAVEYARDS,
-  BG_POWER_RUNES,
-  BG_SPEED_RUNES,
-  bgFieldPlanWalls,
-} from '../../../sim/battleground_layout';
+import { BG_BASES, BG_FLAG_Z, bgFieldPlanWalls } from '../../../sim/battleground_layout';
 import { TH_LOCATIONS } from '../../../sim/thornhollow_field.generated';
 import { paintBgFieldAtlas } from '../../bg_field_relief_core';
 import { getI18nRevision, type TranslationKey, t } from '../../i18n';
@@ -93,20 +91,22 @@ type BgMapColors = Record<keyof typeof MAP_COLOR_TOKENS | keyof typeof MAP_CHROM
 // SAMPLED terrain palette (the field's own dressing), not interface chrome.
 const KEEP_FLOOR = '#a49c8f';
 const KEEP_FLOOR_ALPHA = 0.4;
-const GRAVE_DIRT = '#8a7a5e';
 const WALL_FILL = '#333a48';
-const RUNE_FILL = '#e6dcc2';
 // The atlas plate's own cartography, same precedent and the same reason a token
 // cannot serve: the lip and the crowns are painted UNDER a raster the pure core
 // writes as raw bytes, and the halo exists to hold ink on that raster.
-// SURROUND is the old growth the hollow was cut out of; CROWN/BOULDER are the
-// painted marks over it, each with a lit northwest side; LABEL_HALO is the
-// parchment the landmark names are written on.
+// SURROUND is the old growth the hollow was cut out of; CROWN/BOULDER/HEADSTONE
+// are the painted marks over it, each with a lit northwest side; LABEL_HALO is
+// the parchment the landmark names are written on.
 const SURROUND_FILL = '#3d4a33';
 const CROWN_FILL = '#4a5f38';
 const CROWN_LIT = '#71894f';
 const BOULDER_FILL = '#8e8b82';
 const BOULDER_LIT = '#b3b0a6';
+// Headstones read as paler, colder stone than the field's boulders, so a plot
+// stipples differently from a rock field at the same mark size.
+const HEADSTONE_FILL = '#9aa0a4';
+const HEADSTONE_LIT = '#c3c8ca';
 const LABEL_HALO = '#efe6cf';
 
 const FIELD_PAD_PX = 18;
@@ -116,12 +116,7 @@ const FIELD_PAD_PX = 18;
 const PLATE_MARGIN_PX = FIELD_PAD_PX;
 const MATE_R = 4;
 const SELF_R = 6;
-// Rune pads: shape-coded, never colour-coded, so they can never be mistaken for
-// a team mark. Sprint pads are discs, the Battle/Ward pads diamonds.
-const RUNE_R = 3;
-const RUNE_EDGE_WIDTH = 1;
 const WASH_ALPHA = 0.2;
-const GRAVE_TINT_ALPHA = 0.22;
 const MID_LINE_DASH = 4;
 const FRAME_WIDTH = 2;
 const FLAG_POLE_H = 14;
@@ -169,8 +164,6 @@ const LABEL_FONT_FAMILY = 'Georgia';
 const LABEL_KEYS: Record<BgAtlasLabelId, TranslationKey> = {
   crimsonKeep: 'hudChrome.bg.map.crimsonKeep',
   azureKeep: 'hudChrome.bg.map.azureKeep',
-  crimsonField: 'hudChrome.bg.map.crimsonField',
-  azureField: 'hudChrome.bg.map.azureField',
   ruinCourtyard: 'hudChrome.bg.map.ruinCourtyard',
   graveyard: 'hudChrome.bg.map.graveyard',
 };
@@ -282,52 +275,14 @@ export class BattlegroundMapPainter {
     ctx.stroke();
     ctx.restore();
 
-    // Graveyard plots: dirt inside the rails with a faint side tint (by MAP
-    // side, not home team id: the bottom, own, side reads in your colour).
-    for (const plot of BG_GRAVEYARDS) {
-      const x = plot.x * flip;
-      const z = plot.z * flip;
-      const gx = px(x + plot.hw); // px negates: left edge is the +x bound
-      const gy = py(z + plot.hd);
-      ctx.fillStyle = GRAVE_DIRT;
-      ctx.fillRect(gx, gy, plot.hw * 2 * s, plot.hd * 2 * s);
-      ctx.save();
-      ctx.globalAlpha = GRAVE_TINT_ALPHA;
-      ctx.fillStyle = z < 0 ? own : foe;
-      ctx.fillRect(gx, gy, plot.hw * 2 * s, plot.hd * 2 * s);
-      ctx.restore();
-    }
-
     // Field frame on top of the plan, so the perimeter reads as one edge.
     // Small furniture (pillars, crates, banners) stays OFF the plan on
-    // purpose: the map answers routes and objectives.
+    // purpose: the map answers routes and objectives. The graveyard plots are
+    // drawn GROUND on the plate (their own surface family in the relief core),
+    // so nothing re-stamps them here.
     ctx.strokeStyle = colors.fieldEdge;
     ctx.lineWidth = FRAME_WIDTH;
     ctx.strokeRect(left, top, fieldW, fieldH);
-
-    // Rune pads (static positions; whether a pad is UP is live state the map
-    // deliberately does not scout). Sprint discs, Battle/Ward diamonds.
-    ctx.fillStyle = RUNE_FILL;
-    ctx.strokeStyle = colors.ink;
-    ctx.lineWidth = RUNE_EDGE_WIDTH;
-    for (const pad of BG_SPEED_RUNES) {
-      ctx.beginPath();
-      ctx.arc(px(pad.x * flip), py(pad.z * flip), RUNE_R, 0, FULL_CIRCLE);
-      ctx.fill();
-      ctx.stroke();
-    }
-    for (const pad of BG_POWER_RUNES) {
-      const x = px(pad.x * flip);
-      const y = py(pad.z * flip);
-      ctx.beginPath();
-      ctx.moveTo(x, y - RUNE_R);
-      ctx.lineTo(x + RUNE_R, y);
-      ctx.lineTo(x, y + RUNE_R);
-      ctx.lineTo(x - RUNE_R, y);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-    }
 
     // Flag STANDS (static; live flag positions are deliberately not mapped).
     // The stands are the objective, so they read LARGE: a bold banner glyph
@@ -472,7 +427,8 @@ export class BattlegroundMapPainter {
     bctx.restore();
 
     // 5b. the marks standing on the field: crowns first, then the boulder and
-    //     rubble stipples, each lit from the northwest like the crowns outside.
+    //     rubble stipples, then the headstones on the two graveyard plots, each
+    //     lit from the northwest like the crowns outside.
     for (const mark of marks) {
       if (mark.kind !== 'crown') continue;
       if (Math.abs(mark.x) > halfX || Math.abs(mark.z) > halfZ) continue;
@@ -481,6 +437,10 @@ export class BattlegroundMapPainter {
     for (const mark of marks) {
       if (mark.kind !== 'boulder') continue;
       this.drawMark(bctx, fx(mark.x), fy(mark.z), mark.r * s, BOULDER_FILL, BOULDER_LIT);
+    }
+    for (const mark of marks) {
+      if (mark.kind !== 'headstone') continue;
+      this.drawMark(bctx, fx(mark.x), fy(mark.z), mark.r * s, HEADSTONE_FILL, HEADSTONE_LIT);
     }
 
     // 6. The wall plan: every non-ghost box collider of the field (keep

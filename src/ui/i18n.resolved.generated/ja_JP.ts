@@ -1079,8 +1079,6 @@ export const ja_JP: EnTranslations = {
       "map": {
         "crimsonKeep": "真紅の城塞",
         "azureKeep": "蒼藍の城塞",
-        "crimsonField": "真紅の平原",
-        "azureField": "蒼藍の平原",
         "ruinCourtyard": "廃墟の中庭",
         "graveyard": "墓地"
       }
