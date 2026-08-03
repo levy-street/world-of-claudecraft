@@ -117,10 +117,61 @@ const RIGS = {
     ],
     rock: { bone: 'rig_root', walk: 1.5, run: 2.5 },
   },
+  drakemaw_raptor: {
+    root: 'Root',
+    fwd: -1,
+    // The one BIPED here: a saddle-broken theropod, so the stride is two legs
+    // half a cycle apart rather than diagonal quadruped pairs. Its Tripo rig
+    // came back humanoid (clavicles and hands, no tail bone), which is why the
+    // forelimbs ride in `legs` at a quarter amplitude: same trick grag_bear
+    // uses to swing spine bones as front limbs. Each arm counter-phases the
+    // leg on its own side, so it pumps rather than paddling in sync.
+    //
+    // This entry exists because the imported source clips drove Hip
+    // TRANSLATION half a model unit off the bind pose (baked-in root motion).
+    // Scaled to the ridden height that threw the body ~2.5 yd off the saddle
+    // and cycled it every stride, so the raptor launched back and forth and
+    // the rider appeared to float beside it. Every key here is rest * delta
+    // rotation plus a root Y bob, which cannot leave bind space by
+    // construction: see this file's header contract.
+    legs: [
+      ['L_Thigh', 'L_Calf', 0, 1],
+      ['R_Thigh', 'R_Calf', 0.5, 1],
+      ['L_Upperarm', 'L_Forearm', 0.5, 0.25],
+      ['R_Upperarm', 'R_Forearm', 0, 0.25],
+    ],
+    // Its legs are short for its ridden height (hip 0.43, foot 0.10 on a
+    // 0.94-unit model, so ~34% of height) and it is a top-tier +80% mount at
+    // 12.6 yd/s, which sets up a conflict worth spelling out. Under a perfect
+    // foot match, stride CADENCE is bodySpeed / (2 * stride * normScale): it
+    // depends only on stride LENGTH, never on the clip duration, since
+    // locomotionTimeScale rescales duration away. So on short legs a perfect
+    // foot match forces a frantic cadence (the shared table gave ~3.0
+    // strides/sec, which read as badly sped up), and the only way to calm it is
+    // a longer stride plus a deliberate, bounded amount of slide.
+    // The reach here is pushed to the long end of what a sprinting biped can
+    // sell (58 deg), and the manifest then declares runRef at the ridden speed
+    // so timeScale lands on exactly 1.0 and the clip plays at its authored
+    // cadence: 2 strides/sec. See the manifest entry for the slide that buys.
+    gaits: {
+      Walk: { dur: 0.95, upper: 30, lower: 18 },
+      Run: { dur: 0.5, upper: 58, lower: 34 },
+    },
+    // a running theropod carries its spine level and counter-rotates its
+    // shoulders, so keep the pitch small and let the roll do the work
+    rock: { bone: 'Spine01', walk: 1.2, run: 2.2 },
+    sway: { bone: 'Waist', walk: 1.5, run: 2.8 },
+    head: { bone: 'Head', amp: 3 },
+  },
 };
 
 // gait parameters (angles in degrees, translations in model units; the
-// models are ~0.8 units tall pre-normalization)
+// models are ~0.8 units tall pre-normalization). A rig may override any field
+// per clip via `gaits: { Run: {...} }`, which is how a short-legged rig earns
+// the stride its ridden speed needs: foot-slide is
+// (bodySpeed - stride-derived footSpeed), and locomotionTimeScale can only
+// stretch a clip to 1.6x before it clamps, so a rig whose natural gait is far
+// under its mounted speed cannot be fixed by walkRef/runRef alone.
 const GAITS = {
   Idle: { dur: 3.6, keys: 25 },
   Walk: { dur: 0.9, keys: 19, upper: 26, lower: 16, bob: 0.01, hopH: 0.05 },
@@ -360,7 +411,7 @@ for (const key of targets) {
   }
 
   const makeClip = (name) => {
-    const g = GAITS[name];
+    const g = { ...GAITS[name], ...(cfg.gaits?.[name] ?? {}) };
     const anim = doc.createAnimation(name);
     const times = Float32Array.from({ length: g.keys }, (_, i) => (i / (g.keys - 1)) * g.dur);
     const input = doc

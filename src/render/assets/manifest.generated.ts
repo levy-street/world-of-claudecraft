@@ -736,7 +736,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/foliage/twisted_2.glb": "/media/models/foliage/twisted_2.6ff31dcb2a9c.glb",
   "models/foliage/twisted_3.glb": "/media/models/foliage/twisted_3.1f337078cda9.glb",
   "models/mounts/aether_hover_cycle.glb": "/media/models/mounts/aether_hover_cycle.10935b02e1d8.glb",
-  "models/mounts/drakemaw_raptor.glb": "/media/models/mounts/drakemaw_raptor.1e2a53a97f5e.glb",
+  "models/mounts/drakemaw_raptor.glb": "/media/models/mounts/drakemaw_raptor.44d00a10e348.glb",
   "models/mounts/grag_bear.glb": "/media/models/mounts/grag_bear.767ddb38445d.glb",
   "models/mounts/shadowjump_toad.glb": "/media/models/mounts/shadowjump_toad.2811f4fadfda.glb",
   "models/mounts/stalkglider_snail.glb": "/media/models/mounts/stalkglider_snail.418aa794d44f.glb",

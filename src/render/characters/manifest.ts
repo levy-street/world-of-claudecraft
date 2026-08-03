@@ -954,15 +954,30 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 4.4,
     lazyPreload: true,
   },
-  // The Drakemaw Raptor (broodlord legendary drop): saddle-broken Tripo biped
-  // whose hips-down run cycle ships as Run, retimed as Walk, plus synthesized
-  // Idle bob and side-topple Death (tmp/dragonkin_raptor_gaits.mjs).
+  // The Drakemaw Raptor (broodlord legendary drop): saddle-broken Tripo biped,
+  // gait-baked by scripts/bake_mount_gaits.mjs like the bear/toad/griffin. The
+  // imported source clips drove Hip TRANSLATION half a model unit off the bind
+  // pose (baked-in root motion), which at this height threw the body clear of
+  // the saddle and lurched it every stride; the baker authors rotation-only
+  // keys plus a root Y bob, so that cannot recur. walkRef is MEASURED off the
+  // baked clip (tmp/dragonkin_gait_measure.mjs): walk 3.02 yd/s.
   mount_drakemaw_raptor: {
     url: `${MOUNTS_DIR}/drakemaw_raptor.glb`,
     height: 3.4,
     clips: MOUNT_RIGGED,
-    walkRef: 2.4,
-    runRef: 10,
+    walkRef: 3.0,
+    // runRef is deliberately the RIDDEN speed (RUN_SPEED 7 x +80% = 12.6), not
+    // the Run clip's measured 9.04 yd/s, so timeScale lands on exactly 1.0 and
+    // the clip plays at its authored 2.0 strides/sec (6.3 yd per bound).
+    // Foot-matching instead (runRef 9.04) gives timeScale 1.48 and a 2.96/sec
+    // cadence, which read as badly sped up on a 3.4 yd mount. That is the real
+    // tradeoff on this rig: under a perfect foot match, cadence is
+    // bodySpeed / (2 x stride x normScale) and so depends only on stride
+    // LENGTH, never on clip duration, which timeScale rescales away. Short legs
+    // therefore can only buy a calm cadence with slide. This costs 28%, well
+    // inside what the other baked mounts already ship (grag_bear's 3.58 yd/s
+    // natural against the same 12.6 leaves it sliding over half its travel).
+    runRef: 12.6,
     lazyPreload: true,
   },
 
