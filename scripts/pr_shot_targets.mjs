@@ -1972,9 +1972,10 @@ export const TARGETS = [
           activeTitle: over.activeTitle ?? null,
           joinedAt: over.joinedAt ?? null,
         });
-        // Tenure staging (New under 14 days, Veteran at 90+): both groups carry a
-        // New row, a Veteran row, and a chip-less mid-tenure row so one shot shows
-        // every arm of the badge.
+        // Role staging (one chip per row): the leader and the officer show their
+        // rank labels; a regular member shows the tenure tier AS the role
+        // (Recruit under 7 days, Member 7 to 29 days, Veteran at 30+). Both
+        // groups carry every member tier so one shot shows every arm.
         const day = 24 * 60 * 60 * 1000;
         const now = Date.now();
         // A leaf assignment: socialInfo is typed `null` on the offline Sim, but at
@@ -1997,7 +1998,7 @@ export const TARGETS = [
                 status: 'online',
                 zone: 'zone:stormwind',
                 rank: 'leader',
-                joinedAt: now - 400 * day, // Veteran
+                joinedAt: now - 400 * day, // rank label wins: Guild Master
               }),
               m({
                 id: 2,
@@ -2008,7 +2009,7 @@ export const TARGETS = [
                 status: 'dungeon',
                 zone: 'zone:deadmines',
                 rank: 'officer',
-                joinedAt: now - 40 * day, // mid-tenure, no chip
+                joinedAt: now - 40 * day, // rank label wins: Officer
               }),
               m({
                 id: 3,
@@ -2019,7 +2020,21 @@ export const TARGETS = [
                 status: 'combat',
                 zone: 'zone:elwynn',
                 rank: 'member',
-                joinedAt: now - 5 * day, // New
+                joinedAt: now - 5 * day, // Recruit (under 7 days)
+              }),
+              // The Member and Veteran tiers ride the SHORT offline names (Wisp,
+              // Lyria): an offline row's wide last-seen meta leaves the name span
+              // little room, and a long name (Thornbeard) ellipsizes the chip away
+              // in either desktop grid column.
+              m({
+                id: 6,
+                name: 'Wisp',
+                cls: 'druid',
+                level: 22,
+                online: false,
+                rank: 'member',
+                lastLogin: null,
+                joinedAt: now - 15 * day, // Member (7 to 29 days)
               }),
               m({
                 id: 4,
@@ -2029,7 +2044,7 @@ export const TARGETS = [
                 online: false,
                 rank: 'member',
                 lastLogin: '2026-07-18T20:15:00.000Z',
-                joinedAt: now - 120 * day, // Veteran
+                joinedAt: now - 120 * day, // Veteran (30 days or more)
               }),
               m({
                 id: 5,
@@ -2039,17 +2054,7 @@ export const TARGETS = [
                 online: false,
                 rank: 'member',
                 lastLogin: '2026-07-10T11:00:00.000Z',
-                joinedAt: now - 30 * day, // mid-tenure, no chip
-              }),
-              m({
-                id: 6,
-                name: 'Wisp',
-                cls: 'druid',
-                level: 22,
-                online: false,
-                rank: 'member',
-                lastLogin: null,
-                joinedAt: now - 2 * day, // New
+                joinedAt: now - 45 * day, // Veteran (name truncates, Lyria shows the chip)
               }),
             ],
           },
@@ -2062,24 +2067,44 @@ export const TARGETS = [
       if (!staged.ok) throw new Error(staged.reason);
       const open = await pollForSize(page, '#social-window');
       if (!open) return {};
-      // Switch to the Guild tab (the strip fires on data-tab), then optionally engage
-      // the hide-offline toggle for the hidden variant.
+      // Switch to the Guild tab (the strip fires on data-tab), then drive the
+      // hide-offline toggle to the variant's state. The toggle PERSISTS to
+      // localStorage, so a click-only "engage" would leak the hidden state from
+      // the desktop-hidden variant into the mobile shot (same browser profile);
+      // syncing on aria-pressed makes every variant deterministic.
       await page.evaluate((hide) => {
         document.querySelector('.soc-tab[data-tab="guild"]')?.click();
-        if (hide) document.querySelector('[data-act="toggle-hide-offline"]')?.click();
+        const toggle = document.querySelector('[data-act="toggle-hide-offline"]');
+        const on = toggle?.getAttribute('aria-pressed') === 'true';
+        if (hide !== on) toggle?.click();
       }, variant?.hide === true);
       await wait(400);
-      if (variant?.mobile) {
-        // The short landscape viewport parks the roster below the billboard
-        // editor; scroll the first group header into view so the shot shows
-        // rows (rank + tenure chips), not just the guild chrome.
-        await page.evaluate(() => {
+      // The roster sits below the billboard editor in the scrollable body. On
+      // desktop, scroll the first group header into view so both groups' role
+      // chips are in frame (Guild Master / Officer / Recruit online, Member /
+      // Veteran offline). The short mobile viewport fits only about three rows,
+      // so there anchor the LAST ONLINE row (the Recruit) instead: the frame then
+      // holds the member-tier run (Recruit / Member / Veteran), the part of the
+      // roster the one-chip role change is about.
+      await page.evaluate((mobile) => {
+        if (mobile) {
+          // Anchor the Recruit row's TEXT (skip its top padding) so the ~3-row
+          // viewport reaches one line further down, far enough that the first
+          // offline Veteran row's name line and chip clear the fold too.
+          const body = document.querySelector('#social-window .soc-body');
+          const rows = document.querySelectorAll('#social-window .soc-row');
+          const row = rows[2];
+          if (body && row) {
+            const delta = row.getBoundingClientRect().top - body.getBoundingClientRect().top;
+            body.scrollTop += delta + 8;
+          }
+        } else {
           document
             .querySelector('#social-window .soc-group-head')
             ?.scrollIntoView({ block: 'start' });
-        });
-        await wait(300);
-      }
+        }
+      }, variant?.mobile === true);
+      await wait(300);
       return { clip: '#social-window' };
     },
   },
