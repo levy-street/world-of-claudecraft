@@ -228,10 +228,14 @@ export function scenePose(
     }
     const t = clamp01((nowSec - s.releaseStartAt) / SCENE_RELEASE_SEC);
     const g = sceneCameraEase(t);
-    const target = s.releasePose ?? s.prePose ?? live;
-    out.yaw = lerpAngle(from.yaw, target.yaw, g);
-    out.pitch = lerp(from.pitch, target.pitch, g);
-    out.dist = lerp(from.dist, target.dist, g);
+    const authored = s.releasePose;
+    const gameplay = s.prePose ?? live;
+    // An authored release pose restores DIRECTION (yaw/pitch); the player's
+    // zoom is gameplay state, so dist eases back to the pre-scene camera
+    // distance unless the pose explicitly authors one.
+    out.yaw = lerpAngle(from.yaw, authored?.yaw ?? gameplay.yaw, g);
+    out.pitch = lerp(from.pitch, authored?.pitch ?? gameplay.pitch, g);
+    out.dist = lerp(from.dist, authored?.dist ?? gameplay.dist, g);
     out.focusX = lerp(from.focusX, live.playerX, g);
     out.focusY = lerp(from.focusY, live.playerY, g);
     out.focusZ = lerp(from.focusZ, live.playerZ, g);
@@ -352,7 +356,7 @@ function restoreGameplayPose(s: SceneDirectorState, live: SceneLivePose, out: Sc
   const target = s.releasePose ?? s.prePose;
   out.yaw = target?.yaw ?? live.yaw;
   out.pitch = target?.pitch ?? live.pitch;
-  out.dist = target?.dist ?? live.dist;
+  out.dist = s.releasePose?.dist ?? s.prePose?.dist ?? live.dist;
   out.focusX = live.playerX;
   out.focusY = live.playerY;
   out.focusZ = live.playerZ;
