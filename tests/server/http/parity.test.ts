@@ -1178,7 +1178,7 @@ describe('/internal dispatch parity (legacy flag vs new flag)', () => {
     expect(stableStringify(newCap)).toBe(stableStringify(oldCap));
   });
 
-  it('POST /internal/discord/members-meta with the correct secret and no members is an authed 200 { updated: 0 }, identical old-vs-new', async () => {
+  it('POST /internal/discord/members-meta with the correct secret and no members is an authed 200 zero report, identical old-vs-new', async () => {
     const { oldCap, newCap } = await captureWithEnv({ [DISCORD_ENV]: PARITY_SECRET }, () =>
       makeReq({
         method: 'POST',
@@ -1188,9 +1188,14 @@ describe('/internal dispatch parity (legacy flag vs new flag)', () => {
       }),
     );
     expect(oldCap.status).toBe(200);
+    // The endpoint now reports what it APPLIED, not what it read: `updated` still
+    // counts the records accepted (the bot treats a zero on a NON-empty push as a
+    // refusal), and changed/skipped/unapplied say what became of them. Both
+    // dispatch arms share one implementation, so the identity check below is what
+    // proves a behavior edit cannot land on only one of them.
     expect(JSON.parse(oldCap.body as string)).toEqual({
       success: true,
-      data: { updated: 0 },
+      data: { updated: 0, changed: 0, skipped: 0, unapplied: [] },
       error: null,
     });
     expect(stableStringify(newCap)).toBe(stableStringify(oldCap));

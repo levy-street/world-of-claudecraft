@@ -331,7 +331,7 @@ describe('daily reward payout moderation persistence', () => {
 
     await expect(
       new PgDailyRewardDb().markPayout('2026-07-14', 1, 'paid', 'authoritative-signature', null),
-    ).resolves.toBe(true);
+    ).resolves.toBe('already');
     expect(h.state.row).toMatchObject({
       status: 'paid',
       tx_signature: 'authoritative-signature',

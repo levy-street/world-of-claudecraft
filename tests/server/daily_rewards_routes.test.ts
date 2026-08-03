@@ -42,7 +42,7 @@ const h = vi.hoisted(() => {
     spin: null as { outcomeKey: string; points: number; createdAt: string } | null,
     recentPayouts: [] as unknown[],
     pendingPayouts: [] as unknown[],
-    markPayoutOk: true,
+    markPayoutOutcome: 'updated' as 'updated' | 'already' | 'missing',
     claimPayoutResult: { outcome: 'not_found' } as unknown,
     claimPayoutResendResult: { outcome: 'not_found' } as unknown,
     markPayoutResendOk: true,
@@ -81,7 +81,7 @@ const h = vi.hoisted(() => {
     pendingPayouts: vi.fn(async (_limit: number) => state.pendingPayouts),
     unannouncedWinnerDays: vi.fn(async () => [] as unknown[]),
     markWinnersAnnounced: vi.fn(async () => true),
-    markPayout: vi.fn(async () => state.markPayoutOk),
+    markPayout: vi.fn(async () => state.markPayoutOutcome),
     claimPayout: vi.fn(async () => state.claimPayoutResult),
     claimPayoutResend: vi.fn(async () => state.claimPayoutResendResult),
     markPayoutResend: vi.fn(async () => state.markPayoutResendOk),
@@ -147,6 +147,7 @@ vi.mock('../../server/woc_balance', async (importOriginal) => {
 
 import {
   bustDailyRewardBoardCache,
+  bustDailyRewardWinnersCache,
   DailyRewardService,
   dailyRewardService,
   resetDailyRewardDbForTests,
@@ -351,7 +352,7 @@ beforeEach(() => {
   h.state.spin = null;
   h.state.recentPayouts = [];
   h.state.pendingPayouts = [];
-  h.state.markPayoutOk = true;
+  h.state.markPayoutOutcome = 'updated';
   h.state.claimPayoutResult = { outcome: 'not_found' };
   h.state.claimPayoutResendResult = { outcome: 'not_found' };
   h.state.markPayoutResendOk = true;
@@ -367,8 +368,12 @@ beforeEach(() => {
   // ensureDay/seedTasks pair (the ensureDayThrows case would never reach its throw).
   resetDailyRewardSeedGateForTests();
   // The routes drive the module-load singleton, whose instance board cache
-  // would otherwise leak a board snapshot across tests.
+  // would otherwise leak a board snapshot across tests. The winner-days
+  // snapshot is the same shape of instance state on the same singleton (the
+  // finalize route below busts it for real), so it is reset here too rather
+  // than left to be discovered by whichever test first reads winners.
   bustDailyRewardBoardCache();
+  bustDailyRewardWinnersCache();
   // Default: the gate secret and the config URL are unset, so the config falls back
   // (no fetch) and the ops gate fails closed unless a test opts in.
   delete process.env[OPS_SECRET_ENV];
@@ -793,7 +798,7 @@ describe('ops mark-payout validation', () => {
   });
 
   it('404s when markPayout finds no matching row', async () => {
-    h.state.markPayoutOk = false;
+    h.state.markPayoutOutcome = 'missing';
     const r = await runRoute('POST', '/internal/daily-rewards/mark-payout', {
       headers: OPS_HEADERS,
       body: { day: '2026-07-01', rank: 1, status: 'paid', txSignature: 'signature' },
@@ -804,7 +809,7 @@ describe('ops mark-payout validation', () => {
   });
 
   it('200s { ok: true } when markPayout succeeds', async () => {
-    h.state.markPayoutOk = true;
+    h.state.markPayoutOutcome = 'updated';
     const r = await runRoute('POST', '/internal/daily-rewards/mark-payout', {
       headers: OPS_HEADERS,
       body: { day: '2026-07-01', rank: 1, status: 'paid', txSignature: 'sig' },

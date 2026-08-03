@@ -10308,4 +10308,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.heatingUp': '热身',
   'hudChrome.auraOverlay.procs.arcaneCharge': '奥术充能',
   'hudChrome.auraOverlay.procs.aetherRush': '以太奔涌',
+  'itemUi.vendor.buyStack': '购买 {count} 个',
+  'itemUi.vendor.buyStackAria': '以 {price} 购买 {count} 个 {item}',
 };

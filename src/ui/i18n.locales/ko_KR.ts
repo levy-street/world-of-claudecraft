@@ -10787,4 +10787,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.heatingUp': '달아오름',
   'hudChrome.auraOverlay.procs.arcaneCharge': '비전 충전',
   'hudChrome.auraOverlay.procs.aetherRush': '에테르 쇄도',
+  'itemUi.vendor.buyStack': '{count}개 구매',
+  'itemUi.vendor.buyStackAria': '{price}에 {item} {count}개 구매',
 };

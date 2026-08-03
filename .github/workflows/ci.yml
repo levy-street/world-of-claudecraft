@@ -39,7 +39,7 @@ concurrency:
 #                 job's wall time is the slowest shard, not the whole suite.
 #
 #   pr-checks     the PR tier's serialized checks (i18n freshness + coverage
-#                 summary, malware gate, game/admin typecheck, env/server/client
+#                 summary, malware gate, game/admin typecheck, env/server/bot/client
 #                 builds), parallel with pr-gate. Same triggers as pr-gate.
 #
 #   release-gate  full 21-locale TEST job. Runs on release/** pushes and on the
@@ -55,7 +55,7 @@ concurrency:
 #                 alone carries the tier flag).
 #
 # The release tier is a superset: its `npm test` runs every PR-tier check plus the
-# release-only ones; typecheck and the three builds live in release-checks.
+# release-only ones; typecheck and the four builds live in release-checks.
 #
 # Path filters (D10): a cheap `changes` job classifies pull_request diffs as
 # code vs docs-only. Docs/markdown/screenshot-only PRs keep lint (and any other
@@ -405,6 +405,12 @@ jobs:
       - name: Build server
         run: npm run build:server
 
+      # The Discord bot bundles from the same tree and ships in the same image
+      # (Dockerfile runs build:bot), so a broken bot bundle must fail here rather
+      # than on the production host during docker compose up --build.
+      - name: Build Discord bot
+        run: npm run build:bot
+
       - name: Build client
         run: npm run build
 
@@ -527,6 +533,11 @@ jobs:
 
       - name: Build server
         run: npm run build:server
+
+      # Same reason as the PR-tier job: the bot bundles from this tree and ships
+      # in the same image, so a broken bot bundle fails here, not on the host.
+      - name: Build Discord bot
+        run: npm run build:bot
 
       - name: Build client
         run: npm run build

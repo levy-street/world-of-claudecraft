@@ -113,7 +113,7 @@ import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack
 import { fogFarForBuiltGround } from './chunk_residency_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { buildCliffScree, type CliffScreeView } from './cliff_scree';
-import { CompileGateQueue } from './compile_gate';
+import { CompileGateQueue, settlePendingSwap } from './compile_gate';
 import { trackWebGLContext } from './context_release';
 import {
   animatesEveryFrame,
@@ -962,6 +962,13 @@ export interface EntityView {
   // in so a plain hide would not be overwritten later the same frame. See #2571.
   mountCompilePending: boolean;
   visualCompilePending: boolean;
+  // Same gate shape as mountCompilePending/visualCompilePending (the lazy form roots'
+  // .visible is also recomputed every tick, see the "lazy form visuals" block), but
+  // shared across sheep/bear/cat/travel as ONE token instead of four flags: at most
+  // one form is ever active or newly built per entity per frame (see the mutually
+  // exclusive polyed/bear/cat/travel booleans), so a single field naming the pending
+  // form's root, cleared via settlePendingSwap, is enough. See #2571.
+  formCompilePending: THREE.Object3D | null;
   lastOverheadEmoteKey: string | null;
   recklessOn?: boolean;
   // render-space position last frame, for true u/s locomotion speed
@@ -6850,6 +6857,7 @@ export class Renderer {
       compileReady: null,
       mountCompilePending: false,
       visualCompilePending: false,
+      formCompilePending: null,
       lastOverheadEmoteKey: null,
       lastX: e.pos.x,
       lastZ: e.pos.z,
@@ -8554,11 +8562,18 @@ export class Renderer {
 
       // lazy form visuals, swapped by visibility like the old sheep/bear rigs
       // A null build leaves the field unset; the shared gate retries after its cooldown.
+      // A freshly built form root is exactly a brand-new rig's materials linking for
+      // the first time (same as a race/mech base-visual swap), so it is gated the
+      // same way instead of freezing the frame the form lands on (#2571).
       if (polyed && !v.sheepVisual) {
         const built = this.createCharacterVisualWithRetry(e, 'form_sheep', 'form_sheep');
         if (built) {
           v.sheepVisual = built;
           v.group.add(built.root); // group.scale already carries e.scale
+          v.formCompilePending = built.root;
+          this.gateSwapFlagOnCompile(built.root, () => {
+            v.formCompilePending = settlePendingSwap(v.formCompilePending, built.root);
+          });
         }
       }
       if (bear && !v.bearVisual) {
@@ -8566,6 +8581,10 @@ export class Renderer {
         if (built) {
           v.bearVisual = built;
           v.group.add(built.root);
+          v.formCompilePending = built.root;
+          this.gateSwapFlagOnCompile(built.root, () => {
+            v.formCompilePending = settlePendingSwap(v.formCompilePending, built.root);
+          });
         }
       }
       if (cat && !v.catVisual) {
@@ -8573,6 +8592,10 @@ export class Renderer {
         if (built) {
           v.catVisual = built;
           v.group.add(built.root);
+          v.formCompilePending = built.root;
+          this.gateSwapFlagOnCompile(built.root, () => {
+            v.formCompilePending = settlePendingSwap(v.formCompilePending, built.root);
+          });
         }
       }
       if (travel && !v.travelVisual) {
@@ -8580,12 +8603,27 @@ export class Renderer {
         if (built) {
           v.travelVisual = built;
           v.group.add(built.root);
+          v.formCompilePending = built.root;
+          this.gateSwapFlagOnCompile(built.root, () => {
+            v.formCompilePending = settlePendingSwap(v.formCompilePending, built.root);
+          });
         }
       }
-      if (v.sheepVisual) v.sheepVisual.root.visible = polyed;
-      if (v.bearVisual) v.bearVisual.root.visible = bear;
-      if (v.catVisual) v.catVisual.root.visible = cat;
-      if (v.travelVisual) v.travelVisual.root.visible = travel;
+      // Gated per form root: the per-frame recompute below AND the pending token
+      // both drive .visible, so a still-linking form pops in a frame or two late
+      // instead of stalling the frame it is entered on.
+      if (v.sheepVisual) {
+        v.sheepVisual.root.visible = polyed && v.formCompilePending !== v.sheepVisual.root;
+      }
+      if (v.bearVisual) {
+        v.bearVisual.root.visible = bear && v.formCompilePending !== v.bearVisual.root;
+      }
+      if (v.catVisual) {
+        v.catVisual.root.visible = cat && v.formCompilePending !== v.catVisual.root;
+      }
+      if (v.travelVisual) {
+        v.travelVisual.root.visible = travel && v.formCompilePending !== v.travelVisual.root;
+      }
       // rideable mount under the player (the lazy form-visual pattern). Mount
       // GLBs are lazyPreload: the first sight of a rider kicks the fetch and
       // the visual appears once ready. A druid form replaces the whole body,

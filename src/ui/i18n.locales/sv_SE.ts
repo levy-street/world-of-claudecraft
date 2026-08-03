@@ -6078,6 +6078,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.decline': 'Avböj',
   'hud.prompts.duelRequest': '{name} har utmanat dig på en duell!',
   'hud.prompts.guildInvite': '{name} bjuder in dig att gå med i {guild}.',
+  'hud.prompts.guildInviteCancelled':
+    'En väntande gillesinbjudan avbröts eftersom gillet bytte namn.',
+  'hud.prompts.guildRenamed': 'Ditt gille har bytt namn till {name} av modereringsteamet.',
   'hud.prompts.joinGuild': 'Gå med i gille',
   'hud.prompts.joinParty': 'Gå med i grupp',
   'hud.prompts.openTrade': 'Öppna byteshandel',
@@ -10884,4 +10887,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.riftTracker.closesIn': 'Stänger om {time}',
   'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
   'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
+  'hud.core.chatChannels.moveHint':
+    'Ordna om fliken {channel}: dra den, eller använd Alt+vänster och Alt+höger',
+  'itemUi.vendor.buyStack': 'Köp {count}',
+  'itemUi.vendor.buyStackAria': 'Köp {count} {item} för {price}',
 };
