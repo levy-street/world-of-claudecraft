@@ -400,7 +400,12 @@ describe('CI workflow parity', () => {
 
     // Red-path structural: a paths-ignore on either release job would silently
     // shrink release-tier enforcement on a docs-only release push.
-    for (const name of ['release-gate', 'release-checks', 'release-version-gate'] as const) {
+    for (const name of [
+      'release-gate',
+      'release-i18n',
+      'release-checks',
+      'release-version-gate',
+    ] as const) {
       const job = jobSource(name);
       expect(job).not.toContain('paths-ignore');
       expect(job).not.toContain('needs.changes');

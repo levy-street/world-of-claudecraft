@@ -224,6 +224,7 @@ export function parseGateProfileArgs(argv) {
  *
  * @param {number} workers
  * @param {{
+ *   releaseTier?: boolean,
  *   skipBrowser?: boolean,
  *   skipBuilds?: boolean,
  *   skipVitest?: boolean,

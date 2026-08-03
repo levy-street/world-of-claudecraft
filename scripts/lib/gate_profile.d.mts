@@ -88,6 +88,8 @@ export declare function parseGateProfileArgs(argv: ReadonlyArray<string>): GateP
 export declare function buildGateProfileSteps(
   workers: number,
   opts?: {
+    /** Forwarded to buildFullGateSteps: adds the dedicated release-tier i18n step. */
+    releaseTier?: boolean;
     skipBrowser?: boolean;
     skipBuilds?: boolean;
     skipVitest?: boolean;

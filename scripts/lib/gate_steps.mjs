@@ -43,6 +43,7 @@ export const I18N_ARTIFACTS = Object.freeze([
  *
  * @param {number} workers
  * @param {{
+ *   releaseTier?: boolean,
  *   skipBrowser?: boolean,
  *   skipBuilds?: boolean,
  *   skipVitest?: boolean,

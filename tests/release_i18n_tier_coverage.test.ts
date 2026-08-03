@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { I18N_RELEASE_TIER_SUITES } from '../scripts/lib/gate_steps.mjs';
+import { buildFullGateSteps, I18N_RELEASE_TIER_SUITES } from '../scripts/lib/gate_steps.mjs';
 import { tsFilesUnder } from './helpers/ts_files_under';
 
 // The anti-rot guard for the release-tier split (issue #2820).
@@ -112,5 +112,38 @@ describe('the tier flag lives in exactly one job', () => {
     );
     const ifLine = (job: string) => /^\s{4}if: .+$/m.exec(job)?.[0]?.trim();
     expect(ifLine(releaseI18n)).toBe(ifLine(releaseGate));
+  });
+});
+
+describe('the local gate carries the same split as CI', () => {
+  // tests/ci_workflow.test.ts only string-matches the `buildFullGateSteps(workers,
+  // { releaseTier })` CALL. Deleting the `if (opts.releaseTier)` body would leave that
+  // match, CI's release-i18n job, and the three-way list pin all green while
+  // `npm run gate` on a release branch silently stopped running the tier at all. This
+  // pins the produced step instead of the call site.
+  const prTier = buildFullGateSteps(8);
+  const releaseTier = buildFullGateSteps(8, { releaseTier: true });
+  const named = (steps: ReturnType<typeof buildFullGateSteps>, name: string) =>
+    steps.find((step) => step.name === name);
+
+  it('adds exactly one step on a release branch', () => {
+    expect(releaseTier.length).toBe(prTier.length + 1);
+    expect(named(prTier, 'vitest (release-tier i18n)')).toBeUndefined();
+  });
+
+  it('runs the tier suites under the flag, and nothing else', () => {
+    const step = named(releaseTier, 'vitest (release-tier i18n)');
+    expect(step?.env?.I18N_RELEASE_TIER).toBe('1');
+    expect(step?.args.filter((arg) => arg.endsWith('.test.ts'))).toEqual([
+      ...I18N_RELEASE_TIER_SUITES,
+    ]);
+  });
+
+  it('leaves the full suite at PR tier in both shapes', () => {
+    // The whole point of the split: the full run must never carry the flag, or the
+    // masking this fixes comes straight back locally.
+    for (const steps of [prTier, releaseTier]) {
+      expect(named(steps, 'vitest (full suite)')?.env?.I18N_RELEASE_TIER).toBeUndefined();
+    }
   });
 });

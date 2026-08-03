@@ -420,14 +420,18 @@ jobs:
       - name: Build client
         run: npm run build
 
-  # The release tier is two parallel jobs: release-gate runs the full 21-locale
-  # test suite while release-checks runs the serialized checks, so the release
-  # critical path is max(tests, checks) instead of tests-then-builds on shard 1.
+  # A release ref runs THREE parallel jobs: release-gate (this one) runs the test
+  # suite at PR tier, release-i18n runs the release TIER over the suites that read
+  # the flag, and release-checks runs the serialized checks, so the release critical
+  # path is max(tests, tier, checks) instead of tests-then-builds on shard 1.
   # Locally `npm run gate` (scripts/gate.mjs) still runs the SAME combined step
-  # list serially with ONE full unsharded vitest by design; keep that script's
-  # step list in sync when adding or removing a step in either job.
+  # list serially with ONE full unsharded vitest by design, plus the same dedicated
+  # release-tier step; keep that script's step list in sync when adding or removing
+  # a step in any of the three jobs.
   release-gate:
-    name: Release gate (full 21-locale)
+    # NOT "21-locale": since #2820 the 21-locale assertions live in release-i18n, and
+    # the label is what an operator reads in the checks list to tell the two reds apart.
+    name: Release gate (tests)
     if: (github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))
     runs-on: ubuntu-latest
 

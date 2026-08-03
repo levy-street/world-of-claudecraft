@@ -12,6 +12,8 @@ export interface FullGateStep {
 export function buildFullGateSteps(
   workers: number,
   opts?: {
+    /** Adds the dedicated `vitest (release-tier i18n)` step (see I18N_RELEASE_TIER_SUITES). */
+    releaseTier?: boolean;
     skipBrowser?: boolean;
     skipBuilds?: boolean;
     skipVitest?: boolean;
