@@ -305,6 +305,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/goblin.glb": "/media/models/creatures/goblin.a128051c0b50.glb",
   "models/creatures/golelingevolved.glb": "/media/models/creatures/golelingevolved.156f4c2dcf93.glb",
   "models/creatures/greyjaw.glb": "/media/models/creatures/greyjaw.b78718b95a66.glb",
+  "models/creatures/grubjaw.glb": "/media/models/creatures/grubjaw.e97cb80508f9.glb",
   "models/creatures/leaping_fish.glb": "/media/models/creatures/leaping_fish.3df008156018.glb",
   "models/creatures/mushroom_pixie.glb": "/media/models/creatures/mushroom_pixie.8186e2c99bf3.glb",
   "models/creatures/orc.glb": "/media/models/creatures/orc.6c59f0f4a163.glb",

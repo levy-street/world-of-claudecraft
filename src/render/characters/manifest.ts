@@ -238,6 +238,18 @@ const DRAGONKIN_WHELP: ClipMap = {
   death: 'Death',
   flourish: 'JumpAttack',
 };
+// Grubjaw the Glutton (the Mirefen Marsh rare): his own Tripo sculpt on the
+// 25-bone mixamorig core, auto-skinned by tmp/grubjaw_build.mjs. Two authored
+// swings rotate per attack (a bare Punch and the bigger WeaponA haymaker);
+// Death is a synthesized hips topple, since the drop ships no death clip.
+const GRUBJAW: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Punch', 'WeaponA'],
+  death: 'Death',
+};
+
 // Clipless two-state prop mobs (the dragonkin egg): the GLB ships NO clips, so
 // every action() lookup misses harmlessly (fadeTo null-guards) and the mesh
 // just stands; state changes are mesh-visibility swaps
@@ -1163,6 +1175,22 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.2, // keep the green readable
   },
+  // The Mirefen Marsh rare, replacing his stand-in generic-troll body. Only
+  // the `grubjaw` template maps here (MOB_KEYS below), so every other troll
+  // keeps mob_troll. Gait refs measured (tmp/dragonkin_gait_measure.mjs) at
+  // his template scale 1.3: walk 2.90 (wander 2.63 -> 0.91x), run 6.25
+  // (chase 7.5 -> 1.20x), both inside the matcher's clamps.
+  mob_grubjaw: {
+    url: `${CREATURES}/grubjaw.glb`,
+    height: 2.9,
+    clips: GRUBJAW,
+    walkRef: 2.9,
+    runRef: 6.25,
+    // faint wash only, matching mob_troll: his own texture carries the
+    // colour and a heavy tint floods it with the template green
+    tint: 'entity',
+    tintStrength: 0.1,
+  },
   mob_troll: {
     url: `${CREATURES}/orc.glb`,
     height: 2.4,
@@ -1776,6 +1804,8 @@ const MOB_KEYS: Record<string, string> = {
   dragonkin_broodguard: 'mob_dragonkin_broodguard',
   dragonkin_whelp: 'mob_dragonkin_whelp',
   dragonkin_egg: 'mob_dragon_egg',
+  // Grubjaw the Glutton: his own body now, not the shared troll stand-in.
+  grubjaw: 'mob_grubjaw',
   // Ambient Highwatch stable horse: the Valorsteed mount model (mob_stable_horse
   // above) so it renders as an animated horse, not a humanoid.
   stable_horse: 'mob_stable_horse',

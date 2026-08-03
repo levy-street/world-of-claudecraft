@@ -2638,9 +2638,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 12,
         "rare": true,
         "templateId": "grubjaw",
-        "model": "mob_troll",
+        "model": "mob_grubjaw",
         "tint": "#145a32",
-        "still": "/guide-stills/mob_troll__145a32.webp"
+        "still": "/guide-stills/mob_grubjaw__145a32.webp"
       },
       {
         "name": "Dune Troll",
@@ -9996,6 +9996,12 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "idle": "Idle",
     "height": 2.4,
     "tintStrength": 0.12
+  },
+  "mob_grubjaw": {
+    "url": "models/creatures/grubjaw.glb",
+    "idle": "Idle",
+    "height": 2.9,
+    "tintStrength": 0.1
   },
   "mob_dark_caster": {
     "url": "models/chars/players/mage.glb",
