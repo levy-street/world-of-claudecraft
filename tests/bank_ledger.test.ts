@@ -562,6 +562,12 @@ describe('recordGuildBankDeltas + guildCreateFeeDelta (the FIFO writer)', () => 
       purchasedSlotsAfter: 0,
       container: 'guild',
       containerId: 913,
+      // The differ sees only the BOOK, so an unstamped delta carries no
+      // counterparty side and the columns bind NULL. The stamp is the dispatch
+      // observer's job (server/game.ts runGuildBankOp), pinned end to end in
+      // tests/bank_counterparty.test.ts.
+      counterpartyCopperDelta: null,
+      counterpartyCount: null,
     });
   });
 
@@ -577,6 +583,10 @@ describe('recordGuildBankDeltas + guildCreateFeeDelta (the FIFO writer)', () => 
       purchasedSlotsAfter: 0,
       container: 'guild',
       containerId: 913,
+      // The counterparty IS the founder's purse and it paid exactly the
+      // recorded fee, so the two halves plus the fee's burn sum to zero.
+      counterpartyCopperDelta: -100000,
+      counterpartyCount: 0,
     });
   });
 
@@ -619,6 +629,13 @@ describe('recordGuildBankDeltas + guildCreateFeeDelta (the FIFO writer)', () => 
       purchasedSlotsAfter: 0,
       container: 'guild',
       containerId: 913,
+      // Mirrored from the acting character's side: the discarded work would
+      // have moved 39_000 INTO that purse, which is the direction an operator
+      // reads first. Derived from the discarded op log, not snapshotted (the
+      // ops are long gone), so it is a report and takes no part in the audit's
+      // per-op balance identity.
+      counterpartyCopperDelta: 39_000,
+      counterpartyCount: null,
     });
   });
 

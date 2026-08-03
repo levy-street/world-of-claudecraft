@@ -41,6 +41,15 @@ export interface BankOpDelta {
   // replay, so they leave it absent.
   purchasedSlotsBefore?: number;
   purchasedSlotsAfter: number;
+  // The COUNTERPARTY side (server/guild_bank_counterparty.ts): signed copper
+  // and signed item count the ACTING CHARACTER'S purse and bags moved under
+  // this op, from the same before/after snapshot pair the container side above
+  // comes from. Set by the dispatch observer AFTER the diff (the differ sees
+  // only the book), persisted to bank_ledger, and never part of the escrow
+  // replay: the guild path always stamps a number, the personal path leaves
+  // both absent, and absent means NOT RECORDED, never zero.
+  counterpartyCopperDelta?: number | null;
+  counterpartyCount?: number | null;
 }
 
 type BankSlot = BankInfo['slots'][number];
@@ -330,7 +339,11 @@ export function diffGuildBankOp(
 // diffGuildBankOp (it needs the success signal to mark the book dirty), so
 // this only enqueues; an empty array writes nothing.
 export function recordGuildBankDeltas(
-  op: GuildBankLedgerOp | 'create_fee' | typeof GUILD_BANK_ESCROW_DEFICIT_OP,
+  op:
+    | GuildBankLedgerOp
+    | 'create_fee'
+    | typeof GUILD_BANK_ESCROW_DEFICIT_OP
+    | typeof GUILD_BANK_COUNTERPARTY_ORPHAN_OP,
   who: { characterId: number; accountId: number },
   guildId: number,
   deltas: readonly BankOpDelta[],
@@ -351,6 +364,11 @@ export function recordGuildBankDeltas(
             purchasedSlotsAfter: delta.purchasedSlotsAfter,
             container: 'guild',
             containerId: guildId,
+            // The payer/payee half. A guild delta always carries it (the
+            // observer stamps every one), so a NULL in this column can only
+            // ever mean a pre-feature row.
+            counterpartyCopperDelta: delta.counterpartyCopperDelta ?? null,
+            counterpartyCount: delta.counterpartyCount ?? null,
           }),
         )
         .catch((err) => {
@@ -379,6 +397,48 @@ export function recordGuildBankDeltas(
 // excludes them from the item, treasury, and ladder replays.
 export const GUILD_BANK_ESCROW_DEFICIT_OP = 'escrow_deficit';
 
+// The COUNTERPARTY ORPHAN op. Also not an op a player performed: a guild bank
+// op that moved the acting character's purse or bags while the guild book did
+// not move AT ALL. The book diff is empty there, so without this row the
+// observer writes nothing and scripts/bank_audit.mjs replays a book that
+// reconciles perfectly against a ledger that never mentioned the value that
+// left it. That is precisely the failure mode the counterparty columns exist
+// to detect, in its purest form, so it gets a row of its own rather than being
+// inferred from an absence. No legitimate op can reach it (every op moves both
+// sides or refuses and moves neither), so any row with this op is a defect
+// report; scripts/bank_audit.mjs reports every one and excludes them from the
+// item, treasury, and ladder replays (the value moved OUTSIDE the book).
+export const GUILD_BANK_COUNTERPARTY_ORPHAN_OP = 'counterparty_orphan';
+
+// The counterparty copper the DISCARDED work of an escrow rollback would have
+// moved in the acting character's purse, DERIVED from the discarded op log
+// rather than snapshotted (the ops are long gone by the time the rollback is
+// recorded, and their live snapshots with them).
+//
+// It is a report, not a movement: nothing happened under an escrow_deficit
+// row, so it takes no part in the audit's per-op balance identity, exactly as
+// it takes no part in the item, treasury, and ladder replays. It is here
+// because direction is the first thing an operator needs, and "which way was
+// the purse going" is the question the container-side aggregate cannot answer:
+// a session whose purse was FILLING from the book is the shape that would have
+// minted, and one whose purse was emptying into it is the shape that would
+// have lost the player value.
+function discardedPurseCopper(op: string, copperDelta: number): number {
+  switch (op) {
+    // The treasury gained/lost this copper, so the purse did the opposite.
+    case 'deposit_gold':
+    case 'withdraw_gold':
+      return -copperDelta;
+    // Ladder rung 0 was paid by the acting officer's own purse, and the
+    // recorded delta IS that payment (never treasury copper).
+    case 'open_bank':
+      return copperDelta;
+    // Rungs 1+ came out of the treasury; item ops and purges move no copper.
+    default:
+      return 0;
+  }
+}
+
 // ONE row per rollback event, never one per delta: the log can hold up to
 // GUILD_BANK_UNFLUSHED_OP_CAP entries and bank_ledger is keep-forever, so a
 // per-delta row is an unbounded write amplifier on a table nothing prunes.
@@ -404,15 +464,29 @@ export function recordGuildBankEscrowRollback(
 ): void {
   let copper = 0;
   let items = 0;
+  // The same aggregate seen from the acting character's side: what the
+  // discarded work would have moved in that character's own purse and bags.
+  let purseCopper = 0;
+  let purseItems = 0;
   for (const d of discarded) {
     // open_bank's copper is the acting officer's PURSE paying for rung 0, which
     // the book never held; counting it would over-report book movement by the
     // rung price on every log containing an opening.
     if (d.op !== 'open_bank') copper += Number(d.copperDelta) || 0;
+    purseCopper += discardedPurseCopper(d.op, Number(d.copperDelta) || 0);
     if (d.itemId !== null && d.itemId === deficit?.itemId) {
       const n = Math.max(0, Math.floor(Number(d.count)) || 0);
-      if (d.op === 'deposit') items += n;
-      else if (d.op === 'withdraw') items -= n;
+      if (d.op === 'deposit') {
+        items += n;
+        // The book would have gained the copies, so the bags gave them up.
+        purseItems -= n;
+      } else if (d.op === 'withdraw') {
+        items -= n;
+        purseItems += n;
+      }
+      // admin_purge is deliberately absent from both sums: it destroys a copy
+      // rather than moving it, so neither the operator nor the carrier's bags
+      // were ever a counterparty to it.
     }
   }
   recordGuildBankDeltas(GUILD_BANK_ESCROW_DEFICIT_OP, who, guildId, [
@@ -423,6 +497,38 @@ export function recordGuildBankEscrowRollback(
       copperDelta: copper,
       purchasedSlotsBefore: 0,
       purchasedSlotsAfter: 0,
+      counterpartyCopperDelta: purseCopper,
+      counterpartyCount: deficit?.itemId ? purseItems : null,
+    },
+  ]);
+}
+
+/** ONE row for a guild bank op whose book half did not move while the acting
+ *  character's purse or bags did. See GUILD_BANK_COUNTERPARTY_ORPHAN_OP for
+ *  why it exists at all; this is the writer, kept beside the deficit writer so
+ *  both anomaly shapes share the same FIFO tail and the same fire-and-forget
+ *  discipline as an ordinary op row.
+ *
+ *  `copperDelta` (the container side) is 0 by definition here: the book moved
+ *  nothing. The counterparty columns carry the movement, and the row therefore
+ *  fails the audit's balance identity BY CONSTRUCTION, which is the point. */
+export function recordGuildBankCounterpartyOrphan(
+  who: { characterId: number; accountId: number },
+  guildId: number,
+  purchasedSlotsAfter: number,
+  orphan: { itemId: string | null; count: number | null; copperDelta: number },
+  evidence: unknown,
+): void {
+  recordGuildBankDeltas(GUILD_BANK_COUNTERPARTY_ORPHAN_OP, who, guildId, [
+    {
+      itemId: orphan.itemId,
+      count: orphan.count,
+      instance: evidence,
+      copperDelta: 0,
+      purchasedSlotsBefore: purchasedSlotsAfter,
+      purchasedSlotsAfter,
+      counterpartyCopperDelta: orphan.copperDelta,
+      counterpartyCount: orphan.count ?? 0,
     },
   ]);
 }
@@ -441,5 +547,13 @@ export function guildCreateFeeDelta(chargedCopper: number): BankOpDelta {
     copperDelta: -chargedCopper,
     purchasedSlotsBefore: 0,
     purchasedSlotsAfter: 0,
+    // The counterparty IS the founder's purse, and `chargedCopper` is what the
+    // gate actually took from it (the reserve-at-gate charge, re-read from the
+    // reservation, never a client number), so the two columns agree by
+    // construction on a correct charge: the book gained nothing, the purse
+    // paid the fee, and the fee left the world. A row where they DISAGREE is a
+    // founder who paid a different amount than the fee that was recorded.
+    counterpartyCopperDelta: -chargedCopper,
+    counterpartyCount: 0,
   };
 }

@@ -21,6 +21,18 @@
 // an EMPTY book (a disbanded guild: the disband guard proves both were zero)
 // but skips the purchased reconciliation (expansions survive to the last row).
 //
+// THE COUNTERPARTY CHECK. Every replay described above reads the CONTAINER
+// side of each row and reconciles it against the container, which is
+// self-consistent by construction: it can never see value that left the book
+// for a purse and never came back, and that is the shape of every guild bank
+// dupe there has been. Guild rows now also record the PAYER/PAYEE side (the
+// acting character's purse and bags, from the same server-derived before/after
+// snapshot), so each op is a closed system and conservation is arithmetic on
+// one row: book side + counterparty side + sink = 0. See
+// checkCounterpartyBalance below. Rows with no recorded counterparty side
+// (pre-feature rows, and every personal-container row) are SKIPPED, never read
+// as balanced, and the report says how many were skipped.
+//
 // OPERATOR CAVEAT: run against a QUIESCED realm (or accept false positives).
 // The ledger rows are written fire-and-forget at op time while the book rows
 // land later on the fenced escrow save, so a live realm's unflushed window
@@ -61,8 +73,143 @@ export const OPEN_BANK_SLOTS_AFTER = 24;
 // that would have minted had it been allowed to commit), positive means it was
 // putting value IN. The report states the direction rather than assuming one.
 export const ESCROW_DEFICIT_OP = 'escrow_deficit';
+
+// The COUNTERPARTY ORPHAN op (server/bank_ledger.ts
+// GUILD_BANK_COUNTERPARTY_ORPHAN_OP): a guild bank op that moved the acting
+// character's purse or bags while the guild book did not move at all. No
+// legitimate op produces one, so every row of this op is reported outright.
+// Like the deficit row it takes no part in the item, treasury, or ladder
+// replays: the value it describes moved OUTSIDE the book, which is exactly
+// why the book-only replay could never see it.
+export const COUNTERPARTY_ORPHAN_OP = 'counterparty_orphan';
+
+// Rows that describe something OTHER than a value movement in the book. Both
+// are excluded from every replay (items, treasury, ladder monotonicity) and
+// from the per-op counterparty balance below.
+const ANOMALY_OPS = new Set([ESCROW_DEFICIT_OP, COUNTERPARTY_ORPHAN_OP]);
+
 export const GUILD_BUY_POSITIONS = [30, 36, 42, 48, 54, 60];
 const GUILD_BUY_POSITION_SET = new Set(GUILD_BUY_POSITIONS);
+
+// ---------------------------------------------------------------------------
+// The COUNTERPARTY (payer/payee) balance. THE CHECK THIS SCRIPT WAS MISSING.
+//
+// Before the counterparty columns existed, every guild finding here was
+// derived from bank_ledger rows and reconciled against the guild book, i.e.
+// from the book's own side of every op against the book. That replay is
+// SELF-CONSISTENT BY CONSTRUCTION and can therefore never detect a mint that
+// ends up sitting in a player's purse: value that crosses the purse/book
+// boundary in one direction only leaves the book side perfectly explicable.
+// Every dupe this feature had was exactly that shape.
+//
+// With `counterparty_copper_delta` / `counterparty_count` recorded, each op is
+// a closed system and conservation is arithmetic on ONE row:
+//
+//   book side  +  counterparty side  +  sink  =  0
+//
+// where the sink is the value the op deliberately removed from the world (a
+// ladder rung's price, the guild creation fee, an operator purge's destroyed
+// copy). Both derivations below read only the row's own op and columns.
+//
+// NOTE on copper_delta's overload, which is why `bookCopper` is not simply
+// that column: for deposit_gold / withdraw_gold / buy_slots it IS the
+// treasury's movement, but for open_bank and create_fee it records the PURSE
+// payment (the treasury never held that copper, which is why the treasury
+// replay above excludes both). Reading it uniformly would double-count those
+// two.
+
+/** Copper the guild's TREASURY moved under this row. */
+function bookCopperDelta(row) {
+  switch (row.op) {
+    case 'deposit_gold':
+    case 'withdraw_gold':
+    case 'buy_slots':
+      return Number(row.copper_delta) || 0;
+    default:
+      // open_bank / create_fee are purse-paid; item ops and purges move none.
+      return 0;
+  }
+}
+
+/** Copper this row removed from the world entirely (a positive burn). */
+function copperSinkOf(row) {
+  switch (row.op) {
+    case 'buy_slots':
+    case 'open_bank':
+    case 'create_fee':
+      // copper_delta is the negated price on all three, so the burn is its
+      // negation. A ladder rung and a creation fee are paid to nobody.
+      return -(Number(row.copper_delta) || 0);
+    default:
+      return 0;
+  }
+}
+
+/** Signed count of `item_id` the BOOK gained under this row. */
+function bookItemDelta(row) {
+  const n = Number(row.count) || 0;
+  switch (row.op) {
+    case 'deposit':
+      return n;
+    case 'withdraw':
+    case 'admin_purge':
+      return -n;
+    default:
+      return 0;
+  }
+}
+
+/** Copies this row removed from the world entirely (a positive destruction).
+ *  Only the operator purge destroys: a withdraw hands the copy to the actor,
+ *  which is what its counterparty count says. */
+function itemSinkOf(row) {
+  return row.op === 'admin_purge' ? Number(row.count) || 0 : 0;
+}
+
+/** True when this row records a counterparty side at all. NULL on BOTH columns
+ *  means NOT RECORDED (a pre-feature row, or a personal-container row, which
+ *  never writes one), and the balance is skipped rather than evaluated against
+ *  an assumed zero: reading absence as balance would turn every legacy row
+ *  into a false all-clear, which is the exact failure this check exists to
+ *  stop being possible. */
+function hasCounterparty(row) {
+  return row.counterparty_copper_delta != null || row.counterparty_count != null;
+}
+
+/** The per-op balance identity, evaluated on one guild row. */
+function checkCounterpartyBalance(row, base, findings) {
+  if ((row.container ?? 'personal') !== 'guild') return;
+  // Anomaly rows describe work that did not land (deficit) or report the
+  // imbalance themselves (orphan); neither is a movement to balance.
+  if (ANOMALY_OPS.has(row.op)) return;
+  if (!hasCounterparty(row)) return;
+
+  const cpCopper = Number(row.counterparty_copper_delta) || 0;
+  const copperSum = bookCopperDelta(row) + cpCopper + copperSinkOf(row);
+  if (copperSum !== 0) {
+    findings.push({
+      ...base,
+      kind: 'counterparty_copper_imbalance',
+      detail:
+        `${row.op} row ${row.id} does not conserve copper: the book moved ${bookCopperDelta(row)}, ` +
+        `the acting character's purse moved ${cpCopper}, and ${copperSinkOf(row)} was burned, ` +
+        `leaving ${copperSum} ${copperSum > 0 ? 'MINTED' : 'DESTROYED'}`,
+    });
+  }
+
+  const cpCount = Number(row.counterparty_count) || 0;
+  const itemSum = bookItemDelta(row) + cpCount + itemSinkOf(row);
+  if (itemSum !== 0) {
+    findings.push({
+      ...base,
+      kind: 'counterparty_item_imbalance',
+      detail:
+        `${row.op} row ${row.id} does not conserve ${row.item_id ?? 'items'}: the book moved ` +
+        `${bookItemDelta(row)}, the acting character's bags moved ${cpCount}, and ${itemSinkOf(row)} ` +
+        `was destroyed, leaving ${itemSum} ${itemSum > 0 ? 'MINTED' : 'DESTROYED'}`,
+    });
+  }
+}
 
 // A multiset key over an item: its id plus a stable serialization of the
 // per-instance payload (null when absent). Both the ledger `instance` column and
@@ -243,6 +390,26 @@ function checkRowShape(row, findings) {
         }. Nothing durable was minted or lost; reaching this needs one officer to consume ` +
         'value another officer never made durable and then for that officer to vanish.',
     });
+  } else if (row.op === COUNTERPARTY_ORPHAN_OP) {
+    const copper = Number(row.counterparty_copper_delta) || 0;
+    const count = Number(row.counterparty_count) || 0;
+    const parts = [];
+    if (copper !== 0) {
+      parts.push(`${Math.abs(copper)} copper ${copper > 0 ? 'into' : 'out of'} the purse`);
+    }
+    if (row.item_id != null && count !== 0) {
+      parts.push(`${Math.abs(count)} x ${row.item_id} ${count > 0 ? 'into' : 'out of'} the bags`);
+    }
+    findings.push({
+      ...base,
+      kind: 'counterparty_orphan',
+      detail:
+        `counterparty orphan row ${row.id}: a guild bank op moved the acting character's ` +
+        `purse/bags while the guild book did not move at all (${
+          parts.length > 0 ? parts.join(', ') : 'no recorded movement'
+        }). Value crossed the purse/book boundary in ONE direction, which no legitimate op ` +
+        'can do. The evidence payload names the attempted op and the whole movement.',
+    });
   } else if (row.op === 'create_fee') {
     // The founder's purse paid the (positive) creation fee; a newborn guild
     // has no expansions yet.
@@ -271,7 +438,8 @@ function checkRowShape(row, findings) {
     row.op === 'create_fee' ||
     row.op === 'open_bank' ||
     row.op === 'admin_purge' ||
-    row.op === ESCROW_DEFICIT_OP;
+    row.op === ESCROW_DEFICIT_OP ||
+    row.op === COUNTERPARTY_ORPHAN_OP;
   if (guildOnlyOp && container !== 'guild') {
     findings.push({
       ...base,
@@ -295,8 +463,23 @@ export function auditBank({ ledgerRows, characters, guildBanks }) {
   const findings = [];
   const rows = [...ledgerRows].sort((a, b) => Number(a.id) - Number(b.id));
 
-  // A) Per-row shape checks.
-  for (const row of rows) checkRowShape(row, findings);
+  // A) Per-row shape checks, plus the per-op counterparty balance (the one
+  // check that can see across the purse/book boundary).
+  for (const row of rows) {
+    checkRowShape(row, findings);
+    checkCounterpartyBalance(
+      row,
+      {
+        container: row.container ?? 'personal',
+        realm: row.realm,
+        characterId: row.character_id,
+        ...((row.container ?? 'personal') === 'guild'
+          ? { guildId: row.container_id == null ? null : Number(row.container_id) }
+          : {}),
+      },
+      findings,
+    );
+  }
 
   // Group id-ascending rows: personal per character, guild per GUILD
   // (container_id), because guild item conservation only holds across the
@@ -352,9 +535,10 @@ export function auditBank({ ledgerRows, characters, guildBanks }) {
     let prevPurchased = null;
     let finalPurchased = null;
     for (const row of group.rows) {
-      // Anomaly rows describe work that did NOT land, so they carry no ladder
+      // Anomaly rows describe work that did NOT land in the book (a rolled-
+      // back escrow, or value that moved outside it), so they carry no ladder
       // position and must not drag the monotonicity scan backwards.
-      if (row.op === ESCROW_DEFICIT_OP) continue;
+      if (ANOMALY_OPS.has(row.op)) continue;
       const after = Number(row.purchased_slots_after);
       if (!Number.isFinite(after)) continue;
       if (prevPurchased !== null && after < prevPurchased) {
@@ -580,9 +764,22 @@ export function formatReport(ledgerRows, findings) {
 
   lines.push('Bank ledger conservation audit');
   for (const container of [...containers].sort()) {
-    const rowCount = ledgerRows.filter((r) => (r.container ?? 'personal') === container).length;
+    const rows = ledgerRows.filter((r) => (r.container ?? 'personal') === container);
     const findingCount = findings.filter((f) => f.container === container).length;
-    lines.push(`container ${container}: ledger rows ${rowCount}: findings ${findingCount}`);
+    lines.push(`container ${container}: ledger rows ${rows.length}: findings ${findingCount}`);
+    // How much of the guild container the counterparty balance could actually
+    // judge. A row with no recorded counterparty side is SKIPPED by that
+    // check, so a report that did not say so would read as a stronger
+    // all-clear than it is: the skipped rows are exactly the ones whose
+    // purse/book conservation this audit still cannot see.
+    if (container === 'guild') {
+      const unbalanceable = rows.filter(
+        (r) => !ANOMALY_OPS.has(r.op) && !hasCounterparty(r),
+      ).length;
+      lines.push(
+        `container guild: rows with no recorded counterparty side (pre-feature, unbalanceable): ${unbalanceable}`,
+      );
+    }
   }
   for (const finding of findings) {
     // Guild findings name the guild (the group key); personal ones the character.
@@ -621,8 +818,13 @@ async function main() {
   });
   try {
     const ledger = await pool.query(
+      // Two more columns, no new predicate: this is the same single ordered
+      // scan of the whole table it always was, so it needs no new index (the
+      // recorded deferral about paginating this read with a keyset cursor once
+      // bank_ledger reaches millions of rows still stands, unchanged).
       `SELECT id, realm, character_id, op, item_id, count, instance,
-              copper_delta, purchased_slots_after, container, container_id
+              copper_delta, purchased_slots_after, container, container_id,
+              counterparty_copper_delta, counterparty_count
          FROM bank_ledger
         ORDER BY id`,
     );

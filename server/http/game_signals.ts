@@ -18,7 +18,7 @@
 // CARDINALITY IS BOUNDED BY DESIGN, same contract as server/http/metrics.ts: the
 // only label values here are the ws-message direction (a fixed two), the
 // inbound drop cause (the fixed seven-value WS_DROP_CAUSES set), the guild-bank
-// incident kind (the fixed six-value GUILD_BANK_INCIDENTS set), the copper-flow
+// incident kind (the fixed seven-value GUILD_BANK_INCIDENTS set), the copper-flow
 // source, the harvest band and node tier (the fixed sets in
 // server/economy_telemetry.ts), and the fishing band and rod recipe id (the
 // fixed sets in server/fishing_telemetry.ts, whose zone label reuses the same
@@ -54,7 +54,7 @@ export const WS_DROP_CAUSES = [
 export type WsDropCause = (typeof WS_DROP_CAUSES)[number];
 
 /**
- * The fixed six guild-bank incident kinds. Every one of these is an abnormal
+ * The fixed seven guild-bank incident kinds. Every one of these is an abnormal
  * event on a DUPE-SENSITIVE path (the escrow save, the lease fence-out revert,
  * the reconcile, the durable-truth read, the keep-forever ledger) that
  * otherwise reports only through console.error / console.warn, i.e. it is
@@ -83,6 +83,13 @@ export type WsDropCause = (typeof WS_DROP_CAUSES)[number];
  *   operator-visible outage for that guild, not a transient.
  * - `ledger_write_failed`: a bank_ledger insert rejected, so the audit trail
  *   (scripts/bank_audit.mjs) has a hole the replay cannot see.
+ * - `counterparty_orphan`: a guild bank op moved the acting character's purse
+ *   or bags while the guild book did not move at all
+ *   (server/guild_bank_counterparty.ts). Value crossed the purse/book boundary
+ *   in ONE direction, which is the dupe signature the counterparty ledger
+ *   columns exist to make visible, and no legitimate op can produce it. Paged
+ *   on alongside `escrow_quarantined`: a single sample is a defect, not a
+ *   transient.
  * This closed set IS the kind label's whole vocabulary; it never grows
  * per-guild or per-player (guild id is NEVER a label; the loud log line beside
  * each increment carries the identifying detail).
@@ -94,9 +101,10 @@ export const GUILD_BANK_INCIDENTS = [
   'reconcile',
   'book_unloaded',
   'ledger_write_failed',
+  'counterparty_orphan',
 ] as const;
 
-/** One of the fixed six guild-bank incident kinds. */
+/** One of the fixed seven guild-bank incident kinds. */
 export type GuildBankIncident = (typeof GUILD_BANK_INCIDENTS)[number];
 
 /**

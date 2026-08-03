@@ -113,6 +113,7 @@ import {
   type GuildBankLedgerOp,
   guildCreateFeeDelta,
   recordBankOp,
+  recordGuildBankCounterpartyOrphan,
   recordGuildBankDeltas,
   recordGuildBankEscrowRollback,
 } from './bank_ledger';
@@ -198,6 +199,15 @@ import { fishingBandLabel, isKoi, isRodFeeRecipe } from './fishing_telemetry';
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
 import { forEachGuarded, runGuarded } from './guarded_iter';
+import {
+  type CounterpartyActor,
+  counterpartyIdle,
+  counterpartyMovement,
+  counterpartyOrphan,
+  counterpartyOrphanEvidence,
+  counterpartySnapshot,
+  stampCounterpartyDeltas,
+} from './guild_bank_counterparty';
 import {
   consumeGuildBankOpToken,
   createGuildBankOpGuard,
@@ -4409,9 +4419,31 @@ export class GameServer {
       'pid' in target
         ? this.sim.guildBankInfoFor(target.pid)
         : this.sim.guildBankInfoForGuild(target.guildId);
+    // The COUNTERPARTY read, taken from the SAME instants as the book read so
+    // both halves of the op describe one moment. Server-derived throughout:
+    // the acting character's live purse and bags off the sim's own meta, never
+    // anything the client sent. The operator purge path has no acting
+    // character, so its counterparty is null on both sides and the movement
+    // resolves to a recorded ZERO (the copy is destroyed, not handed to
+    // anybody), which is what lets the audit check a purge instead of skipping
+    // it.
+    //
+    // counterpartySnapshot COPIES the quantities out. `meta.inventory` is the
+    // live array the sim mutates in place, so holding it across run() would
+    // difference every item movement to zero and pass everything silently.
+    const readCounterparty = () => {
+      if (!('pid' in target)) return null;
+      const meta = this.sim.meta(target.pid);
+      const actor: CounterpartyActor | null = meta
+        ? { copper: meta.copper, inventory: meta.inventory }
+        : null;
+      return counterpartySnapshot(actor);
+    };
     const before = read();
+    const actorBefore = readCounterparty();
     run();
     const after = read();
+    const movement = counterpartyMovement(actorBefore, readCounterparty());
     // Rung 0 of the ladder OPENS the bank from the acting officer's own PURSE
     // (the sim decides which rung is next off the BEFORE book); it gets its
     // own ledger op name so the audit's treasury replay can exclude the
@@ -4426,13 +4458,47 @@ export class GameServer {
         ? 'open_bank'
         : op;
     const deltas = diffGuildBankOp(effectiveOp, before, after);
-    if (deltas.length === 0) return;
     // A successful player op requires a stamped officer-plus membership, and
     // the stamp cannot change inside the synchronous run() above. The operator
     // path names its guild outright (it has no acting player to read).
     const guildId =
       'pid' in target ? this.sim.meta(target.pid)?.guildMembership?.guildId : target.guildId;
+    if (deltas.length === 0) {
+      // The book did not move. If the acting character's purse or bags DID,
+      // this op moved value across the purse/book boundary in one direction
+      // only, which is the mint (or the loss) the counterparty side exists to
+      // catch, and it is the one shape that writes no ordinary row at all. No
+      // legitimate op reaches here, so it is recorded loudly rather than
+      // returned from silently: an anomaly ledger row for the offline audit, a
+      // counter for production alerting, and the log line that names the guild.
+      if (guildId !== undefined && !counterpartyIdle(movement)) {
+        const orphan = counterpartyOrphan(movement);
+        if (orphan) {
+          gameMetricsCounters().guildBankIncident('counterparty_orphan');
+          console.error(
+            `guild bank counterparty orphan on ${effectiveOp} for guild ${guildId} (character ${session.characterId}): the book did not move but the acting character's purse/bags did (copper ${orphan.copperDelta}${orphan.itemId ? `, ${orphan.count} x ${orphan.itemId}` : ''})`,
+          );
+          const who =
+            'pid' in target
+              ? session
+              : { characterId: session.characterId, accountId: target.actorAccountId };
+          recordGuildBankCounterpartyOrphan(
+            who,
+            guildId,
+            after?.purchasedSlots ?? before?.purchasedSlots ?? 0,
+            orphan,
+            counterpartyOrphanEvidence(effectiveOp, movement),
+          );
+        }
+      }
+      return;
+    }
     if (guildId === undefined) return;
+    // Stamp the payer/payee half onto the rows the book diff produced. The
+    // stamp DRAINS the movement across the deltas, so the recorded numbers sum
+    // to exactly what moved and a multi-row op can never book one purse
+    // movement twice.
+    stampCounterpartyDeltas(deltas, movement);
     this.markGuildBankDirty(session, guildId);
     // Record the op in the session's unflushed log: this log is the escrow
     // save's WRITE PAYLOAD (replayed forward onto durable truth) and the

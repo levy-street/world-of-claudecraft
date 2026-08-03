@@ -324,6 +324,9 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
       'reconcile',
       'book_unloaded',
       'ledger_write_failed',
+      // A guild bank op that moved a purse while the book stood still: the
+      // dupe signature the bank_ledger counterparty columns exist to surface.
+      'counterparty_orphan',
     ]);
 
     // Scrape BEFORE any increment: an alert rule cannot fire on a series that

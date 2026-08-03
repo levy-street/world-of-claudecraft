@@ -4,6 +4,7 @@ import {
   auditBank,
   type BankAuditFinding,
   type BankLedgerAuditRow,
+  COUNTERPARTY_ORPHAN_OP,
   formatReport,
   GUILD_BUY_POSITIONS,
   OPEN_BANK_SLOTS_AFTER,
@@ -235,6 +236,252 @@ describe('the audit ladder mirror (lockstep with src/sim/guild_bank.ts)', () => 
     // Guild buy_slots (rungs 1+) after-positions are every ladder position
     // past the opened base.
     expect([...GUILD_BUY_POSITIONS]).toEqual([...GUILD_BANK_LADDER_POSITIONS].slice(2));
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The COUNTERPARTY (payer/payee) balance: book side + counterparty side + sink
+// = 0, per op. This is the ONLY check here that can see across the purse/book
+// boundary; everything else reconciles the book against rows derived from the
+// book, which is self-consistent by construction.
+// ---------------------------------------------------------------------------
+/** The same guild session, with each op's counterparty side filled in. */
+const BALANCED_SESSION: BankLedgerAuditRow[] = [
+  // The founder's purse paid the creation fee, and the fee left the world.
+  G({ id: 1, op: 'create_fee', copper_delta: -10_000, counterparty_copper_delta: -10_000 }),
+  // Ladder rung 0: the opening officer's own purse, also burned.
+  G({
+    id: 2,
+    op: 'open_bank',
+    copper_delta: -90_000,
+    purchased_slots_after: 24,
+    counterparty_copper_delta: -90_000,
+  }),
+  // The purse is the exact mirror of the treasury, both directions.
+  G({
+    id: 3,
+    op: 'deposit_gold',
+    copper_delta: 80_000,
+    purchased_slots_after: 24,
+    counterparty_copper_delta: -80_000,
+  }),
+  G({
+    id: 4,
+    op: 'withdraw_gold',
+    copper_delta: -30_000,
+    purchased_slots_after: 24,
+    counterparty_copper_delta: 30_000,
+  }),
+  // The bags are the exact mirror of the book, both directions.
+  G({
+    id: 5,
+    op: 'deposit',
+    item_id: 'wolf_fang',
+    count: 5,
+    purchased_slots_after: 24,
+    counterparty_copper_delta: 0,
+    counterparty_count: -5,
+  }),
+  G({
+    id: 6,
+    op: 'withdraw',
+    item_id: 'wolf_fang',
+    count: 2,
+    purchased_slots_after: 24,
+    counterparty_copper_delta: 0,
+    counterparty_count: 2,
+  }),
+  // A treasury-paid expansion moves no purse at all; the price is burned.
+  G({
+    id: 7,
+    op: 'buy_slots',
+    copper_delta: -25_000,
+    purchased_slots_after: 30,
+    counterparty_copper_delta: 0,
+  }),
+  // An operator purge hands the copy to nobody: it is destroyed.
+  G({
+    id: 8,
+    op: 'admin_purge',
+    item_id: 'wolf_fang',
+    count: 1,
+    purchased_slots_after: 30,
+    counterparty_copper_delta: 0,
+    counterparty_count: 0,
+  }),
+];
+
+const BALANCED_BOOK = [
+  {
+    guild_id: 913,
+    realm: 'Claudemoon',
+    data: { treasury: 25_000, inventory: [{ itemId: 'wolf_fang', count: 2 }], purchasedSlots: 30 },
+  },
+];
+
+/** Strip the counterparty side off every row: this is EXACTLY the ledger this
+ *  audit had before the columns existed, and it is the control every case
+ *  below runs against. */
+const withoutCounterparty = (rows: BankLedgerAuditRow[]): BankLedgerAuditRow[] =>
+  rows.map((r) => ({ ...r, counterparty_copper_delta: null, counterparty_count: null }));
+
+describe('auditBank (the counterparty balance)', () => {
+  it('a known-good session with both halves recorded reports CLEAN', () => {
+    expect(
+      auditBank({ ledgerRows: BALANCED_SESSION, characters: [], guildBanks: BALANCED_BOOK }),
+    ).toEqual([]);
+  });
+
+  it('CATCHES a withdraw whose purse gained more than the treasury lost', () => {
+    // The synthetic mint, as a ledger fixture: the treasury gave up 30_000 and
+    // the acting purse received 45_000. The book side alone is impeccable.
+    const rows = BALANCED_SESSION.map((r) =>
+      r.id === 4 ? { ...r, counterparty_copper_delta: 45_000 } : r,
+    );
+    const findings = auditBank({ ledgerRows: rows, characters: [], guildBanks: BALANCED_BOOK });
+    expect(findings.map((f) => f.kind)).toEqual(['counterparty_copper_imbalance']);
+    expect(findings[0].detail).toContain('15000 MINTED');
+    expect(findings[0]).toMatchObject({ container: 'guild', guildId: 913 });
+
+    // THE CONTROL. Remove the check's input and the report goes silent on the
+    // same data: the book still reconciles perfectly against the ledger,
+    // because the book is not where the 15_000 went. That is the structural
+    // gap this column closes, demonstrated rather than asserted.
+    expect(
+      auditBank({
+        ledgerRows: withoutCounterparty(rows),
+        characters: [],
+        guildBanks: BALANCED_BOOK,
+      }),
+    ).toEqual([]);
+  });
+
+  it('CATCHES a deposit whose bags gave up fewer copies than the book gained', () => {
+    const rows = BALANCED_SESSION.map((r) => (r.id === 5 ? { ...r, counterparty_count: -2 } : r));
+    const findings = auditBank({ ledgerRows: rows, characters: [], guildBanks: BALANCED_BOOK });
+    expect(findings.map((f) => f.kind)).toEqual(['counterparty_item_imbalance']);
+    expect(findings[0].detail).toContain('3 MINTED');
+    expect(
+      auditBank({
+        ledgerRows: withoutCounterparty(rows),
+        characters: [],
+        guildBanks: BALANCED_BOOK,
+      }),
+    ).toEqual([]);
+  });
+
+  it('CATCHES value DESTROYED as readily as value minted', () => {
+    // Direction matters to an operator: a withdraw whose purse received less
+    // than the treasury paid out is a player being robbed, not a dupe.
+    const rows = BALANCED_SESSION.map((r) =>
+      r.id === 4 ? { ...r, counterparty_copper_delta: 10_000 } : r,
+    );
+    const findings = auditBank({ ledgerRows: rows, characters: [], guildBanks: BALANCED_BOOK });
+    expect(findings[0].detail).toContain('-20000 DESTROYED');
+  });
+
+  it('checks EVERY op arm, not only the gold ones', () => {
+    // Per-dimension negatives: each op's own balance must be load-bearing, so
+    // one broken row per op must produce exactly one finding.
+    const perOp: [number, Partial<BankLedgerAuditRow>, string][] = [
+      [1, { counterparty_copper_delta: 0 }, 'create_fee'], // fee charged to nobody
+      [2, { counterparty_copper_delta: 0 }, 'open_bank'], // rung 0 opened for free
+      [3, { counterparty_copper_delta: 0 }, 'deposit_gold'], // treasury filled from nowhere
+      [7, { counterparty_copper_delta: -25_000 }, 'buy_slots'], // charged twice
+      [8, { counterparty_count: 1 }, 'admin_purge'], // purge that handed the copy over
+    ];
+    for (const [id, patch, op] of perOp) {
+      const rows = BALANCED_SESSION.map((r) => (r.id === id ? { ...r, ...patch } : r));
+      const kinds = auditBank({
+        ledgerRows: rows,
+        characters: [],
+        guildBanks: BALANCED_BOOK,
+      }).map((f) => f.kind);
+      expect(`${op}:${kinds.join(',')}`).toBe(
+        `${op}:counterparty_${id === 8 ? 'item' : 'copper'}_imbalance`,
+      );
+    }
+  });
+
+  it('SKIPS a row with no recorded counterparty side rather than reading it as balanced', () => {
+    // Pre-feature rows and personal-container rows carry NULL. Treating an
+    // absence as a zero would call every legacy row balanced, which is exactly
+    // the false all-clear this check exists to stop being possible.
+    expect(
+      auditBank({
+        ledgerRows: withoutCounterparty(BALANCED_SESSION),
+        characters: [],
+        guildBanks: BALANCED_BOOK,
+      }),
+    ).toEqual([]);
+    // A HALF-recorded row is still checked: recording one column is enough to
+    // claim the op was measured, so the other reads as the zero it says it is.
+    const halfRecorded = BALANCED_SESSION.map((r) =>
+      r.id === 4 ? { ...r, counterparty_copper_delta: null, counterparty_count: 0 } : r,
+    );
+    expect(
+      auditBank({ ledgerRows: halfRecorded, characters: [], guildBanks: BALANCED_BOOK }).map(
+        (f) => f.kind,
+      ),
+    ).toEqual(['counterparty_copper_imbalance']);
+  });
+
+  it('never balances a PERSONAL row: that container records no counterparty side', () => {
+    const rows = [
+      L({ id: 1, op: 'deposit', item_id: 'wolf_fang', count: 2, counterparty_count: 999 }),
+    ];
+    expect(
+      auditBank({
+        ledgerRows: rows,
+        characters: [
+          {
+            id: 1,
+            realm: 'Claudemoon',
+            state: { bank: { inventory: [{ itemId: 'wolf_fang', count: 2 }], purchasedSlots: 0 } },
+          },
+        ],
+      }),
+    ).toEqual([]);
+  });
+
+  it('reports a counterparty_orphan row outright and keeps it out of every replay', () => {
+    const rows = [
+      ...BALANCED_SESSION,
+      G({
+        id: 99,
+        op: COUNTERPARTY_ORPHAN_OP,
+        item_id: null,
+        count: null,
+        copper_delta: 0,
+        purchased_slots_after: 0, // must NOT drag the ladder monotonicity back
+        counterparty_copper_delta: 12_345,
+        counterparty_count: 0,
+        instance: { attemptedOp: 'withdraw_gold', copper: 12_345, items: {} },
+      }),
+    ];
+    const findings = auditBank({ ledgerRows: rows, characters: [], guildBanks: BALANCED_BOOK });
+    // Exactly one finding: the orphan itself. The treasury replay, the item
+    // replay, and the ladder scan all ignore it, because the value it
+    // describes moved OUTSIDE the book, which is why it was invisible before.
+    expect(findings.map((f) => f.kind)).toEqual(['counterparty_orphan']);
+    expect(findings[0].detail).toContain('12345 copper into the purse');
+    expect(findings[0].detail).toContain('did not move at all');
+  });
+
+  it('reports how many guild rows it could NOT balance, so silence is never mistaken for proof', () => {
+    const report = formatReport(
+      withoutCounterparty(BALANCED_SESSION),
+      auditBank({
+        ledgerRows: withoutCounterparty(BALANCED_SESSION),
+        characters: [],
+        guildBanks: BALANCED_BOOK,
+      }),
+    );
+    expect(report).toContain(
+      'container guild: rows with no recorded counterparty side (pre-feature, unbalanceable): 8',
+    );
+    // A fully recorded ledger reports zero unbalanceable rows.
+    expect(formatReport(BALANCED_SESSION, [])).toContain('unbalanceable): 0');
   });
 });
 

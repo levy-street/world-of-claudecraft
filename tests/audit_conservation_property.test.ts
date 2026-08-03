@@ -157,6 +157,12 @@ const store = vi.hoisted(() => {
         purchased_slots_after: row.purchasedSlotsAfter,
         container: row.container,
         container_id: row.containerId,
+        // The COUNTERPARTY (payer/payee) side. Carried through here so the P3
+        // audit reconciliation below checks the per-op balance identity on
+        // rows the REAL server wrote, over every sequence the sweeps generate,
+        // not only on the hand-built fixtures in tests/bank_audit.test.ts.
+        counterparty_copper_delta: row.counterpartyCopperDelta,
+        counterparty_count: row.counterpartyCount,
       });
     }),
     loadGuildBankRows: vi.fn(async () =>

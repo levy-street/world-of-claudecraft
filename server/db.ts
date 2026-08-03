@@ -1066,6 +1066,22 @@ CREATE TABLE IF NOT EXISTS bank_ledger (
 );
 CREATE INDEX IF NOT EXISTS bank_ledger_character ON bank_ledger(character_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS bank_ledger_created ON bank_ledger(created_at);
+-- The COUNTERPARTY side of a guild bank row: what the ACTING CHARACTER'S purse
+-- and bags gave or received under the same op, taken from the same
+-- server-derived before/after snapshot the container side comes from (never
+-- from client data). Without it a guild-side replay is self-consistent BY
+-- CONSTRUCTION: every dupe this feature ever had moved value between a purse
+-- and a book, and none of them were visible to scripts/bank_audit.mjs, which
+-- is the failure mode that audit exists to detect.
+--
+-- Additive and NULLABLE with no default on purpose. NULL means NOT RECORDED,
+-- which is exactly what every pre-feature row is and what every 'personal'
+-- container row still is (the personal bank writes no counterparty side), and
+-- the audit SKIPS those rather than reading a 0 default as a balanced op,
+-- which would turn silence into a false all-clear. Signed from the acting
+-- character's point of view: negative means the purse/bags GAVE.
+ALTER TABLE bank_ledger ADD COLUMN IF NOT EXISTS counterparty_copper_delta BIGINT;
+ALTER TABLE bank_ledger ADD COLUMN IF NOT EXISTS counterparty_count INT;
 -- Earned-deed records: one row per (character, deed), written fire-and-forget
 -- off the game loop by server/deeds_records.ts, an OBSERVER of the sim's
 -- deedUnlocked events. The characters.state blob stays the gameplay source of
@@ -4346,7 +4362,14 @@ export interface BankLedgerRow {
     // The operator escape hatch: one DORMANT guild bank slot removed
     // (server/game.ts adminPurgeGuildBankSlot). A real book mutation, so it
     // replays as an item removal like a withdraw.
-    | 'admin_purge';
+    | 'admin_purge'
+    // Not an op a player performed either: the COUNTERPARTY ORPHAN marker
+    // (server/bank_ledger.ts GUILD_BANK_COUNTERPARTY_ORPHAN_OP). A guild bank
+    // op moved the acting character's purse or bags while the book did not
+    // move at all, which is the mint signature the counterparty columns exist
+    // to make visible: without this row the op writes nothing and the audit
+    // sees a clean, self-consistent book.
+    | 'counterparty_orphan';
   itemId: string | null;
   count: number | null;
   instance: unknown;
@@ -4354,14 +4377,23 @@ export interface BankLedgerRow {
   purchasedSlotsAfter: number;
   container: 'personal' | 'guild';
   containerId: number | null;
+  /** Signed copper the ACTING CHARACTER'S PURSE gained under this op (negative
+   *  means it paid). Omitted / null means NOT RECORDED, which is what every
+   *  personal-container row is: the audit's balance check skips those rather
+   *  than reading absence as balance. */
+  counterpartyCopperDelta?: number | null;
+  /** Signed count of THIS ROW'S item_id the acting character's BAGS gained
+   *  (negative means they gave it up). Null on the same terms as above. */
+  counterpartyCount?: number | null;
 }
 
 export async function insertBankLedgerRow(row: BankLedgerRow): Promise<void> {
   await pool.query(
     `INSERT INTO bank_ledger
        (realm, character_id, account_id, op, item_id, count, instance,
-        copper_delta, purchased_slots_after, container, container_id)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+        copper_delta, purchased_slots_after, container, container_id,
+        counterparty_copper_delta, counterparty_count)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
     [
       row.realm,
       row.characterId,
@@ -4374,6 +4406,8 @@ export async function insertBankLedgerRow(row: BankLedgerRow): Promise<void> {
       row.purchasedSlotsAfter,
       row.container,
       row.containerId,
+      row.counterpartyCopperDelta ?? null,
+      row.counterpartyCount ?? null,
     ],
   );
 }

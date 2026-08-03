@@ -16,6 +16,13 @@ export interface BankLedgerAuditRow {
   purchased_slots_after: number | string;
   container: string;
   container_id: number | string | null;
+  /** The COUNTERPARTY (payer/payee) side of a guild row: signed copper and
+   *  signed item count the ACTING CHARACTER'S purse and bags moved under this
+   *  op. Absent / null means NOT RECORDED (a pre-feature row, or a
+   *  personal-container row, which never writes one), and the per-op balance
+   *  check skips those rather than reading absence as balance. */
+  counterparty_copper_delta?: number | string | null;
+  counterparty_count?: number | string | null;
 }
 
 // One characters row projection ({ id, realm, state }); state arrives parsed
@@ -50,6 +57,12 @@ export interface BankAuditFinding {
 // tests/bank_audit.test.ts pins the two declarations in lockstep).
 export const OPEN_BANK_SLOTS_AFTER: number;
 export const GUILD_BUY_POSITIONS: readonly number[];
+
+// The two anomaly op names, mirrored from server/bank_ledger.ts
+// (GUILD_BANK_ESCROW_DEFICIT_OP / GUILD_BANK_COUNTERPARTY_ORPHAN_OP); pinned
+// in lockstep by tests/bank_audit.test.ts.
+export const ESCROW_DEFICIT_OP: string;
+export const COUNTERPARTY_ORPHAN_OP: string;
 
 // The pure checker: replays the ledger against the persisted bank state and
 // returns every shape or conservation anomaly, grouped by container. Guild

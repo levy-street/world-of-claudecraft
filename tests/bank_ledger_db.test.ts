@@ -22,7 +22,7 @@ beforeEach(() => {
 });
 
 describe('insertBankLedgerRow', () => {
-  it('issues one parameterized INSERT into bank_ledger with all 11 columns', async () => {
+  it('issues one parameterized INSERT into bank_ledger with all 13 columns', async () => {
     await insertBankLedgerRow({
       realm: REALM,
       characterId: 42,
@@ -42,10 +42,73 @@ describe('insertBankLedgerRow', () => {
     expect(sql).toContain('INSERT INTO bank_ledger');
     expect(sql).toContain('realm, character_id, account_id, op, item_id, count, instance');
     expect(sql).toContain('copper_delta, purchased_slots_after, container, container_id');
-    // Eleven bind params, no interpolation: the last placeholder is $11.
-    expect(sql).toContain('$11');
-    expect(sql).not.toContain('$12');
-    expect(params).toEqual([REALM, 42, 7, 'deposit', 'wolf_fang', 2, null, 0, 0, 'personal', null]);
+    expect(sql).toContain('counterparty_copper_delta, counterparty_count');
+    // Thirteen bind params, no interpolation: the last placeholder is $13.
+    expect(sql).toContain('$13');
+    expect(sql).not.toContain('$14');
+    // A personal-container row records NO counterparty side, and the two
+    // columns bind NULL rather than 0: the audit must skip an unrecorded side,
+    // never read it as a balanced op.
+    expect(params).toEqual([
+      REALM,
+      42,
+      7,
+      'deposit',
+      'wolf_fang',
+      2,
+      null,
+      0,
+      0,
+      'personal',
+      null,
+      null,
+      null,
+    ]);
+  });
+
+  it('binds the counterparty side when the guild observer supplies it', async () => {
+    await insertBankLedgerRow({
+      realm: REALM,
+      characterId: 42,
+      accountId: 7,
+      op: 'withdraw_gold',
+      itemId: null,
+      count: null,
+      instance: null,
+      copperDelta: -1500,
+      purchasedSlotsAfter: 24,
+      container: 'guild',
+      containerId: 913,
+      counterpartyCopperDelta: 1500,
+      counterpartyCount: 0,
+    });
+    const [, params] = dbMock.query.mock.calls[0];
+    // The treasury lost 1500 and the acting purse gained exactly that: the two
+    // columns are the two halves of one movement, bound as numbers (a 0 count
+    // is a RECORDED zero, never a null).
+    expect(params[11]).toBe(1500);
+    expect(params[12]).toBe(0);
+  });
+
+  it('binds an explicit null counterparty side as null, not as zero', async () => {
+    await insertBankLedgerRow({
+      realm: REALM,
+      characterId: 42,
+      accountId: 7,
+      op: 'escrow_deficit',
+      itemId: null,
+      count: null,
+      instance: null,
+      copperDelta: -250,
+      purchasedSlotsAfter: 0,
+      container: 'guild',
+      containerId: 913,
+      counterpartyCopperDelta: 250,
+      counterpartyCount: null,
+    });
+    const [, params] = dbMock.query.mock.calls[0];
+    expect(params[11]).toBe(250);
+    expect(params[12]).toBeNull();
   });
 
   it('serializes the instance payload as JSON for the JSONB column', async () => {
@@ -95,6 +158,8 @@ describe('insertBankLedgerRow', () => {
       6,
       'personal',
       null,
+      null,
+      null,
     ]);
   });
 });
@@ -115,7 +180,21 @@ describe('insertBankLedgerRow (guild container rows, Guild Bank Phase 3)', () =>
       containerId: 913,
     });
     const [, params] = dbMock.query.mock.calls[0];
-    expect(params).toEqual([REALM, 42, 7, 'deposit_gold', null, null, null, 1500, 6, 'guild', 913]);
+    expect(params).toEqual([
+      REALM,
+      42,
+      7,
+      'deposit_gold',
+      null,
+      null,
+      null,
+      1500,
+      6,
+      'guild',
+      913,
+      null,
+      null,
+    ]);
   });
 
   it('writes the create_fee row shape (negated fee, zero slots)', async () => {
@@ -145,6 +224,8 @@ describe('insertBankLedgerRow (guild container rows, Guild Bank Phase 3)', () =>
       0,
       'guild',
       913,
+      null,
+      null,
     ]);
   });
 });
