@@ -40,10 +40,10 @@ class WoWClassicEnv(gym.Env):
 
     Observation: float32 vector (self, abilities, target, nearby mobs,
     nearest interactable, quest states, active scene controls). Action size is
-    queried from the server —
+    queried from the server:
     movement/turn/strafe/jump, targeting, attack, 10 ability slots,
     interact, stop, eat/drink. Sizes are content-dependent and queried
-    from the env's `info` cmd at startup — never hardcode them.
+    from the env's `info` cmd at startup; never hardcode them.
     """
 
     metadata = {"render_modes": []}
