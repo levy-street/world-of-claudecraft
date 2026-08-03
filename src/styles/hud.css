@@ -6796,7 +6796,12 @@
     opacity: 0;
     pointer-events: none;
     z-index: 42;
-    display: none;
+    /* No display here: the painter owns it inline (resting 'none' set at
+       construction, cleared to reveal). A stylesheet display:none would win
+       whenever the painter clears the inline value, which is exactly the bug
+       that shipped the voyage with no fades at all: setDisplay(el, '')
+       removes the inline style and the class rule takes over. Same contract
+       as .scene-subtitle. */
   }
   .scene-subtitle {
     position: fixed;
