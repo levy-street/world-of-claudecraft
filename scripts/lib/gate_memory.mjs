@@ -15,26 +15,24 @@
 //
 // Measured on a 14-core / 26 GB Mac (uptime 27 days) while four gates ran:
 //   os.freemem()                      1.47 GB  -> memBound 1 (all 1974 test files serial)
-//   vm_stat free+inactive+purgeable  ~12.3 GB  -> memBound 15, so CPU/2 stays the limiter
+//   vm_stat free+inactive+speculative ~12 GB   -> memBound 15, so CPU/2 stays the limiter
 //   `memory_pressure`                 68% free, i.e. no pressure at all
 //
 // The clamp itself is kept: a worker that gets swapped out does not fail cleanly, it times
 // out and reads as a flaky test. Only the sensor changes, and only on darwin.
 import { spawnSync } from 'node:child_process';
 
-/** vm_stat line labels summed into "memory macOS can hand out without swapping". */
-const DARWIN_AVAILABLE_PAGE_LABELS = [
-  'Pages free',
-  'Pages inactive',
-  'Pages speculative',
-  'Pages purgeable',
-];
+// vm_stat line labels summed into "memory macOS can hand out without swapping".
+// Deliberately excluded, because both are ALREADY counted in the lines above and would
+// double count: `File-backed pages` (a file-backed page is also active or inactive) and
+// `Pages purgeable` (a purgeable page also sits in the active or inactive queue). Erring
+// low is the right bias for a clamp whose whole job is to stop a worker from swapping.
+const DARWIN_AVAILABLE_PAGE_LABELS = ['Pages free', 'Pages inactive', 'Pages speculative'];
 
 /**
  * Pure parse of `vm_stat` output into the bytes macOS could hand a new process without
- * swapping: free + inactive + speculative + purgeable pages, at the page size vm_stat prints
- * in its header. File-backed pages are deliberately NOT summed: a file-backed page is also
- * counted as active or inactive, so adding it would double count.
+ * swapping: free + inactive + speculative pages, at the page size vm_stat prints in its
+ * header. See DARWIN_AVAILABLE_PAGE_LABELS for the two classes deliberately left out.
  *
  * Returns null when the text is missing, unparseable, or lacks the page size or the free-page
  * line, so the caller falls back to os.freemem() rather than trusting a partial read.

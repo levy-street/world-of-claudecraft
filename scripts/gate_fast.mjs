@@ -8,7 +8,9 @@
 // script as a substitute for that bar.
 //
 // Cross-platform: same win32 shell spawn pattern as gate.mjs. Worker count uses
-// computeGateWorkers (free-mem clamp kept). Optional GATE_WORKER_TIER=low|medium|high
+// computeGateWorkers (available-memory clamp kept; the sensor is lib/gate_memory.mjs, which
+// reads vm_stat on darwin because os.freemem() under-reports there). Optional
+// GATE_WORKER_TIER=low|medium|high
 // caps workers after the clamp; GATE_MAX_WORKERS is the expert absolute override.
 //
 // Vitest day-loop uses `vitest related` on changed code paths (and explicit

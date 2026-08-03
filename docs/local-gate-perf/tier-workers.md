@@ -6,8 +6,9 @@ Cross-platform guidance for Vitest workers under `npm run gate` and
 
 ## Policy (locked)
 
-1. **Free-mem clamp stays.** Default workers are
-   `min(floor(cpu/2), floor(freeMem / 0.75 GiB))`, never fewer than 1.
+1. **Available-memory clamp stays.** Default workers are
+   `min(floor(cpu/2), floor(availableMem / 0.75 GiB))`, never fewer than 1. The sensor is
+   `scripts/lib/gate_memory.mjs`: `vm_stat` on darwin, `os.freemem()` everywhere else.
 2. **Tier presets are caps**, not a way around memory pressure.
 3. **Full gate remains the merge bar** (`npm run gate`). `gate:fast` is day-loop only.
 4. Scripts use `spawnSync(..., { shell: process.platform === 'win32' })` so `npm` /
@@ -77,7 +78,7 @@ Full OS status matrix (verified / smoke / untested) and the contributor
 
 | OS | Notes |
 |---|---|
-| macOS | Primary agent host; multi-worktree freemem clamp is the usual limiter |
+| macOS | Primary agent host; availability comes from `vm_stat`, so CPU/2 is normally the limiter. Before that sensor landed, `os.freemem()` read near zero on a healthy host and pinned the suite to 1 worker |
 | Linux | Matches CI hosts; same Node scripts, no bash-only gate core |
 | Windows | `gate.mjs` / `gate_fast.mjs` set `shell: true` for npm/npx `.cmd` resolution; use PowerShell or cmd env syntax above; prefer `npm run` over bare `node` when PATH differs |
 

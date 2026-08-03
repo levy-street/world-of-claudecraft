@@ -99,6 +99,8 @@ export declare function formatMachineFacts(
   facts: MachineFacts,
   extra?: {
     workers?: number;
+    /** Availability the clamp budgeted against (lib/gate_memory.mjs), when resolved. */
+    availableMemGb?: number;
     gitSha?: string;
     npmVersion?: string;
     dateUtc?: string;

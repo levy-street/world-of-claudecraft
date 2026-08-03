@@ -10,6 +10,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolveAvailableMemoryBytes } from './lib/gate_memory.mjs';
 import {
   buildGateProfileSteps,
   collectMachineFacts,
@@ -45,11 +46,20 @@ if (args.help) {
 }
 
 const facts = collectMachineFacts(os, process, process.env);
+// Measurement has to model the real gate, so the worker count comes from the SAME sensor
+// gate.mjs uses (lib/gate_memory.mjs), not raw os.freemem(). Profiling a macOS host off
+// freemem would report (and run) fewer workers than the gate it is meant to measure, and
+// docs/local-gate-perf/baselines.md compares the two directly. Machine facts still record
+// freemem as observed; the printed block shows both so the worker count is explainable.
+const availableMemBytes = resolveAvailableMemoryBytes({
+  platform: process.platform,
+  freeMemBytes: facts.freeMemBytes,
+});
 const workers =
   args.workersOverride ??
   computeGateWorkers({
     cpuCount: facts.cpuCount,
-    freeMemBytes: facts.freeMemBytes,
+    freeMemBytes: availableMemBytes,
     envOverride: process.env.GATE_MAX_WORKERS,
     tierCap: resolveGateWorkerTierCap(process.env.GATE_WORKER_TIER),
   });
@@ -62,6 +72,7 @@ const dateUtc = new Date().toISOString();
 console.log(
   formatMachineFacts(facts, {
     workers,
+    availableMemGb: Math.round((availableMemBytes / (1024 * 1024 * 1024)) * 10) / 10,
     gitSha: gitShaShort,
     npmVersion,
     dateUtc,

@@ -25,19 +25,24 @@ File-backed pages:                       220342.
 Anonymous pages:                         523161.
 `;
 
-// free + inactive + speculative + purgeable, at 16 KiB per page.
-const VM_STAT_AVAILABLE = (64722 + 367677 + 3135 + 27) * 16384;
+// free + inactive + speculative, at 16 KiB per page. Purgeable and file-backed are
+// excluded on purpose: each is already counted in the active or inactive queues.
+const VM_STAT_AVAILABLE = (64722 + 367677 + 3135) * 16384;
 
 describe('parseDarwinAvailableMemory', () => {
   it('sums the reclaimable page classes at the reported page size', () => {
     expect(parseDarwinAvailableMemory(VM_STAT)).toBe(VM_STAT_AVAILABLE);
   });
 
-  it('excludes file-backed pages, which are already counted as active or inactive', () => {
-    // The decisive check: including File-backed (220342 pages) would inflate the total,
-    // so pin that the result is strictly below that inflated figure.
-    const withFileBacked = (64722 + 367677 + 3135 + 27 + 220342) * 16384;
-    expect(parseDarwinAvailableMemory(VM_STAT)).toBeLessThan(withFileBacked);
+  it('excludes file-backed and purgeable pages, which are already counted elsewhere', () => {
+    // Both classes also sit in the active or inactive queues, so summing them would
+    // double count and over-provision workers, the exact way to reach the swapping the
+    // clamp exists to prevent. Pinned against the exact inflated totals, not a range.
+    const withFileBacked = (64722 + 367677 + 3135 + 220342) * 16384;
+    const withPurgeable = (64722 + 367677 + 3135 + 27) * 16384;
+    expect(parseDarwinAvailableMemory(VM_STAT)).not.toBe(withFileBacked);
+    expect(parseDarwinAvailableMemory(VM_STAT)).not.toBe(withPurgeable);
+    expect(parseDarwinAvailableMemory(VM_STAT)).toBeLessThan(withPurgeable);
   });
 
   it('ignores active, wired, and throttled pages, which are not available', () => {
@@ -51,10 +56,10 @@ describe('parseDarwinAvailableMemory', () => {
   });
 
   it('treats an omitted optional line as zero rather than failing the whole parse', () => {
-    const noPurgeable = VM_STAT.split('\n')
-      .filter((l) => !l.startsWith('Pages purgeable:'))
+    const noSpeculative = VM_STAT.split('\n')
+      .filter((l) => !l.startsWith('Pages speculative:'))
       .join('\n');
-    expect(parseDarwinAvailableMemory(noPurgeable)).toBe(VM_STAT_AVAILABLE - 27 * 16384);
+    expect(parseDarwinAvailableMemory(noSpeculative)).toBe(VM_STAT_AVAILABLE - 3135 * 16384);
   });
 
   it('returns null when the page size is missing, so the caller keeps os.freemem()', () => {
@@ -177,10 +182,6 @@ describe('the macOS single-worker collapse this fixes', () => {
       .replace(
         'Pages speculative:                         3135.',
         'Pages speculative:                            0.',
-      )
-      .replace(
-        'Pages purgeable:                             27.',
-        'Pages purgeable:                              0.',
       );
     const available = resolveAvailableMemoryBytes({
       platform: 'darwin',
