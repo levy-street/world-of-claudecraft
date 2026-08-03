@@ -855,10 +855,19 @@ async function main() {
     // would fail the whole audit with "column does not exist" precisely then.
     // Absent columns select as NULL, which lands in the already-implemented
     // "unbalanceable, skipped" path and is reported as such.
+    // Resolved through to_regclass, NOT information_schema.columns filtered by
+    // table_name alone: the main SELECT below is UNQUALIFIED, so it reads
+    // whichever bank_ledger the search_path resolves to, and a restore staged
+    // into a side schema (or a per-tenant layout) can make an unfiltered
+    // catalog probe report columns that the table actually being read does not
+    // have. That would kill the audit with "column does not exist" in exactly
+    // the restore scenario this fallback exists for. to_regclass honours the
+    // search_path, so the probe names the same relation the scan will.
     const present = await pool.query(
-      `SELECT column_name FROM information_schema.columns
-        WHERE table_name = 'bank_ledger'
-          AND column_name IN ('counterparty_copper_delta', 'counterparty_count')`,
+      `SELECT attname AS column_name FROM pg_attribute
+        WHERE attrelid = to_regclass('bank_ledger')
+          AND attnum > 0 AND NOT attisdropped
+          AND attname IN ('counterparty_copper_delta', 'counterparty_count')`,
     );
     const has = new Set(present.rows.map((r) => r.column_name));
     const counterpartyColumns = counterpartySelectList(has);

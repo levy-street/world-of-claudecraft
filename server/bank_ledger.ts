@@ -142,6 +142,12 @@ export function diffBankOp(
 // in order; a rejected insert is caught (logged) and the chain continues.
 let tail: Promise<void> = Promise.resolve();
 
+// Log budget for the unstamped-delta detector below. The metric counts every
+// occurrence; the log prints the first few and then stops, so a write site that
+// forgot to stamp cannot flood a process's stderr for its whole uptime.
+const UNSTAMPED_LOG_LIMIT = 5;
+let unstampedLogged = 0;
+
 // Record a successful bank op fire-and-forget. Computes the diff and enqueues one
 // insert per element onto the FIFO tail. Returns void immediately (never a promise,
 // never awaited by the game loop); the whole body is guarded so it can never throw
@@ -359,10 +365,22 @@ export function recordGuildBankDeltas(
       // convention self-detecting rather than merely documented: an unstamped
       // guild delta is counted and logged at the moment it is written.
       if (delta.counterpartyCopperDelta == null && delta.counterpartyCount == null) {
+        // The COUNTER is the signal and is always emitted; the LOG is bounded.
+        // This fires per delta on a path the op guard rate-limits but does not
+        // stop, so an unstamped write site would otherwise print forever. The
+        // first few lines carry the identifying detail an operator needs; the
+        // series carries the rest.
         gameMetricsCounters().guildBankIncident('counterparty_unstamped');
-        console.error(
-          `bank_ledger guild ${op} row for guild ${guildId} (character ${who.characterId}) carries NO counterparty side: the audit can never balance this op, and its NULL is indistinguishable from a pre-feature row`,
-        );
+        if (unstampedLogged < UNSTAMPED_LOG_LIMIT) {
+          unstampedLogged += 1;
+          console.error(
+            `bank_ledger guild ${op} row for guild ${guildId} (character ${who.characterId}) carries NO counterparty side: the audit can never balance this op, and its NULL is indistinguishable from a pre-feature row${
+              unstampedLogged === UNSTAMPED_LOG_LIMIT
+                ? ' (further occurrences are counted only, see woc_guild_bank_incidents_total{kind="counterparty_unstamped"})'
+                : ''
+            }`,
+          );
+        }
       }
       tail = tail
         .then(() =>

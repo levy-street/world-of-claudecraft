@@ -1,6 +1,8 @@
 # Guild Bank: cross-phase state
 
-Current phase: Phase 4 QA complete (2026-08-03); the packet is closed and the branch
+Current phase: Phase 4 QA complete, plus the 2026-08-03 audit-trail hardening
+(payer-side `bank_ledger` counterparty columns and three consolidation loose
+ends; see progress.md). The packet is closed and the branch
 is PR-ready (merged over origin/release/v0.34.0 at fbf4d35a1, full gate green).
 Teardown of docs/guild-bank/ awaits the user's explicit confirmation.
 
@@ -45,9 +47,54 @@ Teardown of docs/guild-bank/ awaits the user's explicit confirmation.
   right trade. At most one reservation per character; a refund whose founder already left
   is logged loudly for operator compensation.
 - Ledger: same `bank_ledger` table, `container = 'guild'`, `container_id = guild id`, ops
-  `deposit_gold | withdraw_gold | deposit | withdraw | buy_slots | open_bank | create_fee`.
+  `deposit_gold | withdraw_gold | deposit | withdraw | buy_slots | open_bank | create_fee`
+  plus the three non-player rows `admin_purge | escrow_deficit | counterparty_orphan`.
   Keep-forever retention re-affirmed with an explicit comment at the retention-sweep
   registration site in `server/main.ts` (it is the anti-dupe audit trail).
+- BOTH SIDES OF EVERY GUILD OP ARE RECORDED (2026-08-03, audit-trail hardening;
+  supersedes the receiving-side-only shape above). The container side alone made the
+  guild replay self-consistent BY CONSTRUCTION, so it could never detect a mint that
+  ends up in a player's purse, which is the shape of every dupe this feature had.
+  `bank_ledger` gained `counterparty_copper_delta BIGINT` and `counterparty_count INT`,
+  additive and NULLABLE WITH NO DEFAULT: NULL means NOT RECORDED (a pre-feature row, or
+  any personal-container row, which never writes one) and the audit SKIPS those rather
+  than reading absence as balance, because a `DEFAULT 0` would have turned every legacy
+  row into a false all-clear. Signed from the acting character's point of view
+  (negative means the purse/bags GAVE), stamped by `server/game.ts runGuildBankOp` from
+  the same server-derived before/after snapshot pair the book side comes from, never
+  from client data. The pure arithmetic is `server/guild_bank_counterparty.ts`
+  (snapshot, movement, drain-stamp, orphan), which takes FROZEN snapshots on purpose:
+  `PlayerMeta.inventory` is a live array, so a before/after pair holding it twice would
+  difference every item movement to zero and pass everything silently.
+  `scripts/bank_audit.mjs` checks `book side + counterparty side + sink = 0` per op
+  (`counterparty_copper_imbalance` / `counterparty_item_imbalance`), where the sink is
+  a ladder rung's price, the creation fee, or an operator purge's destroyed copy. Note
+  that `copper_delta` is OVERLOADED and is not the book's movement for `open_bank` /
+  `create_fee` (both record the PURSE payment), which is why the check derives
+  `bookCopperDelta` and `copperSinkOf` per op rather than reading the column.
+  Three ways the invariant defends itself rather than resting on convention:
+  a purse/bags movement no row accounts for (the book did not move, OR the stamp left
+  an undrained remainder) writes a `counterparty_orphan` row and counts the incident;
+  a guild delta reaching the writer with no counterparty side at all counts
+  `counterparty_unstamped` and logs at write time, so a future write site that forgets
+  cannot hide behind an indistinguishable NULL in a keep-forever table; and the report
+  names the count AND the highest id lacking a counterparty side, so a frozen
+  historical gap is distinguishable from one a live write site is still growing.
+  The audit resolves `bank_ledger` through `to_regclass` (search_path aware, the same
+  relation its unqualified SELECT will read) and selects typed NULLs when the columns
+  are absent, so a restored pre-migration `pg_dump` (the incident DEPLOY.md points the
+  tool at) degrades into the skip path instead of dying, INCLUDING when another visible
+  schema holds a same-named table. `create_fee`'s counterparty is the founder's ACTUAL
+  purse movement, snapshotted at the reserve-at-gate charge, not derived from the
+  charged amount: deriving it made the identity algebraically zero for every input, a
+  check that could not fail and therefore read as coverage it did not have.
+  `escrow_deficit` rows carry a DERIVED purse aggregate as a direction report and take
+  no part in the balance identity (nothing moved under them); `counterparty_orphan`
+  rows are excluded from the item, treasury, and ladder replays for the same reason.
+  Both anomaly ops write `count` SIGNED, unlike every other op (which writes a positive
+  magnitude with the direction in the op name): a reader assuming non-negative counts
+  must exclude those two. No new read predicate, so no new index (the
+  `server/concurrent_indexes.ts` seam is not involved).
 - Purse-paid rung 0 (2026-08-03, user-directed pricing redesign): the guild bank is no
   longer open by default. A new guild starts with a 0-slot bank; an officer OPENS it via
   the existing `guild_bank_buy_slots` token (no new wire surface: the sim decides which
@@ -546,7 +593,8 @@ not preventing one. Concretely:
 - While another session still holds unflushed work for the guild, the refusal
   is TRANSIENT: their commit is what makes the replay applicable and it lands
   within an autosave interval. Nothing is consumed, and the marks and log are
-  exactly as they were.
+  exactly as they were. It is metered as `escrow_refused_retry`, deliberately
+  NOT as `escrow_save_failed`: nothing failed.
 - When no session can ever make the missing value durable (or the retries run
   out after `GameServer.GUILD_BANK_DEFICIT_MAX_SKIPS`), the session's live
   state is ABANDONED: its own book ops come back off the live book, it is
@@ -640,7 +688,12 @@ What remains accepted:
   `save_failed` otherwise, rather than telling an operator a slot is cleared while the
   copy is on its way back. The guild-delete window refuses the operator arm too
   (`runGuildBankOp` pre-empts both targets), and `adminPurgeGuildBankSlot` pre-checks it
-  so the refusal reads as `save_failed` ("try again") rather than "not a stuck item".
+  so the refusal names the real reason rather than reading as "not a stuck item".
+  That reason is its OWN (`delete_in_flight` -> 409 `error.guildBankDeleting`), REVISED
+  2026-08-03: it used to map to `save_failed`, whose operator line says the change "was
+  rolled back", describing an event that did not happen (nothing was attempted, so
+  nothing was saved and nothing was rolled back) and giving the wrong instruction (503
+  reads as a transient to retry into, while the bank is going away with the guild).
   The `admin_purge` delta is a REMOVAL everywhere the machinery reasons about one: the
   forward replay (`applyGuildBankDeltasTo`, all-or-nothing against durable truth), the
   inverse, the replay-equivalent netting (`netGuildBankOpLogForReplay`), and the
@@ -658,15 +711,21 @@ What remains accepted:
   plus a confirm flow; the operator error strings already carry their ADMIN_ERROR_KEYS
   matcher rows and English catalog entries so it is drop-in.
 - Guild bank incidents are metered (2026-08-03): `woc_guild_bank_incidents_total{kind}`
-  over the fixed six `GUILD_BANK_INCIDENTS` (escrow_save_failed, save_fenced_out,
-  escrow_quarantined, reconcile, book_unloaded, ledger_write_failed) through the
-  `gameMetricsCounters` seam, pre-registered at zero. Guild id stays in the loud log and
-  is never a metric label. Each counter sits BESIDE its log, never instead of it.
-  `escrow_save_failed` covers BOTH ways an escrow save rolls both halves back (the db
-  layer throwing, and the merge REFUSING a book half); `escrow_quarantined` is the
-  terminal arm (the refusal ran out of retries or could never resolve, so the session is
-  abandoned) and is the one worth paging on; `reconcile` counts one per GUILD whose
-  unflushed log `revertOwnGuildBookOps` actually undid.
+  over the fixed NINE `GUILD_BANK_INCIDENTS` (escrow_save_failed, escrow_refused_retry,
+  save_fenced_out, escrow_quarantined, reconcile, book_unloaded, ledger_write_failed,
+  counterparty_orphan, counterparty_unstamped) through the `gameMetricsCounters` seam,
+  pre-registered at zero. Guild id stays in the loud log and is never a metric label.
+  Each counter sits BESIDE its log, never instead of it.
+  `escrow_save_failed` means the save really FAILED: the db layer threw, or the merge
+  refused a book half and that refusal was TERMINAL. A refusal that will be RETRIED is
+  `escrow_refused_retry` instead (REVISED 2026-08-03, audit-trail hardening: it used to
+  share `escrow_save_failed`, which is ordinary two-officer concurrency on a healthy
+  realm and made `> 0` alerting useless). Counted per GUILD like `reconcile`; watch its
+  rate, not its presence. `escrow_quarantined` is the terminal arm (the refusal ran out
+  of retries or could never resolve, so the session is abandoned) and is the one worth
+  paging on, now alongside `counterparty_orphan` and `counterparty_unstamped`, each of
+  which is a single-sample defect rather than a transient. `reconcile` counts one per
+  GUILD whose unflushed log `revertOwnGuildBookOps` actually undid.
 - A create-fee reservation whose refund arm finds the founder gone (refused create racing
   a clean logout) cannot refund in the live sim; it is logged loudly for operator
   compensation, and no create_fee ledger row is written for it. Watch item: a refund
@@ -694,9 +753,24 @@ What remains accepted:
 - guild_banks.realm is written on every upsert but never read by the load paths
   (which key off guilds.realm); kept for operator forensics and a future
   cross-realm audit dimension.
+- The conservation property harness (`tests/audit_conservation_property.test.ts`) now
+  rides `admin_purge` through the concurrency and fence-injection sweeps (2026-08-03):
+  the book seeds three transfer-locked copies with birth-complete deposit rows, a purge
+  event runs the real admin entry point, and the oracle's destruction term is derived
+  from state (a fenced-out escrow puts a purged copy back, and a durable row can lag a
+  live book by an unflushed purge, so a tally would drift). Measured: 0 failures before
+  and after, 2616 purges actually removing a copy over 3062 runs.
 - scripts/bank_audit.mjs loads bank_ledger, characters, and guild_banks unpaginated:
   fine at current scale, revisit with a cursor once bank_ledger reaches millions of
-  rows (offline tooling only, never the server).
+  rows (offline tooling only, never the server). The counterparty columns WIDEN the
+  buffered row (pg returns BIGINT as a heap-allocated string), so the runway to that
+  cursor is modestly shorter, roughly 5 to 15% more peak RSS for the same row count on
+  guild rows; the order of magnitude of the trigger is unchanged. The sibling
+  bank_ledger INDEX deferral is NOT moved by any of this: the trigger is "a per-guild
+  reader exists", and every consumer of the new columns is per-row arithmetic during
+  the existing full scan or a JS reduce over the materialized array, so
+  `bank_ledger_created` still has no reader and `(container, container_id)` is still
+  unwarranted.
 - Books deliberately share the market serial writer (no second queue): the leave
   flush writes market, mail, AND books in one transaction, so a separate book queue
   would reopen the interleaving the single writer exists to prevent.

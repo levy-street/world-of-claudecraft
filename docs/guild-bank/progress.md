@@ -12,6 +12,39 @@
 | Phase 4 QA (final, offers teardown) | Done (PASS-WITH-FOLLOWUPS) | 2026-08-02 | 2026-08-03 |
 | Pricing redesign (user-directed) | Done | 2026-08-03 | 2026-08-03 |
 | Follow-ups (stacked branch, 3 slices) | Done | 2026-08-03 | 2026-08-03 |
+| Audit-trail hardening (payer-side ledger column + 3 loose ends) | Done | 2026-08-03 | 2026-08-03 |
+
+## Audit-trail hardening (2026-08-03, on `feature/guild-bank`)
+Four commits. The first is the substantive one; the rest close what the
+consolidation and the two reviewers flagged.
+
+- [x] **Payer-side ledger column.** `bank_ledger` recorded `copper_delta` for the
+      RECEIVING side only, so a guild-side replay was self-consistent BY CONSTRUCTION:
+      it reconciled the book against rows derived from the book, and could never see
+      value that crossed the purse/book boundary in one direction. Every dupe this
+      cycle fixed moved value between a purse and a book, and NOT ONE was visible to
+      `scripts/bank_audit.mjs`, so the audit could not detect the failure mode it
+      exists to detect. Guild rows now carry `counterparty_copper_delta BIGINT` and
+      `counterparty_count INT` (additive, nullable, no default), stamped by
+      `runGuildBankOp` from the same server-derived before/after snapshot pair the
+      book side comes from. See state.md for the full model.
+- [x] **Loose end (a): the delete-window refusal reason.** An admin purge refused
+      inside the guild-delete window answered `save_failed` (503), whose operator line
+      says the change "was rolled back". Nothing was rolled back, because nothing was
+      attempted. New reason `delete_in_flight` -> 409 with `error.guildBankDeleting`
+      and its `ADMIN_ERROR_KEYS` matcher row.
+- [x] **Loose end (b): the escrow counter vocabulary.** `escrow_save_failed` fired on
+      RETRIED refusals, which are ordinary two-officer concurrency, so `> 0` alerting
+      was noise. Split: `escrow_refused_retry` (per guild, watch the rate) for a
+      refusal that will retry; `escrow_save_failed` only for a db throw or a TERMINAL
+      refusal. `GUILD_BANK_INCIDENTS` is now nine kinds (also `counterparty_orphan`,
+      `counterparty_unstamped`), pins updated.
+- [x] **Loose end (c): admin_purge rides the conservation harness.** The server-level
+      property harness generated player ops only. The book now seeds three
+      transfer-locked copies with their birth-complete deposit rows, and a purge event
+      runs the real admin entry point inside the P2, P3 and P4 sweeps, with a
+      state-derived destruction term in the oracle. Measured over 3062 runs and 102123
+      steps: 0 failures before, 0 after, 2616 purges actually removing a copy.
 
 ## Follow-ups (2026-08-03, branch `feature/guild-bank-followups` off `feature/guild-bank`)
 Three independent slices, one commit each.
@@ -32,10 +65,12 @@ Three independent slices, one commit each.
       text). Every failure mode on the dupe-sensitive paths reported only through
       `console.error` / `console.warn`, so it was invisible to production alerting. One
       closed-vocabulary counter through the existing `gameMetricsCounters` seam:
-      `woc_guild_bank_incidents_total{kind}` over the fixed six `GUILD_BANK_INCIDENTS`
-      (`escrow_save_failed`, `save_fenced_out`, `escrow_quarantined`, `reconcile`,
-      `book_unloaded`, `ledger_write_failed`), pre-registered at zero like the ws drop
-      causes. Guild id stays in the log line and is NEVER a label (the
+      `woc_guild_bank_incidents_total{kind}` over the then-fixed six
+      `GUILD_BANK_INCIDENTS` (`escrow_save_failed`, `save_fenced_out`,
+      `escrow_quarantined`, `reconcile`, `book_unloaded`, `ledger_write_failed`),
+      pre-registered at zero like the ws drop causes. SUPERSEDED by the audit-trail
+      hardening above, which split the retry arm out and added the two counterparty
+      kinds: the set is now nine. Guild id stays in the log line and is NEVER a label (the
       bounded-cardinality contract).
       Each increment sits beside its existing loud log, and the escrow-save arm rethrows
       unchanged. Rebased onto the escrow root fix when the two lines merged:

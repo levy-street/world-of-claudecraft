@@ -18,8 +18,9 @@
 
 // Far above human rate: bank ops are manual clicks (a stack move, a gold
 // amount submit), so a burst of 10 with two tokens per second of refill never
-// touches a real player emptying a bank while capping a flooder at two
-// ledger rows per second sustained.
+// touches a real player emptying a bank while capping a flooder at two ops
+// (up to FOUR ledger rows, counting a counterparty-orphan anomaly row beside
+// an op's own row) per second sustained.
 export const GUILD_BANK_OP_BURST = 10;
 export const GUILD_BANK_OP_REFILL_PER_SECOND = 2;
 
