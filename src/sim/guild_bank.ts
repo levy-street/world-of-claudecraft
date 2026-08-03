@@ -354,7 +354,15 @@ export function revertGuildBankDeltas(
       // Rung 0 was PURSE-paid: undo only the slot grant (the dead session's
       // character half, holding the purse charge, already rolled back by
       // definition; crediting the treasury here would mint guild copper).
-      book.purchasedSlots = Math.max(0, book.purchasedSlots - GUILD_BANK_RUNG_SLOTS[0]);
+      // The undo applies ONLY while the book sits exactly at the opened base:
+      // if another session's expansion already advanced the ladder (open 0
+      // to 24, expansion to 30, then this revert), subtracting the base
+      // would strand a NON-LADDER position (6), collapsing capacity below
+      // what rungs 1+ paid for. On any other count the grant stays (the
+      // clamped-residue contract: never destroy paid value).
+      if (book.purchasedSlots === GUILD_BANK_RUNG_SLOTS[0]) {
+        book.purchasedSlots = 0;
+      }
       continue;
     }
     if (d.op === 'buy_slots') {

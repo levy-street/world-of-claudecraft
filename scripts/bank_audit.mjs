@@ -36,6 +36,16 @@
 import { pathToFileURL } from 'node:url';
 import { Pool } from 'pg';
 
+// The guild slot ladder's valid purchased_slots_after values, mirrored from
+// GUILD_BANK_RUNG_SLOTS / GUILD_BANK_LADDER_POSITIONS in src/sim/guild_bank.ts
+// (this script stays dependency-free of the TS sim; tests/bank_audit.test.ts
+// pins the two declarations in lockstep). open_bank (rung 0) always lands on
+// the opened base; a guild buy_slots (rungs 1+) always lands on a later
+// ladder position.
+export const OPEN_BANK_SLOTS_AFTER = 24;
+export const GUILD_BUY_POSITIONS = [30, 36, 42, 48, 54, 60];
+const GUILD_BUY_POSITION_SET = new Set(GUILD_BUY_POSITIONS);
+
 // A multiset key over an item: its id plus a stable serialization of the
 // per-instance payload (null when absent). Both the ledger `instance` column and
 // characters.state are JSONB, so Postgres normalizes each side's key order the
@@ -133,6 +143,19 @@ function checkRowShape(row, findings) {
         detail: `buy_slots row ${row.id} has copper_delta ${String(row.copper_delta)}`,
       });
     }
+    // A GUILD expansion (rungs 1+) always lands on a valid ladder position
+    // above the opened base; any other after-count is a tampered book or a
+    // mis-named op (the personal ladder has its own positions, unchecked here).
+    if (
+      (row.container ?? 'personal') === 'guild' &&
+      !GUILD_BUY_POSITION_SET.has(Number(row.purchased_slots_after))
+    ) {
+      findings.push({
+        ...base,
+        kind: 'bad_buy_position',
+        detail: `guild buy_slots row ${row.id} has purchased_slots_after ${String(row.purchased_slots_after)}`,
+      });
+    }
   } else if (row.op === 'deposit_gold' || row.op === 'withdraw_gold') {
     // Guild treasury moves: copper-only rows with a direction-checked delta.
     if (row.item_id != null || row.count != null) {
@@ -174,7 +197,7 @@ function checkRowShape(row, findings) {
         detail: `open_bank row ${row.id} has copper_delta ${String(row.copper_delta)}`,
       });
     }
-    if (Number(row.purchased_slots_after) !== 24) {
+    if (Number(row.purchased_slots_after) !== OPEN_BANK_SLOTS_AFTER) {
       findings.push({
         ...base,
         kind: 'bad_open_slots',
@@ -344,6 +367,22 @@ export function auditBank({ ledgerRows, characters, guildBanks }) {
             detail: `treasury fell to ${treasury} at row ${row.id}: more copper left than ever entered`,
           });
         }
+      }
+
+      // A guild opens its bank at most once (the ladder never returns to
+      // rung 0 through any legitimate op). A second open_bank row points at a
+      // fenced-out (reverted) opening whose row remained as evidence, or a
+      // corruption: either way an operator should look (the same
+      // rows-remain-by-design caveat as reverted ops elsewhere).
+      const openRows = group.rows.filter((row) => row.op === 'open_bank');
+      if (openRows.length > 1) {
+        findings.push({
+          ...base,
+          kind: 'multiple_open_bank',
+          detail: `guild has ${openRows.length} open_bank rows (ids ${openRows
+            .map((r) => r.id)
+            .join(', ')})`,
+        });
       }
       if (group.guildId != null) {
         guildNet.set(group.guildId, net);

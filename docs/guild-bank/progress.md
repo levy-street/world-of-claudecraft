@@ -35,6 +35,19 @@
       0-capacity deposit refusal, unopened holdings/disband, open_bank ledger + audit
       rows, sanitize-floor sweep, and the UI unopened state (view + window + enablement
       + purse-repaint).
+- [x] Redesign QA fix pass (fresh reviewer, NOT READY -> fixed): the observer derives
+      the rung via guildBankRungsBought (never a literal-zero compare, so a tampered
+      below-base count still records open_bank); the open_bank revert undoes the grant
+      ONLY at exactly the opened base (a cross-session expansion can no longer be
+      stranded on a non-ladder position); three new decisive arms (cross-session
+      open_bank revert, tampered-count observer naming, opened-pane purse-free
+      negative with positive control); bank_audit gains bad_buy_position +
+      multiple_open_bank checks and a lockstep pin tying its ladder literals to the
+      sim tables; the two guild confirm prompts fold into one builder; state.md
+      qualifies the old-row floor (pre-merge-only acceptability). Screenshots:
+      docs/screenshots/guild-bank-tab gains the unopened pane (desktop + mobile),
+      refreshed opened captures, and before-*-guild-open-default.png preserved from
+      the pre-redesign captures.
 
 ## Phase 1 deliverables
 - [x] `src/sim/guild_bank.ts`: state type, constants (from state.md), capacity, sanitize,

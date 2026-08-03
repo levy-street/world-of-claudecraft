@@ -5,7 +5,10 @@ import {
   type BankAuditFinding,
   type BankLedgerAuditRow,
   formatReport,
+  GUILD_BUY_POSITIONS,
+  OPEN_BANK_SLOTS_AFTER,
 } from '../scripts/bank_audit.mjs';
+import { GUILD_BANK_LADDER_POSITIONS, GUILD_BANK_RUNG_SLOTS } from '../src/sim/guild_bank';
 
 // Fill a bank_ledger row's defaults (snake_case, as Postgres returns it); pass only
 // the fields a case cares about. Every row is 'personal' with realm Claudemoon.
@@ -223,6 +226,18 @@ function G(o: Partial<BankLedgerAuditRow>): BankLedgerAuditRow {
 const guildKindsFor = (findings: BankAuditFinding[], guildId: number) =>
   findings.filter((f) => f.guildId === guildId).map((f) => f.kind);
 
+describe('the audit ladder mirror (lockstep with src/sim/guild_bank.ts)', () => {
+  it('pins the dependency-free .mjs ladder literals to the sim tables', () => {
+    // bank_audit.mjs redeclares the ladder (it never imports the TS sim); a
+    // retune landing on one side without the other reddens here instead of
+    // silently mis-flagging (or missing) rows.
+    expect(OPEN_BANK_SLOTS_AFTER).toBe(GUILD_BANK_RUNG_SLOTS[0]);
+    // Guild buy_slots (rungs 1+) after-positions are every ladder position
+    // past the opened base.
+    expect([...GUILD_BUY_POSITIONS]).toEqual([...GUILD_BANK_LADDER_POSITIONS].slice(2));
+  });
+});
+
 describe('auditBank (guild container)', () => {
   it('a clean cross-officer session reconciles against the guild book with zero findings', () => {
     // Officer 1 deposits gold and an item; officer 2 withdraws part of the
@@ -358,6 +373,62 @@ describe('auditBank (guild container)', () => {
     expect(findings).toEqual([]);
   });
 
+  it('flags a guild buy_slots landing off the ladder, and a second open_bank row', () => {
+    const findings = auditBank({
+      ledgerRows: [
+        // Fund guild 80's treasury first so the position finding is isolated
+        // (a bare buy would also trip negative_treasury).
+        G({ id: 90, character_id: 1, op: 'deposit_gold', copper_delta: 25000, container_id: 80 }),
+        // A guild expansion can never land below the opened base + one rung.
+        G({
+          id: 91,
+          character_id: 1,
+          op: 'buy_slots',
+          copper_delta: -25000,
+          purchased_slots_after: 6,
+          container_id: 80,
+        }),
+        // Two openings for one guild: a reverted (fenced-out) opening left its
+        // row, or corruption; an operator should look either way.
+        G({
+          id: 2,
+          character_id: 1,
+          op: 'open_bank',
+          copper_delta: -90000,
+          purchased_slots_after: 24,
+          container_id: 81,
+        }),
+        G({
+          id: 3,
+          character_id: 2,
+          op: 'open_bank',
+          copper_delta: -90000,
+          purchased_slots_after: 24,
+          container_id: 81,
+        }),
+        // The PERSONAL ladder keeps its own positions: a personal buy_slots at
+        // 6 must NOT trip the guild position check.
+        L({
+          id: 4,
+          character_id: 9,
+          op: 'buy_slots',
+          copper_delta: -500,
+          purchased_slots_after: 6,
+        }),
+      ],
+      characters: [
+        {
+          id: 9,
+          realm: 'Claudemoon',
+          state: { bank: { inventory: [], purchasedSlots: 6 } },
+        },
+      ],
+    });
+    expect(guildKindsFor(findings, 80)).toEqual(['bad_buy_position']);
+    expect(guildKindsFor(findings, 81)).toEqual(['multiple_open_bank']);
+    expect(findingKindsFor(findings, 9)).toEqual([]);
+  });
+
   it('reconciles books against replay: item, treasury, and purchased mismatches', () => {
     const findings = auditBank({
       ledgerRows: [
@@ -405,35 +476,48 @@ describe('auditBank (guild container)', () => {
   it('a disbanded guild (rows, no book) reconciles items+treasury against empty and skips purchased', () => {
     const findings = auditBank({
       ledgerRows: [
-        G({ id: 1, character_id: 1, op: 'deposit_gold', copper_delta: 50000 }),
+        G({
+          id: 1,
+          character_id: 1,
+          op: 'open_bank',
+          copper_delta: -90000,
+          purchased_slots_after: 24,
+        }),
         G({
           id: 2,
           character_id: 1,
-          op: 'buy_slots',
-          copper_delta: -50000,
-          purchased_slots_after: 6,
+          op: 'deposit_gold',
+          copper_delta: 25000,
+          purchased_slots_after: 24,
         }),
         G({
           id: 3,
           character_id: 1,
-          op: 'deposit',
-          item_id: 'wolf_fang',
-          count: 1,
-          purchased_slots_after: 6,
+          op: 'buy_slots',
+          copper_delta: -25000,
+          purchased_slots_after: 30,
         }),
         G({
           id: 4,
+          character_id: 1,
+          op: 'deposit',
+          item_id: 'wolf_fang',
+          count: 1,
+          purchased_slots_after: 30,
+        }),
+        G({
+          id: 5,
           character_id: 2,
           op: 'withdraw',
           item_id: 'wolf_fang',
           count: 1,
-          purchased_slots_after: 6,
+          purchased_slots_after: 30,
         }),
       ],
       characters: [],
       guildBanks: [], // the guilds DELETE cascaded the book away
     });
-    // Net items 0, treasury 0, purchased 6 with no row: all clean by design.
+    // Net items 0, treasury 0, purchased 30 with no row: all clean by design.
     expect(findings).toEqual([]);
   });
 

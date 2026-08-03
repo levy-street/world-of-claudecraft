@@ -636,6 +636,29 @@ describe('the UNOPENED pane (rung 0: open the guild bank from the officer purse)
     ).toBe(false);
   });
 
+  it('an OPENED pane stays purse-free: a copper change alone never repaints', () => {
+    // The negative arm of the signature's one purse read: once the bank is
+    // opened, enablement is snapshot-only again, so a purse change must NOT
+    // enter the signature (a repaint per copper tick would thrash the pane
+    // and yank keyboard focus for no data change).
+    const h = harness(guildInfo({ slots: [{ itemId: plainId, count: 5 }] }));
+    h.window.open();
+    clickGuildTab(h);
+    // Prime the signature: the very first refreshIfChanged always repaints
+    // (lastSig starts empty), so grab the node from a settled pane.
+    h.window.refreshIfChanged();
+    const cell = h.root.querySelector('.bank-grid .bank-item');
+    expect(cell).not.toBeNull();
+    h.world.copper += 12_345;
+    h.window.refreshIfChanged();
+    // Same DOM node: no rebuild happened (a repaint recreates the grid).
+    expect(h.root.querySelector('.bank-grid .bank-item')).toBe(cell);
+    // Positive control on the same fixture: a SNAPSHOT change still repaints.
+    h.world.guildBankInfo = guildInfo({ slots: [{ itemId: plainId, count: 5 }], treasury: 999 });
+    h.window.refreshIfChanged();
+    expect(h.root.querySelector('.bank-grid .bank-item')).not.toBe(cell);
+  });
+
   it('after opening (the echo flips purchasedSlots to 24) the normal pane renders', () => {
     const h = harness(unopened());
     h.window.open();

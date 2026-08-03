@@ -45,6 +45,12 @@ export interface BankAuditFinding {
   detail: string;
 }
 
+// The guild slot ladder's valid purchased_slots_after values, mirrored from
+// src/sim/guild_bank.ts (the .mjs stays dependency-free of the TS sim;
+// tests/bank_audit.test.ts pins the two declarations in lockstep).
+export const OPEN_BANK_SLOTS_AFTER: number;
+export const GUILD_BUY_POSITIONS: readonly number[];
+
 // The pure checker: replays the ledger against the persisted bank state and
 // returns every shape or conservation anomaly, grouped by container. Guild
 // reconciliation runs only when guildBanks is provided.

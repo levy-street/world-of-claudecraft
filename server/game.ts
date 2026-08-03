@@ -32,7 +32,11 @@ import {
 import { devTierIndexForMergedPrs } from '../src/sim/dev_tier';
 import { parseRelayCommand } from '../src/sim/discord_relay';
 import { specialRoleChatTag } from '../src/sim/discord_roles';
-import { GUILD_CREATION_FEE_COPPER, type GuildBankOpDelta } from '../src/sim/guild_bank';
+import {
+  GUILD_CREATION_FEE_COPPER,
+  type GuildBankOpDelta,
+  guildBankRungsBought,
+} from '../src/sim/guild_bank';
 import {
   isInJailCage,
   JAIL_CENTER,
@@ -4029,9 +4033,15 @@ export class GameServer {
     // (the sim decides which rung is next off the BEFORE book); it gets its
     // own ledger op name so the audit's treasury replay can exclude the
     // purse-paid copper like create_fee, and so the revert path never credits
-    // the treasury for money it never held.
+    // the treasury for money it never held. The rung is derived EXACTLY as
+    // the sim's buy op derives it (guildBankRungsBought, which floors a
+    // non-position count): a tampered live count below the opened base still
+    // charges the purse, so naming it buy_slots here would corrupt the audit
+    // replay and let a revert mint treasury copper.
     const effectiveOp: GuildBankLedgerOp =
-      op === 'buy_slots' && before?.purchasedSlots === 0 ? 'open_bank' : op;
+      op === 'buy_slots' && before !== null && guildBankRungsBought(before.purchasedSlots) === 0
+        ? 'open_bank'
+        : op;
     const deltas = diffGuildBankOp(effectiveOp, before, after);
     if (deltas.length === 0) return;
     // A successful op requires a stamped officer-plus membership, and the

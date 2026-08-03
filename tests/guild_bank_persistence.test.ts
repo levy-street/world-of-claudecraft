@@ -322,6 +322,36 @@ describe('the dispatch observer: ledger rows + the dirty mark', () => {
     expect(ops[1].copperDelta).toBe(-25_000); // rung 1, treasury-paid
   });
 
+  it('a tampered below-base count still records open_bank (the rung derivation matches the sim)', async () => {
+    // A live count below the opened base is NOT a valid ladder position, but
+    // the sim's buy op floors it to rung 0 and charges the PURSE. The
+    // observer must derive the rung the same way (guildBankRungsBought), not
+    // compare against literal zero: naming this row buy_slots would count
+    // purse copper in the audit's treasury replay and let a later revert
+    // mint 90_000 treasury copper.
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'TamperedOpen');
+    moveToBanker(server, session.pid);
+    server.sim.setPlayerGuildMembership(session.pid, { guildId: GUILD_ID, rank: 'officer' });
+    server.sim.loadGuildBank(GUILD_ID, { treasury: 5_000, inventory: [], purchasedSlots: 0 });
+    const book = server.sim.guildBanks.get(GUILD_ID);
+    if (!book) throw new Error('missing book');
+    book.purchasedSlots = 6; // hostile: below the 24-slot base (load-path floor bypassed)
+    const meta = server.sim.players.get(session.pid);
+    if (!meta) throw new Error('missing meta');
+    meta.copper = 100_000;
+    dispatch(server, session, { cmd: 'guild_bank_buy_slots' });
+    expect(meta.copper).toBe(10_000); // rung 0: purse-paid
+    expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(5_000); // never the treasury
+    await bankLedgerIdle();
+    expect(dbMock.insertBankLedgerRow).toHaveBeenCalledTimes(1);
+    expect((dbMock.insertBankLedgerRow.mock.calls[0] as unknown[])[0]).toMatchObject({
+      op: 'open_bank',
+      copperDelta: -90_000,
+    });
+    expect(session.unflushedGuildBankOps.get(GUILD_ID)?.[0]?.op).toBe('open_bank');
+  });
+
   it('a purse-poor rung-0 open is refused: no row, nothing dirty, nothing granted', async () => {
     const server = new GameServer();
     const { session } = joinServer(server, 1, 'PoorOpener');

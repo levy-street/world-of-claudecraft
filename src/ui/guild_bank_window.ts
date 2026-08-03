@@ -182,6 +182,9 @@ export class GuildBankTab {
   // the styling class, and the always-visible note says whose money it is.
   private buildOpenRow(open: GuildBankOpenModel): HTMLElement {
     const row = document.createElement('div');
+    // `.gbank-open-row` is a structural marker (no CSS rule of its own; the
+    // shared bank-buy-row classes carry the styling): it distinguishes the
+    // open row in tests and DOM tooling.
     row.className = 'bank-buy-row gbank-buy-row gbank-open-row';
     const btn = document.createElement('button');
     btn.type = 'button';
@@ -205,19 +208,39 @@ export class GuildBankTab {
   // The open-the-bank confirm: same chrome as the expansion confirm; the wire
   // token is the same guildBankBuySlots (the sim decides the next rung and
   // charges the PURSE for rung 0; the price is never client-supplied).
+  // `.gbank-open-prompt` is a structural marker (no CSS rule of its own; the
+  // shared bank-buy-prompt classes carry the styling): it distinguishes the
+  // open confirm in tests and DOM tooling.
   private showOpenBankPrompt(price: number): void {
+    this.showBuyConfirmPrompt({
+      className: 'gbank-open-prompt',
+      text: t('hudChrome.bank.guildOpenConfirm', { price: formatMoney(price) }),
+      confirmLabel: t('hudChrome.bank.guildOpenAccept'),
+    });
+  }
+
+  // The ONE confirm-prompt builder behind the expansion and open-the-bank
+  // confirms (the rule of three landed with the open prompt: the personal
+  // pane's buy confirm in bank_window.ts is the third sibling; fold it in if
+  // it ever grows guild-shaped needs). Both actions send the same
+  // guildBankBuySlots token; the sim decides the rung and the payer.
+  private showBuyConfirmPrompt(opts: {
+    className?: string;
+    text: string;
+    confirmLabel: string;
+  }): void {
     this.deps.dismissPrompts();
     const opener = document.activeElement as HTMLElement | null;
     const stack = document.getElementById('prompt-stack');
     if (!stack) return;
     const prompt = document.createElement('div');
-    prompt.className = 'prompt panel bank-buy-prompt gbank-buy-prompt gbank-open-prompt';
-    prompt.innerHTML = `<div class="prompt-text">${esc(
-      t('hudChrome.bank.guildOpenConfirm', { price: formatMoney(price) }),
-    )}</div>`;
+    prompt.className = ['prompt panel bank-buy-prompt gbank-buy-prompt', opts.className]
+      .filter(Boolean)
+      .join(' ');
+    prompt.innerHTML = `<div class="prompt-text">${esc(opts.text)}</div>`;
     const confirm = document.createElement('button');
     confirm.className = 'btn';
-    confirm.textContent = t('hudChrome.bank.guildOpenAccept');
+    confirm.textContent = opts.confirmLabel;
     const cancel = document.createElement('button');
     cancel.className = 'btn';
     cancel.textContent = t('itemUi.vendor.sellQuantityCancel');
@@ -558,38 +581,13 @@ export class GuildBankTab {
   }
 
   private showBuySlotsPrompt(price: number, blockSlots: number): void {
-    this.deps.dismissPrompts();
-    const opener = document.activeElement as HTMLElement | null;
-    const stack = document.getElementById('prompt-stack');
-    if (!stack) return;
-    const prompt = document.createElement('div');
-    prompt.className = 'prompt panel bank-buy-prompt gbank-buy-prompt';
-    prompt.innerHTML = `<div class="prompt-text">${esc(
-      t('hudChrome.bank.guildBuyConfirm', {
+    this.showBuyConfirmPrompt({
+      text: t('hudChrome.bank.guildBuyConfirm', {
         count: this.fmt(blockSlots),
         price: formatMoney(price),
       }),
-    )}</div>`;
-    const confirm = document.createElement('button');
-    confirm.className = 'btn';
-    confirm.textContent = t('hudChrome.bank.buyConfirmAccept');
-    const cancel = document.createElement('button');
-    cancel.className = 'btn';
-    cancel.textContent = t('itemUi.vendor.sellQuantityCancel');
-    prompt.append(confirm, cancel);
-    const { dismiss, dismissAndReturn } = this.deps.installPromptDialog(prompt, opener, () =>
-      prompt.remove(),
-    );
-    confirm.addEventListener('click', () => {
-      this.deps.world().guildBankBuySlots();
-      audio.coin();
-      dismiss();
-      this.deps.requestRender();
-      this.focusClose();
+      confirmLabel: t('hudChrome.bank.buyConfirmAccept'),
     });
-    cancel.addEventListener('click', dismissAndReturn);
-    stack.appendChild(prompt);
-    window.setTimeout(() => confirm.focus(), 0);
   }
 
   // Land focus on the window's always-present close button after an op-driven

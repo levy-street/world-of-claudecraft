@@ -1710,6 +1710,28 @@ describe('revertGuildBankDeltas (the unflushable-session surgical undo)', () => 
     expect(book(sim).treasury).toBe(10_000);
   });
 
+  it('an open_bank revert after ANOTHER session expanded never strands a non-ladder position', () => {
+    // The cross-session race: the dead session opened (0 -> 24), a live
+    // session bought an expansion (24 -> 30), then the dead session's
+    // open_bank delta reverts. Subtracting the 24-slot base would leave 6 (a
+    // non-position: capacity collapses to 0 and the paid expansion is
+    // destroyed); the guard leaves the grant in place instead (the
+    // clamped-residue contract) and the treasury never moves.
+    const sim = makeOfficerSim({ treasury: 40_000, purchasedSlots: 0 });
+    meta(sim).copper = 90_000;
+    sim.guildBankBuySlotsFor(sim.playerId); // open: 0 -> 24 (purse)
+    sim.guildBankBuySlotsFor(sim.playerId); // expand: 24 -> 30 (treasury 40k - 25k)
+    expect(book(sim).purchasedSlots).toBe(30);
+    expect(book(sim).treasury).toBe(15_000);
+    sim.revertGuildBankDeltas(GUILD_ID, [
+      { op: 'open_bank', itemId: null, count: null, instance: null, copperDelta: -90_000 },
+    ]);
+    expect(GUILD_BANK_LADDER_POSITIONS).toContain(book(sim).purchasedSlots); // valid position
+    expect(book(sim).purchasedSlots).toBe(30); // the grant stays: nothing destroyed
+    expect(guildBankCapacity(book(sim))).toBe(30);
+    expect(book(sim).treasury).toBe(15_000); // untouched either way
+  });
+
   it('reverts newest-first over a mixed batch, draws no rng, and no-ops on an absent book', () => {
     const sim = makeOfficerSim({ treasury: 10_000 });
     sim.addItem('wolf_fang', 2);

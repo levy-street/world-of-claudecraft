@@ -52,7 +52,14 @@ Teardown of docs/guild-bank/ awaits the user's explicit confirmation.
   the treasury: the purse charge rolled back with the dead session's character half).
   Persistence shape unchanged (`purchasedSlots` already persists granted slots; the
   sanitize floor onto ladder positions makes any pre-feature/old-ladder row load
-  sanely, and the no-row empty book now correctly means an UNOPENED bank). Item
+  sanely, and the no-row empty book now correctly means an UNOPENED bank). "Sanely"
+  qualified: a pre-redesign row whose purchasedSlots sits below the opened base
+  (the old ladder's 6/12/18) floors to 0, so that bank loads CLOSED and its paid
+  expansions are not honored (items are still never destroyed: over-capacity is
+  tolerated and withdrawal works once reopened). Acceptable ONLY because the
+  feature has never shipped (no production rows exist, only dev-DB residue);
+  landing such a floor against real data would instead need a migration mapping
+  old positions onto the new ladder. Item
   deposit against the 0-capacity book refuses via the capacity check ('The guild bank
   is full.'); an unopened bank with 0 treasury never blocks disband (the guard counts
   copper and items only). UI: the Guild tab's 'unopened' view state renders the
