@@ -102,11 +102,24 @@ export function moveBetweenContainers(
   // Instanced: the whole slot moves as one unit (a per-instance payload can never
   // be split from its units), merging into a byte-equal dest stack when one has
   // room and taking a fresh (deep-cloned) dest slot otherwise.
+  // craftedRecipeId is threaded through BOTH calls here for exactly the reason
+  // the plain arm below spells out: countFit and addStacked key their merge on
+  // it, so omitting it strips the marker off any slot that carries an instance
+  // payload AND a craft provenance (a crafted weapon that was worn while
+  // enchanted is precisely that shape). One bank round trip then launders a
+  // self-crafted item into an indistinguishable found one and it disenchants
+  // for the enchanting skill the anti-farm gate exists to deny. Both calls take
+  // it or neither does: threading it into only one would make the fit check and
+  // the grant disagree about which stacks are mergeable, which is a
+  // no_fit-vs-overflow divergence rather than a laundering one.
   if (slot.instance) {
-    if (countFit(dest, destCapacity, slot.itemId, slot.count, slot.instance) < slot.count) {
+    if (
+      countFit(dest, destCapacity, slot.itemId, slot.count, slot.instance, slot.craftedRecipeId) <
+      slot.count
+    ) {
       return { moved: 0, refusal: 'no_fit' };
     }
-    addStacked(dest, slot.itemId, slot.count, slot.instance);
+    addStacked(dest, slot.itemId, slot.count, slot.instance, slot.craftedRecipeId);
     source.splice(sourceIndex, 1);
     return { moved: slot.count };
   }

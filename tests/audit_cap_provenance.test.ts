@@ -1,14 +1,17 @@
-// HOSTILE AUDIT (throwaway): the guild bank launders the craft-provenance
-// marker off an INSTANCED slot, defeating the craft-then-disenchant
-// anti-farming gate. Each assertion states the SAFE expectation; a FAILING
-// assertion is the finding.
+// PERMANENT REGRESSION PIN, promoted from the hostile audit that found it: a
+// bank round trip used to launder the craft-provenance marker off an INSTANCED
+// slot, defeating the craft-then-disenchant anti-farming gate. The instanced
+// arm of moveBetweenContainers (src/sim/bank.ts) omitted craftedRecipeId from
+// both countFit and addStacked while the plain arm right below it threaded it
+// through, so a slot carrying BOTH carriers lost the marker. It affects the
+// SHIPPED personal bank identically, which is why case 4 exists.
 import { describe, expect, it } from 'vitest';
 import { bankDeposit, bankWithdraw } from '../src/sim/bank';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { BUILTIN_WORLD, ITEMS } from '../src/sim/data';
 import { enchantedPayloadFor, resolveDisenchant } from '../src/sim/professions/enchanting';
 import { Sim } from '../src/sim/sim';
-import type { Entity, WorldContent } from '../src/sim/types';
+import type { Entity, EquipSlot, WorldContent } from '../src/sim/types';
 
 const BANKERS = ['bursar_fernando', 'bursar_petra_vell', 'bursar_aldous_crane'] as const;
 const WORLD: WorldContent = {
@@ -47,7 +50,7 @@ const meta = (sim: Sim) => {
   return m;
 };
 
-describe('AUDIT: guild bank strips craft provenance off an instanced slot', () => {
+describe('a bank round trip must keep craft provenance on an INSTANCED slot', () => {
   it('0: the target weapon is guild-bank eligible (not quest/soulbound/noMarketList)', () => {
     const def = ITEMS[WEAPON];
     expect(def).toBeDefined();
@@ -70,16 +73,20 @@ describe('AUDIT: guild bank strips craft provenance off an instanced slot', () =
     sim.equipItem(WEAPON);
     // The equip carried the marker INTO the worn payload (items.ts equipmentPayloadFor).
     const worn = meta(sim).equipmentInstance;
-    const slotKey = Object.keys(worn).find((k) => worn[k]?.craftedRecipeId === RECIPE);
+    const slotKey = (Object.keys(worn) as EquipSlot[]).find(
+      (k) => worn[k]?.craftedRecipeId === RECIPE,
+    );
     expect(slotKey, 'worn payload should carry the marker').toBeDefined();
 
     // The real worn-enchant write (enchanting.ts:694), reagent gate skipped.
     if (!slotKey) throw new Error('no worn payload');
-    worn[slotKey] = enchantedPayloadFor(worn[slotKey], ENCHANTS.enchant_weapon_might);
-    expect(worn[slotKey].craftedRecipeId).toBe(RECIPE);
-    expect(worn[slotKey].enchant).toBe('enchant_weapon_might');
+    const wornSlot = worn[slotKey];
+    if (!wornSlot) throw new Error('no worn payload');
+    worn[slotKey] = enchantedPayloadFor(wornSlot, ENCHANTS.enchant_weapon_might);
+    expect(worn[slotKey]?.craftedRecipeId).toBe(RECIPE);
+    expect(worn[slotKey]?.enchant).toBe('enchant_weapon_might');
 
-    sim.unequipItem(slotKey as never);
+    sim.unequipItem(slotKey);
     const back = meta(sim).inventory.find((s) => s.itemId === WEAPON);
     expect(back?.craftedRecipeId).toBe(RECIPE);
     expect(back?.instance).toBeDefined(); // BOTH carriers present: the vulnerable shape
@@ -100,7 +107,7 @@ describe('AUDIT: guild bank strips craft provenance off an instanced slot', () =
     expect(meta(sim).inventory[0]?.craftedRecipeId).toBe(RECIPE);
   });
 
-  it('3: EXPLOIT: the laundered copy disenchants for enchanting skill the gate should deny', () => {
+  it('3: the round-tripped copy still disenchants for NO enchanting skill (the anti-farm gate)', () => {
     // Control: the marker intact denies the skill (the shipped anti-farm rule).
     const control = officerAtBanker();
     control.players.get(control.playerId)!.inventory.length = 0;
@@ -129,7 +136,7 @@ describe('AUDIT: guild bank strips craft provenance off an instanced slot', () =
     expect(meta(sim).craftSkills.enchanting ?? 0).toBe(0);
   });
 
-  it('4: the PERSONAL bank (shared moveBetweenContainers) launders it too', () => {
+  it('4: the PERSONAL bank (shared moveBetweenContainers) keeps it too', () => {
     const sim = officerAtBanker();
     meta(sim).inventory.length = 0;
     meta(sim).inventory.push({
