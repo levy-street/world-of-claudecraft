@@ -1,8 +1,8 @@
-// HOSTILE currency-conservation + audit-truth probes against the guild bank.
-// Adversarial audit (attack list F / I / J). Drives the REAL GameServer + Sim
-// with a DURABLE-STORE db mock (saves write into an in-memory "database" and
-// the reconcile read serves it back), because the whole question is what is
-// DURABLE after a torn escrow, not what the live sim holds.
+// PERMANENT currency-conservation + audit-truth pins for the guild bank,
+// promoted from the hostile audit that found the escrow dupes. Drives the REAL
+// GameServer + Sim against a DURABLE-STORE db mock that runs the REAL escrow
+// merge, because the whole question is what is DURABLE after a torn escrow,
+// not what the live sim holds.
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 type Book = { treasury: number; inventory: unknown[]; purchasedSlots: number };

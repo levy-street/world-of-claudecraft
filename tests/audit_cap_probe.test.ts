@@ -1,6 +1,13 @@
-// HOSTILE AUDIT PROBE (throwaway): capacity/stacking, ladder integrity, and
-// malicious-client input against the guild bank. Assertions state the SAFE
-// expectation; a FAILING assertion is the finding.
+// PERMANENT REGRESSION PINS, promoted from the hostile audit probe that found
+// them: capacity/stacking, ladder integrity through the undo path, and
+// malicious-client input against the guild bank. Every assertion states the
+// SAFE expectation, so a failure here is a real defect and not a
+// characterization drifting.
+//
+// The ONE exception is G1, which is labelled CHARACTERIZATION in place: it
+// records the rung-0 flavour of the D5 residue the escrow design deliberately
+// leaves open (docs/guild-bank/state.md), and its size is pinned independently
+// in tests/audit_conservation_property.test.ts P4-RESIDUE.
 import { describe, expect, it } from 'vitest';
 import { bankDeposit, bankWithdraw } from '../src/sim/bank';
 import { BUILTIN_WORLD } from '../src/sim/data';

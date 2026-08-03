@@ -25,6 +25,16 @@
 //
 // Every run is reproducible from a printed seed; failures are minimized to the
 // shortest still-failing op sequence by delta debugging (shrinkSteps below).
+//
+// PERMANENT characterization suite. Most of it is a property that must simply
+// hold; the blocks labelled P4-RESIDUE and P5 are CHARACTERIZATIONS of residues
+// the design deliberately leaves open (docs/guild-bank/state.md), pinned with
+// their exact witnesses and their exact sizes so a change to either is loud
+// rather than silent. A few sweeps carry a generator restriction labelled
+// "D5 MARKER": that is what keeps a sweep from re-deriving a pinned residue,
+// and each one names the residue it marks. Restrictions that existed only to
+// steer sweeps away from the OLD shared-book save window are gone: every sweep
+// now runs both officers acting and both officers saving.
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
