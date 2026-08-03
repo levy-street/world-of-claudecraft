@@ -320,6 +320,79 @@ Current phase: Phase 3 complete (2026-08-02); Phase 3 QA next.
       GUILD_CREATION_FEE_COPPER`): a meta-only pid can never found a free or
       discounted guild.
 - Phase 4 UI modules / i18n keys / screenshots:
+  - New pure core `src/ui/guild_bank_view.ts` (UI_PURE_CORES): `buildGuildBankView`
+    (GuildBankInfo -> render model: slot rows with `known` + `dormant` flags, capacity,
+    RAW-copper treasury with purse-free gold enablement, expansion price + affordability,
+    `hasDormant`), `guildBankSlotDormant` (the client pipe-predicate mirror: quest /
+    soulbound / noMarketList / isTransferLockedInstance; unknown def is NOT dormant, the
+    sim allows the recovery withdraw), `guildBankSlotAction` (dormant always plain
+    withdraw, never the split prompt), `coinFieldsToCopper`, `guildBankGoldDepositMax`,
+    `guildBankGoldWithdrawMax`, `clampGoldAmount`. Money formats at the PAINTER boundary
+    (i18n formatMoney/moneyHtml); the core stays i18n-free per the UI_PURE_CORES scan.
+  - New cold pane painter `src/ui/guild_bank_window.ts` (UI_DOM_MODULES): `GuildBankTab`,
+    composed by `BankWindow`; renders capacity, treasury row (deposit/withdraw money via
+    mailbox-idiom g/s/c coin prompts), the slot grid (dormant slots dimmed + dashed +
+    lock mark + own aria + always-visible legend line, NEVER hidden; unknown-id slots
+    render a localized unknown label and stay withdrawable), and the buy row (treasury
+    price, never affordability-disabled, visible "Treasury short" text marker,
+    "Paid from the guild treasury" note). Prompts reuse BankWindow.installPromptDialog
+    (injected) and the .bank-quantity-prompt / .bank-buy-prompt classes so
+    BANK_PROMPT_SELECTOR teardown covers them.
+  - `src/ui/bank_window.ts`: Personal/Guild tab strip via the shared
+    tab_strip_view/tab_strip_painter cores, rendered ONLY while guildBankInfo is
+    non-null; tab falls back to Personal on the same paint when the info nulls; close()
+    resets to Personal; the ONE refresh signature gained the guild arm (treasury,
+    capacity, purchasedSlots, nextExpansionPrice, slots; deliberately purse-free);
+    `restoreScroll` scopes the .bank-scroll offset to one pane (scrollTop allowance
+    stays 4); `guildTabActive` getter feeds the bags mode wiring.
+  - Bags deposit routing: `BagMode.guildBankDeposit` (bags_view.ts arms
+    `guildBankDeposit` + three pre-empt denies voicing the exact sim lines:
+    error.bankQuestItem / error.guildBankSoulbound / error.guildBankNoTransfer);
+    bags_window.ts consumer (`isGuildBankTab` dep, at most one bank mode active,
+    showDepositQuantityPrompt gained a 'bank'|'guild' target); hud.ts wires
+    `isGuildBankTab: () => this.bankWindow.guildTabActive`.
+  - i18n: 21 new `hudChrome.bank.*` keys (tabsAria, personalTab, guildTab,
+    guildCapacityAria, guildEmpty, guildTreasury, guildDepositGold, guildWithdrawGold,
+    guildDepositGoldTitle, guildWithdrawGoldTitle, guildGoldAvailable, guildBuyConfirm,
+    guildBuyNote, guildTreasuryShort, guildDormantNote, guildDormantHint,
+    guildDormantAria, guildUnknownItem, guildDepositHint, guildCannotDeposit,
+    guildGoldCannotMove), en-only domain + the five M16 non-Latin fills
+    (zh_CN/zh_TW/ja_JP/ko_KR/ru_RU overlays); the withdraw/deposit prompt bodies REUSE
+    the personal keys; no sim/server emits changed (no new sim_i18n rows needed).
+  - Review-driven (Phase 4 reviews, both reviewers): `src/ui/bank_quantity_prompt.ts`
+    (UI_DOM_MODULES), the ONE quantity-prompt builder behind the bank withdraw, guild
+    withdraw, and bags deposit prompts; the gold prompt follows the sim's
+    refuse-and-keep semantics (over-purse -> 'Not enough money.', over-headroom ->
+    error.guildBankTreasuryCap, inline polite live-region line, never a clamp-down;
+    withdraw clamps to the visible treasury BY DESIGN); the plain-click withdraw
+    carries the same identity guard as the prompt submit; `guildTabActive` also
+    requires a live guildBankInfo; `src/sim/guild_bank.ts` exports
+    guildBankPipeRefusal FOR THE PARITY PIN ONLY (no host calls it; zero behavior
+    change), swept against guildBankSlotDormant over the whole item table in
+    tests/guild_bank_view.test.ts; tests/bags_guild_deposit_routing.test.ts pins the
+    guild-tab bag-click dispatch behaviorally.
+  - Styles: .bank-tabs/.bank-tab (soc-tabs mirror), .gbank-treasury*, .gbank-gold-btn,
+    .gbank-dormant* (grayscale + dashed + lock mark + legend), .gbank-unknown*,
+    .gbank-buy-*, .gbank-coin-row inside the components.css bank banner section BEFORE
+    the .bank-bonus block (that block's no-hex scan slices to the docking comment);
+    hud.mobile.css adds the 40px touch floor for .bank-tab/.gbank-gold-btn.
+  - Tests: tests/guild_bank_view.test.ts (model, dormant per dimension, projection-gap
+    pin, boundaries, gold math, Sim-vs-ClientWorld parity), tests/guild_bank_window.test.ts
+    (jsdom-driven REAL BankWindow: tab visibility per state, fallback on null, close
+    reset, dormant rendering, every action round-trip, prompt teardown); pins updated in
+    tests/architecture.test.ts (both registries), tests/bags_view.test.ts (mode cascade),
+    tests/bags_window.test.ts (mode wiring), three bags fixture suites,
+    tests/language_fanout_registry.test.ts (bank_window memos += lastRenderedTab).
+  - Screenshots: docs/screenshots/guild-bank-tab/ (before-desktop/mobile at the Phase 3
+    base; after-desktop-personal/guild, after-desktop-guild-full, after-mobile-personal/
+    guild online via scripts/guild_bank_tab_shot.mjs, STAGE=offline/online; the offline
+    stage doubles as the offline-sees-only-Personal proof).
+  - Known client-side gap, BY DESIGN (pinned in tests/guild_bank_view.test.ts): a
+    dormant slot whose ONLY refusal dimension was a per-copy transfer lock arrives with
+    publicInstanceView-stripped lock fields, so the client cannot flag it; it renders as
+    an ordinary slot and its withdraw round-trips to the sim's localized refusal. Every
+    def-level dormant dimension (the realistic content-update vector in the v1
+    limitation) and every unknown-id row renders visibly distinct.
 
 ## Accepted risks and operational assumptions (Phase 3 review + Phase 3 QA outcomes)
 - Cross-officer escrow skew (ACCEPTED, market precedent, NARROWED by Phase 3 QA to the

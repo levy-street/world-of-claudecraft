@@ -8,7 +8,7 @@
 | Phase 2 QA | Done (PASS-WITH-FOLLOWUPS) | 2026-08-02 | 2026-08-02 |
 | Phase 3: persistence | Done | 2026-08-02 | 2026-08-02 |
 | Phase 3 QA | Done (PASS-WITH-FOLLOWUPS) | 2026-08-02 | 2026-08-02 |
-| Phase 4: UI | Not started | | |
+| Phase 4: UI | Done | 2026-08-02 | 2026-08-02 |
 | Phase 4 QA (final, offers teardown) | Not started | | |
 
 ## Phase 1 deliverables
@@ -48,12 +48,17 @@
       while bank non-empty; tests for both.
 
 ## Phase 4 deliverables
-- [ ] Guild tab in the bank window (renders only when `guildBankInfo` is present), view
-      core registered in `UI_PURE_CORES`, painter/window per the hud contracts.
-- [ ] English i18n keys (treasury shown via the i18n `formatMoney`); no locale overlay
-      edits.
-- [ ] Mobile pass + PR screenshots (desktop and mobile) under `docs/screenshots`.
-- [ ] View-core tests + any hud budget bucket updates.
+- [x] Guild tab in the bank window (renders only when `guildBankInfo` is present), view
+      core registered in `UI_PURE_CORES`, painter/window per the hud contracts
+      (`guild_bank_view.ts` + `guild_bank_window.ts` composed by `BankWindow`; cold
+      bucket, no new registrations needed beyond `UI_DOM_MODULES`).
+- [x] English i18n keys (treasury shown via the i18n `formatMoney` at the painter
+      boundary); the one sanctioned overlay edit class applied: the five M16 non-Latin
+      fills for the new wordy values (zh_CN/zh_TW/ja_JP/ko_KR/ru_RU).
+- [x] Mobile pass + PR screenshots (desktop and mobile) under
+      `docs/screenshots/guild-bank-tab/` (scripts/guild_bank_tab_shot.mjs).
+- [x] View-core tests + window tests; no hud budget bucket changes (bank_window's
+      scrollTop allowance unchanged at 4; the pane is a default cold window).
 
 ## Per-QA-phase checklist (each QA phase)
 - [ ] Every deliverable and acceptance item verified; BLOCKING and SHOULD-FIX fixed.
@@ -62,6 +67,72 @@
 Phase 1 QA: both lines verified and closed on 2026-08-02 (see Notes).
 
 ## Notes
+Phase 4 (2026-08-02):
+- The bank window family stayed COLD (event-driven rebuild + the slow-band
+  refreshIfChanged signature), so the phase's stopping rule (painter-driven per-frame
+  writes) never triggered: the Guild tab is a sibling pane inside the same cold window,
+  behind the same ONE signature (guild arm appended, deliberately purse-free).
+- The three carried-forward Phase 3 QA lines:
+  - No new book mutation path: the UI calls ONLY the five guild_bank_* facet commands
+    (pinned by the round-trip suite); no client code touches a book.
+  - Dormant slots render visibly distinct and are never hidden (dimmed + dashed + lock
+    mark + own aria + an always-visible legend line; the guild pane has NO filter layer
+    so nothing can drop a slot). The projected-lock residue (a slot whose only refusal
+    dimension was a per-copy transfer lock, stripped by publicInstanceView) is
+    client-undetectable BY DESIGN and round-trips to the sim's localized refusal; pinned
+    in tests/guild_bank_view.test.ts and recorded in the state.md ledger.
+  - The transient disband/last-member-leave refusal (guild.bankNotEmpty while an
+    emptying op is unflushed) needed NO client work: it rides the ordinary server error
+    pipeline (server_i18n) and surfaces as-is; no special client error state was added.
+- Screenshot capture is a bespoke online scene (scripts/guild_bank_tab_shot.mjs):
+  the Guild tab exists only online, so the change-aware offline tooling cannot shoot it;
+  the offline stage doubles as the offline/member-sees-only-Personal proof and the
+  BEFORE side (captured at the Phase 3 base via the stash protocol).
+- Phase 4 reviews (both dispatched fresh, COVERAGE not filtering):
+  frontend-seam-reviewer 0 BLOCKING / 8 SHOULD-FIX / 9 NIT; cross-platform-sync
+  APPROVE, 0 BLOCKING / 3 SHOULD-FIX. Every SHOULD-FIX was fixed in this pass:
+  - Mobile: the gold prompt's coin fields gained the 40px/16px touch rule (the
+    market coininput twin) and the Guild pane's fixed chrome gained max-height:480px
+    margin carve-outs beside the existing grid-floor yield.
+  - Distinct guild bags hints (guildDepositHint / guildCannotDeposit + M16 fills):
+    the consequences differ from the personal pane (shared pool, dormant stranding).
+  - Gold prompt semantics rebuilt to the sim's refuse-and-keep: an over-purse
+    deposit refuses with the 'Not enough money.' line, an over-headroom deposit
+    with error.guildBankTreasuryCap, both in an inline polite live-region line
+    (never a silent clamp-down or dismiss); an all-zero submit cancels silently;
+    the WITHDRAW side clamps to the on-screen treasury BY DESIGN (documented).
+  - The stale-index identity guard now covers the PLAIN click too (another
+    officer's op shifting the grid a tick before the click sends), not just the
+    prompt submit; pinned in tests/guild_bank_window.test.ts.
+  - Rule-of-three extraction: src/ui/bank_quantity_prompt.ts (UI_DOM_MODULES) is
+    the ONE quantity-prompt builder behind the bank withdraw, guild withdraw, and
+    bags deposit prompts (stale-resolve closures stay per caller).
+  - The sim's guildBankPipeRefusal is now exported for the parity pin only:
+    tests/guild_bank_view.test.ts sweeps the WHOLE merged item table asserting
+    the client dormant predicate agrees with the sim gate, plus the lock arms.
+  - tests/bags_guild_deposit_routing.test.ts (real BagsWindow, jsdom) pins WHICH
+    facet command each guild-tab bag click dispatches and the exact tSim line
+    each pipe deny voices; tests/guild_bank_window.test.ts gained the
+    no-magic-values twin describe (hex/dash scans, token + focus-ring pins).
+  - guildTabActive now also requires guildBankInfo non-null, closing the
+    one-frame stale-mode window between the mirror nulling and the slow-band
+    repaint; every guild prompt opener tears siblings down (dismissPrompts).
+- Phase 4 NITs accepted with reasons (recorded, not fixed):
+  - The bank tab strip omits panelId/aria-controls (the daily_rewards precedent):
+    the panes mount directly on the window root because wrapping them would
+    disturb the flex column the bank CSS sizes; tabs are still real WAI-ARIA.
+  - The bags deny wording for a guild-tab quest item reuses the sim's personal
+    line ('You cannot store quest items in the bank.'): a guild-worded variant
+    is a sim_i18n change (new emit + row), out of Phase 4 scope; follow-up.
+  - The capacity readout keeps the personal pane's idiom (a text div with a
+    supplementary aria-label, no role), precedent-consistent.
+  - The gbank-quantity-prompt / gbank-gold-prompt / gbank-buy-prompt marker
+    classes carry no CSS on purpose: they are test/QA selectors distinguishing
+    guild prompts from their personal twins inside the shared teardown classes.
+  - Dormant and unknown cells share the dashed border deliberately (both are
+    "needs attention" states); they differ by icon treatment, mark, label, and aria.
+  - The projected-lock dormant gap is the documented state.md item, pinned by test.
+
 Phase 3 QA (2026-08-02), fresh auditor, verdict PASS-WITH-FOLLOWUPS (after fixes):
 - The three reviewer lenses the implementer had only self-reviewed (progress note
   below) were RE-DISPATCHED fresh, serially: privacy-security-review CHANGES
