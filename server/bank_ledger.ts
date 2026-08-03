@@ -32,6 +32,13 @@ export interface BankOpDelta {
   // picks its columns explicitly); absent on personal rows and copper-only rows.
   craftedRecipeId?: string | null;
   copperDelta: number;
+  // The book's ladder position BEFORE the op. Not persisted (the ledger
+  // columns are picked explicitly), and set only on the GUILD path: the guild
+  // escrow log records slot ops ABSOLUTELY ("this op moved the ladder from
+  // before to after"), which is what makes the forward replay idempotent and
+  // the inverse a compare-and-swap. The personal bank's rows never feed a
+  // replay, so they leave it absent.
+  purchasedSlotsBefore?: number;
   purchasedSlotsAfter: number;
 }
 
@@ -239,6 +246,7 @@ export function diffGuildBankOp(
         count: null,
         instance: null,
         copperDelta: delta,
+        purchasedSlotsBefore: before.purchasedSlots,
         purchasedSlotsAfter: after.purchasedSlots,
       },
     ];
@@ -258,6 +266,7 @@ export function diffGuildBankOp(
         count: null,
         instance: null,
         copperDelta: -price,
+        purchasedSlotsBefore: before.purchasedSlots,
         purchasedSlotsAfter: after.purchasedSlots,
       },
     ];
@@ -287,6 +296,7 @@ export function diffGuildBankOp(
         instance: slot.instance ?? null,
         craftedRecipeId: slot.craftedRecipeId ?? null,
         copperDelta: 0,
+        purchasedSlotsBefore: before.purchasedSlots,
         purchasedSlotsAfter: after.purchasedSlots,
       });
     } else if (op === 'withdraw' && delta < 0) {
@@ -297,6 +307,7 @@ export function diffGuildBankOp(
         instance: slot.instance ?? null,
         craftedRecipeId: slot.craftedRecipeId ?? null,
         copperDelta: 0,
+        purchasedSlotsBefore: before.purchasedSlots,
         purchasedSlotsAfter: after.purchasedSlots,
       });
     }
@@ -343,6 +354,40 @@ export function recordGuildBankDeltas(
   }
 }
 
+// The ANOMALY op: an escrow save whose own deltas could not be replayed onto
+// durable truth, recorded once the deficit can never resolve (server/game.ts
+// resolveGuildBankDeficit). It is NOT an op a player performed: it is the
+// audit trail for the D5 consume-then-fence residue in
+// docs/guild-bank/state.md, which until the escrow root fix nothing in the
+// system could observe (the forward replay is the only code that knows both
+// durable truth and the intended delta). scripts/bank_audit.mjs reports every
+// one of these as a finding and excludes them from the item, treasury, and
+// ladder replays, since they describe work that did NOT land.
+export const GUILD_BANK_ESCROW_DEFICIT_OP = 'escrow_deficit';
+
+// Write one anomaly row, fire-and-forget on the shared FIFO tail like every
+// other ledger write. copper_delta carries a treasury shortfall as a NEGATIVE
+// number (copper that left a purse with no durable book decrement behind it);
+// item shortfalls ride item_id + count. purchased_slots_after is 0 and never
+// read: the auditor skips these rows in its monotonicity scan.
+export function recordGuildBankEscrowDeficit(
+  who: { characterId: number; accountId: number },
+  guildId: number,
+  deficit: { kind: string; op: string; itemId: string | null; shortfall: number },
+): void {
+  const isItem = deficit.kind === 'missing_items';
+  recordGuildBankDeltas(GUILD_BANK_ESCROW_DEFICIT_OP as GuildBankLedgerOp, who, guildId, [
+    {
+      itemId: isItem ? deficit.itemId : null,
+      count: isItem ? deficit.shortfall : null,
+      instance: null,
+      copperDelta: isItem ? 0 : -deficit.shortfall,
+      purchasedSlotsBefore: 0,
+      purchasedSlotsAfter: 0,
+    },
+  ]);
+}
+
 // The guild_create fee row (reserve-at-gate: the purse was charged at the
 // dispatch gate; the row is written only in the create's committed success
 // arm, which consumes that reservation). purchased_slots_after is 0: a
@@ -355,6 +400,7 @@ export function guildCreateFeeDelta(chargedCopper: number): BankOpDelta {
     count: null,
     instance: null,
     copperDelta: -chargedCopper,
+    purchasedSlotsBefore: 0,
     purchasedSlotsAfter: 0,
   };
 }

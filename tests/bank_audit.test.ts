@@ -627,3 +627,64 @@ describe('formatReport (guild rows)', () => {
     );
   });
 });
+
+describe('the escrow-deficit anomaly row (the D5 residue, made auditable)', () => {
+  // Until the escrow root fix nothing in the system could observe this residue:
+  // the forward replay is the only code that knows both durable truth and a
+  // session's intended delta, so it is the only place a shortfall is visible.
+  const guildRow = (o: Partial<BankLedgerAuditRow>): BankLedgerAuditRow =>
+    L({ container: 'guild', container_id: 913, ...o });
+
+  it('is REPORTED, and takes no part in the item, treasury, or ladder replays', () => {
+    const findings = auditBank({
+      ledgerRows: [
+        guildRow({ id: 1, op: 'deposit_gold', copper_delta: 5_000, purchased_slots_after: 24 }),
+        // The anomaly: 250 copper reached a purse the book never lost.
+        guildRow({
+          id: 2,
+          op: 'escrow_deficit',
+          copper_delta: -250,
+          // Deliberately 0 while the guild sits at 24: an anomaly row carries
+          // no ladder position and must not read as a ladder regression.
+          purchased_slots_after: 0,
+        }),
+      ],
+      characters: [],
+      guildBanks: [
+        {
+          guild_id: 913,
+          realm: 'Claudemoon',
+          data: { treasury: 5_000, inventory: [], purchasedSlots: 24 },
+        },
+      ],
+    });
+    expect(findings.map((f) => f.kind)).toEqual(['escrow_deficit']);
+    expect(findings[0].detail).toContain('250 copper');
+    expect(findings[0].guildId).toBe(913);
+  });
+
+  it('names the missing copies on an item shortfall', () => {
+    const findings = auditBank({
+      ledgerRows: [
+        guildRow({ id: 1, op: 'deposit', item_id: 'wolf_fang', count: 4 }),
+        guildRow({ id: 2, op: 'withdraw', item_id: 'wolf_fang', count: 4 }),
+        guildRow({ id: 3, op: 'escrow_deficit', item_id: 'wolf_fang', count: 4 }),
+      ],
+      characters: [],
+      guildBanks: [{ guild_id: 913, realm: 'Claudemoon', data: { treasury: 0, inventory: [] } }],
+    });
+    expect(findings.map((f) => f.kind)).toEqual(['escrow_deficit']);
+    expect(findings[0].detail).toContain('4 x wolf_fang');
+  });
+
+  it('is a GUILD-container op: one on the personal container is flagged', () => {
+    const findings = auditBank({
+      ledgerRows: [L({ id: 1, op: 'escrow_deficit', copper_delta: -1 })],
+      characters: [],
+      guildBanks: [],
+    });
+    expect(findings.map((f) => f.kind).sort()).toEqual(
+      ['escrow_deficit', 'gold_op_outside_guild'].sort(),
+    );
+  });
+});

@@ -279,12 +279,21 @@ export function refundGuildCreationFee(ctx: SimContext, pid: number, amount: num
 }
 
 /** One successful guild bank op's effect on the BOOK, as the server's dispatch
- *  observer recorded it (server/bank_ledger.ts diffGuildBankOp): the shape
- *  revertGuildBankDeltas below needs to surgically undo a session's unflushed
- *  ops when that session can never persist them (its escrow save fenced out or
- *  exhausted its leave retries while ANOTHER session still holds legitimate
- *  unflushed ops on the same shared book, so an evict-and-reload from durable
- *  truth would destroy those). */
+ *  observer recorded it (server/bank_ledger.ts diffGuildBankOp). The log of a
+ *  session's un-persisted deltas is that session's UNCOMMITTED WORK, and it is
+ *  replayed in BOTH directions:
+ *
+ *  - FORWARD (applyGuildBankDeltasTo) onto DURABLE truth, to build the escrow
+ *    save's book payload: a session persists "the durable book plus its own
+ *    deltas", never the whole shared live book, so one officer's save can never
+ *    carry another officer's not-yet-durable op into the row.
+ *  - BACKWARD (revertGuildBankDeltasTo) onto the LIVE book, when a session can
+ *    never persist those deltas (its escrow save fenced out, or its leave flush
+ *    exhausted its retries), leaving every other session's work intact.
+ *
+ *  The two are exact inverses and live side by side on purpose; the identity
+ *  property (revert(apply(book, d)) === book) is pinned in
+ *  tests/guild_bank.test.ts so they cannot drift apart. */
 export interface GuildBankOpDelta {
   op: 'deposit_gold' | 'withdraw_gold' | 'deposit' | 'withdraw' | 'buy_slots' | 'open_bank';
   itemId: string | null;
@@ -292,6 +301,34 @@ export interface GuildBankOpDelta {
   instance: InvSlot['instance'] | null;
   craftedRecipeId?: string | null;
   copperDelta: number;
+  /** The book's ladder position BEFORE this op. Slot ops are recorded and
+   *  replayed ABSOLUTELY ("this op moved the ladder from before to after"),
+   *  never relatively ("+6"): a relative record replayed onto durable truth
+   *  that already advanced would double-grant the rung, and a relative undo
+   *  could strand a non-ladder position. Zero on every non-slot op (carried,
+   *  never read). */
+  purchasedSlotsBefore: number;
+  /** The book's ladder position AFTER this op: the "raise to at least N"
+   *  target the forward replay applies, and the compare-and-swap witness the
+   *  inverse checks before undoing anything. */
+  purchasedSlotsAfter: number;
+}
+
+/** Why a session's own deltas could NOT be replayed forward onto durable
+ *  truth. Reaching this means another officer consumed (or depended on) value
+ *  that is not durable yet: the D5 consume-then-fence residue class in
+ *  docs/guild-bank/state.md. The forward applier is the first code in the
+ *  system that can SEE it, because it is the only code that knows both the
+ *  durable base and the intended delta, so the server turns a deficit into a
+ *  retry and (once it can never resolve) a bank_ledger anomaly row. */
+export interface GuildBankDeltaDeficit {
+  kind: 'treasury_underflow' | 'treasury_overflow' | 'missing_items' | 'ladder_behind';
+  op: GuildBankOpDelta['op'];
+  itemId: string | null;
+  /** How much of the delta the base could not satisfy: copper for the two
+   *  treasury kinds, item copies for missing_items, ladder slots for
+   *  ladder_behind. Always positive. */
+  shortfall: number;
 }
 
 function clampTreasury(v: number): number {
@@ -327,16 +364,262 @@ function sameInstance(
   return canonicalJson(a) === canonicalJson(b);
 }
 
-/** Surgically UNDO a dead session's unflushed ops on a live book, newest
- *  first, leaving every OTHER session's unflushed ops intact. Called by the
- *  server only on the arm where a fenced-out (or leave-exhausted) session's
- *  book mutations can never ride their own escrow save AND another live
- *  session still holds legitimate unflushed ops (so the evict-and-reload arm
- *  would destroy value). Inverses clamp rather than throw: if another officer
- *  already consumed the un-durable value (withdrew the copper or the copy),
- *  the inverse no-ops on the missing part; that residue is the documented
- *  accepted risk in docs/guild-bank/state.md. Never touches player state:
- *  the dead session's character half already rolled back by definition. */
+/** The delta's item count as a non-negative integer (0 when the delta carries
+ *  no item half). Shared by both directions so they can never disagree. */
+function deltaCount(d: GuildBankOpDelta): number {
+  return Math.max(0, Math.floor(Number(d.count)) || 0);
+}
+
+/** The delta's craft-provenance marker as addStacked wants it. */
+function deltaRecipe(d: GuildBankOpDelta): string | undefined {
+  return typeof d.craftedRecipeId === 'string' && d.craftedRecipeId !== ''
+    ? d.craftedRecipeId
+    : undefined;
+}
+
+/** How many matching copies a book holds. The match is THREE-dimensional
+ *  (itemId, the canonical instance payload, AND craftedRecipeId): the book
+ *  keeps a crafted and a plain copy of one item as separate slots, and
+ *  crossing that line would destroy another officer's provenance. */
+function countMatching(book: GuildBankState, d: GuildBankOpDelta): number {
+  let held = 0;
+  for (const slot of book.inventory) {
+    if (
+      slot.itemId === d.itemId &&
+      sameInstance(slot.instance, d.instance) &&
+      (slot.craftedRecipeId ?? null) === (d.craftedRecipeId ?? null)
+    ) {
+      held += slot.count;
+    }
+  }
+  return held;
+}
+
+/** Remove up to `count` matching copies from a book, newest slots first, and
+ *  return how many could NOT be found. */
+function removeMatching(book: GuildBankState, d: GuildBankOpDelta, count: number): number {
+  let remaining = count;
+  for (let s = book.inventory.length - 1; s >= 0 && remaining > 0; s--) {
+    const slot = book.inventory[s];
+    if (
+      slot.itemId !== d.itemId ||
+      !sameInstance(slot.instance, d.instance) ||
+      (slot.craftedRecipeId ?? null) !== (d.craftedRecipeId ?? null)
+    ) {
+      continue;
+    }
+    const take = Math.min(slot.count, remaining);
+    slot.count -= take;
+    remaining -= take;
+    if (slot.count <= 0) book.inventory.splice(s, 1);
+  }
+  return remaining;
+}
+
+/** Put copies back through the ONE canonical grant path (bags.ts addStacked):
+ *  it merges only into stacks whose payload AND craft provenance match,
+ *  respects the per-item stack cap (a replay must never mint an over-stacked
+ *  slot no legitimate path can produce), and deep-clones instanced payloads.
+ *  Over-CAPACITY is tolerated by the book contract (capacity only blocks new
+ *  deposits); over-STACK is not. */
+function grantMatching(book: GuildBankState, d: GuildBankOpDelta, count: number): void {
+  if (typeof d.itemId !== 'string' || d.itemId === '') return;
+  addStacked(book.inventory, d.itemId, count, d.instance ?? undefined, deltaRecipe(d));
+}
+
+/** The outcome of a forward replay. */
+export interface GuildBankApplyResult {
+  /** Leading deltas applied IN FULL, a prefix of the input. */
+  applied: number;
+  /** When the delta at index `applied` landed only PARTLY (durable truth held
+   *  some but not all of the copper or copies it moved), the leftover, shaped
+   *  as a delta of its own. The caller replaces that entry with this one and
+   *  retries it on a later save, by which time the other officer's commit has
+   *  landed. Null when the stalled delta moved NOTHING, in which case that
+   *  entry stays in the log exactly as it is. */
+  residual: GuildBankOpDelta | null;
+  /** Null when the whole list landed; otherwise why the replay stopped. */
+  deficit: GuildBankDeltaDeficit | null;
+}
+
+/** Replay a session's own deltas FORWARD onto a book, oldest first. This is
+ *  the escrow save's payload builder: `sanitize(durable row)` then this, which
+ *  is why a session can only ever persist ITS OWN work.
+ *
+ *  Applies the longest PREFIX it can and stops at the first delta durable
+ *  truth cannot satisfy, leaving the book exactly at that prefix (never
+ *  half-way through a single delta). Prefix rather than all-or-nothing because
+ *  two officers' logs can legitimately depend on each other: officer A's
+ *  deposit funds officer B's expansion while officer B's opening grants the
+ *  slots officer A's expansion needs, and an all-or-nothing rule makes that
+ *  pair deadlock, each waiting for a row the other cannot write.
+ *
+ *  Deliberately does NOT re-check capacity: the book contract already
+ *  tolerates over-capacity (capacity only blocks new deposits) and the live op
+ *  already passed the live check. */
+export function applyGuildBankDeltasTo(
+  book: GuildBankState,
+  deltas: readonly GuildBankOpDelta[],
+): GuildBankApplyResult {
+  let applied = 0;
+  const stop = (
+    deficit: GuildBankDeltaDeficit,
+    residual: GuildBankOpDelta | null = null,
+  ): GuildBankApplyResult => ({ applied, residual, deficit });
+  /** The leftover of a partly-applied treasury move, as a gold delta. */
+  const goldResidual = (copperDelta: number): GuildBankOpDelta => ({
+    op: copperDelta > 0 ? 'deposit_gold' : 'withdraw_gold',
+    itemId: null,
+    count: null,
+    instance: null,
+    craftedRecipeId: null,
+    copperDelta,
+    purchasedSlotsBefore: 0,
+    purchasedSlotsAfter: 0,
+  });
+  for (const d of deltas) {
+    if (d.op === 'open_bank' || d.op === 'buy_slots') {
+      // ABSOLUTE, never relative: the op moved the ladder from `before` to
+      // `after`, so the replay refuses unless durable truth is already at or
+      // past `before` (otherwise it would grant rungs nobody paid for), and
+      // then raises to at least `after`. Idempotent and commutative, because
+      // the ladder only ever goes up.
+      if (book.purchasedSlots < d.purchasedSlotsBefore) {
+        return stop({
+          kind: 'ladder_behind',
+          op: d.op,
+          itemId: null,
+          shortfall: d.purchasedSlotsBefore - book.purchasedSlots,
+        });
+      }
+      // Rung 0 (open_bank) was PURSE-paid, so it moves no treasury copper;
+      // rungs 1+ (buy_slots) spent the treasury and must move it here.
+      if (d.op === 'buy_slots') {
+        const next = book.treasury + d.copperDelta;
+        if (next < 0 || next > GUILD_BANK_TREASURY_CAP) {
+          // The rung itself was paid for in the live world, so the GRANT
+          // lands; only the treasury charge is short, and its remainder rides
+          // on as a gold residual for the next save.
+          const room = next < 0 ? -book.treasury : GUILD_BANK_TREASURY_CAP - book.treasury;
+          book.treasury = next < 0 ? 0 : GUILD_BANK_TREASURY_CAP;
+          book.purchasedSlots = Math.max(book.purchasedSlots, d.purchasedSlotsAfter);
+          return stop(
+            {
+              kind: next < 0 ? 'treasury_underflow' : 'treasury_overflow',
+              op: d.op,
+              itemId: null,
+              shortfall: Math.abs(d.copperDelta - room),
+            },
+            room === 0 ? null : goldResidual(d.copperDelta - room),
+          );
+        }
+        book.treasury = next;
+      }
+      book.purchasedSlots = Math.max(book.purchasedSlots, d.purchasedSlotsAfter);
+      applied++;
+      continue;
+    }
+    if (d.op === 'deposit_gold' || d.op === 'withdraw_gold') {
+      const next = book.treasury + d.copperDelta;
+      if (next < 0 || next > GUILD_BANK_TREASURY_CAP) {
+        // Move what durable truth can cover and carry the rest: clamping the
+        // shortfall AWAY would mint it, because this session's purse durably
+        // gained what the book never durably lost.
+        const room = next < 0 ? -book.treasury : GUILD_BANK_TREASURY_CAP - book.treasury;
+        book.treasury = next < 0 ? 0 : GUILD_BANK_TREASURY_CAP;
+        return stop(
+          {
+            kind: next < 0 ? 'treasury_underflow' : 'treasury_overflow',
+            op: d.op,
+            itemId: null,
+            shortfall: Math.abs(d.copperDelta - room),
+          },
+          room === 0 ? null : goldResidual(d.copperDelta - room),
+        );
+      }
+      book.treasury = next;
+      applied++;
+      continue;
+    }
+    const count = typeof d.itemId === 'string' && d.itemId !== '' ? deltaCount(d) : 0;
+    if (count === 0) {
+      applied++;
+      continue;
+    }
+    if (d.op === 'deposit') {
+      grantMatching(book, d, count);
+      applied++;
+      continue;
+    }
+    // withdraw: the copies must actually be in durable truth. A shortfall
+    // means another officer's un-durable deposit is what this session
+    // consumed, which is the one thing the forward replay must never paper
+    // over (papering over it is what mints the copy). Counted BEFORE removing
+    // anything, so a stop never leaves a delta half-applied.
+    const held = countMatching(book, d);
+    if (held < count) {
+      // Take the copies durable truth does hold and carry the rest.
+      if (held > 0) removeMatching(book, d, held);
+      return stop(
+        { kind: 'missing_items', op: d.op, itemId: d.itemId, shortfall: count - held },
+        // A residual is only produced when the delta moved SOMETHING: an entry
+        // that moved nothing stays in the log verbatim, so the caller can tell
+        // "partly consumed, replaced" from "untouched, retry as is".
+        held === 0 ? null : { ...d, count: count - held },
+      );
+    }
+    removeMatching(book, d, count);
+    applied++;
+  }
+  return { applied, residual: null, deficit: null };
+}
+
+/** Replay a session's own deltas BACKWARD onto a book, newest first: the exact
+ *  inverse of applyGuildBankDeltasTo. Used on the LIVE book when a session can
+ *  never persist those deltas, leaving every OTHER session's unflushed ops
+ *  intact.
+ *
+ *  Inverses CLAMP rather than throw: if another officer already consumed the
+ *  un-durable value (withdrew the copper or the copy), the inverse no-ops on
+ *  the missing part. That residue is the D5 accepted risk in
+ *  docs/guild-bank/state.md, not a silent failure: the forward applier reports
+ *  the same shortfall as a deficit and the server records it. */
+export function revertGuildBankDeltasTo(
+  book: GuildBankState,
+  deltas: readonly GuildBankOpDelta[],
+): void {
+  for (let i = deltas.length - 1; i >= 0; i--) {
+    const d = deltas[i];
+    if (d.op === 'open_bank' || d.op === 'buy_slots') {
+      // COMPARE-AND-SWAP on the delta's own before/after witness: undo the
+      // ladder step only while the book still stands exactly where this op
+      // left it. If another session's rung already advanced past it, the undo
+      // is skipped ENTIRELY, slot grant and treasury refund together: undoing
+      // half of it is what let a revert keep the slots AND re-create the
+      // copper (the unconditional refund defect).
+      if (book.purchasedSlots !== d.purchasedSlotsAfter) continue;
+      book.purchasedSlots = d.purchasedSlotsBefore;
+      // Rung 0 was PURSE-paid: the dead session's character half, holding the
+      // purse charge, already rolled back by definition, so crediting the
+      // treasury here would mint guild copper.
+      if (d.op === 'buy_slots') book.treasury = clampTreasury(book.treasury - d.copperDelta);
+      continue;
+    }
+    if (d.op === 'deposit_gold' || d.op === 'withdraw_gold') {
+      book.treasury = clampTreasury(book.treasury - d.copperDelta);
+      continue;
+    }
+    if (typeof d.itemId !== 'string' || d.itemId === '') continue;
+    const count = deltaCount(d);
+    if (count === 0) continue;
+    if (d.op === 'deposit') removeMatching(book, d, count);
+    else if (d.op === 'withdraw') grantMatching(book, d, count);
+  }
+}
+
+/** The ctx-facing delegate (Sim.revertGuildBankDeltas): undo a dead session's
+ *  unflushed ops on the LIVE book. Never touches player state, because the
+ *  dead session's character half already rolled back by definition. */
 export function revertGuildBankDeltas(
   ctx: SimContext,
   guildId: number,
@@ -344,82 +627,7 @@ export function revertGuildBankDeltas(
 ): void {
   const book = ctx.guildBanks.get(guildId);
   if (!book) return;
-  for (let i = deltas.length - 1; i >= 0; i--) {
-    const d = deltas[i];
-    if (d.op === 'deposit_gold' || d.op === 'withdraw_gold') {
-      book.treasury = clampTreasury(book.treasury - d.copperDelta);
-      continue;
-    }
-    if (d.op === 'open_bank') {
-      // Rung 0 was PURSE-paid: undo only the slot grant (the dead session's
-      // character half, holding the purse charge, already rolled back by
-      // definition; crediting the treasury here would mint guild copper).
-      // The undo applies ONLY while the book sits exactly at the opened base:
-      // if another session's expansion already advanced the ladder (open 0
-      // to 24, expansion to 30, then this revert), subtracting the base
-      // would strand a NON-LADDER position (6), collapsing capacity below
-      // what rungs 1+ paid for. On any other count the grant stays (the
-      // clamped-residue contract: never destroy paid value).
-      if (book.purchasedSlots === GUILD_BANK_RUNG_SLOTS[0]) {
-        book.purchasedSlots = 0;
-      }
-      continue;
-    }
-    if (d.op === 'buy_slots') {
-      // An expansion (rungs 1+) only ever moves between valid ladder
-      // positions at or above the opened base, so the slot undo applies only
-      // while the result stays a valid position; the treasury refund applies
-      // regardless (clamped, the accepted residue).
-      if (book.purchasedSlots - GUILD_BANK_EXPANSION_SLOTS >= GUILD_BANK_RUNG_SLOTS[0]) {
-        book.purchasedSlots -= GUILD_BANK_EXPANSION_SLOTS;
-      }
-      book.treasury = clampTreasury(book.treasury - d.copperDelta);
-      continue;
-    }
-    if (typeof d.itemId !== 'string' || d.itemId === '') continue;
-    const count = Math.max(0, Math.floor(Number(d.count)) || 0);
-    if (count === 0) continue;
-    if (d.op === 'deposit') {
-      // Undo a deposit: remove up to `count` matching copies from the book
-      // (newest slots first). The match is THREE-dimensional (itemId, the
-      // canonical instance payload, AND craftedRecipeId): the book keeps a
-      // crafted and a plain copy of one item as separate slots, and removing
-      // across that line would destroy another officer's durable provenance.
-      // A missing copy no-ops (another officer already withdrew it: the
-      // accepted residue).
-      let remaining = count;
-      for (let s = book.inventory.length - 1; s >= 0 && remaining > 0; s--) {
-        const slot = book.inventory[s];
-        if (
-          slot.itemId !== d.itemId ||
-          !sameInstance(slot.instance, d.instance) ||
-          (slot.craftedRecipeId ?? null) !== (d.craftedRecipeId ?? null)
-        ) {
-          continue;
-        }
-        const take = Math.min(slot.count, remaining);
-        slot.count -= take;
-        remaining -= take;
-        if (slot.count <= 0) book.inventory.splice(s, 1);
-      }
-    } else if (d.op === 'withdraw') {
-      // Undo a withdraw: put the copy back through the ONE canonical grant
-      // path (addStacked): it merges only into stacks whose payload AND craft
-      // provenance match, respects the per-item stack cap (a revert must not
-      // mint an over-stacked slot no legitimate path can produce), and deep-
-      // clones instanced payloads. Over-CAPACITY is tolerated by the book
-      // contract (capacity only blocks new deposits); over-STACK is not.
-      addStacked(
-        book.inventory,
-        d.itemId,
-        count,
-        d.instance ?? undefined,
-        typeof d.craftedRecipeId === 'string' && d.craftedRecipeId !== ''
-          ? d.craftedRecipeId
-          : undefined,
-      );
-    }
-  }
+  revertGuildBankDeltasTo(book, deltas);
 }
 
 /** The server-callable membership stamp body (Sim.setPlayerGuildMembership is

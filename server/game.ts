@@ -107,6 +107,7 @@ import {
   guildCreateFeeDelta,
   recordBankOp,
   recordGuildBankDeltas,
+  recordGuildBankEscrowDeficit,
 } from './bank_ledger';
 import type {
   BotDetector,
@@ -138,7 +139,6 @@ import {
   heartbeatCharacterLeases,
   insertChatLogs,
   loadAccountFlair,
-  loadGuildBankRow,
   loadGuildBankRows,
   loadMailState,
   loadMarketState,
@@ -188,9 +188,10 @@ import {
   createGuildBankOpGuard,
   type GuildBankOpGuardState,
 } from './guild_bank_op_guard';
+import { compactGuildBankOpLog } from './guild_bank_op_log';
 import {
-  collectGuildBankSaves,
-  isMalformedGuildBankRow,
+  collectGuildBankDeltas,
+  type GuildBankWriteResult,
   loadGuildBanksIntoSim,
 } from './guild_bank_state';
 import { gameMetricsCounters, type WsDropCause } from './http/game_signals';
@@ -825,22 +826,28 @@ export interface ClientSession {
   dirtyGuildBanks: Map<number, number>;
   // The UNFLUSHED book deltas behind those dirty marks, in op order (guild id
   // -> the diffGuildBankOp output of every successful op not yet committed by
-  // an escrow save). Consumed from the front when a save commits; when this
+  // an escrow save). This log is this session's UNCOMMITTED WORK and it is the
+  // escrow save's WRITE PAYLOAD: the save persists "durable truth plus these
+  // deltas", never the whole shared live book, so one officer's save can never
+  // carry another officer's not-yet-durable op into the row. Consumed from the
+  // front when a save commits; replayed BACKWARD onto the live book when this
   // session's escrow can never commit again (fence-out, or the leave flush
-  // exhausted its retries) and another live session still holds legitimate
-  // unflushed ops on the same book, these are surgically REVERTED from the
-  // live book (Sim.revertGuildBankDeltas) instead of evict-and-reload, so the
-  // dead session's orphaned ops can never ride another officer's save (the
-  // Phase 3 QA dupe fix) while the live session's ops survive. Bounded per
-  // guild by GUILD_BANK_UNFLUSHED_OP_CAP; overflow (only reachable while
-  // commits are failing for minutes at the guarded op rate) empties the log
-  // and flags the guild in revertLostGuildBanks.
+  // exhausted its retries), leaving every other session's ops intact. Bounded
+  // per guild by GUILD_BANK_UNFLUSHED_OP_CAP, which COMPACTS the log
+  // (server/guild_bank_op_log.ts) rather than dropping it: dropping the write
+  // payload would silently discard committed-intent work.
   unflushedGuildBankOps: Map<number, GuildBankOpDelta[]>;
-  // Guilds whose unflushed-op log overflowed its cap: the surgical revert is
-  // no longer possible for this session, so the reconcile falls back to
-  // evict-and-reload from durable truth for them. Cleared when a successful
-  // commit drains the guild's dirty mark.
-  revertLostGuildBanks: Set<number>;
+  // How many entries at the FRONT of each guild's log have already had their
+  // CHARACTER half committed while their book half was skipped (the escrow
+  // deficit arm below: durable truth could not satisfy the replay because
+  // another officer's op is not durable yet). They are retried by later saves
+  // and, crucially, are NEVER replayed backward by the reconcile: the
+  // character half that paid for them is durable, so undoing them on the live
+  // book would mint the value back.
+  settledGuildBankOps: Map<number, number>;
+  // Consecutive escrow-deficit skips per guild, the retry bound for the arm
+  // above.
+  guildBankDeficitSkips: Map<number, number>;
   // IP address at join time (from requestMetadata); used for per-IP session counting.
   ip: string;
   userAgent: string;
@@ -2137,7 +2144,8 @@ export class GameServer {
         for (const s of this.sessionsByCharacterId.values()) {
           s.dirtyGuildBanks.delete(guildId);
           s.unflushedGuildBankOps.delete(guildId);
-          s.revertLostGuildBanks.delete(guildId);
+          s.settledGuildBankOps.delete(guildId);
+          s.guildBankDeficitSkips.delete(guildId);
         }
       },
       // The disband guard's read: the LIVE sim book's holdings (null with no
@@ -3170,7 +3178,8 @@ export class GameServer {
       guildStampSeq: 0,
       dirtyGuildBanks: new Map(),
       unflushedGuildBankOps: new Map(),
-      revertLostGuildBanks: new Set(),
+      settledGuildBankOps: new Map(),
+      guildBankDeficitSkips: new Map(),
       ignoredIds: new Set(),
       lastWhisperFrom: null,
       rememberedChat: { channel: 'say' },
@@ -3555,7 +3564,7 @@ export class GameServer {
           // moment this session tears down. Reconcile now, exactly like the
           // fence-out arm (Guild Bank Phase 3 QA).
           if (session.dirtyGuildBanks.size > 0) {
-            await this.reconcileUnflushableGuildBooks(session, [...session.dirtyGuildBanks.keys()]);
+            this.revertOwnGuildBookOps(session, [...session.dirtyGuildBanks.keys()]);
           }
           return;
         }
@@ -3626,41 +3635,39 @@ export class GameServer {
         // mirror of the v0.34.0 lastPersistedLevel change onto this branch's
         // three-path saveCharacter.
         let persistedLevel = state.level;
-        // Guild books this save will carry (Guild Bank Phase 3), captured WITH
-        // their marks at write time inside the queued closure, exactly like the
-        // market snapshot: books are shared multi-writer state (two officers'
-        // saves carry the same book), so serializing at write time under the
-        // one market queue means a commit can never clobber a newer book with
-        // an older snapshot. (Books deliberately SHARE the market serial
-        // writer rather than getting their own: the leave flush writes market,
-        // mail, AND books in one transaction, so a second queue would reopen
-        // the interleaving the single writer exists to prevent.) A guild whose
-        // serializeGuildBank returns null (no loaded book) is SKIPPED
-        // (collectGuildBankSaves): an empty book must never overwrite a real
-        // row. The captured seqs clear their dirty entries only after a
-        // successful commit, and only if unchanged, so an op landing mid-save
-        // re-schedules the book instead of being dropped.
-        // Scope of the guarantee, stated honestly: the TRANSACTION is atomic
-        // (this character row and these book rows commit or roll back
-        // together), but the book is shared state, so a DIFFERENT officer's
-        // save can persist the live book between this session's op and this
-        // save (their commit is self-consistent for the book, while this
-        // character half is not yet durable). That cross-officer skew window
-        // is the same structural risk the World Market accepts today
-        // (accepted, documented in docs/guild-bank/state.md); the arms that
-        // would make it a RELIABLE dupe (a session leaving the live book
-        // permanently ahead of durable truth after a fence-out or an
-        // exhausted leave flush) are closed by
-        // reconcileUnflushableGuildBooks.
+        // Guild books this save will carry (Guild Bank Phase 3, reshaped by
+        // the escrow root fix). The payload is NOT the shared live book: it is
+        // this session's OWN unflushed delta log per guild, and the write is a
+        // read-modify-write inside the fenced transaction
+        // (server/db.ts writeGuildBankRow: SELECT ... FOR UPDATE, then
+        // mergeGuildBankRow, then the upsert). That is the whole guarantee:
+        //
+        //   A session persists DURABLE TRUTH PLUS ITS OWN DELTAS, so its
+        //   commit can only ever contain its own work. Another officer's
+        //   not-yet-durable op is not in this payload and cannot ride it into
+        //   the row, so the fence means exactly what its comments say: a
+        //   fenced-out session's ops reach durable state through NO path.
+        //
+        // The marks and log lengths are still captured at write time inside
+        // the queued closure, exactly like the market snapshot, so an op
+        // dispatched during the serial-writer wait re-schedules itself instead
+        // of being dropped. A guild whose serializeGuildBank returns null (no
+        // loaded book: unloaded, oversized, or malformed at boot) is SKIPPED
+        // entirely (collectGuildBankDeltas), so an unloaded book's row is
+        // never touched.
         const carriedGuildBankSeqs: [number, number][] = [];
-        // How many unflushed-op log entries per guild this save's snapshot
-        // includes (captured with the serialization): a commit consumes
-        // exactly that many from the front of each log, so a mid-save op's
-        // entry survives alongside its surviving dirty mark.
+        // How many unflushed-op log entries per guild this save's payload
+        // includes (captured with the marks): a commit consumes exactly that
+        // many from the front of each log, so a mid-save op's entry survives
+        // alongside its surviving dirty mark.
         const carriedGuildBankOpCounts = new Map<number, number>();
-        const collectBooks = () => {
+        // What each book write actually did, filled by the db layer inside the
+        // transaction (see GuildBankWriteResult).
+        const guildBankResults: GuildBankWriteResult[] = [];
+        const collectDeltas = () => {
           carriedGuildBankSeqs.length = 0;
           carriedGuildBankOpCounts.clear();
+          guildBankResults.length = 0;
           for (const entry of session.dirtyGuildBanks) {
             carriedGuildBankSeqs.push(entry);
             carriedGuildBankOpCounts.set(
@@ -3668,8 +3675,9 @@ export class GameServer {
               session.unflushedGuildBankOps.get(entry[0])?.length ?? 0,
             );
           }
-          return collectGuildBankSaves(
+          return collectGuildBankDeltas(
             (guildId) => this.sim.serializeGuildBank(guildId),
+            (guildId) => session.unflushedGuildBankOps.get(guildId) ?? [],
             carriedGuildBankSeqs.map(([guildId]) => guildId),
           );
         };
@@ -3705,14 +3713,16 @@ export class GameServer {
                   this.sim.serializeMarket(),
                   this.sim.serializeMail(),
                   session.leaseNonce,
-                  collectBooks(),
+                  collectDeltas(),
+                  guildBankResults,
                 )
               : saveCharacterAndGuildBankState(
                   session.characterId,
                   snap.level,
                   snap,
-                  collectBooks(),
+                  collectDeltas(),
                   session.leaseNonce,
+                  guildBankResults,
                 );
           });
         } else {
@@ -3737,12 +3747,11 @@ export class GameServer {
             `character ${session.characterId} (${session.name}) save fenced out by a same-account takeover; skipping deed publish and lastSave`,
           );
           // Guild books this save carried were mutated in the LIVE sim by ops
-          // whose character half just rolled back: the sim is now AHEAD of
-          // durable state, and another officer's later save could persist the
-          // book half without its paired character half (the dupe shape).
-          // Reload those books from durable truth, or surgically revert this
-          // session's orphaned ops where another session is dirty.
-          await this.reconcileUnflushableGuildBooks(
+          // whose character half just rolled back, so the LIVE book is ahead
+          // of what this session can ever make durable. Undo exactly this
+          // session's own ops on the live book; no other session's payload can
+          // contain them, so there is nothing else to converge.
+          this.revertOwnGuildBookOps(
             session,
             carriedGuildBankSeqs.map(([guildId]) => guildId),
           );
@@ -3759,21 +3768,30 @@ export class GameServer {
           return;
         }
         session.lastSave = Date.now();
-        // The carried books are durable too: release their dirty marks, but
-        // only where the seq is unchanged (a mid-save op re-dirtied the book
-        // with state this commit did not include), and consume the committed
-        // prefix of each unflushed-op log (a mid-save op's entry survives).
+        // The carried books: release their dirty marks where the write
+        // actually landed AND the seq is unchanged (a mid-save op re-dirtied
+        // the book with state this commit did not include), consuming the
+        // committed prefix of each unflushed-op log (a mid-save op's entry
+        // survives). A book whose write was SKIPPED keeps its mark and its log
+        // for a later retry; see resolveGuildBankDeficit.
         for (const [guildId, seq] of carriedGuildBankSeqs) {
+          const carried = carriedGuildBankOpCounts.get(guildId) ?? 0;
+          // A db double that ignores the results out-parameter (the partial
+          // mocks across the test suite) reports nothing; treat that as the
+          // ordinary fully-written case, which is what those doubles model.
+          const result = guildBankResults.find((r) => r.guildId === guildId);
+          if (result && (result.rowUnusable || result.deficit !== null)) {
+            this.resolveGuildBankDeficit(session, guildId, carried, result);
+            continue;
+          }
           if (session.dirtyGuildBanks.get(guildId) === seq) {
             session.dirtyGuildBanks.delete(guildId);
-            // Everything this session had done to the book is durable: the
-            // overflow flag (if any) no longer describes unflushed state.
-            session.revertLostGuildBanks.delete(guildId);
           }
-          const committed = carriedGuildBankOpCounts.get(guildId) ?? 0;
+          session.settledGuildBankOps.delete(guildId);
+          session.guildBankDeficitSkips.delete(guildId);
           const log = session.unflushedGuildBankOps.get(guildId);
           if (log) {
-            log.splice(0, committed);
+            log.splice(0, carried);
             if (log.length === 0) session.unflushedGuildBankOps.delete(guildId);
           }
         }
@@ -3947,9 +3965,10 @@ export class GameServer {
 
   // Upper bound on one session's per-guild unflushed-op log (Guild Bank
   // Phase 3 QA): at the guarded op rate (guild_bank_op_guard.ts) reaching it
-  // takes minutes of continuously failing commits. Overflow trades the
-  // surgical revert for the evict-and-reload reconcile rather than growing
-  // without bound during a DB outage. Pinned in
+  // takes minutes of continuously failing commits. Crossing it COMPACTS the
+  // log (server/guild_bank_op_log.ts), semantics-preserving, rather than
+  // dropping it: the log is the escrow save's write payload, so a drop would
+  // silently discard committed-intent work. Pinned in
   // tests/guild_bank_persistence.test.ts.
   static readonly GUILD_BANK_UNFLUSHED_OP_CAP = 500;
 
@@ -3981,78 +4000,138 @@ export class GameServer {
   // When this session's escrow can never commit again, its guild-book
   // mutations remain in the LIVE book while the character half rolled back
   // (fence-out: a same-account takeover) or never landed (the leave flush
-  // exhausted its retries). Two arms, both returning live state to what the
-  // next durable commit will contain:
-  // - Where no OTHER session holds a dirty mark for the guild, evict the book
-  //   and reload it from the DB row, returning live state to durable truth
-  //   (ops in the brief evicted window refuse silently and never lazily
-  //   create a book; an oversized or malformed row stays unloaded, the boot
-  //   rule).
-  // - Where another session IS dirty, an evict would destroy that session's
-  //   legitimate unflushed ops, so instead the dead session's own unflushed
-  //   deltas are surgically REVERTED from the live book (the recorded
-  //   unflushedGuildBankOps log, newest first), leaving the other session's
-  //   ops intact. Without the revert, the orphaned ops would ride the other
-  //   session's next save: a deterministic, attacker-timable dupe (Phase 3
-  //   QA BLOCKING). The residue where another officer already consumed the
-  //   un-durable value before this reconcile is the narrowed accepted risk
-  //   in docs/guild-bank/state.md.
-  // Both scans run over sessionsByCharacterId, not clients: a mid-leave
-  // session's flush is still in flight and still commits its own books.
-  private async reconcileUnflushableGuildBooks(
-    dead: ClientSession,
-    guildIds: number[],
-  ): Promise<void> {
+  // exhausted its retries). SYNCHRONOUS and unconditional: replay exactly this
+  // session's own unflushed deltas BACKWARD onto the live book, leaving every
+  // other session's unflushed ops untouched.
+  //
+  // There is deliberately no evict-and-reload arm any more, and no
+  // cross-session dirty scan to choose between arms. Under the escrow root fix
+  // a session's payload contains only its own deltas, so a dead session's ops
+  // are in NO other session's payload and durable truth can never have been
+  // advanced by them: reloading the row would restore state that is either
+  // identical (a no-op) or another officer's newer work (destroying it).
+  //
+  // Deltas whose CHARACTER half already committed (the settled prefix: an
+  // escrow-deficit skip below) are excluded. Undoing them would credit the
+  // live book with value the dead character durably kept.
+  private revertOwnGuildBookOps(dead: ClientSession, guildIds: number[]): void {
     for (const guildId of guildIds) {
-      let anotherSessionDirty = false;
-      for (const s of this.sessionsByCharacterId.values()) {
-        if (s !== dead && s.dirtyGuildBanks.has(guildId)) {
-          anotherSessionDirty = true;
-          break;
-        }
-      }
-      const deadOps = dead.unflushedGuildBankOps.get(guildId) ?? [];
-      const revertLost = dead.revertLostGuildBanks.has(guildId);
+      const log = dead.unflushedGuildBankOps.get(guildId) ?? [];
+      const settled = Math.min(dead.settledGuildBankOps.get(guildId) ?? 0, log.length);
       dead.dirtyGuildBanks.delete(guildId);
       dead.unflushedGuildBankOps.delete(guildId);
-      dead.revertLostGuildBanks.delete(guildId);
-      if (anotherSessionDirty && !revertLost) {
-        // Surgical revert: undo ONLY the dead session's unflushed ops.
-        this.sim.revertGuildBankDeltas(guildId, deadOps);
-        continue;
+      dead.settledGuildBankOps.delete(guildId);
+      dead.guildBankDeficitSkips.delete(guildId);
+      if (settled < log.length) this.sim.revertGuildBankDeltas(guildId, log.slice(settled));
+    }
+  }
+
+  // How many consecutive escrow-deficit skips one session tolerates for one
+  // guild before it stops retrying and records the residue. Each skip is one
+  // autosave interval apart, so this is roughly four minutes of waiting for
+  // the other officer's commit to land. The bound exists only for the case
+  // that can never resolve on its own (two sessions each waiting on the
+  // other's un-durable value); an ordinary interleaving clears on the very
+  // next save, so this is deliberately generous.
+  static readonly GUILD_BANK_DEFICIT_MAX_SKIPS = 8;
+
+  // The escrow-deficit arm: this save's character half committed, and the book
+  // half landed only a PREFIX of this session's carried deltas, because the
+  // next one could not be replayed onto durable truth. That happens when this
+  // officer CONSUMED value another officer deposited and has not made durable
+  // yet (withdrew the copper or the copy, or expanded a ladder the other
+  // officer opened), which is the D5 residue class in
+  // docs/guild-bank/state.md.
+  //
+  // The shortfall was never clamped away, because clamping mints it
+  // permanently: this session's purse durably gains what the book never
+  // durably lost. So:
+  //
+  // - While the other officer is still live and dirty, the deficit is
+  //   TRANSIENT: keep the mark and the un-applied remainder of the log, mark
+  //   the unwritten prefix SETTLED (its character half is durable, so the
+  //   reconcile must never replay it backward) and retry on the next save, by
+  //   which time their commit has landed. The skew window in between is the
+  //   same shape as (and strictly smaller than) the cross-officer window the
+  //   World Market accepts today.
+  // - When no other session holds a dirty mark for the guild, nothing will
+  //   ever make the missing value durable, so the residue is PERMANENT: stop
+  //   retrying and write a bank_ledger anomaly row. That row is the first time
+  //   this residue has ever been visible to scripts/bank_audit.mjs.
+  private resolveGuildBankDeficit(
+    session: ClientSession,
+    guildId: number,
+    carried: number,
+    result: GuildBankWriteResult,
+  ): void {
+    const consume = (n: number): void => {
+      const log = session.unflushedGuildBankOps.get(guildId);
+      if (!log) return;
+      log.splice(0, n);
+      if (log.length === 0) session.unflushedGuildBankOps.delete(guildId);
+    };
+    const release = (): void => {
+      session.settledGuildBankOps.delete(guildId);
+      session.guildBankDeficitSkips.delete(guildId);
+      if (!session.unflushedGuildBankOps.has(guildId)) session.dirtyGuildBanks.delete(guildId);
+    };
+    if (result.rowUnusable) {
+      // Not a deficit: the stored row is oversized or structurally not a book
+      // and must be preserved for a human. Retrying cannot help, so release
+      // the mark and leave the row alone (the boot skip rule).
+      consume(carried);
+      release();
+      console.error(
+        `guild bank row for guild ${guildId} is oversized or malformed; escrow save left it untouched (ops stay live, the row is preserved)`,
+      );
+      return;
+    }
+    // Everything that DID land is durable and leaves the log; a partly applied
+    // delta is REPLACED by its leftover, so nothing is lost and nothing is
+    // replayed twice.
+    consume(result.applied + (result.residual ? 1 : 0));
+    if (result.residual) {
+      const log = session.unflushedGuildBankOps.get(guildId) ?? [];
+      log.unshift(result.residual);
+      session.unflushedGuildBankOps.set(guildId, log);
+    }
+    const pending = carried - result.applied;
+    let anotherSessionDirty = false;
+    for (const s of this.sessionsByCharacterId.values()) {
+      if (s !== session && s.dirtyGuildBanks.has(guildId)) {
+        anotherSessionDirty = true;
+        break;
       }
-      // Either no other session is dirty, or this session's overflowed log
-      // makes the surgical revert impossible (revertLost): return the live
-      // book to durable truth. Evict FIRST: if the reload read fails, an
-      // inert (absent) book is the fail-safe state; a book known to be ahead
-      // of durable truth is not. The read retries like the boot load (this
-      // arm often runs exactly when the DB is sick, e.g. after an exhausted
-      // leave flush) so one failed logout cannot leave a guild's bank inert
-      // until restart on a single transient error.
-      this.sim.evictGuildBank(guildId);
-      const attempts = 3;
-      for (let attempt = 1; attempt <= attempts; attempt++) {
-        try {
-          const row = await loadGuildBankRow(guildId);
-          if (row.oversized || isMalformedGuildBankRow(row.data)) {
-            console.error(
-              `guild bank row for guild ${guildId} is oversized or malformed on reconcile; left unloaded`,
-            );
-            break;
-          }
-          this.sim.loadGuildBank(guildId, row.data);
-          break;
-        } catch (err) {
-          if (attempt === attempts) {
-            console.error(
-              `guild bank reconcile failed for guild ${guildId} after ${attempts} attempts (left unloaded until restart; ops inert, guild deletion refused fail-closed):`,
-              err,
-            );
-          } else {
-            await new Promise((r) => setTimeout(r, 250 * attempt));
-          }
-        }
+    }
+    const skips = (session.guildBankDeficitSkips.get(guildId) ?? 0) + 1;
+    const giveUp =
+      pending > 0 && (!anotherSessionDirty || skips >= GameServer.GUILD_BANK_DEFICIT_MAX_SKIPS);
+    if (!giveUp) {
+      if (pending === 0) {
+        release();
+        return;
       }
+      session.guildBankDeficitSkips.set(guildId, skips);
+      session.settledGuildBankOps.set(guildId, pending);
+      return;
+    }
+    // Permanent, as far as this guild's other sessions can tell: drop ONLY the
+    // delta that cannot land (the head of what is left), never the work queued
+    // behind it, and record the residue. Dropping the whole remainder would
+    // destroy deposits that were merely waiting their turn.
+    consume(1);
+    session.settledGuildBankOps.delete(guildId);
+    session.guildBankDeficitSkips.delete(guildId);
+    if (!session.unflushedGuildBankOps.has(guildId)) session.dirtyGuildBanks.delete(guildId);
+    if (result.deficit) {
+      recordGuildBankEscrowDeficit(session, guildId, result.deficit);
+      console.error(
+        `guild bank escrow deficit for guild ${guildId} (character ${session.characterId}): ${result.deficit.kind} shortfall ${result.deficit.shortfall} on ${result.deficit.op}${result.deficit.itemId ? ` (${result.deficit.itemId})` : ''}; ${
+          anotherSessionDirty
+            ? `it did not resolve within ${skips} escrow saves`
+            : 'no other session holds unflushed work for this guild, so it can never resolve'
+        }. The consumed value was never durable: a bank_ledger anomaly row records the residue.`,
+      );
     }
   }
 
@@ -4090,10 +4169,10 @@ export class GameServer {
     const guildId = this.sim.meta(pid)?.guildMembership?.guildId;
     if (guildId === undefined) return;
     this.markGuildBankDirty(session, guildId);
-    // Record the op in the session's unflushed log (consumed by the escrow
-    // save's commit; reverted by reconcileUnflushableGuildBooks when this
-    // session can never commit again while another session is dirty).
-    const log = session.unflushedGuildBankOps.get(guildId) ?? [];
+    // Record the op in the session's unflushed log: this log is the escrow
+    // save's WRITE PAYLOAD (replayed forward onto durable truth) and the
+    // reconcile's undo list (replayed backward onto the live book).
+    let log = session.unflushedGuildBankOps.get(guildId) ?? [];
     for (const d of deltas) {
       log.push({
         op: effectiveOp,
@@ -4102,14 +4181,25 @@ export class GameServer {
         instance: (d.instance ?? null) as GuildBankOpDelta['instance'],
         craftedRecipeId: d.craftedRecipeId ?? null,
         copperDelta: d.copperDelta,
+        // diffGuildBankOp always sets the before witness on the guild path
+        // (pinned in tests/bank_ledger.test.ts); the fallback is defensive.
+        purchasedSlotsBefore: d.purchasedSlotsBefore ?? 0,
+        purchasedSlotsAfter: d.purchasedSlotsAfter,
       });
     }
     if (log.length > GameServer.GUILD_BANK_UNFLUSHED_OP_CAP) {
-      // Overflow (commits failing for minutes): drop the surgical-revert
-      // capability for this session and let the reconcile evict-and-reload
-      // instead, keeping memory bounded.
-      log.length = 0;
-      session.revertLostGuildBanks.add(guildId);
+      // Overflow (commits failing for minutes at the guarded op rate):
+      // COMPACT, never drop. The log is what this session will persist, so
+      // dropping it would silently discard committed-intent work; compaction
+      // is semantics-preserving (server/guild_bank_op_log.ts). The settled
+      // prefix (character half durable, book half pending) is compacted
+      // separately so the boundary survives.
+      const settled = Math.min(session.settledGuildBankOps.get(guildId) ?? 0, log.length);
+      const head = compactGuildBankOpLog(log.slice(0, settled));
+      const tail = compactGuildBankOpLog(log.slice(settled));
+      log = [...head, ...tail];
+      if (head.length > 0) session.settledGuildBankOps.set(guildId, head.length);
+      else session.settledGuildBankOps.delete(guildId);
     }
     session.unflushedGuildBankOps.set(guildId, log);
     recordGuildBankDeltas(effectiveOp, session, guildId, deltas);

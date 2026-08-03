@@ -20,6 +20,7 @@ import { bagCapacity, stackSizeOf } from '../src/sim/bags';
 import { sanitizeBankState } from '../src/sim/bank';
 import { BUILTIN_WORLD, ITEMS, QUESTS } from '../src/sim/data';
 import {
+  applyGuildBankDeltasTo,
   createEmptyGuildBankState,
   GUILD_BANK_EXPANSION_SLOTS,
   GUILD_BANK_LADDER_POSITIONS,
@@ -28,15 +29,17 @@ import {
   GUILD_BANK_TREASURY_CAP,
   GUILD_CREATION_FEE_COPPER,
   GUILD_RANKS,
+  type GuildBankOpDelta,
   type GuildBankState,
   type GuildRank,
   guildBankCapacity,
   guildBankNextExpansionPrice,
   guildBankRungsBought,
+  revertGuildBankDeltasTo,
   sanitizeGuildBankState,
 } from '../src/sim/guild_bank';
 import { Sim } from '../src/sim/sim';
-import type { Entity, WorldContent } from '../src/sim/types';
+import type { Entity, InvSlot, WorldContent } from '../src/sim/types';
 import { META_EXCLUDE, samplePlayerMeta } from './parity/trace';
 
 // The 7-rung ladder from docs/guild-bank/state.md, pinned as literals: rung 0
@@ -1593,6 +1596,19 @@ describe('refundGuildCreationFeeFor (the reserve-at-gate refusal arm)', () => {
   });
 });
 
+/** Ladder rung 0 as the dispatch observer records it: ABSOLUTE (0 -> 24), so
+ *  the forward replay is "raise to at least 24" and the inverse is a
+ *  compare-and-swap against 24. */
+const OPEN_DELTA: GuildBankOpDelta = {
+  op: 'open_bank',
+  itemId: null,
+  count: null,
+  instance: null,
+  copperDelta: -90_000,
+  purchasedSlotsBefore: 0,
+  purchasedSlotsAfter: 24,
+};
+
 describe('revertGuildBankDeltas (the unflushable-session surgical undo)', () => {
   const gold = (op: 'deposit_gold' | 'withdraw_gold', copperDelta: number) => ({
     op,
@@ -1600,6 +1616,8 @@ describe('revertGuildBankDeltas (the unflushable-session surgical undo)', () => 
     count: null,
     instance: null,
     copperDelta,
+    purchasedSlotsBefore: 0,
+    purchasedSlotsAfter: 0,
   });
 
   it('undoes gold deltas in both directions, leaving other unflushed value intact', () => {
@@ -1626,7 +1644,15 @@ describe('revertGuildBankDeltas (the unflushable-session surgical undo)', () => 
     const sim = makeOfficerSim();
     book(sim).inventory.push({ itemId: 'wolf_fang', count: 5 });
     sim.revertGuildBankDeltas(GUILD_ID, [
-      { op: 'deposit', itemId: 'wolf_fang', count: 3, instance: null, copperDelta: 0 },
+      {
+        op: 'deposit',
+        itemId: 'wolf_fang',
+        count: 3,
+        instance: null,
+        copperDelta: 0,
+        purchasedSlotsBefore: 0,
+        purchasedSlotsAfter: 0,
+      },
     ]);
     expect(book(sim).inventory).toEqual([{ itemId: 'wolf_fang', count: 2 }]);
     // Reverting a withdraw restores the copy WITH its craft provenance.
@@ -1638,6 +1664,8 @@ describe('revertGuildBankDeltas (the unflushable-session surgical undo)', () => 
         instance: null,
         craftedRecipeId: 'smith_iron_sword',
         copperDelta: 0,
+        purchasedSlotsBefore: 0,
+        purchasedSlotsAfter: 0,
       },
     ]);
     expect(book(sim).inventory).toContainEqual({
@@ -1649,7 +1677,15 @@ describe('revertGuildBankDeltas (the unflushable-session surgical undo)', () => 
     // else is disturbed and nothing goes negative.
     const before = JSON.stringify(book(sim));
     sim.revertGuildBankDeltas(GUILD_ID, [
-      { op: 'deposit', itemId: 'never_deposited', count: 2, instance: null, copperDelta: 0 },
+      {
+        op: 'deposit',
+        itemId: 'never_deposited',
+        count: 2,
+        instance: null,
+        copperDelta: 0,
+        purchasedSlotsBefore: 0,
+        purchasedSlotsAfter: 0,
+      },
     ]);
     expect(JSON.stringify(book(sim))).toBe(before);
   });
@@ -1669,27 +1705,35 @@ describe('revertGuildBankDeltas (the unflushable-session surgical undo)', () => 
         count: 1,
         instance: structuredClone(armed),
         copperDelta: 0,
+        purchasedSlotsBefore: 0,
+        purchasedSlotsAfter: 0,
       },
     ]);
     // Only the matching payload was removed; the other copy survives.
     expect(book(sim).inventory).toEqual([{ itemId: 'mana_prism', count: 1, instance: other }]);
   });
 
-  it('undoes buy_slots (slots down one expansion, price back) and clamps at the opened base', () => {
+  it('undoes buy_slots as ONE compare-and-swap: slots and price move together or not at all', () => {
     const sim = makeOfficerSim({ treasury: 10_000, purchasedSlots: 30 });
-    sim.revertGuildBankDeltas(GUILD_ID, [
-      { op: 'buy_slots', itemId: null, count: null, instance: null, copperDelta: -25_000 },
-    ]);
+    const expansion = {
+      op: 'buy_slots' as const,
+      itemId: null,
+      count: null,
+      instance: null,
+      copperDelta: -25_000,
+      purchasedSlotsBefore: 24,
+      purchasedSlotsAfter: 30,
+    };
+    sim.revertGuildBankDeltas(GUILD_ID, [expansion]);
     expect(book(sim).purchasedSlots).toBe(24);
     expect(book(sim).treasury).toBe(35_000);
-    // Reverting a buy_slots against the already-at-base ladder never dips
-    // below the opened position (a buy_slots can never have caused 24 -> 18);
-    // the treasury refund still applies (the clamped residue contract).
-    sim.revertGuildBankDeltas(GUILD_ID, [
-      { op: 'buy_slots', itemId: null, count: null, instance: null, copperDelta: -25_000 },
-    ]);
+    // Replaying the same undo against a ladder that no longer stands where
+    // this op left it must move NOTHING. An unconditional refund here was the
+    // audit finding: the guild kept the slots AND got the copper back, minting
+    // the rung price out of nothing.
+    sim.revertGuildBankDeltas(GUILD_ID, [expansion]);
     expect(book(sim).purchasedSlots).toBe(24);
-    expect(book(sim).treasury).toBe(60_000);
+    expect(book(sim).treasury).toBe(35_000);
   });
 
   it('undoes open_bank (rung 0): the slot grant reverts, the treasury NEVER moves', () => {
@@ -1697,15 +1741,12 @@ describe('revertGuildBankDeltas (the unflushable-session surgical undo)', () => 
     // the purse charge) rolled back on its own: crediting the treasury here
     // would mint guild copper out of thin air.
     const sim = makeOfficerSim({ treasury: 10_000, purchasedSlots: 24 });
-    sim.revertGuildBankDeltas(GUILD_ID, [
-      { op: 'open_bank', itemId: null, count: null, instance: null, copperDelta: -90_000 },
-    ]);
+    sim.revertGuildBankDeltas(GUILD_ID, [OPEN_DELTA]);
     expect(book(sim).purchasedSlots).toBe(0); // unopened again
     expect(book(sim).treasury).toBe(10_000); // untouched
-    // Against an already-unopened book it clamps at zero, never negative.
-    sim.revertGuildBankDeltas(GUILD_ID, [
-      { op: 'open_bank', itemId: null, count: null, instance: null, copperDelta: -90_000 },
-    ]);
+    // Against an already-unopened book the compare-and-swap misses: nothing
+    // moves, and the ladder never goes negative.
+    sim.revertGuildBankDeltas(GUILD_ID, [OPEN_DELTA]);
     expect(book(sim).purchasedSlots).toBe(0);
     expect(book(sim).treasury).toBe(10_000);
   });
@@ -1723,9 +1764,7 @@ describe('revertGuildBankDeltas (the unflushable-session surgical undo)', () => 
     sim.guildBankBuySlotsFor(sim.playerId); // expand: 24 -> 30 (treasury 40k - 25k)
     expect(book(sim).purchasedSlots).toBe(30);
     expect(book(sim).treasury).toBe(15_000);
-    sim.revertGuildBankDeltas(GUILD_ID, [
-      { op: 'open_bank', itemId: null, count: null, instance: null, copperDelta: -90_000 },
-    ]);
+    sim.revertGuildBankDeltas(GUILD_ID, [OPEN_DELTA]);
     expect(GUILD_BANK_LADDER_POSITIONS).toContain(book(sim).purchasedSlots); // valid position
     expect(book(sim).purchasedSlots).toBe(30); // the grant stays: nothing destroyed
     expect(guildBankCapacity(book(sim))).toBe(30);
@@ -1742,7 +1781,15 @@ describe('revertGuildBankDeltas (the unflushable-session surgical undo)', () => 
       draws++;
     });
     sim.revertGuildBankDeltas(GUILD_ID, [
-      { op: 'deposit', itemId: 'wolf_fang', count: 2, instance: null, copperDelta: 0 },
+      {
+        op: 'deposit',
+        itemId: 'wolf_fang',
+        count: 2,
+        instance: null,
+        copperDelta: 0,
+        purchasedSlotsBefore: 0,
+        purchasedSlotsAfter: 0,
+      },
     ]);
     sim.rng.setObserver(null);
     expect(draws).toBe(0);
@@ -1766,7 +1813,15 @@ describe('revertGuildBankDeltas: provenance, canonical payloads, and stack caps'
       { itemId: 'iron_sword', count: 1, craftedRecipeId: 'smith_iron_sword' },
     );
     sim.revertGuildBankDeltas(GUILD_ID, [
-      { op: 'deposit', itemId: 'iron_sword', count: 1, instance: null, copperDelta: 0 },
+      {
+        op: 'deposit',
+        itemId: 'iron_sword',
+        count: 1,
+        instance: null,
+        copperDelta: 0,
+        purchasedSlotsBefore: 0,
+        purchasedSlotsAfter: 0,
+      },
     ]);
     // The plain stack shrank; the crafted copy is untouched.
     expect(book(sim).inventory).toEqual([
@@ -1782,6 +1837,8 @@ describe('revertGuildBankDeltas: provenance, canonical payloads, and stack caps'
         instance: null,
         craftedRecipeId: 'smith_iron_sword',
         copperDelta: 0,
+        purchasedSlotsBefore: 0,
+        purchasedSlotsAfter: 0,
       },
     ]);
     expect(book(sim).inventory).toEqual([{ itemId: 'iron_sword', count: 1 }]);
@@ -1803,6 +1860,8 @@ describe('revertGuildBankDeltas: provenance, canonical payloads, and stack caps'
         count: 1,
         instance: JSON.parse('{"bindOnTrade":false,"charges":{"arcane":2}}'),
         copperDelta: 0,
+        purchasedSlotsBefore: 0,
+        purchasedSlotsAfter: 0,
       },
     ]);
     expect(book(sim).inventory).toEqual([]);
@@ -1817,7 +1876,15 @@ describe('revertGuildBankDeltas: provenance, canonical payloads, and stack caps'
     expect(Number.isFinite(stack)).toBe(true);
     book(sim).inventory.push({ itemId: 'wolf_fang', count: stack - 1 });
     sim.revertGuildBankDeltas(GUILD_ID, [
-      { op: 'withdraw', itemId: 'wolf_fang', count: 3, instance: null, copperDelta: 0 },
+      {
+        op: 'withdraw',
+        itemId: 'wolf_fang',
+        count: 3,
+        instance: null,
+        copperDelta: 0,
+        purchasedSlotsBefore: 0,
+        purchasedSlotsAfter: 0,
+      },
     ]);
     const counts = book(sim).inventory.map((s) => s.count);
     expect(counts.reduce((a, b) => a + b, 0)).toBe(stack + 2);
@@ -1833,5 +1900,309 @@ describe('revertGuildBankDeltas: provenance, canonical payloads, and stack caps'
     sim.evictGuildBank(GUILD_ID);
     sim.rng.setObserver(null);
     expect(draws).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The forward/inverse delta pair (the escrow root fix). applyGuildBankDeltasTo
+// is the escrow save's payload builder ("durable truth plus this session's own
+// deltas") and revertGuildBankDeltasTo is its exact inverse on the live book.
+// They must never drift apart, so the identity is pinned as a PROPERTY over a
+// generated corpus rather than a handful of cases.
+// ---------------------------------------------------------------------------
+describe('applyGuildBankDeltasTo / revertGuildBankDeltasTo (the forward + inverse pair)', () => {
+  // Deterministic harness randomness (mulberry32): the sim itself draws no rng
+  // here, and a failure replays exactly from its printed seed.
+  const rngFor = (seed: number) => {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  };
+  const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
+  const ITEM_IDS = ['wolf_fang', 'copper_ore', 'iron_sword'];
+  const RECIPES = [undefined, 'smith_iron_sword'];
+  // A mergeable payload (identical-payload stacking) and a charge-bearing one
+  // (one copy per slot, bags.ts instancedCountCap), so the corpus covers both
+  // grant shapes addStacked can take.
+  const PAYLOADS: (InvSlot['instance'] | null)[] = [
+    null,
+    { signer: 'Ana' },
+    { charges: { arcane: 2 } },
+  ];
+  // A charge-bearing copy is one-per-slot by construction: generating a
+  // stacked one would build a book no legitimate path can produce.
+  const capFor = (payload: InvSlot['instance'] | null | undefined, want: number) =>
+    payload && 'charges' in (payload as Record<string, unknown>) ? 1 : want;
+
+  /** A book's CONSERVED content: treasury, ladder position, and the item
+   *  multiset summed per (itemId, canonical payload, craft provenance). Slot
+   *  LAYOUT is deliberately excluded: addStacked appends, so a remove-then-
+   *  restore cycle legitimately reorders slots and splits a charge-bearing
+   *  grant one copy per slot. Conservation is what the pair owes. */
+  const fingerprint = (b: GuildBankState): string => {
+    const m = new Map<string, number>();
+    for (const s of b.inventory) {
+      const key = `${s.itemId}|${JSON.stringify(s.instance ?? null)}|${s.craftedRecipeId ?? ''}`;
+      m.set(key, (m.get(key) ?? 0) + s.count);
+    }
+    return JSON.stringify([b.treasury, b.purchasedSlots, [...m.entries()].sort()]);
+  };
+
+  function genBook(rnd: () => number): GuildBankState {
+    const rung = Math.floor(rnd() * GUILD_BANK_LADDER_POSITIONS.length);
+    const inventory: InvSlot[] = [];
+    const n = Math.floor(rnd() * 4);
+    for (let i = 0; i < n; i++) {
+      const payload = PAYLOADS[Math.floor(rnd() * PAYLOADS.length)];
+      const slot: InvSlot = {
+        itemId: ITEM_IDS[Math.floor(rnd() * ITEM_IDS.length)],
+        count: capFor(payload, 1 + Math.floor(rnd() * 5)),
+      };
+      if (payload) slot.instance = clone(payload);
+      const recipe = RECIPES[Math.floor(rnd() * RECIPES.length)];
+      if (recipe) slot.craftedRecipeId = recipe;
+      inventory.push(slot);
+    }
+    return {
+      treasury: Math.floor(rnd() * 200_000),
+      inventory,
+      purchasedSlots: GUILD_BANK_LADDER_POSITIONS[rung],
+    };
+  }
+
+  function genDelta(rnd: () => number, book: GuildBankState): GuildBankOpDelta {
+    const roll = rnd();
+    const base: GuildBankOpDelta = {
+      op: 'deposit_gold',
+      itemId: null,
+      count: null,
+      instance: null,
+      craftedRecipeId: null,
+      copperDelta: 0,
+      purchasedSlotsBefore: 0,
+      purchasedSlotsAfter: 0,
+    };
+    if (roll < 0.25) {
+      return { ...base, op: 'deposit_gold', copperDelta: 1 + Math.floor(rnd() * 50_000) };
+    }
+    if (roll < 0.4) {
+      return { ...base, op: 'withdraw_gold', copperDelta: -(1 + Math.floor(rnd() * 50_000)) };
+    }
+    if (roll < 0.65) {
+      const payload = PAYLOADS[Math.floor(rnd() * PAYLOADS.length)];
+      return {
+        ...base,
+        op: 'deposit',
+        itemId: ITEM_IDS[Math.floor(rnd() * ITEM_IDS.length)],
+        count: capFor(payload, 1 + Math.floor(rnd() * 4)),
+        instance: payload ? clone(payload) : null,
+        craftedRecipeId: RECIPES[Math.floor(rnd() * RECIPES.length)] ?? null,
+      };
+    }
+    if (roll < 0.85) {
+      // Withdraw an identity the book actually holds, so the forward replay
+      // has something to remove (a missing copy is the DEFICIT arm, covered
+      // separately below).
+      const slot = book.inventory[Math.floor(rnd() * book.inventory.length)];
+      if (!slot) return { ...base, op: 'deposit_gold', copperDelta: 1 };
+      return {
+        ...base,
+        op: 'withdraw',
+        itemId: slot.itemId,
+        count: 1 + Math.floor(rnd() * slot.count),
+        instance: slot.instance ? clone(slot.instance) : null,
+        craftedRecipeId: slot.craftedRecipeId ?? null,
+      };
+    }
+    // A ladder step from wherever the book stands, recorded ABSOLUTELY.
+    const rung = guildBankRungsBought(book.purchasedSlots);
+    if (rung >= GUILD_BANK_RUNG_PRICES.length) {
+      return { ...base, op: 'deposit_gold', copperDelta: 1 };
+    }
+    const before = GUILD_BANK_LADDER_POSITIONS[rung];
+    const after = GUILD_BANK_LADDER_POSITIONS[rung + 1];
+    return {
+      ...base,
+      op: rung === 0 ? 'open_bank' : 'buy_slots',
+      copperDelta: rung === 0 ? -GUILD_BANK_RUNG_PRICES[0] : -GUILD_BANK_RUNG_PRICES[rung],
+      purchasedSlotsBefore: before,
+      purchasedSlotsAfter: after,
+    };
+  }
+
+  it('apply then revert is the IDENTITY on an arbitrary book and delta list', () => {
+    let checked = 0;
+    for (let seed = 1; seed <= 400; seed++) {
+      const rnd = rngFor(seed);
+      const book = genBook(rnd);
+      const original = clone(book);
+      const deltas: GuildBankOpDelta[] = [];
+      const probe = clone(book);
+      const n = 1 + Math.floor(rnd() * 5);
+      for (let i = 0; i < n; i++) {
+        const d = genDelta(rnd, probe);
+        // Build the list against a running book so each delta's ladder
+        // witness and item identities are the ones a real op would record.
+        if (applyGuildBankDeltasTo(probe, [d]).deficit !== null) break;
+        deltas.push(d);
+      }
+      if (deltas.length === 0) continue;
+      const forward = clone(book);
+      // The deficit arm is all-or-nothing (the caller discards the partially
+      // mutated copy), so the identity only claims anything about clean
+      // replays; the deficit itself is pinned decisively below.
+      if (applyGuildBankDeltasTo(forward, deltas).deficit !== null) continue;
+      revertGuildBankDeltasTo(forward, deltas);
+      checked++;
+      expect(`seed ${seed}: ${fingerprint(forward)}`).toBe(
+        `seed ${seed}: ${fingerprint(original)}`,
+      );
+    }
+    // The property is only worth what it covered.
+    expect(checked).toBeGreaterThan(200);
+  });
+
+  it('the forward replay of NON-slot deltas is order independent', () => {
+    for (let seed = 1; seed <= 300; seed++) {
+      const rnd = rngFor(seed + 10_000);
+      const book = genBook(rnd);
+      const probe = clone(book);
+      const deltas: GuildBankOpDelta[] = [];
+      for (let i = 0; i < 3; i++) {
+        const d = genDelta(rnd, probe);
+        if (d.op === 'open_bank' || d.op === 'buy_slots') continue;
+        if (applyGuildBankDeltasTo(probe, [d]).deficit !== null) break;
+        deltas.push(d);
+      }
+      if (deltas.length < 2) continue;
+      const a = clone(book);
+      const b = clone(book);
+      if (applyGuildBankDeltasTo(a, deltas).deficit !== null) continue;
+      if (applyGuildBankDeltasTo(b, [...deltas].reverse()).deficit !== null) continue;
+      // Inventory ORDER can differ (addStacked appends), so compare the
+      // conserved quantities: the treasury, the ladder, and the item multiset.
+      expect(`seed ${seed}: ${fingerprint(a)}`).toBe(`seed ${seed}: ${fingerprint(b)}`);
+    }
+  });
+
+  it('a slot op replays as RAISE-TO-N, so replaying it twice never double-grants', () => {
+    // The whole point of recording slot ops absolutely. A relative "+6" record
+    // replayed onto a base that already advanced would grant the rung twice.
+    const expansion: GuildBankOpDelta = {
+      op: 'buy_slots',
+      itemId: null,
+      count: null,
+      instance: null,
+      copperDelta: -GUILD_BANK_RUNG_PRICES[1],
+      purchasedSlotsBefore: 24,
+      purchasedSlotsAfter: 30,
+    };
+    const book: GuildBankState = { treasury: 100_000, inventory: [], purchasedSlots: 24 };
+    expect(applyGuildBankDeltasTo(book, [expansion])).toEqual({
+      applied: 1,
+      residual: null,
+      deficit: null,
+    });
+    expect(book.purchasedSlots).toBe(30);
+    // Idempotent on the ladder: the second replay raises nothing. (It still
+    // charges the treasury, which is why a save never replays a committed
+    // delta; the pin is on the LADDER, the part a relative record would ruin.)
+    expect(applyGuildBankDeltasTo(book, [expansion])).toEqual({
+      applied: 1,
+      residual: null,
+      deficit: null,
+    });
+    expect(book.purchasedSlots).toBe(30);
+    // And a base BEHIND the op's own `before` refuses rather than granting
+    // rungs nobody paid for: the escrow save skips the row and retries.
+    const behind: GuildBankState = { treasury: 100_000, inventory: [], purchasedSlots: 0 };
+    expect(applyGuildBankDeltasTo(behind, [expansion])).toEqual({
+      applied: 0,
+      // A ladder the base has not reached applies NOTHING (no partial rung).
+      residual: null,
+      deficit: { kind: 'ladder_behind', op: 'buy_slots', itemId: null, shortfall: 24 },
+    });
+    expect(behind.purchasedSlots).toBe(0);
+  });
+
+  it('reports the DEFICIT rather than clamping when durable truth cannot satisfy the replay', () => {
+    // The one thing the forward replay must never do is paper over a
+    // shortfall: this session's character half durably gains what the book
+    // never durably lost, which mints it permanently. It reports the shortfall
+    // instead, and a PARTLY covered delta rides on as a residual the next save
+    // retries.
+    const empty = (): GuildBankState => ({ treasury: 0, inventory: [], purchasedSlots: 24 });
+    const goldOut: GuildBankOpDelta = {
+      op: 'withdraw_gold',
+      itemId: null,
+      count: null,
+      instance: null,
+      craftedRecipeId: null,
+      copperDelta: -250,
+      purchasedSlotsBefore: 0,
+      purchasedSlotsAfter: 0,
+    };
+    const fangsOut: GuildBankOpDelta = {
+      op: 'withdraw',
+      itemId: 'wolf_fang',
+      count: 4,
+      instance: null,
+      craftedRecipeId: null,
+      copperDelta: 0,
+      purchasedSlotsBefore: 0,
+      purchasedSlotsAfter: 0,
+    };
+    expect(applyGuildBankDeltasTo(empty(), [goldOut])).toEqual({
+      applied: 0,
+      // Nothing moved, so the entry stays in the log exactly as it is.
+      residual: null,
+      deficit: { kind: 'treasury_underflow', op: 'withdraw_gold', itemId: null, shortfall: 250 },
+    });
+    expect(applyGuildBankDeltasTo(empty(), [fangsOut])).toEqual({
+      applied: 0,
+      residual: null,
+      deficit: { kind: 'missing_items', op: 'withdraw', itemId: 'wolf_fang', shortfall: 4 },
+    });
+    // A partial shortfall is still a shortfall (2 of the 4 copies are there).
+    const partial: GuildBankState = {
+      treasury: 0,
+      inventory: [{ itemId: 'wolf_fang', count: 2 }],
+      purchasedSlots: 24,
+    };
+    const half = applyGuildBankDeltasTo(partial, [fangsOut]);
+    expect(half.deficit?.shortfall).toBe(2);
+    // ...the two copies durable truth DID hold move, and the leftover rides on
+    // as a residual: nothing is clamped away and nothing is applied twice.
+    expect(partial.inventory).toEqual([]);
+    expect(half.residual).toEqual({ ...fangsOut, count: 2 });
+    // A deposit whose provenance does not match the book's stack is a fresh
+    // slot, never a merge that launders the marker.
+    const crafted: GuildBankState = {
+      treasury: 0,
+      inventory: [{ itemId: 'iron_sword', count: 1 }],
+      purchasedSlots: 24,
+    };
+    expect(
+      applyGuildBankDeltasTo(crafted, [
+        {
+          op: 'deposit',
+          itemId: 'iron_sword',
+          count: 1,
+          instance: null,
+          craftedRecipeId: 'smith_iron_sword',
+          copperDelta: 0,
+          purchasedSlotsBefore: 0,
+          purchasedSlotsAfter: 0,
+        },
+      ]),
+    ).toEqual({ applied: 1, residual: null, deficit: null });
+    expect(crafted.inventory).toEqual([
+      { itemId: 'iron_sword', count: 1 },
+      { itemId: 'iron_sword', count: 1, craftedRecipeId: 'smith_iron_sword' },
+    ]);
   });
 });

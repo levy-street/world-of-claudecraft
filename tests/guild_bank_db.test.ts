@@ -18,7 +18,7 @@ vi.mock('pg', () => ({
 import {
   GUILD_BANK_BOOT_BATCH,
   GUILD_BANK_ROW_MAX_BYTES,
-  loadGuildBankRow,
+  type GuildBankWriteResult,
   loadGuildBankRows,
   openMarketWriteGate,
   saveCharacterAndGuildBankState,
@@ -57,6 +57,32 @@ const BOOK = {
   purchasedSlots: 30,
 };
 
+// A session's OWN unflushed deltas: the escrow save's payload since the escrow
+// root fix. The row itself is rebuilt inside the transaction as "durable truth
+// plus these", so the payload never carries another officer's work.
+const DEPOSIT_GOLD = {
+  op: 'deposit_gold' as const,
+  itemId: null,
+  count: null,
+  instance: null,
+  craftedRecipeId: null,
+  copperDelta: 1_500,
+  purchasedSlotsBefore: 0,
+  purchasedSlotsAfter: 0,
+};
+const DEPOSIT_FANGS = {
+  op: 'deposit' as const,
+  itemId: 'wolf_fang',
+  count: 2,
+  instance: null,
+  craftedRecipeId: null,
+  copperDelta: 0,
+  purchasedSlotsBefore: 0,
+  purchasedSlotsAfter: 0,
+};
+const SAVE_7 = { guildId: 7, deltas: [DEPOSIT_GOLD, DEPOSIT_FANGS] };
+const SAVE_9 = { guildId: 9, deltas: [DEPOSIT_GOLD] };
+
 describe('the guild_banks DDL (SOCIAL_SCHEMA, the family that owns guilds)', () => {
   it('is additive and idempotent with the state.md column set and the disband cascade', () => {
     expect(SOCIAL_SCHEMA).toContain('CREATE TABLE IF NOT EXISTS guild_banks');
@@ -79,15 +105,14 @@ describe('saveCharacterAndGuildBankState (the game-loop escrow save)', () => {
     const client = clientStub(() => 1);
     dbMock.connect.mockResolvedValueOnce(client as never);
 
+    const results: GuildBankWriteResult[] = [];
     const ok = await saveCharacterAndGuildBankState(
       42,
       5,
       STATE,
-      [
-        { guildId: 7, data: BOOK },
-        { guildId: 9, data: { treasury: 0, inventory: [], purchasedSlots: 0 } },
-      ],
+      [SAVE_7, SAVE_9],
       'nonce-1',
+      results,
     );
     expect(ok).toBe(true);
 
@@ -99,13 +124,42 @@ describe('saveCharacterAndGuildBankState (the game-loop escrow save)', () => {
     const charSql = sqls.find((s) => /UPDATE characters/i.test(s));
     expect(charSql).toContain('EXISTS');
     expect(charSql).toContain('character_leases');
-    // Both books are parameterized upserts on the SAME client.
+    // Each book is a READ-MODIFY-WRITE: the durable row is re-read FOR UPDATE
+    // on this same client, INSIDE the transaction and AFTER the fenced
+    // character UPDATE, then this session's own deltas are replayed onto it.
+    // Reading outside the transaction would be a lost-update window (two saves
+    // reading one base, the later write discarding the earlier's deltas), and
+    // the row lock is what makes the merge safe across PROCESSES.
+    const lockCalls = client.query.mock.calls.filter((c) =>
+      /FROM guild_banks[\s\S]*FOR UPDATE/i.test(String(c[0])),
+    );
+    expect(lockCalls.map((c) => (c[1] as unknown[])[0])).toEqual([7, 9]);
+    expect((lockCalls[0][1] as unknown[])[1]).toBe(GUILD_BANK_ROW_MAX_BYTES);
+    const charIndex = sqls.findIndex((s2) => /UPDATE characters/i.test(s2));
+    const lockIndex = sqls.findIndex((s2) => /FOR UPDATE/i.test(s2));
+    expect(charIndex).toBeGreaterThan(0);
+    expect(lockIndex).toBeGreaterThan(charIndex);
+    // Both books are parameterized upserts on the SAME client, carrying the
+    // MERGED book (this stub's SELECT returns no row, so the base is the empty
+    // book and the merge is exactly this session's deltas).
     const bankCalls = client.query.mock.calls.filter((c) =>
       /INSERT INTO guild_banks/i.test(String(c[0])),
     );
     expect(bankCalls.map((c) => (c[1] as unknown[])[0])).toEqual([7, 9]);
     expect(String(bankCalls[0][0])).toContain('ON CONFLICT (guild_id) DO UPDATE');
-    expect(bankCalls[0][1]).toEqual([7, REALM, JSON.stringify(BOOK)]);
+    expect(bankCalls[0][1]).toEqual([
+      7,
+      REALM,
+      JSON.stringify({
+        treasury: 1_500,
+        inventory: [{ itemId: 'wolf_fang', count: 2 }],
+        purchasedSlots: 0,
+      }),
+    ]);
+    expect(results).toEqual([
+      { guildId: 7, written: true, applied: 2, residual: null, deficit: null, rowUnusable: false },
+      { guildId: 9, written: true, applied: 1, residual: null, deficit: null, rowUnusable: false },
+    ]);
     // Crash-shape: NOTHING leaks onto the bare pool, so the two halves can
     // never persist independently (they commit or vanish together).
     expect(dbMock.query).not.toHaveBeenCalled();
@@ -117,13 +171,7 @@ describe('saveCharacterAndGuildBankState (the game-loop escrow save)', () => {
     const client = clientStub((sql) => (/UPDATE characters/i.test(sql) ? 0 : 1));
     dbMock.connect.mockResolvedValueOnce(client as never);
 
-    const ok = await saveCharacterAndGuildBankState(
-      42,
-      5,
-      STATE,
-      [{ guildId: 7, data: BOOK }],
-      'stale',
-    );
+    const ok = await saveCharacterAndGuildBankState(42, 5, STATE, [SAVE_7], 'stale');
     expect(ok).toBe(false);
 
     const sqls = client.query.mock.calls.map((c) => String(c[0]));
@@ -142,9 +190,9 @@ describe('saveCharacterAndGuildBankState (the game-loop escrow save)', () => {
     });
     dbMock.connect.mockResolvedValueOnce(client as never);
 
-    await expect(
-      saveCharacterAndGuildBankState(1, 1, STATE, [{ guildId: 7, data: BOOK }], 'n'),
-    ).rejects.toThrow('book boom');
+    await expect(saveCharacterAndGuildBankState(1, 1, STATE, [SAVE_7], 'n')).rejects.toThrow(
+      'book boom',
+    );
     const sqls = client.query.mock.calls.map((c) => String(c[0]));
     expect(sqls.some((s) => /UPDATE characters/i.test(s))).toBe(true);
     expect(sqls.some((s) => /ROLLBACK/.test(s))).toBe(true);
@@ -154,7 +202,7 @@ describe('saveCharacterAndGuildBankState (the game-loop escrow save)', () => {
   it('the no-nonce path (tests, resumes) still writes transactionally and reports true', async () => {
     const client = clientStub(() => 1);
     dbMock.connect.mockResolvedValueOnce(client as never);
-    const ok = await saveCharacterAndGuildBankState(3, 2, STATE, [{ guildId: 7, data: BOOK }]);
+    const ok = await saveCharacterAndGuildBankState(3, 2, STATE, [SAVE_7]);
     expect(ok).toBe(true);
     const charCall = client.query.mock.calls.find((c) => /UPDATE characters/i.test(String(c[0])));
     expect(String(charCall?.[0])).not.toContain('character_leases');
@@ -166,9 +214,7 @@ describe('saveCharacterAndMarketState carrying guild books (the leave flush)', (
     const client = clientStub(() => 1);
     dbMock.connect.mockResolvedValueOnce(client as never);
 
-    await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL, undefined, [
-      { guildId: 7, data: BOOK },
-    ]);
+    await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL, undefined, [SAVE_7]);
 
     const sqls = client.query.mock.calls.map((c) => String(c[0]));
     expect(sqls[0]).toMatch(/^BEGIN/);
@@ -188,9 +234,7 @@ describe('saveCharacterAndMarketState carrying guild books (the leave flush)', (
   it('a fence miss on the leave flush writes no book row either', async () => {
     const client = clientStub((sql) => (/UPDATE characters/i.test(sql) ? 0 : 1));
     dbMock.connect.mockResolvedValueOnce(client as never);
-    const ok = await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL, 'stale', [
-      { guildId: 7, data: BOOK },
-    ]);
+    const ok = await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL, 'stale', [SAVE_7]);
     expect(ok).toBe(false);
     const sqls = client.query.mock.calls.map((c) => String(c[0]));
     expect(sqls.some((s) => /guild_banks/i.test(s))).toBe(false);
@@ -288,38 +332,5 @@ describe('loadGuildBankRows (the bounded, batched boot read)', () => {
 
   it('pins the row bound itself (a silent widening would unbound the load)', () => {
     expect(GUILD_BANK_ROW_MAX_BYTES).toBe(262144);
-  });
-
-  it('loadGuildBankRow reads one bounded row for the fence-out reconcile', async () => {
-    dbMock.query.mockResolvedValueOnce({
-      rows: [{ data_bytes: 99, data: BOOK }],
-      rowCount: 1,
-    } as never);
-    const row = await loadGuildBankRow(7);
-    const [sql, params] = dbMock.query.mock.calls[0];
-    expect(String(sql)).toContain('FROM guild_banks');
-    expect(String(sql)).toContain('octet_length(data::text)');
-    expect(params).toEqual([7, GUILD_BANK_ROW_MAX_BYTES]);
-    expect(row).toEqual({ guildId: 7, data: BOOK, oversized: false, dataBytes: 99 });
-  });
-
-  it('loadGuildBankRow reports no-row as null data and an oversized row flagged', async () => {
-    dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 0 } as never);
-    expect(await loadGuildBankRow(8)).toEqual({
-      guildId: 8,
-      data: null,
-      oversized: false,
-      dataBytes: 0,
-    });
-    dbMock.query.mockResolvedValueOnce({
-      rows: [{ data_bytes: GUILD_BANK_ROW_MAX_BYTES + 1, data: null }],
-      rowCount: 1,
-    } as never);
-    expect(await loadGuildBankRow(9)).toEqual({
-      guildId: 9,
-      data: null,
-      oversized: true,
-      dataBytes: GUILD_BANK_ROW_MAX_BYTES + 1,
-    });
   });
 });

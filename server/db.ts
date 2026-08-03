@@ -31,6 +31,11 @@ import { DISCORD_SCHEMA } from './discord_db';
 import { enqueueLinkChange } from './discord_link_changes';
 import { bustDiscordStatus } from './discord_status_cache';
 import { GITHUB_SCHEMA } from './github_db';
+import {
+  type GuildBankSave,
+  type GuildBankWriteResult,
+  mergeGuildBankRow,
+} from './guild_bank_state';
 import { isUniqueViolation } from './http_util';
 import { MAPS_SCHEMA } from './maps_db';
 import {
@@ -3104,6 +3109,8 @@ export async function saveCharacterAndMarketState(
   // carries both MUST land them in this same fenced transaction. Optional and
   // additive: omitted (or empty) writes exactly what this function always has.
   guildBanks?: readonly GuildBankSave[],
+  // Out-parameter, same contract as saveCharacterAndGuildBankState's.
+  results?: GuildBankWriteResult[],
 ): Promise<boolean> {
   // Gate the escrow flush on the boot backfill just like saveMarketState:
   // this writes the realm-market row, so it must not run before ensureSchema
@@ -3153,7 +3160,11 @@ export async function saveCharacterAndMarketState(
     // never land for a displaced session, and a failure anywhere rolls back
     // the character, market, mail, and book halves together.
     for (const gb of guildBanks ?? []) {
-      await writeGuildBankRow(client, gb);
+      // NOT `results?.push(await ...)`: optional chaining short-circuits the
+      // whole call expression, so the write itself would be skipped whenever
+      // the caller omitted the out-parameter.
+      const written = await writeGuildBankRow(client, gb);
+      results?.push(written);
     }
     await client.query('COMMIT');
     return true;
@@ -3176,26 +3187,53 @@ export async function saveCharacterAndMarketState(
 // outside the fence is the dupe shape this phase exists to prevent.
 // ---------------------------------------------------------------------------
 
-export interface GuildBankSave {
-  guildId: number;
-  // The serialized GuildBankState (src/sim/guild_bank.ts serializeGuildBank).
-  // Callers must SKIP guilds whose serialize returned null (no loaded book):
-  // an empty book must never overwrite a real row.
-  data: unknown;
-}
+export type { GuildBankSave, GuildBankWriteResult } from './guild_bank_state';
 
-// The one guild_banks write statement, only ever issued on a client that is
-// inside the fenced escrow transaction (see the section comment above).
+// The one guild_banks write, only ever issued on a client that is inside the
+// fenced escrow transaction (see the section comment above), and always a
+// READ-MODIFY-WRITE rather than a blind blob overwrite:
+//
+//   SELECT ... FOR UPDATE  ->  mergeGuildBankRow(durable, this session's own
+//   deltas)  ->  upsert
+//
+// The row lock is what makes the merge safe across PROCESSES (in-process, the
+// market serial writer already means no two book transactions overlap, but the
+// lease system exists precisely because more than one process can contend for
+// the same character, and a realm's book rows are reachable from any process
+// holding a lease). It is a primary-key lock, sub-millisecond and free in the
+// uncontended case. Reading OUTSIDE the transaction instead would be a
+// lost-update window: two saves could read the same base and the later write
+// would discard the earlier's deltas.
+//
+// The read is issued AFTER the fenced character UPDATE has already passed, so
+// a fence miss still rolls back before any book row is touched or locked.
+//
+// The same size bound the boot read applies (GUILD_BANK_ROW_MAX_BYTES) is
+// applied here in SQL: an oversized blob never crosses the wire and its row is
+// PRESERVED rather than overwritten, exactly like the boot skip.
 async function writeGuildBankRow(
   client: { query: (text: string, values: unknown[]) => Promise<unknown> },
   gb: GuildBankSave,
-): Promise<void> {
+): Promise<GuildBankWriteResult> {
+  const read = (await client.query(
+    `SELECT octet_length(data::text) AS data_bytes,
+            CASE WHEN octet_length(data::text) <= $2 THEN data ELSE NULL END AS data
+       FROM guild_banks
+      WHERE guild_id = $1
+        FOR UPDATE`,
+    [gb.guildId, GUILD_BANK_ROW_MAX_BYTES],
+  )) as { rows: { data_bytes?: unknown; data?: unknown }[] };
+  const row = read.rows?.[0];
+  const oversized = row ? Number(row.data_bytes) > GUILD_BANK_ROW_MAX_BYTES : false;
+  const merged = mergeGuildBankRow(row ? (row.data ?? null) : null, gb.deltas, { oversized });
+  if (merged.data === null) return { guildId: gb.guildId, ...merged.result };
   await client.query(
     `INSERT INTO guild_banks (guild_id, realm, data, updated_at) VALUES ($1, $2, $3, now())
      ON CONFLICT (guild_id) DO UPDATE SET realm = EXCLUDED.realm, data = EXCLUDED.data,
        updated_at = now()`,
-    [gb.guildId, REALM, JSON.stringify(gb.data)],
+    [gb.guildId, REALM, JSON.stringify(merged.data)],
   );
+  return { guildId: gb.guildId, ...merged.result };
 }
 
 // The game-loop escrow save: the acting character's state AND the guild books
@@ -3212,6 +3250,13 @@ export async function saveCharacterAndGuildBankState(
   state: CharacterState,
   guildBanks: readonly GuildBankSave[],
   leaseNonce?: string,
+  // Out-parameter: what each book write actually did (written, skipped for a
+  // deficit, skipped to preserve an unusable row). The caller reads it AFTER
+  // the transaction commits to decide whether to release a dirty mark or keep
+  // it and retry. An out-parameter rather than a richer return type because
+  // the boolean return IS the fence signal and every call site (and every
+  // test double) reads it as one.
+  results?: GuildBankWriteResult[],
 ): Promise<boolean> {
   const cleanState = sanitizeRemovedZone1Content(state).state;
   const client = await pool.connect();
@@ -3232,7 +3277,10 @@ export async function saveCharacterAndGuildBankState(
       return false;
     }
     for (const gb of guildBanks) {
-      await writeGuildBankRow(client, gb);
+      // See the sibling in saveCharacterAndMarketState: the await must not sit
+      // inside an optional-chained call.
+      const written = await writeGuildBankRow(client, gb);
+      results?.push(written);
     }
     await client.query('COMMIT');
     return true;

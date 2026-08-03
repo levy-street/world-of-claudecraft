@@ -43,6 +43,16 @@ import { Pool } from 'pg';
 // the opened base; a guild buy_slots (rungs 1+) always lands on a later
 // ladder position.
 export const OPEN_BANK_SLOTS_AFTER = 24;
+
+// The ANOMALY op (server/bank_ledger.ts GUILD_BANK_ESCROW_DEFICIT_OP): an
+// escrow save whose own deltas could NOT be replayed onto durable truth,
+// recorded once the shortfall can never resolve. It is not an op a player
+// performed and no value moved under it, so it takes no part in the item,
+// treasury, or ladder replays; it is reported directly as a finding, because
+// it is the audit trail for the one residue the escrow design leaves open
+// (docs/guild-bank/state.md: another officer consumed value that never became
+// durable, so their purse durably gained what the book never durably lost).
+export const ESCROW_DEFICIT_OP = 'escrow_deficit';
 export const GUILD_BUY_POSITIONS = [30, 36, 42, 48, 54, 60];
 const GUILD_BUY_POSITION_SET = new Set(GUILD_BUY_POSITIONS);
 
@@ -204,6 +214,19 @@ function checkRowShape(row, findings) {
         detail: `open_bank row ${row.id} has purchased_slots_after ${String(row.purchased_slots_after)}`,
       });
     }
+  } else if (row.op === ESCROW_DEFICIT_OP) {
+    findings.push({
+      ...base,
+      kind: 'escrow_deficit',
+      detail:
+        `escrow deficit row ${row.id}: a guild bank escrow save could not replay its own ` +
+        `deltas onto durable truth (${
+          row.item_id == null
+            ? `${Math.abs(Number(row.copper_delta))} copper`
+            : `${String(row.count)} x ${row.item_id}`
+        } was consumed but never durable). The consuming character kept the value; ` +
+        'the book never lost it.',
+    });
   } else if (row.op === 'create_fee') {
     // The founder's purse paid the (positive) creation fee; a newborn guild
     // has no expansions yet.
@@ -229,7 +252,8 @@ function checkRowShape(row, findings) {
     row.op === 'deposit_gold' ||
     row.op === 'withdraw_gold' ||
     row.op === 'create_fee' ||
-    row.op === 'open_bank';
+    row.op === 'open_bank' ||
+    row.op === ESCROW_DEFICIT_OP;
   if (guildOnlyOp && container !== 'guild') {
     findings.push({
       ...base,
@@ -310,6 +334,9 @@ export function auditBank({ ledgerRows, characters, guildBanks }) {
     let prevPurchased = null;
     let finalPurchased = null;
     for (const row of group.rows) {
+      // Anomaly rows describe work that did NOT land, so they carry no ladder
+      // position and must not drag the monotonicity scan backwards.
+      if (row.op === ESCROW_DEFICIT_OP) continue;
       const after = Number(row.purchased_slots_after);
       if (!Number.isFinite(after)) continue;
       if (prevPurchased !== null && after < prevPurchased) {

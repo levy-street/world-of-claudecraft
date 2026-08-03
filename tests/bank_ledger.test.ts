@@ -328,9 +328,11 @@ describe('bank ledger dispatch integration', () => {
 
 import {
   diffGuildBankOp,
+  GUILD_BANK_ESCROW_DEFICIT_OP,
   type GuildBankLedgerOp,
   guildCreateFeeDelta,
   recordGuildBankDeltas,
+  recordGuildBankEscrowDeficit,
 } from '../server/bank_ledger';
 import type { GuildBankOpDelta } from '../src/sim/guild_bank';
 import type { GuildBankInfo } from '../src/world_api';
@@ -347,13 +349,27 @@ function ginfo(
 describe('diffGuildBankOp (pure)', () => {
   it('deposit_gold records the positive treasury delta', () => {
     expect(diffGuildBankOp('deposit_gold', ginfo(1000), ginfo(3500))).toEqual([
-      { itemId: null, count: null, instance: null, copperDelta: 2500, purchasedSlotsAfter: 0 },
+      {
+        itemId: null,
+        count: null,
+        instance: null,
+        copperDelta: 2500,
+        purchasedSlotsBefore: 0,
+        purchasedSlotsAfter: 0,
+      },
     ]);
   });
 
   it('withdraw_gold records the negative treasury delta', () => {
     expect(diffGuildBankOp('withdraw_gold', ginfo(3500), ginfo(1000))).toEqual([
-      { itemId: null, count: null, instance: null, copperDelta: -2500, purchasedSlotsAfter: 0 },
+      {
+        itemId: null,
+        count: null,
+        instance: null,
+        copperDelta: -2500,
+        purchasedSlotsBefore: 0,
+        purchasedSlotsAfter: 0,
+      },
     ]);
   });
 
@@ -373,6 +389,7 @@ describe('diffGuildBankOp (pure)', () => {
         instance: null,
         craftedRecipeId: null,
         copperDelta: 0,
+        purchasedSlotsBefore: 0,
         purchasedSlotsAfter: 0,
       },
     ]);
@@ -389,6 +406,7 @@ describe('diffGuildBankOp (pure)', () => {
         instance: null,
         craftedRecipeId: null,
         copperDelta: 0,
+        purchasedSlotsBefore: 0,
         purchasedSlotsAfter: 0,
       },
     ]);
@@ -411,6 +429,7 @@ describe('diffGuildBankOp (pure)', () => {
         instance: null,
         craftedRecipeId: null,
         copperDelta: 0,
+        purchasedSlotsBefore: 0,
         purchasedSlotsAfter: 0,
       },
     ]);
@@ -448,6 +467,7 @@ describe('diffGuildBankOp (pure)', () => {
         instance: null,
         craftedRecipeId: 'smith_iron_sword',
         copperDelta: 0,
+        purchasedSlotsBefore: 0,
         purchasedSlotsAfter: 0,
       },
     ]);
@@ -457,7 +477,16 @@ describe('diffGuildBankOp (pure)', () => {
     expect(
       diffGuildBankOp('buy_slots', ginfo(60000, [], 24, 25000), ginfo(35000, [], 30, 50000)),
     ).toEqual([
-      { itemId: null, count: null, instance: null, copperDelta: -25000, purchasedSlotsAfter: 30 },
+      {
+        itemId: null,
+        count: null,
+        instance: null,
+        // ABSOLUTE: the guild escrow log replays a slot op as "raise the
+        // ladder to at least 30, but only from 24", never as a relative +6.
+        copperDelta: -25000,
+        purchasedSlotsBefore: 24,
+        purchasedSlotsAfter: 30,
+      },
     ]);
   });
 
@@ -468,8 +497,33 @@ describe('diffGuildBankOp (pure)', () => {
     expect(
       diffGuildBankOp('open_bank', ginfo(60000, [], 0, 90000), ginfo(60000, [], 24, 25000)),
     ).toEqual([
-      { itemId: null, count: null, instance: null, copperDelta: -90000, purchasedSlotsAfter: 24 },
+      {
+        itemId: null,
+        count: null,
+        instance: null,
+        copperDelta: -90000,
+        purchasedSlotsBefore: 0,
+        purchasedSlotsAfter: 24,
+      },
     ]);
+  });
+
+  it('ALWAYS sets the ladder before-witness on every guild delta it emits', () => {
+    // The escrow log replays slot ops absolutely, so a delta without a before
+    // witness would replay onto the wrong base. GameServer carries a defensive
+    // `?? 0`; this is the pin that keeps that fallback dead code.
+    const cases: ReturnType<typeof diffGuildBankOp>[] = [
+      diffGuildBankOp('deposit_gold', ginfo(0), ginfo(1500)),
+      diffGuildBankOp('withdraw_gold', ginfo(1500), ginfo(0)),
+      diffGuildBankOp('deposit', ginfo(0, []), ginfo(0, [{ itemId: 'wolf_fang', count: 1 }])),
+      diffGuildBankOp('withdraw', ginfo(0, [{ itemId: 'wolf_fang', count: 1 }]), ginfo(0, [])),
+      diffGuildBankOp('buy_slots', ginfo(60000, [], 24, 25000), ginfo(35000, [], 30, 50000)),
+      diffGuildBankOp('open_bank', ginfo(0, [], 0, 90000), ginfo(0, [], 24, 25000)),
+    ];
+    for (const deltas of cases) {
+      expect(deltas.length).toBe(1);
+      expect(typeof deltas[0].purchasedSlotsBefore).toBe('number');
+    }
   });
 
   it('identical or null snapshots (refusals) record nothing', () => {
@@ -532,12 +586,68 @@ describe('recordGuildBankDeltas + guildCreateFeeDelta (the FIFO writer)', () => 
     expect(insertMock).not.toHaveBeenCalled();
   });
 
+  it('records an escrow-deficit ANOMALY row for a copper and an item shortfall', async () => {
+    // The D5 residue's audit trail: an escrow save whose own deltas could not
+    // be replayed onto durable truth (another officer consumed value that is
+    // not durable yet) and can never resolve. The forward replay is the only
+    // code in the system that can see it, so this row is the first time it has
+    // ever been visible to scripts/bank_audit.mjs.
+    recordGuildBankEscrowDeficit({ characterId: 42, accountId: 7 }, 913, {
+      kind: 'treasury_underflow',
+      op: 'withdraw_gold',
+      itemId: null,
+      shortfall: 250,
+    });
+    recordGuildBankEscrowDeficit({ characterId: 42, accountId: 7 }, 913, {
+      kind: 'missing_items',
+      op: 'withdraw',
+      itemId: 'wolf_fang',
+      shortfall: 4,
+    });
+    await bankLedgerIdle();
+    expect(insertMock).toHaveBeenCalledTimes(2);
+    expect(insertMock).toHaveBeenNthCalledWith(1, {
+      realm: REALM,
+      characterId: 42,
+      accountId: 7,
+      op: GUILD_BANK_ESCROW_DEFICIT_OP,
+      itemId: null,
+      count: null,
+      instance: null,
+      // Negative: copper reached a purse with no durable book decrement behind it.
+      copperDelta: -250,
+      purchasedSlotsAfter: 0,
+      container: 'guild',
+      containerId: 913,
+    });
+    expect(insertMock).toHaveBeenNthCalledWith(2, {
+      realm: REALM,
+      characterId: 42,
+      accountId: 7,
+      op: GUILD_BANK_ESCROW_DEFICIT_OP,
+      itemId: 'wolf_fang',
+      count: 4,
+      instance: null,
+      copperDelta: 0,
+      purchasedSlotsAfter: 0,
+      container: 'guild',
+      containerId: 913,
+    });
+  });
+
   it('is fire-and-forget: returns void and a rejecting insert never throws', async () => {
     insertMock.mockRejectedValueOnce(new Error('db down'));
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(
       recordGuildBankDeltas('deposit', { characterId: 1, accountId: 1 }, 913, [
-        { itemId: 'wolf_fang', count: 1, instance: null, copperDelta: 0, purchasedSlotsAfter: 0 },
+        {
+          itemId: 'wolf_fang',
+          count: 1,
+          instance: null,
+          copperDelta: 0,
+          purchasedSlotsBefore: 0,
+          purchasedSlotsAfter: 0,
+        },
       ]),
     ).toBeUndefined();
     await bankLedgerIdle();
@@ -545,7 +655,14 @@ describe('recordGuildBankDeltas + guildCreateFeeDelta (the FIFO writer)', () => 
     errSpy.mockRestore();
     // The chain survives: the next write still lands in order.
     recordGuildBankDeltas('deposit', { characterId: 1, accountId: 1 }, 913, [
-      { itemId: 'wolf_fang', count: 2, instance: null, copperDelta: 0, purchasedSlotsAfter: 0 },
+      {
+        itemId: 'wolf_fang',
+        count: 2,
+        instance: null,
+        copperDelta: 0,
+        purchasedSlotsBefore: 0,
+        purchasedSlotsAfter: 0,
+      },
     ]);
     await bankLedgerIdle();
     expect(insertMock).toHaveBeenCalledTimes(2);
