@@ -13,6 +13,14 @@ const nameplates = readFileSync(
   new URL('../src/render/nameplate_painter.ts', import.meta.url),
   'utf8',
 );
+const nameplateCanvas = readFileSync(
+  new URL('../src/render/nameplate_canvas.ts', import.meta.url),
+  'utf8',
+);
+const editorViewport = readFileSync(
+  new URL('../src/editor/3d/viewport.ts', import.meta.url),
+  'utf8',
+);
 
 describe('renderer CPU hot path', () => {
   it('reuses picking scratch instead of allocating empty-hit containers', () => {
@@ -23,11 +31,23 @@ describe('renderer CPU hot path', () => {
     expect(renderer).not.toContain('const directHitIds: number[] = []');
   });
 
-  it('batches same-frame nameplate insertion into one live-DOM append', () => {
-    expect(renderer).toContain(
-      'private readonly nameplateBatch = document.createDocumentFragment()',
-    );
-    expect(renderer).toContain('this.nameplateLayer.appendChild(this.nameplateBatch)');
+  it('uses one shared canvas instead of per-view nameplate DOM', () => {
+    expect(nameplateCanvas).toContain("document.createElement('canvas')");
+    expect(nameplateCanvas).toContain("canvas.className = 'nameplate-canvas'");
+    expect(nameplateCanvas).toContain('this.ctx.clearRect(0, 0, width, height)');
+    expect(renderer).not.toContain('nameplateBatch');
+    expect(renderer).not.toContain("np.className = 'nameplate'");
+    expect(renderer).not.toContain('nameplate: HTMLDivElement');
+  });
+
+  it('releases the shared canvas and document listeners with the renderer host', () => {
+    const disposeStart = renderer.indexOf('dispose(): void {');
+    const disposeEnd = renderer.indexOf('\n  }', disposeStart);
+    const disposeBlock = renderer.slice(disposeStart, disposeEnd);
+
+    expect(disposeBlock).toContain('this.nameplatePainter.dispose();');
+    expect(disposeBlock).toContain('this.travelSpeedFx.dispose();');
+    expect(editorViewport).toContain('this.renderer.dispose();');
   });
 
   it('manually updates the camera once on ordinary frames', () => {
@@ -114,11 +134,30 @@ describe('renderer CPU hot path', () => {
     expect(renderer).toContain('freezeStaticSubtreeMatrices(this.gatherNodes.group)');
   });
 
-  it('compares nameplate primitives before formatting unchanged DOM strings', () => {
+  it('culls before decluttering and keeps canvas text APIs out of the entity loop', () => {
+    expect(nameplates).toContain('isNameplateScreenAnchorVisible');
+    expect(nameplates).toContain('declutterNameplatesInPlace');
     expect(nameplates).toContain(
-      'if (anchor.sx === v.nameplateScreenX && anchor.sy === v.nameplateScreenY) continue',
+      '!state.initialized || fullPass || plan.urgent || languageChanged',
     );
-    expect(nameplates).toContain('name === v.nameplateStaticName');
-    expect(nameplates).not.toContain("e.auras.some((a) => a.kind === 'stealth')");
+    expect(nameplates).not.toContain('fillText(');
+    expect(nameplates).not.toContain('strokeText(');
+    expect(nameplates).not.toContain('measureText(');
+    expect(nameplateCanvas).not.toContain('fillText(');
+    expect(nameplateCanvas).not.toContain('strokeText(');
+    expect(nameplateCanvas).not.toContain('measureText(');
+    expect(nameplates.indexOf('if (!isNameplateScreenAnchorVisible(')).toBeLessThan(
+      nameplates.indexOf('declutterNameplatesInPlace('),
+    );
+  });
+
+  it('times the live nameplate pass after its painter update', () => {
+    const timingIndex = renderer.indexOf(
+      "phaseStart = this.markRendererPhase(framePhaseMs, 'nameplates', phaseStart);",
+    );
+    const painterIndex = renderer.lastIndexOf('this.nameplatePainter.update(fullNameplatePass);');
+
+    expect(painterIndex).toBeGreaterThan(-1);
+    expect(timingIndex).toBeGreaterThan(painterIndex);
   });
 });

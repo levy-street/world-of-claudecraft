@@ -247,7 +247,13 @@ describe('character visual effects', () => {
       'v.visual.setWeaponAura(weaponAura ? weaponAura.color : null, weaponAura?.tip ?? false);',
     );
     expect(renderer).toContain('active.setSoulRend(hasSoulRend);');
-    expect(renderer).toContain("if (hasSoulRend) {\n        this.vfx.castSparkle(e.id, 'shadow'");
-    expect(renderer).toContain('if (hasRecklessness) {\n        this.vfx.recklessFlame(e.id, dt);');
+    expect(renderer).toContain(
+      'if (runCharacterPresentation) {\n        this.abilityVfx.syncEntity(e);',
+    );
+    expect(renderer).toContain("if (hasSoulRend) {\n          this.vfx.castSparkle(e.id, 'shadow'");
+    expect(renderer).toContain(
+      'if (hasRecklessness) {\n          this.vfx.recklessFlame(e.id, dt);',
+    );
+    expect(renderer).toContain('if (!hasRecklessness && v.recklessSkullsSpawned) {');
   });
 });

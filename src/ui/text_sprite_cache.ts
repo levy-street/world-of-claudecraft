@@ -56,6 +56,9 @@ interface TextSprite {
   canvas: HTMLCanvasElement;
   originX: number;
   originY: number;
+  width: number;
+  height: number;
+  advance: number;
 }
 
 /** Ink extents around the anchor, in px: `left`/`right` along the baseline,
@@ -65,6 +68,7 @@ interface TextInk {
   right: number;
   ascent: number;
   descent: number;
+  advance: number;
 }
 
 /** Sprites kept across redraws.
@@ -145,6 +149,9 @@ export class TextSpriteCache {
   // Insertion order IS the LRU order: a cache hit re-inserts, so the oldest
   // live key is always the front of the iteration.
   private readonly sprites = new Map<string, TextSprite>();
+  private pixelRatio = 1;
+
+  constructor(private readonly spriteLimit = TEXT_SPRITE_LIMIT) {}
 
   /** Live sprite count. */
   get size(): number {
@@ -158,12 +165,21 @@ export class TextSpriteCache {
     this.sprites.clear();
   }
 
+  /** Rasterize future sprites at the destination backing-store density. Existing
+   * sprites are invalid at a different density, so a real change clears once. */
+  setPixelRatio(pixelRatio: number): void {
+    const next = Math.max(1, Math.min(3, Number.isFinite(pixelRatio) ? pixelRatio : 1));
+    if (next === this.pixelRatio) return;
+    this.pixelRatio = next;
+    this.clear();
+  }
+
   /** Open a redraw: trim back to the budget, oldest first. Called BEFORE the
    *  redraw's draws so a label-heavy redraw can overshoot rather than thrash
    *  (see the header). */
   beginRedraw(): void {
     for (const key of this.sprites.keys()) {
-      if (this.sprites.size <= TEXT_SPRITE_LIMIT) return;
+      if (this.sprites.size <= this.spriteLimit) return;
       this.sprites.delete(key);
     }
   }
@@ -199,7 +215,20 @@ export class TextSpriteCache {
     if (text === '') return;
     const sprite = this.sprite(text, style);
     if (!sprite) return;
-    ctx.drawImage(sprite.canvas, Math.round(x - sprite.originX), Math.round(y - sprite.originY));
+    const dx = Math.round((x - sprite.originX) * this.pixelRatio) / this.pixelRatio;
+    const dy = Math.round((y - sprite.originY) * this.pixelRatio) / this.pixelRatio;
+    if (this.pixelRatio === 1) {
+      ctx.drawImage(sprite.canvas, dx, dy);
+    } else {
+      ctx.drawImage(sprite.canvas, dx, dy, sprite.width, sprite.height);
+    }
+  }
+
+  /** Logical advance width for inline layout. This uses the same cached
+   * rasterization as draw(), so steady frames never call a canvas text API. */
+  measureAdvance(text: string, style: TextSpriteStyle): number {
+    if (text === '') return 0;
+    return this.sprite(text, style)?.advance ?? 0;
   }
 
   private sprite(text: string, style: TextSpriteStyle): TextSprite | null {
@@ -211,7 +240,7 @@ export class TextSpriteCache {
       this.sprites.set(key, cached);
       return cached;
     }
-    const sprite = rasterize(text, style);
+    const sprite = rasterize(text, style, this.pixelRatio);
     // A transient 2D-context failure must not be cached: freezing a blank canvas
     // would hide that label for the rest of the session. Skipping this redraw's
     // draw self-heals on the next one.
@@ -246,7 +275,7 @@ function spriteKey(text: string, style: TextSpriteStyle): string {
 }
 
 // Rasterize one label into its own canvas, or null when the 2D context fails.
-function rasterize(text: string, style: TextSpriteStyle): TextSprite | null {
+function rasterize(text: string, style: TextSpriteStyle, pixelRatio: number): TextSprite | null {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   if (!ctx) return null;
@@ -262,8 +291,11 @@ function rasterize(text: string, style: TextSpriteStyle): TextSprite | null {
   const originY = Math.ceil(ink.ascent) + pad;
   // Assigning width/height RESETS every context property (and clears the
   // canvas), so every draw setting below is applied after the resize.
-  canvas.width = Math.max(1, originX + Math.ceil(ink.right) + pad);
-  canvas.height = Math.max(1, originY + Math.ceil(ink.descent) + pad);
+  const width = Math.max(1, originX + Math.ceil(ink.right) + pad);
+  const height = Math.max(1, originY + Math.ceil(ink.descent) + pad);
+  canvas.width = Math.max(1, Math.ceil(width * pixelRatio));
+  canvas.height = Math.max(1, Math.ceil(height * pixelRatio));
+  if (pixelRatio !== 1) ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
   ctx.font = style.font;
   ctx.textAlign = SPRITE_ALIGN;
   ctx.textBaseline = SPRITE_BASELINE;
@@ -277,7 +309,7 @@ function rasterize(text: string, style: TextSpriteStyle): TextSprite | null {
   }
   ctx.fillStyle = style.fill;
   ctx.fillText(text, originX, originY);
-  return { canvas, originX, originY };
+  return { canvas, originX, originY, width, height, advance: ink.advance };
 }
 
 // Ink extents around the anchor the sprite is drawn on. TWO rules keep a sprite
@@ -306,6 +338,7 @@ function measureInk(ctx: CanvasRenderingContext2D, text: string, font: string): 
     right: Math.max(half, finite(m?.actualBoundingBoxRight, half)),
     ascent: Math.max(px, finite(m?.actualBoundingBoxAscent, px)),
     descent: Math.max(descent, finite(m?.actualBoundingBoxDescent, descent)),
+    advance: finite(m?.width, 0),
   };
 }
 

@@ -202,6 +202,7 @@ function fmtRow(s) {
     `p99 ${String(f.p99Ms ?? s.frameP99).padStart(6)}ms`,
     `max ${String(f.maxMs ?? s.frameMax).padStart(6)}ms`,
     `jank ${String(f.jankPct ?? '-').padStart(5)}%`,
+    `np ${String(s.phaseNameplatesMs).padStart(5)}ms`,
     `sub ${String(s.phaseSubmitMs).padStart(5)}ms`,
     `hitch[${z.worstMs ?? 0}ms ${causes}]`,
   ].join('  ');
@@ -266,6 +267,7 @@ async function main() {
         fpsLow1: after.frame?.fpsLow1 ?? 0,
         p99Ms: after.frame?.p99Ms ?? after.frameP99,
         calls: after.calls,
+        phaseNameplatesMs: after.phaseNameplatesMs,
         phaseSubmitMs: after.phaseSubmitMs,
       };
       const b = {
@@ -273,6 +275,7 @@ async function main() {
         fpsLow1: before.frame?.fpsLow1 ?? 0,
         p99Ms: before.frame?.p99Ms ?? before.frameP99,
         calls: before.calls,
+        phaseNameplatesMs: before.phaseNameplatesMs,
         phaseSubmitMs: before.phaseSubmitMs,
       };
       const d = diffMetrics(b, a);
@@ -281,7 +284,7 @@ async function main() {
           ? `${k} ${d[k].before}->${d[k].after} (${d[k].delta > 0 ? '+' : ''}${d[k].pct}% ${d[k].better})`
           : '';
       console.log(
-        `${after.label.padEnd(14)} ${cell('fps')}  ${cell('fpsLow1')}  ${cell('p99Ms')}  ${cell('calls')}`,
+        `${after.label.padEnd(14)} ${cell('fps')}  ${cell('fpsLow1')}  ${cell('p99Ms')}  ${cell('calls')}  ${cell('phaseNameplatesMs')}`,
       );
     }
   }

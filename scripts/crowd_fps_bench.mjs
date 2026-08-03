@@ -276,6 +276,7 @@ async function sample(page, label) {
       views: rr.views,
       programs: rr.programs,
       entitiesMs: rr.phaseMs?.entities?.avg ?? rr.phaseMs?.entities,
+      nameplatesMs: rr.phaseMs?.nameplates?.avg ?? rr.phaseMs?.nameplates,
       submitMs: rr.phaseMs?.submit?.avg ?? rr.phaseMs?.submit,
       rendererMs: r.mainMs?.renderer?.avg,
       entityCount: g.world.entities.size,
@@ -287,7 +288,7 @@ async function sample(page, label) {
 
 function row(s) {
   const f = (n, w = 6) => String(typeof n === 'number' ? Math.round(n * 10) / 10 : n).padStart(w);
-  return `${String(s.label).padEnd(14)} fps=${f(s.fps)} p95=${f(s.frameP95)} p99=${f(s.frameP99)} ents=${f(s.entityCount, 4)} views=${f(s.views, 4)} calls=${f(s.calls)} tris=${f(s.triangles, 9)} entMs=${f(s.entitiesMs, 5)} subMs=${f(s.submitMs, 5)}`;
+  return `${String(s.label).padEnd(14)} fps=${f(s.fps)} p95=${f(s.frameP95)} p99=${f(s.frameP99)} ents=${f(s.entityCount, 4)} views=${f(s.views, 4)} calls=${f(s.calls)} tris=${f(s.triangles, 9)} entMs=${f(s.entitiesMs, 5)} npMs=${f(s.nameplatesMs, 5)} subMs=${f(s.submitMs, 5)}`;
 }
 
 async function main() {

@@ -71,7 +71,13 @@ function stubGltf() {
 type MixerPeek = {
   actions: Map<string, THREE.AnimationAction>;
   current: THREE.AnimationAction | null;
+  mixer: THREE.AnimationMixer;
   model: THREE.Object3D;
+  pendingDt: number;
+  hitCooldown: number;
+  holdT: number;
+  holdCooldown: number;
+  wasDead: boolean;
   starvedFrames: number;
 };
 
@@ -154,6 +160,50 @@ describe('CharacterVisual keeps something driving the rig', () => {
 
     expect([...skeleton.boneMatrices]).not.toEqual(firstPalette);
     expect(visual.skeletonUpdateStats()).toMatchObject({ requests: 2, updates: 2, skips: 0 });
+  });
+
+  it('sleeps off-screen pose work while preserving bounded transition clocks', () => {
+    const peek = visual as unknown as MixerPeek;
+    const mixerUpdate = vi.spyOn(peek.mixer, 'update');
+
+    visual.playHit();
+    expect(peek.hitCooldown).toBeGreaterThan(0);
+    const hitCooldown = peek.hitCooldown;
+    visual.holdFrame(0.08, 0.1);
+    expect(peek.holdT).toBeGreaterThan(0);
+
+    visual.advanceOffscreen(0.2);
+
+    expect(mixerUpdate).not.toHaveBeenCalled();
+    expect(peek.hitCooldown).toBeCloseTo(hitCooldown - 0.2, 9);
+    expect(peek.holdT).toBeLessThanOrEqual(0);
+    expect(peek.holdCooldown).toBeGreaterThan(0);
+
+    visual.advanceOffscreen(1);
+    expect(mixerUpdate).not.toHaveBeenCalled();
+    expect(peek.pendingDt).toBeCloseTo(0.3, 9);
+    expect(peek.hitCooldown).toBe(0);
+
+    visual.update(FRAME, anim(), true);
+    expect(mixerUpdate).toHaveBeenCalledTimes(1);
+    expect(mixerUpdate).toHaveBeenLastCalledWith(0.3);
+    expect(peek.pendingDt).toBe(0);
+  });
+
+  it('reconciles death and revival on re-entry without exposing bind pose', () => {
+    const peek = visual as unknown as MixerPeek;
+
+    visual.advanceOffscreen(1);
+    visual.update(FRAME, anim({ dead: true }), true);
+
+    expect(peek.wasDead).toBe(true);
+    expect(poseWeight(visual)).toBeGreaterThan(1 - POSE_DRIVE_MIN_WEIGHT);
+
+    visual.advanceOffscreen(1);
+    visual.update(FRAME, anim({ dead: false }), true);
+
+    expect(peek.wasDead).toBe(false);
+    expect(poseWeight(visual)).toBeGreaterThan(1 - POSE_DRIVE_MIN_WEIGHT);
   });
 
   it('resets watchdog starvation on the healthy current-action fast path', () => {

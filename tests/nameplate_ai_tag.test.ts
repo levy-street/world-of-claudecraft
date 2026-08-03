@@ -1,15 +1,8 @@
 // @vitest-environment jsdom
-//
-// The operator-set [AI] account tag on the overhead nameplate. Nameplates are
-// positioned DOM divs, so the tag is a class toggle on its own span, not a
-// repaint; the trap is the plate's static SIGNATURE. Every static field a plate
-// draws has to be in that signature, or `setNameplateStatic` early-outs and the
-// plate keeps whatever it last painted. So the decisive test here is a LIVE FLIP:
-// paint a normal player, flip aiAccount on the same entity, paint again, and the
-// tag must appear. Drop `isAi` from the signature and this goes red.
 
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { NameplateCanvasState } from '../src/render/nameplate_canvas';
 import { NameplatePainter } from '../src/render/nameplate_painter';
 import { FRIENDLY } from '../src/render/reaction';
 import type { EntityView } from '../src/render/renderer';
@@ -17,6 +10,40 @@ import type { Entity } from '../src/sim/types';
 import type { IWorld } from '../src/world_api';
 
 const VIEWPORT = { width: 1280, height: 720 };
+
+function fakeContext(): CanvasRenderingContext2D {
+  const noop = vi.fn();
+  return {
+    setTransform: noop,
+    clearRect: noop,
+    save: noop,
+    restore: noop,
+    beginPath: noop,
+    closePath: noop,
+    moveTo: noop,
+    lineTo: noop,
+    quadraticCurveTo: noop,
+    arc: noop,
+    rect: noop,
+    clip: noop,
+    fill: noop,
+    stroke: noop,
+    drawImage: noop,
+    fillText: noop,
+    strokeText: noop,
+    measureText: (text: string) => ({
+      width: text.length * 7,
+      actualBoundingBoxLeft: (text.length * 7) / 2,
+      actualBoundingBoxRight: (text.length * 7) / 2,
+      actualBoundingBoxAscent: 10,
+      actualBoundingBoxDescent: 3,
+    }),
+  } as unknown as CanvasRenderingContext2D;
+}
+
+beforeEach(() => {
+  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(() => fakeContext());
+});
 
 function entity(over: Partial<Entity> & { id: number }): Entity {
   return {
@@ -48,65 +75,23 @@ function entity(over: Partial<Entity> & { id: number }): Entity {
 }
 
 function view(): EntityView {
-  const div = (cls: string) => {
-    const el = document.createElement('div');
-    el.className = cls;
-    return el;
-  };
-  const img = () => document.createElement('img');
-  const nameplate = div('nameplate');
-  const aiEl = document.createElement('span');
-  aiEl.className = 'np-ai';
-  const levelEl = document.createElement('span');
-  levelEl.className = 'np-level';
-  levelEl.style.display = 'none';
   const group = new THREE.Group();
   group.position.set(0, 0, 0);
-  return {
-    group,
-    height: 2,
-    mountLift: 0,
-    nameplate,
-    nameEl: div('np-name'),
-    titleEl: div('np-title'),
-    guildEl: div('np-guild'),
-    hpBar: div('np-hpbar'),
-    hpFill: div('np-hpfill'),
-    emoteEl: div('np-emote'),
-    emoteIconEl: img(),
-    emoteLabelEl: document.createElement('span'),
-    markerEl: div('np-marker'),
-    castBar: div('np-castbar'),
-    castFill: div('np-castfill'),
-    castLabel: div('np-castlabel'),
-    raidMarkEl: div('np-raidmark'),
-    comboRow: div('np-combo'),
-    comboPips: [div('pip'), div('pip'), div('pip'), div('pip'), div('pip')],
-    tierEl: img(),
-    devTierEl: img(),
-    discordEl: img(),
-    aiEl,
-    levelEl,
-    nameplateDisplay: 'none',
-    nameplateTransform: '',
-    nameplateSig: '',
-    nameplateStateMask: 0,
-    nameplateFriendlyPet: false,
-    nameplateHpWidth: '',
-    nameplateScale: 1,
-    nameplateBaseOpacity: '1',
-    nameplateOpacity: '',
-    comboSig: '',
-    tierValue: 0,
-    devTierValue: 0,
-    discordAvatarSig: '',
-    levelSig: '',
-  } as unknown as EntityView;
+  return { group, height: 2, mountLift: 0 } as EntityView;
 }
 
-/** A painter looking straight at a target standing next to the viewer. */
+interface PainterStateAccess {
+  states: Map<number, NameplateCanvasState>;
+}
+
+function stateOf(painter: NameplatePainter, id: number): NameplateCanvasState {
+  const state = (painter as unknown as PainterStateAccess).states.get(id);
+  if (!state) throw new Error(`Missing nameplate state for ${id}`);
+  return state;
+}
+
 function harness(
-  target: Entity,
+  targets: Entity[],
   options: {
     me?: Partial<Entity>;
     isHostilePlayer?: (e: Entity) => boolean;
@@ -119,266 +104,113 @@ function harness(
     ...options.me,
   });
   const views = new Map<number, EntityView>();
-  const v = view();
-  views.set(target.id, v);
+  for (const target of targets) views.set(target.id, view());
   const camera = new THREE.PerspectiveCamera(60, VIEWPORT.width / VIEWPORT.height, 0.1, 500);
   camera.position.set(0, 3, 12);
   camera.lookAt(0, 1, 0);
   camera.updateMatrixWorld(true);
+  const entities = new Map<number, Entity>([[me.id, me]]);
+  for (const target of targets) entities.set(target.id, target);
   const world = {
     player: me,
-    entities: new Map<number, Entity>([
-      [me.id, me],
-      [target.id, target],
-    ]),
+    entities,
     markerFor: () => null,
     questState: () => 'available',
   } as unknown as IWorld;
+  const layer = document.createElement('div');
   const painter = new NameplatePainter({
     views,
     camera,
     world,
+    layer,
     getViewport: () => VIEWPORT,
+    getDevicePixelRatio: () => 1,
     showNameplates: () => true,
     showDevBadges: () => true,
     showOwnNameplate: () => false,
     showPlayerNameplates: () => true,
     isHostilePlayer: options.isHostilePlayer ?? (() => false),
   });
-  return { painter, v };
+  return { painter, layer };
 }
 
-describe('nameplate [AI] account tag', () => {
-  it('draws no tag for a normal player', () => {
-    const target = entity({ id: 2 });
-    const { painter, v } = harness(target);
+describe('batched canvas nameplate state', () => {
+  it('uses one canvas for many entities and creates no per-entity nameplate DOM', () => {
+    const targets = [entity({ id: 2 }), entity({ id: 3, name: 'Other' })];
+    const { painter, layer } = harness(targets);
     painter.update(true);
 
-    // the plate really did paint (otherwise the assertions below are vacuous)
-    expect(v.nameEl.textContent).toBe('Streamer');
-    expect(v.aiEl.classList.contains('ai-tag')).toBe(false);
-    expect(v.aiEl.textContent).toBe('');
+    expect(layer.querySelectorAll('canvas.nameplate-canvas')).toHaveLength(1);
+    expect(layer.children).toHaveLength(1);
+    expect(layer.firstElementChild?.tagName).toBe('CANVAS');
+    expect(layer.querySelectorAll('.nameplate')).toHaveLength(0);
+    expect(stateOf(painter, 2).name).toBe('Streamer');
+    expect(stateOf(painter, 3).name).toBe('Other');
   });
 
-  it('draws the tag for an AI-flagged account', () => {
-    const target = entity({ id: 2, aiAccount: true });
-    const { painter, v } = harness(target);
+  it('updates a live AI-account flip while preserving the independent role color', () => {
+    const target = entity({ id: 2, discordRole: 'admin' });
+    const { painter } = harness([target]);
     painter.update(true);
+    const state = stateOf(painter, 2);
+    expect(state.aiLabel).toBe('');
+    const roleColor = state.nameColor;
 
-    expect(v.aiEl.classList.contains('ai-tag')).toBe(true);
-    expect(v.aiEl.textContent).toBe('[AI]');
-  });
-
-  it('repaints on a LIVE flag flip: isAi is part of the plate signature', () => {
-    const target = entity({ id: 2 });
-    const { painter, v } = harness(target);
-    painter.update(true);
-    expect(v.aiEl.classList.contains('ai-tag')).toBe(false);
-
-    // An admin flips the flag on a live account. Nothing else about the plate
-    // changed, so only isAi being in the signature can force the repaint.
     target.aiAccount = true;
     painter.update(true);
-    expect(v.aiEl.classList.contains('ai-tag')).toBe(true);
-    expect(v.aiEl.textContent).toBe('[AI]');
+    expect(state.aiLabel).toBe('[AI]');
+    expect(state.nameColor).toBe(roleColor);
 
-    // ...and back off again.
     target.aiAccount = false;
     painter.update(true);
-    expect(v.aiEl.classList.contains('ai-tag')).toBe(false);
-    expect(v.aiEl.textContent).toBe('');
+    expect(state.aiLabel).toBe('');
   });
 
-  it('keeps the tag on its own span so the name keeps its role colour and shadow', () => {
-    const target = entity({ id: 2, aiAccount: true, discordRole: 'admin' });
-    const { painter, v } = harness(target);
-    painter.update(true);
-
-    // The name is never restyled into the gradient: it keeps its own element (and
-    // therefore its black text-shadow, which is what keeps it legible over bright
-    // terrain), while the tag lives beside it.
-    expect(v.nameEl.classList.contains('ai-tag')).toBe(false);
-    expect(v.nameEl.textContent).toContain('Streamer');
-    expect(v.aiEl).not.toBe(v.nameEl);
-    expect(v.aiEl.classList.contains('ai-tag')).toBe(true);
-  });
-});
-
-describe('nameplate state classes', () => {
-  const hotStateClasses = new Set([
-    'np-current-target',
-    'np-hostile',
-    'np-dead-enemy',
-    'np-my-pet',
-    'np-aggroed-on-me',
-  ]);
-
-  it('toggles combat-state classes for a targeted hostile dead lootable enemy', () => {
+  it('keeps target, hostile, dead, pet, threat, and hp state in canvas paint data', () => {
     const target = entity({
       id: 2,
       kind: 'mob',
       templateId: 'wolf',
-      dead: true,
-      lootable: true,
       hostile: true,
+      hp: 25,
+      maxHp: 100,
       aggroTargetId: 1,
     });
-    const { painter, v } = harness(target, { me: { targetId: 2 } });
+    const { painter } = harness([target], { me: { targetId: 2 } });
     painter.update(true);
+    const state = stateOf(painter, 2);
+    expect(state.currentTarget).toBe(true);
+    expect(state.hostile).toBe(true);
+    expect(state.threat).toBe(true);
+    expect(state.hpFill).toBe(0.25);
 
-    expect(v.nameplate.classList.contains('np-current-target')).toBe(true);
-    expect(v.nameplate.classList.contains('np-hostile')).toBe(true);
-    expect(v.nameplate.classList.contains('np-dead-enemy')).toBe(true);
-    expect(v.nameplate.classList.contains('np-aggroed-on-me')).toBe(true);
-    expect(v.nameplate.classList.contains('np-my-pet')).toBe(false);
-    expect(v.nameplate.classList.contains('np-friendly-pet')).toBe(false);
-  });
-
-  it('toggles pet-state classes for your friendly pet', () => {
-    const target = entity({
-      id: 2,
-      kind: 'mob',
-      templateId: 'wolf',
-      ownerId: 1,
-      hostile: false,
-    });
-    const { painter, v } = harness(target);
+    target.hostile = false;
+    target.ownerId = 1;
+    target.aggroTargetId = null;
     painter.update(true);
-
-    expect(v.nameplate.classList.contains('np-my-pet')).toBe(true);
-    expect(v.nameplate.classList.contains('np-friendly-pet')).toBe(true);
-    expect(v.nameplate.classList.contains('np-hostile')).toBe(false);
-  });
-
-  it('writes only changed hot-state classes across repeated frames', () => {
-    const target = entity({
-      id: 2,
-      kind: 'mob',
-      templateId: 'wolf',
-      hostile: true,
-    });
-    const { painter, v } = harness(target);
-    const toggle = vi.spyOn(v.nameplate.classList, 'toggle');
-
-    painter.update(true);
-    const firstHotWrites = toggle.mock.calls.filter(([cls]) => hotStateClasses.has(cls));
-    expect(firstHotWrites).toEqual([['np-hostile', true]]);
-
-    toggle.mockClear();
-    painter.update(false);
-    expect(toggle.mock.calls.filter(([cls]) => hotStateClasses.has(cls))).toEqual([]);
-
-    target.aggroTargetId = 1;
-    painter.update(true);
-    expect(toggle.mock.calls.filter(([cls]) => hotStateClasses.has(cls))).toEqual([
-      ['np-aggroed-on-me', true],
-    ]);
-  });
-
-  it('removes state once while hidden or offscreen and restores it when visible', () => {
-    const target = entity({
-      id: 2,
-      kind: 'mob',
-      templateId: 'wolf',
-      hostile: true,
-    });
-    const { painter, v } = harness(target);
-    const toggle = vi.spyOn(v.nameplate.classList, 'toggle');
-    const remove = vi.spyOn(v.nameplate.classList, 'remove');
-
-    painter.update(true);
-    toggle.mockClear();
-    remove.mockClear();
-
-    target.dead = true;
-    target.lootable = false;
-    painter.update(true);
-    expect(remove).toHaveBeenCalledWith(
-      'np-current-target',
-      'np-hostile',
-      'np-dead-enemy',
-      'np-my-pet',
-      'np-aggroed-on-me',
-    );
-    expect(v.nameplateStateMask).toBe(0);
-
-    remove.mockClear();
-    painter.update(true);
-    expect(remove).not.toHaveBeenCalled();
-
-    target.dead = false;
-    painter.update(true);
-    expect(toggle.mock.calls.filter(([cls]) => hotStateClasses.has(cls))).toEqual([
-      ['np-hostile', true],
-    ]);
-
-    toggle.mockClear();
-    remove.mockClear();
-    v.group.position.set(0, 0, 20);
-    painter.update(true);
-    expect(remove).toHaveBeenCalledTimes(1);
-    painter.update(true);
-    expect(remove).toHaveBeenCalledTimes(1);
-
-    v.group.position.set(0, 0, 0);
-    painter.update(true);
-    expect(toggle.mock.calls.filter(([cls]) => hotStateClasses.has(cls))).toEqual([
-      ['np-hostile', true],
-    ]);
-  });
-
-  it('writes pet classes only when ownership changes', () => {
-    const target = entity({
-      id: 2,
-      kind: 'mob',
-      templateId: 'wolf',
-      ownerId: 1,
-    });
-    const { painter, v } = harness(target);
-    const toggle = vi.spyOn(v.nameplate.classList, 'toggle');
-
-    painter.update(true);
-    expect(toggle.mock.calls).toContainEqual(['np-my-pet', true]);
-    expect(toggle.mock.calls).toContainEqual(['np-friendly-pet', true]);
-
-    toggle.mockClear();
-    painter.update(true);
-    expect(toggle.mock.calls.filter(([cls]) => cls === 'np-friendly-pet')).toEqual([]);
-
-    target.ownerId = null;
-    painter.update(true);
-    expect(toggle.mock.calls).toContainEqual(['np-my-pet', false]);
-    expect(toggle.mock.calls).toContainEqual(['np-friendly-pet', false]);
-  });
-});
-
-describe('nameplate level badge', () => {
-  it('shows, hides, and recolors the level badge as mob state changes', () => {
-    const target = entity({
-      id: 2,
-      kind: 'mob',
-      templateId: 'wolf',
-      level: 13,
-      hostile: true,
-    });
-    const { painter, v } = harness(target);
-
-    painter.update(true);
-    expect(v.levelEl.textContent).toBe('13');
-    expect(v.levelEl.style.display).toBe('');
-    expect(v.levelSig).toBe('13|#ff4444');
+    expect(state.myPet).toBe(true);
+    expect(state.friendlyPet).toBe(true);
+    expect(state.levelColor).toBe(FRIENDLY);
 
     target.dead = true;
     target.lootable = true;
+    target.hostile = true;
     painter.update(true);
-    expect(v.levelEl.style.display).toBe('none');
+    expect(state.deadEnemy).toBe(true);
+    expect(state.hpVisible).toBe(false);
+    expect(state.level).toBe('');
+  });
 
-    target.dead = false;
-    target.hostile = false;
-    target.ownerId = 1;
+  it('updates the mob level content without creating another canvas', () => {
+    const target = entity({ id: 2, kind: 'mob', templateId: 'wolf', level: 13, hostile: true });
+    const { painter, layer } = harness([target]);
     painter.update(true);
-    expect(v.levelEl.textContent).toBe('13');
-    expect(v.levelEl.style.display).toBe('');
-    expect(v.levelSig).toBe(`13|${FRIENDLY}`);
+    const state = stateOf(painter, 2);
+    expect(state.level).toBe('13');
+
+    target.level = 14;
+    painter.update(true);
+    expect(state.level).toBe('14');
+    expect(layer.querySelectorAll('canvas.nameplate-canvas')).toHaveLength(1);
   });
 });

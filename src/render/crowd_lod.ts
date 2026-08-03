@@ -85,7 +85,7 @@ export function animatesEveryFrame(
   entityId: number,
   localPlayerId: number,
   targetId: number | null,
-  castingAbility: string | null,
+  casting: boolean,
   inCombat = false,
   ownerId: number | null = null,
   combatTargetId: number | null = null,
@@ -94,7 +94,7 @@ export function animatesEveryFrame(
   return (
     entityId === localPlayerId ||
     entityId === targetId ||
-    castingAbility !== null ||
+    casting ||
     (inCombat &&
       (ownerId === localPlayerId ||
         combatTargetId === localPlayerId ||

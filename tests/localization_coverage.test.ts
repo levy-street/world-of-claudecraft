@@ -1570,13 +1570,6 @@ describe('i18n Localization Key Coverage', () => {
     expect(hudSource).toContain('dungeonDisplayNameFromSource');
     expect(hudSource).not.toContain('zoneWelcomeText(');
 
-    const rendererSource = fs.readFileSync(
-      path.resolve(process.cwd(), 'src/render/renderer.ts'),
-      'utf8',
-    );
-    // objectDisplayName still localizes the build-time object nameplate write in the
-    // renderer; the helper itself moved into entity_labels.ts.
-    expect(rendererSource).toContain('objectDisplayName');
     // The per-entity nameplate content (corpse/mob names) moved into the
     // NameplatePainter; localization is preserved, just relocated (mirrors the
     // minimap_painter zone-label move above).
