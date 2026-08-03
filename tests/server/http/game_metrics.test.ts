@@ -17,6 +17,7 @@ import {
   WOC_ACCOUNTS_ONLINE,
   WOC_CHARACTERS_CREATED_TOTAL,
   WOC_CHAT_MESSAGES_TOTAL,
+  WOC_GUILD_BANK_INCIDENTS_TOTAL,
   WOC_INPUT_FRAMES_MISSED_TOTAL,
   WOC_PLAYERS_ONLINE,
   WOC_SIM_ENTITIES,
@@ -28,7 +29,7 @@ import {
   WOC_WS_MESSAGES_TOTAL,
   WOC_WS_RATE_KICKS_TOTAL,
 } from '../../../server/http/game_metrics';
-import { WS_DROP_CAUSES } from '../../../server/http/game_signals';
+import { GUILD_BANK_INCIDENTS, WS_DROP_CAUSES } from '../../../server/http/game_signals';
 
 /** A GameStateSource returning fixed values; override any field per test. */
 function stubSource(overrides: Partial<GameStateSource> = {}): GameStateSource {
@@ -273,6 +274,55 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     expect(labelValues(text, 'cause')).toEqual(new Set(WS_DROP_CAUSES));
   });
 
+  it('pre-registers every guild bank incident kind at zero and increments by kind', async () => {
+    const registry = new Registry();
+    const counters = registerGameStateMetrics(registry, stubSource());
+
+    expect(WOC_GUILD_BANK_INCIDENTS_TOTAL).toBe('woc_guild_bank_incidents_total');
+    // The whole vocabulary, pinned as literals: these are the series operators
+    // alert on, so a rename must fail here rather than silently retire a rule.
+    expect(GUILD_BANK_INCIDENTS).toEqual([
+      'escrow_save_failed',
+      'save_fenced_out',
+      'reconcile',
+      'book_unloaded',
+      'ledger_write_failed',
+    ]);
+
+    // Scrape BEFORE any increment: an alert rule cannot fire on a series that
+    // does not exist yet, so every kind must expose an explicit 0 from boot.
+    const zeroed = await registry.metrics();
+    expect(zeroed).toContain(`# TYPE ${WOC_GUILD_BANK_INCIDENTS_TOTAL} counter`);
+    for (const kind of GUILD_BANK_INCIDENTS) {
+      expect(
+        sampleValue(
+          zeroed,
+          new RegExp(`^woc_guild_bank_incidents_total\\{kind="${kind}"\\} (\\d+)$`, 'm'),
+        ),
+        kind,
+      ).toBe('0');
+    }
+
+    counters.guildBankIncident('reconcile');
+    counters.guildBankIncident('reconcile');
+    counters.guildBankIncident('ledger_write_failed');
+
+    const text = await registry.metrics();
+    expect(sampleValue(text, /^woc_guild_bank_incidents_total\{kind="reconcile"\} (\d+)$/m)).toBe(
+      '2',
+    );
+    expect(
+      sampleValue(text, /^woc_guild_bank_incidents_total\{kind="ledger_write_failed"\} (\d+)$/m),
+    ).toBe('1');
+    // Untouched kinds stay at their pre-registered zero, never absent.
+    expect(
+      sampleValue(text, /^woc_guild_bank_incidents_total\{kind="escrow_save_failed"\} (\d+)$/m),
+    ).toBe('0');
+    // The kind label's vocabulary is exactly the closed set: no guild id, no
+    // character id, nothing per-player ever reaches a label.
+    expect(labelValues(text, 'kind')).toEqual(new Set(GUILD_BANK_INCIDENTS));
+  });
+
   it('swallows a throwing counter in every sink method and never propagates', () => {
     const registry = new Registry();
     const counters = registerGameStateMetrics(registry, stubSource());
@@ -287,6 +337,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
       WOC_INPUT_FRAMES_MISSED_TOTAL,
       WOC_CHAT_MESSAGES_TOTAL,
       WOC_CHARACTERS_CREATED_TOTAL,
+      WOC_GUILD_BANK_INCIDENTS_TOTAL,
     ]) {
       const metric = registry.getSingleMetric(name) as unknown as { inc: () => never };
       metric.inc = () => {
@@ -300,6 +351,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     expect(() => counters.wsInputSeqGap(3)).not.toThrow();
     expect(() => counters.chatMessage()).not.toThrow();
     expect(() => counters.characterCreated()).not.toThrow();
+    expect(() => counters.guildBankIncident('reconcile')).not.toThrow();
   });
 
   it('bounds the ws direction label to in/out and emits no per-player label anywhere', async () => {

@@ -3673,7 +3673,13 @@ export class GameServer {
             carriedGuildBankSeqs.map(([guildId]) => guildId),
           );
         };
-        if (opts.withMarket || session.dirtyGuildBanks.size > 0) {
+        // Captured BEFORE the await: a save that carries a guild book is the
+        // dupe-sensitive escrow shape, and the dirty marks it would clear are
+        // still set while the write is in flight, so a throw below must be
+        // attributable even though carriedGuildBankSeqs is filled only once
+        // the queued closure actually runs.
+        const carriesGuildBooks = session.dirtyGuildBanks.size > 0;
+        if (opts.withMarket || carriesGuildBooks) {
           // Atomic on the leave path so a logout bag-flush can never tear away
           // from the global Market escrow (see saveCharacterAndMarketState),
           // and on any save carrying a guild book so the character half and
@@ -3714,6 +3720,17 @@ export class GameServer {
                   collectBooks(),
                   session.leaseNonce,
                 );
+          }).catch((err) => {
+            // The whole escrow rolled back: the character half AND every book
+            // half. The live sim is now ahead of durable truth for those books
+            // until a later save or a reconcile lands, which is exactly the
+            // window the dupe guards live in, so it must be visible in
+            // production, not only in a log line. Rethrown unchanged: the
+            // counter observes, it never swallows.
+            if (carriesGuildBooks) {
+              gameMetricsCounters().guildBankIncident('escrow_save_failed');
+            }
+            throw err;
           });
         } else {
           saved = await saveCharacterState(
@@ -3733,6 +3750,13 @@ export class GameServer {
         // saves. Only an explicit false is a fence-out: the no-nonce legacy path
         // returns true, so a strict comparison never mistakes an ordinary save for one.
         if (saved === false) {
+          // Same dupe-sensitive shape as the throw above, reached the other
+          // way: the write matched no row, so nothing persisted. Counted only
+          // when this save actually carried books (an ordinary fenced-out
+          // character save is not a guild bank incident).
+          if (carriedGuildBankSeqs.length > 0) {
+            gameMetricsCounters().guildBankIncident('save_fenced_out');
+          }
           console.warn(
             `character ${session.characterId} (${session.name}) save fenced out by a same-account takeover; skipping deed publish and lastSave`,
           );
@@ -3930,17 +3954,24 @@ export class GameServer {
       }
     }
     const result = loadGuildBanksIntoSim(this.sim, rows);
+    // Each of these leaves ONE guild's book unloaded until a restart: its ops
+    // are inert and its disband is refused fail-closed, an outage for that
+    // guild rather than a transient. Counted per guild beside the loud log
+    // (the guild id stays in the log; it is never a metric label).
     for (const guildId of result.oversized) {
+      gameMetricsCounters().guildBankIncident('book_unloaded');
       console.error(
         `guild bank row for guild ${guildId} exceeds the size bound; left unloaded (ops stay inert, the row is preserved)`,
       );
     }
     for (const guildId of result.malformed) {
+      gameMetricsCounters().guildBankIncident('book_unloaded');
       console.error(
         `guild bank row for guild ${guildId} is structurally not a book; left unloaded (ops stay inert, the row is preserved)`,
       );
     }
     for (const guildId of result.missing) {
+      gameMetricsCounters().guildBankIncident('book_unloaded');
       console.error(`guild bank book for guild ${guildId} failed to load into the sim`);
     }
   }
@@ -4004,6 +4035,10 @@ export class GameServer {
     guildIds: number[],
   ): Promise<void> {
     for (const guildId of guildIds) {
+      // Counted per GUILD, the unit the remedy applies to: reaching this at
+      // all means a session that can never commit again held unflushed book
+      // ops, the shape the Phase 3 QA dupe lived in.
+      gameMetricsCounters().guildBankIncident('reconcile');
       let anotherSessionDirty = false;
       for (const s of this.sessionsByCharacterId.values()) {
         if (s !== dead && s.dirtyGuildBanks.has(guildId)) {
@@ -4035,6 +4070,7 @@ export class GameServer {
         try {
           const row = await loadGuildBankRow(guildId);
           if (row.oversized || isMalformedGuildBankRow(row.data)) {
+            gameMetricsCounters().guildBankIncident('book_unloaded');
             console.error(
               `guild bank row for guild ${guildId} is oversized or malformed on reconcile; left unloaded`,
             );
@@ -4044,6 +4080,7 @@ export class GameServer {
           break;
         } catch (err) {
           if (attempt === attempts) {
+            gameMetricsCounters().guildBankIncident('book_unloaded');
             console.error(
               `guild bank reconcile failed for guild ${guildId} after ${attempts} attempts (left unloaded until restart; ops inert, guild deletion refused fail-closed):`,
               err,

@@ -407,6 +407,7 @@ function recordingSink() {
       chats++;
     },
     characterCreated() {},
+    guildBankIncident() {},
   };
   return {
     sink,

@@ -1,7 +1,8 @@
 // The game-state counter seam: the throughput counters that live on the /metrics
 // exporter (woc_ws_messages_total, woc_ws_messages_dropped_total,
 // woc_ws_rate_kicks_total, woc_input_frames_missed_total,
-// woc_chat_messages_total, woc_characters_created_total) reach the exporter
+// woc_chat_messages_total, woc_characters_created_total,
+// woc_guild_bank_incidents_total) reach the exporter
 // through this one process-wide slot instead of each emission site (game.ts
 // message dispatch and inbound gate/lanes, chat routing, characters.ts create
 // path) threading a sink through its constructors. main.ts
@@ -15,9 +16,11 @@
 // GameStateSource the exporter registration captures. See server/http/game_metrics.ts.
 //
 // CARDINALITY IS BOUNDED BY DESIGN, same contract as server/http/metrics.ts: the
-// only label values here are the ws-message direction (a fixed two) and the
-// inbound drop cause (the fixed seven-value WS_DROP_CAUSES set). Nothing
-// per-player (account id, character id, name, ip) is ever passed as a label.
+// only label values here are the ws-message direction (a fixed two), the
+// inbound drop cause (the fixed seven-value WS_DROP_CAUSES set), and the
+// guild-bank incident kind (the fixed five-value GUILD_BANK_INCIDENTS set).
+// Nothing per-player and nothing per-GUILD (account id, character id, guild id,
+// name, ip) is ever passed as a label.
 
 /** The two directions a ws frame is counted under: client-to-server or server-to-client. */
 export type WsMessageDirection = 'in' | 'out';
@@ -45,6 +48,42 @@ export const WS_DROP_CAUSES = [
 export type WsDropCause = (typeof WS_DROP_CAUSES)[number];
 
 /**
+ * The fixed five guild-bank incident kinds. Every one of these is an abnormal
+ * event on a DUPE-SENSITIVE path (the escrow save, the lease fence-out revert,
+ * the reconcile, the durable-truth reload, the keep-forever ledger) that until
+ * now reported only through console.error / console.warn, i.e. it was invisible
+ * to production alerting:
+ * - `escrow_save_failed`: a save carrying at least one guild book threw, so the
+ *   character half AND the book half rolled back; the live sim is ahead of
+ *   durable truth until a later save or a reconcile lands.
+ * - `save_fenced_out`: that same save matched no row (a same-account takeover
+ *   rotated the character lease), so the carried books need reconciling.
+ * - `reconcile`: reconcileUnflushableGuildBooks ran for one guild, i.e. a
+ *   session that can never commit again had unflushed book ops (surgical
+ *   revert, or evict-and-reload from durable truth). Counted per GUILD, the
+ *   unit the remedy applies to.
+ * - `book_unloaded`: a book was left unloaded after a failed / oversized /
+ *   malformed durable read (boot or reconcile). That guild's ops are inert and
+ *   its disband is refused fail-closed until the process restarts, which is an
+ *   operator-visible outage for that guild, not a transient.
+ * - `ledger_write_failed`: a bank_ledger insert rejected, so the audit trail
+ *   (scripts/bank_audit.mjs) has a hole the replay cannot see.
+ * This closed set IS the kind label's whole vocabulary; it never grows
+ * per-guild or per-player (guild id is NEVER a label; the loud log line beside
+ * each increment carries the identifying detail).
+ */
+export const GUILD_BANK_INCIDENTS = [
+  'escrow_save_failed',
+  'save_fenced_out',
+  'reconcile',
+  'book_unloaded',
+  'ledger_write_failed',
+] as const;
+
+/** One of the fixed five guild-bank incident kinds. */
+export type GuildBankIncident = (typeof GUILD_BANK_INCIDENTS)[number];
+
+/**
  * The game-state throughput emission hooks. Implementations must never
  * throw: an observability write can never be allowed to break the message,
  * chat, or character-create path it measures.
@@ -70,6 +109,12 @@ export interface GameMetricsCounters {
   chatMessage(): void;
   /** One character successfully created. */
   characterCreated(): void;
+  /**
+   * One guild-bank incident on a dupe-sensitive path, by kind (see
+   * GUILD_BANK_INCIDENTS). Always emitted BESIDE the existing loud log, never
+   * instead of it: the counter says how often, the log says which guild.
+   */
+  guildBankIncident(kind: GuildBankIncident): void;
 }
 
 /** A sink that drops every signal; the slot default until boot wires the real one. */
@@ -80,6 +125,7 @@ export const noopGameMetricsCounters: GameMetricsCounters = {
   wsInputSeqGap() {},
   chatMessage() {},
   characterCreated() {},
+  guildBankIncident() {},
 };
 
 let activeCounters: GameMetricsCounters = noopGameMetricsCounters;

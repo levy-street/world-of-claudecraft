@@ -16,6 +16,7 @@
 
 import type { BankInfo, GuildBankInfo } from '../src/world_api';
 import { insertBankLedgerRow } from './db';
+import { gameMetricsCounters } from './http/game_signals';
 import { REALM } from './realm';
 
 export type BankLedgerOp = 'deposit' | 'withdraw' | 'buy_slots';
@@ -334,11 +335,17 @@ export function recordGuildBankDeltas(
           }),
         )
         .catch((err) => {
+          // A rejected insert is a HOLE in the keep-forever audit trail: the
+          // op happened in the live book but scripts/bank_audit.mjs can never
+          // replay it, so a real dupe investigation would come up clean.
+          // Counted beside the log so the hole is visible in production.
+          gameMetricsCounters().guildBankIncident('ledger_write_failed');
           console.error('bank_ledger guild write failed:', err);
         });
     }
   } catch (err) {
     // The observer must never fault the dispatch path.
+    gameMetricsCounters().guildBankIncident('ledger_write_failed');
     console.error('bank_ledger recordGuildBankDeltas failed:', err);
   }
 }

@@ -5,7 +5,7 @@
 // fence-miss keeps the dirty mark), the guild_create fee gate, and the
 // create/disband transport hooks. Drives the REAL GameServer + Sim with the db
 // layer mocked (the guild_stamp_fence idiom).
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const dbMock = vi.hoisted(() => ({
   saveCharacterState: vi.fn(async () => true),
@@ -45,6 +45,12 @@ import { bankLedgerIdle } from '../server/bank_ledger';
 import { drainLinkChanges } from '../server/discord_link_changes';
 import { type ClientSession, GameServer } from '../server/game';
 import { collectGuildBankSaves, loadGuildBanksIntoSim } from '../server/guild_bank_state';
+import {
+  type GameMetricsCounters,
+  type GuildBankIncident,
+  noopGameMetricsCounters,
+  setGameMetricsCounters,
+} from '../server/http/game_signals';
 import { GUILD_CREATION_FEE_COPPER, type GuildBankState } from '../src/sim/guild_bank';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
@@ -1031,4 +1037,160 @@ describe('the guild_create fee gate + the create/disband hooks', () => {
     expect(server.sim.guildBanks.get(GUILD_ID)).toEqual(durable);
     expect(session.dirtyGuildBanks.size).toBe(0);
   }, 30_000);
+});
+
+// ---------------------------------------------------------------------------
+// Guild bank incident counters (server/http/game_signals.ts). Every arm below
+// used to report ONLY through console.error / console.warn, i.e. it was
+// invisible to production alerting on the dupe-sensitive paths. Each test
+// drives the REAL code path (dispatch -> saveCharacter -> reconcile, or the
+// real ledger recorder) with a recording sink installed in the process-wide
+// slot, the tests/game_state_metrics.test.ts idiom.
+// ---------------------------------------------------------------------------
+
+function recordingIncidents(): { sink: GameMetricsCounters; kinds: GuildBankIncident[] } {
+  const kinds: GuildBankIncident[] = [];
+  return {
+    kinds,
+    sink: {
+      ...noopGameMetricsCounters,
+      guildBankIncident(kind) {
+        kinds.push(kind);
+      },
+    },
+  };
+}
+
+describe('guild bank incident counters at their real emission sites', () => {
+  afterEach(() => {
+    setGameMetricsCounters(noopGameMetricsCounters);
+  });
+
+  it('counts escrow_save_failed when a save carrying a book throws', async () => {
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'Thrower');
+    officerSetup(server, session);
+    dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 2_000 });
+    const rec = recordingIncidents();
+    setGameMetricsCounters(rec.sink);
+    dbMock.saveCharacterAndGuildBankState.mockRejectedValueOnce(new Error('db down'));
+    await expect(priv(server).saveCharacter(session)).rejects.toThrow('db down');
+    // The counter OBSERVES: the rejection still propagates unchanged, and the
+    // dirty mark still survives for the next save attempt.
+    expect(rec.kinds).toEqual(['escrow_save_failed']);
+    expect(session.dirtyGuildBanks.has(GUILD_ID)).toBe(true);
+  });
+
+  it('books NO escrow_save_failed when the failed save carried no guild book', async () => {
+    // The decisive negative: an ordinary character save that throws is not a
+    // guild bank incident, or the series would be noise.
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'Plain');
+    const rec = recordingIncidents();
+    setGameMetricsCounters(rec.sink);
+    dbMock.saveCharacterState.mockRejectedValueOnce(new Error('db down'));
+    await expect(priv(server).saveCharacter(session)).rejects.toThrow('db down');
+    expect(rec.kinds).toEqual([]);
+  });
+
+  it('counts save_fenced_out plus the reconcile it triggers on a fenced book save', async () => {
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'Fenced');
+    officerSetup(server, session);
+    session.leaseNonce = 'stale-nonce';
+    dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 2_000 });
+    const durable = { treasury: 100_000, inventory: [], purchasedSlots: 24 };
+    dbMock.loadGuildBankRow.mockResolvedValueOnce({
+      guildId: GUILD_ID,
+      data: durable,
+      oversized: false,
+    });
+    const rec = recordingIncidents();
+    setGameMetricsCounters(rec.sink);
+    dbMock.saveCharacterAndGuildBankState.mockResolvedValueOnce(false);
+    await priv(server).saveCharacter(session);
+    // Fence-out first, then one reconcile for the one carried guild; the book
+    // reloaded cleanly, so no book_unloaded.
+    expect(rec.kinds).toEqual(['save_fenced_out', 'reconcile']);
+    expect(server.sim.guildBanks.get(GUILD_ID)).toEqual(durable);
+  });
+
+  it('books NO save_fenced_out when the fenced save carried no guild book', async () => {
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'PlainFenced');
+    session.leaseNonce = 'stale-nonce';
+    const rec = recordingIncidents();
+    setGameMetricsCounters(rec.sink);
+    dbMock.saveCharacterState.mockResolvedValueOnce(false);
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    await priv(server).saveCharacter(session);
+    warnSpy.mockRestore();
+    expect(rec.kinds).toEqual([]);
+  });
+
+  it('counts book_unloaded when the reconcile reload finds an oversized row', async () => {
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'FencedBad');
+    officerSetup(server, session);
+    session.leaseNonce = 'stale-nonce';
+    dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 2_000 });
+    dbMock.loadGuildBankRow.mockResolvedValueOnce({
+      guildId: GUILD_ID,
+      data: null,
+      oversized: true,
+    });
+    const rec = recordingIncidents();
+    setGameMetricsCounters(rec.sink);
+    dbMock.saveCharacterAndGuildBankState.mockResolvedValueOnce(false);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await priv(server).saveCharacter(session);
+    errSpy.mockRestore();
+    expect(rec.kinds).toEqual(['save_fenced_out', 'reconcile', 'book_unloaded']);
+    expect(server.sim.guildBanks.has(GUILD_ID)).toBe(false); // inert, the fail-safe
+  });
+
+  it('counts book_unloaded once per guild the BOOT load leaves unloaded', async () => {
+    const server = new GameServer();
+    dbMock.loadGuildBankRows.mockResolvedValueOnce([
+      { guildId: 7, data: null, oversized: true }, // oversized
+      { guildId: 8, data: 'not an object', oversized: false }, // malformed
+      { guildId: 9, data: { treasury: 1, inventory: [], purchasedSlots: 24 }, oversized: false },
+    ]);
+    const rec = recordingIncidents();
+    setGameMetricsCounters(rec.sink);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await server.loadGuildBanks();
+    errSpy.mockRestore();
+    // Exactly the two skipped guilds; the healthy book books nothing.
+    expect(rec.kinds).toEqual(['book_unloaded', 'book_unloaded']);
+    expect(server.sim.guildBanks.has(9)).toBe(true);
+  });
+
+  it('counts ledger_write_failed when a guild bank_ledger insert rejects', async () => {
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'Ledger');
+    officerSetup(server, session);
+    const rec = recordingIncidents();
+    setGameMetricsCounters(rec.sink);
+    dbMock.insertBankLedgerRow.mockRejectedValueOnce(new Error('insert rejected'));
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 1_000 });
+    await bankLedgerIdle();
+    errSpy.mockRestore();
+    expect(rec.kinds).toEqual(['ledger_write_failed']);
+    // The op itself still landed: the observer never faults the dispatch path.
+    expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(101_000);
+  });
+
+  it('books nothing at all on a healthy op + save (the vacuity guard)', async () => {
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'Healthy');
+    officerSetup(server, session);
+    const rec = recordingIncidents();
+    setGameMetricsCounters(rec.sink);
+    dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 1_000 });
+    await priv(server).saveCharacter(session);
+    await bankLedgerIdle();
+    expect(rec.kinds).toEqual([]);
+  });
 });
