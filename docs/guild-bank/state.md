@@ -263,6 +263,30 @@ Current phase: Phase 3 complete (2026-08-02); Phase 3 QA next.
     (8 blocks); byte-bound sample pins in `tests/server_i18n.test.ts`.
 - Phase 4 UI modules / i18n keys / screenshots:
 
+## Accepted risks and operational assumptions (Phase 3 review outcomes)
+- Cross-officer escrow skew (ACCEPTED, market precedent): the escrow TRANSACTION is
+  atomic, but the book is shared multi-writer state, so officer B's save can persist
+  the live book (including officer A's not-yet-durable op) before A's character half
+  commits; a crash in that window tears A's escrow. The World Market has the same
+  structural window today. The one arm that made it a RELIABLE dupe, a fenced-out
+  session leaving the live book permanently ahead of durable truth, is CLOSED:
+  `reconcileFencedOutGuildBooks` (server/game.ts) evicts and reloads the touched
+  books from the DB after a fence-out unless another live session holds a dirty mark
+  (then that session's own escrow flush covers the book).
+- Single-writer assumption: guild_banks rows carry NO optimistic-concurrency stamp
+  (no version column); correctness rests on one realm process owning a guild's book
+  (the repo's one-process-per-realm model) plus the per-process market serial writer.
+  Multi-process realms would need a version fence here first.
+- guild_banks.realm is written on every upsert but never read by the load paths
+  (which key off guilds.realm); kept for operator forensics and a future
+  cross-realm audit dimension.
+- scripts/bank_audit.mjs loads bank_ledger, characters, and guild_banks unpaginated:
+  fine at current scale, revisit with a cursor once bank_ledger reaches millions of
+  rows (offline tooling only, never the server).
+- Books deliberately share the market serial writer (no second queue): the leave
+  flush writes market, mail, AND books in one transaction, so a separate book queue
+  would reopen the interleaving the single writer exists to prevent.
+
 ## Known gotchas
 - `SimContext` is append-only: add views/callbacks, never rename or repurpose existing ones.
 - The parity trace excludes server-stamped session-only meta; follow the

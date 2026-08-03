@@ -17,6 +17,7 @@ vi.mock('pg', () => ({
 
 import {
   GUILD_BANK_ROW_MAX_BYTES,
+  loadGuildBankRow,
   loadGuildBankRows,
   openMarketWriteGate,
   saveCharacterAndGuildBankState,
@@ -212,7 +213,11 @@ describe('loadGuildBankRows (the bounded boot read)', () => {
 
     const [sql, params] = dbMock.query.mock.calls[0];
     expect(String(sql)).toContain('LEFT JOIN guild_banks');
-    expect(String(sql)).toContain('pg_column_size');
+    // octet_length of the TEXT form: the bound measures uncompressed bytes
+    // (pg_column_size reports post-TOAST compressed size, which a highly
+    // compressible multi-megabyte blob slips under).
+    expect(String(sql)).toContain('octet_length(gb.data::text)');
+    expect(String(sql)).not.toContain('pg_column_size');
     expect(String(sql)).toContain('g.realm = $1');
     expect(params).toEqual([REALM, GUILD_BANK_ROW_MAX_BYTES]);
 
@@ -229,5 +234,28 @@ describe('loadGuildBankRows (the bounded boot read)', () => {
 
   it('pins the row bound itself (a silent widening would unbound the load)', () => {
     expect(GUILD_BANK_ROW_MAX_BYTES).toBe(262144);
+  });
+
+  it('loadGuildBankRow reads one bounded row for the fence-out reconcile', async () => {
+    dbMock.query.mockResolvedValueOnce({
+      rows: [{ data_bytes: 99, data: BOOK }],
+      rowCount: 1,
+    } as never);
+    const row = await loadGuildBankRow(7);
+    const [sql, params] = dbMock.query.mock.calls[0];
+    expect(String(sql)).toContain('FROM guild_banks');
+    expect(String(sql)).toContain('octet_length(data::text)');
+    expect(params).toEqual([7, GUILD_BANK_ROW_MAX_BYTES]);
+    expect(row).toEqual({ guildId: 7, data: BOOK, oversized: false });
+  });
+
+  it('loadGuildBankRow reports no-row as null data and an oversized row flagged', async () => {
+    dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 0 } as never);
+    expect(await loadGuildBankRow(8)).toEqual({ guildId: 8, data: null, oversized: false });
+    dbMock.query.mockResolvedValueOnce({
+      rows: [{ data_bytes: GUILD_BANK_ROW_MAX_BYTES + 1, data: null }],
+      rowCount: 1,
+    } as never);
+    expect(await loadGuildBankRow(9)).toEqual({ guildId: 9, data: null, oversized: true });
   });
 });

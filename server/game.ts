@@ -132,6 +132,7 @@ import {
   heartbeatCharacterLeases,
   insertChatLogs,
   loadAccountFlair,
+  loadGuildBankRow,
   loadGuildBankRows,
   loadMailState,
   loadMarketState,
@@ -175,7 +176,11 @@ import { assembleEventsFrame, serializeEventFragments } from './event_frame';
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
 import { forEachGuarded, runGuarded } from './guarded_iter';
-import { collectGuildBankSaves, loadGuildBanksIntoSim } from './guild_bank_state';
+import {
+  collectGuildBankSaves,
+  isMalformedGuildBankRow,
+  loadGuildBanksIntoSim,
+} from './guild_bank_state';
 import { gameMetricsCounters, type WsDropCause } from './http/game_signals';
 import { buildSharedInterestCandidates } from './interest_candidates';
 import { IpBlockList } from './ip_block';
@@ -2028,9 +2033,14 @@ export class GameServer {
       },
       // Disband committed (the empty-bank guard passed): evict the book so the
       // map stays bounded and a re-created guild id can never inherit a stale
-      // book. The guild_banks row cascaded away with the guilds DELETE.
+      // book. The guild_banks row cascaded away with the guilds DELETE. Every
+      // session's pending dirty mark for the guild clears too: with the book
+      // evicted the null-serialize skip already keeps saves from writing it,
+      // but a cleared mark also stops re-serialization attempts against a
+      // guild id whose row no longer exists.
       onGuildDisbanded: (guildId) => {
         this.sim.evictGuildBank(guildId);
+        for (const s of this.clients.values()) s.dirtyGuildBanks.delete(guildId);
       },
       // The disband guard's read: the LIVE sim book's holdings (null with no
       // loaded book; the guard fails closed on null).
@@ -3477,11 +3487,26 @@ export class GameServer {
         // market snapshot: books are shared multi-writer state (two officers'
         // saves carry the same book), so serializing at write time under the
         // one market queue means a commit can never clobber a newer book with
-        // an older snapshot. A guild whose serializeGuildBank returns null (no
-        // loaded book) is SKIPPED (collectGuildBankSaves): an empty book must
-        // never overwrite a real row. The captured seqs clear their dirty
-        // entries only after a successful commit, and only if unchanged, so an
-        // op landing mid-save re-schedules the book instead of being dropped.
+        // an older snapshot. (Books deliberately SHARE the market serial
+        // writer rather than getting their own: the leave flush writes market,
+        // mail, AND books in one transaction, so a second queue would reopen
+        // the interleaving the single writer exists to prevent.) A guild whose
+        // serializeGuildBank returns null (no loaded book) is SKIPPED
+        // (collectGuildBankSaves): an empty book must never overwrite a real
+        // row. The captured seqs clear their dirty entries only after a
+        // successful commit, and only if unchanged, so an op landing mid-save
+        // re-schedules the book instead of being dropped.
+        // Scope of the guarantee, stated honestly: the TRANSACTION is atomic
+        // (this character row and these book rows commit or roll back
+        // together), but the book is shared state, so a DIFFERENT officer's
+        // save can persist the live book between this session's op and this
+        // save (their commit is self-consistent for the book, while this
+        // character half is not yet durable). That cross-officer skew window
+        // is the same structural risk the World Market accepts today
+        // (accepted, documented in docs/guild-bank/state.md); the one arm
+        // that would make it a RELIABLE dupe (a fenced-out session leaving
+        // the live book permanently ahead of durable truth) is closed by
+        // reconcileFencedOutGuildBooks below.
         const carriedGuildBankSeqs: [number, number][] = [];
         const collectBooks = () => {
           carriedGuildBankSeqs.length = 0;
@@ -3538,6 +3563,15 @@ export class GameServer {
         if (saved === false) {
           console.warn(
             `character ${session.characterId} (${session.name}) save fenced out by a same-account takeover; skipping deed publish and lastSave`,
+          );
+          // Guild books this save carried were mutated in the LIVE sim by ops
+          // whose character half just rolled back: the sim is now AHEAD of
+          // durable state, and another officer's later save could persist the
+          // book half without its paired character half (the dupe shape).
+          // Reload those books from durable truth where it is safe to do so.
+          await this.reconcileFencedOutGuildBooks(
+            session,
+            carriedGuildBankSeqs.map(([guildId]) => guildId),
           );
           // The lease is gone: this session is a displaced zombie whose writes
           // can never land again. Give the player the same explicit signal an
@@ -3662,24 +3696,88 @@ export class GameServer {
   // DESIGN: books persist only through the fenced escrow save that carries the
   // acting character (saveCharacter below), never standalone.
   async loadGuildBanks(): Promise<void> {
-    try {
-      const result = loadGuildBanksIntoSim(this.sim, await loadGuildBankRows());
-      for (const guildId of result.oversized) {
-        console.error(
-          `guild bank row for guild ${guildId} exceeds the size bound; left unloaded (ops stay inert, the row is preserved)`,
-        );
+    // A failed boot load leaves EVERY guild bank on the realm silently inert
+    // until restart (ops refuse, and last-member-leave/disband fail closed on
+    // the unloaded books, refusing guild deletion), so a transient DB blip is
+    // retried before giving up LOUDLY. Never throws: the realm still boots.
+    const attempts = 3;
+    let rows: Awaited<ReturnType<typeof loadGuildBankRows>> | null = null;
+    for (let attempt = 1; attempt <= attempts && rows === null; attempt++) {
+      try {
+        rows = await loadGuildBankRows();
+      } catch (err) {
+        console.error(`guild bank boot load attempt ${attempt}/${attempts} failed:`, err);
+        if (attempt < attempts) await new Promise((r) => setTimeout(r, 500 * attempt));
       }
-      for (const guildId of result.missing) {
-        console.error(`guild bank book for guild ${guildId} failed to load into the sim`);
-      }
-    } catch (err) {
-      console.error('failed to load guild banks:', err);
+    }
+    if (rows === null) {
+      console.error(
+        'GUILD BANKS UNAVAILABLE: the boot load failed after every retry; all guild bank ops on this realm stay inert and guild deletion (disband, last-member leave) is refused fail-closed until a restart loads the books',
+      );
+      return;
+    }
+    const result = loadGuildBanksIntoSim(this.sim, rows);
+    for (const guildId of result.oversized) {
+      console.error(
+        `guild bank row for guild ${guildId} exceeds the size bound; left unloaded (ops stay inert, the row is preserved)`,
+      );
+    }
+    for (const guildId of result.malformed) {
+      console.error(
+        `guild bank row for guild ${guildId} is structurally not a book; left unloaded (ops stay inert, the row is preserved)`,
+      );
+    }
+    for (const guildId of result.missing) {
+      console.error(`guild bank book for guild ${guildId} failed to load into the sim`);
     }
   }
 
   // Schedule a guild's book for the next fenced escrow save of this session.
   private markGuildBankDirty(session: ClientSession, guildId: number): void {
     session.dirtyGuildBanks.set(guildId, (session.dirtyGuildBanks.get(guildId) ?? 0) + 1);
+  }
+
+  // After a fence-out (a same-account takeover), the character half of the
+  // escrow rolled back but this session's guild-book mutations remain in the
+  // LIVE book. Where no OTHER live session holds a dirty mark for the guild,
+  // evict the book and reload it from the DB row, returning live state to
+  // durable truth (ops in the brief evicted window refuse silently and never
+  // lazily create a book; an oversized or malformed row stays unloaded, the
+  // boot rule). Where another session IS dirty, the live book is left alone:
+  // that session's own escrow save flushes it, and discarding it would
+  // destroy their legitimate unflushed ops; the displaced session's orphaned
+  // mutation riding that flush is the accepted market-precedent skew
+  // documented in docs/guild-bank/state.md.
+  private async reconcileFencedOutGuildBooks(
+    fenced: ClientSession,
+    guildIds: number[],
+  ): Promise<void> {
+    for (const guildId of guildIds) {
+      let anotherSessionDirty = false;
+      for (const s of this.clients.values()) {
+        if (s !== fenced && s.dirtyGuildBanks.has(guildId)) {
+          anotherSessionDirty = true;
+          break;
+        }
+      }
+      if (anotherSessionDirty) continue;
+      fenced.dirtyGuildBanks.delete(guildId);
+      // Evict FIRST: if the reload read fails, an inert (absent) book is the
+      // fail-safe state; a book known to be ahead of durable truth is not.
+      this.sim.evictGuildBank(guildId);
+      try {
+        const row = await loadGuildBankRow(guildId);
+        if (row.oversized || isMalformedGuildBankRow(row.data)) {
+          console.error(
+            `guild bank row for guild ${guildId} is oversized or malformed on reconcile; left unloaded`,
+          );
+          continue;
+        }
+        this.sim.loadGuildBank(guildId, row.data);
+      } catch (err) {
+        console.error(`guild bank reconcile failed for guild ${guildId} (left unloaded):`, err);
+      }
+    }
   }
 
   // Run one dispatched guild bank op with the observer pair around it: the

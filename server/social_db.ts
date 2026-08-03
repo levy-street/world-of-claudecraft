@@ -144,9 +144,14 @@ CREATE INDEX IF NOT EXISTS guild_events_guild_day ON guild_events(guild_id, day)
 
 -- Guild bank books (Guild Bank Phase 3): one JSONB book per guild (treasury,
 -- inventory, purchasedSlots; the shape src/sim/guild_bank.ts owns). Lives in
--- this schema family because guilds owns the parent row: a committed disband
--- cascades the book away (the disband guard in server/social.ts refuses while
--- the bank holds anything, so the cascade never destroys items or copper).
+-- this schema family because guilds owns the parent row: a committed guild
+-- DELETE cascades the book away. ROLLBACK SAFETY: the ONLY thing standing
+-- between that cascade and destroyed escrow value is the empty-bank guard in
+-- server/social.ts, which BOTH guild-deleting paths must keep (guildDisband
+-- AND the last-member arm of guildLeave, each consulting guildBankHoldings
+-- and failing closed on an unloaded book). Any future code change that adds
+-- a guild-deleting path or reorders either guard past its DELETE re-opens
+-- item/copper destruction; tests/social_system.test.ts pins both guards.
 -- Boot-loaded per realm (realm rides the row for that read); every write runs
 -- inside the character-lease-fenced escrow transaction in server/db.ts, never
 -- standalone. realm carries no DEFAULT deliberately: the interpolated-default

@@ -12,7 +12,14 @@ const dbMock = vi.hoisted(() => ({
   saveCharacterAndGuildBankState: vi.fn(async () => true),
   saveCharacterAndMarketState: vi.fn(async () => true),
   insertBankLedgerRow: vi.fn(async () => {}),
-  loadGuildBankRows: vi.fn(async () => []),
+  loadGuildBankRows: vi.fn(async (): Promise<unknown[]> => []),
+  loadGuildBankRow: vi.fn(
+    async (guildId: number): Promise<{ guildId: number; data: unknown; oversized: boolean }> => ({
+      guildId,
+      data: null,
+      oversized: false,
+    }),
+  ),
 }));
 
 vi.mock('../server/db', () => ({
@@ -22,6 +29,7 @@ vi.mock('../server/db', () => ({
   saveCharacterAndMarketState: dbMock.saveCharacterAndMarketState,
   insertBankLedgerRow: dbMock.insertBankLedgerRow,
   loadGuildBankRows: dbMock.loadGuildBankRows,
+  loadGuildBankRow: dbMock.loadGuildBankRow,
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
@@ -102,9 +110,16 @@ beforeEach(() => {
   dbMock.saveCharacterAndMarketState.mockClear();
   dbMock.insertBankLedgerRow.mockClear();
   dbMock.loadGuildBankRows.mockClear();
+  dbMock.loadGuildBankRow.mockClear();
   dbMock.saveCharacterState.mockResolvedValue(true);
   dbMock.saveCharacterAndGuildBankState.mockResolvedValue(true);
   dbMock.saveCharacterAndMarketState.mockResolvedValue(true);
+  dbMock.loadGuildBankRows.mockResolvedValue([]);
+  dbMock.loadGuildBankRow.mockImplementation(async (guildId: number) => ({
+    guildId,
+    data: null,
+    oversized: false,
+  }));
 });
 
 describe('loadGuildBanksIntoSim (the boot load, against a REAL Sim)', () => {
@@ -119,7 +134,7 @@ describe('loadGuildBanksIntoSim (the boot load, against a REAL Sim)', () => {
       { guildId: 7, data: book, oversized: false },
       { guildId: 8, data: null, oversized: false }, // pre-feature guild: no row
     ]);
-    expect(result).toEqual({ loaded: [7, 8], oversized: [], missing: [] });
+    expect(result).toEqual({ loaded: [7, 8], oversized: [], malformed: [], missing: [] });
     // Every loaded guild is verified live in the map (the acceptance line).
     expect(sim.guildBanks.has(7)).toBe(true);
     expect(sim.guildBanks.has(8)).toBe(true);
@@ -130,30 +145,84 @@ describe('loadGuildBanksIntoSim (the boot load, against a REAL Sim)', () => {
   it('SKIPS an oversized row entirely: no book, ops stay inert, nothing to overwrite it', () => {
     const sim = new Sim({ seed: 3, playerClass: 'warrior', autoEquip: false });
     const result = loadGuildBanksIntoSim(sim, [{ guildId: 9, data: null, oversized: true }]);
-    expect(result).toEqual({ loaded: [], oversized: [9], missing: [] });
+    expect(result).toEqual({ loaded: [], oversized: [9], malformed: [], missing: [] });
     // NOT loaded as empty: an empty book would be persisted over the real row.
     expect(sim.guildBanks.has(9)).toBe(false);
     // And the null-serialize contract keeps every save skipping it.
     expect(sim.serializeGuildBank(9)).toBeNull();
   });
 
-  it('hands loadGuildBank a PARSED object; a raw JSON string yields an empty book by design', () => {
+  it('hands loadGuildBank a PARSED object; a raw JSON string never reaches the sim', () => {
+    // The layered parsed-object contract: sanitizeGuildBankState takes
+    // objects only (a string yields an empty book by design, pinned in
+    // tests/guild_bank.test.ts), and the HOST guard here is stricter still: a
+    // string row is classified malformed and SKIPPED (skip-and-preserve),
+    // because an empty book loaded in its place would be persisted over the
+    // real row by the next escrow save. The DB read therefore always hands
+    // parsed JSONB, and an unparsed string can never silently empty a bank.
     const sim = new Sim({ seed: 3, playerClass: 'warrior', autoEquip: false });
     const book = { treasury: 555, inventory: [], purchasedSlots: 0 };
-    loadGuildBanksIntoSim(sim, [
+    const result = loadGuildBanksIntoSim(sim, [
       { guildId: 7, data: book, oversized: false }, // parsed JSONB: the pg contract
       { guildId: 8, data: JSON.stringify(book), oversized: false }, // a string is NOT parsed
     ]);
     expect(sim.guildBanks.get(7)?.treasury).toBe(555);
-    // Pinned: sanitizeGuildBankState takes objects only, so a string row loads
-    // empty. The DB read must therefore always hand parsed JSONB (above).
-    expect(sim.guildBanks.get(8)).toEqual({ treasury: 0, inventory: [], purchasedSlots: 0 });
+    expect(result.malformed).toEqual([8]);
+    expect(sim.guildBanks.has(8)).toBe(false);
+    expect(sim.serializeGuildBank(8)).toBeNull(); // every save skips it too
   });
 
   it('reports a guild whose id the load path refuses as missing', () => {
     const sim = new Sim({ seed: 3, playerClass: 'warrior', autoEquip: false });
     const result = loadGuildBanksIntoSim(sim, [{ guildId: 0, data: null, oversized: false }]);
     expect(result.missing).toEqual([0]);
+  });
+
+  it('SKIPS a structurally-not-a-book row (corrupt under the bound): preserve, never salvage', () => {
+    // sanitizeGuildBankState would salvage these into a near-empty book that
+    // the next escrow save persists OVER the real row. Loads never destroy:
+    // a top-level shape mismatch is skip-and-preserve like the oversized arm.
+    const sim = new Sim({ seed: 3, playerClass: 'warrior', autoEquip: false });
+    const result = loadGuildBanksIntoSim(sim, [
+      { guildId: 7, data: 'not an object', oversized: false },
+      { guildId: 8, data: [1, 2, 3], oversized: false },
+      { guildId: 9, data: { treasury: 5, inventory: 'nope', purchasedSlots: 0 }, oversized: false },
+      // A well-shaped book still loads (per-slot salvage stays sanitize's job).
+      { guildId: 10, data: { treasury: 5, inventory: [], purchasedSlots: 0 }, oversized: false },
+    ]);
+    expect(result.malformed).toEqual([7, 8, 9]);
+    expect(result.loaded).toEqual([10]);
+    expect(sim.guildBanks.has(7)).toBe(false);
+    expect(sim.guildBanks.has(8)).toBe(false);
+    expect(sim.guildBanks.has(9)).toBe(false);
+    expect(sim.serializeGuildBank(9)).toBeNull(); // and every save skips it
+  });
+});
+
+describe('GameServer.loadGuildBanks (boot retry)', () => {
+  it('retries a transient read failure and loads on a later attempt', async () => {
+    const server = new GameServer();
+    dbMock.loadGuildBankRows
+      .mockRejectedValueOnce(new Error('transient'))
+      .mockResolvedValueOnce([
+        { guildId: 7, data: { treasury: 3, inventory: [], purchasedSlots: 0 }, oversized: false },
+      ]);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await server.loadGuildBanks();
+    errSpy.mockRestore();
+    expect(dbMock.loadGuildBankRows).toHaveBeenCalledTimes(2);
+    expect(server.sim.guildBanks.get(7)?.treasury).toBe(3);
+  });
+
+  it('gives up loudly after every retry without throwing (the realm still boots)', async () => {
+    const server = new GameServer();
+    dbMock.loadGuildBankRows.mockRejectedValue(new Error('db down'));
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await expect(server.loadGuildBanks()).resolves.toBeUndefined();
+    const loud = errSpy.mock.calls.some((c) => String(c[0]).includes('GUILD BANKS UNAVAILABLE'));
+    errSpy.mockRestore();
+    expect(loud).toBe(true);
+    expect(server.sim.guildBanks.size).toBe(0);
   });
 });
 
@@ -257,15 +326,74 @@ describe('the escrow save arm (GameServer.saveCharacter)', () => {
     expect(books).toEqual([]);
   });
 
-  it('a fence-miss (false) keeps the dirty mark: nothing persisted, nothing released', async () => {
+  it('a fence-miss (false) reconciles the live book back to DURABLE truth', async () => {
+    // The displaced session's op mutated the live book, but its character
+    // half rolled back: without the reconcile the sim stays AHEAD of durable
+    // state and another officer's save would persist the book half alone (a
+    // reproducible dupe). No other session is dirty here, so the book must be
+    // evicted and reloaded from the DB row.
     const server = new GameServer();
     const { session } = joinServer(server, 1, 'Fenced');
     officerSetup(server, session);
     session.leaseNonce = 'stale-nonce';
     dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 2_000 });
+    expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(102_000); // live, ahead
+    const durable = { treasury: 100_000, inventory: [], purchasedSlots: 0 };
+    dbMock.loadGuildBankRow.mockResolvedValueOnce({
+      guildId: GUILD_ID,
+      data: durable,
+      oversized: false,
+    });
     dbMock.saveCharacterAndGuildBankState.mockResolvedValueOnce(false);
     await priv(server).saveCharacter(session);
-    expect(session.dirtyGuildBanks.has(GUILD_ID)).toBe(true);
+    // Live state returned to durable truth; the doomed session's mark cleared.
+    expect(server.sim.guildBanks.get(GUILD_ID)).toEqual(durable);
+    expect(session.dirtyGuildBanks.has(GUILD_ID)).toBe(false);
+  });
+
+  it('a fence-miss leaves the book alone while ANOTHER session is dirty on it', async () => {
+    // Officer B has unflushed legit ops: discarding the live book would
+    // destroy them. B's own escrow save flushes the book; the displaced
+    // session's orphaned mutation riding that flush is the documented,
+    // accepted market-precedent skew.
+    const server = new GameServer();
+    const a = joinServer(server, 1, 'FencedA').session;
+    const b = joinServer(server, 2, 'DirtyB').session;
+    officerSetup(server, a);
+    moveToBanker(server, b.pid);
+    server.sim.setPlayerGuildMembership(b.pid, { guildId: GUILD_ID, rank: 'officer' });
+    const bMeta = server.sim.players.get(b.pid);
+    if (!bMeta) throw new Error('missing meta');
+    bMeta.copper = 50_000;
+    dispatch(server, a, { cmd: 'guild_bank_deposit_gold', amount: 2_000 });
+    dispatch(server, b, { cmd: 'guild_bank_deposit_gold', amount: 1_000 });
+    a.leaseNonce = 'stale-nonce';
+    dbMock.saveCharacterAndGuildBankState.mockResolvedValueOnce(false);
+    await priv(server).saveCharacter(a);
+    // No evict, no reload: the live book (both deposits) awaits B's save.
+    expect(dbMock.loadGuildBankRow).not.toHaveBeenCalled();
+    expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(103_000);
+    expect(b.dirtyGuildBanks.has(GUILD_ID)).toBe(true);
+  });
+
+  it('a fence-miss with an oversized/malformed durable row leaves the book unloaded', async () => {
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'FencedBad');
+    officerSetup(server, session);
+    session.leaseNonce = 'stale-nonce';
+    dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 2_000 });
+    dbMock.loadGuildBankRow.mockResolvedValueOnce({
+      guildId: GUILD_ID,
+      data: null,
+      oversized: true,
+    });
+    dbMock.saveCharacterAndGuildBankState.mockResolvedValueOnce(false);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await priv(server).saveCharacter(session);
+    errSpy.mockRestore();
+    // Inert (absent) is the fail-safe state: never an ahead book, never an
+    // empty book loaded over the preserved oversized row.
+    expect(server.sim.guildBanks.has(GUILD_ID)).toBe(false);
   });
 
   it('an op landing mid-save keeps the book scheduled (the seq guard)', async () => {

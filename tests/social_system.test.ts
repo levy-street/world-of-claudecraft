@@ -2019,3 +2019,60 @@ describe('guild bank persistence hooks (Guild Bank Phase 3)', () => {
     expect(h.db.guildCount()).toBe(1);
   });
 });
+
+describe('guild bank guard on last-member guildLeave (Guild Bank Phase 3)', () => {
+  let h: ReturnType<typeof setup>;
+  beforeEach(() => {
+    h = setup();
+    h.add(1, 'Aleph');
+    h.add(2, 'Bet');
+    h.tx.setOnline(1);
+    h.tx.setOnline(2);
+  });
+
+  it('a solo Guild Master /gquit with a stocked bank is refused BEFORE any row moves', async () => {
+    // Last-member-out deletes the guild, which cascades the guild_banks row
+    // away exactly like /gdisband: without this guard a solo GM /gquit
+    // destroys the whole book.
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    for (const holdings of [{ copper: 7, items: 0 }, { copper: 0, items: 2 }, null]) {
+      h.tx.holdings.set(1, holdings);
+      h.tx.membershipStamps = [];
+      await h.svc.guildLeave(h.actor(1));
+      expect(h.tx.errorsFor(1)).toContain(
+        'The guild bank must be emptied before the guild can be disbanded.',
+      );
+      // Refused before ANY mutation: still a member, guild alive, no stamp,
+      // no evict.
+      expect(h.db.guildCount()).toBe(1);
+      expect(await h.db.guildMembership(1)).not.toBeNull();
+      expect(h.tx.membershipStamps).toEqual([]);
+      expect(h.tx.disbanded).toEqual([]);
+      h.tx.clear();
+    }
+  });
+
+  it('a solo Guild Master /gquit with an empty bank deletes the guild and evicts once', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    h.tx.membershipStamps = [];
+    await h.svc.guildLeave(h.actor(1)); // default holdings: the empty book
+    expect(h.db.guildCount()).toBe(0);
+    expect(await h.db.guildMembership(1)).toBeNull();
+    expect(h.tx.membershipStamps).toEqual([{ id: 1, membership: null }]);
+    expect(h.tx.disbanded).toEqual([1]);
+  });
+
+  it('a NON-last member leaving never consults the guard (the bank cannot trap them)', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    h.tx.holdings.set(1, { copper: 999, items: 9 }); // stocked bank
+    await h.svc.guildLeave(h.actor(2)); // Bet leaves; Aleph remains
+    expect(h.tx.errorsFor(2)).not.toContain(
+      'The guild bank must be emptied before the guild can be disbanded.',
+    );
+    expect(await h.db.guildMembership(2)).toBeNull(); // the leave went through
+    expect(h.db.guildCount()).toBe(1); // guild survives with its bank
+    expect(h.tx.disbanded).toEqual([]);
+  });
+});

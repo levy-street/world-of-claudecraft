@@ -948,6 +948,23 @@ export class SocialService {
       );
       return;
     }
+    // Last member out DELETES the guild below, which cascades the guild_banks
+    // row away exactly like /gdisband, so the SAME empty-bank guard must hold
+    // here: a solo Guild Master's /gquit with a stocked bank would otherwise
+    // destroy the book's copper and items. Checked BEFORE the member row is
+    // removed, so a refusal leaves the membership untouched; fails CLOSED on
+    // an unloaded book (null holdings), because an unloaded book cannot prove
+    // the persisted row is empty.
+    if (others.length === 0) {
+      const holdings = this.tx.guildBankHoldings(membership.guildId);
+      if (!holdings || holdings.copper > 0 || holdings.items > 0) {
+        this.err(
+          actor.characterId,
+          'The guild bank must be emptied before the guild can be disbanded.',
+        );
+        return;
+      }
+    }
     await this.db.removeGuildMember(actor.characterId);
     // Removed in the DB: clear the live sim stamp before any push resolves
     // (both arms below; the guild bank rank gate must not see a stale rank).
@@ -955,6 +972,9 @@ export class SocialService {
     if (others.length === 0) {
       // last member out: the guild ceases to exist
       await this.db.deleteGuild(membership.guildId);
+      // Committed: evict the (empty) book, the same post-DELETE hook as
+      // guildDisband, so no stale book survives keyed to a dead guild id.
+      this.tx.onGuildDisbanded(membership.guildId);
       this.info(
         actor.characterId,
         `You have left <${membership.guildName}>. The guild has disbanded.`,

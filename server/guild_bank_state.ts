@@ -22,9 +22,28 @@ export interface GuildBankBootResult {
   // stay silently inert, the row is preserved on disk). Never loaded empty:
   // an empty book would be persisted over the real row by the next save.
   oversized: number[];
+  // Guilds whose row is structurally not a book (see isMalformedGuildBankRow):
+  // SKIPPED exactly like the oversized case, preserving the row for a human.
+  malformed: number[];
   // Guilds the has() verification failed for after a load attempt (a wiring
   // defect: loadGuildBank refuses non-positive ids, nothing else).
   missing: number[];
+}
+
+// A row under the size bound can still be structurally NOT a book (a corrupt
+// or foreign write): sanitizeGuildBankState would dutifully salvage it into a
+// near-empty book, which the next escrow save would then persist OVER the
+// real row, destroying whatever the blob still encoded. Loads never destroy,
+// so a top-level shape mismatch is treated exactly like the oversized case:
+// skip-and-preserve (that guild's ops stay inert; the row survives on disk).
+// Null/undefined is NOT malformed: no row means an empty book by design.
+// Deliberately shallow: per-slot salvage inside a well-shaped book remains
+// sanitizeGuildBankState's job (the mail precedent).
+export function isMalformedGuildBankRow(data: unknown): boolean {
+  if (data === null || data === undefined) return false;
+  if (typeof data !== 'object' || Array.isArray(data)) return true;
+  const d = data as { inventory?: unknown };
+  return d.inventory !== undefined && !Array.isArray(d.inventory);
 }
 
 // Inject every realm guild's book into the LIVE sim through the ONE load path.
@@ -37,10 +56,14 @@ export function loadGuildBanksIntoSim(
   sim: GuildBankSimPort,
   rows: readonly GuildBankRow[],
 ): GuildBankBootResult {
-  const result: GuildBankBootResult = { loaded: [], oversized: [], missing: [] };
+  const result: GuildBankBootResult = { loaded: [], oversized: [], malformed: [], missing: [] };
   for (const row of rows) {
     if (row.oversized) {
       result.oversized.push(row.guildId);
+      continue;
+    }
+    if (isMalformedGuildBankRow(row.data)) {
+      result.malformed.push(row.guildId);
       continue;
     }
     // Parsed JSONB in, empty book on null: sanitizeGuildBankState owns the

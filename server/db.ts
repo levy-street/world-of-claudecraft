@@ -3220,12 +3220,15 @@ export interface GuildBankRow {
 // Every guild on this realm with its bank book, for the boot load. LEFT JOIN
 // so a guild with no row still appears (data null -> empty book): a realm
 // created before the guild bank shipped loads exactly like one created after.
+// The bound measures the UNCOMPRESSED serialized bytes (octet_length of the
+// text form): pg_column_size reports post-TOAST compressed size, which would
+// let a highly compressible multi-megabyte blob slip under the bound.
 export async function loadGuildBankRows(): Promise<GuildBankRow[]> {
   const res = await pool.query(
     `SELECT g.id AS guild_id,
             (gb.guild_id IS NOT NULL) AS has_row,
-            COALESCE(pg_column_size(gb.data), 0) AS data_bytes,
-            CASE WHEN COALESCE(pg_column_size(gb.data), 0) <= $2 THEN gb.data ELSE NULL END
+            COALESCE(octet_length(gb.data::text), 0) AS data_bytes,
+            CASE WHEN COALESCE(octet_length(gb.data::text), 0) <= $2 THEN gb.data ELSE NULL END
               AS data
        FROM guilds g LEFT JOIN guild_banks gb ON gb.guild_id = g.id
       WHERE g.realm = $1
@@ -3237,6 +3240,28 @@ export async function loadGuildBankRows(): Promise<GuildBankRow[]> {
     data: r.data ?? null,
     oversized: r.has_row === true && Number(r.data_bytes) > GUILD_BANK_ROW_MAX_BYTES,
   }));
+}
+
+// One guild's book row, for the fence-out reconcile (GameServer
+// reconcileFencedOutGuildBooks): after a displaced session's escrow save
+// fences out, the live book is reloaded from durable truth. Same bound and
+// parsed-JSONB contract as the boot read; a guild with no row reports data
+// null (an empty book, matching what a restart would load).
+export async function loadGuildBankRow(guildId: number): Promise<GuildBankRow> {
+  const res = await pool.query(
+    `SELECT octet_length(data::text) AS data_bytes,
+            CASE WHEN octet_length(data::text) <= $2 THEN data ELSE NULL END AS data
+       FROM guild_banks
+      WHERE guild_id = $1`,
+    [guildId, GUILD_BANK_ROW_MAX_BYTES],
+  );
+  const row = res.rows[0];
+  if (!row) return { guildId, data: null, oversized: false };
+  return {
+    guildId,
+    data: row.data ?? null,
+    oversized: Number(row.data_bytes) > GUILD_BANK_ROW_MAX_BYTES,
+  };
 }
 
 export async function isAdminAccount(accountId: number): Promise<boolean> {
