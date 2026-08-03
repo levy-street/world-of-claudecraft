@@ -111,8 +111,8 @@ than free, so ask before you rely on it.
 | Terrain PBR textures (Grass001, Ground023, Rock026, Rock051, Rock060, Ground071, Ground080, PavingStones046, Snow010A) | ambientCG | https://ambientcg.com | CC0 1.0 | Yes |
 | Terrain PBR textures, biome set (Ground054, Ground095A, Ground093A, Rock029, Lava004, Gravel024, Rock035) | ambientCG | https://ambientcg.com | CC0 1.0 | Yes |
 | Thornhollow battleground terrain textures (`public/textures/battleground/*.jpg`) | ambientCG | https://ambientcg.com | CC0 1.0 | Yes |
-| Thornhollow wall tower (`public/models/city/wall_tower.glb`) | World of ClaudeCraft | Project-generated deterministic geometry via the map editor's `scripts/gen_wall_tower.mjs` | Project asset | With the project only |
-| Thornhollow ground decals (`public/textures/battleground/decals/*.webp`) | World of ClaudeCraft | Project-generated deterministic shape and noise synthesis via the map editor's `scripts/gen_decals.mjs` | Project asset | With the project only |
+| Thornhollow wall tower (`public/models/city/wall_tower.glb`) | World of ClaudeCraft | Project-generated deterministic geometry (generator script not checked into this repository) | Project asset | With the project only |
+| Thornhollow ground decals (`public/textures/battleground/decals/*.webp`) | World of ClaudeCraft | Project-generated deterministic shape and noise synthesis (generator script not checked into this repository) | Project asset | With the project only |
 | Surface-detail PBR textures for the triplanar material families (Bark012, Bricks076A/B, Fabric030, Metal013 incl. Metalness, Plaster007; Color/NormalGL/AmbientOcclusion/Roughness/Displacement under `public/textures/structures/`) | ambientCG | https://ambientcg.com | CC0 1.0 | Yes |
 | Canopy clump-detail textures (Moss002; NormalGL/AmbientOcclusion under `public/textures/foliage/`) | ambientCG | https://ambientcg.com | CC0 1.0 | Yes |
 | Worn-metal surface-detail PBR texture (RustCoarse01, from rust_coarse_01; NormalGL/AmbientOcclusion/Roughness/Displacement under `public/textures/structures/`) | Poly Haven | https://polyhaven.com/a/rust_coarse_01 | CC0 1.0 | Yes |

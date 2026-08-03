@@ -123,8 +123,10 @@ export function battlegroundColliders(): Collider[] {
 
 /** A plan wall has to be tall enough to be worth navigating around; below this
  *  it is a kerb, a step or a floor slab, and drawing it would turn the map into
- *  noise. Deliberately LOWER than the camera-occlusion threshold: a 2.5yd
- *  parapet is a landmark you route around even though you can see over it. */
+ *  noise. This floor answers a map-drawing question only, and is deliberately
+ *  independent of the sight cutoff (`SIGHT_HEIGHT` in colliders.ts) that
+ *  decides whether a CAST clears a piece: a 2.5yd parapet is a landmark you
+ *  route around whatever a spell fired at it does. */
 const BG_PLAN_WALL_MIN_HEIGHT = 2;
 /** ...and WIDE enough. A drum tower's crenellations are eight yards up on a
  *  deck nobody can reach, and a torch bracket is a finger of stone: both are
@@ -152,8 +154,11 @@ export interface BgPlanWall {
  * collider set, so the plan can never drift from what actually blocks.
  *
  * The filter is "blocks movement, stands taller than a step, and is wider than
- * a post", NOT the camera's occlusion flag: whether the chase cam can see over
- * a parapet says nothing about whether a runner has to go around it.
+ * a post". `cameraTopY` is read here only as the piece's precomputed visual
+ * top, the number the height is measured from; it is NOT a sight test, and the
+ * sight cutoff it feeds in colliders.ts is deliberately not this filter:
+ * whether a cast clears a parapet says nothing about whether a runner has to
+ * go around it.
  */
 export function bgFieldPlanWalls(): BgPlanWall[] {
   const out: BgPlanWall[] = [];

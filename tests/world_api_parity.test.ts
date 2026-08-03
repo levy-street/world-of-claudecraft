@@ -504,9 +504,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // activeMasterLootRolls, leaving 274; the rift floor timer HUD adds
     // riftEventMsRemaining and the instance-payload pipes add
     // marketListInstance, leaving 276. Reactive aura timing adds
-    // reactiveAbilityWindowRemaining, leaving 277; this branch removes the
-    // renderer-only riftCollisionToken with third-person camera collision,
-    // leaving 276.
+    // reactiveAbilityWindowRemaining, leaving 277; the v0.34.0 release removes
+    // the renderer-only riftCollisionToken along with third-person camera
+    // collision, leaving 276. This branch (Thornhollow Fields) then adds the
+    // four battleground facet members on top of that base: the bgInfo data
+    // member plus the bgQueueJoin / bgQueueLeave / bgFlagAction commands,
+    // leaving 280.
     expect(IWORLD_MEMBERS.length).toBe(280);
     expect(DATA_MEMBERS.length).toBe(72);
     expect(METHOD_MEMBERS.length).toBe(208);

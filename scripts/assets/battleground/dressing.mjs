@@ -826,9 +826,12 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
   // flame on the one spot every fight converges on read as a hazard, and the
   // stand carries the ceremony instead. Both dais steps finish far under the
   // physics step height, so the dais is ground a body strides over rather than
-  // a ledge, and it rides camGhost like all low stone, so the chase camera in
-  // the court never jams (the compiler's CAMERA_SOLID_MIN_HEIGHT guarantees
-  // both). Nothing stands free around the stand: the court keeps the clean
+  // a ledge. Being low stone it also finishes under the sight cutoff, so the
+  // compiler's `cameraTopY` classification leaves it transparent to casts and a
+  // fight on the stand stays readable from across the court. (That top is now a
+  // SIGHT input only: the geometry-driven chase-camera zoom that used to read
+  // collider metadata was removed in release v0.34.0, and occluders fade
+  // instead.) Nothing stands free around the stand: the court keeps the clean
   // fight space the plan intends, and tests/battleground_band pins the whole
   // contract (dais step height, pickup clearance, no blocker by the stand).
   both({

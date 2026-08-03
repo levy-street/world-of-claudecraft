@@ -2163,6 +2163,18 @@ function sightBlockedAt(
     if (groundHeight(x, z, seed) > sightY) return true;
     // Colliders live in the grid at absolute coordinates with known tops, so
     // the low-obstacle skip applies exactly like the open world's.
+    //
+    // R-BOUND ASSUMPTION, mirror it if you widen the sample. This reads the ONE
+    // cell holding the sample point, not the cell RANGE the point's radius
+    // spans. That is exact only while `r` stays within the padding gridFor()
+    // indexes with (`MAX_BODY_RADIUS`, 0.8 yd): a collider is filed into every
+    // cell its bounds plus that padding touch, so anything whose surface is
+    // within 0.8 yd of the sample is already in this list. The live callers
+    // reach here through lineOfSightClear's default `r = 0.05`, an order of
+    // magnitude inside the pad. A caller passing r > MAX_BODY_RADIUS would
+    // start MISSING colliders parked in a neighbouring cell (permissive: sight
+    // reported clear through a surface), and must read the range instead, the
+    // way queryOpenWorldColliders does over its stamp dedupe.
     const grid = gridFor(seed);
     const list = grid.cells.get(cellKeyAt(x, z));
     return list ? overlapsAny(list, x, z, true) : false;

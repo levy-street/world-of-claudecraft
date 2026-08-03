@@ -44,7 +44,9 @@ export const BASES = [
     team: 0,
     flag: { x: 0, z: -FLAG_Z },
     // The ring flanks the flag stand on its field side (never on it) and sits
-    // clear of the back wall so the spawn-in chase camera never collides.
+    // clear of the back wall, so a fighter who materializes here spawns into
+    // open court with the stand and the mouth both in view, never wedged
+    // against stone.
     spawns: [
       { x: -7, z: -117 },
       { x: 0, z: -113 },

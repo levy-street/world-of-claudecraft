@@ -4154,7 +4154,6 @@ export type SimEvent = { pid?: number } & (
       ratingBefore: number;
       ratingAfter: number;
     }
-  // 2v2 Fiesta party mode. All carry pid (personal — delivered to each combatant).
   // 2v2 Fiesta party mode. All carry pid (personal - delivered to each combatant).
   // `fiestaScore`: the running team tally changed. `fiestaWave`: a new augment
   // wave just opened. `fiestaWord`: an exaggerated word-pop cue (the client maps
