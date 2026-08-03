@@ -48,6 +48,7 @@ import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { FOCUSABLE_SELECTOR } from './focus_manager';
+import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
 import { GuildBankTab } from './guild_bank_window';
 import { formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
@@ -334,6 +335,12 @@ export class BankWindow {
       searchEl !== null && active === searchEl
         ? { start: searchEl.selectionStart, end: searchEl.selectionEnd }
         : null;
+    // The focused control's identity (data-focus-key), captured BEFORE the wipe:
+    // the guild refresh arm repaints on ANY officer's op, so an external echo
+    // must not yank a keyboard user off the tab, cell, or button they were on.
+    // Guild controls carry keys (guild_bank_window.ts + the tab annotation
+    // below); personal controls carry none and keep the close-button fallback.
+    const focusKey = hadFocus ? captureFocusKey(el) : null;
     if (document.querySelector(BANK_PROMPT_SELECTOR)) {
       dismissBankPrompts();
       el.inert = false;
@@ -357,7 +364,6 @@ export class BankWindow {
       `<div class="panel-title"><span>${esc(t('hudChrome.bank.title'))} <span class="panel-subtitle">${esc(t('hudChrome.bank.subtitle'))}</span></span>` +
       `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.bank.close'))}">${svgIcon('close')}</button></div>`;
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
-    if (hadFocus && !searchFocus) (el.querySelector('[data-close]') as HTMLElement | null)?.focus();
     if (guildAvailable) {
       // The shared WAI-ARIA tab strip (tab_strip_view core + wireTabStrip),
       // the social/talents idiom. No panelId: the pane sections mount directly
@@ -386,14 +392,18 @@ export class BankWindow {
         this.render();
         if (focusFollow) focusActiveTab(this.deps.root(), 'bank-tab', 'on');
       });
+      // Key the tab buttons so a repaint keeps focus on the tab the user was
+      // on (the shared strip carries data-tab; the key namespace is ours).
+      for (const tab of el.querySelectorAll<HTMLElement>('.bank-tab')) {
+        tab.dataset.focusKey = `tab:${tab.dataset.tab}`;
+      }
     }
     if (this.tab === 'guild') {
-      this.guildPane.renderInto(el);
+      this.guildPane.renderInto(el, guildModel);
       this.restoreScroll(el, prevScrollTop);
-      // The guild pane has no search box: a rebuild that destroyed a focused
-      // personal search input lands on the close button, never on <body>.
-      if (searchFocus && hadFocus)
-        (el.querySelector('[data-close]') as HTMLElement | null)?.focus();
+      // The guild pane has no search box, so a searchFocus capture degrades
+      // through the key ladder to the close button, never to <body>.
+      if (hadFocus) this.restoreControlFocus(el, focusKey);
       return;
     }
     if (model.kind === 'away') {
@@ -402,6 +412,7 @@ export class BankWindow {
       away.textContent = t('hudChrome.bank.tooFar');
       el.appendChild(away);
       this.lastRenderedTab = this.tab;
+      if (hadFocus) this.restoreControlFocus(el, focusKey);
       return;
     }
     const capacity = document.createElement('div');
@@ -446,7 +457,23 @@ export class BankWindow {
         // close button rather than dropping focus to <body>.
         (el.querySelector('[data-close]') as HTMLElement | null)?.focus();
       }
+    } else if (hadFocus) {
+      this.restoreControlFocus(el, focusKey);
     }
+  }
+
+  // Re-land focus after a full rebuild: the control the user was on (resolved
+  // by its data-focus-key in the fresh tree, skipped when it came back
+  // disabled), else the always-present close button. Never <body> (WCAG 2.4.3).
+  private restoreControlFocus(el: HTMLElement, focusKey: string | null): void {
+    restoreFirstEnabled([
+      focusKey
+        ? (el.querySelector(`[data-focus-key="${focusKey}"]`) as
+            | (HTMLElement & { disabled?: boolean })
+            | null)
+        : null,
+      el.querySelector('[data-close]') as HTMLElement | null,
+    ]);
   }
 
   // Reapply the captured .bank-scroll offset to the freshly built pane, but only

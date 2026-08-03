@@ -92,9 +92,10 @@ export class GuildBankTab {
 
   /** Append the guild pane sections (capacity, treasury, grid, buy row) to the
    *  window root. BankWindow has already painted the title + tab strip and
-   *  captured the .bank-scroll offset it restores after this returns. */
-  renderInto(el: HTMLElement): void {
-    const model = this.model();
+   *  captured the .bank-scroll offset it restores after this returns; it hands
+   *  the model it already built for the tab-visibility branch (one core call
+   *  per paint, never two). */
+  renderInto(el: HTMLElement, model: GuildBankViewModel): void {
     if (model.kind !== 'guild') return; // raced null: BankWindow falls back next paint
     const capacity = document.createElement('div');
     capacity.className = 'bank-capacity';
@@ -143,12 +144,14 @@ export class GuildBankTab {
     const deposit = document.createElement('button');
     deposit.type = 'button';
     deposit.className = 'gbank-gold-btn';
+    deposit.dataset.focusKey = 'gbank:deposit-gold';
     deposit.textContent = t('hudChrome.bank.guildDepositGold');
     deposit.disabled = !model.treasury.canDepositGold;
     deposit.addEventListener('click', () => this.showGoldPrompt('deposit', model.treasury.copper));
     const withdraw = document.createElement('button');
     withdraw.type = 'button';
     withdraw.className = 'gbank-gold-btn';
+    withdraw.dataset.focusKey = 'gbank:withdraw-gold';
     withdraw.textContent = t('hudChrome.bank.guildWithdrawGold');
     withdraw.disabled = !model.treasury.canWithdrawGold;
     withdraw.addEventListener('click', () =>
@@ -179,6 +182,10 @@ export class GuildBankTab {
     const item = ITEMS[slot.itemId];
     const cell = document.createElement('button');
     cell.type = 'button';
+    // Keyed by wire index so a repaint keeps focus on the cell the user was on
+    // (BankWindow.restoreControlFocus); an identity shift is the click guard's
+    // problem, not focus's.
+    cell.dataset.focusKey = `gbank:slot:${slot.slotIndex}`;
     const dormantClass = slot.dormant ? ' gbank-dormant' : '';
     const itemName = item ? itemDisplayName(item) : t('hudChrome.bank.guildUnknownItem');
     const count = this.fmt(slot.count);
@@ -358,11 +365,20 @@ export class GuildBankTab {
     prompt.appendChild(coinRow);
     // The inline refusal line (polite live region): a refused submit keeps the
     // prompt open and says WHY, never a silent dismiss (the seam review line).
+    // Announce via clear-then-append of a fresh child node so a REPEATED
+    // identical refusal is a DOM change AT re-announces (a same-text
+    // textContent write is not).
     const errorLine = document.createElement('div');
     errorLine.className = 'gbank-gold-error';
     errorLine.setAttribute('role', 'status');
     errorLine.setAttribute('aria-live', 'polite');
     prompt.appendChild(errorLine);
+    const voiceRefusal = (text: string): void => {
+      errorLine.textContent = '';
+      const line = document.createElement('span');
+      line.textContent = text;
+      errorLine.appendChild(line);
+    };
     const confirm = document.createElement('button');
     confirm.className = 'btn';
     confirm.textContent =
@@ -391,11 +407,11 @@ export class GuildBankTab {
         // Refuse-and-keep, the sim's own validation order voiced with its own
         // lines: over-purse first, then the treasury-cap headroom.
         if (entered > purse) {
-          errorLine.textContent = t('itemUi.errors.notEnoughMoney');
+          voiceRefusal(t('itemUi.errors.notEnoughMoney'));
           return;
         }
         if (entered > max) {
-          errorLine.textContent = tSim('error.guildBankTreasuryCap');
+          voiceRefusal(tSim('error.guildBankTreasuryCap'));
           return;
         }
         this.deps.world().guildBankDepositGold(entered);
@@ -404,7 +420,7 @@ export class GuildBankTab {
         if (amount === null) {
           // The treasury cannot give anything right now (drained since the
           // paint): surface it, keep the prompt open.
-          errorLine.textContent = t('hudChrome.bank.guildGoldCannotMove');
+          voiceRefusal(t('hudChrome.bank.guildGoldCannotMove'));
           return;
         }
         this.deps.world().guildBankWithdrawGold(amount);
@@ -447,6 +463,7 @@ export class GuildBankTab {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = `bank-buy-btn${buy.affordable ? '' : ' gbank-buy-short'}`;
+    btn.dataset.focusKey = 'gbank:buy';
     const short = buy.affordable
       ? ''
       : `<span class="gbank-buy-short-label">${esc(t('hudChrome.bank.guildTreasuryShort'))}</span>`;

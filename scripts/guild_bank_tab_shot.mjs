@@ -11,7 +11,7 @@
 //   - STAGE=offline: just the vite dev client.
 //
 // Usage:
-//   GAME_URL=http://localhost:5273 SERVER_URL=http://localhost:8887 \
+//   GAME_URL=http://localhost:5273 \
 //   STAGE=online SHOTS_DIR=docs/screenshots/guild-bank-tab \
 //     node scripts/guild_bank_tab_shot.mjs
 //   GAME_URL=http://localhost:5273 STAGE=offline PREFIX=before \
@@ -23,7 +23,6 @@ import { enterOfflineGame } from './enter_offline_game.mjs';
 import { suppressGpuNotice } from './lib/gpu_notice_suppress.mjs';
 
 const GAME_URL = process.env.GAME_URL ?? 'http://localhost:5273';
-const SERVER_URL = process.env.SERVER_URL ?? 'http://localhost:8887';
 const OUT = process.env.SHOTS_DIR ?? 'docs/screenshots/guild-bank-tab';
 const STAGE = process.env.STAGE ?? 'online';
 const PREFIX = process.env.PREFIX ?? 'after';
@@ -157,18 +156,6 @@ async function offlineStage() {
 // ---------------------------------------------------------------------------
 // STAGE=online: officer at the banker with a founded guild and a stocked book.
 // ---------------------------------------------------------------------------
-
-async function api(path, body, token) {
-  const res = await fetch(SERVER_URL + path, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify(body),
-  });
-  return { status: res.status, body: await res.json().catch(() => ({})) };
-}
 
 // The proven online-login recipe (scripts/social_landscape_online_shot.mjs).
 async function loginAndEnter(page, username, charName, cls, { mobile = false, register = true }) {
