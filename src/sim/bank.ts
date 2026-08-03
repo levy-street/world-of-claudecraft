@@ -111,21 +111,18 @@ export function moveBetweenContainers(
   // craftedRecipeId is threaded through BOTH calls here for exactly the reason
   // the plain arm below spells out: countFit and addStacked key their merge on
   // it, so omitting it strips the marker off any slot that carries an instance
-  // payload AND a craft provenance (a crafted weapon that was worn while
-  // enchanted is precisely that shape). One bank round trip then launders a
+  // payload AND a craft provenance. Two independent reviews found this arm the
+  // same way: a crafted weapon that was worn while enchanted is precisely that
+  // shape, and so is commissioned sub-rare equipment, whose crafted provenance
+  // lives ONLY at slot level. Either way one bank round trip launders a
   // self-crafted item into an indistinguishable found one and it disenchants
-  // for the enchanting skill the anti-farm gate exists to deny. Both calls take
-  // it or neither does: threading it into only one would make the fit check and
-  // the grant disagree about which stacks are mergeable, which is a
-  // no_fit-vs-overflow divergence rather than a laundering one.
+  // for the enchanting skill the anti-farm gate exists to deny. addStacked's
+  // merge predicate already compares the marker, so a marker-bearing slot never
+  // merges into an unmarked stack. Both calls take it or neither does:
+  // threading it into only one would make the fit check and the grant disagree
+  // about which stacks are mergeable, which is a no_fit-vs-overflow divergence
+  // rather than a laundering one.
   if (slot.instance) {
-    // craftedRecipeId rides the move exactly as on the fungible arm below:
-    // the round 5 finder caught this arm dropping the slot-level crafted
-    // marker on deposit, which for commissioned sub-rare equipment (whose
-    // crafted provenance lives ONLY at slot level) silently laundered the
-    // provenance through the bank. addStacked's merge predicate already
-    // compares the marker, so a marker-bearing slot never merges into an
-    // unmarked stack.
     if (
       countFit(dest, destCapacity, slot.itemId, slot.count, slot.instance, slot.craftedRecipeId) <
       slot.count

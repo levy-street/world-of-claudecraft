@@ -47,7 +47,6 @@ import {
 import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
-import { FOCUSABLE_SELECTOR } from './focus_manager';
 import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
 import { GuildBankTab } from './guild_bank_window';
 import { formatMoney, formatNumber, type TranslationKey, t } from './i18n';

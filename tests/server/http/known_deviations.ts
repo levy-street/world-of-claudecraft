@@ -847,6 +847,16 @@ export const KNOWN_DEVIATIONS: readonly KnownDeviation[] = [
       '/admin/api/characters/:id/professions',
       '/admin/api/moderation/characters/:id/restore-item',
       '/admin/api/moderation/characters/:id/restore-slot',
+      // Guild Bank Phase 4: the dormant-slot escape hatch, the first
+      // /admin/api/guilds/* route in this ledger. Same class: the legacy arm
+      // passes Number(match[1]) so "0", "00", and a past-2^53 digit string
+      // reach the shared body, which refuses them itself (a non-positive or
+      // non-integer guild id answers no_book WITHOUT touching a live book),
+      // where the RouteDef arm's requireAdminTarget('guild') loader 422s
+      // first. Only the status differs and neither arm mutates. The rest of
+      // the /admin/api/guilds/* family (rename, history) is NOT ledgered here
+      // and predates this branch.
+      '/admin/api/guilds/:id/bank/purge-slot',
     ],
     currentBehavior:
       'NARROWED by the v0.22.0 release merge: BOTH arms now run the central ' +

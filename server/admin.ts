@@ -1154,10 +1154,13 @@ export async function handleAdminApi(
     if (req.method === 'POST' && guildBankPurgeMatch) {
       const body = await readBody(req);
       // Number() on a digit string can still yield 0 or a past-2^53 id here
-      // where the RouteDef arm's loader 422s (the ledgered adminIdParamDecode
-      // deviation, shared by every :id admin route). Both arms REFUSE such an
-      // id without touching the live book: adminPurgeGuildBankSlot rejects a
-      // non-positive guild id up front. Only the status differs.
+      // where the RouteDef arm's requireAdminTarget('guild') loader 422s. That
+      // is the adminIdParamDecode deviation class, and this path is ledgered
+      // for it by name (tests/server/http/known_deviations.ts): it is the first
+      // /admin/api/guilds/* entry, so it was NOT covered by the family the
+      // other :id admin routes sit in. Both arms REFUSE such an id without
+      // touching the live book: adminPurgeGuildBankSlot rejects a non-positive
+      // or non-integer guild id up front. Only the status differs.
       const outcome = await purgeGuildBankSlotOutcome(
         game,
         Number(guildBankPurgeMatch[1]),
