@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { BG_GRAVEYARDS, BG_POWER_RUNES, BG_SPEED_RUNES } from '../src/sim/battleground_layout';
+import { GREATER_INVISIBILITY_DR_AURA_ID } from '../src/sim/combat/greater_invisibility';
 import { offerResurrection } from '../src/sim/combat/resurrection_offer';
 import { battlegroundOrigin, instanceOrigin, isBgPos } from '../src/sim/data';
 import { summonMountItem, toggleMount } from '../src/sim/mounts';
@@ -32,7 +33,7 @@ import {
   startBgMatch,
   updateBattleground,
 } from '../src/sim/social/battleground';
-import type { SimEvent } from '../src/sim/types';
+import { DT, type SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
 function makeWorld() {
@@ -931,6 +932,54 @@ describe('Thornhollow Fields: deliberate pickup + automatic return', () => {
     sim.tick();
     expect(match.flags[1].state).toBe('home'); // own team: proximity return wins
   });
+
+  it('a grab out of Greater Invisibility still pays the aftereffect the vanish owes', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    // The mage vanish, shaped exactly as effect_dispatch applies it: the
+    // configured damage cut rides in value2 and its duration in value3, so
+    // every normal removal path can pay the same aftereffect.
+    const vanish = (pid: number) =>
+      sim.ctx.applyAura(sim.entities.get(pid)!, {
+        id: 'greater_invisibility',
+        name: 'Greater Invisibility',
+        kind: 'stealth',
+        value: 1,
+        value2: 0.9,
+        value3: 2,
+        remaining: 20,
+        duration: 20,
+        sourceId: sim.entities.get(pid)!.id,
+        school: 'arcane',
+      });
+    const runner = match.teams[0][0];
+    const e = sim.entities.get(runner)!;
+    vanish(runner);
+    tp(sim, runner, match.flags[1].home.x, match.flags[1].home.z);
+    sim.bgFlagAction(runner);
+    sim.tick();
+    expect(match.flags[1].carrier, 'the grab must land').toBe(runner);
+    expect(e.stealthed).toBe(false);
+    expect(e.auras.some((a) => a.kind === 'stealth')).toBe(false);
+    const after = e.auras.find((a) => a.id === GREATER_INVISIBILITY_DR_AURA_ID);
+    expect(after, 'a flag grab must not be the one path that eats the aftereffect').toBeTruthy();
+    // ...and it is the SAME grant breaking the same vanish any other way makes
+    // (the shared path an attack out of hiding takes), never a bespoke one.
+    const other = match.teams[0][1];
+    const oe = sim.entities.get(other)!;
+    vanish(other);
+    sim.ctx.breakStealth(oe);
+    const reference = oe.auras.find((a) => a.id === GREATER_INVISIBILITY_DR_AURA_ID)!;
+    expect(reference, 'the shared break is the reference grant').toBeTruthy();
+    expect({ kind: after!.kind, value: after!.value, duration: after!.duration }).toEqual({
+      kind: reference.kind,
+      value: reference.value,
+      duration: reference.duration,
+    });
+    expect(reference.value, 'the configured cut, pinned').toBe(0.9);
+    expect(reference.duration).toBe(2);
+  });
 });
 
 describe('Thornhollow Fields: death, release, and the team wave respawn', () => {
@@ -1283,10 +1332,17 @@ describe('Thornhollow Fields: review-hardening pins', () => {
     let draws = 0;
     sim.rng.setObserver(() => draws++);
     const runner = match.teams[0][0];
-    tp(sim, runner, match.runes[0].pos.x, match.runes[0].pos.z);
-    // a power-rune claim inside the window proves the alternation draws nothing
+    const sprintRune = match.runes[0];
+    tp(sim, runner, sprintRune.pos.x, sprintRune.pos.z);
+    // a power-rune claim inside the window proves the alternation draws nothing.
+    // Derived from the layout, never a bare index: the power pads follow the
+    // speed runes in startBgMatch, so reordering that must fail here loudly.
+    expect(match.runes).toHaveLength(BG_SPEED_RUNES.length + BG_POWER_RUNES.length);
+    const powerRune = match.runes[BG_SPEED_RUNES.length];
+    expect(powerRune.type, 'the first power pad, not a sprint rune').not.toBe('sprint');
+    const faceBefore = powerRune.type;
     const powerRunner = match.teams[0][2];
-    tp(sim, powerRunner, match.runes[4].pos.x, match.runes[4].pos.z);
+    tp(sim, powerRunner, powerRune.pos.x, powerRune.pos.z);
     kill(sim, match.teams[1][1]);
     sim.releaseSpirit(match.teams[1][1]); // the wave raises released spirits only
     const timerBefore = match.timer;
@@ -1298,6 +1354,14 @@ describe('Thornhollow Fields: review-hardening pins', () => {
     expect(draws).toBe(0); // zero draws across 20s of battleground
     expect(match.timer).toBeGreaterThan(timerBefore + 10); // and the phase really ran
     expect(sim.entities.get(match.teams[1][1])!.dead).toBe(false); // released + wave-raised
+    // ...and both claims the zero-draw pin is about really happened: the two
+    // runes were taken (still spent, the 30s recharge outlasts the window) and
+    // the power pad flipped its face without asking the rng for one.
+    expect(sprintRune.active, 'the sprint rune was claimed').toBe(false);
+    expect(powerRune.active, 'the power rune was claimed').toBe(false);
+    expect(powerRune.type, 'a claimed power pad flips its face').toBe(
+      faceBefore === 'damage' ? 'defense' : 'damage',
+    );
   });
 
   it('a single deserter takes the rating loss and the recorded L; the team fights on', () => {
@@ -1440,6 +1504,84 @@ describe('Thornhollow Fields: matchmaking fairness', () => {
     expect(sim.bgMatchFor(pids[0]), 'the queue must never starve').toBeTruthy();
   });
 
+  it('ages a waiting group exactly one DT per tick, however many matches seat that tick', () => {
+    // Fifteen eligible bodies: one ten seats on this tick and five are left in
+    // line. The fairness clock is a TICK clock, so the leftovers have waited
+    // exactly one tick, not one tick per match the retry loop seated.
+    const sim = makeWorld();
+    const pids: number[] = [];
+    for (let i = 0; i < 15; i++) {
+      const pid = sim.addPlayer('warrior', `Q${i}`);
+      tp(sim, pid, 0, -40);
+      sim.entities.get(pid)!.level = BG_MIN_LEVEL;
+      pids.push(pid);
+    }
+    for (const pid of pids) sim.bgQueueJoin(pid);
+    sim.tick();
+    expect(sim.bgMatchFor(pids[0]), 'an even ten seats on the tick').toBeTruthy();
+    const left = sim.ctx.bgQueue;
+    expect(
+      left.reduce((sum, g) => sum + g.pids.length, 0),
+      'five bodies are left over',
+    ).toBe(5);
+    for (const g of left) {
+      expect(g.waited, 'one tick of waiting is exactly DT, never DT per seated match').toBe(DT);
+    }
+  });
+
+  it('reads the fairness clock off the ten being seated, not a stale unpackable group', () => {
+    // Two five-stacks 300 rating apart, plus a three-stack that no packing can
+    // seat behind them (both sides are already full when it is considered).
+    // The three-stack ages forever; its clock must not widen the band, or
+    // release the gates, for a ten it is not part of.
+    const sim = makeWorld();
+    const stack = (size: number, rating: number, tag: string): number[] => {
+      const leader = sim.addPlayer('warrior', `${tag}0`);
+      tp(sim, leader, 0, -40);
+      sim.entities.get(leader)!.level = BG_MIN_LEVEL;
+      sim.meta(leader)!.bgRating = rating;
+      const members = [leader];
+      for (let i = 1; i < size; i++) {
+        const m = sim.addPlayer('warrior', `${tag}${i}`);
+        tp(sim, m, 0, -40);
+        sim.entities.get(m)!.level = BG_MIN_LEVEL;
+        sim.meta(m)!.bgRating = rating;
+        sim.partyInvite(m, leader);
+        sim.partyAccept(m);
+        members.push(m);
+      }
+      sim.bgQueueJoin(leader); // the whole party queues as one group
+      return members;
+    };
+    const stale = stack(3, 1500, 'S');
+    const high = stack(5, 1800, 'H');
+    const low = stack(5, 1500, 'L');
+    sim.tick();
+    expect(sim.bgMatchFor(high[0]), 'a 300 gap is past the fresh band').toBeNull();
+    expect(sim.bgMatchFor(stale[0]), 'the three-stack fits neither side').toBeNull();
+    // Park the stale group's clock past every concession the gates make.
+    const staleGroup = sim.ctx.bgQueue.find((g) => g.pids.includes(stale[0]))!;
+    staleGroup.waited = BG_FAIRNESS_MAX_WAIT + 1;
+    for (let i = 0; i < 20; i++) sim.tick(); // a full second of matchmaker passes
+    expect(
+      sim.bgMatchFor(high[0]),
+      'a stale unpackable group must not release another ten from the rating band',
+    ).toBeNull();
+    expect(staleGroup.waited, 'and it is still the one doing the waiting').toBeGreaterThan(
+      BG_FAIRNESS_MAX_WAIT,
+    );
+    // The seated ten still earns its own concession on its own clock, so the
+    // queue never starves: the band widens until the 300 gap fits.
+    for (let i = 0; i < 20 * (BG_FAIRNESS_MAX_WAIT + 1) && !sim.bgMatchFor(high[0]); i++) {
+      sim.tick();
+    }
+    const match = sim.bgMatchFor(high[0])!;
+    expect(match, 'the queue must never starve').toBeTruthy();
+    for (const pid of stale) {
+      expect(sim.bgMatchFor(pid), 'the unpackable three-stack is still waiting').toBeNull();
+    }
+  });
+
   it('seats an even ten immediately, and splits the two ratings across the teams', () => {
     // FOUR high and six low, which is the packable case: two high and three low
     // on each side closes the gap exactly, so there is no reason to wait. (Five
@@ -1564,6 +1706,48 @@ describe('Thornhollow Fields: the kill and assist honor drip', () => {
     sim.tick();
     expect(sim.meta(a)!.honor).toBe(before);
     expect(match.stats.get(a)!.kills).toBe(0);
+  });
+
+  it('tallies assists in an UNRATED dev match too, while paying no honor for them', () => {
+    // The scoreboard is not currency: an unrated match counts kills, deaths and
+    // captures, so its assists column must not be the one blank row.
+    const sim = makeWorld();
+    const pids: number[] = [];
+    for (let i = 0; i < 4; i++) {
+      const pid = sim.addPlayer('warrior', `D${i}`);
+      tp(sim, pid, 0, -40);
+      sim.entities.get(pid)!.level = BG_MIN_LEVEL;
+      pids.push(pid);
+      sim.bgQueueJoin(pid);
+    }
+    devStartBg(sim.ctx);
+    const match = sim.bgMatchFor(pids[0])!;
+    expect(match.rated).toBe(false);
+    toActive(sim, match);
+    const killer = match.teams[0][0];
+    const helper = match.teams[0][1];
+    const victim = match.teams[1][0];
+    const helperBefore = sim.meta(helper)!.honor ?? 0;
+    const killerBefore = sim.meta(killer)!.honor ?? 0;
+    sim.ctx.dealDamage(
+      sim.entities.get(helper)!,
+      sim.entities.get(victim)!,
+      5,
+      false,
+      'physical',
+      null,
+      'hit',
+    );
+    kill(sim, victim, killer);
+    sim.tick();
+    expect(match.stats.get(killer)!.kills, 'kills count unrated').toBe(1);
+    expect(match.stats.get(victim)!.deaths, 'deaths count unrated').toBe(1);
+    expect(match.stats.get(helper)!.assists, 'and so do assists').toBe(1);
+    expect(match.stats.get(killer)!.assists, 'the blow is never also an assist').toBe(0);
+    // The honor half of the drip stays rated-only: a dev-forced match must
+    // never move real currency.
+    expect((sim.meta(helper)!.honor ?? 0) - helperBefore, 'no assist honor unrated').toBe(0);
+    expect((sim.meta(killer)!.honor ?? 0) - killerBefore, 'no kill honor unrated').toBe(0);
   });
 });
 

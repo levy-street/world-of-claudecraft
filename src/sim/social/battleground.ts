@@ -26,6 +26,7 @@ import {
   type BgTeam,
   keepInteriorBounds,
 } from '../battleground_layout';
+import { applyGreaterInvisibilityAftereffect } from '../combat/greater_invisibility';
 import { BG_SLOT_COUNT, battlegroundOrigin, DUNGEON_X_THRESHOLD } from '../data';
 import { createGroundObject } from '../entity';
 import {
@@ -36,7 +37,6 @@ import {
 } from '../pvp';
 import type { ArenaReturnPools } from '../sim';
 import type { SimContext } from '../sim_context';
-import { releasePlayerSpirit } from '../spirit';
 import { type Aura, DT, type Entity, type Vec3 } from '../types';
 import { eloDelta, snapshotArenaReturnPools } from './arena';
 import { formBgTeamParty, unwindBgAutoPartyFor, unwindBgTeamParties } from './battleground_party';
@@ -168,8 +168,6 @@ export interface BgMatch {
       captures: number;
       /** Killing blows this player helped land without finishing. */
       assists: number;
-      /** Blows that actually PAID honor (the DR curve can zero a repeat). */
-      honorKills: number;
     }
   >;
   ratingAvg: [number, number]; // team average rating at start, for Elo
@@ -441,29 +439,34 @@ function tickCountdown(ctx: SimContext, match: BgMatch): void {
 }
 
 function matchmakeBg(ctx: SimContext): void {
+  // Drop members who went offline, died, entered a match, or walked into
+  // instanced content while waiting; tell the survivors they fell out of
+  // line instead of silently flipping their window back to idle.
+  for (const g of ctx.bgQueue) {
+    g.pids = g.pids.filter((p) => {
+      const e = ctx.entities.get(p);
+      if (e && !e.dead && !ctx.bgMatches.has(p) && e.pos.x <= DUNGEON_X_THRESHOLD) return true;
+      if (e && !ctx.bgMatches.has(p)) {
+        ctx.emit({ type: 'bgUnqueued', pid: p });
+        ctx.emit({
+          type: 'log',
+          text: 'You leave the Thornhollow Fields queue.',
+          color: '#7fd4ff',
+          pid: p,
+        });
+      }
+      return false;
+    });
+  }
+  ctx.bgQueue = ctx.bgQueue.filter((g) => g.pids.length > 0);
+  // The fairness clock is a TICK clock: a waiting group ages exactly DT per
+  // tick, whether this tick seats nothing, one match, or fills every slot.
+  // Inside the retry loop below it aged once per seated match, so a leftover
+  // group was handed band widening (and the starvation release) it had not
+  // actually waited for.
+  for (const g of ctx.bgQueue) g.waited += DT;
   let guard = BG_SLOT_COUNT + 1;
   while (guard-- > 0) {
-    // Drop members who went offline, died, entered a match, or walked into
-    // instanced content while waiting; tell the survivors they fell out of
-    // line instead of silently flipping their window back to idle.
-    for (const g of ctx.bgQueue) {
-      g.pids = g.pids.filter((p) => {
-        const e = ctx.entities.get(p);
-        if (e && !e.dead && !ctx.bgMatches.has(p) && e.pos.x <= DUNGEON_X_THRESHOLD) return true;
-        if (e && !ctx.bgMatches.has(p)) {
-          ctx.emit({ type: 'bgUnqueued', pid: p });
-          ctx.emit({
-            type: 'log',
-            text: 'You leave the Thornhollow Fields queue.',
-            color: '#7fd4ff',
-            pid: p,
-          });
-        }
-        return false;
-      });
-    }
-    ctx.bgQueue = ctx.bgQueue.filter((g) => g.pids.length > 0);
-    for (const g of ctx.bgQueue) g.waited += DT;
     if (bgQueueSize(ctx) < BG_TEAM_SIZE * 2 || freeBgSlot(ctx) === null) return;
     const picked = pickBgTeams(ctx);
     if (!picked) return;
@@ -564,7 +567,15 @@ function pickBgTeams(ctx: SimContext): BgPacking | null {
   const score = (c: BgPacking): number => (c.premadeVsPugs ? 100_000 : 0) + c.gap;
   let best = candidates[0];
   for (const c of candidates) if (score(c) < score(best)) best = c;
-  const waited = Math.max(...ctx.bgQueue.map((g) => g.waited));
+  // The wait that buys a concession is the wait of the groups this pairing
+  // actually seats, never the whole queue's: a group nothing can pack (a
+  // three-stack behind two full premades, say) ages forever, and reading its
+  // clock here would quietly disable the premade hold and the rating band for
+  // every unrelated ten behind it. Reduced, not spread: `used` is small today
+  // but an argument-count limit that scales with the queue is not a limit
+  // worth having (the colliders.ts precedent).
+  let waited = 0;
+  for (const g of best.used) if (g.waited > waited) waited = g.waited;
   if (waited >= BG_FAIRNESS_MAX_WAIT) return best; // the queue never starves
   // Hold a premade-versus-pugs ten only briefly: long enough for a second
   // group to show up, short enough that a party never feels punished for
@@ -645,10 +656,7 @@ export function startBgMatch(
     slot,
     teams: [teamA, teamB],
     stats: new Map(
-      [...teamA, ...teamB].map((p) => [
-        p,
-        { kills: 0, deaths: 0, captures: 0, assists: 0, honorKills: 0 },
-      ]),
+      [...teamA, ...teamB].map((p) => [p, { kills: 0, deaths: 0, captures: 0, assists: 0 }]),
     ),
     scores: [0, 0],
     flags,
@@ -1093,16 +1101,25 @@ function returnFlag(
 }
 
 /** Strip every stealth-kind aura (Stealth, Prowl, vanishes, invisibility all
- *  share the kind) and refresh the live cache, mirroring Sim.breakStealth:
- *  a flag grab is a deliberate, revealing act. */
+ *  share the kind), refresh the live cache, and pay out the Greater
+ *  Invisibility aftereffect each stripped aura owes: a flag grab is a
+ *  deliberate, revealing act, and it must end a vanish on exactly the terms
+ *  Sim.breakStealth and natural aura expiry do, or grabbing the flag out of
+ *  Greater Invisibility would be the one removal path that silently eats the
+ *  damage reduction. The one deliberate difference from Sim.breakStealth is
+ *  the sweep: it drops the FIRST stealth aura, this drops them all.
+ *  Aftereffects are applied AFTER the sweep so an applyAura here can never
+ *  shift an index the removal loop is still walking. */
 function bgBreakStealth(ctx: SimContext, e: Entity): void {
+  const stripped: Aura[] = [];
   for (let i = e.auras.length - 1; i >= 0; i--) {
     if (e.auras[i].kind !== 'stealth') continue;
-    const name = e.auras[i].name;
-    e.auras.splice(i, 1);
-    ctx.emit({ type: 'aura', targetId: e.id, name, gained: false });
+    const [removed] = e.auras.splice(i, 1);
+    stripped.push(removed);
+    ctx.emit({ type: 'aura', targetId: e.id, name: removed.name, gained: false });
   }
   e.stealthed = false; // keep the cache live without waiting for updateAuras
+  for (const removed of stripped) applyGreaterInvisibilityAftereffect(ctx, e, removed);
 }
 
 function dropFlag(ctx: SimContext, match: BgMatch, flag: BgFlagState, at: Entity | null): void {
@@ -1208,50 +1225,47 @@ export function bgOnPlayerDeath(ctx: SimContext, e: Entity, killer: Entity | nul
     const killerStats = match.stats.get(credited.id);
     if (killerStats) killerStats.kills++;
   }
-  // The honor drip: the blow pays, and so does everyone who softened the target
-  // inside the assist window. Rated matches only (a dev-forced match must never
-  // move real currency), and the killer is never paid twice. Read and cleared
-  // together, so one death can only ever pay one round.
+  // Read and cleared together, so one death can only ever pay one round.
   const helpers = match.recentDamage.get(e.id);
   match.recentDamage.delete(e.id);
   match.recentSupport.delete(e.id);
-  if (match.rated) {
-    if (credited) {
-      const killerMeta = ctx.players.get(credited.id);
-      if (killerMeta) {
-        awardBattlegroundKillHonor(ctx, killerMeta, e.id, match.killHonorPairs);
-        const stats = match.stats.get(credited.id);
-        if (stats) stats.honorKills++;
+  // The honor drip: the blow pays. Rated matches only, a dev-forced match must
+  // never move real currency.
+  if (match.rated && credited) {
+    const killerMeta = ctx.players.get(credited.id);
+    if (killerMeta) awardBattlegroundKillHonor(ctx, killerMeta, e.id, match.killHonorPairs);
+  }
+  // Everyone who counts as having helped: the fighters who damaged the
+  // victim, plus the healers who kept THOSE fighters standing while they did
+  // it. Collected into one set first, so a player who both healed and hit is
+  // still credited exactly once.
+  const assisted = new Set<number>();
+  const fresh = (at: number) => match.timer - at <= BG_ASSIST_WINDOW;
+  if (helpers) {
+    for (const [pid, at] of helpers) {
+      if (!fresh(at)) continue;
+      assisted.add(pid);
+      // The healers who supported this damager inside the window.
+      const support = match.recentSupport.get(pid);
+      if (!support) continue;
+      for (const [healerPid, healedAt] of support) {
+        if (fresh(healedAt)) assisted.add(healerPid);
       }
     }
-    // Everyone who counts as having helped: the fighters who damaged the
-    // victim, plus the healers who kept THOSE fighters standing while they did
-    // it. Collected into one set first, so a player who both healed and hit is
-    // still paid exactly once.
-    const assisted = new Set<number>();
-    const fresh = (at: number) => match.timer - at <= BG_ASSIST_WINDOW;
-    if (helpers) {
-      for (const [pid, at] of helpers) {
-        if (!fresh(at)) continue;
-        assisted.add(pid);
-        // The healers who supported this damager inside the window.
-        const support = match.recentSupport.get(pid);
-        if (!support) continue;
-        for (const [healerPid, healedAt] of support) {
-          if (fresh(healedAt)) assisted.add(healerPid);
-        }
-      }
-    }
-    for (const pid of assisted) {
-      if (pid === credited?.id) continue; // the blow already paid
-      if (pid === e.id) continue; // never the victim
-      if (ctx.bgMatches.get(pid) !== match) continue; // deserted mid-fight
-      const helperMeta = ctx.players.get(pid);
-      if (!helperMeta) continue;
-      awardBattlegroundAssistHonor(ctx, helperMeta, e.id, match.assistHonorPairs);
-      const stats = match.stats.get(pid);
-      if (stats) stats.assists++;
-    }
+  }
+  for (const pid of assisted) {
+    if (pid === credited?.id) continue; // the blow already paid
+    if (pid === e.id) continue; // never the victim
+    if (ctx.bgMatches.get(pid) !== match) continue; // deserted mid-fight
+    // The scoreboard TALLY is not currency: kills, deaths and captures all
+    // count in an unrated dev match, so the assists column must not be the one
+    // blank row there. Only the HONOR below stays rated-only.
+    const stats = match.stats.get(pid);
+    if (stats) stats.assists++;
+    if (!match.rated) continue;
+    const helperMeta = ctx.players.get(pid);
+    if (!helperMeta) continue;
+    awardBattlegroundAssistHonor(ctx, helperMeta, e.id, match.assistHonorPairs);
   }
   // Kill feed: names + teams only (the client owns the localized line); an
   // uncredited death still feeds, with a null killer.
