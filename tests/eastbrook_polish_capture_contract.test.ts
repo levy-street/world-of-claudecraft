@@ -369,10 +369,12 @@ describe('Eastbrook polish capture contract', () => {
       // value changed, and no capture was retaken (the five per-asset seal
       // suites stay green untouched).
       // Re-pinned again for the rift parkour courses: renderer.ts gained the
-      // course-tick wiring (build, retire, per-frame drive), moving the same
-      // renderer-integration leaf. Same ruling: no pipeline input or geometry
-      // value changed, no capture retaken, per-asset seals untouched.
-      fingerprint: 'b2b4ea8a16406c8aec4eb9dc85bd4c480fa90ad47abe525894674d98bc3807df',
+      // course-tick wiring (build, retire, per-frame drive) and then the
+      // course fx-host pass (shared flames and fire lights), each moving the
+      // same renderer-integration leaf. Same ruling both times: no pipeline
+      // input or geometry value changed, no capture retaken, per-asset seals
+      // untouched.
+      fingerprint: '4d57138bb336e7dbcc780a73d6e2582e54ceebaa92e3622b8ff5dca18a4b3f68',
       components: {
         captureContract: {
           id: 'polish-v2',
