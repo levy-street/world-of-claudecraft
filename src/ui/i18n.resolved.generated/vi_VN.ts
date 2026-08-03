@@ -1750,7 +1750,22 @@ export const vi_VN: EnTranslations = {
       "backpack": "Ba Lô",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Ô túi trống",
-      "unequipHint": "Nhấp để tháo chiếc túi này"
+      "unequipHint": "Nhấp để tháo chiếc túi này",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotAria": "{type}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow your best {type} tool",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You are not carrying a {type} tool",
+      "toolType": {
+        "mining": "Mining",
+        "logging": "Logging",
+        "herbalism": "Herbalism",
+        "fishing": "Fishing"
+      }
     },
     "raidConvert": {
       "toPartyDone": "Raid của bạn đã chuyển trở lại thành tổ đội.",
@@ -6987,6 +7002,7 @@ export const vi_VN: EnTranslations = {
       "potion": "Thuốc",
       "elixir": "Tiên Dược",
       "bag": "Túi",
+      "toolbelt": "Toolbelt",
       "mount": "Thú Cưỡi"
     },
     "stats": {
@@ -9853,6 +9869,9 @@ export const vi_VN: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Chìa Khóa Khởi Động: Tia Kinh Hoàng, Kẻ Rung Chuyển Mặt Đất"
+      },
+      "toolbelt": {
+        "name": "Tinker's Toolbelt"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"

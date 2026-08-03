@@ -1750,7 +1750,22 @@ export const ko_KR: EnTranslations = {
       "backpack": "배낭",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "빈 가방 칸",
-      "unequipHint": "클릭하여 이 가방을 해제"
+      "unequipHint": "클릭하여 이 가방을 해제",
+      "toolbeltTitle": "공구 벨트",
+      "toolbeltNone": "착용한 공구 벨트 없음",
+      "toolbeltRemoveHint": "클릭하여 이 공구 벨트를 벗기",
+      "toolbeltFilled": "도구 {used}/{total}",
+      "toolSlotAria": "{type}: {name}",
+      "toolSlotEmpty": "비어 있음",
+      "toolSlotStowHint": "클릭하여 최고의 {type} 도구를 보관",
+      "toolSlotTakeHint": "클릭하여 이 도구를 꺼내기",
+      "toolSlotNoTool": "{type} 도구를 소지하고 있지 않습니다",
+      "toolType": {
+        "mining": "채광",
+        "logging": "벌목",
+        "herbalism": "약초학",
+        "fishing": "낚시"
+      }
     },
     "raidConvert": {
       "toPartyDone": "공격대가 파티로 다시 전환되었습니다.",
@@ -6987,6 +7002,7 @@ export const ko_KR: EnTranslations = {
       "potion": "물약",
       "elixir": "비약",
       "bag": "가방",
+      "toolbelt": "공구 벨트",
       "mount": "탈것"
     },
     "stats": {
@@ -9853,6 +9869,9 @@ export const ko_KR: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "테러스파크 시동 열쇠"
+      },
+      "toolbelt": {
+        "name": "팅커의 공구 벨트"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

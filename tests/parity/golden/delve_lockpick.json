@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 832,
-      "state": "592c188c",
+      "state": "867aaebc",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -73,6 +73,9 @@
           "recipesGrandfathered": true,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         }
@@ -143,7 +146,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 842,
-      "state": "1d773182",
+      "state": "e157c502",
       "events": "f72ea94b",
       "rng": {
         "draws": 5,
@@ -154,7 +157,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 842,
-      "state": "d630d4bd",
+      "state": "b8fde655",
       "events": "5c615462",
       "rng": {
         "draws": 5,
@@ -165,7 +168,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 842,
-      "state": "069271a1",
+      "state": "b77d4c01",
       "events": "1d05e32c",
       "rng": {
         "draws": 8,
@@ -176,7 +179,7 @@
       "tick": 38,
       "time": 1.9,
       "nextId": 844,
-      "state": "11b365e8",
+      "state": "bf1345b8",
       "events": "c3192081",
       "rng": {
         "draws": 11,
@@ -280,6 +283,9 @@
           "renown": 55,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {},
           "xp": 898
@@ -485,7 +491,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 844,
-      "state": "31467cbe",
+      "state": "0f4ed746",
       "events": "741638a5",
       "rng": {
         "draws": 11,
@@ -496,7 +502,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 844,
-      "state": "31467cbe",
+      "state": "0f4ed746",
       "events": "741638a5",
       "rng": {
         "draws": 11,
@@ -600,6 +606,9 @@
           "renown": 55,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {},
           "xp": 898

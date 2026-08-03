@@ -917,6 +917,7 @@ const ITEM_KIND_LABEL_KEYS: Record<ItemDef['kind'], TranslationKey> = {
   potion: 'itemUi.kind.potion',
   elixir: 'itemUi.kind.elixir',
   bag: 'itemUi.kind.bag',
+  toolbelt: 'itemUi.kind.toolbelt',
   mount: 'itemUi.kind.mount',
 };
 // Classic class colors (CLASSES[cls].color is a 0xRRGGBB number) as a CSS

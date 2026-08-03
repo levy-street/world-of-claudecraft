@@ -21,6 +21,7 @@ import { ITEMS } from '../data';
 import type { Rng } from '../rng';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
+import { toolSearchInventory } from '../toolbelt';
 import {
   type Entity,
   GATHER_CAST_ID,
@@ -385,7 +386,11 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
   const professionId = NODE_HARVEST_TABLE[node.type].professionId;
   // One bag scan serves both the tool gate and the cast-duration formula
   // below (pure lookup, no rng, so hoisting it cannot shift the draw order).
-  const ownedToolTier = bestOwnedGatherToolTierOrNone(meta.inventory, professionId, ITEMS);
+  const ownedToolTier = bestOwnedGatherToolTierOrNone(
+    toolSearchInventory(meta.inventory, meta.toolbelt),
+    professionId,
+    ITEMS,
+  );
   if (ownedToolTier === NO_TOOL_OWNED || !canGatherTier(ownedToolTier, node.tier)) {
     ctx.emit({
       type: 'gatherDenied',

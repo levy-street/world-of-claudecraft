@@ -31,7 +31,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 835,
-      "state": "8aaf1af9",
+      "state": "c12f0661",
       "events": "1249e2b3",
       "rng": {
         "draws": 0,
@@ -42,7 +42,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 835,
-      "state": "0736fa3c",
+      "state": "248cf03c",
       "events": "52034a5d",
       "rng": {
         "draws": 66,
@@ -53,7 +53,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 835,
-      "state": "2e823b3a",
+      "state": "a06291e2",
       "events": "f87fb1d5",
       "rng": {
         "draws": 273,
@@ -64,7 +64,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 835,
-      "state": "9601ca65",
+      "state": "ce61b95d",
       "events": "8d7bb2c5",
       "rng": {
         "draws": 527,
@@ -75,7 +75,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 835,
-      "state": "6239d23a",
+      "state": "a94e239a",
       "events": "9d34f920",
       "rng": {
         "draws": 538,
@@ -151,6 +151,9 @@
             },
             "spec": "arms"
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -220,6 +223,9 @@
             },
             "spec": "arcane"
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -286,6 +292,9 @@
               "20": "rog_r20_shadowstep"
             },
             "spec": "assassination"
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         },
@@ -355,6 +364,9 @@
               "20": "hun_r20_improved_volley"
             },
             "spec": "beast_mastery"
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         }
@@ -587,7 +599,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 835,
-      "state": "6de89760",
+      "state": "0699e690",
       "events": "44f037c9",
       "rng": {
         "draws": 538,
@@ -663,6 +675,9 @@
             },
             "spec": "arms"
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -732,6 +747,9 @@
             },
             "spec": "arcane"
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -798,6 +816,9 @@
               "20": "rog_r20_shadowstep"
             },
             "spec": "assassination"
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         },
@@ -867,6 +888,9 @@
               "20": "hun_r20_improved_volley"
             },
             "spec": "beast_mastery"
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         }
@@ -1097,7 +1121,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 835,
-      "state": "94c43593",
+      "state": "031e3f83",
       "events": "ccdc9400",
       "rng": {
         "draws": 538,
@@ -1176,6 +1200,9 @@
             },
             "spec": "arms"
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -1245,6 +1272,9 @@
             },
             "spec": "arcane"
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -1312,6 +1342,9 @@
               "20": "rog_r20_shadowstep"
             },
             "spec": "assassination"
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         },
@@ -1381,6 +1414,9 @@
               "20": "hun_r20_improved_volley"
             },
             "spec": "beast_mastery"
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         }
@@ -1611,7 +1647,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 835,
-      "state": "b7d63b29",
+      "state": "36bea031",
       "events": "741638a5",
       "rng": {
         "draws": 780,
@@ -1622,7 +1658,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 835,
-      "state": "7d554b82",
+      "state": "b2a68372",
       "events": "741638a5",
       "rng": {
         "draws": 959,
@@ -1701,6 +1737,9 @@
             },
             "spec": "arms"
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -1770,6 +1809,9 @@
             },
             "spec": "arcane"
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -1837,6 +1879,9 @@
               "20": "rog_r20_shadowstep"
             },
             "spec": "assassination"
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         },
@@ -1906,6 +1951,9 @@
               "20": "hun_r20_improved_volley"
             },
             "spec": "beast_mastery"
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         }

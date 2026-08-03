@@ -62,6 +62,7 @@ import {
 import { type HarvestYield, recordHarvestYield } from './professions/harvest_yields';
 import { bestOwnedAnyGatherToolTier, canHarvestMonsterMaterial } from './professions/tools';
 import type { SimContext } from './sim_context';
+import { toolSearchInventory } from './toolbelt';
 import {
   cloneItemInstancePayload,
   dist2d,
@@ -416,7 +417,10 @@ export function harvestCorpse(
   // (content/professions.ts MONSTER_MATERIAL_TIERS, the prime directive), so
   // in shipped content this gate never fires: it is the seam future
   // higher-tier corpse families compose with.
-  const bestAny = bestOwnedAnyGatherToolTier(meta.inventory, ITEMS);
+  const bestAny = bestOwnedAnyGatherToolTier(
+    toolSearchInventory(meta.inventory, meta.toolbelt),
+    ITEMS,
+  );
   let toolDeniedEmitted = false;
   // #2457: the yield ledger the single harvestResult event below carries. Every
   // grant in this function passes { silent: true, callerLogs: true } from here

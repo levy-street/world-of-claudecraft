@@ -1750,7 +1750,22 @@ export const cs_CZ: EnTranslations = {
       "backpack": "Batoh",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Prázdný slot batohu",
-      "unequipHint": "Klikni pro odebrání tohoto batohu"
+      "unequipHint": "Klikni pro odebrání tohoto batohu",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotAria": "{type}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow your best {type} tool",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You are not carrying a {type} tool",
+      "toolType": {
+        "mining": "Mining",
+        "logging": "Logging",
+        "herbalism": "Herbalism",
+        "fishing": "Fishing"
+      }
     },
     "raidConvert": {
       "toPartyDone": "Tvůj raid byl převeden zpět na skupinu.",
@@ -6987,6 +7002,7 @@ export const cs_CZ: EnTranslations = {
       "potion": "Lektvar",
       "elixir": "Elixír",
       "bag": "Batoh",
+      "toolbelt": "Toolbelt",
       "mount": "Jízdní zvíře"
     },
     "stats": {
@@ -9853,6 +9869,9 @@ export const cs_CZ: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Klíček zapalování: Hrůzojiskra, otřásač země"
+      },
+      "toolbelt": {
+        "name": "Tinker's Toolbelt"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"

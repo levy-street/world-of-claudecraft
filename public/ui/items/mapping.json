@@ -1960,6 +1960,14 @@
       "confidence": "medium"
     },
     {
+      "itemId": "toolbelt",
+      "name": "Tinker's Toolbelt",
+      "sourcePack": "woc_original_svg",
+      "sourceFile": "authored in-repo (SVG, encoded to 128px WebP with sharp)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art, project asset, rights reserved"
+    },
+    {
       "itemId": "tough_jerky",
       "name": "Tough Jerky",
       "sourcePack": "cooking",

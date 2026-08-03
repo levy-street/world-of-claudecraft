@@ -1750,7 +1750,22 @@ export const it_IT: EnTranslations = {
       "backpack": "Zaino",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Alloggiamento borsa vuoto",
-      "unequipHint": "Clicca per rimuovere questa borsa"
+      "unequipHint": "Clicca per rimuovere questa borsa",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotAria": "{type}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow your best {type} tool",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You are not carrying a {type} tool",
+      "toolType": {
+        "mining": "Mining",
+        "logging": "Logging",
+        "herbalism": "Herbalism",
+        "fishing": "Fishing"
+      }
     },
     "raidConvert": {
       "toPartyDone": "La tua incursione è tornata a essere un gruppo.",
@@ -6987,6 +7002,7 @@ export const it_IT: EnTranslations = {
       "potion": "Pozione",
       "elixir": "Elisir",
       "bag": "Borsa",
+      "toolbelt": "Toolbelt",
       "mount": "Cavalcatura"
     },
     "stats": {
@@ -9853,6 +9869,9 @@ export const it_IT: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Chiave d’accensione: Terrorscintilla, Scuoteterra"
+      },
+      "toolbelt": {
+        "name": "Tinker's Toolbelt"
       },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"

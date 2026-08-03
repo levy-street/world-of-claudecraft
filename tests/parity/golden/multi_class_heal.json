@@ -34,7 +34,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 840,
-      "state": "cdc13ff9",
+      "state": "7bd83019",
       "events": "b48b3114",
       "rng": {
         "draws": 6,
@@ -95,6 +95,9 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -149,6 +152,9 @@
           "recipesGrandfathered": true,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         },
@@ -205,6 +211,9 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -260,6 +269,9 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -311,6 +323,9 @@
           "recipesGrandfathered": true,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         }
@@ -827,7 +842,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 840,
-      "state": "f5577b64",
+      "state": "bd0f496c",
       "events": "38c34ba3",
       "rng": {
         "draws": 6,
@@ -888,6 +903,9 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -942,6 +960,9 @@
           "recipesGrandfathered": true,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         },
@@ -1003,6 +1024,9 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -1058,6 +1082,9 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -1109,6 +1136,9 @@
           "recipesGrandfathered": true,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         }
@@ -1643,7 +1673,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 840,
-      "state": "69b3077f",
+      "state": "f3cecb3f",
       "events": "341408e9",
       "rng": {
         "draws": 10,
@@ -1654,7 +1684,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 840,
-      "state": "cc5028b8",
+      "state": "5cfb9168",
       "events": "341408e9",
       "rng": {
         "draws": 10,
@@ -1715,6 +1745,9 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -1769,6 +1802,9 @@
           "recipesGrandfathered": true,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         },
@@ -1830,6 +1866,9 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -1885,6 +1924,9 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -1936,6 +1978,9 @@
           "recipesGrandfathered": true,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         }

@@ -530,6 +530,7 @@ const mergeStringsEn = {
       potion: 'Potion',
       elixir: 'Elixir',
       bag: 'Bag',
+      toolbelt: 'Toolbelt',
       mount: 'Mount',
     },
     tooltip: {

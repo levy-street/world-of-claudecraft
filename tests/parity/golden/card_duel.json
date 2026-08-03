@@ -29,7 +29,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 833,
-      "state": "fed55ce3",
+      "state": "1c2a3d23",
       "events": "314eab99",
       "rng": {
         "draws": 38,
@@ -40,7 +40,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 833,
-      "state": "8d9c219c",
+      "state": "9d75697c",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -51,7 +51,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 833,
-      "state": "d4105742",
+      "state": "f6ae5372",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -62,7 +62,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 833,
-      "state": "b9351c7f",
+      "state": "cb4598ff",
       "events": "46745eda",
       "rng": {
         "draws": 38,
@@ -73,7 +73,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 833,
-      "state": "598ce78c",
+      "state": "22e566d4",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -84,7 +84,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 833,
-      "state": "dad444a1",
+      "state": "ff4e20e9",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -95,7 +95,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 833,
-      "state": "51336f85",
+      "state": "9903375d",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -106,7 +106,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 833,
-      "state": "b8cce0f8",
+      "state": "cc5feb70",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -117,7 +117,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 833,
-      "state": "ca6ae0d5",
+      "state": "fc23c16d",
       "events": "741638a5",
       "rng": {
         "draws": 44,
@@ -178,6 +178,9 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -235,6 +238,9 @@
           "recipesGrandfathered": true,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         }

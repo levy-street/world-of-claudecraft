@@ -1750,7 +1750,22 @@ export const ja_JP: EnTranslations = {
       "backpack": "バックパック",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "空のバッグスロット",
-      "unequipHint": "クリックしてこのバッグを外す"
+      "unequipHint": "クリックしてこのバッグを外す",
+      "toolbeltTitle": "ツールベルト",
+      "toolbeltNone": "ツールベルトを装備していません",
+      "toolbeltRemoveHint": "クリックしてこのツールベルトを外す",
+      "toolbeltFilled": "道具 {used}/{total}",
+      "toolSlotAria": "{type}: {name}",
+      "toolSlotEmpty": "空",
+      "toolSlotStowHint": "クリックして最高の{type}道具をしまう",
+      "toolSlotTakeHint": "クリックしてこの道具を取り出す",
+      "toolSlotNoTool": "{type}の道具を持っていません",
+      "toolType": {
+        "mining": "採掘",
+        "logging": "伐採",
+        "herbalism": "薬草学",
+        "fishing": "釣り"
+      }
     },
     "raidConvert": {
       "toPartyDone": "レイドがパーティに戻りました。",
@@ -6987,6 +7002,7 @@ export const ja_JP: EnTranslations = {
       "potion": "ポーション",
       "elixir": "エリクサー",
       "bag": "バッグ",
+      "toolbelt": "ツールベルト",
       "mount": "マウント"
     },
     "stats": {
@@ -9853,6 +9869,9 @@ export const ja_JP: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "テラースパークの始動キー"
+      },
+      "toolbelt": {
+        "name": "ティンカーのツールベルト"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

@@ -24,6 +24,7 @@ import { onFishCaughtForDeeds } from '../deeds';
 import { PLAYER_SWIM_DEPTH } from '../pathfind';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
+import { toolSearchInventory } from '../toolbelt';
 import { DT, type Entity, FISHING_CAST_ID, FISHING_SESSION_CAP_SEC, isConsuming } from '../types';
 import { groundHeight, waterLevelAt } from '../world';
 import { queueGatheringGrant } from './gathering';
@@ -167,7 +168,7 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
   // gate) and BEFORE the water check and the one bite-delay draw, so a
   // denial is rng-free and starts nothing. Text-free denial (the
   // gatherDenied idiom): the client composes its own localized copy.
-  if (!hasFishingImplement(meta.inventory, ITEMS)) {
+  if (!hasFishingImplement(toolSearchInventory(meta.inventory, meta.toolbelt), ITEMS)) {
     ctx.emit({
       type: 'gatherDenied',
       pid: meta.entityId,
@@ -198,7 +199,11 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
   // rod pulling the max down only. Stored in TICKS on hidden Entity state
   // (ceil, the lockpick deadline precedent), NEVER on castTotal/castRemaining:
   // those broadcast in dynamicFields and must carry no bite information.
-  const rodTier = bestOwnedGatherToolTier(meta.inventory, 'fishing', ITEMS);
+  const rodTier = bestOwnedGatherToolTier(
+    toolSearchInventory(meta.inventory, meta.toolbelt),
+    'fishing',
+    ITEMS,
+  );
   const effMax = Math.max(
     FISH_BITE_DELAY_MIN_SEC,
     FISH_BITE_DELAY_MAX_SEC - FISH_BITE_DELAY_ROD_REDUCTION_SEC * (rodTier - 1),
@@ -231,7 +236,11 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
   // band-capped catch. All of this is pure
   // state resolved before the single rng draw below, so the one-draw-per-catch
   // contract and every existing seed's catch sequence are untouched.
-  const rodTier = bestOwnedGatherToolTier(meta.inventory, 'fishing', ITEMS);
+  const rodTier = bestOwnedGatherToolTier(
+    toolSearchInventory(meta.inventory, meta.toolbelt),
+    'fishing',
+    ITEMS,
+  );
   let allowedBand: 0 | 1 | 2 = 0;
   if (canGatherTier(rodTier, 2)) allowedBand = 1;
   if (canGatherTier(rodTier, 3)) allowedBand = 2;

@@ -3316,6 +3316,7 @@ const ALL_DELTA_KEYS = [
   'atitle',
   'bags',
   'bank',
+  'belt',
   'buyback',
   'cardDuel',
   'cds',
@@ -3390,6 +3391,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   atitle: 'activeTitle',
   bags: 'bags',
   bank: 'bankInfo',
+  belt: 'toolbelt',
   blk: 'blockChance',
   buyback: 'vendorBuyback',
   bval: 'blockValue',
@@ -4148,9 +4150,9 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 62 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(62);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(62);
+  it('ALL_DELTA_KEYS contains exactly 63 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(63);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(63);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -4171,8 +4173,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect(scraped.has('dfb')).toBe(true); // incl. the multi-line maybeRaw('dfb', ...) form
     // The base-merge union: v0.31's 56 (incl. the market-collect key mktU) plus
     // the Rift + mounts and worn-instance keys (einst, mntRtd and the rift
-    // snapshot fragments) for 61, then v0.32's master-loot key mloot for 62.
-    expect(scraped.size).toBe(62);
+    // snapshot fragments) for 61, then v0.32's master-loot key mloot for 62,
+    // then the tool-only container's key belt for 63.
+    expect(scraped.size).toBe(63);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

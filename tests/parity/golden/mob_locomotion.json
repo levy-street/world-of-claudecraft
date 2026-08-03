@@ -32,7 +32,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 834,
-      "state": "5fff13ff",
+      "state": "0dd7374f",
       "events": "be88e77f",
       "rng": {
         "draws": 5,
@@ -92,6 +92,9 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -148,6 +151,9 @@
           "recipesGrandfathered": true,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         }
@@ -318,7 +324,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 835,
-      "state": "d6af3386",
+      "state": "dd12325e",
       "events": "550a95fd",
       "rng": {
         "draws": 10,
@@ -378,6 +384,9 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -434,6 +443,9 @@
           "recipesGrandfathered": true,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         }
@@ -668,7 +680,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 836,
-      "state": "2268df1b",
+      "state": "bc67182b",
       "events": "f855ed61",
       "rng": {
         "draws": 15,
@@ -728,6 +740,9 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -784,6 +799,9 @@
           "recipesGrandfathered": true,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         }
@@ -1074,7 +1092,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 837,
-      "state": "5b008857",
+      "state": "959d6c97",
       "events": "741638a5",
       "rng": {
         "draws": 17,
@@ -1134,6 +1152,9 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -1190,6 +1211,9 @@
           "recipesGrandfathered": true,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         }
@@ -1528,7 +1552,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 838,
-      "state": "822860b4",
+      "state": "e692ca3c",
       "events": "741638a5",
       "rng": {
         "draws": 18,
@@ -1588,6 +1612,9 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -1644,6 +1671,9 @@
           "recipesGrandfathered": true,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         }
@@ -2025,7 +2055,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 839,
-      "state": "9adfb372",
+      "state": "e6a77df2",
       "events": "109778dc",
       "rng": {
         "draws": 18,
@@ -2085,6 +2115,9 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -2141,6 +2174,9 @@
           "recipesGrandfathered": true,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         }
@@ -2567,7 +2603,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 839,
-      "state": "7817f9cd",
+      "state": "2526528d",
       "events": "741638a5",
       "rng": {
         "draws": 18,
@@ -2627,6 +2663,9 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -2683,6 +2722,9 @@
           "recipesGrandfathered": true,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         }
@@ -3110,7 +3152,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 839,
-      "state": "7817f9cd",
+      "state": "2526528d",
       "events": "741638a5",
       "rng": {
         "draws": 18,
@@ -3170,6 +3212,9 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         },
         {
@@ -3226,6 +3271,9 @@
           "recipesGrandfathered": true,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         }

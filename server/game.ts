@@ -63,6 +63,7 @@ import {
   parseTalentRowLevel,
 } from '../src/sim/talent_allocation_input';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
+import { isToolSlotId } from '../src/sim/toolbelt';
 import {
   type Aura,
   DT,
@@ -4592,6 +4593,22 @@ export class GameServer {
           sim.unequipBag(msg.socket, pid);
         }
         break;
+      case 'equip_toolbelt':
+        if (typeof msg.item === 'string') sim.equipToolbelt(msg.item, pid);
+        break;
+      case 'unequip_toolbelt':
+        sim.unequipToolbelt(pid);
+        break;
+      case 'store_tool':
+        if (typeof msg.item === 'string') sim.storeToolInBelt(msg.item, pid);
+        break;
+      case 'take_tool':
+        // The belt slot is a closed vocabulary (one per gathering profession),
+        // so validate membership rather than trusting the string.
+        if (typeof msg.slot === 'string' && isToolSlotId(msg.slot)) {
+          sim.takeToolFromBelt(msg.slot, pid);
+        }
+        break;
       case 'change_skin':
         if (typeof msg.skin === 'number') {
           if (msg.catalog === 'mech') {
@@ -6340,6 +6357,7 @@ export class GameServer {
       session.lastWireRev = meta.wireRev;
       maybe('inv', meta.inventory);
       maybe('bags', meta.bags);
+      maybe('belt', meta.toolbelt);
       maybe('buyback', meta.vendorBuyback);
       maybe('equip', meta.equipment);
       maybe('einst', meta.equipmentInstance);

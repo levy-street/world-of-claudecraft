@@ -1750,7 +1750,22 @@ export const sv_SE: EnTranslations = {
       "backpack": "Ryggsäck",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Tom väskplats",
-      "unequipHint": "Klicka för att ta bort den här väskan"
+      "unequipHint": "Klicka för att ta bort den här väskan",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotAria": "{type}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow your best {type} tool",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You are not carrying a {type} tool",
+      "toolType": {
+        "mining": "Mining",
+        "logging": "Logging",
+        "herbalism": "Herbalism",
+        "fishing": "Fishing"
+      }
     },
     "raidConvert": {
       "toPartyDone": "Din raid har omvandlats tillbaka till en grupp.",
@@ -6987,6 +7002,7 @@ export const sv_SE: EnTranslations = {
       "potion": "Trolldryck",
       "elixir": "Elixir",
       "bag": "Väska",
+      "toolbelt": "Toolbelt",
       "mount": "Riddjur"
     },
     "stats": {
@@ -9853,6 +9869,9 @@ export const sv_SE: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Tändningsnyckel: Skräckgnista, markskakaren"
+      },
+      "toolbelt": {
+        "name": "Tinker's Toolbelt"
       },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"

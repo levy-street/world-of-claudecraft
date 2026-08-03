@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 832,
-      "state": "2ecb744c",
+      "state": "ebf936fc",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -75,6 +75,9 @@
           "recipesGrandfathered": true,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         }
@@ -149,7 +152,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 833,
-      "state": "e554a9ba",
+      "state": "9024af6a",
       "events": "12742299",
       "rng": {
         "draws": 7,
@@ -160,7 +163,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 833,
-      "state": "77455b98",
+      "state": "5e8eb050",
       "events": "741638a5",
       "rng": {
         "draws": 7,
@@ -171,7 +174,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 833,
-      "state": "03c463bc",
+      "state": "12001acc",
       "events": "ae8514d0",
       "rng": {
         "draws": 166,
@@ -182,7 +185,7 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 833,
-      "state": "8f32e5ee",
+      "state": "0ec53bd6",
       "events": "120f766c",
       "rng": {
         "draws": 253,
@@ -266,6 +269,9 @@
           "renown": 20,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         }
@@ -409,7 +415,7 @@
       "tick": 76,
       "time": 3.8,
       "nextId": 833,
-      "state": "e6ce3c56",
+      "state": "57221fce",
       "events": "7bf80ff7",
       "rng": {
         "draws": 300,
@@ -497,6 +503,9 @@
           "renown": 25,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         }

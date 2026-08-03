@@ -1750,7 +1750,22 @@ export const tr_TR: EnTranslations = {
       "backpack": "Sırt Çantası",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Boş çanta yuvası",
-      "unequipHint": "Bu çantayı çıkarmak için tıkla"
+      "unequipHint": "Bu çantayı çıkarmak için tıkla",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotAria": "{type}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow your best {type} tool",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You are not carrying a {type} tool",
+      "toolType": {
+        "mining": "Mining",
+        "logging": "Logging",
+        "herbalism": "Herbalism",
+        "fishing": "Fishing"
+      }
     },
     "raidConvert": {
       "toPartyDone": "Akının yeniden gruba dönüştü.",
@@ -6987,6 +7002,7 @@ export const tr_TR: EnTranslations = {
       "potion": "Şifa İksiri",
       "elixir": "İksir",
       "bag": "Çanta",
+      "toolbelt": "Toolbelt",
       "mount": "Binek"
     },
     "stats": {
@@ -9853,6 +9869,9 @@ export const tr_TR: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Kontak Anahtarı: Dehşetkıvılcım, Yer Sarsan"
+      },
+      "toolbelt": {
+        "name": "Tinker's Toolbelt"
       },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"

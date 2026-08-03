@@ -1750,7 +1750,22 @@ export const id_ID: EnTranslations = {
       "backpack": "Ransel",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Slot tas kosong",
-      "unequipHint": "Klik untuk melepas tas ini"
+      "unequipHint": "Klik untuk melepas tas ini",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotAria": "{type}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow your best {type} tool",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You are not carrying a {type} tool",
+      "toolType": {
+        "mining": "Mining",
+        "logging": "Logging",
+        "herbalism": "Herbalism",
+        "fishing": "Fishing"
+      }
     },
     "raidConvert": {
       "toPartyDone": "Raid Anda telah diubah kembali menjadi rombongan.",
@@ -6987,6 +7002,7 @@ export const id_ID: EnTranslations = {
       "potion": "Ramuan",
       "elixir": "Eliksir",
       "bag": "Tas",
+      "toolbelt": "Toolbelt",
       "mount": "Tunggangan"
     },
     "stats": {
@@ -9853,6 +9869,9 @@ export const id_ID: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Kunci Kontak: Percik Teror, Pengguncang Bumi"
+      },
+      "toolbelt": {
+        "name": "Tinker's Toolbelt"
       },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"

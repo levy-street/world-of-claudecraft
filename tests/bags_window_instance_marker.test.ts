@@ -9,6 +9,7 @@
 // nothing. Every treatment composes with the count badge, the markup is static
 // (no hover, no graphics-tier gate), and the stylesheet contract is pinned
 // separately below.
+import { emptyToolbelt } from '../src/sim/toolbelt';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -23,6 +24,7 @@ function fakeWorld(inventory: InvSlot[]): IWorld {
     inventory,
     bags: [null, null, null, null],
     bagCapacity: 16,
+    toolbelt: emptyToolbelt(),
     copper: 0,
   } as unknown as IWorld;
 }

@@ -31,7 +31,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 836,
-      "state": "55d9c7ea",
+      "state": "0ae78042",
       "events": "96c09176",
       "rng": {
         "draws": 5,
@@ -96,6 +96,9 @@
           "recipesGrandfathered": true,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {},
           "xp": 84
@@ -400,7 +403,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 837,
-      "state": "1ea6c959",
+      "state": "c40acf01",
       "events": "5606375a",
       "rng": {
         "draws": 8,
@@ -472,6 +475,9 @@
           "renown": 10,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {},
           "xp": 198
@@ -835,7 +841,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 837,
-      "state": "fdadaf91",
+      "state": "42287229",
       "events": "df41c51a",
       "rng": {
         "draws": 9,
@@ -908,6 +914,9 @@
           "renown": 10,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {},
           "xp": 198
@@ -1272,7 +1281,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 839,
-      "state": "3adeffe2",
+      "state": "f6e99dba",
       "events": "d1158f8c",
       "rng": {
         "draws": 15,
@@ -1345,6 +1354,9 @@
           "renown": 10,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {},
           "xp": 282
@@ -1752,7 +1764,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 840,
-      "state": "eee86e6c",
+      "state": "401107dc",
       "events": "b47327cb",
       "rng": {
         "draws": 20,
@@ -1829,6 +1841,9 @@
           "renown": 15,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {},
           "xp": 366
@@ -2297,7 +2312,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 840,
-      "state": "eee86e6c",
+      "state": "401107dc",
       "events": "741638a5",
       "rng": {
         "draws": 20,
@@ -2374,6 +2389,9 @@
           "renown": 15,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {},
           "xp": 366

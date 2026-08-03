@@ -1750,7 +1750,22 @@ export const es: EnTranslations = {
       "backpack": "Mochila",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Espacio de bolsa vacío",
-      "unequipHint": "Haz clic para quitar esta bolsa"
+      "unequipHint": "Haz clic para quitar esta bolsa",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotAria": "{type}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow your best {type} tool",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You are not carrying a {type} tool",
+      "toolType": {
+        "mining": "Mining",
+        "logging": "Logging",
+        "herbalism": "Herbalism",
+        "fishing": "Fishing"
+      }
     },
     "raidConvert": {
       "toPartyDone": "Tu banda ha vuelto a convertirse en grupo.",
@@ -6987,6 +7002,7 @@ export const es: EnTranslations = {
       "potion": "Poción",
       "elixir": "Elixir",
       "bag": "Bolsa",
+      "toolbelt": "Toolbelt",
       "mount": "Montura"
     },
     "stats": {
@@ -9853,6 +9869,9 @@ export const es: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Llave de encendido: Aterrachispa, Sacudetierras"
+      },
+      "toolbelt": {
+        "name": "Tinker's Toolbelt"
       },
       "conjured_water4": {
         "name": "Agua de Manantial Conjurada"

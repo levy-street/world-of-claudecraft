@@ -331,8 +331,11 @@ describe('Eastbrook authored gameplay data integration', () => {
       'weaver_ottilie',
       'tinker_gizzel',
     ]);
+    // Re-minted when Trader Wilkes gained the toolbelt in his vendor stock: he is
+    // the Provisioner who already stocks every bag and every gathering tool, so
+    // the tool-only container belongs on the same shelf.
     expect(createHash('sha256').update(JSON.stringify(stableTownNpcPayload())).digest('hex')).toBe(
-      '92c37779f6a29982ec3541169d995fc4365c9696a9b7a0e2fd32713094073db1',
+      'f34298b41c41015f0ca96bae046809f377f89f272c981d612c7bce1729844bab',
     );
     expect(ZONE1_TOWN_NPC_IDS).toHaveLength(15);
     for (const id of ZONE1_TOWN_NPC_IDS) {

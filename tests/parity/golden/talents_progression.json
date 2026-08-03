@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 832,
-      "state": "2ecb744c",
+      "state": "ebf936fc",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -75,6 +75,9 @@
           "recipesGrandfathered": true,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         }
@@ -149,7 +152,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 832,
-      "state": "5cbb819c",
+      "state": "3c091cac",
       "events": "17f152da",
       "rng": {
         "draws": 0,
@@ -213,6 +216,9 @@
             },
             "spec": "arms"
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         }
       ],
@@ -286,7 +292,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 832,
-      "state": "38869e91",
+      "state": "aeb44851",
       "events": "956e03f5",
       "rng": {
         "draws": 0,
@@ -347,6 +353,9 @@
             "rows": {},
             "spec": "arms"
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         }
       ],
@@ -420,7 +429,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 832,
-      "state": "ab3fe16c",
+      "state": "986fd59c",
       "events": "2f73a377",
       "rng": {
         "draws": 0,
@@ -498,6 +507,9 @@
             },
             "spec": "arms"
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         }
       ],
@@ -571,7 +583,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 832,
-      "state": "6b35ff57",
+      "state": "16b6746f",
       "events": "97613885",
       "rng": {
         "draws": 0,
@@ -649,6 +661,9 @@
             },
             "spec": "arms"
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         }
       ],
@@ -722,7 +737,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 832,
-      "state": "e7ec14c9",
+      "state": "ca83d359",
       "events": "676f5f4c",
       "rng": {
         "draws": 0,
@@ -800,6 +815,9 @@
             },
             "spec": "fury"
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {}
         }
       ],
@@ -873,7 +891,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 832,
-      "state": "e7ec14c9",
+      "state": "ca83d359",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -950,6 +968,9 @@
               "8": "war_row_die_by_the_sword"
             },
             "spec": "fury"
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         }

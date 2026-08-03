@@ -1750,7 +1750,22 @@ export const en_XA: EnTranslations = {
       "backpack": "[Ɓáçķþáçķ]",
       "bagSocketAria": "[{name}: {slots}]",
       "socketEmpty": "[Éɱþţý ƀáĝ šļóţ]",
-      "unequipHint": "[Çļíçķ ţó ŕéɱóʋé ţĥíš ƀáĝ]"
+      "unequipHint": "[Çļíçķ ţó ŕéɱóʋé ţĥíš ƀáĝ]",
+      "toolbeltTitle": "[Ţóóļƀéļţ]",
+      "toolbeltNone": "[Ñó ţóóļƀéļţ ŵóŕñ]",
+      "toolbeltRemoveHint": "[Çļíçķ ţó ŕéɱóʋé ţĥíš ţóóļƀéļţ]",
+      "toolbeltFilled": "[{used}/{total} ţóóļš]",
+      "toolSlotAria": "[{type}: {name}]",
+      "toolSlotEmpty": "[Éɱþţý]",
+      "toolSlotStowHint": "[Çļíçķ ţó šţóŵ ýóúŕ ƀéšţ {type} ţóóļ]",
+      "toolSlotTakeHint": "[Çļíçķ ţó ţáķé ţĥíš ţóóļ ƀáçķ]",
+      "toolSlotNoTool": "[Ýóú áŕé ñóţ çáŕŕýíñĝ á {type} ţóóļ]",
+      "toolType": {
+        "mining": "[Ɱíñíñĝ]",
+        "logging": "[Ļóĝĝíñĝ]",
+        "herbalism": "[Ĥéŕƀáļíšɱ]",
+        "fishing": "[Ƒíšĥíñĝ]"
+      }
     },
     "raidConvert": {
       "toPartyDone": "[Ýóúŕ ŕáíð ĥáš çóñʋéŕţéð ƀáçķ ţó á þáŕţý.]",
@@ -6987,6 +7002,7 @@ export const en_XA: EnTranslations = {
       "potion": "[Þóţíóñ]",
       "elixir": "[Éļíẋíŕ]",
       "bag": "[Ɓáĝ]",
+      "toolbelt": "[Ţóóļƀéļţ]",
       "mount": "[Ɱóúñţ]"
     },
     "stats": {
@@ -9853,6 +9869,9 @@ export const en_XA: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "[Íĝñíţíóñ Ķéý: Ţéŕŕóŕšþáŕķ Ĝŕóúñðšĥáķéŕ]"
+      },
+      "toolbelt": {
+        "name": "[Ţíñķéŕ'š Ţóóļƀéļţ]"
       },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"

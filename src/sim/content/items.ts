@@ -511,6 +511,19 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     bagSlots: 14,
     sellValue: 9000,
   },
+  // The Toolbelt is deliberately NOT kind 'bag': it grants no pooled slots and
+  // cannot go in a bag socket. It is the fifth, tool-only container, with one
+  // typed slot per gathering profession (src/sim/toolbelt.ts). Priced on the
+  // bag ladder's 4x buy/sell ratio, between the pouch and the knapsack: it
+  // frees four backpack slots without adding any.
+  toolbelt: {
+    id: 'toolbelt',
+    name: "Tinker's Toolbelt",
+    kind: 'toolbelt',
+    quality: 'uncommon',
+    sellValue: 375,
+    buyValue: 1500,
+  },
   // --- food & drink (vendor) ---
   baked_bread: {
     id: 'baked_bread',

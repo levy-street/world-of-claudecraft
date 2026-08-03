@@ -1750,7 +1750,22 @@ export const da_DK: EnTranslations = {
       "backpack": "Rygsæk",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Tom taskeplads",
-      "unequipHint": "Klik for at fjerne denne taske"
+      "unequipHint": "Klik for at fjerne denne taske",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotAria": "{type}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow your best {type} tool",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You are not carrying a {type} tool",
+      "toolType": {
+        "mining": "Mining",
+        "logging": "Logging",
+        "herbalism": "Herbalism",
+        "fishing": "Fishing"
+      }
     },
     "raidConvert": {
       "toPartyDone": "Dit raid er konverteret tilbage til en gruppe.",
@@ -6987,6 +7002,7 @@ export const da_DK: EnTranslations = {
       "potion": "Eliksir",
       "elixir": "Eliksir",
       "bag": "Taske",
+      "toolbelt": "Toolbelt",
       "mount": "Ridedyr"
     },
     "stats": {
@@ -9853,6 +9869,9 @@ export const da_DK: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Tændingsnøgle: Skrækgnist, jordrysteren"
+      },
+      "toolbelt": {
+        "name": "Tinker's Toolbelt"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"

@@ -40,6 +40,7 @@ import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import { abilityScalingPower, channelTickBonus } from '../spell_scaling';
 import { hasEscapeStealth } from '../threat';
+import { toolSearchInventory } from '../toolbelt';
 import type { AbilityDef, AbilityEffect, Entity, Vec3 } from '../types';
 import {
   angleTo,
@@ -305,7 +306,11 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       // so the widened window follows the rod actually held at the bite.
       ctx.emit({ type: 'fishingBite', pid: p.id });
       p.fishBiteAtTick = 0;
-      const rodTier = bestOwnedGatherToolTier(meta.inventory, 'fishing', ITEMS);
+      const rodTier = bestOwnedGatherToolTier(
+        toolSearchInventory(meta.inventory, meta.toolbelt),
+        'fishing',
+        ITEMS,
+      );
       const windowSec = FISH_REEL_WINDOW_SEC + FISH_REEL_WINDOW_ROD_BONUS_SEC * (rodTier - 1);
       p.fishReelDeadlineTick = ctx.tickCount + Math.ceil(windowSec / DT);
     } else if (p.fishReelDeadlineTick > 0 && ctx.tickCount > p.fishReelDeadlineTick) {

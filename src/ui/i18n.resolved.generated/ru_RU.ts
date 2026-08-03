@@ -1750,7 +1750,22 @@ export const ru_RU: EnTranslations = {
       "backpack": "Рюкзак",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Пустая ячейка для сумки",
-      "unequipHint": "Нажмите, чтобы снять эту сумку"
+      "unequipHint": "Нажмите, чтобы снять эту сумку",
+      "toolbeltTitle": "Пояс с инструментами",
+      "toolbeltNone": "Пояс с инструментами не надет",
+      "toolbeltRemoveHint": "Нажмите, чтобы снять этот пояс",
+      "toolbeltFilled": "Инструментов: {used}/{total}",
+      "toolSlotAria": "{type}: {name}",
+      "toolSlotEmpty": "Пусто",
+      "toolSlotStowHint": "Нажмите, чтобы убрать лучший инструмент ({type})",
+      "toolSlotTakeHint": "Нажмите, чтобы забрать инструмент",
+      "toolSlotNoTool": "У вас нет инструмента ({type})",
+      "toolType": {
+        "mining": "Горное дело",
+        "logging": "Лесозаготовка",
+        "herbalism": "Травничество",
+        "fishing": "Рыбная ловля"
+      }
     },
     "raidConvert": {
       "toPartyDone": "Ваш рейд снова преобразован в группу.",
@@ -6987,6 +7002,7 @@ export const ru_RU: EnTranslations = {
       "potion": "Зелье",
       "elixir": "Эликсир",
       "bag": "Сумка",
+      "toolbelt": "Пояс с инструментами",
       "mount": "Транспорт"
     },
     "stats": {
@@ -9853,6 +9869,9 @@ export const ru_RU: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Ключ зажигания Страхоискра"
+      },
+      "toolbelt": {
+        "name": "Пояс механика"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"

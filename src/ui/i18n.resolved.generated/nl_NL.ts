@@ -1750,7 +1750,22 @@ export const nl_NL: EnTranslations = {
       "backpack": "Rugzak",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Leeg tasvak",
-      "unequipHint": "Klik om deze tas af te doen"
+      "unequipHint": "Klik om deze tas af te doen",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotAria": "{type}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow your best {type} tool",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You are not carrying a {type} tool",
+      "toolType": {
+        "mining": "Mining",
+        "logging": "Logging",
+        "herbalism": "Herbalism",
+        "fishing": "Fishing"
+      }
     },
     "raidConvert": {
       "toPartyDone": "Je raid is terug omgezet naar een groep.",
@@ -6987,6 +7002,7 @@ export const nl_NL: EnTranslations = {
       "potion": "Toverdrank",
       "elixir": "Elixer",
       "bag": "Tas",
+      "toolbelt": "Toolbelt",
       "mount": "Rijdier"
     },
     "stats": {
@@ -9853,6 +9869,9 @@ export const nl_NL: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Contactsleutel: Schrikvonk, de Grondschudder"
+      },
+      "toolbelt": {
+        "name": "Tinker's Toolbelt"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"

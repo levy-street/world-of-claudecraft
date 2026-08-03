@@ -71,6 +71,7 @@ export type BagAction =
   | 'petFeedBlocked'
   | 'discardQuest'
   | 'equipBag'
+  | 'equipToolbelt'
   | 'use';
 
 /** The tooltip hint sub-line i18n key for a bag item (or '' for no hint). */
@@ -126,6 +127,8 @@ export function bagItemAction(
   if (mode.petFeed) return item.kind === 'food' ? 'petFeed' : 'petFeedBlocked';
   if (item.kind === 'quest') return 'discardQuest';
   if (item.kind === 'bag') return 'equipBag';
+  // The tool-only container wears like a bag, into its own dedicated socket.
+  if (item.kind === 'toolbelt') return 'equipToolbelt';
   // A collected reins item falls through to 'use' like any other usable item:
   // clicking it summons that mount (sim useItem -> summonMountItem). There is no
   // picker to open any more.
@@ -360,5 +363,37 @@ export function buildBagBar(
     })),
     used,
     capacity,
+  };
+}
+
+/** One typed slot of the toolbelt bar: the tool type it accepts, the tool
+ *  currently belted there (null when empty), and the best carried candidate a
+ *  one-click fill would stow into it (null when the player carries none). */
+export interface ToolSlotModel {
+  slotId: string;
+  itemId: string | null;
+  fillCandidateId: string | null;
+}
+
+/** The toolbelt-bar model: whether a belt is worn at all, plus one entry per
+ *  tool type in the game. Pure data; the painter renders it. */
+export interface ToolbeltBarModel {
+  equipped: string | null;
+  slots: ToolSlotModel[];
+}
+
+export function buildToolbeltBar(
+  equipped: string | null,
+  slotIds: readonly string[],
+  beltedIn: (slotId: string) => string | null,
+  fillCandidateFor: (slotId: string) => string | null,
+): ToolbeltBarModel {
+  return {
+    equipped,
+    slots: slotIds.map((slotId) => ({
+      slotId,
+      itemId: beltedIn(slotId),
+      fillCandidateId: fillCandidateFor(slotId),
+    })),
   };
 }

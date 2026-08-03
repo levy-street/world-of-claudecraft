@@ -1750,7 +1750,22 @@ export const pl_PL: EnTranslations = {
       "backpack": "Plecak",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Puste gniazdo na torbę",
-      "unequipHint": "Kliknij, aby zdjąć tę torbę"
+      "unequipHint": "Kliknij, aby zdjąć tę torbę",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotAria": "{type}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow your best {type} tool",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You are not carrying a {type} tool",
+      "toolType": {
+        "mining": "Mining",
+        "logging": "Logging",
+        "herbalism": "Herbalism",
+        "fishing": "Fishing"
+      }
     },
     "raidConvert": {
       "toPartyDone": "Twój rajd został z powrotem przekształcony w drużynę.",
@@ -6987,6 +7002,7 @@ export const pl_PL: EnTranslations = {
       "potion": "Mikstura",
       "elixir": "Eliksir",
       "bag": "Torba",
+      "toolbelt": "Toolbelt",
       "mount": "Wierzchowiec"
     },
     "stats": {
@@ -9853,6 +9869,9 @@ export const pl_PL: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Kluczyk zapłonu: Groziskra, Wstrząsacz Ziemi"
+      },
+      "toolbelt": {
+        "name": "Tinker's Toolbelt"
       },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"

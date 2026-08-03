@@ -21,7 +21,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 832,
-      "state": "2ecb744c",
+      "state": "ebf936fc",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -79,6 +79,9 @@
           "recipesGrandfathered": true,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         }
@@ -153,7 +156,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 832,
-      "state": "6c38d545",
+      "state": "bf2aa08d",
       "events": "4af47171",
       "rng": {
         "draws": 2,
@@ -254,6 +257,9 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {},
           "xp": 21
         }
@@ -329,7 +335,7 @@
       "tick": 104,
       "time": 5.2,
       "nextId": 832,
-      "state": "bcf69e55",
+      "state": "f2e040e5",
       "events": "fb67ed28",
       "rng": {
         "draws": 4,
@@ -447,6 +453,9 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {},
           "xp": 42
         }
@@ -522,7 +531,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 832,
-      "state": "5855120d",
+      "state": "b340c705",
       "events": "1ba5e715",
       "rng": {
         "draws": 18,
@@ -533,7 +542,7 @@
       "tick": 1000,
       "time": 50,
       "nextId": 832,
-      "state": "f32a3cfd",
+      "state": "a177215d",
       "events": "0c0f7bb9",
       "rng": {
         "draws": 38,
@@ -544,7 +553,7 @@
       "tick": 1500,
       "time": 75,
       "nextId": 832,
-      "state": "ff18e15f",
+      "state": "e8339627",
       "events": "0df46ace",
       "rng": {
         "draws": 58,
@@ -555,7 +564,7 @@
       "tick": 2000,
       "time": 100,
       "nextId": 832,
-      "state": "e16f1a29",
+      "state": "6f388ac1",
       "events": "0d003f88",
       "rng": {
         "draws": 78,
@@ -566,7 +575,7 @@
       "tick": 2500,
       "time": 125,
       "nextId": 832,
-      "state": "ea02f1b6",
+      "state": "15ee1fde",
       "events": "06f2d110",
       "rng": {
         "draws": 96,
@@ -577,7 +586,7 @@
       "tick": 3000,
       "time": 150,
       "nextId": 832,
-      "state": "be7483fe",
+      "state": "2449f11e",
       "events": "64428e55",
       "rng": {
         "draws": 116,
@@ -588,7 +597,7 @@
       "tick": 3500,
       "time": 175,
       "nextId": 832,
-      "state": "b6d7d71f",
+      "state": "7994ae8f",
       "events": "d339b869",
       "rng": {
         "draws": 136,
@@ -599,7 +608,7 @@
       "tick": 4000,
       "time": 200,
       "nextId": 832,
-      "state": "796e3df4",
+      "state": "f4b4c564",
       "events": "15c574a1",
       "rng": {
         "draws": 156,
@@ -610,7 +619,7 @@
       "tick": 4500,
       "time": 225,
       "nextId": 832,
-      "state": "504f2f72",
+      "state": "c22d0a3a",
       "events": "15c574a1",
       "rng": {
         "draws": 176,
@@ -621,7 +630,7 @@
       "tick": 5000,
       "time": 250,
       "nextId": 832,
-      "state": "7c3e0b7f",
+      "state": "63f98ac7",
       "events": "b6af8804",
       "rng": {
         "draws": 194,
@@ -632,7 +641,7 @@
       "tick": 5206,
       "time": 260.3,
       "nextId": 832,
-      "state": "b494803b",
+      "state": "eecb20eb",
       "events": "e8a5bc9d",
       "rng": {
         "draws": 204,
@@ -772,6 +781,9 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {
+            "slots": {}
+          },
           "townFocus": {},
           "xp": 722
         }
@@ -847,7 +859,7 @@
       "tick": 5208,
       "time": 260.4,
       "nextId": 832,
-      "state": "4e24088e",
+      "state": "211926ce",
       "events": "741638a5",
       "rng": {
         "draws": 204,
@@ -986,6 +998,9 @@
           "renown": 40,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {},
           "xp": 722

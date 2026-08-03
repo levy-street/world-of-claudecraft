@@ -1750,7 +1750,22 @@ export const zh_CN: EnTranslations = {
       "backpack": "背包",
       "bagSocketAria": "{name}：{slots}",
       "socketEmpty": "空背包栏位",
-      "unequipHint": "点击移除此背包"
+      "unequipHint": "点击移除此背包",
+      "toolbeltTitle": "工具腰带",
+      "toolbeltNone": "未佩戴工具腰带",
+      "toolbeltRemoveHint": "点击卸下此工具腰带",
+      "toolbeltFilled": "{used}/{total} 件工具",
+      "toolSlotAria": "{type}: {name}",
+      "toolSlotEmpty": "空",
+      "toolSlotStowHint": "点击收纳你最好的{type}工具",
+      "toolSlotTakeHint": "点击取回此工具",
+      "toolSlotNoTool": "你没有携带{type}工具",
+      "toolType": {
+        "mining": "采矿",
+        "logging": "伐木",
+        "herbalism": "草药学",
+        "fishing": "钓鱼"
+      }
     },
     "raidConvert": {
       "toPartyDone": "你的团队已转换回队伍。",
@@ -6987,6 +7002,7 @@ export const zh_CN: EnTranslations = {
       "potion": "药水",
       "elixir": "药剂",
       "bag": "背包",
+      "toolbelt": "工具腰带",
       "mount": "坐骑"
     },
     "stats": {
@@ -9853,6 +9869,9 @@ export const zh_CN: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "惊雷撼地者点火钥匙"
+      },
+      "toolbelt": {
+        "name": "修补匠的工具腰带"
       },
       "conjured_water4": {
         "name": "魔法泉水"

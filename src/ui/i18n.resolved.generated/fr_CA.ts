@@ -1750,7 +1750,22 @@ export const fr_CA: EnTranslations = {
       "backpack": "Sac à dos",
       "bagSocketAria": "{name} : {slots}",
       "socketEmpty": "Emplacement de sac vide",
-      "unequipHint": "Cliquez pour retirer ce sac"
+      "unequipHint": "Cliquez pour retirer ce sac",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotAria": "{type}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow your best {type} tool",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You are not carrying a {type} tool",
+      "toolType": {
+        "mining": "Mining",
+        "logging": "Logging",
+        "herbalism": "Herbalism",
+        "fishing": "Fishing"
+      }
     },
     "raidConvert": {
       "toPartyDone": "Votre raid a été reconverti en groupe.",
@@ -6987,6 +7002,7 @@ export const fr_CA: EnTranslations = {
       "potion": "Potion",
       "elixir": "Élixir",
       "bag": "Sac",
+      "toolbelt": "Toolbelt",
       "mount": "Monture"
     },
     "stats": {
@@ -9853,6 +9869,9 @@ export const fr_CA: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Clé de contact : Terrétincelle, l’Ébranleur de sol"
+      },
+      "toolbelt": {
+        "name": "Tinker's Toolbelt"
       },
       "conjured_water4": {
         "name": "Eau de source conjurée"

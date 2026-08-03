@@ -1750,7 +1750,22 @@ export const de_DE: EnTranslations = {
       "backpack": "Rucksack",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Leerer Taschenplatz",
-      "unequipHint": "Klicke, um diese Tasche abzulegen"
+      "unequipHint": "Klicke, um diese Tasche abzulegen",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotAria": "{type}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow your best {type} tool",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You are not carrying a {type} tool",
+      "toolType": {
+        "mining": "Mining",
+        "logging": "Logging",
+        "herbalism": "Herbalism",
+        "fishing": "Fishing"
+      }
     },
     "raidConvert": {
       "toPartyDone": "Euer Schlachtzug wurde wieder in eine Gruppe umgewandelt.",
@@ -6987,6 +7002,7 @@ export const de_DE: EnTranslations = {
       "potion": "Trank",
       "elixir": "Elixier",
       "bag": "Tasche",
+      "toolbelt": "Toolbelt",
       "mount": "Reittier"
     },
     "stats": {
@@ -9853,6 +9869,9 @@ export const de_DE: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Zündschlüssel: Schreckfunke, der Bodenerschütterer"
+      },
+      "toolbelt": {
+        "name": "Tinker's Toolbelt"
       },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"

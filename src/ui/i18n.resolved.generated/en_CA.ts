@@ -1750,7 +1750,22 @@ export const en_CA: EnTranslations = {
       "backpack": "Backpack",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Empty bag slot",
-      "unequipHint": "Click to remove this bag"
+      "unequipHint": "Click to remove this bag",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotAria": "{type}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow your best {type} tool",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You are not carrying a {type} tool",
+      "toolType": {
+        "mining": "Mining",
+        "logging": "Logging",
+        "herbalism": "Herbalism",
+        "fishing": "Fishing"
+      }
     },
     "raidConvert": {
       "toPartyDone": "Your raid has converted back to a party.",
@@ -6987,6 +7002,7 @@ export const en_CA: EnTranslations = {
       "potion": "Potion",
       "elixir": "Elixir",
       "bag": "Bag",
+      "toolbelt": "Toolbelt",
       "mount": "Mount"
     },
     "stats": {
@@ -9853,6 +9869,9 @@ export const en_CA: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Ignition Key: Terrorspark Groundshaker"
+      },
+      "toolbelt": {
+        "name": "Tinker's Toolbelt"
       },
       "conjured_water4": {
         "name": "Conjured Springwater"

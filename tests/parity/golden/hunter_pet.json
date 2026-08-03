@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 832,
-      "state": "2fd09f92",
+      "state": "aed76e32",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -76,6 +76,9 @@
           "recipesGrandfathered": true,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         }
@@ -138,7 +141,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 835,
-      "state": "6e2622ae",
+      "state": "d3981116",
       "events": "d162c268",
       "rng": {
         "draws": 10,
@@ -149,7 +152,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 835,
-      "state": "ba3a149f",
+      "state": "e0f80967",
       "events": "741638a5",
       "rng": {
         "draws": 10,
@@ -160,7 +163,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 835,
-      "state": "b843e3a1",
+      "state": "f07b7e01",
       "events": "83b3e55a",
       "rng": {
         "draws": 176,
@@ -171,7 +174,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 835,
-      "state": "c38a0d9c",
+      "state": "45b828ac",
       "events": "741638a5",
       "rng": {
         "draws": 328,
@@ -182,7 +185,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 835,
-      "state": "9ae72679",
+      "state": "7ab640e9",
       "events": "0e71fee6",
       "rng": {
         "draws": 524,
@@ -193,7 +196,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 835,
-      "state": "d1e895ec",
+      "state": "93a4ba1c",
       "events": "741638a5",
       "rng": {
         "draws": 716,
@@ -204,7 +207,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 835,
-      "state": "d1e895ec",
+      "state": "93a4ba1c",
       "events": "741638a5",
       "rng": {
         "draws": 716,
@@ -289,6 +292,9 @@
           "renown": 20,
           "talents": {
             "rows": {}
+          },
+          "toolbelt": {
+            "slots": {}
           },
           "townFocus": {}
         }

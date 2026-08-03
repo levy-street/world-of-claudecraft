@@ -1750,7 +1750,22 @@ export const pt_BR: EnTranslations = {
       "backpack": "Mochila",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Espaço de bolsa vazio",
-      "unequipHint": "Clique para remover esta bolsa"
+      "unequipHint": "Clique para remover esta bolsa",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotAria": "{type}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow your best {type} tool",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You are not carrying a {type} tool",
+      "toolType": {
+        "mining": "Mining",
+        "logging": "Logging",
+        "herbalism": "Herbalism",
+        "fishing": "Fishing"
+      }
     },
     "raidConvert": {
       "toPartyDone": "Sua raide foi convertida de volta em um grupo.",
@@ -6987,6 +7002,7 @@ export const pt_BR: EnTranslations = {
       "potion": "Poção",
       "elixir": "Elixir",
       "bag": "Bolsa",
+      "toolbelt": "Toolbelt",
       "mount": "Montaria"
     },
     "stats": {
@@ -9853,6 +9869,9 @@ export const pt_BR: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Chave de ignição: Faíscaterror, Abala-Terra"
+      },
+      "toolbelt": {
+        "name": "Tinker's Toolbelt"
       },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"

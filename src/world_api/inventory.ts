@@ -1,4 +1,5 @@
 import type { PlayerEquipmentInstances } from '../sim/entity';
+import type { ToolbeltState, ToolSlotId } from '../sim/toolbelt';
 import type { EquipSlot, InvSlot, ItemInstancePayload } from '../sim/types';
 
 export interface IWorldInventory {
@@ -8,6 +9,10 @@ export interface IWorldInventory {
   // Total pooled slot budget: the implicit 16-slot backpack plus every
   // equipped bag's bagSlots (see src/sim/bags.ts). Used slots is inventory.length.
   bagCapacity: number;
+  // The tool-only container: one typed slot per gathering profession, holding
+  // tools that have left the pooled inventory. It grants NO pooled slots, so it
+  // never moves bagCapacity (see src/sim/toolbelt.ts).
+  toolbelt: ToolbeltState;
   vendorBuyback: InvSlot[];
   equipment: Partial<Record<EquipSlot, string>>;
   equipmentInstances: PlayerEquipmentInstances;
@@ -27,6 +32,16 @@ export interface IWorldInventory {
   equipBag(itemId: string, socket?: number): void;
   /** Return the bag in `socket` to the inventory (refused when items would not fit). */
   unequipBag(socket: number): void;
+  /** Wear a toolbelt (kind 'toolbelt'); wearing a second one swaps in place. */
+  equipToolbelt(itemId: string): void;
+  /** Take the belt off. Its stored tools come back with it, so the belt and its
+   *  contents must all fit or the whole thing is refused. */
+  unequipToolbelt(): void;
+  /** Move a carried tool into its typed belt slot. The slot is decided by the
+   *  tool, never by the player, so this takes no slot argument. */
+  storeToolInBelt(itemId: string): void;
+  /** Move the tool in one belt slot back to the inventory. */
+  takeToolFromBelt(slotId: ToolSlotId): void;
   useItem(itemId: string): void;
   discardItem(itemId: string, count?: number): void;
   // `bulk` requests as many units as the buyer can currently afford in one

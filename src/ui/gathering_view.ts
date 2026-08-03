@@ -20,6 +20,7 @@ import { GATHERING_PROFESSION_IDS, type GatheringProfessionId } from '../sim/con
 import { GATHER_NODES, ITEMS } from '../sim/data';
 import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
 import { bestOwnedGatherToolTierOrNone, canGatherTier } from '../sim/professions/tools';
+import { toolSearchInventory } from '../sim/toolbelt';
 import type { GatherNodeDef } from '../sim/types';
 import type { IWorld } from '../world_api';
 import type { TranslationKey } from './i18n.catalog';
@@ -36,11 +37,19 @@ export function classifyGatherNode(world: IWorld, nodeId: string): GatherNodeSta
 
 /** The viewer's best owned gatherTool tier for one gathering profession
  *  (Professions 2.0), resolved from the same IWorld bags read the
- *  bags window renders (IWorldInventory#inventory). 0 means no matching tool
- *  owned at all (#2343: bare hands never gather, so there is no floor here
- *  and every node, tier 1 included, reads locked without its tool). */
+ *  bags window renders (IWorldInventory#inventory), PLUS the toolbelt, through
+ *  the one combined view the sim's own gate reads (toolSearchInventory): a
+ *  belted tool gathers exactly like a carried one, so the lock overlay must
+ *  agree with the sim or the minimap lies about a node the player can work.
+ *  0 means no matching tool owned at all (#2343: bare hands never gather, so
+ *  there is no floor here and every node, tier 1 included, reads locked
+ *  without its tool). */
 export function viewerOwnedToolTier(world: IWorld, professionId: GatheringProfessionId): number {
-  return bestOwnedGatherToolTierOrNone(world.inventory, professionId, ITEMS);
+  return bestOwnedGatherToolTierOrNone(
+    toolSearchInventory(world.inventory, world.toolbelt),
+    professionId,
+    ITEMS,
+  );
 }
 
 /** Whether a node of this tier is tool-locked for the viewer: a SEPARATE
