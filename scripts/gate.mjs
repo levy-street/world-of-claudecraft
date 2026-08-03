@@ -109,6 +109,8 @@ const releaseTier = branch.startsWith('release/');
 const baseEnv = releaseTier ? { ...process.env, I18N_RELEASE_TIER: '1' } : { ...process.env };
 
 // Shared step list (Phase 2 generate-once + Phase 8 turbo cacheable pure steps).
+// The bot build rides inside buildFullGateSteps (scripts/lib/gate_steps.mjs), so
+// the packet's R7 step stays in every consumer of the shared list.
 const steps = buildFullGateSteps(workers);
 
 if (releaseTier) {

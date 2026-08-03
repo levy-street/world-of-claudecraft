@@ -142,6 +142,16 @@ describe('classifyDiff', () => {
     );
     expect(target?.capture.toString()).toContain('knownRecipes: []');
   });
+
+  it('maps a deed catalog copy change to the Book of Deeds target (#2767)', () => {
+    const plan = classifyDiff(['src/sim/content/deeds.ts']);
+    expect(plan.isVisual).toBe(true);
+    expect(plan.specific.map((t: { key: string }) => t.key)).toContain('vale-cup-skill-deed-copy');
+    const target = plan.specific.find(
+      (candidate: { key: string }) => candidate.key === 'vale-cup-skill-deed-copy',
+    );
+    expect(target?.variants).toEqual([{ key: 'desktop' }, { key: 'mobile', mobile: true }]);
+  });
 });
 
 describe('diffChangedPaths', () => {

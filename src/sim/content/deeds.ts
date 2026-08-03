@@ -1439,7 +1439,7 @@ export const DEEDS: Record<string, DeedDef> = {
   pvp_vcup_first_save: {
     id: 'pvp_vcup_first_save',
     name: 'Safe Hands',
-    desc: 'Make a save as keeper in a rated Vale Cup match.',
+    desc: 'Make a save as keeper in a rated Vale Cup match, in the 3v3 bracket or larger. Only a shot moving fast enough to test your grip counts: a soft catch does not.',
     category: 'pvp',
     renown: 5,
     trigger: { kind: 'manual' },
@@ -1447,7 +1447,7 @@ export const DEEDS: Record<string, DeedDef> = {
   pvp_vcup_clean_sheet: {
     id: 'pvp_vcup_clean_sheet',
     name: 'Nothing Gets Past Me',
-    desc: 'Win a rated Vale Cup match as keeper without conceding a goal.',
+    desc: 'Win a rated Vale Cup match as keeper without conceding a goal, in the 3v3 bracket or larger.',
     category: 'pvp',
     renown: 25,
     trigger: { kind: 'manual' },

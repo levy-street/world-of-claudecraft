@@ -10954,4 +10954,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.heatingUp': 'Разогрев',
   'hudChrome.auraOverlay.procs.arcaneCharge': 'Чародейские заряды',
   'hudChrome.auraOverlay.procs.aetherRush': 'Эфирный натиск',
+  'itemUi.vendor.buyStack': 'Купить {count}',
+  'itemUi.vendor.buyStackAria': 'Купить {count} {item} за {price}',
 };

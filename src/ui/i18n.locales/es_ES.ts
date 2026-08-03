@@ -360,4 +360,9 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'hud.errors.marketListBound': 'Este objeto está vinculado y no puede ponerse a la venta.',
   'hudChrome.mailbox.result.noMailBound':
     'Este objeto está vinculado y no puede enviarse por correo.',
+  // Guild rename moderation prompts (v0.34.0 release i18n fill)
+  'hud.prompts.guildInviteCancelled':
+    'Se ha anulado una invitación de hermandad pendiente porque la hermandad ha cambiado de nombre.',
+  'hud.prompts.guildRenamed':
+    'Tu hermandad ha sido renombrada a {name} por el equipo de moderación.',
 };

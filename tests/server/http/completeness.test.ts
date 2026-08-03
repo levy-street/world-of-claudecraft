@@ -573,10 +573,12 @@ describe('registry completeness: oauth + internal surfaces (server/oauth.ts, ser
   it('derives the expected non-empty ladders', () => {
     expect(oauthPostLadder.length).toBe(5);
     expect(oauthGetLadder.length).toBe(2);
-    // 19 = the handleInternalApi twelve (restart-countdown + the 11 Discord-bot
+    // 21 = the handleInternalApi twelve (restart-countdown + the 11 Discord-bot
     // routes, flaired-ids included) plus the seven-route payout and moderation ops
-    // family below.
-    expect(internalLadder.length).toBe(19);
+    // family below, plus the two registry-only rows (POST
+    // /internal/discord/flex-batch and GET /internal/discord/outbox), which have
+    // no legacy ladder arm by design and so are the internal rows with no twin.
+    expect(internalLadder.length).toBe(21);
     expect(opsFamilyRows.length).toBe(7);
   });
 

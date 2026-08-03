@@ -10818,4 +10818,11 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.riftTracker.closesIn': 'Zavře se za {time}',
   'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
   'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
+  'hud.prompts.guildInviteCancelled':
+    'Čekající pozvánka do cechu byla zrušena, protože byl cech přejmenován.',
+  'hud.prompts.guildRenamed': 'Tvůj cech byl moderátorským týmem přejmenován na {name}.',
+  'hud.core.chatChannels.moveHint':
+    'Přeuspořádat kartu {channel}: přetáhněte ji, nebo použijte Alt+vlevo a Alt+vpravo',
+  'itemUi.vendor.buyStack': 'Koupit {count}',
+  'itemUi.vendor.buyStackAria': 'Koupit {count} {item} za {price}',
 };

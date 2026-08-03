@@ -58,7 +58,7 @@ the Elastic IP.
 ```bash
 ssh ubuntu@<elastic-ip>
 echo 'play.example.com {
-	@ops path /livez /readyz /metrics
+	@ops path /livez /readyz /metrics /internal/*
 	respond @ops 404
 	route /wiki* {
 		reverse_proxy localhost:8080
@@ -124,9 +124,12 @@ sudo docker run --rm --memory 2g --memory-swap 2g -v /opt/eastbrook:/src:ro -w /
 #    on the live box prefer the containerized form above.)
 
 # 4. Optional: warn the players. POST /internal/restart-countdown broadcasts an
-#    in-game countdown. The secret header is the ONLY gate: nothing restricts the
-#    endpoint to loopback (the edge hides /livez /readyz /metrics but not
-#    /internal/*), so treat RESTART_COUNTDOWN_SECRET as a real production secret.
+#    in-game countdown. The secret header is the gate: nothing restricts the
+#    endpoint to loopback. The public edge now answers 404 for /internal/* as well
+#    as for /livez, /readyz, and /metrics, but that is defense in depth and not the
+#    gate, so treat RESTART_COUNTDOWN_SECRET as a real production secret. The curl
+#    below targets 127.0.0.1:8787 on the host and never traverses Caddy, so the
+#    edge 404 does not affect it.
 #    With the secret unset the endpoint answers 404 and there is nothing to warn
 #    with. The countdown runs 10 minutes; wait for it to elapse before step 5.
 curl -fsS -X POST -H "x-woc-deploy-secret: <RESTART_COUNTDOWN_SECRET>" \
@@ -371,10 +374,44 @@ For off-box safety, sync the directory to S3 occasionally:
   (anything else gets an opaque 401). Configure the token on **both** the server
   and the Prometheus scrape job in the same change or scraping goes dark, and point
   the scrape job at `127.0.0.1:8787/metrics` on the host: the public edge answers
-  404 for all three ops paths (`/livez`, `/readyz`, `/metrics`) once the Caddy
-  block below is in place. `/livez` and `/readyz` need no token, but they are for
-  the container healthcheck and the host watchdog, which read them locally and
-  never through Caddy; nothing on the public internet needs them.
+  404 for the ops paths (`/livez`, `/readyz`, `/metrics`) and for the whole
+  internal API (`/internal/*`) once the Caddy block below is in place. `/livez`
+  and `/readyz` need no token, but they are for the container healthcheck and the
+  host watchdog, which read them locally and never through Caddy; nothing on the
+  public internet needs them.
+- **Discord bot series (Grafana)**: the bot reports its rate-limit governor
+  counters on the presence push it already sends, so `/metrics` carries them with
+  no extra scrape target and no bot-side endpoint. Cumulative counters
+  (`rate()` and `increase()` apply; the server accumulates across bot restarts, so
+  rendered totals never go backwards): `woc_discord_bot_requests_total`,
+  `woc_discord_bot_rate_limited_total` (labeled `scope` over `user`, `global`,
+  `shared`, `unknown`), `woc_discord_bot_global_pauses_total`,
+  `woc_discord_bot_ban_pauses_total`, `woc_discord_bot_breaker_opens_total`,
+  `woc_discord_bot_forbidden_blocks_total`, `woc_discord_bot_breaker_blocks_total`,
+  `woc_discord_bot_queue_full_blocks_total` (requests refused because a bucket
+  queue was at its cap: a saturated backlog shedding load during an incident).
+  Live gauges: `woc_discord_bot_queue_depth`, `woc_discord_bot_tracked_buckets`,
+  `woc_discord_bot_tracked_routes`, `woc_discord_bot_active_queues`,
+  `woc_discord_bot_forbidden_entries`, and `woc_discord_bot_breaker_state`
+  (labeled `state` over `closed`, `open`, `half-open`; 1 on the active state,
+  all three 0 when nothing is reporting a state: never pushed, stale, or the
+  last push carried an unrecognized state value). The two
+  signals worth alerting on at 2am: **breaker opens** (any increase of
+  `woc_discord_bot_breaker_opens_total` means the bot tripped its own circuit
+  breaker; any open at all is worth an alert) and the **429 rate**
+  (`sum(rate(woc_discord_bot_rate_limited_total[5m]))`; after the stability
+  packet, normal is near zero, so a sustained climb is the next storm forming).
+  The five live gauges and the breaker state read zero five minutes after the
+  bot stops pushing (the same staleness rule the presence snapshot uses) while
+  the cumulative counters hold their totals. `woc_discord_bot_push_age_seconds`
+  (time since the last bot push) is neither: it keeps GROWING through
+  staleness, with two caveats to read it by. It renders 0 in a server process
+  that has never received a push, so a game-server restart while the bot is
+  down reads momentarily fresh (the all-zero counters beside it are the tell),
+  and the presence push is event-driven (a debounce over presence and voice
+  events), so a growing age can be a genuinely quiet guild as well as a dead
+  bot. Liveness belongs to the bot container's own healthcheck; the push age
+  says how old the numbers are, not whether the bot is alive.
 - **Game watchdog (wedge recovery)**: `deploy/game_watchdog.sh`, installed as
   `/usr/local/bin/eastbrook-watchdog` and fired every minute from
   `/etc/cron.d/eastbrook-watchdog`. Docker's `restart: unless-stopped` only acts when
@@ -417,24 +454,43 @@ For off-box safety, sync the directory to S3 occasionally:
   whose compose file carries the healthcheck, so install it alongside that deploy,
   not before it.
   **The Caddy ops block needs the same by-hand treatment**: `deploy/user-data.sh`
-  writes the 404 block for `/livez`, `/readyz`, and `/metrics` at first boot only, so
-  a host provisioned before it existed still proxies all three to the public
-  internet, and `/livez` can now answer 503, which tells anyone polling it exactly
-  when the world loop is down. Add the matcher pair inside EACH public site block of
-  `/etc/caddy/Caddyfile` (alongside the existing `reverse_proxy`; `respond` runs
-  before `reverse_proxy`, so nothing else in the block needs to move):
+  writes the 404 block at first boot only, so a host provisioned before it existed
+  still proxies `/livez`, `/readyz`, and `/metrics` to the public internet, and
+  `/livez` can now answer 503, which tells anyone polling it exactly when the world
+  loop is down. A host provisioned before THIS revision also still proxies the entire
+  `/internal/*` surface (the restart countdown and the whole Discord bot API) to the
+  public internet: an operator who copies the older three-path snippet leaves
+  `/internal/*` public, which is exactly what the matcher below fixes. Look at each
+  public site block of `/etc/caddy/Caddyfile` and pick the case that matches:
+
+  If the block ALREADY has an `@ops path ...` matcher (any host provisioned by
+  `deploy/user-data.sh` since the watchdog era), add ` /internal/*` to the end of that
+  existing line and leave its `handle @ops { respond 404 }` block alone.
+
+  If the block has no `@ops` matcher yet, add the pair below. The bare form works when
+  the block proxies with a bare `reverse_proxy` (the shape in section 4 above), because
+  `respond` runs before a bare `reverse_proxy` and nothing else needs to move:
 
   ```
-  @ops path /livez /readyz /metrics
+  @ops path /livez /readyz /metrics /internal/*
   respond @ops 404
   ```
 
-  Then validate and reload, and confirm from outside:
+  But if the block proxies through a `handle { reverse_proxy ... }` wrapper (the shape
+  `deploy/user-data.sh` writes), a bare `respond` never runs: `handle` precedes
+  `respond` in Caddy's directive order and the catch-all handle terminates the request
+  first. There, wrap it, `handle @ops { respond 404 }` with the same matcher line, and
+  place it ABOVE the catch-all handle (the first matching handle wins).
+
+  Then validate and reload, and confirm from outside (both an ops path and an
+  internal one; a 200 here means the matcher was added in a form the block ignores,
+  see above):
 
   ```bash
   sudo caddy validate --config /etc/caddy/Caddyfile
   sudo systemctl reload caddy
   curl -s -o /dev/null -w '%{http_code}\n' https://<your-domain>/livez  # expect 404
+  curl -s -o /dev/null -w '%{http_code}\n' https://<your-domain>/internal/discord/outbox  # expect 404
   ```
 
   The healthcheck and the watchdog are unaffected: both read the container's own
@@ -517,10 +573,243 @@ For off-box safety, sync the directory to S3 occasionally:
   also performs the largest fold it will ever do (the whole backlog, budget-
   capped per night), so the deploy-time catch-up guidance above applies with
   extra weight.
+- **`/api/discord` status cache** (game service). The account-scoped part of the
+  `GET /api/discord` payload is served from a per-account in-memory cache; every
+  in-process write (link, unlink, grants, swag claims, password set, guild-member
+  and pushed-meta updates) evicts the affected account immediately, so the TTL only
+  bounds staleness for writes a PEER realm process made. Honest cost accounting: a
+  cache hit removes the four PAYLOAD queries; the request still pays its auth reads
+  (bearer-token resolve plus moderation status) like every authenticated endpoint,
+  so the incident's per-request database cost drops by the payload share, not to
+  zero. Brownout behavior changed with the cache: a warm account now answers 200
+  with the last good payload while the PAYLOAD queries are failing but the auth
+  reads still resolve (each such read still attempts a refresh first, and
+  cached_read warns once per failure streak in the game log); a cold account
+  still errors, and a total database outage still fails every request at auth,
+  before the cache is ever consulted. Two keys, both following the "empty,
+  non-numeric, or non-positive means the DEFAULT" contract:
+  - `DISCORD_STATUS_CACHE_TTL_MS=` (empty) means the default 15000 (15 seconds).
+    Raising it saves little (a cache hit is already free of payload queries) and
+    widens the cross-process staleness window; lowering it toward 0 is not possible
+    (a non-positive value reads as the default, never as caching off).
+  - `DISCORD_STATUS_CACHE_MAX_ENTRIES=` (empty) means the default 2000 accounts
+    (double the 1,000-concurrent-player design envelope; a few hundred bytes per
+    entry, unserved columns are kept out of the cached shape). Past the cap the
+    least-recently-read account is evicted and its next status read costs one
+    extra set of payload queries, never an error.
 - Logs: `sudo docker compose -f /opt/eastbrook/docker-compose.yml logs -f game`.
 - If the instance ever feels tight, stop, change instance type,
   start. Everything lives in Docker plus one EBS volume, so nothing
   else changes.
+
+## Discord bot
+
+The Discord bot (`bot/`) is a standalone Node process that bridges the official
+Discord server and the game: status-tier roles plus a level-on-name nickname synced
+from in-game data, presence (the online count and the featured voice room) pushed
+into the HUD widget, in-game "!" community posts relayed as embeds, a
+significant-activity feed (max level, rare drops, duels, arena), daily-rewards
+winner posts, and the consumer for the game's Discord outbox. It is a pure consumer
+of the game server: it reads and writes through the secret-gated
+`/internal/discord/*` API and holds nothing durable of its own, so stopping it never
+affects the realm.
+
+**Enabling it.** The bot is the `discord-bot` compose service (container
+`eastbrook-discord-bot`), behind the `discord` profile and sharing the game image, so
+it needs no separate build:
+
+```bash
+sudo docker compose --profile discord up -d
+```
+
+Without `--profile discord` the service simply never starts, which is the supported
+way to run a realm with no Discord integration. Set the required keys in the host
+`.env` beside `docker-compose.yml` before the first start.
+
+### Environment keys
+
+Compose passes every key below from the host `.env` into the container (the one
+exception is `GAME_SERVER_URL`, which compose pins to the in-network address, so
+repointing it is a `docker-compose.yml` edit), so changing a tunable is an edit plus
+`sudo docker compose --profile discord up -d discord-bot`, never an image rebuild. Every numeric key falls back to its built-in default on an
+empty or non-positive value, so an unset key is always safe and a blank line in
+`.env` never means zero.
+
+**Required** (the bot throws at boot without them):
+
+| Key | Default | What it does / incident guidance |
+|---|---|---|
+| `DISCORD_BOT_TOKEN` | none, required | Bot token from the Discord developer portal. A wrong or revoked token is a fatal gateway close: see the crash-loop note below. |
+| `DISCORD_CLIENT_ID` | none, required | Application (client) id, used to register the `/whoami` and `/link` slash commands. |
+| `DISCORD_GUILD_ID` | none, required | The one guild the bot operates in. |
+| `DISCORD_BOT_SECRET` | none, required | Shared secret for the game's `/internal/discord/*` API. It must match the server's `DISCORD_BOT_SECRET` exactly, or every call the bot makes is rejected and nothing syncs. |
+
+**Connection:**
+
+| Key | Default | What it does / incident guidance |
+|---|---|---|
+| `GAME_SERVER_URL` | `http://game:8787` from compose (`http://127.0.0.1:8787` in code) | Base URL for the internal API. Compose pins this one (no host `.env` interpolation), so changing it means editing `docker-compose.yml`. Leave the compose value alone unless the game runs outside this compose network, and in that case point it at a private or loopback address of the game host, never the public domain: the edge answers 404 for all of `/internal/*`, so a bot aimed through Caddy syncs nothing, and every internal call carries `DISCORD_BOT_SECRET` over plain `http`, so any hop that leaves the host or the private network exposes the shared secret in transit regardless of what the edge answers. |
+| `PUBLIC_GAME_URL` | `http://localhost:8787` from compose (`https://worldofclaudecraft.com` in code) | The public URL shown in bot replies and deep-link buttons. Set it to your real domain, or players get links they cannot use. |
+
+**Channel ids** (each feature is off when its channel is unset):
+
+| Key | Default | What it does / incident guidance |
+|---|---|---|
+| `DISCORD_VOICE_CHANNEL_ID` | unset | The featured voice room surfaced in the in-game Discord widget. |
+| `DISCORD_WELCOME_CHANNEL_ID` | unset | Read at boot but currently unwired: no welcome message is posted, deliberately. |
+| `DISCORD_TEST_CHANNEL_ID` | unset | One-time "bot online" startup announcement, and the last-resort fallback channel for relay and activity posts. |
+| `DISCORD_RELAY_CHANNEL_ID` | falls back to the test channel | Where in-game "!" community posts land. With neither this nor the test channel set, drained relay items are DROPPED after a once-per-channel notice, so set one before opening the feature to players. |
+| `DISCORD_ACTIVITY_CHANNEL_ID` | falls back to relay, then test | Where the significant-activity feed lands. Same drop rule as relay. |
+| `DISCORD_DAILY_REWARDS_CHANNEL_ID` | unset | Daily-rewards top-10 winner posts. Unlike relay and activity, an unset channel drops nothing: a winner day is marked on the server only after its post lands, so it is re-served until it can be announced. |
+
+**Behavior:**
+
+| Key | Default | What it does / incident guidance |
+|---|---|---|
+| `DISCORD_SYNC_NICKNAMES` | `1` from compose (on unless the value is exactly `0`) | Sync each linked member's Discord nickname to carry their in-game level. Set it to `0` to stop every nickname PATCH at once, which is the fastest way to shed Discord write volume without stopping the bot. |
+
+**Governor** (the rate-limit levers, and the first place to reach during a Discord
+incident):
+
+| Key | Default | What it does / incident guidance |
+|---|---|---|
+| `DISCORD_MAX_RPS` | `8` | Ceiling on requests per second to Discord (their own limit is 50). Lower it (2 to 4) during a 429 storm or while a Cloudflare ban keeps recurring; the sweeps just take longer. Raising it above the default is how the 2026-07-29 incident is reproduced, not how it is fixed. |
+| `DISCORD_BAN_PAUSE_MS` | `600000` (10 minutes) | Process-wide pause after a 429 whose body is not JSON, which is how Cloudflare answers once it has started banning. Raise it if bans keep recurring; lowering it retries into a live ban and extends it. |
+| `DISCORD_BREAKER_LIMIT` | `300` | Invalid responses inside one rolling 10 minute window that open the request breaker (Discord's own ban threshold is 10000). Lower it to make background traffic stop sooner during an incident: an open breaker refuses sweeps and outbox drains while essential traffic such as a slash-command reply keeps flowing. |
+| `DISCORD_FORBIDDEN_TTL_MS` | `86400000` (24 hours) | How long a member's 400, 401 or 403 is remembered before that member is retried (a 400 is a payload Discord permanently rejects, such as a nickname it will never accept). Raise it when a permissions problem is flooding the log with repeats. Lower it right after FIXING a permission (for example granting Manage Nicknames) so the affected members re-sync instead of waiting out the day. |
+
+**Cadences** (how often each loop runs; raising them all is the blunt way to cut the
+bot's share of game-server request volume):
+
+| Key | Default | What it does / incident guidance |
+|---|---|---|
+| `DISCORD_ROLE_SYNC_INTERVAL_MS` | `300000` (5 minutes) | The floor between role-sync passes, and the cadence of the special-roles refresh, the members-meta push, and the tier-role refresh. Raise it to cut Discord write volume and internal reads together. |
+| `DISCORD_PRESENCE_DEBOUNCE_MS` | `4000` | The window over which a burst of voice and presence events folds into one push. Raise it during a busy voice event to collapse more of the burst; the widget just updates a little later. |
+| `DISCORD_SWEEP_SLICE_MS` | `3000` | How long the linked-member sweep waits between slices while a pass is live. Raise it to spread the same pass over more wall-clock time. |
+| `DISCORD_SWEEP_SLICE_SIZE` | `100` | How many linked members one slice asks about, and may write to. Lower it together with the slice interval to cut the peak Discord write rate a single tick can queue. |
+| `DISCORD_OUTBOX_POLL_MS` | `3000` | The active poll cadence while the outbox keeps returning work. Raise it to cut the bot's share of game-server requests, at the cost of relay and activity latency. |
+| `DISCORD_OUTBOX_IDLE_MS` | `15000` | Where that cadence decays to once the drains come back empty. The first queued item snaps the loop straight back to the active cadence, so raising this costs no latency on a quiet realm. |
+| `DISCORD_OUTBOX_TIMEOUT_MS` | `70000` | The abort deadline for ONE outbox poll. It must stay ABOVE the game server's 65 second read deadline on the outbox long poll: set lower, every poll aborts client-side before the server can answer, and items the server already drained are lost. 70000 is an ENFORCED floor: the bot logs a warning and uses 70000 for any lower value, so the knob can only raise the deadline. |
+
+**Heartbeat** (liveness, read by the container healthcheck):
+
+| Key | Default | What it does / incident guidance |
+|---|---|---|
+| `DISCORD_HEARTBEAT_FILE` | `/tmp/discord-bot-heartbeat` | The file the bot's scheduler stamps. Both the bot and the healthcheck read this key, so change it in the host `.env` only, where both see the same value. |
+| `DISCORD_HEARTBEAT_INTERVAL_MS` | `30000` | How often the scheduler loop rewrites the stamp. Time-to-red is set by the staleness window below, not by this, so lowering this alone buys nothing: to detect a wedge sooner, lower `DISCORD_HEARTBEAT_STALE_MS` and keep it a comfortable multiple of this interval. |
+| `DISCORD_HEARTBEAT_STALE_MS` | `90000` | Healthcheck side ONLY (the bot itself never reads it): how old the stamp may be before Docker calls the container unhealthy. Keep it a comfortable multiple of the interval, so one slow write is not read as a stall. Empty, non-numeric and non-positive values all fall back to the default, same as the bot's own numeric knobs. |
+
+Not every deadline is an env key. Three request bounds are code constants in `bot/`,
+where the suite can pin them against literals: `SERVER_CALL_TIMEOUT_MS` and
+`DEFAULT_OUTBOX_TIMEOUT_MS` in `bot/server_client.ts` (an ordinary internal-API call,
+and the outbox long poll's much longer deadline) and `DISCORD_CALL_TIMEOUT_MS`
+(15000) for one call out to Discord. Changing one of those is a code change and a
+rebuild, not an `.env` edit.
+
+### Verifying health
+
+The container healthcheck probes the FRESHNESS of the heartbeat file, not the
+presence of a process, because the failure that actually happens is a live process
+whose loops have stopped turning:
+
+```bash
+# health status, and the last few probe results with their output
+sudo docker inspect --format '{{json .State.Health}}' eastbrook-discord-bot
+
+# the same thing by hand: how old the heartbeat stamp is, in milliseconds
+# (resolves DISCORD_HEARTBEAT_FILE the same way the probe does, so it follows an override)
+sudo docker exec eastbrook-discord-bot node -e "const p=(process.env.DISCORD_HEARTBEAT_FILE||'').trim()||'/tmp/discord-bot-heartbeat';const s=require('fs').statSync(p);console.log(p, Date.now()-s.mtimeMs)"
+```
+
+Healthy is an age under 90000 (`DISCORD_HEARTBEAT_STALE_MS`). A red healthcheck
+means the scheduler loop stopped turning even though the process is alive, and
+nothing restarts it for you: `restart: unless-stopped` acts on process exit only, so
+a red probe is an operator signal, not a self-healing one. Act on it with:
+
+```bash
+sudo docker compose --profile discord restart discord-bot
+```
+
+The container also runs under `mem_limit: 512m` with `memswap_limit: 512m`, so a leak
+kills the bot rather than the game or the database sharing the host, and
+`stop_grace_period: 15s`, which is ample because the bot has nothing to save: the
+outbox lives on the server and redelivers anything unacknowledged on the next poll.
+
+### Fatal gateway close: the crash loop is by design
+
+A close the bot cannot recover from (an invalid token, or the privileged
+`GUILD_MEMBERS` and `GUILD_PRESENCES` intents not enabled for the application in the
+developer portal) EXITS the process with code 1, so the restart policy acts on it.
+With the cause still unfixed the container restarts, fails the same way, and Docker's
+backoff spaces the attempts further apart: `sudo docker ps` shows it flipping between
+`Restarting` and a few seconds of uptime, and the logs repeat the same close code.
+That visible crash loop is deliberate (there is no retry limiter and no supervisor by
+design). The alternative, and what the 2026-07-29 incident actually produced, is a
+silent zombie: a process that stays up forever having quietly stopped doing anything.
+The fix is to correct the token or enable the intents and restart, never to disable
+the restart policy.
+
+### Incident runbook
+
+The four commands below are the ones used to diagnose the 2026-07-29 traffic spike
+(`docs/discord-bot-stability/incident-2026-07-29.md`), each with what a healthy
+reading looks like now.
+
+```bash
+# request rate + breakdown from game access logs
+sudo docker logs --since 60m eastbrook-game 2>&1 | grep '"msg":"access"' \
+  | grep -o '"route":"[^"]*"' | sort | uniq -c | sort -rn | head -15
+```
+
+Healthy: normal player and site routes dominate the top of the list, and the
+`/internal/discord/*` routes are a trickle near the bottom. During the incident the
+internal routes were most of the list.
+
+```bash
+# who is generating it (internal 172.18.0.x vs external)
+sudo docker logs --since 60m eastbrook-game 2>&1 | grep '"msg":"access"' \
+  | grep -o '"ip":"[^"]*"' | sort | uniq -c | sort -rn | head -10
+```
+
+Healthy: the internal docker-network addresses (`172.18.0.x`, the bot) are a small
+share of the total. During the incident they were about 45 percent of every request
+the game served.
+
+```bash
+# bot 429 timeline
+sudo docker logs -t eastbrook-discord-bot 2>&1 | grep 429 | cut -c1-13 | sort | uniq -c
+```
+
+Healthy: zero or near-zero lines per hour. Any sustained hourly count is the retry
+storm restarting; the incident peaked at 35000 to 38000 per hour.
+
+```bash
+# connections to the game's internal API
+sudo ss -tn state established '( dport = :8787 )' | wc -l
+```
+
+Healthy: low tens, against roughly 110 held continuously during the incident.
+
+**Escalation levers**, in order. Each is an `.env` edit plus
+`sudo docker compose --profile discord up -d discord-bot`:
+
+1. **Lower `DISCORD_MAX_RPS`** (8 down to 2 to 4). This is the direct brake on
+   Discord-side volume and the one that stops a ban from recurring.
+2. **Raise the sweep and outbox cadences** (`DISCORD_SWEEP_SLICE_MS`,
+   `DISCORD_ROLE_SYNC_INTERVAL_MS`, `DISCORD_OUTBOX_POLL_MS`,
+   `DISCORD_OUTBOX_IDLE_MS`) and lower `DISCORD_SWEEP_SLICE_SIZE`. This is the brake
+   on the bot's share of the GAME server's request volume. Do not lower
+   `DISCORD_OUTBOX_TIMEOUT_MS` while doing this.
+3. **Stop the bot** as the definitive lever:
+
+   ```bash
+   sudo docker compose --profile discord stop discord-bot
+   ```
+
+   The game is unaffected. The bot is a pure consumer, so stopping it costs role,
+   nickname, presence, relay, and activity sync until it is started again, and
+   nothing else. Queued outbox items stay on the server and are delivered when it
+   comes back.
 
 ## Deploying an SFX Studio export
 

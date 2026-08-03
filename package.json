@@ -1,6 +1,6 @@
 {
   "name": "world-of-claudecraft",
-  "version": "0.33.1",
+  "version": "0.34.0",
   "private": true,
   "license": "MIT",
   "author": {
@@ -44,7 +44,8 @@
     "ci:changed": "biome ci --changed --no-errors-on-unmatched",
     "check:admin": "svelte-check --tsconfig ./tsconfig.admin.json",
     "check:ts": "tsc --noEmit --incremental --tsBuildInfoFile node_modules/.cache/tsc/buildinfo.json",
-    "check:types": "npm run check:ts && npm run check:admin",
+    "check:ts:bot": "tsc -p tsconfig.bot.json",
+    "check:types": "npm run check:ts && npm run check:admin && npm run check:ts:bot",
     "pretest": "node scripts/pretest.mjs",
     "test": "vitest run",
     "test:browser": "vitest run --config vitest.browser.config.ts",

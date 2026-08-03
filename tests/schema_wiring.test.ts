@@ -187,7 +187,7 @@ describe('ensureSchema wires every schema module at boot', () => {
     // with statement_timeout disabled (SET LOCAL, reverts at COMMIT). The pool's own
     // default statement_timeout would otherwise cancel schema setup under a pile-up.
     await ensureSchema();
-    const setLocalIdx = h.calls.findIndex((c) => c === 'SET LOCAL statement_timeout = 0');
+    const setLocalIdx = h.calls.indexOf('SET LOCAL statement_timeout = 0');
     const lockIdx = h.calls.findIndex((c) => c.includes('pg_advisory_xact_lock'));
     expect(setLocalIdx).toBeGreaterThanOrEqual(0);
     // It must run before the advisory-lock wait it exists to protect.

@@ -10864,4 +10864,11 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.riftTracker.closesIn': 'Lukker om {time}',
   'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
   'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
+  'hud.prompts.guildInviteCancelled':
+    'En afventende laugsinvitation blev annulleret, fordi lauget blev omdøbt.',
+  'hud.prompts.guildRenamed': 'Dit laug er blevet omdøbt til {name} af moderationsteamet.',
+  'hud.core.chatChannels.moveHint':
+    'Omorganiser fanen {channel}: træk den, eller brug Alt+venstre og Alt+højre',
+  'itemUi.vendor.buyStack': 'Køb {count}',
+  'itemUi.vendor.buyStackAria': 'Køb {count} {item} for {price}',
 };

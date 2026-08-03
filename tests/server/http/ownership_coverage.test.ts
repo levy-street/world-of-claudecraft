@@ -703,9 +703,11 @@ describe('internal secret-gate mounting sweep: every /internal route is gated', 
     vi.restoreAllMocks();
   });
 
-  it('selects the full 19-route internal surface (the handleInternalApi 12 + the 7 ops routes)', () => {
+  it('selects the full 21-route internal surface (handleInternalApi 12 + 7 ops + flex-batch + outbox)', () => {
     // The ops family includes finalization, four payout-service routes, and two moderation mutations.
-    expect(internalSurfaceRoutes.length).toBe(19);
+    // flex-batch and outbox are registry-only (no legacy arm) but still ride the same Discord secret
+    // gate, so the sweep below generates their unset-env and wrong-secret cases like every other route.
+    expect(internalSurfaceRoutes.length).toBe(21);
   });
 
   for (const route of internalSurfaceRoutes) {
