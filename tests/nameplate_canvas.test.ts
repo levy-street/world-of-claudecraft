@@ -8,6 +8,7 @@ import {
 } from '../src/render/nameplate_canvas';
 
 interface ContextTrace {
+  canvas: HTMLCanvasElement;
   clearRect: ReturnType<typeof vi.fn>;
   drawImage: ReturnType<typeof vi.fn>;
   fillText: ReturnType<typeof vi.fn>;
@@ -65,8 +66,11 @@ let traces: ContextTrace[];
 
 beforeEach(() => {
   traces = [];
-  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(() => {
+  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(function (
+    this: HTMLCanvasElement,
+  ) {
     const trace: ContextTrace = {
+      canvas: this,
       clearRect: vi.fn(),
       drawImage: vi.fn(),
       fillText: vi.fn(),
@@ -174,6 +178,40 @@ describe('nameplate canvas surface', () => {
     expect(surface.canvas.width).toBe(640);
     expect(traces[1].setTransform).toHaveBeenCalledWith(2, 0, 0, 2, 0, 0);
     expect(traces[0].drawImage.mock.calls[0]).toHaveLength(5);
+  });
+
+  it('invalidates cached sprites when the same surface changes pixel ratio', () => {
+    const parent = document.createElement('div');
+    const surface = new NameplateCanvasSurface(parent);
+    const state = createNameplateCanvasState();
+    state.initialized = true;
+    state.name = 'Moving Monitor';
+
+    surface.beginFrame(320, 180, 1);
+    surface.drawBase(state, 160, 90);
+    const lowDprSprite = traces[1].canvas;
+    const lowDprRasterCount = traces.reduce(
+      (sum, trace) => sum + trace.fillText.mock.calls.length,
+      0,
+    );
+
+    surface.beginFrame(320, 180, 2);
+    surface.drawBase(state, 160, 90);
+    const highDprSprite = traces[2].canvas;
+    const highDprRasterCount = traces.reduce(
+      (sum, trace) => sum + trace.fillText.mock.calls.length,
+      0,
+    );
+
+    expect(lowDprRasterCount).toBe(1);
+    expect(highDprRasterCount).toBe(2);
+    expect(highDprSprite.width).toBe(lowDprSprite.width * 2);
+    expect(highDprSprite.height).toBe(lowDprSprite.height * 2);
+    expect(traces[0].drawImage.mock.calls[1]).toHaveLength(5);
+
+    surface.beginFrame(320, 180, 2);
+    surface.drawBase(state, 160, 90);
+    expect(traces.reduce((sum, trace) => sum + trace.fillText.mock.calls.length, 0)).toBe(2);
   });
 
   it('keeps more than 384 distinct crowd labels resident between frames', () => {

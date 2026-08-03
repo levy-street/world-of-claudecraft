@@ -16,7 +16,9 @@ describe('dev-tier canvas nameplate glow stays crisp (#1639)', () => {
   });
 
   it('draws one bounded colored outline pass, then the normal legibility sprite', () => {
-    expect(canvas).toContain('devStyle.stroke = state.devOutline;');
+    expect(canvas).toContain(
+      "devStyle.stroke = this.forcedColorsActive() ? 'Highlight' : state.devOutline;",
+    );
     expect(canvas).toContain('devStyle.lineWidth = 4;');
     expect(canvas).toContain('this.text.draw(this.ctx, state.name, nameX, bottomY - 3, devStyle);');
     expect(canvas).toContain(

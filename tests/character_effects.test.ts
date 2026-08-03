@@ -254,6 +254,7 @@ describe('character visual effects', () => {
     expect(renderer).toContain(
       'if (hasRecklessness) {\n          this.vfx.recklessFlame(e.id, dt);',
     );
-    expect(renderer).toContain('if (!hasRecklessness && v.recklessSkullsSpawned) {');
+    expect(renderer).toContain('const nextRecklessSkullsLatch = nextRecklessnessSkullsLatch(');
+    expect(renderer).toContain('v.recklessSkullsSpawned = nextRecklessSkullsLatch;');
   });
 });

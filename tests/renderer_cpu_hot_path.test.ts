@@ -48,6 +48,7 @@ describe('renderer CPU hot path', () => {
     expect(disposeBlock).toContain('this.nameplatePainter.dispose();');
     expect(disposeBlock).toContain('this.travelSpeedFx.dispose();');
     expect(editorViewport).toContain('this.renderer.dispose();');
+    expect(renderer).toContain('this.nameplatePainter.remove(id);');
   });
 
   it('manually updates the camera once on ordinary frames', () => {

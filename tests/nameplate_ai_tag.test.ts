@@ -15,6 +15,8 @@ function fakeContext(): CanvasRenderingContext2D {
   const noop = vi.fn();
   return {
     setTransform: noop,
+    scale: noop,
+    translate: noop,
     clearRect: noop,
     save: noop,
     restore: noop,
@@ -43,6 +45,7 @@ function fakeContext(): CanvasRenderingContext2D {
 
 beforeEach(() => {
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(() => fakeContext());
+  vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue('data:image/png;base64,raid');
 });
 
 function entity(over: Partial<Entity> & { id: number }): Entity {
@@ -95,6 +98,8 @@ function harness(
   options: {
     me?: Partial<Entity>;
     isHostilePlayer?: (e: Entity) => boolean;
+    markerFor?: (entityId: number) => number | null;
+    questState?: (questId: string) => string;
   } = {},
 ) {
   const me = entity({
@@ -114,8 +119,8 @@ function harness(
   const world = {
     player: me,
     entities,
-    markerFor: () => null,
-    questState: () => 'available',
+    markerFor: options.markerFor ?? (() => null),
+    questState: options.questState ?? (() => 'available'),
   } as unknown as IWorld;
   const layer = document.createElement('div');
   const painter = new NameplatePainter({
@@ -212,5 +217,89 @@ describe('batched canvas nameplate state', () => {
     painter.update(true);
     expect(state.level).toBe('14');
     expect(layer.querySelectorAll('canvas.nameplate-canvas')).toHaveLength(1);
+  });
+
+  it('maps live player identity, badge, emote, raid, stealth, and cast state', () => {
+    const target = entity({
+      id: 2,
+      guild: 'Canvas Raiders',
+      title: 'prog_veteran',
+      overheadEmoteId: 'wave',
+      holderTier: 1,
+      devTier: 4,
+      discordAvatar: 'https://example.com/avatar.png',
+      auras: [{ kind: 'stealth' } as Entity['auras'][number]],
+      castingAbility: 'fireball',
+      castTotal: 2,
+      castRemaining: 1,
+    });
+    const { painter } = harness([target], { markerFor: (id) => (id === target.id ? 3 : null) });
+
+    painter.update(true);
+    const state = stateOf(painter, target.id);
+
+    expect(state.guild).toBe('Canvas Raiders');
+    expect(state.title).toBe('Veteran');
+    expect(state.opacity).toBe(0.55);
+    expect(state.badges).toHaveLength(3);
+    expect(state.badges[2]).toMatchObject({
+      url: 'https://example.com/avatar.png',
+      size: 24,
+      circular: true,
+      border: '#5865f2',
+    });
+    expect(state.devOutline).not.toBeNull();
+    expect(state.raidMarkerUrl).not.toBe('');
+    expect(state.emoteIconUrl).toBe('/ui/emotes/emote-wave.png');
+    expect(state.emoteLabel).not.toBe('');
+    expect(state.castVisible).toBe(true);
+    expect(state.castFill).toBe(0.5);
+    expect(state.castSource).toBe('fireball');
+    expect(state.castLabel).not.toBe('fireball');
+  });
+
+  it('maps object, quest NPC, boss, and lootable corpse presentation', () => {
+    const questNpc = entity({
+      id: 2,
+      kind: 'npc',
+      templateId: 'marshal_redbrook',
+      questIds: ['q_wolves'],
+    });
+    const object = entity({ id: 3, kind: 'object', templateId: 'delve_locked_chest' });
+    const boss = entity({ id: 4, kind: 'mob', templateId: 'gorrak', hostile: true });
+    const corpse = entity({
+      id: 5,
+      kind: 'mob',
+      templateId: 'gorrak',
+      hostile: true,
+      dead: true,
+      lootable: true,
+    });
+    const { painter } = harness([questNpc, object, boss, corpse]);
+
+    painter.update(true);
+
+    expect(stateOf(painter, questNpc.id)).toMatchObject({ marker: '!', markerTone: 'quest' });
+    expect(stateOf(painter, object.id)).toMatchObject({ nameColor: '#c084ff', badges: [] });
+    expect(stateOf(painter, object.id).name).not.toBe('');
+    expect(stateOf(painter, boss.id)).toMatchObject({ frame: 'boss', hpVisible: true });
+    expect(stateOf(painter, corpse.id)).toMatchObject({
+      frame: '',
+      marker: '$',
+      markerTone: 'loot',
+      hpVisible: false,
+    });
+    expect(stateOf(painter, corpse.id).name).not.toBe(stateOf(painter, boss.id).name);
+  });
+
+  it('forgets cached paint state when a view leaves interest', () => {
+    const target = entity({ id: 2 });
+    const { painter } = harness([target]);
+    painter.update(true);
+    expect(stateOf(painter, target.id)).toBeDefined();
+
+    painter.remove(target.id);
+
+    expect((painter as unknown as PainterStateAccess).states.has(target.id)).toBe(false);
   });
 });

@@ -10,11 +10,14 @@ describe('character presentation work', () => {
     expect(shouldRunCharacterPresentationWork(false, false)).toBe(false);
     expect(shouldRunCharacterPresentationWork(true, false)).toBe(true);
     expect(shouldRunCharacterPresentationWork(false, true)).toBe(true);
+    expect(shouldRunCharacterPresentationWork(true, true)).toBe(true);
   });
 
   it('treats Water Jet visual channels as actionable casts', () => {
     expect(characterPresentationCasting(null, true, false)).toBe(true);
     expect(characterPresentationCasting('fireball', false, false)).toBe(true);
+    expect(characterPresentationCasting(null, true, true)).toBe(false);
+    expect(characterPresentationCasting('fireball', false, true)).toBe(false);
     expect(characterPresentationCasting('fireball', true, true)).toBe(false);
   });
 
