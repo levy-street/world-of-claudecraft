@@ -2071,9 +2071,12 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain('stopAutorunForInteraction(\n      tryNearbyInteraction(');
     // Open-gate flip: the trailing (online === null) override is gone,
     // so the helpers default harvestStateReliable = true (trusting the hcb
-    // corpse-claim mirror online); the call now closes right after the
-    // nothing-to-interact string.
-    expect(mainTs).toContain("t('errors.nothingInteract'),\n      ),");
+    // corpse-claim mirror online). The R40 confirm gate now trails the
+    // nothing-to-interact string, with harvestStateReliable still an
+    // explicit `undefined` (the default), never a live override.
+    expect(mainTs).toContain(
+      "t('errors.nothingInteract'),\n        undefined,\n        gatherEffectConfirm,\n      ),",
+    );
     // The escort away line sits immediately before it (escort_interact.ts): an
     // escort run has no other client entry point, so an unwired argument here
     // would silently make those quests uncompletable again.
@@ -2089,6 +2092,12 @@ describe('client HTML shell', () => {
       'stopAutorunForInteraction(interactionOutcome, input, mobileControls);',
     );
     expect(mainTs).toContain('stopAutorunForInteraction(\n          handleGatherNodeInteract(');
+    // The R40 gate rides the CLICK dispatch too (the phase 14 QA found only
+    // the interact-key site pinned): the world-click harvest passes the same
+    // confirm gate, trailing the tool gate.
+    expect(mainTs).toContain(
+      'gatherNodeToolGateFor(world, node),\n            gatherEffectConfirm,\n          ),',
+    );
     expect(hudMobileCss).not.toContain('body.mobile-touch #mobile-utility-cluster');
     expect(hudMobileCss).not.toContain('body.mobile-touch #mobile-autorun {');
     // The cast bar sits at the classic centre seat above the bottom-centre

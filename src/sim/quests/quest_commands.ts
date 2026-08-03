@@ -23,11 +23,13 @@
 // render/ui/game/net/DOM/Three, no Math.random/Date.now), so it runs unchanged in
 // Node, the browser, and the headless RL env.
 
-import { bagCapacity, bagsFullError, countFit, removeStacked } from '../bags';
+import { bagCapacity, bagsFullError, consumeOneScratch, countFit, countStacked } from '../bags';
 import { QUESTS, questRewardItemId } from '../data';
 import { formatMoney } from '../format_money';
+import { removePreferFungible } from '../items';
 import type { ArchetypeState } from '../professions/archetype';
 import { armCadence, cadenceBlockedKeys } from '../professions/cadence';
+import { planGradeRemoval } from '../professions/material_grades';
 import { questFallbackGrants } from '../quest_fallback';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -43,10 +45,12 @@ import {
 } from '../types';
 import {
   applyProfessionQuestEffect,
+  isIdentityTransitionQuest,
   professionQuestSelectionTargets,
   resolvedQuestObjectiveCounts,
   validateProfessionQuestSelection,
 } from './profession_quest_effects';
+import { playerHoldsQuestItem } from './quest_item_presence';
 
 // Pure quest-state computation, shared by the sim and the network client. Relocated
 // from sim.ts (W4) and re-exported from sim.ts so the ClientWorld import
@@ -78,16 +82,23 @@ export function computeQuestState(
   ) {
     return 'unavailable';
   }
-  // One pending identity transition at a time: while any attunePair-effect
-  // quest is active, every OTHER attunePair-effect quest is unavailable.
-  // resolvedCounts is stamped at accept and turn-in never re-resolves it, so a
-  // banked second amends would complete at a stale cost after the first return
-  // raised switchCount, dodging the 5 + 3 * switchCount escalation. The gate
-  // lives here so both hosts and the server accept path share it (the quest
-  // already in the log returned 'active' above, so it never gates itself).
-  if (quest.completionEffect?.type === 'attunePair') {
+  // One pending identity transition at a time: while ANY identity-transition
+  // quest is active (attunePair or switchHobby, see isIdentityTransitionQuest),
+  // every OTHER identity-transition quest is unavailable. Two distinct stale-bank
+  // failures share this one gate, which is why its scope is both effect types
+  // rather than the attunePair-only scope it originally shipped with:
+  //   - resolvedCounts is stamped at accept and turn-in never re-resolves it, so
+  //     a banked second amends would complete at a stale cost after the first
+  //     return raised switchCount, dodging the 5 + 3 * switchCount escalation.
+  //   - the hobby quest banks its chosen craft on QuestProgress at accept, but a
+  //     pair transition rewrites both the candidate set and the hobby, so a bank
+  //     that straddles a transition either turns in against the wrong pair or
+  //     sticks unturnable-in on the revalidation below.
+  // The gate lives here so both hosts and the server accept path share it (the
+  // quest already in the log returned 'active' above, so it never gates itself).
+  if (isIdentityTransitionQuest(quest)) {
     for (const activeId of questLog.keys()) {
-      if (QUESTS[activeId]?.completionEffect?.type === 'attunePair') return 'unavailable';
+      if (isIdentityTransitionQuest(QUESTS[activeId])) return 'unavailable';
     }
   }
   // A repeatable work order inside its cooldown window is unavailable until it
@@ -158,7 +169,11 @@ export function finalizeQuestAccept(
     ...(selection === undefined ? {} : { selection }),
     resolvedCounts: resolvedQuestObjectiveCounts(quest, meta),
   });
-  for (const itemId of questFallbackGrants(quest, (id) => ctx.countItem(id, meta.entityId) > 0)) {
+  // The re-grant predicate spans every store the player can recover the item
+  // from alone (bags, bank, market escrow, mailbox), not just the bags: a
+  // bags-only read was the unbounded starter-tool mint (bank it, abandon,
+  // re-accept, repeat). See quest_item_presence.ts for the full reasoning.
+  for (const itemId of questFallbackGrants(quest, (id) => playerHoldsQuestItem(ctx, meta, id))) {
     ctx.addItem(itemId, 1, meta.entityId);
   }
   ctx.emit({ type: 'questAccepted', questId, pid: meta.entityId });
@@ -293,7 +308,21 @@ export function turnInQuest(ctx: SimContext, questId: string, pid?: number): voi
     for (const obj of quest.objectives) {
       if (obj.type === 'collect' && obj.itemId) {
         const index = quest.objectives.indexOf(obj);
-        removeStacked(scratch, obj.itemId, questObjectiveRequired(quest, qp, index));
+        // The same grade plan turnInQuestCore applies, against the scratch
+        // copy, so the room this gate frees is the room the hand-in frees.
+        // Per unit through consumeOneScratch (no exclusion), the scratch
+        // mirror of removePreferFungible's plain-first walk below: a gate
+        // that models the removal differently from the remover it gates
+        // re-opens the overflow class (#2139).
+        for (const take of planGradeRemoval(
+          obj.itemId,
+          questObjectiveRequired(quest, qp, index),
+          (id) => countStacked(scratch, id),
+        )) {
+          for (let unit = 0; unit < take.count; unit++) {
+            consumeOneScratch(scratch, take.itemId);
+          }
+        }
       }
     }
     if (countFit(scratch, bagCapacity(meta.bags), rewardItem, 1) < 1) {
@@ -322,7 +351,23 @@ export function turnInQuestCore(
   if (!applyProfessionQuestEffect(ctx, quest, qp, meta)) return false;
   for (const [index, obj] of quest.objectives.entries()) {
     if (obj.type === 'collect' && obj.itemId) {
-      ctx.removeItem(obj.itemId, questObjectiveRequired(quest, qp, index), meta.entityId);
+      // Base grade first, then the fine grade, so a player holding both hands
+      // over the plain ore and keeps the premium copies. Within each grade
+      // line, plain stacks are spent before instanced copies
+      // (removePreferFungible's own plain-first walk): a signed specimen
+      // survives any turn-in that plain copies can pay, and is consumed only
+      // when nothing plain remains. The trade and vendor arms additionally
+      // deprioritize the owner's self-signed CHARM copies; that charm-scoped
+      // rule is deliberately absent here because no shipped quest collects a
+      // charm (the grade-pool guard in tests/material_grades.test.ts keeps
+      // the collect vocabulary honest).
+      for (const take of planGradeRemoval(
+        obj.itemId,
+        questObjectiveRequired(quest, qp, index),
+        (id) => ctx.countItem(id, meta.entityId),
+      )) {
+        removePreferFungible(ctx, take.itemId, take.count, meta.entityId);
+      }
     }
   }
   qp.state = 'done';

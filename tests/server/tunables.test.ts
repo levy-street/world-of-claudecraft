@@ -9,6 +9,23 @@ import * as fs from 'node:fs';
 import * as http from 'node:http';
 import * as path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
+
+// The env-tunable pool size is read at server/db.ts module init (which also
+// loads .env from cwd), so a shell that legitimately exports the knob (the
+// load-capture recipe tells operators to) would otherwise turn the literal
+// default pin below into a confusing red. Cleared before any dynamic import
+// of server/db can run; vitest gives this file a fresh module registry.
+// Load-bearing and narrow: ESM hoists the static imports above this line, so
+// the delete only protects the pin because server/db is reached EXCLUSIVELY
+// through the dynamic import inside its test; a future static import that
+// transitively pulls in server/db would silently defeat it. Narrower still:
+// this covers the SHELL-export case only. server/env's loadEnvFile runs at
+// that dynamic import and will re-set a just-deleted var from a local .env,
+// so a developer keeping the knob in .env still sees this file red; the
+// capture recipe passes the knob on the command line for exactly that
+// reason.
+delete process.env.DB_POOL_MAX_CLIENTS;
+
 import { DESKTOP_LOGIN_TTL_MS } from '../../server/desktop_login';
 import {
   ASSET_UPLOAD_POLICY,
@@ -89,6 +106,12 @@ process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase1_te
 
 const read = (rel: string): string => fs.readFileSync(path.resolve(process.cwd(), rel), 'utf8');
 const count = (haystack: string, needle: string): number => haystack.split(needle).length - 1;
+// A raw-source .toContain() is comment-gameable: commenting the pinned line out
+// leaves its text sitting in the comment, so the pin stays falsely green while
+// the wiring is dead (confirmed by experiment against the env-wiring pin
+// below). Strip // line comments before any structural match, keeping ://
+// protocol slashes.
+const codeOnly = (src: string): string => src.replace(/(^|[^:])\/\/.*$/gm, '$1');
 
 describe('server timeouts (server/http/server_timeouts.ts)', () => {
   it('the four constants equal the installed Node http defaults', () => {
@@ -299,10 +322,71 @@ describe('byte caps + page sizes hold their literal values', () => {
     const { DB_POOL_MAX_CLIENTS } = await import('../../server/db');
     const { MAX_CARD_BYTES } = await import('../../server/player_card');
     const { BUG_REPORT_MAX_BODY_BYTES } = await import('../../server/reports');
+    // The env-dependent readout of the default. The AUTHORITATIVE default pin is
+    // the pure parseDbPoolMaxClients(undefined) one below, which no shell export
+    // or local .env can perturb; this line only adds that the module constant is
+    // the parser's result in a clean environment (see the delete at the top).
     expect(DB_POOL_MAX_CLIENTS).toBe(10);
     expect(MAX_CARD_BYTES).toBe(4_194_304); // 4 MiB
     expect(BUG_REPORT_MAX_BODY_BYTES).toBe(1_048_576); // 1 MiB
     expect(DEFAULT_JSON_BODY_MAX_BYTES).toBe(65_536); // 64 KiB
+  });
+
+  it('DB_POOL_MAX_CLIENTS env parsing is strict and fail-safe, never a zero-client pool', async () => {
+    const { parseDbPoolMaxClients } = await import('../../server/db');
+    // unset / blank / whitespace stay on the default (Number('') === 0 must
+    // NOT become a zero-client pool; the empty-numeric env trap)
+    expect(parseDbPoolMaxClients(undefined)).toBe(10);
+    expect(parseDbPoolMaxClients('')).toBe(10);
+    expect(parseDbPoolMaxClients('   ')).toBe(10);
+    // out-of-range and malformed values stay on the default per dimension. The
+    // ceiling is the USABLE budget of stock postgres:16 (max_connections 100
+    // minus 3 superuser-reserved), so 98 through 100 are refused too: the
+    // values the comment itself says would break logins must not be blessed.
+    expect(parseDbPoolMaxClients('0')).toBe(10);
+    expect(parseDbPoolMaxClients('-5')).toBe(10);
+    expect(parseDbPoolMaxClients('98')).toBe(10);
+    expect(parseDbPoolMaxClients('100')).toBe(10);
+    expect(parseDbPoolMaxClients('101')).toBe(10);
+    expect(parseDbPoolMaxClients('abc')).toBe(10);
+    expect(parseDbPoolMaxClients('30x')).toBe(10); // strict: a typo must not half-parse to 30
+    expect(parseDbPoolMaxClients('2.5')).toBe(10); // whole clients only
+    // decimal digits only: JS numeric spellings must not surprise an operator
+    expect(parseDbPoolMaxClients('0x50')).toBe(10);
+    expect(parseDbPoolMaxClients('8e1')).toBe(10);
+    expect(parseDbPoolMaxClients('Infinity')).toBe(10);
+    // valid values parse, at both range edges (97 is the last accepted one)
+    expect(parseDbPoolMaxClients('40')).toBe(40);
+    expect(parseDbPoolMaxClients(' 40 ')).toBe(40);
+    expect(parseDbPoolMaxClients('1')).toBe(1);
+    expect(parseDbPoolMaxClients('97')).toBe(97);
+  });
+
+  it('the pool size constant is genuinely FED by the env (the tunability claim itself)', () => {
+    // A revert to `= 10` leaves every parser test green; this scrape is what
+    // fails it (the max: DB_POOL_MAX_CLIENTS wiring pin lives below). Comment
+    // stripped first: with the raw text, commenting the wiring line out and
+    // re-adding a hardcoded export kept this pin green (measured).
+    expect(codeOnly(read('server/db.ts'))).toContain(
+      'parseDbPoolMaxClients(process.env.DB_POOL_MAX_CLIENTS)',
+    );
+  });
+
+  it('the craftedBy/signer clamp equals the ENFORCED auth name ceiling, behaviorally', async () => {
+    // src/sim cannot import server/, so the 16 lives twice; this cross-tie is
+    // what turns a future name-cap raise into a loud failure instead of a
+    // silent provenance drop (phase 16 review). Anchored to the shape
+    // predicate that actually gates names (server/auth.ts validCharNameShape,
+    // whose regex quantifier is the real cap), NOT to reclaim_name's local
+    // sizing copy: a name exactly at the clamp must pass the gate and one
+    // character longer must fail it, so raising the regex alone reddens here.
+    const { validCharNameShape } = await import('../../server/auth');
+    const { MAX_NAME_LEN } = await import('../../server/reclaim_name');
+    const { MAX_CRAFTED_BY_LENGTH } = await import('../../src/sim/professions/tools');
+    expect(validCharNameShape('A'.repeat(MAX_CRAFTED_BY_LENGTH))).toBe(true);
+    expect(validCharNameShape('A'.repeat(MAX_CRAFTED_BY_LENGTH + 1))).toBe(false);
+    expect(MAX_CRAFTED_BY_LENGTH).toBe(MAX_NAME_LEN);
+    expect(MAX_CRAFTED_BY_LENGTH).toBe(16);
   });
 
   it('daily-rewards paginated decode defaults', async () => {
@@ -526,17 +610,27 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     expect(mainSrc).not.toContain('setTimeout(r, 2000)');
   });
 
-  it('wires the bounded unstuck retention prune at boot and daily maintenance', () => {
-    expect(unstuckDbSrc).toContain(
-      'export const UNSTUCK_REPORT_RETENTION_DAYS = UNSTUCK_REPORT_MAX_DAYS;',
-    );
-    expect(unstuckDbSrc).toContain('export const UNSTUCK_REPORT_PRUNE_BATCH_SIZE = 10_000;');
-    expect(unstuckDbSrc).toContain('export const UNSTUCK_REPORT_PRUNE_MAX_BATCHES = 10;');
-    expect(unstuckDbSrc).toContain('pg_try_advisory_lock($1::int)');
+  it('routes the unstuck retention prune through the shared sweep, and ONLY there', () => {
+    // The retention knob lives on the CONFIG (unstuckReportRetentionDays);
+    // the module keeps only the ADMIN VIEW ceiling. The old whole-backlog
+    // prune, its advisory lock, and its private batch constants are retired
+    // with the boot one-shot; the sweep primitive carries the bounded LIMIT.
+    expect(unstuckDbSrc).toContain('export const UNSTUCK_REPORT_MAX_DAYS = 90;');
+    expect(unstuckDbSrc).not.toContain('UNSTUCK_REPORT_PRUNE_BATCH_SIZE');
+    expect(unstuckDbSrc).not.toContain('pg_try_advisory_lock');
     expect(unstuckDbSrc).toContain('LIMIT $2');
-    expect(mainSrc).toContain('const prunedUnstuckReports = await pruneUnstuckReports(pool);');
-    expect(mainSrc).toContain('void pruneUnstuckReports(pool).catch((err) =>');
-    expect(count(mainSrc, 'pruneUnstuckReports(pool)')).toBe(2);
+    // Rewired at the v0.32.0 merge: the release shipped a boot-blocking
+    // one-shot plus a bare interval, and the retention sweep's guard
+    // (main_retention_wiring.test.ts) forbids both shapes. The prune now
+    // rides the shared sweep exactly once, off the config key.
+    expect(mainSrc).toContain(
+      'pruneBatch: (n) => pruneUnstuckReportsBatch(pool, config.unstuckReportRetentionDays, n)',
+    );
+    expect(count(mainSrc, 'pruneUnstuckReportsBatch(pool')).toBe(1);
+    // The retired whole-backlog name at zero occurrences, the retired-name
+    // idiom: the '(' suffix cannot match the Batch name, so a re-added
+    // one-shot in ANY spelling (await or void .catch) reds here.
+    expect(count(mainSrc, 'pruneUnstuckReports(')).toBe(0);
   });
 
   it('bounds unstuck inserts and the shutdown drain with named timeouts', () => {
@@ -558,8 +652,81 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
   });
 
   it('the pg pool max references DB_POOL_MAX_CLIENTS', () => {
-    expect(dbSrc).toContain('max: DB_POOL_MAX_CLIENTS');
-    expect(dbSrc).not.toContain('max: 10 }');
+    // Comment stripped, like the env-wiring pin above: a commented-out
+    // construction line must not keep this green.
+    const dbCode = codeOnly(dbSrc);
+    expect(dbCode).toContain('max: DB_POOL_MAX_CLIENTS');
+    expect(dbCode).not.toContain('max: 10 }');
+  });
+
+  it('a rejected DB_POOL_MAX_CLIENTS is reported at boot, never silently equal to unset', () => {
+    // The parser is fail-safe by design, so a typo and an unset var produce the
+    // same 10 in every later readout: the call site has to SAY so once. Pinned
+    // structurally (comment stripped) rather than by capturing console output,
+    // which would need a set env var at import time plus a module-registry
+    // reset, defeating the file's own delete process.env guard at the top.
+    const dbCode = codeOnly(dbSrc);
+    expect(dbCode).toContain(
+      "const rawDbPoolMaxClients = (process.env.DB_POOL_MAX_CLIENTS ?? '').trim();",
+    );
+    const branchStart = dbCode.indexOf("if (rawDbPoolMaxClients !== ''");
+    expect(branchStart).toBeGreaterThan(-1);
+    // The guard fires only for a SET value that did not survive parsing; the
+    // numeric comparison is what keeps a legitimately configured 10 (and
+    // " 10 ") quiet. Pinned STRUCTURALLY (the condition text), not
+    // behaviorally: the file-level delete of the env var means a behavior
+    // arm would need a resetModules dance the source pin does not.
+    expect(dbCode).toContain(
+      "if (rawDbPoolMaxClients !== '' && Number(rawDbPoolMaxClients) !== DB_POOL_MAX_CLIENTS) {",
+    );
+    const branch = dbCode.slice(branchStart, dbCode.indexOf('\n}', branchStart));
+    // The report names the raw value, the accepted range, and the default now
+    // in force; these are the unevaluated template tokens in the raw source.
+    expect(branch).toContain('console.error(');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: pins the UNEVALUATED token in raw source
+    expect(branch).toContain('${rawDbPoolMaxClients}');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: pins the UNEVALUATED token in raw source
+    expect(branch).toContain('${DB_POOL_MAX_CLIENTS_CEILING}');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: pins the UNEVALUATED token in raw source
+    expect(branch).toContain('${DB_POOL_MAX_CLIENTS_DEFAULT}');
+  });
+
+  it('logs the effective pool sizing at boot and warns on the realm multiplication', () => {
+    const dbCode = codeOnly(dbSrc);
+    // Nothing logged the effective pool size before this line, so a "too many
+    // clients" incident could not be read back to a configured value.
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: pins the UNEVALUATED token in raw source
+    expect(dbCode).toContain('db pool: DB_POOL_MAX_CLIENTS=${DB_POOL_MAX_CLIENTS}');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: pins the UNEVALUATED token in raw source
+    expect(dbCode).toContain('DB_POOL_CONNECT_TIMEOUT_MS=${DB_POOL_CONNECT_TIMEOUT_MS}');
+    // The realm count comes from the PARSED realm directory (REALM_DIRECTORY,
+    // which dedupes names and drops malformed or non-origin REALMS entries),
+    // not raw comma segments, so the warning's arithmetic matches the realm
+    // processes that will actually boot. The env literal itself now lives in
+    // server/realm.ts where the directory is parsed.
+    expect(dbCode).toContain('const configuredRealmCount = REALM_DIRECTORY.length');
+    // And the OTHER half of the chain, so the whole REALMS -> REALM_DIRECTORY
+    // -> configuredRealmCount derivation stays pinned end to end: the env
+    // literal must still feed the directory parser where it now lives.
+    expect(codeOnly(read('server/realm.ts'))).toContain('parseRealms(process.env.REALMS)');
+    const warnStart = dbCode.indexOf('if (configuredRealmCount * DB_POOL_MAX_CLIENTS >');
+    expect(warnStart).toBeGreaterThan(-1);
+    const warnBranch = dbCode.slice(warnStart, dbCode.indexOf('\n}', warnStart));
+    expect(warnBranch).toContain('console.warn(');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: pins the UNEVALUATED token in raw source
+    expect(warnBranch).toContain('${configuredRealmCount}');
+    // The threshold IS the parser's accepted ceiling (one constant, so the two
+    // can never drift), pinned here to its literal value, and to the default
+    // beside it: the derivation plus the number, the trap this file exists for.
+    expect(dbCode).toContain(
+      'configuredRealmCount * DB_POOL_MAX_CLIENTS > DB_POOL_MAX_CLIENTS_CEILING',
+    );
+    expect(dbCode).toContain('const DB_POOL_MAX_CLIENTS_CEILING = 97;');
+    expect(dbCode).toContain('const DB_POOL_MAX_CLIENTS_DEFAULT = 10;');
+    // No re-inlined ceiling anywhere in the module (the parser bound and the
+    // multiplication warning both read the constant).
+    expect(dbCode).not.toContain('<= 97');
+    expect(dbCode).not.toContain('> 97');
   });
 
   it('the pg pool timeouts wire the named constants at construction, never a re-inlined literal', () => {
@@ -801,5 +968,32 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     // a NEW query param with a re-typed numeric fallback is caught, not just the
     // six spellings above.
     expect(dailySrc).not.toMatch(/get\('[^']+'\)\)\s*\|\|\s*\d/);
+  });
+});
+
+// A knob is only a knob where it is reachable. server/db.ts reads the env var,
+// but the shipped compose deployment hands the game service an explicit
+// environment allowlist (no env_file), so a var missing from that list never
+// reaches the process however carefully the host .env sets it. The
+// deploy_*.test.ts family owns this contract for the other runtime knobs;
+// DB_POOL_MAX_CLIENTS rides here, with the rest of its pins.
+describe('the DB pool knob reaches the shipped container', () => {
+  it('passes DB_POOL_MAX_CLIENTS through to the game service, and documents it', () => {
+    const compose = read('docker-compose.yml');
+    // Scoped to the game service block: discord-bot runs the SAME image, so a
+    // whole-file match would still pass with the line on the wrong service.
+    // Bounded at the NEXT top-level service key rather than at discord-bot by
+    // name, so inserting a service between the two cannot silently widen the
+    // slice (fix-round audit).
+    const gameStart = compose.indexOf('\n  game:');
+    expect(gameStart).toBeGreaterThanOrEqual(0);
+    const rest = compose.slice(gameStart + '\n  game:'.length);
+    const next = rest.match(/\n {2}[a-z][a-z-]*:/);
+    expect(next).toBeTruthy();
+    const gameService = rest.slice(0, next?.index);
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: pins compose's own substitution syntax
+    expect(gameService).toContain('DB_POOL_MAX_CLIENTS: ${DB_POOL_MAX_CLIENTS:-}');
+    // Documented for operators, commented out so the built-in default applies.
+    expect(read('.env.example')).toContain('#DB_POOL_MAX_CLIENTS=10');
   });
 });

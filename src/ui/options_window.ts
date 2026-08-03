@@ -1114,7 +1114,8 @@ export class OptionsWindow {
     if (tab === 'chat') {
       this.chatTimestampRows(body);
       this.chatWindowResetRow(body);
-      // Deed broadcasts (share deed unlocks with guild and friends): an ASYNC
+      // Deed broadcasts (share deed unlocks with guildmates and followers, and
+      // deed and masterwork cards with the Discord feed, R58): an ASYNC
       // account setting (accounts.deed_broadcasts), not a settings.ts key, so it
       // is a bespoke row; the seam is the final truth (main.ts wires it only when
       // an authenticated account exists, so an offline character never sees it).

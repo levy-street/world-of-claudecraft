@@ -64,10 +64,15 @@ function onDiskCores(dir: string): string[] {
 // (a code comment that names Math.random, or "the search window") cannot create a
 // false positive. String literals are left intact: the dotted patterns matched
 // below (Math.random, window., ...) do not appear inside the sim's player text.
+// One alternation, so leftmost-first matching decides precedence: a line comment
+// whose text contains /* is consumed AS a line comment instead of opening a
+// bogus block that swallows everything to the next */ elsewhere in the file
+// (that ordering bug exempted most of data.ts, its 53 imports included, from
+// every scan below). The (^|[^:]) guard keeps protocol strings (http://) intact.
 function stripComments(src: string): string {
-  return src
-    .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '))
-    .replace(/(^|[^:])\/\/.*$/gm, '$1');
+  return src.replace(/\/\*[\s\S]*?\*\/|(^|[^:])\/\/[^\n]*/gm, (m, pre) =>
+    m.startsWith('/*') ? m.replace(/[^\n]/g, ' ') : (pre ?? ''),
+  );
 }
 
 // A specifier a host-agnostic sim file must never import. Returns the offending
@@ -139,12 +144,15 @@ const simFiles = walk(simRoot);
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
   'src/ui/aura_overlay_view.ts',
+  'src/ui/banner_queue.ts',
+  'src/ui/item_kind_label.ts',
   'src/ui/proc_overlay_view.ts',
   'src/ui/camera_prompt_core.ts',
   'src/ui/chat_ignore_core.ts',
   'src/ui/daily_rewards_launcher_core.ts',
   'src/ui/char_bags_pairing_core.ts',
   'src/ui/equip_drop_core.ts',
+  'src/ui/known_item.ts',
   'src/ui/log_event_route.ts',
   'src/ui/mob_idle_sfx.ts',
   'src/ui/unit_portrait.ts',
@@ -162,6 +170,7 @@ const UI_PURE_CORES = [
   'src/ui/coords.ts',
   'src/ui/hud/quest/quest_tracker.ts',
   'src/ui/hud/quest/prof_intro_hint_core.ts',
+  'src/ui/quest_marker_tags.ts',
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/hud/battleground/battleground_map_view.ts',
   'src/ui/hud/battleground/battleground_kill_feed_view.ts',
@@ -178,6 +187,7 @@ const UI_PURE_CORES = [
   'src/ui/talents_view.ts',
   'src/ui/social_view.ts',
   'src/ui/tab_strip_view.ts',
+  'src/ui/bag_filter.ts',
   'src/ui/bags_view.ts',
   'src/ui/bag_item_context_menu.ts',
   'src/ui/enchant_apply_view.ts',
@@ -220,6 +230,7 @@ const UI_PURE_CORES = [
   'src/ui/bg_field_relief_core.ts',
   'src/ui/map_window_view.ts',
   'src/ui/continent_map_view.ts',
+  'src/ui/map_open_sea_edge_core.ts',
   'src/ui/map_quest_list_view.ts',
   'src/ui/arena_window_view.ts',
   'src/ui/pvp_tabs_view.ts',
@@ -385,6 +396,8 @@ const RENDER_PURE_CORES = [
 // updating this list) fails the cross-check instead of silently escaping the
 // reverse-completeness guard.
 const BARE_NAMED = [
+  'src/ui/banner_queue.ts',
+  'src/ui/item_kind_label.ts',
   'src/render/foliage_lod.ts',
   'src/render/compile_gate.ts',
   'src/render/prewarm_pass.ts',
@@ -392,6 +405,7 @@ const BARE_NAMED = [
   'src/render/prewarm_resume.ts',
   'src/ui/mob_idle_sfx.ts',
   'src/ui/gather_tool_tooltip.ts',
+  'src/ui/known_item.ts',
   'src/ui/unit_portrait.ts',
   'src/ui/xp_bar.ts',
   'src/ui/absorb_bar.ts',
@@ -404,9 +418,11 @@ const BARE_NAMED = [
   'src/ui/clock.ts',
   'src/ui/compass.ts',
   'src/ui/coords.ts',
+  'src/ui/bag_filter.ts',
   'src/ui/bag_item_context_menu.ts',
   'src/ui/item_slot_labels.ts',
   'src/ui/hud/quest/quest_tracker.ts',
+  'src/ui/quest_marker_tags.ts',
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/swing_timer.ts',
   'src/ui/unit_frame.ts',
@@ -939,7 +955,9 @@ const EXPECTED_BARE_NAMED = [
   'src/render/prewarm_policy.ts',
   'src/render/prewarm_resume.ts',
   'src/ui/absorb_bar.ts',
+  'src/ui/bag_filter.ts',
   'src/ui/bag_item_context_menu.ts',
+  'src/ui/banner_queue.ts',
   'src/ui/chat_bubble_style.ts',
   'src/ui/clock.ts',
   'src/ui/compass.ts',
@@ -950,7 +968,9 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/guild_hide_offline.ts',
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/hud/quest/quest_tracker.ts',
+  'src/ui/item_kind_label.ts',
   'src/ui/item_slot_labels.ts',
+  'src/ui/known_item.ts',
   'src/ui/live_region_politeness.ts',
   'src/ui/log_event_route.ts',
   'src/ui/low_health.ts',
@@ -962,6 +982,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/party_frames.ts',
   'src/ui/pet_action_icons.ts',
   'src/ui/quality_glow.ts',
+  'src/ui/quest_marker_tags.ts',
   'src/ui/rest_indicator.ts',
   'src/ui/roving_index.ts',
   'src/ui/safe_local_storage.ts',
@@ -1306,7 +1327,7 @@ const UI_DOM_MODULES = [
   'src/ui/focus_manager.ts',
   'src/ui/focus_restore.ts',
   'src/ui/form_draft.ts',
-  'src/ui/gather_node_tooltip.ts',
+  'src/ui/gather_node_tooltip_controller.ts',
   'src/ui/gpu_notice_toast.ts',
   'src/ui/hud.ts',
   'src/ui/hud/chat/chat_geometry_controller.ts',
@@ -1325,6 +1346,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/quest/quest_dialog_controller.ts',
   'src/ui/hud/quest/quest_tracker_controller.ts',
   'src/ui/hud/quest/questlog_window.ts',
+  'src/ui/hud/vendor/buy_quantity_prompt_window.ts',
   'src/ui/hud/vendor/heroic_vendor_window.ts',
   'src/ui/hud/vendor/train_window.ts',
   'src/ui/hud/vendor/unbind_window.ts',
@@ -1364,6 +1386,12 @@ const UI_DOM_MODULES = [
   'src/ui/proc_overlay_drag.ts',
   'src/ui/profession_identity_card.ts',
   'src/ui/profession_tutorial_window.ts',
+  'src/ui/prompt_dialog.ts',
+  // professions_window.ts is BACK on the ledger: the focus_restore move left
+  // it host-free for a while, but armSentGuard's one-shot re-arm timer is a
+  // real host reach, now spelled window.setTimeout so this sweep can see it
+  // (a bare setTimeout sat in the sweep's blind spot, the whole-branch
+  // review's note).
   'src/ui/professions_window.ts',
   'src/ui/reconnect_overlay.ts',
   'src/ui/settings_controls.ts',

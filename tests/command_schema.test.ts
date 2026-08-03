@@ -31,10 +31,16 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // place_mobile_station, train_recipe, the three enchanting actions
 // (disenchant_item, apply_enchant, salvage_item), unbind_item (the
 // Maker's Bond unbind service), the Rift + mounts surface (rift and
-// forge commands, learn_riding, mount selection), and market_list_instance
-// (the instance-payload market pipe).
-const EXPECTED_SEND_COUNT = 177; // +3 battleground sends // mount_select left the wire (reins are items)
-const EXPECTED_DISPATCH_COUNT = 190; // +4 battleground, +1 profiler invulnerability (both dev-only dispatch tokens)
+// forge commands, learn_riding), plus slot_tool_effect
+// (attach a catalog effect to one gathering profession's tool, keyed per
+// profession rather than per tool item because the live harvest path
+// resolves a tier and never a tool), and market_list_instance
+// (the instance-payload market pipe). mount_select left the wire
+// (reins are items); recharge_tool_effect joined (the acquisition craft);
+// profiler invulnerability joined as a dev-only dispatch token (no send);
+// the battleground adds three sends plus the dev-only force start.
+const EXPECTED_SEND_COUNT = 179; // +3 battleground sends
+const EXPECTED_DISPATCH_COUNT = 192; // +3 battleground sends, +1 dev_bg_start
 const EXPECTED_DISPATCH_ONLY_COUNT = 13; // + dev_bg_start + dev_profiler_invulnerable
 
 // The chat sub-channel routing switch (server/game.ts `switch

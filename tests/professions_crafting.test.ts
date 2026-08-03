@@ -5,7 +5,9 @@ import {
   COMBO_RECIPES,
   COMMON_RECIPES,
   LADDER_RECIPES,
+  ROD_RECIPES,
   recipeById,
+  TOOL_EFFECT_RECIPES,
   TOOL_RECIPES,
 } from '../src/sim/content/recipes';
 import { STATIONS } from '../src/sim/data';
@@ -83,13 +85,16 @@ describe('TOOL_RECIPES (#1135 de-stub): tier 4/5 tool recipes', () => {
     // requires standing at that station; there is NO level arm anymore (see
     // professions_crafting_hub.test.ts for the gate's dedicated coverage).
     placeAtStationFor(sim, pid, recipe.id);
-    grantItem(sim, 'thorium_ore', 4, pid);
+    // The FINE mirefen ore, not plain osmium (D8): the tier-4 pick's reagent
+    // moved onto the grade that only a tier-3 pick can gather, which is the
+    // same pick this recipe consumes.
+    grantItem(sim, 'fine_iron_ore', 4, pid);
     grantItem(sim, 'mithril_mining_pick', 1, pid);
 
     const result = resolveCraft((sim as any).ctx, pid, recipe.id);
 
     expect(result.ok).toBe(true);
-    expect(sim.countItem('thorium_ore', pid)).toBe(0);
+    expect(sim.countItem('fine_iron_ore', pid)).toBe(0);
     expect(sim.countItem('mithril_mining_pick', pid)).toBe(0);
     expect(sim.countItem('thorium_mining_pick', pid)).toBe(1);
   });
@@ -405,6 +410,8 @@ describe('craftItem command (#1127)', () => {
     const allIds = [
       ...COMMON_RECIPES,
       ...TOOL_RECIPES,
+      ...ROD_RECIPES,
+      ...TOOL_EFFECT_RECIPES,
       ...CASTER_HUB_RECIPES,
       ...COMBO_RECIPES,
       ...LADDER_RECIPES,
@@ -414,6 +421,8 @@ describe('craftItem command (#1127)', () => {
     expect(sim.recipeList.length).toBe(
       COMMON_RECIPES.length +
         TOOL_RECIPES.length +
+        ROD_RECIPES.length +
+        TOOL_EFFECT_RECIPES.length +
         CASTER_HUB_RECIPES.length +
         COMBO_RECIPES.length +
         LADDER_RECIPES.length,

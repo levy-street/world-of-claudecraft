@@ -4,13 +4,13 @@ import { clonePropsWithoutEastbrookLayout } from '../src/sim/custom_world_props'
 import { PROPS } from '../src/sim/data';
 import { emptyZoneProps } from '../src/sim/types';
 import { terrainHeight, waterLevel } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
 // Marsh reeds are waterline dressing around the Deepfen Shallows lake: the renderer
 // (src/render/props.ts) drops each clump straight onto terrainHeight() with no
 // water-aware snapping and no collider, so a coordinate that drifts up the bank
 // renders as a 3-yard reed bush stranded in a dry field, and one that drifts into
 // deep water sinks. Authoring is the only gate, hence this pin.
-const WORLD_SEED = 20061; // the shipped world's fixed seed (server/game.ts, src/main.ts)
 
 // How far above/below waterLevel() a clump may sit and still read as shoreline.
 const MAX_BANK_OFFSET = 1;

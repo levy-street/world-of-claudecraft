@@ -58,6 +58,8 @@ function makeMatch(
   return {
     id: 7,
     phase: 'active',
+    rated: true,
+    practice: false,
     countdown: 0,
     timeLeft: 245,
     golden: false,
@@ -204,6 +206,15 @@ describe('vale_cup_window_view: selections', () => {
     const v = live(buildVcupView(input({ selectedBracket: 1 })));
     expect(v.roles.map((r) => r.id)).toEqual(['allrounder', 'striker', 'sweeper', 'keeper']);
     expect(v.roles.every((r) => !r.disabled)).toBe(true);
+  });
+
+  it('flags the 1v1/2v2 brackets for the all-rounder role note (issue 2767)', () => {
+    // The sim seats every 1v1/2v2 fighter as All-Rounder (normalizeRole), so
+    // the painter shows the note making the keeper deeds' 3v3+ gate explicit.
+    expect(live(buildVcupView(input({ selectedBracket: 1 }))).smallBracketRoles).toBe(true);
+    expect(live(buildVcupView(input({ selectedBracket: 2 }))).smallBracketRoles).toBe(true);
+    expect(live(buildVcupView(input({ selectedBracket: 3 }))).smallBracketRoles).toBe(false);
+    expect(live(buildVcupView(input({ selectedBracket: 5 }))).smallBracketRoles).toBe(false);
   });
 });
 

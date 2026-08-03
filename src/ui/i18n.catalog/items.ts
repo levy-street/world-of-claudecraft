@@ -44,6 +44,10 @@ const itemStringsEn = {
       armor: 'Armor',
       quest: 'Quest Item',
       junk: 'Junk',
+      // The fine-grade presentation split (the UX pass): a fine material's
+      // KIND stays 'junk' internally (substitution and sell rules key off
+      // it) but its tooltip line reads this instead.
+      fineMaterial: 'Fine Material',
       food: 'Food',
       drink: 'Drink',
     },
@@ -93,6 +97,21 @@ const itemStringsEn = {
       destroyTitle: 'Destroy {item}',
       destroyConfirm: 'Destroy',
       destroyCancel: 'Cancel',
+      // Tooltip sub-line for a stack whose item id this bundle cannot resolve
+      // (a client one deploy behind the server, R34); the title is the raw id.
+      unknownItem: 'Unknown item',
+      // The same stack's accessible name: the aria channel must carry the
+      // UNKNOWN signal too, since the tooltip sub-line is hover-only.
+      unknownItemAria: 'Unknown item {id}, quantity {count}',
+      // The per-copy flags for an unknown stack (stale-client guard): both
+      // aria facts must survive together, the UNKNOWN signal (the tooltip is
+      // mouse-only) and the instance flag the sighted glyph shows. Kind map
+      // mirrors hudChrome.bags.itemAria*: signed and generic share the
+      // maker-marked wording.
+      unknownItemAriaMasterwork: 'Unknown item {id}, quantity {count}, masterwork',
+      unknownItemAriaEnchanted: 'Unknown item {id}, quantity {count}, enchanted copy',
+      unknownItemAriaBound: 'Unknown item {id}, quantity {count}, bound copy',
+      unknownItemAriaInstanced: 'Unknown item {id}, quantity {count}, maker-marked copy',
     },
     equipment: {
       empty: 'Empty',
@@ -103,10 +122,38 @@ const itemStringsEn = {
       close: 'Close vendor',
       hint: 'Click an item in your bags to sell it while this window is open.',
       buyAria: 'Buy {item} for {price}',
+      // The requirement-carrying sibling (R22): an aria-label REPLACES the
+      // button's content as its accessible name, so a row whose tool carries
+      // an unmet wield requirement must fold that advisory into the name
+      // itself or screen-reader users never hear it. One key, never two
+      // concatenated t() results; {requirement} receives the already
+      // localized "Requires {craft} {skill}" line.
+      buyAriaWithRequirement: 'Buy {item} for {price}. {requirement}',
       // Bulk purchase (#2374): a ctrl/cmd-click on the row or this always-visible
       // control buys the largest affordable stack in one purchase.
       buyStack: 'Buy {count}',
       buyStackAria: 'Buy {count} {item} for {price}',
+      // The 1x/5x/10x/custom purchase control row (phase 21). qtyMultiple is
+      // the visible label on both the control chips AND the per-row count
+      // chip beside a multiplied total (one grammar for both surfaces); the
+      // arias name the action for screen readers.
+      qtyRowAria: 'Purchase quantity',
+      qtyMultiple: '{count}x',
+      qtyMultipleAria: 'Buy {count} at a time',
+      qtyCustom: 'Custom',
+      qtyCustomAria: 'Choose a custom amount to buy',
+      // The count-aware row labels (acceptance: aria names qty and total
+      // price). The requirement sibling folds the R22 advisory into the name
+      // exactly like buyAriaWithRequirement: one combined key, never two
+      // concatenated t() results.
+      buyCountAria: 'Buy {count} of {item} for {price}',
+      buyCountAriaWithRequirement: 'Buy {count} of {item} for {price}. {requirement}',
+      // The custom-amount prompt (the sell-split prompt family): the title
+      // shows the countFit-derived maximum so the cap is never a surprise;
+      // the cancel label reuses sellQuantityCancel like the deposit prompt.
+      buyQuantityTitle: 'Buy how many {item}? Up to {max}.',
+      buyQuantityInput: 'Quantity to buy',
+      buyQuantityConfirm: 'Buy',
     },
     market: {
       title: 'The World Market',
@@ -297,6 +344,7 @@ export const itemStrings = {
         clickDestroy: 'Haz clic para destruir',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: 'Bolsas',
         close: 'Cerrar bolsas',
         empty: 'Tus bolsas están vacías.',
@@ -464,6 +512,7 @@ export const itemStrings = {
         clickDestroy: 'Cliquer pour détruire',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: 'Sacs',
         close: 'Fermer les sacs',
         empty: 'Vos sacs sont vides.',
@@ -631,6 +680,7 @@ export const itemStrings = {
         clickDestroy: 'Clicca per distruggere',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: 'Borse',
         close: 'Chiudi borse',
         empty: 'Le tue borse sono vuote.',
@@ -791,6 +841,7 @@ export const itemStrings = {
         clickDestroy: 'Zum Zerstören klicken',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: 'Taschen',
         close: 'Taschen schließen',
         empty: 'Eure Taschen sind leer.',
@@ -950,6 +1001,7 @@ export const itemStrings = {
         clickDestroy: '点击摧毁',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: '背包',
         close: '关闭背包',
         empty: '你的背包是空的。',
@@ -1104,6 +1156,7 @@ export const itemStrings = {
         clickDestroy: '點擊摧毀',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: '背包',
         close: '關閉背包',
         empty: '你的背包是空的。',
@@ -1260,6 +1313,7 @@ export const itemStrings = {
         clickDestroy: '클릭하여 파괴',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: '가방',
         close: '가방 닫기',
         empty: '가방이 비어 있습니다.',
@@ -1418,6 +1472,7 @@ export const itemStrings = {
         clickDestroy: 'クリックして破棄',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: 'バッグ',
         close: 'バッグを閉じる',
         empty: 'バッグは空です。',
@@ -1576,6 +1631,7 @@ export const itemStrings = {
         clickDestroy: 'Clique para destruir',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: 'Bolsas',
         close: 'Fechar bolsas',
         empty: 'Suas bolsas estão vazias.',
@@ -1734,6 +1790,7 @@ export const itemStrings = {
         clickDestroy: 'Нажмите, чтобы уничтожить',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: 'Сумки',
         close: 'Закрыть сумки',
         empty: 'Ваши сумки пусты.',
@@ -1816,8 +1873,13 @@ export const itemStrings = {
   },
 };
 
-itemStrings.es_ES = itemStrings.es;
-itemStrings.fr_CA = itemStrings.fr_FR;
+// The casts keep these dialect aliases from forcing new keys into the inline
+// locale blocks above: those blocks are INERT legacy data (the resolver reads
+// only itemStrings.en; translations live in src/ui/i18n.locales/<lang>.ts),
+// and the uncast assignment is exactly what once pushed real fills into this
+// file where no locale ever served them.
+itemStrings.es_ES = itemStrings.es as typeof itemStringsEn;
+itemStrings.fr_CA = itemStrings.fr_FR as typeof itemStringsEn;
 
 const ITEM_ENTITY_IDS = [
   'worn_sword',
@@ -2191,6 +2253,17 @@ const ITEM_ENTITY_IDS = [
   'resonant_links',
   'resonant_steel',
   'resonant_timber',
+  'fine_copper_ore',
+  'fine_iron_ore',
+  'fine_thorium_ore',
+  'fine_ironbark_log',
+  'fine_ashwood_log',
+  'fine_elderwood_log',
+  'fine_silverleaf_herb',
+  'fine_goldleaf_herb',
+  'fine_sunpetal_herb',
+  'stormreel_fishing_rod',
+  'tidewrought_fishing_rod',
   'duskwisp_essence',
   'spore_heart',
   'gleaming_antler',
@@ -2297,6 +2370,8 @@ const ITEM_ENTITY_IDS = [
   'saltforged_grips',
   'mantle_of_the_unbroken_shore',
   'last_keep_signet',
+  'gatherers_cache',
+  'artisans_eye',
   'reins_terrorspark_groundshaker',
 ] as const;
 
@@ -2393,6 +2468,8 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   saltforged_grips: 'Saltforged Grips',
   mantle_of_the_unbroken_shore: 'Mantle of the Unbroken Shore',
   last_keep_signet: 'Signet of the Last Keep',
+  gatherers_cache: "Gatherer's Cache",
+  artisans_eye: "Artisan's Eye",
   reins_terrorspark_groundshaker: 'Ignition Key: Terrorspark Groundshaker',
 };
 
@@ -2814,6 +2891,17 @@ const itemNamesEn = {
       'Resonant Links',
       'Resonant Steel',
       'Resonant Timber',
+      'Fine Copper Ore',
+      'Fine Iron Ore',
+      'Fine Osmium Ore',
+      'Fine Ironbark Log',
+      'Fine Ashwood Log',
+      'Fine Highpine Log',
+      'Fine Sheenleaf Herb',
+      'Fine Goldleaf Herb',
+      'Fine Sunpetal Herb',
+      'Stormreel Fishing Rod',
+      'Tidewrought Fishing Rod',
       'Duskwisp Essence',
       'Spore Heart',
       'Gleaming Antler',
@@ -3230,6 +3318,17 @@ export const itemNames = {
         'Resonant Links',
         'Resonant Steel',
         'Resonant Timber',
+        'Fine Copper Ore',
+        'Fine Iron Ore',
+        'Fine Osmium Ore',
+        'Fine Ironbark Log',
+        'Fine Ashwood Log',
+        'Fine Highpine Log',
+        'Fine Sheenleaf Herb',
+        'Fine Goldleaf Herb',
+        'Fine Sunpetal Herb',
+        'Stormreel Fishing Rod',
+        'Tidewrought Fishing Rod',
         'Esencia de fuego crepuscular',
         'Corazón de espora',
         'Asta reluciente',
@@ -3644,6 +3743,17 @@ export const itemNames = {
         'Resonant Links',
         'Resonant Steel',
         'Resonant Timber',
+        'Fine Copper Ore',
+        'Fine Iron Ore',
+        'Fine Osmium Ore',
+        'Fine Ironbark Log',
+        'Fine Ashwood Log',
+        'Fine Highpine Log',
+        'Fine Sheenleaf Herb',
+        'Fine Goldleaf Herb',
+        'Fine Sunpetal Herb',
+        'Stormreel Fishing Rod',
+        'Tidewrought Fishing Rod',
         'Essence de feu follet du crépuscule',
         'Coeur de spore',
         'Bois de cerf luisant',
@@ -4059,6 +4169,17 @@ export const itemNames = {
         'Resonant Links',
         'Resonant Steel',
         'Resonant Timber',
+        'Fine Copper Ore',
+        'Fine Iron Ore',
+        'Fine Osmium Ore',
+        'Fine Ironbark Log',
+        'Fine Ashwood Log',
+        'Fine Highpine Log',
+        'Fine Sheenleaf Herb',
+        'Fine Goldleaf Herb',
+        'Fine Sunpetal Herb',
+        'Stormreel Fishing Rod',
+        'Tidewrought Fishing Rod',
         'Essenza di fuoco fatuo del crepuscolo',
         'Cuore di spora',
         'Palco luccicante',
@@ -4472,6 +4593,17 @@ export const itemNames = {
         'Resonant Links',
         'Resonant Steel',
         'Resonant Timber',
+        'Fine Copper Ore',
+        'Fine Iron Ore',
+        'Fine Osmium Ore',
+        'Fine Ironbark Log',
+        'Fine Ashwood Log',
+        'Fine Highpine Log',
+        'Fine Sheenleaf Herb',
+        'Fine Goldleaf Herb',
+        'Fine Sunpetal Herb',
+        'Stormreel Fishing Rod',
+        'Tidewrought Fishing Rod',
         'Dämmerirrlicht-Essenz',
         'Sporenherz',
         'Schimmerndes Geweih',
@@ -4885,6 +5017,17 @@ export const itemNames = {
         'Resonant Links',
         'Resonant Steel',
         'Resonant Timber',
+        '优质铜矿石',
+        '优质铁矿石',
+        '优质锇矿石',
+        '优质铁皮木原木',
+        '优质灰木原木',
+        '优质高松原木',
+        '优质润光叶草',
+        '优质金叶草',
+        '优质阳瓣草',
+        '风暴轮钓竿',
+        '潮铸钓竿',
         '暮光灵精华',
         '孢子之心',
         '辉光鹿角',
@@ -5298,6 +5441,17 @@ export const itemNames = {
         'Resonant Links',
         'Resonant Steel',
         'Resonant Timber',
+        '優質銅礦石',
+        '優質鐵礦石',
+        '優質鋨礦石',
+        '優質鐵皮木原木',
+        '優質灰木原木',
+        '優質高松原木',
+        '優質潤光葉草',
+        '優質金葉草',
+        '優質陽瓣草',
+        '風暴輪釣竿',
+        '潮鑄釣竿',
         '暮光靈精華',
         '孢子之心',
         '輝光鹿角',
@@ -5711,6 +5865,17 @@ export const itemNames = {
         'Resonant Links',
         'Resonant Steel',
         'Resonant Timber',
+        '상급 구리 광석',
+        '상급 철 광석',
+        '상급 오스뮴 광석',
+        '상급 무쇠껍질나무 통나무',
+        '상급 잿빛나무 통나무',
+        '상급 고산솔 통나무',
+        '상급 윤광잎 약초',
+        '상급 금빛잎 약초',
+        '상급 태양꽃잎 약초',
+        '폭풍릴 낚싯대',
+        '조수벼림 낚싯대',
         '황혼 위습의 정수',
         '포자 심장',
         '빛나는 가지뿔',
@@ -6124,6 +6289,17 @@ export const itemNames = {
         'Resonant Links',
         'Resonant Steel',
         'Resonant Timber',
+        '上質な銅鉱石',
+        '上質な鉄鉱石',
+        '上質なオスミウム鉱石',
+        '上質なアイアンバークの丸太',
+        '上質なアッシュウッドの丸太',
+        '上質な高嶺松の丸太',
+        '上質な艶葉草',
+        '上質なゴールドリーフ草',
+        '上質なサンペタル草',
+        '嵐リールの釣り竿',
+        '潮鍛えの釣り竿',
         'ダスクウィスプの精髄',
         '胞子の心臓',
         '輝く鹿角',
@@ -6537,6 +6713,17 @@ export const itemNames = {
         'Resonant Links',
         'Resonant Steel',
         'Resonant Timber',
+        'Fine Copper Ore',
+        'Fine Iron Ore',
+        'Fine Osmium Ore',
+        'Fine Ironbark Log',
+        'Fine Ashwood Log',
+        'Fine Highpine Log',
+        'Fine Sheenleaf Herb',
+        'Fine Goldleaf Herb',
+        'Fine Sunpetal Herb',
+        'Stormreel Fishing Rod',
+        'Tidewrought Fishing Rod',
         'Essência de fogo-fátuo do crepúsculo',
         'Coração de esporo',
         'Galhada reluzente',
@@ -6950,6 +7137,17 @@ export const itemNames = {
         'Resonant Links',
         'Resonant Steel',
         'Resonant Timber',
+        'Отборная медная руда',
+        'Отборная железная руда',
+        'Отборная осмиевая руда',
+        'Отборное бревно железнокорого дерева',
+        'Отборное бревно пепельного дерева',
+        'Отборное бревно горной сосны',
+        'Отборная трава глянцелист',
+        'Отборная трава золотолист',
+        'Отборная трава солнцелепест',
+        'Удочка со штормовой катушкой',
+        'Удочка приливной ковки',
         'Сущность сумеречного огонька',
         'Споровое сердце',
         'Сияющий рог',

@@ -67,7 +67,13 @@ Gains are node-tier-relative (`gatherNodeGainMultiplier`,
 (`src/sim/professions/gather_events.ts`) are per-node-type flavors (pristine
 vein, ancient heartwood, moonlit bloom) on ONE shared cadence knob
 (`GATHER_RARE_EVENT_CHANCE`), five times yield, always signed, announced to
-the overworld zone via `emitToZonePlayers`. Corpse harvesting grants ALL
+the overworld zone via `emitToZonePlayers`. Rare-event flavor and material
+signing stay ZONE-AGNOSTIC by design (the content pass's richness audit
+considered zone-flavored rare moments and declined for now): the flavors
+are type identity, the signing is proficiency identity, and the shared
+cadence knob is what the post-launch watch tunes; zone-flavored moments
+become worth their content cost when a zone ships a signature material
+family of its own, the zone-4 design pass's call. Corpse harvesting grants ALL
 plain yields before any signed instance, specimens last, with rarity draws
 staying in the first loop in yield order (`harvestCorpse`,
 `src/sim/interaction.ts`; the draw order is pinned by the corpse suites' own
@@ -100,17 +106,36 @@ per cast (`FISH_BITE_DELAY_MIN_SEC` to `FISH_BITE_DELAY_MAX_SEC`, rod tiers
 above the first shave the max by `FISH_BITE_DELAY_ROD_REDUCTION_SEC`), a
 text-free personal bite SimEvent, and a server-authoritative reel window
 (`FISH_REEL_WINDOW_SEC` plus `FISH_REEL_WINDOW_ROD_BONUS_SEC` per rod tier
-above the first); reel is re-pressing the pole. A miss costs only the cast.
+above the first plus `FISH_REEL_WINDOW_RARITY_BONUS_SEC` per rarity rung
+above common); reel is re-pressing the pole. A miss costs only the cast.
 The wire carries zero bite information (castRemaining decays uniformly), so a
 scripted client can react faster but can never learn the bite early or
 stretch the window: accepted by design, attention over reflexes. Catch
 tables are proficiency-banded (`FISHING_TABLES_BY_BAND`, bands gated by rod
 tier band+1; band 0 is byte-identical to the original shipped table). Gains
-are band-relative and fractional (`FISHING_GAIN_SCHEDULE`); junk teaches
-nothing at or past `FISHING_JUNK_GAIN_CUTOFF_PROFICIENCY`. Hidden per-cast
-state is three transient Entity fields (`fishBiteAtTick`,
-`fishReelDeadlineTick`, `gatherCastNodeId`), never wired, never persisted,
-cleared on every cast-end path.
+are band-relative and fractional (`FISHING_GAIN_SCHEDULE`), and since R19
+the WATER caps how far they teach (`fishingTeachingCeilingFor`, derived
+from the schedule's own row boundaries: tier-1 water grays at 100, tier-2
+at 150, tier-3 at the cap); junk teaches nothing at or past
+`FISHING_JUNK_GAIN_CUTOFF_PROFICIENCY` wherever the water still teaches.
+Hidden per-cast state is a set of transient Entity fields
+(`fishBiteAtTick`, `fishReelDeadlineTick`, `gatherCastNodeId`,
+`fishCastZoneId`, `gatherCastToolRarity`), never wired, never
+persisted, cleared on every cast-end path.
+
+FISHING'S STATED IDENTITY (the content pass's richness audit, veto-able
+in the review worklist's ledger): fishing deliberately has NO fine-grade
+axis. Its specials are the zone-exclusive catch ladder itself (every
+zone's fish are strictly better eating and coin), the Glimmerfin Koi and
+the Codfather as its rare moments, the Slatefin as its zone-3 exclusive,
+and the empty-hook/got-away rhythm as its failure texture; its
+progression pacing is the rod ladder, the band tables, and the R19
+teaching ceiling. A fine-fish axis was considered in the audit and
+declined: it would duplicate what the band tables already express
+(better water, better fish) without a consumer, and the koi already
+fills the jackpot slot. Symmetry with the land trades is therefore
+CONTENT symmetry (per-zone deeds, per-zone tables, its own tool ladder),
+never mechanism-for-mechanism cloning.
 
 ### Tools and the mastery curve
 Every NODE harvest requires a matching-profession gathering tool covering
@@ -127,7 +152,48 @@ completion re-validates exactly range, respawn, and capacity. Using a
 pick/axe/sickle from the bags starts the standard gather cast on the
 nearest matching in-range node (`useGatherToolItem`,
 `src/sim/professions/gathering.ts`), preferring a ready node, and emits
-the text-free `gatherToolNoNode` event when nothing is in reach. Skill gain follows the four-state curve
+the text-free `gatherToolNoNode` event when nothing is in reach.
+
+A better tool also yields a better MATERIAL, which is the third thing the
+tool ladder buys after access and cast speed (`material_grades.ts`). Each
+of the nine node materials has a `fine_` grade, and a harvest grants it
+instead of the plain one when the player's tool is STRICTLY above the
+material's zone tier AND the vein carries that tier. Both arms are
+load-bearing: strictness keeps the tool that merely unlocks a material from
+also improving it (and keeps the parity gather scenario on its shipped
+yields), and the vein arm keeps the deliberate lower-tier veins in Mirefen
+and Thornpeak yielding the plain material, so the base stays gatherable by
+the player who out-tooled the zone. The gate reads the MATERIAL's tier, not
+the node's, because `NODE_MATERIAL_TABLE` resolves a yield from (type, zone)
+alone: all three tiers of Thornpeak vein grant the same id, so a literal
+"one tier above the node" rule would put the tier-4 pick's reagent on the
+easiest vein in the zone. Note this is a DIFFERENT ladder from
+`MATERIAL_TIER_BY_ITEM` (`material_tier.ts`), which is a price band feeding
+the masterwork proc and where the Eastbrook yields are deliberately tier 0.
+Grade resolution is a pure bag scan placed after both rng draws, so the
+two-draw contract is untouched, and it is read at the grant rather than
+carried from the cast start.
+
+The six crafted tool recipes consume the fine grade, so the tool one rung
+down is the only route to the rung above. Two rungs are shaped differently
+and the reason is recorded at `TOOL_RECIPES`: the tier-4 pick is re-pointed
+onto the Mirefen fine ore because the Thornpeak grade would have needed the
+pick that recipe produces, and the tier-5 pick keeps its refined
+`arcanite_bar` (re-pointing off it would strand the bar and its vendor rows)
+while gaining the Thornpeak fine grade.
+
+Substitution runs DOWNWARD only: a fine grade satisfies a requirement for
+its base, the base never satisfies a requirement for the fine grade. That
+asymmetry is what keeps the fine grade a real gate on the tool recipes, and
+the downward half is not a courtesy: the fine grade REPLACES the plain
+yield and Eastbrook is all tier-1 veins, so without it a player carrying any
+tier-2 tool could no longer gather `copper_ore`, `ironbark_log` or
+`silverleaf_herb` at all, taking two shipped repeatable work orders and
+every tier-1 recipe fed by those three with it. The base grade is spent
+first. One pure planner serves both the craft capacity simulation and the
+real consumption, since those must make the identical decision twice.
+
+Skill gain follows the four-state curve
 (`tierProgressMultiplier`, `src/sim/professions/wheel.ts`: 1 / 0.5 / 0.25 / 0
 by tiers below capability, every tier included, no free floor), with
 deterministic fractional gains and never a skill-up roll. Caps are enforced
@@ -136,8 +202,20 @@ functions); at cap, actions still work, only gain stops. A one-time mastery
 reset ran at the curve's deploy behind the persisted `masteryResetApplied`
 flag (`src/sim/professions/mastery_reset.ts`); `normalizeArchetypeState` is
 the single load-time reader of PRE-reset skill values and must keep running
-before `applyMasteryReset`. Tool effects/charges/recharge stay PARKED as
-dormant pure modules in `tools.ts`: do not wire, do not delete.
+before `applyMasteryReset`. Tool effects are LIVE end to end: the
+acquisition craft mints the two charm items through the game's first
+enchanting recipes (`content/recipes.ts` TOOL_EFFECT_RECIPES,
+trainer-taught at the toolworks), the slot command consumes a charm
+through the one mint authority (`resolveSlotToolEffect`, whose consumed
+copy's signer becomes the slot's `craftedBy`), the harvest bonuses spend a
+charge only when they changed the granted outcome (R42, settled at the
+command boundary), and the recharge command prices the arcane material of
+the recharge-time best tool's rarity rung at a count scaled to the charges
+restored (R39) while refilling to that tool's re-derived maximum (R30).
+The slot policy (R9, `slotToolEffectRefused`) still refuses the parked
+respawn-speed effect and all fishing slots until each has real behavior,
+and the craftable set derives from that policy (no Springback charm
+exists).
 
 Character XP from crafting is LEARNING XP: the level-banded curve
 (`craftActionXp`, `src/sim/professions/profession_xp.ts`) scaled at the
@@ -249,6 +327,23 @@ by `tests/professions_station_placement.test.ts`). Field recipes
 (`FIELD_RECIPES`, the common set in `src/sim/content/recipes.ts`) craft
 anywhere; every ladder recipe is trainer-taught AND station-bound. The
 mobile-crafting-station specialization perk bypasses the station gate.
+
+THE CRAFTING-ANCHOR RECORD (the review worklist's content pass, item 5):
+engineering's all-Eastbrook placement, the one toolworks station with
+Tinker Gizzel as its only trainer, is the DELIBERATE hub design, not a
+gap. The craft's outward pull rides its reagent side (the tier-3-plus
+tool recipes consume later-zone counters' exclusives and the prior tools
+themselves), while leatherworking and alchemy carry the station-side
+zone anchors (Fenbridge, Highwatch). Giving a later zone a toolworks
+stake was considered in the pass-1 audit and declined: it would dilute
+the toolmaker's-monopoly identity the guide sells without adding a pull
+the reagents do not already provide. Two riders, stated so the record is
+honest about its edges: the mobile-crafting-station perk above means a
+specialized crafter can work ANY ladder recipe in the field, so the
+station anchors are a pull for the unspecialized climb, not a wall; and
+the work-order distribution below follows the station distribution
+(one order per master), which is where the later-zone thinness comes
+from and why it is recorded as deliberate rather than filled.
 Training is skill-tier gated on learning, never on use:
 `tierForSkill(craft skill) >= tierForSkill(recipe.skillReq)`
 (`resolveTrain`, `src/sim/professions/training.ts`), fees from
@@ -268,7 +363,22 @@ active every other one reports unavailable in both hosts. One cadence-capped
 repeatable work-order quest per master (coin = floor(0.5 * summed vendor
 sellValue of the requested materials), `WORK_ORDER_PAYOUT_FRACTION`,
 cadence `WORK_ORDER_CADENCE_TICKS`; vendoring is always more gold by
-construction). One-shot-per-tier congratulation mail from the attuned
+construction). Two settled work-order calls from the review worklist's
+content pass, both veto-able rulings in its ledger: the LATER-ZONE
+THINNESS (four orders in Eastbrook, one each in Fenbridge and Highwatch)
+is deliberate, because orders are a per-master convention and the zones
+have one station master each; filling it would need either non-master
+order givers (a convention break) or later-zone stations (declined in
+the crafting-anchor record above). And the OUT-TOOLED payout stands as
+deliberate friction: a player whose tool mints only the fine grade hands
+over the more valuable material for the same flat coin (turn-in
+substitution is base-first, downward-only, `planGradeRemoval`), which is
+accepted because the order's real pay is its XP and cadence rhythm, the
+flat coin is what keeps the counter a commission rather than a second
+vendor, the sink property survives either way, and the surrendered value
+is bounded by the fine grade's vendor delta per window. The fine grade's
+worth is realized on the market and the crafting bench, not at the
+order counter. One-shot-per-tier congratulation mail from the attuned
 archetype's master (`src/sim/professions/tier_mail.ts`), trend nudges on
 `NUDGE_CADENCE_TICKS` (`src/sim/professions/prof_nudges.ts`, in-memory
 cadence, resets on restart by design), and the one-shot Guild trend letter
@@ -329,9 +439,14 @@ guards.
 | UNBIND_FEE_BY_QUALITY_TIER | src/sim/professions/commission.ts | [2500, 10000, 40000] copper, clamp both ends |
 | GATHER_CAST_BASE / FLOOR / TOOL_TIER / BAND (sec) | src/sim/professions/gathering.ts | 2.5 / 1.5 / 0.4 / 0.15 |
 | GATHER_GAIN_TIER_STEP | src/sim/professions/gathering.ts | 25 |
+| NODE_HARVEST_TABLE respawnSeconds | src/sim/professions/gathering.ts | 240 (ore / wood / herb) |
+| gather nodes per type per zone | src/sim/content/gather_nodes.ts | 6 |
 | GATHER_RARE_EVENT_CHANCE / YIELD_MULT | src/sim/professions/gather_events.ts | 1/90 / 5 |
+| TIER2 / TIER3_TOOL_GATE_PROFICIENCY | src/sim/content/vendor_row_gates.ts | 40 / 70 |
+| vendor land-tool buyValue by tier | src/sim/content/items.ts | 20 / 120 / 400 (tiers 1 to 3) |
+| tiered rod buyValue by tier | src/sim/content/items.ts | 60 / 150 (tiers 2 and 3) |
 | FISH_BITE_DELAY_MIN / MAX / ROD_REDUCTION (sec) | src/sim/professions/fishing.ts | 3 / 8 / 1.5 |
-| FISH_REEL_WINDOW_SEC / ROD_BONUS_SEC | src/sim/professions/fishing.ts | 3 / 0.75 |
+| FISH_REEL_WINDOW_SEC / _ROD_BONUS_SEC / _RARITY_BONUS_SEC | src/sim/professions/fishing.ts | 2.5 / 0.75 / 0.25 |
 | FISHING_SESSION_CAP_SEC | src/sim/types.ts | 15 |
 | FISHING_GAIN_SCHEDULE | src/sim/professions/fishing.ts | 1 below 50, 0.5 below 100, 0.1 below 150, 0.02 below 200 |
 | FISHING_JUNK_GAIN_CUTOFF_PROFICIENCY | src/sim/professions/fishing.ts | 100 |
@@ -348,13 +463,96 @@ guards.
 | LEGACY_GOLD_POSITIVE_RECIPE_IDS | tests/recipe_economy.test.ts | empty set (every recipe passes the invariant) |
 
 Time-to-master targets the constants were tuned against: first tier-up in
-15 to 20 minutes, skill 50 in an evening, craft mastery in 10 to 20 focused
-hours, gathering 100 in 8 to 12 hours, fishing 200 in 15 to 25 hours.
-Gathering-100 and fishing-200 currently pace FASTER than target:
-maintainer-accepted for this release; correct post-launch via data-only
-levers (respawn seconds, node density, quantity per rarity, bite-delay band,
-junk share), never via smaller gain numbers. If mastery should get longer,
-the lever is material quantities per craft.
+15 to 20 minutes, skill 50 in an evening, craft mastery in roughly 1.5 to 5
+focused hours, gathering 100 in 8 to 12 hours, fishing 200 in 15 to 25
+hours. The craft-mastery band MOVED from the authored 10-to-20 by the
+content pass's veto-able ruling (the review worklist's ledger): the old
+figure predated the v0.32.0 expansion, whose starter zones re-grant the
+top-rung materials from ten more zones (the all-zones supply arm in
+`tests/professions_crafts_to_mastery.test.ts` prices the same bill at
+about 2.8 gather hours under the deliberately conservative model, floored
+at 2 as its trivially-short alarm), and predated the #2387 Battlefield
+Experience attribution fix; the measured all-levers climb lands nearer 1
+to 3 gathering hours plus the cast, throttle, and travel time, which is
+where the band's low end comes from. One access assumption the figures
+rest on, stated: the expansion's thorium faucets are TIER-1 nodes, so
+under R22 they need only the tier-1 pick at any proficiency; only the
+Thornpeak tier-3 circuit asks for the wielded tier-3 tool (mining 70).
+Gathering-100 and fishing-200 currently pace FASTER than target: maintainer-accepted for this release;
+correct post-launch via data-only levers (respawn seconds, node density,
+quantity per rarity, bite-delay band, junk share), never via smaller gain
+numbers. If mastery should get longer, the pre-approved lever is material
+quantities per craft, and the durable supply-side answer is the zone-4
+design pass re-tiering the starter-zone faucets (R37's owner).
+
+The wield thresholds and the land-tool prices are the pacing lever on the
+tool ladder, and both halves are needed: the wield gate (R22) says when a
+rung you own starts working, the price says what the counter asks for it,
+and every counter sells ahead freely. Neither is a gain number, so neither
+touches the locked ruling above. The tier-2/3 thresholds must stay strictly
+below the proficiency at which a tier-1 node stops teaching, which is
+`GATHER_GAIN_TIER_STEP` times 3: the first zone is entirely tier-1 ground and
+the gather quests grant only the tier-1 tool, so a threshold at or above that
+ceiling is unreachable by the only means a new player has, and the ladder
+dead-ends. `tests/professions_tool_gate.test.ts` derives the ceiling from the
+live constants rather than restating it, so retuning the curve fails there
+instead of quietly bricking the climb; 70 rather than the ceiling-hugging 75 is
+that margin made deliberate. The prices were chosen against a first-zone solo
+quest income measured during planning; that figure is pinned nowhere, so it is
+the reason for the shape rather than a live number to check against. Rods are deliberately outside both: their
+profession has no nodes, so neither the ceiling derivation nor the hub-stocking
+rule below can be expressed for them.
+
+Which hub stocks which tier is content, not a constant: each hub sells only the
+tiers its own nodes use (Eastbrook tier 1, Fenbridge tiers 1 to 2, Highwatch
+tiers 1 to 3). Rods follow the same shape against WATER tiers: Fenbridge and
+Highwatch each stock the rung their own water demands, and Trader Wilkes keeps
+the whole rod ladder as the one buy-ahead counter (review ruling R20).
+
+The gate is a PURCHASE gate on the NPC counter, not a use-time gate. What a tool
+can work is decided solely by `canGatherTier` (`src/sim/professions/tools.ts`),
+which never reads proficiency, so every non-counter route reaches full tier at
+any proficiency. The routes worth naming, all open by design rather than by
+omission (and deliberately not given as a closed count, since a future feature
+can add another): a tool already owned, since nothing in the gate reads
+inventory; buyback, because returning a player's own sold item is not a new
+acquisition, and reaching it at 0 needs the tool owned and sold first, which the
+one-time mastery reset allows and so does any route below; and
+player-to-player transfer by market, direct trade or mail attachment, since none
+of the six carries `noMarketList`, `soulbound` or `bindOnTrade`, and the tier-4
+tool recipes consume the tier-3 tools as reagents.
+
+**SETTLED (review ruling R22, superseding the purchase-gate-only model).**
+The question was whether tool tier should gate at USE time rather than at
+purchase, and the answer is USE: land tools gain RuneScape-shaped wield
+requirements (tier 2/3 at gathering 40/70, tiers 4/5 derived under the
+knife-edge rule), the vendor purchase gates become advisory (counters sell
+ahead freely), and enforcement moves to the harvest gate, which also closes
+the traded-tool bypass. Rods are exempt: the water gate and the fishing
+teaching ceiling pace them. Pre-gate owners keep their tools and reach the
+threshold to wield them; nothing is confiscated. LIVE since the review
+worklist's phase 13: the wield gate is the shipped enforcement
+(`src/sim/professions/wield_gate.ts`, thresholds 40/70/85/100 pinned with
+the knife-edge derivation in `tests/professions_tool_gate.test.ts`), the
+counters sell ahead freely with the requirement as an advisory line, and
+the old authoritative buy deny is retired.
+
+One knock-on worth naming, and it INVERTED when the gate moved: the tier-4
+engineering tool recipes consume the tier-3 land tools as reagents, and
+with the counter open that reagent is purchasable at any proficiency
+(consuming a tool in a craft never wields it). Not a completability
+regression (the tool deed is any station craft, and the same recipes
+already need node-only materials), but it is a new coupling between an engineering craft and a gathering counter.
+
+Respawn seconds and node density are ONE lever, not two. The per-zone harvest
+ceiling is nodes x 3600 / respawn, so moving either alone moves the ceiling:
+240 seconds with six nodes per type per zone is the same 270 harvests an hour
+per zone as the earlier 120 seconds with three, and it brought the two later
+zones down onto that figure from 360 rather than lifting any zone. What the
+pair buys is world density and a longer circuit, so the wait is spent
+travelling instead of standing at a node already worked. The rare-event knob
+reads the same product (GATHER_RARE_EVENT_CHANCE, gather_events.ts), so it
+must be re-derived if either number is ever tuned on its own.
 
 ## Locked rulings (do not re-litigate)
 
@@ -365,8 +563,17 @@ the lever is material quantities per craft.
   reagents, the craft fee, market cut, unbind fees, make-amends costs). No
   recipe vendors above its input value (`tests/recipe_economy.test.ts`
   enforces output sellValue strictly below reagent value; the value model is
-  reagentUnitValue = buyValue when finite and positive, else sellValue). No
-  gathered or monster material ever gets a vendor buyValue.
+  reagentUnitValue = buyValue when finite and positive, else sellValue). No NPC
+  ever STOCKS a gathered or monster material: nothing a node, a corpse, or a
+  mob yields appears in any `vendorItems` row, so mastery is gathered for, not
+  shopped for. Those materials keep their `buyValue`, which is the economy
+  basis the rule above reads (`reagentUnitValue` falls back to `sellValue`, and
+  every gathered material is priced at exactly 4x, so dropping the field would
+  flip 28 recipes gold-positive against the rule rather than tighten it).
+  `arcanite_bar` is refined, not gathered, and stays stocked. The nine
+  `fine_` grades follow the same shape: node-gathered only, on no
+  `vendorItems` row anywhere, and priced with the same 4x `buyValue` for the
+  same reason.
 - Market: gold buys MATERIALS, never skill. Fungible materials stay
   listable; the curve, the shared throttle, and material volume are the
   sanctioned brake on purchased progress.
@@ -456,12 +663,40 @@ the lever is material quantities per craft.
   means Runed): a novel reagent mix silently lands in the base bucket, so
   re-derive the sweep's tier mapping when introducing one.
 - New gather node or fish: `NODE_MATERIAL_TABLE` / `NODE_HARVEST_TABLE`
+  (a new node material also needs its `fine_` grade row in `MATERIAL_GRADES`,
+  its own committed icon, and its item-name row; the grade table is pinned
+  against the live material table so a missing row fails loudly)
   (`src/sim/professions/gathering.ts`) or `FISHING_TABLES_BY_BAND`
   (`fishing.ts`), preserving the draw-count contracts above; new node tiers
   compose with the tool gate and the curve automatically.
 - New profession mechanic: its own module in `src/sim/professions/` behind
   `SimContext` (see `src/sim/professions/CLAUDE.md` for the seam map and
   landing checklist).
+- New ZONE with professions content: flip its ledger row to 'complete' in
+  `tests/professions_zone_rollout.test.ts` (the R37 guard) and the same
+  file's new-zone checklist conscripts the zone whole: six nodes per type on
+  legal ground with a real tier ladder, materials with fine twins, the tool
+  and rod rungs the zone opens, catch tables in every band, hub stocking per
+  the hub rule with the ladder top routed through content (R23, the delve
+  Marks prototype), R22 wield requirements reachable on the ladder below,
+  the gatherer chronicle and first-cast deeds, and wiki presence. Shipping
+  an incomplete zone reds the gate instead of relying on memory.
+- CAP SCALING when zone 4 arrives (design note, phase 13; implementation
+  rides the first new zone): the land cap and the fishing cap are today
+  authored constants (`GATHERING_PROFESSIONS` maxSkill 100 / 200) that
+  HAPPEN to equal what the shipped tier ladder teaches: land tier T ground
+  teaches to `GATHER_GAIN_TIER_STEP * (T + 2)` clamped at the cap, and
+  tier-T water teaches to the fishing schedule's row-T boundary. When a
+  tier-4 zone ships, raise the caps as a CONTENT CONSEQUENCE of that
+  derivation (land 125 = 25 * (4 + 2) minus nothing to clamp; fishing gains
+  a schedule row whose boundary becomes the new ceiling), never as a bare
+  constant edit: the character-sheet denominator reads maxSkill live and
+  follows; the R22 wield table gains its next rung under the knife-edge
+  rule (reachable on tier-4 ground, pinned like 40/70/85/100); the
+  empty-hook shortfall schedule gains a band column derived like the
+  shipped ones; and the load clamp (`normalizeGatheringProficiency`) makes
+  any cap RAISE rollback-destructive, so the raise ships with the zone,
+  never ahead of it (the phase 9 rollback note owns the mechanics).
 
 ## Open worklists
 
@@ -486,8 +721,17 @@ the lever is material quantities per craft.
   temporarily non-enchantable, no data loss), the fee-free combo re-grant
   window, the mastery-reset strip-refire under rollback (DESTRUCTIVE), the
   bank sanitize count clamp plus the mail returned-flag arm (DESTRUCTIVE),
-  the silent band-cap retroactivity, the pacing acceptance note, and the
-  release-tier fill budget.
+  the silent band-cap retroactivity, the pacing acceptance note, the
+  release-tier fill budget, and the `toolEffectSlots` rollback across the
+  acquisition-craft boundary (DESTRUCTIVE of real player value now: the
+  slot's charm cost, its recharges, and its `craftedBy` provenance all
+  erase on the first autosave under ANY binary that predates the
+  `toolEffectSlots` field, which is every binary off this branch: the
+  v0.32.x production line AND the unmerged release/v0.33.0 base alike,
+  because such a binary rebuilds the character state without the key; a
+  mid-packet binary that knows the field preserves it losslessly. See
+  "Rollback erases newer fields" in
+  docs/design/professions-tuning-packet.md).
 - Drop the one-release `AURA_NAME_KEY` legacy alias for the pre-rename
   Venomfire aura string after v0.29.0 ships (mixed-fleet deploy window
   only; `src/ui/sim_i18n.ts`).
@@ -517,6 +761,24 @@ the lever is material quantities per craft.
 - Gathering-100 / fishing-200 pacing (data-only levers above).
 - Rare-event cadence stays ONE shared knob until zone-expansion data argues
   for a per-family split.
+- Fine-grade market depth floats free of supply pressure, by construction:
+  node timers are strictly per player (`PlayerMeta.nodeHarvestReadyAt`; the
+  shared-depletion rejection is recorded at the packet design record's D6),
+  so no player's harvesting tightens anyone else's supply, and every
+  fine-grade ask on the market is priced against effectively unlimited
+  personal faucets rather than scarcity. That is the accepted trade of the
+  per-player model, not a defect; the consequence to watch is fine-grade
+  listings drifting toward vendor floor rather than holding a premium. The
+  honest trigger today is indirect: sustained tier-2/3 traffic in
+  `woc_gather_harvests_total{band,tier}` (the same gate the D6 revisit
+  already names) with anecdotal price-floor reports, because no market
+  telemetry exists yet: no listing-book gauge, no sale-price series, and
+  the harvest counter cannot tell a fine mint from a plain yield. A
+  data-driven revisit therefore needs one of those built first; the
+  smallest is a bounded grade label (fine|plain) on the harvest counter,
+  which requires threading the resolved item id into the counter call
+  (`server/game.ts`) under the fixed-cardinality contract
+  (`server/http/game_signals.ts`).
 
 ### Deferred follow-ups (recorded, not scheduled)
 - Wave 2 on #1866/#1298: the commission ORDER workflow, market/mail

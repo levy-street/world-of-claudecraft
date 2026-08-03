@@ -231,6 +231,7 @@ const CALLBACK_KEYS = [
   'queueQuestLetter',
   'mailHeroicMarks',
   'mailAuthoredLetter',
+  'mailboxHoldsItem',
   // Set proc firing.
   'applySetProcs',
   // Vale Cup <-> Arena queue exclusion (social/vale_cup.ts).
@@ -271,6 +272,7 @@ function makeFakeHost() {
       return entities;
     },
     players: new Map(),
+    masteryResetNoticeCounter: { pending: 0 },
     stationPlacements: [],
     primaryId: -1,
     tradeInvites: new Map(),
@@ -553,6 +555,7 @@ function makeFakeHost() {
     queueQuestLetter: vi.fn(),
     mailHeroicMarks: vi.fn(),
     mailAuthoredLetter: vi.fn(),
+    mailboxHoldsItem: vi.fn(() => false),
     applySetProcs: vi.fn(),
     // Vale Cup <-> Arena queue exclusion.
     vcupSeatedOrQueued: vi.fn(() => false),

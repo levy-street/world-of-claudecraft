@@ -20,6 +20,8 @@
 // longer carrying those ids, there is nothing left to replay from.
 
 import { DEEDS } from '../src/sim/content/deeds';
+import { FISHING_RARE_ID } from '../src/sim/content/items';
+import { ITEMS } from '../src/sim/data';
 import type { DeedDef } from '../src/sim/types';
 import type { DeedsRarity } from '../src/world_api';
 import { insertCharacterDeed, insertCharacterDeeds } from './deeds_db';
@@ -67,6 +69,31 @@ export function isHiddenDeedId(deedId: string): boolean {
 export function isPubliclyListableDeedId(id: string): boolean {
   const def = DEEDS[id];
   return def !== undefined && def.hidden !== true;
+}
+
+/** The first-koi deed (col_glimmerfin, "Glimmer of Hope", desc "Catch a
+ *  Sunglint Koi"; the NAME is what ships as the card's deedName): the one
+ *  feed-worthy deed with no title reward; its Discord card reads as a catch. */
+export const FIRST_KOI_DEED_ID = 'col_glimmerfin';
+
+/** The Discord activity-feed payload for one deed unlock, or null when the
+ *  unlock is not feed-worthy. Feed-worthy is exactly a title-rewarding deed or
+ *  the first-koi deed: the professions moments the rareloot detector cannot see
+ *  (no loot roll fires for a catch, a craft, or a deed; the first masterwork
+ *  rides prog_masterwright's title). A Discord channel is precisely the
+ *  third-party public surface the hidden-deed contract covers, so this routes
+ *  through isPubliclyListableDeedId and fails CLOSED on hidden or unknown ids.
+ *  Pure so the gate is unit-testable. */
+export function discordFeedDeed(
+  deedId: string,
+): { deedName: string; deedTitle?: string; itemName?: string } | null {
+  const def = DEEDS[deedId];
+  if (!def || !isPubliclyListableDeedId(deedId)) return null;
+  if (deedId === FIRST_KOI_DEED_ID) {
+    return { deedName: def.name, itemName: ITEMS[FISHING_RARE_ID]?.name ?? FISHING_RARE_ID };
+  }
+  if (def.reward?.kind === 'title') return { deedName: def.name, deedTitle: def.reward.text };
+  return null;
 }
 
 /** The public form of the rarity aggregate: keep only publicly listable deeds

@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { GATHERING_PROFESSION_IDS } from '../src/sim/content/professions';
+import { GATHERING_PROFESSION_NAME_KEYS } from '../src/ui/gathering_profession_name';
 import { hasTranslation, t } from '../src/ui/i18n';
 
 // Gather-event localization: the sim emits ids plus values only
@@ -309,22 +310,104 @@ describe('hudChrome.gathering catch line (Professions 2.0)', () => {
     expect(cueCalls).toEqual(['fishReel']);
   });
 
-  it('every gathering profession id has a catalog label and both window rows', () => {
-    // The label maps in char_window.ts and professions_window.ts are
-    // string-keyed (an id with no key renders no row), so tsc no longer
-    // forces exhaustiveness. This is the tripwire a future fifth gathering
-    // profession trips instead: its id must have the catalog key and a row
-    // in BOTH name-key maps, or the row silently vanishes from the windows.
-    const charSource = readFileSync(path.resolve(process.cwd(), 'src/ui/char_window.ts'), 'utf8');
-    const wheelSource = readFileSync(
-      path.resolve(process.cwd(), 'src/ui/professions_window.ts'),
-      'utf8',
+  it('the fishingEmptyHook case self-notes and plays exactly the reel cue (the timed press)', () => {
+    // Comment-stripped (the phase 14 QA): the arm's own prose names the
+    // self-note and the cue, so a commented-out body satisfied every raw
+    // includes/matchAll below.
+    const source = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8').replace(
+      /^\s*\/\/.*$/gm,
+      '',
     );
+    const caseStart = source.indexOf("case 'fishingEmptyHook'");
+    expect(caseStart).toBeGreaterThan(-1);
+    const block = source.slice(caseStart, source.indexOf('break;', caseStart));
+    expect(block.includes("showSelfNote(t('hudChrome.gathering.emptyHookNote'))")).toBe(true);
+    // Exactly the reel cue: the timing confirmation, and nothing stacking.
+    const cueCalls = [...block.matchAll(/audio\.(\w+)\(/g)].map((m) => m[1]);
+    expect(cueCalls).toEqual(['fishReel']);
+    // The sim's own grey "No fish are biting." line stays the ONLY log line.
+    expect(block.includes('this.log(')).toBe(false);
+    expect(hasTranslation('hudChrome.gathering.emptyHookNote')).toBe(true);
+  });
+
+  it('the effectDepleted flag renders ONE gated FCT self-note (the last-charge signal)', () => {
+    // The phase 14 QA: the HUD arm had no test at all. Same idiom as the
+    // fishingEmptyHook pin above: comment-stripped, the note gated on the
+    // additive flag, the key real, and no log line doubling the announce
+    // (the professions window's charge row is the durable record).
+    const source = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8').replace(
+      /^\s*\/\/.*$/gm,
+      '',
+    );
+    const caseStart = source.indexOf("case 'gatherResult': {");
+    expect(caseStart).toBeGreaterThan(-1);
+    const block = source.slice(caseStart, source.indexOf('break;', caseStart));
+    const gateAt = block.indexOf('if (ev.effectDepleted) {');
+    expect(gateAt).toBeGreaterThan(-1);
+    const gated = block.slice(gateAt, block.indexOf('}', gateAt));
+    expect(gated).toContain("this.showSelfNote(t('hudChrome.professions.toolEffectDepleted'));");
+    expect(gated).not.toContain('this.log(');
+    expect(hasTranslation('hudChrome.professions.toolEffectDepleted')).toBe(true);
+  });
+
+  it('every gathering profession id has a catalog label in the shared name table', () => {
+    // The label map is string-keyed (an id with no key renders no row), so tsc
+    // does not force exhaustiveness. This is the tripwire a future fifth
+    // gathering profession trips instead: its id must carry the catalog key or
+    // the row silently vanishes from every surface that names a profession.
+    //
+    // Re-pointed when the table was extracted: char_window.ts and
+    // professions_window.ts each held a byte-identical private copy, and the
+    // locked vendor row was the third consumer, so the one table now lives in
+    // gathering_profession_name.ts. This arm reads the REAL map rather than
+    // scanning the two window sources for the key string, which is both
+    // stronger (a source scan passes on a key that appears only in a comment,
+    // or on an entry mapped to the wrong value) and no longer coupled to which
+    // file the table happens to sit in.
     for (const id of GATHERING_PROFESSION_IDS) {
       const key = `hudChrome.gathering.${id}`;
       expect(hasTranslation(key as Parameters<typeof hasTranslation>[0]), key).toBe(true);
-      expect(charSource.includes(key), `char_window ${key}`).toBe(true);
-      expect(wheelSource.includes(key), `professions_window ${key}`).toBe(true);
+      expect(GATHERING_PROFESSION_NAME_KEYS[id], `name key for ${id}`).toBe(key);
+    }
+    // No extra ids: an entry for a profession that no longer exists would
+    // render a label for a row nothing produces.
+    expect(Object.keys(GATHERING_PROFESSION_NAME_KEYS).sort()).toEqual(
+      [...GATHERING_PROFESSION_IDS].sort(),
+    );
+  });
+
+  it('both profession windows read the shared name table rather than a private copy', () => {
+    // The half the map read above cannot see: a window that re-privatises its
+    // own copy would keep passing the exhaustiveness arm while drifting from
+    // it. Comments are stripped first, so the import cannot be satisfied by a
+    // mention in prose.
+    const withoutComments = (file: string) =>
+      readFileSync(path.resolve(process.cwd(), file), 'utf8')
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        // Trailing comments too, not just whole lines: a `// ... KEYS` tail
+        // would otherwise satisfy the positive check below on its own. The
+        // strip is context-free, so a string literal containing whitespace
+        // then `//` would be truncated; verified absent in the files below,
+        // and a URL's `//` follows a colon, so it is never matched.
+        .replace(/(^|\s)\/\/.*$/gm, '$1');
+    for (const file of [
+      'src/ui/char_window.ts',
+      'src/ui/professions_window.ts',
+      // The third consumer, which is why the table was extracted at all.
+      'src/ui/hud/vendor/vendor_window.ts',
+    ]) {
+      const source = withoutComments(file);
+      // Either spelling reads the ONE shared table: the raw map (behind an
+      // Object.hasOwn guard at the call site) or the hasOwn-safe getter the
+      // whole-branch review extracted beside it.
+      expect(
+        source.includes('GATHERING_PROFESSION_NAME_KEYS') ||
+          source.includes('gatheringProfessionNameKey('),
+        `${file} consumes the table`,
+      ).toBe(true);
+      expect(source.includes("hudChrome.gathering.mining'"), `${file} has no private copy`).toBe(
+        false,
+      );
     }
   });
 });

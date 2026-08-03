@@ -1510,6 +1510,28 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
   {
     dispatcher: DISPATCH.admin,
     method: 'POST',
+    path: '/admin/api/moderation/characters/:id/restore-item',
+    handler: 'restoreItemMatch',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+    match: /^\/admin\/api\/moderation\/characters\/(\d+)\/restore-item$/,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/moderation/characters/:id/restore-slot',
+    handler: 'restoreSlotMatch',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+    match: /^\/admin\/api\/moderation\/characters\/(\d+)\/restore-slot$/,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
     path: '/admin/api/moderation/accounts/:id/lift-mute',
     handler: 'liftMuteMatch',
     contentType: PROBLEM_JSON,
@@ -2016,6 +2038,17 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
   {
     dispatcher: DISPATCH.admin,
     method: 'GET',
+    path: '/admin/api/characters/:id/professions',
+    handler: 'characterProfessionsMatch',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+    match: /^\/admin\/api\/characters\/(\d+)\/professions$/,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
     path: '/admin/api/accounts/:id/daily-rewards-events',
     handler: 'dailyRewardEventsMatch',
     contentType: PROBLEM_JSON,
@@ -2251,6 +2284,38 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     method: 'GET',
     path: '/internal/discord/flaired-ids',
     handler: 'handleDiscordInternal arm: /internal/discord/flaired-ids',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.secretDiscord,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  // The batched flex read the Discord bot's sweep uses instead of asking the
+  // per-id /internal/discord/flex once per online user. It is the first
+  // REGISTRY-ONLY internal route: born after the pipeline migration, so it has
+  // NO handleDiscordInternal arm and no legacy rollback twin by design (the
+  // new-route rule in server/http/CLAUDE.md), which is why the handler anchors
+  // on the exported RouteDef symbol rather than on a legacy ladder arm.
+  {
+    dispatcher: DISPATCH.internal,
+    method: 'POST',
+    path: '/internal/discord/flex-batch',
+    handler: 'server/internal.ts flexBatchHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.secretDiscord,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  // The consolidated bot poll: the relay, activity and linked-member change
+  // feeds drained together with the winner-day announcements, so the bot makes
+  // one request per interval instead of three plus a full member sweep. The
+  // second REGISTRY-ONLY internal route, same reason as flex-batch above (born
+  // after the migration, no handleDiscordInternal arm, so the handler anchors on
+  // the exported RouteDef symbol).
+  {
+    dispatcher: DISPATCH.internal,
+    method: 'GET',
+    path: '/internal/discord/outbox',
+    handler: 'server/internal.ts outboxHandler (registry-only RouteDef)',
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.secretDiscord,
     limiter: null,

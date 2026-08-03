@@ -565,15 +565,19 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
       'minor_mana_potion',
       'linen_pouch',
       'travelers_knapsack',
+      // Gathering tools, TIER 1 ONLY (#2343's rule: each zone hub stocks the
+      // tiers its own nodes use). Eastbrook is entirely tier-1 ground, so a
+      // tier-2 or tier-3 land tool opens nothing here; the marsh and the peaks
+      // sell the rungs their own veins need, and this counter used to be the
+      // one place in the world that sold the whole ladder at the front door.
+      // The tiered rods stay, and Wilkes is now the one counter carrying the
+      // WHOLE rod ladder rather than the only one carrying any of it: each
+      // zone's water has a required rod tier of its own now
+      // (professions/fishing_zones.ts), so the marsh and the peaks stock the
+      // rung they ask for and this counter is where you buy ahead.
       'copper_mining_pick',
-      'iron_mining_pick',
-      'mithril_mining_pick',
       'handaxe',
-      'felling_axe',
-      'ironbark_axe',
       'gathering_sickle',
-      'bronze_sickle',
-      'silverleaf_sickle',
       'ironreel_fishing_rod',
       'silverstream_fishing_rod',
     ],
@@ -716,16 +720,13 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     // its escalating make-amends return live here now (moved off Smith Haldren),
     // plus the repeatable forge work order.
     questIds: ['q_prof_attune_smith', 'q_prof_amends_smith', 'q_prof_workorder_forge'],
-    // Station stocking: thorium_ore is the premium reagent the forge
-    // station's own recipe (recipe_sootscale_mantle) consumes, so the master
-    // sells it alongside quartermaster_bree (zone3).
-    vendorItems: [
-      'copper_mining_pick',
-      'iron_mining_pick',
-      'mithril_mining_pick',
-      'smithing_flux',
-      'thorium_ore',
-    ],
+    // Station stocking: the forge master sells the tools and the vendor-only
+    // staple its station's recipes need. thorium_ore, the premium reagent
+    // recipe_sootscale_mantle consumes, is NOT here: it is a node yield, and no
+    // NPC stocks a gathered material (professions.md, Locked rulings). The
+    // pick is tier 1 alone, the tier Eastbrook's own veins use; the higher
+    // rungs moved to the hubs whose ground needs them.
+    vendorItems: ['copper_mining_pick', 'smithing_flux'],
     greeting: 'The forge answers to me, $C. Bring good ore and it will answer to you too.',
   },
   cook_marlow: {
@@ -760,19 +761,11 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     // anchor master. Attunement, make-amends return, and the repeatable loom work
     // order live here.
     questIds: ['q_prof_attune_outfitter', 'q_prof_amends_outfitter', 'q_prof_workorder_loom'],
-    // Station stocking: thorium_ore was stocked as the premium
-    // reagent of the loom's own recipe. An input rework later
-    // moved recipe_wardweave_cowl off osmium (silk plus premium herbs now),
-    // but the stock stays: removing a shipped vendor row is out of that
-    // rework's scope, and loom customers still buy it for the
-    // forge crafts next door.
-    vendorItems: [
-      'linen_pouch',
-      'travelers_knapsack',
-      'gathering_sickle',
-      'spool_of_thread',
-      'thorium_ore',
-    ],
+    // Station stocking: the loom master sells its own goods, the tier-1 sickle,
+    // and the vendor-only thread staple. thorium_ore used to sit here as a
+    // premium reagent; it is a node yield, and no NPC stocks a gathered
+    // material (professions.md, Locked rulings).
+    vendorItems: ['linen_pouch', 'travelers_knapsack', 'gathering_sickle', 'spool_of_thread'],
     greeting: 'Mind the threads, $C. A steady hand at the loom beats a strong one.',
   },
   tinker_gizzel: {
@@ -790,23 +783,16 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
       'q_prof_amends_bombardier',
       'q_prof_workorder_toolworks',
     ],
-    // Station stocking: the six premium reagents the toolworks
-    // recipes (TOOL_RECIPES) consume, previously sold only by
-    // quartermaster_bree (zone3).
-    vendorItems: [
-      'handaxe',
-      'felling_axe',
-      'ironbark_axe',
-      'bronze_sickle',
-      'silverleaf_sickle',
-      'simple_fishing_pole',
-      'thorium_ore',
-      'arcanite_bar',
-      'ashwood_log',
-      'elderwood_log',
-      'goldleaf_herb',
-      'sunpetal_herb',
-    ],
+    // Station stocking: the toolworks tools, plus arcanite_bar, the one premium
+    // reagent TOOL_RECIPES consume that a counter may carry. The other five
+    // (thorium_ore, ashwood_log, elderwood_log, goldleaf_herb, sunpetal_herb)
+    // are node yields, and no NPC stocks a gathered material (professions.md,
+    // Locked rulings): a tool above tier 3 is gathered up to, not bought.
+    // Tier-1 implements only, the tier Eastbrook's own stands and patches use.
+    // The tier-2 and tier-3 axes and sickles moved to the marsh and the peaks;
+    // the tier-1 sickle still sits on Ottilie rather than here, the shipped
+    // split between the two masters.
+    vendorItems: ['handaxe', 'simple_fishing_pole', 'arcanite_bar'],
     greeting:
       'Springs, sprockets, and sharp edges, $C: the toolworks has whatever your hands lack.',
   },
@@ -842,6 +828,14 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     xpReward: 150,
     copperReward: 50,
     itemRewards: {},
+    // The quest says to go swing a pick, and under the always-require-tool rule
+    // (#2343) a bare-handed harvest is denied outright. A new character starts
+    // with zero copper, so the game's FIRST quest silently required a detour to
+    // earn 20 copper and buy a pick before its objective could move at all (the
+    // pick is a vendor staple, so this was a dead end only until the player
+    // found that out). questFallbackGrants hands the pick over on accept and
+    // re-grants it if it is ever lost, exactly like a prerequisite quest item.
+    requiredItems: ['copper_mining_pick'],
   },
   q_wolves: {
     id: 'q_wolves',
@@ -960,7 +954,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Stolen Supplies',
     giverNpcId: 'trader_wilkes',
     turnInNpcId: 'trader_wilkes',
-    text: 'Those bandits hit my last wagon and made off with four crates of goods, tools, salt, good Eastbrook linen. The crates are stacked around their camp in the southwest hills. Steal them back for me, would you?',
+    text: 'Those bandits hit my last wagon and made off with four crates of goods: tools, salt, good Eastbrook linen. The crates are stacked around their camp in the southwest hills. Steal them back for me, would you?',
     completionText: 'My crates! Barely a scratch on them. You are a wonder.',
     objectives: [
       { type: 'collect', itemId: 'supply_crate', count: 4, label: 'Stolen Supply Crate' },
@@ -1171,6 +1165,9 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     copperReward: 0,
     itemRewards: {},
     shareable: false,
+    // An anchor master is an independent entry point (no q_prof_intro gate), so
+    // this one cannot lean on the intro quest's pick: it grants its own.
+    requiredItems: ['copper_mining_pick'],
     completionEffect: { type: 'attunePair', mode: 'new', pairId: 'weaponcrafting+armorcrafting' },
   },
   q_prof_attune_outfitter: {
@@ -1218,6 +1215,9 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     copperReward: 0,
     itemRewards: {},
     shareable: false,
+    // A herb objective, so this one grants the SICKLE, not the pick: a mining
+    // tool does not satisfy the herbalism tool gate.
+    requiredItems: ['gathering_sickle'],
     completionEffect: { type: 'attunePair', mode: 'new', pairId: 'engineering+alchemy' },
   },
   // Make-amends returns (Professions 2.0): repeatable, one per anchor
@@ -1307,7 +1307,8 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
   // Repeatable craft work orders (Professions 2.0): a master takes a
   // stack of their craft's staple material off your hands for coin, a light
   // economy sink on a fixed cadence (repeatCadenceTicks WORK_ORDER_CADENCE_TICKS).
-  // The collect turn-in consumes the materials (turnInQuestCore removeItem).
+  // The collect turn-in consumes the materials (turnInQuestCore via
+  // removePreferFungible: plain stacks first, signed copies last).
   // copperReward is floor(0.5 * summed vendor sell value of the requested
   // materials); xpReward matches the only repeatable-quest precedent in the game,
   // the make-amends band (100), since no zone-2/3 repeatable exists to scale to.
@@ -1402,6 +1403,20 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     requiresQuest: 'q_prof_intro',
     repeatable: true,
     shareable: false,
+    // The same 30-minute window its four work-order siblings carry. The iron
+    // gate on the tool mint is the accept-time presence predicate
+    // (quests/quest_item_presence.ts, spanning bank/mail/escrow). The cadence
+    // bounds ONLY the turn-in loop (armCadence fires in turnInQuestCore;
+    // abandoning arms nothing), so the one transfer route left deliberately
+    // open (direct trade, R10) still moves one sickle per accept-abandon
+    // cycle. What actually bounds that route is the value ceiling: the tools
+    // carry noVendorSell and noMarketList, so a traded copy has no route to
+    // copper (guarded in tests/professions_starter_tools.test.ts).
+    repeatCadenceTicks: WORK_ORDER_CADENCE_TICKS,
+    // Also a herb objective, so also the sickle. This is the repeatable one, so
+    // it is the reason the tier-1 tools carry noVendorSell (items.ts): without
+    // that flag, accept-sell-abandon would be an unbounded copper faucet.
+    requiredItems: ['gathering_sickle'],
     completionEffect: { type: 'switchHobby' },
   },
 };
@@ -1466,6 +1481,11 @@ export const ZONE1_QUEST_ORDER = [
 // Guarded by tests/eastbrook_camp_spacing.test.ts. Row ORDER is a determinism
 // contract (see the CAMPS merge in data.ts): edit values, never reorder.
 export const ZONE1_CAMPS: CampDef[] = [
+  // Compass check for every placement comment and quest text below: the
+  // canonical convention statement lives higher in this file (the pois
+  // block: +z north, +x WEST, east is -x), and reading +X as east is what
+  // produced a run of mirrored quest directions; verify any direction claim
+  // against that note, never against raw signs.
   // Wolves: north woods
   { mobId: 'forest_wolf', center: { x: -27, z: 71 }, radius: 28.5, count: 6 },
   { mobId: 'forest_wolf', center: { x: 24, z: 70 }, radius: 26, count: 5 },

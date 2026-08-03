@@ -2309,6 +2309,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'questUi.tracker.complete': '완료',
   'questUi.tracker.showOnMap': '{name} 지도에 표시',
   'questUi.tracker.hideFromMap': '{name} 지도에서 숨기기',
+  'questUi.tracker.unknownQuest': '알 수 없는 퀘스트 ({id})',
   'questUi.log.title': '퀘스트 기록',
   'questUi.log.close': '퀘스트 기록 닫기',
   'questUi.log.summary': '진행 중: {active} / 완료: {completed}',
@@ -2318,6 +2319,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'questUi.log.activeStatus': '진행 중',
   'questUi.log.readyStatus': '완료',
   'questUi.log.completedStatus': '완료됨',
+  'questUi.log.repeatableStatus': '반복 가능',
+  'questUi.log.cooldownStatus': '곧 다시 수령 가능',
   'questUi.log.returnTo': '{name}에게 돌아가기',
   'questUi.log.abandon': '퀘스트 포기',
   'questUi.log.abandonConfirmTitle': '퀘스트 포기',
@@ -2329,6 +2332,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'questUi.dialog.greetingFallback': '안녕하세요.',
   'questUi.dialog.availableQuestAria': '받을 수 있는 퀘스트: {name}',
   'questUi.dialog.readyQuestAria': '완료 보고 가능한 퀘스트: {name}',
+  'questUi.dialog.repeatableQuestAria': '반복 가능한 퀘스트: {name}',
   'questUi.dialog.browseGoods': '물건을 보여 주세요.',
   'questUi.dialog.browseGoodsAria': '{name}의 물건 보기',
   'questUi.dialog.worldMarket': '세계 시장을 보여 주세요.',
@@ -2395,6 +2399,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.armor': '방어구',
   'itemUi.kind.quest': '퀘스트 아이템',
   'itemUi.kind.junk': '잡동사니',
+  'itemUi.kind.fineMaterial': '상급 재료',
   'itemUi.kind.food': '음식',
   'itemUi.kind.drink': '음료',
   'itemUi.kind.tool': '도구',
@@ -2448,6 +2453,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.bags.empty': '가방이 비어 있습니다.',
   'itemUi.bags.itemAria': '{item}, 수량 {count}',
   'itemUi.bags.stackCount': 'x{count}',
+  'itemUi.bags.unknownItem': '알 수 없는 아이템',
+  'itemUi.bags.unknownItemAria': '알 수 없는 아이템 {id}, 수량 {count}',
+  'itemUi.bags.unknownItemAriaMasterwork': '알 수 없는 아이템 {id}, 수량 {count}, 걸작',
+  'itemUi.bags.unknownItemAriaEnchanted': '알 수 없는 아이템 {id}, 수량 {count}, 마법부여된 사본',
+  'itemUi.bags.unknownItemAriaBound': '알 수 없는 아이템 {id}, 수량 {count}, 귀속된 사본',
+  'itemUi.bags.unknownItemAriaInstanced':
+    '알 수 없는 아이템 {id}, 수량 {count}, 제작자 표식이 있는 사본',
   'itemUi.bags.destroyTitle': '{item} 파괴',
   'itemUi.bags.destroyConfirm': '파괴',
   'itemUi.bags.destroyCancel': '취소',
@@ -2457,6 +2469,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.close': '상인 닫기',
   'itemUi.vendor.hint': '이 창이 열려 있을 때 가방의 아이템을 클릭하면 판매합니다.',
   'itemUi.vendor.buyAria': '{price}에 {item} 구매',
+  'itemUi.vendor.buyAriaWithRequirement': '{price}에 {item} 구매. {requirement}',
   'itemUi.vendor.buybackTitle': '되사기',
   'itemUi.vendor.buybackEmpty': '물품 없음',
   'itemUi.vendor.buybackAria': '{item}을(를) {price}에 되사기',
@@ -2464,6 +2477,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.sellQuantityInput': '판매할 수량',
   'itemUi.vendor.sellQuantityConfirm': '판매',
   'itemUi.vendor.sellQuantityCancel': '취소',
+  'itemUi.vendor.qtyRowAria': '구매 수량',
+  'itemUi.vendor.qtyMultipleAria': '한 번에 {count}개씩 구매',
+  'itemUi.vendor.qtyCustom': '직접 입력',
+  'itemUi.vendor.qtyCustomAria': '구매 수량 직접 입력',
+  'itemUi.vendor.buyQuantityTitle': '{item}을(를) 몇 개 구매하시겠습니까? 최대 {max}개.',
+  'itemUi.vendor.buyQuantityInput': '구매할 수량',
   'itemUi.vendor.sellJunk': '잡동사니 판매',
   'itemUi.vendor.sellJunkAria': '모든 잡동사니를 {price}에 판매',
   'itemUi.vendor.sellJunkHint': '퀘스트 아이템을 제외한 가방의 모든 회색 아이템을 판매합니다.',
@@ -3196,6 +3215,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_dust.name': '울림 가루',
   'entities.items.arcane_essence.name': '울림 정수',
   'entities.items.arcane_shard.name': '울림 파편',
+  'entities.items.gatherers_cache.name': '채집가의 주머니',
+  'entities.items.artisans_eye.name': '장인의 눈',
   'entities.items.linen_scrap.name': '아마포 조각',
   'entities.items.fen_muster_order.name': '펜브리지 소집 명령서',
   'entities.items.mire_prowler_pelt.name': '수렁 배회자 가죽',
@@ -3595,7 +3616,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이 호수는 달빛을 마시고, {className}, 익사한 자들을 되돌려 보낸다네. 나는 서른 밤 동안 저 관문을 지켜보았지 — 그리고 오늘 밤, 마침내 그것이 열렸네.',
   'entities.quests.q_prof_intro.title': '검 말고도 할 수 있는 일',
   'entities.quests.q_prof_intro.text':
-    '이스트브룩 사람이라면 누구나 검술 말고도 생업 하나는 익히지, {playerName}. 마을 남서쪽 구리 광산 주변 바위에는 광맥이 있다네. 곡괭이를 들고 직접 광맥 5곳을 캐 오게. 속이려 해도 나는 차이를 안다네.',
+    '이스트브룩 사람이라면 누구나 검술 말고도 생업 하나는 익히지, {playerName}. 마을 남동쪽 구리 광산 주변 바위에는 광맥이 있다네. 곡괭이를 들고 직접 광맥 5곳을 캐 오게. 속이려 해도 나는 차이를 안다네.',
   'entities.quests.q_prof_intro.completion':
     '보게나. 광석도 모았고 손에는 굳은살도 박였군. 길을 다닐 때도 채광과 벌목, 약초 채집을 계속하게. 마을에 돌아오면 시장 옆의 마을 집중 게시판과 근처 제작대도 잊지 말고. 원한다면 이 모든 일에서 정당한 생계를 찾을 수 있다네.',
   'entities.quests.q_prof_intro.objectives.0.label': '광맥 채굴',
@@ -3638,7 +3659,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_bones.objectives.0.label': '불안한 뼈무더기 안식시킴',
   'entities.quests.q_supplies.title': '도난당한 보급품',
   'entities.quests.q_supplies.text':
-    '도적들이 내 마지막 마차를 털었습니다. 도구, 소금, 이스트브룩 아마가 들었습니다. 남동쪽 야영지에서 보급 상자 4개를 되찾아 주십시오.',
+    '도적들이 내 마지막 마차를 털었습니다. 도구, 소금, 이스트브룩 아마가 들었습니다. 남서쪽 야영지에서 보급 상자 4개를 되찾아 주십시오.',
   'entities.quests.q_supplies.completion': '내 상자들입니다! 흠집도 거의 없군요. 대단합니다.',
   'entities.quests.q_supplies.objectives.0.label': '도난당한 보급 상자',
   'entities.quests.q_whispers.title': '아래의 속삭임',
@@ -3861,7 +3882,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_stalker_cloaks.objectives.0.label': '산등성이 추적자 가죽',
   'entities.quests.q_old_cragmaw.title': '늙은 크래그모',
   'entities.quests.q_old_cragmaw.text':
-    '산사람들은 정찰병이 찾은 발자국의 주인을 알고 있었습니다. 늙은 크래그모, 제 무리의 세 세대를 먼저 보낸 흉터투성이 폭군 고양이입니다. 추적자들이 내 길로 쏟아지는 것도 그놈 때문입니다, {playerName}. 굴은 남쪽 길 위 서편 산등성이에 있습니다. 동료를 데리고 가서 그 늙은 악마를 처치하십시오.',
+    '산사람들은 정찰병이 찾은 발자국의 주인을 알고 있었습니다. 늙은 크래그모, 제 무리의 세 세대를 먼저 보낸 흉터투성이 폭군 고양이입니다. 추적자들이 내 길로 쏟아지는 것도 그놈 때문입니다, {playerName}. 굴은 남쪽 길 위 동편 산등성이에 있습니다. 동료를 데리고 가서 그 늙은 악마를 처치하십시오.',
   'entities.quests.q_old_cragmaw.completion':
     '마침내 쓰러졌군요. 산사람들은 그 고양이가 성벽보다 오래 살 거라 장담했었습니다. 이제 추적자들은 높은 설원에 머물 겁니다, {playerName}. 내 순찰대도 피 흘리지 않고 길을 걷겠지요. 당신 덕분에 산등성이 전체가 조용해졌습니다.',
   'entities.quests.q_old_cragmaw.objectives.0.label': '늙은 크래그모 처치',
@@ -4000,7 +4021,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gravewyrm.objectives.0.label': '무덤고룡 코르줄 처치',
   'entities.quests.q_mogger.title': '모거를 쓰러뜨려라',
   'entities.quests.q_mogger.text':
-    '모거는 수레를 쪼개고 울타리를 납작하게 만들며 계곡 절반을 비울 만큼 가축을 죽였습니다. 혼자 맞서지 마십시오. 강한 동료 둘과 동쪽 초원으로 가서 그 짐승을 끝내십시오.',
+    '모거는 수레를 쪼개고 울타리를 납작하게 만들며 계곡 절반을 비울 만큼 가축을 죽였습니다. 혼자 맞서지 마십시오. 강한 동료 둘과 서쪽 초원으로 가서 그 짐승을 끝내십시오.',
   'entities.quests.q_mogger.completion':
     '마침내 모거가 죽었습니다. 이스트브룩의 들판은 더 안전해졌고, 당신은 전할 만한 이야기를 하나 더 안고 계곡을 떠납니다.',
   'entities.quests.q_mogger.objectives.0.label': '모거 처치',
@@ -4423,7 +4444,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.the_codfather.name': '대구 대부',
   'entities.quests.q_the_codfather.title': '대구 대부',
   'entities.quests.q_the_codfather.text':
-    '대구 대부는 그저 물고기가 아니라네, {playerName}. 냉혈한 살인자지. 노인들은 놈이 늪지 배회자를 아침으로 먹는다고 맹세하고, 미어펜 과부거미조차 순전한 공포 때문에 딥펜 여울 근처에는 거미줄을 치지 않는다네. 놈이 그 물을 지배하지. 낚싯대를 들고 그 늙은 악마를 제 물가에서 끌어내 오게. 그러면 자네가 가족이 되었다고 인정하지.',
+    '대구 대부는 그저 물고기가 아니라네, {playerName}. 냉혈한 살인자지. 노인들은 놈이 늪지 배회자를 아침으로 먹는다고 맹세하고, 미어펜 과부거미조차 순전한 공포 때문에 딥펜 여울 근처에는 거미줄을 치지 않는다네. 놈이 그 물을 지배하고, 늪물에는 다름 아닌 쇠릴 낚싯대가 필요하다네. 내 계산대에서 팔고 있지. 하나 손에 들고 그 늙은 악마를 제 물가에서 끌어내 오게. 그러면 자네가 가족이 되었다고 인정하지.',
   'entities.quests.q_the_codfather.completion':
     '축축한 성자들이시여... 대구 대부 그 자체로군. 저 수염 좀 보게. 펜브리지는 이 한 마리로 일 년 내내 이야깃거리를 삼을 걸세, {playerName}.',
   'entities.quests.q_the_codfather.objectives.0.label': '대구 대부',
@@ -4521,7 +4542,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_restless_dead.objectives.0.label': '룬 새긴 뼈 조각',
   'entities.quests.q_nythraxis_graves.title': '잊힌 자들의 무덤',
   'entities.quests.q_nythraxis_graves.text':
-    '북쪽 전장 둘레의 세 오래된 무덤에서 이 표식을 본 적이 있습니다. 알드렌 대장은 동쪽 언덕에, 대사제 말릭은 가운데 부서진 길 근처에, 왕실 암살자 보스는 서쪽 절벽 곁에 묻혀 있습니다. 각 무덤을 만지고 귀 기울이십시오, {playerName}. 죽은 자들은 산 자들이 잊은 것을 기억할지도 모릅니다.',
+    '북쪽 전장 둘레의 세 오래된 무덤에서 이 표식을 본 적이 있습니다. 알드렌 대장은 서쪽 언덕에, 대사제 말릭은 서쪽 가장자리를 따라 더 남쪽에, 왕실 암살자 보스는 동쪽 절벽 곁에 묻혀 있습니다. 각 무덤을 만지고 귀 기울이십시오, {playerName}. 죽은 자들은 산 자들이 잊은 것을 기억할지도 모릅니다.',
   'entities.quests.q_nythraxis_graves.completion':
     '알드렌은 충성을 지켰고, 말릭은 죽음을 받아들이지 않았으며, 보스는 누구보다 먼저 위험을 보았습니다. 셋 모두 같은 잊힌 왕을 섬겼습니다.',
   'entities.quests.q_nythraxis_graves.objectives.0.label': '대장 알드렌의 무덤에서 본 환영',
@@ -4529,7 +4550,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_graves.objectives.2.label': '왕실 암살자 보스의 무덤에서 본 환영',
   'entities.quests.q_nythraxis_sealed_crypt.title': '버려진 납골당',
   'entities.quests.q_nythraxis_sealed_crypt.text':
-    '환영은 서쪽 절벽의 버려진 묘실을 가리킵니다. 그 묘실에 한 왕이 있었다는 옛 전설이 있습니다. 말릭의 의식이 그를 죽지 않는 존재로 뒤틀어 놓은 뒤 쏜피크가 그를 아래에 봉인했을지도 모릅니다. 묘실에 들어가 안에 무엇이 남아 있는지 확인하십시오.',
+    '환영은 동쪽 절벽의 버려진 묘실을 가리킵니다. 그 묘실에 한 왕이 있었다는 옛 전설이 있습니다. 말릭의 의식이 그를 죽지 않는 존재로 뒤틀어 놓은 뒤 쏜피크가 그를 아래에 봉인했을지도 모릅니다. 묘실에 들어가 안에 무엇이 남아 있는지 확인하십시오.',
   'entities.quests.q_nythraxis_sealed_crypt.completion':
     '열쇠돌의 두 조각이 맞물리고, 보스의 일지는 그것들이 봉인한 것을 밝힙니다. 니트락시스 왕의 인장 반지입니다. 일지가 사실이라면 그 반지가 그의 무덤으로 가는 열쇠입니다.',
   'entities.quests.q_nythraxis_sealed_crypt.objectives.0.label': '묘실 열쇠돌 상부',
@@ -5151,6 +5172,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.glimmerfin_koi.name': '윤슬 코이',
   'entities.items.ironreel_fishing_rod.name': '쇠릴 낚싯대',
   'entities.items.silverstream_fishing_rod.name': '은빛 시내 낚싯대',
+  'entities.items.stormreel_fishing_rod.name': '폭풍릴 낚싯대',
+  'entities.items.tidewrought_fishing_rod.name': '조수벼림 낚싯대',
   'entities.items.raw_bog_eel.name': '날 늪지 뱀장어',
   'entities.items.raw_frostgill_trout.name': '날 서리아가미 송어',
   'entities.items.raw_marsh_pike.name': '날 늪지 강꼬치고기',
@@ -5213,6 +5236,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.elderwood_log.name': '고산솔 통나무',
   'entities.items.goldleaf_herb.name': '금빛잎 약초',
   'entities.items.sunpetal_herb.name': '태양꽃잎 약초',
+  // 상급 재료: 도구 등급이 재료보다 높을 때 채집됩니다(D8). 접두사는 "상급"으로 통일.
+  'entities.items.fine_copper_ore.name': '상급 구리 광석',
+  'entities.items.fine_iron_ore.name': '상급 철 광석',
+  'entities.items.fine_thorium_ore.name': '상급 오스뮴 광석',
+  'entities.items.fine_ironbark_log.name': '상급 무쇠껍질나무 통나무',
+  'entities.items.fine_ashwood_log.name': '상급 잿빛나무 통나무',
+  'entities.items.fine_elderwood_log.name': '상급 고산솔 통나무',
+  'entities.items.fine_silverleaf_herb.name': '상급 윤광잎 약초',
+  'entities.items.fine_goldleaf_herb.name': '상급 금빛잎 약초',
+  'entities.items.fine_sunpetal_herb.name': '상급 태양꽃잎 약초',
   'hud.core.chatChannels.add': '채팅 채널 추가',
   'hud.core.chatChannels.addTitle': '채널 추가',
   'hud.core.chatChannels.close': '{channel} 탭 닫기',
@@ -5667,6 +5700,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterArmor': '방어구',
   'hudChrome.bags.filterConsumable': '소모품',
   'hudChrome.bags.filterMaterial': '재료',
+  'hudChrome.bags.filterTool': '도구',
   'hudChrome.bags.filterMount': '탈것',
   'hudChrome.bags.filterQuest': '퀘스트',
   'hudChrome.bags.sortAria': '가방 아이템 정렬',
@@ -7500,6 +7534,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.identity.colSkill': '기술',
   'hudChrome.crafting.identity.colRole': '역할',
   'hudChrome.crafting.identity.colCap': '상한',
+  'hudChrome.crafting.identity.allCrafts': '모든 제작 분야',
+  'hudChrome.crafting.identity.skillListAria': '제작 기술',
   'hudChrome.crafting.identity.tutorial':
     '첫 티어: 한 기술을 숙련도 {skill}까지 올리세요. 제작에 성공하면 다른 지식을 지우지 않고 해당 기술이 성장합니다.',
   'hudChrome.crafting.identity.nearTier': '{craft}는 다음 티어까지 숙련도 {points}이 필요합니다.',
@@ -8413,8 +8449,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이 나무를 베려면 {tier}티어 벌목 도끼가 필요합니다.',
   'hudChrome.gathering.toolTierUnmet.herbalism':
     '이 군락을 채집하려면 {tier}티어 약초 낫이 필요합니다.',
+  'hudChrome.gathering.toolTierUnmet.fishing':
+    '이 수역에서 낚시하려면 {tier}티어 낚싯대가 필요합니다.',
   'hudChrome.gathering.toolTierUnmetCorpse':
     '최상급 재료를 회수하려면 {tier}티어 채집 도구가 필요합니다.',
+  'hudChrome.gathering.wieldUnmet.mining':
+    '가방에 있는 곡괭이를 휘두르려면 채광 {skill}이(가) 필요합니다.',
+  'hudChrome.gathering.wieldUnmet.logging':
+    '가방에 있는 도끼를 휘두르려면 벌목 {skill}이(가) 필요합니다.',
+  'hudChrome.gathering.wieldUnmet.herbalism':
+    '가방에 있는 낫을 다루려면 약초학 {skill}이(가) 필요합니다.',
+  'hudChrome.gathering.wieldUnmetCorpse':
+    '최상급 도구를 제대로 다루려면 채집 기술 {skill}이(가) 필요합니다.',
   'hudChrome.gathering.requiresTool.mining': '채광 곡괭이 필요',
   'hudChrome.gathering.requiresTool.logging': '벌목 도끼 필요',
   'hudChrome.gathering.requiresTool.herbalism': '약초 낫 필요',
@@ -8434,6 +8480,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '{tier}티어까지의 벌목 나무를 베는 데 필요합니다.',
   'hudChrome.gathering.toolTooltip.unlocks.herbalism':
     '{tier}티어까지의 약초 군락을 채집하는 데 필요합니다.',
+  'hudChrome.gathering.toolTooltip.unlocks.fishing':
+    '{tier}티어까지의 수역에서 낚시하는 데 필요합니다.',
   'hudChrome.gathering.toolTooltip.use.mining': '사용: 근처의 광맥을 캡니다.',
   'hudChrome.gathering.toolTooltip.use.logging': '사용: 근처의 벌목 나무를 벱니다.',
   'hudChrome.gathering.toolTooltip.use.herbalism': '사용: 근처의 약초 군락에서 채집합니다.',
@@ -8446,8 +8494,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.downgradeMark':
     '가방이 가득 찼습니다: 수확물이 채집자의 표식 없이 보관되었습니다.',
   'hudChrome.gathering.downgradeFind': '가방이 가득 찼습니다: 최상급 수확물을 놓쳐 버렸습니다.',
+  'hudChrome.gathering.emptyHookNote': '빈 낚싯바늘',
   'hudChrome.gathering.stateReady': '채집 가능',
   'hudChrome.gathering.stateCooldown': '재생성 중',
+  'hudChrome.gathering.stateCooldownTimed': '{time} 후 재생성',
+  'hudChrome.gathering.fineGradePreview': '현재 도구로 채집하면 상급 등급을 얻습니다.',
   'gatherEvent.pristineVein': '{finder}님이 순수한 광맥을 발견했습니다!',
   'gatherEvent.ancientHeartwood': '{finder}님이 고대 심목을 베어냈습니다!',
   'gatherEvent.moonlitBloom': '{finder}님이 달빛 꽃을 발견했습니다!',
@@ -8479,6 +8530,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.craftName.tailoring': '재봉',
   'hudChrome.craftName.leatherworking': '가죽세공',
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  'hudChrome.crafting.reagentFineSub': '(상급 등급 {count}개 소모)',
   // Protect Yumi locale fill (M16 wordy-key floor).
   'yumi.hud.collapse': 'Protect Yumi 게이지 접기',
   'yumi.hud.expand': 'Protect Yumi 게이지 펼치기',
@@ -8578,6 +8630,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.nation.copperdig': '구리 광산',
   'hudChrome.vcup.awayNote': '양 팀이 같은 깃발을 선택하면 원정 팀이 반전 배색으로 경기합니다.',
   'hudChrome.vcup.rolesHeading': '포지션',
+  'hudChrome.vcup.rolesSmallBracketNote':
+    '1대1과 2대2 등급에서는 모든 선수가 올라운더로 출전합니다. 3대3 이상 등급이 필요한 업적은 여기서 달성할 수 없습니다.',
   'hudChrome.vcup.role.allrounder.name': '올라운더',
   'hudChrome.vcup.role.allrounder.desc': '조금씩 다 합니다: 킥, 롱킥, 그리고 정당한 어깨싸움.',
   'hudChrome.vcup.role.striker.name': '스트라이커',
@@ -8610,6 +8664,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.boardWins': '{count}승',
   'hudChrome.vcup.practice': '봇 연습 경기',
   'hudChrome.vcup.practiceNote': '소우필드에서 봇과의 정식 경기를 즉시 시작합니다.',
+  'hudChrome.vcup.practiceUnratedNote':
+    '연습 경기는 등급전이 아닙니다. 전적과 업적의 서 진행도가 반영되지 않습니다.',
   'hudChrome.vcup.clock': '{minutes}:{seconds}',
   'hudChrome.vcup.indicatorQueued': '베일 컵 대기열: {bracket}, {count}명 중 {position}번째',
   'hudChrome.vcup.indicatorLive': '베일 컵',
@@ -8651,6 +8707,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.briefing.rule5': '누구나 다가와 관중석에서 응원할 수 있습니다.',
   'hudChrome.vcup.briefing.kitHeading': '내 기술',
   'hudChrome.vcup.briefing.kitNote': '경기 동안 이 동작들이 직업 능력을 대신합니다.',
+  'hudChrome.vcup.briefing.unratedNote':
+    '봇이 경기장에 있어 이 경기는 등급전이 아닙니다. 전적은 변하지 않으며 골, 세이브, 클린 시트 업적도 반영되지 않습니다.',
+  'hudChrome.vcup.briefing.practiceUnratedNote':
+    '이 경기는 연습 경기이므로 등급전이 아닙니다. 전적은 변하지 않으며 업적의 서 진행도도 반영되지 않습니다.',
   'hudChrome.vcup.briefing.rosterHeading': '출전 명단',
   'hudChrome.vcup.briefing.you': '나',
   'hudChrome.vcup.briefing.bot': '봇',
@@ -9096,7 +9156,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.lbSelfAccount': '내 계정: {rank}위, 상위 {percent}%, 명성 {renown}',
   'hudChrome.deeds.lbSelfRank': '내 계정: {rank}위, 상위 {percent}%',
   'hudChrome.deeds.lbEmpty': '아직 순위에 오른 연대기 작가가 없습니다.',
-  'hudChrome.deeds.broadcastsLabel': '업적 달성을 길드와 친구에게 공유',
+  'hudChrome.deeds.broadcastsLabel':
+    '업적 달성은 길드원과 팔로워에게, 업적과 걸작 카드는 Discord 피드에 공유',
   'guide.deedsPage.catHeading': '{label} ({count})',
   'guide.deedsPage.colName': '업적',
   'guide.deedsPage.featTag': '위업',
@@ -10057,6 +10118,36 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.wildgrowth_leggings.name': '야생성장 다리보호구',
   'entities.items.wildsoul_maul.name': '야생영혼 철퇴',
   'hudChrome.professions.skillValue': '{skill} / {max}',
+  'guide.profPages.toolsNote':
+    '모든 채집물에는 해당 전문 기술의 도구가 가방에 있어야 하며, 1단계도 예외가 아닙니다. 곡괭이가 없으면 광석도 없고, 낚싯대가 없으면 물고기도 없습니다. 상인 사다리는 1단계부터 3단계까지를 다루고, 각 거점은 자기 지역이 필요로 하는 단계만 취급합니다. 그래서 1단계 도구는 모든 지역 거점에서 팔리지만, 그 위 단계는 그것을 필요로 하는 광맥이 있는 곳에서 팔립니다. 상인은 그 단계를 팔기 전에 해당 전문 기술의 숙련도도 요구합니다. 2단계는 {tier2Prof}, 3단계는 {tier3Prof}가 필요하며, 판매 항목에 그 조건이 표시됩니다. 도구는 가방에 있기만 하면 되고 장비 칸도 내구도도 없으므로 한 번만 사면 되며, 이미 가진 도구는 계속 쓸 수 있습니다. 제한에 관여하는 것은 단계뿐입니다. 같은 단계에서 더 희귀한 도구라고 해서 더 열리는 것은 없습니다. 다만 희귀도가 색깔만인 것은 아닙니다. 장착한 도구 효과가 더 오래가고, 낚싯대라면 낚아채는 시간도 넓어집니다.\n\n더 좋은 도구는 두 가지가 아니라 세 가지를 줍니다. 더 높은 단계의 지형을 열고, 채집 시간을 줄이고, 나오는 것을 좋게 합니다. 그 지역 자체의 재료보다 높은 단계의 도구로 광맥을 캐면 평범한 재료 대신 고급 등급이 나옵니다. 대상은 그 지역의 완전 등급 광맥이어야 하므로, 여행자를 위해 남겨둔 쉬운 광맥에서는 여전히 평범한 재료가 나옵니다. 고급 재료는 제작 도구 제조법이 소모하는 것이며, 제조법이나 작업 지시가 평범한 판본을 요구하는 곳이라면 어디서든 고급 등급이 그것을 대신합니다. 그러니 장비를 올린다고 막히는 일은 없습니다. 구리 광석이 고급 구리 광석으로 들어올 뿐입니다.\n\n상인 사다리 위로는 각 전문 기술마다 4단계와 5단계의 제작 도구가 둘 있습니다. 기술자가 도구 공방에서 만들거나, 익사한 연도의 상점에서 탐굴 증표로 살 수 있습니다. 어떤 상인도 동전으로는 팔지 않습니다. 낚시에는 자체 한 쌍이 있으며, 처음부터 아는 것이 아니라 도구 장인에게서 배웁니다. 지금은 3단계를 넘게 요구하는 채집물도 물도 없으므로, 최상위 두 단계가 사는 것은 접근 권한이 아니라 속도와 등급과 넉넉한 낚아채기 시간입니다. 더 높은 단계의 지형이 나오면 그것들이 입장권이 될 것입니다.',
+  'hudChrome.professions.toolEffectName.quickeningCharm': '회복의 부적',
+  'hudChrome.professions.toolEffectName.artisansEye': '장인의 눈',
+  'hudChrome.professions.toolEffectName.gatherersCache': '채집가의 주머니',
+  'hudChrome.professions.toolEffectSlotButton': '{effect} 장착',
+  'hudChrome.professions.toolEffectRechargeButton': '재충전',
+  'hudChrome.professions.toolEffectNoGain': '{effect}은(는) 이미 장착되어 있고 충전도 가득합니다.',
+  'hudChrome.professions.toolEffectRechargeToolCapped':
+    '{effect}을(를) 더 충전하려면 더 좋은 {profession} 도구가 필요합니다.',
+  'hudChrome.professions.toolEffectSlotted': '{effect}이(가) {profession}에 장착되었습니다.',
+  'hudChrome.professions.toolEffectSlotInvalid': '{effect}은(는) 거기에 장착할 수 없습니다.',
+  'hudChrome.professions.toolEffectNoTool': '먼저 진짜 {profession} 도구가 필요합니다.',
+  'hudChrome.professions.toolEffectNoCharm': '가방에 제작한 {effect}이(가) 필요합니다.',
+  'hudChrome.professions.toolEffectRecharged': '{effect} 재충전 완료: {material} x{count} 소모.',
+  'hudChrome.professions.toolEffectRechargeNoSlot': '{profession}에 장착된 효과가 없습니다.',
+  'hudChrome.professions.toolEffectRechargeFull': '{effect}은(는) 이미 완전히 충전되어 있습니다.',
+  'hudChrome.professions.toolEffectRechargeMaterials':
+    '{effect} 재충전에는 {material} x{count}이(가) 필요합니다.',
+  'hudChrome.professions.toolEffectSpent': '모두 소모됨, 재충전 필요',
+  'hudChrome.professions.toolEffectDepleted': '도구 효과를 모두 소모했습니다',
+  'hudChrome.professions.toolEffectRechargePrice': '재충전: {material} x{count}',
+  'hudChrome.professions.toolEffectModeAsk': '사용할 때마다 확인',
+  'hudChrome.professions.toolEffectModePrompt': '사용 시마다 확인함',
+  'hudChrome.professions.toolEffectConfirmTitle': '{effect}을(를) 사용하시겠습니까?',
+  'hudChrome.professions.toolEffectConfirmBody':
+    '이번 채집에 1회를 소모하시겠습니까? 거절해도 채집은 진행되지만 보너스는 없습니다. 남은 횟수: {charges}회',
+  'hudChrome.professions.toolEffectConfirmAccept': '1회 사용',
+  'hudChrome.professions.toolEffectConfirmDecline': '그냥 채집',
+  'hudChrome.professions.toolEffectCharges': '{charges} / {max}회 남음',
   'entities.items.resonant_thread.name': '공명의 실',
   'entities.items.resonant_hide.name': '공명의 가죽',
   'entities.items.resonant_links.name': '공명의 사슬',
@@ -10184,13 +10275,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_amends_smith.objectives.0.label': '숲늑대 처치',
   'entities.quests.q_prof_amends_outfitter.title': '다시 이은 실',
   'entities.quests.q_prof_amends_outfitter.text':
-    '결국 다시 내 베틀 앞이로군. 원한은 없다, {playerName}. 다만 실은 자신을 놓아 버린 손을 기억하고, 그것을 다시 잡는 값은 매번 더 길게 재어진다. 서쪽 숲을 뒤덮은 흑거미줄 잠복자들을 솎아 내라. 그 노동이 좋은 실을 다시 만지기 전에 네 손을 가라앉혀 줄 것이다.',
+    '결국 다시 내 베틀 앞이로군. 원한은 없다, {playerName}. 다만 실은 자신을 놓아 버린 손을 기억하고, 그것을 다시 잡는 값은 매번 더 길게 재어진다. 동쪽 숲을 뒤덮은 흑거미줄 잠복자들을 솎아 내라. 그 노동이 좋은 실을 다시 만지기 전에 네 손을 가라앉혀 줄 것이다.',
   'entities.quests.q_prof_amends_outfitter.completion':
     '다시 흔들림이 없군. 가죽세공과 재봉이 주 전공으로 네 손에 돌아왔다. 이번에는 떠돌기 전에 두 번 재어라.',
   'entities.quests.q_prof_amends_outfitter.objectives.0.label': '흑거미줄 잠복자 처치',
   'entities.quests.q_prof_amends_apothecary.title': '다시 화덕 위로',
   'entities.quests.q_prof_amends_apothecary.text':
-    '이런, 누가 다시 내 냄비 앞에 왔나 보게. 서운한 것 없네, {playerName}, 부엌에는 늘 자리가 있으니까. 다만 걸어 나갈 때마다 외상값이 길어지는 건 자네도 알 테지. 동쪽 초원의 야생 멧돼지를 솎아 오게. 정직한 땀이 첫 번째 재료이고, 그것이 자네 손에 이 일을 다시 일깨워 줄 걸세.',
+    '이런, 누가 다시 내 냄비 앞에 왔나 보게. 서운한 것 없네, {playerName}, 부엌에는 늘 자리가 있으니까. 다만 걸어 나갈 때마다 외상값이 길어지는 건 자네도 알 테지. 서쪽 초원의 야생 멧돼지를 솎아 오게. 정직한 땀이 첫 번째 재료이고, 그것이 자네 손에 이 일을 다시 일깨워 줄 걸세.',
   'entities.quests.q_prof_amends_apothecary.completion':
     '옛 맛이 다시 나는군. 연금술과 요리가 주 전공으로 자네 화덕 위에 돌아왔네. 이번엔 좀 오래 머물게.',
   'entities.quests.q_prof_amends_apothecary.objectives.0.label': '야생 멧돼지 사냥',
@@ -10475,9 +10566,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.nodesNote':
     '채집물의 위치, 티어, 필요한 도구, 산출물. 각 채집물은 내가 채집한 뒤 {respawn}초가 지나야 나에게 다시 생겨난다.',
   'guide.profPages.toolsHeading': '도구',
-  'guide.profPages.toolsNote':
-    '모든 채집지에는 그 전문직의 도구가 가방에 있어야 하며, 1티어도 예외가 아니다. 곡괭이가 없으면 광석도 없고, 낚싯대가 없으면 물고기도 없다. 상인 사다리는 1티어부터 3티어까지를 다루며 모든 거점 마을에 재고가 있다. 도구는 가방에 들어 있기만 하면 되고, 장착 칸도 내구도도 없어서 한 번만 사면 된다. 조건을 가르는 것은 티어뿐이며, 도구의 희귀도 색은 겉모습일 뿐이다.\n\n상인 사다리 위에는 제작 도구 두 가지, 4티어와 5티어가 있다. 기술자가 도구 공방에서 만들며 어떤 NPC도 팔지 않는다. 현재 3티어를 넘는 채집지는 없으므로 지금 이들의 가치는 속도다. 최상급 도구는 낮은 등급 채집지에서 시전 시간을 최소치로 고정하며, 더 높은 티어의 땅이 열리면 그때의 입장권이 된다.',
   'guide.profPages.toolCrafted': '제작({craft})',
+  'guide.profPages.toolCraftedOrMarks': '{craft}(으)로 제작하거나 탐굴 증표 {marks}개로 구매',
+  'guide.profPages.toolCraftedOrMarksHeroic':
+    '{craft}(으)로 제작하거나 익사한 연도의 영웅 난이도 공략 후 탐굴 증표 {marks}개로 구매',
   'guide.profPages.toolVendor': '{name}({hub})',
   'guide.profPages.toolUnavailable': '판매 없음',
   'guide.profPages.priceNone': '판매 없음',
@@ -10580,7 +10672,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '업적의 서가 모든 걸음에 함께한다. 첫 조율은 Craftsworn을, 첫 걸작은 Masterwright를 주며 둘 다 칭호로 착용할 수 있다. 여덟 제작 기술은 각각 기술 50에 이정표 업적을, 상한 125에 Grandmaster 칭호를 두고, 낚시는 숙련 100에 Old Salt를, 200에 Master Angler 칭호를 준다.\n\n첫 채집과 첫 제작, 야외의 희귀한 발견, 분해 회수의 조용한 페이지도 있다. 전부 장식일 뿐이다. 칭호와 명성만 있을 뿐, 업적은 결코 힘을 주지 않는다.',
   'guide.professions.startHeading': '어디서 시작할까',
   'guide.professions.startBody':
-    'Eastbrook에 막 도착했다면 Foreman Odell을 찾아 A Trade for Every Hand를 받자. 마을 남서쪽 Copper Dig 주변의 광맥을 알려 준다. 그 뒤로는 여행 중 지나치는 광맥과 나무, 약초를 전부 캐면 된다. 마을에서는 T 키로 제작 창을 열어 누구나 아는 기본 제조법을 만들고, 대장간과 주방, 베틀, 공작소의 장인들을 찾아 무엇을 가르치는지 보고, 작업 주문으로 꾸준한 동전을 벌자. 길드의 편지가 도착할 즈음이면 어느 짝이 내 집인지 이미 알게 된다.',
+    'Eastbrook에 막 도착했다면 Foreman Odell을 찾아 A Trade for Every Hand를 받자. 마을 남동쪽 Copper Dig 주변의 광맥을 알려 준다. 그 뒤로는 여행 중 지나치는 광맥과 나무, 약초를 전부 캐면 된다. 마을에서는 T 키로 제작 창을 열어 누구나 아는 기본 제조법을 만들고, 대장간과 주방, 베틀, 공작소의 장인들을 찾아 무엇을 가르치는지 보고, 작업 주문으로 꾸준한 동전을 벌자. 길드의 편지가 도착할 즈음이면 어느 짝이 내 집인지 이미 알게 된다.',
   'guide.profPages.yieldsHeading': '채집의 수확물',
   'guide.profPages.yieldsBody':
     '채집마다 품질을 굴리는데, 그 확률은 숙련도가 전부다. 갓 시작한 채집가는 언제나 일반 등급을 얻지만, 숙련이 오를수록 무게가 높은 등급으로 옮겨 가며 절대 후퇴하지 않는다. 상한 100에서는 일반이 완전히 사라져 60% 고급, 30% 희귀, 8% 영웅, 2% 전설이 된다. 품질은 곧 수량이다. 일반 1개, 고급과 희귀 2개, 영웅 3개, 전설 4개. 희귀 이상은 서명이 새겨져(Gathered by) 도착하며, 상한에서는 열 번 중 네 번에 이름이 남는다.',
@@ -10664,7 +10756,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '간판 재료는 낚시가 지역별로 댄다. Eastbrook Vale의 거울 송어와 강 농어, Mirefen Marsh의 늪 창꼬치와 진흙 장어, Thornpeak Heights의 서리아가미 송어와 판지느러미 잉어. 사다리의 각 단은 제 단의 물고기를 요리하니 낚는 요리사는 재료가 마르지 않는다. 푸줏간 쪽은 사체 채집에서 온다. 멧돼지 따위의 사냥 고기, 그리고 희귀 이상 판정에서 나오는 서명된 Prime Cut, 대구이의 주인공이다. 약초가 좋은 접시에 향을 더하고, ashwood 통나무 하나가 장어를 훈제하며, Cooking Salt는 Marlow의 가판에서 한 봉지 8동이다.',
   'guide.profPages.craftProse.cooking.ladderHeading': '육포에서 대구이까지',
   'guide.profPages.craftProse.cooking.ladderBody':
-    "Salted Jerky가 야외 제조법이다. 처음부터 알고, 거미 다리 하나면 어디서든 만드는 신출내기의 행군식. 수련 사다리는 광장 서쪽 Eastbrook 주방에서 돈다. 무료 단은 기술 0(농어, Hunter's Game Skewer, Herbed Marsh Pike), 중간 단은 기술 25에 각 25은(Ashwood Smoked Eel, Goldleaf Game Stew, Frostgill Chowder), 희귀 단은 기술 50에 각 1금(Silvered Carp Supper, Angler's Feast Platter, Marlow's Grand Roast). 묶음 요리는 재료를 늘린다. 훈제 장어와 스튜는 한 번에 두 접시, 연회 모둠은 세 접시다.",
+    "Salted Jerky가 야외 제조법이다. 처음부터 알고, 거미 다리 하나면 어디서든 만드는 신출내기의 행군식. 수련 사다리는 광장 동쪽 Eastbrook 주방에서 돈다. 무료 단은 기술 0(농어, Hunter's Game Skewer, Herbed Marsh Pike), 중간 단은 기술 25에 각 25은(Ashwood Smoked Eel, Goldleaf Game Stew, Frostgill Chowder), 희귀 단은 기술 50에 각 1금(Silvered Carp Supper, Angler's Feast Platter, Marlow's Grand Roast). 묶음 요리는 재료를 늘린다. 훈제 장어와 스튜는 한 번에 두 접시, 연회 모둠은 세 접시다.",
   'guide.profPages.craftProse.cooking.routeHeading': '걸작 아닌 특화, 그리고 125까지의 길',
   'guide.profPages.craftProse.cooking.routeBody':
     '요리는 걸작 이야기의 정직한 예외다. 접시에는 올릴 능력치가 없어 걸작이 절대 발동하지 않고, 좇을 이유도 없다. 이 기술의 정점은 75의 특화다. 모든 재료가 5분의 1씩 절약되고(묶음 요리에서 빠르게 불어난다), 이동식 야외 주방으로 던전 문 앞에서 연회를 차린다. 낚은 것을 요리하자. 두 기술이 서로를 먹인다. 육포와 무료 단으로 25, 중간 단으로 50, 희귀 단으로 75. 이후 더 높은 접시가 없어 희귀 요리가 절반과 4분의 1로 줄고, 상한까지 약 150회다. 갈이가 아니라 비축이라 생각하자. 길드는 모든 접시를 비운다. Marlow의 주문은 30분마다 사냥 고기 8점. 기술 50에 Seasoned Chef, 125에 Grandmaster Cooking 칭호다.',
@@ -10703,6 +10795,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '마법부여는 재료를 소모하고 특정 사본 하나에 표시를 남긴다. 가방 속 사본에 쓰면 별개의 부여된 사본을 돌려받고, 이미 착용 중인 물건에 쓰면 벗었다 다시 입을 필요 없이 그 자리에서 부여된다. 어느 쪽이든 보너스가 영원히 그 물건을 따른다. 한 물건에 하나. 부여된 사본에 다른 마법부여를 쓰면 먼저 확인을 거친 뒤 옛 부여를 그대로 대체하며, 옛 부여는 재료 환불 없이 파괴된다. 판매와 폐기와 분해 모두 무표식 사본을 먼저 집으니 완성품이 실수로 갈리지 않는다. 똑같이 부여된 사본끼리는 겹쳐진다. 걸작과 마법부여는 친구다. 걸작은 온전히 부여 가능하고, 부여는 걸작 보너스와 서명을 건드리지 않고 얹힌다. 모든 것을 쌓은 서명된 걸작의 Greater 부여가 공예품의 정점이며, 그래도 설계상 공격대 전리품 아래에 있다. 이제 부여품과 서명품도 세계 시장에 올릴 수 있다. 한 점씩 단일 등록으로 팔리고, 툴팁에 부여와 제작자의 서명이 표시되며, 큰까마귀 우편으로도 똑같이 보낼 수 있다. 재료는 여전히 장사의 든든한 절반이다. 가루, 정수, 조각은 자유로이 등록되고, 등록은 무료, 수수료는 성사 시 5%뿐이다.',
   'hudChrome.corpseHarvest.components.meat': '고기',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (마법부여)',
+  'hudChrome.materialHint.fineGrade':
+    '상급 등급입니다. 해당 재료보다 높은 등급의 도구로 만렙 채집지에서 캐낸 것이며, 일반 등급이 필요한 곳 어디에서나 대신 사용됩니다.',
   'hudChrome.materialHint.arcaneDust': '마법부여 재료. 일반과 고급 장비의 마력을 추출해 얻습니다.',
   'hudChrome.materialHint.arcaneEssence': '마법부여 재료. 희귀 장비의 마력을 추출해 얻습니다.',
   'hudChrome.materialHint.arcaneShard': '마법부여 재료. 영웅과 전설 장비의 마력을 추출해 얻습니다.',
@@ -10816,4 +10910,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.heatingUp': '달아오름',
   'hudChrome.auraOverlay.procs.arcaneCharge': '비전 충전',
   'hudChrome.auraOverlay.procs.aetherRush': '에테르 쇄도',
+  'itemUi.vendor.buyStack': '{count}개 구매',
+  'itemUi.vendor.buyStackAria': '{price}에 {item} {count}개 구매',
 };

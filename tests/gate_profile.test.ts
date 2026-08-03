@@ -244,7 +244,7 @@ describe('buildGateProfileSteps', () => {
       'sfx check',
       'vitest (full suite)',
       'browser regressions',
-      'typecheck + env/server builds',
+      'typecheck + env/server/bot builds',
       'client build',
     ]);
     const vitest = steps.find((s) => s.name === 'vitest (full suite)');

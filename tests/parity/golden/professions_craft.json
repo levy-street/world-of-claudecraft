@@ -444,7 +444,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 832,
-      "state": "d1fe98cb",
+      "state": "a159cd3d",
       "events": "bc0f8542",
       "rng": {
         "draws": 2,
@@ -569,6 +569,16 @@
           "talents": {
             "rows": {}
           },
+          "tierMailSent": [
+            [
+              "leatherworking",
+              0
+            ],
+            [
+              "tailoring",
+              0
+            ]
+          ],
           "townFocus": {},
           "xp": 24
         }
@@ -643,7 +653,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 832,
-      "state": "5ef499f3",
+      "state": "2fef7979",
       "events": "5dd3b5c3",
       "rng": {
         "draws": 3,
@@ -766,6 +776,16 @@
           "talents": {
             "rows": {}
           },
+          "tierMailSent": [
+            [
+              "leatherworking",
+              0
+            ],
+            [
+              "tailoring",
+              0
+            ]
+          ],
           "townFocus": {},
           "xp": 48
         }
@@ -840,7 +860,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 832,
-      "state": "5ef499f3",
+      "state": "2fef7979",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -963,6 +983,16 @@
           "talents": {
             "rows": {}
           },
+          "tierMailSent": [
+            [
+              "leatherworking",
+              0
+            ],
+            [
+              "tailoring",
+              0
+            ]
+          ],
           "townFocus": {},
           "xp": 48
         }

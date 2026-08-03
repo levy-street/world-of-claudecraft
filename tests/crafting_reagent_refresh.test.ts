@@ -378,6 +378,26 @@ const BOTH_REAGENTS: InvSlot[] = [
   { itemId: REAGENT_B, count: 3 },
 ];
 
+describe('the fine-substitution suffix renders on BOTH claimed surfaces', () => {
+  it('paints the suffix span and folds the same text into the row aria name', () => {
+    // The phase 14 QA: the visible-line-AND-aria-fold claim had zero
+    // rendered arms (only the view's number was pinned). Base copper is
+    // absent and one fine copy covers the bill, so the reagent row must
+    // carry the suffix in the .crafting-fine-sub span and in the row's
+    // composed aria name.
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    paint(el, [
+      { itemId: 'fine_copper_ore', count: 1 },
+      { itemId: REAGENT_B, count: 1 },
+    ]);
+    const sub = el.querySelector('.crafting-fine-sub');
+    expect(sub?.textContent?.trim()).toBe('(spends 1 fine-grade)');
+    expect(el.querySelector('[aria-label*="spends 1 fine-grade"]')).not.toBeNull();
+    el.remove();
+  });
+});
+
 describe('crafting window repaint preserves the player position', () => {
   it('keeps the tab strip scrolled where the player left it', () => {
     // The strip is its own horizontal scroller on mobile, so a repaint that

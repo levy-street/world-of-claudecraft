@@ -154,7 +154,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 832,
-      "state": "bd1df387",
+      "state": "20d8f8d6",
       "events": "4af47171",
       "rng": {
         "draws": 2,
@@ -249,7 +249,7 @@
           "lifetimeXp": 21,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {
-            "ore_eastbrook_1": 122.5
+            "ore_eastbrook_1": 242.5
           },
           "recipesGrandfathered": true,
           "renown": 10,
@@ -331,7 +331,7 @@
       "tick": 104,
       "time": 5.2,
       "nextId": 832,
-      "state": "93a236a7",
+      "state": "699de1f9",
       "events": "fb67ed28",
       "rng": {
         "draws": 4,
@@ -442,8 +442,8 @@
           "lifetimeXp": 42,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {
-            "ore_eastbrook_1": 122.5,
-            "wood_eastbrook_1": 125
+            "ore_eastbrook_1": 242.5,
+            "wood_eastbrook_1": 245
           },
           "recipesGrandfathered": true,
           "renown": 25,
@@ -525,7 +525,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 832,
-      "state": "5252489f",
+      "state": "b554fdd6",
       "events": "1ba5e715",
       "rng": {
         "draws": 18,
@@ -536,7 +536,7 @@
       "tick": 1000,
       "time": 50,
       "nextId": 832,
-      "state": "c724eb07",
+      "state": "4279c612",
       "events": "0c0f7bb9",
       "rng": {
         "draws": 38,
@@ -547,7 +547,7 @@
       "tick": 1500,
       "time": 75,
       "nextId": 832,
-      "state": "65c170d5",
+      "state": "4c263024",
       "events": "0df46ace",
       "rng": {
         "draws": 58,
@@ -558,7 +558,7 @@
       "tick": 2000,
       "time": 100,
       "nextId": 832,
-      "state": "66a3959f",
+      "state": "74250c40",
       "events": "0d003f88",
       "rng": {
         "draws": 78,
@@ -569,7 +569,7 @@
       "tick": 2500,
       "time": 125,
       "nextId": 832,
-      "state": "a5721c1c",
+      "state": "efb4c289",
       "events": "06f2d110",
       "rng": {
         "draws": 96,
@@ -580,7 +580,7 @@
       "tick": 3000,
       "time": 150,
       "nextId": 832,
-      "state": "56e93490",
+      "state": "53eb63eb",
       "events": "64428e55",
       "rng": {
         "draws": 116,
@@ -591,7 +591,7 @@
       "tick": 3500,
       "time": 175,
       "nextId": 832,
-      "state": "5c4cee35",
+      "state": "8094fe0c",
       "events": "d339b869",
       "rng": {
         "draws": 136,
@@ -602,7 +602,7 @@
       "tick": 4000,
       "time": 200,
       "nextId": 832,
-      "state": "f35add72",
+      "state": "131f1723",
       "events": "15c574a1",
       "rng": {
         "draws": 156,
@@ -613,7 +613,7 @@
       "tick": 4500,
       "time": 225,
       "nextId": 832,
-      "state": "7761becc",
+      "state": "01989a4d",
       "events": "15c574a1",
       "rng": {
         "draws": 176,
@@ -624,7 +624,7 @@
       "tick": 5000,
       "time": 250,
       "nextId": 832,
-      "state": "b5860905",
+      "state": "4da3d2f6",
       "events": "b6af8804",
       "rng": {
         "draws": 194,
@@ -635,7 +635,7 @@
       "tick": 5206,
       "time": 260.3,
       "nextId": 832,
-      "state": "3f3512fd",
+      "state": "a40d72ce",
       "events": "e8a5bc9d",
       "rng": {
         "draws": 204,
@@ -686,7 +686,6 @@
               "gather:eastbrook_vale:wood",
               "gather_event:moonlit_bloom",
               "poi:eastbrook_vale:copper_dig",
-              "poi:eastbrook_vale:mirror_lake",
               "poi:eastbrook_vale:sableweb"
             ]
           },
@@ -767,9 +766,9 @@
           "lifetimeXp": 2022,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {
-            "herb_eastbrook_1": 380.25,
-            "ore_eastbrook_1": 122.5,
-            "wood_eastbrook_1": 125
+            "herb_eastbrook_1": 500.25,
+            "ore_eastbrook_1": 242.5,
+            "wood_eastbrook_1": 245
           },
           "recipesGrandfathered": true,
           "renown": 40,
@@ -803,7 +802,7 @@
           "critChance": 0.061,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.061,
-          "fallStartY": -5.25,
+          "fallStartY": -4.298238,
           "fiveSecondRule": 359.3,
           "hp": 176,
           "id": 827,
@@ -818,9 +817,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -86,
-            "y": -5.25,
-            "z": 90
+            "x": -59,
+            "y": -4.298238,
+            "z": 91
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -851,7 +850,7 @@
       "tick": 5208,
       "time": 260.4,
       "nextId": 832,
-      "state": "7a362f14",
+      "state": "59de0bb5",
       "events": "741638a5",
       "rng": {
         "draws": 204,
@@ -902,7 +901,6 @@
               "gather:eastbrook_vale:wood",
               "gather_event:moonlit_bloom",
               "poi:eastbrook_vale:copper_dig",
-              "poi:eastbrook_vale:mirror_lake",
               "poi:eastbrook_vale:sableweb"
             ]
           },
@@ -983,9 +981,9 @@
           "lifetimeXp": 2022,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {
-            "herb_eastbrook_1": 380.25,
-            "ore_eastbrook_1": 122.5,
-            "wood_eastbrook_1": 125
+            "herb_eastbrook_1": 500.25,
+            "ore_eastbrook_1": 242.5,
+            "wood_eastbrook_1": 245
           },
           "recipesGrandfathered": true,
           "renown": 40,
@@ -1019,7 +1017,7 @@
           "critChance": 0.061,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.061,
-          "fallStartY": -5.25,
+          "fallStartY": -4.298238,
           "fiveSecondRule": 359.4,
           "hp": 176,
           "id": 827,
@@ -1034,9 +1032,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -86,
-            "y": -5.25,
-            "z": 90
+            "x": -59,
+            "y": -4.298238,
+            "z": 91
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",

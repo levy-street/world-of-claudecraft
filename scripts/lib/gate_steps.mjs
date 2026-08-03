@@ -93,9 +93,9 @@ export function buildFullGateSteps(workers, opts = {}) {
   // tasks so --skip-* still measures what it claims.
   if (!opts.skipTypes && !opts.skipBuilds) {
     steps.push({
-      name: 'typecheck + env/server builds',
+      name: 'typecheck + env/server/bot builds',
       cmd: 'npx',
-      args: turboRunArgs(['check:types', 'build:env', 'build:server']),
+      args: turboRunArgs(['check:types', 'build:env', 'build:server', 'build:bot']),
     });
     steps.push({
       name: 'client build',
@@ -121,6 +121,11 @@ export function buildFullGateSteps(workers, opts = {}) {
           name: 'server build',
           cmd: 'npx',
           args: turboRunArgs(['build:server']),
+        },
+        {
+          name: 'bot build',
+          cmd: 'npx',
+          args: turboRunArgs(['build:bot']),
         },
         {
           name: 'client build',
