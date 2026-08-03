@@ -1765,12 +1765,17 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
           ],
           lookAt: { kind: 'point', point: { x: 0, z: 10, height: 100 } },
           dur: 1.6,
-          subjectRef: 'statueBlock',
+          // The TOO-FAR arm (the control above owns the not-found arm), so this
+          // must name a prop that really is placed in the world: the lint has to
+          // resolve it before it can measure a distance. Repointed from
+          // statueBlock when Hale's memorial replaced those reused nature-kit
+          // blocks and moved to the berm crest.
+          subjectRef: 'wardenHaleStatue',
         },
       },
     ]),
     expectedCheck: 'reference.subject',
-    expectedMeasured: 'nearest statueBlock',
+    expectedMeasured: 'nearest wardenHaleStatue',
   },
   {
     def: syntheticCameraScene(

@@ -521,15 +521,24 @@ function voyageTimeline(
   ];
 }
 
+// Hale's memorial now stands on the berm crest north of the redoubt (805,139,
+// terrain 9.4) instead of in the market, so this beat is re-composed rather
+// than just re-aimed: the camera climbs the berm's south face from below and
+// looks UP at the bronze against the sky, which is the angle a memorial on a
+// hill wants. `height` is yards above terrain at each point (scenes.ts
+// resolves it against groundPos), and the terrain climbs from 5.9 at z=127 to
+// 9.4 at the crest, so these read lower than they look. The lookAt sits 3.4 up
+// to hold the FIGURE, not the plinth. The cut into the toll beat is
+// fade-covered, so the jump to that shot's own opening needs no continuity.
 const Q0_STATUE_SHOT: SceneDollyShotDef = {
   kind: 'dolly',
   points: [
-    { x: 806, z: 112, height: 8 },
-    { x: 808, z: 113, height: 7.4 },
+    { x: 802, z: 127, height: 3.5 },
+    { x: 804, z: 132, height: 2.8 },
   ],
-  lookAt: { kind: 'point', point: { x: 818, z: 120, height: 2 } },
+  lookAt: { kind: 'point', point: { x: 805, z: 139, height: 3.4 } },
   dur: 4.8,
-  subjectRef: 'statueBlock',
+  subjectRef: 'wardenHaleStatue',
 };
 
 const Q0_TOLL_SHOT: SceneDollyShotDef = {

@@ -679,18 +679,23 @@ export const FARSHORE_PROPS: ZonePropsDef = {
     { kind: 'house', x: 811, z: 126, w: 5, d: 5, rot: 2.1 },
     { kind: 'chapel', x: 831, z: 110, w: 5, d: 7, rot: -2.4 }, // the menders' hall
   ],
-  // The old bronze warden above the harbor steps. Both existing nature-kit
-  // parts share one camera-ghost group at the Q0 shot target.
+  // Warden Hale's memorial. It stands on the berm crest NORTH of the redoubt
+  // (ground 9.4, about 4 yd above the town's flat 5.5 pad) rather than in the
+  // market it used to crowd: a memorial reads as a memorial with space around
+  // it, and from up here the bronze looks back down over the town and the
+  // harbor steps the way the histories describe. Facing south, inland over the
+  // town, per the Q0 line. One authored asset now, not two scaled nature-kit
+  // blocks; the collider radius is the measured circumscribed footprint so
+  // collision matches the silhouette.
   decorProps: [
     {
-      key: 'statueBlock',
-      x: 818,
-      z: 120,
-      rot: Math.PI / 2,
-      scale: 5,
-      r: 1,
-      h: 4.4,
-      parts: [{ key: 'statueHead', y: 1.95, scale: 2.5 }],
+      key: 'wardenHaleStatue',
+      x: 805,
+      z: 139,
+      rot: Math.PI,
+      scale: 1,
+      r: 1.26,
+      h: 4.8,
     },
   ],
   wells: [{ x: 820, z: 119, r: 1.5 }],
