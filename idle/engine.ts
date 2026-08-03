@@ -17,6 +17,7 @@ import { evaluateQuest } from './auto_quest';
 import { steerToward } from './movement';
 import { findBestCampTarget } from './progression_target';
 import { type IdleSaveData, readSave, writeSave } from './storage';
+import { assessThreat } from './threat_map';
 
 /**
  * The per-step counter baseline used to diff the next `step()`. Reused by the
@@ -180,7 +181,7 @@ export class IdleEngine {
       // nothing to fight here. Steer toward a level-appropriate camp instead
       // of wandering randomly. This is the progression navigator: it makes
       // the character migrate to the right hunting grounds for its level.
-      if (action === 1 && !sim.player.targetId) {
+      if (action === 1 && !sim.player.targetId && assessThreat(sim).level !== 'lethal') {
         const camp = findBestCampTarget(sim.player.pos, sim.player.level);
         if (camp) {
           const d = dist2d(sim.player.pos, camp.pos);
