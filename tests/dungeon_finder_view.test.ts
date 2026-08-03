@@ -424,7 +424,13 @@ describe('dungeon finder view core', () => {
     expect(view.board.listings[0].canApply).toBe(false);
   });
 
-  it('keeps a leader listing visible in Open listings when its OWN dungeon goes locked (#2030 followup)', () => {
+  it('keeps a locked-out leader in charge of their listing via the myListing panel (#2030 followup, reconciled with issue 2031)', () => {
+    // Originally this pinned the leader's own row staying in Open listings
+    // when their dungeon went locked. Issue 2031 then hid the own listing
+    // from browse results altogether (it lives in the myListing panel), which
+    // supersedes that row. The #2030 concern it protected still holds and is
+    // pinned here in its reconciled form: a lockout landing mid-run must not
+    // strip the leader of their listing, so the myListing panel survives it.
     const heroicListing = {
       id: 8,
       activityId: 'hollow_crypt_heroic',
@@ -448,8 +454,15 @@ describe('dungeon finder view core', () => {
         }),
       ),
     );
-    expect(view.board.listings.map((l) => l.id)).toEqual([8]);
-    expect(view.board.listings[0].mine).toBe(true);
+    // Browse hides my own group (issue 2031), lockout or not.
+    expect(view.board.listings).toEqual([]);
+    // The lockout must not filter the leader's own management panel.
+    expect(view.board.myListing).toEqual({
+      id: 8,
+      activityId: 'hollow_crypt_heroic',
+      tags: [],
+      applicants: [],
+    });
   });
 
   it('does not hide a listing over a lockout on a DIFFERENT dungeon or a lockout-free difficulty (#2030 followup)', () => {
