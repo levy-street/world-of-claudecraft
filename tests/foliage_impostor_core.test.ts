@@ -71,11 +71,17 @@ describe('impostor atlas packing', () => {
       }
     }
     // the real kit's exact foliage counts (fixed variant lists); buildings
-    // are a cap with headroom over the shipped pool + skyline decor
+    // are a cap with headroom over the MEASURED live inventory: 44 unique
+    // assets registered by collectBuildingImpostors on the shipped world
+    // (pools, per-kind entries, bell tower, every skyline decor prop 7u+).
+    // The first cap here (16) was taken from a stale fixture and threw in
+    // the live session, which the fail-soft turned into a sprite-less far
+    // field: a budget below the real count is a shipped regression, not a
+    // tight bound.
     expect(IMPOSTOR_ROW_BUDGET.tree).toBe(15);
     expect(IMPOSTOR_ROW_BUDGET.rock).toBe(8);
     expect(IMPOSTOR_ROW_BUDGET.dress).toBe(2);
-    expect(IMPOSTOR_ROW_BUDGET.building).toBeGreaterThanOrEqual(14);
+    expect(IMPOSTOR_ROW_BUDGET.building).toBeGreaterThanOrEqual(44 + 2);
   });
 
   it('rigid categories take HARD ZERO wind; sway parity for the living ones', () => {

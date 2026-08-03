@@ -217,10 +217,14 @@ export const IMPOSTOR_CATEGORY_WIND: Record<ImpostorCategoryName, number> = {
  * 14u tree at its ~300u swap subtends ~45 screen pixels at 1080p, and a
  * village house past the 700u detail horizon under 20, so these cells stay
  * oversampled at every distance a sprite can be seen while the whole
- * inventory packs into IMPOSTOR_ATLAS_BUDGET.
+ * inventory packs into IMPOSTOR_ATLAS_BUDGET. Tree and building share one
+ * 80px height class on purpose: same-height rows share shelves in the
+ * packer, which is what lets the REAL building inventory (44 rows of
+ * houses, bell towers and skyline decor, measured live) fit beside the 15
+ * tree rows inside 2048.
  */
 export const IMPOSTOR_CELL_PX: Record<ImpostorCategoryName, number> = {
-  tree: 96,
+  tree: 80,
   rock: 64,
   dress: 64,
   building: 80,
@@ -229,16 +233,20 @@ export const IMPOSTOR_CELL_PX: Record<ImpostorCategoryName, number> = {
 /**
  * Row budget per category. Tree, rock and dress counts are exact (the
  * foliage kit's variant lists are fixed); the building count is a cap with
- * headroom over the shipped pool + skyline decor set. registerArchetype
- * throws past its category's budget, so a grown kit fails the world build
- * loudly (and the browser regression) instead of silently outgrowing the
- * atlas the capacity test verified.
+ * headroom over the MEASURED live inventory (44 unique assets: pools,
+ * per-kind entries, the bell tower, and every skyline decor prop 7u+).
+ * registerArchetype throws past its category's budget, so a grown kit
+ * fails the world build loudly instead of silently outgrowing the atlas
+ * the capacity test verified. The fail-soft in buildFoliage turns that
+ * throw into a sprite-less far field for the player, so treat ANY
+ * budget change as unverified until a live boot shows the four impostor
+ * meshes standing.
  */
 export const IMPOSTOR_ROW_BUDGET: Record<ImpostorCategoryName, number> = {
   tree: 15,
   rock: 8,
   dress: 2,
-  building: 16,
+  building: 48,
 };
 
 /**

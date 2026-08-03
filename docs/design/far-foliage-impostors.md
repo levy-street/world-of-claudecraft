@@ -153,11 +153,11 @@ Measured (fixed probe spots, high tier, draw calls and submitted
 triangles from `renderer.info`; the timed record with real rAF
 frame-interval percentiles, raw samples, GPU/browser/SHA provenance is
 `docs/screenshots/far-foliage-impostors/stats-review-round.json`, an
-Apple M4 Pro under headless Chromium at 1600x900: frame p50 spans 8.1 to
-14.3 ms across the 11 vantages, worst p95 20.6 ms): the light coastal
+Apple M4 Pro under headless Chromium at 1600x900: frame p50 spans 8.3 to
+11.9 ms across the 11 vantages, worst p95 16.8 ms): the light coastal
 vantages sit within a few percent of the fogged game; the densest
 mid-strip vantage (the old marsh wall at 165u) draws the whole strip at
-about 940 calls and 14.2M submitted triangles at 12.1 ms p50. The far
+about 660 calls and 5.7M submitted triangles at 11.7 ms p50. The far
 layer itself costs about 12 tile draws plus 4 sprite draws and ~12k
 sprite triangles for the entire world. The earlier stats-*.json records
 carry draw/triangle data only (their frame-time fields were never validly
