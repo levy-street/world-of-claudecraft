@@ -3630,6 +3630,11 @@ export class GameServer {
     if (session.escrowQuarantined) return;
     const previous = this.characterSaveQueues.get(session.characterId);
     const run = (previous ? previous.catch(() => {}) : Promise.resolve()).then(async () => {
+      // Re-checked INSIDE the queue, not only at entry: a save enqueued before
+      // the rollback would otherwise run after it, and by then this session's
+      // book ops have been undone while its character blob still reflects
+      // them, so committing it is exactly the mint the rollback prevented.
+      if (session.escrowQuarantined) return;
       const state = this.sim.serializeCharacter(session.pid);
       const e = this.sim.entities.get(session.pid);
       // Captured at serialize time: only unlocks already inside THIS blob may
@@ -4118,12 +4123,14 @@ export class GameServer {
   }
 
   // How many consecutive escrow REFUSALS one session tolerates for one guild
-  // before it is rolled back rather than retried. Each is one autosave
-  // interval apart, so this is roughly four minutes of waiting for the other
-  // officer's commit to land. The bound only exists for the case that can
-  // never resolve on its own (two sessions each waiting on the other's
-  // un-durable value); an ordinary interleaving clears on the very next save.
-  static readonly GUILD_BANK_DEFICIT_MAX_SKIPS = 8;
+  // before it is rolled back rather than retried. Deliberately SMALL: while a
+  // refusal is outstanding this character persists NOTHING, including progress
+  // that has nothing to do with the guild bank, so every extra retry is
+  // unrelated progress an adversary can put at risk by keeping the book short.
+  // Two is enough because a refusal immediately flushes the sessions it is
+  // waiting on (see handleGuildBankEscrowRefusal), which turns the wait into a
+  // round trip instead of an autosave interval.
+  static readonly GUILD_BANK_DEFICIT_MAX_SKIPS = 2;
 
   // The escrow REFUSAL arm. The book half could not be replayed onto durable
   // truth, so the whole transaction rolled back and this save persisted
@@ -4187,6 +4194,24 @@ export class GameServer {
         skips < GameServer.GUILD_BANK_DEFICIT_MAX_SKIPS;
       if (canResolve) {
         session.guildBankDeficitSkips.set(guildId, skips);
+        // Do not wait out an autosave interval: FLUSH the sessions whose
+        // unflushed work this replay is waiting on, so the retry lands a round
+        // trip later rather than 30 seconds later. This is what keeps the
+        // blocked window (during which THIS character persists nothing at all,
+        // including progress that has nothing to do with the guild bank) to
+        // the shortest it can be, and it is why the skip bound is small.
+        //
+        // Only on the FIRST refusal: if that flush is itself refused it will
+        // flush back, and an unbounded ping-pong of fire-and-forget saves
+        // between two mutually-stuck sessions is worse than the wait it saves.
+        if (skips > 1) continue;
+        for (const s of this.sessionsByCharacterId.values()) {
+          if (s === session || s.escrowQuarantined || s.left) continue;
+          if (!s.dirtyGuildBanks.has(guildId)) continue;
+          void this.saveCharacter(s).catch((err) =>
+            console.error(`guild bank deficit flush failed for ${s.name}:`, err),
+          );
+        }
         continue;
       }
       const log = session.unflushedGuildBankOps.get(guildId) ?? [];
@@ -4202,13 +4227,17 @@ export class GameServer {
               }`
         }. The session is quarantined and disconnected; nothing it did since its last save was durable, so nothing is lost that was.`,
       );
-      this.revertOwnGuildBookOps(session, [guildId]);
       quarantine = true;
     }
     if (!quarantine) return;
     // The character half is the half that would carry the value the book half
     // could not, so this session must never save again.
     session.escrowQuarantined = true;
+    // Undo EVERY book this session dirtied, not only the refused one: the
+    // session as a whole is abandoned, so its deltas in a second guild's book
+    // are live value nobody will ever make durable, and another officer
+    // withdrawing that phantom value would be refused in turn.
+    this.revertOwnGuildBookOps(session, [...session.dirtyGuildBanks.keys()]);
     if (!session.left) {
       void this.kickSession(session, 'guild bank escrow rollback', 'character taken over');
     }

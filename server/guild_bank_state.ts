@@ -172,14 +172,26 @@ export function mergeGuildBankRow(
     const netted = sanitizeGuildBankState(durableRaw);
     if (applyGuildBankDeltasTo(netted, netGuildBankOpLogForReplay(deltas)) === null) {
       guildBankNettedReplayRescues++;
-      return { data: netted, result: { written: true, deficit: null, rowUnusable: false } };
+      return sized(netted);
     }
     return { data: null, result: { written: false, deficit, rowUnusable: false } };
   }
-  if (JSON.stringify(base).length > GUILD_BANK_MERGED_MAX_BYTES) {
+  return sized(base);
+}
+
+// The size bound applies to EVERY arm that would write, the netted rescue
+// included: a row that crossed it would be skipped by the read bound from then
+// on, which quarantines every officer of that guild forever and makes the boot
+// load skip the book. A legitimate book is a few KB (60 slots at most), so
+// this can only fire on a tampered one.
+function sized(data: GuildBankState): {
+  data: GuildBankState | null;
+  result: Omit<GuildBankWriteResult, 'guildId'>;
+} {
+  if (JSON.stringify(data).length > GUILD_BANK_MERGED_MAX_BYTES) {
     return { data: null, result: { written: false, deficit: null, rowUnusable: true } };
   }
-  return { data: base, result: { written: true, deficit: null, rowUnusable: false } };
+  return { data, result: { written: true, deficit: null, rowUnusable: false } };
 }
 
 // How many times the netted retry above rescued a write the ordered replay

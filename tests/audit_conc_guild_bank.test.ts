@@ -605,6 +605,56 @@ describe('the guild-delete window (guard to DELETE)', () => {
     expect(durable.chars.get(2)?.copper).toBe(500_000);
   });
 
+  it('releases the window when the DELETE THROWS, so a failed disband is not a dead bank', async () => {
+    // The window spans two awaited DB steps. If either throws and the window
+    // is not released, that guild's bank refuses every op until the realm
+    // restarts, which is a worse outcome than the failed disband.
+    const server = new GameServer();
+    const leader = joinServer(server, 1, 'Leader');
+    officer(server, leader, 'leader');
+    seedBook(server, { treasury: 0, inventory: [], purchasedSlots: 24 });
+    const social = priv(server).social;
+    social.db.guildMembership = async () => ({
+      guildId: GUILD_ID,
+      guildName: 'Iron Vanguard',
+      rank: 'leader',
+    });
+    social.db.guildMembers = async () => {
+      throw new Error('db down');
+    };
+    await expect(
+      social.guildDisband({ characterId: 1, accountId: 1, name: 'Leader' }),
+    ).rejects.toThrow('db down');
+    // The window is closed again, so the bank works.
+    restamp(server, leader, 'leader');
+    dispatch(server, leader, { cmd: 'guild_bank_deposit_gold', amount: 1_000 });
+    expect(bookOf(server)?.treasury).toBe(1_000);
+    // ...and a later disband can still take the window.
+    dispatch(server, leader, { cmd: 'guild_bank_withdraw_gold', amount: 1_000 });
+    const tx = priv(server).socialTransport();
+    expect(tx.beginGuildBankDelete(GUILD_ID)).toBeNull(); // fails closed: mark unflushed
+    await priv(server).saveCharacter(leader);
+    expect(tx.beginGuildBankDelete(GUILD_ID)).toEqual({ copper: 0, items: 0 });
+  });
+
+  it('the window does NOT swallow the dirty-mark guard: an unflushed book still fails closed', async () => {
+    // Two independent reasons to refuse a delete, and the window must not mask
+    // either: an unflushed mark means the live book proves nothing about the
+    // durable row the cascade would destroy.
+    const server = new GameServer();
+    const leader = joinServer(server, 1, 'Leader');
+    officer(server, leader, 'leader');
+    seedBook(server, { treasury: 5_000, inventory: [], purchasedSlots: 24 });
+    const tx = priv(server).socialTransport();
+    dispatch(server, leader, { cmd: 'guild_bank_withdraw_gold', amount: 5_000 });
+    expect(server.sim.guildBankHoldings(GUILD_ID)).toEqual({ copper: 0, items: 0 });
+    expect(tx.beginGuildBankDelete(GUILD_ID)).toBeNull(); // unflushed: fail closed
+    // A refused begin took NO window, so the bank keeps working.
+    restamp(server, leader, 'leader');
+    dispatch(server, leader, { cmd: 'guild_bank_deposit_gold', amount: 2_000 });
+    expect(bookOf(server)?.treasury).toBe(2_000);
+  });
+
   it('same window on the last-member /gquit path (guard, then removeGuildMember, then DELETE)', async () => {
     const server = new GameServer();
     const solo = joinServer(server, 1, 'SoloLeader');

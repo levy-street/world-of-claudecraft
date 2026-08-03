@@ -566,12 +566,22 @@ tears.
 
 What remains accepted:
 
-- **A session can lose its unsaved progress to another officer's disappearance.**
-  If officer B consumed value officer A never made durable and A then vanishes,
-  B is rolled back and disconnected: up to one autosave interval of B's play is
-  discarded. That is an availability and fairness cost, not a conservation one,
-  and it is the same rollback a lease fence-out already applies. Two colluding
-  accounts can inflict it on each other; they gain nothing by it.
+- **A session can lose its unsaved progress to another officer's disappearance,
+  and an attacker can aim that.** If officer B consumed value officer A never
+  made durable and A then vanishes (an ordinary re-login is enough), B is rolled
+  back and disconnected. What B loses is everything since B's last SUCCESSFUL
+  save, which is not only guild bank work: while a refusal is outstanding B's
+  character half does not commit either, so unrelated progress (experience,
+  loot, quests) rides on it. That window is bounded by
+  `GameServer.GUILD_BANK_DEFICIT_MAX_SKIPS` refused saves, deliberately small
+  (2) for exactly this reason, and a refusal immediately FLUSHES the sessions it
+  is waiting on rather than waiting out an autosave interval, so the ordinary
+  case clears in a round trip and never reaches the bound at all.
+  It is an availability and fairness cost, not a conservation one, and it is
+  the same rollback a lease fence-out already applies. The attacker pays the
+  same price on their own alt and gains nothing durable; the victim's exposure
+  is a griefing surface worth watching in production, and the loud rollback log
+  plus the `escrow_deficit` row are how it would be spotted.
 - **A crash still loses whatever was not yet saved**, as it always did. The
   difference is that a crash can no longer leave value in two durable places:
   a save either committed both halves or committed neither.

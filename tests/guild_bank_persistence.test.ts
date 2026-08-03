@@ -1358,33 +1358,55 @@ describe('the guild_create fee gate + the create/disband hooks', () => {
     expect(priv(server).social.tx.beginGuildBankDelete(GUILD_ID)).toEqual({ copper: 0, items: 0 });
   });
 
-  it('the retry BOUND is reachable: a mutual deficit ends in a rollback, not a spin', async () => {
-    // Two sessions each consuming what the other has not made durable is the
-    // one shape that can never resolve on its own, so it is the one the bound
-    // exists for. Without it both would refuse forever and neither character
-    // would ever save again.
-    const server = new GameServer();
-    const a = joinServer(server, 1, 'MutualA').session;
-    const b = joinServer(server, 2, 'MutualB').session;
+  // Two officers alternating LADDER rungs is the only shape that can deadlock
+  // both replays at once: gold and items cannot, because the live book never
+  // goes below zero, so at least one session's net is non-negative and lands
+  // (and the flush a refusal fires then unblocks the other). A rung, by
+  // contrast, replays only onto the exact position its witness names, so
+  // officer A's rung waits on officer B's opening while officer B's next rung
+  // waits on officer A's.
+  function ladderDeadlock(server: GameServer, a: ClientSession, b: ClientSession): void {
     officerSetup(server, a, 0);
+    durableBooks.set(GUILD_ID, { treasury: 0, inventory: [], purchasedSlots: 0 });
+    const book = server.sim.guildBanks.get(GUILD_ID);
+    if (!book) throw new Error('missing book');
+    book.purchasedSlots = 0; // unopened, matching the durable row
     moveToBanker(server, b.pid);
-    server.sim.setPlayerGuildMembership(b.pid, { guildId: GUILD_ID, rank: 'officer' });
     const bMeta = server.sim.players.get(b.pid);
     if (!bMeta) throw new Error('missing meta');
     bMeta.copper = 500_000;
-    // Each deposits, then each withdraws MORE than its own deposit, so every
-    // ordered and netted replay of either log is short by the difference.
-    dispatch(server, a, { cmd: 'guild_bank_deposit_gold', amount: 10_000 });
-    dispatch(server, b, { cmd: 'guild_bank_deposit_gold', amount: 10_000 });
-    server.sim.setPlayerGuildMembership(a.pid, { guildId: GUILD_ID, rank: 'officer' });
-    dispatch(server, a, { cmd: 'guild_bank_withdraw_gold', amount: 15_000 });
-    server.sim.setPlayerGuildMembership(b.pid, { guildId: GUILD_ID, rank: 'officer' });
-    dispatch(server, b, { cmd: 'guild_bank_withdraw_gold', amount: 5_000 });
+    const stampBoth = () => {
+      server.sim.setPlayerGuildMembership(a.pid, { guildId: GUILD_ID, rank: 'officer' });
+      server.sim.setPlayerGuildMembership(b.pid, { guildId: GUILD_ID, rank: 'officer' });
+    };
+    stampBoth();
+    dispatch(server, b, { cmd: 'guild_bank_buy_slots' }); // B opens, 0 -> 24
+    stampBoth();
+    dispatch(server, a, { cmd: 'guild_bank_deposit_gold', amount: 25_000 });
+    dispatch(server, a, { cmd: 'guild_bank_buy_slots' }); // A buys rung 1, 24 -> 30
+    stampBoth();
+    dispatch(server, b, { cmd: 'guild_bank_deposit_gold', amount: 50_000 });
+    dispatch(server, b, { cmd: 'guild_bank_buy_slots' }); // B buys rung 2, 30 -> 36
+    stampBoth();
+    expect(server.sim.guildBanks.get(GUILD_ID)?.purchasedSlots).toBe(36);
+    // Neither log can be replayed: A's rung needs the ladder at exactly 24
+    // (B's opening), B's needs it at exactly 30 (A's rung).
+    expect(a.dirtyGuildBanks.has(GUILD_ID)).toBe(true);
+    expect(b.dirtyGuildBanks.has(GUILD_ID)).toBe(true);
+  }
+
+  it('the retry BOUND is reachable: a mutual deficit ends in a rollback, not a spin', async () => {
+    // Without the bound both sessions would refuse forever and neither
+    // character would ever save again.
+    const server = new GameServer();
+    const a = joinServer(server, 1, 'MutualA').session;
+    const b = joinServer(server, 2, 'MutualB').session;
+    ladderDeadlock(server, a, b);
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     // biome-ignore lint/suspicious/noExplicitAny: reading a private static pin
     const cap = (GameServer as any).GUILD_BANK_DEFICIT_MAX_SKIPS as number;
     expect(cap).toBeGreaterThan(1);
-    for (let i = 0; i < cap + 1 && !a.escrowQuarantined; i++) {
+    for (let i = 0; i < cap + 2 && !a.escrowQuarantined; i++) {
       await priv(server).saveCharacter(a);
       if (i === 0) expect(a.escrowQuarantined).toBe(false); // it RETRIES first
     }
@@ -1396,12 +1418,39 @@ describe('the guild_create fee gate + the create/disband hooks', () => {
 
   it("a session's LAST save resolves a refusal instead of waiting for a retry", async () => {
     // The leave flush and the shutdown flush's second pass are the last save a
-    // session gets. Choosing "retry" there discards the session's whole
-    // progress with no log line and no ledger row, because the retry never
-    // comes.
+    // session gets. Choosing "retry" there tears the session down with its
+    // whole progress discarded and no log line and no ledger row saying why,
+    // because the retry never comes.
     const server = new GameServer();
     const a = joinServer(server, 1, 'LeaverA').session;
-    const b = joinServer(server, 2, 'DirtyB').session;
+    const b = joinServer(server, 2, 'StuckB').session;
+    ladderDeadlock(server, a, b);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    dbMock.insertBankLedgerRow.mockClear();
+    // Straight to the leave flush, with no ordinary save first: B is dirty, so
+    // the retry arm's condition is fully satisfied and an ordinary save here
+    // would come back un-quarantined with one skip spent. The leave flush must
+    // not, because there is no save after it to spend the next one on.
+    await priv(server).saveCharacterOnLeave(a);
+    errSpy.mockRestore();
+    await bankLedgerIdle();
+    expect(a.escrowQuarantined).toBe(true);
+    expect(durableChars.has(1)).toBe(false);
+    const rows = dbMock.insertBankLedgerRow.mock.calls.map((c) => (c as unknown[])[0]);
+    expect(rows).toContainEqual(
+      expect.objectContaining({ op: 'escrow_deficit', characterId: 1, containerId: GUILD_ID }),
+    );
+  });
+
+  it('a refusal FLUSHES what it is waiting on, so the ordinary case clears at once', async () => {
+    // The blocked window is the cost this design charges an innocent officer:
+    // while a refusal is outstanding that character persists nothing at all,
+    // guild bank or not. Waiting a full autosave interval for the other
+    // officer's commit would multiply that cost by every retry, so a refusal
+    // flushes the sessions it is waiting on instead.
+    const server = new GameServer();
+    const a = joinServer(server, 1, 'WaiterA').session;
+    const b = joinServer(server, 2, 'DepositorB').session;
     officerSetup(server, a, 0);
     moveToBanker(server, b.pid);
     server.sim.setPlayerGuildMembership(b.pid, { guildId: GUILD_ID, rank: 'officer' });
@@ -1411,27 +1460,53 @@ describe('the guild_create fee gate + the create/disband hooks', () => {
     dispatch(server, b, { cmd: 'guild_bank_deposit_gold', amount: 40_000 });
     server.sim.setPlayerGuildMembership(a.pid, { guildId: GUILD_ID, rank: 'officer' });
     dispatch(server, a, { cmd: 'guild_bank_withdraw_gold', amount: 40_000 });
-    // An ordinary save RETRIES (B is still there to make its deposit durable).
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    await priv(server).saveCharacter(a);
+    await priv(server).saveCharacter(a); // refused, and flushes B
+    await vi.waitFor(() => expect(b.dirtyGuildBanks.size).toBe(0));
     expect(a.escrowQuarantined).toBe(false);
-    dbMock.insertBankLedgerRow.mockClear();
-    // The LAST one does not: there is no next save to wait for.
-    await priv(server).saveCharacterOnLeave(a);
+    // B's deposit is durable now, so A's very next save lands both halves.
+    server.sim.setPlayerGuildMembership(a.pid, { guildId: GUILD_ID, rank: 'officer' });
+    await priv(server).saveCharacter(a);
     errSpy.mockRestore();
-    await bankLedgerIdle();
-    expect(a.escrowQuarantined).toBe(true);
-    expect(durableChars.has(1)).toBe(false);
-    const rows = dbMock.insertBankLedgerRow.mock.calls.map((c) => (c as unknown[])[0]);
-    expect(rows).toContainEqual(
-      expect.objectContaining({
-        op: 'escrow_deficit',
-        characterId: 1,
-        containerId: GUILD_ID,
-        // SIGNED: A's discarded work was taking 40_000 OUT of the book.
-        copperDelta: -40_000,
-      }),
+    expect(a.escrowQuarantined).toBe(false);
+    expect(a.dirtyGuildBanks.size).toBe(0);
+    expect(durableBook()).toEqual({ treasury: 0, inventory: [], purchasedSlots: 24 });
+    expect(durableChars.get(1)?.copper).toBe(540_000);
+  });
+
+  it('a save ENQUEUED before the rollback cannot land after it', async () => {
+    // The quarantine guard has to sit inside the queued closure, not only at
+    // the call, or a save queued a moment earlier runs after the rollback has
+    // undone this session's book ops while its character blob still reflects
+    // them: exactly the mint the rollback prevented.
+    const server = new GameServer();
+    const a = joinServer(server, 1, 'RacerA').session;
+    const b = joinServer(server, 2, 'StuckB').session;
+    ladderDeadlock(server, a, b);
+    const purse = server.sim.players.get(a.pid)?.copper;
+    expect(purse).toBe(475_000); // A paid 25_000 into the treasury
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    // Occupy the serial writer, enqueue A's save behind it, THEN quarantine A,
+    // then let the queue drain.
+    let release: (() => void) | undefined;
+    const blocker = new Promise<void>((r) => {
+      release = r;
+    });
+    void priv(server).enqueueMarketWrite(() => blocker);
+    const queued = priv(server).saveCharacter(a);
+    // The rollback lands while that save is still waiting on the queue.
+    // biome-ignore lint/suspicious/noExplicitAny: driving the private rollback
+    (server as any).handleGuildBankEscrowRefusal(
+      a,
+      [{ guildId: GUILD_ID, written: false, deficit: null, rowUnusable: true }],
+      true,
     );
+    expect(a.escrowQuarantined).toBe(true);
+    release?.();
+    await queued;
+    errSpy.mockRestore();
+    expect(durableChars.has(1)).toBe(false); // the queued save landed nothing
+    expect(b).toBeDefined();
   });
 
   it('COUNTS the netted rescues, so the fallback is visible rather than silent', () => {
