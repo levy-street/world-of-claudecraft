@@ -139,7 +139,10 @@ vi.mock('../server/db', () => ({
   ELIGIBLE_ACCOUNT_SQL: 'a.banned_at IS NULL',
   pool: { query: h.poolQuery, connect: h.connect },
 }));
-vi.mock('../server/realm', () => ({ REALM: 'test-realm' }));
+vi.mock('../server/realm', () => ({
+  REALM: 'test-realm',
+  REALM_DIRECTORY: [{ name: 'test-realm', url: '', type: 'Normal' }],
+}));
 
 import { PgDailyRewardDb } from '../server/daily_rewards_db';
 

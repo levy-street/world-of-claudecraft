@@ -5,7 +5,7 @@ import {
   gatherNodeIdFromIntersection,
   gatherNodePreloadInternalsForTest,
 } from '../src/render/gather_nodes';
-import { NODE_Y_OFFSET } from '../src/render/gather_nodes_lookup';
+import { NODE_Y_OFFSET, nodeTierScale } from '../src/render/gather_nodes_lookup';
 import { GATHER_NODES } from '../src/sim/data';
 import type { GatherNodeDef, GatherNodeType } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -20,9 +20,13 @@ describe('gather node rendering', () => {
       (child): child is THREE.InstancedMesh => child instanceof THREE.InstancedMesh,
     );
 
-    expect(GATHER_NODES).toHaveLength(99);
-    expect(expectedBatches.size).toBe(53);
-    expect(meshes).toHaveLength(53);
+    // 120 nodes in 57 batches through v0.33.0; the phase 20 density pass
+    // (the +36 bottom-three set) took the content to 156 nodes and 68
+    // batches (11 new zone:type:band combos across willowfen, galecrest,
+    // and farshore_isle).
+    expect(GATHER_NODES).toHaveLength(156);
+    expect(expectedBatches.size).toBe(68);
+    expect(meshes).toHaveLength(68);
     expect(meshes.reduce((sum, mesh) => sum + mesh.count, 0)).toBe(GATHER_NODES.length);
     expect(new Set(meshes.map((mesh) => mesh.geometry)).size).toBe(3);
     expect(new Set(meshes.map((mesh) => mesh.material)).size).toBe(3);
@@ -57,6 +61,13 @@ describe('gather node rendering', () => {
       expect(child).toBeInstanceOf(THREE.InstancedMesh);
       const mesh = child as THREE.InstancedMesh;
       const nodeIds = mesh.userData.gatherNodeIds as string[];
+      // The tier-scale base anchor (the packet's UX pass): the instance
+      // translation compensates the upscale by (tierScale - 1) * minY of the
+      // UNSCALED template. Headless builds use the single-part fallback
+      // primitives, so the template union minY is this mesh's own geometry
+      // bounding-box min.y under an identity part transform.
+      mesh.geometry.computeBoundingBox();
+      const templateMinY = mesh.geometry.boundingBox?.min.y ?? 0;
       for (const [instanceId, nodeId] of nodeIds.entries()) {
         mesh.getMatrixAt(instanceId, matrix);
         position.setFromMatrixPosition(matrix);
@@ -65,7 +76,9 @@ describe('gather node rendering', () => {
         if (!node) continue;
         expect(position.x).toBe(node.pos.x);
         expect(position.y).toBeCloseTo(
-          terrainHeight(node.pos.x, node.pos.z, seed) + NODE_Y_OFFSET[node.type],
+          terrainHeight(node.pos.x, node.pos.z, seed) +
+            NODE_Y_OFFSET[node.type] -
+            (nodeTierScale(node.tier) - 1) * templateMinY,
           6,
         );
         expect(position.z).toBe(node.pos.z);

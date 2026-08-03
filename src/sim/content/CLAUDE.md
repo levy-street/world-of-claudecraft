@@ -15,7 +15,9 @@ Healer surface, plus `CLASSES`/`ABILITIES`). A few modules feed one sibling sim
 system directly instead of the `data.ts` spread: `mailboxes.ts`/`letters.ts`
 (mail, `src/sim/mail/post_office.ts`), `tunnels.ts` (`src/sim/voxel.ts`),
 `enchants.ts` (`src/sim/professions/enchanting.ts`), `dungeon_difficulty.ts`
-(`src/sim/instances/`). All shapes are typed in `../types.ts`: add a field
+(`src/sim/instances/`), `vendor_row_gates.ts` (the vendor buy path in
+`src/sim/items.ts` and, sharing the one resolver, the vendor window's pure view
+core). All shapes are typed in `../types.ts`: add a field
 there first if you need one.
 
 ## Where a new thing lands
@@ -50,7 +52,9 @@ there first if you need one.
 - **Professions data:** `professions.ts` (`CRAFT_RING`, `GATHERING_PROFESSIONS`,
   `TOOL_EFFECTS`, `PERK_THRESHOLDS`), `recipes.ts` (`COMMON_RECIPES`/`TOOL_RECIPES`/
   `CASTER_HUB_RECIPES`/`COMBO_RECIPES`, merged into `ALL_RECIPES`),
-  `gather_nodes.ts`, `enchants.ts`. Mechanics live in `src/sim/professions/`,
+  `gather_nodes.ts`, `enchants.ts`, `vendor_row_gates.ts` (per-item proficiency
+  requirements on NPC vendor rows, plus the one resolver both the authoritative
+  buy path and the vendor view call). Mechanics live in `src/sim/professions/`,
   never here.
 - **Events + world systems:** `augments.ts` (2v2 Fiesta) and `skins.ts` (cosmetic
   skin events), `vale_cup.ts`, `yumi.ts`, `item_sets.ts` (set bonuses),

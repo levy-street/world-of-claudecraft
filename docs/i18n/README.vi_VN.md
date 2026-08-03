@@ -92,7 +92,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and choose Play Offline
 ```
 
-Đặt tên cho nhân vật, chọn bất kỳ class nào trong chín class, và bạn bắt đầu ở **Eastbrook Vale** (cấp 1-7), một thị trấn chợ được bao quanh bởi các trung tâm: bãi sói ở phía bắc, đồng cỏ lợn rừng ở phía đông, rừng Sableweb ở phía tây, Mirror Lake ở phía tây bắc, một hầm khai thác đồng đầy burrower ở phía tây nam, và một nhà nguyện đổ nát đầy kẻ chết không yên ở phía đông bắc, cùng trại cướp của Gorrak ở phía đông nam. Con đường phía bắc leo qua một đèo núi vào **Mirefen Marsh** (6-13, trung tâm Fenbridge) và lên tiếp tới **Thornpeak Heights** (13-20, trung tâm Highwatch). Seed của thế giới được cố định trong `src/main.ts`, nên đây là cùng một nơi mỗi lần ghé thăm.
+Đặt tên cho nhân vật, chọn bất kỳ class nào trong chín class, và bạn bắt đầu ở **Eastbrook Vale** (cấp 1-7), một thị trấn chợ được bao quanh bởi các trung tâm: bãi sói ở phía bắc, đồng cỏ lợn rừng ở phía đông, rừng Sableweb ở phía tây, Mirror Lake ở phía tây bắc, một hầm khai thác đồng đầy burrower ở phía tây nam, và một nhà nguyện đổ nát đầy kẻ chết không yên ở phía đông bắc, cùng trại cướp của Gorrak ở phía đông nam. Con đường phía bắc leo qua một đèo núi vào **Mirefen Marsh** (6-13, trung tâm Fenbridge) và lên tiếp tới **Thornpeak Heights** (13-20, trung tâm Highwatch). Seed của thế giới được cố định trong `src/sim/world_seed.ts`, nên đây là cùng một nơi mỗi lần ghé thăm.
 
 ### Ứng dụng desktop cho Windows, Linux, và macOS
 

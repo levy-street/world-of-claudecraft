@@ -38,6 +38,7 @@ import { abilitiesKnownAt, DUNGEON_X_THRESHOLD, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { createMob, createNpc, recalcPlayerStats } from '../entity';
 import { restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';
+import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import type { ArenaReturnPools, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
@@ -788,6 +789,11 @@ function placeCupFighter(
   e: Entity,
   spot: { x: number; z: number; facing: number },
 ): void {
+  // Every kickoff placement is a hard teleport: match start and teardown
+  // arrive pre-cleared through resetForArena, but the golden-goal restart
+  // and the goal reset do not, and a fighter can legally start a gather
+  // cast on the herb node inside the pitch during the celebrate window.
+  cancelProfessionSessionOnDisplacement(ctx, e);
   e.pos = ctx.groundPos(spot.x, spot.z);
   e.prevPos = { ...e.pos };
   e.facing = spot.facing;
@@ -1911,6 +1917,10 @@ function policePitch(ctx: SimContext, match: VcMatch): void {
     else if (nearest === dS) nlz = PITCH.zMin - VC_PITCH_EJECT_MARGIN;
     else if (nearest === dE) nlx = PITCH.xMax + VC_PITCH_EJECT_MARGIN;
     else nlx = PITCH.xMin - VC_PITCH_EJECT_MARGIN;
+    // A bystander swept off the pitch is displaced like any other teleport:
+    // a live gather/fishing session (a herb node sits inside the Sowfield
+    // bounds) must not travel with them.
+    cancelProfessionSessionOnDisplacement(ctx, e);
     e.pos = ctx.groundPos(nlx + ox, nlz + oz);
     e.prevPos = { ...e.pos }; // hard teleport: no interpolated streak across the boards
     ctx.rebucket(e);

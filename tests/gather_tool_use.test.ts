@@ -188,6 +188,10 @@ describe('client wiring source pins (the tests/client_shell.test.ts idiom)', () 
     expect(block).toContain('stopAutorunForInteraction(');
     expect(block).toContain('handleGatherNodeInteract(');
     expect(block).toContain('gatherNodeToolGateFor(world, node)');
+    // The R40 gate rides the bag-tool hook too (the phase 14 QA found only
+    // the interact-key site pinned): a rod or pick used from bags reaches
+    // the same confirm flow as the F key and the click.
+    expect(block).toContain('gatherEffectConfirm');
   });
 
   it('the hud hotbar press tries the hook first and falls back to plain useItem', () => {

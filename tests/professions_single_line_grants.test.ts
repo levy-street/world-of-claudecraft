@@ -248,7 +248,16 @@ describe('one profession action prints exactly one grant line', () => {
     const hud = makeHud();
     hud.handleEvents([
       professionGrant(ORE, 1),
-      { type: 'fishingResult', pid: PLAYER_ID, itemId: ORE, quality: 'common' } as SimEvent,
+      // Fully-populated union member (no shape-hiding cast): a future
+      // required-field addition must red this fixture, not skip it.
+      {
+        type: 'fishingResult',
+        pid: PLAYER_ID,
+        itemId: ORE,
+        quality: 'common',
+        zoneId: 'eastbrook_vale',
+        band: 0,
+      } satisfies SimEvent,
     ]);
     expect(lines(hud)).toEqual([`You reel in: [${itemDisplayName(ITEMS[ORE])}]`]);
     // The double-cue half of #2430: the reel cue fires, the generic loot ding

@@ -31,6 +31,7 @@ vi.mock('../../server/db', () => ({ pool: { __fake: 'outbox-pool' } }));
 vi.mock('../../server/discord_db', () => ({
   accountForDiscord: vi.fn(),
   discordForAccount: vi.fn(),
+  discordForAccounts: vi.fn(async () => new Map()),
   discordIdsWithGuildFlair: vi.fn(),
   discordLinksForAccounts: vi.fn(),
   grantRewardPoints: vi.fn(),
@@ -95,7 +96,8 @@ const ACTIVITY_CAP = ACTIVITY_MAX_QUEUE;
 
 /**
  * The bound on the serialized `data` payload, in bytes. The worst-case fixture
- * below measured 279,891 bytes (0.3 ms of JSON.stringify) when the drain moved to
+ * below measured 290,671 bytes (0.3 ms of JSON.stringify; 279,891 before the
+ * activity fixture moved to the wider deed item shape) when the drain moved to
  * a 1000-item link-change page and a one-day winners ask; the bound is roughly
  * 1.5x that, rounded to a clean number, so ordinary drift in the fixtures does
  * not red it while a page raise or a new per-item field does. The test logs its
@@ -160,16 +162,22 @@ function relayItem(accountId: number): QueuedRelay {
   };
 }
 
-/** An activity card with a realistic party-sized participant list. */
+/** An activity card with a realistic party-sized participant list, in the
+ *  WIDEST per-item shape the queue admits: the deed kind carries deedId,
+ *  deedName, deedTitle AND itemName (the first-koi catch name), which
+ *  serializes larger than the rareloot shape this fixture used before the
+ *  deed kind existed. The worst case must track the widest real shape. */
 function activityItem(index: number, accountIds: number[]): QueuedActivity {
   return {
-    kind: 'rareloot',
+    kind: 'deed',
     accountIds,
     names: accountIds.map((id) => `Adventurer${id}`),
     realm: 'Claudemoon',
     profileUrl: `https://worldofclaudecraft.com/c/claudemoon/adventurer${accountIds[0]}`,
-    itemName: `Bindings of the Windseeker ${index}`,
-    quality: 'legendary',
+    itemName: `Moonlit Koi of the Verdant Vale ${index}`,
+    deedId: `chr_willowfen_first_cast_${index}`,
+    deedName: `First Cast of the Willowfen Reaches ${index}`,
+    deedTitle: 'Angler of the Willowfen',
   };
 }
 

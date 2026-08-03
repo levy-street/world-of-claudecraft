@@ -743,20 +743,29 @@ export function setActiveWorldContent(world: WorldContent | null): void {
 // as always) and x picks the column within it. Every zone without an
 // explicit x-range spans the original full-width strip, so a one-column
 // world behaves exactly as before.
-// The world's northmost zone, for clamping beyond the north end (append
-// order stopped meaning stack order when the first column landed).
-const NORTHMOST_ZONE: ZoneDef = ZONES.reduce((a, b) => (b.zMax > a.zMax ? b : a));
-
+// Walks the ACTIVE content's zones, not the builtin const, so every
+// consumer (the fishing rod gate, catch tables, deed credit, chat
+// readouts) resolves the same world the water and terrain reads resolve.
+// Byte-identical on every shipped host: BUILTIN_WORLD.zones IS the ZONES
+// reference. A content with an EMPTY zone list (the editor rejects one,
+// but a hand-built WorldContent can carry it) falls back to the builtin
+// zones so the declared non-null return stays true, exactly the totality
+// the builtin walk had. The beyond-the-north-end clamp resolves the
+// RESOLVED list's northmost zone (append order stopped meaning stack
+// order when the first column landed), so a custom map clamps to its own
+// north end; on shipped hosts that reduce sees ZONES.
 export function zoneAt(x: number, z: number): ZoneDef {
+  const active = getActiveWorldContent().zones;
+  const zones = active.length > 0 ? active : BUILTIN_WORLD.zones;
   let fallback: ZoneDef | null = null;
-  for (const zone of ZONES) {
+  for (const zone of zones) {
     if (z >= zone.zMax) continue;
     if (fallback === null || zone.zMax < fallback.zMax) fallback = zone; // southmost band containing z
     const x0 = zone.xMin ?? STRIP_MIN_X;
     const x1 = zone.xMax ?? STRIP_MAX_X;
     if (z >= zone.zMin && x >= x0 && x < x1) return zone;
   }
-  return fallback ?? NORTHMOST_ZONE;
+  return fallback ?? zones.reduce((a, b) => (b.zMax > a.zMax ? b : a));
 }
 
 // Strict rect containment: the zone whose rectangle literally contains (x, z),
@@ -765,8 +774,9 @@ export function zoneAt(x: number, z: number): ZoneDef {
 // zone, this reports "nowhere" honestly. Callers that must distinguish the open
 // world from an instanced interior (the far-east dungeon/arena/delve plane at
 // INSTANCE_X_BASE, which zoneAt would misreport as a real zone) use this one.
-// Reads the static ZONES, exactly like zoneAt, so a custom play-test map's zones
-// never redefine world policy.
+// Reads the static ZONES deliberately, UNLIKE zoneAt (which resolves the
+// active world content so an editor play-test map can reshape lookups): a
+// custom play-test map's zones never redefine world policy.
 export function zoneContaining(x: number, z: number): ZoneDef | null {
   for (const zone of ZONES) {
     if (z < zone.zMin || z >= zone.zMax) continue;
@@ -822,18 +832,24 @@ export function columnBlendAt(zone: ZoneDef, x: number, z: number): number {
 // East-west extent of the world at a given z: the union of the zone rects
 // in that row. One column today (the original strip everywhere); a column
 // added east or west widens its own rows and nothing else. Beyond the world
-// ends this clamps to the nearest band, like zoneAt.
+// ends this clamps to the nearest band, like zoneAt. Walks the same RESOLVED
+// zone list zoneAt walks (the active content, builtin fallback): the fallback
+// arm probes zoneAt, so a static-ZONES loop here would return
+// {Infinity, -Infinity} the moment a custom map's bands disagree with the
+// builtin, and that pair reaches the terrain height smoothstep as NaN.
 function computeWorldXBounds(z: number): Readonly<{ min: number; max: number }> {
+  const active = getActiveWorldContent().zones;
+  const zones = active.length > 0 ? active : BUILTIN_WORLD.zones;
   let min = Infinity;
   let max = -Infinity;
-  for (const zone of ZONES) {
+  for (const zone of zones) {
     if (z < zone.zMin || z >= zone.zMax) continue;
     min = Math.min(min, zone.xMin ?? STRIP_MIN_X);
     max = Math.max(max, zone.xMax ?? STRIP_MAX_X);
   }
   if (min > max) {
     const band = zoneAt(0, z);
-    for (const zone of ZONES) {
+    for (const zone of zones) {
       if (zone.zMin !== band.zMin || zone.zMax !== band.zMax) continue;
       min = Math.min(min, zone.xMin ?? STRIP_MIN_X);
       max = Math.max(max, zone.xMax ?? STRIP_MAX_X);
@@ -853,7 +869,12 @@ let worldXBoundsGeneration = -1;
 let worldXBoundsIndex: WorldXBoundsIndex | null = null;
 
 function buildWorldXBoundsIndex(): WorldXBoundsIndex {
-  const starts = [...new Set(ZONES.flatMap((zone) => [zone.zMin, zone.zMax]))].sort(
+  // The SAME resolved list computeWorldXBounds walks: a custom map's band
+  // boundaries must seed the index rows, or every row between two custom
+  // boundaries reuses bounds computed at the wrong builtin boundary.
+  const active = getActiveWorldContent().zones;
+  const zones = active.length > 0 ? active : BUILTIN_WORLD.zones;
+  const starts = [...new Set(zones.flatMap((zone) => [zone.zMin, zone.zMax]))].sort(
     (a, b) => a - b,
   );
   return {

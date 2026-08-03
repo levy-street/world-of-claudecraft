@@ -41,6 +41,7 @@ vi.mock('../../server/db', () => ({ pool: { __fake: 'internal-pool' } }));
 vi.mock('../../server/discord_db', () => ({
   accountForDiscord: vi.fn(),
   discordForAccount: vi.fn(),
+  discordForAccounts: vi.fn(async () => new Map()),
   discordIdsWithGuildFlair: vi.fn(),
   discordLinksForAccounts: vi.fn(),
   grantRewardPoints: vi.fn(),
@@ -92,6 +93,7 @@ import type { DiscordLinkRow, DiscordMemberMetaRecord } from '../../server/disco
 import {
   accountForDiscord,
   discordForAccount,
+  discordForAccounts,
   discordIdsWithGuildFlair,
   discordLinksForAccounts,
   grantRewardPoints,
@@ -1075,9 +1077,12 @@ describe('discord/activity', () => {
   it('drops items with no linked participant and strips accountIds/names', async () => {
     process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
     vi.mocked(drainActivity).mockReturnValue([activityItem(1, 'Alice'), activityItem(2, 'Bob')]);
-    vi.mocked(discordForAccount).mockImplementation(async (_pool, accountId) =>
-      accountId === 1 ? linkRow(1) : null,
-    );
+    // The drain now batches ONE links read per poll (the N+1 fix).
+    vi.mocked(discordForAccounts).mockImplementation(async (_pool, accountIds) => {
+      const links = new Map();
+      if ((accountIds as number[]).includes(1)) links.set(1, linkRow(1));
+      return links;
+    });
 
     const r = await runRoute('GET', '/internal/discord/activity', { headers: DISCORD_HEADERS });
 
@@ -1097,6 +1102,12 @@ describe('discord/activity', () => {
       },
       error: null,
     });
+    // The whole point of the batch: ONE links read per poll, over the
+    // flattened participant ids, with zero per-item singular lookups (a
+    // once-per-item discordForAccounts call would return the same body).
+    expect(discordForAccounts).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(discordForAccounts).mock.calls[0][1]).toEqual([1, 2]);
+    expect(discordForAccount).not.toHaveBeenCalled();
   });
 });
 
@@ -1783,8 +1794,11 @@ describe('discord/outbox', () => {
     // Exactly the union, each account once: 1 rides three relay items and an
     // activity item, 4 rides both an activity item and a link change.
     expect([...requestedAccountIds()].sort((a, b) => a - b)).toEqual([1, 2, 3, 4, 5]);
-    // The N+1 the batched read replaces must not survive anywhere on this path.
+    // The N+1 the batched read replaces must not survive anywhere on this path,
+    // and neither may the activity GET's own 3-column batch: the outbox's one
+    // identity read is discordLinksForAccounts, nothing else.
     expect(vi.mocked(discordForAccount)).not.toHaveBeenCalled();
+    expect(vi.mocked(discordForAccounts)).not.toHaveBeenCalled();
   });
 
   it('reads nothing at all when every stream drained empty', async () => {
@@ -1798,6 +1812,7 @@ describe('discord/outbox', () => {
     // No account was mentioned, so there is nothing to ask the database about.
     expect(vi.mocked(discordLinksForAccounts)).not.toHaveBeenCalled();
     expect(vi.mocked(discordForAccount)).not.toHaveBeenCalled();
+    expect(vi.mocked(discordForAccounts)).not.toHaveBeenCalled();
     // The winner days ride the service's TTL cache, so an idle poll costs at
     // most one read there and zero on a warm cache. ONE day, not the clamp's
     // ceiling of five: the bot announces and marks one day per poll, and every
@@ -1957,10 +1972,16 @@ describe('discord/outbox', () => {
     const links = [linkRow(1)];
 
     stubDrains([], fixture());
-    vi.mocked(discordForAccount).mockImplementation(async (_pool, accountId) =>
-      accountId === 1 ? linkRow(1) : null,
-    );
+    // The standalone GET batches its links read (discordForAccounts, the N+1
+    // fix), so the old arm stubs the BATCH; the singular lookup must stay
+    // uncalled on this path.
+    vi.mocked(discordForAccounts).mockImplementation(async (_pool, accountIds) => {
+      const map = new Map();
+      if ((accountIds as number[]).includes(1)) map.set(1, linkRow(1));
+      return map;
+    });
     const old = await runRoute('GET', '/internal/discord/activity', { headers: DISCORD_HEADERS });
+    expect(discordForAccount).not.toHaveBeenCalled();
 
     stubDrains([], fixture());
     vi.mocked(dailyRewardService.discordWinnerAnnouncements).mockResolvedValue(NO_WINNERS);

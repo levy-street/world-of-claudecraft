@@ -251,6 +251,8 @@ describe('reclaimDeactivatedName', () => {
           {
             id: 99,
             name: 'SturdyStubs',
+            level: 4,
+            state: { skin: 2 },
             account_id: 7,
             deactivated_at: '2026-01-01T00:00:00Z',
             banned_at: null,
@@ -262,13 +264,25 @@ describe('reclaimDeactivatedName', () => {
       .mockResolvedValueOnce({ rows: [], rowCount: 1 } as any) // UPDATE
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // COMMIT
 
-    await expect(reclaimDeactivatedName('SturdyStubs')).resolves.toBe(true);
+    // The archived identity comes back so the caller can rekey the freed
+    // name's world state (market, mail, the orphan's own signed instances)
+    // exactly like a rename. freedName is the holder's STORED name (the
+    // lookup below is case-insensitive), and the blob rides along for the
+    // signer sweep.
+    await expect(reclaimDeactivatedName('sturdystubs')).resolves.toEqual({
+      id: 99,
+      archivedName: 'SturdyStubsa',
+      freedName: 'SturdyStubs',
+      level: 4,
+      state: { skin: 2 },
+    });
 
     const calls = client.query.mock.calls;
     expect(calls[0][0]).toBe('BEGIN');
     expect(calls[1][0]).toMatch(/deactivated_at/);
     expect(calls[1][0]).toMatch(/FOR UPDATE/);
-    expect(calls[1][1]).toEqual([REALM, 'SturdyStubs']);
+    expect(calls[1][0]).toMatch(/lower\(c\.name\)\s*=\s*lower\(\$2\)/);
+    expect(calls[1][1]).toEqual([REALM, 'sturdystubs']);
     const updateCall = calls.find((c) => /UPDATE characters/i.test(c[0]));
     expect(updateCall).toBeDefined();
     expect(updateCall![0]).toMatch(/force_rename\s*=\s*TRUE/i);
@@ -285,6 +299,11 @@ describe('reclaimDeactivatedName', () => {
     // the link row, so the release enqueues ONE flex item for the HOLDER's account
     // (Phase 5 QA feed sweep). The holder SELECT must carry account_id for it.
     expect(calls[1][0]).toMatch(/c\.account_id/);
+    // The rich return's level/state come from the MOCK ROW, so the toEqual above
+    // is blind to the column list; these pins hold the hand-unioned SELECT (the
+    // caller feeds reclaimed.level/state straight into a real save write).
+    expect(calls[1][0]).toMatch(/c\.level/);
+    expect(calls[1][0]).toMatch(/c\.state/);
     expect(drainLinkChanges()).toEqual([{ accountId: 7, kinds: ['flex'] }]);
   });
 
@@ -299,7 +318,7 @@ describe('reclaimDeactivatedName', () => {
       } as any)
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // ROLLBACK
 
-    await expect(reclaimDeactivatedName('SturdyStubs')).resolves.toBe(false);
+    await expect(reclaimDeactivatedName('SturdyStubs')).resolves.toBeNull();
     const verbs = client.query.mock.calls.map((c) => c[0]);
     expect(verbs).not.toContain('COMMIT');
     expect(verbs).toContain('ROLLBACK');
@@ -317,8 +336,10 @@ describe('reclaimDeactivatedName', () => {
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // no holder
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // ROLLBACK
 
-    await expect(reclaimDeactivatedName('Nobody')).resolves.toBe(false);
+    await expect(reclaimDeactivatedName('Nobody')).resolves.toBeNull();
     expect(client.query.mock.calls.map((c) => c[0])).not.toContain('COMMIT');
+    // A refusal is not a transition: nothing may reach the change feed.
+    expect(drainLinkChanges()).toEqual([]);
   });
 
   it("leaves a banned account's name reserved even when the account is deactivated", async () => {
@@ -339,10 +360,12 @@ describe('reclaimDeactivatedName', () => {
       } as any)
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // ROLLBACK
 
-    await expect(reclaimDeactivatedName('SturdyStubs')).resolves.toBe(false);
+    await expect(reclaimDeactivatedName('SturdyStubs')).resolves.toBeNull();
     expect(client.query.mock.calls.map((c) => c[0]).some((s) => /UPDATE characters/i.test(s))).toBe(
       false,
     );
+    // The moderation-hold refusal must not reach the change feed either.
+    expect(drainLinkChanges()).toEqual([]);
   });
 });
 

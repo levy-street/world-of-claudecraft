@@ -13,6 +13,7 @@
 // browser, and the headless RL env.
 
 import { QUESTS } from '../data';
+import { countAcrossGrades, materialGradeIds } from '../professions/material_grades';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
@@ -95,7 +96,15 @@ export function onNodeGatheredForQuests(
   creditDiscreteQuestObjectives(ctx, meta, (objective) => {
     if (objective.type !== 'gather') return false;
     if (objective.nodeType !== undefined && objective.nodeType !== node.type) return false;
-    if (objective.itemId !== undefined && objective.itemId !== itemId) return false;
+    // Grade-aware like the collect arm below (D8): `itemId` is the id the
+    // harvest actually granted, which is the FINE grade whenever the player's
+    // tool outclasses the material, so matching the declared id alone would
+    // silently stop crediting an item-keyed gather objective for exactly the
+    // players who upgraded. No shipped objective uses this arm today (all four
+    // key on nodeType), which is precisely why it would have rotted unnoticed.
+    if (objective.itemId !== undefined && !materialGradeIds(objective.itemId).includes(itemId)) {
+      return false;
+    }
     return true;
   });
 }
@@ -110,7 +119,17 @@ export function onInventoryChangedForQuests(ctx: SimContext, meta: PlayerMeta): 
     quest.objectives.forEach((obj, i) => {
       if (obj.type === 'collect' && obj.itemId) {
         const required = questObjectiveRequired(quest, qp, i);
-        const have = Math.min(required, ctx.countItem(obj.itemId, meta.entityId));
+        // Counted across the objective's material grades (D8,
+        // professions/material_grades.ts): a fine grade IS its base material,
+        // worked with a better tool, and the turn-in spends it the same way.
+        // Without this a player carrying any tier-2 tool would watch a
+        // "Copper Ore delivered" objective sit at 0 while their bags filled
+        // with fine copper ore, since eastbrook_vale is all tier-1 nodes and
+        // the plain grade stops dropping for them entirely.
+        const have = Math.min(
+          required,
+          countAcrossGrades(obj.itemId, (id) => ctx.countItem(id, meta.entityId)),
+        );
         if (have !== qp.counts[i]) {
           if (have > qp.counts[i]) meta.counters.questProgress += have - qp.counts[i];
           qp.counts[i] = have;

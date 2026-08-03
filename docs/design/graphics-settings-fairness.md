@@ -21,6 +21,14 @@ ACTIONABLE (must be identical across every tier; never tiered):
 - The target / boss cast bar. Interrupt timing depends on it.
 - Target HP at a usable granularity (execute thresholds, is-it-dead).
 - Enemy / aggro positions a player acts on.
+- The fishing bobber and its bite state. The reel window is a timed reaction; the bite
+  affordance must read identically on every preset (splash richness may vary, the state
+  may not).
+- The minimap gather-node markers: spotting, the per-viewer ready/cooldown state, and the
+  lock strike (the non-hue lock cue), plus the node tooltip's respawn countdown and
+  fine-grade preview lines.
+- The node prop tier ladder in the 3D world (`nodeTierScale`): tier is actionable
+  information expressed as SIZE, static on every preset.
 
 COSMETIC (may be tiered down on lower presets):
 - Floating combat text volume and lifetime (the live-floater cap and how long each number
@@ -124,6 +132,11 @@ it, so the boundary cannot creep back in as decoration.
   governor; a source-scan pins that party frames are not tiered.
 - `tests/architecture.test.ts`: `ui_tier_knobs.ts` is a registered UI_PURE_CORE (no governor,
   DOM, or render import).
+- `tests/professions_graphics_fairness.test.ts`: the professions actionable set (the fishing
+  bobber pair, the minimap markers and painter, the node tooltip, the node prop ladder) is
+  scanned profile- and governor-free with comment-stripped sources, the tier ladder is
+  literal-pinned and proven applied on the built meshes, and the cosmetic set (LOW_FOG's
+  scenery shed, splash richness) is named beside it.
 - `scripts/perf_tour.mjs` per-tier run: `hudHotDomWrites` pinned across tiers (byte-equivalence)
   and the FCT cap engaging per tier.
 - `tests/snapshots.test.ts`: a real Sim aura to `wireEntity` to `ClientWorld` round trip pins that

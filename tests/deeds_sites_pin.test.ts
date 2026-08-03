@@ -1363,7 +1363,7 @@ describe('station-bound craft counter (prog_tools_of_the_trade)', () => {
     e.level = level;
     e.pos.x = toolworks.pos.x;
     e.pos.z = toolworks.pos.z;
-    sim.ctx.addItem('thorium_ore', 4, meta.entityId);
+    sim.ctx.addItem('fine_iron_ore', 4, meta.entityId);
     sim.ctx.addItem('mithril_mining_pick', 1, meta.entityId);
     return meta;
   }

@@ -3,6 +3,7 @@ import { questObjectiveRequired } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
+import { ownEntry } from '../../known_item';
 import { type QuestTrackerView, questTrackerView, type TrackedQuest } from './quest_tracker';
 
 export interface QuestTrackerSettingsPort {
@@ -29,17 +30,31 @@ export class QuestTrackerController {
     let collapsed = this.deps.settings.collapsed();
     const quests: TrackedQuest[] = [];
     for (const progress of this.deps.world().questLog.values()) {
-      const quest = QUESTS[progress.questId];
+      // The log is SERVER truth: a quest id accepted on a current client can
+      // reach a bundle that predates it (stale-client guard, R34), and the
+      // tracker runs inside hud.update() every frame, so an unguarded deref
+      // here killed the whole HUD tail. The unknown entry still PUSHES (raw
+      // id as its title, no objectives): the tracker numbers must match the
+      // world map's badges, and the map numbers every log entry, so a skip
+      // here would silently desync every number after it.
+      const quest = ownEntry(QUESTS, progress.questId);
       quests.push({
         id: progress.questId,
         number: quests.length + 1,
-        title: this.deps.questTitle(progress.questId),
+        // The unknown title SAYS unknown (a localizable sentence carrying the
+        // raw id) instead of handing the player a bare content slug; the raw
+        // id stays present so the row still matches a bug report.
+        title: quest
+          ? this.deps.questTitle(progress.questId)
+          : t('questUi.tracker.unknownQuest', { id: progress.questId }),
         complete: progress.state === 'ready',
-        objectives: quest.objectives.map((_objective, objectiveIndex) => ({
-          label: this.deps.objectiveLabel(progress.questId, objectiveIndex),
-          current: progress.counts[objectiveIndex],
-          total: questObjectiveRequired(quest, progress, objectiveIndex),
-        })),
+        objectives: quest
+          ? quest.objectives.map((_objective, objectiveIndex) => ({
+              label: this.deps.objectiveLabel(progress.questId, objectiveIndex),
+              current: progress.counts[objectiveIndex],
+              total: questObjectiveRequired(quest, progress, objectiveIndex),
+            }))
+          : [],
       });
     }
     if (collapsed && quests.length === 0 && this.deps.settings.available()) {

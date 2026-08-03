@@ -11,6 +11,7 @@ import {
 } from '../src/sim/data';
 import type { ZoneDef } from '../src/sim/types';
 import { inHollowOpenSea, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 import { openSeaNearness } from '../src/ui/map_open_sea_edge_core';
 import {
   type MapRegion,
@@ -19,7 +20,7 @@ import {
   paintTerrainRows,
 } from '../src/ui/map_terrain';
 
-const SEED = 20061;
+const SEED = WORLD_SEED;
 
 function zoneRegion(zoneId: string): MapRegion {
   const zone = ZONES.find((z) => z.id === zoneId) ?? ZONES[0];
@@ -75,17 +76,23 @@ describe('map terrain painter', () => {
     expect(a).not.toEqual(b);
   });
 
-  // The painter swapped the inline `zoneAt(z).biome` for `zoneBiomeAt(z)`; pin
-  // them as equivalent across the world's z-range so the swap can't silently
-  // drift the map colours.
-  it('zoneBiomeAt matches zoneAt(...).biome across the world', () => {
-    const minZ = ZONES[0].zMin;
-    const maxZ = ZONES[ZONES.length - 1].zMax;
-    for (let z = minZ; z < maxZ; z += 0.5) {
-      expect(zoneBiomeAt(0, z)).toBe(zoneAt(0, z).biome);
-    }
-    // and just past the far edge, where both clamp to the last zone
-    expect(zoneBiomeAt(0, maxZ + 50)).toBe(zoneAt(0, maxZ + 50).biome);
+  // zoneBiomeAt now IS `zoneAt(x, z).biome` (the merge settlement delegated
+  // it), so comparing the two would be a tautology that can never fail. The
+  // map-colour contract is pinned as LITERALS instead, one per ladder arm of
+  // the 2D walk: a rect hit in each column at one shared z, the
+  // southmost-containing-band fallback where no rect covers x, and the
+  // northmost clamp past the world's end. Values re-derived from the shipped
+  // ZONES table; a zone reshape that moves these is a map-colour change and
+  // should be decided, not absorbed.
+  it('zoneBiomeAt walks the 2D ladder (literal probes per arm)', () => {
+    // One z, three columns, three different biomes: the 2D rect hit.
+    expect(zoneBiomeAt(0, 400)).toBe('marsh'); // mirefen strip
+    expect(zoneBiomeAt(300, 400)).toBe('gale'); // galecrest east column
+    expect(zoneBiomeAt(-300, 400)).toBe('fen'); // willowfen west column
+    // No rect covers x=600 anywhere: the southmost band containing z wins.
+    expect(zoneBiomeAt(600, 400)).toBe('marsh');
+    // Past every zone's north end: the northmost zone clamps.
+    expect(zoneBiomeAt(0, 2500)).toBe('ember'); // drakelands, zMax 2420
   });
 });
 

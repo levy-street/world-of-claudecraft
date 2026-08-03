@@ -90,6 +90,29 @@ describe('ActionBarController form persistence', () => {
     expect(controller.actions.slice(22)).toEqual(Array.from({ length: 11 }, () => null));
   });
 
+  it('preserves an item id this bundle predates through load and save (R34)', () => {
+    // The layout is per-character SERVER state and the save is a wholesale
+    // overwrite: nulling an unresolvable slot at parse used to DESTROY the
+    // binding for every device the moment any ordinary save fired (a form
+    // switch, a level-up auto-place). The unknown slot rides through as an
+    // inert item action; the known-but-ineligible strip stays.
+    const storage = new MemoryStorage();
+    const stored = bar();
+    stored[0] = { type: 'item', id: 'ghost_tool_from_v33' };
+    stored[1] = { type: 'item', id: 'baked_bread' };
+    stored[2] = { type: 'item', id: 'wolf_fang' }; // known, NOT a hotbar kind
+    storage.setItem('woc_hotbar_warrior_ActionbarTester', JSON.stringify(stored));
+    const { controller } = makeHarness('warrior', [], bar(), storage);
+    controller.init();
+    expect(controller.actions[0]).toEqual({ type: 'item', id: 'ghost_tool_from_v33' });
+    expect(controller.actions[1]).toEqual({ type: 'item', id: 'baked_bread' });
+    expect(controller.actions[2]).toBeNull();
+    controller.saveActions();
+    const roundTrip = JSON.parse(storage.getItem('woc_hotbar_warrior_ActionbarTester') ?? '[]');
+    expect(roundTrip[0]).toEqual({ type: 'item', id: 'ghost_tool_from_v33' });
+    expect(roundTrip[2]).toBeNull();
+  });
+
   it('persists the last third-row slot independently across Druid forms and reloads', () => {
     const storage = new MemoryStorage();
     const first = makeHarness('druid', ['wrath', 'bear_form', 'claw'], bar(), storage);

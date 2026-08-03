@@ -92,7 +92,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and choose Play Offline
 ```
 
-Pon nombre a tu personaje, elige cualquiera de las nueve clases y empezarás en **Eastbrook Vale** (niveles 1-7), un pueblo mercado rodeado de enclaves: senderos de lobos al norte, praderas de jabalíes al este, los bosques de Sableweb al oeste, Mirror Lake al noroeste, una excavación de cobre plagada de excavadores al suroeste y una capilla en ruinas de muertos inquietos al noreste, con el campamento de bandidos de Gorrak al sureste. El camino del norte asciende por un paso de montaña hasta **Mirefen Marsh** (6-13, enclave Fenbridge) y sigue hacia arriba hasta **Thornpeak Heights** (13-20, enclave Highwatch). La semilla del mundo está fijada en `src/main.ts`, así que es el mismo lugar en cada visita.
+Pon nombre a tu personaje, elige cualquiera de las nueve clases y empezarás en **Eastbrook Vale** (niveles 1-7), un pueblo mercado rodeado de enclaves: senderos de lobos al norte, praderas de jabalíes al este, los bosques de Sableweb al oeste, Mirror Lake al noroeste, una excavación de cobre plagada de excavadores al suroeste y una capilla en ruinas de muertos inquietos al noreste, con el campamento de bandidos de Gorrak al sureste. El camino del norte asciende por un paso de montaña hasta **Mirefen Marsh** (6-13, enclave Fenbridge) y sigue hacia arriba hasta **Thornpeak Heights** (13-20, enclave Highwatch). La semilla del mundo está fijada en `src/sim/world_seed.ts`, así que es el mismo lugar en cada visita.
 
 ### Aplicaciones de escritorio para Windows, Linux y macOS
 

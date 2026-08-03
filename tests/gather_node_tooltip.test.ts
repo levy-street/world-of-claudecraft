@@ -7,7 +7,10 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { gatherNodeToolGateFor, gatherNodeTooltipHtml } from '../src/ui/gather_node_tooltip';
+import {
+  gatherNodeToolGateFor,
+  gatherNodeTooltipHtml,
+} from '../src/ui/gather_node_tooltip_controller';
 import type { GatherNodeTooltipModel } from '../src/ui/gathering_view';
 import { hasTranslation } from '../src/ui/i18n';
 import type { IWorld } from '../src/world_api';
@@ -38,6 +41,20 @@ describe('gatherNodeTooltipHtml', () => {
     expect(html).not.toContain('tt-red');
   });
 
+  it('a wield shortfall outranks the tier line: the hover names the counter (R22)', () => {
+    // The player carries a covering pick and only Mining is short: the tier
+    // sentence would name a requirement they meet, so the wield line renders
+    // instead, red, with the smallest counter that unlocks something owned.
+    const html = gatherNodeTooltipHtml(model({ wieldSkill: 40 }));
+    expect(html).toContain(
+      '<div class="tt-red">You need Mining 40 to swing the pick already in your bags.</div>',
+    );
+    expect(html).not.toContain('Requires a tier 2 mining pick');
+    // The shortfall only speaks while the node is actually locked.
+    const unlocked = gatherNodeTooltipHtml(model({ locked: false, wieldSkill: 40 }));
+    expect(unlocked).toContain('<div class="tt-sub">Requires a tier 2 mining pick</div>');
+  });
+
   it('a tier-1 node renders the tierless base-tool requirement line (#2343: bare hands never gather)', () => {
     // Locked (no pick owned): the tierless line renders red.
     const locked = gatherNodeTooltipHtml(model({ tier: 1, locked: true }));
@@ -53,6 +70,30 @@ describe('gatherNodeTooltipHtml', () => {
     const html = gatherNodeTooltipHtml(model({ state: 'cooldown' }));
     expect(html).toContain('Respawning');
     expect(html).not.toContain('tt-green');
+  });
+
+  it('a cooldown with respawnSeconds renders the live countdown, m:ss, ceiled', () => {
+    const html = gatherNodeTooltipHtml(model({ state: 'cooldown', respawnSeconds: 226.4 }));
+    // 226.4 ceils to 227 = 3:47; the untimed word must NOT also render.
+    expect(html).toContain('Respawns in 3:47');
+    expect(html).not.toContain('>Respawning<');
+    // Sub-minute remainders keep the two-digit seconds token.
+    expect(gatherNodeTooltipHtml(model({ state: 'cooldown', respawnSeconds: 8 }))).toContain(
+      'Respawns in 0:08',
+    );
+    // A live timer never reads 0:00 while the node still refuses.
+    expect(gatherNodeTooltipHtml(model({ state: 'cooldown', respawnSeconds: 0.2 }))).toContain(
+      'Respawns in 0:01',
+    );
+  });
+
+  it('the fine-grade preview line renders green exactly when the model carries it true', () => {
+    const on = gatherNodeTooltipHtml(model({ locked: false, fineUpgrade: true }));
+    expect(on).toContain('<div class="tt-green">Your tool refines this yield to fine grade.</div>');
+    const off = gatherNodeTooltipHtml(model({ locked: false, fineUpgrade: false }));
+    expect(off).not.toContain('fine grade');
+    const absent = gatherNodeTooltipHtml(model({ locked: false }));
+    expect(absent).not.toContain('fine grade');
   });
 
   it('each node family resolves its own name key', () => {
@@ -80,19 +121,42 @@ describe('gatherNodeTooltipHtml', () => {
 });
 
 describe('gatherNodeToolGateFor', () => {
-  function worldWith(inventory: { itemId: string; count: number }[]): IWorld {
-    return { inventory } as unknown as IWorld;
+  function worldWith(
+    inventory: { itemId: string; count: number }[],
+    proficiency: Record<string, number> = {},
+  ): IWorld {
+    // The plain counter map the wield-filtered scan reads (R22).
+    return { inventory, gatheringProficiency: proficiency } as unknown as IWorld;
   }
 
   it('resolves the viewer tier from bags and bakes the localized denial line per family', () => {
-    const gate = gatherNodeToolGateFor(worldWith([{ itemId: 'iron_mining_pick', count: 1 }]), {
-      type: 'ore',
-      tier: 3,
-    });
+    // The pick is WIELDED here (mining 40, R22), so the shortfall is purely
+    // the tier: the tiered line renders. The wield shortfall has its own arm
+    // below.
+    const gate = gatherNodeToolGateFor(
+      worldWith([{ itemId: 'iron_mining_pick', count: 1 }], { mining: 40 }),
+      {
+        type: 'ore',
+        tier: 3,
+      },
+    );
     expect(gate).toEqual({
       nodeTier: 3,
       viewerToolTier: 2,
       unmetText: 'You need a tier 3 mining pick to harvest this vein.',
+    });
+    // The R22 wield arm: the same pick with the counter short composes the
+    // wield line naming the smallest requirement that unlocks something
+    // already carried, exactly the line the sim's own denial would render.
+    expect(
+      gatherNodeToolGateFor(worldWith([{ itemId: 'iron_mining_pick', count: 1 }]), {
+        type: 'ore',
+        tier: 2,
+      }),
+    ).toEqual({
+      nodeTier: 2,
+      viewerToolTier: 0,
+      unmetText: 'You need Mining 40 to swing the pick already in your bags.',
     });
     // Empty bags read as no tool owned (0, #2343: no bare-hands floor), and
     // the wood/herb families word their own tiered lines.
@@ -122,11 +186,24 @@ describe('hud gatherDenied case stays an error toast only (source pin)', () => {
   const caseStart = source.indexOf("case 'gatherDenied'");
   const block = source.slice(caseStart, source.indexOf('break;', caseStart));
 
-  it('maps surface + professionId + requiredTier through the pure key mapper into showError', () => {
+  it('maps surface + professionId + requiredTier + wieldProficiency through the pure key mapper into showError', () => {
     expect(caseStart).toBeGreaterThan(-1);
     expect(block).toContain('this.showError(');
-    expect(block).toContain('gatherDeniedLineKey(ev.surface, ev.professionId, ev.requiredTier)');
+    // Comment-stripped THEN whitespace- and trailing-comma-normalized: the
+    // case's own comment names all four fields, so an unstripped scrape
+    // could be satisfied by prose with the argument removed; and the
+    // four-argument call is long enough for the formatter to wrap
+    // one-per-line with a dangling comma.
+    const strippedBlock = block
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|\s)\/\/.*$/gm, '$1')
+      .replace(/\s+/g, '')
+      .replace(/,\)/g, ')');
+    expect(strippedBlock).toContain(
+      'gatherDeniedLineKey(ev.surface,ev.professionId,ev.requiredTier,ev.wieldProficiency)',
+    );
     expect(block).toContain('formatNumber(ev.requiredTier');
+    expect(block).toContain('formatNumber(ev.wieldProficiency ?? 0');
   });
 
   it('adds no log line and no audio cue (toast only, the double-feedback trap)', () => {

@@ -186,7 +186,7 @@ describe('at cap, actions still work: only skill gain stops', () => {
     p.pos.y = terrainHeight(NODE.pos.x, NODE.pos.z, sim.cfg.seed);
     p.prevPos = { ...p.pos };
 
-    expect(sim.harvestNode(NODE.id, pid)).toBe(true);
+    expect(sim.harvestNode(NODE.id, undefined, pid)).toBe(true);
     // Complete the gather cast synchronously (the gathering_rhythm idiom).
     p.castingAbility = null;
     p.castRemaining = 0;

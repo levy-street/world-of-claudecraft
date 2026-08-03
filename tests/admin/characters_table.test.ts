@@ -26,7 +26,13 @@ const rows: CharacterRow[] = [
 
 describe('CharactersTable', () => {
   it('renders rows and shows the sort arrow on the active column', () => {
-    render(CharactersTable, { rows, sort: 'level', dir: 'desc', onSort: () => {} });
+    render(CharactersTable, {
+      rows,
+      sort: 'level',
+      dir: 'desc',
+      onSort: () => {},
+      onInspectProfessions: () => {},
+    });
     expect(screen.getByText('Aragorn')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'The Fellowship' })).toHaveAttribute(
       'href',
@@ -38,13 +44,38 @@ describe('CharactersTable', () => {
 
   it('calls onSort with the clicked column', async () => {
     const onSort = vi.fn();
-    render(CharactersTable, { rows, sort: 'level', dir: 'desc', onSort });
+    render(CharactersTable, {
+      rows,
+      sort: 'level',
+      dir: 'desc',
+      onSort,
+      onInspectProfessions: () => {},
+    });
     await fireEvent.click(screen.getByText(new RegExp(t('characters.colName'))));
     expect(onSort).toHaveBeenCalledWith('name');
   });
 
+  it('asks the parent to open the professions inspector for the clicked row', async () => {
+    const onInspectProfessions = vi.fn();
+    render(CharactersTable, {
+      rows,
+      sort: 'level',
+      dir: 'desc',
+      onSort: () => {},
+      onInspectProfessions,
+    });
+    await fireEvent.click(screen.getByRole('button', { name: t('characters.professionsButton') }));
+    expect(onInspectProfessions).toHaveBeenCalledWith(rows[0]);
+  });
+
   it('shows the empty message for no rows', () => {
-    render(CharactersTable, { rows: [], sort: 'level', dir: 'desc', onSort: () => {} });
+    render(CharactersTable, {
+      rows: [],
+      sort: 'level',
+      dir: 'desc',
+      onSort: () => {},
+      onInspectProfessions: () => {},
+    });
     expect(screen.getByText(t('characters.empty'))).toBeInTheDocument();
   });
 });

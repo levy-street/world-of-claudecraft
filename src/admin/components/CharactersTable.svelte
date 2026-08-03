@@ -13,11 +13,14 @@
     sort,
     dir,
     onSort,
+    onInspectProfessions,
   }: {
     rows: CharacterRow[];
     sort: string;
     dir: 'asc' | 'desc';
     onSort: (col: string) => void;
+    // R35 professions inspector: the parent owns the modal; a row only asks.
+    onInspectProfessions: (row: CharacterRow) => void;
   } = $props();
 
   const arrow = (col: string) => (sort === col ? (dir === 'asc' ? ' ▲' : ' ▼') : '');
@@ -41,6 +44,7 @@
           <th>{t('characters.colGuildRank')}</th>
           <th class="sortable" onclick={() => onSort('created_at')}>{t('characters.colCreated')}{arrow('created_at')}</th>
           <th class="sortable" onclick={() => onSort('updated_at')}>{t('characters.colLastPlayed')}{arrow('updated_at')}</th>
+          <th>{t('characters.colTools')}</th>
         </tr>
       </thead>
       <tbody>
@@ -63,6 +67,11 @@
             <td>{guildRankLabel(c.guildRank)}</td>
             <td>{fmtDate(c.createdAt)}</td>
             <td>{fmtRelative(c.updatedAt)}</td>
+            <td>
+              <button class="btn-sm" onclick={() => onInspectProfessions(c)}>
+                {t('characters.professionsButton')}
+              </button>
+            </td>
           </tr>
         {/each}
       </tbody>

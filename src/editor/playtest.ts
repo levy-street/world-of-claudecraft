@@ -1,3 +1,4 @@
+import { WORLD_SEED } from '../sim/world_seed';
 // Editor -> game play-test handoff. Stashes a WorldContent (built from the current
 // CustomMap via custom_map.customMapToWorldContent) in sessionStorage and navigates
 // to the game page, which boots OFFLINE into that world (see game/editor_playtest.ts
@@ -6,9 +7,9 @@
 import { EDITOR_PLAYTEST_KEY } from '../game/editor_playtest';
 import type { WorldContent } from '../sim/types';
 
-// The game's fixed offline world seed: using it makes the play-test heightfield
-// match what the editor previews for the built-in terrain.
-export const DEFAULT_PLAYTEST_SEED = 20061;
+// The shipped world seed: using it makes the play-test heightfield match
+// what the editor previews for the built-in terrain.
+export const DEFAULT_PLAYTEST_SEED = WORLD_SEED;
 
 export interface PlaytestOptions {
   seed: number;

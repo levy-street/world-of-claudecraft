@@ -228,10 +228,21 @@ export const RARE_SLAIN_TEMPLATES = new Set([
 
 // Zone fishing catches that count as "a fish" for the chr_ first-cast deeds
 // (weeds and empty hooks do not count). Pinned to the authored tables.
-const ZONE_FISH: Record<string, readonly string[]> = {
+// Exported for the new-zone checklist (tests/professions_zone_rollout.test.ts):
+// a complete zone's first-cast deed is only earnable if a row here writes its
+// fish:<zone> mark, so the checklist sweeps this table too.
+export const ZONE_FISH: Record<string, readonly string[]> = {
   eastbrook_vale: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
   mirefen_marsh: ['raw_marsh_pike', 'raw_bog_eel', 'glimmerfin_koi'],
   thornpeak_heights: ['raw_frostgill_trout', 'raw_stonescale_carp', 'glimmerfin_koi'],
+  // The three bottom-map zones (the phase 20 chronicle pairs, Q26): their
+  // waters draw the Vale FALLBACK tables until the zone-4 pass authors real
+  // ones (professions/fishing.ts, bandTables[zoneId] ?? eastbrook_vale), so
+  // the rows list the fallback's own fish and the deeds_content guard
+  // intersects them against the tables each zone ACTUALLY draws.
+  willowfen: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
+  galecrest: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
+  farshore_isle: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
 };
 
 // The three Chronicler NPCs (interaction-only). Talking to one feeds an
@@ -247,7 +258,9 @@ const SAUL_TALKS_REQUIRED = 9;
 
 // How close (yards) a POI sweep counts a visit, and the witness radius for
 // chr_peaks_waking_witness (inside interest scope, pinned literal).
-const POI_VISIT_RADIUS = 20;
+// Exported for the placement suite's mirror-lake standability arm, which used
+// to carry its own copy of this number and could drift silently.
+export const POI_VISIT_RADIUS = 20;
 const THUNZHARR_WITNESS_RADIUS = 100;
 
 // ---------------------------------------------------------------------------

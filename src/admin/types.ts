@@ -229,6 +229,43 @@ export interface CharacterRow {
   updatedAt: string;
 }
 
+// R35 professions inspector (GET /admin/api/characters/:id/professions);
+// matches server/character_professions.ts CharacterProfessionsSheet exactly.
+export interface CharacterProfessionsSheet {
+  characterId: number;
+  name: string;
+  class: string;
+  level: number;
+  accountId: number;
+  username: string;
+  live: boolean;
+  updatedAt: string | null;
+  preMigration: boolean;
+  archetype: {
+    activeArchetype: string | null;
+    pairedMajor: string | null;
+    hobbyCraft: string | null;
+  };
+  gathering: { professionId: string; proficiency: number }[];
+  crafting: { craftId: string; skill: number; tier: number }[];
+  knownRecipes: number;
+  slots: {
+    professionId: string;
+    effectId: string;
+    durability: number;
+    maxDurability: number;
+    craftedBy: string | null;
+    confirmMode: string;
+  }[];
+  nodeTimers: {
+    nodeId: string;
+    zoneId: string | null;
+    nodeType: string | null;
+    remainingSeconds: number;
+  }[];
+  toolEffectIds: string[];
+}
+
 export interface Paginated<T> {
   rows: T[];
   total: number;

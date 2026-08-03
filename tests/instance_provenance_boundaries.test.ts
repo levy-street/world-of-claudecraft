@@ -3,14 +3,17 @@
 // end byte-identical.
 //
 // Why this file exists as a sweep rather than as N per-feature cases: the
-// "a boundary silently strips an item's identity" bug has now been fixed one
-// boundary at a time at least six times (trade #2049, vendor buyback #2412,
-// the market and the plain bank arm #2603/#2605, the anonymous pipes #2507,
-// then the instanced bank arm, apply-enchant, and the rename escrow books).
+// "a boundary silently strips an item's identity" bug has been fixed one
+// boundary at a time at least eight times now (trade #2049, vendor buyback
+// #2412, the market and the plain bank arm #2603/#2605, the anonymous pipes
+// #2507, the instanced bank arm and the rename buyback/escrow sweeps in the
+// professions packet, then apply-enchant and the instanced escrow legs here).
 // Every one of them was the same mistake: a site that REBUILDS an InvSlot or a
 // payload from parts instead of carrying it whole, so a marker it did not
 // happen to name is dropped. Per-feature tests never caught the next one
-// because each was written against the boundary that had just been fixed.
+// because each was written against the boundary that had just been fixed, and
+// two of the boundaries fixed independently in the professions packet were ones
+// this sweep's rows had already gone red on.
 //
 // The contract this file pins, for every boundary in the table below:
 //   a copy that goes in carrying { signer, rolled.masterwork + stats, enchant,

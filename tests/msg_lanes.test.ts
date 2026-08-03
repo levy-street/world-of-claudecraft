@@ -400,17 +400,83 @@ describe('dispatchMessage lane wiring at the R5 placements', () => {
     sendChat(server, session, 'one too many');
     expect(session.msgRate.dropsThisSecond).toBe(1);
 
-    // A burst of list readouts and moderation commands rides ABOVE the lane
-    // check (the router and filter management stay unthrottled): every one is
-    // handled and none tallies a drop. Ten readouts sit exactly AT the
-    // list-read guard burst, so this arm exercises the lane bypass, not the
-    // guard; a lowered guard burst would fail here first, deliberately.
+    // A burst of list readouts and moderation commands rides ABOVE the CHAT
+    // lane check (the router and filter management never pay chat tokens;
+    // moderation pays the COMMAND lane instead, whose burst comfortably
+    // covers ten): every one is handled and none tallies a drop. Ten
+    // readouts sit exactly AT the list-read guard burst, so this arm
+    // exercises the lane bypass, not the guard; a lowered guard burst would
+    // fail here first, deliberately.
     for (let i = 0; i < 10; i++) sendChat(server, session, '/ignorelist');
     expect(ignoreSpy).toHaveBeenCalledTimes(10);
     moderationSpy.mockClear();
     for (let i = 0; i < 10; i++) sendChat(server, session, '/kick Somebody');
     expect(moderationSpy).toHaveBeenCalledTimes(10);
     expect(session.msgRate.dropsThisSecond).toBe(1);
+  });
+
+  it('a claimed moderation command pays the COMMAND lane (a drained lane drops it whole)', () => {
+    // The /unstuck audit finding's sibling: staff moderation rides the chat
+    // case (classifyMsgLane says 'chat', so the top-of-dispatch command draw
+    // never sees it) but each action is command work with an audited DB
+    // write, so it draws the command lane at the router. A drained lane
+    // drops the frame before the router runs, the drop tallies toward the
+    // flood-kick verdict, and ordinary chat is untouched (its own lane).
+    const server = new GameServer();
+    const session = join(server, { adminPermissions: ['moderation.act'] });
+    sinkDetector(server);
+    const host = server as unknown as {
+      moderation: { handleChatCommand: (session: unknown, text: string) => boolean };
+    };
+    const moderationSpy = vi.spyOn(host.moderation, 'handleChatCommand').mockReturnValue(true);
+    const lanes = session.msgLanes as unknown as {
+      commandTokens: number;
+      lastRefillSec: number;
+    };
+    lanes.commandTokens = 0;
+    lanes.lastRefillSec = Date.now() / 1000 + 3600; // no refill within the test
+    const dropsBefore = session.msgRate.dropsThisSecond;
+    sendChat(server, session, '/kick Somebody');
+    expect(moderationSpy).not.toHaveBeenCalled();
+    expect(session.msgRate.dropsThisSecond).toBe(dropsBefore + 1);
+    // Ordinary chat still flows: the chat lane was never charged for the
+    // refused moderation frame, so a plain line neither drops nor tallies.
+    sendChat(server, session, 'hello there');
+    expect(session.msgRate.dropsThisSecond).toBe(dropsBefore + 1);
+  });
+
+  it('the SPECTATING dispatch site pays the same command lane (its own drop arm)', () => {
+    // The moderation lane draw landed at BOTH dispatch sites; this is the
+    // spectating copy's own observation, so the two-site change cannot
+    // half-revert silently.
+    const server = new GameServer();
+    const session = join(server, { adminPermissions: ['moderation.act'] });
+    sinkDetector(server);
+    session.spectating = {
+      characterId: 2,
+      name: 'Target',
+      savedPos: { x: 0, y: 0, z: 0 },
+      priorGm: false,
+      stowedPet: null,
+    } as ClientSession['spectating'];
+    const host = server as unknown as {
+      moderation: { handleChatCommand: (session: unknown, text: string) => boolean };
+    };
+    const moderationSpy = vi.spyOn(host.moderation, 'handleChatCommand').mockReturnValue(true);
+    const lanes = session.msgLanes as unknown as {
+      commandTokens: number;
+      lastRefillSec: number;
+    };
+    // A full lane first: the spectating router runs and pays.
+    sendChat(server, session, '/kick Somebody');
+    expect(moderationSpy).toHaveBeenCalledTimes(1);
+    // A drained lane drops the frame whole and tallies.
+    lanes.commandTokens = 0;
+    lanes.lastRefillSec = Date.now() / 1000 + 3600;
+    const dropsBefore = session.msgRate.dropsThisSecond;
+    sendChat(server, session, '/kick Somebody');
+    expect(moderationSpy).toHaveBeenCalledTimes(1);
+    expect(session.msgRate.dropsThisSecond).toBe(dropsBefore + 1);
   });
 
   it('still fires the chat ladder cooldown messaging on what the lane passes', () => {

@@ -1,0 +1,1421 @@
+{
+  "scenario": "professions_tool_effect_slot",
+  "seed": 1,
+  "sampleEvery": 500,
+  "ticks": 159,
+  "coverage": [
+    "class:warrior (gatherer carrying a slotted tool effect)",
+    "slotToolEffect mint: consumes the self-signed charm copy, records craftedBy",
+    "toolEffectSlots row minted lazily (absent in every other scenario)",
+    "the slot command is draw-free: zero draws across the whole mint",
+    "quantity effect fires at the vein: granted qty is the same-draw base plus one",
+    "R42 charge settle at the command boundary: one charge for one bonus-bearing harvest",
+    "the harvest keeps its exact two-draw contract with a live slot applied",
+    "own-timer denial on the same vein: zero draws, no cast, no charge",
+    "R40 prompt re-slot: the mode gain mints, the spent slot's charge resets",
+    "R40 unconfirmed prompt use: two draws, base quantity, charge kept (the fail-safe)",
+    "R40 confirmed prompt use: two draws, bonus applied, charge spent (the consented digest)"
+  ],
+  "draws": 6,
+  "drawDigest": "de061ff8",
+  "frames": [
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 832,
+      "state": "2ecb744c",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "init",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 827,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 827
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 100,
+          "id": 827,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 832,
+      "state": "3438ca7a",
+      "events": "cdb7d47b",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "effect-slotted",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "gatherers_cache",
+              "mithril_mining_pick",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "quality:rare"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 827,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {
+            "mining": 70
+          },
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "mithril_mining_pick"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "talents": {
+            "rows": {}
+          },
+          "toolEffectSlots": {
+            "mining": {
+              "confirmMode": "always",
+              "craftedBy": "Adventurer",
+              "durability": 30,
+              "effectId": "gatherers_cache",
+              "maxDurability": 30
+            }
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 827
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 100,
+          "id": 827,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 51,
+      "time": 2.55,
+      "nextId": 832,
+      "state": "8e03c429",
+      "events": "576d3e00",
+      "rng": {
+        "draws": 2,
+        "digest": "ad89c14b"
+      },
+      "label": "harvest-with-effect-applied",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "xpGained": 36
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "fine_iron_ore",
+              "gatherers_cache",
+              "mithril_mining_pick",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "gather:mirefen_marsh:ore",
+              "quality:rare"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "col_first_rare",
+              ""
+            ],
+            [
+              "exp_first_ore",
+              ""
+            ],
+            [
+              "prog_first_harvest",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 827,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {
+            "mining": 70.5
+          },
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "mithril_mining_pick"
+            },
+            {
+              "count": 3,
+              "itemId": "fine_iron_ore"
+            }
+          ],
+          "lifetimeXp": 36,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {
+            "ore_mirefen_t2": 242.1
+          },
+          "recipesGrandfathered": true,
+          "renown": 10,
+          "talents": {
+            "rows": {}
+          },
+          "toolEffectSlots": {
+            "mining": {
+              "confirmMode": "always",
+              "craftedBy": "Adventurer",
+              "durability": 29,
+              "effectId": "gatherers_cache",
+              "maxDurability": 30
+            }
+          },
+          "townFocus": {},
+          "xp": 36
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3597.45,
+              "school": "physical",
+              "sourceId": 827
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "castTotal": 2.1,
+          "combatTimer": 101.55,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": -2.136687,
+          "fiveSecondRule": 101.55,
+          "hp": 100,
+          "id": 827,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 36,
+            "y": -2.136687,
+            "z": 350
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 53,
+      "time": 2.65,
+      "nextId": 832,
+      "state": "115039f4",
+      "events": "45bdbca8",
+      "rng": {
+        "draws": 2,
+        "digest": "ad89c14b"
+      },
+      "label": "same-vein-denied-by-own-timer",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "xpGained": 36
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "fine_iron_ore",
+              "gatherers_cache",
+              "mithril_mining_pick",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "gather:mirefen_marsh:ore",
+              "quality:rare"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "col_first_rare",
+              ""
+            ],
+            [
+              "exp_first_ore",
+              ""
+            ],
+            [
+              "prog_first_harvest",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 827,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {
+            "mining": 70.5
+          },
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "mithril_mining_pick"
+            },
+            {
+              "count": 3,
+              "itemId": "fine_iron_ore"
+            }
+          ],
+          "lifetimeXp": 36,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {
+            "ore_mirefen_t2": 242.1
+          },
+          "recipesGrandfathered": true,
+          "renown": 10,
+          "talents": {
+            "rows": {}
+          },
+          "toolEffectSlots": {
+            "mining": {
+              "confirmMode": "always",
+              "craftedBy": "Adventurer",
+              "durability": 29,
+              "effectId": "gatherers_cache",
+              "maxDurability": 30
+            }
+          },
+          "townFocus": {},
+          "xp": 36
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3597.35,
+              "school": "physical",
+              "sourceId": 827
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "castTotal": 2.1,
+          "combatTimer": 101.65,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": -2.136687,
+          "fiveSecondRule": 101.65,
+          "hp": 100,
+          "id": 827,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 36,
+            "y": -2.136687,
+            "z": 350
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 55,
+      "time": 2.75,
+      "nextId": 832,
+      "state": "926d0822",
+      "events": "fbae1629",
+      "rng": {
+        "draws": 2,
+        "digest": "ad89c14b"
+      },
+      "label": "prompt-mode-reslotted",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "xpGained": 36
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "fine_iron_ore",
+              "gatherers_cache",
+              "mithril_mining_pick",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "gather:mirefen_marsh:ore",
+              "quality:rare"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "col_first_rare",
+              ""
+            ],
+            [
+              "exp_first_ore",
+              ""
+            ],
+            [
+              "prog_first_harvest",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 827,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {
+            "mining": 70.5
+          },
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "mithril_mining_pick"
+            },
+            {
+              "count": 3,
+              "itemId": "fine_iron_ore"
+            }
+          ],
+          "lifetimeXp": 36,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {
+            "ore_mirefen_t2": 242.1
+          },
+          "recipesGrandfathered": true,
+          "renown": 10,
+          "talents": {
+            "rows": {}
+          },
+          "toolEffectSlots": {
+            "mining": {
+              "confirmMode": "prompt",
+              "craftedBy": "Adventurer",
+              "durability": 30,
+              "effectId": "gatherers_cache",
+              "maxDurability": 30
+            }
+          },
+          "townFocus": {},
+          "xp": 36
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3597.25,
+              "school": "physical",
+              "sourceId": 827
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "castTotal": 2.1,
+          "combatTimer": 101.75,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": -2.136687,
+          "fiveSecondRule": 101.75,
+          "hp": 100,
+          "id": 827,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 36,
+            "y": -2.136687,
+            "z": 350
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 106,
+      "time": 5.3,
+      "nextId": 832,
+      "state": "6a7ccf1e",
+      "events": "fbd0ab54",
+      "rng": {
+        "draws": 4,
+        "digest": "313f85da"
+      },
+      "label": "prompt-unconfirmed-skips-whole",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "xpGained": 72
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "fine_iron_ore",
+              "gatherers_cache",
+              "iron_ore",
+              "mithril_mining_pick",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "gather:mirefen_marsh:ore",
+              "quality:rare"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "col_first_rare",
+              ""
+            ],
+            [
+              "exp_first_ore",
+              ""
+            ],
+            [
+              "prog_first_harvest",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 827,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {
+            "mining": 70.75
+          },
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "mithril_mining_pick"
+            },
+            {
+              "count": 3,
+              "itemId": "fine_iron_ore"
+            },
+            {
+              "count": 2,
+              "itemId": "iron_ore"
+            }
+          ],
+          "lifetimeXp": 72,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {
+            "ore_mirefen_1": 244.45,
+            "ore_mirefen_t2": 242.1
+          },
+          "recipesGrandfathered": true,
+          "renown": 10,
+          "talents": {
+            "rows": {}
+          },
+          "toolEffectSlots": {
+            "mining": {
+              "confirmMode": "prompt",
+              "craftedBy": "Adventurer",
+              "durability": 30,
+              "effectId": "gatherers_cache",
+              "maxDurability": 30
+            }
+          },
+          "townFocus": {},
+          "xp": 72
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3594.7,
+              "school": "physical",
+              "sourceId": 827
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "castTotal": 1.7,
+          "combatTimer": 104.3,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": -2.314273,
+          "fiveSecondRule": 104.3,
+          "hp": 100,
+          "id": 827,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 40,
+            "y": -2.314273,
+            "z": 340
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 157,
+      "time": 7.85,
+      "nextId": 832,
+      "state": "a738420c",
+      "events": "c5920077",
+      "rng": {
+        "draws": 6,
+        "digest": "de061ff8"
+      },
+      "label": "prompt-confirmed-fires-and-spends",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "xpGained": 108
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "fine_iron_ore",
+              "gatherers_cache",
+              "iron_ore",
+              "mithril_mining_pick",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "gather:mirefen_marsh:ore",
+              "quality:rare"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "col_first_rare",
+              ""
+            ],
+            [
+              "exp_first_ore",
+              ""
+            ],
+            [
+              "prog_first_harvest",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 827,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {
+            "mining": 71.25
+          },
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "mithril_mining_pick"
+            },
+            {
+              "count": 3,
+              "itemId": "fine_iron_ore"
+            },
+            {
+              "count": 2,
+              "itemId": "iron_ore"
+            },
+            {
+              "count": 3,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "fine_iron_ore"
+            }
+          ],
+          "lifetimeXp": 108,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {
+            "ore_mirefen_1": 244.45,
+            "ore_mirefen_t2": 242.1,
+            "ore_mirefen_t2b": 247.4
+          },
+          "recipesGrandfathered": true,
+          "renown": 10,
+          "talents": {
+            "rows": {}
+          },
+          "toolEffectSlots": {
+            "mining": {
+              "confirmMode": "prompt",
+              "craftedBy": "Adventurer",
+              "durability": 29,
+              "effectId": "gatherers_cache",
+              "maxDurability": 30
+            }
+          },
+          "townFocus": {},
+          "xp": 108
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3592.15,
+              "school": "physical",
+              "sourceId": 827
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "castTotal": 2.1,
+          "combatTimer": 106.85,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": 2.911251,
+          "fiveSecondRule": 106.85,
+          "hp": 100,
+          "id": 827,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 45,
+            "y": 2.911251,
+            "z": 491
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 159,
+      "time": 7.95,
+      "nextId": 832,
+      "state": "26e03019",
+      "events": "741638a5",
+      "rng": {
+        "draws": 6,
+        "digest": "de061ff8"
+      },
+      "label": "final",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "xpGained": 108
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "fine_iron_ore",
+              "gatherers_cache",
+              "iron_ore",
+              "mithril_mining_pick",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "gather:mirefen_marsh:ore",
+              "quality:rare"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "col_first_rare",
+              ""
+            ],
+            [
+              "exp_first_ore",
+              ""
+            ],
+            [
+              "prog_first_harvest",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 827,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {
+            "mining": 71.25
+          },
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "mithril_mining_pick"
+            },
+            {
+              "count": 3,
+              "itemId": "fine_iron_ore"
+            },
+            {
+              "count": 2,
+              "itemId": "iron_ore"
+            },
+            {
+              "count": 3,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "fine_iron_ore"
+            }
+          ],
+          "lifetimeXp": 108,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {
+            "ore_mirefen_1": 244.45,
+            "ore_mirefen_t2": 242.1,
+            "ore_mirefen_t2b": 247.4
+          },
+          "recipesGrandfathered": true,
+          "renown": 10,
+          "talents": {
+            "rows": {}
+          },
+          "toolEffectSlots": {
+            "mining": {
+              "confirmMode": "prompt",
+              "craftedBy": "Adventurer",
+              "durability": 29,
+              "effectId": "gatherers_cache",
+              "maxDurability": 30
+            }
+          },
+          "townFocus": {},
+          "xp": 108
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3592.05,
+              "school": "physical",
+              "sourceId": 827
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "castTotal": 2.1,
+          "combatTimer": 106.95,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": 2.911251,
+          "fiveSecondRule": 106.95,
+          "hp": 100,
+          "id": 827,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 45,
+            "y": 2.911251,
+            "z": 491
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    }
+  ]
+}

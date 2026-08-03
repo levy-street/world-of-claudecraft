@@ -116,7 +116,13 @@ export function outboxIoFor(options: OutboxIoOptions): OutboxIo {
     breakerState: options.breakerState,
     drain: options.drain,
     postRelay: (item) => post('relay', buildRelayMessage(item, options.gameUrl)),
-    postActivity: (item) => post('activity', buildActivityMessage(item)),
+    // buildActivityMessage answers null for a kind this build does not know (a
+    // newer server mid-deploy). Dropping the item beats posting an empty embed:
+    // the feed is at-most-once by design, so a drop loses a card, never state.
+    postActivity: async (item) => {
+      const payload = buildActivityMessage(item);
+      if (payload) await post('activity', payload);
+    },
     postWinnersDay: (day) => post('dailyRewards', buildDailyRewardWinnersMessage(day)),
     markWinnersDay: (day) => options.markDailyRewardWinners(day),
     applyLinkChanges: options.applyLinkChanges,

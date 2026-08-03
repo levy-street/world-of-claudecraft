@@ -92,7 +92,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and choose Play Offline
 ```
 
-Geef je personage een naam, kies een van de negen classes, en je begint in **Eastbrook Vale** (levels 1-7), een marktstad omringd door hubs: wolvenpaden in het noorden, everzwijnweiden in het oosten, de Sableweb-bossen in het westen, Mirror Lake in het noordwesten, een door burrowers vergeven kopergroeve in het zuidwesten en een verwoeste kapel met rusteloze doden in het noordoosten, met Gorrak's bandietenkamp in het zuidoosten. De noordweg klimt via een bergpas omhoog naar **Mirefen Marsh** (6-13, hub Fenbridge) en verder omhoog naar **Thornpeak Heights** (13-20, hub Highwatch). De wereld-seed staat vast in `src/main.ts`, dus het is bij elk bezoek dezelfde plek.
+Geef je personage een naam, kies een van de negen classes, en je begint in **Eastbrook Vale** (levels 1-7), een marktstad omringd door hubs: wolvenpaden in het noorden, everzwijnweiden in het oosten, de Sableweb-bossen in het westen, Mirror Lake in het noordwesten, een door burrowers vergeven kopergroeve in het zuidwesten en een verwoeste kapel met rusteloze doden in het noordoosten, met Gorrak's bandietenkamp in het zuidoosten. De noordweg klimt via een bergpas omhoog naar **Mirefen Marsh** (6-13, hub Fenbridge) en verder omhoog naar **Thornpeak Heights** (13-20, hub Highwatch). De wereld-seed staat vast in `src/sim/world_seed.ts`, dus het is bij elk bezoek dezelfde plek.
 
 ### Desktop-apps voor Windows, Linux en macOS
 

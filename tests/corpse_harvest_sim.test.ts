@@ -45,6 +45,7 @@ import {
   bestOwnedAnyGatherToolTier,
   canHarvestMonsterMaterial,
 } from '../src/sim/professions/tools';
+import { TIER3_TOOL_WIELD_PROFICIENCY } from '../src/sim/professions/wield_gate';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
@@ -2143,6 +2144,9 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     // premium pull once a family tier rises.
     const { sim, internals, a, mob } = soloRig(4);
     sim.addItem('mithril_mining_pick', 1, a); // any-profession owned-best covers tier 2
+    // The tier-3 pick must wield (R22): the corpse arm scans the wield-aware
+    // any-profession best, so an unearned pick would contribute nothing.
+    internals.players.get(a)!.gatheringProficiency.mining = TIER3_TOOL_WIELD_PROFICIENCY;
     sim.drainEvents();
     let draws = 0;
     withTier('hide', 2, () => {
@@ -2161,6 +2165,50 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     expect(specimen?.instance?.signer).toBe('Alpha');
     expect(sim.countItem('rough_hide', a)).toBe(3);
     expect(mob.harvestClaimedBy).toBe(a);
+  });
+
+  it('R50: the same tool BELOW its wield requirement restores nothing, and names the rung (seed 4)', () => {
+    // The R22 negative of the arm above, and the reason the corpse scan reads
+    // WIELDABLE rather than owned: ownership alone must not re-open the premium
+    // pull. One point short of the pick's requirement the scan floats back at
+    // bare hands, the pull downgrades exactly as the toolless arm does, and the
+    // denial NAMES the smallest proficiency at which something already carried
+    // would work the family.
+    const { sim, internals, a, mob } = soloRig(4);
+    sim.addItem('mithril_mining_pick', 1, a);
+    internals.players.get(a)!.gatheringProficiency.mining = TIER3_TOOL_WIELD_PROFICIENCY - 1;
+    sim.drainEvents();
+    let draws = 0;
+    withTier('hide', 2, () => {
+      sim.rng.setObserver(() => draws++);
+      try {
+        sim.harvestCorpse(mob.id, ['hide'], a);
+      } finally {
+        sim.rng.setObserver(null);
+      }
+    });
+    // Same two draws as every other arm: the wield denial sits strictly after
+    // the rarity roll and draws nothing of its own.
+    expect(draws).toBe(2);
+    // Byte-for-byte the bare-handed denied arm's outcome, with an inert pick in
+    // the bags: plain quantity, no jackpot, no signature, corpse still spent.
+    expect(sim.countItem('pristine_hide', a)).toBe(0);
+    expect(sim.countItem('rough_hide', a)).toBe(3);
+    const meta = internals.players.get(a)!;
+    expect(meta.inventory.some((s) => s.instance?.signer)).toBe(false);
+    expect(mob.harvestClaimedBy).toBe(a);
+    // The R22 wield split: one event, carrying the pick's OWN requirement
+    // rather than the family tier, so the toast names a rung that really
+    // unlocks something the player is holding.
+    expect(sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
+      {
+        type: 'gatherDenied',
+        pid: a,
+        surface: 'corpse',
+        requiredTier: 2,
+        wieldProficiency: TIER3_TOOL_WIELD_PROFICIENCY,
+      },
+    ]);
   });
 
   it('at most ONE gatherDenied per harvest command, even with several denied families (seed 31)', () => {

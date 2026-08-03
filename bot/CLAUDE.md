@@ -8,7 +8,8 @@ official Discord server and the game two ways:
   data (the `/flex` command was removed; `FlexData` survives because the role-sync
   poll reads it); in-game "!" community posts relayed as embeds with a respond
   deep-link button; a significant-activity feed (max level, rare drops, duels,
-  arena); daily-rewards top-10 winner posts; a member reward on guild join
+  arena, Vale Cup wins, masterwork crafts, title deeds + the first koi);
+  daily-rewards top-10 winner posts; a member reward on guild join
   (server-deduped; no welcome message is posted, intentionally quiet).
 - **Into the game:** presence (online count + the featured voice room) and member
   metadata (guild join date + top staff role) pushed to the server, which renders
@@ -115,6 +116,32 @@ includes `DOM` for the game client. Nothing in `bot/` may depend on a browser gl
    secret-gated `RouteDef` in `server/internal.ts` (registered via `server/http/registry.ts`).
 3. Only the wiring (a dispatch case or a poll loop) lands in `main.ts`.
 
+### Activity-kind parity (server to bot)
+The activity wire crosses two processes as unchecked JSON, so a kind the server
+enqueues but `buildActivityMessage` has no case for maps to `null` and is
+DROPPED SILENTLY at the outbox io seam (`outbox_consumer.ts` skips the null
+payload; before that guard the unmatched kind rendered an empty embed Discord
+rejects, the shipped vale_cup failure, and a silent drop is deliberately the
+quieter failure: no log line marks it). A new `ActivityKind` in
+`server/discord_activity.ts` therefore needs BOTH, in the same change: a `case`
+in `buildActivityMessage` (`logic.ts`) and a row in `SERVER_KINDS` in
+`tests/discord_bot.test.ts`. That list is pinned to the server union in both
+directions at `tsc` time (a server kind the list lacks reddens the
+conditional-type line; a listed kind the bot cannot take reddens the
+`buildActivityMessage` call), and its runtime loop pins every kind to a
+non-blank embed author name, title, and description. Fallbacks for optional
+copy use `||`, never `??`: an empty string must degrade to the generic title.
+
+### Discord posts are English
+Every builder in `logic.ts` writes English literals, deliberately. The repo's
+"every player-visible string is a `t()` key" rule scopes to the GAME surfaces
+(client HUD, guide, admin), not to this bot: the official Discord server is one
+English-speaking channel with no per-viewer locale to resolve, and the bot has
+no i18n runtime by design (zero dependencies, standalone bundle). English
+copy the game also renders (Vale Cup nation names) is a copy pinned to the
+catalog in `tests/discord_bot.test.ts`, not an import, so `logic.ts` stays free
+of `src/ui/` imports.
+
 ## Invariants
 - **The game server is the authority for rewards.** The bot never computes points
   or status; it reads them and pushes grants the server validates (dedupe keys).
@@ -198,6 +225,10 @@ not stay phase-locked, and repeated event kicks coalesce into exactly one follow
   them: it will NOT drain while the rate governor's breaker is open or half-open (those
   posts are non-essential, so the governor would refuse them, and a 200 is the outbox's only
   acknowledgement, so draining into refusals loses the items); each post is caught per item;
+  an activity item whose kind this build has no `buildActivityMessage` case for drains to a
+  null payload and is dropped silently before the channel gate (at-most-once by design, and
+  the Activity-kind parity rule above keeps the kind set aligned so the drop only ever
+  covers a mid-deploy skew);
   a winners day is marked back on the server ONLY after its post landed, so a failed post
   retries (at-least-once, duplicates accepted); a bounded process-local announced-days memo
   (`OutboxPollState`) keeps a day whose MARK keeps failing from being re-announced every
