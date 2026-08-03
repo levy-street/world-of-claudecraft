@@ -22,8 +22,11 @@ export type SceneTimelineOpDef<Beat extends string = string> = SceneOpAt<SceneOp
 export type SceneCameraShotDef = Extract<SceneOpDef, { kind: 'camera' }>['shot'];
 
 export interface CoveredCutOptions {
-  /** Fade-out and fade-in duration; must meet the perceptual floor. */
+  /** Fade-out duration (and the fade-in default); must meet the perceptual floor. */
   readonly fadeSeconds?: number;
+  /** Fade-in duration when the reveal should run slower than the fade-out
+   * (the classic film grammar: a quicker fade-down, a longer fade-up). */
+  readonly fadeInSeconds?: number;
   /** Full-black hold, split evenly around the cut, for a real breath of black. */
   readonly holdSeconds?: number;
 }
@@ -115,6 +118,10 @@ function expandCoveredCut<Beat extends string>(
   if (!Number.isFinite(fadeSeconds) || fadeSeconds < MIN_PERCEPTUAL_FADE_SECONDS) {
     throw new Error(`coveredCut fadeSeconds must be at least ${MIN_PERCEPTUAL_FADE_SECONDS}s`);
   }
+  const fadeInSeconds = entry.options?.fadeInSeconds ?? fadeSeconds;
+  if (!Number.isFinite(fadeInSeconds) || fadeInSeconds < MIN_PERCEPTUAL_FADE_SECONDS) {
+    throw new Error(`coveredCut fadeInSeconds must be at least ${MIN_PERCEPTUAL_FADE_SECONDS}s`);
+  }
   // The default hold preserves the original cut shape: black is reached one
   // tick before the cut and released one tick after it. A longer hold splits
   // evenly around the cut so the black gets a real breath.
@@ -154,7 +161,7 @@ function expandCoveredCut<Beat extends string>(
       at: fadeClearAt,
       kind: 'fade',
       to: 'clear',
-      dur: fadeSeconds,
+      dur: fadeInSeconds,
     },
   ];
 }

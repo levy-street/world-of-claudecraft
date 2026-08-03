@@ -4451,11 +4451,14 @@ export type SceneRigCameraShot =
  * release restores the pre-scene pose, whose yaw is player state the author
  * cannot know; a scene that has WALKED the player somewhere must author this
  * so the restored camera has a clear line to the player (the voyage mast
- * blocked exactly this hand-back). Focus stays on the live player position. */
+ * blocked exactly this hand-back). Focus stays on the live player position.
+ * dist is optional and rarely authored: the player's zoom is gameplay state,
+ * so a release keeps the pre-scene camera distance unless a scene explicitly
+ * needs a specific one. */
 export interface SceneReleasePose {
   yaw: number;
   pitch: number;
-  dist: number;
+  dist?: number;
 }
 
 export type SceneCameraShot =

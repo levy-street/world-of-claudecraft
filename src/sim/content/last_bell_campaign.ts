@@ -210,23 +210,30 @@ const LAST_BELL_PLINTH_LINE_SECONDS = 7.5;
 const LAST_BELL_TOLL_LINE_SECONDS = 6.5;
 const LANDING_SHOT_SECONDS = 6;
 
-// J2 pacing: the voyage breathes. Every covered cut fades out and in slower
-// than the bare perceptual floor and holds a real beat of black around the
-// cut instead of a single tick.
-const VOYAGE_FADE_SECONDS = 0.8;
-const VOYAGE_HOLD_SECONDS = 0.5;
+// Owner pass two pacing: film-grade fades. Classic feature scene fades run
+// 36 to 48 frames at 24 fps (1.5 to 2 seconds) with a real beat of black
+// between, and the fade-up traditionally runs a touch longer than the
+// fade-down, so the reveal breathes: 1.5 s down, 1 s of black, 2 s up. The
+// fade-in starts half the hold after the cut, so the boat is already
+// composed and under way in its new position before anything is visible.
+const VOYAGE_FADE_OUT_SECONDS = 1.5;
+const VOYAGE_FADE_IN_SECONDS = 2;
+const VOYAGE_HOLD_SECONDS = 1;
 const VOYAGE_CUT = {
-  fadeSeconds: VOYAGE_FADE_SECONDS,
+  fadeSeconds: VOYAGE_FADE_OUT_SECONDS,
+  fadeInSeconds: VOYAGE_FADE_IN_SECONDS,
   holdSeconds: VOYAGE_HOLD_SECONDS,
 } as const;
 // The opening cut's fade lead starts exactly at scene start.
-const VOYAGE_OPEN_CUT_SECONDS = VOYAGE_FADE_SECONDS + VOYAGE_HOLD_SECONDS / 2;
+const VOYAGE_OPEN_CUT_SECONDS = VOYAGE_FADE_OUT_SECONDS + VOYAGE_HOLD_SECONDS / 2;
 
+// openWater and seaArrival sit later than the J2 layout so every shot still
+// holds fully clear for a real beat between the slower fade pairs.
 const VOYAGE_CORE_BEATS = {
   open: VOYAGE_OPEN_CUT_SECONDS,
   castOff: 1.2,
-  openWater: 6.3,
-  seaArrival: 12,
+  openWater: 7,
+  seaArrival: 13,
   park: 19.05,
 } as const;
 
@@ -311,7 +318,7 @@ interface VoyageDirection {
   // The authored hand-back: the release eases the camera to this gameplay
   // pose around the player at the destination gangplank, camera on the pier
   // side with a clear line (the pre-scene yaw would put it behind the mast).
-  readonly releasePose: { yaw: number; pitch: number; dist: number };
+  readonly releasePose: { yaw: number; pitch: number };
 }
 
 const OUTBOUND: VoyageDirection = {
@@ -353,8 +360,9 @@ const OUTBOUND: VoyageDirection = {
   // Hand back looking north from just south of the gangplank: the player
   // front and center, the moored ship off to the side, nothing between
   // camera and player. Yaw 0 also matches the landing dolly's final gaze,
-  // so the release ease is a settle, not a swing.
-  releasePose: { yaw: 0, pitch: 0.35, dist: 9 },
+  // so the release ease is a settle, not a swing. No authored dist: the
+  // release keeps the player's own pre-scene zoom.
+  releasePose: { yaw: 0, pitch: 0.35 },
 };
 
 const RETURN: VoyageDirection = {
@@ -393,7 +401,7 @@ const RETURN: VoyageDirection = {
   },
   // The same north-facing hand-back as the Gullhaven arrival: south of the
   // gangplank, clear of the hull, aligned with the landing dolly's gaze.
-  releasePose: { yaw: 0, pitch: 0.35, dist: 9 },
+  releasePose: { yaw: 0, pitch: 0.35 },
 };
 
 function attachShot(
@@ -567,17 +575,17 @@ function q0StoryTimeline(): SceneTimelineEntry<Q0StoryBeat>[] {
 function releaseTimeline(direction: VoyageDirection): SceneTimelineEntry<ReleaseBeat>[] {
   return [
     {
-      at: beat('release', -(VOYAGE_FADE_SECONDS + DT)),
+      at: beat('release', -(VOYAGE_FADE_OUT_SECONDS + DT)),
       kind: 'fade',
       to: 'black',
-      dur: VOYAGE_FADE_SECONDS,
+      dur: VOYAGE_FADE_OUT_SECONDS,
     },
     { at: 'release', kind: 'fade', to: 'black', dur: 0 },
     // The walk moved the player to the destination gangplank, so the release
     // hands back the AUTHORED pose (pier side, clear line to the player)
     // instead of the pre-scene yaw the mast used to block.
     { at: 'release', kind: 'camera', shot: { kind: 'release', pose: direction.releasePose } },
-    fadeInTail(beat('release', DT), VOYAGE_FADE_SECONDS),
+    fadeInTail(beat('release', DT), VOYAGE_FADE_IN_SECONDS),
     { at: 'end', kind: 'letterbox', on: false },
     { at: 'end', kind: 'inputLock', on: false },
   ];

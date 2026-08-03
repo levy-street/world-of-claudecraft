@@ -533,37 +533,37 @@ describe('the voyage cinematic', () => {
       outCastOff: {
         start: { x: 0, y: 0, z: 0, yaw: 0 },
         end: { x: 22, y: 0, z: 7, yaw: 0 },
-        duration: 5,
+        duration: 5.8,
         ease: 'linear',
       },
       outOpenWater: {
         start: { x: 157.48, y: 0, z: -8.994, yaw: -1.935526 },
         end: { x: 209.481, y: 0, z: -8.995, yaw: -1.935526 },
-        duration: 5.5,
+        duration: 5.7,
         ease: 'linear',
       },
       outArrival: {
         start: { x: -43.351, y: 0, z: -6.478, yaw: -0.3 },
         end: { x: 0, y: 0, z: 0, yaw: 0 },
-        duration: 7,
+        duration: 6,
         ease: 'linear',
       },
       backCastOff: {
         start: { x: 0, y: 0, z: 0, yaw: 0 },
         end: { x: 22, y: 0, z: -7, yaw: 0 },
-        duration: 5,
+        duration: 5.8,
         ease: 'linear',
       },
       backOpenWater: {
         start: { x: 290.615, y: 0, z: -5.869, yaw: 1.206066 },
         end: { x: 342.615, y: 0, z: -5.868, yaw: 1.206066 },
-        duration: 5.5,
+        duration: 5.7,
         ease: 'linear',
       },
       backArrival: {
         start: { x: -43.385, y: 0, z: 4.898, yaw: 0.3 },
         end: { x: 0, y: 0, z: 0, yaw: 0 },
-        duration: 7,
+        duration: 6,
         ease: 'linear',
       },
     });
@@ -575,21 +575,21 @@ describe('the voyage cinematic', () => {
     expect(back).toBeDefined();
     expect(q0).toBeDefined();
     if (!out || !back || !q0) return;
-    expect(out.duration).toBeCloseTo(27.15, 8);
-    expect(back.duration).toBeCloseTo(27.15, 8);
-    expect(q0.duration).toBeCloseTo(34.7, 8);
+    expect(out.duration).toBeCloseTo(28.35, 8);
+    expect(back.duration).toBeCloseTo(28.35, 8);
+    expect(q0.duration).toBeCloseTo(35.9, 8);
     const cameraTimes = (scene: typeof out): number[] =>
       scene.ops.flatMap((op) => (op.kind === 'camera' ? [op.at] : []));
-    expect(cameraTimes(out)).toEqual([expect.closeTo(1.05, 8), 6.3, 12, 19.05, 26.3]);
-    expect(cameraTimes(back)).toEqual([expect.closeTo(1.05, 8), 6.3, 12, 19.05, 26.3]);
-    expect(cameraTimes(q0)).toEqual([expect.closeTo(1.05, 8), 6.3, 12, 19.05, 26.95, 33.85]);
+    expect(cameraTimes(out)).toEqual([expect.closeTo(2, 8), 7, 13, 19.05, 26.3]);
+    expect(cameraTimes(back)).toEqual([expect.closeTo(2, 8), 7, 13, 19.05, 26.3]);
+    expect(cameraTimes(q0)).toEqual([expect.closeTo(2, 8), 7, 13, 19.05, 26.95, 33.85]);
 
     for (const scene of [out, back, q0]) {
       expect(scene.ops.filter((op) => op.at === 0 && op.kind === 'fade')).toEqual([
-        { at: 0, kind: 'fade', to: 'black', dur: 0.8 },
+        { at: 0, kind: 'fade', to: 'black', dur: 1.5 },
       ]);
       const finalFade = scene.ops.filter((op) => op.kind === 'fade').at(-1);
-      expect(finalFade).toMatchObject({ kind: 'fade', to: 'clear', dur: 0.8 });
+      expect(finalFade).toMatchObject({ kind: 'fade', to: 'clear', dur: 2 });
       expect(finalFade?.at).toBeCloseTo(scene === q0 ? 33.9 : 26.35, 8);
     }
 
@@ -751,7 +751,8 @@ describe('the voyage cinematic', () => {
       );
     for (const scene of [out, back, q0]) {
       expect(releaseShots(scene)).toEqual([
-        { kind: 'release', pose: { yaw: 0, pitch: 0.35, dist: 9 } },
+        // No authored dist: the hand-back keeps the player's pre-scene zoom.
+        { kind: 'release', pose: { yaw: 0, pitch: 0.35 } },
       ]);
     }
 
@@ -776,13 +777,13 @@ describe('the voyage cinematic', () => {
 
     for (const scene of [out, back]) {
       const parkFade = scene.ops.flatMap((op) =>
-        op.kind === 'fade' && op.to === 'black' && op.at > 12 && op.at < 19.05
+        op.kind === 'fade' && op.to === 'black' && op.at > 13 && op.at < 19.05
           ? [{ at: op.at, dur: op.dur }]
           : [],
       );
       expect(parkFade).toHaveLength(1);
-      expect(parkFade.map((op) => op.dur)).toEqual([0.8]);
-      expect(parkFade[0]?.at).toBeCloseTo(18, 8);
+      expect(parkFade.map((op) => op.dur)).toEqual([1.5]);
+      expect(parkFade[0]?.at).toBeCloseTo(17.05, 8);
     }
 
     const arrivalCutKinds = (scene: typeof out) =>
@@ -811,7 +812,7 @@ describe('the voyage cinematic', () => {
       { key: 'lb.q0.scene.toll', dur: 6.5 },
     ]);
     expect(q0Lines.map((line) => line.at)).toEqual([
-      expect.closeTo(13.7, 8),
+      expect.closeTo(14.7, 8),
       expect.closeTo(19.25, 8),
       expect.closeTo(27.15, 8),
     ]);
@@ -887,7 +888,7 @@ describe('the voyage cinematic', () => {
     // re-carries, so the director restores one pose whichever way it ends.
     expect(tail.find((e) => e.op.kind === 'end')?.op).toEqual({
       kind: 'end',
-      releasePose: { yaw: 0, pitch: 0.35, dist: 9 },
+      releasePose: { yaw: 0, pitch: 0.35 },
     });
     expect(sim.ctx.scenePlaybacks.size).toBe(0);
     expect(sim.player.pos).toEqual(gullhavenEnd);
@@ -903,7 +904,7 @@ describe('the voyage cinematic', () => {
       sim.groundPos(GULLHAVEN_HARBOR.gangplank.x, GULLHAVEN_HARBOR.gangplank.z),
     );
     board(sim, GULLHAVEN_HARBOR.boarding.x, GULLHAVEN_HARBOR.boarding.z, 'ch_lb_ferry_fare_back');
-    const ops = sceneOps(collect(sim, 13 * 20));
+    const ops = sceneOps(collect(sim, 14 * 20));
     expect(ops.length).toBeGreaterThan(0);
     expect(ops.every((e) => e.sceneId === 'scn_lb_ferry_depart_back')).toBe(true);
     const props = ops
@@ -963,7 +964,7 @@ describe('the voyage cinematic', () => {
     // re-carries the authored hand-back pose for the director's teardown.
     expect(end?.op).toEqual({
       kind: 'end',
-      releasePose: { yaw: 0, pitch: 0.35, dist: 9 },
+      releasePose: { yaw: 0, pitch: 0.35 },
     });
     expect(sim.ctx.scenePlaybacks.size).toBe(0);
     // The crossing happened at pay time and skip settles the un-emitted walk
