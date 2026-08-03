@@ -52,6 +52,11 @@ export class SceneOverlayWindow {
     this.barTop = make('div', 'scene-letterbox scene-letterbox-top');
     this.barBottom = make('div', 'scene-letterbox scene-letterbox-bottom');
     this.fadeEl = make('div', 'scene-fade');
+    // The painter owns the fade layer's display INLINE, like the subtitle
+    // below: the stylesheet must not declare display for .scene-fade, or the
+    // reveal (setDisplay '') falls back to the class rule and the layer never
+    // shows. Resting 'none' keeps an idle HUD compositing nothing.
+    this.fadeEl.style.display = 'none';
     // Decorative layers: never announced, never hit-tested.
     for (const el of [this.barTop, this.barBottom, this.fadeEl]) {
       el.setAttribute('aria-hidden', 'true');

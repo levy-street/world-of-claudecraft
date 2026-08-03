@@ -6,6 +6,9 @@
 // with the right on/off state (the class lands on <body> because #nameplates and
 // the mobile controls are siblings of #ui, not descendants).
 
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { SceneOverlayModel } from '../src/ui/hud/scene/scene_overlay_view';
 import { SceneOverlayWindow } from '../src/ui/hud/scene/scene_overlay_window';
@@ -153,5 +156,37 @@ describe('SceneOverlayWindow: cinematic-mode class toggle (C0 HUD hide)', () => 
       (call) => call.m === 'setStyleProp' && call.args[0] === fade && call.args[1] === 'opacity',
     );
     expect(writes.map((call) => call.args[2])).toEqual(['0.000', '0.500']);
+  });
+
+  it('owns the fade layer display inline: hidden at rest, revealed while fading', () => {
+    const { window, calls } = makeWindow();
+    const fade = container.querySelector('.scene-fade') as HTMLElement;
+    // Resting state is an INLINE none set at construction, never a stylesheet
+    // rule: setDisplay('') clears the inline value to reveal, so a class-level
+    // display:none would win forever (the bug that shipped the voyage with no
+    // fades at all).
+    expect(fade.style.display).toBe('none');
+    window.paint(model({ fadeOpacity: 0.5 }));
+    const displays = calls.filter((call) => call.m === 'setDisplay' && call.args[0] === fade);
+    expect(displays.map((call) => call.args[1])).toEqual(['']);
+    window.paint(model({ fadeOpacity: 0 }));
+    const after = calls.filter((call) => call.m === 'setDisplay' && call.args[0] === fade);
+    expect(after.map((call) => call.args[1])).toEqual(['', 'none']);
+  });
+
+  it('the stylesheet never declares display for the painter-owned scene layers', () => {
+    // The reveal contract above only works if the class rules leave display
+    // alone. jsdom never loads the stylesheet, so pin the source directly.
+    const css = readFileSync(
+      path.join(path.dirname(fileURLToPath(import.meta.url)), '../src/styles/hud.css'),
+      'utf8',
+    );
+    const withoutComments = css.replace(/\/\*[^]*?\*\//g, '');
+    for (const selector of ['.scene-fade', '.scene-subtitle']) {
+      const start = withoutComments.indexOf(`${selector} {`);
+      expect(start, `${selector} rule present`).toBeGreaterThan(-1);
+      const body = withoutComments.slice(start, withoutComments.indexOf('}', start));
+      expect(body.includes('display:'), `${selector} must not declare display`).toBe(false);
+    }
   });
 });
