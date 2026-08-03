@@ -215,7 +215,7 @@ const MOUNT_RIGGED: ClipMap = {
 const DRAGONKIN_BROODLORD: ClipMap = {
   idle: 'Idle',
   walk: 'Walk',
-  run: 'Walk',
+  run: 'Run',
   attack: ['Attack'],
   attackByAbility: { brood_cleave: 'Cleave', brood_stun: 'Stun' },
   death: 'Death',
@@ -225,7 +225,7 @@ const DRAGONKIN_BROODLORD: ClipMap = {
 const DRAGONKIN_BROODGUARD: ClipMap = {
   idle: 'Idle',
   walk: 'Walk',
-  run: 'Walk',
+  run: 'Run',
   attack: ['Attack'],
   death: 'Death',
   flourish: 'Shout',
@@ -233,20 +233,24 @@ const DRAGONKIN_BROODGUARD: ClipMap = {
 const DRAGONKIN_WHELP: ClipMap = {
   idle: 'Idle',
   walk: 'Walk',
-  run: 'Walk',
+  run: 'Run',
   attack: ['JumpAttack'],
   death: 'Death',
   flourish: 'JumpAttack',
 };
-// Clipless two-state prop mobs (the dragonkin egg): every action() lookup
-// misses harmlessly (fadeTo null-guards), so the mesh just stands; state
-// changes are mesh-visibility swaps (VisualDef.corpseMeshSwap), not clips.
+// Clipless two-state prop mobs (the dragonkin egg): the GLB ships NO clips, so
+// every action() lookup misses harmlessly (fadeTo null-guards) and the mesh
+// just stands; state changes are mesh-visibility swaps
+// (VisualDef.corpseMeshSwap), not clips. Names the nominal 'Idle' throughout
+// and registers in CLIPLESS_RIGS (tests/character_clipmaps.test.ts), the same
+// contract mob_spider_egg_sac holds: that registration is what exempts a
+// clip-less prop from the per-clip and far-LOD bake guards.
 const STATIC_PROP: ClipMap = {
-  idle: '',
-  walk: '',
-  run: '',
-  attack: [],
-  death: '',
+  idle: 'Idle',
+  walk: 'Idle',
+  run: 'Idle',
+  attack: ['Idle'],
+  death: 'Idle',
 };
 
 // Custom baked wolf rig (wolf_basic/greyjaw, Dog_Animation donor skeleton): the
@@ -1247,13 +1251,35 @@ export const VISUALS: Record<string, VisualDef> = {
   // dragonevolved wyrm ONLY in the Drakelands (per-template MOB_KEYS
   // overrides below); the other dragonkin-family mobs keep the family
   // fallback above.
+  // The gait references below are MEASURED, not guessed
+  // (tmp/dragonkin_gait_measure.mjs): ref = the clip's own natural world
+  // speed, 2 x stride x normScale x entityScale / duration, which is exactly
+  // what locomotionTimeScale divides the body speed by. They are per-DEF and
+  // scale-dependent, which is why the matriarch has her own def below rather
+  // than sharing the broodlord's: at scale 2.85 her stride covers 33% more
+  // ground per cycle, and reusing the lord's refs over-strode her by 25%.
   mob_dragonkin_broodlord: {
     url: `${CREATURES}/dragonkin_elite.glb`,
     height: 2.6,
     clips: DRAGONKIN_BROODLORD,
-    // 'entity' tint: the broodlords wash dark scale-brown (template color)
-    // while Cindraleth shares this def gold (her 0xf0b040), so the matriarch
-    // reads as the gilded mother of the same brood.
+    // scale 2.25: walk 4.24 (wander 3.3 -> 0.78x), run 7.92 (chase 9.5 ->
+    // 1.20x). Both land inside the matcher's clamps, so the feet plant.
+    walkRef: 4.24,
+    runRef: 7.92,
+    // 'entity' tint: the broodlords wash dark scale-brown (template color).
+    tint: 'entity',
+    tintStrength: 0.12,
+  },
+  // Cindraleth: the same GLB and clips as her broodlords, own refs for her
+  // scale 2.85 body (walk 5.37, run 10.04 -> her 9.0 chase plays at 0.90x).
+  // Her template color (0xf0b040) tints this shared body gold, so she reads
+  // as the gilded mother of the same brood.
+  mob_dragonkin_matriarch: {
+    url: `${CREATURES}/dragonkin_elite.glb`,
+    height: 2.6,
+    clips: DRAGONKIN_BROODLORD,
+    walkRef: 5.37,
+    runRef: 10.04,
     tint: 'entity',
     tintStrength: 0.12,
   },
@@ -1261,6 +1287,10 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/dragonkin_mob.glb`,
     height: 2.2,
     clips: DRAGONKIN_BROODGUARD,
+    // scale 1.5: walk 2.15 (wander 2.98 -> 1.39x), run 5.59 (chase 8.5 ->
+    // 1.52x, a 0.55s sprint cadence). Feet plant at both speeds.
+    walkRef: 2.15,
+    runRef: 5.59,
     tint: 'entity',
     tintStrength: 0.1,
   },
@@ -1268,6 +1298,14 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/dragonkin_baby.glb`,
     height: 1.05,
     clips: DRAGONKIN_WHELP,
+    // scale 0.85: walk 0.54, run 1.87. A hatchling 0.9yd tall CANNOT
+    // foot-match a 10 yd/s chase (11 body-lengths/sec, gecko territory: the
+    // clip would need a 0.1s cycle), so this one keeps a residual slide by
+    // physics, not by oversight. The compressed 0.32s cycle reads as a
+    // frantic scurry, which is what hides it; the refs stay honest so the
+    // slow wander gait (and any future speed change) still matches.
+    walkRef: 0.54,
+    runRef: 1.87,
     tint: 'entity',
     tintStrength: 0.1,
   },
@@ -1734,7 +1772,7 @@ const MOB_KEYS: Record<string, string> = {
   // family fallback (the floating dragonevolved wyrm) stays for the sanctum,
   // temple, rift, and Galecrest dragonkin.
   drakemaw_broodlord: 'mob_dragonkin_broodlord',
-  cindraleth_maw_matriarch: 'mob_dragonkin_broodlord',
+  cindraleth_maw_matriarch: 'mob_dragonkin_matriarch',
   dragonkin_broodguard: 'mob_dragonkin_broodguard',
   dragonkin_whelp: 'mob_dragonkin_whelp',
   dragonkin_egg: 'mob_dragon_egg',

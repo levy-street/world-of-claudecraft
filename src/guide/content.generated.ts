@@ -10078,7 +10078,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   },
   "mob_dragon_egg": {
     "url": "models/creatures/dragon_egg.glb",
-    "idle": "",
+    "idle": "Idle",
     "height": 0.95,
     "tintStrength": 0.08
   },

@@ -5,21 +5,31 @@
       "out": "models/creatures/dragonkin_elite.glb",
       "type": "character",
       "maxTex": 512,
-      "keepClips": ["Idle", "Walk", "Attack", "Cleave", "FireBreath", "Shout", "Stun", "Death"]
+      "keepClips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Attack",
+        "Cleave",
+        "FireBreath",
+        "Shout",
+        "Stun",
+        "Death"
+      ]
     },
     {
       "src": "tmp/asset_src/Dragonkin_Mobs/built/dragonkin_mob.glb",
       "out": "models/creatures/dragonkin_mob.glb",
       "type": "character",
       "maxTex": 512,
-      "keepClips": ["Idle", "Walk", "Attack", "Shout", "Death"]
+      "keepClips": ["Idle", "Walk", "Run", "Attack", "Shout", "Death"]
     },
     {
       "src": "tmp/asset_src/Dragonkin_Mobs/built/dragonkin_baby.glb",
       "out": "models/creatures/dragonkin_baby.glb",
       "type": "character",
       "maxTex": 512,
-      "keepClips": ["Idle", "Walk", "JumpAttack", "Death"]
+      "keepClips": ["Idle", "Walk", "Run", "JumpAttack", "Death"]
     },
     {
       "src": "tmp/asset_src/Dragonkin_Mobs/built/dragon_egg.glb",
