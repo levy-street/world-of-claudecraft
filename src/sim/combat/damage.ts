@@ -30,6 +30,7 @@ import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
 import { lockNormalDungeonResetOnBossKill, spawnBossExitPortal } from '../instances/dungeons';
+import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { pvpDamageMultiplier } from '../pvp';
 import { resolveRespawnSeconds } from '../respawn_policy';
 import { aurasSurvivingDeath } from '../resurrection';
@@ -67,6 +68,7 @@ import {
   igniteOnCrit,
   PERSONAL_BARRIER_IDS,
 } from './fire_mage';
+import { questGateBlocksDamage } from './quest_damage_gate';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
@@ -126,6 +128,9 @@ export function dealDamage(
   aoe = false,
 ): number {
   if (target.dead) return 0;
+  // Quest-gated destructible (e.g. Broodmother eggs): only a player (or pet) whose
+  // owner has the gating quest active/ready may harm it; other hits are a no-op.
+  if (questGateBlocksDamage(ctx.players, source, target)) return 0;
   if (
     source?.kind === 'mob' &&
     source.ownerId !== null &&
@@ -1374,6 +1379,8 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
         if (xpGain > 0) grantXp(ctx, xpGain, member, { fromKill: true });
         ctx.onMobKilledForQuests(e, member);
       }
+      // A destroyed Broodmother egg may hatch a widow that swarms the killer.
+      if (e.templateId === 'spider_egg' && killer) spawnWidowHatchlingOnEggDeath(ctx, e, killer);
       // World bosses use PERSONAL loot for every contributor (rolled below from the
       // hate-table snapshot), not the tapper/party shared-corpse roll. Rares pass
       // their own damage-contributor snapshot (rareContribs) so rollLoot's guaranteed

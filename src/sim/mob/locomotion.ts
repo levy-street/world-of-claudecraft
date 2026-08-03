@@ -109,6 +109,11 @@ const NYTHRAXIS_HEROIC_ADD_IDS = new Set([
 ]);
 
 export function updateMob(ctx: SimContext, mob: Entity): void {
+  // Summoned quest add (widow hatchling): cancel its out-of-combat despawn while it
+  // is fighting; resetEvadingMob (re)starts the countdown when it leashes home.
+  if (mob.leashDespawnSecs !== undefined && !mob.dead && mob.inCombat) {
+    mob.despawnTimer = undefined;
+  }
   if (mob.dead) {
     ctx.onBossDeath(mob);
     if (mob.ownerId !== null && MOBS[mob.templateId]?.family !== 'demon') return;
@@ -1021,6 +1026,9 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.hp = mob.maxHp;
   mob.auras = [];
   mob.inCombat = false;
+  // A summoned quest add starts its out-of-combat despawn countdown the moment it
+  // leashes home (the player ran off); updateMob cancels it if the add re-engages.
+  if (mob.leashDespawnSecs !== undefined) mob.despawnTimer = mob.leashDespawnSecs;
   mob.tappedById = null;
   mob.leashAnchor = null;
   mob.evadeStall = 0;
