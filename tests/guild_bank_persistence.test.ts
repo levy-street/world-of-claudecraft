@@ -1403,6 +1403,34 @@ describe('the guild_create fee gate + the create/disband hooks', () => {
     );
   });
 
+  it('the SHUTDOWN flush retries whoever is still dirty, so a stall resolves', async () => {
+    // A stalled escrow replay resolves on the session's NEXT save, and at
+    // shutdown there is otherwise no next save: the residue would go durable
+    // unrecorded. One extra pass over whoever is still dirty is enough, because
+    // the first pass made every other session's work durable.
+    const server = new GameServer();
+    const a = joinServer(server, 1, 'ConsumerA').session;
+    const b = joinServer(server, 2, 'DepositorB').session;
+    officerSetup(server, a, 0);
+    moveToBanker(server, b.pid);
+    server.sim.setPlayerGuildMembership(b.pid, { guildId: GUILD_ID, rank: 'officer' });
+    const bMeta = server.sim.players.get(b.pid);
+    if (!bMeta) throw new Error('missing meta');
+    bMeta.copper = 500_000;
+    // B deposits (live only) and A consumes it. A saves FIRST at shutdown, so
+    // A's withdraw meets a durable book that has not seen B's deposit yet.
+    dispatch(server, b, { cmd: 'guild_bank_deposit_gold', amount: 40_000 });
+    server.sim.setPlayerGuildMembership(a.pid, { guildId: GUILD_ID, rank: 'officer' });
+    dispatch(server, a, { cmd: 'guild_bank_withdraw_gold', amount: 40_000 });
+    await server.saveAll('shutdown');
+    // Both halves converged: nothing was left stalled, nothing was dropped.
+    expect(durableBook()).toEqual({ treasury: 0, inventory: [], purchasedSlots: 24 });
+    expect(a.dirtyGuildBanks.size).toBe(0);
+    expect(b.dirtyGuildBanks.size).toBe(0);
+    expect(durableChars.get(1)?.copper).toBe(540_000);
+    expect(durableChars.get(2)?.copper).toBe(460_000);
+  });
+
   it('a give-up keeps the REST of the carried batch marked settled', async () => {
     // Giving up drops only the delta that cannot land, never the work queued
     // behind it. Everything behind it still has a DURABLE character half, so

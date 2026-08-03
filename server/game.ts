@@ -3914,6 +3914,21 @@ export class GameServer {
       }
     };
     await Promise.all(Array.from({ length: Math.min(SAVE_CONCURRENCY, sessions.length) }, worker));
+    // SHUTDOWN gets a second pass over whoever is still dirty. A guild book
+    // whose escrow replay stalled on another officer's not-yet-durable work
+    // keeps its mark and resolves on the session's NEXT save, and at shutdown
+    // there is otherwise no next save: the residue would go durable unrecorded
+    // and heal only if the realm came back with both officers online. One
+    // extra pass is enough because the first pass made every other session's
+    // work durable. The 30 s autosave sweep does not need it (its next tick is
+    // the retry) and must not pay for it.
+    if (reason !== 'shutdown') return;
+    const stillDirty = sessions.filter((s) => s.dirtyGuildBanks.size > 0);
+    for (const session of stillDirty) {
+      await this.saveCharacter(session).catch((err) =>
+        console.error(`${reason} retry failed for ${session.name}:`, err),
+      );
+    }
   }
 
   // The World Market is shared global state, persisted as a single JSONB blob.
