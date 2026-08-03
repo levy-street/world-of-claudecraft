@@ -4,6 +4,7 @@ import {
   blockRows,
   friendRows,
   type GuildRosterItem,
+  guildDisplayedRole,
   guildRosterItems,
   guildView,
   ignoreRows,
@@ -286,6 +287,42 @@ describe('tenureTier', () => {
 
   it('shows no badge when joinedAt is unknown', () => {
     expect(tenureTier(null, NOW)).toBeNull();
+  });
+});
+
+describe('guildDisplayedRole (the one role chip per roster row)', () => {
+  const DAY = 24 * 60 * 60 * 1000;
+  const NOW = Date.UTC(2026, 7, 1); // any fixed clock; the helpers are pure
+  const roleAt = (rank: string, joinedAgoMs: number | null) =>
+    guildDisplayedRole(rank, tenureTier(joinedAgoMs === null ? null : NOW - joinedAgoMs, NOW));
+
+  it('a member shows the tenure tier AS the role across the locked boundaries', () => {
+    expect(roleAt('member', 13 * DAY + 23 * 60 * 60 * 1000)).toBe('new'); // 13d23h
+    expect(roleAt('member', 14 * DAY)).toBe('member'); // exactly 14d drops New
+    expect(roleAt('member', 89 * DAY)).toBe('member');
+    expect(roleAt('member', 90 * DAY)).toBe('veteran'); // exactly 90d gains Veteran
+  });
+
+  it('a member with an unknown joinedAt shows the plain member role', () => {
+    expect(roleAt('member', null)).toBe('member');
+    expect(guildDisplayedRole('member', null)).toBe('member');
+  });
+
+  it('officers and the leader pass their rank through and NEVER a tenure role', () => {
+    // Regression teeth: an officer/leader must keep the rank label even when
+    // their tenure would resolve to a tier (fresh recruit or long veteran).
+    for (const rank of ['leader', 'officer'] as const) {
+      expect(roleAt(rank, 3 * DAY)).toBe(rank);
+      expect(roleAt(rank, 400 * DAY)).toBe(rank);
+      expect(roleAt(rank, null)).toBe(rank);
+      expect(guildDisplayedRole(rank, 'new')).toBe(rank);
+      expect(guildDisplayedRole(rank, 'veteran')).toBe(rank);
+    }
+  });
+
+  it('an unrecognized rank falls back to the member arm (rankLabel parity)', () => {
+    expect(guildDisplayedRole('somefuturerank', 'new')).toBe('new');
+    expect(guildDisplayedRole('somefuturerank', null)).toBe('member');
   });
 });
 

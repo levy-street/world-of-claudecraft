@@ -196,12 +196,13 @@ export type TenureTier = 'new' | 'veteran';
 /**
  * Guild-roster tenure tier from the member's joinedAt (epoch ms) and the
  * caller's clock: under 14 days is 'new', 90 days or more is 'veteran', in
- * between (and unknown joinedAt) is no badge. A joinedAt in the future (clock
- * skew) lands in the 'new' arm by construction. Returns a keyed tier, never
- * display text: the painter localizes. Cosmetic-only by design: the tier is
- * derived from the viewer's own clock and only styles the viewer's roster,
- * so it must never gate a permission or any gameplay outcome; if tenure ever
- * becomes gameplay-relevant, compute it server-side first.
+ * between (and unknown joinedAt) is no tier (guildDisplayedRole renders the
+ * plain member role then). A joinedAt in the future (clock skew) lands in the
+ * 'new' arm by construction. Returns a keyed tier, never display text: the
+ * painter localizes. Cosmetic-only by design: the tier is derived from the
+ * viewer's own clock and only styles the viewer's roster, so it must never
+ * gate a permission or any gameplay outcome; if tenure ever becomes
+ * gameplay-relevant, compute it server-side first.
  */
 export function tenureTier(joinedAt: number | null, now: number): TenureTier | null {
   if (joinedAt === null) return null;
@@ -209,6 +210,25 @@ export function tenureTier(joinedAt: number | null, now: number): TenureTier | n
   if (tenureMs < TENURE_NEW_MS) return 'new';
   if (tenureMs >= TENURE_VETERAN_MS) return 'veteran';
   return null;
+}
+
+/** The one keyed role label a guild-roster row displays: a rank for officers
+ *  and the leader, a tenure-derived role for everyone else. */
+export type GuildDisplayedRole = 'leader' | 'officer' | 'member' | 'new' | 'veteran';
+
+/**
+ * Resolve the ONE role chip a guild-roster row shows (one chip per row, by
+ * design): officers and the leader display their rank label exactly as
+ * before and never a tenure label; a regular member displays the tenure tier
+ * AS the role ('new' under 14 days, 'veteran' at 90 days or more) and the
+ * plain 'member' role in between or when joinedAt is unknown (a null tier).
+ * DISPLAY-ONLY: the underlying rank, every permission computation, and the
+ * roster sort are untouched; this only picks the chip's keyed label, which
+ * the painter localizes.
+ */
+export function guildDisplayedRole(rank: string, tier: TenureTier | null): GuildDisplayedRole {
+  if (rank === 'leader' || rank === 'officer') return rank;
+  return tier ?? 'member';
 }
 
 export type GuildRosterGroup = 'online' | 'offline';

@@ -7477,12 +7477,14 @@
     margin-left: 4px;
     text-decoration: none;
   }
-  /* Guild-roster tenure chip (New under 14 days, Veteran at 90+): shares the
-     .rank chip metrics and sits between the rank chip and the deed title
-     inside the ellipsized .soc-name cell. Tinted with the PANEL-AWARE text
+  /* Guild-roster tenure-tier role chip: a member's ONE role chip shows the
+     tenure tier AS the role (New under 14 days, Veteran at 90+; the plain
+     member role, and every officer/leader rank chip, keeps the accent-gold
+     .rank tint above). Shares the .rank chip metrics inside the ellipsized
+     .soc-name cell, before the deed title. Tinted with the PANEL-AWARE text
      tokens (theme.ts runs both through ensureReadable per preset), never the
      raw accent or a static green: New pops as body text, Veteran sits muted,
-     and both read apart from the accent-gold rank chip on every preset. The
+     and both read apart from the accent-gold rank chips on every preset. The
      tiers stay distinguishable by their text alone (forced-colors safe).
      The compound .rank.soc-tenure-* selector out-specifies the .soc-name
      .rank tint by design (never a source-order tie): reordering the file

@@ -34,15 +34,16 @@ import { localizeZone } from './server_i18n';
 import {
   blockRows,
   friendRows,
+  type GuildDisplayedRole,
   type GuildRow,
   type GuildView,
+  guildDisplayedRole,
   guildRosterItems,
   guildView,
   ignoreRows,
   raidView,
   type SocialTab,
   socialStructSig,
-  type TenureTier,
   tenureTier,
 } from './social_view';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
@@ -123,10 +124,13 @@ function rankLabel(rank: string): string {
       : t('hud.social.ranks.member');
 }
 
-// Tenure badge text for a keyed tier from the pure core (tenureTier); the
-// mapping mirrors rankLabel so the core stays i18n-free.
-function tenureLabel(tier: TenureTier): string {
-  return tier === 'new' ? t('hud.social.tenure.new') : t('hud.social.tenure.veteran');
+// Displayed-role chip text for a keyed role from the pure core
+// (guildDisplayedRole): the two tenure tiers get their tier labels, every
+// rank role maps through rankLabel, so the core stays i18n-free.
+function roleLabel(role: GuildDisplayedRole): string {
+  if (role === 'new') return t('hud.social.tenure.new');
+  if (role === 'veteran') return t('hud.social.tenure.veteran');
+  return rankLabel(role);
 }
 
 /** One guild-roster row. A stateless string builder (module-level, exported so
@@ -146,18 +150,19 @@ export function guildMemberRowHtml(m: GuildRow, now: number): string {
   // name; the ellipsized .soc-name cell trims the title tail first.
   const memberTitle = m.activeTitle ? deedTitleText(m.activeTitle) : '';
   const memberTitleSpan = memberTitle ? `<span class="soc-title">${esc(memberTitle)}</span>` : '';
-  // Tenure badge (New under 14 days, Veteran at 90+): always-visible chip
-  // text (never hover-only), between the rank chip and the deed title. The
-  // client clock is fine here (ui code, not sim). Known cosmetic quirk, by
-  // design: the repaint gate keys on socialInfo content, not the clock, so a
-  // member crossing a threshold while the panel sits open keeps the old
-  // badge until the next social frame or reopen (a wall-clock driver would
+  // The ONE role chip per row: officers and the leader show their rank label
+  // (never a tenure label); a regular member shows the tenure tier AS the
+  // role (New under 14 days, Veteran at 90+, Member in between or with an
+  // unknown joinedAt). Always-visible chip text (never hover-only), before
+  // the deed title; display-only (rank, permissions, and sort untouched).
+  // The client clock is fine here (ui code, not sim). Known cosmetic quirk,
+  // by design: the repaint gate keys on socialInfo content, not the clock,
+  // so a member crossing a threshold while the panel sits open keeps the old
+  // label until the next social frame or reopen (a wall-clock driver would
   // break the cold-window "no repeating driver" contract).
-  const tier = tenureTier(m.joinedAt, now);
-  const tenureSpan = tier
-    ? `<span class="rank soc-tenure-${tier}">${esc(tenureLabel(tier))}</span>`
-    : '';
-  const nameInner = `${esc(m.name)}<span class="rank">${esc(rankLabel(m.rank))}</span>${tenureSpan}${memberTitleSpan}`;
+  const role = guildDisplayedRole(m.rank, tenureTier(m.joinedAt, now));
+  const roleClass = role === 'new' || role === 'veteran' ? ` soc-tenure-${role}` : '';
+  const nameInner = `${esc(m.name)}<span class="rank${roleClass}">${esc(roleLabel(role))}</span>${memberTitleSpan}`;
   const name =
     m.online && !m.self
       ? `<button type="button" class="soc-name soc-link" data-whisper="${esc(m.name)}" title="${esc(t('hud.social.whisperTitle', { name: m.name }))}">${nameInner}</button>`
