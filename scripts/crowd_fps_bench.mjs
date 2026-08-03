@@ -12,15 +12,23 @@
 //   npm run dev                             # :5173 (proxies /api,/ws -> :8787)
 //   node scripts/crowd_fps_bench.mjs
 //
-// Env: CROWD_BATCHES=10,20,30,40 (cumulative crowd sizes), CROWD_W/H, CROWD_DPR,
+// Exact 40-player PR evidence run (replace both SHAs with `git rev-parse`
+// output, and keep the raw text plus JSON files):
+//   CROWD_BASE_SHA=<base-sha> CROWD_HEAD_SHA=<head-sha> CROWD_BATCHES=40 \
+//   CROWD_OUT=tmp/crowd-40.txt CROWD_JSON_OUT=tmp/crowd-40.json npm run perf:crowd
+//
+// Env: CROWD_BATCHES=10,20,35,50 (cumulative crowd sizes), CROWD_W/H, CROWD_DPR,
 //      CROWD_SETTLE_MS, GAME_URL, SERVER_URL, BROWSER_PATH, CROWD_MIN_FPS (per-sample
-//      fps floor, unset = no floor), CROWD_JSON_OUT (evidence JSON path).
+//      fps floor, unset = no floor), CROWD_JSON_OUT (evidence JSON path),
+//      CROWD_BASE_SHA and CROWD_HEAD_SHA (the compared revisions recorded in evidence).
 //
 // This is a GATE, not just a probe (scripts/lib/bench_gate.mjs): every crowd batch
 // must join EXACTLY (actual sockets, bots.length, never attempts; partial joins fail,
 // with no escape hatch: lower CROWD_BATCHES for exploratory runs), a missing or
 // non-finite metric fails as missing evidence, and the verdict drives the exit code.
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import puppeteer from 'puppeteer-core';
 import WebSocket from 'ws';
@@ -52,6 +60,23 @@ const SETTLE_MS = Number(process.env.CROWD_SETTLE_MS ?? 3500);
 const CLUSTER_R = Number(process.env.CROWD_R ?? 9);
 const MIN_FPS = parseCeilingEnv('CROWD_MIN_FPS', process.env.CROWD_MIN_FPS);
 const JSON_OUT = process.env.CROWD_JSON_OUT ?? 'tmp/crowd-fps-latest.json';
+const checkedOutHeadSha = gitOutput(['rev-parse', 'HEAD']);
+const evidenceHeadSha = process.env.CROWD_HEAD_SHA?.trim() || checkedOutHeadSha;
+const evidenceBaseSha = process.env.CROWD_BASE_SHA?.trim() || null;
+
+if (process.env.CROWD_HEAD_SHA && evidenceHeadSha !== checkedOutHeadSha) {
+  throw new Error(
+    `CROWD_HEAD_SHA=${evidenceHeadSha} does not match checked-out HEAD ${checkedOutHeadSha}`,
+  );
+}
+
+function gitOutput(args) {
+  try {
+    return execFileSync('git', args, { encoding: 'utf8' }).trim();
+  } catch {
+    return null;
+  }
+}
 
 const CLASSES = [
   'warrior',
@@ -309,6 +334,37 @@ async function main() {
   });
   const bots = [];
   const results = [];
+  const evidence = {
+    provenance: {
+      baseSha: evidenceBaseSha,
+      headSha: evidenceHeadSha,
+      checkedOutHeadSha,
+      command: 'npm run perf:crowd',
+    },
+    environment: {
+      batches: BATCHES,
+      viewport: { width: W, height: H, dpr: DPR },
+      settleMs: SETTLE_MS,
+      clusterRadius: CLUSTER_R,
+      gameUrl: GAME_URL,
+      serverUrl: SERVER,
+      headed: true,
+      vsync: false,
+    },
+    hardware: {
+      platform: os.platform(),
+      release: os.release(),
+      arch: os.arch(),
+      cpu: os.cpus()[0]?.model ?? null,
+      logicalCpus: os.cpus().length,
+      totalMemoryBytes: os.totalmem(),
+    },
+    browser: {
+      product: await browser.version(),
+      userAgent: await browser.userAgent(),
+      executablePath: BROWSER_PATH,
+    },
+  };
   try {
     const page = await browser.newPage();
     await page.setViewport({ width: W, height: H, deviceScaleFactor: DPR });
@@ -388,7 +444,7 @@ async function main() {
     fs.mkdirSync(path.dirname(JSON_OUT) || '.', { recursive: true });
     fs.writeFileSync(
       JSON_OUT,
-      `${JSON.stringify({ batches: BATCHES, minFps: MIN_FPS, results, verdict }, null, 2)}\n`,
+      `${JSON.stringify({ evidence, minFps: MIN_FPS, results, verdict }, null, 2)}\n`,
     );
     console.log(`wrote ${JSON_OUT}`);
     process.exitCode = verdict.ok ? 0 : 1;

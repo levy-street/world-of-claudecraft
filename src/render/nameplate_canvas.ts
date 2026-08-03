@@ -85,7 +85,16 @@ export const NAMEPLATE_BASE_WIDTH = 80;
 export const NAMEPLATE_BOSS_WIDTH = 100;
 export const NAMEPLATE_MARKER_ROW_HEIGHT = 26;
 export const NAMEPLATE_MAX_PIXEL_RATIO = 2;
-export const NAMEPLATE_TEXT_SPRITE_LIMIT = 1536;
+// Nameplate labels scale their backing stores with DPR. The count remains a
+// secondary guard, while the 16 MiB RGBA budget is the hard memory ceiling.
+// At DPR 2 a representative 126x43 logical label retains about 85 KiB, so the
+// byte budget holds roughly 190 such labels rather than the old 129 MiB worst
+// case from a 1536-entry count alone.
+export const NAMEPLATE_TEXT_SPRITE_LIMIT = 512;
+export const NAMEPLATE_TEXT_SPRITE_BUDGET_BYTES = 16 * 1024 * 1024;
+export const NAMEPLATE_IMAGE_CACHE_LIMIT = 160;
+export const NAMEPLATE_IMAGE_RETRY_BASE_FRAMES = 30;
+const NAMEPLATE_IMAGE_RETRY_MAX_FRAMES = 600;
 
 const TITLE_FONT = 'Cinzel, Georgia, serif';
 const NAME_STYLE: TextSpriteStyle = {
@@ -158,7 +167,8 @@ const EMOTE_STYLE: TextSpriteStyle = {
 interface CachedImage {
   image: HTMLImageElement;
   status: 'loading' | 'ready' | 'failed';
-  lastFrame: number;
+  failures: number;
+  retryFrame: number;
 }
 
 class NameplateImageCache {
@@ -167,32 +177,61 @@ class NameplateImageCache {
 
   beginFrame(): void {
     this.frame++;
-    if (this.entries.size <= 160) return;
-    for (const [key, entry] of this.entries) {
-      if (this.entries.size <= 128) break;
-      if (entry.lastFrame < this.frame - 2) this.entries.delete(key);
-    }
   }
 
   get(url: string): HTMLImageElement | null {
     if (!url) return null;
     let entry = this.entries.get(url);
     if (!entry) {
-      const image = document.createElement('img');
-      entry = { image, status: 'loading', lastFrame: this.frame };
-      image.addEventListener('load', () => {
-        if (entry) entry.status = 'ready';
-      });
-      image.addEventListener('error', () => {
-        if (entry) entry.status = 'failed';
-      });
-      image.referrerPolicy = 'no-referrer';
-      image.src = url;
-      if (image.complete && image.naturalWidth > 0) entry.status = 'ready';
+      entry = this.load(url, 0);
+      this.entries.set(url, entry);
+      this.trim();
+    } else if (entry.status === 'failed' && this.frame >= entry.retryFrame) {
+      entry = this.load(url, entry.failures);
       this.entries.set(url, entry);
     }
-    entry.lastFrame = this.frame;
+    // Map insertion order is the LRU order. Every hit moves to the back, so a
+    // live working set above the cap evicts the least recently used URL even
+    // when every entry was touched in this frame.
+    this.entries.delete(url);
+    this.entries.set(url, entry);
     return entry.status === 'ready' ? entry.image : null;
+  }
+
+  private load(url: string, failures: number): CachedImage {
+    const image = document.createElement('img');
+    const entry: CachedImage = {
+      image,
+      status: 'loading',
+      failures,
+      retryFrame: this.frame,
+    };
+    image.addEventListener('load', () => {
+      if (this.entries.get(url) !== entry) return;
+      entry.status = 'ready';
+      entry.failures = 0;
+    });
+    image.addEventListener('error', () => {
+      if (this.entries.get(url) !== entry) return;
+      entry.status = 'failed';
+      entry.failures++;
+      const delay = Math.min(
+        NAMEPLATE_IMAGE_RETRY_MAX_FRAMES,
+        NAMEPLATE_IMAGE_RETRY_BASE_FRAMES * 2 ** Math.min(5, entry.failures - 1),
+      );
+      entry.retryFrame = this.frame + delay;
+    });
+    image.referrerPolicy = 'no-referrer';
+    image.src = url;
+    if (image.complete && image.naturalWidth > 0) entry.status = 'ready';
+    return entry;
+  }
+
+  private trim(): void {
+    for (const key of this.entries.keys()) {
+      if (this.entries.size <= NAMEPLATE_IMAGE_CACHE_LIMIT) return;
+      this.entries.delete(key);
+    }
   }
 }
 
@@ -221,7 +260,10 @@ function roundedRect(
 export class NameplateCanvasSurface {
   readonly canvas: HTMLCanvasElement;
   private readonly ctx: CanvasRenderingContext2D;
-  private readonly text = new TextSpriteCache(NAMEPLATE_TEXT_SPRITE_LIMIT);
+  private readonly text = new TextSpriteCache(
+    NAMEPLATE_TEXT_SPRITE_LIMIT,
+    NAMEPLATE_TEXT_SPRITE_BUDGET_BYTES,
+  );
   private readonly images = new NameplateImageCache();
   private readonly forcedColorsMql: MediaQueryList | null;
   private readonly nameStyle: TextSpriteStyle = { ...NAME_STYLE };

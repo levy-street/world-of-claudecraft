@@ -21,14 +21,12 @@
 // the box has to come from measureText rather than a constant, and the live set
 // has to be bounded and evicted because ally names are player-supplied.
 //
-// THE BOUND AND ITS EVICTION. `beginRedraw` trims the cache back to
-// TEXT_SPRITE_LIMIT in least-recently-used order; a draw during a redraw never
-// evicts. So the cache holds at most TEXT_SPRITE_LIMIT sprites at every redraw
-// boundary, plus whatever that one redraw asked for. That ordering is the whole
-// point: trimming mid-redraw would let a label-heavy redraw evict the sprites it
-// is still drawing and re-rasterize every one of them, every redraw, which is
-// worse than the fillText it replaced. Overshoot is reclaimed by the next
-// `beginRedraw`.
+// THE BOUND AND ITS EVICTION. The default map-label cache uses a redraw-boundary
+// count trim because its known working set fits under TEXT_SPRITE_LIMIT. A
+// caller with DPR-scaled, open-ended labels can also pass a hard backing-store
+// byte budget. That mode evicts least-recently-used sprites immediately after a
+// miss, so neither the count nor RGBA backing bytes can overshoot between
+// redraws. A one-off sprite larger than the budget is drawn but not retained.
 //
 // DOM: needs `document.createElement('canvas')`, so this is a painter-side
 // helper, not a pure core. It stays host-agnostic otherwise (no window, no
@@ -59,6 +57,7 @@ interface TextSprite {
   width: number;
   height: number;
   advance: number;
+  bytes: number;
 }
 
 /** Ink extents around the anchor, in px: `left`/`right` along the baseline,
@@ -150,12 +149,25 @@ export class TextSpriteCache {
   // live key is always the front of the iteration.
   private readonly sprites = new Map<string, TextSprite>();
   private pixelRatio = 1;
+  private cachedBytes = 0;
+  private readonly spriteLimit: number;
+  private readonly hardByteLimit: number;
 
-  constructor(private readonly spriteLimit = TEXT_SPRITE_LIMIT) {}
+  constructor(spriteLimit = TEXT_SPRITE_LIMIT, hardByteLimit = Number.POSITIVE_INFINITY) {
+    this.spriteLimit = Math.max(1, Math.floor(spriteLimit));
+    this.hardByteLimit = Number.isFinite(hardByteLimit)
+      ? Math.max(0, Math.floor(hardByteLimit))
+      : Number.POSITIVE_INFINITY;
+  }
 
   /** Live sprite count. */
   get size(): number {
     return this.sprites.size;
+  }
+
+  /** RGBA backing-store bytes retained by live sprites. */
+  get bytes(): number {
+    return this.cachedBytes;
   }
 
   /** Drop every sprite. The caller owns the reason: the map painter calls this on
@@ -163,6 +175,7 @@ export class TextSpriteCache {
    *  rasters would otherwise sit in the budget until LRU worked them out. */
   clear(): void {
     this.sprites.clear();
+    this.cachedBytes = 0;
   }
 
   /** Rasterize future sprites at the destination backing-store density. Existing
@@ -180,7 +193,7 @@ export class TextSpriteCache {
   beginRedraw(): void {
     for (const key of this.sprites.keys()) {
       if (this.sprites.size <= this.spriteLimit) return;
-      this.sprites.delete(key);
+      this.deleteSprite(key);
     }
   }
 
@@ -250,8 +263,26 @@ export class TextSpriteCache {
     // canvas ignores, so the sprite would freeze in the default black. Draw it
     // this redraw (exactly what the inline fillText did on that frame) but never
     // cache it.
-    if (style.fill !== '' && style.stroke !== '') this.sprites.set(key, sprite);
+    if (style.fill !== '' && style.stroke !== '') {
+      this.sprites.set(key, sprite);
+      this.cachedBytes += sprite.bytes;
+      if (Number.isFinite(this.hardByteLimit)) this.trimHardBudget();
+    }
     return sprite;
+  }
+
+  private trimHardBudget(): void {
+    for (const key of this.sprites.keys()) {
+      if (this.sprites.size <= this.spriteLimit && this.cachedBytes <= this.hardByteLimit) return;
+      this.deleteSprite(key);
+    }
+  }
+
+  private deleteSprite(key: string): void {
+    const sprite = this.sprites.get(key);
+    if (!sprite) return;
+    this.cachedBytes -= sprite.bytes;
+    this.sprites.delete(key);
   }
 }
 
@@ -309,7 +340,15 @@ function rasterize(text: string, style: TextSpriteStyle, pixelRatio: number): Te
   }
   ctx.fillStyle = style.fill;
   ctx.fillText(text, originX, originY);
-  return { canvas, originX, originY, width, height, advance: ink.advance };
+  return {
+    canvas,
+    originX,
+    originY,
+    width,
+    height,
+    advance: ink.advance,
+    bytes: canvas.width * canvas.height * 4,
+  };
 }
 
 // Ink extents around the anchor the sprite is drawn on. TWO rules keep a sprite

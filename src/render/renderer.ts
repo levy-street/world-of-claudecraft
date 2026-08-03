@@ -8788,8 +8788,8 @@ export class Renderer {
         recklessSkullsSpawned,
       );
       const spawnRecklessnessSkulls = nextRecklessSkullsLatch && !recklessSkullsSpawned;
+      this.abilityVfx.syncEntity(e, runCharacterPresentation);
       if (runCharacterPresentation) {
-        this.abilityVfx.syncEntity(e);
         if (st.casting) {
           this.vfx.castSparkle(
             e.id,

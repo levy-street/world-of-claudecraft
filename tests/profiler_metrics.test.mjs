@@ -174,4 +174,18 @@ describe('nameplate profiler presentation', () => {
     );
     expect(crowdBenchSource).toContain(['npMs=$', '{f(s.nameplatesMs, 5)}'].join(''));
   });
+
+  it('records reproducible crowd benchmark provenance with the real default curve', () => {
+    expect(crowdBenchSource).toContain(
+      "const BATCHES = (process.env.CROWD_BATCHES ?? '10,20,35,50')",
+    );
+    expect(crowdBenchSource).toContain('CROWD_BASE_SHA=<base-sha> CROWD_HEAD_SHA=<head-sha>');
+    expect(crowdBenchSource).toContain('baseSha: evidenceBaseSha');
+    expect(crowdBenchSource).toContain('headSha: evidenceHeadSha');
+    expect(crowdBenchSource).toContain('cpu: os.cpus()[0]?.model ?? null');
+    expect(crowdBenchSource).toContain('product: await browser.version()');
+    expect(profileSource).toContain(
+      'node scripts/profile.mjs crowd --crowd 40 --tier ultra --dpr 1 --ms 4000',
+    );
+  });
 });

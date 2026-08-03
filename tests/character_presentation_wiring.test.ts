@@ -43,7 +43,7 @@ describe('character presentation sleep wiring', () => {
     expect(renderer).toContain('v.recklessSkullsSpawned = nextRecklessSkullsLatch;');
   });
 
-  it('keeps mount particles and continuous ability FX inside the same gate', () => {
+  it('sleeps ability VFX semantically while mount particles remain presentation-gated', () => {
     const mountStart = renderer.indexOf('if (v.mountVisual && mountSpec && mountShown) {');
     const abilityStart = renderer.indexOf('// per-ability windup orb + buff-orbit bands');
     expect(mountStart).toBeGreaterThan(-1);
@@ -54,7 +54,8 @@ describe('character presentation sleep wiring', () => {
     expect(mountBlock).toContain('this.vfx.mountSlimeTrail');
     expect(mountBlock).toContain('this.vfx.mountExhaust');
     expect(renderer.slice(abilityStart)).toContain(
-      'if (runCharacterPresentation) {\n        this.abilityVfx.syncEntity(e);',
+      'this.abilityVfx.syncEntity(e, runCharacterPresentation);',
     );
+    expect(renderer.slice(abilityStart)).toContain('if (runCharacterPresentation) {');
   });
 });

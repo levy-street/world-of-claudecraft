@@ -23,6 +23,10 @@
 //   --compare baseline.json        diff this run against a saved baseline
 //   --label tag                    label the run
 //   BROWSER_PATH=/path/to/chrome   browser binary
+//
+// Exact one-off 40-player sample used alongside the curve gate above:
+//   node scripts/profile.mjs crowd --crowd 40 --tier ultra --dpr 1 --ms 4000 \
+//     --label pr-2789-head --out tmp/profile-crowd-40-head.json
 import fs from 'node:fs';
 import path from 'node:path';
 import { Profiler } from './profiler/harness.mjs';

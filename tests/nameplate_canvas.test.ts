@@ -3,6 +3,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   createNameplateCanvasState,
+  NAMEPLATE_IMAGE_CACHE_LIMIT,
+  NAMEPLATE_IMAGE_RETRY_BASE_FRAMES,
+  NAMEPLATE_TEXT_SPRITE_BUDGET_BYTES,
   NAMEPLATE_TEXT_SPRITE_LIMIT,
   NameplateCanvasSurface,
 } from '../src/render/nameplate_canvas';
@@ -214,8 +217,30 @@ describe('nameplate canvas surface', () => {
     expect(traces.reduce((sum, trace) => sum + trace.fillText.mock.calls.length, 0)).toBe(2);
   });
 
+  it('keeps the high-DPR text working set inside a hard backing-store byte budget', () => {
+    expect(NAMEPLATE_TEXT_SPRITE_BUDGET_BYTES).toBe(16 * 1024 * 1024);
+    expect(NAMEPLATE_TEXT_SPRITE_LIMIT).toBe(512);
+    const parent = document.createElement('div');
+    const surface = new NameplateCanvasSurface(parent);
+    const states = Array.from({ length: NAMEPLATE_TEXT_SPRITE_LIMIT + 40 }, (_, index) => {
+      const state = createNameplateCanvasState();
+      state.initialized = true;
+      state.name = `Retina Crowd Hero ${String(index).padStart(4, '0')}`;
+      return state;
+    });
+
+    surface.beginFrame(1280, 720, 2);
+    for (let index = 0; index < states.length; index++) {
+      surface.drawBase(states[index], index, 360);
+    }
+
+    const cachedBytes = (surface as unknown as { text: { bytes: number } }).text.bytes;
+    const cachedCount = (surface as unknown as { text: { size: number } }).text.size;
+    expect(cachedBytes).toBeLessThanOrEqual(NAMEPLATE_TEXT_SPRITE_BUDGET_BYTES);
+    expect(cachedCount).toBeLessThan(states.length);
+  });
+
   it('keeps more than 384 distinct crowd labels resident between frames', () => {
-    expect(NAMEPLATE_TEXT_SPRITE_LIMIT).toBe(1536);
     const parent = document.createElement('div');
     const surface = new NameplateCanvasSurface(parent);
     const states = Array.from({ length: 500 }, (_, index) => {
@@ -245,6 +270,136 @@ describe('nameplate canvas surface', () => {
 
     expect(firstRasterCount).toBe(500);
     expect(secondRasterCount).toBe(firstRasterCount);
+  });
+
+  it('retries a transient image failure, then draws the loaded replacement', () => {
+    expect(NAMEPLATE_IMAGE_RETRY_BASE_FRAMES).toBe(30);
+    const createElement = vi.spyOn(document, 'createElement');
+    const images = (): HTMLImageElement[] =>
+      createElement.mock.results
+        .map((result) => result.value)
+        .filter((element): element is HTMLImageElement => element instanceof HTMLImageElement);
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = createNameplateCanvasState();
+    state.badges = [{ url: '/transient-avatar.webp', size: 24 }];
+
+    surface.beginFrame(320, 180, 1);
+    surface.drawBase(state, 160, 90);
+    expect(images()).toHaveLength(1);
+    images()[0].dispatchEvent(new Event('error'));
+
+    for (let frame = 1; frame < NAMEPLATE_IMAGE_RETRY_BASE_FRAMES; frame++) {
+      surface.beginFrame(320, 180, 1);
+      surface.drawBase(state, 160, 90);
+    }
+    expect(images()).toHaveLength(1);
+
+    surface.beginFrame(320, 180, 1);
+    surface.drawBase(state, 160, 90);
+    expect(images()).toHaveLength(2);
+    images()[1].dispatchEvent(new Event('load'));
+    surface.drawBase(state, 160, 90);
+
+    const imageBlits = traces[0].drawImage.mock.calls.filter(
+      ([source]) => source instanceof HTMLImageElement,
+    );
+    expect(imageBlits).toHaveLength(1);
+    expect(imageBlits[0][0]).toBe(images()[1]);
+  });
+
+  it('backs image retries off exponentially through the hard 600-frame cap', () => {
+    expect(NAMEPLATE_IMAGE_RETRY_BASE_FRAMES).toBe(30);
+    const createElement = vi.spyOn(document, 'createElement');
+    const images = (): HTMLImageElement[] =>
+      createElement.mock.results
+        .map((result) => result.value)
+        .filter((element): element is HTMLImageElement => element instanceof HTMLImageElement);
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = createNameplateCanvasState();
+    state.badges = [{ url: '/repeatedly-failing-avatar.webp', size: 24 }];
+
+    surface.beginFrame(320, 180, 1);
+    surface.drawBase(state, 160, 90);
+    for (const delay of [30, 60, 120, 240, 480, 600, 600]) {
+      const before = images().length;
+      images().at(-1)?.dispatchEvent(new Event('error'));
+      for (let frame = 1; frame < delay; frame++) {
+        surface.beginFrame(320, 180, 1);
+        surface.drawBase(state, 160, 90);
+      }
+      expect(images()).toHaveLength(before);
+      surface.beginFrame(320, 180, 1);
+      surface.drawBase(state, 160, 90);
+      expect(images()).toHaveLength(before + 1);
+    }
+  });
+
+  it('ignores load and error events from a replaced image request', () => {
+    const createElement = vi.spyOn(document, 'createElement');
+    const images = (): HTMLImageElement[] =>
+      createElement.mock.results
+        .map((result) => result.value)
+        .filter((element): element is HTMLImageElement => element instanceof HTMLImageElement);
+    const initialImageCount = images().length;
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = createNameplateCanvasState();
+    state.badges = [{ url: '/stale-avatar.webp', size: 24 }];
+
+    surface.beginFrame(320, 180, 1);
+    surface.drawBase(state, 160, 90);
+    const stale = images()[initialImageCount];
+    stale.dispatchEvent(new Event('error'));
+    for (let frame = 0; frame < 30; frame++) {
+      surface.beginFrame(320, 180, 1);
+      surface.drawBase(state, 160, 90);
+    }
+    const replacement = images()[initialImageCount + 1];
+    expect(replacement).toBeInstanceOf(HTMLImageElement);
+
+    stale.dispatchEvent(new Event('load'));
+    surface.drawBase(state, 160, 90);
+    expect(
+      traces[0].drawImage.mock.calls.some(([source]) => source instanceof HTMLImageElement),
+    ).toBe(false);
+
+    replacement.dispatchEvent(new Event('load'));
+    surface.drawBase(state, 160, 90);
+    stale.dispatchEvent(new Event('error'));
+    for (let frame = 0; frame < 30; frame++) {
+      surface.beginFrame(320, 180, 1);
+      surface.drawBase(state, 160, 90);
+    }
+    expect(images()).toHaveLength(initialImageCount + 2);
+    const imageBlits = traces[0].drawImage.mock.calls.filter(
+      ([source]) => source instanceof HTMLImageElement,
+    );
+    expect(imageBlits.at(-1)?.[0]).toBe(replacement);
+  });
+
+  it('hard-bounds the live image working set with least-recently-used eviction', () => {
+    expect(NAMEPLATE_IMAGE_CACHE_LIMIT).toBe(160);
+    const createElement = vi.spyOn(document, 'createElement');
+    const imageCount = (): number =>
+      createElement.mock.results.filter((result) => result.value instanceof HTMLImageElement)
+        .length;
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = createNameplateCanvasState();
+    const initialImageCount = imageCount();
+
+    surface.beginFrame(320, 180, 1);
+    for (let index = 0; index <= NAMEPLATE_IMAGE_CACHE_LIMIT; index++) {
+      state.badges = [{ url: `/active-badge-${index}.webp`, size: 20 }];
+      surface.drawBase(state, 160, 90);
+    }
+    expect(imageCount() - initialImageCount).toBe(NAMEPLATE_IMAGE_CACHE_LIMIT + 1);
+
+    state.badges = [{ url: `/active-badge-${NAMEPLATE_IMAGE_CACHE_LIMIT}.webp`, size: 20 }];
+    surface.drawBase(state, 160, 90);
+    expect(imageCount() - initialImageCount).toBe(NAMEPLATE_IMAGE_CACHE_LIMIT + 1);
+
+    state.badges = [{ url: '/active-badge-0.webp', size: 20 }];
+    surface.drawBase(state, 160, 90);
+    expect(imageCount() - initialImageCount).toBe(NAMEPLATE_IMAGE_CACHE_LIMIT + 2);
   });
 
   it('draws the actionable and identity presentation branches on the shared surface', () => {
