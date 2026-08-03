@@ -49,11 +49,14 @@ For reference-image reconstruction and procedural GLB authoring, read the living
   never a bespoke pipeline.
 - **Source fingerprints are load-bearing.** Eastbrook-era exporters stamp a sha256 over a
   pinned input list (factory/entry/exporter/spec, `build_assets.mjs`, reference
-  turnarounds, the shared atlas, and `package-lock.json`) into the GLB extras, and tests
+  turnarounds, the shared atlas, and `pnpm-lock.yaml`) into the GLB extras, and tests
   recompute it live. Any change to a fingerprinted input, including a lockfile-only bump,
   means re-exporting the affected families (`--no-preview`), regenerating the media
   manifest, and re-pinning the sha256/fingerprint literals in tests, docs, and capture
-  evidence JSONs in the same change.
+  evidence JSONs in the same change. For a lockfile-only leaf rename/swap that must keep
+  shipping GLB sizes, prefer the size-preserving in-place remint
+  (`scripts/assets/remint_lockfile_fingerprints.mjs`) over a full geometry rebuild, then
+  re-pin seals and run `remint_polish_provenance.mjs` as needed.
 
 ## Relationship to the rest
 - **Output to `public/`** (the GLB/texture/HDRI tree the game loads at runtime).

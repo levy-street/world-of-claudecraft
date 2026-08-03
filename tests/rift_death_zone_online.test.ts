@@ -63,7 +63,10 @@ function moveTo(server: GameServer, pid: number, x: number, z: number): void {
 }
 
 // Build a bare ClientWorld whose field initialisers have run (the same idiom
-// used by world_api_parity.test.ts and raid_lockout_world.test.ts).
+// used by world_api_parity.test.ts and raid_lockout_world.test.ts). Kept
+// bespoke on purpose (issue #2088): this suite wants the truly bare prototype,
+// unlike the shared tests/helpers/bare_client.ts bareClient(), which is the
+// default for a new suite that needs the fully-defaulted fields instead.
 function bareClient(): ClientWorld {
   return Object.create(ClientWorld.prototype) as ClientWorld;
 }

@@ -7,6 +7,8 @@ import { ClientWorld } from '../src/net/online';
 
 // The xp.test.ts bare-prototype idiom: these reads touch only `base` (and,
 // for the board, `token`), so no socket or snapshot machinery is needed.
+// Kept bespoke on purpose (issue #2088): the shared tests/helpers/bare_client.ts
+// bareClient() does not set base/token, this suite's only two live fields.
 function bareClient(): ClientWorld {
   const c = Object.create(ClientWorld.prototype) as ClientWorld;
   (c as unknown as { base: string }).base = '';

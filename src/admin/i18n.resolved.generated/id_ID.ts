@@ -44,6 +44,7 @@ export const id_ID: AdminTranslations = {
   "nav.primaryLabel": "Navigasi admin",
   "nav.openMenu": "Buka navigasi",
   "nav.closeMenu": "Tutup navigasi",
+  "theme.darkModeLabel": "Dark mode",
   "stats.onlineNow": "daring sekarang",
   "stats.onlineAccounts": "akun daring",
   "stats.siteUsersNow": "pengguna situs sekarang",

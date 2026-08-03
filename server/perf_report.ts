@@ -225,6 +225,38 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value && typeof value === 'object' && !Array.isArray(value));
 }
 
+// A genuine browser stall can legitimately run for several seconds (that is
+// the whole point of longTasks.max as corroboration for a multi-second
+// freeze), so the ceiling is generous rather than the sub-second bound the
+// per-frame fields use.
+const LONG_TASK_RAW_MS_MAX = 60_000;
+// lastAge is time SINCE the last recorded long task, not a task duration: it
+// can legitimately span a whole reporting interval between beacons, so its
+// ceiling is scaled to that instead of a single task's length. -1 is the
+// client's "no long task observed yet" sentinel (src/game/perf.ts).
+const LONG_TASK_RAW_AGE_MS_MAX = 30 * 60_000;
+
+// browser.longTasks.{totalMs,avg,max,lastAge} (issue #2479): the four
+// longtask fields the client observer computes but the beacon used to drop.
+// They ride inside raw_summary (JSONB, no DDL) rather than as new typed
+// columns, but still get the same kind of numeric bound the typed frame
+// columns get so a hostile payload cannot inject an absurd number into the
+// admin raw-report reader. Applied unconditionally in rawSummary() (not only
+// on the compact path), unlike compactPrewarmSummary below.
+function sanitizeBrowserSummary(value: unknown): Record<string, unknown> | undefined {
+  if (!isRecord(value)) return undefined;
+  const longTasks = value.longTasks;
+  if (!isRecord(longTasks)) return undefined;
+  return {
+    longTasks: {
+      totalMs: nullableNumberIn(longTasks.totalMs, 0, LONG_TASK_RAW_MS_MAX) ?? 0,
+      avg: nullableNumberIn(longTasks.avg, 0, LONG_TASK_RAW_MS_MAX) ?? 0,
+      max: nullableNumberIn(longTasks.max, 0, LONG_TASK_RAW_MS_MAX) ?? 0,
+      lastAge: nullableNumberIn(longTasks.lastAge, -1, LONG_TASK_RAW_AGE_MS_MAX) ?? -1,
+    },
+  };
+}
+
 function compactPrewarmSummary(value: unknown): Record<string, unknown> | null {
   if (!isRecord(value)) return null;
   const out: Record<string, unknown> = {};
@@ -290,6 +322,7 @@ function compactRawSummary(value: Record<string, unknown>): Record<string, unkno
     'hud',
     'netPipeline',
     'heapSawtooth',
+    'browser',
   ]) {
     if (value[key] !== undefined) out[key] = value[key];
   }
@@ -304,6 +337,9 @@ function rawSummary(value: unknown, devTraceAllowed = false): Record<string, unk
     const text = JSON.stringify(value);
     const parsed = JSON.parse(text) as Record<string, unknown>;
     if (!devTraceAllowed) delete parsed.devTrace;
+    const browser = sanitizeBrowserSummary(parsed.browser);
+    if (browser) parsed.browser = browser;
+    else delete parsed.browser;
     const boundedText = JSON.stringify(parsed);
     const maxBytes = devTraceAllowed ? RAW_SUMMARY_DEV_TRACE_MAX_BYTES : RAW_SUMMARY_MAX_BYTES;
     if (Buffer.byteLength(boundedText) > maxBytes) {
@@ -440,4 +476,6 @@ export const perfReportInternalsForTest = {
   CROWD_BUCKET_LABELS,
   KNOWN_PERF_SUGGESTION_IDS,
   PERF_REPORT_SCHEMA_VERSION,
+  LONG_TASK_RAW_MS_MAX,
+  LONG_TASK_RAW_AGE_MS_MAX,
 };

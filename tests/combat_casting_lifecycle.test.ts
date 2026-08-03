@@ -22,7 +22,7 @@ import { Sim } from '../src/sim/sim';
 import { readyArenaFighter } from '../src/sim/social/arena';
 import { fiestaDownEntity } from '../src/sim/social/fiesta';
 import { releasePlayerSpirit, resurrectAtSpiritHealer } from '../src/sim/spirit';
-import type { Entity, PlayerClass, WorldContent } from '../src/sim/types';
+import type { Aura, Entity, PlayerClass, WorldContent } from '../src/sim/types';
 import {
   CAST_PUSHBACK_SEC,
   CAST_QUEUE_WINDOW_SEC,
@@ -147,6 +147,58 @@ describe('casting_lifecycle: timed cast start -> progress -> finish', () => {
     expect(p.castTargetId).toBeNull();
     expect(ally.hp).toBeGreaterThan(allyHp0); // the heal landed on the locked target
     expect(bystander.hp).toBe(bystanderHp0); // the current target got nothing
+  });
+});
+
+describe('casting_lifecycle: Vanish escape stealth blocks a hostile cast (issue #2426)', () => {
+  function vanishAura(sourceId: number): Aura {
+    return {
+      id: 'vanish',
+      name: 'Smokestep',
+      kind: 'stealth',
+      remaining: 10,
+      duration: 10,
+      value: 0.5,
+      sourceId,
+      school: 'physical',
+    };
+  }
+
+  it('refuses to start a hostile cast against a target that just vanished', () => {
+    const { sim, p } = makeSim('mage', 12);
+    const target = spawnTarget(sim, p, 12, 6);
+    const hp0 = target.hp;
+    target.auras.push(vanishAura(target.id));
+    const errors: Array<Record<string, any>> = [];
+    const orig = (sim as any).emit.bind(sim);
+    (sim as any).emit = (e: Record<string, any>) => {
+      errors.push(e);
+      orig(e);
+    };
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.castingAbility).toBeNull(); // never started
+    expect(errors.some((e) => e.type === 'error' && e.text === 'You have no target.')).toBe(true);
+    expect(target.hp).toBe(hp0);
+  });
+
+  it('still starts the cast against a target that has an ordinary (non-escape) stealth aura', () => {
+    // Only Vanish's aura (id 'vanish') carries escape semantics (hasEscapeStealth,
+    // threat.ts); this pins that the new gate is scoped to that aura, not to every
+    // 'stealth'-kind buff.
+    const { sim, p } = makeSim('mage', 12);
+    const target = spawnTarget(sim, p, 12, 6);
+    target.auras.push({
+      id: 'some_other_stealth',
+      name: 'Test Cloak',
+      kind: 'stealth',
+      remaining: 10,
+      duration: 10,
+      value: 0.5,
+      sourceId: target.id,
+      school: 'physical',
+    });
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.castingAbility).toBe('fireball');
   });
 });
 

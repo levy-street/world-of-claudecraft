@@ -1005,6 +1005,12 @@ export interface ResolvedAbility {
   threatMult: number; // classic multiplier on this ability's damage-threat
   castWhileMoving?: boolean; // talent-granted mobility (def.castWhileMoving covers baseline)
   damagePushbackImmune?: boolean; // talent-granted immunity to damage-driven cast pushback
+  // Set when a next_cast_free/next_execute_free empowerment (e.g. Borrowed Tempo)
+  // zeroed this cast's cost: a spendsCombo finisher cast this way banks its combo
+  // points instead of spending them (issue #2426), since "free" means the whole
+  // cast, not just the resource bill. Never set by a next_cast_cheap/next_cast_instant
+  // consume (those only discount cost/cast time, e.g. Knife's Dividend/Formrush).
+  freeCast?: boolean;
   charges?: number; // authored stored uses; undefined means one use
   bonusCharges?: number; // talent-added uses, kept distinct from native maxCharges
   /** 1-based authoritative charge stage for hold-to-charge spells. */

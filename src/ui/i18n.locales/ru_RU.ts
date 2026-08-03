@@ -5192,6 +5192,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.core.chatChannels.add': 'Добавить канал чата',
   'hud.core.chatChannels.addTitle': 'Добавить канал',
   'hud.core.chatChannels.close': 'Закрыть вкладку {channel}',
+  'hud.core.chatChannels.moveHint':
+    'Изменить порядок вкладки {channel}: перетащите или используйте Alt+влево и Alt+вправо',
   'hud.core.chatChannels.names.general': 'Общий',
   'hud.core.chatChannels.names.guild': 'Гильдия',
   'hud.core.chatChannels.names.lfg': 'Поиск группы',
@@ -9230,6 +9232,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Совет: вызовите другого игрока на дружескую дуэль или встаньте в очередь на арену Пепельного Колизея, чтобы испытать свой билд.',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': 'Сесть / Спешиться',
+  // On-bar action-bar key-binding mode (issue #1238). M16 wordy fills.
+  'hudChrome.actionBar.editKeys': 'Настроить клавиши панели действий',
+  'hudChrome.actionBar.editKeysHint':
+    'Щёлкните ячейку на панели действий, затем нажмите клавишу, чтобы назначить её.',
+  'hudChrome.actionBar.bannerHint':
+    'Щёлкните ячейку, затем нажмите клавишу, чтобы назначить её. По завершении нажмите «Готово».',
+  'hudChrome.actionBar.bannerCapturing': 'Нажмите клавишу, чтобы назначить её этой ячейке...',
+  'hudChrome.actionBar.boundToKey': 'Назначено на {key}.',
+  'hudChrome.actionBar.reset': 'Сбросить',
+  'hudChrome.actionBar.cancel': 'Отмена',
+  'hudChrome.actionBar.resetConfirmTitle': 'Сбросить клавиши панели действий?',
+  'hudChrome.actionBar.resetConfirmBody':
+    'Первая панель вернётся к клавишам по умолчанию, а вторая и третья панели останутся без назначенных клавиш. Это действие нельзя отменить.',
   'hudChrome.mobile.mounts': 'Транспорт',
   'hudChrome.mounts.title': 'Транспорт',
   'hudChrome.mounts.close': 'Закрыть',

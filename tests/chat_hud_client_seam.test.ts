@@ -29,6 +29,9 @@ describe('Hud to ClientWorld chat seam', () => {
     };
 
     const sent: unknown[] = [];
+    // Kept bespoke on purpose (issue #2088): a hand-picked field subset plus a
+    // live `ws` mock. tests/helpers/bare_client.ts bareClient() is the default
+    // for a new suite that just needs a bare ClientWorld.
     const client = Object.create(ClientWorld.prototype) as ClientWorld;
     Object.assign(client as unknown as Record<string, unknown>, {
       connected: true,

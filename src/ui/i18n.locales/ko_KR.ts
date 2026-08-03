@@ -5132,6 +5132,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.core.chatChannels.add': '채팅 채널 추가',
   'hud.core.chatChannels.addTitle': '채널 추가',
   'hud.core.chatChannels.close': '{channel} 탭 닫기',
+  'hud.core.chatChannels.moveHint':
+    '{channel} 탭 순서 변경: 드래그하거나 Alt+왼쪽 또는 Alt+오른쪽 사용',
   'hud.core.chatChannels.names.general': '일반',
   'hud.core.chatChannels.names.guild': '길드',
   'hud.core.chatChannels.names.lfg': '파티 찾기',
@@ -9065,6 +9067,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '팁: 다른 플레이어에게 친선 결투를 신청하거나 잿빛 콜로세움 투기장에 참가해 빌드를 시험해보세요.',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': '탑승 / 하차',
+  // On-bar action-bar key-binding mode (issue #1238). M16 wordy fills.
+  'hudChrome.actionBar.editKeys': '액션 바 키 편집',
+  'hudChrome.actionBar.editKeysHint': '액션 바의 슬롯을 클릭한 다음 키를 눌러 지정하세요.',
+  'hudChrome.actionBar.bannerHint':
+    '슬롯을 클릭한 다음 키를 눌러 지정하세요. 완료되면 "완료"를 클릭하세요.',
+  'hudChrome.actionBar.bannerCapturing': '키를 눌러 이 슬롯에 지정하세요...',
+  'hudChrome.actionBar.boundToKey': '{key}(으)로 지정되었습니다.',
+  'hudChrome.actionBar.reset': '초기화',
+  'hudChrome.actionBar.cancel': '취소',
+  'hudChrome.actionBar.resetConfirmTitle': '액션 바 키를 초기화하시겠습니까?',
+  'hudChrome.actionBar.resetConfirmBody':
+    '첫 번째 바는 기본 키로 되돌아가고, 두 번째와 세 번째 바는 지정 해제됩니다. 이 작업은 되돌릴 수 없습니다.',
   'hudChrome.mobile.mounts': '탈것',
   'hudChrome.mounts.title': '탈것',
   'hudChrome.mounts.close': '닫기',

@@ -34,8 +34,8 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // forge commands, learn_riding, mount selection), and market_list_instance
 // (the instance-payload market pipe).
 const EXPECTED_SEND_COUNT = 174; // mount_select left the wire (reins are items)
-const EXPECTED_DISPATCH_COUNT = 185; // mount_select left the wire (reins are items)
-const EXPECTED_DISPATCH_ONLY_COUNT = 11;
+const EXPECTED_DISPATCH_COUNT = 186; // profiler invulnerability is a dev-only dispatch token
+const EXPECTED_DISPATCH_ONLY_COUNT = 12;
 
 // The chat sub-channel routing switch (server/game.ts `switch
 // (session.rememberedChat.channel)`) is NOT a msg.cmd dispatch; its labels must

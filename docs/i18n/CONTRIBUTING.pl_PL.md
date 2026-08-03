@@ -37,25 +37,31 @@ Tu jest miejsce dla każdego:
 
 ## Pierwsze kroki
 
-Będziesz potrzebować [Node.js 26](https://nodejs.org/) oraz npm, czyli wersji,
-których używa CI i obraz produkcyjny. Starsze wersje główne nie są testowane. Do
-uruchomienia serwera wieloosobowego przyda się także [Docker](https://www.docker.com/)
-do obsługi Postgres.
+Będziesz potrzebować [Node.js 26](https://nodejs.org/) oraz **pnpm 10.34.x** (dokładny pin w `package.json` pod `packageManager`, obecnie `pnpm@10.34.5`). Starsze major Node nie są testowane. Do serwera multiplayer przyda się też [Docker](https://www.docker.com/) do uruchomienia Postgresa.
+
+**Corepack nie jest wymagany.** Zainstaluj pnpm raz przez npm dołączone do Node. Ta sama ścieżka działa na macOS, Linuxie i Windows.
 
 ```bash
-# 1. Zrób fork repozytorium na GitHubie, potem sklonuj swój fork
+# 1. Fork the repo on GitHub, then clone your fork
 git clone https://github.com/<your-username>/world-of-claudecraft.git
 cd world-of-claudecraft
 
-# 2. Zainstaluj zależności
-npm ci
+# 2. Install pnpm once (same command on macOS, Linux, Windows)
+#    Match the packageManager pin in package.json (today: 10.34.5).
+npm install -g pnpm@10.34.5
+pnpm --version   # should print 10.34.5 (or the pin in package.json)
 
-# 3. Wskaż gitowi hooki repozytorium (raz na klon)
+# 3. Install dependencies (uses the global content-addressable store)
+pnpm install --frozen-lockfile
+
+# 4. Point git at the repository hooks (once per clone)
 git config core.hooksPath .githooks
 
-# 4. Uruchom klienta offline (serwer ani baza danych nie są potrzebne)
-npm run dev          # otwórz adres URL, który wypisze (zwykle http://localhost:5173)
+# 5. Run the offline client (no server or database needed)
+pnpm run dev         # open the URL it prints (usually http://localhost:5173)
 ```
+
+`npm run <script>` nadal działa po instalacji pnpm (Node dostarcza npm), ale **instalacja i aktualizacje lockfile muszą iść przez pnpm**. Nie commituj `package-lock.json`; jedyne źródło prawdy to `pnpm-lock.yaml`.
 
 To wystarczy, by zagrać w świat offline i pracować nad większością rzeczy. Aby
 uruchomić pełny stos online, potrzebujesz najpierw hasła do bazy danych w swoim
@@ -63,14 +69,14 @@ uruchomić pełny stos online, potrzebujesz najpierw hasła do bazy danych w swo
 
 ```bash
 cp .env.example .env
-# ustaw POSTGRES_PASSWORD i skieruj DATABASE_URL na to samo hasło
-npm run db:up        # uruchom Postgres 16 w Dockerze (deweloperska baza na porcie 5433)
-npm run server       # zbuduj i uruchom autorytatywny serwer gry na :8787
-npm run dev          # w innym terminalu; klient przekazuje żądania do serwera
+# set POSTGRES_PASSWORD and point DATABASE_URL at the same password
+pnpm run db:up       # start Postgres 16 in Docker (dev DB on port 5433)
+pnpm run server      # build and run the authoritative game server on :8787
+pnpm run dev         # in another terminal; the client proxies to the server
 ```
 
 Jeśli zamierzasz uruchamiać pełną bramkę opisaną poniżej, zainstaluj raz
-przeglądarkę, którą ona steruje: `npx playwright install chromium`.
+przeglądarkę, którą ona steruje: `pnpm exec playwright install chromium`.
 
 [README](../../README.md) zawiera pełny przewodnik po hostowaniu, rozwijaniu i
 graniu, a pliki `CLAUDE.md` w całym repozytorium dokumentują konwencje dla każdego
@@ -100,13 +106,7 @@ natomiast `@typescript/native` dostarcza binarkę `tsc`. Warto wiedzieć:
   znaczy szybciej. `--singleThreaded` wyłącza całą równoległość. Doraźne sprawdzenie
   pojedynczego pliku (`npx tsc somefile.ts`) kończy się błędem, gdy katalog zawiera
   `tsconfig.json`; podaj `--ignoreConfig`, aby uzyskać dawne zachowanie.
-- **Plik blokady.** Generuj `package-lock.json` ponownie wyłącznie poleceniem
-  `npx npm@10 install --package-lock-only`: plik korzysta z semantyki npm 10, a
-  nowsze wersje główne npm (w tym npm 11 dołączony do Node 26 używanego przez CI)
-  po cichu usuwają zagnieżdżone wpisy opcjonalnych zależności peer pakietu
-  `svelte-check`, co rozjeżdża `npm ci` w CI. Zwykłe `npm ci` jest bezpieczne przy
-  każdej wersji głównej npm. Po regeneracji sprawdź, czy `npm ci --dry-run` jest
-  spójne zarówno pod npm 10, jak i pod npm na Twojej stacji roboczej.
+- **Plik blokady.** Lockfile to `pnpm-lock.yaml` (pnpm 10 / lockfileVersion 9). Aktualizuj go tylko przez `pnpm install`, `pnpm add` lub `pnpm update` z roota tego repo (nigdy ręcznie). Commituj `pnpm-lock.yaml` razem ze zmianami w `package.json`. CI instaluje przez `pnpm install --frozen-lockfile`; przestarzały lockfile kończy się błędem. Nie wprowadzaj drugiego lockfile (`package-lock.json` / yarn.lock): podwójne lockfile cicho się rozjeżdżają i są zabronione. Szum peer dependency z opcjonalnych drzew wallet/solana jest tolerowany przez `.npmrc` (`strict-peer-dependencies=false`); nie poluzowuj tego bez pomiaru.
 - **Kiedy do tego wrócić.** Zwiń podwójny alias z powrotem do jednej zależności
   `typescript` dopiero wtedy, gdy spełnione będą OBA warunki: stabilne API JS
   TypeScript 7.1 zostanie wydane (TypeScript 7.0 nie zawiera żadnego API JS;
@@ -159,7 +159,7 @@ To są kluczowe reguły bazy kodu. Pełne szczegóły znajdują się w głównym
   czyta renderer albo HUD, przechodzą przez interfejs `IWorld` (`src/world_api/`) i
   są zaimplementowane zarówno w świecie offline, jak i online; nowy system symulacji
   trafia za `SimContext`; nowy endpoint REST to moduł trasy, który wygenerujesz
-  poleceniem `npm run new:endpoint`.
+  poleceniem `pnpm run new:endpoint`.
 - **Nie edytuj ręcznie wygenerowanych plików** takich jak `*.generated.ts`.
   Wygeneruj je ponownie przez proces budowania.
 - **Styl redakcyjny projektu: żadnych długich myślników, półpauz ani emoji** w
@@ -176,7 +176,7 @@ Formatowanie zapewnia [Biome](https://biomejs.dev/), skonfigurowany w `biome.jso
 wcięcie 2 spacji, wiersze po 100 kolumn, pojedyncze cudzysłowy, przecinki końcowe.
 Formatuj wyłącznie pliki, których dotknąłeś
 (`npx @biomejs/biome check --write <your-file.ts>`), i sprawdzaj je poleceniem
-`npm run ci:changed`. CI kontroluje tylko zmienione pliki, więc prosimy, nie
+`pnpm run ci:changed`. CI kontroluje tylko zmienione pliki, więc prosimy, nie
 formatuj ponownie reszty drzewa: przebieg na całym repozytorium ujawnia dawny dług,
 którego naprawa nie należy do Ciebie.
 
@@ -185,13 +185,13 @@ którego naprawa nie należy do Ciebie.
 Uruchom bramkę repozytorium lokalnie. To ta sama umowa, którą egzekwuje CI:
 
 ```bash
-npm run gate
+pnpm run gate
 ```
 
 W trakcie pracy uruchamiaj pojedynczy zestaw testów
-(`npx vitest run tests/sim.test.ts`) oraz `npm run ci:changed` dla formatowania;
-`npm test` uruchamia wszystko, a mapa zestawów jest w `tests/CLAUDE.md`. Pełne
-`npm run gate` obejmuje aktualność wygenerowanych artefaktów, skan pod kątem
+(`npx vitest run tests/sim.test.ts`) oraz `pnpm run ci:changed` dla formatowania;
+`pnpm test` uruchamia wszystko, a mapa zestawów jest w `tests/CLAUDE.md`. Pełne
+`pnpm run gate` obejmuje aktualność wygenerowanych artefaktów, skan pod kątem
 złośliwego kodu, formatowanie zmienionych plików, kontrolę zgodności efektów
 dźwiękowych, cały zestaw testów, przebieg regresyjny w prawdziwej przeglądarce,
 ścisłe sprawdzenie typów oraz budowy klienta, serwera i wersji bezgłowej.
@@ -217,13 +217,13 @@ przez krótką listę kontrolną. Prosimy, uzupełnij ją:
 - Połącz powiązane zgłoszenie (na przykład „Closes #123”).
 - Dodaj **zrzuty ekranu lub klip dla zmian interfejsu**, na komputerze i urządzeniu
   mobilnym.
-- Potwierdź, że `npm run gate` przechodzi, a nowe ciągi znaków widoczne dla graczy
+- Potwierdź, że `pnpm run gate` przechodzi, a nowe ciągi znaków widoczne dla graczy
   są zgodne z opisaną niżej zasadą „najpierw angielski” dla współtwórców.
 
 W Twoim PR CI uruchamia formatowanie i lintowanie zmienionych plików, pełny zestaw
 testów na czterech równoległych fragmentach, przebieg regresyjny w przeglądarce oraz
 sprawdzenie typów wraz z budowami klienta, serwera i wersji bezgłowej. Odpowiada to
-temu, co lokalnie robi `npm run gate`, więc zielona bramka dobrze zapowiada zielony
+temu, co lokalnie robi `pnpm run gate`, więc zielona bramka dobrze zapowiada zielony
 PR.
 
 Zielony przebieg CI i kompletna lista kontrolna to to, czego szukamy przed
@@ -261,7 +261,7 @@ tylko angielskie źródło.
   niezależne od języka, musi zostać ponownie zlokalizowany na granicy klienta w tej
   samej zmianie. Test strażniczy `npx vitest run tests/localization_fixes.test.ts`
   to egzekwuje.
-- Po dodaniu lub zmianie dowolnego ciągu znaków uruchom `npm run i18n:gen` i
+- Po dodaniu lub zmianie dowolnego ciągu znaków uruchom `pnpm run i18n:gen` i
   zacommituj wygenerowane na nowo paczki w tej samej zmianie. Bramka i CI porównują
   zacommitowane artefakty ze świeżą regeneracją, więc nieaktualna paczka wywala
   budowę.
@@ -285,7 +285,7 @@ kodu gry, by to zrobić:
    `src/ui/server_i18n.ts`, treści talentów w modułach `talent_i18n`, a panel
    administracyjny ma własny zestaw w `src/admin/i18n.locales/`.
 2. Ulepsz istniejące tłumaczenia lub uzupełnij te, które brzmią niezgrabnie.
-3. Uruchom `npm run i18n:gen`, zacommituj wygenerowane na nowo paczki razem ze swoją
+3. Uruchom `pnpm run i18n:gen`, zacommituj wygenerowane na nowo paczki razem ze swoją
    zmianą nakładki, następnie uruchom zestawy testów lokalizacji
    (`npx vitest run tests/i18n_completeness.test.ts tests/localization_coverage.test.ts`)
    i otwórz PR. Samo sprawdzenie typów nie powie Ci, czy brakuje klucza, ponieważ

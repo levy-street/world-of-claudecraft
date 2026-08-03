@@ -80,6 +80,7 @@ export function sweptLanding(ctx: SimContext, entity: Entity, aim: Vec3): Vec3 {
           false,
           undefined,
           { y: crest, lift: 0 },
+          ctx.riftCollisionToken,
         );
         if (Math.hypot(over.x - nextX, over.z - nextZ) > PLAYER_BODY_RADIUS * 0.25) break;
         safeX = nextX;

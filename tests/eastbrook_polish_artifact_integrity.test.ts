@@ -609,15 +609,15 @@ function readJsonFile<T>(filePath: string): T {
 }
 
 const ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT =
-  '4d3ec4b5413f6db4b30939ce883d093875f3a29a0ff6dcb32140cbaa783217bf';
+  'e15d65fda69efd04395e93dd28af8a56f2fb9bc1ff1125e3b605b07720891367';
 const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   POLISH_ROOT,
   'metadata/after-desktop-ultra.json',
 );
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '1276ca6bb0f63f19cd8f76ee1f4999d616b2bb006c69152713ab58752de0f623';
+  '7e15cc4c6b8c5b5bbf066129aa59f21f3f93a5125816918ea5814aa2cf31e59d';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '9d38235f6a16ce60925c0faa28567775cbdb640f1749686c866ffeb9e5a10cb9';
+  'fd1b2a46947d588aa6c0e62a04885a8039ed3fb1c2d1e281342f80168b16d590';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1474,12 +1474,15 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(acceptedFiles).toHaveLength(4);
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
-    // The graphics overhaul changed the fingerprinted runtimeRender inputs, so
-    // the composite polish provenance moved and this seal follows the composite.
-    // Every measured value (frame timings, draw stats, triangle and scenario
+    // The lockfile leaf is pnpm-lock.yaml after the local-gate-perf migration (0.33.1 previously used package-lock.json), a hashed input to every
+    // GLB source fingerprint, so the town/mailbox/noticeboard leaves moved, the
+    // composite polish provenance followed (also folding in the v0.33 render
+    // recovery's renderer leaf, which re-pinned the capture contract without
+    // re-sweeping this evidence), and this seal follows the composite. Every
+    // measured value (frame timings, draw stats, triangle and scenario
     // numbers) is byte-identical, and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      '7c4dac9b0aca7cb191d8ab90feb0eb987eba9b1dcb70c4ff3cfee7e34aaeef26',
+      '71d3f6fc676687032023477349393654690706dbfe0bd25106dca32a13d1de3c',
     );
   });
 

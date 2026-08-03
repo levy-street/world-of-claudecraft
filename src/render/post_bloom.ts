@@ -1,5 +1,6 @@
 import { type Texture, Vector2, type WebGLRenderer, type WebGLRenderTarget } from 'three';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { removeUnrealBloomTintMultipliers } from './post_bloom_shader_core';
 
 const BLUR_X = new Vector2(1, 0);
 const BLUR_Y = new Vector2(0, 1);
@@ -60,17 +61,10 @@ export class PreparedBloomPass extends UnrealBloomPass {
     // vec3(1), and no caller changes them. Remove only those identity
     // multiplications while retaining every factor, texture sample, addition,
     // and outer strength multiplication in its original order.
-    let compositeShader = this.compositeMaterial.fragmentShader.replace(
-      'uniform vec3 bloomTintColors[NUM_MIPS];',
-      '',
+    this.compositeMaterial.fragmentShader = removeUnrealBloomTintMultipliers(
+      this.compositeMaterial.fragmentShader,
+      this.nMips,
     );
-    for (let mip = 0; mip < this.nMips; mip++) {
-      compositeShader = compositeShader.replace(` * vec4(bloomTintColors[${mip}], 1.0)`, '');
-    }
-    if (compositeShader.includes('bloomTintColors')) {
-      throw new Error('Pinned UnrealBloom composite tint shader shape changed');
-    }
-    this.compositeMaterial.fragmentShader = compositeShader;
     delete this.compositeMaterial.uniforms.bloomTintColors;
   }
 

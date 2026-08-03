@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 //
 // DOM structural guard over the professions window's rebuilt layout surface:
 // the hero band (identity card + ring stage), the two-line craft-row anatomy

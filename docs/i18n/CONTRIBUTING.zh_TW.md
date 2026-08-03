@@ -28,34 +28,43 @@
 
 ## 開始上手
 
-你會需要 [Node.js 26](https://nodejs.org/) 和 npm，這是 CI 與正式環境映像所使用的版本。更舊的主版本未經測試。若要跑多人連線伺服器，還會用到 [Docker](https://www.docker.com/) 來執行 Postgres。
+你需要 [Node.js 26](https://nodejs.org/) 與 **pnpm 10.34.x**（精確版本寫在 `package.json` 的 `packageManager`，目前是 `pnpm@10.34.5`）。更舊的 Node 主版本未經驗證。若要跑多人遊戲伺服器，還需要 [Docker](https://www.docker.com/) 來執行 Postgres。
+
+**不強制使用 Corepack。** 用 Node 內建的 npm 全域安裝一次 pnpm 即可。macOS、Linux、Windows 路徑相同。
 
 ```bash
 # 1. Fork the repo on GitHub, then clone your fork
 git clone https://github.com/<your-username>/world-of-claudecraft.git
 cd world-of-claudecraft
 
-# 2. Install dependencies
-npm ci
+# 2. Install pnpm once (same command on macOS, Linux, Windows)
+#    Match the packageManager pin in package.json (today: 10.34.5).
+npm install -g pnpm@10.34.5
+pnpm --version   # should print 10.34.5 (or the pin in package.json)
 
-# 3. Point git at the repository hooks (once per clone)
+# 3. Install dependencies (uses the global content-addressable store)
+pnpm install --frozen-lockfile
+
+# 4. Point git at the repository hooks (once per clone)
 git config core.hooksPath .githooks
 
-# 4. Run the offline client (no server or database needed)
-npm run dev          # open the URL it prints (usually http://localhost:5173)
+# 5. Run the offline client (no server or database needed)
+pnpm run dev         # open the URL it prints (usually http://localhost:5173)
 ```
+
+用 pnpm 裝好依賴之後，`npm run <script>` 仍然可用（Node 內建 npm），但 **安裝依賴與更新 lockfile 必須走 pnpm**。不要提交 `package-lock.json`；唯一權威是 `pnpm-lock.yaml`。
 
 這樣就足以遊玩離線世界，也能處理大部分的工作。若要執行完整的線上環境，你得先在環境變數中設定資料庫密碼：
 
 ```bash
 cp .env.example .env
 # set POSTGRES_PASSWORD and point DATABASE_URL at the same password
-npm run db:up        # start Postgres 16 in Docker (dev DB on port 5433)
-npm run server       # build and run the authoritative game server on :8787
-npm run dev          # in another terminal; the client proxies to the server
+pnpm run db:up       # start Postgres 16 in Docker (dev DB on port 5433)
+pnpm run server      # build and run the authoritative game server on :8787
+pnpm run dev         # in another terminal; the client proxies to the server
 ```
 
-如果你打算執行下方的完整檢查關卡，請先安裝它會驅動的瀏覽器（只需一次）：`npx playwright install chromium`。
+如果你打算執行下方的完整檢查關卡，請先安裝它會驅動的瀏覽器（只需一次）：`pnpm exec playwright install chromium`。
 
 [README](README.zh_TW.md) 提供了完整的架設、開發與遊玩指南，而散布在整個 repo 中的 `CLAUDE.md` 檔案則記錄了各個區塊的慣例。
 
@@ -65,7 +74,7 @@ npm run dev          # in another terminal; the client proxies to the server
 
 - **編輯器。** 在內建支援推出之前，VS Code 需要 marketplace 上的「TypeScript 7」擴充套件（`TypeScriptTeam.native-preview`）才能取得原生語言服務支援；它透過 `js/ts.experimental.useTsgo` 設定切換，而它的「Disable TypeScript 7 Language Server」指令是回退到 TypeScript 6 tsserver 的官方認可做法。JetBrains 系列 IDE 只有在套件名稱為 `@typescript/native-preview` 時才會自動偵測到原生伺服器，所以它們不會從本 repo 的 `@typescript/native` 別名認出它；它們內建的 TypeScript 6 支援可以正常運作。
 - **好用的 tsc 參數。** `--checkers N` 設定平行型別檢查的工作程序數量（預設為 4；不論設定多少，結果都相同）：在資源吃緊的 runner 上調低它以限制記憶體用量，在多核心機器上調高它，兩種情況都請實際量測，因為更多不見得更快。`--singleThreaded` 會關閉所有平行處理。臨時檢查單一檔案（`npx tsc somefile.ts`）在目錄裡有 `tsconfig.json` 時會出錯；加上 `--ignoreConfig` 可以取得舊有行為。
-- **鎖定檔。** 只能用 `npx npm@10 install --package-lock-only` 重新產生 `package-lock.json`：這個檔案採用 npm 10 的語意，而更新的 npm 主版本（包括 CI 的 Node 26 所附帶的 npm 11）會靜默丟掉 `svelte-check` 的巢狀 optional-peer 項目，導致 CI 中的 `npm ci` 失去同步。單純執行 `npm ci` 在任何 npm 主版本下都是安全的。重新產生之後，請確認 `npm ci --dry-run` 在 npm 10 與你工作機的 npm 底下都是同步的。
+- **鎖定檔。** 鎖定檔是 `pnpm-lock.yaml`（pnpm 10 / lockfileVersion 9）。只能在倉庫根目錄用 `pnpm install`、`pnpm add` 或 `pnpm update` 更新（禁止手改）。把 `pnpm-lock.yaml` 與 `package.json` 的變更一起提交。CI 使用 `pnpm install --frozen-lockfile`；過期的 lockfile 會直接失敗。不要再引入第二份鎖定檔（`package-lock.json` / yarn.lock）：雙鎖定檔會靜默分叉，倉庫禁止。可選 wallet/solana 樹帶來的 peer 雜訊透過 `.npmrc` 的 `strict-peer-dependencies=false` 容忍；沒有測量就不要再放寬。
 - **何時該重新檢視。** 只有在以下兩件事「同時」成立時，才把雙別名收攏回單一的 `typescript` 相依套件：TypeScript 7.1 穩定版的 JS API 已經推出（TypeScript 7.0 完全不提供 JS API；替代方案追蹤在 microsoft/typescript-go 議題 2824），以及 sveltejs/language-tools 議題 3063 已經隨著採用它的 `svelte-check` 正式版一起關閉。svelte-check 的實驗性 `--tsgo` 模式並不會解除它對 TypeScript 6 API 的需求，而它進行中的 TypeScript 7 載入支援（language-tools PR 3073）讀取的正是本 repo 已經在用的 `@typescript/native` 別名，所以不需要任何改名。
 
 ## 進行你的修改
@@ -90,24 +99,24 @@ npm run dev          # in another terminal; the client proxies to the server
 - **模擬核心（`src/sim/`）是唯一的真實來源**，而且它保持純淨，不引入任何 DOM、瀏覽器或 Three.js 的模組，因此完全相同的程式碼可以在離線、伺服器，以及無頭 RL 環境中執行。
 - **模擬是確定性的。** 它以固定的 20 Hz tick 執行，所有隨機性都透過 `Rng` 處理，sim 邏輯中絕不使用 `Math.random`、`Date.now` 或 `performance.now`。相同的種子永遠產生相同的世界。
 - **遊戲數值遵循經典時代的 MMO 公式**（怒氣、命中表、護甲、經驗值曲線）。請不要自行發明平衡數值。請改為引用公式。
-- **新的邏輯會以自己的小型、有測試的模組，落在既有的接縫之後**，而不是往其中一個龐大的協調者檔案裡追加。算繪器或 HUD 讀取的資料要跨越 `IWorld` 介面（`src/world_api/`），並且在離線世界與線上世界中都要實作；新的模擬系統放在 `SimContext` 之後；新的 REST 端點是一個路由模組，你可以用 `npm run new:endpoint` 產生它的骨架。
+- **新的邏輯會以自己的小型、有測試的模組，落在既有的接縫之後**，而不是往其中一個龐大的協調者檔案裡追加。算繪器或 HUD 讀取的資料要跨越 `IWorld` 介面（`src/world_api/`），並且在離線世界與線上世界中都要實作；新的模擬系統放在 `SimContext` 之後；新的 REST 端點是一個路由模組，你可以用 `pnpm run new:endpoint` 產生它的骨架。
 - **不要手動編輯產生出來的檔案**，例如 `*.generated.ts`。請透過建置流程重新產生它們。
 - **專案文案風格：任何地方都不使用長破折號、短破折號或表情符號**，包含程式碼、註解、文件、commit 訊息、PR 內文，以及玩家看得到的文案。請改用逗號、冒號、括號，範圍則用「to」。推送前的檢查會掃描你的 diff，一旦命中就擋下推送。
 - **絕不提交密鑰**或 `.env` 檔案，也絕不在正式環境路徑中啟用 `ALLOW_DEV_COMMANDS`，因為它會解鎖作弊功能。
 
 ### 程式碼風格
 
-格式化交由 [Biome](https://biomejs.dev/) 處理，設定在 `biome.json`：2 空格縮排、100 欄行寬、單引號、結尾逗號。只格式化你動過的檔案（`npx @biomejs/biome check --write <your-file.ts>`），並用 `npm run ci:changed` 檢查它們。CI 只針對變更過的檔案把關，所以請不要重新格式化整個檔案樹：全 repo 的執行會翻出長年累積、不該由你來修的技術債。
+格式化交由 [Biome](https://biomejs.dev/) 處理，設定在 `biome.json`：2 空格縮排、100 欄行寬、單引號、結尾逗號。只格式化你動過的檔案（`npx @biomejs/biome check --write <your-file.ts>`），並用 `pnpm run ci:changed` 檢查它們。CI 只針對變更過的檔案把關，所以請不要重新格式化整個檔案樹：全 repo 的執行會翻出長年累積、不該由你來修的技術債。
 
 ## 在你開 pull request 之前
 
 請在本機執行 repo 的檢查關卡。它和 CI 所強制執行的契約完全相同：
 
 ```bash
-npm run gate
+pnpm run gate
 ```
 
-在反覆修改的過程中，可以只跑單一套件（`npx vitest run tests/sim.test.ts`），並用 `npm run ci:changed` 檢查格式；`npm test` 會跑完全部，套件對照表在 `tests/CLAUDE.md`。完整的 `npm run gate` 涵蓋產生出來的成品是否為最新、惡意程式碼掃描、變更檔案的格式化、音效一致性檢查、整套測試、真實瀏覽器的回歸測試、嚴格型別檢查，以及用戶端、伺服器與無頭版本的建置。從推送前的最低門檻往上的分層檢查，說明在 [`docs/qa-gate.md`](../qa-gate.md)。
+在反覆修改的過程中，可以只跑單一套件（`npx vitest run tests/sim.test.ts`），並用 `pnpm run ci:changed` 檢查格式；`pnpm test` 會跑完全部，套件對照表在 `tests/CLAUDE.md`。完整的 `pnpm run gate` 涵蓋產生出來的成品是否為最新、惡意程式碼掃描、變更檔案的格式化、音效一致性檢查、整套測試、真實瀏覽器的回歸測試、嚴格型別檢查，以及用戶端、伺服器與無頭版本的建置。從推送前的最低門檻往上的分層檢查，說明在 [`docs/qa-gate.md`](../qa-gate.md)。
 
 接著，如果你的修改觸及任何玩家會看到的部分，請同時在桌機與行動裝置上測試你的改動，包括手機尺寸的視窗在直向與橫向下的呈現。觸控目標應維持至少 40x40px，表單輸入欄位的字級應至少 16px。UI 標準記錄在 [`src/ui/CLAUDE.md`](../../src/ui/CLAUDE.md) 中。
 
@@ -118,9 +127,9 @@ npm run gate
 - 描述**改了什麼**，以及**為什麼**。
 - 連結任何相關的議題（例如「Closes #123」）。
 - 為 **UI 改動附上截圖或短片**，桌機與行動裝置都要。
-- 確認 `npm run gate` 通過，且新的玩家可見字串遵循下方的「英文優先」貢獻者原則。
+- 確認 `pnpm run gate` 通過，且新的玩家可見字串遵循下方的「英文優先」貢獻者原則。
 
-在你的 PR 上，CI 會針對你變更過的檔案執行格式化與 lint、以四個平行分片跑完整套測試、進行一次瀏覽器回歸測試，並執行型別檢查以及用戶端、伺服器與無頭版本的建置。這和 `npm run gate` 在本機跑的內容一致，所以本機關卡亮綠燈，通常也能預測 PR 會是綠的。
+在你的 PR 上，CI 會針對你變更過的檔案執行格式化與 lint、以四個平行分片跑完整套測試、進行一次瀏覽器回歸測試，並執行型別檢查以及用戶端、伺服器與無頭版本的建置。這和 `pnpm run gate` 在本機跑的內容一致，所以本機關卡亮綠燈，通常也能預測 PR 會是綠的。
 
 CI 跑出綠燈，加上一份完整的檢查清單，就是我們合併前所要看的。維護者可能會提出修改建議。這是流程中正常且具有協作精神的一部分，並不是被退回。我們努力在審查中保持友善與建設性，也請你以同樣的方式對待我們。
 
@@ -135,7 +144,7 @@ World of ClaudeCraft 以多種語言發行。每一段玩家可見的字串都�
 - 所有面向使用者的文字都是 `t()` key。請把新的英文文案加到 [`src/ui/i18n.catalog/`](../../src/ui/i18n.catalog/) 底下對應的分領域模組（新的 HUD 外框元素放在 `hud_chrome.ts`），然後用 `t('dotted.key', values)` 算繪它。對功能型 PR 來說，只有英文正是正確的做法：維護者會在發行時補上其他語系，所以你不需要編輯 `src/ui/i18n.locales/` 的覆蓋檔，也絕不要在裡面留下英文佔位字串或 `// TODO`。M16 例外是新增一個字數較多的英文值，它還需要 [`src/ui/CLAUDE.md`](../../src/ui/CLAUDE.md) 中所述的五個非拉丁語系填寫。
 - 數字、金錢、日期、單位與百分比都要透過格式化工具處理（`formatNumber`、`formatMoney`、`formatDateTime`、`Intl`），而不是手動拼接字串。
 - 從 `src/sim/` 或 `server/` 發出的、面向玩家的文字（這些區塊保持與語言無關），必須在同一次改動中於用戶端邊界重新在地化。守門測試 `npx vitest run tests/localization_fixes.test.ts` 會強制執行這一點。
-- 新增或修改任何字串之後，請執行 `npm run i18n:gen`，並在同一次改動中提交重新產生的 bundle。本機關卡與 CI 都會把已提交的成品和重新產生的結果做比對，所以過時的 bundle 會讓建置失敗。
+- 新增或修改任何字串之後，請執行 `pnpm run i18n:gen`，並在同一次改動中提交重新產生的 bundle。本機關卡與 CI 都會把已提交的成品和重新產生的結果做比對，所以過時的 bundle 會讓建置失敗。
 
 所以，用英文加入你的字串然後開 PR 就好；你不需要自己翻譯它們。如果你想幫忙翻譯，請看下一節。
 
@@ -147,7 +156,7 @@ World of ClaudeCraft 以多種語言發行。每一段玩家可見的字串都�
 
 1. 大部分玩家可見的翻譯都放在 [`src/ui/i18n.locales/`](../../src/ui/i18n.locales/) 底下的各語系覆蓋檔（每個語系一個），對應 [`src/ui/i18n.catalog/`](../../src/ui/i18n.catalog/) 中的英文 key。由模擬與伺服器發出的文字在 `src/ui/sim_i18n.ts` 和 `src/ui/server_i18n.ts` 中翻譯，天賦文案在 `talent_i18n` 模組中，而管理後台則有自己的一套，位於 `src/admin/i18n.locales/`。
 2. 改善既有的翻譯，或補上任何讀起來彆扭的部分。
-3. 執行 `npm run i18n:gen`，把重新產生的 bundle 和你的覆蓋檔一起提交，接著執行在地化測試套件（`npx vitest run tests/i18n_completeness.test.ts tests/localization_coverage.test.ts`）並開一個 PR。光靠型別檢查無法告訴你是否漏了某個 key，因為覆蓋檔本來就是刻意稀疏的。
+3. 執行 `pnpm run i18n:gen`，把重新產生的 bundle 和你的覆蓋檔一起提交，接著執行在地化測試套件（`npx vitest run tests/i18n_completeness.test.ts tests/localization_coverage.test.ts`）並開一個 PR。光靠型別檢查無法告訴你是否漏了某個 key，因為覆蓋檔本來就是刻意稀疏的。
 
 若要提議一個全新的語系，或想討論語氣與用語，請到 [Discord](https://discord.com/invite/worldofclaudecraft) 開一個討論串，我們會協助你把它接上去。我們特別歡迎母語者與流利的使用者。好的翻譯會讓世界各地的玩家覺得這款遊戲就像回到家一樣。
 

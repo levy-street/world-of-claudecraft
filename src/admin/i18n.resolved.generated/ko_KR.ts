@@ -44,6 +44,7 @@ export const ko_KR: AdminTranslations = {
   "nav.primaryLabel": "관리 탐색",
   "nav.openMenu": "탐색 열기",
   "nav.closeMenu": "탐색 닫기",
+  "theme.darkModeLabel": "Dark mode",
   "stats.onlineNow": "현재 접속",
   "stats.onlineAccounts": "접속 계정",
   "stats.siteUsersNow": "현재 사이트 사용자",

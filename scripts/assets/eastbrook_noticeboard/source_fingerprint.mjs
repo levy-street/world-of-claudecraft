@@ -15,7 +15,7 @@ export const EASTBROOK_NOTICEBOARD_SOURCE_FILES = Object.freeze([
   'scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs',
   'scripts/assets/specs/eastbrook_noticeboard.json',
   'scripts/assets/build_assets.mjs',
-  'package-lock.json',
+  'pnpm-lock.yaml',
 ]);
 
 function lengthDelimiter(byteLength) {

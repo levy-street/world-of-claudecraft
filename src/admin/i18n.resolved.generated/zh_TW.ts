@@ -44,6 +44,7 @@ export const zh_TW: AdminTranslations = {
   "nav.primaryLabel": "管理導航",
   "nav.openMenu": "打開導航",
   "nav.closeMenu": "關閉導航",
+  "theme.darkModeLabel": "Dark mode",
   "stats.onlineNow": "目前在線",
   "stats.onlineAccounts": "在線帳號",
   "stats.siteUsersNow": "目前網站使用者",

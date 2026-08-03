@@ -216,7 +216,7 @@ describe('graphics tier resolution', () => {
     expect(medium.shadowMap).toBeLessThan(high.shadowMap);
     expect(medium.pixelRatioCap).toBeLessThan(high.pixelRatioCap);
     expect(medium.msaaSamples).toBe(0);
-    expect(medium.smaa).toBe(true);
+    expect(medium.smaa).toBe(false);
 
     expect(high.standardMaterials).toBe(true);
     expect(high.dynamicShadows).toBe(true);
@@ -266,12 +266,9 @@ describe('graphics tier resolution', () => {
     ).toEqual([0.55, 0.62, 0.7, 0.75, 0.8]);
     expect(insane.terrainSplat).toBe(true);
     expect(insane.leanFoliage).toBe(false);
-    // The round-10 detail-layer ladder: the overhaul's near-field layers
-    // (worn surfaces, blade carpet, cliff scree, canopy clumps, terrain
-    // relief) run at high and up ONLY; medium keeps its pre-overhaul look and
-    // cost. Insane owns the 4-tap full-clamp worn parallax and shares the
-    // terrain micro-shadow (relief 3) with ultra; high runs the shallower
-    // 3-tap 0.65-clamp walk and relief 2 (no micro-shadow).
+    // The round-10 detail-layer ladder: High takes the coherent Advanced-Medium
+    // profile to recover its steady frame cost, while Ultra and Insane keep the
+    // full fixed detail layers. Advanced can still opt into every level.
     const medium = gfxInternalsForTest.settingsFor('medium');
     for (const below of [gfxInternalsForTest.settingsFor('low'), medium]) {
       expect(below.surfaceDetail).toBe(false);
@@ -281,20 +278,24 @@ describe('graphics tier resolution', () => {
       expect(below.canopyDetail).toBe(false);
       expect(below.terrainRelief).toBe(0);
     }
-    for (const tier of [high, ultra, insane]) {
+    expect(high.surfaceDetail).toBe(true);
+    expect(high.surfaceDetailTaps).toBe(0);
+    expect(high.surfaceDetailClampK).toBe(0);
+    expect(high.bladeCarpetRadius).toBe(24);
+    expect(high.cliffScree).toBe(false);
+    expect(high.canopyDetail).toBe(false);
+    expect(high.terrainRelief).toBe(1);
+    for (const tier of [ultra, insane]) {
       expect(tier.surfaceDetail).toBe(true);
       expect(tier.bladeCarpetRadius).toBe(34);
       expect(tier.cliffScree).toBe(true);
       expect(tier.canopyDetail).toBe(true);
       expect(tier.bloom).toBe(true);
     }
-    expect(high.surfaceDetailTaps).toBe(3);
-    expect(high.surfaceDetailClampK).toBe(0.65);
     expect(ultra.surfaceDetailTaps).toBe(3);
     expect(ultra.surfaceDetailClampK).toBe(0.85);
     expect(insane.surfaceDetailTaps).toBe(4);
     expect(insane.surfaceDetailClampK).toBe(1);
-    expect(high.terrainRelief).toBe(2);
     expect(ultra.terrainRelief).toBe(3);
     expect(insane.terrainRelief).toBe(3);
     expect(high.aoFullRes).toBe(false);
@@ -337,7 +338,10 @@ describe('graphics tier resolution', () => {
     expect(foliageMedium.farGrassDensityFloor).toBe(0.62);
     expect(foliageMedium.bladeCarpetRadius).toBe(24);
     expect(foliageMedium.cliffScree).toBe(false);
-    expect(adv({ foliageDensity: 1 }).bladeCarpetRadius).toBe(34);
+    const foliageHigh = adv({ foliageDensity: 1 });
+    expect(foliageHigh.bladeCarpetRadius).toBe(34);
+    expect(foliageHigh.cliffScree).toBe(true);
+    expect(foliageHigh.canopyDetail).toBe(true);
     expect(adv({ foliageDensity: 2 }).bladeCarpetRadius).toBe(40);
     expect(adv({ foliageDensity: 2 }).farGrassDensityFloor).toBe(0.85);
     // Surface Detail (the town-cost dial): Off / Basic / Full / Insane.
@@ -358,7 +362,7 @@ describe('graphics tier resolution', () => {
     expect(effectsLow.gradePass).toBe(true);
     expect(effectsLow.ao).toBe(false);
     expect(effectsLow.msaaSamples).toBe(0);
-    expect(effectsLow.smaa).toBe(true);
+    expect(effectsLow.smaa).toBe(false);
     const effectsMedium = adv({ effectsQuality: 0.5 });
     expect(effectsMedium.ao).toBe(true);
     expect(effectsMedium.bloom).toBe(false);

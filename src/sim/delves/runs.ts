@@ -1408,13 +1408,10 @@ export function delveInteract(ctx: SimContext, objectId: number, pid?: number): 
       });
       return false;
     }
-    if (!state.attemptAvailable) {
-      ctx.error(
-        r.meta.entityId,
-        'The lock is jammed beyond picking. Clear the delve again for another attempt.',
-      );
-      return false;
-    }
+    // attemptAvailable only ever goes false alongside `looted` (see
+    // lockpick_controller.ts lockpickSucceed), so the `state.looted` check
+    // above already covers a spent chest; no separate jammed guard is
+    // reachable here.
     if (run.lockpick && run.lockpick.state === 'IN_PROGRESS') {
       // Someone is already picking it (single interactor, v1).
       if (run.lockpick.ownerId !== r.meta.entityId) {

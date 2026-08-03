@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 // The crafting window's craft tab strip: the pure tab model (craftingTabs and
 // resolveSelectedCraft in crafting_view.ts) plus the painter DOM contract in

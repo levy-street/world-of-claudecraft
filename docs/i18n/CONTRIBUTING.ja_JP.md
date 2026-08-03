@@ -27,34 +27,43 @@
 
 ## はじめに
 
-[Node.js 26](https://nodejs.org/) と npm が必要です。CI と本番イメージが使っているバージョンです。それより古いメジャーバージョンは検証されていません。マルチプレイヤーサーバーを動かすには、Postgres を実行するための [Docker](https://www.docker.com/) も用意してください。
+[Node.js 26](https://nodejs.org/) と **pnpm 10.34.x** が必要です（正確なピンは `package.json` の `packageManager`、現在は `pnpm@10.34.5`）。それより古い Node のメジャーバージョンは検証されていません。マルチプレイヤーサーバーを動かすには、Postgres を実行するための [Docker](https://www.docker.com/) も用意してください。
+
+**Corepack は必須ではありません。** Node 同梱の npm で pnpm を一度だけインストールします。手順は macOS / Linux / Windows で同じです。
 
 ```bash
 # 1. Fork the repo on GitHub, then clone your fork
 git clone https://github.com/<your-username>/world-of-claudecraft.git
 cd world-of-claudecraft
 
-# 2. Install dependencies
-npm ci
+# 2. Install pnpm once (same command on macOS, Linux, Windows)
+#    Match the packageManager pin in package.json (today: 10.34.5).
+npm install -g pnpm@10.34.5
+pnpm --version   # should print 10.34.5 (or the pin in package.json)
 
-# 3. Point git at the repository hooks (once per clone)
+# 3. Install dependencies (uses the global content-addressable store)
+pnpm install --frozen-lockfile
+
+# 4. Point git at the repository hooks (once per clone)
 git config core.hooksPath .githooks
 
-# 4. Run the offline client (no server or database needed)
-npm run dev          # open the URL it prints (usually http://localhost:5173)
+# 5. Run the offline client (no server or database needed)
+pnpm run dev         # open the URL it prints (usually http://localhost:5173)
 ```
+
+pnpm でインストールしたあとも `npm run <script>` は使えます（Node が npm を同梱するため）が、**依存関係のインストールと lockfile の更新は必ず pnpm 経由**にしてください。`package-lock.json` をコミットしないでください。唯一の正は `pnpm-lock.yaml` です。
 
 オフラインの世界で遊んだり、ほとんどの作業を進めたりするには、これだけで十分です。オンラインのフルスタックを実行するには、まず環境変数にデータベースのパスワードを設定する必要があります。
 
 ```bash
 cp .env.example .env
 # set POSTGRES_PASSWORD and point DATABASE_URL at the same password
-npm run db:up        # start Postgres 16 in Docker (dev DB on port 5433)
-npm run server       # build and run the authoritative game server on :8787
-npm run dev          # in another terminal; the client proxies to the server
+pnpm run db:up       # start Postgres 16 in Docker (dev DB on port 5433)
+pnpm run server      # build and run the authoritative game server on :8787
+pnpm run dev         # in another terminal; the client proxies to the server
 ```
 
-下記のゲートをすべて実行するつもりなら、そこで使われるブラウザを一度インストールしておいてください。`npx playwright install chromium` です。
+下記のゲートをすべて実行するつもりなら、そこで使われるブラウザを一度インストールしておいてください。`pnpm exec playwright install chromium` です。
 
 [README](../../README.md) には、ホスティング、開発、プレイの完全なガイドがあります。また、リポジトリ全体に置かれた `CLAUDE.md` ファイルが、各領域の慣習を説明しています。
 
@@ -64,7 +73,7 @@ npm run dev          # in another terminal; the client proxies to the server
 
 - **エディター。** VS Code では、組み込みのサポートが出荷されるまでの間、ネイティブ言語サービスを使うために「TypeScript 7」マーケットプレイス拡張（`TypeScriptTeam.native-preview`）が必要です。切り替えは `js/ts.experimental.useTsgo` 設定で行い、その「Disable TypeScript 7 Language Server」コマンドが TypeScript 6 の tsserver へ戻る公式な手段です。JetBrains の IDE は `@typescript/native-preview` というパッケージ名でしかネイティブサーバーを自動検出しないため、このリポジトリの `@typescript/native` エイリアスからは認識しません。IDE に同梱された TypeScript 6 のサポートで問題なく動きます。
 - **役に立つ tsc のフラグ。** `--checkers N` は型チェッカーの並列ワーカー数を指定します（既定は 4 で、いくつにしても結果は同一です）。制約の厳しいランナーではメモリを抑えるために下げ、コア数の多いマシンでは上げてください。ただし多いほど速いとは限らないので、どちらの場合も実測してください。`--singleThreaded` は並列処理をすべて無効にします。単一ファイルをその場でチェックする（`npx tsc somefile.ts`）と、そのディレクトリに `tsconfig.json` があるときはエラーになります。従来の挙動が必要なら `--ignoreConfig` を渡してください。
-- **ロックファイル。** `package-lock.json` の再生成は `npx npm@10 install --package-lock-only` だけで行ってください。このファイルは npm 10 のセマンティクスに従っており、より新しいメジャーバージョン（CI の Node 26 に同梱される npm 11 を含む）は `svelte-check` のネストされた optional peer エントリを黙って削除してしまい、CI の `npm ci` が食い違います。素の `npm ci` はどの npm メジャーバージョンでも安全です。再生成したあとは、npm 10 と自分の作業環境の npm の両方で `npm ci --dry-run` が同期していることを確認してください。
+- **ロックファイル。** ロックファイルは `pnpm-lock.yaml` です（pnpm 10 / lockfileVersion 9）。更新はリポジトリルートで `pnpm install` / `pnpm add` / `pnpm update` のみ（手編集禁止）。`package.json` の変更と一緒に `pnpm-lock.yaml` をコミットしてください。CI は `pnpm install --frozen-lockfile` で入れます。古い lockfile は失敗します。第二の lockfile（`package-lock.json` / yarn.lock）を持ち込まないでください。二重 lockfile は静かに食い違い、禁止されています。任意の wallet/solana ツリー由来の peer 依存ノイズは `.npmrc` の `strict-peer-dependencies=false` で許容します。測定なしにさらに緩めないでください。
 - **見直す時期。** デュアルエイリアスを単一の `typescript` 依存へ戻すのは、次の両方が満たされたときです。TypeScript 7.1 の安定版 JS API が出荷されること（TypeScript 7.0 は JS API をまったく提供せず、その代替は microsoft/typescript-go の issue 2824 で追跡されています）。そして sveltejs/language-tools の issue 3063 がクローズし、それを採用した `svelte-check` がリリースされること。svelte-check の実験的な `--tsgo` モードは TypeScript 6 API の要件を解消しません。また進行中の TypeScript 7 読み込み対応（language-tools の PR 3073）は、このリポジトリがすでに使っている `@typescript/native` エイリアスを読むため、名前の変更は不要です。
 
 ## 変更を加える
@@ -89,24 +98,24 @@ npm run dev          # in another terminal; the client proxies to the server
 - **シミュレーションコア（`src/sim/`）が信頼できる唯一の情報源です。** ここは純粋に保たれ、DOM、ブラウザ、Three.js のインポートを一切含みません。だからこそ、まったく同じコードがオフライン、サーバー、ヘッドレスの RL 環境で動きます。
 - **シミュレーションは決定的です。** 固定された 20 Hz のティックで動き、すべての乱数は `Rng` を通します。シミュレーションのロジックでは `Math.random`、`Date.now`、`performance.now` を決して使いません。同じシードからは、常に同じ世界が生まれます。
 - **ゲームプレイの計算はクラシック時代の MMO の公式に従います**（レイジ、ヒットテーブル、アーマー、XP カーブなど）。バランスの数値を勝手に作り出さないでください。代わりに公式を引用してください。
-- **新しいロジックは、既存のシームの背後に置かれた、小さくテスト済みの独立したモジュールとして追加します。** 大きなコーディネーターファイルに書き足すのではありません。レンダラーや HUD が読むデータは `IWorld` インターフェース（`src/world_api/`）を通り、オフラインとオンラインの両方の世界で実装されます。新しいシミュレーションのシステムは `SimContext` の背後に置き、新しい REST エンドポイントは `npm run new:endpoint` で雛形を作れるルートモジュールにします。
+- **新しいロジックは、既存のシームの背後に置かれた、小さくテスト済みの独立したモジュールとして追加します。** 大きなコーディネーターファイルに書き足すのではありません。レンダラーや HUD が読むデータは `IWorld` インターフェース（`src/world_api/`）を通り、オフラインとオンラインの両方の世界で実装されます。新しいシミュレーションのシステムは `SimContext` の背後に置き、新しい REST エンドポイントは `pnpm run new:endpoint` で雛形を作れるルートモジュールにします。
 - **生成されたファイルを手で編集しないでください。** `*.generated.ts` などがそれにあたります。ビルドを通して再生成してください。
 - **文章スタイルの決まり。em ダッシュ、en ダッシュ、絵文字はどこでも使いません。** コード、コメント、ドキュメント、コミットメッセージ、PR の文章、プレイヤーに見えるテキストのいずれでも同じです。読点、コロン、丸括弧を使い、範囲には「to」を使ってください。プッシュ前のチェックが差分を走査し、見つかった時点でプッシュをブロックします。
 - **秘密情報や `.env` ファイルを決してコミットしないでください。** また、`ALLOW_DEV_COMMANDS` はチートを解放してしまうため、本番環境のパスでは決して有効にしないでください。
 
 ### コードスタイル
 
-フォーマットは [Biome](https://biomejs.dev/) で、設定は `biome.json` にあります。インデントは 2 スペース、1 行は 100 桁、シングルクォート、末尾カンマです。自分が触ったファイルだけをフォーマットし（`npx @biomejs/biome check --write <your-file.ts>`）、`npm run ci:changed` で確認してください。CI は変更されたファイルだけをチェックするので、ツリー全体を整形し直すのはやめてください。リポジトリ全体に対して実行すると、あなたが直すべきものではない長年の負債が表面化してしまいます。
+フォーマットは [Biome](https://biomejs.dev/) で、設定は `biome.json` にあります。インデントは 2 スペース、1 行は 100 桁、シングルクォート、末尾カンマです。自分が触ったファイルだけをフォーマットし（`npx @biomejs/biome check --write <your-file.ts>`）、`pnpm run ci:changed` で確認してください。CI は変更されたファイルだけをチェックするので、ツリー全体を整形し直すのはやめてください。リポジトリ全体に対して実行すると、あなたが直すべきものではない長年の負債が表面化してしまいます。
 
 ## プルリクエストを開く前に
 
 リポジトリのゲートをローカルで実行してください。CI が強制するのと同じ契約です。
 
 ```bash
-npm run gate
+pnpm run gate
 ```
 
-作業の途中では、単一のスイート（`npx vitest run tests/sim.test.ts`）と、フォーマット確認のための `npm run ci:changed` を実行してください。`npm test` はすべてを実行し、スイートの一覧は `tests/CLAUDE.md` にあります。`npm run gate` の全体は、生成物の鮮度、マルウェアスキャン、変更ファイルのフォーマット、効果音の適合チェック、テストスイート全体、実ブラウザによるリグレッション、厳格な型チェック、そしてクライアント、サーバー、ヘッドレスのビルドを対象にします。プッシュ前の最低ラインから積み上がる階層的なチェックについては、[`docs/qa-gate.md`](../qa-gate.md) に説明があります。
+作業の途中では、単一のスイート（`npx vitest run tests/sim.test.ts`）と、フォーマット確認のための `pnpm run ci:changed` を実行してください。`pnpm test` はすべてを実行し、スイートの一覧は `tests/CLAUDE.md` にあります。`pnpm run gate` の全体は、生成物の鮮度、マルウェアスキャン、変更ファイルのフォーマット、効果音の適合チェック、テストスイート全体、実ブラウザによるリグレッション、厳格な型チェック、そしてクライアント、サーバー、ヘッドレスのビルドを対象にします。プッシュ前の最低ラインから積み上がる階層的なチェックについては、[`docs/qa-gate.md`](../qa-gate.md) に説明があります。
 
 そして、プレイヤーの目に触れる部分に手を入れたなら、その変更をデスクトップとモバイルの両方でテストしてください。スマートフォンサイズのビューポートで、縦向きと横向きの両方を確認することも含みます。タッチターゲットは少なくとも 40x40px、フォーム入力のフォントは少なくとも 16px を保つようにしてください。UI の基準は [`src/ui/CLAUDE.md`](../../src/ui/CLAUDE.md) に記載されています。
 
@@ -117,9 +126,9 @@ npm run gate
 - **何が**変わったのか、そして**なぜ**変えたのかを説明してください。
 - 関連する issue があればリンクしてください（たとえば「Closes #123」）。
 - **UI の変更には、スクリーンショットや短い動画**を、デスクトップとモバイルの両方で添えてください。
-- `npm run gate` が通ること、そしてプレイヤーに見える新しい文字列が、下記の英語優先の貢献者ポリシーに従っていることを確認してください。
+- `pnpm run gate` が通ること、そしてプレイヤーに見える新しい文字列が、下記の英語優先の貢献者ポリシーに従っていることを確認してください。
 
-あなたの PR では、CI が変更ファイルのフォーマットとリント、4 つの並列シャードにまたがるテストスイート全体、ブラウザのリグレッション、そして型チェックとクライアント、サーバー、ヘッドレスのビルドを実行します。これはローカルの `npm run gate` が実行する内容と一致するので、ゲートがグリーンなら PR もグリーンになる見込みが高いということです。
+あなたの PR では、CI が変更ファイルのフォーマットとリント、4 つの並列シャードにまたがるテストスイート全体、ブラウザのリグレッション、そして型チェックとクライアント、サーバー、ヘッドレスのビルドを実行します。これはローカルの `pnpm run gate` が実行する内容と一致するので、ゲートがグリーンなら PR もグリーンになる見込みが高いということです。
 
 マージ前に私たちが見るのは、CI がグリーンであることと、チェックリストが埋まっていることです。メンテナーが変更を提案することもあります。それはこのプロセスの自然で協力的な一部であって、拒否ではありません。私たちはレビューにおいて親切で建設的であろうと努めていますし、あなたにも同じことをお願いします。
 
@@ -134,7 +143,7 @@ World of ClaudeCraft は多くの言語で提供されています。プレイ�
 - ユーザー向けのテキストはすべて `t()` キーです。新しい英語のテキストは、[`src/ui/i18n.catalog/`](../../src/ui/i18n.catalog/) 配下の該当するドメイン別モジュールに追加し（新しい HUD の枠回りは `hud_chrome.ts` です）、`t('dotted.key', values)` で描画してください。機能の PR では英語だけで完全に正しいやり方です。他のロケールはリリース時にメンテナーが埋めるので、`src/ui/i18n.locales/` のオーバーレイを編集する必要はなく、そこに英語のプレースホルダーや `// TODO` を残すこともありません。例外は M16 で、語数の多い新しい英語の値は、[`src/ui/CLAUDE.md`](../../src/ui/CLAUDE.md) に記載された 5 つの非ラテン言語の翻訳も同じ変更で必要になります。
 - 数値、金額、日付、単位、パーセンテージは、手作業で文字列を組み立てるのではなく、フォーマッター（`formatNumber`、`formatMoney`、`formatDateTime`、`Intl`）を通してください。
 - `src/sim/` や `server/`（これらは言語に依存しないまま保たれます）から発せられるプレイヤー向けのテキストは、同じ変更の中でクライアント境界において再ローカライズしなければなりません。ガードテスト `npx vitest run tests/localization_fixes.test.ts` がこれを強制します。
-- 文字列を追加または変更したあとは `npm run i18n:gen` を実行し、再生成されたバンドルを同じ変更としてコミットしてください。ゲートと CI はどちらも、コミットされた生成物と新たに再生成したものを比較するので、古いバンドルのままだとビルドが失敗します。
+- 文字列を追加または変更したあとは `pnpm run i18n:gen` を実行し、再生成されたバンドルを同じ変更としてコミットしてください。ゲートと CI はどちらも、コミットされた生成物と新たに再生成したものを比較するので、古いバンドルのままだとビルドが失敗します。
 
 というわけで、文字列は英語で追加して PR を開いてください。自分で翻訳する必要はありません。翻訳を手伝いたい場合は、次のセクションを参照してください。
 
@@ -146,7 +155,7 @@ World of ClaudeCraft は多くの言語で提供されています。プレイ�
 
 1. プレイヤー向けの翻訳のほとんどは、[`src/ui/i18n.locales/`](../../src/ui/i18n.locales/) 配下の言語ごとのオーバーレイファイル（ロケールごとに 1 つ）にあり、[`src/ui/i18n.catalog/`](../../src/ui/i18n.catalog/) の英語キーを写した構造になっています。シミュレーションとサーバーが発するテキストは `src/ui/sim_i18n.ts` と `src/ui/server_i18n.ts` で、タレントのテキストは `talent_i18n` モジュールで翻訳します。管理ダッシュボードには `src/admin/i18n.locales/` に独自の一式があります。
 2. 既存の翻訳を改善したり、ぎこちなく感じる箇所を埋めたりします。
-3. `npm run i18n:gen` を実行し、再生成されたバンドルをオーバーレイの編集と一緒にコミットしてから、ローカライズのスイート（`npx vitest run tests/i18n_completeness.test.ts tests/localization_coverage.test.ts`）を実行して PR を開いてください。オーバーレイは意図的に疎な構造になっているため、型チェックだけではキーの漏れはわかりません。
+3. `pnpm run i18n:gen` を実行し、再生成されたバンドルをオーバーレイの編集と一緒にコミットしてから、ローカライズのスイート（`npx vitest run tests/i18n_completeness.test.ts tests/localization_coverage.test.ts`）を実行して PR を開いてください。オーバーレイは意図的に疎な構造になっているため、型チェックだけではキーの漏れはわかりません。
 
 まったく新しいロケールを提案したい場合や、トーンや用語について相談したい場合は、[Discord](https://discord.com/invite/worldofclaudecraft) でスレッドを立ててください。設定のつなぎ込みをお手伝いします。ネイティブの方や流暢に話せる方は、とりわけ歓迎します。良い翻訳は、世界中のプレイヤーにとって、このゲームを我が家のように感じさせてくれます。
 

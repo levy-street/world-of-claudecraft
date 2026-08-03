@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 //
 // DOM behavioral guard: keyboard focus, scroll position, and write elision
 // across professions-window rebuilds (the deeds_window_focus.test.ts family).

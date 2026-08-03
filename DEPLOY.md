@@ -108,19 +108,20 @@ sudo git -C private/bot_detector pull
 #    config can carry tokens; the type check needs none of them), and
 #    --ignore-scripts stops dependency install hooks from running as root with
 #    network access. The memory bound matters because this runs on the live box
-#    BEFORE the game stops: an unbounded npm ci plus tsc can spike past what the
-#    host has spare and create the exact memory pressure the game service's
-#    mem_limit exists to prevent. 2g is ample for this tree's npm ci and tsc; the
+#    BEFORE the game stops: an unbounded pnpm install plus tsc can spike past what
+#    the host has spare and create the exact memory pressure the game service's
+#    mem_limit exists to prevent. 2g is ample for this tree's install and tsc; the
 #    swap bound matches so the gate cannot push the host into swap either.
 sudo docker run --rm --memory 2g --memory-swap 2g -v /opt/eastbrook:/src:ro -w /app node:26-slim \
-  sh -c 'cp -a /src/. /app && find /app \( -name .git -o -name .env \) -prune -exec rm -rf {} + && npm ci --ignore-scripts --no-audit --no-fund && npx tsc --noEmit'
+  sh -c 'cp -a /src/. /app && find /app \( -name .git -o -name .env \) -prune -exec rm -rf {} + && npm install -g pnpm@10.34.5 && pnpm install --frozen-lockfile --ignore-scripts && npx tsc --noEmit'
 #    Red means STOP, do not deploy: the image would build fine and fail at runtime.
 #    One exception: exit code 137 means the container hit the 2g memory bound (a
 #    gate-environment failure, not a type error); raise the bound or run the gate
 #    off-box, do not skip it.
-#    (On a host that does have Node 26 on PATH, `npm ci --ignore-scripts && npx tsc
-#    --noEmit` in the checkout runs the same type check, but WITHOUT the container's
-#    memory bound; on the live box prefer the containerized form above.)
+#    (On a host that does have Node 26 on PATH with pnpm available,
+#    `pnpm install --frozen-lockfile --ignore-scripts && npx tsc --noEmit` in the
+#    checkout runs the same type check, but WITHOUT the container's memory bound;
+#    on the live box prefer the containerized form above.)
 
 # 4. Optional: warn the players. POST /internal/restart-countdown broadcasts an
 #    in-game countdown. The secret header is the ONLY gate: nothing restricts the

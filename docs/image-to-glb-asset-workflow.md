@@ -509,14 +509,14 @@ provide.
 Every Eastbrook-era GLB carries a sha256 fingerprint over a pinned input list
 (`scripts/assets/<asset>/source_fingerprint.mjs`): the factory, entry, exporter, spec,
 `build_assets.mjs`, the reference turnarounds and shared atlas where applicable, and
-`package-lock.json`. Contract tests recompute it live and compare it to the stamped GLB. The town family's
+`pnpm-lock.yaml`. Contract tests recompute it live and compare it to the stamped GLB. The town family's
 polish integrity test instead pins the provenance recorded in capture evidence JSONs
 against the frozen values the evidence itself carries (the evidence predates later
 rebuilds and is never recaptured); the mailbox and noticeboard families still bind to
 live values. Consequences:
 
 - Changing ANY fingerprinted input, including a lockfile-only dependency bump or a release
-  merge that touches `package-lock.json`, requires re-exporting the affected families
+  merge that touches `pnpm-lock.yaml`, requires re-exporting the affected families
   (`--no-preview` keeps evidence untouched), regenerating the media manifest, and
   re-pinning the sha256 and fingerprint literals in tests, design-doc tables, and evidence
   JSONs in the same change.

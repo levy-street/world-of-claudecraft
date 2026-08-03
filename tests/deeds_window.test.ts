@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 //
 // Source-guard suite for the Book of Deeds window + tracker wiring (the
 // bank_window.test.ts pattern): no-magic-values in the painters, the hud.ts

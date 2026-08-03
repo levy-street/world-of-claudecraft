@@ -959,6 +959,18 @@ export const ko_KR: EnTranslations = {
       "petAggressive": "펫: 공격적",
       "mount": "탑승 / 하차"
     },
+    "actionBar": {
+      "editKeys": "액션 바 키 편집",
+      "editKeysHint": "액션 바의 슬롯을 클릭한 다음 키를 눌러 지정하세요.",
+      "bannerHint": "슬롯을 클릭한 다음 키를 눌러 지정하세요. 완료되면 \"완료\"를 클릭하세요.",
+      "bannerCapturing": "키를 눌러 이 슬롯에 지정하세요...",
+      "boundToKey": "{key}(으)로 지정되었습니다.",
+      "reset": "초기화",
+      "done": "Done",
+      "cancel": "취소",
+      "resetConfirmTitle": "액션 바 키를 초기화하시겠습니까?",
+      "resetConfirmBody": "첫 번째 바는 기본 키로 되돌아가고, 두 번째와 세 번째 바는 지정 해제됩니다. 이 작업은 되돌릴 수 없습니다."
+    },
     "mounts": {
       "title": "탈것",
       "close": "닫기",
@@ -6215,6 +6227,7 @@ export const ko_KR: EnTranslations = {
         "add": "채팅 채널 추가",
         "addTitle": "채널 추가",
         "close": "{channel} 탭 닫기",
+        "moveHint": "{channel} 탭 순서 변경: 드래그하거나 Alt+왼쪽 또는 Alt+오른쪽 사용",
         "sendingTo": "{channel} 채널에 보내기",
         "names": {
           "say": "말하기",

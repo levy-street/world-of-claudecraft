@@ -22,7 +22,7 @@ vi.mock('../server/db', () => ({
   })),
 }));
 
-import { type ClientSession, GameServer, wireEntity } from '../server/game';
+import { GameServer, wireEntity } from '../server/game';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import { ClientWorld } from '../src/net/online';
 import { bagCapacity, stackSizeOf } from '../src/sim/bags';
@@ -49,6 +49,7 @@ import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { corpseHarvestView } from '../src/ui/hud/loot/corpse_harvest_view';
+import { bareClient, broadcast, fakeWs, joinServer, lastSnap } from './helpers/bare_client';
 
 // End-to-end: a slain mob's corpse can be harvested for profession components
 // exactly once, first-come. This is the deliberate OPPOSITE of a world gathering
@@ -2226,56 +2227,6 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
   });
 });
 
-// A ClientWorld without the WebSocket plumbing, to drive applySnapshot directly
-// (the established bare-client idiom; see bareClient in tests/snapshots.test.ts
-// and tests/CLAUDE.md).
-function bareClient(pid: number): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass: 'warrior' };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.ownPlayerId = pid;
-  c.ownPlayerClass = 'warrior';
-  c.spectating = null;
-  c.cupInfo = null;
-  c.sportRole = null;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.honor = 0;
-  c.lifetimeHonor = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.selectedDungeonDifficulty = 'normal';
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.serverTickHz = null;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  c.spectateFacingPending = false;
-  c.pendingSpectateFacing = null;
-  c.nodeCooldowns = new Map();
-  return c;
-}
-
 // The online half of the claim: the server encodes harvestClaimedBy as the
 // sparse terse key `hcb` (server/game.ts wireEntity), ClientWorld mirrors it,
 // and the corpse picker's availability core (corpseLootAvailability) therefore
@@ -2317,34 +2268,6 @@ describe('corpse harvest claim over the wire (online picker parity)', () => {
 // (dyn-only) record, and leaving interest scope evicts the corpse from the
 // session's sent set so re-entry gets a fresh full record. Both arms must
 // deliver claim truth to the mirror.
-interface FakeClient {
-  sent: any[];
-  ws: any;
-}
-
-function fakeWs(): FakeClient {
-  const sent: any[] = [];
-  return { sent, ws: { readyState: 1, send: (payload: string) => sent.push(JSON.parse(payload)) } };
-}
-
-function lastSnap(sent: any[]): any {
-  for (let i = sent.length - 1; i >= 0; i--) {
-    if (sent[i].t === 'snap') return sent[i];
-  }
-  return null;
-}
-
-function joinServer(server: GameServer, fc: FakeClient, id: number, name: string): ClientSession {
-  const session = server.join(fc.ws, id, id, name, 'warrior', null);
-  if ('error' in session) throw new Error(session.error);
-  session.blockListLoaded = true;
-  return session;
-}
-
-function broadcast(server: GameServer): void {
-  (server as any).broadcastSnapshots();
-}
-
 describe('corpse harvest claim over the live broadcast (delta + interest scope)', () => {
   function liveSetup() {
     const server = new GameServer();

@@ -37,25 +37,31 @@ Místo tu má každý:
 
 ## Než začneš
 
-Budeš potřebovat [Node.js 26](https://nodejs.org/) a npm, tedy verze, které používá
-CI a produkční image. Starší hlavní verze nejsou otestované. Pro víceuživatelský
-server se ti navíc bude hodit [Docker](https://www.docker.com/), aby ses rozběhl
-Postgres.
+Budeš potřebovat [Node.js 26](https://nodejs.org/) a **pnpm 10.34.x** (přesný pin je v `package.json` u `packageManager`, dnes `pnpm@10.34.5`). Starší hlavní verze Node nejsou otestované. Pro víceuživatelský server se ti navíc bude hodit [Docker](https://www.docker.com/), aby ses rozběhl Postgres.
+
+**Corepack není povinný.** pnpm nainstaluj jednou přes npm, které je součástí Node. Stejný postup platí na macOS, Linuxu i Windows.
 
 ```bash
 # 1. Fork the repo on GitHub, then clone your fork
 git clone https://github.com/<your-username>/world-of-claudecraft.git
 cd world-of-claudecraft
 
-# 2. Install dependencies
-npm ci
+# 2. Install pnpm once (same command on macOS, Linux, Windows)
+#    Match the packageManager pin in package.json (today: 10.34.5).
+npm install -g pnpm@10.34.5
+pnpm --version   # should print 10.34.5 (or the pin in package.json)
 
-# 3. Point git at the repository hooks (once per clone)
+# 3. Install dependencies (uses the global content-addressable store)
+pnpm install --frozen-lockfile
+
+# 4. Point git at the repository hooks (once per clone)
 git config core.hooksPath .githooks
 
-# 4. Run the offline client (no server or database needed)
-npm run dev          # open the URL it prints (usually http://localhost:5173)
+# 5. Run the offline client (no server or database needed)
+pnpm run dev         # open the URL it prints (usually http://localhost:5173)
 ```
+
+`npm run <script>` po instalaci přes pnpm stále funguje (Node dodává npm), ale **instalace a aktualizace lockfile musí jít přes pnpm**. Do repozitáře necommituj `package-lock.json`; jediný zdroj pravdy je `pnpm-lock.yaml`.
 
 To stačí na hraní offline světa a na většinu práce. Pro rozběhnutí kompletního
 online stacku potřebuješ nejdřív v prostředí heslo k databázi:
@@ -63,13 +69,13 @@ online stacku potřebuješ nejdřív v prostředí heslo k databázi:
 ```bash
 cp .env.example .env
 # set POSTGRES_PASSWORD and point DATABASE_URL at the same password
-npm run db:up        # start Postgres 16 in Docker (dev DB on port 5433)
-npm run server       # build and run the authoritative game server on :8787
-npm run dev          # in another terminal; the client proxies to the server
+pnpm run db:up       # start Postgres 16 in Docker (dev DB on port 5433)
+pnpm run server      # build and run the authoritative game server on :8787
+pnpm run dev         # in another terminal; the client proxies to the server
 ```
 
 Pokud plánuješ spouštět kompletní gate popsaný níže, nainstaluj si jednou
-prohlížeč, který řídí: `npx playwright install chromium`.
+prohlížeč, který řídí: `pnpm exec playwright install chromium`.
 
 [README](README.cs_CZ.md) obsahuje kompletního průvodce hostingem, vývojem a hraním
 a soubory `CLAUDE.md` po celém repozitáři dokumentují konvence pro každou oblast.
@@ -98,13 +104,7 @@ místo desítek sekund. Instalace používá oficiální dvojitý alias: balíč
   veškerou paralelizaci. Kontrola jednoho souboru na přeskáčku (`npx tsc somefile.ts`)
   skončí chybou, když adresář obsahuje `tsconfig.json`; původní chování vrátíš
   přepínačem `--ignoreConfig`.
-- **Lockfile.** `package-lock.json` regeneruj výhradně příkazem
-  `npx npm@10 install --package-lock-only`: soubor používá sémantiku npm 10 a novější
-  hlavní verze npm (včetně npm 11, které přibaluje Node 26 v CI) tiše zahazují
-  vnořené záznamy volitelných peer závislostí `svelte-check`, což rozhodí `npm ci`
-  v CI. Samotné `npm ci` je bezpečné pod libovolnou hlavní verzí npm. Po regeneraci
-  ověř, že `npm ci --dry-run` je v souladu jak pod npm 10, tak pod npm na tvé
-  pracovní stanici.
+- **Lockfile.** Lockfile je `pnpm-lock.yaml` (pnpm 10 / lockfileVersion 9). Aktualizuj ho jen příkazy `pnpm install`, `pnpm add` nebo `pnpm update` z kořene tohoto repozitáře (nikdy neručně). Commitni `pnpm-lock.yaml` společně se změnami v `package.json`. CI instaluje přes `pnpm install --frozen-lockfile`; zastaralý lockfile selže. Nezaváděj druhý lockfile (`package-lock.json` / yarn.lock): dual lockfiles se tiše rozcházejí a jsou zakázané. Šum z peer závislostí volitelných wallet/solana stromů se toleruje přes `.npmrc` (`strict-peer-dependencies=false`); dál to neuvolňuj bez měření.
 - **Kdy se k tomu vrátit.** Dvojitý alias slouč zpátky na jedinou závislost
   `typescript` teprve tehdy, až budou platit OBĚ podmínky: vyjde stabilní JS API
   TypeScriptu 7.1 (TypeScript 7.0 nedodává žádné JS API; náhrada se sleduje v issue
@@ -154,7 +154,7 @@ Tohle jsou nosné pravidla kódové základny. Kompletní podrobnosti žijí v k
   čte renderer nebo HUD, procházejí rozhraním `IWorld` (`src/world_api/`) a
   implementují se v obou světech, offline i online; nový systém simulace jde za
   `SimContext`; nový REST endpoint je modul routy, jehož kostru vygeneruješ pomocí
-  `npm run new:endpoint`.
+  `pnpm run new:endpoint`.
 - **Needituj ručně generované soubory** jako `*.generated.ts`. Regeneruj je přes
   build.
 - **Domácí styl textu: nikde žádné dlouhé ani střední pomlčky a žádná emoji**, ani
@@ -169,7 +169,7 @@ Tohle jsou nosné pravidla kódové základny. Kompletní podrobnosti žijí v k
 Formátování zajišťuje [Biome](https://biomejs.dev/), nastavený v `biome.json`:
 odsazení 2 mezery, řádky na 100 sloupců, jednoduché uvozovky, koncové čárky.
 Formátuj jen soubory, kterých ses dotkl (`npx @biomejs/biome check --write <your-file.ts>`),
-a zkontroluj je pomocí `npm run ci:changed`. CI hlídá jen změněné soubory, takže
+a zkontroluj je pomocí `pnpm run ci:changed`. CI hlídá jen změněné soubory, takže
 prosím nepřeformátovávej zbytek stromu: běh přes celý repozitář vynese dlouho
 existující dluh, který není na tobě, abys ho opravoval.
 
@@ -178,12 +178,12 @@ existující dluh, který není na tobě, abys ho opravoval.
 Spusť si gate repozitáře lokálně. Je to tentýž kontrakt, jaký vynucuje CI:
 
 ```bash
-npm run gate
+pnpm run gate
 ```
 
 Při iterování spouštěj jednu sadu (`npx vitest run tests/sim.test.ts`) a
-`npm run ci:changed` na formátování; `npm test` spustí všechno a mapa sad je
-v `tests/CLAUDE.md`. Kompletní `npm run gate` pokrývá čerstvost generovaných
+`pnpm run ci:changed` na formátování; `pnpm test` spustí všechno a mapa sad je
+v `tests/CLAUDE.md`. Kompletní `pnpm run gate` pokrývá čerstvost generovaných
 artefaktů, sken na malware, formátování změněných souborů, kontrolu konformity
 zvukových efektů, celou testovací sadu, regresní průchod ve skutečném prohlížeči,
 striktní kontrolu typů a buildy klienta, serveru i headless verze. Vrstvené
@@ -207,13 +207,13 @@ kontrolním seznamem. Prosím vyplň ho:
 - Popiš, **co** se změnilo a **proč**.
 - Odkaž na související issue (například "Closes #123").
 - Přidej **screenshoty nebo krátké video u změn rozhraní**, na desktopu i na mobilu.
-- Potvrď, že `npm run gate` prochází a že nové řetězce pro hráče dodržují níže
+- Potvrď, že `pnpm run gate` prochází a že nové řetězce pro hráče dodržují níže
   popsanou politiku "nejdřív angličtina" pro přispěvatele.
 
 Na tvém PR spustí CI formátování a linting nad tvými změněnými soubory, kompletní
 testovací sadu rozloženou do čtyř paralelních shardů, regresní průchod prohlížečem
 a kontrolu typů plus buildy klienta, serveru i headless verze. To odpovídá tomu, co
-lokálně spouští `npm run gate`, takže zelený gate dobře předpovídá zelený PR.
+lokálně spouští `pnpm run gate`, takže zelený gate dobře předpovídá zelený PR.
 
 Zelený běh CI a kompletní kontrolní seznam jsou to, na co se před sloučením díváme.
 Správce může navrhnout změny. To je normální, kolegiální součást procesu, ne
@@ -246,7 +246,7 @@ anglický zdroj.
 - Text pro hráče vycházející z `src/sim/` nebo `server/`, které zůstávají jazykově
   neutrální, se musí ve stejné změně znovu lokalizovat na hranici klienta. Vynucuje
   to ochranný test `npx vitest run tests/localization_fixes.test.ts`.
-- Po přidání nebo změně jakéhokoli řetězce spusť `npm run i18n:gen` a regenerované
+- Po přidání nebo změně jakéhokoli řetězce spusť `pnpm run i18n:gen` a regenerované
   bundly commitni ve stejné změně. Gate i CI porovnávají commitnuté artefakty
   s čerstvou regenerací, takže zastaralý bundle build shodí.
 
@@ -267,7 +267,7 @@ Chceš vylepšit nějaký jazyk nebo pomoct dostat hru do nového? Nemusíš k t
    `src/ui/server_i18n.ts`, texty talentů v modulech `talent_i18n` a administrátorský
    dashboard má vlastní sadu pod `src/admin/i18n.locales/`.
 2. Vylepši stávající překlady nebo doplň ty, které se čtou kostrbatě.
-3. Spusť `npm run i18n:gen`, commitni regenerované bundly spolu se svou úpravou
+3. Spusť `pnpm run i18n:gen`, commitni regenerované bundly spolu se svou úpravou
    overlaye, pak spusť lokalizační sady
    (`npx vitest run tests/i18n_completeness.test.ts tests/localization_coverage.test.ts`)
    a otevři PR. Samotná kontrola typů ti neřekne, jestli nějaký klíč chybí, protože
