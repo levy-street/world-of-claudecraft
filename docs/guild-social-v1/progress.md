@@ -240,3 +240,7 @@ non-Latin fills) and thresholds moved to 7/30 days (was 14/90). View core, windo
 catalog, locales, and both test suites updated; tsc + social_view/social_window/
 i18n_completeness/architecture green. Roster after-screenshots still show the old 'New'
 label on the youngest member; recapture owed if the maintainer wants pixel-current shots.
+
+Revision 2 (2026-08-02, user-directed): all five role labels now share the one plain
+.rank chip treatment; the per-tier soc-tenure-* tint classes and their CSS were removed
+(label text alone distinguishes tiers). Pins updated to forbid a tier class returning.

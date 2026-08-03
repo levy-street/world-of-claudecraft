@@ -160,9 +160,10 @@ export function guildMemberRowHtml(m: GuildRow, now: number): string {
   // so a member crossing a threshold while the panel sits open keeps the old
   // label until the next social frame or reopen (a wall-clock driver would
   // break the cold-window "no repeating driver" contract).
+  // All five role labels share the one .rank chip treatment (user call: the
+  // label alone distinguishes the tiers; no per-tier tint).
   const role = guildDisplayedRole(m.rank, tenureTier(m.joinedAt, now));
-  const roleClass = role === 'recruit' || role === 'veteran' ? ` soc-tenure-${role}` : '';
-  const nameInner = `${esc(m.name)}<span class="rank${roleClass}">${esc(roleLabel(role))}</span>${memberTitleSpan}`;
+  const nameInner = `${esc(m.name)}<span class="rank">${esc(roleLabel(role))}</span>${memberTitleSpan}`;
   const name =
     m.online && !m.self
       ? `<button type="button" class="soc-name soc-link" data-whisper="${esc(m.name)}" title="${esc(t('hud.social.whisperTitle', { name: m.name }))}">${nameInner}</button>`

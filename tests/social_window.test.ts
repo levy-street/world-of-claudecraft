@@ -195,7 +195,7 @@ describe('social_window: Book of Deeds title spans (both roster surfaces)', () =
     // name, then the ONE role chip, then title: a long title trims off the
     // tail and can never push the chip out of the ellipsized cell.
     expect(painter).toContain(
-      '${esc(m.name)}<span class="rank${roleClass}">${esc(roleLabel(role))}</span>${memberTitleSpan}',
+      '${esc(m.name)}<span class="rank">${esc(roleLabel(role))}</span>${memberTitleSpan}',
     );
   });
 });
@@ -222,11 +222,12 @@ describe('social_window: guild displayed-role chip (source pins)', () => {
     expect(rowBuilder).not.toContain('Date.now()');
   });
 
-  it('escapes the localized chip text and classes the tier variants only', () => {
-    expect(painter).toContain(
-      "const roleClass = role === 'recruit' || role === 'veteran' ? ` soc-tenure-${role}` : '';",
-    );
-    expect(painter).toContain('<span class="rank${roleClass}">${esc(roleLabel(role))}</span>');
+  it('escapes the localized chip text into the ONE shared .rank chip (no tier class)', () => {
+    // User call: all five role labels share the rank-chip treatment; the
+    // label alone distinguishes the tiers. A soc-tenure-* class or a
+    // role-derived class sneaking back in must fail here.
+    expect(painter).toContain('<span class="rank">${esc(roleLabel(role))}</span>');
+    expect(painter).not.toContain('soc-tenure');
   });
 
   it('localizes every role label through t() keys (tiers + ranks via rankLabel)', () => {
@@ -234,34 +235,6 @@ describe('social_window: guild displayed-role chip (source pins)', () => {
     expect(painter).toContain("t('hud.social.tenure.veteran')");
     expect(painter).toContain("t('hud.social.ranks.member')");
     expect(painter).toContain('return rankLabel(role);');
-  });
-
-  it('styles both tier chips with panel-aware text tokens inside the name cell', () => {
-    // The compound .rank.soc-tenure-* selector is load-bearing: it must
-    // OUT-SPECIFY the .soc-name .rank gold tint rather than tie with it on
-    // source order, so a stylesheet reorder cannot regress the chips.
-    expect(componentsCss).toContain('.soc-name .rank.soc-tenure-recruit');
-    expect(componentsCss).toContain('.soc-name .rank.soc-tenure-veteran');
-    // The chips must ride the theme's ensureReadable text tokens, never the
-    // raw accent (invisible next to the gold rank chip on dark presets) or a
-    // static green (sub-AA on the light Parchment panel). Each rule is sliced
-    // on its own so the PER-TIER binding is pinned (swapping the two tokens
-    // between the tiers must fail, not just dropping one from the union).
-    const rule = (selector: string): string => {
-      const start = componentsCss.indexOf(selector);
-      expect(start).toBeGreaterThan(-1);
-      return componentsCss.slice(start, componentsCss.indexOf('}', start));
-    };
-    const recruitRule = rule('.soc-name .rank.soc-tenure-recruit');
-    expect(recruitRule).toContain('var(--color-text-light)');
-    expect(recruitRule).not.toContain('var(--color-text-muted)');
-    const veteranRule = rule('.soc-name .rank.soc-tenure-veteran');
-    expect(veteranRule).toContain('var(--color-text-muted)');
-    expect(veteranRule).not.toContain('var(--color-text-light)');
-    for (const section of [recruitRule, veteranRule]) {
-      expect(section).not.toContain('var(--color-primary)');
-      expect(section).not.toContain('var(--color-friendly)');
-    }
   });
 });
 
@@ -300,13 +273,13 @@ describe('social_window: guild displayed-role chip (rendered rows)', () => {
 
   it('renders ONE chip, the Recruit tier as the role, for a 3-day member', () => {
     const html = guildMemberRowHtml(row({ joinedAt: NOW - 3 * DAY }), NOW);
-    expect(chips(html)).toEqual(['<span class="rank soc-tenure-recruit">Recruit</span>']);
+    expect(chips(html)).toEqual(['<span class="rank">Recruit</span>']);
     expect(html).not.toContain('>Member<');
   });
 
   it('renders ONE chip, the Veteran tier as the role, for a 200-day member', () => {
     const html = guildMemberRowHtml(row({ joinedAt: NOW - 200 * DAY }), NOW);
-    expect(chips(html)).toEqual(['<span class="rank soc-tenure-veteran">Veteran</span>']);
+    expect(chips(html)).toEqual(['<span class="rank">Veteran</span>']);
     expect(html).not.toContain('>Member<');
   });
 
