@@ -1,6 +1,6 @@
 # Guild Bank: cross-phase state
 
-Current phase: Phase 2 QA complete (2026-08-02, PASS-WITH-FOLLOWUPS); Phase 3 next.
+Current phase: Phase 3 complete (2026-08-02); Phase 3 QA next.
 
 ## Locked design decisions
 - Base `release/v0.34.0`, branch `feature/guild-bank`. PR A (`feature/guild-social-v1`)
@@ -218,6 +218,49 @@ Current phase: Phase 2 QA complete (2026-08-02, PASS-WITH-FOLLOWUPS); Phase 3 ne
       arm, the locked-slot projection, the four-dimension withdraw pipe sweep,
       and malformed-count negatives in `tests/guild_bank.test.ts`.
 - Phase 3 DDL / db functions / ledger ops / fee wiring:
+  - DDL: `guild_banks` appended to `SOCIAL_SCHEMA` (`server/social_db.ts`), exactly the
+    state.md shape (PK guild_id REFERENCES guilds ON DELETE CASCADE, realm TEXT NOT
+    NULL with no default, data JSONB NOT NULL, updated_at). Pinned in
+    `tests/guild_bank_db.test.ts`; proven valid + idempotent against real Postgres.
+  - db functions (`server/db.ts`): `characterUpdateStatement` (the ONE fenced character
+    UPDATE, shared by the whole save family), `saveCharacterAndGuildBankState`
+    (character + books, one transaction, lease fence, false on fence miss),
+    `saveCharacterAndMarketState(..., guildBanks?)` (additive trailing param for the
+    leave flush), `writeGuildBankRow` (the only guild_banks write statement, fence-side
+    only), `loadGuildBankRows()` (realm LEFT JOIN, size bound in SQL), constants
+    `GUILD_BANK_ROW_MAX_BYTES` (262144); `BankLedgerRow` widened: ops +=
+    `deposit_gold | withdraw_gold | create_fee`, container `'personal' | 'guild'`,
+    containerId `number | null`.
+  - Host glue: `server/guild_bank_state.ts` (`loadGuildBanksIntoSim` with has()
+    verification and the oversized SKIP, `collectGuildBankSaves` with the
+    null-serialize skip). Boot call `GameServer.loadGuildBanks()` awaited in `main.ts`
+    before listen. Session state: `ClientSession.dirtyGuildBanks` (guildId -> seq),
+    seq-guarded release in `saveCharacter`; book serialization happens at write time
+    inside the market serial writer.
+  - Ledger ops (`server/bank_ledger.ts`): `GuildBankLedgerOp`
+    (`deposit_gold | withdraw_gold | deposit | withdraw | buy_slots`), pure
+    `diffGuildBankOp` + `recordGuildBankDeltas` (+ `guildCreateFeeDelta`), shared FIFO
+    tail, container='guild', container_id = guild id, purchased_slots_after from the
+    AFTER book (0 for create_fee). Gold ops carry the TREASURY delta; create_fee the
+    founder's purse and is excluded from the audit treasury replay.
+    `scripts/bank_audit.mjs`: guild rows group per GUILD, treasury replay, new shape
+    checks (`item_on_gold_op`, `bad_gold_delta`, `nonnegative_create_fee`,
+    `slots_on_create_fee`, `gold_op_outside_guild`, `missing_container_id`,
+    `negative_treasury`, `treasury_mismatch`), `guild_banks` reconciliation
+    (`auditBank({..., guildBanks?})`); personal report unchanged. Keep-forever comment
+    at the `server/main.ts` retention `tables:` site.
+  - Fee wiring: dispatch gate in `server/game.ts` `guild_create` (refuse-poor before
+    any DB work; literal derived from `GUILD_CREATION_FEE_COPPER` via a `goldAmount`
+    local so the S3 probe matches the RULE); transport hook
+    `SocialTransport.onGuildCreated` fired in `guildCreate`'s success arm right after
+    the founder stamp (seed empty book -> `chargeGuildCreationFeeFor` -> create_fee row
+    -> escrow save). Disband: `guildBankHoldings` transport read (fail-closed on null)
+    guards `guildDisband`; `onGuildDisbanded` evicts via `Sim.evictGuildBank`.
+  - Sim additions (`src/sim/guild_bank.ts` + facade): `evictGuildBank`,
+    `guildBankHoldings`, `chargeGuildCreationFee` (clamped, silent, no rng).
+  - i18n: `guild.createFee` (parameterized, + RULES row) and `guild.bankNotEmpty`
+    (exact) in `src/ui/server_i18n.ts` (14 blocks) and `server_i18n.newlocales.ts`
+    (8 blocks); byte-bound sample pins in `tests/server_i18n.test.ts`.
 - Phase 4 UI modules / i18n keys / screenshots:
 
 ## Known gotchas

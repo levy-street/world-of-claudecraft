@@ -6,7 +6,7 @@
 | Phase 1 QA | Done (PASS-WITH-FOLLOWUPS) | 2026-08-02 | 2026-08-02 |
 | Phase 2: ops and wire | Done | 2026-08-02 | 2026-08-02 |
 | Phase 2 QA | Done (PASS-WITH-FOLLOWUPS) | 2026-08-02 | 2026-08-02 |
-| Phase 3: persistence | Not started | | |
+| Phase 3: persistence | Done | 2026-08-02 | 2026-08-02 |
 | Phase 3 QA | Not started | | |
 | Phase 4: UI | Not started | | |
 | Phase 4 QA (final, offers teardown) | Not started | | |
@@ -34,16 +34,16 @@
       stacks), command schema/facets, snapshot gating (away/dead/demoted/left), determinism.
 
 ## Phase 3 deliverables
-- [ ] `guild_banks` DDL (additive, idempotent) + boot load per realm + book injection into
+- [x] `guild_banks` DDL (additive, idempotent) + boot load per realm + book injection into
       the sim. MUST also seed an empty book at `guild_create` (a freshly founded guild
       has no row to boot-load, and ops never lazily create one), add the disband evict,
       and land BEFORE any Phase 4 UI ships: until books load, every op is deliberately
       silent-inert (Phase 2 review finding, tracked).
-- [ ] Escrow save: acting character + touched book in one transaction with the lease
+- [x] Escrow save: acting character + touched book in one transaction with the lease
       fence; rollback on fence miss; round-trip + crash-shape tests.
-- [ ] Ledger observer for guild ops (`container='guild'`), `create_fee` row, audit script
+- [x] Ledger observer for guild ops (`container='guild'`), `create_fee` row, audit script
       compatibility; keep-forever comment at the retention registration site.
-- [ ] Creation fee at `guild_create` dispatch (create-then-charge ordering) + refusal when
+- [x] Creation fee at `guild_create` dispatch (create-then-charge ordering) + refusal when
       poor; disband guard while bank non-empty; tests for both.
 
 ## Phase 4 deliverables
@@ -61,6 +61,63 @@
 Phase 1 QA: both lines verified and closed on 2026-08-02 (see Notes).
 
 ## Notes
+Phase 3 (2026-08-02):
+- DDL landed in `SOCIAL_SCHEMA` (the family that owns guilds): `guild_banks` per the
+  state.md shape, `ON DELETE CASCADE` off `guilds`, realm with NO interpolated default
+  (every insert passes realm explicitly). Applied against the real dev Postgres by a
+  server boot and re-applied twice by hand: valid and idempotent.
+- Persistence is ONE mechanism: the fenced escrow family in `server/db.ts`. The fenced
+  character UPDATE was extracted into `characterUpdateStatement` (rule of three: the
+  third copy appeared) so the lease fence is byte-identical across `saveCharacterState`,
+  `saveCharacterAndMarketState`, and the new `saveCharacterAndGuildBankState`. The
+  market sibling gained an additive optional `guildBanks` trailing param (the leave
+  flush carries books); the new sibling is the autosave-path escrow (no market gate:
+  it writes no world_state row, and books only exist post-boot-load/seed). Fence miss
+  rolls back everything and returns false; there is NO standalone book write anywhere.
+- Boot: `server/guild_bank_state.ts` (`loadGuildBanksIntoSim` + `collectGuildBankSaves`)
+  is the host-side glue module, unit-tested against a real Sim. `loadGuildBankRows`
+  LEFT JOINs every realm guild; no-row = empty book; an OVERSIZED row (bound applied
+  in SQL via `pg_column_size`, `GUILD_BANK_ROW_MAX_BYTES` = 256 KiB) is SKIPPED
+  entirely, never loaded as empty (that guild stays inert and its row survives; the
+  disband guard fails closed on it). `sim.guildBanks.has()` verified per loaded guild.
+  `main.ts` awaits `loadGuildBanks()` before listen: books are live before any join,
+  releasing the Phase 2 silent-inert wire.
+- Dirty tracking: `session.dirtyGuildBanks` (guildId -> seq). The dispatch observer
+  (`runGuildBankOp`) diffs `guildBankInfoFor` before/after each op: a non-empty diff
+  writes the container='guild' ledger rows (shared FIFO tail, never awaited) AND marks
+  the book dirty. Saves carrying books ride the ONE market serial writer with book
+  serialization at write time (the market clobber rationale); the seq-guarded release
+  keeps a mid-save op scheduled; a fence-out (false) releases nothing.
+- Fee: dispatch refuses a poor founder BEFORE any DB work with the localized
+  `guild.createFee` line; the commit arm (`SocialTransport.onGuildCreated`, fired in
+  guildCreate's success arm right after the founder stamp) seeds the empty book into
+  the LIVE sim, charges via `Sim.chargeGuildCreationFeeFor` (clamped to the purse,
+  silent by design), writes the `create_fee` row, and schedules the escrow save.
+- Disband: `guildDisband` consults `tx.guildBankHoldings` (the live book) after the
+  leader check; refuses while copper/items remain AND fails CLOSED on null (unloaded
+  book = the oversized-skip state; the cascade must not destroy the row). On the
+  committed DELETE, `onGuildDisbanded` evicts the book (`Sim.evictGuildBank`).
+- Ledger + audit: `diffGuildBankOp` (pure) + `recordGuildBankDeltas` in
+  `server/bank_ledger.ts`; gold ops record the TREASURY delta, buy_slots the negated
+  BEFORE table price, create_fee the founder's purse (excluded from treasury replay).
+  `scripts/bank_audit.mjs` groups guild rows per GUILD (anonymous pipe), replays the
+  treasury to non-negative, shape-checks the new ops, reconciles against `guild_banks`
+  books (disbanded guilds reconcile items+treasury against empty, purchased skipped),
+  and its `main()` reads `guild_banks`; ran clean against the dev DB (exit 0).
+- i18n: two new server literals (`guild.createFee` parameterized + RULES entry,
+  `guild.bankNotEmpty` exact) with DICT rows in ALL 22 locales and byte-bound pins in
+  `tests/server_i18n.test.ts` (game.ts/social.ts are S3 blind spots; the samples list
+  is the backstop). The fee literal uses a `goldAmount` local so the S3 scanner's
+  probe substitution stays digit-shaped and the RULE recognizes it.
+- New suites: `tests/guild_bank_db.test.ts` (DDL pin, transaction/crash shape,
+  fence-miss rollback, bounded read), `tests/guild_bank_persistence.test.ts` (real
+  GameServer + Sim: boot load, parsed-object pin, round trip, observer, escrow arm,
+  null-serialize skip, fence-out keeps the mark, mid-save seq guard, fee gate, create
+  and disband hooks); guild arms appended to `tests/bank_ledger.test.ts`,
+  `tests/bank_ledger_db.test.ts`, `tests/bank_audit.test.ts`,
+  `tests/social_system.test.ts` (guard refus/allow/evict/fail-closed),
+  `tests/guild_bank.test.ts` (evict/holdings/charge).
+
 Phase 2 (2026-08-02):
 - Sim ops landed as free functions over SimContext in `src/sim/guild_bank.ts` with a
   shared `requireOfficerBook` gate helper. Validation order exactly per state.md.
