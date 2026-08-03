@@ -14,7 +14,7 @@
 // they ARE the map, and the map is gameplay.
 
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   BASES,
   COVER_CRATES,
@@ -49,6 +49,9 @@ import { buildPaint, SWATCHES } from '../scripts/assets/battleground/ground_pain
 import { bodyOffset, courseFit, r4, yaw } from '../scripts/assets/battleground/kit.mjs';
 import { makeHeightAt } from '../scripts/assets/battleground/stamp_chain.mjs';
 import { terrainStamps } from '../scripts/assets/battleground/terrain.mjs';
+import { BattlegroundMapPainter } from '../src/ui/hud/battleground/battleground_map_painter';
+import type { BgMapModel } from '../src/ui/hud/battleground/battleground_map_view';
+import { setLanguage, t } from '../src/ui/i18n';
 
 /** Does `set` contain the point mirror of `p`, to within `eps`? */
 function hasMirror(set: readonly PlanPoint[], p: PlanPoint, eps = 1e-9): boolean {
@@ -451,11 +454,41 @@ const mapPainterCode = MAP_PAINTER_SRC.replace(/\/\*[\s\S]*?\*\//g, '').replace(
   '$1',
 );
 
-// The ONLY colour literals allowed to survive in this file, by CONSTANT NAME:
-// the sampled terrain palette (see the rationale above). A new name may not be
-// added here without the same justification; interface chrome belongs in
-// MAP_CHROME_TOKENS with a CSS var.
-const TERRAIN_PALETTE_CONSTANTS = ['KEEP_FLOOR', 'GRAVE_DIRT', 'WALL_FILL', 'RUNE_FILL'];
+// The ONLY colour literals allowed to survive in this file, by CONSTANT NAME.
+// A new name may not be added here without the same justification the two
+// groups below carry; interface chrome belongs in MAP_CHROME_TOKENS with a CSS
+// var, and every entry must still be DRAWN with (the second test below).
+const TERRAIN_PALETTE_CONSTANTS = [
+  // GROUP 1, the sampled field dressing: the built things standing on the
+  // ground, sampled from the 3D field's own materials (flagstone keep floors,
+  // slate walls, graveyard dirt, the pale rune pads).
+  'KEEP_FLOOR',
+  'GRAVE_DIRT',
+  'WALL_FILL',
+  'RUNE_FILL',
+  // GROUP 2, the atlas plate's cartography, added with the M-map restyle. Same
+  // map_terrain.ts precedent and one extra reason a token cannot serve: these
+  // are painted into the CACHED PLATE, under and around a raster the pure core
+  // (bg_field_relief_core.paintBgFieldAtlas) writes as raw RGBA bytes, where a
+  // CSS var is not readable at all. They are plate art, not theme surface: the
+  // plate is rebuilt only on a resize, a team swap or a language switch, so a
+  // themeable value here could not follow a theme change anyway.
+  // SURROUND_FILL is the old growth the hollow was cut out of, filling the
+  // plate margin outside the ramparts.
+  'SURROUND_FILL',
+  // CROWN_*/BOULDER_* are the painted marks over it and over the field: a blob
+  // plus its lit northwest face, map_terrain's clumped-crown read drawn as two
+  // arcs instead of per pixel. Green for the trees, grey for rock and rubble.
+  'CROWN_FILL',
+  'CROWN_LIT',
+  'BOULDER_FILL',
+  'BOULDER_LIT',
+  // LABEL_HALO is the parchment each landmark name is written on. Its partner
+  // (the ink the name is written IN) is the --color-bg-map-ink TOKEN, which is
+  // the split this rule exists to enforce: the halo is plate material, the ink
+  // is HUD chrome.
+  'LABEL_HALO',
+];
 
 describe('Thornhollow Fields map painter: no magic colours (canvas sub-rule)', () => {
   it('keeps every colour literal in the terrain palette or a documented token fallback', () => {
@@ -513,5 +546,277 @@ describe('Thornhollow Fields map painter: no magic colours (canvas sub-rule)', (
     // The REQUIRED group still gates the draw; the chrome group falls back.
     expect(mapPainterCode).toContain('if (!v) return null;');
     expect(mapPainterCode).toMatch(/getPropertyValue\(token\)\.trim\(\) \|\| fallback/);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The atlas PLATE itself, driven through a fake 2D context.
+//
+// The plate is the map's golden look: a cached raster nothing re-derives per
+// frame, so a drift in it is invisible to every other suite here. These arms
+// drive the REAL painter and record the plate's draw-command trace, which makes
+// three claims behaviour rather than prose: the build is deterministic (same
+// inputs, same trace, so the look cannot silently move), it is keyed on the
+// things that must rebuild it (size, team, language), and it survives the away
+// team's 180-degree turn with its labels upright and point-mirrored.
+
+/** One recorded plate command: the op, its arguments, and the style in force. */
+type PlateOp = string;
+
+interface PlateTrace {
+  /** Every offscreen canvas the painter minted, with the ops drawn into it. */
+  plates: Array<{ w: number; h: number; ops: PlateOp[] }>;
+  /** Every text entry point used on the MAP context (labels belong to the
+   *  plate, so this must stay empty). */
+  mapText: string[];
+}
+
+function fakePlateCanvas(trace: PlateTrace): unknown {
+  const plate = { w: 0, h: 0, ops: [] as PlateOp[] };
+  trace.plates.push(plate);
+  const ctx = {
+    fillStyle: '',
+    strokeStyle: '',
+    lineWidth: 1,
+    lineJoin: 'miter',
+    globalAlpha: 1,
+    font: '',
+    textAlign: 'start',
+    textBaseline: 'alphabetic',
+    save: (): void => void plate.ops.push('save'),
+    restore: (): void => void plate.ops.push('restore'),
+    translate: (x: number, y: number): void => void plate.ops.push(`translate ${x} ${y}`),
+    rotate: (a: number): void => void plate.ops.push(`rotate ${a}`),
+    beginPath: (): void => void plate.ops.push('beginPath'),
+    arc: (x: number, y: number, r: number): void => void plate.ops.push(`arc ${x} ${y} ${r}`),
+    fill: (): void => void plate.ops.push(`fill ${ctx.fillStyle} a=${ctx.globalAlpha}`),
+    fillRect: (x: number, y: number, w: number, h: number): void =>
+      void plate.ops.push(`fillRect ${x} ${y} ${w} ${h} ${ctx.fillStyle} a=${ctx.globalAlpha}`),
+    strokeRect: (x: number, y: number, w: number, h: number): void =>
+      void plate.ops.push(`strokeRect ${x} ${y} ${w} ${h} ${ctx.strokeStyle} ${ctx.lineWidth}`),
+    createImageData: (w: number, h: number) => ({
+      data: new Uint8ClampedArray(w * h * 4),
+      width: w,
+      height: h,
+    }),
+    putImageData: (image: { data: Uint8ClampedArray }, x: number, y: number): void => {
+      // The raster is compared pixel for pixel in tests/bg_field_relief_core.test.ts;
+      // here a cheap checksum is enough to catch a plate that painted DIFFERENT
+      // ground into the same commands.
+      let sum = 0;
+      for (let i = 0; i < image.data.length; i += 997) sum = (sum + image.data[i]) | 0;
+      plate.ops.push(`putImageData ${x} ${y} ${image.data.length} ${sum}`);
+    },
+    strokeText: (text: string, x: number, y: number): void =>
+      void plate.ops.push(`strokeText ${text} ${x} ${y} ${ctx.font} ${ctx.strokeStyle}`),
+    fillText: (text: string, x: number, y: number): void =>
+      void plate.ops.push(`fillText ${text} ${x} ${y} ${ctx.font} ${ctx.fillStyle}`),
+  };
+  return {
+    set width(v: number) {
+      plate.w = v;
+    },
+    get width(): number {
+      return plate.w;
+    },
+    set height(v: number) {
+      plate.h = v;
+    },
+    get height(): number {
+      return plate.h;
+    },
+    getContext: (kind: string): unknown => (kind === '2d' ? ctx : null),
+  };
+}
+
+function fakeMapCtx(trace: PlateTrace): CanvasRenderingContext2D {
+  const ctx = {
+    fillStyle: '' as unknown,
+    strokeStyle: '' as unknown,
+    lineWidth: 1,
+    globalAlpha: 1,
+    font: '',
+    clearRect: (): void => {},
+    save: (): void => {},
+    restore: (): void => {},
+    translate: (): void => {},
+    rotate: (): void => {},
+    setLineDash: (): void => {},
+    beginPath: (): void => {},
+    moveTo: (): void => {},
+    lineTo: (): void => {},
+    closePath: (): void => {},
+    arc: (): void => {},
+    fill: (): void => {},
+    stroke: (): void => {},
+    fillRect: (): void => {},
+    strokeRect: (): void => {},
+    drawImage: (): void => {},
+    createLinearGradient: () => ({ addColorStop: (): void => {} }),
+    fillText: (text: string): void => void trace.mapText.push(`fillText:${text}`),
+    strokeText: (text: string): void => void trace.mapText.push(`strokeText:${text}`),
+    measureText: (text: string) => {
+      trace.mapText.push(`measureText:${text}`);
+      return { width: 0 };
+    },
+  };
+  return ctx as unknown as CanvasRenderingContext2D;
+}
+
+/** The four REQUIRED tokens, so the painter draws instead of bailing. */
+const PLATE_TOKENS: Record<string, string> = {
+  '--color-team-red': 'red',
+  '--color-team-blue': 'blue',
+  '--color-minimap-party-dead': 'grey',
+  '--color-minimap-player': 'white',
+};
+
+function installPlateGlobals(trace: PlateTrace): void {
+  vi.stubGlobal('document', {
+    documentElement: {},
+    createElement: (tag: string): unknown => {
+      if (tag !== 'canvas') throw new Error(`unexpected createElement(${tag})`);
+      return fakePlateCanvas(trace);
+    },
+  });
+  vi.stubGlobal('getComputedStyle', () => ({
+    getPropertyValue: (token: string): string => PLATE_TOKENS[token] ?? '',
+  }));
+}
+
+const PLATE_CANVAS_SIZE = 480;
+
+function plateModel(myTeam: number): BgMapModel {
+  return { active: true, myTeam, self: null, mates: [], halfX: HALF_X, halfZ: HALF_Z };
+}
+
+/** Paint once with a FRESH painter and hand back the plate it built. */
+function buildPlate(myTeam: number): { w: number; h: number; ops: PlateOp[] } {
+  const trace: PlateTrace = { plates: [], mapText: [] };
+  installPlateGlobals(trace);
+  const painter = new BattlegroundMapPainter();
+  painter.paint(fakeMapCtx(trace), plateModel(myTeam), PLATE_CANVAS_SIZE);
+  expect(trace.plates, 'exactly one plate per fresh painter').toHaveLength(1);
+  expect(trace.mapText, 'labels belong to the cached plate, never the redraw').toEqual([]);
+  return trace.plates[0];
+}
+
+/** The label ops of a plate, in draw order. */
+function plateLabels(plate: {
+  ops: PlateOp[];
+}): Array<{ text: string; x: number; y: number; font: string }> {
+  const out: Array<{ text: string; x: number; y: number; font: string }> = [];
+  for (const op of plate.ops) {
+    const m = /^fillText (.+) (-?[\d.]+) (-?[\d.]+) (bold \d+px \w+) /.exec(op);
+    if (m) out.push({ text: m[1], x: Number(m[2]), y: Number(m[3]), font: m[4] });
+  }
+  return out;
+}
+
+describe('Thornhollow Fields atlas plate: built once, and always the same plate', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('is deterministic: two fresh painters draw the identical plate', () => {
+    // The plate is a cached raster nothing re-derives per frame, so nothing else
+    // would notice it drifting. Same size, same team, same language, same
+    // commands in the same order with the same styles, down to the raster
+    // checksum: the golden look cannot move without this failing.
+    const a = buildPlate(0);
+    const b = buildPlate(0);
+    expect([b.w, b.h]).toEqual([a.w, a.h]);
+    expect(b.ops).toEqual(a.ops);
+    // Non-vacuous: a plate really is a full atlas build, not two fillRects.
+    expect(a.ops.length).toBeGreaterThan(500);
+    expect(a.ops.some((op) => op.startsWith('putImageData'))).toBe(true);
+  });
+
+  it('is the field plus exactly the map padding of wooded lip, so it blits edge to edge', () => {
+    // The geometry the blit depends on. The tall axis fills the canvas: the fit
+    // leaves the map's own 18px padding on each side, and the plate claims that
+    // padding as its margin, so plate height == canvas size and the field
+    // raster lands at (margin, margin) inside it. Get this wrong and the whole
+    // plan slides against the markers drawn over it.
+    const plate = buildPlate(0);
+    const s = (PLATE_CANVAS_SIZE - 36) / (HALF_Z * 2);
+    const fieldW = Math.round(HALF_X * 2 * s);
+    const fieldH = Math.round(HALF_Z * 2 * s);
+    expect(plate.h).toBe(PLATE_CANVAS_SIZE);
+    expect(plate.h - fieldH).toBe(36);
+    expect(plate.w - fieldW).toBe(36);
+    const raster = plate.ops.find((op) => op.startsWith('putImageData'));
+    expect(raster?.startsWith('putImageData 18 18 ')).toBe(true);
+  });
+
+  it('caches per size, team and language, and rebuilds when any of the three moves', () => {
+    const trace: PlateTrace = { plates: [], mapText: [] };
+    installPlateGlobals(trace);
+    const painter = new BattlegroundMapPainter();
+    const ctx = fakeMapCtx(trace);
+    painter.paint(ctx, plateModel(0), PLATE_CANVAS_SIZE);
+    painter.paint(ctx, plateModel(0), PLATE_CANVAS_SIZE);
+    expect(trace.plates, 'a second identical redraw must blit the cache').toHaveLength(1);
+    painter.paint(ctx, plateModel(0), PLATE_CANVAS_SIZE - 40);
+    expect(trace.plates, 'a resize rebuilds').toHaveLength(2);
+    painter.paint(ctx, plateModel(1), PLATE_CANVAS_SIZE - 40);
+    expect(trace.plates, 'the away view is its own plate, not a rotated blit').toHaveLength(3);
+    // ...and a language switch, because the labels are baked INTO the raster.
+    // de_DE's chunk is not resident in Node, so the strings stay English; what
+    // is under test is the cache key, not the translation.
+    setLanguage('de_DE');
+    try {
+      painter.paint(ctx, plateModel(1), PLATE_CANVAS_SIZE - 40);
+      expect(trace.plates, 'a language switch rebuilds the baked labels').toHaveLength(4);
+    } finally {
+      setLanguage('en');
+    }
+  });
+
+  it('writes every landmark the authored map names, from t(), on the plate only', () => {
+    const labels = plateLabels(buildPlate(0));
+    expect(labels.map((l) => l.text).sort()).toEqual(
+      [
+        t('hudChrome.bg.map.azureField'),
+        t('hudChrome.bg.map.azureKeep'),
+        t('hudChrome.bg.map.crimsonField'),
+        t('hudChrome.bg.map.crimsonKeep'),
+        t('hudChrome.bg.map.graveyard'),
+        t('hudChrome.bg.map.graveyard'),
+        t('hudChrome.bg.map.ruinCourtyard'),
+      ].sort(),
+    );
+    // Every name is haloed before it is inked, so it holds over turf and wall.
+    const strokes = buildPlate(0).ops.filter((op) => op.startsWith('strokeText'));
+    expect(strokes).toHaveLength(labels.length);
+    // The two tiers really are two sizes (regions larger than the graveyards).
+    const region = labels.find((l) => l.text === t('hudChrome.bg.map.crimsonKeep'));
+    const place = labels.find((l) => l.text === t('hudChrome.bg.map.graveyard'));
+    expect(region && place, 'both label tiers drawn').toBeTruthy();
+    expect(region?.font).not.toBe(place?.font);
+  });
+
+  it('turns the whole plate for the away team, labels upright and point-mirrored', () => {
+    // The mirror-honesty rule: the field is point-symmetric and the away view is
+    // the same ground read the other way round, so every label must land at the
+    // 180-degree image of its home-view position. Same font (never rotated,
+    // never mirrored) is the other half: a rotated PLATE would stand the names
+    // on their heads.
+    const home = buildPlate(0);
+    const away = buildPlate(1);
+    expect([away.w, away.h]).toEqual([home.w, home.h]);
+    const homeLabels = plateLabels(home);
+    const awayLabels = plateLabels(away);
+    expect(awayLabels).toHaveLength(homeLabels.length);
+    for (const label of homeLabels) {
+      const twin = awayLabels.find(
+        (l) =>
+          l.text === label.text &&
+          Math.abs(l.x + label.x - home.w) < 1 &&
+          Math.abs(l.y + label.y - home.h) < 1,
+      );
+      expect(twin, `${label.text} at (${label.x}, ${label.y}) has no mirrored twin`).toBeTruthy();
+      expect(twin?.font).toBe(label.font);
+    }
   });
 });

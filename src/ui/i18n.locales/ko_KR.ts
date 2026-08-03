@@ -897,6 +897,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.defeatBanner': '패배. 쏜할로우 평원 {crimson}:{azure}. 레이팅 {rating}({delta})',
   'hudChrome.bg.drawBanner': '쏜할로우 평원 무승부 {crimson}:{azure}. 레이팅 {rating}({delta})',
   'hudChrome.bg.endLog': '쏜할로우 평원 종료, {crimson}:{azure}. 레이팅 {rating}({delta}).',
+  'hudChrome.bg.map.crimsonKeep': '크림슨 요새',
+  'hudChrome.bg.map.azureKeep': '애저 요새',
+  'hudChrome.bg.map.crimsonField': '크림슨 평원',
+  'hudChrome.bg.map.azureField': '애저 평원',
+  'hudChrome.bg.map.ruinCourtyard': '폐허 안뜰',
+  'hudChrome.bg.map.graveyard': '묘지',
   'guide.nav.ravenrift': '쏜할로우 평원',
   'guide.ravenriftPage.heading': '쏜할로우 평원',
   'guide.ravenriftPage.intro':

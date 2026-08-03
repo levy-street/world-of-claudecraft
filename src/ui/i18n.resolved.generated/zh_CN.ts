@@ -1075,7 +1075,15 @@ export const zh_CN: EnTranslations = {
       "victoryBanner": "胜利!荆谷原野{crimson}:{azure}。评分{rating}({delta})",
       "defeatBanner": "战败。荆谷原野{crimson}:{azure}。评分{rating}({delta})",
       "drawBanner": "荆谷原野平局{crimson}:{azure}。评分{rating}({delta})",
-      "endLog": "荆谷原野结束,{crimson}:{azure}。评分{rating}({delta})。"
+      "endLog": "荆谷原野结束,{crimson}:{azure}。评分{rating}({delta})。",
+      "map": {
+        "crimsonKeep": "绯红要塞",
+        "azureKeep": "蔚蓝要塞",
+        "crimsonField": "绯红原野",
+        "azureField": "蔚蓝原野",
+        "ruinCourtyard": "废墟庭院",
+        "graveyard": "墓地"
+      }
     },
     "vcup": {
       "title": "溪谷杯",

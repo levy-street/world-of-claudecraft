@@ -1075,7 +1075,15 @@ export const en_XA: EnTranslations = {
       "victoryBanner": "[Ʋíçţóŕý! Ţĥóŕñĥóļļóŵ Ƒíéļðš {crimson}:{azure}. Ŕáţíñĝ {rating} ({delta})]",
       "defeatBanner": "[Ðéƒéáţ. Ţĥóŕñĥóļļóŵ Ƒíéļðš {crimson}:{azure}. Ŕáţíñĝ {rating} ({delta})]",
       "drawBanner": "[Ţĥóŕñĥóļļóŵ Ƒíéļðš ðŕáŵ {crimson}:{azure}. Ŕáţíñĝ {rating} ({delta})]",
-      "endLog": "[Ţĥóŕñĥóļļóŵ Ƒíéļðš éñðéð {crimson}:{azure}. Ŕáţíñĝ {rating} ({delta}).]"
+      "endLog": "[Ţĥóŕñĥóļļóŵ Ƒíéļðš éñðéð {crimson}:{azure}. Ŕáţíñĝ {rating} ({delta}).]",
+      "map": {
+        "crimsonKeep": "[Çŕíɱšóñ Ķééþ]",
+        "azureKeep": "[Ážúŕé Ķééþ]",
+        "crimsonField": "[Çŕíɱšóñ Ƒíéļð]",
+        "azureField": "[Ážúŕé Ƒíéļð]",
+        "ruinCourtyard": "[Ţĥé Ŕúíñ Çóúŕţýáŕð]",
+        "graveyard": "[Ĝŕáʋéýáŕð]"
+      }
     },
     "vcup": {
       "title": "[Ţĥé Ʋáļé Çúþ]",

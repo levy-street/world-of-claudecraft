@@ -1075,7 +1075,15 @@ export const zh_TW: EnTranslations = {
       "victoryBanner": "勝利!荊谷原野{crimson}:{azure}。評分{rating}({delta})",
       "defeatBanner": "戰敗。荊谷原野{crimson}:{azure}。評分{rating}({delta})",
       "drawBanner": "荊谷原野平手{crimson}:{azure}。評分{rating}({delta})",
-      "endLog": "荊谷原野結束,{crimson}:{azure}。評分{rating}({delta})。"
+      "endLog": "荊谷原野結束,{crimson}:{azure}。評分{rating}({delta})。",
+      "map": {
+        "crimsonKeep": "緋紅要塞",
+        "azureKeep": "蔚藍要塞",
+        "crimsonField": "緋紅原野",
+        "azureField": "蔚藍原野",
+        "ruinCourtyard": "廢墟庭院",
+        "graveyard": "墓地"
+      }
     },
     "vcup": {
       "title": "溪谷盃",

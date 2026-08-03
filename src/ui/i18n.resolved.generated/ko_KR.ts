@@ -1075,7 +1075,15 @@ export const ko_KR: EnTranslations = {
       "victoryBanner": "승리! 쏜할로우 평원 {crimson}:{azure}. 레이팅 {rating}({delta})",
       "defeatBanner": "패배. 쏜할로우 평원 {crimson}:{azure}. 레이팅 {rating}({delta})",
       "drawBanner": "쏜할로우 평원 무승부 {crimson}:{azure}. 레이팅 {rating}({delta})",
-      "endLog": "쏜할로우 평원 종료, {crimson}:{azure}. 레이팅 {rating}({delta})."
+      "endLog": "쏜할로우 평원 종료, {crimson}:{azure}. 레이팅 {rating}({delta}).",
+      "map": {
+        "crimsonKeep": "크림슨 요새",
+        "azureKeep": "애저 요새",
+        "crimsonField": "크림슨 평원",
+        "azureField": "애저 평원",
+        "ruinCourtyard": "폐허 안뜰",
+        "graveyard": "묘지"
+      }
     },
     "vcup": {
       "title": "베일 컵",

@@ -1075,7 +1075,15 @@ export const ru_RU: EnTranslations = {
       "victoryBanner": "Победа! Терновая Лощина {crimson}:{azure}. Рейтинг {rating} ({delta})",
       "defeatBanner": "Поражение. Терновая Лощина {crimson}:{azure}. Рейтинг {rating} ({delta})",
       "drawBanner": "Ничья в Терновой Лощине {crimson}:{azure}. Рейтинг {rating} ({delta})",
-      "endLog": "Терновая Лощина завершена, {crimson}:{azure}. Рейтинг {rating} ({delta})."
+      "endLog": "Терновая Лощина завершена, {crimson}:{azure}. Рейтинг {rating} ({delta}).",
+      "map": {
+        "crimsonKeep": "Багровая крепость",
+        "azureKeep": "Лазурная крепость",
+        "crimsonField": "Багровое поле",
+        "azureField": "Лазурное поле",
+        "ruinCourtyard": "Двор Руин",
+        "graveyard": "Кладбище"
+      }
     },
     "vcup": {
       "title": "Кубок Долины",

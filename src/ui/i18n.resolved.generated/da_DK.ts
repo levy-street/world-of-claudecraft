@@ -1075,7 +1075,15 @@ export const da_DK: EnTranslations = {
       "victoryBanner": "Victory! Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
       "defeatBanner": "Defeat. Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
       "drawBanner": "Thornhollow Fields draw {crimson}:{azure}. Rating {rating} ({delta})",
-      "endLog": "Thornhollow Fields ended {crimson}:{azure}. Rating {rating} ({delta})."
+      "endLog": "Thornhollow Fields ended {crimson}:{azure}. Rating {rating} ({delta}).",
+      "map": {
+        "crimsonKeep": "Crimson Keep",
+        "azureKeep": "Azure Keep",
+        "crimsonField": "Crimson Field",
+        "azureField": "Azure Field",
+        "ruinCourtyard": "The Ruin Courtyard",
+        "graveyard": "Graveyard"
+      }
     },
     "vcup": {
       "title": "Dalpokalen",

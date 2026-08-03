@@ -23,6 +23,12 @@ import {
   TH_HEIGHT_MIN,
   TH_HEIGHT_ROWS,
   TH_HEIGHTFIELD_B64,
+  TH_PAINT_CELL,
+  TH_PAINT_COLS,
+  TH_PAINT_ORIGIN_X,
+  TH_PAINT_ORIGIN_Z,
+  TH_PAINT_RLE,
+  TH_PAINT_ROWS,
   TH_STAMPS,
   type ThHeightStamp,
 } from './thornhollow_field.generated';
@@ -123,3 +129,47 @@ export function bgFieldHeightLocal(lx: number, lz: number): number {
 }
 
 export { TH_HALF_X as BG_FIELD_HALF_X, TH_HALF_Z as BG_FIELD_HALF_Z };
+
+// --- authored ground paint --------------------------------------------------
+//
+// The surface the map was PAINTED with (grass, cobbled court, dirt lanes), the
+// other half of "what you see is what you walk on". The compiler emits it as
+// run-length pairs over a row-major cell grid; this is the ONE decode of that
+// table. Two consumers want two different per-cell values out of the same walk:
+// the renderer stores texture-array LAYER indices (src/render/battleground_core.ts
+// bgPaintLookup), and the M-map atlas plate stores its own surface family
+// (src/ui/bg_field_relief_core.ts). `map` decides which, so neither has to copy
+// the walk (and neither retains the other's grid).
+
+/** Cell pitch of the paint grid, yards. */
+export const BG_PAINT_CELL = TH_PAINT_CELL;
+export const BG_PAINT_COLS = TH_PAINT_COLS;
+export const BG_PAINT_ROWS = TH_PAINT_ROWS;
+/** Field-local yards at cell (0, 0), the grid's -x/-z corner. */
+export const BG_PAINT_ORIGIN_X = TH_PAINT_ORIGIN_X;
+export const BG_PAINT_ORIGIN_Z = TH_PAINT_ORIGIN_Z;
+/** The value a cell keeps when `map` declines its swatch id. No authored swatch
+ *  id reaches it, so it can never collide with a real mapped value. */
+export const BG_PAINT_UNPAINTED = 255;
+
+/**
+ * Decode the run-length ground paint into a dense row-major cell grid
+ * (`row * BG_PAINT_COLS + col`, col along +x from `BG_PAINT_ORIGIN_X`).
+ *
+ * `map` translates an authored swatch id into the byte the caller wants stored;
+ * returning `undefined` leaves the run unpainted.
+ */
+export function bgFieldPaintCells(
+  map: (id: number) => number | undefined,
+): Uint8Array<ArrayBuffer> {
+  const out = new Uint8Array(TH_PAINT_COLS * TH_PAINT_ROWS);
+  out.fill(BG_PAINT_UNPAINTED);
+  let at = 0;
+  for (let i = 0; i + 1 < TH_PAINT_RLE.length; i += 2) {
+    const value = map(TH_PAINT_RLE[i]);
+    const run = TH_PAINT_RLE[i + 1];
+    if (value !== undefined) out.fill(value, at, Math.min(out.length, at + run));
+    at += run;
+  }
+  return out;
+}

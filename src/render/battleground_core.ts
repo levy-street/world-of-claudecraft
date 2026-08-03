@@ -10,6 +10,7 @@
 // This module therefore does no layout work at all; it groups placements for
 // instancing, plans the terrain chunks, and resolves the ground-paint tables.
 
+import { bgFieldPaintCells } from '../sim/battleground_field';
 import {
   TH_DECALS,
   TH_HALF_X,
@@ -21,7 +22,6 @@ import {
   TH_PAINT_COLS,
   TH_PAINT_ORIGIN_X,
   TH_PAINT_ORIGIN_Z,
-  TH_PAINT_RLE,
   TH_PAINT_ROWS,
   TH_PAINT_SWATCHES,
   TH_PLACEMENTS,
@@ -163,21 +163,18 @@ let paintCache: BgPaintLookup | null = null;
  * The map stores swatch IDS (200..217); the renderer wants LAYER INDICES into
  * a texture array, so the decode remaps through the swatch table once here
  * rather than per fragment. Unpainted cells stay 255 and read as bare ground.
+ *
+ * The run-length WALK itself is shared with the M-map atlas plate, which wants
+ * the same cells resolved to a different per-cell value: it lives once in
+ * `bgFieldPaintCells` (src/sim/battleground_field.ts) and takes the remap as an
+ * argument, so neither consumer copies it or retains the other's grid.
  */
 export function bgPaintLookup(): BgPaintLookup {
   if (paintCache) return paintCache;
   const swatches = TH_PAINT_SWATCHES;
   const indexById = new Map<number, number>();
   for (let i = 0; i < swatches.length; i++) indexById.set(swatches[i].id, i);
-  const ids = new Uint8Array(TH_PAINT_COLS * TH_PAINT_ROWS).fill(255);
-  let at = 0;
-  for (let i = 0; i + 1 < TH_PAINT_RLE.length; i += 2) {
-    const id = TH_PAINT_RLE[i];
-    const run = TH_PAINT_RLE[i + 1];
-    const layer = indexById.get(id);
-    if (layer !== undefined) ids.fill(layer, at, Math.min(ids.length, at + run));
-    at += run;
-  }
+  const ids = bgFieldPaintCells((id) => indexById.get(id));
   paintCache = {
     ids,
     cols: TH_PAINT_COLS,

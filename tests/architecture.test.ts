@@ -228,6 +228,7 @@ const UI_PURE_CORES = [
   'src/ui/vale_cup_window_view.ts',
   'src/ui/vale_cup_indicator_view.ts',
   'src/ui/vale_cup_hud_view.ts',
+  'src/ui/hud/battleground/battleground_atlas_view.ts',
   'src/ui/hud/battleground/battleground_window_view.ts',
   'src/ui/hud/battleground/battleground_scoreboard_view.ts',
   'src/ui/vale_cup_briefing_view.ts',

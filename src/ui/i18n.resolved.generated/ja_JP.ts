@@ -1075,7 +1075,15 @@ export const ja_JP: EnTranslations = {
       "victoryBanner": "勝利!ソーンホロウ平原{crimson}:{azure}。レーティング{rating}({delta})",
       "defeatBanner": "敗北。ソーンホロウ平原{crimson}:{azure}。レーティング{rating}({delta})",
       "drawBanner": "ソーンホロウ平原引き分け{crimson}:{azure}。レーティング{rating}({delta})",
-      "endLog": "ソーンホロウ平原終了、{crimson}:{azure}。レーティング{rating}({delta})。"
+      "endLog": "ソーンホロウ平原終了、{crimson}:{azure}。レーティング{rating}({delta})。",
+      "map": {
+        "crimsonKeep": "真紅の城塞",
+        "azureKeep": "蒼藍の城塞",
+        "crimsonField": "真紅の平原",
+        "azureField": "蒼藍の平原",
+        "ruinCourtyard": "廃墟の中庭",
+        "graveyard": "墓地"
+      }
     },
     "vcup": {
       "title": "ヴェイルカップ",

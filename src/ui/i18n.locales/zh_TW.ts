@@ -872,6 +872,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.defeatBanner': '戰敗。荊谷原野{crimson}:{azure}。評分{rating}({delta})',
   'hudChrome.bg.drawBanner': '荊谷原野平手{crimson}:{azure}。評分{rating}({delta})',
   'hudChrome.bg.endLog': '荊谷原野結束,{crimson}:{azure}。評分{rating}({delta})。',
+  'hudChrome.bg.map.crimsonKeep': '緋紅要塞',
+  'hudChrome.bg.map.azureKeep': '蔚藍要塞',
+  'hudChrome.bg.map.crimsonField': '緋紅原野',
+  'hudChrome.bg.map.azureField': '蔚藍原野',
+  'hudChrome.bg.map.ruinCourtyard': '廢墟庭院',
+  'hudChrome.bg.map.graveyard': '墓地',
   'guide.nav.ravenrift': '荊谷原野',
   'guide.ravenriftPage.heading': '荊谷原野',
   'guide.ravenriftPage.intro':

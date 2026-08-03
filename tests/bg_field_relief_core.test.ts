@@ -15,7 +15,15 @@
 
 import { describe, expect, it } from 'vitest';
 import { BG_HALF_X, BG_HALF_Z } from '../src/sim/battleground_layout';
-import { paintBgFieldRelief } from '../src/ui/bg_field_relief_core';
+import { TH_PAINT_SWATCHES } from '../src/sim/thornhollow_field.generated';
+import {
+  BG_SURFACE_DIRT,
+  BG_SURFACE_FLAGSTONE,
+  BG_SURFACE_GRASS,
+  bgFieldSurfaceAt,
+  paintBgFieldAtlas,
+  paintBgFieldRelief,
+} from '../src/ui/bg_field_relief_core';
 
 const CHANNELS = 4;
 
@@ -141,5 +149,175 @@ describe('bg_field_relief_core: the shaded field underlay', () => {
     // terrace front is a different tone entirely.
     const terrace = mean(paint(8, 8, 1, 4, -108));
     expect(Math.abs(terrace - coarse)).toBeGreaterThan(10);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The ATLAS plate raster (the M-map's field surface), the second style over the
+// same field. Everything above still holds for the minimap's wash; what is new
+// here is the authored GROUND PAINT driving the base colour, and the fact that
+// the away team's view is produced by walking the field the other way round
+// rather than by rotating a finished raster.
+
+function atlas(
+  w: number,
+  h: number,
+  pxPerYard: number,
+  originX: number,
+  originZ: number,
+  axis: 1 | -1,
+): Uint8ClampedArray {
+  const data = new Uint8ClampedArray(w * h * CHANNELS);
+  paintBgFieldAtlas(data, w, h, pxPerYard, originX, originZ, axis);
+  return data;
+}
+
+/** Mean channel-by-channel colour of a whole buffer. */
+function meanRgb(data: Uint8ClampedArray): number[] {
+  const out = [0, 0, 0];
+  const n = data.length / CHANNELS;
+  for (let i = 0; i < n; i++) {
+    for (let c = 0; c < 3; c++) out[c] += data[i * CHANNELS + c];
+  }
+  return out.map((v) => v / n);
+}
+
+describe('bg_field_relief_core: the authored ground paint the atlas plate reads', () => {
+  it('sorts every authored swatch into one of the three drawn families', () => {
+    // The classifier reads the swatch's TEXTURE name, so a re-authored map that
+    // swaps one grass for another keeps painting grass. A map that grows a
+    // FOURTH kind of surface should show up here as an unclassified texture
+    // rather than silently reading as turf on the plate.
+    const seen = new Set<number>();
+    for (const swatch of TH_PAINT_SWATCHES) {
+      expect(swatch.texture).toMatch(/^(?:Grass|Cobblestone|Ground)/);
+      seen.add(
+        swatch.texture.startsWith('Cobblestone')
+          ? BG_SURFACE_FLAGSTONE
+          : swatch.texture.startsWith('Ground')
+            ? BG_SURFACE_DIRT
+            : BG_SURFACE_GRASS,
+      );
+    }
+    expect([...seen].sort()).toEqual([BG_SURFACE_GRASS, BG_SURFACE_FLAGSTONE, BG_SURFACE_DIRT]);
+  });
+
+  it('reads the real authored surface under named places on the field', () => {
+    // Ground truth from the map: the heart ruin and the keep courts are paved,
+    // the graveyard plot is dirt, the open field chamber is turf. A grid read
+    // with the axes crossed would answer these three with each other's values.
+    expect(bgFieldSurfaceAt(0, 0)).toBe(BG_SURFACE_FLAGSTONE); // the hollow heart ruin
+    expect(bgFieldSurfaceAt(0, -118)).toBe(BG_SURFACE_FLAGSTONE); // the Crimson flag stand
+    expect(bgFieldSurfaceAt(33, -130)).toBe(BG_SURFACE_DIRT); // the Crimson graveyard plot
+    expect(bgFieldSurfaceAt(0, -82)).toBe(BG_SURFACE_GRASS); // the Crimson field chamber
+  });
+
+  it('is point-symmetric, the fairness invariant the turned plate rests on', () => {
+    for (let x = -48; x <= 48; x += 3) {
+      for (let z = -138; z <= 138; z += 7) {
+        expect(bgFieldSurfaceAt(x, z), `surface at (${x}, ${z}) is not mirrored`).toBe(
+          bgFieldSurfaceAt(-x, -z),
+        );
+      }
+    }
+  });
+});
+
+describe('bg_field_relief_core: the atlas plate raster', () => {
+  it('fills every pixel opaquely, and paints a rich plate rather than a wash', () => {
+    const w = 40;
+    const h = 70;
+    const data = atlas(w, h, 1, BG_HALF_X, BG_HALF_Z, 1);
+    for (let i = 0; i < w * h; i++) expect(data[i * CHANNELS + 3]).toBe(255);
+    const distinct = new Set<string>();
+    for (let i = 0; i < w * h; i++) {
+      distinct.add(`${data[i * CHANNELS]},${data[i * CHANNELS + 1]},${data[i * CHANNELS + 2]}`);
+    }
+    // The mottle, the contours and the inked surface edges mean an atlas plate
+    // carries far more distinct tones than the minimap's flat hypsometric wash
+    // over the same window.
+    expect(distinct.size).toBeGreaterThan(
+      new Set(
+        Array.from({ length: w * h }, (_v, i) => {
+          const wash = paint(w, h, 1, BG_HALF_X, BG_HALF_Z);
+          return `${wash[i * CHANNELS]},${wash[i * CHANNELS + 1]},${wash[i * CHANNELS + 2]}`;
+        }),
+      ).size,
+    );
+  });
+
+  it('is deterministic: same request, same pixels, so the plate cannot drift', () => {
+    // The plate is built once per size and blitted forever after, so nothing at
+    // runtime would ever notice it changing. Every source of variation in it
+    // (the fbm mottle included) is seeded from the authored map.
+    const a = atlas(24, 40, 2, 40, 40, 1);
+    const b = atlas(24, 40, 2, 40, 40, 1);
+    expect(Array.from(a)).toEqual(Array.from(b));
+  });
+
+  it('paints the away view as the SAME ground walked the other way round', () => {
+    // The mirror-honesty rule. The home view starts at (+halfX, +halfZ) and
+    // walks toward -x/-z; the away view starts at the opposite corner and walks
+    // back. Because the field, its heightfield and its ground paint are all
+    // point-symmetric, the two rasters describe the same picture, and crucially
+    // BOTH are lit from the screen's northwest: a rotated raster would carry
+    // the light around with it.
+    const w = 30;
+    const h = 60;
+    const home = atlas(w, h, 1.6, BG_HALF_X, BG_HALF_Z, 1);
+    const away = atlas(w, h, 1.6, -BG_HALF_X, -BG_HALF_Z, -1);
+    let worst = 0;
+    for (let i = 0; i < w * h * CHANNELS; i++) worst = Math.max(worst, Math.abs(home[i] - away[i]));
+    // Not byte-identical only because the bilinear height sum adds its terms in
+    // the mirrored order; a lighting or axis mistake moves whole regions, not
+    // one count of one channel.
+    expect(worst).toBeLessThanOrEqual(2);
+  });
+
+  it('takes its base colour from the authored surface, not from height alone', () => {
+    // Two windows at nearly the same elevation on opposite surfaces: the turf
+    // of the Crimson field chamber and the paving of the courtyard mouth. The
+    // hypsometric ramp alone would give these the same tone; the plate must
+    // read one as green and the other as stone.
+    const turf = meanRgb(atlas(10, 10, 1, 4, -78, 1));
+    const paving = meanRgb(atlas(10, 10, 1, 4, -52, 1));
+    expect(bgFieldSurfaceAt(0, -82)).toBe(BG_SURFACE_GRASS);
+    expect(bgFieldSurfaceAt(0, -56)).toBe(BG_SURFACE_FLAGSTONE);
+    // Green dominant on turf; the paving is near-neutral and lighter overall.
+    expect(turf[1] - turf[0]).toBeGreaterThan(8);
+    expect(Math.abs(paving[1] - paving[0])).toBeLessThan(8);
+    expect(paving[2]).toBeGreaterThan(turf[2]);
+  });
+
+  it('still reads elevation: the courtyard bowl is darker than a keep terrace', () => {
+    // Both are paved, so this is the hypsometric tint doing its job THROUGH the
+    // surface colour rather than instead of it.
+    const bowl = meanRgb(atlas(8, 8, 1, 4, 4, 1));
+    const terrace = meanRgb(atlas(8, 8, 1, 4, -114, 1));
+    expect(bgFieldSurfaceAt(0, 0)).toBe(BG_SURFACE_FLAGSTONE);
+    expect(bgFieldSurfaceAt(0, -118)).toBe(BG_SURFACE_FLAGSTONE);
+    const luma3 = (rgb: number[]): number => 0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2];
+    expect(luma3(terrace) - luma3(bowl)).toBeGreaterThan(10);
+  });
+
+  it('reads the row above, not just the row it is on', () => {
+    // The second hillshade axis and the contour banding both need the previous
+    // row. Painting the same window one row at a time starves every row of it,
+    // so the two renders must differ; a plate that only ever looked sideways
+    // would come out identical.
+    const w = 16;
+    const h = 12;
+    const px = 1.5;
+    const whole = atlas(w, h, px, 30, -100, 1);
+    const rowwise = new Uint8ClampedArray(w * h * CHANNELS);
+    for (let iy = 0; iy < h; iy++) {
+      const row = atlas(w, 1, px, 30, -100 - iy / px, 1);
+      rowwise.set(row, iy * w * CHANNELS);
+    }
+    let differing = 0;
+    for (let i = 0; i < w * h; i++) {
+      if (whole[i * CHANNELS] !== rowwise[i * CHANNELS]) differing++;
+    }
+    expect(differing).toBeGreaterThan(w); // more than the one row that legitimately matches
   });
 });

@@ -901,6 +901,18 @@ export const hudChromeStrings = {
     defeatBanner: 'Defeat. Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})',
     drawBanner: 'Thornhollow Fields draw {crimson}:{azure}. Rating {rating} ({delta})',
     endLog: 'Thornhollow Fields ended {crimson}:{azure}. Rating {rating} ({delta}).',
+    // Landmark names written onto the M-key map's atlas plate. Each names a
+    // rectangle the authored field itself declares, so they are the place names
+    // a player calls out, not decoration: short proper nouns, painted on canvas
+    // at plate-build time (battleground_map_painter).
+    map: {
+      crimsonKeep: 'Crimson Keep',
+      azureKeep: 'Azure Keep',
+      crimsonField: 'Crimson Field',
+      azureField: 'Azure Field',
+      ruinCourtyard: 'The Ruin Courtyard',
+      graveyard: 'Graveyard',
+    },
   },
   vcup: {
     title: 'The Vale Cup',
