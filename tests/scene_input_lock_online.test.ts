@@ -6,7 +6,10 @@ import {
   SceneInputLockCoordinator,
 } from '../src/game/scene_input_lock';
 import { ClientWorld } from '../src/net/online';
-import { sceneInputLockAfterEvent } from '../src/net/scene_input_lock_mirror';
+import {
+  sceneActiveAfterEvent,
+  sceneInputLockAfterEvent,
+} from '../src/net/scene_input_lock_mirror';
 import { emptyMoveInput, type SimEvent } from '../src/sim/types';
 
 function bareOnline() {
@@ -245,5 +248,52 @@ describe('online scene input lock receipt', () => {
         7,
       ),
     ).toBe(false);
+  });
+});
+
+describe('scene-active receipt mirror', () => {
+  const startOp: SimEvent = {
+    type: 'scene',
+    sceneId: 's',
+    pid: 7,
+    op: { kind: 'start', duration: 10 },
+  };
+  const endOp: SimEvent = { type: 'scene', sceneId: 's', pid: 7, op: { kind: 'end' } };
+
+  it('flips on the personal start op and off on end', () => {
+    expect(sceneActiveAfterEvent(false, startOp, 7)).toBe(true);
+    expect(sceneActiveAfterEvent(true, endOp, 7)).toBe(false);
+  });
+
+  it('ignores another player personal scene events', () => {
+    expect(sceneActiveAfterEvent(false, startOp, 8)).toBe(false);
+    expect(sceneActiveAfterEvent(true, endOp, 8)).toBe(true);
+  });
+
+  it('converges from sceneSync authority in both directions', () => {
+    const active: SimEvent = {
+      type: 'sceneSync',
+      state: {
+        sceneId: 's',
+        remainingSeconds: 4,
+        inputLocked: true,
+        letterbox: true,
+        musicSilenced: false,
+      },
+    };
+    const inactive: SimEvent = { type: 'sceneSync', state: null };
+    expect(sceneActiveAfterEvent(false, active, 7)).toBe(true);
+    expect(sceneActiveAfterEvent(true, inactive, 7)).toBe(false);
+  });
+
+  it('holds state across unrelated ops', () => {
+    const fade: SimEvent = {
+      type: 'scene',
+      sceneId: 's',
+      pid: 7,
+      op: { kind: 'fade', to: 'black', dur: 1 },
+    };
+    expect(sceneActiveAfterEvent(true, fade, 7)).toBe(true);
+    expect(sceneActiveAfterEvent(false, fade, 7)).toBe(false);
   });
 });
