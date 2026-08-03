@@ -292,9 +292,12 @@ describe('sanitizeCreditedObjects (load-side normalization)', () => {
   });
 
   it('drops non-strings, duplicates, and a non-array entirely', () => {
-    expect(sanitizeCreditedObjects(['a', 1, 'a', null, 'b'])).toEqual(['a', 'b']);
+    expect(sanitizeCreditedObjects(['0@1.0,2.0', 1, '0@1.0,2.0', null, '0@3.0,4.0'])).toEqual([
+      '0@1.0,2.0',
+      '0@3.0,4.0',
+    ]);
     expect(sanitizeCreditedObjects(undefined)).toBeUndefined();
-    expect(sanitizeCreditedObjects('a')).toBeUndefined();
+    expect(sanitizeCreditedObjects('0@1.0,2.0')).toBeUndefined();
     expect(sanitizeCreditedObjects([])).toBeUndefined();
     expect(sanitizeCreditedObjects(null)).toBeUndefined();
   });
@@ -305,7 +308,37 @@ describe('sanitizeCreditedObjects (load-side normalization)', () => {
     // must not stall the tick or bloat the row forever.
     const huge = Array.from({ length: 5000 }, (_, i) => `0@${i}.0,0.0`);
     expect(sanitizeCreditedObjects(huge)?.length).toBe(64);
-    expect(sanitizeCreditedObjects(['x'.repeat(5000), 'ok'])).toEqual(['ok']);
+    expect(sanitizeCreditedObjects(['x'.repeat(5000), '0@1.0,2.0'])).toEqual(['0@1.0,2.0']);
+  });
+
+  it('keeps only strings in the exact key grammar', () => {
+    // A key that does not match what interactObjectCreditKey emits was never
+    // produced by this module, so it is tamper or a bug elsewhere. Per DIMENSION
+    // negatives, so a loosened regex cannot pass by accident.
+    expect(sanitizeCreditedObjects([interactObjectCreditKey(2, { x: -12.5, z: 4 })])).toEqual([
+      '2@-12.5,4.0',
+    ]);
+    for (const bad of [
+      'a', // no structure at all
+      '0@256,0.0', // x missing its decimal
+      '0@256.0,0', // z missing its decimal
+      '0@256.00,0.0', // wrong precision
+      '@256.0,0.0', // no objective index
+      'x@256.0,0.0', // non-numeric objective index
+      '0@256.0', // one coordinate
+      '0@256.0,0.0,7.0', // three coordinates
+      ' 0@256.0,0.0', // leading space
+      '0@256.0,0.0 ', // trailing space
+      '0@abc.0,0.0', // non-numeric coordinate
+    ]) {
+      expect(sanitizeCreditedObjects([bad]), `should drop ${JSON.stringify(bad)}`).toBeUndefined();
+    }
+  });
+
+  it('drops a bad key rather than keeping it, which is the fail-open direction', () => {
+    // Keeping an unrecognized key would refuse an object the player never used
+    // and dead-end the quest; dropping it only re-grants that one interact.
+    expect(sanitizeCreditedObjects(['garbage', '0@1.0,2.0'])).toEqual(['0@1.0,2.0']);
   });
 });
 
@@ -394,7 +427,9 @@ describe('the load path normalizes an untrusted ledger', () => {
   it('drops junk entries and duplicates coming out of the save blob', () => {
     // sanitizeCreditedObjects is wired into the real load loop, not just unit
     // tested: this is untrusted JSONB from the characters row.
-    expect(loadWith(['a', 1, 'a', null, 'b'])?.creditedObjects).toEqual(['a', 'b']);
+    expect(
+      loadWith(['0@1.0,2.0', 1, '0@1.0,2.0', null, 'garbage', '0@3.0,4.0'])?.creditedObjects,
+    ).toEqual(['0@1.0,2.0', '0@3.0,4.0']);
   });
 
   it('loads a malformed ledger as absent instead of throwing', () => {

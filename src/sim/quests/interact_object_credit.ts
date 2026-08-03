@@ -40,6 +40,16 @@ const KEY_PRECISION = 1;
 const MAX_CREDITED_OBJECTS = 64;
 const MAX_KEY_LENGTH = 64;
 
+/** The exact grammar interactObjectCreditKey emits, derived from KEY_PRECISION
+ *  so the two cannot drift. A key that does not match it was never produced by
+ *  this module, so it can only be tamper or a bug elsewhere: drop it rather than
+ *  keep it in the row forever. Dropping is fail-OPEN by design (the player
+ *  regains that interact), which is the safe direction: a retained bad key would
+ *  refuse an object the player never used and dead-end the quest. */
+const KEY_SHAPE = new RegExp(
+  `^\\d+@-?\\d+\\.\\d{${KEY_PRECISION}},-?\\d+\\.\\d{${KEY_PRECISION}}$`,
+);
+
 /**
  * Stable ledger key for "this objective, credited off the object at this spot".
  * The objective index is part of the key so two interact objectives in one quest
@@ -98,7 +108,8 @@ export function sanitizeCreditedObjects(raw: unknown): string[] | undefined {
   if (!Array.isArray(raw)) return undefined;
   const seen = new Set<string>();
   for (const v of raw) {
-    if (typeof v !== 'string' || v.length > MAX_KEY_LENGTH) continue;
+    // Length first: it bounds the work the shape test does on a hostile string.
+    if (typeof v !== 'string' || v.length > MAX_KEY_LENGTH || !KEY_SHAPE.test(v)) continue;
     seen.add(v);
     if (seen.size >= MAX_CREDITED_OBJECTS) break;
   }
