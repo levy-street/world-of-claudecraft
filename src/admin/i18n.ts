@@ -203,6 +203,11 @@ const ADMIN_ERROR_KEYS: Record<string, string> = {
   'guild name must change': 'error.guildNameUnchanged',
   'a moderation reason is required (500 chars max)': 'error.guildReasonInvalid',
   'guild member limit exceeded': 'error.guildMemberLimit',
+  // The guild bank dormant-slot escape hatch (server/admin.ts).
+  'a slot index is required': 'error.guildBankSlotRequired',
+  'that guild has no loaded bank': 'error.guildBankNotLoaded',
+  'no member of that guild is online to persist the change': 'error.guildBankNoCarrier',
+  'that slot is not a stuck item': 'error.guildBankSlotNotStuck',
   'guild name must be 3-24 letters with single spaces': 'error.guildNameInvalid',
   'invalid streamer link': 'error.invalidStreamerLink',
   'admin accounts cannot be chat muted': 'error.cannotChatMuteAdmin',

@@ -60,6 +60,12 @@ describe('admin route permission map', () => {
     expect(permissionForAdminRoute('GET', '/admin/api/guilds/42')).toBe('accounts.read');
     expect(permissionForAdminRoute('GET', '/admin/api/guilds/42/history')).toBe('moderation.read');
     expect(permissionForAdminRoute('POST', '/admin/api/guilds/42/rename')).toBe('moderation.act');
+    // The guild bank escape hatch destroys player property, so it carries its
+    // OWN permission: a moderator with moderation.act must not reach it.
+    expect(permissionForAdminRoute('POST', '/admin/api/guilds/42/bank/purge-slot')).toBe(
+      'guildbank.purge',
+    );
+    expect(permissionForAdminRoute('GET', '/admin/api/guilds/42/bank/purge-slot')).toBeNull();
     expect(permissionForAdminRoute('POST', '/admin/api/accounts/42/reset-password')).toBe(
       'accounts.password',
     );

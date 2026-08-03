@@ -175,6 +175,13 @@ const STREAMER_FLAG_REQUIRED = 'streamer must be a boolean';
 const STREAMER_LINKS_REQUIRED = 'a links object is required';
 const ACCOUNT_FLAIR_FAILED = 'failed to update account flair';
 const DAILY_REWARD_EVENT_DAY_REQUIRED = 'a valid daily rewards date is required';
+// The guild bank dormant-slot purge refusals. Shared by both dispatch arms so
+// the strings stay byte-identical, and mirrored into the dashboard's
+// ADMIN_ERROR_KEYS matcher (src/admin/i18n.ts) like every other operator error.
+const GUILD_BANK_SLOT_REQUIRED = 'a slot index is required';
+const GUILD_BANK_NOT_LOADED = 'that guild has no loaded bank';
+const GUILD_BANK_NO_CARRIER = 'no member of that guild is online to persist the change';
+const GUILD_BANK_SLOT_NOT_DORMANT = 'that slot is not a stuck item';
 
 function guildRenameFailure(error: AdminGuildRenameError): { status: number; message: string } {
   switch (error) {
@@ -191,6 +198,42 @@ function guildRenameFailure(error: AdminGuildRenameError): { status: number; mes
     case 'invalid_name':
       return { status: 400, message: 'guild name must be 3-24 letters with single spaces' };
   }
+}
+
+/** The guild bank dormant-slot purge, resolved ONCE for both dispatch arms so
+ *  the legacy ladder and the RouteDef handler can never drift (the dual-edit
+ *  rule). Shape validation, the game call, and the outcome-to-response mapping
+ *  all live here; each arm only reads the body and writes the envelope. */
+function purgeGuildBankSlotOutcome(
+  rt: Pick<AdminRuntime, 'adminPurgeGuildBankSlot'>,
+  guildId: number,
+  rawSlot: unknown,
+):
+  | { ok: true; body: { guildId: number; slotIndex: number; itemId: string; count: number } }
+  | { ok: false; status: number; message: string } {
+  if (typeof rawSlot !== 'number' || !Number.isInteger(rawSlot) || rawSlot < 0) {
+    return { ok: false, status: 400, message: GUILD_BANK_SLOT_REQUIRED };
+  }
+  const result = rt.adminPurgeGuildBankSlot(guildId, rawSlot);
+  if (!result.ok) {
+    switch (result.reason) {
+      case 'no_book':
+        return { ok: false, status: 404, message: GUILD_BANK_NOT_LOADED };
+      case 'no_carrier':
+        return { ok: false, status: 409, message: GUILD_BANK_NO_CARRIER };
+      case 'not_dormant':
+        return { ok: false, status: 400, message: GUILD_BANK_SLOT_NOT_DORMANT };
+    }
+  }
+  return {
+    ok: true,
+    body: {
+      guildId,
+      slotIndex: rawSlot,
+      itemId: result.removed.itemId,
+      count: result.removed.count,
+    },
+  };
 }
 
 async function dailyRewardEventDay(value: string | null): Promise<string | null> {
@@ -963,6 +1006,18 @@ export async function handleAdminApi(
       });
     }
 
+    // The guild bank dormant-slot escape hatch: remove ONE permanently
+    // unwithdrawable copy so the guild can empty its bank and disband. The
+    // removal runs through the same observed book-mutation path every other
+    // guild bank op uses (ledger row op 'admin_purge' + the fenced escrow
+    // save); the sim refuses anything that is not actually dormant.
+    const guildBankPurgeMatch = /^\/admin\/api\/guilds\/(\d+)\/bank\/purge-slot$/.exec(path);
+    if (req.method === 'POST' && guildBankPurgeMatch) {
+      const body = await readBody(req);
+      const outcome = purgeGuildBankSlotOutcome(game, Number(guildBankPurgeMatch[1]), body.slot);
+      return outcome.ok ? ok(res, outcome.body) : fail(res, outcome.status, outcome.message);
+    }
+
     // Chat filter: word list + escalation config management. Every edit reloads
     // the live filter and pushes the new soft list to connected clients.
     if (req.method === 'POST' && path === '/admin/api/chat-filter/words') {
@@ -1420,6 +1475,9 @@ export type AdminRuntime = Pick<
   | 'applyAntibotConfig'
   | 'startPerfCapture'
   | 'perfCaptureStatus'
+  // The guild bank dormant-slot escape hatch (guildbank.purge). A live-sim
+  // mutation, so it rides the runtime Pick like every other game-session hook.
+  | 'adminPurgeGuildBankSlot'
   | 'social'
 >;
 
@@ -1950,6 +2008,15 @@ async function guildRenameHandler(ctx: Ctx): Promise<void> {
   );
   bustAdminGuildBoardCaches();
   ok(ctx.res, { id: renamed.result.guildId, name: renamed.result.newName });
+}
+
+/** POST /admin/api/guilds/:id/bank/purge-slot: the dormant guild bank slot
+ *  escape hatch (see purgeGuildBankSlotOutcome for the shared body). */
+async function guildBankPurgeSlotHandler(ctx: Ctx): Promise<void> {
+  const body = await readBody(ctx.req);
+  const outcome = purgeGuildBankSlotOutcome(useAdminRuntime(), adminTargetId(ctx), body.slot);
+  if (!outcome.ok) return fail(ctx.res, outcome.status, outcome.message);
+  ok(ctx.res, outcome.body);
 }
 
 /** GET /admin/api/shared-ips: paged shared IPs; the online=1 branch reads live. */
@@ -2681,6 +2748,14 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin, requireAdminTarget('guild')],
     meta: adminTargetMeta('guild'),
     handler: guildRenameHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/guilds/:id/bank/purge-slot',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('guild')],
+    meta: adminTargetMeta('guild'),
+    handler: guildBankPurgeSlotHandler,
   },
   {
     method: 'GET',

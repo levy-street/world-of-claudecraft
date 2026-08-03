@@ -19,6 +19,13 @@ export const ADMIN_PERMISSIONS = [
   'content.moderate',
   'botdetector.read',
   'botdetector.configure',
+  // The guild bank dormant-slot escape hatch: remove one permanently
+  // unwithdrawable copy from a guild's book (server/game.ts
+  // adminPurgeGuildBankSlot). Deliberately its OWN permission rather than
+  // riding moderation.act: it destroys player property, so it must be
+  // grantable (and auditable) independently of everyday moderation, and it is
+  // kept out of the moderator and viewer bundles below.
+  'guildbank.purge',
   'staff.manage',
 ] as const;
 

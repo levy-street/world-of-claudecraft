@@ -14,6 +14,13 @@ Teardown of docs/guild-bank/ awaits the user's explicit confirmation.
   escrow persistence in one transaction). See brainstorm.md for the full rationale.
 - Access: banker NPC proximity (the personal-bank `nearBanker` gate), Guild tab inside the
   existing bank window. Offline: no-op everywhere, tab never renders.
+- Refusal WORDING is direction-aware (2026-08-03): `guildBankPipeRefusal(slot, dir)`
+  defaults to `'deposit'`; the refusal SET is direction-independent (the one dormant
+  predicate), only the sentence changes. Deposit names the dimension
+  (`error.guildBankQuestItem` / `error.guildBankSoulbound` / `error.guildBankNoTransfer`),
+  withdraw speaks one line for all four (`error.guildBankWithdrawRefused`), because
+  "you cannot store that" is false for a copy already in the book. The bags pre-empt
+  voices the same keys.
 - Item policy (revised in Phase 2 review; supersedes the original "quest items refused"
   line): the guild bank is an ANONYMOUS EXCHANGE PIPE (officer A deposits, officer B
   withdraws), so it carries the full World Market / Ravenpost pipe policy, not the
@@ -510,13 +517,30 @@ Teardown of docs/guild-bank/ awaits the user's explicit confirmation.
   script may flag them against the book; that finding points at the incident the loud
   fence-out log recorded (see the operator caveat in scripts/bank_audit.mjs: audit a
   quiesced realm).
-- Dormant pipe-refused slots can make a bank permanently non-emptiable (DEFERRED, v1
-  limitation): an item a later content update flags soulbound/noMarketList is refused in
-  BOTH directions (anonymous-pipe policy), so it can never be withdrawn, and the disband
-  guard then refuses forever. Known and deliberate for v1 (items are never destroyed);
-  requires an admin escape hatch (an operator tool that mails the dormant copy back to
-  its depositor or archives the book) before it can bite a real guild. Tracked in
-  progress.md deferrals; the future PR body must call it out.
+- Dormant pipe-refused slots could make a bank permanently non-emptiable (v1 limitation,
+  REMEDIED 2026-08-03 on `feature/guild-bank-followups`): an item a later content update
+  flags soulbound/noMarketList is refused in BOTH directions (anonymous-pipe policy), so
+  it can never be withdrawn, and the disband guard then refused forever. The operator
+  escape hatch is now `POST /admin/api/guilds/:id/bank/purge-slot` (permission
+  `guildbank.purge`) -> `GameServer.adminPurgeGuildBankSlot` -> the sim's
+  `purgeDormantGuildBankSlot`, which removes exactly ONE slot the pipe actually refuses
+  (an ordinary withdrawable copy is refused, pinned by test) and rides `runGuildBankOp`
+  like every other book mutation: `bank_ledger` op `admin_purge` carrying item id, count
+  and the real instance payload as evidence, the per-session unflushed delta (so a
+  fence-out reverts it), and the same fenced escrow save. Removing the last dormant slot
+  unblocks disband end to end (pinned).
+  Two accepted limits: the purge needs a live session OF THAT GUILD to carry the escrow
+  save (books never persist standalone), so it refuses `no_carrier` when nobody from the
+  guild is online; and it PURGES rather than mailing the copy back (the book keeps no
+  depositor identity, and the mail pipe refuses the same copy). The admin dashboard
+  control is a follow-up: a usable UI needs a guild-bank read surface (slot list with
+  indices + dormant flags) the admin API does not have yet; the four operator error
+  strings already carry their ADMIN_ERROR_KEYS matcher rows.
+- Guild bank incidents are metered (2026-08-03): `woc_guild_bank_incidents_total{kind}`
+  over the fixed five `GUILD_BANK_INCIDENTS` (escrow_save_failed, save_fenced_out,
+  reconcile, book_unloaded, ledger_write_failed) through the `gameMetricsCounters` seam,
+  pre-registered at zero. Guild id stays in the loud log and is never a metric label.
+  Each counter sits BESIDE its log, never instead of it.
 - reconcileUnflushableGuildBooks' dirty-scan pair (the another-session-dirty check and
   the mark/log consumption) runs synchronously before its first await; any future edit
   that splits them across an await reopens a mark-release race. Same trap class for the

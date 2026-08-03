@@ -488,6 +488,13 @@ export const en = {
   'error.guildReasonInvalid': 'Enter a moderation reason of no more than 500 characters.',
   'error.guildMemberLimit': 'This guild exceeds the supported member limit.',
   'error.guildNameInvalid': 'Guild names must contain 3 to 24 letters with single spaces.',
+  // The guild bank dormant-slot escape hatch (POST /admin/api/guilds/:id/bank/purge-slot).
+  'error.guildBankSlotRequired': 'Enter the guild bank slot number to remove.',
+  'error.guildBankNotLoaded': "This guild's bank is not loaded on this realm right now.",
+  'error.guildBankNoCarrier':
+    'A member of this guild must be online before the change can be saved.',
+  'error.guildBankSlotNotStuck':
+    'That slot holds an ordinary item the guild can withdraw itself, so it cannot be removed here.',
   'moderation.title': 'Moderation',
   'moderation.reportsTitle': 'Reports',
   'moderation.queueTitle': 'Report queue',

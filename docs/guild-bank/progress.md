@@ -11,6 +11,81 @@
 | Phase 4: UI | Done | 2026-08-02 | 2026-08-02 |
 | Phase 4 QA (final, offers teardown) | Done (PASS-WITH-FOLLOWUPS) | 2026-08-02 | 2026-08-03 |
 | Pricing redesign (user-directed) | Done | 2026-08-03 | 2026-08-03 |
+| Follow-ups (stacked branch, 3 slices) | Done | 2026-08-03 | 2026-08-03 |
+
+## Follow-ups (2026-08-03, branch `feature/guild-bank-followups` off `feature/guild-bank`)
+Three independent slices, one commit each.
+
+- [x] **Slice 1: guild-worded, direction-aware pipe refusals.** The quest refusal reused
+      the PERSONAL bank's line (`error.bankQuestItem`, "in the bank"), which names the
+      wrong bank in the guild pane, and every dimension was deposit-voiced even on the
+      withdraw arm. `guildBankPipeRefusal(slot, dir)` now takes a direction defaulting
+      to `'deposit'`: the refusal SET stays direction-independent (the `!== null` dormant
+      predicate every reader shares is unchanged, pinned by a new test), only the wording
+      moves. New sim_i18n rows `error.guildBankQuestItem` (deposit) and
+      `error.guildBankWithdrawRefused` (all four dimensions on withdraw), each with its
+      five non-Latin M16 fills. The `bags_window.ts` pre-empt moved to the new quest key
+      in the SAME change, and the cross-pin in `tests/bags_guild_deposit_routing.test.ts`
+      now also asserts the personal line is NOT the guild one. Closes the Phase 4 NOTE
+      "withdraw-direction refusal copy is deposit-voiced".
+- [x] **Slice 2: guild bank incident counters** (server-only, no schema change, no player
+      text). Every failure mode on the dupe-sensitive paths reported only through
+      `console.error` / `console.warn`, so it was invisible to production alerting. One
+      closed-vocabulary counter through the existing `gameMetricsCounters` seam:
+      `woc_guild_bank_incidents_total{kind}` over the fixed five `GUILD_BANK_INCIDENTS`
+      (`escrow_save_failed`, `save_fenced_out`, `reconcile`, `book_unloaded`,
+      `ledger_write_failed`), pre-registered at zero like the ws drop causes. Guild id
+      stays in the log line and is NEVER a label (the bounded-cardinality contract).
+      Each increment sits beside its existing loud log, and the escrow-save arm rethrows
+      unchanged. Emission sites: `server/game.ts` (the escrow save `.catch`, the
+      `saved === false` fence-out when books were carried, per-guild in
+      `reconcileUnflushableGuildBooks`, and every "left unloaded" arm in both the boot
+      load and the reconcile reload) plus `server/bank_ledger.ts`
+      (`recordGuildBankDeltas`). Tests drive the real paths in
+      `tests/guild_bank_persistence.test.ts` with a recording sink, with decisive
+      negatives (a failed/fenced save carrying NO book books nothing) and a vacuity
+      guard; the exposition shape is pinned in `tests/server/http/game_metrics.test.ts`.
+- [x] **Slice 3: the admin escape hatch for a dormant slot.** REMEDIES the v1 limitation
+      below: an item a later content change flags soulbound / noMarketList /
+      transfer-locked was refused in both directions, so `guildBankHoldings` stayed
+      non-zero forever and the guild could never disband, with no player action able to
+      clear it.
+      - Sim: `purgeDormantGuildBankSlot(ctx, guildId, slotIndex)` removes exactly one
+        slot `guildBankPipeRefusal` refuses and returns the removed clone as evidence;
+        an ordinary withdrawable copy, a bad index, and a missing book all refuse
+        without mutating. Plus `guildBankInfoForGuild`, the ungated guild-id read,
+        deliberately NOT downgraded to `publicInstanceView` (the projection would erase
+        the very bind identity the evidence row needs); server-only, never IWorld.
+      - Server: `GameServer.adminPurgeGuildBankSlot` runs the removal through
+        `runGuildBankOp`, which was EXTENDED (not duplicated) to take
+        `{ pid } | { guildId }` so the operator path shares the one observed mutation
+        path: same `bank_ledger` row, same per-session unflushed delta the fence-out
+        revert depends on, same fenced escrow save. A fence-out reverts a purge exactly
+        like a withdraw (pinned end to end).
+      - Ledger: new op `admin_purge` (declared in `GuildBankOpDelta`, `GuildBankLedgerOp`,
+        and `BankLedgerRow['op']`, with the sim/server lockstep type pin already in
+        place). It carries item id, count, and the REAL instance payload.
+        `scripts/bank_audit.mjs` gained its four registrations (shape chain, guild-only
+        predicate, item replay as a REMOVAL, excluded from the treasury replay) with a
+        load-bearing control test proving the book stops reconciling without the arm.
+      - Route: `POST /admin/api/guilds/:id/bank/purge-slot`, both dispatch arms (RouteDef
+        + the legacy ladder, the dual-edit rule) over one shared outcome helper, behind
+        the NEW permission `guildbank.purge` (its own permission, not `moderation.act`:
+        it destroys player property, and it is kept out of the moderator and viewer
+        bundles). Surface-inventory row added.
+      - THE CARRIER CONSTRAINT (accepted, documented): books persist only inside a
+        character's fenced escrow transaction (there is no standalone book write by
+        design), so the purge rides a live session of the TARGET GUILD (officer-plus
+        first, any member otherwise). With nobody from the guild online it refuses with
+        `no_carrier` (409) rather than mutating a book it could not persist.
+      - Deferred, recorded here: (a) MAIL DELIVERY of the purged copy back to its
+        depositor: the book keeps no depositor identity and the mail pipe refuses the
+        same copy, so v1 purges; (b) the ADMIN DASHBOARD control: a usable UI needs a
+        guild-bank READ surface the admin API does not have (slot list with indices +
+        dormant flags) plus a confirm flow, which is a second endpoint and a new panel,
+        so the API + tests shipped and the UI is a follow-up. The four operator error
+        strings already carry their `ADMIN_ERROR_KEYS` matcher rows and English catalog
+        entries so the UI follow-up is drop-in.
 
 ## Pricing redesign (2026-08-03, user-directed)
 - [x] `GUILD_CREATION_FEE_COPPER` 100_000 -> 10_000 (1 gold); pure constant change,

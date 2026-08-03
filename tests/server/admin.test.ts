@@ -3352,3 +3352,111 @@ describe('account flair (AI mark + streamer links)', () => {
     expect(rt.applyAccountFlairLive).not.toHaveBeenCalled();
   });
 });
+
+// ---------------------------------------------------------------------------
+// The guild bank dormant-slot escape hatch (POST /admin/api/guilds/:id/bank/
+// purge-slot). It destroys player property, so the authorization arm matters as
+// much as the happy path: it carries its OWN permission (guildbank.purge), not
+// moderation.act, and every refusal must reach the operator as its own body.
+// ---------------------------------------------------------------------------
+
+describe('guild bank dormant-slot purge', () => {
+  it('purges the named slot and answers with what was removed', async () => {
+    const adminPurgeGuildBankSlot = vi.fn(() => ({
+      ok: true as const,
+      removed: { itemId: 'wolf_fang', count: 2 },
+      carrierCharacterId: 11,
+    }));
+    authedAdminDb({});
+    installAdminRuntime({ adminPurgeGuildBankSlot });
+
+    const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '913' },
+      body: { slot: 3 },
+    });
+
+    expect(adminPurgeGuildBankSlot).toHaveBeenCalledWith(913, 3);
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({
+      success: true,
+      data: { guildId: 913, slotIndex: 3, itemId: 'wolf_fang', count: 2 },
+      error: null,
+    });
+  });
+
+  it('denies a moderator BEFORE touching the live sim (its own permission)', async () => {
+    // moderation.act reaches the guild rename; it must NOT reach this.
+    const adminPurgeGuildBankSlot = vi.fn();
+    authedAdminDb({
+      adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
+    });
+    installAdminRuntime({ adminPurgeGuildBankSlot });
+
+    const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '913' },
+      body: { slot: 0 },
+    });
+
+    expect(r.status).toBe(403);
+    expect(adminPurgeGuildBankSlot).not.toHaveBeenCalled();
+  });
+
+  it('rejects a malformed slot without calling the game at all', async () => {
+    const adminPurgeGuildBankSlot = vi.fn();
+    authedAdminDb({});
+    installAdminRuntime({ adminPurgeGuildBankSlot });
+
+    for (const slot of [undefined, 'first', -1, 1.5, null]) {
+      const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
+        headers: { authorization: BEARER },
+        params: { id: '913' },
+        body: { slot },
+      });
+      expect(r.status, String(slot)).toBe(400);
+      expect(r.body).toEqual({
+        success: false,
+        data: null,
+        error: 'a slot index is required',
+      });
+    }
+    expect(adminPurgeGuildBankSlot).not.toHaveBeenCalled();
+  });
+
+  it('maps each refusal reason to its own status and operator body', async () => {
+    const cases = [
+      { reason: 'no_book', status: 404, error: 'that guild has no loaded bank' },
+      {
+        reason: 'no_carrier',
+        status: 409,
+        error: 'no member of that guild is online to persist the change',
+      },
+      { reason: 'not_dormant', status: 400, error: 'that slot is not a stuck item' },
+    ] as const;
+    for (const c of cases) {
+      authedAdminDb({});
+      installAdminRuntime({
+        adminPurgeGuildBankSlot: vi.fn(() => ({ ok: false as const, reason: c.reason })),
+      });
+      const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
+        headers: { authorization: BEARER },
+        params: { id: '913' },
+        body: { slot: 0 },
+      });
+      expect(r.status, c.reason).toBe(c.status);
+      expect(r.body, c.reason).toEqual({ success: false, data: null, error: c.error });
+    }
+  });
+
+  it('401s an unauthenticated caller before the sim is reached', async () => {
+    const adminPurgeGuildBankSlot = vi.fn();
+    installAdminRuntime({ adminPurgeGuildBankSlot });
+    const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
+      params: { id: '913' },
+      body: { slot: 0 },
+    });
+    expect(r.status).toBe(401);
+    expect(adminPurgeGuildBankSlot).not.toHaveBeenCalled();
+  });
+});

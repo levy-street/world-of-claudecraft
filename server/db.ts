@@ -4193,7 +4193,8 @@ export interface BankLedgerRow {
     | 'deposit_gold'
     | 'withdraw_gold'
     | 'create_fee'
-    | 'open_bank';
+    | 'open_bank'
+    | 'admin_purge';
   itemId: string | null;
   count: number | null;
   instance: unknown;

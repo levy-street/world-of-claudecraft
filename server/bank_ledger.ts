@@ -194,7 +194,12 @@ export type GuildBankLedgerOp =
   | 'deposit'
   | 'withdraw'
   | 'buy_slots'
-  | 'open_bank';
+  | 'open_bank'
+  // The operator escape hatch (src/sim/guild_bank.ts purgeDormantGuildBankSlot):
+  // one DORMANT slot removed from a guild's book. Its own op name so the audit
+  // replay accounts for the removal instead of reading it as an unexplained
+  // shortfall, and so an operator can find every purge with one WHERE clause.
+  | 'admin_purge';
 
 // The guild multiset key: itemId + instance payload + craft provenance. The
 // third dimension exists because guild deltas feed the revert path
@@ -290,7 +295,10 @@ export function diffGuildBankOp(
         copperDelta: 0,
         purchasedSlotsAfter: after.purchasedSlots,
       });
-    } else if (op === 'withdraw' && delta < 0) {
+    } else if ((op === 'withdraw' || op === 'admin_purge') && delta < 0) {
+      // admin_purge removes a dormant copy exactly the way a withdraw removes
+      // a live one, so it shares this arm: same negative-count delta, same
+      // three-dimension key, and therefore the same revert on a fence-out.
       const slot = beforeCounts.get(key)?.slot as BankSlot;
       out.push({
         itemId: slot.itemId,
