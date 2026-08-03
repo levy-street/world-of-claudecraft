@@ -10773,4 +10773,5 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.toolType.fishing': '낚시',
   'itemUi.kind.toolbelt': '공구 벨트',
   'entities.items.toolbelt.name': '팅커의 공구 벨트',
+  'itemUi.tooltip.toolbeltDesc': '도구를 넣을 수 있는 벨트로, 배낭 공간을 절약해 줍니다.',
 };

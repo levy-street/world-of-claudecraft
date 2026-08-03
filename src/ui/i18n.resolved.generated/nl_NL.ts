@@ -7046,7 +7046,8 @@ export const nl_NL: EnTranslations = {
       "clickUseInstant": "Klik om direct te gebruiken in gevecht",
       "clickUse": "Klik om te gebruiken",
       "clickBuyback": "Klik om terug te kopen",
-      "bagSlots": "Tas met {slots} vakken"
+      "bagSlots": "Tas met {slots} vakken",
+      "toolbeltDesc": "A belt that can hold your tools, freeing up space in your backpack."
     },
     "bags": {
       "title": "Tassen",

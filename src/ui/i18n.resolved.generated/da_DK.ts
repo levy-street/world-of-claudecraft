@@ -7046,7 +7046,8 @@ export const da_DK: EnTranslations = {
       "clickUseInstant": "Klik for at bruge øjeblikkeligt i kamp",
       "clickUse": "Klik for at bruge",
       "clickBuyback": "Klik for at købe tilbage",
-      "bagSlots": "Taske med {slots} pladser"
+      "bagSlots": "Taske med {slots} pladser",
+      "toolbeltDesc": "A belt that can hold your tools, freeing up space in your backpack."
     },
     "bags": {
       "title": "Tasker",

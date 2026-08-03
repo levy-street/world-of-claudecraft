@@ -7046,7 +7046,8 @@ export const ja_JP: EnTranslations = {
       "clickUseInstant": "クリックして戦闘中に即使用",
       "clickUse": "クリックして使用",
       "clickBuyback": "クリックして買い戻す",
-      "bagSlots": "{slots}スロットのバッグ"
+      "bagSlots": "{slots}スロットのバッグ",
+      "toolbeltDesc": "道具を収められるベルト。バックパックの空きが増えます。"
     },
     "bags": {
       "title": "バッグ",

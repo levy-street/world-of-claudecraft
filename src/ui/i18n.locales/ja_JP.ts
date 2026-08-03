@@ -10785,4 +10785,5 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.toolType.fishing': '釣り',
   'itemUi.kind.toolbelt': 'ツールベルト',
   'entities.items.toolbelt.name': 'ティンカーのツールベルト',
+  'itemUi.tooltip.toolbeltDesc': '道具を収められるベルト。バックパックの空きが増えます。',
 };

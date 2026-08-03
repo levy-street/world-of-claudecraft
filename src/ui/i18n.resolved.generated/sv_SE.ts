@@ -7046,7 +7046,8 @@ export const sv_SE: EnTranslations = {
       "clickUseInstant": "Klicka för att använda omedelbart i strid",
       "clickUse": "Klicka för att använda",
       "clickBuyback": "Klicka för att köpa tillbaka",
-      "bagSlots": "Väska med {slots} platser"
+      "bagSlots": "Väska med {slots} platser",
+      "toolbeltDesc": "A belt that can hold your tools, freeing up space in your backpack."
     },
     "bags": {
       "title": "Väskor",

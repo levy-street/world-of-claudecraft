@@ -7046,7 +7046,8 @@ export const tr_TR: EnTranslations = {
       "clickUseInstant": "Savaşta anında kullanmak için tıkla",
       "clickUse": "Kullanmak için tıkla",
       "clickBuyback": "Geri satın almak için tıkla",
-      "bagSlots": "{slots} Yuvalı Çanta"
+      "bagSlots": "{slots} Yuvalı Çanta",
+      "toolbeltDesc": "A belt that can hold your tools, freeing up space in your backpack."
     },
     "bags": {
       "title": "Çantalar",

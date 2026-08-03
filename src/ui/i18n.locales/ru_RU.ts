@@ -10965,4 +10965,5 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.toolType.fishing': 'Рыбная ловля',
   'itemUi.kind.toolbelt': 'Пояс с инструментами',
   'entities.items.toolbelt.name': 'Пояс механика',
+  'itemUi.tooltip.toolbeltDesc': 'Пояс, в который помещаются инструменты, освобождая место в рюкзаке.',
 };

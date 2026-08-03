@@ -7046,7 +7046,8 @@ export const vi_VN: EnTranslations = {
       "clickUseInstant": "Nhấp để dùng tức thời trong chiến đấu",
       "clickUse": "Nhấp để sử dụng",
       "clickBuyback": "Nhấp để mua lại",
-      "bagSlots": "Túi {slots} Ô"
+      "bagSlots": "Túi {slots} Ô",
+      "toolbeltDesc": "A belt that can hold your tools, freeing up space in your backpack."
     },
     "bags": {
       "title": "Túi Đồ",

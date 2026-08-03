@@ -7046,7 +7046,8 @@ export const en_XA: EnTranslations = {
       "clickUseInstant": "[Çļíçķ ţó úšé íñšţáñţļý íñ çóɱƀáţ]",
       "clickUse": "[Çļíçķ ţó úšé]",
       "clickBuyback": "[Çļíçķ ţó ƀúý ƀáçķ]",
-      "bagSlots": "[{slots} Šļóţ Ɓáĝ]"
+      "bagSlots": "[{slots} Šļóţ Ɓáĝ]",
+      "toolbeltDesc": "[Á ƀéļţ ţĥáţ çáñ ĥóļð ýóúŕ ţóóļš, ƒŕééíñĝ úþ šþáçé íñ ýóúŕ ƀáçķþáçķ.]"
     },
     "bags": {
       "title": "[Ɓáĝš]",

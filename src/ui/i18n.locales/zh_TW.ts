@@ -10299,4 +10299,5 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.toolType.fishing': '釣魚',
   'itemUi.kind.toolbelt': '工具腰帶',
   'entities.items.toolbelt.name': '修補匠的工具腰帶',
+  'itemUi.tooltip.toolbeltDesc': '一條可以收納工具的腰帶，為你的背包騰出空間。',
 };

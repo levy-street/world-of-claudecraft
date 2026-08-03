@@ -38,6 +38,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bags.toolbeltRemoveHint",
     "hudChrome.bags.toolbeltTitle",
     "itemUi.kind.toolbelt",
+    "itemUi.tooltip.toolbeltDesc",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -70,6 +71,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bags.toolbeltRemoveHint",
     "hudChrome.bags.toolbeltTitle",
     "itemUi.kind.toolbelt",
+    "itemUi.tooltip.toolbeltDesc",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -102,6 +104,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bags.toolbeltRemoveHint",
     "hudChrome.bags.toolbeltTitle",
     "itemUi.kind.toolbelt",
+    "itemUi.tooltip.toolbeltDesc",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -134,6 +137,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bags.toolbeltRemoveHint",
     "hudChrome.bags.toolbeltTitle",
     "itemUi.kind.toolbelt",
+    "itemUi.tooltip.toolbeltDesc",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -167,6 +171,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bags.toolbeltRemoveHint",
     "hudChrome.bags.toolbeltTitle",
     "itemUi.kind.toolbelt",
+    "itemUi.tooltip.toolbeltDesc",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -199,6 +204,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bags.toolbeltRemoveHint",
     "hudChrome.bags.toolbeltTitle",
     "itemUi.kind.toolbelt",
+    "itemUi.tooltip.toolbeltDesc",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -255,6 +261,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bags.toolbeltRemoveHint",
     "hudChrome.bags.toolbeltTitle",
     "itemUi.kind.toolbelt",
+    "itemUi.tooltip.toolbeltDesc",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -293,6 +300,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bags.toolbeltRemoveHint",
     "hudChrome.bags.toolbeltTitle",
     "itemUi.kind.toolbelt",
+    "itemUi.tooltip.toolbeltDesc",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -325,6 +333,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bags.toolbeltRemoveHint",
     "hudChrome.bags.toolbeltTitle",
     "itemUi.kind.toolbelt",
+    "itemUi.tooltip.toolbeltDesc",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -357,6 +366,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bags.toolbeltRemoveHint",
     "hudChrome.bags.toolbeltTitle",
     "itemUi.kind.toolbelt",
+    "itemUi.tooltip.toolbeltDesc",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -389,6 +399,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bags.toolbeltRemoveHint",
     "hudChrome.bags.toolbeltTitle",
     "itemUi.kind.toolbelt",
+    "itemUi.tooltip.toolbeltDesc",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -421,6 +432,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bags.toolbeltRemoveHint",
     "hudChrome.bags.toolbeltTitle",
     "itemUi.kind.toolbelt",
+    "itemUi.tooltip.toolbeltDesc",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -453,6 +465,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bags.toolbeltRemoveHint",
     "hudChrome.bags.toolbeltTitle",
     "itemUi.kind.toolbelt",
+    "itemUi.tooltip.toolbeltDesc",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -485,6 +498,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bags.toolbeltRemoveHint",
     "hudChrome.bags.toolbeltTitle",
     "itemUi.kind.toolbelt",
+    "itemUi.tooltip.toolbeltDesc",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -517,6 +531,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bags.toolbeltRemoveHint",
     "hudChrome.bags.toolbeltTitle",
     "itemUi.kind.toolbelt",
+    "itemUi.tooltip.toolbeltDesc",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ]

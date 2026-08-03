@@ -7046,7 +7046,8 @@ export const zh_CN: EnTranslations = {
       "clickUseInstant": "点击在战斗中立即使用",
       "clickUse": "点击使用",
       "clickBuyback": "点击回购",
-      "bagSlots": "{slots} 格背包"
+      "bagSlots": "{slots} 格背包",
+      "toolbeltDesc": "一条可以收纳工具的腰带，为你的背包腾出空间。"
     },
     "bags": {
       "title": "背包",

@@ -7046,7 +7046,8 @@ export const cs_CZ: EnTranslations = {
       "clickUseInstant": "Kliknutím okamžitě použiješ v boji",
       "clickUse": "Kliknutím použiješ",
       "clickBuyback": "Kliknutím odkoupíš zpět",
-      "bagSlots": "Batoh s {slots} sloty"
+      "bagSlots": "Batoh s {slots} sloty",
+      "toolbeltDesc": "A belt that can hold your tools, freeing up space in your backpack."
     },
     "bags": {
       "title": "Batohy",

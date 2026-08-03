@@ -7046,7 +7046,8 @@ export const es: EnTranslations = {
       "clickUseInstant": "Haz clic para usar al instante en combate",
       "clickUse": "Haz clic para usar",
       "clickBuyback": "Haz clic para recomprar",
-      "bagSlots": "Bolsa de {slots} espacios"
+      "bagSlots": "Bolsa de {slots} espacios",
+      "toolbeltDesc": "A belt that can hold your tools, freeing up space in your backpack."
     },
     "bags": {
       "title": "Bolsas",

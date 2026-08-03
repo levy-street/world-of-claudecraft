@@ -8331,6 +8331,7 @@ export type TranslationKeyFlat =
   | 'itemUi.tooltip.questItem'
   | 'itemUi.tooltip.sellPrice'
   | 'itemUi.tooltip.stat'
+  | 'itemUi.tooltip.toolbeltDesc'
   | 'itemUi.tooltip.useDrink'
   | 'itemUi.tooltip.useFishing'
   | 'itemUi.tooltip.useFood'

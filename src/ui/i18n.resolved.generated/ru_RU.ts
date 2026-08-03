@@ -7046,7 +7046,8 @@ export const ru_RU: EnTranslations = {
       "clickUseInstant": "Нажмите, чтобы мгновенно использовать в бою",
       "clickUse": "Нажмите, чтобы использовать",
       "clickBuyback": "Нажмите, чтобы выкупить",
-      "bagSlots": "Сумка на {slots} ячеек"
+      "bagSlots": "Сумка на {slots} ячеек",
+      "toolbeltDesc": "Пояс, в который помещаются инструменты, освобождая место в рюкзаке."
     },
     "bags": {
       "title": "Сумки",

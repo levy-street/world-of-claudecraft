@@ -7046,7 +7046,8 @@ export const id_ID: EnTranslations = {
       "clickUseInstant": "Klik untuk memakai seketika dalam pertempuran",
       "clickUse": "Klik untuk memakai",
       "clickBuyback": "Klik untuk membeli kembali",
-      "bagSlots": "Tas {slots} Slot"
+      "bagSlots": "Tas {slots} Slot",
+      "toolbeltDesc": "A belt that can hold your tools, freeing up space in your backpack."
     },
     "bags": {
       "title": "Tas",

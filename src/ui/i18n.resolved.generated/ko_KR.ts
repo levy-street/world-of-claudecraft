@@ -7046,7 +7046,8 @@ export const ko_KR: EnTranslations = {
       "clickUseInstant": "클릭하여 전투 중 즉시 사용",
       "clickUse": "클릭하여 사용",
       "clickBuyback": "클릭하여 되사기",
-      "bagSlots": "{slots}칸 가방"
+      "bagSlots": "{slots}칸 가방",
+      "toolbeltDesc": "도구를 넣을 수 있는 벨트로, 배낭 공간을 절약해 줍니다."
     },
     "bags": {
       "title": "가방",

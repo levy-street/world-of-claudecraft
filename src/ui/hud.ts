@@ -548,6 +548,7 @@ import { targetOfTargetId } from './target_of_target';
 import { targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
+import { toolbeltTooltipLines } from './toolbelt_tooltip';
 import { SharedTooltipOwner } from './tooltip_owner';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
@@ -5221,6 +5222,7 @@ export class Hud {
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.questItem'))}</div>`;
     if (item.kind === 'bag' && item.bagSlots)
       html += `<div class="tt-stat">${esc(t('itemUi.tooltip.bagSlots', { slots: itemNumber(item.bagSlots) }))}</div>`;
+    html += toolbeltTooltipLines(item);
     // Collectible mount reins: the mount's flavor + specialty numbers + its
     // ride-level gate (red below the gate, like gear's requires-level line).
     if (item.kind === 'mount') {
