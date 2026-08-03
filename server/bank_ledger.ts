@@ -321,7 +321,7 @@ export function diffGuildBankOp(
 // diffGuildBankOp (it needs the success signal to mark the book dirty), so
 // this only enqueues; an empty array writes nothing.
 export function recordGuildBankDeltas(
-  op: GuildBankLedgerOp | 'create_fee',
+  op: GuildBankLedgerOp | 'create_fee' | typeof GUILD_BANK_ESCROW_DEFICIT_OP,
   who: { characterId: number; accountId: number },
   guildId: number,
   deltas: readonly BankOpDelta[],

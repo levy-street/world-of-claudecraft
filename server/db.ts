@@ -4241,7 +4241,12 @@ export interface BankLedgerRow {
     | 'deposit_gold'
     | 'withdraw_gold'
     | 'create_fee'
-    | 'open_bank';
+    | 'open_bank'
+    // Not an op a player performed: the escrow-deficit ANOMALY marker
+    // (server/bank_ledger.ts GUILD_BANK_ESCROW_DEFICIT_OP), the audit trail
+    // for value one officer consumed that another never made durable.
+    // scripts/bank_audit.mjs reports these and excludes them from every replay.
+    | 'escrow_deficit';
   itemId: string | null;
   count: number | null;
   instance: unknown;
