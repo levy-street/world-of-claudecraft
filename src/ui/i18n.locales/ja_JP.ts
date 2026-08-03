@@ -839,18 +839,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.fiestaKill': 'フィエスタ撃破',
   'hudChrome.warfare.reasons.fiestaComplete': 'フィエスタ完遂',
   'hudChrome.warfare.reasons.fiestaWin': 'フィエスタ勝利',
-  'hudChrome.warfare.reasons.battlegroundWin': 'レイヴンリフト勝利',
-  'hudChrome.warfare.reasons.battlegroundComplete': 'レイヴンリフト参戦',
+  'hudChrome.warfare.reasons.battlegroundWin': 'ソーンホロウ平原勝利',
+  'hudChrome.warfare.reasons.battlegroundComplete': 'ソーンホロウ平原参戦',
   'hudChrome.warfare.reasons.battlegroundKill': '名誉ある撃破',
   'hudChrome.warfare.reasons.battlegroundAssist': '撃破アシスト',
   'hudChrome.keybinds.bgFlag': '戦場フラッグアクション',
-  'hudChrome.pvp.launcherTitle': 'PvP:レイヴンリフトと闘技場',
+  'hudChrome.pvp.launcherTitle': 'PvP:ソーンホロウ平原と闘技場',
   'hudChrome.pvp.mobileLabel': 'PvP',
-  'hudChrome.bg.title': 'レイヴンリフト',
+  'hudChrome.bg.title': 'ソーンホロウ平原',
   'hudChrome.bg.blurb':
     'ソーンピークの影が落ちる、壁に囲まれた窪地を挟んで二つの廃城が向かい合う。南に真紅、北に蒼藍、その間には未だどちらの手にも落ちていない古い廃墟の中庭が横たわる。五対五、旗は各一本。相手の旗を五度持ち帰った側が戦場を制する。',
   'hudChrome.bg.modeTag': '5v5キャプチャー・ザ・フラッグ',
-  'hudChrome.bg.offlineNote': 'レイヴンリフトは同期中です。レルムの応答後にキューが開きます。',
+  'hudChrome.bg.offlineNote': 'ソーンホロウ平原は同期中です。レルムの応答後にキューが開きます。',
   'hudChrome.bg.ratingSummary': 'レーティング。{wins}勝 / {losses}敗',
   'hudChrome.bg.careerCaptures': '通算キャプチャー:{count}',
   'hudChrome.bg.enterQueue': 'キューに参加',
@@ -879,7 +879,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.resultDraw': '引き分け',
   'hudChrome.bg.leavingIn': '{seconds}秒後に戦場を離れます',
   'hudChrome.bg.foundBanner': 'マッチ成立。あなたは{team}として戦います!',
-  'hudChrome.bg.countdownBanner': 'レイヴンリフト開始まで{seconds}',
+  'hudChrome.bg.countdownBanner': 'ソーンホロウ平原開始まで{seconds}',
   'hudChrome.bg.startBanner': '旗を奪え!',
   'hudChrome.bg.flagTakenLog': '{name}が{team}の旗を奪った!',
   'hudChrome.bg.flagDroppedLog': '{team}の旗が落とされた。',
@@ -896,19 +896,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.flagReturnedBanner': '{team}の旗が戻された!',
   'hudChrome.bg.capturedLog': '{name}が{team}の旗をキャプチャー。スコア{crimson}:{azure}。',
   'hudChrome.bg.victoryBanner':
-    '勝利!レイヴンリフト{crimson}:{azure}。レーティング{rating}({delta})',
+    '勝利!ソーンホロウ平原{crimson}:{azure}。レーティング{rating}({delta})',
   'hudChrome.bg.defeatBanner':
-    '敗北。レイヴンリフト{crimson}:{azure}。レーティング{rating}({delta})',
+    '敗北。ソーンホロウ平原{crimson}:{azure}。レーティング{rating}({delta})',
   'hudChrome.bg.drawBanner':
-    'レイヴンリフト引き分け{crimson}:{azure}。レーティング{rating}({delta})',
-  'hudChrome.bg.endLog': 'レイヴンリフト終了、{crimson}:{azure}。レーティング{rating}({delta})。',
-  'guide.nav.ravenrift': 'レイヴンリフト',
-  'guide.ravenriftPage.heading': 'レイヴンリフト',
+    'ソーンホロウ平原引き分け{crimson}:{azure}。レーティング{rating}({delta})',
+  'hudChrome.bg.endLog': 'ソーンホロウ平原終了、{crimson}:{azure}。レーティング{rating}({delta})。',
+  'guide.nav.ravenrift': 'ソーンホロウ平原',
+  'guide.ravenriftPage.heading': 'ソーンホロウ平原',
   'guide.ravenriftPage.intro':
     'ソーンピークの下、古い森に抱かれた壁に囲まれた窪地で戦うランク制5対5の旗奪取戦場。峡谷の両端で二つの廃城が向かい合い、その間にはどちらの手にも落ちたことのない、より古い中庭が横たわる。五人ずつ、城は二つ、目的は一つ。相手の旗を奪い、こちらの旗を奪われる前に持ち帰れ。',
   'guide.ravenriftPage.queueHeading': 'キューへの参加',
   'guide.ravenriftPage.queueBody':
-    'レイヴンリフトパネルを開けばソロで参加できるほか、最大5人のパーティで一緒に並べます。パーティは必ず同じチームに配置され、残りの席はソロの勇者で埋まります。10人が揃うと両チームが砦に配置され、短い整列ののち旗が有効になります。',
+    'ソーンホロウ平原パネルを開けばソロで参加できるほか、最大5人のパーティで一緒に並べます。パーティは必ず同じチームに配置され、残りの席はソロの勇者で埋まります。10人が揃うと両チームが砦に配置され、短い整列ののち旗が有効になります。',
   'guide.ravenriftPage.fieldHeading': '戦場',
   'guide.ravenriftPage.fieldBody':
     '壁に囲まれた野外の戦場は、3つの区画に分かれています。両チームそれぞれの前庭と、その間に挟まれた「廃墟の中庭」です。全幅を貫く2枚の隔壁が境界となり、区画間の移動は必ず争奪点を通ります。広い正門と、隔壁をまたぐ門楼です。門楼の2つの扉は互い違いに開いており、伏撃の角を回り込む必要があります。各砦は正面口以外が完全に封じられているため、旗をめぐる出入りは必ず同じ開口部を通ります。その正面口には低いバリケードが立ち、まっすぐな突撃を阻みます。中庭には空洞の中心遺跡と側翼の2つのスプリントルーンがあり、残る2つは旗への進路に待っています。さらに各正門の中庭側入口にはバトルルーンまたはウォードルーン(短時間、与ダメージ増加か被ダメージ軽減)が待機:両方の台は同じ面で試合を開始し、取得のたびに面が切り替わります。',
@@ -1878,7 +1878,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.options.mouseCamera': 'マウスカメラ',
   'hud.options.keybindHelpMouseCamera':
     'マウスカメラオフ: A/Dで旋回、ドラッグで周回（クラシック）。オン: カメラ基準のWASD、A/Dで横移動。キー欄をクリックして割り当て変更、Escでキャンセル。',
-  'hud.keybinds.actions.arena': 'PvP(レイヴンリフトとアリーナ)',
+  'hud.keybinds.actions.arena': 'PvP(ソーンホロウ平原とアリーナ)',
   'hud.keybinds.categories.movement': '移動',
   'hud.keybinds.categories.targeting': 'ターゲット',
   'hud.keybinds.categories.interface': 'インターフェース',
@@ -8394,8 +8394,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.marketDay.title': '市の日',
   'hudChrome.calendar.events.marketDay.note':
     '商人が新しい品を待っている。ワールドマーケットを見て回るのに良い日。',
-  'hudChrome.calendar.events.fiestaNight.title': 'フィエスタナイト',
-  'hudChrome.calendar.events.fiestaNight.note': '今夜の2v2フィエスタのリングは大賑わい。',
   'hudChrome.calendar.events.arenaClash.title': 'アリーナ激突',
   'hudChrome.calendar.events.arenaClash.note':
     '決闘者たちが灰燼の闘技場へ。キューに並んでラダーを駆け上がろう。',

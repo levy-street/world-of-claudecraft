@@ -2363,10 +2363,6 @@ export const tr_TR: EnTranslations = {
           "title": "Pazar Günü",
           "note": "Tüccar taze mal bekliyor. Dünya Pazarı'na göz atmak için güzel bir gün."
         },
-        "fiestaNight": {
-          "title": "Fiesta Gecesi",
-          "note": "İkiye iki Fiesta ringi bu gece en gürültülü kalabalığını topluyor."
-        },
         "arenaClash": {
           "title": "Arena Çatışması",
           "note": "Düellocular Kül Kolezyumu'na akın ediyor. Sıraya gir ve merdiveni tırman."

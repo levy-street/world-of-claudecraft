@@ -2119,9 +2119,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Bruder Halven menandai petanya: hari yang baik untuk menantang Relikuari Runtuh.',
   'hudChrome.calendar.events.delveDay.title': 'Hari Delve',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'Gelanggang Fiesta 2v2 menarik penonton paling riuh malam ini.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Malam Fiesta',
   'hudChrome.calendar.events.fishingDerby.note':
     'Para pemancing berjajar di tepi danau. Bawalah joran dan saling bertukar kisah memancing.',
   'hudChrome.calendar.events.fishingDerby.title': 'Lomba Memancing',

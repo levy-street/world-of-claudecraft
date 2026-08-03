@@ -2363,10 +2363,6 @@ export const pt_BR: EnTranslations = {
           "title": "Dia de Mercado",
           "note": "O Mercador espera estoque fresco. Um belo dia para explorar o Mercado Mundial."
         },
-        "fiestaNight": {
-          "title": "Noite de Fiesta",
-          "note": "O ringue da Fiesta 2v2 atrai suas plateias mais barulhentas esta noite."
-        },
         "arenaClash": {
           "title": "Confronto na Arena",
           "note": "Duelistas acorrem ao Coliseu Cinzento. Entre na fila e suba na classificação."

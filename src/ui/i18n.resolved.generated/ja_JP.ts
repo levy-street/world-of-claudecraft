@@ -1014,16 +1014,16 @@ export const ja_JP: EnTranslations = {
       "timeLeft": "{seconds}秒"
     },
     "pvp": {
-      "launcherTitle": "PvP:レイヴンリフトと闘技場",
+      "launcherTitle": "PvP:ソーンホロウ平原と闘技場",
       "mobileLabel": "PvP",
       "bracket1v1": "1v1",
       "bracket2v2": "2v2"
     },
     "bg": {
-      "title": "レイヴンリフト",
+      "title": "ソーンホロウ平原",
       "blurb": "ソーンピークの影が落ちる、壁に囲まれた窪地を挟んで二つの廃城が向かい合う。南に真紅、北に蒼藍、その間には未だどちらの手にも落ちていない古い廃墟の中庭が横たわる。五対五、旗は各一本。相手の旗を五度持ち帰った側が戦場を制する。",
       "modeTag": "5v5キャプチャー・ザ・フラッグ",
-      "offlineNote": "レイヴンリフトは同期中です。レルムの応答後にキューが開きます。",
+      "offlineNote": "ソーンホロウ平原は同期中です。レルムの応答後にキューが開きます。",
       "ratingSummary": "レーティング。{wins}勝 / {losses}敗",
       "careerCaptures": "通算キャプチャー:{count}",
       "enterQueue": "キューに参加",
@@ -1055,7 +1055,7 @@ export const ja_JP: EnTranslations = {
       "killFeed": "{killer}が{victim}を倒した",
       "killFeedFallen": "{victim}が倒れた",
       "foundBanner": "マッチ成立。あなたは{team}として戦います!",
-      "countdownBanner": "レイヴンリフト開始まで{seconds}",
+      "countdownBanner": "ソーンホロウ平原開始まで{seconds}",
       "startBanner": "旗を奪え!",
       "flagTakenLog": "{name}が{team}の旗を奪った!",
       "flagDroppedLog": "{team}の旗が落とされた。",
@@ -1072,10 +1072,10 @@ export const ja_JP: EnTranslations = {
       "flagReturnedBanner": "{team}の旗が戻された!",
       "capturedTeamBanner": "{takers}が{team}の旗をキャプチャー!{crimson}:{azure}",
       "capturedLog": "{name}が{team}の旗をキャプチャー。スコア{crimson}:{azure}。",
-      "victoryBanner": "勝利!レイヴンリフト{crimson}:{azure}。レーティング{rating}({delta})",
-      "defeatBanner": "敗北。レイヴンリフト{crimson}:{azure}。レーティング{rating}({delta})",
-      "drawBanner": "レイヴンリフト引き分け{crimson}:{azure}。レーティング{rating}({delta})",
-      "endLog": "レイヴンリフト終了、{crimson}:{azure}。レーティング{rating}({delta})。"
+      "victoryBanner": "勝利!ソーンホロウ平原{crimson}:{azure}。レーティング{rating}({delta})",
+      "defeatBanner": "敗北。ソーンホロウ平原{crimson}:{azure}。レーティング{rating}({delta})",
+      "drawBanner": "ソーンホロウ平原引き分け{crimson}:{azure}。レーティング{rating}({delta})",
+      "endLog": "ソーンホロウ平原終了、{crimson}:{azure}。レーティング{rating}({delta})。"
     },
     "vcup": {
       "title": "ヴェイルカップ",
@@ -1428,8 +1428,8 @@ export const ja_JP: EnTranslations = {
         "fiestaKill": "フィエスタ撃破",
         "fiestaComplete": "フィエスタ完遂",
         "fiestaWin": "フィエスタ勝利",
-        "battlegroundWin": "レイヴンリフト勝利",
-        "battlegroundComplete": "レイヴンリフト参戦",
+        "battlegroundWin": "ソーンホロウ平原勝利",
+        "battlegroundComplete": "ソーンホロウ平原参戦",
         "battlegroundKill": "名誉ある撃破",
         "battlegroundAssist": "撃破アシスト"
       }
@@ -2363,10 +2363,6 @@ export const ja_JP: EnTranslations = {
           "title": "市の日",
           "note": "商人が新しい品を待っている。ワールドマーケットを見て回るのに良い日。"
         },
-        "fiestaNight": {
-          "title": "フィエスタナイト",
-          "note": "今夜の2v2フィエスタのリングは大賑わい。"
-        },
         "arenaClash": {
           "title": "アリーナ激突",
           "note": "決闘者たちが灰燼の闘技場へ。キューに並んでラダーを駆け上がろう。"
@@ -3121,7 +3117,7 @@ export const ja_JP: EnTranslations = {
       "talents": "タレント",
       "arena": "アリーナとPvP",
       "valeCup": "ヴェイルカップ",
-      "ravenrift": "レイヴンリフト",
+      "ravenrift": "ソーンホロウ平原",
       "deeds": "功績の書",
       "glossary": "用語集",
       "wishIKnew": "知っておきたかったこと",
@@ -3896,10 +3892,10 @@ export const ja_JP: EnTranslations = {
       "ladderBody": "ランクプレイでは時間をかけて順位を記録します。リーダーボードを確認すれば、自分の位置やレルムの頂点に立つのが誰かが分かります。"
     },
     "ravenriftPage": {
-      "heading": "レイヴンリフト",
+      "heading": "ソーンホロウ平原",
       "intro": "ソーンピークの下、古い森に抱かれた壁に囲まれた窪地で戦うランク制5対5の旗奪取戦場。峡谷の両端で二つの廃城が向かい合い、その間にはどちらの手にも落ちたことのない、より古い中庭が横たわる。五人ずつ、城は二つ、目的は一つ。相手の旗を奪い、こちらの旗を奪われる前に持ち帰れ。",
       "queueHeading": "キューへの参加",
-      "queueBody": "レイヴンリフトパネルを開けばソロで参加できるほか、最大5人のパーティで一緒に並べます。パーティは必ず同じチームに配置され、残りの席はソロの勇者で埋まります。10人が揃うと両チームが砦に配置され、短い整列ののち旗が有効になります。",
+      "queueBody": "ソーンホロウ平原パネルを開けばソロで参加できるほか、最大5人のパーティで一緒に並べます。パーティは必ず同じチームに配置され、残りの席はソロの勇者で埋まります。10人が揃うと両チームが砦に配置され、短い整列ののち旗が有効になります。",
       "fieldHeading": "戦場",
       "fieldBody": "壁に囲まれた野外の戦場は、3つの区画に分かれています。両チームそれぞれの前庭と、その間に挟まれた「廃墟の中庭」です。全幅を貫く2枚の隔壁が境界となり、区画間の移動は必ず争奪点を通ります。広い正門と、隔壁をまたぐ門楼です。門楼の2つの扉は互い違いに開いており、伏撃の角を回り込む必要があります。各砦は正面口以外が完全に封じられているため、旗をめぐる出入りは必ず同じ開口部を通ります。その正面口には低いバリケードが立ち、まっすぐな突撃を阻みます。中庭には空洞の中心遺跡と側翼の2つのスプリントルーンがあり、残る2つは旗への進路に待っています。さらに各正門の中庭側入口にはバトルルーンまたはウォードルーン(短時間、与ダメージ増加か被ダメージ軽減)が待機:両方の台は同じ面で試合を開始し、取得のたびに面が切り替わります。",
       "flagsHeading": "旗",
@@ -6420,7 +6416,7 @@ export const ja_JP: EnTranslations = {
         "nameplates": "ネームプレート切り替え",
         "meters": "ダメージメーター",
         "social": "フレンド & ギルド",
-        "arena": "PvP(レイヴンリフトとアリーナ)",
+        "arena": "PvP(ソーンホロウ平原とアリーナ)",
         "chat": "チャットを開く",
         "attack": "攻撃",
         "actionBarSlot": "アクションバー {slot}"

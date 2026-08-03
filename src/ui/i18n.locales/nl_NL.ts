@@ -2246,9 +2246,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Broeder Halven markeert zijn kaarten: een mooie dag om het Ingestorte Reliekschrijn te trotseren.',
   'hudChrome.calendar.events.delveDay.title': 'Delvedag',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'De 2v2 Fiesta-ring trekt vanavond zijn luidruchtigste publiek.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Fiesta-avond',
   'hudChrome.calendar.events.fishingDerby.note':
     'Hengelaars staan langs de meren. Neem een hengel mee en wissel visverhalen uit.',
   'hudChrome.calendar.events.fishingDerby.title': 'Visderby',

@@ -4044,9 +4044,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Bratr Halven značí mapy: skvělý den pro odvahu ve Zhrouceném relikviáři.',
   'hudChrome.calendar.events.delveDay.title': 'Den výprav',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'Kruh 2v2 Fiesty dnes večer přitahuje nejhlasitější davy.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Fiesta noc',
   'hudChrome.calendar.events.fishingDerby.note':
     'Rybáři lemují jezera. Přines prut a vyměň si rybářské historky.',
   'hudChrome.calendar.events.fishingDerby.title': 'Rybářské derby',

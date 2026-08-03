@@ -2014,9 +2014,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Broder Halven markerer sine kort: en fin dag at trodse Det Sammenstyrtede Relikvarium.',
   'hudChrome.calendar.events.delveDay.title': 'Delve-Dag',
-  'hudChrome.calendar.events.fiestaNight.note':
-    '2v2-Fiesta-ringen trækker sine mest højrøstede tilskuere i aften.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Fiesta-Aften',
   'hudChrome.calendar.events.fishingDerby.note':
     'Lystfiskere står langs søerne. Tag en stang med, og udveksl fiskehistorier.',
   'hudChrome.calendar.events.fishingDerby.title': 'Fiskederby',

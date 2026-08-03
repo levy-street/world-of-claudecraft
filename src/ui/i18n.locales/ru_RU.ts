@@ -839,19 +839,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.fiestaKill': 'Устранение на Фиесте',
   'hudChrome.warfare.reasons.fiestaComplete': 'Завершение Фиесты',
   'hudChrome.warfare.reasons.fiestaWin': 'Победа на Фиесте',
-  'hudChrome.warfare.reasons.battlegroundWin': 'Победа в Вороньем Разломе',
-  'hudChrome.warfare.reasons.battlegroundComplete': 'Битва в Вороньем Разломе',
+  'hudChrome.warfare.reasons.battlegroundWin': 'Победа в Терновой Лощине',
+  'hudChrome.warfare.reasons.battlegroundComplete': 'Битва в Терновой Лощине',
   'hudChrome.warfare.reasons.battlegroundKill': 'Почётное убийство',
   'hudChrome.warfare.reasons.battlegroundAssist': 'Помощь в убийстве',
   'hudChrome.keybinds.bgFlag': 'Действие с флагом',
-  'hudChrome.pvp.launcherTitle': 'PvP: Вороний Разлом и арены',
+  'hudChrome.pvp.launcherTitle': 'PvP: Терновая Лощина и арены',
   'hudChrome.pvp.mobileLabel': 'PvP',
-  'hudChrome.bg.title': 'Вороний Разлом',
+  'hudChrome.bg.title': 'Терновая Лощина',
   'hudChrome.bg.blurb':
     'Две разрушенные крепости смотрят друг на друга через обнесённую стеной лощину в тени Тернового пика: Багровые на юге, Лазурные на севере, а между ними старый Двор Руин, который так и не достался никому. Пятеро на пятеро, по одному знамени, и первый, кто пять раз донесёт чужое знамя домой, забирает поле.',
   'hudChrome.bg.modeTag': 'Захват флага 5 на 5',
   'hudChrome.bg.offlineNote':
-    'Вороний Разлом синхронизируется. Очередь откроется после ответа мира.',
+    'Терновая Лощина синхронизируется. Очередь откроется после ответа мира.',
   'hudChrome.bg.ratingSummary': 'Рейтинг. Побед: {wins} / поражений: {losses}',
   'hudChrome.bg.careerCaptures': 'Захватов за карьеру: {count}',
   'hudChrome.bg.enterQueue': 'Встать в очередь',
@@ -880,7 +880,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.resultDraw': 'Ничья',
   'hudChrome.bg.leavingIn': 'Вы покинете поле боя через {seconds}',
   'hudChrome.bg.foundBanner': 'Битва найдена. Вы сражаетесь за {team}!',
-  'hudChrome.bg.countdownBanner': 'Вороний Разлом начнется через {seconds}',
+  'hudChrome.bg.countdownBanner': 'Терновая Лощина начнется через {seconds}',
   'hudChrome.bg.startBanner': 'Захватите флаг!',
   'hudChrome.bg.flagTakenLog': '{name} забирает флаг команды {team}!',
   'hudChrome.bg.flagDroppedLog': 'Флаг команды {team} уронен.',
@@ -898,19 +898,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.flagReturnedBanner': 'Флаг команды {team} возвращен!',
   'hudChrome.bg.capturedLog': '{name} захватывает флаг команды {team}. Счет {crimson}:{azure}.',
   'hudChrome.bg.victoryBanner':
-    'Победа! Вороний Разлом {crimson}:{azure}. Рейтинг {rating} ({delta})',
+    'Победа! Терновая Лощина {crimson}:{azure}. Рейтинг {rating} ({delta})',
   'hudChrome.bg.defeatBanner':
-    'Поражение. Вороний Разлом {crimson}:{azure}. Рейтинг {rating} ({delta})',
+    'Поражение. Терновая Лощина {crimson}:{azure}. Рейтинг {rating} ({delta})',
   'hudChrome.bg.drawBanner':
-    'Ничья в Вороньем Разломе {crimson}:{azure}. Рейтинг {rating} ({delta})',
-  'hudChrome.bg.endLog': 'Вороний Разлом завершен, {crimson}:{azure}. Рейтинг {rating} ({delta}).',
-  'guide.nav.ravenrift': 'Вороний Разлом',
-  'guide.ravenriftPage.heading': 'Вороний Разлом',
+    'Ничья в Терновой Лощине {crimson}:{azure}. Рейтинг {rating} ({delta})',
+  'hudChrome.bg.endLog': 'Терновая Лощина завершена, {crimson}:{azure}. Рейтинг {rating} ({delta}).',
+  'guide.nav.ravenrift': 'Терновая Лощина',
+  'guide.ravenriftPage.heading': 'Терновая Лощина',
   'guide.ravenriftPage.intro':
     'Рейтинговое поле боя 5 на 5 за захват флага в обнесённой стеной лощине среди старого леса под Терновым пиком, где две разрушенные крепости смотрят друг на друга вдоль ущелья, а между ними лежит двор постарше, так и не доставшийся никому. Две команды по пять, две крепости, одна цель: унести чужое знамя домой раньше, чем унесут ваше.',
   'guide.ravenriftPage.queueHeading': 'Очередь',
   'guide.ravenriftPage.queueBody':
-    'Откройте панель Вороньего Разлома и встаньте в очередь в одиночку или соберите группу до пяти человек и вставайте вместе: группа всегда попадает в одну команду, а свободные места заполняют одиночные бойцы. Когда готовы десять, матч рассаживает обе команды по крепостям для короткого построения, после чего флаги оживают.',
+    'Откройте панель Терновой Лощины и встаньте в очередь в одиночку или соберите группу до пяти человек и вставайте вместе: группа всегда попадает в одну команду, а свободные места заполняют одиночные бойцы. Когда готовы десять, матч рассаживает обе команды по крепостям для короткого построения, после чего флаги оживают.',
   'guide.ravenriftPage.fieldHeading': 'Поле',
   'guide.ravenriftPage.fieldBody':
     'Обнесенное стенами открытое поле разделено на три зоны: собственное поле каждой команды и Двор Руин между ними. Две куртины во всю ширину образуют границы, и любой переход между зонами идет через спорную точку: широкие главные ворота или надвратный дом, оседлавший куртину, чьи смещенные двери заставляют огибать угол засады. Каждая крепость наглухо закрыта со всех сторон, кроме входа, так что путь к флагу и от него лежит через один и тот же проем, а низкая баррикада у ворот ломает прямой натиск. Во дворе ждут полое сердце руин и две фланговые руны спринта; еще две стоят на подходах к флагам.У дворового входа каждых главных ворот ждет руна битвы или руна защиты (ненадолго больше урона или меньше получаемого урона): оба постамента открывают матч одной стороной и переворачиваются с каждым захватом.',
@@ -1901,7 +1901,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.options.mouseCamera': 'Камера мышью',
   'hud.options.keybindHelpMouseCamera':
     'Камера мышью выкл.: A/D поворачивает, перетаскивание облетает (классика). Вкл.: WASD относительно камеры, A/D стрейф. Щелкните ячейку клавиши для переназначения; Esc отменяет.',
-  'hud.keybinds.actions.arena': 'PvP (Вороний Разлом и арены)',
+  'hud.keybinds.actions.arena': 'PvP (Терновая Лощина и арены)',
   'hud.keybinds.categories.movement': 'Передвижение',
   'hud.keybinds.categories.targeting': 'Цели',
   'hud.keybinds.categories.interface': 'Интерфейс',
@@ -8527,9 +8527,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.marketDay.title': 'Ярмарочный день',
   'hudChrome.calendar.events.marketDay.note':
     'Торговец ждёт свежий товар. Отличный день, чтобы заглянуть на Мировой рынок.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Ночь фиесты',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'Сегодня ринг фиесты 2 на 2 собирает самые шумные толпы.',
   'hudChrome.calendar.events.arenaClash.title': 'Битва на арене',
   'hudChrome.calendar.events.arenaClash.note':
     'Дуэлянты стекаются в Пепельный Колизей. Вставайте в очередь и поднимайтесь по лестнице.',

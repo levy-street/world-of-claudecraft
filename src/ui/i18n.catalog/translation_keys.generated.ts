@@ -6378,8 +6378,6 @@ export type TranslationKeyFlat =
   | 'hudChrome.calendar.events.arenaClash.title'
   | 'hudChrome.calendar.events.delveDay.note'
   | 'hudChrome.calendar.events.delveDay.title'
-  | 'hudChrome.calendar.events.fiestaNight.note'
-  | 'hudChrome.calendar.events.fiestaNight.title'
   | 'hudChrome.calendar.events.fishingDerby.note'
   | 'hudChrome.calendar.events.fishingDerby.title'
   | 'hudChrome.calendar.events.marketDay.note'

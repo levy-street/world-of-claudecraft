@@ -2363,10 +2363,6 @@ export const pl_PL: EnTranslations = {
           "title": "Dzień Targowy",
           "note": "Kupiec spodziewa się świeżego towaru. Dobry dzień na przegląd Rynku Świata."
         },
-        "fiestaNight": {
-          "title": "Noc Fiesty",
-          "note": "Ring Fiesty 2v2 przyciąga dziś wieczorem najgłośniejsze tłumy."
-        },
         "arenaClash": {
           "title": "Starcie na Arenie",
           "note": "Pojedynkowicze ściągają do Popielnego Koloseum. Zapisz się do kolejki i wspinaj po drabinie rankingowej."

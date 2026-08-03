@@ -2124,9 +2124,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Tu Huynh Halven đánh dấu vào những tấm bản đồ của mình: một ngày lành để thử sức Thánh Tích Sụp Đổ.',
   'hudChrome.calendar.events.delveDay.title': 'Ngày Hang Sâu',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'Võ đài Fiesta 2v2 đón đám đông cuồng nhiệt nhất vào tối nay.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Đêm Fiesta',
   'hudChrome.calendar.events.fishingDerby.note':
     'Cần thủ xếp hàng quanh các hồ nước. Hãy mang theo cần câu và trao đổi chuyện câu cá.',
   'hudChrome.calendar.events.fishingDerby.title': 'Hội Thi Câu Cá',

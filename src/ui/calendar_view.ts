@@ -8,7 +8,10 @@
 import type { GuildEventInfo } from '../world_api';
 
 // Recurring system events (display-only: each points the player at a real
-// activity; none changes gameplay). Titles/notes localize in the painter via
+// activity; none changes gameplay). Every id here must name something a player
+// can actually go and do: the weekly Fiesta Night row was dropped when the
+// Fiesta ring stayed unqueueable, because a calendar entry for a mode nobody can
+// queue is false advertising. Titles/notes localize in the painter via
 // hudChrome.calendar.events.<id>.*; weekday is 0=Sunday..6=Saturday (UTC).
 export interface SystemEventDef {
   id: string;
@@ -18,7 +21,6 @@ export interface SystemEventDef {
 export const SYSTEM_EVENTS: SystemEventDef[] = [
   { id: 'raid_call', rule: { kind: 'weekly', weekday: 2 } }, // Tuesday
   { id: 'market_day', rule: { kind: 'weekly', weekday: 3 } }, // Wednesday
-  { id: 'fiesta_night', rule: { kind: 'weekly', weekday: 5 } }, // Friday
   { id: 'arena_clash', rule: { kind: 'weekly', weekday: 6 } }, // Saturday
   { id: 'fishing_derby', rule: { kind: 'weekly', weekday: 0 } }, // Sunday
   { id: 'delve_day', rule: { kind: 'monthly', day: 7 } },

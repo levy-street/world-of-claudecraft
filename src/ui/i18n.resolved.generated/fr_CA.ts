@@ -2363,10 +2363,6 @@ export const fr_CA: EnTranslations = {
           "title": "Jour de marché",
           "note": "Le Marchand attend des marchandises fraîches. Un beau jour pour parcourir le Marché mondial."
         },
-        "fiestaNight": {
-          "title": "Nuit de la Fiesta",
-          "note": "Le ring de la Fiesta 2c2 attire ce soir ses foules les plus bruyantes."
-        },
         "arenaClash": {
           "title": "Choc des arènes",
           "note": "Les duellistes affluent au Colisée cendré. Entrez en file et grimpez au classement."

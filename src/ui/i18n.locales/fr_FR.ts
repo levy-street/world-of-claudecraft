@@ -2528,9 +2528,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     "Frère Halven l'inscrit sur ses cartes : un beau jour pour braver le Reliquaire effondré.",
   'hudChrome.calendar.events.delveDay.title': 'Jour de plongée',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'Le ring de la Fiesta 2c2 attire ce soir ses foules les plus bruyantes.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Nuit de la Fiesta',
   'hudChrome.calendar.events.fishingDerby.note':
     'Les pêcheurs bordent les lacs. Apportez une canne et échangez des histoires de pêche.',
   'hudChrome.calendar.events.fishingDerby.title': 'Concours de pêche',

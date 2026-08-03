@@ -33,10 +33,6 @@ const SYSTEM_EVENT_TEXT: Record<string, { title: TranslationKey; note: Translati
     title: 'hudChrome.calendar.events.marketDay.title',
     note: 'hudChrome.calendar.events.marketDay.note',
   },
-  fiesta_night: {
-    title: 'hudChrome.calendar.events.fiestaNight.title',
-    note: 'hudChrome.calendar.events.fiestaNight.note',
-  },
   arena_clash: {
     title: 'hudChrome.calendar.events.arenaClash.title',
     note: 'hudChrome.calendar.events.arenaClash.note',

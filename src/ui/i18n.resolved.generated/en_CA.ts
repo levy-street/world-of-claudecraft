@@ -2363,10 +2363,6 @@ export const en_CA: EnTranslations = {
           "title": "Market Day",
           "note": "The Merchant expects fresh stock. A fine day to browse the World Market."
         },
-        "fiestaNight": {
-          "title": "Fiesta Night",
-          "note": "The 2v2 Fiesta ring draws its loudest crowds tonight."
-        },
         "arenaClash": {
           "title": "Arena Clash",
           "note": "Duelists flock to the Ashen Coliseum. Queue up and climb the ladder."

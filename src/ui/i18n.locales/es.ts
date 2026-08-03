@@ -1991,9 +1991,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'El Hermano Halven marca sus cartas: un buen día para atreverse con el Relicario Hundido.',
   'hudChrome.calendar.events.delveDay.title': 'Día de Expedición',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'El anillo de la Fiesta 2c2 reúne esta noche a su público más ruidoso.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Noche de Fiesta',
   'hudChrome.calendar.events.fishingDerby.note':
     'Los pescadores bordean los lagos. Trae una caña y comparte anécdotas de pesca.',
   'hudChrome.calendar.events.fishingDerby.title': 'Torneo de Pesca',

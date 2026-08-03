@@ -1014,16 +1014,16 @@ export const ko_KR: EnTranslations = {
       "timeLeft": "{seconds}초"
     },
     "pvp": {
-      "launcherTitle": "PvP: 레이븐리프트와 투기장",
+      "launcherTitle": "PvP: 쏜할로우 평원과 투기장",
       "mobileLabel": "PvP",
       "bracket1v1": "1v1",
       "bracket2v2": "2v2"
     },
     "bg": {
-      "title": "레이븐리프트",
+      "title": "쏜할로우 평원",
       "blurb": "가시봉 그늘에 성벽으로 둘러싸인 분지를 사이에 두고 두 폐허가 된 요새가 마주 본다. 남쪽은 크림슨, 북쪽은 애저, 그 사이의 오래된 폐허 안뜰은 아직 누구도 차지하지 못했다. 5대 5, 깃발은 하나씩. 상대의 깃발을 먼저 다섯 번 가져오는 쪽이 전장을 차지한다.",
       "modeTag": "5v5 깃발 뺏기",
-      "offlineNote": "레이븐리프트 동기화 중입니다. 서버 응답 후 대기열이 열립니다.",
+      "offlineNote": "쏜할로우 평원 동기화 중입니다. 서버 응답 후 대기열이 열립니다.",
       "ratingSummary": "레이팅. {wins}승 / {losses}패",
       "careerCaptures": "통산 탈취: {count}",
       "enterQueue": "대기열 참가",
@@ -1055,7 +1055,7 @@ export const ko_KR: EnTranslations = {
       "killFeed": "{killer}이(가) {victim}을(를) 처치했습니다",
       "killFeedFallen": "{victim}이(가) 쓰러졌습니다",
       "foundBanner": "전투 성사. 당신은 {team} 소속입니다!",
-      "countdownBanner": "레이븐리프트 시작까지 {seconds}",
+      "countdownBanner": "쏜할로우 평원 시작까지 {seconds}",
       "startBanner": "깃발을 빼앗아라!",
       "flagTakenLog": "{name}이(가) {team} 깃발을 빼앗았습니다!",
       "flagDroppedLog": "{team} 깃발이 떨어졌습니다.",
@@ -1072,10 +1072,10 @@ export const ko_KR: EnTranslations = {
       "flagReturnedBanner": "{team} 깃발이 반환되었습니다!",
       "capturedTeamBanner": "{takers} 팀이 {team} 깃발을 탈취!{crimson}:{azure}",
       "capturedLog": "{name}이(가) {team} 깃발을 탈취했습니다. 점수 {crimson}:{azure}.",
-      "victoryBanner": "승리! 레이븐리프트 {crimson}:{azure}. 레이팅 {rating}({delta})",
-      "defeatBanner": "패배. 레이븐리프트 {crimson}:{azure}. 레이팅 {rating}({delta})",
-      "drawBanner": "레이븐리프트 무승부 {crimson}:{azure}. 레이팅 {rating}({delta})",
-      "endLog": "레이븐리프트 종료, {crimson}:{azure}. 레이팅 {rating}({delta})."
+      "victoryBanner": "승리! 쏜할로우 평원 {crimson}:{azure}. 레이팅 {rating}({delta})",
+      "defeatBanner": "패배. 쏜할로우 평원 {crimson}:{azure}. 레이팅 {rating}({delta})",
+      "drawBanner": "쏜할로우 평원 무승부 {crimson}:{azure}. 레이팅 {rating}({delta})",
+      "endLog": "쏜할로우 평원 종료, {crimson}:{azure}. 레이팅 {rating}({delta})."
     },
     "vcup": {
       "title": "베일 컵",
@@ -1428,8 +1428,8 @@ export const ko_KR: EnTranslations = {
         "fiestaKill": "피에스타 처치",
         "fiestaComplete": "피에스타 완료",
         "fiestaWin": "피에스타 승리",
-        "battlegroundWin": "레이븐리프트 승리",
-        "battlegroundComplete": "레이븐리프트 참전",
+        "battlegroundWin": "쏜할로우 평원 승리",
+        "battlegroundComplete": "쏜할로우 평원 참전",
         "battlegroundKill": "명예로운 처치",
         "battlegroundAssist": "처치 도움"
       }
@@ -2363,10 +2363,6 @@ export const ko_KR: EnTranslations = {
           "title": "장날",
           "note": "상인이 새 물건을 기다립니다. 월드 마켓을 둘러보기 좋은 날."
         },
-        "fiestaNight": {
-          "title": "피에스타의 밤",
-          "note": "오늘 밤 2대2 피에스타 링이 가장 붐빕니다."
-        },
         "arenaClash": {
           "title": "투기장 격돌",
           "note": "결투사들이 잿빛 투기장으로 몰려듭니다. 대기열에 올라 순위를 노리세요."
@@ -3121,7 +3117,7 @@ export const ko_KR: EnTranslations = {
       "talents": "특성",
       "arena": "투기장과 PvP",
       "valeCup": "베일 컵",
-      "ravenrift": "레이븐리프트",
+      "ravenrift": "쏜할로우 평원",
       "deeds": "업적의 서",
       "glossary": "용어집",
       "wishIKnew": "미리 알았으면 좋았을 것들",
@@ -3896,10 +3892,10 @@ export const ko_KR: EnTranslations = {
       "ladderBody": "등급전은 시간이 지나며 당신의 순위를 기록합니다. 순위표를 확인해 자신의 위치와 서버 정상에 오른 이가 누구인지 살펴보세요."
     },
     "ravenriftPage": {
-      "heading": "레이븐리프트",
+      "heading": "쏜할로우 평원",
       "intro": "가시봉 아래 오래된 숲의 성벽으로 둘러싸인 분지에서 벌어지는 랭크 5대 5 깃발 뺏기 전장. 협곡 양 끝에서 두 폐허 요새가 마주 보고, 그 사이에는 누구도 차지한 적 없는 더 오래된 안뜰이 있다. 다섯 명씩, 요새 둘, 목표 하나. 적의 깃발을 빼앗아 우리 깃발을 빼앗기기 전에 가져와라.",
       "queueHeading": "대기열 참가",
-      "queueBody": "레이븐리프트 창을 열어 혼자 대기열에 서거나, 최대 5인 파티로 함께 참가하세요. 파티는 항상 같은 팀에 배치되고 남는 자리는 솔로 용사들로 채워집니다. 열 명이 모이면 양 팀이 각자의 요새에 배치되고, 짧은 집결 후 깃발이 활성화됩니다.",
+      "queueBody": "쏜할로우 평원 창을 열어 혼자 대기열에 서거나, 최대 5인 파티로 함께 참가하세요. 파티는 항상 같은 팀에 배치되고 남는 자리는 솔로 용사들로 채워집니다. 열 명이 모이면 양 팀이 각자의 요새에 배치되고, 짧은 집결 후 깃발이 활성화됩니다.",
       "fieldHeading": "전장",
       "fieldBody": "성벽으로 둘러싸인 야외 전장이 세 구역으로 나뉩니다. 양 팀 각자의 앞마당과 그 사이에 낀 폐허 안뜰입니다. 전장을 가로지르는 두 장벽이 경계를 이루며, 구역 사이를 오가려면 반드시 쟁탈 지점을 지나야 합니다. 넓은 정문과 장벽에 걸쳐 앉은 문루입니다. 문루의 두 문은 엇갈리게 나 있어 매복 모퉁이를 돌아가야 합니다. 각 요새는 정문을 제외하면 완전히 막혀 있어 깃발을 노리는 출입은 반드시 같은 입구를 지나며, 그 정문 앞에는 낮은 방책이 서서 일직선 돌격을 막습니다. 안뜰에는 속이 빈 중앙 유적과 측면의 질주 룬 2개가 있으며, 나머지 2개는 깃발 진입로에 놓여 있습니다.또한 각 정문의 안뜰 입구에는 전투 룬 또는 수호 룬(짧은 시간 동안 피해 증가 또는 피해 감소)이 기다립니다. 두 받침대는 같은 면으로 경기를 시작하며 차지할 때마다 면이 뒤집힙니다.",
       "flagsHeading": "깃발",
@@ -6420,7 +6416,7 @@ export const ko_KR: EnTranslations = {
         "nameplates": "이름표 전환",
         "meters": "피해량 미터",
         "social": "친구 및 길드",
-        "arena": "PvP(레이븐리프트와 투기장)",
+        "arena": "PvP(쏜할로우 평원과 투기장)",
         "chat": "채팅 열기",
         "attack": "공격",
         "actionBarSlot": "행동 단축바 {slot}"

@@ -1014,16 +1014,16 @@ export const zh_CN: EnTranslations = {
       "timeLeft": "{seconds}秒"
     },
     "pvp": {
-      "launcherTitle": "PvP:鸦裂谷与竞技场",
+      "launcherTitle": "PvP:荆谷原野与竞技场",
       "mobileLabel": "PvP",
       "bracket1v1": "1v1",
       "bracket2v2": "2v2"
     },
     "bg": {
-      "title": "鸦裂谷",
+      "title": "荆谷原野",
       "blurb": "两座废弃的要塞隔着棘峰阴影下的围墙山谷遥遥相望：绯红在南，蔚蓝在北，而两者之间的古老废墟庭院，谁都不曾真正占据。每方五人，各持一面战旗，先将对方战旗夺回本方五次者赢得战场。",
       "modeTag": "5v5夺旗战",
-      "offlineNote": "鸦裂谷正在同步。待王国响应后即可排队。",
+      "offlineNote": "荆谷原野正在同步。待王国响应后即可排队。",
       "ratingSummary": "评分。{wins}胜 / {losses}负",
       "careerCaptures": "生涯夺旗:{count}",
       "enterQueue": "加入队列",
@@ -1055,7 +1055,7 @@ export const zh_CN: EnTranslations = {
       "killFeed": "{killer}击杀了{victim}",
       "killFeedFallen": "{victim}倒下了",
       "foundBanner": "战斗已就绪。你为{team}而战!",
-      "countdownBanner": "鸦裂谷{seconds}秒后开战",
+      "countdownBanner": "荆谷原野{seconds}秒后开战",
       "startBanner": "夺取旗帜!",
       "flagTakenLog": "{name}夺走了{team}的旗帜!",
       "flagDroppedLog": "{team}的旗帜掉落了。",
@@ -1072,10 +1072,10 @@ export const zh_CN: EnTranslations = {
       "flagReturnedBanner": "{team}的旗帜已归还!",
       "capturedTeamBanner": "{takers}夺取了{team}的旗帜!{crimson}:{azure}",
       "capturedLog": "{name}夺取了{team}的旗帜。比分{crimson}:{azure}。",
-      "victoryBanner": "胜利!鸦裂谷{crimson}:{azure}。评分{rating}({delta})",
-      "defeatBanner": "战败。鸦裂谷{crimson}:{azure}。评分{rating}({delta})",
-      "drawBanner": "鸦裂谷平局{crimson}:{azure}。评分{rating}({delta})",
-      "endLog": "鸦裂谷结束,{crimson}:{azure}。评分{rating}({delta})。"
+      "victoryBanner": "胜利!荆谷原野{crimson}:{azure}。评分{rating}({delta})",
+      "defeatBanner": "战败。荆谷原野{crimson}:{azure}。评分{rating}({delta})",
+      "drawBanner": "荆谷原野平局{crimson}:{azure}。评分{rating}({delta})",
+      "endLog": "荆谷原野结束,{crimson}:{azure}。评分{rating}({delta})。"
     },
     "vcup": {
       "title": "溪谷杯",
@@ -1428,8 +1428,8 @@ export const zh_CN: EnTranslations = {
         "fiestaKill": "嘉年华击倒",
         "fiestaComplete": "完成嘉年华",
         "fiestaWin": "嘉年华胜利",
-        "battlegroundWin": "鸦裂谷胜利",
-        "battlegroundComplete": "鸦裂谷参战",
+        "battlegroundWin": "荆谷原野胜利",
+        "battlegroundComplete": "荆谷原野参战",
         "battlegroundKill": "荣誉击杀",
         "battlegroundAssist": "助攻击杀"
       }
@@ -2363,10 +2363,6 @@ export const zh_CN: EnTranslations = {
           "title": "集市日",
           "note": "商人正等着新货。今天很适合逛逛世界市场。"
         },
-        "fiestaNight": {
-          "title": "狂欢之夜",
-          "note": "今晚 2v2 狂欢擂台的人气最旺。"
-        },
         "arenaClash": {
           "title": "竞技场之战",
           "note": "决斗者涌向灰烬斗兽场。排队开打，向天梯进发。"
@@ -3121,7 +3117,7 @@ export const zh_CN: EnTranslations = {
       "talents": "天赋",
       "arena": "竞技场与 PvP",
       "valeCup": "溪谷杯",
-      "ravenrift": "鸦裂谷",
+      "ravenrift": "荆谷原野",
       "deeds": "功绩之书",
       "glossary": "术语表",
       "wishIKnew": "我希望早点知道的事",
@@ -3896,10 +3892,10 @@ export const zh_CN: EnTranslations = {
       "ladderBody": "排名对战会长期追踪你的排名。查看排行榜，看看你身处何处，以及谁占据着这片位面的榜首。"
     },
     "ravenriftPage": {
-      "heading": "鸦裂谷",
+      "heading": "荆谷原野",
       "intro": "一场排位 5v5 夺旗战场，战场位于棘峰之下老林中的围墙山谷：两座废弃要塞沿着峡谷两端遥遥相对，中间是一座更古老的庭院，谁都不曾真正占据。每方五人，两座要塞，一个目标：夺走敌方战旗并抢在对方之前带回家。",
       "queueHeading": "排队参战",
-      "queueBody": "打开鸦裂谷面板即可单人排队,也可以组一支最多五人的小队一同排队:小队总在同一边,空位由单人勇士补齐。十人就位后,比赛会把双方安置在各自要塞,短暂列队后旗帜生效。",
+      "queueBody": "打开荆谷原野面板即可单人排队,也可以组一支最多五人的小队一同排队:小队总在同一边,空位由单人勇士补齐。十人就位后,比赛会把双方安置在各自要塞,短暂列队后旗帜生效。",
       "fieldHeading": "战场地形",
       "fieldBody": "一片有围墙的露天战场,被隔成三个区域:两队各自的前场,以及夹在中间的废墟中庭。两道横贯全场的隔墙划出边界,穿行区域之间必须经过争夺点:宽阔的正门,或是骑跨在隔墙上的门楼小屋,其错位的两扇门逼你绕过伏击死角。每座要塞除正门外全部封死,夺旗进出只有这一个口;正门前还有一道矮壁垒挡住直冲的路线。中庭里有空心的中央废墟与两枚侧翼疾行符文,另外两枚守在两旗的接近路上。每个正门的中庭入口处还有一枚战斗或守护符文(短时间内提升伤害或减免伤害):两个符文台开局同面,每次拾取后翻面。",
       "flagsHeading": "旗帜",
@@ -6420,7 +6416,7 @@ export const zh_CN: EnTranslations = {
         "nameplates": "切换姓名板",
         "meters": "伤害统计",
         "social": "好友与公会",
-        "arena": "PvP(鸦裂谷与竞技场)",
+        "arena": "PvP(荆谷原野与竞技场)",
         "chat": "打开聊天",
         "attack": "攻击",
         "actionBarSlot": "动作条 {slot}"

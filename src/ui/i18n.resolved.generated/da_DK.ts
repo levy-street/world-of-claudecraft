@@ -2363,10 +2363,6 @@ export const da_DK: EnTranslations = {
           "title": "Markedsdag",
           "note": "Købmanden venter friske varer. En fin dag at kigge på Verdensmarkedet."
         },
-        "fiestaNight": {
-          "title": "Fiesta-Aften",
-          "note": "2v2-Fiesta-ringen trækker sine mest højrøstede tilskuere i aften."
-        },
         "arenaClash": {
           "title": "Arenasammenstød",
           "note": "Duellanter strømmer til Askekolosseet. Stil dig i kø, og klatr op ad ranglisten."

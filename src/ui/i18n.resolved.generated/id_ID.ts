@@ -2363,10 +2363,6 @@ export const id_ID: EnTranslations = {
           "title": "Hari Pasar",
           "note": "Sang Pedagang menantikan stok segar. Hari yang baik untuk menjelajahi Pasar Dunia."
         },
-        "fiestaNight": {
-          "title": "Malam Fiesta",
-          "note": "Gelanggang Fiesta 2v2 menarik penonton paling riuh malam ini."
-        },
         "arenaClash": {
           "title": "Bentrokan Arena",
           "note": "Para duelis berbondong-bondong ke Koloseum Abu. Masuklah antrean dan panjat tangga peringkat."

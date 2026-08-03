@@ -2108,9 +2108,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     "Birader Halven haritalarını işaretliyor: Çökmüş Emanetlik'e meydan okumak için güzel bir gün.",
   'hudChrome.calendar.events.delveDay.title': 'Mağara Günü',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'İkiye iki Fiesta ringi bu gece en gürültülü kalabalığını topluyor.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Fiesta Gecesi',
   'hudChrome.calendar.events.fishingDerby.note':
     'Oltacılar göl kıyılarını doldurdu. Bir olta kap ve balıkçı hikayeleri paylaş.',
   'hudChrome.calendar.events.fishingDerby.title': 'Balık Tutma Yarışması',

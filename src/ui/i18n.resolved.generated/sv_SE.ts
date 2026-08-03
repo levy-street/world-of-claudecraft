@@ -2363,10 +2363,6 @@ export const sv_SE: EnTranslations = {
           "title": "Marknadsdag",
           "note": "Köpmannen väntar färska varor. En fin dag att botanisera på Världsmarknaden."
         },
-        "fiestaNight": {
-          "title": "Fiestanatt",
-          "note": "2v2-fiestans ring drar sin högljuddaste publik i kväll."
-        },
         "arenaClash": {
           "title": "Arenadrabbning",
           "note": "Duellanter flockas till Askgrå kolosseum. Ställ dig i kö och klättra på stegen."

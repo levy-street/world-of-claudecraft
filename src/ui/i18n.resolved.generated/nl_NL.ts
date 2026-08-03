@@ -2363,10 +2363,6 @@ export const nl_NL: EnTranslations = {
           "title": "Marktdag",
           "note": "De Koopman verwacht verse voorraad. Een mooie dag om de Wereldmarkt af te struinen."
         },
-        "fiestaNight": {
-          "title": "Fiesta-avond",
-          "note": "De 2v2 Fiesta-ring trekt vanavond zijn luidruchtigste publiek."
-        },
         "arenaClash": {
           "title": "Arenatreffen",
           "note": "Duellisten stromen naar het Asgrauwe Colosseum. Sluit aan in de wachtrij en klim de ladder op."

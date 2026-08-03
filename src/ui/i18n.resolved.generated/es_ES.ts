@@ -2363,10 +2363,6 @@ export const es_ES: EnTranslations = {
           "title": "Día de Mercado",
           "note": "El Mercader espera género fresco. Un buen día para echar un vistazo al Mercado Mundial."
         },
-        "fiestaNight": {
-          "title": "Noche de Fiesta",
-          "note": "El anillo de la Fiesta 2c2 reúne esta noche a su público más ruidoso."
-        },
         "arenaClash": {
           "title": "Choque en la Arena",
           "note": "Los duelistas acuden en masa al Coliseo Cinéreo. Entra en cola y asciende en la clasificación."

@@ -1014,16 +1014,16 @@ export const zh_TW: EnTranslations = {
       "timeLeft": "{seconds}秒"
     },
     "pvp": {
-      "launcherTitle": "PvP:鴉裂谷與競技場",
+      "launcherTitle": "PvP:荊谷原野與競技場",
       "mobileLabel": "PvP",
       "bracket1v1": "1v1",
       "bracket2v2": "2v2"
     },
     "bg": {
-      "title": "鴉裂谷",
+      "title": "荊谷原野",
       "blurb": "兩座廢棄的要塞隔著棘峰陰影下的圍牆山谷遙遙相望：緋紅在南，蔚藍在北，而兩者之間的古老廢墟庭院，誰都不曾真正佔據。每方五人，各持一面戰旗，先將對方戰旗奪回己方五次者贏得戰場。",
       "modeTag": "5v5奪旗戰",
-      "offlineNote": "鴉裂谷正在同步。待王國回應後即可排隊。",
+      "offlineNote": "荊谷原野正在同步。待王國回應後即可排隊。",
       "ratingSummary": "評分。{wins}勝 / {losses}敗",
       "careerCaptures": "生涯奪旗:{count}",
       "enterQueue": "加入佇列",
@@ -1055,7 +1055,7 @@ export const zh_TW: EnTranslations = {
       "killFeed": "{killer}擊殺了{victim}",
       "killFeedFallen": "{victim}倒下了",
       "foundBanner": "戰鬥已就緒。你為{team}而戰!",
-      "countdownBanner": "鴉裂谷{seconds}秒後開戰",
+      "countdownBanner": "荊谷原野{seconds}秒後開戰",
       "startBanner": "奪取旗幟!",
       "flagTakenLog": "{name}奪走了{team}的旗幟!",
       "flagDroppedLog": "{team}的旗幟掉落了。",
@@ -1072,10 +1072,10 @@ export const zh_TW: EnTranslations = {
       "flagReturnedBanner": "{team}的旗幟已歸還!",
       "capturedTeamBanner": "{takers}奪取了{team}的旗幟!{crimson}:{azure}",
       "capturedLog": "{name}奪取了{team}的旗幟。比分{crimson}:{azure}。",
-      "victoryBanner": "勝利!鴉裂谷{crimson}:{azure}。評分{rating}({delta})",
-      "defeatBanner": "戰敗。鴉裂谷{crimson}:{azure}。評分{rating}({delta})",
-      "drawBanner": "鴉裂谷平手{crimson}:{azure}。評分{rating}({delta})",
-      "endLog": "鴉裂谷結束,{crimson}:{azure}。評分{rating}({delta})。"
+      "victoryBanner": "勝利!荊谷原野{crimson}:{azure}。評分{rating}({delta})",
+      "defeatBanner": "戰敗。荊谷原野{crimson}:{azure}。評分{rating}({delta})",
+      "drawBanner": "荊谷原野平手{crimson}:{azure}。評分{rating}({delta})",
+      "endLog": "荊谷原野結束,{crimson}:{azure}。評分{rating}({delta})。"
     },
     "vcup": {
       "title": "溪谷盃",
@@ -1428,8 +1428,8 @@ export const zh_TW: EnTranslations = {
         "fiestaKill": "嘉年華擊倒",
         "fiestaComplete": "完成嘉年華",
         "fiestaWin": "嘉年華勝利",
-        "battlegroundWin": "鴉裂谷勝利",
-        "battlegroundComplete": "鴉裂谷參戰",
+        "battlegroundWin": "荊谷原野勝利",
+        "battlegroundComplete": "荊谷原野參戰",
         "battlegroundKill": "榮譽擊殺",
         "battlegroundAssist": "助攻擊殺"
       }
@@ -2363,10 +2363,6 @@ export const zh_TW: EnTranslations = {
           "title": "集市日",
           "note": "商人正等著新貨。今天很適合逛逛世界市場。"
         },
-        "fiestaNight": {
-          "title": "狂歡之夜",
-          "note": "今晚 2v2 狂歡擂台的人氣最旺。"
-        },
         "arenaClash": {
           "title": "競技場之戰",
           "note": "決鬥者湧向灰燼鬥獸場。排隊開打，向天梯進發。"
@@ -3121,7 +3117,7 @@ export const zh_TW: EnTranslations = {
       "talents": "天賦",
       "arena": "競技場與PvP",
       "valeCup": "溪谷盃",
-      "ravenrift": "鴉裂谷",
+      "ravenrift": "荊谷原野",
       "deeds": "功績之書",
       "glossary": "詞彙表",
       "wishIKnew": "我希望早點知道的事",
@@ -3896,10 +3892,10 @@ export const zh_TW: EnTranslations = {
       "ladderBody": "排名對戰會長期記錄你的名次。查看排行榜便能看到自己的位置，以及誰穩坐王國之巔。"
     },
     "ravenriftPage": {
-      "heading": "鴉裂谷",
+      "heading": "荊谷原野",
       "intro": "一場排位 5v5 奪旗戰場，戰場位於棘峰之下老林中的圍牆山谷：兩座廢棄要塞沿著峽谷兩端遙遙相對，中間是一座更古老的庭院，誰都不曾真正佔據。每方五人，兩座要塞，一個目標：奪走敵方戰旗並趕在對方之前帶回家。",
       "queueHeading": "排隊參戰",
-      "queueBody": "打開鴉裂谷面板即可單人排隊,也可以組一支最多五人的隊伍一同排隊:隊伍總在同一邊,空位由單人勇士補齊。十人就位後,比賽會把雙方安置在各自要塞,短暫列隊後旗幟生效。",
+      "queueBody": "打開荊谷原野面板即可單人排隊,也可以組一支最多五人的隊伍一同排隊:隊伍總在同一邊,空位由單人勇士補齊。十人就位後,比賽會把雙方安置在各自要塞,短暫列隊後旗幟生效。",
       "fieldHeading": "戰場地形",
       "fieldBody": "一片有圍牆的露天戰場,被隔成三個區域:兩隊各自的前場,以及夾在中間的廢墟中庭。兩道橫貫全場的隔牆劃出邊界,穿行區域之間必須經過爭奪點:寬闊的正門,或是騎跨在隔牆上的門樓小屋,其錯位的兩扇門逼你繞過伏擊死角。每座要塞除正門外全部封死,奪旗進出只有這一個口;正門前還有一道矮壁壘擋住直衝的路線。中庭裡有空心的中央廢墟與兩枚側翼疾行符文,另外兩枚守在兩旗的接近路上。每個正門的中庭入口處還有一枚戰鬥或守護符文(短時間內提升傷害或減免傷害):兩個符文台開局同面,每次拾取後翻面。",
       "flagsHeading": "旗幟",
@@ -6420,7 +6416,7 @@ export const zh_TW: EnTranslations = {
         "nameplates": "切換姓名板",
         "meters": "傷害統計",
         "social": "好友與公會",
-        "arena": "PvP(鴉裂谷與競技場)",
+        "arena": "PvP(荊谷原野與競技場)",
         "chat": "開啟聊天",
         "attack": "攻擊",
         "actionBarSlot": "動作列 {slot}"

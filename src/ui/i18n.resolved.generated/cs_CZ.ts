@@ -2363,10 +2363,6 @@ export const cs_CZ: EnTranslations = {
           "title": "Tržní den",
           "note": "Obchodník čeká čerstvé zásoby. Skvělý den pro procházení Světového trhu."
         },
-        "fiestaNight": {
-          "title": "Fiesta noc",
-          "note": "Kruh 2v2 Fiesty dnes večer přitahuje nejhlasitější davy."
-        },
         "arenaClash": {
           "title": "Střet v aréně",
           "note": "Duelisté míří do Popelavého kolosea. Zařaď se do fronty a stoupej v žebříčku."

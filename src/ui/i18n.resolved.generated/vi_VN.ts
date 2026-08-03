@@ -2363,10 +2363,6 @@ export const vi_VN: EnTranslations = {
           "title": "Ngày Họp Chợ",
           "note": "Thương Nhân chờ đợi hàng mới về. Một ngày lành để dạo Chợ Thế Giới."
         },
-        "fiestaNight": {
-          "title": "Đêm Fiesta",
-          "note": "Võ đài Fiesta 2v2 đón đám đông cuồng nhiệt nhất vào tối nay."
-        },
         "arenaClash": {
           "title": "Đại Chiến Đấu Trường",
           "note": "Các đấu sĩ đổ về Đấu Trường Tro Tàn. Hãy xếp hàng và leo bảng xếp hạng."
