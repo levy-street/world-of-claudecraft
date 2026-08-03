@@ -472,6 +472,19 @@ Teardown of docs/guild-bank/ awaits the user's explicit confirmation.
   (feature/guild-social-v1) had NOT landed at merge time; if it lands before
   this PR merges, re-merge the release branch (both touch server/social.ts
   wiring).
+- Release merge 2 (2026-08-03): origin/release/v0.34.0 (5f22a51a0, +143 commits:
+  discord-bot stability, the v0.34.0 i18n fill, premade-group filtering) merged
+  as b4b1d7670 to clear the PR 2812 conflict. One textual conflict (the
+  generated i18n pending bundle) resolved by regenerating all i18n artifacts.
+  release-merge-audit found ONE legacy-arm divergence and it is mirrored: the
+  release's linked-member level feed (ClientSession.lastPersistedLevel) gates on
+  the SERIALIZED level, but this branch's escrow save arm persists a FRESH
+  re-serialization (snap.level) inside the queued thunk, so the gate now tracks
+  the PERSISTED level (`persistedLevel` local in saveCharacter) with a mid-wait
+  regression test in tests/guild_bank_persistence.test.ts. No injected-helper
+  drift (the escrow save family and SocialTransport are untouched by the
+  release); server/social.ts had 0 delta lines, so PR A has still not landed
+  (the re-merge caveat above stands).
 
 ## Accepted risks and operational assumptions (Phase 3 review + Phase 3 QA outcomes)
 - Cross-officer escrow skew (ACCEPTED, market precedent, NARROWED by Phase 3 QA to the

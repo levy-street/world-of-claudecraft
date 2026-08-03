@@ -3617,6 +3617,15 @@ export class GameServer {
         // is temporarily 20, but serializeCharacter reports the real level — so the
         // character-list/leaderboard `level` column never reflects the temp state.
         let saved: boolean;
+        // The level the row will actually carry. The escrow arm below
+        // re-serializes a FRESH snapshot inside the queued thunk (snap), so a
+        // silent level move landing during the queue wait persists snap.level
+        // while the T0 `state.level` stays behind; the linked-member level
+        // feed must gate on the PERSISTED value or it reports the move a save
+        // late (or never, when that save was the leave flush). Release-merge
+        // mirror of the v0.34.0 lastPersistedLevel change onto this branch's
+        // three-path saveCharacter.
+        let persistedLevel = state.level;
         // Guild books this save will carry (Guild Bank Phase 3), captured WITH
         // their marks at write time inside the queued closure, exactly like the
         // market snapshot: books are shared multi-writer state (two officers'
@@ -3687,6 +3696,7 @@ export class GameServer {
             // never less (publish never runs ahead of durable state).
             const fresh = this.sim.serializeCharacter(session.pid);
             const snap = fresh ? applyFixups(fresh) : state;
+            persistedLevel = snap.level;
             return opts.withMarket
               ? saveCharacterAndMarketState(
                   session.characterId,
@@ -3793,8 +3803,8 @@ export class GameServer {
         // characters on one account, and it rises on nearly every save of an active
         // player, so gating on it would turn the 30 s autosave sweep into a per-player
         // metronome. The bot's periodic full resync heals that rare tiebreak flip.
-        if (state.level !== session.lastPersistedLevel) {
-          session.lastPersistedLevel = state.level;
+        if (persistedLevel !== session.lastPersistedLevel) {
+          session.lastPersistedLevel = persistedLevel;
           // Date.now(), like every other enqueue site: the feed's dedupe window is
           // measured against wall-clock now, so handing it a stamp coupled to the
           // save bookkeeping buys nothing and a stale one would merge where it

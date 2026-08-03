@@ -42,6 +42,7 @@ vi.mock('../server/db', () => ({
 }));
 
 import { bankLedgerIdle } from '../server/bank_ledger';
+import { drainLinkChanges } from '../server/discord_link_changes';
 import { type ClientSession, GameServer } from '../server/game';
 import { collectGuildBankSaves, loadGuildBanksIntoSim } from '../server/guild_bank_state';
 import { GUILD_CREATION_FEE_COPPER, type GuildBankState } from '../src/sim/guild_bank';
@@ -623,6 +624,40 @@ describe('escrow snapshot consistency across the serial-writer wait', () => {
     // The mid-wait op was fully captured, so its mark and log are consumed.
     expect(session.dirtyGuildBanks.size).toBe(0);
     expect(session.unflushedGuildBankOps.size).toBe(0);
+  });
+
+  it('a silent level move DURING the queue wait still feeds the linked-member change queue', async () => {
+    // Release-merge mirror (v0.34.0 lastPersistedLevel): the level feed is
+    // delta-gated on the SERIALIZED level, and on this branch the escrow arm
+    // persists the re-serialized snapshot (snap.level), not the T0 blob. A
+    // gate that read the T0 level would miss a silent mid-wait
+    // setPlayerLevel (dev_level / GM join / PBE boost) for this save, and
+    // forever when this save was the leave flush (the next join re-seeds
+    // lastPersistedLevel from the newer blob).
+    drainLinkChanges();
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'MidLevel');
+    officerSetup(server, session);
+    dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 1_000 });
+    let releaseWriter: (() => void) | undefined;
+    const blocker = new Promise<void>((resolve) => {
+      releaseWriter = resolve;
+    });
+    void priv(server).enqueueMarketWrite(() => blocker);
+    const savePromise = priv(server).saveCharacter(session);
+    // While the save waits on the queue, a silent level set lands.
+    server.sim.setPlayerLevel(7, session.pid);
+    releaseWriter?.();
+    await savePromise;
+    // The escrow row carried the NEW level...
+    const [, savedLevel] = dbMock.saveCharacterAndGuildBankState.mock.calls[0] as unknown as [
+      number,
+      number,
+    ];
+    expect(savedLevel).toBe(7);
+    // ...and the feed gate tracked the PERSISTED level and fired exactly once.
+    expect(session.lastPersistedLevel).toBe(7);
+    expect(drainLinkChanges()).toEqual([{ accountId: session.accountId, kinds: ['flex'] }]);
   });
 });
 
