@@ -443,8 +443,12 @@ function requireOfficerBook(ctx: SimContext, meta: PlayerMeta): GuildBankState |
  *  directions: deposit keeps them out, and withdraw refuses them too so a
  *  tampered or legacy Phase 3 row can never complete the laundering (such a
  *  copy stays dormant in the book, the items-are-never-destroyed load
- *  philosophy). Returns the refusal line, or null when the slot may move. */
-function guildBankPipeRefusal(slot: InvSlot): string | null {
+ *  philosophy). Returns the refusal line, or null when the slot may move.
+ *  EXPORTED for the UI parity pin only (tests/guild_bank_view.test.ts drives
+ *  this and the client-side dormant predicate over the whole item table so a
+ *  new refusal dimension cannot silently desync the Guild tab's rendering);
+ *  no host calls it directly. */
+export function guildBankPipeRefusal(slot: InvSlot): string | null {
   const def = ITEMS[slot.itemId];
   if (def?.kind === 'quest') return 'You cannot store quest items in the bank.';
   if (def?.soulbound) return 'You cannot store soulbound items in the guild bank.';

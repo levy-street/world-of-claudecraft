@@ -2490,6 +2490,38 @@ export const hudChromeStrings = {
     bonusReferralExplainer:
       'Invite a friend: when they reach level 10 you each earn 2 slots, up to 5 friends.',
     bonusSectionAria: 'Bonus bank slots and how to earn more',
+    // The Guild tab (guild bank): the Personal/Guild strip renders only while
+    // guildBankInfo is non-null (officer-plus standing at a banker, online).
+    // Withdraw/deposit prompt bodies reuse the personal keys above; the gold
+    // prompts reuse itemUi.money.* for the coin field labels. (Wordy values,
+    // M16: the five non-Latin fills land in this same change.)
+    tabsAria: 'Bank tabs',
+    personalTab: 'Personal',
+    guildTab: 'Guild',
+    guildCapacityAria: 'Guild bank slots used: {used} of {total}',
+    guildEmpty: 'The guild bank is empty.',
+    guildTreasury: 'Guild treasury',
+    guildDepositGold: 'Deposit money',
+    guildWithdrawGold: 'Withdraw money',
+    guildDepositGoldTitle: 'Deposit money into the guild treasury',
+    guildWithdrawGoldTitle: 'Withdraw money from the guild treasury',
+    guildGoldAvailable: 'Available: {amount}',
+    guildBuyConfirm:
+      'Purchase {count} additional guild bank slots for {price} from the guild treasury?',
+    guildBuyNote: 'Paid from the guild treasury',
+    guildTreasuryShort: 'Treasury short',
+    guildDormantNote: 'Locked items cannot be withdrawn and prevent disbanding the guild.',
+    guildDormantHint: 'This item is locked in the guild bank and cannot be withdrawn.',
+    guildDormantAria: '{item}, quantity {count}, cannot be withdrawn',
+    guildUnknownItem: 'Unknown item',
+    // Bags-side hints while the GUILD tab is active: distinct from the
+    // personal depositHint/cannotDeposit because the consequences differ
+    // (a shared pool any officer can take from; a refused copy would strand).
+    guildDepositHint: 'Click to deposit into the guild bank',
+    guildCannotDeposit: 'Cannot go in the guild bank',
+    // The gold prompt's refusal line when a non-zero amount cannot move at
+    // all right now (empty purse on deposit, full treasury, empty treasury).
+    guildGoldCannotMove: 'That amount cannot be moved right now.',
   },
   // The event calendar window: recurring system events plus the guild lane
   // (booked by officers and the Guild Master, mirrored via socialInfo).

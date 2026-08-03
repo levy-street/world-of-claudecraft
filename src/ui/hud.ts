@@ -4029,6 +4029,7 @@ export class Hud {
     isMarketSell: () => this.marketWindow.isSellTab,
     isMailAttach: () => this.mailboxWindow.isSendTab,
     isBankOpen: () => this.bankWindow.isOpen,
+    isGuildBankTab: () => this.bankWindow.guildTabActive,
     pendingPetFeed: () => this.pendingPetFeed,
     closeVendor: () => this.closeVendor(),
     closeBank: () => this.closeBank(),

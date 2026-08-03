@@ -38,7 +38,8 @@ export interface BagItemInfo {
 
 /** The open-window modes that change what a bag click does. At most one is the
  *  effective mode (checked in priority order: trade, mail-attach, market-sell,
- *  vendor, bank-deposit, pet-feed). */
+ *  vendor, guild-bank-deposit, bank-deposit, pet-feed; the wiring sets at most
+ *  one of the two bank modes, keyed off the bank window's active tab). */
 export interface BagMode {
   tradeOpen: boolean;
   /** The Ravenpost mailbox is open on its Send tab (clicks attach parcels). */
@@ -48,6 +49,9 @@ export interface BagMode {
   vendorOpen: boolean;
   /** The bank window is open (docked beside the bags): a click deposits the stack. */
   bankDeposit: boolean;
+  /** The bank window is open ON ITS GUILD TAB: a click deposits into the guild
+   *  bank instead. The wiring sets at most one of bankDeposit/guildBankDeposit. */
+  guildBankDeposit: boolean;
   /** Pet-feed cursor mode is armed. */
   petFeed: boolean;
 }
@@ -67,6 +71,10 @@ export type BagAction =
   | 'vendorSell'
   | 'bankDeposit'
   | 'bankDepositBlockedQuest'
+  | 'guildBankDeposit'
+  | 'guildBankDepositBlockedQuest'
+  | 'guildBankDepositBlockedSoulbound'
+  | 'guildBankDepositBlockedNoTransfer'
   | 'petFeed'
   | 'petFeedBlocked'
   | 'discardQuest'
@@ -83,6 +91,8 @@ export type BagTooltipHintKey =
   | 'itemUi.tooltip.clickSell'
   | 'hudChrome.bank.depositHint'
   | 'hudChrome.bank.cannotDeposit'
+  | 'hudChrome.bank.guildDepositHint'
+  | 'hudChrome.bank.guildCannotDeposit'
   | 'itemUi.tooltip.clickDestroy'
   | 'hudChrome.mounts.clickManage'
   | 'itemUi.tooltip.clickEquip'
@@ -94,8 +104,9 @@ export type BagTooltipHintKey =
   | '';
 
 /** Decide what a click on a bag item does. Mirrors the original click handler's
- *  priority order exactly: trade > mail-attach > market-sell > vendor > bank-deposit
- *  > pet-feed > quest > use. `instance` is the clicked SLOT's payload (issue 1165):
+ *  priority order exactly: trade > mail-attach > market-sell > vendor >
+ *  guild-bank-deposit > bank-deposit > pet-feed > quest > use (the wiring sets
+ *  at most one of the two bank modes). `instance` is the clicked SLOT's payload (issue 1165):
  *  a transfer-locked copy (bindOnTrade-armed or boundTo-bound,
  *  isTransferLockedInstance, the sim's pipe rule) blocks mail-attach and
  *  market-sell in place; an unlocked instanced copy stages as itself. */
@@ -122,6 +133,18 @@ export function bagItemAction(
   if (mode.vendorOpen) return 'vendorSell';
   // Window modes cluster before the armed pet-feed cursor (vendor beats pet-feed
   // today); the sim refuses a quest item, so block it in place with the deny toast.
+  // The GUILD tab carries the full anonymous-pipe policy (the sim's
+  // guildBankPipeRefusal: quest / soulbound / noMarketList / per-copy transfer
+  // lock), pre-empted here with the matching deny arms; note the top-of-function
+  // soulbound gate deliberately does NOT cover this mode, so the guild arm owns
+  // its own soulbound deny with the guild-worded sim line.
+  if (mode.guildBankDeposit) {
+    if (item.kind === 'quest') return 'guildBankDepositBlockedQuest';
+    if (item.soulbound) return 'guildBankDepositBlockedSoulbound';
+    if (item.noMarketList || isTransferLockedInstance(instance))
+      return 'guildBankDepositBlockedNoTransfer';
+    return 'guildBankDeposit';
+  }
   if (mode.bankDeposit) return item.kind === 'quest' ? 'bankDepositBlockedQuest' : 'bankDeposit';
   if (mode.petFeed) return item.kind === 'food' ? 'petFeed' : 'petFeedBlocked';
   if (item.kind === 'quest') return 'discardQuest';
@@ -137,7 +160,7 @@ export function bagItemAction(
  *  where shift-click already owns the split-stack sell / deposit prompt; those
  *  affordances are left untouched. */
 export function bagShiftLinks(mode: BagMode): boolean {
-  return !mode.vendorOpen && !mode.bankDeposit;
+  return !mode.vendorOpen && !mode.bankDeposit && !mode.guildBankDeposit;
 }
 
 /** Resolve the exact inventory index of a clicked bag stack by REFERENCE identity,
@@ -221,7 +244,8 @@ export function bagDestroyAction(item: BagItemInfo, mode: BagMode): BagDestroyAc
     mode.marketSell ||
     mode.vendorOpen ||
     mode.petFeed ||
-    mode.bankDeposit
+    mode.bankDeposit ||
+    mode.guildBankDeposit
   )
     return 'none';
   if (item.noDiscard) return 'discardBlocked';
@@ -252,6 +276,19 @@ export function bagTooltipHintKey(
   }
   if (mode.vendorOpen)
     return item.kind === 'quest' ? 'itemUi.tooltip.cannotVendor' : 'itemUi.tooltip.clickSell';
+  if (mode.guildBankDeposit) {
+    // The guild pipe refuses more than quest items; every refused dimension
+    // reads the same guild cannot-be-banked hint (the click deny carries the
+    // exact sim wording), an allowed stack the guild deposit hint. The keys
+    // are DISTINCT from the personal pair: the consequences differ (a shared
+    // pool any officer can take from; a refused copy would strand dormant).
+    return item.kind === 'quest' ||
+      item.soulbound ||
+      item.noMarketList ||
+      isTransferLockedInstance(instance)
+      ? 'hudChrome.bank.guildCannotDeposit'
+      : 'hudChrome.bank.guildDepositHint';
+  }
   if (mode.bankDeposit)
     return item.kind === 'quest' ? 'hudChrome.bank.cannotDeposit' : 'hudChrome.bank.depositHint';
   if (item.kind === 'quest') return 'itemUi.tooltip.clickDestroy';

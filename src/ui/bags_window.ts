@@ -50,6 +50,7 @@ import {
   buildBagGrid,
   resolveDepositSubmit,
 } from './bags_view';
+import { showQuantityPrompt } from './bank_quantity_prompt';
 import { itemDisplayName } from './entity_i18n';
 import { isPaperdollDraggable } from './equip_drop_core';
 import { esc } from './esc';
@@ -169,6 +170,10 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   isMailAttach(): boolean;
   /** The bank window is open (docked beside the bags): a click deposits the stack. */
   isBankOpen(): boolean;
+  /** The bank window is open ON ITS GUILD TAB: a click deposits into the guild
+   *  bank instead (officer-plus only; the tab exists only while guildBankInfo
+   *  is non-null, so this can never be true for a member or offline). */
+  isGuildBankTab(): boolean;
   pendingPetFeed(): boolean;
   // Cross-window commands the bag click fans out to.
   closeVendor(): void;
@@ -939,6 +944,31 @@ export class BagsWindow {
         // through the shared showError pipe), and send nothing.
         this.deps.showError(tSim('error.bankQuestItem'));
         return;
+      case 'guildBankDeposit': {
+        // The guild twin of bankDeposit: same reference-resolved index, same
+        // shift split prompt, sent through the IWorldGuildBank facet.
+        const index = bagStackIndex(this.deps.world().inventory, s);
+        if (index < 0) break;
+        if (ev.shiftKey && bankDepositOpensPrompt(s)) {
+          this.showDepositQuantityPrompt(index, s, Math.max(1, Math.floor(s.count)), 'guild');
+        } else {
+          this.deps.world().guildBankDeposit(index);
+          this.deps.hideTooltip();
+          this.render();
+        }
+        break;
+      }
+      // The guild pipe's pre-empt denies, each voicing the exact line the sim
+      // would refuse with (its established sim_i18n keys), sending nothing.
+      case 'guildBankDepositBlockedQuest':
+        this.deps.showError(tSim('error.bankQuestItem'));
+        return;
+      case 'guildBankDepositBlockedSoulbound':
+        this.deps.showError(tSim('error.guildBankSoulbound'));
+        return;
+      case 'guildBankDepositBlockedNoTransfer':
+        this.deps.showError(tSim('error.guildBankNoTransfer'));
+        return;
       case 'petFeedBlocked':
         this.deps.showError(t('hud.pet.petEatsFoodOnly'));
         return;
@@ -978,8 +1008,12 @@ export class BagsWindow {
       // Advertise the shift-click partial deposit on a splittable stack, the bank
       // window's withdrawPartialHint twin (tied to the deposit hint arm so a
       // blocked quest item never shows it).
+      // Both bank modes advertise the shift split on their deposit-hint arm
+      // (a blocked item never shows it): the guild target reuses the partial
+      // wording, only the primary hint key differs.
       const partial =
-        key === 'hudChrome.bank.depositHint' && bankDepositOpensPrompt(s)
+        (key === 'hudChrome.bank.depositHint' || key === 'hudChrome.bank.guildDepositHint') &&
+        bankDepositOpensPrompt(s)
           ? `<div class="tt-sub">${esc(t('hudChrome.bank.depositPartialHint'))}</div>`
           : '';
       // Advertise the two drag gestures that replaced right-click-destroy: a gear
@@ -1019,7 +1053,10 @@ export class BagsWindow {
       mailAttach: this.deps.isMailAttach(),
       marketSell: this.deps.isMarketSell(),
       vendorOpen: this.deps.vendorOpen(),
-      bankDeposit: this.deps.isBankOpen(),
+      // At most ONE of the two bank modes: the guild tab claims the click while
+      // it is active, else the open bank deposits to the personal pane.
+      bankDeposit: this.deps.isBankOpen() && !this.deps.isGuildBankTab(),
+      guildBankDeposit: this.deps.isGuildBankTab(),
       petFeed: this.deps.pendingPetFeed(),
     };
   }
@@ -1036,6 +1073,7 @@ export class BagsWindow {
       !mode.marketSell &&
       !mode.vendorOpen &&
       !mode.bankDeposit &&
+      !mode.guildBankDeposit &&
       !mode.petFeed;
     return inDefaultMode && bagItemHasContextActions(item, itemId);
   }
@@ -1278,69 +1316,58 @@ export class BagsWindow {
   }
 
   // The partial-deposit prompt (shift-click a splittable stack while the bank is
-  // open), cloned from the QA-hardened bank withdraw prompt: index-based, and AT
-  // SUBMIT it re-resolves the live slot and refuses on an itemId mismatch (the bags
-  // can repaint under the open prompt) while clamping the count to the live stack.
-  // Reuses this window's installPromptDialog (role/aria-modal/aria-labelledby, the
-  // Tab cycle, Escape preventDefault+stopPropagation, the #bags inert set/clear, and
-  // focus return) and the shared prompt cancel label.
-  private showDepositQuantityPrompt(index: number, captured: InvSlot, maxCount: number): void {
-    dismissBagPrompts();
-    const opener = document.activeElement as HTMLElement | null;
+  // open). The shared builder (bank_quantity_prompt.ts) owns the chrome; this
+  // owns the bags closures: the stale-slot re-resolve (resolveDepositSubmit
+  // refuses on an itemId mismatch, else clamps to the live stack) and the send.
+  // `target` picks which facet command the submit sends: the personal pane's
+  // bankDeposit (default) or the Guild tab's guildBankDeposit; everything else
+  // is identical between the two.
+  private showDepositQuantityPrompt(
+    index: number,
+    captured: InvSlot,
+    maxCount: number,
+    target: 'bank' | 'guild' = 'bank',
+  ): void {
     const item = ITEMS[captured.itemId];
-    const stack = document.getElementById('prompt-stack');
-    if (!stack) return;
-    const prompt = document.createElement('div');
-    prompt.className = 'prompt panel bank-deposit-prompt';
     const itemName = item ? itemDisplayName(item) : captured.itemId;
-    prompt.innerHTML = `<div class="prompt-text">${esc(t('hudChrome.bank.depositQuantityTitle', { item: itemName }))}</div>`;
-    const input = document.createElement('input');
-    input.className = 'prompt-number';
-    input.type = 'number';
-    input.setAttribute('aria-label', t('hudChrome.bank.depositQuantityInput'));
-    input.min = '1';
-    input.max = String(maxCount);
-    input.step = '1';
-    input.value = '1';
-    const confirm = document.createElement('button');
-    confirm.className = 'btn';
-    confirm.textContent = t('hudChrome.bank.depositQuantityConfirm');
-    const cancel = document.createElement('button');
-    cancel.className = 'btn';
-    cancel.textContent = t('itemUi.vendor.sellQuantityCancel');
-    const close = () => prompt.remove();
-    prompt.append(input, confirm, cancel);
-    const { dismiss, dismissAndReturn } = this.installPromptDialog(prompt, opener, close);
-    const submit = () => {
-      // Re-resolve the live slot at the captured index: depositing the WRONG item
-      // (the bags repainted under the prompt) is worse than dismissing. resolveDepositSubmit
-      // returns null to refuse on a mismatch, else the count clamped to the live stack.
-      const live = this.deps.world().inventory[index];
-      const count = resolveDepositSubmit(live, captured, Number(input.value) || 0, maxCount);
-      if (count === null) {
-        dismiss();
-        (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
-        return;
-      }
-      this.deps.world().bankDeposit(index, count);
-      dismiss();
-      this.deps.hideTooltip();
-      // render() rebuilds the grid, detaching the opener slot, so land focus on the
-      // always-present close button rather than dropping it to <body>. dismiss()
-      // cleared inert first, so this focus is not lost into a still-inert subtree.
-      this.render();
-      (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
-    };
-    confirm.addEventListener('click', submit);
-    cancel.addEventListener('click', dismissAndReturn);
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') submit();
-    });
-    stack.appendChild(prompt);
-    window.setTimeout(() => {
-      input.focus();
-      input.select();
-    }, 0);
+    showQuantityPrompt(
+      {
+        installPromptDialog: (prompt, opener, close) =>
+          this.installPromptDialog(prompt, opener, close),
+        dismissSiblings: dismissBagPrompts,
+      },
+      {
+        className: 'bank-deposit-prompt',
+        titleText: t('hudChrome.bank.depositQuantityTitle', { item: itemName }),
+        inputAriaText: t('hudChrome.bank.depositQuantityInput'),
+        confirmText: t('hudChrome.bank.depositQuantityConfirm'),
+        cancelText: t('itemUi.vendor.sellQuantityCancel'),
+        maxCount,
+        resolveCount: (requested) => {
+          // Re-resolve the live slot at the captured index: depositing the
+          // WRONG item (the bags repainted under the prompt) is worse than
+          // dismissing.
+          const live = this.deps.world().inventory[index];
+          return resolveDepositSubmit(live, captured, requested, maxCount);
+        },
+        send: (count) => {
+          if (target === 'guild') this.deps.world().guildBankDeposit(index, count);
+          else this.deps.world().bankDeposit(index, count);
+        },
+        afterClose: (sent) => {
+          if (sent) {
+            this.deps.hideTooltip();
+            // render() rebuilds the grid, detaching the opener slot; dismiss()
+            // cleared inert first, so the focus below is not lost into a
+            // still-inert subtree.
+            this.render();
+          }
+          // Land focus on the always-present close button rather than letting
+          // it drop to <body> (the opener slot is gone on both arms).
+          (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+        },
+      },
+    );
   }
 
   // Write the dragged item onto the DataTransfer (reproduced from the exported
