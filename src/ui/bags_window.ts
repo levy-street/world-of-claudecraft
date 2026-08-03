@@ -45,6 +45,7 @@ import {
   bagStackIndex,
   bagsMoneyRowStale,
   bagTooltipHintKey,
+  bagUnknownAction,
   bankDepositOpensPrompt,
   buildBagBar,
   buildBagGrid,
@@ -53,25 +54,27 @@ import {
 import { itemDisplayName } from './entity_i18n';
 import { isPaperdollDraggable } from './equip_drop_core';
 import { esc } from './esc';
-import { FOCUSABLE_SELECTOR } from './focus_manager';
+import { captureFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
 import { encodeHotbarAction, HOTBAR_ACTION_MIME } from './hud/action_bar/hotbar';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { BagItemDrag, ItemDragState } from './item_drag_state';
 import { resolveDropTargetAt } from './item_drop_hit_test';
+import { knownItemDef } from './known_item';
 import type { PainterHostPresentation } from './painter_host';
 import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
+import {
+  installPromptDialog as installModalPromptDialog,
+  type PromptDialogHandle,
+} from './prompt_dialog';
 import { tSim } from './sim_i18n';
 import { bindTouchItemDrag } from './touch_item_drag';
 import { svgIcon, type UiIconName } from './ui_icons';
+import { unknownItemIconHtml } from './unknown_item_icon';
 import { totalHeldCount } from './vendor_sell_quantity';
 import { dropOnWorld } from './world_drop_target';
 
 const BAG_FILTER_KEY = 'woc_bag_filter';
-
-// Monotonic id source for the ad-hoc prompt dialogs' aria-labelledby target, so the
-// id never couples to class ordering (was prompt.classList[last]).
-let promptDialogSeq = 0;
 
 // The ad-hoc discard / sell / bank-deposit quantity prompts mount into #prompt-stack
 // (outside #bags). A window-level close() removes any that are open so it never leaves
@@ -113,12 +116,26 @@ const BAG_GLYPH_ARIA_KEYS: Readonly<Record<NonNullable<BagInstanceGlyphKind>, Tr
   generic: 'hudChrome.bags.itemAriaInstanced',
 };
 
+// The unknown-cell siblings (stale-client guard): the SAME kind map, but
+// every sentence keeps the UNKNOWN signal beside the per-copy flag, because
+// for an unknown stack the tooltip is the only other channel and it is
+// mouse-only. One key per kind, whole sentences, never composed at runtime.
+const UNKNOWN_GLYPH_ARIA_KEYS: Readonly<Record<NonNullable<BagInstanceGlyphKind>, TranslationKey>> =
+  {
+    masterwork: 'itemUi.bags.unknownItemAriaMasterwork',
+    enchanted: 'itemUi.bags.unknownItemAriaEnchanted',
+    signed: 'itemUi.bags.unknownItemAriaInstanced',
+    bound: 'itemUi.bags.unknownItemAriaBound',
+    generic: 'itemUi.bags.unknownItemAriaInstanced',
+  };
+
 const BAG_CATEGORY_LABEL_KEYS: Record<BagCategory, TranslationKey> = {
   all: 'hudChrome.bags.filterAll',
   weapon: 'hudChrome.bags.filterWeapon',
   armor: 'hudChrome.bags.filterArmor',
   consumable: 'hudChrome.bags.filterConsumable',
   material: 'hudChrome.bags.filterMaterial',
+  tool: 'hudChrome.bags.filterTool',
   quest: 'hudChrome.bags.filterQuest',
   mount: 'hudChrome.bags.filterMount',
 };
@@ -191,8 +208,7 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   stageMailParcel(itemId: string, instance?: ItemInstancePayload): void;
   /** Shift-click: insert a readable item link into the chat input. */
   insertItemChatLink(itemId: string): void;
-  /** Open the character sheet's mount picker highlighting this mount (a click
-   *  on a collected kind:'mount' reins item). */
+  /** Surface a deps-owned error toast (reins-use denials and drag rejects). */
   showError(text: string): void;
   setPendingPetFeed(active: boolean): void;
   resetPetBarSig(): void;
@@ -216,6 +232,15 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  window owns the paperdoll drop (and its refusals); this is the touch arm's way
    *  in, since a finger release has no drop event to land on that window. */
   dropOnEquipSlot(itemId: string, slot: EquipSlot): void;
+  /** Place a touch-dragged stack on a hotbar seat (the desktop drop's item
+   *  branch, reached by finger): `slot` is the 1-based bar slot a desktop
+   *  row button stamps. The HUD owns eligibility (isHotbarItemId) and the
+   *  layout write; an ineligible item is a silent cancel, the desktop rule. */
+  dropOnActionSlot(itemId: string, slot: number): void;
+  /** Same, released over a mobile action-ring button: `ringIndex` is the
+   *  RING position; the HUD resolves the underlying bar slot from the live
+   *  page at drop time (the paged-ring mapping is HUD state). */
+  dropOnActionRingSlot(itemId: string, ringIndex: number): void;
   /** Open the bag-item action menu (Disenchant / Salvage / Apply Enchant)
    *  for a stack at a viewport point. `runDefault` runs the exact classic
    *  left-click action for the clicked slot, so the menu's first row stays
@@ -346,11 +371,20 @@ export class BagsWindow {
   render(): void {
     const el = this.deps.root();
     const world = this.deps.world();
+    // The focused control's identity, carried across the rebuild (the vendor
+    // ladder pattern, the phase 13 QA hand-off): this window rebuilds whole
+    // on the same onInventoryChanged hook the vendor does, and used to drop
+    // keyboard focus to <body> every time a stack changed. Captured BEFORE
+    // teardown, with the focused grid SLOT for the outward-walk rung.
+    const focusKey = captureFocusKey(el);
+    const preRows = [...el.querySelectorAll<HTMLElement>('.bag-grid [data-focus-key]')];
+    const focusedNode = focusedWithin(el);
+    const focusedSlot = focusedNode instanceof HTMLElement ? preRows.indexOf(focusedNode) : -1;
     // .bag-grid (not #bags) is the scroll container; it is recreated on every
     // rebuild, so capture its scroll offset and reapply it to the fresh grid:
     // otherwise using an item (e.g. a potion) snaps the list back to the top.
     const prevScrollTop = el.querySelector('.bag-grid')?.scrollTop ?? 0;
-    el.innerHTML = `<div class="panel-title"><span>${esc(t('itemUi.bags.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.bags.close'))}">${svgIcon('close')}</button></div>`;
+    el.innerHTML = `<div class="panel-title"><span>${esc(t('itemUi.bags.title'))}</span><button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(t('itemUi.bags.close'))}">${svgIcon('close')}</button></div>`;
     el.appendChild(this.buildBagBar());
     // Skip the chip/search row entirely when the bag is empty: a full filter bar
     // above a grid of empty squares is just noise.
@@ -364,6 +398,34 @@ export class BagsWindow {
     moneyRow.className = 'money';
     el.appendChild(moneyRow);
     this.paintMoneyRow(moneyRow, world.copper);
+    // The restore ladder (the vendor contract): the exact control when it
+    // survived, else the same grid slot walking outward (after a consumed
+    // stack the slot holds the NEXT item, the useful landing), else Close.
+    // Every rung resolves by dataset equality (jsdom has no CSS.escape).
+    if (focusKey !== null) {
+      const keyed = [...el.querySelectorAll<HTMLElement>('[data-focus-key]')];
+      const exact = keyed.find((node) => node.dataset.focusKey === focusKey);
+      const rows = [...el.querySelectorAll<HTMLElement>('.bag-grid [data-focus-key]')];
+      const slot = focusedSlot >= 0 ? Math.min(focusedSlot, rows.length - 1) : -1;
+      const neighbors: (HTMLElement | undefined)[] = [];
+      if (slot >= 0) {
+        for (let step = 0; step < rows.length; step++) {
+          if (rows[slot + step]) neighbors.push(rows[slot + step]);
+          // The backward rung is NEAR-dead by construction: the clamp above
+          // guarantees rows[slot] resolves whenever any row survives, so
+          // walking backward only matters if forward rungs are all
+          // disabled. Kept deliberately: restoreFirstEnabled skips
+          // disabled controls, and a grid tail of aria-disabled rows is a
+          // real state (the unknown-cell ladder).
+          if (step > 0 && rows[slot - step]) neighbors.push(rows[slot - step]);
+        }
+      }
+      restoreFirstEnabled([
+        exact,
+        ...neighbors,
+        el.querySelector<HTMLElement>('[data-close]') ?? undefined,
+      ]);
+    }
     el.querySelector('[data-close]')?.addEventListener('click', () => {
       // On touch the vendor / bank clusters hide their LEFT panel's own x-btn, so
       // this bags x-btn is the whole cluster's single close control: it closes the
@@ -404,6 +466,7 @@ export class BagsWindow {
     const backpack = document.createElement('button');
     backpack.type = 'button';
     backpack.className = 'bag-socket backpack';
+    backpack.dataset.focusKey = 'bagsocket:backpack';
     backpack.setAttribute('aria-disabled', 'true');
     backpack.innerHTML = `<img class="item-icon q-common" src="${iconDataUrl('item', 'backpack')}" alt="" draggable="false">`;
     backpack.setAttribute(
@@ -427,6 +490,7 @@ export class BagsWindow {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = `bag-socket q-${bagQualityKey(item)}`;
+        btn.dataset.focusKey = `bagsocket:${socket.socket}`;
         btn.innerHTML = this.deps.itemIcon(item);
         btn.setAttribute(
           'aria-label',
@@ -452,6 +516,7 @@ export class BagsWindow {
         const emptySocket = document.createElement('button');
         emptySocket.type = 'button';
         emptySocket.className = 'bag-socket empty';
+        emptySocket.dataset.focusKey = `bagsocket:${socket.socket}`;
         emptySocket.setAttribute('aria-disabled', 'true');
         emptySocket.setAttribute('aria-label', t('hudChrome.bags.socketEmpty'));
         this.deps.attachTooltip(
@@ -499,6 +564,7 @@ export class BagsWindow {
       const chip = document.createElement('button');
       chip.type = 'button';
       chip.className = `bag-chip${this.filter.category === category ? ' active' : ''}`;
+      chip.dataset.focusKey = `bagchip:${category}`;
       chip.textContent = t(BAG_CATEGORY_LABEL_KEYS[category]);
       chip.setAttribute('aria-pressed', this.filter.category === category ? 'true' : 'false');
       chip.addEventListener('click', () => {
@@ -518,6 +584,7 @@ export class BagsWindow {
     const search = document.createElement('input');
     search.type = 'search';
     search.className = 'bag-search';
+    search.dataset.focusKey = 'bag-search';
     search.placeholder = t('hudChrome.bags.searchPlaceholder');
     search.setAttribute('aria-label', t('hudChrome.bags.searchAria'));
     search.value = this.filter.search;
@@ -530,6 +597,10 @@ export class BagsWindow {
 
     const sort = document.createElement('select');
     sort.className = 'bag-sort';
+    // The one filter-bar control the ladder missed (the phase 14 QA): its
+    // change handler rebuilds the window, and keyless it fell to <body>
+    // mid-interaction (a closed select fires change per arrow press).
+    sort.dataset.focusKey = 'bag-sort';
     sort.setAttribute('aria-label', t('hudChrome.bags.sortAria'));
     for (const option of BAG_SORTS) {
       const opt = document.createElement('option');
@@ -555,7 +626,12 @@ export class BagsWindow {
   // without rebuilding the filter bar and stealing input focus.
   private fillGrid(grid: HTMLElement): void {
     const world = this.deps.world();
-    const model = buildBagGrid(world.inventory, (id) => ITEMS[id], this.filter, world.bagCapacity);
+    const model = buildBagGrid(
+      world.inventory,
+      (id) => knownItemDef(ITEMS, id),
+      this.filter,
+      world.bagCapacity,
+    );
     if (model.state === 'empty') {
       grid.innerHTML = `<div class="bag-empty">${esc(t('itemUi.bags.empty'))}</div>`;
       return;
@@ -572,17 +648,25 @@ export class BagsWindow {
     if (model.cells.length > 0) {
       for (let cell = 0; cell < model.cells.length; cell++) {
         const stack = model.cells[cell];
-        const item = stack ? ITEMS[stack.itemId] : undefined;
+        const item = stack ? knownItemDef(ITEMS, stack.itemId) : undefined;
+        // Stale-client guard (R34): a stack whose id this bundle predates is
+        // still an OCCUPIED slot; painting it as an empty square is how a
+        // counted slot turns invisible.
         grid.appendChild(
-          stack && item ? this.buildStackCell(stack, item, cell) : this.buildEmptyCell(cell),
+          stack && item
+            ? this.buildStackCell(stack, item, cell)
+            : stack
+              ? this.buildUnknownStackCell(stack, cell)
+              : this.buildEmptyCell(cell),
         );
       }
       return;
     }
     for (const s of model.visible) {
-      const item = ITEMS[s.itemId];
-      if (!item) continue;
-      grid.appendChild(this.buildStackCell(s, item, null));
+      const item = knownItemDef(ITEMS, s.itemId);
+      grid.appendChild(
+        item ? this.buildStackCell(s, item, null) : this.buildUnknownStackCell(s, null),
+      );
     }
     for (let i = 0; i < model.emptyCells; i++) grid.appendChild(this.buildEmptyCell(null));
   }
@@ -603,6 +687,16 @@ export class BagsWindow {
       // instanced copies share an itemId): that is what the move command sends as `from`.
       const index = bagStackIndex(world.inventory, s);
       if (cell !== null) row.dataset.bagIndex = String(cell);
+      // Focus identity for the rebuild ladder (the vendor pattern): itemId
+      // plus the stack's ORDINAL among same-item stacks, not the raw
+      // inventory index (the phase 14 QA): consuming an earlier
+      // different-item stack shifts every later index, and an index-keyed
+      // exact rung then lands focus one stack over. The ordinal only moves
+      // when an earlier SAME-item stack goes, where the same-slot rung is
+      // the honest landing anyway. Distinct 'bagu:' prefix on the
+      // unknown-cell builder keeps the two families from colliding on a
+      // shared miss value.
+      row.dataset.focusKey = `bag:${s.itemId}:${this.stackOrdinal(world.inventory, s)}`;
       this.bindBagCellDrop(row, cell);
       const qColor = QUALITY_COLOR[bagQualityKey(item)] ?? QUALITY_DEFAULT_COLOR;
       const itemName = itemDisplayName(item);
@@ -776,6 +870,9 @@ export class BagsWindow {
           if (target.kind === 'equip') this.deps.dropOnEquipSlot(s.itemId, target.slot);
           else if (target.kind === 'bagCell')
             this.dropOnBagCell(index >= 0 ? index : null, target.index);
+          else if (target.kind === 'actionSlot') this.deps.dropOnActionSlot(s.itemId, target.slot);
+          else if (target.kind === 'actionRingSlot')
+            this.deps.dropOnActionRingSlot(s.itemId, target.ringIndex);
           else if (target.kind === 'world') this.dropOnWorldToDestroy(s.itemId, count);
         },
         onEnd: () => {
@@ -799,6 +896,211 @@ export class BagsWindow {
       this.bindBagCellDrop(el, cell);
     }
     return el;
+  }
+
+  // An occupied square whose def this bundle cannot resolve (stale-client
+  // guard, R34): inventory is server truth, so an id minted by content this
+  // bundle predates still holds a real, counted slot. The cell renders the
+  // fallback icon, its count badge, the raw id as its label, and the def-free
+  // corner glyph (the instance payload is wire truth, so a bound or enchanted
+  // copy keeps its marker and its aria flag). It keeps every DEF-FREE
+  // capability and only those: it is a drop target in the pristine view, a
+  // DRAG SOURCE (moveInventoryItem acts on indices alone, the same argument
+  // that keeps the bank's withdraw live), and with the bank open it DEPOSITS
+  // (bankDeposit is index-based too, so the withdraw the guard kept live is
+  // not a one-way trip). Use / sell / equip all need a def, so outside the
+  // bank the cell is a focusable no-op and aria-disabled is honest.
+  // Shift-click chat linking is not wired because it would be a silent no-op
+  // anyway: the send path (insertItemLink) refuses an id with no resolvable
+  // display name. (The "[?]" a stale client can see in chat is the
+  // RECEIVER's degradation of a link a current client sent; nothing here
+  // affects it.) Everything acts again once the client updates.
+  // The same-item ordinal for the focus keys (the phase 14 QA): stable when
+  // an earlier DIFFERENT-item stack goes, unlike the raw index. Computed as
+  // ONE pass per inventory array and cached on the array's identity (both
+  // worlds hand back a stable array between changes; a world that copied
+  // per access would only degrade this to the per-row cost it replaced).
+  private ordinalCache: { inv: readonly InvSlot[]; map: Map<InvSlot, number> } | null = null;
+  private stackOrdinal(inventory: readonly InvSlot[], s: InvSlot): number {
+    if (this.ordinalCache?.inv !== inventory) {
+      const map = new Map<InvSlot, number>();
+      const counts = new Map<string, number>();
+      for (const slot of inventory) {
+        const n = counts.get(slot.itemId) ?? 0;
+        map.set(slot, n);
+        counts.set(slot.itemId, n + 1);
+      }
+      this.ordinalCache = { inv: inventory, map };
+    }
+    return this.ordinalCache.map.get(s) ?? -1;
+  }
+
+  private buildUnknownStackCell(s: InvSlot, cell: number | null): HTMLElement {
+    const row = document.createElement('button');
+    row.type = 'button';
+    row.className = 'bag-item q-common';
+    row.dataset.focusKey = `bagu:${s.itemId}:${
+      cell ?? this.stackOrdinal(this.deps.world().inventory, s)
+    }`;
+    row.style.setProperty('--bag-slot-quality', QUALITY_DEFAULT_COLOR);
+    // The known cell's ladder gives trade, mail-attach, market-sell, and
+    // vendor precedence over the deposit; those four all need a def, so on
+    // the unknown cell an active higher mode means NO action (the honest
+    // aria-disabled no-op), never a deposit that jumps the ladder. The
+    // decision itself lives beside bagItemAction (bags_view.ts
+    // bagUnknownAction) so the two ladders cannot drift apart.
+    const canDeposit = bagUnknownAction(this.bagMode()) === 'bankDeposit';
+    if (!canDeposit) row.setAttribute('aria-disabled', 'true');
+    // The accessible name says UNKNOWN, not just the raw id: the hover
+    // tooltip is mouse-only, and the two channels must agree (the glyph
+    // aria-key rule above). The def-free glyph kind rides the same aria keys
+    // the known cell uses, with the unknown label as the item token.
+    const glyphKind = bagInstanceGlyphKind(s.instance);
+    row.setAttribute(
+      'aria-label',
+      glyphKind
+        ? // A glyphed unknown stack carries BOTH aria facts: the UNKNOWN
+          // signal and the per-copy flag (bound is the one a player checks
+          // before trading). The per-kind unknown keys keep the pair as one
+          // localizable sentence.
+          t(UNKNOWN_GLYPH_ARIA_KEYS[glyphKind], {
+            id: s.itemId,
+            count: formatNumber(s.count, { maximumFractionDigits: 0 }),
+          })
+        : t('itemUi.bags.unknownItemAria', {
+            id: s.itemId,
+            count: formatNumber(s.count, { maximumFractionDigits: 0 }),
+          }),
+    );
+    if (cell !== null) row.dataset.bagIndex = String(cell);
+    this.bindBagCellDrop(row, cell);
+    const instanceMark =
+      glyphKind === 'generic'
+        ? '<span class="bi-instance" aria-hidden="true"></span>'
+        : glyphKind === 'enchanted' || glyphKind === 'signed' || glyphKind === 'bound'
+          ? `<span class="bi-glyph bi-glyph-${glyphKind}" aria-hidden="true">${svgIcon(BAG_GLYPH_ICONS[glyphKind])}</span>`
+          : glyphKind === 'masterwork'
+            ? `<img class="bi-masterwork-seal" src="${MASTERWORK_SEAL_IMAGE_URL}" alt="" aria-hidden="true" draggable="false">`
+            : '';
+    row.innerHTML = `${unknownItemIconHtml(s.itemId)}${instanceMark}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+    if (canDeposit) {
+      row.addEventListener('click', (ev) => {
+        // The same peek and trailing-synthetic-click dance as the known cell:
+        // this cell has a drag source, so a completed touch drag must not
+        // also deposit on release.
+        if (this.deps.consumePeek()) {
+          this.deps.hideTooltip();
+          return;
+        }
+        if (this.suppressNextClick) {
+          this.suppressNextClick = false;
+          return;
+        }
+        // The known cell's bankDeposit arm, def-free by construction: resolve
+        // the exact clicked stack by reference and send the index. The prompt
+        // (shift, multi-count fungible stacks) is def-free too.
+        const index = bagStackIndex(this.deps.world().inventory, s);
+        if (index < 0) return;
+        if (ev.shiftKey && bankDepositOpensPrompt(s)) {
+          this.showDepositQuantityPrompt(index, s, Math.max(1, Math.floor(s.count)));
+        } else {
+          this.deps.world().bankDeposit(index);
+          this.deps.hideTooltip();
+          this.render();
+        }
+      });
+    }
+    // A touch long-press belongs to the tooltip peek here exactly as on the
+    // known cell (Chromium synthesizes contextmenu at ~500ms, beating the
+    // peek timer, and this cell's tooltip is the only channel that explains
+    // it to a sighted touch player); desktop right-click stays inert since
+    // the cell has no secondary action to offer.
+    row.addEventListener('contextmenu', (ev) => {
+      const pointerType = (ev as PointerEvent).pointerType;
+      if (
+        pointerType === 'touch' ||
+        pointerType === 'pen' ||
+        (document.body.classList.contains('mobile-touch') && pointerType !== 'mouse')
+      ) {
+        ev.preventDefault();
+      }
+    });
+    // A fresh press clears any stale suppression, mirroring the known cell's
+    // contract: the flag only ever swallows the ONE synthetic click trailing
+    // the drag that set it, and a drag that ends without that click (release
+    // over another element, a rebuild destroying the source row) must never
+    // eat a later, real deposit tap.
+    row.addEventListener('pointerdown', () => {
+      this.suppressNextClick = false;
+    });
+    this.deps.attachTooltip(
+      row,
+      () =>
+        `<div class="tt-title">${esc(s.itemId)}</div><div class="tt-sub">${esc(t('itemUi.bags.unknownItem'))}</div>`,
+    );
+    // The drag source, trimmed from buildStackCell's wiring: no hotbar
+    // payload (a hotbar action needs a def), and markEquipDropTargets is
+    // def-gated and lights nothing for an unknown id; the world/paperdoll
+    // drop arms no-op the same way, leaving the bag-cell move as the one
+    // live target, which is the point. The click-suppression dance IS here
+    // (the deposit click above, the onDrop flag below, and the pointerdown
+    // reset): with the bank open this cell has a real click action now.
+    const index = bagStackIndex(this.deps.world().inventory, s);
+    row.draggable = !this.deps.tradeOpen() && !this.deps.vendorOpen();
+    row.addEventListener('dragstart', (e) => {
+      this.deps.dragState.begin({
+        itemId: s.itemId,
+        count: Math.max(1, Math.floor(s.count)),
+        index: index >= 0 ? index : null,
+      });
+      if (e.dataTransfer) {
+        e.dataTransfer.setData('text/plain', s.itemId);
+        e.dataTransfer.effectAllowed = 'copyMove';
+      }
+      this.deps.markEquipDropTargets(s.itemId);
+      this.deps.hideTooltip();
+    });
+    row.addEventListener('dragend', () => {
+      this.deps.dragState.end();
+      this.deps.clearActionDropTargets();
+      this.deps.markEquipDropTargets(null);
+    });
+    bindTouchItemDrag(row, {
+      state: this.deps.dragState,
+      isTouchHud: () => this.deps.isTouchHud(),
+      payload: () =>
+        this.deps.tradeOpen() || this.deps.vendorOpen()
+          ? null
+          : {
+              itemId: s.itemId,
+              count: Math.max(1, Math.floor(s.count)),
+              index: index >= 0 ? index : null,
+            },
+      ghostHtml: () => unknownItemIconHtml(s.itemId),
+      onStart: () => {
+        this.deps.hideTooltip();
+        this.deps.markEquipDropTargets(s.itemId);
+      },
+      onMove: () => {
+        /* nothing to light beyond the shared drag ghost */
+      },
+      onDrop: (x, y) => {
+        // Suppress the synthetic click the release fires on the source row
+        // (touch_item_drag.ts contract): with the bank open this cell HAS a
+        // click action now, and without the flag a reorganize drag would
+        // also deposit the stack on release.
+        this.suppressNextClick = true;
+        // Only the bag-cell move is live for a def-less stack: equip and the
+        // world-destroy prompt both need the def, so releasing there is a
+        // plain cancel rather than a half-working action.
+        const target = resolveDropTargetAt(x, y);
+        if (target.kind === 'bagCell') this.dropOnBagCell(index >= 0 ? index : null, target.index);
+      },
+      onEnd: () => {
+        this.deps.markEquipDropTargets(null);
+      },
+    });
+    return row;
   }
 
   // A bag square as a drop target for a stack dragged out of the SAME bag. `cell` is the
@@ -856,7 +1158,7 @@ export class BagsWindow {
   /** What dropping `itemId` on the world does right now (pure decision, shared with
    *  the tooltip hint). Public for the HUD-installed canvas drop target. */
   destroyAction(itemId: string): BagDestroyAction {
-    const item = ITEMS[itemId];
+    const item = knownItemDef(ITEMS, itemId);
     if (!item) return 'none';
     return bagDestroyAction(item, this.bagMode());
   }
@@ -911,6 +1213,9 @@ export class BagsWindow {
       case 'marketSell':
         this.deps.stageMarketSell(s.itemId, s.instance);
         break;
+      case 'vendorSellBlocked':
+        this.deps.showError(t('itemUi.tooltip.cannotVendor'));
+        return;
       case 'vendorSell':
         this.sellBagItem(s, ev);
         break;
@@ -1067,97 +1372,20 @@ export class BagsWindow {
     }
   }
 
-  // WCAG 2.2 AA: the ad-hoc bag prompts (discard / sell quantity) are modal
-  // dialogs but carried no role/name, no keyboard trap, and no focus return. This wires
-  // role=dialog + aria-modal + aria-labelledby (the prompt text), a self-contained Tab
-  // cycle among the prompt's controls (these prompts are appended to #prompt-stack,
-  // outside the bag window's reach, so they own their own trap), an Escape close, and
-  // focus return to the element that opened the prompt. Returns a close-and-return fn.
+  // WCAG 2.2 AA modal prompt wiring, the shared recipe (src/ui/prompt_dialog.ts):
+  // #bags is the inert root while a prompt is open, and if the bags window itself
+  // is force-closed out from under an open prompt, close() clears inert as a
+  // teardown backstop, so #bags is never left inert while hidden. This single
+  // chokepoint covers the discard, sell, and bank-deposit prompts.
   private installPromptDialog(
     prompt: HTMLElement,
     opener: HTMLElement | null,
     close: () => void,
-  ): { dismiss: () => void; dismissAndReturn: () => void } {
-    prompt.setAttribute('role', 'dialog');
-    prompt.setAttribute('aria-modal', 'true');
-    // Mark the bag grid behind the modal prompt inert while it is open, so a screen
-    // reader / Tab cannot reach the now-blocked inventory underneath. EVERY prompt
-    // teardown path (confirm/submit, cancel, Escape) routes through dismiss(), which
-    // clears inert before the prompt is removed; and if the bags window itself is
-    // force-closed out from under an open prompt, close() clears inert as a teardown
-    // backstop, so #bags is never left inert while hidden. The focus-returning variant
-    // clears inert BEFORE refocusing (a focus into a still-inert subtree is silently
-    // dropped, and the openers live inside #bags). This single chokepoint covers BOTH the
-    // discard and sell prompts.
-    const bagsRoot = this.deps.root();
-    bagsRoot.inert = true;
-    const titleEl = prompt.querySelector('.prompt-text') as HTMLElement | null;
-    if (titleEl) {
-      if (!titleEl.id) titleEl.id = `bags-prompt-title-${promptDialogSeq++}`;
-      prompt.setAttribute('aria-labelledby', titleEl.id);
-      // Name an unlabeled quantity field by the prompt's own question (the same titled
-      // text, e.g. "Destroy how many Linen Cloth?") so a number input is never anonymous
-      // (WCAG 1.3.1 / 4.1.2). The discard prompt's input had no name (the new bags axe
-      // case caught it); the sell prompt's input already carries a dedicated aria-label,
-      // so leave that one alone (aria-labelledby would otherwise shadow the better name).
-      const numInput = prompt.querySelector('.prompt-number');
-      if (numInput && !numInput.hasAttribute('aria-label')) {
-        numInput.setAttribute('aria-labelledby', titleEl.id);
-      }
-    }
-    // Clear inert THEN remove the prompt; the only teardown both the confirm and the
-    // cancel paths share, so routing every close through it guarantees inert never leaks.
-    const dismiss = (): void => {
-      bagsRoot.inert = false;
-      close();
-    };
-    const dismissAndReturn = (): void => {
-      dismiss();
-      opener?.focus();
-    };
-    prompt.addEventListener('keydown', (e) => {
-      const ke = e as KeyboardEvent;
-      // Escape: stopPropagation, not just preventDefault. The input layer's
-      // window-level keydown runs the global escape action (closeAll) regardless of
-      // defaultPrevented, and prompt BUTTONS are not tag-exempt like inputs, so
-      // without it one keypress dismisses the prompt AND closes the whole window.
-      if (ke.key === 'Escape') {
-        ke.preventDefault();
-        ke.stopPropagation();
-        dismissAndReturn();
-        return;
-      }
-      // Enter / Space: stopPropagation for the same reason, keeping the default so
-      // native activation (Enter/Space on the confirm and cancel buttons) survives.
-      // A submit handler on the quantity input runs at the target phase and removes
-      // the prompt DURING this keydown, so a window-level gate keyed on the prompt's
-      // presence runs too late: without the stop, the same press hits the global
-      // chat/jump bind and steals the WCAG 2.4.3 focus return. The event path is
-      // fixed at dispatch, so this listener still runs after the detach; only THEN
-      // cancel the default too, or the browser runs the key's activation against
-      // the freshly re-landed focus (Enter ghost-clicking [data-close] and closing
-      // the whole window).
-      if (ke.key === 'Enter' || ke.key === ' ' || ke.code === 'Space') {
-        ke.stopPropagation();
-        if (!prompt.isConnected) ke.preventDefault();
-        return;
-      }
-      if (ke.key !== 'Tab') return;
-      // Reuse the one canonical focusable set so a prompt that ever
-      // gains an [href] / [tabindex] control stays inside the trap.
-      const f = Array.from(prompt.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
-      if (f.length === 0) return;
-      const first = f[0];
-      const last = f[f.length - 1];
-      if (ke.shiftKey && document.activeElement === first) {
-        ke.preventDefault();
-        last.focus();
-      } else if (!ke.shiftKey && document.activeElement === last) {
-        ke.preventDefault();
-        first.focus();
-      }
+  ): PromptDialogHandle {
+    return installModalPromptDialog(prompt, opener, close, {
+      inertRoot: this.deps.root(),
+      idPrefix: 'bags-prompt-title',
     });
-    return { dismiss, dismissAndReturn };
   }
 
   private showDiscardItemPrompt(itemId: string, maxCount: number): void {
@@ -1165,7 +1393,7 @@ export class BagsWindow {
       el.remove();
     });
     const opener = document.activeElement as HTMLElement | null;
-    const item = ITEMS[itemId];
+    const item = knownItemDef(ITEMS, itemId);
     const stack = document.getElementById('prompt-stack');
     if (!stack) return;
     const prompt = document.createElement('div');
@@ -1232,7 +1460,7 @@ export class BagsWindow {
       el.remove();
     });
     const opener = document.activeElement as HTMLElement | null;
-    const item = ITEMS[itemId];
+    const item = knownItemDef(ITEMS, itemId);
     const stack = document.getElementById('prompt-stack');
     if (!stack) return;
     const prompt = document.createElement('div');
@@ -1287,7 +1515,7 @@ export class BagsWindow {
   private showDepositQuantityPrompt(index: number, captured: InvSlot, maxCount: number): void {
     dismissBagPrompts();
     const opener = document.activeElement as HTMLElement | null;
-    const item = ITEMS[captured.itemId];
+    const item = knownItemDef(ITEMS, captured.itemId);
     const stack = document.getElementById('prompt-stack');
     if (!stack) return;
     const prompt = document.createElement('div');

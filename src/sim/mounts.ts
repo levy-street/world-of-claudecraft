@@ -28,7 +28,7 @@ import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { DT, type Entity, FORM_AURA_KINDS } from './types';
+import { DT, type Entity, FORM_AURA_KINDS, isNonSpellCast } from './types';
 
 // Summon channel duration (seconds). Mounting is a short cast the player can
 // interrupt by moving into combat or water. Dismounting has NO channel: it is
@@ -254,6 +254,13 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
     if (e.dead || e.ghost) return false;
     if (e.inCombat) {
       ctx.error(pid, "You can't do that while in combat.");
+      return false;
+    }
+    // The profession-cast interlock's third route: the lesson summon is the
+    // one mount path that skips useItem (no reins exist for the training
+    // steed), so it carries the busy refusal the reins click gets for free.
+    if (isNonSpellCast(e.castingAbility)) {
+      ctx.error(pid, 'You are busy.');
       return false;
     }
     cancelFormsAndGhostWolf(ctx, e);

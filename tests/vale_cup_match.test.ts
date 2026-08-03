@@ -1047,6 +1047,77 @@ describe('Vale Cup: the pitch is closed during a match', () => {
   });
 });
 
+describe('the pitch police and live profession sessions', () => {
+  it('the goal-reset kickoff placement ends a FIGHTER live gather session', () => {
+    // Fighters are skipped by the pitch police, and a herb node sits inside
+    // the pitch: a gather cast started during the goal celebrate must not
+    // ride the kickoff teleport (the golden-goal and goal-reset placements
+    // arrive with no arena reset, unlike match start and teardown).
+    const sim = makeWorld();
+    const a = addAt(sim, 'warrior', 'Kicker');
+    const b = addAt(sim, 'mage', 'Keeper');
+    const match = startBout(sim, a, b);
+    for (const e of sim.entities.values()) {
+      if (e.kind !== 'mob') continue;
+      e.dead = true;
+      e.hp = 0;
+      e.aiState = 'dead';
+      e.respawnTimer = 9999;
+      e.corpseTimer = 9999;
+      e.inCombat = false;
+    }
+    sim.addItem('gathering_sickle', 1, a);
+    teleport(sim, a, 23, -99); // herb_eastbrook_4, inside the pitch
+    expect(sim.harvestNode('herb_eastbrook_4', undefined, a)).toBe(true);
+    const e = sim.entities.get(a);
+    if (!e) throw new Error('missing fighter');
+    expect(e.castingAbility).not.toBeNull();
+
+    // Force the goal-reset arm: the goal phase expiring with no pending
+    // winner runs placeCupFighters straight into the kickoff placement.
+    match.phase = 'goal';
+    match.timer = 0.01;
+    match.pendingWinner = undefined;
+    sim.tick();
+
+    expect(e.castingAbility).toBeNull();
+    expect(e.gatherCastNodeId).toBe('');
+  });
+
+  it('sweeping a bystander off the live pitch ends their gather session', () => {
+    // herb_eastbrook_4 sits at (23, -99), INSIDE the Sowfield bounds: a
+    // harvest can legally start on the open pitch, and the next match tick's
+    // policePitch eject is a hard teleport that must not carry the session.
+    const sim = makeWorld();
+    const a = addAt(sim, 'warrior', 'Kicker');
+    const b = addAt(sim, 'mage', 'Keeper');
+    startBout(sim, a, b);
+    for (const e of sim.entities.values()) {
+      if (e.kind !== 'mob') continue; // mob damage would cancel for the wrong reason
+      e.dead = true;
+      e.hp = 0;
+      e.aiState = 'dead';
+      e.respawnTimer = 9999;
+      e.corpseTimer = 9999;
+      e.inCombat = false;
+    }
+    const c = sim.addPlayer('warrior', 'Herbalist');
+    sim.addItem('gathering_sickle', 1, c);
+    teleport(sim, c, 23, -99);
+    expect(sim.harvestNode('herb_eastbrook_4', undefined, c)).toBe(true);
+    const e = sim.entities.get(c);
+    if (!e) throw new Error('missing herbalist');
+    expect(e.castingAbility).not.toBeNull();
+
+    sim.tick();
+
+    // Ejected past the boards, and the session ended with the teleport.
+    expect(isOnPitch(e.pos.x, e.pos.z)).toBe(false);
+    expect(e.castingAbility).toBeNull();
+    expect(e.gatherCastNodeId).toBe('');
+  });
+});
+
 describe('Vale Cup: skill deeds unlock through a real match (issue #2767)', () => {
   // deeds_sites_pin.test.ts pins onCupGoalForDeeds / onCupSaveForDeeds /
   // onCupStandingForDeeds against a structural CupMatchForDeeds, called directly.

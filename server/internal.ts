@@ -17,6 +17,7 @@ import {
   type DiscordMemberMetaRecord,
   type DiscordOutboxLinkRow,
   discordForAccount,
+  discordForAccounts,
   discordIdsWithGuildFlair,
   discordLinksForAccounts,
   grantRewardPoints,
@@ -194,18 +195,21 @@ async function handleDiscordInternal(
   // celebrates players who linked Discord).
   if (req.method === 'GET' && url.pathname === '/internal/discord/activity') {
     const items = drainActivity();
+    // ONE batched links read per drain (the RouteDef twin's exact shape).
+    const links = await discordForAccounts(
+      pool,
+      items.flatMap((it) => it.accountIds),
+    );
     const out: unknown[] = [];
     for (const it of items) {
-      const participants = await Promise.all(
-        it.accountIds.map(async (accountId, i) => {
-          const link = await discordForAccount(pool, accountId);
-          return {
-            name: it.names[i] ?? '',
-            discordUserId: link?.discord_user_id ?? null,
-            discordAvatar: link?.discord_avatar ?? null,
-          };
-        }),
-      );
+      const participants = it.accountIds.map((accountId, i) => {
+        const link = links.get(accountId);
+        return {
+          name: it.names[i] ?? '',
+          discordUserId: link?.discord_user_id ?? null,
+          discordAvatar: link?.discord_avatar ?? null,
+        };
+      });
       if (!participants.some((p) => p.discordUserId)) continue; // nobody linked
       const { accountIds: _a, names: _n, ...rest } = it;
       out.push({ ...rest, participants });
@@ -445,9 +449,9 @@ export const OUTBOX_LINK_CHANGE_PAGE = 1000;
  *  3. Collect the account ids every drained item mentions. An EMPTY set issues no
  *     identity query at all.
  *  4. Otherwise resolve the whole union with ONE discordLinksForAccounts call.
- *     The per-item discordForAccount that the relay and activity GETs run once
- *     per item (or once per participant) never appears here: that N+1 is what
- *     invariant D1 forbids on this path.
+ *     The per-item discordForAccount the relay GET still runs once per item
+ *     never appears here (the activity GET already batches its own read via
+ *     discordForAccounts): that N+1 is what invariant D1 forbids on this path.
  *
  * RETRY CONTRACT (Phase 6's retry logic is written against this):
  *  - `winners` is an IDEMPOTENT READ. It stays unannounced until the bot calls
@@ -854,18 +858,22 @@ export const routes: RouteDef[] = [
     middleware: [discordGate],
     handler: async (ctx) => {
       const items = drainActivity();
+      // ONE batched links read per drain (most players are unlinked, so the
+      // old per-participant lookup mostly fetched nulls sequentially).
+      const links = await discordForAccounts(
+        pool,
+        items.flatMap((it) => it.accountIds),
+      );
       const out: unknown[] = [];
       for (const it of items) {
-        const participants = await Promise.all(
-          it.accountIds.map(async (accountId, i) => {
-            const link = await discordForAccount(pool, accountId);
-            return {
-              name: it.names[i] ?? '',
-              discordUserId: link?.discord_user_id ?? null,
-              discordAvatar: link?.discord_avatar ?? null,
-            };
-          }),
-        );
+        const participants = it.accountIds.map((accountId, i) => {
+          const link = links.get(accountId);
+          return {
+            name: it.names[i] ?? '',
+            discordUserId: link?.discord_user_id ?? null,
+            discordAvatar: link?.discord_avatar ?? null,
+          };
+        });
         if (!participants.some((p) => p.discordUserId)) continue; // nobody linked
         const { accountIds: _a, names: _n, ...rest } = it;
         out.push({ ...rest, participants });

@@ -3,8 +3,9 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import { groundHeight } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
-const SEED = 20061;
+const SEED = WORLD_SEED;
 const PREMIUM = 'greyjaw_hide_boots'; // uncommon: opens a roll under default strategies
 const COMMON = 'worn_sword'; // common: never master-looted under a rare threshold
 

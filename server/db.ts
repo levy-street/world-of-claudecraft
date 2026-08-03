@@ -50,7 +50,7 @@ import {
   recordCharacterCreation,
 } from './player_metrics_db';
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
-import { REALM } from './realm';
+import { REALM, REALM_DIRECTORY } from './realm';
 import { chooseArchiveName } from './reclaim_name';
 import { SOCIAL_SCHEMA } from './social_db';
 import { UNSTUCK_SCHEMA } from './unstuck_db';
@@ -79,13 +79,85 @@ export const DATABASE_URL =
 // across the HTTP request path and the game loop. The pool is timeout-bounded on
 // every axis below so a slow or unreachable database degrades into fast, isolated
 // query failures instead of a process-wide stall.
-export const DB_POOL_MAX_CLIENTS = 10;
+// Env-tunable (DB_POOL_MAX_CLIENTS) because the R36 1,000-concurrent load
+// captures exhaust the default long before the loop does: at about 500 online
+// the 30 s autosave waves hold every client while login handshakes wait out
+// DB_POOL_CONNECT_TIMEOUT_MS. Parsing is strict and fail-safe: a set-but-blank,
+// non-decimal-digit, or out-of-range value stays on the default (an empty
+// string must never become a zero-client pool, a typo like "30x" must not
+// half-parse, and hex/exponent spellings are rejected rather than surprising).
+// Nothing is clamped: a value outside the accepted range FALLS BACK to the
+// default and says so on the console at boot, so a typo can never leave an
+// operator silently running a pool size they did not ask for.
+const DB_POOL_MAX_CLIENTS_DEFAULT = 10;
+// The largest value the parser accepts, taken from the CONNECTION BUDGET of the
+// shipped deployment: stock postgres:16 serves max_connections 100 with 3
+// superuser-reserved, so 97 are usable. Every realm process builds its own pool
+// on the one DATABASE_URL and pools have no cross-process coordination, so
+// realms x DB_POOL_MAX_CLIENTS + tooling is what must stay at or under 97, plus
+// one more per realm for ensureSchema's dedicated boot Client (outside the
+// pool, held while that process applies the schema, and a rolling restart pays
+// it on every realm at once). Past that, logins fail with "too many clients"
+// exactly at peak.
+// Connections are not the binding constraint on the shipped deployment, though:
+// the game process and Postgres share ONE 4-vCPU box, where the database is
+// already the heaviest CPU consumer at peak, so a large pool only buys
+// concurrency the shared cores cannot serve. Raise this knob against a measured
+// pool-exhaustion symptom (handshakes timing out on the checkout wait), a few
+// clients at a time, never toward the budget ceiling because it is allowed.
+const DB_POOL_MAX_CLIENTS_CEILING = 97;
+export function parseDbPoolMaxClients(raw: string | undefined): number {
+  const trimmed = (raw ?? '').trim();
+  if (!/^\d+$/.test(trimmed)) return DB_POOL_MAX_CLIENTS_DEFAULT;
+  const n = Number(trimmed);
+  return n >= 1 && n <= DB_POOL_MAX_CLIENTS_CEILING ? n : DB_POOL_MAX_CLIENTS_DEFAULT;
+}
+export const DB_POOL_MAX_CLIENTS = parseDbPoolMaxClients(process.env.DB_POOL_MAX_CLIENTS);
+// A rejected value lands on the default, which is indistinguishable from unset
+// in every later readout, so without this a typo silently costs the operator
+// the pool they meant to configure. The comparison is numeric, so the spellings
+// that do reach the requested number (" 10 ", "010") stay quiet. Dev-channel
+// English: a log line, never player text.
+const rawDbPoolMaxClients = (process.env.DB_POOL_MAX_CLIENTS ?? '').trim();
+if (rawDbPoolMaxClients !== '' && Number(rawDbPoolMaxClients) !== DB_POOL_MAX_CLIENTS) {
+  console.error(
+    `DB_POOL_MAX_CLIENTS="${rawDbPoolMaxClients}" is not an accepted value (a whole number from 1 to ${DB_POOL_MAX_CLIENTS_CEILING}); falling back to the default of ${DB_POOL_MAX_CLIENTS_DEFAULT} clients.`,
+  );
+}
 
 // Pool checkout / connect wait: how long pool.connect() (and every pool.query,
 // which checks a client out first) may block waiting for a free client or a new
 // TCP connect before it rejects. A slow database must fail a request fast rather
 // than queue the whole handshake path behind an exhausted pool forever.
 export const DB_POOL_CONNECT_TIMEOUT_MS = 5000;
+
+// One boot line naming the effective pool sizing. Nothing else logs it, so an
+// operator reading a "too many clients" or checkout-timeout incident had no way
+// to tell what this process actually claimed.
+console.log(
+  `db pool: DB_POOL_MAX_CLIENTS=${DB_POOL_MAX_CLIENTS} DB_POOL_CONNECT_TIMEOUT_MS=${DB_POOL_CONNECT_TIMEOUT_MS}`,
+);
+// The multi-realm multiplication, warned about where it is decided rather than
+// left to the operator's arithmetic. REALMS is the realm directory every realm
+// process is handed (scripts/dev-realms.mjs exports it to each child; a
+// production deployment sets the same list on every process), so its entry
+// count is how many independent pools this one DATABASE_URL will see. Unset
+// means a single realm, whose pool is already bounded by the parser ceiling and
+// so can never trip this on its own. PREMISE: every realm shares one database
+// (true of the shipped single-box deployment); directory entries hosted on
+// their own databases have their own budgets, so the warning below names the
+// assumption instead of pretending to know each realm's DATABASE_URL.
+// Counted through the SAME parser the realm directory ships from
+// (REALM_DIRECTORY dedupes names and drops malformed or non-origin entries),
+// so the warning's arithmetic matches the processes that will actually boot
+// rather than raw comma segments. Unset REALMS parses to the single-realm
+// fallback entry, which can never trip the ceiling on its own.
+const configuredRealmCount = REALM_DIRECTORY.length;
+if (configuredRealmCount * DB_POOL_MAX_CLIENTS > DB_POOL_MAX_CLIENTS_CEILING) {
+  console.warn(
+    `db pool: ${configuredRealmCount} realms x ${DB_POOL_MAX_CLIENTS} clients = ${configuredRealmCount * DB_POOL_MAX_CLIENTS} connections, past the ${DB_POOL_MAX_CLIENTS_CEILING} usable on stock postgres:16 (max_connections 100, 3 superuser-reserved) and before ensureSchema's one boot client per realm. If every realm shares this DATABASE_URL, logins will fail with "too many clients" at peak: lower DB_POOL_MAX_CLIENTS or raise max_connections.`,
+  );
+}
 
 // Server-side default statement timeout per session, applied as a connection
 // startup parameter so every query on every pooled client is bounded by the
@@ -2904,12 +2976,18 @@ export async function createCharacterCapped(
 // was released; the caller then retries the create. Race-safe: the holder row
 // is locked FOR UPDATE and the (realm, lower(name)) unique index is the real
 // guard on the subsequent insert.
-export async function reclaimDeactivatedName(name: string): Promise<boolean> {
+export async function reclaimDeactivatedName(name: string): Promise<{
+  id: number;
+  archivedName: string;
+  freedName: string;
+  level: number;
+  state: CharacterState | null;
+} | null> {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
     const holder = await client.query(
-      `SELECT c.id, c.name, c.account_id, a.deactivated_at, a.banned_at
+      `SELECT c.id, c.name, c.level, c.state, c.account_id, a.deactivated_at, a.banned_at
          FROM characters c JOIN accounts a ON a.id = c.account_id
         WHERE c.realm = $1 AND lower(c.name) = lower($2)
         FOR UPDATE OF c`,
@@ -2919,7 +2997,7 @@ export async function reclaimDeactivatedName(name: string): Promise<boolean> {
     // Free already, held by a live account, or under a moderation ban: nothing to reclaim.
     if (!row || row.deactivated_at == null || row.banned_at != null) {
       await client.query('ROLLBACK');
-      return false;
+      return null;
     }
     // Find an archival placeholder for the orphaned character that collides with
     // no other name in this realm (case-insensitive), mirroring the dedupe scheme.
@@ -2943,7 +3021,19 @@ export async function reclaimDeactivatedName(name: string): Promise<boolean> {
     // rolled back without touching the row (Phase 5 QA feed sweep).
     enqueueLinkChange({ accountId: row.account_id, kinds: ['flex'] }, Date.now());
     bustAdminGuildListReads();
-    return true;
+    // The caller must rekey the freed name's world state (market, mail, the
+    // orphan's own signed item instances) to the archived identity, exactly
+    // like a rename: a reclaim IS a rename of the orphaned holder, and the
+    // freed display name is about to belong to a stranger. freedName is the
+    // holder's STORED name: the lookup above is case-insensitive, so the
+    // requested casing can differ, and every book rekey matches exactly.
+    return {
+      id: row.id,
+      archivedName: freed,
+      freedName: row.name,
+      level: row.level,
+      state: row.state,
+    };
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
     throw err;

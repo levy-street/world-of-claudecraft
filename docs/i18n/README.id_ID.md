@@ -92,7 +92,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and choose Play Offline
 ```
 
-Beri nama karakter Anda, pilih salah satu dari sembilan class, dan Anda mulai di **Eastbrook Vale** (level 1-7), sebuah kota pasar yang dikelilingi hub: jalur serigala di utara, padang babi hutan di timur, hutan Sableweb di barat, Mirror Lake di barat laut, galian tembaga yang dipenuhi burrower di barat daya, dan kapel reruntuhan berisi mayat gelisah di timur laut, dengan kamp bandit Gorrak di tenggara. Jalan utara mendaki celah gunung menuju **Mirefen Marsh** (6-13, hub Fenbridge) dan terus naik ke **Thornpeak Heights** (13-20, hub Highwatch). Seed dunia ditetapkan di `src/main.ts`, jadi ini tempat yang sama di setiap kunjungan.
+Beri nama karakter Anda, pilih salah satu dari sembilan class, dan Anda mulai di **Eastbrook Vale** (level 1-7), sebuah kota pasar yang dikelilingi hub: jalur serigala di utara, padang babi hutan di timur, hutan Sableweb di barat, Mirror Lake di barat laut, galian tembaga yang dipenuhi burrower di barat daya, dan kapel reruntuhan berisi mayat gelisah di timur laut, dengan kamp bandit Gorrak di tenggara. Jalan utara mendaki celah gunung menuju **Mirefen Marsh** (6-13, hub Fenbridge) dan terus naik ke **Thornpeak Heights** (13-20, hub Highwatch). Seed dunia ditetapkan di `src/sim/world_seed.ts`, jadi ini tempat yang sama di setiap kunjungan.
 
 ### Aplikasi desktop untuk Windows, Linux, dan macOS
 

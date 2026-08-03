@@ -85,13 +85,27 @@ CREATE INDEX IF NOT EXISTS unstuck_reports_realm_area_local
   );
 CREATE INDEX IF NOT EXISTS unstuck_reports_created
   ON unstuck_reports(created_at ASC, id ASC);
+-- The two nullable FK columns: every player-triggerable character delete
+-- (and account delete) applies ON DELETE SET NULL, which without these
+-- seq-scans the whole telemetry table per deletion. Partial (IS NOT NULL)
+-- because the RI lookup always binds the column, and NULLed rows need no
+-- entry. Built by the boot DDL transaction (timeout 0, advisory-locked):
+-- acceptable ONLY because unstuck_reports is cooldown-gated, low-volume
+-- telemetry (one row per terminal /unstuck, 90-day retention, shipped in
+-- v0.32.0), so the first post-deploy build covers at most one release of
+-- sparse rows and finishes in seconds. Do NOT copy this pattern onto a
+-- busy table: there the build belongs in the post-commit CONCURRENTLY arm.
+CREATE INDEX IF NOT EXISTS unstuck_reports_character
+  ON unstuck_reports(character_id) WHERE character_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS unstuck_reports_account
+  ON unstuck_reports(account_id) WHERE account_id IS NOT NULL;
 `;
 
+// The ADMIN VIEW's read-window ceiling, distinct from the retention knob
+// (UNSTUCK_REPORT_RETENTION_DAYS in server/http/config.ts): rows older than
+// the configured retention are pruned; rows within retention but past this
+// cap exist without being viewable through the admin endpoints.
 export const UNSTUCK_REPORT_MAX_DAYS = 90;
-export const UNSTUCK_REPORT_RETENTION_DAYS = UNSTUCK_REPORT_MAX_DAYS;
-export const UNSTUCK_REPORT_PRUNE_BATCH_SIZE = 10_000;
-export const UNSTUCK_REPORT_PRUNE_MAX_BATCHES = 10;
-export const UNSTUCK_REPORT_PRUNE_ADVISORY_KEY = 1_918_765_031;
 export const UNSTUCK_INSERT_QUERY_TIMEOUT_MS = 1_000;
 export const UNSTUCK_REPORT_MAX_LIMIT = 200;
 export const UNSTUCK_HOTSPOT_MAX_LIMIT = 50;
@@ -413,52 +427,33 @@ export async function insertUnstuckReport(
   await pool.query(query);
 }
 
-/** Delete globally expired reports in bounded batches, with one worker across all realms. */
-export async function pruneUnstuckReports(pool: Pool): Promise<number> {
-  const client = await pool.connect();
-  let lockAcquired = false;
-  let releaseError: Error | undefined;
-  try {
-    const lock = await client.query<{ acquired: boolean }>(
-      'SELECT pg_try_advisory_lock($1::int) AS acquired',
-      [UNSTUCK_REPORT_PRUNE_ADVISORY_KEY],
-    );
-    lockAcquired = lock.rows[0]?.acquired === true;
-    if (!lockAcquired) return 0;
-
-    let total = 0;
-    for (let batch = 0; batch < UNSTUCK_REPORT_PRUNE_MAX_BATCHES; batch += 1) {
-      const res = await client.query(
-        `WITH expired AS (
-           SELECT id
-           FROM unstuck_reports
-           WHERE created_at < now() - ($1::int * INTERVAL '1 day')
-           ORDER BY created_at ASC, id ASC
-           LIMIT $2
-           FOR UPDATE SKIP LOCKED
-         )
-         DELETE FROM unstuck_reports AS r
-         USING expired
-         WHERE r.id = expired.id`,
-        [UNSTUCK_REPORT_RETENTION_DAYS, UNSTUCK_REPORT_PRUNE_BATCH_SIZE],
-      );
-      const deleted = res.rowCount ?? 0;
-      total += deleted;
-      if (deleted < UNSTUCK_REPORT_PRUNE_BATCH_SIZE) break;
-    }
-    return total;
-  } finally {
-    if (lockAcquired) {
-      try {
-        await client.query('SELECT pg_advisory_unlock($1::int)', [
-          UNSTUCK_REPORT_PRUNE_ADVISORY_KEY,
-        ]);
-      } catch (err) {
-        releaseError = err instanceof Error ? err : new Error(String(err));
-      }
-    }
-    client.release(releaseError);
-  }
+/**
+ * One bounded retention delete, the shared-sweep primitive shape
+ * (pruneChatLogsBatch contract): 0 or negative days keeps forever, a
+ * fractional value clamps to at least one day, and the caller (the daily
+ * retention sweep in server/main.ts) owns cadence, budget, and batching, so
+ * this deliberately carries no advisory lock, no internal loop, and no
+ * SKIP LOCKED: the sweep's verdict rule reads a SHORT batch as
+ * caught-up, and lock-skipping would fake a short batch whenever a
+ * concurrent character delete holds candidate rows.
+ */
+export async function pruneUnstuckReportsBatch(
+  pool: Pool,
+  retentionDays: number,
+  batchSize: number,
+): Promise<number> {
+  if (!Number.isFinite(retentionDays) || retentionDays <= 0) return 0;
+  const days = Math.max(1, Math.floor(retentionDays));
+  const res = await pool.query(
+    `DELETE FROM unstuck_reports
+      WHERE id IN (
+        SELECT id FROM unstuck_reports
+         WHERE created_at < now() - ($1::int * INTERVAL '1 day')
+         ORDER BY created_at ASC, id ASC
+         LIMIT $2)`,
+    [days, Math.max(1, Math.floor(batchSize))],
+  );
+  return res.rowCount ?? 0;
 }
 
 function reportFromRow(row: RawUnstuckReportRow): UnstuckReportRow {

@@ -530,6 +530,10 @@ describe('vale cup: online integration (GameServer)', () => {
     const matchInfo = snapsWithSelfKey(fcB, 'vcup').pop()?.self.vcup;
     expect(matchInfo?.match?.ballId).toBe(ball.entityId);
     expect(matchInfo?.match?.phase).toBe('active');
+    // the rated and practice flags ride the wire so the client briefing can
+    // flag an unrated (practice / bot-backfilled) bout up front (issue 2767)
+    expect(matchInfo?.match?.rated).toBe(true);
+    expect(matchInfo?.match?.practice).toBe(false);
     const sharedInfo = snapsWithSelfKey(fcB, 'vcupb').pop()?.self.vcupb;
     expect(sharedInfo?.live?.bracket).toBe(1);
 

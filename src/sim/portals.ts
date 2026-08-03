@@ -9,6 +9,7 @@
 // emit the flavor line in the same arcane #b9f the dungeon transitions use.
 
 import { DUNGEON_X_THRESHOLD, PORTALS } from './data';
+import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
 import type { SimContext } from './sim_context';
 import type { Entity, PortalSide } from './types';
 
@@ -21,6 +22,10 @@ function dist2dTo(p: Entity, side: PortalSide): number {
 }
 
 function teleport(ctx: SimContext, p: Entity, to: PortalSide, text: string): void {
+  // The one every-teleport session teardown (session_teardown.ts): proximity
+  // triggering makes a live cast here unlikely, but a click-entry mid-cast is
+  // reachable and the rule is scoped to every teleport, not the likely ones.
+  cancelProfessionSessionOnDisplacement(ctx, p);
   p.pos = ctx.groundPos(to.landing.x, to.landing.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);

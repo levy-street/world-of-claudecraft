@@ -8,7 +8,9 @@
 // arm, so a lit socket is always one the sim will accept and a refused drop is one
 // it would have refused anyway.
 
-import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { describe, expect, it, vi } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { EquipSlot } from '../src/sim/types';
@@ -17,6 +19,7 @@ import {
   isPaperdollDraggable,
   paperdollDropAction,
 } from '../src/ui/equip_drop_core';
+import { Hud } from '../src/ui/hud';
 import { resolveDropTargetAt } from '../src/ui/item_drop_hit_test';
 
 function equipmentOf(sim: Sim & Record<string, any>, pid: number): Record<string, string> {
@@ -154,6 +157,29 @@ describe('resolveDropTargetAt (touch release)', () => {
     expect(resolveDropTargetAt(10, 10, () => el)).toEqual({ kind: 'none' });
   });
 
+  it('resolves the action-slot arms: desktop bar seat and mobile ring seat (the UX pass)', () => {
+    // The desktop row button carries the 1-based bar slot...
+    const bar = stubEl('<button class="action-btn" data-hotbar-slot="4"><span></span></button>');
+    expect(resolveDropTargetAt(10, 10, () => bar)).toEqual({ kind: 'actionSlot', slot: 4 });
+    // ...through a child, the finger-lands-on-the-icon shape.
+    document.body.appendChild(bar);
+    const icon = bar.querySelector('span') as Element;
+    expect(resolveDropTargetAt(10, 10, () => icon)).toEqual({ kind: 'actionSlot', slot: 4 });
+    bar.remove();
+    // The mobile ring button carries its RING position; the HUD maps it to
+    // a bar slot through the live page at drop time, never here.
+    const ring = stubEl('<button class="mobile-action-slot" data-mobile-index="2"></button>');
+    expect(resolveDropTargetAt(10, 10, () => ring)).toEqual({
+      kind: 'actionRingSlot',
+      ringIndex: 2,
+    });
+    // Malformed attributes resolve to no target, the equip-arm rule.
+    const bogus = stubEl('<button class="action-btn" data-hotbar-slot="0"></button>');
+    expect(resolveDropTargetAt(10, 10, () => bogus)).toEqual({ kind: 'none' });
+    const bogusRing = stubEl('<button class="mobile-action-slot" data-mobile-index="x"></button>');
+    expect(resolveDropTargetAt(10, 10, () => bogusRing)).toEqual({ kind: 'none' });
+  });
+
   it('resolves a bag cell by its data-bag-index (the manual-order drop)', () => {
     const el = stubEl('<button class="bag-item" data-bag-index="5"></button>');
     expect(resolveDropTargetAt(10, 10, () => el)).toEqual({ kind: 'bagCell', index: 5 });
@@ -176,5 +202,123 @@ describe('resolveDropTargetAt (touch release)', () => {
     const el = stubEl('<div id="chatlog"></div>');
     expect(resolveDropTargetAt(10, 10, () => el)).toEqual({ kind: 'none' });
     expect(resolveDropTargetAt(10, 10, () => null)).toEqual({ kind: 'none' });
+  });
+});
+
+describe('touch drop routing beyond the hit-test (the phase 14 QA gaps)', () => {
+  const stripped = (rel: string): string =>
+    readFileSync(join(__dirname, rel), 'utf8').replace(/^\s*\/\/.*$/gm, '');
+
+  it('the bags release routes both action arms into the HUD deps (source pin)', () => {
+    const bags = stripped('../src/ui/bags_window.ts');
+    expect(bags).toContain(
+      "if (target.kind === 'equip') this.deps.dropOnEquipSlot(s.itemId, target.slot);",
+    );
+    expect(bags).toContain(
+      "else if (target.kind === 'actionSlot') this.deps.dropOnActionSlot(s.itemId, target.slot);",
+    );
+    expect(bags).toContain('this.deps.dropOnActionRingSlot(s.itemId, target.ringIndex);');
+  });
+
+  it('the ring wiring bounds the index against the live ring (source pin)', () => {
+    const hud = stripped('../src/ui/hud.ts');
+    const idx = hud.indexOf('dropOnActionRingSlot: (itemId, ringIndex) => {');
+    expect(idx).toBeGreaterThan(-1);
+    const body = hud.slice(idx, hud.indexOf('},', idx));
+    expect(body).toContain('if (ringIndex >= this.mobileRingSlotBtns.length) return;');
+    expect(body).toContain(
+      'this.placeHotbarItemFromTouch(itemId, this.mobileSourceSlotForButton(ringIndex));',
+    );
+  });
+
+  it('placeHotbarItemFromTouch refuses bad slots and non-hotbar items, places the rest', () => {
+    // The three behaviors on the real prototype method: the slot >= 1
+    // integer refusal, the isHotbarItemId silent cancel, and the placement
+    // with its save and stale-tooltip rule.
+    const rig = () => {
+      const replaceActions = vi.fn();
+      const h = Object.create(Hud.prototype) as unknown as {
+        actionBarController: {
+          isHotbarItemId(id: string): boolean;
+          actions: unknown[];
+          replaceActions: ReturnType<typeof vi.fn>;
+        };
+        saveSlotMap: ReturnType<typeof vi.fn>;
+        hideTooltip: ReturnType<typeof vi.fn>;
+        placeHotbarItemFromTouch(itemId: string, slot: number): void;
+      };
+      // The hotbarActions accessor pair delegates to the controller: the
+      // getter reads `actions`, the setter calls `replaceActions`.
+      h.actionBarController = {
+        isHotbarItemId: (id: string) => id === 'simple_fishing_pole',
+        actions: [null, null, null, null],
+        replaceActions,
+      };
+      h.saveSlotMap = vi.fn();
+      h.hideTooltip = vi.fn();
+      return h;
+    };
+    for (const bad of [0, -1, 1.5, Number.NaN]) {
+      const h = rig();
+      h.placeHotbarItemFromTouch('simple_fishing_pole', bad);
+      expect(h.saveSlotMap, `slot ${bad}`).not.toHaveBeenCalled();
+      expect(h.actionBarController.replaceActions).not.toHaveBeenCalled();
+    }
+    const notHotbar = rig();
+    notHotbar.placeHotbarItemFromTouch('iron_ore', 2);
+    expect(notHotbar.saveSlotMap).not.toHaveBeenCalled();
+    const ok = rig();
+    ok.placeHotbarItemFromTouch('simple_fishing_pole', 2);
+    const placed = ok.actionBarController.replaceActions.mock.calls[0]?.[0] as unknown[];
+    expect(placed?.[1]).toMatchObject({ type: 'item', id: 'simple_fishing_pole' });
+    expect(ok.saveSlotMap).toHaveBeenCalledTimes(1);
+    expect(ok.hideTooltip).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('touch drop reachability (the phase 14 QA blocker)', () => {
+  // The hit-test arms above only matter if a release can REACH a target:
+  // the full-screen bags sheet sits at z-index 95 and the action ring's
+  // layer at 60, so without the drag-scoped raise every release hit-tests
+  // the sheet and the drag-to-slot flow cannot be performed at all.
+  const read = (rel: string): string =>
+    readFileSync(join(__dirname, rel), 'utf8').replace(/^\s*\/\/.*$/gm, '');
+
+  it('the drag lifecycle stamps and removes body.touch-item-dragging', () => {
+    const drag = read('../src/ui/touch_item_drag.ts');
+    expect(drag).toContain("document.body.classList.add('touch-item-dragging');");
+    expect(drag).toContain("document.body.classList.remove('touch-item-dragging');");
+  });
+
+  it('the drag window raises the controls layer above the bags sheet', () => {
+    const css = readFileSync(join(__dirname, '../src/styles/hud.mobile.css'), 'utf8');
+    // The sheet's own literal, so a re-tiering of either side re-derives
+    // this pair rather than passing silently.
+    expect(css).toContain('z-index: 95 !important;');
+    const idx = css.indexOf('body.mobile-touch.game-active.touch-item-dragging #mobile-controls');
+    expect(idx).toBeGreaterThan(-1);
+    const rule = css.slice(idx, css.indexOf('}', idx));
+    expect(rule).toContain('z-index: 96;');
+  });
+
+  it('the raise keeps ONLY the ring pointer-active (the fix-round blocker)', () => {
+    // The raise lifts the whole controls subtree above the open windows, so
+    // without this rule the move zone silently ate equip drops in the
+    // paired layout and the menu cluster ate bag-cell drops. Everything but
+    // the ring goes pointer-events none for exactly the drag window.
+    const css = readFileSync(join(__dirname, '../src/styles/hud.mobile.css'), 'utf8');
+    // BOTH selector lines, pinned separately (the mutation check caught the
+    // single-indexOf form surviving a half-broken group): the direct
+    // children AND their descendants must be neutralized, or a nested
+    // pointer-active control keeps eating drops.
+    const child =
+      'body.mobile-touch.game-active.touch-item-dragging #mobile-controls > :not(#mobile-action-ring),';
+    const descendant =
+      'body.mobile-touch.game-active.touch-item-dragging #mobile-controls > :not(#mobile-action-ring) * {';
+    expect(css).toContain(child);
+    expect(css).toContain(descendant);
+    const idx = css.indexOf(descendant);
+    const rule = css.slice(idx, css.indexOf('}', idx));
+    expect(rule).toContain('pointer-events: none;');
   });
 });

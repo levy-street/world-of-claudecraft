@@ -7,15 +7,16 @@
 // same two things in outline: before the wipe, remember WHICH control had focus; after
 // it, focus the rebuilt equivalent, skipping any that came back disabled (#2528).
 //
-// "In outline" is the honest phrasing, because only the two callers of this module key
-// their controls off `data-focus-key`. The others carry a different identity entirely:
+// "In outline" is the honest phrasing, because only the callers of this module key
+// their controls off `data-focus-key` (professions_window migrated onto it when it
+// gained action buttons). The others carry a different identity entirely:
 // deeds_window a priority-ordered selector over four attributes, spellbook_window a
 // four-branch chain (two class-plus-dataset pairs, then two bare attribute markers),
-// claudium_window a discriminated union, professions_window a bare boolean, bank_window a
+// claudium_window a discriminated union, bank_window a
 // boolean plus a caret pair for its search box. Two more resolve the identity from a click
 // handler's argument and never read activeElement at all (options_window, char_window).
 // Migrating one of those means changing its rendered markup or its capture shape, not
-// swapping a call, which is why #2528 scoped this to the pair that already shares the
+// swapping a call, which is why #2528 scoped this to the set that already shares the
 // attribute.
 //
 // What stays with the CALLER is the interesting half: which fresh control is the
@@ -89,10 +90,11 @@ export interface FocusRestoreCandidate {
  * The identity is read off `dataset.focusKey` (`data-focus-key="..."` in markup), ONE
  * flat namespace shared by every window, which is exactly why the containment check
  * lives HERE and not in the caller: mailbox_window keys its parcel steppers
- * `<itemId>:<role>` and town_focus_window keys its allocation steppers
- * `<component>:<role>`, the same shape under the same attribute name. A window that read
- * the key without checking containment would let its own repaint pull focus out of
- * another open window.
+ * `<itemId>:<role>`, town_focus_window keys its allocation steppers
+ * `<component>:<role>`, and professions_window keys its action buttons
+ * `recharge:<professionId>` and `slot:<professionId>:<effectId>`, all the same shape
+ * under the same attribute name. A window that read the key without checking
+ * containment would let its own repaint pull focus out of another open window.
  *
  * `instanceof HTMLElement` rather than a cast: `document.activeElement` is typed
  * `Element | null`, and the `dataset` read is only sound on an HTMLElement (an

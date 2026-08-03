@@ -21,6 +21,14 @@ ACTIONABLE (must be identical across every tier; never tiered):
 - The target / boss cast bar. Interrupt timing depends on it.
 - Target HP at a usable granularity (execute thresholds, is-it-dead).
 - Enemy / aggro positions a player acts on.
+- The fishing bobber and its bite state. The reel window is a timed reaction; the bite
+  affordance must read identically on every preset (splash richness may vary, the state
+  may not).
+- The minimap gather-node markers: spotting, the per-viewer ready/cooldown state, and the
+  lock strike (the non-hue lock cue), plus the node tooltip's respawn countdown and
+  fine-grade preview lines.
+- The node prop tier ladder in the 3D world (`nodeTierScale`): tier is actionable
+  information expressed as SIZE, static on every preset.
 
 COSMETIC (may be tiered down on lower presets):
 - Floating combat text volume and lifetime (the live-floater cap and how long each number
@@ -91,6 +99,30 @@ Commits on `feature/frontend-modernization-v016`: `8aba739d` (aura debuff-priori
 `ae619faf` (party full-rate + the `nonSelfRepaintDue` swap-bypass), `82721b18` (minimap token
 cache), `119b47fa` (FCT drop-kind uniformity test), `4915b6b7` (docs).
 
+### The world map's open-sea limit (2026-08-03)
+
+Not a graphics-preset shed, but the same question asked of a MAP read, and the answer landed
+somewhere worth recording: the map now marks the swim-fatigue limit LESS than it used to, on
+purpose.
+
+The zone map used to colour water with two palettes a stark distance apart, split by the sim's
+swim-fatigue predicate (`inHollowOpenSea`): safe water light, the lethal open sea near-navy.
+That predicate is a rectangle test, so the two met at a hard straight step through open water
+and the map read as a lighter box pasted on a flat sea. The sea is now one shallow-to-deep ramp
+that the limit's nearness walks (`src/ui/map_open_sea_edge_core.ts`, consumed by
+`map_terrain.ts`), and the boundary is not drawn at all.
+
+That is defensible because the map was never the load-bearing signal. `src/sim/fatigue.ts`
+raises an on-screen error toast the moment a swimmer crosses, repeats it every 4 seconds, logs
+it, and gives 8 seconds of grace before the first damage pulse: real time to turn around,
+delivered to a player who is looking at the world rather than at the map. A rule drawn across
+open water restated that worse, for the cost of a straight line through the sea.
+
+The rule this leaves behind: check WHERE a signal actually reaches the player before treating a
+cosmetic surface as though it carried the read. `tests/map_terrain.test.ts` pins the outcome in
+both directions, including that no pixel near the limit is drawn brighter than the water inside
+it, so the boundary cannot creep back in as decoration.
+
 ## Enforcing guards
 
 - `tests/auras_painter.test.ts`: a debuff past the buff cap still renders; an all-debuff bar
@@ -100,6 +132,11 @@ cache), `119b47fa` (FCT drop-kind uniformity test), `4915b6b7` (docs).
   governor; a source-scan pins that party frames are not tiered.
 - `tests/architecture.test.ts`: `ui_tier_knobs.ts` is a registered UI_PURE_CORE (no governor,
   DOM, or render import).
+- `tests/professions_graphics_fairness.test.ts`: the professions actionable set (the fishing
+  bobber pair, the minimap markers and painter, the node tooltip, the node prop ladder) is
+  scanned profile- and governor-free with comment-stripped sources, the tier ladder is
+  literal-pinned and proven applied on the built meshes, and the cosmetic set (LOW_FOG's
+  scenery shed, splash richness) is named beside it.
 - `scripts/perf_tour.mjs` per-tier run: `hudHotDomWrites` pinned across tiers (byte-equivalence)
   and the FCT cap engaging per tier.
 - `tests/snapshots.test.ts`: a real Sim aura to `wireEntity` to `ClientWorld` round trip pins that

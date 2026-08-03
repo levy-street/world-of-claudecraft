@@ -228,4 +228,41 @@ describe('sanitizeEscrowSlot', () => {
       { itemId: 'hide', count: 2 },
     );
   });
+
+  it('runs the shared payload bound: an oversized signer drops instead of riding the book', () => {
+    // The phase 18 whole-branch review: the two escrow books were the only
+    // persisted instance loads outside item_instance_load's bound, and a
+    // book row can persist forever with no login to self-heal it.
+    const dropped: string[] = [];
+    const clean = sanitizeEscrowSlot(
+      { itemId: 'hide', count: 1, instance: { signer: 'x'.repeat(5000) } },
+      20,
+      dropped,
+    );
+    expect(clean).toEqual({ itemId: 'hide', count: 1 });
+    expect(dropped).toEqual(['hide.signer', 'hide.payload']);
+  });
+
+  it('drops a clone-mangled ARRAY instance whole (typeof [] passes the object guard)', () => {
+    const dropped: string[] = [];
+    const clean = sanitizeEscrowSlot(
+      { itemId: 'hide', count: 3, instance: [1, 2, 3] as never },
+      20,
+      dropped,
+    );
+    expect(clean).toEqual({ itemId: 'hide', count: 3 });
+    expect(dropped).toEqual(['hide.payload']);
+  });
+
+  it('a legal payload passes the bound byte-identical, so the escrow arm changes nothing legal', () => {
+    const raw = {
+      itemId: 'hide',
+      count: 1,
+      instance: { signer: 'Ayla', rolled: { quality: 'fine', stats: { agi: 2 } } },
+    };
+    const dropped: string[] = [];
+    const clean = sanitizeEscrowSlot(raw, 20, dropped);
+    expect(clean).toEqual(raw);
+    expect(dropped).toEqual([]);
+  });
 });

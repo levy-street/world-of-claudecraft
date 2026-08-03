@@ -63,6 +63,9 @@ describe('Vale Cup: bot showcase', () => {
     expect(real).toBeTruthy();
     expect(real.id).not.toBe(showcase.id);
     expect(real.rated).toBe(true);
+    // The all-human match's readout says rated (no unrated note shows).
+    expect(sim.cupInfoFor(a)!.match!.rated).toBe(true);
+    expect(sim.cupInfoFor(a)!.match!.practice).toBe(false);
     expect(real.teamA).toContain(a);
     expect(real.teamB).toContain(b);
     // The showcase bots are gone (only the two real humans remain seated).
@@ -122,6 +125,11 @@ describe('Vale Cup: bot backfill and practice', () => {
     const match = sim.vcup.match!;
     expect(match).toBeTruthy();
     expect(match.rated).toBe(false);
+    // The readout ships the flag, so the briefing overlay can tell the player
+    // the bout is unrated (no standings, no skill deeds; issue 2767). Backfill
+    // is queued play, not practice, so the copy branch reads false.
+    expect(sim.cupInfoFor(a)!.match!.rated).toBe(false);
+    expect(sim.cupInfoFor(a)!.match!.practice).toBe(false);
     expect(sim.vcup.botPids.length).toBe(3);
     expect(match.teamA[0]).toBe(a);
     // Bot names are lore-flavored and unique.
@@ -148,6 +156,10 @@ describe('Vale Cup: bot backfill and practice', () => {
     expect(match).toBeTruthy();
     expect(match.bracket).toBe(3);
     expect(match.rated).toBe(false);
+    // The private practice readout carries the unrated flag too, plus the
+    // practice flag that picks the blanket no-deeds briefing copy (issue 2767).
+    expect(sim.cupInfoFor(sim.primaryId)!.match!.rated).toBe(false);
+    expect(sim.cupInfoFor(sim.primaryId)!.match!.practice).toBe(true);
     expect(match.practice?.ownerPid).toBe(sim.primaryId);
     expect(sim.vcup.botPids.length).toBe(5);
     expect(match.teamA[0]).toBe(sim.primaryId);

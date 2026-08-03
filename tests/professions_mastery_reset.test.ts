@@ -13,10 +13,15 @@ import { DEEDS } from '../src/sim/content/deeds';
 import { MASTERY_RESET_LETTER } from '../src/sim/content/letters';
 import { CRAFT_RING, GATHERING_PROFESSION_IDS } from '../src/sim/content/professions';
 import { markDeedsDirty } from '../src/sim/deeds';
-import { applyMasteryReset, MASTERY_RESET_LETTER_ID } from '../src/sim/professions/mastery_reset';
+import {
+  applyMasteryReset,
+  MASTERY_RESET_LETTER_ID,
+  updateMasteryResetNotices,
+} from '../src/sim/professions/mastery_reset';
 import { proficiencyBandFor } from '../src/sim/professions/proficiency_bands';
 import { isSpecialized, tierCapability } from '../src/sim/professions/wheel';
-import { type CharacterState, Sim } from '../src/sim/sim';
+import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
+import type { SimContext } from '../src/sim/sim_context';
 import { samplePlayerMeta } from './parity/trace';
 
 const makeSim = (seed = 42) => new Sim({ seed, playerClass: 'warrior', noPlayer: true });
@@ -105,7 +110,7 @@ describe('applyMasteryReset (pure, in place)', () => {
 
   it('the letter id is registered in the LETTER_IDS table of world_entity_i18n.ts', () => {
     // LETTER_IDS is a module-private const, so pin it by source scan (the
-    // professions_trend.test.ts precedent for the guild trend letters).
+    // professions_trend_content.test.ts precedent for the guild trend letters).
     const src = fs.readFileSync(path.resolve(process.cwd(), 'src/ui/world_entity_i18n.ts'), 'utf8');
     const start = src.indexOf('const LETTER_IDS = [');
     expect(start, 'the LETTER_IDS declaration should exist').toBeGreaterThan(-1);
@@ -296,18 +301,57 @@ describe('one-shot: the flag serializes literal true and never re-fires', () => 
 });
 
 describe('the mail-phase notice letter', () => {
-  it('arrives exactly once, on the first tick after the reset load', () => {
+  it('arrives exactly once, on the first tick after the reset load (counter-gated)', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Notice', { state: resetSave() });
     expect(sim.mailUnreadFor(pid)).toBe(0);
+    // The phase 16 fast path: the load flip arms the live counter, the very
+    // NEXT tick drains it (a wider window would let a save-and-leave lose the
+    // one-shot forever, the phase 16 review finding), and the drained counter
+    // returns to zero so the 20 Hz sweep is a single integer read afterwards.
+    expect(sim.masteryResetNoticeCounter.pending).toBe(1);
     sim.tick();
     expect(sim.mailUnreadFor(pid)).toBe(1);
+    expect(sim.masteryResetNoticeCounter.pending).toBe(0);
     for (let i = 0; i < 40; i++) sim.tick();
     expect(sim.mailUnreadFor(pid)).toBe(1);
     moveToMailbox(sim, pid);
     const info = sim.mailInfoFor(pid);
     const notices = info?.messages.filter((m) => m.letterId === MASTERY_RESET_LETTER_ID) ?? [];
     expect(notices).toHaveLength(1);
+  });
+
+  it('THE COUNTER GATE: a pending player is not mailed while the counter reads zero', () => {
+    // The exact contract of the phase 16 fast path, which nothing else in
+    // the repo pins: with the counter at zero the sweep returns BEFORE the
+    // walk, so deleting that early return left the whole suite green even
+    // though it turns a one-integer-read-per-tick sweep back into a walk of
+    // every online player at 20 Hz. Driven through a fake ctx because the
+    // live sim never presents this state (the load branch arms the counter
+    // in the same block that arms the meta), and that is precisely why the
+    // guard has had no pin of its own.
+    const mailed: string[] = [];
+    const meta = { pendingMasteryResetNotice: true } as unknown as PlayerMeta;
+    const ctx = {
+      masteryResetNoticeCounter: { pending: 0 },
+      players: new Map([[1, meta]]),
+      mailAuthoredLetter: (_meta: PlayerMeta, letter: { letterId: string }) => {
+        mailed.push(letter.letterId);
+      },
+    } as unknown as SimContext;
+    updateMasteryResetNotices(ctx);
+    expect(mailed).toEqual([]);
+    // Still ARMED: the gate must skip the walk, never consume the one-shot.
+    expect(meta.pendingMasteryResetNotice).toBe(true);
+    // Positive control on the same fixture: with the counter armed the very
+    // same call mails exactly one letter, drains the flag, and re-zeroes the
+    // counter. Without it the pin above would pass on a sweep that never
+    // mails anything at all.
+    ctx.masteryResetNoticeCounter.pending = 1;
+    updateMasteryResetNotices(ctx);
+    expect(mailed).toEqual([MASTERY_RESET_LETTER_ID]);
+    expect(meta.pendingMasteryResetNotice).toBe(false);
+    expect(ctx.masteryResetNoticeCounter.pending).toBe(0);
   });
 
   it('a reloaded flag-true character gets no letter at all', () => {

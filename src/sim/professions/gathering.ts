@@ -9,15 +9,18 @@
 // 20 Hz tick loop (sim.ts `tick()`, next to `updateRested`), so a grant only
 // ever takes effect on the deterministic tick path, never out of band.
 
-import { bagCapacity, countFit } from '../bags';
+import { bagCapacity, bagsFullError, countFit } from '../bags';
+import { isActionLockingFormAuraKind } from '../combat/forms';
 import { GATHER_NODES } from '../content/gather_nodes';
 import {
   GATHERING_PROFESSION_IDS,
   GATHERING_PROFESSIONS,
   type GatheringProfessionId,
   HARVEST_COMPONENT_ITEMS,
+  TOOL_EFFECTS,
 } from '../content/professions';
 import { ITEMS } from '../data';
+import { forceDismount } from '../mounts';
 import type { Rng } from '../rng';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -28,6 +31,7 @@ import {
   type GatherNodeType,
   type GatherRareEventFlavor,
   INTERACT_RANGE,
+  type InvSlot,
   type ItemDef,
   isConsuming,
 } from '../types';
@@ -36,11 +40,22 @@ import {
   GATHER_RARE_EVENT_YIELD_MULT,
   rollGatherRareEvent,
 } from './gather_events';
+import { fineGradeReachable, harvestGradeItemId } from './material_grades';
 import { gatherActionXp } from './profession_xp';
 import { proficiencyBandFor } from './proficiency_bands';
-import { bestOwnedGatherToolTierOrNone, canGatherTier, NO_TOOL_OWNED } from './tools';
+import {
+  applyEffectBonus,
+  applyToolEffectUse,
+  bestOwnedGatherToolFor,
+  canGatherTier,
+  depleteEffect,
+  NO_TOOL_OWNED,
+  ratchetCeilingForUse,
+  type ToolEffectSlot,
+} from './tools';
 import type { PlayerProfessionSkill } from './types';
 import { tierProgressMultiplier } from './wheel';
+import { bestWieldableGatherToolTierOrNone, minWieldRequirementToWork } from './wield_gate';
 
 export type GatheringProficiency = Record<GatheringProfessionId, number>;
 
@@ -51,13 +66,27 @@ export type GatheringProficiency = Record<GatheringProfessionId, number>;
 // placeholder junk grants (bone_fragments/linen_scrap/spider_leg) are gone,
 // but those items themselves survive (recipes consume them, players hold
 // them): only their node source went away.
+//
+// respawnSeconds is 240 and moved there together with the node count, which
+// doubled to six per type per zone across the TUNED strip zones
+// (content/gather_nodes.ts; the v0.32.0 expansion zones ship two starter
+// nodes per type instead, their ceilings deliberately starter-kit per R37
+// until the zone-4 design pass re-tiers them). The pair
+// is one change and has to stay one within that tuned set: the per-zone
+// ceiling is nodes * 3600 / respawn,
+// so 9 nodes at 120 seconds and 18 at 240 are the same 270 harvests an hour,
+// and Mirefen and Thornpeak (12 nodes at 120, 360 an hour) come DOWN onto that
+// same figure rather than up. What the pair buys is circuit length: every zone
+// circuit used to be shorter than the respawn, so a gathering session was spent
+// standing at a node already worked. Raising respawn alone would have cut the
+// ceiling; adding nodes alone would have raised it. Neither is the goal.
 export const NODE_HARVEST_TABLE: Record<
   GatherNodeType,
   { professionId: GatheringProfessionId; respawnSeconds: number }
 > = {
-  ore: { professionId: 'mining', respawnSeconds: 120 },
-  wood: { professionId: 'logging', respawnSeconds: 120 },
-  herb: { professionId: 'herbalism', respawnSeconds: 120 },
+  ore: { professionId: 'mining', respawnSeconds: 240 },
+  wood: { professionId: 'logging', respawnSeconds: 240 },
+  herb: { professionId: 'herbalism', respawnSeconds: 240 },
 };
 
 // Every material row yields this many units per rolled rarity (one
@@ -74,10 +103,13 @@ const MATERIAL_QTY_BY_RARITY: Record<MaterialRarity, number> = Object.freeze({
 
 // Zone x node-type material matrix (Professions 2.0): which item a
 // harvest grants in which zone, and the per-rarity unit counts. The zone-1
-// (eastbrook_vale) rows grant ONLY the dedicated sellValue-4 starter materials
+// (eastbrook_vale) rows grant ONLY the dedicated starter-material FAMILIES
 // (copper_ore/ironbark_log/silverleaf_herb), never the premium vendor
-// reagents: that is the stockpiling mitigation, so farming starter nodes
-// cannot pile up mid-tier trade goods. Exported so tests can pin the table
+// reagents: that is the stockpiling mitigation, scoped to what it actually
+// buys since D8: an out-tooled gatherer harvests the sellValue-8 FINE grade
+// of these same families here, so starter-node farming yields fine starter
+// materials, still never the mid-tier vendor reagents the mitigation
+// exists to keep off this faucet. Exported so tests can pin the table
 // contents.
 export const NODE_MATERIAL_TABLE: Record<
   GatherNodeType,
@@ -142,7 +174,132 @@ export function nodeMaterialFor(
   zoneId: string,
 ): { itemId: string; qtyByRarity: Record<MaterialRarity, number> } {
   const byZone = NODE_MATERIAL_TABLE[type];
+  // Bare index on purpose, unlike rodTierRequiredForZone's Object.hasOwn:
+  // zoneId here is static GATHER_NODES content, never a map-doc-authored
+  // string, so a prototype key cannot reach this lookup.
   return byZone[zoneId] ?? byZone.eastbrook_vale;
+}
+
+/** The item id a harvest of `node` grants a player whose best matching tool is
+ *  `usableToolTier`: the zone row's material, upgraded to its fine grade when
+ *  that tool outclasses the material at a full-grade vein (D8, the rule and
+ *  its two arms live in professions/material_grades.ts). Signature kept
+ *  separate from nodeMaterialFor, whose (type, zoneId) shape is depended on by
+ *  the quest-objective and placement suites and carries no player. */
+export function harvestYieldItemIdFor(node: GatherNodeDef, usableToolTier: number): string {
+  return harvestGradeItemId(
+    nodeMaterialFor(node.type, node.zoneId).itemId,
+    node.tier,
+    usableToolTier,
+  );
+}
+
+/** The same resolution from a player's bags. One pure bag scan, no rng, so
+ *  every caller can ask BEFORE drawing: the capacity pre-gates at both ends of
+ *  the cast and the grant itself all resolve the id this way, and they must
+ *  agree or a pre-gate would clear room for an item the grant does not mint.
+ *  `effectUseConfirmed` is the R40 consent the pre-gates thread through so an
+ *  unconfirmed 'prompt' cast reserves room for the BASE grade the grant will
+ *  actually mint; readers outside a live command (the tooltip preview) keep
+ *  the default and see the effect-assisted answer. */
+export function harvestYieldItemId(
+  meta: PlayerMeta,
+  node: GatherNodeDef,
+  effectUseConfirmed = true,
+): string {
+  const professionId = NODE_HARVEST_TABLE[node.type].professionId;
+  return harvestYieldItemIdFor(
+    node,
+    effectiveGradeToolTier(meta, professionId, node, effectUseConfirmed),
+  );
+}
+
+/** The subset of PlayerMeta the grade resolution reads, spelled out so the
+ *  client-side tooltip preview can supply it too: the sim hands the full
+ *  PlayerMeta (structurally assignable), the tooltip adapts the equivalent
+ *  IWorld reads (bags, proficiency map, tool-effect slot rows). Loose string
+ *  keying on the proficiency map is deliberate: the online mirror's map is
+ *  Record<string, number>, and an absent profession coerces fail-closed to 0
+ *  inside bestWieldableGatherToolTierOrNone either way. */
+export interface GradeReadMeta {
+  inventory: readonly InvSlot[];
+  gatheringProficiency: Readonly<Record<string, number>>;
+  toolEffectSlots?: Partial<Record<GatheringProfessionId, ToolEffectSlot>>;
+}
+
+/**
+ * The slot the grant will actually RUN for a harvest of this node: a QUALITY
+ * effect is suppressed outright (no charge spent, no bonus applied) where the
+ * fine grade is categorically unreachable (the R9 zero-benefit refusal;
+ * yieldsFineGrade demands node.tier at or above the material's rung, and the
+ * v0.32.0 expansion's starter nodes sit below every rung 2+ material they
+ * grant). Quantity effects always pay and pass through. Pure reads only.
+ * The preview (`effectiveGradeToolTier`) and the grant (`resolveHarvest`)
+ * both read THIS resolution: a second copy of the suppression rule is
+ * exactly how a tooltip would come to advertise a bonus the grant refuses.
+ */
+export function usableToolEffectSlot(
+  meta: GradeReadMeta,
+  professionId: GatheringProfessionId,
+  node: GatherNodeDef,
+): ToolEffectSlot | undefined {
+  const slot = meta.toolEffectSlots?.[professionId];
+  const slotKind = slot ? TOOL_EFFECTS[slot.effectId]?.kind : undefined;
+  const materialItemId = nodeMaterialFor(node.type, node.zoneId).itemId;
+  return slotKind === 'quality' && !fineGradeReachable(materialItemId, node.tier)
+    ? undefined
+    : slot;
+}
+
+/**
+ * The tool tier the FINE-GRADE comparison should read for this player at this
+ * node: their best WIELDABLE tool (R22/R49, wield_gate.ts), plus whatever a
+ * USABLE slotted quality effect adds (`usableToolEffectSlot` above owns
+ * usability, so a suppressed slot previews no bonus either).
+ *
+ * Runs the bonus through `applyEffectBonus`, the same function the grant path
+ * uses, rather than re-deriving "+1 if a quality effect is slotted" here. That
+ * is deliberate: a second copy of a bonus rule is exactly how a tooltip once
+ * promised a second the sim's clamp never gave. One definition, three live
+ * readers (the capacity gates at both ends of the cast, through
+ * harvestYieldItemId, the grant, and the grade-preview tooltip, which adapts
+ * the IWorld reads into `GradeReadMeta` in src/ui/gathering_view.ts so the
+ * preview and the grant literally share this function).
+ *
+ * Pure and draw-free, and it never spends a charge: spending belongs to the
+ * grant alone (`resolveHarvest`), so asking what a harvest WOULD yield costs
+ * the player nothing.
+ */
+export function effectiveGradeToolTier(
+  meta: GradeReadMeta,
+  professionId: GatheringProfessionId,
+  node: GatherNodeDef,
+  // The R40 consent: a 'prompt' slot contributes its bonus only when the use
+  // is confirmed. Defaults true so out-of-command readers (the tooltip
+  // preview, an 'always' world) see the effect-assisted answer; the capacity
+  // pre-gates thread the live cast's captured value.
+  effectUseConfirmed = true,
+): number {
+  // WIELDABLE, not owned (R49, the R22 grade arm): the fine-grade comparison
+  // reads the same wield-filtered scan the access gate reads, so a traded
+  // tier-4 tool a player cannot swing mints no fine grade either. The access
+  // gate and this resolution moving together is the invariant; the ratchet
+  // and recharge surfaces deliberately stay ownership-based (R47/R30, the
+  // price family).
+  const wieldable = bestWieldableGatherToolTierOrNone(
+    meta.inventory,
+    professionId,
+    meta.gatheringProficiency[professionId],
+    ITEMS,
+  );
+  // Through applyToolEffectUse rather than applyEffectBonus directly, so the
+  // prompt-consent gate has ONE owner: the tier a pre-gate reserves for and
+  // the tier the grant runs share the same confirmed/unconfirmed answer.
+  return applyToolEffectUse(
+    usableToolEffectSlot(meta, professionId, node),
+    { quantity: 0, gradeToolTier: wieldable },
+    effectUseConfirmed,
+  ).outcome.gradeToolTier;
 }
 
 export function gatherNodeById(nodeId: string): GatherNodeDef | undefined {
@@ -213,13 +370,30 @@ function distToNode(pos: { x: number; z: number }, node: { x: number; z: number 
 
 // Per-player, per-node respawn readiness: `meta.nodeHarvestReadyAt[nodeId]` is the
 // sim.time (seconds) at or after which THAT player may harvest THAT node again.
-// Absent means never harvested (always ready). Session-only state (not
-// persisted), same as `lastActiveTick`: one player harvesting a node never
-// blocks, delays, or resets any other player's timer for the same node, so
-// there is no gather rush or node camping.
+// Absent means never harvested (always ready). Persisted across logout as
+// remaining-time deltas (D6, professions/node_persist.ts): the timers freeze
+// at the logout frame and resume on load, so a relog cannot reset them. Still
+// strictly per-player: one player harvesting a node never blocks, delays, or
+// resets any other player's timer for the same node, so there is no gather
+// rush or node camping.
 export function isNodeHarvestableBy(meta: PlayerMeta, nodeId: string, now: number): boolean {
   const readyAt = meta.nodeHarvestReadyAt[nodeId];
   return readyAt === undefined || now >= readyAt;
+}
+
+/** Remaining seconds until THIS player may harvest `nodeId` again, or null
+ *  when it is harvestable now (never harvested counts as ready). The read
+ *  half of the same timer isNodeHarvestableBy gates on, same clock domain
+ *  (sim.time seconds), so the tooltip countdown and the harvest gate can
+ *  never disagree about readiness. */
+export function nodeRespawnRemainingSec(
+  meta: PlayerMeta,
+  nodeId: string,
+  now: number,
+): number | null {
+  const readyAt = meta.nodeHarvestReadyAt[nodeId];
+  if (readyAt === undefined || now >= readyAt) return null;
+  return readyAt - now;
 }
 
 // Node-tier-relative proficiency gain (Professions 2.0): every
@@ -260,6 +434,16 @@ export interface HarvestResolution {
   signed?: boolean;
   // Non-null when draw #2 hit the zone-broadcast rare event.
   rareEvent?: GatherRareEventFlavor | null;
+  // The R42 counterfactual, carried so the command boundary can settle the
+  // charge spend against what the player ACTUALLY received. `effectApplied`
+  // is true when a usable slotted effect fired on this resolution;
+  // `baseItemId`/`baseQty` are the same-draw outcome WITHOUT the bonus (same
+  // rarity, same rare-event roll, zero extra draws). The boundary spends the
+  // charge only when the granted outcome differs from this base: the fine
+  // grade really minted, or the extra unit really landed past truncation.
+  effectApplied?: boolean;
+  baseItemId?: string;
+  baseQty?: number;
 }
 
 // Resolves one player's harvest attempt against one node: if that player's own
@@ -275,6 +459,12 @@ export function resolveHarvest(
   node: GatherNodeDef,
   now: number,
   rng: Rng,
+  // The R40 per-use consent for a 'prompt'-mode slot, threaded from the
+  // command boundary (completeGatherCast reads the cast-start capture).
+  // Defaults false, the fail-safe arm: an unconfirmed prompt use skips the
+  // effect entirely (no bonus, no charge) while the harvest proceeds; an
+  // 'always' slot ignores it (applyToolEffectUse owns the gate).
+  effectUseConfirmed = false,
 ): HarvestResolution {
   if (!isNodeHarvestableBy(meta, node.id, now)) return { granted: false };
   const entry = NODE_HARVEST_TABLE[node.type];
@@ -287,7 +477,54 @@ export function resolveHarvest(
   const rarity = rollMaterialRarity(meta.gatheringProficiency[entry.professionId], rng);
   const rareEvent = rollGatherRareEvent(rng, node.type);
   const material = nodeMaterialFor(node.type, node.zoneId);
-  const qty = material.qtyByRarity[rarity] * (rareEvent ? GATHER_RARE_EVENT_YIELD_MULT : 1);
+  // Grade resolution (D8): a pure bag scan against the node, AFTER both draws
+  // so it cannot move them, and unit counts come from the base row either way
+  // (a fine grade is a quality change, never a rate one). Read here, at the
+  // grant, rather than carried from the cast start: the tool GATE is
+  // deliberately a start-time check that completeGatherCast does not re-run,
+  // but the grade is about what the player is holding when the ore comes out,
+  // and pinning it at start would need transient cast state on Entity for a
+  // difference only a player who gained or lost a tool mid-cast could see.
+  // Losing the tool mid-cast costs the upgrade, never the harvest.
+  // The slotted tool effect (D10), applied AFTER both draws and drawing
+  // nothing itself, which is what lets it sit inside the two-draw contract
+  // above. A quantity effect raises the units; a quality effect raises only
+  // the tier the GRADE comparison reads, never the tier the access gate reads,
+  // so an effect can improve what a vein yields and can never open one.
+  // `confirmed` is the R40 per-use consent threaded from the command
+  // boundary; an 'always' slot ignores it outright, a 'prompt' slot fires
+  // only when it is true.
+  // Use-time zero-benefit gate (the R9 refusal): `usableToolEffectSlot` owns
+  // the suppression rule, shared with the preview reader
+  // (`effectiveGradeToolTier`), so the tier a tooltip previews and the tier
+  // the grant runs can never diverge. Without the gate a slotted Artisan's
+  // Eye would burn a charge per harvest on the expansion's starter nodes for
+  // a categorically impossible upgrade. Pure reads only, so the two-draw
+  // contract is untouched.
+  //
+  // THE CHARGE IS NOT SPENT HERE (R42): `applyToolEffectUse` only applies
+  // the bonus. The command boundary (completeGatherCast) settles the spend
+  // against the granted outcome, because only it can see capacity
+  // truncation; the base fields returned below are its same-draw
+  // counterfactual.
+  // WIELDABLE, not owned (R49): the grant's grade comparison must agree with
+  // the capacity pre-gates at both cast ends, which resolve through
+  // effectiveGradeToolTier's wield-filtered scan; an unwieldable tool minting
+  // a fine grade here would clear room for one item and grant another.
+  const wieldableTier = bestWieldableGatherToolTierOrNone(
+    meta.inventory,
+    entry.professionId,
+    meta.gatheringProficiency[entry.professionId],
+    ITEMS,
+  );
+  const baseQty = material.qtyByRarity[rarity] * (rareEvent ? GATHER_RARE_EVENT_YIELD_MULT : 1);
+  const effect = applyToolEffectUse(
+    usableToolEffectSlot(meta, entry.professionId, node),
+    { quantity: baseQty, gradeToolTier: wieldableTier },
+    effectUseConfirmed,
+  );
+  const itemId = harvestYieldItemIdFor(node, effect.outcome.gradeToolTier);
+  const qty = effect.outcome.quantity;
   const signed = rareEvent !== null || isSignableMaterialRarity(rarity);
   // The queued gain is node-tier-relative (gatherNodeGainMultiplier
   // above), read off the proficiency at the moment of harvest; a gray harvest
@@ -299,20 +536,23 @@ export function resolveHarvest(
   );
   return {
     granted: true,
-    itemId: material.itemId,
+    itemId,
     professionId: entry.professionId,
     rarity,
     qty,
     signed,
     rareEvent,
+    effectApplied: effect.applied,
+    baseItemId: effect.applied ? harvestYieldItemIdFor(node, wieldableTier) : itemId,
+    baseQty,
   };
 }
 
 // Gather cast timing (Professions 2.0): the harvest is a short
 // visible cast instead of an instant grant. Base duration, shortened per
-// owned tool tier ABOVE the node's tier (owning exactly the required tier
-// buys nothing: the gate already demands covering it) and modestly per
-// proficiency band, floored. Named tuning constants, recorded in state.md.
+// WIELDABLE tool tier ABOVE the node's tier (R22; holding exactly the
+// required tier buys nothing: the gate already demands covering it) and
+// modestly per proficiency band, floored. Named tuning constants, recorded in state.md.
 export const GATHER_CAST_BASE_SEC = 2.5;
 export const GATHER_CAST_FLOOR_SEC = 1.5;
 export const GATHER_CAST_TOOL_TIER_REDUCTION_SEC = 0.4;
@@ -340,15 +580,32 @@ export function gatherCastDurationSec(
 // path (dispatched from a wire command the same tick it arrives, per the
 // other immediate-interaction commands like `buyItem`), never off-tick.
 // Denies (no side effect, rng-free) if the requesting player is dead
-// (matching the vendor family's dead gate, items.ts buyItem/useItem), busy
-// (already casting or consuming), the node id is unknown, the player is too
+// (matching the vendor family's dead gate, items.ts buyItem/useItem), in
+// combat or swimming (the same pair startFishing enforces, byte-identical
+// literals so the existing client matcher rows cover both), busy (already
+// casting or consuming), the node id is unknown, the player is too
 // far away, their own timer for the node has not elapsed, they lack the tool
 // tier, or their bags are full (matching the pickupObject capacity
 // pre-check, interaction.ts); a denial never touches another player's state,
 // never consumes that player's respawn timer, and never starts a cast.
 // Returns true when the cast STARTS: starting the cast is the successful
 // interaction for the autorun-stop contract (#1982).
-export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): boolean {
+//
+// `confirmEffectUse` is the R40 per-use consent for a 'prompt'-mode tool
+// effect slot: true means the player explicitly confirmed spending a charge
+// on THIS harvest. Defaults false (fail-safe: an old bundle that never sends
+// the flag skips the effect and keeps the charge); an 'always' slot ignores
+// it entirely, so every pre-prompt caller is byte-identical.
+// Parameter order matches the `Sim.harvestNode` delegate positionally
+// (nodeId, then consent, then pid), so a caller written against either
+// signature cannot silently land a pid in the consent slot or the reverse
+// (the whole-branch review found the two disagreed, an any-cast footgun).
+export function harvestNode(
+  ctx: SimContext,
+  nodeId: string,
+  confirmEffectUse = false,
+  pid?: number,
+): boolean {
   const r = ctx.resolve(pid);
   if (!r) return false;
   const { meta, e: p } = r;
@@ -356,10 +613,30 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
     ctx.error(meta.entityId, "You can't do that while dead.");
     return false;
   }
-  // Busy gate (right after the dead gate): a running cast or a
-  // consume blocks starting a gather cast, the startFishing busy literal.
+  // In-combat and swimming denials, mirroring startFishing's order (dead,
+  // combat, swim, busy): land harvesting refuses exactly where fishing does,
+  // so the two gathering surfaces are explainable as one rule. Both are
+  // rng-free and state-free, and both literals already have matcher rows.
+  if (p.inCombat) {
+    ctx.error(meta.entityId, "You can't do that while in combat.");
+    return false;
+  }
+  if (ctx.isSwimming(p)) {
+    ctx.error(meta.entityId, "You can't do that while swimming.");
+    return false;
+  }
+  // Busy gate: a running cast or a consume blocks starting a gather cast,
+  // the startFishing busy literal.
   if (p.castingAbility || isConsuming(p)) {
     ctx.error(meta.entityId, 'You are busy.');
+    return false;
+  }
+  // Action-locked shapeshift forms refuse harvesting, the exact gate and
+  // literal castAbility applies to the normal kit (a Bruin druid cannot mine
+  // any more than it can cast). Moonkin/shadow keep the normal kit and pass;
+  // the classic rule is the sim's own action-locked set, not "any form".
+  if (p.auras.some((a) => isActionLockingFormAuraKind(a.kind))) {
+    ctx.error(meta.entityId, "You can't do that while shapeshifted.");
     return false;
   }
   const node = gatherNodeById(nodeId);
@@ -379,39 +656,81 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
   // mechanic. EVERY node harvest requires a matching-profession gatherTool of
   // at least the node's tier anywhere in bags (no equip slot); bare hands
   // never harvest, so a tier-1 node needs a tier-1 tool and requiredTier 1 on
-  // the denial means "no tool owned at all". The gate is rng-free and sits
+  // the denial means "no tool owned at all". Since R22 the tool must also
+  // WIELD: the scan filters out land tools whose proficiency requirement the
+  // player has not reached (professions/wield_gate.ts), so a traded or
+  // bought-ahead tool sits inert until earned ON THE ACCESS, GRADE, AND
+  // SPEED AXES. Stated precisely because one axis deliberately stays
+  // ownership-based: the tool-effect mint and recharge size charges from the
+  // best tool OWNED (R30's letter; the R47 ratchet and rung floor own the
+  // price side), so an unearned tool still fattens a slot's charge count.
+  // That reading is SURFACED in the review worklist's ledger for the
+  // maintainer beside R45/R47 rather than silently re-ruled here.
+  // The gate is rng-free and sits
   // before both rng draws: a denial never touches the respawn timer, never
   // draws rng, and never consumes anything.
   const professionId = NODE_HARVEST_TABLE[node.type].professionId;
   // One bag scan serves both the tool gate and the cast-duration formula
   // below (pure lookup, no rng, so hoisting it cannot shift the draw order).
-  const ownedToolTier = bestOwnedGatherToolTierOrNone(meta.inventory, professionId, ITEMS);
-  if (ownedToolTier === NO_TOOL_OWNED || !canGatherTier(ownedToolTier, node.tier)) {
+  const wieldableToolTier = bestWieldableGatherToolTierOrNone(
+    meta.inventory,
+    professionId,
+    meta.gatheringProficiency[professionId],
+    ITEMS,
+  );
+  if (wieldableToolTier === NO_TOOL_OWNED || !canGatherTier(wieldableToolTier, node.tier)) {
+    // Two shapes of the same refusal, split for the player's sake: when a
+    // covering tool IS in the bags and only the wield requirement is short,
+    // the denial names the smallest proficiency at which something they
+    // already carry would work this node (`wieldProficiency`); otherwise it
+    // is the plain no-tool/tier arm. Both are text-free events the client
+    // matcher renders.
+    const wieldReq = minWieldRequirementToWork(meta.inventory, professionId, node.tier, ITEMS);
     ctx.emit({
       type: 'gatherDenied',
       pid: meta.entityId,
       surface: 'node',
       professionId,
       requiredTier: node.tier,
+      ...(wieldReq !== null && wieldReq > 0 ? { wieldProficiency: wieldReq } : {}),
     });
     return false;
   }
   // Capacity pre-gate on the material this zone's node actually grants. The
-  // item id is known BEFORE any rng draw (zone x type lookup, no roll), so a
-  // full-bag denial here happens before the rng stream is touched and cannot
-  // shift the world's draw order.
-  const material = nodeMaterialFor(node.type, node.zoneId);
-  if (!ctx.canAddItem(material.itemId, 1, meta.entityId)) {
-    ctx.error(meta.entityId, 'Your bags are full.');
+  // item id is known BEFORE any rng draw (zone x type lookup plus the D8 grade
+  // comparison, both pure), so a full-bag denial here happens before the rng
+  // stream is touched and cannot shift the world's draw order. It resolves
+  // through the slotted quality effect (harvestYieldItemId), the SAME resolver
+  // the completion gate and the grant use, so the three sites cannot disagree
+  // about which id needs room: a raw-tool read here once passed a harvest the
+  // grant would refuse (room for plain, none for fine) and refused the mirror
+  // case. That re-walks the bags once more per cast START (a command, never
+  // per tick), the price of one resolver instead of two.
+  const yieldItemId = harvestYieldItemId(meta, node, confirmEffectUse);
+  if (!ctx.canAddItem(yieldItemId, 1, meta.entityId)) {
+    bagsFullError(ctx, meta.entityId);
     return false;
   }
   // Start the gather cast: every gate above is rng-free, so a
   // denial draws nothing and starts no cast. The draws and the grant moved
   // to completeGatherCast below, routed by the cast lifecycle on completion.
+  // Starting the cast is a deliberate action and breaks stealth (rng-free),
+  // AFTER every deny arm: a refused attempt never reveals the player.
+  ctx.breakStealth(p);
   if (p.sitting) ctx.standUp(p);
+  // Auto-dismount family (the castStart arm in combat/casting_lifecycle.ts):
+  // a gather cast is a deliberate cast, so a mounted player dismounts to
+  // gather and an in-flight summon channel is dropped, exactly as any
+  // ability cast does. Draw-free (forceDismount is field writes plus a stat
+  // recalc), so the two-draw contract is untouched.
+  if (p.mountKey !== '') forceDismount(ctx, p);
+  if (p.mountCastKey !== '') {
+    p.mountCastRemaining = 0;
+    p.mountCastKey = '';
+  }
   const duration = gatherCastDurationSec(
     node.tier,
-    ownedToolTier,
+    wieldableToolTier,
     proficiencyBandFor(meta.gatheringProficiency[professionId]),
   );
   p.castingAbility = GATHER_CAST_ID;
@@ -420,6 +739,35 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
   p.castTargetId = null;
   p.channeling = false;
   p.gatherCastNodeId = node.id;
+  // The R47 use-time capture: remember the best matching-profession tool
+  // rarity at CAST START when this profession carries a tool-effect slot, so
+  // the completion-time ratchet latches off BOTH ends of the cast. Trade has
+  // no casting gate (deliberately), so without this a mid-cast handoff could
+  // take the bonus while dodging the price rung. '' when no slot exists,
+  // which keeps the field inert for every slot-less gather cast (and every
+  // existing parity frame byte-identical). Pure bag scan, draw-free. The
+  // `?? ''` is a type-level floor only: with a slot present the scan always
+  // returns a concrete rarity (bestOwnedGatherToolFor floors at 'common'),
+  // so the no-slot branch is the one live source of ''.
+  p.gatherCastToolRarity = meta.toolEffectSlots?.[professionId]
+    ? (bestOwnedGatherToolFor(meta.inventory, professionId, ITEMS).rarity ?? '')
+    : '';
+  // The R40 consent capture, beside the rarity capture and under the same
+  // slot-present condition, so a slot-less cast (every player until one is
+  // slotted) keeps the field inert and every existing parity frame
+  // byte-identical. Read once at completion. Load-bearing coupling: the
+  // cast-start pre-gate above threads the RAW flag while this capture ANDs
+  // in slot presence; they agree only because usableToolEffectSlot derives
+  // presence from the same toolEffectSlots map, so a confirmed-but-slotless
+  // read resolves the base grade either way. If the two expressions ever
+  // diverge, the pre-gate reserves room for an id the grant does not mint.
+  p.gatherCastEffectConfirmed =
+    confirmEffectUse && meta.toolEffectSlots?.[professionId] !== undefined;
+  // Drop any GCD-held queued spell press: a session's end paths never call
+  // fireQueuedCast, so a slot that survived into the session would fire
+  // unprompted one tick after it ends (updateCasting's retry arm).
+  p.queuedCastAbility = null;
+  p.queuedCastAim = null;
   ctx.emit({
     type: 'castStart',
     entityId: p.id,
@@ -480,7 +828,13 @@ export function useGatherToolItem(
     ctx.emit({ type: 'gatherToolNoNode', pid: meta.entityId, professionId });
     return false;
   }
-  return harvestNode(ctx, best.id, pid);
+  // Deliberately consent-blind (R40): this is the raw item-use command's
+  // path (the RL env, bots, an old bundle), whose wire shape carries no
+  // confirm flag and whose callers have no dialog to answer, so the default
+  // false is the fail-safe arm: a 'prompt' slot never fires here and never
+  // spends. The three client dispatch sites resolve the node locally and
+  // send harvest_node with the consent instead.
+  return harvestNode(ctx, best.id, false, pid);
 }
 
 // Completion of a running gather cast, reached through the
@@ -495,6 +849,16 @@ export function useGatherToolItem(
 export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   const nodeId = p.gatherCastNodeId;
   p.gatherCastNodeId = '';
+  // The R47 cast-start rarity capture (harvestNode): read and reset beside
+  // the node id, so the field is inert again whatever arm returns below.
+  const startToolRarity = p.gatherCastToolRarity;
+  p.gatherCastToolRarity = '';
+  // The R40 consent capture, read-and-reset the same way: the whole
+  // completion (both capacity reads and the grant) resolves under ONE
+  // consent value, so the room this gate checks is room for the id the
+  // grant actually mints, confirmed or not.
+  const effectUseConfirmed = p.gatherCastEffectConfirmed;
+  p.gatherCastEffectConfirmed = false;
   const node = gatherNodeById(nodeId);
   // Defensive: the id was validated at cast start and content is static.
   if (!node) return;
@@ -506,12 +870,14 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
     ctx.error(meta.entityId, 'This resource node has not respawned for you yet.');
     return;
   }
-  const material = nodeMaterialFor(node.type, node.zoneId);
-  if (!ctx.canAddItem(material.itemId, 1, meta.entityId)) {
-    ctx.error(meta.entityId, 'Your bags are full.');
+  // Same grade resolution resolveHarvest is about to make, one line later and
+  // with no inventory mutation in between, so the room this gate checks is
+  // room for the id the grant actually mints.
+  if (!ctx.canAddItem(harvestYieldItemId(meta, node, effectUseConfirmed), 1, meta.entityId)) {
+    bagsFullError(ctx, meta.entityId);
     return;
   }
-  const result = resolveHarvest(meta, node, ctx.time, ctx.rng);
+  const result = resolveHarvest(meta, node, ctx.time, ctx.rng, effectUseConfirmed);
   if (!result.granted) {
     // Unreachable in practice (the readiness check above already gates this),
     // but kept as a defensive fallback so a future resolveHarvest change
@@ -580,6 +946,52 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
   } else {
     grantedQty = grantFungibleFit();
   }
+  // The R42 charge settle, AFTER the grant so truncation is visible: the
+  // charge is spent only when the bonus actually changed what the player
+  // received. The two kinds reduce to one predicate over the counterfactual
+  // the resolution carried: a quality effect mattered iff the granted id
+  // differs from the no-bonus id (draw-free grade compare), a quantity
+  // effect mattered iff the granted count exceeds the no-bonus count (the
+  // same-draw base; a grant clipped to or below it gave the player nothing
+  // the base would not have). Draws nothing, so the two-draw contract holds;
+  // the slot object is the same live reference the resolution applied, read
+  // through the SAME suppression rule so a suppressed slot never spends.
+  //
+  // The R47 use-time ratchet settles here too, on EVERY applied use (mattered
+  // or not): taking the bonus alongside a better owned tool is what latches
+  // the slot's price ceiling. It reads BOTH ends of the cast, the completion
+  // bags and the cast-start capture (harvestNode), because trade has no
+  // casting gate: a mid-cast handoff could otherwise fire the bonus with the
+  // good pick already gone and dodge the latch (the completion-only read
+  // once claimed "node access forces the tool to be CARRIED", which is true
+  // only at cast start). So a slot minted cheap with the good pick stashed
+  // re-prices itself on its first bonus-bearing harvest, handoff or not.
+  // Raise-only and idempotent, so the pair is exactly max(start, completion).
+  // One extra bag scan on the effect-bearing path only, draw-free.
+  let effectDepleted = false;
+  if (result.effectApplied) {
+    const usedSlot = usableToolEffectSlot(meta, professionId, node);
+    if (usedSlot) {
+      ratchetCeilingForUse(
+        usedSlot,
+        bestOwnedGatherToolFor(meta.inventory, professionId, ITEMS).rarity,
+      );
+      if (startToolRarity !== '') ratchetCeilingForUse(usedSlot, startToolRarity);
+    }
+    const mattered = itemId !== result.baseItemId || grantedQty > (result.baseQty ?? qty);
+    // The last-charge signal (the UX pass): a spend that empties the slot is
+    // the one worth announcing, so the return depleteEffect always had is
+    // finally read instead of discarded. Rides the gatherResult emit below
+    // as an additive optional field.
+    if (mattered) {
+      const spent = depleteEffect(usedSlot);
+      // `spent` already implies usedSlot is defined (depleteEffect returns
+      // false for undefined); the extra term is TypeScript narrowing only.
+      // Do not "simplify" by dropping `spent`: the durability read alone
+      // would announce a depletion the settle never performed.
+      effectDepleted = spent && usedSlot !== undefined && usedSlot.durability <= 0;
+    }
+  }
   ctx.onNodeGatheredForQuests(node, itemId, meta);
   // Zone gather mark: one entry per zone and node type ever harvested.
   ctx.markVisited(meta, `gather:${node.zoneId}:${node.type}`);
@@ -607,6 +1019,9 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
     rarity,
     qty: grantedQty,
     rareEvent: rareEvent ?? null,
+    // Present only when THIS spend emptied the slot (absent otherwise, so
+    // every non-final harvest's event stays byte-identical to the old wire).
+    ...(effectDepleted ? { effectDepleted: true as const } : {}),
   });
 }
 
@@ -629,7 +1044,11 @@ export function isGatheringProfessionId(id: string): id is GatheringProfessionId
 // value above the profession's enforced content cap (GATHERING_PROFESSIONS
 // maxSkill) clamps DOWN to it; the sim.ts call site feeds this both the
 // current gatheringProficiency key and the legacy pre-rename `professions`
-// key, so the clamp covers both save shapes.
+// key, so the clamp covers both save shapes. CAP-RAISE CAVEAT: this clamp
+// makes a cap raise rollback-destructive (an old binary clamps raised values
+// on load and persists the loss on its first save); whoever raises a cap
+// must ship the mechanical fix with it. See the shared "rollback erases
+// newer fields" note in docs/design/professions-tuning-packet.md.
 export function normalizeGatheringProficiency(
   saved: Partial<Record<string, number>> | undefined | null,
 ): GatheringProficiency {
@@ -659,6 +1078,23 @@ export function queueGatheringGrant(
   meta.pendingGatherGrants.push({ professionId, amount });
 }
 
+// One clamp rule for applying a queued grant to a proficiency record, shared
+// by the tick drain and the save-time fold below so the two can never disagree
+// about the cap. The GATHERING_PROFESSIONS lookup is deliberately unguarded:
+// every queue writer is typed (or validates via isGatheringProfessionId, the
+// /dev gather path). Note the fold puts this lookup on the SAVE path, so an
+// out-of-table id would fail the save (a retried leave flush), not just the
+// tick that drained it.
+function applyGrantClamped(record: GatheringProficiency, grant: PendingGatherGrant): void {
+  record[grant.professionId] = Math.max(
+    0,
+    Math.min(
+      GATHERING_PROFESSIONS[grant.professionId].maxSkill,
+      record[grant.professionId] + grant.amount,
+    ),
+  );
+}
+
 // Drains one player's queued grants, applying each additively to that
 // profession's own counter only. Called once per player per tick (sim.ts
 // `tick()`), so a grant issued this tick is visible starting next tick, the
@@ -669,15 +1105,24 @@ export function queueGatheringGrant(
 export function drainGatheringGrants(meta: PlayerMeta): void {
   if (meta.pendingGatherGrants.length === 0) return;
   for (const grant of meta.pendingGatherGrants) {
-    meta.gatheringProficiency[grant.professionId] = Math.max(
-      0,
-      Math.min(
-        GATHERING_PROFESSIONS[grant.professionId].maxSkill,
-        meta.gatheringProficiency[grant.professionId] + grant.amount,
-      ),
-    );
+    applyGrantClamped(meta.gatheringProficiency, grant);
   }
   meta.pendingGatherGrants.length = 0;
+}
+
+// The proficiency record a SAVE should carry: the live counters with any
+// still-queued grants folded in, under the same clamp the tick drain applies.
+// A leave-time save can run between the tick that queued a grant (a completed
+// harvest, a reel-landed catch) and the tick that drains it; without this fold
+// that save would silently lose the grant. Pure: the live meta is untouched,
+// so the queue still drains ONLY on the deterministic tick path, and the
+// folded snapshot equals what the drain will produce one tick later.
+export function foldPendingGatherGrants(
+  meta: Pick<PlayerMeta, 'gatheringProficiency' | 'pendingGatherGrants'>,
+): GatheringProficiency {
+  const out = { ...meta.gatheringProficiency };
+  for (const grant of meta.pendingGatherGrants) applyGrantClamped(out, grant);
+  return out;
 }
 
 // Projects the internal per-profession counter onto the settled

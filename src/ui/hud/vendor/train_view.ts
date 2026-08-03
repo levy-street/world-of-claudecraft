@@ -15,10 +15,13 @@
 // unmet. Locked rows are ALWAYS produced (the visible ladder: the player
 // must see what a master will eventually teach), never dropped.
 
-import { STATION_TYPE_BY_CRAFT } from '../../../sim/content/professions';
 import { ALL_RECIPES } from '../../../sim/content/recipes';
 import type { StationType } from '../../../sim/professions/stations';
-import { teachTierMet, trainingFeeFor } from '../../../sim/professions/training';
+import {
+  teachTierMet,
+  trainingFeeFor,
+  trainingStationTypeFor,
+} from '../../../sim/professions/training';
 import type { ProfessionRecipeRecord } from '../../../sim/professions/types';
 import { TIER_SKILL_STEP, tierForSkill } from '../../../sim/professions/wheel';
 import type { ItemDef, StationDef } from '../../../sim/types';
@@ -114,25 +117,25 @@ function rowState(
 
 /**
  * Build the training view for one station master: the master resolves to a
- * station (STATIONS masterNpcId), the station type to its crafts
- * (STATION_TYPE_BY_CRAFT), and every recipe of those crafts becomes a row.
- * Rows sort by craft, then skillReq, then id (a stable ladder).
+ * station (STATIONS masterNpcId), and every recipe whose teaching home is
+ * that station's type becomes a row. The home is the sim's own
+ * trainingStationTypeFor (the recipe's stationType, else its craft's
+ * station), the same resolution resolveTrain's range arm applies, so a
+ * recipe this list shows is exactly one this master teaches: the tool-effect
+ * charms (enchanting home, toolworks binding) list at the toolworks because
+ * that is where resolveTrain teaches them. Rows sort by craft, then
+ * skillReq, then id (a stable ladder).
  */
 export function buildTrainView(masterNpcId: string, deps: TrainViewDeps): TrainView {
   const station = deps.stations.find((entry) => entry.masterNpcId === masterNpcId);
   if (!station) return { stationType: null, rows: [] };
-  const crafts = new Set(
-    Object.keys(STATION_TYPE_BY_CRAFT).filter(
-      (craftId) => STATION_TYPE_BY_CRAFT[craftId] === station.type,
-    ),
-  );
   const known = new Set(deps.knownRecipes);
   // Confirmed-but-unmirrored learns read Known immediately: knownness wins
   // over any stale pending flag for the same id (resolve() cleared it anyway).
   if (deps.confirmedRecipes) for (const id of deps.confirmedRecipes) known.add(id);
   const rows: TrainRow[] = [];
   for (const recipe of ALL_RECIPES) {
-    if (!crafts.has(recipe.professionId)) continue;
+    if (trainingStationTypeFor(recipe) !== station.type) continue;
     const state = rowState(recipe, known, deps.craftSkills);
     if (state === null) continue;
     const feeCopper = trainingFeeFor(recipe);

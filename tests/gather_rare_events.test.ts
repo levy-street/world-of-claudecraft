@@ -17,6 +17,7 @@ import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import type { GatherNodeType, GatherRareEventFlavor, SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import { placeAtHarvestSpot } from './helpers/harvest_spot';
 
 const FLAVOR_BY_TYPE: Record<GatherNodeType, GatherRareEventFlavor> = {
   ore: 'pristine_vein',
@@ -112,11 +113,18 @@ describe('gather rare events: cadence knob + flavor mapping', () => {
 describe('resolveHarvest two-draw order pin', () => {
   const node = mustNode('ore_eastbrook_1');
 
+  // The tier-1 pick is load-bearing, not decoration: resolveHarvest resolves
+  // the material GRADE off the bags (D8), so an inventory-less fixture no
+  // longer models a real harvester. A tier-1 tool at this tier-1 eastbrook
+  // vein is the plain-grade case, which is what these draw-order pins are
+  // about; the fine-grade arm has its own coverage in
+  // tests/material_grades.test.ts.
   function freshMeta(): PlayerMeta {
     return {
       gatheringProficiency: { mining: 0, logging: 0, herbalism: 0 },
       nodeHarvestReadyAt: {},
       pendingGatherGrants: [],
+      inventory: [{ itemId: 'copper_mining_pick', count: 1 }],
     } as unknown as PlayerMeta;
   }
 
@@ -271,10 +279,7 @@ describe('rare events through Sim.harvestNode (all three flavors)', () => {
     const node = mustNode(nodeId);
     const p = sim.entities.get(pid);
     if (!p) throw new Error('missing player entity');
-    p.pos.x = node.pos.x;
-    p.pos.z = node.pos.z;
-    p.pos.y = terrainHeight(node.pos.x, node.pos.z, sim.cfg.seed);
-    p.prevPos = { ...p.pos };
+    placeAtHarvestSpot(sim, pid, nodeId);
     const meta = sim.players.get(pid);
     if (!meta) throw new Error('missing player meta');
     for (let i = 0; i < 2000; i++) {
@@ -285,7 +290,7 @@ describe('rare events through Sim.harvestNode (all three flavors)', () => {
       meta.inventory.length = 0;
       meta.inventory.push({ itemId: TOOL_BY_TYPE[node.type], count: 1 });
       delete meta.nodeHarvestReadyAt[nodeId];
-      expect(sim.harvestNode(nodeId, pid)).toBe(true);
+      expect(sim.harvestNode(nodeId, undefined, pid)).toBe(true);
       completeCastNow(sim, pid);
       const events = sim.drainEvents();
       const rare = events.find((e) => e.type === 'gatherRareEvent');
@@ -396,10 +401,7 @@ describe('rarity-floor signing through Sim.harvestNode', () => {
     const node = mustNode(nodeId);
     const p = sim.entities.get(pid);
     if (!p) throw new Error('missing player entity');
-    p.pos.x = node.pos.x;
-    p.pos.z = node.pos.z;
-    p.pos.y = terrainHeight(node.pos.x, node.pos.z, sim.cfg.seed);
-    p.prevPos = { ...p.pos };
+    placeAtHarvestSpot(sim, pid, nodeId);
     const meta = sim.players.get(pid);
     if (!meta) throw new Error('missing player meta');
     // Max proficiency: zero common weight, so rare-or-better shows up fast.
@@ -408,7 +410,7 @@ describe('rarity-floor signing through Sim.harvestNode', () => {
       meta.inventory.length = 0;
       meta.inventory.push({ itemId: TOOL_BY_TYPE.ore, count: 1 }); // the #2343 tool gate
       delete meta.nodeHarvestReadyAt[nodeId];
-      expect(sim.harvestNode(nodeId, pid)).toBe(true);
+      expect(sim.harvestNode(nodeId, undefined, pid)).toBe(true);
       completeCastNow(sim, pid);
       const gather = sim.drainEvents().find((e) => e.type === 'gatherResult');
       if (gather?.type !== 'gatherResult') throw new Error('expected gatherResult');
@@ -467,10 +469,7 @@ describe('grant truncation at the command boundary (full bags)', () => {
     const node = mustNode(nodeId);
     const p = sim.entities.get(pid);
     if (!p) throw new Error('missing player entity');
-    p.pos.x = node.pos.x;
-    p.pos.z = node.pos.z;
-    p.pos.y = terrainHeight(node.pos.x, node.pos.z, sim.cfg.seed);
-    p.prevPos = { ...p.pos };
+    placeAtHarvestSpot(sim, pid, nodeId);
     const meta = sim.players.get(pid);
     if (!meta) throw new Error('missing player meta');
     return { sim, pid, nodeId, meta };
@@ -488,7 +487,7 @@ describe('grant truncation at the command boundary (full bags)', () => {
       for (let f = 0; f < capacity - 2; f++)
         meta.inventory.push({ itemId: 'bone_fragments', count: 1 });
       delete meta.nodeHarvestReadyAt[nodeId];
-      expect(sim.harvestNode(nodeId, pid)).toBe(true);
+      expect(sim.harvestNode(nodeId, undefined, pid)).toBe(true);
       completeCastNow(sim, pid);
       const events = sim.drainEvents();
       const gather = events.find((e) => e.type === 'gatherResult');
@@ -532,7 +531,7 @@ describe('grant truncation at the command boundary (full bags)', () => {
         meta.inventory.push({ itemId: 'bone_fragments', count: 1 });
       meta.inventory.push({ itemId: 'copper_ore', count: 15 });
       delete meta.nodeHarvestReadyAt[nodeId];
-      if (!sim.harvestNode(nodeId, pid)) continue;
+      if (!sim.harvestNode(nodeId, undefined, pid)) continue;
       completeCastNow(sim, pid);
       const events = sim.drainEvents();
       const gather = events.find((e) => e.type === 'gatherResult');
@@ -582,7 +581,7 @@ describe('grant truncation at the command boundary (full bags)', () => {
       meta.inventory.push({ itemId: 'copper_ore', count: 15 });
       meta.inventory.push({ itemId: 'copper_ore', count: 5, instance: { signer: 'Packrat' } });
       delete meta.nodeHarvestReadyAt[nodeId];
-      if (!sim.harvestNode(nodeId, pid)) continue;
+      if (!sim.harvestNode(nodeId, undefined, pid)) continue;
       completeCastNow(sim, pid);
       const events = sim.drainEvents();
       const gather = events.find((e) => e.type === 'gatherResult');
@@ -621,7 +620,7 @@ describe('grant truncation at the command boundary (full bags)', () => {
         meta.inventory.push({ itemId: 'bone_fragments', count: 1 });
       meta.inventory.push({ itemId: 'copper_ore', count: 19 });
       delete meta.nodeHarvestReadyAt[nodeId];
-      if (!sim.harvestNode(nodeId, pid)) continue;
+      if (!sim.harvestNode(nodeId, undefined, pid)) continue;
       completeCastNow(sim, pid);
       const events = sim.drainEvents();
       const gather = events.find((e) => e.type === 'gatherResult');
