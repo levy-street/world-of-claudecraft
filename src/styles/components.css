@@ -7483,13 +7483,13 @@
      .rank tint above). Shares the .rank chip metrics inside the ellipsized
      .soc-name cell, before the deed title. Tinted with the PANEL-AWARE text
      tokens (theme.ts runs both through ensureReadable per preset), never the
-     raw accent or a static green: New pops as body text, Veteran sits muted,
-     and both read apart from the accent-gold rank chips on every preset. The
-     tiers stay distinguishable by their text alone (forced-colors safe).
-     The compound .rank.soc-tenure-* selector out-specifies the .soc-name
-     .rank tint by design (never a source-order tie): reordering the file
-     cannot regress the chip back to rank gold. */
-  .soc-name .rank.soc-tenure-new {
+     raw accent or a static green: Recruit pops as body text, Veteran sits
+     muted, and both read apart from the accent-gold rank chips on every
+     preset. The tiers stay distinguishable by their text alone
+     (forced-colors safe). The compound .rank.soc-tenure-* selector
+     out-specifies the .soc-name .rank tint by design (never a source-order
+     tie): reordering the file cannot regress the chip back to rank gold. */
+  .soc-name .rank.soc-tenure-recruit {
     color: var(--color-text-light);
   }
   .soc-name .rank.soc-tenure-veteran {

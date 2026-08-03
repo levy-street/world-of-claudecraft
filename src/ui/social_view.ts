@@ -186,19 +186,19 @@ export function guildView(social: SocialInfo | null, myName: string): GuildView 
   };
 }
 
-/** Membership under 14 days marks a member "new". */
-export const TENURE_NEW_MS = 14 * 24 * 60 * 60 * 1000;
-/** Membership of 90 days or more marks a member "veteran". */
-export const TENURE_VETERAN_MS = 90 * 24 * 60 * 60 * 1000;
+/** Membership under 7 days marks a member a "recruit". */
+export const TENURE_RECRUIT_MS = 7 * 24 * 60 * 60 * 1000;
+/** Membership of 30 days or more marks a member "veteran". */
+export const TENURE_VETERAN_MS = 30 * 24 * 60 * 60 * 1000;
 
-export type TenureTier = 'new' | 'veteran';
+export type TenureTier = 'recruit' | 'veteran';
 
 /**
  * Guild-roster tenure tier from the member's joinedAt (epoch ms) and the
- * caller's clock: under 14 days is 'new', 90 days or more is 'veteran', in
+ * caller's clock: under 7 days is 'recruit', 30 days or more is 'veteran', in
  * between (and unknown joinedAt) is no tier (guildDisplayedRole renders the
  * plain member role then). A joinedAt in the future (clock skew) lands in the
- * 'new' arm by construction. Returns a keyed tier, never display text: the
+ * 'recruit' arm by construction. Returns a keyed tier, never display text: the
  * painter localizes. Cosmetic-only by design: the tier is derived from the
  * viewer's own clock and only styles the viewer's roster, so it must never
  * gate a permission or any gameplay outcome; if tenure ever becomes
@@ -207,20 +207,20 @@ export type TenureTier = 'new' | 'veteran';
 export function tenureTier(joinedAt: number | null, now: number): TenureTier | null {
   if (joinedAt === null) return null;
   const tenureMs = now - joinedAt;
-  if (tenureMs < TENURE_NEW_MS) return 'new';
+  if (tenureMs < TENURE_RECRUIT_MS) return 'recruit';
   if (tenureMs >= TENURE_VETERAN_MS) return 'veteran';
   return null;
 }
 
 /** The one keyed role label a guild-roster row displays: a rank for officers
  *  and the leader, a tenure-derived role for everyone else. */
-export type GuildDisplayedRole = 'leader' | 'officer' | 'member' | 'new' | 'veteran';
+export type GuildDisplayedRole = 'leader' | 'officer' | 'member' | 'recruit' | 'veteran';
 
 /**
  * Resolve the ONE role chip a guild-roster row shows (one chip per row, by
  * design): officers and the leader display their rank label exactly as
  * before and never a tenure label; a regular member displays the tenure tier
- * AS the role ('new' under 14 days, 'veteran' at 90 days or more) and the
+ * AS the role ('recruit' under 7 days, 'veteran' at 30 days or more) and the
  * plain 'member' role in between or when joinedAt is unknown (a null tier).
  * DISPLAY-ONLY: the underlying rank, every permission computation, and the
  * roster sort are untouched; this only picks the chip's keyed label, which

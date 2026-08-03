@@ -6747,7 +6747,7 @@ export const tr_TR: EnTranslations = {
         "member": "Üye"
       },
       "tenure": {
-        "new": "New",
+        "recruit": "Recruit",
         "veteran": "Veteran"
       },
       "guildHeadOne": "{rank} rütbesindesin, {count} üye",

@@ -6747,7 +6747,7 @@ export const ko_KR: EnTranslations = {
         "member": "회원"
       },
       "tenure": {
-        "new": "신입",
+        "recruit": "신병",
         "veteran": "베테랑"
       },
       "guildHeadOne": "당신은 {rank}, {count}명 회원",

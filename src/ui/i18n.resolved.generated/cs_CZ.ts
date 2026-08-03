@@ -6747,7 +6747,7 @@ export const cs_CZ: EnTranslations = {
         "member": "Člen"
       },
       "tenure": {
-        "new": "New",
+        "recruit": "Recruit",
         "veteran": "Veteran"
       },
       "guildHeadOne": "jsi {rank}, {count} člen",

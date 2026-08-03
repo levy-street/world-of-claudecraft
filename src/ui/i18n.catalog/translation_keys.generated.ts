@@ -5929,7 +5929,7 @@ export type TranslationKeyFlat =
   | 'hud.social.status.online'
   | 'hud.social.statusWithZone'
   | 'hud.social.stopIgnoringTitle'
-  | 'hud.social.tenure.new'
+  | 'hud.social.tenure.recruit'
   | 'hud.social.tenure.veteran'
   | 'hud.social.title'
   | 'hud.social.transferConfirm'

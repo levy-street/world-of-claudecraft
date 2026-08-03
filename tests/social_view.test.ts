@@ -12,7 +12,7 @@ import {
   type SocialTab,
   socialDot,
   socialStructSig,
-  TENURE_NEW_MS,
+  TENURE_RECRUIT_MS,
   TENURE_VETERAN_MS,
   tenureTier,
 } from '../src/ui/social_view';
@@ -258,31 +258,31 @@ describe('tenureTier', () => {
   const DAY = 24 * 60 * 60 * 1000;
   const NOW = Date.UTC(2026, 7, 1); // any fixed clock; the helper is pure
 
-  it('pins the locked thresholds: 14 days new, 90 days veteran', () => {
-    expect(TENURE_NEW_MS).toBe(14 * DAY);
-    expect(TENURE_VETERAN_MS).toBe(90 * DAY);
+  it('pins the locked thresholds: 7 days recruit, 30 days veteran', () => {
+    expect(TENURE_RECRUIT_MS).toBe(7 * DAY);
+    expect(TENURE_VETERAN_MS).toBe(30 * DAY);
   });
 
-  it('marks a member new strictly under 14 days (13d23h boundary)', () => {
-    expect(tenureTier(NOW - (13 * DAY + 23 * 60 * 60 * 1000), NOW)).toBe('new');
+  it('marks a member a recruit strictly under 7 days (6d23h boundary)', () => {
+    expect(tenureTier(NOW - (6 * DAY + 23 * 60 * 60 * 1000), NOW)).toBe('recruit');
   });
 
-  it('drops the new badge at exactly 14 days', () => {
-    expect(tenureTier(NOW - 14 * DAY, NOW)).toBeNull();
+  it('drops the recruit role at exactly 7 days', () => {
+    expect(tenureTier(NOW - 7 * DAY, NOW)).toBeNull();
   });
 
-  it('shows no badge through 89 days', () => {
-    expect(tenureTier(NOW - 89 * DAY, NOW)).toBeNull();
+  it('shows the plain tier through 29 days', () => {
+    expect(tenureTier(NOW - 29 * DAY, NOW)).toBeNull();
   });
 
-  it('marks a member veteran at exactly 90 days and beyond', () => {
-    expect(tenureTier(NOW - 90 * DAY, NOW)).toBe('veteran');
+  it('marks a member veteran at exactly 30 days and beyond', () => {
+    expect(tenureTier(NOW - 30 * DAY, NOW)).toBe('veteran');
     expect(tenureTier(NOW - 400 * DAY, NOW)).toBe('veteran');
   });
 
-  it('treats a just-joined and a future (clock-skewed) joinedAt as new', () => {
-    expect(tenureTier(NOW, NOW)).toBe('new');
-    expect(tenureTier(NOW + DAY, NOW)).toBe('new');
+  it('treats a just-joined and a future (clock-skewed) joinedAt as a recruit', () => {
+    expect(tenureTier(NOW, NOW)).toBe('recruit');
+    expect(tenureTier(NOW + DAY, NOW)).toBe('recruit');
   });
 
   it('shows no badge when joinedAt is unknown', () => {
@@ -297,10 +297,10 @@ describe('guildDisplayedRole (the one role chip per roster row)', () => {
     guildDisplayedRole(rank, tenureTier(joinedAgoMs === null ? null : NOW - joinedAgoMs, NOW));
 
   it('a member shows the tenure tier AS the role across the locked boundaries', () => {
-    expect(roleAt('member', 13 * DAY + 23 * 60 * 60 * 1000)).toBe('new'); // 13d23h
-    expect(roleAt('member', 14 * DAY)).toBe('member'); // exactly 14d drops New
-    expect(roleAt('member', 89 * DAY)).toBe('member');
-    expect(roleAt('member', 90 * DAY)).toBe('veteran'); // exactly 90d gains Veteran
+    expect(roleAt('member', 6 * DAY + 23 * 60 * 60 * 1000)).toBe('recruit'); // 6d23h
+    expect(roleAt('member', 7 * DAY)).toBe('member'); // exactly 7d drops Recruit
+    expect(roleAt('member', 29 * DAY)).toBe('member');
+    expect(roleAt('member', 30 * DAY)).toBe('veteran'); // exactly 30d gains Veteran
   });
 
   it('a member with an unknown joinedAt shows the plain member role', () => {
@@ -315,13 +315,13 @@ describe('guildDisplayedRole (the one role chip per roster row)', () => {
       expect(roleAt(rank, 3 * DAY)).toBe(rank);
       expect(roleAt(rank, 400 * DAY)).toBe(rank);
       expect(roleAt(rank, null)).toBe(rank);
-      expect(guildDisplayedRole(rank, 'new')).toBe(rank);
+      expect(guildDisplayedRole(rank, 'recruit')).toBe(rank);
       expect(guildDisplayedRole(rank, 'veteran')).toBe(rank);
     }
   });
 
   it('an unrecognized rank falls back to the member arm (rankLabel parity)', () => {
-    expect(guildDisplayedRole('somefuturerank', 'new')).toBe('new');
+    expect(guildDisplayedRole('somefuturerank', 'recruit')).toBe('recruit');
     expect(guildDisplayedRole('somefuturerank', null)).toBe('member');
   });
 });

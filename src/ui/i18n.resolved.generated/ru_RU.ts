@@ -6747,7 +6747,7 @@ export const ru_RU: EnTranslations = {
         "member": "Участник"
       },
       "tenure": {
-        "new": "Новичок",
+        "recruit": "Новобранец",
         "veteran": "Ветеран"
       },
       "guildHeadOne": "вы {rank}, {count} участник",

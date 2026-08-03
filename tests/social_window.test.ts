@@ -201,7 +201,7 @@ describe('social_window: Book of Deeds title spans (both roster surfaces)', () =
 });
 
 describe('social_window: guild displayed-role chip (source pins)', () => {
-  // The role decision (rank passthrough + 14/90-day tenure thresholds) is
+  // The role decision (rank passthrough + 7/30-day tenure thresholds) is
   // pure and unit-tested in social_view.test.ts; the behavioral render cases
   // live in the next describe. These pins hold the contracts a rendered
   // string cannot prove: the role comes from the pure core with ONE hoisted
@@ -224,13 +224,13 @@ describe('social_window: guild displayed-role chip (source pins)', () => {
 
   it('escapes the localized chip text and classes the tier variants only', () => {
     expect(painter).toContain(
-      "const roleClass = role === 'new' || role === 'veteran' ? ` soc-tenure-${role}` : '';",
+      "const roleClass = role === 'recruit' || role === 'veteran' ? ` soc-tenure-${role}` : '';",
     );
     expect(painter).toContain('<span class="rank${roleClass}">${esc(roleLabel(role))}</span>');
   });
 
   it('localizes every role label through t() keys (tiers + ranks via rankLabel)', () => {
-    expect(painter).toContain("t('hud.social.tenure.new')");
+    expect(painter).toContain("t('hud.social.tenure.recruit')");
     expect(painter).toContain("t('hud.social.tenure.veteran')");
     expect(painter).toContain("t('hud.social.ranks.member')");
     expect(painter).toContain('return rankLabel(role);');
@@ -240,7 +240,7 @@ describe('social_window: guild displayed-role chip (source pins)', () => {
     // The compound .rank.soc-tenure-* selector is load-bearing: it must
     // OUT-SPECIFY the .soc-name .rank gold tint rather than tie with it on
     // source order, so a stylesheet reorder cannot regress the chips.
-    expect(componentsCss).toContain('.soc-name .rank.soc-tenure-new');
+    expect(componentsCss).toContain('.soc-name .rank.soc-tenure-recruit');
     expect(componentsCss).toContain('.soc-name .rank.soc-tenure-veteran');
     // The chips must ride the theme's ensureReadable text tokens, never the
     // raw accent (invisible next to the gold rank chip on dark presets) or a
@@ -252,13 +252,13 @@ describe('social_window: guild displayed-role chip (source pins)', () => {
       expect(start).toBeGreaterThan(-1);
       return componentsCss.slice(start, componentsCss.indexOf('}', start));
     };
-    const newRule = rule('.soc-name .rank.soc-tenure-new');
-    expect(newRule).toContain('var(--color-text-light)');
-    expect(newRule).not.toContain('var(--color-text-muted)');
+    const recruitRule = rule('.soc-name .rank.soc-tenure-recruit');
+    expect(recruitRule).toContain('var(--color-text-light)');
+    expect(recruitRule).not.toContain('var(--color-text-muted)');
     const veteranRule = rule('.soc-name .rank.soc-tenure-veteran');
     expect(veteranRule).toContain('var(--color-text-muted)');
     expect(veteranRule).not.toContain('var(--color-text-light)');
-    for (const section of [newRule, veteranRule]) {
+    for (const section of [recruitRule, veteranRule]) {
       expect(section).not.toContain('var(--color-primary)');
       expect(section).not.toContain('var(--color-friendly)');
     }
@@ -269,7 +269,7 @@ describe('social_window: guild displayed-role chip (rendered rows)', () => {
   const DAY = 24 * 60 * 60 * 1000;
   // Deliberately YEARS away from the real clock: an implementation that
   // ignored the `now` parameter and read Date.now() inside the row builder
-  // would flip the new (3d) and member (40d) cases below to veteran.
+  // would flip the recruit (3d) and member (15d) cases below to veteran.
   const NOW = Date.UTC(2021, 0, 1);
   const row = (over: Partial<GuildRow> = {}): GuildRow => ({
     name: 'Gorak',
@@ -298,9 +298,9 @@ describe('social_window: guild displayed-role chip (rendered rows)', () => {
   const chips = (html: string): string[] =>
     html.match(/<span class="rank[^"]*">[^<]*<\/span>/g) ?? [];
 
-  it('renders ONE chip, the New tier as the role, for a 3-day member', () => {
+  it('renders ONE chip, the Recruit tier as the role, for a 3-day member', () => {
     const html = guildMemberRowHtml(row({ joinedAt: NOW - 3 * DAY }), NOW);
-    expect(chips(html)).toEqual(['<span class="rank soc-tenure-new">New</span>']);
+    expect(chips(html)).toEqual(['<span class="rank soc-tenure-recruit">Recruit</span>']);
     expect(html).not.toContain('>Member<');
   });
 
@@ -310,8 +310,8 @@ describe('social_window: guild displayed-role chip (rendered rows)', () => {
     expect(html).not.toContain('>Member<');
   });
 
-  it('renders the plain Member rank chip for a 40-day member (no tenure class)', () => {
-    const html = guildMemberRowHtml(row({ joinedAt: NOW - 40 * DAY }), NOW);
+  it('renders the plain Member rank chip for a 15-day member (no tenure class)', () => {
+    const html = guildMemberRowHtml(row({ joinedAt: NOW - 15 * DAY }), NOW);
     expect(chips(html)).toEqual(['<span class="rank">Member</span>']);
     expect(html).not.toContain('soc-tenure');
   });

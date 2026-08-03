@@ -6747,7 +6747,7 @@ export const nl_NL: EnTranslations = {
         "member": "Lid"
       },
       "tenure": {
-        "new": "New",
+        "recruit": "Recruit",
         "veteran": "Veteran"
       },
       "guildHeadOne": "je bent {rank}, {count} lid",

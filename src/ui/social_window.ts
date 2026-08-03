@@ -128,7 +128,7 @@ function rankLabel(rank: string): string {
 // (guildDisplayedRole): the two tenure tiers get their tier labels, every
 // rank role maps through rankLabel, so the core stays i18n-free.
 function roleLabel(role: GuildDisplayedRole): string {
-  if (role === 'new') return t('hud.social.tenure.new');
+  if (role === 'recruit') return t('hud.social.tenure.recruit');
   if (role === 'veteran') return t('hud.social.tenure.veteran');
   return rankLabel(role);
 }
@@ -152,7 +152,7 @@ export function guildMemberRowHtml(m: GuildRow, now: number): string {
   const memberTitleSpan = memberTitle ? `<span class="soc-title">${esc(memberTitle)}</span>` : '';
   // The ONE role chip per row: officers and the leader show their rank label
   // (never a tenure label); a regular member shows the tenure tier AS the
-  // role (New under 14 days, Veteran at 90+, Member in between or with an
+  // role (Recruit under 7 days, Veteran at 30+, Member in between or with an
   // unknown joinedAt). Always-visible chip text (never hover-only), before
   // the deed title; display-only (rank, permissions, and sort untouched).
   // The client clock is fine here (ui code, not sim). Known cosmetic quirk,
@@ -161,7 +161,7 @@ export function guildMemberRowHtml(m: GuildRow, now: number): string {
   // label until the next social frame or reopen (a wall-clock driver would
   // break the cold-window "no repeating driver" contract).
   const role = guildDisplayedRole(m.rank, tenureTier(m.joinedAt, now));
-  const roleClass = role === 'new' || role === 'veteran' ? ` soc-tenure-${role}` : '';
+  const roleClass = role === 'recruit' || role === 'veteran' ? ` soc-tenure-${role}` : '';
   const nameInner = `${esc(m.name)}<span class="rank${roleClass}">${esc(roleLabel(role))}</span>${memberTitleSpan}`;
   const name =
     m.online && !m.self

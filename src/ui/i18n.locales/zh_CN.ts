@@ -2032,7 +2032,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.social.ranks.leader': '会长',
   'hud.social.ranks.officer': '官员',
   'hud.social.ranks.member': '成员',
-  'hud.social.tenure.new': '新人',
+  'hud.social.tenure.recruit': '新兵',
   'hud.social.tenure.veteran': '老兵',
   'hud.social.guildHeadOne': '你是{rank}，{count}名成员',
   'hud.social.guildHeadMany': '你是{rank}，{count}名成员',

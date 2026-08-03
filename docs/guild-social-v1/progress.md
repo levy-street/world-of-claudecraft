@@ -233,3 +233,10 @@ Revision: one-chip roster role (2026-08-02, user-approved design revision):
 - Screenshots: after-roster-desktop.png and after-roster-mobile.png recaptured against
   THIS worktree's dev server (port re-verified after the :5173 collision trap from the
   Phase 2 QA notes); before-shots and the login-line shots untouched.
+
+Revision (2026-08-02, user-directed, quick pass): tenure tier 'new' renamed 'recruit'
+(label Recruit, class soc-tenure-recruit, key hud.social.tenure.recruit with refreshed
+non-Latin fills) and thresholds moved to 7/30 days (was 14/90). View core, window, CSS,
+catalog, locales, and both test suites updated; tsc + social_view/social_window/
+i18n_completeness/architecture green. Roster after-screenshots still show the old 'New'
+label on the youngest member; recapture owed if the maintainer wants pixel-current shots.
