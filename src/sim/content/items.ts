@@ -1544,6 +1544,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'quest',
     sellValue: 0,
     questId: 'q_deepfen_purge',
+    use: { type: 'throw' },
   },
   // Name/label entry for the burnable murloc-hut world objects (q_deepfen_purge).
   murloc_hut: {

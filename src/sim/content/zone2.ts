@@ -1049,7 +1049,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     turnInNpcId: 'brother_aldric_fen',
     text: 'The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, $N, and the rest will scatter back into the mire.',
     completionText:
-      'You give the dead more mercy than their masters ever did. Take this — you have more than earned it.',
+      'You give the dead more mercy than their masters ever did. Take this, you have more than earned it.',
     objectives: [
       {
         type: 'kill',

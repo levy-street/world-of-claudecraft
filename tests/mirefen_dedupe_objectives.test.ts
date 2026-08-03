@@ -7,8 +7,10 @@ import {
   FIREBOTTLE_COOLDOWN_SECS,
   firebottleBurnCheck,
   HUT_BURN_RANGE,
+  throwFirebottleAtNearestHut,
 } from '../src/sim/interactions/firebottle_hut';
 import type { PlayerMeta } from '../src/sim/sim';
+import type { SimContext } from '../src/sim/sim_context';
 import type { Entity, QuestProgress } from '../src/sim/types';
 
 // Mirefen duplicate-objective rework: each duplicate quest keeps its id (no DB
@@ -165,6 +167,52 @@ describe('Mirefen quest de-duplication', () => {
       expect(firebottleBurnCheck({ ...base, hutBurningUntil: 101 })).toMatchObject({
         reason: 'alreadyBurning',
       });
+    });
+  });
+
+  describe('using the firebottle torches the nearest hut (throwFirebottleAtNearestHut)', () => {
+    const makeCtx = (hut: Entity | null, time = 100) => {
+      const events: { type: string }[] = [];
+      const entities = new Map<number, Entity>();
+      if (hut) entities.set(hut.id, hut);
+      const ctx = {
+        time,
+        entities,
+        emit: (e: { type: string }) => events.push(e),
+        error: (_pid: number, text: string) => events.push({ type: 'error', text } as never),
+        countItem: () => 1,
+        checkQuestReady: () => {},
+      } as unknown as SimContext;
+      return { ctx, events };
+    };
+    const onQuestMeta = (): PlayerMeta =>
+      ({
+        entityId: 1,
+        counters: { questProgress: 0 },
+        questLog: new Map([
+          ['q_deepfen_purge', { questId: 'q_deepfen_purge', counts: [0], state: 'active' }],
+        ]),
+      }) as unknown as PlayerMeta;
+    const player = { id: 1, pos: { x: 1, z: 0 } } as unknown as Entity;
+
+    it('burns a nearby hut, credits the objective, and sets the 5s cooldown', () => {
+      const hut = { id: 5, pos: { x: 0, z: 0 }, objectItemId: 'murloc_hut' } as unknown as Entity;
+      const { ctx, events } = makeCtx(hut, 100);
+      const meta = onQuestMeta();
+      throwFirebottleAtNearestHut(ctx, player, meta);
+      expect((hut.burnBurstUntil ?? 0) > 100).toBe(true);
+      expect(meta.firebottleReadyAt).toBe(100 + FIREBOTTLE_COOLDOWN_SECS);
+      expect(meta.questLog.get('q_deepfen_purge')?.counts[0]).toBe(1);
+      expect(events.some((e) => e.type === 'worldObjectBurning')).toBe(true);
+      expect(events.some((e) => e.type === 'questProgress')).toBe(true);
+    });
+
+    it('errors and burns nothing when no hut is within range', () => {
+      const hut = { id: 5, pos: { x: 99, z: 99 }, objectItemId: 'murloc_hut' } as unknown as Entity;
+      const { ctx, events } = makeCtx(hut, 100);
+      throwFirebottleAtNearestHut(ctx, player, onQuestMeta());
+      expect(hut.burnBurstUntil).toBeUndefined();
+      expect(events.some((e) => e.type === 'error')).toBe(true);
     });
   });
 });
