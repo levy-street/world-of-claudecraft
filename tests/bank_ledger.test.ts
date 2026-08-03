@@ -361,7 +361,14 @@ describe('diffGuildBankOp (pure)', () => {
     expect(
       diffGuildBankOp('deposit', ginfo(0, []), ginfo(0, [{ itemId: 'wolf_fang', count: 3 }])),
     ).toEqual([
-      { itemId: 'wolf_fang', count: 3, instance: null, copperDelta: 0, purchasedSlotsAfter: 0 },
+      {
+        itemId: 'wolf_fang',
+        count: 3,
+        instance: null,
+        craftedRecipeId: null,
+        copperDelta: 0,
+        purchasedSlotsAfter: 0,
+      },
     ]);
     expect(
       diffGuildBankOp(
@@ -370,7 +377,36 @@ describe('diffGuildBankOp (pure)', () => {
         ginfo(0, [{ itemId: 'wolf_fang', count: 1 }]),
       ),
     ).toEqual([
-      { itemId: 'wolf_fang', count: 2, instance: null, copperDelta: 0, purchasedSlotsAfter: 0 },
+      {
+        itemId: 'wolf_fang',
+        count: 2,
+        instance: null,
+        craftedRecipeId: null,
+        copperDelta: 0,
+        purchasedSlotsAfter: 0,
+      },
+    ]);
+  });
+
+  it('item deltas carry the moved slot craft provenance for the revert path', () => {
+    // craftedRecipeId is NOT a ledger column (insertBankLedgerRow picks its
+    // columns explicitly); it rides the delta so Sim.revertGuildBankDeltas can
+    // restore a reverted withdraw byte-identically.
+    expect(
+      diffGuildBankOp(
+        'withdraw',
+        ginfo(0, [{ itemId: 'iron_sword', count: 1, craftedRecipeId: 'smith_iron_sword' }]),
+        ginfo(0, []),
+      ),
+    ).toEqual([
+      {
+        itemId: 'iron_sword',
+        count: 1,
+        instance: null,
+        craftedRecipeId: 'smith_iron_sword',
+        copperDelta: 0,
+        purchasedSlotsAfter: 0,
+      },
     ]);
   });
 

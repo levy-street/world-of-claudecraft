@@ -1444,3 +1444,161 @@ describe('chargeGuildCreationFeeFor (create-then-charge, the sim half)', () => {
     expect(sim.drainEvents().filter((e) => e.type === 'error' || e.type === 'log')).toEqual([]);
   });
 });
+
+describe('refundGuildCreationFeeFor (the reserve-at-gate refusal arm)', () => {
+  it('returns exactly the reserved fee to the purse', () => {
+    const sim = freshSim();
+    meta(sim).copper = 150_000;
+    const charged = sim.chargeGuildCreationFeeFor(sim.playerId);
+    expect(charged).toBe(100_000);
+    expect(meta(sim).copper).toBe(50_000);
+    expect(sim.refundGuildCreationFeeFor(sim.playerId, charged)).toBe(100_000);
+    expect(meta(sim).copper).toBe(150_000);
+  });
+
+  it('refuses malformed amounts and clamps at the integer-safe purse bound', () => {
+    const sim = freshSim();
+    meta(sim).copper = 500;
+    expect(sim.refundGuildCreationFeeFor(sim.playerId, 0)).toBe(0);
+    expect(sim.refundGuildCreationFeeFor(sim.playerId, -5)).toBe(0);
+    expect(sim.refundGuildCreationFeeFor(sim.playerId, 1.5)).toBe(0);
+    expect(sim.refundGuildCreationFeeFor(sim.playerId, Number.NaN)).toBe(0);
+    expect(meta(sim).copper).toBe(500);
+    meta(sim).copper = Number.MAX_SAFE_INTEGER - 10;
+    expect(sim.refundGuildCreationFeeFor(sim.playerId, 100)).toBe(10);
+    expect(meta(sim).copper).toBe(Number.MAX_SAFE_INTEGER);
+  });
+
+  it('an unresolvable pid refunds nothing, and refunding draws no rng and emits nothing', () => {
+    const sim = freshSim();
+    expect(sim.refundGuildCreationFeeFor(999999, 100)).toBe(0);
+    meta(sim).copper = 100;
+    sim.drainEvents();
+    let draws = 0;
+    sim.rng.setObserver(() => {
+      draws++;
+    });
+    sim.refundGuildCreationFeeFor(sim.playerId, 50);
+    sim.rng.setObserver(null);
+    expect(draws).toBe(0);
+    expect(sim.drainEvents().filter((e) => e.type === 'error' || e.type === 'log')).toEqual([]);
+  });
+});
+
+describe('revertGuildBankDeltas (the unflushable-session surgical undo)', () => {
+  const gold = (op: 'deposit_gold' | 'withdraw_gold', copperDelta: number) => ({
+    op,
+    itemId: null,
+    count: null,
+    instance: null,
+    copperDelta,
+  });
+
+  it('undoes gold deltas in both directions, leaving other unflushed value intact', () => {
+    const sim = makeOfficerSim({ treasury: 50_000 });
+    // The live book carries the dead session's +20_000 deposit AND another
+    // officer's +5_000 (which must survive the revert).
+    book(sim).treasury = 75_000;
+    sim.revertGuildBankDeltas(GUILD_ID, [gold('deposit_gold', 20_000)]);
+    expect(book(sim).treasury).toBe(55_000);
+    // A reverted withdrawal puts the copper back.
+    sim.revertGuildBankDeltas(GUILD_ID, [gold('withdraw_gold', -5_000)]);
+    expect(book(sim).treasury).toBe(60_000);
+  });
+
+  it('clamps rather than tearing when the value was already consumed (the residue)', () => {
+    const sim = makeOfficerSim({ treasury: 1_000 });
+    // The dead session deposited 20_000, but another officer already withdrew
+    // it: the inverse clamps at zero instead of going negative.
+    sim.revertGuildBankDeltas(GUILD_ID, [gold('deposit_gold', 20_000)]);
+    expect(book(sim).treasury).toBe(0);
+  });
+
+  it('undoes an item deposit by removing the matching copies, and a withdraw by restoring them', () => {
+    const sim = makeOfficerSim();
+    book(sim).inventory.push({ itemId: 'wolf_fang', count: 5 });
+    sim.revertGuildBankDeltas(GUILD_ID, [
+      { op: 'deposit', itemId: 'wolf_fang', count: 3, instance: null, copperDelta: 0 },
+    ]);
+    expect(book(sim).inventory).toEqual([{ itemId: 'wolf_fang', count: 2 }]);
+    // Reverting a withdraw restores the copy WITH its craft provenance.
+    sim.revertGuildBankDeltas(GUILD_ID, [
+      {
+        op: 'withdraw',
+        itemId: 'iron_sword',
+        count: 1,
+        instance: null,
+        craftedRecipeId: 'smith_iron_sword',
+        copperDelta: 0,
+      },
+    ]);
+    expect(book(sim).inventory).toContainEqual({
+      itemId: 'iron_sword',
+      count: 1,
+      craftedRecipeId: 'smith_iron_sword',
+    });
+    // A missing copy no-ops (already withdrawn by another officer): nothing
+    // else is disturbed and nothing goes negative.
+    const before = JSON.stringify(book(sim));
+    sim.revertGuildBankDeltas(GUILD_ID, [
+      { op: 'deposit', itemId: 'never_deposited', count: 2, instance: null, copperDelta: 0 },
+    ]);
+    expect(JSON.stringify(book(sim))).toBe(before);
+  });
+
+  it('matches instanced copies by payload, never collapsing distinct instances', () => {
+    const sim = makeOfficerSim();
+    const armed = { charges: { arcane: 3 } };
+    const other = { charges: { arcane: 1 } };
+    book(sim).inventory.push(
+      { itemId: 'mana_prism', count: 1, instance: structuredClone(armed) },
+      { itemId: 'mana_prism', count: 1, instance: structuredClone(other) },
+    );
+    sim.revertGuildBankDeltas(GUILD_ID, [
+      {
+        op: 'deposit',
+        itemId: 'mana_prism',
+        count: 1,
+        instance: structuredClone(armed),
+        copperDelta: 0,
+      },
+    ]);
+    // Only the matching payload was removed; the other copy survives.
+    expect(book(sim).inventory).toEqual([{ itemId: 'mana_prism', count: 1, instance: other }]);
+  });
+
+  it('undoes buy_slots (slots down one expansion, price back) and clamps at zero', () => {
+    const sim = makeOfficerSim({ treasury: 10_000, purchasedSlots: 6 });
+    sim.revertGuildBankDeltas(GUILD_ID, [
+      { op: 'buy_slots', itemId: null, count: null, instance: null, copperDelta: -50_000 },
+    ]);
+    expect(book(sim).purchasedSlots).toBe(0);
+    expect(book(sim).treasury).toBe(60_000);
+    // Reverting against an already-zero ladder clamps, never negative.
+    sim.revertGuildBankDeltas(GUILD_ID, [
+      { op: 'buy_slots', itemId: null, count: null, instance: null, copperDelta: -50_000 },
+    ]);
+    expect(book(sim).purchasedSlots).toBe(0);
+  });
+
+  it('reverts newest-first over a mixed batch, draws no rng, and no-ops on an absent book', () => {
+    const sim = makeOfficerSim({ treasury: 10_000 });
+    sim.addItem('wolf_fang', 2);
+    const idx = meta(sim).inventory.findIndex((s) => s.itemId === 'wolf_fang');
+    sim.guildBankDepositFor(sim.playerId, idx, 2);
+    let draws = 0;
+    sim.rng.setObserver(() => {
+      draws++;
+    });
+    sim.revertGuildBankDeltas(GUILD_ID, [
+      { op: 'deposit', itemId: 'wolf_fang', count: 2, instance: null, copperDelta: 0 },
+    ]);
+    sim.rng.setObserver(null);
+    expect(draws).toBe(0);
+    expect(book(sim).inventory).toEqual([]);
+    // Absent book: nothing to revert, nothing throws, nothing created.
+    sim.evictGuildBank(GUILD_ID);
+    expect(() => sim.revertGuildBankDeltas(GUILD_ID, [gold('deposit_gold', 1_000)])).not.toThrow();
+    expect(sim.guildBanks.has(GUILD_ID)).toBe(false);
+  });
+});

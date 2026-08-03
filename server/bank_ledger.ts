@@ -26,6 +26,11 @@ export interface BankOpDelta {
   itemId: string | null;
   count: number | null;
   instance: unknown;
+  // The moved slot's craft provenance, carried so the guild revert path
+  // (Sim.revertGuildBankDeltas, Guild Bank Phase 3 QA) can restore a reverted
+  // withdraw byte-identically. Not persisted to bank_ledger (insertBankLedgerRow
+  // picks its columns explicitly); absent on personal rows and copper-only rows.
+  craftedRecipeId?: string | null;
   copperDelta: number;
   purchasedSlotsAfter: number;
 }
@@ -232,7 +237,9 @@ export function diffGuildBankOp(
     ];
   }
 
-  // Item ops: the personal-bank multiset diff over the book's slots.
+  // Item ops: the personal-bank multiset diff over the book's slots. Guild
+  // deltas additionally carry craftedRecipeId (not a ledger column) so the
+  // revert path can restore a reverted withdraw byte-identically.
   const beforeCounts = countByKey(before.slots);
   const afterCounts = countByKey(after.slots);
   const keys = new Set<string>([...beforeCounts.keys(), ...afterCounts.keys()]);
@@ -247,6 +254,7 @@ export function diffGuildBankOp(
         itemId: slot.itemId,
         count: delta,
         instance: slot.instance ?? null,
+        craftedRecipeId: slot.craftedRecipeId ?? null,
         copperDelta: 0,
         purchasedSlotsAfter: after.purchasedSlots,
       });
@@ -256,6 +264,7 @@ export function diffGuildBankOp(
         itemId: slot.itemId,
         count: -delta,
         instance: slot.instance ?? null,
+        craftedRecipeId: slot.craftedRecipeId ?? null,
         copperDelta: 0,
         purchasedSlotsAfter: after.purchasedSlots,
       });

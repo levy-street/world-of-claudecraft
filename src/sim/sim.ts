@@ -9461,10 +9461,24 @@ export class Sim {
     return guildBankMod.guildBankHoldings(this.ctx, guildId);
   }
 
-  // Create-then-charge (state.md): the server calls this only AFTER the guild
-  // row committed. Returns the copper actually charged (clamped to the purse).
+  // Reserve-at-gate (state.md, revised by Phase 3 QA): the server charges this
+  // synchronously at the guild_create dispatch gate, before any DB work, and
+  // refunds on every refusal arm. Returns the copper actually charged.
   chargeGuildCreationFeeFor(pid: number): number {
     return guildBankMod.chargeGuildCreationFee(this.ctx, pid);
+  }
+
+  // The refusal arm of the reserve-at-gate flow: return a reserved creation
+  // fee to the purse. Returns the copper actually refunded.
+  refundGuildCreationFeeFor(pid: number, amount: number): number {
+    return guildBankMod.refundGuildCreationFee(this.ctx, pid, amount);
+  }
+
+  // Surgically undo a dead session's unflushed guild bank ops on the live book
+  // (the fence-out arm where another session's legitimate unflushed ops make
+  // an evict-and-reload destructive). See guild_bank.ts revertGuildBankDeltas.
+  revertGuildBankDeltas(guildId: number, deltas: readonly guildBankMod.GuildBankOpDelta[]): void {
+    guildBankMod.revertGuildBankDeltas(this.ctx, guildId, deltas);
   }
 
   // The five op bodies + the gated info read, as pid-first SERVER entry points

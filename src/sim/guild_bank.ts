@@ -206,13 +206,15 @@ export function guildBankHoldings(
 }
 
 /** Deduct the guild creation fee from the acting player's purse, returning the
- *  copper actually charged. Called by the server AFTER the guild row commits
- *  (create-then-charge, state.md: a crash between the two yields a free guild,
- *  never lost gold). The server refuses a poor founder BEFORE any DB work, so
- *  a shortfall here means copper was spent mid-flight: the charge clamps to
- *  the purse (never negative) rather than refusing a guild that already
- *  exists. Deliberately emits NO player line (the "You found the guild" arm
- *  is the celebration; the purse delta rides the normal self snapshot). */
+ *  copper actually charged. RESERVE-AT-GATE (Phase 3 QA, revising the original
+ *  create-then-charge decision): the server charges this SYNCHRONOUSLY at the
+ *  guild_create dispatch gate, BEFORE any DB work, and refunds it on every
+ *  refusal arm (refundGuildCreationFee below). Charging after the commit left
+ *  a deterministic exploit: a client could pipeline guild_create with a spend
+ *  (or log out) so the deferred clamped charge collected residue or nothing.
+ *  The gate refuses a poor founder first, so the clamp here is defensive
+ *  only. Deliberately emits NO player line (the "You found the guild" arm is
+ *  the celebration; the purse delta rides the normal self snapshot). */
 export function chargeGuildCreationFee(ctx: SimContext, pid: number): number {
   const r = resolveActor(ctx, pid);
   if (!r) return 0;
@@ -220,6 +222,121 @@ export function chargeGuildCreationFee(ctx: SimContext, pid: number): number {
   if (charged <= 0) return 0;
   r.meta.copper -= charged;
   return charged;
+}
+
+/** Return a reserved guild creation fee to the acting player's purse (the
+ *  refusal arm of the reserve-at-gate flow above: name invalid or taken,
+ *  already in a guild, or the create's DB transaction failed). Clamped so the
+ *  purse can never exceed the integer-safe bound; returns the copper actually
+ *  refunded. Silent like the charge; refunding an unresolvable pid refunds
+ *  nothing (the server logs that arm loudly for operator compensation). */
+export function refundGuildCreationFee(ctx: SimContext, pid: number, amount: number): number {
+  const r = resolveActor(ctx, pid);
+  if (!r) return 0;
+  if (!Number.isSafeInteger(amount) || amount <= 0) return 0;
+  const refunded = Math.min(amount, Number.MAX_SAFE_INTEGER - r.meta.copper);
+  if (refunded <= 0) return 0;
+  r.meta.copper += refunded;
+  return refunded;
+}
+
+/** One successful guild bank op's effect on the BOOK, as the server's dispatch
+ *  observer recorded it (server/bank_ledger.ts diffGuildBankOp): the shape
+ *  revertGuildBankDeltas below needs to surgically undo a session's unflushed
+ *  ops when that session can never persist them (its escrow save fenced out or
+ *  exhausted its leave retries while ANOTHER session still holds legitimate
+ *  unflushed ops on the same shared book, so an evict-and-reload from durable
+ *  truth would destroy those). */
+export interface GuildBankOpDelta {
+  op: 'deposit_gold' | 'withdraw_gold' | 'deposit' | 'withdraw' | 'buy_slots';
+  itemId: string | null;
+  count: number | null;
+  instance: InvSlot['instance'] | null;
+  craftedRecipeId?: string | null;
+  copperDelta: number;
+}
+
+function clampTreasury(v: number): number {
+  return Math.max(0, Math.min(GUILD_BANK_TREASURY_CAP, v));
+}
+
+/** True when the two instance payloads are the same copy for revert purposes.
+ *  Both sides descend from the same cloneInvSlot lineage, so key order is
+ *  stable and JSON equality is exact; identical payloads are fungible for
+ *  conservation, which is all a revert needs. */
+function sameInstance(
+  a: InvSlot['instance'] | null | undefined,
+  b: InvSlot['instance'] | null | undefined,
+): boolean {
+  if (!a && !b) return true;
+  if (!a || !b) return false;
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
+/** Surgically UNDO a dead session's unflushed ops on a live book, newest
+ *  first, leaving every OTHER session's unflushed ops intact. Called by the
+ *  server only on the arm where a fenced-out (or leave-exhausted) session's
+ *  book mutations can never ride their own escrow save AND another live
+ *  session still holds legitimate unflushed ops (so the evict-and-reload arm
+ *  would destroy value). Inverses clamp rather than throw: if another officer
+ *  already consumed the un-durable value (withdrew the copper or the copy),
+ *  the inverse no-ops on the missing part; that residue is the documented
+ *  accepted risk in docs/guild-bank/state.md. Never touches player state:
+ *  the dead session's character half already rolled back by definition. */
+export function revertGuildBankDeltas(
+  ctx: SimContext,
+  guildId: number,
+  deltas: readonly GuildBankOpDelta[],
+): void {
+  const book = ctx.guildBanks.get(guildId);
+  if (!book) return;
+  for (let i = deltas.length - 1; i >= 0; i--) {
+    const d = deltas[i];
+    if (d.op === 'deposit_gold' || d.op === 'withdraw_gold') {
+      book.treasury = clampTreasury(book.treasury - d.copperDelta);
+      continue;
+    }
+    if (d.op === 'buy_slots') {
+      book.purchasedSlots = Math.max(0, book.purchasedSlots - GUILD_BANK_EXPANSION_SLOTS);
+      book.treasury = clampTreasury(book.treasury - d.copperDelta);
+      continue;
+    }
+    if (typeof d.itemId !== 'string' || d.itemId === '') continue;
+    const count = Math.max(0, Math.floor(Number(d.count)) || 0);
+    if (count === 0) continue;
+    if (d.op === 'deposit') {
+      // Undo a deposit: remove up to `count` matching copies from the book
+      // (newest slots first). A missing copy no-ops (another officer already
+      // withdrew it: the accepted residue).
+      let remaining = count;
+      for (let s = book.inventory.length - 1; s >= 0 && remaining > 0; s--) {
+        const slot = book.inventory[s];
+        if (slot.itemId !== d.itemId || !sameInstance(slot.instance, d.instance)) continue;
+        const take = Math.min(slot.count, remaining);
+        slot.count -= take;
+        remaining -= take;
+        if (slot.count <= 0) book.inventory.splice(s, 1);
+      }
+    } else if (d.op === 'withdraw') {
+      // Undo a withdraw: put the copy back. Merge into a matching plain stack
+      // where one exists; over-capacity is tolerated by the book contract
+      // (capacity only blocks new deposits).
+      const existing = d.instance
+        ? undefined
+        : book.inventory.find((s) => s.itemId === d.itemId && !s.instance && !s.craftedRecipeId);
+      if (existing && !d.craftedRecipeId) {
+        existing.count += count;
+      } else {
+        const slot: InvSlot = d.instance
+          ? { itemId: d.itemId, count, instance: d.instance }
+          : { itemId: d.itemId, count };
+        if (typeof d.craftedRecipeId === 'string' && d.craftedRecipeId !== '') {
+          slot.craftedRecipeId = d.craftedRecipeId;
+        }
+        book.inventory.push(cloneInvSlot(slot));
+      }
+    }
+  }
 }
 
 /** The server-callable membership stamp body (Sim.setPlayerGuildMembership is
