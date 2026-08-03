@@ -513,16 +513,19 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   // The Toolbelt is deliberately NOT kind 'bag': it grants no pooled slots and
   // cannot go in a bag socket. It is the fifth, tool-only container, with one
-  // typed slot per gathering profession (src/sim/toolbelt.ts). Priced on the
-  // bag ladder's 4x buy/sell ratio, between the pouch and the knapsack: it
-  // frees four backpack slots without adding any.
+  // typed slot per gathering profession (src/sim/toolbelt.ts).
+  // Priced BELOW the linen pouch (250) on purpose: this is meant to be the
+  // first storage upgrade a new character buys, affordable while the zone-1
+  // collect quests are still paying out in copper. Common quality for the same
+  // reason, so it reads as starter kit rather than a find. Keeps the bag
+  // ladder's 4x buy/sell ratio.
   toolbelt: {
     id: 'toolbelt',
     name: "Tinker's Toolbelt",
     kind: 'toolbelt',
-    quality: 'uncommon',
-    sellValue: 375,
-    buyValue: 1500,
+    quality: 'common',
+    sellValue: 12,
+    buyValue: 50,
   },
   // --- food & drink (vendor) ---
   baked_bread: {
