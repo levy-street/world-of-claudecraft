@@ -1458,6 +1458,15 @@ export class GameServer {
     number,
     { accountId: number; amount: number }
   >();
+  // Guilds whose bank is CLOSED because a guild-delete is in flight: the
+  // window between the empty-bank guard passing and the guilds DELETE (which
+  // cascades the guild_banks row away) plus its post-commit hooks. Guild bank
+  // ops for a guild in this set are refused, so nothing can be deposited into
+  // a bank that is about to stop existing (server/social.ts
+  // beginGuildBankDelete / endGuildBankDelete). Entries live for the two
+  // awaited DB steps of one command and are removed on every arm, including
+  // a throw.
+  private readonly guildBankDeleteWindows = new Set<number>();
   private readonly moderation: ModerationService<ClientSession>;
   private wireCache = new Map<number, EntityWireCache>();
   // partyFrameAggroTargets / partyFrameIncomingHeals scan the whole entity set and
@@ -2148,22 +2157,35 @@ export class GameServer {
           s.guildBankDeficitSkips.delete(guildId);
         }
       },
-      // The disband guard's read: the LIVE sim book's holdings (null with no
-      // loaded book; the guard fails closed on null). ALSO fails closed (null)
-      // while ANY session holds an unflushed dirty mark for the guild: the
-      // live book proves only live state, and a disband would cascade-delete
-      // the DURABLE row while the ops that emptied it are not yet durable (a
-      // crash before that session's save would then destroy the escrow value
-      // outright). Scanned over sessionsByCharacterId, not clients, because a
-      // mid-leave session's flush is still in flight and its books must keep
-      // the guard closed until the flush commits. Self-heals within one
-      // autosave interval; the guard's refusal line already tells the actor
-      // to retry.
-      guildBankHoldings: (guildId) => {
+      // The disband guard's read, and the OPEN of the guild-delete window it
+      // has to hold. Returns the LIVE sim book's holdings, or null (the guard
+      // fails closed) when:
+      //  - no book is loaded, so nothing can prove the DB row is empty;
+      //  - ANY session holds an unflushed dirty mark for the guild, because
+      //    the live book proves only live state and a disband would
+      //    cascade-delete the DURABLE row while the ops that emptied it are
+      //    not yet durable (scanned over sessionsByCharacterId, not clients:
+      //    a mid-leave session's flush is still in flight);
+      //  - another guild-delete already holds the window.
+      // Taking the window is what closes the TOCTOU: the guard is
+      // synchronous, but two awaits and a DELETE follow it, and dispatched
+      // guild bank ops run straight off the socket event. While the window is
+      // held runGuildBankOp refuses every op for this guild, so nothing can
+      // land in the bank between the guard passing and the row cascading
+      // away. Self-heals within one autosave interval; the guard's refusal
+      // line already tells the actor to retry.
+      beginGuildBankDelete: (guildId) => {
+        if (this.guildBankDeleteWindows.has(guildId)) return null;
         for (const s of this.sessionsByCharacterId.values()) {
           if (s.dirtyGuildBanks.has(guildId)) return null;
         }
-        return this.sim.guildBankHoldings(guildId);
+        const holdings = this.sim.guildBankHoldings(guildId);
+        if (!holdings) return null;
+        this.guildBankDeleteWindows.add(guildId);
+        return holdings;
+      },
+      endGuildBankDelete: (guildId) => {
+        this.guildBankDeleteWindows.delete(guildId);
       },
       isBlocking: (recipientId, senderCharacterId) => {
         const s = this.sessionByCharacterId(recipientId);
@@ -4146,6 +4168,15 @@ export class GameServer {
     op: GuildBankLedgerOp,
     run: () => void,
   ): void {
+    // A guild whose DELETE is already in flight has passed its empty-bank
+    // guard, so its row is about to cascade away: an op landing now would be
+    // destroyed by that cascade with its dirty mark wiped by the post-commit
+    // hook. Refuse before the sim runs, so nothing mutates, no ledger row is
+    // written and no book is marked dirty. Silent, like the other host-wiring
+    // refusals (the window is two DB round trips wide and the actor's own
+    // disband command reports its own outcome).
+    const actingGuildId = this.sim.meta(pid)?.guildMembership?.guildId;
+    if (actingGuildId !== undefined && this.guildBankDeleteWindows.has(actingGuildId)) return;
     const before = this.sim.guildBankInfoFor(pid);
     run();
     const after = this.sim.guildBankInfoFor(pid);

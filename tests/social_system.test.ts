@@ -291,7 +291,17 @@ class FakeTransport implements SocialTransport {
     this.disbanded.push(guildId);
   }
   holdings = new Map<number, { copper: number; items: number } | null>();
-  guildBankHoldings(guildId: number): { copper: number; items: number } | null {
+  guildBankDeleteWindows = new Set<number>();
+  beginGuildBankDelete(guildId: number): { copper: number; items: number } | null {
+    if (this.guildBankDeleteWindows.has(guildId)) return null;
+    const holdings = this.guildBankHoldingsFor(guildId);
+    if (holdings) this.guildBankDeleteWindows.add(guildId);
+    return holdings;
+  }
+  endGuildBankDelete(guildId: number): void {
+    this.guildBankDeleteWindows.delete(guildId);
+  }
+  guildBankHoldingsFor(guildId: number): { copper: number; items: number } | null {
     const h = this.holdings.get(guildId);
     return h === undefined ? { copper: 0, items: 0 } : h;
   }

@@ -466,8 +466,8 @@ describe('an overflowing op log while another session holds unflushed ops', () =
 // ---------------------------------------------------------------------------
 // D: guild lifecycle races.
 // ---------------------------------------------------------------------------
-describe('AUDIT: the disband guard window', () => {
-  it('VAPORIZES a deposit that lands between the empty-bank guard and the guilds DELETE', async () => {
+describe('the guild-delete window (guard to DELETE)', () => {
+  it('refuses every op that lands between the empty-bank guard and the guilds DELETE', async () => {
     const server = new GameServer();
     const leader = joinServer(server, 1, 'Leader');
     const b = joinServer(server, 2, 'OfficerB');
@@ -478,42 +478,116 @@ describe('AUDIT: the disband guard window', () => {
 
     const tx = priv(server).socialTransport();
 
-    // SocialService.guildDisband step 1: the guard read (synchronous).
-    expect(tx.guildBankHoldings(GUILD_ID)).toEqual({ copper: 0, items: 0 });
+    // SocialService.guildDisband step 1: the guard read, which also OPENS the
+    // guild-delete window (synchronous).
+    expect(tx.beginGuildBankDelete(GUILD_ID)).toEqual({ copper: 0, items: 0 });
 
     // Step 2/3 are `await db.guildMembers()` and `await db.deleteGuild()`.
     // Any WS frame arriving in that window is dispatched immediately
-    // (handleMessage is not tick-gated), and the actor is still stamped.
+    // (handleMessage is not tick-gated), and the actor is still stamped. With
+    // the window held, every one of those ops is refused before the sim runs.
     const bMeta = server.sim.players.get(b.pid);
     const lMeta = server.sim.players.get(leader.pid);
     if (!bMeta || !lMeta) throw new Error('missing meta');
     const idx = lMeta.inventory.findIndex((s) => s.itemId === 'wolf_fang');
     dispatch(server, leader, { cmd: 'guild_bank_deposit', slot: idx, count: 4 });
     dispatch(server, b, { cmd: 'guild_bank_deposit_gold', amount: 50_000 });
-    expect(bMeta.copper).toBe(450_000); // charged
-    expect(lMeta.inventory.some((s) => s.itemId === 'wolf_fang')).toBe(false); // out of bags
-    expect(bookOf(server)?.treasury).toBe(50_000);
+    expect(bMeta.copper).toBe(500_000); // never charged
+    expect(lMeta.inventory.some((s) => s.itemId === 'wolf_fang')).toBe(true); // still in bags
+    expect(bookOf(server)?.treasury).toBe(0);
+    expect(b.dirtyGuildBanks.size).toBe(0);
 
-    // Step 4: the DELETE committed; the post-commit hooks run.
+    // Step 4: the DELETE committed; the post-commit hooks run, then the window
+    // closes.
     tx.onGuildDisbanded(GUILD_ID);
     tx.onGuildMembershipChanged(1, null);
     tx.onGuildMembershipChanged(2, null);
+    tx.endGuildBankDelete(GUILD_ID);
 
     // The book (and its guild_banks row, via ON DELETE CASCADE) is gone, and
-    // every mark/log that could have flushed it was cleared.
+    // nothing of value went with it.
     expect(server.sim.guildBanks.has(GUILD_ID)).toBe(false);
-    expect(b.dirtyGuildBanks.size).toBe(0);
     expect(b.unflushedGuildBankOps.size).toBe(0);
 
-    // The character halves persist the LOSS: copper gone, item gone, no book.
     await priv(server).saveCharacter(b);
     await priv(server).saveCharacter(leader);
-    // Conservation: the bank (and its row) no longer exists, so the only place
-    // the copper and the stack can legitimately be is back with their owners.
-    expect(durable.chars.get(2)?.copper).toBe(500_000); // FAILS: 450_000, 50_000 destroyed
+    // Conservation: the bank (and its row) no longer exists, so the copper and
+    // the stack are still with their owners.
+    expect(durable.chars.get(2)?.copper).toBe(500_000);
     expect((durable.chars.get(1)?.inventory ?? []).some((s) => s.itemId === 'wolf_fang')).toBe(
       true,
-    ); // FAILS: the stack was destroyed with the book
+    );
+  });
+
+  it('is re-entrant-safe: a second delete cannot take a window someone else holds', () => {
+    const server = new GameServer();
+    const leader = joinServer(server, 1, 'Leader');
+    officer(server, leader, 'leader');
+    seedBook(server, { treasury: 0, inventory: [], purchasedSlots: 24 });
+    const tx = priv(server).socialTransport();
+    expect(tx.beginGuildBankDelete(GUILD_ID)).toEqual({ copper: 0, items: 0 });
+    // A concurrent /gdisband + last-member /gquit would otherwise each think
+    // they own the window, and the first to finish would open the gap under
+    // the second.
+    expect(tx.beginGuildBankDelete(GUILD_ID)).toBeNull();
+    tx.endGuildBankDelete(GUILD_ID);
+    expect(tx.beginGuildBankDelete(GUILD_ID)).toEqual({ copper: 0, items: 0 });
+  });
+
+  it('closes the window on the REFUSAL arm, so a stocked bank stays usable', async () => {
+    // A refused disband must not leave the guild's bank refusing ops until the
+    // realm restarts.
+    const server = new GameServer();
+    const leader = joinServer(server, 1, 'Leader');
+    officer(server, leader, 'leader');
+    seedBook(server, { treasury: 50_000, inventory: [], purchasedSlots: 24 });
+    const social = priv(server).social;
+    social.db.guildMembership = async () => ({
+      guildId: GUILD_ID,
+      guildName: 'Iron Vanguard',
+      rank: 'leader',
+    });
+    await social.guildDisband({ characterId: 1, accountId: 1, name: 'Leader' });
+    expect(server.sim.guildBanks.has(GUILD_ID)).toBe(true); // refused, nothing deleted
+    restamp(server, leader, 'leader');
+    dispatch(server, leader, { cmd: 'guild_bank_withdraw_gold', amount: 50_000 });
+    expect(bookOf(server)?.treasury).toBe(0); // the bank still works
+  });
+
+  it('END TO END: the real /gdisband refuses an op dispatched inside its await gap', async () => {
+    // The manual reproductions above stage the window by hand; this one drives
+    // the REAL SocialService.guildDisband and lands the op inside the genuine
+    // `await db.guildMembers()` gap, which is where a WS frame actually
+    // arrives (handleMessage is not tick-gated).
+    const server = new GameServer();
+    const leader = joinServer(server, 1, 'Leader');
+    const b = joinServer(server, 2, 'OfficerB');
+    officer(server, leader, 'leader');
+    officer(server, b, 'officer');
+    seedBook(server, { treasury: 0, inventory: [], purchasedSlots: 24 });
+    const social = priv(server).social;
+    social.db.guildMembership = async () => ({
+      guildId: GUILD_ID,
+      guildName: 'Iron Vanguard',
+      rank: 'leader',
+    });
+    let landedInGap = false;
+    social.db.guildMembers = async () => {
+      restamp(server, b);
+      dispatch(server, b, { cmd: 'guild_bank_deposit_gold', amount: 50_000 });
+      landedInGap = true;
+      return [{ id: 1, name: 'Leader', rank: 'leader' }];
+    };
+    social.db.deleteGuild = async () => {};
+    await social.guildDisband({ characterId: 1, accountId: 1, name: 'Leader' });
+
+    expect(landedInGap).toBe(true); // vacuity guard: the op really was dispatched
+    // Refused: the copper stayed in B's purse instead of being cascaded away.
+    expect(server.sim.players.get(b.pid)?.copper).toBe(500_000);
+    expect(b.dirtyGuildBanks.size).toBe(0);
+    expect(server.sim.guildBanks.has(GUILD_ID)).toBe(false); // the disband committed
+    await priv(server).saveCharacter(b);
+    expect(durable.chars.get(2)?.copper).toBe(500_000);
   });
 
   it('same window on the last-member /gquit path (guard, then removeGuildMember, then DELETE)', async () => {
@@ -523,15 +597,18 @@ describe('AUDIT: the disband guard window', () => {
     seedBook(server, { treasury: 0, inventory: [], purchasedSlots: 24 });
 
     const tx = priv(server).socialTransport();
-    expect(tx.guildBankHoldings(GUILD_ID)).toEqual({ copper: 0, items: 0 }); // guard passes
+    // The last-member arm of /gquit runs the SAME guard, so it takes the same
+    // window: the DELETE is two awaits away there too.
+    expect(tx.beginGuildBankDelete(GUILD_ID)).toEqual({ copper: 0, items: 0 });
     // `await db.removeGuildMember(actor)` is in flight; the stamp is still live.
     dispatch(server, solo, { cmd: 'guild_bank_deposit_gold', amount: 90_000 });
-    expect(bookOf(server)?.treasury).toBe(90_000);
+    expect(bookOf(server)?.treasury).toBe(0); // refused, not banked
     tx.onGuildMembershipChanged(1, null);
     tx.onGuildDisbanded(GUILD_ID);
+    tx.endGuildBankDelete(GUILD_ID);
 
     await priv(server).saveCharacter(solo);
-    expect(durable.chars.get(1)?.copper).toBe(500_000); // FAILS: 90_000 destroyed
+    expect(durable.chars.get(1)?.copper).toBe(500_000);
   });
 });
 

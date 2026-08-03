@@ -1332,15 +1332,15 @@ describe('the guild_create fee gate + the create/disband hooks', () => {
     expect(session.unflushedGuildBankOps.size).toBe(0);
   });
 
-  it('guildBankHoldings on the transport reads the live book (null when unloaded)', () => {
+  it('beginGuildBankDelete reads the live book (null when unloaded)', () => {
     const server = new GameServer();
     joinServer(server, 1, 'Reader');
-    expect(priv(server).social.tx.guildBankHoldings(GUILD_ID)).toBeNull();
+    expect(priv(server).social.tx.beginGuildBankDelete(GUILD_ID)).toBeNull();
     server.sim.loadGuildBank(GUILD_ID, { treasury: 42, inventory: [], purchasedSlots: 0 });
-    expect(priv(server).social.tx.guildBankHoldings(GUILD_ID)).toEqual({ copper: 42, items: 0 });
+    expect(priv(server).social.tx.beginGuildBankDelete(GUILD_ID)).toEqual({ copper: 42, items: 0 });
   });
 
-  it('guildBankHoldings fails CLOSED while any session holds an unflushed mark', async () => {
+  it('beginGuildBankDelete fails CLOSED while any session holds an unflushed mark', async () => {
     // The disband guard proves LIVE state only; the cascade destroys the
     // DURABLE row. While an op that emptied the live book is still unflushed,
     // a disband would destroy escrow value a crash could never recover, so
@@ -1352,10 +1352,10 @@ describe('the guild_create fee gate + the create/disband hooks', () => {
     dispatch(server, session, { cmd: 'guild_bank_withdraw_gold', amount: 1_000 });
     // The live book is empty now, but the withdrawal is not yet durable.
     expect(server.sim.guildBankHoldings(GUILD_ID)).toEqual({ copper: 0, items: 0 });
-    expect(priv(server).social.tx.guildBankHoldings(GUILD_ID)).toBeNull();
+    expect(priv(server).social.tx.beginGuildBankDelete(GUILD_ID)).toBeNull();
     // The escrow save commits: the guard opens (self-heals within one save).
     await priv(server).saveCharacter(session);
-    expect(priv(server).social.tx.guildBankHoldings(GUILD_ID)).toEqual({ copper: 0, items: 0 });
+    expect(priv(server).social.tx.beginGuildBankDelete(GUILD_ID)).toEqual({ copper: 0, items: 0 });
   });
 
   it('an exhausted leave flush undoes the books it could never commit', async () => {

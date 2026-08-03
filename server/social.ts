@@ -239,10 +239,27 @@ export interface SocialTransport {
   // stays bounded and a re-created guild id can never inherit a stale book;
   // the guild_banks row cascades away with the guilds DELETE.
   onGuildDisbanded(guildId: number): void;
-  // What the guild's LIVE bank book holds, for guildDisband's guard: null when
-  // no book is loaded, which the guard treats as fail-CLOSED (an unloaded book
-  // cannot prove the DB row is empty, and disbanding would cascade-delete it).
-  guildBankHoldings(guildId: number): { copper: number; items: number } | null;
+  // OPEN the guild-delete window and report what the guild's LIVE bank book
+  // holds, for the empty-bank guard both guild-deleting paths run. Returns
+  // null when the guard must fail CLOSED: no book is loaded (an unloaded book
+  // cannot prove the DB row is empty, and disbanding would cascade-delete it),
+  // a session holds unflushed book work, or another delete already holds the
+  // window.
+  //
+  // The window, not just the read, is the point. The guard is synchronous but
+  // the DELETE is two awaits away, and dispatched guild bank ops are NOT
+  // tick-gated: an op landing in that gap used to be destroyed outright by the
+  // FK cascade with its dirty mark wiped by the post-commit hook. While the
+  // window is held every guild bank op for that guild is refused, so the guard
+  // still means what it says at the moment the row actually goes away.
+  //
+  // ONLY call endGuildBankDelete when this returned non-null: a null means the
+  // window was not taken (possibly because someone else holds it), and
+  // releasing it would open the gap under them.
+  beginGuildBankDelete(guildId: number): { copper: number; items: number } | null;
+  // CLOSE the window opened above. Must run on every arm (refusal, throw, or
+  // commit), or that guild's bank stays refused until the realm restarts.
+  endGuildBankDelete(guildId: number): void;
   // true if `recipientId` has `senderCharacterId` on their BLOCK list, so
   // guild/officer chat can honour the same filter say/whisper already apply
   isBlocking(recipientId: number, senderCharacterId: number): boolean;
@@ -961,9 +978,12 @@ export class SocialService {
     // removed, so a refusal leaves the membership untouched; fails CLOSED on
     // an unloaded book (null holdings), because an unloaded book cannot prove
     // the persisted row is empty.
+    let deleteWindow = false;
     if (others.length === 0) {
-      const holdings = this.tx.guildBankHoldings(membership.guildId);
+      const holdings = this.tx.beginGuildBankDelete(membership.guildId);
+      deleteWindow = holdings !== null;
       if (!holdings || holdings.copper > 0 || holdings.items > 0) {
+        if (deleteWindow) this.tx.endGuildBankDelete(membership.guildId);
         this.err(
           actor.characterId,
           'The guild bank must be emptied before the guild can be disbanded.',
@@ -971,6 +991,24 @@ export class SocialService {
         return;
       }
     }
+    try {
+      await this.finishGuildLeave(actor, membership, others);
+    } finally {
+      // The window spans the guard to the DELETE and its post-commit hooks;
+      // releasing it early (or not at all) is what reopens the gap.
+      if (deleteWindow) this.tx.endGuildBankDelete(membership.guildId);
+    }
+  }
+
+  /** The committed tail of guildLeave, after the empty-bank guard: the member
+   *  row, the stamp clear, and (for the last member out) the guilds DELETE that
+   *  cascades the book row away. Split out so the caller can hold the
+   *  guild-delete window across all of it with one try/finally. */
+  private async finishGuildLeave(
+    actor: SocialActor,
+    membership: { guildId: number; guildName: string },
+    others: { id: number }[],
+  ): Promise<void> {
     await this.db.removeGuildMember(actor.characterId);
     // Removed in the DB: clear the live sim stamp before any push resolves
     // (both arms below; the guild bank rank gate must not see a stale rank).
@@ -1075,27 +1113,37 @@ export class SocialService {
     // came from it); null means no book is loaded, which fails CLOSED, because
     // an unloaded book cannot prove the persisted row is empty (the oversized-
     // row boot skip is exactly this state, and its row must survive).
-    const holdings = this.tx.guildBankHoldings(membership.guildId);
+    //
+    // The guard OPENS the guild-delete window and holds it all the way to the
+    // DELETE: the guildMembers read below is an await, and a dispatched guild
+    // bank op is not tick-gated, so an op landing in that gap was previously
+    // destroyed by the cascade with its dirty mark wiped by onGuildDisbanded.
+    const holdings = this.tx.beginGuildBankDelete(membership.guildId);
     if (!holdings || holdings.copper > 0 || holdings.items > 0) {
+      if (holdings) this.tx.endGuildBankDelete(membership.guildId);
       this.err(
         actor.characterId,
         'The guild bank must be emptied before the guild can be disbanded.',
       );
       return;
     }
-    const members = await this.db.guildMembers(membership.guildId);
-    await this.db.deleteGuild(membership.guildId);
-    // Committed: evict the (empty) book from the live sim AFTER the guard
-    // passed, so the map stays bounded and a re-created guild id starts fresh.
-    this.tx.onGuildDisbanded(membership.guildId);
-    for (const m of members) {
-      // Every member's stamp clears, online or not (the transport no-ops for
-      // characters with no live session; they re-stamp null at next join).
-      this.tx.onGuildMembershipChanged(m.id, null);
-      if (this.tx.isOnline(m.id)) {
-        this.info(m.id, `<${membership.guildName}> has been disbanded.`, '#ffd100');
-        this.push(m.id);
+    try {
+      const members = await this.db.guildMembers(membership.guildId);
+      await this.db.deleteGuild(membership.guildId);
+      // Committed: evict the (empty) book from the live sim AFTER the guard
+      // passed, so the map stays bounded and a re-created guild id starts fresh.
+      this.tx.onGuildDisbanded(membership.guildId);
+      for (const m of members) {
+        // Every member's stamp clears, online or not (the transport no-ops for
+        // characters with no live session; they re-stamp null at next join).
+        this.tx.onGuildMembershipChanged(m.id, null);
+        if (this.tx.isOnline(m.id)) {
+          this.info(m.id, `<${membership.guildName}> has been disbanded.`, '#ffd100');
+          this.push(m.id);
+        }
       }
+    } finally {
+      this.tx.endGuildBankDelete(membership.guildId);
     }
   }
 
