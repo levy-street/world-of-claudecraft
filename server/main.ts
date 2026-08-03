@@ -2898,6 +2898,10 @@ export async function startServer(): Promise<http.Server> {
   await pruneApplePendingLogins(pool);
   await game.loadMarket();
   await game.loadMail();
+  // Guild bank books boot-load BEFORE listen() below, so every non-oversized
+  // guild's book is live before any player can join (Guild Bank Phase 3: this
+  // releases the deliberately silent-inert Phase 2 wire).
+  await game.loadGuildBanks();
   await game.loadRifts();
   await game.loadChatFilter();
   await game.loadBlockedIps();
@@ -3068,6 +3072,15 @@ export async function startServer(): Promise<http.Server> {
     saveLastSweepDay: async (day) => {
       await saveWorldState('retention_sweep:last_run', { day });
     },
+    // bank_ledger is deliberately ABSENT from this table list: it is kept
+    // FOREVER. It is the anti-dupe audit trail for both containers, and the
+    // guild container (Guild Bank Phase 3) makes that non-negotiable: guild
+    // conservation replays the WHOLE per-guild history (items in-vs-out across
+    // officers, the treasury balance), so pruning any prefix would turn every
+    // later legitimate withdraw into a false negative_net/negative_treasury
+    // finding and erase the evidence trail a real dupe investigation needs.
+    // Growth is accepted: one row per successful op, insert-only, append-only
+    // indexes (bank_ledger_character, bank_ledger_created), no hot reads.
     tables: [
       { name: 'chat_logs', pruneBatch: (n) => pruneChatLogsBatch(config.chatLogRetentionDays, n) },
       {

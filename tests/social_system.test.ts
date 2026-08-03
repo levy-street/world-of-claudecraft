@@ -278,6 +278,23 @@ class FakeTransport implements SocialTransport {
   onGuildFounded(id: number): void {
     this.founded.push(id);
   }
+  // Guild Bank Phase 3 seams. created records the commit-arm seed/fee hook;
+  // disbanded records the book evict; holdings is what guildDisband's guard
+  // reads (default an EMPTY book, so pre-guild-bank tests disband freely;
+  // set a guild's entry to non-empty holdings or null to drive the guard).
+  created: { id: number; guildId: number }[] = [];
+  onGuildCreated(id: number, guildId: number): void {
+    this.created.push({ id, guildId });
+  }
+  disbanded: number[] = [];
+  onGuildDisbanded(guildId: number): void {
+    this.disbanded.push(guildId);
+  }
+  holdings = new Map<number, { copper: number; items: number } | null>();
+  guildBankHoldings(guildId: number): { copper: number; items: number } | null {
+    const h = this.holdings.get(guildId);
+    return h === undefined ? { copper: 0, items: 0 } : h;
+  }
   // Every synchronous guild membership/rank stamp, in call order (the Guild
   // Bank Phase 2 seam: game.ts pairs setPlayerGuild with
   // setPlayerGuildMembership behind this). Recorded for ALL characters,
@@ -1904,5 +1921,101 @@ describe('broadcastDeedUnlock', () => {
     } satisfies Extract<SocialEvent, { type: 'deedBroadcast' }>;
     const fromSim: Extract<SocialEvent, { type: 'deedBroadcast' }> = fromSocial;
     expect(fromSim).toEqual(fromSocial);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Guild Bank Phase 3: the create-commit hook (book seed + fee, via the
+// transport) and the disband guard over the live book's holdings.
+// ---------------------------------------------------------------------------
+
+describe('guild bank persistence hooks (Guild Bank Phase 3)', () => {
+  let h: ReturnType<typeof setup>;
+  beforeEach(() => {
+    h = setup();
+    h.add(1, 'Aleph');
+    h.add(2, 'Bet');
+    h.tx.setOnline(1);
+    h.tx.setOnline(2);
+  });
+
+  it('onGuildCreated fires once, in the committed success arm only, AFTER the founder stamp', async () => {
+    await h.svc.guildCreate(h.actor(1), 'no'); // invalid name: refused
+    expect(h.tx.created).toEqual([]);
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    expect(h.tx.created).toEqual([{ id: 1, guildId: 1 }]);
+    // Ordering: the membership stamp (the authorization input) landed BEFORE
+    // the seed/fee hook, in the same synchronous success arm.
+    expect(h.tx.membershipStamps).toEqual([
+      { id: 1, membership: { guildId: 1, guildName: 'Iron Vanguard', rank: 'leader' } },
+    ]);
+    // Refusals after: duplicate name, already guilded. No further hook calls.
+    await h.svc.guildCreate(h.actor(2), 'iron vanguard');
+    await h.svc.guildCreate(h.actor(1), 'Second Banner');
+    expect(h.tx.created).toEqual([{ id: 1, guildId: 1 }]);
+  });
+
+  it('disband refuses while the bank holds copper, and again while it holds items', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    for (const holdings of [
+      { copper: 5, items: 0 },
+      { copper: 0, items: 1 },
+    ]) {
+      h.tx.holdings.set(1, holdings);
+      await h.svc.guildDisband(h.actor(1));
+      expect(h.tx.errorsFor(1)).toContain(
+        'The guild bank must be emptied before the guild can be disbanded.',
+      );
+      // Refused: the guild survives, nothing stamped, nothing evicted.
+      expect(h.db.guildCount()).toBe(1);
+      expect(h.tx.membershipStamps).toEqual(
+        expect.arrayContaining([expect.objectContaining({ membership: expect.anything() })]),
+      );
+      expect(h.tx.disbanded).toEqual([]);
+      h.tx.clear();
+    }
+    // The refusal stamped NOTHING beyond the create's founder stamp.
+    expect(h.tx.membershipStamps).toHaveLength(1);
+  });
+
+  it('disband fails CLOSED when no book is loaded (holdings null)', async () => {
+    // An unloaded book cannot prove the persisted row is empty (the oversized
+    // boot-skip state): the guard must refuse rather than cascade-delete it.
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    h.tx.holdings.set(1, null);
+    await h.svc.guildDisband(h.actor(1));
+    expect(h.tx.errorsFor(1)).toContain(
+      'The guild bank must be emptied before the guild can be disbanded.',
+    );
+    expect(h.db.guildCount()).toBe(1);
+    expect(h.tx.disbanded).toEqual([]);
+  });
+
+  it('an empty bank disbands: the guild deletes, members clear, the book evicts once', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    // The default FakeTransport holdings are an EMPTY book ({0, 0}).
+    h.tx.membershipStamps = [];
+    await h.svc.guildDisband(h.actor(1));
+    expect(h.db.guildCount()).toBe(0);
+    expect(h.tx.membershipStamps).toEqual([{ id: 1, membership: null }]);
+    expect(h.tx.disbanded).toEqual([1]); // the evict hook, exactly once
+    // A second disband finds no guild and evicts nothing further.
+    await h.svc.guildDisband(h.actor(1));
+    expect(h.tx.disbanded).toEqual([1]);
+  });
+
+  it('the guard reads holdings for the LEADER path only after the rank checks', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    h.tx.holdings.set(1, { copper: 99, items: 0 });
+    // A member cannot reach the guard: the rank refusal comes first and the
+    // bank refusal line never fires for them.
+    await h.svc.guildDisband(h.actor(2));
+    expect(h.tx.errorsFor(2)).toContain('Only the Guild Master may disband the guild.');
+    expect(h.tx.errorsFor(2)).not.toContain(
+      'The guild bank must be emptied before the guild can be disbanded.',
+    );
+    expect(h.db.guildCount()).toBe(1);
   });
 });

@@ -226,6 +226,22 @@ export interface SocialTransport {
     characterId: number,
     membership: { guildId: number; guildName: string; rank: GuildRank } | null,
   ): void;
+  // The guild CREATE just committed (the same success arm that stamps the
+  // founder, after onGuildMembershipChanged). The transport owner seeds the
+  // new guild's EMPTY book into the LIVE sim (ops never lazily create a book:
+  // loadGuildBank is load-once, and a lazy book would shadow the persisted
+  // row after a restart), then charges the creation fee (create-then-charge,
+  // state.md) and writes its create_fee ledger row.
+  onGuildCreated(characterId: number, guildId: number): void;
+  // The guild DELETE just committed (the empty-bank guard below passed). The
+  // transport owner EVICTS the guild's book from the live sim so the map
+  // stays bounded and a re-created guild id can never inherit a stale book;
+  // the guild_banks row cascades away with the guilds DELETE.
+  onGuildDisbanded(guildId: number): void;
+  // What the guild's LIVE bank book holds, for guildDisband's guard: null when
+  // no book is loaded, which the guard treats as fail-CLOSED (an unloaded book
+  // cannot prove the DB row is empty, and disbanding would cascade-delete it).
+  guildBankHoldings(guildId: number): { copper: number; items: number } | null;
   // true if `recipientId` has `senderCharacterId` on their BLOCK list, so
   // guild/officer chat can honour the same filter say/whisper already apply
   isBlocking(recipientId: number, senderCharacterId: number): boolean;
@@ -804,6 +820,10 @@ export class SocialService {
       guildName: name,
       rank: 'leader',
     });
+    // Same success arm, right after the stamp: seed the empty book into the
+    // live sim and charge the creation fee (create-then-charge; the transport
+    // owner does both). A refused create above must never reach this.
+    this.tx.onGuildCreated(actor.characterId, result.guildId);
     // Founder credit rides the transport seam: soc_guild_founded reads the
     // guildsFounded deed stat, which only this success arm may ever produce
     // (a refused create above must never reach it).
@@ -1023,8 +1043,25 @@ export class SocialService {
       this.err(actor.characterId, 'Only the Guild Master may disband the guild.');
       return;
     }
+    // The guild bank guard: the guilds DELETE below cascades the guild_banks
+    // row away, so a disband while the bank holds ANY copper or item would
+    // destroy them. The LIVE sim book is authoritative here (every flushed op
+    // came from it); null means no book is loaded, which fails CLOSED, because
+    // an unloaded book cannot prove the persisted row is empty (the oversized-
+    // row boot skip is exactly this state, and its row must survive).
+    const holdings = this.tx.guildBankHoldings(membership.guildId);
+    if (!holdings || holdings.copper > 0 || holdings.items > 0) {
+      this.err(
+        actor.characterId,
+        'The guild bank must be emptied before the guild can be disbanded.',
+      );
+      return;
+    }
     const members = await this.db.guildMembers(membership.guildId);
     await this.db.deleteGuild(membership.guildId);
+    // Committed: evict the (empty) book from the live sim AFTER the guard
+    // passed, so the map stays bounded and a re-created guild id starts fresh.
+    this.tx.onGuildDisbanded(membership.guildId);
     for (const m of members) {
       // Every member's stamp clears, online or not (the transport no-ops for
       // characters with no live session; they re-stamp null at next join).

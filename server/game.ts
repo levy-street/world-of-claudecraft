@@ -31,6 +31,7 @@ import {
 import { devTierIndexForMergedPrs } from '../src/sim/dev_tier';
 import { parseRelayCommand } from '../src/sim/discord_relay';
 import { specialRoleChatTag } from '../src/sim/discord_roles';
+import { GUILD_CREATION_FEE_COPPER } from '../src/sim/guild_bank';
 import {
   isInJailCage,
   JAIL_CENTER,
@@ -95,7 +96,13 @@ import {
 import { type ActionBarLayout, sanitizeActionBarLayout } from '../src/world_api/action_bar';
 import { recordOnlineSample } from './admin_db';
 import { offensiveName } from './auth';
-import { recordBankOp } from './bank_ledger';
+import {
+  diffGuildBankOp,
+  type GuildBankLedgerOp,
+  guildCreateFeeDelta,
+  recordBankOp,
+  recordGuildBankDeltas,
+} from './bank_ledger';
 import type {
   BotDetector,
   BotTrackingContext,
@@ -125,6 +132,7 @@ import {
   heartbeatCharacterLeases,
   insertChatLogs,
   loadAccountFlair,
+  loadGuildBankRows,
   loadMailState,
   loadMarketState,
   loadRiftState,
@@ -133,6 +141,7 @@ import {
   pool,
   releaseCharacterLease,
   revokeAccountMechChroma,
+  saveCharacterAndGuildBankState,
   saveCharacterAndMarketState,
   saveCharacterState,
   saveMailState,
@@ -166,6 +175,7 @@ import { assembleEventsFrame, serializeEventFragments } from './event_frame';
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
 import { forEachGuarded, runGuarded } from './guarded_iter';
+import { collectGuildBankSaves, loadGuildBanksIntoSim } from './guild_bank_state';
 import { gameMetricsCounters, type WsDropCause } from './http/game_signals';
 import { buildSharedInterestCandidates } from './interest_candidates';
 import { IpBlockList } from './ip_block';
@@ -774,6 +784,12 @@ export interface ClientSession {
   // in-flight snapshot can never roll the guild bank's officer gate back to a
   // pre-demote rank.
   guildStampSeq: number;
+  // Guild books this session dirtied (guild id -> a per-mark seq), awaiting the
+  // fenced escrow save (Guild Bank Phase 3). Marked when a dispatched guild
+  // bank op's before/after diff is non-empty (and at guild_create's seed);
+  // cleared per guild after a SUCCESSFUL save only if the seq is unchanged, so
+  // an op landing mid-save keeps the book scheduled for the next save.
+  dirtyGuildBanks: Map<number, number>;
   // IP address at join time (from requestMetadata); used for per-IP session counting.
   ip: string;
   userAgent: string;
@@ -1984,6 +2000,41 @@ export class GameServer {
           membership ? { guildId: membership.guildId, rank: membership.rank } : null,
         );
       },
+      // Guild Bank Phase 3: the create commit's book seed + creation fee.
+      onGuildCreated: (id, guildId) => {
+        // Seed the empty book into the LIVE sim in the same success arm that
+        // stamped the founder: ops never lazily create a book (loadGuildBank
+        // is load-once; a lazy book would shadow the persisted row after a
+        // restart), so without this seed the founder's bank would be silently
+        // inert until a realm restart boot-loads it.
+        this.sim.loadGuildBank(guildId, null);
+        const s = this.sessionByCharacterId(id);
+        if (!s) return; // founder vanished mid-flight: free guild, never lost gold
+        // CREATE-THEN-CHARGE (state.md): the guild row committed FIRST; only
+        // now is the fee deducted from the sim purse, so a crash between the
+        // two yields a free guild, never gold lost to a guild that does not
+        // exist. Never charge first. The dispatch gate already refused a poor
+        // founder before any DB work; the sim clamps a mid-flight shortfall.
+        const charged = this.sim.chargeGuildCreationFeeFor(s.pid);
+        if (charged > 0) {
+          recordGuildBankDeltas('create_fee', s, guildId, [guildCreateFeeDelta(charged)]);
+        }
+        // Persist the charged purse and the seeded (empty) book together
+        // through the fenced escrow save.
+        this.markGuildBankDirty(s, guildId);
+        void this.saveCharacter(s).catch((err) =>
+          console.error(`guild create fee save failed for ${s.name}:`, err),
+        );
+      },
+      // Disband committed (the empty-bank guard passed): evict the book so the
+      // map stays bounded and a re-created guild id can never inherit a stale
+      // book. The guild_banks row cascaded away with the guilds DELETE.
+      onGuildDisbanded: (guildId) => {
+        this.sim.evictGuildBank(guildId);
+      },
+      // The disband guard's read: the LIVE sim book's holdings (null with no
+      // loaded book; the guard fails closed on null).
+      guildBankHoldings: (guildId) => this.sim.guildBankHoldings(guildId),
       isBlocking: (recipientId, senderCharacterId) => {
         const s = this.sessionByCharacterId(recipientId);
         return s ? s.blockedIds.has(senderCharacterId) : false;
@@ -2990,6 +3041,7 @@ export class GameServer {
       blockedIds: new Set(),
       blockListLoaded: false,
       guildStampSeq: 0,
+      dirtyGuildBanks: new Map(),
       ignoredIds: new Set(),
       lastWhisperFrom: null,
       rememberedChat: { channel: 'say' },
@@ -3420,20 +3472,51 @@ export class GameServer {
         // is temporarily 20, but serializeCharacter reports the real level — so the
         // character-list/leaderboard `level` column never reflects the temp state.
         let saved: boolean;
-        if (opts.withMarket) {
+        // Guild books this save will carry (Guild Bank Phase 3), captured WITH
+        // their marks at write time inside the queued closure, exactly like the
+        // market snapshot: books are shared multi-writer state (two officers'
+        // saves carry the same book), so serializing at write time under the
+        // one market queue means a commit can never clobber a newer book with
+        // an older snapshot. A guild whose serializeGuildBank returns null (no
+        // loaded book) is SKIPPED (collectGuildBankSaves): an empty book must
+        // never overwrite a real row. The captured seqs clear their dirty
+        // entries only after a successful commit, and only if unchanged, so an
+        // op landing mid-save re-schedules the book instead of being dropped.
+        const carriedGuildBankSeqs: [number, number][] = [];
+        const collectBooks = () => {
+          carriedGuildBankSeqs.length = 0;
+          for (const entry of session.dirtyGuildBanks) carriedGuildBankSeqs.push(entry);
+          return collectGuildBankSaves(
+            (guildId) => this.sim.serializeGuildBank(guildId),
+            carriedGuildBankSeqs.map(([guildId]) => guildId),
+          );
+        };
+        if (opts.withMarket || session.dirtyGuildBanks.size > 0) {
           // Atomic on the leave path so a logout bag-flush can never tear away
-          // from the global Market escrow (see saveCharacterAndMarketState). Run
-          // through the market queue and capture the market snapshot at write
-          // time so this commit can't clobber a newer one.
+          // from the global Market escrow (see saveCharacterAndMarketState),
+          // and on any save carrying a guild book so the character half and
+          // the book half commit or vanish together (the same escrow shape;
+          // both siblings ride the character-lease fence). Run through the
+          // market queue and capture the market/book snapshots at write time
+          // so this commit can't clobber newer ones.
           saved = await this.enqueueMarketWrite(() =>
-            saveCharacterAndMarketState(
-              session.characterId,
-              state.level,
-              state,
-              this.sim.serializeMarket(),
-              this.sim.serializeMail(),
-              session.leaseNonce,
-            ),
+            opts.withMarket
+              ? saveCharacterAndMarketState(
+                  session.characterId,
+                  state.level,
+                  state,
+                  this.sim.serializeMarket(),
+                  this.sim.serializeMail(),
+                  session.leaseNonce,
+                  collectBooks(),
+                )
+              : saveCharacterAndGuildBankState(
+                  session.characterId,
+                  state.level,
+                  state,
+                  collectBooks(),
+                  session.leaseNonce,
+                ),
           );
         } else {
           saved = await saveCharacterState(
@@ -3469,6 +3552,14 @@ export class GameServer {
           return;
         }
         session.lastSave = Date.now();
+        // The carried books are durable too: release their dirty marks, but
+        // only where the seq is unchanged (a mid-save op re-dirtied the book
+        // with state this commit did not include).
+        for (const [guildId, seq] of carriedGuildBankSeqs) {
+          if (session.dirtyGuildBanks.get(guildId) === seq) {
+            session.dirtyGuildBanks.delete(guildId);
+          }
+        }
         // The blob is durable: publish every unlock it contains. A rejected
         // save skips this (the throw propagates past it), leaving the ids
         // pending for the next save attempt (the 30s autosave, the next
@@ -3560,6 +3651,59 @@ export class GameServer {
     } catch (err) {
       console.error('failed to save mail:', err);
     }
+  }
+
+  // Guild bank books (Guild Bank Phase 3): boot-load every realm guild's book
+  // into the live sim BEFORE players join (a guild with no row gets an empty
+  // book), releasing the deliberately silent-inert Phase 2 wire. An oversized
+  // row is SKIPPED loudly (that guild's ops stay inert and its row survives on
+  // disk); a load failure leaves every book absent, which is safe (ops refuse
+  // silently) but logged. There is no periodic saveGuildBanks sibling BY
+  // DESIGN: books persist only through the fenced escrow save that carries the
+  // acting character (saveCharacter below), never standalone.
+  async loadGuildBanks(): Promise<void> {
+    try {
+      const result = loadGuildBanksIntoSim(this.sim, await loadGuildBankRows());
+      for (const guildId of result.oversized) {
+        console.error(
+          `guild bank row for guild ${guildId} exceeds the size bound; left unloaded (ops stay inert, the row is preserved)`,
+        );
+      }
+      for (const guildId of result.missing) {
+        console.error(`guild bank book for guild ${guildId} failed to load into the sim`);
+      }
+    } catch (err) {
+      console.error('failed to load guild banks:', err);
+    }
+  }
+
+  // Schedule a guild's book for the next fenced escrow save of this session.
+  private markGuildBankDirty(session: ClientSession, guildId: number): void {
+    session.dirtyGuildBanks.set(guildId, (session.dirtyGuildBanks.get(guildId) ?? 0) + 1);
+  }
+
+  // Run one dispatched guild bank op with the observer pair around it: the
+  // before/after guildBankInfoFor diff (the personal bank's recordBankOp
+  // idiom) detects success, writes the fire-and-forget ledger rows, and marks
+  // the acting player's guild book dirty for the escrow save. Never awaited,
+  // never a gameplay dependency; a refused op diffs empty and does nothing.
+  private runGuildBankOp(
+    session: ClientSession,
+    pid: number,
+    op: GuildBankLedgerOp,
+    run: () => void,
+  ): void {
+    const before = this.sim.guildBankInfoFor(pid);
+    run();
+    const after = this.sim.guildBankInfoFor(pid);
+    const deltas = diffGuildBankOp(op, before, after);
+    if (deltas.length === 0) return;
+    // A successful op requires a stamped officer-plus membership, and the
+    // stamp cannot change inside the synchronous run() above.
+    const guildId = this.sim.meta(pid)?.guildMembership?.guildId;
+    if (guildId === undefined) return;
+    this.markGuildBankDirty(session, guildId);
+    recordGuildBankDeltas(op, session, guildId, deltas);
   }
 
   async loadRifts(): Promise<void> {
@@ -5006,8 +5150,26 @@ export class GameServer {
         void this.sendSocialSnapshot(session.characterId);
         break;
       case 'guild_create':
-        if (typeof msg.name === 'string')
+        if (typeof msg.name === 'string') {
+          // The creation-fee gate, BEFORE any DB work (Guild Bank Phase 3):
+          // a founder whose sim purse cannot cover GUILD_CREATION_FEE_COPPER
+          // is refused right here, so a refused create never touches the
+          // database. The charge itself happens in the create's success arm
+          // (onGuildCreated), AFTER the guild row commits: create-then-charge,
+          // because a crash between the two must yield a free guild, never
+          // gold lost to a guild that does not exist. The English literal is
+          // re-localized client-side (src/ui/server_i18n.ts guild.createFee,
+          // pinned byte-for-byte in tests/server_i18n.test.ts).
+          const meta = this.sim.meta(pid);
+          if (!meta || meta.copper < GUILD_CREATION_FEE_COPPER) {
+            // 10,000 copper to the gold; the whole-gold amount keeps the
+            // emitted line matchable by the guild.createFee RULE.
+            const goldAmount = GUILD_CREATION_FEE_COPPER / 10_000;
+            this.sendChatNotice(session, `You need ${goldAmount} gold to found a guild.`);
+            break;
+          }
           void this.social.guildCreate(this.actorFor(session), msg.name).catch(logSocialErr);
+        }
         break;
       case 'guild_invite':
         if (typeof msg.name === 'string')
@@ -5475,32 +5637,47 @@ export class GameServer {
       // checks here (the bank_* idiom): the Sim owns every gameplay rule
       // (banker proximity, officer-plus rank via the session membership stamp,
       // quest-bind, treasury cap, table price, capacity). `slot` is a container
-      // index, `count` optional (omit = whole stack), `amount` copper. The
-      // bank_ledger observer rows land in Phase 3 alongside persistence.
+      // index, `count` optional (omit = whole stack), `amount` copper. Every op
+      // runs through runGuildBankOp: the before/after guildBankInfoFor diff is
+      // the ONE success signal, feeding both the fire-and-forget bank_ledger
+      // rows (container='guild') and the dirty mark that schedules the book
+      // for the fenced escrow save. A refusal diffs empty: no row, no mark.
       case 'guild_bank_deposit_gold':
-        if (typeof msg.amount === 'number') sim.guildBankDepositGoldFor(pid, msg.amount);
+        if (typeof msg.amount === 'number') {
+          const amount = msg.amount;
+          this.runGuildBankOp(session, pid, 'deposit_gold', () =>
+            sim.guildBankDepositGoldFor(pid, amount),
+          );
+        }
         break;
       case 'guild_bank_withdraw_gold':
-        if (typeof msg.amount === 'number') sim.guildBankWithdrawGoldFor(pid, msg.amount);
+        if (typeof msg.amount === 'number') {
+          const amount = msg.amount;
+          this.runGuildBankOp(session, pid, 'withdraw_gold', () =>
+            sim.guildBankWithdrawGoldFor(pid, amount),
+          );
+        }
         break;
       case 'guild_bank_deposit':
-        if (typeof msg.slot === 'number')
-          sim.guildBankDepositFor(
-            pid,
-            msg.slot,
-            typeof msg.count === 'number' ? msg.count : undefined,
+        if (typeof msg.slot === 'number') {
+          const slot = msg.slot;
+          const count = typeof msg.count === 'number' ? msg.count : undefined;
+          this.runGuildBankOp(session, pid, 'deposit', () =>
+            sim.guildBankDepositFor(pid, slot, count),
           );
+        }
         break;
       case 'guild_bank_withdraw':
-        if (typeof msg.slot === 'number')
-          sim.guildBankWithdrawFor(
-            pid,
-            msg.slot,
-            typeof msg.count === 'number' ? msg.count : undefined,
+        if (typeof msg.slot === 'number') {
+          const slot = msg.slot;
+          const count = typeof msg.count === 'number' ? msg.count : undefined;
+          this.runGuildBankOp(session, pid, 'withdraw', () =>
+            sim.guildBankWithdrawFor(pid, slot, count),
           );
+        }
         break;
       case 'guild_bank_buy_slots':
-        sim.guildBankBuySlotsFor(pid);
+        this.runGuildBankOp(session, pid, 'buy_slots', () => sim.guildBankBuySlotsFor(pid));
         break;
       // Book of Deeds: select/clear the displayed title. The sim validator
       // owns every rule (deed earned + title reward; null clears; invalid
