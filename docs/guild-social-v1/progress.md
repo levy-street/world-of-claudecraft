@@ -6,6 +6,7 @@
 | Phase 1 QA | Complete | 2026-08-02 | 2026-08-02 |
 | Phase 2: tenure badges + name screening | Complete | 2026-08-02 | 2026-08-02 |
 | Phase 2 QA (final, offers teardown) | Complete (gate + teardown pending, see notes) | 2026-08-02 | 2026-08-02 |
+| Revision: one-chip roster role | Complete | 2026-08-02 | 2026-08-02 |
 
 ## Phase 1 deliverables
 - [x] `src/ui/guild_motd_login.ts`: pure decision module (last-shown tracking), Node-tested.
@@ -209,3 +210,26 @@ Phase 2 QA (final, 2026-08-02):
   consumer). Nice-to-haves recorded, not done: a behavior test for the echo's
   masking (the source pin covers it), the `[[q:id]]` literal-render quirk, and
   offensiveName's non-string fail-open arm (unreachable via guildCreate).
+
+Revision: one-chip roster role (2026-08-02, user-approved design revision):
+- The roster previously showed every row's rank chip PLUS a separate tenure chip
+  (New/Veteran) beside it. Now each row shows ONE chip: officers and the leader keep
+  their rank label with no tenure chip; a non-officer member shows the tenure tier AS
+  the displayed role label (New under 14 days, Member 14 to 89 days or null joinedAt,
+  Veteran at 90 days or more). Thresholds unchanged; display-only (rank, permissions,
+  context menu, sort, and the wire shape untouched; see the revised locked decision in
+  state.md).
+- Implementation: new pure resolver `guildDisplayedRole(rank, tier)` +
+  `GuildDisplayedRole` in `src/ui/social_view.ts`; `social_window.ts` replaced
+  `tenureLabel` + the tenureSpan markup with `roleLabel` and the single
+  `<span class="rank[ soc-tenure-<tier>]">` chip. The de-tied
+  `.soc-name .rank.soc-tenure-*` selectors stay (tier tints only; comment revised);
+  no i18n key changes (tenure.new/veteran and all three rank keys remain in use).
+- Tests: `tests/social_view.test.ts` gained the resolver suite (13d23h/14d/89d/90d
+  boundaries, null-joinedAt arm, leader/officer passthrough at any tenure, unknown-rank
+  fallback); `tests/social_window.test.ts` rendered-row suite moved to an exact
+  one-chip-array assertion (a reappearing second chip or an officer tenure label fails
+  decisively) and the source pins track the new role derivation.
+- Screenshots: after-roster-desktop.png and after-roster-mobile.png recaptured against
+  THIS worktree's dev server (port re-verified after the :5173 collision trap from the
+  Phase 2 QA notes); before-shots and the login-line shots untouched.

@@ -18,8 +18,14 @@ place). Full matrix results and the deferral ledger: progress.md.
   untranslated; the chat-log echo DOES run the display-side profanity mask
   (`Hud.maskChat`) like every other player-authored chat-pane body, per the QA ruling in
   progress.md. The latch still keys on the raw text.)
-- Tenure thresholds: New is under 14 days since `joinedAt`; Veteran is 90 days or more; in
-  between renders no badge. Client clock (`Date.now` in ui code is fine; never in sim).
+- Tenure display, REVISED 2026-08-02 (user-approved design revision, superseding the
+  original rank-chip-plus-tenure-chip model): each roster row shows ONE chip. Officers and
+  the leader show their rank label exactly as before, never a tenure chip; a non-officer
+  member shows the tenure tier AS the displayed role label: New (under 14 days since
+  `joinedAt`), Member (14 to 89 days, and the null-`joinedAt` defensive arm), Veteran
+  (90 days or more). Thresholds unchanged. Display-only: the underlying GuildRank, every
+  permission computation, the context menu, sorting, and the wire shape are untouched.
+  Client clock (`Date.now` in ui code is fine; never in sim).
 - `joinedAt` rides the wire as epoch milliseconds on each guild member row, sourced from
   `guild_members.joined_at`.
 - Guild-name screening is an injected predicate on `SocialService` (wired to
@@ -112,6 +118,15 @@ place). Full matrix results and the deferral ledger: progress.md.
   `hud.social.tenure.new` has five non-Latin overlay fills like Veteran. Screenshot
   tooling: `scripts/pr_shot_targets.mjs` stages joinedAt in the guild-roster fixture and
   adds a `guild-login-line` target; captures live in `docs/screenshots/guild-social-v1/`.
+- Design revision (2026-08-02, user-approved): one role chip per roster row. The pure
+  resolver `guildDisplayedRole(rank, tier)` (`src/ui/social_view.ts`) maps officers and the
+  leader to their rank and everyone else to the tenure tier ('new' / 'veteran') or 'member'
+  (the mid-tenure and null-`joinedAt` arm); `roleLabel` in `social_window.ts` localizes it
+  (tiers via `hud.social.tenure.*`, ranks via `rankLabel`, so all five keys stay in use)
+  and the row emits `<span class="rank[ soc-tenure-<tier>]">`. The separate tenure chip
+  markup and `tenureLabel` are gone; the de-tied `.soc-name .rank.soc-tenure-*` selectors
+  remain for the two tier tints, the Member/rank chips keep the plain `.rank` gold. Roster
+  after-shots recaptured; before-shots and login-line shots untouched.
 
 ## Known gotchas
 - The social snapshot is re-pushed on ANY social change; the login-line module must key off
