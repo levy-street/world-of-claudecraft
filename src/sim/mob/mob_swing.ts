@@ -26,8 +26,8 @@ import * as deedsMod from '../deeds';
 import { nythraxisGravebreakerOnMobSwing } from '../encounters/nythraxis';
 import type { SimContext } from '../sim_context';
 import {
-  angleTo,
   type Aura,
+  angleTo,
   dist2d,
   type Entity,
   type MobTemplate,
@@ -993,7 +993,16 @@ export function runMobSwingAffixes(
         if (pe.id !== target.id) {
           let sd = rawDmg * arc.mult;
           sd *= 1 - mobArmorReduction(mob, pe, ctx.effectiveArmor(pe));
-          ctx.dealDamage(mob, pe, Math.max(1, Math.round(sd)), crit, 'physical', arc.name, 'hit', true);
+          ctx.dealDamage(
+            mob,
+            pe,
+            Math.max(1, Math.round(sd)),
+            crit,
+            'physical',
+            arc.name,
+            'hit',
+            true,
+          );
         }
         if (arc.burn && !pe.dead) applyBroodBurn(ctx, mob, pe, arc.burn);
       }
