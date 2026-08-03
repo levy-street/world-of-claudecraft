@@ -82,6 +82,9 @@ export class BattlegroundFx {
   // Keyed by pid; the boolean remembers ally-ness so a rebuilt group is only
   // needed when the relative side would change (it cannot mid-match).
   private teamRings = new Map<number, THREE.Group>();
+  /** Scratch for the ring pass's "still on the roster" set. Reused and cleared
+   *  per frame: a fresh Set every frame is garbage on the render hot path. */
+  private ringSeen = new Set<number>();
   private ringGeo: THREE.RingGeometry | null = null;
   private ringUnderlayGeo: THREE.RingGeometry | null = null;
   private ringMats: {
@@ -232,7 +235,8 @@ export class BattlegroundFx {
   // match player's group (green ally / red enemy, relative to MY team; hidden
   // on a corpse), and drop rings whose player left the roster or scoped out.
   private teamRingPass(match: NonNullable<BgInfo['match']>): void {
-    const seen = new Set<number>();
+    const seen = this.ringSeen;
+    seen.clear();
     for (const row of match.players) {
       const view = this.views.get(row.pid);
       if (!view) continue;

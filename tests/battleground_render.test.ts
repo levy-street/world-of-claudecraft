@@ -39,8 +39,11 @@ import {
   bgPaintTextureFiles,
   bgTerrainChunks,
 } from '../src/render/battleground_core';
-import { isPrimaryBattlegroundMeshName } from '../src/render/battleground_placements';
-import { BG_HALF_X, BG_HALF_Z } from '../src/sim/battleground_layout';
+import {
+  isBattlegroundOccluderAsset,
+  isPrimaryBattlegroundMeshName,
+} from '../src/render/battleground_placements';
+import { BG_BASES, BG_HALF_X, BG_HALF_Z } from '../src/sim/battleground_layout';
 import {
   TH_HEIGHT_CELL,
   TH_PAINT_CELL,
@@ -311,14 +314,36 @@ describe('Thornhollow dressing: authored lights and decals', () => {
 
   it('mirrors every light through the field centre, colour included where it is neutral', () => {
     // Cosmetic, but the fairness story is the same as the plan's: one half lit
-    // and the other dim is an advantage a player can see. Team-coloured pairs
-    // (the keep braziers and flag shrines) are exempt from the colour half.
+    // and the other dim is an advantage a player can see. The title claims the
+    // COLOUR mirrors too wherever it is neutral, so the set is partitioned and
+    // the neutral half carries that claim: the shrine lights over the two flag
+    // stands are team-coloured by design and exempt, everything else has to
+    // mirror colour as well as intensity and range. Position/intensity/range
+    // alone would let a recoloured half through.
     const lights = bgFieldLights();
+    const twinOf = (l: { x: number; z: number }) =>
+      lights.find((q) => Math.hypot(q.x + l.x, q.z + l.z) < 1e-6);
+    const isTeamColoured = (l: { x: number; z: number }) =>
+      BG_BASES.some((b) => Math.hypot(l.x - b.flag.x, l.z - b.flag.z) < 6);
+    const neutral = lights.filter((l) => !isTeamColoured(l));
+    // The partition is non-empty on BOTH sides: an exemption that swallowed
+    // every light would make the colour assertion below vacuous, and one that
+    // exempted nothing would mean the team shrines stopped being team-coloured.
+    expect(neutral.length, 'no neutral lights left to carry the colour claim').toBeGreaterThan(0);
+    expect(
+      lights.length - neutral.length,
+      'no team-coloured lights: the shrine exemption is stale',
+    ).toBeGreaterThan(0);
     for (const l of lights) {
-      const twin = lights.find((q) => Math.hypot(q.x + l.x, q.z + l.z) < 1e-6);
+      const twin = twinOf(l);
       expect(twin, `light (${l.x}, ${l.z}) has no mirrored twin`).toBeTruthy();
       expect(twin?.intensity).toBe(l.intensity);
       expect(twin?.range).toBe(l.range);
+    }
+    for (const l of neutral) {
+      expect(twinOf(l)?.color, `neutral light (${l.x}, ${l.z}) is not mirrored in colour`).toBe(
+        l.color,
+      );
     }
   });
 
@@ -342,6 +367,76 @@ describe('Thornhollow dressing: authored lights and decals', () => {
     const loadLine = src.split('\n').find((l) => l.includes('/decals/'));
     expect(loadLine, 'the field builder no longer loads from the decals folder').toBeTruthy();
     expect(loadLine).toContain('.webp');
+  });
+});
+
+describe('Thornhollow structures join the occluder-fade family', () => {
+  // Every other interior-capable render family (props, foliage, dungeon,
+  // eastbrook_town, yumi_maze) fades geometry that comes between the player and
+  // the chase camera. The field has keeps, gatehouses and towers a camera can
+  // sit behind, so its placements consume the same seam. Cosmetic only: the
+  // faded geometry still blocks movement and casts, and nothing is tier-gated.
+  it('classifies the tall wall, tower and gate pieces as occluders, clutter as not', () => {
+    for (const assetId of [
+      'dungeon/wall',
+      'dungeon/wall_broken',
+      'dungeon/barrier',
+      'city/wall_tower',
+      'biome/dungeon_arch_stone',
+    ]) {
+      expect(isBattlegroundOccluderAsset(assetId), assetId).toBe(true);
+    }
+    for (const assetId of [
+      'dungeon/crate_small',
+      'dungeon/rubble_large',
+      'dungeon/skull',
+      'foliage/oak_1',
+      'grass/patch',
+      'dungeon/torch_mounted',
+    ]) {
+      expect(isBattlegroundOccluderAsset(assetId), assetId).toBe(false);
+    }
+  });
+
+  it('splits the AUTHORED asset set both ways, so neither half is empty', () => {
+    // Run against the real manifest rather than a hand list: an asset rename in
+    // the map would otherwise leave the classifier matching nothing at all
+    // while the ids above still read as a passing test.
+    const ids = bgAssetGroups().map((g) => g.assetId);
+    const fading = ids.filter(isBattlegroundOccluderAsset);
+    expect(fading.length, 'no authored asset is classified as an occluder').toBeGreaterThan(0);
+    expect(
+      ids.length - fading.length,
+      'every authored asset fades: ground clutter is not exempt',
+    ).toBeGreaterThan(0);
+    // The structures really are the bulk of the field's geometry, so the fade
+    // is doing the job the family exists for.
+    const structuralPlacements = bgAssetGroups()
+      .filter((g) => isBattlegroundOccluderAsset(g.assetId))
+      .reduce((n, g) => n + g.placements.length, 0);
+    expect(structuralPlacements).toBeGreaterThan(400);
+  });
+
+  it('consumes the shared fade core and routes reduced motion, and the renderer drives it', () => {
+    const placements = readFileSync(`${ROOT}src/render/battleground_placements.ts`, 'utf8');
+    // The same three-part consumption every sibling family uses: the pure step
+    // policy, the settle test, and the segment/box hit test.
+    expect(placements).toContain("from './occluder_fade_core'");
+    expect(placements).toContain('occluderSegmentHitsBox(');
+    expect(placements).toContain('occluderFadeSettled(');
+    // An InstancedMesh cannot fade one instance, so the ghost pool is the only
+    // correct way to do this over the field's instanced batches.
+    expect(placements).toContain('InstancedOccluderGhosts');
+    // Reduced motion has to reach the step, exactly as
+    // graphics_overhaul_integration pins for the other consumers.
+    expect(placements).toMatch(/stepOccluderFade\([^)]+,\s*reducedMotion\)/s);
+    const renderer = readFileSync(`${ROOT}src/render/renderer.ts`, 'utf8');
+    const start = renderer.indexOf('updateBattlegroundOccluderFades(\n');
+    expect(start, 'the renderer never drives the battleground fade').toBeGreaterThan(-1);
+    const call = renderer.slice(start, renderer.indexOf(');', start));
+    expect(call).toContain('this.camera.position.x');
+    expect(call).toContain('this.cameraLookAt.x');
+    expect(call).toContain('this.reducedMotion()');
   });
 });
 

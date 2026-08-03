@@ -56,6 +56,7 @@ import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink
 import { attachBankerChestToNpcView } from './banker_chest';
 import { type BattlegroundView, buildBattleground } from './battleground';
 import { BattlegroundFx } from './battleground_fx';
+import { updateBattlegroundOccluderFades } from './battleground_placements';
 import { buildBattlegroundObject } from './battleground_props';
 import { type BirdsView, buildBirds } from './birds';
 import { type BladeGrassView, buildBladeGrass } from './blade_grass';
@@ -7048,8 +7049,12 @@ export class Renderer {
   // arena copies; their update() anchors the team beacons each frame.
   private yumiMazeViews = new Map<number, YumiMazeView>();
   // Thornhollow Fields battleground fields, one per match slot, built lazily like the
-  // yumi maze copies; the field is static, so there is no per-frame update.
+  // yumi maze copies; the geometry is static, and the only per-frame work is the
+  // occluder fade the placements own (battleground_placements.ts).
   private bgViews = new Map<number, BattlegroundView>();
+  // Reused ward-state carrier: setWardState only READS these fields, so the
+  // per-frame push refills this object rather than minting a literal.
+  private bgWardState = { countdown: false, ghost: false, myTeam: null as number | null };
   // Blue/red team arrows above every yumi fighter (yumi_team_markers.ts).
   private readonly yumiTeamMarkers = new YumiTeamMarkers();
   // Delve module interiors build asynchronously; track in-flight keys so a
@@ -7816,13 +7821,23 @@ export class Renderer {
   private updateBgWards(): void {
     if (this.bgViews.size === 0) return;
     const match = this.sim.bgInfo?.match ?? null;
-    const me = this.sim.playerId;
-    const mine = match?.players.find((p) => p.pid === me) ?? null;
-    const state = {
-      countdown: match?.state === 'countdown',
-      ghost: Boolean(match && match.state === 'active' && mine?.dead),
-      myTeam: match ? match.myTeam : null,
-    };
+    // Scratch state, refilled in place: setWardState only reads the fields, so
+    // a fresh literal every frame would be pure garbage on the render path.
+    const state = this.bgWardState;
+    state.countdown = match?.state === 'countdown';
+    state.myTeam = match ? match.myTeam : null;
+    // The roster scan only matters while the match is live, so it is skipped as
+    // a whole outside that window rather than run and then discarded, and the
+    // plain loop over the at-most-ten rows allocates no per-frame closure.
+    state.ghost = false;
+    if (match?.state === 'active') {
+      const me = this.sim.playerId;
+      for (const row of match.players) {
+        if (row.pid !== me) continue;
+        state.ghost = row.dead;
+        break;
+      }
+    }
     for (const view of this.bgViews.values()) view.setWardState(state);
   }
 
@@ -9373,6 +9388,19 @@ export class Renderer {
         dt,
         this.reducedMotion(),
       );
+    // Battleground keeps, gatehouses and towers fade when they come between the
+    // player and the chase camera (the same occluder-fade family every other
+    // interior-capable subsystem uses). A no-op loop while no field is built.
+    updateBattlegroundOccluderFades(
+      this.camera.position.x,
+      this.camera.position.y,
+      this.camera.position.z,
+      this.cameraLookAt.x,
+      this.cameraLookAt.y,
+      this.cameraLookAt.z,
+      dt,
+      this.reducedMotion(),
+    );
     this.yumiTeamMarkers.update(this.sim, this.views);
     this.tickValeCupFx(dt);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'vfx', worldStart);
