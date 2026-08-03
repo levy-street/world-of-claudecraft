@@ -295,13 +295,13 @@ describe('scripted playthrough (one sim, live sites only)', () => {
         sawBiteOnKoiSession = bit;
       }
     }
-    // Hunted literal (seed 4242, after every beat above, re-recorded after the
-    // Idol Guardian gained phasesThroughObstacles on this branch: its ambient
-    // wander no longer stalls on the Sunken Idol relic colliders, so its
-    // wander-arrival timing moves and every shared-stream draw after it shifts
-    // (the same cause as this branch's parity golden re-mint): the koi bites
-    // on session index 39.
-    expect(koiSession).toBe(39);
+    // Hunted literal (seed 4242, after every beat above, re-hunted for the Drakelands dragonkin brood rework: the brood's own
+    // spawns and idling are off-stream (CampDef.offStream /
+    // MobTemplate.offStreamIdle), but the three broodlords that REPLACED the
+    // emberwing drakes in shipped camp slots draw on the shared stream at
+    // spawn and no longer idle on it, which shifts every later draw once):
+    // the koi bites on session index 44.
+    expect(koiSession).toBe(44);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -329,18 +329,18 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Hunted literals (seed 4242, after every beat above): the harvest index
     // where each flavor's 1-in-90 event fires under the shared stream.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 57 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 16 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 126,
+        hitAt: 65,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 2,
+        hitAt: 92,
       },
     ];
     for (const hunt of hunts) {
@@ -397,12 +397,14 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       sim.harvestCorpse(mob.id, ['hide'], pid);
       if (sim.countItem('pristine_hide', pid) > 0) hitAt = i;
     }
-    // Hunted literal (seed 4242, after every beat above, re-recorded after the
-    // Idol Guardian gained phasesThroughObstacles on this branch: its wander
-    // no longer stalls on the relic colliders, shifting every shared-stream
-    // draw after it): the rare-or-better rarity roll that mints the signed
-    // specimen lands on attempt index 19.
-    expect(hitAt).toBe(19);
+    // Hunted literal (seed 4242, after every beat above, re-hunted for the Drakelands dragonkin brood rework: the brood's own
+    // spawns and idling are off-stream (CampDef.offStream /
+    // MobTemplate.offStreamIdle), but the three broodlords that REPLACED the
+    // emberwing drakes in shipped camp slots draw on the shared stream at
+    // spawn and no longer idle on it, which shifts every later draw once):
+    // the rare-or-better rarity roll that mints the signed specimen lands on
+    // attempt index 1.
+    expect(hitAt).toBe(1);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);
     expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(true);
