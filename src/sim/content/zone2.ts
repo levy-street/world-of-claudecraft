@@ -965,7 +965,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     completionText:
       "Ruthless and thorough. If this marsh ever dries out, there's warden's work waiting for you.",
     objectives: [
-      { type: 'interact', targetObjectItemId: 'murloc_hut', count: 5, label: 'Murloc huts burned' },
+      { type: 'interact', targetObjectItemId: 'murloc_hut', count: 5, label: 'Mudfin huts burned' },
     ],
     xpReward: 1100,
     copperReward: 450,
@@ -1321,8 +1321,10 @@ export const ZONE2_CAMPS: CampDef[] = [
   { mobId: 'mire_widow', center: { x: 70, z: 300 }, radius: 20, count: 7 },
   { mobId: 'mire_widow', center: { x: 95, z: 340 }, radius: 16, count: 6 },
   { mobId: 'mirefen_broodmother', center: { x: 98, z: 348 }, radius: 3, count: 1 },
-  // The Broodmother's clutch: quest-gated eggs to destroy for q_broodmother.
-  { mobId: 'spider_egg', center: { x: 92, z: 352 }, radius: 12, count: 10 },
+  // The Broodmother's clutch: quest-gated eggs spread across Widow Thicket,
+  // interleaved with the widow packs (q_broodmother).
+  { mobId: 'spider_egg', center: { x: 70, z: 300 }, radius: 20, count: 7 },
+  { mobId: 'spider_egg', center: { x: 95, z: 340 }, radius: 16, count: 6 },
   // Drowned dead: the Drowned Chapel and the shallows beyond
   { mobId: 'drowned_dead', center: { x: 90, z: 420 }, radius: 20, count: 8 },
   { mobId: 'drowned_dead', center: { x: 115, z: 450 }, radius: 16, count: 6 },

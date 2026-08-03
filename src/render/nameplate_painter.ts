@@ -19,6 +19,7 @@
 import * as THREE from 'three';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
+import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
 import { type Entity, GATHER_CAST_ID, isQuestTurnInNpc } from '../sim/types';
 import { deedTitleText } from '../ui/deed_i18n';
 import {
@@ -130,6 +131,12 @@ export class NameplatePainter {
     for (const [id, v] of this.views) {
       const e = world.entities.get(id);
       if (!e) continue;
+      // Quest-gated mobs (Broodmother eggs): no nameplate or hp bar for players not
+      // on the gating quest, so the clutch reads as inert scenery until you have it.
+      if (isQuestGatedEntityHidden(e, world.questLog)) {
+        this.hideNameplate(v);
+        continue;
+      }
       // the saddle lift rides the anchor so a mounted player's plate clears the head
       const plan = nameplatePlanInto(
         this.plan,

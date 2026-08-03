@@ -11997,7 +11997,7 @@ export const en_CA: EnTranslations = {
         "completion": "Ruthless and thorough. If this marsh ever dries out, there's warden's work waiting for you.",
         "objectives": {
           "0": {
-            "label": "Murloc huts burned"
+            "label": "Mudfin huts burned"
           }
         }
       },

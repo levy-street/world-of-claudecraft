@@ -9,6 +9,7 @@ import {
   HUT_BURN_RANGE,
   throwFirebottleAtNearestHut,
 } from '../src/sim/interactions/firebottle_hut';
+import { isQuestGatedEntityHidden } from '../src/sim/quest_gated_entity';
 import type { PlayerMeta } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import type { Entity, QuestProgress } from '../src/sim/types';
@@ -213,6 +214,27 @@ describe('Mirefen quest de-duplication', () => {
       throwFirebottleAtNearestHut(ctx, player, onQuestMeta());
       expect(hut.burnBurstUntil).toBeUndefined();
       expect(events.some((e) => e.type === 'error')).toBe(true);
+    });
+  });
+
+  describe('quest-gated egg visibility (isQuestGatedEntityHidden)', () => {
+    const egg = { kind: 'mob', templateId: 'spider_egg' } as unknown as Entity;
+    const widow = { kind: 'mob', templateId: 'mire_widow' } as unknown as Entity;
+    const object = { kind: 'object', templateId: 'ground_murloc_hut' } as unknown as Entity;
+    const log = (state?: QuestProgress['state']): Map<string, QuestProgress> =>
+      state
+        ? new Map([['q_broodmother', { questId: 'q_broodmother', counts: [0, 0], state }]])
+        : new Map();
+
+    it('hides a Broodmother egg from a player not on the quest', () => {
+      expect(isQuestGatedEntityHidden(egg, log())).toBe(true);
+    });
+    it('shows the egg once the quest is active', () => {
+      expect(isQuestGatedEntityHidden(egg, log('active'))).toBe(false);
+    });
+    it('never hides an ordinary mob or a world object', () => {
+      expect(isQuestGatedEntityHidden(widow, log())).toBe(false);
+      expect(isQuestGatedEntityHidden(object, log())).toBe(false);
     });
   });
 });
