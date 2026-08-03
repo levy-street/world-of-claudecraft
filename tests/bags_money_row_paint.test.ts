@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 // The bag money row's own staleness refresh (issue #2373), driven against the REAL
 // BagsWindow painter in jsdom (the bags_window_instance_marker.test.ts idiom).
 //

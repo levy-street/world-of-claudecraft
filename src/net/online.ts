@@ -173,6 +173,7 @@ interface ClientWireAura {
   emp?: Aura['empowerAbilities'];
   src?: number;
   ub?: 1;
+  bt?: 1;
 }
 
 // ---------------------------------------------------------------------------
@@ -1324,6 +1325,7 @@ function blankEntity(id: number): Entity {
     chaseStall: 0,
     evadeEpoch: 0,
     combatExitHoldUntil: 0,
+    chainPullInbound: false,
     fleeTimer: 0,
     fleeReturnTimer: 0,
     hasFled: false,
@@ -1495,6 +1497,11 @@ export class ClientWorld implements IWorld {
   // Active procedural Rift floor, rebuilt from the riftState event (no snapshot
   // field). The renderer regenerates geometry/style from this descriptor.
   riftFloor: RiftFloorView | null = null;
+  // The online client never registers a rift collision region of its own (collision
+  // resolution is server-authoritative); 0 keeps findPlayerPath/resolvePlayerDestination
+  // and the swept-landing crest re-resolve (see world_api/dungeons.ts) inert here, same
+  // as outside a rift.
+  readonly riftCollisionToken = 0;
   // The riftState event's expiresAtMs mirrored verbatim: an epoch-ms deadline the
   // server computed via ctx.lockoutNowMs() (real Date.now() on the live server, the
   // same clock raidLockouts() already relies on). Null while riftFloor is null or
@@ -2830,6 +2837,7 @@ export class ClientWorld implements IWorld {
             // (auras_view ownFirst). An old server omits it; 0 matches no player id.
             rec.sourceId = a.src ?? 0;
             rec.unbreakableControl = a.ub === 1 ? true : undefined;
+            rec.breakThreshold = a.bt === 1 ? 1 : undefined;
           }
         } else {
           e.auras = wireAuras.map((a) => ({
@@ -2848,6 +2856,7 @@ export class ClientWorld implements IWorld {
             charges: a.charges,
             empowerAbilities: a.emp,
             unbreakableControl: a.ub === 1 ? true : undefined,
+            breakThreshold: a.bt === 1 ? 1 : undefined,
           }));
         }
       }

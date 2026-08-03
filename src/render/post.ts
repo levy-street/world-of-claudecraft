@@ -16,8 +16,8 @@ import { renderLayerDisabled } from './render_dev_flags';
 // Post chain: N8AO (high: half-res Low, ultra+insane: full-res Medium)
 // -> UnrealBloom -> OutputGradePass (OutputPass ACES tonemap + sRGB followed
 // by the display-space lift/gamma/gain, saturation, vignette, and grain)
-// -> SMAA (medium and above). Medium uses RenderPass -> OutputGradePass
-// -> SMAA.
+// -> ScreenFx -> SMAA (high and above). Medium uses the region-safe
+// RenderPass -> OutputGradePass chain only.
 //
 // N8AO replaced three's GTAOPass: better denoise at lower sample counts, and
 // cheap enough (half-res) to run on the high tier where GTAO was ultra-only.
@@ -25,16 +25,16 @@ import { renderLayerDisabled } from './render_dev_flags';
 //
 // Actual AA graph on the pinned packages: N8AO renders into its own
 // single-sample beauty target, so MSAA cannot protect the composer tiers.
-// High, ultra, and insane use tail SMAA at a 1.75 DPR cap. Medium also uses
-// tail SMAA through its existing grade path instead of a multisampled geometry
-// target. Full-screen targets never inherit MSAA.
+// High, ultra, and insane use tail SMAA at a 1.75 DPR cap. Medium keeps its
+// adaptive-resolution region by omitting SMAA and the full-UV ScreenFx tail.
+// Full-screen targets never inherit MSAA.
 //
 // OutputGradePass explicitly quantizes both removed RGBA16F boundaries: bloom's
 // additive scene write before tone mapping, then OutputPass color before the
 // unchanged grade. PreparedBloomPass keeps a dedicated bright target and leaves
 // every bright/blur/composite sample intact while removing that full-resolution
-// add draw and its redundant clears. With no tail SMAA, the composer also aliases
-// its read/write buffer.
+// add draw and its redundant clears. ScreenFx is itself a swapping tail, so the
+// Advanced chain keeps distinct composer targets even when SMAA is disabled.
 //
 // N8AO owns one beauty+depth scene draw. Full-res Medium reconstructs normals
 // from that shared depth texture; half-res Low downsamples the same depth once.
@@ -133,8 +133,8 @@ export function buildComposer(
   opts?: { gradeOnly?: boolean },
 ): PostPipeline {
   // Grade-only mini chain for the medium tier: RenderPass -> OutputGradePass,
-  // one fullscreen grade pass over the direct path, followed by SMAA. No AO
-  // or bloom, but the display-space grade (lift/gain/S-curve/vignette) is what
+  // one region-remapped fullscreen grade pass over the direct path. No AO,
+  // bloom, ScreenFx, or SMAA, but the display-space grade is what
   // separates "cinematic" from "raw ACES wash", and medium was the only
   // daylight tier shipping without it.
   const gradeOnly = opts?.gradeOnly === true;
@@ -218,8 +218,10 @@ export function buildComposer(
   // through the boot prewarm frames so its shader compiles alongside
   // everything else, then self-disables whenever no ripple/flash is live;
   // EffectComposer simply skips a disabled pass, so toggling is free.
-  const screenFx = new ShaderPass(ScreenFxShader);
-  composer.addPass(screenFx);
+  const screenFx = plan.composerPasses.includes('screen-fx')
+    ? new ShaderPass(ScreenFxShader)
+    : null;
+  if (screenFx) composer.addPass(screenFx);
   const rippleSlots = Array.from({ length: SCREEN_RIPPLE_SLOTS }, () => ({
     x: 0,
     y: 0,
@@ -230,15 +232,15 @@ export function buildComposer(
   const rippleProj = new THREE.Vector3();
   let flash = 0;
   let aspect = width / Math.max(1, height);
-  let screenFxWarm = 2; // main-loop frames to keep the pass compiled at boot
+  let screenFxWarm = screenFx ? 2 : 0; // main-loop frames to keep the pass compiled at boot
 
   // Edge AA, after the grade so it works on the display-space image (SMAA's
   // edge detector expects the gamma-encoded color OutputGradePass produces).
   // It stays the LAST pass; the screen-fx pass above feeds into it.
   // Construction size is provisional; addPass and the setSize() member resize
   // every pass to the live drawing-buffer extent.
-  // The AA policy uses SMAA from medium upward. Ultra and insane now run the
-  // same 1.75 cap as high: when both caps bind, 1.75 squared is 49 percent of
+  // The AA policy uses SMAA on the full composer tiers. Ultra and insane run
+  // the same 1.75 cap as high: when both caps bind, 1.75 squared is 49 percent of
   // the fragments at the old 2.5 cap, which leaves room for this fixed-cost
   // edge pass.
   // ?smaa=off is the dev-only perf-attribution kill switch. It keeps the
@@ -250,19 +252,19 @@ export function buildComposer(
     bloom,
     ao,
     grade,
-    supportsDynamicResolution: gradeOnly,
+    supportsDynamicResolution: plan.supportsDynamicResolution,
     setSize(width: number, height: number, pixelRatio = webgl.getPixelRatio()): void {
       composer.setSizeAndPixelRatio(width, height, pixelRatio);
       // The ripple projection maps world points to clip space, so it needs the
       // logical aspect, not the drawing-buffer extent.
       aspect = width / Math.max(1, height);
-      if (gradeOnly) {
+      if (plan.supportsDynamicResolution) {
         composer.setRenderRegion(composer.renderTarget1.width, composer.renderTarget1.height);
         grade.setInputUvRect(1, 1, 1, 1);
       }
     },
     setRenderRegion(region: DynamicResolutionRect): void {
-      if (!gradeOnly) return;
+      if (!plan.supportsDynamicResolution) return;
       composer.setRenderRegion(region.renderWidth, region.renderHeight);
       grade.setInputUvRect(region.uvScaleX, region.uvScaleY, region.uvMaxX, region.uvMaxY);
     },
@@ -270,6 +272,7 @@ export function buildComposer(
       composer.render();
     },
     screenRipple(x: number, y: number, z: number, strength: number): void {
+      if (!screenFx) return;
       let slot = null;
       for (const s of rippleSlots) {
         if (s.strength <= 0) {
@@ -289,9 +292,11 @@ export function buildComposer(
       slot.strength = 0.55 * Math.min(1.4, Math.max(0, strength)); // gallery spawnRipple scale
     },
     screenFlash(strength: number): void {
+      if (!screenFx) return;
       flash = Math.min(0.4, Math.max(flash, strength));
     },
     updateScreenFx(dt: number): void {
+      if (!screenFx) return;
       let active = false;
       const u = screenFx.uniforms;
       const ripples = u.uRipples.value as THREE.Vector4[];

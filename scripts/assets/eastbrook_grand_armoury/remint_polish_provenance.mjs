@@ -15,7 +15,7 @@
 //     performance evidence digest literal (recomputed LAST, from the swept
 //     files, matching the test's own name\0bytes\0 stream)
 //
-// GLB pipeline inputs (scripts/assets sources, package-lock.json) are NOT
+// GLB pipeline inputs (scripts/assets sources, pnpm-lock.yaml) are NOT
 // covered here: those need the full deterministic export re-run described in
 // the 0.30.0 re-mint commit.
 import { createHash } from 'node:crypto';

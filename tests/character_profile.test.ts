@@ -28,7 +28,9 @@ const SHEET = {
 
 function makeWorld(): any {
   // ClientWorld's constructor takes the connection params; we never open a socket,
-  // we only exercise the REST read.
+  // we only exercise the REST read. Kept bespoke on purpose (issue #2088): this
+  // fixture only touches base/token, unlike the shared
+  // tests/helpers/bare_client.ts bareClient(), which does not set them.
   const w = Object.create(ClientWorld.prototype);
   w.base = 'https://example.test';
   w.token = 'SECRET-BEARER-TOKEN';

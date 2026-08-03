@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 //
 // The mailbox parcel list's rebuild-refocus ladder, behaviorally.
 //

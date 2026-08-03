@@ -16,7 +16,7 @@ export interface GfxAaPolicy {
 
 const STANDARD_POLICIES: Record<GfxAaTier, GfxAaPolicy> = {
   low: { pixelRatioCap: 1.48, msaaSamples: 0, postAa: 'none' },
-  medium: { pixelRatioCap: 1.48, msaaSamples: 0, postAa: 'smaa' },
+  medium: { pixelRatioCap: 1.48, msaaSamples: 0, postAa: 'none' },
   high: { pixelRatioCap: 1.75, msaaSamples: 0, postAa: 'smaa' },
   ultra: { pixelRatioCap: 1.75, msaaSamples: 0, postAa: 'smaa' },
   insane: { pixelRatioCap: 1.75, msaaSamples: 0, postAa: 'smaa' },
@@ -32,9 +32,9 @@ const STANDARD_POLICIES: Record<GfxAaTier, GfxAaPolicy> = {
  * with edge-local reconstruction. Lower-DPR panels save less because both caps are
  * bounded by the panel DPR.
  *
- * Medium also uses tail SMAA. Its grade target already supplies the post seam, so
- * dropping 4x MSAA removes multisample storage and resolve bandwidth without adding
- * another scene draw. Low keeps its existing no-AA path.
+ * Medium keeps only its region-safe grade path. A full-size SMAA tail does not inherit
+ * the composer's reduced viewport and scissor, so it would reintroduce stale pixels
+ * outside the active region. Low keeps its existing no-AA path.
  */
 export function gfxAaPolicy(tier: GfxAaTier, hints: GfxAaDeviceHints = {}): GfxAaPolicy {
   // The 4 GB-class rung is stricter than the native iOS profile: both WebKit

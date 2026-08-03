@@ -5152,6 +5152,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.core.chatChannels.add': 'チャットチャンネルを追加',
   'hud.core.chatChannels.addTitle': 'チャンネルを追加',
   'hud.core.chatChannels.close': '{channel}タブを閉じる',
+  'hud.core.chatChannels.moveHint':
+    '{channel}タブを並べ替え: ドラッグするか、Alt+左または Alt+右を使用',
   'hud.core.chatChannels.names.general': '一般',
   'hud.core.chatChannels.names.guild': 'ギルド',
   'hud.core.chatChannels.names.lfg': '仲間募集',
@@ -9101,6 +9103,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ヒント：他のプレイヤーに友好的な決闘を申し込むか、灰塵のコロシアムに参加してビルドを試してみましょう。',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': '騎乗 / 降車',
+  // On-bar action-bar key-binding mode (issue #1238). M16 wordy fills.
+  'hudChrome.actionBar.editKeys': 'アクションバーのキーを編集',
+  'hudChrome.actionBar.editKeysHint':
+    'アクションバーのスロットをクリックし、キーを押して割り当てます。',
+  'hudChrome.actionBar.bannerHint':
+    'スロットをクリックし、キーを押して割り当てます。終わったら「完了」をクリックしてください。',
+  'hudChrome.actionBar.bannerCapturing': 'キーを押してこのスロットに割り当てます…',
+  'hudChrome.actionBar.boundToKey': '{key} に割り当てました。',
+  'hudChrome.actionBar.reset': 'リセット',
+  'hudChrome.actionBar.cancel': 'キャンセル',
+  'hudChrome.actionBar.resetConfirmTitle': 'アクションバーのキーをリセットしますか？',
+  'hudChrome.actionBar.resetConfirmBody':
+    '1本目のバーはデフォルトのキーに戻り、2本目と3本目のバーは未設定になります。この操作は取り消せません。',
   'hudChrome.mobile.mounts': 'マウント',
   'hudChrome.mounts.title': 'マウント',
   'hudChrome.mounts.close': '閉じる',

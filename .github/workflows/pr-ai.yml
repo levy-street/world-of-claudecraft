@@ -44,7 +44,7 @@ jobs:
       contents: write
       pull-requests: write
     # issue_comment fires this workflow on every comment on any issue or PR; without this
-    # guard the full checkout + npm ci + Vite boot + puppeteer run would fire on every
+    # guard the full checkout + pnpm install + Vite boot + puppeteer run would fire on every
     # comment too, even though nothing in this job reads the comment.
     if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
     steps:
@@ -54,14 +54,19 @@ jobs:
           # Full history so the diff against the PR base drives change-aware capture.
           fetch-depth: 0
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 26
-          cache: npm
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       # The client imports committed-but-derived i18n tables at boot; regenerate to be safe.
       - name: Generate i18n artifacts

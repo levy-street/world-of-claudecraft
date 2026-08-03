@@ -63,12 +63,12 @@
   }
 
   .auto-refresh input:checked + .switch-track {
-    background: #17301f;
-    border-color: #348b56;
+    background: var(--toggle-on-bg);
+    border-color: var(--badge-success-border);
   }
 
   .auto-refresh input:checked + .switch-track span {
-    background: #7bea9f;
+    background: var(--badge-success-text);
     transform: translateX(15px);
   }
 

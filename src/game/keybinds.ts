@@ -32,6 +32,13 @@ export interface BindAction {
 // Slot 0 is Attack. Slots 1..11, 12..22, and 23..33 are the three ability rows.
 export const ACTION_BAR_SLOTS = 34;
 
+// Slots 0 (Attack) through PRIMARY_BAR_MAX_SLOT (11) make up the first,
+// always-visible action bar; every slot past it belongs to the optional
+// secondary/third bar (mirrors ACTION_BAR_ABILITY_SLOTS_PER_ROW in
+// src/ui/hud/action_bar/action_bar_layout_core.ts). Used by resetSlots() to
+// decide which slots restore to their default vs go fully unbound.
+const PRIMARY_BAR_MAX_SLOT = 11;
+
 const SLOT_DEFAULTS = [
   'Digit1',
   'Digit2',
@@ -691,6 +698,46 @@ export class Keybinds {
 
   reset(): void {
     this.map = this.defaults();
+    this.save();
+  }
+
+  /**
+   * Reset ONLY the action-bar slot bindings (`slot0`..`slot${ACTION_BAR_SLOTS - 1}`),
+   * leaving every other action (movement, targeting, interface, pet) untouched, unlike
+   * the everything-resetting reset(). The first bar (slot0 Attack plus slots
+   * 1..PRIMARY_BAR_MAX_SLOT) returns to its default keys; every slot on an optional
+   * secondary/third bar goes fully unbound rather than reverting to its numpad
+   * default, freeing those physical keys for the player to reuse elsewhere. Used by
+   * the on-bar key-binding mode's Reset action (src/ui/hud.ts).
+   */
+  resetSlots(): void {
+    const defaults = this.defaults();
+    for (const a of BIND_ACTIONS) {
+      if (!a.id.startsWith('slot')) continue;
+      const slot = Number(a.id.slice(4));
+      this.map.set(
+        a.id,
+        slot <= PRIMARY_BAR_MAX_SLOT ? (defaults.get(a.id) ?? [null, null]) : [null, null],
+      );
+    }
+    // The just-restored primary-bar defaults may collide with a code the player
+    // has since rebound elsewhere (another action, including a non-primary slot
+    // whose custom binding happened to match a primary default); the classic
+    // one-code-per-action invariant means the restored default wins, mirroring
+    // the eviction sweep bind() and load() both run.
+    const claimed = new Set<string>();
+    for (let slot = 0; slot <= PRIMARY_BAR_MAX_SLOT; slot++) {
+      for (const c of this.map.get(`slot${slot}`) ?? []) if (c !== null) claimed.add(c);
+    }
+    for (const [id, codes] of this.map) {
+      const slot = id.startsWith('slot') ? Number(id.slice(4)) : null;
+      if (slot !== null && slot <= PRIMARY_BAR_MAX_SLOT) continue; // the restored defaults themselves
+      if (actionAllowsShared(id)) continue;
+      for (let i = 0; i < codes.length; i++) {
+        const c = codes[i];
+        if (c !== null && claimed.has(c)) codes[i] = null;
+      }
+    }
     this.save();
   }
 }

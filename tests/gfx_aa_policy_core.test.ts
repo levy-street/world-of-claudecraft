@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { gfxAaPolicy } from '../src/render/gfx_aa_policy_core';
 
 describe('graphics anti-aliasing policy', () => {
-  it('uses post AA instead of multisampling from medium upward', () => {
+  it('keeps the region-scaled medium tier free of full-size post AA', () => {
     expect(gfxAaPolicy('low')).toEqual({
       pixelRatioCap: 1.48,
       msaaSamples: 0,
@@ -11,7 +11,7 @@ describe('graphics anti-aliasing policy', () => {
     expect(gfxAaPolicy('medium')).toEqual({
       pixelRatioCap: 1.48,
       msaaSamples: 0,
-      postAa: 'smaa',
+      postAa: 'none',
     });
     expect(gfxAaPolicy('high')).toEqual({
       pixelRatioCap: 1.75,

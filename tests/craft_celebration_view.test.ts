@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 // Pure-core pins for the crafting celebration plan (Professions 2.0):
 // tier-crossing detection over craft-skill snapshots and the coalesced

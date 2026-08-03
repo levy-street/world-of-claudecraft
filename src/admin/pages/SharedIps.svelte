@@ -217,12 +217,12 @@
   }
 
   .online-filter input:checked + .switch-track {
-    background: #17301f;
-    border-color: #348b56;
+    background: var(--toggle-on-bg);
+    border-color: var(--badge-success-border);
   }
 
   .online-filter input:checked + .switch-track span {
-    background: #7bea9f;
+    background: var(--badge-success-text);
     transform: translateX(15px);
   }
 
@@ -235,7 +235,7 @@
     margin: 10px 0 14px;
     padding: 9px 11px;
     color: var(--text-dim);
-    background: #14131a;
+    background: var(--surface-inset);
     border-left: 2px solid var(--gold-dim);
     border-radius: 3px;
     font-size: 12px;

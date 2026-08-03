@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 // The HUD render sink for the four Professions 2.0 text-free
 // SimEvents (profTrendNudge, profTierTutorial, attuned, attunedZone). The sim

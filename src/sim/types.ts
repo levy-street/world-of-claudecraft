@@ -3401,6 +3401,7 @@ export interface Entity extends ClientMirroredEntityFields {
   chaseStall: number; // seconds an engaged mob has been pinned unable to close on its target; at CHASE_STALL_TIMEOUT (mob/reachability.ts) it evades home like a leash break
   evadeEpoch: number; // bumped every full evade-home reset (resetEvadingMob); lets a stamped-at-exit snapshot (instance_exit_memory.ts) detect a pull it no longer belongs to
   combatExitHoldUntil: number; // sim time; while in the future, resetEvadingMob defers the full evade-home reset (issue #2653): a mob a player just left mid-combat stays parked in 'evade' (immune, undamaged, hate table intact) instead of healing/clearing so a same-claim re-entry within instance_exit_memory.ts's window resumes the exact fight it left, not a fresh unengaged pull
+  chainPullInbound: boolean; // woken by a boss chain pull and still crossing to the puller; suspends the soft leash until it arrives (mob/chain_pull_transit.ts)
   fleeTimer: number; // seconds left in a low-HP panic flee; counts down in the 'flee' state
   fleeReturnTimer: number; // grace after a panic flee hits leash edge, letting it run back before normal leash reset resumes
   hasFled: boolean; // a cowardly mob flees only once per pull; cleared when it resets at spawn
@@ -3416,6 +3417,10 @@ export interface Entity extends ClientMirroredEntityFields {
   // [dev] /dev god cheat state, kept OFF the production gm flag so it never touches a
   // real game master (who could otherwise deal 100x or have their invuln toggled).
   devGod?: boolean;
+  /** Profiler-only invulnerability. The dev-gated server command sets this
+   *  idempotently so combat presentation remains active without /dev god's
+   *  outgoing damage multiplier. Server-private and never persisted. */
+  profilerInvulnerable?: boolean;
   /** Owner of a mob created by /dev spawn. Server-private and never persisted. */
   devSpawnOwnerId?: number;
   /** Dev/test healer target: friendly-selectable inert dummy instance. */

@@ -1,5 +1,5 @@
 // Draw-stats frame accumulator: real per-frame draw-call/triangle deltas on the
-// composer tiers, where three's per-render auto-reset makes every post-frame
+// post-processing tiers, where three's per-render auto-reset makes every post-frame
 // reader see only the final fullscreen pass (1 call / 1 triangle; confirmed
 // live on high and ultra, packet 0 phase 01).
 //
@@ -9,8 +9,8 @@
 // counters only ever hold the most recent pass (and even single-pass tiers
 // exclude shadow draws). WebGLInfo.reset() zeroes render.calls/triangles/
 // points/lines only; info.memory and info.programs are never reset. The
-// renderer flips info.autoReset to false ONLY when the composer is active
-// (packet ruling R1), letting the counters run monotonically across all
+// renderer flips info.autoReset to false only when a post chain is active,
+// letting the counters run monotonically across all
 // passes; this core turns consecutive reads into per-frame deltas.
 //
 // Pure core contract: no three import (structural counters only), no DOM, no
@@ -45,6 +45,25 @@ export interface DrawStatsAccumulator {
    * are discarded with it (one under-reported frame per exclusion).
    */
   noteOutOfBand(read: DrawStatsCounters): void;
+}
+
+/** Structural subset of Three's WebGLInfo used by the renderer wiring. */
+export interface LogicalFrameDrawInfo {
+  autoReset: boolean;
+  readonly render: DrawStatsCounters;
+  reset(): void;
+}
+
+/**
+ * One owner for the renderer's post-processing draw-counter lifecycle. Keeping
+ * setup, frame snapshots, governor reads, and out-of-band resets together
+ * prevents one consumer from silently falling back to the final fullscreen pass.
+ */
+export interface LogicalFrameDrawStats {
+  beginFrame(): Readonly<DrawStatsCounters>;
+  currentFrame(): Readonly<DrawStatsCounters>;
+  governorSignal(tier: GfxTier): Readonly<DrawStatsCounters>;
+  discardOutOfBand(): void;
 }
 
 const zeroFrame = (): DrawStatsCounters => ({ calls: 0, triangles: 0, points: 0, lines: 0 });
@@ -93,32 +112,36 @@ export function createDrawStatsAccumulator(): DrawStatsAccumulator {
 }
 
 /**
- * What the render-budget governor saw on the composer tiers before the
- * accumulator existed: the final fullscreen output pass, one call drawing
- * one fullscreen triangle (observed live on high and ultra, 150/150 frames
- * each, and pinned by tests/draw_stats_core.test.ts).
- */
-export const COMPOSER_TIER_LEGACY_DRAW_SIGNAL: Readonly<DrawStatsCounters> = Object.freeze({
-  calls: 1,
-  triangles: 1,
-  points: 0,
-  lines: 0,
-});
-
-/**
- * The governor's draw-pressure input per tier (packet ruling R1). Composer
- * tiers (high/ultra) receive the frozen legacy constant so the governor's
- * draw arm stays exactly as dead as it was before the accumulator; low and
- * medium pass the live frame through verbatim. Callers on a non-composer
- * high/ultra profile (native iOS memory profile, advanced preset with
- * effects shed) must NOT route through this shim: their live counters are
- * real and already feed the governor unchanged.
+ * The governor's draw-pressure input. Post-processing profiles pass the
+ * logical-frame accumulator snapshot through here, while direct profiles
+ * already feed their live frame counters to the governor at the caller. The
+ * tier argument keeps that caller contract explicit and prevents a future tier
+ * from silently substituting a synthetic signal.
  */
 export function governorDrawSignal(
-  tier: GfxTier,
+  _tier: GfxTier,
   frame: DrawStatsCounters,
 ): Readonly<DrawStatsCounters> {
-  return tier === 'high' || tier === 'ultra' || tier === 'insane'
-    ? COMPOSER_TIER_LEGACY_DRAW_SIGNAL
-    : frame;
+  return frame;
+}
+
+export function createLogicalFrameDrawStats(info: LogicalFrameDrawInfo): LogicalFrameDrawStats {
+  info.autoReset = false;
+  const accumulator = createDrawStatsAccumulator();
+  const frame = zeroFrame();
+  return {
+    beginFrame(): Readonly<DrawStatsCounters> {
+      return accumulator.beginFrame(info.render, frame);
+    },
+    currentFrame(): Readonly<DrawStatsCounters> {
+      return frame;
+    },
+    governorSignal(tier: GfxTier): Readonly<DrawStatsCounters> {
+      return governorDrawSignal(tier, frame);
+    },
+    discardOutOfBand(): void {
+      accumulator.noteOutOfBand(info.render);
+      info.reset();
+    },
+  };
 }

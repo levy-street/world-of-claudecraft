@@ -95,18 +95,20 @@ describe('shouldCheckInstallSync', () => {
 });
 
 describe('formatInstallSyncFailure', () => {
-  it('pins the message shape and the npm ci hint for multiple problems', () => {
+  it('pins the message shape and the pnpm install hint for multiple problems', () => {
     const msg = formatInstallSyncFailure([
       'missing: @capgo/capacitor-updater@^8.51.2, required by world-of-claudecraft@0.33.0',
       'invalid: three@0.185.1 /repo/node_modules/three',
     ]);
-    expect(msg).toContain('node_modules does not match what package-lock.json would install');
+    expect(msg).toContain('node_modules does not match what pnpm-lock.yaml would install');
     expect(msg).toContain('2 problems');
     expect(msg).toContain(
       '  - missing: @capgo/capacitor-updater@^8.51.2, required by world-of-claudecraft@0.33.0',
     );
     expect(msg).toContain('  - invalid: three@0.185.1 /repo/node_modules/three');
-    expect(msg).toContain('Run `npm ci` to reinstall exactly what the lockfile pins');
+    expect(msg).toContain(
+      'Run `pnpm install --frozen-lockfile` to reinstall exactly what the lockfile pins',
+    );
   });
 
   it('uses the singular "problem" for exactly one finding', () => {

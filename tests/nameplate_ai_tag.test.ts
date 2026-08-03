@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 //
 // The operator-set [AI] account tag on the overhead nameplate. Nameplates are
 // positioned DOM divs, so the tag is a class toggle on its own span, not a

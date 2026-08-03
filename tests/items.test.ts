@@ -120,6 +120,39 @@ describe('items.useItem', () => {
     expect(sim.countItem('spring_water', pid)).toBe(0);
   });
 
+  it('a second food use while already eating is rejected, not a wasted second item (#2565)', () => {
+    const sim = makeWorld();
+    const { pid, p } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    sim.addItem('baked_bread', 2, pid);
+
+    items.useItem(ctx, 'baked_bread', pid);
+    const firstConsuming = p.eating;
+    expect(sim.countItem('baked_bread', pid)).toBe(1);
+
+    sim.drainEvents();
+    items.useItem(ctx, 'baked_bread', pid);
+    expect(errorTexts(sim.drainEvents() as SimEvent[])).toContain('You are already eating.');
+    // the in-flight slot is untouched and the second copy was never spent
+    expect(p.eating).toBe(firstConsuming);
+    expect(sim.countItem('baked_bread', pid)).toBe(1);
+  });
+
+  it('a second drink use while already drinking is rejected the same way, independent of the eating slot', () => {
+    const sim = makeWorld();
+    const { pid, p } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    sim.addItem('spring_water', 2, pid);
+
+    items.useItem(ctx, 'spring_water', pid);
+    const firstConsuming = p.drinking;
+    sim.drainEvents();
+    items.useItem(ctx, 'spring_water', pid);
+    expect(errorTexts(sim.drainEvents() as SimEvent[])).toContain('You are already drinking.');
+    expect(p.drinking).toBe(firstConsuming);
+    expect(sim.countItem('spring_water', pid)).toBe(1);
+  });
+
   it('sitting down to eat/drink emits an immediate sound-only heal (source + sfxTick), before any regen tick', () => {
     const sim = makeWorld();
     const { pid, p } = vendorPlayer(sim);

@@ -39,6 +39,7 @@ import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import { abilityScalingPower, channelTickBonus } from '../spell_scaling';
+import { hasEscapeStealth } from '../threat';
 import type { AbilityDef, AbilityEffect, Entity, Vec3 } from '../types';
 import {
   angleTo,
@@ -794,7 +795,15 @@ export function castAbility(
     }
   } else if (ability.requiresTarget && ability.targetType === 'any') {
     target = p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null;
-    if (!target || target.dead || (!ctx.isHostileTo(p, target) && !ctx.isFriendlyTo(p, target))) {
+    if (
+      !target ||
+      target.dead ||
+      (!ctx.isHostileTo(p, target) && !ctx.isFriendlyTo(p, target)) ||
+      // Vanish (hasEscapeStealth) makes a HOSTILE target fully undetectable
+      // (issue #2426); a friendly cast (self/party heal) is unaffected, since
+      // allies can always perceive a stealthed party member.
+      (ctx.isHostileTo(p, target) && hasEscapeStealth(target))
+    ) {
       ctx.error(p.id, 'You have no target.', target?.dead ? 'target_dead' : undefined);
       return;
     }
@@ -813,7 +822,10 @@ export function castAbility(
       p.targetId !== null
         ? (ctx.entities.get(p.targetId) ?? null)
         : vanishedLowBlowFallbackTarget(ctx, p, ability);
-    if (!target || target.dead || !ctx.isHostileTo(p, target)) {
+    // Vanish (hasEscapeStealth) makes the target fully undetectable, same gate
+    // the mob AI already applies (mob/targeting.ts): a hostile cast against it
+    // is refused exactly like an out-of-range or dead target (issue #2426).
+    if (!target || target.dead || !ctx.isHostileTo(p, target) || hasEscapeStealth(target)) {
       ctx.error(p.id, 'You have no target.', target?.dead ? 'target_dead' : undefined);
       return;
     }
@@ -1023,7 +1035,7 @@ export function castAbility(
   // ability, so the charge must survive until then and be consumed there.
   if ((castTime === 0 || ability.channel) && !togglingOff) {
     if (canCastFree && consumeFreeCostFor(ctx, p, ability.id)) {
-      res = { ...res, cost: 0 };
+      res = { ...res, cost: 0, freeCast: true };
     } else if (res.cost > 0) {
       const cheap = consumeNextCastCheap(ctx, p, ability.id);
       if (cheap !== null) res = { ...res, cost: Math.ceil(res.cost * cheap) };
@@ -1457,7 +1469,9 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
   }
 
   const target = p.castTargetId !== null ? ctx.entities.get(p.castTargetId) : null;
-  if (!target || target.dead || !ctx.isHostileTo(p, target)) {
+  // A channel whose target vanishes mid-cast (Vanish, hasEscapeStealth) stops
+  // ticking on it, same as an out-of-range or dead target (issue #2426).
+  if (!target || target.dead || !ctx.isHostileTo(p, target) || hasEscapeStealth(target)) {
     cancelCast(ctx, p);
     return;
   }
@@ -1684,7 +1698,12 @@ function applyAbility(
     }
   } else if (ability.requiresTarget && ability.targetType === 'any') {
     target = castTarget !== null ? (ctx.entities.get(castTarget) ?? null) : null;
-    if (!target || target.dead || (!ctx.isHostileTo(p, target) && !ctx.isFriendlyTo(p, target))) {
+    if (
+      !target ||
+      target.dead ||
+      (!ctx.isHostileTo(p, target) && !ctx.isFriendlyTo(p, target)) ||
+      (ctx.isHostileTo(p, target) && hasEscapeStealth(target))
+    ) {
       ctx.error(p.id, 'You have no target.');
       return;
     }
@@ -1700,7 +1719,7 @@ function applyAbility(
     }
   } else if (ability.requiresTarget) {
     target = castTarget !== null ? (ctx.entities.get(castTarget) ?? null) : null;
-    if (!target || target.dead || !ctx.isHostileTo(p, target)) {
+    if (!target || target.dead || !ctx.isHostileTo(p, target) || hasEscapeStealth(target)) {
       ctx.error(p.id, 'You have no target.');
       return;
     }
@@ -1723,7 +1742,7 @@ function applyAbility(
     return;
   }
   if (canCastFree && !togglingOff && consumeFreeCostFor(ctx, p, ability.id)) {
-    res = { ...res, cost: 0 };
+    res = { ...res, cost: 0, freeCast: true };
   } else if (res.cost > 0 && !togglingOff) {
     const cheap = consumeNextCastCheap(ctx, p, ability.id);
     if (cheap !== null) res = { ...res, cost: Math.ceil(res.cost * cheap) };

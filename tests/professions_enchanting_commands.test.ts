@@ -38,7 +38,8 @@ import { type ClientSession, GameServer } from '../server/game';
 import { ClientWorld } from '../src/net/online';
 import { CRAFT_THROTTLE_MAX_PER_WINDOW } from '../src/sim/professions/action_throttle';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
-import type { PlayerClass, SimEvent } from '../src/sim/types';
+import type { SimEvent } from '../src/sim/types';
+import { bareClient } from './helpers/bare_client';
 
 // A common-quality one-hand weapon: disenchants to arcane_dust with NO typed
 // secondary, salvages to bone_fragments, and takes the mainhand Might enchant.
@@ -335,57 +336,6 @@ function eventsFor(sent: { t: string; list?: SimEvent[] }[], type: SimEvent['typ
     .filter((m) => m.t === 'events')
     .flatMap((m) => m.list ?? [])
     .filter((ev) => ev.type === type);
-}
-
-// A ClientWorld without the WebSocket plumbing, to drive applySnapshot directly
-// (the tests/snapshots.test.ts bareClient shape).
-function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.ownPlayerId = pid;
-  c.ownPlayerClass = playerClass;
-  c.spectating = null;
-  c.cupInfo = null;
-  c.lastVcupRemainder = null;
-  c.lastVcupShared = null;
-  c.sportRole = null;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.honor = 0;
-  c.lifetimeHonor = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.selectedDungeonDifficulty = 'normal';
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.serverTickHz = null;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  c.spectateFacingPending = false;
-  c.pendingSpectateFacing = null;
-  c.nodeCooldowns = new Map();
-  return c;
 }
 
 function metaOf(server: GameServer, pid: number): PlayerMeta {
@@ -895,6 +845,9 @@ describe('ClientWorld enchanting members are live (send + event mirror)', () => 
     (globalThis as { WebSocket?: unknown }).WebSocket = { OPEN: 1 };
     try {
       const sent: unknown[] = [];
+      // Kept bespoke on purpose (issue #2088): a hand-picked field subset plus
+      // a live `ws` mock. tests/helpers/bare_client.ts bareClient() is the
+      // default for a new suite that just needs a bare ClientWorld.
       const c: any = Object.create(ClientWorld.prototype);
       c.connected = true;
       c.spectating = null;
@@ -943,7 +896,7 @@ describe('ClientWorld enchanting members are live (send + event mirror)', () => 
       applyEnchantResultEvent(ev: SimEvent): void;
       applySalvageResultEvent(ev: SimEvent): void;
     };
-    expect(client.lastDisenchantResult).toBeUndefined(); // bareClient skips field init
+    expect(client.lastDisenchantResult).toBeNull(); // bareClient's declaration default
 
     internals.applyDisenchantResultEvent({
       type: 'disenchantResult',

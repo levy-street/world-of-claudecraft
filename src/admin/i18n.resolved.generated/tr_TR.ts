@@ -44,6 +44,7 @@ export const tr_TR: AdminTranslations = {
   "nav.primaryLabel": "Yönetici gezinmesi",
   "nav.openMenu": "Gezinmeyi aç",
   "nav.closeMenu": "Gezinmeyi kapat",
+  "theme.darkModeLabel": "Dark mode",
   "stats.onlineNow": "şu an çevrimiçi",
   "stats.onlineAccounts": "çevrimiçi hesaplar",
   "stats.siteUsersNow": "şu anki site kullanıcıları",

@@ -44,6 +44,7 @@ export const ja_JP: AdminTranslations = {
   "nav.primaryLabel": "管理者のナビゲーション",
   "nav.openMenu": "ナビゲーションを開く",
   "nav.closeMenu": "ナビゲーションを閉じる",
+  "theme.darkModeLabel": "Dark mode",
   "stats.onlineNow": "現在オンライン",
   "stats.onlineAccounts": "オンラインアカウント",
   "stats.siteUsersNow": "現在のサイトユーザー",

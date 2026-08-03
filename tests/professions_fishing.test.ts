@@ -30,7 +30,6 @@ vi.mock('../server/db', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
-import { ClientWorld } from '../src/net/online';
 import { bagCapacity } from '../src/sim/bags';
 import { updateCasting } from '../src/sim/combat/casting_lifecycle';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
@@ -46,14 +45,9 @@ import {
   startFishing,
 } from '../src/sim/professions/fishing';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
-import {
-  type Entity,
-  FISHING_CAST_ID,
-  GATHER_CAST_ID,
-  type PlayerClass,
-  type SimEvent,
-} from '../src/sim/types';
+import { type Entity, FISHING_CAST_ID, GATHER_CAST_ID, type SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import { bareClient } from './helpers/bare_client';
 
 function makeSim(seed = 467): Sim {
   return new Sim({ seed, playerClass: 'warrior', autoEquip: true });
@@ -1285,55 +1279,6 @@ function lastSnap(sent: any[]): any {
     if (sent[i].t === 'snap') return sent[i];
   }
   return null;
-}
-
-// A ClientWorld without the WebSocket plumbing, to drive applySnapshot
-// directly (the bareClient idiom from tests/snapshots.test.ts).
-function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.ownPlayerId = pid;
-  c.ownPlayerClass = playerClass;
-  c.spectating = null;
-  c.cupInfo = null;
-  c.sportRole = null;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.honor = 0;
-  c.lifetimeHonor = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.selectedDungeonDifficulty = 'normal';
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.serverTickHz = null;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  c.spectateFacingPending = false;
-  c.pendingSpectateFacing = null;
-  c.nodeCooldowns = new Map();
-  return c;
 }
 
 describe('fishing over the live server (pin 8)', () => {

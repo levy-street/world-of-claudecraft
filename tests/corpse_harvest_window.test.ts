@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 //
 // Behavioral pin for the per-corpse harvest picker painter (the pure row/button
 // decisions are unit-tested in corpse_harvest_view via the sim suite). Unlike the

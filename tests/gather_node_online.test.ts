@@ -8,6 +8,9 @@ import { ClientWorld } from '../src/net/online';
 // the ClientWorld-only edges that fixture doesn't: the unset-before-any-
 // snapshot default and a cooldown clearing on a later snapshot.
 describe('ClientWorld.nodeHarvestableByMe', () => {
+  // Kept bespoke on purpose (issue #2088): this suite needs the truly UNSET
+  // prototype (no nodeCooldowns), unlike the shared tests/helpers/bare_client.ts
+  // bareClient(), which always initializes it.
   function bareClient(): ClientWorld {
     return Object.create(ClientWorld.prototype);
   }

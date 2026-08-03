@@ -44,6 +44,7 @@ export const en_XA: AdminTranslations = {
   "nav.primaryLabel": "[Áðɱíñ ñáʋíĝáţíóñ]",
   "nav.openMenu": "[Óþéñ ñáʋíĝáţíóñ]",
   "nav.closeMenu": "[Çļóšé ñáʋíĝáţíóñ]",
+  "theme.darkModeLabel": "[Ðáŕķ ɱóðé]",
   "stats.onlineNow": "[óñļíñé ñóŵ]",
   "stats.onlineAccounts": "[óñļíñé áççóúñţš]",
   "stats.siteUsersNow": "[šíţé úšéŕš ñóŵ]",

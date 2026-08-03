@@ -44,6 +44,7 @@ export const da_DK: AdminTranslations = {
   "nav.primaryLabel": "Administratornavigation",
   "nav.openMenu": "Åbn navigation",
   "nav.closeMenu": "Luk navigation",
+  "theme.darkModeLabel": "Dark mode",
   "stats.onlineNow": "online nu",
   "stats.onlineAccounts": "online konti",
   "stats.siteUsersNow": "sidebrugere nu",

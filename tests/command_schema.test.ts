@@ -33,9 +33,12 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // Maker's Bond unbind service), the Rift + mounts surface (rift and
 // forge commands, learn_riding, mount selection), and market_list_instance
 // (the instance-payload market pipe).
-const EXPECTED_SEND_COUNT = 179; // +5: the guild_bank_* cluster (Guild Bank Phase 2)
-const EXPECTED_DISPATCH_COUNT = 190; // +5: the guild_bank_* cluster (Guild Bank Phase 2)
-const EXPECTED_DISPATCH_ONLY_COUNT = 11;
+// 174 send / 186 dispatch on release/v0.34.0 (mount_select left the wire, reins
+// are items; profiler invulnerability is a dev-only dispatch token), +5 both
+// sides for the guild_bank_* cluster (Guild Bank Phase 2).
+const EXPECTED_SEND_COUNT = 179;
+const EXPECTED_DISPATCH_COUNT = 191;
+const EXPECTED_DISPATCH_ONLY_COUNT = 12;
 
 // The chat sub-channel routing switch (server/game.ts `switch
 // (session.rememberedChat.channel)`) is NOT a msg.cmd dispatch; its labels must

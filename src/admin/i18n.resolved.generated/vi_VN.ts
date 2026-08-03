@@ -44,6 +44,7 @@ export const vi_VN: AdminTranslations = {
   "nav.primaryLabel": "Điều hướng của quản trị viên",
   "nav.openMenu": "Mở điều hướng",
   "nav.closeMenu": "Đóng điều hướng",
+  "theme.darkModeLabel": "Dark mode",
   "stats.onlineNow": "đang trực tuyến",
   "stats.onlineAccounts": "tài khoản trực tuyến",
   "stats.siteUsersNow": "người dùng trang hiện tại",

@@ -44,6 +44,7 @@ export const zh_CN: AdminTranslations = {
   "nav.primaryLabel": "管理导航",
   "nav.openMenu": "打开导航",
   "nav.closeMenu": "关闭导航",
+  "theme.darkModeLabel": "Dark mode",
   "stats.onlineNow": "当前在线",
   "stats.onlineAccounts": "在线账号",
   "stats.siteUsersNow": "当前站点用户",

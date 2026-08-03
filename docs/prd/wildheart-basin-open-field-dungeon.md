@@ -303,6 +303,17 @@ mobs anchor their leash on the puller rather than on where they stood, because t
 reaching the shrine. Draws no rng, so the parity goldens are unaffected. Implementation in
 `src/sim/instances/boss_chain_pull.ts`, pinned by `tests/wildheart_boss_chain_pull.test.ts`.
 
+The puller-anchored leash alone was not enough, and shipping it alone left the mechanic working only
+near the shrine: a mob woken 170 yards away starts outside that same 70-yard sphere, so the leash
+prelude evaded it home on its first engaged tick and thirteen of the nineteen never took a step. A
+pulled mob now also carries a transit grace (`Entity.chainPullInbound`, `src/sim/mob/chain_pull_transit.ts`)
+that suspends the SOFT leash while it crosses and spends itself the moment the mob reaches the
+sphere, after which the ordinary leash governs from the pull point. The hard tether and the
+unreachable-target stall are untouched, so a mob pinned by geometry still evades on the normal
+clock. One deliberate consequence: a group that pulls and immediately runs is chased rather than
+leashed, since a mob kited away from the pull point never reaches the sphere that would spend its
+grace. That stays bounded by the instance, because the exit portal and a wipe both scrub the pull.
+
 Zulgar drops three new epic weapons: Wildheart Tuskblade, Hexwood Staff of the Basin, and
 Fangknife of Zulgar.
 

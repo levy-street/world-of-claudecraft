@@ -1900,6 +1900,11 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         // (server/leaderboard.ts) carries the same dev_commands field. Read live
         // per request, mirroring the /api/perf gate just below.
         dev_commands: process.env.ALLOW_DEV_COMMANDS === '1',
+        // Online-profiler capability handshake. Presence proves this server
+        // supports the idempotent invulnerability command; false tells the
+        // harness to stop before entry because the dev gate is off. Dual-arm
+        // edit: the migrated statusHandler carries the identical field.
+        profiler_invulnerability: process.env.ALLOW_DEV_COMMANDS === '1',
       });
     }
     // Dev-only world-loop perf profile (per-phase tick p95/max), for the load

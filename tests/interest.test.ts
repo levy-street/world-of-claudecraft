@@ -13,8 +13,9 @@ vi.mock('../server/db', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
-import { ClientWorld } from '../src/net/online';
+import type { ClientWorld } from '../src/net/online';
 import type { Entity } from '../src/sim/types';
+import { bareClient } from './helpers/bare_client';
 
 interface FakeClient {
   sent: any[];
@@ -84,33 +85,6 @@ function inKeep(snap: any, id: number): boolean {
 function besideViewer(viewer: Entity, d: number): { x: number; z: number } {
   const dx = viewer.pos.x > 0 ? -d : d;
   return { x: viewer.pos.x + dx, z: viewer.pos.z };
-}
-
-// A ClientWorld without the WebSocket plumbing, to drive applySnapshot directly.
-function bareClient(pid: number): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass: 'warrior' };
-  c.entities = new Map();
-  c.missingSince = new Map(); // despawn-grace bookkeeping (set by the real field initializer)
-  c.playerId = pid;
-  c.moveInput = {};
-  c.inventory = [];
-  c.equipment = {};
-  c.copper = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.partyInfo = null;
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  return c;
 }
 
 describe('crowd interest management', () => {

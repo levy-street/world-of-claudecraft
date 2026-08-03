@@ -12,9 +12,15 @@
 // other work shares the machine (failing files that then pass in isolation).
 // Steps run sequentially with inherited stdio and stop at the first failure.
 // Keep the step list in sync with .github/workflows/ci.yml (and vice versa).
+//
+// Phase 2: generate-once i18n + wiki; vitest skips pretest; client uses
+// build:bundle (no triple gen). Phase 8: pure artifact steps go through turbo
+// (local disk cache + parallel typecheck/env/server). Tests, malware, and
+// changed-file biome are never treated as cacheable "green forever".
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
-import { computeGateWorkers } from './lib/gate_workers.mjs';
+import { buildFullGateSteps } from './lib/gate_steps.mjs';
+import { computeGateWorkers, resolveGateWorkerTierCap } from './lib/gate_workers.mjs';
 import {
   formatInstallSyncFailure,
   parseInstallProblems,
@@ -26,25 +32,28 @@ import { FFMPEG_PATH, FFPROBE_PATH } from './sfx/ffmpeg_paths.mjs';
 // second `npm run gate` (or any other heavy vitest run) is happening in a sibling
 // worktree on the same machine, which this repo's own parallel-worktree workflow makes
 // routine. computeGateWorkers additionally clamps to available memory, since a vitest
-// fork worker that starts swapping presents as a flaky failure, not a slow one. Override
-// with GATE_MAX_WORKERS=<n> when you know better than the heuristic (e.g. deliberately
-// running several gates at once and want each one to take a smaller share).
+// fork worker that starts swapping presents as a flaky failure, not a slow one. Optional
+// GATE_WORKER_TIER=low|medium|high applies a further cap AFTER the free-mem clamp (never
+// instead of it). GATE_MAX_WORKERS=<n> remains the expert absolute override when you
+// deliberately share the machine or raise workers on a quiet high-tier host.
 const workers = computeGateWorkers({
   cpuCount: os.availableParallelism(),
   freeMemBytes: os.freemem(),
   envOverride: process.env.GATE_MAX_WORKERS,
+  tierCap: resolveGateWorkerTierCap(process.env.GATE_WORKER_TIER),
 });
 // npm/npx resolve to .cmd files on Windows, which spawnSync only finds via a shell.
 const shell = process.platform === 'win32';
 
-// Verify node_modules is what package-lock.json actually pins, BEFORE any other
-// step. `npm ci` always resets this in CI, so CI never sees drift; a long-lived
-// local checkout can drift silently (a stray `npm install <pkg>`, or just going
-// stale) and the first symptom is usually a confusing tsc or build failure many
-// minutes into the gate that looks like a real regression in the change under
-// test. `npm ls --depth=0 --json` costs under a second and names the actual
-// problem instead of a downstream symptom. No CI job runs this script (CI always
-// starts from a fresh `npm ci`), so nothing else catches a false-positive block;
+// Verify node_modules is what pnpm-lock.yaml actually pins, BEFORE any other
+// step. CI always resets this with `pnpm install --frozen-lockfile`, so CI never
+// sees drift; a long-lived local checkout can drift silently (a stray
+// `pnpm add <pkg>`, or just going stale) and the first symptom is usually a
+// confusing tsc or build failure many minutes into the gate that looks like a
+// real regression in the change under test. `npm ls --depth=0 --json` still
+// works under pnpm's layout, costs under a second, and names the actual problem
+// instead of a downstream symptom. No CI job runs this script (CI always starts
+// from a fresh frozen install), so nothing else catches a false-positive block;
 // WOC_SKIP_DEP_SYNC=1 is the escape hatch for a checkout this check gets wrong,
 // and other preflights that need to test their OWN failure mode in isolation
 // (tests/sfx_gate_preflight.test.ts) set it explicitly rather than relying on the
@@ -85,8 +94,10 @@ if (missingAudioTools.length > 0) {
   console.error(
     `[gate] missing required SFX audio tooling: ${missingAudioTools.map(([name]) => name).join(', ')}\n` +
       '[gate] the bundled ffmpeg-static/ffprobe-static binaries are absent or broken (a\n' +
-      '[gate] scripts-skipped install leaves them missing): reinstall with npm ci, or\n' +
-      '[gate] install FFmpeg (including ffprobe) on PATH, then re-run npm run gate',
+      '[gate] scripts-skipped install leaves them missing): reinstall with\n' +
+      '[gate] pnpm install --frozen-lockfile (ensure onlyBuiltDependencies allows\n' +
+      '[gate] ffmpeg-static/ffprobe-static), or install FFmpeg (including ffprobe) on PATH,\n' +
+      '[gate] then re-run pnpm run gate',
   );
   process.exit(1);
 }
@@ -94,40 +105,19 @@ if (missingAudioTools.length > 0) {
 const branch =
   spawnSync('git', ['branch', '--show-current'], { encoding: 'utf8', shell }).stdout?.trim() ?? '';
 const releaseTier = branch.startsWith('release/');
-const env = releaseTier ? { ...process.env, I18N_RELEASE_TIER: '1' } : process.env;
+// Base env for every step. Per-step overlays (e.g. pretest skip on vitest) merge on top.
+const baseEnv = releaseTier ? { ...process.env, I18N_RELEASE_TIER: '1' } : { ...process.env };
 
-const I18N_ARTIFACTS = [
-  'src/ui/i18n.resolved.generated',
-  'src/admin/i18n.resolved.generated',
-  'src/ui/i18n.catalog/translation_keys.generated.ts',
-];
-
-const steps = [
-  ['i18n artifacts', 'npm', ['run', 'i18n:gen']],
-  [
-    'i18n freshness',
-    'git',
-    ['diff', '--exit-code', '--', ...I18N_ARTIFACTS],
-    'the regenerated i18n artifacts differ from the staged/committed copies: stage them ' +
-      `(git add ${I18N_ARTIFACTS.join(' ')}) and re-run`,
-  ],
-  ['malware scan', 'npm', ['run', 'security:gate']],
-  ['biome (changed files)', 'npm', ['run', 'ci:changed']],
-  ['sfx check', 'npm', ['run', 'sfx:check']],
-  ['vitest (full suite)', 'npm', ['test', '--', `--maxWorkers=${workers}`]],
-  ['browser regressions', 'npm', ['run', 'test:browser']],
-  ['typecheck', 'npm', ['run', 'check:types']],
-  ['env build', 'npm', ['run', 'build:env']],
-  ['server build', 'npm', ['run', 'build:server']],
-  ['client build', 'npm', ['run', 'build']],
-];
+// Shared step list (Phase 2 generate-once + Phase 8 turbo cacheable pure steps).
+const steps = buildFullGateSteps(workers);
 
 if (releaseTier) {
   console.log(`[gate] release branch "${branch}": running release-tier (I18N_RELEASE_TIER=1)`);
 }
 
-for (const [name, cmd, args, hint] of steps) {
+for (const { name, cmd, args, hint, env: envOverlay } of steps) {
   console.log(`\n[gate] ${name}: ${cmd} ${args.join(' ')}`);
+  const env = envOverlay ? { ...baseEnv, ...envOverlay } : baseEnv;
   const res = spawnSync(cmd, args, { stdio: 'inherit', env, shell });
   if (res.status !== 0) {
     console.error(`\n[gate] FAIL at "${name}" (exit ${res.status ?? 'killed'})`);

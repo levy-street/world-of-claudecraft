@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 import './_setup';
 import * as fs from 'node:fs';
 import * as path from 'node:path';

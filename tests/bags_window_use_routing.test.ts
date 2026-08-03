@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 // The bags 'use' click routing (#2343): drives the REAL BagsWindow against a
 // jsdom container (the bags_window_instance_marker.test.ts fixture idiom) and
 // pins the behavior the source pin in bags_window.test.ts can only anchor

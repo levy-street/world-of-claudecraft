@@ -269,6 +269,9 @@ describe('work-order cadence mirror over the live GameServer wire (cprof)', () =
 // masterwork_event_mirror / masterwork_zone_broadcast): the client questState
 // honors the mirrored cadenceBlockedQuests exactly as the offline Sim honors its
 // live questCadence, so a mirrored cooldown reads unavailable client-side too.
+// Kept bespoke on purpose (issue #2088): this fixture is parameterized by a
+// CraftingIdentityView patch, not a pid, unlike the shared
+// tests/helpers/bare_client.ts bareClient().
 function bareClient(identity: Partial<CraftingIdentityView>): ClientWorld {
   const c = Object.create(ClientWorld.prototype) as ClientWorld;
   const w = c as unknown as {

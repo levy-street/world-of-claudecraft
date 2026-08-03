@@ -735,6 +735,24 @@ export const hudChromeStrings = {
     // Rideable mounts: the Z toggle (opens the stable while nothing is picked).
     mount: 'Mount / Dismount',
   },
+  // On-bar action-bar key-binding mode (issue #1238): the Key Bindings menu's
+  // single "Edit action bar keys" entry (replacing the wall of per-slot rebind
+  // rows) plus the on-bar banner it opens. Wordy (M16): the five non-Latin
+  // fills land in this same change, except `done`, which is short enough to
+  // stay pending like an ordinary contributor add.
+  actionBar: {
+    editKeys: 'Edit action bar keys',
+    editKeysHint: 'Click a slot on the action bar, then press a key to bind it.',
+    bannerHint: 'Click a slot, then press a key to bind it. Click Done when finished.',
+    bannerCapturing: 'Press a key to bind this slot...',
+    boundToKey: 'Bound to {key}.',
+    reset: 'Reset',
+    done: 'Done',
+    cancel: 'Cancel',
+    resetConfirmTitle: 'Reset action bar keys?',
+    resetConfirmBody:
+      'The first bar returns to its default keys. The second and third bars become unbound. This cannot be undone.',
+  },
   // The character sheet's mount picker (mount_picker.ts; the old Mounts window
   // is retired, its keys stay per the retired-but-translated chrome precedent).
   // Names and descriptions come from the reference cards

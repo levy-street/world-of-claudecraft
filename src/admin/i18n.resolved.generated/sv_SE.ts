@@ -44,6 +44,7 @@ export const sv_SE: AdminTranslations = {
   "nav.primaryLabel": "Administratörsnavigering",
   "nav.openMenu": "Öppna navigering",
   "nav.closeMenu": "Stäng navigering",
+  "theme.darkModeLabel": "Dark mode",
   "stats.onlineNow": "anslutna nu",
   "stats.onlineAccounts": "anslutna konton",
   "stats.siteUsersNow": "webbplatsanvändare nu",

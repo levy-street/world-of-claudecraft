@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 // The priest's Light halo: per-visual geometry (PR: halo must not clip the
 // canon mage-model hat). Pins the halo.ts cache doctrine (geometry keyed by
 // radius, material keyed by color, both shared and never disposed) and the

@@ -44,6 +44,7 @@ export const es: AdminTranslations = {
   "nav.primaryLabel": "Navegación de administrador",
   "nav.openMenu": "Abrir navegación",
   "nav.closeMenu": "Cerrar navegación",
+  "theme.darkModeLabel": "Dark mode",
   "stats.onlineNow": "en línea ahora",
   "stats.onlineAccounts": "cuentas en línea",
   "stats.siteUsersNow": "usuarios del sitio ahora",

@@ -497,7 +497,11 @@ export class Input {
     if (hadHeldInput) this.noteIntent('move');
   }
 
-  captureNextKey(cb: (code: string | null) => void): void {
+  // Passing null clears an armed capture without invoking a callback, so a
+  // caller that abandons a pending capture (Done / Reset confirm) does not
+  // leave a stale one-shot handler in place to swallow the player's next
+  // real keypress.
+  captureNextKey(cb: ((code: string | null) => void) | null): void {
     this.captureCb = cb;
   }
 

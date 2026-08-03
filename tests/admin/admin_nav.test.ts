@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 import './_setup';
 import { render, screen } from '@testing-library/svelte';
 import { beforeEach, describe, expect, it } from 'vitest';

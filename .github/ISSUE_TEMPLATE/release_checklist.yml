@@ -20,10 +20,11 @@ body:
     attributes:
       label: Bump the version
       description: >
-        One command updates package.json, package-lock.json, the desktop
-        download links, the visible static page version, android/app/build.gradle
-        (versionName + versionCode) and the iOS project (MARKETING_VERSION +
-        CURRENT_PROJECT_VERSION). Do not edit these by hand.
+        One command updates package.json, the desktop download links, the
+        visible static page version, android/app/build.gradle (versionName +
+        versionCode) and the iOS project (MARKETING_VERSION +
+        CURRENT_PROJECT_VERSION). pnpm-lock.yaml is not rewritten for version
+        bumps. Do not edit these by hand.
       options:
         - label: Ran `npm run release:prepare -- <X.Y.Z>` on the release branch.
           required: false

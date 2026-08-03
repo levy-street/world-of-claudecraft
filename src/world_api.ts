@@ -493,6 +493,9 @@ export const COMMAND_NAMES = [
   // Guild billboard: set (or clear, with '') the officer-editable message
   // pinned atop the social window's Guild tab (SocialService.guildSetMotd).
   'guild_set_motd',
+  // Profiler-only server authority: idempotently prevents incoming damage while
+  // preserving normal outgoing damage and incoming hit presentation.
+  'dev_profiler_invulnerable',
   // The Guild Bank cluster (officer-plus shared treasury + item store,
   // src/sim/guild_bank.ts). Its own guild_bank_* tokens forever, NEVER a reuse
   // of the personal bank_* strings (state.md decision; pinned by
@@ -534,6 +537,7 @@ export const DISPATCH_ONLY_COMMANDS = [
   // abandon.
   'mount_train_answer',
   'mount_train_abort',
+  'dev_profiler_invulnerable',
 ] as const satisfies readonly CommandName[];
 
 export type DispatchOnlyCommand = (typeof DISPATCH_ONLY_COMMANDS)[number];
