@@ -7,6 +7,7 @@ node_modules
 # build outputs
 dist/
 dist-env/
+dist-idle/
 dist-server/
 release/
 release-steam/
@@ -14,6 +15,9 @@ release-steam/
 electron/vendor/
 media-cache/
 sfx-runtime/
+
+# idle engine save files
+idle/save/
 
 # i18n per-locale emit crash leftovers (the build sweeps these; never commit one)
 src/ui/i18n.resolved.generated/*.tmp
