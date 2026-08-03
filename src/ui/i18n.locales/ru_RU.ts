@@ -9065,7 +9065,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.guildContentsTab': 'Содержимое',
   'hudChrome.bank.guildLogTab': 'Журнал',
   'hudChrome.bank.logAria': 'Журнал операций банка гильдии',
-  'hudChrome.bank.logNote': '50 последних операций банка гильдии.',
+  'hudChrome.bank.logNote': '{count} последних операций банка гильдии.',
   'hudChrome.bank.logLoading': 'Загрузка журнала банка гильдии...',
   'hudChrome.bank.logEmpty': 'В банк гильдии пока ничего не клали и ничего из него не брали.',
   'hudChrome.bank.logRefused': 'Читать журнал банка гильдии могут только офицеры гильдии.',

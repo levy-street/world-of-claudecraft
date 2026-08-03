@@ -8914,7 +8914,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.guildContentsTab': '内容',
   'hudChrome.bank.guildLogTab': 'ログ',
   'hudChrome.bank.logAria': 'ギルド銀行の活動ログ',
-  'hudChrome.bank.logNote': '直近50件のギルド銀行の操作です。',
+  'hudChrome.bank.logNote': '直近{count}件のギルド銀行の操作です。',
   'hudChrome.bank.logLoading': 'ギルド銀行のログを読み込んでいます...',
   'hudChrome.bank.logEmpty': 'ギルド銀行にはまだ何も出し入れされていません。',
   'hudChrome.bank.logRefused': 'ギルド銀行のログを閲覧できるのはギルド役員のみです。',

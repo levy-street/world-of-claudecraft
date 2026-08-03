@@ -2305,7 +2305,7 @@ export const zh_TW: EnTranslations = {
       "guildContentsTab": "內容",
       "guildLogTab": "日誌",
       "logAria": "公會銀行活動日誌",
-      "logNote": "最近 50 筆公會銀行操作。",
+      "logNote": "最近 {count} 筆公會銀行操作。",
       "logLoading": "正在載入公會銀行日誌...",
       "logEmpty": "公會銀行中尚未存入或取出任何物品。",
       "logRefused": "只有公會幹部才能查看公會銀行日誌。",

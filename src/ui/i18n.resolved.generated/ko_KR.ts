@@ -2305,7 +2305,7 @@ export const ko_KR: EnTranslations = {
       "guildContentsTab": "내용물",
       "guildLogTab": "기록",
       "logAria": "길드 은행 활동 기록",
-      "logNote": "최근 길드 은행 활동 50건입니다.",
+      "logNote": "최근 길드 은행 활동 {count}건입니다.",
       "logLoading": "길드 은행 기록을 불러오는 중...",
       "logEmpty": "아직 길드 은행에 넣거나 뺀 것이 없습니다.",
       "logRefused": "길드 장교만 길드 은행 기록을 볼 수 있습니다.",

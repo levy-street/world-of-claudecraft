@@ -6569,6 +6569,17 @@
     border-color: #6f5a2a;
     background: linear-gradient(#2a2436, #161220);
   }
+  /* The Guild pane's role=tabpanel wrapper. It exists for ACCESSIBILITY, not
+     layout (the pane holds a nested tab list, which needs an owning panel to be
+     intelligible), so it is a transparent flex passthrough: it reproduces the
+     window's own column so the sections inside size exactly as they did when
+     they mounted flat on #bank-window. */
+  .gbank-pane {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
   /* The Guild pane's Contents / Log sub-strip. Its own tab class rather than a
      shared .bank-tab: the outer Personal/Guild strip is wired by querying
      .bank-tab, so a shared class would hand these buttons to the wrong

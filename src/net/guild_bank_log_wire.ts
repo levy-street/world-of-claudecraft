@@ -14,7 +14,7 @@
 // allowlist on this side means a server that ever regressed and sent one could
 // still never render it as guild history.
 
-import type { GuildBankLogEntry, GuildBankLogOp } from '../world_api';
+import { GUILD_BANK_LOG_LIMIT, type GuildBankLogEntry, type GuildBankLogOp } from '../world_api';
 
 /** The ops a client will render. Deliberately a second, independent statement
  *  of the server's projection allowlist (server/guild_bank_log.ts). */
@@ -31,18 +31,29 @@ const RENDERABLE_OPS: ReadonlySet<string> = new Set<GuildBankLogOp>([
 
 /**
  * How long an installed answer stays fresh, and equally how long a request that
- * never answered blocks a retry. Ten seconds is chosen against the SERVER cache
- * (server/guild_bank_log.ts), which busts on every book change: a client
- * watching the log while its guild works therefore sees a change within about
- * one TTL, while a whole guild of officers staring at an idle log costs at most
- * one cached read each per TTL and zero queries.
+ * never answered blocks a retry.
+ *
+ * To be exact about what this is and is not: while the log view is OPEN, this
+ * is the refresh interval, which is what makes another officer's deposit show
+ * up on a pane somebody is watching. While it is CLOSED, nothing reads the log
+ * at all, so nothing is sent (the pane's own visibility gate, see
+ * GuildBankTab.readAndRequestLog and the log arm of BankWindow's refresh
+ * signature): that is the sense in which the fetch is on demand, and this
+ * constant never turns a repaint into a poll on its own.
+ *
+ * Ten seconds is chosen against the SERVER cache (server/guild_bank_log.ts),
+ * which busts on every book change: a watcher sees a change within about one
+ * TTL, while a whole guild of officers staring at an idle log costs at most one
+ * cached read each per TTL and zero queries.
  */
 export const GUILD_BANK_LOG_TTL_MS = 10_000;
 
-/** Hard row bound: the server answers at most GUILD_BANK_LOG_LIMIT (50) rows,
- *  so anything past that is a defect or a hostile frame and is truncated
- *  rather than pasted into the DOM. */
-export const GUILD_BANK_LOG_MAX_ROWS = 50;
+/** Hard row bound, taken from the ONE seam constant the server window and the
+ *  pane's scope line also read (src/world_api/guild_bank.ts): anything past it
+ *  is a defect or a hostile frame and is truncated rather than pasted into the
+ *  DOM. Re-exported so the decoder's callers and tests can name the bound
+ *  without reaching across the seam themselves. */
+export const GUILD_BANK_LOG_MAX_ROWS = GUILD_BANK_LOG_LIMIT;
 
 /** The longest actor name that can reach a row. Character names are far
  *  shorter; this bounds the damage a malformed frame can do to one line of

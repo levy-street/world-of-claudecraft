@@ -2305,7 +2305,7 @@ export const sv_SE: EnTranslations = {
       "guildContentsTab": "Contents",
       "guildLogTab": "Log",
       "logAria": "Guild bank activity log",
-      "logNote": "The 50 most recent guild bank actions.",
+      "logNote": "The {count} most recent guild bank actions.",
       "logLoading": "Loading the guild bank log...",
       "logEmpty": "Nothing has been moved in or out of the guild bank yet.",
       "logRefused": "Only guild officers can read the guild bank log.",

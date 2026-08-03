@@ -48,7 +48,12 @@ import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
-import { type GuildBankPaneView, GuildBankTab } from './guild_bank_window';
+import {
+  GUILD_PANEL_ID,
+  GUILD_TAB_ID,
+  type GuildBankPaneView,
+  GuildBankTab,
+} from './guild_bank_window';
 import { formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import { knownItemDef } from './known_item';
@@ -380,16 +385,27 @@ export class BankWindow {
     // refreshIfChanged's grace-close on bankInfo.
     const guildModel = this.guildPane.model();
     const guildAvailable = guildModel.kind !== 'hidden'; // opened OR unopened pane
-    if (!guildAvailable) this.tab = 'personal';
+    if (!guildAvailable) {
+      this.tab = 'personal';
+      // ...and drop the pane's OWN sub-view with it, the way close() does. The
+      // log view is the one that fetches: leaving it selected on a pane that no
+      // longer exists left a demoted client re-requesting a log the server
+      // refuses, once per TTL, forever.
+      this.guildPane.resetView();
+    }
     el.innerHTML =
       `<div class="panel-title"><span>${esc(t('hudChrome.bank.title'))} <span class="panel-subtitle">${esc(t('hudChrome.bank.subtitle'))}</span></span>` +
       `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.bank.close'))}">${svgIcon('close')}</button></div>`;
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     if (guildAvailable) {
       // The shared WAI-ARIA tab strip (tab_strip_view core + wireTabStrip),
-      // the social/talents idiom. No panelId: the pane sections mount directly
-      // on the window root (wrapping them would disturb the flex column the
-      // bank CSS sizes), the daily_rewards precedent for omitting aria-controls.
+      // the social/talents idiom. The PERSONAL pane's sections still mount
+      // directly on the window root (wrapping them would disturb the flex
+      // column the bank CSS sizes), so the strip carries no blanket `panelId`;
+      // the GUILD pane does build a real role=tabpanel, because it holds a
+      // nested tab list of its own and a second peer tablist with no stated
+      // relationship is unintelligible to a screen reader. Its aria-controls is
+      // stamped below, once that panel exists.
       el.insertAdjacentHTML(
         'beforeend',
         tabStripHtml(
@@ -400,7 +416,9 @@ export class BankWindow {
             selectedClass: 'on',
             tabs: [
               { id: 'personal', label: t('hudChrome.bank.personalTab') },
-              { id: 'guild', label: t('hudChrome.bank.guildTab') },
+              // A stable id so the Guild pane's panel can point its
+              // aria-labelledby back at this tab.
+              { id: 'guild', label: t('hudChrome.bank.guildTab'), buttonId: GUILD_TAB_ID },
             ],
             selected: this.tab,
           }),
@@ -421,6 +439,13 @@ export class BankWindow {
     }
     if (this.tab === 'guild') {
       this.guildPane.renderInto(el, guildModel);
+      // Close the tab/panel relationship now that the panel exists: without it
+      // the pane's own Contents/Log strip reads to assistive tech as a second,
+      // unrelated top-level tab list that appeared out of nowhere.
+      const guildTab = el.querySelector<HTMLElement>(`#${GUILD_TAB_ID}`);
+      if (guildTab && el.querySelector(`#${GUILD_PANEL_ID}`)) {
+        guildTab.setAttribute('aria-controls', GUILD_PANEL_ID);
+      }
       this.annotateGuildFocusKeys(el);
       this.restoreScroll(el, prevScrollTop);
       // The guild pane has no search box, so a searchFocus capture degrades
@@ -580,7 +605,13 @@ export class BankWindow {
       // IS open this is what turns the response landing (loading -> ready, or a
       // fresh row after another officer's op busted the server cache) into a
       // repaint, with no timer of its own.
-      this.guildPane.logRefreshKey(),
+      // ...and ONLY while the log view is on screen. `readAndRequestLog` reads
+      // the log, and reading it is what SENDS the request, so this arm is gated
+      // on the pane actually being visible rather than on the pane's remembered
+      // sub-view alone: a player who opened the log and went back to the
+      // Personal tab was otherwise re-requesting it every TTL for a pane nobody
+      // was looking at.
+      this.tab === 'guild' && g !== null ? this.guildPane.readAndRequestLog() : null,
     ]);
     if (sig === this.lastSig) return;
     this.lastSig = sig;

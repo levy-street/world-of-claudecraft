@@ -45,15 +45,20 @@
 // server/bank_ledger.ts, so the bust is COMPLETE rather than best-effort: there
 // is no peer-process writer whose row this cache could miss until TTL.
 
-import type { GuildBankLogEntry, GuildBankLogOp } from '../src/world_api';
+import {
+  type GuildBankLogEntry,
+  type GuildBankLogOp,
+  GUILD_BANK_LOG_LIMIT as SEAM_GUILD_BANK_LOG_LIMIT,
+} from '../src/world_api/guild_bank';
 import { KeyedCachedRead } from './cached_read';
 import { type GuildBankLogDbRow, loadGuildBankLogRows } from './db';
 
-/** The window size. The classic guild-bank log is a short recent history, not
- *  an archive: 50 rows is what a guild actually reads after "who took the
- *  ore?", it bounds the frame, and it bounds the index scan. The full history
- *  stays in bank_ledger forever for the audit. */
-export const GUILD_BANK_LOG_LIMIT = 50;
+/** The window size, re-exported from the ONE seam constant
+ *  (src/world_api/guild_bank.ts) that the client decoder's hard bound and the
+ *  pane's scope line also read: the SQL LIMIT, the truncation bound, and the
+ *  sentence a player reads are the same fact, and duplicating it per layer is
+ *  how the copy ends up lying in six languages. */
+export const GUILD_BANK_LOG_LIMIT = SEAM_GUILD_BANK_LOG_LIMIT;
 
 /** The ops a guild may SEE, and the ORDER is not meaningful (the SQL orders by
  *  id). A closed allowlist rather than a denylist on purpose: a new ledger op

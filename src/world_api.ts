@@ -190,11 +190,12 @@ export type {
   DungeonFinderQueueView,
 } from './world_api/dungeon_finder';
 export type { RaidLockout, RiftFloorView } from './world_api/dungeons';
-export type {
-  GuildBankInfo,
-  GuildBankLogEntry,
-  GuildBankLogOp,
-  GuildBankLogView,
+export {
+  GUILD_BANK_LOG_LIMIT,
+  type GuildBankInfo,
+  type GuildBankLogEntry,
+  type GuildBankLogOp,
+  type GuildBankLogView,
 } from './world_api/guild_bank';
 export type { WorldInteractionOutcome } from './world_api/interaction';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';

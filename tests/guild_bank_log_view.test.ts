@@ -8,6 +8,7 @@
 // like an untouched one because a frame went missing or a demotion landed.
 import { describe, expect, it } from 'vitest';
 
+import { Sim } from '../src/sim/sim';
 import {
   buildGuildBankLogView,
   guildBankLogRow,
@@ -175,5 +176,22 @@ describe('guildBankLogSignature: the repaint gate', () => {
 
   it('carries no player-authored text (it is compared, never rendered)', () => {
     expect(guildBankLogSignature(ready([entry({ actor: 'Kara' })]))).not.toContain('Kara');
+  });
+});
+
+describe('the OFFLINE world arm feeds the core safely', () => {
+  it('the frozen offline read renders EMPTY and signs without mutating it', () => {
+    // The offline Sim answers one shared frozen view forever. The core sorts
+    // and the signature scans, so if either ever reached for the input array in
+    // place, offline play would throw on the first paint of the pane. Cheap to
+    // pin, silent to regress.
+    const sim = new Sim({ seed: 7, playerClass: 'warrior' });
+    const offline = sim.guildBankLog();
+    expect(offline).toEqual({ state: 'ready', entries: [] });
+    expect(Object.isFrozen(offline)).toBe(true);
+    expect(buildGuildBankLogView(offline)).toEqual({ kind: 'empty' });
+    expect(guildBankLogSignature(offline)).toBe('ready:0:0');
+    // The same instance comes back untouched for the next caller.
+    expect(sim.guildBankLog()).toBe(offline);
   });
 });

@@ -92,6 +92,17 @@ export interface GuildBankTabDeps extends PainterHostPresentation {
 /** The two views inside the Guild pane: the bank itself, and its activity log. */
 export type GuildBankPaneView = 'contents' | 'log';
 
+/** The Guild pane's role=tabpanel element id. Exported so BankWindow can point
+ *  the outer Guild tab's aria-controls at it: the pane holds a nested tab list,
+ *  and without the tab/panel relationship that inner strip reads to assistive
+ *  tech as a second, unrelated top-level tab list appearing for no reason. */
+export const GUILD_PANEL_ID = 'bank-panel-guild';
+
+/** The outer Guild TAB's element id: BankWindow stamps it through the shared
+ *  strip's `buttonId` and the panel above names it in aria-labelledby.
+ *  Exported and declared beside its partner so the pair cannot drift apart. */
+export const GUILD_TAB_ID = 'bank-tab-guild';
+
 export class GuildBankTab {
   // Which view of the Guild pane is showing. Owned here (not by BankWindow)
   // because the sub-strip, the log pane, and the on-demand fetch trigger are
@@ -116,14 +127,19 @@ export class GuildBankTab {
   }
 
   /**
-   * The repaint key for the log, or null while the log view is CLOSED.
+   * READ THE LOG AND, IF IT IS DUE, REQUEST IT, returning the repaint key; null
+   * while the log view is CLOSED.
    *
-   * The null arm is load-bearing: reading world.guildBankLog() is what REQUESTS
-   * the log, so asking for a signature while the contents view is showing would
-   * turn "fetch on demand" into a poll for every officer standing at a banker.
-   * Only an open log view touches it.
+   * The name says "request" because this is not a pure observation: reading
+   * world.guildBankLog() is what SENDS the wire command, and a signature helper
+   * that quietly sends is exactly the shape that hides a leak. The null arm is
+   * therefore load-bearing, and so is the caller's own visibility gate
+   * (BankWindow only calls this while the Guild tab is the ACTIVE tab and the
+   * mirror is non-null): between them, an officer who is not looking at the log
+   * never touches it, which is what keeps "fetch on demand" from becoming a
+   * poll.
    */
-  logRefreshKey(): string | null {
+  readAndRequestLog(): string | null {
     if (this.view !== 'log') return null;
     return guildBankLogSignature(this.deps.world().guildBankLog());
   }
@@ -147,11 +163,22 @@ export class GuildBankTab {
    *  captured the .bank-scroll offset it restores after this returns; it hands
    *  the model it already built for the tab-visibility branch (one core call
    *  per paint, never two). */
-  renderInto(el: HTMLElement, model: GuildBankViewModel): void {
+  renderInto(root: HTMLElement, model: GuildBankViewModel): void {
     if (model.kind === 'hidden') return; // raced null: BankWindow falls back next paint
-    // The Contents / Log sub-strip. It renders for the UNOPENED bank too: the
-    // treasury works from day one, so a bank nobody has opened can already have
-    // gold movements and a charter fee worth reading.
+    // A REAL role=tabpanel, unlike the personal pane, which mounts flat. This
+    // pane holds a nested tab list, and an inner tablist with no owning panel
+    // reads to a screen reader as a second unrelated top-level strip that came
+    // from nowhere. The wrapper is a transparent flex passthrough (see
+    // .gbank-pane) so the window's column sizing is unchanged.
+    const el = document.createElement('div');
+    el.id = GUILD_PANEL_ID;
+    el.className = 'gbank-pane';
+    el.setAttribute('role', 'tabpanel');
+    el.setAttribute('aria-labelledby', GUILD_TAB_ID);
+    root.appendChild(el);
+    // The Contents / Log sub-strip, INSIDE the panel. It renders for the
+    // UNOPENED bank too: the treasury works from day one, so a bank nobody has
+    // opened can already have gold movements and a charter fee worth reading.
     this.renderViewStrip(el);
     if (this.view === 'log') {
       // Reading the log is what REQUESTS it (cold data, no snapshot key), so

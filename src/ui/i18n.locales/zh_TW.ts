@@ -8507,7 +8507,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.guildContentsTab': '內容',
   'hudChrome.bank.guildLogTab': '日誌',
   'hudChrome.bank.logAria': '公會銀行活動日誌',
-  'hudChrome.bank.logNote': '最近 50 筆公會銀行操作。',
+  'hudChrome.bank.logNote': '最近 {count} 筆公會銀行操作。',
   'hudChrome.bank.logLoading': '正在載入公會銀行日誌...',
   'hudChrome.bank.logEmpty': '公會銀行中尚未存入或取出任何物品。',
   'hudChrome.bank.logRefused': '只有公會幹部才能查看公會銀行日誌。',

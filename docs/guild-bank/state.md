@@ -2,7 +2,9 @@
 
 Current phase: Phase 4 QA complete, plus the 2026-08-03 audit-trail hardening
 (payer-side `bank_ledger` counterparty columns and three consolidation loose
-ends; see progress.md). The packet is closed and the branch
+ends) and the 2026-08-03 IN-GAME ACTIVITY LOG (the final feature slice: the
+officer-visible read of the `bank_ledger` rows every op already wrote; see
+progress.md). The packet is closed and the branch
 is PR-ready (merged over origin/release/v0.34.0 at fbf4d35a1, full gate green).
 Teardown of docs/guild-bank/ awaits the user's explicit confirmation.
 
@@ -95,6 +97,76 @@ Teardown of docs/guild-bank/ awaits the user's explicit confirmation.
   magnitude with the direction in the op name): a reader assuming non-negative counts
   must exclude those two. No new read predicate, so no new index (the
   `server/concurrent_indexes.ts` seam is not involved).
+- IN-GAME ACTIVITY LOG (2026-08-03, the final feature slice). The officer-only design
+  means any officer can quietly drain shared property; every op already wrote its
+  `bank_ledger` row, so the knowledge existed and only an operator could see it. The
+  log is the SOCIAL TRUST MECHANISM that makes officer-only withdrawals defensible,
+  not a reporting extra.
+  - GATE: the BANK's own gate, reused verbatim (`sim.guildBankInfoFor(pid) !== null`:
+    alive, officer-plus via `GUILD_BANK_RANKS`, book loaded, at a banker). A MEMBER is
+    refused by exactly the predicate that denies them the bank itself, so the log can
+    never be a side channel around the officer-only design. The guild id comes from the
+    server's own membership STAMP, never from the request (there is no guild field on
+    the wire). The gate is RE-CHECKED after the awaited read, because a demotion,
+    leave, death or walk-away can land in that window; the answer reflects authority at
+    DELIVERY time. `GameServer.guildBankLogGuildFor` is the one place that decides it.
+  - SHOWN: `deposit | withdraw | deposit_gold | withdraw_gold | buy_slots | open_bank |
+    create_fee | admin_purge`. HIDDEN, never leaving the server: `escrow_deficit` and
+    `counterparty_orphan` (diagnostic anomaly rows about a conservation defect, not
+    something a player did, and frequently wrong about who was involved). A CLOSED
+    ALLOWLIST in SQL and re-stated independently client-side, so a new ledger op is
+    invisible until somebody deliberately writes its sentence.
+  - `admin_purge` IS SHOWN and names NOBODY (the decision the slice was asked to make):
+    hiding it would leave an unexplained gap exactly where guild property vanished,
+    which is worse, but its ledger character column is the escrow CARRIER, a bystander
+    who neither ordered nor benefited from the removal, so naming them would accuse the
+    wrong guildmate. The entry carries `actor: null` and renders "An administrator
+    removed {count} {item}". Enforced twice (server projection + the pure core).
+  - PRIVACY: `server/db.ts loadGuildBankLogRows` selects the narrowest column set that
+    can render a sentence. No `account_id`, no `realm`, no `instance` payload, and
+    `character_id` is resolved to a display NAME in the same statement, so no internal
+    id ships either. Nothing account-scoped is in the row for a downstream projection
+    bug to leak.
+  - CACHING: the answer is identical for every officer, so it rides the cached-read
+    seam (`server/cached_read.ts`) per guild: TTL 30s, single-flight (two officers
+    racing a cold window share ONE query), stale-on-error, LRU-bounded at 256 entries.
+    Freshness does NOT rest on the TTL: `server/bank_ledger.ts recordGuildBankDeltas`
+    busts the guild entry on every guild row it writes, at the ONE writer so a future
+    write site cannot forget, and TWICE (immediately, and again once the
+    fire-and-forget inserts have SETTLED, because a read racing the write would
+    otherwise re-install a pre-op snapshot and serve it for a whole TTL). A guild lives
+    on one realm process and every writer runs there, so the bust is COMPLETE rather
+    than best-effort.
+  - INDEX (supersedes the deferral recorded under "Accepted risks": the trigger was
+    "a per-guild reader exists" and this IS that reader). `bank_ledger_container_recent
+    ON bank_ledger(container, container_id, id DESC)` through the post-boot
+    `server/concurrent_indexes.ts` CONCURRENTLY seam, never boot DDL (bank_ledger is
+    large, live, and keep-forever). The THIRD column is load-bearing and measured: on
+    400k rows the equality pair alone still loses to a backward primary-key scan (252
+    shared buffers, 1.35ms) while the three-column form is a bounded backward index
+    scan (56 buffers, 0.20ms). `id` not `created_at` because BIGSERIAL cannot tie.
+  - WIRE: `guild_bank_log` (a pure READ token, no mutation) answered on its own
+    one-shot `{ t: 'gbanklog', ok, entries }` frame, NEVER a snapshot key: the payload
+    is cold, identical per guild, and 50 rows wide. `GUILD_BANK_LOG_LIMIT = 50`.
+    Shares the existing `consumeGuildBankOp` guard rather than growing a second bucket.
+  - FACET: ONE new `IWorldGuildBank` member, `guildBankLog(): GuildBankLogView`. A
+    METHOD because READING IT IS WHAT REQUESTS IT (there is no snapshot key).
+    Idempotence is the send-time gate (`guildBankLogAt`), not an in-flight flag: a
+    repaint inside `GUILD_BANK_LOG_TTL_MS` (10s) sends nothing, and a request whose
+    answer never arrived ages out on the same clock into exactly one retry, so a
+    dropped frame cannot wedge the pane on loading. A background refresh keeps serving
+    the installed rows; a REFUSAL keeps saying refused rather than degrading to an
+    empty log. Losing the `guildBankInfo` mirror RESETS it (the rows belong to a guild
+    and a rank this client may no longer hold). Offline returns a frozen empty ready view.
+  - THREE STATES ARE THREE RENDERINGS, deliberately: loading, refused, empty. "You may
+    not read this" and "nobody has done anything" are opposite facts, and a drained
+    bank must never be able to look like an untouched one because a frame went missing.
+  - UI: a Contents / Log sub-strip inside the Guild pane (its own `gbank-view-tab`
+    class, NOT `.bank-tab`, because the outer strip is wired by querying `.bank-tab`).
+    `BankWindow.guildTabActive` now also requires the CONTENTS view, so a bag click on
+    the reading surface cannot silently deposit. `lastRenderedGuildView` scopes the
+    `.bank-scroll` restore per sub-view. The refresh signature's log arm is NULL unless
+    the log view is open, which is what keeps "fetch on demand" from becoming a poll.
 - Purse-paid rung 0 (2026-08-03, user-directed pricing redesign): the guild bank is no
   longer open by default. A new guild starts with a 0-slot bank; an officer OPENS it via
   the existing `guild_bank_buy_slots` token (no new wire surface: the sim decides which
@@ -738,8 +810,11 @@ What remains accepted:
   triggers named): per-guild autosave serializer if the shared-writer depth warn fires
   in production; keyset pagination + realm/container filters for scripts/bank_audit.mjs
   once bank_ledger reaches millions of rows; bank_ledger index calculus (the created_at
-  index has no reader under keep-forever; no (container, container_id) index until a
-  per-guild reader exists); gameMetricsCounters for escrow-save failures / fence-outs /
+  index STILL has no reader under keep-forever; the (container, container_id) deferral
+  is RESOLVED as of 2026-08-03, its named trigger having fired: the in-game activity
+  log is the per-guild reader and the index landed with it as
+  bank_ledger_container_recent through the CONCURRENTLY seam, see the ACTIVITY LOG
+  decision above); gameMetricsCounters for escrow-save failures / fence-outs /
   reconciles / unloaded books / escrow deficits (console.error is the current signal, and
   the escrow_deficit ledger row for the permanent arm); the O(live sessions) dirty-mark
   scan inside beginGuildBankDelete (client-triggerable but cheap; refcount it if
@@ -766,11 +841,12 @@ What remains accepted:
   buffered row (pg returns BIGINT as a heap-allocated string), so the runway to that
   cursor is modestly shorter, roughly 5 to 15% more peak RSS for the same row count on
   guild rows; the order of magnitude of the trigger is unchanged. The sibling
-  bank_ledger INDEX deferral is NOT moved by any of this: the trigger is "a per-guild
+  bank_ledger INDEX deferral was not moved by any of this (the trigger is "a per-guild
   reader exists", and every consumer of the new columns is per-row arithmetic during
-  the existing full scan or a JS reduce over the materialized array, so
-  `bank_ledger_created` still has no reader and `(container, container_id)` is still
-  unwarranted.
+  the existing full scan or a JS reduce over the materialized array). That trigger
+  fired LATER, on 2026-08-03, when the in-game activity log added exactly that reader:
+  `(container, container_id, id DESC)` now exists as bank_ledger_container_recent, and
+  `bank_ledger_created` still has no reader.
 - Books deliberately share the market serial writer (no second queue): the leave
   flush writes market, mail, AND books in one transaction, so a separate book queue
   would reopen the interleaving the single writer exists to prevent.

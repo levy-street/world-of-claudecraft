@@ -2305,7 +2305,7 @@ export const ja_JP: EnTranslations = {
       "guildContentsTab": "内容",
       "guildLogTab": "ログ",
       "logAria": "ギルド銀行の活動ログ",
-      "logNote": "直近50件のギルド銀行の操作です。",
+      "logNote": "直近{count}件のギルド銀行の操作です。",
       "logLoading": "ギルド銀行のログを読み込んでいます...",
       "logEmpty": "ギルド銀行にはまだ何も出し入れされていません。",
       "logRefused": "ギルド銀行のログを閲覧できるのはギルド役員のみです。",

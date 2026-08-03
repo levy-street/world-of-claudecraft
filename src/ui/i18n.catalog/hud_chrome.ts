@@ -2583,7 +2583,10 @@ export const hudChromeStrings = {
     guildContentsTab: 'Contents',
     guildLogTab: 'Log',
     logAria: 'Guild bank activity log',
-    logNote: 'The 50 most recent guild bank actions.',
+    // {count} is interpolated from GUILD_BANK_LOG_LIMIT at the painter
+    // boundary: a baked-in number would lie in six languages the moment the
+    // window size moved.
+    logNote: 'The {count} most recent guild bank actions.',
     logLoading: 'Loading the guild bank log...',
     logEmpty: 'Nothing has been moved in or out of the guild bank yet.',
     // A refusal is deliberately NOT an empty list: "you may not read this" and

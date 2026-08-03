@@ -161,6 +161,13 @@ export function buildGuildBankLogView(view: GuildBankLogView): GuildBankLogPaneM
  * ids plus a count are enough to detect every change the window cares about.
  */
 export function guildBankLogSignature(view: GuildBankLogView): string {
-  const newest = view.entries.length > 0 ? Math.max(...view.entries.map((e) => e.id)) : 0;
+  // A reduce, not Math.max(...map(...)): this core is a public export any
+  // future caller can hand a view wider than the wire's 50-row cap, and a
+  // spread of an unbounded array is both an allocation and an arity risk on a
+  // function that runs on the slow band while the log is open.
+  let newest = 0;
+  for (const entry of view.entries) {
+    if (entry.id > newest) newest = entry.id;
+  }
   return `${view.state}:${view.entries.length}:${newest}`;
 }

@@ -13,6 +13,69 @@
 | Pricing redesign (user-directed) | Done | 2026-08-03 | 2026-08-03 |
 | Follow-ups (stacked branch, 3 slices) | Done | 2026-08-03 | 2026-08-03 |
 | Audit-trail hardening (payer-side ledger column + 3 loose ends) | Done | 2026-08-03 | 2026-08-03 |
+| In-game bank log (final feature slice) | Done | 2026-08-03 | 2026-08-03 |
+
+## In-game bank log (2026-08-03, on `feature/guild-bank`)
+Three commits (server read path, facet + wire, UI). The final feature slice: the
+guild bank is officer-only, so any officer can quietly drain shared property.
+Every op already wrote its `bank_ledger` row; the knowledge existed and only an
+operator could see it. This is the read that makes officer actions visible to
+the guild, which is the social check the permission model rests on.
+
+- [x] **Server read path.** `server/guild_bank_log.ts` (projection + per-guild
+      cached read), `server/db.ts loadGuildBankLogRows` (the one statement),
+      `server/game.ts` dispatch case + `sendGuildBankLog` +
+      `guildBankLogGuildFor`. The gate is the BANK's own gate reused verbatim,
+      so a member is refused by the same predicate that denies them the bank,
+      and it is RE-CHECKED after the awaited read (a demotion can land inside
+      that window). The guild id comes from the membership stamp; there is no
+      guild field on the wire.
+- [x] **Index.** `bank_ledger_container_recent ON bank_ledger(container,
+      container_id, id DESC)` via the post-boot CONCURRENTLY seam
+      (`server/bank_ledger_indexes.ts` + `server/concurrent_indexes.ts`), never
+      boot DDL. This resolves the Phase 3 QA deferral whose trigger was "a
+      per-guild reader exists". Measured on 400k rows: no index 252 shared
+      buffers / 1.35ms (backward primary-key scan); the equality pair ALONE
+      still loses to that same PK scan (252 buffers / 1.38ms), which is why the
+      third column is not decoration; the three-column form 56 buffers /
+      0.20ms.
+- [x] **Cache.** Per guild through `server/cached_read.ts` (TTL 30s,
+      single-flight, stale-on-error, LRU cap 256). `KeyedCachedRead` MOVED from
+      `server/discord_status_cache.ts` to `cached_read.ts` (re-exported there,
+      so every existing caller and test keeps its import path): it is a generic,
+      and a guild bank module importing the Discord module for it would have
+      been the wrong seam. The bust lives in `recordGuildBankDeltas`, the ONE
+      guild row writer, and fires TWICE: at the op, and again once the
+      fire-and-forget inserts SETTLE, because a read racing the write would
+      otherwise re-install a pre-op snapshot and serve it for a whole TTL.
+- [x] **Withheld.** `escrow_deficit` / `counterparty_orphan` never leave the
+      server (filtered in SQL, allowlist re-stated client-side). No account id,
+      realm, or instance payload is selected; character ids resolve to display
+      names in the statement. `admin_purge` IS shown and names NOBODY: its
+      ledger character is the escrow carrier, a bystander, so "An administrator
+      removed X" is the honest sentence and an unexplained gap is avoided.
+- [x] **Facet + wire.** ONE new member, `guildBankLog(): GuildBankLogView`, a
+      METHOD because reading it is what REQUESTS the cold payload; token
+      `guild_bank_log` answered on its own `gbanklog` frame, never a snapshot
+      key. Send-time TTL gate makes a per-frame read idempotent AND ages a lost
+      response into exactly one retry. Pins: parity 288/74/214,
+      send 182 / dispatch 194, `GUILD_BANK_TAGS` + facet exhaustiveness,
+      concurrent-index order.
+- [x] **UI.** `src/ui/guild_bank_log_view.ts` (UI_PURE_CORES) +
+      `src/ui/guild_bank_log_window.ts` (UI_DOM_MODULES) behind a Contents/Log
+      sub-strip in the Guild pane. Loading / refused / empty are three distinct
+      renderings on purpose. Character names are spliced into a textContent
+      sink (the rows are built node by node, never as HTML). 17 new
+      `hudChrome.bank.*` keys with their five non-Latin M16 fills; 40px mobile
+      floors for the sub-tabs. `guildTabActive` now requires the CONTENTS view,
+      so a bag click on the reading surface cannot silently deposit.
+- [x] **Tests.** `tests/guild_bank_log_view.test.ts` (20),
+      `tests/guild_bank_log_wire.test.ts` (18),
+      `tests/guild_bank_log_server.test.ts` (12, real GameServer),
+      `tests/server/guild_bank_log.test.ts` (20), plus 16 new cases in
+      `tests/guild_bank_window.test.ts`. Mutation-checked: removing the rank
+      gate reddens 3 server tests, disabling the bust reddens the freshness
+      test.
 
 ## Audit-trail hardening (2026-08-03, on `feature/guild-bank`)
 Four commits. The first is the substantive one; the rest close what the

@@ -6,13 +6,19 @@
 // distinct and are NEVER hidden (the carried-forward Phase 3 QA line), and
 // walking away / losing the rank empties the Guild tab state cleanly.
 import { readFileSync } from 'node:fs';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { stackSizeOf } from '../src/sim/bags';
 import { ITEMS } from '../src/sim/data';
 import { GUILD_BANK_RUNG_PRICES, GUILD_BANK_TREASURY_CAP } from '../src/sim/guild_bank';
 import type { InvSlot } from '../src/sim/types';
 import { BankWindow, type BankWindowDeps } from '../src/ui/bank_window';
-import type { BankInfo, GuildBankInfo, GuildBankLogView, IWorld } from '../src/world_api';
+import {
+  type BankInfo,
+  GUILD_BANK_LOG_LIMIT,
+  type GuildBankInfo,
+  type GuildBankLogView,
+  type IWorld,
+} from '../src/world_api';
 
 // Real merged-table ids so the pane renders true defs: a plain stackable, a
 // quest def, and a soulbound def (each derived, never hardcoded, so a content
@@ -136,12 +142,18 @@ beforeEach(() => {
 describe('guild_bank_window: no magic values (the bank_window twin)', () => {
   // Plain repo-relative paths: under the jsdom environment import.meta.url is
   // not a file: URL, so the sibling suites' new URL(...) idiom cannot be used.
+  // BOTH guild painters. The repo's no-magic guard is deliberately
+  // DECENTRALIZED (each painter scans its own source), so a new painter nobody
+  // scans is a hole even while it happens to be clean.
+  const painters = ['src/ui/guild_bank_window.ts', 'src/ui/guild_bank_log_window.ts'] as const;
   const painter = readFileSync('src/ui/guild_bank_window.ts', 'utf8');
   const components = readFileSync('src/styles/components.css', 'utf8');
 
   it('carries no literal hex color in TS (quality color comes from QUALITY_COLOR + a token)', () => {
-    const hex = painter.match(/#[0-9a-fA-F]{3,8}\b/g) ?? [];
-    expect(hex, `hex colors must move to tokens: ${hex.join(', ')}`).toEqual([]);
+    for (const file of painters) {
+      const hex = readFileSync(file, 'utf8').match(/#[0-9a-fA-F]{3,8}\b/g) ?? [];
+      expect(hex, `${file}: hex colors must move to tokens: ${hex.join(', ')}`).toEqual([]);
+    }
   });
 
   it('uses the --color-quality-default token for the unranked-quality fallback', () => {
@@ -149,13 +161,20 @@ describe('guild_bank_window: no magic values (the bank_window twin)', () => {
   });
 
   it('uses no em or en dashes (ASCII separators only)', () => {
-    expect(painter.includes('\u2014'), 'em dash found').toBe(false);
-    expect(painter.includes('\u2013'), 'en dash found').toBe(false);
+    for (const file of painters) {
+      const src = readFileSync(file, 'utf8');
+      expect(src.includes('\u2014'), `${file}: em dash found`).toBe(false);
+      expect(src.includes('\u2013'), `${file}: en dash found`).toBe(false);
+    }
   });
 
-  it('gives the tab strip and the gold buttons a tokenized :focus-visible ring', () => {
+  it('gives the tab strips and the gold buttons a tokenized :focus-visible ring', () => {
     expect(components).toMatch(
       /\.bank-tab:focus-visible \{\s*outline: 2px solid var\(--color-border-focus\);/,
+    );
+    // The log's own sub-strip is chrome the keyboard lands on too.
+    expect(components).toMatch(
+      /\.gbank-view-tab:focus-visible \{\s*outline: 2px solid var\(--color-border-focus\);/,
     );
     expect(components).toMatch(
       /\.gbank-gold-btn:focus-visible \{\s*outline: 2px solid var\(--color-border-focus\);/,
@@ -730,6 +749,27 @@ describe('guild_bank_window: the activity log view', () => {
     expect(new Set(strips).size).toBe(strips.length);
   });
 
+  it('the sub-strip is nested in the A11Y tree, not just visually', () => {
+    // Two peer tablists with no stated relationship read to a screen reader as
+    // a second, unrelated top-level tab list appearing from nowhere. The Guild
+    // pane is a real tabpanel, the outer Guild tab controls it, the panel names
+    // that tab back, and the inner strip lives INSIDE the panel.
+    const h = harness(guildInfo());
+    h.window.open();
+    clickGuildTab(h);
+    const panel = h.root.querySelector('[role="tabpanel"]') as HTMLElement;
+    expect(panel).not.toBeNull();
+    expect(panel.id.length).toBeGreaterThan(0);
+    const guildTab = h.root.querySelector('.bank-tab[data-tab="guild"]') as HTMLElement;
+    expect(guildTab.getAttribute('aria-controls')).toBe(panel.id);
+    expect(panel.getAttribute('aria-labelledby')).toBe(guildTab.id);
+    expect(guildTab.id.length).toBeGreaterThan(0);
+    const innerStrip = h.root.querySelector('.gbank-view-tabs') as HTMLElement;
+    expect(panel.contains(innerStrip)).toBe(true);
+    // ...and the pane content is inside it too, not stranded beside it.
+    expect(panel.querySelector('.gbank-treasury')).not.toBeNull();
+  });
+
   it('does NOT read the log while the contents view is showing (on demand, not a poll)', () => {
     // Reading guildBankLog() is what REQUESTS it, so a pane that read it every
     // paint would turn every officer standing at a banker into a poller.
@@ -738,6 +778,43 @@ describe('guild_bank_window: the activity log view', () => {
     clickGuildTab(h);
     h.window.refreshIfChanged();
     expect(h.calls).not.toContain('guildBankLog');
+  });
+
+  it('stops reading the log once the player switches back to the Personal tab', () => {
+    // REGRESSION: the on-demand guard used to gate only on the pane's
+    // remembered sub-view, so a player who opened the log and then went back to
+    // Personal kept re-requesting it every TTL for a pane nobody was looking
+    // at. The guard has to be "is this pane VISIBLE", not "was Log selected".
+    const h = harness(guildInfo());
+    h.window.open();
+    clickGuildTab(h);
+    clickLogTab(h);
+    (h.root.querySelector('.bank-tab[data-tab="personal"]') as HTMLElement).click();
+    h.calls.length = 0;
+    h.window.refreshIfChanged();
+    h.window.refreshIfChanged();
+    expect(h.calls).not.toContain('guildBankLog');
+  });
+
+  it('stops reading the log when the guild bank mirror goes away (a demotion)', () => {
+    // The worse arm of the same regression: losing the mirror re-arms the
+    // client's request gate, so a demoted player was sending a request the
+    // server refuses, once per TTL, indefinitely.
+    const h = harness(guildInfo());
+    h.window.open();
+    clickGuildTab(h);
+    clickLogTab(h);
+    h.world.guildBankInfo = null;
+    h.calls.length = 0;
+    h.window.refreshIfChanged();
+    h.window.refreshIfChanged();
+    expect(h.calls).not.toContain('guildBankLog');
+    // ...and the pane forgot the log view with the tab, so a re-approach starts
+    // on the contents rather than silently refetching.
+    h.world.guildBankInfo = guildInfo();
+    h.window.refreshIfChanged();
+    clickGuildTab(h);
+    expect(h.root.querySelector('.gbank-view-tab.on')?.getAttribute('data-tab')).toBe('contents');
   });
 
   it('reads the log as soon as its view is opened', () => {
@@ -787,6 +864,33 @@ describe('guild_bank_window: the activity log view', () => {
     // announces rather than changing silently.
     expect(notice?.getAttribute('role')).toBe('status');
     expect(notice?.getAttribute('aria-live')).toBe('polite');
+    // ...and the ATTRIBUTES ALONE would be decoration: a live region inserted
+    // already-populated is generally not announced, because AT announces a
+    // CHANGE inside a region that already exists. The pane therefore re-writes
+    // the same text one task later, which is a real mutation on a live region
+    // by then in the tree and invisible to sighted players (no paint between).
+    const before = notice?.textContent;
+    vi.useFakeTimers();
+    try {
+      const fresh = harness(guildInfo());
+      fresh.world.logView = { state: 'refused', entries: [] };
+      fresh.window.open();
+      clickGuildTab(fresh);
+      clickLogTab(fresh);
+      const line = fresh.root.querySelector('.gbank-log-notice') as HTMLElement;
+      // Node IDENTITY, not text equality: the announcement IS the replacement,
+      // and the text is deliberately identical (a visible flash would be a
+      // regression, not the feature).
+      const originalTextNode = line.firstChild;
+      expect(originalTextNode).not.toBeNull();
+      vi.runOnlyPendingTimers();
+      expect(line.firstChild, 'the refusal must re-write its live region').not.toBe(
+        originalTextNode,
+      );
+      expect(line.textContent).toBe(before);
+    } finally {
+      vi.useRealTimers();
+    }
     // The two lines must not be the same string, or the distinction is cosmetic.
     const refusedText = notice?.textContent ?? '';
     const empty = harness(guildInfo());
@@ -905,6 +1009,19 @@ describe('guild_bank_window: the activity log view', () => {
     expect(h.root.querySelector('.gbank-view-tab[data-tab="log"]')).not.toBeNull();
     clickLogTab(h);
     expect(h.calls).toContain('guildBankLog');
+  });
+
+  it('says how big the window is, from the ONE seam constant, never a baked number', () => {
+    // A hardcoded "50" in the copy would have lied in six languages the moment
+    // the cap moved (and it lived in three places at once).
+    const h = harness(guildInfo());
+    h.world.logView = { state: 'ready', entries: [logEntry({ id: 3 })] };
+    h.window.open();
+    clickGuildTab(h);
+    clickLogTab(h);
+    const note = h.root.querySelector('.gbank-log-note')?.textContent ?? '';
+    expect(note).toContain(String(GUILD_BANK_LOG_LIMIT));
+    expect(note).not.toContain('{count}');
   });
 
   it('repaints when the log answer lands, without a driver of its own', () => {

@@ -23,6 +23,7 @@
 // look like an untouched one because a frame went missing.
 
 import type { ItemDef } from '../sim/types';
+import { GUILD_BANK_LOG_LIMIT } from '../world_api';
 import { itemDisplayName } from './entity_i18n';
 import type {
   GuildBankLogPaneModel,
@@ -51,6 +52,10 @@ export interface GuildBankLogPaneDeps {
 }
 
 export class GuildBankLogPane {
+  // The pane state the last paint ANNOUNCED, so a repeated repaint (any officer
+  // op rebuilds this window) cannot re-announce the same refusal over and over.
+  private lastAnnounced: GuildBankLogPaneModel['kind'] | null = null;
+
   constructor(private readonly deps: GuildBankLogPaneDeps) {}
 
   /** Append the log view's sections to the pane root. */
@@ -58,16 +63,23 @@ export class GuildBankLogPane {
     const wrap = document.createElement('div');
     wrap.className = 'gbank-log';
     if (model.kind !== 'rows') {
-      wrap.appendChild(this.buildNotice(model.kind));
+      const notice = this.buildNotice(model.kind);
+      wrap.appendChild(notice);
       el.appendChild(wrap);
+      this.announce(notice, model.kind);
       return;
     }
+    this.lastAnnounced = model.kind;
     // The scope line is always-visible TEXT, not a tooltip: a player reading a
     // trust surface has to know it is a recent WINDOW and not the whole history,
     // or an absent row reads as proof that nothing happened.
     const note = document.createElement('div');
     note.className = 'gbank-log-note';
-    note.textContent = t('hudChrome.bank.logNote');
+    // The window size is interpolated from the ONE seam constant, never baked
+    // into the copy: a hardcoded "50" would have made the sentence lie in every
+    // language the moment the cap moved, and it would have skipped formatNumber
+    // (thousands separators are locale business even at this size).
+    note.textContent = t('hudChrome.bank.logNote', { count: this.count(GUILD_BANK_LOG_LIMIT) });
     wrap.appendChild(note);
     // .bank-scroll is the window's one scroll-region class; BankWindow captures
     // and restores its offset (and scopes that restore to one pane), so the log
@@ -84,24 +96,48 @@ export class GuildBankLogPane {
   }
 
   // The loading / refused / empty line. One node shape for all three so the
-  // pane's height and focus behaviour do not jump between them; the refusal
-  // gets a live region because it can appear WHILE the player is looking at the
-  // pane (a demotion mid-view), and an unannounced disappearance of the history
-  // is exactly the thing this surface must not do quietly.
+  // pane's height and focus behaviour do not jump between them.
   private buildNotice(kind: 'loading' | 'refused' | 'empty'): HTMLElement {
     const line = document.createElement('div');
     line.className = `bank-empty gbank-log-notice gbank-log-${kind}`;
-    line.textContent =
-      kind === 'loading'
-        ? t('hudChrome.bank.logLoading')
-        : kind === 'refused'
-          ? t('hudChrome.bank.logRefused')
-          : t('hudChrome.bank.logEmpty');
+    line.textContent = this.noticeText(kind);
     if (kind !== 'empty') {
       line.setAttribute('role', 'status');
       line.setAttribute('aria-live', 'polite');
     }
     return line;
+  }
+
+  private noticeText(kind: 'loading' | 'refused' | 'empty'): string {
+    return kind === 'loading'
+      ? t('hudChrome.bank.logLoading')
+      : kind === 'refused'
+        ? t('hudChrome.bank.logRefused')
+        : t('hudChrome.bank.logEmpty');
+  }
+
+  // Make the refusal ACTUALLY announce. A live region is announced when its
+  // content CHANGES while the region is already in the accessibility tree; a
+  // region inserted already-populated (which is what a full window rebuild
+  // produces every time) generally is not announced at all, so the attributes
+  // alone were decoration. Re-writing the same text one task later is a real
+  // mutation on a live region that by then exists, and it is invisible to
+  // sighted players because no paint happens in between.
+  //
+  // Only on a CHANGE of pane state, and only for the refusal: the refusal is
+  // the one that can replace a history somebody is reading (a demotion
+  // mid-view), and this window repaints on any officer's op, so announcing
+  // unconditionally would nag. A one-shot timeout, never a repeating driver.
+  // A late fire onto a node the next repaint already detached is harmless.
+  private announce(node: HTMLElement, kind: GuildBankLogPaneModel['kind']): void {
+    const changed = this.lastAnnounced !== kind;
+    this.lastAnnounced = kind;
+    if (!changed || kind !== 'refused') return;
+    const text = this.noticeText(kind);
+    window.setTimeout(() => {
+      node.textContent = '';
+      node.appendChild(document.createTextNode(text));
+    }, 0);
   }
 
   private buildRow(row: GuildBankLogRowModel): HTMLElement {
@@ -128,14 +164,24 @@ export class GuildBankLogPane {
     // its sentence at all (the operator is described, not named).
     const actor = row.actor ?? t('hudChrome.bank.logFormerMember');
     const key = ROW_KEY[row.kind];
+    // EXHAUSTIVE, with no default arm: a default would silently route a future
+    // kind into the money sentence and render formatMoney(0) for it.
     switch (row.kind) {
       case 'depositItem':
       case 'withdrawItem':
         return t(key, { actor, count: this.count(row.count), item: this.itemName(row.itemId) });
       case 'adminPurge':
         return t(key, { count: this.count(row.count), item: this.itemName(row.itemId) });
-      default:
+      case 'depositMoney':
+      case 'withdrawMoney':
+      case 'buySlots':
+      case 'openBank':
+      case 'charterFee':
         return t(key, { actor, amount: formatMoney(row.copper) });
+      default: {
+        const unreachable: never = row.kind;
+        return String(unreachable);
+      }
     }
   }
 

@@ -48,6 +48,19 @@ export interface GuildBankInfo {
 // operator forensics, not guild history, and never reach the client at all.
 // ---------------------------------------------------------------------------
 
+/**
+ * How many rows one read returns: the window the server answers with, the hard
+ * bound the client decoder truncates at, AND the number the pane's scope line
+ * says out loud. It lives on the SEAM because all three of those are the same
+ * fact: with the constant duplicated per layer, raising the cap would have left
+ * the copy lying in every language while the decoder silently dropped rows.
+ *
+ * A short recent history rather than an archive, which is what a guild actually
+ * reads after "who took the ore?"; it also bounds the frame and the index scan.
+ * The full history stays in bank_ledger forever for the audit.
+ */
+export const GUILD_BANK_LOG_LIMIT = 50;
+
 /** The ops a guild can SEE. A strict subset of the `bank_ledger` op vocabulary
  *  (server/db.ts BankLedgerRow['op']): the two diagnostic anomaly ops are never
  *  projected here, so a client can never render one. */
@@ -101,10 +114,16 @@ export interface GuildBankLogView {
 export interface IWorldGuildBank {
   // Non-null only while an officer-plus guild member stands at a banker NPC.
   guildBankInfo: GuildBankInfo | null;
-  /** The guild bank activity log, fetched ON DEMAND: calling this while the log
-   *  view is open is what REQUESTS it (there is no snapshot key for it). The
-   *  call is idempotent while a request is in flight and while an installed
-   *  response is still fresh, so a per-frame repaint cannot become a poll.
+  /** The guild bank activity log, fetched ON DEMAND: calling this is what
+   *  REQUESTS it (there is no snapshot key for it), so a caller must only call
+   *  it while the log view is actually on screen.
+   *
+   *  Two things bound the traffic, and they are different: this call is
+   *  IDEMPOTENT inside its TTL, so a per-frame repaint of an open log view
+   *  sends at most one request per TTL rather than one per frame; and while the
+   *  view is CLOSED nobody calls it at all, so nothing is sent. Neither alone
+   *  is enough (the second is the one a caller can get wrong), which is why the
+   *  UI gates on the pane being visible rather than on its remembered sub-view.
    *  The offline Sim has no guild and always answers an empty ready view. */
   guildBankLog(): GuildBankLogView;
   guildBankDepositGold(amount: number): void;
