@@ -230,8 +230,9 @@ export interface SocialTransport {
   // founder, after onGuildMembershipChanged). The transport owner seeds the
   // new guild's EMPTY book into the LIVE sim (ops never lazily create a book:
   // loadGuildBank is load-once, and a lazy book would shadow the persisted
-  // row after a restart), then charges the creation fee (create-then-charge,
-  // state.md) and writes its create_fee ledger row.
+  // row after a restart) and consumes the gate-reserved creation fee
+  // (reserve-at-gate, state.md): the create_fee ledger row and the escrow
+  // save of the already-charged purse.
   onGuildCreated(characterId: number, guildId: number): void;
   // The guild DELETE just committed (the empty-bank guard below passed). The
   // transport owner EVICTS the guild's book from the live sim so the map

@@ -326,7 +326,13 @@ describe('bank ledger dispatch integration', () => {
 // FIFO recorder. GuildBankInfo fixtures mirror the info() helper above.
 // ---------------------------------------------------------------------------
 
-import { diffGuildBankOp, guildCreateFeeDelta, recordGuildBankDeltas } from '../server/bank_ledger';
+import {
+  diffGuildBankOp,
+  type GuildBankLedgerOp,
+  guildCreateFeeDelta,
+  recordGuildBankDeltas,
+} from '../server/bank_ledger';
+import type { GuildBankOpDelta } from '../src/sim/guild_bank';
 import type { GuildBankInfo } from '../src/world_api';
 
 function ginfo(
@@ -386,6 +392,43 @@ describe('diffGuildBankOp (pure)', () => {
         purchasedSlotsAfter: 0,
       },
     ]);
+  });
+
+  it('keys crafted and plain copies of one item SEPARATELY (the revert-path contract)', () => {
+    // The guild key has three dimensions (itemId, instance, craftedRecipeId):
+    // withdrawing the plain copy while a crafted copy sits in the book must
+    // record the PLAIN provenance, or the revert would mint provenance the
+    // moved copy never had.
+    const both = [
+      { itemId: 'iron_sword', count: 1, craftedRecipeId: 'smith_iron_sword' },
+      { itemId: 'iron_sword', count: 1 },
+    ];
+    const craftedOnly = [{ itemId: 'iron_sword', count: 1, craftedRecipeId: 'smith_iron_sword' }];
+    expect(diffGuildBankOp('withdraw', ginfo(0, both), ginfo(0, craftedOnly))).toEqual([
+      {
+        itemId: 'iron_sword',
+        count: 1,
+        instance: null,
+        craftedRecipeId: null,
+        copperDelta: 0,
+        purchasedSlotsAfter: 0,
+      },
+    ]);
+  });
+
+  it('pins the sim and server guild-op vocabularies in lockstep (both ways)', () => {
+    // GuildBankOpDelta['op'] (src/sim/guild_bank.ts) and GuildBankLedgerOp
+    // (server/bank_ledger.ts) redeclare the same five literals (the sim never
+    // imports server code). An op added on one side without the other would
+    // otherwise compile and silently never revert (or never record).
+    type SimOp = GuildBankOpDelta['op'];
+    type AssertBothWays = [SimOp] extends [GuildBankLedgerOp]
+      ? [GuildBankLedgerOp] extends [SimOp]
+        ? true
+        : never
+      : never;
+    const lockstep: AssertBothWays = true;
+    expect(lockstep).toBe(true);
   });
 
   it('item deltas carry the moved slot craft provenance for the revert path', () => {

@@ -22,7 +22,7 @@
 // Date.now (enforced by tests/architecture.test.ts). This module draws NO rng.
 
 import type { GuildBankInfo } from '../world_api';
-import { bagCapacity, bagsFullError, instancedCountCap } from './bags';
+import { addStacked, bagCapacity, bagsFullError, instancedCountCap } from './bags';
 import { moveBetweenContainers, nearBanker } from './bank';
 import { ITEMS } from './data';
 import { formatMoney } from './format_money';
@@ -31,9 +31,11 @@ import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { cloneInvSlot, type InvSlot } from './types';
 
-/** One-time fee the founder pays when a guild is created (10 gold). Charged in
- *  Phase 3's guild_create dispatch AFTER the guild row exists (create first,
- *  then deduct: a crash between them yields a free guild, never lost gold). */
+/** One-time fee the founder pays when a guild is created (10 gold).
+ *  RESERVE-AT-GATE (revised by Phase 3 QA): deducted synchronously at the
+ *  guild_create dispatch gate BEFORE any DB work and refunded on every
+ *  refusal arm; charging after the commit left a deterministic fee-dodge
+ *  exploit (see chargeGuildCreationFee below and docs/guild-bank/state.md). */
 export const GUILD_CREATION_FEE_COPPER = 100_000;
 
 /** Slots every guild bank starts with, before any expansion. */
@@ -260,17 +262,33 @@ function clampTreasury(v: number): number {
   return Math.max(0, Math.min(GUILD_BANK_TREASURY_CAP, v));
 }
 
+/** Key-order-independent serialization for payload equality: object keys are
+ *  sorted recursively, so a payload that round-tripped through Postgres JSONB
+ *  (which does NOT preserve key insertion order) still compares equal to its
+ *  pre-reload clone. Plain data only (the instance payloads are JSON to begin
+ *  with). */
+function canonicalJson(value: unknown): string {
+  if (value === null || typeof value !== 'object') return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
+  const keys = Object.keys(value as Record<string, unknown>).sort();
+  const parts = keys.map(
+    (k) => `${JSON.stringify(k)}:${canonicalJson((value as Record<string, unknown>)[k])}`,
+  );
+  return `{${parts.join(',')}}`;
+}
+
 /** True when the two instance payloads are the same copy for revert purposes.
- *  Both sides descend from the same cloneInvSlot lineage, so key order is
- *  stable and JSON equality is exact; identical payloads are fungible for
- *  conservation, which is all a revert needs. */
+ *  Canonical (sorted-key) equality, NOT raw JSON.stringify: one side may have
+ *  round-tripped through JSONB (the evict-and-reload arm) and come back with
+ *  reordered keys; identical payloads are fungible for conservation, which is
+ *  all a revert needs. */
 function sameInstance(
   a: InvSlot['instance'] | null | undefined,
   b: InvSlot['instance'] | null | undefined,
 ): boolean {
   if (!a && !b) return true;
   if (!a || !b) return false;
-  return JSON.stringify(a) === JSON.stringify(b);
+  return canonicalJson(a) === canonicalJson(b);
 }
 
 /** Surgically UNDO a dead session's unflushed ops on a live book, newest
@@ -306,35 +324,43 @@ export function revertGuildBankDeltas(
     if (count === 0) continue;
     if (d.op === 'deposit') {
       // Undo a deposit: remove up to `count` matching copies from the book
-      // (newest slots first). A missing copy no-ops (another officer already
-      // withdrew it: the accepted residue).
+      // (newest slots first). The match is THREE-dimensional (itemId, the
+      // canonical instance payload, AND craftedRecipeId): the book keeps a
+      // crafted and a plain copy of one item as separate slots, and removing
+      // across that line would destroy another officer's durable provenance.
+      // A missing copy no-ops (another officer already withdrew it: the
+      // accepted residue).
       let remaining = count;
       for (let s = book.inventory.length - 1; s >= 0 && remaining > 0; s--) {
         const slot = book.inventory[s];
-        if (slot.itemId !== d.itemId || !sameInstance(slot.instance, d.instance)) continue;
+        if (
+          slot.itemId !== d.itemId ||
+          !sameInstance(slot.instance, d.instance) ||
+          (slot.craftedRecipeId ?? null) !== (d.craftedRecipeId ?? null)
+        ) {
+          continue;
+        }
         const take = Math.min(slot.count, remaining);
         slot.count -= take;
         remaining -= take;
         if (slot.count <= 0) book.inventory.splice(s, 1);
       }
     } else if (d.op === 'withdraw') {
-      // Undo a withdraw: put the copy back. Merge into a matching plain stack
-      // where one exists; over-capacity is tolerated by the book contract
-      // (capacity only blocks new deposits).
-      const existing = d.instance
-        ? undefined
-        : book.inventory.find((s) => s.itemId === d.itemId && !s.instance && !s.craftedRecipeId);
-      if (existing && !d.craftedRecipeId) {
-        existing.count += count;
-      } else {
-        const slot: InvSlot = d.instance
-          ? { itemId: d.itemId, count, instance: d.instance }
-          : { itemId: d.itemId, count };
-        if (typeof d.craftedRecipeId === 'string' && d.craftedRecipeId !== '') {
-          slot.craftedRecipeId = d.craftedRecipeId;
-        }
-        book.inventory.push(cloneInvSlot(slot));
-      }
+      // Undo a withdraw: put the copy back through the ONE canonical grant
+      // path (addStacked): it merges only into stacks whose payload AND craft
+      // provenance match, respects the per-item stack cap (a revert must not
+      // mint an over-stacked slot no legitimate path can produce), and deep-
+      // clones instanced payloads. Over-CAPACITY is tolerated by the book
+      // contract (capacity only blocks new deposits); over-STACK is not.
+      addStacked(
+        book.inventory,
+        d.itemId,
+        count,
+        d.instance ?? undefined,
+        typeof d.craftedRecipeId === 'string' && d.craftedRecipeId !== ''
+          ? d.craftedRecipeId
+          : undefined,
+      );
     }
   }
 }

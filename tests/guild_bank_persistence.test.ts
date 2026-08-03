@@ -661,6 +661,28 @@ describe('the guild_create fee gate + the create/disband hooks', () => {
     });
   });
 
+  it('a short charge at the gate refuses and refunds; never a discounted guild', () => {
+    // The purse check and the charge run in the same synchronous block, but a
+    // pid can resolve meta-only (no live entity) and charge 0: the gate must
+    // refuse rather than reserve a short amount and found a free guild.
+    const server = new GameServer();
+    const { session, sent } = joinServer(server, 1, 'ShortCharge');
+    const meta = server.sim.players.get(session.pid);
+    if (!meta) throw new Error('missing meta');
+    meta.copper = 150_000;
+    vi.spyOn(server.sim, 'chargeGuildCreationFeeFor').mockReturnValueOnce(0);
+    const createSpy = vi.fn(async () => true);
+    priv(server).social.guildCreate = createSpy;
+    dispatch(server, session, { cmd: 'guild_create', name: 'Iron Vanguard' });
+    expect(createSpy).not.toHaveBeenCalled();
+    expect(priv(server).pendingGuildCreateFees.size).toBe(0);
+    const events = sent.flatMap((m) => ((m as { list?: unknown[] }).list ?? []) as never[]);
+    expect(events).toContainEqual({
+      type: 'error',
+      text: 'You need 10 gold to found a guild.',
+    });
+  });
+
   it('lets a founder at exactly the fee through to the create', () => {
     const server = new GameServer();
     const { session } = joinServer(server, 1, 'Exact');

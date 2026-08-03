@@ -5544,6 +5544,16 @@ export class GameServer {
           // success/refund arms can never mismatch reservations.
           if (this.pendingGuildCreateFees.has(session.characterId)) break;
           const charged = this.sim.chargeGuildCreationFeeFor(pid);
+          if (charged < GUILD_CREATION_FEE_COPPER) {
+            // The purse check above passed but the charge came back short: the
+            // pid resolved meta-only (no live entity) or a state edge. Never
+            // found a discounted or free guild: return whatever was taken and
+            // refuse with the same line.
+            if (charged > 0) this.sim.refundGuildCreationFeeFor(pid, charged);
+            const goldAmount = GUILD_CREATION_FEE_COPPER / 10_000;
+            this.sendChatNotice(session, `You need ${goldAmount} gold to found a guild.`);
+            break;
+          }
           this.pendingGuildCreateFees.set(session.characterId, {
             accountId: session.accountId,
             amount: charged,

@@ -192,6 +192,26 @@ export type GuildBankLedgerOp =
   | 'withdraw'
   | 'buy_slots';
 
+// The guild multiset key: itemId + instance payload + craft provenance. The
+// third dimension exists because guild deltas feed the revert path
+// (Sim.revertGuildBankDeltas), which must restore the exact copy; the
+// personal slotKey deliberately keeps its two dimensions (its rows never
+// feed a revert).
+function guildSlotKey(slot: BankSlot): string {
+  return JSON.stringify([slot.itemId, slot.instance ?? null, slot.craftedRecipeId ?? null]);
+}
+
+function countByGuildKey(slots: BankSlot[]): Map<string, { slot: BankSlot; count: number }> {
+  const m = new Map<string, { slot: BankSlot; count: number }>();
+  for (const slot of slots) {
+    const key = guildSlotKey(slot);
+    const existing = m.get(key);
+    if (existing) existing.count += slot.count;
+    else m.set(key, { slot, count: slot.count });
+  }
+  return m;
+}
+
 // Observe a guild bank op's outcome by diffing the before/after
 // guildBankInfoFor snapshots. Empty means refused / no-op (nothing to record,
 // nothing dirty). A successful op always has non-null snapshots on both sides
@@ -237,11 +257,16 @@ export function diffGuildBankOp(
     ];
   }
 
-  // Item ops: the personal-bank multiset diff over the book's slots. Guild
-  // deltas additionally carry craftedRecipeId (not a ledger column) so the
-  // revert path can restore a reverted withdraw byte-identically.
-  const beforeCounts = countByKey(before.slots);
-  const afterCounts = countByKey(after.slots);
+  // Item ops: the personal-bank multiset diff over the book's slots, keyed
+  // with craftedRecipeId as a THIRD dimension (the personal slotKey has two):
+  // the guild deltas carry craftedRecipeId so the revert path can restore a
+  // reverted withdraw byte-identically, and a two-dimension key would collapse
+  // a crafted and a plain copy of the same item into one key and record
+  // whichever slot's provenance came first, minting or destroying
+  // disenchant-gate provenance on revert (the Phase 3 QA architecture
+  // finding).
+  const beforeCounts = countByGuildKey(before.slots);
+  const afterCounts = countByGuildKey(after.slots);
   const keys = new Set<string>([...beforeCounts.keys(), ...afterCounts.keys()]);
   const out: BankOpDelta[] = [];
   for (const key of keys) {
@@ -312,11 +337,12 @@ export function recordGuildBankDeltas(
   }
 }
 
-// The guild_create fee row (create-then-charge: written only after the guild
-// row committed AND the sim purse was actually charged). purchased_slots_after
-// is 0: a newborn guild has no expansions. copper_delta is the negated copper
-// the founder's PURSE paid (never treasury copper), so the audit script
-// excludes create_fee from the treasury replay.
+// The guild_create fee row (reserve-at-gate: the purse was charged at the
+// dispatch gate; the row is written only in the create's committed success
+// arm, which consumes that reservation). purchased_slots_after is 0: a
+// newborn guild has no expansions. copper_delta is the negated copper the
+// founder's PURSE paid (never treasury copper), so the audit script excludes
+// create_fee from the treasury replay.
 export function guildCreateFeeDelta(chargedCopper: number): BankOpDelta {
   return {
     itemId: null,

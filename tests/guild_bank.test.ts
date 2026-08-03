@@ -16,7 +16,7 @@ import { describe, expect, it } from 'vitest';
 // redeclaration to the server's source of truth so the two cannot drift silently.
 import type { GuildRank as ServerGuildRank } from '../server/social';
 import { ClientWorld } from '../src/net/online';
-import { bagCapacity } from '../src/sim/bags';
+import { bagCapacity, stackSizeOf } from '../src/sim/bags';
 import { sanitizeBankState } from '../src/sim/bank';
 import { BUILTIN_WORLD, ITEMS, QUESTS } from '../src/sim/data';
 import {
@@ -1353,7 +1353,7 @@ describe('guild bank ops: the stale-rank scenario and determinism', () => {
 
 // ---------------------------------------------------------------------------
 // Phase 3: the persistence-facing sim helpers the server wires up (the evict,
-// the disband-guard holdings read, and the create-then-charge fee deduction).
+// the disband-guard holdings read, and the reserve-at-gate fee charge/refund).
 // The SQL side lives in server/db.ts and is pinned in the server suites.
 // ---------------------------------------------------------------------------
 
@@ -1403,7 +1403,7 @@ describe('evictGuildBank (the sanctioned evict) + guildBankHoldings', () => {
   });
 });
 
-describe('chargeGuildCreationFeeFor (create-then-charge, the sim half)', () => {
+describe('chargeGuildCreationFeeFor (reserve-at-gate, the sim half)', () => {
   it('charges exactly the fee once when the purse covers it', () => {
     const sim = freshSim();
     meta(sim).copper = 150_000;
@@ -1411,10 +1411,10 @@ describe('chargeGuildCreationFeeFor (create-then-charge, the sim half)', () => {
     expect(meta(sim).copper).toBe(50_000);
   });
 
-  it('clamps to the purse when copper was spent mid-flight (never negative)', () => {
-    // The dispatch gate refused poor founders BEFORE the DB create; a shortfall
-    // here means a mid-flight spend, and the guild already exists (create first,
-    // then charge), so the charge takes what is there rather than refusing.
+  it('clamps to the purse on a shortfall (never negative); the GATE refuses a short charge', () => {
+    // The dispatch gate checks the purse and charges in the same synchronous
+    // block, refusing (and refunding) when the charge comes back short, so
+    // the clamp here is defensive only.
     const sim = freshSim();
     meta(sim).copper = 40_000;
     expect(sim.chargeGuildCreationFeeFor(sim.playerId)).toBe(40_000);
@@ -1600,5 +1600,87 @@ describe('revertGuildBankDeltas (the unflushable-session surgical undo)', () => 
     sim.evictGuildBank(GUILD_ID);
     expect(() => sim.revertGuildBankDeltas(GUILD_ID, [gold('deposit_gold', 1_000)])).not.toThrow();
     expect(sim.guildBanks.has(GUILD_ID)).toBe(false);
+  });
+});
+
+describe('revertGuildBankDeltas: provenance, canonical payloads, and stack caps', () => {
+  it('a plain-copy revert never removes a crafted copy of the same item (and vice versa)', () => {
+    // The book legitimately holds crafted and plain copies of one item as
+    // separate slots (addStacked keys its merge on craftedRecipeId). A revert
+    // that ignored the third dimension would scan newest-first and destroy
+    // another officer's durable crafted provenance.
+    const sim = makeOfficerSim();
+    book(sim).inventory.push(
+      { itemId: 'iron_sword', count: 2 },
+      { itemId: 'iron_sword', count: 1, craftedRecipeId: 'smith_iron_sword' },
+    );
+    sim.revertGuildBankDeltas(GUILD_ID, [
+      { op: 'deposit', itemId: 'iron_sword', count: 1, instance: null, copperDelta: 0 },
+    ]);
+    // The plain stack shrank; the crafted copy is untouched.
+    expect(book(sim).inventory).toEqual([
+      { itemId: 'iron_sword', count: 1 },
+      { itemId: 'iron_sword', count: 1, craftedRecipeId: 'smith_iron_sword' },
+    ]);
+    // The mirror: a crafted-copy revert leaves the plain stack alone.
+    sim.revertGuildBankDeltas(GUILD_ID, [
+      {
+        op: 'deposit',
+        itemId: 'iron_sword',
+        count: 1,
+        instance: null,
+        craftedRecipeId: 'smith_iron_sword',
+        copperDelta: 0,
+      },
+    ]);
+    expect(book(sim).inventory).toEqual([{ itemId: 'iron_sword', count: 1 }]);
+  });
+
+  it('matches an instanced payload whose keys were reordered by a JSONB round trip', () => {
+    // Postgres JSONB does not preserve object key order: after the
+    // evict-and-reload arm, the live slot's payload may serialize with a
+    // different key order than the delta's pre-reload clone. The canonical
+    // (sorted-key) match must still find the copy; raw JSON.stringify
+    // equality would silently no-op the revert and resurrect the dupe.
+    const sim = makeOfficerSim();
+    const reordered = JSON.parse('{"charges":{"arcane":2},"bindOnTrade":false}');
+    book(sim).inventory.push({ itemId: 'mana_prism', count: 1, instance: reordered });
+    sim.revertGuildBankDeltas(GUILD_ID, [
+      {
+        op: 'deposit',
+        itemId: 'mana_prism',
+        count: 1,
+        instance: JSON.parse('{"bindOnTrade":false,"charges":{"arcane":2}}'),
+        copperDelta: 0,
+      },
+    ]);
+    expect(book(sim).inventory).toEqual([]);
+  });
+
+  it('a withdraw-undo respects the per-item stack cap (grants through addStacked)', () => {
+    // The revert must not mint an over-stacked slot no legitimate path can
+    // produce: the book contract tolerates over-CAPACITY, never over-STACK.
+    const sim = makeOfficerSim();
+    const stack = stackSizeOf(ITEMS.wolf_fang);
+    expect(stack).toBeGreaterThan(1);
+    expect(Number.isFinite(stack)).toBe(true);
+    book(sim).inventory.push({ itemId: 'wolf_fang', count: stack - 1 });
+    sim.revertGuildBankDeltas(GUILD_ID, [
+      { op: 'withdraw', itemId: 'wolf_fang', count: 3, instance: null, copperDelta: 0 },
+    ]);
+    const counts = book(sim).inventory.map((s) => s.count);
+    expect(counts.reduce((a, b) => a + b, 0)).toBe(stack + 2);
+    for (const c of counts) expect(c).toBeLessThanOrEqual(stack);
+  });
+
+  it('evictGuildBank draws no rng (completing the module-wide zero-rng sweep)', () => {
+    const sim = makeOfficerSim();
+    let draws = 0;
+    sim.rng.setObserver(() => {
+      draws++;
+    });
+    sim.evictGuildBank(GUILD_ID);
+    sim.rng.setObserver(null);
+    expect(draws).toBe(0);
   });
 });
