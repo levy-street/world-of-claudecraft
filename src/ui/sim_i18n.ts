@@ -37,6 +37,12 @@ const baseEnTable = {
   'error.bagRemoveTooManyItems': 'You have too many items to remove that bag.',
   'error.tradeBagSpace': 'Trade failed: not enough bag space.',
   'log.bagsMigrated': 'Your belongings have been packed into new bags.',
+  // Toolbelt (the tool-only container; src/sim/toolbelt.ts). Equipping and
+  // unequipping reuse the shared log.equipped / log.unequipped rules, so only
+  // the belt-specific refusals and the stow/take lines need their own keys.
+  'error.noToolbelt': 'You are not wearing a toolbelt.',
+  'error.toolbeltToolsOnly': 'Only tools fit in a toolbelt.',
+  'error.toolbeltRemoveTooManyItems': 'You have too many items to remove that toolbelt.',
   // Bank (guild-bank-ready pooled bank; src/sim/bank.ts). The error.* lines are the
   // refusal toasts; log.bankSlotsPurchased is the purchase notice.
   'error.bankQuestItem': 'You cannot store quest items in the bank.',
@@ -286,6 +292,8 @@ const baseEnTable = {
   'log.discarded': 'Discarded {item}.',
   'log.equipped': 'Equipped {item}.',
   'log.unequipped': 'Unequipped {item}.',
+  'log.toolStowed': 'Stowed {item} in your toolbelt.',
+  'log.toolTaken': 'Took {item} from your toolbelt.',
   'log.noFish': 'No fish are biting.',
   'log.rareCatch': 'A rare catch! Something gleams on your line.',
   'log.sitEat': 'You sit down to eat.',
@@ -8941,6 +8949,14 @@ const RULES: Rule[] = [
   { re: /^You have already recovered this relic\.$/, build: () => tItemExtra('relicRecovered') },
   { re: /^Equipped (?!\()(.+)\.$/, build: (m) => tSim('log.equipped', { item: locItem(m[1]) }) },
   { re: /^Unequipped (.+)\.$/, build: (m) => tSim('log.unequipped', { item: locItem(m[1]) }) },
+  {
+    re: /^Stowed (.+) in your toolbelt\.$/,
+    build: (m) => tSim('log.toolStowed', { item: locItem(m[1]) }),
+  },
+  {
+    re: /^Took (.+) from your toolbelt\.$/,
+    build: (m) => tSim('log.toolTaken', { item: locItem(m[1]) }),
+  },
   { re: /^You quaff (.+)\.$/, build: (m) => tSim('log.quaff', { item: locItem(m[1]) }) },
   {
     re: /^(Need|Greed) Roll - (\d+) for (.+) by (.+)$/,
