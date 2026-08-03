@@ -257,7 +257,7 @@ import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_st
 import { presentationTimeAfterWire, stampScenePresentationTime } from './presentation_clock';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
-import { sceneInputLockAfterEvent } from './scene_input_lock_mirror';
+import { sceneActiveAfterEvent, sceneInputLockAfterEvent } from './scene_input_lock_mirror';
 import {
   type SnapshotTimerWireMode,
   STABLE_TIMER_WIRE_VERSION,
@@ -2198,6 +2198,9 @@ export class ClientWorld implements IWorld {
     if (!this.sceneInputLockedBeforeDrain) return;
     this.sceneInputLockedBeforeDrain = false;
     this.onSceneInputLockChanged?.(false);
+    // Terminal scene teardown also clears the receipt-side active mirror so
+    // a dropped end op cannot leave the zone-warmup gate scene-covered.
+    this.sceneActiveMirror = false;
   }
 
   setMoveInput(input: unknown, facing?: unknown): void {
@@ -2561,6 +2564,7 @@ export class ClientWorld implements IWorld {
       for (const ev of msg.list) {
         const event = stampScenePresentationTime(ev as SimEvent, this.presentationTime);
         this.mirrorSceneInputLock(event);
+        this.mirrorSceneActive(event);
         this.applyLockpickEvent(event);
         this.applyMountRaceEvent(event);
         this.applyMountTrainEvent(event);
@@ -2646,6 +2650,12 @@ export class ClientWorld implements IWorld {
     }
   }
 
+  private sceneActiveMirror = false;
+
+  private mirrorSceneActive(event: SimEvent): void {
+    this.sceneActiveMirror = sceneActiveAfterEvent(this.sceneActiveMirror, event, this.playerId);
+  }
+
   private mirrorSceneInputLock(event: SimEvent): void {
     const locked = sceneInputLockAfterEvent(this.sceneInputLockedBeforeDrain, event, this.playerId);
     if (locked === this.sceneInputLockedBeforeDrain) return;
@@ -2666,6 +2676,7 @@ export class ClientWorld implements IWorld {
       this.presentationTime,
     );
     this.mirrorSceneInputLock(sceneSync);
+    this.mirrorSceneActive(sceneSync);
     this.eventQueue.push(sceneSync);
     this.eventQueue.push(
       stampScenePresentationTime(
@@ -5049,6 +5060,10 @@ export class ClientWorld implements IWorld {
   // answers with the 'scene' end op / 'sceneChoiceResult' event, never an
   // outcome frame. The id caps mirror the server-side validation, so an
   // oversized id is dropped before it ever hits the wire. ---
+  sceneActiveForLocalPlayer(): boolean {
+    return this.sceneActiveMirror;
+  }
+
   sceneSkip(): void {
     this.cmd({ cmd: 'scene_skip' });
   }

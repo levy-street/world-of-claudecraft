@@ -812,6 +812,24 @@ describe('the voyage cinematic', () => {
     ).toHaveLength(2);
   });
 
+  it('scene-active truth is synchronous with the fare answer, before any tick', () => {
+    // The fare answer runs in the CLICK HANDLER: it teleports the rider and
+    // starts the voyage in one synchronous call, while the scene events wait
+    // for the next tick's drain. The frame loop's zone-warmup gate reads
+    // sceneActiveForLocalPlayer() to decide against the blocking loading
+    // screen, so it must be true here, with the player already displaced,
+    // before a single tick runs.
+    const sim = makeRider();
+    sim.ctx.players.get(sim.playerId)?.questsDone.add(Q0);
+    expect(sim.sceneActiveForLocalPlayer()).toBe(false);
+    board(sim, 238, -47.5, 'ch_lb_ferry_fare_out');
+    expect(sim.player.pos.x).toBeGreaterThan(600); // teleported to Gullhaven
+    expect(sim.sceneActiveForLocalPlayer()).toBe(true);
+    // And it clears once the scene finishes.
+    collect(sim, 30 * 20);
+    expect(sim.sceneActiveForLocalPlayer()).toBe(false);
+  });
+
   it('the first paid crossing plays the spliced voyage: ship cue, bell, then the arrival', () => {
     const sim = makeRider();
     board(sim, 238, -47.5, 'ch_lb_ferry_fare_out');

@@ -3676,7 +3676,12 @@ async function startGame(
     // the whole crossing to stream in the background before the arrival
     // shot needs it. Sim collision is procedural math, so the authoritative
     // player standing on not-yet-rendered ground stays correct throughout.
-    const sceneCovered = !riftExit && sceneDirector.sceneActive();
+    // world.sceneActiveForLocalPlayer() is the SYNCHRONOUS truth (registry
+    // offline, receipt mirror online); the director flag lags it by up to a
+    // couple of frames because the fare answer teleports from the click
+    // handler while the scene events wait for the next tick's drain.
+    const sceneCovered =
+      !riftExit && (world.sceneActiveForLocalPlayer() || sceneDirector.sceneActive());
     if (sceneCovered) {
       zoneWarmup = renderer
         .prepareZoneAt(zoneX, zoneZ)

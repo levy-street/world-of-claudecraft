@@ -10913,6 +10913,18 @@ export class Sim {
     return this.time;
   }
 
+  sceneActiveForLocalPlayer(): boolean {
+    // Personal playbacks key by -pid; a claim playback lists the player in
+    // its started audience once its start op emitted. Both read the live
+    // registry, so this is true the instant playSceneForPlayer runs, before
+    // any tick drains the scene events.
+    if (scenesMod.sceneActiveFor(this.ctx, -this.playerId)) return true;
+    for (const playback of this.ctx.scenePlaybacks.values()) {
+      if (playback.startedAudience.has(this.playerId)) return true;
+    }
+    return false;
+  }
+
   sceneSkip(): void {
     scenesMod.requestSceneSkip(this.ctx);
   }

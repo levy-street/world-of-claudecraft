@@ -16,3 +16,16 @@ export function sceneInputLockAfterEvent(
   if (event.op.kind === 'end') return false;
   return locked;
 }
+
+/** Immediate mirror of "a scene is active for the local player" on receipt,
+ * same contract as the lock mirror above: the frame loop's zone-warmup gate
+ * reads it so a fare teleport arriving in the same message as its scene
+ * start can never race the event drain into the blocking loading screen. */
+export function sceneActiveAfterEvent(active: boolean, event: SimEvent, playerId: number): boolean {
+  if (event.type === 'sceneSync') return event.state !== null;
+  if (event.type !== 'scene') return active;
+  if (event.pid !== undefined && event.pid !== playerId) return active;
+  if (event.op.kind === 'start') return true;
+  if (event.op.kind === 'end') return false;
+  return active;
+}

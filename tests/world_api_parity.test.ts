@@ -421,6 +421,7 @@ export const IWORLD_MEMBERS = [
   { name: 'presentationTime', kind: 'data' },
   { name: 'sceneSkip', kind: 'method' },
   { name: 'answerSceneChoice', kind: 'method' },
+  { name: 'sceneActiveForLocalPlayer', kind: 'method' },
   // IWorldActionBar: per-character action-bar layout persistence + login restore.
   { name: 'saveActionBarLayout', kind: 'method' },
   { name: 'takeActionBarLayoutRestore', kind: 'method' },
@@ -533,10 +534,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // Rift + mounts surface. The action-bar pair and Last Bell's clock plus two
     // scene methods are included in the merged facet union; making reins usable
     // items removed selectedMount + selectMount from the prior surface. The
-    // v0.32.0 integration adds activeMasterLootRolls.
-    expect(IWORLD_MEMBERS.length).toBe(277);
+    // v0.32.0 integration adds activeMasterLootRolls. The voyage loading
+    // screen suppression adds the synchronous sceneActiveForLocalPlayer.
+    expect(IWORLD_MEMBERS.length).toBe(278);
     expect(DATA_MEMBERS.length).toBe(73);
-    expect(METHOD_MEMBERS.length).toBe(204);
+    expect(METHOD_MEMBERS.length).toBe(205);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -789,6 +791,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'salvageItem',
       'saveActionBarLayout',
       'saveLoadout',
+      'sceneActiveForLocalPlayer',
       'sceneSkip',
       'searchCharacters',
       'selectTalentRow',
@@ -1112,6 +1115,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'salvageItem',
       'saveActionBarLayout',
       'saveLoadout',
+      'sceneActiveForLocalPlayer',
       'sceneSkip',
       'searchCharacters',
       'selectTalentRow',
@@ -1658,6 +1662,7 @@ const FACET_SCENES = [
   'presentationTime',
   'sceneSkip',
   'answerSceneChoice',
+  'sceneActiveForLocalPlayer',
 ] as const satisfies readonly (keyof IWorldScenes)[];
 type _ExhaustScenes = AssertNever<Exclude<keyof IWorldScenes, (typeof FACET_SCENES)[number]>>;
 
@@ -1748,8 +1753,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(277);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(277);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(278);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(278);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);
