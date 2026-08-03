@@ -34,8 +34,18 @@ export interface BgPlayerInfo {
   // Deliberately NO hp/mhp: the scoreboard reads dead/carrying and the
   // tallies only, and the bg self key is match-wide (never interest-scoped),
   // so shipping enemy health here would leak actionable state past the
-  // ~120yd interest rule. Health is the granular, moment-to-moment read that
+  // interest rule. Health is the granular, moment-to-moment read that
   // decides whether to commit; alive-or-dead plus a public wave clock is not.
+  // The property this preserves is enforced, not merely conventional: the
+  // authoritative snapshot never SHIPS an enemy fighter's entity record
+  // (position, facing, hp/mhp, resource, cast bar, auras) past the ordinary
+  // open-world interest radii. The battleground's raised match-wide radius
+  // covers only your own team plus the field's non-player entities (flags,
+  // runes, props); see bgWideInterestApplies and BG_MATCH_INTEREST_RADIUS in
+  // server/game.ts, with the per-arm pins in tests/battleground_wire.test.ts.
+  // So an honest client cannot draw an enemy on the map or minimap from data
+  // it was never sent, and this omission is the matching rule for the one
+  // match-wide payload.
 }
 
 export interface BgMatchInfo {

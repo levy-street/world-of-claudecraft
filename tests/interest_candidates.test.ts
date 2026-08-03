@@ -36,6 +36,13 @@ function survivingIds(
   return out;
 }
 
+// This module is pure spatial GATHERING: the wide band only makes a band cell's
+// shared query a superset, so a battleground viewer's candidate list can reach
+// the far end of the field. WHO actually survives out there is decided by the
+// caller's per-viewer cutoff, and inside the band that cutoff is team-aware
+// (server/game.ts bgWideInterestApplies: own team plus non-player entities, an
+// enemy player back at the open-world radii). Those arms are pinned end to end
+// in tests/battleground_wire.test.ts; keep this file team-agnostic.
 describe('interest_candidates: the wide-band arm', () => {
   const WIDE = 320; // matches the server's BG_MATCH_DROP_RADIUS
   const BAND_X = 16400; // inside the battleground band

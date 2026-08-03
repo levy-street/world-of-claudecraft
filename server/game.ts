@@ -249,12 +249,21 @@ const NPC_DROP_RADIUS = 130;
 // the widest OPEN-WORLD radius any entity kind can be relevant at (the
 // battleground band widens past this: BG_MATCH_DROP_RADIUS below)
 const INTEREST_QUERY_RADIUS = NPC_DROP_RADIUS;
-// Thornhollow Fields: the 100x280 field (diagonal ~297yd) stays fully
-// tracked for its own match, so the whole battle exists in every participant's
-// sim mirror (the CLIENT hides past ~120yd behind the band's distance fog, like
-// the open world's view distance). Applies to SAME-SLOT pairs only: slot
-// spacing (BG_SLOT_SPACING, 460) keeps cross-slot pairs >= 180yd apart, beyond
-// every default radius.
+// Thornhollow Fields: the 100x280 field (diagonal ~297yd) fits inside this
+// raised radius, so a fighter's OWN SIDE and the field's furniture stay
+// tracked across the whole field. It is deliberately NOT a blanket same-slot
+// widening (see bgWideInterestApplies): it applies to
+//   (a) SAME-TEAM player pairs of one match, which the M map plots as teammate
+//       positions and the party frames read, and
+//   (b) the slot's non-player entities (flags, runes, props), which both sides
+//       are meant to track.
+// An ENEMY player falls back to the open-world radii above, so their position,
+// facing, health, resource, cast bar and auras are never SHIPPED past normal
+// interest. Hiding enemies is the server's job here, not the client's: fog is
+// presentation, and a client that ignores it must learn nothing extra.
+// Same-slot only in every arm: slot spacing (BG_SLOT_SPACING in
+// src/sim/data.ts) puts cross-slot pairs beyond BG_MATCH_DROP_RADIUS, pinned by
+// the cross-slot corner check in tests/battleground_band.test.ts.
 export const BG_MATCH_INTEREST_RADIUS = 300;
 export const BG_MATCH_DROP_RADIUS = 320;
 // Distance-tiered update rates: full snapshot rate inside nameplate range
@@ -437,6 +446,14 @@ const BG_WIRE_RESET_EVENTS = new Set([
   'bgKill', // the board tallies moved: refresh them with the feed line
   'bgEnd',
 ]);
+// A respawn is NOT in that set: the sim emits it pid-scoped for the RESPAWNER
+// only, while the readout it invalidates (the match-wide `dead` column) is read
+// by every member. A per-recipient reset would leave the other nine scoreboards
+// showing bodies for up to one BG_WIRE_HZ period, which the offline host, which
+// recomputes the view every frame, never does. So a respawn fans out to the
+// whole match instead (bgRespawnRefreshPids), the shape the bgKill events
+// already have because the sim emits one copy per member.
+const BG_RESPAWN_EVENT = 'respawn';
 // Vale Cup readout cadence: the CupInfo payload carries whole-second clocks and
 // queue sizes, so 2 Hz keeps the window/indicator live without re-serializing
 // the rosters at 20 Hz. Instant transitions ride the pid-scoped vcup* events.
@@ -1220,11 +1237,30 @@ function isStealthed(e: Entity): boolean {
   return e.stealthed; // cached in the sim's updateAuras; see Entity.stealthed
 }
 
-// Both endpoints inside the SAME battleground slot: the raised match-wide
-// interest applies (never across slots, never to the open world).
+// Both endpoints inside the SAME battleground slot: the necessary condition for
+// the raised match-wide interest (never across slots, never to the open world).
 function inSameBgSlot(a: Entity, b: Entity): boolean {
   if (!isBgPos(a.pos.x) || !isBgPos(b.pos.x)) return false;
   return bgOriginAt(a.pos.z).slot === bgOriginAt(b.pos.z).slot;
+}
+
+// The raised battleground interest, narrowed to what the mode actually needs a
+// client to hold (see BG_MATCH_INTEREST_RADIUS): a same-slot TEAMMATE, or a
+// same-slot non-player entity (flag, rune, prop). `viewerBgTeam` is the pid
+// list of the viewer's own team, or null when the viewer is not in a match.
+// An enemy player, and anything an enemy owns, returns false and falls back to
+// the open-world radii in interestLimitSq.
+function bgWideInterestApplies(
+  viewer: Entity,
+  e: Entity,
+  viewerBgTeam: readonly number[] | null,
+): boolean {
+  if (!inSameBgSlot(viewer, e)) return false;
+  // A summoned mob (pet, guardian, totem) inherits its OWNER's arm: an enemy's
+  // pet trails the enemy, so widening it would leak the same position by proxy.
+  const subjectId = e.kind === 'player' ? e.id : e.ownerId;
+  if (subjectId === null) return true; // flags, runes, props, npcs, wild mobs
+  return viewerBgTeam !== null && viewerBgTeam.includes(subjectId);
 }
 
 // full rate close up and for anything the viewer is fighting; mid range
@@ -5822,6 +5858,10 @@ export class GameServer {
         const ents: string[] = [];
         const keep: number[] = [];
         const present = new Set<number>();
+        // Resolved ONCE per viewer per pass (a map lookup, no allocation): the
+        // pid list of this viewer's own battleground team, which decides who
+        // rides the raised match radius below.
+        const bgTeam = this.bgTeamPidsFor(anchorEntity);
         const gridStart = this.perfDetailActive ? process.hrtime.bigint() : 0n;
         for (const e of candidates.forSession(session.pid)) {
           // Re-apply the exact viewer-relative cutoff the single grid query used
@@ -5846,7 +5886,7 @@ export class GameServer {
           const limitSq =
             anchorEntity.targetId === e.id
               ? NPC_DROP_RADIUS * NPC_DROP_RADIUS
-              : inSameBgSlot(anchorEntity, e)
+              : bgWideInterestApplies(anchorEntity, e, bgTeam)
                 ? known !== undefined
                   ? BG_MATCH_DROP_RADIUS * BG_MATCH_DROP_RADIUS
                   : BG_MATCH_INTEREST_RADIUS * BG_MATCH_INTEREST_RADIUS
@@ -5908,8 +5948,12 @@ export class GameServer {
         );
         if (this.perfDetailActive) this.bcastSelfNs += process.hrtime.bigint() - selfStart;
         const keepJson = keep.length > 0 ? `,"keep":[${keep.join(',')}]` : '';
-        // Ground-AoE warnings ship to the same horizon as the entities that
-        // cast them: the widened match radius inside the battleground band.
+        // Ground-AoE warnings (frost rings, temporal hourglasses) are anonymous
+        // ground effects, not entities: they carry a position, radius and timer
+        // and no caster identity or team, and a player must be able to react to
+        // one wherever it lands. They therefore keep the widened match horizon
+        // inside the band, unlike the enemy PLAYERS above, whose records the
+        // narrowed rule holds to the open-world radii.
         const aoeBase = isBgPos(anchorEntity.pos.x) ? BG_MATCH_DROP_RADIUS : INTEREST_QUERY_RADIUS;
         const frostRings = activeFrostRings
           .filter((ring) => {
@@ -5953,6 +5997,16 @@ export class GameServer {
       this.lastWireSweepTick = tick;
       this.sweepWireCache();
     }
+  }
+
+  // The pid list of the viewer's OWN battleground team, or null when the viewer
+  // is not a player in a live match. Returns the sim's own array by reference:
+  // read-only here, and this runs once per viewer per broadcast pass.
+  private bgTeamPidsFor(viewer: Entity): readonly number[] | null {
+    if (viewer.kind !== 'player' || !isBgPos(viewer.pos.x)) return null;
+    const match = this.sim.bgMatchFor(viewer.id);
+    if (!match) return null;
+    return match.teams[1].includes(viewer.id) ? match.teams[1] : match.teams[0];
   }
 
   private canObserveEntity(viewer: Entity, e: Entity, d2: number): boolean {
@@ -6851,6 +6905,24 @@ export class GameServer {
     }
   }
 
+  // Every pid whose throttled `bg` readout a respawn in this batch invalidated:
+  // the full membership of each respawning fighter's match, since the readout
+  // carries the match-wide `dead` column (see BG_RESPAWN_EVENT). Returns null
+  // when no respawn in the batch belongs to a match, so the ordinary batch pays
+  // one type comparison per event and allocates nothing.
+  private bgRespawnRefreshPids(events: SimEvent[]): Set<number> | null {
+    let pids: Set<number> | null = null;
+    for (const ev of events) {
+      if (ev.type !== BG_RESPAWN_EVENT || ev.pid === undefined) continue;
+      const match = this.sim.bgMatchFor(ev.pid);
+      if (!match) continue;
+      pids ??= new Set<number>();
+      for (const p of match.teams[0]) pids.add(p);
+      for (const p of match.teams[1]) pids.add(p);
+    }
+    return pids;
+  }
+
   private routeEvents(events: SimEvent[]): void {
     if (events.length === 0 || this.clients.size === 0) return;
     const eventTime = Date.now();
@@ -6891,6 +6963,9 @@ export class GameServer {
     // tracking context and never the event; the once-per-batch flair stamp above is the
     // only event mutation and correctly precedes this serialization.
     const fragments = serializeEventFragments(events);
+    // Resolved once per batch, applied per session below against that session's
+    // ANCHOR pid (so a spectator watching a fighter refreshes with them).
+    const bgRespawnRefresh = this.bgRespawnRefreshPids(events);
     // Guard each session: a throw while routing events to one player must not
     // drop this tick's events for every other session (server/CLAUDE.md).
     forEachGuarded(
@@ -6907,6 +6982,9 @@ export class GameServer {
           anchorPid = target.pid;
           anchorPos = targetEntity.pos;
         }
+        // A wave raised somebody in this session's match: the match-wide `dead`
+        // column just changed for everyone, not only the fighter who stood up.
+        if (bgRespawnRefresh?.has(anchorPid)) session.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
         const anchorParty = this.sim.partyOf(anchorPid);
         const mine: string[] = [];
         for (let i = 0; i < events.length; i++) {
