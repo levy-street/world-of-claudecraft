@@ -9,7 +9,7 @@
 | Phase 3: persistence | Done | 2026-08-02 | 2026-08-02 |
 | Phase 3 QA | Done (PASS-WITH-FOLLOWUPS) | 2026-08-02 | 2026-08-02 |
 | Phase 4: UI | Done | 2026-08-02 | 2026-08-02 |
-| Phase 4 QA (final, offers teardown) | Not started | | |
+| Phase 4 QA (final, offers teardown) | Done (PASS-WITH-FOLLOWUPS) | 2026-08-02 | 2026-08-03 |
 
 ## Phase 1 deliverables
 - [x] `src/sim/guild_bank.ts`: state type, constants (from state.md), capacity, sanitize,
@@ -65,8 +65,117 @@
 - [ ] Tests decisive; no orphaned tests; no dead code; matrix suites green.
 
 Phase 1 QA: both lines verified and closed on 2026-08-02 (see Notes).
+Phase 4 QA: both lines verified and closed on 2026-08-03 (see Notes); this was the
+packet-closing QA, so the whole-feature matrix below the Phase 4 QA note is the
+final verification record.
 
 ## Notes
+Phase 4 QA (2026-08-03), fresh auditor, verdict PASS-WITH-FOLLOWUPS (after fixes):
+- Reviews dispatched fresh (COVERAGE not filtering): qa-checklist READY (0 BLOCKING,
+  1 SHOULD-FIX, 6 NIT) and test-coverage-auditor (1 BLOCKING, 8 SHOULD-FIX, 5 NIT).
+  The two frontend reviewers were not re-dispatched (they ran during implementation);
+  instead their six applied fixes were spot-verified in the committed code: the
+  refuse-and-keep gold prompt with inline live-region refusals, the plain-click
+  identity guard, the shared bank_quantity_prompt builder, the whole-table
+  dormant-predicate parity sweep, the mobile coin floor, and the no-magic guard
+  describe. All present and correct.
+- qa-checklist SHOULD-FIX fixed: render()'s blanket close-button refocus yanked a
+  keyboard user off their guild control whenever ANOTHER officer's op repainted the
+  signature. Focus now re-lands via the shared focus_restore key ladder
+  (data-focus-key on tabs, grid cells, gold buttons, buy button; close fallback),
+  driven by a jsdom test simulating an external signature change over a focused
+  cell and tab. The first full-gate run caught the release-merged
+  tests/focus_restore.test.ts single-reader guard (any src/ui module touching
+  data-focus-key must import the helper): fixed architecturally by moving ALL key
+  annotation into BankWindow.annotateGuildFocusKeys, keeping the pane
+  focus-agnostic.
+- test-coverage BLOCKING fixed: guildTabActive's live-info conjunct (the one-frame
+  stale-mode fix from the Phase 4 reviews) had NO decisive assertion (the only test
+  repainted first, so the tab reset masked a deleted conjunct). Pinned without the
+  repaint; mutation-checked (conjunct removed, test fails, restored).
+- test-coverage SHOULD-FIX fixed (all eight): deposit-disabled-at-cap arm; the
+  affordable-arm buy-marker negative; the zero-submit silent-dismiss assertion; the
+  live-region role/aria-live pins; the zero-headroom withdraw refusal arm
+  (guildGoldCannotMove, purse at MAX_SAFE_INTEGER); the pre-empt deny lines
+  cross-pinned to guildBankPipeRefusal's literal returns (key identity alone would
+  pass a reworded row); a hostile unknown item id proving esc() guards the tooltip
+  path; presence pins for the hud.mobile.css guild touch-floor rules (the generic
+  bank scan matches .bank-*, never .gbank-). Plus two cheap NITs: the parity
+  sweep's vacuity guard and the unknown-cell withdraw click.
+- Cheap qa-checklist NITs taken: gold-prompt refusals land as a fresh child node so
+  a repeated identical refusal re-announces to AT; renderInto receives the model
+  BankWindow already built (one core call per paint); dead api() helper deleted
+  from scripts/guild_bank_tab_shot.mjs; the two dash literals in the guard test
+  switched to unicode escapes; the stale 'locale overlays untouched' matrix line
+  corrected to name the sanctioned M16 fills.
+- NITs recorded, not fixed (with reasons): the quest-deny wording deferral (a sim
+  emit change, out of scope, follow-up), the withdraw-clamps/deposit-refuses
+  asymmetry (documented BY DESIGN in the painter), the projected-lock dormant gap
+  (documented, pinned), and no automated mobile-viewport regression gate (the
+  committed mobile PNGs cover this release; follow-up).
+- Carried-forward Phase 3 QA lines verified: NO guild book mutation outside
+  src/sim/guild_bank.ts (grep over src/ server/ headless/: every server reference
+  is read-only boot verification or fenced save serialization; Phase 4 touched no
+  server path); the two-session fence-out dupe regression, the fail-closed disband
+  guard, and the reserve-at-gate fee tests all pass UNMODIFIED (untouched by the
+  Phase 4 diff; 252 tests green); the dormant-slot v1 limitation is called out for
+  the PR body (below).
+- Release merge: origin/release/v0.34.0 (17e5ba027) merged as fbf4d35a1. The
+  release brought the pnpm migration (pnpm-lock.yaml, package-lock.json gone,
+  pnpm install --frozen-lockfile), gate-perf phases, the dev_profiler_invulnerable
+  dispatch token, the riftCollisionToken re-add, and the mount_select wire
+  removal. Conflicts: COMMAND_NAMES (both appended; release token first, the five
+  guild_bank_* tokens last), command-schema pins (now 179 send / 191 dispatch / 12
+  dispatch-only), IWorld parity pins (283 members, 73 data, 210 methods), and the
+  generated pending.ts (regenerated via npm run i18n:gen, never hand-merged). The
+  release-merge-audit skill ran clean: no branch-owned surface was release-touched
+  (social/db/bank/tab-strip/painter files untouched on the release side), no
+  legacy-arm divergence, no stale injected bindings, and the release-authored
+  partial db mocks (the trap class) all pass on the merged tree. Premise note:
+  PR A (feature/guild-social-v1) had NOT landed on the release branch at merge
+  time; the state.md 'rebase after PR A merges' line is superseded by this merge
+  (re-merge the release branch if PR A lands before this PR does).
+- Whole-feature matrix (qa-checklist.md), all PASS: see the matrix results block
+  below.
+- Validation: npx tsc --noEmit clean on the merged tree; the touched-suite matrix
+  green (881 passed across the 13 core suites, 341 across the 9 UI suites);
+  scripts/bank_audit.mjs exit 0 against the dev DB (48 guild ledger rows, 0
+  findings); npm run gate green (the full pre-merge gate, post-merge tree).
+- Teardown NOT performed: docs/guild-bank/ is retained until the user explicitly
+  confirms deletion (the packet teardown question is the orchestrator's to ask).
+
+Whole-feature matrix results (2026-08-03, post-merge tree):
+- Three-host parity: PASS. tests/world_api_parity.test.ts + the full tests/parity
+  trace green (185 passed); the offline Sim facet arm pinned inert and the
+  ClientWorld payloads pinned in tests/guild_bank.test.ts.
+- Determinism: PASS. tests/architecture.test.ts green; the zero-rng sweep over the
+  whole op surface pinned in tests/guild_bank.test.ts.
+- Server authority: PASS. Per-op negative tests for member rank, out of range, and
+  dead in tests/guild_bank.test.ts; prices pinned to the sim table; dispatch pinned
+  shape-only in tests/guild_stamp_fence.test.ts.
+- Dupe safety: PASS. tests/guild_bank_persistence.test.ts + tests/guild_bank_db
+  .test.ts green unmodified (escrow transaction, fence-miss rollback, crash
+  shapes); scripts/bank_audit.mjs reconciled the dev DB ledger clean (exit 0).
+- Economy: PASS. tests/bank_ledger*.test.ts + tests/bank_audit.test.ts green;
+  treasury-cap refuse-never-truncate and copper conservation pinned.
+- Persistence: PASS. Pre-feature saves load unchanged (no-row guilds get an empty
+  book, pinned); unknown item ids survive load dormant (pinned in the view suite
+  and the sanitizer suite).
+- i18n: PASS. S3 guard (tests/localization_fixes.test.ts) green; every UI string an
+  English catalog key with the five M16 non-Latin fills; formatMoney at the painter
+  boundary; post-merge artifacts regenerated via npm run i18n:gen.
+- UI/mobile: PASS. Tab matrix, dormant rendering, and every action round-trip
+  pinned in tests/guild_bank_window.test.ts; 40px touch floors + 16px anti-zoom
+  coin fields now presence-pinned; desktop + mobile screenshots committed under
+  docs/screenshots/guild-bank-tab/.
+- Performance: PASS. tests/bandwidth.test.ts green (proximity + rank gated,
+  delta-guarded snapshot); the guild pane is a cold window (no per-frame work, no
+  new budget registrations).
+- Copy: PASS. Whole-feature diff scan found no em/en dashes or emojis (the two
+  guard-test literals now unicode escapes).
+- Gate: PASS. npm run gate green on the merged tree; screenshots exist and are
+  referenced; the branch carries the release merge (see the merge note above).
+
 Phase 4 (2026-08-02):
 - The bank window family stayed COLD (event-driven rebuild + the slow-band
   refreshIfChanged signature), so the phase's stopping rule (painter-driven per-frame

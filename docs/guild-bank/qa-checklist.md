@@ -18,7 +18,7 @@ Run once at packet completion (Phase 4 QA), on top of the per-phase QA passes.
 - **Persistence**: guilds and characters saved before this feature load unchanged; a guild
   with no `guild_banks` row gets an empty bank; unknown item ids survive load dormant.
 - **i18n**: S3 guard green; every UI string an English catalog key; money through the
-  right `formatMoney` on each side; locale overlays untouched.
+  right `formatMoney` on each side; no overlay edits beyond the sanctioned M16 fills.
 - **UI/mobile**: Guild tab correct on a phone viewport; tap targets comfortable; no
   hover-only information; graphics-settings fairness untouched.
 - **Performance**: snapshot field is proximity + rank gated and delta-guarded

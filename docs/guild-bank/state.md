@@ -1,6 +1,8 @@
 # Guild Bank: cross-phase state
 
-Current phase: Phase 3 complete (2026-08-02); Phase 3 QA next.
+Current phase: Phase 4 QA complete (2026-08-03); the packet is closed and the branch
+is PR-ready (merged over origin/release/v0.34.0 at fbf4d35a1, full gate green).
+Teardown of docs/guild-bank/ awaits the user's explicit confirmation.
 
 ## Locked design decisions
 - Base `release/v0.34.0`, branch `feature/guild-bank`. PR A (`feature/guild-social-v1`)
@@ -393,6 +395,49 @@ Current phase: Phase 3 complete (2026-08-02); Phase 3 QA next.
     an ordinary slot and its withdraw round-trips to the sim's localized refusal. Every
     def-level dormant dimension (the realistic content-update vector in the v1
     limitation) and every unknown-id row renders visibly distinct.
+  - Phase 4 QA drift (fresh auditor; fixes landed as two commits on top of the
+    release merge):
+    - Focus across repaints: render() no longer blanket-refocuses the close button.
+      BankWindow.restoreControlFocus re-lands focus via the shared focus_restore
+      ladder (captureFocusKey before the wipe; data-focus-key on the tab buttons
+      ('tab:personal'/'tab:guild', annotated after the shared strip mounts), grid
+      cells ('gbank:slot:<index>'), gold buttons, and the buy button; [data-close]
+      is the fallback and disabled controls are skipped). The guild refresh arm
+      repaints on ANY officer's op, so this is what keeps strangers' ops from
+      yanking a keyboard user. ALL key annotation lives in
+      BankWindow.annotateGuildFocusKeys (stamped after renderInto returns, cells
+      keyed by DOM order which IS slot order): the release-merged guard in
+      tests/focus_restore.test.ts pins a single-reader rule for the
+      data-focus-key namespace, so the pane never touches it.
+    - The gold prompt refusals go through voiceRefusal (clear-then-append a fresh
+      child node) so a repeated identical refusal re-announces to AT; renderInto
+      takes the GuildBankViewModel BankWindow already built (one core call per
+      paint); the dead api() helper left scripts/guild_bank_tab_shot.mjs.
+    - New decisive pins (tests/guild_bank_window.test.ts unless noted): the
+      guildTabActive live-info conjunct WITHOUT a repaint (mutation-checked); the
+      external-repaint focus test; deposit-disabled at the treasury cap; the
+      affordable-arm buy-marker negative; zero-submit dismisses silently; the
+      refusal line's role=status + aria-live=polite; the zero-headroom withdraw
+      refusal (guildGoldCannotMove); the hostile-item-id escape pin (esc() in the
+      tooltip path); hud.mobile.css guild touch-floor presence pins; the
+      unknown-cell withdraw click; the dormant parity sweep's vacuity guard
+      (tests/guild_bank_view.test.ts); the pre-empt deny lines cross-pinned to
+      guildBankPipeRefusal's literal returns
+      (tests/bags_guild_deposit_routing.test.ts). tests/bank_window.test.ts's
+      render-body source pin follows the new focus-ladder shape.
+- Release merge (2026-08-03): origin/release/v0.34.0 (17e5ba027) merged as
+  fbf4d35a1. Pin values on the merged tree: COMMAND_NAMES carries the release's
+  dev_profiler_invulnerable BEFORE the five guild_bank_* tokens (both appended;
+  send 179 / dispatch 191 / dispatch-only 12); IWorld is 283 members (73 data,
+  210 methods; the release re-added riftCollisionToken). The repo is now pnpm
+  (pnpm install --frozen-lockfile; vitest's fsModuleCache needed one
+  --clearCache after the node_modules re-layout). Generated i18n resolved
+  artifacts were regenerated via npm run i18n:gen, never hand-merged.
+  release-merge-audit: clean (no branch-owned surface release-touched, no
+  legacy-arm divergence, partial db mocks green on the merged tree). PR A
+  (feature/guild-social-v1) had NOT landed at merge time; if it lands before
+  this PR merges, re-merge the release branch (both touch server/social.ts
+  wiring).
 
 ## Accepted risks and operational assumptions (Phase 3 review + Phase 3 QA outcomes)
 - Cross-officer escrow skew (ACCEPTED, market precedent, NARROWED by Phase 3 QA to the
