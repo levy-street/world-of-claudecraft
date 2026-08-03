@@ -19,6 +19,11 @@ import type { PainterHostWriters } from '../../painter_host';
 import type { BgScoreboardView } from './battleground_scoreboard_view';
 
 const num = (n: number): string => formatNumber(n, { maximumFractionDigits: 0 });
+// Clock seconds: the same house formatter as every other number on the strip, with
+// the mm:ss zero pad expressed as an Intl option (the yumi_match_painter precedent)
+// rather than an ASCII padStart, so a locale with its own digits pads in ITS digits.
+const num2 = (n: number): string =>
+  formatNumber(n, { minimumIntegerDigits: 2, maximumFractionDigits: 0 });
 const FLAG_STATES = ['home', 'carried', 'dropped'] as const;
 // Literal key map (the HONOR_REASON_KEYS pattern): a fourth flag state must
 // red-fail tsc here, never throw at runtime through a constructed key.
@@ -27,6 +32,9 @@ const FLAG_STATE_KEYS = {
   carried: 'hudChrome.bg.flagState.carried',
   dropped: 'hudChrome.bg.flagState.dropped',
 } as const;
+// The strip's own accessible name, named once: mount and relocalize() must read
+// the SAME key or a language switch renames the toggle to something else.
+const BOARD_TOGGLE_KEY = 'hudChrome.bg.boardToggleLabel';
 
 export interface BattlegroundScoreboardDeps {
   /** The HUD layer the strip mounts into (the #ui element). */
@@ -44,6 +52,8 @@ export class BattlegroundScoreboard {
   private flagEls: [HTMLElement | null, HTMLElement | null] = [null, null];
   private resultEl: HTMLElement | null = null;
   private fstateEls: [HTMLElement | null, HTMLElement | null] = [null, null];
+  /** The document-level outside-click closer, held so dispose() can remove it. */
+  private onAwayPointerDown: ((ev: PointerEvent) => void) | null = null;
   // Expanded-board row cells, aligned with view.board order (structural sig).
   private boardRows: {
     row: HTMLElement;
@@ -119,14 +129,15 @@ export class BattlegroundScoreboard {
             ? t('hudChrome.bg.leavingIn', { seconds: num(view.countdown) })
             : t('hudChrome.bg.clock', {
                 minutes: num(view.minutes),
-                seconds: String(view.seconds).padStart(2, '0'),
+                seconds: num2(view.seconds),
               }),
       );
     }
     for (const team of [0, 1] as const) {
       const state = view.flagStates[team];
-      // No player names on the strip (owner direction): the call is about
-      // the FLAG ('Flag stolen!'), the combat log keeps the who.
+      // No player names anywhere on the strip (owner direction): every flag
+      // readout here, the glyph tooltip and the status line alike, is about
+      // the FLAG ('Flag stolen!'). The combat log keeps the who.
       const stateText = t(FLAG_STATE_KEYS[state]);
       const el = this.flagEls[team];
       if (el) {
@@ -137,11 +148,10 @@ export class BattlegroundScoreboard {
         // never aria-hidden decoration).
         w.setAttr(el, 'aria-label', stateText);
       }
-      // The visible status line under each side: 'Flag at the keep' at rest,
-      // the enemy carrier's NAME while carried, 'Flag on the ground' dropped.
-      // The status line speaks only when there is a CALL: the enemy
-      // carrier's name while taken, the grounded line while dropped. At rest
-      // it stays empty (repeating 'at the keep' under both names was noise).
+      // The visible status line under each side speaks only when there is a
+      // CALL: the same flag-state text the glyph carries ('Flag stolen!' while
+      // taken, 'Flag on the ground' while dropped). At rest it stays EMPTY
+      // (repeating 'at the keep' under both team names was noise).
       const fs = this.fstateEls[team];
       if (fs) {
         for (const s of FLAG_STATES) w.toggleClass(fs, s, state === s);
@@ -173,8 +183,30 @@ export class BattlegroundScoreboard {
     }
   }
 
-  /** Language switch: clear the structural sig so the next update rebuilds. */
+  /** Language switch: clear the structural sig so the next update rebuilds, and
+   *  re-write the strip's own accessible name. The root is minted ONCE
+   *  (ensureRoot early-returns forever), so the toggle's aria-label is the one
+   *  string on this surface a skeleton rebuild can never reach: without this a
+   *  mid-session language switch leaves a screen reader reading the old locale. */
   relocalize(): void {
+    this.lastSig = '';
+    if (this.root) this.deps.writers.setAttr(this.root, 'aria-label', t(BOARD_TOGGLE_KEY));
+  }
+
+  /** Release the document-level listener this painter owns. The strip's roots are
+   *  self-mounted for the session, so nothing calls this in the shipping client
+   *  today; it exists so the listener has an owner and cannot outlive the painter
+   *  in a host that does discard one (the tests drive it). */
+  dispose(): void {
+    if (this.onAwayPointerDown) {
+      document.removeEventListener('pointerdown', this.onAwayPointerDown);
+      this.onAwayPointerDown = null;
+    }
+    this.root?.remove();
+    this.respawnRoot?.remove();
+    this.root = null;
+    this.respawnRoot = null;
+    this.boardRows = [];
     this.lastSig = '';
   }
 
@@ -193,7 +225,13 @@ export class BattlegroundScoreboard {
     // board: focus reveals via :focus-within, Enter/Space pins it exactly like
     // a click (a keyboard user must never be locked out of the tallies).
     el.tabIndex = 0;
-    el.setAttribute('aria-label', t('hudChrome.bg.boardToggleLabel'));
+    // A focusable div that toggles a disclosure IS a button to assistive tech:
+    // without the role it announces as plain text and the Enter/Space handling
+    // below is a surprise. aria-label rides the ELIDED writer (never a raw
+    // setAttribute) so relocalize() can re-write the one string a skeleton
+    // rebuild cannot reach, with no stale writer cache in between.
+    el.setAttribute('role', 'button');
+    this.deps.writers.setAttr(el, 'aria-label', t(BOARD_TOGGLE_KEY));
     el.setAttribute('aria-expanded', 'false');
     const togglePin = (): void => {
       const pinned = el.classList.toggle('expanded');
@@ -210,14 +248,17 @@ export class BattlegroundScoreboard {
       togglePin();
     });
     // Clicking anywhere OFF the strip closes a pinned board (and drops the
-    // focus reveal): the board must never stay stuck over the fight.
-    document.addEventListener('pointerdown', (ev) => {
+    // focus reveal): the board must never stay stuck over the fight. Held in a
+    // field so dispose() can take it back off the document (an anonymous
+    // listener on `document` outlives every root this painter owns).
+    this.onAwayPointerDown = (ev: PointerEvent): void => {
       if (el.contains(ev.target as Node)) return;
       if (!el.classList.contains('expanded') && document.activeElement !== el) return;
       el.classList.remove('expanded');
       el.setAttribute('aria-expanded', 'false');
       el.blur();
-    });
+    };
+    document.addEventListener('pointerdown', this.onAwayPointerDown);
     layer.appendChild(el);
     this.root = el;
     return el;

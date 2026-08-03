@@ -11,10 +11,11 @@
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { BG_HALF_X, BG_HALF_Z } from '../src/sim/battleground_layout';
-import { QUESTS, YUMI_BAND_X_MIN } from '../src/sim/data';
+import { battlegroundOrigin, QUESTS, YUMI_BAND_X_MIN } from '../src/sim/data';
 import { isQuestTurnInNpc } from '../src/sim/types';
+import { createMinimapMarkers } from '../src/ui/minimap_markers';
 import { MinimapPainter } from '../src/ui/minimap_painter';
-import type { IWorld } from '../src/world_api';
+import type { BgMatchInfo, BgPlayerInfo, IWorld } from '../src/world_api';
 
 const painter = readFileSync(new URL('../src/ui/minimap_painter.ts', import.meta.url), 'utf8');
 // Drop comments so prose can't create a false positive (mirrors architecture.test).
@@ -527,5 +528,188 @@ describe('minimap_painter: NPC glyphs draw from the sprite cache, never per-mark
     const drawMarkersBody = sliceFrom(code, 'private drawMarkers(');
     expect(drawMarkersBody).not.toContain('fillText');
     expect(drawMarkersBody).not.toContain('ctx.font');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Thornhollow Fields: the ordinary ally dot must NOT track the enemy team.
+//
+// paintBattleground reuses the ordinary overworld marker set (markers.build),
+// so the friend/guild dot the open world draws for anyone on your friends or
+// guild list follows you into a rated 5v5. A guildmate drawn on the ENEMY side
+// is a live through-wall position feed one team has and the other does not,
+// which is the graphics/interface fairness invariant read straight. The filter
+// lives in the PURE CORE, so it is asserted there (marker counts), plus the
+// routing pin that the bg surface really does draw that same model.
+
+const BG_ORIGIN = battlegroundOrigin(0);
+const BG_S = 162;
+const BG_PX_PER_YARD = 1.7;
+/** Marker x for a body `dxYards` map-east of the viewer (build negates +X). */
+const bgMarkerX = (dxYards: number): number => BG_S / 2 - dxYards * BG_PX_PER_YARD;
+
+const bgRosterPlayer = (over: Partial<BgPlayerInfo>): BgPlayerInfo => ({
+  pid: 0,
+  name: '',
+  cls: 'warrior',
+  team: 0,
+  carrying: false,
+  dead: false,
+  kills: 0,
+  deaths: 0,
+  captures: 0,
+  assists: 0,
+  ...over,
+});
+
+/**
+ * A viewer standing in the field with two nearby non-party players, BOTH on the
+ * viewer's friends list: `Foe` 6yd map-east, `Mate` 6yd map-west. `match` null
+ * models the same pair met in the open world (the control arm).
+ */
+function bgAllyWorld(opts: { match: BgMatchInfo | null; partyPids?: number[] }): IWorld {
+  const player = {
+    id: 1,
+    kind: 'player',
+    name: 'Me',
+    pos: { x: BG_ORIGIN.x, z: BG_ORIGIN.z },
+    facing: 0,
+  };
+  const other = (id: number, name: string, dx: number) => ({
+    id,
+    kind: 'player',
+    name,
+    dead: false,
+    lootable: false,
+    aggroTargetId: null,
+    templateId: '',
+    questIds: [],
+    pos: { x: BG_ORIGIN.x + dx, z: BG_ORIGIN.z },
+  });
+  const entities = new Map<number, unknown>([
+    [1, player],
+    [2, other(2, 'Foe', 6)],
+    [3, other(3, 'Mate', -6)],
+  ]);
+  const partyPids = opts.partyPids ?? [];
+  return {
+    player,
+    entities,
+    // Match by PID: both are on the friends list under their real names, so a
+    // name-keyed filter would pass this test while still leaking.
+    socialInfo: {
+      friends: [
+        { name: 'Foe', online: true },
+        { name: 'Mate', online: true },
+      ],
+      guild: null,
+    },
+    partyInfo: partyPids.length
+      ? {
+          members: partyPids.map((pid) => ({
+            pid,
+            cls: 'warrior',
+            x: BG_ORIGIN.x + (pid === 2 ? 6 : -6),
+            z: BG_ORIGIN.z,
+            dead: 0,
+          })),
+        }
+      : null,
+    bgInfo: opts.match ? { match: opts.match } : null,
+    delveRun: null,
+    riftFloor: null,
+    cfg: { seed: 42, playerClass: 'warrior' },
+    playerId: 1,
+    inventory: [],
+    stationPlacements: [],
+    nodeHarvestableByMe: () => false,
+    questState: () => 'unavailable',
+  } as unknown as IWorld;
+}
+
+/** A live match: me + Mate on team 0 (mine), Foe on team 1. */
+const bgSplitMatch = (over: Partial<BgMatchInfo> = {}): BgMatchInfo =>
+  ({
+    state: 'active',
+    myTeam: 0,
+    capsToWin: 3,
+    scores: [0, 0],
+    flags: [
+      { state: 'home', carrierPid: null, carrierName: null, carrierTeam: null },
+      { state: 'home', carrierPid: null, carrierName: null, carrierTeam: null },
+    ],
+    players: [
+      bgRosterPlayer({ pid: 1, name: 'Me', team: 0 }),
+      bgRosterPlayer({ pid: 3, name: 'Mate', team: 0 }),
+      bgRosterPlayer({ pid: 2, name: 'Foe', team: 1 }),
+    ],
+    countdown: 0,
+    timeLeft: 300,
+    waveIn: [10, 10],
+    respawnIn: 0,
+    winner: null,
+    ...over,
+  }) as BgMatchInfo;
+
+function bgMarkers(world: IWorld) {
+  return createMinimapMarkers().build(world, BG_S, BG_PX_PER_YARD).markers;
+}
+
+describe('minimap markers: a battleground never tracks the enemy team', () => {
+  it('draws NO ally dot for a friend seated on the enemy roster, and keeps the same-team one', () => {
+    const markers = bgMarkers(bgAllyWorld({ match: bgSplitMatch() }));
+    const allies = markers.filter((m) => m.kind === 'ally');
+    // The positive arm and the negative arm in one assertion: exactly one dot,
+    // and it is the WEST body (Mate, my team). A filter that dropped both, or
+    // that kept the wrong one, fails here.
+    expect(allies).toHaveLength(1);
+    expect(allies[0]).toMatchObject({ mx: bgMarkerX(-6) });
+    expect(allies.some((m) => m.mx === bgMarkerX(6))).toBe(false);
+  });
+
+  it('still draws BOTH dots for the same pair met outside a match (not vacuous)', () => {
+    // Without this arm the test above passes just as well against a core that
+    // stopped emitting ally markers at all.
+    const allies = bgMarkers(bgAllyWorld({ match: null })).filter((m) => m.kind === 'ally');
+    expect(allies).toHaveLength(2);
+    expect(allies.map((m) => m.mx).sort((a, b) => a - b)).toEqual(
+      [bgMarkerX(6), bgMarkerX(-6)].sort((a, b) => a - b),
+    );
+  });
+
+  it('drops the party disc for an enemy-team pid too (the cross-team party path)', () => {
+    const inMatch = bgMarkers(bgAllyWorld({ match: bgSplitMatch(), partyPids: [2, 3] }));
+    const discs = inMatch.filter((m) => m.kind === 'party-disc' || m.kind === 'party-arrow');
+    expect(discs).toHaveLength(1);
+    expect(discs[0]).toMatchObject({ mx: bgMarkerX(-6) });
+    // Same party outside a match: both members keep their discs.
+    const outside = bgMarkers(bgAllyWorld({ match: null, partyPids: [2, 3] }));
+    expect(outside.filter((m) => m.kind === 'party-disc')).toHaveLength(2);
+  });
+
+  it('suppresses by PID, not by name: an enemy who renames onto the friends list stays dark', () => {
+    // The roster carries the pid; the entity carries the name. Ship a roster
+    // whose enemy row has a DIFFERENT name from the entity (a rename mid-match,
+    // or an impostor): the dot must still be suppressed, which only holds if the
+    // filter reads pids.
+    const renamed = bgSplitMatch({
+      players: [
+        bgRosterPlayer({ pid: 1, name: 'Me', team: 0 }),
+        bgRosterPlayer({ pid: 3, name: 'Mate', team: 0 }),
+        bgRosterPlayer({ pid: 2, name: 'SomeoneElse', team: 1 }),
+      ],
+    });
+    const allies = bgMarkers(bgAllyWorld({ match: renamed })).filter((m) => m.kind === 'ally');
+    expect(allies).toHaveLength(1);
+    expect(allies[0]).toMatchObject({ mx: bgMarkerX(-6) });
+  });
+
+  it('paints the battleground surface from that same filtered model', () => {
+    // The core-level arms above only protect the bg surface because
+    // paintBattleground builds its markers through the same core (it does not
+    // keep a second marker path of its own).
+    const body = sliceFrom(code, 'paintBattleground(', 'private ');
+    expect(body).toContain('this.markers.build(');
+    expect(body).toContain('this.drawMarkers(');
   });
 });

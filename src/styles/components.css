@@ -9008,9 +9008,11 @@
   .bg-fstate.azure {
     text-align: left;
   }
-  /* the quiet baseline is at-the-keep; a taken or grounded flag is the call */
+  /* the quiet baseline is at-the-keep; a taken or grounded flag is the call.
+     The carried orange is the shared token the M-map's carry ring also
+     resolves, so the strip and the map can never drift apart. */
   .bg-fstate.carried {
-    color: #ffb03c;
+    color: var(--color-bg-carry-ring);
     font-weight: 600;
   }
   .bg-fstate.dropped {

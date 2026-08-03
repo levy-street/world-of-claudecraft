@@ -16,11 +16,14 @@
 // canvas and blitted (the delve_map_painter / minimapBg cache technique); only
 // the team washes and the live markers re-stroke per redraw.
 //
-// The terrain palette is hardcoded here the way map_terrain.ts hardcodes the
+// The TERRAIN palette is hardcoded here the way map_terrain.ts hardcodes the
 // world-map biome colours: sand flagstone ground, slate stone walls, dirt
-// graveyards, sampled from the real field dressing. Only the two team hues
-// resolve from CSS tokens (the minimap_painter caching rule: static :root
-// tokens, no runtime mutation) so they ride the shared --color-team-*.
+// graveyards, sampled from the real field dressing. Everything a player reads as
+// INTERFACE (the team hues, the dead ring, the self arrow, the frame, the
+// halfway line, the glyph edge, the carrier ring) resolves from CSS tokens in
+// one cached pass instead (the minimap_painter caching rule: static :root
+// tokens, no runtime mutation), so the map cannot drift from the HUD it belongs
+// to. See MAP_COLOR_TOKENS / MAP_CHROME_TOKENS below.
 
 import {
   BG_BASES,
@@ -34,25 +37,45 @@ import { TH_LOCATIONS } from '../../../sim/thornhollow_field.generated';
 import { paintBgFieldRelief } from '../../bg_field_relief_core';
 import type { BgMapModel } from './battleground_map_view';
 
+// REQUIRED tokens: the plan does not draw until every one of them resolves (an
+// unstyled first frame would paint the team marks in the wrong hue, which is the
+// one thing on this surface a player reads as sides).
 const MAP_COLOR_TOKENS = {
   teamRed: '--color-team-red',
   teamBlue: '--color-team-blue',
   dead: '--color-minimap-party-dead',
+  self: '--color-minimap-player',
 } as const;
 
-type BgMapColors = Record<keyof typeof MAP_COLOR_TOKENS, string>;
+// CHROME tokens: the painter's own furniture (the frame, the halfway line, the
+// glyph edge, the carrier ring). Resolved in the SAME single getComputedStyle
+// pass as the required group, but each carries the literal it shipped with as a
+// fallback, so an absent var (Node tests run with no stylesheet at all) degrades
+// to today's exact appearance instead of blanking the map. The fallback is the
+// ONLY place a colour literal is allowed to live in this file
+// (tests/battleground_map_plan.test.ts pins that).
+const MAP_CHROME_TOKENS = {
+  fieldEdge: ['--color-bg-field-edge', '#262c38'],
+  midLine: ['--color-bg-mid-line', '#00000026'],
+  // dark edge that holds glyphs on the pale ground
+  ink: ['--color-bg-map-ink', '#00000090'],
+  // the scoreboard's .carried orange, which lives as a literal in components.css
+  // today; this reads the token as soon as one is authored for it
+  carryRing: ['--color-bg-carry-ring', '#ffb03c'],
+} as const;
+
+type BgMapColors = Record<keyof typeof MAP_COLOR_TOKENS | keyof typeof MAP_CHROME_TOKENS, string>;
 
 // Field palette (see header): the relief carries the ground now, so the flat
 // fills left here are the built things standing on it, which read cool and dark
-// against the sand so the team-colour marks always separate from them.
+// against the sand so the team-colour marks always separate from them. These four
+// stay literals on the documented map_terrain precedent: they are a SAMPLED
+// terrain palette (the field's own dressing), not interface chrome.
 const KEEP_FLOOR = '#a49c8f';
 const KEEP_FLOOR_ALPHA = 0.4;
 const GRAVE_DIRT = '#8a7a5e';
 const WALL_FILL = '#333a48';
 const RUNE_FILL = '#e6dcc2';
-const FIELD_EDGE = '#262c38';
-const INK = '#00000090'; // dark edge that holds glyphs on the pale ground
-const CARRY_RING = '#ffb03c'; // the scoreboard's .carried orange
 
 const FIELD_PAD_PX = 18;
 const MATE_R = 4;
@@ -63,7 +86,6 @@ const RUNE_R = 3;
 const RUNE_EDGE_WIDTH = 1;
 const WASH_ALPHA = 0.2;
 const GRAVE_TINT_ALPHA = 0.22;
-const MID_LINE = '#00000026';
 const MID_LINE_DASH = 4;
 const FRAME_WIDTH = 2;
 const FLAG_POLE_H = 14;
@@ -101,12 +123,17 @@ export class BattlegroundMapPainter {
 
   private resolveColors(): BgMapColors | null {
     if (this.colors) return this.colors;
+    // ONE getComputedStyle pass for both groups, cached for the session (the
+    // minimap_painter caching rule: these are static :root tokens).
     const style = getComputedStyle(document.documentElement);
     const out = {} as Record<string, string>;
     for (const [key, token] of Object.entries(MAP_COLOR_TOKENS)) {
       const v = style.getPropertyValue(token).trim();
       if (!v) return null; // stylesheet not applied yet: draw next frame
       out[key] = v;
+    }
+    for (const [key, [token, fallback]] of Object.entries(MAP_CHROME_TOKENS)) {
+      out[key] = style.getPropertyValue(token).trim() || fallback;
     }
     this.colors = out as BgMapColors;
     return this.colors;
@@ -162,7 +189,7 @@ export class BattlegroundMapPainter {
     ] as const) {
       const wash = ctx.createLinearGradient(0, py(edgeZ), 0, py(Math.sign(edgeZ) * KEEP_LINE_Z));
       wash.addColorStop(0, tint);
-      wash.addColorStop(1, '#00000000');
+      wash.addColorStop(1, 'transparent'); // the CSS keyword, not a colour choice
       ctx.save();
       ctx.globalAlpha = WASH_ALPHA;
       ctx.fillStyle = wash;
@@ -173,7 +200,7 @@ export class BattlegroundMapPainter {
     // Mid line: the halfway mark through the Fightpit, dashed so it never reads
     // as a wall.
     ctx.save();
-    ctx.strokeStyle = MID_LINE;
+    ctx.strokeStyle = colors.midLine;
     ctx.lineWidth = 1;
     ctx.setLineDash([MID_LINE_DASH, MID_LINE_DASH]);
     ctx.beginPath();
@@ -201,14 +228,14 @@ export class BattlegroundMapPainter {
     // Field frame on top of the plan, so the perimeter reads as one edge.
     // Small furniture (pillars, crates, banners) stays OFF the plan on
     // purpose: the map answers routes and objectives.
-    ctx.strokeStyle = FIELD_EDGE;
+    ctx.strokeStyle = colors.fieldEdge;
     ctx.lineWidth = FRAME_WIDTH;
     ctx.strokeRect(left, top, fieldW, fieldH);
 
     // Rune pads (static positions; whether a pad is UP is live state the map
     // deliberately does not scout). Sprint discs, Battle/Ward diamonds.
     ctx.fillStyle = RUNE_FILL;
-    ctx.strokeStyle = INK;
+    ctx.strokeStyle = colors.ink;
     ctx.lineWidth = RUNE_EDGE_WIDTH;
     for (const pad of BG_SPEED_RUNES) {
       ctx.beginPath();
@@ -237,7 +264,7 @@ export class BattlegroundMapPainter {
       const y = py(base.flag.z * flip);
       const mine = base.team === model.myTeam;
       ctx.save();
-      ctx.strokeStyle = INK;
+      ctx.strokeStyle = colors.ink;
       ctx.lineWidth = FLAG_EDGE_WIDTH;
       ctx.fillStyle = mine ? own : foe;
       ctx.beginPath();
@@ -265,12 +292,12 @@ export class BattlegroundMapPainter {
       } else {
         ctx.fillStyle = own;
         ctx.fill();
-        ctx.strokeStyle = INK;
+        ctx.strokeStyle = colors.ink;
         ctx.lineWidth = MARK_EDGE_WIDTH;
         ctx.stroke();
       }
       if (mate.carrying) {
-        ctx.strokeStyle = CARRY_RING;
+        ctx.strokeStyle = colors.carryRing;
         ctx.lineWidth = DEAD_RING_WIDTH;
         ctx.beginPath();
         ctx.arc(x, y, MATE_R + CARRY_RING_GAP, 0, FULL_CIRCLE);
@@ -293,9 +320,9 @@ export class BattlegroundMapPainter {
       ctx.lineTo(0, SELF_R * 0.45);
       ctx.lineTo(-SELF_R + 1, SELF_R);
       ctx.closePath();
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = colors.self;
       ctx.fill();
-      ctx.strokeStyle = INK;
+      ctx.strokeStyle = colors.ink;
       ctx.lineWidth = SELF_EDGE_WIDTH;
       ctx.stroke();
       ctx.restore();

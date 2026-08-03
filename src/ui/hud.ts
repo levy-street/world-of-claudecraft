@@ -11197,7 +11197,11 @@ export class Hud {
             crimson: formatNumber(ev.scoreCrimson, { maximumFractionDigits: 0 }),
             azure: formatNumber(ev.scoreAzure, { maximumFractionDigits: 0 }),
             rating: formatNumber(ev.ratingAfter, { maximumFractionDigits: 0 }),
-            delta: `${delta >= 0 ? '+' : ''}${formatNumber(delta, { maximumFractionDigits: 0 })}`,
+            // The rating swing reads as a signed delta. The sign is Intl's
+            // (signDisplay: 'always'), never a concatenated ASCII '+': a locale
+            // that writes its own plus sign, or puts it after the digits, gets
+            // that instead of a hardcoded prefix.
+            delta: formatNumber(delta, { maximumFractionDigits: 0, signDisplay: 'always' }),
           };
           if (ev.draw) {
             this.showBanner(t('hudChrome.bg.drawBanner', params));

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   BG_BASES,
   BG_FLAG_Z,
@@ -11,6 +11,7 @@ import {
 } from '../src/sim/battleground_layout';
 import { battlegroundOrigin } from '../src/sim/data';
 import {
+  BattlegroundScoreboard,
   BG_KILL_FEED_MAX,
   BG_KILL_FEED_TTL,
   type BgAllTimeEntry,
@@ -20,6 +21,8 @@ import {
   pruneBgKillLines,
   pushBgKillLine,
 } from '../src/ui/hud/battleground';
+import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
+import { makeWriterFacet } from '../src/ui/painter_host';
 import type { BgInfo, BgMatchInfo } from '../src/world_api';
 
 const baseInfo = (over: Partial<BgInfo> = {}): BgInfo => ({
@@ -88,6 +91,68 @@ const baseMatch = (over: Partial<BgMatchInfo> = {}): BgMatchInfo => ({
   winner: null,
   ...over,
 });
+
+// Every property path the `bg` self key ships, pinned to literals: the flat
+// scalars bgInfoFor returns, the match core sharedMatchView builds, and the two
+// nested record shapes (flags, players). `[]` stands for an array element, so
+// one row covers every roster entry. Source of truth:
+// src/sim/social/battleground.ts (bgInfoFor + sharedMatchView), serialized onto
+// the snapshot by server/game.ts `maybe('bg', ...)`.
+const BG_WIRE_KEYS = new Set<string>([
+  ...['rating', 'wins', 'losses', 'captures', 'queued', 'queueSize', 'queuedParty', 'match'].map(
+    (k) => `.${k}`,
+  ),
+  ...[
+    'state',
+    'myTeam',
+    'capsToWin',
+    'scores',
+    'flags',
+    'players',
+    'countdown',
+    'timeLeft',
+    'waveIn',
+    'respawnIn',
+    'winner',
+  ].map((k) => `match.${k}`),
+  ...['state', 'carrierPid', 'carrierName', 'carrierTeam'].map((k) => `match.flags[].${k}`),
+  ...[
+    'pid',
+    'name',
+    'cls',
+    'team',
+    'carrying',
+    'dead',
+    'kills',
+    'deaths',
+    'captures',
+    'assists',
+  ].map((k) => `match.players[].${k}`),
+]);
+
+/**
+ * Wrap `value` so every named property read is recorded into `seen` as a path.
+ * Array methods (`filter`, `map`, the iterator) are handed back unbound, so
+ * `this` stays the proxy and their element reads are intercepted too; array
+ * elements are wrapped under a shared `path[]` so one roster row speaks for all.
+ */
+function watchReads(value: unknown, path: string, seen: Set<string>): unknown {
+  if (value === null || typeof value !== 'object') return value;
+  const isArray = Array.isArray(value);
+  return new Proxy(value as object, {
+    get(target, prop, receiver) {
+      const raw = Reflect.get(target, prop, receiver);
+      if (typeof prop === 'symbol') return raw;
+      if (isArray) {
+        // Numeric indices only; `length` and the Array.prototype methods are
+        // machinery, not wire fields.
+        return /^\d+$/.test(prop) ? watchReads(raw, `${path}[]`, seen) : raw;
+      }
+      seen.add(`${path}.${prop}`);
+      return watchReads(raw, path === '' ? prop : `${path}.${prop}`, seen);
+    },
+  });
+}
 
 describe('battleground window view (pure core)', () => {
   it('models offline, idle, queued, and in-match states', () => {
@@ -161,31 +226,53 @@ describe('battleground window view (pure core)', () => {
     expect(v.allTime![1]).toMatchObject({ rank: 2, name: 'Me', knownClass: false, me: true });
   });
 
-  it('is identical for a Sim-built and a wire-mirror-shaped snapshot', () => {
-    // The Sim-shaped input comes from the typed literal; the mirror-shaped one
-    // is authored as the JSON the server actually ships on the `bg` self key
-    // (plain parsed JSON, string keys, no prototypes), including the wire's
-    // online-only null carrier fields.
-    const simShaped = baseInfo({ rating: 1616, wins: 4, match: baseMatch() });
-    const wireShaped = JSON.parse(
-      '{"rating":1616,"wins":4,"losses":0,"captures":0,"queued":false,' +
-        '"queueSize":0,"queuedParty":1,"match":{"state":"active","myTeam":0,' +
-        '"capsToWin":5,"scores":[1,2],"flags":[{"state":"home","carrierPid":null,' +
-        '"carrierName":null,"carrierTeam":null},{"state":"carried","carrierPid":7,' +
-        '"carrierName":"Ravven","carrierTeam":0}],"players":[{"pid":7,"name":"Ravven",' +
-        '"cls":"warrior","team":0,"carrying":true,"dead":false,"kills":3,"deaths":1,"captures":2,"assists":4},' +
-        '{"pid":8,"name":"Bryn","cls":"mage","team":0,"carrying":false,"dead":true,"kills":0,"deaths":4,"captures":0,"assists":1},' +
-        '{"pid":9,"name":"Cael","cls":"priest","team":1,' +
-        '"carrying":false,"dead":false,"kills":5,"deaths":0,"captures":1,"assists":0}],"countdown":0,' +
-        '"timeLeft":605,"waveIn":[10,5],"respawnIn":0,"winner":null}}',
-    ) as BgInfo;
+  it('reads ONLY fields the `bg` wire key ships, and survives its JSON round trip', () => {
+    // This replaces a pin that compared two identically-shaped inputs and so
+    // could not fail. Two teeth instead, both of which move when the cores
+    // reach past the wire:
+    //
+    // (1) FIELD DEPENDENCY. Every property read off the payload is recorded
+    //     through a proxy and checked against BG_WIRE_KEYS, the key set the
+    //     server's encoder really emits (bgInfoFor + sharedMatchView in
+    //     src/sim/social/battleground.ts, JSON.stringify'd onto the snapshot's
+    //     `bg` self key in server/game.ts). A core that read a Sim-only field
+    //     would work offline and render undefined for every online player;
+    //     here it fails by name.
+    // (2) SERIALIZATION. The offline arm is the LIVE object the Sim hands the
+    //     HUD, carrying things JSON cannot express (an undefined-valued key, a
+    //     live Map, a prototype accessor); the online arm is that same object
+    //     after the exact JSON.parse(JSON.stringify(...)) hop the wire does.
+    //     The two views must be equal, so the shapes genuinely differ.
+    const live = baseInfo({ rating: 1616, wins: 4, match: baseMatch() }) as BgInfo &
+      Record<string, unknown>;
+    // Sim-side baggage the wire cannot carry, on the object AND on its prototype.
+    live.simOnlyUndefined = undefined;
+    live.simOnlyMap = new Map([[7, 'Ravven']]);
+    Object.setPrototypeOf(live, {
+      get simOnlyAccessor(): number {
+        return 42;
+      },
+    });
+    const wire = JSON.parse(JSON.stringify(live)) as BgInfo;
+    expect(Object.hasOwn(wire, 'simOnlyUndefined')).toBe(false);
+    expect((wire as unknown as Record<string, unknown>).simOnlyAccessor).toBeUndefined();
+
     const inputRest = { playerName: 'X', playerLevel: 20, party: null, allTime: null };
-    expect(buildBgWindowView({ info: simShaped, ...inputRest })).toEqual(
-      buildBgWindowView({ info: wireShaped, ...inputRest }),
+    expect(buildBgWindowView({ info: live, ...inputRest })).toEqual(
+      buildBgWindowView({ info: wire, ...inputRest }),
     );
-    // The per-tick scoreboard core gets the same dual-shape arm: it reads the
-    // deepest nested wire structure (flags, players, personal readouts).
-    expect(buildBgScoreboardView(simShaped, 7)).toEqual(buildBgScoreboardView(wireShaped, 7));
+    // The per-tick scoreboard core gets the same arm: it reads the deepest
+    // nested wire structure (flags, players, personal readouts).
+    expect(buildBgScoreboardView(live, 7)).toEqual(buildBgScoreboardView(wire, 7));
+
+    const seen = new Set<string>();
+    const watched = watchReads(wire, '', seen) as BgInfo;
+    buildBgWindowView({ info: watched, ...inputRest });
+    buildBgScoreboardView(watched, 7);
+    // Non-vacuous: the cores really did read through the proxy.
+    expect(seen.size).toBeGreaterThan(10);
+    expect(seen).toContain('match.players[].pid');
+    expect([...seen].filter((path) => !BG_WIRE_KEYS.has(path))).toEqual([]);
   });
 });
 
@@ -201,9 +288,11 @@ describe('battleground scoreboard view (pure core)', () => {
     expect(v.minutes).toBe(10);
     expect(v.seconds).toBe(5);
     expect(v.flagStates).toEqual(['home', 'carried']);
-    expect(v.carrierNames[1]).toBe('Ravven');
-    expect(v.flagStates).toEqual(['home', 'carried']);
-    expect(v.carrierNames).toEqual([null, 'Ravven']);
+    // The strip names no player, so the view models flag STATE only and never
+    // the wire's carrierName (see the painter's flag-line comment). The carrier
+    // is readable on the board instead, off the roster's own `carrying` flag.
+    expect('carrierNames' in v).toBe(false);
+    expect(v.board.filter((r) => r.carrying).map((r) => r.pid)).toEqual([7]);
     // The expanded board: both rosters in team order with the match tallies.
     expect(v.board).toHaveLength(3);
     expect(v.board[0]).toMatchObject({
@@ -403,5 +492,188 @@ describe('battleground map view (pure core)', () => {
     // The walls are placed structures, not axis-aligned segments: a painter
     // that filled plain rects and ignored `rot` would draw a lie.
     expect(walls.some((w) => Math.abs(Math.sin(w.rot * 2)) > 1e-3)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The scoreboard PAINTER's mount-time a11y contract, its language switch, and
+// its listener hygiene, driven through a hand-rolled fake DOM (the repo has no
+// jsdom, the tiny-dependency invariant; same idiom as tests/hud_perf_budget).
+// The strip is a self-mounting root minted ONCE, so anything written only in
+// ensureRoot() is frozen for the session: that is exactly the class of bug
+// these arms exist for.
+
+interface FakeEl {
+  id: string;
+  tabIndex: number;
+  textContent: string;
+  innerHTML: string;
+  style: Record<string, unknown>;
+  attrs: Map<string, string>;
+  /** Every setAttribute in call order, so an elided repeat is visible. */
+  attrWrites: { name: string; value: string }[];
+  classes: Set<string>;
+  children: FakeEl[];
+  parent: FakeEl | null;
+  blurs: number;
+  classList: {
+    toggle(cls: string, on?: boolean): void;
+    contains(cls: string): boolean;
+    remove(cls: string): void;
+  };
+  setAttribute(name: string, value: string): void;
+  getAttribute(name: string): string | null;
+  addEventListener(type: string, fn: (ev: unknown) => void): void;
+  appendChild(child: FakeEl): void;
+  remove(): void;
+  blur(): void;
+  contains(node: unknown): boolean;
+  querySelector(): null;
+  querySelectorAll(): FakeEl[];
+}
+
+function fakeEl(): FakeEl {
+  const el: FakeEl = {
+    id: '',
+    tabIndex: -1,
+    textContent: '',
+    innerHTML: '',
+    style: { setProperty(): void {} },
+    attrs: new Map(),
+    attrWrites: [],
+    classes: new Set(),
+    children: [],
+    parent: null,
+    blurs: 0,
+    classList: {
+      toggle(cls: string, on?: boolean): void {
+        const next = on ?? !el.classes.has(cls);
+        if (next) el.classes.add(cls);
+        else el.classes.delete(cls);
+      },
+      contains: (cls: string) => el.classes.has(cls),
+      remove: (cls: string) => void el.classes.delete(cls),
+    },
+    setAttribute(name: string, value: string): void {
+      el.attrs.set(name, value);
+      el.attrWrites.push({ name, value });
+    },
+    getAttribute: (name: string) => el.attrs.get(name) ?? null,
+    addEventListener(): void {},
+    appendChild(child: FakeEl): void {
+      child.parent = el;
+      el.children.push(child);
+    },
+    remove(): void {
+      if (!el.parent) return;
+      el.parent.children = el.parent.children.filter((c) => c !== el);
+      el.parent = null;
+    },
+    blur(): void {
+      el.blurs++;
+    },
+    contains: () => false,
+    querySelector: () => null,
+    querySelectorAll: () => [],
+  };
+  return el;
+}
+
+/** The document surface the painter touches, with its listener book visible. */
+function fakeDocument() {
+  const listeners = new Map<string, Array<(ev: unknown) => void>>();
+  return {
+    activeElement: null as unknown,
+    listeners,
+    createElement: () => fakeEl(),
+    addEventListener(type: string, fn: (ev: unknown) => void): void {
+      const list = listeners.get(type) ?? [];
+      list.push(fn);
+      listeners.set(type, list);
+    },
+    removeEventListener(type: string, fn: (ev: unknown) => void): void {
+      listeners.set(
+        type,
+        (listeners.get(type) ?? []).filter((f) => f !== fn),
+      );
+    },
+  };
+}
+
+function mountScoreboard() {
+  const doc = fakeDocument();
+  vi.stubGlobal('document', doc);
+  const layer = fakeEl();
+  const painter = new BattlegroundScoreboard({
+    layer: () => layer as unknown as HTMLElement,
+    writers: makeWriterFacet(
+      new Map(),
+      new Map(),
+      new Map(),
+      new Map(),
+      () => {},
+      () => {},
+    ),
+  });
+  painter.update(buildBgScoreboardView(baseInfo({ match: baseMatch() }), 7));
+  const root = layer.children[0];
+  return { doc, layer, painter, root };
+}
+
+describe('battleground scoreboard painter (DOM contract)', () => {
+  afterEach(async () => {
+    vi.unstubAllGlobals();
+    await ensureLocaleLoaded('en');
+    setLanguage('en');
+  });
+
+  it('mounts the strip as a real widget: focusable, role=button, named, collapsed', () => {
+    const { root } = mountScoreboard();
+    expect(root.id).toBe('bg-scoreboard');
+    expect(root.tabIndex).toBe(0);
+    // It is focusable and it handles Enter/Space as a disclosure toggle, so it
+    // must ANNOUNCE as a button; a bare focusable div reads as plain text.
+    expect(root.getAttribute('role')).toBe('button');
+    expect(root.getAttribute('aria-expanded')).toBe('false');
+    expect(root.getAttribute('aria-live')).toBe('off');
+    expect(root.getAttribute('aria-label')).toBe(t('hudChrome.bg.boardToggleLabel'));
+  });
+
+  it('re-writes the toggle name on a language switch, through the elided writer', async () => {
+    const { painter, root } = mountScoreboard();
+    const english = root.getAttribute('aria-label');
+    const writesFor = (name: string) => root.attrWrites.filter((w) => w.name === name).length;
+    expect(writesFor('aria-label')).toBe(1);
+
+    // Same language: the elided writer must skip, or the strip pays a DOM write
+    // on every relocalize fan-out.
+    painter.relocalize();
+    expect(writesFor('aria-label')).toBe(1);
+
+    await ensureLocaleLoaded('ja_JP');
+    setLanguage('ja_JP');
+    painter.relocalize();
+    // The root is minted once and ensureRoot() early-returns forever, so this
+    // is the ONLY thing that can move the screen-reader name off the old locale.
+    expect(writesFor('aria-label')).toBe(2);
+    expect(root.getAttribute('aria-label')).toBe(t('hudChrome.bg.boardToggleLabel'));
+    expect(root.getAttribute('aria-label')).not.toBe(english);
+  });
+
+  it('owns its document-level listener and gives it back on dispose', () => {
+    const { doc, layer, painter, root } = mountScoreboard();
+    // The outside-click closer is on the DOCUMENT, so it outlives every root
+    // the painter owns unless the painter takes it back.
+    expect(doc.listeners.get('pointerdown')).toHaveLength(1);
+    expect(layer.children).toContain(root);
+
+    painter.dispose();
+    expect(doc.listeners.get('pointerdown')).toHaveLength(0);
+    expect(layer.children).toHaveLength(0);
+    // Idempotent, and it re-mounts cleanly afterward (one listener, never two).
+    painter.dispose();
+    expect(doc.listeners.get('pointerdown')).toHaveLength(0);
+    painter.update(buildBgScoreboardView(baseInfo({ match: baseMatch() }), 7));
+    expect(doc.listeners.get('pointerdown')).toHaveLength(1);
   });
 });

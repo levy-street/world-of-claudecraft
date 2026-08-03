@@ -13,6 +13,7 @@
 // These modules are the deliberate exception to "tests never touch scripts/":
 // they ARE the map, and the map is gameplay.
 
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   BASES,
@@ -423,5 +424,94 @@ describe('Thornhollow Fields kit arithmetic: catalogue pieces fitted to the plan
     // generated module can never differ by a float tail.
     expect(yaw(-Math.PI / 2)).toBe(4.7124);
     expect(yaw(Math.PI * 4)).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The M-map painter's no-magic-colour rule (the canvas sub-rule), mirroring the
+// decentralized scan in tests/minimap_painter.test.ts.
+//
+// The painter draws two different kinds of thing and they take different rules.
+// The sampled TERRAIN palette stays literal on the documented map_terrain.ts
+// precedent: it is the field's own dressing (flagstone, slate, dirt), authored
+// against the 3D ground, and it is not part of any theme. Everything a player
+// reads as INTERFACE (team hues, the dead ring, the self arrow, the frame, the
+// halfway line, the glyph edge, the carrier ring) must resolve from a CSS token
+// in the painter's ONE cached getComputedStyle pass, so the map cannot drift
+// from the HUD it belongs to. The carrier ring is the case that proved it: it
+// duplicated the scoreboard's .carried orange by hand.
+
+const MAP_PAINTER_SRC = readFileSync(
+  new URL('../src/ui/hud/battleground/battleground_map_painter.ts', import.meta.url),
+  'utf8',
+);
+// Drop comments so prose can never create a false positive (mirrors architecture.test).
+const mapPainterCode = MAP_PAINTER_SRC.replace(/\/\*[\s\S]*?\*\//g, '').replace(
+  /(^|[^:])\/\/.*$/gm,
+  '$1',
+);
+
+// The ONLY colour literals allowed to survive in this file, by CONSTANT NAME:
+// the sampled terrain palette (see the rationale above). A new name may not be
+// added here without the same justification; interface chrome belongs in
+// MAP_CHROME_TOKENS with a CSS var.
+const TERRAIN_PALETTE_CONSTANTS = ['KEEP_FLOOR', 'GRAVE_DIRT', 'WALL_FILL', 'RUNE_FILL'];
+
+describe('Thornhollow Fields map painter: no magic colours (canvas sub-rule)', () => {
+  it('keeps every colour literal in the terrain palette or a documented token fallback', () => {
+    const stray: string[] = [];
+    for (const line of mapPainterCode.split('\n')) {
+      if (!/#[0-9a-fA-F]{3,8}\b/.test(line) && !/\brgba?\s*\(/.test(line)) continue;
+      const isTerrain = TERRAIN_PALETTE_CONSTANTS.some((name) =>
+        new RegExp(`const ${name} = '#`).test(line),
+      );
+      // A chrome fallback is only legal ON the token row it backs, so a literal
+      // can never be smuggled in as a bare constant.
+      const isTokenFallback = line.includes("'--color-");
+      if (!isTerrain && !isTokenFallback) stray.push(line.trim());
+    }
+    expect(stray, `unowned colour literals: ${stray.join(' | ')}`).toEqual([]);
+    // Non-vacuous: the terrain palette really is still here and still literal.
+    for (const name of TERRAIN_PALETTE_CONSTANTS) {
+      expect(mapPainterCode, `${name} is no longer a literal palette entry`).toContain(
+        `const ${name} = '#`,
+      );
+    }
+  });
+
+  it('draws with resolved colours only: no literal reaches a canvas draw call', () => {
+    // The teeth that survive a MOVE: a literal re-introduced inside paint() or
+    // the plan raster would pass a definition-site scan.
+    const start = mapPainterCode.indexOf('paint(ctx');
+    expect(start, 'battleground_map_painter.ts no longer defines paint(ctx').toBeGreaterThan(0);
+    const drawBody = mapPainterCode.slice(start);
+    for (const [what, re] of [
+      ['hex', /#[0-9a-fA-F]{3,8}\b/g],
+      ['rgb', /\brgba?\s*\(/g],
+    ] as const) {
+      const hits = drawBody.match(re) ?? [];
+      expect(hits, `${what} literal in a draw body: ${hits.join(', ')}`).toEqual([]);
+    }
+    // The terrain palette is used BY NAME there, so the scan above is not
+    // passing merely because the draw bodies stopped painting the ground.
+    for (const name of TERRAIN_PALETTE_CONSTANTS) expect(drawBody).toContain(name);
+  });
+
+  it('resolves the chrome tokens in the SAME single cached getComputedStyle pass', () => {
+    // One pass for the session (the minimap_painter caching rule); promoting the
+    // chrome must not have bought a second style read, and it must not have made
+    // the map refuse to draw when a var is absent (Node tests have no stylesheet,
+    // and so does the very first frame in the browser).
+    expect(mapPainterCode.match(/getComputedStyle/g) ?? []).toHaveLength(1);
+    expect(mapPainterCode).toContain('MAP_CHROME_TOKENS');
+    for (const key of ['carryRing', 'fieldEdge', 'midLine', 'ink']) {
+      expect(mapPainterCode, `${key} is not resolved from a token`).toMatch(
+        new RegExp(`${key}: \\['--color-[a-z-]+', '#[0-9a-fA-F]{3,8}'\\]`),
+      );
+      expect(mapPainterCode, `${key} is never drawn with`).toContain(`colors.${key}`);
+    }
+    // The REQUIRED group still gates the draw; the chrome group falls back.
+    expect(mapPainterCode).toContain('if (!v) return null;');
+    expect(mapPainterCode).toMatch(/getPropertyValue\(token\)\.trim\(\) \|\| fallback/);
   });
 });

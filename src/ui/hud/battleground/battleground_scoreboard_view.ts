@@ -1,5 +1,5 @@
 // Pure, host-agnostic view model for the in-match Thornhollow Fields scoreboard strip:
-// both team scores, the two flag states (with carrier), the team roster pips,
+// both team scores, the two flag states, the team roster pips,
 // the match clock, and the personal wave-respawn / spawn-protection readouts.
 // Snapshot-driven from bgInfo.match so it self-heals on reconnect; the one-shot
 // juice (banners, cues) rides the bg SimEvents in hud.handleEvents, never this
@@ -45,9 +45,11 @@ export interface BgScoreboardView {
   /** Remaining match time, split for the painter's clock key. */
   minutes: number;
   seconds: number;
-  /** Flag states by home team (0 = Crimson, 1 = Azure). */
+  /** Flag states by home team (0 = Crimson, 1 = Azure). Deliberately state ONLY:
+   *  the strip names no player (owner direction), so the carrier NAMES the wire
+   *  ships on `flags[].carrierName` are not modelled here. The carrier is read on
+   *  the board instead, off the roster's own `carrying` flag. */
   flagStates: ['home' | 'carried' | 'dropped', 'home' | 'carried' | 'dropped'];
-  carrierNames: [string | null, string | null];
   /** Both rosters in team order for the expanded board; stats ride elided
    *  writer slots (stable row identity = the structural sig). */
   board: BgBoardRow[];
@@ -70,7 +72,6 @@ const INACTIVE: BgScoreboardView = {
   minutes: 0,
   seconds: 0,
   flagStates: ['home', 'home'],
-  carrierNames: [null, null],
   board: [],
   respawnIn: 0,
   sig: 'off',
@@ -101,7 +102,6 @@ export function buildBgScoreboardView(info: BgInfo | null, myPid: number): BgSco
     minutes: Math.floor(left / 60),
     seconds: left % 60,
     flagStates: [m.flags[0].state, m.flags[1].state],
-    carrierNames: [m.flags[0].carrierName, m.flags[1].carrierName],
     board: [...crimson, ...azure].map((p) => ({
       pid: p.pid,
       name: p.name,
