@@ -196,6 +196,11 @@ export interface BucketWindowInput {
   fogLimit: number;
 }
 
+export type BucketWindowSquaredInput = Omit<BucketWindowInput, 'centerDist'> & {
+  /** squared distance from the camera to the bucket's CENTER */
+  centerDistSq: number;
+};
+
 /**
  * The build-time caps (the near-fill density cull, rocks, dressing, the early bark
  * cull) are measured against the bucket's CENTER, as they always have been. They
@@ -227,4 +232,35 @@ export function bucketVisible(w: BucketWindowInput): boolean {
   if (w.maxAtDetail && nearEdge >= w.detailFar) return false;
 
   return nearEdge < w.fogLimit;
+}
+
+/**
+ * Allocation-free hot-path variant of bucketVisible. The renderer already has
+ * the camera-to-bucket vector, so keeping the distance squared avoids a sqrt
+ * for every foliage bucket on every frame. All thresholds are non-negative in
+ * the live renderer, which makes the comparisons equivalent to bucketVisible.
+ */
+export function bucketVisibleSquared(w: BucketWindowSquaredInput): boolean {
+  if (Number.isNaN(w.centerDistSq)) return false;
+
+  const minCap = (w.minDist ?? 0) * w.distanceScale;
+  if (minCap > 0 && w.centerDistSq < minCap * minCap) return false;
+
+  const maxCap =
+    w.maxDist === undefined
+      ? Number.POSITIVE_INFINITY
+      : w.maxDist * w.distanceScale * w.revealScale;
+  if (maxCap <= 0 || w.centerDistSq >= maxCap * maxCap) return false;
+
+  if (w.minAtDetail) {
+    const maxCenter = w.detailFar - w.radius;
+    if (maxCenter > 0 && w.centerDistSq < maxCenter * maxCenter) return false;
+  }
+  if (w.maxAtDetail) {
+    const minCenter = w.detailFar + w.radius;
+    if (minCenter <= 0 || w.centerDistSq >= minCenter * minCenter) return false;
+  }
+
+  const fogCenter = w.fogLimit + w.radius;
+  return fogCenter > 0 && w.centerDistSq < fogCenter * fogCenter;
 }

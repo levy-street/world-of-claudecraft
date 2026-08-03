@@ -40,8 +40,8 @@ import {
   insideGrassHubExclusion,
 } from './foliage_core';
 import {
-  type BucketWindowInput,
-  bucketVisible,
+  type BucketWindowSquaredInput,
+  bucketVisibleSquared,
   foliageDistanceScale,
   foliageFogLimit,
   type InstanceCullWindows,
@@ -3055,8 +3055,8 @@ export function buildFoliage(seed: number): FoliageView {
   // Reused by the per-frame bucket cull below. Allocating this input inside the
   // loop generated one short-lived object per foliage bucket per frame (well
   // over 100 MB of garbage in a 12-second gameplay sample).
-  const bucketWindow: BucketWindowInput = {
-    centerDist: 0,
+  const bucketWindow: BucketWindowSquaredInput = {
+    centerDistSq: 0,
     radius: 0,
     minDist: undefined,
     maxDist: undefined,
@@ -3162,7 +3162,7 @@ export function buildFoliage(seed: number): FoliageView {
             : 1;
         const dx = b.x - camX;
         const dz = b.z - camZ;
-        bucketWindow.centerDist = Math.sqrt(dx * dx + dz * dz);
+        bucketWindow.centerDistSq = dx * dx + dz * dz;
         bucketWindow.radius = b.radius;
         bucketWindow.minDist = b.minDist;
         bucketWindow.maxDist = b.maxDist;
@@ -3172,7 +3172,7 @@ export function buildFoliage(seed: number): FoliageView {
         bucketWindow.detailFar = detailFar;
         bucketWindow.revealScale = revealScale;
         bucketWindow.fogLimit = fogLimit;
-        b.mesh.visible = bucketVisible(bucketWindow);
+        b.mesh.visible = bucketVisibleSquared(bucketWindow);
         // "Visible" counts SUBMITTED instances: shader-collapsed ones still
         // count here (the collapse saves raster work, not submission).
         if (b.mesh.visible) {
