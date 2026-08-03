@@ -209,6 +209,7 @@ import {
   counterpartySnapshot,
   stampCounterpartyDeltas,
 } from './guild_bank_counterparty';
+import { readGuildBankLog } from './guild_bank_log';
 import {
   consumeGuildBankOpToken,
   createGuildBankOpGuard,
@@ -4579,6 +4580,61 @@ export class GameServer {
     reportOrphan(unaccounted);
   }
 
+  /** Answer a `guild_bank_log` request with the guild's visible bank history,
+   *  or refuse it.
+   *
+   *  THE GATE IS THE BANK'S OWN GATE, deliberately not a looser one:
+   *  `guildBankInfoFor(pid)` is non-null only for an alive, officer-plus member
+   *  of a guild whose book is loaded, standing at a banker (the shared
+   *  GUILD_BANK_RANKS allowlist). A MEMBER is refused by exactly the same
+   *  predicate that denies them the bank itself, so the log can never become a
+   *  side channel around the officer-only design, and the guild id comes from
+   *  the server's own membership STAMP, never from the request: a client cannot
+   *  name a guild to read.
+   *
+   *  The gate is re-checked AFTER the awaited read, because the read may share
+   *  an in-flight query and a demotion, a leave, a death, or a walk-away can
+   *  land in that window; the answer must reflect the authority at DELIVERY
+   *  time, not at request time. A refusal is an explicit frame rather than
+   *  silence, so the pane can say so instead of rendering an empty history that
+   *  reads as "no officer has ever done anything". */
+  private sendGuildBankLog(session: ClientSession, pid: number): void {
+    const guildId = this.guildBankLogGuildFor(pid);
+    if (guildId === null) {
+      this.send(session, { t: 'gbanklog', ok: false });
+      return;
+    }
+    readGuildBankLog(guildId)
+      .then((entries) => {
+        // Same session, same character, same guild, still authorized. A
+        // linkdead or replaced session is caught by sendRaw's readyState guard
+        // as well; this is the AUTHORIZATION half.
+        if (session.left || session.pid !== pid || this.guildBankLogGuildFor(pid) !== guildId) {
+          this.send(session, { t: 'gbanklog', ok: false });
+          return;
+        }
+        this.send(session, { t: 'gbanklog', ok: true, entries });
+      })
+      .catch((err) => {
+        // A cold cache whose query failed. Never a stack trace to the player,
+        // and never a silent drop: the pane needs an answer to leave its
+        // loading state, and "refused" is the honest one (we do not know the
+        // history right now).
+        console.error(`guild bank log read failed for guild ${guildId}:`, err);
+        this.send(session, { t: 'gbanklog', ok: false });
+      });
+  }
+
+  /** The guild whose bank log this pid may read, or null when it may read
+   *  none. The single place the log's authorization is decided, shared by the
+   *  request gate and the post-await re-check so the two can never drift. */
+  private guildBankLogGuildFor(pid: number): number | null {
+    const guildId = this.sim.meta(pid)?.guildMembership?.guildId;
+    if (guildId === undefined) return null;
+    // The rank + proximity + alive + book-loaded gate, reused verbatim.
+    return this.sim.guildBankInfoFor(pid) === null ? null : guildId;
+  }
+
   /** The OPERATOR escape hatch for a dormant guild bank slot (the admin route
    *  in server/admin.ts). A slot holding an item a later content change flagged
    *  soulbound / noMarketList / transfer-locked is refused in BOTH directions,
@@ -6953,6 +7009,15 @@ export class GameServer {
       case 'guild_bank_buy_slots':
         if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
         this.runGuildBankOp(session, { pid }, 'buy_slots', () => sim.guildBankBuySlotsFor(pid));
+        break;
+      // The activity log READ (no mutation, no sim call). It shares the guild
+      // bank op guard rather than getting a second bucket: it is the same
+      // window, the same officer, and the same abuse shape, and the honest
+      // client asks at most once per its own TTL, so a legitimate session never
+      // notices while a flooder is stopped by machinery that already exists.
+      case 'guild_bank_log':
+        if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
+        this.sendGuildBankLog(session, pid);
         break;
       // Book of Deeds: select/clear the displayed title. The sim validator
       // owns every rule (deed earned + title reward; null clears; invalid

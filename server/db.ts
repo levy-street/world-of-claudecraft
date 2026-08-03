@@ -4394,6 +4394,79 @@ export interface BankLedgerRow {
   counterpartyCount?: number | null;
 }
 
+// ---------------------------------------------------------------------------
+// The guild bank ACTIVITY LOG read: the newest window of one guild's
+// bank_ledger rows, for the in-game officer-visible history
+// (server/guild_bank_log.ts owns the projection, the gate, and the cache; this
+// is only the statement).
+//
+// PRIVACY IS THE COLUMN LIST. This is the one read whose result reaches
+// players, so it selects the narrowest set that can render a sentence:
+// bank_ledger.account_id, realm, and the instance payload are NOT selected at
+// all, and character_id is resolved to a display name here rather than shipped.
+// Nothing account-scoped can leak through a projection bug downstream, because
+// nothing account-scoped is in the row.
+//
+// The predicate rides bank_ledger_container_recent (container, container_id,
+// id DESC), added through the CONCURRENTLY seam with this reader: see
+// server/bank_ledger_indexes.ts for why the third column carries its weight.
+// `id DESC` (not created_at) is the paging order: BIGSERIAL cannot tie, and it
+// is exactly the index's trailing column, so this is a bounded backwards index
+// scan whose cost is the LIMIT rather than the guild's lifetime row count.
+//
+// The op filter is applied HERE rather than in JS so a suppressed row never
+// crosses the wire into this process at all, and so the LIMIT counts only rows
+// a player can actually see (filtering after the fact would silently return
+// fewer than the window it promised).
+export interface GuildBankLogDbRow {
+  id: number;
+  /** Epoch milliseconds (the column is TIMESTAMPTZ; pg hands back a Date). */
+  at: number;
+  /** The acting character's display name, or null when the character row is
+   *  gone. Never an id. */
+  characterName: string | null;
+  op: string;
+  itemId: string | null;
+  count: number | null;
+  copperDelta: number;
+}
+
+export async function loadGuildBankLogRows(
+  guildId: number,
+  limit: number,
+  visibleOps: readonly string[],
+): Promise<GuildBankLogDbRow[]> {
+  const res = await pool.query(
+    `SELECT bl.id,
+            bl.created_at,
+            bl.op,
+            bl.item_id,
+            bl.count,
+            bl.copper_delta,
+            c.name AS character_name
+       FROM bank_ledger bl
+       LEFT JOIN characters c ON c.id = bl.character_id
+      WHERE bl.container = 'guild'
+        AND bl.container_id = $1
+        AND bl.op = ANY($2::text[])
+      ORDER BY bl.id DESC
+      LIMIT $3`,
+    [guildId, visibleOps, limit],
+  );
+  return res.rows.map((r) => ({
+    id: Number(r.id),
+    at: r.created_at instanceof Date ? r.created_at.getTime() : Number(new Date(r.created_at)),
+    characterName: typeof r.character_name === 'string' ? r.character_name : null,
+    op: String(r.op),
+    itemId: r.item_id === null || r.item_id === undefined ? null : String(r.item_id),
+    count: r.count === null || r.count === undefined ? null : Number(r.count),
+    // BIGINT arrives as a string from pg; Number() is safe here because every
+    // legitimate copper magnitude is far inside the safe-integer range (the
+    // treasury cap alone is 1e9).
+    copperDelta: Number(r.copper_delta) || 0,
+  }));
+}
+
 export async function insertBankLedgerRow(row: BankLedgerRow): Promise<void> {
   await pool.query(
     `INSERT INTO bank_ledger

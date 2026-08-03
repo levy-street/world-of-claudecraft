@@ -1,0 +1,231 @@
+// The guild bank ACTIVITY LOG read path: the officer-visible projection of one
+// guild's append-only bank_ledger rows.
+//
+// WHY IT EXISTS. The guild bank is officer-only, so any officer can quietly
+// drain shared property. Every op already writes a bank_ledger row with the
+// actor, the op, the item, the counts and both copper sides; the knowledge has
+// always been there and only the operator could see it. Making officer actions
+// visible to the guild is the social trust mechanism that makes officer-only
+// withdrawals defensible in the first place, so this read is a FEATURE of the
+// permission model, not a reporting extra.
+//
+// WHAT IS DELIBERATELY WITHHELD, and why each one:
+//   - `escrow_deficit` and `counterparty_orphan` are DIAGNOSTIC anomaly rows,
+//     not things a player did. They exist so an operator can find a conservation
+//     defect; rendering "Somebody caused an escrow deficit of 250 copper" to a
+//     guild would be alarming, unactionable, and frequently wrong about who was
+//     involved (the row's character is whoever's session was rolled back). They
+//     never leave the server: the op filter is in the SQL, so a suppressed row
+//     is not even fetched, and the client re-states the allowlist independently.
+//   - Account ids, IPs, realms, and per-instance item payloads are not selected
+//     at all (server/db.ts loadGuildBankLogRows). Character ids are resolved to
+//     display names in that same statement, so no internal id ships either.
+//   - An `admin_purge` IS shown, and shown as an OPERATOR action with NO name.
+//     Hiding it would leave an unexplained gap exactly where a guild's property
+//     disappeared, which is worse than saying so. Naming its ledger character
+//     would be a straight-up lie: that column holds the escrow CARRIER, an
+//     online guild member who merely lent their save transaction and neither
+//     ordered nor benefited from the removal (see GameServer.adminPurgeGuild-
+//     BankSlot). So the entry carries actor null and the client renders
+//     "An administrator removed ..." with no guildmate implicated.
+//
+// CACHING. The answer is IDENTICAL for every officer of a guild, so a
+// per-request query would multiply one read by the number of officers with the
+// window open, on a keep-forever table, for zero added information. It rides
+// the repo's cached-read seam (server/cached_read.ts): per-guild TTL +
+// single-flight (two officers racing a cold window share ONE query) +
+// stale-on-error, in a map bounded by maxEntries with LRU eviction. Freshness
+// does not rest on the TTL: server/bank_ledger.ts busts the guild's entry on
+// every guild row it writes, both when the op happens and again once the
+// inserts have actually settled, so the next reader sees the new row rather
+// than a snapshot taken microseconds before it landed.
+//
+// A guild lives on exactly one realm process, and every writer of its book
+// (player ops, the operator purge, the create fee) runs in that process through
+// server/bank_ledger.ts, so the bust is COMPLETE rather than best-effort: there
+// is no peer-process writer whose row this cache could miss until TTL.
+
+import type { GuildBankLogEntry, GuildBankLogOp } from '../src/world_api';
+import { KeyedCachedRead } from './cached_read';
+import { type GuildBankLogDbRow, loadGuildBankLogRows } from './db';
+
+/** The window size. The classic guild-bank log is a short recent history, not
+ *  an archive: 50 rows is what a guild actually reads after "who took the
+ *  ore?", it bounds the frame, and it bounds the index scan. The full history
+ *  stays in bank_ledger forever for the audit. */
+export const GUILD_BANK_LOG_LIMIT = 50;
+
+/** The ops a guild may SEE, and the ORDER is not meaningful (the SQL orders by
+ *  id). A closed allowlist rather than a denylist on purpose: a new ledger op
+ *  added later is INVISIBLE to players until somebody deliberately decides it
+ *  should be shown and writes its sentence, which is the safe direction to fail
+ *  for a table that also carries diagnostics. */
+export const GUILD_BANK_LOG_VISIBLE_OPS: readonly GuildBankLogOp[] = [
+  'deposit',
+  'withdraw',
+  'deposit_gold',
+  'withdraw_gold',
+  'buy_slots',
+  'open_bank',
+  'create_fee',
+  'admin_purge',
+];
+
+/** The guild-container ops deliberately WITHHELD, named so the exhaustiveness
+ *  test can prove visible + hidden covers every op bank_ledger can hold: a new
+ *  op that lands in neither list reddens that test instead of silently
+ *  defaulting into invisibility nobody reviewed. */
+export const GUILD_BANK_LOG_HIDDEN_OPS: readonly string[] = [
+  'escrow_deficit',
+  'counterparty_orphan',
+];
+
+const VISIBLE_OPS: ReadonlySet<string> = new Set(GUILD_BANK_LOG_VISIBLE_OPS);
+
+/** Ops whose actor must NEVER be named. `admin_purge`'s ledger character is the
+ *  escrow carrier (a bystander), and its account is the operator, who is not a
+ *  guild matter; either name would misattribute a destroyed item. */
+const ANONYMOUS_OPS: ReadonlySet<string> = new Set<GuildBankLogOp>(['admin_purge']);
+
+/** How long an installed answer is served without re-querying. Short, but not
+ *  the freshness mechanism: the per-guild bust is. This is the ceiling on how
+ *  stale an idle guild's log can be if a bust were ever missed, and the floor
+ *  on how often a guild-full of officers staring at an unchanging log can cost
+ *  a query (once per TTL, no matter how many of them are looking). */
+export const GUILD_BANK_LOG_CACHE_TTL_MS = 30_000;
+
+/** Entry bound. Guild bank logs are read only by officers standing at a banker
+ *  with the window open, so the live set is tiny; the cap is what keeps a long
+ *  uptime with churn from turning the map into an unbounded per-guild residue
+ *  (the grows-without-bound defect server/CLAUDE.md forbids). Past the cap the
+ *  coldest guild is evicted and its next read costs one extra query. */
+export const GUILD_BANK_LOG_CACHE_MAX_ENTRIES = 256;
+
+/**
+ * Project one ledger row into the player-visible entry, or null when the row
+ * must not be shown. Pure, so the projection rules (the op allowlist, the
+ * anonymous ops, the magnitude normalization) are unit-testable without a
+ * database.
+ *
+ * Copper and count are normalized to POSITIVE MAGNITUDES because the op name
+ * already carries the direction, and because `copper_delta`'s sign is not a
+ * single consistent thing across ops in this table: the gold ops record the
+ * TREASURY's signed movement, while `buy_slots`, `open_bank` and `create_fee`
+ * record a negated PAYMENT (from the treasury, from the opener's purse, and
+ * from the founder's purse respectively). Rendering the raw sign would show
+ * "-9g" for opening a bank and "+5g" for a deposit as if they were the same
+ * axis. The sentence says what happened; the number says how much.
+ */
+export function projectGuildBankLogRow(row: GuildBankLogDbRow): GuildBankLogEntry | null {
+  if (!VISIBLE_OPS.has(row.op)) return null;
+  const op = row.op as GuildBankLogOp;
+  const anonymous = ANONYMOUS_OPS.has(op);
+  const copperMagnitude = Math.abs(Math.trunc(row.copperDelta));
+  const countMagnitude = row.count === null ? 0 : Math.abs(Math.trunc(row.count));
+  return {
+    id: row.id,
+    at: row.at,
+    // A null name is also what a vanished character row would produce; it
+    // renders as an unnamed guild member rather than as an empty sentence.
+    actor: anonymous ? null : (row.characterName ?? null),
+    op,
+    itemId: row.itemId,
+    count: countMagnitude > 0 ? countMagnitude : null,
+    copper: copperMagnitude > 0 ? copperMagnitude : null,
+  };
+}
+
+/** Project a whole result set, dropping anything the allowlist refuses. */
+export function projectGuildBankLogRows(
+  rows: readonly GuildBankLogDbRow[],
+): readonly GuildBankLogEntry[] {
+  const out: GuildBankLogEntry[] = [];
+  for (const row of rows) {
+    const entry = projectGuildBankLogRow(row);
+    if (entry !== null) out.push(entry);
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------------------
+// The process cache. The database reader is INJECTED (the
+// configure<Domain>Runtime idiom) so tests can drive the cache mechanics with a
+// counting fake and no Postgres, and so the cache builds lazily: no clock and
+// no bound is bound before a test can replace it.
+// ---------------------------------------------------------------------------
+
+export type GuildBankLogReader = (guildId: number) => Promise<readonly GuildBankLogEntry[]>;
+
+const defaultReader: GuildBankLogReader = async (guildId) =>
+  // Frozen on the way in: this array becomes the SHARED cached value handed to
+  // every officer of the guild, so a caller that sorted or spliced it in place
+  // would rewrite history for everyone else until the next bust.
+  Object.freeze(
+    projectGuildBankLogRows(
+      await loadGuildBankLogRows(guildId, GUILD_BANK_LOG_LIMIT, GUILD_BANK_LOG_VISIBLE_OPS),
+    ),
+  );
+
+let reader: GuildBankLogReader = defaultReader;
+let active: KeyedCachedRead<readonly GuildBankLogEntry[]> | null = null;
+let testOverrides: { ttlMs?: number; maxEntries?: number; now?: () => number } | null = null;
+
+function activeCache(): KeyedCachedRead<readonly GuildBankLogEntry[]> {
+  if (active !== null) return active;
+  active = new KeyedCachedRead<readonly GuildBankLogEntry[]>((guildId) => reader(guildId), {
+    ttlMs: testOverrides?.ttlMs ?? GUILD_BANK_LOG_CACHE_TTL_MS,
+    maxEntries: testOverrides?.maxEntries ?? GUILD_BANK_LOG_CACHE_MAX_ENTRIES,
+    now: testOverrides?.now,
+  });
+  return active;
+}
+
+/**
+ * The one read every caller uses. Two officers of the same guild racing a cold
+ * window share ONE query (single-flight), and a warm entry answers with no
+ * query at all.
+ *
+ * The returned array is the SHARED cached instance, deliberately frozen by the
+ * reader below so a caller cannot mutate one guild's cached history for every
+ * other reader.
+ */
+export function readGuildBankLog(guildId: number): Promise<readonly GuildBankLogEntry[]> {
+  return activeCache().read(guildId);
+}
+
+/**
+ * Drop one guild's cached log. Called by server/bank_ledger.ts on every guild
+ * row it writes: once when the op happens (so an entry captured before it can
+ * never be served again) and once more after the fire-and-forget inserts have
+ * settled (so a read racing the write does not re-install a snapshot taken
+ * microseconds before the row landed and then serve it for a whole TTL).
+ */
+export function bustGuildBankLog(guildId: number): void {
+  activeCache().bust(guildId);
+}
+
+/** Cache telemetry (reads, refreshes, evictions, busts, live entries): the
+ *  query rate here is bust rate times officer read rate, which is exactly the
+ *  thing that is invisible without a counter. */
+export function guildBankLogCacheStats(): ReturnType<KeyedCachedRead<unknown>['stats']> {
+  return activeCache().stats();
+}
+
+/** Test seam: swap the database reader and rebuild the cache. */
+export function configureGuildBankLogReader(read: GuildBankLogReader): void {
+  reader = read;
+  active = null;
+}
+
+/** Test seam: reset to the production reader (or keep an injected one) and
+ *  rebuild the cache with optional bounds/clock overrides. */
+export function resetGuildBankLogCacheForTests(overrides?: {
+  ttlMs?: number;
+  maxEntries?: number;
+  now?: () => number;
+  reader?: GuildBankLogReader;
+}): void {
+  testOverrides = overrides ?? null;
+  reader = overrides?.reader ?? defaultReader;
+  active = null;
+}

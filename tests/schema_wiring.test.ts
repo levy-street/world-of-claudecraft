@@ -567,6 +567,7 @@ describe('ensureSchema wires every schema module at boot', () => {
       'play_sessions_ended_account',
       'guilds_realm_lower_name_prefix',
       'guilds_realm_created_id',
+      'bank_ledger_container_recent',
     ]);
     const guildPrefix = CONCURRENT_INDEX_MIGRATIONS.find(
       (m) => m.name === 'guilds_realm_lower_name_prefix',
@@ -582,6 +583,20 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(guildCreated?.createSql).toContain('ON guilds(realm, created_at, id)');
     expect(guildCreated?.checkSql).toContain("to_regclass('guilds_realm_created_id')");
     expect(guildCreated?.dropSql).toBe('DROP INDEX CONCURRENTLY IF EXISTS guilds_realm_created_id');
+    // The guild bank activity log's reader. The THIRD column is the load-bearing
+    // part and is pinned as such: without `id DESC` the "newest 50 rows of one
+    // guild" read still sorts that guild's whole keep-forever history.
+    const bankLedgerContainer = CONCURRENT_INDEX_MIGRATIONS.find(
+      (m) => m.name === 'bank_ledger_container_recent',
+    );
+    expect(bankLedgerContainer?.createSql).toContain(
+      'ON bank_ledger(container, container_id, id DESC)',
+    );
+    expect(bankLedgerContainer?.createSql).toContain('CREATE INDEX CONCURRENTLY IF NOT EXISTS');
+    expect(bankLedgerContainer?.checkSql).toContain("to_regclass('bank_ledger_container_recent')");
+    expect(bankLedgerContainer?.dropSql).toBe(
+      'DROP INDEX CONCURRENTLY IF EXISTS bank_ledger_container_recent',
+    );
   });
 
   it('applies the rate-limit schema idempotently (a second boot re-issues the same DDL)', async () => {

@@ -16,6 +16,7 @@
 
 import type { BankInfo, GuildBankInfo } from '../src/world_api';
 import { insertBankLedgerRow } from './db';
+import { bustGuildBankLog } from './guild_bank_log';
 import { gameMetricsCounters } from './http/game_signals';
 import { REALM } from './realm';
 
@@ -411,6 +412,29 @@ export function recordGuildBankDeltas(
           gameMetricsCounters().guildBankIncident('ledger_write_failed');
           console.error('bank_ledger guild write failed:', err);
         });
+    }
+    // The in-game activity log (server/guild_bank_log.ts) is a CACHE over the
+    // very rows this function writes, so its bust belongs HERE, at the one
+    // writer, rather than at each of the call sites: a future write site cannot
+    // forget it, and every op that produces a row (player op, operator purge,
+    // create fee, anomaly marker) invalidates the guild's window by
+    // construction.
+    //
+    // TWICE, on purpose. The immediate bust retires any snapshot taken before
+    // this op. The second one fires after the fire-and-forget inserts have
+    // actually SETTLED, because a reader racing this write would otherwise
+    // refresh from a table that does not contain the new row yet and then serve
+    // that pre-op snapshot for a whole TTL: the op would be invisible to the
+    // guild for 30s precisely when somebody is watching. Failures are ignored
+    // on purpose (a rejected insert already logged and counted); the bust is
+    // correct either way, because a bust only ever costs one extra query.
+    if (deltas.length > 0) {
+      bustGuildBankLog(guildId);
+      const settled = tail;
+      void settled.then(
+        () => bustGuildBankLog(guildId),
+        () => bustGuildBankLog(guildId),
+      );
     }
   } catch (err) {
     // The observer must never fault the dispatch path.
