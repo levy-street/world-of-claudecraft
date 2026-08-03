@@ -4,7 +4,7 @@ import type { ZoneDef } from '../sim/types';
 import { waterLevel } from '../sim/world';
 import { loadTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
-import { farVistaPlan } from './far_terrain_core';
+import { activeFarFieldPolicy } from './foliage_impostor';
 import { GFX, SUN_DIR, sharedUniforms } from './gfx';
 import { idleSlot, runIdleQueue } from './idle_queue';
 import { waterNormalish, waterNormalMaps } from './textures';
@@ -458,7 +458,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
   // that envelope well past the classic view, so the apron grows with the
   // tier plan, with extra segments so coastal cells stay fade-band sized.
   {
-    const vista = farVistaPlan(GFX.tier, GFX.constrainedMemory);
+    const vista = activeFarFieldPolicy().vista;
     const reach = vista.enabled ? WORLD_MAX_X + vista.envelopeFar + 400 : 0;
     const width = vista.enabled ? reach * 2 : 3000;
     const span = WORLD_MAX_Z - WORLD_MIN_Z + (vista.enabled ? reach * 2 : 2400);

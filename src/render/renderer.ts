@@ -172,7 +172,6 @@ import {
   detailCullFar,
   type FarVistaPlan,
   FOGLESS_DETAIL_FAR,
-  farVistaPlan,
   horizonHazePlan,
 } from './far_terrain_core';
 import { buildFarshoreFeatures } from './farshore_features';
@@ -187,6 +186,7 @@ import {
   type FoliageView,
   foliageResidencySources,
 } from './foliage';
+import { activeFarFieldPolicy } from './foliage_impostor';
 import {
   type FrostNovaRootVisual,
   isFrostNovaRootAura,
@@ -1864,8 +1864,9 @@ export class Renderer {
     // The near plane also steps out to 0.2 there: at near 0.1 the 24-bit
     // depth buffer resolves only a few units at the 3200u horizon, right
     // where the far mesh and the water apron run nearly coplanar along
-    // distant coasts.
-    this.farVista = farVistaPlan(GFX.tier, GFX.constrainedMemory);
+    // distant coasts. The plan comes through the ONE far-field policy so
+    // the vista can never enable on a profile the sprite arm rejects.
+    this.farVista = activeFarFieldPolicy().vista;
     this.camera = new THREE.PerspectiveCamera(
       CAMERA_BASE_FOV,
       this.viewport.width / this.viewport.height,
@@ -4162,7 +4163,7 @@ export class Renderer {
     // foliage_lod.ts); with the vista on, the near plane pairs with the CAPPED
     // far the foliage culls against, never scene fog.
     const fogNear =
-      this.farVista.enabled && this.fogState === 'outdoor'
+      this.vistaLive() && this.fogState === 'outdoor'
         ? Math.min((this.scene.fog as THREE.Fog).near, fogFar * 0.55)
         : (this.scene.fog as THREE.Fog).near;
     const projectionPixels = projectionScalePixels(
@@ -4217,10 +4218,10 @@ export class Renderer {
       this.cameraLookAt.z,
       fogNear,
       fogFar,
-      this.farVista.enabled && this.fogState === 'outdoor'
+      this.vistaLive() && this.fogState === 'outdoor'
         ? this.farVista.envelopeFar * 0.9
         : this.lastRequestedFogNear,
-      this.farVista.enabled && this.fogState === 'outdoor'
+      this.vistaLive() && this.fogState === 'outdoor'
         ? this.farVista.envelopeFar
         : this.lastRequestedFogFar,
       projectionPixels,
@@ -7388,12 +7389,30 @@ export class Renderer {
     return Renderer.BIOME_FOG[zoneBiomeAt(this.sim.player.pos.x, this.sim.player.pos.z)];
   }
 
+  /**
+   * The vista arms may only engage once the far layer can actually stand in
+   * for the fog: until EVERY planned tile is attached, an unbuilt direction
+   * past the detail horizon would render as void (Safari's idle fallback
+   * paces a high-tier tile near 3 seconds, so the full grid can take half a
+   * minute there). Until then the classic fogged renderer runs verbatim,
+   * and the fog wall keeps the horizon closed; the flip when the last tile
+   * lands rides the same eased fog/detail transitions every zone change
+   * uses. An editor far-layer rebuild drops readiness the same way, closing
+   * the fog back over the void instead of exposing it.
+   */
+  private vistaLive(): boolean {
+    return (
+      this.farVista.enabled &&
+      this.farTerrainView.builtTileCount() >= this.farTerrainView.plannedTileCount()
+    );
+  }
+
   /** The classic cull distance the detail subsystems key off: scene fog
    *  verbatim when the vista is off (identical to the fogged renderer), the
    *  residency-eased detail horizon capped at the classic envelope when it
    *  is on (outdoor fog is parked past the camera there and culls nothing). */
   private subsystemCullFar(): number {
-    if (!this.farVista.enabled || this.fogState !== 'outdoor') {
+    if (!this.vistaLive() || this.fogState !== 'outdoor') {
       return (this.scene.fog as THREE.Fog).far;
     }
     return detailCullFar(this.detailFogFar, MAX_OUTDOOR_FOG_FAR);
@@ -7402,7 +7421,7 @@ export class Renderer {
   /** Where the whole-world view ends on vista tiers (far tiles and foliage
    *  sprites reach it); scene fog verbatim elsewhere. */
   private viewFar(): number {
-    return this.farVista.enabled && this.fogState === 'outdoor'
+    return this.vistaLive() && this.fogState === 'outdoor'
       ? this.farVista.envelopeFar
       : (this.scene.fog as THREE.Fog).far;
   }
@@ -7824,7 +7843,7 @@ export class Renderer {
       // The residency clamp keeps gating the DETAIL horizon while zones
       // stream in; the far mesh stands beneath, so an unbuilt chunk reads as
       // coarse ground, never a hole.
-      const vista = this.farVista.enabled;
+      const vista = this.vistaLive();
       const requestedFar = vista ? FOGLESS_DETAIL_FAR : preset.far * (this.lowGfx ? 1 : g.farScale);
       this.lastRequestedFogFar = requestedFar;
       this.lastRequestedFogNear = preset.near;
@@ -9520,7 +9539,7 @@ export class Renderer {
     // foliage_lod.ts); with the vista on, the near plane pairs with the CAPPED
     // far the foliage culls against, never scene fog.
     const fogNear =
-      this.farVista.enabled && this.fogState === 'outdoor'
+      this.vistaLive() && this.fogState === 'outdoor'
         ? Math.min((this.scene.fog as THREE.Fog).near, fogFar * 0.55)
         : (this.scene.fog as THREE.Fog).near;
     this.queueVisibleZonePrepares(Math.max(fogFar, this.lastRequestedFogFar));
@@ -9578,10 +9597,10 @@ export class Renderer {
       this.cameraLookAt.z,
       fogNear,
       fogFar,
-      this.farVista.enabled && this.fogState === 'outdoor'
+      this.vistaLive() && this.fogState === 'outdoor'
         ? this.farVista.envelopeFar * 0.9
         : this.lastRequestedFogNear,
-      this.farVista.enabled && this.fogState === 'outdoor'
+      this.vistaLive() && this.fogState === 'outdoor'
         ? this.farVista.envelopeFar
         : this.lastRequestedFogFar,
       projectionPixels,
@@ -9990,6 +10009,11 @@ export class Renderer {
    */
   cancelTerrainStreaming(): void {
     this.terrainView.cancelStreaming();
+    // The far layer streams on the same lifecycle: without this, a host
+    // that tears the renderer down right after (the editor destroys the GL
+    // context next) leaves the idle-paced far build allocating geometries
+    // against a dead renderer and retaining it through the closure.
+    this.farTerrainView.cancelStreaming();
   }
 
   /**
@@ -10076,6 +10100,12 @@ export class Renderer {
    */
   rebakeTerrainNormals(region: { minX: number; minZ: number; maxX: number; maxZ: number }): void {
     this.terrainView.rebakeNormalRegion(region.minX, region.minZ, region.maxX, region.maxZ);
+    // The far layer is a static snapshot of the heightfield, so a sculpt or
+    // biome paint must invalidate the tiles it intersects or the edit
+    // reverts to the old geometry when the camera backs across the detail
+    // handoff. Stroke end is the right cadence (this hook), matching the
+    // normal rebake's own debounce: never per drag sample.
+    this.farTerrainView.rebuildRegion(region.minX, region.minZ, region.maxX, region.maxZ);
   }
 
   /**

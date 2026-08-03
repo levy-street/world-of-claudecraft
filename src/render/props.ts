@@ -823,6 +823,33 @@ function rotLocal(lx: number, lz: number, rot: number): { x: number; z: number }
   return { x: lx * c + lz * s, z: -lx * s + lz * c };
 }
 
+/**
+ * The chapel bell tower's WORLD center: its CHAPEL_TOWER.dz rear offset
+ * rotated by the building yaw. The one transform the real composed chapel
+ * (its hideable footprint), the camera collider and the far IMPOSTOR all
+ * derive from; an impostor centered at the raw (b.x, b.z) instead sits
+ * dz off its real twin and jumps sideways at the handoff.
+ */
+export function chapelTowerWorldCenter(b: { x: number; z: number; rot: number }): {
+  x: number;
+  z: number;
+} {
+  const off = rotLocal(0, CHAPEL_TOWER.dz, b.rot);
+  return { x: b.x + off.x, z: b.z + off.z };
+}
+
+/**
+ * The one house-asset pick for a building record: the same pool and the
+ * same keyRand draw whether the consumer is the real placement loop or the
+ * impostor collector, so a far sprite can never disagree with the model it
+ * hands off to.
+ */
+function buildingAssetPick(b: { x: number; z: number; kind: BuildingDef['kind'] }): PropKey {
+  const key = b.x * 13.7 + b.z * 3.1;
+  const pool = b.kind === 'hollowHouse' ? HOUSE_POOL_HOLLOW : HOUSE_POOL;
+  return KIND_ASSET[b.kind] ?? pool[Math.floor(keyRand(key, 3) * 0.999 * pool.length)];
+}
+
 type Scale = number | [number, number, number];
 
 function setScale(o: THREE.Object3D, s: Scale): void {
@@ -1199,13 +1226,9 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- buildings: village houses / inn / composed chapel ------------------
-  const housePool = HOUSE_POOL;
-  const hollowPool = HOUSE_POOL_HOLLOW;
   const houseHeight = HOUSE_HEIGHT;
-  const kindAsset = KIND_ASSET;
 
   for (const b of activeContent.props.buildings) {
-    const key = b.x * 13.7 + b.z * 3.1;
     const y = ground(b.x, b.z);
     const armoury = buildEastbrookGrandArmouryView(b, ground);
     if (armoury) {
@@ -1246,12 +1269,12 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       gTower.position.set(b.x, y - CHAPEL_HALL.sink, b.z);
       gTower.rotation.y = b.rot;
       group.add(shadowed(gTower));
-      const towerOff = rotLocal(0, CHAPEL_TOWER.dz, b.rot);
+      const towerCenter = chapelTowerWorldCenter(b);
       registerHideable(
         gTower,
         obbFootprint(
-          b.x + towerOff.x,
-          b.z + towerOff.z,
+          towerCenter.x,
+          towerCenter.z,
           (b.w * CHAPEL_TOWER.wScale) / 2,
           (b.d * CHAPEL_TOWER.dScale) / 2,
           b.rot,
@@ -1285,9 +1308,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       );
       continue;
     }
-    const pool = b.kind === 'hollowHouse' ? hollowPool : housePool;
-    const asset: PropKey =
-      kindAsset[b.kind] ?? pool[Math.floor(keyRand(key, 3) * 0.999 * pool.length)];
+    const asset = buildingAssetPick(b);
     const a = propAsset(asset);
     const g = new THREE.Group();
     addParts(g, asset, { scale: [b.w / a.size.x, houseHeight[asset] / a.size.y, b.d / a.size.z] });
@@ -2747,21 +2768,25 @@ export function collectBuildingImpostors(seed: number): {
     if (b.kind === 'chapel') {
       const tower = use('bellTower');
       const w = Math.max(b.w * CHAPEL_TOWER.wScale, b.d * CHAPEL_TOWER.dScale);
+      // The real tower stands at the rotated CHAPEL_TOWER.dz rear offset,
+      // through the SAME helper the real loop's footprint uses; centering
+      // on the raw building origin made the sprite jump sideways at the
+      // handoff.
+      const center = chapelTowerWorldCenter(b);
       instances.push({
         asset: 'bellTower',
-        x: b.x,
+        x: center.x,
+        // base height comes from the building ORIGIN, exactly like the real
+        // group (positioned at b.x/b.z, tower offset inside it)
         y: y - CHAPEL_HALL.sink,
-        z: b.z,
+        z: center.z,
         rot: b.rot,
         widthScale: w / Math.max(tower.size.x, tower.size.z),
         heightScale: CHAPEL_TOWER.height / tower.size.y,
       });
       continue;
     }
-    const key = b.x * 13.7 + b.z * 3.1;
-    const pool = b.kind === 'hollowHouse' ? HOUSE_POOL_HOLLOW : HOUSE_POOL;
-    const asset: PropKey =
-      KIND_ASSET[b.kind] ?? pool[Math.floor(keyRand(key, 3) * 0.999 * pool.length)];
+    const asset = buildingAssetPick(b);
     const a = use(asset);
     instances.push({
       asset,

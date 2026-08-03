@@ -1383,8 +1383,10 @@ function buildTrees(
     twistedSpec.impostorRows = twistedSpec.sets.map((parts, i) =>
       session.registerArchetype('tree', MODEL_URLS.twisted[i], parts),
     );
+    // windMul 0: the dead species is bare rigid wood; the leafy 0.08 sway
+    // that sells a canopy reads as the whole trunk bending on a snag
     deadSpec.impostorRows = deadSpec.sets.map((parts, i) =>
-      session.registerArchetype('tree', MODEL_URLS.dead[i], parts),
+      session.registerArchetype('tree', MODEL_URLS.dead[i], parts, 0),
     );
   }
 

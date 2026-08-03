@@ -1,14 +1,20 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  IMPOSTOR_ATLAS_BUDGET,
   IMPOSTOR_ATLAS_MAX,
+  IMPOSTOR_CATEGORY_VIEWS,
+  IMPOSTOR_CATEGORY_WIND,
+  IMPOSTOR_CELL_PX,
   IMPOSTOR_JITTER_GLSL,
   IMPOSTOR_MIN_BAND,
+  IMPOSTOR_ROW_BUDGET,
   IMPOSTOR_SWAP_FADE,
   type ImpostorArchetypeSpec,
   packImpostorAtlas,
   SPRITE_MIN_FOG_BLEND,
   SPRITE_SWAP_MIN,
+  shippedImpostorInventory,
   spriteSwapDistance,
   spriteSwapFloor,
 } from '../src/render/foliage_impostor_core';
@@ -31,24 +37,56 @@ function spec(over: Partial<ImpostorArchetypeSpec> = {}): ImpostorArchetypeSpec 
   };
 }
 
-// The shipped kit's shape at the default tier: 15 tree variants at 128px x 12
-// views, 8 rock colorway variants and 2 bush kinds at 64px, and about a
-// dozen building and skyline-decor archetypes at 96px x 6 views. The packer
-// must keep this inside the 4096 hardware floor with room to grow.
-function shippedSet(): ImpostorArchetypeSpec[] {
-  const specs: ImpostorArchetypeSpec[] = [];
-  for (let i = 0; i < 15; i++) specs.push(spec({ id: `tree:${i}` }));
-  for (let i = 0; i < 8; i++) specs.push(spec({ id: `rock:${i}`, views: 6, cellPx: 64 }));
-  for (let i = 0; i < 2; i++) specs.push(spec({ id: `dress:${i}`, views: 8, cellPx: 64 }));
-  for (let i = 0; i < 14; i++) specs.push(spec({ id: `building:${i}`, views: 6, cellPx: 96 }));
-  return specs;
-}
+// The production inventory: shippedImpostorInventory() is every category at
+// its FULL row budget with its shipped views and cell sizes, the same
+// tables the live session registers against (registerArchetype throws past
+// a category budget, so a real world can never register more rows than
+// this set packs). Driving the capacity assertions from it means a cell,
+// view or budget change here is a change to the verified atlas.
+const shippedSet = shippedImpostorInventory;
 
 describe('impostor atlas packing', () => {
-  it('fits the shipped set inside the hardware floor and stays power of two', () => {
-    const placement = packImpostorAtlas(shippedSet(), IMPOSTOR_ATLAS_MAX);
-    expect(placement.size).toBeLessThanOrEqual(IMPOSTOR_ATLAS_MAX);
+  it('packs the full production inventory into EXACTLY the atlas budget', () => {
+    // 2048 is a memory number, not a convenience: the resident mip chain is
+    // about 21 MiB there and 85 MiB at 4096. If a kit change makes this
+    // throw or mint 4096, shrink cells or views (or raise the budget with
+    // measured peak-memory evidence), never delete the assertion.
+    const placement = packImpostorAtlas(shippedSet(), IMPOSTOR_ATLAS_BUDGET);
+    expect(placement.size).toBe(2048);
+    expect(IMPOSTOR_ATLAS_BUDGET).toBeLessThanOrEqual(IMPOSTOR_ATLAS_MAX);
     expect(Math.log2(placement.size) % 1).toBe(0);
+  });
+
+  it('carries the shipped category tables the session registers against', () => {
+    // The inventory must stay the WORST case of what registerArchetype
+    // admits: every category present, at its full budget, at the live
+    // views/cell tables.
+    const specs = shippedSet();
+    for (const category of ['tree', 'rock', 'dress', 'building'] as const) {
+      const rows = specs.filter((s) => s.id.startsWith(`${category}:`));
+      expect(rows).toHaveLength(IMPOSTOR_ROW_BUDGET[category]);
+      for (const row of rows) {
+        expect(row.views).toBe(IMPOSTOR_CATEGORY_VIEWS[category]);
+        expect(row.cellPx).toBe(IMPOSTOR_CELL_PX[category]);
+      }
+    }
+    // the real kit's exact foliage counts (fixed variant lists); buildings
+    // are a cap with headroom over the shipped pool + skyline decor
+    expect(IMPOSTOR_ROW_BUDGET.tree).toBe(15);
+    expect(IMPOSTOR_ROW_BUDGET.rock).toBe(8);
+    expect(IMPOSTOR_ROW_BUDGET.dress).toBe(2);
+    expect(IMPOSTOR_ROW_BUDGET.building).toBeGreaterThanOrEqual(14);
+  });
+
+  it('rigid categories take HARD ZERO wind; sway parity for the living ones', () => {
+    // The #2793 review defect: every non-rock non-tree category inherited
+    // the 0.096 bush amplitude, so village houses swayed like shrubs.
+    expect(IMPOSTOR_CATEGORY_WIND.building).toBe(0);
+    expect(IMPOSTOR_CATEGORY_WIND.rock).toBe(0);
+    // parity numbers with the real canopies (TREE_WIND_STRENGTH and the
+    // bush windMul in foliage.ts)
+    expect(IMPOSTOR_CATEGORY_WIND.tree).toBeCloseTo(0.08, 10);
+    expect(IMPOSTOR_CATEGORY_WIND.dress).toBeCloseTo(0.096, 10);
   });
 
   it('gives every archetype a full row of non-overlapping view cells in bounds', () => {

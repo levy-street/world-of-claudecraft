@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   CLASSIC_CAMERA_FAR,
+  createFarShortfallSampler,
   createFarTileBuilder,
   detailCullFar,
   FAR_MESH_DROP,
@@ -10,6 +11,7 @@ import {
   FAR_WORLD_MARGIN,
   type FarTile,
   FOGLESS_DETAIL_FAR,
+  farFieldPolicy,
   farGridIndices,
   farGridSide,
   farGroundColor,
@@ -308,6 +310,151 @@ describe('farGroundColor: the far recipe reads like the world it stands in for',
 
   it('stays deterministic: same input, same triple', () => {
     expect(color(123, 456)).toEqual(color(123, 456));
+  });
+});
+
+describe('farFieldPolicy: the ONE capability decision for sprites and the vista', () => {
+  const full = { standardMaterials: true, leanFoliage: false, constrainedMemory: false };
+
+  it('full-capability desktop tiers get sprites, and the vista follows the tier plan', () => {
+    for (const tier of ['medium', 'high', 'ultra', 'insane'] as const) {
+      const policy = farFieldPolicy(tier, full);
+      expect(policy.sprites).toBe(true);
+      expect(policy.vista).toEqual(farVistaPlan(tier, false));
+      expect(policy.vista.enabled).toBe(true);
+    }
+  });
+
+  it('low tier: lean pipeline, no sprites, no vista (the classic renderer)', () => {
+    // the low tier ships leanFoliage and no standard materials
+    const policy = farFieldPolicy('low', {
+      standardMaterials: false,
+      leanFoliage: true,
+      constrainedMemory: false,
+    });
+    expect(policy.sprites).toBe(false);
+    expect(policy.vista.enabled).toBe(false);
+    expect(policy.vista.cameraFar).toBe(CLASSIC_CAMERA_FAR);
+  });
+
+  it('weak-iGPU medium (leanFoliage on a standard-material tier): NEITHER arm', () => {
+    // The divergence this policy exists to kill: farVistaPlan(medium) alone
+    // would open the fog-free vista while the lean sprite arm bakes nothing,
+    // leaving a bare-ground horizon with no far foliage.
+    const policy = farFieldPolicy('medium', {
+      standardMaterials: true,
+      leanFoliage: true,
+      constrainedMemory: false,
+    });
+    expect(policy.sprites).toBe(false);
+    expect(policy.vista.enabled).toBe(false);
+  });
+
+  it('constrained-memory medium/high (phone-class ceilings): NEITHER arm, no atlas', () => {
+    // The other divergence: constrained profiles used to keep classic fog
+    // (vista off) while still BAKING the sprite atlas, putting the largest
+    // one-shot GPU allocation on the most memory-sensitive devices.
+    for (const tier of ['medium', 'high'] as const) {
+      const policy = farFieldPolicy(tier, {
+        standardMaterials: true,
+        leanFoliage: false,
+        constrainedMemory: true,
+      });
+      expect(policy.sprites).toBe(false);
+      expect(policy.vista.enabled).toBe(false);
+    }
+  });
+
+  it('native iOS memory profile: NEITHER arm (constrained and no standard materials)', () => {
+    // nativeIosMemoryProfile forces constrainedMemory true AND
+    // standardMaterials false in gfx.ts; either alone already disables both
+    // arms here.
+    const policy = farFieldPolicy('high', {
+      standardMaterials: false,
+      leanFoliage: false,
+      constrainedMemory: true,
+    });
+    expect(policy.sprites).toBe(false);
+    expect(policy.vista.enabled).toBe(false);
+  });
+
+  it('the vista NEVER enables without sprites, on any flag combination', () => {
+    for (const tier of ['low', 'medium', 'high', 'ultra', 'insane'] as const) {
+      for (const standardMaterials of [true, false]) {
+        for (const leanFoliage of [true, false]) {
+          for (const constrainedMemory of [true, false]) {
+            const policy = farFieldPolicy(tier, {
+              standardMaterials,
+              leanFoliage,
+              constrainedMemory,
+            });
+            if (policy.vista.enabled) expect(policy.sprites).toBe(true);
+          }
+        }
+      }
+    }
+  });
+});
+
+describe('createFarShortfallSampler: session-scoped, never a stale surface', () => {
+  // A ridge crest inside the world where the coarse grid meaningfully
+  // shaves height, so shortfalls are non-trivial.
+  const at = { x: 300, z: 100 };
+
+  it('matches a fresh farVertexHeight bilinear reconstruction', () => {
+    const spacing = 12;
+    const seed = 20061;
+    const sampler = createFarShortfallSampler(seed, spacing, -1000, -1000);
+    const baseY = terrainHeight(at.x, at.z, seed);
+    const x0 = -1000 + Math.floor((at.x + 1000) / spacing) * spacing;
+    const z0 = -1000 + Math.floor((at.z + 1000) / spacing) * spacing;
+    const tx = (at.x - x0) / spacing;
+    const tz = (at.z - z0) / spacing;
+    const h = (x: number, z: number) => farVertexHeight(x, z, spacing, seed);
+    const farY =
+      (h(x0, z0) * (1 - tx) + h(x0 + spacing, z0) * tx) * (1 - tz) +
+      (h(x0, z0 + spacing) * (1 - tx) + h(x0 + spacing, z0 + spacing) * tx) * tz;
+    const want = Math.max(0, baseY - (farY - FAR_MESH_DROP));
+    expect(sampler.shortfall(at.x, at.z, baseY)).toBeCloseTo(want, 10);
+    // and the cached second read is identical
+    expect(sampler.shortfall(at.x, at.z, baseY)).toBeCloseTo(want, 10);
+  });
+
+  it('two sequential samplers with different SEEDS never share a surface', () => {
+    // The regression class: a module-level corner cache keyed by x:z alone
+    // served the FIRST world's heights to the second (editor map swap),
+    // writing stale sprite sinks. Same query, different seed, different
+    // sampler: the heights must come from each sampler's own world.
+    const spacing = 12;
+    const a = createFarShortfallSampler(20061, spacing, -1000, -1000);
+    const b = createFarShortfallSampler(77777, spacing, -1000, -1000);
+    // prime a's cache first, then read b at the SAME corners
+    const baseA = terrainHeight(at.x, at.z, 20061);
+    const baseB = terrainHeight(at.x, at.z, 77777);
+    const sa = a.shortfall(at.x, at.z, baseA);
+    const sb = b.shortfall(at.x, at.z, baseB);
+    const freshB = createFarShortfallSampler(77777, spacing, -1000, -1000).shortfall(
+      at.x,
+      at.z,
+      baseB,
+    );
+    expect(sb).toBeCloseTo(freshB, 10);
+    // and the two worlds genuinely disagree here (guards test vacuity)
+    expect(Math.abs(sa - sb)).toBeGreaterThan(1e-6);
+  });
+
+  it('two sequential samplers with different SPACINGS never share a surface', () => {
+    // Same class, tier-change flavor: high (12) then ultra (10) in one JS
+    // context must re-sample the coarser/finer grid, not reuse corners.
+    const seed = 20061;
+    const baseY = terrainHeight(at.x, at.z, seed) + 5;
+    const a = createFarShortfallSampler(seed, 12, -1000, -1000);
+    const sa = a.shortfall(at.x, at.z, baseY);
+    const b = createFarShortfallSampler(seed, 10, -1000, -1000);
+    const sb = b.shortfall(at.x, at.z, baseY);
+    const freshB = createFarShortfallSampler(seed, 10, -1000, -1000).shortfall(at.x, at.z, baseY);
+    expect(sb).toBeCloseTo(freshB, 10);
+    expect(Math.abs(sa - sb)).toBeGreaterThan(1e-9);
   });
 });
 

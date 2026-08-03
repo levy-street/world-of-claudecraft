@@ -182,3 +182,92 @@ export const IMPOSTOR_JITTER_GLSL =
 
 /** GL_MAX_TEXTURE_SIZE floor is 4096 everywhere WebGL2 runs; stay inside it. */
 export const IMPOSTOR_ATLAS_MAX = 4096;
+
+// ---------------------------------------------------------------------------
+// The shipped inventory budget (what the atlas is allowed to hold)
+// ---------------------------------------------------------------------------
+
+export type ImpostorCategoryName = 'tree' | 'rock' | 'dress' | 'building';
+
+/** Yaw views per category: enough that the two-view blend never smears. */
+export const IMPOSTOR_CATEGORY_VIEWS: Record<ImpostorCategoryName, number> = {
+  tree: 12,
+  rock: 6,
+  dress: 8,
+  building: 6,
+};
+
+/**
+ * World-fixed sway amplitude per category: amplitude parity with the real
+ * canopies (TREE_WIND_STRENGTH 0.08, bush windMul 1.2) for the things that
+ * sway, HARD ZERO for the rigid kit. A building or boulder billboard
+ * riding the bush gust reads broken from any distance. Dead trees share
+ * the tree category and zero out per archetype instead (registerArchetype
+ * windMul).
+ */
+export const IMPOSTOR_CATEGORY_WIND: Record<ImpostorCategoryName, number> = {
+  tree: 0.08,
+  dress: 0.096,
+  rock: 0,
+  building: 0,
+};
+
+/**
+ * Cell edge per category, sized for the DISPLAY distance, not the model: a
+ * 14u tree at its ~300u swap subtends ~45 screen pixels at 1080p, and a
+ * village house past the 700u detail horizon under 20, so these cells stay
+ * oversampled at every distance a sprite can be seen while the whole
+ * inventory packs into IMPOSTOR_ATLAS_BUDGET.
+ */
+export const IMPOSTOR_CELL_PX: Record<ImpostorCategoryName, number> = {
+  tree: 96,
+  rock: 64,
+  dress: 64,
+  building: 80,
+};
+
+/**
+ * Row budget per category. Tree, rock and dress counts are exact (the
+ * foliage kit's variant lists are fixed); the building count is a cap with
+ * headroom over the shipped pool + skyline decor set. registerArchetype
+ * throws past its category's budget, so a grown kit fails the world build
+ * loudly (and the browser regression) instead of silently outgrowing the
+ * atlas the capacity test verified.
+ */
+export const IMPOSTOR_ROW_BUDGET: Record<ImpostorCategoryName, number> = {
+  tree: 15,
+  rock: 8,
+  dress: 2,
+  building: 16,
+};
+
+/**
+ * The atlas edge the WHOLE shipped inventory must fit: 2048 keeps the
+ * resident mip chain near 21 MiB where 4096 costs 85 MiB, on every desktop
+ * tier that bakes at all (constrained-memory profiles never bake, see
+ * farFieldPolicy). Pinned exactly in the core test via
+ * shippedImpostorInventory().
+ */
+export const IMPOSTOR_ATLAS_BUDGET = 2048;
+
+/**
+ * The worst-case inventory the budget must hold: every category at its full
+ * row budget. World dimensions do not affect packing (only views * cellPx
+ * does), so the specs carry nominal sizes.
+ */
+export function shippedImpostorInventory(): ImpostorArchetypeSpec[] {
+  const specs: ImpostorArchetypeSpec[] = [];
+  for (const category of ['tree', 'rock', 'dress', 'building'] as const) {
+    for (let i = 0; i < IMPOSTOR_ROW_BUDGET[category]; i++) {
+      specs.push({
+        id: `${category}:${i}`,
+        worldWidth: 10,
+        worldHeight: 10,
+        worldBaseY: 0,
+        views: IMPOSTOR_CATEGORY_VIEWS[category],
+        cellPx: IMPOSTOR_CELL_PX[category],
+      });
+    }
+  }
+  return specs;
+}
