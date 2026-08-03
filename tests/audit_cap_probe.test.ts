@@ -158,21 +158,64 @@ const buyDelta = (price: number, before = 24, after = 30): GuildBankOpDelta => (
 });
 
 describe('PROBE G: purchasedSlots ladder through revertGuildBankDeltas', () => {
-  it('G1: reverting the OPENING session before the expander leaves 24 unpaid slots', () => {
-    // Server-level setup this models (server/game.ts reconcileUnflushableGuildBooks):
-    // session A opened the bank (0 -> 24, purse-paid), session B bought rung 1
-    // (24 -> 30, treasury-paid), and a third session C holds an unflushed dirty
-    // mark for the same guild throughout, so BOTH fence-outs take the surgical
-    // REVERT arm rather than the evict-and-reload arm.
+  it("G1 (CHARACTERIZATION): the opener's grant survives when a later rung pinned the ladder", () => {
+    // Session A opened the bank (0 -> 24, purse-paid), session B bought rung 1
+    // (24 -> 30, treasury-paid), then A fences out first and B second.
+    //
+    // The undo is a COMPARE-AND-SWAP against the delta's own absolute witness,
+    // so A's undo is SKIPPED (the book stands at 30, not at the 24 A left it
+    // at) and B's then moves 30 -> 24 and refunds its 25_000. The bank keeps
+    // 24 slots nobody's durable purse paid for.
+    //
+    // Zero is not reachable by any local rule here, and pinning it would
+    // contradict what the safe behaviour has to be: A's undo CANNOT lower the
+    // ladder past a rung B paid for (that would destroy B's purchase and
+    // strand a non-ladder position), and once B's undo has run, A's is long
+    // gone. Closing it needs the escrow save to REFUSE rather than carry a
+    // shortfall (docs/guild-bank/escrow-fix-plan.md section 5, "Strong
+    // Direction B", deliberately deferred). Its exact cost is pinned as
+    // 90_000 of minted ladder value in P4-RESIDUE
+    // (tests/audit_conservation_property.test.ts), and this is the same
+    // residue seen from the ladder side.
     const sim = makeOfficerSim({ purchasedSlots: 0, treasury: 0 });
     book(sim).purchasedSlots = 30;
     book(sim).treasury = 0; // B's 25_000 left the treasury
-    // A fences out first: its open_bank delta is reverted while the book sits at 30.
+    // A fences out first: its open_bank undo finds the ladder moved on.
     sim.revertGuildBankDeltas(GUILD_ID, [openDelta]);
-    // B fences out next: its buy_slots delta is reverted (30 -> 24, +25_000).
+    expect(book(sim).purchasedSlots).toBe(30); // B's paid rung is NOT destroyed
+    expect(book(sim).treasury).toBe(0); // and rung 0 was purse-paid: no refund
+    // B fences out next: its buy_slots undo matches and moves 30 -> 24, +25_000.
     sim.revertGuildBankDeltas(GUILD_ID, [buyDelta(25_000)]);
-    // Safe outcome: nobody's purchase survived, so the bank is CLOSED again.
+    expect(book(sim).purchasedSlots).toBe(24);
+    expect(book(sim).treasury).toBe(25_000);
+    // Always a VALID ladder position, whatever the order.
+    expect([0, 24, 30, 36, 42, 48, 54, 60]).toContain(book(sim).purchasedSlots);
+  });
+
+  it('G1b: the buy_slots undo never refunds without also undoing the slots', () => {
+    // The audit finding this closes: the treasury refund used to be
+    // UNCONDITIONAL while the slot undo was gated, so a book sitting anywhere
+    // but where the op left it kept the slots AND got the rung price back.
+    // Compare-and-swap makes them one decision.
+    const sim = makeOfficerSim({ purchasedSlots: 24, treasury: 0 });
+    sim.revertGuildBankDeltas(GUILD_ID, [buyDelta(25_000)]); // witness says 30, book is 24
+    expect(book(sim).purchasedSlots).toBe(24); // slots kept...
+    expect(book(sim).treasury).toBe(0); // ...and the copper NOT re-created
+    // The matching case still undoes BOTH halves.
+    book(sim).purchasedSlots = 30;
+    sim.revertGuildBankDeltas(GUILD_ID, [buyDelta(25_000)]);
+    expect(book(sim).purchasedSlots).toBe(24);
+    expect(book(sim).treasury).toBe(25_000);
+  });
+
+  it('G1c: the open_bank undo never touches the treasury (rung 0 was PURSE-paid)', () => {
+    // Crediting the treasury for rung 0 would mint guild copper: the opener's
+    // own purse charge rolls back with its character half, and the treasury
+    // never held that copper at all.
+    const sim = makeOfficerSim({ purchasedSlots: 24, treasury: 7_000 });
+    sim.revertGuildBankDeltas(GUILD_ID, [openDelta]);
     expect(book(sim).purchasedSlots).toBe(0);
+    expect(book(sim).treasury).toBe(7_000);
   });
 
   it('G2: the other fence-out order is consistent (control)', () => {
