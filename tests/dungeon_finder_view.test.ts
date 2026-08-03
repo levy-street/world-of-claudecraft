@@ -424,11 +424,54 @@ describe('dungeon finder view core', () => {
     expect(view.board.listings[0].canApply).toBe(false);
   });
 
-  it('keeps a leader listing visible in Open listings when its OWN dungeon goes locked (#2030 followup)', () => {
+  it('keeps a locked-out leader listing in the myListing panel, not the browse list (#2820)', () => {
+    // Two rules meet here, and this pins how they compose. Issue 2031 hides the
+    // group I am already in from the browse list, my own listing included, and
+    // issue 2030 hides listings for a dungeon I am locked out of. So a leader who
+    // takes the lockout mid-run has no row in Open Listings, by BOTH rules. The
+    // #2030 concern (a leader losing sight of their own listing) is answered by
+    // the dedicated myListing panel, which no lockout filters: asserted here, so
+    // hiding the row can never quietly become hiding the listing entirely.
     const heroicListing = {
       id: 8,
       activityId: 'hollow_crypt_heroic',
       leaderName: 'Lead',
+      tags: [],
+      size: 1,
+      capacity: 5,
+      needed: { tank: 0, healer: 1, dps: 3 },
+      members: [{ cls: 'warrior' as const, level: 20, role: 'tank' as const }],
+    };
+    const myListing = {
+      id: 8,
+      activityId: 'hollow_crypt_heroic',
+      tags: [],
+      applicants: [],
+    };
+    const view = live(
+      buildDungeonFinderView(
+        input({
+          tab: 'board',
+          playerLevel: 20,
+          board: [heroicListing],
+          info: makeInfo('sim', { myListing }),
+          lockouts: [{ id: 'hollow_crypt:heroic', msRemaining: 3_600_000 }],
+        }),
+      ),
+    );
+    expect(view.board.listings).toEqual([]);
+    expect(view.board.myListing).toEqual(myListing);
+  });
+
+  it('still shows a locked-out listing I have APPLIED to, so it stays withdrawable (#2030)', () => {
+    // The one surviving exemption in the lockout filter. Distinct from the case
+    // above: not mine, so issue 2031 does not hide it, and applied, so the
+    // lockout does not either. Without this the row (and its withdraw control)
+    // would vanish the moment the lockout landed, stranding the application.
+    const heroicListing = {
+      id: 9,
+      activityId: 'hollow_crypt_heroic',
+      leaderName: 'Someone Else',
       tags: [],
       size: 1,
       capacity: 5,
@@ -441,15 +484,13 @@ describe('dungeon finder view core', () => {
           tab: 'board',
           playerLevel: 20,
           board: [heroicListing],
-          info: makeInfo('sim', {
-            myListing: { id: 8, activityId: 'hollow_crypt_heroic', tags: [], applicants: [] },
-          }),
+          info: makeInfo('sim', { myApplication: { listingId: 9 } }),
           lockouts: [{ id: 'hollow_crypt:heroic', msRemaining: 3_600_000 }],
         }),
       ),
     );
-    expect(view.board.listings.map((l) => l.id)).toEqual([8]);
-    expect(view.board.listings[0].mine).toBe(true);
+    expect(view.board.listings.map((l) => l.id)).toEqual([9]);
+    expect(view.board.listings[0].applied).toBe(true);
   });
 
   it('does not hide a listing over a lockout on a DIFFERENT dungeon or a lockout-free difficulty (#2030 followup)', () => {
