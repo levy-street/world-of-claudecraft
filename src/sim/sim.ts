@@ -264,8 +264,8 @@ import {
   mobEffectiveMeleeRange as mobEffectiveMeleeRangeImpl,
   tryMobMeleeSwingInRange as tryMobMeleeSwingInRangeImpl,
 } from './mob/combat_profile';
-import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './mob/healer_channel';
 import { updateDragonkinBrood } from './mob/dragonkin_brood';
+import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './mob/healer_channel';
 import * as lifecycle from './mob/lifecycle';
 import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
@@ -564,6 +564,7 @@ import {
   type AuraKind,
   angleTo,
   assertCanonicalEastbrookNoticeboardDef,
+  type CampDef,
   type CrowdControlDrCategory,
   type CrowdControlDrState,
   cloneInvSlot,
@@ -1989,13 +1990,21 @@ export class Sim {
           this.addEntity(mob);
           continue;
         }
+        // An offStream camp scatters off a PRIVATE sub-stream, so it draws no
+        // shared rng at all and adding it leaves every later world draw (and
+        // therefore every seeded gameplay roll) bit-identical. Same principle
+        // as the dummy/ambient branch above, but it still gets real scatter.
+        // Seeded from the world seed plus the camp's AUTHORED identity (never
+        // its array index, so reordering the list cannot move it), and never
+        // from wall-clock, so all three hosts agree.
+        const campRng = camp.offStream ? this.campPrivateRng(camp, i) : this.rng;
         // Spread the camp's mobs with even nearest-neighbor spacing (a sunflower
         // spiral) instead of independent uniform sampling, which let mobs stack.
         // The two draws below feed campSpawnOffset as jitter and are consumed in the
         // SAME order/count as the old angle/radius rolls, so the global rng stream
         // position is unchanged: only spawn positions move (see camp_scatter.ts).
-        const jitterAngle = this.rng.range(0, Math.PI * 2);
-        const jitterFrac = this.rng.next();
+        const jitterAngle = campRng.range(0, Math.PI * 2);
+        const jitterFrac = campRng.next();
         const off = campSpawnOffset(i, camp.count, camp.radius, jitterAngle, jitterFrac);
         // Keep camp mobs out of every dungeon door's clear ring so approaching or
         // zoning out of a dungeon never lands the player in a pack's aggro radius.
@@ -2010,11 +2019,16 @@ export class Sim {
         const grounded = this.findSafePos(cleared.x, cleared.z, minHeight);
         const safe = projectOutsideDungeonDoors(grounded.x, grounded.z);
         const pos = this.groundPos(safe.x, safe.z);
-        const level = this.rng.int(template.minLevel, template.maxLevel);
+        const level = campRng.int(template.minLevel, template.maxLevel);
         const mob = createMob(this.nextId++, template, level, pos);
-        mob.facing = this.rng.range(-Math.PI, Math.PI);
+        mob.facing = campRng.range(-Math.PI, Math.PI);
         mob.prevFacing = mob.facing;
-        mob.wanderTimer = this.rng.range(2, 10);
+        mob.wanderTimer = campRng.range(2, 10);
+        // Carry the off-stream contract onto the spawn: its passive idle draws
+        // must stay private too, or the herd drifts the shared stream anyway
+        // (see Entity.offStreamRng). A template flagged offStreamIdle gets the
+        // same treatment even in a shared-stream camp slot.
+        if (camp.offStream || template.offStreamIdle) mob.offStreamRng = true;
         this.addEntity(mob);
       }
     }
@@ -4090,6 +4104,28 @@ export class Sim {
 
   groundPos(x: number, z: number): Vec3 {
     return { x, y: groundHeight(x, z, this.cfg.seed), z };
+  }
+
+  /** The private scatter stream for an `offStream` camp (see CampDef.offStream).
+   *  Seeded from the world seed plus the camp's AUTHORED identity (mob id,
+   *  centre, radius, count) and the index WITHIN that camp, never the camp's
+   *  position in the CAMPS array, so reordering or inserting camps cannot move
+   *  an existing one. Pure and wall-clock-free, so offline, server and headless
+   *  all place these spawns identically. */
+  private campPrivateRng(camp: CampDef, index: number): Rng {
+    let h = 0x811c9dc5 ^ (this.cfg.seed >>> 0);
+    const mix = (n: number): void => {
+      h = (h ^ (n >>> 0)) >>> 0;
+      h = Math.imul(h, 0x01000193) >>> 0;
+    };
+    for (let i = 0; i < camp.mobId.length; i++) mix(camp.mobId.charCodeAt(i));
+    // Quantized so a float re-authored to the same place cannot drift the seed.
+    mix(Math.round(camp.center.x * 100));
+    mix(Math.round(camp.center.z * 100));
+    mix(Math.round(camp.radius * 100));
+    mix(camp.count);
+    mix(index);
+    return new Rng(h >>> 0);
   }
 
   // Deterministic outward spiral to the nearest spot that is on dry-enough

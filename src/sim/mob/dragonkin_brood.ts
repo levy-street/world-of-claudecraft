@@ -172,6 +172,10 @@ function hatchEgg(ctx: SimContext, egg: Entity, def: NonNullable<MobTemplate['br
   // hatched (the summoned-add rule; mob/locomotion.ts). The egg's own camp
   // respawn re-clutches the nest and with it the next generation.
   whelp.summonedAdd = true;
+  // Inherit the egg's off-stream contract: a hatchling left un-engaged idles
+  // like any other brood mob, and its wander must not drift the shared stream
+  // either (see Entity.offStreamRng).
+  if (egg.offStreamRng) whelp.offStreamRng = true;
   ctx.addEntity(whelp);
 
   // The broodlord's shout wards the hatchlings of the eggs IT cracked: the

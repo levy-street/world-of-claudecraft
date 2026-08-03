@@ -1223,6 +1223,14 @@ export interface MobTemplate {
   // combat and heals to full a few seconds after the last hit. Guarded in
   // enterCombat (sim.ts) and updateMob (mob/locomotion.ts).
   dummy?: boolean;
+  // Take PASSIVE idle draws off the shared world stream (Entity.offStreamRng).
+  // CampDef.offStream covers a wholly new camp; this covers a template that
+  // REPLACED shipped content in an existing camp slot, where the spawn draws
+  // must stay on the shared stream (so the replaced camp's own spawns do not
+  // move) but the new mob's idling must not drift it: a swap with a different
+  // moveSpeed arrives at its wander targets on a different cadence, which
+  // re-rolls the shared stream for every mob after it.
+  offStreamIdle?: boolean;
   // Idle-wander liveliness multiplier (default 1). Divides the wander PAUSE
   // rolled between hops, so a restless creature (the dragonkin whelp) putters
   // around its patch instead of standing statuesque. Applied AFTER the shared
@@ -2571,6 +2579,19 @@ export interface CampDef {
   center: { x: number; z: number };
   radius: number;
   count: number;
+  // Scatter this camp off a PRIVATE rng sub-stream instead of the shared
+  // world stream (the ambient-horse / training-dummy principle in the Sim camp
+  // loop, generalized so a camp can still scatter). The shared stream's
+  // POSITION is what every seeded gameplay roll downstream inherits, so a camp
+  // appended on it shifts every later draw in the world: harmless in play, but
+  // it silently re-rolls every test and golden pinned to a hunted seed. A camp
+  // that carries this draws zero shared rng, so adding or removing it leaves
+  // the rest of the world bit-identical. The sub-stream is seeded from the
+  // world seed plus the camp's own authored identity (see campPrivateRng in
+  // sim.ts), so its own spawns stay deterministic across all three hosts.
+  // Use it for NEW camps added to shipped content; a camp that already shipped
+  // on the shared stream must stay there, or its own spawns move.
+  offStream?: boolean;
 }
 
 // Ground interactables (sparkle objects)
@@ -3465,6 +3486,17 @@ export interface Entity extends ClientMirroredEntityFields {
   // unravels with its corpse instead of respawning at its eruption point,
   // which is wherever the fight dragged (see mob/locomotion.ts).
   summonedAdd: boolean;
+  // Server-local (never on the wire, same as summonedAdd above): this mob was
+  // spawned by an `offStream` camp (CampDef.offStream), so its PASSIVE idle
+  // draws come from a private sub-stream instead of the shared world stream.
+  // Spawning it off-stream is only half the guarantee: an idle mob keeps
+  // drawing shared rng forever as its wander timer re-rolls, so a herd of new
+  // ambient content would still drift every seeded roll in the world a minute
+  // later (measured: identical at 1s, diverged by 31s). Combat draws stay on
+  // the shared stream: those only happen because a player engaged, which is a
+  // real gameplay event rather than passive world churn. Same principle as the
+  // ambient stable horses (mob/ambient.ts), generalized to a fighting mob.
+  offStreamRng?: boolean;
   enraged: boolean; // enrage mechanic active
   // Heroic-instance mechanic scaling (instances/difficulty.ts applyDungeonMobTuning).
   // Mechanic numbers (aoePulse/bigCast/stomp damage; mendAlly/wardAllies/stoneskin

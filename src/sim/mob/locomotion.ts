@@ -42,6 +42,7 @@ import {
   riftRankForBaseLevel,
 } from '../rift/ranks';
 import { instancePlayerIds } from '../rift/runs';
+import { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
 import { clearThreat, hasEscapeStealth, stealthDetectionRadius } from '../threat';
 import {
@@ -109,6 +110,18 @@ const NYTHRAXIS_HEROIC_ADD_IDS = new Set([
   'nythraxis_heroic_priest_add',
   'nythraxis_heroic_rogue_add',
 ]);
+
+/** The rng an `offStreamRng` mob's PASSIVE idle draws come from: a private
+ *  sub-stream seeded from the sim clock and the mob's id, exactly as the
+ *  ambient stable horses do (mob/ambient.ts), so a new herd of idle content
+ *  never drifts the shared world stream. Every other mob keeps `ctx.rng`, so
+ *  no shipped mob's draw order moves. Deterministic and wall-clock free, so
+ *  offline, server and headless agree. */
+function idleRng(ctx: SimContext, mob: Entity): Rng {
+  if (!mob.offStreamRng) return ctx.rng;
+  const seed = (((ctx.tickCount * 0x9e3779b1) >>> 0) ^ ((mob.id * 0x85ebca6b) >>> 0)) >>> 0;
+  return new Rng(seed);
+}
 
 export function updateMob(ctx: SimContext, mob: Entity): void {
   if (mob.dead) {
@@ -398,10 +411,12 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
           mob.wanderTarget = null;
           // wanderHaste divides the pause AFTER the draw (identical rng
           // stream for every template; see the MobTemplate field comment).
-          mob.wanderTimer = ctx.rng.range(3, 10) / (MOBS[mob.templateId]?.wanderHaste ?? 1);
+          mob.wanderTimer =
+            idleRng(ctx, mob).range(3, 10) / (MOBS[mob.templateId]?.wanderHaste ?? 1);
         } else {
-          const ang = ctx.rng.range(0, Math.PI * 2);
-          const r = ctx.rng.range(MIN_WANDER_RADIUS, MAX_WANDER_RADIUS);
+          const wr = idleRng(ctx, mob);
+          const ang = wr.range(0, Math.PI * 2);
+          const r = wr.range(MIN_WANDER_RADIUS, MAX_WANDER_RADIUS);
           mob.wanderTarget = ctx.groundPos(
             mob.spawnPos.x + Math.sin(ang) * r,
             mob.spawnPos.z + Math.cos(ang) * r,
@@ -413,7 +428,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         const arrived = ctx.moveToward(mob, mob.wanderTarget, mob.moveSpeed * 0.35);
         if (arrived) {
           mob.wanderTarget = null;
-          mob.wanderTimer = ctx.rng.range(3, 10);
+          mob.wanderTimer = idleRng(ctx, mob).range(3, 10);
         }
       }
       break;
