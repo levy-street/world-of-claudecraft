@@ -424,7 +424,15 @@ describe('dungeon finder view core', () => {
     expect(view.board.listings[0].canApply).toBe(false);
   });
 
-  it('keeps a leader listing visible in Open listings when its OWN dungeon goes locked (#2030 followup)', () => {
+  it('a leader OWN listing leaves Open listings for the myListing panel, lockout or not (#2030 followup, superseded by #2031)', () => {
+    // Reconciles the #2030-followup contract with #2724 (issue 2031, "hide
+    // premade groups the player already belongs to"): the leader's own
+    // listing no longer renders as a board row AT ALL (it lives in the
+    // separate myListing panel), so the old law "a mid-run lockout must not
+    // drop my own row" is now vacuous for the board. What survives of
+    // #2030 here: the own-group hide must come from MEMBERSHIP, never from
+    // the lockout filter, so the myListing panel keeps rendering it and a
+    // lockout still cannot orphan the leader's controls.
     const heroicListing = {
       id: 8,
       activityId: 'hollow_crypt_heroic',
@@ -435,21 +443,20 @@ describe('dungeon finder view core', () => {
       needed: { tank: 0, healer: 1, dps: 3 },
       members: [{ cls: 'warrior' as const, level: 20, role: 'tank' as const }],
     };
+    const myListing = { id: 8, activityId: 'hollow_crypt_heroic', tags: [], applicants: [] };
     const view = live(
       buildDungeonFinderView(
         input({
           tab: 'board',
           playerLevel: 20,
           board: [heroicListing],
-          info: makeInfo('sim', {
-            myListing: { id: 8, activityId: 'hollow_crypt_heroic', tags: [], applicants: [] },
-          }),
+          info: makeInfo('sim', { myListing }),
           lockouts: [{ id: 'hollow_crypt:heroic', msRemaining: 3_600_000 }],
         }),
       ),
     );
-    expect(view.board.listings.map((l) => l.id)).toEqual([8]);
-    expect(view.board.listings[0].mine).toBe(true);
+    expect(view.board.listings.map((l) => l.id)).toEqual([]);
+    expect(view.board.myListing).toEqual(myListing);
   });
 
   it('does not hide a listing over a lockout on a DIFFERENT dungeon or a lockout-free difficulty (#2030 followup)', () => {
