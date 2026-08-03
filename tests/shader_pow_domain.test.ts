@@ -1,16 +1,10 @@
-import {
-  mkdirSync,
-  mkdtempSync,
-  readdirSync,
-  readFileSync,
-  rmSync,
-  statSync,
-  writeFileSync,
-} from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, relative } from 'node:path';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, describe, expect, it } from 'vitest';
+import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
+import { sourceFilesUnder } from './helpers/source_files_under';
 
 // GLSL pow(x, y) is UNDEFINED for x < 0, and every shipping compiler lowers it
 // to exp2(y * log2(x)), so a negative base returns NaN rather than a clamped
@@ -21,20 +15,30 @@ import { afterAll, describe, expect, it } from 'vitest';
 // before ACES, and GLSL max(x, y) returns x when y is NaN, so the whole
 // rectangle collapses to black rather than to garbage.
 //
-// The bases that bite are the fresnel-style ones: `1.0 - dot(n, v)` where both
-// vectors were normalized IN SHADER. A normalized dot product overshoots 1.0 by
-// an ulp on the silhouette, the base goes to -1e-7, and the frame gets a black
-// box. That shipped as the weapon-skin black square (the Hoarfrost shell, whose
-// uPow is 2.6). This gate keeps every pow() base in the tree provably >= 0.
+// The bases that bite are the fresnel-style ones: `1.0 - abs(dot(n, v))` where
+// both vectors were normalized IN SHADER. That base is near 1 along the
+// silhouette (abs(dot) near 0) and near 0 where the two vectors are ALIGNED or
+// ANTI-ALIGNED, i.e. where the surface faces the camera head-on. It is the
+// near-zero end that bites: a normalized dot product overshoots 1.0 by an ulp,
+// so the base lands at about -1e-7 and the frame gets a black box. That shipped
+// as the weapon-skin black square (the Hoarfrost shell, whose uPow is 2.6).
+// This gate keeps every pow() base in the tree provably >= 0.
 //
 // Recognized-safe base forms, no allowlist entry needed:
 //   abs(x) / saturate(x) / clamp(x, 0.0, hi) / max(x, 0.0)   the whole base IS
 //                                                            the clamping call
-//   any of the above scaled by a positive literal
+//   any of the above scaled by a positive FINITE literal, multiplied or divided
 //   1.0 - saturate(x) and 1.0 - clamp(x, lo, 1.0)            x is bounded to 1
 // Deliberately NOT recognized: `1.0 - max(x, 0.0)`, which clamps the LOW side
 // only and leaves the high side open. That is exactly how the water fresnel used
 // to spell this bug.
+//
+// Every bound the classifier leans on has to be a FINITE literal it can order,
+// because two of the ways to write a "clamped" expression are not clamps at
+// all: `clamp(x, 0.0, -1.0)` has its bounds reversed, which GLSL leaves
+// undefined rather than defining as either bound, and `max(x, 0.0) / 0.0` wraps
+// a genuinely non-negative term in a division whose result is undefined and, on
+// the shipping lowering, NaN or Inf. Both used to classify safe here.
 //
 // The classifier is whole-expression, never prefix-matched: `abs(x) - 1.0` and
 // `1.0 - saturate(x) * 2.0` both START with a safe-looking token and are both
@@ -79,15 +83,21 @@ const PROVEN_SAFE_BASES: ProvenSafeBase[] = [
     file: 'src/render/weapon_vfx.ts',
     base: 'w',
     sites: 1,
-    anchor: /float w = 0\.5 \+ 0\.5 \* sin\(/,
-    why: 'GLSL sin() is bounded to [-1, 1], so w = 0.5 + 0.5 * sin(...) is >= 0',
+    // The anchor pins the WHOLE guarded expression, clamp included. The
+    // mathematical range of sin() is not the proof it looks like: GLSL leaves
+    // the precision of the trigonometric functions to the implementation, so
+    // 0.5 + 0.5 * sin(x) is only provably >= 0 in exact arithmetic. The clamp is
+    // what makes the claim hold on a real compiler, so the row stands or falls
+    // with it rather than with the sin().
+    anchor: /float w = clamp\(0\.5 \+ 0\.5 \* sin\([^;]*, 0\.0, 1\.0\);/,
+    why: 'w is the result of a clamp(..., 0.0, 1.0), read one line above the pow()',
   },
   {
     file: 'scripts/asset_pipeline/weapon_vfx.js',
     base: 'w',
     sites: 1,
-    anchor: /float w = 0\.5 \+ 0\.5 \* sin\(/,
-    why: 'the offline inspector copy of the same twinkles shader',
+    anchor: /float w = clamp\(0\.5 \+ 0\.5 \* sin\([^;]*, 0\.0, 1\.0\);/,
+    why: 'the offline inspector copy of the same clamped twinkles shader',
   },
   {
     file: 'src/render/water.ts',
@@ -132,29 +142,6 @@ const POW_SITES_PER_FILE: Record<string, number> = {
 // Generated locale bundles are megabytes of prose with no shader in them; a
 // stray "pow(" in lore text would be classified as GLSL.
 const SKIPPED_DIRS = new Set(['node_modules', 'dist', 'i18n.locales', 'i18n.resolved.generated']);
-
-// Hand-rolled rather than helpers/ts_files_under.ts, which is .ts-only by
-// explicit ruling and whose header directs a caller wanting another extension to
-// write its own walk. This corpus must include .js and .mjs, because the offline
-// asset-pipeline mirror of the weapon shader is JS and carries the same shader
-// text. (expectScansOnlyThroughSharedWalkers is therefore inapplicable: it bans
-// every directory read outright.) The recursion is pinned below by a mkdtemp
-// fixture driving this same producer, per tests/CLAUDE.md. The two behaviors
-// that walker learned the hard way are kept: sort, because readdir returns hash
-// order on the ext4 CI runner and byte order on a dev checkout, and resolve
-// symlinks through statSync rather than trusting a Dirent's lstat, so a
-// symlinked module or subtree cannot silently leave the scan.
-function walk(dir: string): string[] {
-  const out: string[] = [];
-  for (const name of readdirSync(dir).sort()) {
-    if (SKIPPED_DIRS.has(name)) continue;
-    const full = join(dir, name);
-    const stat = statSync(full, { throwIfNoEntry: false });
-    if (stat?.isDirectory()) out.push(...walk(full));
-    else if (/\.(?:ts|js|mjs)$/.test(name) && !name.endsWith('.d.ts')) out.push(full);
-  }
-  return out;
-}
 
 /** Strip block and line comments so commented-out or explanatory pow() text is
  *  ignored. The line arm keeps a `://` in a URL from eating the rest of its
@@ -216,15 +203,37 @@ function wholeCallArguments(expr: string, name: string): string[] | null {
   return null;
 }
 
-const ZERO = /^(?:vec[234]\s*\(\s*)?0(?:\.0*)?\s*\)?$/;
-const ONE = /^(?:vec[234]\s*\(\s*)?1(?:\.0*)?\s*\)?$/;
+const NUMBER = /^[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?$/;
+
+/** The finite scalar an expression denotes, or null when it is not one. Accepts
+ *  a `vecN(x)` splat, which GLSL bounds are routinely written as. Anything else,
+ *  a uniform or a computed term included, is null: a bound this cannot read is a
+ *  bound this cannot ORDER, and an unordered clamp is the undefined case below. */
+function literalValue(expr: string): number | null {
+  const splat = /^vec[234]\s*\(([^()]*)\)$/.exec(expr.trim());
+  const scalar = (splat ? splat[1] : expr).trim();
+  if (!NUMBER.test(scalar)) return null;
+  const value = Number(scalar);
+  return Number.isFinite(value) ? value : null;
+}
+
+/** Arguments of a whole-expression `clamp(x, lo, hi)` whose bounds are finite
+ *  literals in the RIGHT ORDER, else null. GLSL leaves clamp(x, lo, hi) with
+ *  lo > hi undefined, so a reversed pair proves nothing about either end. */
+function orderedClampBounds(expr: string): { lo: number; hi: number } | null {
+  const clamp = wholeCallArguments(expr, 'clamp');
+  if (clamp === null || clamp.length !== 3) return null;
+  const lo = literalValue(clamp[1]);
+  const hi = literalValue(clamp[2]);
+  if (lo === null || hi === null || lo > hi) return null;
+  return { lo, hi };
+}
 
 /** True when the expression cannot exceed 1.0, so `1.0 - it` stays >= 0. */
 function boundedAboveByOne(expr: string): boolean {
   const e = expr.trim();
   if (wholeCallArguments(e, 'saturate') !== null) return true;
-  const clamp = wholeCallArguments(e, 'clamp');
-  return clamp !== null && clamp.length === 3 && ONE.test(clamp[2]);
+  return orderedClampBounds(e)?.hi === 1;
 }
 
 /** True when the expression cannot go below 0.0, so pow() is well defined. */
@@ -237,23 +246,32 @@ function boundedBelowByZero(expr: string): boolean {
   const additive = topLevelOperators(e, '+-');
   if (additive.length > 0) {
     if (additive.length !== 1 || e[additive[0]] !== '-') return false;
-    if (!ONE.test(e.slice(0, additive[0]).trim())) return false;
+    if (literalValue(e.slice(0, additive[0])) !== 1) return false;
     const right = e.slice(additive[0] + 1).trim();
     if (topLevelOperators(right, '*/').length > 0) return false;
     return boundedAboveByOne(right);
   }
 
-  // No additive term: a trailing scale by a POSITIVE literal cannot change the
-  // sign, so drop it and require what remains to BE a clamping call. Any other
-  // top-level product (`abs(a) * sign`, `max(a, 0.0) * -1.0`) stays unproven.
-  const scaled = e.replace(/\s*[*/]\s*[0-9]+(?:\.[0-9]*)?\s*$/, '');
+  // No additive term: a trailing scale by a POSITIVE FINITE literal cannot
+  // change the sign, so drop it and require what remains to BE a clamping call.
+  // Multiplication and division are split rather than sharing one arm: `* 0.0`
+  // is a degenerate but non-negative zero while `/ 0.0` is undefined and NaN or
+  // Inf on the shipping lowering, so the divisor has to be strictly positive and
+  // the two cannot be proven by the same rule. Any other top-level product
+  // (`abs(a) * sign`, `max(a, 0.0) * -1.0`, `max(a, 0.0) / scale`) is unproven.
+  const trailing = /\s*([*/])\s*([^\s*/]+)\s*$/.exec(e);
+  let scaled = e;
+  if (trailing !== null && topLevelOperators(e, '*/').length === 1) {
+    const factor = literalValue(trailing[2]);
+    if (factor === null || factor <= 0) return false;
+    scaled = e.slice(0, trailing.index).trim();
+  }
   if (topLevelOperators(scaled, '*/').length > 0) return false;
   if (wholeCallArguments(scaled, 'abs') !== null) return true;
   if (wholeCallArguments(scaled, 'saturate') !== null) return true;
-  const clamp = wholeCallArguments(scaled, 'clamp');
-  if (clamp !== null) return clamp.length === 3 && ZERO.test(clamp[1]);
+  if (wholeCallArguments(scaled, 'clamp') !== null) return orderedClampBounds(scaled)?.lo === 0;
   const max = wholeCallArguments(scaled, 'max');
-  return (max ?? []).some((arg) => ZERO.test(arg));
+  return (max ?? []).some((arg) => literalValue(arg) === 0);
 }
 
 interface PowSite {
@@ -280,12 +298,20 @@ function firstArgument(source: string, open: number): string | null {
 // a site. Sticky so the scan can resume after each match.
 const POW_CALL = /(^|[^.A-Za-z0-9_])pow\s*\(/g;
 
+// The corpus is read through helpers/source_files_under.ts, not a walk of this
+// guard's own: this scan needs the .js and .mjs half of the tree (the offline
+// asset-pipeline inspector ships its own JS copy of the weapon shaders) and any
+// standalone shader file, and the extension policy behind that belongs in one
+// shared place rather than restated per guard. The recursion is still pinned
+// below by a mkdtemp fixture driving THIS producer, per tests/CLAUDE.md, since
+// the fixture is what proves the guard consumes the walk correctly, and the
+// self-audit pins that no second, hand-rolled read was added beside it.
 function powSites(roots: string[], base: string): PowSite[] {
   const sites: PowSite[] = [];
   for (const root of roots) {
-    for (const full of walk(join(base, root))) {
-      const file = relative(base, full).split('\\').join('/');
-      const raw = readFileSync(full, 'utf8');
+    for (const entry of sourceFilesUnder(join(base, root), { skipDirectories: SKIPPED_DIRS })) {
+      const file = `${root}/${entry.file}`;
+      const raw = readFileSync(entry.full, 'utf8');
       if (!raw.includes('pow')) continue;
       const source = withoutComments(raw);
       POW_CALL.lastIndex = 0;
@@ -392,6 +418,23 @@ describe('GLSL pow() bases stay non-negative', () => {
     expect(boundedBelowByZero('max(a, 0.0) / scale')).toBe(false);
   });
 
+  it('rejects a wrapper that LOOKS like a clamp and is not one', () => {
+    // The two shapes that used to classify safe here. Neither is a clamped
+    // term: `/ 0.0` is undefined in GLSL and NaN or Inf on the shipping
+    // lowering, and a clamp whose bounds are reversed is undefined outright, so
+    // nothing about either end of it is proven.
+    expect(boundedBelowByZero('max(x, 0.0) / 0.0')).toBe(false);
+    expect(boundedBelowByZero('clamp(x, 0.0, -1.0)')).toBe(false);
+    expect(boundedBelowByZero('1.0 - clamp(x, 2.0, 1.0)')).toBe(false);
+    // And the same rule applied per dimension: a negative divisor flips the
+    // sign, a non-literal one cannot be ordered at all, and a bound that is not
+    // a literal is a bound this classifier must not pretend to have read.
+    expect(boundedBelowByZero('max(x, 0.0) / -2.0')).toBe(false);
+    expect(boundedBelowByZero('max(x, 0.0) / uScale')).toBe(false);
+    expect(boundedBelowByZero('clamp(x, 0.0, uHi)')).toBe(false);
+    expect(boundedBelowByZero('1.0 - clamp(x, uLo, 1.0)')).toBe(false);
+  });
+
   it('accepts the guarded spellings the fix introduced', () => {
     expect(boundedBelowByZero('max(0.0, 1.0 - abs(dot(normalize(vN), normalize(vV))))')).toBe(true);
     expect(boundedBelowByZero('max(0.0, sin(3.14159 * vUv.x))')).toBe(true);
@@ -410,11 +453,23 @@ describe('GLSL pow() bases stay non-negative', () => {
     expect(withoutComments('/* pow(commented, 2.0) */ real')).toBe(' real');
   });
 
+  it('reads the tree only through the shared walker', () => {
+    // The other half of the tests/CLAUDE.md contract: the fixture below pins
+    // that this producer consumes the walk correctly, and this pins that no
+    // second, hand-rolled directory read was added beside it. Over a corpus
+    // pinned as a file set, a stray flat read is invisible until the day
+    // something moves down a level.
+    expectScansOnlyThroughSharedWalkers(import.meta.url, ['source_files_under']);
+  });
+
   describe('the producer itself', () => {
-    // tests/CLAUDE.md: a guard with its own walk pins the recursion with a
-    // mkdtemp fixture driving that walk, because every real scan root here is
-    // already deep enough to pass either way, so no assertion over the real tree
-    // can tell a recursive walk from a flat one.
+    // tests/CLAUDE.md: a guard that scans a directory pins the recursion with a
+    // mkdtemp fixture driving its OWN producer, because every real scan root
+    // here is already deep enough to pass either way, so no assertion over the
+    // real tree can tell a recursive walk from a flat one. The walk itself is
+    // helpers/source_files_under.ts and has its own paired test; what this
+    // fixture pins is that THIS producer drives it over the whole corpus, at
+    // every depth and every extension, and classifies what comes back.
     const fixture = mkdtempSync(join(tmpdir(), 'shader-pow-'));
     afterAll(() => rmSync(fixture, { recursive: true, force: true }));
 
@@ -425,6 +480,10 @@ describe('GLSL pow() bases stay non-negative', () => {
     writeFileSync(join(fixture, 'root', 'nested', 'deeper', 'low.mjs'), 'z = pow (c, 2.0);\n');
     writeFileSync(join(fixture, 'root', 'nested', 'skip.txt'), 'w = pow(d, 2.0);\n');
     writeFileSync(join(fixture, 'root', 'node_modules', 'dep.ts'), 'v = pow(e, 2.0);\n');
+    // A standalone shader file. None exists in the tree today, which is exactly
+    // why it is pinned here: the first one added must land INSIDE this scan
+    // rather than beside it.
+    writeFileSync(join(fixture, 'root', 'nested', 'shader.frag'), 'float q = pow(j, 2.0);\n');
     writeFileSync(
       join(fixture, 'root', 'nested', 'tricky.ts'),
       'const url = "https://x.dev/y"; u = pow(f, 2.0);\n' +
@@ -436,13 +495,14 @@ describe('GLSL pow() bases stay non-negative', () => {
     const found = powSites(['root'], fixture);
 
     it('recurses, so a file one level down cannot leave the scan', () => {
-      expect(found.map((site) => site.base).sort()).toEqual(['a', 'b', 'c', 'f']);
+      expect(found.map((site) => site.base).sort()).toEqual(['a', 'b', 'c', 'f', 'j']);
     });
 
-    it('keeps the .js and .mjs half of the corpus the shared .ts walker drops', () => {
+    it('keeps the .js, .mjs and shader half of the corpus a .ts-only walk drops', () => {
       expect(found.map((site) => site.file).sort()).toEqual([
         'root/nested/deeper/low.mjs',
         'root/nested/mid.js',
+        'root/nested/shader.frag',
         'root/nested/tricky.ts',
         'root/top.ts',
       ]);

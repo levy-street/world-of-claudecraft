@@ -2487,7 +2487,11 @@ function makeTwinkles(root: THREE.Object3D, b: THREE.Box3, c: WeaponVfxTwinkles)
       uniform float uTime; uniform float uScale;
       varying float vI;
       void main() {
-        float w = 0.5 + 0.5 * sin(uTime * aRate * 6.2831 + aSeed * 6.2831);
+        // clamp() is load-bearing: GLSL leaves the precision of sin() to the
+        // implementation, so 0.5 + 0.5 * sin(x) is only non-negative in exact
+        // arithmetic. pow() of a negative base is NaN, and one NaN here is a
+        // hard-edged black rectangle once the bloom blurs it.
+        float w = clamp(0.5 + 0.5 * sin(uTime * aRate * 6.2831 + aSeed * 6.2831), 0.0, 1.0);
         vI = pow(w, 9.0);
         vec4 mv = modelViewMatrix * vec4(position, 1.0);
         gl_PointSize = aSize * uScale * (0.55 + 0.45 * vI) / max(0.15, -mv.z);
@@ -2648,9 +2652,12 @@ function makeShell(root: THREE.Object3D, shellSpec: WeaponVfxShellSpec): VfxPart
       uniform vec3 uColor; uniform float uStr; uniform float uPow; uniform float uTime;
       varying vec3 vN; varying vec3 vV;
       void main() {
-        // max() is load-bearing: normalized dot products overshoot 1.0 by an ulp
-        // on the silhouette, and pow() of a negative base is NaN. One NaN pixel
-        // here becomes a hard-edged black rectangle after the bloom blur.
+        // max() is load-bearing: abs(dot(...)) of two vectors normalized in
+        // shader overshoots 1.0 by an ulp where they are aligned or
+        // anti-aligned, i.e. where the surface faces the camera head-on, so the
+        // base goes an ulp NEGATIVE there and pow() of a negative base is NaN.
+        // One NaN pixel here becomes a hard-edged black rectangle after the
+        // bloom blur.
         float f = pow(max(0.0, 1.0 - abs(dot(normalize(vN), normalize(vV)))), uPow);
         float a = f * uStr * (0.85 + 0.15 * sin(uTime * 1.7));
         gl_FragColor = vec4(uColor * a, a);
