@@ -9,10 +9,11 @@
 // nothing. Every treatment composes with the count badge, the markup is static
 // (no hover, no graphics-tier gate), and the stylesheet contract is pinned
 // separately below.
-import { emptyToolbelt } from '../src/sim/toolbelt';
+
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { emptyToolbelt } from '../src/sim/toolbelt';
 import type { InvSlot } from '../src/sim/types';
 import { bagInstanceGlyphKind } from '../src/ui/bag_instance_glyph_view';
 import { BagsWindow, type BagsWindowDeps } from '../src/ui/bags_window';

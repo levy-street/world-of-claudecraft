@@ -6118,11 +6118,11 @@
   }
   /* An empty tool slot is CLICKABLE when the player carries a matching tool
      (one-click stow), unlike an empty bag socket, which is inert. */
-  .toolbelt-bar .bag-socket.empty:not([aria-disabled='true']) {
+  .toolbelt-bar .bag-socket.empty:not([aria-disabled="true"]) {
     cursor: var(--cursor-point);
     border-color: #4a3d26;
   }
-  .toolbelt-bar .bag-socket.empty:not([aria-disabled='true']):hover {
+  .toolbelt-bar .bag-socket.empty:not([aria-disabled="true"]):hover {
     filter: brightness(1.25);
   }
   .toolbelt-none {

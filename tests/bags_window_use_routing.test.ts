@@ -5,8 +5,9 @@
 // textually: a click on a usable item tries the gathering-tool hook first, a
 // consumed use never reaches world.useItem, and a declined use (a non-tool,
 // or the hook unwired on this host) falls back to exactly one plain useItem.
-import { emptyToolbelt } from '../src/sim/toolbelt';
+
 import { describe, expect, it } from 'vitest';
+import { emptyToolbelt } from '../src/sim/toolbelt';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 import { BagsWindow, type BagsWindowDeps } from '../src/ui/bags_window';
 import { ItemDragState } from '../src/ui/item_drag_state';

@@ -10,8 +10,8 @@
 // yank the bag-search caret mid-word, strand a hovered tooltip and drop an armed
 // touch drag. Hence a narrow .money rewrite, and hence these assertions.
 
-import { emptyToolbelt } from '../src/sim/toolbelt';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { emptyToolbelt } from '../src/sim/toolbelt';
 import type { InvSlot } from '../src/sim/types';
 import { bagsWindowShown } from '../src/ui/bags_view';
 import { BagsWindow, type BagsWindowDeps } from '../src/ui/bags_window';
