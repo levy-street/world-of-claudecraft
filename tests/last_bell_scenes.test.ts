@@ -669,17 +669,23 @@ describe('the voyage cinematic', () => {
         at: 19.05,
         shot: {
           kind: 'dolly',
+          // Hale's memorial moved to the berm crest north of the redoubt, so
+          // this beat climbs the berm's south face and looks UP at the bronze
+          // against the sky. `height` is yards above terrain, and the terrain
+          // rises from 5.9 at z=127 to 9.4 at the crest, so these read lower
+          // than the old market-level numbers did.
           points: [
-            { x: 806, z: 112, height: 8 },
-            { x: 808, z: 113, height: 7.4 },
+            { x: 802, z: 127, height: 3.5 },
+            { x: 804, z: 132, height: 2.8 },
           ],
           lookAt: {
             kind: 'point',
-            point: { x: 818, z: 120, height: 2 },
+            // 3.4 up holds the figure, not the plinth
+            point: { x: 805, z: 139, height: 3.4 },
           },
           dur: 4.8,
           entry: 'snap',
-          subjectRef: 'statueBlock',
+          subjectRef: 'wardenHaleStatue',
         },
       },
       {

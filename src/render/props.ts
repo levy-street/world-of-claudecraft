@@ -130,6 +130,11 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   columnBroken: { url: '/models/props/column_broken.glb', kit: 'nature' },
   statueHead: { url: '/models/props/statue_head.glb', kit: 'nature' },
   statueBlock: { url: '/models/props/statue_block.glb', kit: 'nature' },
+  // Warden Hale's memorial above Gullhaven: a bronze warden striding with the
+  // sealing stone raised, on a plinth whose face carries one engraved name per
+  // warden who carried a seal inside, and blank room beneath them. Replaces the
+  // two reused nature-kit blocks that stood in for it. Front faces +Z.
+  wardenHaleStatue: { url: '/models/props/wardenHaleStatue.glb', kit: 'qprops' },
   marshReeds: { url: '/models/props/reeds.glb', kit: 'nature' },
   dockPlatform: { url: '/models/props/dock_platform.glb', kit: 'pirate' },
   rowboat: { url: '/models/props/rowboat.glb', kit: 'pirate' },

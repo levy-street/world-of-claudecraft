@@ -224,23 +224,30 @@ describe('Last Bell campaign fixtures', () => {
     expect(FARSHORE_PROPS.docks.some((d) => d.x === 778 && d.z === -36)).toBe(true);
   });
 
-  it('places the old warden statue at the Q0 look-at point with its plinth', () => {
+  // Warden Hale's memorial: one authored asset on the berm crest north of the
+  // redoubt, replacing the two reused nature-kit blocks that used to stand in
+  // for it down in the market. The pin still ties the same three things
+  // together (the placement, the Q0 look-at, and the camera-ghost collider),
+  // because that is what keeps the shot aimed at the prop it names.
+  it('places Warden Hale memorial at the Q0 look-at point with its plinth', () => {
     const statue = {
-      key: 'statueBlock',
-      x: 818,
-      z: 120,
-      rot: Math.PI / 2,
-      scale: 5,
-      r: 1,
-      h: 4.4,
-      parts: [{ key: 'statueHead', y: 1.95, scale: 2.5 }],
+      key: 'wardenHaleStatue',
+      x: 805,
+      z: 139,
+      rot: Math.PI,
+      scale: 1,
+      r: 1.26,
+      h: 4.8,
     };
     expect(FARSHORE_PROPS.decorProps).toContainEqual(statue);
     expect(PROPS.decorProps).toContainEqual(statue);
 
-    for (const key of [statue.key, ...statue.parts.map((part) => part.key)]) {
-      expect(PROP_ASSET_DEFS[key], `${key} must resolve through the prop registry`).toBeDefined();
-    }
+    expect(
+      PROP_ASSET_DEFS[statue.key],
+      `${statue.key} must resolve through the prop registry`,
+    ).toBeDefined();
+    // One authored mesh, so the retired stand-in parts are gone from it.
+    expect('parts' in statue).toBe(false);
 
     const seed = 4242;
     const groundY = groundHeight(statue.x, statue.z, seed);
@@ -259,17 +266,14 @@ describe('Last Bell campaign fixtures', () => {
         added.push({ parent, key, options });
       },
     );
-    expect(group.position.toArray()).toEqual([818, renderBaseY, 120]);
-    expect(group.rotation.y).toBeCloseTo(Math.PI / 2);
+    expect(group.position.toArray()).toEqual([statue.x, renderBaseY, statue.z]);
+    expect(group.rotation.y).toBeCloseTo(Math.PI);
     expect(added.every(({ parent }) => parent === group)).toBe(true);
     expect(
       added.map(({ key, options }) => ({ key, y: options.y ?? 0, scale: options.scale })),
-    ).toEqual([
-      { key: 'statueBlock', y: 0, scale: 5 },
-      { key: 'statueHead', y: 1.95, scale: 2.5 },
-    ]);
+    ).toEqual([{ key: 'wardenHaleStatue', y: 0, scale: 1 }]);
     expect(propPlacementInternalsForTest.decorPropCameraTopY(statue, renderBaseY)).toBeCloseTo(
-      groundY + 4.4,
+      groundY + statue.h,
     );
 
     const scene = sceneById('scn_lb_q0_voyage');
@@ -296,15 +300,21 @@ describe('Last Bell campaign fixtures', () => {
 
     const statueCollider = colliderInternalsForTest
       .staticWorldColliders(seed)
-      .find((collider) => collider.type === 'circle' && collider.x === 818 && collider.z === 120);
+      .find(
+        (collider) =>
+          collider.type === 'circle' && collider.x === statue.x && collider.z === statue.z,
+      );
     expect(statueCollider).toMatchObject({
       type: 'circle',
-      x: 818,
-      z: 120,
-      r: 1,
+      x: statue.x,
+      z: statue.z,
+      // the measured circumscribed footprint, so collision matches the silhouette
+      r: 1.26,
       camGhost: true,
     });
-    expect(statueCollider?.cameraTopY).toBeCloseTo(groundHeight(818, 120, seed) + 4.4);
+    expect(statueCollider?.cameraTopY).toBeCloseTo(
+      groundHeight(statue.x, statue.z, seed) + statue.h,
+    );
 
     expect(LAST_BELL_CAMPAIGN_QUESTS.q_lb_q0_ashore.text).toContain(
       'east past the harbor steps and the old statue',
