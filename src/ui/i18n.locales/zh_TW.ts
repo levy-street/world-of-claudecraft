@@ -8671,7 +8671,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.mount': '騎乘 / 下騎',
   // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.
   'hudChrome.keybinds.mouseHint':
-    '滑鼠按鍵同樣可用：綁定時按下中鍵 (M3) 或拇指鍵 (M4、M5)。左鍵與右鍵保留給鏡頭使用。',
+    '滑鼠按鍵同樣可用：綁定時按下中鍵 (M3) 或拇指鍵 (M4、M5)。左鍵與右鍵保留給鏡頭、點擊移動與點擊世界中的目標使用。',
   // On-bar action-bar key-binding mode (issue #1238). M16 wordy fills.
   'hudChrome.actionBar.editKeys': '編輯動作列按鍵',
   'hudChrome.actionBar.editKeysHint': '點擊動作列上的一個欄位，然後按下按鍵進行綁定。',

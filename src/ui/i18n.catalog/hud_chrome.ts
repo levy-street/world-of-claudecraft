@@ -740,7 +740,7 @@ export const hudChromeStrings = {
     // identical across locales. Wordy (M16): the five non-Latin fills land in
     // this same change.
     mouseHint:
-      'Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera.',
+      'Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world.',
   },
   // On-bar action-bar key-binding mode (issue #1238): the Key Bindings menu's
   // single "Edit action bar keys" entry (replacing the wall of per-slot rebind

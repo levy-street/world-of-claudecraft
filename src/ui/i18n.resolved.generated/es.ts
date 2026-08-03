@@ -958,7 +958,7 @@ export const es: EnTranslations = {
       "petDefensive": "Mascota: defensiva",
       "petAggressive": "Mascota: agresiva",
       "mount": "Montar / Desmontar",
-      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera."
+      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
     },
     "actionBar": {
       "editKeys": "Edit action bar keys",
