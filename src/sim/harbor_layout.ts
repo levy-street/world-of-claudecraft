@@ -729,9 +729,16 @@ export const GULLHAVEN_HARBOR: HarborDef = withBounds({
   ramps: [
     // the town entry up from the graded waterfront street pocket
     { x: 786.5, z: 116, hw: 1.5, hd: 4, dir: 'x+', highY: 5.9, lowY: 4.4 },
-    // deck seams stepping down toward the head
-    { x: 779, z: 116, hw: 1.5, hd: 2.5, dir: 'x-', highY: 5.9, lowY: 4.2 },
-    { x: 768.75, z: 116, hw: 1.25, hd: 2.5, dir: 'x-', highY: 4.2, lowY: 2.6 },
+    // Deck seams stepping down toward the head. Each high edge sits half a
+    // yard INSIDE the upper deck it leaves (the same tuck the pier-head seam
+    // below documents): the deck overhangs the ramp and rules by height
+    // there, so the walkable transition happens at the DECK's edge, not the
+    // ramp's. Both of these used to reach 2 to 2.5 yards under their deck,
+    // which buried most of the climb and left the deck edge standing as a
+    // 1.3 to 1.4 yard wall, well over the 0.9 movement step gate: the ramp
+    // was unwalkable from above even though its own high edge measured flush.
+    { x: 777, z: 116, hw: 1.5, hd: 2.5, dir: 'x-', highY: 5.9, lowY: 4.2 },
+    { x: 767.25, z: 116, hw: 1.25, hd: 2.5, dir: 'x-', highY: 4.2, lowY: 2.6 },
     // high edge tucked just half a yard inside the lower pier's west edge
     // (the mainland seam pattern) so the exposed step at the edge stays
     // small: the rail audit (J5) caught the original placement burying the

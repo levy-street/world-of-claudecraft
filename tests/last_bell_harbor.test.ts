@@ -159,6 +159,68 @@ describe('Last Bell harbors', () => {
     }
   });
 
+  // The tightest bound the authored tree actually allows. A correct seam
+  // steps about 0.3 (the high edge sits half a yard inside the deck, so the
+  // exposed ramp starts just under it); the mainland's mid-pier seam at
+  // x 196.75 is the loosest at 0.372, hence 0.5 rather than 0.35. Still far
+  // below the 0.9 movement gate (MAX_STEP_HEIGHT), so this stays a
+  // smoothness contract, not merely a "technically strideable" one.
+  const MAX_SEAM_STEP = 0.5;
+
+  // The seam a ramp exists to smooth is the UPPER deck's own edge, which is
+  // not the ramp's high edge: every authored seam tucks the high edge a little
+  // way back INSIDE the deck, so the deck overhangs it and rules by height
+  // there. Sampling only the high edge (as the flush-at-both-ends pin above
+  // does) therefore reads the deck and passes no matter how far the ramp has
+  // drifted; the wall opens where the deck stops. Walk each ramp's own axis
+  // across BOTH seams instead, which is the thing a player actually does.
+  it('walks every ramp axis across both seams without a blocking step', () => {
+    for (const harbor of HARBORS) {
+      for (const r of harbor.ramps) {
+        const alongX = r.dir === 'x+' || r.dir === 'x-';
+        const half = alongX ? r.hw : r.hd;
+        for (const seed of SEEDS) {
+          let prev: number | null = null;
+          // A yard of margin past each end covers the overhanging deck edge.
+          for (let t = -half - 1; t <= half + 1; t += 0.05) {
+            const x = alongX ? r.x + t : r.x;
+            const z = alongX ? r.z : r.z + t;
+            const g = groundHeight(x, z, seed);
+            if (prev !== null) {
+              expect(
+                Math.abs(g - prev),
+                `${harbor.id} ramp ${r.dir} at ${r.x},${r.z}: step at ${x.toFixed(2)},${z.toFixed(2)} seed ${seed}`,
+              ).toBeLessThan(MAX_SEAM_STEP);
+            }
+            prev = g;
+          }
+        }
+      }
+    }
+  });
+
+  // The end-to-end march above walks the MAINLAND approach only. Gullhaven is
+  // the mirrored berth (mirrorZ), so it is exactly where an asymmetry hides:
+  // walk its whole boardwalk too, town apron down to the berth head.
+  it('walks the Gullhaven approach end to end without a blocking step', () => {
+    const z = GULLHAVEN_HARBOR.bridge.z;
+    for (const seed of SEEDS) {
+      let prev: number | null = null;
+      for (let x = 786; x >= 723; x -= 0.05) {
+        const g = groundHeight(x, z, seed);
+        if (prev !== null) {
+          expect(
+            Math.abs(g - prev),
+            `gullhaven step at ${x.toFixed(2)},${z.toFixed(2)} seed ${seed}`,
+          ).toBeLessThan(MAX_SEAM_STEP);
+        }
+        prev = g;
+      }
+      // and the walk ends on the ship's measured deck height at the berth head
+      expect(groundHeight(725.5, z, seed)).toBe(1.034142297254);
+    }
+  });
+
   it('keeps every deck walkable: the boardwalk is ground, above the terrain, on multiple seeds', () => {
     for (const harbor of HARBORS) {
       for (const deck of harbor.decks) {
