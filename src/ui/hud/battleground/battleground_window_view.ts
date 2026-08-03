@@ -46,7 +46,16 @@ export interface BgAllTimeRow {
 export type BgWindowAction =
   | { kind: 'in-match'; scoreCrimson: number; scoreAzure: number }
   | { kind: 'queued'; queueSize: number; queuedParty: number }
-  | { kind: 'idle'; partySize: number; requiredLevel: number; locked: boolean };
+  | {
+      kind: 'idle';
+      partySize: number;
+      requiredLevel: number;
+      locked: boolean;
+      /** In a real party but not its leader: only the leader may queue the
+       *  group (the sim refuses server-side regardless). Mirrors the arena
+       *  arm's own leader gate in arena_window_view.ts. */
+      queueDisabled: boolean;
+    };
 
 /** The full window view-model: the offline/not-synced notice, or the live panel. */
 export type BgWindowView =
@@ -70,6 +79,8 @@ export interface BgWindowViewInput {
   /** Own level, for the queue floor (BG_MIN_LEVEL) display + lock. */
   playerLevel: number;
   party: PartyInfo | null;
+  /** Own pid, to tell the party leader from a member (the queue is leader-only). */
+  playerId: number;
   /** The all-time board cache (painter-owned, server-fetched; null until seen). */
   allTime: BgAllTimeEntry[] | null;
 }
@@ -81,10 +92,12 @@ export interface BgWindowViewInput {
  * output for identical snapshots.
  */
 export function buildBgWindowView(input: BgWindowViewInput): BgWindowView {
-  const { info: b, playerName, playerLevel, party, allTime } = input;
+  const { info: b, playerName, playerLevel, party, playerId, allTime } = input;
   if (!b) return { kind: 'offline' };
 
   const partySize = party?.members.length ?? 1;
+  // Solo counts as leader of self, so a lone player is never gated.
+  const isLeader = !party || party.leader === playerId;
   const action: BgWindowAction = b.match
     ? { kind: 'in-match', scoreCrimson: b.match.scores[0], scoreAzure: b.match.scores[1] }
     : b.queued
@@ -94,6 +107,7 @@ export function buildBgWindowView(input: BgWindowViewInput): BgWindowView {
           partySize,
           requiredLevel: BG_MIN_LEVEL,
           locked: playerLevel < BG_MIN_LEVEL,
+          queueDisabled: partySize > 1 && !isLeader,
         };
 
   const allTimeRows: BgAllTimeRow[] | null = allTime

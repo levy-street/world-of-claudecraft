@@ -258,11 +258,20 @@ export function bgQueueJoin(ctx: SimContext, pid?: number, opts?: { bypassLevel?
     return;
   }
   // Queue the whole party as one group (kept together by matchmaking); solo
-  // players queue alone. Any eligible member can put the party in. An
-  // over-size party is refused outright rather than silently truncated.
+  // players queue alone. An over-size party is refused outright rather than
+  // silently truncated.
   const party = ctx.partyOf(id);
   if (party && party.members.length > BG_TEAM_SIZE) {
     ctx.error(id, 'Your party is too large for Thornhollow Fields. It queues parties of up to 5.');
+    return;
+  }
+  // Leader-only, the same rule every other grouped queue already runs (arena
+  // 2v2 and Protect Yumi, the Vale Cup, the Dungeon Finder): the press commits
+  // every member to a rated match, so it belongs to the one player who speaks
+  // for the group. A solo player is their own leader, so solo queueing is
+  // untouched; leaving the queue stays open to any member.
+  if (party && party.members.length > 1 && party.leader !== id) {
+    ctx.error(id, 'Only the party leader may queue your team for Thornhollow Fields.');
     return;
   }
   const members = party ? [...party.members] : [id];

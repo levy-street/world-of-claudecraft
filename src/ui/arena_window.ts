@@ -226,6 +226,7 @@ export class ArenaWindow {
       playerName: world.player.name,
       playerLevel: world.player.level,
       party: world.partyInfo,
+      playerId: world.playerId,
       allTime: this.bgAllTime,
     });
     if (view.kind === 'offline') {
@@ -394,8 +395,12 @@ export class ArenaWindow {
         )}</div>`
       );
     }
+    // Leader-only group queue: a member sees the same button, inert (the sim
+    // refuses it server-side regardless, with the leader-only error).
     return (
-      `<button class="btn" data-act="queue">${esc(label)}</button>` +
+      `<button class="btn${action.queueDisabled ? ' disabled' : ''}" data-act="queue"${
+        action.queueDisabled ? ' disabled aria-disabled="true"' : ''
+      }>${esc(label)}</button>` +
       `<div class="bg-note">${esc(t('hudChrome.bg.queueNote'))}</div>` +
       `<div class="bg-note bg-level-req">${esc(
         t('hudChrome.bg.levelRequirement', { level: num(action.requiredLevel) }),

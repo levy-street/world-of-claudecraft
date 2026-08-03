@@ -23,7 +23,7 @@ import {
 } from '../src/ui/hud/battleground';
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
 import { makeWriterFacet } from '../src/ui/painter_host';
-import type { BgInfo, BgMatchInfo } from '../src/world_api';
+import type { BgInfo, BgMatchInfo, PartyInfo } from '../src/world_api';
 
 const baseInfo = (over: Partial<BgInfo> = {}): BgInfo => ({
   rating: 1500,
@@ -162,6 +162,7 @@ describe('battleground window view (pure core)', () => {
         playerName: 'X',
         playerLevel: 20,
         party: null,
+        playerId: 1,
         allTime: null,
       }).kind,
     ).toBe('offline');
@@ -170,21 +171,35 @@ describe('battleground window view (pure core)', () => {
       playerName: 'X',
       playerLevel: 20,
       party: null,
+      playerId: 1,
       allTime: null,
     });
     expect(idle.kind).toBe('live');
     if (idle.kind !== 'live') return;
-    expect(idle.action).toEqual({ kind: 'idle', partySize: 1, requiredLevel: 20, locked: false });
+    expect(idle.action).toEqual({
+      kind: 'idle',
+      partySize: 1,
+      requiredLevel: 20,
+      locked: false,
+      queueDisabled: false,
+    });
     // Under the floor: same idle affordance, locked, with the requirement.
     const low = buildBgWindowView({
       info: baseInfo(),
       playerName: 'X',
       playerLevel: 19,
       party: null,
+      playerId: 1,
       allTime: null,
     });
     if (low.kind !== 'live') throw new Error('expected live');
-    expect(low.action).toEqual({ kind: 'idle', partySize: 1, requiredLevel: 20, locked: true });
+    expect(low.action).toEqual({
+      kind: 'idle',
+      partySize: 1,
+      requiredLevel: 20,
+      locked: true,
+      queueDisabled: false,
+    });
     expect(low.sig).not.toBe(idle.sig); // the lock re-renders
 
     const queued = buildBgWindowView({
@@ -192,6 +207,7 @@ describe('battleground window view (pure core)', () => {
       playerName: 'X',
       playerLevel: 20,
       party: null,
+      playerId: 1,
       allTime: null,
     });
     if (queued.kind !== 'live') throw new Error('expected live');
@@ -202,10 +218,46 @@ describe('battleground window view (pure core)', () => {
       playerName: 'X',
       playerLevel: 20,
       party: null,
+      playerId: 1,
       allTime: null,
     });
     if (inMatch.kind !== 'live') throw new Error('expected live');
     expect(inMatch.action).toEqual({ kind: 'in-match', scoreCrimson: 1, scoreAzure: 2 });
+  });
+
+  // The sim refuses a non-leader's party queue press (bgQueueJoin), so the
+  // window must not offer a live button that can only ever fail. Mirrors the
+  // arena arm's own queueDisabled leader gate (arena_window_view.ts).
+  it('disables the queue button for a party member who is not the leader', () => {
+    const party = (leader: number): PartyInfo =>
+      ({
+        leader,
+        raid: false,
+        members: [
+          { pid: 1, name: 'P1', cls: 'warrior', level: 20 },
+          { pid: 2, name: 'P2', cls: 'mage', level: 20 },
+        ],
+      }) as unknown as PartyInfo;
+    const rest = { info: baseInfo(), playerName: 'P2', playerLevel: 20, allTime: null };
+    const member = buildBgWindowView({ ...rest, party: party(1), playerId: 2 });
+    if (member.kind !== 'live') throw new Error('expected live');
+    expect(member.action).toEqual({
+      kind: 'idle',
+      partySize: 2,
+      requiredLevel: 20,
+      locked: false,
+      queueDisabled: true,
+    });
+    // The leader of the same party keeps the live button...
+    const leader = buildBgWindowView({ ...rest, party: party(2), playerId: 2 });
+    if (leader.kind !== 'live') throw new Error('expected live');
+    expect(leader.action).toMatchObject({ partySize: 2, queueDisabled: false });
+    // ...and the gate re-renders, so a promotion is not stuck behind the sig.
+    expect(member.sig).not.toBe(leader.sig);
+    // Solo is never gated: no party at all, and a degenerate one-member party.
+    const solo = buildBgWindowView({ ...rest, party: null, playerId: 2 });
+    if (solo.kind !== 'live') throw new Error('expected live');
+    expect(solo.action).toMatchObject({ partySize: 1, queueDisabled: false });
   });
 
   it('ranks the all-time board, marks me, and flags unknown classes for the painter', () => {
@@ -218,6 +270,7 @@ describe('battleground window view (pure core)', () => {
       playerName: 'Me',
       playerLevel: 20,
       party: null,
+      playerId: 1,
       allTime,
     });
     if (v.kind !== 'live') throw new Error('expected live');
@@ -257,7 +310,7 @@ describe('battleground window view (pure core)', () => {
     expect(Object.hasOwn(wire, 'simOnlyUndefined')).toBe(false);
     expect((wire as unknown as Record<string, unknown>).simOnlyAccessor).toBeUndefined();
 
-    const inputRest = { playerName: 'X', playerLevel: 20, party: null, allTime: null };
+    const inputRest = { playerName: 'X', playerLevel: 20, party: null, playerId: 1, allTime: null };
     expect(buildBgWindowView({ info: live, ...inputRest })).toEqual(
       buildBgWindowView({ info: wire, ...inputRest }),
     );

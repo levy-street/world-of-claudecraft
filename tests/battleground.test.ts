@@ -22,6 +22,7 @@ import {
   BG_POWER_RUNE_VALUE,
   BG_PREMADE_HOLD,
   BG_RATING_BAND,
+  BG_TEAM_SIZE,
   BG_WAVE_OFFSET,
   BG_WAVE_PERIOD,
   type BgMatch,
@@ -82,6 +83,17 @@ function errorTexts(events: SimEvent[]): string[] {
     .filter((e): e is Extract<SimEvent, { type: 'error' }> => e.type === 'error')
     .map((e) => e.text);
 }
+
+// Which pids received one exact log line, sorted: the fan-out question.
+function logPidsFor(events: SimEvent[], text: string): number[] {
+  return events
+    .filter((e): e is Extract<SimEvent, { type: 'log' }> => e.type === 'log' && e.text === text)
+    .map((e) => e.pid ?? -1)
+    .sort((a, b) => a - b);
+}
+
+const bgPartyJoinLine = (count: number): string =>
+  `Your party of ${count} joins the Thornhollow Fields queue.`;
 
 function kill(sim: Sim, pid: number, killerPid: number | null = null) {
   const e = sim.entities.get(pid)!;
@@ -507,6 +519,101 @@ describe('Thornhollow Fields: the level 20 queue floor', () => {
     sim.bgQueueJoin(leader);
     expect(sim.bgInfoFor(leader)!.queued).toBe(true);
     expect(sim.bgInfoFor(buddy)!.queued).toBe(true);
+  });
+});
+
+describe('Thornhollow Fields: only the party leader queues the group', () => {
+  // A three-stack, all at the queue floor, standing in the open world.
+  function partyOfThree(): { sim: Sim; leader: number; members: number[] } {
+    const sim = makeWorld();
+    const leader = sim.addPlayer('warrior', 'Leader');
+    tp(sim, leader, 0, -40);
+    sim.entities.get(leader)!.level = BG_MIN_LEVEL;
+    const members = [leader];
+    for (let i = 0; i < 2; i++) {
+      const m = sim.addPlayer('priest', `Mate${i}`);
+      tp(sim, m, 0, -40);
+      sim.entities.get(m)!.level = BG_MIN_LEVEL;
+      sim.partyInvite(m, leader);
+      sim.partyAccept(m);
+      members.push(m);
+    }
+    return { sim, leader, members };
+  }
+
+  it('refuses a non-leader member with the leader-only error and leaves the queue untouched', () => {
+    const { sim, leader, members } = partyOfThree();
+    const member = members[1];
+    expect(sim.partyOf(member)!.leader).toBe(leader);
+    sim.events.length = 0;
+    sim.bgQueueJoin(member);
+    expect(errorTexts(sim.events)).toEqual([
+      'Only the party leader may queue your team for Thornhollow Fields.',
+    ]);
+    // Nothing entered the queue: not the presser, not the party, not the leader.
+    for (const m of members) expect(sim.bgInfoFor(m)!.queued).toBe(false);
+    expect(sim.bgInfoFor(leader)!.queueSize).toBe(0);
+    // The refusal is a toast, never a silent no-op with a queue line behind it.
+    expect(logPidsFor(sim.events, bgPartyJoinLine(members.length))).toEqual([]);
+  });
+
+  it('queues the whole party for the leader; every member sees it and gets the join line', () => {
+    const { sim, leader, members } = partyOfThree();
+    sim.events.length = 0;
+    sim.bgQueueJoin(leader);
+    expect(errorTexts(sim.events)).toEqual([]);
+    const sorted = [...members].sort((a, b) => a - b);
+    // bgInfoFor is MEMBERSHIP-based, not caller-based: a member who never
+    // pressed the button still reads their group's queued state.
+    for (const m of members) {
+      const info = sim.bgInfoFor(m)!;
+      expect(info.queued, `member ${m} must see the queued group`).toBe(true);
+      expect(info.queuedParty).toBe(members.length);
+      expect(info.queueSize).toBe(members.length);
+    }
+    // ...and the chat line + the queued event fan out to the whole group.
+    expect(logPidsFor(sim.events, bgPartyJoinLine(members.length))).toEqual(sorted);
+    expect(
+      sim.events
+        .filter((e): e is Extract<SimEvent, { type: 'bgQueued' }> => e.type === 'bgQueued')
+        .map((e) => e.pid ?? -1)
+        .sort((a, b) => a - b),
+    ).toEqual(sorted);
+  });
+
+  it('leaves solo queueing untouched', () => {
+    const sim = makeWorld();
+    const solo = sim.addPlayer('mage', 'Solo');
+    tp(sim, solo, 0, -40);
+    sim.entities.get(solo)!.level = BG_MIN_LEVEL;
+    expect(sim.partyOf(solo)).toBe(null);
+    sim.events.length = 0;
+    sim.bgQueueJoin(solo);
+    expect(errorTexts(sim.events)).toEqual([]);
+    expect(sim.bgInfoFor(solo)!.queued).toBe(true);
+    expect(sim.bgInfoFor(solo)!.queuedParty).toBe(1);
+    expect(
+      logPidsFor(
+        sim.events,
+        `You join the Thornhollow Fields queue. Need ${BG_TEAM_SIZE * 2} champions to start a match.`,
+      ),
+    ).toEqual([solo]);
+  });
+
+  it('still lets a non-leader member leave the queue (no leader gate on leave)', () => {
+    const { sim, leader, members } = partyOfThree();
+    sim.bgQueueJoin(leader);
+    for (const m of members) expect(sim.bgInfoFor(m)!.queued).toBe(true);
+    const member = members[2];
+    sim.events.length = 0;
+    sim.bgQueueLeave(member); // never the leader
+    expect(errorTexts(sim.events)).toEqual([]);
+    // Unchanged behaviour: the member's press pulls the whole group out.
+    for (const m of members) expect(sim.bgInfoFor(m)!.queued).toBe(false);
+    expect(sim.bgInfoFor(leader)!.queueSize).toBe(0);
+    expect(logPidsFor(sim.events, 'You leave the Thornhollow Fields queue.')).toEqual(
+      [...members].sort((a, b) => a - b),
+    );
   });
 });
 
