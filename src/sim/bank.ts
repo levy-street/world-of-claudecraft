@@ -78,8 +78,9 @@ export interface MoveResult {
  *    regardless of count (its units can never be split from their payload).
  *    Identical-payload stacking: the units merge into a byte-equal
  *    mergeable dest stack with room and otherwise land in a fresh deep-cloned
- *    dest slot (countFit/addStacked carry the payload), refusing 'no_fit' only
- *    when the whole count cannot land.
+ *    dest slot (countFit/addStacked carry the payload AND the slot's
+ *    craftedRecipeId, which an instanced slot can carry too), refusing
+ *    'no_fit' only when the whole count cannot land.
  *  - A fungible slot reuses the bags.ts stacking rules (countFit/addStacked),
  *    threading slot.craftedRecipeId through both calls so a plain crafted stack
  *    (InvSlot.craftedRecipeId, no `instance`) keeps its provenance marker and
@@ -102,11 +103,25 @@ export function moveBetweenContainers(
   // Instanced: the whole slot moves as one unit (a per-instance payload can never
   // be split from its units), merging into a byte-equal dest stack when one has
   // room and taking a fresh (deep-cloned) dest slot otherwise.
+  // craftedRecipeId rides along here for the same reason the plain arm below
+  // threads it, and the case is easy to miss because the two markers are
+  // orthogonal: a slot can carry BOTH an `instance` AND the plain-stack marker.
+  // That is exactly the shape a masterwork proc mints (professions/crafting.ts
+  // addItemInstance with craftedRecipeId) and the shape an enchanted crafted
+  // piece returns to bags as (items.ts returnEquippedItemToBags splits the
+  // worn payload back into instance + marker), so omitting it here laundered a
+  // self-crafted item into an indistinguishable found one on ONE deposit.
+  // Threaded into BOTH calls so the fit check and the grant keep agreeing about
+  // which stacks are mergeable: doing one alone trades laundering for a
+  // no_fit-versus-overflow divergence.
   if (slot.instance) {
-    if (countFit(dest, destCapacity, slot.itemId, slot.count, slot.instance) < slot.count) {
+    if (
+      countFit(dest, destCapacity, slot.itemId, slot.count, slot.instance, slot.craftedRecipeId) <
+      slot.count
+    ) {
       return { moved: 0, refusal: 'no_fit' };
     }
-    addStacked(dest, slot.itemId, slot.count, slot.instance);
+    addStacked(dest, slot.itemId, slot.count, slot.instance, slot.craftedRecipeId);
     source.splice(sourceIndex, 1);
     return { moved: slot.count };
   }

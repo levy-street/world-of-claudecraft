@@ -631,6 +631,62 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
     expect(dst).toContainEqual({ itemId: 'wolf_fang', count: 8, craftedRecipeId: 'recipe_a' });
   });
 
+  it('preserves craftedRecipeId on an INSTANCED move, and keeps fit and grant agreeing', () => {
+    // The easy-to-miss half of the pair above: the two provenance channels are
+    // orthogonal, so a slot can carry an `instance` AND the plain-stack marker.
+    // That is exactly what a masterwork proc mints (professions/crafting.ts) and
+    // what an enchanted crafted piece returns to bags as
+    // (items.ts returnEquippedItemToBags), and the instanced arm used to thread
+    // neither call's marker, laundering it on ONE deposit.
+    const mw = () => ({ signer: 'Bru', rolled: { masterwork: true, stats: { str: 4 } } });
+    const src: InvSlot[] = [
+      { itemId: 'worn_sword', count: 1, instance: mw(), craftedRecipeId: 'recipe_a' },
+    ];
+    const dst: InvSlot[] = [];
+    expect(moveBetweenContainers(src, 0, undefined, dst, 10)).toEqual({ moved: 1 });
+    expect(dst).toEqual([
+      { itemId: 'worn_sword', count: 1, instance: mw(), craftedRecipeId: 'recipe_a' },
+    ]);
+
+    // Round trip: the marker survives the way back too.
+    expect(moveBetweenContainers(dst, 0, undefined, src, 10)).toEqual({ moved: 1 });
+    expect(src[0].craftedRecipeId).toBe('recipe_a');
+    expect(src[0].instance).toEqual(mw());
+  });
+
+  it('does not merge a byte-equal instanced payload across DIFFERENT craft markers', () => {
+    // The fit check and the grant must key their merge on the same tuple. If
+    // only one of the two carried the marker, these two rows would disagree
+    // about whether the move fits, turning a laundering bug into a
+    // no_fit-versus-overflow divergence.
+    const inst = () => ({ signer: 'Bru' });
+    const dst: InvSlot[] = [
+      { itemId: 'wolf_fang', count: 1, instance: inst(), craftedRecipeId: 'recipe_a' },
+    ];
+    const src: InvSlot[] = [
+      { itemId: 'wolf_fang', count: 1, instance: inst(), craftedRecipeId: 'recipe_b' },
+    ];
+    // Capacity 2 is enough for two distinct rows, and they must stay distinct.
+    expect(moveBetweenContainers(src, 0, undefined, dst, 2)).toEqual({ moved: 1 });
+    expect(dst).toHaveLength(2);
+    expect(dst.map((r) => r.craftedRecipeId).sort()).toEqual(['recipe_a', 'recipe_b']);
+
+    // With room for only the one existing row, the differently-marked copy
+    // cannot land at all: it is a fresh slot, not a merge.
+    const tight: InvSlot[] = [
+      { itemId: 'wolf_fang', count: 1, instance: inst(), craftedRecipeId: 'recipe_a' },
+    ];
+    const src2: InvSlot[] = [
+      { itemId: 'wolf_fang', count: 1, instance: inst(), craftedRecipeId: 'recipe_b' },
+    ];
+    expect(moveBetweenContainers(src2, 0, undefined, tight, 1)).toEqual({
+      moved: 0,
+      refusal: 'no_fit',
+    });
+    expect(tight).toHaveLength(1);
+    expect(src2).toHaveLength(1);
+  });
+
   it('returns an invalid refusal for a bad index or non-positive / over-count, mutating nothing', () => {
     const base: InvSlot[] = [{ itemId: 'wolf_fang', count: 5 }];
     for (const [i, c] of [

@@ -113,12 +113,20 @@ describe('countMatchingUnlocked / holdsMatchingLocked', () => {
 describe('removeMatchingInstance', () => {
   it('consumes the highest-index equal unlocked copy and returns the SLOT payload', () => {
     const low = { itemId: 'hide', count: 1, instance: { signer: 'Ayla' } };
-    const high = { itemId: 'hide', count: 1, instance: { signer: 'Ayla' } };
+    const high = {
+      itemId: 'hide',
+      count: 1,
+      instance: { signer: 'Ayla' },
+      craftedRecipeId: 'recipe_hide',
+    };
     const inventory: InvSlot[] = [low, { itemId: 'hide', count: 3 }, high];
     const { ctx, hookFired } = fakeCtx(inventory);
     const got = removeMatchingInstance(ctx, 'hide', SIGNED, 1);
     // The final unit of a fully-consumed slot returns the ORIGINAL object.
-    expect(got).toBe(high.instance);
+    expect(got?.instance).toBe(high.instance);
+    // Both provenance channels come out, not just the payload: an escrowed copy
+    // can be instanced AND crafted at once.
+    expect(got?.craftedRecipeId).toBe('recipe_hide');
     expect(inventory).toHaveLength(2);
     expect(inventory).toContain(low);
     expect(hookFired()).toBe(1);
@@ -129,8 +137,9 @@ describe('removeMatchingInstance', () => {
     const inventory: InvSlot[] = [stack];
     const { ctx } = fakeCtx(inventory);
     const got = removeMatchingInstance(ctx, 'hide', SIGNED, 1);
-    expect(got).toEqual(SIGNED);
-    expect(got).not.toBe(stack.instance);
+    expect(got?.instance).toEqual(SIGNED);
+    expect(got?.instance).not.toBe(stack.instance);
+    expect(got?.craftedRecipeId).toBeUndefined();
     expect(stack.count).toBe(1);
   });
 

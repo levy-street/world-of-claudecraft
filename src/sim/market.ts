@@ -10,6 +10,7 @@
 // (enforced by tests/architecture.test.ts). The market draws NO rng.
 
 import { bagCapacity, canGrantCopies, instancedCountCap } from './bags';
+import { rekeySignerInSlots } from './character_rename';
 import { ITEMS } from './data';
 import { formatMoney } from './format_money';
 import {
@@ -114,11 +115,12 @@ export interface MarketListing {
   instance?: ItemInstancePayload;
   // Recipe id that crafted every unit in this stack (bags.ts InvSlot.craftedRecipeId,
   // professions/crafting.ts), when the seller's stock carried one. Absent for a
-  // plain, never-crafted stack (and always absent on an instanced row: `instance`
-  // and `craftedRecipeId` are mutually exclusive, one row is either a single
-  // instanced copy or a plain fungible stack). Threaded through buy/cancel/collect
-  // (BUG #9) so a market round trip never launders a crafted item's provenance
-  // and reopens the disenchant anti-farming gate
+  // plain, never-crafted stack. ORTHOGONAL to `instance`, not exclusive with it:
+  // a single instanced row can also be crafted (a masterwork proc, or a crafted
+  // piece enchanted while worn), and reading the two as mutually exclusive is
+  // what dropped the marker off every such listing. Threaded through
+  // list/buy/cancel/collect (BUG #9) so a market round trip never launders a
+  // crafted item's provenance and reopens the disenchant anti-farming gate
   // (professions/enchanting.ts isCraftedDisenchantVictim).
   craftedRecipeId?: string;
 }
@@ -248,6 +250,21 @@ export class Market {
         listing.sellerKey = key;
         listing.sellerName = newName;
       }
+    }
+    // The escrowed PAYLOADS, not just the seller identity above: since #2507
+    // an instanced copy can sit in a listing or a collection row, and its
+    // signer is the renamed character's old name. Swept over EVERY row rather
+    // than only this seller's, because a name is unique at the moment of the
+    // rename, so `signer === oldName` unambiguously means "signed by this
+    // character": a copy they signed and sold on, sitting in someone else's
+    // listing, is corrected too. That is strictly more than the blob sweep
+    // can do (character_rename.ts, which cannot reach other players' saves)
+    // and costs one walk of a book this call already dirties.
+    for (const listing of this.marketListings) {
+      if (rekeySignerInSlots([listing], oldName, newName)) changed = true;
+    }
+    for (const collection of this.marketCollections.values()) {
+      if (rekeySignerInSlots(collection.items, oldName, newName)) changed = true;
     }
     return changed;
   }
@@ -490,7 +507,7 @@ export class Market {
       return;
     }
     const escrowed = removeMatchingInstance(this.ctx, itemId, instance, meta.entityId);
-    if (!escrowed) return; // revalidation raced away; nothing was removed
+    if (!escrowed?.instance) return; // revalidation raced away; nothing was removed
     this.marketListings.push({
       id: this.nextListingId++,
       sellerKey,
@@ -500,7 +517,13 @@ export class Market {
       price: ask,
       expiresAt: this.ctx.time + MARKET_LISTING_DURATION,
       house: false,
-      instance: escrowed,
+      instance: escrowed.instance,
+      // An instanced row CAN also be crafted (a masterwork proc, an enchanted
+      // crafted piece), so the marker rides alongside the payload rather than
+      // being assumed absent here.
+      ...(escrowed.craftedRecipeId === undefined
+        ? {}
+        : { craftedRecipeId: escrowed.craftedRecipeId }),
     });
     this.ctx.emit({
       type: 'loot',
@@ -903,16 +926,12 @@ export class Market {
         // Keep returned/expired-listing items even when their id is unknown, for
         // the same reason as listings above: a content edit must not silently
         // empty a player's pending pickups. The id stays dormant until corrected.
-        // sanitizeEscrowSlot preserves an instanced return's payload and clamps
-        // its count to the identical-payload merge cap (the character-load rule).
+        // sanitizeEscrowSlot preserves an instanced return's payload, carries the
+        // craftedRecipeId marker on either arm, and clamps the count to the
+        // identical-payload merge cap (the character-load rule).
         items: (c.items ?? [])
           .filter((s) => s && typeof s.itemId === 'string')
-          .map((s) => ({
-            ...sanitizeEscrowSlot(s, instancedCountCap(ITEMS[s.itemId], s.instance)),
-            ...(typeof s.craftedRecipeId === 'string'
-              ? { craftedRecipeId: s.craftedRecipeId }
-              : {}),
-          })),
+          .map((s) => sanitizeEscrowSlot(s, instancedCountCap(ITEMS[s.itemId], s.instance))),
       });
     }
     this.nextListingId = plan.nextListingId;

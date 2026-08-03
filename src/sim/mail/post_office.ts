@@ -17,6 +17,7 @@
 // Date.now (enforced by tests/architecture.test.ts). The post draws NO rng.
 
 import { bagCapacity, canGrantCopies, instancedCountCap } from '../bags';
+import { rekeySignerInSlots } from '../character_rename';
 import {
   HEROIC_MARK_LETTER,
   type LetterDef,
@@ -476,7 +477,18 @@ export class PostOffice {
     for (const s of items) {
       if (s.instance && typeof s.instance === 'object') {
         const escrowed = removeMatchingInstance(this.ctx, s.itemId, s.instance, meta.entityId);
-        if (escrowed) parcels.push({ itemId: s.itemId, count: 1, instance: escrowed });
+        // The craft marker rides alongside the payload: an instanced parcel can
+        // be crafted too (a masterwork proc, an enchanted crafted piece), so it
+        // is carried rather than assumed absent on this arm.
+        if (escrowed?.instance)
+          parcels.push({
+            itemId: s.itemId,
+            count: 1,
+            instance: escrowed.instance,
+            ...(escrowed.craftedRecipeId === undefined
+              ? {}
+              : { craftedRecipeId: escrowed.craftedRecipeId }),
+          });
       } else {
         const count = Math.floor(s.count);
         const consumed = removeVendorSellUnits(
@@ -772,6 +784,16 @@ export class PostOffice {
         m.recipientName = newName;
       }
     }
+    // The escrowed PARCEL payloads, not just the recipient identity above:
+    // since #2507 an instanced copy rides the raven, and its signer is the
+    // renamed character's old name. Swept over EVERY letter (not only this
+    // recipient's) for the market's reason: a name is unique at the moment of
+    // the rename, so `signer === oldName` unambiguously means "signed by this
+    // character", including a copy they signed that is in flight to somebody
+    // else.
+    for (const m of this.mail) {
+      if (rekeySignerInSlots(m.items, oldName, newName)) changed = true;
+    }
     return changed;
   }
 
@@ -820,17 +842,13 @@ export class PostOffice {
       if (!m || typeof m.recipientKey !== 'string') continue;
       // Keep letters whose attached item id is no longer in ITEMS (a content
       // edit): dormant, recoverable data, exactly like market listings.
-      // sanitizeEscrowSlot preserves an instanced parcel's payload and clamps
-      // its count to the identical-payload merge cap (the character-load rule).
-      // A plain parcel's craftedRecipeId marker rides alongside it (dropped by
-      // sanitizeEscrowSlot, which is instance-only), so a mail restart never
-      // strips a crafted item's provenance out of an in-flight attachment.
+      // sanitizeEscrowSlot preserves an instanced parcel's payload, carries the
+      // craftedRecipeId marker on either arm, and clamps the count to the
+      // identical-payload merge cap (the character-load rule), so a mail restart
+      // never strips a crafted item's provenance out of an in-flight attachment.
       const items = (m.items ?? [])
         .filter((s) => s && typeof s.itemId === 'string')
-        .map((s) => ({
-          ...sanitizeEscrowSlot(s, instancedCountCap(ITEMS[s.itemId], s.instance)),
-          ...(typeof s.craftedRecipeId === 'string' ? { craftedRecipeId: s.craftedRecipeId } : {}),
-        }));
+        .map((s) => sanitizeEscrowSlot(s, instancedCountCap(ITEMS[s.itemId], s.instance)));
       const kind: MailKind = m.kind === 'player' || m.kind === 'npc' ? m.kind : 'system';
       const recipientName = String(m.recipientName ?? m.recipientKey);
       const senderName = String(m.senderName ?? '?');
