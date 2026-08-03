@@ -360,15 +360,18 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned. Four independent causes now stack: the 0.33.0
-      // version sync moved every GLB source-fingerprint leaf (#2729), the
-      // graphics overhaul and the ability-VFX integration each changed the
-      // renderer-integration and view-priority leaves, and this branch edits
-      // src/render/renderer.ts for the compile gates. So the composite mints
-      // fresh and matches no parent's literal. No pipeline input or geometry
-      // value changed, and no capture was retaken (the five per-asset seal
-      // suites stay green untouched).
-      fingerprint: 'de135002a7774db47f426cc50bed3dea71727cd988d6cd63910ee768ac3fc672',
+      // Deliberately re-pinned. The composite hashes src/render/renderer.ts as
+      // its renderer-integration leaf, so any branch that edits the renderer
+      // moves it: the 0.33.0 version sync moved every GLB source-fingerprint
+      // leaf (#2729), the graphics overhaul and the ability-VFX integration
+      // each changed the renderer-integration and view-priority leaves, this
+      // branch edits renderer.ts for the compile gates, and the audit-fix pass
+      // (battleground occluder-fade wiring and ward-state hygiene) edited it
+      // again AFTER the v0.34.0 base merge, which is why the previous literal
+      // went stale. Re-derive this pin whenever renderer.ts changes. No
+      // pipeline input or geometry value changed, and no capture was retaken
+      // (the five per-asset seal suites stay green untouched).
+      fingerprint: '39a87cda897babaaaa948634517d5b580187b8b20e36c5d26a9548318ef424b7',
       components: {
         captureContract: {
           id: 'polish-v2',

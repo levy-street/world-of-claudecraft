@@ -76,7 +76,7 @@ import {
   TH_LOCATIONS,
   TH_PLACEMENTS,
 } from '../src/sim/thornhollow_field.generated';
-import { groundHeight } from '../src/sim/world';
+import { groundHeight, terrainHeight } from '../src/sim/world';
 
 const SEED = 42;
 const ORIGIN = battlegroundOrigin(0);
@@ -157,7 +157,10 @@ describe('Thornhollow terrain: one surface for the compiler, the sim and the gri
     // the stamp chain. bgFieldExactHeight is the sim's copy. If the two ports
     // ever drift (a brush falloff, the level/add mode), every collider seat and
     // placement seat the compiler baked is wrong.
-    expect(TH_HEIGHT_PROBES.length).toBeGreaterThanOrEqual(24);
+    // Vacuity floor, kept near the real count (42: the compiler's 40 scattered
+    // samples plus one per flag) rather than far under it. A floor with room to
+    // spare is what lets most of the scatter vanish while the sweep stays green.
+    expect(TH_HEIGHT_PROBES.length).toBeGreaterThanOrEqual(40);
     let worst = 0;
     for (const p of TH_HEIGHT_PROBES) {
       const d = Math.abs(bgFieldExactHeight(p.x, p.z) - p.h);
@@ -246,8 +249,29 @@ describe('Thornhollow terrain: one surface for the compiler, the sim and the gri
 
   it('the field outside the band is untouched: groundHeight only branches on x', () => {
     // A band arm that leaked into the open world would break every other zone.
+    // "Not the field height" alone is weak (two unrelated surfaces disagree by
+    // default), so pin the POSITIVE: at open-world coordinates groundHeight is
+    // still exactly the un-branched terrain function, at scattered points well
+    // clear of the walkable-lift features (stands, beacon, castle, docks) that
+    // are the only other thing that arm adds.
     expect(isBgPos(BG_BAND_X_MIN - 1)).toBe(false);
-    expect(groundHeight(0, 0, SEED)).not.toBeCloseTo(bgFieldHeightLocal(0, 0), 3);
+    const openSamples: [number, number][] = [
+      [0, 0],
+      [137, -262],
+      [-311, 184],
+      [903, -655],
+      [-1480, 1207],
+      [2570, 341],
+    ];
+    for (const [x, z] of openSamples) {
+      expect(isBgPos(x), `(${x}, ${z}) must be open world for this pin`).toBe(false);
+      expect(groundHeight(x, z, SEED), `groundHeight at (${x}, ${z})`).toBe(
+        terrainHeight(x, z, SEED),
+      );
+      // ...and the two surfaces really are different functions, so the equality
+      // above is not comparing a stub against itself.
+      expect(groundHeight(x, z, SEED)).not.toBeCloseTo(bgFieldHeightLocal(x, z), 3);
+    }
   });
 });
 
@@ -614,23 +638,49 @@ describe('Thornhollow Fields walkability: one connected field, both keeps includ
 
   it('EVERY crossing the layout authors is open, in both directions', () => {
     // The layout's whole shape is "two crossings per curtain, and no more".
-    // Walk each of the six openings a route actually uses, from the cell before
-    // it to the cell after: a dressing pass that leaned a crate into a doorway
-    // or thickened a gate jamb closes one of these and quietly halves the map.
-    const crossings: [string, number, number, number, number][] = [
-      // name, from x/z, to x/z
-      ['Crimson keep mouth', 0, -112, 0, -104],
-      ['Azure keep mouth', 0, 112, 0, 104],
-      ['south main gate', 13, -62, 13, -50],
-      ['north main gate', -13, 62, -13, 50],
-      ['south gatehouse field door', -22, -67, -22, -60],
-      ['south gatehouse court door', -30, -52, -30, -42],
-      ['north gatehouse field door', 22, 67, 22, 60],
-      ['north gatehouse court door', 30, 52, 30, 42],
+    // Reachability of two endpoints does NOT say the crossing between them is
+    // open: the flood can arrive the long way round, and two points on the same
+    // side of a wall stay connected whatever the door does. So each opening is
+    // walked as a straight segment THROUGH it at 0.25yd steps, and the line the
+    // segment has to straddle is spelled out and asserted, so a pair that
+    // stopped crossing anything fails instead of passing quietly. A dressing
+    // pass that leaned a crate into a doorway or thickened a gate jamb closes
+    // one of these and quietly halves the map.
+    const crossings: [string, number, number, number, number, number][] = [
+      // name, from x/z, to x/z, the z line the crossing pierces
+      // The keep mouth line is 10yd field-side of the flag; the run is offset
+      // off centre because the mouth barricade deliberately breaks the straight
+      // line from the field to the flag.
+      ['Crimson keep mouth', 8, -113, 8, -103, -108],
+      ['Azure keep mouth', -8, 113, -8, 103, 108],
+      // The 10yd main gate through each curtain (curtain line |z| = 56).
+      ['south main gate', 13, -62, 13, -50, -56],
+      ['north main gate', -13, 62, -13, 50, 56],
+      // The gatehouse doors are OFFSET across its room, so each is walked on
+      // its own x line: the field-side wall sits at |z| = 65, the courtyard
+      // side at |z| = 47, and the room straddles the curtain between them.
+      ['south gatehouse field door', -22.5, -68, -22.5, -61, -65],
+      ['south gatehouse court door', -30, -51, -30, -43, -47],
+      ['north gatehouse field door', 22.5, 68, 22.5, 61, 65],
+      ['north gatehouse court door', 30, 51, 30, 43, 47],
     ];
-    for (const [name, ax, az, bx, bz] of crossings) {
+    for (const [name, ax, az, bx, bz, lineZ] of crossings) {
+      expect(
+        (az - lineZ) * (bz - lineZ) < 0,
+        `${name}: the probe segment must straddle z = ${lineZ}`,
+      ).toBe(true);
       expect(reaches(ax, az), `${name}: approach`).toBe(true);
       expect(reaches(bx, bz), `${name}: far side`).toBe(true);
+      const steps = Math.ceil(Math.hypot(bx - ax, bz - az) / 0.25);
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        const x = ax + (bx - ax) * t;
+        const z = az + (bz - az) * t;
+        expect(
+          isBlocked(SEED, ORIGIN.x + x, ORIGIN.z + z, BODY_RADIUS),
+          `${name}: closed at (${x.toFixed(2)}, ${z.toFixed(2)})`,
+        ).toBe(false);
+      }
     }
   });
 
@@ -673,16 +723,26 @@ describe('Thornhollow Fields layout: the combat shape the dressing is laid over'
     // always carries a y: applying it everywhere would silently retune spell
     // line of sight for every player in the game. This pins the scoping itself,
     // which is the only thing standing between the two behaviors.
-    const OPEN_A = { x: 40, z: 40 };
-    const OPEN_B = { x: 60, z: 40 };
+    // The probe line has to be one that is BLOCKED from the ground and would
+    // CLEAR if the caller's y were honoured, or "the answer did not move" is
+    // vacuous: over open ground both arms read true whatever eyeAt does, and
+    // deleting the isBgPos guard would leave this green. At seed 42 this span
+    // runs into a world prop whose top sits just above the ground eye line and
+    // well under a lifted one, so the two arms are only equal because the open
+    // world ignores y.
+    const OPEN_A = { x: -186, z: 168 };
+    const OPEN_B = { x: -166, z: 168 };
     expect(isBgPos(OPEN_A.x), 'the open-world probe must not be in the band').toBe(false);
     const openGround = lineOfSightClear(
       SEED,
       { ...OPEN_A, y: groundHeight(OPEN_A.x, OPEN_A.z, SEED) },
       { ...OPEN_B, y: groundHeight(OPEN_B.x, OPEN_B.z, SEED) },
     );
+    expect(openGround, 'the open-world probe line must be blocked at ground eye height').toBe(
+      false,
+    );
     // Lift BOTH endpoints a body's height off the ground: in the open world the
-    // answer must not move, because y is ignored there.
+    // answer must not move, because y is ignored there. Still blocked.
     const openLifted = lineOfSightClear(
       SEED,
       { ...OPEN_A, y: groundHeight(OPEN_A.x, OPEN_A.z, SEED) + 3 },
