@@ -120,6 +120,90 @@ describe('effect_dispatch: a single cast fans into every listed effect', () => {
     expect(at5 - at1).toBe(8);
   });
 
+  it('garrote: the direct hit carries abilityId, the bleed ticks never do (no per-tick cue replay)', () => {
+    const { sim, p, meta } = makeSim('rogue', 20);
+    const mob = spawnTarget(sim, p);
+    sim.events.length = 0;
+    runEffects(sim.ctx, p, meta, mob, resolve(sim, 'garrote', p.id));
+
+    // The direct hit is the one damage event allowed to carry the stable id.
+    const direct = sim.events.filter((ev) => ev.type === 'damage' && ev.amount > 0);
+    expect(direct).toHaveLength(1);
+    expect(direct[0]).toMatchObject({ abilityId: 'garrote' });
+
+    // The bleed shares the ability id as its aura id, so an id-carrying tick
+    // would replay the garrote recording every 3s for 18s
+    // (IMPACT_ABILITY_CUES); combat/auras.ts must emit ticks without it.
+    sim.events.length = 0;
+    const ticks: { abilityId?: string | null }[] = [];
+    for (let i = 0; i < 20 * 7; i++) {
+      for (const ev of sim.tick()) {
+        if (ev.type === 'damage' && ev.ability === 'Throat Wire' && ev.amount > 0) ticks.push(ev);
+      }
+    }
+    expect(ticks.length).toBeGreaterThan(0);
+    for (const tick of ticks) expect(tick.abilityId ?? null).toBeNull();
+  });
+
+  it('fearImpact is gated to Harrow: Morrowlash shares fearDr but emits none', () => {
+    // Harrow (ability id 'fear'): the landed fear sounds once at the target.
+    const harrow = makeSim('warlock', 20);
+    const harrowTarget = spawnTarget(harrow.sim, harrow.p);
+    harrow.sim.events.length = 0;
+    runEffects(
+      harrow.sim.ctx,
+      harrow.p,
+      harrow.meta,
+      harrowTarget,
+      resolve(harrow.sim, 'fear', harrow.p.id),
+    );
+    const fearImpacts = harrow.sim.events.filter(
+      (ev) => ev.type === 'spellfx' && ev.fx === 'fearImpact',
+    );
+    expect(fearImpacts).toHaveLength(1);
+    expect(fearImpacts[0]).toMatchObject({ targetId: harrowTarget.id, ability: 'fear' });
+
+    // Morrowlash (death_coil) also carries fearDr (the graded fear break), but
+    // it has no fear recording and its own directDamage impact already sounds
+    // the hit, so the fearImpact emit must stay gated to Harrow's id.
+    // death_coil is a row-17 choice-row grant, so select it first.
+    const coil = makeSim('warlock', 20);
+    expect(coil.sim.applyTalents({ spec: null, rows: { 17: 'wlk_r17_death_coil' } })).toBe(true);
+    const coilTarget = spawnTarget(coil.sim, coil.p);
+    coil.sim.events.length = 0;
+    runEffects(
+      coil.sim.ctx,
+      coil.p,
+      coil.meta,
+      coilTarget,
+      resolve(coil.sim, 'death_coil', coil.p.id),
+    );
+    expect(coilTarget.auras.some((a: Aura) => a.kind === 'incapacitate')).toBe(true);
+    expect(coil.sim.events.some((ev) => ev.type === 'spellfx' && ev.fx === 'fearImpact')).toBe(
+      false,
+    );
+
+    // The AoE fear shouts emit fearImpact from the separate aoeFear case
+    // (once per creature actually feared), which the Harrow id gate above
+    // must not touch. psychic_scream is a row-8 choice-row grant.
+    const shout = makeSim('priest', 20);
+    expect(shout.sim.applyTalents({ spec: null, rows: { 8: 'pri_r8_psychic_scream' } })).toBe(true);
+    const shoutTarget = spawnTarget(shout.sim, shout.p);
+    shout.sim.events.length = 0;
+    runEffects(
+      shout.sim.ctx,
+      shout.p,
+      shout.meta,
+      shoutTarget,
+      resolve(shout.sim, 'psychic_scream', shout.p.id),
+    );
+    const shoutImpacts = shout.sim.events.filter(
+      (ev) => ev.type === 'spellfx' && ev.fx === 'fearImpact',
+    );
+    expect(shoutImpacts).toHaveLength(1);
+    expect(shoutImpacts[0]).toMatchObject({ targetId: shoutTarget.id, ability: 'psychic_scream' });
+  });
+
   it('druid rip: dot damage scales with combo points spent (bleed finisher, not flat)', () => {
     const dotValueAt = (combo: number): number => {
       const { sim, p, meta } = makeSim('druid', 20);
