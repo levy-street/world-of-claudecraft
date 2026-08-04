@@ -911,6 +911,7 @@ export const en_XA: EnTranslations = {
       "minutesSeconds": "[{m}ɱ {s}š]",
       "seconds": "[{s}š]",
       "autoShowHint": "[Ŕóŵš áþþéáŕ áúţóɱáţíçáļļý óñçé ýóúŕ þáŕţý ðéáļš ðáɱáĝé óŕ ĥéáļíñĝ, áñð ţĥíš šéĝɱéñţ çļóšéš á ƒéŵ šéçóñðš áƒţéŕ çóɱƀáţ éñðš.]",
+      "threatFallback": "[Ñó ļíʋé ţĥŕéáţ: šĥóŵíñĝ ðáɱáĝé ţó {name}]",
       "breakdownSummary": "[{tab}: {value}]",
       "breakdownRow": "[{value} ({percent})]",
       "breakdownOther": "[Óţĥéŕ ({count})]",

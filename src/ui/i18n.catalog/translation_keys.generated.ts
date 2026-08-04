@@ -7415,6 +7415,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.meters.resize'
   | 'hudChrome.meters.seconds'
   | 'hudChrome.meters.separate'
+  | 'hudChrome.meters.threatFallback'
   | 'hudChrome.mobTooltip.familyDemon'
   | 'hudChrome.mobTooltip.friendly'
   | 'hudChrome.mobTooltip.hostile'

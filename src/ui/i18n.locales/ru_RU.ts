@@ -5479,6 +5479,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
   'hudChrome.meters.seconds': '{s} сек.',
   'hudChrome.meters.breakdownRow': '{value} ({percent})',
+  'hudChrome.meters.threatFallback': 'Нет данных об угрозе: показан урон по {name}',
   'hudChrome.meters.breakdownSummary': '{tab}: {value}',
   'hudChrome.meters.percent': '{value}%',
   'hudChrome.meters.petAbility': '{pet}: {ability}',

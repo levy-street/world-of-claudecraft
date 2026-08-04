@@ -911,6 +911,7 @@ export const ko_KR: EnTranslations = {
       "minutesSeconds": "{m}분 {s}초",
       "seconds": "{s}초",
       "autoShowHint": "파티가 피해를 주거나 치유를 하면 행이 자동으로 나타나며, 전투가 끝난 후 몇 초 뒤에 이 구역이 닫힙니다.",
+      "threatFallback": "실시간 위협 없음: {name}에게 입힌 피해 표시",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "기타 ({count})",

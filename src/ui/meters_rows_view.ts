@@ -4,8 +4,13 @@
 // Extracted from the single Meters.render() when the panel became
 // instance-parameterized: the damage window and each detached Threat / Healing
 // window now build their rows through this one function, so a ranking or
-// threat-folding rule can never drift between them. DOM-free and i18n-free; the
-// painter localizes the names and formats the numbers.
+// pet rule can never drift between them. DOM-free and i18n-free; the painter
+// localizes the names and formats the numbers.
+//
+// The pet rule is per TAB. On damage/healing a pet folds into its owner's bar
+// (the damage-meter convention). On THREAT it gets its own bar, because the
+// mob's pull-over rule compares each hate-table ENTRY separately: a combined
+// owner+pet number is measured against a threshold that is never applied to it.
 
 /** The three meters a panel can show. */
 export type MeterTab = 'dmg' | 'heal' | 'threat';
@@ -29,10 +34,22 @@ export interface MeterRowTally {
 
 export interface MeterRow {
   tally: MeterRowTally;
+  /**
+   * Set when this row is a PET's own hate row rather than its owner's; the
+   * painter labels the bar with it. Null on every damage/healing row and on an
+   * owner's own row.
+   */
+  petName: string | null;
+  /**
+   * The entity whose hate this row represents: the member's pid, or the pet's.
+   * The mob's pull-over rule compares each hate-table ENTRY on its own, so this
+   * is the id that decides the aggro marker.
+   */
+  threatPid: number;
   value: number;
   /** 0..1 of the biggest row, for the bar width */
   fill: number;
-  /** the engaged mob is targeting this member, or one of their pets */
+  /** the engaged mob is swinging at exactly this entity */
   hasAggro: boolean;
 }
 
@@ -49,26 +66,37 @@ export interface MeterRowsInput {
   aggroPid: number | null;
 }
 
-/** A member's threat column: their own hate plus every pet they own. */
-export function threatOf(
-  pid: number,
-  threat: Map<number, number>,
-  pets: MeterPet[] | undefined,
-): number {
-  let total = threat.get(pid) ?? 0;
-  for (const pet of pets ?? []) total += threat.get(pet.pid) ?? 0;
-  return total;
-}
-
 function valueFor(tally: MeterRowTally, input: MeterRowsInput): number {
   if (input.tab === 'dmg') return tally.dmg;
   if (input.tab === 'heal') return tally.heal;
-  if (input.liveThreat) {
-    return threatOf(tally.pid, input.liveThreat, input.petsByOwner?.get(tally.pid));
-  }
   // No live hate table (a finished encounter whose mob is gone): fall back to
-  // each member's damage on the threat-subject mob.
+  // each member's damage on the threat-subject mob. The panel says so; these
+  // are damage numbers and must never read as live hate.
   return input.mainMobId !== null ? (tally.dmgByMob.get(input.mainMobId) ?? 0) : 0;
+}
+
+/** Every candidate bar before ranking: one per member, plus one per live pet. */
+function candidates(
+  input: MeterRowsInput,
+): { tally: MeterRowTally; petName: string | null; threatPid: number; value: number }[] {
+  const out: { tally: MeterRowTally; petName: string | null; threatPid: number; value: number }[] =
+    [];
+  const live = input.tab === 'threat' ? input.liveThreat : null;
+  for (const tally of input.tallies) {
+    if (!live) {
+      out.push({ tally, petName: null, threatPid: tally.pid, value: valueFor(tally, input) });
+      continue;
+    }
+    // A pet is its OWN hate-table entry and can rip aggro on its own, so it gets
+    // its own bar. Folding it into the owner (which is right for a damage meter)
+    // overstated every pet class against a threshold the mob never applies to
+    // the combined number.
+    out.push({ tally, petName: null, threatPid: tally.pid, value: live.get(tally.pid) ?? 0 });
+    for (const pet of input.petsByOwner?.get(tally.pid) ?? []) {
+      out.push({ tally, petName: pet.name, threatPid: pet.pid, value: live.get(pet.pid) ?? 0 });
+    }
+  }
+  return out;
 }
 
 /**
@@ -76,22 +104,19 @@ function valueFor(tally: MeterRowTally, input: MeterRowsInput): number {
  * relative to the top bar so the leader always fills its track.
  */
 export function buildMeterRows(input: MeterRowsInput): MeterRow[] {
-  const scored = [...input.tallies]
-    .map((tally) => ({ tally, value: valueFor(tally, input) }))
+  const scored = candidates(input)
     .filter((row) => row.value > 0)
     .sort((a, b) => b.value - a.value);
   const top = scored[0]?.value ?? 1;
   const { aggroPid } = input;
-  return scored.map(({ tally, value }) => ({
+  return scored.map(({ tally, petName, threatPid, value }) => ({
     tally,
+    petName,
+    threatPid,
     value,
     fill: value / top,
-    // The mob's own target keeps the marker; a pet holding aggro marks its
-    // OWNER's bar, since the pet no longer has one of its own.
-    hasAggro:
-      input.tab === 'threat' &&
-      aggroPid !== null &&
-      (aggroPid === tally.pid ||
-        (input.petsByOwner?.get(tally.pid)?.some((pet) => pet.pid === aggroPid) ?? false)),
+    // Exactly the entity the mob is swinging at, which is now always a row of
+    // its own.
+    hasAggro: input.tab === 'threat' && aggroPid !== null && aggroPid === threatPid,
   }));
 }

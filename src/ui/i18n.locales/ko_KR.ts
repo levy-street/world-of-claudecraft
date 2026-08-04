@@ -5416,6 +5416,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
   'hudChrome.meters.seconds': '{s}초',
   'hudChrome.meters.breakdownRow': '{value} ({percent})',
+  'hudChrome.meters.threatFallback': '실시간 위협 없음: {name}에게 입힌 피해 표시',
   'hudChrome.meters.breakdownSummary': '{tab}: {value}',
   'hudChrome.meters.percent': '{value}%',
   'hudChrome.meters.petAbility': '{pet}: {ability}',

@@ -241,6 +241,7 @@ const UI_PURE_CORES = [
   'src/ui/meters_frame_core.ts',
   'src/ui/meters_menu_view.ts',
   'src/ui/meters_rows_view.ts',
+  'src/ui/threat_subject_core.ts',
   'src/ui/mob_tooltip_view.ts',
   'src/ui/player_tooltip_view.ts',
   'src/ui/talents_view.ts',
