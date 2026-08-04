@@ -44,6 +44,7 @@
 import type * as http from 'node:http';
 import { rekeyInstanceSigner } from '../src/sim/character_rename';
 import { resolveActiveWeaponSkin } from '../src/sim/content/weapon_skin_rules';
+import { DEEDS_RECENT_CAP } from '../src/sim/deeds';
 import type { CharacterState } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { normalizeCharName, offensiveName } from './auth';
@@ -587,6 +588,20 @@ async function ownerSheetHandler(ctx: Ctx): Promise<void> {
   );
 }
 
+/**
+ * GET /api/characters/:id/deeds-recent: the owner's newest-first deed unlock
+ * ids from the character_deeds observer table, `{ deeds: [id, ...] }` capped
+ * at DEEDS_RECENT_CAP. The state blob only keeps the earn DAY, so this read is
+ * the client's one source of exact earn order (the Book of Deeds recent
+ * strip). Ids only: the owner's Book already holds every earned day, and the
+ * timestamps stay server-side.
+ */
+async function deedsRecentHandler(ctx: Ctx): Promise<void> {
+  const character = ownedCharacter(ctx);
+  const rows = await charactersDb.recentDeedsForCharacter(character.id, DEEDS_RECENT_CAP);
+  json(ctx.res, 200, { deeds: rows.map((row) => row.deedId) });
+}
+
 /** POST /api/characters/:id/rename: moderator-sanctioned rename (force_rename gated). */
 async function renameHandler(ctx: Ctx): Promise<void> {
   const rt = useRuntime();
@@ -752,6 +767,16 @@ export const routes: RouteDef[] = [
     surface: 'api',
     middleware: [readGuard, requireOwnedCharacter(CHARACTER_NOT_FOUND)],
     handler: ownerSheetHandler,
+    meta: OWNED_CHARACTER_META,
+  },
+  {
+    method: 'GET',
+    path: '/api/characters/:id/deeds-recent',
+    surface: 'api',
+    // Registry-only (the new-route rule): no legacy ladder twin. Read-tier
+    // bearer + ownership, the owner-sheet gate pair exactly.
+    middleware: [readGuard, requireOwnedCharacter(CHARACTER_NOT_FOUND)],
+    handler: deedsRecentHandler,
     meta: OWNED_CHARACTER_META,
   },
   {

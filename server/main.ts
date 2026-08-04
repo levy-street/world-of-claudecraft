@@ -151,6 +151,7 @@ import {
   releaseCharacterLease,
   renameCharacter,
   revokeCompanionToken,
+  runConcurrentIndexMigrations,
   saveToken,
   saveWorldState,
   scopeAllowsMutation,
@@ -203,6 +204,7 @@ import {
 } from './github';
 import { configureGithubContributorsRuntime, topContributors } from './github_contributors';
 import { pruneGitHubOAuthStates } from './github_db';
+import { guildBankLogCacheStats } from './guild_bank_log';
 import { createAccessLogSink } from './http/access_log';
 import { setAttackSignalSink } from './http/attack_signals';
 import { registerBusinessMetrics } from './http/business_metrics';
@@ -2947,6 +2949,10 @@ export async function startServer(): Promise<http.Server> {
   await pruneApplePendingLogins(pool);
   await game.loadMarket();
   await game.loadMail();
+  // Guild bank books boot-load BEFORE listen() below, so every non-oversized
+  // guild's book is live before any player can join (Guild Bank Phase 3: this
+  // releases the deliberately silent-inert Phase 2 wire).
+  await game.loadGuildBanks();
   await game.loadRifts();
   await game.loadChatFilter();
   await game.loadBlockedIps();
@@ -3083,6 +3089,9 @@ export async function startServer(): Promise<http.Server> {
     }),
     lastTickAt: () => game.lastTickAt(),
     loopStartedAt: () => game.loopStartedAt(),
+    // Read at scrape time and never constructs the cache: an idle process must
+    // not mint one as a side effect of being measured.
+    guildBankLogCache: () => guildBankLogCacheStats(),
   };
   setGameMetricsCounters(registerGameStateMetrics(httpMetrics.registry, gameStateSource));
   // Hand the same live source to /livez, so a wedged loop answers 503 from outside
@@ -3110,6 +3119,25 @@ export async function startServer(): Promise<http.Server> {
     console.log(`  WS:   /ws, then first message {t:"${ONLINE_WORLD_AUTH_TYPE}",token,character}`);
   });
 
+  // The CONCURRENTLY index builds run AFTER listen, deliberately. They
+  // serialize across every realm process on the schema advisory lock, and a
+  // build on a genuinely large table (bank_ledger) is two heap scans plus a
+  // wait for every transaction that could see it: before listen, a rolling
+  // restart paid that stall on every realm at once and none of them served
+  // players meanwhile. A slow build should delay the index, not the realm.
+  //
+  // Not awaited, and a failure is LOUD but not fatal: every entry is idempotent
+  // and drops its own INVALID carcass, so the next boot retries, and a realm
+  // that is already serving players must not be killed by an index build. The
+  // readers that depend on these indexes carry their own statement bounds, so a
+  // window without one degrades a query rather than the process.
+  void runConcurrentIndexMigrations().catch((err) => {
+    console.error(
+      'concurrent index migrations failed; the realm is serving WITHOUT them and the next boot will retry:',
+      err,
+    );
+  });
+
   // Off-peak batched retention. The sweep self-clocks once per UTC day behind a
   // database advisory lock, so with several processes exactly one sweeps; each
   // primitive below is one bounded DELETE batch and the sweep drives iteration.
@@ -3128,6 +3156,23 @@ export async function startServer(): Promise<http.Server> {
     saveLastSweepDay: async (day) => {
       await saveWorldState('retention_sweep:last_run', { day });
     },
+    // bank_ledger is deliberately ABSENT from this table list: it is kept
+    // FOREVER. It is the anti-dupe audit trail for both containers, and the
+    // guild container (Guild Bank Phase 3) makes that non-negotiable: guild
+    // conservation replays the WHOLE per-guild history (items in-vs-out across
+    // officers, the treasury balance), so pruning any prefix would turn every
+    // later legitimate withdraw into a false negative_net/negative_treasury
+    // finding and erase the evidence trail a real dupe investigation needs.
+    // Growth is accepted: one row per successful op, insert-only. It carries
+    // three append-only indexes (bank_ledger_character, bank_ledger_created,
+    // and bank_ledger_container_recent), and as of the in-game guild bank
+    // ACTIVITY LOG it has one player-triggerable hot read: the officer-visible
+    // per-guild history (server/guild_bank_log.ts), which is why that third
+    // index exists and is PARTIAL to `container = 'guild'`. Anyone re-deciding
+    // whether unbounded growth is still acceptable should weigh that read: it
+    // is bounded (LIMIT 50, a backward index scan) and cached per guild, so it
+    // does not scale with table size, but it is no longer true that nothing
+    // reads this table hot.
     tables: [
       { name: 'chat_logs', pruneBatch: (n) => pruneChatLogsBatch(config.chatLogRetentionDays, n) },
       {

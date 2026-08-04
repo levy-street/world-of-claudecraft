@@ -35,14 +35,32 @@ mkdirSync(outDir, { recursive: true });
 //    root-relative /<logical> paths our static server maps into public/), which esbuild leaves
 //    intact for a classic IIFE <script src> and would be a SyntaxError. esbuild matches each
 //    FULL member path exactly (a bare `import.meta.env` define does NOT fold `.DEV`), so define
-//    both Vite flags media.ts / i18n.ts read; the assert below fails loudly if a transitive
+//    every Vite flag a module the bundle graph reaches reads: media.ts / i18n.ts read
+//    DEV/PROD, and render/gfx.ts pulls in client_origin.ts and (transitively) runtime.ts for
+//    native/desktop-app origin detection (VITE_NATIVE_APP, VITE_API_ORIGIN,
+//    VITE_DESKTOP_APP, VITE_DESKTOP_API_ORIGIN, VITE_DESKTOP_RELATIVE_API), none of which
+//    apply to this static headless render. The assert below fails loudly if a transitive
 //    module ever reads another import.meta field this define misses.
 const bundled = await esbuild.build({
   entryPoints: [path.join(root, 'scripts', 'wiki', 'stills_render_entry.js')],
   bundle: true,
   format: 'iife',
   platform: 'browser',
-  define: { 'import.meta.env.DEV': 'true', 'import.meta.env.PROD': 'false' },
+  define: {
+    'import.meta.env.DEV': 'true',
+    'import.meta.env.PROD': 'false',
+    // src/client_origin.ts and src/runtime.ts (pulled in transitively via the guide
+    // viewer's asset chain) also read import.meta.env at module scope; esbuild replaces
+    // the whole import.meta object with {} for a non-ESM output format, so an undefined
+    // field access here throws in the browser page rather than failing this build step
+    // (the assert below only catches a literal `import.meta` surviving the bundle, not
+    // an unmatched member access on the now-empty stand-in object).
+    'import.meta.env.VITE_NATIVE_APP': '""',
+    'import.meta.env.VITE_API_ORIGIN': '""',
+    'import.meta.env.VITE_DESKTOP_APP': '""',
+    'import.meta.env.VITE_DESKTOP_API_ORIGIN': '""',
+    'import.meta.env.VITE_DESKTOP_RELATIVE_API': '""',
+  },
   write: false,
   logLevel: 'silent',
 });
@@ -75,17 +93,21 @@ const dataUrl = `data:text/javascript;base64,${Buffer.from(dataBuilt.outputFiles
 const { GUIDE_CLASSES, GUIDE_DRUID_FORMS, GUIDE_WARLOCK_PETS, GUIDE_FAMILIES, GUIDE_MODELS } =
   await import(dataUrl);
 
-// Flatten every figure to a distinct (model, tint) render job, deduped by still key.
+// Flatten every figure to a distinct (model, tint, tintStrength) render job, deduped by
+// still key. tintStrength comes straight off the figure record (build_content.mjs bakes it
+// alongside tint/still), the same value model.ts reads off GUIDE_MODELS[model] to paint the
+// render, so a strength-only manifest change mints a new key here too.
 const jobs = new Map();
-const addFigure = (model, tint) => {
+const addFigure = (model, tint, tintStrength) => {
   if (!model || !GUIDE_MODELS[model]) return;
-  const key = stillKey(model, tint);
-  if (!jobs.has(key)) jobs.set(key, { key, model, tint: tint ?? null });
+  const key = stillKey(model, tint, tintStrength);
+  if (!jobs.has(key)) jobs.set(key, { key, model, tint: tint ?? null, tintStrength });
 };
-for (const c of GUIDE_CLASSES) addFigure(c.model, c.tint);
-for (const d of GUIDE_DRUID_FORMS) addFigure(d.model, d.tint);
-for (const p of GUIDE_WARLOCK_PETS) addFigure(p.model, p.tint);
-for (const f of GUIDE_FAMILIES) for (const c of f.creatures) addFigure(c.model, c.tint);
+for (const c of GUIDE_CLASSES) addFigure(c.model, c.tint, c.tintStrength);
+for (const d of GUIDE_DRUID_FORMS) addFigure(d.model, d.tint, d.tintStrength);
+for (const p of GUIDE_WARLOCK_PETS) addFigure(p.model, p.tint, p.tintStrength);
+for (const f of GUIDE_FAMILIES)
+  for (const c of f.creatures) addFigure(c.model, c.tint, c.tintStrength);
 
 // 3) Serve public/ (for the GLBs) plus the render harness and bundle, all same-origin so
 //    the page's `/models/...` fetches resolve to the committed assets.

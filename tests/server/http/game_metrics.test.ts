@@ -32,6 +32,8 @@ import {
   WOC_FISHING_GOT_AWAYS_TOTAL,
   WOC_FISHING_KOI_TOTAL,
   WOC_GATHER_HARVESTS_TOTAL,
+  WOC_GUILD_BANK_INCIDENTS_TOTAL,
+  WOC_GUILD_BANK_LOG_CACHE,
   WOC_INPUT_FRAMES_MISSED_TOTAL,
   WOC_PLAYERS_ONLINE,
   WOC_ROD_FEE_COPPER,
@@ -45,7 +47,7 @@ import {
   WOC_WS_MESSAGES_TOTAL,
   WOC_WS_RATE_KICKS_TOTAL,
 } from '../../../server/http/game_metrics';
-import { WS_DROP_CAUSES } from '../../../server/http/game_signals';
+import { GUILD_BANK_INCIDENTS, WS_DROP_CAUSES } from '../../../server/http/game_signals';
 
 /** A GameStateSource returning fixed values; override any field per test. */
 function stubSource(overrides: Partial<GameStateSource> = {}): GameStateSource {
@@ -57,6 +59,14 @@ function stubSource(overrides: Partial<GameStateSource> = {}): GameStateSource {
     simTickHz: () => 20,
     tickPhaseMillis: () => ({}),
     dbPool: () => ({ total: 7, idle: 4, waiting: 1 }),
+    guildBankLogCache: () => ({
+      reads: 11,
+      refreshes: 3,
+      evictions: 1,
+      busts: 4,
+      entries: 2,
+      dirtyGuilds: 1,
+    }),
     lastTickAt: () => 1_700_000_000_000,
     loopStartedAt: () => 1_700_000_000_000,
     ...overrides,
@@ -79,10 +89,16 @@ function harvestSeries(text: string): string[] {
 }
 
 /** The set of distinct values of a given label across the whole exposition text. */
-function labelValues(text: string, label: string): Set<string> {
+function labelValues(text: string, label: string, metric?: string): Set<string> {
   const values = new Set<string>();
+  // Scoped to ONE metric when asked: several metrics now carry a `kind` label,
+  // and a whole-text sweep would silently mix their vocabularies together and
+  // stop being a closed-set pin for either of them.
+  const lines = metric
+    ? text.split('\n').filter((line) => line.startsWith(`${metric}{`))
+    : text.split('\n');
   const re = new RegExp(`${label}="([^"]*)"`, 'g');
-  for (const m of text.matchAll(re)) values.add(m[1]);
+  for (const m of lines.join('\n').matchAll(re)) values.add(m[1]);
   return values;
 }
 
@@ -252,6 +268,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
       'lane_command',
       'lane_chat',
       'list_read',
+      'guild_bank',
     ]);
     for (const cause of WS_DROP_CAUSES) {
       expect(
@@ -308,6 +325,77 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     expect(labelValues(text, 'cause')).toEqual(new Set(WS_DROP_CAUSES));
   });
 
+  it('pre-registers every guild bank incident kind at zero and increments by kind', async () => {
+    const registry = new Registry();
+    const counters = registerGameStateMetrics(registry, stubSource());
+
+    expect(WOC_GUILD_BANK_INCIDENTS_TOTAL).toBe('woc_guild_bank_incidents_total');
+    // The whole vocabulary, pinned as literals: these are the series operators
+    // alert on, so a rename must fail here rather than silently retire a rule.
+    expect(GUILD_BANK_INCIDENTS).toEqual([
+      'escrow_save_failed',
+      // A refusal that will RETRY is ordinary concurrency, not a failure, and
+      // it has its own kind so an operator alerting on escrow_save_failed > 0
+      // is not drowned in it.
+      'escrow_refused_retry',
+      'save_fenced_out',
+      'escrow_quarantined',
+      'reconcile',
+      'book_unloaded',
+      'ledger_write_failed',
+      // A guild bank op that moved a purse while the book stood still: the
+      // dupe signature the bank_ledger counterparty columns exist to surface.
+      'counterparty_orphan',
+      // A guild row written with no counterparty side at all, whose NULL would
+      // otherwise be indistinguishable from a pre-feature row forever.
+      'counterparty_unstamped',
+      // The officer-visible activity log's read failed. Its own kind because
+      // the refusal frame a player receives is byte-identical for "you are not
+      // an officer" and "the query failed", so without this a total read outage
+      // looks exactly like ordinary refusals at the wire.
+      'log_read_failed',
+      // A created guild whose creation fee never became durable: the charge
+      // lived only on a live purse whose session was abandoned, so the guild
+      // exists and was never paid for. A single-sample defect, not a rate.
+      'create_fee_unpaid',
+    ]);
+
+    // Scrape BEFORE any increment: an alert rule cannot fire on a series that
+    // does not exist yet, so every kind must expose an explicit 0 from boot.
+    const zeroed = await registry.metrics();
+    expect(zeroed).toContain(`# TYPE ${WOC_GUILD_BANK_INCIDENTS_TOTAL} counter`);
+    for (const kind of GUILD_BANK_INCIDENTS) {
+      expect(
+        sampleValue(
+          zeroed,
+          new RegExp(`^woc_guild_bank_incidents_total\\{kind="${kind}"\\} (\\d+)$`, 'm'),
+        ),
+        kind,
+      ).toBe('0');
+    }
+
+    counters.guildBankIncident('reconcile');
+    counters.guildBankIncident('reconcile');
+    counters.guildBankIncident('ledger_write_failed');
+
+    const text = await registry.metrics();
+    expect(sampleValue(text, /^woc_guild_bank_incidents_total\{kind="reconcile"\} (\d+)$/m)).toBe(
+      '2',
+    );
+    expect(
+      sampleValue(text, /^woc_guild_bank_incidents_total\{kind="ledger_write_failed"\} (\d+)$/m),
+    ).toBe('1');
+    // Untouched kinds stay at their pre-registered zero, never absent.
+    expect(
+      sampleValue(text, /^woc_guild_bank_incidents_total\{kind="escrow_save_failed"\} (\d+)$/m),
+    ).toBe('0');
+    // The kind label's vocabulary is exactly the closed set: no guild id, no
+    // character id, nothing per-player ever reaches a label.
+    expect(labelValues(text, 'kind', WOC_GUILD_BANK_INCIDENTS_TOTAL)).toEqual(
+      new Set(GUILD_BANK_INCIDENTS),
+    );
+  });
+
   it('swallows a throwing counter in every sink method and never propagates', () => {
     const registry = new Registry();
     const counters = registerGameStateMetrics(registry, stubSource());
@@ -331,6 +419,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
       WOC_FISHING_GOT_AWAYS_TOTAL,
       WOC_FISHING_EMPTY_HOOKS_TOTAL,
       WOC_ROD_FEE_PAYMENTS_TOTAL,
+      WOC_GUILD_BANK_INCIDENTS_TOTAL,
     ]) {
       const metric = registry.getSingleMetric(name) as unknown as { inc: () => never };
       metric.inc = () => {
@@ -358,6 +447,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     expect(() => counters.fishingGotAway('mirefen_marsh', '1')).not.toThrow();
     expect(() => counters.fishingEmptyHook('mirefen_marsh', '1')).not.toThrow();
     expect(() => counters.rodFeePaid(ROD_FEE_RECIPE_IDS[0])).not.toThrow();
+    expect(() => counters.guildBankIncident('reconcile')).not.toThrow();
   });
 
   it('bounds the ws direction label to in/out and emits no per-player label anywhere', async () => {
@@ -837,5 +927,45 @@ describe('registerGameStateMetrics: fishing telemetry counters', () => {
       expect(labelValues(text, forbidden).size, forbidden).toBe(0);
     }
     expect(text).not.toMatch(/woc_(fishing|rod)[^\n]*\b(account|character|player|name|ip)=/);
+  });
+});
+
+describe('guild bank activity log cache readout', () => {
+  it('exposes the cache counters as one labeled gauge, read at scrape time', async () => {
+    // The REFRESH count is the number the whole design rests on: the cache
+    // exists so one answer serves every officer of a guild, and its coalescing
+    // floor exists because a naive bust made a busy guild's log uncached
+    // exactly when officers read it. None of that is alertable without this.
+    const registry = new Registry();
+    registerGameStateMetrics(registry, stubSource());
+    const scrape = await registry.metrics();
+    expect(scrape).toContain(`# TYPE ${WOC_GUILD_BANK_LOG_CACHE} gauge`);
+    expect(scrape).toContain(`${WOC_GUILD_BANK_LOG_CACHE}{kind="refreshes"} 3`);
+    expect(scrape).toContain(`${WOC_GUILD_BANK_LOG_CACHE}{kind="reads"} 11`);
+    expect(scrape).toContain(`${WOC_GUILD_BANK_LOG_CACHE}{kind="busts"} 4`);
+    expect(scrape).toContain(`${WOC_GUILD_BANK_LOG_CACHE}{kind="evictions"} 1`);
+    expect(scrape).toContain(`${WOC_GUILD_BANK_LOG_CACHE}{kind="entries"} 2`);
+    expect(scrape).toContain(`${WOC_GUILD_BANK_LOG_CACHE}{kind="dirty_guilds"} 1`);
+  });
+
+  it('re-reads the source on every scrape (no background sampling, no drift)', async () => {
+    let refreshes = 0;
+    const registry = new Registry();
+    registerGameStateMetrics(
+      registry,
+      stubSource({
+        guildBankLogCache: () => ({
+          reads: 0,
+          refreshes: refreshes++,
+          evictions: 0,
+          busts: 0,
+          entries: 0,
+          dirtyGuilds: 0,
+        }),
+      }),
+    );
+    await registry.metrics();
+    const second = await registry.metrics();
+    expect(second).toContain(`${WOC_GUILD_BANK_LOG_CACHE}{kind="refreshes"} 1`);
   });
 });

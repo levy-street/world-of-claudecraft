@@ -8041,10 +8041,10 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.quit': 'Esci',
   'desktop.crash.reload': 'Ricarica',
   'desktop.crash.title': 'World of ClaudeCraft',
-  'desktop.update.downloading': "Download dell'aggiornamento {version} in corso...",
+  'desktop.update.downloadingTitle': "Download dell'aggiornamento {version} in corso...",
   'desktop.update.later': 'Più tardi',
-  'desktop.update.ready':
-    "L'aggiornamento {version} è pronto. Verrà installato alla chiusura, oppure riavvia ora.",
+  'desktop.update.readyTitle': "L'aggiornamento {version} è pronto",
+  'desktop.update.readyBody': 'Verrà installato alla chiusura, oppure riavvia ora.',
   'desktop.update.restart': 'Riavvia ora',
   'hudChrome.dailyRewards.close': 'Chiudi ricompense giornaliere',
   'hudChrome.dailyRewards.endsIn': 'Termina tra {time}',

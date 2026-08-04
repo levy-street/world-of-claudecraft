@@ -109,14 +109,21 @@ export function moveBetweenContainers(
   // Instanced: the whole slot moves as one unit (a per-instance payload can never
   // be split from its units), merging into a byte-equal dest stack when one has
   // room and taking a fresh (deep-cloned) dest slot otherwise.
+  // craftedRecipeId is threaded through BOTH calls here for exactly the reason
+  // the plain arm below spells out: countFit and addStacked key their merge on
+  // it, so omitting it strips the marker off any slot that carries an instance
+  // payload AND a craft provenance. Two independent reviews found this arm the
+  // same way: a crafted weapon that was worn while enchanted is precisely that
+  // shape, and so is commissioned sub-rare equipment, whose crafted provenance
+  // lives ONLY at slot level. Either way one bank round trip launders a
+  // self-crafted item into an indistinguishable found one and it disenchants
+  // for the enchanting skill the anti-farm gate exists to deny. addStacked's
+  // merge predicate already compares the marker, so a marker-bearing slot never
+  // merges into an unmarked stack. Both calls take it or neither does:
+  // threading it into only one would make the fit check and the grant disagree
+  // about which stacks are mergeable, which is a no_fit-vs-overflow divergence
+  // rather than a laundering one.
   if (slot.instance) {
-    // craftedRecipeId rides the move exactly as on the fungible arm below:
-    // the round 5 finder caught this arm dropping the slot-level crafted
-    // marker on deposit, which for commissioned sub-rare equipment (whose
-    // crafted provenance lives ONLY at slot level) silently laundered the
-    // provenance through the bank. addStacked's merge predicate already
-    // compares the marker, so a marker-bearing slot never merges into an
-    // unmarked stack.
     if (
       countFit(dest, destCapacity, slot.itemId, slot.count, slot.instance, slot.craftedRecipeId) <
       slot.count
@@ -150,8 +157,10 @@ const BANKER_RANGE = INTERACT_RANGE + 2;
 
 /** True when the player entity stands within reach of any live banker NPC. Iterates
  *  the ctx.bankerIds anchor list (seeded by the Sim ctor) against the live entities,
- *  the same liveness checks nearMerchant uses (present + kind 'npc'). */
-function nearBanker(ctx: SimContext, e: Entity): boolean {
+ *  the same liveness checks nearMerchant uses (present + kind 'npc'). Exported so
+ *  the guild bank (guild_bank.ts) shares the ONE proximity gate with the personal
+ *  bank rather than growing a second reach rule. */
+export function nearBanker(ctx: SimContext, e: Entity): boolean {
   for (const id of ctx.bankerIds) {
     const b = ctx.entities.get(id);
     if (b && b.kind === 'npc' && dist2d(e.pos, b.pos) <= BANKER_RANGE) return true;

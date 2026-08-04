@@ -2652,10 +2652,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.quit': 'Ukončit',
   'desktop.crash.reload': 'Načíst znovu',
   'desktop.crash.title': 'World of ClaudeCraft',
-  'desktop.update.downloading': 'Stahuje se aktualizace {version}...',
+  'desktop.update.downloadingTitle': 'Stahuje se aktualizace {version}...',
   'desktop.update.later': 'Později',
-  'desktop.update.ready':
-    'Aktualizace {version} je připravena. Nainstaluje se při ukončení, nebo restartuj hned.',
+  'desktop.update.readyTitle': 'Aktualizace {version} je připravena',
+  'desktop.update.readyBody': 'Nainstaluje se při ukončení, nebo restartuj hned.',
   'desktop.update.restart': 'Restartovat hned',
   'worldContent.corpseName': '{name} (mrtvola)',
   'worldContent.delveLockedChestInteract': 'Stiskni F pro vypáčení zámku',

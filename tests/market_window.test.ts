@@ -324,7 +324,11 @@ describe('market_window: behavior preserved through the core', () => {
   });
 
   it('preserves the buy / list / cancel / collect dispatch and money formatting', () => {
-    expect(painter).toContain('.marketBuy(l.id)');
+    // Buy now lands behind the confirm prompt (the id it sends is the one the
+    // prompt captured and rechecked); the behavior itself is driven end to end in
+    // tests/market_buy_confirm.test.ts. Reclaim is unchanged: one click.
+    expect(painter).toContain('this.promptBuy(l, itemName)');
+    expect(painter).toContain('.marketBuy(pending.listingId)');
     expect(painter).toContain('.marketCancel(l.id)');
     expect(painter).toContain('.marketList(view.form.itemId, qty, each * qty)');
     expect(painter).toContain('.marketCollect()');
@@ -444,7 +448,7 @@ describe('market_window: reconnect resync (#2416)', () => {
 
   it('imports queryDiffersFromEcho and searchDiffersFromEcho from the world_api seam (the pure drift checks, not re-derived comparisons)', () => {
     expect(painter).toContain(
-      "import {\n  type IWorld,\n  type MarketInfo,\n  queryDiffersFromEcho,\n  searchDiffersFromEcho,\n} from '../world_api';",
+      "import {\n  type IWorld,\n  type MarketInfo,\n  type MarketListingView,\n  queryDiffersFromEcho,\n  searchDiffersFromEcho,\n} from '../world_api';",
     );
   });
 

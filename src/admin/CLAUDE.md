@@ -49,7 +49,11 @@ daily-rewards bans (optional duration in hours, blank means permanent) and accou
 Points event ledger (`accounts.read`; pure presentation in `daily_reward_event_log.ts`,
 pinned by `tests/admin/daily_reward_event_log.test.ts`), and `OnlinePlayers`
 (`accounts.read`; the live roster that used to sit on the Overview dashboard, with
-search/sort/paging in the pure `online_players_view.ts` and a switchable 1-minute poll).
+search/sort/paging in the pure `online_players_view.ts` and a switchable 1-minute poll),
+and `GuildBankPanel` on the guild detail page (`moderation.read` to READ a guild's live
+book, the superadmin-only `guildbank.purge` to remove a stuck slot; request shaping in the
+pure `guild_bank_purge.ts`, confirm flow in `GuildBankPurgeDialog`). Two panels on one page
+with DIFFERENT permissions is the norm here, not a smell: gate each panel on what it shows.
 
 ## i18n: operators are users, so all rendered text routes through `t()`
 Admin has its OWN sparse-overlay catalog, independent of the game. Author English in

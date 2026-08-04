@@ -65,6 +65,7 @@ function makePairArchetype() {
     attunedPairs: ['weaponcrafting+armorcrafting'],
     switchCount: 0,
     amendsProgress: 0,
+    isJackOfAllTrades: false,
   };
 }
 
@@ -77,6 +78,7 @@ function makeWrongPairArchetype() {
     attunedPairs: ['alchemy+engineering'],
     switchCount: 0,
     amendsProgress: 0,
+    isJackOfAllTrades: false,
   };
 }
 

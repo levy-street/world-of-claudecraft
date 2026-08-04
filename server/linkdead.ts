@@ -20,6 +20,14 @@ export interface LinkdeadSessionView {
   // lease release the nonce fence cannot see, since the resume arm never
   // re-acquires).
   left: boolean;
+  // True once this session's guild bank escrow was ROLLED BACK: its live state
+  // was abandoned and it can never persist again (server/game.ts
+  // handleGuildBankEscrowRefusal). RESUMING it would hand the player a session
+  // that plays normally and saves NOTHING, forever, with no error and no
+  // signal: silent unbounded data loss, which is far worse than the reconnect
+  // refusal below. The refused client retries into the fresh-join arm and
+  // loads from its durable row, which is exactly what the rollback intends.
+  escrowQuarantined: boolean;
 }
 
 export type JoinPlan =
@@ -47,13 +55,15 @@ export function planJoin(opts: {
     if (
       opts.sameCharacter.linkdead &&
       !opts.sameCharacter.left &&
+      !opts.sameCharacter.escrowQuarantined &&
       opts.sameCharacter.accountId === opts.accountId
     ) {
       return { action: 'resume' };
     }
-    // Mid-teardown (left) and live-socket sessions both reject with the
-    // transient conflict error; the client's reconnect policy retries it, and
-    // the retry lands on a clean fresh join once the teardown finishes.
+    // Mid-teardown (left), escrow-quarantined, and live-socket sessions all
+    // reject with the transient conflict error; the client's reconnect policy
+    // retries it, and the retry lands on a clean fresh join once the teardown
+    // finishes.
     return { action: 'reject', error: 'character already in world' };
   }
   if (!opts.isGm && opts.liveOtherSessions >= opts.maxPerAccount) {

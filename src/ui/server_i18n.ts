@@ -58,6 +58,13 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.exists': "A guild named '{name}' already exists.",
     'guild.alreadyInOne': 'You are already in a guild.',
     'guild.notInOne': 'You are not in a guild.',
+    'guild.createFee': 'You need {amount} gold to found a guild.',
+    'guild.bankNotEmpty': 'The guild bank must be emptied before the guild can be disbanded.',
+    // The guild-delete window: between the empty-bank guard passing and the
+    // guilds DELETE (which cascades the book row away), every guild bank op is
+    // refused, because anything banked in that gap would be destroyed with the
+    // row. Two DB round trips wide.
+    'guild.bankClosing': 'The guild bank is closing. Try again in a moment.',
     'guild.onlyOfficersInvite': 'Only officers and the Guild Master may invite.',
     'guild.alreadyInThis': 'You are already in the guild.',
     'guild.mustBeOnline': '{name} must be online to be invited.',
@@ -191,6 +198,9 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.exists': "A guild named '{name}' already exists.",
     'guild.alreadyInOne': 'You are already in a guild.',
     'guild.notInOne': 'You are not in a guild.',
+    'guild.createFee': 'You need {amount} gold to found a guild.',
+    'guild.bankNotEmpty': 'The guild bank must be emptied before the guild can be disbanded.',
+    'guild.bankClosing': 'The guild bank is closing. Try again in a moment.',
     'guild.onlyOfficersInvite': 'Only officers and the Guild Master may invite.',
     'guild.alreadyInThis': 'You are already in the guild.',
     'guild.mustBeOnline': '{name} must be online to be invited.',
@@ -311,6 +321,11 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.exists': "Ya existe una hermandad llamada '{name}'.",
     'guild.alreadyInOne': 'Ya perteneces a una hermandad.',
     'guild.notInOne': 'No perteneces a ninguna hermandad.',
+    'guild.createFee': 'Necesitas {amount} de oro para fundar una hermandad.',
+    'guild.bankNotEmpty':
+      'El banco de hermandad debe vaciarse antes de poder disolver la hermandad.',
+    'guild.bankClosing':
+      'El banco de hermandad se está cerrando. Inténtalo de nuevo en un momento.',
     'guild.onlyOfficersInvite': 'Solo los oficiales y el Maestro de hermandad pueden invitar.',
     'guild.alreadyInThis': 'Ya perteneces a la hermandad.',
     'guild.mustBeOnline': '{name} debe estar conectado para ser invitado.',
@@ -435,6 +450,11 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.exists': "Ya existe una hermandad llamada '{name}'.",
     'guild.alreadyInOne': 'Ya perteneces a una hermandad.',
     'guild.notInOne': 'No perteneces a ninguna hermandad.',
+    'guild.createFee': 'Necesitas {amount} de oro para fundar una hermandad.',
+    'guild.bankNotEmpty':
+      'El banco de hermandad debe vaciarse antes de poder disolver la hermandad.',
+    'guild.bankClosing':
+      'El banco de hermandad se está cerrando. Inténtalo de nuevo en un momento.',
     'guild.onlyOfficersInvite': 'Solo los oficiales y el Maestro de hermandad pueden invitar.',
     'guild.alreadyInThis': 'Ya perteneces a la hermandad.',
     'guild.mustBeOnline': '{name} debe estar conectado para poder ser invitado.',
@@ -561,6 +581,10 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.exists': 'Une guilde nommée « {name} » existe déjà.',
     'guild.alreadyInOne': 'Vous appartenez déjà à une guilde.',
     'guild.notInOne': "Vous n'appartenez à aucune guilde.",
+    'guild.createFee': "Il vous faut {amount} pièces d'or pour fonder une guilde.",
+    'guild.bankNotEmpty':
+      'La banque de guilde doit être vidée avant que la guilde puisse être dissoute.',
+    'guild.bankClosing': 'La banque de guilde est en cours de fermeture. Réessaie dans un instant.',
     'guild.onlyOfficersInvite': 'Seuls les officiers et le maître de guilde peuvent inviter.',
     'guild.alreadyInThis': 'Vous appartenez déjà à cette guilde.',
     'guild.mustBeOnline': '{name} doit être en ligne pour être invité.',
@@ -687,6 +711,10 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.exists': 'Une guilde nommée « {name} » existe déjà.',
     'guild.alreadyInOne': "Vous faites déjà partie d'une guilde.",
     'guild.notInOne': "Vous ne faites partie d'aucune guilde.",
+    'guild.createFee': "Il vous faut {amount} pièces d'or pour fonder une guilde.",
+    'guild.bankNotEmpty':
+      'La banque de guilde doit être vidée avant que la guilde puisse être dissoute.',
+    'guild.bankClosing': 'La banque de guilde est en cours de fermeture. Réessaie dans un instant.',
     'guild.onlyOfficersInvite': 'Seuls les officiers et le maître de guilde peuvent inviter.',
     'guild.alreadyInThis': 'Vous faites déjà partie de la guilde.',
     'guild.mustBeOnline': '{name} doit être en ligne pour être invité.',
@@ -808,6 +836,10 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.exists': "Esiste già una gilda chiamata '{name}'.",
     'guild.alreadyInOne': 'Fai già parte di una gilda.',
     'guild.notInOne': 'Non fai parte di nessuna gilda.',
+    'guild.createFee': "Ti servono {amount} monete d'oro per fondare una gilda.",
+    'guild.bankNotEmpty':
+      'La banca di gilda deve essere svuotata prima di poter sciogliere la gilda.',
+    'guild.bankClosing': 'La banca di gilda si sta chiudendo. Riprova tra un momento.',
     'guild.onlyOfficersInvite': 'Solo gli ufficiali e il Maestro di Gilda possono invitare.',
     'guild.alreadyInThis': 'Fai già parte della gilda.',
     'guild.mustBeOnline': '{name} deve essere connesso per essere invitato.',
@@ -934,6 +966,10 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.exists': "Eine Gilde mit dem Namen '{name}' existiert bereits.",
     'guild.alreadyInOne': 'Ihr seid bereits in einer Gilde.',
     'guild.notInOne': 'Ihr seid in keiner Gilde.',
+    'guild.createFee': 'Ihr benötigt {amount} Gold, um eine Gilde zu gründen.',
+    'guild.bankNotEmpty':
+      'Die Gildenbank muss geleert werden, bevor die Gilde aufgelöst werden kann.',
+    'guild.bankClosing': 'Die Gildenbank wird geschlossen. Versuche es gleich noch einmal.',
     'guild.onlyOfficersInvite': 'Nur Offiziere und der Gildenmeister können einladen.',
     'guild.alreadyInThis': 'Ihr seid bereits in der Gilde.',
     'guild.mustBeOnline': '{name} muss online sein, um eingeladen zu werden.',
@@ -1053,6 +1089,9 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.exists': '已存在名为“{name}”的公会。',
     'guild.alreadyInOne': '你已经加入了一个公会。',
     'guild.notInOne': '你没有加入任何公会。',
+    'guild.createFee': '创建公会需要{amount}金币。',
+    'guild.bankNotEmpty': '必须先清空公会银行才能解散公会。',
+    'guild.bankClosing': '公会银行正在关闭。请稍后再试。',
     'guild.onlyOfficersInvite': '只有官员和会长才能邀请成员。',
     'guild.alreadyInThis': '你已经在该公会中了。',
     'guild.mustBeOnline': '{name}必须在线才能被邀请。',
@@ -1168,6 +1207,9 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.exists': '已經有一個名為「{name}」的公會存在。',
     'guild.alreadyInOne': '你已經加入了一個公會。',
     'guild.notInOne': '你並未加入任何公會。',
+    'guild.createFee': '建立公會需要 {amount} 金幣。',
+    'guild.bankNotEmpty': '必須先清空公會銀行才能解散公會。',
+    'guild.bankClosing': '公會銀行正在關閉。請稍後再試。',
     'guild.onlyOfficersInvite': '只有幹部和會長才能邀請成員。',
     'guild.alreadyInThis': '你已經是這個公會的成員。',
     'guild.mustBeOnline': '{name} 必須在線上才能被邀請。',
@@ -1284,6 +1326,9 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.exists': "'{name}'(이)라는 이름의 길드가 이미 존재합니다.",
     'guild.alreadyInOne': '이미 길드에 가입되어 있습니다.',
     'guild.notInOne': '길드에 가입되어 있지 않습니다.',
+    'guild.createFee': '길드를 창설하려면 {amount} 골드가 필요합니다.',
+    'guild.bankNotEmpty': '길드를 해산하려면 먼저 길드 은행을 비워야 합니다.',
+    'guild.bankClosing': '길드 은행이 닫히는 중입니다. 잠시 후 다시 시도하세요.',
     'guild.onlyOfficersInvite': '장교와 길드장만 초대할 수 있습니다.',
     'guild.alreadyInThis': '이미 해당 길드에 가입되어 있습니다.',
     'guild.mustBeOnline': '{name}님을 초대하려면 접속 중이어야 합니다.',
@@ -1401,6 +1446,9 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.exists': '「{name}」という名前のギルドはすでに存在します。',
     'guild.alreadyInOne': 'あなたはすでにギルドに所属しています。',
     'guild.notInOne': 'あなたはギルドに所属していません。',
+    'guild.createFee': 'ギルドを設立するには{amount}ゴールドが必要です。',
+    'guild.bankNotEmpty': 'ギルドを解散するには、先にギルド銀行を空にする必要があります。',
+    'guild.bankClosing': 'ギルド銀行は閉鎖中です。しばらくしてからもう一度お試しください。',
     'guild.onlyOfficersInvite': '招待できるのはオフィサーとギルドマスターのみです。',
     'guild.alreadyInThis': 'あなたはすでにこのギルドに所属しています。',
     'guild.mustBeOnline': '{name}を招待するには、相手がオンラインである必要があります。',
@@ -1525,6 +1573,10 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.exists': "Já existe uma guilda chamada '{name}'.",
     'guild.alreadyInOne': 'Você já está em uma guilda.',
     'guild.notInOne': 'Você não está em uma guilda.',
+    'guild.createFee': 'Você precisa de {amount} de ouro para fundar uma guilda.',
+    'guild.bankNotEmpty':
+      'O banco da guilda deve ser esvaziado antes que a guilda possa ser dissolvida.',
+    'guild.bankClosing': 'O banco da guilda está fechando. Tente novamente em um momento.',
     'guild.onlyOfficersInvite': 'Apenas oficiais e o Mestre da Guilda podem convidar.',
     'guild.alreadyInThis': 'Você já está na guilda.',
     'guild.mustBeOnline': '{name} precisa estar online para ser convidado.',
@@ -1646,6 +1698,9 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.exists': 'Гильдия с названием «{name}» уже существует.',
     'guild.alreadyInOne': 'Вы уже состоите в гильдии.',
     'guild.notInOne': 'Вы не состоите в гильдии.',
+    'guild.createFee': 'Чтобы основать гильдию, вам нужно {amount} золота.',
+    'guild.bankNotEmpty': 'Прежде чем распустить гильдию, необходимо опустошить гильдейский банк.',
+    'guild.bankClosing': 'Гильдейский банк закрывается. Попробуйте ещё раз через мгновение.',
     'guild.onlyOfficersInvite': 'Приглашать могут только офицеры и глава гильдии.',
     'guild.alreadyInThis': 'Вы уже состоите в этой гильдии.',
     'guild.mustBeOnline': '{name} должен(на) быть в сети, чтобы получить приглашение.',
@@ -1995,6 +2050,13 @@ const RULES: Rule[] = [
   {
     re: /^You found the guild <([^>]+)>! You are its Guild Master\.$/,
     build: (m) => tServer('guild.founded', { name: m[1] }),
+  },
+  {
+    // The guild creation-fee refusal (server/game.ts guild_create dispatch).
+    // The amount is derived from GUILD_CREATION_FEE_COPPER and spliced through
+    // verbatim, like every other count.
+    re: /^You need (\d+) gold to found a guild\.$/,
+    build: (m) => tServer('guild.createFee', { amount: m[1] }),
   },
   {
     re: /^You have left <([^>]+)>\. The guild has disbanded\.$/,

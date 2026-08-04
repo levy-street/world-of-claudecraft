@@ -216,6 +216,17 @@ function tintFor(visualKey, entityColor) {
   if (!def || def.tint === undefined) return null;
   return def.tint === 'entity' ? entityColor : def.tint;
 }
+// The manifest's tint strength for a tinted model, resolved with the same fallback
+// modelKeyFor bakes onto MODELS[visualKey], so a figure's own record and its model spec
+// never disagree. Baked onto the figure alongside tint/still and threaded into
+// stillUrl/stillKey so a tintStrength-only manifest edit (no tint color change) mints a
+// new still key: the old committed WebP orphans and the new one is missing until someone
+// regenerates, which is the self-detection this module exists for (see still_key.mjs).
+function tintStrengthFor(visualKey) {
+  const def = VISUALS[visualKey];
+  if (!def || def.tint === undefined) return undefined;
+  return def.tintStrength ?? 0.4;
+}
 const playerVisualKey = (id) => visualKeyFor({ kind: 'player', templateId: id });
 const mobVisualKey = (id) => visualKeyFor({ kind: 'mob', templateId: id });
 
@@ -240,6 +251,7 @@ const classes = ALL_CLASSES.map((id) => {
   const vk = playerVisualKey(id);
   const tint = tintFor(vk, 0xffffff);
   const tintHex = tint != null ? hex(tint) : null;
+  const tintStrength = tintStrengthFor(vk);
   const model = modelKeyFor(vk);
   return {
     id,
@@ -251,7 +263,10 @@ const classes = ALL_CLASSES.map((id) => {
     abilities: kit.map(abilityRef),
     model,
     ...(tintHex != null ? { tint: tintHex } : {}),
-    ...(stillUrl(model, tintHex) ? { still: stillUrl(model, tintHex) } : {}),
+    ...(tintStrength !== undefined ? { tintStrength } : {}),
+    ...(stillUrl(model, tintHex, tintStrength)
+      ? { still: stillUrl(model, tintHex, tintStrength) }
+      : {}),
   };
 });
 
@@ -308,11 +323,15 @@ const druidForms = DRUID_FORM_KEYS.map((vk) => {
   if (!model) throw new Error(`druid form visual missing from the manifest: ${vk}`);
   const tint = tintFor(vk, 0xffffff);
   const tintHex = tint != null ? hex(tint) : null;
+  const tintStrength = tintStrengthFor(vk);
   return {
     id: vk,
     model,
     ...(tintHex != null ? { tint: tintHex } : {}),
-    ...(stillUrl(model, tintHex) ? { still: stillUrl(model, tintHex) } : {}),
+    ...(tintStrength !== undefined ? { tintStrength } : {}),
+    ...(stillUrl(model, tintHex, tintStrength)
+      ? { still: stillUrl(model, tintHex, tintStrength) }
+      : {}),
   };
 });
 
@@ -321,13 +340,17 @@ const warlockPets = Object.values(WARLOCK_PET_MOBS).map((p) => {
   const vk = mobVisualKey(p.id);
   const tint = tintFor(vk, p.color ?? 0xffffff);
   const tintHex = tint != null ? hex(tint) : null;
+  const tintStrength = tintStrengthFor(vk);
   const model = modelKeyFor(vk);
   return {
     id: p.id,
     name: p.name,
     model,
     ...(tintHex != null ? { tint: tintHex } : {}),
-    ...(stillUrl(model, tintHex) ? { still: stillUrl(model, tintHex) } : {}),
+    ...(tintStrength !== undefined ? { tintStrength } : {}),
+    ...(stillUrl(model, tintHex, tintStrength)
+      ? { still: stillUrl(model, tintHex, tintStrength) }
+      : {}),
   };
 });
 
@@ -368,6 +391,7 @@ for (const [id, m] of Object.entries(MOBS)) {
   const vk = mobVisualKey(id);
   const tint = tintFor(vk, m.color ?? 0xffffff);
   const tintHex = tint != null ? hex(tint) : null;
+  const tintStrength = tintStrengthFor(vk);
   const model = modelKeyFor(vk);
   famMap[m.family] ??= new Map();
   famMap[m.family].set(m.name, {
@@ -378,7 +402,10 @@ for (const [id, m] of Object.entries(MOBS)) {
     templateId: id,
     model,
     ...(tintHex != null ? { tint: tintHex } : {}),
-    ...(stillUrl(model, tintHex) ? { still: stillUrl(model, tintHex) } : {}),
+    ...(tintStrength !== undefined ? { tintStrength } : {}),
+    ...(stillUrl(model, tintHex, tintStrength)
+      ? { still: stillUrl(model, tintHex, tintStrength) }
+      : {}),
   });
   publishedMobIds.add(id);
 }
@@ -923,6 +950,10 @@ export interface GuideClassInfo {
   abilities: GuideAbilityRef[];
   model: string;
   tint?: string;
+  /** Manifest tint strength (0..1) for this figure's model, when tinted. Feeds the still's
+   *  filename identity (still_key.mjs) alongside model/tint; the live viewer reads its own
+   *  copy off GuideModelSpec.tintStrength, so this is not consumed for rendering. */
+  tintStrength?: number;
   /** Pre-rendered transparent still (public/guide-stills/), the default poster. */
   still?: string;
 }
@@ -949,13 +980,13 @@ export interface GuideDungeon {
   name?: string;
 }
 
-export interface GuideWarlockPet { id: string; name: string; model: string; tint?: string; still?: string; }
+export interface GuideWarlockPet { id: string; name: string; model: string; tint?: string; tintStrength?: number; still?: string; }
 
 // Druid shapeshift forms. Unnamed on purpose: the gallery labels them with guide.models.form*
 // keys so the names localize like the rest of the picker chrome.
-export interface GuideDruidForm { id: string; model: string; tint?: string; still?: string; }
+export interface GuideDruidForm { id: string; model: string; tint?: string; tintStrength?: number; still?: string; }
 
-export interface GuideCreature { name: string; min: number; max: number; rare: boolean; templateId: string; model: string; tint?: string; still?: string; }
+export interface GuideCreature { name: string; min: number; max: number; rare: boolean; templateId: string; model: string; tint?: string; tintStrength?: number; still?: string; }
 export interface GuideFamily { family: string; creatures: GuideCreature[]; }
 
 export interface GuideDelveKeeper { name: string; title: string; }

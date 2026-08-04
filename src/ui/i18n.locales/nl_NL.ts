@@ -7943,10 +7943,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.quit': 'Afsluiten',
   'desktop.crash.reload': 'Opnieuw laden',
   'desktop.crash.title': 'World of ClaudeCraft',
-  'desktop.update.downloading': 'Update {version} wordt gedownload...',
+  'desktop.update.downloadingTitle': 'Update {version} wordt gedownload...',
   'desktop.update.later': 'Later',
-  'desktop.update.ready':
-    'Update {version} is klaar. Deze wordt geïnstalleerd wanneer je afsluit, of herstart nu.',
+  'desktop.update.readyTitle': 'Update {version} is klaar',
+  'desktop.update.readyBody': 'Deze wordt geïnstalleerd wanneer je afsluit, of herstart nu.',
   'desktop.update.restart': 'Nu herstarten',
   'hudChrome.dailyRewards.close': 'Dagelijkse beloningen sluiten',
   'hudChrome.dailyRewards.endsIn': 'Eindigt over {time}',

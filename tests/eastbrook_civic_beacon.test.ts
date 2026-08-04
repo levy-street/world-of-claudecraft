@@ -326,7 +326,7 @@ describe('Eastbrook civic beacon shader animation', () => {
     });
   });
 
-  it('preserves the committed 29,110 runtime triangle budget without another draw', async () => {
+  it('preserves the committed 28,902 runtime triangle budget without another draw', async () => {
     await MeshoptDecoder.ready;
     const io = new NodeIO()
       .registerExtensions(ALL_EXTENSIONS)
@@ -346,7 +346,7 @@ describe('Eastbrook civic beacon shader animation', () => {
       triangleCountByAsset[assetUrl] = triangles;
     }
     expect(eastbrookTownTriangleBudget(triangleCountByAsset)).toMatchObject({
-      maximumRuntimeTriangles: 29_110,
+      maximumRuntimeTriangles: 28_902,
       withinHardCeiling: true,
       meetsTarget: true,
     });

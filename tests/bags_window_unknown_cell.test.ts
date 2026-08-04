@@ -59,6 +59,7 @@ function harness(inventory: InvSlot[]): {
     isMarketSell: () => false,
     isMailAttach: () => false,
     isBankOpen: () => true,
+    isPersonalBankTab: () => true,
     pendingPetFeed: () => false,
     closeVendor: noop,
     closeBank: noop,
@@ -78,6 +79,7 @@ function harness(inventory: InvSlot[]): {
     isTouchHud: () => false,
     markEquipDropTargets: noop,
     dropOnEquipSlot: noop,
+    isGuildBankTab: () => false,
     dropOnActionSlot: noop,
     dropOnActionRingSlot: noop,
     openItemActionMenu: noop,
@@ -158,7 +160,9 @@ describe('bagUnknownAction mirrors the bagItemAction ladder', () => {
       mailAttach: false,
       marketSell: false,
       vendorOpen: false,
+      bankOpen: false,
       bankDeposit: false,
+      guildBankDeposit: false,
       petFeed: false,
     },
   };
@@ -166,6 +170,30 @@ describe('bagUnknownAction mirrors the bagItemAction ladder', () => {
   it('deposits only with the bank open and no higher mode active', () => {
     expect(bagUnknownAction({ ...MODES.none, bankDeposit: true })).toBe('bankDeposit');
     expect(bagUnknownAction(MODES.none)).toBe('none');
+  });
+
+  it('an open bank with no deposit target offers nothing (the log view)', () => {
+    // The unknown cell needs no no-target rung of its own: it has no use/equip
+    // ladder below to fall into, so 'none' is already right. Pinned so the
+    // asymmetry with bagItemAction (which DID need an explicit rung) is a
+    // stated decision rather than an oversight nobody rechecks.
+    expect(bagUnknownAction({ ...MODES.none, bankOpen: true })).toBe('none');
+    // And the superset flag never suppresses an ARMED personal deposit.
+    expect(bagUnknownAction({ ...MODES.none, bankOpen: true, bankDeposit: true })).toBe(
+      'bankDeposit',
+    );
+  });
+
+  it('offers NOTHING on the guild tab: an unknown copy could strand dormant', () => {
+    // Fail closed, and pinned as its own rule rather than as a side effect of
+    // the two bank modes being exclusive. A stale client cannot evaluate the
+    // guild pipe's four refusal dimensions, and a refused copy sits dormant in
+    // a shared book that no player action can clear.
+    expect(bagUnknownAction({ ...MODES.none, guildBankDeposit: true })).toBe('none');
+    // Even if a future mode build set both, the guild tab still wins as none.
+    expect(bagUnknownAction({ ...MODES.none, guildBankDeposit: true, bankDeposit: true })).toBe(
+      'none',
+    );
   });
 
   it('every def-needing mode above the deposit in bagItemAction wins here as none', () => {

@@ -54,6 +54,8 @@ describe('wireEntity aura serialization', () => {
     expect(w).not.toHaveProperty('stacks');
     expect(w).not.toHaveProperty('charges');
     expect(w).not.toHaveProperty('src');
+    expect(w).not.toHaveProperty('ub');
+    expect(w).not.toHaveProperty('und');
     expect(w).not.toHaveProperty('bt');
   });
 
@@ -70,6 +72,8 @@ describe('wireEntity aura serialization', () => {
         stacks: 4,
         charges: 2,
         sourceId: 7,
+        unbreakableControl: true,
+        undispellable: true,
         breakThreshold: 25,
       }),
     ];
@@ -89,6 +93,8 @@ describe('wireEntity aura serialization', () => {
       stacks: 4,
       charges: 2,
       src: 7,
+      ub: 1,
+      und: 1,
       bt: 1,
     });
     expect(Object.keys(w)).toEqual([
@@ -105,6 +111,8 @@ describe('wireEntity aura serialization', () => {
       'stacks',
       'charges',
       'src',
+      'ub',
+      'und',
       'bt',
     ]);
   });
