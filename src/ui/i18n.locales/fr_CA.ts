@@ -303,7 +303,8 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'desktop.update.checkingTitle': 'Recherche de mises à jour...',
   'desktop.update.checkingBody': 'Les nouvelles versions se téléchargent pendant que vous jouez.',
   'desktop.update.dismiss': 'Fermer',
-  'desktop.update.downloadingBody': "Vous pouvez continuer à jouer; elle s'installera à la fermeture.",
+  'desktop.update.downloadingBody':
+    "Vous pouvez continuer à jouer; elle s'installera à la fermeture.",
   'desktop.update.uptodateTitle': 'Vous utilisez déjà la dernière version.',
   'hudChrome.crafting.dialogOption': 'Artisanat',
   'hudChrome.crafting.dialogOptionAria': "Ouvrir la fenêtre d'artisanat pour {craft}",
