@@ -55,6 +55,40 @@ describe('Thornpeak quest de-duplication', () => {
     });
   });
 
+  describe('The Voice Below repoints its zealot kill at an elite (q_voice_below)', () => {
+    it('adds an elite Threnos the First Voice, placed in the world', () => {
+      const v = MOBS.threnos_first_voice;
+      expect(v).toBeDefined();
+      expect(v.elite).toBe(true);
+      expect(v.family).toBe('humanoid');
+      expect(CAMPS.some((c) => c.mobId === 'threnos_first_voice')).toBe(true);
+    });
+    it('kills the elite plus the necromancers, no longer the generic zealot', () => {
+      const q = QUESTS.q_voice_below;
+      // The zealot kill (duplicated with q_zealots) is gone; the necromancer kill,
+      // which is not a duplicate objective, is kept.
+      expect(
+        q.objectives.some((x) => x.type === 'kill' && x.targetMobId === 'wyrmcult_zealot'),
+      ).toBe(false);
+      const elite = q.objectives.find(
+        (x) => x.type === 'kill' && x.targetMobId === 'threnos_first_voice',
+      );
+      expect(elite).toBeDefined();
+      if (elite?.type === 'kill') expect(elite.count).toBe(1);
+      expect(
+        q.objectives.some((x) => x.type === 'kill' && x.targetMobId === 'wyrmcult_necromancer'),
+      ).toBe(true);
+    });
+    it('leaves Chants on the Wind as the only remaining zealot kill (q_zealots)', () => {
+      const zealotKillQuests = Object.entries(QUESTS)
+        .filter(([, q]) =>
+          q.objectives.some((o) => o.type === 'kill' && o.targetMobId === 'wyrmcult_zealot'),
+        )
+        .map(([id]) => id);
+      expect(zealotKillQuests).toEqual(['q_zealots']);
+    });
+  });
+
   describe('Bones of the Vanguard becomes a bone collect (q_revenant_vanguard)', () => {
     it('adds the Vanguard Bone item dropping from Boneclad Revenants', () => {
       expect(ITEMS.vanguard_bone?.questId).toBe('q_revenant_vanguard');

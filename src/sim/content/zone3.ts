@@ -546,6 +546,35 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     color: 0x533566,
     componentTags: ['cloth'],
   },
+  threnos_first_voice: {
+    id: 'threnos_first_voice',
+    name: 'Threnos the First Voice',
+    minLevel: 19,
+    maxLevel: 19,
+    family: 'humanoid',
+    elite: true,
+    hpBase: 88,
+    hpPerLevel: 24,
+    dmgBase: 14,
+    dmgPerLevel: 2.8,
+    attackSpeed: 2.0,
+    armorPerLevel: 18,
+    moveSpeed: 7,
+    aggroRadius: 12,
+    // The loudest of the choir: Korzul speaks through him, and his chant claws
+    // deeper at the mind than any common zealot's (a stronger Maddening Whisper).
+    enfeeble: { chance: 0.35, int: 18, duration: 12, name: 'The Waking Voice', school: 'shadow' },
+    // Like his flock, he brands away a victim's fire so none may rival the wyrm's.
+    lockout: { chance: 0.3, duration: 6, name: 'Wyrmward Sigil', school: 'fire' },
+    loot: [
+      { copper: 300, chance: 1 },
+      { itemId: 'frayed_prayer_beads', chance: 1 },
+      { itemId: 'shardsong_mantle', chance: 0.06 },
+    ],
+    scale: 1.3,
+    color: 0x9b59b6,
+    componentTags: ['cloth'],
+  },
   boneclad_revenant: {
     id: 'boneclad_revenant',
     name: 'Boneclad Revenant',
@@ -1736,11 +1765,16 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'The Voice Below',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
-    text: 'Last night the whole cult camp knelt at once, $N — every zealot, every necromancer, all facing the Sanctum. Korzul speaks to them in their sleep now; Vael heard the same voice in the fen, and Morthen before him. Cut the congregation down — ten zealots, six necromancers — before that voice has hands enough to pull the gate open itself.',
+    text: 'Last night the whole cult camp knelt at once, $N, every zealot and necromancer facing the Sanctum, and one throat led the chant. They call him Threnos, the First Voice, and Korzul speaks through his mouth. Vael heard the same voice in the fen, and Morthen before him. Silence Threnos and cut down the six necromancers who keep his choir, before that voice has hands enough to pull the gate open itself.',
     completionText:
-      'The kneeling has stopped. We have not silenced the voice, $N — only thinned its choir. It must be enough.',
+      'Threnos is silent, and the kneeling has stopped, $N. We have not ended the voice below, only taken from it the mouth that carried it. It must be enough.',
     objectives: [
-      { type: 'kill', targetMobId: 'wyrmcult_zealot', count: 10, label: 'Wyrmcult Zealot slain' },
+      {
+        type: 'kill',
+        targetMobId: 'threnos_first_voice',
+        count: 1,
+        label: 'Threnos the First Voice silenced',
+      },
       {
         type: 'kill',
         targetMobId: 'wyrmcult_necromancer',
@@ -2104,6 +2138,9 @@ export const ZONE3_CAMPS: CampDef[] = [
   { mobId: 'wyrmcult_zealot', center: { x: 55, z: 820 }, radius: 20, count: 8 },
   { mobId: 'wyrmcult_zealot', center: { x: 34, z: 845 }, radius: 16, count: 6 },
   { mobId: 'wyrmcult_necromancer', center: { x: 40, z: 855 }, radius: 14, count: 5 },
+  // Quest capstone: Threnos the First Voice leads the congregation before the
+  // Sanctum gate (q_voice_below).
+  { mobId: 'threnos_first_voice', center: { x: 44, z: 848 }, radius: 3, count: 1 },
   // Revenants: the old battlefield (Revenant Fields). The second pack used to sit
   // at (-15, 860), right where the x=0 Sanctum Approach road ends and only ~20yd
   // from the gate, so (aggroRadius 11) it jumped players entering/exiting the
