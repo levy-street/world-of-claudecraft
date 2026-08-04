@@ -1,9 +1,10 @@
 import * as THREE from 'three';
-import { WORLD_MAX_Z, WORLD_MIN_Z, WORLD_SIZE } from '../sim/data';
+import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z, WORLD_SIZE } from '../sim/data';
 import type { ZoneDef } from '../sim/types';
 import { waterLevel } from '../sim/world';
 import { loadTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { activeFarFieldPolicy } from './foliage_impostor';
 import { GFX, type GfxSettings, SUN_DIR, sharedUniforms } from './gfx';
 import { idleSlot, runIdleQueue } from './idle_queue';
 import { waterNormalish, waterNormalMaps } from './textures';
@@ -467,12 +468,20 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
   // the baked bounding volumes stay valid.
   const refits: (() => void)[] = [];
   // The apron: one huge deep-sea sheet running far past every map edge, so
-  // looking off the world's side reads as open ocean to the fog line, never
+  // looking off the world's side reads as open ocean to the horizon, never
   // a water plane ending in mid-air. It sits a hair below the zone planes
-  // (no z-fight) and carries a constant deep shore attribute.
+  // (no z-fight) and carries a constant deep shore attribute. Its reach must
+  // beat the view envelope from ANY camera position or its rim shows as a
+  // line against the sky; the vista tiers (whose outdoor fog is gone) open
+  // that envelope well past the classic view, so the apron grows with the
+  // tier plan, with extra segments so coastal cells stay fade-band sized.
   {
-    const span = WORLD_MAX_Z - WORLD_MIN_Z + 2400;
-    const geo = new THREE.PlaneGeometry(3000, span, APRON_SEGMENTS, APRON_SEGMENTS).rotateX(
+    const vista = activeFarFieldPolicy().vista;
+    const reach = vista.enabled ? WORLD_MAX_X + vista.envelopeFar + 400 : 0;
+    const width = vista.enabled ? reach * 2 : 3000;
+    const span = WORLD_MAX_Z - WORLD_MIN_Z + (vista.enabled ? reach * 2 : 2400);
+    const apronSegments = vista.enabled ? 288 : APRON_SEGMENTS;
+    const geo = new THREE.PlaneGeometry(width, span, apronSegments, apronSegments).rotateX(
       -Math.PI / 2,
     );
     geo.translate(0, 0, (WORLD_MIN_Z + WORLD_MAX_Z) / 2);
@@ -527,9 +536,9 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       // reads foam as depth/slope, and a constant slope of 1 against the real
       // shelf depths out here (~1.5 yards) lands inside the surf band and would
       // paint foam across open water.
-      const columns = APRON_SEGMENTS + 1;
-      const dx = (2 * 3000) / APRON_SEGMENTS;
-      const dz = (2 * span) / APRON_SEGMENTS;
+      const columns = apronSegments + 1;
+      const dx = (2 * width) / apronSegments;
+      const dz = (2 * span) / apronSegments;
       for (let i = 0; i < pos.count; i++) {
         const row = Math.floor(i / columns);
         const col = i % columns;
