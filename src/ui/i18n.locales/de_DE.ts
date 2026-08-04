@@ -11242,7 +11242,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'desktop.update.checkingTitle': 'Suche nach Updates...',
   'desktop.update.checkingBody': 'Neue Versionen werden heruntergeladen, während du spielst.',
   'desktop.update.dismiss': 'Schließen',
-  'desktop.update.downloadingBody': 'Du kannst weiterspielen; die Installation erfolgt beim Beenden.',
+  'desktop.update.downloadingBody':
+    'Du kannst weiterspielen; die Installation erfolgt beim Beenden.',
   'desktop.update.uptodateTitle': 'Du hast bereits die neueste Version.',
   'hudChrome.crafting.dialogOption': 'Handwerk',
   'hudChrome.crafting.dialogOptionAria': 'Handwerksfenster für {craft} öffnen',

@@ -11005,7 +11005,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'desktop.update.checkingTitle': 'Søger efter opdateringer...',
   'desktop.update.checkingBody': 'Nye versioner hentes, mens du spiller.',
   'desktop.update.dismiss': 'Luk',
-  'desktop.update.downloadingBody': 'Du kan fortsætte med at spille; den installeres, når du afslutter.',
+  'desktop.update.downloadingBody':
+    'Du kan fortsætte med at spille; den installeres, når du afslutter.',
   'desktop.update.uptodateTitle': 'Du har allerede den nyeste version.',
   'hudChrome.crafting.dialogOption': 'Håndværk',
   'hudChrome.crafting.dialogOptionAria': 'Åbn håndværksvinduet for {craft}',

@@ -590,7 +590,8 @@ export class Keybinds {
     for (const a of BIND_ACTIONS) {
       if (Array.isArray(obj[a.id])) continue;
       if (actionAllowsShared(a.id)) continue; // keep its (intentionally shared) default
-      const slots = this.map.get(a.id)!;
+      const slots = this.map.get(a.id);
+      if (slots === undefined) continue;
       for (let i = 0; i < slots.length; i++) {
         const c = slots[i];
         if (c === null) continue;

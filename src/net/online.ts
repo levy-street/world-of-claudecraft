@@ -989,12 +989,12 @@ export class Api {
   // ONE request. In-flight only, keyed by the realm base: nothing is memoized
   // past settle, so every non-overlapping call still reads the server fresh,
   // and a realm switch mid-flight never serves the old realm's document.
-  private statusDocInFlight: { base: string; doc: Promise<any> } | null = null;
+  private statusDocInFlight: { base: string; doc: Promise<Record<string, unknown>> } | null = null;
 
-  private statusDoc(): Promise<any> {
+  private statusDoc(): Promise<Record<string, unknown>> {
     const hit = this.statusDocInFlight;
     if (hit !== null && hit.base === this.base) return hit.doc;
-    const doc = this.get('/api/status').finally(() => {
+    const doc = this.get<Record<string, unknown>>('/api/status').finally(() => {
       if (this.statusDocInFlight?.doc === doc) this.statusDocInFlight = null;
     });
     this.statusDocInFlight = { base: this.base, doc };

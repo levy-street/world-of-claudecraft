@@ -61,6 +61,26 @@ const WIRE_TEST_WORLD: WorldContent = {
   groundObjects: [],
 };
 
+type SnapshotClient = ClientWorld & { applySnapshot(snap: unknown): void };
+type MessageClient = ClientWorld & { onMessage(message: string): void };
+type SelfWireServer = GameServer & {
+  selfWireJson(session: ClientSession, ...rest: unknown[]): string;
+};
+
+function applyClientSnapshot(client: ClientWorld, snap: unknown): void {
+  (client as SnapshotClient).applySnapshot(snap);
+}
+
+function feedEventFrame(client: ClientWorld, frame: unknown): void {
+  (client as MessageClient).onMessage(JSON.stringify(frame));
+}
+
+function requireClientEntity(client: ClientWorld, id: number): Entity {
+  const entity = client.entities.get(id);
+  if (entity === undefined) throw new Error(`missing mirrored entity ${id}`);
+  return entity;
+}
+
 const DELTA_KEYS = [
   'inv',
   'buyback',
@@ -86,10 +106,6 @@ function eventTexts(sent: any[]): string[] {
     .flatMap((msg) => (msg.t === 'events' ? msg.list : []))
     .filter((ev) => ev.type === 'log' || ev.type === 'error')
     .map((ev) => ev.text);
-}
-
-function feedEventFrame(client: ClientWorld, frame: unknown): void {
-  (client as any).onMessage(JSON.stringify(frame));
 }
 
 describe('self stat wire round-trip', () => {
@@ -322,11 +338,14 @@ describe('per-session isolation in the broadcast loop', () => {
     joinServer(server, after, 3, 'After');
 
     // Force a throw only while serializing the bad session's self payload.
-    const original = (server as any).selfWireJson.bind(server);
-    vi.spyOn(server as any, 'selfWireJson').mockImplementation((session: any, ...rest: any[]) => {
-      if (session.pid === badSession.pid) throw new Error('corrupt self state');
-      return original(session, ...rest);
-    });
+    const selfWireServer = server as SelfWireServer;
+    const original = selfWireServer.selfWireJson.bind(selfWireServer);
+    vi.spyOn(selfWireServer, 'selfWireJson').mockImplementation(
+      (session: ClientSession, ...rest: unknown[]) => {
+        if (session.pid === badSession.pid) throw new Error('corrupt self state');
+        return original(session, ...rest);
+      },
+    );
 
     expect(() => broadcast(server)).not.toThrow();
     // Both healthy sessions, on either side of the throw, still got a snapshot;
@@ -429,8 +448,8 @@ describe('Combat Mech held weapon over the wire', () => {
     const e = sim.entities.get(pid)!;
 
     const client = bareClient(pid + 1000);
-    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
-    const mirrored = client.entities.get(e.id)!;
+    applyClientSnapshot(client, { t: 'snap', ents: [wireEntity(e)] });
+    const mirrored = requireClientEntity(client, e.id);
     expect(mirrored.skinCatalog).toBe('mech');
     expect(mirrored.mainhandItemId).toBe('worn_sword');
     expect(mirrored.offhandItemId).toBe('eastbrook_buckler');
@@ -464,8 +483,8 @@ describe('account flair over the wire', () => {
 
     // A DIFFERENT player's client seeing this streamer in the world.
     const client = bareClient(e.id + 1000);
-    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
-    const mirrored = client.entities.get(e.id)!;
+    applyClientSnapshot(client, { t: 'snap', ents: [wire] });
+    const mirrored = requireClientEntity(client, e.id);
     expect(mirrored.aiAccount).toBe(true);
     expect(mirrored.streamerLinks).toEqual(LINKS);
   });
@@ -481,8 +500,8 @@ describe('account flair over the wire', () => {
     expect(wire).not.toHaveProperty('slk');
 
     const client = bareClient(e.id + 1000);
-    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
-    const mirrored = client.entities.get(e.id)!;
+    applyClientSnapshot(client, { t: 'snap', ents: [wire] });
+    const mirrored = requireClientEntity(client, e.id);
     expect(mirrored.aiAccount).toBe(false);
     expect(mirrored.streamerLinks).toBeUndefined();
   });
@@ -496,8 +515,8 @@ describe('account flair over the wire', () => {
     const wire = { ...wireEntity(e), slk: { twitch: 'javascript:alert(1)' } };
 
     const client = bareClient(e.id + 1000);
-    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
-    expect(client.entities.get(e.id)!.streamerLinks).toBeUndefined();
+    applyClientSnapshot(client, { t: 'snap', ents: [wire] });
+    expect(requireClientEntity(client, e.id).streamerLinks).toBeUndefined();
   });
 });
 
@@ -537,8 +556,8 @@ describe('corpse harvest claim over the wire', () => {
     expect(w).not.toHaveProperty('hcb');
 
     const client = bareClient(1);
-    (client as any).applySnapshot({ t: 'snap', ents: [w] });
-    expect(client.entities.get(mob.id)!.harvestClaimedBy).toBeNull();
+    applyClientSnapshot(client, { t: 'snap', ents: [w] });
+    expect(requireClientEntity(client, mob.id).harvestClaimedBy).toBeNull();
   });
 
   it('clears a stale mirrored claim when a later record arrives without hcb', () => {
@@ -546,14 +565,14 @@ describe('corpse harvest claim over the wire', () => {
     mob.harvestClaimedBy = 42;
 
     const client = bareClient(1);
-    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(mob)] });
-    expect(client.entities.get(mob.id)!.harvestClaimedBy).toBe(42);
+    applyClientSnapshot(client, { t: 'snap', ents: [wireEntity(mob)] });
+    expect(requireClientEntity(client, mob.id).harvestClaimedBy).toBe(42);
 
     // Respawn clears the claim server-side (src/sim/mob/lifecycle.ts); the next
     // record simply omits hcb, and the mirror must reset, not keep the stale pid.
     mob.harvestClaimedBy = null;
-    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(mob)] });
-    expect(client.entities.get(mob.id)!.harvestClaimedBy).toBeNull();
+    applyClientSnapshot(client, { t: 'snap', ents: [wireEntity(mob)] });
+    expect(requireClientEntity(client, mob.id).harvestClaimedBy).toBeNull();
   });
 });
 
