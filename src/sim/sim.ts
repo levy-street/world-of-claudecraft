@@ -5789,8 +5789,8 @@ export class Sim {
     // step-out, matching the movement kernel and the clamp findChargePath
     // already plans with, so a wading-depth ford never ends a charge.
     const h1 = groundHeight(nx, nz, this.cfg.seed);
-    if (h1 < waterLevelAt(nx, nz) - SWIM_DEPTH) return done(false);
-    const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz);
+    if (h1 < waterLevelAt(nx, nz, this.cfg.seed) - SWIM_DEPTH) return done(false);
+    const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz, this.cfg.seed);
     const r0 = Math.max(groundHeight(p.pos.x, p.pos.z, this.cfg.seed), wls);
     const r1 = Math.max(h1, wls);
     if (
@@ -5860,11 +5860,11 @@ export class Sim {
     const nx = p.pos.x + Math.sin(p.facing) * step;
     const nz = p.pos.z + Math.cos(p.facing) * step;
     const h1 = groundHeight(nx, nz, this.cfg.seed);
-    if (h1 < waterLevelAt(nx, nz) - SWIM_DEPTH) return true; // don't trail into deep water
+    if (h1 < waterLevelAt(nx, nz, this.cfg.seed) - SWIM_DEPTH) return true; // don't trail into deep water
     // ridden-surface slopes plus the shore step-out (ride_height.ts), matching
     // the movement kernel: a follower crosses the same fords and climbs the
     // same low banks its leader just walked.
-    const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz);
+    const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz, this.cfg.seed);
     const r0 = Math.max(groundHeight(p.pos.x, p.pos.z, this.cfg.seed), wls);
     const r1 = Math.max(h1, wls);
     if (
@@ -6383,11 +6383,11 @@ export class Sim {
       const nx = cx + ux * adv,
         nz = cz + uz * adv;
       const h1 = groundHeight(nx, nz, this.cfg.seed);
-      if (h1 < waterLevelAt(nx, nz) - SWIM_DEPTH) break; // would land in deep water
+      if (h1 < waterLevelAt(nx, nz, this.cfg.seed) - SWIM_DEPTH) break; // would land in deep water
       // ridden-surface slopes (ride_height.ts): a submerged bed bump does not
       // stop a shove crossing shallow water. No shore step-out here: a forced
       // displacement conservatively stops at a bank face.
-      const wls = stepWaterLevel(cx, cz, nx, nz);
+      const wls = stepWaterLevel(cx, cz, nx, nz, this.cfg.seed);
       const r0 = Math.max(groundHeight(cx, cz, this.cfg.seed), wls);
       const r1 = Math.max(h1, wls);
       if (
@@ -7201,7 +7201,7 @@ export class Sim {
       e.pos.x = nx;
       e.pos.z = nz;
       const g = groundHeight(nx, nz, this.cfg.seed);
-      e.pos.y = Math.max(g, swimSurfaceY(nx, nz)); // ride the surface while phasing, don't sink under terrain/water
+      e.pos.y = Math.max(g, swimSurfaceY(nx, nz, this.cfg.seed)); // ride the surface while phasing, don't sink under terrain/water
       return d - step < 0.3;
     }
     // Mobs have no nav mesh. Try the straight path first; only if a prop or the
@@ -7217,7 +7217,7 @@ export class Sim {
     // footprint there is no waterline at all, so a dry sunken feature never
     // reads as a shore.
     const ride = (x: number, z: number, h: number): number => {
-      const wl = waterLevelAt(x, z);
+      const wl = waterLevelAt(x, z, this.cfg.seed);
       return canSwim && h < wl ? wl : h;
     };
     let h0 = Number.NaN; // lazily sampled: only steep cells pay for heights
@@ -7226,7 +7226,10 @@ export class Sim {
       const nx = e.pos.x + Math.sin(a) * step;
       const nz = e.pos.z + Math.cos(a) * step;
       // landlocked creatures stop at the waterline instead of walking under it
-      if (!canSwim && groundHeight(nx, nz, this.cfg.seed) < waterLevelAt(nx, nz) - SWIM_DEPTH) {
+      if (
+        !canSwim &&
+        groundHeight(nx, nz, this.cfg.seed) < waterLevelAt(nx, nz, this.cfg.seed) - SWIM_DEPTH
+      ) {
         continue;
       }
       // Mobs, pets, and feared players obey the wall rule too: no uphill step
@@ -7258,7 +7261,9 @@ export class Sim {
     e.pos.z = bestZ;
     const g = groundHeight(bestX, bestZ, this.cfg.seed);
     e.pos.y =
-      canSwim && g < waterLevelAt(bestX, bestZ) - SWIM_DEPTH ? swimSurfaceY(bestX, bestZ) : g;
+      canSwim && g < waterLevelAt(bestX, bestZ, this.cfg.seed) - SWIM_DEPTH
+        ? swimSurfaceY(bestX, bestZ, this.cfg.seed)
+        : g;
     return dist2d(e.pos, dest) < 0.3;
   }
 

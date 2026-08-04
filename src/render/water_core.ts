@@ -146,6 +146,115 @@ export function shoreDepthAt(x: number, z: number, seed: number): number {
 }
 
 /**
+ * Per-vertex gate for the swell DISPLACEMENT, baked from a sheet's shore-depth
+ * grid: the minimum depth over the vertex's 3x3 grid neighbourhood, less a
+ * margin, on the same `clamp(depth * 0.8, 0, 1)` ramp the shader used to apply
+ * to the vertex's own depth.
+ *
+ * WHY A NEIGHBOURHOOD MINIMUM, and why 3x3 exactly. Gating on the vertex's own
+ * depth is correct AT every vertex and wrong everywhere BETWEEN them: the GPU
+ * interpolates the lift linearly across a quad, so one wet corner drags the
+ * displaced sheet over the whole cell. On the zone planes that reaches 2 to 3.3
+ * yards inland and reads as surf wash, but the horizon apron's cells are 29 by
+ * 38 yards, and there the sheet climbed measurably onto dry beaches (600 quads,
+ * 7892 square yards, up to 0.44 yards proud of the sand) where it painted the
+ * shredded near-opaque foam that shows up in screenshots as water tearing
+ * through the shore.
+ *
+ * The 3x3 minimum closes it completely, and the 4-neighbour version does not.
+ * Displacement inside a triangle is barycentric, so the lift anywhere in a quad
+ * is a convex combination of its four corner lifts. Take any quad with a dry
+ * corner V: every other corner of that quad is a grid neighbour of V by an edge
+ * OR BY A DIAGONAL, so each one's 3x3 window contains V's non-positive depth
+ * and gates to zero, as does V itself. All four lifts are zero, so the whole
+ * quad lies flat at the water level for every wave phase, whatever the terrain
+ * does between the vertices. Drop the diagonals and the corner opposite V
+ * survives, which is exactly the case that leaks.
+ *
+ * `margin` covers what the grid cannot see at all: ground that rises above the
+ * waterline strictly BETWEEN vertices, so no vertex reads dry. Sandbars smaller
+ * than an apron cell are the real case (one measured at 12 by 6 yards). The
+ * planes need none of it at 2 yard spacing.
+ *
+ * A morphological erosion cannot introduce a discontinuity the depth field did
+ * not already have: the gate ramp keeps its shape and moves one cell seaward.
+ */
+export function bakeSwellGate(
+  depth: ArrayLike<number>,
+  columns: number,
+  rows: number,
+  margin: number,
+): Float32Array {
+  const gate = new Float32Array(columns * rows);
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < columns; c++) {
+      let min = Number.POSITIVE_INFINITY;
+      for (let dr = -1; dr <= 1; dr++) {
+        const rr = r + dr;
+        if (rr < 0 || rr >= rows) continue;
+        for (let dc = -1; dc <= 1; dc++) {
+          const cc = c + dc;
+          if (cc < 0 || cc >= columns) continue;
+          const d = depth[rr * columns + cc];
+          if (d < min) min = d;
+        }
+      }
+      const ramp = (min - margin) * 0.8;
+      gate[r * columns + c] = ramp < 0 ? 0 : ramp > 1 ? 1 : ramp;
+    }
+  }
+  return gate;
+}
+
+/**
+ * Dry-tile culling for the water sheets. A zone plane (and the horizon apron)
+ * spans its whole rect, but most of that rect is LAND: every quad whose
+ * corners all sit this far above the waterline has its surface buried under
+ * terrain and can never contribute a visible fragment, yet its vertices are
+ * shaded every frame. The margin is one ~2 yard vertex spacing of slack so a
+ * quad that straddles the waterline contour (or heaves with the swell) is
+ * always kept; only genuinely-inland tiles drop.
+ */
+export const WATER_TILE_KEEP_ABOVE = -0.75;
+
+/**
+ * Index buffer over a (columns x rows) vertex lattice keeping only quads with
+ * at least one corner deeper than WATER_TILE_KEEP_ABOVE. Triangle order and
+ * winding match THREE.PlaneGeometry exactly (a,b,d / b,c,d), so a culled
+ * geometry renders identically to the full sheet minus the buried tiles.
+ * Returns null when nothing was dropped (keep the geometry's own index).
+ */
+export function buildWaterSurfaceIndex(
+  depth: ArrayLike<number>,
+  columns: number,
+  rows: number,
+): Uint16Array | Uint32Array | null {
+  const quads: number[] = [];
+  let dropped = 0;
+  for (let r = 0; r < rows - 1; r++) {
+    for (let c = 0; c < columns - 1; c++) {
+      const a = r * columns + c;
+      const b = (r + 1) * columns + c;
+      const cc = (r + 1) * columns + c + 1;
+      const d = r * columns + c + 1;
+      if (
+        depth[a] > WATER_TILE_KEEP_ABOVE ||
+        depth[b] > WATER_TILE_KEEP_ABOVE ||
+        depth[cc] > WATER_TILE_KEEP_ABOVE ||
+        depth[d] > WATER_TILE_KEEP_ABOVE
+      ) {
+        quads.push(a, b, d, b, cc, d);
+      } else {
+        dropped++;
+      }
+    }
+  }
+  if (dropped === 0) return null;
+  const vertexCount = columns * rows;
+  return vertexCount > 65535 ? new Uint32Array(quads) : new Uint16Array(quads);
+}
+
+/**
  * Deepest the terrain generator ever puts the seabed below the water line.
  * Measured across a 30 sample coastline survey: every sample tops out at
  * exactly this, and depth 15 is reached by none of them. The colour ramp

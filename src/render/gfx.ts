@@ -1480,6 +1480,11 @@ export const gfxInternalsForTest = {
 export const sharedUniforms = {
   uTime: { value: 0 },
   uRimBoost: { value: 1 },
+  /** (player x, player z, dense blade-carpet radius): the paint-free ring the
+   *  terrain splat reads so painted blades never show under the real carpet.
+   *  Radius 0 (a tier with no carpet) leaves the paint everywhere. Written by
+   *  the renderer each frame beside uTime. */
+  uCarpetRing: { value: new THREE.Vector3(0, 0, 0) },
 };
 
 // The one sun. Everything that needs the sun's position/direction (key light,

@@ -10,6 +10,14 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.solana_artifact_required",
+    "apiError.seeker.wallet_required",
     "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -156,9 +164,18 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.dialog.repeatableQuestAria",
     "questUi.log.cooldownStatus",
     "questUi.log.repeatableStatus",
-    "questUi.tracker.unknownQuest"
+    "questUi.tracker.unknownQuest",
+    "wallet.seekerAppHelp"
   ],
   "es_ES": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.solana_artifact_required",
+    "apiError.seeker.wallet_required",
     "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -305,9 +322,18 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.dialog.repeatableQuestAria",
     "questUi.log.cooldownStatus",
     "questUi.log.repeatableStatus",
-    "questUi.tracker.unknownQuest"
+    "questUi.tracker.unknownQuest",
+    "wallet.seekerAppHelp"
   ],
   "fr_FR": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.solana_artifact_required",
+    "apiError.seeker.wallet_required",
     "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -454,9 +480,18 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.dialog.repeatableQuestAria",
     "questUi.log.cooldownStatus",
     "questUi.log.repeatableStatus",
-    "questUi.tracker.unknownQuest"
+    "questUi.tracker.unknownQuest",
+    "wallet.seekerAppHelp"
   ],
   "fr_CA": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.solana_artifact_required",
+    "apiError.seeker.wallet_required",
     "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -603,10 +638,19 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.dialog.repeatableQuestAria",
     "questUi.log.cooldownStatus",
     "questUi.log.repeatableStatus",
-    "questUi.tracker.unknownQuest"
+    "questUi.tracker.unknownQuest",
+    "wallet.seekerAppHelp"
   ],
   "en_CA": [],
   "it_IT": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.solana_artifact_required",
+    "apiError.seeker.wallet_required",
     "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -753,9 +797,18 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.dialog.repeatableQuestAria",
     "questUi.log.cooldownStatus",
     "questUi.log.repeatableStatus",
-    "questUi.tracker.unknownQuest"
+    "questUi.tracker.unknownQuest",
+    "wallet.seekerAppHelp"
   ],
   "de_DE": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.solana_artifact_required",
+    "apiError.seeker.wallet_required",
     "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -902,7 +955,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.dialog.repeatableQuestAria",
     "questUi.log.cooldownStatus",
     "questUi.log.repeatableStatus",
-    "questUi.tracker.unknownQuest"
+    "questUi.tracker.unknownQuest",
+    "wallet.seekerAppHelp"
   ],
   "zh_CN": [
     "guide.profPages.colWield",
@@ -945,6 +999,14 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.qtyMultiple"
   ],
   "pt_BR": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.solana_artifact_required",
+    "apiError.seeker.wallet_required",
     "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -1091,7 +1153,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.dialog.repeatableQuestAria",
     "questUi.log.cooldownStatus",
     "questUi.log.repeatableStatus",
-    "questUi.tracker.unknownQuest"
+    "questUi.tracker.unknownQuest",
+    "wallet.seekerAppHelp"
   ],
   "ru_RU": [
     "guide.profPages.colWield",
@@ -1104,6 +1167,14 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.qtyMultiple"
   ],
   "cs_CZ": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.solana_artifact_required",
+    "apiError.seeker.wallet_required",
     "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -1251,9 +1322,18 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.dialog.repeatableQuestAria",
     "questUi.log.cooldownStatus",
     "questUi.log.repeatableStatus",
-    "questUi.tracker.unknownQuest"
+    "questUi.tracker.unknownQuest",
+    "wallet.seekerAppHelp"
   ],
   "nl_NL": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.solana_artifact_required",
+    "apiError.seeker.wallet_required",
     "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -1401,9 +1481,18 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.dialog.repeatableQuestAria",
     "questUi.log.cooldownStatus",
     "questUi.log.repeatableStatus",
-    "questUi.tracker.unknownQuest"
+    "questUi.tracker.unknownQuest",
+    "wallet.seekerAppHelp"
   ],
   "pl_PL": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.solana_artifact_required",
+    "apiError.seeker.wallet_required",
     "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -1551,9 +1640,18 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.dialog.repeatableQuestAria",
     "questUi.log.cooldownStatus",
     "questUi.log.repeatableStatus",
-    "questUi.tracker.unknownQuest"
+    "questUi.tracker.unknownQuest",
+    "wallet.seekerAppHelp"
   ],
   "id_ID": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.solana_artifact_required",
+    "apiError.seeker.wallet_required",
     "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -1701,9 +1799,18 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.dialog.repeatableQuestAria",
     "questUi.log.cooldownStatus",
     "questUi.log.repeatableStatus",
-    "questUi.tracker.unknownQuest"
+    "questUi.tracker.unknownQuest",
+    "wallet.seekerAppHelp"
   ],
   "tr_TR": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.solana_artifact_required",
+    "apiError.seeker.wallet_required",
     "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -1851,9 +1958,18 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.dialog.repeatableQuestAria",
     "questUi.log.cooldownStatus",
     "questUi.log.repeatableStatus",
-    "questUi.tracker.unknownQuest"
+    "questUi.tracker.unknownQuest",
+    "wallet.seekerAppHelp"
   ],
   "sv_SE": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.solana_artifact_required",
+    "apiError.seeker.wallet_required",
     "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -2001,9 +2117,18 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.dialog.repeatableQuestAria",
     "questUi.log.cooldownStatus",
     "questUi.log.repeatableStatus",
-    "questUi.tracker.unknownQuest"
+    "questUi.tracker.unknownQuest",
+    "wallet.seekerAppHelp"
   ],
   "vi_VN": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.solana_artifact_required",
+    "apiError.seeker.wallet_required",
     "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -2151,9 +2276,18 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.dialog.repeatableQuestAria",
     "questUi.log.cooldownStatus",
     "questUi.log.repeatableStatus",
-    "questUi.tracker.unknownQuest"
+    "questUi.tracker.unknownQuest",
+    "wallet.seekerAppHelp"
   ],
   "da_DK": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.solana_artifact_required",
+    "apiError.seeker.wallet_required",
     "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -2301,6 +2435,7 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.dialog.repeatableQuestAria",
     "questUi.log.cooldownStatus",
     "questUi.log.repeatableStatus",
-    "questUi.tracker.unknownQuest"
+    "questUi.tracker.unknownQuest",
+    "wallet.seekerAppHelp"
   ]
 };

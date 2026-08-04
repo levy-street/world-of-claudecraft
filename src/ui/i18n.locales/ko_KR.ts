@@ -1297,6 +1297,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '여기에 지갑이 표시되려면 Solflare Wallet 같은 브라우저 지갑 확장 프로그램이 활성화되어 있어야 합니다.',
   'wallet.mobileAppHelp':
     'Phantom 또는 Solflare를 선택하세요. 지갑 앱에서 승인을 요청합니다. 게임을 열어 둔 채 완료 후 돌아오세요.',
+  'wallet.seekerAppHelp':
+    'Seed Vault Wallet로 계속하세요. Seed Vault에서 연결 및 인증 요청을 확인한 후 게임으로 돌아오세요.',
   'wallet.standaloneAppHelp':
     '홈 화면 앱에서는 아직 지갑 연결을 사용할 수 없습니다. Phantom 또는 Solflare를 사용하려면 Safari나 Chrome에서 World of ClaudeCraft를 여세요.',
   'wallet.openAppTitle': '{wallet}에서 계속',
@@ -8127,6 +8129,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.steam.disabled': '현재 Steam 연동을 사용할 수 없습니다.',
   'apiError.wallet.handoff_invalid':
     '지갑 인증이 만료되었거나 확인할 수 없습니다. 다시 시도해 주세요.',
+  'apiError.seeker.native_only': 'Seeker 자격은 네이티브 앱에서만 사용할 수 있습니다.',
+  'apiError.seeker.attestation_failed': '기기 인증에 실패했습니다. 다시 시도해 주세요.',
+  'apiError.seeker.solana_artifact_required': 'Solana Store 앱을 사용하여 계속해 주세요.',
+  'apiError.seeker.wallet_required': '먼저 지갑을 연결하고 인증하세요.',
+  'apiError.seeker.genesis_token_required': '인증된 Seeker Genesis Token이 필요합니다.',
+  'apiError.seeker.genesis_token_claimed': '해당 Seeker Genesis Token은 이미 등록되었습니다.',
+  'apiError.seeker.entitlement_required': '인증된 Seeker 자격이 필요합니다.',
+  'apiError.seeker.current_ownership_required': '현재 Seeker Genesis Token을 보유해야 합니다.',
   'apiError.steam.invalid_ticket':
     'Steam이 이 연동 요청을 확인하지 못했습니다. 데스크톱 앱에서 다시 시도해 주세요.',
   'apiError.steam.banned': '해당 Steam 계정은 연동할 수 없습니다.',

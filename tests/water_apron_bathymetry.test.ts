@@ -44,7 +44,7 @@ describe('horizon apron carries real bathymetry', () => {
     mockWaterShaderAssets();
     const { buildWater } = await import('../src/render/water');
     const { shoreDepthAt, WATER_SEABED_CLAMP_YARDS } = await import('../src/render/water_core');
-    const { WORLD_SIZE, WORLD_MAX_Z, WORLD_MIN_Z } = await import('../src/sim/data');
+    const { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } = await import('../src/sim/data');
     await Promise.resolve();
 
     const view = buildWater(SEED);
@@ -57,7 +57,9 @@ describe('horizon apron carries real bathymetry', () => {
 
     // Every apron vertex sitting INSIDE the world must read what the seabed
     // actually is there, which is what the zone plane covering it reads.
-    const half = WORLD_SIZE / 2;
+    // The FULL world rect, side columns included (WORLD_SIZE / 2 is one
+    // column's half-width and left the outer coasts unguarded).
+    const half = WORLD_MAX_X;
     let insideChecked = 0;
     let worstError = 0;
     for (let i = 0; i < pos.count; i++) {
@@ -90,7 +92,7 @@ describe('horizon apron carries real bathymetry', () => {
     mockWaterShaderAssets();
     const { buildWater } = await import('../src/render/water');
     const { WATER_FOAM_WIDTH_YARDS } = await import('../src/render/water_core');
-    const { WORLD_SIZE, WORLD_MAX_Z, WORLD_MIN_Z } = await import('../src/sim/data');
+    const { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } = await import('../src/sim/data');
     await Promise.resolve();
 
     const view = buildWater(SEED);
@@ -102,7 +104,9 @@ describe('horizon apron carries real bathymetry', () => {
     // Only OUTSIDE the world, where the apron is the surface you actually see.
     // Inside it, the apron lies under the zone plane and correctly mirrors that
     // plane's own shelf and surf.
-    const half = WORLD_SIZE / 2;
+    // The FULL world rect, side columns included (WORLD_SIZE / 2 is one
+    // column's half-width and left the outer coasts unguarded).
+    const half = WORLD_MAX_X;
     // The shader reads surf as depth/slope, so a slope of zero or a constant
     // slope against real shelf depths would flood the open sea with foam.
     let checked = 0;

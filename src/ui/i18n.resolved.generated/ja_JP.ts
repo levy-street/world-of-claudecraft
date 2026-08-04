@@ -3079,6 +3079,16 @@ export const ja_JP: EnTranslations = {
     },
     "ota_updates": {
       "invalid_input": "入力が無効です。"
+    },
+    "seeker": {
+      "native_only": "Seeker資格はネイティブアプリでのみ利用できます。",
+      "attestation_failed": "端末の検証に失敗しました。もう一度お試しください。",
+      "solana_artifact_required": "Solana Store版アプリを使用して続行してください。",
+      "wallet_required": "先にウォレットを連携して検証してください。",
+      "genesis_token_required": "検証済みのSeeker Genesis Tokenが必要です。",
+      "genesis_token_claimed": "そのSeeker Genesis Tokenはすでに取得されています。",
+      "entitlement_required": "検証済みのSeeker資格が必要です。",
+      "current_ownership_required": "現在Seeker Genesis Tokenを所有している必要があります。"
     }
   },
   "guide": {
@@ -5158,6 +5168,7 @@ export const ja_JP: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "ホルダー特典が有効です。署名や支払いが必要なときはアプリを接続してください。",
     "extensionHelp": "ここにウォレットを表示するには、Solflare Wallet などのブラウザ用ウォレット拡張機能を有効にしておいてください。",
     "mobileAppHelp": "Phantom または Solflare を選択してください。ウォレットアプリで承認を求められます。ゲームを開いたままにし、完了後に戻ってください。",
+    "seekerAppHelp": "Seed Vault Walletで続行します。Seed Vaultで接続と認証のリクエストを確認し、完了したらゲームに戻ってください。",
     "standaloneAppHelp": "ホーム画面アプリでは、まだウォレットに接続できません。Phantom または Solflare を使用するには、Safari か Chrome で World of ClaudeCraft を開いてください。",
     "openAppTitle": "{wallet} で続行",
     "openAppHelp": "{wallet} を開いてこのリクエストを確認してください。ウォレットアプリの使用中も、このゲームタブを開いたままにしてください。",

@@ -87,7 +87,7 @@ function expectWalkableRoute(
     seed: SEED,
     bodyRadius,
     maxClimbSlope: PLAYER_MAX_CLIMB_SLOPE,
-    minGround: (x: number, z: number) => waterLevelAt(x, z) - PLAYER_SWIM_DEPTH,
+    minGround: (x: number, z: number) => waterLevelAt(x, z, SEED) - PLAYER_SWIM_DEPTH,
     maxSpan: 128,
   } as const;
   let route = findPath(from, to, options);
@@ -130,7 +130,7 @@ function expectWalkableRoute(
     const previousGround = groundHeight(current.x, current.z, SEED);
     const nextGround = groundHeight(resolved.x, resolved.z, SEED);
     expect(nextGround, `${label} enters deep water`).toBeGreaterThanOrEqual(
-      waterLevelAt(resolved.x, resolved.z) - PLAYER_SWIM_DEPTH,
+      waterLevelAt(resolved.x, resolved.z, SEED) - PLAYER_SWIM_DEPTH,
     );
     expect(
       (nextGround - previousGround) / Math.max(moved, Number.EPSILON),
@@ -1001,7 +1001,7 @@ describe('the first sixty seconds: starter pull lanes from spawn', () => {
         seed: SEED,
         bodyRadius: 0.5,
         maxClimbSlope: PLAYER_MAX_CLIMB_SLOPE,
-        minGround: (x: number, z: number) => waterLevelAt(x, z) - PLAYER_SWIM_DEPTH,
+        minGround: (x: number, z: number) => waterLevelAt(x, z, SEED) - PLAYER_SWIM_DEPTH,
         maxSpan: 160,
       });
       expect(route.length, `${camp.mobId} has a route from spawn`).toBeGreaterThan(0);
@@ -1026,7 +1026,7 @@ describe('the first sixty seconds: starter pull lanes from spawn', () => {
         seed: SEED,
         bodyRadius: 0.5,
         maxClimbSlope: PLAYER_MAX_CLIMB_SLOPE,
-        minGround: (x: number, z: number) => waterLevelAt(x, z) - PLAYER_SWIM_DEPTH,
+        minGround: (x: number, z: number) => waterLevelAt(x, z, SEED) - PLAYER_SWIM_DEPTH,
         maxSpan: 160,
       });
       expect(route.length, `${camp.mobId} at ${camp.center.x},${camp.center.z}`).toBeGreaterThan(0);

@@ -41,8 +41,8 @@ describe('terrain/feature-aware water (#1518)', () => {
     const [lakeX, lakeZ] = [-92, 88];
     expect(isInWaterBody(lakeX, lakeZ)).toBe(true);
     expect(isInWaterBody(DRY_SPOT.x, DRY_SPOT.z)).toBe(false);
-    expect(waterLevelAt(lakeX, lakeZ)).toBe(WATER_LEVEL);
-    expect(waterLevelAt(DRY_SPOT.x, DRY_SPOT.z)).toBe(-Infinity);
+    expect(waterLevelAt(lakeX, lakeZ, SEED)).toBe(WATER_LEVEL);
+    expect(waterLevelAt(DRY_SPOT.x, DRY_SPOT.z, SEED)).toBe(-Infinity);
   });
 
   it('waterBodies() reflects only declared lakes, not incidental low terrain', () => {
@@ -82,7 +82,7 @@ describe('terrain/feature-aware water (#1518)', () => {
     // must never satisfy those predicates no matter how deep it goes.
     setActiveWorldContent(withSunkenFeature());
     const h = terrainHeight(DRY_SPOT.x, DRY_SPOT.z, SEED);
-    const wl = waterLevelAt(DRY_SPOT.x, DRY_SPOT.z);
+    const wl = waterLevelAt(DRY_SPOT.x, DRY_SPOT.z, SEED);
     expect(wl).toBe(-Infinity);
     expect(h <= wl - 0.5).toBe(false); // swim-pose feet-depth gate
     expect(h < wl + 0.4).toBe(false); // ambience nearWater gate
@@ -105,7 +105,7 @@ describe('terrain/feature-aware water (#1518)', () => {
     // mirrors buildFish()'s depthAt: waterLevelAt() - terrainHeight(), the
     // actual render-side composition, not a hand-duplicated formula.
     const depthAt = (x: number, z: number): number =>
-      waterLevelAt(x, z) - terrainHeight(x, z, SEED);
+      waterLevelAt(x, z, SEED) - terrainHeight(x, z, SEED);
     expect(isLeapableWater(DRY_SPOT.x, DRY_SPOT.z, depthAt)).toBe(false);
 
     const [lakeX, lakeZ] = [-108, 84]; // deep lake cell (see pathfind.test.ts)

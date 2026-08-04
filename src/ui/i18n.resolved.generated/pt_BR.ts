@@ -3079,6 +3079,16 @@ export const pt_BR: EnTranslations = {
     },
     "ota_updates": {
       "invalid_input": "Entrada inválida."
+    },
+    "seeker": {
+      "native_only": "Seeker entitlement is available only in the native app.",
+      "attestation_failed": "Device verification failed. Please try again.",
+      "solana_artifact_required": "Use the Solana Store app to continue.",
+      "wallet_required": "Link and verify a wallet first.",
+      "genesis_token_required": "A verified Seeker Genesis Token is required.",
+      "genesis_token_claimed": "That Seeker Genesis Token has already been claimed.",
+      "entitlement_required": "Verified Seeker entitlement is required.",
+      "current_ownership_required": "Current Seeker Genesis Token ownership is required."
     }
   },
   "guide": {
@@ -5158,6 +5168,7 @@ export const pt_BR: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "As vantagens de titular estão ativas. Conecte o app quando precisar assinar ou gastar.",
     "extensionHelp": "Para ver uma carteira aqui, mantenha ativa uma extensão de carteira do navegador, como a Solflare Wallet.",
     "mobileAppHelp": "Escolha Phantom ou Solflare. Seu app de carteira pedirá aprovação. Mantenha o jogo aberto e retorne a ele quando terminar.",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "As conexões de carteira ainda não estão disponíveis no aplicativo da Tela Inicial. Abra o World of ClaudeCraft no Safari ou Chrome para usar Phantom ou Solflare.",
     "openAppTitle": "Continuar em {wallet}",
     "openAppHelp": "Abra {wallet} para revisar esta solicitação. Mantenha esta aba do jogo aberta enquanto o app da carteira estiver ativo.",

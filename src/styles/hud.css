@@ -3605,16 +3605,17 @@
     color: #fff;
     border-color: #c9a86a;
   }
-  /* day/night dial: a small satellite disc on the top-right rim of the minimap
-     (mirrors the #raid-lockout button placement), showing the 12h world cycle.
-     Purely informational, so it ignores pointer input. */
+  /* day/night dial: a satellite disc on the top-right rim of the minimap
+     (mirrors the #raid-lockout button placement), showing the world day/night
+     cycle. Sized to read at a glance; purely informational, so it ignores
+     pointer input. */
   #minimap-daynight {
     position: absolute;
-    top: 6px;
-    right: 6px;
+    top: 2px;
+    right: 2px;
     z-index: 3;
-    width: 30px;
-    height: 30px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     border: 2px solid var(--border);
     background: #14141d;
@@ -4060,9 +4061,9 @@
   body.native-app #mobile-donate,
   body.native-app #token-ca,
   body.native-app #nav-btn-download,
-  body.native-app .cs-wallet,
-  body.native-app .cs-wallet-hidden-note,
-  body.native-app .account-wallet-card,
+  body.native-app:not(.seeker-wallet-enabled) .cs-wallet,
+  body.native-app:not(.seeker-wallet-enabled) .cs-wallet-hidden-note,
+  body.native-app:not(.seeker-wallet-enabled) .account-wallet-card,
   body.native-app #performance-tip,
   body.native-app .official-site-copy {
     display: none !important;
@@ -6423,12 +6424,17 @@
   }
   /* ---------- World Market collect indicator ---------- */
   /* The Merchant's coin: sale proceeds or returned items wait for collection.
-     Same rim-satellite family as the envelope; claims the top-RIGHT corner
-     (raid-lockout owns bottom-left, the envelope bottom-right; guarded by
-     tests/minimap_rim_badges.test.ts). */
+     Same rim-satellite family as the envelope, and it claims the top-LEFT
+     corner (raid-lockout owns bottom-left, the envelope bottom-right, the
+     day/night dial top-right). It shipped at top/right, which the dial already
+     held, and the dial is later in the DOM at the same z-index, so the coin was
+     painted over completely: an actionable control buried under an aria-hidden
+     decoration, visible together only when proceeds happen to be waiting, which
+     is why it went unnoticed. tests/minimap_rim_badges.test.ts keeps the four
+     corners one-to-one and holds the touch sheet's re-anchoring to match. */
   #market-indicator {
     position: absolute;
-    right: 4px;
+    left: 4px;
     top: 4px;
     z-index: 3;
     display: inline-flex;

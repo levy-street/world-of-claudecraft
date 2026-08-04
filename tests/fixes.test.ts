@@ -421,7 +421,17 @@ describe('swimming', () => {
     const p = sim.player;
     teleportTo(sim, LAKE.x, LAKE.z);
     expect(groundHeight(LAKE.x, LAKE.z, SEED)).toBeLessThan(WATER_LEVEL - 0.8);
-    sim.tick();
+    // The water overhaul made buoyancy physical: a body dropped over deep
+    // water RISES to the float band over a few ticks (measured: surfaced at
+    // tick 9 from the lakebed) instead of snapping there in one. The
+    // guarantee this pins is reaching the band promptly and STAYING in it.
+    let surfacedAt = -1;
+    for (let i = 0; i < 40 && surfacedAt < 0; i++) {
+      sim.tick();
+      if (p.pos.y > WATER_LEVEL - 1.0) surfacedAt = i + 1;
+    }
+    expect(surfacedAt, 'reaches the float band within 2s').toBeGreaterThan(0);
+    for (let i = 0; i < 20; i++) sim.tick();
     expect(p.pos.y).toBeGreaterThan(WATER_LEVEL - 1.0);
     expect(p.pos.y).toBeLessThan(WATER_LEVEL);
     expect(sim.isSwimming(p)).toBe(true);

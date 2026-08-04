@@ -798,7 +798,7 @@ function staticWorldColliders(seed: number): Collider[] {
       const bx = d.x + off.x;
       const bz = d.z + off.z;
       const bg = groundHeight(bx, bz, seed);
-      const wl = waterLevelAt(bx, bz);
+      const wl = waterLevelAt(bx, bz, seed);
       const afloat = bg < wl - 0.1;
       const deckY = (afloat ? wl + 0.18 : bg + 0.06) + DOCK_BOAT.deckHeight;
       out.push({

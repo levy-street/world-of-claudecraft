@@ -3079,6 +3079,16 @@ export const cs_CZ: EnTranslations = {
     },
     "ota_updates": {
       "invalid_input": "Neplatný vstup."
+    },
+    "seeker": {
+      "native_only": "Seeker entitlement is available only in the native app.",
+      "attestation_failed": "Device verification failed. Please try again.",
+      "solana_artifact_required": "Use the Solana Store app to continue.",
+      "wallet_required": "Link and verify a wallet first.",
+      "genesis_token_required": "A verified Seeker Genesis Token is required.",
+      "genesis_token_claimed": "That Seeker Genesis Token has already been claimed.",
+      "entitlement_required": "Verified Seeker entitlement is required.",
+      "current_ownership_required": "Current Seeker Genesis Token ownership is required."
     }
   },
   "guide": {
@@ -5158,6 +5168,7 @@ export const cs_CZ: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "Výhody držitele jsou aktivní. Připoj aplikaci, až budeš potřebovat podepisovat nebo utrácet.",
     "extensionHelp": "Aby se tu peněženka zobrazila, nech aktivní rozšíření prohlížeče, například Solflare Wallet.",
     "mobileAppHelp": "Zvol Phantom nebo Solflare. Tvoje aplikace peněženky požádá o schválení. Nechej tuto hru otevřenou a po dokončení se do ní vrať.",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "Připojení peněženky není zatím v aplikaci z domovské obrazovky dostupné. Otevři World of ClaudeCraft v Safari nebo Chrome pro použití Phantom nebo Solflare.",
     "openAppTitle": "Pokračovat v {wallet}",
     "openAppHelp": "Otevři {wallet} pro kontrolu tohoto požadavku. Nechej tuto záložku hry otevřenou, zatímco je aplikace peněženky aktivní.",

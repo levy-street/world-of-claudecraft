@@ -1949,7 +1949,8 @@ describe('harvest denies in combat and while swimming (the startFishing pair)', 
     const node = mustNode(WATERLINE);
     const sim = makeWorld(1);
     expect(
-      groundHeight(DEEP.x, DEEP.z, sim.cfg.seed) < waterLevelAt(DEEP.x, DEEP.z) - PLAYER_SWIM_DEPTH,
+      groundHeight(DEEP.x, DEEP.z, sim.cfg.seed) <
+        waterLevelAt(DEEP.x, DEEP.z, sim.cfg.seed) - PLAYER_SWIM_DEPTH,
     ).toBe(true);
     expect(Math.hypot(DEEP.x - node.pos.x, DEEP.z - node.pos.z)).toBeLessThanOrEqual(
       INTERACT_RANGE,

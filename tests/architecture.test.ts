@@ -307,12 +307,16 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // the same contract for the map editor's realtime terrain/water edits.
 // day_night_core is the clock-to-grade math of the world day/night cycle
 // (Date.now stays in the renderer that calls it), so a Vitest can drive any
-// moment of the cycle.
+// moment of the cycle. night_lighting_core is the pair of ramps every
+// after-dark readability layer fades on, and streetlamp_placement_core lays
+// out the town lamp posts from the road polylines through caller-supplied
+// probes, so both stay drivable without a renderer.
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
   'src/render/ability_vfx_core.ts',
   'src/render/arena_water_band_core.ts',
+  'src/render/biome_haze_field_core.ts',
   'src/render/blade_grass_dense_core.ts',
   'src/render/camera_boom_core.ts',
   'src/render/compile_gate.ts',
@@ -345,6 +349,9 @@ const RENDER_PURE_CORES = [
   'src/render/post_plan_core.ts',
   'src/render/nameplate_view.ts',
   'src/render/net_interp_core.ts',
+  'src/render/night_accents_core.ts',
+  'src/render/night_lighting_core.ts',
+  'src/render/streetlamp_placement_core.ts',
   'src/render/opaque_draw_order_core.ts',
   'src/render/perceptual_lod_core.ts',
   'src/render/prop_cell_core.ts',
@@ -358,12 +365,15 @@ const RENDER_PURE_CORES = [
   'src/render/vfx_pool_core.ts',
   'src/render/view_candidate_pool_core.ts',
   'src/render/water_core.ts',
+  'src/render/water_wave_core.ts',
   'src/render/water_flora_core.ts',
   'src/render/water_flora_shader_core.ts',
   'src/render/day_night_core.ts',
   'src/render/authored_walls_core.ts',
   'src/render/garden_maze_core.ts',
   'src/render/garden_parterre_core.ts',
+  'src/render/far_terrain_core.ts',
+  'src/render/foliage_impostor_core.ts',
   'src/render/foliage_lod.ts',
   'src/render/prewarm_pass.ts',
   'src/render/prewarm_policy.ts',

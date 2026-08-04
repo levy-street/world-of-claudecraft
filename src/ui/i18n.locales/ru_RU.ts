@@ -1315,6 +1315,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Чтобы кошелек появился здесь, держите активным браузерное расширение кошелька, например Solflare Wallet.',
   'wallet.mobileAppHelp':
     'Выберите Phantom или Solflare. Приложение кошелька запросит подтверждение. Не закрывайте игру и вернитесь в нее после завершения.',
+  'wallet.seekerAppHelp':
+    'Продолжите с Seed Vault Wallet. Проверьте запросы на подключение и подтверждение в Seed Vault, затем вернитесь в игру.',
   'wallet.standaloneAppHelp':
     'Подключение кошелька пока недоступно в приложении с главного экрана. Для Phantom или Solflare откройте World of ClaudeCraft в Safari или Chrome.',
   'wallet.openAppTitle': 'Продолжить в {wallet}',
@@ -8273,6 +8275,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.steam.disabled': 'Привязка Steam сейчас недоступна.',
   'apiError.wallet.handoff_invalid':
     'Срок действия авторизации кошелька истек или ее не удалось проверить. Повторите попытку.',
+  'apiError.seeker.native_only': 'Права Seeker доступны только в нативном приложении.',
+  'apiError.seeker.attestation_failed': 'Не удалось подтвердить устройство. Повторите попытку.',
+  'apiError.seeker.solana_artifact_required': 'Продолжите в версии приложения из Solana Store.',
+  'apiError.seeker.wallet_required': 'Сначала привяжите и подтвердите кошелек.',
+  'apiError.seeker.genesis_token_required': 'Требуется подтвержденный Seeker Genesis Token.',
+  'apiError.seeker.genesis_token_claimed': 'Этот Seeker Genesis Token уже был зарегистрирован.',
+  'apiError.seeker.entitlement_required': 'Требуются подтвержденные права Seeker.',
+  'apiError.seeker.current_ownership_required': 'Требуется текущее владение Seeker Genesis Token.',
   'apiError.steam.invalid_ticket':
     'Steam не смог подтвердить этот запрос на привязку. Повторите попытку из настольного приложения.',
   'apiError.steam.banned': 'Этот аккаунт Steam нельзя привязать.',

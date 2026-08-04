@@ -26,6 +26,15 @@ Everything else is a sibling module in one of these families:
   the floating C/B/A/S rank badge above a world rift portal.
 - **Per-frame overlay/FX modules** ticked from `sync()`: `vfx.ts` (pooled
   particles), `weather.ts`, `character_effects.ts`.
+- **Cross-surface shader services** own a shared uniform block plus a GLSL
+  snippet that SEVERAL materials splice, never a copy per material.
+  `biome_haze_field.ts` (+ its `_core`) is the reference: one small world-space
+  DataTexture of per-zone haze colour and strength, which `terrain.ts`, the far
+  vista tiles and `water.ts` all splice at the same anchor (immediately before
+  `<fog_fragment>`) on the same uniform objects, so distant land carries its
+  own realm's atmosphere and the detail-horizon handoff cannot draw a ring.
+  The renderer builds it once from its outdoor fog presets and pushes the
+  camera + `dnGrade.fog` per frame; `?zonehaze=off` is the A/B switch.
 - **The nameplate suite** (below) owns all overhead text and badges.
 - **Pure logic cores** (below) hold Node-tested per-frame decisions.
 - **Perf governors:** `render_budget.ts` (adaptive frame budget, see

@@ -119,13 +119,14 @@ describe('generated chunk geometry is stable', () => {
     expect(inRect.length).toBe(36);
     expect(gapFill.length).toBe(12);
 
-    // Re-minted for the exact Uint16 and tile-major index pipeline. The
-    // terrain_vertex_pipeline contract proves the ordered triangles and every
-    // vertex attribute are unchanged; only triangle submission order and
-    // index transport width moved.
-    expect(digestOf(inRect)).toBe('79c79fa3732d4c2e235db0a8bca13f67');
-    // The gap super-chunks take the same index-only migration.
-    expect(digestOf(gapFill)).toBe('b13f0ba61280f097b30d31904eb73415');
+    // Re-minted for the greenSeamT south-edge skirt: the seam used to switch
+    // on at full strength at z = 170, so the coast appliers it silences came
+    // back all at once and stepped the shore along that whole line. It now
+    // fades in across 154..170, which moves ground in that 16yd band only
+    // (bit-identical from z = 170 north). An INTENDED visual change.
+    expect(digestOf(inRect)).toBe('9d96e8f6df4c99904a6e8d97c1ed1c39');
+    // The gap super-chunks west of the rect straddle the same 154..170 band.
+    expect(digestOf(gapFill)).toBe('64228be53411273a266271503b82825d');
 
     terrain.cancelStreaming();
   });

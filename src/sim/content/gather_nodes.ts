@@ -1150,7 +1150,13 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'ore_galecrest_2',
     zoneId: 'galecrest',
     type: 'ore',
-    pos: { x: 466, z: 374 },
+    // Moved off the Wickharbor cove floor (466,374) at the release/v0.34.0
+    // merge: open-sea swim made the cove real water, so the old spot sat at
+    // swim depth where harvestNode's swim deny always refuses. The headland
+    // west of the cove keeps the whole harvest disc standable and a full
+    // yard above the sea plane (its sea-plane exemption retired with the
+    // move).
+    pos: { x: 430, z: 379 },
     level: 20,
     tier: 1,
   },
@@ -1177,8 +1183,13 @@ export const GATHER_NODES: GatherNodeDef[] = [
     // Nudged off (438,404) at the v0.32.0 merge: a 5.7 rise/run crag sat
     // inside the authored spot's 5yd harvest reach, and the flat ground west
     // of it would close the pair gap under the 30yd quest-target cluster
-    // link, so the patch moved out along the ridge foot instead.
-    pos: { x: 448, z: 400 },
+    // link, so the patch moved out along the ridge foot to (448,400). Moved
+    // again at the release/v0.34.0 merge: open-sea swim made the Wickharbor
+    // cove real water, the ridge-foot spot sat at swim depth with no
+    // standable ground in harvest reach, so the patch stepped west onto the
+    // cove rim, still 31yd from its pair (its sea-plane exemption retired
+    // with the move).
+    pos: { x: 435, z: 400 },
     level: 20,
     tier: 1,
   },
@@ -1434,8 +1445,11 @@ export const GATHER_NODES: GatherNodeDef[] = [
     zoneId: 'farshore_isle',
     type: 'wood',
     // Nudged off (263,92) at the v0.32.0 merge: a 1.9 rise/run bluff sat
-    // inside the authored spot's 5yd harvest reach.
-    pos: { x: 259, z: 96 },
+    // inside the authored spot's 5yd harvest reach. Moved uphill off
+    // (259,96) at the release/v0.34.0 merge: open-sea swim made the shore
+    // shallows real water and the old strand spot's harvest disc dipped to
+    // swim depth (its sea-plane exemption retired with the move).
+    pos: { x: 269, z: 83 },
     level: 5,
     tier: 1,
   },
@@ -1459,7 +1473,11 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'herb_farshore_isle_2',
     zoneId: 'farshore_isle',
     type: 'herb',
-    pos: { x: 291, z: 122 },
+    // Moved inland off (291,122) at the release/v0.34.0 merge: open-sea
+    // swim made the shore shallows real water, and the old spot sat at swim
+    // depth with no standable ground in harvest reach (its sea-plane
+    // exemption retired with the move). Still 33yd from its pair.
+    pos: { x: 291, z: 104 },
     level: 5,
     tier: 1,
   },

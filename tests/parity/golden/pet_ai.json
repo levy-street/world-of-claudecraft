@@ -568,7 +568,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 836,
-      "state": "4f572bd0",
+      "state": "90dd4590",
       "events": "741638a5",
       "rng": {
         "draws": 942,
@@ -579,7 +579,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 836,
-      "state": "c65d32bf",
+      "state": "fd23306c",
       "events": "741638a5",
       "rng": {
         "draws": 1164,
@@ -590,7 +590,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 836,
-      "state": "0c7c3942",
+      "state": "ad4e1f6f",
       "events": "741638a5",
       "rng": {
         "draws": 1415,
@@ -601,7 +601,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 836,
-      "state": "0c7c3942",
+      "state": "ad4e1f6f",
       "events": "741638a5",
       "rng": {
         "draws": 1415,
@@ -789,8 +789,8 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "evadeStall": 1.45,
-          "facing": -1.570796,
+          "evadeStall": 1.3,
+          "facing": -1.574018,
           "fallStartY": -9.5,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -806,9 +806,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 180.8,
-            "y": -7.173699,
-            "z": -1000
+            "x": 179.174207,
+            "y": -4.719024,
+            "z": -999.461459
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -891,8 +891,8 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "evadeStall": 1.4,
-          "facing": -1.662934,
+          "evadeStall": 1.35,
+          "facing": -1.665748,
           "fallStartY": -9.5,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -908,9 +908,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 180.59331,
-            "y": -6.475519,
-            "z": -982.389234
+            "x": 179.612253,
+            "y": -4.763391,
+            "z": -981.94169
           },
           "potionCooldownUntil": -1,
           "spawnPos": {

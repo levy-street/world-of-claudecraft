@@ -3079,6 +3079,16 @@ export const nl_NL: EnTranslations = {
     },
     "ota_updates": {
       "invalid_input": "Ongeldige invoer."
+    },
+    "seeker": {
+      "native_only": "Seeker entitlement is available only in the native app.",
+      "attestation_failed": "Device verification failed. Please try again.",
+      "solana_artifact_required": "Use the Solana Store app to continue.",
+      "wallet_required": "Link and verify a wallet first.",
+      "genesis_token_required": "A verified Seeker Genesis Token is required.",
+      "genesis_token_claimed": "That Seeker Genesis Token has already been claimed.",
+      "entitlement_required": "Verified Seeker entitlement is required.",
+      "current_ownership_required": "Current Seeker Genesis Token ownership is required."
     }
   },
   "guide": {
@@ -5158,6 +5168,7 @@ export const nl_NL: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "Houdervoordelen zijn actief. Verbind de app wanneer je moet ondertekenen of uitgeven.",
     "extensionHelp": "Om hier een portemonnee te zien, houd je een browserextensie voor portemonnees zoals Solflare Wallet actief.",
     "mobileAppHelp": "Kies Phantom of Solflare. Je portemonnee-app vraagt om goedkeuring. Houd dit spel open en keer ernaar terug wanneer je klaar bent.",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "Portemonneeverbindingen zijn nog niet beschikbaar in de beginscherm-app. Open World of ClaudeCraft in Safari of Chrome om Phantom of Solflare te gebruiken.",
     "openAppTitle": "Doorgaan in {wallet}",
     "openAppHelp": "Open {wallet} om dit verzoek te bekijken. Houd dit speltabblad open terwijl de portemonnee-app actief is.",

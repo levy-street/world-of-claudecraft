@@ -11,6 +11,7 @@ import { GRASS_BIOME_DENSITY } from './foliage';
 import { insideGrassHubExclusion } from './foliage_core';
 import { patchConstantUpNormalVertexShader } from './foliage_shader_core';
 import { GFX, sharedUniforms } from './gfx';
+import { MEADOW_CARPET_FADE_START } from './meadow_tuning';
 import { renderLayerDisabled } from './render_dev_flags';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 
@@ -38,15 +39,20 @@ import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 // the carpet), so the grid dimensions derive per build inside buildBladeGrass.
 const CELL = 0.46; // yards between clusters
 const PLACE_BUDGET = 560; // re-placements per frame while moving
-const FADE_START = 0.8; // of RADIUS: outer ring shrinks blades to nothing
+// of RADIUS: where the outer scale-collapse fade begins. Shared with the
+// meadow tuning surface: a short fade ring read as grass "loading in"
+// around the player, so the ramp now spans the outer half of the carpet.
+const FADE_START = MEADOW_CARPET_FADE_START;
 
 export interface BladeGrassView {
   group: THREE.Group;
   update(px: number, pz: number): void;
 }
 
-// same tiny deterministic PRNG the motes pool uses (module-local there)
-function mulberry32(seed: number): () => number {
+// same tiny deterministic PRNG the motes pool uses (module-local there);
+// exported for the mid-band and the ground bake, which reuse the exact
+// cluster look
+export function mulberry32(seed: number): () => number {
   let a = seed >>> 0;
   return () => {
     a = (a + 0x6d2b79f5) | 0;
@@ -62,7 +68,10 @@ function mulberry32(seed: number): () => number {
 // reads as grown grass arcing over rather than a symmetric fan of straight
 // spikes. Vertex colors carry a base->tip brighten so blades read rooted
 // without a texture; instanceColor multiplies in the per-spot ground tint.
-function clusterGeometry(rng: () => number): THREE.BufferGeometry {
+// Exported (geometry unchanged): the mid-band (blade_grass_band.ts) and the
+// ground bake (grass_ground_bake.ts) must use these EXACT clusters so the
+// carpet, the band, and the painted ground are one look by construction.
+export function clusterGeometry(rng: () => number): THREE.BufferGeometry {
   const positions: number[] = [];
   const colors: number[] = [];
   const indices: number[] = [];

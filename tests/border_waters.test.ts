@@ -85,7 +85,7 @@ describe('border waters between maps are real, escapable water', () => {
     // player treads instead of bed-walking
     const bed = terrainHeight(STRAIT.x, STRAIT.z, SEED);
     expect(bed, 'strait bed is carved deep').toBeLessThan(WATER_LEVEL - PLAYER_SWIM_DEPTH);
-    expect(waterLevelAt(STRAIT.x, STRAIT.z), 'waterline is live').toBe(WATER_LEVEL);
+    expect(waterLevelAt(STRAIT.x, STRAIT.z, SEED), 'waterline is live').toBe(WATER_LEVEL);
 
     const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true });
     const actor = makeActor(sim, STRAIT.x, STRAIT.z, 0);
@@ -198,9 +198,9 @@ describe('border waters between maps are real, escapable water', () => {
     for (let z = 1100; z <= 1800; z += 10) {
       const x = -232;
       if (
-        waterLevelAt(x, z) === -Infinity &&
+        waterLevelAt(x, z, SEED) === -Infinity &&
         terrainHeight(x, z, SEED) < WATER_LEVEL - 1 &&
-        waterLevelAt(-226, z) === WATER_LEVEL
+        waterLevelAt(-226, z, SEED) === WATER_LEVEL
       ) {
         start = { x, z };
         break;
@@ -220,7 +220,7 @@ describe('border waters between maps are real, escapable water', () => {
       ...BUILTIN_WORLD,
       terrainEdits: [{ x: 30, z: 40, radius: 6, delta: -25, falloff: 'flat', mode: 'add' }],
     });
-    expect(waterLevelAt(30, 40)).toBe(-Infinity);
+    expect(waterLevelAt(30, 40, SEED)).toBe(-Infinity);
   });
 
   it('is deterministic: identical strait heights on identical inputs', () => {

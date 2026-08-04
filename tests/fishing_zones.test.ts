@@ -50,7 +50,7 @@ import {
   type ItemDef,
   type SimEvent,
 } from '../src/sim/types';
-import { terrainHeight, waterLevel, waterLevelAt } from '../src/sim/world';
+import { isInWaterBody, terrainHeight, waterLevel, waterLevelAt } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 // DERIVED from the authored tables' own keys, never a hand list: the
@@ -1143,7 +1143,8 @@ describe('every rod-tier row stands on real water and a real schedule row', () =
         if (dx * dx + dz * dz > lake.radius * lake.radius) continue;
         const x = lake.x + dx;
         const z = lake.z + dz;
-        if (terrainHeight(x, z, WORLD_SEED) < waterLevelAt(x, z) - PLAYER_SWIM_DEPTH) wet++;
+        if (terrainHeight(x, z, WORLD_SEED) < waterLevelAt(x, z, WORLD_SEED) - PLAYER_SWIM_DEPTH)
+          wet++;
       }
     }
     return wet;
@@ -1231,7 +1232,7 @@ describe('every rod-tier row stands on real water and a real schedule row', () =
   const dryFoot = (x: number, z: number): boolean => {
     const ground = terrainHeight(x, z, WORLD_SEED);
     if (ground <= waterLevel()) return false;
-    const wl = waterLevelAt(x, z);
+    const wl = waterLevelAt(x, z, WORLD_SEED);
     return !Number.isFinite(wl) || ground > wl - PLAYER_SWIM_DEPTH;
   };
 
@@ -1397,18 +1398,21 @@ describe('every rod-tier row stands on real water and a real schedule row', () =
   });
 
   it('the open sea is unfishable: a seaward coastal cast denies with the no-water error', () => {
-    // The render draws one world-spanning sea, but the ocean is not a
-    // declared water body, so waterLevelAt answers -Infinity there and the
-    // 24yd probe walk finds no fishable sample. The farshore south strand
-    // faces open ocean with no declared body in reach; the same rod that
-    // accepts on Gull Mere denies here.
+    // The ocean is swimmable since the water overhaul (waterLevelAt answers
+    // a finite surface over open sea), but it is not a DECLARED water body,
+    // and the 24yd probe walk accepts declared bodies only, so it finds no
+    // fishable sample. The farshore south strand faces open ocean with no
+    // declared body in reach; the same rod that accepts on Gull Mere denies
+    // here.
     // Premise first, the sibling arms' idiom (the QA round): the water this
-    // cast faces really is open sea (terrain below the WORLD plane, outside
-    // every declared body: -7.70 against -4.5 at the 24yd sample when this
-    // landed), so a strand-lifting terrain edit cannot silently degrade this
-    // into a duplicate of the dry-hillside deny while it stays green.
+    // cast faces really is open sea (terrain below the WORLD plane, a real
+    // sea surface, outside every declared body: -7.70 against -4.5 at the
+    // 24yd sample when this landed), so a strand-lifting terrain edit cannot
+    // silently degrade this into a duplicate of the dry-hillside deny while
+    // it stays green.
     expect(terrainHeight(295, -94, WORLD_SEED)).toBeLessThan(waterLevel());
-    expect(Number.isFinite(waterLevelAt(295, -94))).toBe(false);
+    expect(Number.isFinite(waterLevelAt(295, -94, WORLD_SEED))).toBe(true);
+    expect(isInWaterBody(295, -94)).toBe(false);
     const sim = makeSim();
     const meta = sim.meta(sim.playerId) as PlayerMeta;
     sim.addItem('silverstream_fishing_rod', 1);
@@ -1446,7 +1450,7 @@ describe('every rod-tier row stands on real water and a real schedule row', () =
         total++;
         const x = lake.x + dx;
         const z = lake.z + dz;
-        if (terrainHeight(x, z, seed) < waterLevelAt(x, z) - PLAYER_SWIM_DEPTH) wet++;
+        if (terrainHeight(x, z, seed) < waterLevelAt(x, z, seed) - PLAYER_SWIM_DEPTH) wet++;
       }
     }
     expect(total).toBeGreaterThan(1000); // the grid itself is real
@@ -1457,7 +1461,7 @@ describe('every rod-tier row stands on real water and a real schedule row', () =
       const x = lake.x + Math.cos(a) * (lake.radius + 1.5);
       const z = lake.z + Math.sin(a) * (lake.radius + 1.5);
       expect(
-        terrainHeight(x, z, seed) >= waterLevelAt(x, z) - PLAYER_SWIM_DEPTH,
+        terrainHeight(x, z, seed) >= waterLevelAt(x, z, seed) - PLAYER_SWIM_DEPTH,
         `shore bearing ${i} is swimmable`,
       ).toBe(true);
     }

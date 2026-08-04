@@ -444,6 +444,10 @@ export interface SkyView {
   setCameraPos(x: number, z: number, dt: number): void;
   /** per-channel day/night multiplier on the dome color (1,1,1 = full day) */
   setDayNight(mul: readonly [number, number, number]): void;
+  /** the cycle's live sky grading: the sun/moon direction the dawn/dusk glow
+   *  anchors to, how strongly that warm horizon lobe shows (0 = sun high or
+   *  deep under), and how far the sky desaturates toward moonlit grey. */
+  setCycle(sunDir: THREE.Vector3, duskWarm: number, nightDesat: number): void;
   /** current scene fog color: drives the dome's horizon fog band */
   setFog(color: THREE.Color): void;
   /** set the star-field strength (0 day, 1 deep night) and the current time in
@@ -496,6 +500,9 @@ const SKY_FRAG = /* glsl */ `
   uniform vec3 uTintA; // per-biome dome grade (white = untouched)
   uniform vec3 uTintB;
   uniform vec3 uDayNight; // day/night grade (white = full day, dark blue = night)
+  uniform vec3 uSunDirLive; // live sun/moon direction the dawn/dusk glow anchors to
+  uniform float uDuskWarm;  // dawn/dusk horizon-glow strength (0 = none)
+  uniform float uNightDesat; // how far the sky greys out toward night
   uniform vec3 uFog; // current scene fog color (biome + day/night graded)
   uniform float uLiftA; // 1 = mask the HDRI's photographed horizon hills
   uniform float uLiftB;
@@ -560,7 +567,45 @@ const SKY_FRAG = /* glsl */ `
       c = mix(c, backdrop, uBackdropStrength * mix(uBackdropAmtA, uBackdropAmtB, uMix));
     }
     c *= mix(uTintA, uTintB, uMix); // biome grade
+    // Cycle sky grading, between the biome grade and the dark night multiply:
+    // (1) desaturate toward night, so the day HDRI greys out to moonlight
+    // instead of reading as a dimmed daytime photograph; (2) pour a warm
+    // dawn/dusk glow into the horizon band around the live sun azimuth while
+    // the sun crosses it, so the sky itself sets and rises with the sun.
+    float cycleLum = dot(c, vec3(0.2126, 0.7152, 0.0722));
+    c = mix(c, vec3(cycleLum), uNightDesat);
     c *= uDayNight;                 // world day/night grade
+    // The dawn/dusk glow lands AFTER the dark multiply: the sunset sky is the
+    // brightest thing in the frame at the horizon crossing, so the grade must
+    // not dim it (uDuskWarm is zero through deep night, so nothing leaks).
+    if (uDuskWarm > 0.001) {
+      vec2 sunAz = normalize(uSunDirLive.xz);
+      vec2 dirAz = normalize(dir.xz + vec2(1e-5, 0.0));
+      float align = max(dot(dirAz, sunAz), 0.0);
+      // The glow climbs to dir.y 0.55 rather than 0.45: a sunset that stops a
+      // few degrees off the horizon reads as a stripe, and the camera looks
+      // DOWN, so the band has to reach well up the dome to fill the frame.
+      float band = (1.0 - smoothstep(0.04, 0.55, dir.y)) * smoothstep(-0.24, -0.02, dir.y);
+      float warm = uDuskWarm * band * (0.2 + 0.8 * align * align);
+      vec3 duskCol = vec3(1.0, 0.34, 0.09);
+      // Two terms with very different costs. The MIX rewrites the sky toward
+      // the dusk hue scaled by the sky's OWN luminance, so it re-colours what
+      // is already there; it can be pushed. The ADD is real extra radiance into
+      // the band around the sun, and it feeds the bloom threshold that hazes
+      // distant sprite impostors out to white, so it goes the other way: 0.5,
+      // under the 0.6 it replaces. Deeper orange, less light.
+      //
+      // The min() is the load-bearing part. Uncapped, this target reached red
+      // 1.38 over the bright HDR sky, and after the ACES curve and the output
+      // GAIN that pinned red at 255 across roughly 5 percent of the frame at the
+      // horizon crossing: a wide detail-less wash, not a sun. Capping the target
+      // under 1 means the re-colour can never itself be a clipping value, while
+      // the 0.3 floor still lifts the DARK sky, which is where the glow reads
+      // and where clipping is impossible anyway.
+      float duskTarget = min(0.3 + 0.9 * cycleLum, 0.95);
+      c = mix(c, duskCol * duskTarget, warm * 0.8);
+      c += duskCol * warm * align * align * 0.5;
+    }
     // The sun and moon discs are billboard sprites (see renderer.ts) so they stay
     // perfect circles on screen; the dome only carries the sky and the stars.
     // stars: a fine field of small twinkling points at hash-jittered spots, only
@@ -710,6 +755,7 @@ export function buildSky(
         current = biomeBlendAt(x, z);
       },
       setDayNight: () => {},
+      setCycle: () => {},
       setFog: () => {},
       setStars: () => {},
       envTexture: () => null,
@@ -747,6 +793,9 @@ export function buildSky(
     uTintA: { value: tintVec(start.from) },
     uTintB: { value: tintVec(start.to) },
     uDayNight: { value: new THREE.Vector3(1, 1, 1) },
+    uSunDirLive: { value: sun.clone() },
+    uDuskWarm: { value: 0 },
+    uNightDesat: { value: 0 },
     uFog: { value: new THREE.Color(0x7095bd) },
     uLiftA: { value: BIOME_HORIZON_LIFT[start.from] },
     uLiftB: { value: BIOME_HORIZON_LIFT[start.to] },
@@ -795,6 +844,11 @@ export function buildSky(
     },
     setDayNight(mul: readonly [number, number, number]): void {
       uniforms.uDayNight.value.set(mul[0], mul[1], mul[2]);
+    },
+    setCycle(liveSunDir: THREE.Vector3, duskWarm: number, nightDesat: number): void {
+      uniforms.uSunDirLive.value.copy(liveSunDir);
+      uniforms.uDuskWarm.value = duskWarm;
+      uniforms.uNightDesat.value = nightDesat;
     },
     setFog(color: THREE.Color): void {
       uniforms.uFog.value.copy(color);

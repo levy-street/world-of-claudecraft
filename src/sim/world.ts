@@ -103,12 +103,57 @@ export function isInWaterBody(x: number, z: number): boolean {
   return false;
 }
 
+// True where the world's OWN terrain generation (base fields, coasts, lake
+// basins, the world-edge sea shave; custom-map sculpt stamps excluded, #1518)
+// carved the finished ground below the active waterline. This is exactly where
+// the renderer's zone water planes and horizon apron read as open water, so
+// the sim recognizes the same seas, straits, and coves the player can SEE
+// (the old declared-footprint-only rule left every undeclared sea sim-dry:
+// players sank to the seabed, walked under the surface, and wedged on bed
+// slopes no shore rule would release). Instanced interiors sit on their own
+// floors far off-world and never read as sea.
+export function isOpenSeaAt(x: number, z: number, seed: number): boolean {
+  if (x > DUNGEON_X_THRESHOLD) return false;
+  // Per-cell memo: this runs inside the movement gates several times per
+  // entity per tick and the sea test costs a full terrain sample. Sea-ness is
+  // stable per 1-yard cell (the same quantization the movement gates already
+  // accept from the steepness memo), so cache the bit per cell, keyed by the
+  // active content + seed (tests and custom maps swap both). Callers compare
+  // exact ground against the returned surface, so only the yard nearest the
+  // waterline contour ever sees the quantization, where the water is ankle
+  // deep and every consumer no-ops anyway.
+  const content = getActiveWorldContent();
+  if (seed !== seaCellSeed || content !== seaCellContent) {
+    seaCellSeed = seed;
+    seaCellContent = content;
+    seaCellCache.clear();
+  }
+  const cx = Math.floor(x);
+  const cz = Math.floor(z);
+  const key = (cx + 8192) * 65536 + (cz + 8192);
+  let sea = seaCellCache.get(key);
+  if (sea === undefined) {
+    if (seaCellCache.size > 400000) seaCellCache.clear(); // bound the memo
+    sea = terrainHeightSansEdits(cx + 0.5, cz + 0.5, seed) < waterLevel();
+    seaCellCache.set(key, sea);
+  }
+  return sea;
+}
+let seaCellSeed = Number.NaN;
+let seaCellContent: unknown = null;
+const seaCellCache = new Map<number, boolean>();
+
 // The water surface height AT this location: waterLevel() inside a declared
-// lake's footprint, else -Infinity (there is no water surface here, so nothing
-// reads as flooded and no swim-depth floor applies). Callers that need "is there
-// water here at all" should prefer this over a flat global constant.
-export function waterLevelAt(x: number, z: number): number {
-  return isInWaterBody(x, z) ? waterLevel() : -Infinity;
+// lake's footprint OR anywhere the generator itself carved open sea, else
+// -Infinity (there is no water surface here, so nothing reads as flooded and
+// no swim-depth floor applies). The cheap footprint scan answers first so
+// declared water never pays for a terrain sample; an authored sunken stamp
+// outside every footprint stays dry (#1518, isOpenSeaAt ignores the edit
+// layer). Callers that need "is there water here at all" should prefer this
+// over a flat global constant.
+export function waterLevelAt(x: number, z: number, seed: number): number {
+  if (isInWaterBody(x, z)) return waterLevel();
+  return isOpenSeaAt(x, z, seed) ? waterLevel() : -Infinity;
 }
 
 // Every declared lake across the active content's zones, in render/authoring
@@ -1826,6 +1871,15 @@ function applyWorldEdgeSea(x: number, z: number, h: number): number {
 // gated to low ground (a lowGate) so it only widens the near-shore into the
 // moat, never cuts a marginal sliver out of interior land or the Tablecrag;
 // the isthmus crossings at z1890 are left as land bridges.
+//
+// The OUTER edge carries a skirt past x=+-180 for the same reason the border
+// ridge carries one past 3 sigma: dEdge is 0 at the boundary, so the carve
+// stood at FULL depth (up to 5yd) on the line the applier returned unchanged
+// past, walling the strip off from the column shore it is supposed to slope
+// into. The skirt factor is exactly 1 for ax <= 180, so every height inside
+// the strip stays bit-identical; only the fade outward is new, and lowGate
+// keeps it on ground already low enough to be shore.
+const STRIP_FLANK_OUTER_SKIRT = 14; // yards; 5yd over 14 is the 0.55 bank slope
 function applyStripFlankCoast(x: number, z: number, h: number): number {
   // The z window fades INSIDE the old hard 940..1925 edges (which left step
   // walls where the carve was still several yards deep at the line): the
@@ -1837,9 +1891,10 @@ function applyStripFlankCoast(x: number, z: number, h: number): number {
   // tests/terrain_window_seams.test.ts pins the lines.
   if (z < 940 || z > 1925) return h;
   const ax = Math.abs(x);
-  if (ax > 180 || ax < 124) return h;
+  if (ax > 180 + STRIP_FLANK_OUTER_SKIRT || ax < 124) return h;
   const zWin = smoothstep(940, 956, z) * (1 - smoothstep(1909, 1925, z));
   const xWin = smoothstep(124, 132, ax);
+  const outerSkirt = 1 - smoothstep(180, 180 + STRIP_FLANK_OUTER_SKIRT, ax);
   const dEdge = 180 - ax;
   const nearPass = 1 - smoothstep(20, 48, Math.abs(z - 1890));
   const wob =
@@ -1847,7 +1902,8 @@ function applyStripFlankCoast(x: number, z: number, h: number): number {
     (fbm2(z * 0.05, Math.sign(x) * 31, 9323, 2) - 0.5) * 12;
   const band = 28 + wob;
   const lowGate = 1 - smoothstep(6, 22, h);
-  const seaT = (1 - smoothstep(band - 22, band, dEdge)) * (1 - nearPass) * lowGate * zWin * xWin;
+  const seaT =
+    (1 - smoothstep(band - 22, band, dEdge)) * (1 - nearPass) * lowGate * zWin * xWin * outerSkirt;
   if (seaT <= 0) return h;
   const floor = Math.min(h, WATER_LEVEL - 5);
   return h + (floor - h) * seaT;
@@ -1857,10 +1913,20 @@ function applyStripFlankCoast(x: number, z: number, h: number): number {
 // strip as dry rolling land (the sketch's land borders). The coast
 // appliers stand down inside the seam band so no shoreline forms there,
 // and the border ridge still rises over it (seaGate reads this too).
+// Its north edge already releases across 870..910; the south one cut hard at
+// 170 with the seam at full strength, so the coast appliers it silences came
+// back on all at once and stepped the shore along the whole line. Fade it in
+// BELOW 170 (bit-identical from 170 north, where the marsh row it serves
+// begins) rather than inside, which would re-carve the seam's own dry border.
+const GREEN_SEAM_SOUTH_SKIRT = 16;
 function greenSeamT(x: number, z: number): number {
-  if (z < 170 || z > 910) return 0;
+  if (z < 170 - GREEN_SEAM_SOUTH_SKIRT || z > 910) return 0;
   const d = Math.abs(Math.abs(x) - STRIP_MAX_X);
-  return (1 - smoothstep(50, 90, d)) * (1 - smoothstep(870, 910, z));
+  return (
+    (1 - smoothstep(50, 90, d)) *
+    (1 - smoothstep(870, 910, z)) *
+    smoothstep(170 - GREEN_SEAM_SOUTH_SKIRT, 170, z)
+  );
 }
 
 // Same coast recipe; holds the sealed wall's footing at the south fringe.
@@ -3420,7 +3486,24 @@ export function groundHeight(x: number, z: number, seed: number): number {
 }
 
 export function terrainHeight(x: number, z: number, seed: number): number {
-  let h = terrainHeightUnpadded(x, z, seed);
+  return applyTerrainPads(x, z, seed, terrainHeightUnpadded(x, z, seed));
+}
+
+// The finished overworld height as the GENERATOR alone authors it: the full
+// unpadded chain and every authored pad, with only the custom-map sculpt-edit
+// layer skipped. This is the ground truth for "did the world's own shaping
+// carve below the waterline here" (isOpenSeaAt), so an author's sunken stamp
+// (#1518) can never read as sea. For the built-in world (no terrainEdits) it
+// equals terrainHeight exactly.
+export function terrainHeightSansEdits(x: number, z: number, seed: number): number {
+  return applyTerrainPads(x, z, seed, terrainHeightUnpadded(x, z, seed, true));
+}
+
+// The authored pad chain over the unpadded height (castle pad, spring bank,
+// pool walkway bed, garden/gale pads): one shared body so terrainHeight and
+// terrainHeightSansEdits can never drift.
+function applyTerrainPads(x: number, z: number, seed: number, h0: number): number {
+  let h = h0;
   // The Last Keep's courtyard pad, over the FINISHED height (the world-edge
   // sea shave runs late in the unpadded chain and was clipping the castle's
   // seaward corner; the castle plateau must win everywhere inside its walls).
@@ -3584,7 +3667,7 @@ function borderSeaGate(x: number, z: number): number {
   return smoothstep(0.005, 0.06, land);
 }
 
-function terrainHeightUnpadded(x: number, z: number, seed: number): number {
+function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = false): number {
   const region = terrainRegionAt(x, z);
   let h = baseHeight(x, z, seed, region);
 
@@ -3995,7 +4078,9 @@ function terrainHeightUnpadded(x: number, z: number, seed: number): number {
   // height (the editor's height stamps; a no-op for the built-in world, which has
   // no terrainEdits). Kept in terrainHeight so the render mesh (which samples
   // terrainHeight) and the sim's groundHeight both see the edited ground.
-  return applyEditLayer(x, z, h);
+  // skipEdits serves terrainHeightSansEdits (the open-sea predicate) alone:
+  // every gameplay and render height keeps the edited ground.
+  return skipEdits ? h : applyEditLayer(x, z, h);
 }
 
 // Steepest local rise/run of the walkable heightfield at (x, z), independent of

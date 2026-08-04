@@ -3079,6 +3079,16 @@ export const en_CA: EnTranslations = {
     },
     "ota_updates": {
       "invalid_input": "Invalid input."
+    },
+    "seeker": {
+      "native_only": "Seeker entitlement is available only in the native app.",
+      "attestation_failed": "Device verification failed. Please try again.",
+      "solana_artifact_required": "Use the Solana Store app to continue.",
+      "wallet_required": "Link and verify a wallet first.",
+      "genesis_token_required": "A verified Seeker Genesis Token is required.",
+      "genesis_token_claimed": "That Seeker Genesis Token has already been claimed.",
+      "entitlement_required": "Verified Seeker entitlement is required.",
+      "current_ownership_required": "Current Seeker Genesis Token ownership is required."
     }
   },
   "guide": {
@@ -5158,6 +5168,7 @@ export const en_CA: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "Holder perks are active. Connect the app when you need to sign or spend.",
     "extensionHelp": "Choose an installed browser wallet, or open Reown AppKit for Phantom, Solflare, Backpack, and more.",
     "mobileAppHelp": "Choose Phantom or Solflare. Your wallet app will ask for approval. Keep this game open and return to it when finished.",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "Wallet connections are not available in the Home Screen app yet. Open World of ClaudeCraft in Safari or Chrome to use Phantom or Solflare.",
     "openAppTitle": "Continue in {wallet}",
     "openAppHelp": "Open {wallet} to review this request. Keep this game tab open while the wallet app is active.",

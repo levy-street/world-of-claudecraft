@@ -15,7 +15,7 @@ const SEED = 1;
 // The sim's depth rule, restated independently so the core cannot drift from
 // it without this suite noticing.
 function fishableAt(x: number, z: number): boolean {
-  return groundHeight(x, z, SEED) < waterLevelAt(x, z) - PLAYER_SWIM_DEPTH;
+  return groundHeight(x, z, SEED) < waterLevelAt(x, z, SEED) - PLAYER_SWIM_DEPTH;
 }
 
 // A shore spot near Mirror Lake facing open water (the sim.test.ts
@@ -26,7 +26,7 @@ function lakeShoreSpot(): { x: number; z: number; facing: number } {
       const a = (i / 72) * Math.PI * 2;
       const x = LAKE.x + Math.cos(a) * r;
       const z = LAKE.z + Math.sin(a) * r;
-      if (groundHeight(x, z, SEED) < waterLevelAt(x, z)) continue;
+      if (groundHeight(x, z, SEED) < waterLevelAt(x, z, SEED)) continue;
       const facing = Math.atan2(LAKE.x - x, LAKE.z - z);
       const sin = Math.sin(facing);
       const cos = Math.cos(facing);
@@ -53,7 +53,7 @@ describe('fishing bobber anchor core', () => {
     const d = firstD as number;
     expect(out.x).toBeCloseTo(spot.x + sin * d, 10);
     expect(out.z).toBeCloseTo(spot.z + cos * d, 10);
-    expect(out.y).toBeCloseTo(waterLevelAt(out.x, out.z), 10);
+    expect(out.y).toBeCloseTo(waterLevelAt(out.x, out.z, SEED), 10);
   });
 
   it('reports no anchor when the angler faces away from fishable water', () => {
