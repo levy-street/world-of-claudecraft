@@ -35,12 +35,16 @@ mkdirSync(outDir, { recursive: true });
 //    root-relative /<logical> paths our static server maps into public/), which esbuild leaves
 //    intact for a classic IIFE <script src> and would be a SyntaxError. esbuild matches each
 //    FULL member path exactly (a bare `import.meta.env` define does NOT fold `.DEV`), so define
-//    every Vite flag a module the bundle graph reaches reads: media.ts / i18n.ts read
-//    DEV/PROD, and render/gfx.ts pulls in client_origin.ts and (transitively) runtime.ts for
-//    native/desktop-app origin detection (VITE_NATIVE_APP, VITE_API_ORIGIN,
-//    VITE_DESKTOP_APP, VITE_DESKTOP_API_ORIGIN, VITE_DESKTOP_RELATIVE_API), none of which
-//    apply to this static headless render. The assert below fails loudly if a transitive
-//    module ever reads another import.meta field this define misses.
+//    every Vite flag a transitive module reads (`grep -rho 'import\.meta\.env\.[A-Za-z_]*' src/`):
+//    media.ts / i18n.ts read DEV/PROD, and render/gfx.ts pulls in client_origin.ts and
+//    (transitively) runtime.ts for native/desktop-app origin detection, none of which apply to
+//    this static headless render.
+//
+//    The `raw import.meta` assert below is necessary but NOT sufficient: for an iife bundle
+//    esbuild folds an undefined member path down to `({}).env`, so a missed field leaves no
+//    literal `import.meta` to catch and instead throws at runtime reading a property of
+//    undefined (which surfaces only as a PAGEERR and a 20s wait-for timeout). client_origin.ts
+//    reading VITE_NATIVE_APP hit exactly that, so keep this list exhaustive.
 const bundled = await esbuild.build({
   entryPoints: [path.join(root, 'scripts', 'wiki', 'stills_render_entry.js')],
   bundle: true,
@@ -49,17 +53,16 @@ const bundled = await esbuild.build({
   define: {
     'import.meta.env.DEV': 'true',
     'import.meta.env.PROD': 'false',
-    // src/client_origin.ts and src/runtime.ts (pulled in transitively via the guide
-    // viewer's asset chain) also read import.meta.env at module scope; esbuild replaces
-    // the whole import.meta object with {} for a non-ESM output format, so an undefined
-    // field access here throws in the browser page rather than failing this build step
-    // (the assert below only catches a literal `import.meta` surviving the bundle, not
-    // an unmatched member access on the now-empty stand-in object).
-    'import.meta.env.VITE_NATIVE_APP': '""',
+    'import.meta.env.BASE_URL': '"/"',
     'import.meta.env.VITE_API_ORIGIN': '""',
-    'import.meta.env.VITE_DESKTOP_APP': '""',
     'import.meta.env.VITE_DESKTOP_API_ORIGIN': '""',
+    'import.meta.env.VITE_DESKTOP_APP': '""',
     'import.meta.env.VITE_DESKTOP_RELATIVE_API': '""',
+    'import.meta.env.VITE_DISCORD_DISABLED': '""',
+    'import.meta.env.VITE_NATIVE_APP': '""',
+    'import.meta.env.VITE_REOWN_PROJECT_ID': '""',
+    'import.meta.env.VITE_TURNSTILE_SITEKEY': '""',
+    'import.meta.env.VITE_WALLET_DISABLED': '""',
   },
   write: false,
   logLevel: 'silent',

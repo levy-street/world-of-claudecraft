@@ -208,6 +208,45 @@ describe('character visual manifest', () => {
     }
   });
 
+  it('gives druid Bear Form its own quadruped rig with a held jump and a landing', async () => {
+    const bear = VISUALS.form_bear;
+    expect(bear.url).toBe('models/creatures/bear_form.glb');
+    // no tint: the sculpt ships its own texture, unlike the brown-washed yeti
+    // biped that used to stand in for the form
+    expect(bear.tint).toBeUndefined();
+
+    const names = await glbAnimationNames(`public/${bear.url}`);
+    expect([...new Set(expectedClipNames(bear.clips))].filter((n) => !names.has(n))).toEqual([]);
+    // Jump/Land are a PAIR: `land` is what makes visual.ts clamp the jump clip on
+    // its airborne pose instead of looping it, so a jump without a land would
+    // silently keep the old looping behaviour.
+    expect(bear.clips.jump).toBe('Jump');
+    expect(bear.clips.land).toBe('Land');
+    expect(names.has('Jump') && names.has('Land')).toBe(true);
+
+    // An instant ability must not animate the bear. The cast base state falls
+    // back to idle without a `cast` clip, and the ability-VFX painter only plays
+    // a ceremonial gesture when the rig authors a per-ability clip
+    // (hasGestureClip), so all three of these staying absent is the mechanism.
+    // Real attacks still resolve through `attack`.
+    expect(bear.clips.cast).toBeUndefined();
+    expect(bear.clips.attackByAbility).toBeUndefined();
+    expect(bear.clips.emote).toBeUndefined();
+    expect(bear.clips.attack).toEqual(['Attack']);
+
+    // measured off the clips (see the manifest comment); full run (RUN_SPEED 7)
+    // must land clear of the 1.6 clamp in locomotionTimeScale, where feet skate
+    expect(bear.runRef).toBeDefined();
+    expect(7 / (bear.runRef as number)).toBeLessThan(1.6);
+  });
+
+  it('pairs `land` with `jump` on every rig that ships one', () => {
+    for (const [key, def] of Object.entries(VISUALS)) {
+      if (!def.clips.land) continue;
+      expect(def.clips.jump, `${key} names a land clip but no jump clip to clamp`).toBeDefined();
+    }
+  });
+
   it('keeps held weapons and props available on low graphics', () => {
     const allWeaponUrls = manifestUrls().filter((url) => url.startsWith('models/weapons/'));
     expect(allWeaponUrls.length).toBeGreaterThan(0);
