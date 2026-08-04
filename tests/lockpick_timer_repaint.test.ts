@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 // The lockpick countdown's repaint contract (#2498).
 //

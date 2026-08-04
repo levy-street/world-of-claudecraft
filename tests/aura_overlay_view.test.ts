@@ -3,6 +3,7 @@ import { CHOICE_ROWS } from '../src/sim/content/choice_rows';
 import type { TalentAllocation } from '../src/sim/content/talents';
 import type { PlayerClass } from '../src/sim/types';
 import { activeAuraProcIds, availableAuraProcDefs } from '../src/ui/aura_overlay_view';
+import { abilityImageUrl } from '../src/ui/icons';
 
 const known = (...ids: string[]) => ids.map((id) => ({ def: { id } }));
 const talents = (rows: TalentAllocation['rows']): TalentAllocation => ({ spec: null, rows });
@@ -209,6 +210,41 @@ describe('availableAuraProcDefs', () => {
     }
 
     expect(missing).toEqual([]);
+  });
+
+  it('routes every selected talent proc overlay to authored ability art', () => {
+    const actionableKinds = new Set(['empowerNext', 'aura', 'absorb', 'echo']);
+    const missing: string[] = [];
+
+    for (const [rawClass, tree] of Object.entries(CHOICE_ROWS)) {
+      const playerClass = rawClass as PlayerClass;
+      for (const row of tree.rows) {
+        for (const option of row.options) {
+          const proc = option.effect.proc;
+          if (!proc?.responses.some((response) => actionableKinds.has(response.kind))) {
+            continue;
+          }
+          const def = availableAuraProcDefs(
+            playerClass,
+            known(),
+            talents({ [row.level]: option.id }),
+          ).find((candidate) => candidate.id === proc.id);
+          if (def && !abilityImageUrl(def.iconAbilityId)) {
+            missing.push(`${playerClass}:${option.id}:${def.iconAbilityId}`);
+          }
+        }
+      }
+    }
+
+    expect(missing).toEqual([]);
+  });
+
+  it('routes Hellglass Ward to the canonical Felhunter painting', () => {
+    expect(
+      availableAuraProcDefs('warlock', known(), talents({ 20: 'wlk_r20_grimoire_of_haste' })).map(
+        ({ id, iconAbilityId }) => ({ id, iconAbilityId }),
+      ),
+    ).toEqual([{ id: 'wlk_grimoire_of_carnage', iconAbilityId: 'summon_felhunter' }]);
   });
 
   it('covers the actionable Fire, Frost, and Arcane Mage states', () => {

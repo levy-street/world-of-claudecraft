@@ -9,6 +9,10 @@ const questStringsEn = {
       complete: 'Complete',
       showOnMap: 'Show {name} on the map',
       hideFromMap: 'Hide {name} from the map',
+      // Stale-client fallback (R34): a log entry whose quest id this bundle
+      // predates keeps its tracker position, labeled as unknown rather than
+      // as a bare content slug.
+      unknownQuest: 'Unknown quest ({id})',
     },
     log: {
       title: 'Quest Log',
@@ -20,6 +24,11 @@ const questStringsEn = {
       activeStatus: 'Active',
       readyStatus: 'Complete',
       completedStatus: 'Completed',
+      // The map tooltip's tags for the phase 23 marker variants (the status
+      // vocabulary family readyStatus already lends to that tooltip): the
+      // blue repeatable turn-in, and a work order inside its cooldown window.
+      repeatableStatus: 'Repeatable',
+      cooldownStatus: 'Available again soon',
       returnTo: 'Return to {name}',
       abandon: 'Abandon Quest',
       abandonConfirmTitle: 'Abandon Quest',
@@ -33,6 +42,10 @@ const questStringsEn = {
       greetingFallback: 'Greetings.',
       availableQuestAria: 'Available quest: {name}',
       readyQuestAria: 'Quest ready to turn in: {name}',
+      // The gossip row for a repeatable quest already completed at least
+      // once (the blue '!'): the aria names the repeatable state, acceptance
+      // (e) of the phase 23 marker work.
+      repeatableQuestAria: 'Repeatable quest: {name}',
       discussQuest: 'Discuss {name}.',
       discussQuestAria: 'Discuss quest: {name}',
       // The profession masters' locked-quest hint row. Deliberately terse:

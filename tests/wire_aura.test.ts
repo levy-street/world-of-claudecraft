@@ -54,6 +54,7 @@ describe('wireEntity aura serialization', () => {
     expect(w).not.toHaveProperty('stacks');
     expect(w).not.toHaveProperty('charges');
     expect(w).not.toHaveProperty('src');
+    expect(w).not.toHaveProperty('bt');
   });
 
   it('includes every optional field when the aura carries a non-default value', () => {
@@ -69,6 +70,7 @@ describe('wireEntity aura serialization', () => {
         stacks: 4,
         charges: 2,
         sourceId: 7,
+        breakThreshold: 25,
       }),
     ];
 
@@ -87,6 +89,7 @@ describe('wireEntity aura serialization', () => {
       stacks: 4,
       charges: 2,
       src: 7,
+      bt: 1,
     });
     expect(Object.keys(w)).toEqual([
       'id',
@@ -102,6 +105,7 @@ describe('wireEntity aura serialization', () => {
       'stacks',
       'charges',
       'src',
+      'bt',
     ]);
   });
 

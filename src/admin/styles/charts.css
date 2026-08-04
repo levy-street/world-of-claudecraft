@@ -44,7 +44,7 @@
     stroke: var(--gold);
   }
   .chart .line.secondary {
-    stroke: #8cc7ff;
+    stroke: var(--chart-secondary);
     stroke-width: 2;
     opacity: 0.9;
   }
@@ -64,8 +64,8 @@
   }
   .range-tab {
     min-height: 40px;
-    border: 1px solid #4a3920;
-    background: #1a130d;
+    border: 1px solid var(--border);
+    background: var(--btn-flat-bg);
     color: var(--text);
     border-radius: 6px;
     padding: 6px 10px;
@@ -74,6 +74,6 @@
   .range-tab.active {
     color: var(--gold);
     border-color: var(--gold-dim);
-    background: #241a0e;
+    background: var(--surface-active);
   }
 }

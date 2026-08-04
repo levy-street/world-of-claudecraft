@@ -43,6 +43,7 @@ import {
 } from '../src/guide/routes';
 import { buildIndex, rank } from '../src/guide/search';
 import { DEEDS } from '../src/sim/content/deeds';
+import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
@@ -58,6 +59,10 @@ import {
   STATIONS,
 } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
+import {
+  TIER2_TOOL_GATE_PROFICIENCY,
+  TIER3_TOOL_GATE_PROFICIENCY,
+} from '../src/sim/content/vendor_row_gates';
 import { CAMPS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
 import { MARKET_CUT, MARKET_LISTING_DEPOSIT_COPPER } from '../src/sim/market';
 import {
@@ -96,6 +101,11 @@ import {
   tierForSkill,
   tierProgressMultiplier,
 } from '../src/sim/professions/wheel';
+import {
+  TIER4_TOOL_WIELD_PROFICIENCY,
+  TIER5_TOOL_WIELD_PROFICIENCY,
+  WIELD_REQUIREMENT_BY_TIER,
+} from '../src/sim/professions/wield_gate';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
@@ -1335,16 +1345,22 @@ describe('Guide professions gathering accuracy', () => {
         ).length;
         expect(row.count).toBe(simCount);
       }
-      expect(g.respawnSeconds).toBe(120);
+      // Re-minted from 120 alongside the node-count expansion: the wiki prints
+      // this straight out of NODE_HARVEST_TABLE, and the two moved together so
+      // the per-zone harvest ceiling stayed flat (gathering.ts).
+      expect(g.respawnSeconds).toBe(240);
     }
-    // Spot pin: Thornpeak ships one tier-3 node per gathering type.
+    // Spot pin: Thornpeak ships two tier-3 nodes per gathering type. Was one,
+    // and doubled with the respawn so a tier-3 gatherer's rate held; the number
+    // matters here because tier 3 is the only tier that finishes the climb to
+    // proficiency 100.
     const mining = GUIDE_PROF_GATHERING.find((g) => g.id === 'mining');
     const t3 = mining?.nodes?.find((n) => n.tier === 3);
     expect(t3).toEqual({
       zone: 'Thornpeak Heights',
       tier: 3,
       toolTier: 3,
-      count: 1,
+      count: 2,
       material: 'Osmium Ore',
     });
   });
@@ -1370,19 +1386,175 @@ describe('Guide professions gathering accuracy', () => {
           ALL_RECIPES.find((r) => r.resultItemId === itemId)?.professionId,
         );
       }
+      // R22 wield column: land tools above tier 1 publish the frozen wield
+      // requirement; tier 1 and every fishing rod publish none (rods are the
+      // structural exemption, wield_gate.ts). This is a MIRROR (generator and
+      // expectation both read the same constants); the absolute literal pins
+      // live in tests/professions_tool_gate.test.ts (85/100) and
+      // tests/delve_shop.test.ts (24/56 and every gate).
+      if (use.professionId !== 'fishing' && use.tier >= 2) {
+        expect(rows[0].wieldProficiency, `${itemId} wield requirement`).toBe(
+          WIELD_REQUIREMENT_BY_TIER[use.tier],
+        );
+      } else {
+        expect(rows[0].wieldProficiency, `${itemId} must publish no wield`).toBeUndefined();
+      }
+      // The Marks route publishes its clears gate exactly as the delve
+      // counter enforces it, and the tier-4 rows all sit on clears:3, which
+      // is what keeps the English "three delve clears" in
+      // guide.profPages.toolCraftedOrMarks honest.
+      const shopRows = Object.values(DELVE_SHOPS)
+        .flat()
+        .filter((e) => e.itemId === itemId);
+      // First-match-wins on both sides (the generator's marksRowFor scans the
+      // same way), so a tool stocked twice at different gates would agree
+      // invisibly: require uniqueness before trusting the mirror.
+      expect(shopRows.length, `${itemId} must appear on at most one delve counter`).toBeLessThan(2);
+      const shopRow = shopRows[0];
+      if (shopRow) {
+        expect(rows[0].priceMarks, `${itemId} Marks price`).toBe(shopRow.marks);
+        if (shopRow.gate === 'heroicClear') {
+          expect(rows[0].marksHeroicClear, `${itemId} heroic gate`).toBe(true);
+          expect(rows[0].marksClears).toBeUndefined();
+        } else {
+          expect(shopRow.gate, `${itemId} gate must be the pinned clears rung`).toBe('clears:3');
+          expect(rows[0].marksClears, `${itemId} clears gate`).toBe(3);
+          expect(rows[0].marksHeroicClear).toBeUndefined();
+        }
+      } else {
+        expect(rows[0].priceMarks).toBeUndefined();
+        expect(rows[0].marksClears).toBeUndefined();
+        expect(rows[0].marksHeroicClear).toBeUndefined();
+      }
     }
     // The rod ladder: simple pole tier 1, Ironreel t2 at 60c, Silverstream t3
-    // at 150c, all at Trader Wilkes.
+    // at 150c, all bought; Stormreel t4 and Tidewrought t5 crafted, so they
+    // carry no price at all.
     const fishing = GUIDE_PROF_GATHERING.find((g) => g.id === 'fishing');
     expect(fishing?.tools.map((tool) => [tool.name, tool.tier, tool.priceCopper])).toEqual([
       ['Simple Fishing Pole', 1, 20],
       ['Ironreel Fishing Rod', 2, 60],
       ['Silverstream Fishing Rod', 3, 150],
+      ['Stormreel Fishing Rod', 4, null],
+      ['Tidewrought Fishing Rod', 5, null],
     ]);
+    // Every rung says where it comes from, and the two routes are exclusive:
+    // a bought rod names a counter, a crafted one names the craft that makes
+    // it. Before the crafted rods existed this loop demanded a vendor for
+    // every row, which a crafted rod can never satisfy.
+    let bought = 0;
+    let crafted = 0;
     for (const rod of fishing?.tools ?? []) {
-      expect(
-        rod.vendors.some((v) => v.name === 'Trader Wilkes' || v.name === 'Fisherman Brandt'),
-      ).toBe(true);
+      if (rod.priceCopper === null) {
+        expect(rod.vendors, `${rod.name} is crafted and must be on no counter`).toEqual([]);
+        // The published row carries no item id, so the recipe is resolved
+        // through the display name the row does carry.
+        expect(rod.craftedBy, `${rod.name} must name its craft`).toBe(
+          ALL_RECIPES.find((r) => ITEMS[r.resultItemId]?.name === rod.name)?.professionId,
+        );
+        expect(rod.craftedBy).toBe('engineering');
+        crafted += 1;
+      } else {
+        expect(
+          rod.vendors.some((v) => v.name === 'Trader Wilkes' || v.name === 'Fisherman Brandt'),
+          `${rod.name} must name its stockist`,
+        ).toBe(true);
+        bought += 1;
+      }
+      // Each bought rung above the first is also sold in the zone whose water
+      // asks for it, so no zone demands tackle no local counter carries.
+      if (rod.tier === 2) {
+        expect(
+          rod.vendors.some((v) => v.name === 'Provisioner Hale'),
+          'the marsh must stock the rod its own water takes',
+        ).toBe(true);
+      }
+      if (rod.tier === 3) {
+        expect(
+          rod.vendors.some((v) => v.name === 'Quartermaster Bree'),
+          'the peaks must stock the rod their own water takes',
+        ).toBe(true);
+      }
+    }
+    expect([bought, crafted]).toEqual([3, 2]);
+  });
+
+  it('publishes the tool-gate thresholds through placeholders in EVERY locale', () => {
+    // The tools note states the two gate thresholds. It takes them as {tier2} /
+    // {tier3} rather than as literals so a retune moves the published prose in
+    // all 19 languages at once; a fill that dropped the tokens would republish
+    // frozen numbers, and nothing else would notice, because the value would
+    // still be present and translated.
+    setLanguage('en');
+    const en = t('guide.profPages.toolsNote', {
+      tier2Prof: String(TIER2_TOOL_GATE_PROFICIENCY),
+      tier3Prof: String(TIER3_TOOL_GATE_PROFICIENCY),
+    });
+    expect(en).toContain(String(TIER2_TOOL_GATE_PROFICIENCY));
+    expect(en).toContain(String(TIER3_TOOL_GATE_PROFICIENCY));
+    expect(en, 'no token left unspliced').not.toMatch(/\{[A-Za-z0-9_]+\}/);
+    // The crafted rungs' thresholds ride the prose as ENGLISH LITERALS (the
+    // long-translated key keeps its token set, R64), so pin the exact
+    // crafted-rung clause to the frozen wield table: a retune fails here
+    // instead of rotting in the prose, and the clause scope keeps an
+    // unrelated 100 elsewhere in the note from ever satisfying this.
+    expect(en).toContain(
+      `${TIER4_TOOL_WIELD_PROFICIENCY} and ${TIER5_TOOL_WIELD_PROFICIENCY} for the two crafted rungs`,
+    );
+    // The Marks-route cells name their gates as English words, so tie the
+    // wording to the live gate IN THE SAME BREATH: if the delve counter's
+    // tier-4 rung ever leaves clears:3, this line reds together with the
+    // wording below, not in a different test a fixer can satisfy alone.
+    expect(
+      Object.values(DELVE_SHOPS)
+        .flat()
+        .find((e) => e.itemId === 'thorium_mining_pick')?.gate,
+    ).toBe('clears:3');
+    // The delve name in the wording derives from the shipped delve, so a sim
+    // rename reds this pin against the prose literal instead of rotting six
+    // English strings plus five locale fills with a green suite (R66).
+    const litany = GUIDE_DELVES.find((d) => d.id === 'drowned_litany')?.name.replace(/^The /, '');
+    expect(litany, 'the Litany ships under its known name').toBe('Drowned Litany');
+    expect(t('guide.profPages.toolCraftedOrMarks', { craft: 'X', marks: '24' })).toContain(
+      `three ${litany} clears`,
+    );
+    expect(t('guide.profPages.toolCraftedOrMarksHeroic', { craft: 'X', marks: '56' })).toContain(
+      `Heroic ${litany} clear`,
+    );
+
+    // Every shipped locale, read off the resolved bundles: both tokens present
+    // AND neither threshold spelled out as a literal. The second half is what a
+    // reword silently leaves behind, since the row stays "translated" and no
+    // i18n gate ever marks it pending.
+    const dir = resolve(process.cwd(), 'src/ui/i18n.resolved.generated');
+    // Locale bundles only: the directory also holds the barrel, the lazy
+    // loader map, and the pending slice.
+    const INFRA = new Set(['index.ts', 'loaders.ts', 'pending.ts']);
+    const locales = readdirSync(dir).filter((f) => f.endsWith('.ts') && !INFRA.has(f));
+    expect(locales.length).toBeGreaterThan(15);
+    for (const file of locales) {
+      const source = readFileSync(`${dir}/${file}`, 'utf8');
+      const at = source.indexOf('toolsNote');
+      expect(at, `${file} carries toolsNote`).toBeGreaterThan(-1);
+      // Bounded by the value's own line, not a magic width: a window wider
+      // than the longest translation reaches into following keys, and the
+      // direction of that looseness is a FALSE PASS.
+      const lineEnd = source.slice(at).indexOf('\n');
+      const value = source.slice(at, lineEnd === -1 ? undefined : at + lineEnd);
+      expect(value, `${file} keeps {tier2Prof}`).toContain('{tier2Prof}');
+      expect(value, `${file} keeps {tier3Prof}`).toContain('{tier3Prof}');
+      // The half a placeholder check alone cannot see: a fill that spelled the
+      // numbers out would keep the tokens elsewhere in the sentence and still
+      // publish frozen values. Neither threshold may appear as a literal.
+      const withoutTokens = value.replace(/\{[^}]*\}/g, '');
+      // Whole-number match, not a substring: an unrelated figure that merely
+      // CONTAINS the threshold digits (a 240-second respawn, say) must not trip
+      // this, or a future prose edit fails for the wrong reason.
+      for (const threshold of [TIER2_TOOL_GATE_PROFICIENCY, TIER3_TOOL_GATE_PROFICIENCY]) {
+        expect(withoutTokens, `${file} spells out ${threshold}`).not.toMatch(
+          new RegExp(`(^|[^0-9])${threshold}([^0-9]|$)`),
+        );
+      }
     }
   });
 
@@ -1393,9 +1565,25 @@ describe('Guide professions gathering accuracy', () => {
     expect(f.biteMinSec).toBe(3);
     expect(f.biteMaxSec).toBe(8);
     expect(f.rodBiteReductionSec).toBe(1.5);
-    expect(f.reelWindowSec).toBe(3);
+    expect(f.reelWindowSec).toBe(2.5);
     expect(f.reelRodBonusSec).toBe(0.75);
     expect(f.sessionCapSec).toBe(15);
+    // The biteBody prose quotes DERIVED figures (worst wait and reel window
+    // per rod tier) as English literals; derive them here from the published
+    // constants so a rhythm retune reds the prose too, not just the numbers
+    // above (the QA lens found the derivations otherwise unpinned).
+    setLanguage('en');
+    const bite = t('guide.profPages.fish.biteBody', {
+      min: '3',
+      max: '8',
+      reel: '2.5',
+      cap: '15',
+      rod: '1.5',
+      reelRod: '0.75',
+    });
+    expect(bite).toContain(`down to ${f.biteMaxSec - f.rodBiteReductionSec} seconds`);
+    expect(bite).toContain(`${f.reelWindowSec + f.reelRodBonusSec} second window`);
+    expect(bite).toContain(`the Silverstream to ${f.biteMaxSec - 2 * f.rodBiteReductionSec} with`);
     expect(f.schedule).toEqual(
       FISHING_GAIN_SCHEDULE.map((row) => ({ below: row.belowProficiency, gain: row.gain })),
     );
@@ -1429,14 +1617,17 @@ describe('Guide professions gathering accuracy', () => {
         expect(pubZone?.rows.reduce((sum, r) => sum + r.pct, 0)).toBe(100);
       }
     }
-    // The koi odds stay flat across bands: 3 percent in the Vale and marsh,
-    // 4 in Thornpeak (its odds never scale with skill).
-    for (const band of f.bandTables) {
-      for (const zone of band.zones) {
+    // The koi odds are the one row that reads skill and nothing else: the same
+    // 1 / 3 / 6 percent in every zone, rising with the band.
+    let koiRowsChecked = 0;
+    for (const [band, published] of f.bandTables.entries()) {
+      for (const zone of published.zones) {
         const koi = zone.rows.find((r) => r.name === 'Sunglint Koi');
-        expect(koi?.pct).toBe(zone.zone === 'Thornpeak Heights' ? 4 : 3);
+        expect(koi?.pct, `${zone.zone} band ${band}`).toBe([1, 3, 6][band]);
+        koiRowsChecked += 1;
       }
     }
+    expect(koiRowsChecked).toBe(9);
   });
 
   it('publishes the exact shared curve, cast, and rare-event numbers', () => {
@@ -1468,6 +1659,33 @@ describe('Guide professions gathering accuracy', () => {
     // The corpse specimen chance: the rare+ share of the corpse rarity roll
     // at its fixed baseline (40 * 0.4 / 100 = 16 percent).
     expect(c.specimenChancePct).toBe(16);
+  });
+
+  it('ties the gatherDeeds prose counts to the deed catalog (phase 24)', () => {
+    // The two per-zone deed families the gatherDeeds prose counts. A new zone
+    // that authors either deed (the zone-4 pass) moves the count here and must
+    // reword the prose in the same change, or these arms go red.
+    const firstCast = Object.values(DEEDS).filter(
+      (d) => d.trigger.kind === 'visit' && d.trigger.markId.startsWith('fish:'),
+    );
+    const chronicles = Object.values(DEEDS).filter(
+      (d) =>
+        d.trigger.kind === 'visits' &&
+        d.trigger.markIds.length > 0 &&
+        d.trigger.markIds.every((m) => m.startsWith('gather:')),
+    );
+    const words: Record<number, string> = { 5: 'five', 6: 'six', 7: 'seven', 8: 'eight' };
+    const castWord = words[firstCast.length];
+    expect(castWord, `unmapped first-cast count ${firstCast.length}`).toBeDefined();
+    expect(guideStrings.profPages.gatherDeeds.fishing).toContain(
+      `each of ${castWord} zones' waters`,
+    );
+    const chronWord = words[chronicles.length];
+    expect(chronWord, `unmapped gatherer-chronicle count ${chronicles.length}`).toBeDefined();
+    const chronSentence = `${(chronWord as string)[0].toUpperCase()}${(chronWord as string).slice(1)} zones keep a gatherer's chronicle page apiece`;
+    for (const trade of ['mining', 'logging', 'herbalism'] as const) {
+      expect(guideStrings.profPages.gatherDeeds[trade]).toContain(chronSentence);
+    }
   });
 });
 
@@ -1634,6 +1852,75 @@ describe('Guide professions pages and routes', () => {
       expect((html.match(/<h1>/g) ?? []).length, `page "${id}" h1 count`).toBe(1);
       expect(html).not.toContain('guide-notfound');
     }
+    // The tool table's Use at column renders end to end: the header cell, the
+    // wield numbers, the ungated fallback, and BOTH Marks-gate source cells
+    // (the data-level mirror above cannot see a header/cell desync or a
+    // swapped gate string; this can).
+    const mining = professionsPage.render(ctx(['mining']));
+    expect(mining).toContain(`<th scope="col">${t('guide.profPages.colWield')}</th>`);
+    expect(mining).toContain(`<td>${t('guide.profPages.wieldNone')}</td>`);
+    // Tie each gate WORDING to its own tool's row, not just to the page: a
+    // swapped heroic/clears key pair in toolSource keeps both strings on the
+    // page (mining has one tool at each gate) and only a per-row assertion
+    // reds on the inversion.
+    const rowFor = (name: string): string =>
+      mining.match(
+        new RegExp(`<tr>(?:(?!</tr>)[\\s\\S])*${name}(?:(?!</tr>)[\\s\\S])*</tr>`),
+      )?.[0] ?? '';
+    // Delve name derived as in the wording pin above: a sim rename must red
+    // these rows rather than leave stale prose green.
+    const litanyRow = GUIDE_DELVES.find((d) => d.id === 'drowned_litany')?.name.replace(
+      /^The /,
+      '',
+    );
+    expect(rowFor('Osmium Mining Pick'), 'tier-4 row names its clears gate').toContain(
+      `three ${litanyRow} clears`,
+    );
+    expect(rowFor('Glyphsteel Mining Pick'), 'tier-5 row names its Heroic gate').toContain(
+      `Heroic ${litanyRow} clear`,
+    );
+    // The rendered wield NUMBER in its own COLUMN, not just the artifact
+    // field: the data mirror pins the corpus, so a page that renders the
+    // wrong value in the cell would otherwise ship silently (the QA mutation
+    // pass proved it), and a bare toContain would survive a column swap. The
+    // Use at column is the fourth cell (Tool, Tier, Quality, Use at, ...).
+    const wieldCell = (name: string): string =>
+      rowFor(name).match(/<td[^>]*>[\s\S]*?<\/td>/g)?.[3] ?? '';
+    expect(wieldCell('Osmium Mining Pick'), 'tier-4 wield column holds its number').toBe(
+      `<td>${TIER4_TOOL_WIELD_PROFICIENCY}</td>`,
+    );
+    expect(wieldCell('Glyphsteel Mining Pick'), 'tier-5 wield column holds its number').toBe(
+      `<td>${TIER5_TOOL_WIELD_PROFICIENCY}</td>`,
+    );
+    // Two guide-prof-tables render on the page (nodes first, tools second);
+    // anchor on the Use at header so the parity check reads the TOOLS table.
+    const toolsTable = mining
+      .split('<table')
+      .find((seg) => seg.includes(`<th scope="col">${t('guide.profPages.colWield')}</th>`));
+    expect(toolsTable, 'tools table present').toBeDefined();
+    const thCount = (toolsTable?.match(/<thead><tr>([\s\S]*?)<\/tr>/)?.[1].match(/<th[\s>]/g) ?? [])
+      .length;
+    expect(thCount, 'header column count').toBe(6);
+    // EVERY body row, not just the first: a conditional cell in a later row
+    // would slip past a first-row-only parity check.
+    const bodyRows =
+      toolsTable?.match(/<tbody>([\s\S]*?)<\/tbody>/)?.[1].match(/<tr>[\s\S]*?<\/tr>/g) ?? [];
+    // Exact row count from the corpus, not a floor: a table collapsing to one
+    // row must red, and the corpus mirror above pins the corpus to ITEMS.
+    expect(bodyRows.length, 'tools table renders every ladder rung').toBe(
+      GUIDE_PROF_GATHERING.find((g) => g.id === 'mining')?.tools.length,
+    );
+    for (const row of bodyRows) {
+      expect((row.match(/<td/g) ?? []).length, 'body row column count agrees with header').toBe(6);
+    }
+    // The mobile min-width floor is a two-sided contract: the markup carries
+    // the scoped class and the guide stylesheet declares a min-width for it.
+    // src/guide/styles.css sits outside every src/styles CSS guard, so this
+    // is its one pin (the fix round scoped the floor away from the shared
+    // .guide-prof-table after it crushed narrow tables).
+    expect(toolsTable, 'tools table carries its scoped width class').toContain('guide-tools-table');
+    const guideCss = readFileSync(resolve(process.cwd(), 'src/guide/styles.css'), 'utf8');
+    expect(guideCss).toMatch(/\.guide-tools-table\s*\{[^}]*min-width:/);
     // The craft page really renders its recipe rows.
     const weapon = professionsPage.render(ctx(['weaponcrafting']));
     expect(weapon).toContain('Osmium Warblade');

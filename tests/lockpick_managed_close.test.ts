@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 // The lockpick panel's managed-window close path (#2517).
 //

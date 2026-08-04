@@ -96,7 +96,7 @@ describe('insane worn-surface fragment shader', () => {
   });
 
   it.each([
-    ['high', 'high', 3],
+    ['high', 'high', 0],
     ['ultra', 'ultra', 3],
     ['advanced basic', 'high&gfxo=surfaceDetail:1,surfaceDetailTaps:0,surfaceDetailClampK:0', 0],
   ] as const)('emits a balanced %s worn shader', async (_name, search, parallaxCalls) => {

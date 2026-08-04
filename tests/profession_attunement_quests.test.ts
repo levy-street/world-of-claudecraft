@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { ZONE1_QUESTS } from '../src/sim/content/zone1';
-import { GATHER_NODES } from '../src/sim/data';
+import { GATHER_NODES, QUESTS } from '../src/sim/data';
 import { normalizeArchetypeState } from '../src/sim/professions/archetype';
+import { isIdentityTransitionQuest } from '../src/sim/quests/profession_quest_effects';
 import { Sim } from '../src/sim/sim';
 import { terrainHeight } from '../src/sim/world';
 import { COMMAND_NAMES } from '../src/world_api';
@@ -169,6 +170,32 @@ describe('live profession attunement quests', () => {
     expect(sim.questLog.has(HOBBY_QUEST)).toBe(false);
   });
 
+  it('a make-amends return restores the hobby this character quested for that pair', () => {
+    // End to end through the real quests: the explicit choice is destroyed at
+    // the transition AWAY (every transition re-derives the pair default), so
+    // without the per-pair memory the return below lands on 'leatherworking',
+    // the skill default this character deliberately quested away from.
+    const sim = makeSim();
+    unlockProfessionQuests(sim);
+    attune(sim, SMITH_MASTER, 'q_prof_attune_smith', WEAPON_ARMOR);
+    expect(sim.hobbyCraft).toBe('leatherworking'); // the pair default
+
+    acceptAt(sim, HOBBY_MASTER, HOBBY_QUEST, 'tailoring');
+    completeAndTurnInAt(sim, HOBBY_MASTER, HOBBY_QUEST);
+    expect(sim.hobbyCraft).toBe('tailoring');
+
+    // Away to the outfitter pair: its own default hobby applies, and the smith
+    // pair's quested choice is no longer anywhere in live archetype state.
+    attune(sim, OUTFITTER_MASTER, 'q_prof_attune_outfitter', LEATHER_TAILOR);
+    expect(sim.hobbyCraft).toBe('weaponcrafting');
+
+    // The make-amends return: the quested hobby comes back, not the default.
+    acceptAt(sim, SMITH_MASTER, 'q_prof_amends_smith', WEAPON_ARMOR);
+    completeAndTurnInAt(sim, SMITH_MASTER, 'q_prof_amends_smith');
+    expect(sim.craftingIdentity.activeArchetype).toBe('weaponcrafting');
+    expect(sim.hobbyCraft).toBe('tailoring');
+  });
+
   it('round-trips active pair, explicit hobby, history, and an accepted quest selection', () => {
     const sim = makeSim();
     unlockProfessionQuests(sim);
@@ -262,7 +289,7 @@ describe('live profession attunement quests', () => {
         player.pos.z = node.pos.z;
         player.pos.y = terrainHeight(node.pos.x, node.pos.z, sim.cfg.seed);
         player.prevPos = { ...player.pos };
-        sim.harvestNode(node.id, pid); // rarity roll: draws rng
+        sim.harvestNode(node.id, undefined, pid); // rarity roll: draws rng
         sim.tick();
       }
 
@@ -403,17 +430,25 @@ describe('q_prof_hobby_switch reward shape', () => {
   });
 });
 
-// One pending identity transition at a time. resolvedCounts is
-// stamped at ACCEPT (finalizeQuestAccept) and turn-in never re-resolves it, so
-// holding two attunePair quests at once lets the second complete at a stale
-// amends cost: new-pair attunes are free and leave switchCount at 0, so a
-// player with three pairs in history can bank both open amends quests at
-// counts [5] and turn the second in after the first return bumped switchCount
-// to 1, dodging the honest 5 + 3 = 8. The shared computeQuestState therefore
-// hides every OTHER attunePair-effect quest while one is active, on both hosts
-// (the online mirror shares the function; the server accept gate rides
-// questState). switchHobby quests and plain quests are outside the gate.
-describe('attunePair quests block concurrent identity transitions', () => {
+// One pending identity transition at a time, where "identity transition" is
+// BOTH completionEffect types (attunePair and switchHobby), not attunePair
+// alone. Two stale-bank failures share the one gate:
+//   - resolvedCounts is stamped at ACCEPT (finalizeQuestAccept) and turn-in
+//     never re-resolves it, so holding two attunePair quests at once lets the
+//     second complete at a stale amends cost: new-pair attunes are free and
+//     leave switchCount at 0, so a player with three pairs in history can bank
+//     both open amends quests at counts [5] and turn the second in after the
+//     first return bumped switchCount to 1, dodging the honest 5 + 3 = 8.
+//   - the hobby quest banks its chosen craft at accept, but a pair transition
+//     rewrites the candidate set and the hobby, so a bank that straddles a
+//     transition either applies a choice made under the old pair or sticks
+//     unturnable-in on the turn-in revalidation ("no longer available", with
+//     the gathered herbs spent and abandon the only way out).
+// The shared computeQuestState therefore hides every OTHER identity-transition
+// quest while one is active, on both hosts (the online mirror shares the
+// function; the server accept gate rides questState). Plain quests (no
+// completionEffect) stay outside the gate.
+describe('identity-transition quests block each other', () => {
   const APOTHECARY_PAIR = 'alchemy+cooking';
 
   it('hides other attune quests while one is active, and reopens them on abandon', () => {
@@ -431,21 +466,67 @@ describe('attunePair quests block concurrent identity transitions', () => {
     expect(sim.questState('q_prof_attune_outfitter')).toBe('available');
   });
 
-  it('leaves switchHobby quests outside the gate (attunePair-only scope)', () => {
-    // The work-order control above has NO completionEffect, so it cannot catch
-    // a regression that broadens the gate from attunePair to any effect; the
-    // hobby switch carries the OTHER effect type and must stay offered while
-    // an identity transition is pending.
+  it('hides the hobby switch while a pair transition is pending, and reopens it on abandon', () => {
+    // Direction one of the widened scope. The hobby selection is banked on
+    // QuestProgress at accept and validated against the pair that was current
+    // THEN, so a hobby quest accepted while an amends is in flight can be
+    // turned in against a different pair entirely.
     const sim = makeSim();
     unlockProfessionQuests(sim);
     attune(sim, SMITH_MASTER, 'q_prof_attune_smith', WEAPON_ARMOR);
     attune(sim, OUTFITTER_MASTER, 'q_prof_attune_outfitter', LEATHER_TAILOR);
+    expect(sim.questState(HOBBY_QUEST)).toBe('available'); // not vacuous
 
     acceptAt(sim, SMITH_MASTER, 'q_prof_amends_smith', WEAPON_ARMOR);
     // The gated control: a fresh attunePair quest hides while amends is active.
     expect(sim.questState('q_prof_attune_apothecary')).toBe('unavailable');
-    // The scope boundary: the switchHobby quest is untouched by the gate.
+    // The widened scope: the switchHobby quest hides too.
+    expect(sim.questState(HOBBY_QUEST)).toBe('unavailable');
+    // Still identity-scoped: a plain quest (the smith's work order, no
+    // completionEffect) is untouched.
+    expect(sim.questState('q_prof_workorder_forge')).toBe('available');
+
+    sim.abandonQuest('q_prof_amends_smith');
     expect(sim.questState(HOBBY_QUEST)).toBe('available');
+  });
+
+  it('hides pair transitions while a hobby selection is banked, and refuses the accept', () => {
+    // Direction two: the banked hobby craft goes stale the moment the pair
+    // changes (the candidate set and the default hobby are both pair-derived),
+    // so the transition quests close while a hobby switch is in flight. The
+    // accept path refuses outright, which is what replaces the old stuck
+    // turn-in ("That profession choice is no longer available", herbs spent).
+    const sim = makeSim();
+    unlockProfessionQuests(sim);
+    attune(sim, SMITH_MASTER, 'q_prof_attune_smith', WEAPON_ARMOR);
+    expect(sim.questState('q_prof_attune_outfitter')).toBe('available'); // not vacuous
+
+    acceptAt(sim, HOBBY_MASTER, HOBBY_QUEST, 'tailoring');
+    expect(sim.questLog.get(HOBBY_QUEST)?.selection).toBe('tailoring');
+    expect(sim.questState('q_prof_attune_outfitter')).toBe('unavailable');
+    expect(sim.questState('q_prof_workorder_forge')).toBe('available'); // plain quest control
+    acceptAt(sim, OUTFITTER_MASTER, 'q_prof_attune_outfitter', LEATHER_TAILOR);
+    expect(sim.questLog.has('q_prof_attune_outfitter')).toBe(false);
+
+    sim.abandonQuest(HOBBY_QUEST);
+    expect(sim.questState('q_prof_attune_outfitter')).toBe('available');
+  });
+
+  it('pins the shipped completionEffect vocabulary the gate treats as identity', () => {
+    // The gate reads "carries a completionEffect", which is exactly "is an
+    // identity transition" only while the shipped vocabulary stays these two
+    // types. A third type has to come back to isIdentityTransitionQuest and
+    // decide; this pin is what forces that.
+    const shipped = new Set(
+      Object.values(QUESTS)
+        .map((quest) => quest.completionEffect?.type)
+        .filter((type) => type !== undefined),
+    );
+    expect([...shipped].sort()).toEqual(['attunePair', 'switchHobby']);
+    expect(isIdentityTransitionQuest(QUESTS.q_prof_attune_smith)).toBe(true);
+    expect(isIdentityTransitionQuest(QUESTS[HOBBY_QUEST])).toBe(true);
+    expect(isIdentityTransitionQuest(QUESTS.q_prof_workorder_forge)).toBe(false);
+    expect(isIdentityTransitionQuest(undefined)).toBe(false);
   });
 
   it('refuses a banked second amends so escalation can never be dodged', () => {

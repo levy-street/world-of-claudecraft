@@ -10,114 +10,69 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "es_ES": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "fr_FR": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "fr_CA": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "en_CA": [],
   "it_IT": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "de_DE": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
-  "zh_CN": [
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
-  ],
-  "zh_TW": [
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
-  ],
-  "ko_KR": [
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
-  ],
-  "ja_JP": [
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
-  "ru_RU": [
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "nl_NL": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "pl_PL": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "id_ID": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "tr_TR": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "sv_SE": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "vi_VN": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "da_DK": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ]
 };

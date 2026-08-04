@@ -3,6 +3,7 @@ import { isSoftwareRendererName } from '../render/software_renderer';
 import { crowdBucketLabel } from './crowd_bucket';
 import { localDevPerfTraceEnabled, type PerfMonitor, type PerfSnapshot } from './perf';
 import { analyzePerfSuggestions } from './perf_doctor';
+import { jitteredPerfReportDelay } from './perf_report_schedule';
 import type { Settings } from './settings';
 import type { WorldTelemetry } from './world_telemetry';
 
@@ -334,6 +335,19 @@ function payloadFromSnapshot(
       hud: snapshot.hud,
       netPipeline: snapshot.netPipeline,
       heapSawtooth: snapshot.heapSawtooth,
+      // The two top-level longtask fields (longTaskCount, longTaskP95Ms) cannot
+      // corroborate a rare multi-second stall: a single event never moves a
+      // p95. These four ride here (issue #2479) rather than as new top-level
+      // columns, so storing them needs no DDL; the server bounds them on
+      // ingest (server/perf_report.ts).
+      browser: {
+        longTasks: {
+          totalMs: longTasks.totalMs,
+          avg: longTasks.avg,
+          max: longTasks.max,
+          lastAge: longTasks.lastAge,
+        },
+      },
       ...(snapshot.devTrace ? { devTrace: snapshot.devTrace } : {}),
     },
   };
@@ -358,7 +372,11 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
   let stopped = false;
   let timer: number | null = null;
   let lastFinalFlushAt = 0;
+  let reportSequence = 0;
   let cleanupDebug = (): void => {};
+
+  const cadenceDelay = (baseMs: number): number =>
+    devTrace ? baseMs : jitteredPerfReportDelay(baseMs, sessionId, reportSequence++);
 
   const schedule = (delay: number): void => {
     if (stopped) return;
@@ -377,7 +395,7 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
     timer = null;
     if (stopped) return;
     if (!sendOptions.allowHidden && document.visibilityState !== 'visible') {
-      skip('hidden', REPEAT_REPORT_MS);
+      skip('hidden', cadenceDelay(REPEAT_REPORT_MS));
       return;
     }
     const snapshot = options.perf.report();
@@ -397,7 +415,7 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
       options.desktopShell ?? false,
     );
     if (!body) {
-      skip('no-renderer', sendOptions.final ? null : REPEAT_REPORT_MS);
+      skip('no-renderer', sendOptions.final ? null : cadenceDelay(REPEAT_REPORT_MS));
       return;
     }
     const token = options.tokenProvider();
@@ -452,7 +470,9 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
         status.lastError = errorText(err);
         devTraceLog(status, 'warn', `post failed: ${status.lastError}`);
       });
-    if (!sendOptions.final) schedule(devTrace ? DEV_TRACE_REPEAT_REPORT_MS : REPEAT_REPORT_MS);
+    if (!sendOptions.final) {
+      schedule(devTrace ? DEV_TRACE_REPEAT_REPORT_MS : cadenceDelay(REPEAT_REPORT_MS));
+    }
   }
 
   function sendNow(): void {
@@ -487,7 +507,7 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
   cleanupDebug = exposeDebug(status, sendNow, stop);
   window.addEventListener('pagehide', flushFinal);
   document.addEventListener('visibilitychange', handleVisibilityChange);
-  schedule(devTrace ? DEV_TRACE_FIRST_REPORT_MS : FIRST_REPORT_MS);
+  schedule(devTrace ? DEV_TRACE_FIRST_REPORT_MS : cadenceDelay(FIRST_REPORT_MS));
   return stop;
 }
 

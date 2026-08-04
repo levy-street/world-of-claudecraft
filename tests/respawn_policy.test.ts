@@ -1,11 +1,18 @@
-// Pins the open-world respawn policy (src/sim/respawn_policy.ts): the level-band
-// tiers, the precedence chain around them, and the death site that consumes it.
+// Pins the open-world respawn policy (src/sim/respawn_policy.ts): the single
+// world delay, the precedence chain around it, and the death site that consumes
+// it.
+//
+// The level-band tiers this file used to pin were RETIRED (rationale in the
+// policy header). The band cases below are kept, inverted: they now assert that
+// a zone's level band does NOT change its respawn, so reintroducing a band by
+// accident fails here rather than shipping.
 import { describe, expect, it } from 'vitest';
 import { CORPSE_DURATION } from '../src/sim/combat/damage';
 import {
   DUNGEON_X_THRESHOLD,
   instanceOrigin,
   MOBS,
+  QUESTS,
   ZONES,
   zoneAt,
   zoneContaining,
@@ -16,9 +23,7 @@ import {
   isSelfScheduled,
   LEGACY_RESPAWN_SECONDS,
   resolveRespawnSeconds,
-  TRASH_RESPAWN_SECONDS_HIGH,
-  TRASH_RESPAWN_SECONDS_LOW,
-  TRASH_RESPAWN_SECONDS_MID,
+  TRASH_RESPAWN_SECONDS,
   trashRespawnSecondsForZone,
 } from '../src/sim/respawn_policy';
 import { Sim } from '../src/sim/sim';
@@ -43,36 +48,32 @@ function zoneWithBand(bandCap: number, trashRespawnSeconds?: number): ZoneDef {
   };
 }
 
-describe('trashRespawnSecondsForZone: the level-band tiers', () => {
-  it('gives starter bands (cap <= 7) the fast tier', () => {
-    expect(TRASH_RESPAWN_SECONDS_LOW).toBe(60);
-    expect(trashRespawnSecondsForZone(zoneWithBand(7))).toBe(60);
-    expect(trashRespawnSecondsForZone(zoneWithBand(1))).toBe(60);
+describe('trashRespawnSecondsForZone: one delay for every level band', () => {
+  it('is 60 seconds, stated as a literal so the number cannot drift silently', () => {
+    expect(TRASH_RESPAWN_SECONDS).toBe(60);
   });
 
-  it('gives mid bands (cap 8 to 14) the middle tier', () => {
-    expect(TRASH_RESPAWN_SECONDS_MID).toBe(120);
-    expect(trashRespawnSecondsForZone(zoneWithBand(8))).toBe(120);
-    expect(trashRespawnSecondsForZone(zoneWithBand(14))).toBe(120);
+  it('gives EVERY band the same delay, including the old tier boundaries', () => {
+    // The retired tiers split at cap 7|8 and 14|15. Those two boundaries are
+    // checked explicitly because they are exactly where a reintroduced band
+    // would first show up.
+    for (const bandCap of [1, 7, 8, 14, 15, 20]) {
+      expect(trashRespawnSecondsForZone(zoneWithBand(bandCap))).toBe(60);
+    }
   });
 
-  it('gives endgame bands (cap >= 15) the slow tier', () => {
-    expect(TRASH_RESPAWN_SECONDS_HIGH).toBe(180);
-    expect(trashRespawnSecondsForZone(zoneWithBand(15))).toBe(180);
-    expect(trashRespawnSecondsForZone(zoneWithBand(20))).toBe(180);
-  });
-
-  it('crosses each tier boundary at exactly the documented cap', () => {
-    // Decisive on the boundary itself: 7|8 and 14|15 must differ.
-    expect(trashRespawnSecondsForZone(zoneWithBand(7))).not.toBe(
+  it('no longer varies across the old boundaries, the inverse of the retired pin', () => {
+    // Decisive against a band creeping back: 7|8 and 14|15 must now MATCH,
+    // where the tiered policy required them to differ.
+    expect(trashRespawnSecondsForZone(zoneWithBand(7))).toBe(
       trashRespawnSecondsForZone(zoneWithBand(8)),
     );
-    expect(trashRespawnSecondsForZone(zoneWithBand(14))).not.toBe(
+    expect(trashRespawnSecondsForZone(zoneWithBand(14))).toBe(
       trashRespawnSecondsForZone(zoneWithBand(15)),
     );
   });
 
-  it('lets one zone override its tier with trashRespawnSeconds', () => {
+  it('lets one zone override the world delay with trashRespawnSeconds', () => {
     expect(trashRespawnSecondsForZone(zoneWithBand(20, 45))).toBe(45);
     // ...including down past the fast tier, and including an explicit 0.
     expect(trashRespawnSecondsForZone(zoneWithBand(7, 300))).toBe(300);
@@ -96,10 +97,14 @@ describe('trashRespawnSecondsForZone: the level-band tiers', () => {
 describe('the ZoneDef.trashRespawnSeconds override, end to end', () => {
   const overridden = zoneWithBand(20, 45);
 
-  it('beats the level band through the full resolution, not just the tier fn', () => {
+  it('beats the world delay through the full resolution, not just the tier fn', () => {
     expect(trashRespawnSecondsForZone(overridden)).toBe(45);
-    // Same zone with no override would be the 180s endgame tier.
-    expect(trashRespawnSecondsForZone(zoneWithBand(20))).toBe(180);
+    // Same zone with no override takes the single 60s world delay. Asserted
+    // against the other branch so the override is proven to CHANGE something.
+    expect(trashRespawnSecondsForZone(zoneWithBand(20))).toBe(60);
+    expect(trashRespawnSecondsForZone(overridden)).not.toBe(
+      trashRespawnSecondsForZone(zoneWithBand(20)),
+    );
   });
 
   it('still loses to an explicit SimConfig base, as types.ts documents', () => {
@@ -145,16 +150,17 @@ describe('zoneContaining: strict rect containment, no fallback', () => {
   });
 });
 
-describe('baseRespawnSecondsAt: the global override vs the zone tier', () => {
-  it('reads the zone tier at a position when no global base is configured', () => {
-    // Eastbrook Vale [1-7] -> fast, Mirefen Marsh [6-13] -> mid,
-    // Thornpeak Heights [13-20] -> slow.
+describe('baseRespawnSecondsAt: the global override vs the zone delay', () => {
+  it('reads the same 60s at positions in three different level bands', () => {
+    // Eastbrook Vale [1-7], Mirefen Marsh [6-13] and Thornpeak Heights [13-20]
+    // spanned all three retired tiers, so they are the decisive sample: real
+    // world coordinates, not a synthetic ZoneDef, all landing on one number.
     expect(baseRespawnSecondsAt(-27, 71, undefined)).toBe(60);
-    expect(baseRespawnSecondsAt(-40, 230, undefined)).toBe(120);
-    expect(baseRespawnSecondsAt(-90, 700, undefined)).toBe(180);
+    expect(baseRespawnSecondsAt(-40, 230, undefined)).toBe(60);
+    expect(baseRespawnSecondsAt(-90, 700, undefined)).toBe(60);
   });
 
-  it('lets an explicitly configured base win over every zone tier', () => {
+  it('lets an explicitly configured base win over the zone delay', () => {
     expect(baseRespawnSecondsAt(-27, 71, 2)).toBe(2);
     expect(baseRespawnSecondsAt(-90, 700, 2)).toBe(2);
     // 0 is explicit, not absent.
@@ -168,8 +174,10 @@ describe('baseRespawnSecondsAt: the global override vs the zone tier', () => {
 });
 
 describe('resolveRespawnSeconds: full precedence', () => {
-  const thornpeak = { x: -90, z: 700 }; // level band [13, 20] -> 180s
-  const vale = { x: -27, z: 71 }; // level band [1, 7] -> 60s
+  // Both now resolve to the one 60s world delay; they sat in different tiers
+  // before, so keeping both proves the band no longer separates them.
+  const thornpeak = { x: -90, z: 700 }; // level band [13, 20]
+  const vale = { x: -27, z: 71 }; // level band [1, 7]
 
   it('lets a template respawnSeconds win over everything', () => {
     expect(resolveRespawnSeconds({ respawnSeconds: 10 }, thornpeak, undefined)).toBe(10);
@@ -180,8 +188,8 @@ describe('resolveRespawnSeconds: full precedence', () => {
     );
   });
 
-  it('applies the zone tier to plain trash', () => {
-    expect(resolveRespawnSeconds({}, thornpeak, undefined)).toBe(180);
+  it('applies the one world delay to plain trash, wherever it stands', () => {
+    expect(resolveRespawnSeconds({}, thornpeak, undefined)).toBe(60);
     expect(resolveRespawnSeconds({}, vale, undefined)).toBe(60);
     expect(resolveRespawnSeconds(undefined, vale, undefined)).toBe(60);
   });
@@ -213,8 +221,12 @@ describe('resolveRespawnSeconds: full precedence', () => {
     expect(isSelfScheduled({ respawnMult: 4, rare: true })).toBe(true);
     expect(isSelfScheduled({})).toBe(false);
     // Elite and boss status alone do NOT self-schedule: an open-world boss that
-    // never declared a cadence rides the zone tier like the trash around it.
+    // never declares a cadence rides the world delay like the trash around it.
+    // That is exactly how Warlord Drogmar ended up on a trash timer while
+    // carrying boss loot, so the rule is pinned rather than assumed.
     expect(isSelfScheduled({ rare: false })).toBe(false);
+    expect(isSelfScheduled({ boss: true } as never)).toBe(false);
+    expect(isSelfScheduled({ elite: true } as never)).toBe(false);
     expect(isSelfScheduled(undefined)).toBe(false);
   });
 
@@ -240,8 +252,8 @@ describe('resolveRespawnSeconds: full precedence', () => {
   });
 
   it('names exactly the templates whose respawn DID move, so the change is visible', () => {
-    // The complement of the pin above. Only unscheduled open-world bosses and
-    // plain trash may appear here; a rare showing up is the regression.
+    // The complement of the pin above. Only plain trash may appear here; a
+    // self-scheduled template showing up is the regression.
     const moved = Object.values(MOBS)
       .filter((t) => t.respawnSeconds === undefined && isSelfScheduled(t))
       .filter(
@@ -251,22 +263,66 @@ describe('resolveRespawnSeconds: full precedence', () => {
       )
       .map((t) => t.id);
     expect(moved).toEqual([]);
-    // ...while plain trash and unscheduled bosses DO move, so the tier is live.
-    expect(resolveRespawnSeconds(MOBS.warlord_drogmar, thornpeak, undefined)).toBe(180);
-    expect(MOBS.warlord_drogmar.boss).toBe(true);
-    expect(MOBS.warlord_drogmar.respawnMult).toBeUndefined();
+    // ...while plain trash DOES take the world delay, so the policy is live.
+    expect(resolveRespawnSeconds(MOBS.thornpeak_ogre, thornpeak, undefined)).toBe(60);
+    expect(isSelfScheduled(MOBS.thornpeak_ogre)).toBe(false);
+  });
+
+  it('keeps Warlord Drogmar on the quest-target cadence, not the trash delay', () => {
+    // He is boss + elite with boss-tier loot and NO rare flag, the exact shape
+    // that silently inherited a trash timer. The explicit multiplier is what
+    // fixes that, so both halves are pinned: the flags that do not schedule him,
+    // and the multiplier that does.
+    const drogmar = MOBS.warlord_drogmar;
+    expect(drogmar.boss).toBe(true);
+    expect(drogmar.rare).toBeUndefined();
+    expect(drogmar.respawnMult).toBe(7.2);
+    expect(isSelfScheduled(drogmar)).toBe(true);
+    // 7.2 * 25 = three minutes, and it holds wherever he stands.
+    expect(resolveRespawnSeconds(drogmar, thornpeak, undefined)).toBe(180);
+    expect(resolveRespawnSeconds(drogmar, vale, undefined)).toBe(180);
+    // Decisive against a regression to the trash delay.
+    expect(resolveRespawnSeconds(drogmar, thornpeak, undefined)).not.toBe(TRASH_RESPAWN_SECONDS);
+    // He matches Old Cragmaw, the shipped cadence for a quest kill target, and
+    // deliberately NOT Marrowlord Varkas's boss hour: a required quest step
+    // must not make a party wait or queue. This is the assertion that fails if
+    // someone "corrects" him onto a boss cadence without reading q_drogmar.
+    expect(resolveRespawnSeconds(MOBS.old_cragmaw, thornpeak, undefined)).toBe(180);
+    expect(resolveRespawnSeconds(MOBS.marrowlord_varkas, thornpeak, undefined)).toBe(3600);
+  });
+
+  it('holds Drogmar to a quest-friendly cadence because a quest requires him', () => {
+    // The premise the cadence rests on, pinned so it cannot rot silently: if
+    // q_drogmar ever stops requiring the kill, the three minutes is free to be
+    // revisited, and whoever revisits it should see this test say so.
+    const objectives = QUESTS.q_drogmar?.objectives ?? [];
+    expect(objectives).toContainEqual(
+      expect.objectContaining({ type: 'kill', targetMobId: 'warlord_drogmar' }),
+    );
+    // Coin held to Varkas parity instead, which is what keeps the corridor
+    // honest now that cadence cannot.
+    const coin = MOBS.warlord_drogmar.loot.find((e) => e.copper)?.copper;
+    expect(coin).toBe(650);
+    expect(MOBS.marrowlord_varkas.loot.find((e) => e.copper)?.copper).toBe(650);
+    // The three unique drops survive, so the kill still pays like a boss.
+    expect(MOBS.warlord_drogmar.loot.filter((e) => e.itemId)).toHaveLength(3);
   });
 
   it('uses the SPAWN position, not the death position', () => {
-    // Same template, two different homes: the band decides.
+    // The world delay is uniform, so an in-world position no longer separates
+    // from another in-world position: the decisive contrast is on-map (60s)
+    // against off-map (the 25s instance-plane fallback).
+    const offMap = instanceOrigin(0, 0);
+    expect(resolveRespawnSeconds({}, vale, undefined)).toBe(TRASH_RESPAWN_SECONDS);
+    expect(resolveRespawnSeconds({}, offMap, undefined)).toBe(DEFAULT_RESPAWN_SECONDS);
     expect(resolveRespawnSeconds({}, vale, undefined)).not.toBe(
-      resolveRespawnSeconds({}, thornpeak, undefined),
+      resolveRespawnSeconds({}, offMap, undefined),
     );
   });
 });
 
 describe('the death site consumes the policy', () => {
-  it('puts a slain open-world mob down for its zone tier, not the old flat 25s', () => {
+  it('puts a slain open-world mob down for the world delay, not the off-map 25s', () => {
     const sim = new Sim({ seed: 20061, playerClass: 'warrior' });
     expect(sim.cfg.respawnSeconds).toBeUndefined();
     const mob = [...sim.entities.values()].find(
@@ -277,7 +333,7 @@ describe('the death site consumes the policy', () => {
     expect(home?.id).toBe('eastbrook_vale');
     sim.dealDamage(null, mob, 99_999, false, 'physical', null, 'hit');
     expect(mob.dead).toBe(true);
-    expect(mob.respawnTimer).toBe(TRASH_RESPAWN_SECONDS_LOW);
+    expect(mob.respawnTimer).toBe(TRASH_RESPAWN_SECONDS);
     expect(mob.respawnTimer).not.toBe(DEFAULT_RESPAWN_SECONDS);
   });
 
@@ -321,14 +377,14 @@ describe('the death site consumes the policy', () => {
     // so the effective delay is max(tier, corpse window). Giving coinless trash
     // harvest tags makes those corpses lootable where they were not, which would
     // silently stretch the delay if the corpse window ever exceeded a tier.
-    // CORPSE_DURATION is 60 and the fastest tier is 60, so the tier still wins
-    // everywhere; farm_yield prices camps on the tier alone and stays correct.
-    expect(CORPSE_DURATION).toBeLessThanOrEqual(TRASH_RESPAWN_SECONDS_LOW);
-    expect(CORPSE_DURATION).toBeLessThanOrEqual(TRASH_RESPAWN_SECONDS_MID);
-    expect(CORPSE_DURATION).toBeLessThanOrEqual(TRASH_RESPAWN_SECONDS_HIGH);
+    // CORPSE_DURATION is 60 and the world delay is 60, so the delay still wins
+    // (they are EQUAL now, which is the tightest this can be without the corpse
+    // window starting to push respawns out); farm_yield prices camps on the
+    // delay alone and stays correct only while this holds.
+    expect(CORPSE_DURATION).toBeLessThanOrEqual(TRASH_RESPAWN_SECONDS);
 
-    // ...and end to end: a harvestable Eastbrook beast is back on the 60s tier,
-    // not 60 plus a corpse window.
+    // ...and end to end: a harvestable Eastbrook beast is back on the 60s
+    // delay, not 60 plus a corpse window.
     const sim = new Sim({ seed: 20061, playerClass: 'warrior', noPlayer: true });
     const wolf = [...sim.entities.values()].find(
       (e) => e.kind === 'mob' && e.templateId === 'forest_wolf',
@@ -337,8 +393,8 @@ describe('the death site consumes the policy', () => {
     expect(MOBS.forest_wolf.componentTags?.length).toBeGreaterThan(0);
     sim.dealDamage(null, wolf, 99_999, false, 'physical', null, 'hit');
     expect(wolf.dead).toBe(true);
-    expect(wolf.respawnTimer).toBe(TRASH_RESPAWN_SECONDS_LOW);
-    const deadline = Math.ceil(TRASH_RESPAWN_SECONDS_LOW / DT) + 4;
+    expect(wolf.respawnTimer).toBe(TRASH_RESPAWN_SECONDS);
+    const deadline = Math.ceil(TRASH_RESPAWN_SECONDS / DT) + 4;
     let revivedAt: number | null = null;
     for (let i = 0; i < deadline && revivedAt === null; i++) {
       sim.tick();
@@ -346,8 +402,8 @@ describe('the death site consumes the policy', () => {
     }
     expect(revivedAt).not.toBeNull();
     // Within one tick of the tier, so no corpse window was added on top.
-    expect(revivedAt as number).toBeGreaterThanOrEqual(TRASH_RESPAWN_SECONDS_LOW);
-    expect(revivedAt as number).toBeLessThan(TRASH_RESPAWN_SECONDS_LOW + 1);
+    expect(revivedAt as number).toBeGreaterThanOrEqual(TRASH_RESPAWN_SECONDS);
+    expect(revivedAt as number).toBeLessThan(TRASH_RESPAWN_SECONDS + 1);
   });
 
   it('still caps corpse decay at a fixed template respawn (the training dummy)', () => {
@@ -361,7 +417,7 @@ describe('the death site consumes the policy', () => {
     // The dummy's whole point is a huge HP pool; overkill it outright.
     sim.dealDamage(null, dummy, dummy.hp, false, 'physical', null, 'hit');
     expect(dummy.dead).toBe(true);
-    // Its fixed schedule beats Thornpeak's 180s tier, and still caps corpse decay.
+    // Its fixed schedule beats the world delay, and still caps corpse decay.
     expect(dummy.respawnTimer).toBe(fixed);
     expect(dummy.corpseTimer).toBeLessThanOrEqual(fixed as number);
   });

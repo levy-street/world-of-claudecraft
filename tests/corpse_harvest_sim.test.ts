@@ -22,7 +22,7 @@ vi.mock('../server/db', () => ({
   })),
 }));
 
-import { type ClientSession, GameServer, wireEntity } from '../server/game';
+import { GameServer, wireEntity } from '../server/game';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import { ClientWorld } from '../src/net/online';
 import { bagCapacity, stackSizeOf } from '../src/sim/bags';
@@ -45,10 +45,12 @@ import {
   bestOwnedAnyGatherToolTier,
   canHarvestMonsterMaterial,
 } from '../src/sim/professions/tools';
+import { TIER3_TOOL_WIELD_PROFICIENCY } from '../src/sim/professions/wield_gate';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { corpseHarvestView } from '../src/ui/hud/loot/corpse_harvest_view';
+import { bareClient, broadcast, fakeWs, joinServer, lastSnap } from './helpers/bare_client';
 
 // End-to-end: a slain mob's corpse can be harvested for profession components
 // exactly once, first-come. This is the deliberate OPPOSITE of a world gathering
@@ -2142,6 +2144,9 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     // premium pull once a family tier rises.
     const { sim, internals, a, mob } = soloRig(4);
     sim.addItem('mithril_mining_pick', 1, a); // any-profession owned-best covers tier 2
+    // The tier-3 pick must wield (R22): the corpse arm scans the wield-aware
+    // any-profession best, so an unearned pick would contribute nothing.
+    internals.players.get(a)!.gatheringProficiency.mining = TIER3_TOOL_WIELD_PROFICIENCY;
     sim.drainEvents();
     let draws = 0;
     withTier('hide', 2, () => {
@@ -2160,6 +2165,50 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     expect(specimen?.instance?.signer).toBe('Alpha');
     expect(sim.countItem('rough_hide', a)).toBe(3);
     expect(mob.harvestClaimedBy).toBe(a);
+  });
+
+  it('R50: the same tool BELOW its wield requirement restores nothing, and names the rung (seed 4)', () => {
+    // The R22 negative of the arm above, and the reason the corpse scan reads
+    // WIELDABLE rather than owned: ownership alone must not re-open the premium
+    // pull. One point short of the pick's requirement the scan floats back at
+    // bare hands, the pull downgrades exactly as the toolless arm does, and the
+    // denial NAMES the smallest proficiency at which something already carried
+    // would work the family.
+    const { sim, internals, a, mob } = soloRig(4);
+    sim.addItem('mithril_mining_pick', 1, a);
+    internals.players.get(a)!.gatheringProficiency.mining = TIER3_TOOL_WIELD_PROFICIENCY - 1;
+    sim.drainEvents();
+    let draws = 0;
+    withTier('hide', 2, () => {
+      sim.rng.setObserver(() => draws++);
+      try {
+        sim.harvestCorpse(mob.id, ['hide'], a);
+      } finally {
+        sim.rng.setObserver(null);
+      }
+    });
+    // Same two draws as every other arm: the wield denial sits strictly after
+    // the rarity roll and draws nothing of its own.
+    expect(draws).toBe(2);
+    // Byte-for-byte the bare-handed denied arm's outcome, with an inert pick in
+    // the bags: plain quantity, no jackpot, no signature, corpse still spent.
+    expect(sim.countItem('pristine_hide', a)).toBe(0);
+    expect(sim.countItem('rough_hide', a)).toBe(3);
+    const meta = internals.players.get(a)!;
+    expect(meta.inventory.some((s) => s.instance?.signer)).toBe(false);
+    expect(mob.harvestClaimedBy).toBe(a);
+    // The R22 wield split: one event, carrying the pick's OWN requirement
+    // rather than the family tier, so the toast names a rung that really
+    // unlocks something the player is holding.
+    expect(sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
+      {
+        type: 'gatherDenied',
+        pid: a,
+        surface: 'corpse',
+        requiredTier: 2,
+        wieldProficiency: TIER3_TOOL_WIELD_PROFICIENCY,
+      },
+    ]);
   });
 
   it('at most ONE gatherDenied per harvest command, even with several denied families (seed 31)', () => {
@@ -2226,56 +2275,6 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
   });
 });
 
-// A ClientWorld without the WebSocket plumbing, to drive applySnapshot directly
-// (the established bare-client idiom; see bareClient in tests/snapshots.test.ts
-// and tests/CLAUDE.md).
-function bareClient(pid: number): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass: 'warrior' };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.ownPlayerId = pid;
-  c.ownPlayerClass = 'warrior';
-  c.spectating = null;
-  c.cupInfo = null;
-  c.sportRole = null;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.honor = 0;
-  c.lifetimeHonor = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.selectedDungeonDifficulty = 'normal';
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.serverTickHz = null;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  c.spectateFacingPending = false;
-  c.pendingSpectateFacing = null;
-  c.nodeCooldowns = new Map();
-  return c;
-}
-
 // The online half of the claim: the server encodes harvestClaimedBy as the
 // sparse terse key `hcb` (server/game.ts wireEntity), ClientWorld mirrors it,
 // and the corpse picker's availability core (corpseLootAvailability) therefore
@@ -2317,34 +2316,6 @@ describe('corpse harvest claim over the wire (online picker parity)', () => {
 // (dyn-only) record, and leaving interest scope evicts the corpse from the
 // session's sent set so re-entry gets a fresh full record. Both arms must
 // deliver claim truth to the mirror.
-interface FakeClient {
-  sent: any[];
-  ws: any;
-}
-
-function fakeWs(): FakeClient {
-  const sent: any[] = [];
-  return { sent, ws: { readyState: 1, send: (payload: string) => sent.push(JSON.parse(payload)) } };
-}
-
-function lastSnap(sent: any[]): any {
-  for (let i = sent.length - 1; i >= 0; i--) {
-    if (sent[i].t === 'snap') return sent[i];
-  }
-  return null;
-}
-
-function joinServer(server: GameServer, fc: FakeClient, id: number, name: string): ClientSession {
-  const session = server.join(fc.ws, id, id, name, 'warrior', null);
-  if ('error' in session) throw new Error(session.error);
-  session.blockListLoaded = true;
-  return session;
-}
-
-function broadcast(server: GameServer): void {
-  (server as any).broadcastSnapshots();
-}
-
 describe('corpse harvest claim over the live broadcast (delta + interest scope)', () => {
   function liveSetup() {
     const server = new GameServer();

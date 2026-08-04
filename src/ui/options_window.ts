@@ -211,6 +211,9 @@ export interface OptionsWindowDeps {
   slotActionName(slot: number): string | null;
   /** Re-sync the action-bar keycaps after a rebind/reset. */
   refreshKeybindLabels(): void;
+  /** Close this window and enter the on-bar key-binding mode (issue 1238): the
+   *  single "Edit action bar keys" entry that replaces the per-slot rebind rows. */
+  beginActionBarKeybindMode(): void;
   /** The shared gold-themed dropdown (carries the listbox ARIA + keyboard nav). */
   buildDropdown(
     options: { value: string; label: string }[],
@@ -1110,7 +1113,8 @@ export class OptionsWindow {
     if (tab === 'chat') {
       this.chatTimestampRows(body);
       this.chatWindowResetRow(body);
-      // Deed broadcasts (share deed unlocks with guild and friends): an ASYNC
+      // Deed broadcasts (share deed unlocks with guildmates and followers, and
+      // deed and masterwork cards with the Discord feed, R58): an ASYNC
       // account setting (accounts.deed_broadcasts), not a settings.ts key, so it
       // is a bespoke row; the seam is the final truth (main.ts wires it only when
       // an authenticated account exists, so an offline character never sees it).
@@ -1637,12 +1641,59 @@ export class OptionsWindow {
     note.className = 'kb-note';
     note.textContent = this.keybindNote || t('hud.options.keybindHelpMouseCamera');
     el.appendChild(note);
+    // Mouse buttons bind like keys (src/game/mouse_binds.ts); say so once here
+    // rather than rewording every capture prompt. Pointless on touch, which has
+    // no mouse, so it follows the same useTouchInterface() gate the rest of the
+    // desktop-only rows use.
+    if (!useTouchInterface()) {
+      const mouseNote = document.createElement('div');
+      mouseNote.className = 'kb-note';
+      mouseNote.textContent = t('hudChrome.keybinds.mouseHint');
+      el.appendChild(mouseNote);
+    }
     const cols = document.createElement('div');
     cols.className = 'kb-cols';
     // The Attack Move key is only meaningful (and only rebindable) while its mode
     // is on; otherwise hide its row so it can't shadow Turn Left's A in the list.
     const attackMoveOn = !!hooks?.settings.get('attackMove');
     for (const category of BIND_CATEGORIES) {
+      if (category === 'Action Bar') {
+        // The wall of per-slot rebind rows (one per action-bar slot, 34 on this
+        // branch) dominated the panel; a single entry opens the on-bar
+        // click-a-slot-then-press-a-key mode instead (issue 1238). Desktop
+        // only: the mode needs a physical keyboard, so hide it on touch, like
+        // the mode entry it replaces on the primary Key Bindings surface.
+        if (useTouchInterface()) continue;
+        const col = document.createElement('div');
+        col.className = 'kb-col';
+        const header = document.createElement('div');
+        header.className = 'kb-cat';
+        header.textContent = BIND_CATEGORY_LABEL_KEYS[category]
+          ? t(BIND_CATEGORY_LABEL_KEYS[category])
+          : category;
+        col.appendChild(header);
+        // Not a .kb-row: that grid is shaped for a name plus two key buttons,
+        // which this single-button entry does not have. .kb-rows is already a
+        // column flexbox, so the button just becomes its one, full-width child.
+        const rows = document.createElement('div');
+        rows.className = 'kb-rows';
+        const editBtn = document.createElement('button');
+        editBtn.type = 'button';
+        editBtn.className = 'btn kb-actionbar-edit';
+        editBtn.textContent = t('hudChrome.actionBar.editKeys');
+        editBtn.addEventListener('click', () => {
+          audio.click();
+          this.deps.beginActionBarKeybindMode();
+        });
+        rows.appendChild(editBtn);
+        col.appendChild(rows);
+        const hint = document.createElement('div');
+        hint.className = 'kb-note';
+        hint.textContent = t('hudChrome.actionBar.editKeysHint');
+        col.appendChild(hint);
+        cols.appendChild(col);
+        continue;
+      }
       const visible = BIND_ACTIONS.filter(
         (a) => a.category === category && (a.id !== 'attackMove' || attackMoveOn),
       );

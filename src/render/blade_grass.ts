@@ -33,9 +33,9 @@ import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 // Denser and finer than the first cut (blades were reading as sparse
 // standalone clumps): tighter cells, smaller blades, and a wider ring so
 // the carpet blends into the card tufts instead of ending at your feet.
-// The RADIUS comes from GFX.bladeCarpetRadius (34 on the high+ tiers; the
-// Advanced Foliage Density dial trims or extends it; 0 disables the carpet),
-// so the grid dimensions derive per build inside buildBladeGrass.
+// The RADIUS comes from GFX.bladeCarpetRadius (24 on high, 34 on ultra and
+// insane; the Advanced Foliage Density dial trims or extends it; 0 disables
+// the carpet), so the grid dimensions derive per build inside buildBladeGrass.
 const CELL = 0.46; // yards between clusters
 const PLACE_BUDGET = 560; // re-placements per frame while moving
 const FADE_START = 0.8; // of RADIUS: outer ring shrinks blades to nothing
@@ -135,9 +135,9 @@ export function buildBladeGrass(
   const group = new THREE.Group();
   group.name = 'bladeGrass';
   // The carpet is a close-camera read and one of the graphics-overhaul detail
-  // layers: HIGH AND UP only (GFX.bladeCarpetRadius, 0 below high). Medium
-  // compiled it originally and paid -25..-34% at the meadow bench for it;
-  // medium keeps the card-tuft field and its pre-overhaul frame cost instead.
+  // layers: high runs a 24u recovery ring, ultra and insane run the full 34u
+  // ring, and tiers below high keep only the card-tuft field. The Advanced
+  // Foliage Density dial maps onto the same radius knob.
   // ?bladegrass=off is the dev-only perf-attribution kill switch
   // (render_dev_flags.ts).
   const RADIUS = GFX.bladeCarpetRadius;

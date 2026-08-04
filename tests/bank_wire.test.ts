@@ -17,8 +17,8 @@ vi.mock('../server/db', () => ({
 }));
 
 import { GameServer } from '../server/game';
-import { ClientWorld } from '../src/net/online';
 import { Sim } from '../src/sim/sim';
+import { bareClient } from './helpers/bare_client';
 
 // The personal-bank wire round-trip: bank_deposit / bank_withdraw / bank_buy_slots
 // resolve inside the authoritative Sim, ride the proximity-gated `bank` self-delta,
@@ -40,35 +40,6 @@ function fakeWs() {
 function lastSnap(sent: any[]): any {
   for (let i = sent.length - 1; i >= 0; i--) if (sent[i].t === 'snap') return sent[i];
   return null;
-}
-// A field-initialized-free ClientWorld (the snapshots.test.ts idiom): Object.create
-// skips field initializers, so bankInfo starts undefined and is set only by
-// applySnapshot's delta-guarded decode. That is exactly what the omission test needs.
-function bareClient(pid: number): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass: 'warrior' };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.missingSince = new Map();
-  c.mouselookFacing = null;
-  c.markers = {};
-  return c;
 }
 
 function joinAt(server: GameServer, fw: ReturnType<typeof fakeWs>, acct: number, name: string) {

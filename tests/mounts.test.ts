@@ -34,6 +34,7 @@ import { createMob } from '../src/sim/entity';
 import { useItem } from '../src/sim/items';
 import { MARKET_HOUSE_STOCK } from '../src/sim/market';
 import {
+  bagOwnedMounts,
   MOUNT_SUMMON_SECONDS,
   mountItemId,
   mountOwned,
@@ -371,6 +372,27 @@ describe('mount reins items (the collection: owning the item is owning the mount
     expect(ownedMounts(meta)).toContain('stormfeather_griffin');
   });
 
+  it('bagOwnedMounts is bags-only: a bank-only reins does not count (#2739 followup)', () => {
+    // The mobile quick-summon button (src/ui/mount_quick_summon.ts) picks from
+    // this list, not the wider ownedMounts(), because it hands the result
+    // straight to useItem, which gates on countItem (bags only). A bank-only
+    // reins must therefore be invisible here even though ownedMounts() (bags +
+    // bank) reports it, or the button would offer a summon useItem refuses.
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const meta = sim.players.get(pid)!;
+    expect(bagOwnedMounts(meta.inventory)).toEqual([]);
+
+    meta.bank.inventory.push({ itemId: 'reins_grag_bear', count: 1 });
+    expect(ownedMounts(meta)).toContain('grag_bear'); // wider list sees the bank
+    expect(bagOwnedMounts(meta.inventory)).toEqual([]); // bags-only list does not
+
+    sim.addItem('reins_valorsteed', 1, pid);
+    // Catalog order: valorsteed (bags) is visible; grag_bear (bank-only) is not,
+    // even though grag_bear would otherwise sort first by not being present at all.
+    expect(bagOwnedMounts(meta.inventory)).toEqual(['valorsteed']);
+  });
+
   it('exposes the collection on the IWorld facade (ownedMounts), empty for a fresh player', () => {
     const sim = makeWorld();
     const pid = join(sim, 20);
@@ -431,7 +453,7 @@ describe('mount purchase (Marla sells reins for 10g after ridingTrained)', () =>
     meta.copper = 2_000_000;
     meta.ridingTrained = false; // explicitly not trained
     const npcId = standAtStable(sim, pid);
-    sim.buyItem(npcId, 'reins_valorsteed', pid);
+    sim.buyItem(npcId, 'reins_valorsteed', undefined, pid);
     expect(errorTexts(sim.tick())).toContain(
       'You must learn to ride first. Find a riding trainer.',
     );

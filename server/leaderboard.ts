@@ -622,6 +622,9 @@ async function projectStatsHandler(ctx: Ctx): Promise<void> {
  * carries the same field). Read live per request, mirroring the /api/perf gate. It
  * advertises only; every cheat is still re-gated server-side on each message, so a
  * forged true buys a client nothing.
+ * profiler_invulnerability is a narrower capability advert for the online profiler.
+ * Its presence proves the server supports the idempotent command, and its value is
+ * true only when that command's ALLOW_DEV_COMMANDS gate is armed.
  */
 async function statusHandler(ctx: Ctx): Promise<void> {
   const rt = useRuntime();
@@ -633,6 +636,7 @@ async function statusHandler(ctx: Ctx): Promise<void> {
     steam: { enabled: steamEnabled() },
     epic: { enabled: epicEnabled() },
     dev_commands: process.env.ALLOW_DEV_COMMANDS === '1',
+    profiler_invulnerability: process.env.ALLOW_DEV_COMMANDS === '1',
   });
 }
 

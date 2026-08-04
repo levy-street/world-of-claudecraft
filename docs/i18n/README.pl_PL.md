@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.33.0-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.34.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.pl_PL.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -92,7 +92,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and choose Play Offline
 ```
 
-Nazwij swoją postać, wybierz jedną z dziewięciu klas i zaczynasz w **Eastbrook Vale** (poziomy 1-7), miasteczku targowym otoczonym węzłami: ścieżki wilków na północy, łąki dzików na wschodzie, lasy Sableweb na zachodzie, Mirror Lake na północnym zachodzie, opanowany przez drążycieli wykop miedzi na południowym zachodzie i zrujnowana kaplica niespokojnych umarłych na północnym wschodzie, z obozem bandytów Gorrak na południowym wschodzie. Północna droga wspina się przez przełęcz górską do **Mirefen Marsh** (6-13, węzeł Fenbridge), a dalej w górę do **Thornpeak Heights** (13-20, węzeł Highwatch). Seed świata jest ustalony w `src/main.ts`, więc to to samo miejsce przy każdej wizycie.
+Nazwij swoją postać, wybierz jedną z dziewięciu klas i zaczynasz w **Eastbrook Vale** (poziomy 1-7), miasteczku targowym otoczonym węzłami: ścieżki wilków na północy, łąki dzików na wschodzie, lasy Sableweb na zachodzie, Mirror Lake na północnym zachodzie, opanowany przez drążycieli wykop miedzi na południowym zachodzie i zrujnowana kaplica niespokojnych umarłych na północnym wschodzie, z obozem bandytów Gorrak na południowym wschodzie. Północna droga wspina się przez przełęcz górską do **Mirefen Marsh** (6-13, węzeł Fenbridge), a dalej w górę do **Thornpeak Heights** (13-20, węzeł Highwatch). Seed świata jest ustalony w `src/sim/world_seed.ts`, więc to to samo miejsce przy każdej wizycie.
 
 ### Aplikacje desktopowe na Windows, Linux i macOS
 

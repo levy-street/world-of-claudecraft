@@ -881,6 +881,9 @@ describe('determinism: the commission arc replays byte-identically', () => {
 // 9. The wire: ClientWorld send shapes (byte-identical when not commissioned).
 // ---------------------------------------------------------------------------
 describe('ClientWorld command send shapes', () => {
+  // Kept bespoke on purpose (issue #2088): a hand-picked field subset plus a
+  // captured `rawCmd`, returning the {client, sent} pair. tests/helpers/bare_client.ts
+  // bareClient() is the default for a new suite that just needs a bare ClientWorld.
   function clientWithCapture(): { client: ClientWorld; sent: Record<string, unknown>[] } {
     const client = Object.create(ClientWorld.prototype) as ClientWorld;
     (client as unknown as { spectating: null }).spectating = null;

@@ -244,7 +244,10 @@ export class ValeCupWindow {
       this.nationsHtml(view.nations) +
       `<div class="vcup-note">${esc(t('hudChrome.vcup.awayNote'))}</div>` +
       `<div class="vcup-sub">${esc(t('hudChrome.vcup.rolesHeading'))}</div>` +
-      this.rolesHtml(view.roles) +
+      this.rolesHtml(view.roles, view.smallBracketRoles) +
+      (view.smallBracketRoles
+        ? `<div class="vcup-note" id="vcup-roles-smallnote">${esc(t('hudChrome.vcup.rolesSmallBracketNote'))}</div>`
+        : '') +
       this.guildEntryHtml(view.guildEntry, view.guildStanding) +
       this.actionHtml(view.action) +
       this.practiceHtml(view.practice) +
@@ -315,13 +318,17 @@ export class ValeCupWindow {
     return `<div class="vcup-nations" role="group" aria-label="${esc(t('hudChrome.vcup.nationsHeading'))}">${cells.map(btn).join('')}</div>`;
   }
 
-  private rolesHtml(rows: VcupRoleRow[]): string {
+  private rolesHtml(rows: VcupRoleRow[], smallBracket: boolean): string {
     const btn = (r: VcupRoleRow): string =>
       `<button type="button" class="vcup-role${r.selected ? ' selected' : ''}" data-role="${r.id}"` +
       ` aria-pressed="${r.selected ? 'true' : 'false'}"${r.disabled ? ' disabled' : ''}>` +
       `<span class="vcup-role-name">${esc(t(ROLE_NAME_KEYS[r.id]))}</span>` +
       `<span class="vcup-role-desc">${esc(t(ROLE_DESC_KEYS[r.id]))}</span></button>`;
-    return `<div class="vcup-roles" role="group" aria-label="${esc(t('hudChrome.vcup.rolesHeading'))}">${rows.map(btn).join('')}</div>`;
+    // In the 1v1/2v2 brackets the group is described by the small-bracket note
+    // (the pick is seated as All-Rounder), so a screen reader hears it on
+    // entering the group rather than by reading around the controls.
+    const describedBy = smallBracket ? ' aria-describedby="vcup-roles-smallnote"' : '';
+    return `<div class="vcup-roles" role="group" aria-label="${esc(t('hudChrome.vcup.rolesHeading'))}"${describedBy}>${rows.map(btn).join('')}</div>`;
   }
 
   private actionHtml(action: VcupAction): string {
@@ -361,9 +368,14 @@ export class ValeCupWindow {
 
   private practiceHtml(show: boolean): string {
     if (!show) return '';
+    // Practice bouts are deliberately unrated (no standings, no Book of Deeds
+    // progress); say so where the button is offered (issue 2767), and hand
+    // both notes to the button via aria-describedby so a screen reader hears
+    // them on the control itself.
     return (
-      `<button type="button" class="btn vcup-practice" data-act="practice">${esc(t('hudChrome.vcup.practice'))}</button>` +
-      `<div class="vcup-note">${esc(t('hudChrome.vcup.practiceNote'))}</div>`
+      `<button type="button" class="btn vcup-practice" data-act="practice" aria-describedby="vcup-practice-note vcup-practice-unrated-note">${esc(t('hudChrome.vcup.practice'))}</button>` +
+      `<div class="vcup-note" id="vcup-practice-note">${esc(t('hudChrome.vcup.practiceNote'))}</div>` +
+      `<div class="vcup-note" id="vcup-practice-unrated-note">${esc(t('hudChrome.vcup.practiceUnratedNote'))}</div>`
     );
   }
 

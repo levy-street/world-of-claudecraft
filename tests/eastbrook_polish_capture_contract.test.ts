@@ -360,9 +360,14 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Re-pinned because the crowd presentation sleep changes the fingerprinted
-      // renderer integration. No pipeline input, geometry, or capture changed.
-      fingerprint: '45cf8c41c40df78cab070fa63a1f310267b6c1d4ff69631a5c17e3995124b8f7',
+      // Deliberately re-pinned: src/render/renderer.ts is the rendererIntegration
+      // leaf of this composite, and both the shapeshift-form compile gate (#2571)
+      // and the crowd nameplate/presentation batching edit it, moving the leaf's
+      // own sha256 and, with it, the composite fingerprint. No GLB source
+      // fingerprint moved and no capture was retaken, following the identical
+      // precedent this composite already carries from the compile-storm
+      // gear/mount/base-visual gate fix.
+      fingerprint: '16c2fa150301c7077294987b9d74d713edc9fc4006c3fcfbf924475eb1391019',
       components: {
         captureContract: {
           id: 'polish-v2',

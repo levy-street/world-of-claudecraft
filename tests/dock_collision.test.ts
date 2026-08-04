@@ -5,6 +5,7 @@ import { dockLocalPoint } from '../src/sim/dock_layout';
 import { Sim } from '../src/sim/sim';
 import type { WorldContent } from '../src/sim/types';
 import { groundHeight, terrainHeight } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
 // Issue #1500: fishing docks are raised surfaces, not walls. buildProps renders
 // three `dockPlatform` sections with their plank surface about 0.36yd above each
@@ -13,7 +14,7 @@ import { groundHeight, terrainHeight } from '../src/sim/world';
 // and cross the visible deck in all three hosts.
 
 const SEED = 4242;
-const PRODUCTION_SEED = 20061;
+const PRODUCTION_SEED = WORLD_SEED;
 
 function world(extra: Partial<WorldContent>): WorldContent {
   // A fresh object per test: the collider grid cache is keyed per content.

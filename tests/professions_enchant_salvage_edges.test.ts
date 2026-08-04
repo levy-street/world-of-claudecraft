@@ -179,6 +179,9 @@ type MirrorInternals = {
   applySalvageResultEvent(ev: SimEvent): void;
 };
 
+// Kept bespoke on purpose (issue #2088): a truly bare prototype so each test
+// below can stamp its own sentinel values, unlike the shared
+// tests/helpers/bare_client.ts bareClient(), which defaults lastX to null.
 function bareMirrorClient(): ClientWorld {
   return Object.create(ClientWorld.prototype) as ClientWorld;
 }

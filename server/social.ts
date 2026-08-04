@@ -53,6 +53,10 @@ export interface GuildMemberEntry extends CharInfo {
   // ISO-8601 timestamp of the member's most recent world-entry, or null if never
   // recorded. Serialized server-side (server/social_db.ts) and shown in the roster.
   lastLogin: string | null;
+  // Epoch-ms timestamp of when the member joined the guild (guild_members.joined_at,
+  // NOT NULL in the DDL, so null is the defensive arm only). Drives the client's
+  // roster tenure badges.
+  joinedAt: number | null;
   // The selected Book of Deeds title (a deed id, null untitled), as on FriendEntry.
   activeTitle: string | null;
   online: boolean;
@@ -143,10 +147,13 @@ export interface SocialDb {
     fromCharId: number,
     toCharId: number,
   ): Promise<'ok' | 'not_leader' | 'not_member' | 'no_guild'>;
-  guildMembers(
-    guildId: number,
-  ): Promise<
-    (CharInfo & { rank: GuildRank; lastLogin: string | null; activeTitle: string | null })[]
+  guildMembers(guildId: number): Promise<
+    (CharInfo & {
+      rank: GuildRank;
+      lastLogin: string | null;
+      activeTitle: string | null;
+      joinedAt: number | null;
+    })[]
   >;
   // guild billboard (motd): the officer-set message + setter name on the guilds row
   setGuildMotd(guildId: number, motd: string, setBy: string): Promise<void>;
@@ -346,6 +353,12 @@ export class SocialService {
     private readonly db: SocialDb,
     private readonly tx: SocialTransport,
     private readonly now: () => number = () => Date.now(),
+    // Guild-name content screen, injected so the service stays hermetic in tests:
+    // production wires offensiveName from server/auth.ts (server/game.ts). Required
+    // on purpose (no fail-open default): every construction site must decide what
+    // it screens. Applies at creation only; existing guild names are never
+    // retro-scanned here.
+    private readonly isNameOffensive: (name: string) => boolean,
   ) {}
 
   // -------------------------------------------------------------------------
@@ -766,6 +779,12 @@ export class SocialService {
     const name = validateGuildName(rawName);
     if (!name) {
       this.err(actor.characterId, 'Guild names are 3-24 letters (spaces allowed).');
+      return;
+    }
+    // Content screen (server-authoritative; the client has no say): refuse an
+    // offensive name before any row is created, so a refused create never exists.
+    if (this.isNameOffensive(name)) {
+      this.err(actor.characterId, 'That guild name is not allowed.');
       return;
     }
     const result = await this.db.createGuildWithLeader(name, actor.characterId);

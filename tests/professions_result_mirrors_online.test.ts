@@ -36,13 +36,14 @@ vi.mock('../server/db', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
-import { ClientWorld } from '../src/net/online';
+import type { ClientWorld } from '../src/net/online';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { CRAFT_THROTTLE_MAX_PER_WINDOW } from '../src/sim/professions/action_throttle';
-import type { Entity, PlayerClass, SimEvent } from '../src/sim/types';
+import type { Entity, SimEvent } from '../src/sim/types';
 import { grantItemToken, grantQtyText, harvestLineKey } from '../src/ui/grant_line_view';
 import { t } from '../src/ui/i18n';
+import { bareClient } from './helpers/bare_client';
 
 const COMMON_WEAPON = 'eastbrook_arming_sword';
 const DUST = 'arcane_dust';
@@ -57,7 +58,6 @@ type WireMsg = {
 };
 
 type SnapWireMsg = WireMsg & { self: Record<string, unknown> };
-type BareClientHarness = ClientWorld & Record<string, unknown>;
 type PositionedEntity = Entity & { prevPos?: Entity['pos'] };
 
 function fakeWs(): { sent: WireMsg[]; ws: unknown } {
@@ -117,64 +117,6 @@ function eventFrames(sent: WireMsg[], fromIdx = 0): WireMsg[] {
   return sent.slice(fromIdx).filter((m) => m.t === 'events');
 }
 
-// The tests/snapshots.test.ts bareClient shape (identical to the shipped
-// suites): a ClientWorld without WebSocket plumbing.
-function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWorld {
-  const c = Object.create(ClientWorld.prototype) as BareClientHarness;
-  Object.assign(c, {
-    cfg: { seed: 20061, playerClass },
-    entities: new Map(),
-    playerId: pid,
-    ownPlayerId: pid,
-    ownPlayerClass: playerClass,
-    spectating: null,
-    cupInfo: null,
-    lastVcupRemainder: null,
-    lastVcupShared: null,
-    sportRole: null,
-    moveInput: {},
-    inventory: [],
-    vendorBuyback: [],
-    equipment: {},
-    accountCosmetics: {
-      completedQuestIds: [],
-      mechChromaIds: [],
-      weaponSkinIds: [],
-      weaponSkinLoadout: {},
-    },
-    copper: 0,
-    honor: 0,
-    lifetimeHonor: 0,
-    xp: 0,
-    known: [],
-    questLog: new Map(),
-    questsDone: new Set(),
-    pendingQuestCommands: new Map(),
-    partyInfo: null,
-    selectedDungeonDifficulty: 'normal',
-    tradeInfo: null,
-    duelInfo: null,
-    lastSnapAt: 0,
-    snapInterval: 50,
-    serverTickHz: null,
-    missingSince: new Map(),
-    pendingFacingDelta: 0,
-    connected: true,
-    eventQueue: [],
-    mouselookFacing: null,
-    lastInputSentAt: 0,
-    lastInputSig: '',
-    inputSeq: 0,
-    pendingInputSeqSentAt: new Map(),
-    ackedInputSeq: 0,
-    inputEchoSamples: [],
-    spectateFacingPending: false,
-    pendingSpectateFacing: null,
-    nodeCooldowns: new Map(),
-  });
-  return c;
-}
-
 // eventQueue is private on ClientWorld; the probe reads it through one cast
 // (the HUD drains it via drainEvents, which would consume what we assert on).
 function queueOf(client: ClientWorld): SimEvent[] {
@@ -203,7 +145,7 @@ describe('result mirror: event arm alone through the real onMessage path', () =>
     server.sim.addItem(COMMON_WEAPON, 3, st.pid);
     server.sim.addItem(DUST, 5, st.pid);
     const client = bareClient(st.pid);
-    expect(client.lastSalvageResult).toBeUndefined(); // bareClient skips field init
+    expect(client.lastSalvageResult).toBeNull(); // bareClient's declaration default
 
     // Salvage.
     let mark = fc.sent.length;

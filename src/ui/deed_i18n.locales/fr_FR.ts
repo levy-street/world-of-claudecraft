@@ -855,6 +855,10 @@ export const table: DeedLocaleTable = {
     name: 'Héroïque : le Bassin du Cœur Sauvage',
     desc: 'Vainquez Zulgar, Voix du Bassin, dans le Bassin du Cœur Sauvage en difficulté héroïque.',
   },
+  chr_peaks_gatherer: {
+    name: 'Moisson des Hauteurs',
+    desc: "Récolter un filon de minerai, un bosquet de bois et un carré d'herbes dans les Hauteurs de Thornpeak.",
+  },
   chr_marsh_rares_ii: {
     name: 'Le Glouton, porté au compte',
     desc: 'Tuer Grubjaw le Glouton, une quatrième terreur nommée du Marais de Mirefen oubliée du premier décompte.',
@@ -870,6 +874,30 @@ export const table: DeedLocaleTable = {
   chr_hollow_rares: {
     name: 'Le troupeau se souvient',
     desc: 'Tuer le Vieux Marrowshell et Aurelhorn, Premier du Troupeau, les deux boss rares errants du Vallon.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Les largesses des Saules',
+    desc: "Récolter un filon de minerai, un bosquet de bois et un carré d'herbes dans le Marais des Saules.",
+  },
+  chr_willowfen_first_cast: {
+    name: 'Des rides sur les Lilymoors',
+    desc: 'Pêcher un poisson dans les eaux du Marais des Saules.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Moisson du promontoire',
+    desc: "Récolter un filon de minerai, un bosquet de bois et un carré d'herbes sur la Crête du Vent.",
+  },
+  chr_galecrest_first_cast: {
+    name: 'Une ligne dans le Lac Miroir',
+    desc: 'Pêcher un poisson dans les eaux de la Crête du Vent.',
+  },
+  chr_farshore_gatherer: {
+    name: "Les vivres de l'île",
+    desc: "Récolter un filon de minerai, un bosquet de bois et un carré d'herbes sur le Rivage Lointain.",
+  },
+  chr_farshore_first_cast: {
+    name: 'Ce que savent les mouettes',
+    desc: 'Pêcher un poisson dans les eaux du Rivage Lointain.',
   },
 };
 

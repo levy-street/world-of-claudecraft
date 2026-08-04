@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 //
 // Regression for issue #2569: the Performance Overlay settings window's gilded
 // ::before ornament (components.css) is attached to #options-menu.perf-wide, the

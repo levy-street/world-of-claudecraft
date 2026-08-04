@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 //
 // The shared rebuild-refocus helper (#2528), extracted from about ten hand-rolled
 // copies in src/ui. Two halves, tested here against the shapes the real callers hand

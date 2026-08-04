@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 //
 // The dev-only en_XA pseudo-locale (?lang=en_XA on a non-release build) exists to
 // surface un-keyed literals: every catalog leaf is accent-pushed and bracketed.

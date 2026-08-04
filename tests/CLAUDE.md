@@ -30,8 +30,10 @@ Subdirectories (plus one shared fixture):
 - `browser/`: OPT-IN real-browser Playwright suite (`*.browser.test.ts`,
   `npm run test:browser`) for WebKit/Safari CSS, axe, target-size; never a bare `vitest run`.
 - `progression/`: mirrors `src/sim/progression/` (unit tests for the extracted modules).
-- `helpers/` + `util/`: shared cross-suite utilities (`fake_dom.ts`, the reusable
-  hand-rolled fake DOM for controller suites, `i18n_determinism.ts`, `ts_files_under.ts`
+- `helpers/` + `util/`: shared cross-suite utilities (`bare_client.ts`, the shared
+  `bareClient()`/`fakeWs()`/`lastSnap()`/`joinServer()`/`broadcast()` family, see
+  "Server tests" below; `fake_dom.ts`, the reusable hand-rolled fake DOM for controller
+  suites, `i18n_determinism.ts`, `ts_files_under.ts`
   and `css_tree_under.ts`, the two source walks, `scan_guard_self_audit.ts`, the pin that
   keeps a guard from re-growing its own directory read, `method_call_sites.ts`, the
   `ts.createSourceFile` walk that reports the calls a class method evaluates, each with the
@@ -64,8 +66,13 @@ Postgres is mocked at the top: `vi.mock('../server/db', () => ({ pool, saveChara
 (hoisted; keep it ABOVE the `server/game` import). Drive `new GameServer()` with a
 fake socket: `fakeWs()` collects `JSON.parse`'d sends; `server.join(...)`,
 `server.handleMessage(session, JSON.stringify({t:'cmd',...}))`, `(server as any).broadcastSnapshots()`.
-For the online client path, build a `ClientWorld` with `Object.create(ClientWorld.prototype)`
-(see `bareClient` in `snapshots.test.ts`/`talents.test.ts`) and call `applySnapshot(...)`.
+For the online client path, build a `ClientWorld` without the WebSocket plumbing by importing
+`bareClient(pid, overrides?)` from `tests/helpers/bare_client.ts` (also hosts the `fakeWs`/
+`lastSnap`/`joinServer`/`broadcast` family above) and call `applySnapshot(...)` on the result;
+it mirrors every field `ClientWorld` declares a static default for, so a new field never needs
+a manual sweep across suites. Import it rather than hand-rolling `Object.create(ClientWorld.prototype)`
+again, unless the suite genuinely needs a narrower or differently-shaped fixture (a few do, each
+marked with a one-line "kept bespoke on purpose" comment, issue #2088).
 `server/social.ts` etc. take injected interfaces: implement an in-memory `FakeDb`/
 transport (see `social_system.test.ts`) rather than mocking. REST/RouteDef endpoints
 use the `tests/server/helpers/` fakes (see Map), not a bespoke GameServer rig.
@@ -166,8 +173,14 @@ yourself or the S3 guard throws "status.json is missing".
   completeness + placeholder parity per locale). Add or change a sim/server player string and update
   the matcher in the SAME change or this fails.
 - **Two tiers via `I18N_RELEASE_TIER`** (also read by `localization_coverage`, `i18n_status_registry`,
-  `i18n_t_behavior`): unset = PR tier (registration/key-existence only, English-only legal); `=1` =
-  release tier (hard-fails on any `pending` locale row + full-localization checks).
+  `i18n_t_behavior`, `deed_i18n`): unset = PR tier (registration/key-existence only, English-only
+  legal); `=1` = release tier (hard-fails on any `pending` locale row + full-localization checks).
+  The tier runs as its OWN job / gate step over exactly those suites (`release-i18n` in
+  `.github/workflows/ci.yml`, `vitest (release-tier i18n)` locally), never over the whole suite:
+  a release branch is red for un-filled locales through most of a cycle, and fusing that with
+  the test signal let a real regression hide inside expected noise (#2820). Adding a suite that
+  reads the flag means adding it to `I18N_RELEASE_TIER_SUITES` (`scripts/lib/gate_steps.mjs`) and
+  the ci.yml job; `tests/release_i18n_tier_coverage.test.ts` fails until all three agree.
 
 ## Running & adding
 - Single file (preferred while iterating): `npx vitest run tests/<file>.test.ts`.

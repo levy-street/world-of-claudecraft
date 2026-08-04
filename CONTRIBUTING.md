@@ -37,24 +37,37 @@ There's a place for everyone here:
 
 ## Getting started
 
-You'll need [Node.js 26](https://nodejs.org/) and npm, the versions CI and the
-production image use. Older majors are untested. For the multiplayer server
-you'll also want [Docker](https://www.docker.com/) to run Postgres.
+You'll need [Node.js 26](https://nodejs.org/) and **pnpm 10.34.x** (exact pin in
+`package.json` `packageManager`, currently `pnpm@10.34.5`). Older Node majors
+are untested. For the multiplayer server you'll also want
+[Docker](https://www.docker.com/) to run Postgres.
+
+**Corepack is not required.** Install pnpm once with the npm that ships with
+Node. That path is the same on macOS, Linux, and Windows.
 
 ```bash
 # 1. Fork the repo on GitHub, then clone your fork
 git clone https://github.com/<your-username>/world-of-claudecraft.git
 cd world-of-claudecraft
 
-# 2. Install dependencies
-npm ci
+# 2. Install pnpm once (same command on macOS, Linux, Windows)
+#    Match the packageManager pin in package.json (today: 10.34.5).
+npm install -g pnpm@10.34.5
+pnpm --version   # should print 10.34.5 (or the pin in package.json)
 
-# 3. Point git at the repository hooks (once per clone)
+# 3. Install dependencies (uses the global content-addressable store)
+pnpm install --frozen-lockfile
+
+# 4. Point git at the repository hooks (once per clone)
 git config core.hooksPath .githooks
 
-# 4. Run the offline client (no server or database needed)
-npm run dev          # open the URL it prints (usually http://localhost:5173)
+# 5. Run the offline client (no server or database needed)
+pnpm run dev         # open the URL it prints (usually http://localhost:5173)
 ```
+
+`npm run <script>` still works after a pnpm install (Node ships npm), but
+**install and lockfile updates must go through pnpm**. Do not commit a
+`package-lock.json`; the single source of truth is `pnpm-lock.yaml`.
 
 That's enough to play the offline world and work on most things. To run the full
 online stack you need a database password in your environment first:
@@ -62,25 +75,73 @@ online stack you need a database password in your environment first:
 ```bash
 cp .env.example .env
 # set POSTGRES_PASSWORD and point DATABASE_URL at the same password
-npm run db:up        # start Postgres 16 in Docker (dev DB on port 5433)
-npm run server       # build and run the authoritative game server on :8787
-npm run dev          # in another terminal; the client proxies to the server
+pnpm run db:up       # start Postgres 16 in Docker (dev DB on port 5433)
+pnpm run server      # build and run the authoritative game server on :8787
+pnpm run dev         # in another terminal; the client proxies to the server
 ```
 
 If you plan to run the full gate below, install the browser it drives once:
-`npx playwright install chromium`.
+`pnpm exec playwright install chromium`.
 
 The [README](README.md) has the full host, develop, and play guide, and the
 `CLAUDE.md` files throughout the repo document the conventions for each area.
 
+### Multi-worktree installs (agents and parallel branches)
+
+pnpm stores packages once under a shared content-addressable store. Defaults:
+
+| OS | Default store path |
+|---|---|
+| macOS | `~/Library/pnpm/store` |
+| Linux | `~/.local/share/pnpm/store` |
+| Windows | `%LOCALAPPDATA%\pnpm\store` |
+
+Each worktree only links into that store, so spinning a second (or twentieth)
+worktree is much cheaper than a full per-tree copy.
+
+```bash
+git worktree add ../wocc-my-task -b feature/my-task origin/release/v0.34.0
+cd ../wocc-my-task
+pnpm install --frozen-lockfile   # links from the shared store
+pnpm run gate:fast               # day-loop; full gate remains the merge bar
+```
+
+Override the store path if needed: `pnpm config set store-dir /path/to/store`
+(or `PNPM_STORE_DIR`). Keep the same `packageManager` pin across machines.
+
+### Cross-platform notes (macOS / Linux / Windows)
+
+The developer loop is the same on all three: Node 26, `npm install -g pnpm@…`
+matching `packageManager`, then `pnpm install --frozen-lockfile` and
+`pnpm run …`. CI uses `pnpm/action-setup` with the same pin (not Corepack).
+
+- **Layout.** This repo sets `node-linker=hoisted` in `.npmrc`, so
+  `node_modules` is a flat npm-like tree. That avoids Windows Developer Mode
+  symlink requirements that pure isolated pnpm layouts can hit.
+- **Windows shells.** Git Bash, PowerShell, and cmd all work. Gate scripts
+  already spawn `npm`/`npx`/`pnpm` via a shell on Windows so `.cmd` shims resolve.
+  Only if a script still fails to find a shim, set
+  `pnpm config set script-shell "C:\\Windows\\System32\\cmd.exe"` as a last resort.
+- **Windows Defender.** Can slow package installs; optional exclusion:
+  `Add-MpPreference -ExclusionPath $(pnpm store path)` (admin PowerShell).
+- **Corepack.** Optional only. Do not document it as required: many nvm / Node
+  installs omit it, and pnpm 10+ can self-align to `packageManager` once any
+  matching major is on PATH.
+
+**Native / optional platform packages.** Install scripts are allowlisted in
+`package.json` under `pnpm.onlyBuiltDependencies` (esbuild, sharp,
+ffmpeg-static, ffprobe-static, bufferutil, utf-8-validate, and a few others).
+If a scripts-skipped or incomplete install leaves binaries missing, reinstall
+with `pnpm install --frozen-lockfile` rather than hand-running install.js.
+
 ### TypeScript toolchain
 
-Type checking runs on TypeScript 7, the native compiler: `npx tsc --noEmit` works
-exactly as before and a full repo check now takes a few seconds instead of tens of
-seconds. The install is the official dual alias: the `typescript` package resolves
-the TypeScript 6 JS API (via the `@typescript/typescript6` wrapper) because
-`svelte-check` still consumes that API, while `@typescript/native` provides the
-`tsc` binary. Things to know:
+Type checking runs on TypeScript 7, the native compiler: `pnpm exec tsc --noEmit`
+(or `npx tsc --noEmit`) works exactly as before and a full repo check now takes
+a few seconds instead of tens of seconds. The install is the official dual
+alias: the `typescript` package resolves the TypeScript 6 JS API (via the
+`@typescript/typescript6` wrapper) because `svelte-check` still consumes that
+API, while `@typescript/native` provides the `tsc` binary. Things to know:
 
 - **Editors.** VS Code needs the "TypeScript 7" marketplace extension
   (`TypeScriptTeam.native-preview`) for native language service support until the
@@ -96,12 +157,15 @@ the TypeScript 6 JS API (via the `@typescript/typescript6` wrapper) because
   since more is not always faster. `--singleThreaded` disables all parallelism.
   Checking a single file ad hoc (`npx tsc somefile.ts`) errors when the directory
   has a `tsconfig.json`; pass `--ignoreConfig` for the old behavior.
-- **Lockfile.** Regenerate `package-lock.json` only with
-  `npx npm@10 install --package-lock-only`: the file uses npm-10 semantics, and
-  newer npm majors (including the npm 11 that CI's Node 26 bundles) silently drop
-  `svelte-check`'s nested optional-peer entries, which desyncs `npm ci` in CI.
-  Plain `npm ci` is safe under any npm major. After regenerating, confirm
-  `npm ci --dry-run` is in sync under both npm 10 and your workstation's npm.
+- **Lockfile.** The lockfile is `pnpm-lock.yaml` (pnpm 10 / lockfileVersion 9).
+  Update it only with `pnpm install` or `pnpm add` / `pnpm update` from this
+  repo root (never hand-edit). Commit `pnpm-lock.yaml` together with
+  `package.json` changes. CI installs with `pnpm install --frozen-lockfile`; a
+  stale lockfile fails closed. Do not introduce a second lockfile
+  (`package-lock.json` / yarn.lock): dual lockfiles diverge silently and are
+  forbidden. Peer dependency noise from optional wallet/solana trees is
+  tolerated via `.npmrc` (`strict-peer-dependencies=false`); do not loosen that
+  further without measuring.
 - **When to revisit.** Collapse the dual alias back to a single `typescript`
   dependency once BOTH hold: the TypeScript 7.1 stable JS API has shipped
   (TypeScript 7.0 ships no JS API at all; the replacement is tracked in
@@ -171,13 +235,43 @@ fix.
 
 ## Before you open a pull request
 
-Run the repository gate locally. It is the same contract CI enforces:
+Run the **full** repository gate locally. It is the same contract CI enforces and
+the only local command that counts as the pre-merge bar:
 
 ```bash
 npm run gate
 ```
 
-While iterating, run a single suite (`npx vitest run tests/sim.test.ts`) and
+While iterating (especially on mid/low-tier machines or in agent day-loops), you can
+use the fast path, which is **not** a substitute for the full gate:
+
+```bash
+npm run gate:fast
+```
+
+`gate:fast` runs malware, changed-file Biome, architecture + localization guards,
+incremental `check:ts`, and Vitest related to git changes. It skips the full suite,
+browser tests, SFX check, i18n freshness, and production builds. Details and worker
+tier presets (`GATE_WORKER_TIER`, `GATE_MAX_WORKERS`) are in
+[`docs/qa-gate.md`](docs/qa-gate.md) and
+[`docs/local-gate-perf/tier-workers.md`](docs/local-gate-perf/tier-workers.md).
+**Which command for low vs high tier, agent vs human, and OS status:**
+[`docs/local-gate-perf/platform-matrix.md`](docs/local-gate-perf/platform-matrix.md).
+
+Thinner Vitest helpers (also not merge bars): `npm run test:related -- <source.ts>`
+and `npm run test:changed` (optional git base after `--`). Prefer those or
+`gate:fast` while iterating; warm re-runs benefit from Vitest
+`experimental.fsModuleCache` (see `docs/local-gate-perf/`).
+
+The full gate also uses **Turborepo** for pure artifact steps (i18n gen, wiki
+content, SFX check, typecheck, env/server/client builds). On an unchanged tree a
+second `pnpm run gate` replays those from the local `.turbo/` cache; vitest,
+browser tests, malware, and changed-file Biome still always run. See
+[`docs/local-gate-perf/task-cache.md`](docs/local-gate-perf/task-cache.md).
+Clear the cache with `rm -rf .turbo` or force a task with
+`npx turbo run <task> --force`.
+
+You can also run a single suite (`npx vitest run tests/sim.test.ts`) and
 `npm run ci:changed` for formatting; `npm test` runs everything, and the suite map
 is in `tests/CLAUDE.md`. The full `npm run gate` covers generated-artifact
 freshness, the malware scan, formatting on changed files, the sound-effect

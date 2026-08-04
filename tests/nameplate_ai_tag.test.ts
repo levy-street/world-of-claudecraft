@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 import * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';

@@ -3,8 +3,11 @@
 
 FROM node:26-slim AS build
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci --no-audit --no-fund
+# Match package.json packageManager (Corepack not required; same as CONTRIBUTING).
+# .npmrc carries node-linker=hoisted so the install layout matches local/CI.
+RUN npm install -g pnpm@10.34.5
+COPY package.json pnpm-lock.yaml .npmrc ./
+RUN pnpm install --frozen-lockfile
 COPY .browserslistrc tsconfig.json vite.config.ts svelte.config.js index.html admin.html play.html guide.html editor.html wallet-handoff.html ./
 COPY src ./src
 COPY server ./server
@@ -26,7 +29,7 @@ ARG VITE_WALLET_DISABLED=""
 RUN VITE_TURNSTILE_SITEKEY="$VITE_TURNSTILE_SITEKEY" \
     VITE_REOWN_PROJECT_ID="$VITE_REOWN_PROJECT_ID" \
     VITE_WALLET_DISABLED="$VITE_WALLET_DISABLED" \
-    npm run build && cp -a dist/media ./media-build && rm -rf dist/media && npm run build:server && npm run build:bot
+    pnpm run build && cp -a dist/media ./media-build && rm -rf dist/media && pnpm run build:server && pnpm run build:bot
 
 FROM node:26-slim
 WORKDIR /app

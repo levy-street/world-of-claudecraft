@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { ClientWorld } from '../src/net/online';
 import { MOUNT_KEYS, MOUNTS } from '../src/sim/content/mounts';
 import { BUILTIN_WORLD, MOBS, NPCS, zoneAt } from '../src/sim/data';
 import { grantDeed } from '../src/sim/deeds';
@@ -11,6 +10,7 @@ import type { SimContext } from '../src/sim/sim_context';
 import * as chatMod from '../src/sim/social/chat';
 import type { SimEvent, WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { bareClient } from './helpers/bare_client';
 
 // Chat/emote/presence tests only ever talk between hand-added players (the
 // /played and /playtime timelines tick a minute-plus of world time), so none
@@ -848,30 +848,6 @@ describe('trade completion event', () => {
 });
 
 describe('snapshot interpolation continuity', () => {
-  function bareClient(pid: number): any {
-    const c: any = Object.create(ClientWorld.prototype);
-    c.cfg = { seed: 42, playerClass: 'warrior' };
-    c.entities = new Map();
-    c.playerId = pid;
-    c.inventory = [];
-    c.equipment = {};
-    c.copper = 0;
-    c.xp = 0;
-    c.known = [];
-    c.questLog = new Map();
-    c.questsDone = new Set();
-    c.partyInfo = null;
-    c.tradeInfo = null;
-    c.duelInfo = null;
-    c.lastSnapAt = 0;
-    c.snapInterval = 50;
-    c.pendingFacingDelta = 0;
-    c.connected = true;
-    c.eventQueue = [];
-    c.mouselookFacing = null;
-    return c;
-  }
-
   const wire = (id: number, x: number) => ({
     id,
     k: 'player',
@@ -887,7 +863,7 @@ describe('snapshot interpolation continuity', () => {
   });
 
   it('re-anchors prevPos at the rendered pose instead of the last server pose', () => {
-    const c = bareClient(7);
+    const c = bareClient(7, { cfg: { seed: 42, playerClass: 'warrior' } });
     const self = (x: number) => ({
       ...wire(7, x),
       res: 0,
@@ -904,15 +880,15 @@ describe('snapshot interpolation continuity', () => {
       stats: { str: 1, agi: 1, sta: 1, int: 1, spi: 1, armor: 0 },
       weapon: { min: 1, max: 2, speed: 2 },
     });
-    c.applySnapshot({ t: 'snap', tick: 1, time: 0, self: self(0), ents: [] });
-    const e = c.entities.get(7);
+    (c as any).applySnapshot({ t: 'snap', tick: 1, time: 0, self: self(0), ents: [] });
+    const e = c.entities.get(7)!;
     // second snapshot lands: the player moved server-side from x=0 to x=10
-    c.applySnapshot({ t: 'snap', tick: 2, time: 0.05, self: self(10), ents: [] });
+    (c as any).applySnapshot({ t: 'snap', tick: 2, time: 0.05, self: self(10), ents: [] });
     // third snapshot from x=10 to x=20: prevPos must sit on the segment the
     // renderer was drawing (between 0 and 10, or slightly past 10 when the
     // frame extrapolated) — never reset all the way back to the old pose
     // unless no time passed at all
-    c.applySnapshot({ t: 'snap', tick: 3, time: 0.1, self: self(20), ents: [] });
+    (c as any).applySnapshot({ t: 'snap', tick: 3, time: 0.1, self: self(20), ents: [] });
     expect(e.pos.x).toBe(20);
     expect(e.prevPos.x).toBeGreaterThanOrEqual(0);
     expect(e.prevPos.x).toBeLessThanOrEqual(12.5); // <= 1.25 extrapolation cap
@@ -921,7 +897,7 @@ describe('snapshot interpolation continuity', () => {
   });
 
   it('mirrors overhead emotes from snapshots and clears them when absent', () => {
-    const c = bareClient(7);
+    const c = bareClient(7, { cfg: { seed: 42, playerClass: 'warrior' } });
     const self = (emo?: string, emoSeq?: number) => ({
       ...wire(7, 0),
       ...(emo ? { emo, emoSeq } : {}),
@@ -939,14 +915,14 @@ describe('snapshot interpolation continuity', () => {
       stats: { str: 1, agi: 1, sta: 1, int: 1, spi: 1, armor: 0 },
       weapon: { min: 1, max: 2, speed: 2 },
     });
-    c.applySnapshot({ t: 'snap', tick: 1, time: 0, self: self('laugh', 4), ents: [] });
+    (c as any).applySnapshot({ t: 'snap', tick: 1, time: 0, self: self('laugh', 4), ents: [] });
     expect(c.entities.get(7)?.overheadEmoteId).toBe('laugh');
     expect(c.entities.get(7)?.overheadEmoteSeq).toBe(4);
 
-    c.applySnapshot({ t: 'snap', tick: 2, time: 0.05, self: self('laugh', 5), ents: [] });
+    (c as any).applySnapshot({ t: 'snap', tick: 2, time: 0.05, self: self('laugh', 5), ents: [] });
     expect(c.entities.get(7)?.overheadEmoteSeq).toBe(5);
 
-    c.applySnapshot({ t: 'snap', tick: 3, time: 0.1, self: self(), ents: [] });
+    (c as any).applySnapshot({ t: 'snap', tick: 3, time: 0.1, self: self(), ents: [] });
 
     expect(c.entities.get(7)?.overheadEmoteId).toBeNull();
   });

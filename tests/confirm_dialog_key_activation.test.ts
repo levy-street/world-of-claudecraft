@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 //
 // Fixed test-first: keyboard activation inside the
 // #confirm-dialog family. The game input layer listens for keydown on window

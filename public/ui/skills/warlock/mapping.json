@@ -110,7 +110,258 @@
       "sourcePack": "demon",
       "sourceFile": "12.png",
       "output": "searing_pain.webp"
+    },
+    {
+      "abilityId": "chaos_bolt",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warlock/chaos_bolt.png",
+      "output": "chaos_bolt.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A massive twisted fire-and-shadow bolt cracking the frame as it launches.",
+      "references": [
+        {
+          "path": "public/ui/skills/warlock/immolate.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/warlock/shadow_bolt.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warlock\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Ruinbolt (chaos_bolt)\nCanonical mechanic: Ruinbolt is a 2.5 sec cast dealing 128 to 156 Fire damage; 12 sec cooldown.\nSubject: A massive twisted fire-and-shadow bolt cracking the frame as it launches.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "conflagrate",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warlock/conflagrate.png",
+      "output": "conflagrate.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A burning pact sigil collapsing into a violent flame burst.",
+      "references": [
+        {
+          "path": "public/ui/skills/warlock/immolate.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/warlock/shadow_bolt.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warlock\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Conflagrate (conflagrate)\nCanonical mechanic: Conflagrate consumes Immolate on the target and deals 54 to 64 Fire damage; 6 sec cooldown.\nSubject: A burning pact sigil collapsing into a violent flame burst.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "curse_of_exhaustion",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warlock/curse_of_exhaustion.png",
+      "output": "curse_of_exhaustion.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A chained boot sinking beneath a heavy purple curse seal.",
+      "references": [
+        {
+          "path": "public/ui/skills/warlock/fear.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/warlock/drain_life.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warlock\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Leaden Hex (curse_of_exhaustion)\nCanonical mechanic: Leaden Hex slows target movement by 30% for 12 sec.\nSubject: A chained boot sinking beneath a heavy purple curse seal.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "death_coil",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warlock/death_coil.png",
+      "output": "death_coil.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A coiling skull projectile striking a heart and leaving a spiraling terror wake.",
+      "references": [
+        {
+          "path": "public/ui/skills/warlock/fear.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/warlock/shadow_bolt.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warlock\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Morrowlash (death_coil)\nCanonical mechanic: Morrowlash deals 55 to 65 Shadow damage and incapacitates the target for 3 sec using fear diminishing returns; 120 sec cooldown.\nSubject: A coiling skull projectile striking a heart and leaving a spiraling terror wake.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "howl_of_terror",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warlock/howl_of_terror.png",
+      "output": "howl_of_terror.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Several screaming skulls forming an expanding circular fear chorus.",
+      "references": [
+        {
+          "path": "public/ui/skills/warlock/fear.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/warlock/shadow_bolt.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warlock\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Dread Chorus (howl_of_terror)\nCanonical mechanic: Dread Chorus fears enemies within 8 yd for up to 3 sec; damage may break it; 40 sec cooldown.\nSubject: Several screaming skulls forming an expanding circular fear chorus.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "metamorphosis",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warlock/metamorphosis.png",
+      "output": "metamorphosis.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A horned winged demon silhouette mirrored with an empowered pet beneath two linked halos.",
+      "references": [
+        {
+          "path": "public/ui/skills/warlock/fear.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/warlock/shadow_bolt.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warlock\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Dread Aspect (metamorphosis)\nCanonical mechanic: Dread Aspect transforms the caster for 20 sec, grants 20% spell damage and haste, and grants the demon pet 50% damage and 20% spell haste; 180 sec cooldown.\nSubject: A horned winged demon silhouette mirrored with an empowered pet beneath two linked halos.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "rain_of_fire",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warlock/rain_of_fire.png",
+      "output": "rain_of_fire.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Burning meteors descending into a black-red ritual circle.",
+      "references": [
+        {
+          "path": "public/ui/skills/warlock/immolate.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/warlock/shadow_bolt.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warlock\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Rain of Fire (rain_of_fire)\nCanonical mechanic: Rain of Fire channels for 4 sec over a ground area, dealing 14 to 18 Fire damage each second within 7 yd; 10 sec cooldown.\nSubject: Burning meteors descending into a black-red ritual circle.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "siphon_life",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warlock/siphon_life.png",
+      "output": "siphon_life.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A green-violet vein tether pulling blood-light from an enemy heart to the caster.",
+      "references": [
+        {
+          "path": "public/ui/skills/warlock/drain_life.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/warlock/shadow_bolt.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warlock\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Veinleech (siphon_life)\nCanonical mechanic: Veinleech deals 60 Shadow damage over 30 sec in 3 sec ticks and heals the caster for all damage dealt.\nSubject: A green-violet vein tether pulling blood-light from an enemy heart to the caster.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "spell_lock",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warlock/spell_lock.png",
+      "output": "spell_lock.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Felhunter jaws clamping shut around a luminous spell rune.",
+      "references": [
+        {
+          "path": "public/ui/skills/warlock/fear.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/warlock/shadow_bolt.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warlock\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Gag Order (spell_lock)\nCanonical mechanic: Gag Order interrupts a target at 30 yd and locks that spell school for 5 sec; 24 sec cooldown.\nSubject: Felhunter jaws clamping shut around a luminous spell rune.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "voidfeast",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warlock/voidfeast.png",
+      "output": "voidfeast.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A void maw swallowing a gold-green magic mote while a healing pulse returns to the caster.",
+      "references": [
+        {
+          "path": "public/ui/skills/warlock/drain_life.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/warlock/shadow_bolt.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warlock\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Voidfeast (voidfeast)\nCanonical mechanic: Voidfeast requires a dispellable effect, removes one enemy buff or allied debuff, and heals the caster for 6% maximum health; 15 sec cooldown.\nSubject: A void maw swallowing a gold-green magic mote while a healing pulse returns to the caster.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
     }
   ],
-  "deferredStayProcedural": {}
+  "deferredStayProcedural": {},
+  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 entries are project-generated and explicitly override it."
 }

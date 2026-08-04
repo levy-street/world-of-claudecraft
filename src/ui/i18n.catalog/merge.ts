@@ -644,6 +644,8 @@ const mergeStringsEn = {
       },
       statusWithZone: '{status} - {zone}',
       ranks: { leader: 'Guild Master', officer: 'Officer', member: 'Member' },
+      // Guild-roster tenure roles: joined under 7 days ago / 30 days or more.
+      tenure: { recruit: 'Recruit', veteran: 'Veteran' },
       guildHeadOne: 'you are {rank}, {count} member',
       guildHeadMany: 'you are {rank}, {count} members',
     },
@@ -2569,7 +2571,7 @@ const mergeEntitiesEn = {
   quests: {
     q_mogger: {
       title: 'Mogger Must Fall',
-      text: 'Mogger has split carts, flattened fences, and killed enough livestock to empty half the Vale. Do not face him alone. Take two strong companions into the eastern meadow and put the brute down for good.',
+      text: 'Mogger has split carts, flattened fences, and killed enough livestock to empty half the Vale. Do not face him alone. Take two strong companions into the western meadow and put the brute down for good.',
       completion:
         "Mogger is dead at last. Eastbrook's fields are safer, and you leave the Vale with one more tale worth retelling.",
       objectives: { 0: { label: 'Mogger slain' } },

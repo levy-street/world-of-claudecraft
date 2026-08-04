@@ -42,10 +42,10 @@ export const GFX_TIER_RANK: Record<GfxTier, number> = {
 export function gfxTierAtLeast(tier: GfxTier, floor: GfxTier): boolean {
   return GFX_TIER_RANK[tier] >= GFX_TIER_RANK[floor];
 }
-// v19: scenery may use projected-size density and cadence LOD. Fleet
-// dashboards segment the relaxed perceptual contract and submitted grass
-// counts from the pixel-exact v18 renderer.
-export const GFX_CONFIG_VERSION = 19;
+// v20: High uses the reduced fixed-layer profile and the composer governor
+// consumes truthful logical-frame draw stats. Fleet dashboards segment these
+// semantics from the v19 relaxed scenery contract.
+export const GFX_CONFIG_VERSION = 20;
 
 export const GFX_BUCKET_IDS = [
   'resolution',
@@ -134,9 +134,9 @@ export interface GfxSettings {
   // Round-10 granular detail knobs. The graphics-overhaul layers cost real
   // frame budget, so each one keys off its OWN derived knob here (never a
   // scattered tier comparison in a render module): the tier ladder sets the
-  // monotone defaults below (medium keeps its pre-overhaul look and cost; the
-  // layers start at high), and the Advanced preset's sub-settings remap the
-  // same knobs level by level (see the PRESET_ADVANCED branch).
+  // monotone defaults below (High uses the reduced Advanced-Medium profile;
+  // the full layers start at Ultra), and the Advanced preset's sub-settings
+  // remap the same knobs level by level (see the PRESET_ADVANCED branch).
   // -------------------------------------------------------------------------
   /** worn_stone.ts triplanar surface-detail family layer (fetches + application) */
   readonly surfaceDetail: boolean;
@@ -924,25 +924,28 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
             ? 2048
             : 4096,
     standardMaterials: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
-    // Round-10 detail-knob defaults (see the interface comment): the overhaul
-    // layers start at HIGH (medium measured -25..-34% carrying them with the
-    // least PBR frame budget); insane is the everything-on showcase (4-tap
-    // full-clamp worn parallax), ultra runs the same layers on the cheaper
-    // 3-tap execution, high shallower still (0.65 clamp, no terrain
-    // micro-shadow).
+    // Round-10 detail-knob defaults (see the interface comment): High takes the
+    // existing Advanced-Medium profile to bound its steady cost (basic worn
+    // surface, reduced carpet, cavity-only relief). Ultra retains the full
+    // 3-tap layers; Insane remains the 4-tap everything-on showcase.
     surfaceDetail: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'high'),
-    surfaceDetailTaps: tier === 'insane' ? 4 : gfxTierAtLeast(tier, 'high') ? 3 : 0,
-    surfaceDetailClampK:
-      tier === 'insane' ? 1 : tier === 'ultra' ? 0.85 : tier === 'high' ? 0.65 : 0,
-    bladeCarpetRadius: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'high') ? 34 : 0,
-    cliffScree: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'high'),
-    canopyDetail: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'high'),
+    surfaceDetailTaps: tier === 'insane' ? 4 : gfxTierAtLeast(tier, 'ultra') ? 3 : 0,
+    surfaceDetailClampK: tier === 'insane' ? 1 : tier === 'ultra' ? 0.85 : 0,
+    bladeCarpetRadius: nativeIosMemoryProfile
+      ? 0
+      : gfxTierAtLeast(tier, 'ultra')
+        ? 34
+        : tier === 'high'
+          ? 24
+          : 0,
+    cliffScree: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'ultra'),
+    canopyDetail: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'ultra'),
     terrainRelief: nativeIosMemoryProfile
       ? 0
       : gfxTierAtLeast(tier, 'ultra')
         ? 3
         : tier === 'high'
-          ? 2
+          ? 1
           : 0,
     aoFullRes: gfxTierAtLeast(tier, 'ultra'),
     smaa: aaPolicy.postAa === 'smaa',
@@ -1021,7 +1024,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     else settings = { ...settings, terrainRelief: terrainLevel };
     // Foliage Density: Low keeps the historical sparse card tufts (and no
     // overhaul layers); Medium buys a reduced blade carpet; High the full
-    // carpet plus cliff scree and canopy clump detail (the high+ tier set);
+    // carpet plus cliff scree and canopy clump detail;
     // Insane extends the carpet ring past the tier ladder's 34u.
     const foliageLevel = levelOf(hints.foliageDensity ?? 1);
     if (foliageLevel === 0)
@@ -1042,8 +1045,21 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
         cliffScree: false,
         canopyDetail: false,
       };
-    else if (foliageLevel === 3)
-      settings = { ...settings, farGrassDensityFloor: 0.85, bladeCarpetRadius: 40 };
+    else if (foliageLevel === 2)
+      settings = {
+        ...settings,
+        bladeCarpetRadius: 34,
+        cliffScree: true,
+        canopyDetail: true,
+      };
+    else
+      settings = {
+        ...settings,
+        farGrassDensityFloor: 0.85,
+        bladeCarpetRadius: 40,
+        cliffScree: true,
+        canopyDetail: true,
+      };
     // Surface Detail (the town-cost dial): Off sheds the whole worn layer;
     // Basic keeps the detail normals + AO grime without the parallax walk;
     // Full runs the ultra execution (3 taps, 0.85 clamp); Insane the
@@ -1061,8 +1077,8 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     else if (surfaceLevel === 2)
       settings = { ...settings, surfaceDetailTaps: 3, surfaceDetailClampK: 0.85 };
     else settings = { ...settings, surfaceDetailTaps: 4, surfaceDetailClampK: 1 };
-    // Effects & Lighting: Low is the grade-only mini composer (the medium
-    // tier's post profile, including SMAA); Medium adds N8AO; High the full
+    // Effects & Lighting: Low is the region-safe grade-only mini composer (the
+    // medium tier's post profile, without full-frame SMAA); Medium adds N8AO; High the full
     // high-tier stack (AO + bloom + SMAA). The level-0 test keeps the shared
     // EFFECTS_QUALITY_LOW_CUTOFF constant so the HUD effect tier and the 3D
     // renderer still downgrade at the same threshold.
@@ -1076,7 +1092,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
         ao: false,
         aoFullRes: false,
         bloom: false,
-        smaa: !nativeIosMemoryProfile,
+        smaa: false,
         maxPointLights: Math.min(settings.maxPointLights, 3),
       };
     else if (effectsValue < 0.75)

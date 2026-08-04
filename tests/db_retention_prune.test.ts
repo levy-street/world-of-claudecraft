@@ -32,6 +32,7 @@ vi.mock('pg', () => ({
   }),
 }));
 
+import { EMAIL_CHANGE_TTL_HOURS, PASSWORD_RESET_TTL_HOURS } from '../server/account';
 import {
   pruneChatLogsBatch,
   pruneClientPerfReportsBatch,
@@ -213,5 +214,49 @@ describe('retention prune batches', () => {
     for (const sql of recorded) {
       expect(sql.startsWith('SET LOCAL')).toBe(false);
     }
+  });
+});
+
+// The token TTLs and the prune floor are ONE coupled contract, owned by two
+// files that never import each other. A pending verification token must EXPIRE
+// before the earliest instant a prune can legally reach its row: past that
+// point the sweep deletes a row whose emailed link is still live, and the
+// player's click dies as "invalid or expired" through no fault of their own.
+// The earliest legal horizon is 24 hours, because every prune clamps its
+// retention with Math.max(1, Math.floor(retentionDays)) (server/db.ts) and rows
+// only become prunable at created_at < now() - that interval, so even an
+// operator's sub-day setting still keeps a full day.
+describe('token TTLs versus the earliest legal prune horizon', () => {
+  // Read the horizon out of the REAL prune instead of restating one day: drive
+  // the smallest retention that still prunes at all (anything above the
+  // keep-forever 0) and take the interval the clamp actually built.
+  async function earliestPruneHorizonHours(
+    prune: (retentionDays: number, batchSize: number) => Promise<number>,
+  ): Promise<number> {
+    dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 0 });
+    await prune(0.5, 100);
+    const [, params] = dbMock.query.mock.calls[0];
+    const hours = Number(params[0]) * 24;
+    expect(hours).toBeGreaterThan(0);
+    return hours;
+  }
+
+  it('the email-change TTL expires within the prune horizon', async () => {
+    const horizonHours = await earliestPruneHorizonHours(pruneEmailChangeRequestsBatch);
+    // EXACTLY at the boundary today (a 24 h TTL against a 24 h horizon), and
+    // equality is the accepted edge: the token expires at or before the
+    // earliest prunable instant, so no still-valid row can be deleted. Raising
+    // EMAIL_CHANGE_TTL_HOURS past the floor (or dropping the floor below the
+    // TTL) reds here instead of silently shipping a sweep that eats live links.
+    expect(EMAIL_CHANGE_TTL_HOURS).toBeLessThanOrEqual(horizonHours);
+  });
+
+  it('the password-reset TTL expires within the prune horizon', async () => {
+    const horizonHours = await earliestPruneHorizonHours(prunePasswordResetRequestsBatch);
+    // The reset link is deliberately much shorter than the horizon, so this arm
+    // carries margin rather than sitting on the edge; the pin exists so a
+    // future lengthening (a "give users a day to click it" change) has to
+    // notice the prune floor.
+    expect(PASSWORD_RESET_TTL_HOURS).toBeLessThanOrEqual(horizonHours);
   });
 });

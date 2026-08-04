@@ -55,8 +55,8 @@ describe('opaque front-to-back draw order', () => {
     expect(renderer.match(/setOpaqueSort\(/g)).toHaveLength(1);
     expect(renderer.match(/this\.updateOpaqueDrawOrder\(dt\)/g)).toHaveLength(2);
     expect(renderer).toContain('private opaqueFrontToBackActive: boolean | null = null');
-    expect(renderer).toContain(
-      'input.drawCalls = this.drawStats ? this.drawStatsFrame.calls : this.webgl.info.render.calls',
+    expect(renderer).toMatch(
+      /input\.drawCalls = this\.drawStats\s+\? this\.drawStats\.currentFrame\(\)\.calls\s+: this\.webgl\.info\.render\.calls/,
     );
     expect(renderer).toContain('input.previousFocusX = focusX');
     expect(renderer).toContain('input.previousFocusZ = focusZ');

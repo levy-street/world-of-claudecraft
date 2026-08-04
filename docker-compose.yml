@@ -51,6 +51,10 @@ services:
       # advertises the value so the client realm list can show Full honestly. Empty
       # (unset) yields the built-in default of 5000; an explicit 0 disables the cap.
       MAX_PLAYERS_PER_REALM: ${MAX_PLAYERS_PER_REALM:-}
+      # Runtime: Postgres clients this process keeps in its pool (server/db.ts).
+      # Empty (unset) yields the built-in default of 10; accepted range is 1 to
+      # 97 and anything else falls back to the default with an error at boot.
+      DB_POOL_MAX_CLIENTS: ${DB_POOL_MAX_CLIENTS:-}
       # Community test realms can opt in to a ready-made level-20 roster for
       # every newly created account. The production-safe default is disabled.
       PROVISION_TEST_ACCOUNTS: ${PROVISION_TEST_ACCOUNTS:-0}
@@ -78,6 +82,11 @@ services:
       GOOGLE_PLAY_INTEGRITY_PACKAGE_NAME: ${GOOGLE_PLAY_INTEGRITY_PACKAGE_NAME:-com.worldofclaudecraft}
       GOOGLE_PLAY_INTEGRITY_CERT_DIGESTS: ${GOOGLE_PLAY_INTEGRITY_CERT_DIGESTS:-}
       GOOGLE_PLAY_INTEGRITY_DEVICE_VERDICT: ${GOOGLE_PLAY_INTEGRITY_DEVICE_VERDICT:-MEETS_DEVICE_INTEGRITY}
+      # Solana Store (Seeker) artifact allowlist: fail-closed while unset, so the
+      # Solana native-auth arm and Seeker claim/spin stay off until configured.
+      SEEKER_SOLANA_INTEGRITY_PACKAGE_NAME: ${SEEKER_SOLANA_INTEGRITY_PACKAGE_NAME:-}
+      SEEKER_SOLANA_INTEGRITY_CERT_DIGESTS: ${SEEKER_SOLANA_INTEGRITY_CERT_DIGESTS:-}
+      SEEKER_SOLANA_INTEGRITY_DEVICE_VERDICT: ${SEEKER_SOLANA_INTEGRITY_DEVICE_VERDICT:-MEETS_DEVICE_INTEGRITY}
       APPLE_TEAM_ID: ${APPLE_TEAM_ID:-}
       APPLE_BUNDLE_ID: ${APPLE_BUNDLE_ID:-com.worldofclaudecraft}
       APPLE_DEVICECHECK_KEY_ID: ${APPLE_DEVICECHECK_KEY_ID:-}
@@ -109,6 +118,11 @@ services:
       # Runtime: the game server uses the bot token to auto-join a linking player to
       # the official guild (guilds.join). Empty disables auto-join (verify-only).
       DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
+      # Runtime: the /api/discord status cache levers (server/discord_status_cache.ts;
+      # operator rows in DEPLOY.md). Empty, non-numeric, or non-positive reads as the
+      # in-code default (15000 ms TTL, 2000 entries), so an unset key is always safe.
+      DISCORD_STATUS_CACHE_TTL_MS: ${DISCORD_STATUS_CACHE_TTL_MS:-}
+      DISCORD_STATUS_CACHE_MAX_ENTRIES: ${DISCORD_STATUS_CACHE_MAX_ENTRIES:-}
       # Runtime: GitHub OAuth for the in-game developer badge. Both id+secret must be
       # set to enable "Link GitHub"; empty hides it exactly like Discord. GITHUB_REPO
       # selects which repo's contributor stats back the badge (code default:
@@ -233,7 +247,86 @@ services:
       DISCORD_ACTIVITY_CHANNEL_ID: ${DISCORD_ACTIVITY_CHANNEL_ID:-}
       DISCORD_DAILY_REWARDS_CHANNEL_ID: ${DISCORD_DAILY_REWARDS_CHANNEL_ID:-}
       DISCORD_SYNC_NICKNAMES: ${DISCORD_SYNC_NICKNAMES:-1}
+      # Runtime: every tuning knob the bot reads, so an operator can turn the
+      # incident levers DEPLOY.md documents (the request ceiling, the ban pause,
+      # the breaker limit, the forbidden-channel TTL, and the sweep and outbox
+      # cadences) without editing and rebuilding the image. The bot code already
+      # read all of these; compose forwarded none of them, so on the host every
+      # documented lever was inert and the only way to change one was a rebuild.
+      # Empty when unset is safe by design: the bot's positiveNumberFromEnv
+      # rejects '' and falls back to its built-in default, exactly as if the key
+      # were absent. Repeating the code defaults as compose defaults was rejected
+      # for the opposite reason: it would put the same numbers in two places and
+      # let them drift with nothing to notice.
+      DISCORD_MAX_RPS: ${DISCORD_MAX_RPS:-}
+      DISCORD_BAN_PAUSE_MS: ${DISCORD_BAN_PAUSE_MS:-}
+      DISCORD_BREAKER_LIMIT: ${DISCORD_BREAKER_LIMIT:-}
+      DISCORD_FORBIDDEN_TTL_MS: ${DISCORD_FORBIDDEN_TTL_MS:-}
+      DISCORD_ROLE_SYNC_INTERVAL_MS: ${DISCORD_ROLE_SYNC_INTERVAL_MS:-}
+      DISCORD_PRESENCE_DEBOUNCE_MS: ${DISCORD_PRESENCE_DEBOUNCE_MS:-}
+      DISCORD_SWEEP_SLICE_MS: ${DISCORD_SWEEP_SLICE_MS:-}
+      DISCORD_SWEEP_SLICE_SIZE: ${DISCORD_SWEEP_SLICE_SIZE:-}
+      DISCORD_OUTBOX_POLL_MS: ${DISCORD_OUTBOX_POLL_MS:-}
+      DISCORD_OUTBOX_IDLE_MS: ${DISCORD_OUTBOX_IDLE_MS:-}
+      DISCORD_OUTBOX_TIMEOUT_MS: ${DISCORD_OUTBOX_TIMEOUT_MS:-}
+      # Runtime: the liveness heartbeat. The first two are read by the bot (where
+      # it stamps the file, and how often); the third is read ONLY by the
+      # healthcheck one-liner below, which decides how old a stamp may be before
+      # the container is called unhealthy. Keeping the staleness knob out of the
+      # bot is deliberate: the writer must not be able to widen the window the
+      # prober judges it by.
+      DISCORD_HEARTBEAT_FILE: ${DISCORD_HEARTBEAT_FILE:-}
+      DISCORD_HEARTBEAT_INTERVAL_MS: ${DISCORD_HEARTBEAT_INTERVAL_MS:-}
+      DISCORD_HEARTBEAT_STALE_MS: ${DISCORD_HEARTBEAT_STALE_MS:-}
     command: ["node", "dist-bot/bot.cjs"]
+    # Exec form with a node one-liner for the same reason the game service uses one
+    # (node:26-slim ships neither curl nor wget), but it cannot reuse the game's
+    # probe shape: the bot serves no HTTP port, so there is no /livez to hit. It
+    # tests the FRESHNESS of the heartbeat file instead. Freshness, not existence:
+    # a file that exists proves the process started once, while an mtime inside the
+    # window proves the scheduler loop is still turning, which is the failure that
+    # actually happens (a live process whose loops have stalled). Missing,
+    # un-stat-able (a denied path), and stale all exit nonzero, hence the try/catch
+    # around statSync. A chmod-000 heartbeat FILE still stats fine (stat needs no
+    # read permission) and reads healthy while fresh, which is correct: mtime is the
+    # only evidence the probe needs, and a file the bot cannot WRITE stops advancing
+    # and goes stale within one window anyway.
+    # The s>0?s:90000 guard is deliberate: compose passes '' for an unset host key
+    # and Number('') is 0, a garbage value is NaN, and a negative would make the
+    # comparison unsatisfiable (permanently unhealthy); none of the three is > 0,
+    # so all fall back to the default, matching the bot's own positiveNumberFromEnv.
+    # The path is trimmed because bot/config.ts trims it: without the matching trim
+    # a padded override would send the write and the stat to two different names.
+    # start_period covers the first jittered write, which can land up to about 33s
+    # after boot. Note what this does NOT do: a red healthcheck never restarts the
+    # container, because `restart: unless-stopped` acts on process exit only. It is
+    # the operator signal DEPLOY.md documents, and the reason the probe is worth
+    # having even so.
+    healthcheck:
+      test: ["CMD", "node", "-e", "const fs=require('fs');const p=(process.env.DISCORD_HEARTBEAT_FILE||'').trim()||'/tmp/discord-bot-heartbeat';const s=Number(process.env.DISCORD_HEARTBEAT_STALE_MS);const stale=s>0?s:90000;try{process.exit(Date.now()-fs.statSync(p).mtimeMs<stale?0:1)}catch{process.exit(1)}"]
+      interval: 15s
+      timeout: 5s
+      retries: 4
+      start_period: 60s
+    # Time docker allows between SIGTERM and SIGKILL. Far shorter than the game's 75s
+    # because the bot has no save or drain obligations: nothing durable lives in this
+    # process, and it installs no SIGTERM handler, so node's default disposition ends
+    # it immediately and the grace window is rarely consumed at all. Any positive
+    # value is therefore enough; safety comes from the outbox living server-side and
+    # redelivering anything unacked on the next poll, not from covering an in-flight
+    # call (a Discord call can ride DISCORD_CALL_TIMEOUT_MS for 15s on its own).
+    stop_grace_period: 15s
+    # Container memory ceiling. A relay bot's working set is tens of MiB, so 512m is
+    # generous headroom rather than a tight fit; the ceiling exists for the neighbours,
+    # not for this process. Without one, a leak in the bot can grow until it starves the
+    # game and the database sharing the host, turning a cosmetic bot bug into a realm
+    # outage. With one, the bot is the only thing that dies.
+    mem_limit: 512m
+    # Pin swap to the memory limit. Left unset, docker allows total memory plus swap up
+    # to twice mem_limit, so on a host with swap a leaking bot would thrash half a gig of
+    # host swap (slowing every other container on the box) before anything killed it.
+    # Equal values mean it takes a clean in-container OOM kill instead.
+    memswap_limit: 512m
 
   mediawiki-db:
     image: mariadb:11

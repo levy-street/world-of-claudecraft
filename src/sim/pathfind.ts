@@ -277,8 +277,9 @@ function playerDestinationWalkable(
   seed: number,
   p: { x: number; z: number },
   swim: boolean,
+  riftToken = 0,
 ): boolean {
-  if (isBlocked(seed, p.x, p.z, PLAYER_BODY_RADIUS)) return false;
+  if (isBlocked(seed, p.x, p.z, PLAYER_BODY_RADIUS, false, undefined, riftToken)) return false;
   // Swimmers can stop on the water; walkers can't, so deep water inside a
   // declared lake is rejected and the caller snaps to the nearest shore.
   return swim || groundHeight(p.x, p.z, seed) >= waterLevelAt(p.x, p.z) - PLAYER_SWIM_DEPTH;
@@ -288,9 +289,19 @@ export function resolvePlayerDestination(
   seed: number,
   target: { x: number; z: number },
   swim = false,
+  riftToken = 0,
 ): { x: number; z: number } {
-  const pushed = resolvePosition(seed, target.x, target.z, PLAYER_BODY_RADIUS);
-  if (playerDestinationWalkable(seed, pushed, swim)) return pushed;
+  const pushed = resolvePosition(
+    seed,
+    target.x,
+    target.z,
+    PLAYER_BODY_RADIUS,
+    false,
+    undefined,
+    undefined,
+    riftToken,
+  );
+  if (playerDestinationWalkable(seed, pushed, swim, riftToken)) return pushed;
 
   let best: { x: number; z: number } | null = null;
   let bestD2 = Infinity;
@@ -304,8 +315,17 @@ export function resolvePlayerDestination(
         x: target.x + Math.sin(a) * radius,
         z: target.z + Math.cos(a) * radius,
       };
-      const p = resolvePosition(seed, raw.x, raw.z, PLAYER_BODY_RADIUS);
-      if (!playerDestinationWalkable(seed, p, swim)) continue;
+      const p = resolvePosition(
+        seed,
+        raw.x,
+        raw.z,
+        PLAYER_BODY_RADIUS,
+        false,
+        undefined,
+        undefined,
+        riftToken,
+      );
+      if (!playerDestinationWalkable(seed, p, swim, riftToken)) continue;
       const dx = p.x - target.x,
         dz = p.z - target.z;
       const d2 = dx * dx + dz * dz;

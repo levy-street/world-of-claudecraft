@@ -41,25 +41,31 @@ Ada tempat untuk semua orang di sini:
 
 ## Memulai
 
-Kamu memerlukan [Node.js 26](https://nodejs.org/) dan npm, versi yang dipakai CI
-dan image produksi. Major yang lebih lama tidak diuji. Untuk server multiplayer
-kamu juga akan membutuhkan [Docker](https://www.docker.com/) untuk menjalankan
-Postgres.
+Kamu memerlukan [Node.js 26](https://nodejs.org/) dan **pnpm 10.34.x** (pin tepat ada di `package.json` pada `packageManager`, saat ini `pnpm@10.34.5`). Major Node yang lebih lama belum diuji. Untuk server multipemain, kamu juga ingin [Docker](https://www.docker.com/) untuk menjalankan Postgres.
+
+**Corepack tidak wajib.** Pasang pnpm sekali dengan npm yang ikut Node. Jalur yang sama berlaku di macOS, Linux, dan Windows.
 
 ```bash
 # 1. Fork the repo on GitHub, then clone your fork
 git clone https://github.com/<your-username>/world-of-claudecraft.git
 cd world-of-claudecraft
 
-# 2. Install dependencies
-npm ci
+# 2. Install pnpm once (same command on macOS, Linux, Windows)
+#    Match the packageManager pin in package.json (today: 10.34.5).
+npm install -g pnpm@10.34.5
+pnpm --version   # should print 10.34.5 (or the pin in package.json)
 
-# 3. Point git at the repository hooks (once per clone)
+# 3. Install dependencies (uses the global content-addressable store)
+pnpm install --frozen-lockfile
+
+# 4. Point git at the repository hooks (once per clone)
 git config core.hooksPath .githooks
 
-# 4. Run the offline client (no server or database needed)
-npm run dev          # open the URL it prints (usually http://localhost:5173)
+# 5. Run the offline client (no server or database needed)
+pnpm run dev         # open the URL it prints (usually http://localhost:5173)
 ```
+
+`npm run <script>` tetap berfungsi setelah instalasi pnpm (Node menyertakan npm), tetapi **instalasi dan pembaruan lockfile harus lewat pnpm**. Jangan commit `package-lock.json`; satu-satunya sumber kebenaran adalah `pnpm-lock.yaml`.
 
 Itu sudah cukup untuk memainkan dunia offline dan mengerjakan sebagian besar hal.
 Untuk menjalankan stack online secara penuh, kamu perlu password database di
@@ -68,13 +74,13 @@ environment-mu terlebih dahulu:
 ```bash
 cp .env.example .env
 # set POSTGRES_PASSWORD and point DATABASE_URL at the same password
-npm run db:up        # start Postgres 16 in Docker (dev DB on port 5433)
-npm run server       # build and run the authoritative game server on :8787
-npm run dev          # in another terminal; the client proxies to the server
+pnpm run db:up       # start Postgres 16 in Docker (dev DB on port 5433)
+pnpm run server      # build and run the authoritative game server on :8787
+pnpm run dev         # in another terminal; the client proxies to the server
 ```
 
 Jika kamu berencana menjalankan gate lengkap di bawah, pasang sekali browser yang
-dijalankannya: `npx playwright install chromium`.
+dijalankannya: `pnpm exec playwright install chromium`.
 
 [README](README.id_ID.md) memuat panduan host, kembangkan, dan main secara
 lengkap, dan berkas-berkas `CLAUDE.md` di seluruh repo mendokumentasikan konvensi
@@ -105,13 +111,7 @@ beberapa detik, bukan puluhan detik. Instalasinya memakai alias ganda resmi: pak
   `--singleThreaded` mematikan seluruh paralelisme. Memeriksa satu berkas secara
   ad hoc (`npx tsc somefile.ts`) akan error ketika direktorinya punya
   `tsconfig.json`; berikan `--ignoreConfig` untuk perilaku lama.
-- **Lockfile.** Hasilkan ulang `package-lock.json` hanya dengan
-  `npx npm@10 install --package-lock-only`: berkas itu memakai semantik npm 10,
-  dan major npm yang lebih baru (termasuk npm 11 yang dibundel Node 26 milik CI)
-  diam-diam membuang entri optional-peer bersarang milik `svelte-check`, yang
-  membuat `npm ci` di CI tidak sinkron. `npm ci` biasa aman di major npm mana pun.
-  Setelah menghasilkan ulang, pastikan `npm ci --dry-run` sudah sinkron baik di
-  npm 10 maupun di npm workstation-mu.
+- **Lockfile.** Lockfile-nya adalah `pnpm-lock.yaml` (pnpm 10 / lockfileVersion 9). Perbarui hanya dengan `pnpm install`, `pnpm add`, atau `pnpm update` dari root repo ini (jangan diedit manual). Commit `pnpm-lock.yaml` bersama perubahan `package.json`. CI memasang dengan `pnpm install --frozen-lockfile`; lockfile basi gagal tertutup. Jangan memperkenalkan lockfile kedua (`package-lock.json` / yarn.lock): dual lockfile menyimpang diam-diam dan dilarang. Kebisingan peer dependency dari pohon wallet/solana opsional ditoleransi lewat `.npmrc` (`strict-peer-dependencies=false`); jangan longgarkan lebih jauh tanpa mengukur.
 - **Kapan meninjau ulang.** Satukan kembali alias ganda menjadi satu dependensi
   `typescript` begitu KEDUANYA terpenuhi: API JS stabil TypeScript 7.1 sudah
   dirilis (TypeScript 7.0 tidak menyertakan API JS sama sekali; penggantinya
@@ -166,7 +166,7 @@ Ini adalah aturan inti yang menopang basis kode. Detail lengkapnya ada di
   (`src/world_api/`) dan diimplementasikan di dunia offline maupun online; sebuah
   sistem simulasi baru berada di balik `SimContext`; sebuah endpoint REST baru
   adalah modul route yang bisa kamu buat kerangkanya dengan
-  `npm run new:endpoint`.
+  `pnpm run new:endpoint`.
 - **Jangan menyunting berkas yang dihasilkan secara manual** seperti
   `*.generated.ts`. Hasilkan ulang melalui proses build.
 - **Gaya penulisan rumah: tanpa em dash, en dash, atau emoji** di mana pun, baik
@@ -183,7 +183,7 @@ Pemformatan memakai [Biome](https://biomejs.dev/), yang dikonfigurasi di
 `biome.json`: indentasi 2 spasi, baris 100 kolom, kutip tunggal, koma di akhir.
 Format hanya berkas yang kamu sentuh
 (`npx @biomejs/biome check --write <your-file.ts>`) dan periksa dengan
-`npm run ci:changed`. CI hanya menilai berkas yang berubah, jadi mohon jangan
+`pnpm run ci:changed`. CI hanya menilai berkas yang berubah, jadi mohon jangan
 memformat ulang seluruh pohon repo: menjalankannya untuk repo penuh akan memunculkan
 utang lama yang bukan tugasmu untuk membereskannya.
 
@@ -193,13 +193,13 @@ Jalankan gate repo secara lokal. Itu adalah kontrak yang sama dengan yang
 ditegakkan CI:
 
 ```bash
-npm run gate
+pnpm run gate
 ```
 
 Saat sedang beriterasi, jalankan satu suite saja
-(`npx vitest run tests/sim.test.ts`) dan `npm run ci:changed` untuk pemformatan;
-`npm test` menjalankan semuanya, dan peta suite-nya ada di `tests/CLAUDE.md`.
-`npm run gate` yang lengkap mencakup kesegaran artefak yang dihasilkan, pemindaian
+(`npx vitest run tests/sim.test.ts`) dan `pnpm run ci:changed` untuk pemformatan;
+`pnpm test` menjalankan semuanya, dan peta suite-nya ada di `tests/CLAUDE.md`.
+`pnpm run gate` yang lengkap mencakup kesegaran artefak yang dihasilkan, pemindaian
 malware, pemformatan pada berkas yang berubah, pemeriksaan konformitas efek suara,
 seluruh suite tes, satu putaran regresi di browser sungguhan, typecheck ketat,
 serta build klien, server, dan headless. Pemeriksaan berlapis, mulai dari lantai
@@ -224,13 +224,13 @@ melalui sebuah daftar periksa singkat. Mohon isi:
 - Tautkan isu terkait apa pun (misalnya, "Closes #123").
 - Tambahkan **tangkapan layar atau klip untuk perubahan UI**, di desktop dan
   mobile.
-- Konfirmasi bahwa `npm run gate` lulus dan string baru yang dilihat pemain
+- Konfirmasi bahwa `pnpm run gate` lulus dan string baru yang dilihat pemain
   mengikuti kebijakan kontributor English-first di bawah.
 
 Di PR-mu, CI menjalankan pemformatan dan lint pada berkas yang kamu ubah, seluruh
 suite tes di empat shard paralel, satu putaran regresi browser, serta typecheck
 ditambah build klien, server, dan headless. Itu sama dengan yang dijalankan
-`npm run gate` secara lokal, jadi gate yang hijau adalah pertanda baik bahwa PR-mu
+`pnpm run gate` secara lokal, jadi gate yang hijau adalah pertanda baik bahwa PR-mu
 juga akan hijau.
 
 CI yang hijau dan daftar periksa yang lengkap adalah yang kami cari sebelum
@@ -270,7 +270,7 @@ menambahkan sumber bahasa Inggrisnya.
   `server/`, yang tetap agnostik terhadap bahasa, harus dilokalisasi ulang di batas
   klien dalam perubahan yang sama. Tes penjaga
   `npx vitest run tests/localization_fixes.test.ts` menegakkan hal ini.
-- Setelah menambahkan atau mengubah string apa pun, jalankan `npm run i18n:gen` dan
+- Setelah menambahkan atau mengubah string apa pun, jalankan `pnpm run i18n:gen` dan
   commit bundle yang dihasilkan ulang dalam perubahan yang sama. Gate dan CI
   sama-sama membandingkan artefak yang di-commit dengan hasil regenerasi baru, jadi
   bundle yang basi akan menggagalkan build.
@@ -294,7 +294,7 @@ baru? Kamu tidak perlu menulis kode game apa pun untuk melakukannya:
    `src/ui/server_i18n.ts`, teks talent di modul `talent_i18n`, dan dashboard admin
    punya kumpulannya sendiri di bawah `src/admin/i18n.locales/`.
 2. Tingkatkan terjemahan yang ada, atau lengkapi yang terbaca janggal.
-3. Jalankan `npm run i18n:gen`, commit bundle yang dihasilkan ulang bersama
+3. Jalankan `pnpm run i18n:gen`, commit bundle yang dihasilkan ulang bersama
    suntingan overlay-mu, lalu jalankan suite lokalisasi
    (`npx vitest run tests/i18n_completeness.test.ts tests/localization_coverage.test.ts`)
    dan buka sebuah PR. Pemeriksaan tipe saja tidak akan memberi tahu apakah ada

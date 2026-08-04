@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { ClientWorld } from '../src/net/online';
 import {
   DEFAULT_NET_INTERVAL_MS,
   facingAlpha,
   POS_EXTRAPOLATION_CAP,
   remoteEntityAlpha,
 } from '../src/render/net_interp_core';
+import { bareClient } from './helpers/bare_client';
 
 // Regression for the "immobile characters strobe" report (prod capture,
 // flicker-events.json): an idle mob's only record in minutes is a wander
@@ -49,48 +49,6 @@ describe('facingAlpha', () => {
     expect(facingAlpha(1.25)).toBe(1);
   });
 });
-
-// A ClientWorld without the WebSocket plumbing, to drive applySnapshot directly
-// (the snapshots.test.ts idiom).
-function bareClient(pid: number): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass: 'warrior' };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.ownPlayerId = pid;
-  c.ownPlayerClass = 'warrior';
-  c.spectating = null;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  c.spectateFacingPending = false;
-  c.pendingSpectateFacing = null;
-  return c;
-}
 
 // Phase 06 companion pin (packet-0-instruments R11): remote-entity continuity
 // across a 400 ms broadcast gap. While records are missing, the renderer

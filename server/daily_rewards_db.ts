@@ -89,6 +89,17 @@ export type DailyRewardPayoutModerationResult =
   | { outcome: 'not_found' }
   | { outcome: 'invalid_status'; status: string };
 
+/**
+ * markPayout's answer, split so the caller can tell a real write from an
+ * idempotent replay: 'updated' stamped the row, 'already' matched an
+ * already-paid row with the same signature and wrote NOTHING (the payout
+ * runner re-posting a paid mark after a dropped response), 'missing' matched
+ * nothing at all. The split exists because the winners-cache bust must ride
+ * real writes only; busting on every replay would evict a healthy snapshot
+ * exactly when the runner is retrying (Phase 5 QA, fresh-eyes round).
+ */
+export type DailyRewardPayoutMarkOutcome = 'updated' | 'already' | 'missing';
+
 export type DailyRewardPayoutClaimResult =
   | { outcome: 'claimed' | 'existing'; payout: DailyRewardInternalPayoutRow }
   | { outcome: 'not_found' }
@@ -163,7 +174,7 @@ export interface DailyRewardDb {
     status: string,
     txSignature: string | null,
     error: string | null,
-  ): Promise<boolean>;
+  ): Promise<DailyRewardPayoutMarkOutcome>;
   claimPayout(
     day: string,
     rank: number,
@@ -860,7 +871,7 @@ export class PgDailyRewardDb implements DailyRewardDb {
     status: string,
     txSignature: string | null,
     error: string | null,
-  ): Promise<boolean> {
+  ): Promise<DailyRewardPayoutMarkOutcome> {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
@@ -877,8 +888,8 @@ export class PgDailyRewardDb implements DailyRewardDb {
             )`,
         [day, REALM, rank, status, txSignature, error],
       );
-      let updated = (res.rowCount ?? 0) === 1;
-      if (!updated && status === 'paid' && txSignature) {
+      let outcome: DailyRewardPayoutMarkOutcome = (res.rowCount ?? 0) === 1 ? 'updated' : 'missing';
+      if (outcome === 'missing' && status === 'paid' && txSignature) {
         const existing = await client.query(
           `SELECT 1
              FROM daily_reward_payouts
@@ -886,7 +897,7 @@ export class PgDailyRewardDb implements DailyRewardDb {
               AND status = 'paid' AND tx_signature = $4`,
           [day, REALM, rank, txSignature],
         );
-        updated = (existing.rowCount ?? 0) === 1;
+        if ((existing.rowCount ?? 0) === 1) outcome = 'already';
       }
       if ((res.rowCount ?? 0) === 1 && txSignature) {
         await client.query(
@@ -898,7 +909,7 @@ export class PgDailyRewardDb implements DailyRewardDb {
         );
       }
       await client.query('COMMIT');
-      return updated;
+      return outcome;
     } catch (err) {
       await client.query('ROLLBACK').catch(() => undefined);
       throw err;

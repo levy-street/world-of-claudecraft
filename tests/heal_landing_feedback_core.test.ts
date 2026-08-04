@@ -22,6 +22,9 @@ function heal2(overrides: Partial<Heal2Event>): Heal2Event {
   };
 }
 
+// Kept bespoke on purpose (issue #2088): only eventQueue is needed here,
+// unlike the shared tests/helpers/bare_client.ts bareClient(), which sets
+// every declared field.
 function onlineDrain(events: SimEvent[]): SimEvent[] {
   const client = Object.create(ClientWorld.prototype) as {
     eventQueue: SimEvent[];

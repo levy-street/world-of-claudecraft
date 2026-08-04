@@ -60,6 +60,26 @@ describe('deploy and CI Node version pin', () => {
     expect(dockerfile.split(`FROM ${TARGET_TAG}`)).toHaveLength(3);
   });
 
+  // Full pnpm migration: the game-server image must not reintroduce package-lock.json
+  // or npm ci. Pin packageManager version + frozen install so a copy-paste npm
+  // Dockerfile cannot ship while CI and local stay on pnpm-lock.yaml.
+  it('installs build deps with pnpm frozen-lockfile matching packageManager', () => {
+    const pkg = JSON.parse(readFileSync('package.json', 'utf8')) as {
+      packageManager?: string;
+    };
+    const field = pkg.packageManager ?? '';
+    const match = field.match(/^pnpm@(\d+\.\d+\.\d+)$/);
+    expect(match).not.toBeNull();
+    const pnpmVer = match?.[1] ?? '';
+    expect(pnpmVer).toMatch(/^\d+\.\d+\.\d+$/);
+    expect(dockerfile).toContain(`pnpm@${pnpmVer}`);
+    expect(dockerfile).toContain('pnpm-lock.yaml');
+    expect(dockerfile).toContain('.npmrc');
+    expect(dockerfile).toContain('pnpm install --frozen-lockfile');
+    expect(dockerfile).not.toContain('package-lock.json');
+    expect(dockerfile).not.toContain('npm ci');
+  });
+
   // Every actions/setup-node step in the main CI workflow must be on TARGET_MAJOR.
   // desktop-publish.yml is deliberately NOT read here: the Steam/Electron publish
   // path is intentionally held on Node 22, so folding it in would wrongly red this

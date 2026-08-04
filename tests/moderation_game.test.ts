@@ -846,3 +846,101 @@ describe('moderator spectate integration', () => {
     expect(restoredSnap.self.tal?.alloc).toEqual(moderatorMeta.talents);
   });
 });
+
+describe('server-side teleports end a live profession session', () => {
+  it('/jail cancels a running fishing session at the teleport', async () => {
+    const server = new GameServer();
+    const moderatorWs = fakeWs();
+    const targetWs = fakeWs();
+    const moderator = joined(
+      server.join(moderatorWs, 70, 170, 'Moderator', 'warrior', null, false, {
+        isAdmin: true,
+        adminPermissions: MOD_PERMS,
+      }),
+    );
+    const target = joined(server.join(targetWs, 71, 171, 'Angler', 'rogue', null));
+    // A live session by direct assignment (the parity-drive precedent): the
+    // point under test is the jail teleport's teardown, not the cast start.
+    const angler = entity(server, target.pid);
+    angler.castingAbility = 'fishing';
+    angler.castTotal = 15;
+    angler.castRemaining = 15;
+    angler.fishBiteAtTick = server.sim.tickCount + 100;
+    angler.fishCastZoneId = 'eastbrook_vale';
+
+    command(server, moderator, '/jail "Angler" 5 fishing in court');
+
+    await vi.waitFor(() => expect(isInJailCage(entity(server, target.pid).pos)).toBe(true));
+    expect(angler.castingAbility).toBeNull();
+    expect(angler.fishBiteAtTick).toBe(0);
+    expect(angler.fishReelDeadlineTick).toBe(0);
+    expect(angler.fishCastZoneId).toBe('');
+  });
+
+  function assignSession(server: GameServer, pid: number) {
+    const e = entity(server, pid);
+    e.castingAbility = 'fishing';
+    e.castTotal = 15;
+    e.castRemaining = 15;
+    e.fishBiteAtTick = server.sim.tickCount + 100;
+    e.fishCastZoneId = 'eastbrook_vale';
+    return e;
+  }
+
+  function expectEnded(e: ReturnType<typeof assignSession>) {
+    expect(e.castingAbility).toBeNull();
+    expect(e.fishBiteAtTick).toBe(0);
+    expect(e.fishReelDeadlineTick).toBe(0);
+    expect(e.fishCastZoneId).toBe('');
+  }
+
+  it('spectate entry and exit both cancel the moderator own session', async () => {
+    // The moderator is the displaced entity here: /spectate teleports THEM to
+    // limbo and /unspectate teleports them back, so a session of their own
+    // must end at both moves.
+    const server = new GameServer();
+    const moderatorWs = fakeWs();
+    const targetWs = fakeWs();
+    const moderator = joined(
+      server.join(moderatorWs, 72, 172, 'Watcher', 'warrior', null, false, {
+        isAdmin: true,
+        adminPermissions: MOD_PERMS,
+      }),
+    );
+    joined(server.join(targetWs, 73, 173, 'Suspect', 'rogue', null));
+
+    const modEntity = assignSession(server, moderator.pid);
+    command(server, moderator, '/spectate "Suspect"');
+    await vi.waitFor(() =>
+      expect(frames(moderatorWs)).toContainEqual({ t: 'spectate', name: 'Suspect' }),
+    );
+    expectEnded(modEntity);
+
+    assignSession(server, moderator.pid);
+    command(server, moderator, '/unspectate');
+    await vi.waitFor(() =>
+      expect(frames(moderatorWs)).toContainEqual({ t: 'spectate', name: null }),
+    );
+    expectEnded(modEntity);
+  });
+
+  it('the dev_teleport wire arm cancels a session (dev only)', () => {
+    const saved = process.env.ALLOW_DEV_COMMANDS;
+    process.env.ALLOW_DEV_COMMANDS = '1';
+    try {
+      const server = new GameServer();
+      const ws = fakeWs();
+      const session = joined(server.join(ws, 74, 174, 'Tester', 'warrior', null));
+      const e = assignSession(server, session.pid);
+      server.handleMessage(
+        session,
+        JSON.stringify({ t: 'cmd', cmd: 'dev_teleport', x: 50, z: 50 }),
+      );
+      expectEnded(e);
+      expect(e.pos.x).toBeCloseTo(50, 1);
+    } finally {
+      if (saved === undefined) delete process.env.ALLOW_DEV_COMMANDS;
+      else process.env.ALLOW_DEV_COMMANDS = saved;
+    }
+  });
+});

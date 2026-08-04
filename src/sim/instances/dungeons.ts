@@ -25,6 +25,7 @@ import {
   takeCombatExit,
 } from '../instance_exit_memory';
 import { retargetMob } from '../mob/targeting';
+import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import type { InstanceSlot, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { arenaQueueLeave } from '../social/arena';
@@ -408,6 +409,8 @@ export function enterDungeon(
   }
   const origin = instanceOriginOf(inst);
   const p = r.e;
+  // A live gather/fishing session never survives the door (R28 family).
+  cancelProfessionSessionOnDisplacement(ctx, p);
   p.pos = ctx.groundPos(origin.x + dungeon.entry.x, origin.z + dungeon.entry.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
@@ -539,6 +542,7 @@ export function leaveDungeon(ctx: SimContext, pid?: number): boolean {
   // Re-entering means earning aggro from scratch.
   const inst = ctx.instances.find((i) => i.partyKey !== null && instanceClaimContains(i, p.pos));
   if (inst) scrubInstanceThreat(ctx, inst, p.id);
+  cancelProfessionSessionOnDisplacement(ctx, p);
   p.pos = ctx.groundPos(dungeon.doorPos.x, dungeon.doorPos.z - 4);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
