@@ -315,6 +315,12 @@ describe('main.ts wiring', () => {
     expect(body).toContain("arenaLeaderboardCache['2v2'] = null");
     expect(body).toContain('deedsBoardCache = null');
     expect(body).toContain('bustDailyRewardBoardCache()');
+    // Not a board, but on the same hook and for the same reason: the
+    // daily-reward ban and IP-ban writes fire this hook and feed the
+    // daily_reward_excluded_accounts view that the Discord winner-announcement
+    // read filters its payouts through, so an exclusion must evict that snapshot
+    // too (a warm one would keep a just-banned winner announceable for a TTL).
+    expect(body).toContain('bustDailyRewardWinnersCache()');
   });
 
   it('registers exactly one moderation hook (the composite bust covers every board)', () => {

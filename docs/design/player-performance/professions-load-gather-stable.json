@@ -1,0 +1,1156 @@
+{
+  "base": "http://127.0.0.1:8799",
+  "runId": "etrap",
+  "gitHead": "f881426ba14d815151744c266b5d75805801e672",
+  "startIso": "2026-07-31T04:34:13.358Z",
+  "bots": 1000,
+  "aliveAtEnd": 1000,
+  "mode": "gather",
+  "stable": true,
+  "durationMs": 180000,
+  "warmupMs": 45000,
+  "connectConcurrency": 20,
+  "botLevel": 60,
+  "tourSec": 6,
+  "nodesPerBot": 40,
+  "stepMs": 250,
+  "fishSpots": 0,
+  "fishSpotRotations": 0,
+  "observersRequested": 32,
+  "observerCount": 32,
+  "fleet": {
+    "rxBytesPerSecondPerBot": 12397,
+    "rxFramesPerSecondPerBot": 2.9
+  },
+  "roles": {
+    "gather": {
+      "observers": 32,
+      "snapshots": 8992,
+      "snapBytes": {
+        "count": 8992,
+        "mean": 7232.7,
+        "p50": 4759,
+        "p95": 19934,
+        "p99": 44152,
+        "max": 60537
+      },
+      "gapP95Median": 693.9,
+      "gapMaxWorst": 795.2,
+      "ncd": {
+        "presenceRatio": 0.0757,
+        "bytesPerSnapshot": 37.2,
+        "bytesWhenPresent": 491
+      },
+      "tslot": {
+        "presenceRatio": 0,
+        "bytesPerSnapshot": 0,
+        "bytesWhenPresent": 0
+      }
+    }
+  },
+  "rig": {
+    "loopLagMs": {
+      "count": 720,
+      "mean": 37.1,
+      "p50": 1.4,
+      "p95": 312.7,
+      "p99": 763.3,
+      "max": 1055.1
+    }
+  },
+  "serverPerfAtWindowOpen": {
+    "online": 1000,
+    "simEntities": 1824,
+    "tickHz": 15.41,
+    "samples": 1200,
+    "windowTicks": 1200,
+    "phases": {
+      "stale": {
+        "mean": 0.27,
+        "p50": 0.25,
+        "p95": 0.51,
+        "p99": 0.55,
+        "max": 0.87
+      },
+      "tick": {
+        "mean": 274.41,
+        "p50": 288.38,
+        "p95": 509.33,
+        "p99": 530.72,
+        "max": 551.14
+      },
+      "events": {
+        "mean": 3.01,
+        "p50": 0.85,
+        "p95": 12.09,
+        "p99": 53.93,
+        "max": 87
+      },
+      "antibot": {
+        "mean": 10.84,
+        "p50": 11.33,
+        "p95": 20.3,
+        "p99": 20.92,
+        "max": 24.67
+      },
+      "broadcast": {
+        "mean": 41.49,
+        "p50": 43.07,
+        "p95": 67.35,
+        "p99": 75.6,
+        "max": 97.92
+      },
+      "bcastGrid": {
+        "mean": 22.92,
+        "p50": 23.71,
+        "p95": 37.18,
+        "p99": 42.36,
+        "max": 54.33
+      },
+      "bcastSelf": {
+        "mean": 12.08,
+        "p50": 12.42,
+        "p95": 19.75,
+        "p99": 24.83,
+        "max": 35.43
+      },
+      "social": {
+        "mean": 0.01,
+        "p50": 0,
+        "p95": 0.04,
+        "p99": 0.05,
+        "max": 0.07
+      },
+      "sim.respawns": {
+        "mean": 0.01,
+        "p50": 0.01,
+        "p95": 0.01,
+        "p99": 0.02,
+        "max": 0.04
+      },
+      "sim.worldBosses": {
+        "mean": 0.02,
+        "p50": 0.02,
+        "p95": 0.04,
+        "p99": 0.06,
+        "max": 0.08
+      },
+      "sim.groundAoEs": {
+        "mean": 0.01,
+        "p50": 0.01,
+        "p95": 0.01,
+        "p99": 0.02,
+        "max": 0.2
+      },
+      "sim.frozenOrbs": {
+        "mean": 0.01,
+        "p50": 0.01,
+        "p95": 0.01,
+        "p99": 0.01,
+        "max": 0.07
+      },
+      "sim.despawnDecay": {
+        "mean": 2.42,
+        "p50": 2.6,
+        "p95": 4.31,
+        "p99": 4.7,
+        "max": 6.1
+      },
+      "sim.projectiles": {
+        "mean": 0.01,
+        "p50": 0.01,
+        "p95": 0.02,
+        "p99": 0.02,
+        "max": 0.06
+      },
+      "sim.p.move": {
+        "mean": 220.96,
+        "p50": 232.4,
+        "p95": 412.25,
+        "p99": 428.79,
+        "max": 446.4
+      },
+      "sim.p.doors": {
+        "mean": 4.77,
+        "p50": 4.91,
+        "p95": 9.09,
+        "p99": 10.26,
+        "max": 10.95
+      },
+      "sim.p.casting": {
+        "mean": 1.21,
+        "p50": 1.08,
+        "p95": 3.98,
+        "p99": 6.29,
+        "max": 9.42
+      },
+      "sim.p.autoAtk": {
+        "mean": 1.2,
+        "p50": 1.26,
+        "p95": 2.24,
+        "p99": 2.45,
+        "max": 3.39
+      },
+      "sim.p.regen": {
+        "mean": 18.37,
+        "p50": 19.21,
+        "p95": 34.38,
+        "p99": 35.55,
+        "max": 37.56
+      },
+      "sim.p.auras": {
+        "mean": 2.67,
+        "p50": 2.79,
+        "p95": 5.05,
+        "p99": 5.32,
+        "max": 6.11
+      },
+      "sim.mob.update": {
+        "mean": 16.72,
+        "p50": 18.31,
+        "p95": 29.09,
+        "p99": 31.21,
+        "max": 32.57
+      },
+      "sim.mob.auras": {
+        "mean": 1.39,
+        "p50": 1.55,
+        "p95": 2.25,
+        "p99": 2.41,
+        "max": 3.09
+      },
+      "sim.ent.misc": {
+        "mean": 0.16,
+        "p50": 0.07,
+        "p95": 0.81,
+        "p99": 0.88,
+        "max": 0.95
+      },
+      "sim.engaged": {
+        "mean": 0.95,
+        "p50": 0.99,
+        "p95": 1.78,
+        "p99": 1.93,
+        "max": 2.87
+      },
+      "sim.duels": {
+        "mean": 0.02,
+        "p50": 0.02,
+        "p95": 0.03,
+        "p99": 0.03,
+        "max": 0.04
+      },
+      "sim.cardDuel": {
+        "mean": 0.01,
+        "p50": 0.01,
+        "p95": 0.02,
+        "p99": 0.02,
+        "max": 0.03
+      },
+      "sim.arena": {
+        "mean": 0.07,
+        "p50": 0.07,
+        "p95": 0.11,
+        "p99": 0.12,
+        "max": 0.32
+      },
+      "sim.trades": {
+        "mean": 0.02,
+        "p50": 0.02,
+        "p95": 0.04,
+        "p99": 0.04,
+        "max": 0.26
+      },
+      "sim.lootRolls": {
+        "mean": 0.01,
+        "p50": 0.01,
+        "p95": 0.01,
+        "p99": 0.01,
+        "max": 0.03
+      },
+      "sim.instances": {
+        "mean": 0.08,
+        "p50": 0.08,
+        "p95": 0.13,
+        "p99": 0.14,
+        "max": 0.25
+      },
+      "sim.delves": {
+        "mean": 0.01,
+        "p50": 0.02,
+        "p95": 0.02,
+        "p99": 0.02,
+        "max": 0.3
+      },
+      "sim.valecup": {
+        "mean": 1,
+        "p50": 0.67,
+        "p95": 2.5,
+        "p99": 2.72,
+        "max": 3.75
+      },
+      "sim.dfinder": {
+        "mean": 0,
+        "p50": 0,
+        "p95": 0.01,
+        "p99": 0.01,
+        "max": 0.02
+      },
+      "sim.market": {
+        "mean": 0,
+        "p50": 0,
+        "p95": 0.01,
+        "p99": 0.01,
+        "max": 0.02
+      },
+      "sim.postOffice": {
+        "mean": 0.35,
+        "p50": 0.02,
+        "p95": 1.22,
+        "p99": 1.44,
+        "max": 3.69
+      },
+      "sim.delayedEv": {
+        "mean": 0.01,
+        "p50": 0.01,
+        "p95": 0.01,
+        "p99": 0.01,
+        "max": 0.03
+      },
+      "sim.deeds": {
+        "mean": 0.2,
+        "p50": 0.07,
+        "p95": 0.6,
+        "p99": 1.74,
+        "max": 2.45
+      },
+      "sim.gridRefresh": {
+        "mean": 1.72,
+        "p50": 1.8,
+        "p95": 3.41,
+        "p99": 3.63,
+        "max": 4.41
+      },
+      "sim.mob.update|beast": {
+        "mean": 4.17,
+        "p50": 4.51,
+        "p95": 7.41,
+        "p99": 7.83,
+        "max": 10.63
+      },
+      "sim.mob.update|humanoid": {
+        "mean": 1.68,
+        "p50": 1.85,
+        "p95": 2.97,
+        "p99": 3.21,
+        "max": 3.75
+      },
+      "sim.mob.update|mudfin": {
+        "mean": 0.84,
+        "p50": 0.86,
+        "p95": 1.63,
+        "p99": 1.96,
+        "max": 4.15
+      },
+      "sim.mob.update|spider": {
+        "mean": 0.79,
+        "p50": 0.85,
+        "p95": 1.45,
+        "p99": 1.61,
+        "max": 1.77
+      },
+      "sim.mob.update|burrower": {
+        "mean": 1.23,
+        "p50": 1.2,
+        "p95": 2.45,
+        "p99": 3,
+        "max": 3.46
+      },
+      "sim.mob.update|undead": {
+        "mean": 1.95,
+        "p50": 1.97,
+        "p95": 3.57,
+        "p99": 4.21,
+        "max": 4.89
+      },
+      "sim.mob.update|troll": {
+        "mean": 0.39,
+        "p50": 0.39,
+        "p95": 0.76,
+        "p99": 0.87,
+        "max": 1.02
+      },
+      "sim.mob.update|ogre": {
+        "mean": 1.1,
+        "p50": 1.12,
+        "p95": 2.13,
+        "p99": 2.38,
+        "max": 2.98
+      },
+      "sim.mob.update|elemental": {
+        "mean": 2.22,
+        "p50": 2.43,
+        "p95": 4.2,
+        "p99": 4.62,
+        "max": 8.12
+      },
+      "sim.mob.update|dragonkin": {
+        "mean": 0.15,
+        "p50": 0.11,
+        "p95": 0.36,
+        "p99": 0.46,
+        "max": 0.75
+      },
+      "sim.mob.update|demon": {
+        "mean": 0.09,
+        "p50": 0.08,
+        "p95": 0.19,
+        "p99": 0.23,
+        "max": 0.89
+      },
+      "sim.mob.update|kobold": {
+        "mean": 1.69,
+        "p50": 1.84,
+        "p95": 3.15,
+        "p99": 3.49,
+        "max": 5.17
+      },
+      "sim.mob.update|murloc": {
+        "mean": 0.42,
+        "p50": 0.35,
+        "p95": 1.06,
+        "p99": 1.2,
+        "max": 1.41
+      },
+      "sim.mob.update|reptile": {
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "sim.mob.update|other": {
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "sim.mob.z:eastbrook_vale": {
+        "mean": 2.36,
+        "p50": 2.74,
+        "p95": 4.27,
+        "p99": 4.57,
+        "max": 7.26
+      },
+      "sim.mob.z:mirefen_marsh": {
+        "mean": 2.36,
+        "p50": 2.57,
+        "p95": 4.11,
+        "p99": 4.44,
+        "max": 6.69
+      },
+      "sim.mob.z:thornpeak_heights": {
+        "mean": 4.09,
+        "p50": 4.38,
+        "p95": 8.28,
+        "p99": 9.28,
+        "max": 10.09
+      },
+      "sim.mob.z:veiled_hollow": {
+        "mean": 2.44,
+        "p50": 2.65,
+        "p95": 4.71,
+        "p99": 5.11,
+        "max": 8.52
+      },
+      "sim.mob.z:drakelands": {
+        "mean": 0.43,
+        "p50": 0.43,
+        "p95": 0.85,
+        "p99": 0.97,
+        "max": 1.11
+      },
+      "sim.mob.z:frostveil": {
+        "mean": 0.88,
+        "p50": 0.88,
+        "p95": 1.88,
+        "p99": 2.14,
+        "max": 2.65
+      },
+      "sim.mob.z:amberfall": {
+        "mean": 0.34,
+        "p50": 0.36,
+        "p95": 0.68,
+        "p99": 0.77,
+        "max": 0.91
+      },
+      "sim.mob.z:willowfen": {
+        "mean": 0.55,
+        "p50": 0.5,
+        "p95": 1.25,
+        "p99": 1.39,
+        "max": 3.85
+      },
+      "sim.mob.z:nightbloom": {
+        "mean": 0.53,
+        "p50": 0.55,
+        "p95": 1.04,
+        "p99": 1.17,
+        "max": 1.49
+      },
+      "sim.mob.z:wraithwood": {
+        "mean": 0.33,
+        "p50": 0.34,
+        "p95": 0.65,
+        "p99": 0.74,
+        "max": 0.94
+      },
+      "sim.mob.z:palmreach": {
+        "mean": 0.37,
+        "p50": 0.36,
+        "p95": 0.77,
+        "p99": 1.01,
+        "max": 1.26
+      },
+      "sim.mob.z:evergarden": {
+        "mean": 0.59,
+        "p50": 0.65,
+        "p95": 1.14,
+        "p99": 1.28,
+        "max": 1.42
+      },
+      "sim.mob.z:galecrest": {
+        "mean": 1.15,
+        "p50": 1.2,
+        "p95": 2.11,
+        "p99": 2.34,
+        "max": 2.83
+      },
+      "sim.mob.z:farshore_isle": {
+        "mean": 0.29,
+        "p50": 0.29,
+        "p95": 0.56,
+        "p99": 0.63,
+        "max": 1.19
+      },
+      "sim.mob.z:instance": {
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "sim.mob.z:other": {
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "total": {
+        "mean": 330.02,
+        "p50": 345.34,
+        "p95": 612.08,
+        "p99": 666.96,
+        "max": 720.06
+      }
+    }
+  },
+  "serverPerfMid": [
+    {
+      "atMs": 3997,
+      "online": 1000,
+      "tickHz": 15.38
+    },
+    {
+      "atMs": 14708,
+      "online": 1000,
+      "tickHz": 15.38
+    },
+    {
+      "atMs": 25096,
+      "online": 1000,
+      "tickHz": 15.72
+    },
+    {
+      "atMs": 35299,
+      "online": 1000,
+      "tickHz": 15.56
+    },
+    {
+      "atMs": 45705,
+      "online": 1000,
+      "tickHz": 15.54
+    },
+    {
+      "atMs": 56054,
+      "online": 1000,
+      "tickHz": 15.46
+    },
+    {
+      "atMs": 65744,
+      "online": 1000,
+      "tickHz": 15.6
+    },
+    {
+      "atMs": 76013,
+      "online": 1000,
+      "tickHz": 15.98
+    },
+    {
+      "atMs": 86306,
+      "online": 1000,
+      "tickHz": 15.71
+    },
+    {
+      "atMs": 96507,
+      "online": 1000,
+      "tickHz": 15.89
+    },
+    {
+      "atMs": 106183,
+      "online": 1000,
+      "tickHz": 15.7
+    },
+    {
+      "atMs": 116340,
+      "online": 1000,
+      "tickHz": 15.88
+    },
+    {
+      "atMs": 126629,
+      "online": 1000,
+      "tickHz": 15.8
+    },
+    {
+      "atMs": 136758,
+      "online": 1000,
+      "tickHz": 16.03
+    },
+    {
+      "atMs": 146936,
+      "online": 1000,
+      "tickHz": 15.8
+    },
+    {
+      "atMs": 157167,
+      "online": 1000,
+      "tickHz": 15.71
+    },
+    {
+      "atMs": 167422,
+      "online": 1000,
+      "tickHz": 16.03
+    },
+    {
+      "atMs": 177542,
+      "online": 1000,
+      "tickHz": 15.72
+    }
+  ],
+  "serverPerf": {
+    "online": 1000,
+    "simEntities": 1831,
+    "tickHz": 15.84,
+    "samples": 1200,
+    "windowTicks": 1200,
+    "phases": {
+      "stale": {
+        "mean": 0.32,
+        "p50": 0.29,
+        "p95": 0.52,
+        "p99": 0.55,
+        "max": 0.87
+      },
+      "tick": {
+        "mean": 388.07,
+        "p50": 463.89,
+        "p95": 526.32,
+        "p99": 537.66,
+        "max": 554.22
+      },
+      "events": {
+        "mean": 8.62,
+        "p50": 1.52,
+        "p95": 46.73,
+        "p99": 67.72,
+        "max": 91.9
+      },
+      "antibot": {
+        "mean": 15.3,
+        "p50": 18.43,
+        "p95": 20.7,
+        "p99": 21.05,
+        "max": 24.67
+      },
+      "broadcast": {
+        "mean": 53.1,
+        "p50": 54.21,
+        "p95": 72.55,
+        "p99": 79.36,
+        "max": 97.92
+      },
+      "bcastGrid": {
+        "mean": 28.75,
+        "p50": 30.02,
+        "p95": 38.37,
+        "p99": 43.01,
+        "max": 54.33
+      },
+      "bcastSelf": {
+        "mean": 15.78,
+        "p50": 15.41,
+        "p95": 23.75,
+        "p99": 28.98,
+        "max": 35.43
+      },
+      "social": {
+        "mean": 0.02,
+        "p50": 0,
+        "p95": 0.05,
+        "p99": 0.05,
+        "max": 0.07
+      },
+      "sim.respawns": {
+        "mean": 0.01,
+        "p50": 0.01,
+        "p95": 0.01,
+        "p99": 0.02,
+        "max": 0.03
+      },
+      "sim.worldBosses": {
+        "mean": 0.03,
+        "p50": 0.03,
+        "p95": 0.05,
+        "p99": 0.06,
+        "max": 0.12
+      },
+      "sim.groundAoEs": {
+        "mean": 0.01,
+        "p50": 0.01,
+        "p95": 0.02,
+        "p99": 0.02,
+        "max": 0.02
+      },
+      "sim.frozenOrbs": {
+        "mean": 0.01,
+        "p50": 0.01,
+        "p95": 0.01,
+        "p99": 0.01,
+        "max": 0.07
+      },
+      "sim.despawnDecay": {
+        "mean": 3.18,
+        "p50": 3.73,
+        "p95": 4.35,
+        "p99": 4.74,
+        "max": 6.18
+      },
+      "sim.projectiles": {
+        "mean": 0.01,
+        "p50": 0.01,
+        "p95": 0.02,
+        "p99": 0.02,
+        "max": 0.03
+      },
+      "sim.p.move": {
+        "mean": 313.46,
+        "p50": 375.44,
+        "p95": 424.88,
+        "p99": 433.8,
+        "max": 446.4
+      },
+      "sim.p.doors": {
+        "mean": 6.74,
+        "p50": 7.98,
+        "p95": 9.63,
+        "p99": 10.68,
+        "max": 11.91
+      },
+      "sim.p.casting": {
+        "mean": 2.13,
+        "p50": 1.68,
+        "p95": 5.39,
+        "p99": 7.14,
+        "max": 9.42
+      },
+      "sim.p.autoAtk": {
+        "mean": 1.68,
+        "p50": 2.02,
+        "p95": 2.31,
+        "p99": 2.52,
+        "max": 3.39
+      },
+      "sim.p.regen": {
+        "mean": 26.03,
+        "p50": 31.18,
+        "p95": 35.41,
+        "p99": 36.29,
+        "max": 40.58
+      },
+      "sim.p.auras": {
+        "mean": 3.8,
+        "p50": 4.54,
+        "p95": 5.3,
+        "p99": 5.55,
+        "max": 6.11
+      },
+      "sim.mob.update": {
+        "mean": 22.73,
+        "p50": 26.46,
+        "p95": 31.01,
+        "p99": 32.25,
+        "max": 35.5
+      },
+      "sim.mob.auras": {
+        "mean": 1.82,
+        "p50": 2.17,
+        "p95": 2.28,
+        "p99": 2.49,
+        "max": 3.09
+      },
+      "sim.ent.misc": {
+        "mean": 0.2,
+        "p50": 0.08,
+        "p95": 0.84,
+        "p99": 0.88,
+        "max": 0.95
+      },
+      "sim.engaged": {
+        "mean": 1.33,
+        "p50": 1.58,
+        "p95": 1.85,
+        "p99": 1.97,
+        "max": 2.87
+      },
+      "sim.duels": {
+        "mean": 0.02,
+        "p50": 0.02,
+        "p95": 0.03,
+        "p99": 0.03,
+        "max": 0.04
+      },
+      "sim.cardDuel": {
+        "mean": 0.02,
+        "p50": 0.02,
+        "p95": 0.02,
+        "p99": 0.02,
+        "max": 0.03
+      },
+      "sim.arena": {
+        "mean": 0.08,
+        "p50": 0.1,
+        "p95": 0.11,
+        "p99": 0.12,
+        "max": 0.32
+      },
+      "sim.trades": {
+        "mean": 0.03,
+        "p50": 0.03,
+        "p95": 0.04,
+        "p99": 0.04,
+        "max": 0.26
+      },
+      "sim.lootRolls": {
+        "mean": 0.01,
+        "p50": 0.01,
+        "p95": 0.01,
+        "p99": 0.01,
+        "max": 0.03
+      },
+      "sim.instances": {
+        "mean": 0.1,
+        "p50": 0.12,
+        "p95": 0.14,
+        "p99": 0.15,
+        "max": 0.25
+      },
+      "sim.delves": {
+        "mean": 0.02,
+        "p50": 0.02,
+        "p95": 0.02,
+        "p99": 0.02,
+        "max": 0.28
+      },
+      "sim.valecup": {
+        "mean": 1.41,
+        "p50": 1.71,
+        "p95": 2.5,
+        "p99": 2.79,
+        "max": 3.75
+      },
+      "sim.dfinder": {
+        "mean": 0.01,
+        "p50": 0.01,
+        "p95": 0.01,
+        "p99": 0.01,
+        "max": 0.02
+      },
+      "sim.market": {
+        "mean": 0.01,
+        "p50": 0.01,
+        "p95": 0.01,
+        "p99": 0.01,
+        "max": 0.02
+      },
+      "sim.postOffice": {
+        "mean": 0.49,
+        "p50": 0.02,
+        "p95": 1.26,
+        "p99": 1.47,
+        "max": 3.69
+      },
+      "sim.delayedEv": {
+        "mean": 0.01,
+        "p50": 0.01,
+        "p95": 0.01,
+        "p99": 0.02,
+        "max": 0.03
+      },
+      "sim.deeds": {
+        "mean": 0.37,
+        "p50": 0.2,
+        "p95": 1.51,
+        "p99": 2.11,
+        "max": 2.59
+      },
+      "sim.gridRefresh": {
+        "mean": 2.32,
+        "p50": 2.7,
+        "p95": 3.41,
+        "p99": 3.63,
+        "max": 4.41
+      },
+      "sim.mob.update|beast": {
+        "mean": 5.68,
+        "p50": 6.63,
+        "p95": 7.94,
+        "p99": 8.4,
+        "max": 11.33
+      },
+      "sim.mob.update|humanoid": {
+        "mean": 2.24,
+        "p50": 2.55,
+        "p95": 3.11,
+        "p99": 3.3,
+        "max": 3.75
+      },
+      "sim.mob.update|mudfin": {
+        "mean": 1.25,
+        "p50": 1.25,
+        "p95": 2.29,
+        "p99": 2.77,
+        "max": 4.15
+      },
+      "sim.mob.update|spider": {
+        "mean": 1.02,
+        "p50": 1.13,
+        "p95": 1.47,
+        "p99": 1.66,
+        "max": 1.93
+      },
+      "sim.mob.update|burrower": {
+        "mean": 1.69,
+        "p50": 1.85,
+        "p95": 2.67,
+        "p99": 3.06,
+        "max": 3.46
+      },
+      "sim.mob.update|undead": {
+        "mean": 2.71,
+        "p50": 2.96,
+        "p95": 4.04,
+        "p99": 4.35,
+        "max": 5.46
+      },
+      "sim.mob.update|troll": {
+        "mean": 0.51,
+        "p50": 0.54,
+        "p95": 0.8,
+        "p99": 0.92,
+        "max": 1.18
+      },
+      "sim.mob.update|ogre": {
+        "mean": 1.49,
+        "p50": 1.63,
+        "p95": 2.31,
+        "p99": 2.52,
+        "max": 3.52
+      },
+      "sim.mob.update|elemental": {
+        "mean": 2.94,
+        "p50": 3.24,
+        "p95": 4.43,
+        "p99": 4.76,
+        "max": 8.12
+      },
+      "sim.mob.update|dragonkin": {
+        "mean": 0.2,
+        "p50": 0.19,
+        "p95": 0.37,
+        "p99": 0.47,
+        "max": 0.86
+      },
+      "sim.mob.update|demon": {
+        "mean": 0.12,
+        "p50": 0.12,
+        "p95": 0.21,
+        "p99": 0.24,
+        "max": 0.89
+      },
+      "sim.mob.update|kobold": {
+        "mean": 2.37,
+        "p50": 2.61,
+        "p95": 3.67,
+        "p99": 4.01,
+        "max": 5.29
+      },
+      "sim.mob.update|murloc": {
+        "mean": 0.53,
+        "p50": 0.51,
+        "p95": 1.06,
+        "p99": 1.2,
+        "max": 1.41
+      },
+      "sim.mob.update|reptile": {
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "sim.mob.update|other": {
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "sim.mob.z:eastbrook_vale": {
+        "mean": 3.12,
+        "p50": 3.6,
+        "p95": 4.39,
+        "p99": 4.66,
+        "max": 7.71
+      },
+      "sim.mob.z:mirefen_marsh": {
+        "mean": 3.11,
+        "p50": 3.56,
+        "p95": 4.24,
+        "p99": 4.49,
+        "max": 6.69
+      },
+      "sim.mob.z:thornpeak_heights": {
+        "mean": 5.87,
+        "p50": 6.18,
+        "p95": 9.29,
+        "p99": 10.01,
+        "max": 11.25
+      },
+      "sim.mob.z:veiled_hollow": {
+        "mean": 3.21,
+        "p50": 3.6,
+        "p95": 4.85,
+        "p99": 5.21,
+        "max": 8.52
+      },
+      "sim.mob.z:drakelands": {
+        "mean": 0.57,
+        "p50": 0.61,
+        "p95": 0.9,
+        "p99": 1.05,
+        "max": 1.21
+      },
+      "sim.mob.z:frostveil": {
+        "mean": 1.29,
+        "p50": 1.38,
+        "p95": 2.23,
+        "p99": 2.66,
+        "max": 3.08
+      },
+      "sim.mob.z:amberfall": {
+        "mean": 0.45,
+        "p50": 0.49,
+        "p95": 0.7,
+        "p99": 0.8,
+        "max": 1.01
+      },
+      "sim.mob.z:willowfen": {
+        "mean": 0.74,
+        "p50": 0.78,
+        "p95": 1.26,
+        "p99": 1.39,
+        "max": 3.85
+      },
+      "sim.mob.z:nightbloom": {
+        "mean": 0.71,
+        "p50": 0.77,
+        "p95": 1.1,
+        "p99": 1.21,
+        "max": 1.63
+      },
+      "sim.mob.z:wraithwood": {
+        "mean": 0.43,
+        "p50": 0.46,
+        "p95": 0.67,
+        "p99": 0.75,
+        "max": 0.94
+      },
+      "sim.mob.z:palmreach": {
+        "mean": 0.54,
+        "p50": 0.52,
+        "p95": 0.97,
+        "p99": 1.13,
+        "max": 1.56
+      },
+      "sim.mob.z:evergarden": {
+        "mean": 0.79,
+        "p50": 0.87,
+        "p95": 1.19,
+        "p99": 1.39,
+        "max": 1.49
+      },
+      "sim.mob.z:galecrest": {
+        "mean": 1.51,
+        "p50": 1.66,
+        "p95": 2.22,
+        "p99": 2.48,
+        "max": 2.91
+      },
+      "sim.mob.z:farshore_isle": {
+        "mean": 0.38,
+        "p50": 0.41,
+        "p95": 0.58,
+        "p99": 0.66,
+        "max": 1.19
+      },
+      "sim.mob.z:instance": {
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "sim.mob.z:other": {
+        "mean": 0,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0
+      },
+      "total": {
+        "mean": 465.43,
+        "p50": 538.71,
+        "p95": 659.77,
+        "p99": 682.14,
+        "max": 720.8
+      }
+    }
+  },
+  "verdict": {
+    "ok": true,
+    "failures": [],
+    "minGaps": 180
+  }
+}

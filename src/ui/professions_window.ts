@@ -1,18 +1,27 @@
-// The Professions window painter (#professions-window): a cold, read-only
+// The Professions window painter (#professions-window): a cold
 // identity-and-progress browser over IWorldProfessions (craftingIdentity +
-// professionsState), the Book of Deeds shape exactly. Full innerHTML rebuild
-// on open, on a real data change (refreshIfChanged diffs the pure
-// professionsRefreshSig), and on language switch; the section scroller
-// survives rebuilds; nothing here runs on the per-frame hot path. The pure
-// model lives in professions_view.ts (which composes the PR 2039 identity
-// view); this module only paints and wires callbacks through injected deps
-// (it never imports Hud and never hardcodes the window id).
+// professionsState), the Book of Deeds shape, PLUS the acquisition craft's
+// two action senders (slotToolEffect / rechargeToolEffect on the gathering
+// rows: no longer read-only, and the outcome round-trips as the pid-scoped
+// toolEffectResult event rather than a local repaint). Full innerHTML
+// rebuild on open, on a real data change (refreshIfChanged diffs the pure
+// professionsRefreshSig), on the toolEffectResult event, and on language
+// switch; the section scroller and the focused control's identity survive
+// rebuilds; nothing here runs on the per-frame hot path. The pure model
+// lives in professions_view.ts (which composes the PR 2039 identity view);
+// this module only paints and wires callbacks through injected deps (it
+// never imports Hud and never hardcodes the window id).
 
 import { audio } from '../game/audio';
+import { GATHERING_PROFESSIONS, type GatheringProfessionId } from '../sim/content/professions';
+import { ITEMS } from '../sim/data';
 import type { IWorld } from '../world_api';
 import { archetypeTitleText, craftNameText } from './char_window';
 import { markDialogRoot } from './dialog_root';
+import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
+import { captureFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
+import { gatheringProfessionNameKey } from './gathering_profession_name';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { professionIconUrl } from './icons';
 import type { PainterHostPresentation } from './painter_host';
@@ -22,12 +31,14 @@ import {
   buildProfessionsView,
   type CraftNextUnlock,
   type ProfessionsCraftRow,
+  type ProfessionsGatheringRow,
   type ProfessionsViewInput,
   type ProfessionsViewModel,
   professionsRefreshSig,
   type RingArc,
   type RingLayout,
 } from './professions_view';
+import { toolEffectNameKey } from './tool_effect_name';
 import { svgIcon } from './ui_icons';
 
 // Ring node distance from the container center, in percent of the box
@@ -37,6 +48,11 @@ const RING_RADIUS_PCT = 40;
 // Icon backing-store sizes (2x the CSS box for crisp HiDPI).
 const RING_ICON_SIZE = 64;
 const ROW_ICON_SIZE = 56;
+
+// How long a sent action button stays guarded when NO repaint answers it
+// (a dropped frame: closed socket, spectate, lane refusal). Comfortably
+// above a live round trip, far below "dead until reopen".
+const SENT_GUARD_REARM_MS = 2000;
 
 const ROLE_LABEL_KEYS: Record<ProfessionRole, TranslationKey> = {
   major: 'hudChrome.professions.roleMajor',
@@ -51,21 +67,12 @@ const CEILING_LABEL_KEYS: Record<EmpowermentCeiling, TranslationKey> = {
   common: 'hudChrome.professions.ceilingCommon',
 };
 
-// Gathering display-name keys (the char-window gathering section family).
-// Every GATHERING_PROFESSION_IDS id adds its id here alongside its catalog
-// key; an id with no key renders no row (the
-// view core passes every row through).
-const GATHERING_NAME_KEYS: Record<string, TranslationKey> = {
-  mining: 'hudChrome.gathering.mining',
-  logging: 'hudChrome.gathering.logging',
-  herbalism: 'hudChrome.gathering.herbalism',
-  fishing: 'hudChrome.gathering.fishing',
-};
-
 /**
  * Hud-supplied glue: the shared presentation bag plus the window surface (the
  * world reads, trapping focus capture/return, and close/teardown chrome).
- * Read-only window: no world commands, no watch-change nudge.
+ * The window SENDS two world commands (slotToolEffect / rechargeToolEffect,
+ * wired in wire()); everything else is read-only, and there is still no
+ * watch-change nudge.
  */
 export interface ProfessionsWindowDeps extends PainterHostPresentation {
   /** The #professions-window root (Hud owns the id). */
@@ -74,8 +81,10 @@ export interface ProfessionsWindowDeps extends PainterHostPresentation {
   world(): IWorld;
   closeOthers(): void;
   hideTooltip(): void;
-  /** The shared Hud TouchPeekGuard (the deeds/bank contract); this window has
-   *  no activating card actions today, so it is wired but never consumed. */
+  /** The shared Hud TouchPeekGuard (the deeds/bank contract); wired but never
+   *  consumed: the slot/recharge controls are plain labeled buttons with no
+   *  tooltip peek state, outside the card-action family the guard exists
+   *  for, and the window has no peeking cards. */
   consumePeek(): boolean;
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
@@ -85,6 +94,16 @@ export class ProfessionsWindow {
   private opened = false;
   private lastSig = '';
   private openerFocus: HTMLElement | null = null;
+  // The R40 "Ask each use" choice per gathering profession: UI-local state
+  // for the NEXT slot action (the mode is part of the mint, so it rides the
+  // slotToolEffect command), held here so the full innerHTML rebuild cannot
+  // reset a checked box. Seeded from the LIVE slots' modes at each fresh
+  // open (the phase 14 QA: the toggle otherwise contradicted the chip one
+  // line above it); the player's unsent choice then persists across
+  // rebuilds for as long as the window stays open. The durable record of a
+  // LIVE slot's mode stays the row's own chip, mirrored from the tslot
+  // wire.
+  private readonly slotModePrompt = new Set<string>();
 
   constructor(private readonly deps: ProfessionsWindowDeps) {}
 
@@ -102,6 +121,16 @@ export class ProfessionsWindow {
     this.deps.closeOthers();
     this.openerFocus = this.deps.captureFocus();
     this.opened = true;
+    // Seed the toggles from the LIVE slots (the phase 14 QA): the capture
+    // truth-test showed a prompt-mode slot chipping "Asks each use" beside
+    // an unchecked "Ask each use" toggle, two near-identical labels
+    // contradicting each other. A fresh open reflects each slot's real
+    // mode; the player's unsent choice then persists across rebuilds for
+    // as long as the window stays open.
+    this.slotModePrompt.clear();
+    for (const row of this.deps.world().toolEffectSlots) {
+      if (row.confirmMode === 'prompt') this.slotModePrompt.add(row.professionId);
+    }
     this.lastSig = '';
     this.render();
     this.deps.root().style.display = 'flex';
@@ -136,22 +165,44 @@ export class ProfessionsWindow {
    *  dimension stays unit-pinned. */
   refreshIfChanged(): void {
     if (!this.opened) return;
-    const sig = professionsRefreshSig(this.buildInput());
+    const input = this.buildInput();
+    const sig = professionsRefreshSig(input);
     if (sig === this.lastSig) return;
-    this.lastSig = sig;
-    this.render();
+    // render() re-latches the signature itself, so a forced repaint from
+    // anywhere (the toolEffectResult arm) cannot leave a stale one behind for
+    // this band to act on a second time. Handing the compared input AND its
+    // signature over keeps the read and the bag-walking hash one apiece per
+    // changed repaint.
+    this.render(input, sig);
   }
 
-  render(): void {
+  render(prebuilt?: ProfessionsViewInput, prebuiltSig?: string): void {
     const el = this.deps.root();
     if (!this.opened) return;
-    const active = document.activeElement as HTMLElement | null;
-    const hadFocus = el.contains(active);
+    // The focused control's own identity, carried across the rebuild through
+    // the shared seam (focus_restore.ts) rather than a hand-rolled
+    // activeElement read. This window is FocusManager-registered, so the
+    // keyboard path is real, and it now has action buttons beside Close: a
+    // repaint that parked focus on Close would make the next Enter close the
+    // window instead of repeating the action (the #2377 double-fire family).
+    // Close stays the FALLBACK only, for a control the rebuild removed.
+    const focusKey = captureFocusKey(el);
+    const hadFocus = focusedWithin(el) !== null;
     this.deps.hideTooltip();
     markDialogRoot(el, { label: t('hudChrome.professions.title') });
     const prevScrollTop = el.querySelector('.prof-scroll')?.scrollTop ?? 0;
 
-    const model = buildProfessionsView(this.buildInput());
+    // ONE input read feeds the paint AND the signature latch below: latching
+    // from a second read would record whatever the world says after the
+    // paint, and any listener that moved a signature input in between would
+    // leave the DOM stale behind a fresh signature the 500 ms band then
+    // trusts. `prebuilt`/`prebuiltSig` let refreshIfChanged hand over the
+    // input and signature it just compared (a synchronous same-tick call, so
+    // the world cannot have moved in between): the input hand-over spares
+    // the per-access view builders, and the signature hand-over spares the
+    // one real bag walk in the pair (the sig hash itself).
+    const input = prebuilt ?? this.buildInput();
+    const model = buildProfessionsView(input);
     const body = model.mode === 'simplified' ? this.simplifiedHtml(model) : this.fullHtml(model);
     el.innerHTML =
       `<div class="panel-title"><span>${esc(t('hudChrome.professions.title'))}</span>` +
@@ -161,20 +212,71 @@ export class ProfessionsWindow {
     this.wire(el);
     const scroll = el.querySelector('.prof-scroll');
     if (scroll) scroll.scrollTop = prevScrollTop;
-    // The close button is the only interactive control, so it is also the
-    // whole stable-identity refocus story (the deeds fallback arm).
-    if (hadFocus) (el.querySelector('[data-close]') as HTMLElement | null)?.focus();
+    // Re-latch BEFORE the refocus: restoreFirstEnabled's focus() dispatches
+    // focus listeners synchronously, and the latch must describe the paint,
+    // not whatever those listeners do next.
+    this.lastSig = prebuiltSig ?? professionsRefreshSig(input);
+    if (hadFocus) {
+      // Matched by SCANNING the keyed controls rather than building an
+      // attribute selector out of the key: the key embeds wire-supplied ids,
+      // and a selector string is the one place those could throw
+      // (querySelector SyntaxError) or escape their quotes. A comparison
+      // cannot do either. Degradation rungs: the same control, then Close,
+      // and deliberately NOTHING in between. Every action button this window
+      // paints SPENDS (a slot burns a crafted charm, a recharge consumes
+      // materials), and input.ts leaves a focused button's Enter default
+      // alone, so a rung that re-parks focus on a DIFFERENT action button
+      // hands an Enter activation to an action the player never aimed at
+      // (with the default binds the same press also opens chat, which
+      // usually absorbs the repeat stream, but the hazard is live for a
+      // rebound chat key or an unavailable composer, and the rung is free
+      // to drop). Close is the one control whose accidental activation
+      // costs nothing. A future non-spending row control may earn a middle
+      // rung, deliberately.
+      const keyed = [...el.querySelectorAll<HTMLElement>('[data-focus-key]')];
+      const exact =
+        focusKey === null
+          ? null
+          : (keyed.find((node) => node.dataset.focusKey === focusKey) ?? null);
+      restoreFirstEnabled([exact, el.querySelector<HTMLElement>('[data-close]')]);
+    }
   }
 
   private buildInput(): ProfessionsViewInput {
     const world = this.deps.world();
     return {
       identity: world.craftingIdentity,
-      gathering: world.professionsState.skills.map((row) => ({
+      gathering: world.professionsState.skills.map((row) => {
+        // The denominator comes from the GATHERING_PROFESSIONS content table,
+        // the character sheet's cure (gathering_view.ts
+        // buildGatheringProficiencyRows): the wire row's maxSkill is the same
+        // number on an honest server but it is per-row rather than total, so
+        // a missing or malformed row must never paint a nonsense "12 / 0".
+        // hasOwn because the id is wire-mirrored (the prototype-key doctrine);
+        // an unknown id keeps the wire value and falls out at the view's
+        // name-key guard.
+        const cap = Object.hasOwn(GATHERING_PROFESSIONS, row.professionId)
+          ? GATHERING_PROFESSIONS[row.professionId as GatheringProfessionId].maxSkill
+          : row.maxSkill;
+        return {
+          professionId: row.professionId,
+          skill: Number.isFinite(row.skill) ? Math.max(0, row.skill) : 0,
+          maxSkill: cap,
+        };
+      }),
+      toolEffects: world.toolEffectSlots.map((row) => ({
         professionId: row.professionId,
-        skill: row.skill,
-        maxSkill: row.maxSkill,
+        effectId: row.effectId,
+        charges: row.charges,
+        maxCharges: row.maxCharges,
+        confirmMode: row.confirmMode,
+        selfCrafted: row.selfCrafted,
       })),
+      inventory: world.inventory,
+      viewerName: world.player.name,
+      // The R40 "Ask each use" toggles (painter-local, survives rebuilds in
+      // this field the way the section scroller does). Sorted for the sig.
+      slotModePrompt: [...this.slotModePrompt].sort(),
     };
   }
 
@@ -419,7 +521,10 @@ export class ProfessionsWindow {
   private gatheringHtml(model: ProfessionsViewModel): string {
     const rows = model.gathering
       .map((row) => {
-        const key = GATHERING_NAME_KEYS[row.professionId];
+        // The shared hasOwn-safe getter (one idiom for the rule): the id is
+        // wire-mirrored, and a bare index on a prototype key would resolve a
+        // function that passes the undefined check and reaches t().
+        const key = gatheringProfessionNameKey(row.professionId);
         if (key === undefined) return '';
         const pct = Math.round(row.bar.fillFraction * 100);
         return (
@@ -432,7 +537,9 @@ export class ProfessionsWindow {
               max: this.fmt(row.bar.maxSkill),
             }),
           )}</span></div>` +
-          `<div class="prof-bar-wrap"><span class="prof-bar"><span class="prof-bar-fill" style="width:${pct}%"></span></span></div></div></li>`
+          `<div class="prof-bar-wrap"><span class="prof-bar"><span class="prof-bar-fill" style="width:${pct}%"></span></span></div>` +
+          this.gatherEffectHtml(row) +
+          `</div></li>`
         );
       })
       .join('');
@@ -440,11 +547,180 @@ export class ProfessionsWindow {
     return `<section class="prof-gathering"><h3 class="prof-section-header">${esc(t('hudChrome.professions.gatheringHeader'))}</h3><ul class="prof-list" role="list">${rows}</ul></section>`;
   }
 
+  // The slotted tool effect, under its profession's skill bar, plus the
+  // slot/recharge affordances the acquisition craft opened. The effect line
+  // renders NOTHING when the profession has no slot (an always-present "no
+  // effect" line would be permanent rows of absence in a window that is
+  // otherwise all progress); the action buttons render exactly when the
+  // model's resolver-derived flags say the command would accept.
+  private gatherEffectHtml(row: ProfessionsGatheringRow): string {
+    const effect = row.effect;
+    let html = '';
+    if (effect) {
+      // The shared hasOwn-safe getter, same rule as the profession name.
+      const nameKey = toolEffectNameKey(effect.effectId);
+      if (nameKey !== undefined) {
+        // Spent says so in words rather than showing "0 / 30", which reads
+        // like a broken tool rather than a rechargeable one that has done its
+        // work.
+        const charges = effect.spent
+          ? t('hudChrome.professions.toolEffectSpent')
+          : t('hudChrome.professions.toolEffectCharges', {
+              charges: this.fmt(effect.charges),
+              max: this.fmt(effect.maxCharges),
+            });
+        // The cost preview (the UX pass): the priced material and count the
+        // resolver would charge RIGHT NOW, beside the button that sends it.
+        // Ceil-priced, so the blind marginal top-up reads honestly: at 49 of
+        // 50 the line says one full material for the one charge. R46's deny
+        // line stays the affordability surface; this is the price surface.
+        const rechargeDef = effect.recharge ? ITEMS[effect.recharge.materialItemId] : undefined;
+        const price =
+          effect.recharge && rechargeDef
+            ? `<span class="prof-effect-price">${esc(
+                t('hudChrome.professions.toolEffectRechargePrice', {
+                  count: this.fmt(effect.recharge.count),
+                  material: itemDisplayName(rechargeDef),
+                }),
+              )}</span>`
+            : '';
+        const recharge = effect.rechargeable
+          ? `${price}<button type="button" class="btn prof-effect-btn" data-recharge-profession="${esc(row.professionId)}" data-focus-key="recharge:${esc(row.professionId)}">${esc(
+              t('hudChrome.professions.toolEffectRechargeButton'),
+            )}</button>`
+          : '';
+        // The R40 mode chip: a 'prompt' slot says it asks, in words beside
+        // the charges, so the per-use dialog never reads as a malfunction.
+        // Not hue-gated: the chip IS the second signal.
+        const modeChip =
+          effect.confirmMode === 'prompt'
+            ? `<span class="prof-effect-mode">${esc(t('hudChrome.professions.toolEffectModePrompt'))}</span>`
+            : '';
+        html +=
+          `<div class="prof-effect${effect.spent ? ' prof-effect-spent' : ''}">` +
+          `<span class="prof-effect-name">${esc(t(nameKey))}</span>` +
+          `<span class="prof-effect-charges">${esc(charges)}</span>${modeChip}${recharge}</div>`;
+      }
+    }
+    const slotButtons = row.slottable
+      .map((effectId) => {
+        const nameKey = toolEffectNameKey(effectId);
+        if (nameKey === undefined) return '';
+        return `<button type="button" class="btn prof-effect-btn" data-slot-profession="${esc(row.professionId)}" data-slot-effect="${esc(effectId)}" data-focus-key="slot:${esc(row.professionId)}:${esc(effectId)}">${esc(
+          t('hudChrome.professions.toolEffectSlotButton', { effect: t(nameKey) }),
+        )}</button>`;
+      })
+      .join('');
+    if (slotButtons !== '') {
+      // The R40 mode toggle rides the actions row: it configures the NEXT
+      // slot action (the mode is part of the mint), so it renders exactly
+      // when a slot button does. A real labeled checkbox: keyboard-operable,
+      // announced by its own text, and focus-keyed so the rebuild the toggle
+      // triggers restores focus onto it (the exact-control rung).
+      const checked = this.slotModePrompt.has(row.professionId) ? ' checked' : '';
+      const toggle =
+        `<label class="prof-effect-mode-toggle"><input type="checkbox" data-slot-mode="${esc(row.professionId)}" data-focus-key="slotmode:${esc(row.professionId)}"${checked}> ` +
+        `${esc(t('hudChrome.professions.toolEffectModeAsk'))}</label>`;
+      html += `<div class="prof-effect-actions">${slotButtons}${toggle}</div>`;
+    }
+    return html;
+  }
+
   private wire(el: HTMLElement): void {
     el.querySelector('[data-close]')?.addEventListener('click', () => {
       this.close();
       audio.click();
     });
+    // Slot/recharge senders: command only, never predicted, and NO repaint
+    // here. The pid-scoped toolEffectResult event is the one repaint path
+    // (Hud's arm re-renders an open professions window), which keeps this
+    // handler from rebuilding the subtree mid-click and walking into the
+    // refocus double-fire family (the #2377 ruling); the 500 ms
+    // refreshIfChanged band backstops it either way, since the signature
+    // hashes the charm and charge state these buttons derive from.
+    //
+    // What each button promises, exactly: the SLOT set is exact (the view
+    // threads the same live slot, provenance boolean, and slotter name the
+    // server resolver reads, so a rendered slot button is an action the
+    // server accepts barring a race the event then reports). RECHARGEABLE
+    // means the resolver accepts; affordability and the shared throttle live
+    // in the command body. The PRICE surface is now split (the UX pass): the
+    // .prof-effect-price line previews the resolver's material and count
+    // before the click, while R46's deny line stays the AFFORDABILITY
+    // surface, so the button still renders for a player who cannot afford
+    // it on purpose.
+    //
+    // The sent-guard: one command per painted button. The repaint that
+    // answers the command replaces the node (fresh dataset), and every
+    // RESOLVER refusal emits the event that triggers it; until then, a
+    // double-click or a held Enter's key repeats on the SAME button send
+    // nothing more. Guarding beats disabling, because disabling the focused
+    // button drops keyboard focus to <body> before the repaint can restore
+    // it. THE RESIDUALS the one-shot timer below covers: a frame that never
+    // reaches the sim (the reconnect window's closed socket, spectate's
+    // command drop, a lane-refused frame) answers with nothing, and the
+    // sim's PRE-RESOLVER dead gate answers on the chat line with no
+    // toolEffectResult (the deliberate no-new-wire-reason choice), so both
+    // leave the node for the re-arm rather than dead until a reopen; if a
+    // real answer then arrives late, a duplicate send is refused server-side
+    // (no_gain or already_full), so the race costs nothing.
+    for (const button of el.querySelectorAll<HTMLElement>('[data-slot-effect]')) {
+      button.addEventListener('click', () => {
+        if (button.dataset.sent !== undefined) return;
+        const professionId = button.getAttribute('data-slot-profession');
+        const effectId = button.getAttribute('data-slot-effect');
+        if (professionId === null || effectId === null) return;
+        this.armSentGuard(button);
+        // The R40 mode rides the mint: 'prompt' when the row's toggle is on,
+        // OMITTED otherwise so the plain send stays byte-identical.
+        if (this.slotModePrompt.has(professionId)) {
+          this.deps.world().slotToolEffect(professionId, effectId, 'prompt');
+        } else {
+          this.deps.world().slotToolEffect(professionId, effectId);
+        }
+        audio.click();
+      });
+    }
+    // The R40 mode toggles: flip the painter-local choice and repaint (the
+    // slottable set asks the resolver with the sent mode, so the button set
+    // can change with the toggle). render() re-latches the signature and the
+    // focus ladder restores onto the checkbox's own focus key.
+    for (const box of el.querySelectorAll<HTMLInputElement>('[data-slot-mode]')) {
+      box.addEventListener('change', () => {
+        const professionId = box.getAttribute('data-slot-mode');
+        if (professionId === null) return;
+        if (box.checked) this.slotModePrompt.add(professionId);
+        else this.slotModePrompt.delete(professionId);
+        audio.click();
+        this.render();
+      });
+    }
+    for (const button of el.querySelectorAll<HTMLElement>('[data-recharge-profession]')) {
+      button.addEventListener('click', () => {
+        if (button.dataset.sent !== undefined) return;
+        const professionId = button.getAttribute('data-recharge-profession');
+        if (professionId === null) return;
+        this.armSentGuard(button);
+        this.deps.world().rechargeToolEffect(professionId);
+        audio.click();
+      });
+    }
+  }
+
+  /** Mark a button as having sent its command, with the dropped-frame
+   *  re-arm: a ONE-SHOT timer (not a repeating driver, so the cold-window
+   *  contract holds) clears the guard if no repaint replaced the node,
+   *  covering the paths where the frame never reaches the sim and no
+   *  toolEffectResult can answer. */
+  private armSentGuard(button: HTMLElement): void {
+    button.dataset.sent = '1';
+    // Spelled window.setTimeout so the host reach is visible to the
+    // architecture sweep (UI_HOST_GLOBALS scans window.*, not bare timers),
+    // which puts this module back on the UI_DOM_MODULES ledger instead of
+    // arming a real host timer from the "reaches no host" bucket.
+    window.setTimeout(() => {
+      if (button.isConnected) delete button.dataset.sent;
+    }, SENT_GUARD_REARM_MS);
   }
 
   private fmt(n: number): string {

@@ -161,6 +161,18 @@ export interface GuideProfTool {
   priceCopper: number | null;
   vendors: { name: string; hub: string }[];
   craftedBy?: string;
+  /** Delve Marks price, for a tool a delve counter stocks. Absent otherwise. */
+  priceMarks?: number;
+  /** Total delve clears the Marks row unlocks after (shop.ts 'clears:N').
+   *  Consumed today by the tests/guide.test.ts gate pin only: the source
+   *  cell keeps the count as an English literal until the deferred locale
+   *  re-fill adds a {clears} token (R64, the packet review doc). */
+  marksClears?: number;
+  /** True when the Marks row unlocks after a Heroic clear. */
+  marksHeroicClear?: boolean;
+  /** R22 wield requirement (proficiency in the tool's own trade) for land
+   *  tools above tier 1. Absent for tier 1 and for every fishing rod. */
+  wieldProficiency?: number;
 }
 
 export interface GuideProfNodeRow {
@@ -4469,7 +4481,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "House Rules",
     "category": "pvp",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/pvp_card_duel_first_win.webp"
   },
   {
     "id": "prog_guildsworn",
@@ -4695,42 +4708,104 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "The Basin Bites Back",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_wildheart_basin.webp"
   },
   {
     "id": "dgn_wildheart_basin_heroic",
     "name": "Heroic: The Wildheart Basin",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_wildheart_basin_heroic.webp"
+  },
+  {
+    "id": "chr_peaks_gatherer",
+    "name": "Harvest of the Heights",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_peaks_gatherer.webp"
   },
   {
     "id": "chr_marsh_rares_ii",
     "name": "The Glutton, Reckoned",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_marsh_rares_ii.webp"
   },
   {
     "id": "chr_peaks_rares_ii",
     "name": "More Names Cut into the Crag",
     "category": "chronicle",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_peaks_rares_ii.webp"
   },
   {
     "id": "chr_gleamstag",
     "name": "The Legend That Would Not Strike First",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_gleamstag.webp"
   },
   {
     "id": "chr_hollow_rares",
     "name": "The Herd Remembers",
     "category": "chronicle",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_hollow_rares.webp"
+  },
+  {
+    "id": "chr_willowfen_gatherer",
+    "name": "Fenland Bounty",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_willowfen_gatherer.webp"
+  },
+  {
+    "id": "chr_willowfen_first_cast",
+    "name": "Ripples in the Lilymoors",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_willowfen_first_cast.webp"
+  },
+  {
+    "id": "chr_galecrest_gatherer",
+    "name": "Harvest on the Headland",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_galecrest_gatherer.webp"
+  },
+  {
+    "id": "chr_galecrest_first_cast",
+    "name": "A Line in the Mirror Tarn",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_galecrest_first_cast.webp"
+  },
+  {
+    "id": "chr_farshore_gatherer",
+    "name": "Island Provisions",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_farshore_gatherer.webp"
+  },
+  {
+    "id": "chr_farshore_first_cast",
+    "name": "What the Gulls Know",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_farshore_first_cast.webp"
   },
   {
     "id": "chr_drakemaw_broodlord",
@@ -4923,7 +4998,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
-            "name": "Osmium Ore",
+            "name": "Fine Iron Ore",
             "count": 4
           },
           {
@@ -4957,6 +5032,10 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 2
           },
           {
+            "name": "Fine Osmium Ore",
+            "count": 2
+          },
+          {
             "name": "Osmium Mining Pick",
             "count": 1
           }
@@ -4983,7 +5062,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
-            "name": "Ashwood Log",
+            "name": "Fine Ashwood Log",
             "count": 4
           },
           {
@@ -5013,7 +5092,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
-            "name": "Highpine Log",
+            "name": "Fine Highpine Log",
             "count": 2
           },
           {
@@ -5043,7 +5122,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
-            "name": "Goldleaf Herb",
+            "name": "Fine Goldleaf Herb",
             "count": 4
           },
           {
@@ -5073,7 +5152,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
-            "name": "Sunpetal Herb",
+            "name": "Fine Sunpetal Herb",
             "count": 2
           },
           {
@@ -5091,6 +5170,70 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 175,
           "minimalAt": 200,
           "zeroAt": 225
+        }
+      },
+      {
+        "id": "recipe_stormreel_fishing_rod",
+        "name": "Stormreel Fishing Rod",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "name": "Sunglint Koi",
+            "count": 4
+          },
+          {
+            "name": "Silverstream Fishing Rod",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Stormreel Fishing Rod",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        }
+      },
+      {
+        "id": "recipe_tidewrought_fishing_rod",
+        "name": "Tidewrought Fishing Rod",
+        "skillReq": 125,
+        "tier": 5,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 160000,
+        "materials": [
+          {
+            "name": "Sunglint Koi",
+            "count": 2
+          },
+          {
+            "name": "Raw Slatefin Carp",
+            "count": 8
+          },
+          {
+            "name": "Stormreel Fishing Rod",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Tidewrought Fishing Rod",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
         }
       }
     ]
@@ -6730,7 +6873,76 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       "at": 75,
       "materialDiscountPct": 20
     },
-    "recipes": []
+    "recipes": [
+      {
+        "id": "recipe_gatherers_cache",
+        "name": "Gatherer's Cache",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Chime Shard",
+            "count": 5
+          },
+          {
+            "name": "Chime Essence",
+            "count": 4
+          },
+          {
+            "name": "Chime Dust",
+            "count": 6
+          }
+        ],
+        "output": {
+          "name": "Gatherer's Cache",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_artisans_eye",
+        "name": "Artisan's Eye",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Chime Shard",
+            "count": 5
+          },
+          {
+            "name": "Chime Essence",
+            "count": 4
+          },
+          {
+            "name": "Chime Dust",
+            "count": 6
+          }
+        ],
+        "output": {
+          "name": "Artisan's Eye",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      }
+    ]
   },
   {
     "id": "weaponcrafting",
@@ -7657,16 +7869,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "name": "Iron Mining Pick",
         "tier": 2,
         "quality": "common",
-        "priceCopper": 60,
+        "priceCopper": 120,
         "vendors": [
-          {
-            "name": "Trader Wilkes",
-            "hub": "Eastbrook"
-          },
-          {
-            "name": "Forgemistress Darva",
-            "hub": "Eastbrook"
-          },
           {
             "name": "Provisioner Hale",
             "hub": "Fenbridge"
@@ -7675,27 +7879,21 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
             "name": "Quartermaster Bree",
             "hub": "Highwatch"
           }
-        ]
+        ],
+        "wieldProficiency": 40
       },
       {
         "name": "Skysilver Mining Pick",
         "tier": 3,
         "quality": "uncommon",
-        "priceCopper": 150,
+        "priceCopper": 400,
         "vendors": [
-          {
-            "name": "Trader Wilkes",
-            "hub": "Eastbrook"
-          },
-          {
-            "name": "Forgemistress Darva",
-            "hub": "Eastbrook"
-          },
           {
             "name": "Quartermaster Bree",
             "hub": "Highwatch"
           }
-        ]
+        ],
+        "wieldProficiency": 70
       },
       {
         "name": "Osmium Mining Pick",
@@ -7703,7 +7901,10 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "quality": "rare",
         "priceCopper": null,
         "vendors": [],
-        "craftedBy": "engineering"
+        "craftedBy": "engineering",
+        "priceMarks": 24,
+        "marksClears": 3,
+        "wieldProficiency": 85
       },
       {
         "name": "Glyphsteel Mining Pick",
@@ -7711,7 +7912,10 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "quality": "epic",
         "priceCopper": null,
         "vendors": [],
-        "craftedBy": "engineering"
+        "craftedBy": "engineering",
+        "priceMarks": 56,
+        "marksHeroicClear": true,
+        "wieldProficiency": 100
       }
     ],
     "nodes": [
@@ -7719,21 +7923,21 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "Eastbrook Vale",
         "tier": 1,
         "toolTier": 1,
-        "count": 3,
+        "count": 6,
         "material": "Copper Ore"
       },
       {
         "zone": "Mirefen Marsh",
         "tier": 1,
         "toolTier": 1,
-        "count": 3,
+        "count": 4,
         "material": "Iron Ore"
       },
       {
         "zone": "Mirefen Marsh",
         "tier": 2,
         "toolTier": 2,
-        "count": 1,
+        "count": 2,
         "material": "Iron Ore"
       },
       {
@@ -7761,7 +7965,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Farshore",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Iron Ore"
       },
       {
@@ -7775,7 +7979,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Galecrest",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Osmium Ore"
       },
       {
@@ -7803,7 +8007,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Willowfen",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Osmium Ore"
       },
       {
@@ -7824,18 +8028,18 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "Thornpeak Heights",
         "tier": 2,
         "toolTier": 2,
-        "count": 1,
+        "count": 2,
         "material": "Osmium Ore"
       },
       {
         "zone": "Thornpeak Heights",
         "tier": 3,
         "toolTier": 3,
-        "count": 1,
+        "count": 2,
         "material": "Osmium Ore"
       }
     ],
-    "respawnSeconds": 120
+    "respawnSeconds": 240
   },
   {
     "id": "logging",
@@ -7875,16 +8079,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "name": "Felling Axe",
         "tier": 2,
         "quality": "common",
-        "priceCopper": 60,
+        "priceCopper": 120,
         "vendors": [
-          {
-            "name": "Trader Wilkes",
-            "hub": "Eastbrook"
-          },
-          {
-            "name": "Tinker Gizzel",
-            "hub": "Eastbrook"
-          },
           {
             "name": "Provisioner Hale",
             "hub": "Fenbridge"
@@ -7893,27 +8089,21 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
             "name": "Quartermaster Bree",
             "hub": "Highwatch"
           }
-        ]
+        ],
+        "wieldProficiency": 40
       },
       {
         "name": "Ironbark Axe",
         "tier": 3,
         "quality": "uncommon",
-        "priceCopper": 150,
+        "priceCopper": 400,
         "vendors": [
-          {
-            "name": "Trader Wilkes",
-            "hub": "Eastbrook"
-          },
-          {
-            "name": "Tinker Gizzel",
-            "hub": "Eastbrook"
-          },
           {
             "name": "Quartermaster Bree",
             "hub": "Highwatch"
           }
-        ]
+        ],
+        "wieldProficiency": 70
       },
       {
         "name": "Ashwood Axe",
@@ -7921,7 +8111,10 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "quality": "rare",
         "priceCopper": null,
         "vendors": [],
-        "craftedBy": "engineering"
+        "craftedBy": "engineering",
+        "priceMarks": 24,
+        "marksClears": 3,
+        "wieldProficiency": 85
       },
       {
         "name": "Highpine Axe",
@@ -7929,7 +8122,10 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "quality": "epic",
         "priceCopper": null,
         "vendors": [],
-        "craftedBy": "engineering"
+        "craftedBy": "engineering",
+        "priceMarks": 56,
+        "marksHeroicClear": true,
+        "wieldProficiency": 100
       }
     ],
     "nodes": [
@@ -7937,21 +8133,21 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "Eastbrook Vale",
         "tier": 1,
         "toolTier": 1,
-        "count": 3,
+        "count": 6,
         "material": "Ironbark Log"
       },
       {
         "zone": "Mirefen Marsh",
         "tier": 1,
         "toolTier": 1,
-        "count": 3,
+        "count": 4,
         "material": "Ashwood Log"
       },
       {
         "zone": "Mirefen Marsh",
         "tier": 2,
         "toolTier": 2,
-        "count": 1,
+        "count": 2,
         "material": "Ashwood Log"
       },
       {
@@ -7979,7 +8175,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Farshore",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Ashwood Log"
       },
       {
@@ -7993,7 +8189,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Galecrest",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Highpine Log"
       },
       {
@@ -8021,7 +8217,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Willowfen",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Highpine Log"
       },
       {
@@ -8042,18 +8238,18 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "Thornpeak Heights",
         "tier": 2,
         "toolTier": 2,
-        "count": 1,
+        "count": 2,
         "material": "Highpine Log"
       },
       {
         "zone": "Thornpeak Heights",
         "tier": 3,
         "toolTier": 3,
-        "count": 1,
+        "count": 2,
         "material": "Highpine Log"
       }
     ],
-    "respawnSeconds": 120
+    "respawnSeconds": 240
   },
   {
     "id": "herbalism",
@@ -8093,16 +8289,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "name": "Bronze Sickle",
         "tier": 2,
         "quality": "common",
-        "priceCopper": 60,
+        "priceCopper": 120,
         "vendors": [
-          {
-            "name": "Trader Wilkes",
-            "hub": "Eastbrook"
-          },
-          {
-            "name": "Tinker Gizzel",
-            "hub": "Eastbrook"
-          },
           {
             "name": "Provisioner Hale",
             "hub": "Fenbridge"
@@ -8111,27 +8299,21 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
             "name": "Quartermaster Bree",
             "hub": "Highwatch"
           }
-        ]
+        ],
+        "wieldProficiency": 40
       },
       {
         "name": "Sheenleaf Sickle",
         "tier": 3,
         "quality": "uncommon",
-        "priceCopper": 150,
+        "priceCopper": 400,
         "vendors": [
-          {
-            "name": "Trader Wilkes",
-            "hub": "Eastbrook"
-          },
-          {
-            "name": "Tinker Gizzel",
-            "hub": "Eastbrook"
-          },
           {
             "name": "Quartermaster Bree",
             "hub": "Highwatch"
           }
-        ]
+        ],
+        "wieldProficiency": 70
       },
       {
         "name": "Goldleaf Sickle",
@@ -8139,7 +8321,10 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "quality": "rare",
         "priceCopper": null,
         "vendors": [],
-        "craftedBy": "engineering"
+        "craftedBy": "engineering",
+        "priceMarks": 24,
+        "marksClears": 3,
+        "wieldProficiency": 85
       },
       {
         "name": "Sunpetal Sickle",
@@ -8147,7 +8332,10 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "quality": "epic",
         "priceCopper": null,
         "vendors": [],
-        "craftedBy": "engineering"
+        "craftedBy": "engineering",
+        "priceMarks": 56,
+        "marksHeroicClear": true,
+        "wieldProficiency": 100
       }
     ],
     "nodes": [
@@ -8155,21 +8343,21 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "Eastbrook Vale",
         "tier": 1,
         "toolTier": 1,
-        "count": 3,
+        "count": 6,
         "material": "Sheenleaf Herb"
       },
       {
         "zone": "Mirefen Marsh",
         "tier": 1,
         "toolTier": 1,
-        "count": 3,
+        "count": 4,
         "material": "Goldleaf Herb"
       },
       {
         "zone": "Mirefen Marsh",
         "tier": 2,
         "toolTier": 2,
-        "count": 1,
+        "count": 2,
         "material": "Goldleaf Herb"
       },
       {
@@ -8197,7 +8385,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Farshore",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Goldleaf Herb"
       },
       {
@@ -8211,7 +8399,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Galecrest",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Sunpetal Herb"
       },
       {
@@ -8239,7 +8427,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Willowfen",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Sunpetal Herb"
       },
       {
@@ -8260,18 +8448,18 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "Thornpeak Heights",
         "tier": 2,
         "toolTier": 2,
-        "count": 1,
+        "count": 2,
         "material": "Sunpetal Herb"
       },
       {
         "zone": "Thornpeak Heights",
         "tier": 3,
         "toolTier": 3,
-        "count": 1,
+        "count": 2,
         "material": "Sunpetal Herb"
       }
     ],
-    "respawnSeconds": 120
+    "respawnSeconds": 240
   },
   {
     "id": "fishing",
@@ -8316,6 +8504,10 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
           {
             "name": "Trader Wilkes",
             "hub": "Eastbrook"
+          },
+          {
+            "name": "Provisioner Hale",
+            "hub": "Fenbridge"
           }
         ]
       },
@@ -8328,15 +8520,39 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
           {
             "name": "Trader Wilkes",
             "hub": "Eastbrook"
+          },
+          {
+            "name": "Quartermaster Bree",
+            "hub": "Highwatch"
           }
         ]
+      },
+      {
+        "name": "Stormreel Fishing Rod",
+        "tier": 4,
+        "quality": "rare",
+        "priceCopper": null,
+        "vendors": [],
+        "craftedBy": "engineering",
+        "priceMarks": 24,
+        "marksClears": 3
+      },
+      {
+        "name": "Tidewrought Fishing Rod",
+        "tier": 5,
+        "quality": "epic",
+        "priceCopper": null,
+        "vendors": [],
+        "craftedBy": "engineering",
+        "priceMarks": 56,
+        "marksHeroicClear": true
       }
     ],
     "fishing": {
       "biteMinSec": 3,
       "biteMaxSec": 8,
       "rodBiteReductionSec": 1.5,
-      "reelWindowSec": 3,
+      "reelWindowSec": 2.5,
       "reelRodBonusSec": 0.75,
       "sessionCapSec": 15,
       "schedule": [
@@ -8370,12 +8586,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Mirror Trout",
-                  "pct": 45,
+                  "pct": 46,
                   "quality": "common"
                 },
                 {
                   "name": "Raw River Perch",
-                  "pct": 30,
+                  "pct": 31,
                   "quality": "common"
                 },
                 {
@@ -8385,7 +8601,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
                 },
                 {
                   "name": "Sunglint Koi",
-                  "pct": 3,
+                  "pct": 1,
                   "quality": "uncommon"
                 },
                 {
@@ -8400,32 +8616,32 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Marsh Pike",
-                  "pct": 40,
+                  "pct": 22,
                   "quality": "common"
                 },
                 {
                   "name": "Raw Bog Eel",
-                  "pct": 30,
+                  "pct": 17,
                   "quality": "common"
                 },
                 {
                   "name": "Soggy Boot",
-                  "pct": 8,
+                  "pct": 12,
                   "quality": "poor"
                 },
                 {
                   "name": "Tangled Weed",
-                  "pct": 9,
+                  "pct": 13,
                   "quality": "poor"
                 },
                 {
                   "name": "Sunglint Koi",
-                  "pct": 3,
+                  "pct": 1,
                   "quality": "uncommon"
                 },
                 {
                   "name": null,
-                  "pct": 10,
+                  "pct": 35,
                   "quality": null
                 }
               ]
@@ -8435,27 +8651,27 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Frostgill Trout",
-                  "pct": 40,
+                  "pct": 9,
                   "quality": "common"
                 },
                 {
                   "name": "Raw Slatefin Carp",
-                  "pct": 30,
+                  "pct": 7,
                   "quality": "common"
                 },
                 {
                   "name": "Tangled Weed",
-                  "pct": 14,
+                  "pct": 28,
                   "quality": "poor"
                 },
                 {
                   "name": "Sunglint Koi",
-                  "pct": 4,
+                  "pct": 1,
                   "quality": "uncommon"
                 },
                 {
                   "name": null,
-                  "pct": 12,
+                  "pct": 55,
                   "quality": null
                 }
               ]
@@ -8472,12 +8688,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Mirror Trout",
-                  "pct": 48,
+                  "pct": 49,
                   "quality": "common"
                 },
                 {
                   "name": "Raw River Perch",
-                  "pct": 33,
+                  "pct": 32,
                   "quality": "common"
                 },
                 {
@@ -8502,12 +8718,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Marsh Pike",
-                  "pct": 43,
+                  "pct": 42,
                   "quality": "common"
                 },
                 {
                   "name": "Raw Bog Eel",
-                  "pct": 33,
+                  "pct": 32,
                   "quality": "common"
                 },
                 {
@@ -8527,7 +8743,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
                 },
                 {
                   "name": null,
-                  "pct": 8,
+                  "pct": 10,
                   "quality": null
                 }
               ]
@@ -8537,27 +8753,27 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Frostgill Trout",
-                  "pct": 43,
+                  "pct": 27,
                   "quality": "common"
                 },
                 {
                   "name": "Raw Slatefin Carp",
-                  "pct": 33,
+                  "pct": 20,
                   "quality": "common"
                 },
                 {
                   "name": "Tangled Weed",
-                  "pct": 10,
+                  "pct": 15,
                   "quality": "poor"
                 },
                 {
                   "name": "Sunglint Koi",
-                  "pct": 4,
+                  "pct": 3,
                   "quality": "uncommon"
                 },
                 {
                   "name": null,
-                  "pct": 10,
+                  "pct": 35,
                   "quality": null
                 }
               ]
@@ -8574,12 +8790,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Mirror Trout",
-                  "pct": 51,
+                  "pct": 50,
                   "quality": "common"
                 },
                 {
                   "name": "Raw River Perch",
-                  "pct": 36,
+                  "pct": 34,
                   "quality": "common"
                 },
                 {
@@ -8589,7 +8805,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
                 },
                 {
                   "name": "Sunglint Koi",
-                  "pct": 3,
+                  "pct": 6,
                   "quality": "uncommon"
                 },
                 {
@@ -8604,12 +8820,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Marsh Pike",
-                  "pct": 46,
+                  "pct": 43,
                   "quality": "common"
                 },
                 {
                   "name": "Raw Bog Eel",
-                  "pct": 36,
+                  "pct": 34,
                   "quality": "common"
                 },
                 {
@@ -8624,12 +8840,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
                 },
                 {
                   "name": "Sunglint Koi",
-                  "pct": 3,
+                  "pct": 6,
                   "quality": "uncommon"
                 },
                 {
                   "name": null,
-                  "pct": 6,
+                  "pct": 8,
                   "quality": null
                 }
               ]
@@ -8639,12 +8855,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Frostgill Trout",
-                  "pct": 46,
+                  "pct": 44,
                   "quality": "common"
                 },
                 {
                   "name": "Raw Slatefin Carp",
-                  "pct": 36,
+                  "pct": 34,
                   "quality": "common"
                 },
                 {
@@ -8654,12 +8870,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
                 },
                 {
                   "name": "Sunglint Koi",
-                  "pct": 4,
+                  "pct": 6,
                   "quality": "uncommon"
                 },
                 {
                   "name": null,
-                  "pct": 8,
+                  "pct": 10,
                   "quality": null
                 }
               ]

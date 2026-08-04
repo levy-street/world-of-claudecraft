@@ -852,6 +852,10 @@ export const table: DeedLocaleTable = {
     name: 'Eroico: Il Bacino di Wildheart',
     desc: 'Sconfiggi Zulgar, Voce del Bacino, nel Bacino di Wildheart in difficoltà Eroica.',
   },
+  chr_peaks_gatherer: {
+    name: 'Raccolto delle Alture',
+    desc: "Raccogli una vena di minerale, un ceppo di legname e una macchia d'erbe sulle Alture di Thornpeak.",
+  },
   chr_marsh_rares_ii: {
     name: 'Il Ghiottone, Messo in Conto',
     desc: 'Uccidi Grubjaw il Ghiottone, un quarto terrore famigerato della Palude di Mirefen rimasto fuori dal primo conteggio.',
@@ -867,5 +871,29 @@ export const table: DeedLocaleTable = {
   chr_hollow_rares: {
     name: 'Il Branco Ricorda',
     desc: 'Uccidi il Vecchio Marrowshell e Aurelhorn, Primo del Branco, i due boss rari erranti della Valletta.',
+  },
+  chr_willowfen_gatherer: {
+    name: "L'Abbondanza del Willowfen",
+    desc: "Raccogli una vena di minerale, un ceppo di legname e una macchia d'erbe nel Willowfen.",
+  },
+  chr_willowfen_first_cast: {
+    name: 'Increspature nelle Lilymoors',
+    desc: 'Pesca un pesce nelle acque del Willowfen.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Raccolto sul Promontorio',
+    desc: "Raccogli una vena di minerale, un ceppo di legname e una macchia d'erbe nel Galecrest.",
+  },
+  chr_galecrest_first_cast: {
+    name: 'Una Lenza nel Laghetto Specchio',
+    desc: 'Pesca un pesce nelle acque del Galecrest.',
+  },
+  chr_farshore_gatherer: {
+    name: "Provviste dell'Isola",
+    desc: "Raccogli una vena di minerale, un ceppo di legname e una macchia d'erbe sul Farshore.",
+  },
+  chr_farshore_first_cast: {
+    name: 'Ciò che Sanno i Gabbiani',
+    desc: 'Pesca un pesce nelle acque del Farshore.',
   },
 };

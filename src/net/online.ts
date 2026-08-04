@@ -32,9 +32,9 @@ import {
   ALL_RECIPES,
   abilitiesKnownAt,
   CLASSES,
+  getActiveWorldContent,
   NPCS,
   resolveDelveShopOffers,
-  STATIONS,
 } from '../sim/data';
 import { deadTargetSelectable } from '../sim/dead_target';
 import { freshDeedStats } from '../sim/deeds';
@@ -76,6 +76,8 @@ import {
   type VcNationId,
   type WeaponSkinType,
 } from '../sim/types';
+import type { VendorBuyOptions } from '../sim/vendor_buy_stack';
+import { WORLD_SEED } from '../sim/world_seed';
 import {
   type AccountCosmetics,
   type ActiveFrostRing,
@@ -121,6 +123,7 @@ import {
   type RecipeDef,
   type RiftFloorView,
   type SocialInfo,
+  type ToolEffectSlotView,
   type TradeInfo,
   type VcSharedCupInfo,
   type VcViewerReadout,
@@ -138,6 +141,7 @@ import type {
 } from '../world_api/professions';
 import { computeBackoffDelay } from './backoff';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
+import { createNativeAttestationProof } from './native_attestation';
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
@@ -311,6 +315,11 @@ export class ApiError extends Error {
     super(message);
     this.name = 'ApiError';
   }
+}
+
+export interface SeekerEntitlementStatus {
+  entitled: boolean;
+  mint: string | null;
 }
 
 // Builds the ApiError for a non-ok JSON response, capturing the stable `code` and
@@ -677,9 +686,10 @@ export class Api {
   }
 
   // The account's deed-broadcast setting (accounts.deed_broadcasts): whether a
-  // marquee unlock fans out to guildmates and followers. Read/write pair for
-  // the options toggle; both need the signed-in bearer. A malformed read body
-  // conservatively reads as enabled (the column default).
+  // marquee unlock fans out to guildmates and followers, and whether the
+  // Discord activity feed posts the account's deed and masterwork cards (R58).
+  // Read/write pair for the options toggle; both need the signed-in bearer. A
+  // malformed read body conservatively reads as enabled (the column default).
   async deedBroadcasts(): Promise<boolean> {
     const data = await this.get('/api/deeds/broadcasts');
     return data.enabled !== false;
@@ -858,6 +868,22 @@ export class Api {
 
   async unlinkWallet(): Promise<void> {
     await this.delete('/api/wallet/link', {});
+  }
+
+  async seekerEntitlement(): Promise<SeekerEntitlementStatus> {
+    const data = await this.get('/api/seeker/entitlement');
+    return {
+      entitled: data.entitled === true,
+      mint: typeof data.mint === 'string' ? data.mint : null,
+    };
+  }
+
+  async claimSeekerEntitlement(nativeAttestation: unknown): Promise<SeekerEntitlementStatus> {
+    const data = await this.post('/api/seeker/entitlement', { nativeAttestation });
+    return {
+      entitled: data.entitled === true,
+      mint: typeof data.mint === 'string' ? data.mint : null,
+    };
   }
 
   // ── Discord link/login + status ────────────────────────────────────────────
@@ -1258,8 +1284,11 @@ function blankEntity(id: number): Entity {
     castTargetId: null,
     castAim: null,
     gatherCastNodeId: '',
+    gatherCastToolRarity: '',
+    gatherCastEffectConfirmed: false,
     fishBiteAtTick: 0,
     fishReelDeadlineTick: 0,
+    fishCastZoneId: '',
     channeling: false,
     channelTickTimer: 0,
     channelTickEvery: 0,
@@ -1560,6 +1589,11 @@ export class ClientWorld implements IWorld {
   // from the `gprof` self-wire delta below (the real read surface; see
   // professionsState below for crafting/secondary professions).
   gatheringProficiency: Record<string, number> = {};
+  // Slotted tool effects, one row per gathering profession that has one,
+  // mirrored from the `tslot` self-wire delta. Empty for every player who has
+  // never slotted an effect, which is the server's own default: the sim leaves
+  // the backing PlayerMeta field absent and projects [] for it.
+  toolEffectSlots: readonly ToolEffectSlotView[] = [];
   // Per-delve clears (key `${delveId}:${tierId}`), mirrored from the self-wire so
   // delveShopOffers can resolve the shop lock badge client-side.
   delveClears: Record<string, number> = {};
@@ -1582,13 +1616,25 @@ export class ClientWorld implements IWorld {
   nodeHarvestableByMe(nodeId: string): boolean {
     return !this.nodeCooldowns?.has(nodeId);
   }
+  // The countdown read of the same mirror (IWorldProfessions
+  // nodeRespawnSeconds): the entry IS the remaining seconds, refreshed per
+  // snapshot in stable timer mode (refreshStableSelfTimers ages the deadline
+  // set) and re-sent by the legacy wire, so this stays a plain lookup with no
+  // second timer domain. Null exactly when nodeHarvestableByMe is true.
+  nodeRespawnSeconds(nodeId: string): number | null {
+    return this.nodeCooldowns?.get(nodeId) ?? null;
+  }
   // Static content read (#1127, extended #1132): the full recipe list (common
   // tier plus combo recipes) ships with the client bundle like every other
   // content table, so this needs no wire round-trip. See src/world_api/professions.ts.
   recipeList: readonly RecipeDef[] = ALL_RECIPES;
-  // Online realms always use the version-pinned built-in static layout; no
-  // snapshot field is needed for authored station markers.
-  readonly stationPlacements = STATIONS;
+  // Station anchors resolve the ACTIVE content bundle, exactly like the
+  // offline Sim's stationPlacements (byte-identical on shipped hosts, where
+  // the active bundle wraps the builtin STATIONS reference); no snapshot
+  // field is needed for authored station markers.
+  get stationPlacements() {
+    return getActiveWorldContent().services?.stations ?? [];
+  }
   // Craft-result surface (#1127), mirrored from the server's `craftResult`
   // event (applyEvent below). Null until this session's first craft attempt.
   lastCraftResult: CraftResultView | null = null;
@@ -1758,7 +1804,9 @@ export class ClientWorld implements IWorld {
     this.base = normalizeOrigin(base) || NATIVE_API_ORIGIN || DESKTOP_API_ORIGIN;
     this.clientSeed = clientSeed;
     this.ownPlayerClass = cls;
-    this.cfg = { seed: 20061, playerClass: cls };
+    // Placeholder until the server's hello supplies the authoritative seed;
+    // seeded from the shipped constant so the two can never silently diverge.
+    this.cfg = { seed: WORLD_SEED, playerClass: cls };
     this.openSocket();
     // unconditional input stream beat; constants + gate shared with the
     // cadence-model matrix via input_send_cadence.ts (R13)
@@ -2830,6 +2878,12 @@ export class ClientWorld implements IWorld {
             // (auras_view ownFirst). An old server omits it; 0 matches no player id.
             rec.sourceId = a.src ?? 0;
             rec.unbreakableControl = a.ub === 1 ? true : undefined;
+            // Presence-only mirror of the break-threshold armed marker (the
+            // server emits bt = 1 when breakThreshold is defined): the one
+            // client reader is the Lingering Dread victim-band alias, which
+            // gates on breakThreshold !== undefined and never reads the
+            // value (ability_vfx/painter.ts). An old server omits it and the
+            // band stays off, exactly the offline-parity gap this closes.
             rec.breakThreshold = a.bt === 1 ? 1 : undefined;
           }
         } else {
@@ -3251,6 +3305,7 @@ export class ClientWorld implements IWorld {
       if (s.ench !== undefined) this.lastEnchantResult = s.ench ?? null;
       if (s.salv !== undefined) this.lastSalvageResult = s.salv ?? null;
       if (s.gprof !== undefined) this.gatheringProficiency = s.gprof ?? {};
+      if (s.tslot !== undefined) this.toolEffectSlots = s.tslot ?? [];
       if (s.prof !== undefined) this.professionsState = s.prof ?? { skills: [] };
       if (s.cprof !== undefined && s.cprof) {
         const cprof = s.cprof as CraftingIdentityView;
@@ -3277,6 +3332,11 @@ export class ClientWorld implements IWorld {
           // order on cooldown shows unavailable on the client too. The ?? []
           // keeps an older server's payload (without the field) loading cleanly.
           cadenceBlockedQuests: [...(cprof.cadenceBlockedQuests ?? [])],
+          // The quested-hobby record, mirrored so the attunement preview can
+          // promise the hobby a return will actually restore. Conditional
+          // spread: absent stays absent (older server payloads, characters
+          // without the feature).
+          ...(cprof.questedHobbies ? { questedHobbies: { ...cprof.questedHobbies } } : {}),
         };
       }
       // camera follows server-side facing changes when not mouselooking
@@ -3669,16 +3729,41 @@ export class ClientWorld implements IWorld {
   discardItem(itemId: string, count?: number): void {
     this.cmd({ cmd: 'discard', item: itemId, count });
   }
-  buyItem(npcId: number, itemId: string, bulk?: boolean): void {
-    // `bulk` rides the wire only when true (the craftItem `commission` idiom
-    // above): an ordinary buy stays byte-identical to the pre-#2374 message.
-    if (bulk === true) {
+  buyItem(npcId: number, itemId: string, opts?: VendorBuyOptions): void {
+    // `bulk` and `count` each ride the wire only when non-default (the
+    // craftItem `commission` idiom above): an ordinary buy stays
+    // byte-identical to the pre-#2374 message, and a count of 1 stays
+    // byte-identical to the bulk-era frame. The sender never emits both
+    // fields: bulk's two affordances and the count control row are separate
+    // surfaces, and the server's bulk-wins precedence only ever decides
+    // hand-crafted frames.
+    //
+    // Facet parity on a HOSTILE count (nothing in this client sends one; the
+    // control row emits 5/10 and the prompt floors at 1): a finite non-1
+    // value rides the wire as-is so the authoritative sanitize denies it
+    // with the same toast the offline Sim gives; a non-finite value cannot
+    // ride JSON at all (NaN/Infinity serialize to null and would silently
+    // buy 1), so it is dropped here, the one place it can be. Either way a
+    // hostile count never becomes a purchase in either world.
+    if (opts?.bulk === true) {
       this.cmd({ cmd: 'buy', npc: npcId, item: itemId, bulk: true });
+    } else if (opts?.count !== undefined && opts.count !== 1) {
+      if (Number.isFinite(opts.count)) {
+        this.cmd({ cmd: 'buy', npc: npcId, item: itemId, count: opts.count });
+      }
     } else {
       this.cmd({ cmd: 'buy', npc: npcId, item: itemId });
     }
   }
-  harvestNode(nodeId: string): Promise<boolean> {
+  // `confirmEffectUse` (R40): the per-use consent for a 'prompt'-mode tool
+  // effect slot, sent ONLY when true (the craftItem `commission` precedent)
+  // so every unconfirmed harvest's wire message stays byte-identical to the
+  // pre-flow form. The server reads it strict-boolean and defaults
+  // unconfirmed, the fail-safe arm for a stale bundle that never sends it.
+  harvestNode(nodeId: string, confirmEffectUse?: boolean): Promise<boolean> {
+    if (confirmEffectUse === true) {
+      return this.cmdWithOutcome({ cmd: 'harvest_node', node: nodeId, confirmUse: true });
+    }
     return this.cmdWithOutcome({ cmd: 'harvest_node', node: nodeId });
   }
   // `commission` (Professions 2.0): the boolean Maker's Bond
@@ -3700,6 +3785,38 @@ export class ClientWorld implements IWorld {
   // trainResult event; the learned set mirrors back via the cprof delta.
   trainRecipe(recipeId: string): void {
     this.cmd({ cmd: 'train_recipe', recipe: recipeId });
+  }
+  // Tool effect slotting: command only, never predicted. The server
+  // re-validates the profession id, the effect id, that a real tool for that
+  // profession is carried, and that a crafted charm copy is held (the
+  // acquisition craft: the slot consumes it server-side); the resulting slot
+  // mirrors back via the tslot delta and the outcome via the pid-scoped
+  // toolEffectResult event, so nothing is written here optimistically.
+  // The mode union matches the re-widened IWorld facet (R40): 'prompt' is a
+  // real mode now that the confirm flow ships, and the resolver validates
+  // the union server-side either way.
+  slotToolEffect(professionId: string, effectId: string, confirmMode?: 'always' | 'prompt'): void {
+    // The craftItem `commission` precedent: an omitted optional sends a wire
+    // message byte-identical to the pre-feature form rather than an explicit
+    // default the server would have applied anyway.
+    if (confirmMode === undefined) {
+      this.cmd({ cmd: 'slot_tool_effect', profession: professionId, effect: effectId });
+      return;
+    }
+    this.cmd({
+      cmd: 'slot_tool_effect',
+      profession: professionId,
+      effect: effectId,
+      mode: confirmMode,
+    });
+  }
+  // Tool effect recharge: command only, never predicted. The server prices
+  // the R39 material count and the R30 fill off ITS copy of the viewer's bags
+  // and slot; the refreshed charges mirror back via the tslot delta and the
+  // outcome (price paid, or required on the insufficient-materials deny) via
+  // the same toolEffectResult event the slot uses.
+  rechargeToolEffect(professionId: string): void {
+    this.cmd({ cmd: 'recharge_tool_effect', profession: professionId });
   }
   // Enchanting profession commands (Professions 2.0): command only,
   // never predicted. The server re-validates ownership/eligibility/throttle in
@@ -4587,11 +4704,17 @@ export class ClientWorld implements IWorld {
   // tick dependency needed. Expired entries are lazily dropped by the reader.
   private applyRiftDeathZoneSpawnEvent(ev: SimEvent): void {
     if (ev.type !== 'riftDeathZoneSpawn') return;
+    const now = performance.now();
+    // Drop expired rings HERE, not just in the reader's return value: the
+    // reader filters its output but left the backing array to grow for the
+    // whole floor, a per-frame walk over dead entries on a long boss fight.
+    // Spawn cadence bounds the cost of the filter itself.
+    this.activeBossDeathZones = this.activeBossDeathZones.filter((z) => z.expiresAtMs > now);
     this.activeBossDeathZones.push({
       x: ev.x,
       z: ev.z,
       radius: ev.radius,
-      expiresAtMs: performance.now() + ev.durationSecs * 1000,
+      expiresAtMs: now + ev.durationSecs * 1000,
     });
   }
 
@@ -4866,13 +4989,16 @@ export class ClientWorld implements IWorld {
   }
 
   async spinDailyReward(): Promise<DailyRewardSpinResult> {
+    const nativeAttestation = NATIVE_APP
+      ? await createNativeAttestationProof(this.base, 'seeker-spin')
+      : undefined;
     const res = await fetch(apiUrl('/api/daily-rewards/spin', this.base), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.token}`,
       },
-      body: '{}',
+      body: JSON.stringify({ nativeAttestation }),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error ?? 'daily spin unavailable');

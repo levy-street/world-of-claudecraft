@@ -66,6 +66,55 @@ const DROWNED_LITANY_SHOP: DelveShopEntry[] = [
   // -- signature rares require a Heroic completion (multi-week goals) --
   { itemId: 'sister_nhalia_choir_plate', marks: 56, gate: 'heroicClear' },
   { itemId: 'drowned_choir_fang', marks: 56, gate: 'heroicClear' },
+  // -- the crafted top-tier gathering tools, as a NON-CRAFTER's route to them --
+  //
+  // These eight are the tier-4 and tier-5 picks, axes, sickles and rods that
+  // otherwise only an engineer at a toolworks can produce (recipes.ts
+  // TOOL_RECIPES and ROD_RECIPES). A player who never took a crafting
+  // profession had no path to the top of the tool ladder at all; this is that
+  // path, priced in Marks rather than in a profession.
+  //
+  // NO NEW PRICE RUNGS AND NO NEW GATES. Both rows reuse this shop's existing
+  // top two: tier 4 sits on the helm's rung (24 Marks behind three clears, the
+  // "commitment" step) and tier 5 on the signature-rare rung (56 behind a
+  // Heroic clear, the multi-week goal). That is deliberate rather than
+  // convenient, because the Litany's whole price ladder is pinned as a straight
+  // 2x of the Collapsed Reliquary's tiers (tests/delve_shop.test.ts), and a
+  // bespoke tool price would either break that relationship or force an
+  // invented mirror row into the entry delve where a top tool does not belong.
+  //
+  // They land HERE rather than on the Heroic Quartermaster's counter, which was
+  // the other candidate: HEROIC_VENDOR_ITEMS (content/heroic_vendor.ts) is a
+  // self-contained ItemDef registry that never reads ITEMS, so a tool row there
+  // means a duplicate def of an item that already exists, and its stock is
+  // budget-enforced level-20 jewelry (tests/item_level.test.ts) whose stated
+  // identity is being the game's only source of necks and rings. A stat-less
+  // tool fits neither. A DelveShopEntry's itemId resolves into ITEMS directly,
+  // and delveShopGateUnlocked below is already shared by the authoritative buy
+  // and the client's lock badge, so these rows need no new gate logic anywhere.
+  //
+  // This does NOT weaken the tools' never-sold rule, it sharpens it: the claim
+  // is that no counter sells them FOR COPPER, and Marks are a delve currency
+  // earned by running the delve. The guards in tests/professions_tools.test.ts
+  // and tests/professions_rod_recipes.test.ts assert exactly that, and were
+  // widened to sweep this table (and the heroic vendor's) rather than only
+  // NPCS[*].vendorItems, which would have let these rows through in silence.
+  //
+  // These rows carry NO proficiency requirement, unlike the tier-2 and tier-3
+  // copper rows on the ordinary counters (content/vendor_row_gates.ts). That is
+  // not an oversight and not a decision made here: whether a tool's PURCHASE
+  // should be gated on the same proficiency its USE is gated on is an open
+  // question the maintainer holds. The clears gate is what paces these rows
+  // today, and it is a content gate rather than a profession one, so nothing
+  // here presumes an answer either way.
+  { itemId: 'thorium_mining_pick', marks: 24, gate: 'clears:3' },
+  { itemId: 'ashwood_axe', marks: 24, gate: 'clears:3' },
+  { itemId: 'goldleaf_sickle', marks: 24, gate: 'clears:3' },
+  { itemId: 'stormreel_fishing_rod', marks: 24, gate: 'clears:3' },
+  { itemId: 'arcanite_mining_pick', marks: 56, gate: 'heroicClear' },
+  { itemId: 'elderwood_axe', marks: 56, gate: 'heroicClear' },
+  { itemId: 'sunpetal_sickle', marks: 56, gate: 'heroicClear' },
+  { itemId: 'tidewrought_fishing_rod', marks: 56, gate: 'heroicClear' },
 ];
 
 // Per-delve shop stock, keyed by DelveDef.id. New delves register their stock

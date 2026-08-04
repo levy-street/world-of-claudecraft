@@ -1,10 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
   compactScreeMatrices,
+  SCREE_CELL,
   screeSpotAt,
   screeSpotsInBounds,
 } from '../src/render/cliff_scree_core';
-import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
+import { BUILTIN_WORLD, GATHER_NODES, setActiveWorldContent } from '../src/sim/data';
 import type { WorldContent } from '../src/sim/types';
 import {
   groundHeight,
@@ -71,6 +72,44 @@ describe('cliff scree placement', () => {
         expect(d).toBeGreaterThanOrEqual(15);
       }
     }
+  });
+
+  it('never places inside a gather node footprint (the harvest disc plus margin)', () => {
+    // The v0.34.0 merge audit: scree had road and hub exclusions but no
+    // gather-node exclusion, and at the SHIPPED seed 22 boulders landed
+    // inside 5yd harvest discs, two essentially ON node props. The shipped
+    // seed is therefore the decisive one here: with the exclusion removed
+    // this sweep fails at 20061 (the measured regression), not just in
+    // principle. 6 = INTERACT_RANGE + 1yd of visual margin
+    // (cliff_scree_core.ts NODE_EXCLUSION_RADIUS).
+    const SHIPPED_SEED = 20061;
+    const pad = 6 + SCREE_CELL; // exclusion radius + one full candidate cell
+    let spotsSeen = 0;
+    for (const seed of [SHIPPED_SEED, SEED]) {
+      for (const node of GATHER_NODES) {
+        for (
+          let ci = Math.floor((node.pos.x - pad) / SCREE_CELL);
+          ci <= Math.ceil((node.pos.x + pad) / SCREE_CELL);
+          ci++
+        ) {
+          for (
+            let cj = Math.floor((node.pos.z - pad) / SCREE_CELL);
+            cj <= Math.ceil((node.pos.z + pad) / SCREE_CELL);
+            cj++
+          ) {
+            const spot = screeSpotAt(seed, ci, cj);
+            if (!spot) continue;
+            spotsSeen++;
+            const d = Math.hypot(spot.x - node.pos.x, spot.z - node.pos.z);
+            expect(d, `${node.id} seed ${seed} cell ${ci},${cj}`).toBeGreaterThanOrEqual(6);
+          }
+        }
+      }
+    }
+    // Non-vacuity: the sweep must actually see surviving neighbours, or a
+    // content or cell retune could hollow this pin out silently (measured
+    // 365 + 400 surviving spots across the two seeds at the fix round).
+    expect(spotsSeen).toBeGreaterThan(200);
   });
 
   it('keeps tier-gated visual scree out of the shared walkable heightfield', () => {

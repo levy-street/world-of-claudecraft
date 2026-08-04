@@ -302,8 +302,9 @@ deploy_watchdog cases):
 1. Tank crit immunity (`src/sim/combat/tank_crit_immunity.ts` + the one mob
    crit roll in `Sim.mobSwing`; roll still drawn for parity): prot warrior,
    protection paladin, feral druid IN Sloth Form. Pinned by
-   `tests/tank_crit_immunity.test.ts` (immune trio at zero crits, control
-   specs still critted).
+   the `tests/tank_crit_immunity_*_pair.test.ts` trio, warrior, paladin, and
+   druid, over the shared `tests/tank_crit_immunity_util.ts` (immune spec at
+   zero crits, control specs still critted).
 2. Heal-side Spell Power doubled (`HEALING_SP_SCALE = 2` in spell_scaling.ts,
    direct heals + HoTs; absorbs deliberately excluded: the only
    coefficient-carrying shields are MAGE barriers, and the healer shield

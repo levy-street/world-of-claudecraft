@@ -10,8 +10,14 @@
 // (enforced by tests/architecture.test.ts). The market draws NO rng.
 
 import { bagCapacity, canGrantCopies, instancedCountCap } from './bags';
+import { rekeySigner } from './character_rename';
 import { ITEMS } from './data';
 import { formatMoney } from './format_money';
+import {
+  boundCraftedRecipeIdOnLoad,
+  sanitizeItemInstancePayloadOnLoad,
+  warnDroppedInstanceKeys,
+} from './item_instance_load';
 import {
   countMatchingUnlocked,
   grantCopies,
@@ -114,11 +120,12 @@ export interface MarketListing {
   instance?: ItemInstancePayload;
   // Recipe id that crafted every unit in this stack (bags.ts InvSlot.craftedRecipeId,
   // professions/crafting.ts), when the seller's stock carried one. Absent for a
-  // plain, never-crafted stack (and always absent on an instanced row: `instance`
-  // and `craftedRecipeId` are mutually exclusive, one row is either a single
-  // instanced copy or a plain fungible stack). Threaded through buy/cancel/collect
-  // (BUG #9) so a market round trip never launders a crafted item's provenance
-  // and reopens the disenchant anti-farming gate
+  // plain, never-crafted stack. ORTHOGONAL to `instance`, not exclusive with it:
+  // a single instanced row can also be crafted (a masterwork proc, or a crafted
+  // piece enchanted while worn), and reading the two as mutually exclusive is
+  // what dropped the marker off every such listing. Threaded through
+  // list/buy/cancel/collect (BUG #9) so a market round trip never launders a
+  // crafted item's provenance and reopens the disenchant anti-farming gate
   // (professions/enchanting.ts isCraftedDisenchantVictim).
   craftedRecipeId?: string;
 }
@@ -247,8 +254,48 @@ export class Market {
         if (listing.sellerKey !== key || listing.sellerName !== newName) changed = true;
         listing.sellerKey = key;
         listing.sellerName = newName;
+        // The escrowed payload follows its owner through the rename the same
+        // way the blob sweep's buyback arm does (the fix-round review): a
+        // cancel or expiry hands this exact copy back, and a stale signer
+        // would detach the original-crafter discount, or after a reclaim
+        // name a stranger. Foreign signers are untouched (the accepted
+        // craftedBy limitation).
+        if (rekeySigner(listing.instance, oldName, newName)) changed = true;
       }
     }
+    const collection = this.marketCollections.get(key);
+    for (const slot of collection?.items ?? []) {
+      if (rekeySigner(slot.instance, oldName, newName)) changed = true;
+    }
+    return changed;
+  }
+
+  // Character deletion (R43): a deleted character can never stand at the Merchant
+  // again, so its listings and its collection leave the book instead of sitting
+  // uncollectable forever (expired listings would keep folding goods into an
+  // orphan collection nobody can claim). Matches the SAME dual keys
+  // rekeyMarketSeller does, the stable character-id key plus a legacy name-keyed
+  // row, and never touches house stock. (marketSellerKey's entityId fallback
+  // for a meta with no characterId cannot key a production row: the server
+  // always passes the character id at join, and the only metas without one
+  // are dev-gated bots.) Everything destroyed here is the deleted
+  // character's OWN escrow (marketList escrows out of the seller's own bags), so
+  // no other player's property rides along. Returns whether anything changed, so
+  // the caller only pays for a save when there was something to purge.
+  purgeMarketSeller(characterId: number, name: string): boolean {
+    if (!Number.isFinite(characterId)) return false;
+    const key = String(characterId);
+    const owns = (k: string): boolean => k === key || (name !== '' && k === name);
+    let changed = false;
+    for (let i = this.marketListings.length - 1; i >= 0; i--) {
+      const listing = this.marketListings[i];
+      if (listing.house) continue;
+      if (!owns(listing.sellerKey)) continue;
+      this.marketListings.splice(i, 1);
+      changed = true;
+    }
+    if (this.marketCollections.delete(key)) changed = true;
+    if (name !== '' && name !== key && this.marketCollections.delete(name)) changed = true;
     return changed;
   }
 
@@ -490,7 +537,7 @@ export class Market {
       return;
     }
     const escrowed = removeMatchingInstance(this.ctx, itemId, instance, meta.entityId);
-    if (!escrowed) return; // revalidation raced away; nothing was removed
+    if (!escrowed?.instance) return; // revalidation raced away; nothing was removed
     this.marketListings.push({
       id: this.nextListingId++,
       sellerKey,
@@ -500,7 +547,13 @@ export class Market {
       price: ask,
       expiresAt: this.ctx.time + MARKET_LISTING_DURATION,
       house: false,
-      instance: escrowed,
+      instance: escrowed.instance,
+      // An instanced row CAN also be crafted (a masterwork proc, an enchanted
+      // crafted piece), so the marker rides alongside the payload rather than
+      // being assumed absent here.
+      ...(escrowed.craftedRecipeId === undefined
+        ? {}
+        : { craftedRecipeId: escrowed.craftedRecipeId }),
     });
     this.ctx.emit({
       type: 'loot',
@@ -695,7 +748,12 @@ export class Market {
       this.marketListings.splice(i, 1);
       // Conditional spread: a plain row must not grow an `instance: undefined`/
       // `craftedRecipeId: undefined` key (rows are persisted and diffed
-      // byte-for-byte). instance and craftedRecipeId are mutually exclusive.
+      // byte-for-byte). BOTH are spread independently because a row can carry
+      // both at once (a masterwork proc, or a crafted piece enchanted while
+      // worn): reading them as mutually exclusive is the exact mental model
+      // that dropped the marker off every such listing, so this expiry return
+      // must keep treating them as orthogonal. See the MarketListing field
+      // comment above.
       this.collectionFor(l.sellerKey).items.push({
         itemId: l.itemId,
         count: l.count,
@@ -846,6 +904,8 @@ export class Market {
     // never lands, and `remapped` counts only reissues the book actually took.
     // (A listing whose item id is merely no longer in ITEMS is a different case
     // and is KEPT; see the loop below.)
+    // One aggregated dev-channel line per book load, the mail-book idiom.
+    const escrowDrops: string[] = [];
     const saved = (save.listings ?? []).filter((l) => l && typeof l.itemId === 'string');
     // Settle the id counter and reissue any collision BEFORE a single row is
     // pushed back. The house band is already in the book (seeded by the ctor)
@@ -874,16 +934,31 @@ export class Market {
       // A persisted instanced row rehydrates its payload (deep-cloned off the
       // raw blob) and clamps to the single-copy contract: no hand-edited save
       // can mint a counted stack of one escrowed special copy.
-      const instance =
-        l.instance && typeof l.instance === 'object'
-          ? cloneItemInstancePayload(l.instance)
-          : undefined;
-      this.marketListings.push({
+      // Through the SAME shared payload bound the escrow slots take (the
+      // phase 18 whole-branch review): the listing arm was the one instanced
+      // rehydration in either book that bypassed even sanitizeEscrowSlot, so
+      // an oversized or clone-mangled payload rode every market save and was
+      // granted into the buyer's live bags on purchase. A payload the bound
+      // rejects whole leaves the listing as dormant plain data, the same
+      // doctrine as an unknown item id.
+      // The single-copy clamp keys on the RAW row's instance, not the
+      // post-bound survivor: a payload the bound rejects whole must still
+      // load as count 1, or a tampered instanced row would launder its
+      // count through deliberately corrupt payload bytes (the round 5
+      // finder caught the clamp reading the bound's output).
+      const hadInstance = !!(l.instance && typeof l.instance === 'object');
+      let instance: ItemInstancePayload | undefined;
+      if (hadInstance && l.instance) {
+        const bounded = sanitizeItemInstancePayloadOnLoad(cloneItemInstancePayload(l.instance));
+        for (const d of bounded.dropped) escrowDrops.push(`listing.${l.itemId}.${d}`);
+        instance = bounded.payload;
+      }
+      const listing = {
         id: plan.ids[i],
         sellerKey: String(l.sellerKey ?? ''),
         sellerName: String(l.sellerName ?? l.sellerKey ?? '?'),
         itemId: l.itemId,
-        count: instance ? 1 : Math.max(1, l.count | 0),
+        count: hadInstance ? 1 : Math.max(1, l.count | 0),
         price: Math.max(
           MARKET_MIN_PRICE,
           Math.min(MARKET_MAX_PRICE, Math.floor(l.price) || MARKET_MIN_PRICE),
@@ -894,7 +969,18 @@ export class Market {
         house: false,
         ...(instance ? { instance } : {}),
         ...(typeof l.craftedRecipeId === 'string' ? { craftedRecipeId: l.craftedRecipeId } : {}),
-      });
+      };
+      // The slot-level marker bound every other persisted marker load takes
+      // (bag/buyback/bank; item_instance_load.ts doctrine): a listing row can
+      // persist to expiry and re-grant into live bags via grantCopies, so a
+      // bare typeof keep would carry an empty or unbounded marker unreported.
+      // 'listingSlot', not 'listing': the payload bound above already emits
+      // listing.<itemId>.craftedRecipeId for a dropped PAYLOAD key of the
+      // same name (payloads legitimately carry one, items.ts), so the
+      // slot-level marker drop needs its own label to stay tellable apart
+      // in the one aggregated book line.
+      boundCraftedRecipeIdOnLoad(listing, escrowDrops, 'listingSlot');
+      this.marketListings.push(listing);
     }
     for (const c of save.collections ?? []) {
       if (!c || typeof c.key !== 'string') continue;
@@ -907,14 +993,22 @@ export class Market {
         // its count to the identical-payload merge cap (the character-load rule).
         items: (c.items ?? [])
           .filter((s) => s && typeof s.itemId === 'string')
-          .map((s) => ({
-            ...sanitizeEscrowSlot(s, instancedCountCap(ITEMS[s.itemId], s.instance)),
-            ...(typeof s.craftedRecipeId === 'string'
-              ? { craftedRecipeId: s.craftedRecipeId }
-              : {}),
-          })),
+          .map((s) => {
+            const slot: InvSlot = {
+              ...sanitizeEscrowSlot(s, instancedCountCap(ITEMS[s.itemId], s.instance), escrowDrops),
+              ...(typeof s.craftedRecipeId === 'string'
+                ? { craftedRecipeId: s.craftedRecipeId }
+                : {}),
+            };
+            // Same slot-level marker bound as the listing arm above: a
+            // collection slot persists until collected and grants straight
+            // into live bags, the same forever-row class as mail.
+            boundCraftedRecipeIdOnLoad(slot, escrowDrops, 'collectionSlot');
+            return slot;
+          }),
       });
     }
+    warnDroppedInstanceKeys('market book', escrowDrops);
     this.nextListingId = plan.nextListingId;
     if (plan.remapped > 0) {
       // Dev-channel only: a boot-time repair the operator should see in the log.

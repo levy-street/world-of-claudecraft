@@ -10,6 +10,7 @@ vi.mock('../server/db', () => ({
 
 vi.mock('../server/realm', () => ({
   REALM: 'test-realm',
+  REALM_DIRECTORY: [{ name: 'test-realm', url: '', type: 'Normal' }],
 }));
 
 import { associationsForIp, listSharedIps } from '../server/admin_db';

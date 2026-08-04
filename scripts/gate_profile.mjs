@@ -10,6 +10,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolveAvailableMemoryBytes } from './lib/gate_memory.mjs';
 import {
   buildGateProfileSteps,
   collectMachineFacts,
@@ -45,11 +46,20 @@ if (args.help) {
 }
 
 const facts = collectMachineFacts(os, process, process.env);
+// Measurement has to model the real gate, so the worker count comes from the SAME sensor
+// gate.mjs uses (lib/gate_memory.mjs), not raw os.freemem(). Profiling a macOS host off
+// freemem would report (and run) fewer workers than the gate it is meant to measure, and
+// docs/local-gate-perf/baselines.md compares the two directly. Machine facts still record
+// freemem as observed; the printed block shows both so the worker count is explainable.
+const availableMemBytes = resolveAvailableMemoryBytes({
+  platform: process.platform,
+  freeMemBytes: facts.freeMemBytes,
+});
 const workers =
   args.workersOverride ??
   computeGateWorkers({
     cpuCount: facts.cpuCount,
-    freeMemBytes: facts.freeMemBytes,
+    freeMemBytes: availableMemBytes,
     envOverride: process.env.GATE_MAX_WORKERS,
     tierCap: resolveGateWorkerTierCap(process.env.GATE_WORKER_TIER),
   });
@@ -62,6 +72,7 @@ const dateUtc = new Date().toISOString();
 console.log(
   formatMachineFacts(facts, {
     workers,
+    availableMemGb: Math.round((availableMemBytes / (1024 * 1024 * 1024)) * 10) / 10,
     gitSha: gitShaShort,
     npmVersion,
     dateUtc,
@@ -127,7 +138,14 @@ if (args.steps) {
     );
   }
 
+  // Resolved before the builder so a dry run PLANS the release-tier step too: a planned
+  // list that omits a step the real run performs is exactly the drift this harness exists
+  // to catch.
+  const profiledBranch = runCapture('git', ['branch', '--show-current']) ?? '';
+  const releaseTier = profiledBranch.startsWith('release/');
+
   const steps = buildGateProfileSteps(workers, {
+    releaseTier,
     skipBrowser: args.skipBrowser,
     skipBuilds: args.skipBuilds,
     skipVitest: args.skipVitest,
@@ -143,12 +161,14 @@ if (args.steps) {
       timed.push({ name: s.name, seconds: 0, status: 'skipped' });
     }
   } else {
-    const branch = runCapture('git', ['branch', '--show-current']) ?? '';
-    const releaseTier = branch.startsWith('release/');
-    const env = releaseTier ? { ...process.env, I18N_RELEASE_TIER: '1' } : process.env;
+    // Mirror gate.mjs exactly: the tier rides on the dedicated release-tier step
+    // buildGateProfileSteps added above, NOT on the whole run. A job-level flag here
+    // would reintroduce the full-suite i18n red that issue #2820 took off the merge bar,
+    // and would time a run the real gate no longer performs.
+    const env = process.env;
     if (releaseTier) {
       console.log(
-        `[gate_profile] release branch "${branch}": I18N_RELEASE_TIER=1 (same as gate.mjs)`,
+        `[gate_profile] release branch "${profiledBranch}": timing the added release-tier i18n step`,
       );
     }
 

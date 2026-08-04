@@ -360,16 +360,21 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned, twice over now. First: the lockfile leaf is
-      // pnpm-lock.yaml after the local-gate-perf migration (previously
-      // package-lock.json at 0.33.1), a hashed input to every GLB source
-      // fingerprint, so the town, mailbox and noticeboard leaves all moved.
-      // Second: the Drakelands brood added its shout/flourish and
-      // attackByAbility wiring to src/render/renderer.ts, which is the
-      // rendererIntegration leaf, so that one moved too and the composite mints
-      // fresh again. Still not one pipeline input or geometry value changed, and
-      // no capture was retaken: Eastbrook itself is untouched by both.
-      fingerprint: '587e777b708fc2f9db35abe8391a28a3cdeac8ba9a36e4186df4642d58d5b23b',
+      // Deliberately re-pinned, and this mint folds in three independent moves.
+      // First: the lockfile leaf is pnpm-lock.yaml after the local-gate-perf
+      // migration (previously package-lock.json at 0.33.1), a hashed input to
+      // every GLB source fingerprint, so the town, mailbox and noticeboard
+      // leaves all moved. Second: src/render/renderer.ts is the
+      // rendererIntegration leaf, and the release branch edited it to gate the
+      // shapeshift-form visual swap on async compile (#2571). Third: the
+      // Drakelands brood added its shout/flourish and attackByAbility wiring to
+      // that same leaf, then gated the shout/flourish dispatch on a mob source
+      // so player castFx keeps reaching the warrior plan. Still not one pipeline
+      // input or geometry value changed, and no capture was retaken: Eastbrook
+      // itself is untouched by all three, following the identical precedent this
+      // composite already carries from the compile-storm gear/mount/base-visual
+      // gate fix.
+      fingerprint: '2d4e6e0ee7168a0bf25a13ba1a2754f39e8c8f168e6f369ceb6588fe2bb9b2bb',
       components: {
         captureContract: {
           id: 'polish-v2',

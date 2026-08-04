@@ -46,29 +46,32 @@ import {
   type Entity,
   type EquipSlot,
   INTERACT_RANGE,
+  type InventoryUnit,
   type ItemDef,
   type ItemInstancePayload,
   isNonSpellCast,
   POTION_COOLDOWN,
 } from './types';
-import { bulkBuyQuantity } from './vendor_buy_stack';
-import { vendorStackSize } from './vendor_stack';
+import {
+  bulkBuyQuantity,
+  buyPurchaseTotals,
+  sanitizeBuyCount,
+  type VendorBuyOptions,
+  vendorCountForced,
+} from './vendor_buy_stack';
 
 const VENDOR_BUYBACK_LIMIT = 12;
 
-interface EquippedInventoryUnit {
-  instance: ItemInstancePayload | undefined;
-  craftedRecipeId: string | undefined;
-}
+// The one shared shape (types.ts InventoryUnit): both provenance channels of a
+// single unit lifted out of a slot. Kept as a local alias rather than a second
+// declaration so the equip bridge cannot drift from the removers.
+type EquippedInventoryUnit = InventoryUnit;
 
 // Exported for social/trade.ts and market.ts (BUG #9): the trade swap and the
 // World Market escrow both need the same per-unit craftedRecipeId tracking a
 // vendor sell/buyback already had, so they reuse this shape and the walk
 // below instead of duplicating it.
-export interface VendorRemovedUnit {
-  instance: ItemInstancePayload | undefined;
-  craftedRecipeId: string | undefined;
-}
+export type VendorRemovedUnit = InventoryUnit;
 
 function consumeEquippedInventoryUnit(meta: PlayerMeta, itemId: string): EquippedInventoryUnit {
   for (let i = meta.inventory.length - 1; i >= 0; i--) {
@@ -188,36 +191,73 @@ export function removePreferFungible(
   count: number,
   pid?: number,
   skip?: (instance: ItemInstancePayload) => boolean,
+  // The trade copy-choice fix (the phase 12 QA hand-off): copies this
+  // predicate matches are consumed LAST among the instanced copies (still
+  // honoring `skip` outright). The trade drop arm passes the seller's own
+  // signature, so shipping "one charm" no longer grabs the seller's
+  // discount-bearing self-signed copy while a foreign or unsigned copy sat
+  // beside it. Absent, the walk is byte-identical to before.
+  deprioritize?: (instance: ItemInstancePayload) => boolean,
 ): ItemInstancePayload[] {
   const fungibleAvailable = ctx.countFungibleItem(itemId, pid);
   const fungibleTake = Math.min(fungibleAvailable, count);
   if (fungibleTake > 0) ctx.removeFungibleItem(itemId, fungibleTake, pid);
   const remaining = count - fungibleTake;
   if (remaining <= 0) return [];
-  if (!skip) return ctx.removeItem(itemId, remaining, pid);
+  if (!skip && !deprioritize) return ctx.removeItem(itemId, remaining, pid);
   const r = ctx.resolve(pid);
   if (!r) return [];
   const { meta } = r;
   const consumed: ItemInstancePayload[] = [];
   let left = remaining;
-  for (let i = meta.inventory.length - 1; i >= 0 && left > 0; i--) {
-    const s = meta.inventory[i];
-    if (s.itemId !== itemId || !s.instance || skip(s.instance)) continue;
-    const take = Math.min(s.count, left);
-    for (let unit = 0; unit < take; unit++) {
-      const finalUnitOfSlot = take >= s.count && unit === take - 1;
-      consumed.push(finalUnitOfSlot ? s.instance : cloneItemInstancePayload(s.instance));
+  // Two passes over the same highest-index-first order: the preferred class
+  // first, then (only if still short) the deprioritized class. With no
+  // deprioritize predicate the first pass is the whole old walk.
+  const walk = (takeDeprioritized: boolean): void => {
+    for (let i = meta.inventory.length - 1; i >= 0 && left > 0; i--) {
+      const s = meta.inventory[i];
+      if (s.itemId !== itemId || !s.instance || skip?.(s.instance)) continue;
+      if ((deprioritize?.(s.instance) ?? false) !== takeDeprioritized) continue;
+      const take = Math.min(s.count, left);
+      for (let unit = 0; unit < take; unit++) {
+        const finalUnitOfSlot = take >= s.count && unit === take - 1;
+        consumed.push(finalUnitOfSlot ? s.instance : cloneItemInstancePayload(s.instance));
+      }
+      s.count -= take;
+      left -= take;
+      if (s.count <= 0) meta.inventory.splice(i, 1);
     }
-    s.count -= take;
-    left -= take;
-    if (s.count <= 0) meta.inventory.splice(i, 1);
-  }
+  };
+  walk(false);
+  if (deprioritize && left > 0) walk(true);
   // Same post-removal hook the inventory hub's removeItem fires. Optional-called
   // so a decoupled test ctx that models inventory but omits the hook (its own
   // removeItem does the same) is not forced to stub it; the live SimContext
   // always provides it.
   ctx.onInventoryChangedForQuests?.(meta);
   return consumed;
+}
+
+/** The owner copy-choice predicate (the phase 12 QA hand-off, widened by the
+ *  phase 18 whole-branch review): built per removal and shared VERBATIM by
+ *  every disposal arm that can consume an instanced charm copy (the trade
+ *  removal and capacity model in social/trade.ts, the vendor sell walks, and
+ *  discardItem), so the owner's self-signed copies always go LAST and a
+ *  routine disposal cannot silently retire the R48 original-crafter recharge
+ *  discount. Scoped to charm items (use.type 'toolEffect'): widening it to
+ *  every signed instance would silently reroute commission and masterwork
+ *  equipment trades, where the signature is the very thing being traded. The
+ *  signer compare keys on the display name (the craft signing rule's own
+ *  key): after a sanctioned rename the owner's older copies carry the old
+ *  name and ship in the pre-fix order, the same accepted limitation
+ *  `craftedBy` carries. A resolve-less owner ships signer-blind as before. */
+export function sellerSignedCharmDeprioritize(
+  sellerName: string | undefined,
+  itemId: string,
+): ((instance: ItemInstancePayload) => boolean) | undefined {
+  if (sellerName === undefined) return undefined;
+  if (ITEMS[itemId]?.use?.type !== 'toolEffect') return undefined;
+  return (instance) => instance.signer === sellerName;
 }
 
 // Per-unit removal that reports each removed unit's ItemInstancePayload AND
@@ -233,6 +273,7 @@ export function removeVendorSellUnits(
   count: number,
   pid: number,
   skip?: (instance: ItemInstancePayload) => boolean,
+  deprioritize?: (instance: ItemInstancePayload) => boolean,
 ): VendorRemovedUnit[] {
   const r = ctx.resolve(pid);
   if (!r) return [];
@@ -250,21 +291,31 @@ export function removeVendorSellUnits(
     left -= take;
     if (s.count <= 0) meta.inventory.splice(i, 1);
   }
-  for (let i = meta.inventory.length - 1; i >= 0 && left > 0; i--) {
-    const s = meta.inventory[i];
-    if (s.itemId !== itemId || !s.instance || skip?.(s.instance)) continue;
-    const take = Math.min(s.count, left);
-    for (let unit = 0; unit < take; unit++) {
-      const finalUnitOfSlot = take >= s.count && unit === take - 1;
-      consumed.push({
-        instance: finalUnitOfSlot ? s.instance : cloneItemInstancePayload(s.instance),
-        craftedRecipeId: s.craftedRecipeId,
-      });
+  // Two instanced passes over the same highest-index-first order, mirroring
+  // removePreferFungible: the preferred class first, then (only if still
+  // short) the deprioritized class, so a vendor sale spares the seller's own
+  // self-signed charm copies exactly the way a trade does. With no predicate
+  // the first pass is the whole old walk.
+  const instancedWalk = (takeDeprioritized: boolean): void => {
+    for (let i = meta.inventory.length - 1; i >= 0 && left > 0; i--) {
+      const s = meta.inventory[i];
+      if (s.itemId !== itemId || !s.instance || skip?.(s.instance)) continue;
+      if ((deprioritize?.(s.instance) ?? false) !== takeDeprioritized) continue;
+      const take = Math.min(s.count, left);
+      for (let unit = 0; unit < take; unit++) {
+        const finalUnitOfSlot = take >= s.count && unit === take - 1;
+        consumed.push({
+          instance: finalUnitOfSlot ? s.instance : cloneItemInstancePayload(s.instance),
+          craftedRecipeId: s.craftedRecipeId,
+        });
+      }
+      s.count -= take;
+      left -= take;
+      if (s.count <= 0) meta.inventory.splice(i, 1);
     }
-    s.count -= take;
-    left -= take;
-    if (s.count <= 0) meta.inventory.splice(i, 1);
-  }
+  };
+  instancedWalk(false);
+  if (deprioritize && left > 0) instancedWalk(true);
   ctx.onInventoryChangedForQuests?.(meta);
   return consumed;
 }
@@ -282,7 +333,17 @@ export function discardItem(ctx: SimContext, itemId: string, count = 1, pid?: nu
   if (def.noDiscard) return;
   const discardCount = Number.isFinite(count) ? Math.min(Math.floor(count), available) : 0;
   if (discardCount <= 0) return;
-  removePreferFungible(ctx, itemId, discardCount, meta.entityId);
+  // The copy-choice rule on the discard arm (the phase 18 whole-branch
+  // review): with a plain and a self-signed charm copy in the bags, the
+  // discard consumes the plain one and the recharge discount survives.
+  removePreferFungible(
+    ctx,
+    itemId,
+    discardCount,
+    meta.entityId,
+    undefined,
+    sellerSignedCharmDeprioritize(meta.name, itemId),
+  );
   ctx.emit({
     type: 'log',
     // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
@@ -500,6 +561,15 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     else useGatherToolItem(ctx, def.use.professionId, meta.entityId);
     return;
   }
+  // A tool-effect charm is slotted from the professions window, never used
+  // from the bag, but the natural first gesture with a new rare item IS a
+  // right-click: without this arm the click is a silent no-op with no path
+  // from the item to its function (the same reason the gatherTool arm above
+  // has gatherToolNoNode). Text-only, no state change.
+  if (def.use?.type === 'toolEffect') {
+    ctx.error(meta.entityId, 'Open Professions to slot that.');
+    return;
+  }
   if (def.use?.type === 'mechChroma') {
     return ctx.unlockMechChromaFromItem(meta, itemId, def.use.chromaId);
   }
@@ -657,7 +727,7 @@ export function buyItem(
   npcId: number,
   itemId: string,
   pid?: number,
-  bulk?: boolean,
+  opts?: VendorBuyOptions,
 ): void {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -699,6 +769,24 @@ export function buyItem(
     ctx.error(meta.entityId, 'Too far away.');
     return;
   }
+  // Sanitize sits BELOW the dead/range gates (a dead or out-of-range buyer
+  // hears the same refusal a legit frame gets) but ABOVE the riding
+  // DELEGATION and the mount GATES: a hostile count must deny on EVERY row
+  // (Q20). The distinction matters: the teachesRiding branch below delegates
+  // and RETURNS without ever reaching the count branch, so a deny placed
+  // after it would silently launder a hostile count into a charge no
+  // legitimate client sent; the mount block is only a gate ladder that falls
+  // through to the count math. A VALID count on both is still simply force-1
+  // (the riding delegate ignores it; vendorCountForced pins mounts), never a
+  // second deny. Bulk wins on a crafted frame carrying both fields (the
+  // shipped verb's precedence, decided here once so all three hosts agree);
+  // the client never sends both.
+  const bulk = opts?.bulk === true;
+  const count = sanitizeBuyCount(bulk ? undefined : opts?.count);
+  if (count === null) {
+    ctx.error(meta.entityId, 'That item is not for sale.');
+    return;
+  }
   // Riding Training (the stablemaster's service entry): buying it delegates to
   // learnRiding, which owns every gate (already trained, level 20, the 80g fee,
   // trainer identity, range) and never puts an item in the bags.
@@ -724,6 +812,13 @@ export function buyItem(
       return;
     }
   }
+  // No vendor-row proficiency deny here any more (R22): the counter sells
+  // ahead freely the way Wilkes always sold the rod ladder, the row's
+  // requirement line became advisory display (content/vendor_row_gates.ts),
+  // and enforcement moved to the WIELD gate at the moment of use
+  // (professions/wield_gate.ts, read by the harvest gate), which closes the
+  // market/trade/mail routes the counter deny never could. Owners are never
+  // stripped; a tool bought early wields at its threshold.
   // Food and drink are handed over in a stack (vendorStackSize); the player pays
   // the per-unit buyValue for every unit, so the per-unit price stays classic and
   // vendor buy price stays above the per-unit sell value (no buy-low/sell-high loop).
@@ -738,12 +833,39 @@ export function buyItem(
   // guards against a SECOND purchase, not a bulk quantity within this one). The
   // result is floored at 1 so an unaffordable bulk request still hits the normal
   // "Not enough money" check below instead of silently buying zero.
-  const bulkEligible = bulk === true && hasCopperPrice && !hasHonorPrice && def.kind !== 'mount';
-  const qty = bulkEligible
-    ? Math.max(1, bulkBuyQuantity(def, freeVendor ? 0 : copperUnitPrice, meta.copper))
-    : vendorStackSize(def);
-  const copperCost = freeVendor ? 0 : copperUnitPrice * qty;
-  const honorCost = freeVendor ? 0 : honorPrice;
+  //
+  // Count purchase (the 1x/5x/10x/custom control row): count N is N ordinary
+  // row-unit purchases resolved atomically, refuse-whole on any shortfall
+  // (Q20). The Q23 force-1 rows never multiply, and the totals are
+  // overflow-guarded BEFORE the balance compares below so those compares can
+  // never run on a non-safe integer. The count itself was sanitized above
+  // the riding delegation and the mount gates (a hostile count denies on
+  // every row; a valid one is force-1 there), so `count` here is always a
+  // safe integer >= 1.
+  const bulkEligible = bulk && hasCopperPrice && !hasHonorPrice && def.kind !== 'mount';
+  let qty: number;
+  let copperCost: number;
+  let honorCost: number;
+  if (bulkEligible) {
+    qty = Math.max(1, bulkBuyQuantity(def, freeVendor ? 0 : copperUnitPrice, meta.copper));
+    copperCost = freeVendor ? 0 : copperUnitPrice * qty;
+    honorCost = freeVendor ? 0 : honorPrice;
+  } else {
+    const appliedCount = vendorCountForced(def) ? 1 : count;
+    const totals = buyPurchaseTotals(
+      def,
+      freeVendor ? 0 : copperUnitPrice,
+      freeVendor ? 0 : honorPrice,
+      appliedCount,
+    );
+    if (totals === null) {
+      ctx.error(meta.entityId, 'Not enough money.');
+      return;
+    }
+    qty = totals.units;
+    copperCost = totals.copper;
+    honorCost = totals.honor;
+  }
   if (meta.copper < copperCost) {
     ctx.error(meta.entityId, 'Not enough money.');
     return;
@@ -870,6 +992,10 @@ export function sellItem(ctx: SimContext, itemId: string, count = 1, pid?: numbe
     sellableCount,
     meta.entityId,
     (instance) => instance.boundTo !== undefined,
+    // The copy-choice rule on the vendor arm too (the phase 18 whole-branch
+    // review): the seller's own self-signed charm copies go last, so selling
+    // one of two charms never silently retires the recharge discount.
+    sellerSignedCharmDeprioritize(meta.name, itemId),
   );
   for (const unit of consumedUnits) {
     recordVendorBuyback(meta, itemId, 1, unit.instance, unit.craftedRecipeId);
@@ -956,6 +1082,9 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
       count,
       meta.entityId,
       (instance) => instance.boundTo !== undefined,
+      // Same copy-choice rule as sellItem; unreachable for charms today
+      // (rare quality, never poor), carried for the same-walk symmetry.
+      sellerSignedCharmDeprioritize(meta.name, itemId),
     );
     for (const unit of consumedUnits) {
       recordVendorBuyback(meta, itemId, 1, unit.instance, unit.craftedRecipeId);

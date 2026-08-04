@@ -825,6 +825,10 @@ export const table: DeedLocaleTable = {
     name: 'Heroico: La Cuenca del Corazón Salvaje',
     desc: 'Derrota a Zulgar, Voz de la Cuenca, en la Cuenca del Corazón Salvaje en dificultad heroica.',
   },
+  chr_peaks_gatherer: {
+    name: 'Cosecha de las Alturas',
+    desc: 'Recolecta una veta de mineral, un árbol talable y un macizo de hierbas en las Alturas de Thornpeak.',
+  },
   chr_marsh_rares_ii: {
     name: 'El Glotón, Contado',
     desc: 'Mata a Grubjaw el Glotón, un cuarto terror con nombre de la Ciénaga de Mirefen que quedó fuera del primer recuento.',
@@ -840,6 +844,30 @@ export const table: DeedLocaleTable = {
   chr_hollow_rares: {
     name: 'La manada recuerda',
     desc: 'Mata al Viejo Marrowshell y a Aurelhorn, Primero de la Manada, los dos jefes raros errantes de la Hondonada.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'La abundancia del pantano',
+    desc: 'Recolecta una veta de mineral, un árbol talable y un macizo de hierbas en el Pantano de los Sauces.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Ondas en los Páramos de Lirios',
+    desc: 'Pesca un pez en las aguas del Pantano de los Sauces.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Cosecha en el promontorio',
+    desc: 'Recolecta una veta de mineral, un árbol talable y un macizo de hierbas en la Cresta del Vendaval.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Un sedal en el Lago Espejo',
+    desc: 'Pesca un pez en las aguas de la Cresta del Vendaval.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Provisiones isleñas',
+    desc: 'Recolecta una veta de mineral, un árbol talable y un macizo de hierbas en la Costa Lejana.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Lo que saben las gaviotas',
+    desc: 'Pesca un pez en las aguas de la Costa Lejana.',
   },
 };
 

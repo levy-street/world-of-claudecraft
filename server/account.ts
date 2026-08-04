@@ -82,10 +82,10 @@ import {
 const TOTP_ISSUER = 'World of ClaudeCraft';
 
 // How long an email-change verification link stays valid.
-const EMAIL_CHANGE_TTL_HOURS = 24;
+export const EMAIL_CHANGE_TTL_HOURS = 24;
 // How long a password-reset link stays valid. Shorter than the email-change TTL:
 // a reset is higher-value and the user acts on it immediately.
-const PASSWORD_RESET_TTL_HOURS = 1;
+export const PASSWORD_RESET_TTL_HOURS = 1;
 
 // Hooks main.ts injects so the deactivate path can consult and tear down live
 // game sessions without account.ts importing the GameServer (which pulls in the

@@ -30,8 +30,8 @@ import { HARVEST_COMPONENT_ITEMS, NODE_MATERIAL_TABLE } from '../src/sim/profess
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, MAX_LEVEL, XP_TABLE, type ZoneDef } from '../src/sim/types';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
-const WORLD_SEED = 20061; // production seed (main.ts / server/game.ts)
 const SCRIPTED_COLLECT_ITEMS = new Set(['the_codfather']);
 
 // The complete set of ways a collect-objective item can legitimately enter a

@@ -23,7 +23,10 @@ import {
 } from '../src/sim/data';
 import { emptyZoneProps, isQuestTurnInNpc, type QuestProgress } from '../src/sim/types';
 import { overworldDungeonPortals } from '../src/ui/map_dungeon_portals';
-import { MapWindowPainter } from '../src/ui/map_window_painter';
+import {
+  MapWindowPainter,
+  MAP_COLOR_TOKENS as PAINTER_TOKEN_TABLE,
+} from '../src/ui/map_window_painter';
 import { buildOverworldMapModel } from '../src/ui/map_window_view';
 import { TEXT_SPRITE_LIMIT } from '../src/ui/text_sprite_cache';
 import type { IWorld } from '../src/world_api';
@@ -35,7 +38,11 @@ const hudSource = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'ut
 // Comments stripped for the same reason as `code` above: a wiring pin that a
 // commented-out call satisfies is not a pin (see the repo's raw-source rule).
 const hud = hudSource.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
-const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
+// Comment-stripped like `code`: a commented-out token declaration must not
+// satisfy the design-token pins below.
+const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8')
+  .replace(/\/\*[\s\S]*?\*\//g, '')
+  .replace(/(^|[^:])\/\/.*$/gm, '$1');
 
 const MAP_COLOR_TOKENS = [
   '--color-map-ocean',
@@ -44,6 +51,7 @@ const MAP_COLOR_TOKENS = [
   '--color-map-portal-dot',
   '--color-map-portal-label',
   '--color-map-npc-quest',
+  '--color-map-npc-quest-repeat',
   '--color-map-player',
   '--color-map-ally-friend',
   '--color-map-ally-guild',
@@ -107,8 +115,10 @@ interface PaintTrace {
   styleReads: string[];
   /** Every canvas minted through document.createElement('canvas'). */
   sprites: LabelSprite[];
-  /** Every 3-argument drawImage: the label blits (the terrain blit passes 9). */
-  blits: Array<{ sprite: LabelSprite; dx: number; dy: number }>;
+  /** Every 3-argument drawImage: the label blits (the terrain blit passes 9),
+   *  with the context's globalAlpha AT BLIT TIME (the cooldown glyph dims at
+   *  the blit, never in the sprite raster). */
+  blits: Array<{ sprite: LabelSprite; dx: number; dy: number; alpha: number }>;
   /** Every canvas text entry point used on the MAP context, which must stay empty. */
   textApi: string[];
   /** Every stroke() on the map context with the stroke state it used. The width
@@ -147,12 +157,19 @@ function makeLabelSprite(trace: PaintTrace): LabelSprite {
 function fakeMapContext(trace: PaintTrace): CanvasRenderingContext2D {
   let commands: string[] = [];
   let font = '';
+  let alpha = 1;
   const ctx = {
     fillStyle: '',
     strokeStyle: '',
     lineWidth: 1,
     textAlign: 'start',
     imageSmoothingEnabled: false,
+    get globalAlpha(): number {
+      return alpha;
+    },
+    set globalAlpha(value: number) {
+      alpha = value;
+    },
     get font(): string {
       return font;
     },
@@ -163,7 +180,7 @@ function fakeMapContext(trace: PaintTrace): CanvasRenderingContext2D {
     drawImage(image: unknown, ...rest: number[]): void {
       // The 3-argument form is a label sprite; the terrain sub-rect blit passes 9.
       if (rest.length === 2) {
-        trace.blits.push({ sprite: image as LabelSprite, dx: rest[0], dy: rest[1] });
+        trace.blits.push({ sprite: image as LabelSprite, dx: rest[0], dy: rest[1], alpha });
       }
     },
     // the painter floods the ocean before the zone bg blit; the fake context
@@ -277,6 +294,20 @@ describe('map_window_painter: no magic values', () => {
     for (const tok of MAP_COLOR_TOKENS) {
       expect(code, `painter never reads ${tok}`).toContain(tok);
       expect(tokens, `missing ${tok}`).toContain(`${tok}:`);
+    }
+    // The hand list above cannot see a table entry it was never told about,
+    // so a token missing from tokens.css would resolve '' and draw default
+    // ink. Pin EVERY live table entry (the exported source of truth) against
+    // the sheet, and the hand list against the table, so neither can drift
+    // (the minimap suite's rationale).
+    for (const tok of Object.values(PAINTER_TOKEN_TABLE)) {
+      expect(tokens, `tokens.css missing live table entry ${tok}`).toContain(`${tok}:`);
+    }
+    for (const tok of MAP_COLOR_TOKENS) {
+      expect(
+        Object.values(PAINTER_TOKEN_TABLE),
+        `hand list names a token the painter no longer reads: ${tok}`,
+      ).toContain(tok);
     }
   });
 
@@ -447,6 +478,9 @@ function labelWorld(): IWorld {
         { questId: kill.id, counts: kill.objectives.map(() => 0), state: 'active' as const },
       ],
     ]),
+    // The quest-marker inputs both worlds expose (the phase 23 classifier).
+    questsDone: new Set<string>(),
+    craftingIdentity: { version: 1, synced: true, cadenceBlockedQuests: [] },
   } as unknown as IWorld;
 }
 
@@ -804,6 +838,113 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
       { op: 'stroke', color: 'paint:--color-map-outline', text: '?' },
       { op: 'fill', color: 'paint:--color-map-npc-quest', text: '?' },
     ]);
+  });
+
+  it('draws the repeat and cooldown variants in the repeat token, dimming only the cooldown blit', () => {
+    // The phase 23 blue "!" at the map surface, over the real cadenced work
+    // order. The repeat arm fills the repeat token at full alpha; the
+    // cooldown arm reuses the same style but blits at the dim, restoring the
+    // context's alpha so no later layer inherits it; and the plain available
+    // glyph (labelWorld above) stays on the gold token, pinned as the
+    // negative arm so acceptance (b) has a decisive assertion here.
+    const workOrder = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
+    if (!workOrder) throw new Error('expected a cadenced work order');
+    const variantWorld = (state: 'repeat' | 'cooldown'): IWorld => {
+      const world = labelWorld() as unknown as {
+        entities: Map<number, { templateId: string; questIds: string[] }>;
+        questState: (q: string) => string;
+        questsDone: Set<string>;
+        craftingIdentity: { cadenceBlockedQuests: string[] };
+      };
+      const npc = world.entities.get(2);
+      if (!npc) throw new Error('expected the fixture npc');
+      npc.templateId = workOrder.giverNpcId;
+      npc.questIds = [workOrder.id];
+      world.questsDone = new Set([workOrder.id]);
+      world.questState = (q) =>
+        state === 'repeat' && q === workOrder.id ? 'available' : 'unavailable';
+      world.craftingIdentity.cadenceBlockedQuests = state === 'cooldown' ? [workOrder.id] : [];
+      return world as unknown as IWorld;
+    };
+    // Is the work order's giver even inside this fixture zone? The glyphs
+    // resolve from static content, so require it up front rather than
+    // passing vacuously on an empty marker list.
+    for (const state of ['repeat', 'cooldown'] as const) {
+      const trace = newTrace();
+      installMapStyleGlobals(trace);
+      setActiveWorldContent(BUILTIN_WORLD);
+      const ctx = fakeMapContext(trace);
+      new MapWindowPainter(classColor).paintOverworld(
+        ctx,
+        variantWorld(state),
+        labelPaintOptions(),
+      );
+      const glyphBlits = trace.blits.filter((b) => spriteText(b.sprite) === '!');
+      // Exactly one: the fixture stages a single giver, and a second glyph
+      // drawn first would silently change which sprite is asserted below.
+      expect(glyphBlits, state).toHaveLength(1);
+      expect(glyphBlits[0].sprite.ink.map(inkStyle), state).toEqual([
+        { op: 'stroke', color: 'paint:--color-map-outline', text: '!' },
+        { op: 'fill', color: 'paint:--color-map-npc-quest-repeat', text: '!' },
+      ]);
+      expect(glyphBlits[0].alpha, state).toBe(state === 'cooldown' ? 0.55 : 1);
+      expect(ctx.globalAlpha, state).toBe(1);
+    }
+
+    // The negative arm: the ordinary available glyph keeps the gold token at
+    // full alpha, byte-identical styling to the pre-phase painter.
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+    new MapWindowPainter(classColor).paintOverworld(
+      fakeMapContext(trace),
+      labelWorld(),
+      labelPaintOptions(),
+    );
+    const gold = trace.blits.filter((b) => spriteText(b.sprite) === '!');
+    // Exactly one, for the same reason as the variant arms above.
+    expect(gold).toHaveLength(1);
+    expect(gold[0].sprite.ink.map(inkStyle)).toEqual([
+      { op: 'stroke', color: 'paint:--color-map-outline', text: '!' },
+      { op: 'fill', color: 'paint:--color-map-npc-quest', text: '!' },
+    ]);
+    expect(gold[0].alpha).toBe(1);
+  });
+
+  it('restores the CALLER alpha around the cooldown blit, not a literal 1', () => {
+    // The restore-prior contract is only observable under a non-1 caller
+    // alpha: a reverted literal-1 restore stays green on every 1-alpha
+    // fixture and reddens here. The world staging mirrors the variant arms
+    // above (a cadenced work order inside its window).
+    const workOrder = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
+    if (!workOrder) throw new Error('expected a cadenced work order');
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+    const world = labelWorld() as unknown as {
+      entities: Map<number, { templateId: string; questIds: string[] }>;
+      questState: (q: string) => string;
+      questsDone: Set<string>;
+      craftingIdentity: { cadenceBlockedQuests: string[] };
+    };
+    const fixtureNpc = world.entities.get(2);
+    if (!fixtureNpc) throw new Error('expected the fixture npc');
+    fixtureNpc.templateId = workOrder.giverNpcId;
+    fixtureNpc.questIds = [workOrder.id];
+    world.questsDone = new Set([workOrder.id]);
+    world.questState = () => 'unavailable';
+    world.craftingIdentity.cadenceBlockedQuests = [workOrder.id];
+    const ctx = fakeMapContext(trace);
+    ctx.globalAlpha = 0.9;
+    new MapWindowPainter(classColor).paintOverworld(
+      ctx,
+      world as unknown as IWorld,
+      labelPaintOptions(),
+    );
+    const glyphBlits = trace.blits.filter((b) => spriteText(b.sprite) === '!');
+    expect(glyphBlits).toHaveLength(1);
+    expect(glyphBlits[0].alpha).toBe(0.55);
+    expect(ctx.globalAlpha).toBe(0.9);
   });
 
   it('opens each redraw on the cache, so the budget is enforced in the shipped path', () => {

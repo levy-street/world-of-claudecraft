@@ -83,6 +83,21 @@ describe('stable snapshot timer protocol', () => {
     expect(client.player.cooldowns.get('cast')).toBe(9);
   });
 
+  it('ages the nodeRespawnSeconds countdown off the stable ncd deadlines', () => {
+    // The countdown read rides the same deadline set the readiness mirror
+    // does: ncd { ore: 12 } at stable time 10 is a deadline, so the remaining
+    // ages between snapshots without the wire resending it, and the read
+    // drains to null exactly when the readiness flips.
+    const client = bareClient(1);
+    apply(client, { tw: 2, time: 10, self: playerWire(1, { ncd: { ore: 12 } }) });
+    expect(client.nodeRespawnSeconds('ore')).toBe(2);
+    apply(client, { tw: 2, time: 11, self: playerWire(1) });
+    expect(client.nodeRespawnSeconds('ore')).toBe(1);
+    apply(client, { tw: 2, time: 13.1, self: playerWire(1) });
+    expect(client.nodeRespawnSeconds('ore')).toBeNull();
+    expect(client.nodeHarvestableByMe('ore')).toBe(true);
+  });
+
   it('ages omitted v2 timers and preserves auras on moving lite records', () => {
     const client = bareClient(1);
     apply(client, {

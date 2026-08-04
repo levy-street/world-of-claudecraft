@@ -125,6 +125,14 @@ export const API_ERROR_KEYS = {
   'epic.upstream': 'apiError.epic.upstream',
   'wallet.handoff_invalid': 'apiError.wallet.handoff_invalid',
   'ota_updates.invalid_input': 'apiError.ota_updates.invalid_input',
+  'seeker.native_only': 'apiError.seeker.native_only',
+  'seeker.attestation_failed': 'apiError.seeker.attestation_failed',
+  'seeker.solana_artifact_required': 'apiError.seeker.solana_artifact_required',
+  'seeker.wallet_required': 'apiError.seeker.wallet_required',
+  'seeker.genesis_token_required': 'apiError.seeker.genesis_token_required',
+  'seeker.genesis_token_claimed': 'apiError.seeker.genesis_token_claimed',
+  'seeker.entitlement_required': 'apiError.seeker.entitlement_required',
+  'seeker.current_ownership_required': 'apiError.seeker.current_ownership_required',
 } satisfies Record<string, TranslationKey>;
 
 /** The message of an Error, or the string form of any other thrown value. */

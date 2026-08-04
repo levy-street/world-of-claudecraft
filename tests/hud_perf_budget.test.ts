@@ -702,6 +702,35 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
     reflowAllow: { '.getBoundingClientRect': 1, '.scrollTop': 4 },
     driverAllow: {},
   },
+  // The gather-node hover tip (the phase 14 QA's countdown clock): pointer
+  // -driven repaints plus ONE 1 Hz interval armed only while a COOLDOWN tip
+  // is shown, disposed on hide and by the ready flip. Its tick re-enters
+  // the same paint the pointer path uses, and that paint elides whole on
+  // unchanged HTML, so the size pair below (the viewport clamp) and the
+  // getUiScale read run only when the rendered m:ss actually moved: at
+  // most once per second over a single five-line tooltip. The second
+  // getUiScale count is the import specifier (the matcher counts the
+  // reference on purpose).
+  {
+    file: 'gather_node_tooltip_controller.ts',
+    reflowAllow: { '.offsetWidth': 1, '.offsetHeight': 1, getUiScale: 2 },
+    driverAllow: { setInterval: 1 },
+    drivers: [
+      {
+        driver: 'setInterval',
+        everyMs: 1000,
+        why: 'the respawn countdown tick: while a cooldown tip is shown, re-read the world and repaint the m:ss line so a stationary hover drains live and flips to Ready. Armed only while shown over a cooling node, cleared on hide, on the ready flip, and when the node stops resolving; its per-tick body is the shown guard, one pure model rebuild, and the shared paintAt.',
+        stopsAt: {
+          paintAt:
+            'the SAME paint every pointer-driven repaint takes, whose writes and both forced reads elide whole when the rendered HTML did not change; the tick adds nothing of its own on the way there.',
+        },
+        writeAllow: {},
+        queryAllow: {},
+        idlAllow: {},
+        reflowAllow: {},
+      },
+    ],
+  },
   { file: 'bank_window.ts', reflowAllow: { '.scrollTop': 4 }, driverAllow: {} },
   // The scroll pair and the rAF both belonged to the mount picker's
   // scroll-the-selected-card-into-view path, which went away when reins became
@@ -710,7 +739,12 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   { file: 'char_window.ts', reflowAllow: {}, driverAllow: {} },
   {
     file: 'crafting_window.ts',
-    reflowAllow: { '.scrollTop': 2, '.scrollLeft': 2 },
+    // Three scroll regions carried across the rebuild, capture + write-back
+    // each: .crafting-body, the identity card's capped .profession-skill-list
+    // (desktop), and the card itself (the MOBILE scroller; hud.mobile.css
+    // lifts the list cap), plus the .crafting-tabs horizontal pair (the
+    // bags_window/bank_window shape, one region deeper).
+    reflowAllow: { '.scrollTop': 6, '.scrollLeft': 2 },
     driverAllow: {},
   },
   // Two polls that repaint an OPEN window only: a 15s refresh of the reward state and a 30s
@@ -1386,6 +1420,7 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
     // empty slice, or a `drivers` list quietly deleted from an entry, reports zero violations
     // over zero callbacks and reads as a pass.
     expect(sweep.scanned).toEqual([
+      'gather_node_tooltip_controller.ts#0',
       'daily_rewards_window.ts#0',
       'daily_rewards_window.ts#1',
       'hud/delve/lockpick_window.ts#0',
@@ -1409,6 +1444,11 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
     // and this exact-list pin is what stops it being cheap: a cut added anywhere in any bucket
     // shows up as a new row and fails until it is argued for in the diff.
     expect(sweep.cuts, 'the one declared reachability cut stopped reaching anything').toEqual([
+      // The countdown tick cuts at the SHARED paint the pointer path takes,
+      // whose writes and forced reads elide whole on unchanged HTML (argued
+      // in the entry's why/stopsAt above): the tick body itself is the
+      // shown guard plus one pure model rebuild.
+      'gather_node_tooltip_controller.ts: paintAt',
       'daily_rewards_window.ts: renderCurrent',
     ]);
     expect(

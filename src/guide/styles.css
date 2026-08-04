@@ -3029,6 +3029,15 @@ a.guide-poi:hover {
 .guide-set-table {
   min-width: 560px;
 }
+/* The gathering pages' TOOLS table only: six columns since the Use at column
+   landed, with the Source cell carrying the longest prose on the page. Same
+   pattern as .guide-set-table above: the min-width keeps the columns readable
+   on phones and hands overflow to the .guide-table-scroll wrapper. Scoped to
+   its own class because .guide-prof-table also dresses the narrower station,
+   recipe, and node tables, which need no floor. */
+.guide-tools-table {
+  min-width: 640px;
+}
 .guide-set-name {
   color: var(--g-text);
   font-weight: 600;

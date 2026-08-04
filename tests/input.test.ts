@@ -37,6 +37,9 @@ function makeInput(userAgent?: string) {
   const exitPointerLock = vi.fn();
   let gameActive = true;
   let mobileTouch = false;
+  // Input's optional "a menu owns the keyboard right now" gate; true unless a
+  // test flips it, so every existing expectation is unaffected.
+  let gameKeysAllowed = true;
   const canvas = {
     style: { cursor: '' },
     addEventListener: vi.fn((type: string, cb: (event: any) => void) => {
@@ -80,6 +83,7 @@ function makeInput(userAgent?: string) {
     onEmoteWheel: vi.fn(),
     onClickPick: vi.fn(),
     onAttackMove: vi.fn(),
+    canUseGameKeys: () => gameKeysAllowed,
   };
   const input = new Input(canvas as any, cb, new Keybinds());
   return {
@@ -94,6 +98,9 @@ function makeInput(userAgent?: string) {
     },
     setMobileTouch: (active: boolean) => {
       mobileTouch = active;
+    },
+    setGameKeysAllowed: (allowed: boolean) => {
+      gameKeysAllowed = allowed;
     },
   };
 }
@@ -1448,5 +1455,213 @@ describe('Input captureNextKey cancellation (issue 1238)', () => {
 
     expect(captured).toEqual(['Digit1']);
     expect(cb.onAbilityDown).not.toHaveBeenCalled();
+  });
+});
+
+describe('Input mouse-button bindings', () => {
+  // The thumb and middle buttons bind like keys (src/game/mouse_binds.ts):
+  // DOM button 1 is M3, 3 is M4, 4 is M5. Left (0) and right (2) stay reserved
+  // for the camera, click-to-move, and click-picking.
+  const mouseDown = (button: number, extra: Record<string, unknown> = {}) => ({
+    button,
+    preventDefault: vi.fn(),
+    ...extra,
+  });
+
+  it('captures a thumb button for the rebind UI, chord and all', () => {
+    const { input, windowListeners } = makeInput();
+    const captured: (string | null)[] = [];
+    input.captureNextKey((code) => captured.push(code));
+
+    windowListeners.get('mousedown')!(mouseDown(3, { shiftKey: true }));
+
+    expect(captured).toEqual(['Shift+Mouse4']);
+  });
+
+  it('leaves the capture armed when a reserved button is pressed', () => {
+    // The player has to be able to click Done, Cancel, or another row with the
+    // left button while a capture waits, so left/right never resolve it.
+    const { input, cb, windowListeners } = makeInput();
+    const captured: (string | null)[] = [];
+    input.captureNextKey((code) => captured.push(code));
+
+    windowListeners.get('mousedown')!(mouseDown(0));
+    windowListeners.get('mousedown')!(mouseDown(2));
+    expect(captured).toEqual([]);
+
+    // Still armed: the next bindable button resolves it, and never dispatches.
+    windowListeners.get('mousedown')!(mouseDown(4));
+    expect(captured).toEqual(['Mouse5']);
+    expect(cb.onAbilityDown).not.toHaveBeenCalled();
+  });
+
+  it('fires a slot bound to a thumb button on press and releases it on mouseup', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('slot3', 0, 'Mouse4')).toBe(true);
+    const { cb, windowListeners } = makeInput();
+
+    const down = mouseDown(3);
+    windowListeners.get('mousedown')!(down);
+    expect(cb.onAbilityDown).toHaveBeenLastCalledWith(3);
+    // The browser's back-navigation default is cancelled for a press the game used.
+    expect(down.preventDefault).toHaveBeenCalled();
+
+    windowListeners.get('mouseup')!({ button: 3, preventDefault: vi.fn() });
+    expect(cb.onAbilityUp).toHaveBeenLastCalledWith(3);
+  });
+
+  it('drives a held movement action from a mouse button and stops on release', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('forward', 0, 'Mouse5')).toBe(true);
+    const { input, windowListeners } = makeInput();
+
+    windowListeners.get('mousedown')!(mouseDown(4));
+    expect(input.readMoveInput().forward).toBe(true);
+
+    windowListeners.get('mouseup')!({ button: 4, preventDefault: vi.fn() });
+    expect(input.readMoveInput().forward).toBe(false);
+  });
+
+  it('dispatches an interface action bound to the middle button', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('bags', 0, 'Mouse3')).toBe(true);
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('mousedown')!(mouseDown(1));
+
+    expect(cb.onUiKey).toHaveBeenCalledWith('bags');
+  });
+
+  it('keeps a mouse chord distinct from the bare button', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('slot6', 0, 'Shift+Mouse4')).toBe(true);
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('mousedown')!(mouseDown(3));
+    expect(cb.onAbilityDown).not.toHaveBeenCalled();
+
+    windowListeners.get('mousedown')!(mouseDown(3, { shiftKey: true }));
+    expect(cb.onAbilityDown).toHaveBeenLastCalledWith(6);
+  });
+
+  it('leaves an unbound button alone, so browser back/forward still works', () => {
+    const { cb, windowListeners } = makeInput();
+    const down = mouseDown(3); // nothing binds M4 by default
+    const aux = { button: 3, preventDefault: vi.fn() };
+
+    windowListeners.get('mousedown')!(down);
+    windowListeners.get('auxclick')!(aux);
+
+    expect(cb.onAbilityDown).not.toHaveBeenCalled();
+    expect(down.preventDefault).not.toHaveBeenCalled();
+    expect(aux.preventDefault).not.toHaveBeenCalled();
+  });
+
+  it('cancels the auxclick that follows a press the game consumed', () => {
+    // Chromium and Gecko navigate on the thumb buttons; cancelling mousedown
+    // alone is not always enough, so the paired auxclick is cancelled too.
+    const kb = new Keybinds();
+    expect(kb.bind('slot3', 0, 'Mouse4')).toBe(true);
+    const { windowListeners } = makeInput();
+
+    windowListeners.get('mousedown')!(mouseDown(3));
+    const aux = { button: 3, preventDefault: vi.fn() };
+    windowListeners.get('auxclick')!(aux);
+    expect(aux.preventDefault).toHaveBeenCalled();
+
+    // One press, one cancelled auxclick: a later unrelated auxclick is untouched.
+    const second = { button: 3, preventDefault: vi.fn() };
+    windowListeners.get('auxclick')!(second);
+    expect(second.preventDefault).not.toHaveBeenCalled();
+  });
+
+  it('does not let a press whose auxclick never arrived suppress a later one', () => {
+    // Release outside the window means no auxclick for the consumed press. The
+    // next press of that button must clear the stale entry, or an unbound press
+    // later would silently eat the player's browser navigation.
+    const kb = new Keybinds();
+    expect(kb.bind('slot3', 0, 'Mouse4')).toBe(true);
+    const { windowListeners } = makeInput();
+
+    windowListeners.get('mousedown')!(mouseDown(3)); // consumed, auxclick lost
+
+    // A second press the game does NOT consume (a text field owns the keyboard).
+    (globalThis as any).document.activeElement = { tagName: 'INPUT' };
+    const ignored = mouseDown(3);
+    windowListeners.get('mousedown')!(ignored);
+    const aux = { button: 3, preventDefault: vi.fn() };
+    windowListeners.get('auxclick')!(aux);
+    (globalThis as any).document.activeElement = null;
+
+    expect(ignored.preventDefault).not.toHaveBeenCalled();
+    expect(aux.preventDefault).not.toHaveBeenCalled();
+  });
+
+  it('ignores a bound mouse button while a text field has focus', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('slot3', 0, 'Mouse4')).toBe(true);
+    const { cb, windowListeners } = makeInput();
+    (globalThis as any).document.activeElement = { tagName: 'TEXTAREA' };
+
+    windowListeners.get('mousedown')!(mouseDown(3));
+
+    expect(cb.onAbilityDown).not.toHaveBeenCalled();
+    (globalThis as any).document.activeElement = null;
+  });
+
+  it('ignores a bound mouse button while game keys are suppressed', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('slot3', 0, 'Mouse4')).toBe(true);
+    const { cb, windowListeners, setGameKeysAllowed } = makeInput();
+    setGameKeysAllowed(false); // a menu/modal owns input
+
+    windowListeners.get('mousedown')!(mouseDown(3));
+
+    expect(cb.onAbilityDown).not.toHaveBeenCalled();
+  });
+
+  it('issues an attack move from a mouse button, as the keyboard chord does', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('attackMove', 0, 'Mouse4')).toBe(true);
+    const { input, canvasListeners, cb, windowListeners } = makeInput();
+    input.setAttackMoveEnabled(true);
+    canvasListeners.get('mouseenter')!({}); // cursor over the world
+
+    windowListeners.get('mousedown')!(mouseDown(3));
+
+    expect(cb.onAttackMove).toHaveBeenCalled();
+    // Attack Move wins the press outright: no ability/held dispatch follows it.
+    expect(cb.onAbilityDown).not.toHaveBeenCalled();
+  });
+
+  it('never turns an extra button into a world click-pick', () => {
+    const now = 1000;
+    vi.spyOn(performance, 'now').mockImplementation(() => now);
+    const { canvas, cb, canvasListeners, windowListeners } = makeInput();
+
+    canvasListeners.get('mousedown')!(mouseDown(3, { clientX: 120, clientY: 160 }));
+    windowListeners.get('mouseup')!({ button: 3, clientX: 120, clientY: 160, target: canvas });
+
+    expect(cb.onClickPick).not.toHaveBeenCalled();
+  });
+
+  it('does not let a thumb-button press cancel a left click-pick in flight', () => {
+    // The extra button returns early from the canvas gesture handler, so it
+    // cannot clear the pending press the way a reserved-button press would.
+    let now = 1000;
+    vi.spyOn(performance, 'now').mockImplementation(() => now);
+    const kb = new Keybinds();
+    expect(kb.bind('slot3', 0, 'Mouse4')).toBe(true);
+    const { canvas, cb, canvasListeners, windowListeners } = makeInput();
+
+    canvasListeners.get('mousedown')!(mouseDown(0, { clientX: 120, clientY: 160 }));
+    now += 20;
+    windowListeners.get('mousedown')!(mouseDown(3)); // thumb press mid-click
+    windowListeners.get('mouseup')!({ button: 3 });
+    now += 20;
+    windowListeners.get('mouseup')!({ button: 0, clientX: 121, clientY: 161, target: canvas });
+
+    expect(cb.onAbilityDown).toHaveBeenLastCalledWith(3);
+    expect(cb.onClickPick).toHaveBeenCalledWith(120, 160, 0);
   });
 });

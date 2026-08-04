@@ -15,6 +15,7 @@ import type {
   LockpickView,
   MountRaceView,
   PlayerProfessionsView,
+  ToolEffectSlotView,
 } from '../world_api';
 import * as bagsMod from './bags';
 import {
@@ -108,7 +109,7 @@ import { ensureWarriorStance } from './combat/warrior_stances';
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
 import { DEFAULT_MOUNT, type MountKey } from './content/mounts';
-import type { GatheringProfessionId } from './content/professions';
+import { GATHERING_PROFESSION_IDS, type GatheringProfessionId } from './content/professions';
 import { PTR_DEV_VENDOR_DEF } from './content/ptr_dev_vendor';
 import { FURY_ENTITY_ID, FURY_NPC_ID } from './content/pvp_honor';
 import {
@@ -176,6 +177,7 @@ import {
   SPIRIT_HEALER_NPC_ID,
   zoneAt,
 } from './data';
+import { refusedWhileDead } from './dead_gate';
 import * as deedsMod from './deeds';
 import {
   createDeedRuntime,
@@ -224,6 +226,11 @@ import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } fr
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
 import * as interaction from './interaction';
+import {
+  boundCraftedRecipeIdOnLoad,
+  sanitizeItemInstancePayloadOnLoad,
+  warnDroppedInstanceKeys,
+} from './item_instance_load';
 import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
 import { meetsLevelRequirement } from './item_level_req';
 import * as items from './items';
@@ -356,13 +363,18 @@ import {
   completeGatherCast as completeGatherCastImpl,
   drainGatheringGrants,
   emptyGatheringProficiency,
+  foldPendingGatherGrants,
   gatheringSkillsView,
-  gatherNodeById,
   harvestNode as harvestNodeImpl,
   isNodeHarvestableBy,
+  nodeRespawnRemainingSec,
   normalizeGatheringProficiency,
 } from './professions/gathering';
 import { updateGuildTrendLetters } from './professions/guild_letter';
+import {
+  applyPairTransitionHobbyMemory,
+  normalizeHobbyMemoryOnLoad,
+} from './professions/hobby_memory';
 import type { MasterworkProc } from './professions/masterwork';
 import { applyMasteryReset, updateMasteryResetNotices } from './professions/mastery_reset';
 import {
@@ -370,11 +382,35 @@ import {
   type MobileCraftingStation,
   placeMobileStationForPlayer,
 } from './professions/mobile_station';
+import {
+  applyNodeReadiness,
+  isLiveGatherNodeId,
+  serializeNodeReadiness,
+} from './professions/node_persist';
 import { updateProfNudges } from './professions/prof_nudges';
 import { healDisplayRoundedProficiency } from './professions/proficiency_display_heal';
 import { type SalvageResult, salvageItem as salvageItemImpl } from './professions/salvage';
-import { normalizeTierMailOnLoad, updateTierMail } from './professions/tier_mail';
-import { grandfatherKnownRecipes, resolveTrain, type TrainResult } from './professions/training';
+import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
+import {
+  applyPairTransitionTierMail,
+  normalizeTierMailOnLoad,
+  pruneTierMailToActiveMajors,
+  updateTierMail,
+} from './professions/tier_mail';
+import { rechargeToolEffectAction, slotToolEffectAction } from './professions/tool_effect_actions';
+import {
+  EMPTY_TOOL_EFFECT_SLOT_VIEWS,
+  normalizeToolEffectSlots,
+  structuredCloneToolEffectSlots,
+  type ToolEffectConfirmMode,
+  type ToolEffectSlot,
+} from './professions/tools';
+import {
+  grandfatherKnownRecipes,
+  resolveTrain,
+  sanitizeKnownRecipeIds,
+  type TrainResult,
+} from './professions/training';
 import type { ProfessionRecipeRecord as RecipeDef } from './professions/types';
 import {
   craftSkillsFor,
@@ -396,6 +432,7 @@ import {
 import { prestige as prestigeImpl, updateRested } from './progression/xp';
 import { advancePendingProjectiles, type PendingProjectile } from './projectile_travel';
 import * as honorMod from './pvp';
+import { sanitizeCreditedObjects } from './quests/interact_object_credit';
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
 import { Rng } from './rng';
@@ -586,11 +623,13 @@ import {
   FAERIE_FIRE_ARMOR_PCT,
   GCD,
   type HonorArenaDailyState,
+  type InventoryUnit,
   type InvSlot,
   type ItemInstancePayload,
   isConsuming,
   isDungeonDifficulty,
   isEquipSlot,
+  isNonSpellCast,
   isPetClass,
   isQuestTurnInNpc,
   LEASH_DISTANCE,
@@ -639,6 +678,7 @@ import {
   type WorldContent,
   xpToReachLevel,
 } from './types';
+import type { VendorBuyOptions } from './vendor_buy_stack';
 import * as weaponStowMod from './weapon_stow';
 import {
   crossesGardenHedge,
@@ -1147,14 +1187,35 @@ export interface PlayerMeta {
   // additive counters, one per profession: granting one never changes another.
   // Persisted in CharacterState. See src/sim/professions/gathering.ts.
   gatheringProficiency: Record<GatheringProfessionId, number>;
-  // Grants queued by the `/dev gather` cheat, drained once per player per tick
-  // (see drainGatheringGrants). Session-only, never persisted.
+  // Grants queued by harvests, catches, and the `/dev gather` cheat, drained
+  // once per player per tick (see drainGatheringGrants). The queue itself is
+  // session-only (never persisted as a queue), but a save FOLDS any
+  // still-queued grants into the persisted proficiency
+  // (foldPendingGatherGrants), so a leave-time save cannot lose one.
   pendingGatherGrants: { professionId: GatheringProfessionId; amount: number }[];
+  // The slotted tool effect for each gathering profession, if any. Keyed by
+  // PROFESSION rather than by tool item: the harvest path resolves a tool
+  // TIER and never a particular tool, and a per-item slot would go inert the
+  // moment its owner crafted a better pick (see professions/tools.ts). A
+  // player owning two picks therefore shares one slot, which is also why the
+  // HUD shows one row per profession rather than a list.
+  //
+  // ABSENT means no effect slotted anywhere, which is every player until one
+  // is slotted, and the field is left absent rather than initialised to an
+  // empty object on purpose. An empty object still serializes, and the parity
+  // state digest hashes the player: initialising it moved every golden in the
+  // suite for a feature no scenario uses. Absent-by-default keeps a player who
+  // has never slotted an effect byte-identical to before the field existed.
+  // Read at the grant in resolveHarvest; draws nothing.
+  toolEffectSlots?: Partial<Record<GatheringProfessionId, ToolEffectSlot>>;
   // Per-player, per-node gather-node respawn readiness (#1121): nodeId ->
   // sim.time (seconds) at or after which THIS player may harvest that node
-  // again. Absent means never harvested (always ready). Session-only, never
-  // persisted, and never shared across players: see
-  // src/sim/professions/gathering.ts (isNodeHarvestableBy/resolveHarvest).
+  // again. Absent means never harvested (always ready). Never shared across
+  // players (see src/sim/professions/gathering.ts isNodeHarvestableBy/
+  // resolveHarvest), and persisted as remaining-time deltas (D6, the
+  // CharacterState nodeHarvestCooldowns field via professions/node_persist.ts)
+  // so a relog can no longer reset the timers: they freeze at the logout
+  // frame and resume on load.
   nodeHarvestReadyAt: Record<string, number>;
   // Outcome of this player's most recent craftItem command (#1127). Session-only,
   // never persisted: the IWorld craft-result surface for the client to render a
@@ -1288,10 +1349,14 @@ export interface PlayerMeta {
   // knownRecipes exactly once (professions/training.ts
   // grandfatherKnownRecipes), then persists true. Persisted in CharacterState.
   recipesGrandfathered: boolean;
-  // Craft output throttle (#1301): a rolling window of successful crafts,
-  // any recipe. Session-only (like nodeHarvestReadyAt above), never
-  // persisted: a fresh login gets a fresh window rather than carrying a
-  // logout-time cooldown across sessions.
+  // Craft output throttle (#1301): a FIXED tumbling window of successful
+  // actions (five consumer families; see professions/action_throttle.ts,
+  // which states the tumbling semantics and their accepted straddle).
+  // Session-only (like lastActiveTick above), never persisted,
+  // and deliberately so: a fresh login gets a fresh 60-second window rather
+  // than carrying a logout-time throttle across sessions. (This used to cite
+  // nodeHarvestReadyAt as its session-only exemplar; that field persists as
+  // remaining deltas now, while this one stays session-only on purpose.)
   craftThrottle: { windowStart: number; count: number };
   // One-time mastery reset notice pending (Professions 2.0): set by
   // the load-time masteryResetApplied branch, consumed by the tick mail phase
@@ -1330,6 +1395,13 @@ export interface PlayerMeta {
   // ever recorded; baseline arming keeps deploy migration and fresh attunement
   // silent.
   tierMailSent: Map<string, number>;
+  // Per-pair quested hobby (Professions 2.0): canonical pair id -> the hobby
+  // craft this character explicitly chose through the hobby-switch quest while
+  // that pair was active (professions/hobby_memory.ts). A Map (empty -> inert
+  // `[]`, no golden churn), persisted with zero-default omission. Read at every
+  // pair transition so a make-amends return restores the quested choice instead
+  // of re-deriving the skill default; never written by a default.
+  questedHobbies: Map<string, string>;
   // One-time first-tier tutorial sent (Professions 2.0): flipped when a
   // character's first craft skill crosses tier 1 (professions/prof_nudges.ts).
   // Persisted in CharacterState so no later load can re-fire it (the
@@ -1422,6 +1494,13 @@ export interface CharacterState {
   // prefer `gatheringProficiency` and fall back to `professions`.
   professions?: Partial<Record<string, number>>;
   gatheringProficiency?: Partial<Record<string, number>>;
+  // Slotted tool effects, keyed by gathering profession id (JSONB). OPTIONAL,
+  // and written only when the player actually has one: a slot is rare, so an
+  // always-present `{}` would add a key to every character row in the realm to
+  // say nothing. Absent loads to an absent PlayerMeta field, which is the
+  // default the parity digest depends on, so a save written before this field
+  // existed loads byte-identically.
+  toolEffectSlots?: Partial<Record<string, ToolEffectSlot>>;
   copper: number;
   hp: number;
   resource: number;
@@ -1480,6 +1559,14 @@ export interface CharacterState {
   // saves load cleanly with no cooldowns). Persisted so logging out and back in no
   // longer wipes cooldowns and lets a player bypass them by relogging.
   cooldowns?: SavedCooldowns;
+  // Per-player gather-node respawn timers as remaining-time deltas (D6; JSONB,
+  // nodeId -> remaining seconds, the cooldowns scheme above applied to node
+  // readiness). Optional with zero-default omission: absent for pre-D6 saves
+  // and whenever every node is ready, so unchanged characters stay byte-equal.
+  // Loaded through applyNodeReadiness (professions/node_persist.ts): re-anchored
+  // to the loading sim's clock, filtered to live node ids, clamped to one
+  // respawn. Closes the relog exploit that used to reset every node timer.
+  nodeHarvestCooldowns?: Record<string, number>;
   pet?: PetState | null;
   // WoW-style ghost state (JSONB; optional so pre-ghost saves load alive). A player who
   // logs out as a released spirit resumes as a ghost at the graveyard with the corpse
@@ -1542,6 +1629,10 @@ export interface CharacterState {
   // -> tier). Written only when non-empty (zero-default omission), so
   // older and unattuned saves stay byte-equal.
   tierMailSent?: Record<string, number>;
+  // Per-pair quested hobby (Professions 2.0; JSONB, canonical pair id ->
+  // craft id). Written only when non-empty (zero-default omission), so older
+  // saves and characters that never quested a hobby stay byte-equal.
+  questedHobbies?: Record<string, string>;
   // First-tier tutorial already sent (Professions 2.0; JSONB, optional
   // so older saves load cleanly and fire it once when they first qualify).
   // Written only when true (zero-default omission).
@@ -1694,6 +1785,10 @@ export class Sim {
   // reach it through the seam.
   private targeting!: Targeting;
   players = new Map<number, PlayerMeta>(); // keyed by entity id
+  // Live ctx view (SimContext.masteryResetNoticeCounter): how many players
+  // carry a pending mastery-reset notice, so the 20 Hz mail-phase sweep can
+  // skip its player walk entirely on the ~always tick where nobody does.
+  readonly masteryResetNoticeCounter = { pending: 0 };
   // spatial indexes for radius queries; re-bucketed at the end of each tick
   // and kept roster-exact on spawn/despawn/teleport
   readonly grid = new SpatialGrid();
@@ -1956,7 +2051,10 @@ export class Sim {
     // (getActiveWorldContent), never cfg.world. A caller that passes cfg.world
     // MUST also setActiveWorldContent() with content whose terrain-relevant
     // fields (zones, camps, roads, terrainEdits, biomePaint, waterLevel) are
-    // identical, or spawns and geometry silently fork. Placements MAY differ
+    // identical, AND whose services.stations, npcs, and services.graveyards
+    // match (the collider builder's station furniture and its NPC veto read
+    // the module global, while this Sim's station gate reads the construction
+    // copy), or spawns and geometry silently fork. Placements MAY differ
     // (render-only ownership; the editor viewport strips them from cfg.world).
     const worldContent = this.worldContent;
 
@@ -2573,6 +2671,7 @@ export class Sim {
       guildLetterSent: false,
       questCadence: new Map(),
       tierMailSent: new Map(),
+      questedHobbies: new Map(),
       profTierTutorialSent: false,
       profNudgeCadence: new Map(),
       archetype: emptyArchetypeState(),
@@ -2624,11 +2723,38 @@ export class Sim {
       meta.gatheringProficiency = normalizeGatheringProficiency(
         s.gatheringProficiency ?? s.professions,
       );
+      // Slotted tool effects. Only assigned when the save actually carries a
+      // usable row, so the field stays ABSENT for the overwhelming majority of
+      // characters and the parity digest is unchanged for them. Every row is
+      // re-validated on the way in rather than trusted: a stored profession id
+      // or effect id that no longer exists in content is dropped, and the
+      // counters are clamped, so retiring an effect cannot resurrect it or
+      // load a negative charge count.
+      const savedSlots = normalizeToolEffectSlots(s.toolEffectSlots);
+      if (savedSlots) meta.toolEffectSlots = savedSlots;
+      // Node respawn timers resume from their saved remaining deltas (D6),
+      // re-anchored to THIS sim's clock and filtered to live node ids
+      // (professions/node_persist.ts): the timers froze at the logout frame
+      // and pick up here, so a relog cannot reset them. A linkdead drop's
+      // immediate safety-flush save freezes at drop time too, but the
+      // character stays in the world with timers counting in live sim time,
+      // so the autosave and then the grace-expiry save each overwrite it
+      // with a smaller remaining. For timers RUNNING at a save the freeze is
+      // never smaller than reality; the full story, including the
+      // cast-in-flight crash corner (which rolls back timer and yield
+      // together, value-neutral), lives in professions/node_persist.ts.
+      meta.nodeHarvestReadyAt = applyNodeReadiness(s.nodeHarvestCooldowns, this.time);
       if (s.unlockedMilestones)
         for (const id of s.unlockedMilestones) meta.unlockedMilestones.add(id);
       meta.copper = s.copper;
       meta.equipment = { ...s.equipment };
       meta.equipmentInstance = {};
+      // ONE aggregated dev-channel line per character load, not one per row: a
+      // systematically corrupt blob (a bad migration) would otherwise log once
+      // per affected stack, and over-capacity inventories are tolerated rather
+      // than truncated, so that count is unbounded. Every container below
+      // pushes its drops here; the single warn sits after the bank load.
+      const droppedInstanceJunk: string[] = [];
       for (const [slot, instance] of Object.entries(
         s.equipmentInstance ?? s.equipmentInstances ?? {},
       )) {
@@ -2637,9 +2763,33 @@ export class Sim {
         if (!itemId) continue;
         // A rift payload is validated against the worn item (anti-tamper); any
         // other instance (an enchant) deep-clones through the shared rules.
-        const clean = instance.rift
+        const owned = instance.rift
           ? sanitizeRiftGearInstance(itemId, instance, player.id)
           : cloneItemInstancePayload(instance);
+        // A rift rebuild that REFUSES (item/payload mismatch, the anti-tamper
+        // arm) drops silently exactly as it did before the payload bound
+        // existed: routing the null through the bound would log "dropped
+        // item-instance junk: payload" for what is really a rift mismatch, a
+        // different cause with a different owner.
+        if (!owned) continue;
+        // Both branches hand back a payload THIS load owns (a fresh clone, or
+        // a fresh rebuild), which is what lets the shared load bound delete
+        // keys in place (item_instance_load.ts). Its arms are the module's
+        // own contract (key count, key length, string values at the top and
+        // one level into rolled/charges, the subtree JSON ceiling under
+        // them): the phase 16 first cut clamped the signer alone and left
+        // the rest of the shape unbounded.
+        //
+        // On the RIFT branch the signer arm is DEAD, and saying so is the
+        // point: sanitizeRiftGearInstance REBUILDS the payload from bounded
+        // progression inputs and never copies a signer across, so nothing
+        // survives there for the name rule to bite on. Rift rebuild FIRST,
+        // then the bound, on BOTH this arm and the bags arm below: the
+        // rebuild reduces a corrupt rift payload to its bounded keys, so an
+        // over-keyed row that still carries a valid rift survives as the
+        // rebuilt payload instead of being destroyed by the key-count arm.
+        const { payload: clean, dropped } = sanitizeItemInstancePayloadOnLoad(owned);
+        for (const d of dropped) droppedInstanceJunk.push(`equip.${slot}.${d}`);
         if (clean) meta.equipmentInstance[slot] = clean;
       }
       // The shared tamper ceiling (bags.ts instancedCountCap, same rule as the
@@ -2653,10 +2803,38 @@ export class Sim {
         return slot;
       });
       for (const slot of meta.inventory) {
-        if (!slot.instance?.rift) continue;
-        const clean = sanitizeRiftGearInstance(slot.itemId, slot.instance, player.id);
-        if (clean) slot.instance = clean;
-        else delete slot.instance;
+        // Rift rebuild FIRST, matching the equip arm above: the rebuild
+        // reduces a corrupt rift payload to its bounded keys, so an over-keyed
+        // row that still carries a VALID rift survives as the rebuilt payload
+        // instead of being destroyed by the key-count arm before the rebuild
+        // could salvage it (the fix-round review caught the two arms
+        // disagreeing on exactly that blob). A refusal drops silently, same
+        // as the equip arm's anti-tamper rule.
+        // The marker bound runs BEFORE the rift block: the refusal arm below
+        // continues past the rest of this iteration, and the fix-wave review
+        // proved a 100,000-char marker riding a refused-rift row through that
+        // skip while the diagnostic line silently named every drop but this
+        // one. Hoisting is the durable shape against the continue.
+        boundCraftedRecipeIdOnLoad(slot, droppedInstanceJunk, 'bag');
+        if (slot.instance?.rift) {
+          const rebuilt = sanitizeRiftGearInstance(slot.itemId, slot.instance, player.id);
+          if (rebuilt) slot.instance = rebuilt;
+          else {
+            delete slot.instance;
+            continue;
+          }
+        }
+        // The payload bound covers BAGS too (the review round: the mint sites
+        // put signed instances into bags in the common case, so an
+        // equipment-only clamp missed the container that carries most of
+        // them). Same shared rule as the equip arm above, on the clone
+        // cloneInvSlot just made (or the fresh rift rebuild).
+        if (slot.instance) {
+          const { payload, dropped } = sanitizeItemInstancePayloadOnLoad(slot.instance);
+          for (const d of dropped) droppedInstanceJunk.push(`bag.${slot.itemId}.${d}`);
+          if (payload) slot.instance = payload;
+          else delete slot.instance;
+        }
       }
       if (s.bags === undefined) {
         // PRE-BAG save: the character earned this space under the infinite
@@ -2684,12 +2862,33 @@ export class Sim {
       // charge-bearing copies through the grant's fresh-slot clone.
       meta.vendorBuyback = (s.vendorBuyback ?? []).map((raw) => {
         const slot = cloneInvSlot(raw);
+        // Rift rebuild FIRST, the same order as the bags arm above (the
+        // whole-branch review: this arm skipped the rebuild, so the bound's
+        // deliberate rift skip left buyback rift rows unvalidated).
+        if (slot.instance?.rift) {
+          const rebuilt = sanitizeRiftGearInstance(slot.itemId, slot.instance, player.id);
+          if (rebuilt) slot.instance = rebuilt;
+          else delete slot.instance;
+        }
+        boundCraftedRecipeIdOnLoad(slot, droppedInstanceJunk, 'buyback');
+        // Buyback rows carry real signed instances (anything sold to a vendor
+        // lands here for five minutes), so they take the same payload bound
+        // as bags and equipment; the first cut reached neither this list nor
+        // the bank. Before the charges clamp below, which reads the payload
+        // this leaves behind.
+        if (slot.instance) {
+          const { payload, dropped } = sanitizeItemInstancePayloadOnLoad(slot.instance);
+          for (const d of dropped) droppedInstanceJunk.push(`buyback.${slot.itemId}.${d}`);
+          if (payload) slot.instance = payload;
+          else delete slot.instance;
+        }
         if (slot.instance && !isMergeableInstancePayload(slot.instance)) slot.count = 1;
         return slot;
       });
       // Bank sanitizes on load (never destroys items; a pre-bank save has no `bank`
       // field and sanitizes to an empty bank). See bank.ts sanitizeBankState.
-      meta.bank = sanitizeBankState(s.bank);
+      meta.bank = sanitizeBankState(s.bank, meta.name, droppedInstanceJunk, player.id);
+      warnDroppedInstanceKeys(meta.name, droppedInstanceJunk);
       for (const q of s.questLog) {
         // Prune unknown quest ids at load (normalize on load, never crash): a save
         // mid a since-deleted quest (e.g. the retirement of
@@ -2698,6 +2897,10 @@ export class Sim {
         // tick op dereferences QUESTS[qp.questId].objectives and TypeErrors inside
         // the server tick (quest_credit.ts + interactNpcForQuests). questsDone is
         // membership-only (never dereferenced), so it is preserved as history below.
+        // Untrusted JSONB: normalize on load. Absent on any save written before
+        // the per-object interact ledger existed, which grants that player their
+        // remaining interacts rather than dead-ending a part-way-done quest.
+        const creditedObjects = sanitizeCreditedObjects(q.creditedObjects);
         if (q.state !== 'done' && QUESTS[q.questId])
           meta.questLog.set(q.questId, {
             questId: q.questId,
@@ -2705,6 +2908,7 @@ export class Sim {
             state: q.state,
             ...(q.selection === undefined ? {} : { selection: q.selection }),
             ...(q.resolvedCounts === undefined ? {} : { resolvedCounts: [...q.resolvedCounts] }),
+            ...(creditedObjects === undefined ? {} : { creditedObjects }),
           });
       }
       for (const q of s.questsDone) meta.questsDone.add(q);
@@ -2725,7 +2929,19 @@ export class Sim {
         }
       }
       meta.craftSkills = normalizeCraftSkills(s.craftSkills);
-      if (s.knownRecipes) meta.knownRecipes = new Set(s.knownRecipes);
+      // Shape-bounded, never catalog-filtered: retired ids must survive (the
+      // grandfather contract), oversized, non-string or over-count junk must
+      // not (the phase 16 blob growth bound). The filter is TOTAL, so a
+      // stored value that is not an array at all loads as no known recipes
+      // rather than throwing this character's load and locking the account
+      // out for good.
+      if (s.knownRecipes) {
+        const knownRecipeIds = sanitizeKnownRecipeIds(s.knownRecipes);
+        if (!Array.isArray(s.knownRecipes) || s.knownRecipes.length !== knownRecipeIds.length) {
+          console.warn(`[load] dropped knownRecipes junk for ${meta.name}`);
+        }
+        meta.knownRecipes = new Set(knownRecipeIds);
+      }
       // Grandfather normalize (one shared load path for offline saves
       // AND server-persisted state): an older save (flag absent/false)
       // gets the pre-training recipe ids unioned in exactly once, then the
@@ -2750,6 +2966,7 @@ export class Sim {
       if (s.masteryResetApplied !== true) {
         applyMasteryReset(meta.craftSkills, meta.gatheringProficiency);
         meta.pendingMasteryResetNotice = true;
+        this.masteryResetNoticeCounter.pending += 1;
       }
       // The one-time proficiency display heal (issue 2339), after the
       // mastery-reset branch so it sees the values this character actually
@@ -2791,7 +3008,34 @@ export class Sim {
       );
       // Acknowledged tiers: valid finite non-negative entries only; a
       // missing craft re-baselines silently on the next tier-mail sweep.
-      meta.tierMailSent = normalizeTierMailOnLoad(s.tierMailSent);
+      // Then pruned to the CURRENT majors (the archetype state normalized
+      // above), healing any stale entry a pre-prune save carried, so a
+      // return to a once-held pair re-baselines instead of mailing
+      // retroactively (see pruneTierMailToActiveMajors). A save the one-time
+      // mastery reset just fired on drops its record entirely: the reset
+      // zeroed the skills, so a kept acknowledgement would sit ABOVE the
+      // zeroed tier and silently swallow the whole re-climb's letters; the
+      // next sweep re-baselines at the reset tiers instead. The drop guard
+      // reuses the reset gate's expression above VERBATIM (masteryResetApplied
+      // !== true) so the drop and the reset can never fire on different
+      // loads; keep the two textually identical.
+      meta.tierMailSent = normalizeTierMailOnLoad(
+        s.masteryResetApplied !== true ? undefined : s.tierMailSent,
+      );
+      // Load runs the prune WITHOUT the transition sites' immediate baseline,
+      // deliberately: current majors keep their entries through the prune (so
+      // nothing acknowledgeable is dropped), a no-entry pre-deploy save is
+      // the intended silent migration baseline on the next 1 Hz sweep, and on
+      // a mastery-reset load the skills were just zeroed, so no crossing can
+      // land inside the sub-second window the transition-time baseline exists
+      // to close.
+      pruneTierMailToActiveMajors(meta);
+      // Quested hobbies: pair ids the shipped ring still recognizes, holding a
+      // craft that is still one of that pair's hobby candidates. No prune here
+      // and none at the transitions either, deliberately: the record has to
+      // outlive the dormant period, since restoring a hobby quested BEFORE the
+      // character left the pair is the entire point (professions/hobby_memory.ts).
+      meta.questedHobbies = normalizeHobbyMemoryOnLoad(s.questedHobbies);
       meta.profTierTutorialSent = s.profTierTutorialSent === true;
       meta.delveMarks = s.delveMarks ?? 0;
       meta.delveClears = { ...(s.delveClears ?? {}) };
@@ -3344,6 +3588,12 @@ export class Sim {
     // character on the Sowfield). The stowed pet persists via serializePet's
     // delvePetStash fallback; known/sportRole are session-derived, not saved.
     const cupReturn = valeCupMod.vcupReturnFor(this.ctx, pid);
+    // One fold serves both persisted proficiency keys below: the live counters
+    // plus any still-queued grants (foldPendingGatherGrants), so a leave-time
+    // save landing between the tick that queued a grant and the tick that
+    // drains it cannot lose the grant. The live meta is untouched; the queue
+    // still drains only on the tick path.
+    const foldedProficiency = foldPendingGatherGrants(meta);
     const state: CharacterState = {
       contentRevision: CURRENT_CHARACTER_CONTENT_REVISION,
       level: restore ? restore.level : e.level,
@@ -3371,8 +3621,17 @@ export class Sim {
       // PlayerMeta.totalPlayedSeconds); /playtime reads the running total the
       // same way without waiting for a save.
       totalPlayedSeconds: meta.totalPlayedSeconds + Math.max(0, this.time - meta.joinedAt),
-      professions: { ...meta.gatheringProficiency },
-      gatheringProficiency: { ...meta.gatheringProficiency },
+      // Legacy dual-write plus the current key, both off the one fold above
+      // (separate objects on purpose, so no caller can alias one through the
+      // other).
+      professions: { ...foldedProficiency },
+      gatheringProficiency: foldedProficiency,
+      // Spread ONLY when a slot exists, so the key is absent from the saved
+      // JSONB for every character who has never slotted an effect rather than
+      // writing `{}` into every row in the realm.
+      ...(meta.toolEffectSlots
+        ? { toolEffectSlots: structuredCloneToolEffectSlots(meta.toolEffectSlots) }
+        : {}),
       copper: meta.copper,
       hp: e.hp,
       // A druid saved while shifted runs on rage/energy with its mana parked in
@@ -3416,6 +3675,8 @@ export class Sim {
         state: q.state,
         ...(q.selection === undefined ? {} : { selection: q.selection }),
         ...(q.resolvedCounts === undefined ? {} : { resolvedCounts: [...q.resolvedCounts] }),
+        // Absent until the first interact credit (parity-stable saves).
+        ...(q.creditedObjects === undefined ? {} : { creditedObjects: [...q.creditedObjects] }),
       })),
       questsDone: [...meta.questsDone],
       arenaRating: meta.arenaRating,
@@ -3462,6 +3723,12 @@ export class Sim {
         this.time,
         e.abilityCharges,
       ),
+      // Node respawn timers as remaining deltas (D6), absent when every node
+      // is ready (zero-default omission; see the CharacterState field doc).
+      ...(() => {
+        const nodeCooldowns = serializeNodeReadiness(meta.nodeHarvestReadyAt, this.time);
+        return nodeCooldowns ? { nodeHarvestCooldowns: nodeCooldowns } : {};
+      })(),
       skin: meta.skin,
       skinCatalog: meta.skinCatalog,
       pendingSkinRank: meta.pendingSkinRank,
@@ -3514,6 +3781,15 @@ export class Sim {
       })(),
       ...(meta.tierMailSent.size > 0
         ? { tierMailSent: Object.fromEntries(meta.tierMailSent) }
+        : {}),
+      ...(meta.questedHobbies.size > 0
+        ? {
+            // KEY-SORTED like the cprof view arm, so persisted blob diffs
+            // stay readable for the same reason the wire signature is stable.
+            questedHobbies: Object.fromEntries(
+              [...meta.questedHobbies.entries()].sort(([a], [b]) => (a < b ? -1 : 1)),
+            ),
+          }
         : {}),
       ...(meta.profTierTutorialSent ? { profTierTutorialSent: true } : {}),
       townFocus: { ...meta.townFocus },
@@ -4215,6 +4491,9 @@ export class Sim {
       get primaryId() {
         return sim.primaryId;
       },
+      get masteryResetNoticeCounter() {
+        return sim.masteryResetNoticeCounter;
+      },
       get tradeInvites() {
         return sim.tradeInvites;
       },
@@ -4820,6 +5099,7 @@ export class Sim {
       mailHeroicMarks: (pid, itemId, count) => sim.postOffice.mailHeroicMarks(pid, itemId, count),
       mailAuthoredLetter: (meta, letter) =>
         sim.postOffice.sendLetter(sim.postOffice.mailKeyFor(meta), meta.name, letter, 'system'),
+      mailboxHoldsItem: (meta, itemId) => sim.postOffice.mailboxHoldsItem(meta, itemId),
       // Book of Deeds seam callbacks (owned by deeds.ts). Late-bound arrows so
       // sim.ctx resolves at call time (the Q1 pattern).
       bumpDeedStat: (meta, stat, delta) => deedsMod.bumpDeedStat(sim.ctx, meta, stat, delta),
@@ -5652,6 +5932,8 @@ export class Sim {
     ) {
       return true; // wall/cliff
     }
+    const fromX = p.pos.x;
+    const fromZ = p.pos.z;
     const resolved = this.resolveMove(p.pos.x, p.pos.z, nx, nz, BODY_RADIUS, p);
     p.pos.x = resolved.x;
     p.pos.z = resolved.z;
@@ -5659,6 +5941,19 @@ export class Sim {
     p.vy = 0;
     p.onGround = true;
     p.fallStartY = p.pos.y;
+    // A tow across a zone line ends a live gather/fishing session: the
+    // follow walk skips stepPlayerMotion (whose move-input cancel guards
+    // every self-propelled crossing), so without this a leader could carry
+    // an angler into another zone mid-session and fish it against the
+    // wrong zone's rules. The session check leads: it is the cheap common
+    // case (almost no towed player is mid-session), so the two zone walks
+    // run only when there is something to cancel.
+    if (
+      isNonSpellCast(p.castingAbility) &&
+      zoneAt(fromX, fromZ).id !== zoneAt(p.pos.x, p.pos.z).id
+    ) {
+      cancelProfessionSessionOnDisplacement(this.ctx, p);
+    }
     return true;
   }
 
@@ -7727,22 +8022,29 @@ export class Sim {
   // Removal counterpart to countEnchantableItem above: prefers plain fungible
   // stacks (matching removeFungibleItem's ordering within that subset) and only
   // reaches for an instanced-but-unenchanted copy once no fungible copy is left.
-  // Never removes an already-enchanted copy (isEnchantedInstance). Returns the
-  // `instance` payload of every instanced unit actually consumed (matching
-  // removeItem's return contract) so a caller applying an enchant can merge a
-  // crafted copy's signer/masterwork/legacy rolled.quality into the
-  // freshly-enchanted instance instead of silently dropping them (#1712
-  // round-3 review).
-  removeEnchantableItem(itemId: string, count: number, pid?: number): ItemInstancePayload[] {
-    const consumedInstances: ItemInstancePayload[] = [];
+  // Never removes an already-enchanted copy (isEnchantedInstance). Returns one
+  // InventoryUnit per unit actually consumed, from BOTH passes, so a caller
+  // applying an enchant can merge a crafted copy's signer/masterwork/legacy
+  // rolled.quality into the freshly-enchanted instance instead of silently
+  // dropping them (#1712 round-3 review) AND can re-stamp the plain-stack
+  // craftedRecipeId marker on the copy it mints. Pass 1 (plain stacks) used to
+  // report nothing at all, which is precisely how enchanting a common crafted
+  // item laundered its disenchant-gate provenance: a plain crafted stack keeps
+  // its marker on the SLOT, not in an `instance`, so a payload-only return had
+  // nowhere to put it.
+  removeEnchantableItem(itemId: string, count: number, pid?: number): InventoryUnit[] {
+    const consumed: InventoryUnit[] = [];
     const r = this.resolve(pid);
-    if (!r) return consumedInstances;
+    if (!r) return consumed;
     const { meta } = r;
     // Pass 1: plain fungible stacks only, same order removeFungibleItem uses.
     for (let i = meta.inventory.length - 1; i >= 0 && count > 0; i--) {
       const s = meta.inventory[i];
       if (s.itemId !== itemId || s.instance) continue;
       const take = Math.min(s.count, count);
+      for (let unit = 0; unit < take; unit++) {
+        consumed.push({ instance: undefined, craftedRecipeId: s.craftedRecipeId });
+      }
       s.count -= take;
       count -= take;
       if (s.count <= 0) meta.inventory.splice(i, 1);
@@ -7757,14 +8059,17 @@ export class Sim {
       const take = Math.min(s.count, count);
       for (let unit = 0; unit < take; unit++) {
         const finalUnitOfSlot = take >= s.count && unit === take - 1;
-        consumedInstances.push(finalUnitOfSlot ? s.instance : cloneItemInstancePayload(s.instance));
+        consumed.push({
+          instance: finalUnitOfSlot ? s.instance : cloneItemInstancePayload(s.instance),
+          craftedRecipeId: s.craftedRecipeId,
+        });
       }
       s.count -= take;
       count -= take;
       if (s.count <= 0) meta.inventory.splice(i, 1);
     }
     this.ctx.onInventoryChangedForQuests(meta);
-    return consumedInstances;
+    return consumed;
   }
 
   // True when `count` copies of the item fit the player's pooled bag budget
@@ -7813,32 +8118,14 @@ export class Sim {
     return items.useItem(this.ctx, itemId, pid);
   }
 
-  // Two overloads, same trick as buyBackItem below: the IWorld shape UI/production
-  // code calls (npcId, itemId, bulk?) versus the legacy test/server shape that
-  // already threads a pid positionally in the third slot (npcId, itemId, pid?).
-  // Disambiguated by typeof so every existing `sim.buyItem(npc, item, pid)` call
-  // site keeps working unchanged.
-  buyItem(npcId: number, itemId: string, bulk?: boolean): void;
-  buyItem(npcId: number, itemId: string, pid?: number, bulk?: boolean): void;
-  buyItem(
-    npcId: number,
-    itemId: string,
-    bulkOrPid?: boolean | number,
-    pidOrBulk?: number | boolean,
-  ): void {
-    const pid =
-      typeof bulkOrPid === 'number'
-        ? bulkOrPid
-        : typeof pidOrBulk === 'number'
-          ? pidOrBulk
-          : undefined;
-    const bulk =
-      typeof bulkOrPid === 'boolean'
-        ? bulkOrPid
-        : typeof pidOrBulk === 'boolean'
-          ? pidOrBulk
-          : undefined;
-    items.buyItem(this.ctx, npcId, itemId, pid, bulk);
+  // ONE explicit shape, no overloads (phase 21): the request rides an options
+  // bag (VendorBuyOptions) because any positional count or bulk slot beside
+  // the optional numeric pid compiles green under structural typing while
+  // misrouting a count into pid or a pid into count; the bag makes every
+  // stale positional call site a compile error instead. pid stays last, the
+  // per-player thread every sibling command shares.
+  buyItem(npcId: number, itemId: string, opts?: VendorBuyOptions, pid?: number): void {
+    items.buyItem(this.ctx, npcId, itemId, pid, opts);
   }
 
   sellItem(itemId: string, count = 1, pid?: number): void {
@@ -7878,8 +8165,13 @@ export class Sim {
   // Gather-node harvest (#1121): a thin delegate onto
   // src/sim/professions/gathering.ts, resolved on the deterministic tick the
   // command arrives on, same as buyItem/useItem above.
-  harvestNode(nodeId: string, pid?: number): boolean {
-    return harvestNodeImpl(this.ctx, nodeId, pid);
+  // `confirmEffectUse` (R40) sits before pid to match the IWorld facet's
+  // (nodeId, confirmEffectUse?) shape positionally; pid stays last, the
+  // slotToolEffect convention, and the module implementation takes the same
+  // order so the forward cannot transpose them. Callers naming a pid pass
+  // undefined through the consent slot.
+  harvestNode(nodeId: string, confirmEffectUse?: boolean, pid?: number): boolean {
+    return harvestNodeImpl(this.ctx, nodeId, confirmEffectUse === true, pid);
   }
 
   // IWorld read surface (IWorldProfessions): whether the given node is
@@ -7890,12 +8182,33 @@ export class Sim {
   nodeHarvestableByMeFor(nodeId: string, pid: number): boolean {
     const meta = this.players.get(pid);
     if (!meta) return false;
-    if (!gatherNodeById(nodeId)) return false;
+    // Existence via the node_persist id map (O(1)), the same reasoning as
+    // nodeRespawnSecondsFor below: this read runs on the tooltip path and
+    // only needs membership, never the record.
+    if (!isLiveGatherNodeId(nodeId)) return false;
     return isNodeHarvestableBy(meta, nodeId, this.time);
   }
 
   nodeHarvestableByMe(nodeId: string): boolean {
     return this.nodeHarvestableByMeFor(nodeId, this.primaryId);
+  }
+
+  // The countdown read of the same per-player timer (IWorldProfessions
+  // nodeRespawnSeconds): remaining seconds until THIS player may harvest the
+  // node again, null when it is ready now or the id is unknown. Same explicit
+  // pid shape as nodeHarvestableByMeFor, same pure helper clock domain.
+  nodeRespawnSecondsFor(nodeId: string, pid: number): number | null {
+    const meta = this.players.get(pid);
+    if (!meta) return null;
+    // Existence via the node_persist id map (O(1)): this read runs on the
+    // tooltip path, where gatherNodeById's linear GATHER_NODES scan would be
+    // paid per call for a lookup that only needs membership.
+    if (!isLiveGatherNodeId(nodeId)) return null;
+    return nodeRespawnRemainingSec(meta, nodeId, this.time);
+  }
+
+  nodeRespawnSeconds(nodeId: string): number | null {
+    return this.nodeRespawnSecondsFor(nodeId, this.primaryId);
   }
 
   // IWorld read surface (IWorldProfessions, #1127): the full recipe list
@@ -7920,6 +8233,14 @@ export class Sim {
   // only for eligible equipment outputs and mints the bindOnTrade arm
   // server-side (professions/commission.ts), never off client data.
   craftItem(recipeId: string, commission?: boolean, pid?: number): void {
+    // Dead gate for the profession-action family (this wrapper plus
+    // trainRecipe/unbindItem/salvageItem/disenchantItem/applyEnchant below):
+    // refuse BEFORE the resolver, so no result event is emitted and the
+    // shared error line is the single surface (see dead_gate.ts). It sits on
+    // the wrapper, not in the impl, because these wrappers emit the impl's
+    // result unconditionally; mobile-station placement and the rift forge
+    // emit no wrapper-side event, so their gates live in their own modules.
+    if (refusedWhileDead(this.ctx, pid)) return;
     const result = craftItemImpl(this.ctx, recipeId, commission === true, pid);
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastCraftResult = result;
@@ -7971,6 +8292,8 @@ export class Sim {
   // silent no-op (the crafting window's station row already communicates
   // range, and the server re-validates the gate on every craft).
   placeMobileStation(craftId: string, pid?: number): void {
+    // Dead-gated inside placeMobileStationForPlayer itself, so the `/dev
+    // mobilestation` cheat's direct call shares the gate.
     placeMobileStationForPlayer(this.ctx, craftId, pid);
   }
 
@@ -7984,6 +8307,7 @@ export class Sim {
   // the event plus the lastTrainResult probe (the craftItem single-surface
   // doctrine: no ctx.error toast, or the deny would print twice).
   trainRecipe(recipeId: string, pid?: number): void {
+    if (refusedWhileDead(this.ctx, pid)) return;
     const r = this.ctx.resolve(pid);
     if (!r) return;
     const result = resolveTrain(this.stationPlacements, r.meta, r.e.pos, recipeId);
@@ -8012,6 +8336,7 @@ export class Sim {
   // twice); the payload change itself converges through the self inventory
   // mirror in both hosts.
   unbindItem(itemId: string, pid?: number): void {
+    if (refusedWhileDead(this.ctx, pid)) return;
     const result = unbindItemImpl(this.ctx, itemId, pid);
     const meta = this.players.get(pid ?? this.primaryId);
     this.emit({
@@ -8060,6 +8385,7 @@ export class Sim {
   // command arrives on, same shape as craftItem above. Stashes the outcome
   // on the resolved player's PlayerMeta so lastSalvageResult reflects it.
   salvageItem(itemId: string, pid?: number): void {
+    if (refusedWhileDead(this.ctx, pid)) return;
     const result = salvageItemImpl(this.ctx, itemId, pid);
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastSalvageResult = result;
@@ -8111,6 +8437,7 @@ export class Sim {
   ): void {
     const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
     const targetSlotIndex = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    if (refusedWhileDead(this.ctx, pid)) return;
     const result = disenchantItemImpl(this.ctx, itemId, pid, targetSlotIndex);
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastDisenchantResult = result;
@@ -8148,6 +8475,7 @@ export class Sim {
     confirmReplace?: boolean,
     pid?: number,
   ): void {
+    if (refusedWhileDead(this.ctx, pid)) return;
     const result = applyEnchantImpl(this.ctx, itemId, enchantId, pid, slot, confirmReplace);
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastEnchantResult = result;
@@ -9462,6 +9790,11 @@ export class Sim {
     return this.market.rekeyMarketSeller(characterId, oldName, newName);
   }
 
+  /** Character deletion: drop the deleted seller's listings + collection (R43). */
+  purgeMarketSeller(characterId: number, name: string): boolean {
+    return this.market.purgeMarketSeller(characterId, name);
+  }
+
   marketSearch(query: MarketQuery, pid?: number): void {
     this.market.marketSearch(query, pid);
   }
@@ -9563,6 +9896,11 @@ export class Sim {
 
   rekeyMailOwner(characterId: number, oldName: string, newName: string): boolean {
     return this.postOffice.rekeyMailOwner(characterId, oldName, newName);
+  }
+
+  /** Character deletion: clear the deleted character's mailbox (R43). */
+  purgeMailOwner(characterId: number, name: string): boolean {
+    return this.postOffice.purgeMailOwner(characterId, name);
   }
 
   serializeMail(): MailSave {
@@ -10432,6 +10770,18 @@ export class Sim {
         this.players.get(pid)?.questCadence ?? new Map(),
         this.tickCount,
       ),
+      // Quested-hobby record (professions/hobby_memory.ts), KEY-SORTED for a
+      // stable cprof signature and omitted while empty, so the delta diff
+      // never fires for characters without the feature.
+      ...(() => {
+        const quested = this.players.get(pid)?.questedHobbies;
+        if (!quested || quested.size === 0) return {};
+        return {
+          questedHobbies: Object.fromEntries(
+            [...quested.entries()].sort(([a], [b]) => (a < b ? -1 : 1)),
+          ),
+        };
+      })(),
     };
   }
 
@@ -10506,7 +10856,17 @@ export class Sim {
   acceptArchetypeQuest(craftId: string, pid?: number): boolean {
     const r = this.resolve(pid);
     if (!r) return false;
-    return acceptArchetypeQuestImpl(this.ctx, r.meta.entityId, craftId);
+    const accepted = acceptArchetypeQuestImpl(this.ctx, r.meta.entityId, craftId);
+    // The shared pair-transition rules, exactly as the quest attunement path
+    // runs them (both are belt and braces here: accept requires no prior pair,
+    // so the tier-mail prune can only clear entries that predate attunement,
+    // and a quested hobby can only have been recorded while some pair was
+    // already active, which this path refuses outright).
+    if (accepted) {
+      applyPairTransitionHobbyMemory(r.meta);
+      applyPairTransitionTierMail(r.meta);
+    }
+    return accepted;
   }
 
   /** Stub entry point for one completion of the repeatable "make amends" quest
@@ -10524,7 +10884,17 @@ export class Sim {
   switchArchetype(craftId: string, pid?: number): boolean {
     const r = this.resolve(pid);
     if (!r) return false;
-    return switchArchetypeImpl(this.ctx, r.meta.entityId, craftId);
+    const switched = switchArchetypeImpl(this.ctx, r.meta.entityId, craftId);
+    // The shared pair-transition rules, exactly as the quest attunement path
+    // runs them: restore a hobby quested for the pair being switched INTO (a
+    // legacy wrapper still runs the full transition rule), then retire the
+    // outgoing majors' acknowledgements and baseline the new majors so a
+    // crossing before the next 1 Hz sweep is not swallowed.
+    if (switched) {
+      applyPairTransitionHobbyMemory(r.meta);
+      applyPairTransitionTierMail(r.meta);
+    }
+    return switched;
   }
 
   // Read-only gathering-profession proficiency surface for IWorld. Stubbed
@@ -10536,6 +10906,82 @@ export class Sim {
 
   get gatheringProficiency(): Record<string, number> {
     return this.gatheringProficiencyFor(this.primaryId);
+  }
+
+  // The viewer's slotted tool effects, projected for the seam. Takes an
+  // explicit pid (the gatheringProficiencyFor precedent) so the server can
+  // build one player's delta while the offline getter below reads the primary.
+  //
+  // Returns [] for the absent field, which is the default and must stay that
+  // way: an empty object still serializes into the parity state digest, so
+  // initialising the map would move every golden for a feature no scenario
+  // uses. Sorted by professionId so the JSON form is a stable delta signature.
+  toolEffectSlotsFor(pid: number): readonly ToolEffectSlotView[] {
+    const meta = this.players.get(pid);
+    const slots = meta?.toolEffectSlots;
+    // The empty arms return the shared frozen instance: this runs per tick
+    // per session on the snapshot path, and a fresh [] here was two
+    // allocations per player per tick (the array plus its serialized "[]")
+    // for the overwhelming majority who never slot an effect.
+    if (!meta || !slots) return EMPTY_TOOL_EFFECT_SLOT_VIEWS;
+    const rows: ToolEffectSlotView[] = [];
+    for (const professionId of GATHERING_PROFESSION_IDS) {
+      const slot = slots[professionId];
+      if (!slot) continue;
+      rows.push({
+        professionId,
+        effectId: slot.effectId,
+        charges: slot.durability,
+        maxCharges: slot.maxDurability,
+        confirmMode: slot.confirmMode,
+        // The R48 privacy-preserving provenance projection: a boolean, never
+        // the name (a foreign crafter's identity stays server-side).
+        selfCrafted: slot.craftedBy !== undefined && slot.craftedBy === meta.name,
+      });
+    }
+    if (rows.length === 0) return EMPTY_TOOL_EFFECT_SLOT_VIEWS;
+    // GATHERING_PROFESSION_IDS is already a stable content order, but the sort
+    // is what the signature contract actually promises, so state it. A plain
+    // codepoint compare, never localeCompare: this runs per tick per session on
+    // the snapshot path, and an ICU collation inside the deterministic core
+    // would make the wire order depend on the host's locale data.
+    return rows.sort((a, b) =>
+      a.professionId < b.professionId ? -1 : a.professionId > b.professionId ? 1 : 0,
+    );
+  }
+
+  get toolEffectSlots(): readonly ToolEffectSlotView[] {
+    return this.toolEffectSlotsFor(this.primaryId);
+  }
+
+  // Slot an effect onto one gathering profession's tool, consuming one charm
+  // copy from bags. Thin delegate: the whole decision (six refusals, the
+  // owned-tool scan, WHICH charm copy is consumed and the craftedBy it
+  // stamps) lives in professions/tools.ts resolveSlotToolEffect, and the
+  // command body (consumption, the lazy slot write, the personal text-free
+  // toolEffectResult event every refusal now emits) lives in
+  // professions/tool_effect_actions.ts. Draw-free in every arm, so this can
+  // never move the rng stream a harvest walks.
+  //
+  // The OFFLINE console handle (window.__game) can call this directly, but
+  // the resolver holds it to the same price: without a crafted charm in bags
+  // nothing mints, offline included (a determined offline self-cheater can
+  // addItem the charm first, which is /dev-equivalent and stays accepted).
+  slotToolEffect(
+    professionId: string,
+    effectId: string,
+    confirmMode: ToolEffectConfirmMode = 'always',
+    pid?: number,
+  ): void {
+    slotToolEffectAction(this.ctx, professionId, effectId, confirmMode, pid);
+  }
+
+  // Recharge one gathering profession's slotted effect for its owner: the
+  // R39 arcane-material price at the R30 re-derived fill. Thin delegate into
+  // professions/tool_effect_actions.ts (the resolver half is
+  // professions/tools.ts resolveRechargeToolEffect); draw-free in every arm.
+  rechargeToolEffect(professionId: string, pid?: number): void {
+    rechargeToolEffectAction(this.ctx, professionId, pid);
   }
 
   delveShopOffers(delveId: string): DelveShopOffer[] {

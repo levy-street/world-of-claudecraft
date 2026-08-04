@@ -34,6 +34,20 @@ interface WorldState {
     amendsRequired: number;
   };
   gathering: { professionId: string; skill: number; maxSkill: number }[];
+  // The viewer's slotted tool effects (IWorld `toolEffectSlots`). Defaults to
+  // empty, which is what every player reads today, so the existing cases keep
+  // asserting the no-effect surface.
+  toolEffects?: {
+    professionId: string;
+    effectId: string;
+    charges: number;
+    maxCharges: number;
+    confirmMode: 'always' | 'prompt';
+  }[];
+  // The viewer's bags (IWorld `inventory`), the slot/recharge affordance
+  // input. Defaults to empty: no charms, no buttons, so the existing cases
+  // keep asserting the button-free surface.
+  inventory?: { itemId: string; count: number }[];
 }
 
 // An attuned, tiered identity so the window opens in full mode (ring, ten
@@ -83,6 +97,9 @@ function makeWindow(
         gatheringProficiency: Object.fromEntries(
           state.gathering.map((row) => [row.professionId, row.skill]),
         ),
+        toolEffectSlots: state.toolEffects ?? [],
+        inventory: state.inventory ?? [],
+        player: { name: 'Testchar' },
       }) as never,
     closeOthers: () => {},
     hideTooltip: () => {},
@@ -144,12 +161,12 @@ describe('ProfessionsWindow: focus and scroll survive rebuilds', () => {
     expect(document.activeElement).toBe(fresh);
   });
 
-  it('keeps Close the only focusable control, the whole refocus story', () => {
-    // The painter's documented premise: a read-only window whose single
-    // interactive control is the Close button, so the stable-identity refocus
-    // family collapses to the Close arm. If a future change adds an inner
-    // control, this pin fails and forces a real refocus-selector story (the
-    // deeds data-attribute family) plus a test for it.
+  it('keeps Close the only focusable control on the CHARM-LESS surface', () => {
+    // The pre-craft default: with no charms and no slot the window has no
+    // action buttons, so Close is the whole refocus story for that state.
+    // The acquisition craft's buttons are the inner controls the old version
+    // of this pin predicted; their own refocus behavior is the two arms
+    // below.
     const { el } = makeWindow(baseState());
     const focusables = [
       ...el.querySelectorAll<HTMLElement>(
@@ -158,6 +175,63 @@ describe('ProfessionsWindow: focus and scroll survive rebuilds', () => {
     ];
     expect(focusables).toHaveLength(1);
     expect(focusables[0].hasAttribute('data-close')).toBe(true);
+  });
+
+  it('carries focus across a rebuild to the SAME action button by its key', () => {
+    // The #2377 family's remedy: a repaint under a focused slot/recharge
+    // button restores that button, not Close, or the next Enter would shut
+    // the window instead of repeating the action. Deleting the keyed lookup
+    // in render() and falling straight to [data-close] must fail here.
+    const state = baseState();
+    state.inventory = [
+      { itemId: 'copper_mining_pick', count: 1 },
+      { itemId: 'gatherers_cache', count: 1 },
+      { itemId: 'artisans_eye', count: 1 },
+    ];
+    const { w, el } = makeWindow(state);
+    w.refreshIfChanged(); // settle the post-open catch-up repaint
+    const eye = el.querySelector<HTMLElement>('[data-slot-effect="artisans_eye"]');
+    if (!eye) throw new Error('slot button rendered');
+    eye.focus();
+    expect(document.activeElement).toBe(eye);
+    w.render();
+    const after = document.activeElement as HTMLElement | null;
+    expect(after?.getAttribute('data-slot-effect')).toBe('artisans_eye');
+    expect(after?.hasAttribute('data-close')).toBe(false);
+  });
+
+  it('falls back to CLOSE, never a different action button, when the focused one vanished', () => {
+    // The adversarial round's held-Enter finding: every action button in a
+    // gathering row SPENDS (a slot burns a charm, a recharge consumes
+    // materials), and input.ts leaves a focused button's Enter default
+    // alone, so re-parking focus on a DIFFERENT action button hands an
+    // Enter activation to an action the player never aimed at (a recharge
+    // success repaint used to feed the stream into a charm-burning re-slot;
+    // with default binds the chat composer usually absorbs the repeats, but
+    // the hazard is live for a rebound chat key). Close is the one control
+    // whose accidental activation costs nothing, so it is the ONLY fallback
+    // rung.
+    const state = baseState();
+    state.inventory = [
+      { itemId: 'copper_mining_pick', count: 1 },
+      { itemId: 'gatherers_cache', count: 1 },
+      { itemId: 'artisans_eye', count: 1 },
+    ];
+    const { w, el } = makeWindow(state);
+    w.refreshIfChanged();
+    const cache = el.querySelector<HTMLElement>('[data-slot-effect="gatherers_cache"]');
+    if (!cache) throw new Error('slot button rendered');
+    cache.focus();
+    // The charm leaves the bags between paints (its slot succeeded); the
+    // sibling action button survives the rebuild and must NOT inherit focus.
+    state.inventory = [
+      { itemId: 'copper_mining_pick', count: 1 },
+      { itemId: 'artisans_eye', count: 1 },
+    ];
+    w.render();
+    const after = document.activeElement as HTMLElement | null;
+    expect(after?.hasAttribute('data-close')).toBe(true);
+    expect(after?.getAttribute('data-slot-effect')).toBeNull();
   });
 
   it('preserves the scroll offset across a data-driven rebuild', () => {
@@ -212,11 +286,12 @@ describe('ProfessionsWindow: mode and row gating', () => {
   });
 
   it('renders no gathering row for an unknown profession id', () => {
-    // Fishing joined GATHERING_NAME_KEYS with Professions 2.0, so
-    // the unknown-id example is skinning (documented in gathering.ts as
-    // deliberately NOT a gathering profession): an id with no
-    // GATHERING_NAME_KEYS entry renders no row BY DESIGN, while the known
-    // ids beside it still render.
+    // Fishing joined the name table with Professions 2.0, so the unknown-id
+    // example is skinning (documented in gathering.ts as deliberately NOT a
+    // gathering profession): an id with no GATHERING_PROFESSION_NAME_KEYS
+    // entry (src/ui/gathering_profession_name.ts, the extracted shared
+    // table) renders no row BY DESIGN, while the known ids beside it still
+    // render.
     const state = baseState();
     state.gathering = [
       { professionId: 'mining', skill: 30, maxSkill: 300 },

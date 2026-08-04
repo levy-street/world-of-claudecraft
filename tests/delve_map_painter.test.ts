@@ -233,8 +233,10 @@ describe('vendor window WCAG-chrome (compositional, markup intact)', () => {
   });
 
   it('keeps the accessible vendor markup (focusable buttons + aria labels)', () => {
-    // Close control: a real button with an aria-label.
-    expect(vendor).toContain('data-close aria-label=');
+    // Close control: a real button with an aria-label ON THE SAME TAG. A
+    // regex rather than an adjacency literal: the focus-restore key landed
+    // between the two attributes, and the claim was never about adjacency.
+    expect(vendor).toMatch(/data-close[^>]*aria-label=/);
     // Item rows: real <button>s with per-row aria-labels (keyboard reachable,
     // native target size), unchanged by the composition.
     expect(vendor).toContain("row.type = 'button'");

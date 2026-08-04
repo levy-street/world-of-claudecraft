@@ -132,9 +132,13 @@ describe('hud.ts train window wiring (source pins)', () => {
     // begin() false swallows the activation, so a rapid double-click sends
     // train_recipe exactly once and train_already_known can never surface
     // from the trainer window; the immediate renderTrain paints the disabled
-    // pending row as the first click's feedback.
+    // pending row as the first click's feedback. The while-dead arm comes
+    // FIRST: the sim's dead gate (src/sim/dead_gate.ts) refuses the command
+    // with the shared error line and emits NO trainResult, so a flight
+    // opened for it would only sit disabled until its TTL; the click still
+    // sends, so the refusal line is the feedback.
     expect(hudSource).toMatch(
-      /private trainRecipeClicked\(recipeId: string\): void \{\s*\n\s*if \(!this\.trainLearns\.begin\(recipeId, performance\.now\(\)\)\) return;\s*\n\s*this\.sim\.trainRecipe\(recipeId\);\s*\n\s*this\.renderTrain\(\);/,
+      /private trainRecipeClicked\(recipeId: string\): void \{\s*\n(\s*\/\/[^\n]*\n)*\s*if \(this\.sim\.player\.dead\) \{\s*\n\s*this\.sim\.trainRecipe\(recipeId\);\s*\n\s*return;\s*\n\s*\}\s*\n\s*if \(!this\.trainLearns\.begin\(recipeId, performance\.now\(\)\)\) return;\s*\n\s*this\.sim\.trainRecipe\(recipeId\);\s*\n\s*this\.renderTrain\(\);/,
     );
     expect(hudSource).toMatch(
       /import \{ TrainLearnTracker \} from '\.\/hud\/vendor\/train_learn_core';/,

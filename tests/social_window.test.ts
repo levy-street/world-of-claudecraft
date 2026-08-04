@@ -1,5 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import type { GuildRow } from '../src/ui/social_view';
+import { guildMemberRowHtml } from '../src/ui/social_window';
 
 // Source-level guards for the social painter. The pure row + signature decisions are
 // unit-tested in social_view.test.ts; here we pin the no-magic-values
@@ -185,16 +187,132 @@ describe('social_window: Book of Deeds title spans (both roster surfaces)', () =
     expect(painter).toContain('${esc(f.name)}${titleSpan}');
   });
 
-  it('guild rows localize the id, gate on it, and place the title AFTER the rank chip', () => {
+  it('guild rows localize the id, gate on it, and place the title AFTER the role chip', () => {
     expect(painter).toContain(
       "const memberTitle = m.activeTitle ? deedTitleText(m.activeTitle) : '';",
     );
     expect(painter).toContain('<span class="soc-title">${esc(memberTitle)}</span>');
-    // name, then rank chip, then title: a long title trims off the tail and
-    // can never push the chip out of the ellipsized cell.
+    // name, then the ONE role chip, then title: a long title trims off the
+    // tail and can never push the chip out of the ellipsized cell.
     expect(painter).toContain(
-      '${esc(m.name)}<span class="rank">${esc(rankLabel(m.rank))}</span>${memberTitleSpan}',
+      '${esc(m.name)}<span class="rank">${esc(roleLabel(role))}</span>${memberTitleSpan}',
     );
+  });
+});
+
+describe('social_window: guild displayed-role chip (source pins)', () => {
+  // The role decision (rank passthrough + 7/30-day tenure thresholds) is
+  // pure and unit-tested in social_view.test.ts; the behavioral render cases
+  // live in the next describe. These pins hold the contracts a rendered
+  // string cannot prove: the role comes from the pure core with ONE hoisted
+  // clock read per rebuild (never a per-row date computation), every label is
+  // a t() key, and every splice passes esc().
+  it('derives the role from the pure core with one clock read per rebuild', () => {
+    expect(painter).toContain('const now = Date.now();');
+    expect(painter).toContain(
+      'const role = guildDisplayedRole(m.rank, tenureTier(m.joinedAt, now));',
+    );
+    // The row builder itself must stay clock-free (the caller threads `now`),
+    // so a per-row Date.now() cannot sneak back in behind the hoisted read.
+    const rowBuilder = painter.slice(
+      painter.indexOf('export function guildMemberRowHtml'),
+      painter.indexOf('export class SocialWindow'),
+    );
+    expect(rowBuilder.length).toBeGreaterThan(0);
+    expect(rowBuilder).not.toContain('Date.now()');
+  });
+
+  it('escapes the localized chip text into the ONE shared .rank chip (no tier class)', () => {
+    // User call: all five role labels share the rank-chip treatment; the
+    // label alone distinguishes the tiers. A soc-tenure-* class or a
+    // role-derived class sneaking back in must fail here.
+    expect(painter).toContain('<span class="rank">${esc(roleLabel(role))}</span>');
+    expect(painter).not.toContain('soc-tenure');
+  });
+
+  it('localizes every role label through t() keys (tiers + ranks via rankLabel)', () => {
+    expect(painter).toContain("t('hud.social.tenure.recruit')");
+    expect(painter).toContain("t('hud.social.tenure.veteran')");
+    expect(painter).toContain("t('hud.social.ranks.member')");
+    expect(painter).toContain('return rankLabel(role);');
+  });
+});
+
+describe('social_window: guild displayed-role chip (rendered rows)', () => {
+  const DAY = 24 * 60 * 60 * 1000;
+  // Deliberately YEARS away from the real clock: an implementation that
+  // ignored the `now` parameter and read Date.now() inside the row builder
+  // would flip the recruit (3d) and member (15d) cases below to veteran.
+  const NOW = Date.UTC(2021, 0, 1);
+  const row = (over: Partial<GuildRow> = {}): GuildRow => ({
+    name: 'Gorak',
+    cls: 'warrior',
+    level: 10,
+    online: false,
+    dot: 'off',
+    status: undefined,
+    zone: undefined,
+    lastLogin: null,
+    activeTitle: null,
+    rank: 'member',
+    self: false,
+    canWhisper: false,
+    canTransfer: false,
+    canPromote: false,
+    canDemote: false,
+    canKick: false,
+    joinedAt: null,
+    ...over,
+  });
+  // EVERY role/rank/tenure chip in the row, in order. Exact-array asserts on
+  // this are the regression teeth for the one-chip model: a tenure chip
+  // reappearing beside a member rank chip (two entries) or an officer gaining
+  // a tenure label (wrong entry) fails decisively.
+  const chips = (html: string): string[] =>
+    html.match(/<span class="rank[^"]*">[^<]*<\/span>/g) ?? [];
+
+  it('renders ONE chip, the Recruit tier as the role, for a 3-day member', () => {
+    const html = guildMemberRowHtml(row({ joinedAt: NOW - 3 * DAY }), NOW);
+    expect(chips(html)).toEqual(['<span class="rank">Recruit</span>']);
+    expect(html).not.toContain('>Member<');
+  });
+
+  it('renders ONE chip, the Veteran tier as the role, for a 200-day member', () => {
+    const html = guildMemberRowHtml(row({ joinedAt: NOW - 200 * DAY }), NOW);
+    expect(chips(html)).toEqual(['<span class="rank">Veteran</span>']);
+    expect(html).not.toContain('>Member<');
+  });
+
+  it('renders the plain Member rank chip for a 15-day member (no tenure class)', () => {
+    const html = guildMemberRowHtml(row({ joinedAt: NOW - 15 * DAY }), NOW);
+    expect(chips(html)).toEqual(['<span class="rank">Member</span>']);
+    expect(html).not.toContain('soc-tenure');
+  });
+
+  it('renders the plain Member rank chip when joinedAt is unknown', () => {
+    const html = guildMemberRowHtml(row(), NOW);
+    expect(chips(html)).toEqual(['<span class="rank">Member</span>']);
+    expect(html).not.toContain('soc-tenure');
+  });
+
+  it('an officer keeps the rank label and NEVER gains a tenure label, at any tenure', () => {
+    for (const joinedAt of [NOW - 3 * DAY, NOW - 200 * DAY, null]) {
+      const html = guildMemberRowHtml(row({ rank: 'officer', joinedAt }), NOW);
+      expect(chips(html)).toEqual(['<span class="rank">Officer</span>']);
+      expect(html).not.toContain('soc-tenure');
+    }
+  });
+
+  it('the leader keeps the rank label and NEVER gains a tenure label', () => {
+    const html = guildMemberRowHtml(row({ rank: 'leader', joinedAt: NOW - 3 * DAY }), NOW);
+    expect(chips(html)).toEqual(['<span class="rank">Guild Master</span>']);
+    expect(html).not.toContain('soc-tenure');
+  });
+
+  it('escapes the member name around the chip', () => {
+    const html = guildMemberRowHtml(row({ name: 'Bad<img src=x>', joinedAt: NOW - 3 * DAY }), NOW);
+    expect(html).not.toContain('<img');
+    expect(html).toContain('Bad&lt;img');
   });
 });
 
@@ -206,7 +324,9 @@ describe('social_window: guild billboard', () => {
     expect(painter).toContain('${esc(g.motd)}');
     const section = painter.slice(
       painter.indexOf('private billboardHtml'),
-      painter.indexOf('private guildMemberRowHtml'),
+      // billboardHtml is the last method before raidHtml now that the roster
+      // row builder is a module-level function (exported for behavior tests).
+      painter.indexOf('private raidHtml'),
     );
     expect(section.length).toBeGreaterThan(0);
     expect(section).not.toContain('<a ');
@@ -267,8 +387,9 @@ describe('social_window: guild billboard', () => {
 
     const section = painter.slice(
       painter.indexOf('private billboardHtml'),
-      painter.indexOf('private guildMemberRowHtml'),
+      painter.indexOf('private raidHtml'),
     );
+    expect(section.length).toBeGreaterThan(0);
     expect(section).toContain('<div class="soc-billboard-msg">$' + '{esc(g.motd)}</div>');
     expect(section).not.toContain('class="soc-billboard-msg" data-');
   });

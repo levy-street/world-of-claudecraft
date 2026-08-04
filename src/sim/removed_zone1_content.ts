@@ -1,3 +1,4 @@
+import { sanitizeCreditedObjects } from './quests/interact_object_credit';
 import type { CharacterState } from './sim';
 import { cloneInvSlot, type InvSlot } from './types';
 
@@ -59,13 +60,25 @@ export function sanitizeRemovedZone1Content(state: CharacterState): {
 } {
   const questLog = state.questLog
     .filter((quest) => !REMOVED_QUESTS.has(quest.questId))
-    .map((quest) => ({
-      questId: quest.questId,
-      counts: [...quest.counts],
-      state: quest.state,
-      ...(quest.selection === undefined ? {} : { selection: quest.selection }),
-      ...(quest.resolvedCounts === undefined ? {} : { resolvedCounts: [...quest.resolvedCounts] }),
-    }));
+    .map((quest) => {
+      // Carried through the migration: dropping it would hand a mid-quest player
+      // back the interact credits they already spent. Sanitized rather than
+      // spread raw, because this runs on the login path BEFORE the load-side
+      // normalization in Sim.addPlayer, so it is the first reader of the raw
+      // JSONB: a tampered `creditedObjects: null` must not throw here and lock
+      // the character out (this same function is also on the save path).
+      const creditedObjects = sanitizeCreditedObjects(quest.creditedObjects);
+      return {
+        questId: quest.questId,
+        counts: [...quest.counts],
+        state: quest.state,
+        ...(quest.selection === undefined ? {} : { selection: quest.selection }),
+        ...(quest.resolvedCounts === undefined
+          ? {}
+          : { resolvedCounts: [...quest.resolvedCounts] }),
+        ...(creditedObjects === undefined ? {} : { creditedObjects }),
+      };
+    });
   const questsDone = state.questsDone.filter((questId) => !REMOVED_QUESTS.has(questId));
   // cloneInvSlot, not a shallow spread: buyback and bag rows can carry instance
   // payloads whose mutable maps must not alias between input and migrated state.

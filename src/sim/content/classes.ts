@@ -2302,6 +2302,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // ---- Chronomancy out-of-combat mass resurrection. The base seven-second cast
   // and mana cost are provisional playtest values. It has no target and rewinds all
   // dead members on the authoritative group or raid roster at cast completion.
+  // The five-minute cooldown is the real throttle: requiresOutOfCombat alone is not
+  // one, because a backline caster who never draws aggro drops combat mid-fight the
+  // moment combatTimer passes the 5s linger (see the engagedPids pass in sim.ts), so
+  // a zero-cooldown mass rez could be chained repeatedly inside a single encounter.
   collective_reversal: {
     id: 'collective_reversal',
     name: 'Collective Reversal',
@@ -2310,7 +2314,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     specs: ['arcane'],
     cost: 250,
     castTime: 7,
-    cooldown: 0,
+    cooldown: 300,
     range: 0,
     school: 'arcane',
     requiresTarget: false,

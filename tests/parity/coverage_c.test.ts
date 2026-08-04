@@ -405,4 +405,138 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(signedUnits).toBeGreaterThanOrEqual(rareGather!.qty);
     expect(signed.length).toBeLessThanOrEqual(Math.ceil(signedUnits / 20));
   });
+
+  // This block exists because its absence is what let the scenario rot. Its
+  // stand point for step 1 was an inlined coordinate; the v0.32.0 merge moved
+  // ore_mirefen_t2 and the harvest became a "Too far away." denial, faithfully
+  // recorded in the golden as 0 draws at the fine-grade frame and 4 total where
+  // three granted harvests are 6. The gate stayed green the whole time, because
+  // nothing here asserted the fine-grade arm actually fires.
+  it('professions_gather_fine: all three harvests grant, and only the full-grade vein upgrades', () => {
+    const { trace, rec } = record(SCENARIOS.find((s) => s.name === 'professions_gather_fine')!);
+    const ev = rec.allEvents as Ev[];
+
+    // Three granted harvests, in drive order, each carrying the grade its vein
+    // and tool resolve to: fine at the full-grade vein (tier-3 pick strictly
+    // above iron's rung 2), plain at the zone's tier-1 vein (the vein is below
+    // the rung, so no tool upgrades it), plain at the herb patch (the tier-2
+    // sickle only MATCHES goldleaf's rung, and the pick is the wrong
+    // profession).
+    const gathers = ev.filter((e) => e.type === 'gatherResult');
+    expect(gathers).toHaveLength(3);
+    expect(gathers.map((e) => [e.nodeId, e.itemId])).toEqual([
+      ['ore_mirefen_t2', 'fine_iron_ore'],
+      ['ore_mirefen_1', 'iron_ore'],
+      ['herb_mirefen_t2', 'goldleaf_herb'],
+    ]);
+
+    // No harvest was refused for standing in the wrong place: the exact
+    // regression this block guards, and the reason step 1's stand point is
+    // derived from the node instead of inlined.
+    expect(ev.some((e) => e.type === 'error' && e.text === 'Too far away.')).toBe(false);
+
+    // Two draws per granted harvest and no more: six total, with the
+    // fine-grade arm spending its own two (it spent ZERO while stale).
+    const fine = trace.frames.find((f) => f.label === 'fine-grade-at-full-tier-vein');
+    expect(fine, 'missing the fine-grade checkpoint frame').toBeTruthy();
+    expect(fine!.rng.draws).toBe(2);
+    expect(trace.draws).toBe(6);
+  });
+
+  it('professions_tool_effect_slot: draw-free mint, the quantity bonus fires, and one charge settles', () => {
+    const { trace, rec } = record(
+      SCENARIOS.find((s) => s.name === 'professions_tool_effect_slot')!,
+    );
+    const ev = rec.allEvents as Ev[];
+    const pid = (rec.sim as any).playerId as number;
+    const meta = (rec.sim as any).players.get(pid);
+
+    // Two mints landed on the slot action (the 'always' mint plus the R40
+    // prompt re-slot), both for this player's mining profession, and both
+    // consumed charm copies are gone from the bags.
+    const slotted = ev.filter((e) => e.type === 'toolEffectResult' && e.action === 'slot');
+    expect(slotted).toHaveLength(2);
+    for (const s of slotted) {
+      expect(s.ok).toBe(true);
+      expect(s.professionId).toBe('mining');
+      expect(s.effectId).toBe('gatherers_cache');
+      expect(s.pid).toBe(pid);
+    }
+    expect(meta.inventory.some((s: any) => s.itemId === 'gatherers_cache')).toBe(false);
+    // Draw-free in every arm: the whole mint stands at zero draws.
+    const minted = trace.frames.find((f) => f.label === 'effect-slotted');
+    expect(minted, 'missing the mint checkpoint frame').toBeTruthy();
+    expect(minted!.rng.draws).toBe(0);
+
+    // Three granted harvests, in drive order: the 'always' bonus harvest,
+    // the R40 UNCONFIRMED prompt use (base quantity, the fail-safe), and
+    // the CONFIRMED prompt use (+1 fires). gatherResult carries no effect
+    // flag, so each +1 is read off the granted qty against the shipped
+    // yield table for the SAME rolled rarity (the same-draw base the R42
+    // settle compares against).
+    const gathers = ev.filter((e) => e.type === 'gatherResult');
+    expect(gathers.map((g) => g.nodeId)).toEqual([
+      'ore_mirefen_t2',
+      'ore_mirefen_1',
+      'ore_mirefen_t2b',
+    ]);
+    const qtyByRarity: Record<string, number> = {
+      common: 1,
+      uncommon: 2,
+      rare: 2,
+      epic: 3,
+      legendary: 4,
+    };
+    const baseOf = (g: Ev): number => qtyByRarity[g.rarity] * (g.rareEvent ? 5 : 1);
+    expect(gathers[0].professionId).toBe('mining');
+    expect(gathers[0].qty).toBe(baseOf(gathers[0]) + 1);
+    expect(gathers[1].qty).toBe(baseOf(gathers[1]));
+    expect(gathers[2].qty).toBe(baseOf(gathers[2]) + 1);
+    // A 30-charge slot never empties here, so the last-charge flag stays
+    // ABSENT from every event (the additive-optional wire contract).
+    expect(gathers.every((g) => !('effectDepleted' in g))).toBe(true);
+
+    // The draw ledger, cumulative per checkpoint (rng.draws counts from
+    // drive start): every granted harvest is exactly two draws and nothing
+    // else draws, so the R40 consent gate adds NO draw on either of its
+    // arms and both mints stay draw-free (the prompt re-slot checkpoint
+    // sits at the same count as the harvest before it).
+    const drawsAt = (label: string): number => {
+      const frame = trace.frames.find((f) => f.label === label);
+      expect(frame, `missing the ${label} checkpoint frame`).toBeTruthy();
+      return frame?.rng.draws ?? -1;
+    };
+    expect(drawsAt('harvest-with-effect-applied')).toBe(2);
+    expect(drawsAt('prompt-mode-reslotted')).toBe(2);
+    expect(drawsAt('prompt-unconfirmed-skips-whole')).toBe(4);
+    expect(drawsAt('prompt-confirmed-fires-and-spends')).toBe(6);
+    expect(
+      ev.some(
+        (e) => e.type === 'error' && e.text === 'This resource node has not respawned for you yet.',
+      ),
+    ).toBe(true);
+    expect(trace.draws).toBe(6);
+
+    // The R42 charge settle, pinned where the golden records it: the final
+    // checkpoint's sampled slot row. One bonus-bearing harvest spent exactly
+    // one charge, so durability sits strictly below the slot's own ceiling.
+    // The ceiling is an absolute pin, not a self-comparison: 20 base charges
+    // for the cache plus one rarity rung for the uncommon tier-3 pick, and the
+    // R47 use-time ratchet leaves it there because that pick was already the
+    // best tool owned at mint time.
+    const finalFrame = trace.frames.find((f) => f.label === 'final');
+    expect(finalFrame, 'missing the final checkpoint frame').toBeTruthy();
+    const slot = (finalFrame!.players?.[0] as any)?.toolEffectSlots?.mining;
+    expect(slot, 'the final checkpoint sampled no mining tool-effect slot').toBeTruthy();
+    expect(slot.effectId).toBe('gatherers_cache');
+    // The R40 re-slot carried the prompt mode onto the live row, and only
+    // the CONFIRMED use spent from the fresh 30: the unconfirmed one kept
+    // its charge (the fail-safe), so exactly one charge is gone.
+    expect(slot.confirmMode).toBe('prompt');
+    // The self-signed charm's signer became the slot's original-crafter identity.
+    expect(slot.craftedBy).toBe(meta.name);
+    expect(slot.maxDurability).toBe(30);
+    expect(slot.durability).toBeLessThan(slot.maxDurability);
+    expect(slot.durability).toBe(29);
+  });
 });

@@ -46,6 +46,7 @@ function input(over: Partial<DungeonFinderViewInput> = {}): DungeonFinderViewInp
     playerId: 1,
     specRole: null,
     party: null,
+    partyLeaderName: null,
     lockouts: [],
     tab: 'catalogue',
     selectedActivityId: null,
@@ -302,6 +303,70 @@ describe('dungeon finder view core', () => {
     expect(applied.board.listings[0].canApply).toBe(false);
   });
 
+  it('hides premade groups the player is already part of (issue 2031)', () => {
+    const ownListing = {
+      id: 7,
+      activityId: 'hollow_crypt_normal',
+      leaderName: 'Lead',
+      tags: [],
+      size: 1,
+      capacity: 5,
+      needed: { tank: 0, healer: 1, dps: 3 },
+      members: [{ cls: 'warrior' as const, level: 8, role: 'tank' as const }],
+    };
+    const otherListing = {
+      id: 8,
+      activityId: 'hollow_crypt_normal',
+      leaderName: 'Someone Else',
+      tags: [],
+      size: 1,
+      capacity: 5,
+      needed: { tank: 0, healer: 1, dps: 3 },
+      members: [{ cls: 'priest' as const, level: 8, role: 'healer' as const }],
+    };
+
+    // I lead a listing: it never shows up in my own browse results.
+    const leaderView = live(
+      buildDungeonFinderView(
+        input({
+          tab: 'board',
+          board: [ownListing, otherListing],
+          info: makeInfo('sim', {
+            myListing: { id: 7, activityId: 'hollow_crypt_normal', tags: [], applicants: [] },
+          }),
+        }),
+      ),
+    );
+    expect(leaderView.board.listings.map((l) => l.id)).toEqual([8]);
+    // The browse-list filter is separate from the leader's own-listing panel: hiding id
+    // 7 from `listings` must not also drop it from `myListing`.
+    expect(leaderView.board.myListing).toEqual({
+      id: 7,
+      activityId: 'hollow_crypt_normal',
+      tags: [],
+      applicants: [],
+    });
+
+    // I am a party MEMBER (not the leader) of the listed group: still hidden.
+    const memberView = live(
+      buildDungeonFinderView(
+        input({
+          tab: 'board',
+          board: [ownListing, otherListing],
+          party: { leader: 99, size: 2 },
+          partyLeaderName: 'Lead',
+        }),
+      ),
+    );
+    expect(memberView.board.listings.map((l) => l.id)).toEqual([8]);
+
+    // Solo, no party, no listing of my own: everything stays visible.
+    const soloView = live(
+      buildDungeonFinderView(input({ tab: 'board', board: [ownListing, otherListing] })),
+    );
+    expect(soloView.board.listings.map((l) => l.id)).toEqual([7, 8]);
+  });
+
   it('hides premade listings for a dungeon the viewer is locked out of (#2030)', () => {
     const heroicListing = {
       id: 8,
@@ -359,7 +424,18 @@ describe('dungeon finder view core', () => {
     expect(view.board.listings[0].canApply).toBe(false);
   });
 
-  it('keeps a leader listing visible in Open listings when its OWN dungeon goes locked (#2030 followup)', () => {
+  it('hides the leader OWN listing from Open listings, lockout or not; the myListing panel keeps it (issue 2031, superseding the #2030 followup)', () => {
+    // History: the #2030 followup pinned the leader's own row VISIBLE in Open
+    // listings under a lockout, so the leader would not lose their row. Issue
+    // 2031 then hid every already-in-group listing from the browse list (the
+    // row's home is the myListing panel), which deliberately supersedes that
+    // expectation; the release landed the filter without updating this test,
+    // reddening its own tip. The lockout stays in the input so the #2030
+    // path is still exercised: it must neither resurrect the row nor lose
+    // the myListing panel. The release later landed its own reconciliation
+    // of the same red (33729a9716); this merge unions the two, keeping the
+    // positive-control and unlocked arms and adopting the release's full
+    // myListing object assertion.
     const heroicListing = {
       id: 8,
       activityId: 'hollow_crypt_heroic',
@@ -370,21 +446,61 @@ describe('dungeon finder view core', () => {
       needed: { tank: 0, healer: 1, dps: 3 },
       members: [{ cls: 'warrior' as const, level: 20, role: 'tank' as const }],
     };
-    const view = live(
+    const myListing = { id: 8, activityId: 'hollow_crypt_heroic', tags: [], applicants: [] };
+    // The positive control: an unrelated leader's unlocked listing must
+    // SURVIVE both arms, so an empty result can only mean the own row was
+    // hidden, never that the loop produced nothing (a content-id rename
+    // would otherwise green this test forever).
+    const otherListing = {
+      id: 9,
+      activityId: 'hollow_crypt_normal',
+      leaderName: 'Other',
+      tags: [],
+      size: 1,
+      capacity: 5,
+      needed: { tank: 0, healer: 1, dps: 3 },
+      members: [{ cls: 'warrior' as const, level: 20, role: 'tank' as const }],
+    };
+    const locked = live(
       buildDungeonFinderView(
         input({
           tab: 'board',
           playerLevel: 20,
-          board: [heroicListing],
-          info: makeInfo('sim', {
-            myListing: { id: 8, activityId: 'hollow_crypt_heroic', tags: [], applicants: [] },
-          }),
+          board: [heroicListing, otherListing],
+          info: makeInfo('sim', { myListing }),
           lockouts: [{ id: 'hollow_crypt:heroic', msRemaining: 3_600_000 }],
         }),
       ),
     );
-    expect(view.board.listings.map((l) => l.id)).toEqual([8]);
-    expect(view.board.listings[0].mine).toBe(true);
+    expect(locked.board.listings.map((l) => l.id)).toEqual([9]);
+    // The lockout must not filter the leader's own management panel (the
+    // release's full-object assertion, adopted at the merge).
+    expect(locked.board.myListing).toEqual({
+      id: 8,
+      activityId: 'hollow_crypt_heroic',
+      tags: [],
+      applicants: [],
+    });
+    // Same shape without the lockout: the hide comes from the
+    // already-in-group rule, not the lockout path.
+    const unlocked = live(
+      buildDungeonFinderView(
+        input({
+          tab: 'board',
+          playerLevel: 20,
+          board: [heroicListing, otherListing],
+          info: makeInfo('sim', { myListing }),
+          lockouts: [],
+        }),
+      ),
+    );
+    expect(unlocked.board.listings.map((l) => l.id)).toEqual([9]);
+    expect(unlocked.board.myListing).toEqual({
+      id: 8,
+      activityId: 'hollow_crypt_heroic',
+      tags: [],
+      applicants: [],
+    });
   });
 
   it('does not hide a listing over a lockout on a DIFFERENT dungeon or a lockout-free difficulty (#2030 followup)', () => {

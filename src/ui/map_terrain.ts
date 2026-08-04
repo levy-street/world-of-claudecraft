@@ -21,6 +21,10 @@ import {
   STRIP_MAX_X,
   STRIP_MIN_X,
   STRIP_ZONES,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_X,
+  WORLD_MIN_Z,
   ZONES,
 } from '../sim/data';
 import { fbm2, hash2 } from '../sim/rng';
@@ -33,6 +37,7 @@ import {
   WATER_LEVEL,
   zoneBiomeAt,
 } from '../sim/world';
+import { openSeaNearness } from './map_open_sea_edge_core';
 
 export interface MapRegion {
   minX: number;
@@ -41,20 +46,50 @@ export interface MapRegion {
   maxZ: number;
 }
 
+/** Plate detail, in pixels per world yard. The value the 480px plates carried
+ *  over a zone's 360yd width before they were squared, kept so squaring the
+ *  plate widened the world it covers WITHOUT thinning the detail inside it. */
+export const MAP_PLATE_PX_PER_YD = 480 / 360;
+
+/** The pixel width a region's plate bakes at: the ONE definition the bake, the
+ *  manifest and the freshness guard share, now that a plate's width follows its
+ *  region rather than a single constant for every zone. */
+export function mapPlateWidth(region: MapRegion): number {
+  return Math.round((region.maxX - region.minX) * MAP_PLATE_PX_PER_YD);
+}
+
 // Pixel height of a W-wide terrain canvas covering `region` (square-pixel).
 export function mapCanvasHeight(W: number, region: MapRegion): number {
   return Math.round((W * (region.maxZ - region.minZ)) / (region.maxX - region.minX));
 }
 
-/** The full-zone band a world-map plate covers. ONE definition shared by the
- *  HUD painter, the build-time plate bake (scripts/build_map_backgrounds.mjs),
- *  and the freshness guard, so they can never drift apart. */
+/** The band a world-map plate covers. ONE definition shared by the HUD painter,
+ *  the build-time plate bake (scripts/build_map_backgrounds.mjs), and the
+ *  freshness guard, so they can never drift apart.
+ *
+ *  It covers the SQUARE the map window frames, not the zone's own rectangle. The
+ *  window frames a square of the zone's longer side (map_window_view), so for
+ *  every zone taller than it is wide the plate used to stop short of the view and
+ *  the painter filled the rest with flat ocean: a hard-edged lighter box pasted
+ *  on a flat sea, showing open water where the neighbouring zone's land actually
+ *  continues. Squaring the plate paints that margin with the real world instead. */
 export function mapZoneRegion(zone: ZoneDef): MapRegion {
+  const minX = zone.xMin ?? STRIP_MIN_X;
+  const maxX = zone.xMax ?? STRIP_MAX_X;
+  const side = Math.max(maxX - minX, zone.zMax - zone.zMin);
+  const cx = (minX + maxX) / 2;
+  const cz = (zone.zMin + zone.zMax) / 2;
+  // CLAMPED to the world. terrainHeight answers for any coordinate, including
+  // past the world's edge, so an unclamped square paints unreachable generator
+  // terrain as though it were a coastline the player could sail to (the
+  // Wraithwood's square reaches 100 yd past WORLD_MAX_X). Beyond the edge the
+  // painter's flat ocean fill is the honest answer, and it is seamless now that
+  // the fill matches the sea ramp's deep end.
   return {
-    minX: zone.xMin ?? STRIP_MIN_X,
-    maxX: zone.xMax ?? STRIP_MAX_X,
-    minZ: zone.zMin,
-    maxZ: zone.zMax,
+    minX: Math.max(WORLD_MIN_X, cx - side / 2),
+    maxX: Math.min(WORLD_MAX_X, cx + side / 2),
+    minZ: Math.max(WORLD_MIN_Z, cz - side / 2),
+    maxZ: Math.min(WORLD_MAX_Z, cz + side / 2),
   };
 }
 
@@ -74,6 +109,29 @@ export function hashPaintedRows(region: MapRegion, seed: number, W: number, rows
   }
   return (h >>> 0).toString(16).padStart(8, '0');
 }
+
+// The sea's single shallow-to-deep ramp. One body of water instead of the two
+// palettes that used to meet at the swim-fatigue predicate's straight rect
+// edge. The deep end matches --color-map-ocean, the flat fill the painter puts
+// beyond a plate, so a plate edge leaves no seam.
+const SEA_SHALLOW_R = 100;
+const SEA_SHALLOW_G = 164;
+const SEA_SHALLOW_B = 200;
+const SEA_DEEP_R = 26;
+const SEA_DEEP_G = 58;
+const SEA_DEEP_B = 100;
+// Where the lethal open sea starts on that ramp: deep enough to read as open
+// ocean at a glance, close enough that the two sides are one sea. Safe water
+// approaching the limit climbs to meet it.
+//
+// The limit is NOT drawn on the map, and deliberately so. The sim already
+// states it where it matters (src/sim/fatigue.ts): crossing raises an on-screen
+// error toast repeated every 4s, a log line, and 8 seconds of grace before the
+// first damage pulse, which is real time to turn around. A rule drawn across
+// open water would restate that less well (the swimmer is looking at the world,
+// not the map) at the cost of a straight line through the sea, so the map keeps
+// only what a map is good at: water that deepens as the world does.
+const OPEN_SEA_RAMP_FLOOR = 0.62;
 
 // How thick the tree cover stipples per biome (chance per ~1.3yd hash cell).
 const FOREST_STIPPLE: Partial<Record<ReturnType<typeof zoneBiomeAt>, number>> = {
@@ -268,23 +326,29 @@ export function paintTerrainRows(
         b = 48;
 
       if (h < WATER_LEVEL) {
-        // -- water: split by the SIM's death-zone predicate (inHollowOpenSea,
-        // the exact test swim-fatigue uses). The lethal open sea reads as a
-        // dark deep-ocean body (matching the out-of-bounds fill, so plate
-        // edges leave no seam); the safe water near shore, in lakes, and in the
-        // moats/channels reads a light blue easing only to a mid blue. Each is
-        // depth-graded with a smoothstep ease so neither is a flat slab.
+        // -- water: ONE ocean ramp from shallow to deep, walked by two things:
+        // the terrain's own depth, and how near the point is to the sim's
+        // swim-fatigue limit (inHollowOpenSea), past which the ramp simply
+        // starts deep. The two used to be separate palettes a stark distance
+        // apart, meeting at that predicate's straight rect edge, which is what
+        // made the map read as a lighter box pasted on a flat navy sea. The map
+        // no longer marks that boundary at all (see OPEN_SEA_RAMP_FLOOR: the sim
+        // states it far better, in the world, at the moment of crossing), so the
+        // sea is one continuous body: nearer the open sea means deeper water,
+        // which is what a chart says there anyway.
         const t = Math.min(1, (WATER_LEVEL - h) / 8);
         const depth = t * t * (3 - 2 * t);
+        let ramp: number;
         if (inHollowOpenSea(x, z)) {
-          r = 22 + (14 - 22) * depth;
-          g = 48 + (36 - 48) * depth;
-          b = 88 + (76 - 88) * depth;
+          ramp = OPEN_SEA_RAMP_FLOOR + (1 - OPEN_SEA_RAMP_FLOOR) * depth;
         } else {
-          r = 100 + (46 - 100) * depth;
-          g = 164 + (98 - 164) * depth;
-          b = 200 + (150 - 200) * depth;
+          const near = openSeaNearness(x, z, inHollowOpenSea);
+          const approach = near > 0 ? near * near * (3 - 2 * near) : 0;
+          ramp = Math.max(depth * (1 - OPEN_SEA_RAMP_FLOOR), approach * OPEN_SEA_RAMP_FLOOR);
         }
+        r = SEA_SHALLOW_R + (SEA_DEEP_R - SEA_SHALLOW_R) * ramp;
+        g = SEA_SHALLOW_G + (SEA_DEEP_G - SEA_SHALLOW_G) * ramp;
+        b = SEA_SHALLOW_B + (SEA_DEEP_B - SEA_SHALLOW_B) * ramp;
         const chop = (hash2(Math.round(x * 0.6), Math.round(z * 0.6), seed + 811) - 0.5) * 3.5;
         r += chop;
         g += chop;

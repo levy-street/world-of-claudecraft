@@ -18,7 +18,14 @@ import {
 } from '../sim/professions/combo_eligibility';
 import { isCommissionEligible } from '../sim/professions/commission';
 import { holdsSelfSignedInstance, requiredReagentCountFor } from '../sim/professions/crafting';
-import { type StationType, stationsOfType, stationTypeForCraft } from '../sim/professions/stations';
+import {
+  countAcrossGrades,
+  materialGradeIds,
+  planGradeRemoval,
+} from '../sim/professions/material_grades';
+import { type StationType, stationsOfType } from '../sim/professions/stations';
+import { trainingStationTypeFor } from '../sim/professions/training';
+import type { ProfessionRecipeRecord } from '../sim/professions/types';
 import { MINIMAL_TIER_MULTIPLIER, REDUCED_TIER_MULTIPLIER } from '../sim/professions/wheel';
 import type { InvSlot, ItemDef, StationDef } from '../sim/types';
 import { isRecipeKnownForViewer } from './hud/vendor/train_view';
@@ -60,6 +67,12 @@ export interface CraftingReagentRow {
   have: number;
   /** True when the player holds at least `required` of this reagent. */
   satisfied: boolean;
+  /** Units of the FINE grade this craft would consume because base stock
+   *  runs short (the UX pass): resolved through the sim's own
+   *  planGradeRemoval (base drains first, D8), so the warning and the spend
+   *  can never disagree. 0 when the base covers the bill, and 0 while the
+   *  row is unsatisfied (an uncraftable recipe warns about nothing). */
+  fineSubstituted: number;
 }
 
 export interface CraftingRecipeRow {
@@ -168,8 +181,19 @@ export function buildCraftingView(
     let facts = reagentFacts.get(itemId);
     if (!facts) {
       facts = {
-        have: countInInventory(inventory, itemId),
-        selfSigned: playerName !== null && holdsSelfSignedInstance(inventory, playerName, itemId),
+        // Counted across the reagent's material grades, exactly as the sim's
+        // hasRecipeMaterials does (D8, professions/material_grades.ts). A fine
+        // grade satisfies a requirement for its base, so counting the declared
+        // id alone would grey the Craft button out for a craft the sim would
+        // perform: eastbrook_vale is all tier-1 veins, so any tier-2 tool stops
+        // the plain grade dropping and every recipe naming it would go
+        // unbuildable through the window while resolveCraft accepted it.
+        have: countAcrossGrades(itemId, (gradeId) => countInInventory(inventory, gradeId)),
+        selfSigned:
+          playerName !== null &&
+          materialGradeIds(itemId).some((gradeId) =>
+            holdsSelfSignedInstance(inventory, playerName, gradeId),
+          ),
       };
       reagentFacts.set(itemId, facts);
     }
@@ -181,7 +205,8 @@ export function buildCraftingView(
       // The requirement the sim actually charges: the SAME shared
       // requiredReagentCountFor the resolver's availability check and
       // consumption use (crafting.ts, #1134 specialization discount composed
-      // with the #1145 self-signed reduction), so the displayed count and the
+      // with the #1145 self-signed reduction), fed the same grade-spanning
+      // self-signed fact the sim feeds it, so the displayed count and the
       // Craft gate can never diverge from what a craft consumes.
       const required = requiredReagentCountFor(
         selfSigned,
@@ -189,12 +214,25 @@ export function buildCraftingView(
         skills,
         recipe.professionId,
       ).count;
+      // The substitution signal (the UX pass): what the craft would take
+      // from the FINE grade because base stock ran short, read off the SAME
+      // plan the sim spends (planGradeRemoval drains the base first), so a
+      // silent 2x-value substitution becomes a stated one.
+      const satisfied = have >= required;
+      const fineSubstituted = satisfied
+        ? planGradeRemoval(reagent.itemId, required, (gradeId) =>
+            countInInventory(inventory, gradeId),
+          )
+            .filter((take) => take.itemId !== reagent.itemId)
+            .reduce((sum, take) => sum + take.count, 0)
+        : 0;
       return {
         itemId: reagent.itemId,
         item: items[reagent.itemId],
         required,
         have,
-        satisfied: have >= required,
+        satisfied,
+        fineSubstituted,
       };
     });
     const combo = recipe.comboRequirement;
@@ -263,8 +301,14 @@ export function buildCraftingView(
 // hosts serve ALL_RECIPES verbatim as IWorld#recipeList (src/sim/sim.ts,
 // src/net/online.ts), and reagent ids are authored literals, so this set can
 // never miss a reagent the window might row.
+// Grades included: three of the nine fine grades (the eastbrook ones) are
+// reagents in NO recipe, so a declared-id-only set would let a player gather
+// them all afternoon without the open window ever re-converging, which is the
+// #2375 failure mode this signature exists to close.
 const REAGENT_ITEM_IDS: ReadonlySet<string> = new Set(
-  ALL_RECIPES.flatMap((recipe) => recipe.reagents.map((reagent) => reagent.itemId)),
+  ALL_RECIPES.flatMap((recipe) =>
+    recipe.reagents.flatMap((reagent) => materialGradeIds(reagent.itemId)),
+  ),
 );
 
 /**
@@ -349,6 +393,23 @@ export function resolveSelectedCraft(
   return tabs.length > 0 ? tabs[0].professionId : null;
 }
 
+/** True when `craftId` would own a tab for this viewer: at least one recipe
+ *  of that craft is known (craftingTabs' membership rule, restated through
+ *  the SHARED isRecipeKnownForViewer predicate without building the view).
+ *  The gossip Crafting shortcut checks this before persisting its pre-select
+ *  so it never clobbers the saved tab preference (issue #2347) with a craft
+ *  the window cannot show; resolveSelectedCraft still guards the render. */
+export function craftOwnsTab(
+  recipes: readonly ProfessionRecipeRecord[],
+  knownRecipes: readonly string[],
+  craftId: string,
+): boolean {
+  const known = new Set(knownRecipes);
+  return recipes.some(
+    (recipe) => recipe.professionId === craftId && isRecipeKnownForViewer(recipe, known),
+  );
+}
+
 /** One craft's "learnable at a master" pointer: the station type that serves it
  *  and the resident master's NPC template id (the painter localizes the master
  *  name through entity i18n and the station name through the station-name
@@ -360,16 +421,17 @@ export interface CraftLearnHint {
 
 /**
  * Crafts that have at least one trainer-taught recipe the viewer has NOT
- * learned, mapped to the station type serving that craft (stationTypeForCraft)
- * and the resident master (the station registry). Drives the crafting window's
+ * learned, mapped to that recipe's teaching home (trainingStationTypeFor:
+ * the recipe's own stationType, else the station serving its craft) and the
+ * resident master (the station registry). Drives the crafting window's
  * per-section "learnable at a master" discoverability hint: a section renders
  * the hint iff its craft is in this map.
  *
  * Uses the SHARED isRecipeKnownForViewer predicate (train_view.ts), never a
  * second knownness rule, so the hint can never disagree with the train ladder
- * or the crafting window's known-recipe filter. A craft with no physical
- * station (or no seated master) is never hinted: trainer recipes only exist for
- * stationed crafts, and there would be no master to point at. Read-only over
+ * or the crafting window's known-recipe filter. A recipe with no resolvable
+ * teaching home (no stationType and an unstationed craft) is never hinted:
+ * there would be no master to point at. Read-only over
  * static content plus the viewer's mirrored known set (both hosts carry
  * knownRecipes on cprof, so no new IWorld member is needed).
  */
@@ -383,7 +445,11 @@ export function craftLearnHints(
     if (hints.has(recipe.professionId)) continue;
     if (!recipe.acquisition?.includes('trainer')) continue;
     if (isRecipeKnownForViewer(recipe, known)) continue;
-    const stationType = stationTypeForCraft(recipe.professionId);
+    // The recipe's own teaching home (its stationType, else its craft's
+    // station), shared with resolveTrain and the trainer list: an
+    // enchanting-home charm recipe hints at the toolworks master who
+    // actually teaches it, not at a station its craft does not have.
+    const stationType = trainingStationTypeFor(recipe);
     if (!stationType) continue;
     const station = stationsOfType(stations, stationType)[0];
     if (!station) continue;

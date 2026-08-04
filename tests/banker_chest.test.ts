@@ -10,8 +10,9 @@ import { GFX } from '../src/render/gfx';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import type { NpcDef } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
-const TEST_WORLD_SEED = 20061;
+const TEST_WORLD_SEED = WORLD_SEED;
 const banker = (templateId: string) => ({ kind: 'npc' as const, templateId });
 
 function placedBuiltInBanker(templateId: string) {

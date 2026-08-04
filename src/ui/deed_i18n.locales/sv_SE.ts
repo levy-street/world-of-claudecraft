@@ -753,6 +753,10 @@ export const table: DeedLocaleTable = {
     name: 'Heroisk: Vildhjärtats bassäng',
     desc: 'Besegra Zulgar, Bassängens röst, i Vildhjärtats bassäng på heroisk svårighetsgrad.',
   },
+  chr_peaks_gatherer: {
+    name: 'Höjdernas skörd',
+    desc: 'Skörda en malmåder, en virkesdunge och en örttäppa i Törntoppshöjderna.',
+  },
   chr_marsh_rares_ii: {
     name: 'Frossaren, uppräknad',
     desc: 'Dräp Grävkäft Frossaren, en fjärde namnkunnig fasa i Dykärrsträsket som lämnades utanför den första räkningen.',
@@ -768,5 +772,29 @@ export const table: DeedLocaleTable = {
   chr_hollow_rares: {
     name: 'Hjorden minns',
     desc: 'Dräp Gamla Märgskal och Aurelhorn, Först i hjorden, Slöjhålans två vandrande sällsynta bossar.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Kärrmarkens gåvor',
+    desc: 'Skörda en malmåder, en virkesdunge och en örttäppa i Pilkärret.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Ringar på Liljemyrarna',
+    desc: 'Fånga en fisk ur Pilkärrets vatten.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Skörd på näset',
+    desc: 'Skörda en malmåder, en virkesdunge och en örttäppa i Stormkammen.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'En lina i Spegeltjärnen',
+    desc: 'Fånga en fisk ur Stormkammens vatten.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Öns proviant',
+    desc: 'Skörda en malmåder, en virkesdunge och en örttäppa på Fjärrkusten.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Det måsarna vet',
+    desc: 'Fånga en fisk ur Fjärrkustens vatten.',
   },
 };

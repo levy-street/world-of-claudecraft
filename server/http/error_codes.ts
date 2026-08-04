@@ -210,6 +210,15 @@ export const ERROR_CODES = deepFreeze({
   // wallet: the desktop browser handoff was malformed, expired, or mismatched.
   'wallet.handoff_invalid': { params: [] },
   'ota_updates.invalid_input': { params: [] },
+  // seeker: native distribution, attestation, wallet, token, and entitlement failures.
+  'seeker.native_only': { params: [] },
+  'seeker.attestation_failed': { params: [] },
+  'seeker.solana_artifact_required': { params: [] },
+  'seeker.wallet_required': { params: [] },
+  'seeker.genesis_token_required': { params: [] },
+  'seeker.genesis_token_claimed': { params: [] },
+  'seeker.entitlement_required': { params: [] },
+  'seeker.current_ownership_required': { params: [] },
 } as const);
 
 /** A stable error code: one of the keys of ERROR_CODES. */
