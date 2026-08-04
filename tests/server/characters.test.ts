@@ -42,6 +42,7 @@ import {
   resetCharacterMutationRateLimits,
   resetRateLimitClock,
 } from '../../server/ratelimit';
+import { DEEDS_RECENT_CAP } from '../../src/sim/deeds';
 import type { CharacterState } from '../../src/sim/sim';
 import { type FakeRes, fakeCtx } from './helpers';
 
@@ -431,6 +432,51 @@ describe('standing handler', () => {
     });
     expect(res.status).toBe(404);
     expect(res.body).toEqual({ error: 'character not found', code: 'character.not_found' });
+  });
+});
+
+describe('deeds-recent handler', () => {
+  it('200s the newest-first ids, row order preserved and timestamps stripped', async () => {
+    const seen: Array<{ characterId: number; limit: number }> = [];
+    setCharactersDbForTests({
+      recentDeedsForCharacter: async (characterId: number, limit: number) => {
+        seen.push({ characterId, limit });
+        return [
+          { deedId: 'dgn_korzul_flawless', earnedAt: '2026-07-09T10:00:00.000Z' },
+          { deedId: 'prog_veteran', earnedAt: '2026-07-08T10:00:00.000Z' },
+        ];
+      },
+    });
+    const res = await callHandler('GET', '/api/characters/:id/deeds-recent', {
+      account: { accountId: 7, scope: 'read' },
+      state: stateWith(charRow({ id: 3 })),
+    });
+    expect(res.status).toBe(200);
+    // Ids only: the earn timestamps stay server-side (the owner's Book already
+    // holds every earned day; this read is the ORDER source).
+    expect(res.body).toEqual({ deeds: ['dgn_korzul_flawless', 'prog_veteran'] });
+    // The owned row's id feeds the read, capped at the shared client cap.
+    expect(seen).toEqual([{ characterId: 3, limit: DEEDS_RECENT_CAP }]);
+  });
+
+  it('200s an empty list for a character with no recorded unlocks', async () => {
+    setCharactersDbForTests({ recentDeedsForCharacter: async () => [] });
+    const res = await callHandler('GET', '/api/characters/:id/deeds-recent', {
+      account: { accountId: 7, scope: 'read' },
+      state: stateWith(charRow({ id: 3 })),
+    });
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ deeds: [] });
+  });
+
+  it('mounts the READ-tier gate pair, identical to the owner sheet', () => {
+    const recent = routeFor('GET', '/api/characters/:id/deeds-recent');
+    const sheet = routeFor('GET', '/api/characters/:id/sheet');
+    expect(recent.middleware).toHaveLength(2);
+    // Identity, not shape: the exact readGuard instance the sheet mounts, so
+    // a swap to the mutation-tier activeGuard (locking out read-only tokens)
+    // reds here.
+    expect(recent.middleware?.[0]).toBe(sheet.middleware?.[0]);
   });
 });
 
@@ -1446,6 +1492,12 @@ describe('BOLA cross-account 404 (full route chain)', () => {
     expect(r.body).toEqual({ error: 'character not found', code: 'character.not_found' });
   });
 
+  it('deeds-recent 404s character-not-found, handler unreached', async () => {
+    const r = await runRoute('GET', '/api/characters/:id/deeds-recent', { params: { id: '1' } });
+    expect(r).toMatchObject({ status: 404, reached: false });
+    expect(r.body).toEqual({ error: 'character not found', code: 'character.not_found' });
+  });
+
   it('rename 404s character-not-found, handler unreached', async () => {
     const r = await runRoute('POST', '/api/characters/:id/rename', {
       params: { id: '1' },
@@ -1584,8 +1636,8 @@ describe('character-mutation limiters (newLimiterCharacterMutations 429)', () =>
 // ---------------------------------------------------------------------------
 
 describe('routes table', () => {
-  it('registers the eight character routes on the api surface', () => {
-    expect(routes).toHaveLength(8);
+  it('registers the nine character routes on the api surface', () => {
+    expect(routes).toHaveLength(9);
     for (const r of routes) {
       expect(r.surface).toBe('api');
       expect(typeof r.handler).toBe('function');
@@ -1596,6 +1648,7 @@ describe('routes table', () => {
     const ownedPaths = [
       'GET /api/characters/:id/standing',
       'GET /api/characters/:id/sheet',
+      'GET /api/characters/:id/deeds-recent',
       'POST /api/characters/:id/rename',
       'POST /api/characters/:id/takeover',
       'DELETE /api/characters/:id',

@@ -83,6 +83,24 @@ export const DEED_BESPOKE_CRESTS: ReadonlySet<string> = new Set([
  *  display category base `deed_cat_<category>`. The image branch in icons.ts outranks the
  *  bespoke recipe for the same id; the recipes stay as the forward-compat fallback tier
  *  (an artless bespoke deed still lands on deed_<id>, never the base crest). */
+/** Where a jump-to-deed (a chat deed-link or recent-strip activation) may
+ *  land: the deed's display category, or null when the jump must not move the
+ *  Book at all. Null for a catalog-unknown id (content drift) and for a
+ *  hidden deed not yet earned: revealing even the destination shelf would
+ *  leak the masked deed's existence (the masking contract in this header).
+ *  The painter consumes this instead of re-deriving the mask, so the two can
+ *  never drift. */
+export function deedJumpCategory(
+  deeds: Readonly<Record<string, DeedDef>>,
+  deedsEarned: ReadonlyMap<string, string>,
+  id: string,
+): DeedDisplayCategory | null {
+  if (!Object.hasOwn(deeds, id)) return null;
+  const def = deeds[id];
+  if (def.hidden === true && !deedsEarned.has(id)) return null;
+  return deedDisplayCategory(def.category);
+}
+
 export function deedCrestId(id: string, category: string): string {
   return DEED_IMAGE_IDS.has(id) || DEED_BESPOKE_CRESTS.has(id)
     ? `deed_${id}`
@@ -167,6 +185,18 @@ export interface DeedsViewInput {
   // Localized searchable text (name + desc), pre-lowercased by the painter so
   // the core stays i18n-free; both sides of the match share one casing rule.
   searchText(id: string): string;
+  // Newest-first unlock ids from the host's recency record (the async
+  // deedsRecent() facet read), null/absent before it lands or when the host
+  // has none: the sub-day earn ORDER the day-granular earned map cannot carry.
+  recentOrder?: readonly string[] | null;
+  // This session's non-retro unlock ids in drain order (oldest first), the
+  // painter's noteUnlocks feed. The freshest signal: it outranks a fetched
+  // order that may predate an upsert still in flight.
+  sessionUnlocks?: readonly string[];
+  // A deed to spotlight after the next paint (a chat deed-link or
+  // recent-strip jump). The core echoes it back only when the deed produced
+  // an entry, so the painter never scrolls to a card that is not in the DOM.
+  focusDeedId?: string | null;
 }
 
 export interface DeedRecentModel {
@@ -187,8 +217,10 @@ export interface DeedsSummaryModel {
   earned: number;
   visibleTotal: number;
   completion: number;
-  // Last 5 unlocks by earned day, newest first (catalog order breaks ties,
-  // later entries first: appended content reads as more recent).
+  // Last 5 unlocks, newest first, merged from the three recency signals
+  // (session unlocks, then the host's fetched order, then the day-granular
+  // fallback where catalog order breaks same-day ties, later entries first:
+  // appended content reads as more recent).
   recent: DeedRecentModel[];
   // Top 3 unearned counter-trigger deeds by progress fraction (feats and
   // zero-progress deeds excluded), catalog order breaking ties.
@@ -229,6 +261,8 @@ export interface DeedsViewModel {
   categories: DeedsCategoryModel[];
   entries: DeedEntryModel[];
   titles: DeedTitleOption[];
+  // input.focusDeedId when that deed rendered an entry this paint, else null.
+  focusDeedId: string | null;
 }
 
 /** Build the whole cold-window model. Per-call allocation is fine here (the
@@ -285,6 +319,7 @@ export function buildDeedsView(input: DeedsViewInput): DeedsViewModel {
     });
   }
 
+  const focus = input.focusDeedId ?? null;
   return {
     summary: buildSummary(input, earnedCount, visibleTotal),
     categories: DEED_DISPLAY_CATEGORIES.map((category) => {
@@ -293,6 +328,7 @@ export function buildDeedsView(input: DeedsViewInput): DeedsViewModel {
     }),
     entries,
     titles,
+    focusDeedId: focus !== null && entries.some((e) => e.id === focus) ? focus : null,
   };
 }
 
@@ -318,18 +354,35 @@ function buildSummary(
   earned: number,
   visibleTotal: number,
 ): DeedsSummaryModel {
-  // Recent unlocks: earned entries whose id still exists in the catalog
-  // (content drift tolerated by skipping), newest day first; catalog order
-  // (later first) breaks same-day ties deterministically.
+  // Recent unlocks, three recency signals merged strongest-first with dedup:
+  //  1. this session's unlocks, newest first (exact, both hosts, instant);
+  //  2. the host's fetched newest-first order (exact, survives relog);
+  //  3. the day-granular fallback: earned entries newest day first, catalog
+  //     order (later first) breaking same-day ties deterministically.
+  // Every id must still be earned and catalog-known (content drift and a
+  // stale fetched row are tolerated by skipping).
   const orderIndex = new Map<string, number>();
   for (let i = 0; i < input.order.length; i++) orderIndex.set(input.order[i], i);
-  const recent: { id: string; day: string; index: number }[] = [];
+  const dayFallback: { id: string; day: string; index: number }[] = [];
   for (const [id, day] of input.deedsEarned) {
     const def = input.deeds[id];
     if (!def) continue;
-    recent.push({ id, day, index: orderIndex.get(id) ?? 0 });
+    dayFallback.push({ id, day, index: orderIndex.get(id) ?? 0 });
   }
-  recent.sort((a, b) => (a.day === b.day ? b.index - a.index : a.day < b.day ? 1 : -1));
+  dayFallback.sort((a, b) => (a.day === b.day ? b.index - a.index : a.day < b.day ? 1 : -1));
+  const seen = new Set<string>();
+  const recent: string[] = [];
+  const pushRecent = (id: string): void => {
+    // Own-property check, not a bare index read: the fetched recentOrder is
+    // wire data whose ids could name prototype keys (the known_item doctrine).
+    if (seen.has(id) || !input.deedsEarned.has(id) || !Object.hasOwn(input.deeds, id)) return;
+    seen.add(id);
+    recent.push(id);
+  };
+  const session = input.sessionUnlocks ?? [];
+  for (let i = session.length - 1; i >= 0; i--) pushRecent(session[i]);
+  for (const id of input.recentOrder ?? []) pushRecent(id);
+  for (const entry of dayFallback) pushRecent(entry.id);
 
   const nearest: { id: string; progress: DeedProgress; fraction: number; index: number }[] = [];
   for (const id of input.order) {
@@ -349,10 +402,10 @@ function buildSummary(
     earned,
     visibleTotal,
     completion: visibleTotal > 0 ? earned / visibleTotal : 0,
-    recent: recent.slice(0, 5).map((entry) => ({
-      id: entry.id,
-      crestId: deedCrestId(entry.id, input.deeds[entry.id].category),
-      earnedDay: entry.day,
+    recent: recent.slice(0, 5).map((id) => ({
+      id,
+      crestId: deedCrestId(id, input.deeds[id].category),
+      earnedDay: input.deedsEarned.get(id) ?? '',
     })),
     nearest: nearest.slice(0, 3).map((entry) => ({ id: entry.id, progress: entry.progress })),
   };

@@ -95,6 +95,45 @@ describe('shared behavior across all screen sizes', () => {
   });
 });
 
+describe('gossip Crafting shortcut launcher (station masters)', () => {
+  it('routes the quest dialog dep into openCrafting and pre-selects the tab like a tab click', () => {
+    expect(hud).toContain('openCrafting: (craftId) => this.openCrafting(craftId),');
+    // Pin the method BODY (sliced to the method's own 2-space closing brace),
+    // so the same-tab guard, the craftOwnsTab persist gate, the persistence,
+    // the repaint, and the focus handoff must all live inside openCrafting
+    // itself, not merely somewhere in hud.ts. The behavioral halves are unit
+    // tested where they are pure: craftOwnsTab and resolveSelectedCraft in
+    // tests/crafting_window_tabs.test.ts.
+    const start = hud.indexOf('openCrafting(craftId?: string): void {');
+    expect(start).toBeGreaterThan(-1);
+    // Guard the terminator too: an unmatched end would slice to EOF and let
+    // every arm pass vacuously (the slice(start, -1) trap). The length
+    // ceiling keeps the slice ONE method even if the brace style shifts.
+    const end = hud.indexOf('\n  }', start);
+    expect(end).toBeGreaterThan(start);
+    // Strip comment lines so a comment quoting a call can never keep an arm
+    // green after the real call is deleted.
+    const body = hud
+      .slice(start, end)
+      .split('\n')
+      .filter((line) => !line.trim().startsWith('//'))
+      .join('\n');
+    expect(body.length).toBeLessThan(2000);
+    expect(body).toContain('craftId !== this.selectedCraftTab');
+    // The persist gate, matched per argument rather than as one long literal
+    // so a biome re-wrap of the call cannot false-red the pin.
+    expect(body).toContain('craftOwnsTab(');
+    expect(body).toContain('this.sim.recipeList');
+    expect(body).toContain('this.sim.craftingIdentity.knownRecipes');
+    expect(body).toContain('this.selectedCraftTab = craftId;');
+    expect(body).toContain('this.persistCraftingTab();');
+    expect(body).toContain('this.renderCrafting();');
+    // The gossip route's focus handoff: the dialog released its trap without
+    // restoring, so openCrafting must land focus on the selected tab.
+    expect(body).toContain("querySelector('.crafting-tab.sel')");
+  });
+});
+
 describe('side rail height budget', () => {
   // #side-buttons is bottom-anchored and grows upward. It used to be one long
   // column (#side-buttons stacked all launchers directly), which forced a

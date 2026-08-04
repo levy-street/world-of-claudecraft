@@ -3029,6 +3029,11 @@ export const hudChromeStrings = {
   crafting: {
     title: 'Crafting',
     close: 'Close crafting',
+    // The gossip-dialog Crafting option on a station master: opens the
+    // crafting window straight to the master's own craft tab. {craft} in the
+    // aria is the localized craft name (craftName above).
+    dialogOption: 'Crafting',
+    dialogOptionAria: 'Open the crafting window for {craft}',
     craft: 'Craft',
     reagentsNeeded: 'Requires:',
     reagentLine: '{name} x{have}/{required}',
@@ -3549,6 +3554,7 @@ export const hudChromeStrings = {
     countLabel: '{earned}/{total} deeds',
     completionAria: 'Deeds earned: {earned} of {total}',
     recentLabel: 'Recent:',
+    recentJumpAria: 'Jump to {name}',
     nearestLabel: 'Nearly there:',
     filterGroupAria: 'Filter deeds',
     filterAll: 'All',

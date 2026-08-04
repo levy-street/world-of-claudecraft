@@ -101,6 +101,7 @@ function harness(
   const openCardDuel = vi.fn();
   const openTrain = vi.fn();
   const openUnbind = vi.fn();
+  const openCrafting = vi.fn();
   const onOpenChange = vi.fn();
   const controller = new QuestDialogController({
     element,
@@ -136,6 +137,7 @@ function harness(
     openCardDuel,
     openTrain,
     openUnbind,
+    openCrafting,
     onOpenChange,
     voice,
   });
@@ -166,6 +168,7 @@ function harness(
     openCardDuel,
     openTrain,
     openUnbind,
+    openCrafting,
     onOpenChange,
   };
 }
@@ -595,13 +598,54 @@ describe('QuestDialogController', () => {
     expect(plain.element.querySelector('[data-unbind]')).toBeNull();
   });
 
-  it('does not leak Train or Unbind into a world with no authored stations', () => {
+  it('a station master offers the Crafting shortcut and routes its craft to openCrafting', () => {
+    // The Eastbrook forge master: a fresh viewer (no craft skills) resolves
+    // to weaponcrafting, the first forge craft in declaration order. The aria
+    // names the resolved craft (the {craft} placeholder is substituted).
+    const forge = STATIONS.find((station) => station.type === 'forge');
+    if (!forge) throw new Error('forge station fixture not found');
+    const master = harness(npc(51, forge.masterNpcId));
+    master.controller.open(51);
+    const button = master.element.querySelector<HTMLButtonElement>('[data-crafting]');
+    expect(button).not.toBeNull();
+    const aria = button?.getAttribute('aria-label') ?? '';
+    expect(aria).toContain(craftNameText('weaponcrafting'));
+    expect(aria).not.toContain('{craft}');
+    button?.click();
+    expect(master.openCrafting).toHaveBeenCalledWith('weaponcrafting');
+    expect(master.release).toHaveBeenCalledWith(false);
+  });
+
+  it('the Crafting shortcut follows the viewer stronger craft at the two-craft forge', () => {
+    const forge = STATIONS.find((station) => station.type === 'forge');
+    if (!forge) throw new Error('forge station fixture not found');
+    const master = harness(npc(52, forge.masterNpcId), 'available', {
+      craftSkills: { weaponcrafting: 5, armorcrafting: 30 },
+    });
+    master.controller.open(52);
+    master.element.querySelector<HTMLButtonElement>('[data-crafting]')?.click();
+    expect(master.openCrafting).toHaveBeenCalledWith('armorcrafting');
+  });
+
+  it('a non-master NPC renders no Crafting shortcut', () => {
+    const masters = new Set(STATIONS.map((station) => station.masterNpcId));
+    const plainId = Object.values(NPCS).find(
+      (definition) => !definition.banker && !masters.has(definition.id),
+    )?.id;
+    if (!plainId) throw new Error('non-master NPC fixture not found');
+    const plain = harness(npc(53, plainId));
+    plain.controller.open(53);
+    expect(plain.element.querySelector('[data-crafting]')).toBeNull();
+  });
+
+  it('does not leak Train, Crafting, or Unbind into a world with no authored stations', () => {
     const master = harness(npc(50, STATIONS[0].masterNpcId));
     (master.world as unknown as { stationPlacements: typeof STATIONS }).stationPlacements = [];
 
     master.controller.open(50);
 
     expect(master.element.querySelector('[data-train]')).toBeNull();
+    expect(master.element.querySelector('[data-crafting]')).toBeNull();
     expect(master.element.querySelector('[data-unbind]')).toBeNull();
   });
 
