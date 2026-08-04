@@ -810,7 +810,7 @@ describe('Eastbrook town shipping GLBs', () => {
       buildingTriangles +
       triangleCount('civic_well_beacon') +
       2 * triangleCount('market_stall') +
-      4 * 208 +
+      3 * 208 +
       3 * 348;
     const wallTriangles = 26 * triangleCount('wall_wing');
     const optionalFoundationSkirtTriangles = 6 * 12;
@@ -818,9 +818,9 @@ describe('Eastbrook town shipping GLBs', () => {
       fixedNonWallTriangles + wallTriangles + optionalFoundationSkirtTriangles;
 
     expect(buildingTriangles).toBe(18_714);
-    expect(fixedNonWallTriangles).toBe(23_682);
+    expect(fixedNonWallTriangles).toBe(23_474);
     expect(optionalFoundationSkirtTriangles).toBe(72);
-    expect(wholeTownTriangles).toBe(29_110);
+    expect(wholeTownTriangles).toBe(28_902);
     expect(wholeTownTriangles).toBeLessThanOrEqual(30_000);
   });
 

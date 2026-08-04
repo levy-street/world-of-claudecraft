@@ -209,7 +209,7 @@ describe('Eastbrook polish capture contract', () => {
       sourceComparison: 'feature-worktree',
       views: EASTBROOK_TOWN_CAPTURE_VIEWS,
       placementInventory: EASTBROOK_TOWN_REBUILD_PLACEMENT_INVENTORY,
-      townTriangles: 29_644,
+      townTriangles: 29_436,
       attributionTargets: [
         {
           key: 'town-root',
@@ -233,7 +233,7 @@ describe('Eastbrook polish capture contract', () => {
       sourceComparison: 'polish-baseline-worktree',
       views: EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS,
       placementInventory: EASTBROOK_TOWN_REBUILD_PLACEMENT_INVENTORY,
-      townTriangles: 29_644,
+      townTriangles: 29_436,
       attributionTargets: [
         {
           key: 'town-root',
@@ -255,7 +255,7 @@ describe('Eastbrook polish capture contract', () => {
       layoutId: 'eastbrook_civic_layout_v2',
       sourceComparison: 'polish-v2-worktree',
       placementInventory: EASTBROOK_TOWN_POLISH_V2_PLACEMENT_INVENTORY,
-      townTriangles: 29_110,
+      townTriangles: 28_902,
       attributionTargets: [
         {
           key: 'town-root',
@@ -360,14 +360,15 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned: src/render/renderer.ts is the rendererIntegration
-      // leaf of this composite, and both the shapeshift-form compile gate (#2571)
-      // and the crowd nameplate/presentation batching edit it, moving the leaf's
-      // own sha256 and, with it, the composite fingerprint. No GLB source
-      // fingerprint moved and no capture was retaken, following the identical
-      // precedent this composite already carries from the compile-storm
-      // gear/mount/base-visual gate fix.
-      fingerprint: '6c2a621a6e05e1961950846f394097ab658d7f259cdb15f37cab582293a538ce',
+      // Deliberately re-pinned for the merged tree. src/render/renderer.ts is the
+      // rendererIntegration leaf of this composite, and both the shapeshift-form
+      // compile gate (#2571) and the crowd nameplate/presentation batching edit
+      // it, moving the leaf's own sha256; PR #2720's fence removal separately
+      // moves the authoritativeLayout/placementInventory inputs. The merge stacks
+      // both, minting one composite that matches neither parent's literal. No GLB
+      // source fingerprint moved, no pipeline input or geometry value changed,
+      // and no capture was retaken.
+      fingerprint: 'e219453b6dca76837f5c5d63555f261936eaa36c2275774f7fc215a75e9cb7cc',
       components: {
         captureContract: {
           id: 'polish-v2',
@@ -578,10 +579,10 @@ describe('Eastbrook polish capture contract', () => {
         shadowEnabled: true,
         ...(contractId ? { contractId } : {}),
       });
-    expect(() => assertPerf(29_644)).not.toThrow();
-    expect(() => assertPerf(29_644, 'rebuild-v1')).not.toThrow();
-    expect(() => assertPerf(29_644, 'polish-baseline')).not.toThrow();
-    expect(() => assertPerf(29_110, 'polish-v2')).not.toThrow();
+    expect(() => assertPerf(29_436)).not.toThrow();
+    expect(() => assertPerf(29_436, 'rebuild-v1')).not.toThrow();
+    expect(() => assertPerf(29_436, 'polish-baseline')).not.toThrow();
+    expect(() => assertPerf(28_902, 'polish-v2')).not.toThrow();
     expect(() => assertPerf(29_644, 'polish-v2')).toThrow('draw stats');
   });
 

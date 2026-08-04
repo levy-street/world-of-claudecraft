@@ -60,6 +60,9 @@ export const COPIED_ALLOW_IDS = [
   'admin::de_DE::moderation.colStatus',
   'admin::de_DE::moderation.badgeOnline',
   'admin::de_DE::detail.lengthHours',
+  // Admin restore item-id entry field: the placeholder must show a literal item id
+  // that operators can paste into the restore form, not a translated phrase.
+  'admin::de_DE::profInspect.itemIdPlaceholder',
   'admin::de_DE::chatMod.status',
   'admin::pt_BR::app.title',
   'admin::pt_BR::detail.status',

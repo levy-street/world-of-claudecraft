@@ -57,17 +57,27 @@ describe('classifyDiff', () => {
     expect(captureSource).toContain("document.body.classList.contains('game-active')");
   });
 
-  it('captures both the market overview and expanded armor filters for market window changes', () => {
+  it('captures the market overview, the buy confirmation, and expanded armor filters for market window changes', () => {
     const plan = classifyDiff(['src/ui/market_window.ts']);
     expect(plan.isVisual).toBe(true);
     expect(plan.specific.map((t: { key: string }) => t.key)).toEqual([
       'market-window',
+      'market-buy-confirm',
       'market-armor-filters',
     ]);
-    expect(plan.specific[1].variants).toEqual([
+    expect(plan.specific[2].variants).toEqual([
       { key: 'desktop' },
       { key: 'mobile', mobile: true },
     ]);
+  });
+
+  it('captures the buy confirmation for its own pure core too, not just the painter', () => {
+    // The prompt's terms and its confirm-time recheck live in the core, so a change
+    // there alters what the prompt SAYS with the painter untouched.
+    const keys = classifyDiff(['src/ui/market_buy_confirm_core.ts']).specific.map(
+      (target: { key: string }) => target.key,
+    );
+    expect(keys).toEqual(['market-buy-confirm']);
   });
 
   it('captures expanded armor filters for every market-specific UI module', () => {
