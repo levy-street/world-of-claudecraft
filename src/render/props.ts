@@ -37,6 +37,11 @@ import {
   isEastbrookRebuildWell,
 } from './eastbrook_town';
 import { indexExactVertexTuples } from './exact_index_geometry';
+import {
+  isFenbridgeRebuildBuilding,
+  isFenbridgeRebuildStall,
+  isFenbridgeRebuildWell,
+} from './fenbridge_town';
 import { EMISSIVE_LIGHT, GFX, type GfxSettings, sharedUniforms, surfaceMat } from './gfx';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
@@ -1275,6 +1280,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       continue;
     }
     if (builtInWorld && isEastbrookRebuildBuilding(b)) continue;
+    if (builtInWorld && isFenbridgeRebuildBuilding(b)) continue;
     // roof Y mirrors the camera collider height in colliders.ts, through the
     // same shared helper, so an authored per-building height override cannot
     // leave the hideable top and the camera top disagreeing.
@@ -1401,6 +1407,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   // ---- market stalls (smith/armorer stalls get anvil + weapon stand) ------
   activeContent.props.stalls.forEach((s, i) => {
     if (builtInWorld && isEastbrookRebuildStall(s)) return;
+    if (builtInWorld && isFenbridgeRebuildStall(s)) return;
     const key = s.x * 7.7 + s.z * 2.3;
     const g = new THREE.Group();
     const standKey: PropKey = i % 2 === 0 ? 'stand1' : 'stand2';
@@ -1432,6 +1439,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   // ---- wells ---------------------------------------------------------------
   for (const w of activeContent.props.wells) {
     if (builtInWorld && isEastbrookRebuildWell(w)) continue;
+    if (builtInWorld && isFenbridgeRebuildWell(w)) continue;
     const g = new THREE.Group();
     const a = propAsset('well');
     addParts(g, 'well', { scale: [2.6 / a.size.x, 3.6 / a.size.y, 2.9 / a.size.z] });

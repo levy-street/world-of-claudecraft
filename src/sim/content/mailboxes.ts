@@ -5,6 +5,7 @@
 // at spawn, so a collision with a building resolves to the nearest open spot.
 
 import { EASTBROOK_LAYOUT } from '../eastbrook_layout';
+import { FENBRIDGE_LAYOUT } from '../fenbridge_layout';
 import type { MailboxDef } from '../types';
 import { AMBERFALL_ZONE } from './amberfall';
 import { DRAKELANDS_ZONE } from './drakelands';
@@ -29,7 +30,7 @@ function hubMailbox(
 
 export const MAILBOXES: MailboxDef[] = [
   { ...EASTBROOK_LAYOUT.services.mailbox.position },
-  { x: 6, z: 294 }, // Fenbridge, at the boardwalk mouth
+  { ...FENBRIDGE_LAYOUT.services.mailbox.position },
   { x: 6, z: 654 }, // Highwatch, beside the gate path
   hubMailbox(REALM_ZONE, { x: 7, z: -5 }), // Eldergleam, south of the great tree
   hubMailbox(DRAKELANDS_ZONE, { x: -7, z: 5 }), // Wyrmwatch, inside the gate lawn

@@ -997,6 +997,7 @@ export const id_ID: EnTranslations = {
       "name_stormfeather_griffin": "Stormfeather Penjelajah Langit",
       "name_thunderstrut_gobbler": "Thunderstrut Sang Kalkun Agung",
       "name_terrorspark_groundshaker": "Percik Teror, Pengguncang Bumi",
+      "name_drakemaw_raptor": "Drakemaw Raptor",
       "desc_valorsteed": "Kuda tunggangan tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
       "desc_grag_bear": "Beruang tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
       "desc_stalkglider_snail": "Siput ulet berenergi tahan lama yang memberikan kecepatan perjalanan tambahan.",
@@ -1004,7 +1005,8 @@ export const id_ID: EnTranslations = {
       "desc_shadowjump_toad": "Kodok raksasa masif berpijakan mantap, terlatih dalam lompatan bayangan secepat kilat yang mampu menjangkau medan apa pun.",
       "desc_stormfeather_griffin": "Griffin badai yang anggun, melangkah di tanah dengan cakar bersepatu rune, sayap terlipat rapat.",
       "desc_thunderstrut_gobbler": "Kalkun raksasa tetasan badai yang melenggak-lenggok turun dari Puncak yang Terjaga, ekornya terkembang bagai awan guntur.",
-      "desc_terrorspark_groundshaker": "Mesin lapis baja ringkas dengan rantai roda berat, meriam berkaliber besar, dan pelana yang dibuat untuk pilot tanpa rasa takut."
+      "desc_terrorspark_groundshaker": "Mesin lapis baja ringkas dengan rantai roda berat, meriam berkaliber besar, dan pelana yang dibuat untuk pilot tanpa rasa takut.",
+      "desc_drakemaw_raptor": "A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash."
     },
     "mountTraining": {
       "mountPrompt": "Tekan {key} untuk menaiki Valorsteed latihan.",
@@ -1989,6 +1991,7 @@ export const id_ID: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Mutu halus. Dikumpulkan dari urat tingkat penuh dengan alat berperingkat di atas materialnya, dan dihitung sebagai versi biasa di mana pun versi biasa dibutuhkan.",
+      "cookingCatch": "Cooking ingredient. Must be cooked before eating.",
       "arcaneDust": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan umum dan tak biasa.",
       "arcaneEssence": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan langka.",
       "arcaneShard": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan epik dan legendaris.",
@@ -7134,6 +7137,7 @@ export const id_ID: EnTranslations = {
       "quest": "Barang Misi",
       "junk": "Rongsokan",
       "fineMaterial": "Bahan Halus",
+      "material": "Material",
       "food": "Makanan",
       "drink": "Minuman",
       "tool": "Perkakas",
@@ -10072,6 +10076,9 @@ export const id_ID: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Kunci Kontak: Percik Teror, Pengguncang Bumi"
       },
+      "reins_drakemaw_raptor": {
+        "name": "Reins of the Drakemaw Raptor"
+      },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
       },
@@ -11246,6 +11253,18 @@ export const id_ID: EnTranslations = {
       },
       "cindraleth_maw_matriarch": {
         "name": "Cindraleth Sang Matriark Rahang"
+      },
+      "dragonkin_egg": {
+        "name": "Dragonkin Egg"
+      },
+      "dragonkin_whelp": {
+        "name": "Dragonkin Whelp"
+      },
+      "dragonkin_broodguard": {
+        "name": "Dragonkin Broodguard"
+      },
+      "drakemaw_broodlord": {
+        "name": "Drakemaw Broodlord"
       },
       "gilded_stag": {
         "name": "Rusa Bersepuh Emas"

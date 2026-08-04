@@ -997,6 +997,7 @@ export const cs_CZ: EnTranslations = {
       "name_stormfeather_griffin": "Nebeský Bouřepero",
       "name_thunderstrut_gobbler": "Hromokrok, Velký krocan",
       "name_terrorspark_groundshaker": "Hrůzojiskra, otřásač země",
+      "name_drakemaw_raptor": "Drakemaw Raptor",
       "desc_valorsteed": "Otužilý, jistonohý oř poskytující zvýšenou rychlost cestování.",
       "desc_grag_bear": "Otužilý, jistonohý medvěd poskytující zvýšenou rychlost cestování.",
       "desc_stalkglider_snail": "Statný, pomalu se pohybující plž poskytující zvýšenou rychlost cestování.",
@@ -1004,7 +1005,8 @@ export const cs_CZ: EnTranslations = {
       "desc_shadowjump_toad": "Mohutná, jistonohá obří ropucha, vycvičená v bleskurychlých stínových skocích, které zvládnou jakýkoli terén.",
       "desc_stormfeather_griffin": "Vznešený bouřný gryf, který se plíží po zemi na rounami okovaných spárech, se složenými křídly.",
       "desc_thunderstrut_gobbler": "Kolosální krocan zrozený z bouře, který se hrdě prochází z Probouzejícího se vrcholu, s ocasem rozevřeným jako bouřkový mrak.",
-      "desc_terrorspark_groundshaker": "Kompaktní obrněný stroj s těžkými pásy, velkorážním kanónem a sedlem pro nebojácné piloty."
+      "desc_terrorspark_groundshaker": "Kompaktní obrněný stroj s těžkými pásy, velkorážním kanónem a sedlem pro nebojácné piloty.",
+      "desc_drakemaw_raptor": "A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash."
     },
     "mountTraining": {
       "mountPrompt": "Stiskni {key} pro nasednutí na cvičného Udatného oře.",
@@ -1989,6 +1991,7 @@ export const cs_CZ: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Jemná jakost. Sesbírána z naleziště plné úrovně nástrojem vyššího stupně, než je materiál, a počítá se jako běžná verze všude, kde je běžná verze potřeba.",
+      "cookingCatch": "Cooking ingredient. Must be cooked before eating.",
       "arcaneDust": "Reagencie k okouzlení. Získává se rozzačarováním běžné a neobvyklé výbavy.",
       "arcaneEssence": "Reagencie k okouzlení. Získává se rozzačarováním vzácné výbavy.",
       "arcaneShard": "Reagencie k okouzlení. Získává se rozzačarováním epické a legendární výbavy.",
@@ -7134,6 +7137,7 @@ export const cs_CZ: EnTranslations = {
       "quest": "Úkolový předmět",
       "junk": "Odpad",
       "fineMaterial": "Jemný materiál",
+      "material": "Material",
       "food": "Jídlo",
       "drink": "Nápoj",
       "tool": "Nástroj",
@@ -10072,6 +10076,9 @@ export const cs_CZ: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Klíček zapalování: Hrůzojiskra, otřásač země"
       },
+      "reins_drakemaw_raptor": {
+        "name": "Reins of the Drakemaw Raptor"
+      },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
       },
@@ -11246,6 +11253,18 @@ export const cs_CZ: EnTranslations = {
       },
       "cindraleth_maw_matriarch": {
         "name": "Cindraleth, matriarcha Tlamy"
+      },
+      "dragonkin_egg": {
+        "name": "Dragonkin Egg"
+      },
+      "dragonkin_whelp": {
+        "name": "Dragonkin Whelp"
+      },
+      "dragonkin_broodguard": {
+        "name": "Dragonkin Broodguard"
+      },
+      "drakemaw_broodlord": {
+        "name": "Drakemaw Broodlord"
       },
       "gilded_stag": {
         "name": "Pozlacený jelen"

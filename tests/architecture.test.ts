@@ -253,6 +253,7 @@ const UI_PURE_CORES = [
   'src/ui/enchanting_view.ts',
   'src/ui/disenchant_yield_view.ts',
   'src/ui/material_hint_view.ts',
+  'src/ui/cooking_catch_hint_view.ts',
   'src/ui/bag_instance_glyph_view.ts',
   'src/ui/bag_quest_mark_view.ts',
   'src/ui/bag_quest_tracker_highlight_view.ts',
@@ -391,6 +392,7 @@ const RENDER_PURE_CORES = [
   'src/render/camera_feel_core.ts',
   'src/render/cast_bar.ts',
   'src/render/character_effects_core.ts',
+  'src/render/character_presentation_core.ts',
   'src/render/character_view_core.ts',
   'src/render/chunk_residency_core.ts',
   'src/render/cliff_scree_core.ts',
@@ -409,6 +411,7 @@ const RENDER_PURE_CORES = [
   'src/render/grass_cap_collapse_core.ts',
   'src/render/step_smooth_core.ts',
   'src/render/eastbrook_town_visibility_core.ts',
+  'src/render/fenbridge_town_visibility_core.ts',
   'src/render/occluder_fade_core.ts',
   'src/render/point_light_shader_core.ts',
   'src/render/post_bloom_shader_core.ts',
@@ -1378,9 +1381,12 @@ const COLOR_FUNC_RE = /\brgba?\s*\(/g;
 // is imported BY a painter and paints nothing itself; a window painter owns and
 // updates the nodes of its own window. What the gate enforces is that one of them
 // is chosen on purpose.
-const UI_PAINTER_HELPERS = ['src/ui/continent_land_mask.ts', 'src/ui/text_sprite_cache.ts'].map(
-  (rel) => join(repoRoot, rel),
-);
+const UI_PAINTER_HELPERS = [
+  'src/ui/continent_land_mask.ts',
+  'src/ui/text_sprite_cache.ts',
+  // Detached tt-desc / tt-sub line mint (createElement + textContent only).
+  'src/ui/tooltip_line.ts',
+].map((rel) => join(repoRoot, rel));
 
 // Modules that REACH A HOST: they own browser state (the windows, the HUD
 // controllers, the drag / resize / focus plumbing, the storage-backed settings) or

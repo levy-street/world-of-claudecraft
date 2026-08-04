@@ -9,9 +9,9 @@
 // proficiency (GATHERING_PROFESSIONS.fishing): a landed catch queues a
 // proficiency grant on the tick path like any other gathering harvest, and
 // the accrued proficiency selects a catch rarity band (fishingBandFor) whose
-// per-zone table shifts weight out of junk/empty-hook rows and into food fish
-// as skill rises. Where a zone's water sits on that ladder, and which rod it
-// takes to cast there at all, live in professions/fishing_zones.ts.
+// per-zone table shifts weight out of grey-junk/empty-hook rows and into
+// cooking catches as skill rises. Where a zone's water sits on that ladder,
+// and which rod it takes to cast there at all, live in professions/fishing_zones.ts.
 // Draw contract: a normal session draws one rng
 // value at cast start (the bite delay) and one more at a landed reel (the
 // table); a miss stays at one; the codfather reel draws nothing (early
@@ -20,7 +20,7 @@
 // draw-free.
 
 import { isActionLockingFormAuraKind } from '../combat/forms';
-import { FISHING_RARE_ID, FISHING_TABLES_BY_BAND } from '../content/items';
+import { FISHING_RARE_ID, FISHING_TABLES_BY_BAND, isRawCookingCatch } from '../content/items';
 import { DEEPFEN_SHALLOWS_LAKE } from '../content/zone2';
 import { ITEMS, zoneAt } from '../data';
 import { onFishCaughtForDeeds } from '../deeds';
@@ -204,9 +204,10 @@ export const FISHING_GAIN_SCHEDULE = [
   { belowProficiency: 200, gain: 0.02 },
 ] as const;
 
-// Junk catches (ItemDef kind 'junk': tangled weed, soggy boots) stop granting
-// proficiency entirely once band 0 is outgrown: a seasoned angler learns
-// nothing from dredging up boots.
+// Grey fishing junk (tangled weed, soggy boots: kind junk and NOT a raw cooking
+// catch) stops granting proficiency entirely once band 0 is outgrown: a
+// seasoned angler learns nothing from dredging up boots. Raw cooking catches
+// are also kind junk but still teach like any other water catch.
 export const FISHING_JUNK_GAIN_CUTOFF_PROFICIENCY = 100;
 
 // The per-catch proficiency gain: deterministic fractional amounts off the
@@ -592,12 +593,15 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
   // non-positive amounts). Deliberately queued only here, on the landed
   // path: the no-bite null branch, the bags-full got-away branch, and the
   // codfather quest branch (which returns above) never accrue.
+  // Grey vendor trash on the tables (weed/boot) is junk and not a cooking
+  // catch; raw cooking catches are also kind junk but still teach.
+  const isGreyFishingJunk = ITEMS[caught]?.kind === 'junk' && !isRawCookingCatch(caught);
   queueGatheringGrant(
     meta,
     'fishing',
     fishingCatchGainAt(
       meta.gatheringProficiency.fishing ?? 0,
-      ITEMS[caught]?.kind === 'junk',
+      isGreyFishingJunk,
       rodTierRequiredForZone(zoneId),
     ),
   );

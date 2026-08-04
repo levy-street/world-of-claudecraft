@@ -360,25 +360,32 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned, stacking three independent rendererIntegration
-      // moves on src/render/renderer.ts, the leaf of this composite: this branch
-      // swaps the Bear Form visual onto the purpose-built quadruped rig, and
-      // release/v0.34.0 carries both PR #2720's fence-removal layout evidence and
-      // the live graphics rebuild (context recycle plus profile-aware Eastbrook
-      // runtime inputs). Each moves the leaf's own sha256 and with it the
-      // composite, so the merged tree mints one fingerprint matching no parent's
-      // literal. No GLB source fingerprint moved, no pipeline input or geometry
-      // value changed, and no capture was retaken. Re-minted with
+      // Deliberately re-pinned, and this mint stacks every leaf move on both sides
+      // of the merge onto src/render/renderer.ts, the rendererIntegration leaf of
+      // this composite: the pnpm-lock migration (a hashed input to every GLB source
+      // fingerprint), PR #2720's fence-removal layout evidence, release/v0.34.0's
+      // Bear Form quadruped rig and live graphics rebuild (context recycle plus
+      // profile-aware Eastbrook runtime inputs), and this branch's own brood
+      // shout/flourish and attackByAbility wiring (then gating that cue on a mob
+      // source so player castFx keeps reaching the warrior plan). Each moves the
+      // leaf's own sha256 and with it the composite, so the merged tree mints one
+      // fingerprint matching neither parent's literal. No GLB source fingerprint
+      // moved, not one pipeline input or geometry value changed, and no capture was
+      // retaken: Eastbrook itself is untouched by all of it. Re-minted with
       // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
-      // Re-pinned again at the far-field merge: the release retook the polish
-      // captures (its metadata and performance JSONs are adopted verbatim) and
-      // moved the rendererIntegration leaf itself (impostor bake, fog-free
-      // vista, haze band, the #2793 review round), while this branch's own
-      // leaf move (the Blizzard timed ground loop on the snowZone spellfx arm)
-      // still stands. Both sides moved the same leaf, so the merged composite
-      // matches neither parent's literal. No GLB source fingerprint moved and
-      // no capture was retaken here.
-      fingerprint: 'da59529cababd46851f411af6e488aa0bf9228b98170066fa536559ee1c3fcbb',
+      // Re-pinned again at the fenbridge-rebuild merge. The release retook the
+      // polish captures, so their metadata and performance JSONs are adopted
+      // verbatim from the base, and it has now moved the rendererIntegration
+      // leaf repeatedly (the impostor bake, fog-free vista, and haze band of
+      // #2793, the Blizzard timed ground loop of #2861, the reactable rift boss
+      // mechanics of #2858, the batched canvas crowd nameplates of #2789, and
+      // the fenbridge rebuild of #2913). This branch's own edits to
+      // src/render/renderer.ts (the brood shout/flourish and attackByAbility
+      // wiring, then gating that cue on a mob source) stack on top. Both sides
+      // moved the same leaf, so the merged composite matches neither parent's
+      // literal. No GLB source fingerprint moved and no capture was retaken on
+      // this branch.
+      fingerprint: 'e2cdf273f5a5d64997d6b68647e20a0feaffb12e653671ab9108879ed1ff9de6',
       components: {
         captureContract: {
           id: 'polish-v2',

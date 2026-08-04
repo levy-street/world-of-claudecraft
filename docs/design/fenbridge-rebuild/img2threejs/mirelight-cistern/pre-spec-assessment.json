@@ -1,0 +1,552 @@
+{
+  "targetName": "Fenbridge Mirelight Cistern",
+  "sourceImage": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png",
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "exterior-only covered civic cistern and mirelight service station",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "circular civic landmark",
+        "radial canopy",
+        "hard-surface masonry",
+        "ritual-service focal stack"
+      ],
+      "structureKind": [
+        "tiered basin assembly",
+        "four-post timber canopy",
+        "radial roof subassembly",
+        "suspended service fixtures"
+      ],
+      "motionPotential": [
+        "static world landmark",
+        "future crank rotation",
+        "future kettle or lantern sway"
+      ],
+      "materialFamilies": [
+        "damp stone",
+        "rain-dark timber",
+        "oxidized teal roof",
+        "forged iron",
+        "aged brass",
+        "shallow water",
+        "warm fire",
+        "teal fenlight"
+      ],
+      "notes": "Front, rear, and hero crops independently pass reference admission. The side crop is a pHash near-duplicate of front and is excluded as independent evidence."
+    },
+    "complexity": {
+      "tier": "moderate",
+      "scores": {
+        "silhouetteComplexity": 3,
+        "componentCount": 2,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 2,
+        "materialLayerCount": 3,
+        "localDetailDensity": 2,
+        "occlusionRisk": 2,
+        "actionReadinessNeed": 1
+      },
+      "estimatedCounts": {
+        "macroComponents": 4,
+        "mesoComponents": 6,
+        "microFeatureGroups": 14,
+        "materialLayers": 7,
+        "repetitionSystems": 2
+      },
+      "reasoning": [
+        "The concentric stone basin, four-post frame, horned radial canopy, and central fire-kettle stack make the civic silhouette distinct despite the compact footprint.",
+        "Stone sectors, roof courses, rim studs, cage bars, and post fittings need grouped repetition to remain inside the 800-triangle target.",
+        "Three independent admitted views establish the exterior and service cues; exact small radial counts remain cadence rather than literal inventory."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "moderate",
+      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "The cistern needs macro circular masses, meso suspended service assemblies, and mapped micro fittings to retain identity at gameplay distance."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "resolvedUncertainties": [
+      "The side crop is rejected as a near-duplicate of front and does not count as independent evidence; front, rear, and hero control implementation.",
+      "Generated views vary small roof-segment, stone-block, and cage-bar counts; use restrained radial cadence instead of copying any one count literally.",
+      "Water is a shallow closed surface band with no simulated depth or explorable shaft.",
+      "The kettle, crank, bucket, and lanterns are fixed exterior service cues in this asset; sockets preserve possible future motion."
+    ],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 10,
+      "note": "Fourteen observed details map to component local features or material local overrides.",
+      "details": [
+        {
+          "id": "concentric-stone-courses",
+          "kind": "seam",
+          "description": "Two low concentric courses of uneven damp stone define the cistern rim and central service island.",
+          "region": {
+            "x": 0.13,
+            "y": 0.62,
+            "width": 0.74,
+            "height": 0.25,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "basin relief",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "basin-ring/concentric-stone-courses"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/front.png",
+          "confidence": 0.96
+        },
+        {
+          "id": "moss-wet-footing",
+          "kind": "stain",
+          "description": "Moss and darker wetness collect only at the lowest outer stones and post contacts.",
+          "region": {
+            "x": 0.14,
+            "y": 0.72,
+            "width": 0.72,
+            "height": 0.18,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "stone albedo and roughness",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "stone/moss-wet-footing"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png",
+          "confidence": 0.94
+        },
+        {
+          "id": "shallow-water-band",
+          "kind": "gloss",
+          "description": "A narrow dark teal water band remains visible between the outer rim and central brazier island.",
+          "region": {
+            "x": 0.22,
+            "y": 0.64,
+            "width": 0.56,
+            "height": 0.15,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "water plane and material response",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "basin-ring/shallow-water-band"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/front.png",
+          "confidence": 0.92
+        },
+        {
+          "id": "four-post-shoe-clamps",
+          "kind": "fastener",
+          "description": "Four square timber canopy posts seat in broad dark iron shoes with visible clamp plates.",
+          "region": {
+            "x": 0.16,
+            "y": 0.35,
+            "width": 0.68,
+            "height": 0.48,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "post grounding and construction",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "canopy-frame/four-post-shoe-clamps"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png",
+          "confidence": 0.95
+        },
+        {
+          "id": "rope-post-collars",
+          "kind": "ridge",
+          "description": "Coarse rope collars wrap the service-side post and drawworks support.",
+          "region": {
+            "x": 0.2,
+            "y": 0.39,
+            "width": 0.56,
+            "height": 0.34,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "post attachment relief",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "canopy-frame/rope-post-collars"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/rear.png",
+          "confidence": 0.86
+        },
+        {
+          "id": "radial-teal-roof-courses",
+          "kind": "seam",
+          "description": "Layered oxidized teal roof courses radiate from a small central crown to an upturned polygonal eave.",
+          "region": {
+            "x": 0.15,
+            "y": 0.08,
+            "width": 0.72,
+            "height": 0.35,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "canopy silhouette and roof relief",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "canopy-roof/radial-teal-roof-courses"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png",
+          "confidence": 0.97
+        },
+        {
+          "id": "horned-corner-finials",
+          "kind": "contour",
+          "description": "Four restrained upturned horn tips punctuate the canopy corners without exceeding the eave footprint.",
+          "region": {
+            "x": 0.1,
+            "y": 0.12,
+            "width": 0.8,
+            "height": 0.28,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "canopy corner silhouette",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "canopy-roof/horned-corner-finials"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/front.png",
+          "confidence": 0.93
+        },
+        {
+          "id": "brass-ribs-and-crown",
+          "kind": "ridge",
+          "description": "Aged brass radial ribs converge on the roof crown and a short pointed finial.",
+          "region": {
+            "x": 0.22,
+            "y": 0.08,
+            "width": 0.56,
+            "height": 0.29,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "roof metal hierarchy",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "roof-rib-finial-system/brass-ribs-and-crown"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png",
+          "confidence": 0.91
+        },
+        {
+          "id": "brazier-rim-studs",
+          "kind": "fastener",
+          "description": "Even iron studs repeat around the central brazier rim.",
+          "region": {
+            "x": 0.36,
+            "y": 0.47,
+            "width": 0.28,
+            "height": 0.2,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "brazier construction cadence",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "central-brazier/brazier-rim-studs"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/front.png",
+          "confidence": 0.9
+        },
+        {
+          "id": "layered-warm-flame",
+          "kind": "emissive",
+          "description": "A compact yellow-white core sits inside an orange flame mantle and remains below the kettle.",
+          "region": {
+            "x": 0.44,
+            "y": 0.42,
+            "width": 0.14,
+            "height": 0.17,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "warm focal hierarchy",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "central-brazier/layered-warm-flame"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png",
+          "confidence": 0.96
+        },
+        {
+          "id": "kettle-chain-and-handle",
+          "kind": "linework",
+          "description": "A short center chain and broad arched handle suspend the dark kettle above the brazier.",
+          "region": {
+            "x": 0.39,
+            "y": 0.28,
+            "width": 0.23,
+            "height": 0.3,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "vertical service stack",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "hanging-kettle/kettle-chain-and-handle"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/front.png",
+          "confidence": 0.95
+        },
+        {
+          "id": "twin-fenlight-cage-bars",
+          "kind": "linework",
+          "description": "Two small teal fenlight cores are contained by dark square cages under opposite eaves.",
+          "region": {
+            "x": 0.13,
+            "y": 0.29,
+            "width": 0.75,
+            "height": 0.25,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "cool service-light containment",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "fenlight-pair/twin-fenlight-cage-bars"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png",
+          "confidence": 0.94
+        },
+        {
+          "id": "crank-spool-and-rope",
+          "kind": "ridge",
+          "description": "A side crank, horizontal spool, and straight rope drop identify the water-drawing station.",
+          "region": {
+            "x": 0.57,
+            "y": 0.39,
+            "width": 0.3,
+            "height": 0.38,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "drawworks readability",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "drawworks/crank-spool-and-rope"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/rear.png",
+          "confidence": 0.91
+        },
+        {
+          "id": "bucket-hoops",
+          "kind": "linework",
+          "description": "Two dark hoops and a small handle articulate the closed service bucket beside the rim.",
+          "region": {
+            "x": 0.63,
+            "y": 0.59,
+            "width": 0.2,
+            "height": 0.22,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "bucket construction",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "drawworks/bucket-hoops"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png",
+          "confidence": 0.87
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "note": "Architectural service object; character anatomy does not apply."
+    },
+    "sourceImage": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png"
+  },
+  "qualityContract": {
+    "qualityBar": "moderate",
+    "definitionOfDone": [
+      "A floor-seated 3.6 by 2.6 by 3.6 yard exterior cistern reads from three admitted views through its concentric stone-and-water base, four-post horned teal canopy, central brazier-kettle stack, twin fenlights, and crank service cue while remaining under the 800-triangle target and 1,200 hard ceiling."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 4,
+      "mesoComponents": 6,
+      "microFeatureGroups": 10,
+      "materialLayers": 7,
+      "repetitionSystems": 2,
+      "reviewViewpoints": 3
+    },
+    "featureGroups": [
+      {
+        "id": "basin-footprint",
+        "name": "Concentric stone and shallow-water footprint",
+        "required": true,
+        "qualityCriteria": [
+          "Two stone tiers and a visible shallow water band remain circular, low, and floor seated."
+        ],
+        "evidenceRefs": ["front", "rear", "hero"],
+        "failureModes": [
+          "base reads as a solid pedestal",
+          "water implies an open or traversable shaft"
+        ]
+      },
+      {
+        "id": "horned-canopy-silhouette",
+        "name": "Four-post radial canopy with horned corners",
+        "required": true,
+        "qualityCriteria": [
+          "Four grounded posts support a layered polygonal teal canopy with restrained upturned tips and a central crown."
+        ],
+        "evidenceRefs": ["front", "rear", "hero"],
+        "failureModes": [
+          "canopy reads as a generic cone or gazebo",
+          "posts float or lose square construction"
+        ]
+      },
+      {
+        "id": "fire-kettle-stack",
+        "name": "Central brazier, fire, chain, and kettle stack",
+        "required": true,
+        "qualityCriteria": [
+          "The warm brazier remains centered below a dark suspended kettle with a legible chain and handle."
+        ],
+        "evidenceRefs": ["front", "hero"],
+        "failureModes": ["kettle merges into the canopy", "warm core obscures metal containment"]
+      },
+      {
+        "id": "dual-light-hierarchy",
+        "name": "Warm central fire and paired cool fenlights",
+        "required": true,
+        "qualityCriteria": [
+          "Small teal fenlight cores stay inside dark cages and remain subordinate to the central warm fire."
+        ],
+        "evidenceRefs": ["front", "rear", "hero"],
+        "failureModes": [
+          "all lights share one color",
+          "unframed emissive geometry blooms over construction"
+        ]
+      },
+      {
+        "id": "drawworks-service-read",
+        "name": "Crank, spool, rope, and bucket service cue",
+        "required": true,
+        "qualityCriteria": [
+          "The compact drawworks remains attached to the rim and readable without blocking the clear circumference."
+        ],
+        "evidenceRefs": ["rear", "hero"],
+        "failureModes": [
+          "cistern reads only as a shrine",
+          "bucket or crank becomes loose lane clutter"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "outer diameter, canopy height, and eave-width ratios",
+      "four-post spacing and canopy corner-horn silhouette",
+      "brazier, kettle, chain, and crown vertical alignment",
+      "warm versus teal contained-light hierarchy",
+      "crank, spool, rope, bucket, and clear-circumference readability",
+      "wet stone, moss, roof, metal, water, warm, and fenlight value separation"
+    ],
+    "antiShallowSpecRules": [
+      "Do not model an open shaft, explorable interior, or simulated water volume.",
+      "Do not flatten the stone tiers, post shoes, roof courses, kettle, cages, or drawworks into textures.",
+      "Every inventoried detail maps to a named feature or override.",
+      "Group radial masonry, roof courses, studs, and cage bars under the triangle ceiling.",
+      "Keep the exterior circumference clear for world traversal."
+    ]
+  },
+  "authoringInstruction": "Assessment complete from admitted front, rear, and hero crops; side is a rejected near-duplicate. Follow the locked pass sequence and master-plan budget.",
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Fenbridge Mirelight Cistern stylized civic cistern canopy brazier kettle procedural low-poly",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "6857e5ab528b42ac12f4f411f862610a0bffce8e47aee3610a7603c318072fe8"
+    },
+    "matches": [
+      {
+        "record_id": "core.topology-intent",
+        "file_path": "grimoire/glossary/3d_vocabulary.md",
+        "heading": "Geometry And Topology",
+        "key_path": null,
+        "score": 5.143858634031,
+        "snippets": [
+          "Topology intent classifies a surface as hard-surface blockout, subdivision-ready, low-poly prop, organic deformed mesh, or alpha-card cluster."
+        ],
+        "source_refs": [
+          {
+            "path": "grimoire/glossary/3d_vocabulary.md",
+            "heading": "Geometry And Topology",
+            "key_path": null
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "grimoire/glossary/3d_vocabulary.md"
+          },
+          {
+            "kind": "notebooklm-research",
+            "ref": "notebooklm:4b03c2f9-8393-411f-b5b4-039ab9532843",
+            "note": "Validated generic schema vocabulary; numeric claims remain backed by local source_refs."
+          }
+        ]
+      },
+      {
+        "record_id": "core.shader-mapping-customshadermaterial-csm-weathering-hooks",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.rendering_shader_mapping[1]",
+        "score": 3.601401390438,
+        "snippets": [
+          "Extension library exposing csm_* output variables to inject procedural noise/masks into an otherwise-standard lit material, used for dynamic tarnish/patina effects. Thư viện mở rộng cung cấp các biến đầu ra csm_* để chèn nhiễu/mặt nạ thủ tục vào ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.rendering_shader_mapping[1]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      },
+      {
+        "record_id": "core.pbr-hand-painted-vs-pbr-texture",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.material_pbr[12]",
+        "score": 2.632304791455,
+        "snippets": [
+          "Distinguishes textures with lighting baked directly into color (static, stylized) from textures that respond dynamically to scene lighting via separate PBR channels. Phân biệt kết cấu có ánh sáng được nướng trực tiếp vào màu (tĩnh, cách điệu) ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.material_pbr[12]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      }
+    ]
+  }
+}

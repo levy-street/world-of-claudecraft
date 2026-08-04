@@ -191,6 +191,14 @@ export interface AbilityVfxEntityState {
   queuedOnSwing?: string | null;
 }
 
+interface AbilityVfxHeldSemanticState {
+  castingAbility: string | null;
+  queuedOnSwing: string | null;
+  auraStamps: Map<string, number>;
+  serial: number;
+  frameSeen: number;
+}
+
 // The cast-moment fx kinds this painter claims; everything else stays generic.
 const CAST_FX = new Set([
   'projectile',
@@ -335,11 +343,6 @@ const POINT_SEQ_REFRACTORY_SEC = 3;
 // ONE cast to the spam guard, never two. Matches the budget's rolling second.
 const CAST_CHARGE_WINDOW_SEC = 1;
 
-// Long-buff sighting state cadence: entities not synced for STALE seconds
-// drop their seen-aura entries, swept at most once per SWEEP seconds.
-const LONG_BUFF_SEEN_SWEEP_SEC = 2;
-const LONG_BUFF_SEEN_STALE_SEC = 5;
-
 // Zone-pulse debris family per spec palette (the per-pulse re-hit accent).
 const PULSE_BURST_BY_PALETTE: Record<string, ParticleBurstKind> = {
   fire: 'embers',
@@ -381,12 +384,11 @@ export class AbilityVfx {
   private spawned = 0; // primitives spawned by the CURRENT event (probe counter)
   // player classes whose spirit models were already warmed (first sighting)
   private warmedSpiritClasses = new Set<string>();
-  // Long-worn buff auras already seen per entity: the policy keeps their gain
-  // moment as a one-shot swirl on first sighting, so each id fires once while
-  // worn and replays after a drop. Ids prune in syncEntity the frame the aura
-  // is gone; entities not synced for a while sweep in update().
-  private longBuffSeen = new Map<number, { ids: string[]; stamp: number }>();
-  private longBuffSweepAt = 0;
+  // Held casts and auras survive presentation culling independently of the
+  // pooled render primitives. This prevents a persistent offscreen aura from
+  // looking newly acquired when its actor re-enters the camera.
+  private heldSemantic = new Map<number, AbilityVfxHeldSemanticState>();
+  private semanticFrame = 0;
 
   constructor(
     private deps: AbilityVfxDeps,
@@ -1098,8 +1100,26 @@ export class AbilityVfx {
   // buff-orbit bands alive while their aura ids persist. The fx engine sweeps
   // anything not refreshed this frame, so there is no teardown bookkeeping.
   // Allocation-free per call.
-  syncEntity(e: AbilityVfxEntityState): void {
+  syncEntity(e: AbilityVfxEntityState, renderEffects = true): void {
     const fx = this.deps.fx;
+    let held = this.heldSemantic.get(e.id);
+    if (!held) {
+      held = {
+        castingAbility: null,
+        queuedOnSwing: null,
+        auraStamps: new Map(),
+        serial: 0,
+        frameSeen: this.semanticFrame,
+      };
+      this.heldSemantic.set(e.id, held);
+    }
+    const castingWasHeld = e.castingAbility !== null && held.castingAbility === e.castingAbility;
+    const queuedWasHeld = e.queuedOnSwing != null && held.queuedOnSwing === e.queuedOnSwing;
+    if (!renderEffects) {
+      fx.sleepEntity(e.id);
+      this.latchHeldState(held, e);
+      return;
+    }
     // First sighting of a player of a class kicks the async loads for that
     // class's spirit-apparition GLBs, so the models are warm before a cast
     // needs them (a still-loading model's cast skips its spirit silently).
@@ -1124,15 +1144,14 @@ export class AbilityVfx {
         glowStrength = 1.2 * (full?.power ?? 1);
         // the local player is priority: guaranteed a windup slot even when
         // a crowded hub saturates the pool
-        if (
-          fx.windup(
-            e.id,
-            abilityVfxColor(spec),
-            progress,
-            style,
-            this.deps.localPlayerId?.() === e.id,
-          )
-        ) {
+        const windupStarted = fx.windup(
+          e.id,
+          abilityVfxColor(spec),
+          progress,
+          style,
+          this.deps.localPlayerId?.() === e.id,
+        );
+        if (windupStarted && !castingWasHeld) {
           this.spawned = 1;
           this.recordStat(e.castingAbility, false);
           // Charge bed on the FIRST frame of the cast: a nature/moon cast
@@ -1161,6 +1180,7 @@ export class AbilityVfx {
     let orbitTier = -1;
     for (let i = 0; i < e.auras.length; i++) {
       const aura = e.auras[i];
+      const auraWasHeld = held.auraStamps.has(aura.id);
       let auraId = auraSpecId(aura.id);
       // Victim-worn resolution: a hostile suffix (_slow/_root), or the fixed
       // fear id armed by Lingering Dread. A wornDebuff aura reads ONLY through
@@ -1184,13 +1204,14 @@ export class AbilityVfx {
       // ability_vfx_longbuff_core.ts): no orbit band, ground disc, shell, or
       // sustained transformative rim (Wildfang Rally, the one power >= 1.1
       // buff past the threshold, goes silent too; morph forms are exempt in
-      // the policy itself). Only the gain moment survives, as a one-shot swirl
-      // on first sighting (aura-driven exactly like the band swirl below, so
-      // it reads online and for wearers walking into interest range),
-      // replayed after a drop.
+      // the policy itself). Only the gain moment survives, as a one-shot
+      // swirl on the aura's first held sighting (the same held-semantic
+      // stamps the band swirl below rides, so it reads online, replays after
+      // a drop, and never replays on camera re-entry), and the aura stops
+      // consuming band and disc slots.
       if (!wornDebuff && !holdsBuffVfxWhileWorn(auraId, full)) {
         const buffish = full?.buff !== undefined || (full?.archetype ?? spec.a) === 'buff';
-        if (buffish && this.firstLongBuffSighting(e.id, aura.id)) {
+        if (buffish && !auraWasHeld) {
           this.deps.vfx.buffSwirl(e.id, planCast(spec, this.quality, 0).swirlColor);
           this.spawned = 1;
           this.recordStat(auraId, false);
@@ -1223,7 +1244,7 @@ export class AbilityVfx {
           const spin = full.palette !== 'physical' && full.palette !== 'blood';
           discStarted = fx.holdGroundAura(e.id, discs, rimColorOf(full, spec), spin);
           discs++;
-          if (discStarted) {
+          if (discStarted && !auraWasHeld) {
             this.spawned = 1;
             this.recordStat(auraId, false);
           }
@@ -1240,13 +1261,19 @@ export class AbilityVfx {
       );
       if (style === null) {
         // orbit-less buffs still get their gain moment off the disc's first frame
-        if (discStarted) this.deps.vfx.buffSwirl(e.id, planCast(spec, this.quality, 0).swirlColor);
+        if (discStarted && !auraWasHeld) {
+          this.deps.vfx.buffSwirl(e.id, planCast(spec, this.quality, 0).swirlColor);
+        }
         continue;
       }
       if (bands >= 3) continue;
       if (orbitTier < 0) orbitTier = this.biasFor(e.id, this.budget.peek(e.id, this.now()));
       const bandO = wornDebuff ? full?.debuff?.o : (full?.debuff?.o ?? full?.buff?.o);
       if (fx.orbit(e.id, style, abilityVfxColor(spec), bandO, orbitTier)) {
+        if (auraWasHeld) {
+          bands++;
+          continue;
+        }
         // The band just appeared (aura gained): pop the swirl here instead of
         // the aura event, which carries no ability id. Works online too, since
         // this reads the mirrored entity's auras, not sim events. Only for
@@ -1288,29 +1315,6 @@ export class AbilityVfx {
       }
       bands++;
     }
-    // Prune long-buff sighting state the frame an aura is gone, so a re-cast
-    // pops its gain swirl again. Indexed scans with swap-pop removal keep the
-    // per-frame path allocation-free; both lists are tiny (an entity wears a
-    // handful of auras).
-    const seen = this.longBuffSeen.get(e.id);
-    if (seen !== undefined) {
-      seen.stamp = this.now();
-      for (let s = seen.ids.length - 1; s >= 0; s--) {
-        const id = seen.ids[s];
-        let live = false;
-        for (let i = 0; i < e.auras.length; i++) {
-          if (e.auras[i].id === id) {
-            live = true;
-            break;
-          }
-        }
-        if (!live) {
-          seen.ids[s] = seen.ids[seen.ids.length - 1];
-          seen.ids.pop();
-        }
-      }
-      if (seen.ids.length === 0) this.longBuffSeen.delete(e.id);
-    }
     // On-next-swing queue (heroic-strike style): while the sim's queuedOnSwing
     // flag is armed, the queued ability's authored orbit rides the caster as
     // the empowerment tell - Reaver Strike's hot amber weaponGlow ember that
@@ -1326,13 +1330,17 @@ export class AbilityVfx {
       const qstyle = qspec ? asOrbitStyle(qfull?.buff?.orbit ?? qspec.bo) : null;
       if (qspec !== undefined && qstyle !== null) {
         if (orbitTier < 0) orbitTier = this.biasFor(e.id, this.budget.peek(e.id, this.now()));
-        if (fx.orbit(e.id, qstyle, abilityVfxColor(qspec), qfull?.buff?.o, orbitTier)) {
+        if (
+          fx.orbit(e.id, qstyle, abilityVfxColor(qspec), qfull?.buff?.o, orbitTier) &&
+          !queuedWasHeld
+        ) {
           this.spawned = 1;
           this.recordStat(e.queuedOnSwing, false);
         }
       }
     }
     if (glowStrength > 0) fx.bodyGlow(e.id, glowColor, glowStrength, glowSlow);
+    this.latchHeldState(held, e);
   }
 
   // Dev probe surface: the entity's current body-glow intensity.
@@ -1345,32 +1353,13 @@ export class AbilityVfx {
     return this.deps.fx.groundAuraCountOf(entityId);
   }
 
-  // The one-shot gain read for a long-worn buff (the long-buff policy): true
-  // exactly once per (entity, aura id) while the aura stays worn.
-  private firstLongBuffSighting(entityId: number, auraId: string): boolean {
-    let seen = this.longBuffSeen.get(entityId);
-    if (seen === undefined) {
-      seen = { ids: [], stamp: this.now() };
-      this.longBuffSeen.set(entityId, seen);
-    }
-    if (seen.ids.indexOf(auraId) >= 0) return false;
-    seen.ids.push(auraId);
-    return true;
-  }
-
   // Advances the primitive engine (ribbons, rings, decals, orbit/windup draw).
   update(dt: number): void {
     this.deps.fx.update(dt);
-    // Long-buff sighting state for entities that stopped syncing (despawn,
-    // left interest range) sweeps on a slow cadence; a swept wearer re-pops
-    // one swirl on re-sighting, exactly like a held band reappearing today.
-    const nowSec = this.now();
-    if (nowSec - this.longBuffSweepAt > LONG_BUFF_SEEN_SWEEP_SEC) {
-      this.longBuffSweepAt = nowSec;
-      for (const [id, entry] of this.longBuffSeen) {
-        if (nowSec - entry.stamp > LONG_BUFF_SEEN_STALE_SEC) this.longBuffSeen.delete(id);
-      }
+    for (const [entityId, held] of this.heldSemantic) {
+      if (held.frameSeen !== this.semanticFrame) this.heldSemantic.delete(entityId);
     }
+    this.semanticFrame++;
     // a broken beam channel (interrupt, death, retarget mid-cord) simply
     // expires: the cord stops being fed and no final impact ever lands
     if (this.beamChannels.size > 0) {
@@ -1378,6 +1367,17 @@ export class AbilityVfx {
       for (const [id, ch] of this.beamChannels) {
         if (nowSec - ch.lastAt > ch.every * 1.9 + 0.25) this.beamChannels.delete(id);
       }
+    }
+  }
+
+  private latchHeldState(held: AbilityVfxHeldSemanticState, e: AbilityVfxEntityState): void {
+    held.castingAbility = e.castingAbility;
+    held.queuedOnSwing = e.queuedOnSwing ?? null;
+    held.frameSeen = this.semanticFrame;
+    held.serial++;
+    for (let i = 0; i < e.auras.length; i++) held.auraStamps.set(e.auras[i].id, held.serial);
+    for (const [auraId, stamp] of held.auraStamps) {
+      if (stamp !== held.serial) held.auraStamps.delete(auraId);
     }
   }
 

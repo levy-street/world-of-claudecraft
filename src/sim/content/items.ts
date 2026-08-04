@@ -362,36 +362,42 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   // The horse's reins: the ONLY purchasable mount, sold by Stablemaster Marla
   // Hitchen for 10 gold after the player has learned Riding (ridingTrained gate
-  // in items.ts buyItem). Soulbound like every reins item, so owning it IS owning
-  // the horse (src/sim/mounts.ts mountOwned) and it never transfers.
-  // sellValue 0: bought, never sold back.
+  // in items.ts buyItem). Not soulbound: owning the item IS owning the horse
+  // (src/sim/mounts.ts mountOwned), and like every player reins it can trade
+  // hands. The buy path's mountOwned gate therefore only stops duplicates in
+  // your own containers: buy, give away, buy again is allowed, making this an
+  // elastic market good with a 10g vendor floor (deliberate; no copper mint,
+  // since it never sells back). noVendorSell + sellValue 0: an accidental
+  // 0-copper sale that buyback rotation could eat would destroy the mount.
   reins_valorsteed: {
     id: 'reins_valorsteed',
     name: 'Reins of the Valorsteed',
     kind: 'mount',
     mount: 'valorsteed',
     quality: 'common',
-    soulbound: true,
+    noVendorSell: true,
     noDiscard: true,
     sellValue: 0,
     buyValue: 100_000, // 10 gold in copper
   },
   // Collectible mount (Morthen the Gravecaller, The Hollow Crypt). Owning the
-  // reins item IS owning the mount (src/sim/mounts.ts mountOwned): soulbound,
-  // so ownership never transfers, and it stays valid from the bank too.
+  // reins item IS owning the mount (src/sim/mounts.ts mountOwned); it stays
+  // valid from the bank too, and it transfers like any other unbound item.
   reins_grag_bear: {
     id: 'reins_grag_bear',
     name: 'Reins of the Goliath Grag-Bear',
     kind: 'mount',
     mount: 'grag_bear',
     quality: 'rare',
-    soulbound: true,
+    noVendorSell: true,
     noDiscard: true,
     sellValue: 0,
   },
   // Developer-only mount. It is intentionally absent from vendors, quests,
   // creature loot, heroic loot, and Rift reward pools. Use /dev mounts or
   // /dev give reins_terrorspark_groundshaker while the feature remains under development.
+  // Unlike the player reins it STAYS soulbound: it has no acquisition path, so
+  // tradability would turn a dev grant into an economy leak.
   reins_terrorspark_groundshaker: {
     id: 'reins_terrorspark_groundshaker',
     name: 'Ignition Key: Terrorspark Groundshaker',
@@ -1008,9 +1014,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   raw_mirror_trout: {
     id: 'raw_mirror_trout',
     name: 'Raw Mirror Trout',
-    kind: 'food',
+    kind: 'junk',
     quality: 'common',
-    foodHp: 61,
     sellValue: 3,
   },
   tangled_weed: {
@@ -1020,38 +1025,36 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'poor',
     sellValue: 1,
   },
-  // --- fishing catches (see FISHING_TABLES below). Food heals scale with the
-  // depth/level of the zone you fish in; junk just vendors for coppers. ---
+  // --- fishing catches (see FISHING_TABLES below). Every raw catch is a
+  // cooking reagent (kind junk, no foodHp); cooked meals and vendor/conjured
+  // food are the sit-heal path. Grey junk (weed/boot) just vendors for copper.
+  // Zone tier still shapes which catch drops, not a raw heal curve. ---
   raw_river_perch: {
     id: 'raw_river_perch',
     name: 'Raw River Perch',
-    kind: 'food',
+    kind: 'junk',
     quality: 'common',
-    foodHp: 45,
     sellValue: 2,
   },
   raw_marsh_pike: {
     id: 'raw_marsh_pike',
     name: 'Raw Marsh Pike',
-    kind: 'food',
+    kind: 'junk',
     quality: 'common',
-    foodHp: 90,
     sellValue: 6,
   },
   raw_bog_eel: {
     id: 'raw_bog_eel',
     name: 'Raw Bog Eel',
-    kind: 'food',
+    kind: 'junk',
     quality: 'common',
-    foodHp: 90,
     sellValue: 6,
   },
   raw_frostgill_trout: {
     id: 'raw_frostgill_trout',
     name: 'Raw Frostgill Trout',
-    kind: 'food',
+    kind: 'junk',
     quality: 'common',
-    foodHp: 117,
     sellValue: 10,
   },
   // The id/name divergence here is permanent: the id shipped in v0.28.0 (ids
@@ -1061,9 +1064,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   raw_stonescale_carp: {
     id: 'raw_stonescale_carp',
     name: 'Raw Slatefin Carp',
-    kind: 'food',
+    kind: 'junk',
     quality: 'common',
-    foodHp: 117,
     sellValue: 10,
   },
   soggy_boot: {
@@ -1073,13 +1075,13 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'poor',
     sellValue: 1,
   },
-  // The prized rare catch, reelable from any water, a lucky hook.
+  // The prized rare catch, reelable from any water, a lucky hook. Cooking and
+  // rod-ladder reagent, never edible raw.
   glimmerfin_koi: {
     id: 'glimmerfin_koi',
     name: 'Sunglint Koi',
-    kind: 'food',
+    kind: 'junk',
     quality: 'uncommon',
-    foodHp: 117,
     sellValue: 75,
   },
   roasted_boar: {
@@ -2288,14 +2290,14 @@ export interface FishingEntry {
 
 // Catch rarity ladder (Professions 2.0): fishing proficiency selects
 // one of three per-zone tables (bands). As proficiency rises the weight shifts
-// out of the junk rows (tangled_weed / soggy_boot) and the empty-hook null row
-// and into the zone's food-fish rows (the cooking inputs). The moves are
-// strictly monotonic per band step (each food fish non-decreasing, each junk /
-// null row non-increasing), every band still sums to exactly 100, and the
-// empty-hook null row is always present with weight >= 1. Band boundaries and
-// selection live in src/sim/professions/fishing.ts (fishingBandFor);
-// FISHING_TABLES_BY_BAND[band][zoneId] is the resolved table, with the
-// eastbrook_vale row as the fallback for any zone without its own.
+// out of the grey-junk rows (tangled_weed / soggy_boot) and the empty-hook null
+// row and into the zone's cooking-catch rows (raw fish reagents). The moves are
+// strictly monotonic per band step (each cooking catch non-decreasing, each
+// grey junk / null row non-increasing), every band still sums to exactly 100,
+// and the empty-hook null row is always present with weight >= 1. Band
+// boundaries and selection live in src/sim/professions/fishing.ts
+// (fishingBandFor); FISHING_TABLES_BY_BAND[band][zoneId] is the resolved table,
+// with the eastbrook_vale row as the fallback for any zone without its own.
 //
 // THE AXIS THESE NINE CELLS ARE AUTHORED AGAINST (D9). A cell is not "how good
 // is this angler", it is "how far is this angler from what this water asks".
@@ -2308,16 +2310,17 @@ export interface FishingEntry {
 //   rare koi     1 / 3 / 6 by band, in every zone: the one row that reads
 //                skill alone, because it is the rod ladder's reagent and a
 //                seasoned angler should be the one who farms it
-//   junk         carries the zone's own flavor (the marsh keeps its boots) and
+//   grey junk    carries the zone's own flavor (the marsh keeps its boots) and
 //                swells with the shortfall, roughly doubling or worse against
 //                the same zone's at-requirement cell
-//   food fish    whatever is left, split in each zone's shipped proportion
+//   cooking catch whatever is left, split in each zone's shipped proportion
 //
 // So Eastbrook, which asks for nothing, keeps its shipped shape, and Thornpeak
-// at band 0 pays 55 empty hooks and 28 junk out of 100 to a level-1 angler who
-// borrowed a rod good enough to cast there. That is the whole point: the water
-// is the difficulty, not the reel click. tests/fishing_zones.test.ts derives
-// every number above from the schedule and fails on a cell edited past it.
+// at band 0 pays 55 empty hooks and 28 grey junk out of 100 to a level-1 angler
+// who borrowed a rod good enough to cast there. That is the whole point: the
+// water is the difficulty, not the reel click. tests/fishing_zones.test.ts
+// derives every number above from the schedule and fails on a cell edited past
+// it.
 export const FISHING_TABLES_BY_BAND: Record<string, FishingEntry[]>[] = [
   // Band 0 (proficiency 0-99). Eastbrook asks for band 0, so its cell is the
   // shipped starter table with the koi row moved onto the skill scale; the two
@@ -2374,7 +2377,7 @@ export const FISHING_TABLES_BY_BAND: Record<string, FishingEntry[]>[] = [
     ],
   },
   // Band 2 (proficiency 200, fishing's cap): Thornpeak's own band, and the
-  // only place every zone fishes at or above what it asks. Food fish
+  // only place every zone fishes at or above what it asks. Cooking catches
   // dominate, an empty hook is rare but never impossible, and the koi finally
   // pays out at the rate its recipes are priced against.
   {
@@ -2410,3 +2413,22 @@ export const FISHING_TABLES: Record<string, FishingEntry[]> = FISHING_TABLES_BY_
 
 // The rare catch worth a celebratory shout in the combat log.
 export const FISHING_RARE_ID = 'glimmerfin_koi';
+
+// Every raw fishing catch that is a cooking (and rod-ladder) reagent, never
+// edible. Pure id set for useItem refuse, material/UI reuse (Phase 2 labels
+// and icons), and tests that must not detect catches via kind === 'food'.
+// Locked ids: docs/raw-fish-cooking-reagents/state.md.
+export const RAW_COOKING_CATCH_IDS: ReadonlySet<string> = new Set([
+  'raw_mirror_trout',
+  'raw_river_perch',
+  'raw_marsh_pike',
+  'raw_bog_eel',
+  'raw_frostgill_trout',
+  'raw_stonescale_carp',
+  'glimmerfin_koi',
+]);
+
+/** True when `itemId` is a raw fishing catch (cooking reagent, refuse-use). */
+export function isRawCookingCatch(itemId: string): boolean {
+  return RAW_COOKING_CATCH_IDS.has(itemId);
+}

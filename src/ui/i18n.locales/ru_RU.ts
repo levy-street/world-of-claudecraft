@@ -2389,6 +2389,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.quest': 'Задание',
   'itemUi.kind.junk': 'Хлам',
   'itemUi.kind.fineMaterial': 'Отборный материал',
+  'itemUi.kind.material': 'Материал',
   'itemUi.kind.food': 'Еда',
   'itemUi.kind.drink': 'Напиток',
   'itemUi.kind.tool': 'Инструмент',
@@ -8241,6 +8242,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ключ зажигания: эфирный ховерцикл турнирного бойца',
   'entities.items.reins_shadowjump_toad.name': 'Поводья Кама-Кагэ, жабы теневых прыжков',
   'entities.items.reins_stormfeather_griffin.name': 'Поводья Штормокрыла Поднебесного',
+  'entities.items.reins_drakemaw_raptor.name': 'Поводья раптора Дрейкмо',
   'entities.items.reins_thunderstrut_gobbler.name': 'Поводья Громоступа, великого индюка',
   'entities.mobs.drowned_cantor.name': 'Утопший Кантор',
   'entities.mobs.reedbound_acolyte.name': 'Тростниковый Послушник',
@@ -9433,6 +9435,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_aether_hover_cycle': 'Эфирный ховерцикл турнирного бойца',
   'hudChrome.mounts.name_shadowjump_toad': 'Кама-Кагэ, жаба теневых прыжков',
   'hudChrome.mounts.name_stormfeather_griffin': 'Штормокрыл Поднебесный',
+  'hudChrome.mounts.name_drakemaw_raptor': 'Раптор Дрейкмо',
+  'hudChrome.mounts.desc_drakemaw_raptor': 'Приученный к седлу выводковый раптор из кальдеры Дрейкмо: сплошные жилы и бег, и от него всё ещё едва пахнет пеплом.',
   'hudChrome.mounts.name_thunderstrut_gobbler': 'Громоступ, великий индюк',
   'hudChrome.mounts.name_terrorspark_groundshaker': 'Страхоискр, сотрясатель земли',
   'hudChrome.mounts.desc_valorsteed':
@@ -10235,6 +10239,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.apprentice_wren.name': 'Ученица Рен',
   'entities.mobs.barrow_wight.name': 'Курганное умертвие',
   'entities.mobs.castaway_navigator.name': 'Штурман Сули',
+  'entities.mobs.dragonkin_egg.name': 'Яйцо драконида',
+  'entities.mobs.dragonkin_whelp.name': 'Драконид-детёныш',
+  'entities.mobs.dragonkin_broodguard.name': 'Выводковый страж драконидов',
+  'entities.mobs.drakemaw_broodlord.name': 'Выводковый лорд Дрейкмо',
   'entities.mobs.cindraleth_maw_matriarch.name': 'Синдралет, Матриарх Дрейкмо',
   'entities.mobs.drowned_deckhand.name': 'Утонувший матрос',
   'entities.mobs.fisher_bram.name': 'Рыбак Брам',
@@ -11035,6 +11043,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Торговцы слепы к происхождению: подписанная вещь продается NPC ровно по своей простой цене. Наценка за подпись существует только между игроками, что как раз и делает ее интересной: стопка руды-находки, подписанная знаменитым собирателем, Prime Cut с удачного сбора, шедевральный клинок с именем ремесленника, что с тех пор ушел на покой, все стоят столько, сколько говорит чья-то память.\n\nКнига деяний играет на том же инстинкте: Pristine Vein, Ancient Heartwood, Moonlit Bloom, A Perfect Specimen и Glimmer of Hope, это коллекционные отметки с нулевой Известностью, что существуют лишь ради доказательства, что миг случился с вами. Сохраните вещь, что заработала деяние, и вы держите расписку. Ничто из этого не сила; происхождение не покупает характеристик и не выигрывает боев, это бумажный след хороших дней игры.',
   'hudChrome.corpseHarvest.components.meat': 'Мясо',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (зачаровано)',
+  'hudChrome.materialHint.cookingCatch': 'Ингредиент для готовки. Сначала нужно приготовить.',
   'hudChrome.materialHint.fineGrade':
     'Отборный сорт. Добывается на жиле полного уровня инструментом выше самого материала и засчитывается вместо обычной версии везде, где она требуется.',
   'hudChrome.materialHint.arcaneDust':

@@ -797,6 +797,7 @@ export const hudChromeStrings = {
     name_stormfeather_griffin: 'Sky-Reach Stormfeather',
     name_thunderstrut_gobbler: 'Thunderstrut the Grand Gobbler',
     name_terrorspark_groundshaker: 'Terrorspark Groundshaker',
+    name_drakemaw_raptor: 'Drakemaw Raptor',
     desc_valorsteed: 'A hardy, sure-footed steed that provides enhanced travel speed.',
     desc_grag_bear: 'A hardy, sure-footed bear that provides enhanced travel speed.',
     desc_stalkglider_snail: 'A hearty, slow-burning snail that provides enhanced travel speed.',
@@ -810,6 +811,8 @@ export const hudChromeStrings = {
       'A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead.',
     desc_terrorspark_groundshaker:
       'A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.',
+    desc_drakemaw_raptor:
+      'A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash.',
   },
   // The riding lesson at the Highwatch stables (q_riding_lessons): Stablemaster
   // Marla lends the player a training Valorsteed for the paddock race. Finishing
@@ -2223,6 +2226,10 @@ export const hudChromeStrings = {
     // one of them, and nine copies would be nine chances to drift.
     fineGrade:
       'Fine grade. Gathered from a full-tier vein with a tool ranked above the material, and counts as the ordinary version wherever one is required.',
+    // One key shared by every raw fishing catch (RAW_COOKING_CATCH_IDS): cooking
+    // reagents only; never edible raw. Painted via createTooltipLine, not the
+    // materialHintLine HTML-string path.
+    cookingCatch: 'Cooking ingredient. Must be cooked before eating.',
     arcaneDust: 'Enchanting reagent. Disenchanted from common and uncommon gear.',
     arcaneEssence: 'Enchanting reagent. Disenchanted from rare gear.',
     arcaneShard: 'Enchanting reagent. Disenchanted from epic and legendary gear.',

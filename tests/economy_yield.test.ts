@@ -60,6 +60,12 @@ function isTrash(template: MobTemplate): boolean {
     !template.boss &&
     !template.dummy &&
     !template.ambient &&
+    // A puzzle-object mob (xpMult 0: the 1 HP dragonkin egg, the spider egg-sac
+    // pattern) is not trash to be farmed and pays neither XP nor coin BY
+    // DESIGN: the fight it hatches is the reward, and a lootable shell would
+    // sparkle every corpse in a clutch. Same principled gate
+    // tests/progression.test.ts uses for its unconditional-loot rule.
+    template.xpMult !== 0 &&
     template.respawnMult === undefined
   );
 }

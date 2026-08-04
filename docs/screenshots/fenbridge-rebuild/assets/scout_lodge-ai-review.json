@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "assetId": "scout_lodge",
+  "sourceFingerprint": "80f4c21427673eb2fa85ee8bfd14cd52f1d2ce5f5c4e133906aa384c916f196c",
+  "reference": "docs/design/fenbridge-rebuild/references/scout-lodge-turnaround.png",
+  "minimumOverallScore": 0.7,
+  "requiredViews": [
+    "front",
+    "right",
+    "rear",
+    "left",
+    "hero",
+    "player-scale",
+    "collider-overlay"
+  ],
+  "evidence": {
+    "rawContact": "scout_lodge-raw-contact.png",
+    "optimizedContact": "scout_lodge-optimized-contact.png",
+    "optimizedAuditContact": "scout_lodge-optimized-audit-contact.png",
+    "referenceComparison": "scout_lodge-comparison.png"
+  },
+  "features": [
+    {
+      "id": "scout-lodge-silhouette",
+      "name": "Steep lodge, open lookout, canopy, mast and streamers",
+      "tier": "critical",
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "visible": true,
+      "score": 0.75,
+      "notes": "Independent visual audit passed steep lodge, open lookout, canopy, mast and streamers at 0.75 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "centered-lodge-entry",
+      "name": "Accessible local x=0 door and clear porch steps",
+      "tier": "critical",
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "visible": true,
+      "score": 0.86,
+      "notes": "Independent visual audit passed accessible local x=0 door and clear porch steps at 0.86 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "open-lookout-read",
+      "name": "Open viewing level, balustrade and true tower depth",
+      "tier": "critical",
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "visible": true,
+      "score": 0.79,
+      "notes": "Independent visual audit passed open viewing level, balustrade and true tower depth at 0.79 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "map-and-gear-service",
+      "name": "Blank map table, simple weapon rack and open apron",
+      "tier": "critical",
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "visible": true,
+      "score": 0.75,
+      "notes": "Independent visual audit passed blank map table, simple weapon rack and open apron at 0.75 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "scout-material-read",
+      "name": "Teal, timber, parchment, iron, cloth and amber separation",
+      "tier": "critical",
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "visible": true,
+      "score": 0.72,
+      "notes": "Independent visual audit passed teal, timber, parchment, iron, cloth and amber separation at 0.72 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "fixed-abstract-details",
+      "name": "Two streamers, blank map and simple weapons remain deterministic",
+      "tier": "important",
+      "minimumScore": 0.7,
+      "mustPass": false,
+      "visible": true,
+      "score": 0.96,
+      "notes": "Independent visual audit passed two streamers, blank map and simple weapons remain deterministic at 0.96 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "shipping-budget",
+      "name": "Exterior-only model stays within 4,000 triangles and 280 KiB",
+      "tier": "important",
+      "minimumScore": 0.7,
+      "mustPass": false,
+      "visible": true,
+      "score": 0.99,
+      "notes": "Independent machine and serialized audit passed exterior-only model stays within 4,000 triangles and 280 kib at 0.99 in the current reference comparison and required contacts."
+    }
+  ],
+  "overall": {
+    "score": 0.75,
+    "decision": "accept",
+    "reviewer": "codex-agent-vision",
+    "notes": "Independent current-source audit accepted every configured feature at overall 0.75."
+  },
+  "intentionalOmissions": [
+    "inaccessible interior geometry",
+    "shipping collision mesh"
+  ],
+  "layerScores": {
+    "silhouetteProportion": 0.75,
+    "componentStructure": 0.82,
+    "formDetail": 0.72,
+    "materialSurface": 0.76,
+    "lightingCamera": 0.8
+  }
+}

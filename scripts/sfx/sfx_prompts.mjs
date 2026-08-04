@@ -124,6 +124,12 @@ export const SFX = [
     custom: true,
   },
   {
+    // The Drakemaw Raptor's sprint: the gobbler's two-legged gallop donor,
+    // pitched down in sfx_speed_map.json so the heavier raptor reads deeper.
+    key: 'mount_run_drakemaw_raptor',
+    custom: true,
+  },
+  {
     key: 'move_jump',
     custom: true,
     duration: 0.5,

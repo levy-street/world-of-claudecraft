@@ -1,67 +1,74 @@
 // @vitest-environment happy-dom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { EntityView } from '../src/render/renderer';
+import type { NameplateCanvasState } from '../src/render/nameplate_canvas';
+import type { NameplatePlan } from '../src/render/nameplate_view';
+import type { Entity } from '../src/sim/types';
 
-interface StaticNameplateInvoker {
-  setNameplateStatic(
-    view: EntityView,
-    name: string,
-    color: string | null,
-    hpDisplay: string,
-    marker: string,
-    markerClass: string,
-    opacity: string,
-    frame?: string,
-    guild?: string,
-    devOutline?: string | null,
-    isAi?: boolean,
+interface ContentResolver {
+  world: { markerFor: () => null };
+  resolveContent(
+    state: NameplateCanvasState,
+    entity: Entity,
+    player: Entity,
+    plan: NameplatePlan,
+    showOwnNameplate: boolean,
+    showDevBadges: boolean,
   ): void;
 }
 
-interface TitleNameplateInvoker {
-  setNameplateTitle(view: EntityView, titleId: string | null | undefined): void;
-}
-
-function view(): EntityView {
-  const div = () => document.createElement('div');
+function player(over: Partial<Entity> & { id: number }): Entity {
   return {
-    nameEl: div(),
-    hpBar: div(),
-    markerEl: div(),
-    nameplate: div(),
-    guildEl: div(),
-    aiEl: document.createElement('span'),
-    titleEl: div(),
-    nameplateSig: '',
-    nameplateStaticName: '',
-    nameplateStaticColor: null,
-    nameplateStaticHpDisplay: '',
-    nameplateStaticMarker: '',
-    nameplateStaticMarkerClass: '',
-    nameplateStaticOpacity: '',
-    nameplateStaticFrame: '',
-    nameplateStaticGuild: '',
-    nameplateStaticDevOutline: null,
-    nameplateStaticAi: false,
-    nameplateStaticI18nRevision: 0,
-    titleSig: '',
-    nameplateTitleId: '',
-    nameplateTitleI18nRevision: 0,
-  } as unknown as EntityView;
+    kind: 'player',
+    name: 'Streamer',
+    templateId: 'warrior',
+    pos: { x: 0, y: 0, z: 0 },
+    scale: 1,
+    level: 10,
+    hp: 100,
+    maxHp: 100,
+    dead: false,
+    lootable: false,
+    hostile: false,
+    ownerId: null,
+    guild: '',
+    auras: [],
+    questIds: [],
+    targetId: null,
+    aggroTargetId: null,
+    comboPoints: 0,
+    comboTargetId: null,
+    castingAbility: null,
+    castTotal: 0,
+    castRemaining: 0,
+    channeling: false,
+    ...over,
+  } as unknown as Entity;
 }
 
-async function pseudoPainter() {
+async function pseudoHarness() {
   window.history.replaceState({}, '', '/?lang=en_XA');
   vi.resetModules();
-  const [{ NameplatePainter }, i18n] = await Promise.all([
+  const [{ NameplatePainter }, { createNameplateCanvasState }, i18n] = await Promise.all([
     import('../src/render/nameplate_painter'),
+    import('../src/render/nameplate_canvas'),
     import('../src/ui/i18n'),
   ]);
-  return {
-    painter: Object.create(NameplatePainter.prototype) as InstanceType<typeof NameplatePainter>,
-    setLanguage: i18n.setLanguage,
-  };
+  const painter = Object.create(NameplatePainter.prototype) as ContentResolver;
+  painter.world = { markerFor: () => null };
+  const me = player({ id: 1, name: 'Me' });
+  const target = player({ id: 2, aiAccount: true, title: 'prog_veteran' });
+  const state = createNameplateCanvasState();
+  const plan = {
+    hidden: false,
+    anchorYOffset: 0,
+    urgent: true,
+    hasOverheadEmote: false,
+    threat: false,
+    comboPips: 0,
+  } satisfies NameplatePlan;
+  const resolve = () => painter.resolveContent(state, target, me, plan, false, true);
+  return { state, resolve, setLanguage: i18n.setLanguage };
 }
 
 beforeEach(() => {
@@ -73,56 +80,16 @@ afterEach(() => {
   vi.resetModules();
 });
 
-describe('nameplate language-only transitions', () => {
-  it('repaints the localized AI tag when pseudo English changes to English', async () => {
-    const { painter, setLanguage } = await pseudoPainter();
-    const v = view();
-    const staticPainter = painter as unknown as StaticNameplateInvoker;
-
-    staticPainter.setNameplateStatic(
-      v,
-      'Streamer',
-      '#fff',
-      '',
-      '',
-      'np-marker',
-      '1',
-      '',
-      '',
-      null,
-      true,
-    );
-    expect(v.aiEl.textContent).toBe('[[ÁÍ]]');
+describe('canvas nameplate language-only transitions', () => {
+  it('re-resolves localized AI and deed-title sprites after a language change', async () => {
+    const { state, resolve, setLanguage } = await pseudoHarness();
+    resolve();
+    expect(state.aiLabel).toBe('[[ÁÍ]]');
+    expect(state.title).toBe('[Ʋéţéŕáñ]');
 
     setLanguage('en');
-    staticPainter.setNameplateStatic(
-      v,
-      'Streamer',
-      '#fff',
-      '',
-      '',
-      'np-marker',
-      '1',
-      '',
-      '',
-      null,
-      true,
-    );
-
-    expect(v.aiEl.textContent).toBe('[AI]');
-  }, 30_000);
-
-  it('repaints the deed title when only pseudo activation changes', async () => {
-    const { painter, setLanguage } = await pseudoPainter();
-    const v = view();
-    const titlePainter = painter as unknown as TitleNameplateInvoker;
-
-    titlePainter.setNameplateTitle(v, 'prog_veteran');
-    expect(v.titleEl.textContent).toBe('[Ʋéţéŕáñ]');
-
-    setLanguage('en');
-    titlePainter.setNameplateTitle(v, 'prog_veteran');
-
-    expect(v.titleEl.textContent).toBe('Veteran');
+    resolve();
+    expect(state.aiLabel).toBe('[AI]');
+    expect(state.title).toBe('Veteran');
   }, 30_000);
 });

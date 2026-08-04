@@ -1133,6 +1133,12 @@ export function handleDeath(
   e.fishBiteAtTick = 0;
   e.fishReelDeadlineTick = 0;
   e.fishCastZoneId = '';
+  // A dragonkin egg that DIES here (a shot, the chain ripple, the broodlord
+  // shout, the proximity ambush: every real break runs through dealDamage)
+  // is CRACKED: the brood pass hatches only flagged corpses, so an egg
+  // fiat-flagged dead outside the damage path (the test-suite despawnMobs
+  // idiom, admin sweeps) never detonates the clutch (mob/dragonkin_brood.ts).
+  if (e.kind === 'mob' && MOBS[e.templateId]?.broodEgg) e.broodCracked = true;
   ctx.emit({ type: 'death', entityId: e.id, killerId: killer?.id ?? -1 });
 
   // a dead mob keeps no raid marker — respawnMob reuses the same entity id,

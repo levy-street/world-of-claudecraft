@@ -52,6 +52,7 @@ import {
   DROWNED_LITANY_MODULES,
 } from './content/delves';
 import {
+  DRAKELANDS_BROOD_CAMPS,
   DRAKELANDS_CAMPS,
   DRAKELANDS_ITEMS,
   DRAKELANDS_MOBS,
@@ -146,7 +147,7 @@ import {
   NIGHTBLOOM_ROADS,
   NIGHTBLOOM_ZONE,
 } from './content/nightbloom';
-import { NOTICEBOARDS } from './content/noticeboards';
+import { MUSTER_BOARDS, NOTICEBOARDS } from './content/noticeboards';
 import {
   PALMREACH_CAMPS,
   PALMREACH_ESCORTS,
@@ -497,6 +498,9 @@ export const CAMPS: CampDef[] = [
   // LAST so no earlier camp's world-gen rng draw moves (see the draw-order
   // comment at the top of this array).
   ...EVERGARDEN_KNIGHT_CAMPS,
+  // The Drakelands dragonkin brood belt (v0.35 rework) arrived after the
+  // knights: same append-last rule, so every camp above keeps its draws.
+  ...DRAKELANDS_BROOD_CAMPS,
 ];
 
 // Escort quest runs (src/sim/escort.ts): defs authored per realm, merged here
@@ -707,6 +711,7 @@ export const BUILTIN_WORLD: WorldContent = {
     stations: STATIONS,
     mailboxes: MAILBOXES,
     noticeboards: NOTICEBOARDS,
+    musterBoards: MUSTER_BOARDS,
     graveyards: OVERWORLD_GRAVEYARDS,
   },
   // invisible collision walls: the moderation cage plus the Last Keep's

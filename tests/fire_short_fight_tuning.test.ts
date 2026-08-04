@@ -397,11 +397,24 @@ describe('talented burst window (Monte Carlo 2026-07-24, designer round 2026-07-
 // measured). Pre-fix ratio at these seeds: ~2.8x, so both fire assertions
 // fail loudly on the old sim.
 describe('sustained parity, entire fight (Monte Carlo follow-up 2026-07-24)', () => {
-  // Five seeds: three was small enough for the parity floor below to flip on
-  // pure crit luck whenever the shared rng stream forks (any world-content
-  // change forks it). Nine-seed probes put fire at 1.05 to 1.08 over frost;
-  // five keeps the estimator honest at CI-friendly runtime.
-  const SUSTAINED_SEEDS = [41, 101, 115, 7, 57];
+  // The pool is the first ten seeds BY RULE, generated rather than listed, so no
+  // member can be swapped for a luckier one: only its SIZE is a decision (same
+  // idiom as the SEEDS pool in tests/lockpick_gen.test.ts). Three seeds was small
+  // enough for the parity floor below to flip on pure crit luck whenever the
+  // shared rng stream forks (any world-content change forks it), and five turned
+  // out to be too, for the same reason. The floor is exact parity by owner ruling,
+  // so an estimator this noisy decides the verdict on proc luck rather than on
+  // balance; widening the pool is the fix, never discounting the floor.
+  //
+  // Sweep on this tree, talented fire vs talented frost mean DPS over the pool:
+  // 60s reads 208.8 vs 189.6 and 120s reads 212.5 vs 193.0, both ratio 1.10, so
+  // the parity floor clears by 10 points at each duration and the 1.25 ceiling by
+  // 15. Seeds 3 (both durations) and 1 (60s alone) sit BELOW parity on their own
+  // and stay in: the assertion is a claim about the MEAN, and dropping a pool's
+  // unlucky members is the seed-shopping a rule-defined pool exists to prevent
+  // (tests/chronomancy_balance.test.ts keeps its own sub-target seed for the same
+  // reason).
+  const SUSTAINED_SEEDS = Array.from({ length: 10 }, (_, i) => i + 1);
   const SUSTAINED_CEILING = 1.25; // x talented frost, per duration
   // Owner ruling 2026-07-25: frost is the PvP-leaning spec, so fire must
   // NEVER fall below it in PvE damage, at any fight length. The floor is

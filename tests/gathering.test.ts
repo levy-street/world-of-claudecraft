@@ -264,12 +264,17 @@ describe('isHarvestableCorpse', () => {
     // 36 since the farm-economy pass: beast, spider and reptile trash pays in
     // harvestable components instead of coin, so 15 previously untagged
     // templates gained mapped tags (tests/economy_yield.test.ts enforces it).
-    expect(included).toHaveLength(36);
-    // ...and the untagged templates are counted rather than assumed: 184 of them
+    // 39 with the Drakelands dragonkin brood: the broodguard, the whelp and the
+    // broodlord are skinnable scaled hide like every other dragonkin corpse
+    // (the egg clutch is NOT: a 1 HP shell yields nothing at all).
+    expect(included).toHaveLength(39);
+    // ...and the untagged templates are counted rather than assumed: 185 of them
     // ship, all excluded before this change and all excluded after it, which is
-    // the path fen_troll now joins instead of getting one of its own.
+    // the path fen_troll now joins instead of getting one of its own. (184 before
+    // the brood: its three tagged corpses are counted above, and the untagged
+    // dragonkin egg lands here.)
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
-    expect(untagged).toHaveLength(184);
+    expect(untagged).toHaveLength(185);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read
@@ -477,7 +482,13 @@ describe('yieldingFocusComponents and harvestConcentrationBonus (#2514)', () => 
     // that changed nothing would pass both bounds above. A CORPUS CENSUS like
     // the mixed-template count in tests/mob_component_tags: v0.32.0 authored 30
     // against the release bestiary, and this branch's extra corpses raise two
-    // more picks. The two bounds inside the loop are the real assertions.
+    // more picks. The three tagged dragonkin brood corpses add NOTHING here:
+    // they carry hide+fang, both mapped, so every harvestable pick on them
+    // concentrates exactly as the pre-#2514 body did and none of them raises.
+    // (They briefly advertised claw and horn, which are unmapped, and did raise
+    // eight picks; the same commit that took those tags back out of the mixed
+    // census left this pin at 40 by oversight.)
+    // The two bounds inside the loop are the real assertions.
     expect(raised).toBe(32);
   });
 

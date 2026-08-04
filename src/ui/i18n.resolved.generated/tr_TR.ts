@@ -997,6 +997,7 @@ export const tr_TR: EnTranslations = {
       "name_stormfeather_griffin": "Gökyüzü Erişimli Fırtınatüy",
       "name_thunderstrut_gobbler": "Gürlemeadım, Büyük Hindi",
       "name_terrorspark_groundshaker": "Dehşetkıvılcım, Yer Sarsan",
+      "name_drakemaw_raptor": "Drakemaw Raptor",
       "desc_valorsteed": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir küheylan.",
       "desc_grag_bear": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir ayı.",
       "desc_stalkglider_snail": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve yavaş yanan bir salyangoz.",
@@ -1004,7 +1005,8 @@ export const tr_TR: EnTranslations = {
       "desc_shadowjump_toad": "Her arazi türünü aşan, şimşek hızındaki gölgeli sıçramalarla eğitilmiş, dev ve sağlam adımlı bir kurbağa.",
       "desc_stormfeather_griffin": "Rün nallı pençeleriyle yerde süzülen, kanatları katlı, asil bir fırtına grifonu.",
       "desc_thunderstrut_gobbler": "Uyanan Zirve'den kabararak inen, kuyruğu bir fırtına bulutu gibi açılmış devasa bir fırtına hindisi.",
-      "desc_terrorspark_groundshaker": "Ağır paletleri, büyük çaplı bir topu ve korkusuz pilotlar için yapılmış bir eyeri olan kompakt zırhlı bir makine."
+      "desc_terrorspark_groundshaker": "Ağır paletleri, büyük çaplı bir topu ve korkusuz pilotlar için yapılmış bir eyeri olan kompakt zırhlı bir makine.",
+      "desc_drakemaw_raptor": "A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash."
     },
     "mountTraining": {
       "mountPrompt": "Eğitim Yiğit Küheylanına binmek için {key} tuşuna bas.",
@@ -1989,6 +1991,7 @@ export const tr_TR: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Kaliteli derece. Malzemenin üstünde kademelenmiş bir aletle tam kademeli bir damardan toplanır ve sıradan sürümün gerektiği her yerde onun yerine sayılır.",
+      "cookingCatch": "Cooking ingredient. Must be cooked before eating.",
       "arcaneDust": "Sıradan ve az bulunur eşyalardan büyü bozularak elde edilen büyü malzemesi.",
       "arcaneEssence": "Nadir eşyalardan büyü bozularak elde edilen büyü malzemesi.",
       "arcaneShard": "Destansı ve efsanevi eşyalardan büyü bozularak elde edilen büyü malzemesi.",
@@ -7134,6 +7137,7 @@ export const tr_TR: EnTranslations = {
       "quest": "Görev Eşyası",
       "junk": "Döküntü",
       "fineMaterial": "Kaliteli Malzeme",
+      "material": "Material",
       "food": "Yiyecek",
       "drink": "İçecek",
       "tool": "Alet",
@@ -10072,6 +10076,9 @@ export const tr_TR: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Kontak Anahtarı: Dehşetkıvılcım, Yer Sarsan"
       },
+      "reins_drakemaw_raptor": {
+        "name": "Reins of the Drakemaw Raptor"
+      },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"
       },
@@ -11246,6 +11253,18 @@ export const tr_TR: EnTranslations = {
       },
       "cindraleth_maw_matriarch": {
         "name": "Ağız Anaerkili Cindraleth"
+      },
+      "dragonkin_egg": {
+        "name": "Dragonkin Egg"
+      },
+      "dragonkin_whelp": {
+        "name": "Dragonkin Whelp"
+      },
+      "dragonkin_broodguard": {
+        "name": "Dragonkin Broodguard"
+      },
+      "drakemaw_broodlord": {
+        "name": "Drakemaw Broodlord"
       },
       "gilded_stag": {
         "name": "Yaldızlı Geyik"

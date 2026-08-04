@@ -749,6 +749,11 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   if (template.rally) e.rallyTimer = template.rally.every;
   // Telegraph the first War Cadence the same way: one full interval after engage.
   if (template.warcry) e.warcryTimer = template.warcry.every;
+  // A template that takes its PASSIVE idle draws off the shared world stream
+  // (MobTemplate.offStreamIdle) carries the contract from birth, through EVERY spawn
+  // path: the camp loop, a brood egg hatching a whelp at runtime, a dev spawn. Draws
+  // no rng itself, so no spawn's draw position moves.
+  if (template.offStreamIdle) e.offStreamRng = true;
   return e;
 }
 

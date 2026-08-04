@@ -3,6 +3,11 @@
 // trolls dig into barrow-mounds, and Vael the Fogbinder waits in the
 // Sunken Bastion.
 
+import {
+  FENBRIDGE_LAYOUT,
+  FENBRIDGE_NPC_PLACEMENTS_BY_ID,
+  palisadeSegmentMirrored,
+} from '../fenbridge_layout';
 import { WORK_ORDER_CADENCE_TICKS } from '../professions/cadence';
 import type {
   CampDef,
@@ -26,8 +31,13 @@ export const ZONE2_ZONE: ZoneDef = {
   zMax: 540,
   levelRange: [6, 13],
   biome: 'marsh',
-  hub: { x: 0, z: 300, radius: 20, name: 'Fenbridge' },
-  graveyard: { x: -18, z: 286 },
+  hub: {
+    x: FENBRIDGE_LAYOUT.hub.center.x,
+    z: FENBRIDGE_LAYOUT.hub.center.z,
+    radius: FENBRIDGE_LAYOUT.hub.radius,
+    name: 'Fenbridge',
+  },
+  graveyard: { ...FENBRIDGE_LAYOUT.services.graveyard.position },
   lakes: [DEEPFEN_SHALLOWS_LAKE, { x: 60, z: 380, radius: 25 }, { x: -40, z: 450, radius: 20 }],
   pois: [
     { x: 0, z: 300, label: 'Fenbridge', id: 'fenbridge' },
@@ -48,30 +58,7 @@ export const ZONE2_ZONE: ZoneDef = {
 // so the road never dips under the waterline (tests/progression.test.ts
 // samples every road against the heightfield to lock this in).
 export const ZONE2_ROADS: { x: number; z: number }[][] = [
-  [
-    { x: 0, z: 80 },
-    { x: 0, z: 180 },
-    { x: -8, z: 240 },
-    { x: 0, z: 300 },
-  ], // Eastbrook -> Fenbridge
-  [
-    { x: 4, z: 308 },
-    { x: 45, z: 336 },
-    { x: 92, z: 350 },
-    { x: 102, z: 392 },
-    { x: 90, z: 420 },
-  ], // -> Drowned Chapel
-  [
-    { x: -6, z: 308 },
-    { x: -40, z: 370 },
-    { x: -80, z: 420 },
-  ], // -> Troll Mounds
-  [
-    { x: 2, z: 312 },
-    { x: 10, z: 400 },
-    { x: 20, z: 470 },
-    { x: 45, z: 515 },
-  ], // -> cult camp -> Bastion
+  ...FENBRIDGE_LAYOUT.roads.map((road) => road.points.map((point) => ({ ...point }))),
 ];
 
 // ---------------------------------------------------------------------------
@@ -371,7 +358,11 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       { itemId: 'chipped_tusk', chance: 1 },
     ],
     purgeOnHit: { chance: 0.3, name: 'Spellgnaw' },
-    scale: 1.3,
+    // Playtest bump, 75% over the first cut: the Glutton should loom over the
+    // Mirefen trolls he feeds beside. Past the scale-2 threshold his melee
+    // reach needs the bespoke profile in mob_combat.ts (the wildheart whiff
+    // lesson) and his gait refs are re-measured for the bigger stride.
+    scale: 2.275,
     color: 0x145a32,
   },
   gravecaller_cultist: {
@@ -608,8 +599,8 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     id: 'warden_fenwick',
     name: 'Warden Fenwick',
     title: 'Warden of Fenbridge',
-    pos: { x: 3, z: 304 },
-    facing: Math.PI,
+    pos: { ...FENBRIDGE_NPC_PLACEMENTS_BY_ID.warden_fenwick.position },
+    facing: FENBRIDGE_NPC_PLACEMENTS_BY_ID.warden_fenwick.facing,
     color: 0x7e5109,
     questIds: [
       'q_fenbridge_muster',
@@ -625,8 +616,8 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     id: 'brother_aldric_fen',
     name: 'Brother Aldric',
     title: 'Priest of the Vale',
-    pos: { x: -8, z: 296 },
-    facing: 0.8,
+    pos: { ...FENBRIDGE_NPC_PLACEMENTS_BY_ID.brother_aldric_fen.position },
+    facing: FENBRIDGE_NPC_PLACEMENTS_BY_ID.brother_aldric_fen.facing,
     color: 0xf7f9f9,
     questIds: [
       'q_aldrics_fallen_star',
@@ -646,8 +637,8 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     id: 'provisioner_hale',
     name: 'Provisioner Hale',
     title: 'Provisioner',
-    pos: { x: -4, z: 308 },
-    facing: Math.PI / 2,
+    pos: { ...FENBRIDGE_NPC_PLACEMENTS_BY_ID.provisioner_hale.position },
+    facing: FENBRIDGE_NPC_PLACEMENTS_BY_ID.provisioner_hale.facing,
     color: 0x1e8449,
     questIds: ['q_prowler_pelts', 'q_fen_supplies', 'q_the_codfather', 'q_grubjaw'],
     vendorItems: [
@@ -689,8 +680,8 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     id: 'herbalist_yara',
     name: 'Herbalist Yara',
     title: 'Herbalist',
-    pos: { x: 10, z: 295 },
-    facing: -Math.PI / 2,
+    pos: { ...FENBRIDGE_NPC_PLACEMENTS_BY_ID.herbalist_yara.position },
+    facing: FENBRIDGE_NPC_PLACEMENTS_BY_ID.herbalist_yara.facing,
     color: 0x7d3c98,
     questIds: ['q_widows', 'q_broodmother'],
     greeting: 'Mind the thicket west of the road. The webs are thick as sailcloth this season.',
@@ -699,8 +690,8 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     id: 'scout_maren',
     name: 'Scout Maren',
     title: "Marshal's Scout",
-    pos: { x: 6, z: 312 },
-    facing: -0.6,
+    pos: { ...FENBRIDGE_NPC_PLACEMENTS_BY_ID.scout_maren.position },
+    facing: FENBRIDGE_NPC_PLACEMENTS_BY_ID.scout_maren.facing,
     color: 0x7d6608,
     questIds: ['q_troll_fetishes', 'q_cult_camp', 'q_olen'],
     greeting:
@@ -710,10 +701,8 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     id: 'bursar_petra_vell',
     name: 'Bursar Petra Vell',
     title: 'The Gilded Strongbox',
-    // east side of the square, on open ground: {12,303} sits inside the inn's
-    // collider margin and findSafePos would silently relocate her at spawn
-    pos: { x: 9, z: 303 },
-    facing: -Math.PI / 2,
+    pos: { ...FENBRIDGE_NPC_PLACEMENTS_BY_ID.bursar_petra_vell.position },
+    facing: FENBRIDGE_NPC_PLACEMENTS_BY_ID.bursar_petra_vell.facing,
     color: 0xc9a227,
     questIds: [],
     banker: true,
@@ -724,11 +713,8 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     id: 'chronicler_osric_fenn',
     name: 'Chronicler Osric Fenn',
     title: 'The Marsh Chronicle',
-    // West side of the square on open ground, looking east toward the gate
-    // (stays west of x=9, the inn's collider margin, see above; nearest
-    // authored neighbor ~10 units, he had been pressed against Fenwick's post).
-    pos: { x: -14, z: 303 },
-    facing: -1.4,
+    pos: { ...FENBRIDGE_NPC_PLACEMENTS_BY_ID.chronicler_osric_fenn.position },
+    facing: FENBRIDGE_NPC_PLACEMENTS_BY_ID.chronicler_osric_fenn.facing,
     color: 0x3fa66b, // fen teal: the chronicler tint is his identity (shared mage visual)
     questIds: [],
     greeting: 'Mind the damp on the pages, $N. The fen eats more books than readers ever will.',
@@ -740,8 +726,8 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     id: 'tanner_hesk',
     name: 'Tanner Hesk',
     title: 'Master of the Tannery',
-    pos: { x: -11, z: 315.5 },
-    facing: 2.3,
+    pos: { ...FENBRIDGE_NPC_PLACEMENTS_BY_ID.tanner_hesk.position },
+    facing: FENBRIDGE_NPC_PLACEMENTS_BY_ID.tanner_hesk.facing,
     color: 0x8a5a2a,
     // Professions 2.0: the Fenbridge tannery master runs the repeatable
     // leatherworking work order.
@@ -1276,10 +1262,7 @@ export const ZONE2_OBJECTS: GroundObjectDef[] = [
   {
     itemId: 'fen_muster_order',
     name: 'Fenbridge Muster Order',
-    positions: [
-      { x: 1, z: 294 },
-      { x: -2, z: 297 },
-    ],
+    positions: FENBRIDGE_LAYOUT.repeated.musterOrders.map((order) => ({ ...order.position })),
   },
   {
     itemId: 'lost_caravan_goods',
@@ -1647,15 +1630,16 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     sellValue: 350,
     requiredClass: WAR,
   },
-  // Collectible mount (Vael the Fogbinder, The Sunken Bastion). Soulbound;
-  // owning the reins item is owning the mount (src/sim/mounts.ts mountOwned).
+  // Collectible mount (Vael the Fogbinder, The Sunken Bastion). Not soulbound;
+  // owning the reins item is owning the mount (src/sim/mounts.ts mountOwned),
+  // and the item transfers like any other.
   reins_stalkglider_snail: {
     id: 'reins_stalkglider_snail',
     name: 'Reins of the Moss-Shell Stalk-Glider',
     kind: 'mount',
     mount: 'stalkglider_snail',
     quality: 'rare',
-    soulbound: true,
+    noVendorSell: true,
     noDiscard: true,
     sellValue: 0,
   },
@@ -2188,66 +2172,67 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
 // ---------------------------------------------------------------------------
 
 export const ZONE2_PROPS: ZonePropsDef = {
-  buildings: [
-    { kind: 'inn', x: 13, z: 306, w: 6, d: 7, rot: -1.0 },
-    { kind: 'house', x: -13, z: 308, w: 7, d: 6, rot: 0.5 },
-    { kind: 'house', x: -12, z: 291, w: 6, d: 5, rot: 2.6 },
-    { kind: 'house', x: 11, z: 316, w: 6, d: 5, rot: 0.3 },
+  buildings: FENBRIDGE_LAYOUT.buildings.map((building) => ({
+    id: building.id,
+    assetId: building.assetId,
+    kind: building.kind,
+    x: building.position.x,
+    z: building.position.z,
+    w: building.nativeDimensions.width,
+    d: building.nativeDimensions.depth,
+    rot: building.rotation,
+    height: building.nativeDimensions.height,
+  })),
+  wells: [
+    {
+      id: FENBRIDGE_LAYOUT.civic.cistern.id,
+      assetId: FENBRIDGE_LAYOUT.civic.cistern.assetId,
+      x: FENBRIDGE_LAYOUT.civic.cistern.position.x,
+      z: FENBRIDGE_LAYOUT.civic.cistern.position.z,
+      r: FENBRIDGE_LAYOUT.civic.cistern.radius,
+      height: FENBRIDGE_LAYOUT.civic.cistern.height,
+    },
   ],
-  wells: [{ x: 0, z: 302, r: 1.5 }],
-  stalls: [{ x: -5, z: 310.5, rot: Math.PI / 2, r: 1.7 }],
+  stalls: [
+    {
+      id: FENBRIDGE_LAYOUT.civic.provisionStall.id,
+      assetId: FENBRIDGE_LAYOUT.civic.provisionStall.assetId,
+      x: FENBRIDGE_LAYOUT.civic.provisionStall.position.x,
+      z: FENBRIDGE_LAYOUT.civic.provisionStall.position.z,
+      rot: FENBRIDGE_LAYOUT.civic.provisionStall.rotation,
+      r: Math.hypot(
+        FENBRIDGE_LAYOUT.civic.provisionStall.width / 2,
+        FENBRIDGE_LAYOUT.civic.provisionStall.depth / 2,
+      ),
+      w: FENBRIDGE_LAYOUT.civic.provisionStall.width,
+      d: FENBRIDGE_LAYOUT.civic.provisionStall.depth,
+      height: FENBRIDGE_LAYOUT.civic.provisionStall.height,
+    },
+  ],
   mines: [],
-  // fishing dock on the east shore of the big west lake
-  docks: [{ x: -66, z: 305, rot: 1.68, hutLocal: { x: 2.8, z: 2.4, hw: 1.7, hd: 1.5 } }],
-  tents: [
-    // Gravecaller encampment
-    { x: 12, z: 474, rot: 0.5, scale: 1 },
-    { x: 20, z: 466, rot: 2.1, scale: 1 },
-    { x: -22, z: 486, rot: 1.2, scale: 1 },
-    { x: -28, z: 494, rot: -0.7, scale: 1 },
-    { x: -3, z: 505, rot: 2.9, scale: 1.3 },
-  ],
-  // Reed clumps ringing the Deepfen Shallows lake (DEEPFEN_SHALLOWS_LAKE, above).
-  // Reeds are waterline dressing, so every entry must sit on the shore: within
-  // ~1 yard of waterLevel() and inside the lake's own neighbourhood. A clump that
-  // drifts onto the dry bank reads as a bush stranded in a field
-  // (tests/marsh_reeds_placement.test.ts pins both).
-  marshReeds: [
-    [-82, 334],
-    [-85, 337],
-    [-97, 344],
-    [-112, 338],
-    [-74, 316],
-    [-77, 295],
-    [-96, 287],
-    [-110, 274],
-    [-123, 274],
-  ],
-  crates: [
-    [14, 468],
-    [18, 471],
-    [-23, 491],
-    [2, 504],
-  ],
-  campfires: [
-    [4, 299],
-    [-2, 293],
-    [16, 470],
-    [-25, 489],
-    [0, 506],
-  ],
-  // mud-hut clusters at the murloc shallows
-  mudHuts: [
-    [-78, 269],
-    [-83, 266],
-    [-74, 275],
-    [-117, 346],
-    [-123, 354],
-  ],
-  ruinRings: [{ x: 100, z: 435, ringR: 7, columns: 7 }],
-  fences: [
-    { x1: 16, z1: 311, x2: 21, z2: 299 },
-    { x1: -18, z1: 313, x2: -22, z2: 300 },
-  ],
-  graveyards: [{ x: -18, z: 286 }],
+  // Everything beyond the town footprint is literal-preserved in the layout
+  // inventory so a civic rebuild cannot perturb Mirefen's remote landmarks.
+  docks: FENBRIDGE_LAYOUT.preservedProps.docks.map((dock) => ({
+    ...dock,
+    hutLocal: { ...dock.hutLocal },
+  })),
+  tents: FENBRIDGE_LAYOUT.preservedProps.tents.map((tent) => ({ ...tent })),
+  marshReeds: FENBRIDGE_LAYOUT.preservedProps.marshReeds.map(([x, z]): [number, number] => [x, z]),
+  crates: FENBRIDGE_LAYOUT.preservedProps.crates.map(([x, z]): [number, number] => [x, z]),
+  campfires: FENBRIDGE_LAYOUT.preservedProps.campfires.map(([x, z]): [number, number] => [x, z]),
+  mudHuts: FENBRIDGE_LAYOUT.preservedProps.mudHuts.map(([x, z]): [number, number] => [x, z]),
+  ruinRings: FENBRIDGE_LAYOUT.preservedProps.ruinRings.map((ring) => ({ ...ring })),
+  fences: [],
+  walls: FENBRIDGE_LAYOUT.wall.segments.map((segment) => ({
+    id: segment.id,
+    assetId: segment.assetId,
+    x: segment.footprint.center.x,
+    z: segment.footprint.center.z,
+    w: segment.footprint.halfWidth * 2,
+    d: segment.footprint.halfDepth * 2,
+    rot: segment.footprint.rotation,
+    height: segment.height,
+    ...(palisadeSegmentMirrored(segment) ? { mirrored: true as const } : {}),
+  })),
+  graveyards: [{ ...FENBRIDGE_LAYOUT.services.graveyard.position }],
 };

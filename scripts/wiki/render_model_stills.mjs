@@ -32,19 +32,19 @@ const OUT_PX = Number(process.env.STILL_PX || 320); // shipped size; entry super
 mkdirSync(outDir, { recursive: true });
 
 // 1) Bundle the browser entry. loadGltf -> assetUrl reads import.meta.env.DEV (DEV gates the
-//    root-relative /<logical> paths our static server maps into public/), which esbuild leaves
-//    intact for a classic IIFE <script src> and would be a SyntaxError. esbuild matches each
+//    root-relative /<logical> paths our static server maps into public/). esbuild matches each
 //    FULL member path exactly (a bare `import.meta.env` define does NOT fold `.DEV`), so define
 //    every Vite flag a transitive module reads (`grep -rho 'import\.meta\.env\.[A-Za-z_]*' src/`):
 //    media.ts / i18n.ts read DEV/PROD, and render/gfx.ts pulls in client_origin.ts and
 //    (transitively) runtime.ts for native/desktop-app origin detection, none of which apply to
-//    this static headless render.
+//    this static headless render. Keep the list exhaustive and at web-browser defaults.
 //
-//    The `raw import.meta` assert below is necessary but NOT sufficient: for an iife bundle
-//    esbuild folds an undefined member path down to `({}).env`, so a missed field leaves no
-//    literal `import.meta` to catch and instead throws at runtime reading a property of
-//    undefined (which surfaces only as a PAGEERR and a 20s wait-for timeout). client_origin.ts
-//    reading VITE_NATIVE_APP hit exactly that, so keep this list exhaustive.
+//    A missed define no longer surfaces as a raw `import.meta` SyntaxError: current esbuild
+//    rewrites `import.meta` to an EMPTY OBJECT in an IIFE (with a warning), so `({}).env.X`
+//    TypeErrors at page boot and the harness hangs at the __ready wait instead (surfacing only
+//    as a PAGEERR and a 20s wait-for timeout). client_origin.ts reading VITE_NATIVE_APP hit
+//    exactly that. The guard below therefore checks BOTH shapes: a literal `import.meta` and
+//    the rewritten empty-object env reads.
 const bundled = await esbuild.build({
   entryPoints: [path.join(root, 'scripts', 'wiki', 'stills_render_entry.js')],
   bundle: true,
@@ -68,11 +68,14 @@ const bundled = await esbuild.build({
   logLevel: 'silent',
 });
 const bundleJs = bundled.outputFiles[0].text;
-if (bundleJs.includes('import.meta')) {
+// Both failure shapes of a missed define: a raw `import.meta` (older esbuild kept it: a
+// SyntaxError in a classic script) and the current empty-object rewrite (import_meta = {} /
+// import_meta.env.X: a boot-time TypeError the __ready wait can only report as a timeout).
+if (bundleJs.includes('import.meta') || /\bimport_meta\b/.test(bundleJs)) {
   throw new Error(
-    'stills bundle still contains a raw `import.meta`: a transitive module reads an ' +
-      'import.meta.env field with no define. Add an `import.meta.env.<field>` define above ' +
-      '(esbuild matches the full member path) before it SyntaxErrors in the IIFE.',
+    'stills bundle still reads an import.meta.env field with no define (esbuild rewrites ' +
+      'import.meta to an empty object in an IIFE, so the page TypeErrors at boot). Add an ' +
+      "'import.meta.env.<field>' define above; esbuild matches the full member path.",
   );
 }
 

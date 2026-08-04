@@ -3227,9 +3227,13 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // Spent rose 86 to 152 with the farm-economy pass, which gave 15 coinless
     // trash templates their mapped harvest tags; refused is untouched because
     // that arm counts all-unmapped corpses, which the pass did not add to.
-    expect(spent).toBe(152);
+    // Then 152 to 164 for the Drakelands brood: whelp, broodguard and
+    // broodlord each carry hide+fang, so each contributes all 4 of its masks
+    // (2 mapped families means no selection can forfeit every yield) and none
+    // to refused, exactly +12/+0.
+    expect(spent).toBe(164);
     expect(refused).toBe(16);
-    expect(spent + refused).toBe(168);
+    expect(spent + refused).toBe(180);
   });
 
   // The six mapped families and their item ids, spelled out. Deriving them from
@@ -3314,7 +3318,10 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     expect(unmappedOffered).toBe(37);
     // 113 to 217 for the same reason as the spend census above: more mapped
     // families in the corpus, none of them unmapped, so only this half moves.
-    expect(extracted).toBe(217);
+    // 217 to 235 for the Drakelands brood, on the same footing: three hide+fang
+    // templates extract 2 + 1 + 1 + 2 families across their four masks, so +18
+    // here while unmappedOffered above stays put, since neither tag is unmapped.
+    expect(extracted).toBe(235);
   });
 
   it('keeps every mixed template harvestable, so the gate is not a blanket refusal', () => {

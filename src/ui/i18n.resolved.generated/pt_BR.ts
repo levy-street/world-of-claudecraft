@@ -997,6 +997,7 @@ export const pt_BR: EnTranslations = {
       "name_stormfeather_griffin": "Pluma-Tormenta Alcança-Céu",
       "name_thunderstrut_gobbler": "Pavoneia-Trovões, o Grande Peru",
       "name_terrorspark_groundshaker": "Faíscaterror, Abala-Terra",
+      "name_drakemaw_raptor": "Drakemaw Raptor",
       "desc_valorsteed": "Um corcel resistente e de passo firme que aumenta a velocidade de viagem.",
       "desc_grag_bear": "Um urso resistente e de passo firme que aumenta a velocidade de viagem.",
       "desc_stalkglider_snail": "Um caracol valente e de queima lenta que aumenta a velocidade de viagem.",
@@ -1004,7 +1005,8 @@ export const pt_BR: EnTranslations = {
       "desc_shadowjump_toad": "Um sapo gigante, maciço e de passo firme, treinado em saltos sombrios relâmpago por qualquer terreno.",
       "desc_stormfeather_griffin": "Um grifo da tempestade majestoso que ronda o chão sobre garras rúnicas, asas recolhidas.",
       "desc_thunderstrut_gobbler": "Um peru colossal nascido da tempestade que desce do Pico Desperto se pavoneando, com a cauda aberta como uma frente de tempestade.",
-      "desc_terrorspark_groundshaker": "Uma máquina blindada compacta com esteiras pesadas, um canhão de grande calibre e uma sela feita para pilotos destemidos."
+      "desc_terrorspark_groundshaker": "Uma máquina blindada compacta com esteiras pesadas, um canhão de grande calibre e uma sela feita para pilotos destemidos.",
+      "desc_drakemaw_raptor": "A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash."
     },
     "mountTraining": {
       "mountPrompt": "Pressione {key} para montar no Valorsteed de treinamento.",
@@ -1989,6 +1991,7 @@ export const pt_BR: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Grau fino. Coletado de um veio de nível pleno com uma ferramenta de nível acima do material, e conta como a versão comum sempre que uma for exigida.",
+      "cookingCatch": "Cooking ingredient. Must be cooked before eating.",
       "arcaneDust": "Reagente de encantamento. Desencantado de equipamento comum e incomum.",
       "arcaneEssence": "Reagente de encantamento. Desencantado de equipamento raro.",
       "arcaneShard": "Reagente de encantamento. Desencantado de equipamento épico e lendário.",
@@ -7134,6 +7137,7 @@ export const pt_BR: EnTranslations = {
       "quest": "Item de missão",
       "junk": "Sucata",
       "fineMaterial": "Material Fino",
+      "material": "Material",
       "food": "Comida",
       "drink": "Bebida",
       "tool": "Ferramenta",
@@ -10072,6 +10076,9 @@ export const pt_BR: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Chave de ignição: Faíscaterror, Abala-Terra"
       },
+      "reins_drakemaw_raptor": {
+        "name": "Reins of the Drakemaw Raptor"
+      },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"
       },
@@ -11246,6 +11253,18 @@ export const pt_BR: EnTranslations = {
       },
       "cindraleth_maw_matriarch": {
         "name": "Cindraleth, a Matriarca das Fauces"
+      },
+      "dragonkin_egg": {
+        "name": "Dragonkin Egg"
+      },
+      "dragonkin_whelp": {
+        "name": "Dragonkin Whelp"
+      },
+      "dragonkin_broodguard": {
+        "name": "Dragonkin Broodguard"
+      },
+      "drakemaw_broodlord": {
+        "name": "Drakemaw Broodlord"
       },
       "gilded_stag": {
         "name": "Cervo Dourado"

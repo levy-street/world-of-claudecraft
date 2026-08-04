@@ -997,6 +997,7 @@ export const pl_PL: EnTranslations = {
       "name_stormfeather_griffin": "Niebosiężny Burzopiór",
       "name_thunderstrut_gobbler": "Grzmotokroczek, Wielki Indyk",
       "name_terrorspark_groundshaker": "Groziskra, Wstrząsacz Ziemi",
+      "name_drakemaw_raptor": "Drakemaw Raptor",
       "desc_valorsteed": "Wytrzymały, pewny kroku rumak, który zapewnia zwiększoną prędkość podróżowania.",
       "desc_grag_bear": "Wytrzymały, pewny kroku niedźwiedź, który zapewnia zwiększoną prędkość podróżowania.",
       "desc_stalkglider_snail": "Krzepki, powoli, lecz niezmordowanie pełznący ślimak, który zapewnia zwiększoną prędkość podróżowania.",
@@ -1004,7 +1005,8 @@ export const pl_PL: EnTranslations = {
       "desc_shadowjump_toad": "Ogromna, pewna kroku olbrzymia ropucha, wyszkolona w błyskawicznych, cienistych skokach, które pokonują każdy teren.",
       "desc_stormfeather_griffin": "Dostojny gryf burzy, który skrada się po ziemi na szponach okutych runami, ze złożonymi skrzydłami.",
       "desc_thunderstrut_gobbler": "Kolosalny, wylęgły z burzy indyk, który dumnie kroczy z Przebudzonego Szczytu, z ogonem rozłożonym jak burzowa chmura.",
-      "desc_terrorspark_groundshaker": "Zwarta opancerzona maszyna z ciężkimi gąsienicami, wielkokalibrowym działem i siodłem stworzonym dla nieustraszonych pilotów."
+      "desc_terrorspark_groundshaker": "Zwarta opancerzona maszyna z ciężkimi gąsienicami, wielkokalibrowym działem i siodłem stworzonym dla nieustraszonych pilotów.",
+      "desc_drakemaw_raptor": "A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash."
     },
     "mountTraining": {
       "mountPrompt": "Naciśnij {key}, aby dosiąść treningowego Rumaka Męstwa.",
@@ -1989,6 +1991,7 @@ export const pl_PL: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Gatunek wyborny. Zebrany z żyły o pełnym poziomie narzędziem wyższej rangi niż sam materiał; liczy się jako zwykła wersja wszędzie tam, gdzie jest ona wymagana.",
+      "cookingCatch": "Cooking ingredient. Must be cooked before eating.",
       "arcaneDust": "Składnik do zaklinania. Pozyskiwany z rozbrajania pospolitego i niezwykłego ekwipunku.",
       "arcaneEssence": "Składnik do zaklinania. Pozyskiwany z rozbrajania rzadkiego ekwipunku.",
       "arcaneShard": "Składnik do zaklinania. Pozyskiwany z rozbrajania epickiego i legendarnego ekwipunku.",
@@ -7134,6 +7137,7 @@ export const pl_PL: EnTranslations = {
       "quest": "Przedmiot zadania",
       "junk": "Tandeta",
       "fineMaterial": "Wyborny materiał",
+      "material": "Material",
       "food": "Jedzenie",
       "drink": "Napój",
       "tool": "Narzędzie",
@@ -10072,6 +10076,9 @@ export const pl_PL: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Kluczyk zapłonu: Groziskra, Wstrząsacz Ziemi"
       },
+      "reins_drakemaw_raptor": {
+        "name": "Reins of the Drakemaw Raptor"
+      },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"
       },
@@ -11246,6 +11253,18 @@ export const pl_PL: EnTranslations = {
       },
       "cindraleth_maw_matriarch": {
         "name": "Cindraleth, Matriarchini Paszczy"
+      },
+      "dragonkin_egg": {
+        "name": "Dragonkin Egg"
+      },
+      "dragonkin_whelp": {
+        "name": "Dragonkin Whelp"
+      },
+      "dragonkin_broodguard": {
+        "name": "Dragonkin Broodguard"
+      },
+      "drakemaw_broodlord": {
+        "name": "Drakemaw Broodlord"
       },
       "gilded_stag": {
         "name": "Złocony Jeleń"

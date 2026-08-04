@@ -615,6 +615,14 @@ function seedInventory(server: GameServer, pid: number, tag: string): void {
 
 async function makeWorld(): Promise<World> {
   store.reset();
+  // Drop every mock's recorded call history along with the store: a sweep
+  // builds hundreds of worlds inside ONE test, and vi.fn() retains each
+  // call's full argument graph (every save's serialized character, every
+  // ledger row). Nothing reads the histories, but across a 400-seed sweep
+  // they pin gigabytes and OOM the vitest fork on CI runners (the shard-6
+  // "Worker exited unexpectedly" failure). The per-test beforeEach clear
+  // stays for the suites that assert against a fresh history.
+  vi.clearAllMocks();
   const server = new GameServer();
   const actors: Actor[] = [];
   for (const characterId of [1, 2]) {

@@ -1,4 +1,6 @@
 {
   "version": 1,
-  "rateByKey": {}
+  "rateByKey": {
+    "mount_run_drakemaw_raptor": 0.92
+  }
 }

@@ -8,6 +8,7 @@
 // from the ability school / item kind + name keywords, so everything always
 // has a proper icon. Results are cached as data URLs.
 
+import { isRawCookingCatch } from '../sim/content/items';
 import { ABILITIES, ITEMS } from '../sim/data';
 import { DEED_IMAGE_IDS } from './deed_image_ids';
 import { PROFESSION_IMAGE_IDS, professionImageUrl } from './profession_art';
@@ -3538,6 +3539,15 @@ function itemFallback(id: string): IconRecipe | null {
     const isCloth = has(name, ['linen', 'silk', 'woven', 'cloth', 'wool']);
     return r(isCloth ? 'cloth' : 'leather', isCloth ? 'cloth' : 'leather', ['sack'], fx);
   }
+  // Raw fishing catches left kind food for cooking reagents; keep a fish-like
+  // procedural recipe so they never fall through to generic junk trinkets when
+  // static WebP is missing. Name tokens cover cooked fish siblings and rares.
+  if (
+    isRawCookingCatch(id) ||
+    has(name, ['trout', 'perch', 'pike', 'eel', 'carp', 'koi', 'fish'])
+  ) {
+    return r('drink', 'sky', ['fish'], fx);
+  }
   const t = trinketPrimitive(name);
   return r(it.kind === 'quest' ? 'parchment' : 'junk', t.pal, [{ p: t.p, pal: t.pal }], fx);
 }
@@ -4491,6 +4501,22 @@ export function itemImageUrl(id: string): string | null {
 // a consumer.
 const DEED_ICON_DIR = '/ui/deeds';
 const DEED_CREST_PREFIX = 'deed_';
+
+// Deeds whose crest art is COMMISSIONED BUT NOT YET COMMITTED, the ITEM_ART_PENDING model one
+// screen up. The Icons authoring rule in docs/design/deeds.md permits this by design ("an artless
+// deed falls back to its procedural category crest, so art can trail the deed"), so the point of
+// the list is not to change behavior (deedImageUrl already declines any id absent from
+// DEED_IMAGE_IDS) but to make the debt ENUMERATED rather than silent, and to give the art tests
+// one name to agree on instead of three copies of the same literal pair.
+// tests/deed_icons.test.ts holds the line from both sides: a stale entry once art lands, and
+// unenumerated debt. Do not add an id here merely to silence that failure; commission the art and
+// file it in docs/achievements/icon-brief.md.
+export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
+  // The Drakelands dragonkin brood rework (v0.35): both are 'chronicle', so both fall back to
+  // the deed_cat_chronicle crest until their commissioned art lands.
+  'chr_drakemaw_broodlord',
+  'chr_maw_matriarch',
+]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {
   if (!crestId.startsWith(DEED_CREST_PREFIX)) return null;

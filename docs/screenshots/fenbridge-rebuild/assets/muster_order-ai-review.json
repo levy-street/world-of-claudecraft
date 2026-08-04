@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "assetId": "muster_order",
+  "sourceFingerprint": "80f4c21427673eb2fa85ee8bfd14cd52f1d2ce5f5c4e133906aa384c916f196c",
+  "reference": "docs/design/fenbridge-rebuild/references/muster-order-turnaround.png",
+  "minimumOverallScore": 0.7,
+  "requiredViews": [
+    "front",
+    "right",
+    "rear",
+    "left",
+    "hero",
+    "player-scale",
+    "collider-overlay"
+  ],
+  "evidence": {
+    "rawContact": "muster_order-raw-contact.png",
+    "optimizedContact": "muster_order-optimized-contact.png",
+    "optimizedAuditContact": "muster_order-optimized-audit-contact.png",
+    "referenceComparison": "muster_order-comparison.png"
+  },
+  "features": [
+    {
+      "id": "layered-document-packet",
+      "name": "Thin board-backed layered parchment packet",
+      "tier": "critical",
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "visible": true,
+      "score": 0.84,
+      "notes": "Independent visual audit passed thin board-backed layered parchment packet at 0.84 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "teal-binding-system",
+      "name": "Reference-accurate teal binding band",
+      "tier": "critical",
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "visible": true,
+      "score": 0.84,
+      "notes": "Independent visual audit passed reference-accurate teal binding band at 0.84 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "wax-and-ink-marks",
+      "name": "Offset red wax seal and three ink lines",
+      "tier": "important",
+      "minimumScore": 0.72,
+      "mustPass": false,
+      "visible": true,
+      "score": 0.95,
+      "notes": "Independent visual audit passed offset red wax seal and three ink lines at 0.95 in the current reference comparison and required contacts."
+    }
+  ],
+  "overall": {
+    "score": 0.83,
+    "decision": "accept",
+    "reviewer": "codex-agent-vision",
+    "notes": "Independent current-source audit accepted every configured feature at overall 0.83."
+  },
+  "intentionalOmissions": [
+    "inaccessible interior geometry",
+    "shipping collision mesh"
+  ],
+  "layerScores": {
+    "silhouetteProportion": 0.85,
+    "componentStructure": 0.88,
+    "formDetail": 0.83,
+    "materialSurface": 0.9,
+    "lightingCamera": 0.77
+  }
+}

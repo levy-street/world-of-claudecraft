@@ -302,13 +302,18 @@ describe('scripted playthrough (one sim, live sites only)', () => {
         sawBiteOnKoiSession = bit;
       }
     }
-    // Hunted literal (seed 4242, after every beat above, re-recorded on the
-    // v0.34.0 release merge: BOTH parents moved the shared stream since the
-    // last recording, the packet's tuned band tables and world-gen on one
-    // side and the release's Idol Guardian phasesThroughObstacles wander
-    // timing on the other, the same cause as this merge's parity golden
-    // re-mint): the koi bites on session index 42.
-    expect(koiSession).toBe(42);
+    // Hunted literal (seed 4242, after every beat above), re-recorded on this
+    // v0.34.0 sync merge, where THREE stream shifts compose: the release side
+    // brought the packet's tuned band tables and world-gen plus the Idol
+    // Guardian phasesThroughObstacles wander timing, and this branch replaced
+    // the emberwing drakes with three broodlords in shipped camp slots. The
+    // brood's own spawns and idling are off-stream (CampDef.offStream /
+    // MobTemplate.offStreamIdle), but those three in-place swaps still draw on
+    // the shared stream at spawn and no longer idle on it, which shifts every
+    // later draw once. Neither parent's recorded value survives the
+    // composition, so this is a fresh hunt, the same cause and protocol as
+    // this merge's parity golden re-mint: the koi bites on session index 2.
+    expect(koiSession).toBe(2);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -336,18 +341,18 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Hunted literals (seed 4242, after every beat above): the harvest index
     // where each flavor's 1-in-90 event fires under the shared stream.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 58 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 92 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 87,
+        hitAt: 1,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 79,
+        hitAt: 48,
       },
     ];
     for (const hunt of hunts) {
@@ -405,11 +410,11 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       sim.harvestCorpse(mob.id, ['hide'], pid);
       if (sim.countItem('pristine_hide', pid) > 0) hitAt = i;
     }
-    // Hunted literal (seed 4242, after every beat above, re-recorded on the
-    // v0.34.0 release merge, the same both-parents stream shift as the koi
-    // literal above): the rare-or-better rarity roll that mints the signed
-    // specimen lands on attempt index 2.
-    expect(hitAt).toBe(2);
+    // Hunted literal (seed 4242, after every beat above), re-recorded on this
+    // merge, the same three-way stream composition as the koi literal above:
+    // the rare-or-better rarity roll that mints the signed specimen lands on
+    // attempt index 6.
+    expect(hitAt).toBe(6);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);
     expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(true);

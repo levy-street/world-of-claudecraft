@@ -136,6 +136,14 @@ export class BuffShells {
     }
   }
 
+  sleepEntity(entityId: number): void {
+    for (const slot of this.slots) {
+      if (!slot.active || slot.entityId !== entityId) continue;
+      slot.active = false;
+      slot.mesh.visible = false;
+    }
+  }
+
   clear(): void {
     for (const slot of this.slots) {
       slot.active = false;

@@ -730,6 +730,30 @@ export class CharacterVisual {
   }
 
   /**
+   * Advance the bounded clocks that must not stall while this cosmetic rig is
+   * outside the camera frustum. The next visible update consumes the mixer
+   * debt, while state-machine, pose, and skeleton-palette work stays asleep.
+   * Actionable rigs never enter this path.
+   */
+  advanceOffscreen(dt: number): void {
+    this.hitCooldown = Math.max(0, this.hitCooldown - dt);
+    if (this.holdCooldown > 0) this.holdCooldown = Math.max(0, this.holdCooldown - dt);
+    const stowTick = tickStow(this.stow, dt);
+    if (stowTick !== 'none') {
+      if (stowTick === 'swap') this.applyStowSwap();
+      this.endStowGesture();
+    }
+    this.pendingDt = Math.min(
+      MIXER_DT_CAP,
+      this.pendingDt + (this.holdT > 0 ? dt * this.holdScale : dt),
+    );
+    if (this.holdT > 0) {
+      this.holdT -= dt;
+      if (this.holdT <= 0) this.holdCooldown = HOLD_REFRACTORY_S;
+    }
+  }
+
+  /**
    * The baked half of the climb, on the rigs that ship the clips (all player
    * archetypes): the REACH rides Spellcast_Raise scrubbed up to its
    * arms-overhead crest and held, and the TOP-OUT rides Sit_Floor_Down played
@@ -2012,10 +2036,31 @@ export class CharacterVisual {
     }
   }
 
+  /** Two-state prop mobs (VisualDef.corpseMeshSwap): alive shows `hide`,
+   *  dead shows `show` (the dragonkin egg's cracked shell IS its corpse).
+   *  assembleModel seeds the alive state; the death/revive edges flip it. */
+  private applyCorpseMeshSwap(dead: boolean): void {
+    const swap = this.def.corpseMeshSwap;
+    if (!swap) return;
+    this.model.traverse((n) => {
+      if (n.name === swap.hide) n.visible = !dead;
+      else if (n.name === swap.show) n.visible = dead;
+    });
+  }
+
+  /** One-shot the flourish clip (skeleton awaken / boss taunt / the dragonkin
+   *  brood's Shout and the whelp's hatch pounce), off the 'shout'/'flourish'
+   *  spellfx cues. No-op for rigs without a flourish clip. */
+  playFlourish(): void {
+    const clip = this.def.clips.flourish;
+    if (clip && this.action(clip)) this.playOneShot(clip, 1);
+  }
+
   private enterDeath(): void {
     this.deadLock = true;
     this.currentIsOneShot = false;
     this.currentOneShotIsEmote = false;
+    this.applyCorpseMeshSwap(true);
     // Collapse the upright pick capsule to a flat, ground-hugging profile so a
     // near-eye click behind or above the now-lying corpse no longer intersects an
     // invisible standing column (issue 1486). The ground-level footprint stays, so
@@ -2057,6 +2102,7 @@ export class CharacterVisual {
   private revive(): void {
     this.deadLock = false;
     this.baseState = 'idle';
+    this.applyCorpseMeshSwap(false);
     // Release the one-shot latch: a `finished` that never arrived (the rig was
     // throttled, or the clip was cut) would otherwise leave every later base
     // change committing its state while silently skipping its fade.

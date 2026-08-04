@@ -42,13 +42,35 @@ const bundled = await esbuild.build({
   bundle: true,
   format: 'iife',
   platform: 'browser',
-  define: { 'import.meta.env.DEV': 'true', 'import.meta.env.PROD': 'false' },
+  // Every env field the transitive graph reads needs its own define (esbuild
+  // matches the FULL member path). The runtime/client-origin fields arrived with
+  // the v0.34 native/desktop work; without them current esbuild rewrites
+  // import.meta to an EMPTY OBJECT in an IIFE and the page TypeErrors at boot,
+  // which surfaces only as a __ready timeout. Same fix as
+  // scripts/wiki/render_model_stills.mjs, whose guard comment carries the detail.
+  define: {
+    'import.meta.env.DEV': 'true',
+    'import.meta.env.PROD': 'false',
+    'import.meta.env.VITE_NATIVE_APP': "''",
+    'import.meta.env.VITE_API_ORIGIN': "''",
+    'import.meta.env.VITE_DESKTOP_APP': "''",
+    'import.meta.env.VITE_DESKTOP_API_ORIGIN': "''",
+    'import.meta.env.VITE_DESKTOP_RELATIVE_API': "''",
+  },
   write: false,
   logLevel: 'silent',
 });
 const bundleJs = bundled.outputFiles[0].text;
-if (bundleJs.includes('import.meta')) {
-  throw new Error('portrait bundle still contains a raw `import.meta` (add a define)');
+// Both failure shapes of a missed define, the same check scripts/wiki/render_model_stills.mjs
+// runs: a raw `import.meta` (older esbuild kept it: a SyntaxError in a classic script) and
+// the current empty-object rewrite (import_meta = {} / import_meta.env.X: a boot-time
+// TypeError the __ready wait can only report as a timeout).
+if (bundleJs.includes('import.meta') || /\bimport_meta\b/.test(bundleJs)) {
+  throw new Error(
+    'portrait bundle still reads an import.meta.env field with no define (esbuild rewrites ' +
+      'import.meta to an empty object in an IIFE, so the page TypeErrors at boot). Add an ' +
+      "'import.meta.env.<field>' define above; esbuild matches the full member path.",
+  );
 }
 
 // 2) Load the finder catalogue + mob templates + the renderer's visual manifest

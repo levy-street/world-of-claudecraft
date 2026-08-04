@@ -98,41 +98,47 @@ describe('animatesEveryFrame', () => {
   const STRANGER = 3;
 
   it('exempts the local player', () => {
-    expect(animatesEveryFrame(SELF, SELF, TARGET, null)).toBe(true);
+    expect(animatesEveryFrame(SELF, SELF, TARGET, false)).toBe(true);
   });
 
   it('exempts the current target', () => {
-    expect(animatesEveryFrame(TARGET, SELF, TARGET, null)).toBe(true);
+    expect(animatesEveryFrame(TARGET, SELF, TARGET, false)).toBe(true);
   });
 
   it('exempts anything mid-cast, even an untargeted stranger', () => {
-    expect(animatesEveryFrame(STRANGER, SELF, TARGET, 'fireball')).toBe(true);
+    expect(animatesEveryFrame(STRANGER, SELF, TARGET, true)).toBe(true);
   });
 
   it("exempts the local player's pet while it is fighting", () => {
-    expect(animatesEveryFrame(STRANGER, SELF, TARGET, null, true, SELF, TARGET, null)).toBe(true);
+    expect(animatesEveryFrame(STRANGER, SELF, TARGET, false, true, SELF, TARGET, null)).toBe(true);
+  });
+
+  it('exempts a monster directly fighting the local player', () => {
+    expect(animatesEveryFrame(STRANGER, SELF, TARGET, false, true, null, SELF, null)).toBe(true);
   });
 
   it("exempts a monster fighting the local player's pet", () => {
     const PET = 4;
-    expect(animatesEveryFrame(STRANGER, SELF, TARGET, null, true, null, PET, SELF)).toBe(true);
+    expect(animatesEveryFrame(STRANGER, SELF, TARGET, false, true, null, PET, SELF)).toBe(true);
   });
 
   it('exempts an ally fighting the current target', () => {
-    expect(animatesEveryFrame(STRANGER, SELF, TARGET, null, true, null, TARGET, null)).toBe(true);
+    expect(animatesEveryFrame(STRANGER, SELF, TARGET, false, true, null, TARGET, null)).toBe(true);
   });
 
   it('does not exempt idle pets outside combat', () => {
-    expect(animatesEveryFrame(STRANGER, SELF, TARGET, null, false, SELF, TARGET, null)).toBe(false);
+    expect(animatesEveryFrame(STRANGER, SELF, TARGET, false, false, SELF, TARGET, null)).toBe(
+      false,
+    );
   });
 
   it('does not exempt an idle, untargeted stranger', () => {
     // the only case the crowd cadence is allowed to throttle
-    expect(animatesEveryFrame(STRANGER, SELF, TARGET, null)).toBe(false);
+    expect(animatesEveryFrame(STRANGER, SELF, TARGET, false)).toBe(false);
   });
 
   it('does not exempt a stranger just because the player has no target', () => {
-    expect(animatesEveryFrame(STRANGER, SELF, null, null)).toBe(false);
+    expect(animatesEveryFrame(STRANGER, SELF, null, false)).toBe(false);
   });
 });
 

@@ -19,12 +19,14 @@
 //   is ever deleted from a fight and none loses a pending cycle.
 //
 // Deliberately NOT governed: aoeSlow (the anti-kite snare must keep its own
-// cadence or a kiter earns free windows), stoneskin (a self-buff that never
-// lands on players), the updateBossMechanics support kit (summonAdds is
-// hp-threshold-driven; heals/wards are not player-facing pressure), the
-// on-hit dread fear (it only ever hits the swing victim), and the heroic
-// charge trigger (it fires from the engaged-tick hook before the mechanics
-// tail, chase state included). infernoChannel is
+// cadence or a kiter earns free windows; it does however HOLD AT DUE while a
+// telegraph escape window is open, mob/rift_escape_window.ts), stoneskin (a
+// self-buff that never lands on players), the updateBossMechanics support kit
+// (summonAdds is hp-threshold-driven; heals/wards are not player-facing
+// pressure), the on-hit dread fear (it only ever hits the swing victim, and
+// like every on-hit control proc it skips its effect inside an escape
+// window), and the heroic charge trigger (it fires from the engaged-tick hook
+// before the mechanics tail, chase state included). infernoChannel is
 // lock-gated at its fire site but sits outside the oldest-due comparison: its
 // cadence deliberately FREEZES while the lock runs (its hp-gate consumption
 // must not happen on a held tick), so it cannot accumulate a comparable
@@ -32,7 +34,11 @@
 //
 // The lock ticks only while the boss is engaged AND in melee contact, the same
 // gate the governed timers themselves tick under: a kited boss freezes with
-// its held mechanics, then resumes the drain on re-contact.
+// its held mechanics, then resumes the drain on re-contact. One deliberate
+// asymmetry: an instant-mechanic WINDUP (mob/rift_escape_window.ts) ticks on
+// the engaged hook (chase included), so a telegraph whose ring is already on
+// the ground resolves even while the boss chases; the lock it armed stays
+// frozen until re-contact, which only ever spaces mechanics further apart.
 //
 // No SimContext, no rng, no DOM; reads only the static MOBS table and the
 // rift rank gate. A Vitest imports it directly. Inert for every mob without

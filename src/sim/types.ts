@@ -914,9 +914,11 @@ export interface OtherItemDef extends BaseItemDef {
 
 // A collectible mount item. Owning the item IS owning the mount: while it sits
 // in the player's bags or bank, the catalog mount it names is selectable and
-// ridable (src/sim/mounts.ts mountOwned). Always soulbound, so ownership can
-// never transfer. Every catalog mount has one, the horse included: five are
-// sub-1% boss drops, the horse's reins comes from the stablemaster.
+// ridable (src/sim/mounts.ts mountOwned). Player reins are NOT soulbound, so
+// ownership transfers with the item (trade, mail, market, guild bank); only
+// the developer-only tank stays bound. Every catalog mount has one, the horse
+// included: five are sub-1% boss drops, the horse's reins comes from the
+// stablemaster.
 export interface MountItemDef extends BaseItemDef {
   kind: 'mount';
   mount: MountKey;
@@ -1178,6 +1180,17 @@ export type MobFamily =
 export type PetMode = 'passive' | 'defensive' | 'aggressive';
 export type PetRole = 'melee_tank' | 'ranged_dps';
 
+// A mechanic-applied refreshing fire DoT (the dragonkin brood's burns): the
+// same dot-aura shape the on-hit venom/cinder affix family applies, shared by
+// arcCleave / breathCone / broodWhelp so every burn rides the one seam.
+export interface MobBurnSpec {
+  perTick: number;
+  interval: number;
+  duration: number;
+  name: string;
+  school?: string;
+}
+
 export interface MobTemplate {
   id: string;
   name: string;
@@ -1246,6 +1259,27 @@ export interface MobTemplate {
   // combat and heals to full a few seconds after the last hit. Guarded in
   // enterCombat (sim.ts) and updateMob (mob/locomotion.ts).
   dummy?: boolean;
+  // Take PASSIVE idle draws off the shared world stream (Entity.offStreamRng).
+  // CampDef.offStream covers a wholly new camp; this covers a template that
+  // REPLACED shipped content in an existing camp slot, where the spawn draws
+  // must stay on the shared stream (so the replaced camp's own spawns do not
+  // move) but the new mob's idling must not drift it: a swap with a different
+  // moveSpeed arrives at its wander targets on a different cadence, which
+  // re-rolls the shared stream for every mob after it. Stamped onto the spawn in
+  // createMob (src/sim/entity.ts), so the contract holds through EVERY spawn path
+  // (the camp loop, a brood egg hatching a whelp, a dev spawn), not just one.
+  offStreamIdle?: boolean;
+  // Idle-wander liveliness multiplier (default 1). Divides the wander PAUSE at
+  // EVERY site that rolls one, so a restless creature (the dragonkin whelp)
+  // putters around its patch instead of standing statuesque: the two in the idle
+  // wander step (arrival and the 30s walk-budget timeout), the camp spawn, the
+  // respawn reset, and the evade-home reset. All five go through the one owner,
+  // wanderPause in mob/idle_rng.ts, because a knob honored at only SOME of them
+  // does nothing measurable: a quick mob only ever reaches arrival, which is how
+  // this shipped dead when only the timeout divided. Applied AFTER the draw: the
+  // draw count, order, and drawn values are identical for every template, so the
+  // parity draw digest never moves.
+  wanderHaste?: number;
   // Purely-ambient decoration (the Highwatch stable horses): never hostile,
   // never aggros/fights, un-attackable and un-tameable, but wanders a bounded
   // patch. Spawned RNG-free (like the dummy) so it never perturbs the shared
@@ -1282,6 +1316,63 @@ export interface MobTemplate {
     name: string;
     school?: string;
     atHpPct?: number[];
+  };
+  // Boss mechanic: a periodic telegraphed FRONTAL CONE hardcast (the dragonkin
+  // fire breath). Mirrors bigCast's cast machinery (real cast bar via castId,
+  // keeps meleeing, melee-gated cadence) but resolves against every living
+  // player inside `range` yards AND the `arcDeg` cone about the mob's facing
+  // at cast completion, not a radius. Sidestepping the cone is the intended
+  // counterplay. Optionally sets the `burn` fire DoT on everyone caught.
+  breathCone?: {
+    castId: string;
+    name: string;
+    castTime: number;
+    every: number;
+    range: number;
+    arcDeg: number;
+    min: number;
+    max: number;
+    school?: string;
+    burn?: MobBurnSpec;
+  };
+  // On-aggro battle shout (the dragonkin brood): the mob roots in place for
+  // `rootSeconds` on its FIRST player aggro of a pull (facing its target,
+  // not moving, not swinging; the renderer plays the Shout clip off the
+  // 'shout' spellfx) before it starts walking. Fires once per pull; resets on
+  // evade/respawn. The broodlords also crack every dragonkin egg within
+  // `breakEggsRadius` yards awake, and `wardWhelps` wraps each whelp those
+  // eggs hatch in a one-hit ward (the first player hit is fully absorbed;
+  // src/sim/mob/dragonkin_brood.ts strips the ward after it soaks).
+  engageShout?: {
+    rootSeconds: number;
+    breakEggsRadius?: number;
+    wardWhelps?: { duration: number; name: string };
+  };
+  // Counter-stun (the dragonkin broodlords): when a player's hard stun lands
+  // on this mob, it hammers a `seconds` stun back onto the stunner (both end
+  // up stunned), at most once per `cooldown` seconds. The player's stun still
+  // lands normally; pin-trading a broodlord is the deliberate cost.
+  counterStun?: { seconds: number; cooldown: number; name: string };
+  // Dragonkin egg behavior (the 1 HP clutch mob): any death cracks it open
+  // and hatches `hatchMobId` at its spot; the break ripples to every other
+  // egg within `chainRadius` yards on a `chainDelay` stagger per hop, and a
+  // player closing inside `proximityRadius` springs it early. Driven by
+  // src/sim/mob/dragonkin_brood.ts.
+  broodEgg?: {
+    chainRadius: number;
+    chainDelay: number;
+    proximityRadius: number;
+    hatchMobId: string;
+  };
+  // Dragonkin whelp behavior: on hatch it pounces, a `leapSeconds` burst at
+  // `leapSpeedMult` x move speed toward its victim, and its first landed
+  // swing sets the `burn` DoT (the pounce "landing"). Hatch targeting prefers
+  // a healer or damage-dealer within reach over the closest player.
+  broodWhelp?: {
+    leapRange: number;
+    leapSpeedMult: number;
+    leapSeconds: number;
+    burn: MobBurnSpec;
   };
   // Boss mechanic: a periodic telegraphed HARDCAST. Unlike the instant aoePulse,
   // the mob shows a real cast bar (the entity casting fields carry castId) for
@@ -1512,6 +1603,22 @@ export interface MobTemplate {
   // Melee mechanic: each landed swing also splashes onto other players near the
   // primary target for `mult` of the (pre-armor) hit. A classic-style cleave arc.
   cleave?: { radius: number; mult: number; name?: string };
+  // Cadenced FRONT-ARC cleave (the dragonkin broodlords): every `every`th
+  // LANDED swing also strikes every other player inside `range` yards and the
+  // `arcDeg` frontal arc for `mult` x the base swing (armor-reduced per
+  // victim), optionally setting the `burn` fire DoT on everyone struck
+  // (primary target included). Distinct from `cleave` above, which splashes
+  // near the PRIMARY TARGET on every swing with no arc, no cadence, no burn.
+  // Deterministic cadence: draws no rng (the every-Nth counter lives on
+  // Entity.swingCleaveCount).
+  arcCleave?: {
+    every: number;
+    arcDeg: number;
+    range: number;
+    mult: number;
+    name: string;
+    burn?: MobBurnSpec;
+  };
   // On-hit debuff: a chance per landed melee swing to inflict a stacking-refresh
   // damage-over-time poison on the struck target (spiders, serpents, scorpions).
   venom?: {
@@ -2515,6 +2622,21 @@ export interface CampDef {
   center: { x: number; z: number };
   radius: number;
   count: number;
+  // Scatter this camp off a PRIVATE rng sub-stream instead of the shared
+  // world stream (the ambient-horse / training-dummy principle in the Sim camp
+  // loop, generalized so a camp can still scatter). The shared stream's
+  // POSITION is what every seeded gameplay roll downstream inherits, so a camp
+  // appended on it shifts every later draw in the world: harmless in play, but
+  // it silently re-rolls every test and golden pinned to a hunted seed. A camp
+  // that carries this draws zero shared rng, so adding or removing it leaves
+  // the rest of the world bit-identical. The sub-stream is seeded from the
+  // world seed plus the camp's own authored identity (see campPrivateRng in
+  // sim.ts), so its own spawns stay deterministic across all three hosts.
+  // Use it for NEW camps added to shipped content; a camp that already shipped
+  // on the shared stream must stay there, or its own spawns move. Both halves are
+  // pinned by tests/off_stream_rng.test.ts: zero shared draws at world build, and
+  // spawn stability under camp reordering.
+  offStream?: boolean;
 }
 
 // Ground interactables (sparkle objects)
@@ -3408,6 +3530,23 @@ export interface Entity extends ClientMirroredEntityFields {
   infernoPulsesFired: number; // pulses already fired this channel
   infernoGatesFired: number; // infernoChannel.atHpPct thresholds already consumed
   yelledEngage: boolean; // engage bark fired this pull (reset on evade/respawn)
+  // --- dragonkin brood state (all optional: only brood templates carry them) ---
+  swingCleaveCount?: number; // arcCleave: landed swings since the last front-arc cleave
+  breathTimer?: number; // breathCone cadence countdown (the bigCastTimer twin)
+  shoutFired?: boolean; // engageShout consumed this pull (reset on evade/respawn)
+  shoutIntroUntil?: number; // sim-time end of the rooted shout window
+  counterStunReadyAt?: number; // sim-time the counterStun retaliation is next available
+  broodCracked?: boolean; // egg: died through the REAL damage path (handleDeath); only flagged corpses hatch
+  broodHatched?: boolean; // egg: break already processed (hatch fired)
+  broodChainAt?: number; // egg: sim-time a rippling chain-break cracks this egg
+  // egg: the broodlord's shout cracked this egg, so its hatchling comes out
+  // wrapped in the named one-hit ward (engageShout.wardWhelps, stamped at
+  // shout time; chain breaks beyond the shout radius never carry it)
+  broodWardOnHatch?: { duration: number; name: string };
+  leapUntil?: number; // whelp: sim-time end of the pounce speed burst (duration derives from launch distance)
+  leapReadyAt?: number; // whelp: sim-time the NEXT pounce may launch (re-pounce cooldown)
+  leapBurnPending?: boolean; // whelp: first landed swing still owes the pounce burn
+  wardOneHit?: boolean; // whelp: one-hit ward live (brood module strips it after it soaks)
   stoneskinTimer: number; // periodic self-absorb barrier countdown
   terrifyTimer: number; // Banshee's Wail fear-pulse countdown
   aoeSlowTimer: number; // Howling Gale anti-kite snare-pulse countdown
@@ -3428,6 +3567,23 @@ export interface Entity extends ClientMirroredEntityFields {
   // unravels with its corpse instead of respawning at its eruption point,
   // which is wherever the fight dragged (see mob/locomotion.ts).
   summonedAdd: boolean;
+  // Server-local (never on the wire, same as summonedAdd above): this mob was
+  // spawned by an `offStream` camp (CampDef.offStream), so its PASSIVE idle
+  // draws come from a private sub-stream instead of the shared world stream.
+  // Spawning it off-stream is only half the guarantee: an idle mob keeps
+  // drawing shared rng forever as its wander timer re-rolls, so a herd of new
+  // ambient content would still drift every seeded roll in the world a minute
+  // later (measured: identical at 1s, diverged by 31s). Combat draws stay on
+  // the shared stream: those only happen because a player engaged, which is a
+  // real gameplay event rather than passive world churn. Same principle as the
+  // ambient stable horses (mob/ambient.ts), generalized to a fighting mob.
+  // PASSIVE means every draw that re-rolls the idle wander timer: the three in the
+  // idle arm (mob/locomotion.ts), the evade-home reset (resetEvadingMob, same file),
+  // and the respawn reset (mob/lifecycle.ts). All five call sites route through the
+  // one idleRng helper (mob/idle_rng.ts), whose fallback returns ctx.rng ITSELF, so
+  // no shared-stream mob's draw position moves. Pinned by
+  // tests/off_stream_rng.test.ts.
+  offStreamRng?: boolean;
   enraged: boolean; // enrage mechanic active
   // Heroic-instance mechanic scaling (instances/difficulty.ts applyDungeonMobTuning).
   // Mechanic numbers (aoePulse/bigCast/stomp damage; mendAlly/wardAllies/stoneskin
@@ -3594,6 +3750,30 @@ export interface Entity extends ClientMirroredEntityFields {
   // spacing-governed mechanic holds at due and fires the tick the lock clears.
   // Only ever defined on a mob with riftMechanicSpacing.
   mechanicLockTimer?: number;
+  // Windup countdowns for a rift-stamped boss's instant AoE mechanics
+  // (mob/rift_escape_window.ts): the stomp / aoePulse ground-ring telegraph is
+  // in flight while > 0, and the damage lands when the countdown hits zero.
+  // Only ever defined on a mob with riftMechanicSpacing (the same
+  // defined-vs-undefined discipline as mechanicLockTimer, so parity entity
+  // samples never churn for unstamped mobs).
+  stompWindupRemaining?: number;
+  pulseWindupRemaining?: number;
+  // The telegraphed ring center each windup was drawn at: the detonation is
+  // measured from HERE, never from the boss's live position, so the edge
+  // players dodge is the edge they were shown even if the boss chased during
+  // the windup. Same defined-vs-undefined discipline as the countdowns.
+  stompWindupX?: number;
+  stompWindupZ?: number;
+  pulseWindupX?: number;
+  pulseWindupZ?: number;
+  // Absolute sim-time deadline of the boss's current escape window
+  // (mob/rift_escape_window.ts): stamped at every telegraph start (windup,
+  // bigCast, death-zone cast) to the moment the LAST blast can land. An
+  // absolute deadline, deliberately not a castingAbility introspection: a
+  // kited boss freezes its melee-gated cast bar, and a frozen bar must never
+  // pin the window open (that would permanently disable the anti-kite snare).
+  // Only ever defined on a mob with riftMechanicSpacing.
+  escapeWindowUntil?: number;
   // misc
   dead: boolean;
   // Ghost/spirit state for the WoW-style death -> corpse-run -> resurrect loop.
@@ -5181,6 +5361,19 @@ export interface NoticeboardDef {
   frontStandingPoint: { x: number; z: number };
 }
 
+/** A non-interactive authored muster board whose visible footprint is solid. */
+export interface MusterBoardDef {
+  id: string;
+  assetId: string;
+  x: number;
+  z: number;
+  rotation: number;
+  width: number;
+  depth: number;
+  height: number;
+  frontStandingPoint: { x: number; z: number };
+}
+
 function invalidNoticeboardField(field: string): never {
   throw new Error(`Invalid canonical Eastbrook noticeboard ${field}`);
 }
@@ -5250,6 +5443,7 @@ export interface WorldServicesDef {
   stations?: readonly StationDef[];
   mailboxes?: readonly MailboxDef[];
   noticeboards?: readonly NoticeboardDef[];
+  musterBoards?: readonly MusterBoardDef[];
   graveyards?: readonly GraveyardDef[];
 }
 
@@ -5269,7 +5463,7 @@ export interface WorldContent {
   props: ZonePropsDef;
   playerStart: { x: number; z: number };
   // Optional by design: active custom maps that omit services must not inherit
-  // built-in stations, mailboxes, noticeboards, or graveyards.
+  // built-in stations, mailboxes, noticeboards, muster boards, or graveyards.
   services?: WorldServicesDef;
   // Heightfield edits applied inside terrainHeight(). Absent/empty for the
   // built-in world, so its heightfield stays byte-identical.

@@ -735,22 +735,16 @@ describe('renderer celebration + nameplate title', () => {
     expect(rendererSrc.match(/FESTIVAL_GOLD_COLORS/g)?.length).toBe(3);
   });
 
-  it('renders the title subtitle cheap-diffed per (i18n revision, title id)', () => {
-    expect(nameplateSrc).toContain('private setNameplateTitle(');
-    // Keyed on a monotonic i18n revision rather than getLanguage(): the dev
-    // pseudo-locale deliberately leaves getLanguage() at 'en' while changing
-    // what t() resolves to, so a language-keyed gate left pseudo text on screen
-    // after switching back.
-    expect(nameplateSrc).toMatch(/`\$\{i18nRevision\}\|\$\{titleId\}`/);
+  it('renders the title through localized canvas state and invalidates on i18n revision', () => {
     expect(nameplateSrc).toContain(
-      'if (id === v.nameplateTitleId && i18nRevision === v.nameplateTitleI18nRevision) return;',
+      "state.title = entity.title ? deedTitleText(entity.title) : '';",
     );
-    expect(nameplateSrc).toContain(
-      'this.setNameplateTitle(v, suppressSelf ? undefined : e.title);',
-    );
-    expect(rendererSrc).toContain("titleEl.className = 'np-title';");
-    expect(rendererSrc).toContain("titleSig: '',");
-    expect(hudCss).toMatch(/\.np-title \{/);
+    // A monotonic i18n revision, not getLanguage(), also catches pseudo-locale
+    // transitions that deliberately leave the public language key at English.
+    expect(nameplateSrc).toContain('const revision = getI18nRevision();');
+    expect(nameplateSrc).toContain('fullPass || plan.urgent || languageChanged');
+    expect(nameplateSrc).toContain('this.surface.clearTextCache();');
+    expect(rendererSrc).not.toContain("titleEl.className = 'np-title';");
   });
 });
 

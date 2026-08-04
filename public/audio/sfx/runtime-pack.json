@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "9a8f819df9ba24ce88763afdf2afb9298bc7949e15c22aac69114a2f5ed9699d",
-  "catalogHash": "6fee11db1bac7ee1866b7ed4d618305a15c5cc67eeb8b9362cf9cb7070905c5c",
+  "bundleId": "92efd3f13cb4814e891f4976fbbeb19ba3f93c30cf2df22adce0b520bbe46b13",
+  "catalogHash": "52f3fdd334381464a3580c620a1610dce80f9adf0b61a9c0bf7644c84a56bb98",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -2793,6 +2793,18 @@
       ],
       "gain": 1,
       "playbackRate": 1
+    },
+    "mount_run_drakemaw_raptor": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_drakemaw_raptor.mp3?v=b01e419b8171",
+          "bytes": 11328,
+          "sha256": "b01e419b817154035271ee47bf23e051fda675a6ab9ef61ebefbfabbf3379e2c"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 0.92
     },
     "mount_run_grag_bear": {
       "variants": [

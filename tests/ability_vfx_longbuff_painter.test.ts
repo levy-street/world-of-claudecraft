@@ -20,6 +20,7 @@ function makePainter(now: () => number = () => 12.5) {
     holdGroundAura: vi.fn().mockReturnValue(true),
     orbit: vi.fn().mockReturnValue(true),
     bodyGlow: vi.fn(),
+    sleepEntity: vi.fn(),
     update: vi.fn(),
   };
   const vfx = {
@@ -132,28 +133,40 @@ describe('long-worn buffs are silent while held', () => {
     expect(vfx.buffSwirl).toHaveBeenCalledTimes(2);
   });
 
-  it('sweeps sighting state for entities gone past the stale window', () => {
-    let t = 0;
-    const { painter, vfx } = makePainter(() => t);
+  it('replays the gain swirl for an entity that left the world mirror and returned', () => {
+    const { painter, vfx } = makePainter();
 
+    // Held-semantic state drops an entity not synced between two frames, so a
+    // wearer re-entering interest range pops one swirl, like a fresh sighting.
     painter.syncEntity(ent(['arcane_intellect']));
-    t = 10;
+    painter.update(0.016);
     painter.update(0.016);
     painter.syncEntity(ent(['arcane_intellect']));
 
     expect(vfx.buffSwirl).toHaveBeenCalledTimes(2);
   });
 
-  it('keeps sighting state for entities inside the stale window', () => {
-    let t = 0;
-    const { painter, vfx } = makePainter(() => t);
+  it('keeps sighting state across frames while the entity stays synced', () => {
+    const { painter, vfx } = makePainter();
 
     painter.syncEntity(ent(['arcane_intellect']));
-    t = 3;
+    painter.update(0.016);
+    painter.syncEntity(ent(['arcane_intellect']));
     painter.update(0.016);
     painter.syncEntity(ent(['arcane_intellect']));
 
     expect(vfx.buffSwirl).toHaveBeenCalledTimes(1);
+  });
+
+  it('never replays the swirl for an aura latched while presentation-culled', () => {
+    const { painter, vfx } = makePainter();
+
+    // Camera-culled sync latches the worn aura without painting; turning the
+    // camera back must not read as a fresh acquisition.
+    painter.syncEntity(ent(['arcane_intellect']), false);
+    painter.syncEntity(ent(['arcane_intellect']));
+
+    expect(vfx.buffSwirl).not.toHaveBeenCalled();
   });
 });
 

@@ -17,7 +17,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 831,
+      "nextId": 924,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -31,9 +31,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 834,
-      "state": "5fff13ff",
-      "events": "dee65e95",
+      "nextId": 927,
+      "state": "44f05876",
+      "events": "0d44e007",
       "rng": {
         "draws": 5,
         "digest": "a0521195"
@@ -71,7 +71,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 831,
+          "entityId": 924,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -125,7 +125,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 832,
+          "entityId": 925,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -164,7 +164,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 831
+              "sourceId": 924
             }
           ],
           "blockChance": 0.05,
@@ -176,7 +176,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 999943,
-          "id": 831,
+          "id": 924,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -227,7 +227,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 999985,
-          "id": 832,
+          "id": 925,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -268,7 +268,7 @@
           }
         },
         {
-          "aggroTargetId": 831,
+          "aggroTargetId": 924,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -278,7 +278,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 833,
+          "id": 926,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -317,9 +317,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 835,
-      "state": "d6af3386",
-      "events": "ae7d3aaf",
+      "nextId": 928,
+      "state": "aab48527",
+      "events": "74b86d48",
       "rng": {
         "draws": 10,
         "digest": "181f0e45"
@@ -357,7 +357,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 831,
+          "entityId": 924,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -411,7 +411,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 832,
+          "entityId": 925,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -450,7 +450,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 831
+              "sourceId": 924
             },
             {
               "duration": 1.5,
@@ -459,7 +459,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 834
+              "sourceId": 927
             }
           ],
           "blockChance": 0.05,
@@ -471,7 +471,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 999876,
-          "id": 831,
+          "id": 924,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -523,7 +523,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 834
+              "sourceId": 927
             }
           ],
           "comboUntil": -1,
@@ -533,7 +533,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 999973,
-          "id": 832,
+          "id": 925,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -574,7 +574,7 @@
           }
         },
         {
-          "aggroTargetId": 831,
+          "aggroTargetId": 924,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -584,7 +584,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 833,
+          "id": 926,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -619,7 +619,7 @@
           }
         },
         {
-          "aggroTargetId": 831,
+          "aggroTargetId": 924,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -629,7 +629,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 834,
+          "id": 927,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -667,9 +667,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 836,
-      "state": "2268df1b",
-      "events": "583b752b",
+      "nextId": 929,
+      "state": "84633e7f",
+      "events": "74af80e3",
       "rng": {
         "draws": 15,
         "digest": "010d678b"
@@ -707,7 +707,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 831,
+          "entityId": 924,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -761,7 +761,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 832,
+          "entityId": 925,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -800,7 +800,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 831
+              "sourceId": 924
             },
             {
               "duration": 1.5,
@@ -809,7 +809,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 834
+              "sourceId": 927
             }
           ],
           "blockChance": 0.05,
@@ -821,7 +821,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 999981,
-          "id": 831,
+          "id": 924,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -873,7 +873,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 834
+              "sourceId": 927
             },
             {
               "breaksOnDamage": true,
@@ -883,7 +883,7 @@
               "name": "Keening Wail",
               "remaining": 3,
               "school": "shadow",
-              "sourceId": 835,
+              "sourceId": 928,
               "value": -1.932876
             }
           ],
@@ -894,7 +894,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 999976,
-          "id": 832,
+          "id": 925,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -935,7 +935,7 @@
           }
         },
         {
-          "aggroTargetId": 831,
+          "aggroTargetId": 924,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -945,7 +945,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 833,
+          "id": 926,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -980,7 +980,7 @@
           }
         },
         {
-          "aggroTargetId": 831,
+          "aggroTargetId": 924,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -990,7 +990,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 834,
+          "id": 927,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -1024,7 +1024,7 @@
           }
         },
         {
-          "aggroTargetId": 831,
+          "aggroTargetId": 924,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -1034,7 +1034,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 835,
+          "id": 928,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -1073,8 +1073,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 837,
-      "state": "5b008857",
+      "nextId": 930,
+      "state": "fa928a56",
       "events": "741638a5",
       "rng": {
         "draws": 17,
@@ -1113,7 +1113,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 831,
+          "entityId": 924,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1167,7 +1167,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 832,
+          "entityId": 925,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1206,7 +1206,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 831
+              "sourceId": 924
             },
             {
               "duration": 1.5,
@@ -1215,7 +1215,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 834
+              "sourceId": 927
             }
           ],
           "blockChance": 0.05,
@@ -1227,7 +1227,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 999981,
-          "id": 831,
+          "id": 924,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1279,7 +1279,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 834
+              "sourceId": 927
             },
             {
               "breaksOnDamage": true,
@@ -1289,7 +1289,7 @@
               "name": "Keening Wail",
               "remaining": 3,
               "school": "shadow",
-              "sourceId": 835,
+              "sourceId": 928,
               "value": -1.932876
             }
           ],
@@ -1300,7 +1300,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 999976,
-          "id": 832,
+          "id": 925,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1341,7 +1341,7 @@
           }
         },
         {
-          "aggroTargetId": 831,
+          "aggroTargetId": 924,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -1351,7 +1351,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 833,
+          "id": 926,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -1386,7 +1386,7 @@
           }
         },
         {
-          "aggroTargetId": 831,
+          "aggroTargetId": 924,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -1396,7 +1396,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 834,
+          "id": 927,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -1430,7 +1430,7 @@
           }
         },
         {
-          "aggroTargetId": 831,
+          "aggroTargetId": 924,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -1440,7 +1440,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 835,
+          "id": 928,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -1486,7 +1486,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 836,
+          "id": 929,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -1527,8 +1527,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 838,
-      "state": "822860b4",
+      "nextId": 931,
+      "state": "7e63debd",
       "events": "741638a5",
       "rng": {
         "draws": 18,
@@ -1567,7 +1567,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 831,
+          "entityId": 924,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1621,7 +1621,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 832,
+          "entityId": 925,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1660,7 +1660,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 831
+              "sourceId": 924
             },
             {
               "duration": 1.5,
@@ -1669,7 +1669,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 834
+              "sourceId": 927
             }
           ],
           "blockChance": 0.05,
@@ -1681,7 +1681,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 999981,
-          "id": 831,
+          "id": 924,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1733,7 +1733,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 834
+              "sourceId": 927
             },
             {
               "breaksOnDamage": true,
@@ -1743,7 +1743,7 @@
               "name": "Keening Wail",
               "remaining": 3,
               "school": "shadow",
-              "sourceId": 835,
+              "sourceId": 928,
               "value": -1.932876
             }
           ],
@@ -1754,7 +1754,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 999976,
-          "id": 832,
+          "id": 925,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1795,7 +1795,7 @@
           }
         },
         {
-          "aggroTargetId": 831,
+          "aggroTargetId": 924,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -1805,7 +1805,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 833,
+          "id": 926,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -1840,7 +1840,7 @@
           }
         },
         {
-          "aggroTargetId": 831,
+          "aggroTargetId": 924,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -1850,7 +1850,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 834,
+          "id": 927,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -1884,7 +1884,7 @@
           }
         },
         {
-          "aggroTargetId": 831,
+          "aggroTargetId": 924,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -1894,7 +1894,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 835,
+          "id": 928,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -1940,7 +1940,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 836,
+          "id": 929,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -1988,7 +1988,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 837,
+          "id": 930,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -2024,9 +2024,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 839,
-      "state": "9adfb372",
-      "events": "109778dc",
+      "nextId": 932,
+      "state": "1a2409c4",
+      "events": "2a5e31bc",
       "rng": {
         "draws": 18,
         "digest": "9f203d69"
@@ -2064,7 +2064,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 831,
+          "entityId": 924,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2118,7 +2118,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 832,
+          "entityId": 925,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2157,7 +2157,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 831
+              "sourceId": 924
             },
             {
               "duration": 1.5,
@@ -2166,7 +2166,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 834
+              "sourceId": 927
             }
           ],
           "blockChance": 0.05,
@@ -2178,7 +2178,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 1000000,
-          "id": 831,
+          "id": 924,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -2230,7 +2230,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 834
+              "sourceId": 927
             },
             {
               "breaksOnDamage": true,
@@ -2240,7 +2240,7 @@
               "name": "Keening Wail",
               "remaining": 3,
               "school": "shadow",
-              "sourceId": 835,
+              "sourceId": 928,
               "value": -1.932876
             }
           ],
@@ -2251,7 +2251,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 1000000,
-          "id": 832,
+          "id": 925,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -2292,7 +2292,7 @@
           }
         },
         {
-          "aggroTargetId": 831,
+          "aggroTargetId": 924,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -2302,7 +2302,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 833,
+          "id": 926,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -2337,7 +2337,7 @@
           }
         },
         {
-          "aggroTargetId": 831,
+          "aggroTargetId": 924,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -2347,7 +2347,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 834,
+          "id": 927,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -2381,7 +2381,7 @@
           }
         },
         {
-          "aggroTargetId": 831,
+          "aggroTargetId": 924,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -2391,7 +2391,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 835,
+          "id": 928,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -2437,7 +2437,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 836,
+          "id": 929,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -2485,7 +2485,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 837,
+          "id": 930,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -2517,7 +2517,7 @@
           }
         },
         {
-          "aggroTargetId": 831,
+          "aggroTargetId": 924,
           "aiState": "flee",
           "combatTimer": 99.05,
           "comboUntil": -1,
@@ -2530,7 +2530,7 @@
           "hasFled": true,
           "hostile": true,
           "hp": 20,
-          "id": 838,
+          "id": 931,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -2566,8 +2566,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 839,
-      "state": "7817f9cd",
+      "nextId": 932,
+      "state": "772606cf",
       "events": "741638a5",
       "rng": {
         "draws": 18,
@@ -2606,7 +2606,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 831,
+          "entityId": 924,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2660,7 +2660,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 832,
+          "entityId": 925,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2699,7 +2699,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 831
+              "sourceId": 924
             },
             {
               "duration": 1.5,
@@ -2708,7 +2708,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 834
+              "sourceId": 927
             }
           ],
           "blockChance": 0.05,
@@ -2720,7 +2720,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 1000000,
-          "id": 831,
+          "id": 924,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -2772,7 +2772,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 834
+              "sourceId": 927
             },
             {
               "breaksOnDamage": true,
@@ -2782,7 +2782,7 @@
               "name": "Keening Wail",
               "remaining": 3,
               "school": "shadow",
-              "sourceId": 835,
+              "sourceId": 928,
               "value": -1.932876
             }
           ],
@@ -2793,7 +2793,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 1000000,
-          "id": 832,
+          "id": 925,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -2834,7 +2834,7 @@
           }
         },
         {
-          "aggroTargetId": 831,
+          "aggroTargetId": 924,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -2844,7 +2844,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 833,
+          "id": 926,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -2879,7 +2879,7 @@
           }
         },
         {
-          "aggroTargetId": 831,
+          "aggroTargetId": 924,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -2889,7 +2889,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 834,
+          "id": 927,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -2923,7 +2923,7 @@
           }
         },
         {
-          "aggroTargetId": 831,
+          "aggroTargetId": 924,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -2933,7 +2933,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 835,
+          "id": 928,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -2979,7 +2979,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 836,
+          "id": 929,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -3027,7 +3027,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 837,
+          "id": 930,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -3059,7 +3059,7 @@
           }
         },
         {
-          "aggroTargetId": 831,
+          "aggroTargetId": 924,
           "aiState": "flee",
           "combatTimer": 99.1,
           "comboUntil": -1,
@@ -3073,7 +3073,7 @@
           "hasFled": true,
           "hostile": true,
           "hp": 20,
-          "id": 838,
+          "id": 931,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -3109,8 +3109,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 839,
-      "state": "7817f9cd",
+      "nextId": 932,
+      "state": "772606cf",
       "events": "741638a5",
       "rng": {
         "draws": 18,
@@ -3149,7 +3149,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 831,
+          "entityId": 924,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -3203,7 +3203,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 832,
+          "entityId": 925,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -3242,7 +3242,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 831
+              "sourceId": 924
             },
             {
               "duration": 1.5,
@@ -3251,7 +3251,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 834
+              "sourceId": 927
             }
           ],
           "blockChance": 0.05,
@@ -3263,7 +3263,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 1000000,
-          "id": 831,
+          "id": 924,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -3315,7 +3315,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 834
+              "sourceId": 927
             },
             {
               "breaksOnDamage": true,
@@ -3325,7 +3325,7 @@
               "name": "Keening Wail",
               "remaining": 3,
               "school": "shadow",
-              "sourceId": 835,
+              "sourceId": 928,
               "value": -1.932876
             }
           ],
@@ -3336,7 +3336,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 1000000,
-          "id": 832,
+          "id": 925,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -3377,7 +3377,7 @@
           }
         },
         {
-          "aggroTargetId": 831,
+          "aggroTargetId": 924,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -3387,7 +3387,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 833,
+          "id": 926,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -3422,7 +3422,7 @@
           }
         },
         {
-          "aggroTargetId": 831,
+          "aggroTargetId": 924,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -3432,7 +3432,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 834,
+          "id": 927,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -3466,7 +3466,7 @@
           }
         },
         {
-          "aggroTargetId": 831,
+          "aggroTargetId": 924,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -3476,7 +3476,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 835,
+          "id": 928,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -3522,7 +3522,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 836,
+          "id": 929,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -3570,7 +3570,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 837,
+          "id": 930,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -3602,7 +3602,7 @@
           }
         },
         {
-          "aggroTargetId": 831,
+          "aggroTargetId": 924,
           "aiState": "flee",
           "combatTimer": 99.1,
           "comboUntil": -1,
@@ -3616,7 +3616,7 @@
           "hasFled": true,
           "hostile": true,
           "hp": 20,
-          "id": 838,
+          "id": 931,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
