@@ -440,6 +440,10 @@ export const SFX = [
     key: 'blind',
     custom: true,
   },
+  {
+    key: 'cloak_of_shadows',
+    custom: true,
+  },
 
   // --- Heals & auras --------------------------------------------------------
   {

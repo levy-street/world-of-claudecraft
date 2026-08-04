@@ -475,6 +475,15 @@ describe('combat SFX policy', () => {
     expect(auraApplyCue(gained, { ...aura('buff_ap'), id: 'ice_barrier' })).toBe('buff_apply');
   });
 
+  it('gives Cloak of Shadows its own apply cue too (an absorb aura, same apply path)', () => {
+    const gained = { type: 'aura', targetId: 1, name: 'Test Aura', gained: true } as const;
+    expect(auraApplyCue(gained, { ...aura('absorb'), id: 'cloak_of_shadows' })).toBe(
+      'cloak_of_shadows',
+    );
+    // Every other absorb shield keeps the shared chime.
+    expect(auraApplyCue(gained, { ...aura('absorb'), id: 'power_word_shield' })).toBe('buff_apply');
+  });
+
   it('uses unarmed swings in both druid combat forms', () => {
     const druid = target('player', 'druid');
     expect(weaponSwingCue(druid)).toBe('melee_swing_heavy');
