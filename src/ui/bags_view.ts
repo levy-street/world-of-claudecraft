@@ -409,6 +409,61 @@ export interface BagGridModel {
   overflow: number;
 }
 
+/** Which no-match empty copy the bag grid should paint. Quest filter gets a
+ *  warm purpose-class line; every other filter keeps the generic no-match line. */
+export type BagNoMatchKind = 'generic' | 'quest';
+
+/** Discriminant for the empty-filter message. Pure so the painter only maps
+ *  kind -> t() key and never re-derives the category branch. */
+export function bagNoMatchKind(filter: BagFilterState): BagNoMatchKind {
+  return filter.category === 'quest' ? 'quest' : 'generic';
+}
+
+/** One row in a derived (list) bag grid: either a soft section caption or a stack.
+ *  Section rows are NEVER drop targets and never carry a bag cell index. */
+export type BagListRow = { kind: 'section'; section: 'quest' } | { kind: 'stack'; slot: InvSlot };
+
+/** Soft Quest section headers are allowed only when the grid is a derived list
+ *  (not the All+recent manual cell stream). Inserting a header node into the
+ *  drop-target cell stream would shift bagIndex positions and break reorder.
+ *  Category `quest` already implies bagOrderIsManual is false, so it is covered. */
+export function bagQuestSectionHeadersAllowed(filter: BagFilterState): boolean {
+  return !bagOrderIsManual(filter);
+}
+
+/** Build paint rows for a derived bag list. When section headers are allowed and
+ *  the visible list mixes quest and non-quest stacks, emits a soft Quest header
+ *  then quest stacks (stable relative order), then the rest (stable relative
+ *  order). When headers are disallowed or the list is not mixed, returns plain
+ *  stack rows in the original order so sort/search stay honest and the manual
+ *  All+recent path (which never calls this; it paints model.cells) stays free
+ *  of header nodes that would break drop indices. */
+export function buildBagListRows(
+  visible: readonly InvSlot[],
+  lookup: ItemLookup,
+  filter: BagFilterState,
+): BagListRow[] {
+  if (!bagQuestSectionHeadersAllowed(filter)) {
+    return visible.map((slot) => ({ kind: 'stack' as const, slot }));
+  }
+  const quest: InvSlot[] = [];
+  const rest: InvSlot[] = [];
+  for (const slot of visible) {
+    const item = lookup(slot.itemId);
+    if (item?.kind === 'quest') quest.push(slot);
+    else rest.push(slot);
+  }
+  // Soft section only when both sides exist. All-quest (category quest) and
+  // pure non-quest lists need no caption; a lone header would be noise.
+  if (quest.length === 0 || rest.length === 0) {
+    return visible.map((slot) => ({ kind: 'stack' as const, slot }));
+  }
+  const rows: BagListRow[] = [{ kind: 'section', section: 'quest' }];
+  for (const slot of quest) rows.push({ kind: 'stack', slot });
+  for (const slot of rest) rows.push({ kind: 'stack', slot });
+  return rows;
+}
+
 /** Build the filtered grid model from the raw inventory + filter state, reusing
  *  applyBagFilter (bag_filter.ts) for the filter/sort. An empty unfiltered bag
  *  paints capacity empty squares (state 'empty' keeps the "(empty)" line for a

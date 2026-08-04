@@ -1877,6 +1877,11 @@ export const hudChromeStrings = {
     // Accessible-name sibling for the authored masterwork seal. Keep the whole
     // phrase in one key so punctuation and status placement remain localizable.
     itemAriaMasterwork: '{item}, quantity {count}, masterwork',
+    // Accessible-name arm of the quest-purpose bag mark (bag_quest_mark_view.ts):
+    // the corner seal is aria-hidden, so the CELL's name carries the quest fact
+    // that the rim/wash/seal show sighted players. Purpose class, not a quality
+    // tier; whole sentence in one key so punctuation stays localizable.
+    itemAriaQuest: '{item}, quantity {count}, quest item',
     filterGroupAria: 'Filter bags by category',
     filterAll: 'All',
     filterWeapon: 'Weapons',
@@ -1885,6 +1890,10 @@ export const hudChromeStrings = {
     filterMaterial: 'Materials',
     filterTool: 'Tools',
     filterQuest: 'Quest',
+    // Accessible name for the Quest chip when the bag holds quest pieces: the
+    // visible count badge is aria-hidden, so this whole phrase carries the
+    // number for assistive tech. {count} is already formatNumber'd by the host.
+    filterQuestCountAria: 'Quest, {count} items',
     filterMount: 'Mounts',
     sortAria: 'Sort bag items',
     sortRecent: 'Recent',
@@ -1893,6 +1902,9 @@ export const hudChromeStrings = {
     searchPlaceholder: 'Search items',
     searchAria: 'Search bag items by name',
     noMatch: 'No items match your filters.',
+    // Warm empty copy when the Quest category chip matches nothing. Purpose
+    // class, not a broken filter: the bag simply holds no quest pieces.
+    noQuestItems: 'No quest items in your bags.',
     // The bag bar (backpack + 4 equip sockets) and the used/capacity counter.
     capacity: '{used}/{total}',
     capacityAria: 'Bag slots used: {used} of {total}',

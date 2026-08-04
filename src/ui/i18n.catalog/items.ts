@@ -76,6 +76,13 @@ const itemStringsEn = {
       useDrink:
         'Use: Restores {amount} mana over {seconds} sec. Must remain seated while drinking.',
       questItem: 'Quest Item',
+      // Story tooltip lines (quest_item_tooltip_view.ts): related quest title,
+      // keep-rules footer, and orphaned copy when the item is no longer needed
+      // for an active quest. Progress reuses questUi.detail.objectiveProgress
+      // via the host so tracker and item tooltips share one number format.
+      questRelated: 'Quest: {quest}',
+      questRules: 'Cannot be sold, banked, or traded.',
+      questOrphaned: 'Not needed for any active quest.',
       classes: 'Classes: {classes}',
       sellPrice: 'Sell price: {money}',
       clickBuy: 'Click to buy',
