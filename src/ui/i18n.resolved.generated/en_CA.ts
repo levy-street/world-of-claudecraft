@@ -957,7 +957,8 @@ export const en_CA: EnTranslations = {
       "petTaunt": "Pet: Taunt",
       "petDefensive": "Pet: Defensive",
       "petAggressive": "Pet: Aggressive",
-      "mount": "Mount / Dismount"
+      "mount": "Mount / Dismount",
+      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
     },
     "actionBar": {
       "editKeys": "Edit action bar keys",
@@ -2352,6 +2353,7 @@ export const en_CA: EnTranslations = {
       "billboard": {
         "label": "Guild Billboard",
         "empty": "Nothing on the billboard yet.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Set by {name}",
         "save": "Save",
         "placeholder": "Write a message for the guild",
@@ -2588,6 +2590,8 @@ export const en_CA: EnTranslations = {
     "crafting": {
       "title": "Crafting",
       "close": "Close crafting",
+      "dialogOption": "Crafting",
+      "dialogOptionAria": "Open the crafting window for {craft}",
       "craft": "Craft",
       "reagentsNeeded": "Requires:",
       "reagentLine": "{name} x{have}/{required}",
@@ -6807,6 +6811,10 @@ export const en_CA: EnTranslations = {
         "leader": "Guild Master",
         "officer": "Officer",
         "member": "Member"
+      },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
       },
       "guildHeadOne": "you are {rank}, {count} member",
       "guildHeadMany": "you are {rank}, {count} members"

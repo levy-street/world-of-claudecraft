@@ -14,6 +14,8 @@ import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.all': '전체',
+  'hudChrome.actionBar.done': '완료',
+  'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
   'hudChrome.crafting.identity.ceilingRare': '희귀 상한',
   'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -22,8 +24,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.legend': '전설',
   'hudChrome.discord.roleTag.shill': '홍보대사',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
+  'guide.profPages.colWield': '사용 숙련도',
+  'guide.profPages.wieldNone': '제한 없음',
   'guide.profPages.fish.pctFmt': '{pct}%',
   'questUi.dialog.profIntroHint': '{name}에게 "{quest}"을(를) 받으세요.',
+  'itemUi.vendor.qtyMultiple': '{count}개',
+  'itemUi.vendor.buyCountAria': '{price}에 {item} {count}개 구매',
+  'itemUi.vendor.buyCountAriaWithRequirement': '{price}에 {item} {count}개 구매. {requirement}',
+  'itemUi.vendor.buyQuantityConfirm': '구매',
   'entities.items.eastbrook_greatsword.name': '이스트브룩 대검',
   'entities.items.highwatch_greatsword.name': '하이워치 대검',
   'entities.items.highwatch_wallshield.name': '하이워치 벽방패',
@@ -712,6 +720,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.hideOfflineTitle': '오프라인 길드원 숨기기',
   'hudChrome.social.billboard.label': '길드 게시판',
   'hudChrome.social.billboard.empty': '게시판에 아직 아무 내용도 없습니다.',
+  'hudChrome.social.billboard.loginLine': '길드 게시판: {text}',
   'hudChrome.social.billboard.setBy': '{name} 설정',
   'hudChrome.social.billboard.save': '저장',
   'hudChrome.social.billboard.placeholder': '길드에 전할 메시지를 작성하세요',
@@ -2113,6 +2122,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.social.ranks.leader': '길드장',
   'hud.social.ranks.officer': '장교',
   'hud.social.ranks.member': '회원',
+  'hud.social.tenure.recruit': '신병',
+  'hud.social.tenure.veteran': '베테랑',
   'hud.social.guildHeadOne': '당신은 {rank}, {count}명 회원',
   'hud.social.guildHeadMany': '당신은 {rank}, {count}명 회원',
   'hud.trade.title': '{name}님과 거래',
@@ -7438,6 +7449,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.wtb.label': '구매 희망',
   'hudChrome.discord.relay.help.label': '도움 요청',
   'hudChrome.crafting.title': '제작',
+  'hudChrome.crafting.dialogOption': '제작',
+  'hudChrome.crafting.dialogOptionAria': '{craft} 제작 창 열기',
   'hudChrome.crafting.close': '제작 닫기',
   'hudChrome.crafting.craft': '제작',
   'hudChrome.crafting.reagentsNeeded': '필요 재료:',
@@ -9142,6 +9155,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '팁: 다른 플레이어에게 친선 결투를 신청하거나 잿빛 콜로세움 투기장에 참가해 빌드를 시험해보세요.',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': '탑승 / 하차',
+  // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.
+  'hudChrome.keybinds.mouseHint':
+    '마우스 버튼도 사용할 수 있습니다. 지정하는 동안 가운데 버튼 (M3) 또는 엄지 버튼 (M4, M5) 을 누르세요. 왼쪽과 오른쪽 버튼은 카메라 조작, 클릭 이동, 월드 클릭용으로 예약되어 있습니다.',
   // On-bar action-bar key-binding mode (issue #1238). M16 wordy fills.
   'hudChrome.actionBar.editKeys': '액션 바 키 편집',
   'hudChrome.actionBar.editKeysHint': '액션 바의 슬롯을 클릭한 다음 키를 눌러 지정하세요.',

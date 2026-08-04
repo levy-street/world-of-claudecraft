@@ -1059,6 +1059,66 @@ export const TARGETS = [
     },
   },
   {
+    key: 'continent-map',
+    label: 'World map: continent overview (land-masked zone highlight)',
+    when: ['ui/continent_', 'map_pinch_zoom_core'],
+    // Desktop shows the hover highlight (mouse only); mobile shows the resting
+    // overview, which is what a touch player sees before tapping a zone.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page, shot) {
+      await page.evaluate(() => {
+        const p = window.__game?.sim?.player;
+        if (p?.pos) {
+          p.pos.x = 65; // Boar Meadow, Eastbrook Vale (the current-zone highlight)
+          p.pos.z = 0;
+        }
+      });
+      await wait(400);
+      await page.evaluate(() => window.__game?.hud?.toggleMap?.());
+      await wait(600);
+      // Reach the overview the way a player now does: one zoom-out click at the
+      // zone map's full extent leaves the zone level entirely. The level toggle is
+      // the fallback, so this recipe also brings the overview up on a base build
+      // that predates the zoom-out escape (the before half of a comparison).
+      await page.evaluate(() => document.querySelector('#map-zoom-out')?.click());
+      await wait(600);
+      await page.evaluate(() => {
+        const hud = window.__game?.hud;
+        if (hud && hud.mapLevel !== 'continent') hud.toggleMapLevel?.();
+      });
+      await wait(500);
+      if (!shot?.mobile) {
+        // Hover a zone the player is NOT standing in, through the real pointer
+        // path (the painter reads Hud's hovered zone id, nothing synthetic).
+        await page.evaluate(() => {
+          const hud = window.__game?.hud;
+          const canvas = document.querySelector('#map-canvas');
+          if (!hud || !canvas) return;
+          const box = canvas.getBoundingClientRect();
+          const region =
+            hud.continentRegions?.find((r) => r.zoneId === 'nightbloom') ??
+            hud.continentRegions?.[0];
+          if (!region) return;
+          canvas.dispatchEvent(
+            new PointerEvent('pointermove', {
+              pointerType: 'mouse',
+              bubbles: true,
+              clientX: box.left + ((region.rect.mx + region.rect.w / 2) * box.width) / canvas.width,
+              clientY:
+                box.top + ((region.rect.my + region.rect.h / 2) * box.height) / canvas.height,
+            }),
+          );
+        });
+        await wait(400);
+      }
+      const open = await page.evaluate(() => {
+        const w = document.querySelector('#map-window');
+        return !!w && getComputedStyle(w).display !== 'none';
+      });
+      return open ? { clip: '#map-window' } : {};
+    },
+  },
+  {
     key: 'gather-quest-map-areas',
     label: 'World map: gather-objective blobs',
     when: ['sim/quest_targets', 'sim/content/gather_nodes'],
@@ -2508,7 +2568,14 @@ export const TARGETS = [
           rank: over.rank ?? 'member',
           lastLogin: over.lastLogin ?? null,
           activeTitle: over.activeTitle ?? null,
+          joinedAt: over.joinedAt ?? null,
         });
+        // Role staging (one chip per row): the leader and the officer show their
+        // rank labels; a regular member shows the tenure tier AS the role
+        // (Recruit under 7 days, Member 7 to 29 days, Veteran at 30+). Both
+        // groups carry every member tier so one shot shows every arm.
+        const day = 24 * 60 * 60 * 1000;
+        const now = Date.now();
         // A leaf assignment: socialInfo is typed `null` on the offline Sim, but at
         // runtime it is a plain field the HUD reads through IWorld.
         sim.socialInfo = {
@@ -2529,6 +2596,7 @@ export const TARGETS = [
                 status: 'online',
                 zone: 'zone:stormwind',
                 rank: 'leader',
+                joinedAt: now - 400 * day, // rank label wins: Guild Master
               }),
               m({
                 id: 2,
@@ -2539,6 +2607,7 @@ export const TARGETS = [
                 status: 'dungeon',
                 zone: 'zone:deadmines',
                 rank: 'officer',
+                joinedAt: now - 40 * day, // rank label wins: Officer
               }),
               m({
                 id: 3,
@@ -2549,6 +2618,21 @@ export const TARGETS = [
                 status: 'combat',
                 zone: 'zone:elwynn',
                 rank: 'member',
+                joinedAt: now - 5 * day, // Recruit (under 7 days)
+              }),
+              // The Member and Veteran tiers ride the SHORT offline names (Wisp,
+              // Lyria): an offline row's wide last-seen meta leaves the name span
+              // little room, and a long name (Thornbeard) ellipsizes the chip away
+              // in either desktop grid column.
+              m({
+                id: 6,
+                name: 'Wisp',
+                cls: 'druid',
+                level: 22,
+                online: false,
+                rank: 'member',
+                lastLogin: null,
+                joinedAt: now - 15 * day, // Member (7 to 29 days)
               }),
               m({
                 id: 4,
@@ -2558,6 +2642,7 @@ export const TARGETS = [
                 online: false,
                 rank: 'member',
                 lastLogin: '2026-07-18T20:15:00.000Z',
+                joinedAt: now - 120 * day, // Veteran (30 days or more)
               }),
               m({
                 id: 5,
@@ -2567,15 +2652,7 @@ export const TARGETS = [
                 online: false,
                 rank: 'member',
                 lastLogin: '2026-07-10T11:00:00.000Z',
-              }),
-              m({
-                id: 6,
-                name: 'Wisp',
-                cls: 'druid',
-                level: 22,
-                online: false,
-                rank: 'member',
-                lastLogin: null,
+                joinedAt: now - 45 * day, // Veteran (name truncates, Lyria shows the chip)
               }),
             ],
           },
@@ -2588,13 +2665,44 @@ export const TARGETS = [
       if (!staged.ok) throw new Error(staged.reason);
       const open = await pollForSize(page, '#social-window');
       if (!open) return {};
-      // Switch to the Guild tab (the strip fires on data-tab), then optionally engage
-      // the hide-offline toggle for the hidden variant.
+      // Switch to the Guild tab (the strip fires on data-tab), then drive the
+      // hide-offline toggle to the variant's state. The toggle PERSISTS to
+      // localStorage, so a click-only "engage" would leak the hidden state from
+      // the desktop-hidden variant into the mobile shot (same browser profile);
+      // syncing on aria-pressed makes every variant deterministic.
       await page.evaluate((hide) => {
         document.querySelector('.soc-tab[data-tab="guild"]')?.click();
-        if (hide) document.querySelector('[data-act="toggle-hide-offline"]')?.click();
+        const toggle = document.querySelector('[data-act="toggle-hide-offline"]');
+        const on = toggle?.getAttribute('aria-pressed') === 'true';
+        if (hide !== on) toggle?.click();
       }, variant?.hide === true);
       await wait(400);
+      // The roster sits below the billboard editor in the scrollable body. On
+      // desktop, scroll the first group header into view so both groups' role
+      // chips are in frame (Guild Master / Officer / Recruit online, Member /
+      // Veteran offline). The short mobile viewport fits only about three rows,
+      // so there anchor the LAST ONLINE row (the Recruit) instead: the frame then
+      // holds the member-tier run (Recruit / Member / Veteran), the part of the
+      // roster the one-chip role change is about.
+      await page.evaluate((mobile) => {
+        if (mobile) {
+          // Anchor the Recruit row's TEXT (skip its top padding) so the ~3-row
+          // viewport reaches one line further down, far enough that the first
+          // offline Veteran row's name line and chip clear the fold too.
+          const body = document.querySelector('#social-window .soc-body');
+          const rows = document.querySelectorAll('#social-window .soc-row');
+          const row = rows[2];
+          if (body && row) {
+            const delta = row.getBoundingClientRect().top - body.getBoundingClientRect().top;
+            body.scrollTop += delta + 8;
+          }
+        } else {
+          document
+            .querySelector('#social-window .soc-group-head')
+            ?.scrollIntoView({ block: 'start' });
+        }
+      }, variant?.mobile === true);
+      await wait(300);
       return { clip: '#social-window' };
     },
   },
@@ -2687,6 +2795,63 @@ export const TARGETS = [
       });
       await wait(400);
       return { clip: '#social-window' };
+    },
+  },
+  {
+    key: 'guild-login-line',
+    label: 'Chat log: guild billboard echoed as a login line (guild channel)',
+    when: ['ui/guild_motd_login'],
+    // The echo is a value-diffed latch on the Hud slow band reading socialInfo
+    // through IWorld, so staging a guild with a MOTD through the debug hook (the
+    // same sanctioned offline-staging fallback as guild-roster) fires the real
+    // code path: decideGuildMotdLine, the profanity mask, and the guild-channel
+    // chat append.
+    variants: [
+      { key: 'desktop', charName: 'Rueweaver', charClass: 'paladin' },
+      { key: 'mobile', charName: 'Rueweaver', charClass: 'paladin', mobile: true },
+    ],
+    async capture(page, variant) {
+      const staged = await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        if (!sim?.player) return { ok: false, reason: 'offline world is unavailable' };
+        sim.socialInfo = {
+          friends: [],
+          blocks: [],
+          ignores: [],
+          guild: {
+            id: 1,
+            name: 'Emberwatch Vanguard',
+            rank: 'member',
+            motd: 'Raid night Friday, 8pm server. Bring flasks and water.',
+            motdSetBy: 'Gizzelda',
+            members: [],
+            events: [],
+          },
+        };
+        return { ok: true };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      // The line lands on the next slow-band pass; give the loop real time.
+      await wait(1500);
+      if (variant?.mobile) {
+        // The touch layout parks the chat panel behind its own button; without
+        // this the clip target is not visible and the shot silently falls back
+        // to the whole HUD.
+        await page.evaluate(() => {
+          document
+            .getElementById('mobile-chat')
+            ?.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }));
+        });
+        await wait(700);
+      }
+      // The billboard line is the newest entry; pin the log to its bottom so
+      // the short mobile panel does not crop it out of the shot.
+      await page.evaluate(() => {
+        const log = document.querySelector('#chatlog');
+        if (log) log.scrollTop = log.scrollHeight;
+      });
+      await wait(200);
+      return { clip: '#chatlog-wrap' };
     },
   },
   {
@@ -3995,6 +4160,134 @@ export const TARGETS = [
       );
       if (!hasPreview) throw new Error('attunement preview line missing from the quest detail');
       return { clip: '#quest-dialog' };
+    },
+  },
+  {
+    key: 'gossip-crafting-shortcut',
+    label: "Station master gossip Crafting shortcut (crafting window to the master's craft)",
+    when: ['ui/hud/quest/master_craft_core.ts', 'ui/hud/quest/quest_dialog_controller.ts'],
+    // The dialog variants shoot Forgemistress Darva's gossip menu (the
+    // Crafting row between Training and Unbinding). The window variant seeds
+    // a stale persisted tab (cooking; the boot-time woc_crafting_tab read, so
+    // it must land in beforeLoad, never capture staging), then either clicks
+    // the new row (AFTER: the window opens straight to Weaponcrafting) or
+    // falls back to the plain toggle the row replaces (BEFORE source state:
+    // the window opens on the stale cooking tab), so ONE recipe photographs
+    // both halves of the pair.
+    //
+    // beforeLoad also marks the first-run camera-mode prompt as already shown
+    // (woc.cameraModePrompt.shown): page.screenshot clips paint overlapping
+    // page chrome into the #quest-dialog region, and a live camera prompt
+    // was covering Training/Crafting/Unbinding in the after-desktop dialog
+    // shot. Capture still clicks/removes residual overlays as belt-and-braces.
+    variants: [
+      {
+        key: 'dialog-desktop',
+        beforeLoad: (page) =>
+          page.evaluateOnNewDocument("localStorage.setItem('woc.cameraModePrompt.shown', '1')"),
+      },
+      {
+        key: 'dialog-mobile',
+        mobile: true,
+        beforeLoad: (page) =>
+          page.evaluateOnNewDocument("localStorage.setItem('woc.cameraModePrompt.shown', '1')"),
+      },
+      {
+        key: 'window-desktop',
+        beforeLoad: (page) =>
+          page.evaluateOnNewDocument(`
+            localStorage.setItem('woc.cameraModePrompt.shown', '1');
+            localStorage.setItem('woc_crafting_tab', '"cooking"');
+          `),
+      },
+    ],
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.camera-prompt-backdrop')?.remove();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+        // Welcome-mail and other ambient banners paint into the dialog clip
+        // the same way the camera prompt does; clear the shared slot.
+        const banner = document.querySelector('#banner');
+        if (banner) {
+          banner.textContent = '';
+          banner.style.display = 'none';
+        }
+      });
+      await wait(300);
+      // Stand beside Darva (the dialog auto-closes on distance) and open her
+      // gossip menu, the attunement-legibility target's idiom. window.__game
+      // attaches a beat after the entry flow returns, so retry the staging
+      // rather than trusting one fixed wait.
+      let setup = { ok: false, reason: 'staging never ran' };
+      for (let attempt = 0; attempt < 20 && !setup.ok; attempt++) {
+        setup = await page.evaluate(() => {
+          const game = window.__game;
+          const sim = game?.sim;
+          if (!sim) return { ok: false, reason: 'no sim' };
+          const master = [...sim.entities.values()].find(
+            (e) => e.templateId === 'forgemistress_darva',
+          );
+          if (!master) return { ok: false, reason: 'no forgemistress_darva entity' };
+          const p = sim.player;
+          if (p?.pos) {
+            p.pos.x = master.pos.x;
+            p.pos.z = master.pos.z - 2;
+          }
+          const el = document.querySelector('#quest-dialog');
+          if (el) el.style.display = 'none';
+          game.hud.openQuestDialog(master.id);
+          return { ok: true };
+        });
+        if (!setup.ok) await wait(500);
+      }
+      if (!setup.ok) throw new Error(`gossip setup failed: ${setup.reason}`);
+      const open = await pollForSize(page, '#quest-dialog');
+      if (!open) throw new Error('quest dialog did not open');
+      // Re-clear overlays after the dialog opens: a delayed camera prompt or
+      // welcome-mail banner can still land on top of the clip region.
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-backdrop')?.remove();
+        const banner = document.querySelector('#banner');
+        if (banner) {
+          banner.textContent = '';
+          banner.style.display = 'none';
+        }
+      });
+      if (variant?.key !== 'window-desktop') {
+        // The mobile dialog scrolls internally and the service rows sit at
+        // the bottom: bring the subject row (Crafting; the Unbind row on a
+        // BEFORE source tree) into frame or the shot photographs the fold.
+        // Assert the row exists so a contaminated or empty dialog cannot
+        // ship as the PR's before/after evidence.
+        const hasSubject = await page.evaluate(() => {
+          const row =
+            document.querySelector('#quest-dialog [data-crafting]') ??
+            document.querySelector('#quest-dialog [data-unbind]');
+          row?.scrollIntoView({ block: 'center' });
+          return Boolean(row);
+        });
+        if (!hasSubject) {
+          throw new Error(
+            'quest dialog missing Crafting/Unbinding subject row for gossip-crafting-shortcut',
+          );
+        }
+        await wait(300);
+        return { clip: '#quest-dialog' };
+      }
+      await page.evaluate(() => {
+        const row = document.querySelector('#quest-dialog [data-crafting]');
+        if (row) {
+          row.click();
+        } else {
+          document.querySelector('#quest-dialog [data-close]')?.click();
+          window.__game?.hud?.toggleCrafting?.();
+        }
+      });
+      const windowOpen = await pollForSize(page, '#crafting-window');
+      if (!windowOpen) throw new Error('crafting window did not open');
+      return { clip: '#crafting-window' };
     },
   },
   {

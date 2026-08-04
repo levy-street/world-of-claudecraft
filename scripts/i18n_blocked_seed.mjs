@@ -309,6 +309,53 @@ export const COPIED_ALLOW_IDS = [
   // this is locale-specific precedent, not a blanket cognate.
   'admin::sv_SE::guilds.rank.officer',
   'admin::da_DK::guilds.rank.officer',
+  // The professions-inspect panel (v0.34.0). Two of its rows are structurally
+  // English in every locale: itemIdPlaceholder shows a literal item id
+  // ("copper_mining_pick"), which is a code identifier an operator types back
+  // verbatim, and restoreSummary ("{id} x{count}") is a bare format string whose
+  // only non-placeholder character is the multiplication "x". Locales that front
+  // them with a native lead-in (ja_JP "例: ", ru_RU "например, ") do not appear here.
+  'admin::cs_CZ::profInspect.itemIdPlaceholder',
+  'admin::da_DK::profInspect.itemIdPlaceholder',
+  'admin::de_DE::profInspect.itemIdPlaceholder',
+  'admin::es::profInspect.itemIdPlaceholder',
+  'admin::es_ES::profInspect.itemIdPlaceholder',
+  'admin::fr_FR::profInspect.itemIdPlaceholder',
+  'admin::fr_CA::profInspect.itemIdPlaceholder',
+  'admin::id_ID::profInspect.itemIdPlaceholder',
+  'admin::it_IT::profInspect.itemIdPlaceholder',
+  'admin::nl_NL::profInspect.itemIdPlaceholder',
+  'admin::pl_PL::profInspect.itemIdPlaceholder',
+  'admin::pt_BR::profInspect.itemIdPlaceholder',
+  'admin::sv_SE::profInspect.itemIdPlaceholder',
+  'admin::tr_TR::profInspect.itemIdPlaceholder',
+  'admin::vi_VN::profInspect.itemIdPlaceholder',
+  'admin::cs_CZ::profInspect.restoreSummary',
+  'admin::da_DK::profInspect.restoreSummary',
+  'admin::de_DE::profInspect.restoreSummary',
+  'admin::es::profInspect.restoreSummary',
+  'admin::es_ES::profInspect.restoreSummary',
+  'admin::fr_FR::profInspect.restoreSummary',
+  'admin::fr_CA::profInspect.restoreSummary',
+  'admin::id_ID::profInspect.restoreSummary',
+  'admin::it_IT::profInspect.restoreSummary',
+  'admin::ja_JP::profInspect.restoreSummary',
+  'admin::nl_NL::profInspect.restoreSummary',
+  'admin::pl_PL::profInspect.restoreSummary',
+  'admin::pt_BR::profInspect.restoreSummary',
+  'admin::ru_RU::profInspect.restoreSummary',
+  'admin::sv_SE::profInspect.restoreSummary',
+  'admin::tr_TR::profInspect.restoreSummary',
+  'admin::vi_VN::profInspect.restoreSummary',
+  'admin::zh_CN::profInspect.restoreSummary',
+  'admin::zh_TW::profInspect.restoreSummary',
+  // True cognates: "Charges" is the ordinary French noun (the game client already
+  // ships it in hudChrome.professions.toolEffectCharges), and Dutch spells the
+  // noun "Effect" exactly as English does.
+  'admin::fr_FR::profInspect.colCharges',
+  'admin::fr_CA::profInspect.colCharges',
+  'admin::nl_NL::profInspect.colEffect',
+  'admin::nl_NL::profInspect.effectLabel',
 ];
 
 export const V07_SLASH = [

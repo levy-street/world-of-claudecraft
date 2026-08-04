@@ -304,4 +304,37 @@ describe('diffChangedPaths', () => {
     expect(classifyDiff(['src/sim/content/gather_nodes.ts']).isVisual).toBe(true);
     expect(classifyDiff(['src/sim/quest_targets.ts']).isVisual).toBe(true);
   });
+
+  it('maps the gossip Crafting shortcut from both the core and the dialog controller', () => {
+    // A rename of the target key or a `when` trim would silently stop
+    // capturing (a missing target is just one fewer screenshot), so pin the
+    // routing from BOTH implicating paths and the variant list. The dialog
+    // controller path also implies the attunement-legibility target, so use
+    // toContain, not toEqual, for that arm.
+    const fromCore = classifyDiff(['src/ui/hud/quest/master_craft_core.ts']);
+    expect(fromCore.specific.map((t: { key: string }) => t.key)).toContain(
+      'gossip-crafting-shortcut',
+    );
+    expect(
+      classifyDiff(['src/ui/hud/quest/quest_dialog_controller.ts']).specific.map(
+        (t: { key: string }) => t.key,
+      ),
+    ).toContain('gossip-crafting-shortcut');
+    const target = fromCore.specific.find(
+      (t: { key: string }) => t.key === 'gossip-crafting-shortcut',
+    );
+    expect(target?.variants.map((v: { key: string }) => v.key)).toEqual([
+      'dialog-desktop',
+      'dialog-mobile',
+      'window-desktop',
+    ]);
+    // Every variant must seed the camera-mode prompt flag before the document
+    // loads: page.screenshot clips paint overlapping chrome into the dialog
+    // region, and a live prompt was covering the Crafting row in the after
+    // desktop dialog shot. beforeLoad is a function (evaluateOnNewDocument),
+    // so pin presence rather than its body string.
+    for (const variant of target?.variants ?? []) {
+      expect(typeof variant.beforeLoad, `${variant.key} beforeLoad`).toBe('function');
+    }
+  });
 });

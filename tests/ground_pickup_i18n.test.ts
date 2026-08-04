@@ -74,6 +74,10 @@ const PENDING_LOCALE_KEYS = new Set<string>([
   // The quest-dedupe pass surfaces (same contributor-English model).
   'groundPickup.murlocHutDeny',
   'groundPickup.murlocHutEnough',
+  // The one item-agnostic line in the family (same contributor-English model):
+  // the refusal when a multi-count `interact` objective has already taken this
+  // object's credit. Not a deny/enough pair, so it has no partner key.
+  'groundPickup.objectAlreadyCredited',
 ]);
 
 describe('ground-pickup line localization (the S3-invisible surface)', () => {
@@ -84,11 +88,17 @@ describe('ground-pickup line localization (the S3-invisible surface)', () => {
     }
   });
 
-  it('covers 84 distinct lines with groundPickup.* keys', () => {
+  it('covers 85 distinct lines with groundPickup.* keys', () => {
     // 42 through the Veiled Hollow merge, plus 40 (20 deny/enough pairs) from
     // the new-realm quest pass, plus the murloc hut pair from the quest-dedupe
-    // pass.
-    expect(GROUND_PICKUP_KEYS.length).toBe(84);
+    // pass and the item-agnostic already-credited refusal.
+    expect(GROUND_PICKUP_KEYS.length).toBe(85);
+  });
+
+  it('recognizes the already-credited refusal via the EXACT matcher', () => {
+    // Emitted from interactObjectForQuests as a bare literal, so it is the sim
+    // matcher's job to re-localize it on the client.
+    expect(localizeSimText('You have already done this one.')).not.toBeNull();
   });
 
   it('pins a known literal per representative locale', () => {

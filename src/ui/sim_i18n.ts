@@ -275,6 +275,10 @@ const baseEnTable = {
   'groundPickup.wreckfieldFlotsamCrateEnough': 'You have salvaged all the flotsam Edda marked.',
   'groundPickup.gullhavenWatchbellDeny': "The watchbell answers only the bellkeeper's errand.",
   'groundPickup.gullhavenWatchbellEnough': 'Every coastal watchbell has been rung.',
+  // Item-agnostic: every multi-count `interact` objective credits once per
+  // distinct object, so this covers all of them (bells rung, lanterns relit,
+  // banners planted, carts righted). Emitted from interactObjectForQuests.
+  'groundPickup.objectAlreadyCredited': 'You have already done this one.',
   'error.vcupDeserter': 'The Groundskeeper remembers. Come back later.',
   'error.vcupPartyTooBig': 'That bracket needs a smaller party.',
   'error.vcupNoNation': 'Pick a banner nation first.',
@@ -824,6 +828,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.unstuckSickness': 'Unstuck Sickness',
   },
   es: {
+    'groundPickup.objectAlreadyCredited': 'Ya has hecho esto.',
     'error.mountTrainInProgress': 'Ya hay una lección de equitación en curso.',
     'error.mountTrainDismountFirst': 'Desmonta primero.',
     'error.ridingAlreadyLearned': 'Ya has aprendido equitación.',
@@ -1239,6 +1244,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Momento perfecto',
   },
   es_ES: {
+    'groundPickup.objectAlreadyCredited': 'Ya has hecho esto.',
     'error.mountTrainInProgress': 'Ya hay una lección de equitación en curso.',
     'error.mountTrainDismountFirst': 'Desmonta primero.',
     'error.ridingAlreadyLearned': 'Ya has aprendido equitación.',
@@ -1654,6 +1660,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Momento perfecto',
   },
   fr_FR: {
+    'groundPickup.objectAlreadyCredited': 'Vous avez déjà fait celui-ci.',
     'error.mountTrainInProgress': "Une leçon d'équitation est déjà en cours.",
     'error.mountTrainDismountFirst': "Descendez d'abord.",
     'error.ridingAlreadyLearned': "Vous avez déjà appris l'équitation.",
@@ -2075,6 +2082,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Moment parfait',
   },
   fr_CA: {
+    'groundPickup.objectAlreadyCredited': 'Vous avez déjà fait celui-ci.',
     'error.mountTrainInProgress': "Une leçon d'équitation est déjà en cours.",
     'error.mountTrainDismountFirst': "Descendez d'abord.",
     'error.ridingAlreadyLearned': "Vous avez déjà appris l'équitation.",
@@ -2688,6 +2696,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirSerpent': 'Might of the Serpent',
   },
   it_IT: {
+    'groundPickup.objectAlreadyCredited': 'Lo hai già fatto.',
     'error.mountTrainInProgress': 'È già in corso una lezione di equitazione.',
     'error.mountTrainDismountFirst': 'Smonta prima.',
     'error.ridingAlreadyLearned': "Hai già imparato l'equitazione.",
@@ -3104,6 +3113,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Momento Perfetto',
   },
   de_DE: {
+    'groundPickup.objectAlreadyCredited': 'Das habt Ihr bereits erledigt.',
     'error.mountTrainInProgress': 'Es läuft bereits eine Reitstunde.',
     'error.mountTrainDismountFirst': 'Ihr müsst zuerst absitzen.',
     'error.ridingAlreadyLearned': 'Ihr habt Reiten bereits erlernt.',
@@ -3524,6 +3534,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Perfekter Moment',
   },
   zh_CN: {
+    'groundPickup.objectAlreadyCredited': '你已经做过这个了。',
     'error.mountTrainInProgress': '骑乘课程已在进行中。',
     'error.mountTrainDismountFirst': '请先下骑。',
     'error.mountTrainLevel': '你必须达到等级20才能参加骑乘课程。',
@@ -3923,6 +3934,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': '完美时刻',
   },
   zh_TW: {
+    'groundPickup.objectAlreadyCredited': '你已經做過這個了。',
     'error.mountTrainInProgress': '騎乘課程已在進行中。',
     'error.mountTrainDismountFirst': '請先下騎。',
     'error.mountTrainLevel': '你必須達到等級 20 才能參加騎乘課程。',
@@ -4322,6 +4334,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': '完美時刻',
   },
   ko_KR: {
+    'groundPickup.objectAlreadyCredited': '이건 이미 완료했어요.',
     'error.mountTrainInProgress': '기승 수업이 이미 진행 중입니다.',
     'error.mountTrainDismountFirst': '먼저 내리세요.',
     'error.mountTrainLevel': '기승 수업을 받으려면 20레벨이 되어야 합니다.',
@@ -4730,6 +4743,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': '완벽한 순간',
   },
   ja_JP: {
+    'groundPickup.objectAlreadyCredited': 'これはもう済んでいる。',
     'error.mountTrainInProgress': '騎乗レッスンはすでに進行中です。',
     'error.mountTrainDismountFirst': '先に降りてください。',
     'error.mountTrainLevel': '騎乗レッスンを受けるにはレベル20が必要です。',
@@ -5147,6 +5161,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': '完璧な瞬間',
   },
   pt_BR: {
+    'groundPickup.objectAlreadyCredited': 'Você já fez isso.',
     'error.mountTrainInProgress': 'Uma aula de equitação já está em andamento.',
     'error.mountTrainDismountFirst': 'Desmonte primeiro.',
     'error.ridingAlreadyLearned': 'Você já aprendeu equitação.',
@@ -5562,6 +5577,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Momento Perfeito',
   },
   ru_RU: {
+    'groundPickup.objectAlreadyCredited': 'Это уже сделано.',
     'error.mountTrainInProgress': 'Урок верховой езды уже идёт.',
     'error.mountTrainDismountFirst': 'Сначала спешьтесь.',
     'error.mountTrainLevel': 'Чтобы брать уроки верховой езды, нужен 20 уровень.',
@@ -5979,6 +5995,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   },
   ...BASE_NEW,
   cs_CZ: {
+    'groundPickup.objectAlreadyCredited': 'Tohle už je hotové.',
     'error.emptyLoadoutName': 'Název sestavy nesmí být prázdný.',
     'error.sellBound': 'Tento předmět je vázaný a nelze ho prodat.',
     ...BASE_NEW.cs_CZ,
@@ -6097,6 +6114,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Dokonalý okamžik',
   },
   nl_NL: {
+    'groundPickup.objectAlreadyCredited': 'Dit heb je al gedaan.',
     'error.emptyLoadoutName': 'De naam van een build mag niet leeg zijn.',
     'error.sellBound': 'Dat voorwerp is gebonden en kan niet worden verkocht.',
     ...BASE_NEW.nl_NL,
@@ -6214,6 +6232,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Volmaakt Ogenblik',
   },
   pl_PL: {
+    'groundPickup.objectAlreadyCredited': 'To już zrobiłeś.',
     'error.emptyLoadoutName': 'Nazwa buildu nie może być pusta.',
     'error.sellBound': 'Ten przedmiot jest przywiązany i nie można go sprzedać.',
     ...BASE_NEW.pl_PL,
@@ -6334,6 +6353,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Idealna chwila',
   },
   id_ID: {
+    'groundPickup.objectAlreadyCredited': 'Kamu sudah melakukan ini.',
     'error.emptyLoadoutName': 'Nama bangun tidak boleh kosong.',
     'error.sellBound': 'Barang itu terikat dan tidak dapat dijual.',
     ...BASE_NEW.id_ID,
@@ -6452,6 +6472,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Momen Sempurna',
   },
   tr_TR: {
+    'groundPickup.objectAlreadyCredited': 'Bunu zaten yaptın.',
     'error.emptyLoadoutName': 'Derleme adı boş olamaz.',
     'error.sellBound': 'O eşya bağlı ve satılamaz.',
     ...BASE_NEW.tr_TR,
@@ -6570,6 +6591,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Mükemmel An',
   },
   sv_SE: {
+    'groundPickup.objectAlreadyCredited': 'Du har redan gjort det här.',
     'error.emptyLoadoutName': 'Byggets namn får inte vara tomt.',
     'error.sellBound': 'Det föremålet är bundet och kan inte säljas.',
     ...BASE_NEW.sv_SE,
@@ -6687,6 +6709,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Perfekt ögonblick',
   },
   vi_VN: {
+    'groundPickup.objectAlreadyCredited': 'Bạn đã làm cái này rồi.',
     'error.emptyLoadoutName': 'Tên build không được để trống.',
     'error.sellBound': 'Vật phẩm đó đã bị ràng buộc và không thể bán.',
     ...BASE_NEW.vi_VN,
@@ -6803,6 +6826,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Khoảnh Khắc Hoàn Hảo',
   },
   da_DK: {
+    'groundPickup.objectAlreadyCredited': 'Du har allerede gjort det her.',
     'error.emptyLoadoutName': 'Navnet på et build må ikke være tomt.',
     'error.sellBound': 'Den genstand er bundet og kan ikke sælges.',
     ...BASE_NEW.da_DK,

@@ -2487,7 +2487,11 @@ function makeTwinkles(root: THREE.Object3D, b: THREE.Box3, c: WeaponVfxTwinkles)
       uniform float uTime; uniform float uScale;
       varying float vI;
       void main() {
-        float w = 0.5 + 0.5 * sin(uTime * aRate * 6.2831 + aSeed * 6.2831);
+        // clamp() is load-bearing: GLSL leaves the precision of sin() to the
+        // implementation, so 0.5 + 0.5 * sin(x) is only non-negative in exact
+        // arithmetic. pow() of a negative base is NaN, and one NaN here is a
+        // hard-edged black rectangle once the bloom blurs it.
+        float w = clamp(0.5 + 0.5 * sin(uTime * aRate * 6.2831 + aSeed * 6.2831), 0.0, 1.0);
         vI = pow(w, 9.0);
         vec4 mv = modelViewMatrix * vec4(position, 1.0);
         gl_PointSize = aSize * uScale * (0.55 + 0.45 * vI) / max(0.15, -mv.z);
@@ -2613,8 +2617,8 @@ function makeAurora(b: THREE.Box3, c: WeaponVfxAurora): VfxPart | null {
         float t = fract(vUv.x * 1.4 - uTime * 0.1);
         float tri = 1.0 - abs(2.0 * t - 1.0);
         vec3 c = tri < 0.5 ? mix(uColA, uColB, tri * 2.0) : mix(uColB, uColC, tri * 2.0 - 1.0);
-        float ends = pow(sin(3.14159 * vUv.x), 0.75);
-        float edge = pow(1.0 - abs(vUv.y * 2.0 - 1.0), 1.6);
+        float ends = pow(max(0.0, sin(3.14159 * vUv.x)), 0.75);
+        float edge = pow(max(0.0, 1.0 - abs(vUv.y * 2.0 - 1.0)), 1.6);
         float shim = 0.72 + 0.28 * sin(uTime * 1.1 + vUv.x * 8.0);
         float a = ends * edge * shim * uOpacity;
         gl_FragColor = vec4(c * a, a);
@@ -2648,7 +2652,13 @@ function makeShell(root: THREE.Object3D, shellSpec: WeaponVfxShellSpec): VfxPart
       uniform vec3 uColor; uniform float uStr; uniform float uPow; uniform float uTime;
       varying vec3 vN; varying vec3 vV;
       void main() {
-        float f = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), uPow);
+        // max() is load-bearing: abs(dot(...)) of two vectors normalized in
+        // shader overshoots 1.0 by an ulp where they are aligned or
+        // anti-aligned, i.e. where the surface faces the camera head-on, so the
+        // base goes an ulp NEGATIVE there and pow() of a negative base is NaN.
+        // One NaN pixel here becomes a hard-edged black rectangle after the
+        // bloom blur.
+        float f = pow(max(0.0, 1.0 - abs(dot(normalize(vN), normalize(vV)))), uPow);
         float a = f * uStr * (0.85 + 0.15 * sin(uTime * 1.7));
         gl_FragColor = vec4(uColor * a, a);
       }`,

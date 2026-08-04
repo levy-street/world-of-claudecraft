@@ -371,10 +371,14 @@ export function handleDevChat(
     const craftId = mobileStationMatch[1].toLowerCase();
     const station = placeMobileStationForPlayer(ctx, craftId, pid);
     if (!station) {
-      ctx.error(
-        pid,
-        `[dev] Could not place a mobile ${craftId} station (specialization required).`,
-      );
+      // The module's dead gate already printed the real reason for a dead
+      // caller; the specialization line would state the wrong one on top.
+      if (!ctx.resolve(pid)?.e.dead) {
+        ctx.error(
+          pid,
+          `[dev] Could not place a mobile ${craftId} station (specialization required).`,
+        );
+      }
     } else {
       const minutes = Math.round((station.expiresAtTick - station.placedAtTick) / (20 * 60));
       emitDevLog(ctx, pid, `[dev] Mobile ${craftId} station placed here for ${minutes} minutes.`);

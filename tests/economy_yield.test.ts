@@ -9,13 +9,26 @@ import { mobXpValue } from '../src/sim/types';
 import { coinEvPerKill, itemEvPerKill, worldFarmClusters, xpPerKill } from './helpers/farm_yield';
 
 // Budgets are pinned ~25% above the shipped maxima, so ordinary content tuning
-// has room while a structural regression (a respawn tier cut, a coin fill an
-// order of magnitude off, a camp merge) trips the guard.
+// has room while a structural regression (a coin fill an order of magnitude off,
+// a camp merge, a respawn cut past what was decided) trips the guard.
+//
+// THESE WERE RE-BASED when the respawn tiers were retired for a single 60s world
+// delay (rationale in src/sim/respawn_policy.ts). Read them as recording a
+// decision, not as an independent bound: they were authored ALONGSIDE the tiers
+// they were said to justify, and calibrated to whatever the world produced
+// afterwards. What they honestly protect is "the economy did not move again
+// without someone deciding", which is worth having and is all it is.
+//
+// Worth keeping in view when judging whether a future number is alarming: the
+// model assumes a farmer who kills every mob the instant it respawns with zero
+// travel, which at the top cluster is 1.01 kills per SECOND across 130 yards.
+// Real throughput is a small fraction of it, and respawn does not bind a solo
+// player at any delay this world has shipped.
 
-/** Protects the richest cluster: Thornpeak's Glimmermere corridor at 27.5 gold/hr. */
-const MAX_CLUSTER_COPPER_PER_HOUR = 344_000;
-/** Protects the fastest XP cluster: the same corridor at 183k XP/hr. */
-const MAX_CLUSTER_XP_PER_HOUR = 229_000;
+/** Protects the richest cluster: Thornpeak's Glimmermere corridor at 56.0 gold/hr. */
+const MAX_CLUSTER_COPPER_PER_HOUR = 701_000;
+/** Protects the fastest XP cluster: the same corridor at 525k XP/hr. */
+const MAX_CLUSTER_XP_PER_HOUR = 657_000;
 
 /** Coin-carrying families: things that plausibly hold a purse. */
 const COIN_FAMILIES = new Set([

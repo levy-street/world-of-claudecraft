@@ -957,7 +957,8 @@ export const en_XA: EnTranslations = {
       "petTaunt": "[Þéţ: Ţáúñţ]",
       "petDefensive": "[Þéţ: Ðéƒéñšíʋé]",
       "petAggressive": "[Þéţ: Áĝĝŕéššíʋé]",
-      "mount": "[Ɱóúñţ / Ðíšɱóúñţ]"
+      "mount": "[Ɱóúñţ / Ðíšɱóúñţ]",
+      "mouseHint": "[Ɱóúšé ƀúţţóñš ŵóŕķ ţóó: þŕéšš ţĥé ɱíððļé ƀúţţóñ (Ɱ3) óŕ á ţĥúɱƀ ƀúţţóñ (Ɱ4, Ɱ5) ŵĥíļé ƀíñðíñĝ. Ļéƒţ áñð ŕíĝĥţ šţáý ŕéšéŕʋéð ƒóŕ ţĥé çáɱéŕá, çļíçķ ţó ɱóʋé, áñð çļíçķíñĝ ţĥíñĝš íñ ţĥé ŵóŕļð.]"
     },
     "actionBar": {
       "editKeys": "[Éðíţ áçţíóñ ƀáŕ ķéýš]",
@@ -2352,6 +2353,7 @@ export const en_XA: EnTranslations = {
       "billboard": {
         "label": "[Ĝúíļð Ɓíļļƀóáŕð]",
         "empty": "[Ñóţĥíñĝ óñ ţĥé ƀíļļƀóáŕð ýéţ.]",
+        "loginLine": "[Ĝúíļð ƀíļļƀóáŕð: {text}]",
         "setBy": "[Šéţ ƀý {name}]",
         "save": "[Šáʋé]",
         "placeholder": "[Ŵŕíţé á ɱéššáĝé ƒóŕ ţĥé ĝúíļð]",
@@ -2588,6 +2590,8 @@ export const en_XA: EnTranslations = {
     "crafting": {
       "title": "[Çŕáƒţíñĝ]",
       "close": "[Çļóšé çŕáƒţíñĝ]",
+      "dialogOption": "[Çŕáƒţíñĝ]",
+      "dialogOptionAria": "[Óþéñ ţĥé çŕáƒţíñĝ ŵíñðóŵ ƒóŕ {craft}]",
       "craft": "[Çŕáƒţ]",
       "reagentsNeeded": "[Ŕéɋúíŕéš:]",
       "reagentLine": "[{name} ẋ{have}/{required}]",
@@ -6807,6 +6811,10 @@ export const en_XA: EnTranslations = {
         "leader": "[Ĝúíļð Ɱášţéŕ]",
         "officer": "[Óƒƒíçéŕ]",
         "member": "[Ɱéɱƀéŕ]"
+      },
+      "tenure": {
+        "recruit": "[Ŕéçŕúíţ]",
+        "veteran": "[Ʋéţéŕáñ]"
       },
       "guildHeadOne": "[ýóú áŕé {rank}, {count} ɱéɱƀéŕ]",
       "guildHeadMany": "[ýóú áŕé {rank}, {count} ɱéɱƀéŕš]"

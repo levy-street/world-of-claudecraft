@@ -120,11 +120,12 @@ export interface MarketListing {
   instance?: ItemInstancePayload;
   // Recipe id that crafted every unit in this stack (bags.ts InvSlot.craftedRecipeId,
   // professions/crafting.ts), when the seller's stock carried one. Absent for a
-  // plain, never-crafted stack (and always absent on an instanced row: `instance`
-  // and `craftedRecipeId` are mutually exclusive, one row is either a single
-  // instanced copy or a plain fungible stack). Threaded through buy/cancel/collect
-  // (BUG #9) so a market round trip never launders a crafted item's provenance
-  // and reopens the disenchant anti-farming gate
+  // plain, never-crafted stack. ORTHOGONAL to `instance`, not exclusive with it:
+  // a single instanced row can also be crafted (a masterwork proc, or a crafted
+  // piece enchanted while worn), and reading the two as mutually exclusive is
+  // what dropped the marker off every such listing. Threaded through
+  // list/buy/cancel/collect (BUG #9) so a market round trip never launders a
+  // crafted item's provenance and reopens the disenchant anti-farming gate
   // (professions/enchanting.ts isCraftedDisenchantVictim).
   craftedRecipeId?: string;
 }
@@ -536,7 +537,7 @@ export class Market {
       return;
     }
     const escrowed = removeMatchingInstance(this.ctx, itemId, instance, meta.entityId);
-    if (!escrowed) return; // revalidation raced away; nothing was removed
+    if (!escrowed?.instance) return; // revalidation raced away; nothing was removed
     this.marketListings.push({
       id: this.nextListingId++,
       sellerKey,
@@ -546,7 +547,13 @@ export class Market {
       price: ask,
       expiresAt: this.ctx.time + MARKET_LISTING_DURATION,
       house: false,
-      instance: escrowed,
+      instance: escrowed.instance,
+      // An instanced row CAN also be crafted (a masterwork proc, an enchanted
+      // crafted piece), so the marker rides alongside the payload rather than
+      // being assumed absent here.
+      ...(escrowed.craftedRecipeId === undefined
+        ? {}
+        : { craftedRecipeId: escrowed.craftedRecipeId }),
     });
     this.ctx.emit({
       type: 'loot',
@@ -741,7 +748,12 @@ export class Market {
       this.marketListings.splice(i, 1);
       // Conditional spread: a plain row must not grow an `instance: undefined`/
       // `craftedRecipeId: undefined` key (rows are persisted and diffed
-      // byte-for-byte). instance and craftedRecipeId are mutually exclusive.
+      // byte-for-byte). BOTH are spread independently because a row can carry
+      // both at once (a masterwork proc, or a crafted piece enchanted while
+      // worn): reading them as mutually exclusive is the exact mental model
+      // that dropped the marker off every such listing, so this expiry return
+      // must keep treating them as orthogonal. See the MarketListing field
+      // comment above.
       this.collectionFor(l.sellerKey).items.push({
         itemId: l.itemId,
         count: l.count,

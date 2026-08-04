@@ -957,7 +957,8 @@ export const ko_KR: EnTranslations = {
       "petTaunt": "펫: 도발",
       "petDefensive": "펫: 방어",
       "petAggressive": "펫: 공격적",
-      "mount": "탑승 / 하차"
+      "mount": "탑승 / 하차",
+      "mouseHint": "마우스 버튼도 사용할 수 있습니다. 지정하는 동안 가운데 버튼 (M3) 또는 엄지 버튼 (M4, M5) 을 누르세요. 왼쪽과 오른쪽 버튼은 카메라 조작, 클릭 이동, 월드 클릭용으로 예약되어 있습니다."
     },
     "actionBar": {
       "editKeys": "액션 바 키 편집",
@@ -966,7 +967,7 @@ export const ko_KR: EnTranslations = {
       "bannerCapturing": "키를 눌러 이 슬롯에 지정하세요...",
       "boundToKey": "{key}(으)로 지정되었습니다.",
       "reset": "초기화",
-      "done": "Done",
+      "done": "완료",
       "cancel": "취소",
       "resetConfirmTitle": "액션 바 키를 초기화하시겠습니까?",
       "resetConfirmBody": "첫 번째 바는 기본 키로 되돌아가고, 두 번째와 세 번째 바는 지정 해제됩니다. 이 작업은 되돌릴 수 없습니다."
@@ -2352,6 +2353,7 @@ export const ko_KR: EnTranslations = {
       "billboard": {
         "label": "길드 게시판",
         "empty": "게시판에 아직 아무 내용도 없습니다.",
+        "loginLine": "길드 게시판: {text}",
         "setBy": "{name} 설정",
         "save": "저장",
         "placeholder": "길드에 전할 메시지를 작성하세요",
@@ -2588,6 +2590,8 @@ export const ko_KR: EnTranslations = {
     "crafting": {
       "title": "제작",
       "close": "제작 닫기",
+      "dialogOption": "제작",
+      "dialogOptionAria": "{craft} 제작 창 열기",
       "craft": "제작",
       "reagentsNeeded": "필요 재료:",
       "reagentLine": "{name}: {have}/{required}",
@@ -4284,8 +4288,8 @@ export const ko_KR: EnTranslations = {
       "toolUnavailable": "판매 없음",
       "priceNone": "판매 없음",
       "toolTierReq": "{tier}티어 도구",
-      "colWield": "Use at",
-      "wieldNone": "Any",
+      "colWield": "사용 숙련도",
+      "wieldNone": "제한 없음",
       "yieldsHeading": "채집의 수확물",
       "yieldsBody": "채집마다 품질을 굴리는데, 그 확률은 숙련도가 전부다. 갓 시작한 채집가는 언제나 일반 등급을 얻지만, 숙련이 오를수록 무게가 높은 등급으로 옮겨 가며 절대 후퇴하지 않는다. 상한 100에서는 일반이 완전히 사라져 60% 고급, 30% 희귀, 8% 영웅, 2% 전설이 된다. 품질은 곧 수량이다. 일반 1개, 고급과 희귀 2개, 영웅 3개, 전설 4개. 희귀 이상은 서명이 새겨져(Gathered by) 도착하며, 상한에서는 열 번 중 네 번에 이름이 남는다.",
       "bandsHeading": "숙련도 구간",
@@ -6808,6 +6812,10 @@ export const ko_KR: EnTranslations = {
         "officer": "장교",
         "member": "회원"
       },
+      "tenure": {
+        "recruit": "신병",
+        "veteran": "베테랑"
+      },
       "guildHeadOne": "당신은 {rank}, {count}명 회원",
       "guildHeadMany": "당신은 {rank}, {count}명 회원"
     },
@@ -7129,15 +7137,15 @@ export const ko_KR: EnTranslations = {
       "buyStack": "{count}개 구매",
       "buyStackAria": "{price}에 {item} {count}개 구매",
       "qtyRowAria": "구매 수량",
-      "qtyMultiple": "{count}x",
+      "qtyMultiple": "{count}개",
       "qtyMultipleAria": "한 번에 {count}개씩 구매",
       "qtyCustom": "직접 입력",
       "qtyCustomAria": "구매 수량 직접 입력",
-      "buyCountAria": "Buy {count} of {item} for {price}",
-      "buyCountAriaWithRequirement": "Buy {count} of {item} for {price}. {requirement}",
+      "buyCountAria": "{price}에 {item} {count}개 구매",
+      "buyCountAriaWithRequirement": "{price}에 {item} {count}개 구매. {requirement}",
       "buyQuantityTitle": "{item}을(를) 몇 개 구매하시겠습니까? 최대 {max}개.",
       "buyQuantityInput": "구매할 수량",
-      "buyQuantityConfirm": "Buy",
+      "buyQuantityConfirm": "구매",
       "buybackTitle": "되사기",
       "buybackEmpty": "물품 없음",
       "buybackAria": "{item}을(를) {price}에 되사기",

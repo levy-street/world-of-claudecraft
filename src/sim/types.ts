@@ -1034,6 +1034,24 @@ export function cloneInvSlot<T extends InvSlot>(slot: T): T {
   return { ...slot, instance: cloneItemInstancePayload(slot.instance) };
 }
 
+/** ONE unit lifted out of an inventory slot, carrying BOTH provenance channels
+ *  the slot can hold: the per-instance `instance` payload and the plain-stack
+ *  `craftedRecipeId` marker. Any remover that reports what it consumed must
+ *  return this, never the bare payload: a plain crafted stack has no `instance`
+ *  at all, so a payload-only return silently drops its marker and the re-grant
+ *  launders the copy (the class the trade/market/mail/bank fixes each closed
+ *  at their own boundary). THE shape for this, not one of several: items.ts
+ *  (VendorRemovedUnit, the equip bridge) and professions/enchanting.ts
+ *  (ConsumedDisenchantUnit) alias it rather than redeclare it, so a remover
+ *  cannot quietly grow a third spelling that reports only one channel.
+ *  Returned by Sim.removeEnchantableItem, items.ts removeVendorSellUnits,
+ *  item_instance_transfer.ts removeMatchingInstance, and enchanting.ts's
+ *  victim walks. */
+export interface InventoryUnit {
+  instance: ItemInstancePayload | undefined;
+  craftedRecipeId: string | undefined;
+}
+
 export interface LootSlot extends InvSlot {
   // Quest corpse loot can be personal: each listed player can take one copy.
   personalFor?: number[];
@@ -2651,9 +2669,11 @@ export interface ZoneDef {
   // to the Pale Causeway's head so the Wyrmgate opens where the road arrives.
   southPassX?: number;
   // Per-zone override of the open-world trash respawn delay (seconds), which
-  // otherwise comes from this zone's level band (src/sim/respawn_policy.ts
-  // trashRespawnSecondsForZone). An explicit SimConfig.respawnSeconds still
-  // wins over it, and a MobTemplate.respawnSeconds still wins over both.
+  // otherwise is the single world delay TRASH_RESPAWN_SECONDS
+  // (src/sim/respawn_policy.ts trashRespawnSecondsForZone; the level-band tiers
+  // that used to decide it are retired, see that file's header). An explicit
+  // SimConfig.respawnSeconds still wins over it, and a MobTemplate.respawnSeconds
+  // still wins over both.
   trashRespawnSeconds?: number;
 }
 
@@ -3009,8 +3029,15 @@ export interface QuestProgress {
   // content change. Fresh (empty) on accept; persisted with the run
   // (serialize/restore in sim.ts). See src/sim/interactions/firebottle_hut.ts.
   burnedObjects?: { key: string; at: number }[];
+  // Ledger of the distinct objects an `interact` objective has already been
+  // credited off, so one object cannot satisfy a multi-count objective on its
+  // own (see quests/interact_object_credit.ts). Absent until the first credit.
+  // The firebottle huts deliberately do NOT ride this ledger: their re-burn
+  // crediting is the timed burnedObjects cooldown above.
+  creditedObjects?: string[];
   // The QuestDef.rev this progress was accepted (or migrated) under; restore
-  // resets the run when the def's rev has moved (quest_progress_migration.ts).
+  // resets the run when the def's rev has moved (quest_progress_migration.ts),
+  // dropping the per-run scratch (burnedObjects, creditedObjects) with it.
   rev?: number;
 }
 
@@ -4803,7 +4830,12 @@ export type SimEvent = { pid?: number } & (
         | 'insufficient_essence'
         | 'invalid_stat'
         | 'invalid_gem'
-        | 'sockets_full';
+        | 'sockets_full'
+        // Type-level only: the while-dead refusal is returned to callers but
+        // never emitted (the three dead-gate early returns in
+        // rift/progression.ts sit ABOVE emitResult); its one player-facing
+        // surface is the shared "You can't do that while dead." error line.
+        | 'dead';
       upgradeLevel?: number;
       essenceSpent?: number;
     }

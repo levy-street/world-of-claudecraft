@@ -14,6 +14,8 @@ import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.all': '全部',
+  'hudChrome.actionBar.done': '完成',
+  'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
   'hudChrome.crafting.identity.ceilingRare': '稀有品质上限',
   'hudChrome.crafting.pairOptionLabel': '{pair}（{craftA} + {craftB}）',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -22,8 +24,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.legend': '传奇',
   'hudChrome.discord.roleTag.shill': '布道者',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
+  'guide.profPages.colWield': '使用熟练度',
+  'guide.profPages.wieldNone': '不限',
   'guide.profPages.fish.pctFmt': '{pct}%',
   'questUi.dialog.profIntroHint': '请找{name}接取《{quest}》。',
+  'itemUi.vendor.qtyMultiple': '{count}个',
+  'itemUi.vendor.buyCountAria': '以 {price} 购买 {count} 个 {item}',
+  'itemUi.vendor.buyCountAriaWithRequirement': '以 {price} 购买 {count} 个 {item}。{requirement}',
+  'itemUi.vendor.buyQuantityConfirm': '购买',
   'entities.items.eastbrook_greatsword.name': '东溪巨剑',
   'entities.items.highwatch_greatsword.name': '高望巨剑',
   'entities.items.highwatch_wallshield.name': '高望壁盾',
@@ -693,6 +701,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.hideOfflineTitle': '隐藏离线公会成员',
   'hudChrome.social.billboard.label': '公会公告板',
   'hudChrome.social.billboard.empty': '公告板上还没有内容。',
+  'hudChrome.social.billboard.loginLine': '公会公告板：{text}',
   'hudChrome.social.billboard.setBy': '由 {name} 设置',
   'hudChrome.social.billboard.save': '保存',
   'hudChrome.social.billboard.placeholder': '给公会写一条消息',
@@ -2033,6 +2042,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.social.ranks.leader': '会长',
   'hud.social.ranks.officer': '官员',
   'hud.social.ranks.member': '成员',
+  'hud.social.tenure.recruit': '新兵',
+  'hud.social.tenure.veteran': '老兵',
   'hud.social.guildHeadOne': '你是{rank}，{count}名成员',
   'hud.social.guildHeadMany': '你是{rank}，{count}名成员',
   'hud.trade.title': '与 {name} 交易',
@@ -7135,6 +7146,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.wtb.label': '收购',
   'hudChrome.discord.relay.help.label': '求助',
   'hudChrome.crafting.title': '制作',
+  'hudChrome.crafting.dialogOption': '制作',
+  'hudChrome.crafting.dialogOptionAria': '打开{craft}制作窗口',
   'hudChrome.crafting.close': '关闭制作',
   'hudChrome.crafting.craft': '制作',
   'hudChrome.crafting.reagentsNeeded': '需要:',
@@ -8740,6 +8753,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'loading.tips.pvp': '提示：向其他玩家发起友谊决斗，或报名灰烬竞技场，来检验你的 build。',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': '骑乘 / 下骑',
+  // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.
+  'hudChrome.keybinds.mouseHint':
+    '鼠标按键同样可用：绑定时按下中键 (M3) 或拇指键 (M4、M5)。左键和右键保留给镜头、点击移动和点击世界中的目标使用。',
   // On-bar action-bar key-binding mode (issue #1238). M16 wordy fills.
   'hudChrome.actionBar.editKeys': '编辑动作条按键',
   'hudChrome.actionBar.editKeysHint': '点击动作条上的一个槽位，然后按下按键进行绑定。',
