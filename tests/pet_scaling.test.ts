@@ -2,7 +2,15 @@ import { describe, expect, it } from 'vitest';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { applyPetOwnerScaling } from '../src/sim/pet/pet_ai';
-import { completeTame, petOf, summonPet } from '../src/sim/pet/pet_commands';
+import {
+  abandonPet,
+  completeTame,
+  petOf,
+  restorePet,
+  serializePet,
+  summonPet,
+  tameError,
+} from '../src/sim/pet/pet_commands';
 import {
   isTameableFamily,
   PET_CATCHUP_SPEED_MULT,
@@ -202,12 +210,73 @@ describe('pet_scaling: re-deriving is safe', () => {
   });
 });
 
+describe('pet_scaling: lifecycle paths', () => {
+  it('survives a save/load round trip without inflating the pool', () => {
+    // PetState stores hp but never maxHp, so a reload rebuilds the pool from the
+    // template plus a FRESH share. If restorePet applied the share on top of an
+    // already-shared pool, every relog would grow the pet.
+    const { sim, hid, pet } = tamedWolf();
+    const pooled = pet.maxHp;
+    pet.hp = Math.round(pet.maxHp * 0.5);
+    const saved = serializePet(sim.ctx, hid);
+    expect(saved).not.toBeNull();
+    abandonPet(sim.ctx, hid);
+
+    const owner = sim.entities.get(hid) as AnyEntity;
+    restorePet(sim.ctx, owner, saved as NonNullable<typeof saved>);
+    const restored = petOf(sim.ctx, hid) as AnyEntity;
+    expect(restored.maxHp).toBe(pooled);
+    expect(restored.hp).toBe(Math.round(pooled * 0.5));
+    expect(restored.petOwnerHpBonus).toBe(petOwnerScaling(ownerStats(owner)).hp);
+
+    // And a second round trip is still stable.
+    const again = serializePet(sim.ctx, hid);
+    abandonPet(sim.ctx, hid);
+    restorePet(sim.ctx, owner, again as NonNullable<typeof again>);
+    expect((petOf(sim.ctx, hid) as AnyEntity).maxHp).toBe(pooled);
+  });
+
+  it('re-derives rather than compounds when the pet levels with its owner', () => {
+    // syncPetLevel rebuilds maxHp from the template, so it must zero the tracked
+    // share first or the pet keeps the old bonus AND gains a new one.
+    const { sim, hid, hunter, pet } = tamedWolf(10);
+    expect(pet.level).toBe(10);
+    sim.setPlayerLevel(20, hid);
+    for (let i = 0; i < 5; i++) sim.tick();
+    const grown = petOf(sim.ctx, hid) as AnyEntity;
+    expect(grown.level).toBe(20);
+    const base = templateHp('forest_wolf', 20);
+    const share = petOwnerScaling(ownerStats(hunter)).hp;
+    expect(grown.petOwnerHpBonus).toBe(share);
+    expect(grown.maxHp).toBe(base + share);
+  });
+});
+
 describe('pet_scaling: scope', () => {
   it('inherits only for the families a hunter can actually tame', () => {
     expect(isTameableFamily('beast')).toBe(true);
     expect(isTameableFamily('spider')).toBe(true);
     expect(isTameableFamily('demon')).toBe(false);
     expect(isTameableFamily('elemental')).toBe(false);
+  });
+
+  it('keeps the tame gate accepting and rejecting exactly what it did before', () => {
+    // tameError now routes its family check through isTameableFamily. Pin the real
+    // verdict per family so the shared predicate cannot quietly widen or narrow it.
+    const { sim, hunter } = hunterWorld();
+    const verdict = (templateId: string): string | null => {
+      const target = createMob(sim.nextId++, MOBS[templateId], 2, {
+        x: hunter.pos.x + 3,
+        y: hunter.pos.y,
+        z: hunter.pos.z,
+      }) as AnyEntity;
+      sim.addEntity(target);
+      return tameError(sim.ctx, hunter, target);
+    };
+    expect(verdict('forest_wolf')).toBeNull(); // beast
+    expect(verdict('webwood_spider')).toBeNull(); // spider
+    expect(verdict('gloomshade')).toBe('Only beasts can be tamed.'); // demon
+    expect(verdict('water_elemental')).toBe('Only beasts can be tamed.'); // elemental
   });
 
   it('leaves a demon parked on a hunter alone', () => {
