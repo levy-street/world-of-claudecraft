@@ -852,6 +852,22 @@ What remains accepted:
   script may flag them against the book; that finding points at the incident the loud
   fence-out log recorded (see the operator caveat in scripts/bank_audit.mjs: audit a
   quiesced realm).
+  RUNBOOK, loud on purpose because the failure mode looks alarming: a bank_audit run on a
+  LIVE realm can legitimately report `treasury_mismatch` and item drift. Rows of undone
+  ops stay by design, and a live book can be ahead of its durable row by an unflushed op
+  at the instant the audit reads. A live-realm finding is a LEAD, never a defect, and must
+  NOT be "fixed" by editing rows or books: re-run it against a quiesced realm (or after a
+  shutdown flush) and only act on what survives that.
+- RUNBOOK for an OVERSIZED or structurally malformed `guild_banks` row (the boot load skips
+  it, so that guild has no live book and every op is silently inert): the operator purge
+  CANNOT repair it, because the endpoint answers `that guild has no loaded bank` for
+  exactly this state (it operates on a LOADED book, by design: a hatch that wrote rows
+  directly would bypass the observed mutation path the whole audit rests on). Recovery is
+  operator SQL on the row (inspect `octet_length(data::text)` against
+  `GUILD_BANK_ROW_MAX_BYTES` and the `inventory` shape, repair or trim the offending
+  slots, keeping a copy of the original), followed by a realm restart so the boot load
+  installs the repaired book. The boot log names every skipped guild id, which is the
+  signal to look.
 - The guild-delete window (`beginGuildBankDelete` / `endGuildBankDelete`) refuses every
   guild bank op for a guild whose DELETE is in flight, spanning the empty-bank guard to
   the DELETE and its post-commit hooks, and tells the actor so
@@ -955,9 +971,10 @@ What remains accepted:
     and refetches the listing, and a 200 with `audited: false` says the item went but its
     moderation row did not.
 - Guild bank incidents are metered (2026-08-03): `woc_guild_bank_incidents_total{kind}`
-  over the fixed NINE `GUILD_BANK_INCIDENTS` (escrow_save_failed, escrow_refused_retry,
+  over the fixed ELEVEN `GUILD_BANK_INCIDENTS` (escrow_save_failed, escrow_refused_retry,
   save_fenced_out, escrow_quarantined, reconcile, book_unloaded, ledger_write_failed,
-  counterparty_orphan, counterparty_unstamped) through the `gameMetricsCounters` seam,
+  counterparty_orphan, counterparty_unstamped, log_read_failed, create_fee_unpaid)
+  through the `gameMetricsCounters` seam,
   pre-registered at zero. Guild id stays in the loud log and is never a metric label.
   Each counter sits BESIDE its log, never instead of it.
   `escrow_save_failed` means the save really FAILED: the db layer threw, or the merge
@@ -970,6 +987,21 @@ What remains accepted:
   paging on, now alongside `counterparty_orphan` and `counterparty_unstamped`, each of
   which is a single-sample defect rather than a transient. `reconcile` counts one per
   GUILD whose unflushed log `revertOwnGuildBookOps` actually undid.
+  ALERTING, stated so it is not left to taste: `escrow_quarantined`,
+  `counterparty_orphan`, `counterparty_unstamped` and `create_fee_unpaid` are single-sample
+  defects and are PAGE-worthy on `> 0`. `escrow_refused_retry` is alert-worthy on its RATE,
+  not its presence: it is ordinary two-officer concurrency on a healthy realm, so alert on
+  a sustained rise (or a rate that tracks ONE guild), which is the shape that means a book
+  is failing to converge rather than two officers sharing it. `escrow_save_failed`,
+  `ledger_write_failed` and `log_read_failed` are database-health signals; treat a
+  sustained non-zero rate the way any other db error rate is treated.
+  OPEN QUESTION (FernandoX7, recorded not resolved): whether escrow quarantine must be
+  WHOLE-CHARACTER when the only conflict is unflushed GUILD work belonging to an officer
+  who has since gone. Today the refusal abandons the entire session's live state, which is
+  conservative and correct for conservation but costs that player their session for
+  somebody else's stranded book half. A narrower "drop the book half, keep the character
+  half" arm would need a proof that the two halves are separable in that case, which is
+  exactly the property the single transaction exists to deny; not attempted here.
 - A create-fee reservation whose refund arm finds the founder gone (refused create racing
   a clean logout) cannot refund in the live sim; it is logged loudly for operator
   compensation, and no create_fee ledger row is written for it. Watch item: a refund
@@ -978,6 +1010,12 @@ What remains accepted:
 - `GuildBankSimPort` exposes the raw `Sim.guildBanks` map read-only for the boot has()
   verification (the one facade bypass, read-only and test-visible); a future
   `Sim.hasGuildBank` could remove it.
+- Deferred from the PR review (recorded, not fixed): extracting the replay/netting half of
+  `src/sim/guild_bank.ts` into a `guild_bank_replay.ts` leaf. The file is past the 800-line
+  ceiling and the split is a clean pure-leaf move (canonical form, the forward/inverse
+  pair, the netting), but it is a whole-file churn on a branch already carrying a fix wave,
+  and a move-not-rewrite refactor wants its own diff to stay reviewable. TRIGGER: do it in
+  the next change that touches the replay path for any other reason.
 - Deferred from the Phase 3 QA database review (recorded, not fixed; escalation
   triggers named): per-guild autosave serializer if the shared-writer depth warn fires
   in production; keyset pagination + realm/container filters for scripts/bank_audit.mjs

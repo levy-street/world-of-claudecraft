@@ -194,6 +194,38 @@ consolidation and the two reviewers flagged.
       runs the real admin entry point inside the P2, P3 and P4 sweeps, with a
       state-derived destruction term in the oracle. Measured over 3062 runs and 102123
       steps: 0 failures before, 0 after, 2616 purges actually removing a copy.
+- [x] **PR review fix wave (FernandoX7 + Rubsey, five passes).** 0 blocking, one real bug
+      class each in persistence, sanitization, accounting, operator safety, and two client
+      arms. Each fix is test-first and the reasoning lives in state.md:
+      - The merged-book write gate counted UTF-16 units against SQL gates that count UTF-8
+        bytes, so a multi-byte book could land durable and then be skipped by the boot read
+        forever (the quarantine that bound exists to prevent).
+      - `sanitizeGuildBankState` took `instance` verbatim and an uncapped
+        `craftedRecipeId`, breaking the one-sanitizer doctrine for the newest persisted
+        container; both now take the shared load bounds.
+      - The creation fee reached the database only through a fire-and-forget character
+        save, so a fenced-out or lost save left a created guild with an untouched durable
+        purse AND a create_fee row: a free guild booked as sold. The row is now written
+        only after the save commits, with a `create_fee_unpaid` incident for the arm that
+        cannot self-heal.
+      - The purge carrier came off the session stamp; a refused escrow quarantines and
+        DISCONNECTS the carrier, so a stale stamp could kick an ex-member for an
+        operator's act. It is a fresh durable read now, failing closed, and the dashboard
+        warns about the disconnect before the operator confirms.
+      - The purge's durability witness compared item TOTALS, so a concurrent unrelated
+        withdraw could make a reverted purge report success; it compares the specific copy.
+      - The replay's canonical form distinguished an undefined-valued key from an absent
+        one, which would have made a live payload compare unequal to its own durable clone
+        and refused that session's escrow save forever.
+      - The activity-log mirror re-armed only on the gate's null edge, so a refusal taken
+        away from the banker survived the walk-up; and the guild log view disarmed only the
+        guild deposit, leaving the personal one armed behind an off-screen grid.
+      - Nits taken: dirty-mark bound, realm predicates on two statements, a self-tested and
+        tightened `server/` import ban, a whole-gold assertion behind the createFee
+        matcher, and the runbook/alerting lines in state.md.
+      - NOT done (recorded in state.md with its trigger): the `guild_bank_replay.ts`
+        extraction. It is a clean pure-leaf move but a whole-file churn that wants its own
+        diff.
 - [x] **Loose end (d): the admin dashboard control.** CLOSES deferral (b) recorded under
       Slice 3 (a PR-review should-fix: the branch shipped a superadmin purge, its audit
       row, and a full set of t()-keyed operator strings with no component rendering any of
