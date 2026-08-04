@@ -1,0 +1,4312 @@
+{
+  "targetName": "Fenbridge Mirelight Cistern",
+  "targetId": "fenbridge-mirelight-cistern",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 34,
+    "aspect": 1.78,
+    "orientation": {
+      "yaw": 35,
+      "pitch": -13,
+      "roll": 0
+    },
+    "positionHint": [5, 3.8, 7],
+    "note": "Orthographic-like generated turnaround; compare only the admitted front, rear, and hero views and never project baked pixels."
+  },
+  "suitability": "conditional",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 2,
+    "primitive_decomposition": 3,
+    "material_procedurality": 2,
+    "occlusion_risk": 2,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "exterior-only covered civic cistern and mirelight service station",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "circular civic landmark",
+        "radial canopy",
+        "hard-surface masonry",
+        "ritual-service focal stack"
+      ],
+      "structureKind": [
+        "tiered basin assembly",
+        "four-post timber canopy",
+        "radial roof subassembly",
+        "suspended service fixtures"
+      ],
+      "motionPotential": [
+        "static world landmark",
+        "future crank rotation",
+        "future kettle or lantern sway"
+      ],
+      "materialFamilies": [
+        "damp stone",
+        "rain-dark timber",
+        "oxidized teal roof",
+        "forged iron",
+        "aged brass",
+        "shallow water",
+        "warm fire",
+        "teal fenlight"
+      ],
+      "notes": "Front, rear, and hero crops independently pass reference admission. The side crop is a pHash near-duplicate of front and is excluded as independent evidence."
+    },
+    "complexity": {
+      "tier": "moderate",
+      "scores": {
+        "silhouetteComplexity": 3,
+        "componentCount": 2,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 2,
+        "materialLayerCount": 3,
+        "localDetailDensity": 2,
+        "occlusionRisk": 2,
+        "actionReadinessNeed": 1
+      },
+      "estimatedCounts": {
+        "macroComponents": 4,
+        "mesoComponents": 6,
+        "microFeatureGroups": 14,
+        "materialLayers": 7,
+        "repetitionSystems": 2
+      },
+      "reasoning": [
+        "The concentric stone basin, four-post frame, horned radial canopy, and central fire-kettle stack make the civic silhouette distinct despite the compact footprint.",
+        "Stone sectors, roof courses, rim studs, cage bars, and post fittings need grouped repetition to remain inside the 800-triangle target.",
+        "Three independent admitted views establish the exterior and service cues; exact small radial counts remain cadence rather than literal inventory."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "moderate",
+      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "The cistern needs macro circular masses, meso suspended service assemblies, and mapped micro fittings to retain identity at gameplay distance."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "resolvedUncertainties": [
+      "The side crop is rejected as a near-duplicate of front and does not count as independent evidence; front, rear, and hero control implementation.",
+      "Generated views vary small roof-segment, stone-block, and cage-bar counts; use restrained radial cadence instead of copying any one count literally.",
+      "Water is a shallow closed surface band with no simulated depth or explorable shaft.",
+      "The kettle, crank, bucket, and lanterns are fixed exterior service cues in this asset; sockets preserve possible future motion."
+    ],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 10,
+      "note": "Fourteen observed details map to component local features or material local overrides.",
+      "details": [
+        {
+          "id": "concentric-stone-courses",
+          "kind": "seam",
+          "description": "Two low concentric courses of uneven damp stone define the cistern rim and central service island.",
+          "region": {
+            "x": 0.13,
+            "y": 0.62,
+            "width": 0.74,
+            "height": 0.25,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "basin relief",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "basin-ring/concentric-stone-courses"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/front.png",
+          "confidence": 0.96
+        },
+        {
+          "id": "moss-wet-footing",
+          "kind": "stain",
+          "description": "Moss and darker wetness collect only at the lowest outer stones and post contacts.",
+          "region": {
+            "x": 0.14,
+            "y": 0.72,
+            "width": 0.72,
+            "height": 0.18,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "stone albedo and roughness",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "stone/moss-wet-footing"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png",
+          "confidence": 0.94
+        },
+        {
+          "id": "shallow-water-band",
+          "kind": "gloss",
+          "description": "A narrow dark teal water band remains visible between the outer rim and central brazier island.",
+          "region": {
+            "x": 0.22,
+            "y": 0.64,
+            "width": 0.56,
+            "height": 0.15,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "water plane and material response",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "basin-ring/shallow-water-band"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/front.png",
+          "confidence": 0.92
+        },
+        {
+          "id": "four-post-shoe-clamps",
+          "kind": "fastener",
+          "description": "Four square timber canopy posts seat in broad dark iron shoes with visible clamp plates.",
+          "region": {
+            "x": 0.16,
+            "y": 0.35,
+            "width": 0.68,
+            "height": 0.48,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "post grounding and construction",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "canopy-frame/four-post-shoe-clamps"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png",
+          "confidence": 0.95
+        },
+        {
+          "id": "rope-post-collars",
+          "kind": "ridge",
+          "description": "Coarse rope collars wrap the service-side post and drawworks support.",
+          "region": {
+            "x": 0.2,
+            "y": 0.39,
+            "width": 0.56,
+            "height": 0.34,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "post attachment relief",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "canopy-frame/rope-post-collars"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/rear.png",
+          "confidence": 0.86
+        },
+        {
+          "id": "radial-teal-roof-courses",
+          "kind": "seam",
+          "description": "Layered oxidized teal roof courses radiate from a small central crown to an upturned polygonal eave.",
+          "region": {
+            "x": 0.15,
+            "y": 0.08,
+            "width": 0.72,
+            "height": 0.35,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "canopy silhouette and roof relief",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "canopy-roof/radial-teal-roof-courses"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png",
+          "confidence": 0.97
+        },
+        {
+          "id": "horned-corner-finials",
+          "kind": "contour",
+          "description": "Four restrained upturned horn tips punctuate the canopy corners without exceeding the eave footprint.",
+          "region": {
+            "x": 0.1,
+            "y": 0.12,
+            "width": 0.8,
+            "height": 0.28,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "canopy corner silhouette",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "canopy-roof/horned-corner-finials"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/front.png",
+          "confidence": 0.93
+        },
+        {
+          "id": "brass-ribs-and-crown",
+          "kind": "ridge",
+          "description": "Aged brass radial ribs converge on the roof crown and a short pointed finial.",
+          "region": {
+            "x": 0.22,
+            "y": 0.08,
+            "width": 0.56,
+            "height": 0.29,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "roof metal hierarchy",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "roof-rib-finial-system/brass-ribs-and-crown"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png",
+          "confidence": 0.91
+        },
+        {
+          "id": "brazier-rim-studs",
+          "kind": "fastener",
+          "description": "Even iron studs repeat around the central brazier rim.",
+          "region": {
+            "x": 0.36,
+            "y": 0.47,
+            "width": 0.28,
+            "height": 0.2,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "brazier construction cadence",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "central-brazier/brazier-rim-studs"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/front.png",
+          "confidence": 0.9
+        },
+        {
+          "id": "layered-warm-flame",
+          "kind": "emissive",
+          "description": "A compact yellow-white core sits inside an orange flame mantle and remains below the kettle.",
+          "region": {
+            "x": 0.44,
+            "y": 0.42,
+            "width": 0.14,
+            "height": 0.17,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "warm focal hierarchy",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "central-brazier/layered-warm-flame"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png",
+          "confidence": 0.96
+        },
+        {
+          "id": "kettle-chain-and-handle",
+          "kind": "linework",
+          "description": "A short center chain and broad arched handle suspend the dark kettle above the brazier.",
+          "region": {
+            "x": 0.39,
+            "y": 0.28,
+            "width": 0.23,
+            "height": 0.3,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "vertical service stack",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "hanging-kettle/kettle-chain-and-handle"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/front.png",
+          "confidence": 0.95
+        },
+        {
+          "id": "twin-fenlight-cage-bars",
+          "kind": "linework",
+          "description": "Two small teal fenlight cores are contained by dark square cages under opposite eaves.",
+          "region": {
+            "x": 0.13,
+            "y": 0.29,
+            "width": 0.75,
+            "height": 0.25,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "cool service-light containment",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "fenlight-pair/twin-fenlight-cage-bars"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png",
+          "confidence": 0.94
+        },
+        {
+          "id": "crank-spool-and-rope",
+          "kind": "ridge",
+          "description": "A side crank, horizontal spool, and straight rope drop identify the water-drawing station.",
+          "region": {
+            "x": 0.57,
+            "y": 0.39,
+            "width": 0.3,
+            "height": 0.38,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "drawworks readability",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "drawworks/crank-spool-and-rope"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/rear.png",
+          "confidence": 0.91
+        },
+        {
+          "id": "bucket-hoops",
+          "kind": "linework",
+          "description": "Two dark hoops and a small handle articulate the closed service bucket beside the rim.",
+          "region": {
+            "x": 0.63,
+            "y": 0.59,
+            "width": 0.2,
+            "height": 0.22,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "bucket construction",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "drawworks/bucket-hoops"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png",
+          "confidence": 0.87
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "note": "Architectural service object; character anatomy does not apply."
+    },
+    "sourceImage": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png"
+  },
+  "qualityContract": {
+    "qualityBar": "moderate",
+    "definitionOfDone": [
+      "A floor-seated 3.6 by 2.6 by 3.6 yard exterior cistern reads from three admitted views through its concentric stone-and-water base, four-post horned teal canopy, central brazier-kettle stack, twin fenlights, and crank service cue while remaining under the 800-triangle target and 1,200 hard ceiling."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 4,
+      "mesoComponents": 6,
+      "microFeatureGroups": 10,
+      "materialLayers": 7,
+      "repetitionSystems": 2,
+      "reviewViewpoints": 3
+    },
+    "featureGroups": [
+      {
+        "id": "basin-footprint",
+        "name": "Concentric stone and shallow-water footprint",
+        "required": true,
+        "qualityCriteria": [
+          "Two stone tiers and a visible shallow water band remain circular, low, and floor seated."
+        ],
+        "evidenceRefs": ["front", "rear", "hero"],
+        "failureModes": [
+          "base reads as a solid pedestal",
+          "water implies an open or traversable shaft"
+        ]
+      },
+      {
+        "id": "horned-canopy-silhouette",
+        "name": "Four-post radial canopy with horned corners",
+        "required": true,
+        "qualityCriteria": [
+          "Four grounded posts support a layered polygonal teal canopy with restrained upturned tips and a central crown."
+        ],
+        "evidenceRefs": ["front", "rear", "hero"],
+        "failureModes": [
+          "canopy reads as a generic cone or gazebo",
+          "posts float or lose square construction"
+        ]
+      },
+      {
+        "id": "fire-kettle-stack",
+        "name": "Central brazier, fire, chain, and kettle stack",
+        "required": true,
+        "qualityCriteria": [
+          "The warm brazier remains centered below a dark suspended kettle with a legible chain and handle."
+        ],
+        "evidenceRefs": ["front", "hero"],
+        "failureModes": ["kettle merges into the canopy", "warm core obscures metal containment"]
+      },
+      {
+        "id": "dual-light-hierarchy",
+        "name": "Warm central fire and paired cool fenlights",
+        "required": true,
+        "qualityCriteria": [
+          "Small teal fenlight cores stay inside dark cages and remain subordinate to the central warm fire."
+        ],
+        "evidenceRefs": ["front", "rear", "hero"],
+        "failureModes": [
+          "all lights share one color",
+          "unframed emissive geometry blooms over construction"
+        ]
+      },
+      {
+        "id": "drawworks-service-read",
+        "name": "Crank, spool, rope, and bucket service cue",
+        "required": true,
+        "qualityCriteria": [
+          "The compact drawworks remains attached to the rim and readable without blocking the clear circumference."
+        ],
+        "evidenceRefs": ["rear", "hero"],
+        "failureModes": [
+          "cistern reads only as a shrine",
+          "bucket or crank becomes loose lane clutter"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "outer diameter, canopy height, and eave-width ratios",
+      "four-post spacing and canopy corner-horn silhouette",
+      "brazier, kettle, chain, and crown vertical alignment",
+      "warm versus teal contained-light hierarchy",
+      "crank, spool, rope, bucket, and clear-circumference readability",
+      "wet stone, moss, roof, metal, water, warm, and fenlight value separation"
+    ],
+    "antiShallowSpecRules": [
+      "Do not model an open shaft, explorable interior, or simulated water volume.",
+      "Do not flatten the stone tiers, post shoes, roof courses, kettle, cages, or drawworks into textures.",
+      "Every inventoried detail maps to a named feature or override.",
+      "Group radial masonry, roof courses, studs, and cage bars under the triangle ceiling.",
+      "Keep the exterior circumference clear for world traversal."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.7,
+    "mustMatch": [
+      "concentric stone-and-water footprint",
+      "four-post horned teal canopy",
+      "central fire-kettle vertical stack",
+      "paired teal fenlights and rim drawworks"
+    ],
+    "niceToHave": ["individual roof course drift", "brass crown patina", "fine wet-stone streaks"],
+    "fpsTarget": 60,
+    "reviewViewpoints": ["front", "rear", "front-three-quarter"]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": ["continue", "refine-spec", "refine-code", "request-input", "stop"],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "lighting-pass",
+        "interaction-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "cistern-basin-footprint",
+      "name": "Concentric stone-and-water footprint",
+      "tier": "critical",
+      "passIds": ["blockout", "form-refinement"],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": ["basin-ring"],
+      "evidenceRefs": ["front", "rear", "hero"]
+    },
+    {
+      "id": "horned-canopy-profile",
+      "name": "Four-post radial canopy and horned eaves",
+      "tier": "critical",
+      "passIds": ["blockout", "structural-pass"],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": ["canopy-frame", "canopy-roof"],
+      "evidenceRefs": ["front", "rear", "hero"]
+    },
+    {
+      "id": "fire-kettle-stack",
+      "name": "Brazier, flame, chain, and kettle alignment",
+      "tier": "critical",
+      "passIds": ["structural-pass", "form-refinement"],
+      "minimumScore": 0.76,
+      "mustPass": true,
+      "componentRefs": ["central-brazier", "hanging-kettle"],
+      "evidenceRefs": ["front", "hero"]
+    },
+    {
+      "id": "dual-light-hierarchy",
+      "name": "Contained warm fire and twin teal fenlights",
+      "tier": "critical",
+      "passIds": ["material-pass", "surface-pass"],
+      "minimumScore": 0.74,
+      "mustPass": true,
+      "componentRefs": ["central-brazier", "fenlight-pair"],
+      "evidenceRefs": ["front", "rear", "hero"]
+    },
+    {
+      "id": "drawworks-service-read",
+      "name": "Crank, spool, rope, and bucket service cue",
+      "tier": "critical",
+      "passIds": ["structural-pass", "form-refinement"],
+      "minimumScore": 0.72,
+      "mustPass": true,
+      "componentRefs": ["drawworks"],
+      "evidenceRefs": ["rear", "hero"]
+    },
+    {
+      "id": "radial-construction-cadence",
+      "name": "Stone sectors, roof courses, ribs, studs, and braces",
+      "tier": "important",
+      "passIds": ["structural-pass", "surface-pass"],
+      "minimumScore": 0.67,
+      "mustPass": false,
+      "componentRefs": [
+        "basin-ring",
+        "canopy-roof",
+        "roof-rib-finial-system",
+        "central-brazier",
+        "brace-and-shoe-system"
+      ],
+      "evidenceRefs": ["front", "rear", "hero"]
+    },
+    {
+      "id": "wet-moss-restraint",
+      "name": "Wetness and moss limited to stone and post contacts",
+      "tier": "important",
+      "passIds": ["material-pass", "surface-pass"],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": ["basin-ring", "canopy-frame"],
+      "evidenceRefs": ["front", "rear", "hero"]
+    },
+    {
+      "id": "clear-circumference",
+      "name": "Floor seating and unobstructed civic circumference",
+      "tier": "important",
+      "passIds": ["blockout", "optimization-pass"],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": ["basin-ring", "drawworks"],
+      "evidenceRefs": ["front", "rear", "hero"]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "complete",
+    "completedPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "lastCompletedPass": "optimization-pass",
+    "blockedReason": "all build passes completed",
+    "nextRequiredEvidence": []
+  },
+  "lookDevTargets": {
+    "qualityPriority": "gameplay-distance-stylized-vertex-color",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": true,
+      "normalOrBumpRequired": true,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 512,
+      "preferredTextureResolution": 512,
+      "independentMapChannels": ["albedo", "roughness", "height", "normal", "ambient-occlusion"],
+      "requiredSurfaceFrequencyBands": ["macro", "meso", "micro"],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.7,
+        "stopOnLowConfidence": true,
+        "acceptedLimitation": "Generated turnaround pixels contain studio lighting and one crop duplicates another; use admitted views for palette and finish evidence only, with independent shared normal and roughness maps at runtime."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "rim or environment light",
+        "exposure",
+        "tone mapping",
+        "background",
+        "contact shadow"
+      ],
+      "mustAvoid": [
+        "ambient-only lighting",
+        "flat value range",
+        "missing contact shadow",
+        "reference lighting copied without separating material readability"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "The side crop is rejected as a near-duplicate of front and does not count as independent evidence; front, rear, and hero control implementation.",
+    "Generated views vary small roof-segment, stone-block, and cage-bar counts; use restrained radial cadence instead of copying any one count literally.",
+    "Water is a shallow closed surface band with no simulated depth or explorable shaft.",
+    "The kettle, crank, bucket, and lanterns are fixed exterior service cues in this asset; sockets preserve possible future motion."
+  ],
+  "coordinateFrame": {
+    "front": "+Z faces the primary cistern service approach",
+    "up": "+Y",
+    "right": "+X",
+    "scaleReference": "world yards; 3.6 W by 2.6 H by 3.6 D"
+  },
+  "silhouette": {
+    "boundingShape": "low circular stone basin under a broad horned polygonal teal canopy supported by four square posts",
+    "aspectRatios": [
+      "height/width 0.722",
+      "height/depth 0.722",
+      "canopy eave spans about 94 percent of basin diameter"
+    ],
+    "symmetry": "radial four-post construction is nearly symmetric; drawworks and minor rope collars create intentional service-side asymmetry",
+    "dominantCurves": [
+      "concentric low basin rings",
+      "shallow faceted canopy dome",
+      "four restrained upturned eave horns",
+      "arched kettle handle"
+    ],
+    "negativeSpaces": [
+      "open bays between four posts",
+      "gap between kettle and brazier",
+      "fenlight cage openings",
+      "clear circumference around basin"
+    ],
+    "landmarks": [
+      "central brazier and kettle stack",
+      "paired teal eave lights",
+      "side crank and bucket",
+      "brass crown finial"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "front",
+      "view": "front",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": [
+        "concentric basin and water band",
+        "four-post spacing",
+        "horned canopy profile",
+        "brazier-kettle stack and fenlights"
+      ],
+      "confidence": 0.96
+    },
+    {
+      "id": "rear",
+      "view": "rear",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": [
+        "rear post spacing",
+        "drawworks spool and rope",
+        "bucket and canopy braces",
+        "opposed light placement"
+      ],
+      "confidence": 0.91
+    },
+    {
+      "id": "hero",
+      "view": "front-three-quarter",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": [
+        "overall civic identity",
+        "radial roof layering",
+        "post shoe grounding",
+        "warm/cool light hierarchy and service clearance"
+      ],
+      "confidence": 0.97
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Mirelight Cistern exterior assembly",
+      "level": "macro",
+      "role": "container",
+      "importance": 1,
+      "confidence": 0.98,
+      "primitive": "box",
+      "topologyClass": "material-only",
+      "topologyRationale": "Transform container only; all visible volume belongs to child exterior assemblies.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly exterior assembly with visible construction seams",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.024,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard trim seams"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 3.6,
+        "height": 2.6,
+        "depth": 3.6,
+        "units": "yards",
+        "confidence": 0.9
+      },
+      "transform": {
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "compound",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "stone",
+      "materialLayers": ["stone"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [],
+      "surfaceDetail": {
+        "macroRoughness": 0.17,
+        "microRoughness": 0.07,
+        "bumpAmplitude": 0.03,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "basin, post, roof, kettle, cage, and drawworks contacts",
+        "edgeWearPattern": "restrained exposed trim wear",
+        "notes": "Generated studio lighting is excluded from albedo."
+      },
+      "evidenceRefs": ["front", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural"
+    },
+    {
+      "id": "basin-ring",
+      "name": "Concentric stone rim, water band, and service island",
+      "level": "macro",
+      "role": "static-part",
+      "importance": 0.98,
+      "confidence": 0.95,
+      "primitive": "extrude",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Low faceted annuli and a closed central island establish the floor-seated circular footprint without an open shaft.",
+      "geometryDescriptor": {
+        "topologyIntent": "ordered low-poly radial civic construction with visible contact seams",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.018,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard construction seams"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 3.6,
+        "height": 0.62,
+        "depth": 3.6,
+        "units": "yards",
+        "confidence": 0.95
+      },
+      "transform": {
+        "position": [0, 0.31, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "cistern-exterior",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "stone"
+        }
+      },
+      "material": "stone",
+      "materialLayers": ["stone", "water"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "concentric-stone-courses",
+          "kind": "seam",
+          "placement": "outer rim and central island",
+          "geometryEffect": "two staggered low faceted annuli with visible sector joints",
+          "materialEffect": "darker cavities and restrained moss",
+          "confidence": 0.95
+        },
+        {
+          "id": "shallow-water-band",
+          "kind": "gloss",
+          "placement": "annulus between rim and island",
+          "geometryEffect": "thin closed teal disk remains visible between stone tiers",
+          "materialEffect": "smoother opaque water response",
+          "confidence": 0.92
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.16,
+        "microRoughness": 0.06,
+        "bumpAmplitude": 0.025,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "stone, post, roof, cage, chain, and rim contacts",
+        "edgeWearPattern": "restrained exposed metal and timber edge wear",
+        "notes": "Generated studio lighting is excluded from albedo."
+      },
+      "evidenceRefs": ["front", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(78, 86, 80, 1)",
+        "secondaryAlbedo": "rgba(116, 119, 107, 1)",
+        "materialClass": "stone",
+        "materialClassConfidence": 0.94
+      }
+    },
+    {
+      "id": "canopy-frame",
+      "name": "Four-post timber canopy frame",
+      "level": "macro",
+      "role": "static-part",
+      "importance": 0.96,
+      "confidence": 0.94,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Four square posts, upper collars, and grounded metal shoes carry the radial canopy as a clear structural frame.",
+      "geometryDescriptor": {
+        "topologyIntent": "ordered low-poly radial civic construction with visible contact seams",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.018,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard construction seams"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 2.45,
+        "height": 2.65,
+        "depth": 2.45,
+        "units": "yards",
+        "confidence": 0.94
+      },
+      "transform": {
+        "position": [0, 1.55, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "cistern-exterior",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "timber",
+      "materialLayers": ["timber", "metal"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "four-post-shoe-clamps",
+          "kind": "fastener",
+          "placement": "all four post feet",
+          "geometryEffect": "broad iron shoe boxes and raised clamp plates overlap each post",
+          "materialEffect": "dark iron separates post from wet stone",
+          "confidence": 0.95
+        },
+        {
+          "id": "rope-post-collars",
+          "kind": "ridge",
+          "placement": "service-side posts near drawworks",
+          "geometryEffect": "two coarse low-sided collars wrap selected posts",
+          "materialEffect": "rope remains dry matte against timber",
+          "confidence": 0.86
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.16,
+        "microRoughness": 0.06,
+        "bumpAmplitude": 0.025,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "stone, post, roof, cage, chain, and rim contacts",
+        "edgeWearPattern": "restrained exposed metal and timber edge wear",
+        "notes": "Generated studio lighting is excluded from albedo."
+      },
+      "evidenceRefs": ["front", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 39, 30, 1)",
+        "secondaryAlbedo": "rgba(106, 73, 50, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.93
+      }
+    },
+    {
+      "id": "canopy-roof",
+      "name": "Layered horned radial teal canopy",
+      "level": "macro",
+      "role": "static-part",
+      "importance": 0.99,
+      "confidence": 0.96,
+      "primitive": "extrude",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Stacked low-sided frusta create the polygonal radial canopy and its upturned corner profile economically.",
+      "geometryDescriptor": {
+        "topologyIntent": "ordered low-poly radial civic construction with visible contact seams",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.018,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "type": "radial-tier",
+            "amount": 0.16,
+            "axis": "Y",
+            "note": "Course tiers step inward toward the crown; horn tips turn upward only at four corners."
+          }
+        ],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard construction seams"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 3.4,
+        "height": 0.72,
+        "depth": 3.4,
+        "units": "yards",
+        "confidence": 0.96
+      },
+      "transform": {
+        "position": [0, 2.93, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "cistern-exterior",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "roof"
+        }
+      },
+      "material": "roof",
+      "materialLayers": ["roof", "metal"],
+      "deformations": [
+        {
+          "type": "radial-tier",
+          "amount": 0.16,
+          "axis": "Y",
+          "note": "Course tiers step inward toward the crown; horn tips turn upward only at four corners."
+        }
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "radial-teal-roof-courses",
+          "kind": "seam",
+          "placement": "all canopy slopes",
+          "geometryEffect": "two overlapping faceted roof courses radiate from the crown",
+          "materialEffect": "oxidized teal edges receive lighter vertex color",
+          "confidence": 0.97
+        },
+        {
+          "id": "horned-corner-finials",
+          "kind": "contour",
+          "placement": "four eave corners",
+          "geometryEffect": "short upturned horns extend from but stay within the footprint",
+          "materialEffect": "dark metal tips cap teal roof edges",
+          "confidence": 0.93
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.16,
+        "microRoughness": 0.06,
+        "bumpAmplitude": 0.025,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "stone, post, roof, cage, chain, and rim contacts",
+        "edgeWearPattern": "restrained exposed metal and timber edge wear",
+        "notes": "Generated studio lighting is excluded from albedo."
+      },
+      "evidenceRefs": ["front", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(23, 98, 105, 1)",
+        "secondaryAlbedo": "rgba(45, 133, 133, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.88
+      }
+    },
+    {
+      "id": "roof-rib-finial-system",
+      "name": "Radial brass ribs and crown finial",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.82,
+      "confidence": 0.9,
+      "primitive": "instanced-cluster",
+      "topologyClass": "surface-relief",
+      "topologyRationale": "Four low-profile radial ribs and a compact central crown sit on the roof surface as real silhouette relief.",
+      "geometryDescriptor": {
+        "topologyIntent": "ordered low-poly radial civic construction with visible contact seams",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.018,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard construction seams"
+      },
+      "parent": "canopy-roof",
+      "attachment": {
+        "parentId": "canopy-roof",
+        "parentSocket": "radial-rib-seats",
+        "localStart": [-1.35, 0, 0],
+        "localEnd": [1.35, 0, 0],
+        "contactType": "overlap",
+        "overlap": 0.03,
+        "gapTolerance": 0.01,
+        "evidenceRefs": ["front", "rear", "hero"]
+      },
+      "dimensions": {
+        "width": 2.9,
+        "height": 0.42,
+        "depth": 2.9,
+        "units": "yards",
+        "confidence": 0.9
+      },
+      "transform": {
+        "position": [0, 3.2, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "cistern-exterior",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "metal"
+        }
+      },
+      "material": "metal",
+      "materialLayers": ["metal"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "brass-ribs-and-crown",
+          "kind": "ridge",
+          "placement": "radial roof axes and crown",
+          "geometryEffect": "four narrow raised ribs converge on a short pointed finial",
+          "materialEffect": "aged brass remains brighter than iron shoes",
+          "confidence": 0.91
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.16,
+        "microRoughness": 0.06,
+        "bumpAmplitude": 0.025,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "stone, post, roof, cage, chain, and rim contacts",
+        "edgeWearPattern": "restrained exposed metal and timber edge wear",
+        "notes": "Generated studio lighting is excluded from albedo."
+      },
+      "evidenceRefs": ["front", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 56, 58, 1)",
+        "secondaryAlbedo": "rgba(181, 138, 58, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.94
+      }
+    },
+    {
+      "id": "central-brazier",
+      "name": "Central iron brazier and contained fire",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.96,
+      "confidence": 0.95,
+      "primitive": "lathe",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A low faceted bowl, raised rim, studs, and compact flame cluster form the central warm service focal point.",
+      "geometryDescriptor": {
+        "topologyIntent": "ordered low-poly radial civic construction with visible contact seams",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.018,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard construction seams"
+      },
+      "parent": "basin-ring",
+      "attachment": {
+        "parentId": "basin-ring",
+        "parentSocket": "central-service-island",
+        "localStart": [-0.45, 0, 0],
+        "localEnd": [0.45, 0, 0],
+        "contactType": "overlap",
+        "overlap": 0.05,
+        "gapTolerance": 0.01,
+        "evidenceRefs": ["front", "hero"]
+      },
+      "dimensions": {
+        "width": 1,
+        "height": 0.92,
+        "depth": 1,
+        "units": "yards",
+        "confidence": 0.95
+      },
+      "transform": {
+        "position": [0, 0.9, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "cistern-exterior",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "metal"
+        }
+      },
+      "material": "metal",
+      "materialLayers": ["metal", "warm"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "brazier-rim-studs",
+          "kind": "fastener",
+          "placement": "evenly around upper bowl rim",
+          "geometryEffect": "eight low stud caps repeat around the faceted rim",
+          "materialEffect": "stud crowns receive restrained metallic polish",
+          "confidence": 0.9
+        },
+        {
+          "id": "layered-warm-flame",
+          "kind": "emissive",
+          "placement": "inside brazier and below kettle",
+          "geometryEffect": "small nested angular flame volumes preserve metal containment",
+          "materialEffect": "yellow-white core remains inside orange mantle",
+          "confidence": 0.96
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.16,
+        "microRoughness": 0.06,
+        "bumpAmplitude": 0.025,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "stone, post, roof, cage, chain, and rim contacts",
+        "edgeWearPattern": "restrained exposed metal and timber edge wear",
+        "notes": "Generated studio lighting is excluded from albedo."
+      },
+      "evidenceRefs": ["front", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 56, 58, 1)",
+        "secondaryAlbedo": "rgba(181, 138, 58, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.94
+      }
+    },
+    {
+      "id": "hanging-kettle",
+      "name": "Suspended dark kettle, handle, and center chain",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.94,
+      "confidence": 0.94,
+      "primitive": "lathe",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A squat faceted kettle, broad handle, and short chain form a readable vertical stack between canopy and brazier.",
+      "geometryDescriptor": {
+        "topologyIntent": "ordered low-poly radial civic construction with visible contact seams",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.018,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard construction seams"
+      },
+      "parent": "canopy-roof",
+      "attachment": {
+        "parentId": "canopy-roof",
+        "parentSocket": "crown-chain-hook",
+        "localStart": [0, 0, 0],
+        "localEnd": [0, -1.35, 0],
+        "contactType": "overlap",
+        "overlap": 0.04,
+        "gapTolerance": 0.015,
+        "evidenceRefs": ["front", "hero"]
+      },
+      "dimensions": {
+        "width": 0.78,
+        "height": 1.35,
+        "depth": 0.78,
+        "units": "yards",
+        "confidence": 0.94
+      },
+      "transform": {
+        "position": [0, 1.86, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "cistern-exterior",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "metal"
+        }
+      },
+      "material": "metal",
+      "materialLayers": ["metal"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "kettle-chain-and-handle",
+          "kind": "linework",
+          "placement": "canopy crown to kettle shoulders",
+          "geometryEffect": "short segmented chain meets a broad arched handle with deliberate overlap",
+          "materialEffect": "handled edges use aged brass highlights",
+          "confidence": 0.95
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.16,
+        "microRoughness": 0.06,
+        "bumpAmplitude": 0.025,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "stone, post, roof, cage, chain, and rim contacts",
+        "edgeWearPattern": "restrained exposed metal and timber edge wear",
+        "notes": "Generated studio lighting is excluded from albedo."
+      },
+      "evidenceRefs": ["front", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 56, 58, 1)",
+        "secondaryAlbedo": "rgba(181, 138, 58, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.94
+      }
+    },
+    {
+      "id": "fenlight-pair",
+      "name": "Opposed teal fenlight cage pair",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.9,
+      "confidence": 0.93,
+      "primitive": "instanced-cluster",
+      "topologyClass": "surface-relief",
+      "topologyRationale": "Two repeated dark cages and contained teal cores hang under opposite eaves as a compact cool-light system.",
+      "geometryDescriptor": {
+        "topologyIntent": "ordered low-poly radial civic construction with visible contact seams",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.018,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard construction seams"
+      },
+      "parent": "canopy-roof",
+      "attachment": {
+        "parentId": "canopy-roof",
+        "parentSocket": "opposed-eave-hooks",
+        "localStart": [-1.15, 0, 0],
+        "localEnd": [1.15, 0, 0],
+        "contactType": "overlap",
+        "overlap": 0.03,
+        "gapTolerance": 0.015,
+        "evidenceRefs": ["front", "rear", "hero"]
+      },
+      "dimensions": {
+        "width": 2.7,
+        "height": 0.72,
+        "depth": 0.48,
+        "units": "yards",
+        "confidence": 0.93
+      },
+      "transform": {
+        "position": [0, 2.2, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "cistern-exterior",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "fenlight"
+        }
+      },
+      "material": "fenlight",
+      "materialLayers": ["metal", "fenlight"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "twin-fenlight-cage-bars",
+          "kind": "linework",
+          "placement": "opposite canopy eaves",
+          "geometryEffect": "each core is enclosed by four dark cage bars, cap, and base",
+          "materialEffect": "teal emission stays subordinate to warm fire",
+          "confidence": 0.94
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.16,
+        "microRoughness": 0.06,
+        "bumpAmplitude": 0.025,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "stone, post, roof, cage, chain, and rim contacts",
+        "edgeWearPattern": "restrained exposed metal and timber edge wear",
+        "notes": "Generated studio lighting is excluded from albedo."
+      },
+      "evidenceRefs": ["front", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(53, 191, 192, 1)",
+        "secondaryAlbedo": "rgba(156, 244, 232, 1)",
+        "materialClass": "glass",
+        "materialClassConfidence": 0.86
+      }
+    },
+    {
+      "id": "drawworks",
+      "name": "Rim-mounted crank, spool, rope, and bucket",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.94,
+      "confidence": 0.9,
+      "primitive": "instanced-cluster",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A compact attached post-and-spool cluster identifies the civic water service without creating loose path clutter.",
+      "geometryDescriptor": {
+        "topologyIntent": "ordered low-poly radial civic construction with visible contact seams",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.018,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard construction seams"
+      },
+      "parent": "basin-ring",
+      "attachment": {
+        "parentId": "basin-ring",
+        "parentSocket": "drawworks-footing",
+        "localStart": [0, 0, -0.55],
+        "localEnd": [0, 0, 0.55],
+        "contactType": "overlap",
+        "overlap": 0.06,
+        "gapTolerance": 0.02,
+        "evidenceRefs": ["rear", "hero"]
+      },
+      "dimensions": {
+        "width": 1.18,
+        "height": 1.45,
+        "depth": 0.82,
+        "units": "yards",
+        "confidence": 0.9
+      },
+      "transform": {
+        "position": [1.05, 0.92, 0.1],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "cistern-exterior",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "timber",
+      "materialLayers": ["timber", "metal"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "crank-spool-and-rope",
+          "kind": "ridge",
+          "placement": "service side of outer rim",
+          "geometryEffect": "horizontal spool, offset crank arm, and straight rope drop are separate overlapping solids",
+          "materialEffect": "handled metal contrasts with rope and timber",
+          "confidence": 0.91
+        },
+        {
+          "id": "bucket-hoops",
+          "kind": "linework",
+          "placement": "closed bucket beside rim",
+          "geometryEffect": "two dark hoops and a small handle articulate the faceted bucket",
+          "materialEffect": "wet lower bucket darkens toward stone",
+          "confidence": 0.87
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.16,
+        "microRoughness": 0.06,
+        "bumpAmplitude": 0.025,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "stone, post, roof, cage, chain, and rim contacts",
+        "edgeWearPattern": "restrained exposed metal and timber edge wear",
+        "notes": "Generated studio lighting is excluded from albedo."
+      },
+      "evidenceRefs": ["front", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 39, 30, 1)",
+        "secondaryAlbedo": "rgba(106, 73, 50, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.93
+      }
+    },
+    {
+      "id": "brace-and-shoe-system",
+      "name": "Diagonal canopy braces and collar plates",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.76,
+      "confidence": 0.88,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Short diagonal beams and collar plates visibly transfer roof load into the four posts while preserving open sight lines.",
+      "geometryDescriptor": {
+        "topologyIntent": "ordered low-poly radial civic construction with visible contact seams",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.018,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard construction seams"
+      },
+      "parent": "canopy-frame",
+      "attachment": {
+        "parentId": "canopy-frame",
+        "parentSocket": "upper-post-collars",
+        "localStart": [-1.05, 0, 0],
+        "localEnd": [1.05, 0, 0],
+        "contactType": "overlap",
+        "overlap": 0.04,
+        "gapTolerance": 0.015,
+        "evidenceRefs": ["front", "rear", "hero"]
+      },
+      "dimensions": {
+        "width": 2.5,
+        "height": 0.72,
+        "depth": 2.5,
+        "units": "yards",
+        "confidence": 0.88
+      },
+      "transform": {
+        "position": [0, 2.35, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "cistern-exterior",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "timber",
+      "materialLayers": ["timber", "metal"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "diagonal-brace-overlaps",
+          "kind": "ridge",
+          "placement": "inside each upper post corner",
+          "geometryEffect": "four short diagonal beams overlap posts and eave collars",
+          "materialEffect": "dark contact seams clarify load transfer",
+          "confidence": 0.89
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.16,
+        "microRoughness": 0.06,
+        "bumpAmplitude": 0.025,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "stone, post, roof, cage, chain, and rim contacts",
+        "edgeWearPattern": "restrained exposed metal and timber edge wear",
+        "notes": "Generated studio lighting is excluded from albedo."
+      },
+      "evidenceRefs": ["front", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 39, 30, 1)",
+        "secondaryAlbedo": "rgba(106, 73, 50, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.93
+      }
+    }
+  ],
+  "materials": [
+    {
+      "id": "stone",
+      "name": "Damp moss-lined cistern stone",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial-compatible semantic vertex color",
+      "baseColor": "#4E5650",
+      "color": "#4E5650",
+      "albedo": {
+        "dominant": "#4E5650",
+        "secondary": ["#74776B"],
+        "samplingNotes": "Observed from admitted turnaround zones; generated highlights and contact shadows are excluded."
+      },
+      "colorVariation": {
+        "palette": ["#4E5650", "#74776B"],
+        "pattern": "semantic vertex colors multiplied by an independent shared Fenbridge surface cell",
+        "amplitude": 0.11,
+        "heightCorrelation": 0.16
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.13,
+          "role": "broad material and dampness grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 8,
+          "amplitude": 0.07,
+          "role": "stone, grain, roof, water, or metal breakup"
+        },
+        {
+          "id": "micro",
+          "frequency": 36,
+          "amplitude": 0.02,
+          "role": "restrained grazing-highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.92,
+        "variation": 0.1,
+        "map": "independent Fenbridge shared roughness support map",
+        "localResponse": "cavities remain rougher while handled metal crowns and wet surfaces read smoother"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "independent Fenbridge shared normal support map",
+        "strength": 0.22,
+        "scale": 18,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.27,
+        "contactShadowBias": 0.32,
+        "notes": "Independent cavity and contact response; never derived from albedo."
+      },
+      "wear": {
+        "edgeWear": 0.05,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.18,
+        "cavityBias": 0.7,
+        "color": "#25231D"
+      },
+      "localOverrides": [
+        {
+          "id": "moss-wet-footing",
+          "region": "lowest outer stones and post contacts",
+          "color": "#59613A",
+          "roughness": 0.97,
+          "dirtAmount": 0.23,
+          "cavityBias": true,
+          "evidenceRefs": ["front", "rear", "hero"]
+        }
+      ],
+      "shaderNotes": [
+        "Vertex color is the palette authority.",
+        "Normal and roughness support remain independent channels."
+      ],
+      "notes": "Mapped to the stone Fenbridge semantic authoring bucket."
+    },
+    {
+      "id": "timber",
+      "name": "Rain-dark square canopy timber",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial-compatible semantic vertex color",
+      "baseColor": "#34271E",
+      "color": "#34271E",
+      "albedo": {
+        "dominant": "#34271E",
+        "secondary": ["#6A4932"],
+        "samplingNotes": "Observed from admitted turnaround zones; generated highlights and contact shadows are excluded."
+      },
+      "colorVariation": {
+        "palette": ["#34271E", "#6A4932"],
+        "pattern": "semantic vertex colors multiplied by an independent shared Fenbridge surface cell",
+        "amplitude": 0.11,
+        "heightCorrelation": 0.16
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.13,
+          "role": "broad material and dampness grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 8,
+          "amplitude": 0.07,
+          "role": "stone, grain, roof, water, or metal breakup"
+        },
+        {
+          "id": "micro",
+          "frequency": 36,
+          "amplitude": 0.02,
+          "role": "restrained grazing-highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.83,
+        "variation": 0.1,
+        "map": "independent Fenbridge shared roughness support map",
+        "localResponse": "cavities remain rougher while handled metal crowns and wet surfaces read smoother"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "independent Fenbridge shared normal support map",
+        "strength": 0.16,
+        "scale": 18,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.27,
+        "contactShadowBias": 0.32,
+        "notes": "Independent cavity and contact response; never derived from albedo."
+      },
+      "wear": {
+        "edgeWear": 0.05,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.07,
+        "cavityBias": 0.7,
+        "color": "#25231D"
+      },
+      "localOverrides": [
+        {
+          "id": "wet-post-feet",
+          "region": "lower post ends above iron shoes",
+          "color": "#211914",
+          "roughness": 0.76,
+          "dirtAmount": 0.16,
+          "streak": "gravity-down",
+          "evidenceRefs": ["rear", "hero"]
+        }
+      ],
+      "shaderNotes": [
+        "Vertex color is the palette authority.",
+        "Normal and roughness support remain independent channels."
+      ],
+      "notes": "Mapped to the timber Fenbridge semantic authoring bucket."
+    },
+    {
+      "id": "roof",
+      "name": "Oxidized teal radial canopy",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial-compatible semantic vertex color",
+      "baseColor": "#176269",
+      "color": "#176269",
+      "albedo": {
+        "dominant": "#176269",
+        "secondary": ["#2D8585"],
+        "samplingNotes": "Observed from admitted turnaround zones; generated highlights and contact shadows are excluded."
+      },
+      "colorVariation": {
+        "palette": ["#176269", "#2D8585"],
+        "pattern": "semantic vertex colors multiplied by an independent shared Fenbridge surface cell",
+        "amplitude": 0.11,
+        "heightCorrelation": 0.16
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.13,
+          "role": "broad material and dampness grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 8,
+          "amplitude": 0.07,
+          "role": "stone, grain, roof, water, or metal breakup"
+        },
+        {
+          "id": "micro",
+          "frequency": 36,
+          "amplitude": 0.02,
+          "role": "restrained grazing-highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.78,
+        "variation": 0.1,
+        "map": "independent Fenbridge shared roughness support map",
+        "localResponse": "cavities remain rougher while handled metal crowns and wet surfaces read smoother"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "independent Fenbridge shared normal support map",
+        "strength": 0.12,
+        "scale": 18,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.27,
+        "contactShadowBias": 0.32,
+        "notes": "Independent cavity and contact response; never derived from albedo."
+      },
+      "wear": {
+        "edgeWear": 0.05,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.07,
+        "cavityBias": 0.7,
+        "color": "#25231D"
+      },
+      "localOverrides": [
+        {
+          "id": "oxidized-radial-edges",
+          "region": "exposed course edges and horn tips",
+          "color": "#2D8585",
+          "roughness": 0.7,
+          "evidenceRefs": ["front", "hero"]
+        }
+      ],
+      "shaderNotes": [
+        "Vertex color is the palette authority.",
+        "Normal and roughness support remain independent channels."
+      ],
+      "notes": "Mapped to the roof Fenbridge semantic authoring bucket."
+    },
+    {
+      "id": "metal",
+      "name": "Forged iron with aged brass ribs",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial-compatible semantic vertex color",
+      "baseColor": "#34383A",
+      "color": "#34383A",
+      "albedo": {
+        "dominant": "#34383A",
+        "secondary": ["#B58A3A"],
+        "samplingNotes": "Observed from admitted turnaround zones; generated highlights and contact shadows are excluded."
+      },
+      "colorVariation": {
+        "palette": ["#34383A", "#B58A3A"],
+        "pattern": "semantic vertex colors multiplied by an independent shared Fenbridge surface cell",
+        "amplitude": 0.11,
+        "heightCorrelation": 0.16
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.13,
+          "role": "broad material and dampness grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 8,
+          "amplitude": 0.07,
+          "role": "stone, grain, roof, water, or metal breakup"
+        },
+        {
+          "id": "micro",
+          "frequency": 36,
+          "amplitude": 0.02,
+          "role": "restrained grazing-highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.43,
+        "variation": 0.1,
+        "map": "independent Fenbridge shared roughness support map",
+        "localResponse": "cavities remain rougher while handled metal crowns and wet surfaces read smoother"
+      },
+      "metalness": {
+        "base": 0.78,
+        "variation": 0.08
+      },
+      "normal": {
+        "pattern": "independent Fenbridge shared normal support map",
+        "strength": 0.1,
+        "scale": 18,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.27,
+        "contactShadowBias": 0.32,
+        "notes": "Independent cavity and contact response; never derived from albedo."
+      },
+      "wear": {
+        "edgeWear": 0.11,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.07,
+        "cavityBias": 0.7,
+        "color": "#25231D"
+      },
+      "localOverrides": [
+        {
+          "id": "brass-crown-polish",
+          "region": "roof ribs, crown, crank grip, and handled kettle edges",
+          "roughness": 0.24,
+          "color": "#C99A48",
+          "evidenceRefs": ["front", "rear", "hero"]
+        }
+      ],
+      "shaderNotes": [
+        "Vertex color is the palette authority.",
+        "Normal and roughness support remain independent channels."
+      ],
+      "notes": "Mapped to the metal Fenbridge semantic authoring bucket."
+    },
+    {
+      "id": "warm",
+      "name": "Contained brazier fire core",
+      "type": "emissive-standard",
+      "shaderModel": "MeshStandardMaterial-compatible semantic vertex color",
+      "baseColor": "#FFA43A",
+      "color": "#FFA43A",
+      "albedo": {
+        "dominant": "#FFA43A",
+        "secondary": ["#FFDD77"],
+        "samplingNotes": "Observed from admitted turnaround zones; generated highlights and contact shadows are excluded."
+      },
+      "colorVariation": {
+        "palette": ["#FFA43A", "#FFDD77"],
+        "pattern": "semantic vertex colors multiplied by an independent shared Fenbridge surface cell",
+        "amplitude": 0.11,
+        "heightCorrelation": 0.16
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.13,
+          "role": "broad material and dampness grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 8,
+          "amplitude": 0.07,
+          "role": "stone, grain, roof, water, or metal breakup"
+        },
+        {
+          "id": "micro",
+          "frequency": 36,
+          "amplitude": 0.02,
+          "role": "restrained grazing-highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.26,
+        "variation": 0.1,
+        "map": "independent Fenbridge shared roughness support map",
+        "localResponse": "cavities remain rougher while handled metal crowns and wet surfaces read smoother"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "independent Fenbridge shared normal support map",
+        "strength": 0.04,
+        "scale": 18,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.27,
+        "contactShadowBias": 0.32,
+        "notes": "Independent cavity and contact response; never derived from albedo."
+      },
+      "wear": {
+        "edgeWear": 0.05,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.07,
+        "cavityBias": 0.7,
+        "color": "#25231D"
+      },
+      "localOverrides": [
+        {
+          "id": "layered-flame-core",
+          "region": "inside brazier bowl and below kettle only",
+          "emissive": "#FFDD77",
+          "emissiveIntensity": 1.15,
+          "roughness": 0.22,
+          "evidenceRefs": ["front", "hero"]
+        }
+      ],
+      "shaderNotes": [
+        "Vertex color is the palette authority.",
+        "Normal and roughness support remain independent channels."
+      ],
+      "notes": "Mapped to the warm Fenbridge semantic authoring bucket."
+    },
+    {
+      "id": "fenlight",
+      "name": "Contained teal mirelight cores",
+      "type": "emissive-standard",
+      "shaderModel": "MeshStandardMaterial-compatible semantic vertex color",
+      "baseColor": "#35BFC0",
+      "color": "#35BFC0",
+      "albedo": {
+        "dominant": "#35BFC0",
+        "secondary": ["#9CF4E8"],
+        "samplingNotes": "Observed from admitted turnaround zones; generated highlights and contact shadows are excluded."
+      },
+      "colorVariation": {
+        "palette": ["#35BFC0", "#9CF4E8"],
+        "pattern": "semantic vertex colors multiplied by an independent shared Fenbridge surface cell",
+        "amplitude": 0.11,
+        "heightCorrelation": 0.16
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.13,
+          "role": "broad material and dampness grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 8,
+          "amplitude": 0.07,
+          "role": "stone, grain, roof, water, or metal breakup"
+        },
+        {
+          "id": "micro",
+          "frequency": 36,
+          "amplitude": 0.02,
+          "role": "restrained grazing-highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.24,
+        "variation": 0.1,
+        "map": "independent Fenbridge shared roughness support map",
+        "localResponse": "cavities remain rougher while handled metal crowns and wet surfaces read smoother"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "independent Fenbridge shared normal support map",
+        "strength": 0.04,
+        "scale": 18,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.27,
+        "contactShadowBias": 0.32,
+        "notes": "Independent cavity and contact response; never derived from albedo."
+      },
+      "wear": {
+        "edgeWear": 0.05,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.07,
+        "cavityBias": 0.7,
+        "color": "#25231D"
+      },
+      "localOverrides": [
+        {
+          "id": "fenlight-core",
+          "region": "inside paired dark eave cages only",
+          "emissive": "#79E8DE",
+          "emissiveIntensity": 0.82,
+          "roughness": 0.22,
+          "evidenceRefs": ["front", "rear", "hero"]
+        }
+      ],
+      "shaderNotes": [
+        "Vertex color is the palette authority.",
+        "Normal and roughness support remain independent channels."
+      ],
+      "notes": "Mapped to the fenlight Fenbridge semantic authoring bucket."
+    },
+    {
+      "id": "water",
+      "name": "Shallow opaque teal water band",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial-compatible semantic vertex color",
+      "baseColor": "#174C52",
+      "color": "#174C52",
+      "albedo": {
+        "dominant": "#174C52",
+        "secondary": ["#296D71"],
+        "samplingNotes": "Observed from admitted turnaround zones; generated highlights and contact shadows are excluded."
+      },
+      "colorVariation": {
+        "palette": ["#174C52", "#296D71"],
+        "pattern": "semantic vertex colors multiplied by an independent shared Fenbridge surface cell",
+        "amplitude": 0.11,
+        "heightCorrelation": 0.16
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.13,
+          "role": "broad material and dampness grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 8,
+          "amplitude": 0.07,
+          "role": "stone, grain, roof, water, or metal breakup"
+        },
+        {
+          "id": "micro",
+          "frequency": 36,
+          "amplitude": 0.02,
+          "role": "restrained grazing-highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.18,
+        "variation": 0.05,
+        "map": "independent Fenbridge shared roughness support map",
+        "localResponse": "shallow water remains smoother than the stone rim while avoiding mirror-like transparency"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "independent Fenbridge shared normal support map",
+        "strength": 0.05,
+        "scale": 18,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.27,
+        "contactShadowBias": 0.32,
+        "notes": "Independent cavity and contact response; never derived from albedo."
+      },
+      "wear": {
+        "edgeWear": 0.05,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.18,
+        "cavityBias": 0.7,
+        "color": "#25231D"
+      },
+      "localOverrides": [
+        {
+          "id": "shallow-water-sheen",
+          "region": "narrow annulus inside the outer stone rim",
+          "color": "#296D71",
+          "roughness": 0.16,
+          "dirtAmount": 0.02,
+          "cavityBias": false,
+          "evidenceRefs": ["front", "rear", "hero"]
+        }
+      ],
+      "shaderNotes": [
+        "Vertex color is the palette authority.",
+        "Normal and roughness support remain independent channels."
+      ],
+      "notes": "Mapped to the water Fenbridge semantic authoring bucket."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "four-post-shoe-modules",
+      "componentRef": "canopy-frame",
+      "realization": "instanced-cluster",
+      "buildsGeometry": true,
+      "geometry": "square post, broad iron shoe, clamp plate, and upper collar module",
+      "instances": 4,
+      "distribution": "one grounded module at each diagonal canopy corner",
+      "evidenceRefs": ["front", "rear", "hero"]
+    },
+    {
+      "id": "brazier-rim-stud-modules",
+      "componentRef": "central-brazier",
+      "realization": "grouped-geometry",
+      "buildsGeometry": true,
+      "geometry": "low faceted stud caps distributed around the upper bowl rim",
+      "instances": 8,
+      "distribution": "even radial cadence around the central brazier",
+      "evidenceRefs": ["front", "hero"]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match circular basin, four-post frame, horned canopy, and center-stack proportions.",
+      "componentRefs": [
+        "basin-ring",
+        "canopy-frame",
+        "canopy-roof",
+        "central-brazier",
+        "hanging-kettle"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the supported radial and service hierarchy implied by the moderate pre-spec assessment.",
+      "componentRefs": [
+        "roof-rib-finial-system",
+        "central-brazier",
+        "hanging-kettle",
+        "fenlight-pair",
+        "drawworks",
+        "brace-and-shoe-system"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "basin-ring",
+        "canopy-frame",
+        "canopy-roof",
+        "roof-rib-finial-system",
+        "central-brazier",
+        "hanging-kettle",
+        "fenlight-pair",
+        "drawworks",
+        "brace-and-shoe-system"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "basin-ring",
+        "canopy-frame",
+        "canopy-roof",
+        "roof-rib-finial-system",
+        "central-brazier",
+        "hanging-kettle",
+        "fenlight-pair",
+        "drawworks",
+        "brace-and-shoe-system"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent shared normal and roughness support at 512px or higher for the gameplay-distance tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "basin-ring",
+        "canopy-frame",
+        "canopy-roof",
+        "roof-rib-finial-system",
+        "central-brazier",
+        "hanging-kettle",
+        "fenlight-pair",
+        "drawworks",
+        "brace-and-shoe-system"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "lighting-pass",
+      "goal": "Make material and form readable under neutral turntable lighting plus optional reference lighting.",
+      "componentRefs": [
+        "basin-ring",
+        "canopy-frame",
+        "canopy-roof",
+        "roof-rib-finial-system",
+        "central-brazier",
+        "hanging-kettle",
+        "fenlight-pair",
+        "drawworks",
+        "brace-and-shoe-system"
+      ],
+      "acceptance": [
+        "lightingFromPhoto identifies key light direction/color/intensity, fill light, rim or environment light, and ambient color.",
+        "Exposure, tone mapping, background color/gradient, shadow softness, and contact shadow behavior are specified.",
+        "Lighting does not hide geometry/material gaps and screenshots can be compared fairly to the reference.",
+        "Neutral, grazing, and reference-matched lighting checks distinguish material errors from lighting errors.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "interaction-pass",
+      "goal": "Make the model ready for future animation, transformation, physics, or destruction.",
+      "componentRefs": [
+        "basin-ring",
+        "canopy-frame",
+        "canopy-roof",
+        "roof-rib-finial-system",
+        "central-brazier",
+        "hanging-kettle",
+        "fenlight-pair",
+        "drawworks",
+        "brace-and-shoe-system"
+      ],
+      "acceptance": [
+        "Macro and movable meso components have stable pivot nodes.",
+        "Sockets, collider proxies, and destruction metadata are present for future runtime actions.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "basin-ring",
+        "canopy-frame",
+        "canopy-roof",
+        "roof-rib-finial-system",
+        "central-brazier",
+        "hanging-kettle",
+        "fenlight-pair",
+        "drawworks",
+        "brace-and-shoe-system"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [
+    {
+      "timestamp": "2026-08-04T00:46:20.879343+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.84,
+        "componentStructure": 0.86,
+        "formDetail": 0.8,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "cistern-basin-footprint",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed concentric stone-and-water footprint at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-canopy-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed four-post radial canopy and horned eaves at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fire-kettle-stack",
+          "visible": true,
+          "score": 0.79,
+          "notes": "Independent visual audit passed brazier, flame, chain, and kettle alignment at 0.79 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "dual-light-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed contained warm fire and twin teal fenlights at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "drawworks-service-read",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed crank, spool, rope, and bucket service cue at 0.80 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "radial-construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed stone sectors, roof courses, ribs, studs, and braces at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "wet-moss-restraint",
+          "visible": true,
+          "score": 0.71,
+          "notes": "Independent visual audit passed wetness and moss limited to stone and post contacts at 0.71 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-circumference",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed floor seating and unobstructed civic circumference at 0.82 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/mirelight-cistern-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.928148+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.84,
+        "componentStructure": 0.86,
+        "formDetail": 0.8,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "cistern-basin-footprint",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed concentric stone-and-water footprint at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-canopy-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed four-post radial canopy and horned eaves at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fire-kettle-stack",
+          "visible": true,
+          "score": 0.79,
+          "notes": "Independent visual audit passed brazier, flame, chain, and kettle alignment at 0.79 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "dual-light-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed contained warm fire and twin teal fenlights at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "drawworks-service-read",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed crank, spool, rope, and bucket service cue at 0.80 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "radial-construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed stone sectors, roof courses, ribs, studs, and braces at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "wet-moss-restraint",
+          "visible": true,
+          "score": 0.71,
+          "notes": "Independent visual audit passed wetness and moss limited to stone and post contacts at 0.71 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-circumference",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed floor seating and unobstructed civic circumference at 0.82 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/mirelight-cistern-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.975448+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.84,
+        "componentStructure": 0.86,
+        "formDetail": 0.8,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "cistern-basin-footprint",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed concentric stone-and-water footprint at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-canopy-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed four-post radial canopy and horned eaves at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fire-kettle-stack",
+          "visible": true,
+          "score": 0.79,
+          "notes": "Independent visual audit passed brazier, flame, chain, and kettle alignment at 0.79 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "dual-light-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed contained warm fire and twin teal fenlights at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "drawworks-service-read",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed crank, spool, rope, and bucket service cue at 0.80 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "radial-construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed stone sectors, roof courses, ribs, studs, and braces at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "wet-moss-restraint",
+          "visible": true,
+          "score": 0.71,
+          "notes": "Independent visual audit passed wetness and moss limited to stone and post contacts at 0.71 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-circumference",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed floor seating and unobstructed civic circumference at 0.82 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/mirelight-cistern-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:21.022773+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.84,
+        "componentStructure": 0.86,
+        "formDetail": 0.8,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "cistern-basin-footprint",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed concentric stone-and-water footprint at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-canopy-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed four-post radial canopy and horned eaves at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fire-kettle-stack",
+          "visible": true,
+          "score": 0.79,
+          "notes": "Independent visual audit passed brazier, flame, chain, and kettle alignment at 0.79 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "dual-light-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed contained warm fire and twin teal fenlights at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "drawworks-service-read",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed crank, spool, rope, and bucket service cue at 0.80 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "radial-construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed stone sectors, roof courses, ribs, studs, and braces at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "wet-moss-restraint",
+          "visible": true,
+          "score": 0.71,
+          "notes": "Independent visual audit passed wetness and moss limited to stone and post contacts at 0.71 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-circumference",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed floor seating and unobstructed civic circumference at 0.82 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/mirelight-cistern-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:21.071183+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.84,
+        "componentStructure": 0.86,
+        "formDetail": 0.8,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "cistern-basin-footprint",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed concentric stone-and-water footprint at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-canopy-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed four-post radial canopy and horned eaves at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fire-kettle-stack",
+          "visible": true,
+          "score": 0.79,
+          "notes": "Independent visual audit passed brazier, flame, chain, and kettle alignment at 0.79 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "dual-light-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed contained warm fire and twin teal fenlights at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "drawworks-service-read",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed crank, spool, rope, and bucket service cue at 0.80 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "radial-construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed stone sectors, roof courses, ribs, studs, and braces at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "wet-moss-restraint",
+          "visible": true,
+          "score": 0.71,
+          "notes": "Independent visual audit passed wetness and moss limited to stone and post contacts at 0.71 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-circumference",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed floor seating and unobstructed civic circumference at 0.82 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/mirelight-cistern-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:21.118769+00:00",
+      "passId": "lighting-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.84,
+        "componentStructure": 0.86,
+        "formDetail": 0.8,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "cistern-basin-footprint",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed concentric stone-and-water footprint at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-canopy-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed four-post radial canopy and horned eaves at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fire-kettle-stack",
+          "visible": true,
+          "score": 0.79,
+          "notes": "Independent visual audit passed brazier, flame, chain, and kettle alignment at 0.79 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "dual-light-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed contained warm fire and twin teal fenlights at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "drawworks-service-read",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed crank, spool, rope, and bucket service cue at 0.80 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "radial-construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed stone sectors, roof courses, ribs, studs, and braces at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "wet-moss-restraint",
+          "visible": true,
+          "score": 0.71,
+          "notes": "Independent visual audit passed wetness and moss limited to stone and post contacts at 0.71 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-circumference",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed floor seating and unobstructed civic circumference at 0.82 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/mirelight-cistern-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:21.166105+00:00",
+      "passId": "interaction-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.84,
+        "componentStructure": 0.86,
+        "formDetail": 0.8,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "cistern-basin-footprint",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed concentric stone-and-water footprint at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-canopy-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed four-post radial canopy and horned eaves at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fire-kettle-stack",
+          "visible": true,
+          "score": 0.79,
+          "notes": "Independent visual audit passed brazier, flame, chain, and kettle alignment at 0.79 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "dual-light-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed contained warm fire and twin teal fenlights at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "drawworks-service-read",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed crank, spool, rope, and bucket service cue at 0.80 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "radial-construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed stone sectors, roof courses, ribs, studs, and braces at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "wet-moss-restraint",
+          "visible": true,
+          "score": 0.71,
+          "notes": "Independent visual audit passed wetness and moss limited to stone and post contacts at 0.71 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-circumference",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed floor seating and unobstructed civic circumference at 0.82 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/mirelight-cistern-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+    }
+  ],
+  "reviewHistory": [
+    {
+      "timestamp": "2026-08-04T00:46:20.879343+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.84,
+        "componentStructure": 0.86,
+        "formDetail": 0.8,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "cistern-basin-footprint",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed concentric stone-and-water footprint at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-canopy-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed four-post radial canopy and horned eaves at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fire-kettle-stack",
+          "visible": true,
+          "score": 0.79,
+          "notes": "Independent visual audit passed brazier, flame, chain, and kettle alignment at 0.79 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "dual-light-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed contained warm fire and twin teal fenlights at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "drawworks-service-read",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed crank, spool, rope, and bucket service cue at 0.80 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "radial-construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed stone sectors, roof courses, ribs, studs, and braces at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "wet-moss-restraint",
+          "visible": true,
+          "score": 0.71,
+          "notes": "Independent visual audit passed wetness and moss limited to stone and post contacts at 0.71 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-circumference",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed floor seating and unobstructed civic circumference at 0.82 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed blockout for mirelight_cistern.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-comparison.png"
+      ],
+      "mapStrippedRender": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-procedural-contact.png",
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/mirelight-cistern-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.928148+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.84,
+        "componentStructure": 0.86,
+        "formDetail": 0.8,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "cistern-basin-footprint",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed concentric stone-and-water footprint at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-canopy-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed four-post radial canopy and horned eaves at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fire-kettle-stack",
+          "visible": true,
+          "score": 0.79,
+          "notes": "Independent visual audit passed brazier, flame, chain, and kettle alignment at 0.79 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "dual-light-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed contained warm fire and twin teal fenlights at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "drawworks-service-read",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed crank, spool, rope, and bucket service cue at 0.80 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "radial-construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed stone sectors, roof courses, ribs, studs, and braces at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "wet-moss-restraint",
+          "visible": true,
+          "score": 0.71,
+          "notes": "Independent visual audit passed wetness and moss limited to stone and post contacts at 0.71 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-circumference",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed floor seating and unobstructed civic circumference at 0.82 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed structural-pass for mirelight_cistern.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/mirelight-cistern-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.975448+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.84,
+        "componentStructure": 0.86,
+        "formDetail": 0.8,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "cistern-basin-footprint",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed concentric stone-and-water footprint at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-canopy-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed four-post radial canopy and horned eaves at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fire-kettle-stack",
+          "visible": true,
+          "score": 0.79,
+          "notes": "Independent visual audit passed brazier, flame, chain, and kettle alignment at 0.79 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "dual-light-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed contained warm fire and twin teal fenlights at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "drawworks-service-read",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed crank, spool, rope, and bucket service cue at 0.80 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "radial-construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed stone sectors, roof courses, ribs, studs, and braces at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "wet-moss-restraint",
+          "visible": true,
+          "score": 0.71,
+          "notes": "Independent visual audit passed wetness and moss limited to stone and post contacts at 0.71 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-circumference",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed floor seating and unobstructed civic circumference at 0.82 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed form-refinement for mirelight_cistern.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/mirelight-cistern-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:21.022773+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.84,
+        "componentStructure": 0.86,
+        "formDetail": 0.8,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "cistern-basin-footprint",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed concentric stone-and-water footprint at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-canopy-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed four-post radial canopy and horned eaves at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fire-kettle-stack",
+          "visible": true,
+          "score": 0.79,
+          "notes": "Independent visual audit passed brazier, flame, chain, and kettle alignment at 0.79 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "dual-light-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed contained warm fire and twin teal fenlights at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "drawworks-service-read",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed crank, spool, rope, and bucket service cue at 0.80 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "radial-construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed stone sectors, roof courses, ribs, studs, and braces at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "wet-moss-restraint",
+          "visible": true,
+          "score": 0.71,
+          "notes": "Independent visual audit passed wetness and moss limited to stone and post contacts at 0.71 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-circumference",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed floor seating and unobstructed civic circumference at 0.82 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed material-pass for mirelight_cistern.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/mirelight-cistern-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:21.071183+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.84,
+        "componentStructure": 0.86,
+        "formDetail": 0.8,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "cistern-basin-footprint",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed concentric stone-and-water footprint at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-canopy-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed four-post radial canopy and horned eaves at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fire-kettle-stack",
+          "visible": true,
+          "score": 0.79,
+          "notes": "Independent visual audit passed brazier, flame, chain, and kettle alignment at 0.79 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "dual-light-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed contained warm fire and twin teal fenlights at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "drawworks-service-read",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed crank, spool, rope, and bucket service cue at 0.80 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "radial-construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed stone sectors, roof courses, ribs, studs, and braces at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "wet-moss-restraint",
+          "visible": true,
+          "score": 0.71,
+          "notes": "Independent visual audit passed wetness and moss limited to stone and post contacts at 0.71 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-circumference",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed floor seating and unobstructed civic circumference at 0.82 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed surface-pass for mirelight_cistern.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/mirelight-cistern-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:21.118769+00:00",
+      "passId": "lighting-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.84,
+        "componentStructure": 0.86,
+        "formDetail": 0.8,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "cistern-basin-footprint",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed concentric stone-and-water footprint at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-canopy-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed four-post radial canopy and horned eaves at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fire-kettle-stack",
+          "visible": true,
+          "score": 0.79,
+          "notes": "Independent visual audit passed brazier, flame, chain, and kettle alignment at 0.79 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "dual-light-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed contained warm fire and twin teal fenlights at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "drawworks-service-read",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed crank, spool, rope, and bucket service cue at 0.80 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "radial-construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed stone sectors, roof courses, ribs, studs, and braces at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "wet-moss-restraint",
+          "visible": true,
+          "score": 0.71,
+          "notes": "Independent visual audit passed wetness and moss limited to stone and post contacts at 0.71 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-circumference",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed floor seating and unobstructed civic circumference at 0.82 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed lighting-pass for mirelight_cistern.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/mirelight-cistern-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:21.166105+00:00",
+      "passId": "interaction-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.84,
+        "componentStructure": 0.86,
+        "formDetail": 0.8,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "cistern-basin-footprint",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed concentric stone-and-water footprint at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-canopy-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed four-post radial canopy and horned eaves at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fire-kettle-stack",
+          "visible": true,
+          "score": 0.79,
+          "notes": "Independent visual audit passed brazier, flame, chain, and kettle alignment at 0.79 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "dual-light-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed contained warm fire and twin teal fenlights at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "drawworks-service-read",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed crank, spool, rope, and bucket service cue at 0.80 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "radial-construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed stone sectors, roof courses, ribs, studs, and braces at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "wet-moss-restraint",
+          "visible": true,
+          "score": 0.71,
+          "notes": "Independent visual audit passed wetness and moss limited to stone and post contacts at 0.71 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-circumference",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed floor seating and unobstructed civic circumference at 0.82 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed interaction-pass for mirelight_cistern.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/mirelight-cistern-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:21.202516+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": null,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {},
+      "featureReviews": [],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed optimization-pass for mirelight_cistern.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/mirelight_cistern-comparison.png"
+      ]
+    }
+  ],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full merged two-material GLB with basin, horned canopy, kettle-fire stack, cages, and drawworks"
+    },
+    {
+      "tier": "far",
+      "distance": 28,
+      "strategy": "same GLB; Low tier may shed shared maps and decorative emissive intensity, never collision-bearing form"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "silhouette-and-service-readability",
+    "targetTriangles": 800,
+    "hardTriangleCeiling": 1200,
+    "hardByteCeiling": 143360,
+    "maxShippingPrimitives": 2,
+    "maxShippingMaterials": 2,
+    "embeddedTextures": 0,
+    "nativeDimensionsYards": [3.6, 2.6, 3.6],
+    "placementCount": 1,
+    "fpsTarget": 60,
+    "optimizationPolicy": "Protect basin, horned canopy, kettle-fire stack, fenlight cages, and drawworks before simplifying radial seams or small fittings."
+  },
+  "lightingFromPhoto": [
+    "Neutral upper-front-left key separates basin rings, post shoes, kettle, and roof tiers without becoming albedo.",
+    "Broad fill preserves dark timber, iron cages, and drawworks detail beneath the canopy.",
+    "Soft neutral rim outlines horn tips, crown, lantern cages, and kettle handle; ACES-like tone mapping at exposure 1.",
+    "Neutral gray background and soft contact shadow prove floor seating; a grazing pass checks wet stone, metal, and roof relief."
+  ],
+  "proceduralStrategy": [
+    "Block the exact concentric footprint, four post positions, canopy span, and center stack with +Z front.",
+    "Build the basin as closed low faceted tiers; add a shallow opaque water band rather than an open shaft.",
+    "Group radial roof courses, post fittings, brazier studs, cages, and drawworks under the 800-triangle target.",
+    "Use semantic vertex colors plus independent shared normal and roughness support; never project generated studio lighting.",
+    "Merge semantic buckets only in the shared finalizer and preserve authored service sockets."
+  ],
+  "animationAnchors": [
+    "root pivot node supports whole-object translation, rotation, scale, and visibility changes",
+    "component pivot groups support later local transforms without rebuilding geometry"
+  ],
+  "destructionAnchors": [
+    "actionProfile.destruction.fractureGroup marks detachable or breakable component sets",
+    "component seams and sockets define plausible break points instead of random explosions"
+  ],
+  "risks": [
+    "The rejected side near-duplicate cannot independently confirm radial counts; front, rear, and hero establish only stable cadence.",
+    "Sub-1k crops make small stud, stone-sector, cage-bar, and roof-course counts approximate rather than literal.",
+    "The img2threejs blockout still requires browser comparison evidence before later passes unlock."
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Fenbridge Mirelight Cistern stylized civic cistern canopy brazier kettle procedural low-poly",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "6857e5ab528b42ac12f4f411f862610a0bffce8e47aee3610a7603c318072fe8"
+    },
+    "matches": [
+      {
+        "record_id": "core.topology-intent",
+        "file_path": "grimoire/glossary/3d_vocabulary.md",
+        "heading": "Geometry And Topology",
+        "key_path": null,
+        "score": 5.143858634031,
+        "snippets": [
+          "Topology intent classifies a surface as hard-surface blockout, subdivision-ready, low-poly prop, organic deformed mesh, or alpha-card cluster."
+        ],
+        "source_refs": [
+          {
+            "path": "grimoire/glossary/3d_vocabulary.md",
+            "heading": "Geometry And Topology",
+            "key_path": null
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "grimoire/glossary/3d_vocabulary.md"
+          },
+          {
+            "kind": "notebooklm-research",
+            "ref": "notebooklm:4b03c2f9-8393-411f-b5b4-039ab9532843",
+            "note": "Validated generic schema vocabulary; numeric claims remain backed by local source_refs."
+          }
+        ]
+      },
+      {
+        "record_id": "core.shader-mapping-customshadermaterial-csm-weathering-hooks",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.rendering_shader_mapping[1]",
+        "score": 3.601401390438,
+        "snippets": [
+          "Extension library exposing csm_* output variables to inject procedural noise/masks into an otherwise-standard lit material, used for dynamic tarnish/patina effects. Thư viện mở rộng cung cấp các biến đầu ra csm_* để chèn nhiễu/mặt nạ thủ tục vào ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.rendering_shader_mapping[1]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      },
+      {
+        "record_id": "core.pbr-hand-painted-vs-pbr-texture",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.material_pbr[12]",
+        "score": 2.632304791455,
+        "snippets": [
+          "Distinguishes textures with lighting baked directly into color (static, stylized) from textures that respond dynamically to scene lighting via separate PBR channels. Phân biệt kết cấu có ánh sáng được nướng trực tiếp vào màu (tĩnh, cách điệu) ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.material_pbr[12]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      }
+    ]
+  }
+}

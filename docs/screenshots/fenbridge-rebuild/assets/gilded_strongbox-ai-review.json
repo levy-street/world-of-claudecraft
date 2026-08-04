@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "assetId": "gilded_strongbox",
+  "sourceFingerprint": "80f4c21427673eb2fa85ee8bfd14cd52f1d2ce5f5c4e133906aa384c916f196c",
+  "reference": "docs/design/fenbridge-rebuild/references/gilded-strongbox-turnaround.png",
+  "minimumOverallScore": 0.7,
+  "requiredViews": [
+    "front",
+    "right",
+    "rear",
+    "left",
+    "hero",
+    "player-scale",
+    "collider-overlay"
+  ],
+  "evidence": {
+    "rawContact": "gilded_strongbox-raw-contact.png",
+    "optimizedContact": "gilded_strongbox-optimized-contact.png",
+    "optimizedAuditContact": "gilded_strongbox-optimized-audit-contact.png",
+    "referenceComparison": "gilded_strongbox-comparison.png"
+  },
+  "features": [
+    {
+      "id": "bank-width-roof-profile",
+      "name": "Low wide office with restrained teal gable and dormer",
+      "tier": "critical",
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "visible": true,
+      "score": 0.82,
+      "notes": "Independent visual audit passed low wide office with restrained teal gable and dormer at 0.82 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "teller-grille-service",
+      "name": "Readable brass teller grille and counter",
+      "tier": "critical",
+      "minimumScore": 0.78,
+      "mustPass": true,
+      "visible": true,
+      "score": 0.9,
+      "notes": "Independent visual audit passed readable brass teller grille and counter at 0.90 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "ironbound-door-read",
+      "name": "Broad ironbound service door",
+      "tier": "critical",
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "visible": true,
+      "score": 0.84,
+      "notes": "Independent visual audit passed broad ironbound service door at 0.84 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "vault-wheel-security",
+      "name": "Exterior side vault wheel and reinforced bars",
+      "tier": "critical",
+      "minimumScore": 0.78,
+      "mustPass": true,
+      "visible": true,
+      "score": 0.84,
+      "notes": "Independent visual audit passed exterior side vault wheel and reinforced bars at 0.84 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "metal-value-hierarchy",
+      "name": "Iron, brass, and amber focal hierarchy",
+      "tier": "critical",
+      "minimumScore": 0.72,
+      "mustPass": true,
+      "visible": true,
+      "score": 0.82,
+      "notes": "Independent visual audit passed iron, brass, and amber focal hierarchy at 0.82 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "attached-service-props",
+      "name": "Chest, barrel, gutter, rope posts, and blank shield",
+      "tier": "important",
+      "minimumScore": 0.7,
+      "mustPass": false,
+      "visible": true,
+      "score": 0.78,
+      "notes": "Independent visual audit passed chest, barrel, gutter, rope posts, and blank shield at 0.78 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "reinforcement-cadence",
+      "name": "Strap, bolt, bar, block, and shingle cadence",
+      "tier": "important",
+      "minimumScore": 0.7,
+      "mustPass": false,
+      "visible": true,
+      "score": 0.82,
+      "notes": "Independent visual audit passed strap, bolt, bar, block, and shingle cadence at 0.82 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "clear-teller-apron",
+      "name": "Floor seating and unobstructed teller apron",
+      "tier": "important",
+      "minimumScore": 0.7,
+      "mustPass": false,
+      "visible": true,
+      "score": 0.84,
+      "notes": "Independent visual audit passed floor seating and unobstructed teller apron at 0.84 in the current reference comparison and required contacts."
+    }
+  ],
+  "overall": {
+    "score": 0.81,
+    "decision": "accept",
+    "reviewer": "codex-agent-vision",
+    "notes": "Independent current-source audit accepted every configured feature at overall 0.81."
+  },
+  "intentionalOmissions": [
+    "inaccessible interior geometry",
+    "shipping collision mesh"
+  ],
+  "layerScores": {
+    "silhouetteProportion": 0.82,
+    "componentStructure": 0.86,
+    "formDetail": 0.81,
+    "materialSurface": 0.89,
+    "lightingCamera": 0.76
+  }
+}

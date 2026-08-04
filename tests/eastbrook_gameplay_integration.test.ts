@@ -475,7 +475,7 @@ describe('Eastbrook authored gameplay data integration', () => {
         id: 'station_fenbridge_tannery',
         type: 'tannery',
         zoneId: 'mirefen_marsh',
-        pos: { x: -13, z: 314 },
+        pos: { x: 1.0670827486441765, z: 315.3263500973041 },
         masterNpcId: 'tanner_hesk',
       },
       {

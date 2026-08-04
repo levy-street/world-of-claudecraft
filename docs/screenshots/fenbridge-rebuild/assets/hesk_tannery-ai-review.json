@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "assetId": "hesk_tannery",
+  "sourceFingerprint": "80f4c21427673eb2fa85ee8bfd14cd52f1d2ce5f5c4e133906aa384c916f196c",
+  "reference": "docs/design/fenbridge-rebuild/references/hesk-tannery-turnaround.png",
+  "minimumOverallScore": 0.7,
+  "requiredViews": [
+    "front",
+    "right",
+    "rear",
+    "left",
+    "hero",
+    "player-scale",
+    "collider-overlay"
+  ],
+  "evidence": {
+    "rawContact": "hesk_tannery-raw-contact.png",
+    "optimizedContact": "hesk_tannery-optimized-contact.png",
+    "optimizedAuditContact": "hesk_tannery-optimized-audit-contact.png",
+    "referenceComparison": "hesk_tannery-comparison.png"
+  },
+  "features": [
+    {
+      "id": "hesk-silhouette",
+      "name": "Tall workshop, low open awning, smokestack and raised apron",
+      "tier": "critical",
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "visible": true,
+      "score": 0.76,
+      "notes": "Independent visual audit passed tall workshop, low open awning, smokestack and raised apron at 0.76 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "centered-tannery-entry",
+      "name": "Accessible local x=0 door and clear steps",
+      "tier": "critical",
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "visible": true,
+      "score": 0.87,
+      "notes": "Independent visual audit passed accessible local x=0 door and clear steps at 0.87 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "clean-hide-frame-pair",
+      "name": "Two clean non-gory stretched hide frames and ties",
+      "tier": "critical",
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "visible": true,
+      "score": 0.84,
+      "notes": "Independent visual audit passed two clean non-gory stretched hide frames and ties at 0.84 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "vat-drain-station",
+      "name": "Shallow vat, visible water, workbench and drainage trough",
+      "tier": "critical",
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "visible": true,
+      "score": 0.83,
+      "notes": "Independent visual audit passed shallow vat, visible water, workbench and drainage trough at 0.83 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "tannery-material-read",
+      "name": "Timber, roof, hide, water, iron and warm light separation",
+      "tier": "critical",
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "visible": true,
+      "score": 0.84,
+      "notes": "Independent visual audit passed timber, roof, hide, water, iron and warm light separation at 0.84 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "deterministic-clean-clutter",
+      "name": "Hooks, pots and rolls remain fixed, attached and non-gory",
+      "tier": "important",
+      "minimumScore": 0.7,
+      "mustPass": false,
+      "visible": true,
+      "score": 0.81,
+      "notes": "Independent visual audit passed hooks, pots and rolls remain fixed, attached and non-gory at 0.81 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "shipping-budget",
+      "name": "Exterior-only model stays within 5,000 triangles and 350 KiB",
+      "tier": "important",
+      "minimumScore": 0.7,
+      "mustPass": false,
+      "visible": true,
+      "score": 1,
+      "notes": "Independent machine and serialized audit passed exterior-only model stays within 5,000 triangles and 350 kib at 1.00 in the current reference comparison and required contacts."
+    }
+  ],
+  "overall": {
+    "score": 0.8,
+    "decision": "accept",
+    "reviewer": "codex-agent-vision",
+    "notes": "Independent current-source audit accepted every configured feature at overall 0.80."
+  },
+  "intentionalOmissions": [
+    "inaccessible interior geometry",
+    "shipping collision mesh"
+  ],
+  "layerScores": {
+    "silhouetteProportion": 0.76,
+    "componentStructure": 0.86,
+    "formDetail": 0.79,
+    "materialSurface": 0.87,
+    "lightingCamera": 0.81
+  }
+}

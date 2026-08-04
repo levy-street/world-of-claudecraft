@@ -1,0 +1,261 @@
+{
+  "sourceImage": "docs/design/fenbridge-rebuild/references/warden-gatehouse-turnaround.png",
+  "zonesDir": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones",
+  "detailInventory": {
+    "scanMethod": "component-zones",
+    "targetMinDetails": 10,
+    "details": [
+      {
+        "id": "moss-lined-stone-joints",
+        "kind": "stain",
+        "description": "Green moss concentrates in the lowest irregular foundation joints and post bases.",
+        "region": {
+          "x": 0.24,
+          "y": 0.72,
+          "width": 0.52,
+          "height": 0.2,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "stone albedo, roughness, and cavity response",
+        "mapsTo": {
+          "type": "material.localOverrides",
+          "ref": "stone/moss-footing"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/front.png",
+        "confidence": 0.94
+      },
+      {
+        "id": "irregular-block-cadence",
+        "kind": "seam",
+        "description": "Chunky damp-stone courses use uneven widths rather than a uniform brick grid.",
+        "region": {
+          "x": 0.12,
+          "y": 0.68,
+          "width": 0.55,
+          "height": 0.2,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "foundation construction relief",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "foundation/irregular-block-cadence"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/hero.png",
+        "confidence": 0.9
+      },
+      {
+        "id": "vertical-plank-seams",
+        "kind": "seam",
+        "description": "Tall vertical plank rhythm is framed by dark posts and cross rails on every elevation.",
+        "region": {
+          "x": 0.24,
+          "y": 0.26,
+          "width": 0.5,
+          "height": 0.45,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "tower facade construction rhythm",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "tower-shell/vertical-plank-seams"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/rear.png",
+        "confidence": 0.96
+      },
+      {
+        "id": "diagonal-guard-braces",
+        "kind": "ridge",
+        "description": "Diagonal timber braces interrupt the tall wall panels and reinforce the balcony.",
+        "region": {
+          "x": 0.42,
+          "y": 0.4,
+          "width": 0.32,
+          "height": 0.34,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "tower and balcony relief",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "tower-shell/diagonal-guard-braces"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/left.png",
+        "confidence": 0.9
+      },
+      {
+        "id": "iron-strap-fasteners",
+        "kind": "fastener",
+        "description": "Square iron corner plates and raised bolt heads repeat at beams, posts, and door rails.",
+        "region": {
+          "x": 0.22,
+          "y": 0.35,
+          "width": 0.56,
+          "height": 0.42,
+          "units": "normalized"
+        },
+        "scale": "micro",
+        "affects": "metal construction rhythm and edge highlights",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "tower-shell/iron-strap-fasteners"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/front.png",
+        "confidence": 0.92
+      },
+      {
+        "id": "layered-teal-shingles",
+        "kind": "seam",
+        "description": "Overlapping oxidized teal shingle rows step down both steep roof slopes.",
+        "region": {
+          "x": 0.25,
+          "y": 0.08,
+          "width": 0.48,
+          "height": 0.28,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "roof row relief and teal value variation",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "roof-silhouette/layered-teal-shingles"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/hero.png",
+        "confidence": 0.95
+      },
+      {
+        "id": "upturned-horn-caps",
+        "kind": "contour",
+        "description": "Paired dark horn forms flare outward from the upper eaves with metal collar bands.",
+        "region": {
+          "x": 0.15,
+          "y": 0.13,
+          "width": 0.7,
+          "height": 0.2,
+          "units": "normalized"
+        },
+        "scale": "macro",
+        "affects": "roof identity silhouette",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "horned-ridge/upturned-horn-caps"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/front.png",
+        "confidence": 0.88
+      },
+      {
+        "id": "arched-mullion-grid",
+        "kind": "linework",
+        "description": "Small amber arched windows carry dark vertical and horizontal mullions.",
+        "region": {
+          "x": 0.42,
+          "y": 0.3,
+          "width": 0.18,
+          "height": 0.16,
+          "units": "normalized"
+        },
+        "scale": "micro",
+        "affects": "window material separation and facade scale",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "window-system/arched-mullion-grid"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/rear.png",
+        "confidence": 0.94
+      },
+      {
+        "id": "lantern-cage-bars",
+        "kind": "linework",
+        "description": "The hanging amber lantern is enclosed by a tapered iron cage and short chain.",
+        "region": {
+          "x": 0.05,
+          "y": 0.37,
+          "width": 0.2,
+          "height": 0.24,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "lantern negative space and emissive containment",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "lantern-jib/cage-bars-and-chain"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/front.png",
+        "confidence": 0.93
+      },
+      {
+        "id": "lantern-warm-core",
+        "kind": "emissive",
+        "description": "Warm amber core remains contained inside the iron lantern cage.",
+        "region": {
+          "x": 0.02,
+          "y": 0.38,
+          "width": 0.18,
+          "height": 0.2,
+          "units": "normalized"
+        },
+        "scale": "micro",
+        "affects": "emissive value hierarchy",
+        "mapsTo": {
+          "type": "material.localOverrides",
+          "ref": "warm/lantern-core"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/hero.png",
+        "confidence": 0.96
+      },
+      {
+        "id": "door-ring-and-finials",
+        "kind": "fastener",
+        "description": "A round iron door pull and pointed post caps anchor the service entrance.",
+        "region": {
+          "x": 0.3,
+          "y": 0.6,
+          "width": 0.42,
+          "height": 0.24,
+          "units": "normalized"
+        },
+        "scale": "micro",
+        "affects": "entry focal hardware",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "entry-porch/door-ring-and-finials"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/front.png",
+        "confidence": 0.93
+      },
+      {
+        "id": "frayed-blank-banner-edge",
+        "kind": "contour",
+        "description": "The blank teal banner ends in an uneven torn lower edge without an emblem.",
+        "region": {
+          "x": 0.05,
+          "y": 0.31,
+          "width": 0.22,
+          "height": 0.25,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "asymmetric cloth silhouette",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "banner-mast/frayed-blank-banner-edge"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/rear.png",
+        "confidence": 0.91
+      }
+    ]
+  },
+  "authoringInstruction": "Inventory complete. Every detail maps to a real component local feature or material local override in sculpt-spec.json.",
+  "admission": {
+    "verdict": "pass",
+    "probe": "All four crops are technically conditional only for sub-1k resolution; macro and meso evidence remains usable.",
+    "duplicateGate": "front, left, rear, and hero are independently admitted with no duplicate pHash match."
+  },
+  "uncertainty": [
+    "Generated views disagree on minor horn and rope placement; use the front and hero horn silhouette, with the rear view controlling rope anchors.",
+    "Shingle, bolt, and stone counts are cadence evidence rather than literal counts; use grouped repetition under the 5,600-triangle hard ceiling.",
+    "Lantern interior, doorway interior, and balcony room interior remain closed or emissive-backed exterior surfaces."
+  ]
+}

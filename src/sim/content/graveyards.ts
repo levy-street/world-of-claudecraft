@@ -9,6 +9,7 @@
 // per-instance dungeon/raid healers in instances/dungeons.ts (claimInstance).
 
 import { EASTBROOK_LAYOUT } from '../eastbrook_layout';
+import { FENBRIDGE_LAYOUT } from '../fenbridge_layout';
 import type { GraveyardDef, NpcDef } from '../types';
 
 export type { GraveyardDef } from '../types';
@@ -25,7 +26,11 @@ export const OVERWORLD_GRAVEYARDS: GraveyardDef[] = [
   },
   { id: 'gy_vale_chapel', name: 'Vale Chapel Yard', x: 4, z: -56 },
   // Mirefen Marsh (zone 2)
-  { id: 'gy_fenbridge', name: 'Fenbridge Barrow', x: -18, z: 286 },
+  {
+    id: FENBRIDGE_LAYOUT.services.graveyard.id,
+    name: FENBRIDGE_LAYOUT.services.graveyard.name,
+    ...FENBRIDGE_LAYOUT.services.graveyard.position,
+  },
   // Thornpeak Heights (zone 3)
   { id: 'gy_thornpeak', name: 'Thornpeak Cairns', x: 15, z: 645 },
   { id: 'gy_thornpeak_east', name: 'East Ridge Graves', x: 141, z: 712 },

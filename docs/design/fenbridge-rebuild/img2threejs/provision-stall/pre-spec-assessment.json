@@ -1,0 +1,468 @@
+{
+  "targetName": "Fenbridge Provision Stall",
+  "sourceImage": "docs/design/fenbridge-rebuild/references/provision-stall-turnaround.png",
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "open-air timber provision stall",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "low rectangular counter",
+        "four-post canopy",
+        "dense stepped food display"
+      ],
+      "structureKind": [
+        "assembled timber frame",
+        "tensioned cloth roof",
+        "open customer-facing counter"
+      ],
+      "motionPotential": [
+        "static service prop",
+        "replaceable hanging goods",
+        "cloth-edge secondary motion"
+      ],
+      "materialFamilies": [
+        "dark weathered timber",
+        "teal waxed canvas",
+        "bread produce fish and glass"
+      ],
+      "notes": "Classified from the four labeled turnaround quadrants; no character anatomy applies."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 3,
+        "componentCount": 3,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 2,
+        "materialLayerCount": 2,
+        "localDetailDensity": 3,
+        "occlusionRisk": 2,
+        "actionReadinessNeed": 1
+      },
+      "estimatedCounts": {
+        "macroComponents": 2,
+        "mesoComponents": 3,
+        "microFeatureGroups": 8,
+        "materialLayers": 3,
+        "repetitionSystems": 1
+      },
+      "reasoning": [
+        "The turnaround exposes 6 separable semantic systems and 8 identity-defining local details.",
+        "The silhouette, material hierarchy, and rear/side construction require complex depth rather than a single blockout primitive."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Front, side, rear, and hero quadrants expose distinct silhouette, joinery, and material evidence."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "labeled-turnaround-component-zones",
+      "targetMinDetails": 8,
+      "note": "Each observed detail is linked to a concrete component.localFeatures or material.localOverrides key.",
+      "details": [
+        {
+          "id": "counter-edge-wear",
+          "kind": "bevel",
+          "description": "Bright worn bevel along the customer counter edge.",
+          "region": {
+            "x": 0,
+            "y": 0,
+            "width": 0.5,
+            "height": 0.5,
+            "units": "normalized montage quadrant"
+          },
+          "scale": "meso",
+          "affects": "material roughness and edge readability",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "worn-counter-edges"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/provision-stall/zones/front.png",
+          "confidence": 0.9
+        },
+        {
+          "id": "teal-scalloped-valance",
+          "kind": "contour",
+          "description": "Teal canopy terminates in a shallow scalloped front valance.",
+          "region": {
+            "x": 0,
+            "y": 0,
+            "width": 0.5,
+            "height": 0.5,
+            "units": "normalized montage quadrant"
+          },
+          "scale": "meso",
+          "affects": "front silhouette",
+          "mapsTo": {
+            "type": "component.localFeatures-or-material.localOverrides",
+            "ref": "scalloped-canopy-edge"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/provision-stall/zones/front.png",
+          "confidence": 0.895
+        },
+        {
+          "id": "canopy-ridge-crease",
+          "kind": "ridge",
+          "description": "A centered ridge and slight cloth sag break the canopy plane.",
+          "region": {
+            "x": 0.5,
+            "y": 0,
+            "width": 0.5,
+            "height": 0.5,
+            "units": "normalized montage quadrant"
+          },
+          "scale": "meso",
+          "affects": "roof volume",
+          "mapsTo": {
+            "type": "component.localFeatures-or-material.localOverrides",
+            "ref": "center-ridge-sag"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/provision-stall/zones/side.png",
+          "confidence": 0.89
+        },
+        {
+          "id": "four-post-spacing",
+          "kind": "linework",
+          "description": "Four dark posts form a legible frame around the vendor opening.",
+          "region": {
+            "x": 0,
+            "y": 0.5,
+            "width": 0.5,
+            "height": 0.5,
+            "units": "normalized montage quadrant"
+          },
+          "scale": "meso",
+          "affects": "structural rhythm",
+          "mapsTo": {
+            "type": "component.localFeatures-or-material.localOverrides",
+            "ref": "four-post-rhythm"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/provision-stall/zones/rear.png",
+          "confidence": 0.885
+        },
+        {
+          "id": "stepped-baskets",
+          "kind": "contour",
+          "description": "Baskets and crates step up behind the front lip.",
+          "region": {
+            "x": 0.5,
+            "y": 0.5,
+            "width": 0.5,
+            "height": 0.5,
+            "units": "normalized montage quadrant"
+          },
+          "scale": "meso",
+          "affects": "display depth",
+          "mapsTo": {
+            "type": "component.localFeatures-or-material.localOverrides",
+            "ref": "stepped-basket-line"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/provision-stall/zones/hero.png",
+          "confidence": 0.88
+        },
+        {
+          "id": "produce-color-breakup",
+          "kind": "gloss",
+          "description": "Warm produce and cool bottle accents punctuate the neutral food display.",
+          "region": {
+            "x": 0.5,
+            "y": 0.5,
+            "width": 0.5,
+            "height": 0.5,
+            "units": "normalized montage quadrant"
+          },
+          "scale": "meso",
+          "affects": "material separation",
+          "mapsTo": {
+            "type": "component.localFeatures-or-material.localOverrides",
+            "ref": "bottle-gloss-and-produce-color"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/provision-stall/zones/hero.png",
+          "confidence": 0.875
+        },
+        {
+          "id": "bread-loaf-row",
+          "kind": "ridge",
+          "description": "Rounded bread loaves create a repeating warm ridge.",
+          "region": {
+            "x": 0,
+            "y": 0,
+            "width": 0.5,
+            "height": 0.5,
+            "units": "normalized montage quadrant"
+          },
+          "scale": "meso",
+          "affects": "identity detail",
+          "mapsTo": {
+            "type": "component.localFeatures-or-material.localOverrides",
+            "ref": "bread-loaves"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/provision-stall/zones/front.png",
+          "confidence": 0.87
+        },
+        {
+          "id": "rear-sack-profile",
+          "kind": "contour",
+          "description": "A hanging sack and reserve crates keep the vendor side stocked.",
+          "region": {
+            "x": 0,
+            "y": 0.5,
+            "width": 0.5,
+            "height": 0.5,
+            "units": "normalized montage quadrant"
+          },
+          "scale": "meso",
+          "affects": "rear-view completeness",
+          "mapsTo": {
+            "type": "component.localFeatures-or-material.localOverrides",
+            "ref": "hanging-sack"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/provision-stall/zones/rear.png",
+          "confidence": 0.865
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0,
+      "proportions": {
+        "headUnit": 0,
+        "torso": 0,
+        "legs": 0,
+        "shoulderWidth": 0,
+        "hipWidth": 0
+      },
+      "pose": {
+        "type": "not-applicable",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0,
+        "eyeSpacing": 0,
+        "noseBase": 0,
+        "mouthLine": 0,
+        "hairline": 0
+      },
+      "features": [],
+      "confidence": 1,
+      "note": "Static object track; character reconstruction is not applicable."
+    },
+    "sourceImage": "docs/design/fenbridge-rebuild/references/provision-stall-turnaround.png"
+  },
+  "qualityContract": {
+    "qualityBar": "moderate",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 2,
+      "mesoComponents": 3,
+      "microFeatureGroups": 2,
+      "materialLayers": 2,
+      "repetitionSystems": 1,
+      "reviewViewpoints": 3
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "authoringInstruction": "Assessment is complete from the labeled turnaround. Keep every linked component/material/detail claim synchronized with sculpt-spec.json.",
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Fenbridge Provision Stall stylized market stall canopy goods procedural low-poly",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "6857e5ab528b42ac12f4f411f862610a0bffce8e47aee3610a7603c318072fe8"
+    },
+    "matches": [
+      {
+        "record_id": "core.topology-intent",
+        "file_path": "grimoire/glossary/3d_vocabulary.md",
+        "heading": "Geometry And Topology",
+        "key_path": null,
+        "score": 5.143858634031,
+        "snippets": [
+          "Topology intent classifies a surface as hard-surface blockout, subdivision-ready, low-poly prop, organic deformed mesh, or alpha-card cluster."
+        ],
+        "source_refs": [
+          {
+            "path": "grimoire/glossary/3d_vocabulary.md",
+            "heading": "Geometry And Topology",
+            "key_path": null
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "grimoire/glossary/3d_vocabulary.md"
+          },
+          {
+            "kind": "notebooklm-research",
+            "ref": "notebooklm:4b03c2f9-8393-411f-b5b4-039ab9532843",
+            "note": "Validated generic schema vocabulary; numeric claims remain backed by local source_refs."
+          }
+        ]
+      },
+      {
+        "record_id": "core.shader-mapping-customshadermaterial-csm-weathering-hooks",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.rendering_shader_mapping[1]",
+        "score": 3.601401390438,
+        "snippets": [
+          "Extension library exposing csm_* output variables to inject procedural noise/masks into an otherwise-standard lit material, used for dynamic tarnish/patina effects. Thư viện mở rộng cung cấp các biến đầu ra csm_* để chèn nhiễu/mặt nạ thủ tục vào ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.rendering_shader_mapping[1]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      },
+      {
+        "record_id": "core.pbr-hand-painted-vs-pbr-texture",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.material_pbr[12]",
+        "score": 2.632304791455,
+        "snippets": [
+          "Distinguishes textures with lighting baked directly into color (static, stylized) from textures that respond dynamically to scene lighting via separate PBR channels. Phân biệt kết cấu có ánh sáng được nướng trực tiếp vào màu (tĩnh, cách điệu) ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.material_pbr[12]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      }
+    ]
+  }
+}

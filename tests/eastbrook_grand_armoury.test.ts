@@ -32,6 +32,11 @@ import { ZONE1_PROPS } from '../src/sim/content/zone1';
 import { BUILTIN_WORLD, NPCS, PROPS, STATIONS, setActiveWorldContent } from '../src/sim/data';
 import { EASTBROOK_BUILDINGS_BY_ID } from '../src/sim/eastbrook_layout';
 import {
+  FENBRIDGE_BUILDINGS_BY_ID,
+  FENBRIDGE_LAYOUT,
+  localToWorld,
+} from '../src/sim/fenbridge_layout';
+import {
   findPlayerPath,
   PLAYER_BODY_RADIUS,
   PLAYER_MAX_CLIMB_SLOPE,
@@ -339,20 +344,56 @@ describe('Eastbrook Grand Armoury gameplay preservation', () => {
     expect(isResting(player)).toBe(false);
   });
 
-  it('preserves the legacy rest footprint of unrelated rotated inns', () => {
+  it('uses the collider-correct rest footprint for the rebuilt Fenbridge inn', () => {
+    const authoredInn = FENBRIDGE_BUILDINGS_BY_ID.fenbridge_crooked_reed_inn;
     const fenbridgeInn = PROPS.buildings.find(
-      (building) => building.x === 13 && building.z === 306,
+      (building) => building.id === FENBRIDGE_LAYOUT.services.rest.buildingId,
     );
     if (!fenbridgeInn) throw new Error('Fenbridge inn fixture is missing');
-    expect(buildingContainsRestPoint(fenbridgeInn, 6, 306.8, 2)).toBe(true);
-    expect(buildingContainsRestPoint(fenbridgeInn, 6, 304.6, 2)).toBe(false);
+    expect(fenbridgeInn).toMatchObject({
+      id: 'fenbridge_crooked_reed_inn',
+      assetId: '/models/props/fenbridge_crooked_reed_inn.glb',
+      x: -21.25,
+      z: 317,
+      w: 9,
+      d: 8,
+      rot: FENBRIDGE_BUILDINGS_BY_ID.fenbridge_crooked_reed_inn.rotation,
+    });
+
+    const restPadding = buildingRestPadding(fenbridgeInn);
+    const restPoint = authoredInn.frontStandingPoint;
+    const outsideRestPoint = localToWorld(
+      authoredInn.position,
+      authoredInn.rotation,
+      authoredInn.sockets.entrance.localPosition.x,
+      authoredInn.nativeDimensions.depth / 2 + restPadding + 0.25,
+    );
+    expect(restPadding).toBe(2);
+    expect(buildingContainsPoint(fenbridgeInn, restPoint.x, restPoint.z, restPadding)).toBe(true);
+    expect(buildingContainsRestPoint(fenbridgeInn, restPoint.x, restPoint.z, restPadding)).toBe(
+      true,
+    );
+    expect(
+      buildingContainsPoint(fenbridgeInn, outsideRestPoint.x, outsideRestPoint.z, restPadding),
+    ).toBe(false);
+    expect(
+      buildingContainsRestPoint(fenbridgeInn, outsideRestPoint.x, outsideRestPoint.z, restPadding),
+    ).toBe(false);
 
     const player = {
       inCombat: false,
-      pos: { x: 6, y: terrainHeight(6, 306.8, SEED), z: 306.8 },
+      pos: {
+        x: restPoint.x,
+        y: terrainHeight(restPoint.x, restPoint.z, SEED),
+        z: restPoint.z,
+      },
     } as Entity;
     expect(isResting(player)).toBe(true);
-    player.pos.z = 304.6;
+    player.pos = {
+      x: outsideRestPoint.x,
+      y: terrainHeight(outsideRestPoint.x, outsideRestPoint.z, SEED),
+      z: outsideRestPoint.z,
+    };
     expect(isResting(player)).toBe(false);
   });
 

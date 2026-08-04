@@ -147,7 +147,7 @@ import {
   NIGHTBLOOM_ROADS,
   NIGHTBLOOM_ZONE,
 } from './content/nightbloom';
-import { NOTICEBOARDS } from './content/noticeboards';
+import { MUSTER_BOARDS, NOTICEBOARDS } from './content/noticeboards';
 import {
   PALMREACH_CAMPS,
   PALMREACH_ESCORTS,
@@ -711,6 +711,7 @@ export const BUILTIN_WORLD: WorldContent = {
     stations: STATIONS,
     mailboxes: MAILBOXES,
     noticeboards: NOTICEBOARDS,
+    musterBoards: MUSTER_BOARDS,
     graveyards: OVERWORLD_GRAVEYARDS,
   },
   // invisible collision walls: the moderation cage plus the Last Keep's

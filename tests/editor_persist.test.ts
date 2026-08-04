@@ -7,6 +7,7 @@ import {
 import { type KeyValueStore, MapStore, parseMap, serializeMap } from '../src/editor/persist';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
+import { FENBRIDGE_LAYOUT } from '../src/sim/fenbridge_layout';
 
 function memStore(): KeyValueStore {
   const m = new Map<string, string>();
@@ -37,7 +38,7 @@ describe('CustomMap build + projection', () => {
     expect(w.terrainEdits).toHaveLength(1);
   });
 
-  it('removes only canonical Eastbrook props while fresh-cloning every exterior region', () => {
+  it('removes specialized built-in-only props while fresh-cloning rendered exterior props', () => {
     const world = customMapToWorldContent(newCustomMap('M', 'id', 0));
     const eastbrookIds = {
       buildings: new Set<string>([
@@ -50,21 +51,37 @@ describe('CustomMap build + projection', () => {
       benches: new Set<string>(EASTBROOK_LAYOUT.civic.benches.map((placement) => placement.id)),
       walls: new Set<string>(EASTBROOK_LAYOUT.wall.segments.map((placement) => placement.id)),
     };
+    const builtInOnlyWallIds = new Set<string>([
+      ...eastbrookIds.walls,
+      ...FENBRIDGE_LAYOUT.wall.segments.map((placement) => placement.id),
+    ]);
+    const builtInOnlyBuildingIds = new Set<string>([
+      ...eastbrookIds.buildings,
+      ...FENBRIDGE_LAYOUT.buildings.map((placement) => placement.id),
+    ]);
+    const builtInOnlyWellIds = new Set<string>([
+      ...eastbrookIds.wells,
+      FENBRIDGE_LAYOUT.civic.cistern.id,
+    ]);
+    const builtInOnlyStallIds = new Set<string>([
+      ...eastbrookIds.stalls,
+      FENBRIDGE_LAYOUT.civic.provisionStall.id,
+    ]);
 
     expect(
       world.props.buildings
         .map((placement) => placement.id)
-        .filter((id): id is string => id !== undefined && eastbrookIds.buildings.has(id)),
+        .filter((id): id is string => id !== undefined && builtInOnlyBuildingIds.has(id)),
     ).toEqual([]);
     expect(
       world.props.wells
         .map((placement) => placement.id)
-        .filter((id): id is string => id !== undefined && eastbrookIds.wells.has(id)),
+        .filter((id): id is string => id !== undefined && builtInOnlyWellIds.has(id)),
     ).toEqual([]);
     expect(
       world.props.stalls
         .map((placement) => placement.id)
-        .filter((id): id is string => id !== undefined && eastbrookIds.stalls.has(id)),
+        .filter((id): id is string => id !== undefined && builtInOnlyStallIds.has(id)),
     ).toEqual([]);
     expect(
       world.props.fences
@@ -79,20 +96,20 @@ describe('CustomMap build + projection', () => {
     expect(
       (world.props.walls ?? [])
         .map((placement) => placement.id)
-        .filter((id) => eastbrookIds.walls.has(id)),
+        .filter((id) => builtInOnlyWallIds.has(id)),
     ).toEqual([]);
 
     expect(world.props.buildings).toEqual(
       BUILTIN_WORLD.props.buildings.filter(
-        ({ id }) => id === undefined || !eastbrookIds.buildings.has(id),
+        ({ id }) => id === undefined || !builtInOnlyBuildingIds.has(id),
       ),
     );
     expect(world.props.wells).toEqual(
-      BUILTIN_WORLD.props.wells.filter(({ id }) => id === undefined || !eastbrookIds.wells.has(id)),
+      BUILTIN_WORLD.props.wells.filter(({ id }) => id === undefined || !builtInOnlyWellIds.has(id)),
     );
     expect(world.props.stalls).toEqual(
       BUILTIN_WORLD.props.stalls.filter(
-        ({ id }) => id === undefined || !eastbrookIds.stalls.has(id),
+        ({ id }) => id === undefined || !builtInOnlyStallIds.has(id),
       ),
     );
     expect(world.props.fences).toEqual(
@@ -104,7 +121,7 @@ describe('CustomMap build + projection', () => {
       (BUILTIN_WORLD.props.benches ?? []).filter(({ id }) => !eastbrookIds.benches.has(id)),
     );
     expect(world.props.walls).toEqual(
-      (BUILTIN_WORLD.props.walls ?? []).filter(({ id }) => !eastbrookIds.walls.has(id)),
+      (BUILTIN_WORLD.props.walls ?? []).filter(({ id }) => !builtInOnlyWallIds.has(id)),
     );
 
     const eastbrookGraveyard = EASTBROOK_LAYOUT.services.graveyard.position;
@@ -123,21 +140,33 @@ describe('CustomMap build + projection', () => {
     expect(world.props.delveMarkers).toEqual(BUILTIN_WORLD.props.delveMarkers);
 
     const exteriorValeMine = BUILTIN_WORLD.props.mines.find(({ x, z }) => x === -88 && z === -68);
-    const fenbridgeInn = BUILTIN_WORLD.props.buildings.find(({ x, z }) => x === 13 && z === 306);
+    const fenbridgeInn = BUILTIN_WORLD.props.buildings.find(
+      ({ id }) => id === 'fenbridge_crooked_reed_inn',
+    );
     const highwatchForge = BUILTIN_WORLD.props.stalls.find(
       ({ x, z, smithy }) => x === -4.5 && z === 673.5 && smithy,
     );
     const templeCampfire = BUILTIN_WORLD.props.campfires.find(([x, z]) => x === -63 && z === 788);
     expect(exteriorValeMine).toBeDefined();
-    expect(fenbridgeInn).toBeDefined();
+    expect(fenbridgeInn).toMatchObject({
+      id: 'fenbridge_crooked_reed_inn',
+      assetId: '/models/props/fenbridge_crooked_reed_inn.glb',
+      x: -21.25,
+      z: 317,
+    });
     expect(highwatchForge).toBeDefined();
     expect(templeCampfire).toBeDefined();
     expect(world.props.mines).toContainEqual(exteriorValeMine);
-    expect(world.props.buildings).toContainEqual(fenbridgeInn);
+    expect(world.props.buildings).not.toContainEqual(fenbridgeInn);
+    expect(world.props.wells.some(({ id }) => id === FENBRIDGE_LAYOUT.civic.cistern.id)).toBe(
+      false,
+    );
+    expect(
+      world.props.stalls.some(({ id }) => id === FENBRIDGE_LAYOUT.civic.provisionStall.id),
+    ).toBe(false);
     expect(world.props.stalls).toContainEqual(highwatchForge);
     expect(world.props.campfires).toContainEqual(templeCampfire);
     expect(world.props.mines.find(({ x, z }) => x === -88 && z === -68)).not.toBe(exteriorValeMine);
-    expect(world.props.buildings.find(({ x, z }) => x === 13 && z === 306)).not.toBe(fenbridgeInn);
     expect(world.props.stalls.find(({ x, z }) => x === -4.5 && z === 673.5)).not.toBe(
       highwatchForge,
     );
@@ -191,9 +220,9 @@ describe('serialize / parse round-trip', () => {
     map.placements.push({ assetId: 'props/well', x: 5, z: 6, rotY: 1, scale: 2, collide: true });
     const parsed = parseMap(serializeMap(map));
     expect(parsed).not.toBeNull();
-    expect(parsed!.terrainEdits).toEqual(map.terrainEdits);
-    expect(parsed!.placements).toEqual(map.placements);
-    expect(parsed!.content.zones.length).toBe(map.content.zones.length);
+    expect(parsed?.terrainEdits).toEqual(map.terrainEdits);
+    expect(parsed?.placements).toEqual(map.placements);
+    expect(parsed?.content.zones.length).toBe(map.content.zones.length);
   });
 
   it('rejects unsalvageable input (no usable zones)', () => {
@@ -219,12 +248,12 @@ describe('serialize / parse round-trip', () => {
     };
     const parsed = parseMap(dirty);
     expect(parsed).not.toBeNull();
-    expect(parsed!.content.camps).toEqual([]);
-    expect(parsed!.content.roads).toEqual([]);
-    expect(parsed!.terrainEdits).toHaveLength(1);
-    expect(parsed!.placements).toHaveLength(1);
-    expect(parsed!.placements[0].scale).toBe(1); // def-filled
-    expect(parsed!.meta.name).toBe('Untitled Map'); // def-filled
+    expect(parsed?.content.camps).toEqual([]);
+    expect(parsed?.content.roads).toEqual([]);
+    expect(parsed?.terrainEdits).toHaveLength(1);
+    expect(parsed?.placements).toHaveLength(1);
+    expect(parsed?.placements[0].scale).toBe(1); // def-filled
+    expect(parsed?.meta.name).toBe('Untitled Map'); // def-filled
   });
 });
 
