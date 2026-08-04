@@ -8703,6 +8703,18 @@ export const da_DK: EnTranslations = {
       "fen_muster_order": {
         "name": "Kærbro Mønstringsordre"
       },
+      "firebottle": {
+        "name": "Firebottle"
+      },
+      "murloc_hut": {
+        "name": "Mudfin Hut"
+      },
+      "restless_skull": {
+        "name": "Restless Skull"
+      },
+      "vanguard_bone": {
+        "name": "Vanguard Bone"
+      },
       "mire_prowler_pelt": {
         "name": "Sumplusker-Pels"
       },
@@ -10972,6 +10984,21 @@ export const da_DK: EnTranslations = {
       },
       "spider_egg_sac": {
         "name": "Edderkoppe-Ægsæk"
+      },
+      "spider_egg": {
+        "name": "Broodmother Egg"
+      },
+      "widow_hatchling": {
+        "name": "Widow Hatchling"
+      },
+      "drowned_warlord": {
+        "name": "The Drowned Warlord"
+      },
+      "brakka_wallbreaker": {
+        "name": "Brakka the Wallbreaker"
+      },
+      "threnos_first_voice": {
+        "name": "Threnos the First Voice"
       },
       "grave_silt_bulwark": {
         "name": "Gravdynd-Bolværk"

@@ -8703,6 +8703,18 @@ export const pt_BR: EnTranslations = {
       "fen_muster_order": {
         "name": "Ordem de convocação de Fenbridge"
       },
+      "firebottle": {
+        "name": "Firebottle"
+      },
+      "murloc_hut": {
+        "name": "Mudfin Hut"
+      },
+      "restless_skull": {
+        "name": "Restless Skull"
+      },
+      "vanguard_bone": {
+        "name": "Vanguard Bone"
+      },
       "mire_prowler_pelt": {
         "name": "Pele de espreitador do brejo"
       },
@@ -10972,6 +10984,21 @@ export const pt_BR: EnTranslations = {
       },
       "spider_egg_sac": {
         "name": "Saco de Ovos de Aranha"
+      },
+      "spider_egg": {
+        "name": "Broodmother Egg"
+      },
+      "widow_hatchling": {
+        "name": "Widow Hatchling"
+      },
+      "drowned_warlord": {
+        "name": "The Drowned Warlord"
+      },
+      "brakka_wallbreaker": {
+        "name": "Brakka the Wallbreaker"
+      },
+      "threnos_first_voice": {
+        "name": "Threnos the First Voice"
       },
       "grave_silt_bulwark": {
         "name": "Baluarte do Lodo Sepulcral"

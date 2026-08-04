@@ -8703,6 +8703,18 @@ export const it_IT: EnTranslations = {
       "fen_muster_order": {
         "name": "Ordine di raduno di Fenbridge"
       },
+      "firebottle": {
+        "name": "Firebottle"
+      },
+      "murloc_hut": {
+        "name": "Mudfin Hut"
+      },
+      "restless_skull": {
+        "name": "Restless Skull"
+      },
+      "vanguard_bone": {
+        "name": "Vanguard Bone"
+      },
       "mire_prowler_pelt": {
         "name": "Pelliccia di predatore del pantano"
       },
@@ -10972,6 +10984,21 @@ export const it_IT: EnTranslations = {
       },
       "spider_egg_sac": {
         "name": "Sacca di Uova di Ragno"
+      },
+      "spider_egg": {
+        "name": "Broodmother Egg"
+      },
+      "widow_hatchling": {
+        "name": "Widow Hatchling"
+      },
+      "drowned_warlord": {
+        "name": "The Drowned Warlord"
+      },
+      "brakka_wallbreaker": {
+        "name": "Brakka the Wallbreaker"
+      },
+      "threnos_first_voice": {
+        "name": "Threnos the First Voice"
       },
       "grave_silt_bulwark": {
         "name": "Baluardo di Limo Sepolcrale"

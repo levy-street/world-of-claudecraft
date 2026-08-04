@@ -8703,6 +8703,18 @@ export const ru_RU: EnTranslations = {
       "fen_muster_order": {
         "name": "Приказ о сборе в Фенбридже"
       },
+      "firebottle": {
+        "name": "Зажигательная бутыль"
+      },
+      "murloc_hut": {
+        "name": "Хижина илогривов"
+      },
+      "restless_skull": {
+        "name": "Беспокойный череп"
+      },
+      "vanguard_bone": {
+        "name": "Кость авангарда"
+      },
       "mire_prowler_pelt": {
         "name": "Шкура болотного хищника"
       },
@@ -10972,6 +10984,21 @@ export const ru_RU: EnTranslations = {
       },
       "spider_egg_sac": {
         "name": "Паучий Яйцевой Кокон"
+      },
+      "spider_egg": {
+        "name": "Яйцо Матки выводка"
+      },
+      "widow_hatchling": {
+        "name": "Детеныш вдовы"
+      },
+      "drowned_warlord": {
+        "name": "Утопший военачальник"
+      },
+      "brakka_wallbreaker": {
+        "name": "Бракка Стенолом"
+      },
+      "threnos_first_voice": {
+        "name": "Тренос Первый Голос"
       },
       "grave_silt_bulwark": {
         "name": "Могильно-илистый Бастион"

@@ -101,6 +101,12 @@ const MOB_IDS = [
   'deepfen_spearjaw',
   'mirefen_widowling',
   'spider_egg_sac',
+  // Quest-dedupe pass (zones 1 to 3): the Broodmother clutch and the new elites.
+  'spider_egg',
+  'widow_hatchling',
+  'drowned_warlord',
+  'brakka_wallbreaker',
+  'threnos_first_voice',
   'grave_silt_bulwark',
   'sump_troll_devourer',
   'choir_thrall',

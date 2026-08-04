@@ -8703,6 +8703,18 @@ export const en_XA: EnTranslations = {
       "fen_muster_order": {
         "name": "[Ƒéñƀŕíðĝé Ɱúšţéŕ Óŕðéŕ]"
       },
+      "firebottle": {
+        "name": "[Ƒíŕéƀóţţļé]"
+      },
+      "murloc_hut": {
+        "name": "[Ɱúðƒíñ Ĥúţ]"
+      },
+      "restless_skull": {
+        "name": "[Ŕéšţļéšš Šķúļļ]"
+      },
+      "vanguard_bone": {
+        "name": "[Ʋáñĝúáŕð Ɓóñé]"
+      },
       "mire_prowler_pelt": {
         "name": "[Ɱíŕé Þŕóŵļéŕ Þéļţ]"
       },
@@ -10972,6 +10984,21 @@ export const en_XA: EnTranslations = {
       },
       "spider_egg_sac": {
         "name": "[Šþíðéŕ Éĝĝ-Šáç]"
+      },
+      "spider_egg": {
+        "name": "[Ɓŕóóðɱóţĥéŕ Éĝĝ]"
+      },
+      "widow_hatchling": {
+        "name": "[Ŵíðóŵ Ĥáţçĥļíñĝ]"
+      },
+      "drowned_warlord": {
+        "name": "[Ţĥé Ðŕóŵñéð Ŵáŕļóŕð]"
+      },
+      "brakka_wallbreaker": {
+        "name": "[Ɓŕáķķá ţĥé Ŵáļļƀŕéáķéŕ]"
+      },
+      "threnos_first_voice": {
+        "name": "[Ţĥŕéñóš ţĥé Ƒíŕšţ Ʋóíçé]"
       },
       "grave_silt_bulwark": {
         "name": "[Ĝŕáʋé-Šíļţ Ɓúļŵáŕķ]"

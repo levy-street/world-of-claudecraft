@@ -8703,6 +8703,18 @@ export const pl_PL: EnTranslations = {
       "fen_muster_order": {
         "name": "Rozkaz zbiórki z Fenbridge"
       },
+      "firebottle": {
+        "name": "Firebottle"
+      },
+      "murloc_hut": {
+        "name": "Mudfin Hut"
+      },
+      "restless_skull": {
+        "name": "Restless Skull"
+      },
+      "vanguard_bone": {
+        "name": "Vanguard Bone"
+      },
       "mire_prowler_pelt": {
         "name": "Futro bagiennego czyhacza"
       },
@@ -10972,6 +10984,21 @@ export const pl_PL: EnTranslations = {
       },
       "spider_egg_sac": {
         "name": "Pajęczy Kokon Jaj"
+      },
+      "spider_egg": {
+        "name": "Broodmother Egg"
+      },
+      "widow_hatchling": {
+        "name": "Widow Hatchling"
+      },
+      "drowned_warlord": {
+        "name": "The Drowned Warlord"
+      },
+      "brakka_wallbreaker": {
+        "name": "Brakka the Wallbreaker"
+      },
+      "threnos_first_voice": {
+        "name": "Threnos the First Voice"
       },
       "grave_silt_bulwark": {
         "name": "Bastion Grobowego Mułu"
