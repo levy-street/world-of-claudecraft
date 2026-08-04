@@ -7532,11 +7532,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cameraPrompt.changeLater':
     '이 설정은 나중에 Esc 메뉴의 키 설정에서 변경할 수 있습니다.',
   'hudChrome.cameraPrompt.confirm': '확인',
-  'desktop.update.downloading': '업데이트 {version} 다운로드 중...',
-  'desktop.update.ready':
-    '업데이트 {version} 준비 완료. 게임을 종료하면 자동으로 설치되며, 지금 다시 시작할 수도 있습니다.',
+  'desktop.update.checkingTitle': '업데이트 확인 중...',
+  'desktop.update.checkingBody': '게임은 자동으로 최신 상태로 유지됩니다.',
+  'desktop.update.uptodateTitle': '현재 최신 버전입니다.',
+  'desktop.update.downloadingTitle': '업데이트 {version} 다운로드 중...',
+  'desktop.update.downloadingBody':
+    '계속 플레이할 수 있습니다. 업데이트는 게임 종료 시 설치됩니다.',
+  'desktop.update.readyTitle': '업데이트 {version} 준비 완료',
+  'desktop.update.readyBody': '게임을 종료하면 자동으로 설치되며, 지금 다시 시작할 수도 있습니다.',
   'desktop.update.restart': '지금 다시 시작',
   'desktop.update.later': '나중에',
+  'desktop.update.dismiss': '닫기',
   'desktop.crash.title': 'World of ClaudeCraft',
   'desktop.crash.body': '게임 화면이 응답하지 않습니다. 다시 불러올까요?',
   'desktop.crash.reload': '다시 불러오기',

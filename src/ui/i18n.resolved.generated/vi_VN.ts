@@ -2945,6 +2945,7 @@ export const vi_VN: EnTranslations = {
       "countLabel": "{earned}/{total} kỳ công",
       "completionAria": "Kỳ công đã lập: {earned} trên {total}",
       "recentLabel": "Gần đây:",
+      "recentJumpAria": "Jump to {name}",
       "nearestLabel": "Sắp đạt:",
       "filterGroupAria": "Lọc kỳ công",
       "filterAll": "Tất Cả",
@@ -6141,10 +6142,16 @@ export const vi_VN: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "Đang tải bản cập nhật {version}...",
-      "ready": "Bản cập nhật {version} đã sẵn sàng. Sẽ tự cài khi bạn thoát, hoặc khởi động lại ngay.",
+      "checkingTitle": "Checking for updates...",
+      "checkingBody": "New versions download while you play.",
+      "uptodateTitle": "You're up to date",
+      "downloadingTitle": "Đang tải bản cập nhật {version}...",
+      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "readyTitle": "Bản cập nhật {version} đã sẵn sàng",
+      "readyBody": "Sẽ tự cài khi bạn thoát, hoặc khởi động lại ngay.",
       "restart": "Khởi động lại ngay",
-      "later": "Để sau"
+      "later": "Để sau",
+      "dismiss": "Dismiss"
     },
     "crash": {
       "title": "World of ClaudeCraft",

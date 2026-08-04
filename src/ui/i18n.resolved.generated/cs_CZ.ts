@@ -2945,6 +2945,7 @@ export const cs_CZ: EnTranslations = {
       "countLabel": "{earned}/{total} skutků",
       "completionAria": "Vykonáno {earned} z {total} skutků",
       "recentLabel": "Nedávné:",
+      "recentJumpAria": "Jump to {name}",
       "nearestLabel": "Skoro tam:",
       "filterGroupAria": "Filtrovat skutky",
       "filterAll": "Vše",
@@ -6141,10 +6142,16 @@ export const cs_CZ: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "Stahuje se aktualizace {version}...",
-      "ready": "Aktualizace {version} je připravena. Nainstaluje se při ukončení, nebo restartuj hned.",
+      "checkingTitle": "Checking for updates...",
+      "checkingBody": "New versions download while you play.",
+      "uptodateTitle": "You're up to date",
+      "downloadingTitle": "Stahuje se aktualizace {version}...",
+      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "readyTitle": "Aktualizace {version} je připravena",
+      "readyBody": "Nainstaluje se při ukončení, nebo restartuj hned.",
       "restart": "Restartovat hned",
-      "later": "Později"
+      "later": "Později",
+      "dismiss": "Dismiss"
     },
     "crash": {
       "title": "World of ClaudeCraft",

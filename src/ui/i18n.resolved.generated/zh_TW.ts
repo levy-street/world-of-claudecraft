@@ -2945,6 +2945,7 @@ export const zh_TW: EnTranslations = {
       "countLabel": "{earned}/{total} 項功績",
       "completionAria": "已獲得功績：{earned}/{total}",
       "recentLabel": "最近：",
+      "recentJumpAria": "Jump to {name}",
       "nearestLabel": "即將達成：",
       "filterGroupAria": "篩選功績",
       "filterAll": "全部",
@@ -6141,10 +6142,16 @@ export const zh_TW: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "正在下載更新 {version}...",
-      "ready": "更新 {version} 已就緒。離開遊戲時將自動安裝，也可立即重新啟動。",
+      "checkingTitle": "正在檢查更新...",
+      "checkingBody": "遊戲會自動保持最新版本。",
+      "uptodateTitle": "目前已是最新版本。",
+      "downloadingTitle": "正在下載更新 {version}...",
+      "downloadingBody": "可以繼續遊戲，更新將在離開遊戲時安裝。",
+      "readyTitle": "更新 {version} 已就緒",
+      "readyBody": "離開遊戲時將自動安裝，也可立即重新啟動。",
       "restart": "立即重新啟動",
-      "later": "稍後"
+      "later": "稍後",
+      "dismiss": "關閉"
     },
     "crash": {
       "title": "World of ClaudeCraft",

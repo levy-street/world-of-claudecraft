@@ -2945,6 +2945,7 @@ export const ja_JP: EnTranslations = {
       "countLabel": "功績 {earned}/{total}",
       "completionAria": "獲得済みの功績: {earned}/{total}",
       "recentLabel": "最近:",
+      "recentJumpAria": "Jump to {name}",
       "nearestLabel": "あと少し:",
       "filterGroupAria": "功績を絞り込む",
       "filterAll": "すべて",
@@ -6141,10 +6142,16 @@ export const ja_JP: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "アップデート {version} をダウンロード中...",
-      "ready": "アップデート {version} の準備ができました。ゲーム終了時に自動でインストールされます。今すぐ再起動もできます。",
+      "checkingTitle": "アップデートを確認中...",
+      "checkingBody": "ゲームは自動的に最新の状態に保たれます。",
+      "uptodateTitle": "お使いのバージョンは最新です。",
+      "downloadingTitle": "アップデート {version} をダウンロード中...",
+      "downloadingBody": "プレイは続けられます。アップデートはゲーム終了時にインストールされます。",
+      "readyTitle": "アップデート {version} の準備ができました",
+      "readyBody": "ゲーム終了時に自動でインストールされます。今すぐ再起動もできます。",
       "restart": "今すぐ再起動",
-      "later": "後で"
+      "later": "後で",
+      "dismiss": "閉じる"
     },
     "crash": {
       "title": "World of ClaudeCraft",

@@ -2945,6 +2945,7 @@ export const id_ID: EnTranslations = {
       "countLabel": "{earned}/{total} jasa",
       "completionAria": "Jasa yang diraih: {earned} dari {total}",
       "recentLabel": "Terbaru:",
+      "recentJumpAria": "Jump to {name}",
       "nearestLabel": "Hampir tercapai:",
       "filterGroupAria": "Saring jasa",
       "filterAll": "Semua",
@@ -6141,10 +6142,16 @@ export const id_ID: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "Mengunduh pembaruan {version}...",
-      "ready": "Pembaruan {version} siap. Akan terpasang saat kamu keluar, atau mulai ulang sekarang.",
+      "checkingTitle": "Checking for updates...",
+      "checkingBody": "New versions download while you play.",
+      "uptodateTitle": "You're up to date",
+      "downloadingTitle": "Mengunduh pembaruan {version}...",
+      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "readyTitle": "Pembaruan {version} siap",
+      "readyBody": "Akan terpasang saat kamu keluar, atau mulai ulang sekarang.",
       "restart": "Mulai Ulang Sekarang",
-      "later": "Nanti"
+      "later": "Nanti",
+      "dismiss": "Dismiss"
     },
     "crash": {
       "title": "World of ClaudeCraft",

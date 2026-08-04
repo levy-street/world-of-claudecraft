@@ -2945,6 +2945,7 @@ export const ko_KR: EnTranslations = {
       "countLabel": "업적 {earned}/{total}",
       "completionAria": "획득한 업적: {earned}/{total}",
       "recentLabel": "최근:",
+      "recentJumpAria": "Jump to {name}",
       "nearestLabel": "달성 임박:",
       "filterGroupAria": "업적 필터",
       "filterAll": "전체",
@@ -6141,10 +6142,16 @@ export const ko_KR: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "업데이트 {version} 다운로드 중...",
-      "ready": "업데이트 {version} 준비 완료. 게임을 종료하면 자동으로 설치되며, 지금 다시 시작할 수도 있습니다.",
+      "checkingTitle": "업데이트 확인 중...",
+      "checkingBody": "게임은 자동으로 최신 상태로 유지됩니다.",
+      "uptodateTitle": "현재 최신 버전입니다.",
+      "downloadingTitle": "업데이트 {version} 다운로드 중...",
+      "downloadingBody": "계속 플레이할 수 있습니다. 업데이트는 게임 종료 시 설치됩니다.",
+      "readyTitle": "업데이트 {version} 준비 완료",
+      "readyBody": "게임을 종료하면 자동으로 설치되며, 지금 다시 시작할 수도 있습니다.",
       "restart": "지금 다시 시작",
-      "later": "나중에"
+      "later": "나중에",
+      "dismiss": "닫기"
     },
     "crash": {
       "title": "World of ClaudeCraft",

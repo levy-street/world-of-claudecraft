@@ -2945,6 +2945,7 @@ export const sv_SE: EnTranslations = {
       "countLabel": "{earned}/{total} bedrifter",
       "completionAria": "Fullbordade bedrifter: {earned} av {total}",
       "recentLabel": "Nyligen:",
+      "recentJumpAria": "Jump to {name}",
       "nearestLabel": "Nästan framme:",
       "filterGroupAria": "Filtrera bedrifter",
       "filterAll": "Alla",
@@ -6141,10 +6142,16 @@ export const sv_SE: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "Laddar ner uppdatering {version}...",
-      "ready": "Uppdatering {version} är klar. Den installeras när du avslutar, eller starta om nu.",
+      "checkingTitle": "Checking for updates...",
+      "checkingBody": "New versions download while you play.",
+      "uptodateTitle": "You're up to date",
+      "downloadingTitle": "Laddar ner uppdatering {version}...",
+      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "readyTitle": "Uppdatering {version} är klar",
+      "readyBody": "Den installeras när du avslutar, eller starta om nu.",
       "restart": "Starta om nu",
-      "later": "Senare"
+      "later": "Senare",
+      "dismiss": "Dismiss"
     },
     "crash": {
       "title": "World of ClaudeCraft",
