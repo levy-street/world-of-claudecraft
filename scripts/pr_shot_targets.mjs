@@ -160,6 +160,88 @@ async function stubDesktopUpdateBridge(page) {
 
 export const TARGETS = [
   {
+    key: 'longbuff-vfx',
+    label: 'Long-worn buff read: buffed character idle past the cast moment',
+    when: ['render/ability_vfx'],
+    variants: [
+      {
+        key: 'aether-insight-desktop',
+        charClass: 'mage',
+        charName: 'Aetherwise',
+        abilityId: 'arcane_intellect',
+      },
+    ],
+    async capture(page, variant) {
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('#loading-screen');
+          const ui = document.querySelector('#ui');
+          return (
+            document.body.classList.contains('game-active') &&
+            !!ui &&
+            getComputedStyle(ui).display !== 'none' &&
+            !!loading &&
+            !loading.classList.contains('visible')
+          );
+        },
+        { timeout: 90000, polling: 200 },
+      );
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      const staged = await page.evaluate((shot) => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) {
+          return { ok: false, reason: 'offline world is unavailable' };
+        }
+        sim.setPlayerLevel?.(20, player.id);
+        player.resource = player.maxResource;
+        player.targetId = null;
+        game.hud.hotbarActions[0] = { type: 'ability', id: shot.abilityId };
+        game.hud.saveSlotMap?.();
+        return { ok: true };
+      }, variant);
+      if (!staged.ok) throw new Error(staged.reason);
+
+      // Exercise the same click handler a player uses on the primary action
+      // bar (an untargeted party buff self-casts); never inject the aura.
+      let auraApplied = false;
+      for (let attempt = 0; attempt < 2 && !auraApplied; attempt++) {
+        const clicked = await page.evaluate((abilityId) => {
+          const game = window.__game;
+          const player = game?.sim?.player;
+          const button = document.querySelector('.action-btn[data-hotbar-slot="1"]');
+          if (!game || !player || !button) return false;
+          player.resource = player.maxResource;
+          game.hud.hotbarActions[0] = { type: 'ability', id: abilityId };
+          game.hud.saveSlotMap?.();
+          button.click();
+          return true;
+        }, variant.abilityId);
+        if (!clicked) throw new Error('primary action slot 1 is unavailable');
+        for (let poll = 0; poll < 24 && !auraApplied; poll++) {
+          await wait(200);
+          auraApplied = await page.evaluate(
+            (abilityId) => !!window.__game?.sim?.player?.auras.some((a) => a.id === abilityId),
+            variant.abilityId,
+          );
+        }
+      }
+      if (!auraApplied) throw new Error('buff aura never applied');
+
+      // Let the whole cast moment finish (shell flash 1.2s + linger 2s + gain
+      // swirl): whatever is painted after this wait is a HELD read, which is
+      // exactly what the before/after pair is meant to show.
+      await wait(4500);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return {};
+    },
+  },
+  {
     key: 'target-auras',
     label: 'Target aura window with offensive and healing-over-time effects',
     when: ['target_auras'],
