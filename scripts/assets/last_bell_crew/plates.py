@@ -94,14 +94,18 @@ def render_member(member, out_dir, turn_frames=TURN_FRAMES):
         wanted = auto_poses()
     if rig is not None and wanted:
         cam = preview.setup(res=POSE_RES, transparent=True)
-        for clip, frame, label in wanted:
+        for spec in wanted:
+            clip, frame, label = spec[0], spec[1], spec[2]
+            # a pose may carry its own camera yaw: a polearm thrust points away from
+            # the default station and foreshortens to nothing there
+            yaw = spec[3] if len(spec) > 3 else 32
             if bpy.data.actions.get(clip) is None:
                 continue
             preview.pose(rig, clip, frame)
             # re-fit per pose: a stride and a raised strike do not share a frame
             target, dist = preview.fit(figure_objs)
             name = f"{member}_pose_{clip}.png"
-            preview.shoot(cam, os.path.join(out_dir, name), target, dist, 32, 6)
+            preview.shoot(cam, os.path.join(out_dir, name), target, dist, yaw, 6)
             plates.append({"file": name, "clip": clip, "frame": frame, "label": label})
     entry["plates"] = plates
 
@@ -114,7 +118,9 @@ def render_member(member, out_dir, turn_frames=TURN_FRAMES):
     anims = []
     if rig is not None and wanted:
         cam = preview.setup(res=ANIM_RES, transparent=True)
-        for clip, _frame, label in wanted:
+        for spec in wanted:
+            clip, label = spec[0], spec[2]
+            yaw = spec[3] if len(spec) > 3 else 32
             action = bpy.data.actions.get(clip)
             if action is None:
                 continue
@@ -126,7 +132,7 @@ def render_member(member, out_dir, turn_frames=TURN_FRAMES):
                 f = start + (end - start) * (i / ANIM_FRAMES)   # exclusive end: loops clean
                 bpy.context.scene.frame_set(int(round(f)))
                 name = f"{member}_anim_{clip}_{i:02d}.png"
-                preview.shoot(cam, os.path.join(out_dir, name), target, dist, 32, 6)
+                preview.shoot(cam, os.path.join(out_dir, name), target, dist, yaw, 6)
                 files.append(name)
             anims.append({"clip": clip, "label": label, "frames": files,
                           "fps": ANIM_FPS, "width": ANIM_RES[0], "height": ANIM_RES[1]})

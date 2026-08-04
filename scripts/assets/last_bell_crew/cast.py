@@ -90,31 +90,52 @@ CAST = {
             "the militia cannot handle is what the squad is for."
         ),
         "signature": (
-            "Mismatched kit. One good pauldron on his spear arm and nothing on the "
-            "other, a helm that came off a different man, rope lashings where "
-            "straps should be. He is what the island's ordinary defenders look "
-            "like, so that the squad's gear reads as elite without a word of dialogue."
+            "The halberd, and everything around it being worse. A halberd was a "
+            "sergeant's literal badge of rank, so the one good thing he carries is "
+            "also the reason his line can hold a road. Around it: one pauldron on "
+            "his right and nothing on the other, rope lashings where straps should "
+            "be, a padded jack instead of plate, and a helm that came off a "
+            "different man."
         ),
         "palette": [
-            ("Militia iron", "#8d9490", "Cheaper than the squad's, and pitted."),
-            ("Drab wool", "#6a5a3a", "His sim entity colour: town cloth, not livery."),
-            ("Rope and hemp", "#9c7a4e", "Repairs made with what the docks had."),
-            ("Bell bronze", "#9c7437", "One rank badge. The only issued thing he owns."),
+            ("Padded jack", "#cfc4a8", "Quilted cloth, not plate: what a town could actually afford, and his pale field."),
+            ("Issued helm", "#8a8f8b", "Cool iron, and the only real metal on him."),
+            ("Dark leather", "#4a3826", "Edging and boots: his dark field."),
+            ("Hemp rope", "#a98a5c", "Lashings where straps should be, made from what the docks had."),
+            ("Bell bronze", "#9c7437", "One rank badge."),
         ],
         "notes": [
-            "Separated from Coalfast at every level, because they share a body and "
-            "stand two POIs apart: helmed against bare-headed, NO cloak against "
-            "warden rust, warm brown-grey town iron against cold salt-scoured steel, "
-            "spear and round buckler against sword and heavy square shield, and one "
-            "pauldron on the RIGHT against a three-lame stack on the LEFT.",
+            "Three values on purpose. The first pass painted iron, wool and rope at "
+            "almost the same mid warm grey and he read as one flat monochrome mass; he "
+            "now has a pale field (the jack), a dark field (leather and boots) and a "
+            "single accent, the way Ewald does.",
+            "The value fix needed no geometry. On the knight body ONE cell covers the "
+            "cuirass, arms, legs and the helmet, which is exactly why nothing could be "
+            "separated: so the helmet's faces move to their own cell and the shared one "
+            "is repainted as quilted cloth. A jack grown from his torso faces was tried "
+            "first and cut, because a colour boundary that follows triangle edges came "
+            "out as a sawtooth reading as tearing.",
+            "The helm's own crown fins sample the trim cell, so bronze trim turned them "
+            "into a spiked coronet and the militia sergeant out-ornamented the warden. "
+            "Its faces are re-UV'd to plate; the body keeps its trim.",
+            "Separated from Coalfast at every level, because they share a body and stand "
+            "two POIs apart: helmed against bare-headed, no cloak against warden rust, "
+            "warm town iron against cold salt-scoured steel, a two-handed halberd "
+            "against sword and heavy shield, and one pauldron on the RIGHT against a "
+            "three-lame stack on the LEFT.",
         ],
         "weapons": [
-            {"url": "weapons/spear_a.glb", "bone": "handslot.r", "grip": "pole",
-             "why": "A militia spear: cheap, long, and it holds a road with bodies behind it."},
-            {"url": "weapons/shield_round.glb", "bone": "handslot.l", "grip": "shield",
-             "why": "A round buckler off the town armoury rack, painted and repainted."},
+            {"url": "weapons/halberd.glb", "bone": "handslot.r", "grip": "polearm",
+             "why": "A sergeant's halberd: his badge of rank and the reason a militia line holds a road. Carried grounded and vertical at his post."},
         ],
-        "poses": CREW_POSES,
+        "poses": [
+            ("Idle", 7, "Holding the road"),
+            ("Walking_A", 6, "Walking the line"),
+            # A polearm thrust points away from the camera at the book's default yaw,
+            # so this plate carries its own angle and the halberd reads along the frame.
+            ("2H_Melee_Attack_Chop", 14, "The thrust", 100),
+            ("Block", 8, "Bracing the line"),
+        ],
     },
     # -------------------------------------------------------------- the squad
     "coalfast": {

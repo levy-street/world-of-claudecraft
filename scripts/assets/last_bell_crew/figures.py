@@ -498,50 +498,86 @@ def build_ewald():
 
 # ---------------------------------------------------------------------- Marsh
 def build_marsh():
-    """Sergeant Marsh, town militia.
+    """Sergeant Marsh, Town Militia.
 
-    Authored detail: MISMATCHED KIT. One pauldron on his spear arm and nothing on
-    the other, rope lashings where straps should be, a helm that came off a
-    different man. He is the measuring stick: what the militia cannot handle is what
-    the squad is for, and his gear says so without dialogue.
+    Authored detail: MISMATCHED KIT, and the halberd. A halberd was a sergeant's
+    literal badge of rank, so it doubles as the one issued thing he owns and as the
+    reason his line can hold a road. Carried grounded and vertical at his post.
 
-    Deliberately separated from Coalfast at every level, because they share a body
-    and stand two POIs apart:
-      * HELMED where Coalfast is bare-headed
-      * NO CLOAK at all where Coalfast wears warden rust
-      * warm BROWN-grey militia iron against Coalfast's cold salt-scoured steel
-      * SPEAR and a ROUND buckler against sword and heavy square shield
-      * ONE pauldron on the RIGHT where Coalfast's is a three-lame stack on the LEFT
+    He is the measuring stick: what the militia cannot handle is what the squad is
+    for, and his gear has to say that without dialogue. Everything about him is
+    cheaper, patched or improvised, EXCEPT the polearm.
+
+    Separated from Coalfast at every level, because they share a body and stand two
+    POIs apart: helmed against bare-headed, no cloak against warden rust, warm town
+    iron against cold salt-scoured steel, a two-handed halberd against sword and
+    heavy shield, and one pauldron on the RIGHT against a three-lame stack on the LEFT.
     """
     rig, meshes = crew.load_base("knight.glb", hide=("Knight_HelmetVisor", "Knight_Cape"))
+    # THREE VALUES, deliberately. The first pass painted iron, wool and rope at almost
+    # the same mid warm grey and he read as one flat monochrome mass with no structure,
+    # where Ewald works because he has a pale field, a dark field and one accent.
     palette = crew.base_palette(
-        plate=ramp(0x8E8478, 0x46403A),         # brown-grey: town iron, warm and pitted
-        plate_dark=ramp(0x5C554C, 0x2E2A25),
-        trim=ramp(0x6A5A3A, 0x30291A),          # his entity colour: town cloth, not livery
-        cloth=ramp(0x6A5A3A, 0x30291A),
-        leather=crew.LEATHER_PALE,              # repairs made with what the docks had
-        boots=crew.LEATHER,
-        hair=ramp(0x54462F, 0x2A231A),          # brown: he is not an elder either
+        plate=ramp(0xCFC4A8, 0x7C735C),         # the padded jack: quilted cloth, the pale field
+        plate_dark=ramp(0x5A5249, 0x2C2721),
+        trim=ramp(0x4A3826, 0x241B12),          # DARK leather edging: the dark field
+        leather=ramp(0xA98A5C, 0x5B4830),        # hemp and rope: repairs from the docks
+        spare_a=ramp(0xA98A5C, 0x5B4830),
+        boots=ramp(0x3E3226, 0x1E1811),          # dark boots and under-armour
+        spare_b=ramp(0x8A8F8B, 0x434744),        # the issued helm: the only real metal on him
+        steel_b=ramp(0x6A6A62, 0x343430),        # small iron fittings: buckle, chest patch
+        canvas=ramp(0xD2C8AE, 0x82795F),
+        cloth=crew.BRONZE,                       # the rank badge, and nothing else
+        hair=ramp(0x54462F, 0x2A231A),
         skin=ramp(0xD4A177, 0x8D6245),
     )
     img, mat = crew.repaint(meshes, "marsh", palette)
     body = _body(meshes)
-    crew.reuv(body, "cloth", "bronze", shade_t=0.30)   # one issued rank badge
+    helmet = _body(meshes, "Helmet")
+
+    # THE VALUE FIX, and it needs no geometry at all. On the knight body one cell
+    # (`plate`) covers the cuirass, arms, legs AND the helmet, which is exactly why he
+    # read as one flat monochrome mass: there was no way to separate them. So move the
+    # HELMET's faces onto their own cell and then repaint `plate` as pale quilted cloth.
+    # His whole body becomes the padded jack a town could actually afford and the helm
+    # stays iron, which is the militia read: cloth armour under an issued helmet.
+    #
+    # A jack GROWN from his torso faces was tried first and cut: the colour boundary
+    # follows triangle edges, so it came out as a sawtooth that read as tearing, and
+    # aligning it to the body's real edge loops (z=0.958 and z=1.255) shrank it to a
+    # sliver at the collar. Recolouring the whole garment is both simpler and truer.
+    # The helmet moves to a cell the knight body does NOT use. `steel_b` was the first
+    # choice and it backfired: the body carries a small chest patch on that cell, so
+    # painting it helm-iron put a pale scrap on his sternum, which is the stray white
+    # fleck the review flagged.
+    crew.reuv(helmet, "plate", "spare_b", shade_t=0.24)
+    crew.reuv(helmet, "trim", "spare_b", shade_t=0.34)   # and its crown fins with it
+    crew.reuv(body, "cloth", "bronze", shade_t=0.30)     # one issued rank badge
 
     built = []
-    # ONE pauldron, on the spear arm. The asymmetry is the whole point.
+
+    # ONE pauldron, on the right. Its lames were the same cell at nearly the same value
+    # as the arm under them, so the shoulders read symmetric from every angle and his
+    # authored asymmetry did not exist on screen: darker cell, and a fifth larger.
     built.append(parts.lames(
         "Marsh_Pauldron", (-0.196, 0.004, 1.100), (-1.0, 0.058, 0.0),
-        count=2, radius=0.168, width=0.060, spread=0.058,
-        cell="plate", shade_t=0.20, material=mat, sides=9, arc=0.42, grow=0.045))
-    # rope lashings where straps should be
-    for i, z in enumerate((0.980, 0.905)):
-        front = parts.surface_front(body, z) or -0.30
-        built.append(parts.strap(f"Marsh_Lashing{i}", [
-            (-0.250, front + 0.045, z), (0.0, front - 0.014, z - 0.010),
-            (0.250, front + 0.045, z),
-        ], width=0.032, thick=0.026, cell="spare_a", shade_t=0.34,
-            material=mat, up=(0, -1, 0)))
+        count=2, radius=0.201, width=0.072, spread=0.070,
+        cell="plate_dark", shade_t=0.22, material=mat, sides=9, arc=0.44, grow=0.055))
+
+    # Rope lashings, ASYMMETRIC on purpose. Two parallel horizontal straps read as a
+    # ladder bolted to his chest; one thick wrap plus one diagonal over the shoulder
+    # reads as rope someone improvised, which is the point of him.
+    waist = parts.surface_front(body, 0.995) or -0.30
+    built.append(parts.strap("Marsh_Lashing0", [
+        (-0.250, waist + 0.060, 1.010), (-0.090, waist - 0.036, 0.992),
+        (0.090, waist - 0.036, 0.986), (0.250, waist + 0.060, 0.972),
+    ], width=0.052, thick=0.046, cell="leather", shade_t=0.30,
+        material=mat, up=(0, -1, 0)))
+    built.append(parts.strap("Marsh_Lashing1", parts.sash_path(body, -0.200, 0.235,
+                                                              z_hi=1.230, z_lo=0.968),
+                             width=0.046, thick=0.042, cell="leather", shade_t=0.42,
+                             material=mat, up=(0, -1, 0)))
+
     _skinned(built, rig, {
         "Marsh_Pauldron": "upperarm.r",
         "Marsh_Lashing0": "chest", "Marsh_Lashing1": "chest",

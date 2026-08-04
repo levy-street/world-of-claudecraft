@@ -170,7 +170,7 @@ footer.book ul{padding-left:20px;margin:8px 0 0}
     deliberately absent: a prop that reads fine standing still can be plainly wrong the moment
     a wrist moves, which is how a batch of reversed shields and an upside-down staff survived
     the first review.</p>
-  <ul class="toc"><li><a href="#ewald">Ewald</a></li><li><a href="#scale">Scale</a></li></ul>
+  <ul class="toc"><li><a href="#ewald">Ewald</a></li><li><a href="#marsh">Marsh</a></li><li><a href="#scale">Scale</a></li></ul>
 </header>
 
 
@@ -275,6 +275,119 @@ footer.book ul{padding-left:20px;margin:8px 0 0}
   </div>
 </section>
 
+<section class="figure" id="marsh">
+  <header class="figure-head">
+    <div class="ident">
+      <h2>Sergeant Marsh</h2>
+      <p class="title">Town Militia</p>
+      <p class="post">The militia line, Watch Meadow</p>
+    </div>
+    <dl class="spec">
+      <div><dt>Role</dt><dd>Holds the road. Knows exactly what his line can and cannot kill.</dd></div>
+      <div><dt>Height</dt><dd>2.60 yd</dd></div>
+      <div><dt>Triangles</dt><dd>5,512</dd></div>
+      <div><dt>Clips</dt><dd>22</dd></div>
+      <div><dt>Materials</dt><dd>1 body (one draw) + 1 held</dd></div>
+      <div><dt>Base</dt><dd><code>knight.glb</code></dd></div>
+      
+      
+    </dl>
+  </header>
+
+  <div class="figure-body">
+    <div class="turn-wrap">
+      <div class="turn" data-frames="marsh_turn_00.webp,marsh_turn_01.webp,marsh_turn_02.webp,marsh_turn_03.webp,marsh_turn_04.webp,marsh_turn_05.webp,marsh_turn_06.webp,marsh_turn_07.webp,marsh_turn_08.webp,marsh_turn_09.webp,marsh_turn_10.webp,marsh_turn_11.webp" data-dir="last-bell-concept-art">
+        <img class="turn-img" src="last-bell-concept-art/marsh_turn_00.webp" alt="Sergeant Marsh, rotating turnaround">
+      </div>
+      <div class="turn-ctl">
+        <button class="btn spin" type="button" aria-pressed="true">Pause</button>
+        <input class="scrub" type="range" min="0" max="11" value="0"
+               aria-label="Sergeant Marsh turnaround angle">
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>Operational and unsentimental. His line holds the road, and when the rift coughs up something they cannot put down he points at you and says so plainly. He is the measuring stick the campaign uses: what the militia cannot handle is what the squad is for.</p>
+      <div class="signature">
+        <h3>The authored detail</h3>
+        <p>The halberd, and everything around it being worse. A halberd was a sergeant's literal badge of rank, so the one good thing he carries is also the reason his line can hold a road. Around it: one pauldron on his right and nothing on the other, rope lashings where straps should be, a padded jack instead of plate, and a helm that came off a different man.</p>
+      </div>
+      <ul class="palette">
+        <li class="chip">
+          <span class="swatch" style="--c:#8e8478"></span>
+          <span class="chip-text">
+            <b>Militia iron</b> <code>#8e8478</code>
+            <em>Cheap, warm, pitted. Nothing like the squad's cold steel.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#beb39a"></span>
+          <span class="chip-text">
+            <b>Padded jack</b> <code>#beb39a</code>
+            <em>Quilted cloth, not plate. What a town could actually afford.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#4a3826"></span>
+          <span class="chip-text">
+            <b>Dark leather</b> <code>#4a3826</code>
+            <em>The edging and boots: his dark field.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#a98a5c"></span>
+          <span class="chip-text">
+            <b>Hemp rope</b> <code>#a98a5c</code>
+            <em>Lashings where straps should be, made from what the docks had.</em>
+          </span>
+        </li>
+        <li class="chip">
+          <span class="swatch" style="--c:#9c7437"></span>
+          <span class="chip-text">
+            <b>Bell bronze</b> <code>#9c7437</code>
+            <em>One rank badge, and the only bright thing on him.</em>
+          </span>
+        </li></ul>
+      <h3>What they carry</h3><ul class="weapons">
+      <li>
+        <b>halberd</b>
+        <code>handslot.r</code>
+        <em>A sergeant's halberd: his badge of rank and the reason a militia line holds a road. Carried grounded and vertical at his post.</em>
+      </li></ul>
+      <h3>Design notes</h3><ul class="notes"><li>Three values on purpose. The first pass painted iron, wool and rope at almost the same mid warm grey and he read as one flat monochrome mass; he now has a pale field (the jack), a dark field (leather and boots) and a single accent, the way Ewald does.</li><li>The jack is GROWN from his own torso faces rather than fitted over them, so it matches the body and its edges stay welded flush.</li><li>The helm's own crown fins sample the trim cell, so bronze trim turned them into a spiked coronet and the militia sergeant out-ornamented the warden. Its faces are re-UV'd to plate; the body keeps its trim.</li><li>Separated from Coalfast at every level, because they share a body and stand two POIs apart: helmed against bare-headed, no cloak against warden rust, warm town iron against cold salt-scoured steel, a two-handed halberd against sword and heavy shield, and one pauldron on the RIGHT against a three-lame stack on the LEFT.</li></ul>
+    </div>
+  </div>
+
+  
+  <div class="anims">
+    <div class="anims-head">
+      <h3>In motion</h3>
+      <button class="btn anims-toggle" type="button" aria-pressed="true">Pause all</button>
+    </div>
+    <div class="anim-grid">
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/marsh_anim_Idle.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Holding the road</b><span>Idle</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/marsh_anim_Walking_A.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Walking the line</b><span>Walking_A</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/marsh_anim_2H_Melee_Attack_Chop.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>The thrust</b><span>2H_Melee_Attack_Chop</span></figcaption>
+      </figure>
+      <figure class="anim">
+        <div class="anim-stage" data-frames="12" data-fps="12"
+             style="--sheet:url('last-bell-concept-art/marsh_anim_Block.webp');--arw:300;--arh:380;--n:12;--cells:13;--dur:1.00s"></div>
+        <figcaption><b>Bracing the line</b><span>Block</span></figcaption>
+      </figure></div>
+  </div>
+</section>
+
 
 <section class="figure" id="scale">
   <header class="figure-head"><div class="ident"><h2>Scale</h2>
@@ -285,6 +398,10 @@ footer.book ul{padding-left:20px;margin:8px 0 0}
       <li>
         <span class="bar" style="--h:100.0%"></span>
         <span class="bar-label"><b>Ferryman Ewald</b><span>2.60 yd</span></span>
+      </li>
+      <li>
+        <span class="bar" style="--h:100.0%"></span>
+        <span class="bar-label"><b>Sergeant Marsh</b><span>2.60 yd</span></span>
       </li></ul>
 </section>
 

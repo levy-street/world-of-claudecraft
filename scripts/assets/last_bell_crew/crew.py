@@ -232,6 +232,13 @@ GRIPS = {
     "blade": {"rot": (0, 0, 0), "offset": (0, 0, 0), "scale": 0.62},
     "shield": {"rot": (90, 0, 0), "offset": (0, 0.02, 0), "scale": 0.62},
     "pole": {"rot": (0, 0, 0), "offset": (0, 0, 0), "scale": 0.62},
+    # A polearm carried GROUNDED: vertical, head up, butt at the feet, which is the
+    # "my line holds the road" silhouette. Solved numerically against the Idle pose
+    # (sweep the bone-space rotation, maximise the weapon's verticality with the head
+    # up) rather than guessed, then confirmed by looking. The attack clip thrusts it
+    # forward, which is correct for a polearm but foreshortens at the book's default
+    # camera, so that plate carries its own yaw.
+    "polearm": {"rot": (90, 0, -90), "offset": (0, 0, 0), "scale": 0.72},
     "haft": {"rot": (-90, 0, 0), "offset": (0, 0.02, 0), "scale": 0.66},
     "stave": {"rot": (90, 0, 0), "offset": (0, 0.02, 0), "scale": 0.66},
     "hang": {"rot": (0, 0, 0), "offset": (0, 0.02, 0), "scale": 0.62},
