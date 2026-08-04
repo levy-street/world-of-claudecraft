@@ -209,7 +209,7 @@ describe('Eastbrook polish capture contract', () => {
       sourceComparison: 'feature-worktree',
       views: EASTBROOK_TOWN_CAPTURE_VIEWS,
       placementInventory: EASTBROOK_TOWN_REBUILD_PLACEMENT_INVENTORY,
-      townTriangles: 29_644,
+      townTriangles: 29_436,
       attributionTargets: [
         {
           key: 'town-root',
@@ -233,7 +233,7 @@ describe('Eastbrook polish capture contract', () => {
       sourceComparison: 'polish-baseline-worktree',
       views: EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS,
       placementInventory: EASTBROOK_TOWN_REBUILD_PLACEMENT_INVENTORY,
-      townTriangles: 29_644,
+      townTriangles: 29_436,
       attributionTargets: [
         {
           key: 'town-root',
@@ -255,7 +255,7 @@ describe('Eastbrook polish capture contract', () => {
       layoutId: 'eastbrook_civic_layout_v2',
       sourceComparison: 'polish-v2-worktree',
       placementInventory: EASTBROOK_TOWN_POLISH_V2_PLACEMENT_INVENTORY,
-      townTriangles: 29_110,
+      townTriangles: 28_902,
       attributionTargets: [
         {
           key: 'town-root',
@@ -360,21 +360,18 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned, and this mint folds in three independent moves.
-      // First: the lockfile leaf is pnpm-lock.yaml after the local-gate-perf
-      // migration (previously package-lock.json at 0.33.1), a hashed input to
-      // every GLB source fingerprint, so the town, mailbox and noticeboard
-      // leaves all moved. Second: src/render/renderer.ts is the
-      // rendererIntegration leaf, and the release branch edited it to gate the
-      // shapeshift-form visual swap on async compile (#2571). Third: the
-      // Drakelands brood added its shout/flourish and attackByAbility wiring to
-      // that same leaf, then gated the shout/flourish dispatch on a mob source
-      // so player castFx keeps reaching the warrior plan. Still not one pipeline
+      // Deliberately re-pinned, and this mint stacks every leaf move to date: the
+      // pnpm-lock migration (a hashed input to every GLB source fingerprint), the
+      // base renderer provenance move plus PR #2720's fence-removal layout
+      // evidence, and this branch's own edits to src/render/renderer.ts, the
+      // rendererIntegration leaf (the brood shout/flourish and attackByAbility
+      // wiring, then gating that cue on a mob source so player castFx keeps
+      // reaching the warrior plan). The authoritativeLayout / townTriangles /
+      // placementInventory inputs and the upstream provenance leaves mint one
+      // merged composite matching neither parent's literal. Not one pipeline
       // input or geometry value changed, and no capture was retaken: Eastbrook
-      // itself is untouched by all three, following the identical precedent this
-      // composite already carries from the compile-storm gear/mount/base-visual
-      // gate fix.
-      fingerprint: '81ad3b53cf28981b2966933e0e1014d89e4581a73928ac2409455661f28a0c41',
+      // itself is untouched by all of it.
+      fingerprint: '866519f0219669c38cdcb6475194b0ec51f53a82990448bde5ca47e5fb3be008',
       components: {
         captureContract: {
           id: 'polish-v2',
@@ -585,10 +582,10 @@ describe('Eastbrook polish capture contract', () => {
         shadowEnabled: true,
         ...(contractId ? { contractId } : {}),
       });
-    expect(() => assertPerf(29_644)).not.toThrow();
-    expect(() => assertPerf(29_644, 'rebuild-v1')).not.toThrow();
-    expect(() => assertPerf(29_644, 'polish-baseline')).not.toThrow();
-    expect(() => assertPerf(29_110, 'polish-v2')).not.toThrow();
+    expect(() => assertPerf(29_436)).not.toThrow();
+    expect(() => assertPerf(29_436, 'rebuild-v1')).not.toThrow();
+    expect(() => assertPerf(29_436, 'polish-baseline')).not.toThrow();
+    expect(() => assertPerf(28_902, 'polish-v2')).not.toThrow();
     expect(() => assertPerf(29_644, 'polish-v2')).toThrow('draw stats');
   });
 

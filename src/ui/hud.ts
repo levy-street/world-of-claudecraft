@@ -203,7 +203,7 @@ import { shouldRefreshDailyRewardsLauncher } from './daily_rewards_launcher_core
 import { DailyRewardsWindow } from './daily_rewards_window';
 import { decorativeArtImg } from './decorative_art';
 import {
-  deedBroadcastLine,
+  deedBroadcastRendered,
   deedName,
   deedTitleText,
   type TitledNameDecoration,
@@ -365,6 +365,7 @@ import {
 } from './hud/chat/chat_line';
 import { type ChatClock, clampChatClock, formatChatTimestamp } from './hud/chat/chat_timestamp';
 import { ChatWindowController } from './hud/chat/chat_window_controller';
+import { DEED_NAME_TOKEN, deedChatLinkEl, deedLineNodes } from './hud/chat/deed_chat_line';
 import { SkinEventController } from './hud/cosmetics/skin_event_controller';
 import { DelveBoardController } from './hud/delve/delve_board_controller';
 import { DelveMapPainter } from './hud/delve/delve_map_painter';
@@ -4129,6 +4130,8 @@ export class Hud {
     isMarketSell: () => this.marketWindow.isSellTab,
     isMailAttach: () => this.mailboxWindow.isSendTab,
     isBankOpen: () => this.bankWindow.isOpen,
+    isPersonalBankTab: () => this.bankWindow.personalTabActive,
+    isGuildBankTab: () => this.bankWindow.guildTabActive,
     pendingPetFeed: () => this.pendingPetFeed,
     closeVendor: () => this.closeVendor(),
     closeBank: () => this.closeBank(),
@@ -4210,6 +4213,8 @@ export class Hud {
         this.renderBags();
       }
     },
+    confirmDialog: (title, body, okText, cancelText, onOk) =>
+      this.confirmDialog(title, body, okText, cancelText, onOk),
   });
   // Ravenpost mailbox window painter (mailbox_view.ts core + mailbox_window.ts
   // painter). It owns the mailbox view-state (tab, opened letter, staged
@@ -11102,8 +11107,16 @@ export class Hud {
           // A guildmate's or followed friend's marquee unlock. Id-based on
           // the wire (server sends the deed id, never English); the visible
           // line composes in deed_i18n (Node-pinned there), in the guild-chat
-          // green so it reads as social news.
-          this.log(deedBroadcastLine(ev.characterName, ev.deedId), '#40d264');
+          // green so it reads as social news. The deed name is spliced in as
+          // a clickable jump to that deed's card in the viewer's own Book.
+          this.logNodes(
+            deedLineNodes(document, deedBroadcastRendered(ev.characterName, DEED_NAME_TOKEN), () =>
+              deedChatLinkEl(document, deedName(ev.deedId), () =>
+                this.deedsWindow.openWithDeed(ev.deedId),
+              ),
+            ),
+            '#40d264',
+          );
           break;
         }
         case 'error':
@@ -12275,8 +12288,20 @@ export class Hud {
   // localized summary count.
   private handleDeedUnlocks(events: { deedId: string; retro?: boolean }[]): void {
     const plan = buildDeedUnlockPlan(events, DEEDS);
+    // Feed the Book's recent strip the exact session order (the drain order),
+    // ahead of the server record that may still be catching up.
+    this.deedsWindow.noteUnlocks(plan.logIds);
     for (const id of plan.logIds) {
-      this.log(t('hudChrome.deeds.unlockedBanner', { name: deedName(id) }), '#ffd100');
+      // The durable gold log line, with the deed name spliced in as a
+      // clickable jump to its card in the Book of Deeds.
+      this.logNodes(
+        deedLineNodes(
+          document,
+          t('hudChrome.deeds.unlockedBanner', { name: DEED_NAME_TOKEN }),
+          () => deedChatLinkEl(document, deedName(id), () => this.deedsWindow.openWithDeed(id)),
+        ),
+        '#ffd100',
+      );
     }
     for (const id of plan.titleHintIds) {
       this.log(t('hudChrome.deeds.unlockedTitleHint', { title: deedTitleText(id) }), '#ffd100');
@@ -12308,6 +12333,14 @@ export class Hud {
 
   log(text: string, color = '#ccc', decorativeIconUrl?: string): void {
     this.appendLog(this.chatLogEl, text, color, true, 'system', decorativeIconUrl);
+  }
+
+  /** A chat-pane system line whose body is pre-built NODES (the deed-link
+   *  splice): the same chrome as log() (timestamp, filter, announce, trim,
+   *  autoscroll), with the body landing as the given nodes instead of one
+   *  text node. */
+  private logNodes(nodes: readonly Node[], color: string): void {
+    this.appendLog(this.chatLogEl, '', color, true, 'system', undefined, false, nodes);
   }
 
   private noteProcAuraGain(name: string): void {
@@ -12963,6 +12996,7 @@ export class Hud {
     // via esc(), so guild-controlled text must not mint trusted clickable
     // item links in chat either).
     plainText = false,
+    bodyNodes?: readonly Node[],
   ): void {
     const wasNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 24;
     const div = document.createElement('div');
@@ -12976,11 +13010,14 @@ export class Hud {
     if (decorativeIconUrl) {
       div.append(decorativeArtImg(document, 'chat-masterwork-seal', decorativeIconUrl));
     }
+    // A caller-assembled node body (the deed-link splice) lands verbatim.
     // Loot lines carry name-free item tokens ([[i:id]]); render those as clickable
     // links via the shared chat item-link renderer. Plain system/combat lines keep
     // the fast text-node path (the substring test never fires for tokenless lines),
     // and a plainText caller opts out entirely (see the parameter note above).
-    if (!plainText && el === this.chatLogEl && text.includes('[[i:')) {
+    if (bodyNodes) {
+      for (const node of bodyNodes) div.append(node);
+    } else if (!plainText && el === this.chatLogEl && text.includes('[[i:')) {
       for (const seg of parseChatSegments(text)) {
         if (seg.kind === 'item') this.appendChatItemLink(div, seg.itemId);
         else if (seg.kind === 'quest')

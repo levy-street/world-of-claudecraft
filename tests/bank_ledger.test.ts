@@ -320,3 +320,375 @@ describe('bank ledger dispatch integration', () => {
     await bankLedgerIdle();
   });
 });
+
+// ---------------------------------------------------------------------------
+// Guild bank rows (Guild Bank Phase 3): the pure guild differ and the shared
+// FIFO recorder. GuildBankInfo fixtures mirror the info() helper above.
+// ---------------------------------------------------------------------------
+
+import {
+  diffGuildBankOp,
+  GUILD_BANK_ESCROW_DEFICIT_OP,
+  type GuildBankLedgerOp,
+  guildCreateFeeDelta,
+  recordGuildBankDeltas,
+  recordGuildBankEscrowRollback,
+} from '../server/bank_ledger';
+import type { GuildBankOpDelta } from '../src/sim/guild_bank';
+import type { GuildBankInfo } from '../src/world_api';
+
+function ginfo(
+  treasury: number,
+  slots: GuildBankInfo['slots'] = [],
+  purchasedSlots = 0,
+  nextExpansionPrice: number | null = 50000,
+): GuildBankInfo {
+  return { treasury, slots, capacity: 12 + purchasedSlots, purchasedSlots, nextExpansionPrice };
+}
+
+describe('diffGuildBankOp (pure)', () => {
+  it('deposit_gold records the positive treasury delta', () => {
+    expect(diffGuildBankOp('deposit_gold', ginfo(1000), ginfo(3500))).toEqual([
+      {
+        itemId: null,
+        count: null,
+        instance: null,
+        copperDelta: 2500,
+        purchasedSlotsBefore: 0,
+        purchasedSlotsAfter: 0,
+      },
+    ]);
+  });
+
+  it('withdraw_gold records the negative treasury delta', () => {
+    expect(diffGuildBankOp('withdraw_gold', ginfo(3500), ginfo(1000))).toEqual([
+      {
+        itemId: null,
+        count: null,
+        instance: null,
+        copperDelta: -2500,
+        purchasedSlotsBefore: 0,
+        purchasedSlotsAfter: 0,
+      },
+    ]);
+  });
+
+  it('a gold op whose treasury moved the WRONG direction records nothing', () => {
+    // Direction-checked per op: a mislabeled call can never fabricate a row.
+    expect(diffGuildBankOp('deposit_gold', ginfo(3500), ginfo(1000))).toEqual([]);
+    expect(diffGuildBankOp('withdraw_gold', ginfo(1000), ginfo(3500))).toEqual([]);
+  });
+
+  it('an item deposit/withdraw diffs the book multiset like the personal bank', () => {
+    expect(
+      diffGuildBankOp('deposit', ginfo(0, []), ginfo(0, [{ itemId: 'wolf_fang', count: 3 }])),
+    ).toEqual([
+      {
+        itemId: 'wolf_fang',
+        count: 3,
+        instance: null,
+        craftedRecipeId: null,
+        copperDelta: 0,
+        purchasedSlotsBefore: 0,
+        purchasedSlotsAfter: 0,
+      },
+    ]);
+    expect(
+      diffGuildBankOp(
+        'withdraw',
+        ginfo(0, [{ itemId: 'wolf_fang', count: 3 }]),
+        ginfo(0, [{ itemId: 'wolf_fang', count: 1 }]),
+      ),
+    ).toEqual([
+      {
+        itemId: 'wolf_fang',
+        count: 2,
+        instance: null,
+        craftedRecipeId: null,
+        copperDelta: 0,
+        purchasedSlotsBefore: 0,
+        purchasedSlotsAfter: 0,
+      },
+    ]);
+  });
+
+  it('keys crafted and plain copies of one item SEPARATELY (the revert-path contract)', () => {
+    // The guild key has three dimensions (itemId, instance, craftedRecipeId):
+    // withdrawing the plain copy while a crafted copy sits in the book must
+    // record the PLAIN provenance, or the revert would mint provenance the
+    // moved copy never had.
+    const both = [
+      { itemId: 'iron_sword', count: 1, craftedRecipeId: 'smith_iron_sword' },
+      { itemId: 'iron_sword', count: 1 },
+    ];
+    const craftedOnly = [{ itemId: 'iron_sword', count: 1, craftedRecipeId: 'smith_iron_sword' }];
+    expect(diffGuildBankOp('withdraw', ginfo(0, both), ginfo(0, craftedOnly))).toEqual([
+      {
+        itemId: 'iron_sword',
+        count: 1,
+        instance: null,
+        craftedRecipeId: null,
+        copperDelta: 0,
+        purchasedSlotsBefore: 0,
+        purchasedSlotsAfter: 0,
+      },
+    ]);
+  });
+
+  it('pins the sim and server guild-op vocabularies in lockstep (both ways)', () => {
+    // GuildBankOpDelta['op'] (src/sim/guild_bank.ts) and GuildBankLedgerOp
+    // (server/bank_ledger.ts) redeclare the same five literals (the sim never
+    // imports server code). An op added on one side without the other would
+    // otherwise compile and silently never revert (or never record).
+    type SimOp = GuildBankOpDelta['op'];
+    type AssertBothWays = [SimOp] extends [GuildBankLedgerOp]
+      ? [GuildBankLedgerOp] extends [SimOp]
+        ? true
+        : never
+      : never;
+    const lockstep: AssertBothWays = true;
+    expect(lockstep).toBe(true);
+  });
+
+  it('item deltas carry the moved slot craft provenance for the revert path', () => {
+    // craftedRecipeId is NOT a ledger column (insertBankLedgerRow picks its
+    // columns explicitly); it rides the delta so Sim.revertGuildBankDeltas can
+    // restore a reverted withdraw byte-identically.
+    expect(
+      diffGuildBankOp(
+        'withdraw',
+        ginfo(0, [{ itemId: 'iron_sword', count: 1, craftedRecipeId: 'smith_iron_sword' }]),
+        ginfo(0, []),
+      ),
+    ).toEqual([
+      {
+        itemId: 'iron_sword',
+        count: 1,
+        instance: null,
+        craftedRecipeId: 'smith_iron_sword',
+        copperDelta: 0,
+        purchasedSlotsBefore: 0,
+        purchasedSlotsAfter: 0,
+      },
+    ]);
+  });
+
+  it('buy_slots negates the BEFORE table price the treasury paid', () => {
+    expect(
+      diffGuildBankOp('buy_slots', ginfo(60000, [], 24, 25000), ginfo(35000, [], 30, 50000)),
+    ).toEqual([
+      {
+        itemId: null,
+        count: null,
+        instance: null,
+        // ABSOLUTE: the guild escrow log replays a slot op as "raise the
+        // ladder to at least 30, but only from 24", never as a relative +6.
+        copperDelta: -25000,
+        purchasedSlotsBefore: 24,
+        purchasedSlotsAfter: 30,
+      },
+    ]);
+  });
+
+  it('open_bank (rung 0) negates the BEFORE table price the officer PURSE paid', () => {
+    // The 0 -> 24 opening: the row records the purse copper (the treasury
+    // never moved between the snapshots), and the audit's treasury replay
+    // excludes the op like create_fee.
+    expect(
+      diffGuildBankOp('open_bank', ginfo(60000, [], 0, 90000), ginfo(60000, [], 24, 25000)),
+    ).toEqual([
+      {
+        itemId: null,
+        count: null,
+        instance: null,
+        copperDelta: -90000,
+        purchasedSlotsBefore: 0,
+        purchasedSlotsAfter: 24,
+      },
+    ]);
+  });
+
+  it('ALWAYS sets the ladder before-witness on every guild delta it emits', () => {
+    // The escrow log replays slot ops absolutely, so a delta without a before
+    // witness would replay onto the wrong base. GameServer carries a defensive
+    // `?? 0`; this is the pin that keeps that fallback dead code.
+    const cases: ReturnType<typeof diffGuildBankOp>[] = [
+      diffGuildBankOp('deposit_gold', ginfo(0), ginfo(1500)),
+      diffGuildBankOp('withdraw_gold', ginfo(1500), ginfo(0)),
+      diffGuildBankOp('deposit', ginfo(0, []), ginfo(0, [{ itemId: 'wolf_fang', count: 1 }])),
+      diffGuildBankOp('withdraw', ginfo(0, [{ itemId: 'wolf_fang', count: 1 }]), ginfo(0, [])),
+      diffGuildBankOp('buy_slots', ginfo(60000, [], 24, 25000), ginfo(35000, [], 30, 50000)),
+      diffGuildBankOp('open_bank', ginfo(0, [], 0, 90000), ginfo(0, [], 24, 25000)),
+    ];
+    for (const deltas of cases) {
+      expect(deltas.length).toBe(1);
+      expect(typeof deltas[0].purchasedSlotsBefore).toBe('number');
+    }
+  });
+
+  it('identical or null snapshots (refusals) record nothing', () => {
+    expect(diffGuildBankOp('deposit_gold', ginfo(500), ginfo(500))).toEqual([]);
+    expect(diffGuildBankOp('deposit', null, ginfo(500))).toEqual([]);
+    expect(diffGuildBankOp('withdraw', ginfo(500), null)).toEqual([]);
+    expect(diffGuildBankOp('buy_slots', ginfo(500, [], 30), ginfo(500, [], 30))).toEqual([]);
+    expect(diffGuildBankOp('open_bank', ginfo(500, [], 0), ginfo(500, [], 0))).toEqual([]);
+  });
+});
+
+describe('recordGuildBankDeltas + guildCreateFeeDelta (the FIFO writer)', () => {
+  beforeEach(() => {
+    insertMock.mockClear();
+    insertMock.mockResolvedValue(undefined);
+  });
+
+  it('writes container=guild rows with the guild id and the caller identity', async () => {
+    recordGuildBankDeltas(
+      'deposit_gold',
+      { characterId: 42, accountId: 7 },
+      913,
+      diffGuildBankOp('deposit_gold', ginfo(0), ginfo(1500)),
+    );
+    await bankLedgerIdle();
+    expect(insertMock).toHaveBeenCalledTimes(1);
+    expect(insertMock).toHaveBeenCalledWith({
+      realm: REALM,
+      characterId: 42,
+      accountId: 7,
+      op: 'deposit_gold',
+      itemId: null,
+      count: null,
+      instance: null,
+      copperDelta: 1500,
+      purchasedSlotsAfter: 0,
+      container: 'guild',
+      containerId: 913,
+      // The differ sees only the BOOK, so an unstamped delta carries no
+      // counterparty side and the columns bind NULL. The stamp is the dispatch
+      // observer's job (server/game.ts runGuildBankOp), pinned end to end in
+      // tests/bank_counterparty.test.ts.
+      counterpartyCopperDelta: null,
+      counterpartyCount: null,
+    });
+  });
+
+  it('the create_fee row negates the charged purse copper with zero slots', async () => {
+    recordGuildBankDeltas('create_fee', { characterId: 42, accountId: 7 }, 913, [
+      guildCreateFeeDelta(100000, -100000),
+    ]);
+    await bankLedgerIdle();
+    expect(insertMock).toHaveBeenCalledTimes(1);
+    expect(insertMock.mock.calls[0][0]).toMatchObject({
+      op: 'create_fee',
+      copperDelta: -100000,
+      purchasedSlotsAfter: 0,
+      container: 'guild',
+      containerId: 913,
+      // The counterparty IS the founder's purse and it paid exactly the
+      // recorded fee, so the two halves plus the fee's burn sum to zero.
+      counterpartyCopperDelta: -100000,
+      counterpartyCount: 0,
+    });
+  });
+
+  it('an empty delta list (a refusal) writes nothing', async () => {
+    recordGuildBankDeltas('withdraw', { characterId: 1, accountId: 1 }, 913, []);
+    await bankLedgerIdle();
+    expect(insertMock).not.toHaveBeenCalled();
+  });
+
+  it('records ONE aggregate anomaly row per rollback, with SIGNED direction', async () => {
+    // One row per EVENT, never per delta: the log holds up to
+    // GUILD_BANK_UNFLUSHED_OP_CAP entries and bank_ledger is keep-forever, so
+    // per-delta rows are an unbounded write amplifier on a table nothing prunes.
+    const gold = (copperDelta: number) => ({
+      op: copperDelta > 0 ? 'deposit_gold' : 'withdraw_gold',
+      itemId: null,
+      count: null,
+      copperDelta,
+    });
+    recordGuildBankEscrowRollback(
+      { characterId: 42, accountId: 7 },
+      913,
+      [gold(1_000), gold(-40_000)],
+      { itemId: null },
+    );
+    await bankLedgerIdle();
+    expect(insertMock).toHaveBeenCalledTimes(1);
+    expect(insertMock).toHaveBeenCalledWith({
+      realm: REALM,
+      characterId: 42,
+      accountId: 7,
+      op: GUILD_BANK_ESCROW_DEFICIT_OP,
+      itemId: null,
+      count: null,
+      instance: null,
+      // NEGATIVE: the discarded work was taking copper OUT of the book, which
+      // is the shape that would have minted had it been allowed to commit. An
+      // abandoned DEPOSIT reads positive, so the two are distinguishable.
+      copperDelta: -39_000,
+      purchasedSlotsAfter: 0,
+      container: 'guild',
+      containerId: 913,
+      // Mirrored from the acting character's side: the discarded work would
+      // have moved 39_000 INTO that purse, which is the direction an operator
+      // reads first. Derived from the discarded op log, not snapshotted (the
+      // ops are long gone), so it is a report and takes no part in the audit's
+      // per-op balance identity.
+      counterpartyCopperDelta: 39_000,
+      counterpartyCount: null,
+    });
+  });
+
+  it('signs the ITEM movement the same way, so a mint and a loss differ', async () => {
+    const item = (op: 'deposit' | 'withdraw', count: number) => ({
+      op,
+      itemId: 'wolf_fang',
+      count,
+      copperDelta: 0,
+    });
+    recordGuildBankEscrowRollback({ characterId: 42, accountId: 7 }, 913, [item('withdraw', 4)], {
+      itemId: 'wolf_fang',
+    });
+    recordGuildBankEscrowRollback({ characterId: 42, accountId: 7 }, 913, [item('deposit', 4)], {
+      itemId: 'wolf_fang',
+    });
+    await bankLedgerIdle();
+    const counts = insertMock.mock.calls.map(
+      (c) => (c[0] as unknown as { count: number | null }).count,
+    );
+    expect(counts).toEqual([-4, 4]);
+  });
+
+  it('is fire-and-forget: returns void and a rejecting insert never throws', async () => {
+    insertMock.mockRejectedValueOnce(new Error('db down'));
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    expect(
+      recordGuildBankDeltas('deposit', { characterId: 1, accountId: 1 }, 913, [
+        {
+          itemId: 'wolf_fang',
+          count: 1,
+          instance: null,
+          copperDelta: 0,
+          purchasedSlotsBefore: 0,
+          purchasedSlotsAfter: 0,
+        },
+      ]),
+    ).toBeUndefined();
+    await bankLedgerIdle();
+    expect(errSpy).toHaveBeenCalled();
+    errSpy.mockRestore();
+    // The chain survives: the next write still lands in order.
+    recordGuildBankDeltas('deposit', { characterId: 1, accountId: 1 }, 913, [
+      {
+        itemId: 'wolf_fang',
+        count: 2,
+        instance: null,
+        copperDelta: 0,
+        purchasedSlotsBefore: 0,
+        purchasedSlotsAfter: 0,
+      },
+    ]);
+    await bankLedgerIdle();
+    expect(insertMock).toHaveBeenCalledTimes(2);
+  });
+});

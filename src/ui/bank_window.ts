@@ -31,6 +31,7 @@ import {
   serializeBagFilter,
 } from './bag_filter';
 import { filterBankSlots } from './bank_filter';
+import { showQuantityPrompt } from './bank_quantity_prompt';
 import {
   type BankBonusModel,
   type BankBonusRowModel,
@@ -46,6 +47,13 @@ import {
 import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
+import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
+import {
+  GUILD_PANEL_ID,
+  GUILD_TAB_ID,
+  type GuildBankPaneView,
+  GuildBankTab,
+} from './guild_bank_window';
 import { formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import { knownItemDef } from './known_item';
@@ -54,6 +62,8 @@ import {
   installPromptDialog as installModalPromptDialog,
   type PromptDialogHandle,
 } from './prompt_dialog';
+import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
+import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import { svgIcon } from './ui_icons';
 import { unknownItemIconHtml } from './unknown_item_icon';
 
@@ -71,7 +81,10 @@ const BANK_INFO_GRACE_MS = 3_000;
 // window-level close() removes any that are open so it never leaves an orphaned
 // aria-modal dialog floating over the closed window.
 const BANK_PROMPT_SELECTOR = '.bank-quantity-prompt, .bank-buy-prompt';
-function dismissBankPrompts(): void {
+// Exported so the guild pane (guild_bank_window.ts), which shares this window's
+// prompt classes and force-close teardown, can tear siblings down before
+// mounting its own prompts.
+export function dismissBankPrompts(): void {
   for (const p of document.querySelectorAll(BANK_PROMPT_SELECTOR)) p.remove();
 }
 
@@ -176,11 +189,32 @@ export interface BankWindowDeps extends PainterHostPresentation {
   onInventoryChanged(): void;
 }
 
+/** The two bank panes. The Guild tab exists only while guildBankInfo is
+ *  non-null (officer-plus at a banker, online with the book loaded). */
+export type BankTabId = 'personal' | 'guild';
+
 export class BankWindow {
   private opened = false;
   private lastSig = '';
   private openerFocus: HTMLElement | null = null;
   private openedAt = 0;
+
+  // Which pane is showing. Guild is reachable only while the strip renders
+  // (guildBankInfo non-null); any render that finds it gone falls back to
+  // Personal, and close() resets it so a reopened bank never starts on a
+  // pane that may no longer exist.
+  private tab: BankTabId = 'personal';
+  // The pane the LAST paint drew, so the .bank-scroll offset is restored only
+  // within one pane (a tab switch starts at the top, never mid-list).
+  private lastRenderedTab: BankTabId = 'personal';
+  // ...and which GUILD sub-view it drew, for the same reason one level down:
+  // the contents grid and the log list both mount a .bank-scroll, so without
+  // this the grid's offset would be pasted onto the log the moment a player
+  // switched between them.
+  private lastRenderedGuildView: GuildBankPaneView = 'contents';
+  // The guild pane painter (guild_bank_view.ts core + guild_bank_window.ts),
+  // sharing this window's presentation bag and prompt-dialog chrome.
+  private readonly guildPane: GuildBankTab;
 
   // Window-local filter state: category chips + sort persist across sessions under
   // BANK_FILTER_KEY; the live search is per-visit and starts empty even when a
@@ -225,10 +259,59 @@ export class BankWindow {
   private depositAllPending = false;
   private depositAllTimer: number | null = null;
 
-  constructor(private readonly deps: BankWindowDeps) {}
+  constructor(private readonly deps: BankWindowDeps) {
+    this.guildPane = new GuildBankTab({
+      root: () => this.deps.root(),
+      world: () => this.deps.world(),
+      itemIcon: (item) => this.deps.itemIcon(item),
+      moneyHtml: (copper) => this.deps.moneyHtml(copper),
+      itemTooltip: (item, instance) => this.deps.itemTooltip(item, instance),
+      attachTooltip: (el, html) => this.deps.attachTooltip(el, html),
+      hideTooltip: () => this.deps.hideTooltip(),
+      consumePeek: () => this.deps.consumePeek(),
+      onInventoryChanged: () => this.deps.onInventoryChanged(),
+      installPromptDialog: (prompt, opener, close) =>
+        this.installPromptDialog(prompt, opener, close),
+      dismissPrompts: () => dismissBankPrompts(),
+      requestRender: () => {
+        if (this.opened) this.render();
+      },
+    });
+  }
 
   get isOpen(): boolean {
     return this.opened;
+  }
+
+  /** True while the window is open on the PERSONAL pane: the bags companion
+   *  reads this (via Hud) to route a bag click to bankDeposit.
+   *
+   *  It is deliberately NOT "open and not on the guild CONTENTS view": the
+   *  guild pane's Log view is a reading surface, and while it shows, the
+   *  personal grid is off screen behind it exactly like the guild grid is. A
+   *  bag click there must arm NEITHER deposit, or reading the history silently
+   *  banks the item that was clicked, which is the same trap guildTabActive
+   *  documents below. */
+  get personalTabActive(): boolean {
+    return this.opened && this.tab === 'personal';
+  }
+
+  /** True while the window is open on the Guild pane: the bags companion
+   *  reads this (via Hud) to route a bag click to guildBankDeposit. Also
+   *  requires guildBankInfo to be live RIGHT NOW, so the one-frame window
+   *  between the mirror nulling (demotion, walk-away) and the slow-band
+   *  repaint can never route a bag click at the guild facet. */
+  get guildTabActive(): boolean {
+    return (
+      this.opened &&
+      this.tab === 'guild' &&
+      // ONLY the contents view routes bag clicks. The log is a reading surface:
+      // a bag click while the player is reading the history must not silently
+      // deposit the item they clicked (the whole point of that routing is that
+      // the guild grid is on screen to drop into).
+      this.guildPane.activeView === 'contents' &&
+      this.deps.world().guildBankInfo !== null
+    );
   }
 
   // Re-interacting with the banker while already open must not re-run the open
@@ -269,6 +352,15 @@ export class BankWindow {
     el.style.display = 'none';
     el.inert = false;
     this.opened = false;
+    // Walking away (or any close) empties the Guild tab state cleanly: the
+    // next open starts on Personal, never on a pane that may no longer exist.
+    this.tab = 'personal';
+    this.lastRenderedTab = 'personal';
+    // ...including the Guild pane's own sub-view: a reopened bank starts on the
+    // contents, so the log is never refetched by an open the player did not
+    // aim at it.
+    this.guildPane.resetView();
+    this.lastRenderedGuildView = 'contents';
     this.deps.hideTooltip();
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
@@ -310,6 +402,12 @@ export class BankWindow {
       searchEl !== null && active === searchEl
         ? { start: searchEl.selectionStart, end: searchEl.selectionEnd }
         : null;
+    // The focused control's identity (data-focus-key), captured BEFORE the wipe:
+    // the guild refresh arm repaints on ANY officer's op, so an external echo
+    // must not yank a keyboard user off the tab, cell, or button they were on.
+    // Guild controls carry keys (guild_bank_window.ts + the tab annotation
+    // below); personal controls carry none and keep the close-button fallback.
+    const focusKey = hadFocus ? captureFocusKey(el) : null;
     if (document.querySelector(BANK_PROMPT_SELECTOR)) {
       dismissBankPrompts();
       el.inert = false;
@@ -321,16 +419,88 @@ export class BankWindow {
     // else a withdraw snaps the list back to the top (the bags idiom).
     const prevScrollTop = el.querySelector('.bank-scroll')?.scrollTop ?? 0;
     const model = buildBankView(this.deps.world().bankInfo, (id) => knownItemDef(ITEMS, id));
+    // The Guild tab exists ONLY while guildBankInfo is non-null (officer-plus
+    // at a banker, online, book loaded). When it goes away mid-open (demotion,
+    // leave, a reconcile window), the strip disappears and the pane falls back
+    // to Personal on this same paint; the whole-window walk-away close stays
+    // refreshIfChanged's grace-close on bankInfo.
+    const guildModel = this.guildPane.model();
+    const guildAvailable = guildModel.kind !== 'hidden'; // opened OR unopened pane
+    if (!guildAvailable) {
+      this.tab = 'personal';
+      // ...and drop the pane's OWN sub-view with it, the way close() does. The
+      // log view is the one that fetches: leaving it selected on a pane that no
+      // longer exists left a demoted client re-requesting a log the server
+      // refuses, once per TTL, forever.
+      this.guildPane.resetView();
+    }
     el.innerHTML =
       `<div class="panel-title"><span>${esc(t('hudChrome.bank.title'))} <span class="panel-subtitle">${esc(t('hudChrome.bank.subtitle'))}</span></span>` +
       `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.bank.close'))}">${svgIcon('close')}</button></div>`;
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
-    if (hadFocus && !searchFocus) (el.querySelector('[data-close]') as HTMLElement | null)?.focus();
+    if (guildAvailable) {
+      // The shared WAI-ARIA tab strip (tab_strip_view core + wireTabStrip),
+      // the social/talents idiom. The PERSONAL pane's sections still mount
+      // directly on the window root (wrapping them would disturb the flex
+      // column the bank CSS sizes), so the strip carries no blanket `panelId`;
+      // the GUILD pane does build a real role=tabpanel, because it holds a
+      // nested tab list of its own and a second peer tablist with no stated
+      // relationship is unintelligible to a screen reader. Its aria-controls is
+      // stamped below, once that panel exists.
+      el.insertAdjacentHTML(
+        'beforeend',
+        tabStripHtml(
+          tabStripModel({
+            ariaLabel: t('hudChrome.bank.tabsAria'),
+            stripClass: 'bank-tabs',
+            tabClass: 'bank-tab',
+            selectedClass: 'on',
+            tabs: [
+              { id: 'personal', label: t('hudChrome.bank.personalTab') },
+              // A stable id so the Guild pane's panel can point its
+              // aria-labelledby back at this tab.
+              { id: 'guild', label: t('hudChrome.bank.guildTab'), buttonId: GUILD_TAB_ID },
+            ],
+            selected: this.tab,
+          }),
+        ),
+      );
+      wireTabStrip(el, 'bank-tab', (id, focusFollow) => {
+        if (id !== 'personal' && id !== 'guild') return;
+        if (this.tab !== id) audio.click();
+        this.tab = id;
+        this.render();
+        if (focusFollow) focusActiveTab(this.deps.root(), 'bank-tab', 'on');
+      });
+      // Key the tab buttons so a repaint keeps focus on the tab the user was
+      // on (the shared strip carries data-tab; the key namespace is ours).
+      for (const tab of el.querySelectorAll<HTMLElement>('.bank-tab')) {
+        tab.dataset.focusKey = `tab:${tab.dataset.tab}`;
+      }
+    }
+    if (this.tab === 'guild') {
+      this.guildPane.renderInto(el, guildModel);
+      // Close the tab/panel relationship now that the panel exists: without it
+      // the pane's own Contents/Log strip reads to assistive tech as a second,
+      // unrelated top-level tab list that appeared out of nowhere.
+      const guildTab = el.querySelector<HTMLElement>(`#${GUILD_TAB_ID}`);
+      if (guildTab && el.querySelector(`#${GUILD_PANEL_ID}`)) {
+        guildTab.setAttribute('aria-controls', GUILD_PANEL_ID);
+      }
+      this.annotateGuildFocusKeys(el);
+      this.restoreScroll(el, prevScrollTop);
+      // The guild pane has no search box, so a searchFocus capture degrades
+      // through the key ladder to the close button, never to <body>.
+      if (hadFocus) this.restoreControlFocus(el, focusKey);
+      return;
+    }
     if (model.kind === 'away') {
       const away = document.createElement('div');
       away.className = 'bank-empty';
       away.textContent = t('hudChrome.bank.tooFar');
       el.appendChild(away);
+      this.lastRenderedTab = this.tab;
+      if (hadFocus) this.restoreControlFocus(el, focusKey);
       return;
     }
     const capacity = document.createElement('div');
@@ -363,7 +533,7 @@ export class BankWindow {
     const bonus = this.buildBonusSection(model.bonus);
     if (bonus) scroll.appendChild(bonus);
     el.appendChild(scroll);
-    scroll.scrollTop = prevScrollTop;
+    this.restoreScroll(el, prevScrollTop);
     el.appendChild(this.buildBuyRow(model.buy));
     if (searchFocus) {
       const fresh = el.querySelector('.bag-search') as HTMLInputElement | null;
@@ -375,7 +545,62 @@ export class BankWindow {
         // close button rather than dropping focus to <body>.
         (el.querySelector('[data-close]') as HTMLElement | null)?.focus();
       }
+    } else if (hadFocus) {
+      this.restoreControlFocus(el, focusKey);
     }
+  }
+
+  // Stamp the guild pane's controls with their focus keys AFTER renderInto
+  // returned: the shared data-focus-key namespace stays inside this module,
+  // the one that imports focus_restore (the single-reader guard in
+  // tests/focus_restore.test.ts), and the pane stays focus-agnostic. Cells are
+  // keyed by wire index: fillGrid appends model.slots in order (slotIndex ==
+  // array index) before the empty pad, so DOM order IS slot order; the pinned
+  // focus test drives a real repaint over a focused cell, so a reorder that
+  // broke this coupling goes red there.
+  private annotateGuildFocusKeys(el: HTMLElement): void {
+    // The Contents / Log sub-strip first: the log repaints on ANY officer's op
+    // (its cache busts and the response lands), so a keyboard user reading it
+    // must not be thrown off the strip by somebody else's deposit.
+    for (const tab of el.querySelectorAll<HTMLElement>('.gbank-view-tab')) {
+      tab.dataset.focusKey = `gbank:view:${tab.dataset.tab}`;
+    }
+    let slotIndex = 0;
+    for (const cell of el.querySelectorAll<HTMLElement>('.bank-grid .bank-item:not(.empty)')) {
+      cell.dataset.focusKey = `gbank:slot:${slotIndex++}`;
+    }
+    const [deposit, withdraw] = Array.from(el.querySelectorAll<HTMLElement>('.gbank-gold-btn'));
+    if (deposit) deposit.dataset.focusKey = 'gbank:deposit-gold';
+    if (withdraw) withdraw.dataset.focusKey = 'gbank:withdraw-gold';
+    const buy = el.querySelector<HTMLElement>('.bank-buy-btn');
+    if (buy) buy.dataset.focusKey = 'gbank:buy';
+  }
+
+  // Re-land focus after a full rebuild: the control the user was on (resolved
+  // by its data-focus-key in the fresh tree, skipped when it came back
+  // disabled), else the always-present close button. Never <body> (WCAG 2.4.3).
+  private restoreControlFocus(el: HTMLElement, focusKey: string | null): void {
+    restoreFirstEnabled([
+      focusKey
+        ? (el.querySelector(`[data-focus-key="${focusKey}"]`) as
+            | (HTMLElement & { disabled?: boolean })
+            | null)
+        : null,
+      el.querySelector('[data-close]') as HTMLElement | null,
+    ]);
+  }
+
+  // Reapply the captured .bank-scroll offset to the freshly built pane, but only
+  // within one pane (a tab switch starts at the top, never mid-list), and latch
+  // which pane this paint drew. Every render path that mounts a scroll region
+  // routes through here so the offset can never leak across panes.
+  private restoreScroll(el: HTMLElement, prevScrollTop: number): void {
+    const view = this.guildPane.activeView;
+    const samePane = this.lastRenderedTab === this.tab && this.lastRenderedGuildView === view;
+    const scroll = el.querySelector('.bank-scroll') as HTMLElement | null;
+    if (scroll) scroll.scrollTop = samePane ? prevScrollTop : 0;
+    this.lastRenderedTab = this.tab;
+    this.lastRenderedGuildView = view;
   }
 
   // Per-frame (slow divider): refresh the grid when the mirror changes; close when the
@@ -387,12 +612,47 @@ export class BankWindow {
       if (performance.now() - this.openedAt > BANK_INFO_GRACE_MS) this.close();
       return;
     }
+    // The guild half rides the same signature: a guild op echo, an expansion,
+    // and the tab APPEARING or DISAPPEARING (rank change, reconcile window)
+    // each repaint; null collapses the whole guild arm so the strip drops and
+    // the pane falls back to Personal in render(). Deliberately purse-free
+    // (the guild enablement reads snapshot state only, see guild_bank_view.ts)
+    // with ONE exception: while the bank is UNOPENED (purchasedSlots 0), the
+    // open-the-bank row's shortfall marker reads the officer's own purse (rung
+    // 0 is purse-paid), so the purse joins the signature for that state only.
+    // Nesting the guild arm under the bankInfo null-gate above is safe because
+    // guildBankInfoFor's gate is a strict SUPERSET of bankInfoFor's (same
+    // banker proximity, plus alive + officer-plus + a loaded book): guildBank
+    // can never be non-null while bankInfo is null.
+    const g = this.deps.world().guildBankInfo;
     const sig = JSON.stringify([
       info.capacity,
       info.purchasedSlots,
       info.bonusSlots,
       info.nextExpansionCost,
       info.slots,
+      g && [
+        g.treasury,
+        g.capacity,
+        g.purchasedSlots,
+        g.nextExpansionPrice,
+        g.slots,
+        g.purchasedSlots === 0 ? this.deps.world().copper : null,
+      ],
+      // The activity log's own repaint arm, and NULL unless the log view is
+      // actually open: the log is fetched on demand by reading it, so pulling
+      // it into the signature unconditionally would make every officer standing
+      // at a banker poll for a payload they are not looking at. When the view
+      // IS open this is what turns the response landing (loading -> ready, or a
+      // fresh row after another officer's op busted the server cache) into a
+      // repaint, with no timer of its own.
+      // ...and ONLY while the log view is on screen. `readAndRequestLog` reads
+      // the log, and reading it is what SENDS the request, so this arm is gated
+      // on the pane actually being visible rather than on the pane's remembered
+      // sub-view alone: a player who opened the log and went back to the
+      // Personal tab was otherwise re-requesting it every TTL for a pane nobody
+      // was looking at.
+      this.tab === 'guild' && g !== null ? this.guildPane.readAndRequestLog() : null,
     ]);
     if (sig === this.lastSig) return;
     this.lastSig = sig;
@@ -834,69 +1094,54 @@ export class BankWindow {
     window.setTimeout(() => confirm.focus(), 0);
   }
 
+  // The shared quantity-prompt builder (bank_quantity_prompt.ts) owns the
+  // chrome; this owns the bank-specific closures: the stale-index guard and
+  // the withdraw send.
   private showWithdrawQuantityPrompt(slotIndex: number, maxCount: number): void {
-    dismissBankPrompts();
-    const opener = document.activeElement as HTMLElement | null;
     const slot = this.deps.world().bankInfo?.slots[slotIndex];
-    const item = slot ? knownItemDef(ITEMS, slot.itemId) : undefined;
-    const stack = document.getElementById('prompt-stack');
-    if (!stack) return;
-    const prompt = document.createElement('div');
-    prompt.className = 'prompt panel bank-quantity-prompt';
-    const itemName = item ? itemDisplayName(item) : (slot?.itemId ?? '');
-    prompt.innerHTML = `<div class="prompt-text">${esc(t('hudChrome.bank.withdrawQuantityTitle', { item: itemName }))}</div>`;
-    const input = document.createElement('input');
-    input.className = 'prompt-number';
-    input.type = 'number';
-    input.setAttribute('aria-label', t('hudChrome.bank.withdrawQuantityInput'));
-    input.min = '1';
-    input.max = String(maxCount);
-    input.step = '1';
-    input.value = '1';
-    const confirm = document.createElement('button');
-    confirm.className = 'btn';
-    confirm.textContent = t('hudChrome.bank.withdrawQuantityConfirm');
-    const cancel = document.createElement('button');
-    cancel.className = 'btn';
-    cancel.textContent = t('itemUi.vendor.sellQuantityCancel');
-    const close = () => prompt.remove();
-    prompt.append(input, confirm, cancel);
-    const { dismiss, dismissAndReturn } = this.installPromptDialog(prompt, opener, close);
-    const submit = () => {
-      // The prompt captured slotIndex when it opened; the bank can repaint under it
-      // (a server correction, another op landing), shifting what sits at that
-      // index. Re-resolve the live slot and refuse on a mismatch: silently
-      // withdrawing the WRONG item is worse than dismissing the prompt. The count
-      // clamps to the live stack so a shrunken stack withdraws what is there.
-      const live = this.deps.world().bankInfo?.slots[slotIndex];
-      if (!live || !slot || live.itemId !== slot.itemId) {
-        dismiss();
-        (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
-        return;
-      }
-      const count = Math.max(
-        1,
-        Math.min(maxCount, live.count, Math.floor(Number(input.value) || 0)),
-      );
-      this.deps.world().bankWithdraw(slotIndex, count);
-      audio.click();
-      // The split just moved into the bags; repaint the companion (see the dep doc).
-      this.deps.onInventoryChanged();
-      dismiss();
-      // The grid rebuilds on the withdraw event, detaching the opener slot, so land on
-      // the always-present close button rather than dropping focus to <body>.
-      (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
-    };
-    confirm.addEventListener('click', submit);
-    cancel.addEventListener('click', dismissAndReturn);
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') submit();
-    });
-    stack.appendChild(prompt);
-    window.setTimeout(() => {
-      input.focus();
-      input.select();
-    }, 0);
+    if (!slot) return;
+    // knownItemDef, not a raw ITEMS index: the release's stale-client sweep
+    // made every bank item read tolerate an id this client does not know.
+    const item = knownItemDef(ITEMS, slot.itemId);
+    const itemName = item ? itemDisplayName(item) : slot.itemId;
+    showQuantityPrompt(
+      {
+        installPromptDialog: (prompt, opener, close) =>
+          this.installPromptDialog(prompt, opener, close),
+        dismissSiblings: dismissBankPrompts,
+      },
+      {
+        className: 'bank-quantity-prompt',
+        titleText: t('hudChrome.bank.withdrawQuantityTitle', { item: itemName }),
+        inputAriaText: t('hudChrome.bank.withdrawQuantityInput'),
+        confirmText: t('hudChrome.bank.withdrawQuantityConfirm'),
+        cancelText: t('itemUi.vendor.sellQuantityCancel'),
+        maxCount,
+        resolveCount: (requested) => {
+          // The prompt captured slotIndex when it opened; the bank can repaint
+          // under it (a server correction, another op landing), shifting what
+          // sits at that index. Re-resolve the live slot and refuse on a
+          // mismatch: silently withdrawing the WRONG item is worse than
+          // dismissing the prompt. The count clamps to the live stack so a
+          // shrunken stack withdraws what is there.
+          const live = this.deps.world().bankInfo?.slots[slotIndex];
+          if (!live || !slot || live.itemId !== slot.itemId) return null;
+          return Math.max(1, Math.min(maxCount, live.count, requested));
+        },
+        send: (count) => {
+          this.deps.world().bankWithdraw(slotIndex, count);
+          audio.click();
+          // The split just moved into the bags; repaint the companion (see the dep doc).
+          this.deps.onInventoryChanged();
+        },
+        afterClose: () => {
+          // The grid rebuilds on the withdraw event (and a stale refusal
+          // destroyed the opener slot either way), so land on the
+          // always-present close button rather than dropping focus to <body>.
+          (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+        },
+      },
+    );
   }
 
   // WCAG 2.2 AA modal prompt wiring, the shared recipe (src/ui/prompt_dialog.ts):

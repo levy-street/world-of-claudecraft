@@ -395,6 +395,7 @@ describe('attuneArchetypePair / canAttuneArchetypePair mode gating (transitions)
       attunedPairs: [WEAPON_ARMOR],
       switchCount: 0,
       amendsProgress: 0,
+      isJackOfAllTrades: false,
     });
   });
 

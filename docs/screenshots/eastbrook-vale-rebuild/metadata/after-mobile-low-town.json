@@ -52,8 +52,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -175,7 +174,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -219,8 +218,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -981,8 +979,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -1104,7 +1101,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -1148,8 +1145,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -1910,8 +1906,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -2033,7 +2028,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -2077,8 +2072,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -2839,8 +2833,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -2962,7 +2955,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -3006,8 +2999,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -3768,8 +3760,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -3891,7 +3882,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -3935,8 +3926,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -4697,8 +4687,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -4820,7 +4809,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -4864,8 +4853,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -5626,8 +5614,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -5749,7 +5736,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -5793,8 +5780,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -6555,8 +6541,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -6678,7 +6663,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -6722,8 +6707,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -7484,8 +7468,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -7607,7 +7590,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -7651,8 +7634,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -8413,8 +8395,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -8536,7 +8517,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -8580,8 +8561,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -9344,8 +9324,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -9467,7 +9446,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -9511,8 +9490,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -10275,8 +10253,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -10398,7 +10375,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -10442,8 +10419,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -11206,8 +11182,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -11329,7 +11304,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -11373,8 +11348,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -12137,8 +12111,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -12260,7 +12233,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -12304,8 +12277,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -13828,8 +13800,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [
@@ -13951,7 +13922,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -13995,8 +13966,7 @@
             "fences": [
               "eastbrook_fence_smithy_west",
               "eastbrook_fence_smithy_outer",
-              "eastbrook_fence_smithy_east",
-              "eastbrook_fence_market_outer"
+              "eastbrook_fence_smithy_east"
             ],
             "artisanRow": [],
             "benches": [

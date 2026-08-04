@@ -676,6 +676,80 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
       { itemId: 'wolf_fang', count: 3, craftedRecipeId: 'r_wolf_fang' },
     ]);
   });
+
+  // The SAME defect, one arm over. The fix above threaded craftedRecipeId
+  // through the PLAIN arm and left the INSTANCED arm omitting it, so a slot
+  // carrying BOTH an instance payload and a craft marker (a crafted weapon
+  // that was worn while enchanted is exactly that shape) still lost the marker
+  // on one bank round trip. This is the SHIPPED personal bank, not just the
+  // guild bank: it launders a self-crafted item into an indistinguishable
+  // found one and it then disenchants for the enchanting skill the anti-farm
+  // gate exists to deny.
+  it('carries craftedRecipeId through the INSTANCED arm too, in both directions', () => {
+    const payload = { signer: 'Ana' };
+    const src: InvSlot[] = [
+      { itemId: 'wolf_fang', count: 3, instance: { ...payload }, craftedRecipeId: 'r_wolf_fang' },
+    ];
+    const dst: InvSlot[] = [];
+    expect(moveBetweenContainers(src, 0, undefined, dst, 10)).toEqual({ moved: 3 });
+    expect(dst).toEqual([
+      { itemId: 'wolf_fang', count: 3, instance: payload, craftedRecipeId: 'r_wolf_fang' },
+    ]);
+    const back: InvSlot[] = [];
+    expect(moveBetweenContainers(dst, 0, undefined, back, 10)).toEqual({ moved: 3 });
+    expect(back).toEqual([
+      { itemId: 'wolf_fang', count: 3, instance: payload, craftedRecipeId: 'r_wolf_fang' },
+    ]);
+  });
+
+  it('never merges a crafted INSTANCED stack into a same-payload uncrafted one', () => {
+    // The stacking key is three-dimensional (id, payload, provenance): merging
+    // across the provenance line is how the marker disappears without any
+    // single call looking wrong.
+    const src: InvSlot[] = [
+      {
+        itemId: 'wolf_fang',
+        count: 3,
+        instance: { signer: 'Ana' },
+        craftedRecipeId: 'r_wolf_fang',
+      },
+    ];
+    const dst: InvSlot[] = [{ itemId: 'wolf_fang', count: 5, instance: { signer: 'Ana' } }];
+    expect(moveBetweenContainers(src, 0, undefined, dst, 10)).toEqual({ moved: 3 });
+    expect(dst).toEqual([
+      { itemId: 'wolf_fang', count: 5, instance: { signer: 'Ana' } },
+      {
+        itemId: 'wolf_fang',
+        count: 3,
+        instance: { signer: 'Ana' },
+        craftedRecipeId: 'r_wolf_fang',
+      },
+    ]);
+  });
+
+  it('keeps the FIT CHECK and the GRANT on the same key: no_fit, never an overflow', () => {
+    // Threading the marker into only ONE of countFit/addStacked would make the
+    // two disagree about which dest stacks are mergeable, so a move could pass
+    // the fit check and then need a slot the capacity does not have. Capacity
+    // 1, already full with a same-payload UNCRAFTED stack that has room: the
+    // crafted copy cannot merge into it, so the move must be refused rather
+    // than appending a second slot.
+    const src: InvSlot[] = [
+      {
+        itemId: 'wolf_fang',
+        count: 1,
+        instance: { signer: 'Ana' },
+        craftedRecipeId: 'r_wolf_fang',
+      },
+    ];
+    const dst: InvSlot[] = [{ itemId: 'wolf_fang', count: 1, instance: { signer: 'Ana' } }];
+    expect(moveBetweenContainers(src, 0, undefined, dst, 1)).toEqual({
+      moved: 0,
+      refusal: 'no_fit',
+    });
+    expect(dst).toHaveLength(1);
+    expect(src).toHaveLength(1); // nothing moved, nothing lost
+  });
 });
 
 // ---------------------------------------------------------------------------

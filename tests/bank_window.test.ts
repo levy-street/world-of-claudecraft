@@ -370,7 +370,10 @@ describe('bank_window: search / sort / deposit-all', () => {
     expect(body).toContain('active === searchEl');
     expect(body).toContain('searchEl.selectionStart');
     expect(body).toContain('fresh.setSelectionRange(searchFocus.start, searchFocus.end)');
-    expect(body).toContain('if (hadFocus && !searchFocus)');
+    // Non-search focus re-lands via the key ladder (the focused control by its
+    // data-focus-key, else [data-close]), never a blanket close-button yank.
+    expect(body).toContain('} else if (hadFocus) {');
+    expect(body).toContain('this.restoreControlFocus(el, focusKey)');
   });
 
   it('holds deposit-all disabled from send until the mirror echoes (double-click guard)', () => {

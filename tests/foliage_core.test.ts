@@ -24,7 +24,7 @@ describe('Eastbrook town grass exclusion', () => {
   it('snapshots every building, service apron, civic prop, market prop, fence, and wall chord', () => {
     const exclusions = eastbrookGrassExclusions(PROPS.buildings, true, BUILTIN_NOTICEBOARDS);
     expect(BUILTIN_NOTICEBOARDS).toHaveLength(1);
-    expect(exclusions).toHaveLength(52);
+    expect(exclusions).toHaveLength(51);
     for (const building of [
       ...EASTBROOK_LAYOUT.preservedBuildings,
       ...EASTBROOK_LAYOUT.buildings,
@@ -99,9 +99,9 @@ describe('Eastbrook town grass exclusion', () => {
     ]);
     const fenceDimensions = dimensionsFor(EASTBROOK_LAYOUT.fences.map((fence) => fence.id));
     expect(fenceDimensions.map(([halfWidth]) => halfWidth)).toEqual([
-      0.8499999999999994, 4.200000000000001, 0.8499999999999995, 1.5,
+      0.8499999999999994, 4.200000000000001, 0.8499999999999995,
     ]);
-    expect(fenceDimensions.map(([, halfDepth]) => halfDepth)).toEqual([0.14, 0.14, 0.14, 0.14]);
+    expect(fenceDimensions.map(([, halfDepth]) => halfDepth)).toEqual([0.14, 0.14, 0.14]);
 
     const wallDimensions = dimensionsFor(
       EASTBROOK_LAYOUT.wall.segments.map((segment) => segment.id),

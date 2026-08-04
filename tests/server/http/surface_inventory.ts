@@ -257,6 +257,20 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     requireOwnedExpected: REQUIRE_OWNED.bola404,
     match: /^\/api\/characters\/(\d+)\/sheet$/,
   },
+  // Registry-only RouteDef born AFTER the migration (the new-route rule,
+  // server/http/CLAUDE.md): no legacy ladder arm, so no match regex; the
+  // legacy rollback answers 404 for it by design. The owner-sheet gate pair
+  // (read-tier bearer + requireOwnedCharacter) exactly.
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/characters/:id/deeds-recent',
+    handler: 'server/characters.ts deedsRecentHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.bearer,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.bola404,
+  },
   {
     dispatcher: DISPATCH.mainApi,
     method: 'GET',
@@ -1617,6 +1631,17 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
   {
     dispatcher: DISPATCH.admin,
     method: 'POST',
+    path: '/admin/api/guilds/:id/bank/purge-slot',
+    handler: 'guildBankPurgeMatch',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+    match: /^\/admin\/api\/guilds\/(\d+)\/bank\/purge-slot$/,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
     path: '/admin/api/chat-filter/words',
     handler: 'handleAdminApi arm: /admin/api/chat-filter/words',
     contentType: PROBLEM_JSON,
@@ -2074,6 +2099,17 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: REQUIRE_OWNED.operator404,
     match: /^\/admin\/api\/guilds\/(\d+)\/history$/,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
+    path: '/admin/api/guilds/:id/bank',
+    handler: 'guildBankStateMatch',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+    match: /^\/admin\/api\/guilds\/(\d+)\/bank$/,
   },
   {
     dispatcher: DISPATCH.admin,

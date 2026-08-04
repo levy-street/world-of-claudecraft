@@ -10,6 +10,7 @@ import { ITEMS, MOBS, QUESTS, ZONES } from '../src/sim/data';
 import {
   bumpDeedStat,
   checkDeedTrigger,
+  DEEDS_RECENT_CAP,
   evaluateDeedsFor,
   grantDeed,
   markItemDiscovered,
@@ -1820,6 +1821,48 @@ describe('deedsRarity (offline facet arm)', () => {
   it('always resolves null: a sandbox has no population to aggregate', async () => {
     const sim = makeSim();
     await expect(sim.deedsRarity()).resolves.toBeNull();
+  });
+});
+
+describe('deedsRecent (offline facet arm)', () => {
+  it('pins the cap literal and its strip relation', () => {
+    // A literal, never a self-comparison: the three enforcement points (the
+    // Sim slice, the server LIMIT, the client clamp) all import this
+    // constant, so only a literal pin can catch it silently shrinking below
+    // the Book's 5-slot recent strip.
+    expect(DEEDS_RECENT_CAP).toBe(8);
+    expect(DEEDS_RECENT_CAP).toBeGreaterThanOrEqual(5);
+  });
+
+  it('the offline save round-trip preserves the grant order deedsRecent serves', async () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    // A deliberate non-catalog order, so the assertion can tell grant order
+    // from DEED_ORDER after the reload.
+    const granted = ['dgn_korzul_flawless', 'prog_first_steps', 'cmb_first_blood'];
+    for (const id of granted) grantDeed(sim.ctx, meta, id);
+    const state = sim.serializeCharacter(sim.playerId);
+    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    // JSON round-trip: exactly what the offline save does, and the step that
+    // would destroy the order if key order were not preserved.
+    sim2.addPlayer('warrior', 'Reload', { state: JSON.parse(JSON.stringify(state)) });
+    await expect(sim2.deedsRecent()).resolves.toEqual([...granted].reverse());
+  });
+
+  it('serves the live grant order newest first, capped at DEEDS_RECENT_CAP', async () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    // No unlocks yet: an empty list, never null (the Sim always has its own
+    // grant-order record; null is the fetch-failure arm online).
+    await expect(sim.deedsRecent()).resolves.toEqual([]);
+    // Grant two more than the cap in a KNOWN order that is not catalog order,
+    // so the assertion can tell grant order from DEED_ORDER.
+    const granted = [...DEED_ORDER.slice(0, DEEDS_RECENT_CAP + 1), 'dgn_korzul_flawless'];
+    for (const id of granted) grantDeed(sim.ctx, meta, id);
+    const recent = await sim.deedsRecent();
+    expect(recent).toEqual(granted.slice(-DEEDS_RECENT_CAP).reverse());
+    expect(recent).toHaveLength(DEEDS_RECENT_CAP);
+    expect(recent?.[0]).toBe('dgn_korzul_flawless');
   });
 });
 

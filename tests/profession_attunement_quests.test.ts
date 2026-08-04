@@ -233,6 +233,7 @@ describe('live profession attunement quests', () => {
       attunedPairs: [WEAPON_ARMOR],
       switchCount: 2,
       amendsProgress: 4,
+      isJackOfAllTrades: false,
     });
   });
 
@@ -258,6 +259,7 @@ describe('live profession attunement quests', () => {
       attunedPairs: [WEAPON_ARMOR],
       switchCount: 3,
       amendsProgress: 2,
+      isJackOfAllTrades: false,
     });
   });
 

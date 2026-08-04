@@ -223,6 +223,17 @@ const itemStringsEn = {
       reclaim: 'Reclaim',
       buyAria: 'Buy {item} for {price}',
       reclaimAria: 'Reclaim {item}',
+      // Confirm prompt gating a buyout (Reclaim stays one click: it returns your own
+      // goods and costs nothing). The stack body quotes the total ask and the
+      // per-unit ask the browse row showed; buyChanged is the confirm-time refusal
+      // when the listing was replaced or re-priced while the prompt was up (a listing
+      // that left entirely reuses itemUi.errors.listingUnavailable).
+      buyConfirmTitle: 'Confirm Purchase',
+      buyConfirmBody: 'Buy {item} for {price}?',
+      buyConfirmBodyStack: 'Buy {item} x{count} for {price} ({each} each)?',
+      buyConfirmAccept: 'Buy',
+      buyConfirmCancel: 'Cancel',
+      buyChanged: 'That listing changed before you confirmed. Check the price and try again.',
       sellNote:
         'List goods from your bags. The Merchant takes a {cut}% cut when an item sells. You are using {used}/{max} listing slots.',
       sellPickEmpty: 'Click an item in your bags to choose what to sell.',

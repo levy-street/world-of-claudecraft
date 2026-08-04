@@ -2410,6 +2410,22 @@
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }
+  /* Deed chat link (the unlock/broadcast announcements): the color inherits
+     the line's own announcement color (gold for your unlock, guild green for
+     a broadcast), so the underline and hover are what mark it as a jump. */
+  .chat-deed-link {
+    cursor: var(--cursor-point);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+  .chat-deed-link:hover {
+    filter: brightness(1.25);
+  }
+  .chat-deed-link:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
   .chat-pane::-webkit-scrollbar {
     width: 8px;
   }

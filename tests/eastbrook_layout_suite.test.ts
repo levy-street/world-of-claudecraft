@@ -152,6 +152,12 @@ describe('removed Eastbrook placement inventory', () => {
         start: { x: -16, z: 14 },
         end: { x: -20, z: 2 },
       },
+      {
+        id: 'eastbrook_fence_market_outer',
+        disposition: 'removed',
+        start: { x: -12.222218917656093, z: 4.01813945810839 },
+        end: { x: -11.729022993287566, z: 1.0589575136875549 },
+      },
     ]);
 
     const serialized = JSON.stringify(REMOVED_EASTBROOK_PLACEMENTS);
@@ -587,7 +593,7 @@ describe('authoritative Eastbrook replacement plan', () => {
     }
   });
 
-  it('pins only low smithy-yard and market-edge fences', () => {
+  it('pins only low smithy-yard fences', () => {
     expect(
       EASTBROOK_LAYOUT.fences.map((fence) => ({
         id: fence.id,
@@ -621,14 +627,6 @@ describe('authoritative Eastbrook replacement plan', () => {
         end: { x: 1.2944154107280057, z: 23.966248549657966 },
         width: 0.28,
         height: 0.9,
-      },
-      {
-        id: 'eastbrook_fence_market_outer',
-        district: 'market_edge',
-        start: { x: -12.222218917656093, z: 4.01813945810839 },
-        end: { x: -11.729022993287566, z: 1.0589575136875549 },
-        width: 0.28,
-        height: 0.75,
       },
     ]);
     expect(EASTBROOK_LAYOUT.fences.every((fence) => fence.height <= 1)).toBe(true);
