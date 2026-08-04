@@ -34,7 +34,7 @@ import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS } from '../src/sim/dat
 import { createMob } from '../src/sim/entity';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
 import { Sim } from '../src/sim/sim';
-import { type Aura, DT, type PlayerClass, type WorldContent } from '../src/sim/types';
+import { type Aura, DT, type Entity, type PlayerClass, type WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { absorbTotal } from '../src/ui/absorb_bar';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
@@ -61,18 +61,18 @@ const WIRE_TEST_WORLD: WorldContent = {
   groundObjects: [],
 };
 
-type SnapshotClient = ClientWorld & { applySnapshot(snap: unknown): void };
-type MessageClient = ClientWorld & { onMessage(message: string): void };
-type SelfWireServer = GameServer & {
+type SnapshotClient = { applySnapshot(snap: unknown): void };
+type MessageClient = { onMessage(message: string): void };
+type SelfWireServer = {
   selfWireJson(session: ClientSession, ...rest: unknown[]): string;
 };
 
 function applyClientSnapshot(client: ClientWorld, snap: unknown): void {
-  (client as SnapshotClient).applySnapshot(snap);
+  (client as unknown as SnapshotClient).applySnapshot(snap);
 }
 
 function feedEventFrame(client: ClientWorld, frame: unknown): void {
-  (client as MessageClient).onMessage(JSON.stringify(frame));
+  (client as unknown as MessageClient).onMessage(JSON.stringify(frame));
 }
 
 function requireClientEntity(client: ClientWorld, id: number): Entity {
@@ -338,7 +338,7 @@ describe('per-session isolation in the broadcast loop', () => {
     joinServer(server, after, 3, 'After');
 
     // Force a throw only while serializing the bad session's self payload.
-    const selfWireServer = server as SelfWireServer;
+    const selfWireServer = server as unknown as SelfWireServer;
     const original = selfWireServer.selfWireJson.bind(selfWireServer);
     vi.spyOn(selfWireServer, 'selfWireJson').mockImplementation(
       (session: ClientSession, ...rest: unknown[]) => {
