@@ -12185,7 +12185,7 @@ export const fr_CA: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Pas de repos dans les roseaux",
-        "text": "Ce rite relève les noyés partout où le marais les touche. Nous ne pouvons le défaire encore; retirez 14 soldats à leurs maîtres.",
+        "text": "The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, {playerName}, and the rest will scatter back into the mire.",
         "completion": "Vous donnez aux morts plus de pitié que leurs maîtres. Prenez ceci, vous l'avez mérité.",
         "objectives": {
           "0": {

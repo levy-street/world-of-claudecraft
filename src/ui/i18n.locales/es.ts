@@ -4907,11 +4907,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Tal como temía: quemaban ceniza de tumba, y el rito está firmado por Voss.',
   'entities.quests.q_drowned_censers.objectives.0.label': 'Incensario oxidado',
   'entities.quests.q_no_rest.title': 'Sin descanso entre los juncos',
-  'entities.quests.q_no_rest.text':
-    'Ese rito hace levantarse a los ahogados donde la ciénaga los toca. No podemos deshacerlo aún; deja 14 muertos menos a sus amos.',
   'entities.quests.q_no_rest.completion':
     'Das más misericordia a los muertos que sus señores. Toma esto, lo mereces.',
-  'entities.quests.q_no_rest.objectives.0.label': 'Muerto ahogado devuelto al descanso',
   'entities.quests.q_trolls.title': 'Túmulos de Mirefen',
   'entities.quests.q_trolls.text':
     'Los trolls de Mirefen abrieron túmulos más viejos que cualquier reino humano, {playerName}. Expúlsalos: 12 trolls muertos bastarán.',

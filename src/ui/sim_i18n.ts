@@ -88,6 +88,11 @@ const baseEnTable = {
   'error.wrongEquipSlot': 'That does not go in that slot.',
   'error.faceWater': 'You need to face fishable water.',
   'error.potionNotReady': 'That potion is not ready yet.',
+  // Firebottle hut burns (src/sim/interactions/firebottle_hut.ts REASON_MESSAGE).
+  'error.firebottleNeeded': 'You need a firebottle to torch that.',
+  'error.firebottleNotReady': 'Your firebottle is not ready yet.',
+  'error.firebottleTooFar': 'Get right up against a hut to torch it.',
+  'error.hutStillBurning': 'This hut is still burning.',
   'error.fullHealth': 'You are already at full health.',
   'error.nothingRestore': 'Nothing to restore.',
   'error.nothingToConsume': 'Nothing to consume.',

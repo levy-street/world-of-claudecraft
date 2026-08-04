@@ -12185,7 +12185,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Không Yên Nghỉ Giữa Lau Sậy",
-        "text": "Nghi lễ trên những chiếc lư hương ấy buộc kẻ chết chìm trỗi dậy ở bất cứ nơi nào đầm lầy chạm đến chúng - và đầm lầy chạm đến mọi thứ. Sẽ không có yên nghỉ giữa những lau sậy này cho đến khi kẻ chết đông hơn người sống. Ta chưa thể hóa giải nghi lễ, nhưng ta có thể tước đi binh lính của nó. Hãy đưa thêm 14 Kẻ Chết Chìm về an nghỉ.",
+        "text": "The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, {playerName}, and the rest will scatter back into the mire.",
         "completion": "Ngươi ban cho người chết nhiều lòng thương xót hơn những kẻ chủ của chúng từng làm. Hãy nhận lấy thứ này - ngươi xứng đáng còn hơn thế.",
         "objectives": {
           "0": {

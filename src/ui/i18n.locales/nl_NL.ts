@@ -4133,8 +4133,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_no_rest.completion':
     'Je geeft de doden meer genade dan hun meesters ooit deden. Neem dit aan - je hebt het meer dan verdiend.',
   'entities.quests.q_no_rest.objectives.0.label': 'Verdronken Doden ter ruste gelegd',
-  'entities.quests.q_no_rest.text':
-    'Het ritueel op die wierookvaten bindt de verdronkenen om op te staan waar het moeras hen ook raakt - en het moeras raakt alles. Er zal geen rust zijn in dit riet tot de doden de levenden overtreffen. We kunnen het ritueel nog niet ongedaan maken, maar we kunnen het van soldaten ontdoen. Leg nog 14 van de Verdronken Doden ter ruste.',
   'entities.quests.q_no_rest.title': 'Geen Rust in het Riet',
   'entities.quests.q_nythraxis_bound_guardian.completion':
     "De drie relikwieën vertellen hetzelfde verhaal: Aldren vocht om zijn koning te verdedigen, Malric doorbrak de grens van de dood, en Voss probeerde te stoppen wat volgde. Het zegel verzwakt, en deze zegelring is de sleutel tot Nythraxis' tombe. Je bent nu afgestemd om De Crypte van Nythraxis te betreden. Keer terug naar de verlaten crypte, ontgrendel de koninklijke deur, en treed Nythraxis tegemoet voordat de woede van de oude koning zich buiten Doorntop verspreidt.",

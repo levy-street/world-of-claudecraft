@@ -3571,7 +3571,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_drowned_censers.objectives.0.label': '生锈香炉',
   'entities.quests.q_no_rest.title': '芦苇中不得安息',
   'entities.quests.q_no_rest.text':
-    '香炉上的仪式会让溺亡者在湿地触及之处复起。我们还无法破除它，只能先少给敌人14名士兵。',
+    '香炉上的仪式会让溺亡者复起，如今它已唤起一个强大到足以统领他们的存在。守望者称他为溺亡督军，只要他还占据沉没的礼拜堂，死者便阵列不散。打倒他，{playerName}，其余的自会溃散回泥沼。',
   'entities.quests.q_no_rest.completion': '你给了死者比他们主人更多的怜悯。拿着，你早已应得。',
   'entities.quests.q_no_rest.objectives.0.label': '让溺亡死者安息',
   'entities.quests.q_trolls.title': '泥沼坟丘',

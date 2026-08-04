@@ -6456,8 +6456,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_no_rest.completion':
     'Dáváš mrtvým víc milosti, než jim kdy dali jejich páni. Vezmi si tohle, víc než sis to zasloužil.',
   'entities.quests.q_no_rest.objectives.0.label': 'Utopený mrtvý uložen ke klidu',
-  'entities.quests.q_no_rest.text':
-    'Rituál na těch kadidelnicích váže utopené, aby povstali všude, kam dosáhne močál, a močál dosáhne všude. V tomhle rákosí nebude klid, dokud mrtví nepřevýší živé. Rituál zatím zrušit neumíme, ale můžeme ho zbavit vojáků. Ulož k odpočinku dalších 14 utopených mrtvých.',
   'entities.quests.q_no_rest.title': 'Bez odpočinku v rákosí',
   'entities.quests.q_nythraxis_bound_guardian.completion':
     'Ty tři relikvie vyprávějí stejný příběh: Aldren bojoval, aby bránil svého krále, Malric prolomil hranici smrti a Voss se pokusil zastavit, co následovalo. Pečeť slábne a tenhle pečetní prsten je klíčem k Nythraxisově hrobce. Teď jsi naladěn ke vstupu do Krypty Nythraxis. Vrať se do opuštěné krypty, odemkni královské dveře a postav se Nythraxisovi dřív, než hněv starého krále přeteče za Thornpeak.',

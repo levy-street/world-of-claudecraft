@@ -12185,7 +12185,7 @@ export const de_DE: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Keine Ruhe im Schilf",
-        "text": "Dieser Ritus lässt Ertrunkene überall auferstehen, wo das Moor sie berührt. Wir können ihn noch nicht brechen; nimm ihren Herren 14 Soldaten.",
+        "text": "The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, {playerName}, and the rest will scatter back into the mire.",
         "completion": "Du schenkst den Toten mehr Gnade als ihre Meister. Nimm dies, du hast es verdient.",
         "objectives": {
           "0": {

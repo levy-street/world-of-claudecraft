@@ -4000,8 +4000,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_no_rest.completion':
     'Ölülere, efendilerinin hiç göstermediği kadar merhamet gösteriyorsun. Şunu al; fazlasıyla hak ettin.',
   'entities.quests.q_no_rest.objectives.0.label': 'Boğulmuş Ölü huzura kavuşturuldu',
-  'entities.quests.q_no_rest.text':
-    'O buhurdanlıklardaki ayin, boğulmuşları bataklığın değdiği her yerde dirilmeye bağlıyor; bataklık ise her şeye değiyor. Ölüler, dirilerden fazla olana dek bu sazlıklarda huzur olmayacak. Ayini henüz bozamayız, ama onu askerlerinden boşaltabiliriz. 14 Boğulmuş Ölüyü daha huzura kavuştur.',
   'entities.quests.q_no_rest.title': 'Sazlıkta Huzur Yok',
   'entities.quests.q_nythraxis_bound_guardian.completion':
     "Üç emanet aynı hikâyeyi anlatıyor: Aldren kralını savunmak için savaştı, Malric ölümün sınırını yıktı ve Voss ardından geleni durdurmaya çalıştı. Mühür zayıflıyor ve bu mühür yüzüğü, Nythraxis'in mezarının anahtarı. Artık Nythraxis'in Mahzeni'ne girmeye uyumlandın. Terk edilmiş mahzene dön, kraliyet kapısını aç ve eski kralın öfkesi Dikenzirve'nin ötesine taşmadan Nythraxis ile yüzleş.",

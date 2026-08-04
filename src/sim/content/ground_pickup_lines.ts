@@ -29,12 +29,6 @@ export const GROUND_PICKUP_LINES: Record<string, GroundPickupLines> = {
     deny: 'The wax seal holds until the order is yours to claim.',
     enough: 'You already have the Fenbridge muster order.',
   },
-  // Murloc huts are torched with a firebottle (q_deepfen_purge), never looted;
-  // these lines cover the pickup path a bare click would otherwise reach.
-  murloc_hut: {
-    deny: 'You have no reason to torch that.',
-    enough: 'These huts are already smouldering.',
-  },
   lost_caravan_goods: {
     deny: "You aren't authorized to salvage these goods yet.",
     enough: 'You already have enough caravan goods.',

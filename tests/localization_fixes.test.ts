@@ -1128,6 +1128,11 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // Quest-item presence probe (SimContext-holding, text-free today): the
     // fourth module the whole-branch parity audit found outside the corpus.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/quests/quest_item_presence.ts'), 'utf8'),
+    // Whole-directory sweep for src/sim/interactions (the firebottle hut module
+    // and any interaction module that lands beside it), the same directory-glob
+    // treatment src/sim/social and src/sim/professions get above, so a new
+    // emit there sits under the drift guard from day one.
+    socialSourceUnder(path.resolve(process.cwd(), 'src/sim/interactions')),
   ].join('\n');
   // Hardened S3: also scan the authoritative server's player-facing emits. The
   // server (server/game.ts) is language-agnostic like the sim and re-localized

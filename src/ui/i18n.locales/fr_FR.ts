@@ -5492,8 +5492,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Comme je le craignais: ils brûlaient de la cendre de tombe, et le rite porte le nom de Voss.',
   'entities.quests.q_drowned_censers.objectives.0.label': 'Encensoir rouillé',
   'entities.quests.q_no_rest.title': 'Pas de repos dans les roseaux',
-  'entities.quests.q_no_rest.text':
-    'Ce rite relève les noyés partout où le marais les touche. Nous ne pouvons le défaire encore; retirez 14 soldats à leurs maîtres.',
   'entities.quests.q_no_rest.completion':
     "Vous donnez aux morts plus de pitié que leurs maîtres. Prenez ceci, vous l'avez mérité.",
   'entities.quests.q_no_rest.objectives.0.label': 'Mort noyé rendu au repos',

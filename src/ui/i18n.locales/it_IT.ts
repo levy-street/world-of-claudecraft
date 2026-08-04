@@ -5030,8 +5030,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Come temevo: bruciavano cenere di tomba, e il rito è firmato Voss.',
   'entities.quests.q_drowned_censers.objectives.0.label': 'Incensiere arrugginito',
   'entities.quests.q_no_rest.title': 'Nessun riposo tra le canne',
-  'entities.quests.q_no_rest.text':
-    'Quel rito rialza gli annegati ovunque la palude li tocchi. Non possiamo disfarlo ancora; togli 14 soldati ai loro padroni.',
   'entities.quests.q_no_rest.completion':
     "Offri ai morti più misericordia dei loro padroni. Prendi questo, l'hai meritato.",
   'entities.quests.q_no_rest.objectives.0.label': 'Morto annegato restituito al riposo',

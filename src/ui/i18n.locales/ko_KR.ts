@@ -3707,7 +3707,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_drowned_censers.objectives.0.label': '녹슨 향로',
   'entities.quests.q_no_rest.title': '갈대밭에 안식은 없다',
   'entities.quests.q_no_rest.text':
-    '그 의식은 습지가 닿는 곳마다 익사자를 일으킵니다. 아직 풀 수 없지만, 병사 14구를 주인에게서 빼앗을 수 있습니다.',
+    '그 향로의 의식은 익사자를 일으키고, 이제 그들을 이끌 만큼 강한 자까지 일으켰습니다. 파수꾼들은 그를 익사한 전쟁군주라 부릅니다. 그가 잠긴 예배당을 차지하고 있는 한 망자들은 대열을 지킵니다. {playerName}이여, 그를 쓰러뜨리십시오. 남은 것들은 진창으로 흩어져 돌아갈 것입니다.',
   'entities.quests.q_no_rest.completion':
     '당신은 죽은 자들에게 주인들보다 큰 자비를 베풀었습니다. 받으십시오.',
   'entities.quests.q_no_rest.objectives.0.label': '익사한 망자 안식시킴',

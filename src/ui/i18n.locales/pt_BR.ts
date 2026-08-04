@@ -4990,8 +4990,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Como eu temia: queimavam cinza de túmulo, e o rito está assinado por Voss.',
   'entities.quests.q_drowned_censers.objectives.0.label': 'Incensário enferrujado',
   'entities.quests.q_no_rest.title': 'Sem descanso nos juncos',
-  'entities.quests.q_no_rest.text':
-    'Esse rito ergue os afogados onde quer que o pântano os toque. Ainda não podemos desfazê-lo; tire 14 soldados de seus mestres.',
   'entities.quests.q_no_rest.completion':
     'Você dá aos mortos mais misericórdia que os mestres deles. Pegue isto, você mereceu.',
   'entities.quests.q_no_rest.objectives.0.label': 'Morto afogado devolvido ao descanso',

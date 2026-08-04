@@ -3574,7 +3574,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_drowned_censers.objectives.0.label': '生鏽香爐',
   'entities.quests.q_no_rest.title': '蘆葦中不得安息',
   'entities.quests.q_no_rest.text':
-    '香爐上的儀式會讓溺亡者在濕地觸及之處復起。我們還無法破除它，只能先少給敵人14名士兵。',
+    '香爐上的儀式會讓溺亡者復起，如今它已喚起一個強大到足以統領他們的存在。守望者稱他為溺亡督軍，只要他還占據沉沒的禮拜堂，死者便陣列不散。打倒他，{playerName}，其餘的自會潰散回泥沼。',
   'entities.quests.q_no_rest.completion': '你給了死者比他們主人更多的憐憫。拿著，你早已應得。',
   'entities.quests.q_no_rest.objectives.0.label': '讓溺亡死者安息',
   'entities.quests.q_trolls.title': '泥沼墳丘',

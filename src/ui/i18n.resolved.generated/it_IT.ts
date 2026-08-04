@@ -12185,7 +12185,7 @@ export const it_IT: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Nessun riposo tra le canne",
-        "text": "Quel rito rialza gli annegati ovunque la palude li tocchi. Non possiamo disfarlo ancora; togli 14 soldati ai loro padroni.",
+        "text": "The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, {playerName}, and the rest will scatter back into the mire.",
         "completion": "Offri ai morti più misericordia dei loro padroni. Prendi questo, l'hai meritato.",
         "objectives": {
           "0": {

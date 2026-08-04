@@ -4040,8 +4040,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_no_rest.completion':
     'Okazujesz zmarłym więcej litości, niż kiedykolwiek ich panowie. Weź to - z nawiązką na to zasłużyłeś.',
   'entities.quests.q_no_rest.objectives.0.label': 'Utopiony Zmarły ułożony do spoczynku',
-  'entities.quests.q_no_rest.text':
-    'Obrzęd na tych kadzielnicach sprawia, że utopieni powstają wszędzie tam, gdzie sięga ich bagno - a bagno sięga wszędzie. Nie będzie spoczynku w tych szuwarach, póki zmarli nie przewyższą liczebnie żywych. Nie potrafimy jeszcze cofnąć obrzędu, ale możemy pozbawić go żołnierzy. Ułóż do spoczynku 14 kolejnych Utopionych Zmarłych.',
   'entities.quests.q_no_rest.title': 'Brak spoczynku w szuwarach',
   'entities.quests.q_nythraxis_bound_guardian.completion':
     'Trzy relikwie opowiadają tę samą historię: Aldren walczył w obronie swego króla, Malric przełamał granicę śmierci, a Voss próbował powstrzymać to, co nastąpiło. Pieczęć słabnie, a ten sygnet jest kluczem do grobowca Nythraxis. Jesteś teraz dostrojony, by wejść do Krypty Nythraxis. Wróć do opuszczonej krypty, otwórz królewskie wrota i stań przeciw Nythraxis, nim furia starego króla rozleje się poza Ciernisty Szczyt.',

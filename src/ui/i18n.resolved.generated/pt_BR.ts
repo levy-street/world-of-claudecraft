@@ -12185,7 +12185,7 @@ export const pt_BR: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Sem descanso nos juncos",
-        "text": "Esse rito ergue os afogados onde quer que o pântano os toque. Ainda não podemos desfazê-lo; tire 14 soldados de seus mestres.",
+        "text": "The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, {playerName}, and the rest will scatter back into the mire.",
         "completion": "Você dá aos mortos mais misericórdia que os mestres deles. Pegue isto, você mereceu.",
         "objectives": {
           "0": {

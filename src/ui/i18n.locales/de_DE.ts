@@ -5050,8 +5050,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Wie befürchtet: Sie verbrannten Grabasche, und der Ritus ist mit Voss gezeichnet.',
   'entities.quests.q_drowned_censers.objectives.0.label': 'Rostiges Räuchergefäß',
   'entities.quests.q_no_rest.title': 'Keine Ruhe im Schilf',
-  'entities.quests.q_no_rest.text':
-    'Dieser Ritus lässt Ertrunkene überall auferstehen, wo das Moor sie berührt. Wir können ihn noch nicht brechen; nimm ihren Herren 14 Soldaten.',
   'entities.quests.q_no_rest.completion':
     'Du schenkst den Toten mehr Gnade als ihre Meister. Nimm dies, du hast es verdient.',
   'entities.quests.q_no_rest.objectives.0.label': 'Ertrunkener Toter zur Ruhe gelegt',

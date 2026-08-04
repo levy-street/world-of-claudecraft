@@ -3915,8 +3915,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_no_rest.completion':
     'Du ger de döda mer nåd än deras mästare någonsin gjorde. Ta detta - du har mer än förtjänat det.',
   'entities.quests.q_no_rest.objectives.0.label': 'Dränkt död lagd till ro',
-  'entities.quests.q_no_rest.text':
-    'Riten på de där rökelsekaren binder de dränkta att resa sig var än kärret rör vid dem - och kärret rör vid allt. Det finns ingen ro i dessa vassar förrän de döda är fler än de levande. Vi kan inte upphäva riten ännu, men vi kan tömma den på soldater. Lägg ytterligare 14 av de dränkta döda till ro.',
   'entities.quests.q_no_rest.title': 'Ingen ro i vassen',
   'entities.quests.q_nythraxis_bound_guardian.completion':
     'De tre relikerna berättar samma historia: Aldren stred för att försvara sin kung, Malric bröt dödens gräns, och Voss försökte stoppa det som följde. Sigillet försvagas, och denna signetring är nyckeln till Nythraxis grav. Du är nu invigd att träda in i Nythraxis krypta. Återvänd till den övergivna kryptan, lås upp den kungliga dörren, och möt Nythraxis innan den gamle kungens vrede svämmar bortom Törntopp.',

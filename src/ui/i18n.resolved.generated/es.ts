@@ -12185,11 +12185,11 @@ export const es: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Sin descanso entre los juncos",
-        "text": "Ese rito hace levantarse a los ahogados donde la ciénaga los toca. No podemos deshacerlo aún; deja 14 muertos menos a sus amos.",
+        "text": "The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, {playerName}, and the rest will scatter back into the mire.",
         "completion": "Das más misericordia a los muertos que sus señores. Toma esto, lo mereces.",
         "objectives": {
           "0": {
-            "label": "Muerto ahogado devuelto al descanso"
+            "label": "The Drowned Warlord slain"
           }
         }
       },

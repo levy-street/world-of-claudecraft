@@ -12185,7 +12185,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Geen Rust in het Riet",
-        "text": "Het ritueel op die wierookvaten bindt de verdronkenen om op te staan waar het moeras hen ook raakt - en het moeras raakt alles. Er zal geen rust zijn in dit riet tot de doden de levenden overtreffen. We kunnen het ritueel nog niet ongedaan maken, maar we kunnen het van soldaten ontdoen. Leg nog 14 van de Verdronken Doden ter ruste.",
+        "text": "The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, {playerName}, and the rest will scatter back into the mire.",
         "completion": "Je geeft de doden meer genade dan hun meesters ooit deden. Neem dit aan - je hebt het meer dan verdiend.",
         "objectives": {
           "0": {

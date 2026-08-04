@@ -3914,8 +3914,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_no_rest.completion':
     'Du giver de døde mere nåde, end deres mestre nogensinde gjorde. Tag dette - du har mere end fortjent det.',
   'entities.quests.q_no_rest.objectives.0.label': 'Druknede Døde stedt til hvile',
-  'entities.quests.q_no_rest.text':
-    'Riten på de røgelseskar binder de druknede til at rejse sig, hvor end sumpen rører dem - og sumpen rører alt. Der bliver ingen hvile i disse siv, før de døde er flere end de levende. Vi kan ikke ophæve riten endnu, men vi kan tømme den for soldater. Sted 14 flere af de Druknede Døde til hvile.',
   'entities.quests.q_no_rest.title': 'Ingen Hvile i Sivene',
   'entities.quests.q_nythraxis_bound_guardian.completion':
     "De tre relikvier fortæller den samme historie: Aldren kæmpede for at forsvare sin konge, Malric brød dødens grænse, og Voss forsøgte at standse, hvad der fulgte. Seglet svækkes, og denne signetring er nøglen til Nythraxis' grav. Du er nu indviet til at træde ind i Nythraxis' Krypt. Vend tilbage til den forladte krypt, lås den kongelige dør op, og mød Nythraxis, før den gamle konges raseri vælder ud over Tornetop.",
