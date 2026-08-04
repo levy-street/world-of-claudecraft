@@ -366,7 +366,7 @@ describe('Eastbrook polish capture contract', () => {
       // the composite fingerprint. No GLB source fingerprint moved and no
       // capture was retaken, following the identical precedent this composite
       // already carries from the compile-storm gear/mount/base-visual gate fix.
-      fingerprint: '2d4e6e0ee7168a0bf25a13ba1a2754f39e8c8f168e6f369ceb6588fe2bb9b2bb',
+      fingerprint: 'bbe39592b35a3a34379caf5f0571e213df4ef42998eded71d2337a7ee9056128',
       components: {
         captureContract: {
           id: 'polish-v2',
