@@ -1242,6 +1242,16 @@ export function runEffects(
           school: eff.school ?? ability.school,
           leechPct: eff.leechPct,
         });
+        if (dotId === 'rupture') {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: target.id,
+            school: eff.school ?? ability.school,
+            fx: 'dotApply',
+            ability: dotId,
+          });
+        }
         ctx.enterCombat(p, target);
         break;
       }
@@ -1398,8 +1408,8 @@ export function runEffects(
             ability: ability.id,
           });
         }
-        // Dirt Toss (blind) sounds at the target too.
-        if (ability.id === 'blind') {
+        // Dirt Toss (blind) and Sap sound at the target too.
+        if (ability.id === 'blind' || ability.id === 'sap') {
           ctx.emit({
             type: 'spellfx',
             sourceId: p.id,

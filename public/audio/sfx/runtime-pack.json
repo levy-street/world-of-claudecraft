@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "79b9242f2f6f5bc45c248055b1a61f8f4f45b2cfdfe00a31f0dbddf91635ca02",
-  "catalogHash": "5f4f5b960495e03ce9aa0c431f674b83f1eea28fcd5a6fdf719e26ad6d7bda26",
+  "bundleId": "18350120a681cea11f678971ec8b3750b2566baea1151bd0365184d91a36e4da",
+  "catalogHash": "6fee11db1bac7ee1866b7ed4d618305a15c5cc67eeb8b9362cf9cb7070905c5c",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -124,6 +124,18 @@
       "gain": 1,
       "playbackRate": 1
     },
+    "ambush": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ambush.mp3?v=fca4a69b4917",
+          "bytes": 13208,
+          "sha256": "fca4a69b4917a36d62121906395beb635bf406854d449318b7adf78ad7452cda"
+        }
+      ],
+      "gain": 1.798871,
+      "playbackRate": 1
+    },
     "arcane_blast": {
       "variants": [
         {
@@ -134,6 +146,18 @@
         }
       ],
       "gain": 1.995262,
+      "playbackRate": 1
+    },
+    "backstab": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/backstab.mp3?v=65fa47a9f8b3",
+          "bytes": 13835,
+          "sha256": "65fa47a9f8b3fba703085eb4541e5f42c00803192daf8eec65dc9fc252a599ca"
+        }
+      ],
+      "gain": 1.819701,
       "playbackRate": 1
     },
     "blind": {
@@ -424,6 +448,18 @@
       "gain": 1.883649,
       "playbackRate": 1
     },
+    "eviscerate": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/eviscerate.mp3?v=285b13821a6b",
+          "bytes": 18224,
+          "sha256": "285b13821a6bbcdda949fda8f343cd29ebeca6b2fa00ee38b08bd1c690aaaa99"
+        }
+      ],
+      "gain": 1.798871,
+      "playbackRate": 1
+    },
     "fear": {
       "variants": [
         {
@@ -698,6 +734,18 @@
         }
       ],
       "gain": 2.018366,
+      "playbackRate": 1
+    },
+    "garrote": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/garrote.mp3?v=3bf7f6ed44d4",
+          "bytes": 13835,
+          "sha256": "3bf7f6ed44d4598b208a0f6ae0f47833161a50938fb71bd8e389bc01070c0f18"
+        }
+      ],
+      "gain": 1.862087,
       "playbackRate": 1
     },
     "glacial_spike": {
@@ -3172,6 +3220,18 @@
       "gain": 2.570396,
       "playbackRate": 1
     },
+    "sap": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/sap.mp3?v=d8a1740b6963",
+          "bytes": 7566,
+          "sha256": "d8a1740b69631ef751e43f858c2c5c5ecd62aa2b6fdfb12efe2b7837cf1e9149"
+        }
+      ],
+      "gain": 1.927525,
+      "playbackRate": 1
+    },
     "scorch": {
       "variants": [
         {
@@ -3196,6 +3256,18 @@
       "gain": 1.840772,
       "playbackRate": 1
     },
+    "sinister_strike": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/sinister_strike.mp3?v=1744e663c766",
+          "bytes": 13208,
+          "sha256": "1744e663c766b768177e69723b2d6039ca59ecb51c2cfac8662bef24fcbb66ca"
+        }
+      ],
+      "gain": 2.660725,
+      "playbackRate": 1
+    },
     "spell_nova": {
       "variants": [
         {
@@ -3206,6 +3278,18 @@
         }
       ],
       "gain": 1.678804,
+      "playbackRate": 1
+    },
+    "stealth": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/stealth.mp3?v=f747fb4d474b",
+          "bytes": 48944,
+          "sha256": "f747fb4d474b96fab39745fd7ba0e3d6f559dd82547dd0755c8df6b1a6e3c415"
+        }
+      ],
+      "gain": 1,
       "playbackRate": 1
     },
     "temporal_clock": {

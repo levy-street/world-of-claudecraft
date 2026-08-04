@@ -55,6 +55,22 @@ const IMPACT_ABILITY_CUES: Partial<Record<string, SfxId>> = {
   frozen_orb: 'frozen_orb',
   glacial_spike: 'glacial_spike',
   arcane_surge: 'arcane_blast',
+  ambush: 'ambush',
+  backstab: 'backstab',
+  garrote: 'garrote',
+  sinister_strike: 'sinister_strike',
+  eviscerate: 'eviscerate',
+};
+
+// A DoT's periodic damage tick shares the ordinary IMPACT_ABILITY_CUES/school
+// lookup above (impactCueForDamage runs on every 'damage' event, ticks
+// included), which would repeat a dedicated recording every interval for the
+// whole duration and read as spammy (see the HoT precedent, #2271: same
+// problem, heal side). Rupture is deliberately absent from IMPACT_ABILITY_CUES
+// above for exactly that reason; its dedicated cue instead plays once, off the
+// one-shot fx:'dotApply' event effect_dispatch.ts emits at ctx.applyAura time.
+const DOT_APPLY_ABILITY_CUES: Partial<Record<string, SfxId>> = {
+  rupture: 'eviscerate',
 };
 
 // A landed cc (stun/root/incapacitate) has no recording by default (see
@@ -68,6 +84,7 @@ const CC_IMPACT_ABILITY_CUES: Partial<Record<string, SfxId>> = {
   entangling_roots: 'entangling_roots',
   blind: 'blind',
   cheap_shot: 'cheap_shot',
+  sap: 'sap',
 };
 
 // fx:'blinkStep' fires from effect_dispatch.ts's blinkForward case, shared by
@@ -247,18 +264,24 @@ export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number 
     const key = event.ability && BLINK_STEP_ABILITY_CUES[event.ability];
     return key ? { key, anchorId: event.targetId } : null;
   }
+  if (event.fx === 'dotApply') {
+    const key = event.ability && DOT_APPLY_ABILITY_CUES[event.ability];
+    return key ? { key, anchorId: event.targetId } : null;
+  }
   return null;
 }
 
 // Per-ability overrides for a buff's apply moment: normally every buff plays
 // the shared buff_apply chime, keyed off Aura.id (the ability that applied
 // it). Ice Block (Cold Coffin), Cloak of Shadows (Shadecloak, an absorb
-// aura, same apply path), and Vanish (Smokestep, a toggle stealth selfBuff,
-// same apply path too) get their own distinct cue instead.
+// aura, same apply path), Vanish (Smokestep, a toggle stealth selfBuff, same
+// apply path too), and Stealth (Duskveil, the opening rogue stealth toggle,
+// identical selfBuff shape) get their own distinct cue instead.
 const BUFF_APPLY_ABILITY_CUES: Partial<Record<string, SfxId>> = {
   ice_block: 'ice_block',
   cloak_of_shadows: 'cloak_of_shadows',
   vanish: 'vanish',
+  stealth: 'stealth',
 };
 
 export function auraApplyCue(event: AuraEvent, aura: Aura | null): SfxId | null {

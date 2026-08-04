@@ -70,6 +70,7 @@ export const CC_IMPACT_ABILITIES: ReadonlySet<string> = new Set([
   'entangling_roots',
   'blind',
   'cheap_shot',
+  'sap',
 ]);
 
 /** The six schools with a recorded launch whoosh (combat_sfx.ts SCHOOL_CUES

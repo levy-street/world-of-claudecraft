@@ -4370,6 +4370,12 @@ export type SimEvent = { pid?: number } & (
         // A teleport step (Flickerstep / Shadowstep): the renderer SNAPS the
         // mover instead of arcing the reposition like a leap.
         | 'blinkStep'
+        // A DoT landing on its target the moment it is APPLIED (Rupture): audio-only,
+        // fires once at ctx.applyAura time, distinct from the periodic 'tick' fx the
+        // same DoT emits every interval thereafter. Gated per-ability
+        // (DOT_APPLY_ABILITY_CUES, src/ui/combat_sfx.ts) so a DoT with no dedicated
+        // recording stays silent here, exactly like 'ccImpact' above.
+        | 'dotApply'
         // A cast completing with no castFx and no other event of its own: the
         // only completion cue such casts emit, so the per-ability VFX layer
         // can stage their read. Untargeted/self ceremonies (forms, summon

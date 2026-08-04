@@ -120,8 +120,14 @@ describe('impact: the landing belongs to the recorded impact_ pack', () => {
     ).toBe(false);
   });
 
-  it('is recorded for the plain cc override (hammer_of_justice, entangling_roots, blind, cheap_shot)', () => {
-    for (const abilityId of ['hammer_of_justice', 'entangling_roots', 'blind', 'cheap_shot']) {
+  it('is recorded for the plain cc override (hammer_of_justice, entangling_roots, blind, cheap_shot, sap)', () => {
+    for (const abilityId of [
+      'hammer_of_justice',
+      'entangling_roots',
+      'blind',
+      'cheap_shot',
+      'sap',
+    ]) {
       expect(
         isAbilityMomentRecorded('impact', { school: 'physical', archetype: 'cc', abilityId }),
       ).toBe(true);

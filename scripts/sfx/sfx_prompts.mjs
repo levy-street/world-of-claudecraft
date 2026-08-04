@@ -486,6 +486,34 @@ export const SFX = [
     custom: true,
   },
   {
+    key: 'ambush',
+    custom: true,
+  },
+  {
+    key: 'backstab',
+    custom: true,
+  },
+  {
+    key: 'garrote',
+    custom: true,
+  },
+  {
+    key: 'sap',
+    custom: true,
+  },
+  {
+    key: 'sinister_strike',
+    custom: true,
+  },
+  {
+    key: 'eviscerate',
+    custom: true,
+  },
+  {
+    key: 'stealth',
+    custom: true,
+  },
+  {
     key: 'vanish',
     custom: true,
   },

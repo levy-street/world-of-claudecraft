@@ -306,7 +306,7 @@ describe('combat SFX policy', () => {
   });
 
   it('anchors the landed cc moment to the target for the covered set, and stays silent otherwise', () => {
-    for (const ability of ['hammer_of_justice', 'entangling_roots', 'blind', 'cheap_shot']) {
+    for (const ability of ['hammer_of_justice', 'entangling_roots', 'blind', 'cheap_shot', 'sap']) {
       expect(
         spellFxCue({
           type: 'spellfx',
@@ -408,6 +408,67 @@ describe('combat SFX policy', () => {
         target('mob', 'crypt_shambler'),
       ),
     ).toBe('impact_arcane');
+  });
+
+  it('gives Ambush, Backstab, Garrote, Sinister Strike, and Eviscerate their own impact instead of the shared material impact', () => {
+    for (const [ability, key] of [
+      ['ambush', 'ambush'],
+      ['backstab', 'backstab'],
+      ['garrote', 'garrote'],
+      ['sinister_strike', 'sinister_strike'],
+      ['eviscerate', 'eviscerate'],
+    ] as const) {
+      expect(
+        impactCueForDamage(
+          damage({ school: 'physical', ability }),
+          target('mob', 'crypt_shambler'),
+        ),
+      ).toBe(key);
+    }
+    // Every other physical rogue strike keeps the shared material impact.
+    expect(
+      impactCueForDamage(
+        damage({ school: 'physical', ability: 'mutilate' }),
+        target('mob', 'crypt_shambler'),
+      ),
+    ).toBe('impact_bone');
+  });
+
+  it('does not give Rupture its own impact on ordinary damage ticks (that would repeat every interval)', () => {
+    // Rupture rides the same eviscerate.mp3 recording, but only once, on the
+    // one-shot fx:'dotApply' apply moment tested below; the periodic 'damage'
+    // event every tick emits must fall through to the shared material impact,
+    // exactly like the HoT tick-silencing precedent (#2271, heal side).
+    expect(
+      impactCueForDamage(
+        damage({ school: 'physical', ability: 'rupture' }),
+        target('mob', 'crypt_shambler'),
+      ),
+    ).toBe('impact_bone');
+  });
+
+  it('gives Rupture its own cue once, on the dotApply moment', () => {
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 20,
+        school: 'physical',
+        fx: 'dotApply',
+        ability: 'rupture',
+      }),
+    ).toEqual({ key: 'eviscerate', anchorId: 20 });
+    // A dot with no dedicated recording stays silent.
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 20,
+        school: 'nature',
+        fx: 'dotApply',
+        ability: 'rake',
+      }),
+    ).toBeNull();
   });
 
   it('gives Blink and Shadowstep their own teleport cue (same blinkForward effect)', () => {
@@ -583,11 +644,10 @@ describe('combat SFX policy', () => {
     expect(auraApplyCue(gained, { ...aura('absorb'), id: 'power_word_shield' })).toBe('buff_apply');
   });
 
-  it('gives Vanish its own apply cue too (a toggle stealth selfBuff, same apply path)', () => {
+  it('gives Vanish and Stealth their own apply cue too (toggle stealth selfBuffs, same apply path)', () => {
     const gained = { type: 'aura', targetId: 1, name: 'Test Aura', gained: true } as const;
     expect(auraApplyCue(gained, { ...aura('stealth'), id: 'vanish' })).toBe('vanish');
-    // Rogue Stealth (the base ability, not the Vanish cooldown) keeps the shared chime.
-    expect(auraApplyCue(gained, { ...aura('stealth'), id: 'stealth' })).toBe('buff_apply');
+    expect(auraApplyCue(gained, { ...aura('stealth'), id: 'stealth' })).toBe('stealth');
   });
 
   it('uses unarmed swings in both druid combat forms', () => {
