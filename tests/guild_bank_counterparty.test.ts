@@ -50,8 +50,20 @@ const dbMock = vi.hoisted(() => ({
   loadGuildBankRows: vi.fn(async (): Promise<unknown[]> => []),
 }));
 
+// DURABLE guild membership: the escrow carrier is chosen from
+// socialDb.guildMembers (a stale session stamp must not put an ex-member on the
+// quarantine-and-kick path), so this harness answers that one statement.
+// Seeded by officerAtBanker alongside the session stamp.
+const guildMemberRows: { id: number; rank: string }[] = [];
+
 vi.mock('../server/db', () => ({
-  pool: { query: vi.fn(async () => ({ rows: [] })) },
+  pool: {
+    query: vi.fn(async (text: string) =>
+      text.includes('FROM guild_members gm JOIN characters c')
+        ? { rows: guildMemberRows }
+        : { rows: [] },
+    ),
+  },
   GUILD_BANK_ROW_MAX_BYTES: 262144,
   saveCharacterState: dbMock.saveCharacterState,
   saveCharacterAndGuildBankState: dbMock.saveCharacterAndGuildBankState,
@@ -308,6 +320,7 @@ function officerAtBanker(server: GameServer, characterId: number, name: string):
   p.prevPos = { ...p.pos };
   server.sim.rebucket(p);
   server.sim.setPlayerGuildMembership(session.pid, { guildId: GUILD_ID, rank: 'officer' });
+  guildMemberRows.push({ id: characterId, rank: 'officer' });
   return session;
 }
 
@@ -329,6 +342,7 @@ function audit(server: GameServer) {
 }
 
 beforeEach(() => {
+  guildMemberRows.length = 0;
   dbMock.rows.length = 0;
   dbMock.insertBankLedgerRow.mockClear();
   dbMock.loadGuildBankRows.mockResolvedValue([]);
