@@ -3281,13 +3281,19 @@ export class ClientWorld implements IWorld {
       // away from a banker, on death, for member rank, and outside a guild
       // (the proximity + officer-plus gate lives in sim guildBankInfoFor).
       if (s.guildBank !== undefined) {
+        // BOTH EDGES of the gate reset the activity log, not just the losing
+        // one. Losing it (walked away, died, demoted to member, left or
+        // switched guild) invalidates the rows: they are one guild's history
+        // read under a rank this client may no longer hold, so they are dropped
+        // rather than left to paint into the next pane that opens. REGAINING it
+        // has to reset too, because the answer this client is holding was taken
+        // while the gate was shut: an officer who opened the log away from the
+        // banker got a `refused`, and without this the pane went on saying
+        // refused for the rest of the TTL after they walked up. Re-arming on
+        // the transition makes it self-correct in one frame.
+        const hadGate = this.guildBankInfo !== null;
         this.guildBankInfo = s.guildBank;
-        // Losing the gate (walked away, died, demoted to member, left or
-        // switched guild) invalidates the activity log too: those rows are one
-        // guild's history read under a rank this client may no longer hold, so
-        // they are dropped rather than left to paint into the next pane that
-        // opens. Re-arms the request gate, so a re-approach refetches.
-        if (this.guildBankInfo === null) this.resetGuildBankLog();
+        if (hadGate !== (this.guildBankInfo !== null)) this.resetGuildBankLog();
       }
       // --- IWorldDeeds self-decode: `deeds`/`dstats` are heavy-gated,
       // `renown`/`atitle` per-tick diffed (all four delta-omitted: a missing

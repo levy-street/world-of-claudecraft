@@ -279,11 +279,20 @@ describe('ClientWorld.guildBankLog: the on-demand round trip', () => {
     }
   });
 
+  const GATE = {
+    treasury: 0,
+    slots: [],
+    capacity: 24,
+    purchasedSlots: 24,
+    nextExpansionPrice: 25_000,
+  };
+
   it('losing the guild bank gate DROPS the installed rows and re-arms the request', () => {
     // The rows belong to one guild read under a rank this client may no longer
     // hold (walked away, demoted, left, switched guild), so they must never
     // survive into the next pane that opens.
     const { world, wire, sends } = makeWorld();
+    wire.applySnapshot(selfSnap(GATE)); // standing at the banker, officer-plus
     world.guildBankLog();
     wire.onMessage(frame({ ok: true, entries: [wireRow({ id: 9 })] }));
     expect(world.guildBankLog().entries.length).toBe(1);
@@ -296,17 +305,29 @@ describe('ClientWorld.guildBankLog: the on-demand round trip', () => {
 
   it('a snapshot that still carries the gate leaves the installed rows alone', () => {
     const { world, wire } = makeWorld();
+    wire.applySnapshot(selfSnap(GATE));
     world.guildBankLog();
     wire.onMessage(frame({ ok: true, entries: [wireRow({ id: 9 })] }));
-    wire.applySnapshot(
-      selfSnap({
-        treasury: 0,
-        slots: [],
-        capacity: 24,
-        purchasedSlots: 24,
-        nextExpansionPrice: 25_000,
-      }),
-    );
+    wire.applySnapshot(selfSnap(GATE)); // no transition: nothing is reset
     expect(world.guildBankLog().entries.map((e) => e.id)).toEqual([9]);
+  });
+
+  it('REGAINING the gate re-arms too, so a refusal taken without it self-corrects', () => {
+    // REGRESSION: the reset fired only on the NULL edge, so an officer who
+    // opened the log away from the banker got `refused`, walked up, and the
+    // pane went on saying refused for the rest of the TTL. The answer was
+    // taken while the gate was shut, so regaining it must invalidate it.
+    const { world, wire, sends } = makeWorld();
+    world.guildBankLog(); // opened away from the banker
+    wire.onMessage(frame({ ok: false }));
+    expect(world.guildBankLog().state).toBe('refused');
+    expect(sends.length).toBe(1);
+
+    wire.applySnapshot(selfSnap(GATE)); // walked up to the banker
+    // One paint later the pane is loading a fresh answer, not still refused.
+    expect(world.guildBankLog()).toEqual({ state: 'loading', entries: [] });
+    expect(sends.length).toBe(2);
+    wire.onMessage(frame({ ok: true, entries: [wireRow({ id: 9 })] }));
+    expect(world.guildBankLog().state).toBe('ready');
   });
 });
