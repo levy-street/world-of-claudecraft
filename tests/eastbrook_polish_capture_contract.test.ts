@@ -360,13 +360,17 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned after merging the live graphics rebuild (context
-      // recycle plus profile-aware Eastbrook runtime inputs in the renderer, the
-      // rendererIntegration leaf) onto the release/v0.34.0 tip that already
-      // carries PR #2720's fence-removal layout evidence. The merged tree mints
-      // one composite matching neither parent's literal. No pipeline input or
-      // geometry value changed and no capture was retaken.
-      fingerprint: '707c6fbee3c5d9681bb717870125dc1632533b9bd0117b922fdf2767edf47952',
+      // Deliberately re-pinned, stacking three independent rendererIntegration
+      // moves on src/render/renderer.ts, the leaf of this composite: this branch
+      // swaps the Bear Form visual onto the purpose-built quadruped rig, and
+      // release/v0.34.0 carries both PR #2720's fence-removal layout evidence and
+      // the live graphics rebuild (context recycle plus profile-aware Eastbrook
+      // runtime inputs). Each moves the leaf's own sha256 and with it the
+      // composite, so the merged tree mints one fingerprint matching no parent's
+      // literal. No GLB source fingerprint moved, no pipeline input or geometry
+      // value changed, and no capture was retaken. Re-minted with
+      // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
+      fingerprint: '38b87f7e206b1666253705a02283b70485b5fa6dd16096d1463d51ef7defe0f4',
       components: {
         captureContract: {
           id: 'polish-v2',

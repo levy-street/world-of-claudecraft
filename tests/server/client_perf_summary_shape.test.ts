@@ -59,6 +59,7 @@ function expectedAgg(seed: number) {
 
 const KEY_COLUMNS = {
   preset: 'graphics_preset',
+  gfxtier: 'gfx_tier',
   gpu: 'gl_renderer_bucket',
   browser: 'browser_family',
   os: 'os_family',
@@ -70,12 +71,14 @@ const KEY_COLUMNS = {
 function totalsRow(seed: number): Row {
   return {
     graphics_preset: null,
+    gfx_tier: null,
     gl_renderer_bucket: null,
     browser_family: null,
     os_family: null,
     zone_or_scenario: null,
     crowd_bucket: null,
     g_preset: 1,
+    g_gfxtier: 1,
     g_gpu: 1,
     g_browser: 1,
     g_os: 1,
@@ -115,6 +118,7 @@ describe('mapClientPerfSummaryRows classification', () => {
       bucketRow('os', 'Windows', 1, 1, 6),
       bucketRow('scenario', 'elwynn', 1, 1, 7),
       bucketRow('crowd', '25-49', 1, 1, 8),
+      bucketRow('gfxtier', 'ultra', 1, 1, 10),
     ]);
     expect(out.totals).toEqual(expectedAgg(9));
     expect(out.byPreset).toEqual([{ key: '', ...expectedAgg(3) }]);
@@ -124,6 +128,7 @@ describe('mapClientPerfSummaryRows classification', () => {
     expect(out.byScenario).toEqual([{ key: 'elwynn', ...expectedAgg(7) }]);
     expect(out.byCrowd).toEqual([{ key: '25-49', ...expectedAgg(8) }]);
     expect(out.worstGpuBuckets).toEqual([{ key: 'adreno', ...expectedAgg(4) }]);
+    expect(out.byGfxTier).toEqual([{ key: 'ultra', ...expectedAgg(10) }]);
   });
 
   it('folds the legacy empty-string crowd key to unknown at read time, and ONLY there', () => {
@@ -166,6 +171,17 @@ describe('mapClientPerfSummaryRows classification', () => {
     const out = mapClientPerfSummaryRows([bucketRow('preset', null, 1, 1, 2)]);
     expect(out.byPreset).toEqual([{ key: '', ...expectedAgg(2) }]);
   });
+
+  it('routes a gfx_tier row by its own bit, distinct from graphics_preset', () => {
+    // gfx_tier and graphics_preset are two independent segmentation columns on
+    // the same table; a row grouped by one must never be misread as the other.
+    const out = mapClientPerfSummaryRows([
+      bucketRow('gfxtier', 'low', 1, 1, 11),
+      bucketRow('preset', 'low', 1, 1, 12),
+    ]);
+    expect(out.byGfxTier).toEqual([{ key: 'low', ...expectedAgg(11) }]);
+    expect(out.byPreset).toEqual([{ key: 'low', ...expectedAgg(12) }]);
+  });
 });
 
 describe('mapClientPerfSummaryRows ordering', () => {
@@ -177,6 +193,14 @@ describe('mapClientPerfSummaryRows ordering', () => {
       bucketRow('browser', 'zeta', 1, 2, 2),
     ]);
     expect(out.byBrowser.map((b) => b.key)).toEqual(['zeta', 'alpha']);
+  });
+
+  it('orders byGfxTier by the volume rank, same as every other single-column set', () => {
+    const out = mapClientPerfSummaryRows([
+      bucketRow('gfxtier', 'insane', 2, 1, 1),
+      bucketRow('gfxtier', 'medium', 1, 2, 2),
+    ]);
+    expect(out.byGfxTier.map((b) => b.key)).toEqual(['medium', 'insane']);
   });
 
   it('serves byGpu and worstGpuBuckets from the SAME gpu rows under their own rank each', () => {
@@ -212,6 +236,7 @@ describe('mapClientPerfSummaryRows caps', () => {
     for (let i = 1; i <= 21; i++) rows.push(bucketRow('os', `o${i}`, i, i, i));
     for (let i = 1; i <= 22; i++) rows.push(bucketRow('browser', `b${i}`, i, i, i));
     for (let i = 1; i <= 10; i++) rows.push(bucketRow('crowd', `c${i}`, i, i, i));
+    for (let i = 1; i <= 22; i++) rows.push(bucketRow('gfxtier', `t${i}`, i, i, i));
     const out = mapClientPerfSummaryRows(rows);
     expect(out.byPreset).toHaveLength(20);
     expect(out.byPreset[19].key).toBe('p20');
@@ -227,11 +252,15 @@ describe('mapClientPerfSummaryRows caps', () => {
     expect(out.byCrowd).toHaveLength(8);
     expect(out.byCrowd[7].key).toBe('c8');
     expect(out.byCrowd.map((b) => b.key)).not.toContain('c9');
+    expect(out.byGfxTier).toHaveLength(20);
+    expect(out.byGfxTier[19].key).toBe('t20');
+    expect(out.byGfxTier.map((b) => b.key)).not.toContain('t21');
   });
 
   it('pins the per-array caps to the literal numbers the admin lists show', () => {
     expect(PERF_SUMMARY_LIMITS).toEqual({
       byPreset: 20,
+      byGfxTier: 20,
       byGpu: 50,
       byBrowser: 20,
       byOs: 20,
@@ -291,6 +320,7 @@ describe('mapClientPerfSummaryRows empty window', () => {
     // The no-rows fallback and an explicit empty record produce the same shape.
     expect(out.totals).toEqual(perfAggregateFromRow({}));
     expect(out.byPreset).toEqual([]);
+    expect(out.byGfxTier).toEqual([]);
     expect(out.byGpu).toEqual([]);
     expect(out.byBrowser).toEqual([]);
     expect(out.byOs).toEqual([]);

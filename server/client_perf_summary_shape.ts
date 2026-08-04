@@ -23,6 +23,7 @@ export interface PerfBucket extends PerfAggregate {
 export interface ClientPerfSummaryBuckets {
   totals: PerfAggregate;
   byPreset: PerfBucket[];
+  byGfxTier: PerfBucket[];
   byGpu: PerfBucket[];
   byBrowser: PerfBucket[];
   byOs: PerfBucket[];
@@ -47,6 +48,11 @@ export interface PerfSuggestionCount {
 // interpolated into SQL text: runtime mutation must be structurally impossible.
 export const PERF_SUMMARY_LIMITS = Object.freeze({
   byPreset: 20,
+  // Same cap as byPreset: gfx_tier is the other half of the closed-vocabulary
+  // segmentation pair (low/medium/high/ultra/insane today, see
+  // choiceIn(body.gfxTier, ...) in perf_report.ts), not a high-cardinality
+  // dimension like gpu or scenario.
+  byGfxTier: 20,
   byGpu: 50,
   byBrowser: 20,
   byOs: 20,
@@ -68,17 +74,19 @@ export function cleanHours(hours: number): number {
 // One flat row of the GROUPING SETS result, as the reading contract the mapper
 // relies on. The g_* fields are GROUPING() bits: 1 means the column is rolled up
 // in this row's grouping set, 0 means the row is grouped by that column. Exactly
-// one bit is 0 on a bucket row; all six are 1 on the totals row. The shape and
+// one bit is 0 on a bucket row; all seven are 1 on the totals row. The shape and
 // SQL suites type their fixture rows with this contract, so it stays
 // compile-checked against what the tests feed the mapper.
 export type ClientPerfSummaryRow = {
   graphics_preset: string | null;
+  gfx_tier: string | null;
   gl_renderer_bucket: string | null;
   browser_family: string | null;
   os_family: string | null;
   zone_or_scenario: string | null;
   crowd_bucket: string | null;
   g_preset: number;
+  g_gfxtier: number;
   g_gpu: number;
   g_browser: number;
   g_os: number;
@@ -134,6 +142,7 @@ export function perfAggregateFromRow(r: Record<string, unknown>): PerfAggregate 
 // carries the row's key when that bit is 0.
 const BUCKET_SETS = [
   { bit: 'g_preset', column: 'graphics_preset', list: 'byPreset' },
+  { bit: 'g_gfxtier', column: 'gfx_tier', list: 'byGfxTier' },
   { bit: 'g_gpu', column: 'gl_renderer_bucket', list: 'byGpu' },
   { bit: 'g_browser', column: 'browser_family', list: 'byBrowser' },
   { bit: 'g_os', column: 'os_family', list: 'byOs' },
@@ -163,6 +172,7 @@ export function mapClientPerfSummaryRows(
   let totals: PerfAggregate | null = null;
   const ranked: Record<BucketListName, RankedBucket[]> = {
     byPreset: [],
+    byGfxTier: [],
     byGpu: [],
     byBrowser: [],
     byOs: [],
@@ -172,7 +182,7 @@ export function mapClientPerfSummaryRows(
   for (const r of rows) {
     const set = BUCKET_SETS.find((s) => Number(r[s.bit]) === 0);
     if (!set) {
-      // All six bits rolled up: the () grouping set, i.e. the totals row.
+      // All seven bits rolled up: the () grouping set, i.e. the totals row.
       totals = perfAggregateFromRow(r);
       continue;
     }
@@ -206,6 +216,7 @@ export function mapClientPerfSummaryRows(
     // returned no rows at all; both paths give the same all-zeros shape.
     totals: totals ?? perfAggregateFromRow({}),
     byPreset: byRank(ranked.byPreset, 'volRank', PERF_SUMMARY_LIMITS.byPreset),
+    byGfxTier: byRank(ranked.byGfxTier, 'volRank', PERF_SUMMARY_LIMITS.byGfxTier),
     byGpu: byRank(ranked.byGpu, 'volRank', PERF_SUMMARY_LIMITS.byGpu),
     byBrowser: byRank(ranked.byBrowser, 'volRank', PERF_SUMMARY_LIMITS.byBrowser),
     byOs: byRank(ranked.byOs, 'volRank', PERF_SUMMARY_LIMITS.byOs),
