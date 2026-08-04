@@ -332,14 +332,6 @@ jobs:
       # available cores, matching the bounded local gate.
       - name: Run tests (PR tier, shard ${{ matrix.shard }} of 8)
         run: npm test -- --shard=${{ matrix.shard }}/8 --maxWorkers="$(node -p 'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))')"
-        # Heap headroom over Node's default old-space ceiling: the suite's
-        # heaviest shard OOMs a worker at the default (~4 GiB) since the
-        # v0.34 content wave, reddening this matrix on the release branch
-        # itself. Two workers at 6 GiB plus the main process stay inside the
-        # 16 GiB standard runner. (env sits AFTER run: the ci_workflow guard
-        # pins name-to-run adjacency to prove no per-shard if: gating.)
-        env:
-          NODE_OPTIONS: --max-old-space-size=6144
 
   # Runs in parallel with pr-gate: same if-condition, no needs edge in either
   # direction. The default pull_request merge-ref checkout MUST be preserved
@@ -483,14 +475,6 @@ jobs:
       # available cores, matching the bounded local gate.
       - name: Run tests (PR tier, shard ${{ matrix.shard }} of 8)
         run: npm test -- --shard=${{ matrix.shard }}/8 --maxWorkers="$(node -p 'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))')"
-        # Heap headroom over Node's default old-space ceiling: the suite's
-        # heaviest shard OOMs a worker at the default (~4 GiB) since the
-        # v0.34 content wave, reddening this matrix on the release branch
-        # itself. Two workers at 6 GiB plus the main process stay inside the
-        # 16 GiB standard runner. (env sits AFTER run: the ci_workflow guard
-        # pins name-to-run adjacency to prove no per-shard if: gating.)
-        env:
-          NODE_OPTIONS: --max-old-space-size=6144
 
   # The release tier, alone (issue #2820). Only the suites whose assertions change
   # under the flag run here, so this job answers exactly one question: has the
