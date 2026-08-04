@@ -19,7 +19,7 @@ const GUILD_ID = 4242;
 
 // One slot per refusal dimension the anonymous-pipe policy has, matching the
 // hatch's own coverage in tests/guild_bank.test.ts.
-const SOULBOUND = 'reins_grag_bear';
+const SOULBOUND = 'final_argument_greatblade';
 const NO_MARKET = 'riding_training';
 const PLAIN = 'wolf_fang';
 

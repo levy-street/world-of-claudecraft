@@ -917,9 +917,11 @@ export interface OtherItemDef extends BaseItemDef {
 
 // A collectible mount item. Owning the item IS owning the mount: while it sits
 // in the player's bags or bank, the catalog mount it names is selectable and
-// ridable (src/sim/mounts.ts mountOwned). Always soulbound, so ownership can
-// never transfer. Every catalog mount has one, the horse included: five are
-// sub-1% boss drops, the horse's reins comes from the stablemaster.
+// ridable (src/sim/mounts.ts mountOwned). Player reins are NOT soulbound, so
+// ownership transfers with the item (trade, mail, market, guild bank); only
+// the developer-only tank stays bound. Every catalog mount has one, the horse
+// included: five are sub-1% boss drops, the horse's reins comes from the
+// stablemaster.
 export interface MountItemDef extends BaseItemDef {
   kind: 'mount';
   mount: MountKey;

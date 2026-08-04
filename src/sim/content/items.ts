@@ -362,36 +362,42 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   // The horse's reins: the ONLY purchasable mount, sold by Stablemaster Marla
   // Hitchen for 10 gold after the player has learned Riding (ridingTrained gate
-  // in items.ts buyItem). Soulbound like every reins item, so owning it IS owning
-  // the horse (src/sim/mounts.ts mountOwned) and it never transfers.
-  // sellValue 0: bought, never sold back.
+  // in items.ts buyItem). Not soulbound: owning the item IS owning the horse
+  // (src/sim/mounts.ts mountOwned), and like every player reins it can trade
+  // hands. The buy path's mountOwned gate therefore only stops duplicates in
+  // your own containers: buy, give away, buy again is allowed, making this an
+  // elastic market good with a 10g vendor floor (deliberate; no copper mint,
+  // since it never sells back). noVendorSell + sellValue 0: an accidental
+  // 0-copper sale that buyback rotation could eat would destroy the mount.
   reins_valorsteed: {
     id: 'reins_valorsteed',
     name: 'Reins of the Valorsteed',
     kind: 'mount',
     mount: 'valorsteed',
     quality: 'common',
-    soulbound: true,
+    noVendorSell: true,
     noDiscard: true,
     sellValue: 0,
     buyValue: 100_000, // 10 gold in copper
   },
   // Collectible mount (Morthen the Gravecaller, The Hollow Crypt). Owning the
-  // reins item IS owning the mount (src/sim/mounts.ts mountOwned): soulbound,
-  // so ownership never transfers, and it stays valid from the bank too.
+  // reins item IS owning the mount (src/sim/mounts.ts mountOwned); it stays
+  // valid from the bank too, and it transfers like any other unbound item.
   reins_grag_bear: {
     id: 'reins_grag_bear',
     name: 'Reins of the Goliath Grag-Bear',
     kind: 'mount',
     mount: 'grag_bear',
     quality: 'rare',
-    soulbound: true,
+    noVendorSell: true,
     noDiscard: true,
     sellValue: 0,
   },
   // Developer-only mount. It is intentionally absent from vendors, quests,
   // creature loot, heroic loot, and Rift reward pools. Use /dev mounts or
   // /dev give reins_terrorspark_groundshaker while the feature remains under development.
+  // Unlike the player reins it STAYS soulbound: it has no acquisition path, so
+  // tradability would turn a dev grant into an economy leak.
   reins_terrorspark_groundshaker: {
     id: 'reins_terrorspark_groundshaker',
     name: 'Ignition Key: Terrorspark Groundshaker',
