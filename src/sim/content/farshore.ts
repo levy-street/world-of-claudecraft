@@ -30,6 +30,7 @@ import type {
   ZonePropsDef,
 } from '../types';
 import { emptyZoneProps } from '../types';
+import { GULLHAVEN_BUILDINGS, GULLHAVEN_TOWN_PROPS, gullhavenWallProps } from './gullhaven';
 import { GULLHAVEN_MEMORIAL, memorialRailProps } from './memorials';
 
 export const FARSHORE_ZONE: ZoneDef = {
@@ -64,10 +65,12 @@ export const FARSHORE_ZONE: ZoneDef = {
 
 export const FARSHORE_ROADS: { x: number; z: number }[][] = [
   [
+    { x: 784, z: 118 },
+    { x: 791.5, z: 121 },
     { x: 800, z: 122 },
     { x: 812, z: 120 },
     { x: 822, z: 118 },
-  ], // the harbor pier -> Gullhaven
+  ], // the harbour pier -> the west gate -> Gullhaven
   [
     { x: 826, z: 114 },
     { x: 880, z: 70 },
@@ -96,6 +99,16 @@ export const FARSHORE_ROADS: { x: number; z: number }[][] = [
     { x: 855, z: 165 },
     { x: 880, z: 195 },
   ], // Gullhaven -> the Wreckfields
+  // The shore road, up the west coast toward the Landing. Fisher Bram's escort
+  // (q_fs_bram_come_home) already walked this line home and the lore names it
+  // "the shore road", but it was not a road: he crossed open grass. It is a road
+  // now, so the redoubt's north gate stands on a way in rather than on turf.
+  [
+    { x: 808, z: 66 },
+    { x: 812.7, z: 91.6 },
+    { x: 818, z: 108 },
+    { x: 822, z: 118 },
+  ], // the shore road -> the north gate -> Gullhaven
   // The town -> Warden Hale's memorial. It CONTOURS the mound's west flank
   // rather than climbing the face: the same curve MEMORIAL_TERRAIN_EDITS
   // grades, so the painted road always sits on graded ground and the climb
@@ -662,12 +675,16 @@ export const FARSHORE_PROPS: ZonePropsDef = {
   // Gullhaven, the redoubt: a fishing town turned to holding a line. The
   // homes still stand, but a war camp crowds the market and the fences have
   // become a barricade ring.
-  buildings: [
-    { kind: 'inn', x: 813, z: 112, w: 6, d: 7, rot: 0.5 }, // the muster hall
-    { kind: 'house', x: 827, z: 126, w: 5, d: 5, rot: -1.1 },
-    { kind: 'house', x: 811, z: 126, w: 5, d: 5, rot: 2.1 },
-    { kind: 'chapel', x: 831, z: 110, w: 5, d: 7, rot: -2.4 }, // the menders' hall
-  ],
+  // Gullhaven, the redoubt: a fishing town turned to holding a line. The homes
+  // still stand, but a war camp crowds the market and the curtain wall on the
+  // landward side is what the fences became.
+  //
+  // The buildings live in src/sim/content/gullhaven.ts, which also derives the
+  // plot pads that level their ground and the curtain that encloses them. The
+  // four original houses were RE-SITED rather than kept: three of them stood in
+  // the painted road (one dead centre of the memorial path, one dead centre of
+  // the Watch Meadow road) and two had an NPC standing inside their solid box.
+  buildings: GULLHAVEN_BUILDINGS.map(({ kind, x, z, w, d, rot }) => ({ kind, x, z, w, d, rot })),
   // Warden Hale's memorial. It stands on the berm crest NORTH of the redoubt
   // (graded to a level 10.4 terrace, about 5 yd above the town's flat 5.5
   // pad, by MEMORIAL_TERRAIN_EDITS) rather than in the
@@ -692,6 +709,12 @@ export const FARSHORE_PROPS: ZonePropsDef = {
       r: 1.4,
       h: 7.48,
     },
+    // ---- Gullhaven's redoubt ---------------------------------------------
+    // The wall ring and the town fittings, DERIVED from src/sim/content/gullhaven.ts
+    // so the props here and the oriented boxes in colliders.ts stay one geometry.
+    ...gullhavenWallProps(),
+    ...GULLHAVEN_TOWN_PROPS,
+
     // ---- the memorial precinct -------------------------------------------
     // Rebuilt after the first pass read as scattered rubble in a forest. Three
     // corrections, all from measuring the assets instead of picking them by
@@ -718,7 +741,9 @@ export const FARSHORE_PROPS: ZonePropsDef = {
     { key: 'shrubFlowering', x: 803.1, z: 141.5, scale: 1, r: 0.5, h: 1.4 },
     { key: 'shrubFlowering', x: 806.9, z: 141.5, scale: 1, r: 0.5, h: 1.4 },
     { key: 'oakTree', x: 786.5, z: 150, rot: 0.6, scale: 1.2, r: 0.8, h: 9 },
-    { key: 'oakTree', x: 823.5, z: 149, rot: -1.1, scale: 1.25, r: 0.8, h: 9 },
+    // Moved clear of the south bench: at (823.5, 149) it stood in the middle of
+    // the levelled building ground GULLHAVEN_TERRAIN_EDITS cuts there.
+    { key: 'oakTree', x: 831, z: 154.5, rot: -1.1, scale: 1.25, r: 0.8, h: 9 },
   ],
   wells: [{ x: 820, z: 119, r: 1.5 }],
   stalls: [

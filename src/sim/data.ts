@@ -130,6 +130,7 @@ import {
   SPIRIT_HEALER_NPC_ID,
 } from './content/graveyards';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
+import { GULLHAVEN_TERRAIN_EDITS } from './content/gullhaven';
 import { LAST_BELL_DUNGEON_DEFS } from './content/last_bell';
 import {
   LAST_BELL_CAMPAIGN_MOBS,
@@ -738,7 +739,15 @@ export const BUILTIN_WORLD: WorldContent = {
   // both are pure HeightStamp data applied through terrainHeight's edit layer.
   // Memorial grading lands LAST so its terrace wins locally over the
   // broader harbor pads it overlaps at the berm.
-  terrainEdits: [...JAIL_TERRAIN_EDITS, ...HARBOR_TERRAIN_EDITS, ...MEMORIAL_TERRAIN_EDITS],
+  // Gullhaven's town benches land after the harbour grading (whose 4.40 street
+  // pocket they stay clear of) and BEFORE the memorial's, which then cuts its
+  // own terrace and contour path into the result.
+  terrainEdits: [
+    ...JAIL_TERRAIN_EDITS,
+    ...HARBOR_TERRAIN_EDITS,
+    ...GULLHAVEN_TERRAIN_EDITS,
+    ...MEMORIAL_TERRAIN_EDITS,
+  ],
 };
 
 let activeWorld: WorldContent = BUILTIN_WORLD;
