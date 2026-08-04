@@ -31,14 +31,15 @@ const WAND_CUES: Partial<Record<MagicSchool, SfxId>> = {
 
 // A 'nova' fx event normally plays the shared spell_nova cue (every
 // self-centered or ground-targeted burst: Frost Nova, Arcane Explosion,
-// Ring of Frost, ...). The three AoE fear shouts (priest Psychic Scream,
-// warlock Howl of Terror, warrior Intimidating Shout, all archetype
-// aoeFear) get their own distinct cast cue instead, keyed off the casting
-// ability id the event already carries.
+// Ring of Frost, ...). A few abilities get their own distinct cast cue
+// instead, keyed off the casting ability id the event already carries: the
+// three AoE fear shouts (priest Psychic Scream, warlock Howl of Terror,
+// warrior Intimidating Shout, all archetype aoeFear), and Frost Nova.
 const NOVA_ABILITY_CUES: Partial<Record<string, SfxId>> = {
   psychic_scream: 'fear_shout',
   howl_of_terror: 'fear_shout',
   intimidating_shout: 'fear_shout',
+  frost_nova: 'frost_nova',
 };
 
 // Exported (read-only, `as const`) purely so a test can pin its key set

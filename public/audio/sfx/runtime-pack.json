@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "6562253f37445999dee7889b3fcb4d7ce02a4dc4749f6160e01bad9b6165b820",
-  "catalogHash": "01c3ac4374e7517a6072e5c62812461a1657d87fcc646c8dcf2aae2b9daf9376",
+  "bundleId": "f298cba211e5f91157746856f44a7ab134c066b78bd3d5eb75557bd226e0a52e",
+  "catalogHash": "b1ad9b5b729f9b998502db3e8a627b968f314ab5d9dbbd8483b1f8337c83ac2d",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -578,6 +578,18 @@
         }
       ],
       "gain": 1.819701,
+      "playbackRate": 1
+    },
+    "frost_nova": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/frost_nova.mp3?v=431e8b38044c",
+          "bytes": 34524,
+          "sha256": "431e8b38044c8e07d58000140684b499c9cd4c9a0eca1daf02bb25b5a84d7017"
+        }
+      ],
+      "gain": 2.041738,
       "playbackRate": 1
     },
     "heal_impact": {

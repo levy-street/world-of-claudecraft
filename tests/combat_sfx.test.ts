@@ -272,11 +272,24 @@ describe('combat SFX policy', () => {
         type: 'spellfx',
         sourceId: 10,
         targetId: 10,
+        school: 'arcane',
+        fx: 'nova',
+        ability: 'arcane_explosion',
+      }),
+    ).toEqual({ key: 'spell_nova', anchorId: 10 });
+  });
+
+  it('gives Frost Nova its own cast cue instead of the shared spell_nova', () => {
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 10,
         school: 'frost',
         fx: 'nova',
         ability: 'frost_nova',
       }),
-    ).toEqual({ key: 'spell_nova', anchorId: 10 });
+    ).toEqual({ key: 'frost_nova', anchorId: 10 });
   });
 
   it('anchors the landed-fear moment to the feared target', () => {

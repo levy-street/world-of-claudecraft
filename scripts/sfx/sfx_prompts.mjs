@@ -424,6 +424,10 @@ export const SFX = [
     key: 'ice_block',
     custom: true,
   },
+  {
+    key: 'frost_nova',
+    custom: true,
+  },
 
   // --- Heals & auras --------------------------------------------------------
   {
