@@ -357,7 +357,7 @@ describe('mandatory interaction-landmark prewarm', () => {
     expect(gate).toContain('this.compileGate(group)');
     expect(gate).toContain('view.compilePending = false;');
     expect(gate).toContain(
-      'The DOM nameplate, target marker, health, and cast bar remain available',
+      'The canvas nameplate (name, target marker, health, and cast bar) keeps',
     );
     expect(gate).toContain('void this.compileGate(target).then(() => {');
     expect(gate).toContain('void this.compileGate(target).then(onSettled);');
