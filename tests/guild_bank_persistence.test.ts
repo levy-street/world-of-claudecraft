@@ -1316,7 +1316,13 @@ describe('the guild_create fee gate + the create/disband hooks', () => {
         purchasedSlots: 0,
       });
     });
-    expect(session.dirtyGuildBanks.has(GUILD_ID)).toBe(true);
+    // The fee save carries the charged purse and the seeded empty book
+    // together, and the create_fee row is written only AFTER it commits (the
+    // durability ordering: a row written first would book a payment that a
+    // fenced-out save never made).
+    await vi.waitFor(() => {
+      expect(dbMock.saveCharacterAndGuildBankState).toHaveBeenCalled();
+    });
     await bankLedgerIdle();
     expect(dbMock.insertBankLedgerRow).toHaveBeenCalledTimes(1);
     expect((dbMock.insertBankLedgerRow.mock.calls[0] as unknown[])[0]).toMatchObject({
@@ -1327,16 +1333,52 @@ describe('the guild_create fee gate + the create/disband hooks', () => {
       container: 'guild',
       containerId: GUILD_ID,
     });
-    // The fee save was scheduled (fire-and-forget): the escrow sibling carries
-    // the charged purse and the seeded empty book together.
-    await vi.waitFor(() => {
-      expect(dbMock.saveCharacterAndGuildBankState).toHaveBeenCalled();
-    });
     // The seeded book carries no deltas, so what lands is the empty book the
     // seed represents (which is also what a guild with no row loads at boot).
     expect(durableBook()).toEqual({ treasury: 0, inventory: [], purchasedSlots: 0 });
     // No stray refund: the purse stays exactly one fee lighter.
     expect(meta.copper).toBe(140_000);
+  });
+
+  it('books NO create_fee (and counts the incident) when the fee save is fenced out', async () => {
+    // REGRESSION (create-then-never-persist-charge): the fee is deducted from
+    // the LIVE purse at the gate and reaches the database only through this
+    // session's character half. That save used to be fire-and-forget, so a
+    // fence-out (a same-account takeover discards the session's state) left
+    // the guild created, the durable purse untouched, and a create_fee row
+    // standing as if it had been paid: a free guild, booked as sold.
+    // revertOwnGuildBookOps cannot help, because the fee is not a BOOK delta.
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'Founder');
+    const meta = server.sim.players.get(session.pid);
+    if (!meta) throw new Error('missing meta');
+    meta.copper = 150_000;
+    const durableBefore = { ...(durableChars.get(session.characterId) ?? {}) };
+    priv(server).social.guildCreate = vi.fn(async () => {
+      priv(server).social.tx.onGuildCreated(1, GUILD_ID);
+      return true;
+    });
+    const rec = recordingIncidents();
+    setGameMetricsCounters(rec.sink);
+    // The takeover fence: the write reports it did not land.
+    dbMock.saveCharacterAndGuildBankState.mockResolvedValue(false);
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    dispatch(server, session, { cmd: 'guild_create', name: 'Iron Vanguard' });
+    await vi.waitFor(() => expect(dbMock.saveCharacterAndGuildBankState).toHaveBeenCalled());
+    await bankLedgerIdle();
+    await vi.waitFor(() => expect(rec.kinds).toContain('create_fee_unpaid'));
+    warnSpy.mockRestore();
+    errSpy.mockRestore();
+
+    // The audit does not claim a payment that never landed...
+    expect(dbMock.insertBankLedgerRow).not.toHaveBeenCalled();
+    // ...the durable character row was never advanced by this save...
+    expect(durableChars.get(session.characterId) ?? {}).toEqual(durableBefore);
+    // ...and the failure is machine-readable, not just a log line.
+    expect(rec.kinds).toContain('create_fee_unpaid');
+    dbMock.saveCharacterAndGuildBankState.mockReset();
   });
 
   it('a refused create REFUNDS the reserved fee exactly once, on every refusal arm', async () => {

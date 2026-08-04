@@ -2179,22 +2179,26 @@ export class GameServer {
         // be dodged by logging out before the commit.
         const fee = this.pendingGuildCreateFees.get(id);
         this.pendingGuildCreateFees.delete(id);
-        if (fee && fee.amount > 0) {
-          recordGuildBankDeltas(
-            'create_fee',
-            { characterId: id, accountId: fee.accountId },
-            guildId,
-            [guildCreateFeeDelta(fee.amount, fee.pursePaid)],
-          );
-        }
         const s = this.sessionByCharacterId(id);
-        if (!s) return; // paid at the gate; the seeded empty book boot-loads as empty
+        if (!s) {
+          // Offline founder: the charge was applied at the gate and their leave
+          // flush is what persists the charged purse, so there is no live
+          // session to ride and nothing here can verify it either way. The row
+          // is written on the same terms it always was.
+          if (fee && fee.amount > 0) {
+            recordGuildBankDeltas(
+              'create_fee',
+              { characterId: id, accountId: fee.accountId },
+              guildId,
+              [guildCreateFeeDelta(fee.amount, fee.pursePaid)],
+            );
+          }
+          return;
+        }
         // Persist the charged purse and the seeded (empty) book together
-        // through the fenced escrow save.
-        this.markGuildBankDirty(s, guildId);
-        void this.saveCharacter(s).catch((err) =>
-          console.error(`guild create fee save failed for ${s.name}:`, err),
-        );
+        // through the fenced escrow save, and only call the fee PAID once that
+        // write is durable (see persistGuildCreateFee).
+        void this.persistGuildCreateFee(s, guildId, fee ?? null);
       },
       // Disband committed (the empty-bank guard passed): evict the book so the
       // map stays bounded and a re-created guild id can never inherit a stale
@@ -4191,6 +4195,63 @@ export class GameServer {
   // silently discard committed-intent work. Pinned in
   // tests/guild_bank_persistence.test.ts.
   static readonly GUILD_BANK_UNFLUSHED_OP_CAP = 500;
+
+  /** Make the reserve-at-gate creation fee DURABLE, and only then book it.
+   *
+   *  THE HOLE THIS CLOSES: the fee is deducted from the LIVE purse at the
+   *  guild_create gate, the create commits, and the charge reaches the database
+   *  only through this session's character half. Fire-and-forgetting that save
+   *  meant a save which never became durable (a same-account takeover fence-out
+   *  discards the session's state; a crash loses it) left the guild created and
+   *  the founder's DURABLE purse untouched: a free guild. The book half cannot
+   *  rescue it either, because revertOwnGuildBookOps replays BOOK deltas and
+   *  the fee is not one: it lives on the character.
+   *
+   *  What is fixable here is fixable automatically: while the session is alive
+   *  the deduction sits in the live purse, so the autosave, the next op's save,
+   *  or the leave flush all persist it. What is NOT fixable is a session whose
+   *  live state is thrown away, and for that arm the honest answer is to make
+   *  the failure LOUD and MACHINE-READABLE rather than to book a payment that
+   *  did not happen.
+   *
+   *  So the `create_fee` ledger row is written AFTER the write commits (the
+   *  durability ordering the deed publish beside it already uses). A failed
+   *  save writes no row, which keeps the audit honest in the only direction
+   *  that matters: a guild with no create_fee row is a guild that was not paid
+   *  for, and it is findable with one query. The incident counter
+   *  (`create_fee_unpaid`) is the alerting half; the loud log carries the
+   *  guild, the character, and the amount an operator has to collect. */
+  private async persistGuildCreateFee(
+    session: ClientSession,
+    guildId: number,
+    fee: { accountId: number; amount: number; pursePaid: number } | null,
+  ): Promise<void> {
+    this.markGuildBankDirty(session, guildId);
+    let durable = false;
+    try {
+      durable = await this.saveCharacter(session);
+    } catch (err) {
+      console.error(`guild create fee save failed for ${session.name}:`, err);
+    }
+    if (!fee || fee.amount <= 0) return;
+    if (!durable) {
+      // The live purse still holds the deduction, so an ordinary transient
+      // failure self-heals on the next save of a session that is still alive.
+      // This line is for the arm that cannot: a fenced-out or quarantined
+      // session's live state is abandoned, and the fee goes with it.
+      gameMetricsCounters().guildBankIncident('create_fee_unpaid');
+      console.error(
+        `guild create fee for guild ${guildId} did not become durable for character ${session.characterId} (${session.name}): ${fee.amount} copper may be uncollected, and no create_fee row was written`,
+      );
+      return;
+    }
+    recordGuildBankDeltas(
+      'create_fee',
+      { characterId: session.characterId, accountId: fee.accountId },
+      guildId,
+      [guildCreateFeeDelta(fee.amount, fee.pursePaid)],
+    );
+  }
 
   // Schedule a guild's book for the next fenced escrow save of this session.
   private markGuildBankDirty(session: ClientSession, guildId: number): void {

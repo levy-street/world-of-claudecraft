@@ -354,6 +354,10 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
       // an officer" and "the query failed", so without this a total read outage
       // looks exactly like ordinary refusals at the wire.
       'log_read_failed',
+      // A created guild whose creation fee never became durable: the charge
+      // lived only on a live purse whose session was abandoned, so the guild
+      // exists and was never paid for. A single-sample defect, not a rate.
+      'create_fee_unpaid',
     ]);
 
     // Scrape BEFORE any increment: an alert rule cannot fire on a series that

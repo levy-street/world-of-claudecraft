@@ -128,9 +128,16 @@ export const GUILD_BANK_INCIDENTS = [
   // is byte-identical to "you are not an officer", so without this a total read
   // outage is indistinguishable from ordinary refusals at the wire.
   'log_read_failed',
+  // A guild was CREATED but its creation fee never became durable: the charge
+  // lives only on a live purse whose session was fenced out or abandoned, so
+  // the founder holds a guild the database was never paid for. Its own kind
+  // because it is a single-sample defect (unlike the retryable save kinds
+  // beside it) and it is the only one that leaves value UNCOLLECTED rather
+  // than at risk of being double-counted.
+  'create_fee_unpaid',
 ] as const;
 
-/** One of the fixed ten guild-bank incident kinds. */
+/** One of the fixed eleven guild-bank incident kinds. */
 export type GuildBankIncident = (typeof GUILD_BANK_INCIDENTS)[number];
 
 /**

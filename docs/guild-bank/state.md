@@ -51,6 +51,21 @@ gate green). Teardown of docs/guild-bank/ awaits the user's explicit confirmatio
   ordering's crash window loses at most the fee for at most one autosave interval, the
   right trade. At most one reservation per character; a refund whose founder already left
   is logged loudly for operator compensation.
+  THE CRASH WINDOW WAS DESCRIBED BACKWARDS and is now closed on the accounting side
+  (2026-08-03, review finding): logging out before the commit is the arm reserve-at-gate
+  closed, but create-then-never-persist-the-charge was still open. The fee reaches the
+  database only through the founder's CHARACTER half, so a save that never becomes durable
+  (a same-account takeover fence-out discards the session's live state; a crash loses it)
+  left the guild created and the durable purse untouched: a FREE guild. The book half
+  cannot rescue it, because `revertOwnGuildBookOps` replays BOOK deltas and the fee is not
+  one. `GameServer.persistGuildCreateFee` now AWAITS that save and writes the `create_fee`
+  row only after it commits (the durability ordering the deed publish already uses), so a
+  failed save books no payment; the arm that cannot self-heal (a live session's state being
+  thrown away, as opposed to a transient failure, where the deduction sits in the live
+  purse and the next save persists it) is counted as the `create_fee_unpaid` incident and
+  logged with the guild, the character, and the copper an operator has to collect. A guild
+  with no `create_fee` row is therefore exactly "a guild that was not paid for", findable
+  with one query.
 - Ledger: same `bank_ledger` table, `container = 'guild'`, `container_id = guild id`, ops
   `deposit_gold | withdraw_gold | deposit | withdraw | buy_slots | open_bank | create_fee`
   plus the three non-player rows `admin_purge | escrow_deficit | counterparty_orphan`.
