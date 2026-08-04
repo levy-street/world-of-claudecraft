@@ -2590,8 +2590,8 @@ export const fr_CA: EnTranslations = {
     "crafting": {
       "title": "Artisanat",
       "close": "Fermer la fabrication",
-      "dialogOption": "Artisanat",
-      "dialogOptionAria": "Ouvrir la fenêtre d'artisanat pour {craft}",
+      "dialogOption": "Confection",
+      "dialogOptionAria": "Ouvrir la fenêtre de confection pour {craft}",
       "craft": "Artisanat",
       "reagentsNeeded": "Nécessite$1",
       "reagentLine": "{name}: {have}/{required}",
@@ -2901,7 +2901,7 @@ export const fr_CA: EnTranslations = {
       "countLabel": "{earned}/{total} hauts faits",
       "completionAria": "Hauts faits obtenus: {earned} sur {total}",
       "recentLabel": "Récents:",
-      "recentJumpAria": "Aller à {name}",
+      "recentJumpAria": "Passer à {name}",
       "nearestLabel": "Presque au but:",
       "filterGroupAria": "Filtrer les hauts faits",
       "filterAll": "Tous",
@@ -6098,16 +6098,16 @@ export const fr_CA: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "checkingTitle": "Recherche de mises à jour...",
-      "checkingBody": "Les nouvelles versions se téléchargent pendant que vous jouez.",
-      "uptodateTitle": "Vous utilisez déjà la dernière version.",
+      "checkingTitle": "Vérification des mises à jour...",
+      "checkingBody": "Les nouvelles versions se téléchargent pendant la partie.",
+      "uptodateTitle": "Vous avez déjà la version la plus récente.",
       "downloadingTitle": "Téléchargement de la mise à jour {version}...",
-      "downloadingBody": "Vous pouvez continuer à jouer; elle s'installera à la fermeture.",
+      "downloadingBody": "Vous pouvez continuer à jouer; l'installation se fera en quittant.",
       "readyTitle": "La mise à jour {version} est prête",
       "readyBody": "Elle s'installe à la fermeture, ou redémarrez maintenant.",
       "restart": "Redémarrer maintenant",
       "later": "Plus tard",
-      "dismiss": "Fermer"
+      "dismiss": "Fermer l'avis"
     },
     "crash": {
       "title": "World of ClaudeCraft",

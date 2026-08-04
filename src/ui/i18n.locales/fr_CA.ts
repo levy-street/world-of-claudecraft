@@ -300,13 +300,13 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.guildInviteCancelled':
     'Une invitation de guilde en attente a été annulée parce que la guilde a été renommée.',
   'hud.prompts.guildRenamed': "Votre guilde a été renommée en {name} par l'équipe de modération.",
-  'desktop.update.checkingTitle': 'Recherche de mises à jour...',
-  'desktop.update.checkingBody': 'Les nouvelles versions se téléchargent pendant que vous jouez.',
-  'desktop.update.dismiss': 'Fermer',
+  'desktop.update.checkingTitle': 'Vérification des mises à jour...',
+  'desktop.update.checkingBody': 'Les nouvelles versions se téléchargent pendant la partie.',
+  'desktop.update.dismiss': "Fermer l'avis",
   'desktop.update.downloadingBody':
-    "Vous pouvez continuer à jouer; elle s'installera à la fermeture.",
-  'desktop.update.uptodateTitle': 'Vous utilisez déjà la dernière version.',
-  'hudChrome.crafting.dialogOption': 'Artisanat',
-  'hudChrome.crafting.dialogOptionAria': "Ouvrir la fenêtre d'artisanat pour {craft}",
-  'hudChrome.deeds.recentJumpAria': 'Aller à {name}',
+    "Vous pouvez continuer à jouer; l'installation se fera en quittant.",
+  'desktop.update.uptodateTitle': 'Vous avez déjà la version la plus récente.',
+  'hudChrome.crafting.dialogOption': 'Confection',
+  'hudChrome.crafting.dialogOptionAria': 'Ouvrir la fenêtre de confection pour {craft}',
+  'hudChrome.deeds.recentJumpAria': 'Passer à {name}',
 };

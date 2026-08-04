@@ -475,7 +475,7 @@ export const zh_TW: AdminTranslations = {
   "profInspect.professionOptionNone": "選擇專業",
   "profInspect.effectLabel": "效果",
   "profInspect.effectOptionNone": "選擇效果",
-  "profInspect.restoreSummary": "{id} x{count}",
+  "profInspect.restoreSummary": "{count} x {id}",
   "profInspect.slotPair": "{profession} / {effect}",
   "profInspect.chargesPair": "{current} / {max}",
   "profInspect.offlineNote": "恢復操作需要該角色在此伺服器上線。",

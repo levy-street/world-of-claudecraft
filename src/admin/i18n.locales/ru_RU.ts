@@ -74,7 +74,7 @@ export const ru_RU: Record<string, string> = {
   'profInspect.professionOptionNone': 'выберите профессию',
   'profInspect.effectLabel': 'Эффект',
   'profInspect.effectOptionNone': 'выберите эффект',
-  'profInspect.restoreSummary': '{id} x{count}',
+  'profInspect.restoreSummary': '{count} x {id}',
   'profInspect.slotPair': '{profession} / {effect}',
   'profInspect.chargesPair': '{current} / {max}',
   'profInspect.offlineNote': 'Для восстановления персонаж должен быть в сети на этом мире.',

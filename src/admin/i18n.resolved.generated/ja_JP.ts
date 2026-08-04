@@ -475,7 +475,7 @@ export const ja_JP: AdminTranslations = {
   "profInspect.professionOptionNone": "専門技能を選択",
   "profInspect.effectLabel": "効果",
   "profInspect.effectOptionNone": "効果を選択",
-  "profInspect.restoreSummary": "{id} x{count}",
+  "profInspect.restoreSummary": "{count}個: {id}",
   "profInspect.slotPair": "{profession}／{effect}",
   "profInspect.chargesPair": "{current} / {max}",
   "profInspect.offlineNote": "復元にはキャラクターがこのレルムにオンラインである必要があります。",

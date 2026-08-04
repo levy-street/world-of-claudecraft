@@ -475,7 +475,7 @@ export const zh_CN: AdminTranslations = {
   "profInspect.professionOptionNone": "选择一门专业",
   "profInspect.effectLabel": "效果",
   "profInspect.effectOptionNone": "选择一个效果",
-  "profInspect.restoreSummary": "{id} x{count}",
+  "profInspect.restoreSummary": "{count} x {id}",
   "profInspect.slotPair": "{profession} / {effect}",
   "profInspect.chargesPair": "{current} / {max}",
   "profInspect.offlineNote": "补发需要该角色在本服务器在线。",
