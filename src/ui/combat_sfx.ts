@@ -58,8 +58,10 @@ export function novaAbilityCue(ability: string | undefined): SfxId {
 // A damage-landing archetype (bolt/burst/strike/nova/beam/dot) always
 // resolves the shared impact_<school> cue (impactCueForDamage below). A few
 // abilities get their own distinct impact instead, keyed off
-// DamageEvent.ability. Every other fire spell (Fireball, the rest of the
-// bolt/burst family) keeps the shared impact_fire.
+// DamageEvent.abilityId, the stable content id only the PRIMARY direct hit
+// carries (DoT ticks omit it, so garrote's 18s bleed never replays this).
+// Every other fire spell (Fireball, the rest of the bolt/burst family)
+// keeps the shared impact_fire.
 const IMPACT_ABILITY_CUES: Partial<Record<string, SfxId>> = {
   scorch: 'scorch',
   pyroblast: 'pyroblast',

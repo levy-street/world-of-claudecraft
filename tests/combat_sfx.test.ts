@@ -472,6 +472,20 @@ describe('combat SFX policy', () => {
     ).toBe('impact_bone');
   });
 
+  it("does not replay Throat Wire's recording on its bleed ticks (garrote is a hybrid)", () => {
+    // Garrote IS in IMPACT_ABILITY_CUES (its direct hit plays the recording),
+    // and its bleed aura shares the ability id, so the only thing keeping the
+    // recording off the 18s tick train is that combat/auras.ts deliberately
+    // emits tick damage events with NO abilityId. Pin the tick shape here: a
+    // label-only garrote event resolves the shared material impact.
+    expect(
+      impactCueForDamage(
+        damage({ school: 'physical', ability: 'Throat Wire' }),
+        target('mob', 'crypt_shambler'),
+      ),
+    ).toBe('impact_bone');
+  });
+
   it('gives Rupture its own cue once, on the dotApply moment', () => {
     expect(
       spellFxCue({

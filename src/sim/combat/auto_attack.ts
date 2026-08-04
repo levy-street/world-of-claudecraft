@@ -540,6 +540,8 @@ export function meleeSwing(
     true,
     false,
     false,
+    // Cue-presentation only on this path: onSpellCrit skips the physical
+    // school, so the id can never newly arm an ability-filtered proc here.
     opts.abilityId ?? null,
   );
   opts.onDealt?.(resolvedAmount);

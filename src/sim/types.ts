@@ -3955,9 +3955,13 @@ export type SimEvent = { pid?: number } & (
       // playerSwingCueForDamage's 'Auto Shot' check): a display-only rename
       // must never break a client-side lookup keyed off it, the way
       // IMPACT_ABILITY_CUES (src/ui/combat_sfx.ts) was before this field
-      // existed. Not populated by every dealDamage caller (only the sites
-      // that already pass abilityId through for talent-proc filtering), so
-      // client code must fall back to school/material when this is absent.
+      // existed. Populated only for the PRIMARY direct hit: auto-attacks,
+      // DoT ticks, and echoed or fanned-out copies (Power Echo, Bladed Echo,
+      // Sweeping Strikes) deliberately omit it, so a dedicated impact cue
+      // fires once where the ability lands and never replays per tick or
+      // per extra target (a hybrid's dot shares the ability id: Throat
+      // Wire's bleed is aura id 'garrote'). Client code must fall back to
+      // school/material when this is absent.
       abilityId?: string | null;
       kind: DamageEventKind;
       absorbed?: number;

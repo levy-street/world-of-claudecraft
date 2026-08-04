@@ -510,6 +510,10 @@ export function runEffects(
                 ability: ability.id,
               });
               scheduleProjectile(ctx, p, target, (src, tgt) => {
+                // The echoed copy deliberately carries no abilityId: the copy
+                // keeps the shared school impact (one dedicated recording per
+                // cast), and threading the id here would ALSO route the echo
+                // hit through ability-filtered spellCrit procs a second time.
                 ctx.dealDamage(
                   src,
                   tgt,
