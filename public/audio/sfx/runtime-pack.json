@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "590675c4d798c16ffe95be6817bb7fb5d2b4eeb315a867ef4a2a1272400bd512",
-  "catalogHash": "b7322d294551460f16c3a3a593e6d390fd5cd8795df975abcad2e6d3759a29d1",
+  "bundleId": "0d4309c412dd71d337d937308ae72b5a088d58c749af98786c6dbd24e3285a0b",
+  "catalogHash": "e3f813a937843693097219af1277df5b80097f55d66d08901756e043440bc9cf",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -122,6 +122,18 @@
         }
       ],
       "gain": 1,
+      "playbackRate": 1
+    },
+    "arcane_blast": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/arcane_blast.mp3?v=1000eafc3c93",
+          "bytes": 29509,
+          "sha256": "1000eafc3c9389c456828d982db3db49e5eda4ec0dacc4c57170b99e7fb0fd9a"
+        }
+      ],
+      "gain": 1.995262,
       "playbackRate": 1
     },
     "blind": {

@@ -54,6 +54,7 @@ const IMPACT_ABILITY_CUES: Partial<Record<string, SfxId>> = {
   pyroblast: 'pyroblast',
   frozen_orb: 'frozen_orb',
   glacial_spike: 'glacial_spike',
+  arcane_surge: 'arcane_blast',
 };
 
 // A landed cc (stun/root/incapacitate) has no recording by default (see

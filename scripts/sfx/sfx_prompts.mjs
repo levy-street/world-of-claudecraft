@@ -473,6 +473,10 @@ export const SFX = [
     key: 'blink',
     custom: true,
   },
+  {
+    key: 'arcane_blast',
+    custom: true,
+  },
 
   // --- Heals & auras --------------------------------------------------------
   {

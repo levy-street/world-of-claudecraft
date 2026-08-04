@@ -394,6 +394,22 @@ describe('combat SFX policy', () => {
     ).toBe('impact_frost');
   });
 
+  it('gives Aether Surge (arcane_surge) the arcane_blast cue instead of the shared impact_arcane', () => {
+    expect(
+      impactCueForDamage(
+        damage({ school: 'arcane', ability: 'arcane_surge' }),
+        target('mob', 'crypt_shambler'),
+      ),
+    ).toBe('arcane_blast');
+    // Every other arcane spell keeps the shared impact_arcane.
+    expect(
+      impactCueForDamage(
+        damage({ school: 'arcane', ability: 'arcane_missiles' }),
+        target('mob', 'crypt_shambler'),
+      ),
+    ).toBe('impact_arcane');
+  });
+
   it('gives Blink its own teleport cue; Shadowstep (same blinkForward effect) stays silent', () => {
     expect(
       spellFxCue({
