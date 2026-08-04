@@ -245,10 +245,14 @@ export class MeterData {
         return;
       }
     }
-    this.endEncounter(now);
+    this.endEncounter();
   }
 
-  endEncounter(now: number): void {
+  // Takes no clock: a closed segment's duration ends at the LAST ACTIVITY, not
+  // at the moment the idle sweep noticed, so the trailing quiet window never
+  // inflates it. (The parameter was vestigial and unread; dropping it is what
+  // the changed-files lint gate wanted once this file was touched.)
+  endEncounter(): void {
     const enc = this.current;
     if (!enc) return;
     this.current = null;

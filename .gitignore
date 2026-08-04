@@ -45,7 +45,7 @@ tmp/
 # public/ copy (the whole client build dies in prepare-out-dir).
 public/models/sfx-studio-security-*.glb
 # PR-assist screenshot tour output + its CI-only ephemerals
-pr-shots/
+pr-shots*/
 pr.diff
 .devpid
 .codex-research/
