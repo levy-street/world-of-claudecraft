@@ -21,6 +21,7 @@ import {
 import { Sim } from '../src/sim/sim';
 import { applyResurrectionSickness, applyUnstuckSickness } from '../src/sim/spirit';
 import type { Aura, Entity, PlayerClass } from '../src/sim/types';
+import { bareClient } from './helpers/bare_client';
 
 type Ev = { type?: string; text?: string };
 type AnySim = Sim & Record<string, any>;
@@ -100,6 +101,90 @@ describe('the recovery sicknesses carry the undispellable flag', () => {
     const plain = witheringWail(1);
     expect(isPlayerRemovableAura(plain)).toBe(true);
     expect(isDispellableAura(plain, false)).toBe(true);
+  });
+
+  // The cancel arms above ride on isDebuffAura: both sicknesses are negative-value
+  // buff_* auras, so they were already refused as debuffs and those assertions hold
+  // with the flag reverted. A POSITIVE-value buff is the only shape where the
+  // removability term is what decides, so this is the case that actually covers it.
+  it('refuses the cancel on a flagged HELPFUL buff, where the flag is the deciding term', () => {
+    const helpful: Aura = {
+      id: 'test_bound_boon',
+      name: 'Bound Boon',
+      kind: 'buff_ap',
+      remaining: 60,
+      duration: 60,
+      value: 50,
+      sourceId: 1,
+      school: 'holy',
+    };
+    expect(isCancelableAura(helpful)).toBe(true);
+    expect(isCancelableAura({ ...helpful, undispellable: true })).toBe(false);
+    // The client's matching buff-bar affordance is covered beside its own module,
+    // in tests/auras_view.test.ts ("never offers a right-click cancel ...").
+  });
+});
+
+describe('the flag reaches the online client', () => {
+  it('round-trips through the wire as und and back to undispellable', () => {
+    const client = bareClient(1);
+    (client as unknown as { applySnapshot(s: unknown): void }).applySnapshot({
+      ents: [
+        {
+          id: 2,
+          k: 'player',
+          nm: 'Sick',
+          lv: 12,
+          x: 0,
+          y: 0,
+          z: 0,
+          f: 0,
+          hp: 40,
+          mhp: 40,
+          auras: [
+            {
+              id: RESURRECTION_SICKNESS_ID,
+              name: 'Resurrection Sickness',
+              kind: 'buff_allstats_pct',
+              rem: 600,
+              dur: 600,
+              value: RES_SICKNESS_STAT_MULT,
+              school: 'shadow',
+              und: 1,
+            },
+          ],
+        },
+      ],
+    });
+    const mirrored = client.entities.get(2)?.auras.find((a) => a.id === RESURRECTION_SICKNESS_ID);
+    expect(mirrored?.undispellable).toBe(true);
+    expect(isPlayerRemovableAura(mirrored as Aura)).toBe(false);
+  });
+
+  it('leaves an ordinary aura unflagged when the server omits und', () => {
+    const client = bareClient(1);
+    (client as unknown as { applySnapshot(s: unknown): void }).applySnapshot({
+      ents: [
+        {
+          id: 3,
+          k: 'player',
+          nm: 'Well',
+          lv: 12,
+          x: 0,
+          y: 0,
+          z: 0,
+          f: 0,
+          hp: 40,
+          mhp: 40,
+          auras: [
+            { id: 'test_buff', name: 'Test Buff', kind: 'buff_ap', rem: 30, dur: 30, value: 5 },
+          ],
+        },
+      ],
+    });
+    const mirrored = client.entities.get(3)?.auras.find((a) => a.id === 'test_buff');
+    expect(mirrored?.undispellable).toBeUndefined();
+    expect(isPlayerRemovableAura(mirrored as Aura)).toBe(true);
   });
 });
 
@@ -226,6 +311,22 @@ describe('the sickness drain survives every counter', () => {
     expect(p.maxHp).toBe(sickened);
     expect(sicknessAura(p, 'resurrection').value).toBe(RES_SICKNESS_STAT_MULT);
   });
+
+  // Persistence stores only the remaining seconds and restores through the same
+  // applySickness funnel, so the flag cannot be lost across a relog by construction.
+  // This pins that construction: a future refactor that rebuilds the aura literal at
+  // the restore site instead of calling applySickness fails here.
+  it.each(['resurrection', 'unstuck'] as const)(
+    'restores %s sickness flagged when a saved remaining is replayed',
+    (which) => {
+      const { sim, p } = rig('mage', 'mag_r8_warded');
+      const restore = which === 'resurrection' ? applyResurrectionSickness : applyUnstuckSickness;
+      restore(sim.ctx, p, 42);
+      const aura = sicknessAura(p, which);
+      expect(aura.remaining).toBe(42);
+      expect(aura.undispellable).toBe(true);
+    },
+  );
 
   it('refuses the right-click cancel a player could try on the buff bar', () => {
     const { sim, p } = rig('mage', 'mag_r8_warded');
