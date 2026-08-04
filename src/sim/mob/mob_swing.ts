@@ -35,6 +35,7 @@ import {
   normAngle,
 } from '../types';
 import { applyBroodBurn } from './dragonkin_brood';
+import { RIFT_CLEAVE_HALF_ARC, riftEscapeWindowActive } from './rift_escape_window';
 
 // A "Devour Magic"-strippable beneficial enhancement: a positive buff_* stat
 // buff, a heal-over-time, an absorb shield, or a weapon imbue. Stances, forms,
@@ -112,12 +113,22 @@ export function runMobSwingAffixes(
   // Cleave: the swing splashes onto other players standing near the primary
   // target, each taking the hit reduced by their own armor. Hostile mobs only,
   // so a friendly pet swinging through mobSwing never cleaves its owner's party.
+  // On a rift-stamped boss the splash is a FRONTAL arc measured from the boss's
+  // facing (the Nythraxis Gravebreaker arc, so melee standing behind the boss
+  // can play the fight: the 2026-08-04 Warlord Grask feedback); every unstamped
+  // carrier keeps the shipped radial splash (mob_cleave.test.ts pins it).
   const cleave = MOBS[mob.templateId]?.cleave;
   if (cleave && mob.hostile && !mob.dead) {
+    const frontalOnly = (mob.riftMechanicSpacing ?? 0) > 0;
     for (const meta of ctx.players.values()) {
       const pe = ctx.entities.get(meta.entityId);
       if (!pe || pe.dead || pe.id === target.id) continue;
       if (dist2d(pe.pos, target.pos) > cleave.radius) continue;
+      if (
+        frontalOnly &&
+        Math.abs(normAngle(angleTo(mob.pos, pe.pos) - mob.facing)) > RIFT_CLEAVE_HALF_ARC
+      )
+        continue;
       let sd = rawDmg * cleave.mult;
       sd *= 1 - mobArmorReduction(mob, pe, ctx.effectiveArmor(pe));
       ctx.dealDamage(
@@ -485,13 +496,21 @@ export function runMobSwingAffixes(
   // Ensnare: a landed hit may web the victim in place (root). Hostile mobs only
   // (a friendly pet shares this swing path) and only roots players — `applyRootAura`
   // applies crowd-control DR so repeated webs from the same mob shrink and break.
+  // Escape-window suppression (here and on the stun/knockback/fear procs
+  // below): while a rift-stamped boss has a telegraph in flight the players are
+  // being asked to MOVE, so a movement/control proc landing then would eat the
+  // window the telegraph promised (rift_escape_window.ts). The rng roll is
+  // still DRAWN before the window check, so the stream position of every
+  // downstream draw is untouched (the mechanicDamageMult after-the-draw
+  // precedent); only the effect is skipped, and only on stamped bosses.
   const ensnare = MOBS[mob.templateId]?.ensnare;
   if (
     ensnare &&
     mob.hostile &&
     target.kind === 'player' &&
     !target.dead &&
-    ctx.rng.chance(ensnare.chance)
+    ctx.rng.chance(ensnare.chance) &&
+    !riftEscapeWindowActive(ctx, mob)
   ) {
     ctx.applyRootAura(
       mob,
@@ -512,7 +531,9 @@ export function runMobSwingAffixes(
     mob.hostile &&
     target.kind === 'player' &&
     !target.dead &&
-    ctx.rng.chance(stunOnHit.chance)
+    ctx.rng.chance(stunOnHit.chance) &&
+    // escape window: roll drawn, control effect skipped (see ensnare above)
+    !riftEscapeWindowActive(ctx, mob)
   ) {
     ctx.applyAura(target, {
       id: `stun_${mob.templateId}`,
@@ -536,7 +557,9 @@ export function runMobSwingAffixes(
     mob.hostile &&
     target.kind === 'player' &&
     !target.dead &&
-    ctx.rng.chance(knockback.chance)
+    ctx.rng.chance(knockback.chance) &&
+    // escape window: roll drawn, shove skipped (see ensnare above)
+    !riftEscapeWindowActive(ctx, mob)
   ) {
     // Keep the chance draw unconditional for parity draw-order stability.
     // applyKnockback applies target.knockbackResistance itself, so pass raw distance.
@@ -751,8 +774,16 @@ export function runMobSwingAffixes(
     });
   }
   // On-hit chill: frost-touched mobs numb the victim, slowing their movement.
+  // A movement slow eats an escape window as hard as a root, so it takes the
+  // same roll-then-skip suppression as ensnare above.
   const chill = MOBS[mob.templateId]?.chillOnHit;
-  if (chill && !mob.dead && !target.dead && ctx.rng.chance(chill.chance)) {
+  if (
+    chill &&
+    !mob.dead &&
+    !target.dead &&
+    ctx.rng.chance(chill.chance) &&
+    !riftEscapeWindowActive(ctx, mob)
+  ) {
     ctx.applyAura(target, {
       id: `${mob.templateId}_chill`,
       name: chill.name,
@@ -796,17 +827,23 @@ export function runMobSwingAffixes(
   ) {
     const remaining = ctx.diminishedCrowdControlDuration(mob, target, 'fear', dread.duration);
     if (remaining !== null) {
-      ctx.applyAura(target, {
-        id: 'fear_incap',
-        name: dread.name,
-        kind: 'incapacitate',
-        remaining,
-        duration: remaining,
-        value: ctx.rng.range(-Math.PI, Math.PI),
-        sourceId: mob.id,
-        school: dread.school ?? 'shadow',
-        breaksOnDamage: true,
-      });
+      // Unlike the other suppressed procs, this body carries a SECOND draw
+      // (the flee heading), so the escape-window check sits after BOTH draws:
+      // a suppressed fear must consume exactly the rng a landed one would.
+      const heading = ctx.rng.range(-Math.PI, Math.PI);
+      if (!riftEscapeWindowActive(ctx, mob)) {
+        ctx.applyAura(target, {
+          id: 'fear_incap',
+          name: dread.name,
+          kind: 'incapacitate',
+          remaining,
+          duration: remaining,
+          value: heading,
+          sourceId: mob.id,
+          school: dread.school ?? 'shadow',
+          breaksOnDamage: true,
+        });
+      }
     }
   }
   // Polymorph hex: a landed hit can briefly turn the victim into a critter,
@@ -824,7 +861,9 @@ export function runMobSwingAffixes(
     mob.hostile &&
     target.kind === 'player' &&
     !target.dead &&
-    ctx.rng.chance(hex.chance)
+    ctx.rng.chance(hex.chance) &&
+    // escape window: roll drawn, incap skipped (see ensnare above)
+    !riftEscapeWindowActive(ctx, mob)
   ) {
     const remaining = ctx.diminishedCrowdControlDuration(mob, target, 'polymorph', hex.duration);
     if (remaining !== null) {
@@ -852,7 +891,9 @@ export function runMobSwingAffixes(
     mob.hostile &&
     target.kind === 'player' &&
     !target.dead &&
-    ctx.rng.chance(concuss.chance)
+    ctx.rng.chance(concuss.chance) &&
+    // escape window: roll drawn, stun skipped (see ensnare above)
+    !riftEscapeWindowActive(ctx, mob)
   ) {
     ctx.applyAura(target, {
       id: `concuss_${mob.templateId}`,

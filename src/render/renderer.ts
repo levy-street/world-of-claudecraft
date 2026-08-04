@@ -36,9 +36,7 @@ import type { DelveModuleId } from '../sim/delve_layout';
 import { generateRiftFloor, riftLiftAt } from '../sim/rift/rift_gen';
 import type { BiomeId, ZoneDef } from '../sim/types';
 import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
-import { isAtSowfield } from '../sim/vale_cup_layout';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
-import { attachAvatarFallback } from '../ui/avatar_fallback';
 import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
@@ -78,6 +76,11 @@ import {
   CHARACTER_EFFECT_SOUL_REND,
   hasCharacterEffect,
 } from './character_effects_core';
+import {
+  characterPresentationCasting,
+  nextRecklessnessSkullsLatch,
+  shouldRunCharacterPresentationWork,
+} from './character_presentation_core';
 import { characterViewOutsideHysteresis } from './character_view_core';
 import {
   type AnimState,
@@ -121,8 +124,6 @@ import {
   animCadenceFrames,
   type CharacterLodBands,
   characterLodBandsInto,
-  crowdLodScaleSq,
-  midAnimCadence,
   showsStaticFarMesh,
 } from './crowd_lod';
 import { daisVisualLift } from './dais_lift';
@@ -155,7 +156,6 @@ import {
 } from './dynamic_resolution_core';
 import { buildEastbrookTownView, type EastbrookTownView } from './eastbrook_town';
 import { buildEmberFeatures, type EmberFeaturesView } from './ember_features';
-import { objectDisplayName } from './entity_labels';
 import { resolveEnvironmentPrefilterPlan } from './env_prefilter_core';
 import {
   createEnvironmentMapTransition,
@@ -240,7 +240,6 @@ import { buildMailboxPillar } from './mailbox';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
 import { mountBobY, mountVisualSpec } from './mount_visuals';
-import { COMBO_PIP_MAX } from './nameplate_combo';
 import { NameplatePainter } from './nameplate_painter';
 import {
   isProjectedNameplateAnchorVisible,
@@ -898,61 +897,6 @@ export interface EntityView {
   liveScale: number;
   /** what removeView pulls back out of clickTargets */
   clickTarget: THREE.Object3D;
-  nameplate: HTMLDivElement;
-  nameEl: HTMLDivElement;
-  titleEl: HTMLDivElement; // Book of Deeds title subtitle (players only)
-  guildEl: HTMLDivElement; // <Guild> tag under the name (players only)
-  hpBar: HTMLDivElement;
-  hpFill: HTMLDivElement;
-  emoteEl: HTMLDivElement;
-  emoteIconEl: HTMLImageElement;
-  emoteLabelEl: HTMLSpanElement;
-  markerEl: HTMLDivElement;
-  castBar: HTMLDivElement; // overhead spell cast/channel bar, below the hp bar
-  castFill: HTMLDivElement;
-  castLabel: HTMLDivElement;
-  raidMarkEl: HTMLDivElement; // party raid/target marker, above the name
-  comboRow: HTMLDivElement; // rogue/druid combo-point pips, above the name
-  comboPips: HTMLDivElement[]; // the COMBO_PIP_MAX pip cells, lit left-to-right
-  nameplateDisplay: string;
-  nameplateTransform: string;
-  nameplateScreenX: number;
-  nameplateScreenY: number;
-  nameplateSig: string;
-  nameplateStaticName: string;
-  nameplateStaticColor: string | null;
-  nameplateStaticHpDisplay: string;
-  nameplateStaticMarker: string;
-  nameplateStaticMarkerClass: string;
-  nameplateStaticOpacity: string;
-  nameplateStaticFrame: string;
-  nameplateStaticGuild: string;
-  nameplateStaticDevOutline: string | null;
-  nameplateStaticAi: boolean;
-  nameplateStaticI18nRevision: number;
-  /** Bitset of the last-applied combat-state classes, for per-frame write elision. */
-  nameplateStateMask: number;
-  /** Last-applied friendly-pet class, diffed separately from the combat-state bitset. */
-  nameplateFriendlyPet: boolean;
-  nameplateHpWidth: string;
-  nameplateHp: number;
-  nameplateMaxHp: number;
-  titleSig: string; // cheap-diff for the deed-title subtitle (i18n revision|deed id)
-  nameplateTitleId: string;
-  nameplateTitleI18nRevision: number;
-  comboSig: string; // cheap-diff for the combo pip row
-  nameplateComboCount: number;
-  tierEl: HTMLImageElement; // $WOC holder-tier flair badge (other players)
-  tierValue: number; // last-applied holderTier, to diff cheaply
-  devTierEl: HTMLImageElement; // developer-badge flair badge (other players)
-  devTierValue: number; // last-applied devTier, to diff cheaply
-  discordEl: HTMLImageElement; // linked-Discord PFP next to the name (other players)
-  discordAvatarSig: string; // last-applied discord avatar URL, to diff cheaply
-  aiEl: HTMLSpanElement; // operator-set [AI] account tag, inline before the name
-  levelEl: HTMLSpanElement; // mob level badge (e.g. "[5]"), inline before the name; hidden for non-mobs
-  levelSig: string; // cheap-diff for the level badge (levelText|color)
-  nameplateLevelText: string;
-  nameplateLevelColor: string;
   sparkle?: THREE.Sprite; // ground objects
   objectMesh?: THREE.Object3D;
   objectPoolKey: string | null;
@@ -983,7 +927,7 @@ export interface EntityView {
   // form's root, cleared via settlePendingSwap, is enough. See #2571.
   formCompilePending: THREE.Object3D | null;
   lastOverheadEmoteKey: string | null;
-  recklessOn?: boolean;
+  recklessSkullsSpawned?: boolean;
   // render-space position last frame, for true u/s locomotion speed
   lastX: number;
   lastZ: number;
@@ -1244,7 +1188,6 @@ export class Renderer {
   // Travel-form speed-illusion overlay (presentation only; see travel_speed_fx*).
   private travelSpeedFx: TravelSpeedFxPainter;
   private nameplatePainter: NameplatePainter;
-  private readonly nameplateBatch = document.createDocumentFragment();
   // Last local-player XZ, to derive ground speed for the speed cue (yd/s).
   private lastLocalPos: { x: number; z: number } | null = null;
   // Cached prefers-reduced-motion query. `.matches` stays live as the OS setting
@@ -1935,6 +1878,7 @@ export class Renderer {
       views: this.views,
       camera: this.camera,
       world: this.sim,
+      layer: this.nameplateLayer,
       getViewport: () => this.viewport,
       showNameplates: () => this.showNameplates,
       showDevBadges: () => this.showDevBadges,
@@ -2824,6 +2768,13 @@ export class Renderer {
     this.clickTargets.length = 0;
     this.gatherNodeMeshes = [];
     this.viewLights.length = 0;
+    // The nameplate painter owns the shared canvas and a document.fonts
+    // listener; dispose it before clearing the layer so the listener never
+    // outlives the renderer. Optional-chained like the siblings above because
+    // the painter is built inside the constructor's guarded try, AFTER the
+    // WebGL2 checks that can throw: the partial-construction cleanup arm
+    // reaches here with it still unset.
+    bestEffort(() => this.nameplatePainter?.dispose());
     // The layer is renderer-owned. Clearing it catches a pending DocumentFragment
     // batch or any renderer DOM surface added after the explicit maps above.
     bestEffort(() => this.nameplateLayer.replaceChildren());
@@ -4253,28 +4204,20 @@ export class Renderer {
     if (into.length < VIEW_CREATED_TYPE_SAMPLE_LIMIT) into.push(this.createdViewType(e));
   }
 
-  private createRequiredView(
-    id: number | null,
-    createdViewTypes: string[],
-    nameplateParent: ParentNode,
-  ): number {
+  private createRequiredView(id: number | null, createdViewTypes: string[]): number {
     if (id === null) return 0;
     const e = this.sim.entities.get(id);
     if (!e || this.views.has(e.id)) return 0;
     if (!this.viewCreateRetry.canAttempt(e.id, 'view', performance.now())) return 0;
-    this.createView(e, nameplateParent);
+    this.createView(e);
     this.sampleCreatedViewType(createdViewTypes, e);
     return 1;
   }
 
-  private createRequiredViews(
-    player: Entity,
-    createdViewTypes: string[],
-    nameplateParent: ParentNode = this.nameplateLayer,
-  ): number {
+  private createRequiredViews(player: Entity, createdViewTypes: string[]): number {
     return (
-      this.createRequiredView(player.id, createdViewTypes, nameplateParent) +
-      this.createRequiredView(player.targetId, createdViewTypes, nameplateParent)
+      this.createRequiredView(player.id, createdViewTypes) +
+      this.createRequiredView(player.targetId, createdViewTypes)
     );
   }
 
@@ -4332,7 +4275,6 @@ export class Renderer {
     limit: number,
     createdViewTypes: string[],
     deadlineMs = Infinity,
-    nameplateParent: ParentNode = this.nameplateLayer,
   ): number {
     const max = Math.max(0, Math.floor(limit));
     let created = 0;
@@ -4343,7 +4285,7 @@ export class Renderer {
       // a recent failed build (assets unavailable) sits out its cooldown so it
       // cannot burn a budget slot every frame
       if (!this.viewCreateRetry.canAttempt(e.id, 'view', performance.now())) continue;
-      this.createView(e, nameplateParent);
+      this.createView(e);
       this.sampleCreatedViewType(createdViewTypes, e);
       created++;
     }
@@ -6690,7 +6632,7 @@ export class Renderer {
     return group;
   }
 
-  private createView(e: Entity, nameplateParent: ParentNode = this.nameplateLayer): void {
+  private createView(e: Entity): void {
     const group = new THREE.Group();
     setRenderCategory(group, `entity:${e.kind}`);
     let visual: CharacterVisual | null = null;
@@ -6947,112 +6889,6 @@ export class Renderer {
     this.scene.add(group);
     if (!isQuestVision) this.clickTargets.push(clickTarget);
 
-    // nameplate
-    const np = document.createElement('div');
-    np.className = 'nameplate';
-    np.style.display = 'none';
-    const emoteEl = document.createElement('div');
-    emoteEl.className = 'np-emote';
-    emoteEl.style.display = 'none';
-    const emoteIconEl = document.createElement('img');
-    emoteIconEl.className = 'np-emote-icon';
-    emoteIconEl.alt = '';
-    const emoteLabelEl = document.createElement('span');
-    emoteLabelEl.className = 'np-emote-label';
-    emoteEl.append(emoteIconEl, emoteLabelEl);
-    const raidMark = document.createElement('div');
-    raidMark.className = 'np-raidmark';
-    raidMark.style.display = 'none';
-    // combo-point pips (rogue/druid): hidden until the local player builds
-    // points on this entity; lit left-to-right as they accumulate
-    const comboRow = document.createElement('div');
-    comboRow.className = 'np-combo';
-    comboRow.style.display = 'none';
-    const comboPips: HTMLDivElement[] = [];
-    for (let i = 0; i < COMBO_PIP_MAX; i++) {
-      const pip = document.createElement('div');
-      pip.className = 'np-combo-pip';
-      comboRow.appendChild(pip);
-      comboPips.push(pip);
-    }
-    const marker = document.createElement('div');
-    marker.className = 'np-marker';
-    const tierEl = document.createElement('img');
-    tierEl.className = 'np-tier';
-    tierEl.alt = '';
-    tierEl.style.display = 'none';
-    // developer-badge flair, shown inline before the name for other players
-    const devTierEl = document.createElement('img');
-    devTierEl.className = 'np-dev-tier';
-    devTierEl.alt = '';
-    devTierEl.style.display = 'none';
-    // linked-Discord PFP, shown inline before the name for other players
-    const discordEl = document.createElement('img');
-    discordEl.className = 'np-discord';
-    discordEl.alt = '';
-    discordEl.referrerPolicy = 'no-referrer';
-    discordEl.style.display = 'none';
-    // The avatar is the one nameplate image sourced from an external URL (Discord's
-    // CDN); if it fails to load, hide it rather than leave the browser's broken-image
-    // placeholder on the plate. Attached once here; the element is reused per entity.
-    attachAvatarFallback(discordEl);
-    // operator-set AI-account tag, inline before the name. A SEPARATE span, never a
-    // restyled .np-name: the name's black text-shadow is what keeps it legible over
-    // bright terrain, and the tag's background-clip: text cannot coexist with it.
-    // Keeping them apart also lets an AI account who is also Discord staff keep its
-    // role colour on the name. Hidden by CSS until the painter toggles .ai-tag on.
-    const aiEl = document.createElement('span');
-    aiEl.className = 'np-ai';
-    // Mob level badge (e.g. "[5]" / "[5+]"), displayed inline to the left of the
-    // name. Gets the con (difficulty) color from the painter; the name stays white.
-    // Hidden for all non-mob entity kinds (players, NPCs, objects).
-    const levelEl = document.createElement('span');
-    levelEl.className = 'np-level';
-    levelEl.style.display = 'none';
-    const nameEl = document.createElement('div');
-    nameEl.className = 'np-name';
-    nameEl.textContent = e.kind === 'object' ? objectDisplayName(e) : e.name;
-    // Book of Deeds title subtitle under the name (players only); hidden
-    // until the entity's `title` wire field resolves to real text
-    const titleEl = document.createElement('div');
-    titleEl.className = 'np-title';
-    titleEl.style.display = 'none';
-    // guild tag under the name (players in a guild); hidden until set
-    const guildEl = document.createElement('div');
-    guildEl.className = 'np-guild';
-    guildEl.style.display = 'none';
-    const hpBar = document.createElement('div');
-    hpBar.className = 'np-hpbar';
-    const hpFill = document.createElement('div');
-    hpFill.className = 'np-hpfill';
-    hpBar.appendChild(hpFill);
-    // overhead cast bar: hidden until the entity starts casting/channeling
-    const castBar = document.createElement('div');
-    castBar.className = 'np-castbar';
-    castBar.style.display = 'none';
-    const castFill = document.createElement('div');
-    castFill.className = 'np-castfill';
-    const castLabel = document.createElement('div');
-    castLabel.className = 'np-castlabel';
-    castBar.append(castFill, castLabel);
-    np.append(
-      emoteEl,
-      raidMark,
-      comboRow,
-      marker,
-      tierEl,
-      devTierEl,
-      discordEl,
-      aiEl,
-      levelEl,
-      nameEl,
-      titleEl,
-      guildEl,
-      hpBar,
-      castBar,
-    );
-    nameplateParent.appendChild(np);
-
     // Object views gate their own casters. Character shadows live in visual,
     // while separately composed accessories use this same distance gate.
     const objectCasters: THREE.Object3D[] = [];
@@ -7089,64 +6925,11 @@ export class Renderer {
       mageBarrierVisual: null,
       height,
       clickTarget,
-      nameplate: np,
-      nameEl,
-      titleEl,
-      guildEl,
-      hpBar,
-      hpFill,
-      emoteEl,
-      emoteIconEl,
-      emoteLabelEl,
-      markerEl: marker,
-      raidMarkEl: raidMark,
-      comboRow,
-      comboPips,
-      castBar,
-      castFill,
-      castLabel,
-      tierEl,
-      devTierEl,
-      discordEl,
-      aiEl,
-      levelEl,
       sparkle,
       objectMesh,
       objectPoolKey,
       builtTemplateId: e.kind === 'object' ? e.templateId : undefined,
       portal,
-      nameplateDisplay: 'none',
-      nameplateTransform: '',
-      nameplateScreenX: Number.NaN,
-      nameplateScreenY: Number.NaN,
-      nameplateSig: '',
-      nameplateStaticName: '',
-      nameplateStaticColor: null,
-      nameplateStaticHpDisplay: '',
-      nameplateStaticMarker: '',
-      nameplateStaticMarkerClass: '',
-      nameplateStaticOpacity: '',
-      nameplateStaticFrame: '',
-      nameplateStaticGuild: '',
-      nameplateStaticDevOutline: null,
-      nameplateStaticAi: false,
-      nameplateStaticI18nRevision: 0,
-      nameplateStateMask: 0,
-      nameplateFriendlyPet: false,
-      nameplateHpWidth: '',
-      nameplateHp: Number.NaN,
-      nameplateMaxHp: Number.NaN,
-      titleSig: '',
-      nameplateTitleId: '',
-      nameplateTitleI18nRevision: 0,
-      comboSig: '',
-      nameplateComboCount: -1,
-      tierValue: 0,
-      devTierValue: 0,
-      discordAvatarSig: '',
-      levelSig: '',
-      nameplateLevelText: '',
-      nameplateLevelColor: '',
       objectCasters,
       viewLights,
       shadowOn: true,
@@ -7277,9 +7060,9 @@ export class Renderer {
     const priorVisibility = group.visible;
     view.compilePending = true;
     group.visible = false;
-    // The DOM nameplate, target marker, health, and cast bar remain available
-    // while the 3D group is gated, so actionable information has an immediate
-    // placeholder without first-drawing a still-linking shader.
+    // The canvas nameplate (name, target marker, health, and cast bar) keeps
+    // painting while the 3D group is gated, so actionable information has an
+    // immediate placeholder without first-drawing a still-linking shader.
     return this.compileGate(group).then(
       () => {
         if (!this.shutdownStarted && generation === this.lifecycleGeneration) {
@@ -8317,7 +8100,7 @@ export class Renderer {
       }
       this.lightRankDirty = true;
     }
-    v.nameplate.remove();
+    this.nameplatePainter.remove(id);
     const idx = this.clickTargets.indexOf(v.clickTarget);
     if (idx >= 0) this.clickTargets.splice(idx, 1);
     if (v.visual) {
@@ -8493,20 +8276,15 @@ export class Renderer {
     );
     phaseStart = this.markRendererPhase(framePhaseMs, 'setup', phaseStart);
 
-    // dynamic worlds: create nearby views lazily and drop views for leavers or
-    // entities that moved well outside the draw band. This avoids building
-    // rig/nameplate DOM for the whole sim on the first rendered frame.
-    createdViews += this.createRequiredViews(p, createdViewTypes, this.nameplateBatch);
+    // Dynamic worlds create nearby views lazily and drop views for leavers or
+    // entities that moved well outside the draw band.
+    createdViews += this.createRequiredViews(p, createdViewTypes);
     this.collectMissingViewCandidates(p, this.entityViewCreateRangeSq, false);
     createdViews += this.createCandidateViews(
       this.runtimeViewCreateBudget(dt),
       createdViewTypes,
       Infinity,
-      this.nameplateBatch,
     );
-    if (this.nameplateBatch.childNodes.length > 0) {
-      this.nameplateLayer.appendChild(this.nameplateBatch);
-    }
     this.doomedIds.length = 0;
     for (const id of this.views.keys()) {
       const e = sim.entities.get(id);
@@ -8628,6 +8406,15 @@ export class Renderer {
       const _stealthed = hasStealth;
       const hasSoulRend = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_SOUL_REND);
       const hasRecklessness = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_RECKLESSNESS);
+      const visuallyDead = isVisuallyDead(e) && !e.ghost;
+      const waterJetVisualChannel = this.waterJetVisualChannels.has(e.id);
+      // This is the final render-side casting state, including Water Jet's
+      // spellfx-driven channel. It feeds both the rig and the fairness carve-out.
+      const characterCasting = characterPresentationCasting(
+        e.castingAbility,
+        waterJetVisualChannel,
+        visuallyDead,
+      );
       // Pose carries information the player acts on (own feedback, the read on
       // the current target, pet combat, a cast windup telegraph) rather than
       // mere cosmetic smoothness: such an entity is exempt from BOTH the cadence
@@ -8639,7 +8426,7 @@ export class Renderer {
         id,
         p.id,
         p.targetId,
-        e.castingAbility,
+        characterCasting,
         e.inCombat,
         e.ownerId,
         combatTargetId,
@@ -8860,43 +8647,49 @@ export class Renderer {
         continue;
       }
       if (!v.visual) continue;
-      v.iceBlockVisual = syncIceBlockVisual(v.iceBlockVisual, v.group, v.height, hasIceBlock, dt);
-      v.temporalHourglassVisual = syncTemporalHourglassVisual(
-        v.temporalHourglassVisual,
-        v.group,
-        temporalHourglassMode,
-        dt,
-        v.height,
-      );
-      v.frostNovaRootVisual = syncFrostNovaRootVisual(
-        v.frostNovaRootVisual,
-        v.group,
-        v.height,
-        hasFrostNovaRoot,
-        dt,
-      );
-      v.mageBarrierVisual = syncMageBarrierVisual(
-        v.mageBarrierVisual,
-        v.group,
-        v.height,
-        mageBarrierState,
-        dt,
-      );
-      const iceBlockActivated = v.iceBlockVisual?.activatedThisFrame === true;
-
-      this.updateBaseVisual(e, v);
-      if (!v.visual) continue;
-      if (iceBlockActivated) this.activeVisual(v)?.playEmote('wave', 1);
-
-      // off-screen rigs still need their pose/audio updated, but not their draws.
-      // Decide visibility now from the real world position; applied at the end so
-      // the rest of the per-entity work (animation, footstep audio) is unaffected.
+      // Decide visibility from the real world position before presentation work.
+      // Audio and state derivation below remain active even for hidden actors.
       let charOnScreen = true;
       if (this.cullCharacters && id !== p.id) {
         this.cullSphere.center.set(x, y + v.height * 0.5 * e.scale, z);
         this.cullSphere.radius = (v.height * 0.7 + 1.5) * e.scale;
         charOnScreen = this.cullFrustum.intersectsSphere(this.cullSphere);
       }
+      const runCharacterPresentation = shouldRunCharacterPresentationWork(
+        charOnScreen,
+        actionablePose,
+      );
+
+      let iceBlockActivated = false;
+      if (runCharacterPresentation) {
+        v.iceBlockVisual = syncIceBlockVisual(v.iceBlockVisual, v.group, v.height, hasIceBlock, dt);
+        v.temporalHourglassVisual = syncTemporalHourglassVisual(
+          v.temporalHourglassVisual,
+          v.group,
+          temporalHourglassMode,
+          dt,
+          v.height,
+        );
+        v.frostNovaRootVisual = syncFrostNovaRootVisual(
+          v.frostNovaRootVisual,
+          v.group,
+          v.height,
+          hasFrostNovaRoot,
+          dt,
+        );
+        v.mageBarrierVisual = syncMageBarrierVisual(
+          v.mageBarrierVisual,
+          v.group,
+          v.height,
+          mageBarrierState,
+          dt,
+        );
+        iceBlockActivated = v.iceBlockVisual?.activatedThisFrame === true;
+      }
+
+      this.updateBaseVisual(e, v);
+      if (!v.visual) continue;
+      if (iceBlockActivated) this.activeVisual(v)?.playEmote('wave', 1);
 
       // live skin swap: appearance changed (in-game changer or a multiplayer peer).
       // NOT gated: unlike a base-visual swap, the old rig is not being replaced,
@@ -9141,9 +8934,6 @@ export class Renderer {
         THREE.MathUtils.clamp(loco.speed / 9.8, 0, 1),
         isSelf || !v.isFar,
       );
-      // A released spirit is `dead` but should stand and run, not lie prone, so it
-      // animates as a living figure (only its translucent ghost material marks it).
-      const visuallyDead = isVisuallyDead(e) && !e.ghost;
       // `onGround` is authoritative offline but is never sent in online snapshots
       // (ClientWorld defaults it to true), so for players fall back to deriving the
       // airborne state from foot height vs terrain, keeps the jump pose working in
@@ -9209,7 +8999,7 @@ export class Renderer {
       // gradient is resampled on a cadence (four terrain samples) and damped
       // in between, so a crowd costs a handful of samples per frame, and a
       // body standing on a flat prop top stays upright.
-      if (v.visual && !v.isFar) {
+      if (runCharacterPresentation && v.visual && !v.isFar) {
         v.tiltSampleT -= dt;
         if (v.tiltSampleT <= 0) {
           v.tiltSampleT = TILT_SAMPLE_INTERVAL;
@@ -9238,7 +9028,7 @@ export class Renderer {
       // progress online); the visual poses it by hand, tracking the move's
       // real phase so hands plant when the body reaches the lip whatever the
       // climb's height-scaled duration is.
-      if (v.visual) {
+      if (runCharacterPresentation && v.visual) {
         v.visual.setClimbing(
           !!e.climb || e.climbing === true,
           e.climb ? e.climb.elapsed / e.climb.duration : e.climbProgress,
@@ -9257,8 +9047,7 @@ export class Renderer {
       st.backwards = loco.backwards;
       st.reverseBackpedal = ghostWolf;
       st.dead = visuallyDead;
-      const waterJetVisualChannel = this.waterJetVisualChannels.has(e.id);
-      st.casting = (e.castingAbility !== null || waterJetVisualChannel) && !visuallyDead;
+      st.casting = characterCasting;
       st.spinning =
         st.casting &&
         e.castingAbility !== null &&
@@ -9495,10 +9284,11 @@ export class Renderer {
         const cadence = animCadenceFrames(d2, lodBands);
         animate = cadence <= 1 || (this.frameIdx + e.id) % cadence === 0;
       }
-      active.update(dt, st, animate);
-      // weapon-skin VFX ride the humanoid rig's held weapon; advancing them is a
-      // few uniform writes per handle, so they stay smooth at every LOD tier
-      v.visual.updateWeaponVfx(dt);
+      if (runCharacterPresentation) active.update(dt, st, animate);
+      else active.advanceOffscreen(dt);
+      // Weapon-skin VFX ride the humanoid rig's held weapon. Hidden cosmetic
+      // rigs skip their uniform writes until they return to view.
+      if (runCharacterPresentation) v.visual.updateWeaponVfx(dt);
       // The sheathe swap is deferred to the gesture midpoint, so the rig (and any
       // skin VFX point light on it) is rebuilt inside update(), not at the diff.
       if (v.visual.consumeWeaponGraphDirty()) this.reconcileViewLights(v);
@@ -9517,18 +9307,22 @@ export class Renderer {
         mst.airborne = airborne;
         mst.backwards = st.backwards;
         mst.swimming = st.swimming;
-        v.mountVisual.update(dt, mst, animate);
-        // the rider floats WITH the procedural bob (the hover cycle's idle
-        // float), not just the mount body
-        const bob = mountBobY(mountSpec, this.time, moving);
-        v.mountVisual.root.position.y = bob;
-        v.visual.root.position.y = v.mountLift + bob;
-        // ambient mount particles: the snail paints its slime path while
-        // gliding, the hover cycle streams aether exhaust off its tail
-        if (mountSpec.fx === 'slime') {
-          if (moving) this.vfx.mountSlimeTrail(v.group.position, dt);
-        } else if (mountSpec.fx === 'exhaust') {
-          this.vfx.mountExhaust(v.group.position, facing, dt, moving);
+        if (runCharacterPresentation) {
+          v.mountVisual.update(dt, mst, animate);
+          // the rider floats WITH the procedural bob (the hover cycle's idle
+          // float), not just the mount body
+          const bob = mountBobY(mountSpec, this.time, moving);
+          v.mountVisual.root.position.y = bob;
+          v.visual.root.position.y = v.mountLift + bob;
+          // ambient mount particles: the snail paints its slime path while
+          // gliding, the hover cycle streams aether exhaust off its tail
+          if (mountSpec.fx === 'slime') {
+            if (moving) this.vfx.mountSlimeTrail(v.group.position, dt);
+          } else if (mountSpec.fx === 'exhaust') {
+            this.vfx.mountExhaust(v.group.position, facing, dt, moving);
+          }
+        } else {
+          v.mountVisual.advanceOffscreen(dt);
         }
       }
 
@@ -9561,7 +9355,8 @@ export class Renderer {
           !v.wasMountCasting &&
           e.mountCastKey !== '' &&
           !visuallyDead &&
-          !swimming
+          !swimming &&
+          runCharacterPresentation
         ) {
           active.playCallPose(e.mountCastRemaining);
         }
@@ -9571,48 +9366,57 @@ export class Renderer {
         // which lags async asset loading.
         if (e.mountKey !== v.lastMountKey) {
           v.lastMountKey = e.mountKey;
-          this.vfx.mountSummonGlow(e.id);
+          if (runCharacterPresentation) this.vfx.mountSummonGlow(e.id);
         }
       }
 
       // per-ability windup orb + buff-orbit bands (spec-driven; no-op for
       // entities with no spec'd cast or aura)
-      this.abilityVfx.syncEntity(e);
-      if (st.casting) {
-        this.vfx.castSparkle(
-          e.id,
-          waterJetVisualChannel
-            ? 'frost'
-            : e.castingAbility === 'demon_heal'
-              ? 'shadow'
-              : (ABILITIES[e.castingAbility ?? '']?.school ?? 'arcane'),
-          dt,
-          // per-ability spec color when the casting ability has one
-          this.abilityVfx.sparkleColorFor(e.castingAbility),
-        );
-      }
-      if (hasSoulRend) {
-        this.vfx.castSparkle(e.id, 'shadow', dt * 3.2);
-      }
-      if (hasRecklessness) {
-        this.vfx.recklessFlame(e.id, dt);
-        if (!v.recklessOn) {
-          v.recklessOn = true;
-          this.recklessSkulls.spawn(v.group, active.height * e.scale);
+      const recklessSkullsSpawned = v.recklessSkullsSpawned === true;
+      const nextRecklessSkullsLatch = nextRecklessnessSkullsLatch(
+        hasRecklessness,
+        runCharacterPresentation,
+        recklessSkullsSpawned,
+      );
+      const spawnRecklessnessSkulls = nextRecklessSkullsLatch && !recklessSkullsSpawned;
+      this.abilityVfx.syncEntity(e, runCharacterPresentation);
+      if (runCharacterPresentation) {
+        if (st.casting) {
+          this.vfx.castSparkle(
+            e.id,
+            waterJetVisualChannel
+              ? 'frost'
+              : e.castingAbility === 'demon_heal'
+                ? 'shadow'
+                : (ABILITIES[e.castingAbility ?? '']?.school ?? 'arcane'),
+            dt,
+            // per-ability spec color when the casting ability has one
+            this.abilityVfx.sparkleColorFor(e.castingAbility),
+          );
         }
-      } else if (v.recklessOn) {
-        v.recklessOn = false;
+        if (hasSoulRend) {
+          this.vfx.castSparkle(e.id, 'shadow', dt * 3.2);
+        }
+        if (hasRecklessness) {
+          this.vfx.recklessFlame(e.id, dt);
+          if (spawnRecklessnessSkulls) {
+            this.recklessSkulls.spawn(v.group, active.height * e.scale);
+          }
+        }
+        // Shapeshift-form particle auras riding the tints above: metamorph fire,
+        // moonkin star motes, shadowform gloom wisps. Suppressed for the dead
+        // (the auras themselves drop, but a corpse must not smolder for a frame).
+        if (!e.dead) {
+          if (hasMetamorph) this.vfx.formAura(e.id, 'metamorph', dt);
+          else if (hasMoonkin) this.vfx.formAura(e.id, 'moonkin', dt);
+          else if (hasShadowform) this.vfx.formAura(e.id, 'shadowform', dt);
+        }
+        // The graveyard angel: a soft, constant golden shimmer rising off the Spirit Healer.
+        if (e.templateId === 'spirit_healer') this.vfx.castSparkle(e.id, 'holy', dt * 0.6);
       }
-      // Shapeshift-form particle auras riding the tints above: metamorph fire,
-      // moonkin star motes, shadowform gloom wisps. Suppressed for the dead
-      // (the auras themselves drop, but a corpse must not smolder for a frame).
-      if (!e.dead) {
-        if (hasMetamorph) this.vfx.formAura(e.id, 'metamorph', dt);
-        else if (hasMoonkin) this.vfx.formAura(e.id, 'moonkin', dt);
-        else if (hasShadowform) this.vfx.formAura(e.id, 'shadowform', dt);
-      }
-      // The graveyard angel: a soft, constant golden shimmer rising off the Spirit Healer.
-      if (e.templateId === 'spirit_healer') this.vfx.castSparkle(e.id, 'holy', dt * 0.6);
+      // Preserve the spawn latch while the aura is active and hidden. Camera
+      // re-entry must not replay the skull burst; a real aura end re-arms it.
+      v.recklessSkullsSpawned = nextRecklessSkullsLatch;
 
       // skip the draw for off-screen rigs (pose/audio above already ran)
       if (!charOnScreen) v.group.visible = false;
@@ -10345,6 +10149,13 @@ export class Renderer {
     // context next) leaves the idle-paced far build allocating geometries
     // against a dead renderer and retaining it through the closure.
     this.farTerrainView.cancelStreaming();
+  }
+
+  /** Release host-owned workers, overlay canvases, and document listeners. */
+  dispose(): void {
+    this.cancelTerrainStreaming();
+    this.nameplatePainter.dispose();
+    this.travelSpeedFx.dispose();
   }
 
   /**

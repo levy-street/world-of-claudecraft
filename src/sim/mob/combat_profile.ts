@@ -15,6 +15,7 @@ import { chainPullTransitHoldsLeash, clearChainPullInbound } from './chain_pull_
 import { dragonkinEngageShout } from './dragonkin_brood';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './healer_channel';
 import { chaseStalledUnreachable } from './reachability';
+import { resetRiftMechanicWindups } from './rift_escape_window';
 import { retargetMob, updateMobTarget } from './targeting';
 
 export type MobCombatProfileResult = 'done' | 'runAttackMechanics';
@@ -34,6 +35,9 @@ function startEvadeHome(mob: Entity): void {
   clearThreat(mob);
   mob.leashAnchor = null;
   clearChainPullInbound(mob);
+  // A frozen windup must not detonate mid-walk-home (its ring is long gone);
+  // the full evade reset on arrival clears the rest of the mechanic state.
+  resetRiftMechanicWindups(mob);
   mob.castingAbility = null;
   mob.castTotal = 0;
   mob.castRemaining = 0;

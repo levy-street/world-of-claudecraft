@@ -66,6 +66,7 @@ describe('Renderer lifecycle wiring', () => {
     expect(disposal).toContain('this.removeView(id, true)');
     expect(disposal).toContain('for (const visual of pool) bestEffort(() => visual.dispose())');
     expect(disposal).toContain('this.objectPool.clear()');
+    expect(disposal).toContain('this.nameplatePainter?.dispose()');
     expect(disposal).toContain('this.nameplateLayer.replaceChildren()');
     expect(disposal).toContain('this.scene.clear()');
     expect(disposal).toContain('webgl.setAnimationLoop(null)');
@@ -131,6 +132,7 @@ describe('Renderer lifecycle wiring', () => {
     renderer.clickTargets = [];
     renderer.gatherNodeMeshes = [];
     renderer.viewLights = [];
+    renderer.nameplatePainter = { dispose: () => events.push('nameplates:dispose') };
     renderer.nameplateLayer = {
       replaceChildren: () => events.push('nameplates:clear'),
     };
@@ -144,6 +146,7 @@ describe('Renderer lifecycle wiring', () => {
       'queue:shutdown',
       'view:dispose',
       'pool:dispose',
+      'nameplates:dispose',
       'nameplates:clear',
       'travel:dispose',
       'scene:clear',

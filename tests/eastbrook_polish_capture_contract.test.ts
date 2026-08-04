@@ -373,17 +373,19 @@ describe('Eastbrook polish capture contract', () => {
       // moved, not one pipeline input or geometry value changed, and no capture was
       // retaken: Eastbrook itself is untouched by all of it. Re-minted with
       // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
-      // Re-pinned again at the custom-combat-audio merge. The release retook the
+      // Re-pinned again at the canvas-nameplates merge. The release retook the
       // polish captures, so their metadata and performance JSONs are adopted
-      // verbatim from the base, and it moved the rendererIntegration leaf twice
-      // over (the impostor bake, fog-free vista, and haze band of #2793, then
-      // the Blizzard timed ground loop on the snowZone spellfx arm of #2861).
-      // This branch's own edits to src/render/renderer.ts (the brood
-      // shout/flourish and attackByAbility wiring, then gating that cue on a mob
-      // source) stack on top. Both sides moved the same leaf, so the merged
-      // composite matches neither parent's literal. No GLB source fingerprint
-      // moved and no capture was retaken on this branch.
-      fingerprint: '7fbcf44ee83c4bcac356e19ad20b4ba73d2d1a9703fbf1591b3edb52e6a212c2',
+      // verbatim from the base, and it has now moved the rendererIntegration
+      // leaf four times over (the impostor bake, fog-free vista, and haze band
+      // of #2793, the Blizzard timed ground loop on the snowZone spellfx arm of
+      // #2861, the reactable rift boss mechanics of #2858, and the batched
+      // canvas crowd nameplates of #2789). This branch's own edits to
+      // src/render/renderer.ts (the brood shout/flourish and attackByAbility
+      // wiring, then gating that cue on a mob source) stack on top. Both sides
+      // moved the same leaf, so the merged composite matches neither parent's
+      // literal. No GLB source fingerprint moved and no capture was retaken on
+      // this branch.
+      fingerprint: '60d11a6337f3b203a56381d36884d4773a111242ac959d2258decb79733173fe',
       components: {
         captureContract: {
           id: 'polish-v2',

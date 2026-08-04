@@ -905,6 +905,25 @@ export class AbilityVfxFx implements SequencerHost {
     return this.groundAuras.hold(entityId, band, colorHex, spin, this.frame);
   }
 
+  // Presentation-culling transition for one entity. Semantic held state lives
+  // in the painter, while scarce render pools are released immediately so an
+  // offscreen actor consumes no overlay, shell, ground-aura, or glow work.
+  sleepEntity(entityId: number): void {
+    this.windups.delete(entityId);
+    const bands = this.orbits.get(entityId);
+    if (bands) {
+      this.orbitBandCount -= bands.length;
+      this.orbits.delete(entityId);
+    }
+    this.shells.sleepEntity(entityId);
+    this.groundAuras.sleepEntity(entityId);
+    const glow = this.glows.get(entityId);
+    if (glow) {
+      this.applyGlow?.(entityId, glow.color, 0);
+      this.glows.delete(entityId);
+    }
+  }
+
   burstAt(
     x: number,
     y: number,

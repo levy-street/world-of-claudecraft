@@ -40,6 +40,7 @@ import { groundHeight } from '../world';
 import { resetMobCharge } from './charge';
 import { idleRng, wanderPause } from './idle_rng';
 import { resetMechanicSpacing } from './mechanic_spacing';
+import { resetRiftMechanicWindups } from './rift_escape_window';
 
 const PACK_FRENZY_AURA_ID = 'pack_frenzy'; // attack-speed buff granted to surviving packmates
 
@@ -97,6 +98,8 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.terrifyTimer = MOBS[mob.templateId]?.terrify?.every ?? 0;
   // The shared spacing lock dies with the life like the timers around it.
   resetMechanicSpacing(mob);
+  // An in-flight instant-mechanic windup dies with the life too.
+  resetRiftMechanicWindups(mob);
   // A mid-flight inferno channel dies with the life; the cadence reseeds and
   // the hp gates re-arm alongside firedSummons above.
   mob.infernoTimer = MOBS[mob.templateId]?.infernoChannel?.every ?? 0;

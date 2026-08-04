@@ -626,9 +626,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
 // points at the same captured view, and only its swept provenance bytes follow
 // the merged rendererIntegration and layout inputs.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'bbbde9788a3c34ea1e1cd38f16e8ba72561c96074ce2ce087cef052117ce9410';
+  '4f3bc57e8299d813b4dc8c340c39533aeaa6c07a5db07fa508b24e4651507d68';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '7fbcf44ee83c4bcac356e19ad20b4ba73d2d1a9703fbf1591b3edb52e6a212c2';
+  '60d11a6337f3b203a56381d36884d4773a111242ac959d2258decb79733173fe';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1496,7 +1496,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // numbers) is adopted verbatim from the base tip; no parent's literal
     // matched the merged tree, and no capture was retaken here.
     expect(fingerprint.digest('hex')).toBe(
-      'a58e86c734d1872e462170ca6140c27fa6f3cc0aab518d80e605398749f57e59',
+      'b04bea5fb052a8cc2a0619a8c88412d57b500f6b2294acd22a63796a9f39dfd2',
     );
   });
 
