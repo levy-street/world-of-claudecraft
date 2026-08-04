@@ -241,10 +241,10 @@ export function enchantGainTier(enchant: EnchantDef): number {
   return tier;
 }
 
-interface ConsumedDisenchantUnit {
-  instance: ItemInstancePayload | undefined;
-  craftedRecipeId: string | undefined;
-}
+// Alias of the shared types.ts InventoryUnit (see EquippedInventoryUnit in
+// items.ts): the disenchant victim walk reports the same two channels every
+// other remover does.
+type ConsumedDisenchantUnit = InventoryUnit;
 
 function isCraftedDisenchantVictim(consumed: ConsumedDisenchantUnit | undefined): boolean {
   return (

@@ -748,7 +748,12 @@ export class Market {
       this.marketListings.splice(i, 1);
       // Conditional spread: a plain row must not grow an `instance: undefined`/
       // `craftedRecipeId: undefined` key (rows are persisted and diffed
-      // byte-for-byte). instance and craftedRecipeId are mutually exclusive.
+      // byte-for-byte). BOTH are spread independently because a row can carry
+      // both at once (a masterwork proc, or a crafted piece enchanted while
+      // worn): reading them as mutually exclusive is the exact mental model
+      // that dropped the marker off every such listing, so this expiry return
+      // must keep treating them as orthogonal. See the MarketListing field
+      // comment above.
       this.collectionFor(l.sellerKey).items.push({
         itemId: l.itemId,
         count: l.count,

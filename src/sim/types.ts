@@ -1037,9 +1037,13 @@ export function cloneInvSlot<T extends InvSlot>(slot: T): T {
  *  return this, never the bare payload: a plain crafted stack has no `instance`
  *  at all, so a payload-only return silently drops its marker and the re-grant
  *  launders the copy (the class the trade/market/mail/bank fixes each closed
- *  at their own boundary). Consumed by items.ts removeVendorSellUnits and the
- *  equip bridge, professions/enchanting.ts's victim walks, and
- *  Sim.removeEnchantableItem. */
+ *  at their own boundary). THE shape for this, not one of several: items.ts
+ *  (VendorRemovedUnit, the equip bridge) and professions/enchanting.ts
+ *  (ConsumedDisenchantUnit) alias it rather than redeclare it, so a remover
+ *  cannot quietly grow a third spelling that reports only one channel.
+ *  Returned by Sim.removeEnchantableItem, items.ts removeVendorSellUnits,
+ *  item_instance_transfer.ts removeMatchingInstance, and enchanting.ts's
+ *  victim walks. */
 export interface InventoryUnit {
   instance: ItemInstancePayload | undefined;
   craftedRecipeId: string | undefined;

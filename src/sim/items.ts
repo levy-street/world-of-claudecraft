@@ -46,6 +46,7 @@ import {
   type Entity,
   type EquipSlot,
   INTERACT_RANGE,
+  type InventoryUnit,
   type ItemDef,
   type ItemInstancePayload,
   isNonSpellCast,
@@ -61,19 +62,16 @@ import {
 
 const VENDOR_BUYBACK_LIMIT = 12;
 
-interface EquippedInventoryUnit {
-  instance: ItemInstancePayload | undefined;
-  craftedRecipeId: string | undefined;
-}
+// The one shared shape (types.ts InventoryUnit): both provenance channels of a
+// single unit lifted out of a slot. Kept as a local alias rather than a second
+// declaration so the equip bridge cannot drift from the removers.
+type EquippedInventoryUnit = InventoryUnit;
 
 // Exported for social/trade.ts and market.ts (BUG #9): the trade swap and the
 // World Market escrow both need the same per-unit craftedRecipeId tracking a
 // vendor sell/buyback already had, so they reuse this shape and the walk
 // below instead of duplicating it.
-export interface VendorRemovedUnit {
-  instance: ItemInstancePayload | undefined;
-  craftedRecipeId: string | undefined;
-}
+export type VendorRemovedUnit = InventoryUnit;
 
 function consumeEquippedInventoryUnit(meta: PlayerMeta, itemId: string): EquippedInventoryUnit {
   for (let i = meta.inventory.length - 1; i >= 0; i--) {
