@@ -9,6 +9,7 @@ import {
   type RiftGemId,
 } from '../content/rift/items';
 import { ITEMS } from '../data';
+import { refusedWhileDead } from '../dead_gate';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity, ItemInstancePayload, PlayerClass, RiftTier } from '../types';
@@ -42,7 +43,12 @@ export interface RiftForgeResult {
     | 'insufficient_essence'
     | 'invalid_stat'
     | 'invalid_gem'
-    | 'sockets_full';
+    | 'sockets_full'
+    // The while-dead refusal (dead_gate.ts): returned to callers (tests and
+    // the offline probes) but NEVER emitted as a riftForgeResult event; the
+    // shared "You can't do that while dead." error line is its only
+    // player-facing surface, like the unresolvable-player arm above it.
+    | 'dead';
   upgradeLevel?: number;
   essenceSpent?: number;
 }
@@ -387,6 +393,9 @@ function emitResult(ctx: SimContext, pid: number, result: RiftForgeResult): Rift
 }
 
 export function upgradeRiftItem(ctx: SimContext, itemId: string, pid?: number): RiftForgeResult {
+  // Dead gate, matching the profession-action family (dead_gate.ts): the
+  // refusal emits no riftForgeResult, only the shared error line.
+  if (refusedWhileDead(ctx, pid)) return { ok: false, action: 'upgrade', itemId, reason: 'dead' };
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, action: 'upgrade', itemId, reason: 'not_found' };
   const slot = riftInventorySlot(r.meta, itemId);
@@ -435,6 +444,8 @@ export function enchantRiftItem(
   stat: string,
   pid?: number,
 ): RiftForgeResult {
+  // Same dead gate as upgradeRiftItem, for the same single-surface reason.
+  if (refusedWhileDead(ctx, pid)) return { ok: false, action: 'enchant', itemId, reason: 'dead' };
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, action: 'enchant', itemId, reason: 'not_found' };
   const slot = riftInventorySlot(r.meta, itemId);
@@ -484,6 +495,8 @@ export function socketRiftGem(
   gemId: string,
   pid?: number,
 ): RiftForgeResult {
+  // Same dead gate as upgradeRiftItem, for the same single-surface reason.
+  if (refusedWhileDead(ctx, pid)) return { ok: false, action: 'socket', itemId, reason: 'dead' };
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, action: 'socket', itemId, reason: 'not_found' };
   const slot = riftInventorySlot(r.meta, itemId);

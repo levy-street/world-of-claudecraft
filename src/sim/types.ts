@@ -4764,7 +4764,12 @@ export type SimEvent = { pid?: number } & (
         | 'insufficient_essence'
         | 'invalid_stat'
         | 'invalid_gem'
-        | 'sockets_full';
+        | 'sockets_full'
+        // Type-level only: the while-dead refusal is returned to callers but
+        // never emitted (the three dead-gate early returns in
+        // rift/progression.ts sit ABOVE emitResult); its one player-facing
+        // surface is the shared "You can't do that while dead." error line.
+        | 'dead';
       upgradeLevel?: number;
       essenceSpent?: number;
     }
