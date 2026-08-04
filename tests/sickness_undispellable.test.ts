@@ -13,14 +13,17 @@
 import { describe, expect, it } from 'vitest';
 import { isDispellableAura, isPlayerRemovableAura } from '../src/sim/aura_classify';
 import { isCancelableAura } from '../src/sim/combat/aura_cancel';
+import { BUILTIN_WORLD } from '../src/sim/data';
 import {
   RES_SICKNESS_STAT_MULT,
   RESURRECTION_SICKNESS_ID,
+  SICKNESS_AURA_IDS,
   UNSTUCK_SICKNESS_ID,
 } from '../src/sim/resurrection';
 import { Sim } from '../src/sim/sim';
 import { applyResurrectionSickness, applyUnstuckSickness } from '../src/sim/spirit';
 import type { Aura, Entity, PlayerClass } from '../src/sim/types';
+import { groundHeight } from '../src/sim/world';
 import { bareClient } from './helpers/bare_client';
 
 type Ev = { type?: string; text?: string };
@@ -250,6 +253,92 @@ describe('warlock Voidfeast cannot devour a sickness', () => {
     for (let i = 0; i < 15; i++) sim.tick();
     expect(has(p, 'test_withering_wail')).toBe(false);
     expect(has(p, RESURRECTION_SICKNESS_ID)).toBe(true);
+  });
+});
+
+// The arena/fiesta clean slate wipes every aura outright (readyArenaFighter), which
+// is deliberate: nobody should fight a normalized bout at a quarter of their stats.
+// But the wipe also meant one queue laundered the whole penalty, so the debt is now
+// stashed in preMatchPools and handed back on the way out (restoreArenaReturnPools).
+
+// Seat a real ranked bout, at a level where a sickness has a non-zero duration
+// (applySickness is a no-op below level 10, which is what makes the level matter here).
+function seatArenaBout(): { sim: AnySim; a: number; b: number } {
+  const sim = new Sim({
+    seed: 42,
+    playerClass: 'warrior',
+    noPlayer: true,
+    world: { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] },
+  }) as AnySim;
+  const a = sim.addPlayer('warrior', 'Aleph') as number;
+  const b = sim.addPlayer('mage', 'Bet') as number;
+  for (const [pid, x] of [
+    [a, 0],
+    [b, 6],
+  ] as const) {
+    sim.setPlayerLevel(12, pid);
+    const e = sim.entities.get(pid) as Entity;
+    e.pos.x = x;
+    e.pos.z = -40;
+    e.pos.y = groundHeight(x, -40, sim.cfg.seed);
+    e.prevPos = { ...e.pos };
+    sim.rebucket(e);
+  }
+  return { sim, a, b };
+}
+
+// End the bout decisively and run out the return delay that hands the survivor back
+// to the world. The pre-fight countdown has to run out first: a bout only resolves
+// once it is active, so killing during the countdown just waits out the 150s cap.
+function finishArenaBout(sim: AnySim, winnerPid: number, loserPid: number): void {
+  for (let i = 0; i < 20 * 10; i++) {
+    if (sim.arenaMatchFor(winnerPid)?.state === 'active') break;
+    sim.tick();
+  }
+  expect(sim.arenaMatchFor(winnerPid)?.state).toBe('active');
+  const winner = sim.entities.get(winnerPid) as Entity;
+  const loser = sim.entities.get(loserPid) as Entity;
+  loser.hp = 1;
+  sim.dealDamage(winner, loser, 1000, false, 'physical', 'Test', 'hit');
+  for (let i = 0; i < 20 * 60 && sim.arenaMatchFor(winnerPid); i++) sim.tick();
+  expect(sim.arenaMatchFor(winnerPid)).toBeNull();
+}
+
+describe('an arena bout is a parenthesis, not a way to shed a sickness', () => {
+  it.each(['resurrection', 'unstuck'] as const)(
+    'clears %s sickness for the bout and hands it back on return',
+    (which) => {
+      const { sim, a, b } = seatArenaBout();
+      const sick = sim.entities.get(a) as Entity;
+      sicken(sim, sick, which);
+      const owed = sicknessAura(sick, which).remaining;
+
+      sim.arenaQueueJoin(a);
+      sim.arenaQueueJoin(b);
+      sim.tick(); // matchmaking seats the pair
+      // The clean slate is intact for the bout itself: this half is the pre-existing
+      // behavior the fix deliberately preserves.
+      expect(has(sick, idOf(which))).toBe(false);
+
+      finishArenaBout(sim, a, b);
+
+      // The debt came back, and never more than the fighter owed walking in.
+      expect(has(sick, idOf(which))).toBe(true);
+      const returned = sicknessAura(sick, which);
+      expect(returned.remaining).toBeGreaterThan(0);
+      expect(returned.remaining).toBeLessThanOrEqual(owed);
+      expect(returned.undispellable).toBe(true);
+    },
+  );
+
+  it('leaves a fighter who entered healthy healthy on return', () => {
+    const { sim, a, b } = seatArenaBout();
+    sim.arenaQueueJoin(a);
+    sim.arenaQueueJoin(b);
+    sim.tick();
+    finishArenaBout(sim, a, b);
+    const winner = sim.entities.get(a) as Entity;
+    expect(winner.auras.some((aura) => SICKNESS_AURA_IDS.has(aura.id))).toBe(false);
   });
 });
 
