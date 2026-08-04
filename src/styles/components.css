@@ -6536,6 +6536,275 @@
     font-family: var(--title-font);
     font-size: 12px;
   }
+  /* Personal/Guild tab strip: rendered only while guildBankInfo is non-null
+     (an officer-plus standing at a banker, online). Mirrors the .soc-tabs
+     WAI-ARIA strip; the 40px min-height keeps the tabs comfortable on touch. */
+  .bank-tabs {
+    display: flex;
+    gap: 4px;
+    margin: 6px 0 2px;
+    flex: none;
+  }
+  .bank-tab {
+    flex: 1;
+    padding: 7px 0;
+    font-size: 13px;
+    font-family: var(--title-font);
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+    background: #1a1410;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    text-align: center;
+  }
+  .bank-tab:hover {
+    color: var(--gold);
+  }
+  .bank-tab:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .bank-tab.on {
+    color: var(--gold);
+    border-color: #6f5a2a;
+    background: linear-gradient(#2a2436, #161220);
+  }
+  /* The Guild pane's role=tabpanel wrapper. It exists for ACCESSIBILITY, not
+     layout (the pane holds a nested tab list, which needs an owning panel to be
+     intelligible), so it is a transparent flex passthrough: it reproduces the
+     window's own column so the sections inside size exactly as they did when
+     they mounted flat on #bank-window. */
+  .gbank-pane {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+  /* The Guild pane's Contents / Log sub-strip. Its own tab class rather than a
+     shared .bank-tab: the outer Personal/Guild strip is wired by querying
+     .bank-tab, so a shared class would hand these buttons to the wrong
+     handler. Visually a quieter sibling (smaller, no gradient) so the nesting
+     reads as a sub-choice and not a second top-level strip. */
+  .gbank-view-tabs {
+    margin: 2px 0 4px;
+  }
+  .gbank-view-tab {
+    flex: 1;
+    padding: 6px 0;
+    font-size: 12px;
+    font-family: var(--title-font);
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+    background: #15100d;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    text-align: center;
+  }
+  .gbank-view-tab:hover {
+    color: var(--gold);
+  }
+  .gbank-view-tab:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .gbank-view-tab.on {
+    color: var(--gold);
+    border-color: #6f5a2a;
+    background: #221c14;
+  }
+  /* The activity log: the officer-visible history of guild bank actions. A
+     plain reading surface (no controls in a row), so it is a list rather than a
+     grid, and it fills the pane so the shared .bank-scroll inside it scrolls
+     instead of the window. */
+  .gbank-log {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    flex: 1;
+  }
+  .gbank-log-note {
+    flex: none;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin: 0 0 4px;
+  }
+  .gbank-log-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .gbank-log-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 4px 6px;
+    border-radius: 3px;
+    background: #17120e;
+  }
+  .gbank-log-row:nth-child(even) {
+    background: #1c1611;
+  }
+  .gbank-log-time {
+    flex: none;
+    font-size: 10px;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+  .gbank-log-text {
+    font-size: 12px;
+    /* Names and item names are player/content text of unbounded width: wrap
+       rather than clipping a sentence a player is meant to be able to read. */
+    overflow-wrap: anywhere;
+  }
+  /* Loading / refused / empty all share the .bank-empty look; the refusal is
+     tinted because "you may not read this" is not the same news as "nothing has
+     happened", and the words say so too (never color alone). */
+  .gbank-log-refused {
+    color: var(--color-text-error);
+  }
+  /* Guild treasury header row: label + coin readout + the two gold actions. */
+  .gbank-treasury {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 4px 0 6px;
+    flex: none;
+  }
+  .gbank-treasury-label {
+    font-family: var(--title-font);
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .gbank-treasury-amount {
+    font-size: 13px;
+  }
+  .gbank-treasury-actions {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+  }
+  .gbank-gold-btn {
+    font-family: var(--title-font);
+    font-size: 12px;
+    cursor: var(--cursor-point);
+    color: var(--gold-dim);
+    background: #1a1410;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    padding: 6px 10px;
+  }
+  .gbank-gold-btn:hover:not(:disabled) {
+    color: var(--gold);
+  }
+  .gbank-gold-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .gbank-gold-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  /* Dormant (pipe-refused) slots are unwithdrawable BOTH ways and block guild
+     disband (the documented v1 limitation), so the state reads three ways at
+     once, never color alone: dimmed grayscale icon behind a dashed border, a
+     lock mark on the cell, and the always-visible legend line below the
+     treasury row. */
+  .gbank-dormant-note {
+    flex: none;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin: 0 0 4px;
+  }
+  .bank-item.gbank-dormant {
+    border-style: dashed;
+  }
+  .bank-item.gbank-dormant .item-icon {
+    filter: grayscale(1) brightness(0.55);
+  }
+  .gbank-dormant-mark {
+    position: absolute;
+    right: 2px;
+    top: 2px;
+    width: 14px;
+    height: 14px;
+    color: var(--gold-dim);
+    pointer-events: none;
+  }
+  .gbank-dormant-mark .ui-icon {
+    width: 100%;
+    height: 100%;
+    display: block;
+    filter: drop-shadow(0 1px 2px #000);
+  }
+  /* Unknown-id (removed-def) slots: still withdrawable (the recovery path),
+     named by the localized unknown-item label since no def exists to draw. */
+  .bank-item.gbank-unknown {
+    border-style: dashed;
+  }
+  .gbank-unknown-label {
+    position: absolute;
+    inset: 3px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    line-height: 1.15;
+    color: var(--color-text-muted);
+    text-align: center;
+    pointer-events: none;
+  }
+  /* Guild buy-row extras: the treasury-paid note and the visible shortfall
+     marker (text on top of the styling class, never color alone). */
+  .gbank-buy-row {
+    flex-wrap: wrap;
+  }
+  .gbank-buy-note {
+    flex-basis: 100%;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+  .gbank-buy-short-label {
+    font-size: 11px;
+    color: var(--color-text-error);
+  }
+  /* The gold deposit/withdraw prompt: the mailbox coin-row idiom inside the
+     bank prompt chrome (the .coininput skin mirrors .mkt-price-row's). */
+  .gbank-gold-available {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin: 4px 0;
+  }
+  .gbank-coin-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 8px 0;
+  }
+  /* The gold prompt's inline refusal line (polite live region): empty until a
+     refused submit fills it, so it reserves no height while blank. */
+  .gbank-gold-error {
+    font-size: 12px;
+    color: var(--color-text-error);
+  }
+  .gbank-gold-error:empty {
+    display: none;
+  }
+  .gbank-coin-row .coininput {
+    width: 56px;
+    background: #120d07;
+    border: 1px solid #5a4a2a;
+    color: #ffe6a8;
+    border-radius: 4px;
+    padding: 4px 6px;
+    font-family: var(--ui-font, inherit);
+    font-size: 12px;
+  }
   /* Bonus-slot breakdown footer (online only): a compact non-interactive
      text block advertising the account-link and referral bonuses, riding as the TAIL
      of the .bank-scroll region (scrolling past the last cells reaches it on every

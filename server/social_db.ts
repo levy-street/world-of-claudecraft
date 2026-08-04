@@ -150,6 +150,28 @@ CREATE TABLE IF NOT EXISTS guild_events (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS guild_events_guild_day ON guild_events(guild_id, day);
+
+-- Guild bank books (Guild Bank Phase 3): one JSONB book per guild (treasury,
+-- inventory, purchasedSlots; the shape src/sim/guild_bank.ts owns). Lives in
+-- this schema family because guilds owns the parent row: a committed guild
+-- DELETE cascades the book away. ROLLBACK SAFETY: the ONLY thing standing
+-- between that cascade and destroyed escrow value is the empty-bank guard in
+-- server/social.ts, which BOTH guild-deleting paths must keep (guildDisband
+-- AND the last-member arm of guildLeave, each consulting guildBankHoldings
+-- and failing closed on an unloaded book). Any future code change that adds
+-- a guild-deleting path or reorders either guard past its DELETE re-opens
+-- item/copper destruction; tests/social_system.test.ts pins both guards.
+-- Boot-loaded per realm (realm rides the row for that read); every write runs
+-- inside the character-lease-fenced escrow transaction in server/db.ts, never
+-- standalone. realm carries no DEFAULT deliberately: the interpolated-default
+-- pattern is last-boot-wins across realm processes, so every insert passes
+-- realm explicitly.
+CREATE TABLE IF NOT EXISTS guild_banks (
+  guild_id INT PRIMARY KEY REFERENCES guilds(id) ON DELETE CASCADE,
+  realm TEXT NOT NULL,
+  data JSONB NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 `;
 
 const CHAR_COLS = 'id, name, class AS cls, level, realm';
@@ -403,12 +425,21 @@ export class PgSocialDb implements SocialDb {
     bustAdminGuildListReads();
   }
 
-  async setGuildRank(charId: number, rank: GuildRank): Promise<void> {
-    await this.pool.query('UPDATE guild_members SET rank = $2 WHERE character_id = $1', [
-      charId,
-      rank,
-    ]);
+  async setGuildRank(charId: number, guildId: number, rank: GuildRank): Promise<boolean> {
+    // Both predicates matter: the guild_id guard means a rank change decided
+    // against guild A can never rewrite a row the target has since moved to
+    // guild B, and the checked rowcount tells the caller whether the UPDATE
+    // actually landed (a leave/kick/disband may have removed the row between
+    // the caller's membership read and this write). The caller must treat
+    // false as a refusal and stamp NOTHING: the live sim's guild membership
+    // stamp authorizes guild bank access, so stamping a rank the DB refused
+    // is privilege escalation.
+    const res = await this.pool.query(
+      'UPDATE guild_members SET rank = $2 WHERE character_id = $1 AND guild_id = $3',
+      [charId, rank, guildId],
+    );
     bustAdminGuildListReads();
+    return (res.rowCount ?? 0) > 0;
   }
 
   async transferGuildLeader(

@@ -1,7 +1,8 @@
 // The game-state counter seam: the throughput counters that live on the /metrics
 // exporter (woc_ws_messages_total, woc_ws_messages_dropped_total,
 // woc_ws_rate_kicks_total, woc_input_frames_missed_total,
-// woc_chat_messages_total, woc_characters_created_total) reach the exporter
+// woc_chat_messages_total, woc_characters_created_total,
+// woc_guild_bank_incidents_total) reach the exporter
 // through this one process-wide slot instead of each emission site (game.ts
 // message dispatch and inbound gate/lanes, chat routing, characters.ts create
 // path) threading a sink through its constructors. main.ts
@@ -16,12 +17,13 @@
 //
 // CARDINALITY IS BOUNDED BY DESIGN, same contract as server/http/metrics.ts: the
 // only label values here are the ws-message direction (a fixed two), the
-// inbound drop cause (the fixed six-value WS_DROP_CAUSES set), the copper-flow
+// inbound drop cause (the fixed seven-value WS_DROP_CAUSES set), the guild-bank
+// incident kind (the fixed nine-value GUILD_BANK_INCIDENTS set), the copper-flow
 // source, the harvest band and node tier (the fixed sets in
 // server/economy_telemetry.ts), and the fishing band and rod recipe id (the
 // fixed sets in server/fishing_telemetry.ts, whose zone label reuses the same
-// harvest band vocabulary). Nothing per-player (account id, character id, name,
-// ip) is ever a label.
+// harvest band vocabulary). Nothing per-player and nothing per-GUILD (account
+// id, character id, guild id, name, ip) is ever passed as a label.
 
 import type { CopperFlowSource, HarvestBand, HarvestTier } from '../economy_telemetry';
 import type { FishingBandLabel } from '../fishing_telemetry';
@@ -30,11 +32,13 @@ import type { FishingBandLabel } from '../fishing_telemetry';
 export type WsMessageDirection = 'in' | 'out';
 
 /**
- * The fixed six causes an inbound ws frame can be dropped for: the two
+ * The fixed seven causes an inbound ws frame can be dropped for: the two
  * pre-parse gate causes (server/msg_rate_limit.ts), the three post-parse
- * lanes (server/msg_lanes.ts), and the list-read guard on the ignore/block
- * readouts (server/list_read_guard.ts). This closed set IS the cause label's
- * whole vocabulary; it never grows per-player or per-message.
+ * lanes (server/msg_lanes.ts), the list-read guard on the ignore/block
+ * readouts (server/list_read_guard.ts), and the guild-bank op guard
+ * (server/guild_bank_op_guard.ts, each allowed op is a keep-forever ledger
+ * write). This closed set IS the cause label's whole vocabulary; it never
+ * grows per-player or per-message.
  */
 export const WS_DROP_CAUSES = [
   'rate',
@@ -43,10 +47,98 @@ export const WS_DROP_CAUSES = [
   'lane_command',
   'lane_chat',
   'list_read',
+  'guild_bank',
 ] as const;
 
-/** One of the fixed six inbound drop causes. */
+/** One of the fixed seven inbound drop causes. */
 export type WsDropCause = (typeof WS_DROP_CAUSES)[number];
+
+/**
+ * The fixed nine guild-bank incident kinds. Every one of these is an abnormal
+ * event on a DUPE-SENSITIVE path (the escrow save, the lease fence-out revert,
+ * the reconcile, the durable-truth read, the keep-forever ledger) that
+ * otherwise reports only through console.error / console.warn, i.e. it is
+ * invisible to production alerting:
+ * - `escrow_save_failed`: a save carrying at least one guild book FAILED, so
+ *   the character half AND the book half rolled back and nothing this session
+ *   did since its last save is durable. Two ways in: the db layer threw (a
+ *   transport fault), or the escrow merge refused a book half and that refusal
+ *   was TERMINAL (see escrow_quarantined). The live sim is ahead of durable
+ *   truth until a later save or a reconcile lands.
+ *   Deliberately NOT counted for a refusal that will be RETRIED: that is
+ *   ordinary concurrency between two officers of one guild, it happens on a
+ *   healthy realm, and folding it in here made `> 0` alerting useless. It is
+ *   `escrow_refused_retry` below instead. This counter being non-zero means
+ *   something actually went wrong.
+ * - `escrow_refused_retry`: the escrow merge refused a book half because
+ *   another session still holds unflushed work for that guild, so the save is
+ *   retried once their commit makes the replay applicable (which the refusal
+ *   immediately flushes for). NORMAL CONCURRENCY, not a failure: nothing was
+ *   consumed, the marks and the log are exactly as they were, and the ordinary
+ *   case clears in a round trip. Counted per GUILD (the unit the retry applies
+ *   to), like `reconcile`. Watch its RATE, not its presence: a sustained climb
+ *   means officers are contending faster than the flush resolves, and the
+ *   terminal arm it precedes is `escrow_quarantined`.
+ * - `save_fenced_out`: that same save matched no row (a same-account takeover
+ *   rotated the character lease), so the carried books need reconciling.
+ * - `escrow_quarantined`: a refusal ran out of retries, or nothing could ever
+ *   make the missing value durable, so the SESSION was abandoned: quarantined
+ *   (it may never persist again), reverted, and disconnected. The terminal arm
+ *   of the escrow design and the one worth paging on. Counted per SESSION; the
+ *   per-guild reverts it triggers count as `reconcile` below.
+ * - `reconcile`: revertOwnGuildBookOps undid one guild's unflushed log, i.e. a
+ *   session that can never commit again held book ops for it (a fence-out, an
+ *   exhausted leave flush, a teardown, or the quarantine above). Counted per
+ *   GUILD, the unit the remedy applies to.
+ * - `book_unloaded`: a book was left unloaded after a failed / oversized /
+ *   malformed durable read at boot. That guild's ops are inert and its disband
+ *   is refused fail-closed until the process restarts, which is an
+ *   operator-visible outage for that guild, not a transient.
+ * - `ledger_write_failed`: a bank_ledger insert rejected, so the audit trail
+ *   (scripts/bank_audit.mjs) has a hole the replay cannot see.
+ * - `counterparty_orphan`: a guild bank op moved the acting character's purse
+ *   or bags while the guild book did not move at all
+ *   (server/guild_bank_counterparty.ts). Value crossed the purse/book boundary
+ *   in ONE direction, which is the dupe signature the counterparty ledger
+ *   columns exist to make visible, and no legitimate op can produce it. Paged
+ *   on alongside `escrow_quarantined`: a single sample is a defect, not a
+ *   transient.
+ * - `counterparty_unstamped`: a guild bank_ledger row was written with NO
+ *   counterparty side at all. Its NULL columns are indistinguishable from a
+ *   pre-feature row, so the audit will skip that op forever: the convention
+ *   that "NULL means written before the columns existed" is only a convention,
+ *   and this is what makes a live write site breaking it visible instead of
+ *   silent. A single sample is a defect.
+ * This closed set IS the kind label's whole vocabulary; it never grows
+ * per-guild or per-player (guild id is NEVER a label; the loud log line beside
+ * each increment carries the identifying detail).
+ */
+export const GUILD_BANK_INCIDENTS = [
+  'escrow_save_failed',
+  'escrow_refused_retry',
+  'save_fenced_out',
+  'escrow_quarantined',
+  'reconcile',
+  'book_unloaded',
+  'ledger_write_failed',
+  'counterparty_orphan',
+  'counterparty_unstamped',
+  // The officer-visible activity log's read failed (a cold cache whose query
+  // threw or timed out). Its own kind because the refusal frame the player gets
+  // is byte-identical to "you are not an officer", so without this a total read
+  // outage is indistinguishable from ordinary refusals at the wire.
+  'log_read_failed',
+  // A guild was CREATED but its creation fee never became durable: the charge
+  // lives only on a live purse whose session was fenced out or abandoned, so
+  // the founder holds a guild the database was never paid for. Its own kind
+  // because it is a single-sample defect (unlike the retryable save kinds
+  // beside it) and it is the only one that leaves value UNCOLLECTED rather
+  // than at risk of being double-counted.
+  'create_fee_unpaid',
+] as const;
+
+/** One of the fixed eleven guild-bank incident kinds. */
+export type GuildBankIncident = (typeof GUILD_BANK_INCIDENTS)[number];
 
 /**
  * The game-state throughput emission hooks. Implementations must never
@@ -74,6 +166,12 @@ export interface GameMetricsCounters {
   chatMessage(): void;
   /** One character successfully created. */
   characterCreated(): void;
+  /**
+   * One guild-bank incident on a dupe-sensitive path, by kind (see
+   * GUILD_BANK_INCIDENTS). Always emitted BESIDE the existing loud log, never
+   * instead of it: the counter says how often, the log says which guild.
+   */
+  guildBankIncident(kind: GuildBankIncident): void;
   /**
    * `amount` copper (always positive) credited to the acting player during a
    * command attributed to `source`. Sampled as the player's own copper delta
@@ -126,6 +224,7 @@ export const noopGameMetricsCounters: GameMetricsCounters = {
   wsInputSeqGap() {},
   chatMessage() {},
   characterCreated() {},
+  guildBankIncident() {},
   copperCredited() {},
   copperSpent() {},
   harvest() {},

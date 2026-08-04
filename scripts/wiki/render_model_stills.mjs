@@ -35,7 +35,10 @@ mkdirSync(outDir, { recursive: true });
 //    root-relative /<logical> paths our static server maps into public/), which esbuild leaves
 //    intact for a classic IIFE <script src> and would be a SyntaxError. esbuild matches each
 //    FULL member path exactly (a bare `import.meta.env` define does NOT fold `.DEV`), so define
-//    every Vite flag a transitive module reads (`grep -rho 'import\.meta\.env\.[A-Za-z_]*' src/`).
+//    every Vite flag a transitive module reads (`grep -rho 'import\.meta\.env\.[A-Za-z_]*' src/`):
+//    media.ts / i18n.ts read DEV/PROD, and render/gfx.ts pulls in client_origin.ts and
+//    (transitively) runtime.ts for native/desktop-app origin detection, none of which apply to
+//    this static headless render.
 //
 //    The `raw import.meta` assert below is necessary but NOT sufficient: for an iife bundle
 //    esbuild folds an undefined member path down to `({}).env`, so a missed field leaves no
@@ -93,17 +96,21 @@ const dataUrl = `data:text/javascript;base64,${Buffer.from(dataBuilt.outputFiles
 const { GUIDE_CLASSES, GUIDE_DRUID_FORMS, GUIDE_WARLOCK_PETS, GUIDE_FAMILIES, GUIDE_MODELS } =
   await import(dataUrl);
 
-// Flatten every figure to a distinct (model, tint) render job, deduped by still key.
+// Flatten every figure to a distinct (model, tint, tintStrength) render job, deduped by
+// still key. tintStrength comes straight off the figure record (build_content.mjs bakes it
+// alongside tint/still), the same value model.ts reads off GUIDE_MODELS[model] to paint the
+// render, so a strength-only manifest change mints a new key here too.
 const jobs = new Map();
-const addFigure = (model, tint) => {
+const addFigure = (model, tint, tintStrength) => {
   if (!model || !GUIDE_MODELS[model]) return;
-  const key = stillKey(model, tint);
-  if (!jobs.has(key)) jobs.set(key, { key, model, tint: tint ?? null });
+  const key = stillKey(model, tint, tintStrength);
+  if (!jobs.has(key)) jobs.set(key, { key, model, tint: tint ?? null, tintStrength });
 };
-for (const c of GUIDE_CLASSES) addFigure(c.model, c.tint);
-for (const d of GUIDE_DRUID_FORMS) addFigure(d.model, d.tint);
-for (const p of GUIDE_WARLOCK_PETS) addFigure(p.model, p.tint);
-for (const f of GUIDE_FAMILIES) for (const c of f.creatures) addFigure(c.model, c.tint);
+for (const c of GUIDE_CLASSES) addFigure(c.model, c.tint, c.tintStrength);
+for (const d of GUIDE_DRUID_FORMS) addFigure(d.model, d.tint, d.tintStrength);
+for (const p of GUIDE_WARLOCK_PETS) addFigure(p.model, p.tint, p.tintStrength);
+for (const f of GUIDE_FAMILIES)
+  for (const c of f.creatures) addFigure(c.model, c.tint, c.tintStrength);
 
 // 3) Serve public/ (for the GLBs) plus the render harness and bundle, all same-origin so
 //    the page's `/models/...` fetches resolve to the committed assets.

@@ -169,6 +169,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'characterId',
       'fiestaMods',
       'fiestaSpecial',
+      'guildMembership',
       'joinedAt',
       'known',
       'lastActiveTick',

@@ -23,6 +23,11 @@ import {
   GUILDS_REALM_LOWER_NAME_PREFIX_INVALID_INDEX_DROP_SQL,
 } from './admin_guilds_schema';
 import {
+  BANK_LEDGER_CONTAINER_INDEX_SQL,
+  BANK_LEDGER_CONTAINER_INVALID_INDEX_CHECK_SQL,
+  BANK_LEDGER_CONTAINER_INVALID_INDEX_DROP_SQL,
+} from './bank_ledger_indexes';
+import {
   CLIENT_PERF_WORST10S_INDEX_SQL,
   CLIENT_PERF_WORST10S_INVALID_INDEX_CHECK_SQL,
   CLIENT_PERF_WORST10S_INVALID_INDEX_DROP_SQL,
@@ -90,5 +95,13 @@ export const CONCURRENT_INDEX_MIGRATIONS: readonly ConcurrentIndexMigration[] = 
     createSql: GUILDS_REALM_CREATED_ID_INDEX_SQL,
     checkSql: GUILDS_REALM_CREATED_ID_INVALID_INDEX_CHECK_SQL,
     dropSql: GUILDS_REALM_CREATED_ID_INVALID_INDEX_DROP_SQL,
+  },
+  // The guild bank activity log's per-guild reader (server/guild_bank_log.ts).
+  // Appended, never inserted: the order is load-bearing and pinned.
+  {
+    name: 'bank_ledger_container_recent',
+    createSql: BANK_LEDGER_CONTAINER_INDEX_SQL,
+    checkSql: BANK_LEDGER_CONTAINER_INVALID_INDEX_CHECK_SQL,
+    dropSql: BANK_LEDGER_CONTAINER_INVALID_INDEX_DROP_SQL,
   },
 ];
