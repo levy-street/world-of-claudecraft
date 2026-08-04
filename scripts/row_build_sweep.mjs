@@ -125,8 +125,11 @@ function equipPet(sim, cls, pid, player) {
     // always runs specs[0]) are simply absent for most builds. Only insist on a pet
     // when the build can actually cast for one.
     if (!sim.meta(pid).known.some((ability) => ability.def.id === summon)) return;
-    sim.castAbility(summon, pid);
-    for (let i = 0; i < 4 * ticksPerSecond; i++) sim.tick();
+    for (let i = 0; i < 20 * ticksPerSecond && !ownedPet(sim, pid); i++) {
+      player.resource = player.maxResource;
+      if (!player.castingAbility) sim.castAbility(summon, pid);
+      sim.tick();
+    }
     requirePet(sim, cls, pid);
     return;
   }
@@ -137,20 +140,35 @@ function equipPet(sim, cls, pid, player) {
     y: player.pos.y,
     z: player.pos.z,
   });
-  beast.hostile = true;
+  beast.hostile = true; // tameError requires a hostile target
   sim.addEntity(beast);
-  sim.targetEntity(beast.id, pid);
-  sim.castAbility('tame_beast', pid);
-  for (let i = 0; i < 7 * ticksPerSecond; i++) sim.tick();
+  // Wildbond is a 6s cast and the target fights back, so damage pushback routinely
+  // stretches it past any fixed tick budget. Drive it to completion instead: keep
+  // the hunter topped up (this is setup, not the measured window) and re-issue the
+  // cast whenever pushback or a cancel leaves it idle.
+  for (let i = 0; i < 60 * ticksPerSecond && !ownedPet(sim, pid); i++) {
+    player.hp = player.maxHp;
+    if (!player.castingAbility) {
+      sim.targetEntity(beast.id, pid);
+      sim.castAbility('tame_beast', pid);
+    }
+    sim.tick();
+  }
+  // Leave no trace of the setup fight in the measured run.
+  player.hp = player.maxHp;
   requirePet(sim, cls, pid);
 }
 
 // A silently petless run reads as a low class score, which is exactly the defect
 // this sweep was fixed for. Fail loudly instead if a cast time, cooldown, or id
 // drifts out from under the fixed tick budgets above.
+function ownedPet(sim, pid) {
+  for (const e of sim.entities.values()) if (e.kind === 'mob' && e.ownerId === pid) return e;
+  return null;
+}
+
 function requirePet(sim, cls, pid) {
-  for (const e of sim.entities.values()) if (e.kind === 'mob' && e.ownerId === pid) return;
-  throw new Error(`${cls}: expected a pet after setup, got none`);
+  if (!ownedPet(sim, pid)) throw new Error(`${cls}: expected a pet after setup, got none`);
 }
 
 function optionIds(build) {
