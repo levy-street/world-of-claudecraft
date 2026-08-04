@@ -29,11 +29,20 @@ TAU = math.tau
 
 
 # --------------------------------------------------------------------- helpers
-def mesh_from(name, verts, faces, cell, shade_t=0.35, material=None):
-    """Build a mesh whose every loop samples one point of one palette cell."""
+def mesh_from(name, verts, faces, cell, shade_t=0.35, material=None, smooth=False):
+    """Build a mesh whose every loop samples one point of one palette cell.
+
+    `smooth` shades the result smooth, which ORGANIC additions want (a beard built
+    from stacked rows reads as horizontal ribbing when flat-shaded) while hard props
+    such as a crest, a name-plate or a buckle want the default faceted look that
+    matches the KayKit kit.
+    """
     me = bpy.data.meshes.new(name)
     me.from_pydata([tuple(v) for v in verts], [], faces)
     me.validate()
+    if smooth:
+        for poly in me.polygons:
+            poly.use_smooth = True
     uv = me.uv_layers.new(name="UVMap")
     u, v = cell_uv(cell, shade_t)
     for loop in me.loops:
@@ -404,58 +413,98 @@ def tuck_under_hat(host, cells, z_floor, shrink=0.80, ease=0.55, drop=0.02,
     return moved
 
 
-def beard(name, host, cell, rings, shade_t=0.34, material=None, sides=26,
-          arc=0.40, steps=14, front=-0.25, jut=0.0):
-    """A beard mass following the real jaw, built as a partial shell.
+def beard(name, host, cell, shade_t=0.34, material=None, rows=5, steps=16,
+          front=-0.25, spread=0.155, front_top=1.445, front_bot=1.268,
+          side_top=1.600, side_bot=1.395, pad_front=0.034, pad_side=0.014,
+          thick=0.7):
+    """A beard laid ON the real face, by ray casting rather than by revolution.
 
-    `rings` is a list of (z, pad, arc_scale): the height, how far the mass stands
-    off the measured face at that height, and how much of the front arc it covers.
-    Tapering the arc toward the top is what makes it read as a beard climbing to
-    the sideburns rather than as a bib hung round the neck.
+    `hug_profile` revolves ONE radius per angle around the head's axis, which
+    cannot follow a chin: the front bucket picks up whatever juts furthest inside a
+    z band and then applies it across the arc, so the mass floats off the jaw as a
+    slab. Here every vertex is placed by casting a ray from the head's axis outward
+    and landing on the surface it actually hits, so the beard matches the face.
 
-    Only the FRONT arc is built, centred on `front` TURNS of the circle. The face
-    is -Y on these rigs, which is -0.25 turns (-pi/2); -0.5 turns is -X and puts
-    the beard on a cheek, which is exactly where the first attempt built it.
+    The OUTLINE is what makes it read as a beard rather than a chin strap: the top
+    edge runs low at the chin (`front_top`, kept below the mouth) and rises toward
+    the sideburns (`side_top`), while the bottom hangs lowest at the front
+    (`front_bot`) and tucks up under the jaw corners (`side_bot`). A single
+    horizontal top edge across the face reads as a strap, which is what the first
+    attempt built.
+
+    Solid, not a paper shell: an inner surface at `thick` of the standoff is
+    stitched to the outer one around the whole perimeter, so the silhouette has mass
+    from below and from the side.
     """
-    centre = None
-    grid = []
-    for z, pad, arc_scale in rings:
-        prof, centre = hug_profile(host, sides, axis="z", coord=z, pad=pad, centre=centre)
-        cu, cv = centre
-        span = arc * arc_scale * TAU
-        ring = []
-        # EVERY ring gets the same step count; only the span changes. Varying the
-        # count per ring makes consecutive rings topologically mismatched, and the
-        # quad strip then stitches across different angles, which built a spiked
-        # tangle instead of a beard.
-        for i in range(steps + 1):
-            ang = front * TAU + (-span / 2 + span * i / steps)
-            # nearest measured radius for this angle
-            idx = int((ang % TAU) / TAU * sides) % sides
-            r = prof[idx][1]
-            # fuller in the middle of the arc, so the chin carries the bulk
-            mid = 1.0 - abs(i / steps - 0.5) * 2.0
-            rr = r + jut * mid
-            ring.append((cu + math.cos(ang) * rr, cv + math.sin(ang) * rr, z))
-        grid.append(ring)
+    pts = [host.matrix_world @ v.co for v in host.data.vertices]
+    cx = (min(p.x for p in pts) + max(p.x for p in pts)) / 2
+    cy = (min(p.y for p in pts) + max(p.y for p in pts)) / 2
+    to_local = host.matrix_world.inverted()
+    fallback, _c = hug_profile(host, max(steps, 16), axis="z",
+                              coord=(front_top + front_bot) / 2)
+
+    def surface_r(ang, z):
+        """Distance from the axis to the face along `ang` at height `z`."""
+        axis = Vector((cx, cy, z))
+        direction = Vector((math.cos(ang), math.sin(ang), 0.0))
+        hit, loc, _n, _i = host.ray_cast(to_local @ axis, to_local.to_3x3() @ direction)
+        if hit:
+            return ((host.matrix_world @ loc) - axis).length
+        idx = int((ang % TAU) / TAU * len(fallback)) % len(fallback)
+        return fallback[idx][1]
+
+    outer, inner = [], []
+    for i in range(steps + 1):
+        u = i / steps
+        ang = (front + (-spread + 2 * spread * u)) * TAU
+        edge = abs(u - 0.5) * 2.0                 # 0 at the chin, 1 at the arc ends
+        top = front_top + (side_top - front_top) * edge
+        bot = front_bot + (side_bot - front_bot) * edge
+        pad = pad_front + (pad_side - pad_front) * edge
+        col_o, col_i = [], []
+        for j in range(rows + 1):
+            v = j / rows
+            z = top + (bot - top) * v
+            # fullest through the middle of the mass, so the beard has a belly
+            belly = math.sin(v * math.pi) ** 0.7
+            r = surface_r(ang, z)
+            c, s_ = math.cos(ang), math.sin(ang)
+            ro = r + pad * (0.45 + 0.55 * belly)
+            ri = r + pad * thick * 0.25
+            col_o.append((cx + c * ro, cy + s_ * ro, z))
+            col_i.append((cx + c * ri, cy + s_ * ri, z))
+        outer.append(col_o)
+        inner.append(col_i)
 
     verts, faces = [], []
-    offsets = []
-    for ring in grid:
-        offsets.append(len(verts))
-        verts.extend(ring)
-    for gi in range(len(grid) - 1):
-        a0, b0 = offsets[gi], offsets[gi + 1]
-        for i in range(steps):
-            faces.append((a0 + i, a0 + i + 1, b0 + i + 1, b0 + i))
-    # close the underside so the beard reads solid from below
-    last = grid[-1]
-    base = len(verts)
-    cu, cv = centre
-    verts.append((cu, cv, last[0][2] - 0.012))
+    def add(grid):
+        base = len(verts)
+        for col in grid:
+            verts.extend(col)
+        return base
+
+    o0 = add(outer)
+    i0 = add(inner)
+    W, H = steps + 1, rows + 1
+
+    def oi(i, j):
+        return o0 + i * H + j
+
+    def ii(i, j):
+        return i0 + i * H + j
+
     for i in range(steps):
-        faces.append((base, offsets[-1] + i + 1, offsets[-1] + i))
-    return mesh_from(name, verts, faces, cell, shade_t, material)
+        for j in range(rows):
+            faces.append((oi(i, j), oi(i, j + 1), oi(i + 1, j + 1), oi(i + 1, j)))
+            faces.append((ii(i + 1, j), ii(i + 1, j + 1), ii(i, j + 1), ii(i, j)))
+    # perimeter: top edge, bottom edge, and the two arc ends
+    for i in range(steps):
+        faces.append((oi(i, 0), oi(i + 1, 0), ii(i + 1, 0), ii(i, 0)))
+        faces.append((ii(i, rows), ii(i + 1, rows), oi(i + 1, rows), oi(i, rows)))
+    for j in range(rows):
+        faces.append((ii(0, j), ii(0, j + 1), oi(0, j + 1), oi(0, j)))
+        faces.append((oi(steps, j), oi(steps, j + 1), ii(steps, j + 1), ii(steps, j)))
+    return mesh_from(name, verts, faces, cell, shade_t, material, smooth=True)
 
 
 def souwester(name, host, cell, shade_t=0.30, material=None, sides=20,
