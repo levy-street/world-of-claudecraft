@@ -857,6 +857,13 @@ export const KNOWN_DEVIATIONS: readonly KnownDeviation[] = [
       // the /admin/api/guilds/* family (rename, history) is NOT ledgered here
       // and predates this branch.
       '/admin/api/guilds/:id/bank/purge-slot',
+      // The operator READ beside it, same class and same reason: the legacy arm
+      // hands Number(match[1]) to the shared guildBankStateOutcome, whose
+      // adminGuildBankState refuses a non-positive or non-integer guild id with
+      // the 404 "that guild has no loaded bank" WITHOUT reading a live book,
+      // where the RouteDef arm 422s in the loader. Only the status differs, and
+      // a read mutates nothing on either arm.
+      '/admin/api/guilds/:id/bank',
     ],
     currentBehavior:
       'NARROWED by the v0.22.0 release merge: BOTH arms now run the central ' +

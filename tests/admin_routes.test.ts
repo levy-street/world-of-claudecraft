@@ -60,6 +60,12 @@ describe('admin route permission map', () => {
     expect(permissionForAdminRoute('GET', '/admin/api/guilds/42')).toBe('accounts.read');
     expect(permissionForAdminRoute('GET', '/admin/api/guilds/42/history')).toBe('moderation.read');
     expect(permissionForAdminRoute('POST', '/admin/api/guilds/42/rename')).toBe('moderation.act');
+    // The guild bank READ is deliberately wider than the purge it serves:
+    // reading destroys nothing, so it sits with the sibling audit panel on the
+    // same detail page rather than behind the superadmin-only hatch.
+    expect(permissionForAdminRoute('GET', '/admin/api/guilds/42/bank')).toBe('moderation.read');
+    // ...and it is a READ: no POST reaches the live book through this path.
+    expect(permissionForAdminRoute('POST', '/admin/api/guilds/42/bank')).toBeNull();
     // The guild bank escape hatch destroys player property, so it carries its
     // OWN permission: a moderator with moderation.act must not reach it.
     expect(permissionForAdminRoute('POST', '/admin/api/guilds/42/bank/purge-slot')).toBe(

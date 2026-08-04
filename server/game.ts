@@ -107,6 +107,7 @@ import {
 } from '../src/world_api';
 import { type ActionBarLayout, sanitizeActionBarLayout } from '../src/world_api/action_bar';
 import { recordOnlineSample } from './admin_db';
+import { type AdminGuildBankView, adminGuildBankView } from './admin_guild_bank_view';
 import { offensiveName } from './auth';
 import {
   diffGuildBankOp,
@@ -4640,6 +4641,24 @@ export class GameServer {
     if (guildId === undefined) return null;
     // The rank + proximity + alive + book-loaded gate, reused verbatim.
     return this.sim.guildBankInfoFor(pid) === null ? null : guildId;
+  }
+
+  /** The OPERATOR READ of one guild's live bank (the admin route in
+   *  server/admin.ts), null when that guild has no loaded book. The discovery
+   *  half of the escape hatch below: the purge takes a slot index plus the
+   *  itemId at it, and before this an operator had to dig both out of
+   *  guild_banks by hand.
+   *
+   *  Reads the SAME ungated snapshot the purge mutates through
+   *  (sim.guildBankInfoForGuild), never a second book read, so a listing and the
+   *  refusal that follows it agree slot for slot; adminGuildBankView then drops
+   *  the per-copy instance payload, which is where the operator boundary is (see
+   *  server/admin_guild_bank_view.ts). A pure live-map read plus a clone: no db,
+   *  no mutation, nothing marked dirty. */
+  adminGuildBankState(guildId: number): AdminGuildBankView | null {
+    if (!Number.isInteger(guildId) || guildId <= 0) return null;
+    const info = this.sim.guildBankInfoForGuild(guildId);
+    return info === null ? null : adminGuildBankView(info);
   }
 
   /** The OPERATOR escape hatch for a dormant guild bank slot (the admin route

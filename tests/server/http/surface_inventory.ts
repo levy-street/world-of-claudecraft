@@ -2068,6 +2068,17 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
   {
     dispatcher: DISPATCH.admin,
     method: 'GET',
+    path: '/admin/api/guilds/:id/bank',
+    handler: 'guildBankStateMatch',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+    match: /^\/admin\/api\/guilds\/(\d+)\/bank$/,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
     path: '/admin/api/guilds/:id',
     handler: 'guildDetailMatch',
     contentType: PROBLEM_JSON,

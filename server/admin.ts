@@ -17,6 +17,7 @@ import {
   registrationsByDay,
   sessionsByDay,
 } from './admin_db';
+import type { AdminGuildBankView } from './admin_guild_bank_view';
 import {
   ADMIN_GUILD_REASON_MAX,
   type AdminGuildRenameError,
@@ -216,6 +217,29 @@ function guildRenameFailure(error: AdminGuildRenameError): { status: number; mes
     case 'invalid_name':
       return { status: 400, message: 'guild name must be 3-24 letters with single spaces' };
   }
+}
+
+/** The guild bank operator READ, resolved ONCE for both dispatch arms (the
+ *  dual-edit rule), exactly like the purge below it.
+ *
+ *  It exists because the purge is unusable without it: that call names a slot
+ *  INDEX and the itemId at it, and until this landed an operator had to dig
+ *  both out of `guild_banks` with SQL. Reads the live book through the same
+ *  ungated snapshot the purge mutates through, so the listing an operator acts
+ *  on and the refusal they may get back cannot disagree.
+ *
+ *  A missing book reuses the purge's own 404 line rather than minting a second
+ *  one: it is the same fact ("that guild has no loaded bank"), and the dashboard
+ *  already localizes it (error.guildBankNotLoaded). */
+function guildBankStateOutcome(
+  rt: Pick<AdminRuntime, 'adminGuildBankState'>,
+  guildId: number,
+):
+  | { ok: true; body: { guildId: number } & AdminGuildBankView }
+  | { ok: false; status: number; message: string } {
+  const state = rt.adminGuildBankState(guildId);
+  if (!state) return { ok: false, status: 404, message: GUILD_BANK_NOT_LOADED };
+  return { ok: true, body: { guildId, ...state } };
 }
 
 /** The guild bank dormant-slot purge, resolved ONCE for both dispatch arms so
@@ -1381,6 +1405,19 @@ export async function handleAdminApi(
       const rows = await listAdminGuildHistory(Number(guildHistoryMatch[1]));
       return rows === null ? fail(res, 404, 'guild not found') : ok(res, { rows });
     }
+    // The guild bank operator READ: the live book (treasury, capacity, and the
+    // slot list with its dormant flags) the dormant-slot purge is unusable
+    // without. Same shared outcome helper as the RouteDef arm; the degenerate
+    // digit-string :id class diverges here exactly as it does on the purge
+    // beside it (both ledgered in tests/server/http/known_deviations.ts):
+    // adminGuildBankState refuses a non-positive or non-integer guild id
+    // itself, so this arm 404s where the RouteDef arm 422s and NEITHER reads a
+    // live book.
+    const guildBankStateMatch = /^\/admin\/api\/guilds\/(\d+)\/bank$/.exec(path);
+    if (guildBankStateMatch) {
+      const outcome = guildBankStateOutcome(game, Number(guildBankStateMatch[1]));
+      return outcome.ok ? ok(res, outcome.body) : fail(res, outcome.status, outcome.message);
+    }
     const guildDetailMatch = /^\/admin\/api\/guilds\/(\d+)$/.exec(path);
     if (guildDetailMatch) {
       const detail = await adminGuildDetail(Number(guildDetailMatch[1]));
@@ -1653,7 +1690,10 @@ export type AdminRuntime = Pick<
   | 'startPerfCapture'
   | 'perfCaptureStatus'
   // The guild bank dormant-slot escape hatch (guildbank.purge). A live-sim
-  // mutation, so it rides the runtime Pick like every other game-session hook.
+  // mutation, so it rides the runtime Pick like every other game-session hook,
+  // beside the live-book READ (moderation.read) an operator discovers the slot
+  // index and its item id with.
+  | 'adminGuildBankState'
   | 'adminPurgeGuildBankSlot'
   // R35 GM professions tooling: a live character-state snapshot for the
   // inspector, and the two audited restores (item mint, slot re-mint).
@@ -2194,6 +2234,18 @@ async function guildRenameHandler(ctx: Ctx): Promise<void> {
   );
   bustAdminGuildBoardCaches();
   ok(ctx.res, { id: renamed.result.guildId, name: renamed.result.newName });
+}
+
+/** GET /admin/api/guilds/:id/bank: the live book behind the escape hatch (see
+ *  guildBankStateOutcome for the shared body, and
+ *  server/admin_guild_bank_view.ts for what the payload deliberately omits). */
+function guildBankStateHandler(ctx: Ctx): void {
+  const outcome = guildBankStateOutcome(useAdminRuntime(), adminTargetId(ctx));
+  if (!outcome.ok) {
+    fail(ctx.res, outcome.status, outcome.message);
+    return;
+  }
+  ok(ctx.res, outcome.body);
 }
 
 /** POST /admin/api/guilds/:id/bank/purge-slot: the dormant guild bank slot
@@ -3040,6 +3092,14 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin, requireAdminTarget('guild')],
     meta: adminTargetMeta('guild'),
     handler: guildRenameHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/guilds/:id/bank',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('guild')],
+    meta: adminTargetMeta('guild'),
+    handler: guildBankStateHandler,
   },
   {
     method: 'POST',

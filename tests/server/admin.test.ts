@@ -138,6 +138,9 @@ function installAdminRuntime(overrides: Partial<Record<keyof AdminRuntime, unkno
     reloadBlockedIps: vi.fn(async () => {}),
     disconnectByIp: vi.fn(),
     applyAccountFlairLive: vi.fn(),
+    // The guild bank operator read defaults to "no loaded book" so a test that
+    // does not care about banks cannot accidentally assert against a fixture.
+    adminGuildBankState: vi.fn(() => null),
     social: {
       guildRenamed: vi.fn(),
     },
@@ -1040,6 +1043,16 @@ describe('guild administration', () => {
     });
     expect(history.status).toBe(403);
     expect(listAdminGuildHistory).not.toHaveBeenCalled();
+
+    // The guild bank read is a live-sim read rather than a db one, so its
+    // "never reached" proof is the runtime spy.
+    const rtDenied = installAdminRuntime();
+    const bank = await runRoute('GET', '/admin/api/guilds/:id/bank', {
+      headers: { authorization: BEARER },
+      params: { id: '4' },
+    });
+    expect(bank.status).toBe(403);
+    expect(rtDenied.adminGuildBankState).not.toHaveBeenCalled();
 
     authedAdminDb({
       adminRolesForAccount: async () => ({ username: 'op', roles: ['viewer'] }),
@@ -3351,6 +3364,139 @@ describe('account flair (AI mark + streamer links)', () => {
     expect(r.status).toBe(400);
     expect(r.body).toEqual({ success: false, data: null, error: 'boom' });
     expect(rt.applyAccountFlairLive).not.toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The guild bank operator READ (GET /admin/api/guilds/:id/bank): the slot list
+// the escape hatch below is unusable without. Deliberately WIDER than the purge
+// (moderation.read, not the superadmin-only guildbank.purge), because reading
+// destroys nothing and "is this bank stuck?" is the question that decides
+// whether there is anything to escalate. The payload is guild-scoped property
+// only: what it must NOT carry is pinned here and in
+// tests/server/admin_guild_bank_view.test.ts.
+// ---------------------------------------------------------------------------
+
+describe('guild bank operator read', () => {
+  const STATE = {
+    treasury: 12_345,
+    capacity: 30,
+    purchasedSlots: 30,
+    usedSlots: 2,
+    dormantSlots: 1,
+    slots: [
+      { index: 0, itemId: 'wolf_fang', count: 3, dormant: false },
+      { index: 1, itemId: 'reins_grag_bear', count: 1, dormant: true },
+    ],
+  };
+
+  it('answers the live book for the target guild', async () => {
+    const adminGuildBankState = vi.fn(() => STATE);
+    authedAdminDb({});
+    installAdminRuntime({ adminGuildBankState });
+
+    const r = await runRoute('GET', '/admin/api/guilds/:id/bank', {
+      headers: { authorization: BEARER },
+      params: { id: '913' },
+    });
+
+    expect(adminGuildBankState).toHaveBeenCalledWith(913);
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({
+      success: true,
+      data: { guildId: 913, ...STATE },
+      error: null,
+    });
+  });
+
+  it('carries nothing account-scoped: the response is item ids, counts, and flags', async () => {
+    // The operator boundary. The snapshot this read projects keeps the real
+    // per-copy payload (the purge's ledger evidence), so a regression that
+    // forwarded it would leak another character's bind identity to every
+    // moderation.read operator.
+    authedAdminDb({});
+    installAdminRuntime({ adminGuildBankState: vi.fn(() => STATE) });
+    const r = await runRoute('GET', '/admin/api/guilds/:id/bank', {
+      headers: { authorization: BEARER },
+      params: { id: '913' },
+    });
+    const data = (r.body as { data: Record<string, unknown> }).data;
+    expect(Object.keys(data).sort()).toEqual([
+      'capacity',
+      'dormantSlots',
+      'guildId',
+      'purchasedSlots',
+      'slots',
+      'treasury',
+      'usedSlots',
+    ]);
+    for (const slot of data.slots as Record<string, unknown>[]) {
+      expect(Object.keys(slot).sort()).toEqual(['count', 'dormant', 'index', 'itemId']);
+    }
+    expect(r.raw).not.toContain('instance');
+    expect(r.raw).not.toContain('boundTo');
+  });
+
+  it('404s a guild with no loaded book, reusing the purge line an operator already knows', async () => {
+    authedAdminDb({});
+    installAdminRuntime({ adminGuildBankState: vi.fn(() => null) });
+    const r = await runRoute('GET', '/admin/api/guilds/:id/bank', {
+      headers: { authorization: BEARER },
+      params: { id: '913' },
+    });
+    expect(r.status).toBe(404);
+    // Byte-identical to the purge's no_book body, so the dashboard's existing
+    // error.guildBankNotLoaded row localizes both without a second string.
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'that guild has no loaded bank',
+    });
+  });
+
+  it('is reachable by a moderator and a viewer, unlike the purge beside it', async () => {
+    // The deliberate widening, pinned: the roles that investigate a ticket can
+    // SEE a stuck bank. The same roles are denied the purge (pinned below).
+    for (const roles of [['moderator'], ['viewer'], ['admin']]) {
+      const adminGuildBankState = vi.fn(() => STATE);
+      authedAdminDb({ adminRolesForAccount: async () => ({ username: 'op', roles }) });
+      installAdminRuntime({ adminGuildBankState });
+      const r = await runRoute('GET', '/admin/api/guilds/:id/bank', {
+        headers: { authorization: BEARER },
+        params: { id: '913' },
+      });
+      expect(r.status, roles[0]).toBe(200);
+      expect(adminGuildBankState, roles[0]).toHaveBeenCalledWith(913);
+    }
+  });
+
+  it('denies a role holding no moderation.read before the live sim is read', async () => {
+    const adminGuildBankState = vi.fn(() => STATE);
+    authedAdminDb({ adminRolesForAccount: async () => ({ username: 'op', roles: [] }) });
+    installAdminRuntime({ adminGuildBankState });
+    const r = await runRoute('GET', '/admin/api/guilds/:id/bank', {
+      headers: { authorization: BEARER },
+      params: { id: '913' },
+    });
+    expect(r.status).toBe(403);
+    expect(adminGuildBankState).not.toHaveBeenCalled();
+  });
+
+  it('401s an unauthenticated caller before the sim is reached', async () => {
+    const adminGuildBankState = vi.fn(() => STATE);
+    installAdminRuntime({ adminGuildBankState });
+    const r = await runRoute('GET', '/admin/api/guilds/:id/bank', { params: { id: '913' } });
+    expect(r.status).toBe(401);
+    expect(adminGuildBankState).not.toHaveBeenCalled();
+  });
+
+  it('both dispatch arms run the SAME shared body (the dual-edit rule)', () => {
+    const source = readFileSync(join(process.cwd(), 'server/admin.ts'), 'utf8');
+    const calls = source.match(/guildBankStateOutcome\(/g) ?? [];
+    // one declaration + two call sites
+    expect(calls.length).toBe(3);
+    expect(source).toContain('const guildBankStateMatch =');
+    expect(source).toContain("path: '/admin/api/guilds/:id/bank',");
   });
 });
 
