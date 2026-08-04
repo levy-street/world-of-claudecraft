@@ -2113,6 +2113,13 @@ export const it_IT: EnTranslations = {
     "noticeboard": {
       "empty": "Non sembra esserci nulla di affisso."
     },
+    "memorial": {
+      "title": "Memorial",
+      "dedication": "To the wardens of Gullhaven who carried a seal into the Breach and did not come out again. The town keeps the bell for them.",
+      "rollHeading": "Roll of Honour ({count})",
+      "roomRemaining": "The stone below the last name has been left bare.",
+      "close": "Close memorial"
+    },
     "bank": {
       "title": "Banca",
       "subtitle": "Il Forziere Dorato",

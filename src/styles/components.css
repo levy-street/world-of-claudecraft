@@ -5528,6 +5528,72 @@
     margin-top: 4px;
   }
 
+  /* ---------- memorial plaque ---------- */
+  /* The Roll of Honour shown for reading a war memorial. Reuses the
+     confirm-dialog body chrome (the profession-tutorial precedent) and sizes
+     from existing tokens; the only bespoke part is the two-column name list,
+     which reads down each column in turn the way a cut stone roll does. */
+  #memorial-plaque {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 460px;
+    --window-pad: 14px;
+  }
+  #memorial-plaque .cd-body {
+    padding: 10px 0;
+  }
+  #memorial-plaque .memorial-plaque-dedication {
+    margin: 0 0 12px;
+    color: var(--color-text-light);
+    font-size: 12.5px;
+    line-height: 1.55;
+  }
+  #memorial-plaque .memorial-plaque-heading {
+    margin: 0 0 8px;
+    color: var(--color-accent);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+  #memorial-plaque .memorial-plaque-columns {
+    display: flex;
+    gap: 18px;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    padding: 10px 0;
+  }
+  #memorial-plaque .memorial-plaque-column {
+    flex: 1 1 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    min-width: 0;
+  }
+  #memorial-plaque .memorial-plaque-name {
+    color: var(--color-text);
+    font-size: 12.5px;
+    line-height: 1.7;
+    /* a roll is read, not scanned: keep the names on one line each */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* The bare stone under the newest name is the point of the monument. */
+  #memorial-plaque .memorial-plaque-room {
+    margin: 10px 0 0;
+    color: var(--color-text-dim);
+    font-size: 11.5px;
+    font-style: italic;
+    line-height: 1.5;
+  }
+  #memorial-plaque .cd-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
+  }
+
   /* ---------- train window ---------- */
   /* Recipe training: the station master's teaching ladder. Rows keep the
      vendor family's anatomy classes but ride the showcase inset-card idiom

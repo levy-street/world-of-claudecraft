@@ -140,6 +140,7 @@ import {
 import { LAST_BELL_SQUAD_MOBS } from './content/last_bell_squad';
 import { MAGE_PET_MOBS } from './content/mage_pets';
 import { MAILBOXES } from './content/mailboxes';
+import { MEMORIAL_TERRAIN_EDITS, MEMORIALS } from './content/memorials';
 import {
   NIGHTBLOOM_CAMPS,
   NIGHTBLOOM_ITEMS,
@@ -727,6 +728,7 @@ export const BUILTIN_WORLD: WorldContent = {
     stations: STATIONS,
     mailboxes: MAILBOXES,
     noticeboards: NOTICEBOARDS,
+    memorials: MEMORIALS,
     graveyards: OVERWORLD_GRAVEYARDS,
   },
   // invisible collision walls: the moderation cage plus the Last Keep's
@@ -734,7 +736,9 @@ export const BUILTIN_WORLD: WorldContent = {
   blockers: [...JAIL_BLOCKERS, ...CASTLE_BLOCKERS],
   // The jail cage floor plus the harbor shore grading (harbor_layout.ts):
   // both are pure HeightStamp data applied through terrainHeight's edit layer.
-  terrainEdits: [...JAIL_TERRAIN_EDITS, ...HARBOR_TERRAIN_EDITS],
+  // Memorial grading lands LAST so its terrace wins locally over the
+  // broader harbor pads it overlaps at the berm.
+  terrainEdits: [...JAIL_TERRAIN_EDITS, ...HARBOR_TERRAIN_EDITS, ...MEMORIAL_TERRAIN_EDITS],
 };
 
 let activeWorld: WorldContent = BUILTIN_WORLD;

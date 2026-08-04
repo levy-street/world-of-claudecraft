@@ -30,6 +30,7 @@ import type {
   ZonePropsDef,
 } from '../types';
 import { emptyZoneProps } from '../types';
+import { GULLHAVEN_MEMORIAL, memorialRailProps } from './memorials';
 
 export const FARSHORE_ZONE: ZoneDef = {
   id: 'farshore_isle',
@@ -95,6 +96,22 @@ export const FARSHORE_ROADS: { x: number; z: number }[][] = [
     { x: 855, z: 165 },
     { x: 880, z: 195 },
   ], // Gullhaven -> the Wreckfields
+  // The town -> Warden Hale's memorial. It CONTOURS the mound's west flank
+  // rather than climbing the face: the same curve MEMORIAL_TERRAIN_EDITS
+  // grades, so the painted road always sits on graded ground and the climb
+  // stays at about 0.2 per yard. You come round the hill and the bronze
+  // arrives in view, instead of trudging straight at it.
+  [
+    { x: 814, z: 121 },
+    { x: 807, z: 123 },
+    { x: 801, z: 124.5 },
+    { x: 797, z: 127.5 },
+    { x: 795.5, z: 131 },
+    { x: 797.5, z: 133.5 },
+    { x: 801, z: 134 },
+    { x: 805, z: 133.2 },
+    { x: 805, z: 137.5 },
+  ],
 ] as { x: number; z: number }[][];
 
 // No portals: the Farshore is reached on foot, across the Ferrywalk causeway
@@ -652,13 +669,19 @@ export const FARSHORE_PROPS: ZonePropsDef = {
     { kind: 'chapel', x: 831, z: 110, w: 5, d: 7, rot: -2.4 }, // the menders' hall
   ],
   // Warden Hale's memorial. It stands on the berm crest NORTH of the redoubt
-  // (ground 9.4, about 4 yd above the town's flat 5.5 pad) rather than in the
+  // (graded to a level 10.4 terrace, about 5 yd above the town's flat 5.5
+  // pad, by MEMORIAL_TERRAIN_EDITS) rather than in the
   // market it used to crowd: a memorial reads as a memorial with space around
   // it, and from up here the bronze looks back down over the town and the
   // harbor steps the way the histories describe. Facing south, inland over the
   // town, per the Q0 line. One authored asset now, not two scaled nature-kit
   // blocks; the collider radius is the measured circumscribed footprint so
   // collision matches the silhouette.
+  //
+  // The bronze warden now stands on a European-style memorial column rather
+  // than a plinth, which took the asset from 4.8 to 7.48 yd: a shaft only has
+  // to out-measure the figure to read as a column at all. Both numbers below
+  // are measured off the shipping GLB, not chosen.
   decorProps: [
     {
       key: 'wardenHaleStatue',
@@ -666,9 +689,36 @@ export const FARSHORE_PROPS: ZonePropsDef = {
       z: 139,
       rot: Math.PI,
       scale: 1,
-      r: 1.26,
-      h: 4.8,
+      r: 1.4,
+      h: 7.48,
     },
+    // ---- the memorial precinct -------------------------------------------
+    // Rebuilt after the first pass read as scattered rubble in a forest. Three
+    // corrections, all from measuring the assets instead of picking them by
+    // name: hexFenceStone is 1.15 long and 0.27 high, so spacing it every 3
+    // yards left 1.85 yard gaps and it read as debris (dropped); kcasBench is
+    // a salmon-pink castle picnic table, absurd at a memorial (dropped); and
+    // gardenIronFence is 4.0 long with rot 0 running along X, so a run needs
+    // ~3.5 spacing to overlap rather than gap.
+    //
+    // Trees and rocks are cleared inside the memorial's clearingRadius
+    // (decorationAt in world.ts), so the planting below is the only greenery
+    // on the mound and the bronze keeps sky behind it.
+    //
+    // The path arrives from the WEST after contouring the mound, so the
+    // perimeter opens on that side and closes the south and east where the
+    // ground falls away.
+    // The rail, DERIVED from GULLHAVEN_MEMORIAL.rail so the props and the
+    // colliders in colliders.ts cannot drift apart. Do not hand-list these.
+    ...memorialRailProps(GULLHAVEN_MEMORIAL),
+    // Planting in matched pairs on the terrace diagonals: it frames the plinth
+    // and never stands on the axis you walk in on.
+    { key: 'shrubFlowering', x: 803.1, z: 137.7, scale: 1, r: 0.5, h: 1.4 },
+    { key: 'shrubFlowering', x: 806.9, z: 137.7, scale: 1, r: 0.5, h: 1.4 },
+    { key: 'shrubFlowering', x: 803.1, z: 141.5, scale: 1, r: 0.5, h: 1.4 },
+    { key: 'shrubFlowering', x: 806.9, z: 141.5, scale: 1, r: 0.5, h: 1.4 },
+    { key: 'oakTree', x: 786.5, z: 150, rot: 0.6, scale: 1.2, r: 0.8, h: 9 },
+    { key: 'oakTree', x: 823.5, z: 149, rot: -1.1, scale: 1.25, r: 0.8, h: 9 },
   ],
   wells: [{ x: 820, z: 119, r: 1.5 }],
   stalls: [
@@ -686,14 +736,12 @@ export const FARSHORE_PROPS: ZonePropsDef = {
     [782, -26], // the Landing's brazier on the west shore
     [992, 6], // the Watch Meadow's signal fire, kept burning for the vigil
   ],
-  // the barricade ring: the town's old windward fences, doubled and closed
-  // into a defensive line around the muster
-  fences: [
-    { x1: 803, z1: 104, x2: 823, z2: 102 },
-    { x1: 829, z1: 104, x2: 837, z2: 112 },
-    { x1: 807, z1: 134, x2: 827, z2: 136 },
-    { x1: 799, z1: 114, x2: 801, z2: 126 },
-  ],
+  // The barricade ring is retired. It read as clutter around the muster, and
+  // the north run (x 807-827, z 134-136) cut straight across the memorial's
+  // south approach: a solid line between the town and the monument, which is
+  // where the stray collision up there came from. The siege reads through the
+  // war camp, the watchfires and the redoubt itself, not a rail fence.
+  fences: [],
   // the war camp: tents crowd the market where the fish stalls used to stand
   tents: [
     { x: 815, z: 108, rot: 0.4, scale: 1 },

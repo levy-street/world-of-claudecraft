@@ -691,6 +691,39 @@ function staticWorldColliders(seed: number): Collider[] {
     });
   }
 
+  // Memorial rails: one oriented box per post and per panel, derived from the
+  // SAME `def.rail` record the renderer places its props from, so the fence you
+  // see and the fence that stops you are the same geometry. A decorProp can
+  // only carry a circle, which is why the rail had no usable collision at all
+  // before this: a 4.0 long panel has no honest circle.
+  for (const memorial of content.services?.memorials ?? []) {
+    const { rail } = memorial;
+    for (const post of rail.posts) {
+      out.push({
+        type: 'obb',
+        x: post.x,
+        z: post.z,
+        hw: rail.postHalf,
+        hd: rail.postHalf,
+        rot: 0,
+        cameraTopY: topY(seed, post.x, post.z, rail.height),
+        camGhost: true,
+      });
+    }
+    for (const panel of rail.panels) {
+      out.push({
+        type: 'obb',
+        x: panel.x,
+        z: panel.z,
+        hw: rail.panelHalfLength,
+        hd: rail.panelHalfDepth,
+        rot: panel.rot ?? 0,
+        cameraTopY: topY(seed, panel.x, panel.z, rail.height),
+        camGhost: true,
+      });
+    }
+  }
+
   // Gather nodes: the renderer draws every node's GLB at a fixed spot whether
   // or not it is ready to harvest, so ore veins and wood piles are permanent
   // solid, standable bodies; herb clusters stay soft vegetation on purpose

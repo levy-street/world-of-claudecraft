@@ -35,6 +35,7 @@ import { warriorParryChance } from '../sim/combat/warrior_hit_table';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
+import { MEMORIALS } from '../sim/content/memorials';
 import { isOnMountRaceStartPlatform, MOUNTS } from '../sim/content/mounts';
 import { recipeById } from '../sim/content/recipes';
 import { MECH_CHROMAS } from '../sim/content/skins';
@@ -347,6 +348,11 @@ import { LootRollController } from './hud/loot/loot_roll_controller';
 import { lootSettingsView } from './hud/loot/loot_settings_view';
 import { renderLootSettingsWindow } from './hud/loot/loot_settings_window';
 import { LootWindowController } from './hud/loot/loot_window_controller';
+import {
+  buildMemorialPlaqueModel,
+  closeMemorialPlaque,
+  renderMemorialPlaque,
+} from './hud/memorial';
 import { CARD_POSES } from './hud/player_card/player_card';
 import { PlayerCardController } from './hud/player_card/player_card_controller';
 import { QuestDialogController } from './hud/quest/quest_dialog_controller';
@@ -1560,6 +1566,7 @@ export class Hud {
   private confirmTrap: FocusTrapHandle | null = null;
   // The first-tier tutorial modal's focus trap (#profession-tutorial).
   private professionTutorialTrap: FocusTrapHandle | null = null;
+  private memorialPlaqueTrap: FocusTrapHandle | null = null;
   private meters: Meters;
   private tutorial = new TutorialOverlay();
   private lastPetBarSig = '';
@@ -10319,6 +10326,10 @@ export class Hud {
           // Keyboard/sim interact at a banker NPC: open the bank window.
           this.openBank();
           break;
+        case 'memorial':
+          // Read a memorial: open the Roll of Honour plaque.
+          this.openMemorialPlaque(ev.memorialId);
+          break;
         case 'noticeboard':
           // The board has no posted content yet. The structured private event
           // keeps this feedback localized and identical offline and online.
@@ -11499,6 +11510,29 @@ export class Hud {
     this.professionTutorialTrap?.release();
     this.professionTutorialTrap = null;
     document.getElementById('profession-tutorial')?.remove();
+  }
+
+  // Reading a war memorial: the sim's `memorial` event carries the def id only,
+  // so the roll of honour is resolved here from the same content both hosts
+  // hold. Cold window, the profession-tutorial precedent for the focus trap.
+  private openMemorialPlaque(memorialId: string): void {
+    const def = MEMORIALS.find((m) => m.id === memorialId);
+    if (!def) return;
+    this.memorialPlaqueTrap?.release(false);
+    this.memorialPlaqueTrap = null;
+    const el = renderMemorialPlaque(buildMemorialPlaqueModel(def), {
+      onClose: () => this.closeMemorialPlaque(),
+    });
+    this.bringWindowToFront(el);
+    el.style.zIndex = String(Math.max(Number(el.style.zIndex) || 0, 96));
+    this.memorialPlaqueTrap = this.focusManager.open({ root: () => el });
+    el.querySelector<HTMLElement>('.cd-ok')?.focus();
+  }
+
+  private closeMemorialPlaque(): void {
+    this.memorialPlaqueTrap?.release();
+    this.memorialPlaqueTrap = null;
+    closeMemorialPlaque();
   }
 
   // The earned moment, planned purely (deeds_view buildDeedUnlockPlan) so the

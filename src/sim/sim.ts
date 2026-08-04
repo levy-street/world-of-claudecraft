@@ -619,6 +619,7 @@ import {
   type MasterLootPrompt,
   type MasterLootThreshold,
   MELEE_RANGE,
+  type MemorialDef,
   type MobFamily,
   type MountRaceSession,
   type MountTrainingSession,
@@ -1655,6 +1656,10 @@ export class Sim {
   private readonly worldContent: WorldContent;
   /** Validated active-world noticeboards captured for this Sim at construction. */
   readonly noticeboardDefinitions: readonly NoticeboardDef[];
+  /** Active-world memorials captured for this Sim at construction. */
+  readonly memorialDefinitions: readonly MemorialDef[];
+  /** Spawned memorial anchor entity id -> the MemorialDef id it reads. */
+  readonly memorialEntityIds = new Map<number, string>();
   rng: Rng;
   time = 0;
   tickCount = 0;
@@ -1901,6 +1906,7 @@ export class Sim {
       assertCanonicalEastbrookNoticeboardDef(definition);
     }
     this.noticeboardDefinitions = Object.freeze([...activeNoticeboardDefinitions]);
+    this.memorialDefinitions = Object.freeze([...(activeWorldContent.services?.memorials ?? [])]);
     this.rng = new Rng(cfg.seed);
     // Live server opt-in (worldBossAtBoot): the first world-boss rise is due
     // immediately instead of one interval out, so a freshly (re)started realm
@@ -2062,6 +2068,24 @@ export class Sim {
       box.lootable = true; // interactable
       this.addEntity(box);
       this.postOffice.mailboxIds.push(box.id);
+    }
+
+    // War memorials: one readable anchor per monument, spawned at its authored
+    // spot (the mailbox pattern). The stone is decor with its own collider, so
+    // this entity exists purely to carry the interaction; it must not relocate
+    // away from the silhouette. Draws no rng.
+    for (const memorial of worldContent.services?.memorials ?? []) {
+      const stone = createGroundObject(
+        this.nextId++,
+        '',
+        'Memorial',
+        this.groundPos(memorial.x, memorial.z),
+      );
+      stone.templateId = 'memorial';
+      stone.objectItemId = null;
+      stone.lootable = true; // interactable
+      this.addEntity(stone);
+      this.memorialEntityIds.set(stone.id, memorial.id);
     }
 
     // Dungeon entrances + their private instance slots
@@ -4549,6 +4573,12 @@ export class Sim {
       rebucket: sim.rebucket.bind(sim),
       resolve: sim.resolve.bind(sim),
       groundPos: sim.groundPos.bind(sim),
+      memorialIdForEntity: (entityId) => sim.memorialEntityIds.get(entityId) ?? null,
+      memorialInteractionRadius: (entityId) => {
+        const id = sim.memorialEntityIds.get(entityId);
+        if (!id) return null;
+        return sim.memorialDefinitions.find((m) => m.id === id)?.interactionRadius ?? null;
+      },
       playerMods: sim.playerMods.bind(sim),
       delveRunForPlayer: sim.delveRunForPlayer.bind(sim),
       delveModuleEntry: sim.delveModuleEntry.bind(sim),

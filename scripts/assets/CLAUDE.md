@@ -35,6 +35,14 @@ For reference-image reconstruction and procedural GLB authoring, read the living
   is the `image-to-glb` skill (`.claude/skills/image-to-glb/SKILL.md`); a new asset copies
   the mailbox/noticeboard archetype (or the town contract-table archetype for a wave),
   never a bespoke pipeline.
+- **`warden_hale_statue/` is the one BLENDER-authored exporter**, and the exception is
+  deliberate: its figure is the rigged KayKit knight re-posed and skin-baked, which needs
+  an armature evaluator the browser/three path does not have. Same archetype otherwise
+  (deterministic factory -> `tmp/asset_src` raw -> spec -> `build_assets.mjs` -> `public/`),
+  but the factory is `model.py` run under `blender --background` and the driver resolves
+  the binary via `BLENDER_PATH`. Run by hand like everything here, never from `npm run
+  build`, so the toolchain stays off the contributor critical path. Prefer the browser
+  archetype for anything that is not a re-posed rig.
 - **Source fingerprints are load-bearing.** Eastbrook-era exporters stamp a sha256 over a
   pinned input list (factory/entry/exporter/spec, `build_assets.mjs`, reference
   turnarounds, the shared atlas, and `package-lock.json`) into the GLB extras, and tests

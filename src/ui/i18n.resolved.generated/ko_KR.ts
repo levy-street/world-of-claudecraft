@@ -2113,6 +2113,13 @@ export const ko_KR: EnTranslations = {
     "noticeboard": {
       "empty": "게시된 내용이 없는 것 같습니다."
     },
+    "memorial": {
+      "title": "Memorial",
+      "dedication": "To the wardens of Gullhaven who carried a seal into the Breach and did not come out again. The town keeps the bell for them.",
+      "rollHeading": "Roll of Honour ({count})",
+      "roomRemaining": "The stone below the last name has been left bare.",
+      "close": "Close memorial"
+    },
     "bank": {
       "title": "은행",
       "subtitle": "도금 금고",

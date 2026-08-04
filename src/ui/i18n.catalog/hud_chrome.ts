@@ -2298,6 +2298,17 @@ export const hudChromeStrings = {
   noticeboard: {
     empty: 'Nothing seems posted.',
   },
+  // The memorial plaque: the Roll of Honour shown for reading a war memorial.
+  // The names themselves are proper nouns spliced verbatim from content and are
+  // never translated; only this chrome is.
+  memorial: {
+    title: 'Memorial',
+    dedication:
+      'To the wardens of Gullhaven who carried a seal into the Breach and did not come out again. The town keeps the bell for them.',
+    rollHeading: 'Roll of Honour ({count})',
+    roomRemaining: 'The stone below the last name has been left bare.',
+    close: 'Close memorial',
+  },
   // The bank window (the Gilded Strongbox): a pooled deposit box shown while standing
   // at a banker NPC. Plain click withdraws a stack; shift-click withdraws a partial
   // amount; the footer buys 6-slot expansion blocks. The withdraw-quantity and

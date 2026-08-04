@@ -875,7 +875,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/tent_open.glb": "/media/models/props/tent_open.92b3477806c6.glb",
   "models/props/tent_small.glb": "/media/models/props/tent_small.af9378727756.glb",
   "models/props/timber_pillar.glb": "/media/models/props/timber_pillar.6652942ce01e.glb",
-  "models/props/wardenHaleStatue.glb": "/media/models/props/wardenHaleStatue.db6f1d59098e.glb",
+  "models/props/wardenHaleStatue.glb": "/media/models/props/wardenHaleStatue.f5c894a4ac49.glb",
   "models/props/weapon_stand.glb": "/media/models/props/weapon_stand.a781b465d38e.glb",
   "models/props/well.glb": "/media/models/props/well.9308ba09ea3b.glb",
   "models/props/wildheart_ancestor_ruin.glb": "/media/models/props/wildheart_ancestor_ruin.4387df571bff.glb",
