@@ -1,0 +1,342 @@
+{
+  "sourceImage": "docs/design/fenbridge-rebuild/references/gilded-strongbox-turnaround.png",
+  "zonesDir": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones",
+  "detailInventory": {
+    "scanMethod": "component-zones",
+    "targetMinDetails": 10,
+    "details": [
+      {
+        "id": "orderly-block-and-piling-grid",
+        "kind": "seam",
+        "description": "Regular damp-stone courses are interrupted by squared timber piles.",
+        "region": {
+          "x": 0.25,
+          "y": 0.68,
+          "width": 0.55,
+          "height": 0.2,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "foundation relief",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "foundation/orderly-block-and-piling-grid"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/rear.png",
+        "confidence": 0.94
+      },
+      {
+        "id": "moss-at-drains",
+        "kind": "stain",
+        "description": "Moss and dark wetness collect at the lowest blocks and gutter discharge.",
+        "region": {
+          "x": 0.18,
+          "y": 0.75,
+          "width": 0.68,
+          "height": 0.15,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "stone albedo and roughness",
+        "mapsTo": {
+          "type": "material.localOverrides",
+          "ref": "stone/moss-at-drains"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/side.png",
+        "confidence": 0.91
+      },
+      {
+        "id": "square-frame-iron-straps",
+        "kind": "fastener",
+        "description": "Ordered wall posts and rails carry square iron plates and bolt heads.",
+        "region": {
+          "x": 0.23,
+          "y": 0.35,
+          "width": 0.6,
+          "height": 0.42,
+          "units": "normalized"
+        },
+        "scale": "micro",
+        "affects": "fortified facade rhythm",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "office-shell/square-frame-iron-straps"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/rear.png",
+        "confidence": 0.94
+      },
+      {
+        "id": "teal-shingle-and-dormer-cadence",
+        "kind": "seam",
+        "description": "Teal shingle rows wrap the gable roof around a centered front dormer.",
+        "region": {
+          "x": 0.2,
+          "y": 0.05,
+          "width": 0.65,
+          "height": 0.32,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "roof relief",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "roof-dormer/teal-shingle-and-dormer-cadence"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/front.png",
+        "confidence": 0.96
+      },
+      {
+        "id": "brass-teller-grille",
+        "kind": "linework",
+        "description": "Thick brass bars and cross rails form the exterior teller grille.",
+        "region": {
+          "x": 0.36,
+          "y": 0.42,
+          "width": 0.25,
+          "height": 0.22,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "bank service cue",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "teller-bay/brass-teller-grille"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/front.png",
+        "confidence": 0.98
+      },
+      {
+        "id": "ledger-counter-slot",
+        "kind": "groove",
+        "description": "A dark backed counter recess and ledge sit directly below the grille.",
+        "region": {
+          "x": 0.42,
+          "y": 0.52,
+          "width": 0.22,
+          "height": 0.17,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "teller depth cue",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "teller-bay/ledger-counter-slot"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/hero.png",
+        "confidence": 0.94
+      },
+      {
+        "id": "ironbound-door-straps",
+        "kind": "fastener",
+        "description": "The rounded front door carries heavy straps, rivets, and a ring pull.",
+        "region": {
+          "x": 0.62,
+          "y": 0.4,
+          "width": 0.18,
+          "height": 0.33,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "fortified entrance hardware",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "ironbound-door/ironbound-door-straps"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/front.png",
+        "confidence": 0.97
+      },
+      {
+        "id": "barred-amber-window-grid",
+        "kind": "linework",
+        "description": "Amber arched windows are contained by heavy orthogonal bars.",
+        "region": {
+          "x": 0.22,
+          "y": 0.45,
+          "width": 0.46,
+          "height": 0.25,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "window rhythm",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "barred-window-system/barred-amber-window-grid"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/side.png",
+        "confidence": 0.96
+      },
+      {
+        "id": "vault-wheel-spokes",
+        "kind": "ridge",
+        "description": "A radial exterior vault wheel has an outer ring, hub, spokes, and perimeter bolts.",
+        "region": {
+          "x": 0.43,
+          "y": 0.44,
+          "width": 0.18,
+          "height": 0.25,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "bank identity hardware",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "vault-wheel/vault-wheel-spokes"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/side.png",
+        "confidence": 0.98
+      },
+      {
+        "id": "attached-chest-straps",
+        "kind": "fastener",
+        "description": "The side service chest has iron bands, corner plates, and a centered lock.",
+        "region": {
+          "x": 0.08,
+          "y": 0.62,
+          "width": 0.18,
+          "height": 0.2,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "attached bank prop",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "service-props/attached-chest-straps"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/hero.png",
+        "confidence": 0.93
+      },
+      {
+        "id": "drainpipe-barrel-hoops",
+        "kind": "ridge",
+        "description": "Segmented gutter elbows terminate above a barrel with paired iron hoops.",
+        "region": {
+          "x": 0.18,
+          "y": 0.38,
+          "width": 0.16,
+          "height": 0.46,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "drainage silhouette",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "service-props/drainpipe-barrel-hoops"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/hero.png",
+        "confidence": 0.92
+      },
+      {
+        "id": "rope-wrapped-pilings",
+        "kind": "ridge",
+        "description": "Short rope collars wrap the stout front porch posts.",
+        "region": {
+          "x": 0.28,
+          "y": 0.74,
+          "width": 0.5,
+          "height": 0.13,
+          "units": "normalized"
+        },
+        "scale": "micro",
+        "affects": "marsh-built porch detail",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "service-props/rope-wrapped-pilings"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/front.png",
+        "confidence": 0.9
+      },
+      {
+        "id": "blank-shield-bevel",
+        "kind": "bevel",
+        "description": "A blank shield-shaped brass plate hangs from the front porch bracket.",
+        "region": {
+          "x": 0.84,
+          "y": 0.4,
+          "width": 0.12,
+          "height": 0.27,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "sign silhouette",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "blank-shield-sign/blank-shield-bevel"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/front.png",
+        "confidence": 0.95
+      },
+      {
+        "id": "chimney-block-courses",
+        "kind": "seam",
+        "description": "A short stone chimney uses visible block courses and a broad cap.",
+        "region": {
+          "x": 0.46,
+          "y": 0.08,
+          "width": 0.15,
+          "height": 0.28,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "roof silhouette",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "chimney-gutter/chimney-block-courses"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/side.png",
+        "confidence": 0.93
+      },
+      {
+        "id": "paired-lantern-cages",
+        "kind": "emissive",
+        "description": "Small amber lantern cores remain inside dark cages beside teller and door.",
+        "region": {
+          "x": 0.26,
+          "y": 0.38,
+          "width": 0.55,
+          "height": 0.22,
+          "units": "normalized"
+        },
+        "scale": "micro",
+        "affects": "front focal hierarchy",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "lantern-system/paired-lantern-cages"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/front.png",
+        "confidence": 0.94
+      },
+      {
+        "id": "handled-iron-polish",
+        "kind": "gloss",
+        "description": "Door pull, vault hub, and chest lock have localized lower roughness.",
+        "region": {
+          "x": 0.14,
+          "y": 0.45,
+          "width": 0.62,
+          "height": 0.28,
+          "units": "normalized"
+        },
+        "scale": "micro",
+        "affects": "handled metal response",
+        "mapsTo": {
+          "type": "material.localOverrides",
+          "ref": "metal/handled-iron-polish"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/hero.png",
+        "confidence": 0.87
+      }
+    ]
+  },
+  "authoringInstruction": "Inventory complete. Every detail maps to a real component local feature or material local override in sculpt-spec.json.",
+  "admission": {
+    "verdict": "pass",
+    "probe": "All four crops are technically conditional only for sub-1k resolution; macro and meso evidence remains usable.",
+    "duplicateGate": "front, side, rear, and hero are independently admitted."
+  },
+  "uncertainty": [
+    "The exterior vault wheel is canonical on the side elevation; the plain rear elevation remains free of a wheel.",
+    "The attached chest and barrel shift slightly across generated views; use the hero placement within the building footprint.",
+    "The teller recess is a dark backed exterior service bay, not a visible room or open vault.",
+    "The shield sign remains blank and no coin mark, readable ledger, or copied emblem is introduced."
+  ]
+}

@@ -16,13 +16,14 @@ import {
 import { Sim } from '../src/sim/sim';
 import { groundHeight, WATER_LEVEL } from '../src/sim/world';
 
-// The Galecrest Stables paddock west run (content/zone3.ts): an isolated, open-field
-// fence run with room to detour on both sides, used to exercise the generic
-// fence-blocking / fence-jump pathfinding behavior (not Eastbrook-specific).
+// Highwatch paddock west run: an isolated, open-field fence with room to detour
+// on both sides, used to exercise generic fence-blocking / fence-jump pathfinding
+// (not Eastbrook or Fenbridge-specific). The old (-18,313) pin was a removed
+// Fenbridge legacy fence that no longer ships.
 const TEST_FENCE_PLACEMENT = PROPS.fences.find(
-  (fence) => fence.x1 === -18 && fence.z1 === 313 && fence.x2 === -22 && fence.z2 === 300,
+  (fence) => fence.x1 === -14 && fence.z1 === 649 && fence.x2 === -4 && fence.z2 === 647,
 );
-if (!TEST_FENCE_PLACEMENT) throw new Error('missing Galecrest stable paddock west fence');
+if (!TEST_FENCE_PLACEMENT) throw new Error('missing Highwatch paddock west fence');
 const TEST_FENCE = {
   x1: TEST_FENCE_PLACEMENT.x1,
   z1: TEST_FENCE_PLACEMENT.z1,

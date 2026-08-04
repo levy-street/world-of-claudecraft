@@ -180,9 +180,10 @@ describe('banker chest model and placement', () => {
     const expectedOffsets: Record<string, readonly [number, number]> = {
       // The bank facade stands directly behind Fernando, so his behind-side
       // candidates sample blocked and the chest takes the pushed-out front
-      // corner; the other two towns keep the behind-and-beside spot.
+      // corner. Petra's rebuilt exterior teller likewise keeps the bank facade
+      // directly behind her, so its first fully clear spot is also in front.
       bursar_fernando: [2.0, 0.9],
-      bursar_petra_vell: [-1.15, -1.6],
+      bursar_petra_vell: [2.0, 0.9],
       bursar_aldous_crane: [2.0, 0.9],
     };
     for (const [templateId, expected] of Object.entries(expectedOffsets)) {

@@ -1,0 +1,520 @@
+{
+  "targetName": "Fenbridge Lantern Chapel",
+  "sourceImage": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/hero.png",
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "exterior-only timber chapel and archive",
+      "primaryDomain": "object",
+      "formLanguage": ["architectural", "hard-surface", "pointed-arch", "asymmetric roofline"],
+      "structureKind": [
+        "layered exterior shell",
+        "repeated facade modules",
+        "open bell subassembly"
+      ],
+      "motionPotential": ["static world building", "future bell sway", "future lantern sway"],
+      "materialFamilies": [
+        "damp stone",
+        "rain-dark timber",
+        "oxidized teal shingles",
+        "forged iron",
+        "aged brass",
+        "emissive glazing",
+        "parchment"
+      ],
+      "notes": "Four admitted elevations support the exterior chapel and archive; inaccessible interiors are intentionally excluded."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 3,
+        "componentCount": 3,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 2,
+        "materialLayerCount": 3,
+        "localDetailDensity": 3,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 1
+      },
+      "estimatedCounts": {
+        "macroComponents": 4,
+        "mesoComponents": 6,
+        "microFeatureGroups": 13,
+        "materialLayers": 6,
+        "repetitionSystems": 2
+      },
+      "reasoning": [
+        "The tall bell gable, steep sagged roof, pointed portal, archive niche, and exterior lamps make the chapel silhouette and service role distinct.",
+        "Lancets, shingles, stone courses, trim, and chains need grouped repetition to fit the 3,400-triangle target.",
+        "Four views expose all exterior elevations, but generated minor trim counts are treated as cadence rather than literal geometry."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "The chapel needs macro nave masses, meso service assemblies, and mapped micro trim to retain identity at gameplay distance."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "resolvedUncertainties": [
+      "Front, side, and hero views control the bell gable and archive niche; the rear view controls the plain rear timber bay and circular window.",
+      "Generated views vary minor lantern and finial placement; implement a restrained repeated bracket system without copying inconsistent counts.",
+      "Archive papers remain shallow, closed, and abstract with no readable writing; no interior is visible behind the portal or lancets.",
+      "The roof sag is approximated with pitched masses and stepped course offsets rather than dense curved tessellation."
+    ],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 10,
+      "note": "Thirteen observed details map to component local features or material local overrides.",
+      "details": [
+        {
+          "id": "moss-footing",
+          "kind": "stain",
+          "description": "Moss follows the lowest stone joints and corner buttress contacts.",
+          "region": {
+            "x": 0.25,
+            "y": 0.76,
+            "width": 0.5,
+            "height": 0.16,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "stone albedo and roughness",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "stone/moss-footing"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/front.png",
+          "confidence": 0.95
+        },
+        {
+          "id": "buttressed-stone-courses",
+          "kind": "seam",
+          "description": "Uneven damp-stone blocks and heavier corner buttresses seat the nave.",
+          "region": {
+            "x": 0.16,
+            "y": 0.7,
+            "width": 0.62,
+            "height": 0.2,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "foundation relief",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "foundation/buttressed-stone-courses"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/hero.png",
+          "confidence": 0.93
+        },
+        {
+          "id": "timber-truss-rhythm",
+          "kind": "ridge",
+          "description": "Dark posts and diagonal gable braces divide the timber wall bays.",
+          "region": {
+            "x": 0.28,
+            "y": 0.25,
+            "width": 0.45,
+            "height": 0.45,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "nave frame relief",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "nave-shell/timber-truss-rhythm"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/front.png",
+          "confidence": 0.94
+        },
+        {
+          "id": "sagged-shingle-courses",
+          "kind": "seam",
+          "description": "Teal shingles overlap in many horizontal rows across a shallow sagged roof.",
+          "region": {
+            "x": 0.22,
+            "y": 0.12,
+            "width": 0.63,
+            "height": 0.38,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "roof relief",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "roof-silhouette/sagged-shingle-courses"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/side.png",
+          "confidence": 0.96
+        },
+        {
+          "id": "pointed-portal-frame",
+          "kind": "ridge",
+          "description": "Nested pointed arch trim frames the closed accessible double door.",
+          "region": {
+            "x": 0.39,
+            "y": 0.39,
+            "width": 0.25,
+            "height": 0.32,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "portal silhouette and relief",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "front-portal/pointed-portal-frame"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/front.png",
+          "confidence": 0.97
+        },
+        {
+          "id": "diamond-gable-window",
+          "kind": "linework",
+          "description": "A small diamond amber window with dark cross mullions sits above the portal.",
+          "region": {
+            "x": 0.46,
+            "y": 0.28,
+            "width": 0.12,
+            "height": 0.12,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "front focal light",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "front-portal/diamond-gable-window"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/front.png",
+          "confidence": 0.94
+        },
+        {
+          "id": "weathered-bell-and-clapper",
+          "kind": "contour",
+          "description": "A flared brass bell and clapper hang in an open timber gable.",
+          "region": {
+            "x": 0.44,
+            "y": 0.08,
+            "width": 0.12,
+            "height": 0.2,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "bell tower negative space",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "bell-gable/weathered-bell-and-clapper"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/front.png",
+          "confidence": 0.93
+        },
+        {
+          "id": "lancet-mullion-rhythm",
+          "kind": "linework",
+          "description": "Repeated pointed amber lancets carry dark vertical mullions.",
+          "region": {
+            "x": 0.43,
+            "y": 0.52,
+            "width": 0.36,
+            "height": 0.24,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "window repetition and scale",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "lancet-window-system/lancet-mullion-rhythm"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/side.png",
+          "confidence": 0.96
+        },
+        {
+          "id": "ledger-and-scroll-relief",
+          "kind": "ridge",
+          "description": "The protected side niche contains shallow ledger slabs and rolled parchment cylinders.",
+          "region": {
+            "x": 0.37,
+            "y": 0.57,
+            "width": 0.2,
+            "height": 0.18,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "archive service cue",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "archive-niche/ledger-and-scroll-relief"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/hero.png",
+          "confidence": 0.91
+        },
+        {
+          "id": "grave-lamp-finials",
+          "kind": "contour",
+          "description": "Pointed grave-lamp caps and bracket ends repeat at exterior corners.",
+          "region": {
+            "x": 0.1,
+            "y": 0.45,
+            "width": 0.78,
+            "height": 0.28,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "chapel silhouette accents",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "lantern-finial-system/grave-lamp-finials"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/hero.png",
+          "confidence": 0.87
+        },
+        {
+          "id": "lantern-cage-bars",
+          "kind": "linework",
+          "description": "Dark cage bars contain small amber lantern cores at the facade edges.",
+          "region": {
+            "x": 0.16,
+            "y": 0.49,
+            "width": 0.7,
+            "height": 0.2,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "lantern material separation",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "lantern-finial-system/lantern-cage-bars"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/front.png",
+          "confidence": 0.93
+        },
+        {
+          "id": "rain-chain-links",
+          "kind": "linework",
+          "description": "Short dark rain-chain drops descend from side and rear eaves.",
+          "region": {
+            "x": 0.2,
+            "y": 0.5,
+            "width": 0.65,
+            "height": 0.28,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "eave drainage silhouette",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "rain-chain-system/rain-chain-links"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/rear.png",
+          "confidence": 0.88
+        },
+        {
+          "id": "blank-archive-faces",
+          "kind": "linework",
+          "description": "Archive papers use fold and edge lines only, never readable text.",
+          "region": {
+            "x": 0.24,
+            "y": 0.6,
+            "width": 0.2,
+            "height": 0.2,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "parchment facade treatment",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "parchment/blank-archive-faces"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/side.png",
+          "confidence": 0.9
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "note": "Architectural object; character anatomy does not apply."
+    },
+    "sourceImage": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/hero.png"
+  },
+  "qualityContract": {
+    "qualityBar": "complex",
+    "definitionOfDone": [
+      "A floor-seated 7 by 8.6 by 7 yard exterior chapel reads from four views through its steep teal roof, open bell gable, pointed portal, lancet glow, and archive niche while remaining under the 3,400-triangle target and 4,600 hard ceiling."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 4,
+      "mesoComponents": 6,
+      "microFeatureGroups": 10,
+      "materialLayers": 6,
+      "repetitionSystems": 2,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "nave-bell-silhouette",
+        "name": "Steep nave roof and narrow open bell gable",
+        "required": true,
+        "qualityCriteria": [
+          "The long low nave remains subordinate to the tall front bell gable and pointed finial."
+        ],
+        "evidenceRefs": ["front", "side", "hero"],
+        "failureModes": [
+          "chapel reads as a generic cottage",
+          "bell opening collapses into a solid block"
+        ]
+      },
+      {
+        "id": "pointed-service-front",
+        "name": "Pointed accessible portal and front stair",
+        "required": true,
+        "qualityCriteria": [
+          "The closed pointed portal, flanking lancets, and dry steps form a clear service approach on +Z."
+        ],
+        "evidenceRefs": ["front", "hero"],
+        "failureModes": ["door loses pointed identity", "steps or lanterns obstruct the approach"]
+      },
+      {
+        "id": "lancet-light-rhythm",
+        "name": "Repeated amber lancet and lantern rhythm",
+        "required": true,
+        "qualityCriteria": [
+          "Dark mullions and cage bars contain every warm core across front and side bays."
+        ],
+        "evidenceRefs": ["front", "side", "hero"],
+        "failureModes": [
+          "unframed emissive panels wash out the wall",
+          "window cadence becomes uniform rectangles"
+        ]
+      },
+      {
+        "id": "archive-service-niche",
+        "name": "Protected exterior archive display",
+        "required": true,
+        "qualityCriteria": [
+          "The side niche clearly carries blank ledgers and map rolls without implying an explorable interior."
+        ],
+        "evidenceRefs": ["side", "hero"],
+        "failureModes": [
+          "archive cue disappears",
+          "readable pseudo-text or open interior is introduced"
+        ]
+      },
+      {
+        "id": "chapel-construction-surface",
+        "name": "Stone, timber, shingle, bell, and parchment material separation",
+        "required": true,
+        "qualityCriteria": [
+          "Semantic vertex colors keep damp stone, dark timber, teal roof, metal, warm light, and parchment distinct under neutral relighting."
+        ],
+        "evidenceRefs": ["front", "side", "rear", "hero"],
+        "failureModes": [
+          "materials collapse into one brown mass",
+          "baked lighting is projected as albedo"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "nave length, roof height, and bell-gable height ratios",
+      "pointed portal and bell negative-space silhouettes",
+      "front and side lancet count and spacing rhythm",
+      "archive niche projection and parchment grouping",
+      "teal, timber, stone, metal, parchment, and amber value separation"
+    ],
+    "antiShallowSpecRules": [
+      "Do not model an explorable interior or opening behind warm panels.",
+      "Do not flatten the bell opening, pointed portal, archive ledge, or stair into textures.",
+      "Every inventoried detail maps to a named feature or override.",
+      "Group shingles, lancets, finials, and chains under the triangle ceiling.",
+      "Keep the +Z service apron clear."
+    ]
+  },
+  "authoringInstruction": "Assessment complete from admitted front, side, rear, and hero crops; follow the locked pass sequence and master-plan budget.",
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Fenbridge Lantern Chapel stylized exterior timber chapel bell gable procedural low-poly",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "6857e5ab528b42ac12f4f411f862610a0bffce8e47aee3610a7603c318072fe8"
+    },
+    "matches": [
+      {
+        "record_id": "core.topology-intent",
+        "file_path": "grimoire/glossary/3d_vocabulary.md",
+        "heading": "Geometry And Topology",
+        "key_path": null,
+        "score": 5.143858634031,
+        "snippets": [
+          "Topology intent classifies a surface as hard-surface blockout, subdivision-ready, low-poly prop, organic deformed mesh, or alpha-card cluster."
+        ],
+        "source_refs": [
+          {
+            "path": "grimoire/glossary/3d_vocabulary.md",
+            "heading": "Geometry And Topology",
+            "key_path": null
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "grimoire/glossary/3d_vocabulary.md"
+          },
+          {
+            "kind": "notebooklm-research",
+            "ref": "notebooklm:4b03c2f9-8393-411f-b5b4-039ab9532843",
+            "note": "Validated generic schema vocabulary; numeric claims remain backed by local source_refs."
+          }
+        ]
+      },
+      {
+        "record_id": "core.shader-mapping-customshadermaterial-csm-weathering-hooks",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.rendering_shader_mapping[1]",
+        "score": 3.601401390438,
+        "snippets": [
+          "Extension library exposing csm_* output variables to inject procedural noise/masks into an otherwise-standard lit material, used for dynamic tarnish/patina effects. Thư viện mở rộng cung cấp các biến đầu ra csm_* để chèn nhiễu/mặt nạ thủ tục vào ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.rendering_shader_mapping[1]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      },
+      {
+        "record_id": "core.pbr-hand-painted-vs-pbr-texture",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.material_pbr[12]",
+        "score": 2.632304791455,
+        "snippets": [
+          "Distinguishes textures with lighting baked directly into color (static, stylized) from textures that respond dynamically to scene lighting via separate PBR channels. Phân biệt kết cấu có ánh sáng được nướng trực tiếp vào màu (tĩnh, cách điệu) ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.material_pbr[12]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      }
+    ]
+  }
+}

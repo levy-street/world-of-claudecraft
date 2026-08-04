@@ -376,7 +376,7 @@ describe('Eastbrook polish capture contract', () => {
       // pipeline input or geometry value changed, and no capture was retaken in
       // this merge. Re-minted with
       // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
-      fingerprint: '423c6123ca39a04aa506d28022a0833560452fbddea26bb032b3e4b6a3a10eef',
+      fingerprint: '186fd186dfe660b9d25ceaa0fa1e4f7ff726b847f2e2af85696519b90c926d40',
       components: {
         captureContract: {
           id: 'polish-v2',

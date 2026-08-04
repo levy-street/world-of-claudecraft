@@ -1,0 +1,2866 @@
+{
+  "targetName": "Fenbridge Boardwalk",
+  "targetId": "fenbridge-boardwalk",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "docs/design/fenbridge-rebuild/references/boardwalk-turnaround.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 40,
+    "aspect": 1,
+    "orientation": {
+      "yaw": 0,
+      "pitch": 0,
+      "roll": 0
+    },
+    "positionHint": [
+      0,
+      0,
+      3
+    ],
+    "note": "For likeness work, solve the reference camera (forge/stage1_intake/solve_camera_pose.py) so the review render aligns with the photo and the reference can be projected. Confirm by overlay review."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 2,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 2,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "modular marsh timber boardwalk span",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "long parallel plank deck",
+        "low irregular rail posts",
+        "rope-bound edges"
+      ],
+      "structureKind": [
+        "repeated plank deck",
+        "cross-bearer support",
+        "low rope guard"
+      ],
+      "motionPotential": [
+        "static walkable module",
+        "repeatable path segment",
+        "rope secondary motion"
+      ],
+      "materialFamilies": [
+        "raw weathered boards",
+        "dark rope and iron",
+        "moss and damp staining"
+      ],
+      "notes": "Classified from the four labeled turnaround quadrants; no character anatomy applies."
+    },
+    "complexity": {
+      "tier": "moderate",
+      "scores": {
+        "silhouetteComplexity": 2,
+        "componentCount": 3,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 2,
+        "materialLayerCount": 2,
+        "localDetailDensity": 3,
+        "occlusionRisk": 2,
+        "actionReadinessNeed": 1
+      },
+      "estimatedCounts": {
+        "macroComponents": 2,
+        "mesoComponents": 3,
+        "microFeatureGroups": 8,
+        "materialLayers": 3,
+        "repetitionSystems": 2
+      },
+      "reasoning": [
+        "The turnaround exposes 6 separable semantic systems and 8 identity-defining local details.",
+        "The silhouette, material hierarchy, and rear/side construction require moderate depth rather than a single blockout primitive."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "moderate",
+      "minimumComponentLevels": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Front, side, rear, and hero quadrants expose distinct silhouette, joinery, and material evidence."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "labeled-turnaround-component-zones",
+      "targetMinDetails": 8,
+      "note": "Each observed detail is linked to a concrete component.localFeatures or material.localOverrides key.",
+      "details": [
+        {
+          "id": "plank-gap-lines",
+          "kind": "seam",
+          "description": "Dark narrow gaps separate every deck board.",
+          "region": {
+            "x": 0,
+            "y": 0,
+            "width": 0.5,
+            "height": 0.5,
+            "units": "normalized montage quadrant"
+          },
+          "scale": "meso",
+          "affects": "surface readability",
+          "mapsTo": {
+            "type": "component.localFeatures-or-material.localOverrides",
+            "ref": "parallel-plank-rhythm"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/boardwalk/zones/front.png",
+          "confidence": 0.9
+        },
+        {
+          "id": "uneven-board-ends",
+          "kind": "contour",
+          "description": "Individual board ends project by small irregular amounts.",
+          "region": {
+            "x": 0.5,
+            "y": 0,
+            "width": 0.5,
+            "height": 0.5,
+            "units": "normalized montage quadrant"
+          },
+          "scale": "meso",
+          "affects": "hand-built silhouette",
+          "mapsTo": {
+            "type": "component.localFeatures-or-material.localOverrides",
+            "ref": "uneven-plank-ends"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/boardwalk/zones/side.png",
+          "confidence": 0.895
+        },
+        {
+          "id": "crossbar-shadow",
+          "kind": "linework",
+          "description": "Transverse bearers remain visible in the low side view.",
+          "region": {
+            "x": 0,
+            "y": 0.5,
+            "width": 0.5,
+            "height": 0.5,
+            "units": "normalized montage quadrant"
+          },
+          "scale": "meso",
+          "affects": "structural depth",
+          "mapsTo": {
+            "type": "component.localFeatures-or-material.localOverrides",
+            "ref": "under-deck-crossbars"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/boardwalk/zones/rear.png",
+          "confidence": 0.89
+        },
+        {
+          "id": "short-post-rhythm",
+          "kind": "contour",
+          "description": "Sparse short post pairs punctuate both edges.",
+          "region": {
+            "x": 0.5,
+            "y": 0.5,
+            "width": 0.5,
+            "height": 0.5,
+            "units": "normalized montage quadrant"
+          },
+          "scale": "meso",
+          "affects": "path boundary",
+          "mapsTo": {
+            "type": "component.localFeatures-or-material.localOverrides",
+            "ref": "sparse-post-pairs"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/boardwalk/zones/hero.png",
+          "confidence": 0.885
+        },
+        {
+          "id": "rope-catenary",
+          "kind": "contour",
+          "description": "Rope guards sag gently between posts.",
+          "region": {
+            "x": 0.5,
+            "y": 0.5,
+            "width": 0.5,
+            "height": 0.5,
+            "units": "normalized montage quadrant"
+          },
+          "scale": "meso",
+          "affects": "organic line",
+          "mapsTo": {
+            "type": "component.localFeatures-or-material.localOverrides",
+            "ref": "left-and-right-rope-sags"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/boardwalk/zones/hero.png",
+          "confidence": 0.88
+        },
+        {
+          "id": "iron-pin-glint",
+          "kind": "gloss",
+          "description": "Small iron pin highlights anchor rope to post tops.",
+          "region": {
+            "x": 0,
+            "y": 0,
+            "width": 0.5,
+            "height": 0.5,
+            "units": "normalized montage quadrant"
+          },
+          "scale": "meso",
+          "affects": "joinery",
+          "mapsTo": {
+            "type": "component.localFeatures-or-material.localOverrides",
+            "ref": "rope-fiber-and-pin-glints"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/boardwalk/zones/front.png",
+          "confidence": 0.875
+        },
+        {
+          "id": "moss-corner-clumps",
+          "kind": "stain",
+          "description": "Green moss collects asymmetrically at damp corners.",
+          "region": {
+            "x": 0,
+            "y": 0.5,
+            "width": 0.5,
+            "height": 0.5,
+            "units": "normalized montage quadrant"
+          },
+          "scale": "meso",
+          "affects": "marsh integration",
+          "mapsTo": {
+            "type": "component.localFeatures-or-material.localOverrides",
+            "ref": "moss-edge-clumps"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/boardwalk/zones/rear.png",
+          "confidence": 0.87
+        },
+        {
+          "id": "wet-end-grain",
+          "kind": "ridge",
+          "description": "Board end grain and damp tonal variation break the long span.",
+          "region": {
+            "x": 0.5,
+            "y": 0,
+            "width": 0.5,
+            "height": 0.5,
+            "units": "normalized montage quadrant"
+          },
+          "scale": "meso",
+          "affects": "material age",
+          "mapsTo": {
+            "type": "component.localFeatures-or-material.localOverrides",
+            "ref": "wet-end-grain-and-plank-variation"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/boardwalk/zones/side.png",
+          "confidence": 0.865
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0,
+      "proportions": {
+        "headUnit": 0,
+        "torso": 0,
+        "legs": 0,
+        "shoulderWidth": 0,
+        "hipWidth": 0
+      },
+      "pose": {
+        "type": "not-applicable",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0,
+        "eyeSpacing": 0,
+        "noseBase": 0,
+        "mouthLine": 0,
+        "hairline": 0
+      },
+      "features": [],
+      "confidence": 1,
+      "note": "Static object track; character reconstruction is not applicable."
+    },
+    "sourceImage": "docs/design/fenbridge-rebuild/references/boardwalk-turnaround.png"
+  },
+  "qualityContract": {
+    "qualityBar": "moderate",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 2,
+      "mesoComponents": 3,
+      "microFeatureGroups": 2,
+      "materialLayers": 2,
+      "repetitionSystems": 2,
+      "reviewViewpoints": 3
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md).",
+      "Adjacent components must overlap by at least 0.02 world units at shared seams (source: grimoire/build/geometry_patterns.md).",
+      "Raised or recessed relief and fasteners must be geometry, instanced micro-parts, or displacement; a map alone is an approximation (source: grimoire/build/geometry_patterns.md)."
+    ],
+    "mustNotDo": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md).",
+      "Adjacent components must overlap by at least 0.02 world units at shared seams (source: grimoire/build/geometry_patterns.md).",
+      "Raised or recessed relief and fasteners must be geometry, instanced micro-parts, or displacement; a map alone is an approximation (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.7,
+    "mustMatch": [
+      "Long low parallel plank span",
+      "Sparse posts with low sagging ropes",
+      "Damp timber and moss edge cues"
+    ],
+    "niceToHave": [
+      "subtle material age variation",
+      "secondary micro-surface breakup"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "front",
+      "side",
+      "rear",
+      "hero"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "lighting-pass",
+        "interaction-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "parallel-plank-span",
+      "name": "Long low parallel plank span",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "form-refinement"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "walk-root",
+        "plank-deck"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "front"
+      ]
+    },
+    {
+      "id": "low-rope-edges",
+      "name": "Sparse posts with low sagging ropes",
+      "tier": "critical",
+      "passIds": [
+        "structural-pass",
+        "material-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "edge-posts",
+        "rope-guards"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "side"
+      ]
+    },
+    {
+      "id": "marsh-weathering",
+      "name": "Damp timber and moss edge cues",
+      "tier": "important",
+      "passIds": [
+        "structural-pass",
+        "material-pass"
+      ],
+      "minimumScore": 0.72,
+      "mustPass": false,
+      "componentRefs": [
+        "cross-bearers",
+        "moss-clumps"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "rear"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "complete",
+    "completedPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "lastCompletedPass": "optimization-pass",
+    "blockedReason": "all build passes completed",
+    "nextRequiredEvidence": []
+  },
+  "lookDevTargets": {
+    "qualityPriority": "reference-observed-low-poly-shipping",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": true,
+      "normalOrBumpRequired": true,
+      "localOverridesRequired": true,
+      "sharedSupportMaps": [
+        "/textures/fenbridge_surface_atlas.webp",
+        "/textures/fenbridge_surface_normal.webp",
+        "/textures/fenbridge_surface_roughness.webp"
+      ],
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "acceptedLimitation": "The source is a stylized multi-view concept sheet, not a calibrated material photograph; preserve observed color/material zones with deterministic shared maps."
+      }
+    },
+    "lightingPass": {
+      "referenceIntent": "Warm upper-left key, cool sky fill, restrained teal emissive accents, and readable ground contact.",
+      "neutralReviewRequired": true,
+      "grazingReviewRequired": true
+    }
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "Turnaround quadrant labels are authoritative for front/side/rear/hero interpretation.",
+    "Small ornamental marks that do not affect silhouette are represented by low-cost relief or color blocks.",
+    "Runtime sockets, bounds, mesh count, materials, and budgets remain authoritative in scripts/assets/fenbridge_town/model.js."
+  ],
+  "coordinateFrame": {
+    "front": "+X faces the primary interaction or display side",
+    "up": "+Y is world up; native floor is y=0",
+    "depth": "+Z follows the right-handed world-yard convention",
+    "scaleReference": "Native authoring proportions are normalized to the exact asset contract at export."
+  },
+  "silhouette": {
+    "boundingShape": "A very low long plank deck with sparse short posts and rope edges.",
+    "aspectRatios": [
+      "length:width about 2.85:1",
+      "height:length about 0.04:1"
+    ],
+    "symmetry": "Deck span is regular; edge posts and moss are uneven.",
+    "dominantCurves": [
+      "slight rope sags",
+      "subtle uneven plank edge"
+    ],
+    "negativeSpaces": [
+      "thin gaps between planks",
+      "open sides below the low ropes"
+    ],
+    "landmarks": [
+      "parallel planks",
+      "low posts",
+      "rope edges",
+      "mossy corners"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "front",
+      "view": "front",
+      "source": "docs/design/fenbridge-rebuild/img2threejs/boardwalk/zones/front.png",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 0.5,
+        "height": 0.5,
+        "units": "normalized montage quadrant"
+      },
+      "observations": [
+        "A very low long plank deck with sparse short posts and rope edges."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "side",
+      "view": "side",
+      "source": "docs/design/fenbridge-rebuild/img2threejs/boardwalk/zones/side.png",
+      "imageRegion": {
+        "x": 0.5,
+        "y": 0,
+        "width": 0.5,
+        "height": 0.5,
+        "units": "normalized montage quadrant"
+      },
+      "observations": [
+        "low posts"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "rear",
+      "view": "rear",
+      "source": "docs/design/fenbridge-rebuild/img2threejs/boardwalk/zones/rear.png",
+      "imageRegion": {
+        "x": 0,
+        "y": 0.5,
+        "width": 0.5,
+        "height": 0.5,
+        "units": "normalized montage quadrant"
+      },
+      "observations": [
+        "rope edges"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "hero",
+      "view": "hero",
+      "source": "docs/design/fenbridge-rebuild/img2threejs/boardwalk/zones/hero.png",
+      "imageRegion": {
+        "x": 0.5,
+        "y": 0.5,
+        "width": 0.5,
+        "height": 0.5,
+        "units": "normalized montage quadrant"
+      },
+      "observations": [
+        "mossy corners"
+      ],
+      "confidence": 0.9
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "walk-root",
+      "name": "Grounded walkable span",
+      "parent": null,
+      "level": "macro",
+      "role": "foundation",
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Grounded walkable span is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
+      "material": "boardwalk-timber",
+      "materialLayers": [
+        "boardwalk-timber"
+      ],
+      "dimensions": {
+        "width": 1,
+        "height": 1,
+        "depth": 1,
+        "units": "relative-to-native-bounds",
+        "confidence": 0.86
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
+        "uvStrategy": "fixed 12-world-yard padded atlas-cell projection; no embedded per-asset texture",
+        "normalStrategy": "flat-to-soft normals chosen per semantic primitive before merge",
+        "edgeTreatment": {
+          "bevelRadius": 0.02,
+          "segments": 1
+        },
+        "deformationStack": []
+      },
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(118, 82, 54, 1)",
+        "secondaryAlbedo": "rgba(78, 58, 42, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.86
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [
+        "overlap adjacent solids by at least 0.02 native units where visible contact is required"
+      ],
+      "localFeatures": [
+        "low-profile-baseline",
+        "walkable-clear-width"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "front"
+      ],
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "floor-center",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "walk-root",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "none"
+        }
+      },
+      "importance": 1,
+      "confidence": 0.86
+    },
+    {
+      "id": "plank-deck",
+      "name": "Parallel uneven deck boards",
+      "parent": "walk-root",
+      "level": "macro",
+      "role": "identity-structure",
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Parallel uneven deck boards is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
+      "material": "boardwalk-timber",
+      "materialLayers": [
+        "boardwalk-timber"
+      ],
+      "dimensions": {
+        "width": 1,
+        "height": 1,
+        "depth": 1,
+        "units": "relative-to-native-bounds",
+        "confidence": 0.86
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
+        "uvStrategy": "fixed 12-world-yard padded atlas-cell projection; no embedded per-asset texture",
+        "normalStrategy": "flat-to-soft normals chosen per semantic primitive before merge",
+        "edgeTreatment": {
+          "bevelRadius": 0.02,
+          "segments": 1
+        },
+        "deformationStack": []
+      },
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(118, 82, 54, 1)",
+        "secondaryAlbedo": "rgba(78, 58, 42, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.86
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [
+        "overlap adjacent solids by at least 0.02 native units where visible contact is required"
+      ],
+      "localFeatures": [
+        "parallel-plank-rhythm",
+        "uneven-plank-ends"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "side"
+      ],
+      "actionProfile": {
+        "animationRole": "static-detail",
+        "pivot": {
+          "mode": "component-center",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "plank-deck",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "none"
+        }
+      },
+      "importance": 1,
+      "confidence": 0.86
+    },
+    {
+      "id": "cross-bearers",
+      "name": "Transverse underside bearers",
+      "parent": "walk-root",
+      "level": "meso",
+      "role": "identity-structure",
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Transverse underside bearers is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
+      "material": "boardwalk-timber",
+      "materialLayers": [
+        "boardwalk-timber"
+      ],
+      "dimensions": {
+        "width": 1,
+        "height": 1,
+        "depth": 1,
+        "units": "relative-to-native-bounds",
+        "confidence": 0.86
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
+        "uvStrategy": "fixed 12-world-yard padded atlas-cell projection; no embedded per-asset texture",
+        "normalStrategy": "flat-to-soft normals chosen per semantic primitive before merge",
+        "edgeTreatment": {
+          "bevelRadius": 0.02,
+          "segments": 1
+        },
+        "deformationStack": []
+      },
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(118, 82, 54, 1)",
+        "secondaryAlbedo": "rgba(78, 58, 42, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.86
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [
+        "overlap adjacent solids by at least 0.02 native units where visible contact is required"
+      ],
+      "localFeatures": [
+        "under-deck-crossbars"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "front"
+      ],
+      "actionProfile": {
+        "animationRole": "static-detail",
+        "pivot": {
+          "mode": "component-center",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "cross-bearers",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "none"
+        }
+      },
+      "importance": 0.85,
+      "confidence": 0.86
+    },
+    {
+      "id": "edge-posts",
+      "name": "Short irregular edge posts",
+      "parent": "walk-root",
+      "level": "meso",
+      "role": "identity-structure",
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Short irregular edge posts is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
+      "material": "boardwalk-timber",
+      "materialLayers": [
+        "boardwalk-timber"
+      ],
+      "dimensions": {
+        "width": 1,
+        "height": 1,
+        "depth": 1,
+        "units": "relative-to-native-bounds",
+        "confidence": 0.86
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
+        "uvStrategy": "fixed 12-world-yard padded atlas-cell projection; no embedded per-asset texture",
+        "normalStrategy": "flat-to-soft normals chosen per semantic primitive before merge",
+        "edgeTreatment": {
+          "bevelRadius": 0.02,
+          "segments": 1
+        },
+        "deformationStack": []
+      },
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(118, 82, 54, 1)",
+        "secondaryAlbedo": "rgba(78, 58, 42, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.86
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [
+        "overlap adjacent solids by at least 0.02 native units where visible contact is required"
+      ],
+      "localFeatures": [
+        "sparse-post-pairs"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "side"
+      ],
+      "actionProfile": {
+        "animationRole": "static-detail",
+        "pivot": {
+          "mode": "component-center",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "edge-posts",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "none"
+        }
+      },
+      "importance": 0.85,
+      "confidence": 0.86
+    },
+    {
+      "id": "rope-guards",
+      "name": "Low sagging rope edge lines",
+      "parent": "walk-root",
+      "level": "meso",
+      "role": "identity-structure",
+      "primitive": "curve-sweep",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Low sagging rope edge lines is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
+      "material": "rope-iron",
+      "materialLayers": [
+        "rope-iron"
+      ],
+      "dimensions": {
+        "width": 1,
+        "height": 1,
+        "depth": 1,
+        "units": "relative-to-native-bounds",
+        "confidence": 0.86
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
+        "uvStrategy": "fixed 12-world-yard padded atlas-cell projection; no embedded per-asset texture",
+        "normalStrategy": "flat-to-soft normals chosen per semantic primitive before merge",
+        "edgeTreatment": {
+          "bevelRadius": 0.02,
+          "segments": 1
+        },
+        "deformationStack": []
+      },
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 56, 58, 1)",
+        "secondaryAlbedo": "rgba(155, 118, 45, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.86
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [
+        "overlap adjacent solids by at least 0.02 native units where visible contact is required"
+      ],
+      "localFeatures": [
+        "left-and-right-rope-sags"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "front"
+      ],
+      "actionProfile": {
+        "animationRole": "static-detail",
+        "pivot": {
+          "mode": "component-center",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "rope-guards",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "none"
+        }
+      },
+      "attachment": {
+        "parentId": "walk-root",
+        "parentSocket": "surface-contact",
+        "localStart": [
+          0,
+          0,
+          0
+        ],
+        "localEnd": [
+          0,
+          1,
+          0
+        ],
+        "contactType": "embedded-overlap",
+        "overlap": 0.03,
+        "gapTolerance": 0.01,
+        "evidenceRefs": [
+          "hero"
+        ]
+      },
+      "importance": 0.85,
+      "confidence": 0.86
+    },
+    {
+      "id": "moss-clumps",
+      "name": "Moss at damp deck corners",
+      "parent": "walk-root",
+      "level": "micro",
+      "role": "surface-detail",
+      "primitive": "ellipsoid",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Moss at damp deck corners is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
+      "material": "boardwalk-moss",
+      "materialLayers": [
+        "boardwalk-moss"
+      ],
+      "dimensions": {
+        "width": 1,
+        "height": 1,
+        "depth": 1,
+        "units": "relative-to-native-bounds",
+        "confidence": 0.86
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
+        "uvStrategy": "fixed 12-world-yard padded atlas-cell projection; no embedded per-asset texture",
+        "normalStrategy": "flat-to-soft normals chosen per semantic primitive before merge",
+        "edgeTreatment": {
+          "bevelRadius": 0.02,
+          "segments": 1
+        },
+        "deformationStack": []
+      },
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(67, 86, 59, 1)",
+        "secondaryAlbedo": "rgba(110, 118, 73, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.86
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [
+        "overlap adjacent solids by at least 0.02 native units where visible contact is required"
+      ],
+      "localFeatures": [
+        "asymmetric-moss-corners"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "side"
+      ],
+      "actionProfile": {
+        "animationRole": "static-detail",
+        "pivot": {
+          "mode": "component-center",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "moss-clumps",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "none"
+        }
+      },
+      "importance": 0.7,
+      "confidence": 0.86
+    }
+  ],
+  "materials": [
+    {
+      "id": "boardwalk-timber",
+      "name": "Damp raw board timber",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial / merged runtime palette",
+      "baseColor": "#765236",
+      "color": "#765236",
+      "albedo": {
+        "dominant": "#765236",
+        "secondary": [
+          "#523b29",
+          "#765236"
+        ],
+        "samplingNotes": "Mapped from the labeled turnaround zones; preserve local hue separation after semantic-mesh merge."
+      },
+      "colorVariation": {
+        "palette": [
+          "#765236",
+          "#523b29"
+        ],
+        "pattern": "component-local deterministic variation",
+        "amplitude": 0.12,
+        "heightCorrelation": 0.2
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection plus baked vertex palette",
+        "repeat": [
+          1,
+          1
+        ],
+        "anisotropy": 4,
+        "texelDensityIntent": "Keep one padded semantic cell at a fixed physical scale without wrapping into neighboring cells or adding per-asset texture resources."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 2,
+          "amplitude": 0.18,
+          "role": "component-scale value separation"
+        },
+        {
+          "id": "meso",
+          "frequency": 12,
+          "amplitude": 0.09,
+          "role": "grain, folds, dents, or age variation"
+        },
+        {
+          "id": "micro",
+          "frequency": 48,
+          "amplitude": 0.035,
+          "role": "grazing-light highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.92,
+        "variation": 0.12,
+        "map": "/textures/fenbridge_surface_roughness.webp green channel",
+        "localResponse": "Cavities remain rougher; handled or waxed accents retain controlled highlights."
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0,
+        "map": "/textures/fenbridge_surface_roughness.webp blue channel"
+      },
+      "normal": {
+        "pattern": "/textures/fenbridge_surface_normal.webp",
+        "strength": 0.55,
+        "scale": 12,
+        "space": "tangent"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.28,
+        "contactShadowBias": 0.35,
+        "notes": "Darken seams, intersections, underside contacts, and layered paper or board edges."
+      },
+      "wear": {
+        "edgeWear": 0.08,
+        "scratches": [
+          "short direction-following marks"
+        ],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.06,
+        "cavityBias": 0.7,
+        "color": "#2f2a22"
+      },
+      "localOverrides": [
+        {
+          "id": "wet-end-grain-and-plank-variation",
+          "description": "Observed local response for damp raw board timber.",
+          "evidenceRefs": [
+            "hero",
+            "front"
+          ],
+          "roughness": 0.8
+        }
+      ],
+      "shaderNotes": [
+        "Final GLB uses one opaque merged material plus an optional emissive material.",
+        "Shared support maps are renderer-owned resources and are not embedded in the GLB."
+      ]
+    },
+    {
+      "id": "rope-iron",
+      "name": "Dark rope and iron pins",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial / merged runtime palette",
+      "baseColor": "#34383a",
+      "color": "#34383a",
+      "albedo": {
+        "dominant": "#34383a",
+        "secondary": [
+          "#34383a",
+          "#d3be8c"
+        ],
+        "samplingNotes": "Mapped from the labeled turnaround zones; preserve local hue separation after semantic-mesh merge."
+      },
+      "colorVariation": {
+        "palette": [
+          "#34383a",
+          "#d3be8c"
+        ],
+        "pattern": "component-local deterministic variation",
+        "amplitude": 0.12,
+        "heightCorrelation": 0.2
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection plus baked vertex palette",
+        "repeat": [
+          1,
+          1
+        ],
+        "anisotropy": 4,
+        "texelDensityIntent": "Keep one padded semantic cell at a fixed physical scale without wrapping into neighboring cells or adding per-asset texture resources."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 2,
+          "amplitude": 0.18,
+          "role": "component-scale value separation"
+        },
+        {
+          "id": "meso",
+          "frequency": 12,
+          "amplitude": 0.09,
+          "role": "grain, folds, dents, or age variation"
+        },
+        {
+          "id": "micro",
+          "frequency": 48,
+          "amplitude": 0.035,
+          "role": "grazing-light highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.72,
+        "variation": 0.12,
+        "map": "/textures/fenbridge_surface_roughness.webp green channel",
+        "localResponse": "Cavities remain rougher; handled or waxed accents retain controlled highlights."
+      },
+      "metalness": {
+        "base": 0.35,
+        "variation": 0.08,
+        "map": "/textures/fenbridge_surface_roughness.webp blue channel"
+      },
+      "normal": {
+        "pattern": "/textures/fenbridge_surface_normal.webp",
+        "strength": 0.55,
+        "scale": 12,
+        "space": "tangent"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.28,
+        "contactShadowBias": 0.35,
+        "notes": "Darken seams, intersections, underside contacts, and layered paper or board edges."
+      },
+      "wear": {
+        "edgeWear": 0.08,
+        "scratches": [
+          "short direction-following marks"
+        ],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.06,
+        "cavityBias": 0.7,
+        "color": "#2f2a22"
+      },
+      "localOverrides": [
+        {
+          "id": "rope-fiber-and-pin-glints",
+          "description": "Observed local response for dark rope and iron pins.",
+          "evidenceRefs": [
+            "hero",
+            "front"
+          ],
+          "roughness": 0.22
+        }
+      ],
+      "shaderNotes": [
+        "Final GLB uses one opaque merged material plus an optional emissive material.",
+        "Shared support maps are renderer-owned resources and are not embedded in the GLB."
+      ]
+    },
+    {
+      "id": "boardwalk-moss",
+      "name": "Marsh moss accumulations",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial / merged runtime palette",
+      "baseColor": "#43563b",
+      "color": "#43563b",
+      "albedo": {
+        "dominant": "#43563b",
+        "secondary": [
+          "#34383a",
+          "#d3be8c"
+        ],
+        "samplingNotes": "Mapped from the labeled turnaround zones; preserve local hue separation after semantic-mesh merge."
+      },
+      "colorVariation": {
+        "palette": [
+          "#43563b",
+          "#d3be8c"
+        ],
+        "pattern": "component-local deterministic variation",
+        "amplitude": 0.12,
+        "heightCorrelation": 0.2
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection plus baked vertex palette",
+        "repeat": [
+          1,
+          1
+        ],
+        "anisotropy": 4,
+        "texelDensityIntent": "Keep one padded semantic cell at a fixed physical scale without wrapping into neighboring cells or adding per-asset texture resources."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 2,
+          "amplitude": 0.18,
+          "role": "component-scale value separation"
+        },
+        {
+          "id": "meso",
+          "frequency": 12,
+          "amplitude": 0.09,
+          "role": "grain, folds, dents, or age variation"
+        },
+        {
+          "id": "micro",
+          "frequency": 48,
+          "amplitude": 0.035,
+          "role": "grazing-light highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.98,
+        "variation": 0.12,
+        "map": "/textures/fenbridge_surface_roughness.webp green channel",
+        "localResponse": "Cavities remain rougher; handled or waxed accents retain controlled highlights."
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0,
+        "map": "/textures/fenbridge_surface_roughness.webp blue channel"
+      },
+      "normal": {
+        "pattern": "/textures/fenbridge_surface_normal.webp",
+        "strength": 0.55,
+        "scale": 12,
+        "space": "tangent"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.28,
+        "contactShadowBias": 0.35,
+        "notes": "Darken seams, intersections, underside contacts, and layered paper or board edges."
+      },
+      "wear": {
+        "edgeWear": 0.08,
+        "scratches": [
+          "short direction-following marks"
+        ],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.06,
+        "cavityBias": 0.7,
+        "color": "#2f2a22"
+      },
+      "localOverrides": [
+        {
+          "id": "moss-edge-clumps",
+          "description": "Observed local response for marsh moss accumulations.",
+          "evidenceRefs": [
+            "hero",
+            "front"
+          ],
+          "roughness": 0.86
+        }
+      ],
+      "shaderNotes": [
+        "Final GLB uses one opaque merged material plus an optional emissive material.",
+        "Shared support maps are renderer-owned resources and are not embedded in the GLB."
+      ]
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "plank-instances",
+      "description": "Deterministic row of parallel boards with small length offsets",
+      "componentRef": "plank-deck",
+      "realization": "deterministic geometry instances before semantic merge",
+      "buildsGeometry": true,
+      "geometry": "low-poly primitive family",
+      "distribution": "authored fixed positions and scale variation; no runtime randomness"
+    },
+    {
+      "id": "post-instances",
+      "description": "Sparse paired edge posts",
+      "componentRef": "edge-posts",
+      "realization": "deterministic geometry instances before semantic merge",
+      "buildsGeometry": true,
+      "geometry": "low-poly primitive family",
+      "distribution": "authored fixed positions and scale variation; no runtime randomness"
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "walk-root",
+        "plank-deck",
+        "cross-bearers",
+        "edge-posts",
+        "rope-guards",
+        "moss-clumps"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "walk-root",
+        "plank-deck",
+        "cross-bearers",
+        "edge-posts",
+        "rope-guards",
+        "moss-clumps"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "walk-root",
+        "plank-deck",
+        "cross-bearers",
+        "edge-posts",
+        "rope-guards",
+        "moss-clumps"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "walk-root",
+        "plank-deck",
+        "cross-bearers",
+        "edge-posts",
+        "rope-guards",
+        "moss-clumps"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "walk-root",
+        "plank-deck",
+        "cross-bearers",
+        "edge-posts",
+        "rope-guards",
+        "moss-clumps"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "lighting-pass",
+      "goal": "Make material and form readable under neutral turntable lighting plus optional reference lighting.",
+      "componentRefs": [
+        "walk-root",
+        "plank-deck",
+        "cross-bearers",
+        "edge-posts",
+        "rope-guards",
+        "moss-clumps"
+      ],
+      "acceptance": [
+        "lightingFromPhoto identifies key light direction/color/intensity, fill light, rim or environment light, and ambient color.",
+        "Exposure, tone mapping, background color/gradient, shadow softness, and contact shadow behavior are specified.",
+        "Lighting does not hide geometry/material gaps and screenshots can be compared fairly to the reference.",
+        "Neutral, grazing, and reference-matched lighting checks distinguish material errors from lighting errors.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "interaction-pass",
+      "goal": "Make the model ready for future animation, transformation, physics, or destruction.",
+      "componentRefs": [
+        "walk-root",
+        "plank-deck",
+        "cross-bearers",
+        "edge-posts",
+        "rope-guards",
+        "moss-clumps"
+      ],
+      "acceptance": [
+        "Macro and movable meso components have stable pivot nodes.",
+        "Sockets, collider proxies, and destruction metadata are present for future runtime actions.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "walk-root",
+        "plank-deck",
+        "cross-bearers",
+        "edge-posts",
+        "rope-guards",
+        "moss-clumps"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [
+    {
+      "timestamp": "2026-08-04T00:46:22.287077+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.77,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "parallel-plank-span",
+          "visible": true,
+          "score": 0.89,
+          "notes": "Independent visual audit passed long low parallel plank span at 0.89 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "low-rope-edges",
+          "visible": true,
+          "score": 0.87,
+          "notes": "Independent visual audit passed sparse posts with low sagging ropes at 0.87 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "marsh-weathering",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed damp timber and moss edge cues at 0.80 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/boardwalk-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.82."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:22.332810+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.77,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "parallel-plank-span",
+          "visible": true,
+          "score": 0.89,
+          "notes": "Independent visual audit passed long low parallel plank span at 0.89 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "low-rope-edges",
+          "visible": true,
+          "score": 0.87,
+          "notes": "Independent visual audit passed sparse posts with low sagging ropes at 0.87 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "marsh-weathering",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed damp timber and moss edge cues at 0.80 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/boardwalk-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.82."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:22.376510+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.77,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "parallel-plank-span",
+          "visible": true,
+          "score": 0.89,
+          "notes": "Independent visual audit passed long low parallel plank span at 0.89 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "low-rope-edges",
+          "visible": true,
+          "score": 0.87,
+          "notes": "Independent visual audit passed sparse posts with low sagging ropes at 0.87 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "marsh-weathering",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed damp timber and moss edge cues at 0.80 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/boardwalk-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.82."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:22.419564+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.77,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "parallel-plank-span",
+          "visible": true,
+          "score": 0.89,
+          "notes": "Independent visual audit passed long low parallel plank span at 0.89 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "low-rope-edges",
+          "visible": true,
+          "score": 0.87,
+          "notes": "Independent visual audit passed sparse posts with low sagging ropes at 0.87 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "marsh-weathering",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed damp timber and moss edge cues at 0.80 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/boardwalk-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.82."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:22.465735+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.77,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "parallel-plank-span",
+          "visible": true,
+          "score": 0.89,
+          "notes": "Independent visual audit passed long low parallel plank span at 0.89 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "low-rope-edges",
+          "visible": true,
+          "score": 0.87,
+          "notes": "Independent visual audit passed sparse posts with low sagging ropes at 0.87 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "marsh-weathering",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed damp timber and moss edge cues at 0.80 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/boardwalk-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.82."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:22.509896+00:00",
+      "passId": "lighting-pass",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.77,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "parallel-plank-span",
+          "visible": true,
+          "score": 0.89,
+          "notes": "Independent visual audit passed long low parallel plank span at 0.89 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "low-rope-edges",
+          "visible": true,
+          "score": 0.87,
+          "notes": "Independent visual audit passed sparse posts with low sagging ropes at 0.87 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "marsh-weathering",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed damp timber and moss edge cues at 0.80 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/boardwalk-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.82."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:22.550653+00:00",
+      "passId": "interaction-pass",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.77,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "parallel-plank-span",
+          "visible": true,
+          "score": 0.89,
+          "notes": "Independent visual audit passed long low parallel plank span at 0.89 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "low-rope-edges",
+          "visible": true,
+          "score": 0.87,
+          "notes": "Independent visual audit passed sparse posts with low sagging ropes at 0.87 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "marsh-weathering",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed damp timber and moss edge cues at 0.80 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/boardwalk-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.82."
+    }
+  ],
+  "reviewHistory": [
+    {
+      "timestamp": "2026-08-04T00:46:22.287077+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.77,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "parallel-plank-span",
+          "visible": true,
+          "score": 0.89,
+          "notes": "Independent visual audit passed long low parallel plank span at 0.89 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "low-rope-edges",
+          "visible": true,
+          "score": 0.87,
+          "notes": "Independent visual audit passed sparse posts with low sagging ropes at 0.87 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "marsh-weathering",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed damp timber and moss edge cues at 0.80 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed blockout for boardwalk.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/boardwalk-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/boardwalk-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/boardwalk-comparison.png"
+      ],
+      "mapStrippedRender": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-procedural-contact.png",
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/boardwalk-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.82."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:22.332810+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.77,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "parallel-plank-span",
+          "visible": true,
+          "score": 0.89,
+          "notes": "Independent visual audit passed long low parallel plank span at 0.89 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "low-rope-edges",
+          "visible": true,
+          "score": 0.87,
+          "notes": "Independent visual audit passed sparse posts with low sagging ropes at 0.87 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "marsh-weathering",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed damp timber and moss edge cues at 0.80 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed structural-pass for boardwalk.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/boardwalk-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/boardwalk-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/boardwalk-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/boardwalk-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.82."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:22.376510+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.77,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "parallel-plank-span",
+          "visible": true,
+          "score": 0.89,
+          "notes": "Independent visual audit passed long low parallel plank span at 0.89 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "low-rope-edges",
+          "visible": true,
+          "score": 0.87,
+          "notes": "Independent visual audit passed sparse posts with low sagging ropes at 0.87 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "marsh-weathering",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed damp timber and moss edge cues at 0.80 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed form-refinement for boardwalk.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/boardwalk-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/boardwalk-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/boardwalk-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/boardwalk-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.82."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:22.419564+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.77,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "parallel-plank-span",
+          "visible": true,
+          "score": 0.89,
+          "notes": "Independent visual audit passed long low parallel plank span at 0.89 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "low-rope-edges",
+          "visible": true,
+          "score": 0.87,
+          "notes": "Independent visual audit passed sparse posts with low sagging ropes at 0.87 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "marsh-weathering",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed damp timber and moss edge cues at 0.80 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed material-pass for boardwalk.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/boardwalk-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/boardwalk-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/boardwalk-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/boardwalk-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.82."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:22.465735+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.77,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "parallel-plank-span",
+          "visible": true,
+          "score": 0.89,
+          "notes": "Independent visual audit passed long low parallel plank span at 0.89 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "low-rope-edges",
+          "visible": true,
+          "score": 0.87,
+          "notes": "Independent visual audit passed sparse posts with low sagging ropes at 0.87 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "marsh-weathering",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed damp timber and moss edge cues at 0.80 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed surface-pass for boardwalk.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/boardwalk-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/boardwalk-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/boardwalk-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/boardwalk-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.82."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:22.509896+00:00",
+      "passId": "lighting-pass",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.77,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "parallel-plank-span",
+          "visible": true,
+          "score": 0.89,
+          "notes": "Independent visual audit passed long low parallel plank span at 0.89 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "low-rope-edges",
+          "visible": true,
+          "score": 0.87,
+          "notes": "Independent visual audit passed sparse posts with low sagging ropes at 0.87 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "marsh-weathering",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed damp timber and moss edge cues at 0.80 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed lighting-pass for boardwalk.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/boardwalk-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/boardwalk-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/boardwalk-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/boardwalk-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.82."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:22.550653+00:00",
+      "passId": "interaction-pass",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.77,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "parallel-plank-span",
+          "visible": true,
+          "score": 0.89,
+          "notes": "Independent visual audit passed long low parallel plank span at 0.89 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "low-rope-edges",
+          "visible": true,
+          "score": 0.87,
+          "notes": "Independent visual audit passed sparse posts with low sagging ropes at 0.87 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "marsh-weathering",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed damp timber and moss edge cues at 0.80 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed interaction-pass for boardwalk.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/boardwalk-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/boardwalk-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/boardwalk-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/boardwalk-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/boardwalk-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.82."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:22.588721+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": null,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {},
+      "featureReviews": [],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed optimization-pass for boardwalk.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/boardwalk-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/boardwalk-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/boardwalk-comparison.png"
+      ]
+    }
+  ],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "reference-fidelity",
+    "targetTriangles": 250000,
+    "maxDrawCalls": 160,
+    "textureSize": 2048,
+    "fpsTarget": 30,
+    "optimizationPolicy": "Reach accepted visual fidelity first, then optimize without removing reference-critical geometry or surface layers."
+  },
+  "lightingFromPhoto": [
+    "Key light: warm neutral directional light from upper-left/front at about 1.6 relative intensity.",
+    "Fill light: cool blue-grey environment fill at about 0.55 intensity so rear construction remains readable.",
+    "Rim light: subtle cool upper-right rim or environment reflection separates the teal silhouette.",
+    "Exposure 1.0 with ACES filmic tone mapping and a muted neutral background for fair comparison.",
+    "Soft ground contact shadow plus ambient occlusion under feet, rails, papers, and overlapping solids."
+  ],
+  "proceduralStrategy": [
+    "Block out parallel planks and low posts before local detail.",
+    "Build observed components as deterministic low-poly solids with explicit overlap at contacts.",
+    "Route colors through semantic buckets, then merge to one opaque material plus optional fenlight emissive.",
+    "Normalize the finished hierarchy once to the exact contract bounds and floor.",
+    "Validate all four turnaround views plus player-scale and collider-contact evidence."
+  ],
+  "animationAnchors": [
+    "root pivot node supports whole-object translation, rotation, scale, and visibility changes",
+    "component pivot groups support later local transforms without rebuilding geometry"
+  ],
+  "destructionAnchors": [
+    "actionProfile.destruction.fractureGroup marks detachable or breakable component sets",
+    "component seams and sockets define plausible break points instead of random explosions"
+  ],
+  "risks": [
+    "Semantic merge must not erase the observed local color hierarchy.",
+    "Exact normalized bounds can compress thin details, so contact sheets must verify readability."
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Fenbridge Boardwalk modular timber boardwalk planks rope rail procedural low-poly",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "6857e5ab528b42ac12f4f411f862610a0bffce8e47aee3610a7603c318072fe8"
+    },
+    "matches": [
+      {
+        "record_id": "core.topology-intent",
+        "file_path": "grimoire/glossary/3d_vocabulary.md",
+        "heading": "Geometry And Topology",
+        "key_path": null,
+        "score": 5.143858634031,
+        "snippets": [
+          "Topology intent classifies a surface as hard-surface blockout, subdivision-ready, low-poly prop, organic deformed mesh, or alpha-card cluster."
+        ],
+        "source_refs": [
+          {
+            "path": "grimoire/glossary/3d_vocabulary.md",
+            "heading": "Geometry And Topology",
+            "key_path": null
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "grimoire/glossary/3d_vocabulary.md"
+          },
+          {
+            "kind": "notebooklm-research",
+            "ref": "notebooklm:4b03c2f9-8393-411f-b5b4-039ab9532843",
+            "note": "Validated generic schema vocabulary; numeric claims remain backed by local source_refs."
+          }
+        ]
+      },
+      {
+        "record_id": "core.shader-mapping-customshadermaterial-csm-weathering-hooks",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.rendering_shader_mapping[1]",
+        "score": 3.601401390438,
+        "snippets": [
+          "Extension library exposing csm_* output variables to inject procedural noise/masks into an otherwise-standard lit material, used for dynamic tarnish/patina effects. Thư viện mở rộng cung cấp các biến đầu ra csm_* để chèn nhiễu/mặt nạ thủ tục vào ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.rendering_shader_mapping[1]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      },
+      {
+        "record_id": "core.shader-mapping-tsl-node-functions-for-weathering",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.rendering_shader_mapping[2]",
+        "score": 2.403619144168,
+        "snippets": [
+          "Three.js Shading Language (WebGPU) node-graph functions used to build procedural PBR materials, especially for blending pristine vs. weathered states. Các hàm đồ thị nút của Three.js Shading Language (WebGPU) dùng để xây dựng vật liệu PBR thủ ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.rendering_shader_mapping[2]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      }
+    ]
+  }
+}

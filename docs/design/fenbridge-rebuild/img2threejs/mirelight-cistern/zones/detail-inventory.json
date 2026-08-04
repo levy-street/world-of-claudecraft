@@ -1,0 +1,291 @@
+{
+  "sourceImage": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png",
+  "zonesDir": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones",
+  "detailInventory": {
+    "scanMethod": "component-zones",
+    "targetMinDetails": 10,
+    "details": [
+      {
+        "id": "concentric-stone-courses",
+        "kind": "seam",
+        "description": "Two low concentric courses of uneven damp stone define the cistern rim and central service island.",
+        "region": {
+          "x": 0.13,
+          "y": 0.62,
+          "width": 0.74,
+          "height": 0.25,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "basin relief",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "basin-ring/concentric-stone-courses"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/front.png",
+        "confidence": 0.96
+      },
+      {
+        "id": "moss-wet-footing",
+        "kind": "stain",
+        "description": "Moss and darker wetness collect only at the lowest outer stones and post contacts.",
+        "region": {
+          "x": 0.14,
+          "y": 0.72,
+          "width": 0.72,
+          "height": 0.18,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "stone albedo and roughness",
+        "mapsTo": {
+          "type": "material.localOverrides",
+          "ref": "stone/moss-wet-footing"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png",
+        "confidence": 0.94
+      },
+      {
+        "id": "shallow-water-band",
+        "kind": "gloss",
+        "description": "A narrow dark teal water band remains visible between the outer rim and central brazier island.",
+        "region": {
+          "x": 0.22,
+          "y": 0.64,
+          "width": 0.56,
+          "height": 0.15,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "water plane and material response",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "basin-ring/shallow-water-band"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/front.png",
+        "confidence": 0.92
+      },
+      {
+        "id": "four-post-shoe-clamps",
+        "kind": "fastener",
+        "description": "Four square timber canopy posts seat in broad dark iron shoes with visible clamp plates.",
+        "region": {
+          "x": 0.16,
+          "y": 0.35,
+          "width": 0.68,
+          "height": 0.48,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "post grounding and construction",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "canopy-frame/four-post-shoe-clamps"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png",
+        "confidence": 0.95
+      },
+      {
+        "id": "rope-post-collars",
+        "kind": "ridge",
+        "description": "Coarse rope collars wrap the service-side post and drawworks support.",
+        "region": {
+          "x": 0.2,
+          "y": 0.39,
+          "width": 0.56,
+          "height": 0.34,
+          "units": "normalized"
+        },
+        "scale": "micro",
+        "affects": "post attachment relief",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "canopy-frame/rope-post-collars"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/rear.png",
+        "confidence": 0.86
+      },
+      {
+        "id": "radial-teal-roof-courses",
+        "kind": "seam",
+        "description": "Layered oxidized teal roof courses radiate from a small central crown to an upturned polygonal eave.",
+        "region": {
+          "x": 0.15,
+          "y": 0.08,
+          "width": 0.72,
+          "height": 0.35,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "canopy silhouette and roof relief",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "canopy-roof/radial-teal-roof-courses"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png",
+        "confidence": 0.97
+      },
+      {
+        "id": "horned-corner-finials",
+        "kind": "contour",
+        "description": "Four restrained upturned horn tips punctuate the canopy corners without exceeding the eave footprint.",
+        "region": {
+          "x": 0.1,
+          "y": 0.12,
+          "width": 0.8,
+          "height": 0.28,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "canopy corner silhouette",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "canopy-roof/horned-corner-finials"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/front.png",
+        "confidence": 0.93
+      },
+      {
+        "id": "brass-ribs-and-crown",
+        "kind": "ridge",
+        "description": "Aged brass radial ribs converge on the roof crown and a short pointed finial.",
+        "region": {
+          "x": 0.22,
+          "y": 0.08,
+          "width": 0.56,
+          "height": 0.29,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "roof metal hierarchy",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "roof-rib-finial-system/brass-ribs-and-crown"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png",
+        "confidence": 0.91
+      },
+      {
+        "id": "brazier-rim-studs",
+        "kind": "fastener",
+        "description": "Even iron studs repeat around the central brazier rim.",
+        "region": {
+          "x": 0.36,
+          "y": 0.47,
+          "width": 0.28,
+          "height": 0.2,
+          "units": "normalized"
+        },
+        "scale": "micro",
+        "affects": "brazier construction cadence",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "central-brazier/brazier-rim-studs"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/front.png",
+        "confidence": 0.9
+      },
+      {
+        "id": "layered-warm-flame",
+        "kind": "emissive",
+        "description": "A compact yellow-white core sits inside an orange flame mantle and remains below the kettle.",
+        "region": {
+          "x": 0.44,
+          "y": 0.42,
+          "width": 0.14,
+          "height": 0.17,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "warm focal hierarchy",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "central-brazier/layered-warm-flame"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png",
+        "confidence": 0.96
+      },
+      {
+        "id": "kettle-chain-and-handle",
+        "kind": "linework",
+        "description": "A short center chain and broad arched handle suspend the dark kettle above the brazier.",
+        "region": {
+          "x": 0.39,
+          "y": 0.28,
+          "width": 0.23,
+          "height": 0.3,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "vertical service stack",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "hanging-kettle/kettle-chain-and-handle"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/front.png",
+        "confidence": 0.95
+      },
+      {
+        "id": "twin-fenlight-cage-bars",
+        "kind": "linework",
+        "description": "Two small teal fenlight cores are contained by dark square cages under opposite eaves.",
+        "region": {
+          "x": 0.13,
+          "y": 0.29,
+          "width": 0.75,
+          "height": 0.25,
+          "units": "normalized"
+        },
+        "scale": "micro",
+        "affects": "cool service-light containment",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "fenlight-pair/twin-fenlight-cage-bars"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png",
+        "confidence": 0.94
+      },
+      {
+        "id": "crank-spool-and-rope",
+        "kind": "ridge",
+        "description": "A side crank, horizontal spool, and straight rope drop identify the water-drawing station.",
+        "region": {
+          "x": 0.57,
+          "y": 0.39,
+          "width": 0.3,
+          "height": 0.38,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "drawworks readability",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "drawworks/crank-spool-and-rope"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/rear.png",
+        "confidence": 0.91
+      },
+      {
+        "id": "bucket-hoops",
+        "kind": "linework",
+        "description": "Two dark hoops and a small handle articulate the closed service bucket beside the rim.",
+        "region": {
+          "x": 0.63,
+          "y": 0.59,
+          "width": 0.2,
+          "height": 0.22,
+          "units": "normalized"
+        },
+        "scale": "micro",
+        "affects": "bucket construction",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "drawworks/bucket-hoops"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/mirelight-cistern/zones/hero.png",
+        "confidence": 0.87
+      }
+    ]
+  },
+  "authoringInstruction": "All fourteen observed details are assigned to an implemented localFeature or material localOverride; the rejected duplicate side crop is not evidence."
+}

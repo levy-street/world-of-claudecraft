@@ -1,0 +1,203 @@
+{
+  "targetName": "Fenbridge Moonwort Apothecary",
+  "sourceImage": "docs/design/fenbridge-rebuild/img2threejs/moonwort-apothecary/zones/hero.png",
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "crooked exterior-only apothecary hut",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "stylized low-poly",
+        "crooked timber construction",
+        "witch-adjacent swamp craft"
+      ],
+      "structureKind": [
+        "closed timber shell",
+        "curled layered roof",
+        "attached sales facade",
+        "exterior botanical display"
+      ],
+      "motionPotential": [
+        "static town building",
+        "fixed herbalist socket",
+        "nonblocking attached displays"
+      ],
+      "materialFamilies": [
+        "dark timber",
+        "damp stone",
+        "oxidized teal shingles",
+        "copper",
+        "herbs and violet glass"
+      ],
+      "notes": "All four turnaround crops are admitted; bottle and herb counts are treated as a fixed representative system where views vary."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 3,
+        "componentCount": 3,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 3,
+        "materialLayerCount": 2,
+        "localDetailDensity": 3,
+        "occlusionRisk": 2,
+        "actionReadinessNeed": 1
+      },
+      "estimatedCounts": {
+        "macroComponents": 2,
+        "mesoComponents": 4,
+        "microFeatureGroups": 12,
+        "materialLayers": 2,
+        "repetitionSystems": 3
+      },
+      "reasoning": [
+        "The curled teal roof and small centered dormer carry the silhouette while the centered x=0 door anchors the service approach.",
+        "The sales shelf, bottle row, hanging herbs, mushroom planters and copper still must remain separate visual systems before the shipping merge.",
+        "Exact plant species, bottle labels and hidden pipe routing are not evidenced and remain abstract geometry without text."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "The compact footprint still contains several service-defining exterior systems that must be visible from the civic apron."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "four admitted component-zone crops with hero cross-check",
+      "targetMinDetails": 10,
+      "details": [
+        {
+          "id": "roof-curl-silhouette",
+          "kind": "contour",
+          "mapsTo": { "type": "component.localFeatures", "ref": "curled-eave-tips" }
+        },
+        {
+          "id": "front-dormer",
+          "kind": "contour",
+          "mapsTo": { "type": "component.localFeatures", "ref": "front-dormer-window" }
+        },
+        {
+          "id": "sales-window",
+          "kind": "contour",
+          "mapsTo": { "type": "component.localFeatures", "ref": "potion-sales-shelf" }
+        },
+        {
+          "id": "bottle-row",
+          "kind": "gloss",
+          "mapsTo": { "type": "component.localFeatures", "ref": "chunky-bottle-row" }
+        },
+        {
+          "id": "hanging-herbs",
+          "kind": "linework",
+          "mapsTo": { "type": "component.localFeatures", "ref": "drying-herb-bundles" }
+        },
+        {
+          "id": "mushroom-planters",
+          "kind": "contour",
+          "mapsTo": { "type": "component.localFeatures", "ref": "violet-mushroom-planters" }
+        },
+        {
+          "id": "copper-still",
+          "kind": "contour",
+          "mapsTo": { "type": "component.localFeatures", "ref": "copper-alembic-stack" }
+        },
+        {
+          "id": "gutter-drainage",
+          "kind": "linework",
+          "mapsTo": { "type": "component.localFeatures", "ref": "gutter-downspouts" }
+        },
+        {
+          "id": "wet-timber-grain",
+          "kind": "linework",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "fenbridge-opaque/wet-timber-grain"
+          }
+        },
+        {
+          "id": "violet-glow",
+          "kind": "emissive",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "fenbridge-emissive/violet-fenlight-accent"
+          }
+        }
+      ]
+    },
+    "anatomy": { "applies": false }
+  },
+  "qualityContract": {
+    "qualityBar": "complex game-ready exterior",
+    "definitionOfDone": [
+      "The compact 7 by 7.2 by 6 yard hut reads as a practical swamp apothecary through its curled roof, centered door, bottle shelf, herbs, mushrooms and copper still."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 2,
+      "mesoComponents": 4,
+      "microFeatureGroups": 10,
+      "materialLayers": 2,
+      "repetitionSystems": 2,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "apothecary-silhouette",
+        "name": "Crooked roof and compact hut",
+        "required": true,
+        "qualityCriteria": ["Curled tips, front dormer and vent remain legible."],
+        "evidenceRefs": ["front", "hero"],
+        "failureModes": ["reads as a generic cottage"]
+      },
+      {
+        "id": "sales-display",
+        "name": "Potion sales window",
+        "required": true,
+        "qualityCriteria": ["Awning, shelf and chunky bottles stay attached and exterior."],
+        "evidenceRefs": ["front", "side", "hero"],
+        "failureModes": ["service cue is absent"]
+      },
+      {
+        "id": "herbal-craft",
+        "name": "Herbs, fungi and copper still",
+        "required": true,
+        "qualityCriteria": ["Three material families remain readable without loose apron clutter."],
+        "evidenceRefs": ["front", "side", "rear"],
+        "failureModes": ["witch-adjacent craft cues flatten"]
+      },
+      {
+        "id": "material-separation",
+        "name": "Teal, timber, copper, botanical and violet separation",
+        "required": true,
+        "qualityCriteria": ["Two-bucket merge preserves semantic colors and restrained glow."],
+        "evidenceRefs": ["hero"],
+        "failureModes": ["display reads as uniform noise"]
+      }
+    ],
+    "visualDeltaChecks": [
+      "curled roof tips",
+      "centered x=0 doorway",
+      "sales shelf depth",
+      "still silhouette",
+      "violet accent restraint"
+    ],
+    "antiShallowSpecRules": [
+      "Do not use a straight generic gable.",
+      "Do not turn the sales opening into an interior cutaway."
+    ],
+    "mustNotDo": ["No readable bottle labels.", "No loose apron clutter.", "No evil iconography."]
+  },
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Fenbridge Moonwort Apothecary crooked roof herbs bottles fungi copper alembic procedural low-poly",
+    "indexFingerprint": "6857e5ab528b42ac12f4f411f862610a0bffce8e47aee3610a7603c318072fe8",
+    "sourceRefs": [
+      "grimoire/glossary/3d_vocabulary.md",
+      "grimoire/intake/surface_topology.md",
+      "grimoire/build/geometry_patterns.md"
+    ],
+    "evidenceRefs": ["core.topology-intent", "core.pbr-hand-painted-vs-pbr-texture"]
+  }
+}

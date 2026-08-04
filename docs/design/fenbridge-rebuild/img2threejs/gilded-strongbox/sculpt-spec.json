@@ -1,0 +1,4388 @@
+{
+  "targetName": "Fenbridge Gilded Strongbox",
+  "targetId": "fenbridge-gilded-strongbox",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/hero.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 36,
+    "aspect": 1.78,
+    "orientation": {
+      "yaw": 35,
+      "pitch": -12,
+      "roll": 0
+    },
+    "positionHint": [8, 5.5, 11],
+    "note": "Orthographic-like multi-view sheet; compare each admitted elevation independently and never project the baked pixels."
+  },
+  "suitability": "conditional",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 3,
+    "primitive_decomposition": 3,
+    "material_procedurality": 2,
+    "occlusion_risk": 1,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "fortified marsh bank and ledger office",
+      "primaryDomain": "object",
+      "formLanguage": ["architectural", "hard-surface", "orderly", "fortified"],
+      "structureKind": [
+        "layered exterior shell",
+        "repeated facade modules",
+        "attached service props"
+      ],
+      "motionPotential": [
+        "static world building",
+        "future door hinge",
+        "future vault-wheel rotation"
+      ],
+      "materialFamilies": [
+        "damp stone",
+        "rain-dark timber",
+        "oxidized teal shingles",
+        "forged iron",
+        "aged brass",
+        "emissive glazing"
+      ],
+      "notes": "Four admitted views fully cover the exterior bank office; no interior or open vault is inferred."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 2,
+        "componentCount": 3,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 2,
+        "materialLayerCount": 3,
+        "localDetailDensity": 3,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 1
+      },
+      "estimatedCounts": {
+        "macroComponents": 4,
+        "mesoComponents": 8,
+        "microFeatureGroups": 16,
+        "materialLayers": 6,
+        "repetitionSystems": 2
+      },
+      "reasoning": [
+        "The low ordered shell is structurally simple, but teller, door, vault wheel, attached chest, gutter, sign, and barred windows create many identity-critical systems.",
+        "Bars, straps, bolts, shingles, stone courses, and rope collars need grouped repetition inside the 2,900-triangle target.",
+        "Four admitted views resolve all elevations; only small prop placement varies between generated angles."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Bank identity depends on multiple meso hardware systems plus repeated micro reinforcement, not only the building mass."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "resolvedUncertainties": [
+      "The exterior vault wheel is canonical on the side elevation; the plain rear elevation remains free of a wheel.",
+      "The attached chest and barrel shift slightly across generated views; use the hero placement within the building footprint.",
+      "The teller recess is a dark backed exterior service bay, not a visible room or open vault.",
+      "The shield sign remains blank and no coin mark, readable ledger, or copied emblem is introduced."
+    ],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 10,
+      "note": "Sixteen observed details map to concrete local features or material overrides.",
+      "details": [
+        {
+          "id": "orderly-block-and-piling-grid",
+          "kind": "seam",
+          "description": "Regular damp-stone courses are interrupted by squared timber piles.",
+          "region": {
+            "x": 0.25,
+            "y": 0.68,
+            "width": 0.55,
+            "height": 0.2,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "foundation relief",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "foundation/orderly-block-and-piling-grid"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/rear.png",
+          "confidence": 0.94
+        },
+        {
+          "id": "moss-at-drains",
+          "kind": "stain",
+          "description": "Moss and dark wetness collect at the lowest blocks and gutter discharge.",
+          "region": {
+            "x": 0.18,
+            "y": 0.75,
+            "width": 0.68,
+            "height": 0.15,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "stone albedo and roughness",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "stone/moss-at-drains"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/side.png",
+          "confidence": 0.91
+        },
+        {
+          "id": "square-frame-iron-straps",
+          "kind": "fastener",
+          "description": "Ordered wall posts and rails carry square iron plates and bolt heads.",
+          "region": {
+            "x": 0.23,
+            "y": 0.35,
+            "width": 0.6,
+            "height": 0.42,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "fortified facade rhythm",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "office-shell/square-frame-iron-straps"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/rear.png",
+          "confidence": 0.94
+        },
+        {
+          "id": "teal-shingle-and-dormer-cadence",
+          "kind": "seam",
+          "description": "Teal shingle rows wrap the gable roof around a centered front dormer.",
+          "region": {
+            "x": 0.2,
+            "y": 0.05,
+            "width": 0.65,
+            "height": 0.32,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "roof relief",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "roof-dormer/teal-shingle-and-dormer-cadence"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/front.png",
+          "confidence": 0.96
+        },
+        {
+          "id": "brass-teller-grille",
+          "kind": "linework",
+          "description": "Thick brass bars and cross rails form the exterior teller grille.",
+          "region": {
+            "x": 0.36,
+            "y": 0.42,
+            "width": 0.25,
+            "height": 0.22,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "bank service cue",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "teller-bay/brass-teller-grille"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/front.png",
+          "confidence": 0.98
+        },
+        {
+          "id": "ledger-counter-slot",
+          "kind": "groove",
+          "description": "A dark backed counter recess and ledge sit directly below the grille.",
+          "region": {
+            "x": 0.42,
+            "y": 0.52,
+            "width": 0.22,
+            "height": 0.17,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "teller depth cue",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "teller-bay/ledger-counter-slot"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/hero.png",
+          "confidence": 0.94
+        },
+        {
+          "id": "ironbound-door-straps",
+          "kind": "fastener",
+          "description": "The rounded front door carries heavy straps, rivets, and a ring pull.",
+          "region": {
+            "x": 0.62,
+            "y": 0.4,
+            "width": 0.18,
+            "height": 0.33,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "fortified entrance hardware",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "ironbound-door/ironbound-door-straps"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/front.png",
+          "confidence": 0.97
+        },
+        {
+          "id": "barred-amber-window-grid",
+          "kind": "linework",
+          "description": "Amber arched windows are contained by heavy orthogonal bars.",
+          "region": {
+            "x": 0.22,
+            "y": 0.45,
+            "width": 0.46,
+            "height": 0.25,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "window rhythm",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "barred-window-system/barred-amber-window-grid"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/side.png",
+          "confidence": 0.96
+        },
+        {
+          "id": "vault-wheel-spokes",
+          "kind": "ridge",
+          "description": "A radial exterior vault wheel has an outer ring, hub, spokes, and perimeter bolts.",
+          "region": {
+            "x": 0.43,
+            "y": 0.44,
+            "width": 0.18,
+            "height": 0.25,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "bank identity hardware",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "vault-wheel/vault-wheel-spokes"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/side.png",
+          "confidence": 0.98
+        },
+        {
+          "id": "attached-chest-straps",
+          "kind": "fastener",
+          "description": "The side service chest has iron bands, corner plates, and a centered lock.",
+          "region": {
+            "x": 0.08,
+            "y": 0.62,
+            "width": 0.18,
+            "height": 0.2,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "attached bank prop",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "service-props/attached-chest-straps"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/hero.png",
+          "confidence": 0.93
+        },
+        {
+          "id": "drainpipe-barrel-hoops",
+          "kind": "ridge",
+          "description": "Segmented gutter elbows terminate above a barrel with paired iron hoops.",
+          "region": {
+            "x": 0.18,
+            "y": 0.38,
+            "width": 0.16,
+            "height": 0.46,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "drainage silhouette",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "service-props/drainpipe-barrel-hoops"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/hero.png",
+          "confidence": 0.92
+        },
+        {
+          "id": "rope-wrapped-pilings",
+          "kind": "ridge",
+          "description": "Short rope collars wrap the stout front porch posts.",
+          "region": {
+            "x": 0.28,
+            "y": 0.74,
+            "width": 0.5,
+            "height": 0.13,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "marsh-built porch detail",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "service-props/rope-wrapped-pilings"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/front.png",
+          "confidence": 0.9
+        },
+        {
+          "id": "blank-shield-bevel",
+          "kind": "bevel",
+          "description": "A blank shield-shaped brass plate hangs from the front porch bracket.",
+          "region": {
+            "x": 0.84,
+            "y": 0.4,
+            "width": 0.12,
+            "height": 0.27,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "sign silhouette",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "blank-shield-sign/blank-shield-bevel"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/front.png",
+          "confidence": 0.95
+        },
+        {
+          "id": "chimney-block-courses",
+          "kind": "seam",
+          "description": "A short stone chimney uses visible block courses and a broad cap.",
+          "region": {
+            "x": 0.46,
+            "y": 0.08,
+            "width": 0.15,
+            "height": 0.28,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "roof silhouette",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "chimney-gutter/chimney-block-courses"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/side.png",
+          "confidence": 0.93
+        },
+        {
+          "id": "paired-lantern-cages",
+          "kind": "emissive",
+          "description": "Small amber lantern cores remain inside dark cages beside teller and door.",
+          "region": {
+            "x": 0.26,
+            "y": 0.38,
+            "width": 0.55,
+            "height": 0.22,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "front focal hierarchy",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "lantern-system/paired-lantern-cages"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/front.png",
+          "confidence": 0.94
+        },
+        {
+          "id": "handled-iron-polish",
+          "kind": "gloss",
+          "description": "Door pull, vault hub, and chest lock have localized lower roughness.",
+          "region": {
+            "x": 0.14,
+            "y": 0.45,
+            "width": 0.62,
+            "height": 0.28,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "handled metal response",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "metal/handled-iron-polish"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/hero.png",
+          "confidence": 0.87
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "note": "Architectural object; character anatomy does not apply."
+    },
+    "sourceImage": "docs/design/fenbridge-rebuild/img2threejs/gilded-strongbox/zones/hero.png"
+  },
+  "qualityContract": {
+    "qualityBar": "complex",
+    "definitionOfDone": [
+      "A floor-seated 7.5 by 7.4 by 6.5 yard bank office reads through its ordered low silhouette, teller grille, ironbound door, barred windows, side vault wheel, and attached marsh service props while staying under the 2,900-triangle target and 4,000 hard ceiling."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 4,
+      "mesoComponents": 8,
+      "microFeatureGroups": 12,
+      "materialLayers": 6,
+      "repetitionSystems": 2,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "ordered-bank-silhouette",
+        "name": "Low ordered office, gable roof, and dormer proportions",
+        "required": true,
+        "qualityCriteria": [
+          "The bank stays broader than tall, with a stout base, restrained roof, and centered front gable."
+        ],
+        "evidenceRefs": ["front", "rear", "hero"],
+        "failureModes": ["bank reads as a generic cottage", "roof becomes too tall or crooked"]
+      },
+      {
+        "id": "teller-door-service-front",
+        "name": "Brass teller grille and ironbound door service front",
+        "required": true,
+        "qualityCriteria": [
+          "The two front service bays remain distinct, accessible, and backed without showing an interior."
+        ],
+        "evidenceRefs": ["front", "hero"],
+        "failureModes": [
+          "teller grille becomes an ordinary window",
+          "door straps or service ledge disappear"
+        ]
+      },
+      {
+        "id": "vault-and-barred-security",
+        "name": "Exterior vault wheel and barred amber window system",
+        "required": true,
+        "qualityCriteria": [
+          "Side vault wheel, heavy bars, straps, and bolts communicate security without an open vault."
+        ],
+        "evidenceRefs": ["side", "hero"],
+        "failureModes": [
+          "vault wheel is omitted or placed on the rear",
+          "window glow escapes its bars"
+        ]
+      },
+      {
+        "id": "attached-marsh-service-props",
+        "name": "Attached chest, drainage barrel, rope posts, and blank shield",
+        "required": true,
+        "qualityCriteria": [
+          "All service props remain attached within the footprint and keep the approach clear."
+        ],
+        "evidenceRefs": ["front", "side", "hero"],
+        "failureModes": ["loose clutter blocks the lane", "shield gains a mark or chest floats"]
+      },
+      {
+        "id": "ordered-material-separation",
+        "name": "Stone, timber, teal, iron, brass, and amber separation",
+        "required": true,
+        "qualityCriteria": [
+          "Semantic vertex colors preserve the bank's orderly fortified palette under neutral relighting."
+        ],
+        "evidenceRefs": ["front", "side", "rear", "hero"],
+        "failureModes": [
+          "iron and brass collapse into one value",
+          "baked studio light is treated as albedo"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "building width to height and foundation proportion",
+      "teller and door bay widths and spacing",
+      "vault-wheel diameter, spoke count, and side placement",
+      "barred-window, strap, bolt, and shingle cadence",
+      "stone/timber/teal/iron/brass/amber value separation"
+    ],
+    "antiShallowSpecRules": [
+      "Do not expose an interior or open vault.",
+      "Do not replace teller depth, vault wheel, door straps, chest, sign, or gutter with painted marks.",
+      "Map every inventoried detail to a real feature or material override.",
+      "Group bars, bolts, straps, and shingles under the hard ceiling.",
+      "Keep all attached props within the footprint and the +Z teller apron clear."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.7,
+    "mustMatch": [
+      "low ordered bank silhouette",
+      "brass teller counter and grille",
+      "broad ironbound door",
+      "side vault wheel and barred amber windows"
+    ],
+    "niceToHave": [
+      "fine gutter elbows",
+      "individual bolt value drift",
+      "subtle handled-metal polish"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": ["front", "side", "rear", "front-three-quarter"]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": ["continue", "refine-spec", "refine-code", "request-input", "stop"],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "lighting-pass",
+        "interaction-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "bank-width-roof-profile",
+      "name": "Low wide office with restrained teal gable and dormer",
+      "tier": "critical",
+      "passIds": ["blockout"],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": ["foundation", "office-shell", "roof-dormer"],
+      "evidenceRefs": ["front", "rear", "hero"]
+    },
+    {
+      "id": "teller-grille-service",
+      "name": "Readable brass teller grille and counter",
+      "tier": "critical",
+      "passIds": ["structural-pass", "form-refinement"],
+      "minimumScore": 0.78,
+      "mustPass": true,
+      "componentRefs": ["teller-bay"],
+      "evidenceRefs": ["front", "hero"]
+    },
+    {
+      "id": "ironbound-door-read",
+      "name": "Broad ironbound service door",
+      "tier": "critical",
+      "passIds": ["structural-pass", "form-refinement"],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": ["ironbound-door"],
+      "evidenceRefs": ["front", "hero"]
+    },
+    {
+      "id": "vault-wheel-security",
+      "name": "Exterior side vault wheel and reinforced bars",
+      "tier": "critical",
+      "passIds": ["structural-pass", "material-pass"],
+      "minimumScore": 0.78,
+      "mustPass": true,
+      "componentRefs": ["vault-wheel", "barred-window-system"],
+      "evidenceRefs": ["side", "hero"]
+    },
+    {
+      "id": "metal-value-hierarchy",
+      "name": "Iron, brass, and amber focal hierarchy",
+      "tier": "critical",
+      "passIds": ["material-pass", "surface-pass"],
+      "minimumScore": 0.72,
+      "mustPass": true,
+      "componentRefs": ["teller-bay", "ironbound-door", "vault-wheel", "lantern-system"],
+      "evidenceRefs": ["front", "side", "hero"]
+    },
+    {
+      "id": "attached-service-props",
+      "name": "Chest, barrel, gutter, rope posts, and blank shield",
+      "tier": "important",
+      "passIds": ["structural-pass"],
+      "minimumScore": 0.68,
+      "mustPass": false,
+      "componentRefs": ["service-props", "blank-shield-sign", "chimney-gutter"],
+      "evidenceRefs": ["front", "side", "hero"]
+    },
+    {
+      "id": "reinforcement-cadence",
+      "name": "Strap, bolt, bar, block, and shingle cadence",
+      "tier": "important",
+      "passIds": ["surface-pass"],
+      "minimumScore": 0.68,
+      "mustPass": false,
+      "componentRefs": ["foundation", "office-shell", "roof-dormer", "barred-window-system"],
+      "evidenceRefs": ["front", "rear", "hero"]
+    },
+    {
+      "id": "clear-teller-apron",
+      "name": "Floor seating and unobstructed teller apron",
+      "tier": "important",
+      "passIds": ["optimization-pass"],
+      "minimumScore": 0.7,
+      "mustPass": false,
+      "componentRefs": ["root", "teller-bay", "service-props"],
+      "evidenceRefs": ["front", "hero"]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "complete",
+    "completedPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "lastCompletedPass": "optimization-pass",
+    "blockedReason": "all build passes completed",
+    "nextRequiredEvidence": []
+  },
+  "lookDevTargets": {
+    "qualityPriority": "gameplay-distance-stylized-vertex-color",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": true,
+      "normalOrBumpRequired": true,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 512,
+      "preferredTextureResolution": 512,
+      "independentMapChannels": ["albedo", "roughness", "height", "normal", "ambient-occlusion"],
+      "requiredSurfaceFrequencyBands": ["macro", "meso", "micro"],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.7,
+        "stopOnLowConfidence": true,
+        "acceptedLimitation": "Generated turnaround pixels contain studio lighting; use them for palette and finish evidence only, with independent shared normal and roughness response."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "rim or environment light",
+        "exposure",
+        "tone mapping",
+        "background",
+        "contact shadow"
+      ],
+      "mustAvoid": [
+        "ambient-only lighting",
+        "flat value range",
+        "missing contact shadow",
+        "reference lighting copied without separating material readability"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "The exterior vault wheel is canonical on the side elevation; the plain rear elevation remains free of a wheel.",
+    "The attached chest and barrel shift slightly across generated views; use the hero placement within the building footprint.",
+    "The teller recess is a dark backed exterior service bay, not a visible room or open vault.",
+    "The shield sign remains blank and no coin mark, readable ledger, or copied emblem is introduced."
+  ],
+  "coordinateFrame": {
+    "front": "+Z faces the teller apron",
+    "up": "+Y",
+    "right": "+X",
+    "scaleReference": "world yards; 7.5 W by 7.4 H by 6.5 D"
+  },
+  "silhouette": {
+    "boundingShape": "low wide fortified timber office on a heavy base under a restrained teal gable with centered dormer",
+    "aspectRatios": [
+      "height/width 0.987",
+      "height/depth 1.138",
+      "foundation about 16 percent of total height"
+    ],
+    "symmetry": "ordered front mass with asymmetrical teller/door bays, side vault wheel, chest, gutter, and sign",
+    "dominantCurves": ["shallow gable slopes", "arched door and windows", "circular vault wheel"],
+    "negativeSpaces": [
+      "teller grille openings",
+      "porch posts",
+      "sign suspension",
+      "barrel and piling gaps"
+    ],
+    "landmarks": [
+      "central dormer",
+      "brass teller grille",
+      "ironbound door",
+      "side vault wheel",
+      "blank shield sign"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "front",
+      "view": "front",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": [
+        "teller and door bays",
+        "front dormer",
+        "blank sign",
+        "attached chest and porch"
+      ],
+      "confidence": 0.97
+    },
+    {
+      "id": "side",
+      "view": "side",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": [
+        "vault wheel",
+        "barred windows",
+        "chest, barrel, gutter, and side porch depth"
+      ],
+      "confidence": 0.96
+    },
+    {
+      "id": "rear",
+      "view": "rear",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": [
+        "plain rear facade",
+        "two barred windows",
+        "orderly frame grid and foundation"
+      ],
+      "confidence": 0.92
+    },
+    {
+      "id": "hero",
+      "view": "front-three-quarter",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": [
+        "overall bank identity",
+        "front service depth",
+        "vault-side prop grouping",
+        "roof and chimney relationship"
+      ],
+      "confidence": 0.98
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Gilded Strongbox exterior assembly",
+      "level": "macro",
+      "role": "container",
+      "importance": 1,
+      "confidence": 0.98,
+      "primitive": "box",
+      "topologyClass": "material-only",
+      "topologyRationale": "Transform container only; child assemblies own every visible exterior volume.",
+      "geometryDescriptor": {
+        "topologyIntent": "ordered low-poly fortified exterior construction",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.024,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard metal and masonry seams"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 7.5,
+        "height": 7.4,
+        "depth": 6.5,
+        "units": "yards",
+        "confidence": 0.89
+      },
+      "transform": {
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "compound",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; Fenbridge layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "timber",
+      "materialLayers": ["timber"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [],
+      "surfaceDetail": {
+        "macroRoughness": 0.16,
+        "microRoughness": 0.07,
+        "bumpAmplitude": 0.03,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "frame, grille, strap, and masonry contacts",
+        "edgeWearPattern": "controlled edge polish on handled metal",
+        "notes": "Generated studio light is not copied into albedo."
+      },
+      "evidenceRefs": ["front", "side", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural"
+    },
+    {
+      "id": "foundation",
+      "name": "Heavy stone and piling foundation",
+      "level": "macro",
+      "role": "static-part",
+      "importance": 0.86,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Regular stone blocks and discrete timber piles form a rigid, floor-seated base.",
+      "geometryDescriptor": {
+        "topologyIntent": "ordered low-poly fortified exterior construction",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.024,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard metal and masonry seams"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 7,
+        "height": 1.15,
+        "depth": 5.8,
+        "units": "yards",
+        "confidence": 0.89
+      },
+      "transform": {
+        "position": [0, 0.575, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; Fenbridge layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "stone",
+      "materialLayers": ["stone"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "orderly-block-and-piling-grid",
+          "kind": "seam",
+          "placement": "full lower perimeter",
+          "geometryEffect": "regular stone courses interrupted by timber piles and rope collars",
+          "materialEffect": "damp cavities and moss",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.16,
+        "microRoughness": 0.07,
+        "bumpAmplitude": 0.03,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "frame, grille, strap, and masonry contacts",
+        "edgeWearPattern": "controlled edge polish on handled metal",
+        "notes": "Generated studio light is not copied into albedo."
+      },
+      "evidenceRefs": ["front", "side", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(78, 86, 80, 1)",
+        "secondaryAlbedo": "rgba(116, 119, 107, 1)",
+        "materialClass": "stone",
+        "materialClassConfidence": 0.94
+      }
+    },
+    {
+      "id": "office-shell",
+      "name": "Squared fortified timber office shell",
+      "level": "macro",
+      "role": "static-part",
+      "importance": 0.86,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Planar timber walls are organized by a rigid post-and-rail grid with iron straps.",
+      "geometryDescriptor": {
+        "topologyIntent": "ordered low-poly fortified exterior construction",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.024,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard metal and masonry seams"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 6.7,
+        "height": 4.15,
+        "depth": 5.45,
+        "units": "yards",
+        "confidence": 0.89
+      },
+      "transform": {
+        "position": [0, 2.8, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; Fenbridge layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "timber",
+      "materialLayers": ["timber"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "square-frame-iron-straps",
+          "kind": "fastener",
+          "placement": "wall posts, rails, and corners",
+          "geometryEffect": "ordered timber grid with square iron plates and bolts",
+          "materialEffect": "fortified dark metal rhythm",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.16,
+        "microRoughness": 0.07,
+        "bumpAmplitude": 0.03,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "frame, grille, strap, and masonry contacts",
+        "edgeWearPattern": "controlled edge polish on handled metal",
+        "notes": "Generated studio light is not copied into albedo."
+      },
+      "evidenceRefs": ["front", "side", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 39, 30, 1)",
+        "secondaryAlbedo": "rgba(118, 82, 54, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.95
+      }
+    },
+    {
+      "id": "roof-dormer",
+      "name": "Restrained teal gable roof and front dormer",
+      "level": "macro",
+      "role": "static-part",
+      "importance": 0.86,
+      "confidence": 0.9,
+      "primitive": "extrude",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Rigid pitched roof slopes, shallow front canopy, and centered dormer define the ordered bank silhouette.",
+      "geometryDescriptor": {
+        "topologyIntent": "ordered low-poly fortified exterior construction",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.024,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard metal and masonry seams"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 7.4,
+        "height": 2.25,
+        "depth": 6.2,
+        "units": "yards",
+        "confidence": 0.89
+      },
+      "transform": {
+        "position": [0, 5.65, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; Fenbridge layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "roof",
+      "materialLayers": ["roof"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "teal-shingle-and-dormer-cadence",
+          "kind": "seam",
+          "placement": "main slopes and centered front dormer",
+          "geometryEffect": "overlapping shingle courses plus framed dormer",
+          "materialEffect": "oxidized teal variation",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.16,
+        "microRoughness": 0.07,
+        "bumpAmplitude": 0.03,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "frame, grille, strap, and masonry contacts",
+        "edgeWearPattern": "controlled edge polish on handled metal",
+        "notes": "Generated studio light is not copied into albedo."
+      },
+      "evidenceRefs": ["front", "side", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(23, 98, 105, 1)",
+        "secondaryAlbedo": "rgba(45, 133, 133, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.88
+      }
+    },
+    {
+      "id": "teller-bay",
+      "name": "Protected exterior teller counter and brass grille",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.86,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "surface-relief",
+      "topologyRationale": "A deep framed service recess, counter ledge, and raised brass grille project from the front wall without exposing an interior.",
+      "geometryDescriptor": {
+        "topologyIntent": "ordered low-poly fortified exterior construction",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.024,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard metal and masonry seams"
+      },
+      "parent": "office-shell",
+      "attachment": null,
+      "dimensions": {
+        "width": 2.5,
+        "height": 2.15,
+        "depth": 0.45,
+        "units": "yards",
+        "confidence": 0.89
+      },
+      "transform": {
+        "position": [-1.05, 2.55, 2.93],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; Fenbridge layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "brass",
+      "materialLayers": ["brass"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "brass-teller-grille",
+          "kind": "linework",
+          "placement": "front service window",
+          "geometryEffect": "thick brass perimeter, vertical bars, cross rails, and corner bolts",
+          "materialEffect": "aged brass over dark backed window",
+          "confidence": 0.9
+        },
+        {
+          "id": "ledger-counter-slot",
+          "kind": "groove",
+          "placement": "below teller grille",
+          "geometryEffect": "deep stone-backed counter ledge and small ledger box",
+          "materialEffect": "dark cavity below brass",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.16,
+        "microRoughness": 0.07,
+        "bumpAmplitude": 0.03,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "frame, grille, strap, and masonry contacts",
+        "edgeWearPattern": "controlled edge polish on handled metal",
+        "notes": "Generated studio light is not copied into albedo."
+      },
+      "evidenceRefs": ["front", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(155, 118, 45, 1)",
+        "secondaryAlbedo": "rgba(209, 169, 82, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.92
+      }
+    },
+    {
+      "id": "ironbound-door",
+      "name": "Broad ironbound service door",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.86,
+      "confidence": 0.9,
+      "primitive": "extrude",
+      "topologyClass": "surface-relief",
+      "topologyRationale": "A rounded door slab, thick frame, straps, rivets, and pull sit proud of the front facade.",
+      "geometryDescriptor": {
+        "topologyIntent": "ordered low-poly fortified exterior construction",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.024,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard metal and masonry seams"
+      },
+      "parent": "office-shell",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.55,
+        "height": 2.75,
+        "depth": 0.18,
+        "units": "yards",
+        "confidence": 0.89
+      },
+      "transform": {
+        "position": [1.75, 2.05, 2.95],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; Fenbridge layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "metal",
+      "materialLayers": ["metal"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "ironbound-door-straps",
+          "kind": "fastener",
+          "placement": "front door",
+          "geometryEffect": "arched dark frame, horizontal straps, rivet rows, and ring pull",
+          "materialEffect": "iron highlights over timber",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.16,
+        "microRoughness": 0.07,
+        "bumpAmplitude": 0.03,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "frame, grille, strap, and masonry contacts",
+        "edgeWearPattern": "controlled edge polish on handled metal",
+        "notes": "Generated studio light is not copied into albedo."
+      },
+      "evidenceRefs": ["front", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 56, 58, 1)",
+        "secondaryAlbedo": "rgba(98, 103, 106, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.94
+      }
+    },
+    {
+      "id": "barred-window-system",
+      "name": "Barred amber window system",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.86,
+      "confidence": 0.9,
+      "primitive": "instanced-cluster",
+      "topologyClass": "surface-relief",
+      "topologyRationale": "Repeated arched glow panels and heavy bars are attached facade relief, not openings into an interior.",
+      "geometryDescriptor": {
+        "topologyIntent": "ordered low-poly fortified exterior construction",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.024,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard metal and masonry seams"
+      },
+      "parent": "office-shell",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.82,
+        "height": 1.35,
+        "depth": 0.14,
+        "units": "yards",
+        "confidence": 0.89
+      },
+      "transform": {
+        "position": [0, 3, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; Fenbridge layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "warm",
+      "materialLayers": ["warm"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "barred-amber-window-grid",
+          "kind": "linework",
+          "placement": "side and rear windows",
+          "geometryEffect": "arched amber panels with heavy vertical and horizontal bars",
+          "materialEffect": "contained warm glow",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.16,
+        "microRoughness": 0.07,
+        "bumpAmplitude": 0.03,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "frame, grille, strap, and masonry contacts",
+        "edgeWearPattern": "controlled edge polish on handled metal",
+        "notes": "Generated studio light is not copied into albedo."
+      },
+      "evidenceRefs": ["front", "side", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(255, 164, 58, 1)",
+        "secondaryAlbedo": "rgba(255, 221, 119, 1)",
+        "materialClass": "glass",
+        "materialClassConfidence": 0.85
+      }
+    },
+    {
+      "id": "vault-wheel",
+      "name": "Exterior vault-wheel cue",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.86,
+      "confidence": 0.9,
+      "primitive": "torus",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A discrete radial wheel, hub, and spoke assembly is mounted on the side exterior wall.",
+      "geometryDescriptor": {
+        "topologyIntent": "ordered low-poly fortified exterior construction",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.024,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard metal and masonry seams"
+      },
+      "parent": "office-shell",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.35,
+        "height": 1.35,
+        "depth": 0.22,
+        "units": "yards",
+        "confidence": 0.89
+      },
+      "transform": {
+        "position": [-3.43, 3.05, -0.25],
+        "rotation": [0, 1.5707963267948966, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; Fenbridge layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "metal",
+      "materialLayers": ["metal"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "vault-wheel-spokes",
+          "kind": "ridge",
+          "placement": "side exterior wall",
+          "geometryEffect": "radial spokes, outer ring, hub, and perimeter bolts",
+          "materialEffect": "iron and brass focal contrast",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.16,
+        "microRoughness": 0.07,
+        "bumpAmplitude": 0.03,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "frame, grille, strap, and masonry contacts",
+        "edgeWearPattern": "controlled edge polish on handled metal",
+        "notes": "Generated studio light is not copied into albedo."
+      },
+      "evidenceRefs": ["side", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 56, 58, 1)",
+        "secondaryAlbedo": "rgba(98, 103, 106, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.94
+      }
+    },
+    {
+      "id": "service-props",
+      "name": "Attached chest, drainage pipe, barrel, and rope posts",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.86,
+      "confidence": 0.9,
+      "primitive": "instanced-cluster",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Discrete but footprint-attached exterior props communicate fortified marsh service without loose lane clutter.",
+      "geometryDescriptor": {
+        "topologyIntent": "ordered low-poly fortified exterior construction",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.024,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard metal and masonry seams"
+      },
+      "parent": "office-shell",
+      "attachment": {
+        "parentId": "office-shell",
+        "parentSocket": "exterior-service-footing",
+        "localStart": [-1.4, 0, 0],
+        "localEnd": [1.4, 0, 0],
+        "contactType": "overlap",
+        "overlap": 0.06,
+        "gapTolerance": 0.02,
+        "evidenceRefs": ["side", "rear", "hero"]
+      },
+      "dimensions": {
+        "width": 2.8,
+        "height": 2.2,
+        "depth": 1.2,
+        "units": "yards",
+        "confidence": 0.89
+      },
+      "transform": {
+        "position": [-2.75, 1.15, 1.75],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; Fenbridge layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "timber",
+      "materialLayers": ["timber"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "attached-chest-straps",
+          "kind": "fastener",
+          "placement": "side service ledge",
+          "geometryEffect": "compact chest with iron bands and centered lock",
+          "materialEffect": "dark timber and metal",
+          "confidence": 0.9
+        },
+        {
+          "id": "drainpipe-barrel-hoops",
+          "kind": "ridge",
+          "placement": "side wall and barrel",
+          "geometryEffect": "segmented gutter elbows and two barrel hoops",
+          "materialEffect": "iron over timber",
+          "confidence": 0.9
+        },
+        {
+          "id": "rope-wrapped-pilings",
+          "kind": "ridge",
+          "placement": "front porch posts",
+          "geometryEffect": "short repeated rope collars",
+          "materialEffect": "matte rope against timber",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.16,
+        "microRoughness": 0.07,
+        "bumpAmplitude": 0.03,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "frame, grille, strap, and masonry contacts",
+        "edgeWearPattern": "controlled edge polish on handled metal",
+        "notes": "Generated studio light is not copied into albedo."
+      },
+      "evidenceRefs": ["front", "side", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 39, 30, 1)",
+        "secondaryAlbedo": "rgba(118, 82, 54, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.95
+      }
+    },
+    {
+      "id": "blank-shield-sign",
+      "name": "Blank brass shield sign",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.86,
+      "confidence": 0.9,
+      "primitive": "extrude",
+      "topologyClass": "surface-relief",
+      "topologyRationale": "A thick flat shield plate hangs from a short rigid bracket and carries no mark or text.",
+      "geometryDescriptor": {
+        "topologyIntent": "ordered low-poly fortified exterior construction",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.024,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard metal and masonry seams"
+      },
+      "parent": "office-shell",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.8,
+        "height": 1.05,
+        "depth": 0.1,
+        "units": "yards",
+        "confidence": 0.89
+      },
+      "transform": {
+        "position": [3.65, 3.15, 2.75],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; Fenbridge layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "brass",
+      "materialLayers": ["brass"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "blank-shield-bevel",
+          "kind": "bevel",
+          "placement": "front hanging sign",
+          "geometryEffect": "thick shield silhouette with one chamfered edge and no emblem",
+          "materialEffect": "aged brass",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.16,
+        "microRoughness": 0.07,
+        "bumpAmplitude": 0.03,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "frame, grille, strap, and masonry contacts",
+        "edgeWearPattern": "controlled edge polish on handled metal",
+        "notes": "Generated studio light is not copied into albedo."
+      },
+      "evidenceRefs": ["front", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(155, 118, 45, 1)",
+        "secondaryAlbedo": "rgba(209, 169, 82, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.92
+      }
+    },
+    {
+      "id": "chimney-gutter",
+      "name": "Stone chimney and segmented rain gutter",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.86,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A block chimney penetrates the roof while rigid gutter segments descend to the attached barrel.",
+      "geometryDescriptor": {
+        "topologyIntent": "ordered low-poly fortified exterior construction",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.024,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard metal and masonry seams"
+      },
+      "parent": "roof-dormer",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.1,
+        "height": 2.2,
+        "depth": 1.1,
+        "units": "yards",
+        "confidence": 0.89
+      },
+      "transform": {
+        "position": [-1.45, 5.9, -1.35],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; Fenbridge layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "stone",
+      "materialLayers": ["stone"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "chimney-block-courses",
+          "kind": "seam",
+          "placement": "rear roof penetration",
+          "geometryEffect": "stacked gray stone courses and cap",
+          "materialEffect": "soot-dark upper blocks",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.16,
+        "microRoughness": 0.07,
+        "bumpAmplitude": 0.03,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "frame, grille, strap, and masonry contacts",
+        "edgeWearPattern": "controlled edge polish on handled metal",
+        "notes": "Generated studio light is not copied into albedo."
+      },
+      "evidenceRefs": ["side", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(78, 86, 80, 1)",
+        "secondaryAlbedo": "rgba(116, 119, 107, 1)",
+        "materialClass": "stone",
+        "materialClassConfidence": 0.94
+      }
+    },
+    {
+      "id": "lantern-system",
+      "name": "Paired teller and doorway lanterns",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.86,
+      "confidence": 0.9,
+      "primitive": "instanced-cluster",
+      "topologyClass": "surface-relief",
+      "topologyRationale": "Small caged lights project from the protected front porch posts.",
+      "geometryDescriptor": {
+        "topologyIntent": "ordered low-poly fortified exterior construction",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.024,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard metal and masonry seams"
+      },
+      "parent": "office-shell",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.45,
+        "height": 0.8,
+        "depth": 0.35,
+        "units": "yards",
+        "confidence": 0.89
+      },
+      "transform": {
+        "position": [0.3, 3.35, 3.25],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; Fenbridge layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "warm",
+      "materialLayers": ["warm"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "paired-lantern-cages",
+          "kind": "linework",
+          "placement": "teller and door bays",
+          "geometryEffect": "dark cage bars around small amber cores",
+          "materialEffect": "brass and warm light",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.16,
+        "microRoughness": 0.07,
+        "bumpAmplitude": 0.03,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "frame, grille, strap, and masonry contacts",
+        "edgeWearPattern": "controlled edge polish on handled metal",
+        "notes": "Generated studio light is not copied into albedo."
+      },
+      "evidenceRefs": ["front", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(255, 164, 58, 1)",
+        "secondaryAlbedo": "rgba(255, 221, 119, 1)",
+        "materialClass": "glass",
+        "materialClassConfidence": 0.85
+      }
+    }
+  ],
+  "materials": [
+    {
+      "id": "stone",
+      "name": "Orderly damp bank masonry",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial-compatible semantic vertex color",
+      "baseColor": "#4E5650",
+      "color": "#4E5650",
+      "albedo": {
+        "dominant": "#4E5650",
+        "secondary": ["#74776B"],
+        "samplingNotes": "Observed from neutral turnaround areas; baked highlights and shadows are excluded."
+      },
+      "colorVariation": {
+        "palette": ["#4E5650", "#74776B"],
+        "pattern": "semantic vertex colors multiplied by shared atlas grain",
+        "amplitude": 0.1,
+        "heightCorrelation": 0.15
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.14,
+          "role": "broad value grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 9,
+          "amplitude": 0.075,
+          "role": "timber, stone, shingle, or metal breakup"
+        },
+        {
+          "id": "micro",
+          "frequency": 42,
+          "amplitude": 0.023,
+          "role": "grazing highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.9,
+        "variation": 0.09,
+        "map": "independent Fenbridge shared roughness support map",
+        "localResponse": "cavities are rougher; handled metal crowns are smoother"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "independent Fenbridge shared normal support map",
+        "strength": 0.22,
+        "scale": 18,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.28,
+        "contactShadowBias": 0.34,
+        "notes": "Independent contact response under counters, straps, and block seams."
+      },
+      "wear": {
+        "edgeWear": 0.05,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.16,
+        "cavityBias": 0.72,
+        "color": "#25231D"
+      },
+      "localOverrides": [
+        {
+          "id": "moss-at-drains",
+          "region": "lowest blocks and below gutter discharge",
+          "color": "#59613A",
+          "roughness": 0.96,
+          "dirtAmount": 0.18,
+          "cavityBias": true,
+          "evidenceRefs": ["side", "hero"]
+        }
+      ],
+      "shaderNotes": [
+        "Vertex color is the palette authority.",
+        "Normal and roughness support maps remain independent."
+      ],
+      "notes": "Mapped to the stone Fenbridge authoring bucket."
+    },
+    {
+      "id": "timber",
+      "name": "Squared rain-dark bank timber",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial-compatible semantic vertex color",
+      "baseColor": "#34271E",
+      "color": "#34271E",
+      "albedo": {
+        "dominant": "#34271E",
+        "secondary": ["#765236"],
+        "samplingNotes": "Observed from neutral turnaround areas; baked highlights and shadows are excluded."
+      },
+      "colorVariation": {
+        "palette": ["#34271E", "#765236"],
+        "pattern": "semantic vertex colors multiplied by shared atlas grain",
+        "amplitude": 0.1,
+        "heightCorrelation": 0.15
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.14,
+          "role": "broad value grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 9,
+          "amplitude": 0.075,
+          "role": "timber, stone, shingle, or metal breakup"
+        },
+        {
+          "id": "micro",
+          "frequency": 42,
+          "amplitude": 0.023,
+          "role": "grazing highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.8,
+        "variation": 0.09,
+        "map": "independent Fenbridge shared roughness support map",
+        "localResponse": "cavities are rougher; handled metal crowns are smoother"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "independent Fenbridge shared normal support map",
+        "strength": 0.22,
+        "scale": 18,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.28,
+        "contactShadowBias": 0.34,
+        "notes": "Independent contact response under counters, straps, and block seams."
+      },
+      "wear": {
+        "edgeWear": 0.05,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.06,
+        "cavityBias": 0.72,
+        "color": "#25231D"
+      },
+      "localOverrides": [
+        {
+          "id": "handled-counter-edge",
+          "region": "teller ledge and porch rail crowns",
+          "color": "#765236",
+          "roughness": 0.62,
+          "evidenceRefs": ["front", "hero"]
+        }
+      ],
+      "shaderNotes": [
+        "Vertex color is the palette authority.",
+        "Normal and roughness support maps remain independent."
+      ],
+      "notes": "Mapped to the timber Fenbridge authoring bucket."
+    },
+    {
+      "id": "roof",
+      "name": "Oxidized teal bank shingles",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial-compatible semantic vertex color",
+      "baseColor": "#176269",
+      "color": "#176269",
+      "albedo": {
+        "dominant": "#176269",
+        "secondary": ["#2D8585"],
+        "samplingNotes": "Observed from neutral turnaround areas; baked highlights and shadows are excluded."
+      },
+      "colorVariation": {
+        "palette": ["#176269", "#2D8585"],
+        "pattern": "semantic vertex colors multiplied by shared atlas grain",
+        "amplitude": 0.1,
+        "heightCorrelation": 0.15
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.14,
+          "role": "broad value grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 9,
+          "amplitude": 0.075,
+          "role": "timber, stone, shingle, or metal breakup"
+        },
+        {
+          "id": "micro",
+          "frequency": 42,
+          "amplitude": 0.023,
+          "role": "grazing highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.77,
+        "variation": 0.09,
+        "map": "independent Fenbridge shared roughness support map",
+        "localResponse": "cavities are rougher; handled metal crowns are smoother"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "independent Fenbridge shared normal support map",
+        "strength": 0.22,
+        "scale": 18,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.28,
+        "contactShadowBias": 0.34,
+        "notes": "Independent contact response under counters, straps, and block seams."
+      },
+      "wear": {
+        "edgeWear": 0.05,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.06,
+        "cavityBias": 0.72,
+        "color": "#25231D"
+      },
+      "localOverrides": [
+        {
+          "id": "roof-edge-oxidation",
+          "region": "lower shingle edges and dormer trim",
+          "color": "#103A3C",
+          "roughness": 0.82,
+          "evidenceRefs": ["front", "hero"]
+        }
+      ],
+      "shaderNotes": [
+        "Vertex color is the palette authority.",
+        "Normal and roughness support maps remain independent."
+      ],
+      "notes": "Mapped to the roof Fenbridge authoring bucket."
+    },
+    {
+      "id": "metal",
+      "name": "Forged iron straps, bars, and wheel",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial-compatible semantic vertex color",
+      "baseColor": "#34383A",
+      "color": "#34383A",
+      "albedo": {
+        "dominant": "#34383A",
+        "secondary": ["#62676A"],
+        "samplingNotes": "Observed from neutral turnaround areas; baked highlights and shadows are excluded."
+      },
+      "colorVariation": {
+        "palette": ["#34383A", "#62676A"],
+        "pattern": "semantic vertex colors multiplied by shared atlas grain",
+        "amplitude": 0.1,
+        "heightCorrelation": 0.15
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.14,
+          "role": "broad value grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 9,
+          "amplitude": 0.075,
+          "role": "timber, stone, shingle, or metal breakup"
+        },
+        {
+          "id": "micro",
+          "frequency": 42,
+          "amplitude": 0.023,
+          "role": "grazing highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.4,
+        "variation": 0.09,
+        "map": "independent Fenbridge shared roughness support map",
+        "localResponse": "cavities are rougher; handled metal crowns are smoother"
+      },
+      "metalness": {
+        "base": 0.82,
+        "variation": 0.08
+      },
+      "normal": {
+        "pattern": "independent Fenbridge shared normal support map",
+        "strength": 0.22,
+        "scale": 18,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.28,
+        "contactShadowBias": 0.34,
+        "notes": "Independent contact response under counters, straps, and block seams."
+      },
+      "wear": {
+        "edgeWear": 0.13,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.06,
+        "cavityBias": 0.72,
+        "color": "#25231D"
+      },
+      "localOverrides": [
+        {
+          "id": "handled-iron-polish",
+          "region": "door pull, vault hub, and chest lock",
+          "color": "#62676A",
+          "roughness": 0.22,
+          "evidenceRefs": ["front", "side", "hero"]
+        }
+      ],
+      "shaderNotes": [
+        "Vertex color is the palette authority.",
+        "Normal and roughness support maps remain independent."
+      ],
+      "notes": "Mapped to the metal Fenbridge authoring bucket."
+    },
+    {
+      "id": "brass",
+      "name": "Aged brass teller and sign accents",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial-compatible semantic vertex color",
+      "baseColor": "#9B762D",
+      "color": "#9B762D",
+      "albedo": {
+        "dominant": "#9B762D",
+        "secondary": ["#D1A952"],
+        "samplingNotes": "Observed from neutral turnaround areas; baked highlights and shadows are excluded."
+      },
+      "colorVariation": {
+        "palette": ["#9B762D", "#D1A952"],
+        "pattern": "semantic vertex colors multiplied by shared atlas grain",
+        "amplitude": 0.1,
+        "heightCorrelation": 0.15
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.14,
+          "role": "broad value grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 9,
+          "amplitude": 0.075,
+          "role": "timber, stone, shingle, or metal breakup"
+        },
+        {
+          "id": "micro",
+          "frequency": 42,
+          "amplitude": 0.023,
+          "role": "grazing highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.36,
+        "variation": 0.09,
+        "map": "independent Fenbridge shared roughness support map",
+        "localResponse": "cavities are rougher; handled metal crowns are smoother"
+      },
+      "metalness": {
+        "base": 0.86,
+        "variation": 0.08
+      },
+      "normal": {
+        "pattern": "independent Fenbridge shared normal support map",
+        "strength": 0.22,
+        "scale": 18,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.28,
+        "contactShadowBias": 0.34,
+        "notes": "Independent contact response under counters, straps, and block seams."
+      },
+      "wear": {
+        "edgeWear": 0.13,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.06,
+        "cavityBias": 0.72,
+        "color": "#25231D"
+      },
+      "localOverrides": [
+        {
+          "id": "grille-edge-polish",
+          "region": "teller bar and shield bevel crowns",
+          "color": "#D1A952",
+          "roughness": 0.2,
+          "evidenceRefs": ["front", "hero"]
+        }
+      ],
+      "shaderNotes": [
+        "Vertex color is the palette authority.",
+        "Normal and roughness support maps remain independent."
+      ],
+      "notes": "Mapped to the metal Fenbridge authoring bucket."
+    },
+    {
+      "id": "warm",
+      "name": "Contained amber bank glazing",
+      "type": "emissive-standard",
+      "shaderModel": "MeshStandardMaterial-compatible semantic vertex color",
+      "baseColor": "#FFA43A",
+      "color": "#FFA43A",
+      "albedo": {
+        "dominant": "#FFA43A",
+        "secondary": ["#FFDD77"],
+        "samplingNotes": "Observed from neutral turnaround areas; baked highlights and shadows are excluded."
+      },
+      "colorVariation": {
+        "palette": ["#FFA43A", "#FFDD77"],
+        "pattern": "semantic vertex colors multiplied by shared atlas grain",
+        "amplitude": 0.1,
+        "heightCorrelation": 0.15
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.14,
+          "role": "broad value grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 9,
+          "amplitude": 0.075,
+          "role": "timber, stone, shingle, or metal breakup"
+        },
+        {
+          "id": "micro",
+          "frequency": 42,
+          "amplitude": 0.023,
+          "role": "grazing highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.27,
+        "variation": 0.09,
+        "map": "independent Fenbridge shared roughness support map",
+        "localResponse": "cavities are rougher; handled metal crowns are smoother"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "independent Fenbridge shared normal support map",
+        "strength": 0.04,
+        "scale": 18,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.28,
+        "contactShadowBias": 0.34,
+        "notes": "Independent contact response under counters, straps, and block seams."
+      },
+      "wear": {
+        "edgeWear": 0.05,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.06,
+        "cavityBias": 0.72,
+        "color": "#25231D"
+      },
+      "localOverrides": [
+        {
+          "id": "barred-window-core",
+          "region": "behind heavy window bars and lantern cage only",
+          "emissive": "#FFDD77",
+          "emissiveIntensity": 1.02,
+          "roughness": 0.24,
+          "evidenceRefs": ["front", "side", "rear", "hero"]
+        }
+      ],
+      "shaderNotes": [
+        "Vertex color is the palette authority.",
+        "Normal and roughness support maps remain independent."
+      ],
+      "notes": "Mapped to the warm Fenbridge authoring bucket."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "bank-shingle-courses",
+      "componentRef": "roof-dormer",
+      "realization": "grouped-geometry",
+      "buildsGeometry": true,
+      "geometry": "staggered low-profile course boxes",
+      "instances": 30,
+      "distribution": "five courses over both main slopes plus shallow front canopy",
+      "evidenceRefs": ["front", "rear", "hero"]
+    },
+    {
+      "id": "security-bar-and-fastener-system",
+      "componentRef": "office-shell",
+      "realization": "instanced-cluster",
+      "buildsGeometry": true,
+      "geometry": "bars, straps, square plates, bolt heads, and radial spoke units",
+      "instances": 38,
+      "distribution": "teller, windows, door, wall frames, chest, and vault wheel",
+      "evidenceRefs": ["front", "side", "rear", "hero"]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": ["foundation", "office-shell", "roof-dormer"],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "teller-bay",
+        "ironbound-door",
+        "barred-window-system",
+        "vault-wheel",
+        "service-props",
+        "blank-shield-sign",
+        "chimney-gutter",
+        "lantern-system"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "foundation",
+        "office-shell",
+        "roof-dormer",
+        "teller-bay",
+        "ironbound-door",
+        "barred-window-system",
+        "vault-wheel",
+        "service-props",
+        "blank-shield-sign",
+        "chimney-gutter",
+        "lantern-system"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "foundation",
+        "office-shell",
+        "roof-dormer",
+        "teller-bay",
+        "ironbound-door",
+        "barred-window-system",
+        "vault-wheel",
+        "service-props",
+        "blank-shield-sign",
+        "chimney-gutter",
+        "lantern-system"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "foundation",
+        "office-shell",
+        "roof-dormer",
+        "teller-bay",
+        "ironbound-door",
+        "barred-window-system",
+        "vault-wheel",
+        "service-props",
+        "blank-shield-sign",
+        "chimney-gutter",
+        "lantern-system"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "lighting-pass",
+      "goal": "Make material and form readable under neutral turntable lighting plus optional reference lighting.",
+      "componentRefs": [
+        "foundation",
+        "office-shell",
+        "roof-dormer",
+        "teller-bay",
+        "ironbound-door",
+        "barred-window-system",
+        "vault-wheel",
+        "service-props",
+        "blank-shield-sign",
+        "chimney-gutter",
+        "lantern-system"
+      ],
+      "acceptance": [
+        "lightingFromPhoto identifies key light direction/color/intensity, fill light, rim or environment light, and ambient color.",
+        "Exposure, tone mapping, background color/gradient, shadow softness, and contact shadow behavior are specified.",
+        "Lighting does not hide geometry/material gaps and screenshots can be compared fairly to the reference.",
+        "Neutral, grazing, and reference-matched lighting checks distinguish material errors from lighting errors.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "interaction-pass",
+      "goal": "Make the model ready for future animation, transformation, physics, or destruction.",
+      "componentRefs": [
+        "foundation",
+        "office-shell",
+        "roof-dormer",
+        "teller-bay",
+        "ironbound-door",
+        "barred-window-system",
+        "vault-wheel",
+        "service-props",
+        "blank-shield-sign",
+        "chimney-gutter",
+        "lantern-system"
+      ],
+      "acceptance": [
+        "Macro and movable meso components have stable pivot nodes.",
+        "Sockets, collider proxies, and destruction metadata are present for future runtime actions.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "foundation",
+        "office-shell",
+        "roof-dormer",
+        "teller-bay",
+        "ironbound-door",
+        "barred-window-system",
+        "vault-wheel",
+        "service-props",
+        "blank-shield-sign",
+        "chimney-gutter",
+        "lantern-system"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [
+    {
+      "timestamp": "2026-08-04T00:46:19.938838+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.81,
+        "materialSurface": 0.81,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "bank-width-roof-profile",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed low wide office with restrained teal gable and dormer at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "teller-grille-service",
+          "visible": true,
+          "score": 0.9,
+          "notes": "Independent visual audit passed readable brass teller grille and counter at 0.90 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "ironbound-door-read",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed broad ironbound service door at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "vault-wheel-security",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed exterior side vault wheel and reinforced bars at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "metal-value-hierarchy",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed iron, brass, and amber focal hierarchy at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "attached-service-props",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed chest, barrel, gutter, rope posts, and blank shield at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "reinforcement-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed strap, bolt, bar, block, and shingle cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-teller-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and unobstructed teller apron at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/gilded-strongbox-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.989217+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.81,
+        "materialSurface": 0.81,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "bank-width-roof-profile",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed low wide office with restrained teal gable and dormer at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "teller-grille-service",
+          "visible": true,
+          "score": 0.9,
+          "notes": "Independent visual audit passed readable brass teller grille and counter at 0.90 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "ironbound-door-read",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed broad ironbound service door at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "vault-wheel-security",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed exterior side vault wheel and reinforced bars at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "metal-value-hierarchy",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed iron, brass, and amber focal hierarchy at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "attached-service-props",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed chest, barrel, gutter, rope posts, and blank shield at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "reinforcement-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed strap, bolt, bar, block, and shingle cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-teller-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and unobstructed teller apron at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/gilded-strongbox-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.040682+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.81,
+        "materialSurface": 0.81,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "bank-width-roof-profile",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed low wide office with restrained teal gable and dormer at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "teller-grille-service",
+          "visible": true,
+          "score": 0.9,
+          "notes": "Independent visual audit passed readable brass teller grille and counter at 0.90 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "ironbound-door-read",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed broad ironbound service door at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "vault-wheel-security",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed exterior side vault wheel and reinforced bars at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "metal-value-hierarchy",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed iron, brass, and amber focal hierarchy at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "attached-service-props",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed chest, barrel, gutter, rope posts, and blank shield at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "reinforcement-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed strap, bolt, bar, block, and shingle cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-teller-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and unobstructed teller apron at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/gilded-strongbox-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.092195+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.81,
+        "materialSurface": 0.81,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "bank-width-roof-profile",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed low wide office with restrained teal gable and dormer at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "teller-grille-service",
+          "visible": true,
+          "score": 0.9,
+          "notes": "Independent visual audit passed readable brass teller grille and counter at 0.90 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "ironbound-door-read",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed broad ironbound service door at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "vault-wheel-security",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed exterior side vault wheel and reinforced bars at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "metal-value-hierarchy",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed iron, brass, and amber focal hierarchy at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "attached-service-props",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed chest, barrel, gutter, rope posts, and blank shield at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "reinforcement-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed strap, bolt, bar, block, and shingle cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-teller-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and unobstructed teller apron at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/gilded-strongbox-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.143773+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.81,
+        "materialSurface": 0.81,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "bank-width-roof-profile",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed low wide office with restrained teal gable and dormer at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "teller-grille-service",
+          "visible": true,
+          "score": 0.9,
+          "notes": "Independent visual audit passed readable brass teller grille and counter at 0.90 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "ironbound-door-read",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed broad ironbound service door at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "vault-wheel-security",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed exterior side vault wheel and reinforced bars at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "metal-value-hierarchy",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed iron, brass, and amber focal hierarchy at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "attached-service-props",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed chest, barrel, gutter, rope posts, and blank shield at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "reinforcement-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed strap, bolt, bar, block, and shingle cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-teller-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and unobstructed teller apron at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/gilded-strongbox-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.191254+00:00",
+      "passId": "lighting-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.81,
+        "materialSurface": 0.81,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "bank-width-roof-profile",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed low wide office with restrained teal gable and dormer at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "teller-grille-service",
+          "visible": true,
+          "score": 0.9,
+          "notes": "Independent visual audit passed readable brass teller grille and counter at 0.90 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "ironbound-door-read",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed broad ironbound service door at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "vault-wheel-security",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed exterior side vault wheel and reinforced bars at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "metal-value-hierarchy",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed iron, brass, and amber focal hierarchy at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "attached-service-props",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed chest, barrel, gutter, rope posts, and blank shield at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "reinforcement-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed strap, bolt, bar, block, and shingle cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-teller-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and unobstructed teller apron at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/gilded-strongbox-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.244334+00:00",
+      "passId": "interaction-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.81,
+        "materialSurface": 0.81,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "bank-width-roof-profile",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed low wide office with restrained teal gable and dormer at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "teller-grille-service",
+          "visible": true,
+          "score": 0.9,
+          "notes": "Independent visual audit passed readable brass teller grille and counter at 0.90 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "ironbound-door-read",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed broad ironbound service door at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "vault-wheel-security",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed exterior side vault wheel and reinforced bars at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "metal-value-hierarchy",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed iron, brass, and amber focal hierarchy at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "attached-service-props",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed chest, barrel, gutter, rope posts, and blank shield at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "reinforcement-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed strap, bolt, bar, block, and shingle cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-teller-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and unobstructed teller apron at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/gilded-strongbox-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+    }
+  ],
+  "reviewHistory": [
+    {
+      "timestamp": "2026-08-04T00:46:19.938838+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.81,
+        "materialSurface": 0.81,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "bank-width-roof-profile",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed low wide office with restrained teal gable and dormer at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "teller-grille-service",
+          "visible": true,
+          "score": 0.9,
+          "notes": "Independent visual audit passed readable brass teller grille and counter at 0.90 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "ironbound-door-read",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed broad ironbound service door at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "vault-wheel-security",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed exterior side vault wheel and reinforced bars at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "metal-value-hierarchy",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed iron, brass, and amber focal hierarchy at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "attached-service-props",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed chest, barrel, gutter, rope posts, and blank shield at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "reinforcement-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed strap, bolt, bar, block, and shingle cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-teller-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and unobstructed teller apron at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed blockout for gilded_strongbox.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-comparison.png"
+      ],
+      "mapStrippedRender": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-procedural-contact.png",
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/gilded-strongbox-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.989217+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.81,
+        "materialSurface": 0.81,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "bank-width-roof-profile",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed low wide office with restrained teal gable and dormer at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "teller-grille-service",
+          "visible": true,
+          "score": 0.9,
+          "notes": "Independent visual audit passed readable brass teller grille and counter at 0.90 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "ironbound-door-read",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed broad ironbound service door at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "vault-wheel-security",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed exterior side vault wheel and reinforced bars at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "metal-value-hierarchy",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed iron, brass, and amber focal hierarchy at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "attached-service-props",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed chest, barrel, gutter, rope posts, and blank shield at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "reinforcement-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed strap, bolt, bar, block, and shingle cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-teller-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and unobstructed teller apron at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed structural-pass for gilded_strongbox.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/gilded-strongbox-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.040682+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.81,
+        "materialSurface": 0.81,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "bank-width-roof-profile",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed low wide office with restrained teal gable and dormer at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "teller-grille-service",
+          "visible": true,
+          "score": 0.9,
+          "notes": "Independent visual audit passed readable brass teller grille and counter at 0.90 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "ironbound-door-read",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed broad ironbound service door at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "vault-wheel-security",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed exterior side vault wheel and reinforced bars at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "metal-value-hierarchy",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed iron, brass, and amber focal hierarchy at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "attached-service-props",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed chest, barrel, gutter, rope posts, and blank shield at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "reinforcement-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed strap, bolt, bar, block, and shingle cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-teller-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and unobstructed teller apron at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed form-refinement for gilded_strongbox.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/gilded-strongbox-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.092195+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.81,
+        "materialSurface": 0.81,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "bank-width-roof-profile",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed low wide office with restrained teal gable and dormer at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "teller-grille-service",
+          "visible": true,
+          "score": 0.9,
+          "notes": "Independent visual audit passed readable brass teller grille and counter at 0.90 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "ironbound-door-read",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed broad ironbound service door at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "vault-wheel-security",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed exterior side vault wheel and reinforced bars at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "metal-value-hierarchy",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed iron, brass, and amber focal hierarchy at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "attached-service-props",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed chest, barrel, gutter, rope posts, and blank shield at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "reinforcement-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed strap, bolt, bar, block, and shingle cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-teller-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and unobstructed teller apron at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed material-pass for gilded_strongbox.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/gilded-strongbox-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.143773+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.81,
+        "materialSurface": 0.81,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "bank-width-roof-profile",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed low wide office with restrained teal gable and dormer at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "teller-grille-service",
+          "visible": true,
+          "score": 0.9,
+          "notes": "Independent visual audit passed readable brass teller grille and counter at 0.90 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "ironbound-door-read",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed broad ironbound service door at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "vault-wheel-security",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed exterior side vault wheel and reinforced bars at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "metal-value-hierarchy",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed iron, brass, and amber focal hierarchy at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "attached-service-props",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed chest, barrel, gutter, rope posts, and blank shield at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "reinforcement-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed strap, bolt, bar, block, and shingle cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-teller-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and unobstructed teller apron at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed surface-pass for gilded_strongbox.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/gilded-strongbox-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.191254+00:00",
+      "passId": "lighting-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.81,
+        "materialSurface": 0.81,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "bank-width-roof-profile",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed low wide office with restrained teal gable and dormer at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "teller-grille-service",
+          "visible": true,
+          "score": 0.9,
+          "notes": "Independent visual audit passed readable brass teller grille and counter at 0.90 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "ironbound-door-read",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed broad ironbound service door at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "vault-wheel-security",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed exterior side vault wheel and reinforced bars at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "metal-value-hierarchy",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed iron, brass, and amber focal hierarchy at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "attached-service-props",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed chest, barrel, gutter, rope posts, and blank shield at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "reinforcement-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed strap, bolt, bar, block, and shingle cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-teller-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and unobstructed teller apron at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed lighting-pass for gilded_strongbox.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/gilded-strongbox-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.244334+00:00",
+      "passId": "interaction-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.81,
+        "materialSurface": 0.81,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "bank-width-roof-profile",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed low wide office with restrained teal gable and dormer at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "teller-grille-service",
+          "visible": true,
+          "score": 0.9,
+          "notes": "Independent visual audit passed readable brass teller grille and counter at 0.90 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "ironbound-door-read",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed broad ironbound service door at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "vault-wheel-security",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed exterior side vault wheel and reinforced bars at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "metal-value-hierarchy",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed iron, brass, and amber focal hierarchy at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "attached-service-props",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed chest, barrel, gutter, rope posts, and blank shield at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "reinforcement-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed strap, bolt, bar, block, and shingle cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clear-teller-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and unobstructed teller apron at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed interaction-pass for gilded_strongbox.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/gilded-strongbox-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.282098+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": null,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {},
+      "featureReviews": [],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed optimization-pass for gilded_strongbox.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/gilded_strongbox-comparison.png"
+      ]
+    }
+  ],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full merged two-material GLB retaining teller, door, wheel, windows, and attached service props"
+    },
+    {
+      "tier": "far",
+      "distance": 32,
+      "strategy": "same GLB; renderer may shed decorative emissive and shared maps, never the collision-bearing shell"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "silhouette-and-service-readability",
+    "targetTriangles": 2900,
+    "hardTriangleCeiling": 4000,
+    "hardByteCeiling": 286720,
+    "maxShippingPrimitives": 2,
+    "maxShippingMaterials": 2,
+    "embeddedTextures": 0,
+    "nativeDimensionsYards": [7.5, 7.4, 6.5],
+    "placementCount": 1,
+    "fpsTarget": 60,
+    "optimizationPolicy": "Group bars, straps, bolts, shingles, and stone cadence before simplifying teller, door, wheel, or attached service silhouettes."
+  },
+  "lightingFromPhoto": [
+    "Neutral upper-front-left key separates brass grille, teal roof, and door straps without becoming albedo.",
+    "Broad fill keeps the dark teller backing and timber frame legible.",
+    "Soft neutral rim outlines the sign, gutter, chimney, and vault wheel; ACES-like tone mapping at exposure 1.",
+    "Neutral gray background and soft contact shadow prove floor seating; grazing light checks bars, straps, spokes, and bevels."
+  ],
+  "proceduralStrategy": [
+    "Block exact foundation, office, roof, dormer, and porch proportions with +Z front.",
+    "Add teller grille, counter, ironbound door, barred windows, side vault wheel, chest, barrel, gutter, shield, and lamps as named exterior systems.",
+    "Use grouped security and shingle repetition with semantic vertex colors.",
+    "Use independent shared normal and roughness maps at runtime; never project generated studio light.",
+    "Merge semantic buckets only in the shared finalizer and preserve sockets and service cues."
+  ],
+  "animationAnchors": [
+    "root pivot node supports whole-object translation, rotation, scale, and visibility changes",
+    "component pivot groups support later local transforms without rebuilding geometry"
+  ],
+  "destructionAnchors": [
+    "actionProfile.destruction.fractureGroup marks detachable or breakable component sets",
+    "component seams and sockets define plausible break points instead of random explosions"
+  ],
+  "risks": [
+    "Sub-1k crops make tiny bolt, lock, and shingle counts approximate cadence rather than exact inventory.",
+    "Generated views shift the attached chest and barrel slightly; hero placement is canonical.",
+    "The img2threejs blockout still requires browser comparison evidence before later passes unlock."
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Fenbridge Gilded Strongbox stylized exterior timber bank teller vault procedural low-poly",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "6857e5ab528b42ac12f4f411f862610a0bffce8e47aee3610a7603c318072fe8"
+    },
+    "matches": [
+      {
+        "record_id": "core.topology-intent",
+        "file_path": "grimoire/glossary/3d_vocabulary.md",
+        "heading": "Geometry And Topology",
+        "key_path": null,
+        "score": 5.143858634031,
+        "snippets": [
+          "Topology intent classifies a surface as hard-surface blockout, subdivision-ready, low-poly prop, organic deformed mesh, or alpha-card cluster."
+        ],
+        "source_refs": [
+          {
+            "path": "grimoire/glossary/3d_vocabulary.md",
+            "heading": "Geometry And Topology",
+            "key_path": null
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "grimoire/glossary/3d_vocabulary.md"
+          },
+          {
+            "kind": "notebooklm-research",
+            "ref": "notebooklm:4b03c2f9-8393-411f-b5b4-039ab9532843",
+            "note": "Validated generic schema vocabulary; numeric claims remain backed by local source_refs."
+          }
+        ]
+      },
+      {
+        "record_id": "core.shader-mapping-customshadermaterial-csm-weathering-hooks",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.rendering_shader_mapping[1]",
+        "score": 3.601401390438,
+        "snippets": [
+          "Extension library exposing csm_* output variables to inject procedural noise/masks into an otherwise-standard lit material, used for dynamic tarnish/patina effects. Thư viện mở rộng cung cấp các biến đầu ra csm_* để chèn nhiễu/mặt nạ thủ tục vào ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.rendering_shader_mapping[1]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      },
+      {
+        "record_id": "core.pbr-hand-painted-vs-pbr-texture",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.material_pbr[12]",
+        "score": 2.632304791455,
+        "snippets": [
+          "Distinguishes textures with lighting baked directly into color (static, stylized) from textures that respond dynamically to scene lighting via separate PBR channels. Phân biệt kết cấu có ánh sáng được nướng trực tiếp vào màu (tĩnh, cách điệu) ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.material_pbr[12]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      }
+    ]
+  }
+}

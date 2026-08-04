@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "assetId": "moonwort_apothecary",
+  "sourceFingerprint": "80f4c21427673eb2fa85ee8bfd14cd52f1d2ce5f5c4e133906aa384c916f196c",
+  "reference": "docs/design/fenbridge-rebuild/references/moonwort-apothecary-turnaround.png",
+  "minimumOverallScore": 0.7,
+  "requiredViews": [
+    "front",
+    "right",
+    "rear",
+    "left",
+    "hero",
+    "player-scale",
+    "collider-overlay"
+  ],
+  "evidence": {
+    "rawContact": "moonwort_apothecary-raw-contact.png",
+    "optimizedContact": "moonwort_apothecary-optimized-contact.png",
+    "optimizedAuditContact": "moonwort_apothecary-optimized-audit-contact.png",
+    "referenceComparison": "moonwort_apothecary-comparison.png"
+  },
+  "features": [
+    {
+      "id": "moonwort-silhouette",
+      "name": "Compact shell, curled teal roof, dormer and vent",
+      "tier": "critical",
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "visible": true,
+      "score": 0.78,
+      "notes": "Independent visual audit passed compact shell, curled teal roof, dormer and vent at 0.78 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "centered-entry",
+      "name": "Accessible x=0 doorway and clear steps",
+      "tier": "critical",
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "visible": true,
+      "score": 0.86,
+      "notes": "Independent visual audit passed accessible x=0 doorway and clear steps at 0.86 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "potion-sales-display",
+      "name": "Exterior shelf, awning, bottles and violet crystal",
+      "tier": "critical",
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "visible": true,
+      "score": 0.77,
+      "notes": "Independent visual audit passed exterior shelf, awning, bottles and violet crystal at 0.77 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "botanical-craft-read",
+      "name": "Drying herbs, mushrooms, still and drainage",
+      "tier": "critical",
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "visible": true,
+      "score": 0.74,
+      "notes": "Independent visual audit passed drying herbs, mushrooms, still and drainage at 0.74 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "apothecary-material-read",
+      "name": "Teal, timber, copper, botanical, glass and restrained glow separation",
+      "tier": "critical",
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "visible": true,
+      "score": 0.72,
+      "notes": "Independent visual audit passed teal, timber, copper, botanical, glass and restrained glow separation at 0.72 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "fixed-display-counts",
+      "name": "Representative bottle and herb counts remain deterministic",
+      "tier": "important",
+      "minimumScore": 0.7,
+      "mustPass": false,
+      "visible": true,
+      "score": 0.96,
+      "notes": "Independent visual audit passed representative bottle and herb counts remain deterministic at 0.96 in the current reference comparison and required contacts."
+    },
+    {
+      "id": "shipping-budget",
+      "name": "Exterior-only model stays within 4,300 triangles and 300 KiB",
+      "tier": "important",
+      "minimumScore": 0.7,
+      "mustPass": false,
+      "visible": true,
+      "score": 1,
+      "notes": "Independent machine and serialized audit passed exterior-only model stays within 4,300 triangles and 300 kib at 1.00 in the current reference comparison and required contacts."
+    }
+  ],
+  "overall": {
+    "score": 0.76,
+    "decision": "accept",
+    "reviewer": "codex-agent-vision",
+    "notes": "Independent current-source audit accepted every configured feature at overall 0.76."
+  },
+  "intentionalOmissions": [
+    "inaccessible interior geometry",
+    "shipping collision mesh"
+  ],
+  "layerScores": {
+    "silhouetteProportion": 0.78,
+    "componentStructure": 0.83,
+    "formDetail": 0.76,
+    "materialSurface": 0.8,
+    "lightingCamera": 0.73
+  }
+}
