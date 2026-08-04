@@ -7139,6 +7139,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.wtb.label': '收购',
   'hudChrome.discord.relay.help.label': '求助',
   'hudChrome.crafting.title': '制作',
+  'hudChrome.crafting.dialogOption': '制作',
+  'hudChrome.crafting.dialogOptionAria': '打开{craft}制作窗口',
   'hudChrome.crafting.close': '关闭制作',
   'hudChrome.crafting.craft': '制作',
   'hudChrome.crafting.reagentsNeeded': '需要:',

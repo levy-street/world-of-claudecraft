@@ -2634,6 +2634,8 @@ export const ja_JP: EnTranslations = {
     "crafting": {
       "title": "製作",
       "close": "製作を閉じる",
+      "dialogOption": "製作",
+      "dialogOptionAria": "{craft}の製作ウィンドウを開く",
       "craft": "製作",
       "reagentsNeeded": "必要素材:",
       "reagentLine": "{name}: {have}/{required}",

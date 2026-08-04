@@ -7565,6 +7565,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.wtb.label': 'Куплю',
   'hudChrome.discord.relay.help.label': 'Нужна помощь',
   'hudChrome.crafting.title': 'Крафт',
+  'hudChrome.crafting.dialogOption': 'Крафт',
+  'hudChrome.crafting.dialogOptionAria': 'Открыть окно крафта: {craft}',
   'hudChrome.crafting.close': 'Закрыть крафт',
   'hudChrome.crafting.craft': 'Создать',
   'hudChrome.crafting.reagentsNeeded': 'Требуется:',

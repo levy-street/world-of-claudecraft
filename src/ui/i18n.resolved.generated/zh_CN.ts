@@ -2634,6 +2634,8 @@ export const zh_CN: EnTranslations = {
     "crafting": {
       "title": "制作",
       "close": "关闭制作",
+      "dialogOption": "制作",
+      "dialogOptionAria": "打开{craft}制作窗口",
       "craft": "制作",
       "reagentsNeeded": "需要:",
       "reagentLine": "{name}: {have}/{required}",

@@ -2634,6 +2634,8 @@ export const cs_CZ: EnTranslations = {
     "crafting": {
       "title": "Výroba",
       "close": "Zavřít výrobu",
+      "dialogOption": "Crafting",
+      "dialogOptionAria": "Open the crafting window for {craft}",
       "craft": "Vyrobit",
       "reagentsNeeded": "Vyžaduje:",
       "reagentLine": "{name} x{have}/{required}",

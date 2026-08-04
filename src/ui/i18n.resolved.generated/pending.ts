@@ -53,7 +53,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.logWithdrawItem",
     "hudChrome.bank.logWithdrawMoney",
     "hudChrome.bank.personalTab",
-    "hudChrome.bank.tabsAria"
+    "hudChrome.bank.tabsAria",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "es_ES": [
     "hudChrome.bank.cannotDepositNow",
@@ -99,7 +101,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.logWithdrawItem",
     "hudChrome.bank.logWithdrawMoney",
     "hudChrome.bank.personalTab",
-    "hudChrome.bank.tabsAria"
+    "hudChrome.bank.tabsAria",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "fr_FR": [
     "hudChrome.bank.cannotDepositNow",
@@ -145,7 +149,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.logWithdrawItem",
     "hudChrome.bank.logWithdrawMoney",
     "hudChrome.bank.personalTab",
-    "hudChrome.bank.tabsAria"
+    "hudChrome.bank.tabsAria",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "fr_CA": [
     "hudChrome.bank.cannotDepositNow",
@@ -191,7 +197,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.logWithdrawItem",
     "hudChrome.bank.logWithdrawMoney",
     "hudChrome.bank.personalTab",
-    "hudChrome.bank.tabsAria"
+    "hudChrome.bank.tabsAria",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "en_CA": [],
   "it_IT": [
@@ -238,7 +246,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.logWithdrawItem",
     "hudChrome.bank.logWithdrawMoney",
     "hudChrome.bank.personalTab",
-    "hudChrome.bank.tabsAria"
+    "hudChrome.bank.tabsAria",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "de_DE": [
     "hudChrome.bank.cannotDepositNow",
@@ -284,7 +294,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.logWithdrawItem",
     "hudChrome.bank.logWithdrawMoney",
     "hudChrome.bank.personalTab",
-    "hudChrome.bank.tabsAria"
+    "hudChrome.bank.tabsAria",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -334,7 +346,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.logWithdrawItem",
     "hudChrome.bank.logWithdrawMoney",
     "hudChrome.bank.personalTab",
-    "hudChrome.bank.tabsAria"
+    "hudChrome.bank.tabsAria",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -381,7 +395,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.logWithdrawItem",
     "hudChrome.bank.logWithdrawMoney",
     "hudChrome.bank.personalTab",
-    "hudChrome.bank.tabsAria"
+    "hudChrome.bank.tabsAria",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "nl_NL": [
     "hudChrome.bank.cannotDepositNow",
@@ -427,7 +443,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.logWithdrawItem",
     "hudChrome.bank.logWithdrawMoney",
     "hudChrome.bank.personalTab",
-    "hudChrome.bank.tabsAria"
+    "hudChrome.bank.tabsAria",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "pl_PL": [
     "hudChrome.bank.cannotDepositNow",
@@ -473,7 +491,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.logWithdrawItem",
     "hudChrome.bank.logWithdrawMoney",
     "hudChrome.bank.personalTab",
-    "hudChrome.bank.tabsAria"
+    "hudChrome.bank.tabsAria",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "id_ID": [
     "hudChrome.bank.cannotDepositNow",
@@ -519,7 +539,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.logWithdrawItem",
     "hudChrome.bank.logWithdrawMoney",
     "hudChrome.bank.personalTab",
-    "hudChrome.bank.tabsAria"
+    "hudChrome.bank.tabsAria",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "tr_TR": [
     "hudChrome.bank.cannotDepositNow",
@@ -565,7 +587,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.logWithdrawItem",
     "hudChrome.bank.logWithdrawMoney",
     "hudChrome.bank.personalTab",
-    "hudChrome.bank.tabsAria"
+    "hudChrome.bank.tabsAria",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "sv_SE": [
     "hudChrome.bank.cannotDepositNow",
@@ -611,7 +635,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.logWithdrawItem",
     "hudChrome.bank.logWithdrawMoney",
     "hudChrome.bank.personalTab",
-    "hudChrome.bank.tabsAria"
+    "hudChrome.bank.tabsAria",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "vi_VN": [
     "hudChrome.bank.cannotDepositNow",
@@ -657,7 +683,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.logWithdrawItem",
     "hudChrome.bank.logWithdrawMoney",
     "hudChrome.bank.personalTab",
-    "hudChrome.bank.tabsAria"
+    "hudChrome.bank.tabsAria",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "da_DK": [
     "hudChrome.bank.cannotDepositNow",
@@ -703,6 +731,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.logWithdrawItem",
     "hudChrome.bank.logWithdrawMoney",
     "hudChrome.bank.personalTab",
-    "hudChrome.bank.tabsAria"
+    "hudChrome.bank.tabsAria",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ]
 };

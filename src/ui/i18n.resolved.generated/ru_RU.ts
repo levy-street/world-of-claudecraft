@@ -2634,6 +2634,8 @@ export const ru_RU: EnTranslations = {
     "crafting": {
       "title": "Крафт",
       "close": "Закрыть крафт",
+      "dialogOption": "Крафт",
+      "dialogOptionAria": "Открыть окно крафта: {craft}",
       "craft": "Создать",
       "reagentsNeeded": "Требуется:",
       "reagentLine": "{name}: {have}/{required}",

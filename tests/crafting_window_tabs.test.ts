@@ -20,9 +20,11 @@ import {
   type CraftingRecipeRow,
   type CraftingView,
   craftingTabs,
+  craftOwnsTab,
   resolveSelectedCraft,
 } from '../src/ui/crafting_view';
 import { renderCraftingWindow } from '../src/ui/crafting_window';
+import { isRecipeKnownForViewer } from '../src/ui/hud/vendor/train_view';
 
 // Two weaponcrafting recipes that STRADDLE an alchemy recipe in ALL_RECIPES
 // order (recipes.ts is not contiguous per craft), so the grouping rule is
@@ -112,6 +114,58 @@ describe('resolveSelectedCraft (the selection fallback)', () => {
   it('resolves null for an empty book, whatever was requested', () => {
     expect(resolveSelectedCraft([], 'craft_a')).toBeNull();
     expect(resolveSelectedCraft([], null)).toBeNull();
+  });
+});
+
+describe('craftOwnsTab (the gossip shortcut persist gate)', () => {
+  // Real content rows: the arming sword has no acquisition list (grandfathered
+  // known to everyone), the gauntlets are trainer-taught (known only once the
+  // id is in the viewer's mirrored set). Both are weaponcrafting.
+  const sword = recipeRows([SWORD_RECIPE]);
+  const gauntlets = recipeRows([GAUNTLET_RECIPE]);
+
+  it('the fixture premise really holds (content precondition)', () => {
+    // Content drift that flips either acquisition list should fail HERE with
+    // a named precondition, not as a confusing assertion in the arms below
+    // (the interleaved-fixture precondition pattern above).
+    expect(sword[0]?.acquisition ?? []).toEqual([]);
+    expect(gauntlets[0]?.acquisition).toContain('trainer');
+  });
+
+  it('a grandfathered field recipe gives the craft a tab for every viewer', () => {
+    expect(craftOwnsTab(sword, [], 'weaponcrafting')).toBe(true);
+  });
+
+  it('an unlearned trainer-only recipe gives no tab, and learning it flips the gate', () => {
+    expect(craftOwnsTab(gauntlets, [], 'weaponcrafting')).toBe(false);
+    expect(craftOwnsTab(gauntlets, [GAUNTLET_RECIPE], 'weaponcrafting')).toBe(true);
+  });
+
+  it('a craft with no recipes in the book never owns a tab', () => {
+    expect(craftOwnsTab(sword, [], 'craft_without_recipes')).toBe(false);
+    expect(craftOwnsTab([], [], 'weaponcrafting')).toBe(false);
+  });
+
+  it('agrees with craftingTabs tab-existence for every craft (differential)', () => {
+    // craftOwnsTab's doc comment claims it restates craftingTabs' membership
+    // rule; this arm pins the two rules together so a change to either (for
+    // example folding confirmedRecipes into the window's known filter) goes
+    // red instead of silently desynchronizing the persist gate from the strip.
+    const knownSets: string[][] = [[], [GAUNTLET_RECIPE], ALL_RECIPES.map((r) => r.id)];
+    const crafts = [...new Set(ALL_RECIPES.map((r) => r.professionId))];
+    for (const known of knownSets) {
+      const view = buildCraftingView(
+        ALL_RECIPES.filter((r) => isRecipeKnownForViewer(r, new Set(known))),
+        [],
+        ITEMS,
+      );
+      const tabs = craftingTabs(view);
+      for (const craft of crafts) {
+        expect(craftOwnsTab(ALL_RECIPES, known, craft), `${craft} @ ${known.length} known`).toBe(
+          tabs.some((tab) => tab.professionId === craft),
+        );
+      }
+    }
   });
 });
 

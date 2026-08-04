@@ -84,8 +84,9 @@ export interface MoveResult {
  *    regardless of count (its units can never be split from their payload).
  *    Identical-payload stacking: the units merge into a byte-equal
  *    mergeable dest stack with room and otherwise land in a fresh deep-cloned
- *    dest slot (countFit/addStacked carry the payload), refusing 'no_fit' only
- *    when the whole count cannot land.
+ *    dest slot (countFit/addStacked carry the payload AND the slot's
+ *    craftedRecipeId, which an instanced slot can carry too), refusing
+ *    'no_fit' only when the whole count cannot land.
  *  - A fungible slot reuses the bags.ts stacking rules (countFit/addStacked),
  *    threading slot.craftedRecipeId through both calls so a plain crafted stack
  *    (InvSlot.craftedRecipeId, no `instance`) keeps its provenance marker and

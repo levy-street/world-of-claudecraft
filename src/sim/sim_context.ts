@@ -57,6 +57,7 @@ import type {
   ErrorReason,
   EscortRunState,
   GatherNodeDef,
+  InventoryUnit,
   ItemInstancePayload,
   PendingResurrection,
   PlayerClass,
@@ -533,11 +534,13 @@ export interface SimContextCallbacks {
   // professions/enchanting.ts instead of countFungibleItem/removeFungibleItem
   // so crafted single-copy rares remain disenchantable/enchantable.
   countEnchantableItem(itemId: string, pid?: number): number;
-  // Returns the consumed slots' `instance` payloads (removeItem's contract),
-  // so applyEnchant can merge a crafted copy's signer, legacy rolled.quality,
-  // and masterwork bonus into the freshly-enchanted instance instead of
-  // dropping them.
-  removeEnchantableItem(itemId: string, count: number, pid?: number): ItemInstancePayload[];
+  // Returns one InventoryUnit per consumed unit (types.ts): the slot's
+  // `instance` payload AND its plain-stack craftedRecipeId marker, so
+  // applyEnchant can merge a crafted copy's signer, legacy rolled.quality, and
+  // masterwork bonus into the freshly-enchanted instance instead of dropping
+  // them, and can re-stamp the craft marker a plain crafted stack carries on
+  // the slot rather than in a payload.
+  removeEnchantableItem(itemId: string, count: number, pid?: number): InventoryUnit[];
   completeQuestForDev(questId: string, pid?: number): boolean;
   completeCurrentQuestsForDev(pid?: number): number;
 
