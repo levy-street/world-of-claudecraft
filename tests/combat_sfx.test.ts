@@ -305,8 +305,8 @@ describe('combat SFX policy', () => {
     ).toEqual({ key: 'fear', anchorId: 20 });
   });
 
-  it('anchors the landed cc moment to the target for the covered trio, and stays silent otherwise', () => {
-    for (const ability of ['hammer_of_justice', 'entangling_roots', 'blind']) {
+  it('anchors the landed cc moment to the target for the covered set, and stays silent otherwise', () => {
+    for (const ability of ['hammer_of_justice', 'entangling_roots', 'blind', 'cheap_shot']) {
       expect(
         spellFxCue({
           type: 'spellfx',
@@ -319,7 +319,7 @@ describe('combat SFX policy', () => {
       ).toEqual({ key: ability, anchorId: 20 });
     }
     // No ability id, or an ability not in the covered set: no cue at all
-    // (the sim only ever emits ccImpact for these three, but the client
+    // (the sim only ever emits ccImpact for this set, but the client
     // resolver stays defensive regardless).
     expect(
       spellFxCue({

@@ -1349,9 +1349,10 @@ export function runEffects(
           sourceId: p.id,
           school: ability.school,
         });
-        // Sundering Gavel (hammer_of_justice) sounds at the target; every
-        // other stun has no dedicated recording and stays silent here.
-        if (ability.id === 'hammer_of_justice') {
+        // Sundering Gavel (hammer_of_justice) and Gut Punch (cheap_shot)
+        // sound at the target; every other stun has no dedicated recording
+        // and stays silent here.
+        if (ability.id === 'hammer_of_justice' || ability.id === 'cheap_shot') {
           ctx.emit({
             type: 'spellfx',
             sourceId: p.id,

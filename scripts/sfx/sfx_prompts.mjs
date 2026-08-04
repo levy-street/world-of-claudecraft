@@ -482,6 +482,10 @@ export const SFX = [
     custom: true,
   },
   {
+    key: 'cheap_shot',
+    custom: true,
+  },
+  {
     key: 'vanish',
     custom: true,
   },

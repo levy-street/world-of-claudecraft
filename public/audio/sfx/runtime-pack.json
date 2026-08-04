@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "8edb9c60cc73a8ca57897760c7a17424bf8e5ef5dc1d5396355cd40bfce41eb2",
-  "catalogHash": "c818596c3614804241aaa70a1bf47db3ecc05bd0ab8be9b0123c4fc4e2cf2a1b",
+  "bundleId": "79b9242f2f6f5bc45c248055b1a61f8f4f45b2cfdfe00a31f0dbddf91635ca02",
+  "catalogHash": "5f4f5b960495e03ce9aa0c431f674b83f1eea28fcd5a6fdf719e26ad6d7bda26",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -278,6 +278,18 @@
         }
       ],
       "gain": 1,
+      "playbackRate": 1
+    },
+    "cheap_shot": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/cheap_shot.mp3?v=949ae18c2f9d",
+          "bytes": 13208,
+          "sha256": "949ae18c2f9d9227e9aa5f83baea53b8822f918bd994f6065504763c03adc0a6"
+        }
+      ],
+      "gain": 1.840772,
       "playbackRate": 1
     },
     "cloak_of_shadows": {

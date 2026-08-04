@@ -62,12 +62,14 @@ export const FEAR_IMPACT_ABILITIES: ReadonlySet<string> = new Set([
 
 /** Plain (non-fear) cc abilities whose landed moment now has a dedicated
  *  recording (fx:'ccImpact'): Sundering Gavel/hammer_of_justice (stun),
- *  Gripping Roots/entangling_roots (root), Dirt Toss/blind (incapacitate).
- *  All three are archetype 'cc' (normally uncovered). */
+ *  Gripping Roots/entangling_roots (root), Dirt Toss/blind (incapacitate),
+ *  Gut Punch/cheap_shot (stun, the stealth opener). All four are archetype
+ *  'cc' (normally uncovered). */
 export const CC_IMPACT_ABILITIES: ReadonlySet<string> = new Set([
   'hammer_of_justice',
   'entangling_roots',
   'blind',
+  'cheap_shot',
 ]);
 
 /** The six schools with a recorded launch whoosh (combat_sfx.ts SCHOOL_CUES
