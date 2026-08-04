@@ -15,11 +15,14 @@ const DESKTOP_HOST = 'https://updates.worldofclaudecraft.com/desktop';
 
 // electron-builder website-channel artifact names (docs/desktop-release.md):
 // mac ships one universal dmg; the x64 Linux AppImage is named x86_64 (that is
-// electron-builder's arch token for AppImage, not "x64"). Windows ships one
-// combined NSIS installer that selects its x64 or arm64 payload at install time.
+// electron-builder's arch token for AppImage, not "x64"). Windows ships a
+// separate single-arch NSIS installer per arch (build.nsis.buildUniversalInstaller
+// is false, issue 2013); this page links the x64 installer, matching every other
+// channel's precedent of running Windows-on-ARM visitors under x64 emulation
+// rather than shipping a second download button.
 const ARTIFACT: Partial<Record<DesktopPlatform, string>> = {
   mac: `world-of-claudecraft-${DESKTOP_VERSION}-mac-universal.dmg`,
-  win: `world-of-claudecraft-${DESKTOP_VERSION}-win.exe`,
+  win: `world-of-claudecraft-${DESKTOP_VERSION}-win-x64.exe`,
   linux: `world-of-claudecraft-${DESKTOP_VERSION}-linux-x86_64.AppImage`,
 };
 

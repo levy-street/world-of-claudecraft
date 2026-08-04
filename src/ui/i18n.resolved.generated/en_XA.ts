@@ -1214,6 +1214,7 @@ export const en_XA: EnTranslations = {
       "itemScoreLine": "[Šçóŕé {score}]",
       "showSecondaryActionBar": "[Šĥóŵ Šéçóñðáŕý Áçţíóñ Ɓáŕ]",
       "showThirdActionBar": "[Šĥóŵ Ţĥíŕð Áçţíóñ Ɓáŕ]",
+      "lockActionBars": "[Ļóçķ Áçţíóñ Ɓáŕš]",
       "showTargetOfTarget": "[Šĥóŵ Ţáŕĝéţ óƒ Ţáŕĝéţ]",
       "showAttackButton": "[Šĥóŵ Áţţáçķ Ɓúţţóñ]",
       "showDailyRewardsChest": "[Šĥóŵ Ðáíļý Ŕéŵáŕðš Çĥéšţ]",
@@ -1375,7 +1376,14 @@ export const en_XA: EnTranslations = {
     },
     "landing": {
       "highContrast": "[Ĥíĝĥ Çóñţŕášţ]",
-      "highContrastAria": "[Ţóĝĝļé ĥíĝĥ-çóñţŕášţ ƀáçķĝŕóúñð: ðíšáƀļéš ţĥé ɱóʋíñĝ ţŕáíļéŕ šó šţáŕţ-šçŕééñ ţéẋţ šţáýš ļéĝíƀļé]"
+      "highContrastAria": "[Ţóĝĝļé ĥíĝĥ-çóñţŕášţ ƀáçķĝŕóúñð: ðíšáƀļéš ţĥé ɱóʋíñĝ ţŕáíļéŕ šó šţáŕţ-šçŕééñ ţéẋţ šţáýš ļéĝíƀļé]",
+      "browserSupport": {
+        "title": "[Ĥéáðš úþ: úñšúþþóŕţéð ƀŕóŵšéŕ]",
+        "body": "[Ýóú ɱáý šéé ŕéðúçéð þéŕƒóŕɱáñçé íñ ţĥíš ƀŕóŵšéŕ. Ƒóŕ ţĥé ƀéšţ éẋþéŕíéñçé, ĝéţ ţĥé ðéšķţóþ áþþ ƒóŕ Ŵíñðóŵš, ɱáçÓŠ, óŕ Ļíñúẋ. Þŕéƒéŕ þļáýíñĝ íñ á ƀŕóŵšéŕ? Çĥŕóɱé þéŕƒóŕɱš ƀéšţ, áñð Ƒíŕéƒóẋ áñð Šáƒáŕí áŕé áļšó šúþþóŕţéð.]",
+        "getDesktopApp": "[Ĝéţ ţĥé ðéšķţóþ áþþ]",
+        "continueInBrowser": "[Çóñţíñúé íñ ƀŕóŵšéŕ]",
+        "dismissAria": "[Ðíšɱíšš ţĥé úñšúþþóŕţéð ƀŕóŵšéŕ ñóţíçé]"
+      }
     },
     "warfare": {
       "honorAmount": "[{amount} Ĥóñóŕ]",
@@ -1744,6 +1752,7 @@ export const en_XA: EnTranslations = {
       "itemAriaEnchanted": "[{item}, ɋúáñţíţý {count}, éñçĥáñţéð çóþý]",
       "itemAriaBound": "[{item}, ɋúáñţíţý {count}, ƀóúñð çóþý]",
       "itemAriaMasterwork": "[{item}, ɋúáñţíţý {count}, ɱášţéŕŵóŕķ]",
+      "itemAriaQuest": "[{item}, ɋúáñţíţý {count}, ɋúéšţ íţéɱ]",
       "filterGroupAria": "[Ƒíļţéŕ ƀáĝš ƀý çáţéĝóŕý]",
       "filterAll": "[Áļļ]",
       "filterWeapon": "[Ŵéáþóñš]",
@@ -1752,6 +1761,7 @@ export const en_XA: EnTranslations = {
       "filterMaterial": "[Ɱáţéŕíáļš]",
       "filterTool": "[Ţóóļš]",
       "filterQuest": "[Ɋúéšţ]",
+      "filterQuestCountAria": "[Ɋúéšţ, {count} íţéɱš]",
       "filterMount": "[Ɱóúñţš]",
       "sortAria": "[Šóŕţ ƀáĝ íţéɱš]",
       "sortRecent": "[Ŕéçéñţ]",
@@ -1760,6 +1770,7 @@ export const en_XA: EnTranslations = {
       "searchPlaceholder": "[Šéáŕçĥ íţéɱš]",
       "searchAria": "[Šéáŕçĥ ƀáĝ íţéɱš ƀý ñáɱé]",
       "noMatch": "[Ñó íţéɱš ɱáţçĥ ýóúŕ ƒíļţéŕš.]",
+      "noQuestItems": "[Ñó ɋúéšţ íţéɱš íñ ýóúŕ ƀáĝš.]",
       "capacity": "[{used}/{total}]",
       "capacityAria": "[Ɓáĝ šļóţš úšéð: {used} óƒ {total}]",
       "backpack": "[Ɓáçķþáçķ]",
@@ -2270,6 +2281,7 @@ export const en_XA: EnTranslations = {
       "sortAria": "[Šóŕţ ƀáñķ íţéɱš]",
       "searchAria": "[Šéáŕçĥ ƀáñķ íţéɱš ƀý ñáɱé]",
       "depositAll": "[Ðéþóšíţ áļļ ɱáţéŕíáļš]",
+      "depositAllTooltip": "[Šéñðš éʋéŕý çŕáƒţíñĝ ŕéáĝéñţ áñð ĵúñķ íţéɱ ƒŕóɱ ýóúŕ ƀáĝš ţó ţĥé ƀáñķ íñ óñé ţŕíþ. Ĝáţĥéŕíñĝ ţóóļš, éɋúíþþéð ĝéáŕ, ɋúéšţ íţéɱš, áñð çóñšúɱáƀļéš áŕé ñéʋéŕ ţóúçĥéð.]",
       "depositAllDone": "[Ɱáţéŕíáļš ðéþóšíţéð: {count}.]",
       "depositAllFull": "[Ɱáţéŕíáļš ðéþóšíţéð: {count}. Ɓáñķ ñóŵ ƒúļļ.]",
       "depositAllNone": "[Ɓáñķ ƒúļļ: ñóţĥíñĝ ðéþóšíţéð.]",
@@ -6627,6 +6639,11 @@ export const en_XA: EnTranslations = {
     },
     "system": {
       "playerDeath": "[Ýóú ĥáʋé ðíéð.]",
+      "deathRecapKillerAbility": "[Ýóú ĥáʋé ðíéð. Šļáíñ ƀý {killer}'š {ability}.]",
+      "deathRecapKiller": "[Ýóú ĥáʋé ðíéð. Šļáíñ ƀý {killer}.]",
+      "deathRecapAbility": "[Ýóú ĥáʋé ðíéð. Šļáíñ ƀý {ability}.]",
+      "deathRecapFalling": "[Ýóú ĥáʋé ðíéð. Ýóú ƒéļļ ţó ýóúŕ ðéáţĥ.]",
+      "deathRecapDrowned": "[Ýóú ĥáʋé ðíéð. Ýóú ðŕóŵñéð.]",
       "respawn": "[Ýóú ƒééļ ŕéšţéð áñð ŵĥóļé áĝáíñ.]",
       "ignoringChat": "[Íĝñóŕíñĝ çĥáţ ƒŕóɱ {name}.]",
       "noLongerIgnoring": "[Ñó ļóñĝéŕ íĝñóŕíñĝ {name}.]",
@@ -7149,6 +7166,9 @@ export const en_XA: EnTranslations = {
       "useFood": "[Úšé: Ŕéšţóŕéš {amount} ĥéáļţĥ óʋéŕ {seconds} šéç. Ɱúšţ ŕéɱáíñ šéáţéð ŵĥíļé éáţíñĝ.]",
       "useDrink": "[Úšé: Ŕéšţóŕéš {amount} ɱáñá óʋéŕ {seconds} šéç. Ɱúšţ ŕéɱáíñ šéáţéð ŵĥíļé ðŕíñķíñĝ.]",
       "questItem": "[Ɋúéšţ Íţéɱ]",
+      "questRelated": "[Ɋúéšţ: {quest}]",
+      "questRules": "[Çáññóţ ƀé šóļð, ƀáñķéð, óŕ ţŕáðéð.]",
+      "questOrphaned": "[Ñóţ ñééðéð ƒóŕ áñý áçţíʋé ɋúéšţ.]",
       "classes": "[Çļáššéš: {classes}]",
       "sellPrice": "[Šéļļ þŕíçé: {money}]",
       "clickBuy": "[Çļíçķ ţó ƀúý]",

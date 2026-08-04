@@ -363,7 +363,7 @@ export interface SimContextCallbacks {
     // marked ally at a reduced rate. Defaults false.
     aoe?: boolean,
   ): number;
-  handleDeath(entity: Entity, killer: Entity | null): void;
+  handleDeath(entity: Entity, killer: Entity | null, killerAbility?: string | null): void;
   cancelCast(entity: Entity): void;
   pushbackCast(entity: Entity): void;
   refreshMobLeashFromAction(source: Entity | null, target: Entity): void;

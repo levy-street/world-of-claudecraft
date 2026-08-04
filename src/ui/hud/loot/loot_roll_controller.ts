@@ -4,7 +4,7 @@ import type { IWorld } from '../../../world_api';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
-import { QUALITY_COLOR } from '../../icons';
+import { itemNameColor } from '../../item_name_color';
 import { knownItemDef } from '../../known_item';
 import type { PainterHostWriters } from '../../painter_host';
 import { unknownItemIconHtml } from '../../unknown_item_icon';
@@ -14,14 +14,6 @@ import {
   type LootRollStatusRow,
   lootRollStatusFingerprint,
 } from './loot_roll_status_view';
-
-// hasOwn-safe read of the quality tint: `quality` is a wire string and
-// QUALITY_COLOR a plain object literal, so a bare bracket read of a prototype
-// key ('constructor') would interpolate a native function's source into the
-// style attribute (no breakout, the declaration just drops, but the same R34
-// doctrine unknownItemIconHtml applies one line over covers it here too).
-const qualityColor = (quality: string): string =>
-  Object.hasOwn(QUALITY_COLOR, quality) ? QUALITY_COLOR[quality] : '#fff';
 
 type LootRollEvent = Extract<SimEvent, { type: 'lootRoll' }>;
 type MasterLootEvent = Extract<SimEvent, { type: 'masterLoot' }>;
@@ -448,6 +440,7 @@ export class LootRollController {
       const item = knownItemDef(ITEMS, event.itemId);
       const itemName = item ? itemDisplayName(item) : event.itemName;
       const quality = item?.quality ?? event.quality ?? 'common';
+      const nameColor = itemNameColor({ kind: item?.kind, quality });
       const status = statusByRoll.get(rollId);
       const row = this.deps.document.createElement('div');
       row.className = 'loot-roll panel';
@@ -458,7 +451,7 @@ export class LootRollController {
           ${item ? this.deps.itemIcon(item) : unknownItemIconHtml(event.itemId, quality)}
           <div class="loot-roll-copy">
             <div class="loot-roll-title">${esc(t('itemUi.lootRoll.title'))}</div>
-            <div class="loot-roll-name" style="color:${qualityColor(quality)}">${esc(itemName)}</div>
+            <div class="loot-roll-name" style="color:${nameColor}">${esc(itemName)}</div>
           </div>
         </div>
         <div class="loot-roll-timer" aria-hidden="true"><span></span></div>
@@ -485,6 +478,7 @@ export class LootRollController {
       const item = knownItemDef(ITEMS, status.itemId);
       const itemName = item ? itemDisplayName(item) : status.itemName;
       const quality = item?.quality ?? status.quality ?? 'common';
+      const nameColor = itemNameColor({ kind: item?.kind, quality });
       const row = this.deps.document.createElement('div');
       row.className = 'loot-roll panel watch';
       row.dataset.rollId = String(status.rollId);
@@ -495,7 +489,7 @@ export class LootRollController {
           ${item ? this.deps.itemIcon(item) : unknownItemIconHtml(status.itemId, quality)}
           <div class="loot-roll-copy">
             <div class="loot-roll-title">${esc(t('itemUi.lootRoll.title'))}</div>
-            <div class="loot-roll-name" style="color:${qualityColor(quality)}">${esc(itemName)}</div>
+            <div class="loot-roll-name" style="color:${nameColor}">${esc(itemName)}</div>
           </div>
         </div>
         <div class="loot-roll-timer" aria-hidden="true"><span></span></div>
@@ -517,6 +511,7 @@ export class LootRollController {
     const item = knownItemDef(ITEMS, event.itemId);
     const itemName = item ? itemDisplayName(item) : event.itemName;
     const quality = item?.quality ?? event.quality ?? 'common';
+    const nameColor = itemNameColor({ kind: item?.kind, quality });
     const row = this.deps.document.createElement('div');
     row.className = 'loot-roll panel master';
     row.dataset.rollId = String(rollId);
@@ -533,7 +528,7 @@ export class LootRollController {
         ${item ? this.deps.itemIcon(item) : unknownItemIconHtml(event.itemId, quality)}
         <div class="loot-roll-copy">
           <div class="loot-roll-title">${esc(t('hudChrome.masterLoot.assignPrompt', { item: itemName }))}</div>
-          <div class="loot-roll-name" style="color:${qualityColor(quality)}">${esc(itemName)}</div>
+          <div class="loot-roll-name" style="color:${nameColor}">${esc(itemName)}</div>
         </div>
       </div>
       <div class="loot-roll-timer" aria-hidden="true"><span></span></div>

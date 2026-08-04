@@ -430,6 +430,7 @@ const COMBAT_KEYS = [
   'fctScale',
   'showSecondaryActionBar',
   'showThirdActionBar',
+  'lockActionBars',
 ];
 const INTERFACE_KEYS_BY_TAB: Record<InterfaceTab, string[]> = {
   general: GENERAL_KEYS,

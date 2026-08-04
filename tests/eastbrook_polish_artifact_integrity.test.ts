@@ -614,16 +614,16 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   POLISH_ROOT,
   'metadata/after-desktop-ultra.json',
 );
-// Re-pinned again: src/render/renderer.ts is the rendererIntegration leaf of the
-// polish composite, so adding the Blizzard timed ground loop to its snowZone
-// spellfx arm moves the metadata file's bytes (its polishProvenance block) and the
-// composite fingerprint it carries, on top of the live graphics rebuild the release
-// tip already carries. The accepted file still points at the same captured view;
-// only its provenance bytes follow the changed input.
+// Re-pinned after stacking this branch's renderer provenance move (the Bear Form
+// visual swap onto the purpose-built quadruped rig) onto a release/v0.34.0 that
+// already carries PR #2720's Eastbrook fence-removal layout evidence and the live
+// graphics rebuild (context recycle plus profile-aware Eastbrook runtime inputs).
+// The accepted file still points at the same captured view; only its swept
+// provenance bytes follow the merged rendererIntegration and layout inputs.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '62fc92c0a7d4d5717ffe3e1326782d8c0c5fb01e210033c6c2e90221bc3b412c';
+  'cc85733f3d8b76363977b65eee4868018493e20f00aa85c1de1fcc98d1776f24';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '32233c17b92750cb0e470094ca59a8445eaa50f3778b537c62fa4981d573e30b';
+  '38b87f7e206b1666253705a02283b70485b5fa6dd16096d1463d51ef7defe0f4';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1480,14 +1480,15 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(acceptedFiles).toHaveLength(4);
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
-    // src/render/renderer.ts is the rendererIntegration leaf of that composite,
-    // so adding the Blizzard timed ground loop to its snowZone spellfx arm moved
-    // the composite fingerprint on top of the live graphics rebuild the release
-    // tip already carries, and this seal follows. Every measured value (frame
-    // timings, draw stats, triangle and scenario numbers) is byte-identical, and
-    // no capture was retaken.
+    // After stacking this branch's renderer provenance move (the Bear Form rig
+    // swap) onto a base carrying PR #2720's fence-removal content change and the
+    // live graphics rebuild, this seal follows the merged composite, recomputed
+    // last by remint_polish_provenance.mjs. Every measured value (frame timings,
+    // draw stats, triangle and scenario numbers) is byte-identical against the
+    // current release/v0.34.0 tip, no parent's literal matched the merged tree,
+    // and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      '7fe8c1286796ba854a26e714ed7fc6f2da110e1ef87bc330f6c1182aaeb580b4',
+      '7dff3a2a3aaa221a40e3abca1464b0510986ee85c7d7d1922d034b1b7a82f37a',
     );
   });
 

@@ -34,16 +34,22 @@ MARKETING_VERSION = 0.20.0;`;
 
 const INDEX_HTML = `<a href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.20.0-mac-universal.dmg">Download</a>
 <a href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.20.0-linux-x86_64.AppImage">Download</a>
-<a href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.20.0-win.exe">Download</a>
+<a href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.20.0-win-x64.exe">Download</a>
 <div id="game-version">v0.10</div>`;
 
 // play.html omits Linux but carries the macOS and Windows links.
 const PLAY_HTML = `<a href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.20.0-mac-universal.dmg">Download</a>
-<a href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.20.0-win.exe">Download</a>
+<a href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.20.0-win-x64.exe">Download</a>
 <div id="game-version">v0.10</div>`;
 
 const DESKTOP_TS = `export const DESKTOP_VERSION = '0.20.0';
 const DESKTOP_HOST = 'https://updates.worldofclaudecraft.com/desktop';`;
+
+// A page migrated before the per-arch cutover (or hand-edited afterward) can still
+// carry the legacy combined-installer filename ("-win.exe", no arch suffix).
+const LEGACY_WINDOWS_HTML = `<a href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.20.0-mac-universal.dmg">Download</a>
+<a href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.20.0-win.exe">Download</a>
+<div id="game-version">v0.10</div>`;
 
 const README_MD = `[![Version](https://img.shields.io/badge/version-0.20.0-blue)](package.json)`;
 
@@ -113,8 +119,15 @@ describe('release version transforms', () => {
 
   it('updates Windows installer artifact links', () => {
     const out = setDesktopDownloadVersion(INDEX_HTML, '0.21.0', 'index.html');
-    expect(out).toContain('world-of-claudecraft-0.21.0-win.exe');
+    expect(out).toContain('world-of-claudecraft-0.21.0-win-x64.exe');
+    expect(out).not.toContain('world-of-claudecraft-0.20.0-win-x64.exe');
+  });
+
+  it('migrates a legacy combined Windows installer link to the per-arch form', () => {
+    const out = setDesktopDownloadVersion(LEGACY_WINDOWS_HTML, '0.21.0', 'index.html');
+    expect(out).toContain('world-of-claudecraft-0.21.0-win-x64.exe');
     expect(out).not.toContain('world-of-claudecraft-0.20.0-win.exe');
+    expect(out).not.toMatch(/world-of-claudecraft-\d+\.\d+\.\d+-win\.exe/);
   });
 
   it('tolerates pages without a Linux link (play.html)', () => {
@@ -177,8 +190,8 @@ describe('planReleaseVersion', () => {
     expect(plan.htmlFiles['index.html']).toContain(
       'world-of-claudecraft-0.21.0-linux-x86_64.AppImage',
     );
-    expect(plan.htmlFiles['index.html']).toContain('world-of-claudecraft-0.21.0-win.exe');
-    expect(plan.htmlFiles['play.html']).toContain('world-of-claudecraft-0.21.0-win.exe');
+    expect(plan.htmlFiles['index.html']).toContain('world-of-claudecraft-0.21.0-win-x64.exe');
+    expect(plan.htmlFiles['play.html']).toContain('world-of-claudecraft-0.21.0-win-x64.exe');
     expect(plan.htmlFiles['play.html']).toContain('<div id="game-version">v0.21.0</div>');
     expect(plan.desktopModule).toContain("export const DESKTOP_VERSION = '0.21.0';");
     expect(plan.readmeFiles['README.md']).toContain('version-0.21.0-blue');
@@ -234,5 +247,28 @@ describe('collectReleaseVersionFailures', () => {
     });
 
     expect(failures.filter((failure) => failure.includes('Linux'))).toEqual([]);
+  });
+
+  it('reports a stale legacy combined Windows installer link left unmigrated', () => {
+    const failures = collectReleaseVersionFailures({
+      version: '0.21.0',
+      packageJson: PACKAGE_JSON,
+      gradle: GRADLE,
+      pbxproj: PBXPROJ,
+      desktopModule: DESKTOP_TS,
+      htmlFiles: {
+        'index.html': setGameVersionText(LEGACY_WINDOWS_HTML, '0.21.0', 'index.html').replace(
+          'world-of-claudecraft-0.20.0-mac-universal.dmg',
+          'world-of-claudecraft-0.21.0-mac-universal.dmg',
+        ),
+      },
+      readmeFiles: {
+        'README.md': README_MD,
+      },
+    });
+
+    expect(failures).toContain(
+      'index.html has a stale Windows desktop download URL, expected 0.21.0',
+    );
   });
 });
