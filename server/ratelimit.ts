@@ -284,11 +284,14 @@ export function resetRateLimits(): void {
 
 export const CARD_UPLOAD_MAX_PER_MINUTE = 10;
 export const WALLET_LINK_MAX_PER_MINUTE = 10;
+export const SEEKER_SPIN_VERIFY_MAX_PER_MINUTE = 5;
 
 const cardUploadIpAttempts = new Map<string, number[]>();
 const cardUploadAccountAttempts = new Map<number, number[]>();
 const walletLinkIpAttempts = new Map<string, number[]>();
 const walletLinkAccountAttempts = new Map<number, number[]>();
+const seekerSpinVerifyIpAttempts = new Map<string, number[]>();
+const seekerSpinVerifyAccountAttempts = new Map<number, number[]>();
 
 function recordSlidingWindowAttempt<K>(
   attemptsByKey: Map<K, number[]>,
@@ -496,6 +499,30 @@ export function walletLinkRateLimited(
 export function resetWalletLinkRateLimits(): void {
   walletLinkIpAttempts.clear();
   walletLinkAccountAttempts.clear();
+}
+
+/** Bound native SGT ownership RPC work independently from wallet-link attempts. */
+export function seekerSpinVerifyRateLimited(
+  req: http.IncomingMessage,
+  accountId: number,
+): RateLimitOutcome {
+  const ip = recordSlidingWindowAttempt(
+    seekerSpinVerifyIpAttempts,
+    requestIp(req),
+    SEEKER_SPIN_VERIFY_MAX_PER_MINUTE,
+  );
+  const account = recordSlidingWindowAttempt(
+    seekerSpinVerifyAccountAttempts,
+    accountId,
+    SEEKER_SPIN_VERIFY_MAX_PER_MINUTE,
+  );
+  return mergeFusedOutcomes(ip, account);
+}
+
+/** Reset Seeker spin verification throttles. Test-only. */
+export function resetSeekerSpinVerifyRateLimits(): void {
+  seekerSpinVerifyIpAttempts.clear();
+  seekerSpinVerifyAccountAttempts.clear();
 }
 
 // Discord link/status/reward endpoints share one dedicated bucket (per IP AND

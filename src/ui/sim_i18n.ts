@@ -45,6 +45,43 @@ const baseEnTable = {
   'error.bankMaxSlots': 'Your bank cannot be expanded further.',
   'error.bankTooFar': 'You are too far from the banker.',
   'log.bankSlotsPurchased': 'You purchase additional bank slots.',
+  // Guild Bank (src/sim/guild_bank.ts): the officer-plus shared treasury +
+  // item store. The error.* lines are the refusal toasts (too-far, quest-item,
+  // and "Not enough money." reuse the existing rows above / the hud arm); the
+  // log.* lines are the success notices. The four parameterized log.* rows are
+  // matched by RULES entries; the rest register in the EXACT matcher
+  // automatically.
+  // Deliberately NOT the bare 'You are not in a guild.': that exact sentence is
+  // already server_i18n's guild.notInOne (emitted 8x from server/social.ts), and
+  // the hud runs the server matcher FIRST, so a duplicate row here would be dead
+  // at runtime while still shipping a second per-locale copy free to diverge.
+  // The guild-bank refusal names its own feature instead, so this row is the
+  // ONE that renders it.
+  'error.guildBankNoGuild': 'You must be in a guild to use the guild bank.',
+  'error.guildBankRank': 'Only guild officers may use the guild bank.',
+  'error.guildBankFull': 'The guild bank is full.',
+  // The anonymous-pipe item policy refusals (guildBankPipeRefusal). DEPOSIT names
+  // the dimension: quest and soulbound get their own lines; noMarketList and
+  // transfer-locked copies share the generic one (the mail noMailQuestItems
+  // grouping precedent). WITHDRAW is one line for every dimension, because the
+  // deposit wording ("you cannot store that") is false once the copy is already
+  // in the book and the officer asked to take it out; that arm is reachable only
+  // from a tampered or legacy row, which the guild pane renders as dormant.
+  'error.guildBankQuestItem': 'You cannot store quest items in the guild bank.',
+  'error.guildBankSoulbound': 'You cannot store soulbound items in the guild bank.',
+  'error.guildBankNoTransfer': 'That item cannot be stored in the guild bank.',
+  'error.guildBankWithdrawRefused': 'That item cannot be withdrawn from the guild bank.',
+  'error.guildBankTreasuryCap': 'The guild treasury cannot hold that much.',
+  'error.guildBankTreasuryShort': 'The guild treasury does not hold that much.',
+  'error.guildBankCarryCap': 'You cannot carry that much money.',
+  'error.guildBankCannotAfford': 'Your guild cannot afford that expansion.',
+  'error.guildBankMaxSlots': 'The guild bank cannot be expanded further.',
+  'log.guildBankOpened': 'You open the guild bank.',
+  'log.guildBankSlotsPurchased': 'You purchase additional guild bank slots.',
+  'log.guildBankDepositGold': 'You deposit {money} into the guild treasury.',
+  'log.guildBankWithdrawGold': 'You withdraw {money} from the guild treasury.',
+  'log.guildBankDepositItem': 'You deposit {item} into the guild bank.',
+  'log.guildBankWithdrawItem': 'You withdraw {item} from the guild bank.',
   'error.specLevel': 'You may choose a specialization at level {level}.',
   'error.equipLevel': 'You must be level {level} to equip that.',
   'error.mountLevel': 'You must be level {level} to ride that mount.',
@@ -269,6 +306,10 @@ const baseEnTable = {
   'groundPickup.wreckfieldFlotsamCrateEnough': 'You have salvaged all the flotsam Edda marked.',
   'groundPickup.gullhavenWatchbellDeny': "The watchbell answers only the bellkeeper's errand.",
   'groundPickup.gullhavenWatchbellEnough': 'Every coastal watchbell has been rung.',
+  // Item-agnostic: every multi-count `interact` objective credits once per
+  // distinct object, so this covers all of them (bells rung, lanterns relit,
+  // banners planted, carts righted). Emitted from interactObjectForQuests.
+  'groundPickup.objectAlreadyCredited': 'You have already done this one.',
   'error.vcupDeserter': 'The Groundskeeper remembers. Come back later.',
   'error.vcupPartyTooBig': 'That bracket needs a smaller party.',
   'error.vcupNoNation': 'Pick a banner nation first.',
@@ -819,6 +860,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.unstuckSickness': 'Unstuck Sickness',
   },
   es: {
+    'groundPickup.objectAlreadyCredited': 'Ya has hecho esto.',
     'error.mountTrainInProgress': 'Ya hay una lección de equitación en curso.',
     'error.mountTrainDismountFirst': 'Desmonta primero.',
     'error.ridingAlreadyLearned': 'Ya has aprendido equitación.',
@@ -1234,6 +1276,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Momento perfecto',
   },
   es_ES: {
+    'groundPickup.objectAlreadyCredited': 'Ya has hecho esto.',
     'error.mountTrainInProgress': 'Ya hay una lección de equitación en curso.',
     'error.mountTrainDismountFirst': 'Desmonta primero.',
     'error.ridingAlreadyLearned': 'Ya has aprendido equitación.',
@@ -1649,6 +1692,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Momento perfecto',
   },
   fr_FR: {
+    'groundPickup.objectAlreadyCredited': 'Vous avez déjà fait celui-ci.',
     'error.mountTrainInProgress': "Une leçon d'équitation est déjà en cours.",
     'error.mountTrainDismountFirst': "Descendez d'abord.",
     'error.ridingAlreadyLearned': "Vous avez déjà appris l'équitation.",
@@ -2070,6 +2114,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Moment parfait',
   },
   fr_CA: {
+    'groundPickup.objectAlreadyCredited': 'Vous avez déjà fait celui-ci.',
     'error.mountTrainInProgress': "Une leçon d'équitation est déjà en cours.",
     'error.mountTrainDismountFirst': "Descendez d'abord.",
     'error.ridingAlreadyLearned': "Vous avez déjà appris l'équitation.",
@@ -2683,6 +2728,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirSerpent': 'Might of the Serpent',
   },
   it_IT: {
+    'groundPickup.objectAlreadyCredited': 'Lo hai già fatto.',
     'error.mountTrainInProgress': 'È già in corso una lezione di equitazione.',
     'error.mountTrainDismountFirst': 'Smonta prima.',
     'error.ridingAlreadyLearned': "Hai già imparato l'equitazione.",
@@ -3099,6 +3145,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Momento Perfetto',
   },
   de_DE: {
+    'groundPickup.objectAlreadyCredited': 'Das habt Ihr bereits erledigt.',
     'error.mountTrainInProgress': 'Es läuft bereits eine Reitstunde.',
     'error.mountTrainDismountFirst': 'Ihr müsst zuerst absitzen.',
     'error.ridingAlreadyLearned': 'Ihr habt Reiten bereits erlernt.',
@@ -3519,6 +3566,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Perfekter Moment',
   },
   zh_CN: {
+    'groundPickup.objectAlreadyCredited': '你已经做过这个了。',
     'error.mountTrainInProgress': '骑乘课程已在进行中。',
     'error.mountTrainDismountFirst': '请先下骑。',
     'error.mountTrainLevel': '你必须达到等级20才能参加骑乘课程。',
@@ -3785,6 +3833,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.lineOfSight': '目标不在视线内。',
     'error.bagsFull': '你的背包已满。',
     'error.bankQuestItem': '你无法将任务物品存入银行。',
+    'error.guildBankQuestItem': '你无法将任务物品存入公会银行。',
+    'error.guildBankWithdrawRefused': '该物品无法从公会银行取出。',
     'error.bankFull': '你的银行已满。',
     'error.bankCannotAfford': '你无力支付该银行扩展费用。',
     'error.bankMaxSlots': '你的银行无法再扩展了。',
@@ -3922,6 +3972,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': '完美时刻',
   },
   zh_TW: {
+    'groundPickup.objectAlreadyCredited': '你已經做過這個了。',
     'error.mountTrainInProgress': '騎乘課程已在進行中。',
     'error.mountTrainDismountFirst': '請先下騎。',
     'error.mountTrainLevel': '你必須達到等級 20 才能參加騎乘課程。',
@@ -4188,6 +4239,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.lineOfSight': '目標不在視線內。',
     'error.bagsFull': '你的背包已滿。',
     'error.bankQuestItem': '你無法將任務物品存入銀行。',
+    'error.guildBankQuestItem': '你無法將任務物品存入公會銀行。',
+    'error.guildBankWithdrawRefused': '該物品無法從公會銀行取出。',
     'error.bankFull': '你的銀行已滿。',
     'error.bankCannotAfford': '你無力支付該銀行擴充費用。',
     'error.bankMaxSlots': '你的銀行無法再擴充了。',
@@ -4325,6 +4378,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': '完美時刻',
   },
   ko_KR: {
+    'groundPickup.objectAlreadyCredited': '이건 이미 완료했어요.',
     'error.mountTrainInProgress': '기승 수업이 이미 진행 중입니다.',
     'error.mountTrainDismountFirst': '먼저 내리세요.',
     'error.mountTrainLevel': '기승 수업을 받으려면 20레벨이 되어야 합니다.',
@@ -4597,6 +4651,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.lineOfSight': '시야가 막혀 있습니다.',
     'error.bagsFull': '가방이 가득 찼습니다.',
     'error.bankQuestItem': '퀘스트 아이템은 은행에 보관할 수 없습니다.',
+    'error.guildBankQuestItem': '퀘스트 아이템은 길드 은행에 보관할 수 없습니다.',
+    'error.guildBankWithdrawRefused': '해당 아이템은 길드 은행에서 꺼낼 수 없습니다.',
     'error.bankFull': '은행이 가득 찼습니다.',
     'error.bankCannotAfford': '그 은행 확장을 구매할 돈이 부족합니다.',
     'error.bankMaxSlots': '은행을 더 이상 확장할 수 없습니다.',
@@ -4737,6 +4793,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': '완벽한 순간',
   },
   ja_JP: {
+    'groundPickup.objectAlreadyCredited': 'これはもう済んでいる。',
     'error.mountTrainInProgress': '騎乗レッスンはすでに進行中です。',
     'error.mountTrainDismountFirst': '先に降りてください。',
     'error.mountTrainLevel': '騎乗レッスンを受けるにはレベル20が必要です。',
@@ -5017,6 +5074,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.lineOfSight': '視線が通っていません。',
     'error.bagsFull': 'バッグがいっぱいです。',
     'error.bankQuestItem': 'クエストアイテムは銀行に預けられません。',
+    'error.guildBankQuestItem': 'クエストアイテムはギルド銀行に預けられません。',
+    'error.guildBankWithdrawRefused': 'そのアイテムはギルド銀行から引き出せません。',
     'error.bankFull': '銀行がいっぱいです。',
     'error.bankCannotAfford': 'その銀行拡張を購入するにはお金が足りません。',
     'error.bankMaxSlots': '銀行をこれ以上拡張できません。',
@@ -5158,6 +5217,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': '完璧な瞬間',
   },
   pt_BR: {
+    'groundPickup.objectAlreadyCredited': 'Você já fez isso.',
     'error.mountTrainInProgress': 'Uma aula de equitação já está em andamento.',
     'error.mountTrainDismountFirst': 'Desmonte primeiro.',
     'error.ridingAlreadyLearned': 'Você já aprendeu equitação.',
@@ -5573,6 +5633,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Momento Perfeito',
   },
   ru_RU: {
+    'groundPickup.objectAlreadyCredited': 'Это уже сделано.',
     'error.mountTrainInProgress': 'Урок верховой езды уже идёт.',
     'error.mountTrainDismountFirst': 'Сначала спешьтесь.',
     'error.mountTrainLevel': 'Чтобы брать уроки верховой езды, нужен 20 уровень.',
@@ -5852,6 +5913,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.lineOfSight': 'Нет прямой видимости.',
     'error.bagsFull': 'Ваши сумки полны.',
     'error.bankQuestItem': 'Предметы заданий нельзя хранить в банке.',
+    'error.guildBankQuestItem': 'Предметы заданий нельзя хранить в банке гильдии.',
+    'error.guildBankWithdrawRefused': 'Этот предмет нельзя забрать из банка гильдии.',
     'error.bankFull': 'Ваш банк полон.',
     'error.bankCannotAfford': 'У вас недостаточно денег на это расширение банка.',
     'error.bankMaxSlots': 'Ваш банк больше нельзя расширить.',
@@ -5994,6 +6057,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   },
   ...BASE_NEW,
   cs_CZ: {
+    'groundPickup.objectAlreadyCredited': 'Tohle už je hotové.',
     'error.emptyLoadoutName': 'Název sestavy nesmí být prázdný.',
     'error.sellBound': 'Tento předmět je vázaný a nelze ho prodat.',
     ...BASE_NEW.cs_CZ,
@@ -6112,6 +6176,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Dokonalý okamžik',
   },
   nl_NL: {
+    'groundPickup.objectAlreadyCredited': 'Dit heb je al gedaan.',
     'error.emptyLoadoutName': 'De naam van een build mag niet leeg zijn.',
     'error.sellBound': 'Dat voorwerp is gebonden en kan niet worden verkocht.',
     ...BASE_NEW.nl_NL,
@@ -6229,6 +6294,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Volmaakt Ogenblik',
   },
   pl_PL: {
+    'groundPickup.objectAlreadyCredited': 'To już zrobiłeś.',
     'error.emptyLoadoutName': 'Nazwa buildu nie może być pusta.',
     'error.sellBound': 'Ten przedmiot jest przywiązany i nie można go sprzedać.',
     ...BASE_NEW.pl_PL,
@@ -6349,6 +6415,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Idealna chwila',
   },
   id_ID: {
+    'groundPickup.objectAlreadyCredited': 'Kamu sudah melakukan ini.',
     'error.emptyLoadoutName': 'Nama bangun tidak boleh kosong.',
     'error.sellBound': 'Barang itu terikat dan tidak dapat dijual.',
     ...BASE_NEW.id_ID,
@@ -6467,6 +6534,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Momen Sempurna',
   },
   tr_TR: {
+    'groundPickup.objectAlreadyCredited': 'Bunu zaten yaptın.',
     'error.emptyLoadoutName': 'Derleme adı boş olamaz.',
     'error.sellBound': 'O eşya bağlı ve satılamaz.',
     ...BASE_NEW.tr_TR,
@@ -6585,6 +6653,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Mükemmel An',
   },
   sv_SE: {
+    'groundPickup.objectAlreadyCredited': 'Du har redan gjort det här.',
     'error.emptyLoadoutName': 'Byggets namn får inte vara tomt.',
     'error.sellBound': 'Det föremålet är bundet och kan inte säljas.',
     ...BASE_NEW.sv_SE,
@@ -6702,6 +6771,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Perfekt ögonblick',
   },
   vi_VN: {
+    'groundPickup.objectAlreadyCredited': 'Bạn đã làm cái này rồi.',
     'error.emptyLoadoutName': 'Tên build không được để trống.',
     'error.sellBound': 'Vật phẩm đó đã bị ràng buộc và không thể bán.',
     ...BASE_NEW.vi_VN,
@@ -6818,6 +6888,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Khoảnh Khắc Hoàn Hảo',
   },
   da_DK: {
+    'groundPickup.objectAlreadyCredited': 'Du har allerede gjort det her.',
     'error.emptyLoadoutName': 'Navnet på et build må ikke være tomt.',
     'error.sellBound': 'Den genstand er bundet og kan ikke sælges.',
     ...BASE_NEW.da_DK,
@@ -10476,6 +10547,27 @@ const RULES: Rule[] = [
   {
     re: /^Card Duel requires another player online\.$/,
     build: () => tSim('error.cardDuelUnavailable'),
+  },
+  // Guild Bank success notices (src/sim/guild_bank.ts). The money fragment is
+  // sim-formatted ("3g 5s 7c") and splices verbatim like the market price rows;
+  // item names re-localize through the entity dictionary. The "treasury" /
+  // "guild bank" sentence tails are deliberately distinct so the money and item
+  // forms can never shadow each other.
+  {
+    re: /^You deposit (.+) into the guild treasury\.$/,
+    build: (m) => tSim('log.guildBankDepositGold', { money: m[1] }),
+  },
+  {
+    re: /^You withdraw (.+) from the guild treasury\.$/,
+    build: (m) => tSim('log.guildBankWithdrawGold', { money: m[1] }),
+  },
+  {
+    re: /^You deposit (.+) into the guild bank\.$/,
+    build: (m) => tSim('log.guildBankDepositItem', { item: locItem(m[1]) }),
+  },
+  {
+    re: /^You withdraw (.+) from the guild bank\.$/,
+    build: (m) => tSim('log.guildBankWithdrawItem', { item: locItem(m[1]) }),
   },
 ];
 

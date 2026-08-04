@@ -5,9 +5,8 @@
 // debuff and which expose the right-click affordance). Keeping the classification
 // in one leaf means "rendered as a helpful buff" and "right-click cancelable" are
 // provably the same set and can never drift apart.
-import { isDebuffAura as classifyDebuffAura } from '../aura_classify';
+import { isDebuffAura as classifyDebuffAura, isPlayerRemovableAura } from '../aura_classify';
 import type { Aura } from '../types';
-import { isUnbreakableControlAura } from './cc';
 
 // A debuff is anything in the harmful set, OR a stat aura riding a `buff_*` kind
 // with a negative value (an enfeeble / wither drain reuses a buff_* kind but saps
@@ -18,9 +17,11 @@ export function isDebuffAura(a: Aura): boolean {
 
 // A player may voluntarily cancel any helpful aura they carry; debuffs never. The
 // classic right-click-cancel includes forms, stances, and stealth (canceling a
-// form aura reverts to caster form) since none of those are harmful.
+// form aura reverts to caster form) since none of those are harmful. The
+// player-removable test is the same one the dispel and cleanse executors answer to,
+// so an aura no counter may shed is no more cancelable than it is dispellable.
 export function isCancelableAura(a: Aura): boolean {
-  return !isUnbreakableControlAura(a) && !isDebuffAura(a);
+  return isPlayerRemovableAura(a) && !isDebuffAura(a);
 }
 
 // Whether removing this aura changes derived stats and so needs a recalc to

@@ -958,7 +958,8 @@ export const en_XA: EnTranslations = {
       "petTaunt": "[Þéţ: Ţáúñţ]",
       "petDefensive": "[Þéţ: Ðéƒéñšíʋé]",
       "petAggressive": "[Þéţ: Áĝĝŕéššíʋé]",
-      "mount": "[Ɱóúñţ / Ðíšɱóúñţ]"
+      "mount": "[Ɱóúñţ / Ðíšɱóúñţ]",
+      "mouseHint": "[Ɱóúšé ƀúţţóñš ŵóŕķ ţóó: þŕéšš ţĥé ɱíððļé ƀúţţóñ (Ɱ3) óŕ á ţĥúɱƀ ƀúţţóñ (Ɱ4, Ɱ5) ŵĥíļé ƀíñðíñĝ. Ļéƒţ áñð ŕíĝĥţ šţáý ŕéšéŕʋéð ƒóŕ ţĥé çáɱéŕá, çļíçķ ţó ɱóʋé, áñð çļíçķíñĝ ţĥíñĝš íñ ţĥé ŵóŕļð.]"
     },
     "actionBar": {
       "editKeys": "[Éðíţ áçţíóñ ƀáŕ ķéýš]",
@@ -2324,6 +2325,7 @@ export const en_XA: EnTranslations = {
       "depositHint": "[Çļíçķ ţó ðéþóšíţ]",
       "depositPartialHint": "[Šĥíƒţ-çļíçķ ţó ðéþóšíţ á þáŕţíáļ áɱóúñţ]",
       "cannotDeposit": "[Çáññóţ ƀé ƀáñķéð]",
+      "cannotDepositNow": "[Çáññóţ ƀé ðéþóšíţéð ŕíĝĥţ ñóŵ]",
       "depositQuantityTitle": "[Ðéþóšíţ {item}]",
       "depositQuantityInput": "[Ɋúáñţíţý ţó ðéþóšíţ]",
       "depositQuantityConfirm": "[Ðéþóšíţ]",
@@ -2349,7 +2351,50 @@ export const en_XA: EnTranslations = {
       "bonusAdvertWallet": "[Ļíñķ á ŵáļļéţ ţó éáŕñ 2 šļóţš.]",
       "bonusReferralProgress": "[{count}/{cap}]",
       "bonusReferralExplainer": "[Íñʋíţé á ƒŕíéñð: ŵĥéñ ţĥéý ŕéáçĥ ļéʋéļ 10 ýóú éáçĥ éáŕñ 2 šļóţš, úþ ţó 5 ƒŕíéñðš.]",
-      "bonusSectionAria": "[Ɓóñúš ƀáñķ šļóţš áñð ĥóŵ ţó éáŕñ ɱóŕé]"
+      "bonusSectionAria": "[Ɓóñúš ƀáñķ šļóţš áñð ĥóŵ ţó éáŕñ ɱóŕé]",
+      "tabsAria": "[Ɓáñķ ţáƀš]",
+      "personalTab": "[Þéŕšóñáļ]",
+      "guildTab": "[Ĝúíļð]",
+      "guildCapacityAria": "[Ĝúíļð ƀáñķ šļóţš úšéð: {used} óƒ {total}]",
+      "guildEmpty": "[Ţĥé ĝúíļð ƀáñķ íš éɱþţý.]",
+      "guildTreasury": "[Ĝúíļð ţŕéášúŕý]",
+      "guildDepositGold": "[Ðéþóšíţ ɱóñéý]",
+      "guildWithdrawGold": "[Ŵíţĥðŕáŵ ɱóñéý]",
+      "guildDepositGoldTitle": "[Ðéþóšíţ ɱóñéý íñţó ţĥé ĝúíļð ţŕéášúŕý]",
+      "guildWithdrawGoldTitle": "[Ŵíţĥðŕáŵ ɱóñéý ƒŕóɱ ţĥé ĝúíļð ţŕéášúŕý]",
+      "guildGoldAvailable": "[Áʋáíļáƀļé: {amount}]",
+      "guildBuyConfirm": "[Þúŕçĥášé {count} áððíţíóñáļ ĝúíļð ƀáñķ šļóţš ƒóŕ {price} ƒŕóɱ ţĥé ĝúíļð ţŕéášúŕý?]",
+      "guildBuyNote": "[Þáíð ƒŕóɱ ţĥé ĝúíļð ţŕéášúŕý]",
+      "guildTreasuryShort": "[Ţŕéášúŕý šĥóŕţ]",
+      "guildOpenBank": "[Óþéñ ţĥé ĝúíļð ƀáñķ]",
+      "guildOpenConfirm": "[Óþéñ ţĥé ĝúíļð ƀáñķ ƒóŕ {price}? Ţĥíš íš þáíð ƒŕóɱ ýóúŕ óŵñ ɱóñéý.]",
+      "guildOpenAccept": "[Óþéñ]",
+      "guildOpenNote": "[Þáíð ƒŕóɱ ýóúŕ óŵñ ɱóñéý, ñóţ ţĥé ĝúíļð ţŕéášúŕý]",
+      "guildPurseShort": "[Ñóţ éñóúĝĥ ɱóñéý]",
+      "guildDormantNote": "[Ļóçķéð íţéɱš çáññóţ ƀé ŵíţĥðŕáŵñ áñð þŕéʋéñţ ðíšƀáñðíñĝ ţĥé ĝúíļð.]",
+      "guildDormantHint": "[Ţĥíš íţéɱ íš ļóçķéð íñ ţĥé ĝúíļð ƀáñķ áñð çáññóţ ƀé ŵíţĥðŕáŵñ.]",
+      "guildDormantAria": "[{item}, ɋúáñţíţý {count}, çáññóţ ƀé ŵíţĥðŕáŵñ]",
+      "guildUnknownItem": "[Úñķñóŵñ íţéɱ]",
+      "guildDepositHint": "[Çļíçķ ţó ðéþóšíţ íñţó ţĥé ĝúíļð ƀáñķ]",
+      "guildCannotDeposit": "[Çáññóţ ĝó íñ ţĥé ĝúíļð ƀáñķ]",
+      "guildGoldCannotMove": "[Ţĥáţ áɱóúñţ çáññóţ ƀé ɱóʋéð ŕíĝĥţ ñóŵ.]",
+      "guildViewsAria": "[Ĝúíļð ƀáñķ ʋíéŵš]",
+      "guildContentsTab": "[Çóñţéñţš]",
+      "guildLogTab": "[Ļóĝ]",
+      "logAria": "[Ĝúíļð ƀáñķ áçţíʋíţý ļóĝ]",
+      "logNote": "[Ţĥé {count} ɱóšţ ŕéçéñţ ĝúíļð ƀáñķ áçţíóñš.]",
+      "logLoading": "[Ļóáðíñĝ ţĥé ĝúíļð ƀáñķ ļóĝ...]",
+      "logEmpty": "[Ñóţĥíñĝ ĥáš ƀééñ ɱóʋéð íñ óŕ óúţ óƒ ţĥé ĝúíļð ƀáñķ ýéţ.]",
+      "logRefused": "[Óñļý ĝúíļð óƒƒíçéŕš çáñ ŕéáð ţĥé ĝúíļð ƀáñķ ļóĝ.]",
+      "logFormerMember": "[Á ƒóŕɱéŕ ĝúíļð ɱéɱƀéŕ]",
+      "logDepositItem": "[{actor} ðéþóšíţéð {count} {item}]",
+      "logWithdrawItem": "[{actor} ŵíţĥðŕéŵ {count} {item}]",
+      "logDepositMoney": "[{actor} ðéþóšíţéð {amount}]",
+      "logWithdrawMoney": "[{actor} ŵíţĥðŕéŵ {amount}]",
+      "logBuySlots": "[{actor} ƀóúĝĥţ á ƀáñķ éẋþáñšíóñ ƒóŕ {amount}]",
+      "logOpenBank": "[{actor} óþéñéð ţĥé ĝúíļð ƀáñķ ƒóŕ {amount}]",
+      "logCharterFee": "[{actor} þáíð ţĥé ĝúíļð çĥáŕţéŕ ƒéé óƒ {amount}]",
+      "logAdminPurge": "[Áñ áðɱíñíšţŕáţóŕ ŕéɱóʋéð {count} {item}]"
     },
     "calendar": {
       "title": "[Éʋéñţ Çáļéñðáŕ]",
@@ -2423,6 +2468,7 @@ export const en_XA: EnTranslations = {
       "billboard": {
         "label": "[Ĝúíļð Ɓíļļƀóáŕð]",
         "empty": "[Ñóţĥíñĝ óñ ţĥé ƀíļļƀóáŕð ýéţ.]",
+        "loginLine": "[Ĝúíļð ƀíļļƀóáŕð: {text}]",
         "setBy": "[Šéţ ƀý {name}]",
         "save": "[Šáʋé]",
         "placeholder": "[Ŵŕíţé á ɱéššáĝé ƒóŕ ţĥé ĝúíļð]",
@@ -2659,6 +2705,8 @@ export const en_XA: EnTranslations = {
     "crafting": {
       "title": "[Çŕáƒţíñĝ]",
       "close": "[Çļóšé çŕáƒţíñĝ]",
+      "dialogOption": "[Çŕáƒţíñĝ]",
+      "dialogOptionAria": "[Óþéñ ţĥé çŕáƒţíñĝ ŵíñðóŵ ƒóŕ {craft}]",
       "craft": "[Çŕáƒţ]",
       "reagentsNeeded": "[Ŕéɋúíŕéš:]",
       "reagentLine": "[{name} ẋ{have}/{required}]",
@@ -2968,6 +3016,7 @@ export const en_XA: EnTranslations = {
       "countLabel": "[{earned}/{total} ðééðš]",
       "completionAria": "[Ðééðš éáŕñéð: {earned} óƒ {total}]",
       "recentLabel": "[Ŕéçéñţ:]",
+      "recentJumpAria": "[Ĵúɱþ ţó {name}]",
       "nearestLabel": "[Ñéáŕļý ţĥéŕé:]",
       "filterGroupAria": "[Ƒíļţéŕ ðééðš]",
       "filterAll": "[Áļļ]",
@@ -3150,6 +3199,16 @@ export const en_XA: EnTranslations = {
     },
     "ota_updates": {
       "invalid_input": "[Íñʋáļíð íñþúţ.]"
+    },
+    "seeker": {
+      "native_only": "[Šééķéŕ éñţíţļéɱéñţ íš áʋáíļáƀļé óñļý íñ ţĥé ñáţíʋé áþþ.]",
+      "attestation_failed": "[Ðéʋíçé ʋéŕíƒíçáţíóñ ƒáíļéð. Þļéášé ţŕý áĝáíñ.]",
+      "solana_artifact_required": "[Úšé ţĥé Šóļáñá Šţóŕé áþþ ţó çóñţíñúé.]",
+      "wallet_required": "[Ļíñķ áñð ʋéŕíƒý á ŵáļļéţ ƒíŕšţ.]",
+      "genesis_token_required": "[Á ʋéŕíƒíéð Šééķéŕ Ĝéñéšíš Ţóķéñ íš ŕéɋúíŕéð.]",
+      "genesis_token_claimed": "[Ţĥáţ Šééķéŕ Ĝéñéšíš Ţóķéñ ĥáš áļŕéáðý ƀééñ çļáíɱéð.]",
+      "entitlement_required": "[Ʋéŕíƒíéð Šééķéŕ éñţíţļéɱéñţ íš ŕéɋúíŕéð.]",
+      "current_ownership_required": "[Çúŕŕéñţ Šééķéŕ Ĝéñéšíš Ţóķéñ óŵñéŕšĥíþ íš ŕéɋúíŕéð.]"
     }
   },
   "guide": {
@@ -5232,6 +5291,7 @@ export const en_XA: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "[Ĥóļðéŕ þéŕķš áŕé áçţíʋé. Çóññéçţ ţĥé áþþ ŵĥéñ ýóú ñééð ţó šíĝñ óŕ šþéñð.]",
     "extensionHelp": "[Çĥóóšé áñ íñšţáļļéð ƀŕóŵšéŕ ŵáļļéţ, óŕ óþéñ Ŕéóŵñ ÁþþĶíţ ƒóŕ Þĥáñţóɱ, Šóļƒļáŕé, Ɓáçķþáçķ, áñð ɱóŕé.]",
     "mobileAppHelp": "[Çĥóóšé Þĥáñţóɱ óŕ Šóļƒļáŕé. Ýóúŕ ŵáļļéţ áþþ ŵíļļ ášķ ƒóŕ áþþŕóʋáļ. Ķééþ ţĥíš ĝáɱé óþéñ áñð ŕéţúŕñ ţó íţ ŵĥéñ ƒíñíšĥéð.]",
+    "seekerAppHelp": "[Çóñţíñúé ŵíţĥ Šééð Ʋáúļţ Ŵáļļéţ. Ŕéʋíéŵ ţĥé çóññéçţíóñ áñð ʋéŕíƒíçáţíóñ ŕéɋúéšţš íñ Šééð Ʋáúļţ, ţĥéñ ŕéţúŕñ ţó ţĥé ĝáɱé.]",
     "standaloneAppHelp": "[Ŵáļļéţ çóññéçţíóñš áŕé ñóţ áʋáíļáƀļé íñ ţĥé Ĥóɱé Šçŕééñ áþþ ýéţ. Óþéñ Ŵóŕļð óƒ ÇļáúðéÇŕáƒţ íñ Šáƒáŕí óŕ Çĥŕóɱé ţó úšé Þĥáñţóɱ óŕ Šóļƒļáŕé.]",
     "openAppTitle": "[Çóñţíñúé íñ {wallet}]",
     "openAppHelp": "[Óþéñ {wallet} ţó ŕéʋíéŵ ţĥíš ŕéɋúéšţ. Ķééþ ţĥíš ĝáɱé ţáƀ óþéñ ŵĥíļé ţĥé ŵáļļéţ áþþ íš áçţíʋé.]",
@@ -6152,10 +6212,16 @@ export const en_XA: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "[Ðóŵñļóáðíñĝ úþðáţé {version}...]",
-      "ready": "[Úþðáţé {version} íš ŕéáðý. Íţ íñšţáļļš ŵĥéñ ýóú ɋúíţ, óŕ ŕéšţáŕţ ñóŵ.]",
+      "checkingTitle": "[Çĥéçķíñĝ ƒóŕ úþðáţéš...]",
+      "checkingBody": "[Ñéŵ ʋéŕšíóñš ðóŵñļóáð ŵĥíļé ýóú þļáý.]",
+      "uptodateTitle": "[Ýóú'ŕé úþ ţó ðáţé]",
+      "downloadingTitle": "[Ðóŵñļóáðíñĝ úþðáţé {version}...]",
+      "downloadingBody": "[Ýóú çáñ ķééþ þļáýíñĝ. Íţ íñšţáļļš ŵĥéñ ýóú ɋúíţ.]",
+      "readyTitle": "[Úþðáţé {version} íš ŕéáðý]",
+      "readyBody": "[Ŕéšţáŕţ ţó íñšţáļļ ñóŵ, óŕ ķééþ þļáýíñĝ áñð íţ íñšţáļļš ŵĥéñ ýóú ɋúíţ.]",
       "restart": "[Ŕéšţáŕţ ñóŵ]",
-      "later": "[Ļáţéŕ]"
+      "later": "[Ļáţéŕ]",
+      "dismiss": "[Ðíšɱíšš]"
     },
     "crash": {
       "title": "[Ŵóŕļð óƒ ÇļáúðéÇŕáƒţ]",
@@ -6866,6 +6932,10 @@ export const en_XA: EnTranslations = {
         "officer": "[Óƒƒíçéŕ]",
         "member": "[Ɱéɱƀéŕ]"
       },
+      "tenure": {
+        "recruit": "[Ŕéçŕúíţ]",
+        "veteran": "[Ʋéţéŕáñ]"
+      },
       "guildHeadOne": "[ýóú áŕé {rank}, {count} ɱéɱƀéŕ]",
       "guildHeadMany": "[ýóú áŕé {rank}, {count} ɱéɱƀéŕš]"
     },
@@ -7274,6 +7344,12 @@ export const en_XA: EnTranslations = {
       "reclaim": "[Ŕéçļáíɱ]",
       "buyAria": "[Ɓúý {item} ƒóŕ {price}]",
       "reclaimAria": "[Ŕéçļáíɱ {item}]",
+      "buyConfirmTitle": "[Çóñƒíŕɱ Þúŕçĥášé]",
+      "buyConfirmBody": "[Ɓúý {item} ƒóŕ {price}?]",
+      "buyConfirmBodyStack": "[Ɓúý {item} ẋ{count} ƒóŕ {price} ({each} éáçĥ)?]",
+      "buyConfirmAccept": "[Ɓúý]",
+      "buyConfirmCancel": "[Çáñçéļ]",
+      "buyChanged": "[Ţĥáţ ļíšţíñĝ çĥáñĝéð ƀéƒóŕé ýóú çóñƒíŕɱéð. Çĥéçķ ţĥé þŕíçé áñð ţŕý áĝáíñ.]",
       "sellNote": "[Ļíšţ ĝóóðš ƒŕóɱ ýóúŕ ƀáĝš. Ţĥé Ɱéŕçĥáñţ ţáķéš á {cut}% çúţ ŵĥéñ áñ íţéɱ šéļļš. Ýóú áŕé úšíñĝ {used}/{max} ļíšţíñĝ šļóţš.]",
       "sellPickEmpty": "[Çļíçķ áñ íţéɱ íñ ýóúŕ ƀáĝš ţó çĥóóšé ŵĥáţ ţó šéļļ.]",
       "quantity": "[Ɋúáñţíţý]",

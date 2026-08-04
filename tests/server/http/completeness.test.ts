@@ -110,12 +110,14 @@ const EXCLUDED_PATHS = new Set<string>(ORPHAN_DEVIATION?.routes ?? []);
 const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/deeds/rarity',
   '/api/deeds/broadcasts',
+  '/api/characters/:id/deeds-recent',
   '/api/steam/link',
   '/api/steam/status',
   '/api/battleground/leaderboard',
   '/api/epic/link',
   '/api/epic/status',
   '/api/ota/updates',
+  '/api/seeker/entitlement',
 ]);
 
 // Every legacy /api ladder row (dispatcher === main handleApi), minus the
@@ -231,6 +233,9 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'POST', path: '/api/characters' },
     { method: 'GET', path: '/api/characters/:id/standing' },
     { method: 'GET', path: '/api/characters/:id/sheet' },
+    // Registry-only (born after the migration, the new-route rule): the
+    // owner's newest-first deed unlock ids for the Book's recent strip.
+    { method: 'GET', path: '/api/characters/:id/deeds-recent' },
     { method: 'POST', path: '/api/characters/:id/rename' },
     { method: 'POST', path: '/api/characters/:id/takeover' },
     { method: 'DELETE', path: '/api/characters/:id' },
@@ -300,6 +305,8 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'POST', path: '/api/desktop-wallet/claim' },
     { method: 'POST', path: '/api/desktop-wallet/complete' },
     { method: 'POST', path: '/api/desktop-wallet/result' },
+    { method: 'GET', path: '/api/seeker/entitlement' },
+    { method: 'POST', path: '/api/seeker/entitlement' },
     { method: 'GET', path: '/api/daily-rewards' },
     { method: 'POST', path: '/api/daily-rewards/spin' },
     { method: 'GET', path: '/api/daily-rewards/history' },

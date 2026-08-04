@@ -958,7 +958,8 @@ export const en: EnTranslations = {
       "petTaunt": "Pet: Taunt",
       "petDefensive": "Pet: Defensive",
       "petAggressive": "Pet: Aggressive",
-      "mount": "Mount / Dismount"
+      "mount": "Mount / Dismount",
+      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
     },
     "actionBar": {
       "editKeys": "Edit action bar keys",
@@ -2324,6 +2325,7 @@ export const en: EnTranslations = {
       "depositHint": "Click to deposit",
       "depositPartialHint": "Shift-click to deposit a partial amount",
       "cannotDeposit": "Cannot be banked",
+      "cannotDepositNow": "Cannot be deposited right now",
       "depositQuantityTitle": "Deposit {item}",
       "depositQuantityInput": "Quantity to deposit",
       "depositQuantityConfirm": "Deposit",
@@ -2349,7 +2351,50 @@ export const en: EnTranslations = {
       "bonusAdvertWallet": "Link a wallet to earn 2 slots.",
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "Invite a friend: when they reach level 10 you each earn 2 slots, up to 5 friends.",
-      "bonusSectionAria": "Bonus bank slots and how to earn more"
+      "bonusSectionAria": "Bonus bank slots and how to earn more",
+      "tabsAria": "Bank tabs",
+      "personalTab": "Personal",
+      "guildTab": "Guild",
+      "guildCapacityAria": "Guild bank slots used: {used} of {total}",
+      "guildEmpty": "The guild bank is empty.",
+      "guildTreasury": "Guild treasury",
+      "guildDepositGold": "Deposit money",
+      "guildWithdrawGold": "Withdraw money",
+      "guildDepositGoldTitle": "Deposit money into the guild treasury",
+      "guildWithdrawGoldTitle": "Withdraw money from the guild treasury",
+      "guildGoldAvailable": "Available: {amount}",
+      "guildBuyConfirm": "Purchase {count} additional guild bank slots for {price} from the guild treasury?",
+      "guildBuyNote": "Paid from the guild treasury",
+      "guildTreasuryShort": "Treasury short",
+      "guildOpenBank": "Open the guild bank",
+      "guildOpenConfirm": "Open the guild bank for {price}? This is paid from your own money.",
+      "guildOpenAccept": "Open",
+      "guildOpenNote": "Paid from your own money, not the guild treasury",
+      "guildPurseShort": "Not enough money",
+      "guildDormantNote": "Locked items cannot be withdrawn and prevent disbanding the guild.",
+      "guildDormantHint": "This item is locked in the guild bank and cannot be withdrawn.",
+      "guildDormantAria": "{item}, quantity {count}, cannot be withdrawn",
+      "guildUnknownItem": "Unknown item",
+      "guildDepositHint": "Click to deposit into the guild bank",
+      "guildCannotDeposit": "Cannot go in the guild bank",
+      "guildGoldCannotMove": "That amount cannot be moved right now.",
+      "guildViewsAria": "Guild bank views",
+      "guildContentsTab": "Contents",
+      "guildLogTab": "Log",
+      "logAria": "Guild bank activity log",
+      "logNote": "The {count} most recent guild bank actions.",
+      "logLoading": "Loading the guild bank log...",
+      "logEmpty": "Nothing has been moved in or out of the guild bank yet.",
+      "logRefused": "Only guild officers can read the guild bank log.",
+      "logFormerMember": "A former guild member",
+      "logDepositItem": "{actor} deposited {count} {item}",
+      "logWithdrawItem": "{actor} withdrew {count} {item}",
+      "logDepositMoney": "{actor} deposited {amount}",
+      "logWithdrawMoney": "{actor} withdrew {amount}",
+      "logBuySlots": "{actor} bought a bank expansion for {amount}",
+      "logOpenBank": "{actor} opened the guild bank for {amount}",
+      "logCharterFee": "{actor} paid the guild charter fee of {amount}",
+      "logAdminPurge": "An administrator removed {count} {item}"
     },
     "calendar": {
       "title": "Event Calendar",
@@ -2423,6 +2468,7 @@ export const en: EnTranslations = {
       "billboard": {
         "label": "Guild Billboard",
         "empty": "Nothing on the billboard yet.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Set by {name}",
         "save": "Save",
         "placeholder": "Write a message for the guild",
@@ -2659,6 +2705,8 @@ export const en: EnTranslations = {
     "crafting": {
       "title": "Crafting",
       "close": "Close crafting",
+      "dialogOption": "Crafting",
+      "dialogOptionAria": "Open the crafting window for {craft}",
       "craft": "Craft",
       "reagentsNeeded": "Requires:",
       "reagentLine": "{name} x{have}/{required}",
@@ -2968,6 +3016,7 @@ export const en: EnTranslations = {
       "countLabel": "{earned}/{total} deeds",
       "completionAria": "Deeds earned: {earned} of {total}",
       "recentLabel": "Recent:",
+      "recentJumpAria": "Jump to {name}",
       "nearestLabel": "Nearly there:",
       "filterGroupAria": "Filter deeds",
       "filterAll": "All",
@@ -3150,6 +3199,16 @@ export const en: EnTranslations = {
     },
     "ota_updates": {
       "invalid_input": "Invalid input."
+    },
+    "seeker": {
+      "native_only": "Seeker entitlement is available only in the native app.",
+      "attestation_failed": "Device verification failed. Please try again.",
+      "solana_artifact_required": "Use the Solana Store app to continue.",
+      "wallet_required": "Link and verify a wallet first.",
+      "genesis_token_required": "A verified Seeker Genesis Token is required.",
+      "genesis_token_claimed": "That Seeker Genesis Token has already been claimed.",
+      "entitlement_required": "Verified Seeker entitlement is required.",
+      "current_ownership_required": "Current Seeker Genesis Token ownership is required."
     }
   },
   "guide": {
@@ -5232,6 +5291,7 @@ export const en: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "Holder perks are active. Connect the app when you need to sign or spend.",
     "extensionHelp": "Choose an installed browser wallet, or open Reown AppKit for Phantom, Solflare, Backpack, and more.",
     "mobileAppHelp": "Choose Phantom or Solflare. Your wallet app will ask for approval. Keep this game open and return to it when finished.",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "Wallet connections are not available in the Home Screen app yet. Open World of ClaudeCraft in Safari or Chrome to use Phantom or Solflare.",
     "openAppTitle": "Continue in {wallet}",
     "openAppHelp": "Open {wallet} to review this request. Keep this game tab open while the wallet app is active.",
@@ -6152,10 +6212,16 @@ export const en: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "Downloading update {version}...",
-      "ready": "Update {version} is ready. It installs when you quit, or restart now.",
+      "checkingTitle": "Checking for updates...",
+      "checkingBody": "New versions download while you play.",
+      "uptodateTitle": "You're up to date",
+      "downloadingTitle": "Downloading update {version}...",
+      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "readyTitle": "Update {version} is ready",
+      "readyBody": "Restart to install now, or keep playing and it installs when you quit.",
       "restart": "Restart now",
-      "later": "Later"
+      "later": "Later",
+      "dismiss": "Dismiss"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -6866,6 +6932,10 @@ export const en: EnTranslations = {
         "officer": "Officer",
         "member": "Member"
       },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
+      },
       "guildHeadOne": "you are {rank}, {count} member",
       "guildHeadMany": "you are {rank}, {count} members"
     },
@@ -7274,6 +7344,12 @@ export const en: EnTranslations = {
       "reclaim": "Reclaim",
       "buyAria": "Buy {item} for {price}",
       "reclaimAria": "Reclaim {item}",
+      "buyConfirmTitle": "Confirm Purchase",
+      "buyConfirmBody": "Buy {item} for {price}?",
+      "buyConfirmBodyStack": "Buy {item} x{count} for {price} ({each} each)?",
+      "buyConfirmAccept": "Buy",
+      "buyConfirmCancel": "Cancel",
+      "buyChanged": "That listing changed before you confirmed. Check the price and try again.",
       "sellNote": "List goods from your bags. The Merchant takes a {cut}% cut when an item sells. You are using {used}/{max} listing slots.",
       "sellPickEmpty": "Click an item in your bags to choose what to sell.",
       "quantity": "Quantity",

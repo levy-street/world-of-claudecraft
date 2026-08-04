@@ -37,10 +37,14 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // resolves a tier and never a tool), and market_list_instance
 // (the instance-payload market pipe). mount_select left the wire
 // (reins are items); recharge_tool_effect joined (the acquisition craft);
-// profiler invulnerability joined as a dev-only dispatch token (no send);
-// the battleground adds three sends plus the dev-only force start.
-const EXPECTED_SEND_COUNT = 179; // +3 battleground sends
-const EXPECTED_DISPATCH_COUNT = 192; // +3 battleground sends, +1 dev_bg_start
+// profiler invulnerability joined as a dev-only dispatch token (no send).
+// 176 send / 188 dispatch on release/v0.34.0, +5 on BOTH sides for the
+// guild_bank_* cluster (Guild Bank Phase 2), +1 on both for guild_bank_log
+// (the activity log's on-demand READ request; its answer comes back on its own
+// one-shot 'gbanklog' frame, not the snapshot); the battleground adds three
+// sends plus the dev-only force start.
+const EXPECTED_SEND_COUNT = 185; // +3 battleground sends
+const EXPECTED_DISPATCH_COUNT = 198; // +3 battleground sends, +1 dev_bg_start
 const EXPECTED_DISPATCH_ONLY_COUNT = 13; // + dev_bg_start + dev_profiler_invulnerable
 
 // The chat sub-channel routing switch (server/game.ts `switch

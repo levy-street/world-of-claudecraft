@@ -17,6 +17,7 @@
   } from '../navigation';
   import AccountLink from './AccountLink.svelte';
   import Badge from './Badge.svelte';
+  import GuildBankPanel from './GuildBankPanel.svelte';
   import GuildRenameDialog from './GuildRenameDialog.svelte';
   import Panel from './Panel.svelte';
 
@@ -31,7 +32,11 @@
   let renaming = $state(false);
   let detailRequest: Promise<void> | null = null;
   let historyRequestEpoch = 0;
+  // The bank read and the rename audit share moderation.read: both are records
+  // of a guild's private business rather than its public roster. The bank
+  // panel's own destructive action is gated separately inside it.
   let canViewHistory = $derived(auth.can('moderation.read'));
+  let canViewBank = $derived(canViewHistory);
   let canRename = $derived(auth.can('moderation.act'));
 
   async function loadDetail(requireFresh = false): Promise<void> {
@@ -183,6 +188,10 @@
       </div>
     {/if}
   </Panel>
+
+  {#if canViewBank}
+    <GuildBankPanel {guildId} />
+  {/if}
 
   {#if canViewHistory}
     <Panel title={t('guilds.historyTitle')}>

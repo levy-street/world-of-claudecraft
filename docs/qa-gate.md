@@ -52,7 +52,9 @@ It runs, in order:
 
 It deliberately skips full unsharded vitest, browser regressions, SFX conformance,
 i18n generate/freshness, wiki content, and env/server/client builds. Those stay on the
-full gate. Vitest workers still use `computeGateWorkers` (CPU/2 and free-mem clamp).
+full gate. Vitest workers still use `computeGateWorkers` (CPU/2 and available-memory clamp;
+the sensor is `scripts/lib/gate_memory.mjs`, which reads `vm_stat` on macOS because
+`os.freemem()` under-reports availability there).
 Optional `GATE_WORKER_TIER=low|medium|high` caps workers after that clamp; see
 [`docs/local-gate-perf/tier-workers.md`](local-gate-perf/tier-workers.md). Opt in to
 branch-wide `vitest --changed <ref>` with `GATE_FAST_BASE=<ref>` when you deliberately

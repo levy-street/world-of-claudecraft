@@ -414,6 +414,11 @@ export const STATION_RADIUS = 20;
 // Which station type serves each craft. Crafts absent from this table
 // (jewelcrafting, inscription, enchanting) have no physical station and no
 // station-bound recipes today.
+// Key ORDER is load-bearing: professions/stations.ts craftsForStationType
+// returns keys in this order and the gossip Crafting shortcut
+// (src/ui/hud/quest/master_craft_core.ts) takes the first as its tie-break
+// (weaponcrafting before armorcrafting at the forge); pinned in
+// tests/professions_crafting_hub.test.ts.
 export const STATION_TYPE_BY_CRAFT: Readonly<Record<string, StationType>> = {
   weaponcrafting: 'forge',
   armorcrafting: 'forge',

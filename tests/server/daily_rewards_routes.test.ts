@@ -14,10 +14,11 @@
 //
 // It is a PARITY-FIRST migration: each thin handler reuses the same sub-dispatcher the
 // ladder serves, so every body, the lenient Number(...)||limit decode, and mark-payout's
-// validation prose are byte-identical. There is NO withBody anywhere (spin reads no body;
-// mark-payout self-reads via the core's un-caught readBody, the
-// dailyRewardsOpsBodyValidationRemap deviation) and NO rate limiter on any of the eight
-// (legacy has none; the spin throttle decision is the two-tier rate limiter's).
+// validation prose are byte-identical. There is NO withBody anywhere (native Seeker spins
+// self-read their artifact proof while web spins stay body-free; mark-payout self-reads via
+// the core's un-caught readBody, the
+// dailyRewardsOpsBodyValidationRemap deviation). Native Seeker spin requests use the shared
+// handler's IP-and-account ownership-RPC limiter; web requests retain the legacy behavior.
 //
 // This file pins the ROUTE LAYER. The existing tests/daily_rewards_table.test.ts covers the
 // DailyRewardService internals against a hand-written FakeDailyRewardDb; here the service
@@ -152,8 +153,10 @@ import {
   dailyRewardService,
   resetDailyRewardDbForTests,
   resetDailyRewardPriceCacheForTests,
+  resetDailyRewardSeekerArtifactVerifierForTests,
   routes,
   setDailyRewardDbForTests,
+  setDailyRewardSeekerArtifactVerifierForTests,
 } from '../../server/daily_rewards';
 import { resetDailyRewardSeedGateForTests } from '../../server/daily_rewards_seed_gate';
 import { compose } from '../../server/http/compose';
@@ -363,6 +366,7 @@ beforeEach(() => {
   h.state.balance = null;
   resetDailyRewardDbForTests();
   resetDailyRewardPriceCacheForTests();
+  resetDailyRewardSeekerArtifactVerifierForTests();
   // Both memos live at module scope, so without a per-test reset an earlier test
   // that seeds a (day, realm, config) key would let a later test skip the gated
   // ensureDay/seedTasks pair (the ensureDayThrows case would never reach its throw).
@@ -384,6 +388,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
   resetDailyRewardDbForTests();
   resetDailyRewardPriceCacheForTests();
+  resetDailyRewardSeekerArtifactVerifierForTests();
   restoreEnv(OPS_SECRET_ENV, ORIGINAL_OPS_SECRET);
   restoreEnv('WOC_DAILY_REWARD_SERVICE_URL', ORIGINAL_SERVICE_URL);
   vi.restoreAllMocks();
@@ -426,9 +431,14 @@ describe('daily-rewards route table', () => {
     }
   });
 
-  it('mounts exactly one middleware on every route, with no body schema (no withBody)', () => {
+  it('adds Seeker verification admission only to spin, with no body schema (no withBody)', () => {
     for (const r of routes) {
-      expect(Array.isArray(r.middleware) && r.middleware.length === 1, r.path).toBe(true);
+      const expectedMiddlewareCount =
+        r.method === 'POST' && r.path === '/api/daily-rewards/spin' ? 2 : 1;
+      expect(
+        Array.isArray(r.middleware) && r.middleware.length === expectedMiddlewareCount,
+        r.path,
+      ).toBe(true);
       expect(r.schema, r.path).toBeUndefined();
     }
   });
@@ -571,6 +581,50 @@ describe('player routes: thin-handler dispatch', () => {
     expect(h.balance.cachedWocBalance).not.toHaveBeenCalled();
   });
 
+  it('requires a fresh seeker-spin Solana artifact proof for native spins', async () => {
+    const verifyArtifact = vi.fn().mockResolvedValue(null);
+    setDailyRewardSeekerArtifactVerifierForTests(verifyArtifact);
+    authedDb({ hasSeekerEntitlement: async () => false });
+    const nativeAttestation = {
+      platform: 'android',
+      challengeId: 'challenge',
+      token: 'integrity-token',
+    };
+    const rejected = await runRoute('POST', '/api/daily-rewards/spin', {
+      headers: {
+        authorization: BEARER,
+        origin: 'http://localhost',
+        'content-type': 'application/json',
+      },
+      body: { nativeAttestation },
+    });
+    expect(rejected.status).toBe(403);
+    expect(rejected.body).toEqual({
+      error: 'Solana Store app verification required',
+      code: 'seeker.solana_artifact_required',
+    });
+    expect(verifyArtifact).toHaveBeenCalledWith(
+      expect.anything(),
+      nativeAttestation,
+      'seeker-spin',
+    );
+
+    verifyArtifact.mockResolvedValue({ nonce: 'nonce' });
+    const admitted = await runRoute('POST', '/api/daily-rewards/spin', {
+      headers: {
+        authorization: BEARER,
+        origin: 'http://localhost',
+        'content-type': 'application/json',
+      },
+      body: { nativeAttestation },
+    });
+    expect(admitted.status).toBe(403);
+    expect(admitted.body).toEqual({
+      error: 'verified Seeker entitlement required',
+      code: 'seeker.entitlement_required',
+    });
+  });
+
   it('POST spin 409s an already-claimed day for an eligible wallet', async () => {
     // Eligible: a live price from the stubbed config, a linked wallet, and a balance over
     // the minimum. Then an existing spin row makes the second spin a 409.
@@ -627,7 +681,7 @@ describe('player routes: thin-handler dispatch', () => {
     expect(h.db.recentPayouts).toHaveBeenLastCalledWith(30);
   });
 
-  it('POST spin reads NO request body (never attaches a data listener)', async () => {
+  it('web POST spin reads NO request body (never attaches a data listener)', async () => {
     // Build a body-less req and spy on its listener registration: a spin that self-read a
     // body would attach a 'data' listener (readBody), inventing 400/413 behavior the
     // legacy arm never had. The ineligible 403 proves the chain still resolves.

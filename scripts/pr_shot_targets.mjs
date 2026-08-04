@@ -123,6 +123,41 @@ async function stubGlobalLeaderboardFetch(page) {
   })()`);
 }
 
+// The desktop auto-update card only exists inside the Electron shell: an
+// Electron user agent turns the DESKTOP_APP gate on and a wocDesktop bridge
+// stub (installed before the document loads) captures the update callback at
+// window.__updateEventCb so the capture recipe can replay the shell's
+// whitelisted payloads. Absolute https fetches short-circuit to an empty JSON
+// body: with the Electron UA the client targets the baked production API
+// origin, and a screenshot host has no business calling the live site.
+// String-form for the same tsx keepNames reason as the leaderboard stub above.
+async function stubDesktopUpdateBridge(page) {
+  await page.setUserAgent(
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) WorldOfClaudeCraft/0.0.0 Chrome/128.0.0.0 Electron/34.0.0 Safari/537.36',
+  );
+  await page.evaluateOnNewDocument(`(() => {
+    window.wocDesktop = {
+      openBrowserLogin: () => Promise.resolve(),
+      takeLoginCode: () => Promise.resolve(null),
+      onLoginCode: () => () => {},
+      setShellStrings: () => Promise.resolve(null),
+      onUpdateEvent: (cb) => { window.__updateEventCb = cb; return () => {}; },
+      installUpdate: () => Promise.resolve(null),
+    };
+    const real = window.fetch.bind(window);
+    window.fetch = (input, init) => {
+      const url = String(typeof input === 'string' ? input : (input && input.url) || '');
+      if (url.indexOf('https://') === 0) {
+        return Promise.resolve(new Response('{}', {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }));
+      }
+      return real(input, init);
+    };
+  })()`);
+}
+
 export const TARGETS = [
   {
     key: 'ravenrift',
@@ -1241,6 +1276,66 @@ export const TARGETS = [
     },
   },
   {
+    key: 'continent-map',
+    label: 'World map: continent overview (land-masked zone highlight)',
+    when: ['ui/continent_', 'map_pinch_zoom_core'],
+    // Desktop shows the hover highlight (mouse only); mobile shows the resting
+    // overview, which is what a touch player sees before tapping a zone.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page, shot) {
+      await page.evaluate(() => {
+        const p = window.__game?.sim?.player;
+        if (p?.pos) {
+          p.pos.x = 65; // Boar Meadow, Eastbrook Vale (the current-zone highlight)
+          p.pos.z = 0;
+        }
+      });
+      await wait(400);
+      await page.evaluate(() => window.__game?.hud?.toggleMap?.());
+      await wait(600);
+      // Reach the overview the way a player now does: one zoom-out click at the
+      // zone map's full extent leaves the zone level entirely. The level toggle is
+      // the fallback, so this recipe also brings the overview up on a base build
+      // that predates the zoom-out escape (the before half of a comparison).
+      await page.evaluate(() => document.querySelector('#map-zoom-out')?.click());
+      await wait(600);
+      await page.evaluate(() => {
+        const hud = window.__game?.hud;
+        if (hud && hud.mapLevel !== 'continent') hud.toggleMapLevel?.();
+      });
+      await wait(500);
+      if (!shot?.mobile) {
+        // Hover a zone the player is NOT standing in, through the real pointer
+        // path (the painter reads Hud's hovered zone id, nothing synthetic).
+        await page.evaluate(() => {
+          const hud = window.__game?.hud;
+          const canvas = document.querySelector('#map-canvas');
+          if (!hud || !canvas) return;
+          const box = canvas.getBoundingClientRect();
+          const region =
+            hud.continentRegions?.find((r) => r.zoneId === 'nightbloom') ??
+            hud.continentRegions?.[0];
+          if (!region) return;
+          canvas.dispatchEvent(
+            new PointerEvent('pointermove', {
+              pointerType: 'mouse',
+              bubbles: true,
+              clientX: box.left + ((region.rect.mx + region.rect.w / 2) * box.width) / canvas.width,
+              clientY:
+                box.top + ((region.rect.my + region.rect.h / 2) * box.height) / canvas.height,
+            }),
+          );
+        });
+        await wait(400);
+      }
+      const open = await page.evaluate(() => {
+        const w = document.querySelector('#map-window');
+        return !!w && getComputedStyle(w).display !== 'none';
+      });
+      return open ? { clip: '#map-window' } : {};
+    },
+  },
+  {
     key: 'gather-quest-map-areas',
     label: 'World map: gather-objective blobs',
     when: ['sim/quest_targets', 'sim/content/gather_nodes'],
@@ -1956,6 +2051,32 @@ export const TARGETS = [
     },
   },
   {
+    key: 'market-buy-confirm',
+    label: 'World Market buy confirmation prompt (Browse tab, Buy pressed)',
+    when: ['ui/market_window', 'ui/market_buy_confirm_core'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    // Clips the whole HUD rather than #confirm-dialog: on the BASE commit the Buy click
+    // buys outright and no dialog exists, so a dialog-only clip would capture nothing at
+    // all and leave the pair with no "before" to contrast. The HUD frame shows both
+    // states honestly (market alone, versus market with the prompt over it).
+    async capture(page) {
+      if (!(await openMarketBrowse(page))) return {};
+      const pressed = await page.evaluate(() => {
+        // The first row offering Buy (rows the viewer owns read Reclaim and carry the
+        // .cancel modifier); the Merchant's standing stock guarantees at least one.
+        const btn = [...document.querySelectorAll('.mkt-row .mkt-btn')].find(
+          (el) => !el.classList.contains('cancel'),
+        );
+        if (!btn) return false;
+        btn.click();
+        return true;
+      });
+      if (!pressed) return {};
+      await wait(400);
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'market-armor-filters',
     label: 'World Market armor filters (responsive search and filter grid)',
     when: ['ui/market_window', 'ui/market_view', 'ui/market_filters'],
@@ -2490,6 +2611,78 @@ export const TARGETS = [
     },
   },
   {
+    key: 'deed-chat-link-lines',
+    label: 'Chat: deed unlock and broadcast announcements carry a clickable deed link',
+    when: ['ui/hud/chat/deed_chat_line', 'ui/deeds_window', 'ui/deeds_view'],
+    // Drives the REAL earned moment (handleDeedUnlocks) plus the guild
+    // broadcast event arm, so the capture exercises the actual splice path
+    // (logNodes -> deed_chat_line), then shoots the chat pane with both
+    // announcement lines in it. The same recipe shoots the BEFORE (plain
+    // text) frame: the gate below counts lines, not links.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const hud = window.__game?.hud;
+        hud?.handleDeedUnlocks?.([{ deedId: 'prog_first_steps' }]);
+        hud?.handleEvents?.([
+          { type: 'deedBroadcast', characterName: 'Hilda', deedId: 'cmb_first_blood' },
+        ]);
+      });
+      await wait(400);
+      // Mobile: the chat pane sits behind the Chat button; tap it open first.
+      await page.evaluate(() => {
+        const wrap = document.querySelector('#chatlog-wrap');
+        const hidden = !(wrap instanceof HTMLElement) || wrap.offsetParent === null;
+        if (hidden) document.querySelector('#mobile-chat')?.click();
+      });
+      await wait(400);
+      const shown = await page.evaluate(
+        () => document.querySelectorAll('#chatlog > div').length >= 2,
+      );
+      return shown ? { clip: '#chatlog-wrap' } : {};
+    },
+  },
+  {
+    key: 'deed-recent-strip-jump',
+    label: 'Book of Deeds: clickable recent strip and the jump-to-card spotlight',
+    when: ['ui/hud/chat/deed_chat_line', 'ui/deeds_window', 'ui/deeds_view'],
+    // Seed two earned deeds, fire the real unlock drain (which also feeds the
+    // session recency order), then activate the newest chat deed link with a
+    // real click so the Book opens through openWithDeed: category switched,
+    // card scrolled and flashed, the recent strip rendered as jump buttons.
+    // On the BEFORE build no link exists, so the recipe falls back to a plain
+    // openDeeds and shoots the old non-clickable strip.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const game = window.__game;
+        if (!game?.sim || !game.hud) return;
+        game.sim.deedsEarned.set('cmb_first_blood', '2026-08-01');
+        game.sim.deedsEarned.set('prog_first_steps', '2026-08-03');
+        game.hud.handleDeedUnlocks([{ deedId: 'cmb_first_blood' }, { deedId: 'prog_first_steps' }]);
+      });
+      await wait(300);
+      let opened = false;
+      for (let attempt = 0; attempt < 3 && !opened; attempt++) {
+        await page.evaluate(() => {
+          const links = document.querySelectorAll('#chatlog .chat-deed-link');
+          const last = links[links.length - 1];
+          if (last instanceof HTMLElement) last.click();
+          else window.__game?.hud?.openDeeds?.();
+        });
+        opened = await pollForSize(page, '#deeds-window', 10, 500);
+      }
+      if (!opened) throw new Error('deeds window did not open');
+      await wait(400);
+      return { clip: '#deeds-window' };
+    },
+  },
+  {
     key: 'worn-enchant-tooltip',
     label: 'Paperdoll tooltip after enchanting the WORN piece in place',
     when: ['professions/enchanting', 'ui/enchant_apply_view'],
@@ -2690,7 +2883,14 @@ export const TARGETS = [
           rank: over.rank ?? 'member',
           lastLogin: over.lastLogin ?? null,
           activeTitle: over.activeTitle ?? null,
+          joinedAt: over.joinedAt ?? null,
         });
+        // Role staging (one chip per row): the leader and the officer show their
+        // rank labels; a regular member shows the tenure tier AS the role
+        // (Recruit under 7 days, Member 7 to 29 days, Veteran at 30+). Both
+        // groups carry every member tier so one shot shows every arm.
+        const day = 24 * 60 * 60 * 1000;
+        const now = Date.now();
         // A leaf assignment: socialInfo is typed `null` on the offline Sim, but at
         // runtime it is a plain field the HUD reads through IWorld.
         sim.socialInfo = {
@@ -2711,6 +2911,7 @@ export const TARGETS = [
                 status: 'online',
                 zone: 'zone:stormwind',
                 rank: 'leader',
+                joinedAt: now - 400 * day, // rank label wins: Guild Master
               }),
               m({
                 id: 2,
@@ -2721,6 +2922,7 @@ export const TARGETS = [
                 status: 'dungeon',
                 zone: 'zone:deadmines',
                 rank: 'officer',
+                joinedAt: now - 40 * day, // rank label wins: Officer
               }),
               m({
                 id: 3,
@@ -2731,6 +2933,21 @@ export const TARGETS = [
                 status: 'combat',
                 zone: 'zone:elwynn',
                 rank: 'member',
+                joinedAt: now - 5 * day, // Recruit (under 7 days)
+              }),
+              // The Member and Veteran tiers ride the SHORT offline names (Wisp,
+              // Lyria): an offline row's wide last-seen meta leaves the name span
+              // little room, and a long name (Thornbeard) ellipsizes the chip away
+              // in either desktop grid column.
+              m({
+                id: 6,
+                name: 'Wisp',
+                cls: 'druid',
+                level: 22,
+                online: false,
+                rank: 'member',
+                lastLogin: null,
+                joinedAt: now - 15 * day, // Member (7 to 29 days)
               }),
               m({
                 id: 4,
@@ -2740,6 +2957,7 @@ export const TARGETS = [
                 online: false,
                 rank: 'member',
                 lastLogin: '2026-07-18T20:15:00.000Z',
+                joinedAt: now - 120 * day, // Veteran (30 days or more)
               }),
               m({
                 id: 5,
@@ -2749,15 +2967,7 @@ export const TARGETS = [
                 online: false,
                 rank: 'member',
                 lastLogin: '2026-07-10T11:00:00.000Z',
-              }),
-              m({
-                id: 6,
-                name: 'Wisp',
-                cls: 'druid',
-                level: 22,
-                online: false,
-                rank: 'member',
-                lastLogin: null,
+                joinedAt: now - 45 * day, // Veteran (name truncates, Lyria shows the chip)
               }),
             ],
           },
@@ -2770,13 +2980,44 @@ export const TARGETS = [
       if (!staged.ok) throw new Error(staged.reason);
       const open = await pollForSize(page, '#social-window');
       if (!open) return {};
-      // Switch to the Guild tab (the strip fires on data-tab), then optionally engage
-      // the hide-offline toggle for the hidden variant.
+      // Switch to the Guild tab (the strip fires on data-tab), then drive the
+      // hide-offline toggle to the variant's state. The toggle PERSISTS to
+      // localStorage, so a click-only "engage" would leak the hidden state from
+      // the desktop-hidden variant into the mobile shot (same browser profile);
+      // syncing on aria-pressed makes every variant deterministic.
       await page.evaluate((hide) => {
         document.querySelector('.soc-tab[data-tab="guild"]')?.click();
-        if (hide) document.querySelector('[data-act="toggle-hide-offline"]')?.click();
+        const toggle = document.querySelector('[data-act="toggle-hide-offline"]');
+        const on = toggle?.getAttribute('aria-pressed') === 'true';
+        if (hide !== on) toggle?.click();
       }, variant?.hide === true);
       await wait(400);
+      // The roster sits below the billboard editor in the scrollable body. On
+      // desktop, scroll the first group header into view so both groups' role
+      // chips are in frame (Guild Master / Officer / Recruit online, Member /
+      // Veteran offline). The short mobile viewport fits only about three rows,
+      // so there anchor the LAST ONLINE row (the Recruit) instead: the frame then
+      // holds the member-tier run (Recruit / Member / Veteran), the part of the
+      // roster the one-chip role change is about.
+      await page.evaluate((mobile) => {
+        if (mobile) {
+          // Anchor the Recruit row's TEXT (skip its top padding) so the ~3-row
+          // viewport reaches one line further down, far enough that the first
+          // offline Veteran row's name line and chip clear the fold too.
+          const body = document.querySelector('#social-window .soc-body');
+          const rows = document.querySelectorAll('#social-window .soc-row');
+          const row = rows[2];
+          if (body && row) {
+            const delta = row.getBoundingClientRect().top - body.getBoundingClientRect().top;
+            body.scrollTop += delta + 8;
+          }
+        } else {
+          document
+            .querySelector('#social-window .soc-group-head')
+            ?.scrollIntoView({ block: 'start' });
+        }
+      }, variant?.mobile === true);
+      await wait(300);
       return { clip: '#social-window' };
     },
   },
@@ -2869,6 +3110,63 @@ export const TARGETS = [
       });
       await wait(400);
       return { clip: '#social-window' };
+    },
+  },
+  {
+    key: 'guild-login-line',
+    label: 'Chat log: guild billboard echoed as a login line (guild channel)',
+    when: ['ui/guild_motd_login'],
+    // The echo is a value-diffed latch on the Hud slow band reading socialInfo
+    // through IWorld, so staging a guild with a MOTD through the debug hook (the
+    // same sanctioned offline-staging fallback as guild-roster) fires the real
+    // code path: decideGuildMotdLine, the profanity mask, and the guild-channel
+    // chat append.
+    variants: [
+      { key: 'desktop', charName: 'Rueweaver', charClass: 'paladin' },
+      { key: 'mobile', charName: 'Rueweaver', charClass: 'paladin', mobile: true },
+    ],
+    async capture(page, variant) {
+      const staged = await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        if (!sim?.player) return { ok: false, reason: 'offline world is unavailable' };
+        sim.socialInfo = {
+          friends: [],
+          blocks: [],
+          ignores: [],
+          guild: {
+            id: 1,
+            name: 'Emberwatch Vanguard',
+            rank: 'member',
+            motd: 'Raid night Friday, 8pm server. Bring flasks and water.',
+            motdSetBy: 'Gizzelda',
+            members: [],
+            events: [],
+          },
+        };
+        return { ok: true };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      // The line lands on the next slow-band pass; give the loop real time.
+      await wait(1500);
+      if (variant?.mobile) {
+        // The touch layout parks the chat panel behind its own button; without
+        // this the clip target is not visible and the shot silently falls back
+        // to the whole HUD.
+        await page.evaluate(() => {
+          document
+            .getElementById('mobile-chat')
+            ?.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }));
+        });
+        await wait(700);
+      }
+      // The billboard line is the newest entry; pin the log to its bottom so
+      // the short mobile panel does not crop it out of the shot.
+      await page.evaluate(() => {
+        const log = document.querySelector('#chatlog');
+        if (log) log.scrollTop = log.scrollHeight;
+      });
+      await wait(200);
+      return { clip: '#chatlog-wrap' };
     },
   },
   {
@@ -4180,6 +4478,134 @@ export const TARGETS = [
     },
   },
   {
+    key: 'gossip-crafting-shortcut',
+    label: "Station master gossip Crafting shortcut (crafting window to the master's craft)",
+    when: ['ui/hud/quest/master_craft_core.ts', 'ui/hud/quest/quest_dialog_controller.ts'],
+    // The dialog variants shoot Forgemistress Darva's gossip menu (the
+    // Crafting row between Training and Unbinding). The window variant seeds
+    // a stale persisted tab (cooking; the boot-time woc_crafting_tab read, so
+    // it must land in beforeLoad, never capture staging), then either clicks
+    // the new row (AFTER: the window opens straight to Weaponcrafting) or
+    // falls back to the plain toggle the row replaces (BEFORE source state:
+    // the window opens on the stale cooking tab), so ONE recipe photographs
+    // both halves of the pair.
+    //
+    // beforeLoad also marks the first-run camera-mode prompt as already shown
+    // (woc.cameraModePrompt.shown): page.screenshot clips paint overlapping
+    // page chrome into the #quest-dialog region, and a live camera prompt
+    // was covering Training/Crafting/Unbinding in the after-desktop dialog
+    // shot. Capture still clicks/removes residual overlays as belt-and-braces.
+    variants: [
+      {
+        key: 'dialog-desktop',
+        beforeLoad: (page) =>
+          page.evaluateOnNewDocument("localStorage.setItem('woc.cameraModePrompt.shown', '1')"),
+      },
+      {
+        key: 'dialog-mobile',
+        mobile: true,
+        beforeLoad: (page) =>
+          page.evaluateOnNewDocument("localStorage.setItem('woc.cameraModePrompt.shown', '1')"),
+      },
+      {
+        key: 'window-desktop',
+        beforeLoad: (page) =>
+          page.evaluateOnNewDocument(`
+            localStorage.setItem('woc.cameraModePrompt.shown', '1');
+            localStorage.setItem('woc_crafting_tab', '"cooking"');
+          `),
+      },
+    ],
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.camera-prompt-backdrop')?.remove();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+        // Welcome-mail and other ambient banners paint into the dialog clip
+        // the same way the camera prompt does; clear the shared slot.
+        const banner = document.querySelector('#banner');
+        if (banner) {
+          banner.textContent = '';
+          banner.style.display = 'none';
+        }
+      });
+      await wait(300);
+      // Stand beside Darva (the dialog auto-closes on distance) and open her
+      // gossip menu, the attunement-legibility target's idiom. window.__game
+      // attaches a beat after the entry flow returns, so retry the staging
+      // rather than trusting one fixed wait.
+      let setup = { ok: false, reason: 'staging never ran' };
+      for (let attempt = 0; attempt < 20 && !setup.ok; attempt++) {
+        setup = await page.evaluate(() => {
+          const game = window.__game;
+          const sim = game?.sim;
+          if (!sim) return { ok: false, reason: 'no sim' };
+          const master = [...sim.entities.values()].find(
+            (e) => e.templateId === 'forgemistress_darva',
+          );
+          if (!master) return { ok: false, reason: 'no forgemistress_darva entity' };
+          const p = sim.player;
+          if (p?.pos) {
+            p.pos.x = master.pos.x;
+            p.pos.z = master.pos.z - 2;
+          }
+          const el = document.querySelector('#quest-dialog');
+          if (el) el.style.display = 'none';
+          game.hud.openQuestDialog(master.id);
+          return { ok: true };
+        });
+        if (!setup.ok) await wait(500);
+      }
+      if (!setup.ok) throw new Error(`gossip setup failed: ${setup.reason}`);
+      const open = await pollForSize(page, '#quest-dialog');
+      if (!open) throw new Error('quest dialog did not open');
+      // Re-clear overlays after the dialog opens: a delayed camera prompt or
+      // welcome-mail banner can still land on top of the clip region.
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-backdrop')?.remove();
+        const banner = document.querySelector('#banner');
+        if (banner) {
+          banner.textContent = '';
+          banner.style.display = 'none';
+        }
+      });
+      if (variant?.key !== 'window-desktop') {
+        // The mobile dialog scrolls internally and the service rows sit at
+        // the bottom: bring the subject row (Crafting; the Unbind row on a
+        // BEFORE source tree) into frame or the shot photographs the fold.
+        // Assert the row exists so a contaminated or empty dialog cannot
+        // ship as the PR's before/after evidence.
+        const hasSubject = await page.evaluate(() => {
+          const row =
+            document.querySelector('#quest-dialog [data-crafting]') ??
+            document.querySelector('#quest-dialog [data-unbind]');
+          row?.scrollIntoView({ block: 'center' });
+          return Boolean(row);
+        });
+        if (!hasSubject) {
+          throw new Error(
+            'quest dialog missing Crafting/Unbinding subject row for gossip-crafting-shortcut',
+          );
+        }
+        await wait(300);
+        return { clip: '#quest-dialog' };
+      }
+      await page.evaluate(() => {
+        const row = document.querySelector('#quest-dialog [data-crafting]');
+        if (row) {
+          row.click();
+        } else {
+          document.querySelector('#quest-dialog [data-close]')?.click();
+          window.__game?.hud?.toggleCrafting?.();
+        }
+      });
+      const windowOpen = await pollForSize(page, '#crafting-window');
+      if (!windowOpen) throw new Error('crafting window did not open');
+      return { clip: '#crafting-window' };
+    },
+  },
+  {
     key: 'station-props',
     label: 'Crafting-station scenery (Eastbrook forge)',
     when: ['render/stations', 'src/sim/content/professions'],
@@ -5402,6 +5828,65 @@ export const TARGETS = [
       }
       await wait(400);
       return { clip: '#vcup-briefing .vcupb-card' };
+    },
+  },
+  {
+    key: 'desktop-update-card',
+    label: 'Desktop (Electron) auto-update card: checking / downloading / ready',
+    // `when` deliberately omits src/styles/shell.css and src/ui/ui_icons.ts even
+    // though both carry part of this card's look: each is a large shared surface
+    // whose mostly-unrelated edits would re-shoot these three variants on a big
+    // fraction of PRs. A pure styling pass on the card should list one of the
+    // four owning files (or this script) in its diff anyway.
+    when: [
+      'src/ui/desktop_update_toast.ts',
+      'src/ui/desktop_update_view.ts',
+      'electron/updater.cjs',
+      'electron/update_events.cjs',
+    ],
+    // The card is shell-level (pre-game and in-world alike), so `landing`
+    // shots on the marketing shell frame it against a stable background. Each
+    // variant replays the whitelisted event sequence the Electron shell would
+    // send for that state.
+    variants: [
+      {
+        key: 'checking',
+        landing: true,
+        beforeLoad: stubDesktopUpdateBridge,
+        events: [{ type: 'checking' }],
+      },
+      {
+        key: 'downloading',
+        landing: true,
+        beforeLoad: stubDesktopUpdateBridge,
+        events: [
+          { type: 'checking' },
+          { type: 'available', version: '0.34.1' },
+          { type: 'progress', percent: 40 },
+        ],
+      },
+      {
+        key: 'ready',
+        landing: true,
+        beforeLoad: stubDesktopUpdateBridge,
+        events: [
+          { type: 'checking' },
+          { type: 'available', version: '0.34.1' },
+          { type: 'downloaded', version: '0.34.1' },
+        ],
+      },
+    ],
+    async capture(page, variant) {
+      const armed = await page.evaluate((events) => {
+        if (typeof window.__updateEventCb !== 'function') return false;
+        for (const e of events) window.__updateEventCb(e);
+        return true;
+      }, variant.events);
+      if (!armed) throw new Error('desktop update bridge did not initialize');
+      if (!(await pollForSize(page, '#desktop-update-toast', 10, 300))) {
+        throw new Error('desktop update card did not render');
+      }
+      return { clip: '#desktop-update-toast' };
     },
   },
 ];

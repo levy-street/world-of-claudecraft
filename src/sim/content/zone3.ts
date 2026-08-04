@@ -331,6 +331,19 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     family: 'ogre',
     elite: true,
     boss: true,
+    // THREE MINUTES (7.2 * 25), the shipped cadence for a quest kill target
+    // (Old Cragmaw, Captain Verlan). He declared no cadence at all before, and
+    // boss/elite do not feed the respawn policy (only respawnMult or rare: true
+    // do), so he silently inherited the open-world TRASH timer and was 24% of
+    // the whole Glimmermere corridor's gold by himself.
+    //
+    // The fix is NOT a long boss cadence, even though his loot is priced with
+    // Marrowlord Varkas (1hr) and Brutok Skullsmasher (3hr): q_drogmar has a
+    // hard kill objective on him at suggestedPlayers 3, so a party would sit
+    // waiting, and queue behind other parties, for a REQUIRED quest step. He
+    // has to stay available, which makes coin rather than cadence the lever
+    // (see the loot table below).
+    respawnMult: 7.2,
     hpBase: 200,
     hpPerLevel: 30,
     dmgBase: 12,
@@ -345,8 +358,14 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     // drawn-out fight snowballs, so burn him down or kite him off you to bleed
     // the stacks back off.
     rampage: { ap: 20, maxStacks: 5, duration: 10, name: 'Mounting Rage', school: 'physical' },
+    // 650 guaranteed copper, matching Marrowlord Varkas. His TOTAL value per
+    // kill was always in line with his neighbours (3285 against Varkas's 3222
+    // and Brutok's 2557); what was out of line was the SPLIT, at 2000 coin
+    // against their 650 and 320. Since he must stay on a quest-friendly three
+    // minutes, this is the knob that keeps the corridor honest, and it leaves
+    // all three unique drops intact so the kill still pays like a boss.
     loot: [
-      { copper: 2000, chance: 1 },
+      { copper: 650, chance: 1 },
       { itemId: 'drogmar_warboots', chance: 0.3 },
       { itemId: 'drogmars_skullcleaver', chance: 0.25 },
       { itemId: 'thunderward_legguards', chance: 0.25 },

@@ -135,9 +135,13 @@ class FakeDb implements SocialDb {
   async removeGuildMember(c: number): Promise<void> {
     this.members.delete(c);
   }
-  async setGuildRank(c: number, rank: GuildRank): Promise<void> {
+  async setGuildRank(c: number, guildId: number, rank: GuildRank): Promise<boolean> {
+    // Mirrors the real predicate: character AND guild must both match, and the
+    // caller learns whether a row actually moved (false = refused, stamp nothing).
     const m = this.members.get(c);
-    if (m) m.rank = rank;
+    if (!m || m.guildId !== guildId) return false;
+    m.rank = rank;
+    return true;
   }
   async transferGuildLeader(
     guildId: number,
@@ -157,10 +161,19 @@ class FakeDb implements SocialDb {
   setLastLogin(id: number, iso: string): void {
     this.lastLogins.set(id, iso);
   }
-  async guildMembers(
-    guildId: number,
-  ): Promise<
-    (CharInfo & { rank: GuildRank; lastLogin: string | null; activeTitle: string | null })[]
+  // Epoch-ms guild-join stamps (guild_members.joined_at). Unstamped members
+  // report null (the wire's defensive arm), never a fake epoch-0 "Veteran".
+  private joinedAts = new Map<number, number>();
+  setJoinedAt(id: number, epochMs: number): void {
+    this.joinedAts.set(id, epochMs);
+  }
+  async guildMembers(guildId: number): Promise<
+    (CharInfo & {
+      rank: GuildRank;
+      lastLogin: string | null;
+      activeTitle: string | null;
+      joinedAt: number | null;
+    })[]
   > {
     return [...this.members.entries()]
       .filter(([, m]) => m.guildId === guildId)
@@ -168,6 +181,7 @@ class FakeDb implements SocialDb {
         ...this.chars.get(cid)!,
         rank: m.rank,
         lastLogin: this.lastLogins.get(cid) ?? null,
+        joinedAt: this.joinedAts.get(cid) ?? null,
       }));
   }
   guildCount(): number {
@@ -274,6 +288,47 @@ class FakeTransport implements SocialTransport {
   onGuildFounded(id: number): void {
     this.founded.push(id);
   }
+  // Guild Bank Phase 3 seams. created records the commit-arm seed/fee hook;
+  // disbanded records the book evict; holdings is what guildDisband's guard
+  // reads (default an EMPTY book, so pre-guild-bank tests disband freely;
+  // set a guild's entry to non-empty holdings or null to drive the guard).
+  created: { id: number; guildId: number }[] = [];
+  onGuildCreated(id: number, guildId: number): void {
+    this.created.push({ id, guildId });
+  }
+  disbanded: number[] = [];
+  onGuildDisbanded(guildId: number): void {
+    this.disbanded.push(guildId);
+  }
+  holdings = new Map<number, { copper: number; items: number } | null>();
+  guildBankDeleteWindows = new Set<number>();
+  beginGuildBankDelete(guildId: number): { copper: number; items: number } | null {
+    if (this.guildBankDeleteWindows.has(guildId)) return null;
+    const holdings = this.guildBankHoldingsFor(guildId);
+    if (holdings) this.guildBankDeleteWindows.add(guildId);
+    return holdings;
+  }
+  endGuildBankDelete(guildId: number): void {
+    this.guildBankDeleteWindows.delete(guildId);
+  }
+  guildBankHoldingsFor(guildId: number): { copper: number; items: number } | null {
+    const h = this.holdings.get(guildId);
+    return h === undefined ? { copper: 0, items: 0 } : h;
+  }
+  // Every synchronous guild membership/rank stamp, in call order (the Guild
+  // Bank Phase 2 seam: game.ts pairs setPlayerGuild with
+  // setPlayerGuildMembership behind this). Recorded for ALL characters,
+  // online or not: the real transport no-ops offline ids itself.
+  membershipStamps: {
+    id: number;
+    membership: { guildId: number; guildName: string; rank: GuildRank } | null;
+  }[] = [];
+  onGuildMembershipChanged(
+    id: number,
+    membership: { guildId: number; guildName: string; rank: GuildRank } | null,
+  ): void {
+    this.membershipStamps.push({ id, membership });
+  }
   isBlocking(recipientId: number, senderCharacterId: number): boolean {
     return !!this.db.blocks.get(recipientId)?.has(senderCharacterId);
   }
@@ -315,12 +370,15 @@ class FakeTransport implements SocialTransport {
   }
 }
 
-// Test harness: characters 1..N, with helpers to flip presence.
-function setup() {
+// Test harness: characters 1..N, with helpers to flip presence. Tests that
+// exercise guild-name screening inject their own predicate; everything else
+// runs with the harness default (screen nothing). The constructor itself has
+// no default: every host must decide what it screens.
+function setup(cfg: { isNameOffensive?: (name: string) => boolean } = {}) {
   const db = new FakeDb();
   const tx = new FakeTransport(db);
   let clock = 1000;
-  const svc = new SocialService(db, tx, () => clock);
+  const svc = new SocialService(db, tx, () => clock, cfg.isNameOffensive ?? (() => false));
   const actors = new Map<number, { characterId: number; name: string }>();
   const add = (id: number, name: string, opts: { cls?: string; level?: number } = {}) => {
     db.addChar(id, name, opts.cls, opts.level);
@@ -696,6 +754,19 @@ describe('guilds', () => {
     expect(aleph?.lastLogin).toBeNull(); // never stamped
   });
 
+  it('carries each guild member joined_at through the snapshot as epoch ms', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    const joined = Date.UTC(2026, 6, 3, 12, 0, 0);
+    h.db.setJoinedAt(2, joined);
+    const snap = await h.svc.snapshot(1);
+    const bet = snap.guild?.members.find((m) => m.name === 'Bet');
+    const aleph = snap.guild?.members.find((m) => m.name === 'Aleph');
+    expect(bet?.joinedAt).toBe(joined);
+    expect(aleph?.joinedAt).toBeNull(); // never stamped in the fake
+  });
+
   it("refreshes guildmates' panels when a member comes online, even non-friends (#100)", async () => {
     await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
     await h.svc.guildInvite(h.actor(1), 'Bet');
@@ -756,6 +827,89 @@ describe('guilds', () => {
     h.tx.clear();
     await h.svc.guildCreate(h.actor(2), 'iron vanguard');
     expect(h.tx.errorsFor(2).join()).toMatch(/already exists/i);
+  });
+
+  it('refuses an offensive guild name at creation via the injected screen', async () => {
+    const screened: string[] = [];
+    const s = setup({
+      isNameOffensive: (name) => {
+        screened.push(name);
+        return /forbidden/i.test(name);
+      },
+    });
+    s.add(1, 'Aleph');
+    s.tx.setOnline(1);
+    await s.svc.guildCreate(s.actor(1), '  Forbidden Legion  ');
+    // The exact English literal is load-bearing: server_i18n's EXACT matcher
+    // localizes it byte-for-byte (guild.nameNotAllowed).
+    expect(s.tx.errorsFor(1)).toEqual(['That guild name is not allowed.']);
+    // The screen sees the VALIDATED (trimmed) name, after the format gate.
+    expect(screened).toEqual(['Forbidden Legion']);
+    // A refused create leaves nothing behind: no guild row, no founder credit,
+    // no membership.
+    expect(s.db.guildCount()).toBe(0);
+    expect(s.tx.founded).toEqual([]);
+    expect((await s.svc.snapshot(1)).guild).toBeNull();
+  });
+
+  it('accepts a clean guild name through the same screen', async () => {
+    const s = setup({ isNameOffensive: (name) => /forbidden/i.test(name) });
+    s.add(1, 'Aleph');
+    s.tx.setOnline(1);
+    await s.svc.guildCreate(s.actor(1), 'Iron Vanguard');
+    expect(s.tx.errorsFor(1)).toEqual([]);
+    expect(s.tx.founded).toEqual([1]);
+    expect((await s.svc.snapshot(1)).guild?.name).toBe('Iron Vanguard');
+  });
+
+  it('does not screen when the harness injects no predicate (screen-nothing default)', async () => {
+    // The harness default screens nothing: FakeDb suites that never inject a
+    // predicate must keep creating guilds freely.
+    await h.svc.guildCreate(h.actor(1), 'Forbidden Legion');
+    expect(h.tx.errorsFor(1)).toEqual([]);
+    expect((await h.svc.snapshot(1)).guild?.name).toBe('Forbidden Legion');
+  });
+
+  it('refuses a format-invalid name with the rules message before the screen ever runs', async () => {
+    // Ordering pin, negative arm: validateGuildName gates FIRST, so a name that
+    // fails the format rules is refused with nameRules and the predicate is
+    // never consulted (swapping the two blocks flips which error this gets).
+    const screened: string[] = [];
+    const s = setup({
+      isNameOffensive: (name) => {
+        screened.push(name);
+        return true;
+      },
+    });
+    s.add(1, 'Aleph');
+    s.tx.setOnline(1);
+    await s.svc.guildCreate(s.actor(1), 'xx');
+    expect(s.tx.errorsFor(1).join()).toMatch(/3-24/);
+    expect(screened).toEqual([]);
+  });
+
+  it('requires every SocialService construction site to choose a screening predicate', () => {
+    const db = new FakeDb();
+    const tx = new FakeTransport(db);
+    // Fail-closed pin: the 4th constructor param deliberately has no default,
+    // so a host that forgets it fails to compile. Restoring a fail-open
+    // default makes this construction legal and tsc then rejects the
+    // unused expect-error, failing the gate.
+    // @ts-expect-error three args must not construct a SocialService
+    const svc = new SocialService(db, tx, () => 1000);
+    expect(svc).toBeInstanceOf(SocialService);
+  });
+
+  it('wires the real offensiveName screen at the production construction site (source pin)', async () => {
+    // The whole suite injects its own predicates, so the one edge connecting
+    // the tested service to the real screen is server/game.ts; pin it at the
+    // source level (title_reads precedent) so replacing it with () => false
+    // cannot ship silently.
+    const { readFileSync } = await import('node:fs');
+    const game = readFileSync(new URL('../server/game.ts', import.meta.url), 'utf8');
+    const site = game.slice(game.indexOf('new SocialService('));
+    expect(site.length).toBeGreaterThan(0);
+    expect(site.slice(0, 400)).toContain('offensiveName(');
   });
 
   it('fires onGuildFounded exactly once, on the committed create only (the soc_guild_founded feed)', async () => {
@@ -1299,6 +1453,181 @@ describe('guilds', () => {
   });
 });
 
+// The Guild Bank Phase 2 stamp seam: every COMMITTED membership/rank mutation
+// must reach onGuildMembershipChanged synchronously from its call site (the
+// transport owner pairs the sim's name + membership stamps behind it), because
+// the guild bank's officer-plus gate reads the stamped rank: a demote that only
+// arrived via the async pushSnapshot path would leave a stale-officer window.
+// Refused mutations must stamp NOTHING.
+describe('guild membership stamps (onGuildMembershipChanged)', () => {
+  let h: ReturnType<typeof setup>;
+  const G = { guildId: 1, guildName: 'Iron Vanguard' }; // FakeDb ids start at 1
+  beforeEach(async () => {
+    h = setup();
+    h.add(1, 'Aleph');
+    h.add(2, 'Bet');
+    h.add(3, 'Gimel');
+    h.tx.setOnline(1);
+    h.tx.setOnline(2);
+    h.tx.setOnline(3);
+  });
+  const joinBet = async () => {
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+  };
+
+  it('create stamps the founder as leader, exactly once', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    expect(h.tx.membershipStamps).toEqual([{ id: 1, membership: { ...G, rank: 'leader' } }]);
+  });
+
+  it('a refused create (name taken / already in a guild) stamps nothing', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    h.tx.membershipStamps = [];
+    await h.svc.guildCreate(h.actor(2), 'Iron Vanguard'); // name taken
+    await h.svc.guildCreate(h.actor(1), 'Second Banner'); // already in a guild
+    await h.svc.guildCreate(h.actor(3), 'x'); // invalid name
+    expect(h.tx.membershipStamps).toEqual([]);
+  });
+
+  it('accept stamps the joiner as member; an expired invite stamps nothing', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    h.tx.membershipStamps = [];
+    await joinBet();
+    expect(h.tx.membershipStamps).toEqual([{ id: 2, membership: { ...G, rank: 'member' } }]);
+    h.tx.membershipStamps = [];
+    await h.svc.guildAccept(h.actor(3)); // no invite at all
+    expect(h.tx.membershipStamps).toEqual([]);
+  });
+
+  it('promote and demote stamp the target with the new rank; a refused rank change stamps nothing', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    await joinBet();
+    h.tx.membershipStamps = [];
+    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    expect(h.tx.membershipStamps).toEqual([{ id: 2, membership: { ...G, rank: 'officer' } }]);
+    h.tx.membershipStamps = [];
+    await h.svc.guildSetRank(h.actor(1), 'Bet', 'member');
+    expect(h.tx.membershipStamps).toEqual([{ id: 2, membership: { ...G, rank: 'member' } }]);
+    h.tx.membershipStamps = [];
+    await h.svc.guildSetRank(h.actor(2), 'Aleph', 'member'); // not the leader: refused
+    await h.svc.guildSetRank(h.actor(1), 'Gimel', 'officer'); // not in the guild: refused
+    await h.svc.guildSetRank(h.actor(1), 'Bet', 'member'); // already member: refused
+    expect(h.tx.membershipStamps).toEqual([]);
+  });
+
+  it('a promote whose UPDATE matched no row (target left mid-flight) stamps NOTHING', async () => {
+    // The privilege-escalation race the predicated setGuildRank closes: the
+    // leader promotes Bet, but Bet's guildLeave commits between guildSetRank's
+    // membership read and its UPDATE. The write matches zero rows, so the
+    // service must refuse and never stamp the officer rank the DB refused
+    // (the guild bank's officer gate honors the stamp, and a removed
+    // character gets no corrective push).
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    await joinBet();
+    const realSetGuildRank = h.db.setGuildRank.bind(h.db);
+    h.db.setGuildRank = async (c, guildId, rank) => {
+      await h.svc.guildLeave(h.actor(2)); // the leave commits just before the UPDATE
+      return realSetGuildRank(c, guildId, rank);
+    };
+    h.tx.membershipStamps = [];
+    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    // Only the leave's own null stamp: no officer stamp may follow it.
+    expect(h.tx.membershipStamps).toEqual([{ id: 2, membership: null }]);
+    expect(await h.db.guildMembership(2)).toBeNull();
+  });
+
+  it('a promote racing a guild SWITCH cannot rewrite the new guild or stamp the old one', async () => {
+    // Same window, worse shape: Bet leaves guild A and founds guild B before
+    // A's promote UPDATE lands. The guild_id predicate must miss (B's row is
+    // untouched) and no stamp may assert an officer rank in A.
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    await joinBet();
+    const realSetGuildRank = h.db.setGuildRank.bind(h.db);
+    h.db.setGuildRank = async (c, guildId, rank) => {
+      await h.svc.guildLeave(h.actor(2));
+      await h.svc.guildCreate(h.actor(2), 'Second Banner');
+      return realSetGuildRank(c, guildId, rank);
+    };
+    h.tx.membershipStamps = [];
+    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    // The leave's null stamp and the create's leader stamp for guild B, and
+    // nothing else: no officer-in-A stamp, and B's row keeps its leader rank.
+    expect(h.tx.membershipStamps).toEqual([
+      { id: 2, membership: null },
+      { id: 2, membership: { guildId: 2, guildName: 'Second Banner', rank: 'leader' } },
+    ]);
+    expect(await h.db.guildMembership(2)).toEqual({
+      guildId: 2,
+      guildName: 'Second Banner',
+      rank: 'leader',
+    });
+  });
+
+  it('kick stamps the target null (even offline); a refused kick stamps nothing', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    await joinBet();
+    h.tx.setOffline(2); // the stamp seam records regardless; the owner no-ops offline
+    h.tx.membershipStamps = [];
+    await h.svc.guildKick(h.actor(1), 'Bet');
+    expect(h.tx.membershipStamps).toEqual([{ id: 2, membership: null }]);
+    h.tx.membershipStamps = [];
+    await h.svc.guildKick(h.actor(1), 'Gimel'); // not in the guild: refused
+    expect(h.tx.membershipStamps).toEqual([]);
+  });
+
+  it('leave stamps the leaver null in both arms (others remain / last member out)', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    await joinBet();
+    h.tx.membershipStamps = [];
+    await h.svc.guildLeave(h.actor(2)); // others remain
+    expect(h.tx.membershipStamps).toEqual([{ id: 2, membership: null }]);
+    h.tx.membershipStamps = [];
+    await h.svc.guildLeave(h.actor(1)); // last member out: the disband arm
+    expect(h.tx.membershipStamps).toEqual([{ id: 1, membership: null }]);
+    // A blocked leave (leader with members remaining) stamps nothing.
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard II');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    h.tx.membershipStamps = [];
+    await h.svc.guildLeave(h.actor(1)); // refused: must transfer or disband first
+    expect(h.tx.membershipStamps).toEqual([]);
+  });
+
+  it('leader transfer stamps BOTH rows: target to leader, former leader to officer', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    await joinBet();
+    h.tx.membershipStamps = [];
+    await h.svc.guildTransferLeader(h.actor(1), 'Bet');
+    expect(h.tx.membershipStamps).toEqual([
+      { id: 2, membership: { ...G, rank: 'leader' } },
+      { id: 1, membership: { ...G, rank: 'officer' } },
+    ]);
+    h.tx.membershipStamps = [];
+    await h.svc.guildTransferLeader(h.actor(1), 'Bet'); // no longer leader: refused
+    expect(h.tx.membershipStamps).toEqual([]);
+  });
+
+  it('disband stamps EVERY member null, online or offline', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    await joinBet();
+    await h.svc.guildInvite(h.actor(1), 'Gimel');
+    await h.svc.guildAccept(h.actor(3));
+    h.tx.setOffline(3); // offline members clear too (they re-stamp null at next join)
+    h.tx.membershipStamps = [];
+    await h.svc.guildDisband(h.actor(1));
+    const stamps = [...h.tx.membershipStamps].sort((a, b) => a.id - b.id);
+    expect(stamps).toEqual([
+      { id: 1, membership: null },
+      { id: 2, membership: null },
+      { id: 3, membership: null },
+    ]);
+    h.tx.membershipStamps = [];
+    await h.svc.guildDisband(h.actor(1)); // no guild anymore: refused
+    expect(h.tx.membershipStamps).toEqual([]);
+  });
+});
+
 describe('guild atomicity (#149)', () => {
   let h: ReturnType<typeof setup>;
   beforeEach(() => {
@@ -1711,5 +2040,162 @@ describe('broadcastDeedUnlock', () => {
     } satisfies Extract<SocialEvent, { type: 'deedBroadcast' }>;
     const fromSim: Extract<SocialEvent, { type: 'deedBroadcast' }> = fromSocial;
     expect(fromSim).toEqual(fromSocial);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Guild Bank Phase 3: the create-commit hook (book seed + fee, via the
+// transport) and the disband guard over the live book's holdings.
+// ---------------------------------------------------------------------------
+
+describe('guild bank persistence hooks (Guild Bank Phase 3)', () => {
+  let h: ReturnType<typeof setup>;
+  beforeEach(() => {
+    h = setup();
+    h.add(1, 'Aleph');
+    h.add(2, 'Bet');
+    h.tx.setOnline(1);
+    h.tx.setOnline(2);
+  });
+
+  it('onGuildCreated fires once, in the committed success arm only, AFTER the founder stamp', async () => {
+    // The boolean is the reserve-at-gate refund signal (Guild Bank Phase 3
+    // QA): FALSE on every refusal arm (the dispatch gate refunds the reserved
+    // fee), TRUE only on the committed success arm (the hook consumed it).
+    await expect(h.svc.guildCreate(h.actor(1), 'no')).resolves.toBe(false); // invalid name
+    expect(h.tx.created).toEqual([]);
+    await expect(h.svc.guildCreate(h.actor(1), 'Iron Vanguard')).resolves.toBe(true);
+    expect(h.tx.created).toEqual([{ id: 1, guildId: 1 }]);
+    // Ordering: the membership stamp (the authorization input) landed BEFORE
+    // the seed/fee hook, in the same synchronous success arm.
+    expect(h.tx.membershipStamps).toEqual([
+      { id: 1, membership: { guildId: 1, guildName: 'Iron Vanguard', rank: 'leader' } },
+    ]);
+    // Refusals after: duplicate name, already guilded. No further hook calls,
+    // and both report false so the gate refunds.
+    await expect(h.svc.guildCreate(h.actor(2), 'iron vanguard')).resolves.toBe(false);
+    await expect(h.svc.guildCreate(h.actor(1), 'Second Banner')).resolves.toBe(false);
+    expect(h.tx.created).toEqual([{ id: 1, guildId: 1 }]);
+  });
+
+  it('disband refuses while the bank holds copper, and again while it holds items', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    for (const holdings of [
+      { copper: 5, items: 0 },
+      { copper: 0, items: 1 },
+    ]) {
+      h.tx.holdings.set(1, holdings);
+      await h.svc.guildDisband(h.actor(1));
+      expect(h.tx.errorsFor(1)).toContain(
+        'The guild bank must be emptied before the guild can be disbanded.',
+      );
+      // Refused: the guild survives, nothing stamped, nothing evicted.
+      expect(h.db.guildCount()).toBe(1);
+      expect(h.tx.membershipStamps).toEqual(
+        expect.arrayContaining([expect.objectContaining({ membership: expect.anything() })]),
+      );
+      expect(h.tx.disbanded).toEqual([]);
+      h.tx.clear();
+    }
+    // The refusal stamped NOTHING beyond the create's founder stamp.
+    expect(h.tx.membershipStamps).toHaveLength(1);
+  });
+
+  it('disband fails CLOSED when no book is loaded (holdings null)', async () => {
+    // An unloaded book cannot prove the persisted row is empty (the oversized
+    // boot-skip state): the guard must refuse rather than cascade-delete it.
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    h.tx.holdings.set(1, null);
+    await h.svc.guildDisband(h.actor(1));
+    expect(h.tx.errorsFor(1)).toContain(
+      'The guild bank must be emptied before the guild can be disbanded.',
+    );
+    expect(h.db.guildCount()).toBe(1);
+    expect(h.tx.disbanded).toEqual([]);
+  });
+
+  it('an empty bank disbands: the guild deletes, members clear, the book evicts once', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    // The default FakeTransport holdings are an EMPTY book ({0, 0}).
+    h.tx.membershipStamps = [];
+    await h.svc.guildDisband(h.actor(1));
+    expect(h.db.guildCount()).toBe(0);
+    expect(h.tx.membershipStamps).toEqual([{ id: 1, membership: null }]);
+    expect(h.tx.disbanded).toEqual([1]); // the evict hook, exactly once
+    // A second disband finds no guild and evicts nothing further.
+    await h.svc.guildDisband(h.actor(1));
+    expect(h.tx.disbanded).toEqual([1]);
+  });
+
+  it('the guard reads holdings for the LEADER path only after the rank checks', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    h.tx.holdings.set(1, { copper: 99, items: 0 });
+    // A member cannot reach the guard: the rank refusal comes first and the
+    // bank refusal line never fires for them.
+    await h.svc.guildDisband(h.actor(2));
+    expect(h.tx.errorsFor(2)).toContain('Only the Guild Master may disband the guild.');
+    expect(h.tx.errorsFor(2)).not.toContain(
+      'The guild bank must be emptied before the guild can be disbanded.',
+    );
+    expect(h.db.guildCount()).toBe(1);
+  });
+});
+
+describe('guild bank guard on last-member guildLeave (Guild Bank Phase 3)', () => {
+  let h: ReturnType<typeof setup>;
+  beforeEach(() => {
+    h = setup();
+    h.add(1, 'Aleph');
+    h.add(2, 'Bet');
+    h.tx.setOnline(1);
+    h.tx.setOnline(2);
+  });
+
+  it('a solo Guild Master /gquit with a stocked bank is refused BEFORE any row moves', async () => {
+    // Last-member-out deletes the guild, which cascades the guild_banks row
+    // away exactly like /gdisband: without this guard a solo GM /gquit
+    // destroys the whole book.
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    for (const holdings of [{ copper: 7, items: 0 }, { copper: 0, items: 2 }, null]) {
+      h.tx.holdings.set(1, holdings);
+      h.tx.membershipStamps = [];
+      await h.svc.guildLeave(h.actor(1));
+      expect(h.tx.errorsFor(1)).toContain(
+        'The guild bank must be emptied before the guild can be disbanded.',
+      );
+      // Refused before ANY mutation: still a member, guild alive, no stamp,
+      // no evict.
+      expect(h.db.guildCount()).toBe(1);
+      expect(await h.db.guildMembership(1)).not.toBeNull();
+      expect(h.tx.membershipStamps).toEqual([]);
+      expect(h.tx.disbanded).toEqual([]);
+      h.tx.clear();
+    }
+  });
+
+  it('a solo Guild Master /gquit with an empty bank deletes the guild and evicts once', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    h.tx.membershipStamps = [];
+    await h.svc.guildLeave(h.actor(1)); // default holdings: the empty book
+    expect(h.db.guildCount()).toBe(0);
+    expect(await h.db.guildMembership(1)).toBeNull();
+    expect(h.tx.membershipStamps).toEqual([{ id: 1, membership: null }]);
+    expect(h.tx.disbanded).toEqual([1]);
+  });
+
+  it('a NON-last member leaving never consults the guard (the bank cannot trap them)', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    h.tx.holdings.set(1, { copper: 999, items: 9 }); // stocked bank
+    await h.svc.guildLeave(h.actor(2)); // Bet leaves; Aleph remains
+    expect(h.tx.errorsFor(2)).not.toContain(
+      'The guild bank must be emptied before the guild can be disbanded.',
+    );
+    expect(await h.db.guildMembership(2)).toBeNull(); // the leave went through
+    expect(h.db.guildCount()).toBe(1); // guild survives with its bank
+    expect(h.tx.disbanded).toEqual([]);
   });
 });

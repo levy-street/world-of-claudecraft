@@ -46,9 +46,11 @@ export function runtimeWebSocketUrl(
 }
 
 // One auto-update event forwarded by the shell (electron/update_events.cjs
-// whitelists the payloads; 'progress' carries percent, the others version).
+// whitelists the payloads; 'progress' carries percent, 'available' and
+// 'downloaded' carry version, and 'checking'/'not-available'/'error' are bare
+// notifications: 'error' never carries a message by design).
 export interface DesktopUpdateEvent {
-  type: 'available' | 'progress' | 'downloaded';
+  type: 'checking' | 'available' | 'progress' | 'downloaded' | 'not-available' | 'error';
   version?: string;
   percent?: number;
 }

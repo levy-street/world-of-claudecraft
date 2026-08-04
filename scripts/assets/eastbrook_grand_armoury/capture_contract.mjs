@@ -87,7 +87,6 @@ export const EASTBROOK_TOWN_REBUILD_PLACEMENT_INVENTORY = Object.freeze({
     'eastbrook_fence_smithy_west',
     'eastbrook_fence_smithy_outer',
     'eastbrook_fence_smithy_east',
-    'eastbrook_fence_market_outer',
   ]),
   artisanRow: Object.freeze([]),
   benches: Object.freeze([
@@ -116,8 +115,8 @@ export const EASTBROOK_TOWN_POLISH_V2_PLACEMENT_INVENTORY = Object.freeze({
   ]),
 });
 
-const EASTBROOK_TOWN_HISTORICAL_TRIANGLES = 29_644;
-const EASTBROOK_TOWN_POLISH_V2_TRIANGLES = 29_110;
+const EASTBROOK_TOWN_HISTORICAL_TRIANGLES = 29_436;
+const EASTBROOK_TOWN_POLISH_V2_TRIANGLES = 28_902;
 
 const EMPTY_TOWN_PLACEMENT_INVENTORY = Object.freeze(
   Object.fromEntries(

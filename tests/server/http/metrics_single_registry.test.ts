@@ -32,6 +32,14 @@ function stubSource(): GameStateSource {
     dbPool: () => ({ total: 0, idle: 0, waiting: 0 }),
     lastTickAt: () => 1_700_000_000_000,
     loopStartedAt: () => 1_700_000_000_000,
+    guildBankLogCache: () => ({
+      reads: 0,
+      refreshes: 0,
+      evictions: 0,
+      busts: 0,
+      entries: 0,
+      dirtyGuilds: 0,
+    }),
   };
 }
 

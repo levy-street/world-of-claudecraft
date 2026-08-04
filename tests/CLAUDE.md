@@ -173,8 +173,14 @@ yourself or the S3 guard throws "status.json is missing".
   completeness + placeholder parity per locale). Add or change a sim/server player string and update
   the matcher in the SAME change or this fails.
 - **Two tiers via `I18N_RELEASE_TIER`** (also read by `localization_coverage`, `i18n_status_registry`,
-  `i18n_t_behavior`): unset = PR tier (registration/key-existence only, English-only legal); `=1` =
-  release tier (hard-fails on any `pending` locale row + full-localization checks).
+  `i18n_t_behavior`, `deed_i18n`): unset = PR tier (registration/key-existence only, English-only
+  legal); `=1` = release tier (hard-fails on any `pending` locale row + full-localization checks).
+  The tier runs as its OWN job / gate step over exactly those suites (`release-i18n` in
+  `.github/workflows/ci.yml`, `vitest (release-tier i18n)` locally), never over the whole suite:
+  a release branch is red for un-filled locales through most of a cycle, and fusing that with
+  the test signal let a real regression hide inside expected noise (#2820). Adding a suite that
+  reads the flag means adding it to `I18N_RELEASE_TIER_SUITES` (`scripts/lib/gate_steps.mjs`) and
+  the ci.yml job; `tests/release_i18n_tier_coverage.test.ts` fails until all three agree.
 
 ## Running & adding
 - Single file (preferred while iterating): `npx vitest run tests/<file>.test.ts`.

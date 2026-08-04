@@ -70,7 +70,12 @@ vi.mock('pg', () => ({
 }));
 
 import { CONCURRENT_INDEX_MIGRATIONS } from '../server/concurrent_indexes';
-import { closeMarketWriteGateForTests, ensureSchema, saveMarketState } from '../server/db';
+import {
+  closeMarketWriteGateForTests,
+  ensureSchema,
+  runConcurrentIndexMigrations,
+  saveMarketState,
+} from '../server/db';
 import { RATELIMIT_PRUNE_SQL } from '../server/ratelimit_db';
 import type { MarketSave } from '../src/sim/sim';
 
@@ -256,6 +261,16 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS bank_ledger');
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS bank_ledger_character');
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS bank_ledger_created');
+    // The counterparty (payer/payee) half of every guild row, added at boot on
+    // existing databases. Pinned BY NAME, not only by the additive-style scan
+    // below: deleting either statement would leave the scan perfectly happy
+    // while every guild op silently became unauditable.
+    expect(applied).toContain(
+      'ALTER TABLE bank_ledger ADD COLUMN IF NOT EXISTS counterparty_copper_delta BIGINT',
+    );
+    expect(applied).toContain(
+      'ALTER TABLE bank_ledger ADD COLUMN IF NOT EXISTS counterparty_count INT',
+    );
     // Additive-only style within the two new blocks: inside the ONE core-SCHEMA
     // query call, slice from each CREATE TABLE to the next CREATE TABLE (or the end
     // of that call for the last table) and assert nothing destructive or
@@ -328,7 +343,11 @@ describe('ensureSchema wires every schema module at boot', () => {
   });
 
   it('applies the compact player-metrics schema without a boot backfill', async () => {
+    // Both phases, in the order server/main.ts runs them: the schema
+    // transaction, then the CONCURRENTLY builds, which are now a SEPARATE call
+    // made after listen (see the assertion further down).
     await ensureSchema();
+    await runConcurrentIndexMigrations();
     const applied = h.calls.join('\n');
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS player_account_facts');
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS player_activity_daily');
@@ -352,7 +371,7 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(sessionUnlock).toBeGreaterThan(concurrentIndex);
 
     // The boot transaction's SET LOCAL statement_timeout = 0 reverts at COMMIT,
-    // so the post-commit migration must re-disable it session-wide before taking
+    // so the concurrent phase must re-disable it session-wide before taking
     // the session lock: the advisory-lock wait and the concurrent build can both
     // outlast an operator-set database- or role-level statement_timeout.
     const postCommitTimeoutOff = h.calls.findIndex(
@@ -395,6 +414,29 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(h.calls[worst10sIdx]).toContain('worst_10s_frame_p95_ms DESC, created_at DESC');
   });
 
+  it('keeps the CONCURRENTLY builds OUT of ensureSchema (they run after listen)', async () => {
+    // The concurrent phase is its own entry point, deliberately: server/main.ts
+    // runs it AFTER listen, because a build on a genuinely large table
+    // serializes every realm process on the advisory lock and a slow build must
+    // delay the INDEX, not the realm. If it ever slid back into ensureSchema, a
+    // rolling restart would pay that stall on every realm at once again.
+    await ensureSchema();
+    // The literal statements, not the bare word: the boot DDL carries a SQL
+    // COMMENT mentioning CONCURRENTLY (unstuck_db.ts), and matching that would
+    // make this pin pass or fail for the wrong reason.
+    expect(h.calls.some((sql) => sql.includes('CREATE INDEX CONCURRENTLY'))).toBe(false);
+    expect(h.calls.some((sql) => sql.includes('DROP INDEX CONCURRENTLY'))).toBe(false);
+    // ...nor the SESSION-level lock the concurrent phase takes (boot uses the
+    // transaction-scoped pg_advisory_xact_lock).
+    expect(h.calls.some((sql) => sql.includes('pg_advisory_lock($1)'))).toBe(false);
+    // And the concurrent phase really does issue them, so this is not vacuous.
+    h.calls.length = 0;
+    await runConcurrentIndexMigrations();
+    expect(h.calls.some((sql) => sql.includes('CREATE INDEX CONCURRENTLY'))).toBe(true);
+    expect(h.calls.some((sql) => sql.includes('pg_advisory_lock($1)'))).toBe(true);
+    expect(h.calls.some((sql) => sql.includes('pg_advisory_unlock($1)'))).toBe(true);
+  });
+
   it('adds the phase 03 client-perf dimension columns as guarded boot DDL', async () => {
     await ensureSchema();
     const applied = h.calls.join('\n');
@@ -434,7 +476,7 @@ describe('ensureSchema wires every schema module at boot', () => {
     // maintained on every play_sessions write. Boot must drop the carcass and
     // rebuild.
     h.state.invalidMetricsIndexExists = true;
-    await ensureSchema();
+    await runConcurrentIndexMigrations();
     const sessionLock = h.calls.findIndex((sql) => sql.includes('pg_advisory_lock($1)'));
     const drop = h.calls.findIndex((sql) =>
       sql.includes('DROP INDEX CONCURRENTLY IF EXISTS play_sessions_account_started_id'),
@@ -457,11 +499,13 @@ describe('ensureSchema wires every schema module at boot', () => {
   });
 
   it('releases the session advisory lock when a concurrent index build fails', async () => {
-    // The post-commit loop has no per-entry containment (a failed build kills
-    // the boot, same as before the loop), but the finally must still release
-    // the session lock or every OTHER process's boot wedges behind it.
+    // The loop has no per-entry containment (a failed build rejects), but the
+    // finally must still release the session lock or every OTHER process's
+    // build wedges behind it forever. main.ts catches the rejection loudly and
+    // keeps serving: a realm already answering players must not be killed by an
+    // index build, and every entry is idempotent so the next boot retries.
     h.state.failOpenIndexCreate = true;
-    await expect(ensureSchema()).rejects.toThrow('index build interrupted');
+    await expect(runConcurrentIndexMigrations()).rejects.toThrow('index build interrupted');
     const failedCreate = h.calls.findIndex((sql) =>
       sql.includes('CREATE INDEX CONCURRENTLY IF NOT EXISTS play_sessions_open_character'),
     );
@@ -557,6 +601,7 @@ describe('ensureSchema wires every schema module at boot', () => {
       'play_sessions_ended_account',
       'guilds_realm_lower_name_prefix',
       'guilds_realm_created_id',
+      'bank_ledger_container_recent',
     ]);
     const guildPrefix = CONCURRENT_INDEX_MIGRATIONS.find(
       (m) => m.name === 'guilds_realm_lower_name_prefix',
@@ -572,6 +617,25 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(guildCreated?.createSql).toContain('ON guilds(realm, created_at, id)');
     expect(guildCreated?.checkSql).toContain("to_regclass('guilds_realm_created_id')");
     expect(guildCreated?.dropSql).toBe('DROP INDEX CONCURRENTLY IF EXISTS guilds_realm_created_id');
+    // The guild bank activity log's reader. Two things are load-bearing and both
+    // are pinned: the trailing `id DESC` (without it the "newest 50 rows of one
+    // guild" read still sorts that guild's whole keep-forever history), and the
+    // PARTIAL predicate (without it the index carries an entry for every
+    // personal-bank row, which no reader will ever ask for, as permanent write
+    // amplification on a table nothing prunes).
+    const bankLedgerContainer = CONCURRENT_INDEX_MIGRATIONS.find(
+      (m) => m.name === 'bank_ledger_container_recent',
+    );
+    expect(bankLedgerContainer?.createSql).toContain('ON bank_ledger(container_id, id DESC)');
+    expect(bankLedgerContainer?.createSql).toContain("WHERE container = 'guild'");
+    // `op` must NOT be an index column: a ScalarArrayOpExpr on a middle column
+    // forfeits the ordering guarantee the trailing id DESC exists for.
+    expect(bankLedgerContainer?.createSql).not.toContain('op');
+    expect(bankLedgerContainer?.createSql).toContain('CREATE INDEX CONCURRENTLY IF NOT EXISTS');
+    expect(bankLedgerContainer?.checkSql).toContain("to_regclass('bank_ledger_container_recent')");
+    expect(bankLedgerContainer?.dropSql).toBe(
+      'DROP INDEX CONCURRENTLY IF EXISTS bank_ledger_container_recent',
+    );
   });
 
   it('applies the rate-limit schema idempotently (a second boot re-issues the same DDL)', async () => {

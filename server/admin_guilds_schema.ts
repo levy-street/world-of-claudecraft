@@ -15,6 +15,14 @@ CREATE TABLE IF NOT EXISTS guild_moderation_actions (
   admin_account_id INT REFERENCES accounts(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+-- Additive (v0.34.x): the action this row records. Every pre-existing row is a
+-- rename, which is exactly the literal the realm-wide moderation union used to
+-- hardcode, so the DEFAULT backfills them correctly and the union now selects
+-- the column instead. 'guild_bank_purge' rows are the operator dormant-slot
+-- escape hatch (server/game.ts adminPurgeGuildBankSlot); they leave old_name
+-- and new_name equal because a purge never renames.
+ALTER TABLE guild_moderation_actions
+  ADD COLUMN IF NOT EXISTS action TEXT NOT NULL DEFAULT 'guild_rename';
 CREATE INDEX IF NOT EXISTS guild_moderation_actions_guild_created
   ON guild_moderation_actions(realm, guild_id, created_at DESC, id DESC);
 CREATE INDEX IF NOT EXISTS guild_moderation_actions_admin_account

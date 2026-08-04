@@ -276,10 +276,22 @@ describe('bank_window: search / sort / deposit-all', () => {
     expect(painter).toContain('bank-deposit-all');
   });
 
-  it('persists the filter under the bank-specific key via the tolerant parse/serialize', () => {
-    expect(painter).toContain("const BANK_FILTER_KEY = 'woc_bank_filter'");
-    expect(painter).toContain('parseBagFilter(localStorage.getItem(BANK_FILTER_KEY))');
-    expect(painter).toContain('serializeBagFilter(this.filter)');
+  it('persists category/sort under the bank-specific key; the search never enters storage', () => {
+    // Comment-stripped view so a comment carrying a pinned literal cannot satisfy
+    // these (the known source-text-pin trap); behavior is driven in
+    // tests/bank_window_search_reset.test.ts, these anchors keep the source rule
+    // named next to the storage key.
+    const code = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+    expect(code).toContain("const BANK_FILTER_KEY = 'woc_bank_filter'");
+    // The per-visit search rule holds at BOTH ends of the round trip:
+    // construction drops any stored query (legacy or reload-stranded) and
+    // eagerly rewrites a non-empty stored search out of existence...
+    expect(code).toContain('parseBagFilter(localStorage.getItem(BANK_FILTER_KEY))');
+    expect(code).toContain("const next = { ...parsed, search: '' }");
+    expect(code).toContain("if (parsed.search !== '')");
+    expect(code).toContain('localStorage.setItem(BANK_FILTER_KEY, serializeBagFilter(next))');
+    // ...and the serializer strips it from every write.
+    expect(code).toContain("serializeBagFilter({ ...this.filter, search: '' })");
   });
 
   it('runs the pure bank filter core, never a re-derived bag filter', () => {
@@ -358,7 +370,10 @@ describe('bank_window: search / sort / deposit-all', () => {
     expect(body).toContain('active === searchEl');
     expect(body).toContain('searchEl.selectionStart');
     expect(body).toContain('fresh.setSelectionRange(searchFocus.start, searchFocus.end)');
-    expect(body).toContain('if (hadFocus && !searchFocus)');
+    // Non-search focus re-lands via the key ladder (the focused control by its
+    // data-focus-key, else [data-close]), never a blanket close-button yank.
+    expect(body).toContain('} else if (hadFocus) {');
+    expect(body).toContain('this.restoreControlFocus(el, focusKey)');
   });
 
   it('holds deposit-all disabled from send until the mirror echoes (double-click guard)', () => {

@@ -1642,6 +1642,16 @@ export class OptionsWindow {
     note.className = 'kb-note';
     note.textContent = this.keybindNote || t('hud.options.keybindHelpMouseCamera');
     el.appendChild(note);
+    // Mouse buttons bind like keys (src/game/mouse_binds.ts); say so once here
+    // rather than rewording every capture prompt. Pointless on touch, which has
+    // no mouse, so it follows the same useTouchInterface() gate the rest of the
+    // desktop-only rows use.
+    if (!useTouchInterface()) {
+      const mouseNote = document.createElement('div');
+      mouseNote.className = 'kb-note';
+      mouseNote.textContent = t('hudChrome.keybinds.mouseHint');
+      el.appendChild(mouseNote);
+    }
     const cols = document.createElement('div');
     cols.className = 'kb-cols';
     // The Attack Move key is only meaningful (and only rebindable) while its mode

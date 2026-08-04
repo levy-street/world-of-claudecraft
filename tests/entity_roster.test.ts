@@ -248,6 +248,7 @@ function makeCtx() {
     devCommands: false,
     marketListings: [],
     bankerIds: [],
+    guildBanks: new Map(),
     vcup: createVcState(),
     deedDirtyPids: new Set<number>(),
     deedDirtyKeys: new Map<number, Set<string>>(),

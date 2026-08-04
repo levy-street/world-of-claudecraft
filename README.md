@@ -292,7 +292,7 @@ Press `G` to open the PvP window (Thornhollow Fields is its primary tab, beside 
 | `Z` / `X` | sheath or draw your weapons, emote wheel |
 | `V` / `R` / `Esc` | nameplates, autorun, close the top window (or open the game menu) |
 
-Every binding is remappable in the keybinds panel. Touch controls (a movement stick, camera drag, and on-screen action buttons) come up automatically on mobile.
+Every binding is remappable in the keybinds panel, and mouse buttons bind like keys: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world. Touch controls (a movement stick, camera drag, and on-screen action buttons) come up automatically on mobile.
 
 ## Architecture (one sim, three hosts)
 

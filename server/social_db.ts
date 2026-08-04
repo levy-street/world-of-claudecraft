@@ -16,6 +16,15 @@ import type { CharInfo, CharRef, GuildEventRow, GuildRank, SocialDb } from './so
 // kept as an alias for the schema's column default; the live realm is REALM
 export const DEFAULT_REALM = REALM;
 
+/** guild_members.joined_at (TIMESTAMPTZ) as finite epoch ms, or null. The
+ *  explicit finite guard (the discord_db joined-at precedent) keeps a bad
+ *  driver value from riding the wire as NaN. */
+function joinedAtEpochMs(raw: unknown): number | null {
+  if (raw === null || raw === undefined) return null;
+  const ms = new Date(raw as string | Date).getTime();
+  return Number.isFinite(ms) ? ms : null;
+}
+
 export const SOCIAL_SCHEMA = `
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS realm TEXT NOT NULL DEFAULT '${DEFAULT_REALM.replace(/'/g, "''")}';
 CREATE INDEX IF NOT EXISTS characters_realm ON characters(realm);
@@ -141,6 +150,28 @@ CREATE TABLE IF NOT EXISTS guild_events (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS guild_events_guild_day ON guild_events(guild_id, day);
+
+-- Guild bank books (Guild Bank Phase 3): one JSONB book per guild (treasury,
+-- inventory, purchasedSlots; the shape src/sim/guild_bank.ts owns). Lives in
+-- this schema family because guilds owns the parent row: a committed guild
+-- DELETE cascades the book away. ROLLBACK SAFETY: the ONLY thing standing
+-- between that cascade and destroyed escrow value is the empty-bank guard in
+-- server/social.ts, which BOTH guild-deleting paths must keep (guildDisband
+-- AND the last-member arm of guildLeave, each consulting guildBankHoldings
+-- and failing closed on an unloaded book). Any future code change that adds
+-- a guild-deleting path or reorders either guard past its DELETE re-opens
+-- item/copper destruction; tests/social_system.test.ts pins both guards.
+-- Boot-loaded per realm (realm rides the row for that read); every write runs
+-- inside the character-lease-fenced escrow transaction in server/db.ts, never
+-- standalone. realm carries no DEFAULT deliberately: the interpolated-default
+-- pattern is last-boot-wins across realm processes, so every insert passes
+-- realm explicitly.
+CREATE TABLE IF NOT EXISTS guild_banks (
+  guild_id INT PRIMARY KEY REFERENCES guilds(id) ON DELETE CASCADE,
+  realm TEXT NOT NULL,
+  data JSONB NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 `;
 
 const CHAR_COLS = 'id, name, class AS cls, level, realm';
@@ -394,12 +425,21 @@ export class PgSocialDb implements SocialDb {
     bustAdminGuildListReads();
   }
 
-  async setGuildRank(charId: number, rank: GuildRank): Promise<void> {
-    await this.pool.query('UPDATE guild_members SET rank = $2 WHERE character_id = $1', [
-      charId,
-      rank,
-    ]);
+  async setGuildRank(charId: number, guildId: number, rank: GuildRank): Promise<boolean> {
+    // Both predicates matter: the guild_id guard means a rank change decided
+    // against guild A can never rewrite a row the target has since moved to
+    // guild B, and the checked rowcount tells the caller whether the UPDATE
+    // actually landed (a leave/kick/disband may have removed the row between
+    // the caller's membership read and this write). The caller must treat
+    // false as a refusal and stamp NOTHING: the live sim's guild membership
+    // stamp authorizes guild bank access, so stamping a rank the DB refused
+    // is privilege escalation.
+    const res = await this.pool.query(
+      'UPDATE guild_members SET rank = $2 WHERE character_id = $1 AND guild_id = $3',
+      [charId, rank, guildId],
+    );
     bustAdminGuildListReads();
+    return (res.rowCount ?? 0) > 0;
   }
 
   async transferGuildLeader(
@@ -467,24 +507,30 @@ export class PgSocialDb implements SocialDb {
     return { motd: row?.motd ?? '', motdSetBy: row?.motdSetBy ?? '' };
   }
 
-  async guildMembers(
-    guildId: number,
-  ): Promise<
-    (CharInfo & { rank: GuildRank; lastLogin: string | null; activeTitle: string | null })[]
+  async guildMembers(guildId: number): Promise<
+    (CharInfo & {
+      rank: GuildRank;
+      lastLogin: string | null;
+      activeTitle: string | null;
+      joinedAt: number | null;
+    })[]
   > {
     const res = await this.pool.query(
       `SELECT c.id, c.name, c.class AS cls, c.level, c.realm, c.last_login AS "lastLogin", gm.rank,
-              c.state->>'activeTitle' AS active_title
+              gm.joined_at AS "joinedAt", c.state->>'activeTitle' AS active_title
        FROM guild_members gm JOIN characters c ON c.id = gm.character_id
        WHERE gm.guild_id = $1 ORDER BY gm.joined_at`,
       [guildId],
     );
     // last_login is a TIMESTAMPTZ; serialize to an ISO string for the wire (never a
-    // raw Date), null when the character has never entered the world. active_title
-    // normalizes exactly like charactersForDeedsBoard (a deed id or null).
+    // raw Date), null when the character has never entered the world. joined_at is
+    // NOT NULL in the DDL, so the null arm is defensive only; it rides the wire as
+    // epoch milliseconds (drives the roster tenure badges). active_title normalizes
+    // exactly like charactersForDeedsBoard (a deed id or null).
     return res.rows.map(({ active_title, ...r }) => ({
       ...r,
       lastLogin: r.lastLogin ? new Date(r.lastLogin).toISOString() : null,
+      joinedAt: joinedAtEpochMs(r.joinedAt),
       activeTitle: typeof active_title === 'string' && active_title !== '' ? active_title : null,
     }));
   }

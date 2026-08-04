@@ -25,6 +25,7 @@ import {
 } from '../sim/professions/material_grades';
 import { type StationType, stationsOfType } from '../sim/professions/stations';
 import { trainingStationTypeFor } from '../sim/professions/training';
+import type { ProfessionRecipeRecord } from '../sim/professions/types';
 import { MINIMAL_TIER_MULTIPLIER, REDUCED_TIER_MULTIPLIER } from '../sim/professions/wheel';
 import type { InvSlot, ItemDef, StationDef } from '../sim/types';
 import { isRecipeKnownForViewer } from './hud/vendor/train_view';
@@ -390,6 +391,23 @@ export function resolveSelectedCraft(
 ): string | null {
   if (requested !== null && tabs.some((tab) => tab.professionId === requested)) return requested;
   return tabs.length > 0 ? tabs[0].professionId : null;
+}
+
+/** True when `craftId` would own a tab for this viewer: at least one recipe
+ *  of that craft is known (craftingTabs' membership rule, restated through
+ *  the SHARED isRecipeKnownForViewer predicate without building the view).
+ *  The gossip Crafting shortcut checks this before persisting its pre-select
+ *  so it never clobbers the saved tab preference (issue #2347) with a craft
+ *  the window cannot show; resolveSelectedCraft still guards the render. */
+export function craftOwnsTab(
+  recipes: readonly ProfessionRecipeRecord[],
+  knownRecipes: readonly string[],
+  craftId: string,
+): boolean {
+  const known = new Set(knownRecipes);
+  return recipes.some(
+    (recipe) => recipe.professionId === craftId && isRecipeKnownForViewer(recipe, known),
+  );
 }
 
 /** One craft's "learnable at a master" pointer: the station type that serves it

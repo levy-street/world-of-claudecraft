@@ -41,6 +41,19 @@ const historyData = {
   ],
 };
 
+// The guild bank panel rides the same detail page (its own coverage lives in
+// tests/admin/guild_bank_panel.test.ts); this fixture keeps the page coherent
+// and lets the gating assertions below stay honest.
+const bankState = {
+  guildId: 12,
+  treasury: 12_345,
+  capacity: 24,
+  purchasedSlots: 24,
+  usedSlots: 0,
+  dormantSlots: 0,
+  slots: [],
+};
+
 const directory = {
   rows: [
     {
@@ -77,6 +90,7 @@ vi.mock('../../src/admin/api', () => ({
       return { ...detail, guild: { ...detail.guild, id: 13, memberCount: 137 } };
     }
     if (path === '/admin/api/guilds/12/history') return historyData;
+    if (path === '/admin/api/guilds/12/bank') return bankState;
     throw new Error(`unexpected path ${path}`);
   }),
   apiPost: vi.fn(async () => ({})),
@@ -320,6 +334,10 @@ describe('Guilds page', () => {
     ).not.toBeInTheDocument();
     expect(vi.mocked(apiGet)).toHaveBeenCalledWith('/admin/api/guilds/12');
     expect(vi.mocked(apiGet)).not.toHaveBeenCalledWith('/admin/api/guilds/12/history');
+    // The bank panel is a guild's private property, gated with the audit panel:
+    // an accounts.read operator neither sees it nor reads the live book.
+    expect(screen.queryByText(t('guilds.bankTitle'))).not.toBeInTheDocument();
+    expect(vi.mocked(apiGet)).not.toHaveBeenCalledWith('/admin/api/guilds/12/bank');
   });
 
   it('says the roster is partial when the guild is above the paged member cap', async () => {

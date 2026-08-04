@@ -465,6 +465,8 @@ export const en = {
       'Choose an installed browser wallet, or open Reown AppKit for Phantom, Solflare, Backpack, and more.',
     mobileAppHelp:
       'Choose Phantom or Solflare. Your wallet app will ask for approval. Keep this game open and return to it when finished.',
+    seekerAppHelp:
+      'Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.',
     standaloneAppHelp:
       'Wallet connections are not available in the Home Screen app yet. Open World of ClaudeCraft in Safari or Chrome to use Phantom or Solflare.',
     openAppTitle: 'Continue in {wallet}',

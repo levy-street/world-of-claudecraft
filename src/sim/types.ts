@@ -480,6 +480,13 @@ export interface Aura {
   // Encounter-authored control that must land through immunity and cannot be
   // removed by player counters. Natural expiry and encounter cleanup still own it.
   unbreakableControl?: true;
+  // A penalty no player counter may shed: dispel, purge, and cleanse all skip it, and
+  // it is never right-click cancelable. Only its own timer takes it off. Set today at
+  // exactly one site, applySickness in ./spirit.ts, which serves both recovery
+  // sicknesses, matching the fact that they already survive death and relogging;
+  // without it a single dispel erased the entire Pale Keeper / unstuck penalty. The
+  // rule itself is isPlayerRemovableAura in ./aura_classify.ts.
+  undispellable?: true;
   breaksOnDamage?: boolean;
   // Lingering Dread lets a break-on-damage fear absorb this much damage before
   // breaking. Undefined retains the normal break-on-any-damage behavior.
@@ -1040,6 +1047,24 @@ export interface InvSlot {
 export function cloneInvSlot<T extends InvSlot>(slot: T): T {
   if (!slot.instance) return { ...slot };
   return { ...slot, instance: cloneItemInstancePayload(slot.instance) };
+}
+
+/** ONE unit lifted out of an inventory slot, carrying BOTH provenance channels
+ *  the slot can hold: the per-instance `instance` payload and the plain-stack
+ *  `craftedRecipeId` marker. Any remover that reports what it consumed must
+ *  return this, never the bare payload: a plain crafted stack has no `instance`
+ *  at all, so a payload-only return silently drops its marker and the re-grant
+ *  launders the copy (the class the trade/market/mail/bank fixes each closed
+ *  at their own boundary). THE shape for this, not one of several: items.ts
+ *  (VendorRemovedUnit, the equip bridge) and professions/enchanting.ts
+ *  (ConsumedDisenchantUnit) alias it rather than redeclare it, so a remover
+ *  cannot quietly grow a third spelling that reports only one channel.
+ *  Returned by Sim.removeEnchantableItem, items.ts removeVendorSellUnits,
+ *  item_instance_transfer.ts removeMatchingInstance, and enchanting.ts's
+ *  victim walks. */
+export interface InventoryUnit {
+  instance: ItemInstancePayload | undefined;
+  craftedRecipeId: string | undefined;
 }
 
 export interface LootSlot extends InvSlot {
@@ -2655,9 +2680,11 @@ export interface ZoneDef {
   // to the Pale Causeway's head so the Wyrmgate opens where the road arrives.
   southPassX?: number;
   // Per-zone override of the open-world trash respawn delay (seconds), which
-  // otherwise comes from this zone's level band (src/sim/respawn_policy.ts
-  // trashRespawnSecondsForZone). An explicit SimConfig.respawnSeconds still
-  // wins over it, and a MobTemplate.respawnSeconds still wins over both.
+  // otherwise is the single world delay TRASH_RESPAWN_SECONDS
+  // (src/sim/respawn_policy.ts trashRespawnSecondsForZone; the level-band tiers
+  // that used to decide it are retired, see that file's header). An explicit
+  // SimConfig.respawnSeconds still wins over it, and a MobTemplate.respawnSeconds
+  // still wins over both.
   trashRespawnSeconds?: number;
 }
 
@@ -2996,6 +3023,10 @@ export interface QuestProgress {
   state: 'active' | 'ready' | 'done';
   selection?: string;
   resolvedCounts?: number[];
+  // Ledger of the distinct objects an `interact` objective has already been
+  // credited off, so one object cannot satisfy a multi-count objective on its
+  // own (see quests/interact_object_credit.ts). Absent until the first credit.
+  creditedObjects?: string[];
 }
 
 export function questObjectiveRequired(
@@ -4803,7 +4834,12 @@ export type SimEvent = { pid?: number } & (
         | 'insufficient_essence'
         | 'invalid_stat'
         | 'invalid_gem'
-        | 'sockets_full';
+        | 'sockets_full'
+        // Type-level only: the while-dead refusal is returned to callers but
+        // never emitted (the three dead-gate early returns in
+        // rift/progression.ts sit ABOVE emitResult); its one player-facing
+        // surface is the shared "You can't do that while dead." error line.
+        | 'dead';
       upgradeLevel?: number;
       essenceSpent?: number;
     }
@@ -5299,9 +5335,12 @@ export interface SimConfig {
   // omits it. Passing a reference allocates nothing and stays behavior-inert (the
   // host reads it, the sim never does), so the parity/determinism gates are untouched.
   perfLap?: (phase: string, entity?: Entity) => void;
-  // Headless RL host throttle: when positive, idle ownerless mobs farther than this
-  // many world units from every player skip their per-tick idle AI. Offline/server
-  // hosts leave it unset so their world simulation remains fully live.
+  // Distance-cull throttle: when positive, idle ownerless mobs farther than this many
+  // world units from every player skip their per-tick idle AI. Per host: the offline
+  // browser Sim and every deterministic golden/test Sim leave it unset (0, fully live,
+  // draw-order stable); the live GameServer sets it to INTEREST_DROP_RADIUS (the same
+  // distance a mob stays known/rendered to a viewer, see server/game.ts, #2703); the
+  // headless RL env sets its own throttle (headless/env_server.ts).
   idleMobTickRadius?: number;
   // When true, the Sowfield auto-runs a bot-vs-bot showcase match after a stretch
   // of no queue activity, so a walk-up spectator always has a game to watch (and

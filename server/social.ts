@@ -53,6 +53,10 @@ export interface GuildMemberEntry extends CharInfo {
   // ISO-8601 timestamp of the member's most recent world-entry, or null if never
   // recorded. Serialized server-side (server/social_db.ts) and shown in the roster.
   lastLogin: string | null;
+  // Epoch-ms timestamp of when the member joined the guild (guild_members.joined_at,
+  // NOT NULL in the DDL, so null is the defensive arm only). Drives the client's
+  // roster tenure badges.
+  joinedAt: number | null;
   // The selected Book of Deeds title (a deed id, null untitled), as on FriendEntry.
   activeTitle: string | null;
   online: boolean;
@@ -133,7 +137,13 @@ export interface SocialDb {
     limit: number,
   ): Promise<'ok' | 'full' | 'already_member' | 'no_guild'>;
   removeGuildMember(charId: number): Promise<void>;
-  setGuildRank(charId: number, rank: GuildRank): Promise<void>;
+  // Rank write predicated on BOTH the character and the guild the caller
+  // authorized against, returning whether a row actually moved. False means
+  // the target left that guild (or switched guilds) between the caller's
+  // membership read and this write: the caller must treat it as a refusal
+  // and stamp nothing (the live membership stamp gates the guild bank, so a
+  // stamp the DB refused is privilege escalation, see guildSetRank).
+  setGuildRank(charId: number, guildId: number, rank: GuildRank): Promise<boolean>;
   // hand off the Guild Master title atomically: locks the guild row, re-checks
   // that fromCharId is still the leader and toCharId is still a member of the
   // SAME guild, then promotes/demotes both rows in one transaction, so two
@@ -143,10 +153,13 @@ export interface SocialDb {
     fromCharId: number,
     toCharId: number,
   ): Promise<'ok' | 'not_leader' | 'not_member' | 'no_guild'>;
-  guildMembers(
-    guildId: number,
-  ): Promise<
-    (CharInfo & { rank: GuildRank; lastLogin: string | null; activeTitle: string | null })[]
+  guildMembers(guildId: number): Promise<
+    (CharInfo & {
+      rank: GuildRank;
+      lastLogin: string | null;
+      activeTitle: string | null;
+      joinedAt: number | null;
+    })[]
   >;
   // guild billboard (motd): the officer-set message + setter name on the guilds row
   setGuildMotd(guildId: number, motd: string, setBy: string): Promise<void>;
@@ -207,6 +220,53 @@ export interface SocialTransport {
   // (guildsFounded is the one server-produced DeedStatKey; see its doc in
   // src/sim/types.ts)
   onGuildFounded(characterId: number): void;
+  // A guild membership or rank mutation just COMMITTED in the DB for this
+  // character. The transport owner re-stamps the live sim SYNCHRONOUSLY (the
+  // session-only PlayerMeta.guildMembership stamp plus the nameplate guild
+  // name, one combined entry point), because the Guild Bank's officer-plus
+  // gate reads the stamped rank: routing this through the async pushSnapshot
+  // path alone would leave a stale-rank window between the DB commit and the
+  // snapshot's arrival. Called with null on leave, kick, and disband. Offline
+  // characters have no live sim state to stamp (the owner no-ops); the join
+  // path re-stamps them from the snapshot chokepoint.
+  onGuildMembershipChanged(
+    characterId: number,
+    membership: { guildId: number; guildName: string; rank: GuildRank } | null,
+  ): void;
+  // The guild CREATE just committed (the same success arm that stamps the
+  // founder, after onGuildMembershipChanged). The transport owner seeds the
+  // new guild's EMPTY book into the LIVE sim (ops never lazily create a book:
+  // loadGuildBank is load-once, and a lazy book would shadow the persisted
+  // row after a restart) and consumes the gate-reserved creation fee
+  // (reserve-at-gate, state.md): the create_fee ledger row and the escrow
+  // save of the already-charged purse.
+  onGuildCreated(characterId: number, guildId: number): void;
+  // The guild DELETE just committed (the empty-bank guard below passed). The
+  // transport owner EVICTS the guild's book from the live sim so the map
+  // stays bounded and a re-created guild id can never inherit a stale book;
+  // the guild_banks row cascades away with the guilds DELETE.
+  onGuildDisbanded(guildId: number): void;
+  // OPEN the guild-delete window and report what the guild's LIVE bank book
+  // holds, for the empty-bank guard both guild-deleting paths run. Returns
+  // null when the guard must fail CLOSED: no book is loaded (an unloaded book
+  // cannot prove the DB row is empty, and disbanding would cascade-delete it),
+  // a session holds unflushed book work, or another delete already holds the
+  // window.
+  //
+  // The window, not just the read, is the point. The guard is synchronous but
+  // the DELETE is two awaits away, and dispatched guild bank ops are NOT
+  // tick-gated: an op landing in that gap used to be destroyed outright by the
+  // FK cascade with its dirty mark wiped by the post-commit hook. While the
+  // window is held every guild bank op for that guild is refused, so the guard
+  // still means what it says at the moment the row actually goes away.
+  //
+  // ONLY call endGuildBankDelete when this returned non-null: a null means the
+  // window was not taken (possibly because someone else holds it), and
+  // releasing it would open the gap under them.
+  beginGuildBankDelete(guildId: number): { copper: number; items: number } | null;
+  // CLOSE the window opened above. Must run on every arm (refusal, throw, or
+  // commit), or that guild's bank stays refused until the realm restarts.
+  endGuildBankDelete(guildId: number): void;
   // true if `recipientId` has `senderCharacterId` on their BLOCK list, so
   // guild/officer chat can honour the same filter say/whisper already apply
   isBlocking(recipientId: number, senderCharacterId: number): boolean;
@@ -346,6 +406,12 @@ export class SocialService {
     private readonly db: SocialDb,
     private readonly tx: SocialTransport,
     private readonly now: () => number = () => Date.now(),
+    // Guild-name content screen, injected so the service stays hermetic in tests:
+    // production wires offensiveName from server/auth.ts (server/game.ts). Required
+    // on purpose (no fail-open default): every construction site must decide what
+    // it screens. Applies at creation only; existing guild names are never
+    // retro-scanned here.
+    private readonly isNameOffensive: (name: string) => boolean,
   ) {}
 
   // -------------------------------------------------------------------------
@@ -762,11 +828,23 @@ export class SocialService {
   // Guilds
   // -------------------------------------------------------------------------
 
-  async guildCreate(actor: SocialActor, rawName: string): Promise<void> {
+  // Returns true ONLY on the committed success arm; false on every refusal.
+  // The caller reserved the creation fee at its dispatch gate (reserve-at-gate,
+  // Guild Bank Phase 3 QA) and refunds it when this reports false (or throws).
+  async guildCreate(actor: SocialActor, rawName: string): Promise<boolean> {
     const name = validateGuildName(rawName);
     if (!name) {
       this.err(actor.characterId, 'Guild names are 3-24 letters (spaces allowed).');
-      return;
+      return false;
+    }
+    // Content screen (server-authoritative; the client has no say): refuse an
+    // offensive name before any row is created, so a refused create never exists.
+    if (this.isNameOffensive(name)) {
+      this.err(actor.characterId, 'That guild name is not allowed.');
+      // false, never a bare return: the caller reserves the creation fee at the
+      // dispatch gate and refunds on every falsy arm, so returning undefined
+      // here would charge a founder for a guild that was never created.
+      return false;
     }
     const result = await this.db.createGuildWithLeader(name, actor.characterId);
     if ('error' in result) {
@@ -776,8 +854,20 @@ export class SocialService {
           ? `A guild named '${name}' already exists.`
           : 'You are already in a guild.',
       );
-      return;
+      return false;
     }
+    // Founder is seated as leader in the same transaction as the create: stamp
+    // the live sim before any push resolves (the guild bank rank gate).
+    this.tx.onGuildMembershipChanged(actor.characterId, {
+      guildId: result.guildId,
+      guildName: name,
+      rank: 'leader',
+    });
+    // Same success arm, right after the stamp: seed the empty book into the
+    // live sim and consume the gate-reserved creation fee (the create_fee
+    // ledger row; the transport owner does both). A refused create above must
+    // never reach this.
+    this.tx.onGuildCreated(actor.characterId, result.guildId);
     // Founder credit rides the transport seam: soc_guild_founded reads the
     // guildsFounded deed stat, which only this success arm may ever produce
     // (a refused create above must never reach it).
@@ -788,6 +878,7 @@ export class SocialService {
       '#40ff7f',
     );
     this.push(actor.characterId);
+    return true;
   }
 
   async guildInvite(actor: SocialActor, name: string): Promise<void> {
@@ -869,6 +960,12 @@ export class SocialService {
       this.err(actor.characterId, 'That guild is full.');
       return;
     }
+    // Seated in the DB: stamp the live sim before any push resolves.
+    this.tx.onGuildMembershipChanged(actor.characterId, {
+      guildId: invite.guildId,
+      guildName: invite.guildName,
+      rank: 'member',
+    });
     await this.broadcastGuild(invite.guildId, [
       { type: 'log', text: `${actor.name} has joined the guild.`, color: '#40ff7f' },
     ]);
@@ -896,10 +993,54 @@ export class SocialService {
       );
       return;
     }
+    // Last member out DELETES the guild below, which cascades the guild_banks
+    // row away exactly like /gdisband, so the SAME empty-bank guard must hold
+    // here: a solo Guild Master's /gquit with a stocked bank would otherwise
+    // destroy the book's copper and items. Checked BEFORE the member row is
+    // removed, so a refusal leaves the membership untouched; fails CLOSED on
+    // an unloaded book (null holdings), because an unloaded book cannot prove
+    // the persisted row is empty.
+    let deleteWindow = false;
+    if (others.length === 0) {
+      const holdings = this.tx.beginGuildBankDelete(membership.guildId);
+      deleteWindow = holdings !== null;
+      if (!holdings || holdings.copper > 0 || holdings.items > 0) {
+        if (deleteWindow) this.tx.endGuildBankDelete(membership.guildId);
+        this.err(
+          actor.characterId,
+          'The guild bank must be emptied before the guild can be disbanded.',
+        );
+        return;
+      }
+    }
+    try {
+      await this.finishGuildLeave(actor, membership, others);
+    } finally {
+      // The window spans the guard to the DELETE and its post-commit hooks;
+      // releasing it early (or not at all) is what reopens the gap.
+      if (deleteWindow) this.tx.endGuildBankDelete(membership.guildId);
+    }
+  }
+
+  /** The committed tail of guildLeave, after the empty-bank guard: the member
+   *  row, the stamp clear, and (for the last member out) the guilds DELETE that
+   *  cascades the book row away. Split out so the caller can hold the
+   *  guild-delete window across all of it with one try/finally. */
+  private async finishGuildLeave(
+    actor: SocialActor,
+    membership: { guildId: number; guildName: string },
+    others: { id: number }[],
+  ): Promise<void> {
     await this.db.removeGuildMember(actor.characterId);
+    // Removed in the DB: clear the live sim stamp before any push resolves
+    // (both arms below; the guild bank rank gate must not see a stale rank).
+    this.tx.onGuildMembershipChanged(actor.characterId, null);
     if (others.length === 0) {
       // last member out: the guild ceases to exist
       await this.db.deleteGuild(membership.guildId);
+      // Committed: evict the (empty) book, the same post-DELETE hook as
+      // guildDisband, so no stale book survives keyed to a dead guild id.
+      this.tx.onGuildDisbanded(membership.guildId);
       this.info(
         actor.characterId,
         `You have left <${membership.guildName}>. The guild has disbanded.`,
@@ -955,6 +1096,18 @@ export class SocialService {
       this.err(actor.characterId, `${target.name} is not in your guild.`);
       return;
     }
+    // Both rows moved in one DB transaction (target -> leader, former leader
+    // -> officer): stamp both live sims before any push resolves.
+    this.tx.onGuildMembershipChanged(target.id, {
+      guildId: membership.guildId,
+      guildName: membership.guildName,
+      rank: 'leader',
+    });
+    this.tx.onGuildMembershipChanged(actor.characterId, {
+      guildId: membership.guildId,
+      guildName: membership.guildName,
+      rank: 'officer',
+    });
     await this.broadcastGuild(membership.guildId, [
       {
         type: 'log',
@@ -976,13 +1129,43 @@ export class SocialService {
       this.err(actor.characterId, 'Only the Guild Master may disband the guild.');
       return;
     }
-    const members = await this.db.guildMembers(membership.guildId);
-    await this.db.deleteGuild(membership.guildId);
-    for (const m of members) {
-      if (this.tx.isOnline(m.id)) {
-        this.info(m.id, `<${membership.guildName}> has been disbanded.`, '#ffd100');
-        this.push(m.id);
+    // The guild bank guard: the guilds DELETE below cascades the guild_banks
+    // row away, so a disband while the bank holds ANY copper or item would
+    // destroy them. The LIVE sim book is authoritative here (every flushed op
+    // came from it); null means no book is loaded, which fails CLOSED, because
+    // an unloaded book cannot prove the persisted row is empty (the oversized-
+    // row boot skip is exactly this state, and its row must survive).
+    //
+    // The guard OPENS the guild-delete window and holds it all the way to the
+    // DELETE: the guildMembers read below is an await, and a dispatched guild
+    // bank op is not tick-gated, so an op landing in that gap was previously
+    // destroyed by the cascade with its dirty mark wiped by onGuildDisbanded.
+    const holdings = this.tx.beginGuildBankDelete(membership.guildId);
+    if (!holdings || holdings.copper > 0 || holdings.items > 0) {
+      if (holdings) this.tx.endGuildBankDelete(membership.guildId);
+      this.err(
+        actor.characterId,
+        'The guild bank must be emptied before the guild can be disbanded.',
+      );
+      return;
+    }
+    try {
+      const members = await this.db.guildMembers(membership.guildId);
+      await this.db.deleteGuild(membership.guildId);
+      // Committed: evict the (empty) book from the live sim AFTER the guard
+      // passed, so the map stays bounded and a re-created guild id starts fresh.
+      this.tx.onGuildDisbanded(membership.guildId);
+      for (const m of members) {
+        // Every member's stamp clears, online or not (the transport no-ops for
+        // characters with no live session; they re-stamp null at next join).
+        this.tx.onGuildMembershipChanged(m.id, null);
+        if (this.tx.isOnline(m.id)) {
+          this.info(m.id, `<${membership.guildName}> has been disbanded.`, '#ffd100');
+          this.push(m.id);
+        }
       }
+    } finally {
+      this.tx.endGuildBankDelete(membership.guildId);
     }
   }
 
@@ -1019,6 +1202,8 @@ export class SocialService {
       return;
     }
     await this.db.removeGuildMember(target.id);
+    // Removed in the DB: clear the live sim stamp before any push resolves.
+    this.tx.onGuildMembershipChanged(target.id, null);
     if (this.tx.isOnline(target.id)) {
       this.info(target.id, `You have been removed from <${membership.guildName}>.`, '#ffd100');
       this.push(target.id);
@@ -1061,7 +1246,26 @@ export class SocialService {
       this.err(actor.characterId, `${target.name} is already ${RANK_LABEL[rank]}.`);
       return;
     }
-    await this.db.setGuildRank(target.id, rank);
+    const moved = await this.db.setGuildRank(target.id, membership.guildId, rank);
+    if (!moved) {
+      // The target's row left this guild (a leave, kick, disband, or guild
+      // switch committed between the membership read above and the UPDATE):
+      // the predicated write matched no row, so NOTHING changed in the DB and
+      // NOTHING may be stamped. Stamping here would assert a rank the DB
+      // refused, which the guild bank's officer gate would honor: privilege
+      // escalation with no corrective push (a removed character is no longer
+      // in pushGuild's member list).
+      this.err(actor.characterId, `${target.name} is not in your guild.`);
+      return;
+    }
+    // Rank moved in the DB (row confirmed): stamp the live sim before any
+    // push resolves. A demote lands on the guild bank's officer gate
+    // IMMEDIATELY (the stale-rank window is privilege-escalation-shaped).
+    this.tx.onGuildMembershipChanged(target.id, {
+      guildId: membership.guildId,
+      guildName: membership.guildName,
+      rank,
+    });
     await this.broadcastGuild(membership.guildId, [
       { type: 'log', text: `${target.name} is now ${RANK_LABEL[rank]}.`, color: '#40ff7f' },
     ]);

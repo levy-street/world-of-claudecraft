@@ -14,6 +14,7 @@
 import { audio } from '../game/audio';
 import { ITEMS } from '../sim/data';
 import { itemInstancePayloadsEqual } from '../sim/item_instance_merge';
+import { isTransferLockedInstance } from '../sim/item_instance_transfer';
 import type { InvSlot, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { markDialogRoot } from './dialog_root';
@@ -25,6 +26,7 @@ import { formatMoney, formatNumber, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import {
   buildMailboxView,
+  canStageInstancedCopy,
   clampParcelQty,
   type MailInboxBody,
   type MailInboxRow,
@@ -138,12 +140,19 @@ export class MailboxWindow {
       return;
     }
     if (instance) {
-      // One chip per distinct copy: a byte-equal duplicate stages once (the
-      // plain dedup rule, payload-aware); differently-instanced copies of one
-      // item id each get their own chip.
+      // One chip per COPY, not per distinct payload: byte-equal copies are
+      // interchangeable and the sim escrows each named entry separately, so a
+      // player holding several identical signed copies can send several in one
+      // letter (bounded by what they hold unlocked and by the parcel limit
+      // above). Differently-instanced copies of one item id each get their own
+      // chip as before.
       if (
-        this.attachments.some(
-          (s) => s.itemId === itemId && itemInstancePayloadsEqual(s.instance, instance),
+        !canStageInstancedCopy(
+          this.attachments,
+          itemId,
+          instance,
+          this.ownedInstancedCountFor(itemId, instance),
+          max,
         )
       )
         return;
@@ -175,6 +184,26 @@ export class MailboxWindow {
     return this.deps
       .world()
       .inventory.filter((s) => s.itemId === itemId && !s.instance)
+      .reduce((n, s) => n + s.count, 0);
+  }
+
+  /**
+   * Held copies of one item id whose payload is byte-equal to `instance` AND
+   * are not transfer-locked: the instanced twin of ownedCountFor above, and the
+   * exact mirror of the sim's escrow validation (item_instance_transfer.ts
+   * countMatchingUnlocked), so the staging ceiling can never exceed what the
+   * send path will actually escrow.
+   */
+  private ownedInstancedCountFor(itemId: string, instance: ItemInstancePayload): number {
+    return this.deps
+      .world()
+      .inventory.filter(
+        (s) =>
+          s.itemId === itemId &&
+          !!s.instance &&
+          !isTransferLockedInstance(s.instance) &&
+          itemInstancePayloadsEqual(s.instance, instance),
+      )
       .reduce((n, s) => n + s.count, 0);
   }
 

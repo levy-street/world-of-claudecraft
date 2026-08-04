@@ -761,6 +761,50 @@ describe('asset library registry parsers', () => {
     expect(Object.fromEntries(parsed)).toEqual(WORLD_TUNING);
   });
 
+  it('the viewer twin shell POWERS match src/render/weapon_vfx.ts, and stay above zero', async () => {
+    // The exponent half of the pow() domain, on the offline mirror. The base
+    // half is guarded tree-wide by tests/shader_pow_domain.test.ts, and the
+    // runtime exponents by tests/weapon_vfx_specs.test.ts, but that suite
+    // imports src/ and so says nothing about this file: with the base now
+    // clamped, a mirror shell power edited to 0 makes the offline makeShell
+    // path evaluate pow(0.0, 0.0), which is undefined exactly as a negative
+    // base is, and every other suite stays green.
+    const { TIERS } = await import('../src/render/weapon_vfx');
+    const twinSrc = readFileSync(join(ROOT, 'scripts/asset_pipeline/weapon_vfx.js'), 'utf8');
+    const block = twinSrc.match(/export const TIERS = \{([\s\S]*?)\n\};/);
+    expect(block, 'weapon_vfx.js twin must export TIERS').toBeTruthy();
+    const body = block?.[1] ?? '';
+
+    // Keyed by tier name rather than by position, so a reordered twin compares
+    // the rows a reader would expect it to compare.
+    const headers = [...body.matchAll(/^ {2}(\w+): \{$/gm)];
+    const twinPowers: Record<string, number> = {};
+    for (const [index, header] of headers.entries()) {
+      const end = headers[index + 1]?.index ?? body.length;
+      const section = body.slice(header.index ?? 0, end);
+      const power = section.match(/shell: \{[^}]*\bpower: (-?[\d.]+)/);
+      if (power) twinPowers[header[1]] = Number(power[1]);
+    }
+
+    const realPowers = Object.fromEntries(
+      Object.entries(TIERS).map(([name, tier]) => [name, tier.shell.power]),
+    );
+    expect(twinPowers).toEqual(realPowers);
+    // Vacuity floor: an equality against an empty object passes, and a parser
+    // that silently matched nothing is the way this pin dies quietly.
+    expect(Object.keys(twinPowers).length).toBe(Object.keys(TIERS).length);
+    for (const [name, power] of Object.entries(twinPowers)) {
+      expect(power, `twin tier ${name}: shell power must be > 0`).toBeGreaterThan(0);
+    }
+    // Every shell row in the WHOLE twin, not only the tier table: a per-weapon
+    // override added below WEAPON_VFX reaches the same makeShell.
+    const everyPower = [...twinSrc.matchAll(/shell: \{[^}]*\bpower: (-?[\d.]+)/g)].map((m) =>
+      Number(m[1]),
+    );
+    expect(everyPower.length).toBeGreaterThanOrEqual(Object.keys(TIERS).length);
+    for (const power of everyPower) expect(power).toBeGreaterThan(0);
+  });
+
   it('parses WEAPON_VFX_TUNING into weaponKey -> channel multipliers, ignoring comments', async () => {
     const library = await libraryImport;
     const src = [

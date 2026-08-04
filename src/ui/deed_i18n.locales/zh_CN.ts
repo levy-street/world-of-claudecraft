@@ -493,6 +493,10 @@ export const table: DeedLocaleTable = {
     name: '英雄：荒野之心盆地',
     desc: '在英雄难度的荒野之心盆地中击败盆地之声祖尔加。',
   },
+  chr_peaks_gatherer: {
+    name: '高地馈赠',
+    desc: '在荆峰高地采集一处矿脉、一片林木与一丛草药。',
+  },
   chr_marsh_rares_ii: {
     name: '暴食者，终得清算',
     desc: '斩杀暴食者蛆颚，泥沼湿地第四位恶名之敌，首次清算时被漏记在册。',
@@ -508,5 +512,29 @@ export const table: DeedLocaleTable = {
   chr_hollow_rares: {
     name: '鹿群不忘',
     desc: '斩杀老髓壳与鹿群之首金辉角，帷幕幽谷的两位游荡稀有首领。',
+  },
+  chr_willowfen_gatherer: {
+    name: '柳泽丰饶',
+    desc: '在柳泽沼地采集一处矿脉、一片林木与一丛草药。',
+  },
+  chr_willowfen_first_cast: {
+    name: '睡莲泽的涟漪',
+    desc: '在柳泽沼地的水域钓起一条鱼。',
+  },
+  chr_galecrest_gatherer: {
+    name: '海岬收成',
+    desc: '在疾风崖采集一处矿脉、一片林木与一丛草药。',
+  },
+  chr_galecrest_first_cast: {
+    name: '镜湖垂纶',
+    desc: '在疾风崖的水域钓起一条鱼。',
+  },
+  chr_farshore_gatherer: {
+    name: '岛上补给',
+    desc: '在远岸采集一处矿脉、一片林木与一丛草药。',
+  },
+  chr_farshore_first_cast: {
+    name: '海鸥知晓',
+    desc: '在远岸的水域钓起一条鱼。',
   },
 };

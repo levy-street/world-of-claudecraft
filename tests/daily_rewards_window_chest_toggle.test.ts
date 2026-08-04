@@ -17,5 +17,7 @@ describe('Daily Rewards chest visibility control', () => {
   it('keeps chest visibility configurable through Settings', () => {
     expect(hudSource).toContain('showDailyRewardsChestButton()');
     expect(hudSource).toContain('setDailyRewardsChestButtonPreference(show: boolean)');
+    expect(hudSource).toContain("parentElement?.id === 'mobile-combat-controls'");
+    expect(hudSource).toContain("mobileButton?.toggleAttribute('hidden', !mobileVisible)");
   });
 });

@@ -439,6 +439,7 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
     if (!activity) continue;
     const applied = info.myApplication?.listingId === listing.id;
     const mine = info.myListing?.id === listing.id;
+    const locked = lockoutMinutesFor(activity, input.lockouts) > 0;
     // Hide a listing for the group I am ALREADY part of, whether I lead it
     // (mine) or I am one of the leader's party members browsing the same
     // board (matched by leader name: the board carries no member pids).
@@ -456,7 +457,7 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
     // entirely); a locked-out leader keeps managing theirs through the
     // separate `myListing` panel, which no lockout ever filters. The `!mine`
     // guard stays as belt and braces should the skip above ever narrow.
-    if (!applied && !mine && lockoutMinutesFor(activity, input.lockouts) > 0) continue;
+    if (!applied && !mine && locked) continue;
     const blocked = blockReasonFor(activity, level, specRole);
     const roleFit =
       activity.composition === null || info.roles.some((r) => (listing.needed?.[r] ?? 0) > 0);

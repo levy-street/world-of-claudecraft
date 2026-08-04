@@ -13,14 +13,28 @@ import {
 } from './helpers/farm_yield';
 
 /**
- * The most mobs a single fast-respawning trash cluster may hold. Eastbrook
- * Vale's wolf/spider/bones chain sits exactly at this cap today, so the guard is
- * deliberately tight: adding another mob to any level 1-7 camp near that chain
- * is a decision to be made on purpose, not by accident.
+ * The most farmable trash one cluster may hold.
+ *
+ * This was a FAST-respawn cap back when respawn varied by level band and only
+ * the level 1-7 zones qualified. The band tiers are retired (every zone is now
+ * on one 60s delay, see src/sim/respawn_policy.ts), so every trash cluster in
+ * the world is "fast" and this is simply a trash-density cap now. Re-based to
+ * 25% above Thornpeak's Glimmermere corridor at 59, on the same convention as
+ * the yield ceilings.
+ *
+ * It still measures something the total cap below does not: trash is what a
+ * farmer can actually cycle, so a cluster that is mostly rares reads very
+ * differently here than it does there (the corridor is 59 of 63).
  */
-const MAX_FAST_TRASH_PER_CLUSTER = 30;
+const MAX_TRASH_PER_CLUSTER = 75;
 
-/** Below this a respawn counts as "fast" for density purposes. */
+/**
+ * Below this a respawn counts as "fast" for density purposes. Every authored
+ * zone is under it today, which is the point: the classifier is kept so a future
+ * per-zone ZoneDef.trashRespawnSeconds slower than 100s drops out of the trash
+ * cap automatically, rather than the cap silently governing a cadence nobody
+ * meant it to.
+ */
 const FAST_RESPAWN_SECONDS = 100;
 
 /**
@@ -103,11 +117,18 @@ describe('clusterCamps: the union-find proximity model', () => {
 });
 
 describe('no farm cluster is overdense', () => {
-  it('keeps every fast-respawn trash cluster at or under the cap', () => {
+  it('keeps every farmable-trash cluster at or under the cap', () => {
     const offenders = worldFarmClusters()
       .map((c) => ({ n: fastTrashCount(c.camps), ids: c.mobIds.join(', ') }))
-      .filter((c) => c.n > MAX_FAST_TRASH_PER_CLUSTER);
+      .filter((c) => c.n > MAX_TRASH_PER_CLUSTER);
     expect(offenders).toEqual([]);
+  });
+
+  it('has that trash cap within reach, so it is a real bound', () => {
+    // Same anti-vacuity check the total cap carries: a cap re-based upward has
+    // to stay reachable or it stops being a guard.
+    const largest = Math.max(...worldFarmClusters().map((c) => fastTrashCount(c.camps)));
+    expect(largest).toBeGreaterThan(MAX_TRASH_PER_CLUSTER * 0.7);
   });
 
   it('caps TOTAL mobs per cluster in every band, not just the fast one', () => {
@@ -227,23 +248,22 @@ describe('the Thornpeak corridor is one dense cluster ON PURPOSE', () => {
     expect(merged[0].mobCount).toBe(63);
   });
 
-  it('bounds that cluster by YIELD instead, which is what the tiers fixed', () => {
+  it('bounds that cluster by YIELD instead, since density here is the layout', () => {
     // Density here is inherent to the layout, so the guard that matters is the
-    // economic one: at the old flat 25s this same cluster paid about 189 gold
-    // and 1.29M XP an hour. tests/economy_yield.test.ts owns the ceilings; this
-    // asserts the corridor is the cluster they are protecting against.
+    // economic one. tests/economy_yield.test.ts owns the ceilings; this asserts
+    // the corridor is the cluster they are protecting against.
     const clusters = worldFarmClusters();
     const richest = clusters.reduce((a, b) => (b.copperPerHour > a.copperPerHour ? b : a));
     expect(richest.mobIds).toContain('glimmermere_wader');
     expect(richest.mobIds).toContain('thornpeak_ogre');
-    // Every TRASH camp in it is on the 180s endgame tier (the rares keep their
-    // own shipped cadence, which is why they are excluded here), and nothing in
-    // the cluster is fast-respawn at all.
+    // Every TRASH camp in it now sits on the single 60s world delay (the rares
+    // and Drogmar keep their own declared cadence, which is why isTrash excludes
+    // them), so the corridor IS fast-respawn: that is the decision, and the
+    // yield ceilings rather than the density cap are what bound it.
     for (const y of richest.camps) {
-      if (isTrash(y.template)) expect(y.respawnSeconds, y.camp.mobId).toBe(180);
-      expect(y.respawnSeconds, y.camp.mobId).toBeGreaterThanOrEqual(FAST_RESPAWN_SECONDS);
+      if (isTrash(y.template)) expect(y.respawnSeconds, y.camp.mobId).toBe(60);
     }
-    expect(fastTrashCount(richest.camps)).toBe(0);
+    expect(fastTrashCount(richest.camps)).toBe(59);
   });
 });
 
