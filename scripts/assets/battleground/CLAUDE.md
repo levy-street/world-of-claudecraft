@@ -47,6 +47,32 @@ Both steps are deterministic (same inputs, byte-identical output) and both
 committed artifacts are freshness-gated by `tests/battleground_band.test.ts`.
 Re-run BOTH after any edit here and commit the results.
 
+## The three rune pad GLBs: a documented exporter exemption
+
+`public/models/battleground/rune_damage.glb`, `rune_defense.glb` and
+`rune_sprint.glb` (the bodies `src/render/battleground_rune_model.ts` seats on the
+Battle, Ward and Sprint pads) are the ONE battleground asset family with no
+`scripts/assets/` entry. That is deliberate and it is a debt, not a pattern: they
+predate their generator being checked in, and their generation inputs are not
+reconstructible, so there is nothing honest to commit as an exporter. Everything
+else under `public/models/` that this branch ships was produced by a committed
+deterministic exporter and is fingerprinted against it.
+
+What stands in for the missing exporter is
+**`tests/battleground_rune_models.test.ts`**, which pins each shipped binary two
+ways: by sha256 of the exact committed bytes, and by parsed GLB shape (container
+header and chunk layout, mesh and primitive counts, node names, material and
+texture counts, the KTX2 / `KHR_texture_basisu` texture encoding the shipping base
+mandates, and a byte-size ceiling). A silent re-export, a recompression, or an
+optimizer pass that changes what the pads actually are therefore fails CI rather
+than landing unnoticed.
+
+**If these are ever regenerated, the exemption ends.** Land a deterministic
+procedural factory plus exporter under `scripts/assets/` per
+`docs/image-to-glb-asset-workflow.md` and the `image-to-glb` skill, replace the
+sha256 pins with source-fingerprint pins against that exporter, and delete this
+section. Do not add a fourth rune model under the exemption.
+
 ## Never
 
 - No `Math.random`, no `Date.now`: the builder has to be byte-deterministic or

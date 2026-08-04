@@ -503,10 +503,11 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
     expectAssetExistsAndManifested(mailboxPreloadInternalsForTest.mailboxAssetUrl);
   });
 
-  // Thornhollow Fields rune pads: the def table is all-null until custom models land
-  // (each unregistered rune spins its procedural fallback), so this sweeps an
-  // empty list today and starts enforcing the moment a url is filled in: no
-  // extra wiring needed when the GLB is dropped under public/models.
+  // Thornhollow Fields rune pads: all three defs are filled in now, so this
+  // sweeps the real set. Existence + manifest presence is all it claims; the
+  // per-file sha256 and parsed-shape contract for those three bodies lives in
+  // tests/battleground_rune_models.test.ts, which is what stands in for the
+  // deterministic exporter they do not have.
   it('battleground rune pad assets', () => {
     for (const url of battlegroundRuneModelPreloadInternalsForTest.urls()) {
       expectAssetExistsAndManifested(url);
