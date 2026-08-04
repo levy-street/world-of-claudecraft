@@ -21,6 +21,7 @@ import { audio } from '../game/audio';
 import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
 import { ITEMS, QUESTS } from '../sim/data';
 import { FIREBOTTLE_COOLDOWN_SECS, FIREBOTTLE_ITEM_ID } from '../sim/interactions/firebottle_hut';
+import { bestStowCandidate } from '../sim/toolbelt';
 import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
 import {
@@ -56,6 +57,7 @@ import {
   buildBagBar,
   buildBagGrid,
   buildBagListRows,
+  buildToolbeltBar,
   resolveDepositSubmit,
 } from './bags_view';
 import { showQuantityPrompt } from './bank_quantity_prompt';
@@ -414,6 +416,7 @@ export class BagsWindow {
     const prevScrollTop = el.querySelector('.bag-grid')?.scrollTop ?? 0;
     el.innerHTML = `<div class="panel-title"><span>${esc(t('itemUi.bags.title'))}</span><button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(t('itemUi.bags.close'))}">${svgIcon('close')}</button></div>`;
     el.appendChild(this.buildBagBar());
+    el.appendChild(this.buildToolbeltBar());
     // Skip the chip/search row entirely when the bag is empty: a full filter bar
     // above a grid of empty squares is just noise.
     if (world.inventory.length > 0) el.appendChild(this.buildFilterBar());
@@ -565,6 +568,120 @@ export class BagsWindow {
       'aria-label',
       t('hudChrome.bags.capacityAria', { used: fmt(model.used), total: fmt(model.capacity) }),
     );
+    bar.appendChild(counter);
+    return bar;
+  }
+
+  // The toolbelt bar: the worn belt plus its GENERIC tool slots (2/3/4 by
+  // belt tier). Unlike the bag bar this shows no capacity, because the belt
+  // grants no pooled slots; the counter says how many slots are filled.
+  // Clicking a filled slot takes that tool back; clicking an empty one stows
+  // the best carried tool of a type not yet belted, so nobody has to hunt a
+  // pick out of a full backpack. A belt is worn by clicking the toolbelt item
+  // in the grid (bagItemAction 'equipToolbelt'), exactly like a bag.
+  private buildToolbeltBar(): HTMLElement {
+    const world = this.deps.world();
+    const belt = world.toolbelt;
+    const model = buildToolbeltBar(
+      belt.equipped,
+      belt.slots.map((slot) => slot?.itemId ?? null),
+      bestStowCandidate(world.inventory, belt, ITEMS) ?? null,
+    );
+    const bar = document.createElement('div');
+    bar.className = 'bag-bar toolbelt-bar';
+    const fmt = (n: number): string => formatNumber(n, { maximumFractionDigits: 0 });
+    const slotLabel = (index: number): string =>
+      t('hudChrome.bags.toolSlotLabel', { slot: fmt(index + 1) });
+
+    if (!model.equipped) {
+      const none = document.createElement('span');
+      none.className = 'bag-capacity toolbelt-none';
+      none.textContent = t('hudChrome.bags.toolbeltNone');
+      bar.appendChild(none);
+      return bar;
+    }
+
+    const beltItem = ITEMS[model.equipped];
+    const beltBtn = document.createElement('button');
+    beltBtn.type = 'button';
+    beltBtn.className = `bag-socket q-${bagQualityKey(beltItem ?? {})}`;
+    beltBtn.innerHTML = beltItem ? this.deps.itemIcon(beltItem) : '';
+    beltBtn.setAttribute(
+      'aria-label',
+      beltItem ? itemDisplayName(beltItem) : t('hudChrome.bags.toolbeltTitle'),
+    );
+    beltBtn.addEventListener('click', () => {
+      this.deps.world().unequipToolbelt();
+      this.deps.hideTooltip();
+      this.render();
+    });
+    if (beltItem) {
+      this.deps.attachTooltip(
+        beltBtn,
+        () =>
+          `${this.deps.itemTooltip(beltItem)}<div class="tt-sub">${esc(t('hudChrome.bags.toolbeltRemoveHint'))}</div>`,
+      );
+    }
+    bar.appendChild(beltBtn);
+
+    for (const slot of model.slots) {
+      const tool = slot.itemId ? ITEMS[slot.itemId] : undefined;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = tool ? `bag-socket q-${bagQualityKey(tool)}` : 'bag-socket empty';
+      if (tool) btn.innerHTML = this.deps.itemIcon(tool);
+      btn.setAttribute(
+        'aria-label',
+        t('hudChrome.bags.toolSlotAria', {
+          slot: slotLabel(slot.index),
+          name: tool ? itemDisplayName(tool) : t('hudChrome.bags.toolSlotEmpty'),
+        }),
+      );
+      if (tool) {
+        btn.addEventListener('click', () => {
+          this.deps.world().takeToolFromBelt(slot.index);
+          this.deps.hideTooltip();
+          this.render();
+        });
+        this.deps.attachTooltip(
+          btn,
+          () =>
+            `${this.deps.itemTooltip(tool)}<div class="tt-sub">${esc(t('hudChrome.bags.toolSlotTakeHint'))}</div>`,
+        );
+      } else if (model.stowCandidateId) {
+        const candidateId = model.stowCandidateId;
+        const candidate = ITEMS[candidateId];
+        btn.addEventListener('click', () => {
+          this.deps.world().storeToolInBelt(candidateId);
+          this.deps.hideTooltip();
+          this.render();
+        });
+        this.deps.attachTooltip(
+          btn,
+          () =>
+            `<div class="tt-title">${esc(slotLabel(slot.index))}</div><div class="tt-sub">${esc(
+              t('hudChrome.bags.toolSlotStowHint', {
+                name: candidate ? itemDisplayName(candidate) : candidateId,
+              }),
+            )}</div>`,
+        );
+      } else {
+        btn.setAttribute('aria-disabled', 'true');
+        this.deps.attachTooltip(
+          btn,
+          () =>
+            `<div class="tt-title">${esc(slotLabel(slot.index))}</div><div class="tt-sub">${esc(t('hudChrome.bags.toolSlotNoTool'))}</div>`,
+        );
+      }
+      bar.appendChild(btn);
+    }
+
+    const counter = document.createElement('span');
+    counter.className = 'bag-capacity';
+    counter.textContent = t('hudChrome.bags.toolbeltFilled', {
+      used: fmt(model.slots.filter((s) => s.itemId).length),
+      total: fmt(model.slots.length),
+    });
     bar.appendChild(counter);
     return bar;
   }
@@ -1413,6 +1530,11 @@ export class BagsWindow {
         break;
       case 'equipBag':
         this.deps.world().equipBag(s.itemId);
+        this.deps.hideTooltip();
+        this.render();
+        break;
+      case 'equipToolbelt':
+        this.deps.world().equipToolbelt(s.itemId);
         this.deps.hideTooltip();
         this.render();
         break;

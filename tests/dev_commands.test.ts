@@ -166,3 +166,40 @@ describe('dev commands', () => {
     expect(devSpawns(sim)).toEqual([]);
   });
 });
+
+describe('/dev profession (the umbrella skill cheat)', () => {
+  it('raises a craft skill through the real primitive, clamped at the craft cap', () => {
+    const sim = devSim();
+    const meta = sim.players.get(sim.playerId);
+    if (!meta) throw new Error('missing player meta');
+    expect(meta.craftSkills.tailoring ?? 0).toBe(0);
+
+    sim.chat('/dev profession tailoring 30');
+    expect(meta.craftSkills.tailoring).toBe(30);
+
+    // Additive, and capped at the craft's enforced maxSkill (125), never past.
+    sim.chat('/dev profession tailoring 125');
+    expect(meta.craftSkills.tailoring).toBe(125);
+  });
+
+  it('delegates a gathering id to the same queued grant /dev gather uses', () => {
+    const sim = devSim();
+    const meta = sim.players.get(sim.playerId);
+    if (!meta) throw new Error('missing player meta');
+
+    sim.chat('/dev profession mining 25');
+    expect(meta.pendingGatherGrants).toEqual([{ professionId: 'mining', amount: 25 }]);
+  });
+
+  it('rejects an unknown profession without touching any skill', () => {
+    const sim = devSim();
+    const meta = sim.players.get(sim.playerId);
+    if (!meta) throw new Error('missing player meta');
+    const before = { ...meta.craftSkills };
+
+    sim.chat('/dev profession basketweaving 50');
+
+    expect(meta.craftSkills).toEqual(before);
+    expect(meta.pendingGatherGrants).toEqual([]);
+  });
+});

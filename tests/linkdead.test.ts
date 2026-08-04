@@ -5,6 +5,7 @@ const openPlaySession = vi.fn(async () => 1);
 const closePlaySession = vi.fn(async () => {});
 
 vi.mock('../server/db', () => ({
+  walletForAccount: vi.fn(async () => null),
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
   saveCharacterAndMarketState: vi.fn(async () => {}),

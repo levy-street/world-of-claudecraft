@@ -11,6 +11,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 // Mock the db layer so the online-path test needs no Postgres (mirrors
 // snapshots.test.ts). Hoisted by vitest, so it applies to server/game below.
 vi.mock('../server/db', () => ({
+  walletForAccount: vi.fn(async () => null),
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),

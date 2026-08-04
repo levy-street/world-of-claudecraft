@@ -17,6 +17,7 @@ import {
   ROD_RECIPES,
   recipeById,
   TOOL_EFFECT_RECIPES,
+  TOOLBELT_RECIPES,
 } from '../src/sim/content/recipes';
 import { ITEMS, NPCS, STATIONS } from '../src/sim/data';
 import { requiredReagentCountFor } from '../src/sim/professions/crafting';
@@ -267,17 +268,19 @@ describe('REFERENTIAL INTEGRITY', () => {
       }
     }
     // The 54 ladder recipes plus the 3 grandfathered combos all carry
-    // 'trainer', and so do the two crafted rods and the two tool-effect
-    // charms: the pre-training id list is frozen, so anything authored after
-    // that switch has to be learned.
+    // 'trainer', and so do the two crafted rods, the two tool-effect charms,
+    // and the three toolbelt rungs: the pre-training id list is frozen, so
+    // anything authored after that switch has to be learned.
     expect(trainerRecipes).toBe(
       LADDER_RECIPES.length +
         COMBO_RECIPES.length +
         ROD_RECIPES.length +
-        TOOL_EFFECT_RECIPES.length,
+        TOOL_EFFECT_RECIPES.length +
+        TOOLBELT_RECIPES.length,
     );
     expect(ROD_RECIPES).toHaveLength(2);
     expect(TOOL_EFFECT_RECIPES).toHaveLength(2);
+    expect(TOOLBELT_RECIPES).toHaveLength(3);
   });
 
   it('the three station-free combo recipes resolve a home via professionId, not stationType', () => {

@@ -2401,6 +2401,9 @@ const ITEM_ENTITY_IDS = [
   'artisans_eye',
   'reins_terrorspark_groundshaker',
   'reins_drakemaw_raptor',
+  'basic_toolbelt',
+  'reinforced_toolbelt',
+  'artisans_toolbelt',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2507,6 +2510,10 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   reins_drakemaw_raptor: 'Reins of the Drakemaw Raptor',
   restless_skull: 'Restless Skull',
   vanguard_bone: 'Vanguard Bone',
+  // The toolbelt ladder (tailoring-crafted tool-only containers).
+  basic_toolbelt: 'Basic Toolbelt',
+  reinforced_toolbelt: 'Reinforced Toolbelt',
+  artisans_toolbelt: "Artisan's Toolbelt",
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

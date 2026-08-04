@@ -43,6 +43,7 @@ import {
 import { ITEMS } from '../data';
 import { refusedWhileDead } from '../dead_gate';
 import type { SimContext } from '../sim_context';
+import { toolSearchInventory } from '../toolbelt';
 import { recordAction, withinActionThrottle } from './action_throttle';
 import { gatherNodeById, NODE_HARVEST_TABLE } from './gathering';
 import {
@@ -235,7 +236,11 @@ export function restoreToolEffectSlotAction(
   if (slotToolEffectRefused(professionId, effectId)) return 'invalid_request';
   const profession = professionId as GatheringProfessionId;
   if (r.meta.toolEffectSlots?.[profession] !== undefined) return 'already_slotted';
-  const best = bestOwnedGatherToolFor(r.meta.inventory, profession, ITEMS);
+  const best = bestOwnedGatherToolFor(
+    toolSearchInventory(r.meta.inventory, r.meta.toolbelt),
+    profession,
+    ITEMS,
+  );
   if (best.ownedTier === NO_TOOL_OWNED) return 'no_tool';
   const slot = slotEffect(effectId as ToolEffectId, { toolRarity: best.rarity });
   applyMintedSlot(ctx, r, profession, effectId, slot);

@@ -1917,6 +1917,23 @@ export const hudChromeStrings = {
     bagSocketAria: '{name}: {slots}',
     socketEmpty: 'Empty bag slot',
     unequipHint: 'Click to remove this bag',
+    // The toolbelt bar: the worn belt's generic tool slots (2/3/4 by belt
+    // tier), rendered under the bag bar. It holds tools only and grants no
+    // bag slots, so its counter says how many slots are filled rather than
+    // how much space is left.
+    toolbeltTitle: 'Toolbelt',
+    toolbeltNone: 'No toolbelt worn',
+    toolbeltRemoveHint: 'Click to remove this toolbelt',
+    toolbeltFilled: '{used}/{total} tools',
+    // A belt slot's own label ({slot} is its 1-based position) and the
+    // accessible name composed from it: '{slot}: {name}' where {name} is the
+    // belted tool (or the empty label).
+    toolSlotLabel: 'Tool slot {slot}',
+    toolSlotAria: '{slot}: {name}',
+    toolSlotEmpty: 'Empty',
+    toolSlotStowHint: 'Click to stow {name}',
+    toolSlotTakeHint: 'Click to take this tool back',
+    toolSlotNoTool: 'You have no tool to stow',
   },
   // Raid -> party demotion (Social panel raid tab). The sim emits these in English;
   // src/ui/sim_i18n.ts re-localizes them through these keys. Mirrors the existing

@@ -6950,6 +6950,104 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 100,
           "zeroAt": 125
         }
+      },
+      {
+        "id": "recipe_basic_toolbelt",
+        "name": "Basic Toolbelt",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "loom",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Homespun Cloth",
+            "count": 3
+          },
+          {
+            "name": "Spool of Thread",
+            "count": 3
+          }
+        ],
+        "output": {
+          "name": "Basic Toolbelt",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_reinforced_toolbelt",
+        "name": "Reinforced Toolbelt",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "loom",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Spider Silk",
+            "count": 4
+          },
+          {
+            "name": "Homespun Cloth",
+            "count": 2
+          },
+          {
+            "name": "Spool of Thread",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Reinforced Toolbelt",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_artisans_toolbelt",
+        "name": "Artisan's Toolbelt",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "loom",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "name": "Pristine Silk",
+            "count": 2
+          },
+          {
+            "name": "Spider Silk",
+            "count": 6
+          },
+          {
+            "name": "Spool of Thread",
+            "count": 6
+          }
+        ],
+        "output": {
+          "name": "Artisan's Toolbelt",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        }
       }
     ]
   },

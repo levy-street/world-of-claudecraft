@@ -375,6 +375,10 @@ describe('Eastbrook authored gameplay data integration', () => {
       'simple_fishing_pole',
       'arcanite_bar',
     ]);
+    //
+    // Re-minted a third time when Trader Wilkes gained the toolbelt row: the
+    // tool-only container belongs on the counter that already stocks the bags
+    // and the tier-1 tools. Only trader_wilkes.vendorItems moved.
     expect(createHash('sha256').update(JSON.stringify(stableTownNpcPayload())).digest('hex')).toBe(
       '253d5927ed17e438faa5d66b57e031cc1ab3af61370b773e0d714bc3426226e8',
     );

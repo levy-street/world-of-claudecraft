@@ -6323,6 +6323,27 @@
     color: var(--color-text-muted);
     padding: 6px;
   }
+  /* The toolbelt bar sits under the bag bar and reuses its socket chrome. It
+     holds tools only and grants no pooled slots, so it is set apart by a rule
+     above it rather than by a second heading. */
+  .toolbelt-bar {
+    margin-top: 0;
+    padding-top: 4px;
+    border-top: 1px solid #2f281a;
+  }
+  /* An empty tool slot is CLICKABLE when the player carries a matching tool
+     (one-click stow), unlike an empty bag socket, which is inert. */
+  .toolbelt-bar .bag-socket.empty:not([aria-disabled="true"]) {
+    cursor: var(--cursor-point);
+    border-color: #4a3d26;
+  }
+  .toolbelt-bar .bag-socket.empty:not([aria-disabled="true"]):hover {
+    filter: brightness(1.25);
+  }
+  .toolbelt-none {
+    margin-left: 0;
+    color: var(--color-text-muted);
+  }
   /* Modular bag filtering: category chips + sort/search tools above the grid. */
   .bag-filter-bar {
     display: flex;

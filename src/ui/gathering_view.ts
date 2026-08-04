@@ -39,6 +39,7 @@ import {
   bestWieldableGatherToolTierOrNone,
   minWieldRequirementToWork,
 } from '../sim/professions/wield_gate';
+import { toolSearchInventory } from '../sim/toolbelt';
 import { type GatherNodeDef, isConsuming } from '../sim/types';
 import type { IWorld } from '../world_api';
 import type { TranslationKey } from './i18n.catalog';
@@ -83,7 +84,12 @@ export function viewerUsableToolTier(
   proficiency: Readonly<Record<string, number>> | undefined = world.gatheringProficiency,
 ): number {
   const skill = proficiency?.[professionId];
-  return bestWieldableGatherToolTierOrNone(world.inventory, professionId, skill, ITEMS);
+  return bestWieldableGatherToolTierOrNone(
+    toolSearchInventory(world.inventory, world.toolbelt),
+    professionId,
+    skill,
+    ITEMS,
+  );
 }
 
 /** Whether a node of this tier is tool-locked for the viewer: a SEPARATE
@@ -268,7 +274,12 @@ export function buildGatherNodeTooltip(
   const professionId = NODE_HARVEST_TABLE[node.type].professionId;
   const locked = isNodeToolLockedFor(world, node);
   const wieldReq = locked
-    ? minWieldRequirementToWork(world.inventory, professionId, node.tier, ITEMS)
+    ? minWieldRequirementToWork(
+        toolSearchInventory(world.inventory, world.toolbelt),
+        professionId,
+        node.tier,
+        ITEMS,
+      )
     : null;
   const state = classifyGatherNode(world, node.id);
   const respawn = state === 'cooldown' ? world.nodeRespawnSeconds(node.id) : null;

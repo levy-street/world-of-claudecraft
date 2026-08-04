@@ -596,6 +596,13 @@ import {
   threatModifier,
   topThreatValue,
 } from './threat';
+import * as toolbeltMod from './toolbelt';
+import {
+  emptyToolbelt,
+  sanitizeToolbeltState,
+  type ToolbeltState,
+  toolSearchInventory,
+} from './toolbelt';
 import {
   type AbilityDef,
   type AbilityEffect,
@@ -1163,6 +1170,10 @@ export interface PlayerMeta {
   // The 4 equippable bag sockets (itemId of a kind:'bag' item, or null). The
   // 16-slot backpack is implicit; capacity math lives in bags.ts. Persisted.
   bags: (string | null)[];
+  // The fifth, tool-only container: generic tool slots (2/3/4 by belt tier),
+  // holding tools that have LEFT the pooled inventory. Grants no pooled slots
+  // (that is what makes it not a bag). Math lives in toolbelt.ts. Persisted.
+  toolbelt: ToolbeltState;
   // The per-character bank: a second pooled item store with its own copper-bought
   // slot budget. Capacity/move math lives in bank.ts. Persisted (inside the
   // character save, exactly like inventory/bags).
@@ -1538,6 +1549,11 @@ export interface CharacterState {
   // Equipped bag sockets. Optional so pre-bag saves load cleanly (defaults to
   // 4 empty sockets; an over-capacity legacy inventory is tolerated).
   bags?: (string | null)[];
+  // The tool-only container (JSONB; optional so pre-toolbelt saves load cleanly,
+  // defaulting to no belt worn and nothing stored). sanitizeToolbeltState is the
+  // one load path; anything it cannot honor spills back into the inventory
+  // rather than being destroyed.
+  toolbelt?: ToolbeltState;
   // Per-character bank (JSONB; optional so pre-bank saves load cleanly, defaulting
   // to an empty bank with no purchased/bonus slots). sanitizeBankState is the one
   // load path (never destroys items; tolerates an over-capacity inventory).
@@ -2625,6 +2641,7 @@ export class Sim {
       wireRev: 0,
       inventory: [],
       bags: Array<string | null>(BAG_SOCKETS).fill(null),
+      toolbelt: emptyToolbelt(),
       bank: { inventory: [], purchasedSlots: 0, bonusSlots: 0 },
       bankBonusSources: [],
       guildMembership: null,
@@ -2890,6 +2907,18 @@ export class Sim {
           const id = s.bags[i];
           meta.bags[i] = id && ITEMS[id]?.kind === 'bag' ? id : null;
         }
+      }
+      // The tool-only container. Absent on a pre-toolbelt save, which loads as
+      // no belt worn and nothing stored. Anything the sanitizer cannot honor (a
+      // non-tool, a tool past the belt's slot count, contents with no belt
+      // worn) comes back as spill and returns to the inventory rather than
+      // being destroyed; the
+      // spill is stacked in unconditionally, since a load may legitimately land
+      // over capacity (the same tolerance pre-bag saves get above).
+      const belt = sanitizeToolbeltState(s.toolbelt);
+      meta.toolbelt = belt.state;
+      for (const slot of belt.spill) {
+        addStacked(meta.inventory, slot.itemId, slot.count, slot.instance, slot.craftedRecipeId);
       }
       // Buyback rows deliberately skip the full instancedCountCap: byte-equal
       // merges past the stack cap are legitimate here (recordVendorBuyback
@@ -3725,6 +3754,10 @@ export class Sim {
       ),
       inventory: meta.inventory.map(cloneInvSlot),
       bags: [...meta.bags],
+      toolbelt: {
+        equipped: meta.toolbelt.equipped,
+        slots: meta.toolbelt.slots.map((slot) => (slot ? cloneInvSlot(slot) : null)),
+      },
       bank: {
         inventory: meta.bank.inventory.map(cloneInvSlot),
         purchasedSlots: meta.bank.purchasedSlots,
@@ -4242,6 +4275,9 @@ export class Sim {
   }
   get bagCapacity(): number {
     return bagCapacity(this.primary.bags);
+  }
+  get toolbelt(): ToolbeltState {
+    return this.primary.toolbelt;
   }
   get vendorBuyback(): InvSlot[] {
     return this.primary.vendorBuyback;
@@ -8177,6 +8213,22 @@ export class Sim {
 
   unequipBag(socket: number, pid?: number): void {
     bagsMod.unequipBag(this.ctx, socket, pid);
+  }
+
+  equipToolbelt(itemId: string, pid?: number): void {
+    toolbeltMod.equipToolbelt(this.ctx, itemId, pid);
+  }
+
+  unequipToolbelt(pid?: number): void {
+    toolbeltMod.unequipToolbelt(this.ctx, pid);
+  }
+
+  storeToolInBelt(itemId: string, pid?: number): void {
+    toolbeltMod.storeToolInBelt(this.ctx, itemId, pid);
+  }
+
+  takeToolFromBelt(slotIndex: number, pid?: number): void {
+    toolbeltMod.takeToolFromBelt(this.ctx, slotIndex, pid);
   }
 
   discardItem(itemId: string, count = 1, pid?: number): void {

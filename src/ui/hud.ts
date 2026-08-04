@@ -584,6 +584,7 @@ import { targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { toolEffectNameKey } from './tool_effect_name';
+import { toolbeltTooltipLines } from './toolbelt_tooltip';
 import { createTooltipLine } from './tooltip_line';
 import { SharedTooltipOwner } from './tooltip_owner';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
@@ -949,6 +950,30 @@ const PET_MODE_DESC_KEYS: Record<PetMode, TranslationKey> = {
   passive: 'hud.pet.passiveDesc',
   defensive: 'hud.pet.defensiveDesc',
   aggressive: 'hud.pet.aggressiveDesc',
+};
+type ItemQuality = NonNullable<ItemDef['quality']>;
+const ITEM_QUALITY_LABEL_KEYS: Record<ItemQuality, TranslationKey> = {
+  poor: 'itemUi.quality.poor',
+  common: 'itemUi.quality.common',
+  uncommon: 'itemUi.quality.uncommon',
+  rare: 'itemUi.quality.rare',
+  epic: 'itemUi.quality.epic',
+  legendary: 'itemUi.quality.legendary',
+};
+const ITEM_KIND_LABEL_KEYS: Record<ItemDef['kind'], TranslationKey> = {
+  weapon: 'itemUi.kind.weapon',
+  armor: 'itemUi.kind.armor',
+  held_offhand: 'itemUi.kind.armor',
+  quest: 'itemUi.kind.quest',
+  junk: 'itemUi.kind.junk',
+  food: 'itemUi.kind.food',
+  drink: 'itemUi.kind.drink',
+  tool: 'itemUi.kind.tool',
+  potion: 'itemUi.kind.potion',
+  elixir: 'itemUi.kind.elixir',
+  bag: 'itemUi.kind.bag',
+  toolbelt: 'itemUi.kind.toolbelt',
+  mount: 'itemUi.kind.mount',
 };
 /** The visual language the shared #banner slot paints in. 'default' is the
  *  bare gold celebration text every milestone has always used (level up, zone
@@ -1403,7 +1428,7 @@ export class Hud {
   private minimapBg: HTMLCanvasElement;
   private clockEl: HTMLElement | null = null;
   private dayNightCtx: CanvasRenderingContext2D | null = null;
-  private lastDayNightDrawAt = 0; // the dial redraws ~1Hz; the 12h cycle barely moves
+  private lastDayNightDrawAt = 0; // the dial redraws ~1Hz; ample for the hour cycle
   private raidLockoutEl: HTMLElement | null = null;
   private raidLockoutLocked = false;
   private clock24 = false; // 24-hour vs 12-hour AM/PM display
@@ -2238,8 +2263,8 @@ export class Hud {
     // UI-only concern, so `new Date()` here is fine (the sim-only time ban
     // doesn't apply — cf. meters.ts using performance.now()).
     this.clockEl = $('#minimap-clock');
-    // day/night dial on the minimap rim: a decorative canvas showing the 12h
-    // world cycle. Same UI-only wall-clock allowance as the clock above.
+    // day/night dial on the minimap rim: a decorative canvas showing the
+    // world day/night cycle. Same UI-only wall-clock allowance as the clock above.
     const dayNightCanvas = document.getElementById('minimap-daynight') as HTMLCanvasElement | null;
     this.dayNightCtx = dayNightCanvas?.getContext('2d') ?? null;
     // raid-lockout badge on the minimap rim: a lock icon whose hover/tap panel
@@ -5356,6 +5381,7 @@ export class Hud {
     if (questModel) html += this.questItemTooltipStoryHtml(questModel);
     if (item.kind === 'bag' && item.bagSlots)
       html += `<div class="tt-stat">${esc(t('itemUi.tooltip.bagSlots', { slots: itemNumber(item.bagSlots) }))}</div>`;
+    html += toolbeltTooltipLines(item);
     // Collectible mount reins: the mount's flavor + specialty numbers + its
     // ride-level gate (red below the gate, like gear's requires-level line).
     if (item.kind === 'mount') {
@@ -9372,7 +9398,7 @@ export class Hud {
     this.lastDayNightDrawAt = 0;
   }
 
-  // Draw the minimap day/night dial: a ring painted with the 12h world sky cycle
+  // Draw the minimap day/night dial: a ring painted with the world sky cycle
   // (deep navy night, warm dawn/dusk glow, bright day blue), a "now" marker that
   // sweeps it once per cycle, and a centre sun or moon. Purely visual (the canvas
   // is aria-hidden) and reads the shared UTC-anchored cycle, so a glance shows the
@@ -9381,17 +9407,17 @@ export class Hud {
     const ctx = this.dayNightCtx;
     if (!ctx) return;
     const now = Date.now();
-    if (now - this.lastDayNightDrawAt < 1000) return; // the 12h cycle crawls; ~1Hz is ample
+    if (now - this.lastDayNightDrawAt < 1000) return; // the marker crawls; ~1Hz is ample
     this.lastDayNightDrawAt = now;
 
-    const S = 60; // backing resolution (CSS shows it at 30px, so 2x for crispness)
+    const S = 88; // backing resolution (CSS shows it at 44px, so 2x for crispness)
     const cx = S / 2;
     const cy = S / 2;
-    const rMid = 23; // ring centreline radius
-    const ringW = 8;
+    const rMid = 34; // ring centreline radius
+    const ringW = 11;
     const rInner = rMid - ringW / 2 - 2; // centre disc radius
     // noon (brightest) sits at the top, midnight at the bottom; the marker sweeps
-    // clockwise once per 12h. angle = pi/2 + phase*2pi (canvas y is down).
+    // clockwise once per cycle. angle = pi/2 + phase*2pi (canvas y is down).
     const angleForPhase = (p: number): number => Math.PI / 2 + p * Math.PI * 2;
     const rgb = (c: readonly [number, number, number]): string =>
       `rgb(${Math.round(c[0] * 255)}, ${Math.round(c[1] * 255)}, ${Math.round(c[2] * 255)})`;
@@ -9424,36 +9450,43 @@ export class Hud {
     if (daynessNow >= 0.5) {
       ctx.fillStyle = '#ffd45a';
       ctx.beginPath();
-      ctx.arc(cx, cy, 5.5, 0, Math.PI * 2);
+      ctx.arc(cx, cy, 8, 0, Math.PI * 2);
       ctx.fill();
       ctx.strokeStyle = '#ffd45a';
-      ctx.lineWidth = 1.4;
+      ctx.lineWidth = 2;
       for (let i = 0; i < 8; i++) {
         const a = (i / 8) * Math.PI * 2;
         ctx.beginPath();
-        ctx.moveTo(cx + Math.cos(a) * 8, cy + Math.sin(a) * 8);
-        ctx.lineTo(cx + Math.cos(a) * 10.5, cy + Math.sin(a) * 10.5);
+        ctx.moveTo(cx + Math.cos(a) * 11.5, cy + Math.sin(a) * 11.5);
+        ctx.lineTo(cx + Math.cos(a) * 15.5, cy + Math.sin(a) * 15.5);
         ctx.stroke();
       }
     } else {
       // crescent: a pale disc minus an offset disc repainted in the sky color
       ctx.fillStyle = '#e2e8f6';
       ctx.beginPath();
-      ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+      ctx.arc(cx, cy, 8.8, 0, Math.PI * 2);
       ctx.fill();
       ctx.fillStyle = rgb(skyNow);
       ctx.beginPath();
-      ctx.arc(cx + 3, cy - 2.2, 6, 0, Math.PI * 2);
+      ctx.arc(cx + 4.4, cy - 3.2, 8.8, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    // the "now" marker: a bright pip riding the ring at the current phase
+    // the "now" marker: a glowing pip riding the ring at the current phase,
+    // sized and haloed so the cycle position reads at a glance
     const am = angleForPhase(phaseNow);
+    ctx.save();
+    ctx.shadowColor = '#fff';
+    ctx.shadowBlur = 8;
     ctx.beginPath();
-    ctx.arc(cx + Math.cos(am) * rMid, cy + Math.sin(am) * rMid, 3.6, 0, Math.PI * 2);
+    ctx.arc(cx + Math.cos(am) * rMid, cy + Math.sin(am) * rMid, 5.2, 0, Math.PI * 2);
     ctx.fillStyle = '#fff';
     ctx.fill();
-    ctx.lineWidth = 1.4;
+    ctx.restore();
+    ctx.beginPath();
+    ctx.arc(cx + Math.cos(am) * rMid, cy + Math.sin(am) * rMid, 5.2, 0, Math.PI * 2);
+    ctx.lineWidth = 2;
     ctx.strokeStyle = '#000';
     ctx.stroke();
   }

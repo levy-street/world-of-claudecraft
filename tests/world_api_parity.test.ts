@@ -94,6 +94,7 @@ export const IWORLD_MEMBERS = [
   { name: 'inventory', kind: 'data' },
   { name: 'bags', kind: 'data' },
   { name: 'bagCapacity', kind: 'data' },
+  { name: 'toolbelt', kind: 'data' },
   { name: 'vendorBuyback', kind: 'data' },
   { name: 'equipment', kind: 'data' },
   { name: 'equipmentInstances', kind: 'data' },
@@ -157,6 +158,10 @@ export const IWORLD_MEMBERS = [
   { name: 'socketRiftGem', kind: 'method' },
   { name: 'equipBag', kind: 'method' },
   { name: 'unequipBag', kind: 'method' },
+  { name: 'equipToolbelt', kind: 'method' },
+  { name: 'unequipToolbelt', kind: 'method' },
+  { name: 'storeToolInBelt', kind: 'method' },
+  { name: 'takeToolFromBelt', kind: 'method' },
   { name: 'changeSkin', kind: 'method' },
   { name: 'claimEventSkin', kind: 'method' },
   { name: 'unequipMechChroma', kind: 'method' },
@@ -528,10 +533,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // IWorldGuildBank members (guildBankInfo, one data read, plus five
     // commands), leaving 287. The guild bank ACTIVITY LOG adds one read member
     // (guildBankLog, a method because reading it is what requests the cold
-    // payload on demand: it has no snapshot key), leaving 288.
-    expect(IWORLD_MEMBERS.length).toBe(289);
-    expect(DATA_MEMBERS.length).toBe(74);
-    expect(METHOD_MEMBERS.length).toBe(215);
+    // payload on demand: it has no snapshot key), leaving 288... 289 with the
+    // v0.35.0 cut. The tool-only container adds one data member (toolbelt)
+    // and four methods (equip/unequip/store/take), leaving 294.
+    expect(IWORLD_MEMBERS.length).toBe(294);
+    expect(DATA_MEMBERS.length).toBe(75);
+    expect(METHOD_MEMBERS.length).toBe(219);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -641,6 +648,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'equipBag',
       'equipItem',
       'equipItemToSlot',
+      'equipToolbelt',
       'equipment',
       'equipmentInstances',
       'feedPet',
@@ -793,10 +801,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'startAutoAttack',
       'stationPlacements',
       'stopAutoAttack',
+      'storeToolInBelt',
       'submitLootRoll',
       'switchLoadout',
       'tabTarget',
       'takeActionBarLayoutRestore',
+      'takeToolFromBelt',
       'talentPoints',
       'talentRole',
       'talentSpec',
@@ -806,6 +816,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'toggleMounted',
       'toggleWeaponStow',
       'toolEffectSlots',
+      'toolbelt',
       'townFocus',
       'tradeAccept',
       'tradeCancel',
@@ -819,6 +830,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'unequipBag',
       'unequipItem',
       'unequipMechChroma',
+      'unequipToolbelt',
       'unlockedMilestones',
       'unstuck',
       'upgradeRiftItem',
@@ -905,6 +917,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'talentSpec',
       'talents',
       'toolEffectSlots',
+      'toolbelt',
       'townFocus',
       'tradeInfo',
       'unlockedMilestones',
@@ -986,6 +999,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'equipBag',
       'equipItem',
       'equipItemToSlot',
+      'equipToolbelt',
       'feedPet',
       'forfeitCardDuel',
       'friendAdd',
@@ -1101,10 +1115,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'spinDailyReward',
       'startAutoAttack',
       'stopAutoAttack',
+      'storeToolInBelt',
       'submitLootRoll',
       'switchLoadout',
       'tabTarget',
       'takeActionBarLayoutRestore',
+      'takeToolFromBelt',
       'talentPoints',
       'targetEntity',
       'targetNearestFriendly',
@@ -1121,6 +1137,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'unequipBag',
       'unequipItem',
       'unequipMechChroma',
+      'unequipToolbelt',
       'unstuck',
       'upgradeRiftItem',
       'useItem',
@@ -1275,6 +1292,11 @@ const FACET_INVENTORY = [
   'socketRiftGem',
   'equipBag',
   'unequipBag',
+  'toolbelt',
+  'equipToolbelt',
+  'unequipToolbelt',
+  'storeToolInBelt',
+  'takeToolFromBelt',
 ] as const satisfies readonly (keyof IWorldInventory)[];
 type _ExhaustInventory = AssertNever<
   Exclude<keyof IWorldInventory, (typeof FACET_INVENTORY)[number]>
@@ -1690,8 +1712,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(289);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(289);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(294);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(294);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

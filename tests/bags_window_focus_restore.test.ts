@@ -7,6 +7,7 @@
 // identity first, then the same grid slot walking outward, then Close.
 
 import { describe, expect, it } from 'vitest';
+import { emptyToolbelt } from '../src/sim/toolbelt';
 import type { InvSlot } from '../src/sim/types';
 import { BagsWindow, type BagsWindowDeps } from '../src/ui/bags_window';
 import { ItemDragState } from '../src/ui/item_drag_state';
@@ -17,6 +18,7 @@ function harness(inventory: InvSlot[]): { root: HTMLElement; w: BagsWindow; inv:
     inventory,
     bags: [null, null, null, null],
     bagCapacity: 16,
+    toolbelt: emptyToolbelt(),
     copper: 0,
     useItem: () => {},
   } as unknown as IWorld;

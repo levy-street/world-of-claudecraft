@@ -9,6 +9,7 @@
 // and can be its victim).
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
+import { emptyToolbelt } from '../src/sim/toolbelt';
 import type { InvSlot } from '../src/sim/types';
 import { bagItemAction, bagUnknownAction } from '../src/ui/bags_view';
 import { BagsWindow, type BagsWindowDeps } from '../src/ui/bags_window';
@@ -28,6 +29,7 @@ function harness(inventory: InvSlot[]): {
     inventory,
     bags: [null, null, null, null],
     bagCapacity: 16,
+    toolbelt: emptyToolbelt(),
     copper: 0,
     bankDeposit: (index: number) => {
       deposits.push(index);

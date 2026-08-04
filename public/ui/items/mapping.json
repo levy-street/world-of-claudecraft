@@ -1967,6 +1967,30 @@
       "confidence": "medium"
     },
     {
+      "itemId": "basic_toolbelt",
+      "name": "Basic Toolbelt",
+      "sourcePack": "woc_original_svg",
+      "sourceFile": "authored in-repo (SVG, encoded to 128px WebP with sharp)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art, project asset, rights reserved"
+    },
+    {
+      "itemId": "reinforced_toolbelt",
+      "name": "Reinforced Toolbelt",
+      "sourcePack": "woc_original_svg",
+      "sourceFile": "authored in-repo (hue-shifted derivation of the basic belt art)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art, project asset, rights reserved"
+    },
+    {
+      "itemId": "artisans_toolbelt",
+      "name": "Artisan's Toolbelt",
+      "sourcePack": "woc_original_svg",
+      "sourceFile": "authored in-repo (hue-shifted derivation of the basic belt art)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art, project asset, rights reserved"
+    },
+    {
       "itemId": "tough_jerky",
       "name": "Tough Jerky",
       "sourcePack": "cooking",

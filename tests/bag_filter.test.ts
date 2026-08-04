@@ -392,12 +392,16 @@ describe('chip reachability census: the All-only set, pinned', () => {
   // (tests/market_filters.test.ts); the bags/bank chips deliberately do NOT
   // carry it: the 2026-08-01 settlement ruled grey trash and the five trophy
   // oddments out of every chip (Q3/Q4), and the six bag-kind items matched no
-  // chip before the narrowing either. This census makes the ruling
-  // enforceable: a chip or taxonomy edit that strands MORE items (or quietly
-  // rescues one the settlement excluded) reds an exact-set diff naming it.
+  // chip before the narrowing either; the three toolbelt-kind containers (the
+  // tailoring ladder) sit beside the bags in the same All-only set. This
+  // census makes the ruling enforceable: a chip or taxonomy edit that strands
+  // MORE items (or quietly rescues one the settlement excluded) reds an
+  // exact-set diff naming it.
   const ALL_ONLY = [
     'amber_hide',
+    'artisans_toolbelt',
     'bandit_bandana',
+    'basic_toolbelt',
     'bogiron_nugget',
     'briny_idol',
     'chipped_tusk',
@@ -419,6 +423,7 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'ogre_toe_ring',
     'old_cragmaws_pelt',
     'pale_pearl',
+    'reinforced_toolbelt',
     'silkspun_satchel',
     'soft_down',
     'soggy_boot',
@@ -430,7 +435,7 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'wolfhide_satchel',
   ] as const;
 
-  it('exactly the ruled 26 junk items plus the 6 bag-kind items match no chip', () => {
+  it('exactly the ruled 26 junk items plus the 6 bag-kind and 3 toolbelt-kind items match no chip', () => {
     const allOnly = Object.values(REAL_ITEMS)
       .filter((def) => !BAG_CATEGORIES.some((c) => c !== 'all' && matchesCategory(def, c)))
       .map((d) => d.id)
