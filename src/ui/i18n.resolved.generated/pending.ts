@@ -46,42 +46,17 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.gravewyrm_bone_quiver.name",
     "entities.items.moggers_hide_quiver.name"
   ],
-  "zh_CN": [
-    "entities.items.cragmaw_huntquiver.name",
-    "entities.items.direfang_quiver.name",
-    "entities.items.gravewyrm_bone_quiver.name",
-    "entities.items.moggers_hide_quiver.name"
-  ],
-  "zh_TW": [
-    "entities.items.cragmaw_huntquiver.name",
-    "entities.items.direfang_quiver.name",
-    "entities.items.gravewyrm_bone_quiver.name",
-    "entities.items.moggers_hide_quiver.name"
-  ],
-  "ko_KR": [
-    "entities.items.cragmaw_huntquiver.name",
-    "entities.items.direfang_quiver.name",
-    "entities.items.gravewyrm_bone_quiver.name",
-    "entities.items.moggers_hide_quiver.name"
-  ],
-  "ja_JP": [
-    "entities.items.cragmaw_huntquiver.name",
-    "entities.items.direfang_quiver.name",
-    "entities.items.gravewyrm_bone_quiver.name",
-    "entities.items.moggers_hide_quiver.name"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "entities.items.cragmaw_huntquiver.name",
     "entities.items.direfang_quiver.name",
     "entities.items.gravewyrm_bone_quiver.name",
     "entities.items.moggers_hide_quiver.name"
   ],
-  "ru_RU": [
-    "entities.items.cragmaw_huntquiver.name",
-    "entities.items.direfang_quiver.name",
-    "entities.items.gravewyrm_bone_quiver.name",
-    "entities.items.moggers_hide_quiver.name"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "entities.items.cragmaw_huntquiver.name",
     "entities.items.direfang_quiver.name",

@@ -10092,16 +10092,16 @@ export const ru_RU: EnTranslations = {
         "name": "Поводья раптора Дрейкмо"
       },
       "moggers_hide_quiver": {
-        "name": "Mogger's Hide Quiver"
+        "name": "Кожаный колчан Моггера"
       },
       "cragmaw_huntquiver": {
-        "name": "Cragmaw Huntquiver"
+        "name": "Охотничий колчан Крэгмо"
       },
       "gravewyrm_bone_quiver": {
-        "name": "Gravewyrm Bone Quiver"
+        "name": "Костяной колчан Могильного Вирма"
       },
       "direfang_quiver": {
-        "name": "Direfang Quiver"
+        "name": "Колчан Лютого Клыка"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"

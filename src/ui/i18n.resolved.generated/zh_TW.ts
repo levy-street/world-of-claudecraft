@@ -10092,16 +10092,16 @@ export const zh_TW: EnTranslations = {
         "name": "龍喉迅猛龍的韁繩"
       },
       "moggers_hide_quiver": {
-        "name": "Mogger's Hide Quiver"
+        "name": "莫格的獸皮箭袋"
       },
       "cragmaw_huntquiver": {
-        "name": "Cragmaw Huntquiver"
+        "name": "裂顎的狩獵箭袋"
       },
       "gravewyrm_bone_quiver": {
-        "name": "Gravewyrm Bone Quiver"
+        "name": "墓龍骨箭袋"
       },
       "direfang_quiver": {
-        "name": "Direfang Quiver"
+        "name": "厲牙箭袋"
       },
       "conjured_water4": {
         "name": "魔法泉水"
