@@ -1526,14 +1526,14 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: kaykit(['1H_Melee_Attack_Chop']),
     attach: [{ url: `${WEAPONS}/spear_a.glb`, bone: 'handslot.r' }],
   },
+  // A sergeant's halberd is two-handed, so his swing is the 2H clip and his off hand
+  // is empty. It is also his badge of rank, which is why the militia sergeant's one
+  // good possession is the polearm and everything else on him is patched.
   npc_marsh: {
     url: `${NPCS_DIR}/marsh.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['1H_Melee_Attack_Chop']),
-    attach: [
-      { url: `${WEAPONS}/spear_a.glb`, bone: 'handslot.r' },
-      { url: `${WEAPONS}/shield_round.glb`, bone: 'handslot.l' },
-    ],
+    clips: kaykit(['2H_Melee_Attack_Chop']),
+    attach: [{ url: `${WEAPONS}/halberd.glb`, bone: 'handslot.r' }],
   },
 
   // -- The break-spawned -----------------------------------------------------
