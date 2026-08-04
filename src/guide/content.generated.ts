@@ -2355,6 +2355,15 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "still": "/guide-stills/mob_spider__283747.webp"
       },
       {
+        "name": "Broodmother Egg",
+        "min": 10,
+        "max": 10,
+        "rare": false,
+        "templateId": "spider_egg",
+        "model": "mob_spider_egg_sac",
+        "still": "/guide-stills/mob_spider_egg_sac.webp"
+      },
+      {
         "name": "Canopy Weaver",
         "min": 20,
         "max": 20,
@@ -10171,6 +10180,11 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "idle": "Idle_Combat",
     "height": 2.5,
     "tintStrength": 0.25
+  },
+  "mob_spider_egg_sac": {
+    "url": "models/creatures/spider_egg_sac.glb",
+    "idle": "Idle",
+    "height": 1.8
   },
   "mob_troll": {
     "url": "models/creatures/orc.glb",
