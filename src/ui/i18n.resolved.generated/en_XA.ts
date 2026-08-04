@@ -2250,6 +2250,7 @@ export const en_XA: EnTranslations = {
       "depositHint": "[Çļíçķ ţó ðéþóšíţ]",
       "depositPartialHint": "[Šĥíƒţ-çļíçķ ţó ðéþóšíţ á þáŕţíáļ áɱóúñţ]",
       "cannotDeposit": "[Çáññóţ ƀé ƀáñķéð]",
+      "cannotDepositNow": "[Çáññóţ ƀé ðéþóšíţéð ŕíĝĥţ ñóŵ]",
       "depositQuantityTitle": "[Ðéþóšíţ {item}]",
       "depositQuantityInput": "[Ɋúáñţíţý ţó ðéþóšíţ]",
       "depositQuantityConfirm": "[Ðéþóšíţ]",

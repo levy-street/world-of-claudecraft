@@ -2250,6 +2250,7 @@ export const sv_SE: EnTranslations = {
       "depositHint": "Klicka för att sätta in",
       "depositPartialHint": "Skift-klicka för att sätta in en del av antalet",
       "cannotDeposit": "Kan inte förvaras i banken",
+      "cannotDepositNow": "Cannot be deposited right now",
       "depositQuantityTitle": "Sätt in {item}",
       "depositQuantityInput": "Antal att sätta in",
       "depositQuantityConfirm": "Sätt in",

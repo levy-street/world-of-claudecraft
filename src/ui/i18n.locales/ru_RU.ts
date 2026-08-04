@@ -9018,6 +9018,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.depositHint': 'Нажмите, чтобы положить',
   'hudChrome.bank.depositPartialHint': 'Shift+клик, чтобы положить часть',
   'hudChrome.bank.cannotDeposit': 'Нельзя хранить в банке',
+  'hudChrome.bank.cannotDepositNow': 'Сейчас положить нельзя',
   'hudChrome.bank.depositQuantityTitle': 'Положить {item}',
   'hudChrome.bank.depositQuantityInput': 'Количество для внесения',
   'hudChrome.bank.depositQuantityConfirm': 'Положить',

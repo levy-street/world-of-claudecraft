@@ -2250,6 +2250,7 @@ export const tr_TR: EnTranslations = {
       "depositHint": "Yatırmak için tıkla",
       "depositPartialHint": "Bir kısmını yatırmak için Shift ile tıkla",
       "cannotDeposit": "Bankaya konulamaz",
+      "cannotDepositNow": "Cannot be deposited right now",
       "depositQuantityTitle": "{item} yatır",
       "depositQuantityInput": "Yatırılacak miktar",
       "depositQuantityConfirm": "Yatır",

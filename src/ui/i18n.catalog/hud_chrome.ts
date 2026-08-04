@@ -2503,6 +2503,12 @@ export const hudChromeStrings = {
     depositHint: 'Click to deposit',
     depositPartialHint: 'Shift-click to deposit a partial amount',
     cannotDeposit: 'Cannot be banked',
+    // The bank is open on a view with NO grid to deposit into (its guild pane's
+    // Log). State-based, not item-based: the item is fine, the surface has
+    // nowhere to put it. One terse key serving both the hover hint and the
+    // click's refusal toast, the way cannotVendor / cannotMarket already do.
+    // (Wordy value, M16: the five non-Latin fills land in this same change.)
+    cannotDepositNow: 'Cannot be deposited right now',
     depositQuantityTitle: 'Deposit {item}',
     depositQuantityInput: 'Quantity to deposit',
     depositQuantityConfirm: 'Deposit',

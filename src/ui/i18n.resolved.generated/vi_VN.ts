@@ -2250,6 +2250,7 @@ export const vi_VN: EnTranslations = {
       "depositHint": "Nhấp để gửi vào",
       "depositPartialHint": "Shift-click để gửi vào một phần",
       "cannotDeposit": "Không thể gửi vào ngân hàng",
+      "cannotDepositNow": "Cannot be deposited right now",
       "depositQuantityTitle": "Gửi {item}",
       "depositQuantityInput": "Số lượng cần gửi",
       "depositQuantityConfirm": "Gửi Vào",

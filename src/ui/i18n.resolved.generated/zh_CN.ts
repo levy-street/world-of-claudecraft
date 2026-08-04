@@ -2250,6 +2250,7 @@ export const zh_CN: EnTranslations = {
       "depositHint": "点击存入",
       "depositPartialHint": "Shift+点击存入部分数量",
       "cannotDeposit": "无法存入银行",
+      "cannotDepositNow": "暂时无法存入",
       "depositQuantityTitle": "存入 {item}",
       "depositQuantityInput": "要存入的数量",
       "depositQuantityConfirm": "存入",

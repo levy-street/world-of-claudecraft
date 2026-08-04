@@ -8868,6 +8868,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.depositHint': 'クリックで預ける',
   'hudChrome.bank.depositPartialHint': 'Shift+クリックで一部だけ預ける',
   'hudChrome.bank.cannotDeposit': '銀行に預けられません',
+  'hudChrome.bank.cannotDepositNow': '今は預けられません',
   'hudChrome.bank.depositQuantityTitle': '{item}を預ける',
   'hudChrome.bank.depositQuantityInput': '預ける数量',
   'hudChrome.bank.depositQuantityConfirm': '預ける',

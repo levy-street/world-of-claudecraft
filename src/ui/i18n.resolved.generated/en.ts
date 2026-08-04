@@ -2250,6 +2250,7 @@ export const en: EnTranslations = {
       "depositHint": "Click to deposit",
       "depositPartialHint": "Shift-click to deposit a partial amount",
       "cannotDeposit": "Cannot be banked",
+      "cannotDepositNow": "Cannot be deposited right now",
       "depositQuantityTitle": "Deposit {item}",
       "depositQuantityInput": "Quantity to deposit",
       "depositQuantityConfirm": "Deposit",

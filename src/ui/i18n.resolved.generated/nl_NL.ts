@@ -2250,6 +2250,7 @@ export const nl_NL: EnTranslations = {
       "depositHint": "Klik om te storten",
       "depositPartialHint": "Shift-klik om een deel te storten",
       "cannotDeposit": "Kan niet in de bank",
+      "cannotDepositNow": "Cannot be deposited right now",
       "depositQuantityTitle": "{item} storten",
       "depositQuantityInput": "Aantal om te storten",
       "depositQuantityConfirm": "Storten",

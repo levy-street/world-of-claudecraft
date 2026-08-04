@@ -2250,6 +2250,7 @@ export const ko_KR: EnTranslations = {
       "depositHint": "클릭하여 넣기",
       "depositPartialHint": "Shift+클릭하여 일부만 넣기",
       "cannotDeposit": "은행에 보관할 수 없음",
+      "cannotDepositNow": "지금은 보관할 수 없음",
       "depositQuantityTitle": "{item} 넣기",
       "depositQuantityInput": "넣을 수량",
       "depositQuantityConfirm": "넣기",

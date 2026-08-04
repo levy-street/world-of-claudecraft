@@ -1255,6 +1255,15 @@ export class BagsWindow {
         // through the shared showError pipe), and send nothing.
         this.deps.showError(tSim('error.bankQuestItem'));
         return;
+      case 'bankDepositBlockedNoTarget':
+        // The bank is open with no grid on screen to drop into (its guild pane's
+        // Log view). SPEAK, do not go quiet: this is a deliberate click on an
+        // item, in a docked window whose every other click either deposits or
+        // says why it will not, so silence here reads as a broken bag. The line
+        // is the same terse one the hover advertises, matching how the vendor
+        // and market denies reuse their cannot-hint wording.
+        this.deps.showError(t('hudChrome.bank.cannotDepositNow'));
+        return;
       case 'guildBankDeposit': {
         // The guild twin of bankDeposit: same reference-resolved index, same
         // shift split prompt, sent through the IWorldGuildBank facet.
@@ -1371,6 +1380,13 @@ export class BagsWindow {
       // only while its own grid is actually on screen to drop into. The guild
       // pane's Log view arms neither, because a bag click while reading the
       // history must not silently deposit the item that was clicked.
+      //
+      // bankOpen carries the fact the two deposit flags no longer can: that the
+      // bank cluster owns the bag slot at all. Without it, disarming both
+      // deposits reads downstream as "no window is open", which demotes the
+      // click to the plain use/equip default and re-arms the destroy prompt and
+      // the item action menu over a reading surface.
+      bankOpen: this.deps.isBankOpen(),
       bankDeposit: this.deps.isPersonalBankTab(),
       guildBankDeposit: this.deps.isGuildBankTab(),
       petFeed: this.deps.pendingPetFeed(),
@@ -1381,6 +1397,9 @@ export class BagsWindow {
   // the plain-use default mode (never trade / mail / market / vendor / bank /
   // pet-feed, whose own click owns the slot), mirroring bagDestroyAction's
   // transactional-mode gate, and only when the item has an eligible action.
+  // The bank arm reads bankOpen for the same reason bagDestroyAction does: a
+  // bank view with no deposit target is still the bank owning the slot, and the
+  // menu's rows are the very use / equip / destroy actions this surface refuses.
   private itemMenuAvailable(item: ItemDef, itemId: string): boolean {
     const mode = this.bagMode();
     const inDefaultMode =
@@ -1388,6 +1407,7 @@ export class BagsWindow {
       !mode.mailAttach &&
       !mode.marketSell &&
       !mode.vendorOpen &&
+      !mode.bankOpen &&
       !mode.bankDeposit &&
       !mode.guildBankDeposit &&
       !mode.petFeed;

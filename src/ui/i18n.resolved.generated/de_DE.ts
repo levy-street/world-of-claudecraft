@@ -2250,6 +2250,7 @@ export const de_DE: EnTranslations = {
       "depositHint": "Klicke, um einzulagern",
       "depositPartialHint": "Umschalt-Klick, um eine Teilmenge einzulagern",
       "cannotDeposit": "Kann nicht eingelagert werden",
+      "cannotDepositNow": "Cannot be deposited right now",
       "depositQuantityTitle": "{item} einlagern",
       "depositQuantityInput": "Einzulagernde Menge",
       "depositQuantityConfirm": "Einlagern",

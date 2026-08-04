@@ -2250,6 +2250,7 @@ export const da_DK: EnTranslations = {
       "depositHint": "Klik for at indsætte",
       "depositPartialHint": "Shift-klik for at indsætte et mindre antal",
       "cannotDeposit": "Kan ikke lægges i banken",
+      "cannotDepositNow": "Cannot be deposited right now",
       "depositQuantityTitle": "Indsæt {item}",
       "depositQuantityInput": "Antal at indsætte",
       "depositQuantityConfirm": "Indsæt",

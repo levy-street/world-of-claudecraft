@@ -6317,6 +6317,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.bank.buySlots'
   | 'hudChrome.bank.buySlotsMaxed'
   | 'hudChrome.bank.cannotDeposit'
+  | 'hudChrome.bank.cannotDepositNow'
   | 'hudChrome.bank.capacity'
   | 'hudChrome.bank.capacityAria'
   | 'hudChrome.bank.close'

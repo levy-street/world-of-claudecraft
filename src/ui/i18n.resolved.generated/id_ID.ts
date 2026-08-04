@@ -2250,6 +2250,7 @@ export const id_ID: EnTranslations = {
       "depositHint": "Klik untuk menyetor",
       "depositPartialHint": "Shift-klik untuk menyetor sebagian",
       "cannotDeposit": "Tidak dapat disimpan di bank",
+      "cannotDepositNow": "Cannot be deposited right now",
       "depositQuantityTitle": "Setor {item}",
       "depositQuantityInput": "Jumlah yang disetor",
       "depositQuantityConfirm": "Setor",

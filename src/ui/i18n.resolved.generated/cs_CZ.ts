@@ -2250,6 +2250,7 @@ export const cs_CZ: EnTranslations = {
       "depositHint": "Kliknutím uložíš",
       "depositPartialHint": "Shift + kliknutí uloží jen část množství",
       "cannotDeposit": "Nelze uložit do banky",
+      "cannotDepositNow": "Cannot be deposited right now",
       "depositQuantityTitle": "Uložit {item}",
       "depositQuantityInput": "Množství k uložení",
       "depositQuantityConfirm": "Uložit",

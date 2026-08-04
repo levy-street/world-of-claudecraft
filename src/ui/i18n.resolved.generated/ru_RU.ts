@@ -2250,6 +2250,7 @@ export const ru_RU: EnTranslations = {
       "depositHint": "Нажмите, чтобы положить",
       "depositPartialHint": "Shift+клик, чтобы положить часть",
       "cannotDeposit": "Нельзя хранить в банке",
+      "cannotDepositNow": "Сейчас положить нельзя",
       "depositQuantityTitle": "Положить {item}",
       "depositQuantityInput": "Количество для внесения",
       "depositQuantityConfirm": "Положить",

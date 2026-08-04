@@ -2250,6 +2250,7 @@ export const pl_PL: EnTranslations = {
       "depositHint": "Kliknij, aby zdeponować",
       "depositPartialHint": "Kliknij z Shiftem, aby zdeponować część",
       "cannotDeposit": "Nie można zdeponować",
+      "cannotDepositNow": "Cannot be deposited right now",
       "depositQuantityTitle": "Zdeponuj: {item}",
       "depositQuantityInput": "Liczba do zdeponowania",
       "depositQuantityConfirm": "Zdeponuj",

@@ -2250,6 +2250,7 @@ export const ja_JP: EnTranslations = {
       "depositHint": "クリックで預ける",
       "depositPartialHint": "Shift+クリックで一部だけ預ける",
       "cannotDeposit": "銀行に預けられません",
+      "cannotDepositNow": "今は預けられません",
       "depositQuantityTitle": "{item}を預ける",
       "depositQuantityInput": "預ける数量",
       "depositQuantityConfirm": "預ける",

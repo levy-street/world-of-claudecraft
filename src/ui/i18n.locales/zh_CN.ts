@@ -8463,6 +8463,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.depositHint': '点击存入',
   'hudChrome.bank.depositPartialHint': 'Shift+点击存入部分数量',
   'hudChrome.bank.cannotDeposit': '无法存入银行',
+  'hudChrome.bank.cannotDepositNow': '暂时无法存入',
   'hudChrome.bank.depositQuantityTitle': '存入 {item}',
   'hudChrome.bank.depositQuantityInput': '要存入的数量',
   'hudChrome.bank.depositQuantityConfirm': '存入',

@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 // load-bearing behaviors: reusing bag_filter via buildBagGrid (not re-deriving the
 // filter) and preserving the .bag-grid scroll offset across a rebuild.
 const painter = readFileSync(new URL('../src/ui/bags_window.ts', import.meta.url), 'utf8');
+const view = readFileSync(new URL('../src/ui/bags_view.ts', import.meta.url), 'utf8');
 const promptDialog = readFileSync(new URL('../src/ui/prompt_dialog.ts', import.meta.url), 'utf8');
 const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
 const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
@@ -86,6 +87,15 @@ describe('bags_window: bank-deposit mode wiring', () => {
     // NOT the personal predicate: it armed the personal deposit behind the log.
     expect(painter).toContain('bankDeposit: this.deps.isPersonalBankTab(),');
     expect(painter).toContain('guildBankDeposit: this.deps.isGuildBankTab(),');
+    // ...and the SUPERSET flag that says the bank cluster owns the slot at all.
+    // Without it, both deposits off is bit-identical to "no window is open",
+    // which demoted the click to the use/equip default and re-armed the destroy
+    // prompt and the item action menu over the guild pane's reading surface.
+    expect(painter).toContain('bankOpen: this.deps.isBankOpen(),');
+    // The consumers that must read the superset, not the deposit pair.
+    expect(painter).toContain('!mode.bankOpen &&');
+    expect(view).toContain("if (mode.bankOpen) return 'bankDepositBlockedNoTarget';");
+    expect(view).toContain("if (mode.bankOpen) return 'hudChrome.bank.cannotDepositNow';");
   });
 
   it('hud wires isBankOpen to the live bank-window open state', () => {

@@ -8858,6 +8858,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.depositHint': '클릭하여 넣기',
   'hudChrome.bank.depositPartialHint': 'Shift+클릭하여 일부만 넣기',
   'hudChrome.bank.cannotDeposit': '은행에 보관할 수 없음',
+  'hudChrome.bank.cannotDepositNow': '지금은 보관할 수 없음',
   'hudChrome.bank.depositQuantityTitle': '{item} 넣기',
   'hudChrome.bank.depositQuantityInput': '넣을 수량',
   'hudChrome.bank.depositQuantityConfirm': '넣기',
