@@ -6,11 +6,18 @@
 // folded-row count) plus the numbers, and meters.ts localizes them. That keeps
 // the ranking and share math unit-testable in plain Node.
 //
-// The same shape serves all three tabs: damage and healing break down BY
-// ABILITY (a pet's abilities carry the pet's name, so a hunter running two pets
-// can still tell which of them did what), while threat breaks down BY
-// CONTRIBUTOR (the member's own hate plus one row per pet), where every entry
-// has a null ability.
+// The same shape serves all three tabs, and all three now break down BY
+// ABILITY: a pet's abilities carry the pet's name, so a hunter running two pets
+// can still tell which of them did what. Threat used to break down BY
+// CONTRIBUTOR instead (the member's own hate plus one row per pet, every entry
+// with a null ability); that mode is gone because the threat tab gives each
+// contributor its own BAR now, so the panel behind one bar narrows to that
+// contributor's abilities rather than re-splitting a folded column.
+//
+// Note what this core does NOT do: it ranks strictly by amount, so a pet's
+// abilities interleave with its owner's and there is no pet SUBTOTAL row, and
+// `rowCap` folds the tail globally rather than per contributor. Grouping a pet
+// under a subtotal is a real gap, tracked separately from the threat work.
 
 /** One raw contribution before ranking: an ability, or a whole contributor. */
 export interface BreakdownEntry {
