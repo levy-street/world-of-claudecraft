@@ -23,13 +23,28 @@ const IMG_DIR = join(REPO, 'docs', 'design', 'last-bell-concept-art');
 // Page order is story order: you meet the ferryman, land, meet the squad, then
 // the things that come through the breaks.
 const ORDER = [
-  'ewald', 'marsh', 'coalfast', 'coalfast_helm', 'ollun', 'edda', 'saul', 'tam',
+  'ewald',
+  'marsh',
+  'coalfast',
+  'coalfast_helm',
+  'ollun',
+  'edda',
+  'saul',
+  'tam',
   'nell',
-  'riftspawn', 'breach_wretch', 'void_stalker', 'tidemill_stalker', 'sundered_horror',
+  'riftspawn',
+  'breach_wretch',
+  'void_stalker',
+  'tidemill_stalker',
+  'sundered_horror',
 ];
 
 const esc = (s) =>
-  String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 
 async function toWebp(src, outName, width) {
   const out = join(IMG_DIR, outName);
@@ -71,7 +86,13 @@ function weaponList(weapons = []) {
     .map(
       (w) => `
       <li>
-        <b>${esc(w.url.split('/').pop().replace(/\.glb$/, '').replace(/_/g, ' '))}</b>
+        <b>${esc(
+          w.url
+            .split('/')
+            .pop()
+            .replace(/\.glb$/, '')
+            .replace(/_/g, ' '),
+        )}</b>
         <code>${esc(w.bone)}</code>
         <em>${esc(w.why)}</em>
       </li>`,
@@ -379,17 +400,24 @@ async function main() {
       images.turntable.push(await toWebp(join(PLATES_IN, f), f.replace(/\.png$/, '.webp'), 440));
     }
     for (const p of entry.plates) {
-      images.plates.push(await toWebp(join(PLATES_IN, p.file), p.file.replace(/\.png$/, '.webp'), 560));
+      images.plates.push(
+        await toWebp(join(PLATES_IN, p.file), p.file.replace(/\.png$/, '.webp'), 560),
+      );
     }
     if (entry.bust) {
       await toWebp(join(PLATES_IN, entry.bust), entry.bust.replace(/\.png$/, '.webp'), 420);
     }
     sections.push(figureSection(entry, images));
-    process.stdout.write(`  ${entry.id}: ${images.turntable.length} turntable, ${images.plates.length} plates\n`);
+    process.stdout.write(
+      `  ${entry.id}: ${images.turntable.length} turntable, ${images.plates.length} plates\n`,
+    );
   }
 
   const toc = entries
-    .map((e) => `<li><a href="#${esc(e.id)}">${esc(e.name.replace(/^(Warden|Riftwatch|Quartermaster|Mender|Bellkeeper|Ferryman|Sergeant) /, ''))}</a></li>`)
+    .map(
+      (e) =>
+        `<li><a href="#${esc(e.id)}">${esc(e.name.replace(/^(Warden|Riftwatch|Quartermaster|Mender|Bellkeeper|Ferryman|Sergeant) /, ''))}</a></li>`,
+    )
     .join('');
 
   const html = `<!doctype html>
