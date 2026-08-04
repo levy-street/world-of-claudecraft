@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "bbb0349fce6f03ec35ad8d2ef0dd0add098d223a2cf91f6ee99bfc796bfe57c4",
-  "catalogHash": "49b4ca2e18d0d36d23b7e00056a3f28e520cd268a22d22adf35a552583220538",
+  "bundleId": "b1d7f3545fe1ad19f43b97778cd7ee0a4a9471baae1d34dc74e62d4616281ebd",
+  "catalogHash": "62cd30609e4d083a14116d86a36b264cddc806d53392979eef4890dbff0ff424",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -398,6 +398,18 @@
         }
       ],
       "gain": 2.06538,
+      "playbackRate": 1
+    },
+    "flamestrike": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/flamestrike.mp3?v=d57a0627c1bf",
+          "bytes": 60229,
+          "sha256": "d57a0627c1bfe6daacd67706c2359347af522be0c89ba13466dcb58d94b77416"
+        }
+      ],
+      "gain": 2.041738,
       "playbackRate": 1
     },
     "foot_dirt": {
@@ -3040,6 +3052,18 @@
       "gain": 1.883649,
       "playbackRate": 1
     },
+    "pyroblast": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/pyroblast.mp3?v=46d9a02dab7b",
+          "bytes": 37659,
+          "sha256": "46d9a02dab7b747e386c249d986e92281ab092a552d491002e4c24abb2b17cbc"
+        }
+      ],
+      "gain": 2.041738,
+      "playbackRate": 1
+    },
     "quest_accept": {
       "variants": [
         {
@@ -3074,6 +3098,18 @@
         }
       ],
       "gain": 2.570396,
+      "playbackRate": 1
+    },
+    "scorch": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/scorch.mp3?v=7f312cad2cd6",
+          "bytes": 19478,
+          "sha256": "7f312cad2cd6ebf8a2b9bf73c6b70efe9030b3ccc0d86d3d54e90c761acab940"
+        }
+      ],
+      "gain": 1.840772,
       "playbackRate": 1
     },
     "spell_nova": {

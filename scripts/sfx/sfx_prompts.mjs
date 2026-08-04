@@ -444,6 +444,18 @@ export const SFX = [
     key: 'cloak_of_shadows',
     custom: true,
   },
+  {
+    key: 'scorch',
+    custom: true,
+  },
+  {
+    key: 'pyroblast',
+    custom: true,
+  },
+  {
+    key: 'flamestrike',
+    custom: true,
+  },
 
   // --- Heals & auras --------------------------------------------------------
   {

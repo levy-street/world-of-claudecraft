@@ -345,6 +345,37 @@ describe('combat SFX policy', () => {
     ).toBeNull();
   });
 
+  it('gives Flamestrike its own cast cue instead of the shared spell_nova', () => {
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 10,
+        school: 'fire',
+        fx: 'nova',
+        ability: 'flamestrike',
+      }),
+    ).toEqual({ key: 'flamestrike', anchorId: 10 });
+  });
+
+  it('gives Scorch and Pyroblast their own impact instead of the shared impact_fire', () => {
+    for (const [ability, key] of [
+      ['scorch', 'scorch'],
+      ['pyroblast', 'pyroblast'],
+    ] as const) {
+      expect(
+        impactCueForDamage(damage({ school: 'fire', ability }), target('mob', 'crypt_shambler')),
+      ).toBe(key);
+    }
+    // Every other fire spell (Fireball, etc.) keeps the shared impact_fire.
+    expect(
+      impactCueForDamage(
+        damage({ school: 'fire', ability: 'fireball' }),
+        target('mob', 'crypt_shambler'),
+      ),
+    ).toBe('impact_fire');
+  });
+
   it('preserves v0.25 mob families and loaded subfamily overrides', () => {
     expect(mobVoiceFamily('mudfin_murloc')).toBe('mudfin');
     expect(mobVoiceCue('mudfin_murloc', 'aggro')).toBe('mob_mudfin_aggro');

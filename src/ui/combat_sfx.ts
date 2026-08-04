@@ -34,12 +34,24 @@ const WAND_CUES: Partial<Record<MagicSchool, SfxId>> = {
 // Ring of Frost, ...). A few abilities get their own distinct cast cue
 // instead, keyed off the casting ability id the event already carries: the
 // three AoE fear shouts (priest Psychic Scream, warlock Howl of Terror,
-// warrior Intimidating Shout, all archetype aoeFear), and Frost Nova.
+// warrior Intimidating Shout, all archetype aoeFear), Frost Nova, and
+// Flamestrike (also archetype 'nova': a ground-targeted fire burst).
 const NOVA_ABILITY_CUES: Partial<Record<string, SfxId>> = {
   psychic_scream: 'fear_shout',
   howl_of_terror: 'fear_shout',
   intimidating_shout: 'fear_shout',
   frost_nova: 'frost_nova',
+  flamestrike: 'flamestrike',
+};
+
+// A damage-landing archetype (bolt/burst/strike/nova/beam/dot) always
+// resolves the shared impact_<school> cue (impactCueForDamage below). A few
+// abilities get their own distinct impact instead, keyed off
+// DamageEvent.ability. Every other fire spell (Fireball, the rest of the
+// bolt/burst family) keeps the shared impact_fire.
+const IMPACT_ABILITY_CUES: Partial<Record<string, SfxId>> = {
+  scorch: 'scorch',
+  pyroblast: 'pyroblast',
 };
 
 // A landed cc (stun/root/incapacitate) has no recording by default (see
@@ -189,6 +201,10 @@ export function materialImpactCue(target: Entity): SfxId {
 }
 
 export function impactCueForDamage(event: DamageEvent, target: Entity): SfxId | null {
+  if (event.ability) {
+    const override = IMPACT_ABILITY_CUES[event.ability];
+    if (override) return override;
+  }
   if (!event.school || event.school === 'physical') return materialImpactCue(target);
   const school = magicSchool(event.school);
   return school ? SCHOOL_CUES[school].impact : null;
