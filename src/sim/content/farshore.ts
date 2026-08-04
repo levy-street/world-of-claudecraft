@@ -30,7 +30,12 @@ import type {
   ZonePropsDef,
 } from '../types';
 import { emptyZoneProps } from '../types';
-import { GULLHAVEN_BUILDINGS, GULLHAVEN_TOWN_PROPS, gullhavenWallProps } from './gullhaven';
+import {
+  GULLHAVEN_BUILDINGS,
+  GULLHAVEN_CHURCHYARD_FENCE,
+  GULLHAVEN_TOWN_PROPS,
+  gullhavenWallProps,
+} from './gullhaven';
 import { GULLHAVEN_MEMORIAL, memorialRailProps } from './memorials';
 
 export const FARSHORE_ZONE: ZoneDef = {
@@ -755,7 +760,7 @@ export const FARSHORE_PROPS: ZonePropsDef = {
     { key: 'oakTree', x: 786.5, z: 150, rot: 0.6, scale: 1.2, r: 0.8, h: 9 },
     // Moved clear of the south bench: at (823.5, 149) it stood in the middle of
     // the levelled building ground GULLHAVEN_TERRAIN_EDITS cuts there.
-    { key: 'oakTree', x: 831, z: 154.5, rot: -1.1, scale: 1.25, r: 0.8, h: 9 },
+    { key: 'oakTree', x: 836, z: 156, rot: -1.1, scale: 1.25, r: 0.8, h: 9 },
   ],
   wells: [{ x: 820, z: 119, r: 1.5 }],
   stalls: [
@@ -781,7 +786,10 @@ export const FARSHORE_PROPS: ZonePropsDef = {
   // south approach: a solid line between the town and the monument, which is
   // where the stray collision up there came from. The siege reads through the
   // war camp, the watchfires and the redoubt itself, not a rail fence.
-  fences: [],
+  // The churchyard wall behind the menders' hall (src/sim/content/gullhaven.ts).
+  // The old barricade ring is still retired: it read as clutter round the muster
+  // and cut across the memorial's south approach.
+  fences: [...GULLHAVEN_CHURCHYARD_FENCE],
   // No tents either, for the same reason: canvas beside a stone bell tower and
   // mortared houses is two different towns in one frame. The siege now reads
   // through the curtain wall, the gates and the salvage on the quay.

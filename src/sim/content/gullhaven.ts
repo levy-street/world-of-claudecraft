@@ -105,32 +105,70 @@ export interface GullhavenBuilding {
 }
 
 export const GULLHAVEN_BUILDINGS: readonly GullhavenBuilding[] = Object.freeze([
-  // ---- the east quarter: ONE STREET, two facing rows, closed at its head ----
-  // A lane runs north to south along x 842.5 on the levelled bench, with a row of
-  // houses either side of it and the menders' hall across its head. Every
-  // rotation here is a right angle, and the pairs sit opposite each other at the
-  // same z: that is what makes it read as a street a town laid out rather than
-  // as houses that happened to land nearby. Doors face the lane (local +z lands
-  // on (sin rot, cos rot), so rot -PI/2 faces west and PI/2 faces east).
-  { kind: 'house', x: 838, z: 118, w: 5, d: 5, rot: Math.PI / 2, pad: 6.3 },
-  { kind: 'house', x: 847, z: 118, w: 5, d: 5, rot: -Math.PI / 2, pad: 6.3 },
-  { kind: 'house', x: 838, z: 126, w: 5, d: 5, rot: Math.PI / 2, pad: 6.3 },
-  { kind: 'house', x: 847, z: 126, w: 5, d: 5, rot: -Math.PI / 2, pad: 6.3 },
-  // The menders' hall closes the lane's south head, facing back up it: the one
-  // building you are looking at the whole way down the street.
-  { kind: 'chapel', x: 842.5, z: 134, w: 5, d: 7, rot: Math.PI, pad: 6.3 },
+  // SIZE FIRST. The renderer scales a building's model to w by d in plan but takes
+  // its HEIGHT from a fixed per-asset table (`houseHeight` in render/props.ts):
+  // house1 is 8.0 yards tall, house2 7.6. A 5 by 5 footprint therefore produced an
+  // eight yard tower on a cottage plan, which is why the old town read as a set of
+  // toy models parked on grass. These are 7 by 8 and up, so a house is wider than
+  // it is tall and has the mass of a building.
+  //
+  // Six buildings, each answering a question about where a town puts that thing.
 
-  // ---- the knoll inside the north gate ----
-  // The muster hall stands square to the shore road on the knoll above the town,
-  // so it is the first roof over the wall as you come down to the north gate,
-  // and it addresses the square below.
-  { kind: 'inn', x: 826, z: 99, w: 6, d: 7, rot: 0, pad: 6.1 },
+  // The harbour inn, on the ferry road where it climbs off the pier: the first
+  // roof you reach walking up from the boat, facing the road it serves.
+  { kind: 'inn', x: 807, z: 110, w: 9, d: 8, rot: 0, pad: 4.94 },
 
-  // ---- the south bench: the fisher row ----
-  // Two cottages in one line at the same z, facing north back at the town, on
-  // the levelled bench above the Wreckfields road.
-  { kind: 'house', x: 816, z: 145, w: 5, d: 5, rot: Math.PI, pad: 7.9 },
-  { kind: 'house', x: 824, z: 145, w: 5, d: 5, rot: Math.PI, pad: 7.9 },
+  // The knoll house inside the north gate, square to the shore road and looking
+  // back down over the square. A gate needs something standing at it.
+  { kind: 'house', x: 826, z: 100, w: 7, d: 8, rot: 0, pad: 6.1 },
+
+  // ---- the square's east terrace ----
+  // The church alone closes it. There is no second building up here on purpose:
+  // the Watch Meadow road sweeps north-east across x 822 to 855 as z falls from
+  // 118 to 90, so the only ground north of the church is road, and a tower facing
+  // the market across fifteen yards of open square is a strong enough east side
+  // without something crowding it.
+  // THE CHURCH, and it carries Gullhaven's bell. The `chapel` kind is COMPOSED
+  // (prop_layout.CHAPEL_TOWER): a 10.6 yard bell tower at the rear over a squat
+  // entry hall, which already makes it the tallest thing in the town, taller than
+  // the 8.0 yard houses. So the standalone `bellTower` prop is gone: it stood 4.76
+  // yards at its authored scale, SHORTER than a house, and putting a second one
+  // ten yards from this tower gave the town two bells arguing with each other.
+  // The campaign is named for the bell, the zone's welcome text promises it, and
+  // Tam's greeting spells out its code: this tower is it.
+  //
+  // It faces west across the square, dominating the terrace, and its walled
+  // burial ground lies directly behind it to the south. In a siege the hall
+  // doubles as Saul's infirmary, which is where the menders' hall went.
+  { kind: 'chapel', x: 841, z: 122, w: 8, d: 10, rot: -Math.PI / 2, pad: 6.3 },
+
+  // ---- the fisher row on the south bench ----
+  // Two cottages on the bench above the Wreckfields road, both facing north back
+  // at the town. This is where a fishing town puts its people: near their own
+  // shore, below the market, off the through-roads. Two and not three because the
+  // bench's levelled core is sixteen yards across and a third 7 by 8 cottage
+  // could only fit by leaning on the curtain.
+  { kind: 'house', x: 820, z: 146, w: 7, d: 8, rot: Math.PI, pad: 8.28 },
+  { kind: 'house', x: 810, z: 155, w: 7, d: 8, rot: Math.PI, pad: 8.81 },
+]);
+
+/**
+ * The churchyard wall. The graveyard renders as SIX headstones on a 3 by 2 grid
+ * stepping +2.2 in x and +2.6 in z from its anchor (render/props.ts), so the plot
+ * itself is only about 4.4 by 2.6 yards and had nothing around it: six stones
+ * loose on the grass behind a building. This walls it, which is what makes it read
+ * as a burial ground belonging to the hall in front of it rather than as scenery.
+ *
+ * Open on the NORTH side, where you come down from the hall's door. The stone
+ * module is 1.155 long at its 4.2 render scale, so runs are sized in whole
+ * modules to avoid a part-module stub at a corner.
+ */
+export const GULLHAVEN_CHURCHYARD_FENCE = Object.freeze([
+  // Squared to the hall's own footprint (x 836 to 846) so the wall continues the
+  // building's lines instead of sitting askew behind it.
+  { x1: 836, z1: 129, x2: 836, z2: 138.5, kind: 'stone' as const }, // west
+  { x1: 846, z1: 129, x2: 846, z2: 138.5, kind: 'stone' as const }, // east
+  { x1: 836, z1: 138.5, x2: 846, z2: 138.5, kind: 'stone' as const }, // south
 ]);
 
 /**
@@ -144,7 +182,11 @@ export const GULLHAVEN_BUILDINGS: readonly GullhavenBuilding[] = Object.freeze([
 function plotPads(): HeightStamp[] {
   const out: HeightStamp[] = [];
   for (const b of GULLHAVEN_BUILDINGS) {
-    const plot = Math.max(b.w, b.d) / 2 + 1.1;
+    // The flat pass has to cover the footprint's half-DIAGONAL, not half its
+    // longest side: a corner sits further from the centre than any edge midpoint,
+    // so sizing on the side left every corner of the larger buildings outside the
+    // level pad and back on the natural slope (1.86 yards out at the inn).
+    const plot = Math.hypot(b.w, b.d) / 2 + 0.6;
     out.push({
       x: b.x,
       z: b.z,
@@ -483,23 +525,11 @@ export function gullhavenWallProps(): {
  * stands on ground the town actually uses (pinned by `tests/gullhaven_wall.test.ts`).
  */
 export const GULLHAVEN_TOWN_PROPS = Object.freeze([
-  // THE BELL. The campaign is named for it, the zone's welcome text promises it
-  // ("Gullhaven's bell will find you before the town does"), and Tam's greeting
-  // spells out its code. Until now all three watchbells stood OUTSIDE the town
-  // and `bellTower` was a prop no content in the game placed. It stands where the
-  // square meets the head of the houses' street, so it closes the market's east
-  // side and every road out of the junction passes under it.
-  { key: 'bellTower', x: 832.6, z: 119.3, rot: 0, r: 1.1, h: 4.76 },
   // Edda's forge on the square's south-east shoulder, turned back toward the
   // market, with her anvil out front. She is the Redoubt Armorer and reforges the
   // Bellheart's voice at her forge in the finale; she stood in open air until now.
-  { key: 'blacksmith', x: 832, z: 123.5, rot: -2.6, r: 1.9, h: 3 },
-  { key: 'anvil', x: 833.5, z: 126.5, rot: 0.4, r: 0.5, h: 1 },
-  // Triage beside the menders' hall, off the lane so it never blocks the door:
-  // Saul treats every patient by name, and the last break cost the watch "a
-  // morning and two stretchers".
-  { key: 'cart', x: 847, z: 133, rot: 1.9, r: 1.1, h: 1.8 },
-  { key: 'barrel', x: 846.4, z: 135.4, rot: 0, r: 0.5, h: 1.1 },
+  { key: 'blacksmith', x: 830, z: 124.5, rot: -2.6, r: 1.9, h: 3 },
+  { key: 'anvil', x: 831.5, z: 127.5, rot: 0.4, r: 0.5, h: 1 },
   // Star-glass salvage stacked for the mainland buyers Q0 names, on the apron
   // where the harbour road comes up off the pier.
   { key: 'crate', x: 800.5, z: 116.5, rot: 0.3, r: 0.6, h: 1.1 },
