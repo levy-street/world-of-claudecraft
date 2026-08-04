@@ -2110,8 +2110,7 @@ export const GUIDE_DRUID_FORMS: GuideDruidForm[] = [
   {
     "id": "form_bear",
     "model": "form_bear",
-    "tint": "#5a4030",
-    "still": "/guide-stills/form_bear__5a4030.webp"
+    "still": "/guide-stills/form_bear.webp"
   },
   {
     "id": "form_cat",
@@ -9871,10 +9870,9 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     ]
   },
   "form_bear": {
-    "url": "models/creatures/yetialt.glb",
+    "url": "models/creatures/bear_form.glb",
     "idle": "Idle",
-    "height": 2.4,
-    "tintStrength": 0.55
+    "height": 2.35
   },
   "form_cat": {
     "url": "models/creatures/wolf_basic.glb",

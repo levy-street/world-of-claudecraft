@@ -35,14 +35,32 @@ mkdirSync(outDir, { recursive: true });
 //    root-relative /<logical> paths our static server maps into public/), which esbuild leaves
 //    intact for a classic IIFE <script src> and would be a SyntaxError. esbuild matches each
 //    FULL member path exactly (a bare `import.meta.env` define does NOT fold `.DEV`), so define
-//    both Vite flags media.ts / i18n.ts read; the assert below fails loudly if a transitive
-//    module ever reads another import.meta field this define misses.
+//    every Vite flag a transitive module reads (`grep -rho 'import\.meta\.env\.[A-Za-z_]*' src/`).
+//
+//    The `raw import.meta` assert below is necessary but NOT sufficient: for an iife bundle
+//    esbuild folds an undefined member path down to `({}).env`, so a missed field leaves no
+//    literal `import.meta` to catch and instead throws at runtime reading a property of
+//    undefined (which surfaces only as a PAGEERR and a 20s wait-for timeout). client_origin.ts
+//    reading VITE_NATIVE_APP hit exactly that, so keep this list exhaustive.
 const bundled = await esbuild.build({
   entryPoints: [path.join(root, 'scripts', 'wiki', 'stills_render_entry.js')],
   bundle: true,
   format: 'iife',
   platform: 'browser',
-  define: { 'import.meta.env.DEV': 'true', 'import.meta.env.PROD': 'false' },
+  define: {
+    'import.meta.env.DEV': 'true',
+    'import.meta.env.PROD': 'false',
+    'import.meta.env.BASE_URL': '"/"',
+    'import.meta.env.VITE_API_ORIGIN': '""',
+    'import.meta.env.VITE_DESKTOP_API_ORIGIN': '""',
+    'import.meta.env.VITE_DESKTOP_APP': '""',
+    'import.meta.env.VITE_DESKTOP_RELATIVE_API': '""',
+    'import.meta.env.VITE_DISCORD_DISABLED': '""',
+    'import.meta.env.VITE_NATIVE_APP': '""',
+    'import.meta.env.VITE_REOWN_PROJECT_ID': '""',
+    'import.meta.env.VITE_TURNSTILE_SITEKEY': '""',
+    'import.meta.env.VITE_WALLET_DISABLED': '""',
+  },
   write: false,
   logLevel: 'silent',
 });
