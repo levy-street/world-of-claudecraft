@@ -3242,7 +3242,7 @@ export const id_ID: EnTranslations = {
       "talents": "Talent",
       "arena": "Arena & PvP",
       "valeCup": "Piala Lembah",
-      "ravenrift": "Thornhollow Fields",
+      "thornhollow": "Thornhollow Fields",
       "deeds": "Kitab Jasa",
       "glossary": "Glosarium",
       "wishIKnew": "Hal yang Andai Kuketahui",
@@ -4016,7 +4016,7 @@ export const id_ID: EnTranslations = {
       "ladderHeading": "Menaiki tangga peringkat",
       "ladderBody": "Permainan berperingkat melacak kedudukanmu dari waktu ke waktu. Lihat papan peringkat untuk mengetahui posisimu dan siapa yang memuncaki realm."
     },
-    "ravenriftPage": {
+    "thornhollowPage": {
       "heading": "Thornhollow Fields",
       "intro": "A ranked 5v5 capture-the-flag battleground fought in a walled hollow in the old growth below Thornpeak, where two ruined keeps face each other down the length of a ravine and an older courtyard sits between them that neither has ever held. Two teams of five, two keeps, one goal: steal the enemy banner and run it home before they run yours.",
       "queueHeading": "Queueing up",

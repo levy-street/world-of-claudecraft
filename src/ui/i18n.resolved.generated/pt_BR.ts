@@ -3242,7 +3242,7 @@ export const pt_BR: EnTranslations = {
       "talents": "Talentos",
       "arena": "Arena e JcJ",
       "valeCup": "Copa do Vale",
-      "ravenrift": "Thornhollow Fields",
+      "thornhollow": "Thornhollow Fields",
       "deeds": "Livro dos Feitos",
       "glossary": "Glossário",
       "wishIKnew": "O que eu gostaria de saber",
@@ -4016,7 +4016,7 @@ export const pt_BR: EnTranslations = {
       "ladderHeading": "Subindo no ranking",
       "ladderBody": "O jogo ranqueado acompanha sua classificação ao longo do tempo. Confira o placar para ver onde você está e quem domina o topo do reino."
     },
-    "ravenriftPage": {
+    "thornhollowPage": {
       "heading": "Thornhollow Fields",
       "intro": "A ranked 5v5 capture-the-flag battleground fought in a walled hollow in the old growth below Thornpeak, where two ruined keeps face each other down the length of a ravine and an older courtyard sits between them that neither has ever held. Two teams of five, two keeps, one goal: steal the enemy banner and run it home before they run yours.",
       "queueHeading": "Queueing up",

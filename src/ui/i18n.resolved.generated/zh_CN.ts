@@ -3242,7 +3242,7 @@ export const zh_CN: EnTranslations = {
       "talents": "天赋",
       "arena": "竞技场与 PvP",
       "valeCup": "溪谷杯",
-      "ravenrift": "荆谷原野",
+      "thornhollow": "荆谷原野",
       "deeds": "功绩之书",
       "glossary": "术语表",
       "wishIKnew": "我希望早点知道的事",
@@ -4016,7 +4016,7 @@ export const zh_CN: EnTranslations = {
       "ladderHeading": "攀登天梯",
       "ladderBody": "排名对战会长期追踪你的排名。查看排行榜，看看你身处何处，以及谁占据着这片位面的榜首。"
     },
-    "ravenriftPage": {
+    "thornhollowPage": {
       "heading": "荆谷原野",
       "intro": "一场排位 5v5 夺旗战场，战场位于棘峰之下老林中的围墙山谷：两座废弃要塞沿着峡谷两端遥遥相对，中间是一座更古老的庭院，谁都不曾真正占据。每方五人，两座要塞，一个目标：夺走敌方战旗并抢在对方之前带回家。",
       "queueHeading": "排队参战",

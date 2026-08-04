@@ -884,29 +884,29 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.map.azureKeep': '蔚蓝要塞',
   'hudChrome.bg.map.ruinCourtyard': '废墟庭院',
   'hudChrome.bg.map.graveyard': '墓地',
-  'guide.nav.ravenrift': '荆谷原野',
-  'guide.ravenriftPage.heading': '荆谷原野',
-  'guide.ravenriftPage.intro':
+  'guide.nav.thornhollow': '荆谷原野',
+  'guide.thornhollowPage.heading': '荆谷原野',
+  'guide.thornhollowPage.intro':
     '一场排位 5v5 夺旗战场，战场位于棘峰之下老林中的围墙山谷：两座废弃要塞沿着峡谷两端遥遥相对，中间是一座更古老的庭院，谁都不曾真正占据。每方五人，两座要塞，一个目标：夺走敌方战旗并抢在对方之前带回家。',
-  'guide.ravenriftPage.queueHeading': '排队参战',
-  'guide.ravenriftPage.queueBody':
+  'guide.thornhollowPage.queueHeading': '排队参战',
+  'guide.thornhollowPage.queueBody':
     '打开荆谷原野面板即可单人排队,也可以组一支最多五人的小队一同排队:小队总在同一边,空位由单人勇士补齐。十人就位后,比赛会把双方安置在各自要塞,短暂列队后旗帜生效。',
-  'guide.ravenriftPage.fieldHeading': '战场地形',
-  'guide.ravenriftPage.fieldBody':
+  'guide.thornhollowPage.fieldHeading': '战场地形',
+  'guide.thornhollowPage.fieldBody':
     '一片有围墙的露天战场,被隔成三个区域:两队各自的前场,以及夹在中间的废墟中庭。两道横贯全场的隔墙划出边界,穿行区域之间必须经过争夺点:宽阔的正门,或是骑跨在隔墙上的门楼小屋,其错位的两扇门逼你绕过伏击死角。每座要塞除正门外全部封死,夺旗进出只有这一个口;正门前还有一道矮壁垒挡住直冲的路线。中庭里有空心的中央废墟与两枚侧翼疾行符文,另外两枚守在两旗的接近路上。每个正门的中庭入口处还有一枚战斗或守护符文(短时间内提升伤害或减免伤害):两个符文台开局同面,每次拾取后翻面。',
-  'guide.ravenriftPage.flagsHeading': '旗帜',
-  'guide.ravenriftPage.flagsBody':
+  'guide.thornhollowPage.flagsHeading': '旗帜',
+  'guide.thornhollowPage.flagsBody':
     '每座要塞守着本队军旗。夺取敌旗并送到己方旗座即可得分;先夺得五次者获胜,超时的战斗按比分定胜负。旗手阵亡时旗帜就地掉落:敌人可以再次拾起,而本队队员只需靠近便能立即将其送回。军旗也绝不藏身:拾旗会解除潜行,旗手若以任何方式隐身,旗帜都会当场掉落。',
-  'guide.ravenriftPage.respawnBody':
+  'guide.thornhollowPage.respawnBody':
     '死亡保留经典仪式:尸体停在原地,直到你亲自释放灵魂;灵魂会在你方主堡旁的围栏墓地中升起,并被结界束缚,直到你方下一波复活潮。复活潮会同时唤起所有等待的灵魂;两队的复活潮刻意错开,战斗永远不会同时完全重置。这里没有跑尸,也没有灵魂医者的交易:释放、等潮、再战。',
-  'guide.ravenriftPage.pickupNote':
+  'guide.thornhollowPage.pickupNote':
     '拾旗永远需要主动按下战场动作键:没有人会因为跑过旗帜而意外成为旗手。',
-  'guide.ravenriftPage.respawnHeading': '战场阵亡',
-  'guide.ravenriftPage.carrierHeading': '扛旗',
-  'guide.ravenriftPage.carrierBody':
+  'guide.thornhollowPage.respawnHeading': '战场阵亡',
+  'guide.thornhollowPage.carrierHeading': '扛旗',
+  'guide.thornhollowPage.carrierBody':
     '扛着敌旗太久的旗手会越来越脆弱,承受的伤害持续增加,直到旗帜被夺回、掉落或归还。抱旗躲藏是败招;把旗送回家才是胜途。',
-  'guide.ravenriftPage.ladderHeading': '天梯',
-  'guide.ravenriftPage.ladderBody':
+  'guide.thornhollowPage.ladderHeading': '天梯',
+  'guide.thornhollowPage.ladderBody':
     '每场比赛无论胜负都会移动角色的战场评分,历史总榜记录王国的冠军。胜利与鏖战到底的失利也会通过战争体系发放荣誉。',
   'hudChrome.charSheet.offense': '攻击',
   'hudChrome.charSheet.defense': '防御',

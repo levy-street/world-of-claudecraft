@@ -3242,7 +3242,7 @@ export const zh_TW: EnTranslations = {
       "talents": "天賦",
       "arena": "競技場與PvP",
       "valeCup": "溪谷盃",
-      "ravenrift": "荊谷原野",
+      "thornhollow": "荊谷原野",
       "deeds": "功績之書",
       "glossary": "詞彙表",
       "wishIKnew": "我希望早點知道的事",
@@ -4016,7 +4016,7 @@ export const zh_TW: EnTranslations = {
       "ladderHeading": "在天梯上攀升",
       "ladderBody": "排名對戰會長期記錄你的名次。查看排行榜便能看到自己的位置，以及誰穩坐王國之巔。"
     },
-    "ravenriftPage": {
+    "thornhollowPage": {
       "heading": "荊谷原野",
       "intro": "一場排位 5v5 奪旗戰場，戰場位於棘峰之下老林中的圍牆山谷：兩座廢棄要塞沿著峽谷兩端遙遙相對，中間是一座更古老的庭院，誰都不曾真正佔據。每方五人，兩座要塞，一個目標：奪走敵方戰旗並趕在對方之前帶回家。",
       "queueHeading": "排隊參戰",

@@ -910,29 +910,29 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.map.azureKeep': '애저 요새',
   'hudChrome.bg.map.ruinCourtyard': '폐허 안뜰',
   'hudChrome.bg.map.graveyard': '묘지',
-  'guide.nav.ravenrift': '쏜할로우 평원',
-  'guide.ravenriftPage.heading': '쏜할로우 평원',
-  'guide.ravenriftPage.intro':
+  'guide.nav.thornhollow': '쏜할로우 평원',
+  'guide.thornhollowPage.heading': '쏜할로우 평원',
+  'guide.thornhollowPage.intro':
     '가시봉 아래 오래된 숲의 성벽으로 둘러싸인 분지에서 벌어지는 랭크 5대 5 깃발 뺏기 전장. 협곡 양 끝에서 두 폐허 요새가 마주 보고, 그 사이에는 누구도 차지한 적 없는 더 오래된 안뜰이 있다. 다섯 명씩, 요새 둘, 목표 하나. 적의 깃발을 빼앗아 우리 깃발을 빼앗기기 전에 가져와라.',
-  'guide.ravenriftPage.queueHeading': '대기열 참가',
-  'guide.ravenriftPage.queueBody':
+  'guide.thornhollowPage.queueHeading': '대기열 참가',
+  'guide.thornhollowPage.queueBody':
     '쏜할로우 평원 창을 열어 혼자 대기열에 서거나, 최대 5인 파티로 함께 참가하세요. 파티는 항상 같은 팀에 배치되고 남는 자리는 솔로 용사들로 채워집니다. 열 명이 모이면 양 팀이 각자의 요새에 배치되고, 짧은 집결 후 깃발이 활성화됩니다.',
-  'guide.ravenriftPage.fieldHeading': '전장',
-  'guide.ravenriftPage.fieldBody':
+  'guide.thornhollowPage.fieldHeading': '전장',
+  'guide.thornhollowPage.fieldBody':
     '성벽으로 둘러싸인 야외 전장이 세 구역으로 나뉩니다. 양 팀 각자의 앞마당과 그 사이에 낀 폐허 안뜰입니다. 전장을 가로지르는 두 장벽이 경계를 이루며, 구역 사이를 오가려면 반드시 쟁탈 지점을 지나야 합니다. 넓은 정문과 장벽에 걸쳐 앉은 문루입니다. 문루의 두 문은 엇갈리게 나 있어 매복 모퉁이를 돌아가야 합니다. 각 요새는 정문을 제외하면 완전히 막혀 있어 깃발을 노리는 출입은 반드시 같은 입구를 지나며, 그 정문 앞에는 낮은 방책이 서서 일직선 돌격을 막습니다. 안뜰에는 속이 빈 중앙 유적과 측면의 질주 룬 2개가 있으며, 나머지 2개는 깃발 진입로에 놓여 있습니다.또한 각 정문의 안뜰 입구에는 전투 룬 또는 수호 룬(짧은 시간 동안 피해 증가 또는 피해 감소)이 기다립니다. 두 받침대는 같은 면으로 경기를 시작하며 차지할 때마다 면이 뒤집힙니다.',
-  'guide.ravenriftPage.flagsHeading': '깃발',
-  'guide.ravenriftPage.flagsBody':
+  'guide.thornhollowPage.flagsHeading': '깃발',
+  'guide.thornhollowPage.flagsBody':
     '각 요새는 자기 팀의 깃발을 지킵니다. 적 깃발을 빼앗아 아군 깃대까지 가져오면 득점하며, 먼저 5회 탈취한 팀이 승리하고 시간이 다 된 전투는 점수로 판가름납니다. 운반자가 쓰러지면 깃발은 그 자리에 떨어집니다. 적은 다시 주울 수 있지만, 깃발 주인 팀은 가까이 가기만 해도 즉시 되찾아옵니다. 또한 깃발은 결코 숨지 않습니다. 깃발을 주우면 은신이 풀리고, 운반자가 어떤 수단으로든 모습을 감추면 깃발은 그 자리에 떨어집니다.',
-  'guide.ravenriftPage.respawnBody':
+  'guide.thornhollowPage.respawnBody':
     '죽음은 고전 의식을 그대로 따릅니다. 시신은 직접 영혼을 해방할 때까지 그 자리에 남고, 영혼은 아군 요새 옆 울타리 묘지에서 일어나 다음 아군 부활 파도까지 그곳에 결박됩니다. 파도는 기다리던 모든 영혼을 함께 일으킵니다. 두 팀의 파도는 의도적으로 엇갈려 있어 전투가 한꺼번에 완전히 초기화되는 일은 없습니다. 시신 달리기도, 영혼 치유사와의 거래도 없습니다. 해방하고, 파도를 기다리고, 다시 싸우십시오.',
-  'guide.ravenriftPage.pickupNote':
+  'guide.thornhollowPage.pickupNote':
     '깃발 줍기는 언제나 전장 행동 키를 의도적으로 누르는 행위입니다. 깃발 위를 스쳐 지나갔다고 운반자가 되는 일은 없습니다.',
-  'guide.ravenriftPage.respawnHeading': '전장에서의 죽음',
-  'guide.ravenriftPage.carrierHeading': '깃발 운반',
-  'guide.ravenriftPage.carrierBody':
+  'guide.thornhollowPage.respawnHeading': '전장에서의 죽음',
+  'guide.thornhollowPage.carrierHeading': '깃발 운반',
+  'guide.thornhollowPage.carrierBody':
     '적 깃발을 너무 오래 들고 있는 운반자는 점점 취약해져, 깃발이 탈취되거나 떨어지거나 반환될 때까지 받는 피해가 계속 늘어납니다. 깃발을 안고 숨는 것은 지는 길이고, 집으로 가져오는 것이 이기는 길입니다.',
-  'guide.ravenriftPage.ladderHeading': '순위표',
-  'guide.ravenriftPage.ladderBody':
+  'guide.thornhollowPage.ladderHeading': '순위표',
+  'guide.thornhollowPage.ladderBody':
     '승패와 관계없이 매 경기 캐릭터별 전장 레이팅이 움직이며, 역대 순위표가 서버의 챔피언을 기록합니다. 승리와 끝까지 싸운 패배에는 전쟁 체계를 통해 명예도 지급됩니다.',
   'hudChrome.charSheet.offense': '공격',
   'hudChrome.charSheet.defense': '방어',

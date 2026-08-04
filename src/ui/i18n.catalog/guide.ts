@@ -45,7 +45,7 @@ export const guideStrings = {
     talents: 'Talents',
     arena: 'Arena & PvP',
     valeCup: 'Vale Cup',
-    ravenrift: 'Thornhollow Fields',
+    thornhollow: 'Thornhollow Fields',
     deeds: 'Book of Deeds',
     glossary: 'Glossary',
     wishIKnew: 'Things I Wish I Knew',
@@ -1151,10 +1151,11 @@ export const guideStrings = {
       'Ranked play tracks your standing over time. Check the leaderboard to see where you sit and who holds the top of the realm.',
   },
 
-  // The Vale Cup boarball minigame page (docs/prd/vale-cup.md). Spoiler-safe:
-  // lore, how to play, nations, roles; no kick powers, timers, or matchmaker
-  // internals. Nation/role NAMES render from the shared hudChrome.vcup.* keys.
-  ravenriftPage: {
+  // The Thornhollow Fields 5v5 capture-the-flag battleground page
+  // (docs/design/thornhollow-fields-lore.md). Spoiler-safe: the mode, the field,
+  // flags, wave respawns, runes, the ladder; no honor amounts, rating math, or
+  // tuning constants.
+  thornhollowPage: {
     heading: 'Thornhollow Fields',
     intro:
       'A ranked 5v5 capture-the-flag battleground fought in a walled hollow in the old growth below Thornpeak, where two ruined keeps face each other down the length of a ravine and an older courtyard sits between them that neither has ever held. Two teams of five, two keeps, one goal: steal the enemy banner and run it home before they run yours.',
@@ -1179,6 +1180,9 @@ export const guideStrings = {
     ladderBody:
       'Every match moves a persistent per-character battleground rating, win or lose, and the all-time board ranks the realm champions. Wins and hard-fought losses also pay Honor through the Warfare system.',
   },
+  // The Vale Cup boarball minigame page (docs/prd/vale-cup.md). Spoiler-safe:
+  // lore, how to play, nations, roles; no kick powers, timers, or matchmaker
+  // internals. Nation/role NAMES render from the shared hudChrome.vcup.* keys.
   valeCupPage: {
     heading: 'The Vale Cup',
     intro:

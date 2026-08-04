@@ -885,29 +885,29 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.map.azureKeep': '蔚藍要塞',
   'hudChrome.bg.map.ruinCourtyard': '廢墟庭院',
   'hudChrome.bg.map.graveyard': '墓地',
-  'guide.nav.ravenrift': '荊谷原野',
-  'guide.ravenriftPage.heading': '荊谷原野',
-  'guide.ravenriftPage.intro':
+  'guide.nav.thornhollow': '荊谷原野',
+  'guide.thornhollowPage.heading': '荊谷原野',
+  'guide.thornhollowPage.intro':
     '一場排位 5v5 奪旗戰場，戰場位於棘峰之下老林中的圍牆山谷：兩座廢棄要塞沿著峽谷兩端遙遙相對，中間是一座更古老的庭院，誰都不曾真正佔據。每方五人，兩座要塞，一個目標：奪走敵方戰旗並趕在對方之前帶回家。',
-  'guide.ravenriftPage.queueHeading': '排隊參戰',
-  'guide.ravenriftPage.queueBody':
+  'guide.thornhollowPage.queueHeading': '排隊參戰',
+  'guide.thornhollowPage.queueBody':
     '打開荊谷原野面板即可單人排隊,也可以組一支最多五人的隊伍一同排隊:隊伍總在同一邊,空位由單人勇士補齊。十人就位後,比賽會把雙方安置在各自要塞,短暫列隊後旗幟生效。',
-  'guide.ravenriftPage.fieldHeading': '戰場地形',
-  'guide.ravenriftPage.fieldBody':
+  'guide.thornhollowPage.fieldHeading': '戰場地形',
+  'guide.thornhollowPage.fieldBody':
     '一片有圍牆的露天戰場,被隔成三個區域:兩隊各自的前場,以及夾在中間的廢墟中庭。兩道橫貫全場的隔牆劃出邊界,穿行區域之間必須經過爭奪點:寬闊的正門,或是騎跨在隔牆上的門樓小屋,其錯位的兩扇門逼你繞過伏擊死角。每座要塞除正門外全部封死,奪旗進出只有這一個口;正門前還有一道矮壁壘擋住直衝的路線。中庭裡有空心的中央廢墟與兩枚側翼疾行符文,另外兩枚守在兩旗的接近路上。每個正門的中庭入口處還有一枚戰鬥或守護符文(短時間內提升傷害或減免傷害):兩個符文台開局同面,每次拾取後翻面。',
-  'guide.ravenriftPage.flagsHeading': '旗幟',
-  'guide.ravenriftPage.flagsBody':
+  'guide.thornhollowPage.flagsHeading': '旗幟',
+  'guide.thornhollowPage.flagsBody':
     '每座要塞守著本隊軍旗。奪取敵旗並送到己方旗座即可得分;先奪得五次者獲勝,超時的戰鬥按比分定勝負。旗手陣亡時旗幟就地掉落:敵人可以再次拾起,而本隊隊員只需靠近便能立即將其送回。軍旗也絕不藏身:拾旗會解除潛行,旗手若以任何方式隱身,旗幟都會當場掉落。',
-  'guide.ravenriftPage.respawnBody':
+  'guide.thornhollowPage.respawnBody':
     '死亡保留經典儀式:屍體停在原地,直到你親自釋放靈魂;靈魂會在你方主堡旁的圍欄墓地中升起,並被結界束縛,直到你方下一波復活潮。復活潮會同時喚起所有等待的靈魂;兩隊的復活潮刻意錯開,戰鬥永遠不會同時完全重置。這裡沒有跑屍,也沒有靈魂醫者的交易:釋放、等潮、再戰。',
-  'guide.ravenriftPage.pickupNote':
+  'guide.thornhollowPage.pickupNote':
     '拾旗永遠需要主動按下戰場動作鍵:沒有人會因為跑過旗幟而意外成為旗手。',
-  'guide.ravenriftPage.respawnHeading': '戰場陣亡',
-  'guide.ravenriftPage.carrierHeading': '扛旗',
-  'guide.ravenriftPage.carrierBody':
+  'guide.thornhollowPage.respawnHeading': '戰場陣亡',
+  'guide.thornhollowPage.carrierHeading': '扛旗',
+  'guide.thornhollowPage.carrierBody':
     '扛著敵旗太久的旗手會越來越脆弱,承受的傷害持續增加,直到旗幟被奪回、掉落或歸還。抱旗躲藏是敗招;把旗送回家才是勝途。',
-  'guide.ravenriftPage.ladderHeading': '天梯',
-  'guide.ravenriftPage.ladderBody':
+  'guide.thornhollowPage.ladderHeading': '天梯',
+  'guide.thornhollowPage.ladderBody':
     '每場比賽無論勝負都會移動角色的戰場評分,歷史總榜記錄王國的冠軍。勝利與鏖戰到底的失利也會透過戰爭體系發放榮譽。',
   'hudChrome.charSheet.offense': '攻擊',
   'hudChrome.charSheet.defense': '防禦',

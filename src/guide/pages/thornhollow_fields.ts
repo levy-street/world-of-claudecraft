@@ -9,20 +9,20 @@ import type { GuidePage } from './types';
 import { callout, pageHeader, related, section } from './ui';
 
 export const thornhollowFields: GuidePage = {
-  titleKey: 'guide.nav.ravenrift',
+  titleKey: 'guide.nav.thornhollow',
   render() {
     return `
       <article class="guide-article guide-thornhollow-fields">
-        ${pageHeader('guide.ravenriftPage.heading', 'guide.ravenriftPage.intro')}
-        ${section('guide.ravenriftPage.queueHeading', `<p>${esc(t('guide.ravenriftPage.queueBody'))}</p>`)}
-        ${section('guide.ravenriftPage.fieldHeading', `<p>${esc(t('guide.ravenriftPage.fieldBody'))}</p>`)}
+        ${pageHeader('guide.thornhollowPage.heading', 'guide.thornhollowPage.intro')}
+        ${section('guide.thornhollowPage.queueHeading', `<p>${esc(t('guide.thornhollowPage.queueBody'))}</p>`)}
+        ${section('guide.thornhollowPage.fieldHeading', `<p>${esc(t('guide.thornhollowPage.fieldBody'))}</p>`)}
         ${section(
-          'guide.ravenriftPage.flagsHeading',
-          `<p>${esc(t('guide.ravenriftPage.flagsBody'))}</p>${callout(esc(t('guide.ravenriftPage.pickupNote')), { variant: 'note' })}`,
+          'guide.thornhollowPage.flagsHeading',
+          `<p>${esc(t('guide.thornhollowPage.flagsBody'))}</p>${callout(esc(t('guide.thornhollowPage.pickupNote')), { variant: 'note' })}`,
         )}
-        ${section('guide.ravenriftPage.respawnHeading', `<p>${esc(t('guide.ravenriftPage.respawnBody'))}</p>`)}
-        ${section('guide.ravenriftPage.carrierHeading', `<p>${esc(t('guide.ravenriftPage.carrierBody'))}</p>`)}
-        ${section('guide.ravenriftPage.ladderHeading', `<p>${esc(t('guide.ravenriftPage.ladderBody'))}</p>`)}
+        ${section('guide.thornhollowPage.respawnHeading', `<p>${esc(t('guide.thornhollowPage.respawnBody'))}</p>`)}
+        ${section('guide.thornhollowPage.carrierHeading', `<p>${esc(t('guide.thornhollowPage.carrierBody'))}</p>`)}
+        ${section('guide.thornhollowPage.ladderHeading', `<p>${esc(t('guide.thornhollowPage.ladderBody'))}</p>`)}
         ${related([
           { href: hrefFor('arena'), key: 'guide.nav.arena' },
           { href: hrefFor('classes'), key: 'guide.nav.classes' },

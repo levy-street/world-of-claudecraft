@@ -915,29 +915,29 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.map.azureKeep': '蒼藍の城塞',
   'hudChrome.bg.map.ruinCourtyard': '廃墟の中庭',
   'hudChrome.bg.map.graveyard': '墓地',
-  'guide.nav.ravenrift': 'ソーンホロウ平原',
-  'guide.ravenriftPage.heading': 'ソーンホロウ平原',
-  'guide.ravenriftPage.intro':
+  'guide.nav.thornhollow': 'ソーンホロウ平原',
+  'guide.thornhollowPage.heading': 'ソーンホロウ平原',
+  'guide.thornhollowPage.intro':
     'ソーンピークの下、古い森に抱かれた壁に囲まれた窪地で戦うランク制5対5の旗奪取戦場。峡谷の両端で二つの廃城が向かい合い、その間にはどちらの手にも落ちたことのない、より古い中庭が横たわる。五人ずつ、城は二つ、目的は一つ。相手の旗を奪い、こちらの旗を奪われる前に持ち帰れ。',
-  'guide.ravenriftPage.queueHeading': 'キューへの参加',
-  'guide.ravenriftPage.queueBody':
+  'guide.thornhollowPage.queueHeading': 'キューへの参加',
+  'guide.thornhollowPage.queueBody':
     'ソーンホロウ平原パネルを開けばソロで参加できるほか、最大5人のパーティで一緒に並べます。パーティは必ず同じチームに配置され、残りの席はソロの勇者で埋まります。10人が揃うと両チームが砦に配置され、短い整列ののち旗が有効になります。',
-  'guide.ravenriftPage.fieldHeading': '戦場',
-  'guide.ravenriftPage.fieldBody':
+  'guide.thornhollowPage.fieldHeading': '戦場',
+  'guide.thornhollowPage.fieldBody':
     '壁に囲まれた野外の戦場は、3つの区画に分かれています。両チームそれぞれの前庭と、その間に挟まれた「廃墟の中庭」です。全幅を貫く2枚の隔壁が境界となり、区画間の移動は必ず争奪点を通ります。広い正門と、隔壁をまたぐ門楼です。門楼の2つの扉は互い違いに開いており、伏撃の角を回り込む必要があります。各砦は正面口以外が完全に封じられているため、旗をめぐる出入りは必ず同じ開口部を通ります。その正面口には低いバリケードが立ち、まっすぐな突撃を阻みます。中庭には空洞の中心遺跡と側翼の2つのスプリントルーンがあり、残る2つは旗への進路に待っています。さらに各正門の中庭側入口にはバトルルーンまたはウォードルーン(短時間、与ダメージ増加か被ダメージ軽減)が待機:両方の台は同じ面で試合を開始し、取得のたびに面が切り替わります。',
-  'guide.ravenriftPage.flagsHeading': '旗',
-  'guide.ravenriftPage.flagsBody':
+  'guide.thornhollowPage.flagsHeading': '旗',
+  'guide.thornhollowPage.flagsBody':
     '各砦は自軍の旗を守っています。敵の旗を奪って自軍の旗座まで運べば得点。先に5回キャプチャーしたチームの勝利で、時間切れの戦いはスコアで決着します。倒された運び手はその場に旗を落とします。敵は拾い直せますが、旗の持ち主チームは近づくだけで即座に旗を戻せます。また、旗は決して隠れません。旗を拾うとステルスは解除され、運び手がどんな手段であれ姿を消せば、旗はその場に落ちます。',
-  'guide.ravenriftPage.respawnBody':
+  'guide.thornhollowPage.respawnBody':
     '死は古典の儀式のまま:遺体はあなた自身が解放するまでその場に残り、魂は自陣キープの傍らの柵に囲まれた墓地に現れ、次のチーム復活ウェーブまでそこに縛られます。ウェーブは待機中の霊体を全員同時に蘇らせます。両チームのウェーブは意図的にずらされており、戦いが同時に完全リセットされることはありません。遺体走りも、スピリットヒーラーとの取引もありません:解放し、ウェーブを待ち、戦うのみ。',
-  'guide.ravenriftPage.pickupNote':
+  'guide.thornhollowPage.pickupNote':
     '旗を拾うのは常に戦場アクションキーの意図的な押下です。誤って旗の上を走り抜けて運び手になることはありません。',
-  'guide.ravenriftPage.respawnHeading': '戦場での死',
-  'guide.ravenriftPage.carrierHeading': '旗の運搬',
-  'guide.ravenriftPage.carrierBody':
+  'guide.thornhollowPage.respawnHeading': '戦場での死',
+  'guide.thornhollowPage.carrierHeading': '旗の運搬',
+  'guide.thornhollowPage.carrierBody':
     '敵の旗を長く持ちすぎた運び手はどんどん脆くなり、旗がキャプチャー、ドロップ、返還されるまで被ダメージが増え続けます。旗を抱えて隠れるのは負け筋。持ち帰るのが勝ち筋です。',
-  'guide.ravenriftPage.ladderHeading': 'ラダー',
-  'guide.ravenriftPage.ladderBody':
+  'guide.thornhollowPage.ladderHeading': 'ラダー',
+  'guide.thornhollowPage.ladderBody':
     '勝っても負けても、毎試合キャラクターごとの戦場レーティングが動き、歴代ランキングがレルムの王者を記録します。勝利と最後まで戦い抜いた敗北にはウォーフェアシステムを通じて名誉も支払われます。',
   'hudChrome.charSheet.offense': '攻撃',
   'hudChrome.charSheet.defense': '防御',

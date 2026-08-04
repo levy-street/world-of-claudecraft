@@ -164,9 +164,9 @@ export const GUIDE_ROUTES: GuideRoute[] = [
   {
     id: 'thornhollow-fields',
     sub: 'thornhollow-fields',
-    navKey: 'guide.nav.ravenrift',
+    navKey: 'guide.nav.thornhollow',
     group: 'compendium',
-    descKey: 'guide.ravenriftPage.intro',
+    descKey: 'guide.thornhollowPage.intro',
   },
   {
     id: 'deeds',
