@@ -361,12 +361,12 @@ describe('Eastbrook polish capture contract', () => {
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
       // Deliberately re-pinned: src/render/renderer.ts is the rendererIntegration
-      // leaf of this composite, and editing it to gate the shapeshift-form visual
-      // swap on async compile (#2571) moves the leaf's own sha256 and, with it,
-      // the composite fingerprint. No GLB source fingerprint moved and no
-      // capture was retaken, following the identical precedent this composite
-      // already carries from the compile-storm gear/mount/base-visual gate fix.
-      fingerprint: '2d4e6e0ee7168a0bf25a13ba1a2754f39e8c8f168e6f369ceb6588fe2bb9b2bb',
+      // leaf of this composite, and adding the Blizzard timed ground loop to its
+      // snowZone spellfx arm moves the leaf's own sha256 and, with it, the
+      // composite fingerprint. No GLB source fingerprint moved and no capture was
+      // retaken, following the identical precedent this composite already carries
+      // from the shapeshift async-compile gate and the compile-storm fix before it.
+      fingerprint: '35a73d73ae56abff042936a85b78c20dd561d2e7a1ab4f13e72d7f376c11ba8b',
       components: {
         captureContract: {
           id: 'polish-v2',

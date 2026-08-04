@@ -615,14 +615,14 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   'metadata/after-desktop-ultra.json',
 );
 // Re-pinned: src/render/renderer.ts is the rendererIntegration leaf of the polish
-// composite provenance, so gating the shapeshift-form visual swap on async compile
-// (#2571) in that file moves the metadata file's bytes (its polishProvenance block)
-// and the composite fingerprint it carries, the same way the compile-storm
-// gear/mount/base-visual gate fix re-pinned these before it.
+// composite provenance, so adding the Blizzard timed ground loop to its snowZone
+// spellfx arm moves the metadata file's bytes (its polishProvenance block) and the
+// composite fingerprint it carries, the same way the shapeshift async-compile gate
+// and the compile-storm gear/mount/base-visual fix re-pinned these before it.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '33c844c2f31361c377506f384718ee2310da2bf1607b4c8724a56303beceff38';
+  '697e46d296c7c6587ba4d43f67fefa3fc29274ff3ab0795f17534f9b7a167e0e';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '2d4e6e0ee7168a0bf25a13ba1a2754f39e8c8f168e6f369ceb6588fe2bb9b2bb';
+  '35a73d73ae56abff042936a85b78c20dd561d2e7a1ab4f13e72d7f376c11ba8b';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1480,12 +1480,12 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
     // src/render/renderer.ts is the rendererIntegration leaf of that composite,
-    // so gating the shapeshift-form visual swap on async compile (#2571) moved
+    // so adding the Blizzard timed ground loop to its snowZone spellfx arm moved
     // the composite fingerprint and, with it, this seal follows. Every measured
     // value (frame timings, draw stats, triangle and scenario numbers) is
     // byte-identical, and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      'e6115e14fe78b1bc52616624a72b0837858282c74bd3a3feab9fdd312a576454',
+      'ee65722daa3b88b525b9c1c96d0cc39596682b54bf0c8b60aa221ba6142455d2',
     );
   });
 
