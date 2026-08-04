@@ -373,7 +373,15 @@ describe('Eastbrook polish capture contract', () => {
       // moved, not one pipeline input or geometry value changed, and no capture was
       // retaken: Eastbrook itself is untouched by all of it. Re-minted with
       // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
-      fingerprint: '43744314ffd1751887724b4cafa4c76d1169fa08073641f8e4979e88a21ed8bf',
+      // Re-pinned again at the far-field merge: the release retook the polish
+      // captures, so their metadata and performance JSONs are adopted verbatim
+      // from the base here, but this branch's own edits to src/render/renderer.ts
+      // (the brood shout/flourish and attackByAbility wiring, then gating that
+      // cue on a mob source) still move the rendererIntegration leaf on top of
+      // the release's impostor bake, fog-free vista, and haze band. The merged
+      // composite therefore matches neither parent's literal. No capture was
+      // retaken on this branch.
+      fingerprint: '0f60d8018c882564cbcb4fc2303610a1d599fa7dc2f65710573ba232e79ee7ef',
       components: {
         captureContract: {
           id: 'polish-v2',

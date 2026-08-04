@@ -821,6 +821,32 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
 // draw, so mesh and physics agree per placement.
 const propRand = propPlacementRoll;
 
+// Village-building pools and heights, shared by the placement loop in
+// buildProps and by the far-field impostor collector below so the sprite a
+// building becomes is always the asset it really renders as.
+const HOUSE_POOL: PropKey[] = ['house1', 'house2', 'blacksmith'];
+const HOUSE_POOL_HOLLOW: PropKey[] = ['kmedHomeA', 'kmedHomeB'];
+const HOUSE_HEIGHT: Record<string, number> = {
+  house1: 8.0,
+  house2: 7.6,
+  blacksmith: 6.6,
+  inn: 7.6,
+  kmedHomeA: 8.0,
+  kmedHomeB: 8.8,
+  kmedTavern: 8.5,
+  kmedChurch: 10.5,
+  kmedBlacksmith: 6.2,
+  kmedMarket: 5.2,
+};
+// single-asset (non-pool) building kinds
+const KIND_ASSET: Partial<Record<BuildingDef['kind'], PropKey>> = {
+  inn: 'inn',
+  hollowInn: 'kmedTavern',
+  hollowChapel: 'kmedChurch',
+  hollowSmith: 'kmedBlacksmith',
+  hollowMarket: 'kmedMarket',
+};
+
 function keyRand(key: number, n: number): number {
   return hash2(Math.round(key * 97), n * 7919, 0x9e3779);
 }
@@ -830,6 +856,33 @@ function rotLocal(lx: number, lz: number, rot: number): { x: number; z: number }
   const c = Math.cos(rot),
     s = Math.sin(rot);
   return { x: lx * c + lz * s, z: -lx * s + lz * c };
+}
+
+/**
+ * The chapel bell tower's WORLD center: its CHAPEL_TOWER.dz rear offset
+ * rotated by the building yaw. The one transform the real composed chapel
+ * (its hideable footprint), the camera collider and the far IMPOSTOR all
+ * derive from; an impostor centered at the raw (b.x, b.z) instead sits
+ * dz off its real twin and jumps sideways at the handoff.
+ */
+export function chapelTowerWorldCenter(b: { x: number; z: number; rot: number }): {
+  x: number;
+  z: number;
+} {
+  const off = rotLocal(0, CHAPEL_TOWER.dz, b.rot);
+  return { x: b.x + off.x, z: b.z + off.z };
+}
+
+/**
+ * The one house-asset pick for a building record: the same pool and the
+ * same keyRand draw whether the consumer is the real placement loop or the
+ * impostor collector, so a far sprite can never disagree with the model it
+ * hands off to.
+ */
+function buildingAssetPick(b: { x: number; z: number; kind: BuildingDef['kind'] }): PropKey {
+  const key = b.x * 13.7 + b.z * 3.1;
+  const pool = b.kind === 'hollowHouse' ? HOUSE_POOL_HOLLOW : HOUSE_POOL;
+  return KIND_ASSET[b.kind] ?? pool[Math.floor(keyRand(key, 3) * 0.999 * pool.length)];
 }
 
 type Scale = number | [number, number, number];
@@ -1208,31 +1261,9 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- buildings: village houses / inn / composed chapel ------------------
-  const housePool: PropKey[] = ['house1', 'house2', 'blacksmith'];
-  const hollowPool: PropKey[] = ['kmedHomeA', 'kmedHomeB'];
-  const houseHeight: Record<string, number> = {
-    house1: 8.0,
-    house2: 7.6,
-    blacksmith: 6.6,
-    inn: 7.6,
-    kmedHomeA: 8.0,
-    kmedHomeB: 8.8,
-    kmedTavern: 8.5,
-    kmedChurch: 10.5,
-    kmedBlacksmith: 6.2,
-    kmedMarket: 5.2,
-  };
-  // single-asset (non-pool) building kinds
-  const kindAsset: Partial<Record<BuildingDef['kind'], PropKey>> = {
-    inn: 'inn',
-    hollowInn: 'kmedTavern',
-    hollowChapel: 'kmedChurch',
-    hollowSmith: 'kmedBlacksmith',
-    hollowMarket: 'kmedMarket',
-  };
+  const houseHeight = HOUSE_HEIGHT;
 
   for (const b of activeContent.props.buildings) {
-    const key = b.x * 13.7 + b.z * 3.1;
     const y = ground(b.x, b.z);
     const armoury = buildEastbrookGrandArmouryView(b, ground);
     if (armoury) {
@@ -1273,12 +1304,12 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       gTower.position.set(b.x, y - CHAPEL_HALL.sink, b.z);
       gTower.rotation.y = b.rot;
       group.add(shadowed(gTower));
-      const towerOff = rotLocal(0, CHAPEL_TOWER.dz, b.rot);
+      const towerCenter = chapelTowerWorldCenter(b);
       registerHideable(
         gTower,
         obbFootprint(
-          b.x + towerOff.x,
-          b.z + towerOff.z,
+          towerCenter.x,
+          towerCenter.z,
           (b.w * CHAPEL_TOWER.wScale) / 2,
           (b.d * CHAPEL_TOWER.dScale) / 2,
           b.rot,
@@ -1312,9 +1343,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       );
       continue;
     }
-    const pool = b.kind === 'hollowHouse' ? hollowPool : housePool;
-    const asset: PropKey =
-      kindAsset[b.kind] ?? pool[Math.floor(keyRand(key, 3) * 0.999 * pool.length)];
+    const asset = buildingAssetPick(b);
     const a = propAsset(asset);
     const g = new THREE.Group();
     addParts(g, asset, { scale: [b.w / a.size.x, houseHeight[asset] / a.size.y, b.d / a.size.z] });
@@ -2723,3 +2752,114 @@ function normalizedStaticGeometry(source: THREE.BufferGeometry): THREE.BufferGeo
 export const propStaticMergeInternalsForTest = { mergeStaticMeshes };
 
 export const propMaterialInternalsForTest = { convertMaterial };
+
+// ---------------------------------------------------------------------------
+// Far-field building impostors
+// ---------------------------------------------------------------------------
+
+export interface BuildingImpostorPart {
+  geometry: THREE.BufferGeometry;
+  material: THREE.Material;
+  isLeaf: boolean;
+}
+
+export interface BuildingImpostorInstance {
+  asset: string;
+  x: number;
+  y: number;
+  z: number;
+  rot: number;
+  widthScale: number;
+  heightScale: number;
+}
+
+/**
+ * Everything the far-field sprite layer needs to stand in for the village
+ * buildings and the skyline-scale decor (windmills, moored ships) past the
+ * detail horizon: the asset parts to bake and the placements, computed with
+ * the SAME pools, pick hash, scale rules and seating the real placement loop
+ * in buildProps uses, so a sprite can never disagree with the building it
+ * replaces. Chapels reduce to their bell tower: at sprite range the squat
+ * entry hall sits below the treeline. The Eastbrook rebuild kit and the
+ * Grand Armoury keep their bespoke views and are skipped here.
+ */
+export function collectBuildingImpostors(seed: number): {
+  sources: { asset: string; parts: BuildingImpostorPart[] }[];
+  instances: BuildingImpostorInstance[];
+} {
+  const activeContent = getActiveWorldContent();
+  const builtInWorld = activeContent === BUILTIN_WORLD;
+  const used = new Map<string, PropAsset>();
+  const instances: BuildingImpostorInstance[] = [];
+  const use = (key: PropKey): PropAsset => {
+    const a = propAsset(key);
+    used.set(key, a);
+    return a;
+  };
+  for (const b of activeContent.props.buildings) {
+    if (b.landmark) continue;
+    if (builtInWorld && isEastbrookRebuildBuilding(b)) continue;
+    const y = terrainHeight(b.x, b.z, seed);
+    if (b.kind === 'chapel') {
+      const tower = use('bellTower');
+      const w = Math.max(b.w * CHAPEL_TOWER.wScale, b.d * CHAPEL_TOWER.dScale);
+      // The real tower stands at the rotated CHAPEL_TOWER.dz rear offset,
+      // through the SAME helper the real loop's footprint uses; centering
+      // on the raw building origin made the sprite jump sideways at the
+      // handoff.
+      const center = chapelTowerWorldCenter(b);
+      instances.push({
+        asset: 'bellTower',
+        x: center.x,
+        // base height comes from the building ORIGIN, exactly like the real
+        // group (positioned at b.x/b.z, tower offset inside it)
+        y: y - CHAPEL_HALL.sink,
+        z: center.z,
+        rot: b.rot,
+        widthScale: w / Math.max(tower.size.x, tower.size.z),
+        heightScale: CHAPEL_TOWER.height / tower.size.y,
+      });
+      continue;
+    }
+    const asset = buildingAssetPick(b);
+    const a = use(asset);
+    instances.push({
+      asset,
+      x: b.x,
+      y: y - 0.12,
+      z: b.z,
+      rot: b.rot,
+      widthScale: Math.max(b.w, b.d) / Math.max(a.size.x, a.size.z),
+      heightScale: HOUSE_HEIGHT[asset] / a.size.y,
+    });
+  }
+  for (const d of activeContent.props.decorProps ?? []) {
+    if (!(d.key in PROP_ASSET_DEFS)) continue;
+    const a = propAsset(d.key as PropKey);
+    const scale = typeof d.scale === 'number' ? d.scale : 1;
+    // only skyline-scale decor earns a sprite; small dressing is sub-pixel
+    // out where the sprites live
+    if (a.size.y * scale < 7) continue;
+    used.set(d.key, a);
+    const y =
+      d.float !== undefined
+        ? Math.max(terrainHeight(d.x, d.z, seed), WATER_LEVEL - d.float)
+        : terrainHeight(d.x, d.z, seed) - 0.05;
+    instances.push({
+      asset: d.key,
+      x: d.x,
+      y,
+      z: d.z,
+      rot: d.rot ?? 0,
+      widthScale: scale,
+      heightScale: scale,
+    });
+  }
+  return {
+    sources: [...used].map(([asset, a]) => ({
+      asset,
+      parts: a.parts.map((part) => ({ geometry: part.geo, material: part.mat, isLeaf: false })),
+    })),
+    instances,
+  };
+}

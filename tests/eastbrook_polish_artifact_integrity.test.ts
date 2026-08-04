@@ -614,16 +614,18 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   POLISH_ROOT,
   'metadata/after-desktop-ultra.json',
 );
-// Re-pinned after stacking this branch's renderer provenance move (the Bear Form
-// visual swap onto the purpose-built quadruped rig) onto a release/v0.34.0 that
-// already carries PR #2720's Eastbrook fence-removal layout evidence and the live
-// graphics rebuild (context recycle plus profile-aware Eastbrook runtime inputs).
-// The accepted file still points at the same captured view; only its swept
-// provenance bytes follow the merged rendererIntegration and layout inputs.
+// Re-pinned after stacking this branch's renderer provenance move (the brood
+// shout/flourish and attackByAbility wiring, then gating that cue on a mob
+// source) onto a release/v0.34.0 that already carries PR #2720's Eastbrook
+// fence-removal layout evidence, the Bear Form quadruped rig, the live graphics
+// rebuild, and the far-field impostor bake plus fog-free vista. The release
+// retook the polish captures and this branch adopts them verbatim: the accepted
+// file still points at the same captured view, and only its swept provenance
+// bytes follow the merged rendererIntegration and layout inputs.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'cc85733f3d8b76363977b65eee4868018493e20f00aa85c1de1fcc98d1776f24';
+  '7ab529a9793e3ab488601108a0883556ba43edf4ad9754b3eb750d70a0e35541';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '38b87f7e206b1666253705a02283b70485b5fa6dd16096d1463d51ef7defe0f4';
+  '0f60d8018c882564cbcb4fc2303610a1d599fa7dc2f65710573ba232e79ee7ef';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1483,13 +1485,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // It therefore follows the first-order composite, so the base sync moves it
     // for the same reason: this branch's renderer provenance move (the brood
     // shout/flourish and attackByAbility wiring) stacked onto a base carrying
-    // PR #2720's fence-removal content change, the Bear Form quadruped rig, and
-    // the live graphics rebuild, recomputed last by remint_polish_provenance.mjs.
-    // Every measured value (frame timings, draw stats, triangle and scenario
-    // numbers) is byte-identical against the current release/v0.34.0 tip, no
-    // parent's literal matched the merged tree, and no capture was retaken.
+    // PR #2720's fence-removal content change, the Bear Form quadruped rig, the
+    // live graphics rebuild, and the far-field impostor bake plus fog-free vista,
+    // recomputed last by remint_polish_provenance.mjs. The release retook the
+    // polish captures, so every measured value (frame timings, draw stats,
+    // triangle and scenario numbers) is adopted verbatim from the base tip; no
+    // parent's literal matched the merged tree, and no capture was retaken here.
     expect(fingerprint.digest('hex')).toBe(
-      '7ad10652aa913c2871a88e3ba197887cb82b30b5fdc618dee743c6a998b0eb30',
+      '9c3db81629fb5f7e743d5dc4b38013d9bb9d2afc84dd069f79f16998d8d1733e',
     );
   });
 

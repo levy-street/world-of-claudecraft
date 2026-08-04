@@ -7,8 +7,6 @@ import {
   foliageDistanceScale,
   foliageFogLimit,
   IMPOSTOR_MIN_FOG_BLEND,
-  instanceCullWindows,
-  instanceCullWindowsInto,
   LOD_HIGH,
   LOD_LOW,
   lodDistsFor,
@@ -97,13 +95,19 @@ function windowFor(over: Partial<BucketWindowInput> & { centerDist: number }): B
   };
 }
 // The two buckets a species places over the SAME trees: the real GLB model
-// inside the detail radius, the cone/blob impostor outside it.
+// inside the detail radius, the baked sprite impostor outside it.
 const realTrees = (centerDist: number, over: Partial<BucketWindowInput> = {}) =>
   windowFor({ centerDist, maxAtDetail: true, ...over });
 const impostors = (centerDist: number, over: Partial<BucketWindowInput> = {}) =>
   windowFor({ centerDist, minAtDetail: true, ...over });
 
-describe('foliage LOD: the far-tree impostor never stands in clear air', () => {
+// treeDetailDistance is the LEAN arm's law now (the sprite arm follows the
+// budget: spriteSwapDistance, pinned in tests/foliage_impostor_core.test.ts).
+// On lean there is nothing past the boundary at all, so the blend law is what
+// keeps the forest from visibly ENDING in clear air; the sweep runs the whole
+// shipped preset table through it because the function must hold for any fog
+// pair it could ever be fed.
+describe('foliage LOD: the lean-arm treeline never ends in clear air', () => {
   const qualityCases = [
     ...FOG_ROWS.flatMap((fog) => QUALITY_LEVELS.map((q) => ({ ...fog, q, lean: false }))),
     ...QUALITY_LEVELS.map((q) => ({ ...shippedLowFog(), q, lean: true })),
@@ -128,10 +132,10 @@ describe('foliage LOD: the far-tree impostor never stands in clear air', () => {
     },
   );
 
-  it('regression: a build-time 300u swap left cones half-clear in the long-fog zones', () => {
+  it('regression: a build-time 300u boundary ended the treeline half-clear in long-fog zones', () => {
     // This is the reported bug, not the fix's own arithmetic. The open-sky Vale
-    // runs to MAX_OUTDOOR_FOG_FAR; a flat 300u swap sits far short of its fog
-    // floor, i.e. plainly visible as a cone. Revert treeDetailDistance to a
+    // runs to MAX_OUTDOOR_FOG_FAR; a flat 300u boundary sits far short of its
+    // fog floor, i.e. the forest visibly stops. Revert treeDetailDistance to a
     // constant and this fails.
     const vale = fogOf('vale');
     expect(fogBlendAt(300, vale.near, vale.far)).toBeLessThan(IMPOSTOR_MIN_FOG_BLEND);
@@ -141,12 +145,12 @@ describe('foliage LOD: the far-tree impostor never stands in clear air', () => {
     expect(fogBlendAt(fixed, vale.near, vale.far)).toBeGreaterThanOrEqual(IMPOSTOR_MIN_FOG_BLEND);
   });
 
-  it('a starved frame budget cannot drag cones toward the camera', () => {
-    // The "cones until they load" half of the report: nothing is loading. The
-    // budget dips while assets decode and shaders compile, the detail radius
-    // shrank with it (300 * 0.72 = 216u), and the cones marched in until it
-    // recovered. In the shipped Vale the floor sits inside the cull at every
-    // quality, so starved and rested must land on the same fog-floor swap.
+  it('a starved frame budget cannot drag the treeline toward the camera', () => {
+    // The budget dips while assets decode and shaders compile; the detail
+    // radius must not march in with it (300 * 0.72 = 216u) on the arm where
+    // nothing stands past the boundary. In the shipped Vale the floor sits
+    // inside the cull at every quality, so starved and rested must land on
+    // the same fog-floor boundary.
     const vale = fogOf('vale');
     const starved = detailAt(vale, 0);
     const rested = detailAt(vale, 1);
@@ -156,11 +160,11 @@ describe('foliage LOD: the far-tree impostor never stands in clear air', () => {
     expect(starved.detailFar).toBe(rested.detailFar); // fog floor dominates: no pop either way
   });
 
-  it('short-fog realms finally hand their far band to impostors', () => {
+  it('short-fog realms retreat the boundary to the fog floor', () => {
     // The marsh closes at 165u while the budgeted radius is 216-300u, so the
-    // swap used to land past the fog cull at EVERY governor level: the impostor
-    // window was empty and real trees were drawn right up to the line that
-    // culled them (measured live: core 1.36M triangles, impostors 0 buckets).
+    // boundary used to land past the fog cull at EVERY governor level and real
+    // trees were drawn right up to the line that culled them (measured live:
+    // core 1.36M triangles past any use).
     const marsh = fogOf('marsh');
     const floor = marsh.near + IMPOSTOR_MIN_FOG_BLEND * (marsh.far - marsh.near); // 138
 
@@ -175,11 +179,10 @@ describe('foliage LOD: the far-tree impostor never stands in clear air', () => {
     expect(starved.detailFar).toBe(starved.fogLimit);
   });
 
-  it('the cave keeps its swap cheap AND gains a band', () => {
+  it('the cave keeps its boundary cheap AND inside the cull', () => {
     // Pre-fix pin: best-scale cave detail was the flat 300u constant, far past
     // its own fog wall. The retreat rule pulls it to the fog floor, which is
-    // BOTH cheaper than the old constant and inside the cull for the first
-    // time, so the cave's far band goes to cones like everywhere else.
+    // BOTH cheaper than the old constant and inside the cull.
     const cave = fogOf('cave');
     const floor = cave.near + IMPOSTOR_MIN_FOG_BLEND * (cave.far - cave.near);
     for (const q of QUALITY_LEVELS) {
@@ -189,12 +192,12 @@ describe('foliage LOD: the far-tree impostor never stands in clear air', () => {
     }
   });
 
-  it('a residency fog wall never pulls the swap toward the camera', () => {
+  it('a residency fog wall never pulls the boundary toward the camera', () => {
     // The streaming clamp can pin the LIVE fog at a 45u wall while the zone
-    // builds. The swap reads the ATMOSPHERIC fog (the update() contract), so
-    // during the wall it parks ON the live cull: real trees to the wall, no
-    // impostor band, no cones a few strides from the camera. Feeding the swap
-    // the clamped pair instead would retreat it to ~39u; this pins the split.
+    // builds. The boundary reads the ATMOSPHERIC fog (the update() contract),
+    // so during the wall it parks ON the live cull: real trees to the wall,
+    // nothing missing a few strides from the camera. Feeding it the clamped
+    // pair instead would retreat it to ~39u; this pins the split.
     const garden = fogOf('garden');
     for (const q of QUALITY_LEVELS) {
       const liveCull = foliageFogLimit(45, q);
@@ -250,10 +253,10 @@ describe('foliage LOD: the real-model and impostor windows cover the world', () 
           realTrees(d, { detailFar, radius }),
           impostors(d, { detailFar, radius }),
         ].filter(bucketVisible).length;
-        // A bucket overlapping the swap draws both meshes and the per-instance
-        // windows (instanceCullWindows, enforced in the vertex shader) split
-        // its trees exactly; everywhere else exactly one mesh draws. 0 is a
-        // hole in the forest; 2 outside the straddle is a double-drawn tree.
+        // A bucket overlapping the swap draws both meshes and the
+        // per-instance shader windows (foliage_collapse.ts) split its trees
+        // exactly; everywhere else exactly one mesh draws. 0 is a hole in
+        // the forest; 2 outside the straddle is a double-drawn tree.
         const straddles = d - radius < detailFar && d + radius >= detailFar;
         expect(drawn, `radius ${radius}, distance ${d}`).toBe(straddles ? 2 : 1);
       }
@@ -301,19 +304,14 @@ describe('foliage LOD: the real-model and impostor windows cover the world', () 
     expect(bucketVisible(impostors(onBoundary - 1, { detailFar, radius }))).toBe(false);
   });
 
-  it('the near-fill half still culls at its own cap, and grows no impostor there', () => {
-    // Half of each species drops out at treeFillFar to keep the far field cheap.
-    // That cap is TIGHTER than the fog-derived swap, so those trees must simply
-    // vanish: they must not reappear as cones just because the swap moved out.
-    const fill = LOD_HIGH.treeFillFar; // 310, inside detailFar 368
+  it('the near-fill half still culls its real geometry at its own cap', () => {
+    // Half of each species keeps a tighter real-geometry cap to keep the far
+    // field cheap. (On the sprite arm those trees carry on as sprites in the
+    // bucket's shared impostor mesh, whose row has no such cap.)
+    const fill = LOD_HIGH.treeFillFar; // 310, inside this detailFar of 368
     const nearFillTrees = (d: number) => realTrees(d, { detailFar, maxDist: fill });
-    const nearFillImpostors = (d: number) => impostors(d, { detailFar, maxDist: fill });
-
     expect(bucketVisible(nearFillTrees(fill - 1))).toBe(true);
     expect(bucketVisible(nearFillTrees(fill + 1))).toBe(false);
-    for (const d of [fill + 1, detailFar - 1, detailFar + 1, 500]) {
-      expect(bucketVisible(nearFillImpostors(d)), `no near-fill cone at ${d}`).toBe(false);
-    }
   });
 
   it('buckets behind the fog wall are dropped whichever LOD they are', () => {
@@ -351,35 +349,60 @@ describe('foliage LOD: the real-model and impostor windows cover the world', () 
   });
 });
 
-describe('foliage LOD: per-instance collapse windows', () => {
-  it('real and impostor windows are exact complements at the swap', () => {
-    const w = instanceCullWindows(368, 418.15);
-    expect(w.treeMax).toBe(368);
-    expect(w.impostorMin).toBe(w.treeMax);
-    expect(w.fogCull).toBe(418.15);
+describe('foliage LOD: sprite rows (the merged per-bucket impostor meshes)', () => {
+  const spriteRow = (centerDist: number, over: Partial<BucketWindowInput> = {}) =>
+    windowFor({
+      centerDist,
+      minAtDetail: true,
+      spriteRow: true,
+      detailFar: 300,
+      swapFade: 24,
+      fogLimit: 546,
+      spriteFar: 700,
+      ...over,
+    });
+
+  it('comes alive at the earliest jittered handoff, radius aware', () => {
+    const radius = 120;
+    // nearest instance a bucket could hold sits at centerDist + radius; the
+    // earliest handoff any instance can take is detailFar - swapFade
+    expect(bucketVisible(spriteRow(300 - 24 - radius, { radius }))).toBe(true);
+    expect(bucketVisible(spriteRow(300 - 24 - radius - 1, { radius }))).toBe(false);
   });
 
-  it('a swap at the cull line leaves no impostor band but stays complementary', () => {
-    // The mq-0 short-fog case: treeDetailDistance parks the swap ON the cull.
-    const w = instanceCullWindows(146.85, 146.85);
-    expect(w.treeMax).toBe(146.85);
-    expect(w.impostorMin).toBe(146.85);
-    expect(w.fogCull).toBe(146.85);
+  it('dies at the LIVE fog wall, not the model-quality-trimmed foliage cull', () => {
+    // fogLimit here is 546 (the mq trim of a 700 wall); a sprite is 2
+    // triangles, so trimming it before the fog swallows it saves nothing and
+    // pops the picture. The row must survive to the wall itself.
+    expect(bucketVisible(spriteRow(600))).toBe(true);
+    expect(bucketVisible(spriteRow(701))).toBe(false);
   });
 
-  it('a stale over-cull swap can never push real trees past the fog cull', () => {
-    // Defense in depth: even handed a detailFar past the cull (the pre-fix
-    // arithmetic), the tree window clamps to the cull line.
-    const w = instanceCullWindows(258, 146.85);
-    expect(w.treeMax).toBe(146.85);
-    expect(w.impostorMin).toBe(w.treeMax);
+  it('rock and dress rows key on their own swap via detailFar', () => {
+    // The caller passes the row's category swap in detailFar; a rock bucket
+    // whose center is inside the rock swap but whose far half is beyond it
+    // must stay alive for its sprites.
+    const radius = 120;
+    expect(bucketVisible(spriteRow(345.6 - 24 - radius, { detailFar: 345.6, radius }))).toBe(true);
+    expect(bucketVisible(spriteRow(345.6 - 24 - radius - 1, { detailFar: 345.6, radius }))).toBe(
+      false,
+    );
   });
 
-  it('the allocation-free variant fills identically', () => {
-    const out = { treeMax: -1, impostorMin: -1, fogCull: -1 };
-    const returned = instanceCullWindowsInto(368, 418.15, out);
-    expect(returned).toBe(out); // fills the caller-owned object, no allocation
-    expect(out).toEqual(instanceCullWindows(368, 418.15));
+  it('legacy rows are unaffected by the sprite fields', () => {
+    // A lean-arm row (spriteRow unset) keeps the plain minAtDetail and the
+    // trimmed fog cull, even when the shared input object carries sprite
+    // values from a previous iteration.
+    const legacy = windowFor({
+      centerDist: 600,
+      minAtDetail: true,
+      detailFar: 300,
+      fogLimit: 546,
+      swapFade: 24,
+      spriteFar: 700,
+    });
+    expect(bucketVisible(legacy)).toBe(false); // near edge 600 >= fogLimit 546
+    expect(bucketVisible({ ...legacy, centerDist: 500 })).toBe(true);
   });
 });
 
