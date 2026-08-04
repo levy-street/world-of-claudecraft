@@ -2246,6 +2246,45 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
     expect(durableBook()).toEqual({ treasury: 100_000, inventory: [], purchasedSlots: 24 });
   });
 
+  it('confirms THIS copy is gone, not the item TOTAL (a concurrent withdraw cannot fake it)', async () => {
+    // REGRESSION: the durability check compared the book's total item count
+    // before and after, so a withdraw of an UNRELATED item inside the save
+    // window lowered the total and made a REVERTED purge report success: the
+    // one direction a destructive tool must never err in. The witness is now
+    // the specific copy (item id, craft provenance, instance payload).
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'Officer');
+    officerSetup(server, session);
+    const live = server.sim.guildBanks.get(GUILD_ID);
+    if (!live) throw new Error('missing book');
+    // An ordinary stack beside the dormant copy, live-only so the purge's own
+    // escrow save is REFUSED (the copy comes back) exactly as before.
+    live.inventory.push({ itemId: 'wolf_fang', count: 5 } as never);
+    live.inventory.push({ ...DORMANT_SLOT } as never);
+    const dormantIndex = live.inventory.length - 1;
+    // The concurrent unrelated withdraw: it lands while the save is out, so
+    // the book's TOTAL falls even though the purged copy came back.
+    dbMock.saveCharacterAndGuildBankState.mockImplementationOnce(async () => {
+      const book = server.sim.guildBanks.get(GUILD_ID);
+      if (book) book.inventory = book.inventory.filter((s) => s.itemId !== 'wolf_fang');
+      return false; // fenced out: the purge is reverted
+    });
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const result = await server.adminPurgeGuildBankSlot(
+      GUILD_ID,
+      dormantIndex,
+      DORMANT_SLOT.itemId,
+      OPERATOR,
+    );
+    errSpy.mockRestore();
+    warnSpy.mockRestore();
+    // The copy is back on the book, so the honest answer is save_failed even
+    // though the book now holds FEWER items than it did before the purge.
+    expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toContainEqual(DORMANT_SLOT);
+    expect(result).toEqual({ ok: false, reason: 'save_failed' });
+  });
+
   it('a carrier is never charged for the purge it carries', async () => {
     // The carrier only lends its escrow transaction: pin that its own purse and
     // bags are untouched (the row names the operator, pinned separately).

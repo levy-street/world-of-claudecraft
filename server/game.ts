@@ -38,6 +38,7 @@ import {
   type GuildBankOpDelta,
   guildBankRungsBought,
 } from '../src/sim/guild_bank';
+import { itemInstancePayloadsEqual } from '../src/sim/item_instance_merge';
 import {
   isInJailCage,
   JAIL_CENTER,
@@ -80,6 +81,7 @@ import {
   type Entity,
   emptyMoveInput,
   FISHING_CAST_ID,
+  type InvSlot,
   type ItemInstancePayload,
   isDungeonDifficulty,
   isEquipSlot,
@@ -4803,22 +4805,27 @@ export class GameServer {
       );
       return { ok: false, reason: 'delete_in_flight' };
     }
-    const before = this.sim.guildBankHoldings(guildId);
-    if (before === null) return { ok: false, reason: 'no_book' };
+    // The book-loaded gate (the holdings read fails closed on an absent book).
+    if (this.sim.guildBankHoldings(guildId) === null) return { ok: false, reason: 'no_book' };
     const carrier = await this.guildBankSaveCarrier(guildId);
     if (!carrier) return { ok: false, reason: 'no_carrier' };
-    let purged: { itemId: string; count: number } | null = null;
+    let purged: InvSlot | null = null;
     this.runGuildBankOp(carrier, { guildId, actorAccountId }, 'admin_purge', () => {
-      const slot = this.sim.purgeDormantGuildBankSlot(guildId, slotIndex, expectItemId);
-      if (slot) purged = { itemId: slot.itemId, count: slot.count };
+      purged = this.sim.purgeDormantGuildBankSlot(guildId, slotIndex, expectItemId);
     });
     // Read through an explicitly typed local: the assignment above happens
     // inside a callback, which the control-flow analysis cannot see.
-    const removed = purged as { itemId: string; count: number } | null;
+    const removedSlot = purged as InvSlot | null;
     // Null means the sim refused: no such index, the slot does not hold the
     // named item, or it is an ordinary withdrawable copy. Nothing mutated, so
     // the observer diffed empty too.
-    if (removed === null) return { ok: false, reason: 'not_dormant' };
+    if (removedSlot === null) return { ok: false, reason: 'not_dormant' };
+    const removed = { itemId: removedSlot.itemId, count: removedSlot.count };
+    // The witness for the durability check below, taken from the SPECIFIC copy
+    // that was removed rather than from a total item count: a concurrent
+    // withdraw of an UNRELATED item inside the save window would otherwise
+    // lower the total and make a reverted purge read as a success.
+    const copiesAfterOp = this.guildBankCopiesOf(guildId, removedSlot);
     try {
       await this.saveCharacter(carrier);
     } catch (err) {
@@ -4829,12 +4836,16 @@ export class GameServer {
       return { ok: false, reason: 'save_failed' };
     }
     // A fence-out inside that save reverts (or reloads away) the removal, so
-    // confirm against live state rather than trusting the call returned. A
-    // concurrent deposit landing inside the save window can make this read
-    // conservative (reporting save_failed on a purge that did land); erring
-    // toward "go and check" is the right direction for a destructive tool.
-    const after = this.sim.guildBankHoldings(guildId);
-    if (after === null || after.items >= before.items) {
+    // confirm against live state rather than trusting the call returned. The
+    // witness is THIS COPY (item id, craft provenance, instance payload), not
+    // the book's total item count: totals move for reasons that have nothing to
+    // do with this purge, and a concurrent withdraw of another item would then
+    // make a REVERTED purge look like a success, which is the one direction a
+    // destructive tool must never err in. A concurrent deposit of an identical
+    // copy can still make this read conservative (reporting save_failed on a
+    // purge that did land); erring toward "go and check" is the right way round.
+    const copiesNow = this.guildBankCopiesOf(guildId, removedSlot);
+    if (copiesAfterOp === null || copiesNow === null || copiesNow > copiesAfterOp) {
       console.error(
         `guild bank admin purge for guild ${guildId} did not survive its escrow save (fence-out or reload)`,
       );
@@ -4844,6 +4855,27 @@ export class GameServer {
       `guild bank admin purge: account ${actorAccountId} removed ${removed.count}x ${removed.itemId} from guild ${guildId} (carried by character ${carrier.characterId})`,
     );
     return { ok: true, removed, carrierCharacterId: carrier.characterId };
+  }
+
+  /** How many copies of ONE specific slot identity (item id, craft provenance,
+   *  and instance payload) a guild's live book holds, or null when no book is
+   *  loaded. The durability witness for the operator purge: it answers "is THIS
+   *  copy still gone", which a total item count cannot.
+   *
+   *  Both sides of the comparison are LIVE book reads, so structural payload
+   *  equality is the right predicate here; the JSON-shaped canonical form in
+   *  src/sim/guild_bank.ts exists for the live-vs-DURABLE comparison instead. */
+  private guildBankCopiesOf(guildId: number, slot: InvSlot): number | null {
+    const info = this.sim.guildBankInfoForGuild(guildId);
+    if (info === null) return null;
+    let copies = 0;
+    for (const held of info.slots) {
+      if (held.itemId !== slot.itemId) continue;
+      if ((held.craftedRecipeId ?? null) !== (slot.craftedRecipeId ?? null)) continue;
+      if (!itemInstancePayloadsEqual(held.instance, slot.instance)) continue;
+      copies += held.count;
+    }
+    return copies;
   }
 
   /** A live session that can carry guild `guildId`'s book into a fenced escrow

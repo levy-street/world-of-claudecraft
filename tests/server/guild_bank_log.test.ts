@@ -419,6 +419,33 @@ describe('readGuildBankLog: the per-guild cached read', () => {
     expect(guildBankLogCacheStats().evictions).toBeGreaterThan(0);
   });
 
+  it('bounds the DIRTY MARKS too: an evicted guild does not keep its mark forever', async () => {
+    // A mark is consumed by the next READ of its guild, so a guild whose cache
+    // entry is LRU-evicted before anyone reads it again would otherwise keep
+    // its mark for the life of the process, which is not the bound the module
+    // header claims for it.
+    const now = 0;
+    resetGuildBankLogCacheForTests({
+      now: () => now,
+      minRefreshMs: 2_000,
+      maxEntries: 2,
+      reader: async (guildId) => {
+        calls.push(guildId);
+        return [];
+      },
+    });
+    // Read and mark three guilds, evicting the earliest entries as we go.
+    for (const guildId of [1, 2, 3]) {
+      await readGuildBankLog(guildId);
+      bustGuildBankLog(guildId);
+    }
+    expect(guildBankLogCacheStats().evictions).toBeGreaterThan(0);
+    // The sweep runs on the bust that pushes the marks past the cache bound.
+    await readGuildBankLog(4);
+    bustGuildBankLog(4);
+    expect(guildBankLogCacheStats().dirtyGuilds).toBeLessThanOrEqual(2);
+  });
+
   it('the cached array is frozen: one reader cannot rewrite history for the rest', async () => {
     resetGuildBankLogCacheForTests();
     const spy = vi.spyOn(await import('../../server/db'), 'loadGuildBankLogRows');

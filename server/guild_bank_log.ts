@@ -203,6 +203,12 @@ function minRefreshMs(): number {
   return testOverrides?.minRefreshMs ?? GUILD_BANK_LOG_MIN_REFRESH_MS;
 }
 
+/** The cache's own entry ceiling, which is also the bound on the dirty marks
+ *  that shadow it (see bustGuildBankLog's sweep). */
+function cacheMaxEntries(): number {
+  return testOverrides?.maxEntries ?? GUILD_BANK_LOG_CACHE_MAX_ENTRIES;
+}
+
 function activeCache(): KeyedCachedRead<readonly GuildBankLogEntry[]> {
   if (active !== null) return active;
   active = new KeyedCachedRead<readonly GuildBankLogEntry[]>((guildId) => reader(guildId), {
@@ -262,6 +268,17 @@ export function readGuildBankLog(guildId: number): Promise<readonly GuildBankLog
  * indefinitely.
  */
 export function bustGuildBankLog(guildId: number): void {
+  // Enforce the bound the comment above dirtyUntil claims, rather than assuming
+  // it: a mark is consumed by the next READ of that guild, so a guild whose
+  // cache entry is LRU-evicted before anyone reads it again would keep its mark
+  // for the life of the process. Sweeping the marks whose entry is gone is
+  // cheap and only runs once the map has actually outgrown the cache it
+  // shadows, which cannot happen while every mark still has an entry.
+  if (dirtyUntil.size > cacheMaxEntries()) {
+    for (const guild of dirtyUntil.keys()) {
+      if (!activeCache().has(guild)) dirtyUntil.delete(guild);
+    }
+  }
   if (dirtyUntil.has(guildId)) return; // already pending; never extend the window
   // No entry at all (nothing installed, nothing in flight) means there is
   // nothing to coalesce: the next read is a cold mint that will see this write
