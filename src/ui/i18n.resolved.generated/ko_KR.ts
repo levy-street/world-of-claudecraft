@@ -10091,6 +10091,15 @@ export const ko_KR: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "화산구 랩터의 고삐"
       },
+      "moggers_hide_quiver": {
+        "name": "Mogger's Hide Quiver"
+      },
+      "gravewyrm_bone_quiver": {
+        "name": "Gravewyrm Bone Quiver"
+      },
+      "direfang_quiver": {
+        "name": "Direfang Quiver"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },

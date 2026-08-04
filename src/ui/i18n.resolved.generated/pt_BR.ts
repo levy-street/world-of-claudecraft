@@ -10091,6 +10091,15 @@ export const pt_BR: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "Rédeas do Raptor de Drakemaw"
       },
+      "moggers_hide_quiver": {
+        "name": "Mogger's Hide Quiver"
+      },
+      "gravewyrm_bone_quiver": {
+        "name": "Gravewyrm Bone Quiver"
+      },
+      "direfang_quiver": {
+        "name": "Direfang Quiver"
+      },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"
       },

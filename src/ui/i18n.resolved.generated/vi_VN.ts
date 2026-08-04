@@ -10091,6 +10091,15 @@ export const vi_VN: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "Dây Cương Cuồng Long Drakemaw"
       },
+      "moggers_hide_quiver": {
+        "name": "Mogger's Hide Quiver"
+      },
+      "gravewyrm_bone_quiver": {
+        "name": "Gravewyrm Bone Quiver"
+      },
+      "direfang_quiver": {
+        "name": "Direfang Quiver"
+      },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
       },

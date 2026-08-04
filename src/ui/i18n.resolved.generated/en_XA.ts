@@ -10091,6 +10091,15 @@ export const en_XA: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "[Ŕéíñš óƒ ţĥé Ðŕáķéɱáŵ Ŕáþţóŕ]"
       },
+      "moggers_hide_quiver": {
+        "name": "[Ɱóĝĝéŕ'š Ĥíðé Ɋúíʋéŕ]"
+      },
+      "gravewyrm_bone_quiver": {
+        "name": "[Ĝŕáʋéŵýŕɱ Ɓóñé Ɋúíʋéŕ]"
+      },
+      "direfang_quiver": {
+        "name": "[Ðíŕéƒáñĝ Ɋúíʋéŕ]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },

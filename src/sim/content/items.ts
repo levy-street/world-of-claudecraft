@@ -20,6 +20,12 @@ export const CASTER_ALL: PlayerClass[] = [
   'paladin',
   'druid',
 ];
+// Quivers: the hunter's held-offhand stat sticks. A bespoke, hunter-only lock
+// like FERAL above, and deliberately NOT the ROG group: rogues already reach the
+// offhand slot by dual wielding, so sharing the lock would hand them a second
+// way to fill a slot hunters have no way at all to fill. Like every held_offhand
+// this is the whole equip rule (src/sim/equipment_rules.ts canEquipItem).
+export const HUNTER_ONLY: PlayerClass[] = ['hunter'];
 const CASTER_WEAPON_CLASSES: PlayerClass[] = [
   'mage',
   'priest',
@@ -1703,6 +1709,22 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     stats: { int: 1, spi: 1 },
     sellValue: 160,
     requiredClass: CASTER_ALL,
+  },
+  moggers_hide_quiver: {
+    id: 'moggers_hide_quiver',
+    name: "Mogger's Hide Quiver",
+    kind: 'held_offhand',
+    slot: 'offhand',
+    quality: 'uncommon',
+    // The hunter counterpart to valefire_lantern, off the same rare elite:
+    // Mogger (level 6) -> item level 7, offhand budget 2. Hunters are the one
+    // class no offhand rule admits (equipment_rules canDualWield excludes them,
+    // and no shield or held offhand names them), so the slot sat empty and its
+    // stat budget went uncollected. Held offhands equip by the literal
+    // requiredClass alone, which is what lets a hunter-only list work here.
+    stats: { agi: 1, sta: 1 },
+    sellValue: 160,
+    requiredClass: HUNTER_ONLY,
   },
   // --- quest items ---
   boar_hide: {
