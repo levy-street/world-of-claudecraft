@@ -12327,9 +12327,6 @@ export const pl_PL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Zabity zelota Kultu Żmija"
-          },
-          "1": {
-            "label": "Rozkazy Kultu Żmija"
           }
         }
       },
@@ -12340,9 +12337,6 @@ export const pl_PL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Nekromanta Kultu Żmija pokonany"
-          },
-          "1": {
-            "label": "Rytualne filakterium"
           }
         }
       },

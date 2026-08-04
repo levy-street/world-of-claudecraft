@@ -12327,9 +12327,6 @@ export const ru_RU: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Фанатик Культа Вирма: убито"
-          },
-          "1": {
-            "label": "Приказы Культа Вирма"
           }
         }
       },
@@ -12340,9 +12337,6 @@ export const ru_RU: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Некромант Культа Вирма: убито"
-          },
-          "1": {
-            "label": "Ритуальная филактерия"
           }
         }
       },

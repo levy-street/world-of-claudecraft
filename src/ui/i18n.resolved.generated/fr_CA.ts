@@ -12327,9 +12327,6 @@ export const fr_CA: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Zélote du Culte du Wyrm tué"
-          },
-          "1": {
-            "label": "Ordres du Culte du Wyrm"
           }
         }
       },
@@ -12340,9 +12337,6 @@ export const fr_CA: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Nécromancien du Culte du Wyrm tué"
-          },
-          "1": {
-            "label": "Phylactère rituel"
           }
         }
       },

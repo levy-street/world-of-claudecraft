@@ -12327,9 +12327,6 @@ export const da_DK: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Ormekult-Zelot dræbt"
-          },
-          "1": {
-            "label": "Ormekult-Ordrer"
           }
         }
       },
@@ -12340,9 +12337,6 @@ export const da_DK: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Ormekult-Nekromantiker dræbt"
-          },
-          "1": {
-            "label": "Rituelt Fylakterie"
           }
         }
       },

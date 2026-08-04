@@ -12327,9 +12327,6 @@ export const nl_NL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Wurmsekte-Dweper gedood"
-          },
-          "1": {
-            "label": "Wurmsekte-Bevelen"
           }
         }
       },
@@ -12340,9 +12337,6 @@ export const nl_NL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Wurmsekte-Necromancer gedood"
-          },
-          "1": {
-            "label": "Rituele Phylacterie"
           }
         }
       },

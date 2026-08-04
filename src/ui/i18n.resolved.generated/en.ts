@@ -12382,11 +12382,11 @@ export const en: EnTranslations = {
       },
       "q_voice_below": {
         "title": "The Voice Below",
-        "text": "Last night the whole cult camp knelt at once, {playerName} - every zealot, every necromancer, all facing the Sanctum. Korzul speaks to them in their sleep now; Vael heard the same voice in the fen, and Morthen before him. Cut the congregation down - ten zealots, six necromancers - before that voice has hands enough to pull the gate open itself.",
-        "completion": "The kneeling has stopped. We have not silenced the voice, {playerName} - only thinned its choir. It must be enough.",
+        "text": "Last night the whole cult camp knelt at once, {playerName}, every zealot and necromancer facing the Sanctum, and one throat led the chant. They call him Threnos, the First Voice, and Korzul speaks through his mouth. Vael heard the same voice in the fen, and Morthen before him. Silence Threnos and cut down the six necromancers who keep his choir, before that voice has hands enough to pull the gate open itself.",
+        "completion": "Threnos is silent, and the kneeling has stopped, {playerName}. We have not ended the voice below, only taken from it the mouth that carried it. It must be enough.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult Zealot slain"
+            "label": "Threnos the First Voice silenced"
           },
           "1": {
             "label": "Wyrmcult Necromancer slain"

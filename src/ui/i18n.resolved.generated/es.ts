@@ -12327,9 +12327,6 @@ export const es: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Fanático del Culto del Wyrm abatido"
-          },
-          "1": {
-            "label": "Órdenes del Culto del Wyrm"
           }
         }
       },
@@ -12340,9 +12337,6 @@ export const es: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Nigromante del Culto del Wyrm abatido"
-          },
-          "1": {
-            "label": "Filacteria ritual"
           }
         }
       },

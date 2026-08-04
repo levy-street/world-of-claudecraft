@@ -12327,9 +12327,6 @@ export const sv_SE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Lindormskultsivrare dräpt"
-          },
-          "1": {
-            "label": "Lindormskultens order"
           }
         }
       },
@@ -12340,9 +12337,6 @@ export const sv_SE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Lindormssektens nekromant dräpt"
-          },
-          "1": {
-            "label": "Rituellt fylakterium"
           }
         }
       },

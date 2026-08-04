@@ -12327,9 +12327,6 @@ export const de_DE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Wyrmkult-Eiferer getötet"
-          },
-          "1": {
-            "label": "Befehle des Wyrmkults"
           }
         }
       },
@@ -12340,9 +12337,6 @@ export const de_DE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Wyrmkult-Nekromant getötet"
-          },
-          "1": {
-            "label": "Rituelles Seelengefäß"
           }
         }
       },

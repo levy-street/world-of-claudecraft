@@ -12327,9 +12327,6 @@ export const tr_TR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Ejdertarikatı Bağnazı öldürüldü"
-          },
-          "1": {
-            "label": "Ejdertarikatı Emirleri"
           }
         }
       },
@@ -12340,9 +12337,6 @@ export const tr_TR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Ejder Tarikatı Nekromatiği öldürüldü"
-          },
-          "1": {
-            "label": "Ayinsel Filakter"
           }
         }
       },

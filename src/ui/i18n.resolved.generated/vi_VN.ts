@@ -12327,9 +12327,6 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Đã hạ Cuồng Tín Long Giáo"
-          },
-          "1": {
-            "label": "Mệnh Lệnh Long Giáo"
           }
         }
       },
@@ -12340,9 +12337,6 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Đã hạ Pháp Sư Tử Linh Long Giáo"
-          },
-          "1": {
-            "label": "Hồn Hộp Nghi Lễ"
           }
         }
       },

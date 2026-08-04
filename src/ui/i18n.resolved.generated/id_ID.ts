@@ -12327,9 +12327,6 @@ export const id_ID: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Fanatik Wyrmcult terbunuh"
-          },
-          "1": {
-            "label": "Perintah Wyrmcult"
           }
         }
       },
@@ -12340,9 +12337,6 @@ export const id_ID: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Wyrmcult Necromancer dibunuh"
-          },
-          "1": {
-            "label": "Filakteri Ritual"
           }
         }
       },

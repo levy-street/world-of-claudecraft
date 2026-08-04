@@ -12327,9 +12327,6 @@ export const cs_CZ: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Fanatik kultu draka zabit"
-          },
-          "1": {
-            "label": "Rozkazy kultu draka"
           }
         }
       },
@@ -12340,9 +12337,6 @@ export const cs_CZ: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Nekromant kultu draka zabit"
-          },
-          "1": {
-            "label": "Rituální fylakterie"
           }
         }
       },
