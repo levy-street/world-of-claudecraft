@@ -7,10 +7,10 @@
 // (types.ts ItemInstancePayload.rolled.stats), so it survives equip/unequip
 // (src/sim/items.ts) and stays a distinct good, separate from a plain copy of
 // the same item id. sellItem/discardItem/trade's drop arm now prefer a
-// fungible copy over this one (items.ts removePreferFungible), and trade
-// carries the payload end to end (#2049); market listing and mail still do
-// not (#1165-style gap): a fully "tradeable good" there is a known follow-up,
-// not yet true here.
+// fungible copy over this one (items.ts removePreferFungible), and trade,
+// the World Market, and Ravenpost mail all carry the payload end to end
+// (#2049, then #2507 completed the anonymous pipes via
+// src/sim/item_instance_transfer.ts).
 //
 // Replacing an enchant (#2415): an already-enchanted copy is never silently
 // overwritten, but it is not locked forever either. The apply command carries
@@ -68,13 +68,14 @@ import type { SimContext } from '../sim_context';
 import {
   cloneItemInstancePayload,
   type EquipSlot,
+  type InventoryUnit,
   type InvSlot,
   type ItemDef,
   type ItemInstancePayload,
 } from '../types';
 import { recordAction, withinActionThrottle } from './action_throttle';
 import { enchantingGainMultiplier } from './archetype';
-import { typedSecondaryFor } from './disenchant_reagents';
+import { DISENCHANT_MATERIAL_BY_QUALITY, typedSecondaryFor } from './disenchant_reagents';
 import { gainCraftSkill } from './wheel';
 
 // #1712 round-3 review: neither action previously called gainCraftSkill, so
@@ -114,19 +115,12 @@ const QUALITY_ORDER: readonly NonNullable<ItemDef['quality']>[] = [
   'legendary',
 ];
 
-// Which arcane material a disenchant yields, keyed by the disenchanted
-// item's rarity: a dedicated Enchanting material rather than a shared junk
-// item, feeding the same three tiers applyEnchant's reagents draw from. Only
-// strictly better than plain salvage.ts's generic yield from `rare` up
-// (arcane_dust and bone_fragments vendor near-identically at `common`; see
-// #1712 round-3 review point 12).
-export const DISENCHANT_MATERIAL_BY_QUALITY: Readonly<Record<string, string>> = {
-  common: 'arcane_dust',
-  uncommon: 'arcane_dust',
-  rare: 'arcane_essence',
-  epic: 'arcane_shard',
-  legendary: 'arcane_shard',
-};
+// The universal arcane ladder now lives in the disenchant_reagents.ts pure
+// leaf (R39 made it a two-consumer table: the disenchant yield here AND the
+// tool-effect recharge price in tools.ts, which as a pure leaf must not
+// import this SimContext module). Re-exported so this module stays the
+// enchanting-facing home every existing importer knows.
+export { DISENCHANT_MATERIAL_BY_QUALITY };
 
 /** The authoritative already-enchanted read for one instance payload: the
  *  explicit `enchant` marker (written by resolveApplyEnchant below), or, for
@@ -179,15 +173,16 @@ export function replaceVictimIndex(inventory: readonly InvSlot[], itemId: string
 export function consumeEnchantedVictim(
   inventory: InvSlot[],
   itemId: string,
-): ItemInstancePayload | undefined {
+): InventoryUnit | undefined {
   const i = replaceVictimIndex(inventory, itemId);
   if (i < 0) return undefined;
   const s = inventory[i];
   const survives = s.count > 1;
   const payload = survives && s.instance ? cloneItemInstancePayload(s.instance) : s.instance;
+  const craftedRecipeId = s.craftedRecipeId;
   s.count -= 1;
   if (s.count <= 0) inventory.splice(i, 1);
-  return payload;
+  return { instance: payload, craftedRecipeId };
 }
 
 /** Eligible for disenchant: same eligibility as plain salvage (an equippable
@@ -246,10 +241,10 @@ export function enchantGainTier(enchant: EnchantDef): number {
   return tier;
 }
 
-interface ConsumedDisenchantUnit {
-  instance: ItemInstancePayload | undefined;
-  craftedRecipeId: string | undefined;
-}
+// Alias of the shared types.ts InventoryUnit (see EquippedInventoryUnit in
+// items.ts): the disenchant victim walk reports the same two channels every
+// other remover does.
+type ConsumedDisenchantUnit = InventoryUnit;
 
 function isCraftedDisenchantVictim(consumed: ConsumedDisenchantUnit | undefined): boolean {
   return (
@@ -781,7 +776,10 @@ function resolveReplaceEnchantBagged(
   // the array the peek above found the victim in) and deliberately kept as the
   // safe direction: were it ever taken, the gate would model the mint without
   // modeling the removal, which under-counts free space and denies MORE.
-  const scratchVictim = consumeEnchantedVictim(scratch, itemId) ?? victim;
+  const scratchVictim = consumeEnchantedVictim(scratch, itemId) ?? {
+    instance: victim,
+    craftedRecipeId: meta.inventory[victimIdx]?.craftedRecipeId,
+  };
   for (const reagent of enchant.reagents) removeStacked(scratch, reagent.itemId, reagent.count);
   if (
     countFit(
@@ -789,7 +787,8 @@ function resolveReplaceEnchantBagged(
       bagCapacity(meta.bags),
       itemId,
       1,
-      replacedEnchantPayloadFor(scratchVictim, enchant),
+      replacedEnchantPayloadFor(scratchVictim.instance ?? victim, enchant),
+      scratchVictim.craftedRecipeId,
     ) < 1
   ) {
     return { ok: false, itemId, enchantId, reason: 'no_bag_space' };
@@ -803,7 +802,7 @@ function resolveReplaceEnchantBagged(
   // destroyed the copy by the time we get here, and this return would skip the
   // mint, losing the item rather than duping it. Any such change has to keep
   // the removal and the mint atomic here, not lean on this line.
-  if (!consumed) return { ok: false, itemId, enchantId, reason: 'not_held' };
+  if (!consumed?.instance) return { ok: false, itemId, enchantId, reason: 'not_held' };
   ctx.onInventoryChangedForQuests(meta);
   for (const reagent of enchant.reagents) ctx.removeItem(reagent.itemId, reagent.count, pid);
   // silent + callerLogs, exactly like the plain apply mint below: the
@@ -811,9 +810,14 @@ function resolveReplaceEnchantBagged(
   // src/game/audio.ts) and logs the one enchant line. This mint re-grants the
   // player's OWN copy, so the hub's "You receive:" line told them they had
   // received an item that never left their bags (#2430).
-  ctx.addItemInstance(itemId, replacedEnchantPayloadFor(consumed, enchant), pid, 1, {
+  // craftedRecipeId re-stamps the consumed slot's plain-stack craft marker onto
+  // the replacement: the payload transform above carries every `instance` field
+  // through, but the marker lives on the SLOT, so without this the replace arm
+  // would launder a self-crafted piece exactly as the plain apply arm did.
+  ctx.addItemInstance(itemId, replacedEnchantPayloadFor(consumed.instance, enchant), pid, 1, {
     silent: true,
     callerLogs: true,
+    craftedRecipeId: consumed.craftedRecipeId,
   });
   // Quality-tiered gain: the applied enchant's reagent-derived tier, exactly
   // like the plain arms (also stamps the shared throttle).
@@ -922,6 +926,15 @@ export function resolveApplyEnchant(
   // (the removeItem walk), and the grant via the SAME enchantedPayloadFor the
   // success path mints below, so a byte-equal enchanted stack with room still
   // counts as fitting. Denies with no side effect and draws nothing.
+  // The mint below also re-stamps the victim's craftedRecipeId, which this
+  // model deliberately does NOT carry: consumeOneScratch reports the payload
+  // only, and countFit uses the marker solely to pick which dest stack a grant
+  // may merge into. Every enchantable item is equippable gear (an enchant
+  // declares an itemSlot), gear is stack-cap 1, so no mergeable dest stack can
+  // exist and the marker cannot change this answer. If a STACKABLE item ever
+  // becomes enchantable, that stops holding: widen consumeOneScratch to return
+  // an InventoryUnit and thread the marker through here, or the gate starts
+  // disagreeing with the grant about what merges.
   if (meta) {
     const scratch = meta.inventory.map((s) => ({ ...s }));
     const victim = consumeOneScratch(scratch, itemId, isEnchantedInstance);
@@ -937,12 +950,23 @@ export function resolveApplyEnchant(
   // The minted payload: the consumed copy's markers plus the enchant's
   // additive bonus and marker (enchantedPayloadFor above, shared with the
   // capacity gate).
-  const merged = enchantedPayloadFor(consumed, enchant);
+  const merged = enchantedPayloadFor(consumed?.instance, enchant);
   // silent + callerLogs: the enchantResult event fires its own dedicated cue
   // (audio.enchant in src/game/audio.ts) and logs the one enchant line. This
   // mint re-grants the player's OWN copy, so the hub's "You receive:" line
   // told them they had received an item that never left their bags (#2430).
-  ctx.addItemInstance(itemId, merged, pid, 1, { silent: true, callerLogs: true });
+  // craftedRecipeId re-stamps the consumed slot's plain-stack craft marker: a
+  // COMMON crafted piece carries its provenance on the slot with no `instance`
+  // at all, so enchanting it used to hand back a copy indistinguishable from a
+  // found one, and disenchanting that copy then paid full Enchanting skill,
+  // reopening the anti-farm gate (professions/crafting.ts
+  // isCraftedDisenchantTrackedOutput) through a craft -> enchant -> disenchant
+  // loop the player runs entirely on their own gear.
+  ctx.addItemInstance(itemId, merged, pid, 1, {
+    silent: true,
+    callerLogs: true,
+    craftedRecipeId: consumed?.craftedRecipeId,
+  });
   // Quality-tiered gain: the applied enchant's reagent-derived tier.
   if (meta) grantEnchantingSkill(ctx, meta, enchantGainTier(enchant));
   return { ok: true, itemId, enchantId };

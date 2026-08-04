@@ -1,8 +1,11 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { ClientWorld } from '../src/net/online';
 
 // A ClientWorld with only the fields the cast path touches, to exercise its
-// dead-target pre-validation without the WebSocket plumbing.
+// dead-target pre-validation without the WebSocket plumbing. Kept bespoke on
+// purpose (issue #2088): a narrower field subset plus a `cmd` spy.
+// tests/helpers/bare_client.ts bareClient() is the default for a new suite
+// that just needs a bare ClientWorld.
 function castClient(targetDead: boolean): any {
   const c: any = Object.create(ClientWorld.prototype);
   c.entities = new Map();
@@ -20,7 +23,11 @@ describe('ClientWorld dead-target cast pre-validation', () => {
     const c = castClient(true);
     c.castAbility('fireball');
     expect(c.cmd).not.toHaveBeenCalled();
-    expect(c.drainEvents()).toContainEqual({ type: 'error', text: 'You have no target.', reason: 'target_dead' });
+    expect(c.drainEvents()).toContainEqual({
+      type: 'error',
+      text: 'You have no target.',
+      reason: 'target_dead',
+    });
   });
 
   it('sends a hostile cast on a live target', () => {
@@ -41,6 +48,10 @@ describe('ClientWorld dead-target cast pre-validation', () => {
     const c = castClient(true);
     c.castAbilityBySlot(0);
     expect(c.cmd).not.toHaveBeenCalled();
-    expect(c.drainEvents()).toContainEqual({ type: 'error', text: 'You have no target.', reason: 'target_dead' });
+    expect(c.drainEvents()).toContainEqual({
+      type: 'error',
+      text: 'You have no target.',
+      reason: 'target_dead',
+    });
   });
 });

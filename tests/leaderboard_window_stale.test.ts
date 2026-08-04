@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 //
 // DOM behavioral guard: stale async board responses. The five boards share one
 // .lb-body, so a slow response for an older tab (or page) must be dropped when

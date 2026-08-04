@@ -1046,3 +1046,196 @@ describe('Vale Cup: the pitch is closed during a match', () => {
     }
   });
 });
+
+describe('the pitch police and live profession sessions', () => {
+  it('the goal-reset kickoff placement ends a FIGHTER live gather session', () => {
+    // Fighters are skipped by the pitch police, and a herb node sits inside
+    // the pitch: a gather cast started during the goal celebrate must not
+    // ride the kickoff teleport (the golden-goal and goal-reset placements
+    // arrive with no arena reset, unlike match start and teardown).
+    const sim = makeWorld();
+    const a = addAt(sim, 'warrior', 'Kicker');
+    const b = addAt(sim, 'mage', 'Keeper');
+    const match = startBout(sim, a, b);
+    for (const e of sim.entities.values()) {
+      if (e.kind !== 'mob') continue;
+      e.dead = true;
+      e.hp = 0;
+      e.aiState = 'dead';
+      e.respawnTimer = 9999;
+      e.corpseTimer = 9999;
+      e.inCombat = false;
+    }
+    sim.addItem('gathering_sickle', 1, a);
+    teleport(sim, a, 23, -99); // herb_eastbrook_4, inside the pitch
+    expect(sim.harvestNode('herb_eastbrook_4', undefined, a)).toBe(true);
+    const e = sim.entities.get(a);
+    if (!e) throw new Error('missing fighter');
+    expect(e.castingAbility).not.toBeNull();
+
+    // Force the goal-reset arm: the goal phase expiring with no pending
+    // winner runs placeCupFighters straight into the kickoff placement.
+    match.phase = 'goal';
+    match.timer = 0.01;
+    match.pendingWinner = undefined;
+    sim.tick();
+
+    expect(e.castingAbility).toBeNull();
+    expect(e.gatherCastNodeId).toBe('');
+  });
+
+  it('sweeping a bystander off the live pitch ends their gather session', () => {
+    // herb_eastbrook_4 sits at (23, -99), INSIDE the Sowfield bounds: a
+    // harvest can legally start on the open pitch, and the next match tick's
+    // policePitch eject is a hard teleport that must not carry the session.
+    const sim = makeWorld();
+    const a = addAt(sim, 'warrior', 'Kicker');
+    const b = addAt(sim, 'mage', 'Keeper');
+    startBout(sim, a, b);
+    for (const e of sim.entities.values()) {
+      if (e.kind !== 'mob') continue; // mob damage would cancel for the wrong reason
+      e.dead = true;
+      e.hp = 0;
+      e.aiState = 'dead';
+      e.respawnTimer = 9999;
+      e.corpseTimer = 9999;
+      e.inCombat = false;
+    }
+    const c = sim.addPlayer('warrior', 'Herbalist');
+    sim.addItem('gathering_sickle', 1, c);
+    teleport(sim, c, 23, -99);
+    expect(sim.harvestNode('herb_eastbrook_4', undefined, c)).toBe(true);
+    const e = sim.entities.get(c);
+    if (!e) throw new Error('missing herbalist');
+    expect(e.castingAbility).not.toBeNull();
+
+    sim.tick();
+
+    // Ejected past the boards, and the session ended with the teleport.
+    expect(isOnPitch(e.pos.x, e.pos.z)).toBe(false);
+    expect(e.castingAbility).toBeNull();
+    expect(e.gatherCastNodeId).toBe('');
+  });
+});
+
+describe('Vale Cup: skill deeds unlock through a real match (issue #2767)', () => {
+  // deeds_sites_pin.test.ts pins onCupGoalForDeeds / onCupSaveForDeeds /
+  // onCupStandingForDeeds against a structural CupMatchForDeeds, called directly.
+  // This test drives one real rated 3v3 match through the actual sim tick loop
+  // (queue, matchmake, kickoff, three goals, a keeper save, full time) and
+  // asserts all three skill deeds unlock through the PRODUCTION call sites in
+  // src/sim/social/vale_cup.ts, pinning the whole match-to-deed path the issue
+  // reported as silently ungated (rated only, 3v3+ only for the keeper deeds,
+  // a hard-enough shot for a save) end to end.
+  it('a rated 3v3 match awards Hat Trick Hero, Safe Hands, and Nothing Gets Past Me', () => {
+    const sim = makeWorld();
+    const classes = ['warrior', 'mage', 'rogue', 'priest', 'paladin', 'shaman'] as const;
+    const names = ['Scorer', 'Keeper', 'Filler', 'OppKeeper', 'OppStriker', 'OppFiller'];
+    const roles = ['striker', 'keeper', 'sweeper', 'keeper', 'striker', 'sweeper'] as const;
+    const pids = names.map((name, i) => addAt(sim, classes[i], name, i * 2, -40));
+    // Six solos, bracket 3: first three queuers seat team A, next three team B
+    // (vcupPackTeams fills team A first; same fill order as the "keeper role"
+    // grip test above).
+    for (let i = 0; i < 6; i++) {
+      sim.vcupQueueJoin(3, i < 3 ? 'vale' : 'coliseum', roles[i], false, pids[i]);
+    }
+    sim.tick();
+    const match = sim.vcup.match!;
+    expect(match.rated).toBe(true); // matchmakeValeCup always starts a RATED match
+    expect(match.bracket).toBe(3); // the keeper deeds' silent 3v3+ gate
+    expect(match.teamA).toEqual([pids[0], pids[1], pids[2]]);
+    expect(match.teamB).toEqual([pids[3], pids[4], pids[5]]);
+    const scorer = pids[0];
+    const keeper = pids[1];
+    expect(match.roles[keeper]).toBe('keeper');
+    readyAll(sim);
+    tickUntil(sim, () => match.phase === 'active', 20 * 6);
+    expect(match.phase).toBe('active');
+
+    const scorerMeta = sim.players.get(scorer)!;
+    const keeperMeta = sim.players.get(keeper)!;
+
+    // Park every fighter but the shooter clear of the east goal mouth, then
+    // stage a kickable ball for team A (mirrors the "first to 5" scoring drill
+    // earlier in this file, scaled to a full 3v3 roster).
+    function stageEastGoal() {
+      for (const p of pids) {
+        if (p === scorer) continue;
+        teleport(sim, p, PITCH.xMin + 1, PITCH.zMin + 1);
+      }
+      teleport(sim, scorer, GOAL_LINE_EAST_X - 8, PITCH_CENTER.z);
+      sim.entities.get(scorer)!.facing = Math.PI / 2;
+      const ball = match.ball!;
+      ball.x = GOAL_LINE_EAST_X - 6;
+      ball.z = PITCH_CENTER.z;
+      ball.y = groundHeight(ball.x, ball.z, sim.cfg.seed);
+      ball.vx = 0;
+      ball.vy = 0;
+      ball.vz = 0;
+      ball.holderPid = null;
+    }
+
+    // GOALS 1-3: Hat Trick Hero needs three goals by the SAME scorer inside one
+    // rated 3v3+ match.
+    for (let g = 1; g <= 3; g++) {
+      stageEastGoal();
+      sim.castAbility('sport_shoot', scorer, { x: GOAL_LINE_EAST_X + 12, z: PITCH_CENTER.z });
+      const events = tickUntil(sim, () => match.phase === 'goal', 20 * 8);
+      const goal = events.find((e) => e.type === 'vcupGoal') as any;
+      expect(goal, `goal ${g}`).toBeTruthy();
+      expect(goal.team).toBe('A');
+      expect(goal.scorerName).toBe('Scorer');
+      expect(match.scoreA).toBe(g);
+      tickUntil(sim, () => match.phase !== 'goal', 20 * 6);
+    }
+    expect(match.phase).toBe('active');
+    expect(scorerMeta.deedsEarned.has('pvp_vcup_hat_trick')).toBe(true);
+
+    // SAVE: a shot moving at the keeper hard enough to threaten the west goal
+    // (team A's own goal) sticks in the grip. Stages the ball directly, the
+    // same way the "keeper role" grip test above does (a moving inbound ball
+    // inside the box), so the real updateBallContacts -> gripBall ->
+    // onCupSaveForDeeds path runs rather than calling the helper in isolation.
+    const keeperEntity = sim.entities.get(keeper)!;
+    for (const p of pids) {
+      if (p === keeper) continue;
+      teleport(sim, p, PITCH.xMax - 1, PITCH.zMax - 1);
+    }
+    teleport(sim, keeper, GOAL_LINE_WEST_X + 2, PITCH_CENTER.z);
+    const ball = match.ball!;
+    ball.x = keeperEntity.pos.x + 2.5;
+    ball.z = keeperEntity.pos.z;
+    ball.y = groundHeight(ball.x, ball.z, sim.cfg.seed);
+    ball.vx = -16; // inbound toward the WEST goal, above VC_SAVE_SHOT_SPEED
+    ball.vz = 0;
+    ball.holderPid = null;
+    const saveEvents = tickUntil(sim, () => ball.holderPid !== null, 10);
+    expect(ball.holderPid).toBe(keeper);
+    expect(
+      saveEvents.some((e) => e.type === 'vcupSave' && (e as any).keeperName === 'Keeper'),
+    ).toBe(true);
+    expect(keeperMeta.deedsEarned.has('pvp_vcup_first_save')).toBe(true);
+    expect(match.scoreB).toBe(0); // a save, not a concession: the clean sheet lives
+
+    // GOALS 4-5: push team A on to the score cap (5) so the match ends with
+    // team A winning 5-0, the "conceded nothing" half of Nothing Gets Past Me.
+    for (let g = 4; g <= 5; g++) {
+      stageEastGoal();
+      sim.castAbility('sport_shoot', scorer, { x: GOAL_LINE_EAST_X + 12, z: PITCH_CENTER.z });
+      tickUntil(sim, () => match.phase === 'goal', 20 * 8);
+      tickUntil(sim, () => match.phase !== 'goal', 20 * 6);
+    }
+    expect(match.scoreA).toBe(5);
+    expect(match.scoreB).toBe(0);
+    expect(match.ended).toBe(true);
+    expect(match.phase).toBe('over');
+    expect(scorerMeta.vcupWins).toBe(1);
+    expect(keeperMeta.vcupWins).toBe(1);
+    // Nothing Gets Past Me: the winning, seated KEEPER with a clean sheet.
+    expect(keeperMeta.deedsEarned.has('pvp_vcup_clean_sheet')).toBe(true);
+    // All three skill deeds landed their Renown (5 + 25, plus first_save's 5
+    // stacks on the keeper; the scorer separately banks first_goal + hat_trick).
+    expect(keeperMeta.renown).toBeGreaterThanOrEqual(30);
+    expect(scorerMeta.renown).toBeGreaterThanOrEqual(25);
+  });
+});

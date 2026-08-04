@@ -39,6 +39,13 @@ const ITEMS: Record<string, ItemDef> = {
   bound: { kind: 'armor', name: 'Bound Plate', quality: 'uncommon', noMarketList: true } as ItemDef,
   rod: { kind: 'tool', name: 'Fishing Rod', use: { type: 'fishing' } } as ItemDef,
   soulbound: { kind: 'quest', name: 'Soulbound Key', quality: 'epic', noDiscard: true } as ItemDef,
+  starterTool: {
+    kind: 'tool',
+    name: 'Gathering Sickle',
+    quality: 'common',
+    noVendorSell: true,
+    noMarketList: true,
+  } as ItemDef,
   mark: {
     kind: 'tool',
     name: 'Heroic Mark',
@@ -516,5 +523,38 @@ describe('bagsMoneyRowStale', () => {
   it('is not pinned to the current shown value', () => {
     // Mirrors bagsWindowShown's own contract: guard the hidden values, not 'flex'.
     expect(bagsMoneyRowStale('block', 5000, 1000)).toBe(true);
+  });
+});
+
+describe('noVendorSell affordances (the quest-granted starter tools)', () => {
+  it('denies the vendor click in place instead of dispatching a sale the sim refuses', () => {
+    // The sim refuses on noVendorSell (src/sim/items.ts sellItem). Before this
+    // mirror existed the click dispatched anyway and the player's only feedback
+    // was an error toast. A quality-'common' tool with a real sellValue is the
+    // case that made it visible: the tier-1 gathering tools are the first items
+    // to carry noVendorSell AND a nonzero sell price.
+    expect(bagItemAction(ITEMS.starterTool, { ...NO_MODE, vendorOpen: true })).toBe(
+      'vendorSellBlocked',
+    );
+    // Discriminating control: an ordinary sellable item still sells.
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, vendorOpen: true })).toBe('vendorSell');
+  });
+
+  it('labels the tooltip cannot-vendor rather than advertising a click to sell', () => {
+    expect(bagTooltipHintKey(ITEMS.starterTool, { ...NO_MODE, vendorOpen: true })).toBe(
+      'itemUi.tooltip.cannotVendor',
+    );
+    expect(bagTooltipHintKey(ITEMS.sword, { ...NO_MODE, vendorOpen: true })).toBe(
+      'itemUi.tooltip.clickSell',
+    );
+  });
+
+  it('leaves every other mode alone: the flag gates the vendor arm only', () => {
+    // noVendorSell must not leak into trade, bank, or use. The tool is also
+    // noMarketList, so the market and mail arms block on THAT flag, which is a
+    // separate rule with its own pins above.
+    expect(bagItemAction(ITEMS.starterTool, { ...NO_MODE, tradeOpen: true })).toBe('trade');
+    expect(bagItemAction(ITEMS.starterTool, { ...NO_MODE, bankDeposit: true })).toBe('bankDeposit');
+    expect(bagItemAction(ITEMS.starterTool, NO_MODE)).toBe('use');
   });
 });

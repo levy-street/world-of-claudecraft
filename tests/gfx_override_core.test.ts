@@ -144,12 +144,12 @@ describe('gfx override application', () => {
     );
 
     expect(hashes).toEqual({
-      low: 'e300c8365d0cb6689c198796a350949e929e8ee0ef79e7b0497f6d3e9ba9e3b8',
-      medium: '892d0127aa4b348dcdd2746398dd602df81df6d4f1a6272722d32b1f55ef0ac0',
-      high: '98b97c6a77a8b684b32d5df741893457a198b54f26c88a5457f42070a3967212',
-      ultra: '381c1d4d87ad4f019a8660bd6a840efc462c808da80b8081292dd502e5462a1f',
-      insane: '717d895218db192a1e6e95c9f2b1acddf56264df660cacd2e9e894ab394b9169',
-      advanced: 'a4001e70e5bed5e9ca886d801130a48636fd15a433adad2db1d65bbcbcad953d',
+      low: '42ed799774110700ab92986f9c91ca11eddf4dec10f283c840c8dceaa193678f',
+      medium: 'c050b1dcd93c42a1e3bb889d09d111a01843d40f3c2e6b18246fa29fa72df5f2',
+      high: '2c9f07d64a9bc6de9bef133b0fda15b78cf5b3caea3c1b663e2581acc4cb64a7',
+      ultra: 'a4d06e8812fb3d633004e6e0b7b0476d09fcea35bf5e4867a41c298844451345',
+      insane: 'f958af0c8455eb70663b7eb7298fc20d2508d1250897aa340eb57152b142e960',
+      advanced: 'a46ab9ada9e851a87cc5c54ce48650fbce8c704368b22d87bb6f1f21c4b8467e',
     });
   });
 

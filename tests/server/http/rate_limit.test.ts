@@ -36,6 +36,7 @@ import {
   REPORTS_CREATE_POLICY,
   rateLimit,
   resetTier2ErrorLogThrottle,
+  SEEKER_SPIN_VERIFY_POLICY,
   WALLET_LINK_POLICY,
   WOC_BALANCE_POLICY,
 } from '../../../server/http/middleware/rate_limit';
@@ -56,6 +57,7 @@ import {
   resetRateLimitClock,
   resetWalletLinkRateLimits,
   resetWocBalanceRateLimits,
+  SEEKER_SPIN_VERIFY_MAX_PER_MINUTE,
   setRateLimitClock,
   setRateLimitTier2Store,
   WALLET_LINK_MAX_PER_MINUTE,
@@ -385,6 +387,7 @@ describe('rateLimit: policy derivation guard', () => {
       { policy: WOC_BALANCE_POLICY, limit: WOC_BALANCE_MAX_PER_MINUTE },
       { policy: CARD_UPLOAD_POLICY, limit: CARD_UPLOAD_MAX_PER_MINUTE },
       { policy: WALLET_LINK_POLICY, limit: WALLET_LINK_MAX_PER_MINUTE },
+      { policy: SEEKER_SPIN_VERIFY_POLICY, limit: SEEKER_SPIN_VERIFY_MAX_PER_MINUTE },
       { policy: CLAUDIUM_PURCHASE_PRE_AUTH_POLICY, limit: CLAUDIUM_PURCHASE_MAX_PER_MINUTE },
       { policy: CLAUDIUM_QUOTE_PRE_AUTH_POLICY, limit: CLAUDIUM_QUOTE_MAX_PER_MINUTE },
       { policy: CLAUDIUM_CONFIRM_PRE_AUTH_POLICY, limit: CLAUDIUM_CONFIRM_MAX_PER_MINUTE },

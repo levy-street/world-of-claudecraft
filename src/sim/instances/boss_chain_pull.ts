@@ -16,7 +16,9 @@
 // already set, and it draws NO rng, so the shared draw order (and the parity
 // goldens) are untouched. Runs once per boss pull: aggroMob early-returns for a
 // boss already in chase/attack, and re-arms if the boss evades and resets.
+
 import { DUNGEONS, MOBS } from '../data';
+import { markChainPullInbound } from '../mob/chain_pull_transit';
 import type { SimContext } from '../sim_context';
 import { addThreat } from '../threat';
 import type { Entity } from '../types';
@@ -60,10 +62,17 @@ export function chainPullInstanceOnBossAggro(
     // DUNGEON_LEASH_DISTANCE is 70, so a mob anchored where it stood would run
     // 70 yards, hit its leash, and evade home without ever reaching the fight,
     // which would quietly turn the whole mechanic into a no-op for the far half
-    // of the dungeon. Anchoring on the puller lets every pulled mob arrive while
-    // still keeping a real leash: it can be dragged 70 yards from the pull
-    // point, so the group cannot walk the dungeon out through the door.
+    // of the dungeon. Anchoring on the puller keeps a real leash around the
+    // FIGHT: once a mob has arrived it can be dragged 70 yards from the pull
+    // point and no further, so the group cannot walk the dungeon out the door.
+    //
+    // The anchor alone is not enough, and shipping it alone is what broke this
+    // mechanic past the shrine: a mob that starts 170 yards from the puller is
+    // already outside that same sphere, so the leash prelude evaded it home on
+    // its first engaged tick. The inbound flag suspends the soft leash for the
+    // crossing and spends itself on arrival (mob/chain_pull_transit.ts).
     mob.leashAnchor = { ...target.pos };
+    markChainPullInbound(mob);
     addThreat(mob, target.id, 1); // seed the hate table, as aggroMob does
     pulled++;
   }

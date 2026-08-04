@@ -19,6 +19,7 @@ import {
   type DeedsViewInput,
   deedCrestId,
   deedDisplayCategory,
+  deedJumpCategory,
   deedProgress,
   deedRarityFraction,
   deedStatsDigest,
@@ -437,6 +438,109 @@ describe('buildDeedsView', () => {
     expect(view.summary.recent[0].crestId).toBe('deed_cat_combat');
   });
 
+  it('lets the fetched recentOrder outrank the day sort, skipping drifted and unearned ids', () => {
+    const view = buildDeedsView(
+      makeInput({
+        deedsEarned: new Map([
+          ['prog_a', '2026-07-01'],
+          ['cmb_counter', '2026-07-03'],
+          ['cmb_title', '2026-07-03'],
+          ['dgn_clears', '2026-07-02'],
+        ]),
+        recentOrder: ['cmb_counter', 'removed_deed', 'exp_visits', 'cmb_title', 'prog_a'],
+      }),
+    );
+    // The fetched order wins over the day sort (which would put cmb_title
+    // first); the drifted id and the unearned id are skipped; the deed the
+    // fetch missed (dgn_clears) still follows from the day fallback.
+    expect(view.summary.recent.map((r) => r.id)).toEqual([
+      'cmb_counter',
+      'cmb_title',
+      'prog_a',
+      'dgn_clears',
+    ]);
+  });
+
+  it('puts session unlocks first, newest first, deduped against the fetched order', () => {
+    const view = buildDeedsView(
+      makeInput({
+        deedsEarned: new Map([
+          ['prog_a', '2026-07-01'],
+          ['cmb_counter', '2026-07-03'],
+          ['cmb_title', '2026-07-03'],
+        ]),
+        // Drain order (oldest first): prog_a is the newest session unlock.
+        sessionUnlocks: ['cmb_counter', 'prog_a'],
+        recentOrder: ['cmb_title', 'cmb_counter'],
+      }),
+    );
+    expect(view.summary.recent.map((r) => r.id)).toEqual(['prog_a', 'cmb_counter', 'cmb_title']);
+    // The display day still resolves from the earned map for a merged source.
+    expect(view.summary.recent[0].earnedDay).toBe('2026-07-01');
+  });
+
+  it('an earned id the catalog no longer knows cannot enter recent through the fetched order', () => {
+    // Both drift ids sit in the EARNED map, so the earned check alone cannot
+    // reject them: the catalog own-property check is the only thing between
+    // the wire-sourced order and deedCrestId throwing on a missing def (and
+    // 'constructor' is the prototype-key arm of the same guard).
+    const view = buildDeedsView(
+      makeInput({
+        deedsEarned: new Map([
+          ['removed_deed', '2026-07-01'],
+          ['constructor', '2026-07-01'],
+          ['cmb_counter', '2026-07-02'],
+        ]),
+        recentOrder: ['removed_deed', 'constructor', 'cmb_counter'],
+      }),
+    );
+    expect(view.summary.recent.map((r) => r.id)).toEqual(['cmb_counter']);
+  });
+
+  it('echoes focusDeedId only when the deed rendered an entry this paint', () => {
+    const earned = new Map([['cmb_counter', '2026-07-01']]);
+    expect(
+      buildDeedsView(makeInput({ deedsEarned: earned, focusDeedId: 'cmb_counter' })).focusDeedId,
+    ).toBe('cmb_counter');
+    // Another category selected: the card is not in the DOM, so null.
+    expect(
+      buildDeedsView(
+        makeInput({ deedsEarned: earned, category: 'progression', focusDeedId: 'cmb_counter' }),
+      ).focusDeedId,
+    ).toBe(null);
+    // Hidden and unearned: masked entirely, never echoed even on its shelf.
+    expect(buildDeedsView(makeInput({ category: 'feat', focusDeedId: 'hid_x' })).focusDeedId).toBe(
+      null,
+    );
+    // A filter that hides the card also clears the echo.
+    expect(
+      buildDeedsView(
+        makeInput({ deedsEarned: earned, filter: 'unearned', focusDeedId: 'cmb_counter' }),
+      ).focusDeedId,
+    ).toBe(null);
+    // A search that hides the card clears it too (the reason openWithDeed
+    // resets the search before it paints).
+    expect(
+      buildDeedsView(
+        makeInput({ deedsEarned: earned, search: 'zzz-no-match', focusDeedId: 'cmb_counter' }),
+      ).focusDeedId,
+    ).toBe(null);
+    // Absent input: null.
+    expect(buildDeedsView(makeInput()).focusDeedId).toBe(null);
+  });
+
+  it('deedJumpCategory: display bucket for a landable deed, null when the jump must not move', () => {
+    const earnedHidden = new Map([['hid_x', '2026-07-01']]);
+    expect(deedJumpCategory(TEST_DEEDS, new Map(), 'cmb_counter')).toBe('combat');
+    // An EARNED hidden deed is revealed on the Feats shelf and jumpable.
+    expect(deedJumpCategory(TEST_DEEDS, earnedHidden, 'hid_x')).toBe('feat');
+    // Hidden and unearned: even the destination shelf would leak, so null.
+    expect(deedJumpCategory(TEST_DEEDS, new Map(), 'hid_x')).toBe(null);
+    // Drift and prototype ids: null, never a throw.
+    expect(deedJumpCategory(TEST_DEEDS, earnedHidden, 'removed_deed')).toBe(null);
+    expect(deedJumpCategory(TEST_DEEDS, earnedHidden, 'constructor')).toBe(null);
+  });
+
   it('ranks nearest by progress fraction, excluding zero progress', () => {
     const s = stats((x) => {
       x.counters.kills = 3; // cmb_counter 0.3
@@ -563,10 +667,10 @@ describe('real catalog integration', () => {
     const view = buildDeedsView(
       makeInput({ deeds: DEEDS, order: DEED_ORDER, category: 'progression' }),
     );
-    // 225 deeds - 3 feats - 9 hidden = 213 visible to a fresh character.
-    expect(view.summary.visibleTotal).toBe(213);
+    // 232 deeds - 3 feats - 9 hidden = 220 visible to a fresh character.
+    expect(view.summary.visibleTotal).toBe(220);
     // The bucket sum adds the Feats shelf's own 3 rows back on top.
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(216);
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(223);
   });
 
   it('maps every live catalog category onto a display bucket', () => {

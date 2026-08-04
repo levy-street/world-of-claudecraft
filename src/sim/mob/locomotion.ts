@@ -1030,6 +1030,7 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   // (instance_exit_memory.ts) is recognized as stale and never reapplied onto
   // whoever re-pulls this mob fresh inside the same memory window.
   mob.evadeEpoch++;
+  mob.chainPullInbound = false;
   mob.fleeTimer = 0;
   mob.fleeReturnTimer = 0;
   mob.hasFled = false;

@@ -257,6 +257,20 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     requireOwnedExpected: REQUIRE_OWNED.bola404,
     match: /^\/api\/characters\/(\d+)\/sheet$/,
   },
+  // Registry-only RouteDef born AFTER the migration (the new-route rule,
+  // server/http/CLAUDE.md): no legacy ladder arm, so no match regex; the
+  // legacy rollback answers 404 for it by design. The owner-sheet gate pair
+  // (read-tier bearer + requireOwnedCharacter) exactly.
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/characters/:id/deeds-recent',
+    handler: 'server/characters.ts deedsRecentHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.bearer,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.bola404,
+  },
   {
     dispatcher: DISPATCH.mainApi,
     method: 'GET',
@@ -879,15 +893,36 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: 'wocBalanceRateLimited',
     requireOwnedExpected: null,
   },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/seeker/entitlement',
+    handler: 'server/seeker_entitlement.ts entitlementStatusHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/seeker/entitlement',
+    handler: 'server/seeker_entitlement.ts entitlementClaimHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: 'rateLimit(WALLET_LINK_POLICY)',
+    requireOwnedExpected: null,
+  },
   // Daily-rewards player family (v0.19.0, server/daily_rewards.ts): served by
   // the handleDailyRewardApi sub-dispatcher behind the main.ts PREFIX arm
   // `url.startsWith('/api/daily-rewards')`, which runs bearerActiveAccount
   // (full active session, read tokens 403) BEFORE delegating, method- and
   // subpath-agnostic. The prefix has NO trailing-slash boundary, so a no-slash
   // sibling like '/api/daily-rewardsfoo' also enters the family (auth first,
-  // then the in-family 404) instead of falling through the ladder. No rate
-  // limiter on any of the three (spin relies on the one-spin-per-day 409 guard
-  // only). In-family fallthrough (wrong method or unknown subpath, after auth)
+  // then the in-family 404) instead of falling through the ladder. Native Seeker
+  // spins additionally use the shared handler's IP-and-account RPC-work limiter;
+  // web spins retain the one-spin-per-day 409 guard. In-family fallthrough
+  // (wrong method or unknown subpath, after auth)
   // is 404 { error: 'unknown endpoint' }.
   {
     dispatcher: DISPATCH.mainApi,
@@ -918,7 +953,7 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     handler: 'handleDailyRewardApi arm: /api/daily-rewards/spin',
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.full,
-    limiter: null,
+    limiter: 'SEEKER_SPIN_VERIFY_POLICY (native Seeker only)',
     requireOwnedExpected: null,
   },
   {
@@ -1496,6 +1531,28 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
   {
     dispatcher: DISPATCH.admin,
     method: 'POST',
+    path: '/admin/api/moderation/characters/:id/restore-item',
+    handler: 'restoreItemMatch',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+    match: /^\/admin\/api\/moderation\/characters\/(\d+)\/restore-item$/,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/moderation/characters/:id/restore-slot',
+    handler: 'restoreSlotMatch',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+    match: /^\/admin\/api\/moderation\/characters\/(\d+)\/restore-slot$/,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
     path: '/admin/api/moderation/accounts/:id/lift-mute',
     handler: 'liftMuteMatch',
     contentType: PROBLEM_JSON,
@@ -2002,6 +2059,17 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
   {
     dispatcher: DISPATCH.admin,
     method: 'GET',
+    path: '/admin/api/characters/:id/professions',
+    handler: 'characterProfessionsMatch',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+    match: /^\/admin\/api\/characters\/(\d+)\/professions$/,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
     path: '/admin/api/accounts/:id/daily-rewards-events',
     handler: 'dailyRewardEventsMatch',
     contentType: PROBLEM_JSON,
@@ -2237,6 +2305,38 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     method: 'GET',
     path: '/internal/discord/flaired-ids',
     handler: 'handleDiscordInternal arm: /internal/discord/flaired-ids',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.secretDiscord,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  // The batched flex read the Discord bot's sweep uses instead of asking the
+  // per-id /internal/discord/flex once per online user. It is the first
+  // REGISTRY-ONLY internal route: born after the pipeline migration, so it has
+  // NO handleDiscordInternal arm and no legacy rollback twin by design (the
+  // new-route rule in server/http/CLAUDE.md), which is why the handler anchors
+  // on the exported RouteDef symbol rather than on a legacy ladder arm.
+  {
+    dispatcher: DISPATCH.internal,
+    method: 'POST',
+    path: '/internal/discord/flex-batch',
+    handler: 'server/internal.ts flexBatchHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.secretDiscord,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  // The consolidated bot poll: the relay, activity and linked-member change
+  // feeds drained together with the winner-day announcements, so the bot makes
+  // one request per interval instead of three plus a full member sweep. The
+  // second REGISTRY-ONLY internal route, same reason as flex-batch above (born
+  // after the migration, no handleDiscordInternal arm, so the handler anchors on
+  // the exported RouteDef symbol).
+  {
+    dispatcher: DISPATCH.internal,
+    method: 'GET',
+    path: '/internal/discord/outbox',
+    handler: 'server/internal.ts outboxHandler (registry-only RouteDef)',
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.secretDiscord,
     limiter: null,

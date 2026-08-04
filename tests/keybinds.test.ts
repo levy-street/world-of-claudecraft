@@ -251,6 +251,67 @@ describe('binding', () => {
   });
 });
 
+describe('resetSlots (action-bar-only reset)', () => {
+  it('restores the first bar to its defaults and clears the secondary/third bars', () => {
+    const kb = new Keybinds();
+    kb.bind('slot0', 0, 'KeyR'); // rebind Attack off "1"
+    kb.bind('slot1', 0, 'Semicolon'); // rebind a primary-bar ability slot
+    kb.bind('slot12', 0, 'KeyG'); // rebind a secondary-bar slot off its numpad default
+    kb.bind('slot23', 0, 'KeyF'); // rebind a third-bar slot off its shifted-numpad default
+    kb.resetSlots();
+    expect(kb.codeAt('slot0', 0)).toBe('Digit1');
+    expect(kb.codeAt('slot1', 0)).toBe('Digit2');
+    expect(kb.codeAt('slot12', 0)).toBeNull(); // unbound, not reverted to Numpad1
+    expect(kb.codeAt('slot23', 0)).toBeNull(); // unbound, not reverted to Shift+Numpad1
+    expect(kb.actionForCode('KeyR')).toBeNull();
+    expect(kb.actionForCode('Semicolon')).toBeNull();
+    expect(kb.actionForCode('KeyG')).toBeNull();
+    expect(kb.actionForCode('KeyF')).toBeNull();
+  });
+
+  it('leaves every non-action-bar binding untouched', () => {
+    const kb = new Keybinds();
+    kb.bind('jump', 0, 'KeyJ');
+    kb.bind('bags', 0, 'KeyN');
+    kb.resetSlots();
+    expect(kb.codeAt('jump', 0)).toBe('KeyJ');
+    expect(kb.codeAt('bags', 0)).toBe('KeyN');
+  });
+
+  it('evicts a conflicting non-slot binding that now collides with a restored primary default', () => {
+    const kb = new Keybinds();
+    kb.bind('slot0', 0, 'KeyR'); // free up Digit1
+    kb.bind('bags', 0, 'Digit1'); // bags borrows it
+    expect(kb.actionForCode('Digit1')).toBe('bags');
+    kb.resetSlots();
+    // slot0 reclaims its default; bags loses the code it borrowed, preserving
+    // the one-code-per-action invariant.
+    expect(kb.actionForCode('Digit1')).toBe('slot0');
+    expect(kb.codeAt('bags', 0)).toBeNull();
+  });
+
+  it('preserves the one-code-per-action invariant secondary/tertiary defaults do not steal back', () => {
+    // A player rebinds a secondary-bar slot onto a primary-bar default key.
+    // resetSlots() must leave that borrowed key alone (it did not come from a
+    // restored primary default), only the primary-bar codes get restored.
+    const kb = new Keybinds();
+    kb.bind('slot12', 0, 'Digit3'); // steals slot2's default
+    kb.resetSlots();
+    expect(kb.codeAt('slot2', 0)).toBe('Digit3');
+    expect(kb.codeAt('slot12', 0)).toBeNull();
+  });
+
+  it('persists across instances like every other bind()/reset() mutation', () => {
+    const a = new Keybinds();
+    a.bind('slot0', 0, 'KeyR');
+    a.bind('slot12', 0, 'KeyG');
+    a.resetSlots();
+    const b = new Keybinds();
+    expect(b.codeAt('slot0', 0)).toBe('Digit1');
+    expect(b.codeAt('slot12', 0)).toBeNull();
+  });
+});
+
 describe('Attack Move (shared key)', () => {
   it('defaults to A, sharing the code with Turn Left', () => {
     const kb = new Keybinds();
@@ -705,5 +766,62 @@ describe('modifiers and held (movement) actions', () => {
     expect(kb.heldActionForCode('Space')).toBe('jump');
     // edge keys are not held
     expect(kb.heldActionForCode('Digit1')).toBe(null);
+  });
+});
+
+describe('mouse buttons as bindable keys', () => {
+  it('binds a mouse pseudo-code to an action-bar slot and labels it as a keycap', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('slot3', 0, 'Mouse4')).toBe(true);
+    expect(kb.edgeActionForCombo('Mouse4')).toBe('slot3');
+    expect(kb.primaryLabel('slot3')).toBe('M4');
+    expect(keyCapLabel(kb.primaryLabel('slot3'))).toBe('m4');
+  });
+
+  it('binds a mouse button to a held (movement) action so the per-frame poll matches', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('strafeLeft', 0, 'Mouse5')).toBe(true);
+    expect(kb.heldActionForCode('Mouse5')).toBe('strafeLeft');
+  });
+
+  it('keeps a mouse chord distinct from the bare button, like a key chord', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('slot4', 0, 'Shift+Mouse4')).toBe(true);
+    expect(kb.bind('slot5', 0, 'Mouse4')).toBe(true);
+    expect(kb.edgeActionForCombo('Shift+Mouse4')).toBe('slot4');
+    expect(kb.edgeActionForCombo('Mouse4')).toBe('slot5');
+    expect(kb.primaryLabel('slot4')).toBe('Shift+M4');
+  });
+
+  it('refuses the left and right buttons, which the camera and click-picking own', () => {
+    const kb = new Keybinds();
+    expect(isReservedCode('Mouse1')).toBe(true);
+    expect(isReservedCode('Mouse2')).toBe(true);
+    expect(isReservedCode('Shift+Mouse2')).toBe(true); // a chord on them is reserved too
+    expect(isReservedCode('Mouse3')).toBe(false);
+    expect(kb.bind('slot3', 0, 'Mouse1')).toBe(false);
+    expect(kb.bind('slot3', 0, 'Mouse2')).toBe(false);
+    // the refused binds left the slot on its default, not unbound or overwritten
+    expect(kb.codeAt('slot3', 0)).toBe('Digit4');
+  });
+
+  it('evicts a mouse binding when its button is reassigned, like any other code', () => {
+    const kb = new Keybinds();
+    kb.bind('slot3', 0, 'Mouse4');
+    kb.bind('slot7', 0, 'Mouse4');
+    expect(kb.codeAt('slot3', 0)).toBe(null);
+    expect(kb.edgeActionForCombo('Mouse4')).toBe('slot7');
+  });
+
+  it('persists a mouse binding across reloads, and drops a stored reserved one', () => {
+    const kb = new Keybinds();
+    kb.bind('slot3', 0, 'Mouse4');
+    expect(new Keybinds().codeAt('slot3', 0)).toBe('Mouse4');
+    // A hand-edited / legacy blob holding a reserved button must not load: the
+    // camera button would otherwise fire an ability on every click.
+    localStorage.setItem('woc_keybinds', JSON.stringify({ slot3: ['Mouse1', null] }));
+    const reloaded = new Keybinds();
+    expect(reloaded.codeAt('slot3', 0)).toBe(null);
+    expect(reloaded.edgeActionForCombo('Mouse1')).toBe(null);
   });
 });

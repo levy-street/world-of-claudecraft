@@ -28,6 +28,8 @@ import { CONCURRENT_INDEX_MIGRATIONS } from './concurrent_indexes';
 import { CONTENT_MODERATION_SCHEMA } from './content_moderation_db';
 import type { RankedDeedsAccount } from './deeds_board';
 import { DISCORD_SCHEMA } from './discord_db';
+import { enqueueLinkChange } from './discord_link_changes';
+import { bustDiscordStatus } from './discord_status_cache';
 import { GITHUB_SCHEMA } from './github_db';
 import { isUniqueViolation } from './http_util';
 import { MAPS_SCHEMA } from './maps_db';
@@ -48,8 +50,9 @@ import {
   recordCharacterCreation,
 } from './player_metrics_db';
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
-import { REALM } from './realm';
+import { REALM, REALM_DIRECTORY } from './realm';
 import { chooseArchiveName } from './reclaim_name';
+import { SEEKER_ENTITLEMENT_SCHEMA } from './seeker_entitlement_db';
 import { SOCIAL_SCHEMA } from './social_db';
 import { UNSTUCK_SCHEMA } from './unstuck_db';
 import { USER_ASSETS_SCHEMA } from './user_assets_db';
@@ -77,13 +80,85 @@ export const DATABASE_URL =
 // across the HTTP request path and the game loop. The pool is timeout-bounded on
 // every axis below so a slow or unreachable database degrades into fast, isolated
 // query failures instead of a process-wide stall.
-export const DB_POOL_MAX_CLIENTS = 10;
+// Env-tunable (DB_POOL_MAX_CLIENTS) because the R36 1,000-concurrent load
+// captures exhaust the default long before the loop does: at about 500 online
+// the 30 s autosave waves hold every client while login handshakes wait out
+// DB_POOL_CONNECT_TIMEOUT_MS. Parsing is strict and fail-safe: a set-but-blank,
+// non-decimal-digit, or out-of-range value stays on the default (an empty
+// string must never become a zero-client pool, a typo like "30x" must not
+// half-parse, and hex/exponent spellings are rejected rather than surprising).
+// Nothing is clamped: a value outside the accepted range FALLS BACK to the
+// default and says so on the console at boot, so a typo can never leave an
+// operator silently running a pool size they did not ask for.
+const DB_POOL_MAX_CLIENTS_DEFAULT = 10;
+// The largest value the parser accepts, taken from the CONNECTION BUDGET of the
+// shipped deployment: stock postgres:16 serves max_connections 100 with 3
+// superuser-reserved, so 97 are usable. Every realm process builds its own pool
+// on the one DATABASE_URL and pools have no cross-process coordination, so
+// realms x DB_POOL_MAX_CLIENTS + tooling is what must stay at or under 97, plus
+// one more per realm for ensureSchema's dedicated boot Client (outside the
+// pool, held while that process applies the schema, and a rolling restart pays
+// it on every realm at once). Past that, logins fail with "too many clients"
+// exactly at peak.
+// Connections are not the binding constraint on the shipped deployment, though:
+// the game process and Postgres share ONE 4-vCPU box, where the database is
+// already the heaviest CPU consumer at peak, so a large pool only buys
+// concurrency the shared cores cannot serve. Raise this knob against a measured
+// pool-exhaustion symptom (handshakes timing out on the checkout wait), a few
+// clients at a time, never toward the budget ceiling because it is allowed.
+const DB_POOL_MAX_CLIENTS_CEILING = 97;
+export function parseDbPoolMaxClients(raw: string | undefined): number {
+  const trimmed = (raw ?? '').trim();
+  if (!/^\d+$/.test(trimmed)) return DB_POOL_MAX_CLIENTS_DEFAULT;
+  const n = Number(trimmed);
+  return n >= 1 && n <= DB_POOL_MAX_CLIENTS_CEILING ? n : DB_POOL_MAX_CLIENTS_DEFAULT;
+}
+export const DB_POOL_MAX_CLIENTS = parseDbPoolMaxClients(process.env.DB_POOL_MAX_CLIENTS);
+// A rejected value lands on the default, which is indistinguishable from unset
+// in every later readout, so without this a typo silently costs the operator
+// the pool they meant to configure. The comparison is numeric, so the spellings
+// that do reach the requested number (" 10 ", "010") stay quiet. Dev-channel
+// English: a log line, never player text.
+const rawDbPoolMaxClients = (process.env.DB_POOL_MAX_CLIENTS ?? '').trim();
+if (rawDbPoolMaxClients !== '' && Number(rawDbPoolMaxClients) !== DB_POOL_MAX_CLIENTS) {
+  console.error(
+    `DB_POOL_MAX_CLIENTS="${rawDbPoolMaxClients}" is not an accepted value (a whole number from 1 to ${DB_POOL_MAX_CLIENTS_CEILING}); falling back to the default of ${DB_POOL_MAX_CLIENTS_DEFAULT} clients.`,
+  );
+}
 
 // Pool checkout / connect wait: how long pool.connect() (and every pool.query,
 // which checks a client out first) may block waiting for a free client or a new
 // TCP connect before it rejects. A slow database must fail a request fast rather
 // than queue the whole handshake path behind an exhausted pool forever.
 export const DB_POOL_CONNECT_TIMEOUT_MS = 5000;
+
+// One boot line naming the effective pool sizing. Nothing else logs it, so an
+// operator reading a "too many clients" or checkout-timeout incident had no way
+// to tell what this process actually claimed.
+console.log(
+  `db pool: DB_POOL_MAX_CLIENTS=${DB_POOL_MAX_CLIENTS} DB_POOL_CONNECT_TIMEOUT_MS=${DB_POOL_CONNECT_TIMEOUT_MS}`,
+);
+// The multi-realm multiplication, warned about where it is decided rather than
+// left to the operator's arithmetic. REALMS is the realm directory every realm
+// process is handed (scripts/dev-realms.mjs exports it to each child; a
+// production deployment sets the same list on every process), so its entry
+// count is how many independent pools this one DATABASE_URL will see. Unset
+// means a single realm, whose pool is already bounded by the parser ceiling and
+// so can never trip this on its own. PREMISE: every realm shares one database
+// (true of the shipped single-box deployment); directory entries hosted on
+// their own databases have their own budgets, so the warning below names the
+// assumption instead of pretending to know each realm's DATABASE_URL.
+// Counted through the SAME parser the realm directory ships from
+// (REALM_DIRECTORY dedupes names and drops malformed or non-origin entries),
+// so the warning's arithmetic matches the processes that will actually boot
+// rather than raw comma segments. Unset REALMS parses to the single-realm
+// fallback entry, which can never trip the ceiling on its own.
+const configuredRealmCount = REALM_DIRECTORY.length;
+if (configuredRealmCount * DB_POOL_MAX_CLIENTS > DB_POOL_MAX_CLIENTS_CEILING) {
+  console.warn(
+    `db pool: ${configuredRealmCount} realms x ${DB_POOL_MAX_CLIENTS} clients = ${configuredRealmCount * DB_POOL_MAX_CLIENTS} connections, past the ${DB_POOL_MAX_CLIENTS_CEILING} usable on stock postgres:16 (max_connections 100, 3 superuser-reserved) and before ensureSchema's one boot client per realm. If every realm shares this DATABASE_URL, logins will fail with "too many clients" at peak: lower DB_POOL_MAX_CLIENTS or raise max_connections.`,
+  );
+}
 
 // Server-side default statement timeout per session, applied as a connection
 // startup parameter so every query on every pooled client is bounded by the
@@ -1107,6 +1182,7 @@ export async function ensureSchema(): Promise<void> {
     await client.query(DAILY_REWARD_EXCLUDED_ACCOUNTS_VIEW_SQL);
     await client.query(SOCIAL_SCHEMA);
     await client.query(ADMIN_GUILDS_SCHEMA);
+    await client.query(SEEKER_ENTITLEMENT_SCHEMA);
     await client.query(OAUTH_SCHEMA);
     // Discord integration tables (links, oauth states, pending logins, reward
     // economy). FK-references accounts(id), so it runs after SCHEMA. Applied
@@ -1555,6 +1631,10 @@ export async function createAccount(
       }
     }
     await client.query('COMMIT');
+    // The roster is inserted at its authored level, so the account has a top
+    // character from this moment. After COMMIT only: a rolled-back provisioning
+    // transaction inserted nothing and must not enqueue.
+    enqueueLinkChange({ accountId: account.id, kinds: ['flex'] }, Date.now());
     return account;
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
@@ -1686,10 +1766,14 @@ export async function updatePasswordHash(accountId: number, passwordHash: string
   // Setting a password always makes it a real, owner-chosen one, so mark the
   // account usable (a no-op for accounts that were already password_set = TRUE,
   // and the conversion step for a Discord-provisioned account).
-  await pool.query('UPDATE accounts SET password_hash = $2, password_set = TRUE WHERE id = $1', [
-    accountId,
-    passwordHash,
-  ]);
+  const res = await pool.query(
+    'UPDATE accounts SET password_hash = $2, password_set = TRUE WHERE id = $1',
+    [accountId, passwordHash],
+  );
+  // password_set rides the /api/discord payload (the unlink flow's "set a
+  // password first" gate reads it), so a real write busts the cached status
+  // core here, covering every caller of this chokepoint at once.
+  if ((res.rowCount ?? 0) > 0) bustDiscordStatus(accountId);
 }
 
 // Revoke every token for an account except (optionally) the one in hand.
@@ -1975,6 +2059,11 @@ export async function consumePasswordResetRequest(
     );
     await client.query('DELETE FROM auth_tokens WHERE account_id = $1', [row.account_id]);
     await client.query('COMMIT');
+    // This path writes password_set = TRUE in its OWN transaction (it does not
+    // call updatePasswordHash), so it carries its own /api/discord status bust,
+    // after COMMIT like the discord_db.ts sites. The expired/replayed-token arm
+    // returns above without writing and must not evict a healthy snapshot.
+    bustDiscordStatus(row.account_id);
     return { accountId: row.account_id };
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
@@ -2225,6 +2314,13 @@ export async function exportAccountData(
       ORDER BY last_seen_at DESC`,
     [accountId],
   );
+  const seekerEntitlements = await pool.query(
+    `SELECT mint, claimant_wallet, proof_version, verification_slot, claimed_at
+       FROM seeker_entitlement_claims
+      WHERE account_id = $1
+      ORDER BY claimed_at`,
+    [accountId],
+  );
   return {
     exportedAt: new Date().toISOString(),
     account: {
@@ -2246,6 +2342,7 @@ export async function exportAccountData(
     })),
     playtimeTotals: playtimeTotals.rows,
     ipAssociations: ipAssociations.rows,
+    seekerEntitlements: seekerEntitlements.rows,
   };
 }
 
@@ -2682,6 +2779,13 @@ export interface CharacterRow {
 // the ORDER BY uses a static JSONB expression literal (Postgres does not allow a
 // bound parameter for an ORDER BY expression), so the query string carries no
 // interpolation and there is no injection surface.
+//
+// LOCKSTEP: discordFlexRowsForDiscordIds (server/discord_db.ts) is the batched
+// read serving /internal/discord/flex-batch, and it repeats this ORDER BY inside
+// a LATERAL. Both endpoints stay live, so the two must agree on which character
+// is "top" or the bot renders a different one depending on which it called. The
+// ordering is restated there rather than shared because db.ts imports discord_db
+// (DISCORD_SCHEMA), so that module cannot import back from here.
 export async function highestCharacterForAccount(accountId: number): Promise<CharacterRow | null> {
   const res = await pool.query(
     `SELECT id, account_id, name, class, level, state, is_gm, force_rename
@@ -2854,6 +2958,12 @@ export async function createCharacterCapped(
     );
     await recordCharacterCreation(client, accountId, REALM);
     await client.query('COMMIT');
+    // A created character can become the account's top one, and its class is fixed
+    // here forever (no statement ever updates characters.class). Enqueued inside the
+    // db function rather than at the route so the RouteDef arm, its retained legacy
+    // twin in main.ts, and the PBE boost roster are all covered by one site. After
+    // COMMIT: a rolled-back create must never have enqueued.
+    enqueueLinkChange({ accountId, kinds: ['flex'] }, Date.now());
     return res.rows[0];
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
@@ -2876,12 +2986,18 @@ export async function createCharacterCapped(
 // was released; the caller then retries the create. Race-safe: the holder row
 // is locked FOR UPDATE and the (realm, lower(name)) unique index is the real
 // guard on the subsequent insert.
-export async function reclaimDeactivatedName(name: string): Promise<boolean> {
+export async function reclaimDeactivatedName(name: string): Promise<{
+  id: number;
+  archivedName: string;
+  freedName: string;
+  level: number;
+  state: CharacterState | null;
+} | null> {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
     const holder = await client.query(
-      `SELECT c.id, c.name, a.deactivated_at, a.banned_at
+      `SELECT c.id, c.name, c.level, c.state, c.account_id, a.deactivated_at, a.banned_at
          FROM characters c JOIN accounts a ON a.id = c.account_id
         WHERE c.realm = $1 AND lower(c.name) = lower($2)
         FOR UPDATE OF c`,
@@ -2891,7 +3007,7 @@ export async function reclaimDeactivatedName(name: string): Promise<boolean> {
     // Free already, held by a live account, or under a moderation ban: nothing to reclaim.
     if (!row || row.deactivated_at == null || row.banned_at != null) {
       await client.query('ROLLBACK');
-      return false;
+      return null;
     }
     // Find an archival placeholder for the orphaned character that collides with
     // no other name in this realm (case-insensitive), mirroring the dedupe scheme.
@@ -2909,8 +3025,25 @@ export async function reclaimDeactivatedName(name: string): Promise<boolean> {
       [row.id, freed],
     );
     await client.query('COMMIT');
+    // The archived character's name is bot-visible via the flex payload, and
+    // deactivation does not remove a discord link, so a still-linked holder needs
+    // a feed item. After COMMIT, on the released path only: every refusal above
+    // rolled back without touching the row (Phase 5 QA feed sweep).
+    enqueueLinkChange({ accountId: row.account_id, kinds: ['flex'] }, Date.now());
     bustAdminGuildListReads();
-    return true;
+    // The caller must rekey the freed name's world state (market, mail, the
+    // orphan's own signed item instances) to the archived identity, exactly
+    // like a rename: a reclaim IS a rename of the orphaned holder, and the
+    // freed display name is about to belong to a stranger. freedName is the
+    // holder's STORED name: the lookup above is case-insensitive, so the
+    // requested casing can differ, and every book rekey matches exactly.
+    return {
+      id: row.id,
+      archivedName: freed,
+      freedName: row.name,
+      level: row.level,
+      state: row.state,
+    };
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
     throw err;
@@ -2925,6 +3058,10 @@ export async function deleteCharacter(accountId: number, characterId: number): P
     [characterId, accountId, REALM],
   );
   const deleted = (res.rowCount ?? 0) > 0;
+  // Only a delete that matched a row is a transition: deleting the top character
+  // promotes the next-ordered one (or none). A miss (wrong owner, wrong realm,
+  // already gone) changes nothing and must not enqueue.
+  if (deleted) enqueueLinkChange({ accountId, kinds: ['flex'] }, Date.now());
   if (deleted) bustAdminGuildListReads();
   return deleted;
 }
@@ -2979,9 +3116,17 @@ export async function renameCharacter(
      RETURNING id, account_id, name, class, level, state, is_gm, force_rename`,
     [characterId, accountId, name, REALM],
   );
-  const renamed = res.rows[0] ?? null;
-  if (renamed) bustAdminGuildListReads();
-  return renamed;
+  const row = res.rows[0] ?? null;
+  // The name rides the bot-visible flex payload (discordFlexForAccount ships
+  // character.name and a profileUrl derived from it), so a landed rename is a
+  // flex transition. Enqueued inside the db function so the RouteDef arm and any
+  // future caller are covered by one site; a null row (no sanctioned rename
+  // matched) must not enqueue. Found by the Phase 5 QA feed sweep: the original
+  // exclusion's stated reason ("the name is outside the flex definition") was
+  // wrong about the payload.
+  if (row) enqueueLinkChange({ accountId, kinds: ['flex'] }, Date.now());
+  if (row) bustAdminGuildListReads();
+  return row;
 }
 
 // Persist a character row. Returns true when the write landed. When a leaseNonce is

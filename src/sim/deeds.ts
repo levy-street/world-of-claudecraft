@@ -28,6 +28,7 @@
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from './content/deeds';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
 import { pointsSpent } from './content/talents';
+import { VC_ALLROUNDER_ONLY_MAX_BRACKET } from './content/vale_cup';
 import { ITEMS, MOBS, zoneAt } from './data';
 import { LAUNCH_PAPERDOLL_SLOTS } from './launch_paperdoll_slots';
 import { RESURRECTION_SICKNESS_ID } from './resurrection';
@@ -111,6 +112,13 @@ export const GROUND_PICKUP_PROVING_QUESTS: readonly string[] = [
 // the stranded threshold (the content-integrity test cross-checks the ceiling
 // against the real tables).
 export const MAX_CREDITABLE_MOB_LEVEL = 23;
+
+// How many recent unlock ids the IWorldDeeds.deedsRecent() read returns, on
+// every host: the Sim serves its live grant order, the online client fetches
+// the same count from the server's character_deeds record. Slightly above the
+// Book's 5-slot recent strip so the view core keeps spares after it dedups
+// the session-fresh unlocks against the fetched order.
+export const DEEDS_RECENT_CAP = 8;
 
 // Dungeon final bosses whose kill credit bumps deedStats.dungeonClears (keys
 // '<dungeonId>' and '<dungeonId>:heroic') and the dungeonFinalBossKills
@@ -227,10 +235,21 @@ export const RARE_SLAIN_TEMPLATES = new Set([
 
 // Zone fishing catches that count as "a fish" for the chr_ first-cast deeds
 // (weeds and empty hooks do not count). Pinned to the authored tables.
-const ZONE_FISH: Record<string, readonly string[]> = {
+// Exported for the new-zone checklist (tests/professions_zone_rollout.test.ts):
+// a complete zone's first-cast deed is only earnable if a row here writes its
+// fish:<zone> mark, so the checklist sweeps this table too.
+export const ZONE_FISH: Record<string, readonly string[]> = {
   eastbrook_vale: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
   mirefen_marsh: ['raw_marsh_pike', 'raw_bog_eel', 'glimmerfin_koi'],
   thornpeak_heights: ['raw_frostgill_trout', 'raw_stonescale_carp', 'glimmerfin_koi'],
+  // The three bottom-map zones (the phase 20 chronicle pairs, Q26): their
+  // waters draw the Vale FALLBACK tables until the zone-4 pass authors real
+  // ones (professions/fishing.ts, bandTables[zoneId] ?? eastbrook_vale), so
+  // the rows list the fallback's own fish and the deeds_content guard
+  // intersects them against the tables each zone ACTUALLY draws.
+  willowfen: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
+  galecrest: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
+  farshore_isle: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
 };
 
 // The three Chronicler NPCs (interaction-only). Talking to one feeds an
@@ -246,7 +265,9 @@ const SAUL_TALKS_REQUIRED = 9;
 
 // How close (yards) a POI sweep counts a visit, and the witness radius for
 // chr_peaks_waking_witness (inside interest scope, pinned literal).
-const POI_VISIT_RADIUS = 20;
+// Exported for the placement suite's mirror-lake standability arm, which used
+// to carry its own copy of this number and could drift silently.
+export const POI_VISIT_RADIUS = 20;
 const THUNZHARR_WITNESS_RADIUS = 100;
 
 // ---------------------------------------------------------------------------
@@ -1659,7 +1680,7 @@ export function onCupGoalForDeeds(
   if (!meta) return;
   grantDeed(ctx, meta, 'pvp_vcup_first_goal');
   if (match.golden) grantDeed(ctx, meta, 'pvp_vcup_golden_goal');
-  if (match.bracket >= 3) {
+  if (match.bracket > VC_ALLROUNDER_ONLY_MAX_BRACKET) {
     let goals = ctx.deedRuntime.cupGoals.get(match.id);
     if (!goals) {
       goals = new Map();
@@ -1671,13 +1692,16 @@ export function onCupGoalForDeeds(
   }
 }
 
-/** A keeper save (shot at or above the save speed floor), rated only. */
+/** A keeper save (shot at or above the save speed floor), rated only. The
+ *  description also promises the 3v3 bracket or larger; today that holds
+ *  emergently (normalizeRole seats no small-bracket keeper), so the explicit
+ *  gate enforces the published rule rather than inferring it. */
 export function onCupSaveForDeeds(
   ctx: SimContext,
   match: CupMatchForDeeds,
   keeperPid: number,
 ): void {
-  if (!match.rated) return;
+  if (!match.rated || match.bracket <= VC_ALLROUNDER_ONLY_MAX_BRACKET) return;
   const meta = ctx.players.get(keeperPid);
   if (meta) grantDeed(ctx, meta, 'pvp_vcup_first_save');
 }
@@ -1695,6 +1719,9 @@ export function onCupStandingForDeeds(
   // The Cup win meters moved in the caller's standing loop: full pass.
   markDeedsDirty(ctx, pid);
   if (winner !== team) return;
+  // Clean sheet promises the 3v3 bracket or larger, like the save deed above:
+  // enforce the published rule directly instead of leaning on normalizeRole.
+  if (match.bracket <= VC_ALLROUNDER_ONLY_MAX_BRACKET) return;
   if (match.roles[pid] !== 'keeper' || match.benched.has(pid)) return;
   const opposingScore = team === 'A' ? match.scoreB : match.scoreA;
   if (opposingScore !== 0) return;

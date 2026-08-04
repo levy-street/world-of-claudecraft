@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
-import { type CompileGateScheduler, raceCompileGate } from '../src/render/compile_gate';
+import {
+  awaitCompileGate,
+  CompileGateQueue,
+  type CompileGateScheduler,
+  settlePendingSwap,
+} from '../src/render/compile_gate';
 
 function fakeScheduler(): CompileGateScheduler & {
   fire: () => void;
@@ -34,68 +39,147 @@ function fakeScheduler(): CompileGateScheduler & {
   };
 }
 
-describe('raceCompileGate', () => {
-  it('resolves once compile() resolves, before the timeout fires', async () => {
+describe('awaitCompileGate', () => {
+  it('resolves when compile() resolves and clears the diagnostic timer', async () => {
     const scheduler = fakeScheduler();
     let resolveCompile!: () => void;
     const compile = () => new Promise<void>((resolve) => (resolveCompile = resolve));
-    const gate = raceCompileGate(compile, 1500, scheduler);
+    const gate = awaitCompileGate(compile, 1500, { scheduler });
     let done = false;
     void gate.then(() => {
       done = true;
     });
     expect(done).toBe(false);
     resolveCompile();
-    await gate;
-    await Promise.resolve();
+    await expect(gate).resolves.toEqual({ failed: false, timedOut: false });
     expect(done).toBe(true);
     expect(scheduler.cleared).toContain(scheduler.pendingId ?? -1);
   });
 
-  it('resolves once compile() rejects, treating failure the same as success', async () => {
+  it('records timeout without abandoning the active compile', async () => {
     const scheduler = fakeScheduler();
-    let rejectCompile!: (err: unknown) => void;
-    const compile = () => new Promise<void>((_resolve, reject) => (rejectCompile = reject));
-    const gate = raceCompileGate(compile, 1500, scheduler);
-    rejectCompile(new Error('link failed'));
-    await expect(gate).resolves.toBeUndefined();
-  });
-
-  it('resolves via the timeout when compile() never settles', async () => {
-    const scheduler = fakeScheduler();
-    const compile = () => new Promise<void>(() => {});
-    const gate = raceCompileGate(compile, 1500, scheduler);
+    const onTimeout = vi.fn();
+    let resolveCompile!: () => void;
+    const compile = () => new Promise<void>((resolve) => (resolveCompile = resolve));
+    const gate = awaitCompileGate(compile, 1500, { onTimeout, scheduler });
     let done = false;
     void gate.then(() => {
       done = true;
     });
-    expect(done).toBe(false);
-    scheduler.fire();
-    await gate;
-    expect(done).toBe(true);
-  });
 
-  it('only resolves once even if both the compile and the timeout fire', async () => {
-    const scheduler = fakeScheduler();
-    let resolveCompile!: () => void;
-    const compile = () => new Promise<void>((resolve) => (resolveCompile = resolve));
-    const gate = raceCompileGate(compile, 1500, scheduler);
-    const spy = vi.fn();
-    void gate.then(spy);
-    resolveCompile();
-    await gate;
     scheduler.fire();
     await Promise.resolve();
-    expect(spy).toHaveBeenCalledTimes(1);
+    expect(done).toBe(false);
+    expect(onTimeout).toHaveBeenCalledTimes(1);
+
+    resolveCompile();
+    await expect(gate).resolves.toEqual({ failed: false, timedOut: true });
   });
 
-  it('resolves and clears the timer when compile() throws synchronously', async () => {
-    const scheduler = fakeScheduler();
-    const compile = (): Promise<unknown> => {
+  it('settles fail-soft after a rejection or synchronous throw', async () => {
+    const rejected = awaitCompileGate(() => Promise.reject(new Error('link failed')), 1500);
+    await expect(rejected).resolves.toEqual({ failed: true, timedOut: false });
+
+    const thrown = awaitCompileGate(() => {
       throw new Error('extension unavailable');
+    }, 1500);
+    await expect(thrown).resolves.toEqual({ failed: true, timedOut: false });
+  });
+});
+
+describe('CompileGateQueue', () => {
+  it('keeps streamed compile calls strictly sequential', async () => {
+    const queue = new CompileGateQueue();
+    let active = 0;
+    let maxActive = 0;
+    const resolvers: Array<() => void> = [];
+    const compile = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          active += 1;
+          maxActive = Math.max(maxActive, active);
+          resolvers.push(() => {
+            active -= 1;
+            resolve();
+          });
+        }),
+    );
+
+    const first = queue.run(compile, 1500);
+    const second = queue.run(compile, 1500);
+    await Promise.resolve();
+    expect(compile).toHaveBeenCalledTimes(1);
+    resolvers.shift()?.();
+    await first;
+    await Promise.resolve();
+    expect(compile).toHaveBeenCalledTimes(2);
+    expect(maxActive).toBe(1);
+    resolvers.shift()?.();
+    await second;
+  });
+
+  it('does not start the next compile when the active one only times out', async () => {
+    const scheduler = fakeScheduler();
+    const queue = new CompileGateQueue();
+    let resolveFirst!: () => void;
+    const firstCompile = vi.fn(() => new Promise<void>((resolve) => (resolveFirst = resolve)));
+    const secondCompile = vi.fn(() => Promise.resolve());
+    const first = queue.run(firstCompile, 1500, { scheduler });
+    const second = queue.run(secondCompile, 1500);
+    await Promise.resolve();
+
+    scheduler.fire();
+    await Promise.resolve();
+    expect(secondCompile).not.toHaveBeenCalled();
+
+    resolveFirst();
+    await first;
+    await second;
+    expect(secondCompile).toHaveBeenCalledTimes(1);
+  });
+
+  it('uses a shared GPU arbiter and forwards live priority', async () => {
+    const priorities: Array<number | undefined> = [];
+    const sharedQueue = {
+      run: async <T>(work: () => T | Promise<T>, priority?: number): Promise<T> => {
+        priorities.push(priority);
+        return work();
+      },
     };
-    const gate = raceCompileGate(compile, 1500, scheduler);
-    await expect(gate).resolves.toBeUndefined();
-    expect(scheduler.cleared.length).toBeGreaterThan(0);
+    const queue = new CompileGateQueue(sharedQueue);
+
+    await expect(queue.run(() => Promise.resolve(), 1500, { priority: 40 })).resolves.toEqual({
+      failed: false,
+      timedOut: false,
+    });
+    expect(priorities).toEqual([40]);
+  });
+});
+
+describe('settlePendingSwap', () => {
+  it('clears the token when it still names the settling owner', () => {
+    const root = { id: 'bear' };
+    expect(settlePendingSwap(root, root)).toBeNull();
+  });
+
+  it('leaves an already-clear token alone', () => {
+    expect(settlePendingSwap(null, { id: 'bear' })).toBeNull();
+  });
+
+  it('does not clobber a newer pending swap: the classic druid form-dance race', () => {
+    // Bear form is built and gated first (token = bearRoot). Before its compile
+    // settles, the player reswaps to cat form, which is built and gated second
+    // (token = catRoot, overwriting bearRoot). When bear's gate finally settles,
+    // its callback must NOT clear cat's still-pending token, or cat would reveal
+    // one frame before its own shader actually finished linking: the exact
+    // freeze this gate exists to prevent, just relocated to a rapid form swap.
+    const bearRoot = { id: 'bear' };
+    const catRoot = { id: 'cat' };
+    let pending: typeof bearRoot | typeof catRoot | null = bearRoot;
+    pending = catRoot; // cat's build reassigns the shared token before bear settles
+    pending = settlePendingSwap(pending, bearRoot); // bear's onSettled fires late
+    expect(pending).toBe(catRoot);
+    pending = settlePendingSwap(pending, catRoot); // cat's own onSettled fires next
+    expect(pending).toBeNull();
   });
 });

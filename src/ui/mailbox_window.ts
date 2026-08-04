@@ -14,10 +14,11 @@
 import { audio } from '../game/audio';
 import { ITEMS } from '../sim/data';
 import { itemInstancePayloadsEqual } from '../sim/item_instance_merge';
+import { isTransferLockedInstance } from '../sim/item_instance_transfer';
 import type { InvSlot, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { markDialogRoot } from './dialog_root';
-import { itemDisplayName, tEntity } from './entity_i18n';
+import { itemDisplayName, knownLetterId, tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
 import { captureFormDraft, restoreFormDraft } from './form_draft';
@@ -25,6 +26,7 @@ import { formatMoney, formatNumber, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import {
   buildMailboxView,
+  canStageInstancedCopy,
   clampParcelQty,
   type MailInboxBody,
   type MailInboxRow,
@@ -138,12 +140,19 @@ export class MailboxWindow {
       return;
     }
     if (instance) {
-      // One chip per distinct copy: a byte-equal duplicate stages once (the
-      // plain dedup rule, payload-aware); differently-instanced copies of one
-      // item id each get their own chip.
+      // One chip per COPY, not per distinct payload: byte-equal copies are
+      // interchangeable and the sim escrows each named entry separately, so a
+      // player holding several identical signed copies can send several in one
+      // letter (bounded by what they hold unlocked and by the parcel limit
+      // above). Differently-instanced copies of one item id each get their own
+      // chip as before.
       if (
-        this.attachments.some(
-          (s) => s.itemId === itemId && itemInstancePayloadsEqual(s.instance, instance),
+        !canStageInstancedCopy(
+          this.attachments,
+          itemId,
+          instance,
+          this.ownedInstancedCountFor(itemId, instance),
+          max,
         )
       )
         return;
@@ -175,6 +184,26 @@ export class MailboxWindow {
     return this.deps
       .world()
       .inventory.filter((s) => s.itemId === itemId && !s.instance)
+      .reduce((n, s) => n + s.count, 0);
+  }
+
+  /**
+   * Held copies of one item id whose payload is byte-equal to `instance` AND
+   * are not transfer-locked: the instanced twin of ownedCountFor above, and the
+   * exact mirror of the sim's escrow validation (item_instance_transfer.ts
+   * countMatchingUnlocked), so the staging ceiling can never exceed what the
+   * send path will actually escrow.
+   */
+  private ownedInstancedCountFor(itemId: string, instance: ItemInstancePayload): number {
+    return this.deps
+      .world()
+      .inventory.filter(
+        (s) =>
+          s.itemId === itemId &&
+          !!s.instance &&
+          !isTransferLockedInstance(s.instance) &&
+          itemInstancePayloadsEqual(s.instance, instance),
+      )
       .reduce((n, s) => n + s.count, 0);
   }
 
@@ -284,12 +313,19 @@ export class MailboxWindow {
   }
 
   private senderLabel(row: MailInboxRow): string {
-    if (row.letterId) return tEntity({ kind: 'letter', id: row.letterId, field: 'sender' });
+    // Localized when THIS bundle ships the letter; an authored letter this
+    // bundle predates falls back to the WIRE-shipped English the server
+    // already sends beside the id (R34: raw ids are for ids, not prose).
+    if (row.letterId && knownLetterId(row.letterId)) {
+      return tEntity({ kind: 'letter', id: row.letterId, field: 'sender' });
+    }
     return row.senderName;
   }
 
   private subjectLabel(row: MailInboxRow): string {
-    if (row.letterId) return tEntity({ kind: 'letter', id: row.letterId, field: 'subject' });
+    if (row.letterId && knownLetterId(row.letterId)) {
+      return tEntity({ kind: 'letter', id: row.letterId, field: 'subject' });
+    }
     return row.subject.length > 0 ? row.subject : t('hudChrome.mailbox.noSubject');
   }
 
@@ -407,9 +443,10 @@ export class MailboxWindow {
   private renderReading(body: HTMLElement, opened: MailInboxRow & { body: string }): void {
     const sender = this.senderLabel(opened);
     const subject = this.subjectLabel(opened);
-    const letterBody = opened.letterId
-      ? tEntity({ kind: 'letter', id: opened.letterId, field: 'body' })
-      : opened.body;
+    const letterBody =
+      opened.letterId && knownLetterId(opened.letterId)
+        ? tEntity({ kind: 'letter', id: opened.letterId, field: 'body' })
+        : opened.body;
     body.innerHTML =
       `<div class="mail-reading">` +
       `<button type="button" class="mail-back" data-mail-back>${svgIcon('prev')}<span>${esc(t('hudChrome.mailbox.back'))}</span></button>` +

@@ -10,7 +10,10 @@ import WebSocket from 'ws';
 import { BROWSER_PATH } from '../browser_path.mjs';
 import { enterOfflineGame } from '../enter_offline_game.mjs';
 import { worldAuthMessage } from '../lib/world_auth.mjs';
+import { requireOnlineProfilerCapability } from './capability.mjs';
 import { attributeFreezes, frameStats, normalizeReport } from './metrics.mjs';
+
+export { requireOnlineProfilerCapability } from './capability.mjs';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const BOT_JOIN_CONCURRENCY = 8;
@@ -257,6 +260,118 @@ class Bot {
   }
 }
 
+function onlineEntrySurface() {
+  if (window.__game?.world?.player) return 'world';
+  return document.body.dataset.startPanel ?? '';
+}
+
+/**
+ * Enter the profiler character from every supported post-login surface.
+ * Repeated tier runs reuse one account and character, so later loads can show
+ * Enter World, Take Over, or an already resumed world instead of character
+ * creation. The returned action lets the caller track session-only dev state.
+ */
+export async function enterOnlineProfilerCharacter(page, { name, cls }) {
+  await page.waitForFunction(
+    () =>
+      Boolean(window.__game?.world?.player) ||
+      ['realm-panel', 'charselect-panel', 'charcreate-panel'].includes(
+        document.body.dataset.startPanel,
+      ),
+    { timeout: 20000, polling: 200 },
+  );
+
+  let surface = await page.evaluate(onlineEntrySurface);
+  if (surface === 'world') return 'resumed';
+
+  if (surface === 'realm-panel') {
+    await page.evaluate(() =>
+      document.querySelector('#realm-panel .realm-row, #realm-panel button')?.click(),
+    );
+    await page.waitForFunction(
+      () =>
+        Boolean(window.__game?.world?.player) ||
+        ['charselect-panel', 'charcreate-panel'].includes(document.body.dataset.startPanel),
+      { timeout: 12000, polling: 200 },
+    );
+    surface = await page.evaluate(onlineEntrySurface);
+    if (surface === 'world') return 'resumed';
+  }
+
+  if (surface === 'charselect-panel') {
+    const action = await page.evaluate((characterName) => {
+      const row = [...document.querySelectorAll('.char-row')].find(
+        (candidate) => candidate.querySelector('.char-name')?.textContent === characterName,
+      );
+      if (row) {
+        const button = row.querySelector('.enter-world-btn, .take-over-btn');
+        if (!button) return 'blocked';
+        const action = button.classList.contains('take-over-btn') ? 'takeover' : 'enter';
+        button.click();
+        return action;
+      }
+      document.querySelector('#btn-new-character')?.click();
+      return 'create';
+    }, name);
+    if (action === 'blocked') {
+      throw new Error(
+        `profiler character ${name} cannot enter until its roster action is resolved`,
+      );
+    }
+    if (action === 'enter' || action === 'takeover') return action;
+    await page.waitForFunction(
+      () =>
+        Boolean(window.__game?.world?.player) ||
+        document.body.dataset.startPanel === 'charcreate-panel',
+      { timeout: 12000, polling: 200 },
+    );
+    surface = await page.evaluate(onlineEntrySurface);
+    if (surface === 'world') return 'resumed';
+  }
+
+  if (surface !== 'charcreate-panel') {
+    throw new Error(`online profiler reached unsupported entry surface: ${surface || 'unknown'}`);
+  }
+
+  await page.evaluate(
+    (characterName, characterClass) => {
+      const input = document.querySelector('#new-char-name');
+      input.value = characterName;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      document
+        .querySelector(`#charcreate-panel .mini-class[data-class="${characterClass}"]`)
+        ?.click();
+      document.querySelector('#btn-create-char')?.click();
+    },
+    name,
+    cls,
+  );
+  await page.waitForFunction(
+    (characterName) => {
+      if (window.__game?.world?.player) return true;
+      return [...document.querySelectorAll('.char-row')].some((row) => {
+        const matches = row.querySelector('.char-name')?.textContent === characterName;
+        return matches && Boolean(row.querySelector('.enter-world-btn, .take-over-btn'));
+      });
+    },
+    { timeout: 15000, polling: 200 },
+    name,
+  );
+  surface = await page.evaluate(onlineEntrySurface);
+  if (surface === 'world') return 'resumed';
+  const entered = await page.evaluate((characterName) => {
+    const row = [...document.querySelectorAll('.char-row')].find(
+      (candidate) => candidate.querySelector('.char-name')?.textContent === characterName,
+    );
+    const button = row?.querySelector('.enter-world-btn, .take-over-btn');
+    if (!button) return false;
+    button.click();
+    return true;
+  }, name);
+  if (!entered) throw new Error(`created profiler character ${name} has no entry action`);
+  return 'created';
+}
+
 export class Profiler {
   constructor(opts = {}) {
     this.gameUrl = opts.gameUrl ?? process.env.GAME_URL ?? 'http://localhost:5173';
@@ -280,6 +395,7 @@ export class Profiler {
     this.bots = [];
     this.nextBotIndex = 0;
     this.mode = 'offline';
+    this.onlineInvulnerabilityArmed = false;
   }
 
   log(...a) {
@@ -320,6 +436,7 @@ export class Profiler {
       deviceScaleFactor: this.dpr,
     });
     this.page.on('pageerror', (e) => this.log('  [pageerror]', String(e).slice(0, 140)));
+    this.page.on('dialog', (dialog) => void dialog.accept().catch(() => {}));
     return this;
   }
 
@@ -354,6 +471,7 @@ export class Profiler {
         gameBootTimeoutMs,
       });
     } else {
+      await requireOnlineProfilerCapability(this.server);
       const u = `prof_cam_${this.uniq}`;
       await api(
         this.server,
@@ -379,51 +497,12 @@ export class Profiler {
         document.querySelector('#login-pass').value = 'hunter22';
         document.querySelector('#btn-login').click();
       }, u);
-      await page.waitForFunction(
-        () => ['charselect-panel', 'realm-panel'].includes(document.body.dataset.startPanel),
-        { timeout: 20000, polling: 200 },
-      );
-      if (await page.evaluate(() => document.body.dataset.startPanel === 'realm-panel')) {
-        await page.evaluate(() =>
-          document.querySelector('#realm-panel .realm-row, #realm-panel button')?.click(),
-        );
-        await page.waitForFunction(() => document.body.dataset.startPanel === 'charselect-panel', {
-          timeout: 12000,
-          polling: 200,
-        });
-      }
-      await page.evaluate(() => document.querySelector('#btn-new-character')?.click());
-      await page.waitForFunction(() => document.body.dataset.startPanel === 'charcreate-panel', {
-        timeout: 12000,
-        polling: 200,
-      });
       // Character names accept letters only; the profiler uniqueness token is
       // timestamp-derived and normally contains digits. Map those digits to
       // stable letters so the real client validation reaches createCharacter.
       const nm = `Pcam${characterNameToken(this.uniq)}`;
-      await page.evaluate(
-        (nm, cls) => {
-          const n = document.querySelector('#new-char-name');
-          n.value = nm;
-          n.dispatchEvent(new Event('input', { bubbles: true }));
-          document.querySelector(`#charcreate-panel .mini-class[data-class="${cls}"]`).click();
-          document.querySelector('#btn-create-char').click();
-        },
-        nm,
-        cls,
-      );
-      await page.waitForFunction(() => document.querySelector('.char-row .enter-world-btn'), {
-        timeout: 15000,
-        polling: 200,
-      });
-      await page.evaluate((nm) => {
-        const row = [...document.querySelectorAll('.char-row')].find(
-          (r) => r.querySelector('.char-name')?.textContent === nm,
-        );
-        (
-          row?.querySelector('.enter-world-btn') ?? document.querySelector('.enter-world-btn')
-        )?.click();
-      }, nm);
+      const entryAction = await enterOnlineProfilerCharacter(page, { name: nm, cls });
+      if (entryAction !== 'resumed') this.onlineInvulnerabilityArmed = false;
       // The post-login Welcome Screen gates world entry (index.html only): click
       // through Continue once the world connection enables it. No-op where absent.
       await page
@@ -482,21 +561,25 @@ export class Profiler {
       x: window.__game.world.player.pos.x,
       z: window.__game.world.player.pos.z,
     }));
-    await this._startGodMode();
+    await this._startProfilerInvulnerability();
     return this;
   }
 
-  // Keep the profiled player immortal so a scenario that fights mobs (combat, play)
-  // runs uninterrupted instead of dying, releasing spirit, and teleporting to a
-  // graveyard mid-measurement. Assigning hp does NOT work (the sim re-derives/clamps
-  // it every tick, and a single multi-mob tick can burst past maxHp before any
-  // top-up, which just makes a die/revive FLICKER). Instead redefine `hp` as a getter
-  // that always reads full (maxHp) with a no-op setter: the sim's `hp -= damage`
-  // becomes a no-op and the `hp <= 0` death check can never trip. Applied at enter,
-  // before any combat, so the player simply never dies. Re-asserted at 1 Hz in case
-  // the player entity is swapped (e.g. zone change). Damage DEALT is untouched, so
-  // the combat/cast/VFX load we profile is unchanged.
-  async _startGodMode() {
+  // Keep the profiled player immortal so combat scenarios cannot release spirit
+  // and teleport to a graveyard during measurement. Online uses an idempotent,
+  // server-authoritative dev command that preserves normal outgoing damage and
+  // incoming hit presentation. Arm it once per entity across linkdead resume.
+  // Offline has no server authority: redefine hp as a full-health getter with a
+  // no-op setter, then re-assert it in case a zone transition swaps the entity.
+  async _startProfilerInvulnerability() {
+    if (this.mode === 'online') {
+      if (this.onlineInvulnerabilityArmed) return;
+      await this.page.evaluate(() => {
+        window.__game.online.devCmd({ cmd: 'dev_profiler_invulnerable' });
+      });
+      this.onlineInvulnerabilityArmed = true;
+      return;
+    }
     await this.page.evaluate(() => {
       if (window.__godTimer) return;
       const apply = () => {
@@ -528,18 +611,46 @@ export class Profiler {
   }
 
   async teleport(x, z, facing = 0) {
-    await this.page.evaluate(
-      (x, z, f) => {
-        const p = window.__game.world.player ?? window.__game.sim.player;
-        p.pos.x = x;
-        p.pos.z = z;
-        p.facing = f;
-        window.__game.input.camYaw = f;
-      },
-      x,
-      z,
-      facing,
-    );
+    if (this.mode === 'online') {
+      await this.page.evaluate(
+        (x, z, f) => {
+          window.__game.online.devCmd({ cmd: 'dev_teleport', x, z });
+          window.__game.input.camYaw = f;
+        },
+        x,
+        z,
+        facing,
+      );
+      try {
+        await this.page.waitForFunction(
+          (x, z) => {
+            const pos = window.__game?.world?.player?.pos;
+            return pos && Math.hypot(pos.x - x, pos.z - z) < 2;
+          },
+          { timeout: 10000, polling: 100 },
+          x,
+          z,
+        );
+      } catch (error) {
+        throw new Error(
+          'online profiler teleport was not acknowledged; start the server with ALLOW_DEV_COMMANDS=1',
+          { cause: error },
+        );
+      }
+    } else {
+      await this.page.evaluate(
+        (x, z, f) => {
+          const p = window.__game.world.player ?? window.__game.sim.player;
+          p.pos.x = x;
+          p.pos.z = z;
+          p.facing = f;
+          window.__game.input.camYaw = f;
+        },
+        x,
+        z,
+        facing,
+      );
+    }
     await sleep(400);
   }
 

@@ -46,7 +46,9 @@ import {
   rateLimitNow,
   rateLimitTier2Store,
   reportsCreateRateLimited,
+  SEEKER_SPIN_VERIFY_MAX_PER_MINUTE,
   STEAM_LINK_MAX_PER_MINUTE,
+  seekerSpinVerifyRateLimited,
   steamLinkRateLimited,
   WALLET_LINK_MAX_PER_MINUTE,
   WINDOW_MS,
@@ -243,6 +245,15 @@ export const WALLET_LINK_POLICY: RateLimitPolicy = {
   limit: WALLET_LINK_MAX_PER_MINUTE,
   windowSeconds: WINDOW_SECONDS,
   tier1: (ctx) => walletLinkRateLimited(ctx.req, ctxAccountId(ctx)),
+  tier2: 'global',
+};
+
+export const SEEKER_SPIN_VERIFY_POLICY: RateLimitPolicy = {
+  name: 'seeker_spin_verify',
+  keyClass: 'ip+account',
+  limit: SEEKER_SPIN_VERIFY_MAX_PER_MINUTE,
+  windowSeconds: WINDOW_SECONDS,
+  tier1: (ctx) => seekerSpinVerifyRateLimited(ctx.req, ctxAccountId(ctx)),
   tier2: 'global',
 };
 

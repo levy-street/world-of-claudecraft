@@ -8,6 +8,7 @@
   import AdminNav from './AdminNav.svelte';
   import AccountModal from './AccountModal.svelte';
   import PageHeader from './PageHeader.svelte';
+  import ThemeToggle from './ThemeToggle.svelte';
 
   let { route, children }: { route: AdminRoute; children: Snippet } = $props();
   let navOpen = $state(false);
@@ -85,6 +86,7 @@
       </div>
       <div class="who">
         <span>{t('auth.signedInAs')}</span> <span id="who-name">{auth.name}</span>
+        <ThemeToggle />
         <button type="button" onclick={() => auth.logout()}>{t('auth.signOut')}</button>
       </div>
     </header>
@@ -138,7 +140,7 @@
   .app-title {
     color: var(--gold);
     font-family: var(--title-font);
-    text-shadow: 1px 1px 2px #000;
+    text-shadow: var(--title-shadow);
   }
 
   .app-title {
@@ -150,7 +152,10 @@
   }
 
   .who {
+    display: flex;
     flex: none;
+    align-items: center;
+    gap: 12px;
     color: var(--text-dim);
     font-size: 12px;
   }
@@ -165,7 +170,6 @@
   }
 
   .who button {
-    margin-left: 12px;
     padding: 4px 10px;
   }
 

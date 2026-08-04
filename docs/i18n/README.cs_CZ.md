@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.33.0-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.34.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.cs_CZ.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -92,7 +92,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and choose Play Offline
 ```
 
-Pojmenuj svou postavu, vyber si kteroukoli z devíti tříd a začínáš v **Eastbrook Vale** (úrovně 1-7), tržním městečku obklopeném uzly: vlčí revíry na severu, kančí louky na východě, les Sableweb na západě, Mirror Lake na severozápadě, měděný důl zamořený hrabavci na jihozápadě a zřícená kaple neklidných mrtvých na severovýchodě, s Gorrakovým banditským táborem na jihovýchodě. Severní cesta stoupá horským průsmykem do **Mirefen Marsh** (6-13, uzel Fenbridge) a dál nahoru do **Thornpeak Heights** (13-20, uzel Highwatch). Seed světa je pevně dán v `src/main.ts`, takže je to při každé návštěvě stejné místo.
+Pojmenuj svou postavu, vyber si kteroukoli z devíti tříd a začínáš v **Eastbrook Vale** (úrovně 1-7), tržním městečku obklopeném uzly: vlčí revíry na severu, kančí louky na východě, les Sableweb na západě, Mirror Lake na severozápadě, měděný důl zamořený hrabavci na jihozápadě a zřícená kaple neklidných mrtvých na severovýchodě, s Gorrakovým banditským táborem na jihovýchodě. Severní cesta stoupá horským průsmykem do **Mirefen Marsh** (6-13, uzel Fenbridge) a dál nahoru do **Thornpeak Heights** (13-20, uzel Highwatch). Seed světa je pevně dán v `src/sim/world_seed.ts`, takže je to při každé návštěvě stejné místo.
 
 ### Desktopové aplikace pro Windows, Linux a macOS
 

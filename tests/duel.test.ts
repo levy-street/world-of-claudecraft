@@ -239,3 +239,115 @@ describe('duel: PvP combat affordances', () => {
     expect(warlock.hp).toBeGreaterThan(warlockHpBeforeDrain);
   });
 });
+
+describe('duel end and live profession sessions', () => {
+  it('the duel-ending clamped blow still ends the loser fishing session', () => {
+    // The 1 hp duel clamp early-returns before the shared damage tail, which
+    // is where the landed-hit session cancel lives: without its own cancel a
+    // duel loser kept fishing at 1 hp through the blow that ended the duel.
+    const { sim, a, b } = startedDuel();
+    const loser = sim.entities.get(b);
+    if (!loser) throw new Error('missing loser');
+    loser.castingAbility = 'fishing';
+    loser.castTotal = 15;
+    loser.castRemaining = 15;
+    loser.fishBiteAtTick = (sim as any).tickCount + 100;
+    loser.fishCastZoneId = 'eastbrook_vale';
+    const winner = sim.entities.get(a);
+    if (!winner) throw new Error('missing winner');
+
+    sim.events = [];
+    sim.dealDamage(winner, loser, loser.hp + 500, false, 'physical', null, 'hit');
+
+    expect(loser.hp).toBe(1);
+    // The release/v0.33.0 duel-end contract defers the map delete to the
+    // tick-tail purge (endedTick), so consumers see the end through
+    // duelFor's null, never a deleted entry.
+    expect(sim.duelFor(a)).toBeNull();
+    expect(loser.castingAbility).toBeNull();
+    expect(loser.fishBiteAtTick).toBe(0);
+    expect(loser.fishCastZoneId).toBe('');
+    // Event order matches the shared tail: damage first, then castStop, so
+    // clients and parity goldens see one order for a landed-blow cancel.
+    const types = sim.events.map((e) => e.type);
+    const damageAt = types.indexOf('damage');
+    const stopAt = types.indexOf('castStop');
+    expect(damageAt).toBeGreaterThan(-1);
+    expect(stopAt).toBeGreaterThan(damageAt);
+  });
+
+  it('the duel-ending blow leaves a SPELL cast alone (classic no-cancel)', () => {
+    // Dropping the isNonSpellCast gate for an unconditional cancel must red
+    // here: the clamp arm never grew a spell-cancel path.
+    const { sim, a, b } = startedDuel();
+    const loser = sim.entities.get(b);
+    if (!loser) throw new Error('missing loser');
+    loser.castingAbility = 'frostbolt';
+    loser.castTotal = 15;
+    loser.castRemaining = 15;
+    const winner = sim.entities.get(a);
+    if (!winner) throw new Error('missing winner');
+
+    sim.dealDamage(winner, loser, loser.hp + 500, false, 'physical', null, 'hit');
+
+    expect(loser.hp).toBe(1);
+    // The release/v0.33.0 duel-end contract defers the map delete to the
+    // tick-tail purge (endedTick), so consumers see the end through
+    // duelFor's null, never a deleted entry.
+    expect(sim.duelFor(a)).toBeNull();
+    expect(loser.castingAbility).toBe('frostbolt');
+  });
+
+  it('a same-tick reciprocal lethal exchange clamps and cancels BOTH duelists', () => {
+    // The v0.33.0 sync composed two independent changes on the clamp arm: the
+    // release widened its gate to admit a duel that ended EARLIER THIS TICK
+    // (endedTick === tickCount, the reciprocal-lethal fix) and the branch
+    // added the landed-hit session cancel inside the arm. Neither parent
+    // exercised the combination: the second blow of a reciprocal exchange
+    // must still clamp to 1 hp AND cancel the survivor's non-spell cast.
+    const { sim, a, b } = startedDuel();
+    const first = sim.entities.get(a);
+    const second = sim.entities.get(b);
+    if (!first || !second) throw new Error('missing duelist');
+    first.castingAbility = 'fishing';
+    first.castTotal = 15;
+    first.castRemaining = 15;
+    second.castingAbility = 'fishing';
+    second.castTotal = 15;
+    second.castRemaining = 15;
+
+    // Blow one ends the duel (endedTick stamps the current tick).
+    sim.dealDamage(first, second, second.hp + 500, false, 'physical', null, 'hit');
+    expect(second.hp).toBe(1);
+    expect(second.castingAbility).toBeNull();
+    expect(sim.duelFor(a)).toBeNull();
+
+    // Blow two, same tick, from the other duelist: the ended-this-tick duel
+    // still clamps (nobody dies to a duel), and the branch's cancel runs on
+    // this newly-admitted path too.
+    sim.dealDamage(second, first, first.hp + 500, false, 'physical', null, 'hit');
+    expect(first.hp).toBe(1);
+    expect(first.castingAbility).toBeNull();
+  });
+
+  it('a duelist SELF-sourced clamped tick does not end their own session', () => {
+    // The tail's self-hit exclusion, restated on the clamp arm: a duelist's
+    // own damage (the Cauterize burn carries the caster's own id) can land
+    // the clamped blow, and classic rules say your own damage never
+    // interrupts a gather or fishing session.
+    const { sim, a, b } = startedDuel();
+    const duelist = sim.entities.get(b);
+    if (!duelist) throw new Error('missing duelist');
+    duelist.castingAbility = 'fishing';
+    duelist.castTotal = 15;
+    duelist.castRemaining = 15;
+    duelist.fishCastZoneId = 'eastbrook_vale';
+
+    sim.dealDamage(duelist, duelist, duelist.hp + 500, false, 'fire', null, 'hit');
+
+    expect(duelist.hp).toBe(1);
+    expect(duelist.castingAbility).toBe('fishing');
+    expect(duelist.fishCastZoneId).toBe('eastbrook_vale');
+    void a;
+  });
+});

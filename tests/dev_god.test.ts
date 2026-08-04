@@ -123,6 +123,54 @@ describe('/dev god cheat', () => {
   });
 });
 
+describe('profiler-only invulnerability', () => {
+  it('preserves incoming hit presentation without changing outgoing damage', () => {
+    const { sim } = godSim();
+    const player = sim.player;
+    player.profilerInvulnerable = true;
+    const attacker = spawnMob(sim);
+    const target = spawnMob(sim, 60000);
+
+    sim.drainEvents();
+    deal(sim, attacker, player, 500);
+    const events = sim.drainEvents();
+
+    expect(player.hp).toBe(player.maxHp);
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      type: 'damage',
+      sourceId: attacker.id,
+      targetId: player.id,
+      amount: 0,
+      school: 'physical',
+    });
+
+    const before = target.hp;
+    deal(sim, player, target, 100);
+    expect(before - target.hp).toBe(100);
+  });
+
+  it('does not grant profiler invulnerability when dev commands are disabled', () => {
+    const { sim } = godSim(false);
+    const player = sim.player;
+    player.profilerInvulnerable = true;
+    const attacker = spawnMob(sim);
+
+    const before = player.hp;
+    deal(sim, attacker, player, 500);
+
+    expect(player.hp).toBe(before - 500);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'damage',
+        sourceId: attacker.id,
+        targetId: player.id,
+        amount: 500,
+      }),
+    );
+  });
+});
+
 describe('/dev attune + /dev raid cheats', () => {
   it('/dev attune marks every quest done, opening the raid attunement gate', () => {
     const { sim, pid } = godSim();

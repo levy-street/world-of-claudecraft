@@ -38,39 +38,45 @@
 
 ## 시작하기
 
-[Node.js 26](https://nodejs.org/)과 npm이 필요하며, 이는 CI와 프로덕션 이미지가
-사용하는 버전입니다. 그보다 낮은 메이저 버전은 검증되지 않았습니다. 멀티플레이어
-서버를 실행하려면 Postgres를 구동하기 위한 [Docker](https://www.docker.com/)도
-필요합니다.
+[Node.js 26](https://nodejs.org/)와 **pnpm 10.34.x**가 필요합니다(`package.json`의 `packageManager`에 정확한 핀이 있으며, 현재는 `pnpm@10.34.5`). 더 오래된 Node 메이저는 검증되지 않았습니다. 멀티플레이어 서버를 쓰려면 Postgres용 [Docker](https://www.docker.com/)도 필요합니다.
+
+**Corepack은 필수가 아닙니다.** Node에 포함된 npm으로 pnpm을 한 번만 설치하세요. macOS, Linux, Windows에서 같은 경로입니다.
 
 ```bash
-# 1. GitHub에서 저장소를 포크한 다음, 포크한 저장소를 클론합니다
+# 1. Fork the repo on GitHub, then clone your fork
 git clone https://github.com/<your-username>/world-of-claudecraft.git
 cd world-of-claudecraft
 
-# 2. 의존성을 설치합니다
-npm ci
+# 2. Install pnpm once (same command on macOS, Linux, Windows)
+#    Match the packageManager pin in package.json (today: 10.34.5).
+npm install -g pnpm@10.34.5
+pnpm --version   # should print 10.34.5 (or the pin in package.json)
 
-# 3. git이 저장소의 훅을 사용하도록 지정합니다 (클론당 한 번)
+# 3. Install dependencies (uses the global content-addressable store)
+pnpm install --frozen-lockfile
+
+# 4. Point git at the repository hooks (once per clone)
 git config core.hooksPath .githooks
 
-# 4. 오프라인 클라이언트를 실행합니다 (서버나 데이터베이스가 필요 없습니다)
-npm run dev          # 출력되는 URL을 엽니다 (보통 http://localhost:5173)
+# 5. Run the offline client (no server or database needed)
+pnpm run dev         # open the URL it prints (usually http://localhost:5173)
 ```
+
+pnpm 설치 후에도 `npm run <script>`는 동작합니다(Node가 npm을 포함)만, **설치와 lockfile 갱신은 반드시 pnpm으로** 해야 합니다. `package-lock.json`을 커밋하지 마세요. 유일한 진실 소스는 `pnpm-lock.yaml`입니다.
 
 오프라인 월드를 즐기고 대부분의 작업을 진행하기에는 이 정도면 충분합니다. 전체
 온라인 스택을 실행하려면 먼저 환경 변수에 데이터베이스 비밀번호가 있어야 합니다.
 
 ```bash
 cp .env.example .env
-# POSTGRES_PASSWORD를 설정하고 DATABASE_URL이 같은 비밀번호를 가리키게 합니다
-npm run db:up        # Docker에서 Postgres 16을 시작합니다 (개발 DB는 port 5433)
-npm run server       # 권한을 가진 게임 서버를 빌드해 :8787에서 실행합니다
-npm run dev          # 다른 터미널에서 실행합니다. 클라이언트가 서버로 프록시합니다
+# set POSTGRES_PASSWORD and point DATABASE_URL at the same password
+pnpm run db:up       # start Postgres 16 in Docker (dev DB on port 5433)
+pnpm run server      # build and run the authoritative game server on :8787
+pnpm run dev         # in another terminal; the client proxies to the server
 ```
 
 아래의 전체 게이트를 실행할 계획이라면, 게이트가 구동하는 브라우저를 한 번 설치해
-두세요. `npx playwright install chromium`.
+두세요. `pnpm exec playwright install chromium`.
 
 [README](../../README.md)에는 호스팅, 개발, 플레이에 대한 전체 가이드가 담겨 있고,
 저장소 곳곳에 있는 `CLAUDE.md` 파일에는 각 영역의 규칙이 정리되어 있습니다.
@@ -98,13 +104,7 @@ API로 해석되고, `tsc` 바이너리는 `@typescript/native`가 제공합니�
   비활성화합니다. 디렉터리에 `tsconfig.json`이 있으면 단일 파일을 임시로 검사하는
   방식(`npx tsc somefile.ts`)은 오류가 납니다. 예전처럼 동작시키려면
   `--ignoreConfig`를 넘기세요.
-- **잠금 파일.** `package-lock.json`은 오직
-  `npx npm@10 install --package-lock-only`로만 다시 생성하세요. 이 파일은 npm 10
-  의미론을 따르며, 더 높은 npm 메이저 버전(CI의 Node 26이 번들하는 npm 11 포함)은
-  `svelte-check`의 중첩된 선택적 peer 항목을 조용히 없애 버려 CI에서 `npm ci`가
-  어긋나게 됩니다. 평범한 `npm ci`는 어떤 npm 메이저 버전에서도 안전합니다. 다시
-  생성한 뒤에는 npm 10과 여러분의 작업 환경 npm 양쪽에서 `npm ci --dry-run`이
-  일치하는지 확인하세요.
+- **잠금 파일.** 잠금 파일은 `pnpm-lock.yaml`입니다(pnpm 10 / lockfileVersion 9). 이 저장소 루트에서 `pnpm install`, `pnpm add`, `pnpm update`로만 갱신하세요(수동 편집 금지). `package.json` 변경과 함께 `pnpm-lock.yaml`을 커밋하세요. CI는 `pnpm install --frozen-lockfile`로 설치하며, 오래된 lockfile은 실패합니다. 두 번째 lockfile(`package-lock.json` / yarn.lock)을 들이지 마세요. 이중 lockfile은 조용히 어긋나며 금지됩니다. 선택적 wallet/solana 트리의 peer 의존성 노이즈는 `.npmrc`의 `strict-peer-dependencies=false`로 허용됩니다. 측정 없이 더 느슨하게 만들지 마세요.
 - **언제 다시 검토할지.** 다음 두 가지가 모두 충족되면 이중 별칭을 하나의
   `typescript` 의존성으로 되돌립니다. TypeScript 7.1의 안정 JS API가 출시되고
   (TypeScript 7.0은 JS API를 전혀 제공하지 않으며, 대체 방안은
@@ -154,7 +154,7 @@ API로 해석되고, `tsc` 바이너리는 `@typescript/native`가 제공합니�
   테스트된 모듈로 들어갑니다.** 렌더러나 HUD가 읽는 데이터는 `IWorld`
   인터페이스(`src/world_api/`)를 통과하며 오프라인 월드와 온라인 월드 양쪽에
   구현합니다. 새 시뮬레이션 시스템은 `SimContext` 뒤로 들어가고, 새 REST
-  엔드포인트는 `npm run new:endpoint`로 뼈대를 만들 수 있는 라우트 모듈입니다.
+  엔드포인트는 `pnpm run new:endpoint`로 뼈대를 만들 수 있는 라우트 모듈입니다.
 - **생성된 파일을 직접 수정하지 마세요.** `*.generated.ts` 같은 파일이 그 예이며,
   빌드를 통해 다시 생성해 주세요.
 - **문서 표기 규칙: em 대시, en 대시, 이모지를 어디에서도 쓰지 않습니다.** 코드,
@@ -168,7 +168,7 @@ API로 해석되고, `tsc` 바이너리는 `@typescript/native`가 제공합니�
 
 포매팅은 `biome.json`에 설정된 [Biome](https://biomejs.dev/)를 따릅니다. 2칸 들여쓰기,
 100열 줄 길이, 작은따옴표, 후행 쉼표입니다. 여러분이 건드린 파일만 포매팅하고
-(`npx @biomejs/biome check --write <your-file.ts>`) `npm run ci:changed`로 확인하세요.
+(`npx @biomejs/biome check --write <your-file.ts>`) `pnpm run ci:changed`로 확인하세요.
 CI는 변경된 파일만 검사하므로 저장소 전체를 다시 포매팅하지는 말아 주세요. 전체
 실행은 여러분이 고칠 몫이 아닌 오래된 부채를 드러냅니다.
 
@@ -177,12 +177,12 @@ CI는 변경된 파일만 검사하므로 저장소 전체를 다시 포매팅�
 저장소 게이트를 로컬에서 실행하세요. CI가 강제하는 것과 동일한 계약입니다.
 
 ```bash
-npm run gate
+pnpm run gate
 ```
 
 작업하는 동안에는 단일 스위트(`npx vitest run tests/sim.test.ts`)와 포매팅 확인용
-`npm run ci:changed`를 실행하세요. `npm test`는 전부를 실행하며, 스위트 지도는
-`tests/CLAUDE.md`에 있습니다. 전체 `npm run gate`는 생성 산출물의 최신 여부, 악성
+`pnpm run ci:changed`를 실행하세요. `pnpm test`는 전부를 실행하며, 스위트 지도는
+`tests/CLAUDE.md`에 있습니다. 전체 `pnpm run gate`는 생성 산출물의 최신 여부, 악성
 코드 스캔, 변경된 파일 포매팅, 효과음 적합성 검사, 전체 테스트 스위트, 실제 브라우저
 회귀 검사, 엄격한 타입 검사, 그리고 클라이언트, 서버, 헤드리스 빌드를 포함합니다.
 푸시 전 최소 검사부터 시작하는 계층별 검사는 [`docs/qa-gate.md`](../qa-gate.md)에
@@ -205,12 +205,12 @@ npm run gate
 - **무엇이** 바뀌었고 **왜** 바뀌었는지 설명하세요.
 - 관련된 이슈가 있으면 연결하세요 (예: "Closes #123").
 - **UI 변경에는 스크린샷이나 짧은 클립을** 데스크톱과 모바일 모두에 대해 첨부하세요.
-- `npm run gate`가 통과하는지, 그리고 플레이어에게 보이는 새 문자열이 아래의
+- `pnpm run gate`가 통과하는지, 그리고 플레이어에게 보이는 새 문자열이 아래의
   영어 우선 기여자 정책을 따르는지 확인하세요.
 
 여러분의 PR에서 CI는 변경된 파일에 대한 포매팅과 린트, 네 개의 병렬 샤드로 나눈 전체
 테스트 스위트, 브라우저 회귀 검사, 그리고 타입 검사와 클라이언트, 서버, 헤드리스
-빌드를 실행합니다. 이는 로컬에서 `npm run gate`가 실행하는 것과 같으므로, 게이트가
+빌드를 실행합니다. 이는 로컬에서 `pnpm run gate`가 실행하는 것과 같으므로, 게이트가
 초록색이면 PR도 초록색일 가능성이 높습니다.
 
 병합 전에 저희가 보는 것은 통과한 CI 실행과 빠짐없이 채워진 체크리스트입니다.
@@ -245,7 +245,7 @@ World of ClaudeCraft는 여러 언어로 제공됩니다. 플레이어에게 보
 - 언어 중립을 유지하는 `src/sim/`이나 `server/`에서 내보내는, 플레이어에게 보이는
   텍스트는 같은 변경 안에서 클라이언트 경계에서 다시 현지화해야 합니다. 가드 테스트
   `npx vitest run tests/localization_fixes.test.ts`가 이를 강제합니다.
-- 문자열을 추가하거나 변경한 뒤에는 `npm run i18n:gen`을 실행하고 다시 생성된 번들을
+- 문자열을 추가하거나 변경한 뒤에는 `pnpm run i18n:gen`을 실행하고 다시 생성된 번들을
   같은 변경 안에서 커밋하세요. 게이트와 CI 모두 커밋된 산출물을 새로 생성한 결과와
   비교하므로, 오래된 번들은 빌드를 실패시킵니다.
 
@@ -267,7 +267,7 @@ World of ClaudeCraft는 여러 언어로 제공됩니다. 플레이어에게 보
    `src/ui/server_i18n.ts`에서, 특성 문구는 `talent_i18n` 모듈에서 번역하며, 관리자
    대시보드는 `src/admin/i18n.locales/` 아래에 자체 세트를 가지고 있습니다.
 2. 기존 번역을 다듬거나, 어색하게 읽히는 부분을 채워 넣으세요.
-3. `npm run i18n:gen`을 실행하고 다시 생성된 번들을 오버레이 수정과 함께 커밋한 다음,
+3. `pnpm run i18n:gen`을 실행하고 다시 생성된 번들을 오버레이 수정과 함께 커밋한 다음,
    현지화 스위트
    (`npx vitest run tests/i18n_completeness.test.ts tests/localization_coverage.test.ts`)를
    실행하고 PR을 여세요. 오버레이는 의도적으로 성기게 작성되어 있으므로, 타입 검사만

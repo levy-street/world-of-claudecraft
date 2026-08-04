@@ -543,7 +543,7 @@ describe('readPublicSheet (FakeCharactersDb, resolved by name)', () => {
 // ---------------------------------------------------------------------------
 
 describe('status handler (name-list trim deviation)', () => {
-  it('returns counts only: { ok, realm, players_online, players_cap, steam, epic, dev_commands } with NO names list', async () => {
+  it('returns counts and capability adverts with NO names list', async () => {
     configureLeaderboardRuntime(fakeRuntime({ playersOnline: () => 4, playersCap: () => 250 }));
     const ctx = fakeCtx({ method: 'GET', url: '/api/status' });
     await handlerFor('/api/status')(ctx);
@@ -560,6 +560,7 @@ describe('status handler (name-list trim deviation)', () => {
       // The /dev GUI capability advert. False here because the suite runs without
       // ALLOW_DEV_COMMANDS, which is also the production posture.
       dev_commands: false,
+      profiler_invulnerability: false,
     });
     expect('names' in (body as object)).toBe(false);
   });
@@ -575,19 +576,34 @@ describe('status handler (name-list trim deviation)', () => {
       process.env.ALLOW_DEV_COMMANDS = '1';
       const on = fakeCtx({ method: 'GET', url: '/api/status' });
       await handlerFor('/api/status')(on);
-      expect((captured(on.res).body as { dev_commands: boolean }).dev_commands).toBe(true);
+      expect(
+        captured(on.res).body as {
+          dev_commands: boolean;
+          profiler_invulnerability: boolean;
+        },
+      ).toMatchObject({ dev_commands: true, profiler_invulnerability: true });
 
       // Same process, no re-boot: flipping the env must flip the next answer.
       process.env.ALLOW_DEV_COMMANDS = '0';
       const off = fakeCtx({ method: 'GET', url: '/api/status' });
       await handlerFor('/api/status')(off);
-      expect((captured(off.res).body as { dev_commands: boolean }).dev_commands).toBe(false);
+      expect(
+        captured(off.res).body as {
+          dev_commands: boolean;
+          profiler_invulnerability: boolean;
+        },
+      ).toMatchObject({ dev_commands: false, profiler_invulnerability: false });
 
       // Only the exact string '1' arms it, matching every other ALLOW_DEV_COMMANDS gate.
       process.env.ALLOW_DEV_COMMANDS = 'true';
       const truthy = fakeCtx({ method: 'GET', url: '/api/status' });
       await handlerFor('/api/status')(truthy);
-      expect((captured(truthy.res).body as { dev_commands: boolean }).dev_commands).toBe(false);
+      expect(
+        captured(truthy.res).body as {
+          dev_commands: boolean;
+          profiler_invulnerability: boolean;
+        },
+      ).toMatchObject({ dev_commands: false, profiler_invulnerability: false });
     } finally {
       if (previous === undefined) delete process.env.ALLOW_DEV_COMMANDS;
       else process.env.ALLOW_DEV_COMMANDS = previous;

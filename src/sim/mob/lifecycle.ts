@@ -68,6 +68,7 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.leashAnchor = null;
   mob.evadeStall = 0;
   mob.chaseStall = 0;
+  mob.chainPullInbound = false;
   mob.fleeTimer = 0;
   mob.fleeReturnTimer = 0;
   mob.hasFled = false;

@@ -22,6 +22,9 @@ describe('Sim.raidLockouts', () => {
   });
 });
 
+// Kept bespoke on purpose (issue #2088): the second case below needs the truly
+// UNSET prototype (no selfLockouts) to prove the pre-snapshot default, unlike
+// the shared tests/helpers/bare_client.ts bareClient(), which always initializes it.
 describe('ClientWorld.raidLockouts', () => {
   it('derives remaining time from the mirrored expiry map and the local clock', () => {
     const client: ClientWorld = Object.create(ClientWorld.prototype);

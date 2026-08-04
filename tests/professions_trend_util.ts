@@ -9,6 +9,7 @@ import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import type { SimEvent } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // The ten canonical adjacent-pair ids over the locked CRAFT_RING order,
 // pinned literally: a ring reorder or pair-id format change must fail here.
@@ -25,7 +26,11 @@ export const RING_PAIR_IDS = [
   'armorcrafting+engineering',
 ] as const;
 
-export const makeWorld = () => new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+// Guild-letter suites only drive craft skill + PostOffice delivery. Strip ambient
+// camps/NPCs/objects so multi-minute tick windows do not run continent AI
+// (subsystem-world pattern; mailboxes stay via BUILTIN_WORLD.services).
+export const makeWorld = () =>
+  new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: EMPTY_TEST_WORLD });
 
 export function tickFor(sim: Sim, seconds: number): SimEvent[] {
   const out: SimEvent[] = [];

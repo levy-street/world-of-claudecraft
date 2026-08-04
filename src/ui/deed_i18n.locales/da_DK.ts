@@ -752,6 +752,10 @@ export const table: DeedLocaleTable = {
     name: 'Heroisk: Vildhjertebassinet',
     desc: 'Besejr Zulgar, Bassinets Stemme, i Vildhjertebassinet på heroisk sværhedsgrad.',
   },
+  chr_peaks_gatherer: {
+    name: 'Høst fra Højderne',
+    desc: 'Høst en malmåre, en skovbevoksning og et urtebed i Tornetop Højder.',
+  },
   chr_marsh_rares_ii: {
     name: 'Den Grådige, Gjort Op',
     desc: 'Dræb Gravekæft den Grådige, en fjerde navngiven rædsel i Mosekær Sump, som blev glemt i den første optælling.',
@@ -767,5 +771,29 @@ export const table: DeedLocaleTable = {
   chr_hollow_rares: {
     name: 'Flokken Husker',
     desc: 'Dræb Gamle Marvskal og Aurelhorn, Første af Flokken, de to omstrejfende sjældne bosser i Den Tilslørede Hule.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Kærets Overflod',
+    desc: 'Høst en malmåre, en skovbevoksning og et urtebed i Pilekæret.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Ringe i Liljemoserne',
+    desc: 'Fang en fisk i Pilekærets vande.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Høst på Næsset',
+    desc: 'Høst en malmåre, en skovbevoksning og et urtebed i Stormkammen.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'En Snøre i Spejltjørnet',
+    desc: 'Fang en fisk i Stormkammens vande.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Øens Proviant',
+    desc: 'Høst en malmåre, en skovbevoksning og et urtebed på Fjernkysten.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Hvad Mågerne Ved',
+    desc: 'Fang en fisk i Fjernkystens vande.',
   },
 };

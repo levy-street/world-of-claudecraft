@@ -21,9 +21,9 @@ import { renderLayerDisabled } from './render_dev_flags';
 
 // The terrain relief ladder (GFX.terrainRelief, one source for the tier
 // ladder and the Advanced Terrain Detail dial): 0 none (medium and below),
-// 1 cavity shading only, 2 adds the parallax walk (high), 3 adds the micro
-// sun-shadow (ultra/insane). ?trelief=off is the dev perf-attribution kill
-// switch (render_dev_flags.ts).
+// 1 cavity shading only (high), 2 adds the parallax walk (Advanced), 3 adds
+// the parallax walk plus micro sun-shadow (ultra/insane). ?trelief=off is the
+// dev perf-attribution kill switch (render_dev_flags.ts).
 const terrainReliefLevel = (): number => (renderLayerDisabled('trelief') ? 0 : GFX.terrainRelief);
 
 // The rich splat-albedo profile (multi-octave grass/dirt/rock, wall plate
@@ -71,7 +71,7 @@ import { groundDetailTexture, groundSplatMaps, macroNoiseTexture } from './textu
 //   plus the vertex slope times the coarsest band spacing, since a T-junction
 //   hole grows with both the neighbor's chord span and the local gradient
 //   (terraced cliffs open multi-yard holes that a flat drop cannot cover).
-// - High tier: MeshStandardMaterial + splat shading (grass/dirt/rock/sand
+// - Medium and above: MeshStandardMaterial + splat shading (grass/dirt/rock/sand
 //   weights precomputed per vertex from slope/height/roadDistance into a vec4
 //   attribute) over the biome vertex-color tint, plus a world-space macro
 //   normal map baked from the mesh height view (terrain_mesh_height.ts).
@@ -685,10 +685,9 @@ function buildSplatMaterial(
               : ''
         }
         ${
-          // The parallax walk is relief level 2+ (high and up): medium
-          // compiles the splat pipeline but has the least frame budget of the
-          // PBR tiers (the round-10 medium regate), so it keeps flat-lit
-          // ground.
+          // The parallax walk is relief level 2+: the standard ladder reaches
+          // it at ultra, while Advanced Terrain Detail exposes level 2. High
+          // keeps cavity-only relief and medium keeps flat-lit ground.
           terrainReliefLevel() >= 2
             ? `float pDist = wocCamDist;
         // Outside either smoothstep support the fade is exactly zero. Keep
@@ -721,8 +720,7 @@ function buildSplatMaterial(
           // second iteration: re-read the height where the first offset
           // landed, which keeps steep clod edges from overshooting and
           // swimming at grazing view angles (three more taps of the 512^2
-          // packed AO texture; every relief tier affords it now that the
-          // stack starts at high)
+          // packed AO texture; every parallax tier affords it)
           pOff = pDir * wocGroundHeightSmooth(tuv + pOff, pAmp) * pFade;
           pOff /= max(1.0, length(pOff) / WOC_PARALLAX_CLAMP);
           tuv += pOff;
@@ -1400,6 +1398,10 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     size: number;
     spacing: number;
   }[] = [];
+  let lastVisibilityX = Number.NaN;
+  let lastVisibilityZ = Number.NaN;
+  let lastVisibilityFar = Number.NaN;
+  let lastVisibilityChunkCount = -1;
 
   // True when the chunk cell overlaps a mountain-wall band: an inter-zone
   // ridge line (ZONES[i].zMax) or the world rim. Those chunks always take the
@@ -1779,11 +1781,24 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
       pool?.dispose();
     },
     update(camX: number, camZ: number, fogFar: number): void {
+      if (
+        camX === lastVisibilityX &&
+        camZ === lastVisibilityZ &&
+        fogFar === lastVisibilityFar &&
+        chunks.length === lastVisibilityChunkCount
+      ) {
+        return;
+      }
+      lastVisibilityX = camX;
+      lastVisibilityZ = camZ;
+      lastVisibilityFar = fogFar;
+      lastVisibilityChunkCount = chunks.length;
       // fully-fogged chunks are pure overdraw; drop them before the frustum
+      const fogFarSq = fogFar * fogFar;
       for (const chunk of chunks) {
         const dx = Math.max(Math.abs(camX - chunk.x) - chunk.half, 0);
         const dz = Math.max(Math.abs(camZ - chunk.z) - chunk.half, 0);
-        chunk.mesh.visible = Math.hypot(dx, dz) < fogFar;
+        chunk.mesh.visible = fogFar > 0 && dx * dx + dz * dz < fogFarSq;
       }
     },
     rebuildRegion(minX: number, minZ: number, maxX: number, maxZ: number): void {

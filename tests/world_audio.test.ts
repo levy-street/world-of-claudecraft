@@ -10,8 +10,9 @@ import { BUILTIN_WORLD, DUNGEON_X_THRESHOLD, PROPS, setActiveWorldContent } from
 import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
 import { SOWFIELD_CENTER } from '../src/sim/vale_cup_layout';
 import { groundHeight } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
-const SEED = 20061;
+const SEED = WORLD_SEED;
 
 afterEach(() => {
   setActiveWorldContent(null);

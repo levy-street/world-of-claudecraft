@@ -10,8 +10,9 @@
 //   settles in mortar lines / plank seams while raised faces lighten a touch,
 //   so the surface reads worn rather than just dirty),
 // - roughness lerps partway toward the set's roughness map,
-// - on HIGH and above, a multi-tap parallax (3 taps on high/ultra, 4 on
-//   insane) walks the projection along the view ray using the family's
+// - on ULTRA and above, a multi-tap parallax (3 taps on ultra, 4 on insane;
+//   also available through the Advanced Surface Detail dial) walks the
+//   projection along the view ray using the family's
 //   Displacement map (per-family amplitude and clamp: deep on stone/rock/
 //   bark, shallow on plaster/fabric) so surfaces gain clearly per-pixel
 //   height response against both the light AND the camera, and the sampled
@@ -42,7 +43,7 @@ interface FamilyTextures {
   normal: THREE.Texture | null;
   ao: THREE.Texture | null;
   rough: THREE.Texture | null;
-  /** high-and-up parallax height field; stays null on lower import-time tiers */
+  /** parallax height field; stays null when import-time policy requests zero taps */
   disp: THREE.Texture | null;
   /** per-texel metalness (the metal family only): rust patches stay
    *  dielectric while bare metal actually reflects the IBL */
@@ -252,9 +253,9 @@ const FAMILIES: Record<SurfaceFamily, FamilyDef> = {
  *  gfx.ts knobs (GFX.surfaceDetailTaps / GFX.surfaceDetailClampK, one source
  *  for the tier ladder AND the Advanced Surface Detail dial): insane takes 4
  *  taps at the full clamp (the pre-round-10 ultra execution, kept exactly),
- *  ultra 3 at 0.85, high 3 at 0.65. The normalized amplitudes walk real
- *  depth, and the deeper clamps need the extra refinement to stay swim-free,
- *  which is why the 3-tap executions shrink their clamp (the round-10
+ *  ultra 3 at 0.85, and high 0. The normalized amplitudes walk real depth,
+ *  and the deeper clamps need the extra refinement to stay swim-free,
+ *  which is why the 3-tap execution shrinks its clamp (the round-10
  *  screenshot A/B on the keep wall / boulder / town street reads the 3-tap
  *  0.85-clamp walk as the same relief while dropping the fourth dependent
  *  fetch). Ultra shipped at 6 taps originally; round 9 measured 4 at full
@@ -382,9 +383,9 @@ const scaledFadeBands = (parallaxDepth: number, tileScale: number): SurfaceDetai
 // anisotropy tweak cannot leak into another consumer of the same URL. All
 // maps are non-color data and stay in linear space. Every fetch keys off the
 // IMPORT-TIME tier guess: if the live tier lands lower the textures merely
-// idle, and if a lower guess later runs high+ the layer fails soft to the
-// undetailed material (the detail_normals null contract, the canopy_detail
-// precedent).
+// idle. A high import-time policy loads the base layer without displacement;
+// if the live policy later requests ultra parallax, it fails soft to that base
+// material (the detail_normals null contract, the canopy_detail precedent).
 if (GFX.surfaceDetail) {
   const wantDisp = parallaxTierTaps() > 0;
   for (const fam of Object.values(FAMILIES)) {
@@ -620,10 +621,9 @@ export function applySurfaceDetail(
   opts?: SurfaceDetailOpts,
 ): void {
   // HIGH AND UP (GFX.surfaceDetail; the Advanced Surface Detail dial maps
-  // onto the same knob): the round-10 ladder bench measured the layer's
-  // residual detail taps (normal/AO/rough, post-fade) as the whole
-  // medium-town regression (-18..-33% orbit/run), so medium keeps its
-  // pre-overhaul surfaces and its pre-overhaul frame budget.
+  // onto the same knob): high keeps the basic normal/AO/rough layer with no
+  // parallax walk, while ultra and insane add the view-ray refinement. Medium
+  // keeps its pre-overhaul surfaces and frame budget.
   if (!GFX.surfaceDetail || !mat.isMeshStandardMaterial) return;
   // Dev-only perf-attribution kill switch (?worndetail=off): the whole layer
   // stays un-applied, so an A/B bench run isolates its cost.
@@ -672,8 +672,9 @@ export function applySurfaceDetail(
     const hasAo = fam.aoSpan > 0 && fam.tex.ao !== null;
     if (fam.aoSpan > 0 && !hasAo) return;
     const hasMetal = metalMix > 0 && fam.tex.metal !== null;
-    // Parallax gates on the LIVE tier at compile time (3 taps on high, 6 on
-    // ultra) plus a resolved height field, and needs the world-space view ray.
+    // Parallax gates on the LIVE policy at compile time (0 taps on high, 3 on
+    // ultra, 4 on insane) plus a resolved height field, and needs the
+    // world-space view ray.
     const taps = !objectSpace && fam.tex.disp !== null ? parallaxTierTaps() : 0;
     const parallax = taps > 0;
     // Normalized amplitude: one sd of height walks the projection by the
@@ -805,7 +806,7 @@ export function applySurfaceDetail(
           parallax
             ? `float wornHShade = 0.0;
         if ( wornCamD < ${fade.parEnd.toFixed(1)} ) {
-          // Multi-tap parallax (3 on high/ultra, 4 on insane): estimate height, then
+          // Multi-tap parallax (3 on ultra, 4 on insane): estimate height, then
           // refine along the view ray, walking the projection by the averaged
           // offset. The amplitude is sd-normalized (one sd of height = the
           // family's target depth) and the offset clamps at 2.2 sd so tails
@@ -984,8 +985,8 @@ export function reapplySurfaceDetailToClone(clone: THREE.Material): void {
  * sweep (renderer.ts collectObjectTextures reads map/normalMap/... keys) can
  * never find them: without an explicit prewarm they upload on the first live
  * draw that binds them. The Displacement fields are the heavy case: they only
- * load on the parallax tiers (high+), and their first-draw decode+upload was
- * measured as 1fps 1%-low windows mid-travel on the high-tier meadow bench.
+ * load on the parallax tiers (ultra+), and their first-draw decode+upload was
+ * measured as 1fps 1%-low windows mid-travel on the historical meadow bench.
  * Empty before the preload gate resolves (call after assetsReady()).
  */
 export function surfaceDetailPrewarmTextures(): THREE.Texture[] {

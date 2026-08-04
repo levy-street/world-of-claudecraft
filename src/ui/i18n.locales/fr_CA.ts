@@ -297,4 +297,7 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'hud.errors.marketListBound': 'Cet objet est lié et ne peut pas être inscrit au marché.',
   'hudChrome.mailbox.result.noMailBound':
     'Cet objet est lié et ne peut pas être envoyé par la poste.',
+  'hud.prompts.guildInviteCancelled':
+    'Une invitation de guilde en attente a été annulée parce que la guilde a été renommée.',
+  'hud.prompts.guildRenamed': "Votre guilde a été renommée en {name} par l'équipe de modération.",
 };

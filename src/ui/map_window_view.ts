@@ -17,6 +17,7 @@
 
 import { DUNGEON_LIST, isDelvePos, STRIP_MAX_X, STRIP_MIN_X, type ZoneDef } from '../sim/data';
 import {
+  type MapQuestMarkerKind,
   type QuestObjectiveRef,
   questGiverNpcMarkers,
   questObjectiveAreas,
@@ -93,20 +94,27 @@ export interface MapPortalMarker {
   dungeonId: string;
 }
 
-/** One quest carried by a map quest-giver glyph, for its hover tooltip. */
+/** One quest carried by a map quest-giver glyph, for its hover tooltip:
+ *  'ready' (the '?' state), 'available' (first-offer gold '!'), 'repeat'
+ *  (completed-repeatable blue '!'), or 'cooldown' (a work order inside its
+ *  cadence window, the dimmed '!'). The type is the four-member
+ *  MapQuestMarkerKind, so consumers see only drawable kinds; the tooltip
+ *  tag table switches exhaustively over them (the painter resolves glyph
+ *  and color by comparison). */
 export interface MapNpcQuestRef {
   questId: string;
-  /** true = ready to turn in (the '?' state); false = available to pick up. */
-  ready: boolean;
+  kind: MapQuestMarkerKind;
 }
 
-/** A quest-giver glyph: '?' (turn-in ready) wins over '!' (available). Carries
- *  the quest identities behind the glyph so the hover tooltip can resolve
- *  their localized titles + level requirements (this core stays i18n-free). */
+/** A quest-giver glyph: `kind` is the strongest state present under the
+ *  shared quest_marker_kind fold ('?' turn-in ready wins over every '!'
+ *  variant). Carries the quest identities behind the glyph so the hover
+ *  tooltip can resolve their localized titles + level requirements (this
+ *  core stays i18n-free). */
 export interface MapNpcMarker {
   mx: number;
   my: number;
-  ready: boolean;
+  kind: MapQuestMarkerKind;
   quests: MapNpcQuestRef[];
 }
 
@@ -269,7 +277,7 @@ export interface OverworldMapModel {
   /** Drag cursor when zoomed past the full-zone view. */
   cursor: 'grab' | 'default';
   /** The visible world rect. The painter composites the current zone's cached
-   *  background into it (+X is map-left, +Z map-down) over an ocean fill. */
+   *  background into it (+X is map-left, +Z map-up; R61) over an ocean fill. */
   region: { minX: number; maxX: number; minZ: number; maxZ: number };
   /** The committed zone id (the painter localizes the on-canvas title + summary). */
   zoneId: string;
@@ -357,7 +365,10 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     maxZ: cz + spanZ / 2,
   };
 
-  // +X is map-left (east = -X); +Z is map-down.
+  // +X is map-left (east = -X); +Z is map-up (north = +Z): my shrinks as z
+  // grows. This projection is the compass authority for player-facing
+  // direction words (R61, docs/design/professions-tuning-packet-review.md);
+  // the layout files' legacy +x=east names are raw coordinates, not compass.
   const toMap = (x: number, z: number): { mx: number; my: number } => ({
     mx: ((region.maxX - x) / spanX) * S,
     my: ((region.maxZ - z) / spanZ) * S,
@@ -430,12 +441,21 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
 
   // Quest-giver glyphs, resolved from the static NPCS content table (like the
   // quest-area blobs above) rather than world.entities, so the online interest
-  // radius never hides a distant giver's '!'/'?' glyph.
+  // radius never hides a distant giver's '!'/'?' glyph. questsDone and the
+  // cadence-blocked set feed the shared quest_marker_kind rule (the repeat
+  // and cooldown variants); both are IWorld members on both worlds, so the
+  // offline map and the online mirror classify identically.
   const npcs: MapNpcMarker[] = [];
-  for (const marker of questGiverNpcMarkers((q) => world.questState(q))) {
+  const blocked = world.craftingIdentity?.cadenceBlockedQuests;
+  const cadenceBlocked = blocked && blocked.length > 0 ? new Set(blocked) : undefined;
+  for (const marker of questGiverNpcMarkers(
+    (q) => world.questState(q),
+    world.questsDone,
+    cadenceBlocked,
+  )) {
     if (!inZone(marker.pos.x, marker.pos.z) || !inView(marker.pos.x, marker.pos.z)) continue;
     const { mx, my } = toMap(marker.pos.x, marker.pos.z);
-    npcs.push({ mx, my, ready: marker.ready, quests: marker.quests });
+    npcs.push({ mx, my, kind: marker.kind, quests: marker.quests });
   }
 
   let player: MapPlayerMarker | null = null;

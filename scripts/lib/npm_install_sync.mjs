@@ -1,20 +1,21 @@
 // Pure parse/format logic for the gate's dependency-sync preflight
-// (scripts/gate.mjs). A local checkout can drift from package-lock.json without
-// anyone noticing: a stray `npm install <pkg>` bumps a version, or a long-lived
-// checkout just gets stale. `npm ci` always re-syncs, so CI never sees this, but
-// a local `npm run gate` run has no such reset between sessions. The drift then
-// surfaces many minutes later as a confusing tsc or build failure that looks like
-// a real regression (a bumped `three` can change public type shapes enough to
-// fail `tsc --noEmit`) but is actually just an out-of-sync install. Catching it
-// with `npm ls --depth=0 --json` up front costs under a second and fails with a
-// message that names the actual problem instead of a downstream symptom.
+// (scripts/gate.mjs). A local checkout can drift from pnpm-lock.yaml without
+// anyone noticing: a stray `pnpm add <pkg>` bumps a version, or a long-lived
+// checkout just gets stale. CI always re-syncs with `pnpm install --frozen-lockfile`,
+// but a local `npm run gate` / `pnpm run gate` has no such reset between sessions.
+// The drift then surfaces many minutes later as a confusing tsc or build failure
+// that looks like a real regression (a bumped `three` can change public type
+// shapes enough to fail `tsc --noEmit`) but is actually just an out-of-sync
+// install. Catching it with `npm ls --depth=0 --json` up front still works under
+// pnpm's symlink layout, costs under a second, and fails with a message that
+// names the actual problem instead of a downstream symptom.
 
 // Only these two `npm ls` problem classes reflect the failure mode this preflight
 // targets: an installed version that does not satisfy what package.json (and
-// therefore package-lock.json) declares. `extraneous:` (an unlisted package left
+// therefore pnpm-lock.yaml) declares. `extraneous:` (an unlisted package left
 // over in node_modules, e.g. after a dependency was removed) does not change what
 // any declared import resolves to, so it cannot itself break tsc or a build; no
-// CI job runs `npm run gate` (CI always starts from a fresh `npm ci`), so a
+// CI job runs `npm run gate` (CI always starts from a fresh frozen install), so a
 // prefix this preflight doesn't recognize has no other gate to catch a
 // false-positive block, and the gate stays silent on it rather than stopping
 // every local run over a problem class that was never the one causing failures.
@@ -72,9 +73,9 @@ export function shouldCheckInstallSync({ error, stdout }) {
 export function formatInstallSyncFailure(problems) {
   const count = `${problems.length} problem${problems.length === 1 ? '' : 's'}`;
   return (
-    `node_modules does not match what package-lock.json would install (npm ls --depth=0 reported ${count}):\n` +
+    `node_modules does not match what pnpm-lock.yaml would install (npm ls --depth=0 reported ${count}):\n` +
     problems.map((p) => `  - ${p}`).join('\n') +
-    '\n\nRun `npm ci` to reinstall exactly what the lockfile pins, then re-run the gate. ' +
+    '\n\nRun `pnpm install --frozen-lockfile` to reinstall exactly what the lockfile pins, then re-run the gate. ' +
     'A drifted install can fail typecheck or a build step in a way that looks like a real ' +
     'regression in your change but is actually environment drift.'
   );

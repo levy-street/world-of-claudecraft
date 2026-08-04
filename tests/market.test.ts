@@ -95,7 +95,7 @@ function marketSellerKey(pid: number): string {
   return String(pid);
 }
 
-describe('the World Market — the Merchant', () => {
+describe('the World Market: the Merchant', () => {
   it('spawns a single Merchant who keeps standing house stock', () => {
     const sim = makeWorld();
     const merchants = [...sim.entities.values()].filter((e) => e.templateId === 'the_merchant');
@@ -541,6 +541,52 @@ describe('the World Market — the Merchant', () => {
     expect(sim.marketInfoFor(seller)?.collectionCopper).toBe(95);
   });
 
+  it('the rename sweep re-keys the SIGNER inside the renamer OWN escrowed rows', () => {
+    // The owner rekey renames who OWNS a row. Since #2507 an instanced copy can
+    // be escrowed IN the row, and its signer is a separate string: cancelling
+    // the listing after a rename would otherwise hand back a copy signed by a
+    // name that no longer exists. Shipped untested, so pinned here.
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    standAtMerchant(sim, seller);
+    sim.addItemInstance('wolf_fang', { signer: 'Seller' }, seller, 1);
+    sim.marketListInstance('wolf_fang', 500, { signer: 'Seller' }, seller);
+    const listing = listingBy(sim, (l) => !!l.instance, 'instanced listing');
+    listing.sellerKey = 'Seller';
+    listing.sellerName = 'Seller';
+    const internals = sim.market as unknown as {
+      marketCollections: Map<
+        string,
+        { copper: number; items: { instance?: { signer?: string } }[] }
+      >;
+    };
+    internals.marketCollections.set('77', {
+      copper: 0,
+      items: [{ itemId: 'wolf_fang', count: 1, instance: { signer: 'Seller' } } as never],
+    });
+
+    expect(sim.rekeyMarketSeller(77, 'Seller', 'Renamed')).toBe(true);
+    expect(listing.instance?.signer).toBe('Renamed');
+    expect(internals.marketCollections.get('77')?.items[0].instance?.signer).toBe('Renamed');
+  });
+
+  it('the rename sweep leaves a STRANGER escrowed row alone (the accepted limitation)', () => {
+    // The deliberate scope boundary, pinned so a later widening is a conscious
+    // choice rather than a drift: a copy this character signed but that now
+    // sits in someone else's listing is foreign-held and stays on the old name.
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    standAtMerchant(sim, seller);
+    sim.addItemInstance('wolf_fang', { signer: 'Seller' }, seller, 1);
+    sim.marketListInstance('wolf_fang', 500, { signer: 'Seller' }, seller);
+    const listing = listingBy(sim, (l) => !!l.instance, 'instanced listing');
+    listing.sellerKey = 'somebody-else';
+    listing.sellerName = 'Somebody Else';
+
+    sim.rekeyMarketSeller(77, 'Seller', 'Renamed');
+    expect(listing.instance?.signer).toBe('Seller');
+  });
+
   it('rejects a purchase the buyer cannot afford', () => {
     const sim = makeWorld();
     const seller = sim.addPlayer('warrior', 'Seller');
@@ -716,6 +762,59 @@ describe('the World Market — the Merchant', () => {
     sim2.marketList('bone_fragments', 1, 50, seller2);
     const ids = sim2.marketListings.map((l) => l.id);
     expect(new Set(ids).size).toBe(ids.length); // no id collisions
+  });
+
+  it('bounds a persisted craftedRecipeId on both book arms like every other marker load', () => {
+    // The v0.34.0 merge-audit finding: the release's marker re-attach (#2605)
+    // kept a persisted craftedRecipeId on a bare typeof check while every
+    // other marker load (bag/buyback/bank) takes boundCraftedRecipeIdOnLoad,
+    // and a market row persists to expiry and grants into live bags with no
+    // login to self-heal it. Driven through the REAL loadMarket path: a legal
+    // marker survives both arms, an over-ceiling and an empty one drop whole.
+    const sim = makeWorld();
+    const listingRow = (id: number, craftedRecipeId: string) => ({
+      id,
+      sellerKey: 'k1',
+      sellerName: 'Seller',
+      itemId: 'wolf_fang',
+      count: 1,
+      price: 100,
+      secondsLeft: 600,
+      craftedRecipeId,
+    });
+    sim.loadMarket({
+      listings: [
+        listingRow(5000, 'recipe_tough_jerky'),
+        listingRow(5001, 'r'.repeat(65)),
+        listingRow(5002, ''),
+      ],
+      collections: [
+        {
+          key: 'k1',
+          copper: 0,
+          items: [
+            { itemId: 'wolf_fang', count: 1, craftedRecipeId: 'recipe_tough_jerky' },
+            { itemId: 'wolf_fang', count: 1, craftedRecipeId: '' },
+            { itemId: 'wolf_fang', count: 1, craftedRecipeId: 'r'.repeat(65) },
+          ],
+        },
+      ],
+      nextListingId: 5003,
+    } as never);
+    const legal = sim.marketListings.find((l) => l.id === 5000);
+    const over = sim.marketListings.find((l) => l.id === 5001);
+    const empty = sim.marketListings.find((l) => l.id === 5002);
+    expect(legal?.craftedRecipeId).toBe('recipe_tough_jerky');
+    expect(over && 'craftedRecipeId' in over).toBe(false);
+    expect(empty && 'craftedRecipeId' in empty).toBe(false);
+    const col = (
+      sim.market as unknown as {
+        marketCollections: Map<string, { items: { itemId: string; craftedRecipeId?: string }[] }>;
+      }
+    ).marketCollections.get('k1');
+    expect(col?.items[0].craftedRecipeId).toBe('recipe_tough_jerky');
+    expect(col && 'craftedRecipeId' in col.items[1]).toBe(false);
+    expect(col && 'craftedRecipeId' in col.items[2]).toBe(false);
   });
 
   // ---------------------------------------------------------------------------
@@ -1099,5 +1198,100 @@ describe('marketCollectPendingFor - the collect-indicator bit', () => {
     };
     internals.marketCollections.set(String(sim.playerId), { copper: 95, items: [] });
     expect(sim.marketCollectPending).toBe(true);
+  });
+});
+
+// Character deletion (R43): a deleted character can never stand at the Merchant
+// again, so its listings and collection leave the book rather than sitting
+// uncollectable forever. Dual-key by the rekeyMarketSeller rule: the stable
+// character-id key AND a legacy name-keyed row.
+describe('purgeMarketSeller - deleting a character', () => {
+  function collectionsOf(sim: Sim): Map<string, { copper: number; items: { count: number }[] }> {
+    return (
+      sim.market as unknown as {
+        marketCollections: Map<string, { copper: number; items: { count: number }[] }>;
+      }
+    ).marketCollections;
+  }
+
+  it('removes the deleted seller under BOTH keys, sparing house stock and other sellers', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller', { characterId: 77 });
+    const other = sim.addPlayer('mage', 'Other', { characterId: 88 });
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, other);
+    sim.addItem('wolf_fang', 2, seller);
+    sim.addItem('wolf_fang', 1, other);
+
+    // One id-keyed listing, one legacy name-keyed listing, both the deleted seller's.
+    sim.marketList('wolf_fang', 1, 200, seller);
+    sim.marketList('wolf_fang', 1, 300, seller);
+    const legacy = listingBy(sim, (l) => !l.house && l.price === 300, 'legacy listing');
+    legacy.sellerKey = 'Seller';
+    legacy.sellerName = 'Seller';
+    sim.marketList('wolf_fang', 1, 400, other);
+
+    // A collection under EACH of the seller's keys, plus the other seller's.
+    const collections = collectionsOf(sim);
+    collections.set('77', { copper: 95, items: [] });
+    collections.set('Seller', { copper: 40, items: [] });
+    collections.set('88', { copper: 10, items: [] });
+    const houseBefore = sim.marketListings.filter((l) => l.house).length;
+    expect(houseBefore).toBeGreaterThan(0);
+    // Make the house guard the OPERATIVE cause for one row: a house listing
+    // hand-keyed to the deleted seller's id could only survive through the
+    // `listing.house` skip (real house stock carries sellerKey '', which the
+    // ownership check already refuses, leaving the guard otherwise inert).
+    sim.marketListings.push({
+      ...sim.marketListings.find((l) => l.house)!,
+      id: 990077,
+      sellerKey: '77',
+    });
+
+    expect(sim.purgeMarketSeller(77, 'Seller')).toBe(true);
+
+    // No NON-house row remains under either key (the hand-keyed house probe
+    // above survives by the house guard, checked below).
+    expect(sim.marketListings.some((l) => !l.house && l.sellerKey === '77')).toBe(false);
+    expect(sim.marketListings.some((l) => !l.house && l.sellerKey === 'Seller')).toBe(false);
+    expect(collections.has('77')).toBe(false);
+    expect(collections.has('Seller')).toBe(false);
+    // The other seller and the Merchant's own stock are untouched.
+    expect(sim.marketListings.filter((l) => l.sellerKey === '88' && l.price === 400)).toHaveLength(
+      1,
+    );
+    expect(collections.get('88')?.copper).toBe(10);
+    // houseBefore + the hand-keyed probe: the guard spared it despite the
+    // matching sellerKey.
+    expect(sim.marketListings.filter((l) => l.house)).toHaveLength(houseBefore + 1);
+    expect(sim.marketListings.some((l) => l.house && l.sellerKey === '77')).toBe(true);
+  });
+
+  it('reports no change when the deleted character had nothing on the market', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller', { characterId: 77 });
+    standAtMerchant(sim, seller);
+    sim.addItem('wolf_fang', 1, seller);
+    sim.marketList('wolf_fang', 1, 200, seller);
+    const before = sim.marketListings.length;
+
+    expect(sim.purgeMarketSeller(99, 'Nobody')).toBe(false);
+    expect(sim.marketListings).toHaveLength(before);
+    expect(sim.marketListings.some((l) => l.sellerKey === '77')).toBe(true);
+  });
+
+  it('refuses a non-finite character id rather than purging by name alone', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller', { characterId: 77 });
+    standAtMerchant(sim, seller);
+    sim.addItem('wolf_fang', 1, seller);
+    sim.marketList('wolf_fang', 1, 200, seller);
+    const legacy = listingBy(sim, (l) => !l.house && l.price === 200, 'legacy listing');
+    legacy.sellerKey = 'Seller';
+    collectionsOf(sim).set('Seller', { copper: 40, items: [] });
+
+    expect(sim.purgeMarketSeller(Number.NaN, 'Seller')).toBe(false);
+    expect(sim.marketListings.some((l) => l.sellerKey === 'Seller')).toBe(true);
+    expect(collectionsOf(sim).has('Seller')).toBe(true);
   });
 });

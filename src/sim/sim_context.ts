@@ -56,6 +56,7 @@ import type {
   ErrorReason,
   EscortRunState,
   GatherNodeDef,
+  InventoryUnit,
   ItemInstancePayload,
   PendingResurrection,
   PlayerClass,
@@ -87,6 +88,15 @@ export interface SimContextPrimitives {
   // first join and on the primary's departure, so it is a LIVE getter, not a snapshot.
   // Stays a Sim field; the moved raid-marker `markerFor` (T1) reads it through the seam.
   readonly primaryId: number;
+  // The mastery-reset notice fast path (phase 16): a LIVE counter of players
+  // whose load-time reset flagged a pending authored notice. The load branch
+  // (Sim.addPlayer) increments; the mail-phase sweep
+  // (professions/mastery_reset.ts) early-returns at zero (one integer read per
+  // tick instead of an O(players) walk), drains on the very next tick
+  // otherwise, and re-zeroes after its walk so a pending player who left
+  // before the sweep cannot leave the fast path armed forever. The backing
+  // object stays on Sim, mutated in place.
+  readonly masteryResetNoticeCounter: { pending: number };
   // Social-invite maps owned by the trade (G2) and duel (A2) slices. The party
   // machine (A1) reads them for hasPendingSocialInvite's cross-system pending check
   // and lazily expires entries in place, so these are LIVE views: the backing fields
@@ -517,11 +527,13 @@ export interface SimContextCallbacks {
   // professions/enchanting.ts instead of countFungibleItem/removeFungibleItem
   // so crafted single-copy rares remain disenchantable/enchantable.
   countEnchantableItem(itemId: string, pid?: number): number;
-  // Returns the consumed slots' `instance` payloads (removeItem's contract),
-  // so applyEnchant can merge a crafted copy's signer, legacy rolled.quality,
-  // and masterwork bonus into the freshly-enchanted instance instead of
-  // dropping them.
-  removeEnchantableItem(itemId: string, count: number, pid?: number): ItemInstancePayload[];
+  // Returns one InventoryUnit per consumed unit (types.ts): the slot's
+  // `instance` payload AND its plain-stack craftedRecipeId marker, so
+  // applyEnchant can merge a crafted copy's signer, legacy rolled.quality, and
+  // masterwork bonus into the freshly-enchanted instance instead of dropping
+  // them, and can re-stamp the craft marker a plain crafted stack carries on
+  // the slot rather than in a payload.
+  removeEnchantableItem(itemId: string, count: number, pid?: number): InventoryUnit[];
   completeQuestForDev(questId: string, pid?: number): boolean;
   completeCurrentQuestsForDev(pid?: number): number;
 
@@ -905,6 +917,12 @@ export interface SimContextCallbacks {
   // consumes it. Binding points at the PostOffice instance on Sim.
   mailAuthoredLetter(meta: PlayerMeta, letter: LetterDef): void;
 
+  // Ravenpost mail, read-only: does this player's mailbox (in-flight letters
+  // included) hold `itemId` as an attachment? The accept-time quest re-grant
+  // predicate (quests/quest_item_presence.ts) is the reader. Binding points at
+  // the PostOffice instance on Sim.
+  mailboxHoldsItem(meta: PlayerMeta, itemId: string): boolean;
+
   // Set proc firing is owned by combat/set_procs.ts.
   applySetProcs(source: Entity, target: Entity | null, trigger: SetProc['trigger']): void;
   // Book of Deeds (deeds.ts owns every body; append-only additions). The
@@ -979,6 +997,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get players() {
       return host.players;
+    },
+    get masteryResetNoticeCounter() {
+      return host.masteryResetNoticeCounter;
     },
     get stationPlacements() {
       return host.stationPlacements;
@@ -1425,6 +1446,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     queueQuestLetter: host.queueQuestLetter,
     mailHeroicMarks: host.mailHeroicMarks,
     mailAuthoredLetter: host.mailAuthoredLetter,
+    mailboxHoldsItem: host.mailboxHoldsItem,
     applySetProcs: host.applySetProcs,
     // Book of Deeds seam (points at deeds.ts via the Sim-bound arrows).
     bumpDeedStat: host.bumpDeedStat,

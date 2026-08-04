@@ -152,17 +152,26 @@ const sorted = (s: Set<string>): string[] => [...s].sort();
 // Exact paths a registered RouteDef dispatches (the migrated router side of the
 // flag). Param routes (:id) are excluded: their legacy arms are `*Match` regexes
 // covered by the param gate below, and a RouteDef path template is not a regex
-// source. Paths whose inventory row is flagged `unreachable` (the swag claim:
+// source. The one exception is a REGISTRY-ONLY param route (born after the
+// migration, so it has no legacy arm and no match regex): its RouteDef path
+// template IS its one dispatch source and its inventory row is classified
+// exact (no match), so it joins the comparison verbatim via the allowlist
+// below. Paths whose inventory row is flagged `unreachable` (the swag claim:
 // registered, but deliberately recorded as having no legacy dispatch arm) keep
-// that classification; the unreachable filter on dispatchedRows already excludes
-// them from the inventory side, so they must not enter the source side either.
-// See the header note on REGISTERED RouteDefs.
+// that classification; the unreachable filter on dispatchedRows already
+// excludes them from the inventory side, so they must not enter the source
+// side either. See the header note on REGISTERED RouteDefs.
 const inventoryUnreachablePaths = new Set(
   SURFACE_INVENTORY.filter((r) => r.unreachable).map((r) => r.path),
 );
+const REGISTRY_ONLY_PARAM_PATHS = new Set(['/api/characters/:id/deeds-recent']);
 const registryExactPaths = new Set(
   apiRoutes
-    .filter((r) => !r.path.includes(':') && !inventoryUnreachablePaths.has(r.path))
+    .filter(
+      (r) =>
+        (!r.path.includes(':') || REGISTRY_ONLY_PARAM_PATHS.has(r.path)) &&
+        !inventoryUnreachablePaths.has(r.path),
+    )
     .map((r) => r.path),
 );
 

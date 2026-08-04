@@ -86,7 +86,11 @@ $SITE {
 	# never the public: /livez would otherwise be a public wedge oracle and /metrics
 	# exposes operational internals. Answer them 404 from outside. The healthcheck probes
 	# /livez on 127.0.0.1 inside the container, which never passes through Caddy.
-	@ops path /livez /readyz /metrics
+	# /internal/* is the bot and deploy internal API (the restart countdown, the bot
+	# relay hooks). Nothing restricts it to loopback: a shared secret header is its
+	# only real gate, so this 404 is defense in depth layered on top of that secret,
+	# never the gate itself. It removes the public path, it does not replace the key.
+	@ops path /livez /readyz /metrics /internal/*
 	handle @ops {
 		respond 404
 	}
@@ -102,7 +106,11 @@ if [ -n "$ADMIN_DOMAIN" ]; then
 $ADMIN_DOMAIN {
 	# Same as the public site: keep the ops endpoints off the public edge (they are for
 	# the in-container healthcheck and the host watchdog, which never traverse Caddy).
-	@ops path /livez /readyz /metrics
+	# /internal/* rides the same rule: the bot and deploy internal API is gated by a
+	# shared secret header at the server, and this 404 is defense in depth on top of
+	# that secret, not the gate. Leaving it open on the second vhost would undo the
+	# first one entirely, since both names resolve to the same server.
+	@ops path /livez /readyz /metrics /internal/*
 	handle @ops {
 		respond 404
 	}

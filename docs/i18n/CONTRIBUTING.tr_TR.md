@@ -40,25 +40,31 @@ Burada herkes için bir yer var:
 
 ## Başlarken
 
-[Node.js 26](https://nodejs.org/) ve npm gerekecek; bunlar CI'nin ve üretim
-imajının kullandığı sürümlerdir. Daha eski ana sürümler test edilmiyor. Çok
-oyunculu sunucu için Postgres çalıştırmak üzere ayrıca
-[Docker](https://www.docker.com/) isteyeceksiniz.
+[Node.js 26](https://nodejs.org/) ve **pnpm 10.34.x** gerekecek (`package.json` içindeki `packageManager` pin'i, bugün `pnpm@10.34.5`). Daha eski Node majörleri test edilmedi. Çok oyunculu sunucu için Postgres çalıştırmak üzere [Docker](https://www.docker.com/) da isteyeceksiniz.
+
+**Corepack zorunlu değildir.** pnpm'i Node ile gelen npm ile bir kez kurun. Aynı yol macOS, Linux ve Windows'ta geçerlidir.
 
 ```bash
 # 1. Fork the repo on GitHub, then clone your fork
 git clone https://github.com/<your-username>/world-of-claudecraft.git
 cd world-of-claudecraft
 
-# 2. Install dependencies
-npm ci
+# 2. Install pnpm once (same command on macOS, Linux, Windows)
+#    Match the packageManager pin in package.json (today: 10.34.5).
+npm install -g pnpm@10.34.5
+pnpm --version   # should print 10.34.5 (or the pin in package.json)
 
-# 3. Point git at the repository hooks (once per clone)
+# 3. Install dependencies (uses the global content-addressable store)
+pnpm install --frozen-lockfile
+
+# 4. Point git at the repository hooks (once per clone)
 git config core.hooksPath .githooks
 
-# 4. Run the offline client (no server or database needed)
-npm run dev          # open the URL it prints (usually http://localhost:5173)
+# 5. Run the offline client (no server or database needed)
+pnpm run dev         # open the URL it prints (usually http://localhost:5173)
 ```
+
+pnpm kurulumundan sonra `npm run <script>` hâlâ çalışır (Node npm içerir), ancak **kurulum ve lockfile güncellemeleri pnpm üzerinden olmalıdır**. `package-lock.json` commit etmeyin; tek gerçek kaynak `pnpm-lock.yaml`'dır.
 
 Çevrimdışı dünyayı oynamak ve çoğu şey üzerinde çalışmak için bu kadarı yeterli.
 Tam çevrimiçi yığını çalıştırmak için önce ortamınızda bir veritabanı parolası
@@ -67,13 +73,13 @@ olması gerekir:
 ```bash
 cp .env.example .env
 # set POSTGRES_PASSWORD and point DATABASE_URL at the same password
-npm run db:up        # start Postgres 16 in Docker (dev DB on port 5433)
-npm run server       # build and run the authoritative game server on :8787
-npm run dev          # in another terminal; the client proxies to the server
+pnpm run db:up       # start Postgres 16 in Docker (dev DB on port 5433)
+pnpm run server      # build and run the authoritative game server on :8787
+pnpm run dev         # in another terminal; the client proxies to the server
 ```
 
 Aşağıdaki tam denetimi çalıştırmayı planlıyorsanız, sürdüğü tarayıcıyı bir kez
-kurun: `npx playwright install chromium`.
+kurun: `pnpm exec playwright install chromium`.
 
 [README](README.tr_TR.md), tam barındırma, geliştirme ve oynama rehberini içerir
 ve depo genelindeki `CLAUDE.md` dosyaları her alan için kuralları belgeler.
@@ -103,14 +109,7 @@ Bilinmesi gerekenler:
   değildir. `--singleThreaded` tüm paralelliği kapatır. Tek bir dosyayı ayrıca
   denetlemek (`npx tsc somefile.ts`), dizinde bir `tsconfig.json` varsa hata
   verir; eski davranış için `--ignoreConfig` geçin.
-- **Kilit dosyası.** `package-lock.json` dosyasını yalnızca
-  `npx npm@10 install --package-lock-only` ile yeniden üretin: dosya npm 10
-  semantiğini kullanır ve daha yeni npm ana sürümleri (CI'nin Node 26'sının
-  paketlediği npm 11 dahil) `svelte-check` için iç içe isteğe bağlı eş bağımlılık
-  girdilerini sessizce düşürerek CI'de `npm ci` senkronizasyonunu bozar. Düz
-  `npm ci` her npm ana sürümünde güvenlidir. Yeniden ürettikten sonra,
-  `npm ci --dry-run` çıktısının hem npm 10 hem de iş istasyonunuzun npm'i altında
-  senkron olduğunu doğrulayın.
+- **Kilit dosyası.** Kilit dosyası `pnpm-lock.yaml`'dır (pnpm 10 / lockfileVersion 9). Yalnızca bu depo kökünden `pnpm install`, `pnpm add` veya `pnpm update` ile güncelleyin (elle düzenlemeyin). `package.json` değişiklikleriyle birlikte `pnpm-lock.yaml`'ı commit edin. CI `pnpm install --frozen-lockfile` ile kurar; bayat lockfile başarısız olur. İkinci bir lockfile (`package-lock.json` / yarn.lock) getirmeyin: çift lockfile sessizce sapar ve yasaktır. İsteğe bağlı wallet/solana ağaçlarından peer bağımlılık gürültüsü `.npmrc` ile tolere edilir (`strict-peer-dependencies=false`); ölçmeden daha fazla gevşetmeyin.
 - **Ne zaman yeniden ele alınmalı.** İkili takma adı tek bir `typescript`
   bağımlılığına geri indirmek için HER İKİ koşul da sağlanmalı: TypeScript 7.1
   kararlı JS API'sinin yayımlanmış olması (TypeScript 7.0 hiç JS API'si
@@ -164,7 +163,7 @@ Bunlar kod tabanının yük taşıyan kurallarıdır. Tüm ayrıntılar kök
   Oluşturucunun veya HUD'un okuduğu veriler `IWorld` arayüzünden
   (`src/world_api/`) geçer ve hem çevrimdışı hem çevrimiçi dünyada uygulanır;
   yeni bir simülasyon sistemi `SimContext` arkasına gider; yeni bir REST uç
-  noktası ise `npm run new:endpoint` ile iskeletini kurabileceğiniz bir rota
+  noktası ise `pnpm run new:endpoint` ile iskeletini kurabileceğiniz bir rota
   modülüdür.
 - `*.generated.ts` gibi **üretilen dosyaları elle düzenlemeyin.** Bunları derleme
   yoluyla yeniden üretin.
@@ -181,7 +180,7 @@ Bunlar kod tabanının yük taşıyan kurallarıdır. Tüm ayrıntılar kök
 Biçimlendirme [Biome](https://biomejs.dev/) ile yapılır ve `biome.json` içinde
 yapılandırılmıştır: 2 boşluk girinti, 100 sütunluk satırlar, tek tırnak, sondaki
 virgüller. Yalnızca dokunduğunuz dosyaları biçimlendirin
-(`npx @biomejs/biome check --write <your-file.ts>`) ve onları `npm run ci:changed`
+(`npx @biomejs/biome check --write <your-file.ts>`) ve onları `pnpm run ci:changed`
 ile kontrol edin. CI yalnızca değişen dosyaları denetler, bu yüzden lütfen ağacın
 geri kalanını yeniden biçimlendirmeyin: depo genelinde bir çalıştırma, sizin
 düzeltmeniz gerekmeyen eski borçları ortaya çıkarır.
@@ -191,12 +190,12 @@ düzeltmeniz gerekmeyen eski borçları ortaya çıkarır.
 Depo denetimini yerelde çalıştırın. Bu, CI'nin dayattığı sözleşmenin aynısıdır:
 
 ```bash
-npm run gate
+pnpm run gate
 ```
 
 Üzerinde çalışırken tek bir takım çalıştırın (`npx vitest run tests/sim.test.ts`)
-ve biçimlendirme için `npm run ci:changed` kullanın; `npm test` her şeyi
-çalıştırır ve takım haritası `tests/CLAUDE.md` içindedir. Tam `npm run gate`
+ve biçimlendirme için `pnpm run ci:changed` kullanın; `pnpm test` her şeyi
+çalıştırır ve takım haritası `tests/CLAUDE.md` içindedir. Tam `pnpm run gate`
 şunları kapsar: üretilen yapıtların tazeliği, kötü amaçlı yazılım taraması,
 değişen dosyalarda biçimlendirme, ses efekti uyumluluk kontrolü, tüm test takımı,
 gerçek tarayıcıda bir regresyon geçişi, katı tip denetimi ve istemci, sunucu ve
@@ -222,13 +221,13 @@ kontrol listesinde yönlendirecek. Lütfen onu doldurun:
 - İlgili herhangi bir sorunu bağlayın (örneğin, "Closes #123").
 - Arayüz değişiklikleri için masaüstü ve mobilde **ekran görüntüsü veya bir klip
   ekleyin**.
-- `npm run gate` denetiminin geçtiğini ve oyuncuya yönelik yeni dizgelerin
+- `pnpm run gate` denetiminin geçtiğini ve oyuncuya yönelik yeni dizgelerin
   aşağıdaki İngilizce öncelikli katkı politikasına uyduğunu onaylayın.
 
 PR'ınızda CI, değiştirdiğiniz dosyalarda biçimlendirme ve linting, dört paralel
 parçaya dağıtılmış tam test takımı, bir tarayıcı regresyon geçişi ve tip denetimi
 ile istemci, sunucu ve başsız derlemelerini çalıştırır. Bu, yerelde
-`npm run gate` çalıştırdıklarıyla örtüşür, dolayısıyla yeşil bir denetim yeşil
+`pnpm run gate` çalıştırdıklarıyla örtüşür, dolayısıyla yeşil bir denetim yeşil
 bir PR'ın iyi bir habercisidir.
 
 Birleştirmeden önce aradığımız şey, yeşil bir CI çalışması ve tamamlanmış bir
@@ -266,7 +265,7 @@ kaynağı ekler.
 - Dilden bağımsız kalan `src/sim/` veya `server/` içinden yayılan oyuncuya yönelik
   metinler, aynı değişiklikte istemci sınırında yeniden yerelleştirilmelidir.
   Koruma testi `npx vitest run tests/localization_fixes.test.ts` bunu uygular.
-- Herhangi bir dizgeyi ekledikten veya değiştirdikten sonra `npm run i18n:gen`
+- Herhangi bir dizgeyi ekledikten veya değiştirdikten sonra `pnpm run i18n:gen`
   çalıştırın ve yeniden üretilen paketleri aynı değişiklikte commit edin. Hem
   denetim hem de CI, commit edilen yapıtları taze bir yeniden üretimle
   karşılaştırır, dolayısıyla bayat bir paket derlemeyi başarısız kılar.
@@ -290,7 +289,7 @@ istiyorsunuz? Bunu yapmak için herhangi bir oyun kodu yazmanıza gerek yok:
    `talent_i18n` modüllerinde çevrilir; yönetim panelinin ise
    `src/admin/i18n.locales/` altında kendi seti vardır.
 2. Mevcut çevirileri iyileştirin veya kulağa garip gelen çevirileri doldurun.
-3. `npm run i18n:gen` çalıştırın, yeniden üretilen paketleri bindirme
+3. `pnpm run i18n:gen` çalıştırın, yeniden üretilen paketleri bindirme
    düzenlemenizle birlikte commit edin, ardından yerelleştirme takımlarını
    (`npx vitest run tests/i18n_completeness.test.ts tests/localization_coverage.test.ts`)
    çalıştırın ve bir PR açın. Bindirmeler kasıtlı olarak seyrek olduğundan, tek

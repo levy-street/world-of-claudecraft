@@ -19,7 +19,12 @@
 import * as THREE from 'three';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
-import { type Entity, GATHER_CAST_ID, isQuestTurnInNpc } from '../sim/types';
+import {
+  npcQuestMarkerKind,
+  type QuestMarkerKind,
+  strongerQuestMarker,
+} from '../sim/quests/quest_marker_kind';
+import { type Entity, GATHER_CAST_ID } from '../sim/types';
 import { deedTitleText } from '../ui/deed_i18n';
 import {
   devTierBadgeDataUrl,
@@ -102,6 +107,27 @@ export class NameplatePainter {
   // proportional to the player count. `anchorCount` is the live prefix length.
   private readonly anchorScratch: NameplateAnchor[] = [];
   private anchorCount = 0;
+  // Quest-marker inputs (the shared quest_marker_kind rule), resolved lazily
+  // on the first quest-bearing plate of a pass and dropped at every full
+  // pass: craftingIdentity is a per-access allocation on the offline Sim,
+  // and an urgent town-NPC plate reaches the content branch at frame rate on
+  // throttled passes too, so a per-frame resolve tripled that cost for a
+  // marker whose inputs move on turn-in cadence. questsDone is held by
+  // REFERENCE: live on the offline Sim (one Set mutated in place), frozen on
+  // the online ClientWorld (replaced wholesale per qdone snapshot). The
+  // identity re-check at the resolve site heals that replacement immediately
+  // (and re-reads the cadence mirror with it, since a turn-in ships qdone
+  // and cprof in the same snapshot), so the one remaining stale window is a
+  // cprof-only change (a cadence lapse) on a throttled pass, bounded by one
+  // nameplate interval: the tier-scaled 1/24s to 1/15s plate staleness floor
+  // that already throttles every field identically (ruling recorded in the
+  // phase 23 QA record, docs/design/professions-tuning-packet-review.md:
+  // inside the sanctioned envelope, not a fairness gate). A throttled pass
+  // reuses the snapshot when one exists and resolves it fresh otherwise.
+  private questMarkerCtx: {
+    questsDone: ReadonlySet<string>;
+    cadenceBlocked: ReadonlySet<string> | undefined;
+  } | null = null;
 
   constructor(deps: NameplatePainterDeps) {
     this.views = deps.views;
@@ -127,6 +153,9 @@ export class NameplatePainter {
     const showOwnNameplate = this.showOwnNameplate();
     const showPlayerNameplates = this.showPlayerNameplates();
     this.anchorCount = 0;
+    // Drop the quest-marker snapshot at every full pass so it re-resolves
+    // lazily below; throttled passes reuse it (see the field's rationale).
+    if (fullPass) this.questMarkerCtx = null;
     for (const [id, v] of this.views) {
       const e = world.entities.get(id);
       if (!e) continue;
@@ -287,35 +316,59 @@ export class NameplatePainter {
           e.kind === 'npc'
             ? npcDisplayName(e.templateId)
             : tEntity({ kind: 'mob', id: e.templateId, field: 'name' });
-        let marker = '';
-        let cls = '';
-        // role-aware: '!' only at the quest's giver, '?' only at its turn-in
-        // NPC (gray while in progress), matching the gossip dialog
-        for (const qid of e.questIds) {
-          const quest = QUESTS[qid];
-          if (!quest) continue;
-          const st = world.questState(qid);
-          if (st === 'ready' && isQuestTurnInNpc(quest, e.templateId)) {
-            marker = '?';
-            cls = 'ready';
-            break;
+        // Role-aware via the shared quest_marker_kind rule: '!' only at the
+        // quest's giver (gold first-offer, blue repeat, dimmed cooldown),
+        // '?' only at its turn-in NPC. The nameplate is the ONE surface that
+        // renders the gray in-progress state, so 'active' joins its fold at
+        // its shared rank (beating cooldown: an in-progress turn-in here is
+        // the more actionable signal); the minimap, map, and gossip list
+        // filter 'active' per quest instead, since they never drew it.
+        if (e.questIds.length > 0) {
+          // A changed questsDone identity means the online mirror replaced
+          // the history Set: drop the snapshot and re-resolve now, instead
+          // of folding a fresh questState against stale history for the
+          // rest of the pass (see the field's rationale).
+          if (this.questMarkerCtx && this.questMarkerCtx.questsDone !== world.questsDone) {
+            this.questMarkerCtx = null;
           }
-          if (st === 'available' && quest.giverNpcId === e.templateId) {
-            marker = '!';
-            cls = 'avail';
-          } else if (st === 'active' && isQuestTurnInNpc(quest, e.templateId) && !marker) {
-            marker = '?';
-            cls = 'active';
+          if (!this.questMarkerCtx) {
+            const blocked = world.craftingIdentity?.cadenceBlockedQuests;
+            this.questMarkerCtx = {
+              questsDone: world.questsDone,
+              cadenceBlocked: blocked && blocked.length > 0 ? new Set(blocked) : undefined,
+            };
           }
         }
+        let folded: QuestMarkerKind = 'none';
+        for (const qid of e.questIds) {
+          const quest = QUESTS[qid];
+          if (!quest || !this.questMarkerCtx) continue;
+          folded = strongerQuestMarker(
+            folded,
+            npcQuestMarkerKind(
+              quest,
+              e.templateId,
+              world.questState(qid),
+              this.questMarkerCtx.questsDone,
+              this.questMarkerCtx.cadenceBlocked,
+            ),
+          );
+          if (folded === 'ready') break; // nothing outranks the '?'
+        }
+        const marker =
+          folded === 'none' ? '' : folded === 'ready' || folded === 'active' ? '?' : '!';
         const markerClass =
-          cls === 'ready'
+          folded === 'ready'
             ? 'np-marker ready'
-            : cls === 'avail'
+            : folded === 'available'
               ? 'np-marker avail'
-              : cls === 'active'
-                ? 'np-marker active'
-                : 'np-marker';
+              : folded === 'repeat'
+                ? 'np-marker repeat'
+                : folded === 'active'
+                  ? 'np-marker active'
+                  : folded === 'cooldown'
+                    ? 'np-marker cooldown'
+                    : 'np-marker';
         this.setNameplateStatic(v, npcName, FRIENDLY, 'none', marker, markerClass, '1');
         this.setNameplateLevel(v, '', '');
         this.setFriendlyPetState(v, false);

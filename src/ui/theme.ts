@@ -239,6 +239,17 @@ export function themeCssVars(knobs: ThemeKnobs): Record<string, string> {
     panelEdge,
     MIN_LARGE_CONTRAST,
   );
+  // The quest-marker tooltip TAG text (the map tooltip's "Repeatable" and
+  // "Available again soon" tags): a lifted rare-adjacent blue that reads AA
+  // on the dark presets but is blue-on-cream on the light Parchment panel,
+  // so it is repaired per preset exactly like --color-gold above, against
+  // BOTH the panel and its gradient edge. The static tokens.css default is
+  // the classic-preset value; this emit keeps every preset at the text tier.
+  const questTagText = ensureReadable(
+    ensureReadable('#3d9bff', panel, MIN_TEXT_CONTRAST),
+    panelEdge,
+    MIN_TEXT_CONTRAST,
+  );
   // Overlay text sits over the 3D world (quest tracker), NOT a panel, so it must
   // stay light regardless of preset and lean on its text-shadow for contrast.
   const overlayText = '#f4eede';
@@ -265,6 +276,7 @@ export function themeCssVars(knobs: ThemeKnobs): Record<string, string> {
     '--color-text-light': text,
     '--color-text-muted': textMuted,
     '--color-text-overlay': overlayText,
+    '--color-quest-tag-text': questTagText,
     '--text-outline-color': textOutline,
     '--scrollbar-thumb': mixHex(border, '#000000', 0.15),
     '--scrollbar-thumb-hover': border,

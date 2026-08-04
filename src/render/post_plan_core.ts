@@ -16,6 +16,8 @@ export interface PostFullscreenStagePlan {
   readonly writes: string;
 }
 
+export type PostComposerPass = 'render' | 'n8ao' | 'bloom' | 'output-grade' | 'screen-fx' | 'smaa';
+
 export interface PostPlanInput {
   readonly gradeOnly: boolean;
   readonly ao: boolean;
@@ -34,8 +36,9 @@ export interface PostPipelinePlan {
     readonly aoQuality: 'Low' | 'Medium' | null;
     readonly aoScale: 0.5 | 1 | null;
   };
-  readonly composerPasses: readonly ('render' | 'n8ao' | 'bloom' | 'output-grade' | 'smaa')[];
+  readonly composerPasses: readonly PostComposerPass[];
   readonly singleComposerBuffer: boolean;
+  readonly supportsDynamicResolution: boolean;
   readonly composerSamples: number;
   readonly resolveCount: number;
   readonly renderTargets: readonly PostRenderTargetPlan[];
@@ -57,6 +60,22 @@ const stage = (
   writes: string,
 ): PostFullscreenStagePlan => ({ id, scale, reads, writes });
 
+type ComposerTargetId = 'composer-a' | 'composer-b';
+type PostRegionContract = 'scissored-scene' | 'remapped-input' | 'full-frame';
+
+const PASS_REGION_CONTRACT: Record<PostComposerPass, PostRegionContract> = {
+  render: 'scissored-scene',
+  n8ao: 'full-frame',
+  bloom: 'full-frame',
+  'output-grade': 'remapped-input',
+  'screen-fx': 'full-frame',
+  smaa: 'full-frame',
+};
+
+function otherComposerTarget(targetId: ComposerTargetId): ComposerTargetId {
+  return targetId === 'composer-a' ? 'composer-b' : 'composer-a';
+}
+
 /**
  * Describes the concrete r165 EffectComposer, n8ao 1.10.3, and bloom graph.
  * The live builder consumes the same decisions, while tests pin every target
@@ -65,20 +84,30 @@ const stage = (
 export function postPipelinePlan(input: PostPlanInput): PostPipelinePlan {
   const useAo = input.ao && !input.gradeOnly && !input.n8aoDisabled;
   const useBloom = input.bloom && !input.gradeOnly;
-  const useSmaa = input.smaa && !input.smaaDisabled;
-  const singleComposerBuffer = !useSmaa;
+  const useScreenFx = !input.gradeOnly;
+  const useSmaa = input.smaa && !input.gradeOnly && !input.smaaDisabled;
   // Preserve the shipped dev-override behavior: configured AO owns scene rasterization
   // storage even when ?n8ao=off temporarily selects the RenderPass attribution branch.
   const aoOwnsSceneStorage = input.ao && !input.gradeOnly;
   const composerSamples =
     input.isWebGL2 && !aoOwnsSceneStorage ? Math.max(0, input.msaaSamples) : 0;
   const scenePass = useAo ? 'n8ao' : 'render';
-  const sceneTarget = useAo || singleComposerBuffer ? 'composer-a' : 'composer-b';
-  const outputTarget = useSmaa
-    ? sceneTarget === 'composer-a'
-      ? 'composer-b'
-      : 'composer-a'
-    : 'canvas';
+  const composerPasses: PostComposerPass[] = [scenePass];
+  if (useBloom) composerPasses.push('bloom');
+  composerPasses.push('output-grade');
+  if (useScreenFx) composerPasses.push('screen-fx');
+  if (useSmaa) composerPasses.push('smaa');
+
+  // OutputGrade renders straight to the canvas only when it is the tail. Every
+  // enabled swapping pass after it makes OutputGrade write an intermediate, so
+  // that pass must receive a target distinct from the scene texture it samples.
+  const outputGradeIndex = composerPasses.indexOf('output-grade');
+  const hasSwappingTail = composerPasses.slice(outputGradeIndex + 1).length > 0;
+  const singleComposerBuffer = !hasSwappingTail;
+  const sceneTarget: ComposerTargetId = useAo || singleComposerBuffer ? 'composer-a' : 'composer-b';
+  const supportsDynamicResolution = composerPasses.every(
+    (pass) => PASS_REGION_CONTRACT[pass] !== 'full-frame',
+  );
   const renderTargets: PostRenderTargetPlan[] = [
     target(
       'composer-a',
@@ -100,7 +129,6 @@ export function postPipelinePlan(input: PostPlanInput): PostPipelinePlan {
     );
   }
 
-  const composerPasses: PostPipelinePlan['composerPasses'][number][] = [scenePass];
   const fullscreenStages: PostFullscreenStagePlan[] = [];
   let aoQuality: PostPipelinePlan['scene']['aoQuality'] = null;
   let aoScale: PostPipelinePlan['scene']['aoScale'] = null;
@@ -129,7 +157,6 @@ export function postPipelinePlan(input: PostPlanInput): PostPipelinePlan {
   }
 
   if (useBloom) {
-    composerPasses.push('bloom');
     renderTargets.push(target('bloom-bright', 0.5, 'rgba16f'));
     fullscreenStages.push(stage('bloom-high-pass', 0.5, [sceneTarget], 'bloom-bright'));
     let bloomInput = 'bloom-bright';
@@ -154,18 +181,25 @@ export function postPipelinePlan(input: PostPlanInput): PostPipelinePlan {
     );
   }
 
-  composerPasses.push('output-grade');
+  let composerReadTarget = sceneTarget;
+  const gradeOutput = hasSwappingTail ? otherComposerTarget(composerReadTarget) : 'canvas';
   fullscreenStages.push(
-    stage('output-grade', 1, useBloom ? [sceneTarget, 'bloom-h-0'] : [sceneTarget], outputTarget),
+    stage('output-grade', 1, useBloom ? [sceneTarget, 'bloom-h-0'] : [sceneTarget], gradeOutput),
   );
+  if (gradeOutput !== 'canvas') composerReadTarget = gradeOutput;
+
+  if (useScreenFx) {
+    const screenFxOutput = useSmaa ? otherComposerTarget(composerReadTarget) : 'canvas';
+    fullscreenStages.push(stage('screen-fx', 1, [composerReadTarget], screenFxOutput));
+    if (screenFxOutput !== 'canvas') composerReadTarget = screenFxOutput;
+  }
 
   if (useSmaa) {
-    composerPasses.push('smaa');
     renderTargets.push(target('smaa-edges', 1, 'rgba16f'), target('smaa-weights', 1, 'rgba16f'));
     fullscreenStages.push(
-      stage('smaa-edges', 1, [outputTarget], 'smaa-edges'),
+      stage('smaa-edges', 1, [composerReadTarget], 'smaa-edges'),
       stage('smaa-weights', 1, ['smaa-edges'], 'smaa-weights'),
-      stage('smaa-blend', 1, [outputTarget, 'smaa-weights'], 'canvas'),
+      stage('smaa-blend', 1, [composerReadTarget, 'smaa-weights'], 'canvas'),
     );
   }
 
@@ -177,8 +211,9 @@ export function postPipelinePlan(input: PostPlanInput): PostPipelinePlan {
     },
     composerPasses,
     singleComposerBuffer,
+    supportsDynamicResolution,
     composerSamples,
-    resolveCount: composerSamples > 0 ? (useSmaa ? 2 : 1) : 0,
+    resolveCount: composerSamples > 0 ? 1 + Number(useScreenFx) + Number(useSmaa) : 0,
     renderTargets,
     fullscreenStages,
   };

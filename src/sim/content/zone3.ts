@@ -331,6 +331,19 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     family: 'ogre',
     elite: true,
     boss: true,
+    // THREE MINUTES (7.2 * 25), the shipped cadence for a quest kill target
+    // (Old Cragmaw, Captain Verlan). He declared no cadence at all before, and
+    // boss/elite do not feed the respawn policy (only respawnMult or rare: true
+    // do), so he silently inherited the open-world TRASH timer and was 24% of
+    // the whole Glimmermere corridor's gold by himself.
+    //
+    // The fix is NOT a long boss cadence, even though his loot is priced with
+    // Marrowlord Varkas (1hr) and Brutok Skullsmasher (3hr): q_drogmar has a
+    // hard kill objective on him at suggestedPlayers 3, so a party would sit
+    // waiting, and queue behind other parties, for a REQUIRED quest step. He
+    // has to stay available, which makes coin rather than cadence the lever
+    // (see the loot table below).
+    respawnMult: 7.2,
     hpBase: 200,
     hpPerLevel: 30,
     dmgBase: 12,
@@ -345,8 +358,14 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     // drawn-out fight snowballs, so burn him down or kite him off you to bleed
     // the stacks back off.
     rampage: { ap: 20, maxStacks: 5, duration: 10, name: 'Mounting Rage', school: 'physical' },
+    // 650 guaranteed copper, matching Marrowlord Varkas. His TOTAL value per
+    // kill was always in line with his neighbours (3285 against Varkas's 3222
+    // and Brutok's 2557); what was out of line was the SPLIT, at 2000 coin
+    // against their 650 and 320. Since he must stay on a quest-friendly three
+    // minutes, this is the knob that keeps the corridor honest, and it leaves
+    // all three unique drops intact so the kill still pays like a boss.
     loot: [
-      { copper: 2000, chance: 1 },
+      { copper: 650, chance: 1 },
       { itemId: 'drogmar_warboots', chance: 0.3 },
       { itemId: 'drogmars_skullcleaver', chance: 0.25 },
       { itemId: 'thunderward_legguards', chance: 0.25 },
@@ -1147,7 +1166,9 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
       'windguard_leggings',
       // Gathering tools (#2343: every node harvest needs a matching tool, so
       // each zone hub stocks the tiers its own nodes use; Thornpeak has
-      // tier-1 through tier-3 nodes). Tiered rods stay a Wilkes exclusive.
+      // tier-1 through tier-3 nodes). Rods follow the same rule now that
+      // water has a tier: the silverstream row below is this hub's rung, and
+      // Wilkes keeps the whole ladder as the buy-ahead counter (R20).
       'copper_mining_pick',
       'iron_mining_pick',
       'mithril_mining_pick',
@@ -1158,16 +1179,18 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
       'bronze_sickle',
       'silverleaf_sickle',
       'simple_fishing_pole',
+      // The peaks take a tier-3 rod (professions/fishing_zones.ts): the same
+      // rule the land tools above follow, now that fishing water has a tier of
+      // its own. Trader Wilkes keeps the whole rod ladder as the one place you
+      // can buy ahead; this row is so you never have to.
+      'silverstream_fishing_rod',
       // Tier 4/5 station-recipe reagents (items.ts): Bree is the Highwatch
-      // trade-goods vendor, so every station-bound (stationType) recipe has
-      // a live reagent source (prog_tools_of_the_trade needs at least one
-      // station craft to be possible).
-      'thorium_ore',
+      // trade-goods vendor, but she carries only arcanite_bar, the one premium
+      // reagent that is refined rather than gathered (no node anywhere yields
+      // it). The other five (thorium_ore, ashwood_log, elderwood_log,
+      // goldleaf_herb, sunpetal_herb) are node yields, and no NPC stocks a
+      // gathered material (professions.md, Locked rulings).
       'arcanite_bar',
-      'ashwood_log',
-      'elderwood_log',
-      'goldleaf_herb',
-      'sunpetal_herb',
     ],
     greeting:
       'Wool, hardtack, and steel-shod boots — Highwatch runs on all three, and I am short of everything.',
@@ -1394,7 +1417,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Old Cragmaw',
     giverNpcId: 'captain_thessaly',
     turnInNpcId: 'captain_thessaly',
-    text: 'The mountain folk put a name to the prints my scout found: Old Cragmaw, a scar-pelted tyrant of a cat that has outlived three generations of its own pack. It is the reason the stalkers flood my road, $N. Its den sits on the western ridge above the road south. Bring a friend, and put the old devil down.',
+    text: 'The mountain folk put a name to the prints my scout found: Old Cragmaw, a scar-pelted tyrant of a cat that has outlived three generations of its own pack. It is the reason the stalkers flood my road, $N. Its den sits on the eastern ridge above the road south. Bring a friend, and put the old devil down.',
     completionText:
       'Down at last. The mountain folk swore that cat would outlive the wall itself. The stalkers will keep to their high snows now, $N, and my patrols will walk the road without bleeding for it. The whole ridge is quieter for your work.',
     objectives: [
@@ -1851,7 +1874,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Graves of the Forgotten',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
-    text: 'I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the eastern rise, High Priest Malric near the central broken road, and Royal Assassin Voss by the western cliff. Touch each grave and listen, $N. The dead may remember what the living forgot.',
+    text: 'I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the western rise, High Priest Malric further south along the western edge, and Royal Assassin Voss by the eastern cliff. Touch each grave and listen, $N. The dead may remember what the living forgot.',
     completionText:
       'Aldren remained loyal, Malric refused to accept death, and Voss saw the danger before anyone else. All three served the same forgotten king.',
     objectives: [
@@ -1885,7 +1908,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'The Abandoned Crypt',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
-    text: "The visions point to the abandoned crypt in the western cliff. There is an old legend that the crypt housed a king. Perhaps Thornpeak sealed him below after Malric's ritual twisted him into something deathless. Enter the crypt and see what remains inside.",
+    text: "The visions point to the abandoned crypt in the eastern cliff. There is an old legend that the crypt housed a king. Perhaps Thornpeak sealed him below after Malric's ritual twisted him into something deathless. Enter the crypt and see what remains inside.",
     completionText:
       "The keystone halves fit together, and Voss's diary names what they sealed: the signet of King Nythraxis. If the diary is true, that signet is the key to his tomb.",
     objectives: [

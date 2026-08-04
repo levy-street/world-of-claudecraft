@@ -467,7 +467,9 @@ describe('text_sprite_cache: the bound and its eviction', () => {
       ...ZONES.map((zone) => overworldDungeonPortals(DUNGEON_LIST, zone.zMin, zone.zMax).length),
     );
     const zoneTitle = 1;
-    const questGiverGlyphs = 2;
+    // Gold '?', gold '!', and the phase 23 repeat-blue '!' (the cooldown
+    // variant dims the blue raster at blit time, minting no fourth sprite).
+    const questGiverGlyphs = 3;
 
     const worstCase =
       allyNames + badgeDigits + poiLabels + portalNames + zoneTitle + questGiverGlyphs;
@@ -482,8 +484,8 @@ describe('text_sprite_cache: the bound and its eviction', () => {
     // quotes, which is the other direction the check below cannot see.
     expect(
       worstCase,
-      'the header quotes 370; a SMALLER total means a term broke',
-    ).toBeGreaterThanOrEqual(370);
+      'the header quotes 371; a SMALLER total means a term broke',
+    ).toBeGreaterThanOrEqual(371);
     expect(
       TEXT_SPRITE_LIMIT,
       `worst case grew to ${worstCase}: raise TEXT_SPRITE_LIMIT above it, or the map thrashes`,

@@ -247,3 +247,47 @@ export function parseChatTabs(raw: string | null): ChatOpenTab[] {
 export function serializeChatTabs(tabs: ChatOpenTab[]): string {
   return JSON.stringify(tabs);
 }
+
+// Reorder an open-tab list by moving `moved` to sit immediately before `before`
+// (dragging a tab onto a sibling), or to the end of the list when `before` is
+// null (dragging onto the "+" add button) or equal to `moved` itself (dropped
+// on its own position). Every no-op, including one where the computed order
+// happens to match the input (dragging a tab onto the neighbor it already
+// sits before, or dropping the last tab on "+"), returns the ORIGINAL `tabs`
+// reference, not just an equal-looking copy, so a caller can compare by
+// reference to decide whether anything actually needs a rerender/persist.
+// Defensive like the rest of this module: an unknown `moved` id, or a
+// `before` id no longer in the list (a stale drag target from a tab that
+// closed mid-gesture), is one more such no-op.
+export function reorderChatTabs(
+  tabs: ChatOpenTab[],
+  moved: ChatOpenTab,
+  before: ChatOpenTab | null,
+): ChatOpenTab[] {
+  if (!tabs.includes(moved)) return tabs;
+  if (before !== null && (before === moved || !tabs.includes(before))) return tabs;
+  const rest = tabs.filter((tab) => tab !== moved);
+  let next: ChatOpenTab[];
+  if (before === null) {
+    next = [...rest, moved];
+  } else {
+    const index = rest.indexOf(before);
+    next = [...rest.slice(0, index), moved, ...rest.slice(index)];
+  }
+  return next.every((tab, i) => tab === tabs[i]) ? tabs : next;
+}
+
+// Swap `moved` with its immediate left (`step: -1`) or right (`step: 1`)
+// neighbor: the keyboard-accessible non-drag reorder path (Alt+ArrowLeft /
+// Alt+ArrowRight on a focused tab), which reaches the same persisted order as
+// a drag. A no-op (returns the input unchanged) at either edge of the list or
+// for an id the list does not contain.
+export function stepChatTab(tabs: ChatOpenTab[], moved: ChatOpenTab, step: -1 | 1): ChatOpenTab[] {
+  const index = tabs.indexOf(moved);
+  if (index < 0) return tabs;
+  const target = index + step;
+  if (target < 0 || target >= tabs.length) return tabs;
+  const next = [...tabs];
+  [next[index], next[target]] = [next[target], next[index]];
+  return next;
+}

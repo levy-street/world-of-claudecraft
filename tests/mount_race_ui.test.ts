@@ -63,7 +63,9 @@ describe('show-jumping race UI wiring', () => {
   });
 
   it('shows the lesson completion prompt as localized subtext and clears it for later banners', () => {
-    expect(hudTs).toContain("t('hudChrome.mountTraining.returnToMarla'), 6000");
+    expect(hudTs).toMatch(
+      /showBanner\(\s*summary,\s*true,\s*undefined,\s*'default',\s*t\('hudChrome\.mountTraining\.returnToMarla'\),\s*6000,?\s*\)/,
+    );
     expect(hudTs).toContain("this.bannerEl.classList.toggle('has-subtext', !!subtext)");
     expect(hudTs).toContain('this.bannerEl.replaceChildren()');
     expect(hudCss).toContain('#banner .banner-subtext');

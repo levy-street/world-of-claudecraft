@@ -6,8 +6,9 @@ import {
   resolveHarvest,
   rollMaterialRarity,
 } from '../src/sim/professions/gathering';
+import { canGatherTier, slotEffect, type ToolEffectSlot } from '../src/sim/professions/tools';
 import { Rng } from '../src/sim/rng';
-import type { PlayerMeta } from '../src/sim/sim';
+import { type PlayerMeta, Sim } from '../src/sim/sim';
 
 const TIERS: MaterialRarity[] = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
 
@@ -52,10 +53,13 @@ describe('material rarity roll (#1122)', () => {
     const node = GATHER_NODES[0];
     // Only the fields resolveHarvest touches; the full PlayerMeta shape is not
     // needed for this leaf-level pin (same convention as AnySim/AnyEntity).
+    // `inventory` is one of those fields since D8: the material grade is
+    // resolved from the player's best matching tool.
     const meta = {
       gatheringProficiency: { mining: 50, logging: 50, herbalism: 50 },
       nodeHarvestReadyAt: { [node.id]: 1000 },
       pendingGatherGrants: [],
+      inventory: [{ itemId: 'copper_mining_pick', count: 1 }],
     } as unknown as PlayerMeta;
     let draws = 0;
     const rng = new Rng(1);
@@ -150,5 +154,125 @@ describe('material rarity roll (#1122)', () => {
       const tier = rollMaterialRarity(50, rng);
       expect(TIERS).toContain(tier);
     }
+  });
+});
+
+// A slotted tool effect must be invisible to the rng stream. The harvest path
+// is pinned at exactly two draws per granted harvest and zero on a denial, and
+// that pin is only worth having if it holds for EVERY player: an effect that
+// spent a draw would mean two players standing at the same vein walked
+// different streams depending on what one of them had slotted.
+describe('a slotted tool effect changes the yield and never the draw stream', () => {
+  const ORE_NODE = GATHER_NODES.find((n) => n.type === 'ore' && n.zoneId === 'eastbrook_vale');
+
+  function metaWith(slot?: ToolEffectSlot): PlayerMeta {
+    return {
+      gatheringProficiency: { mining: 50, logging: 50, herbalism: 50 },
+      nodeHarvestReadyAt: {},
+      pendingGatherGrants: [],
+      inventory: [{ itemId: 'copper_mining_pick', count: 1 }],
+      ...(slot ? { toolEffectSlots: { mining: slot } } : {}),
+    } as unknown as PlayerMeta;
+  }
+
+  function drawsFor(slot: ToolEffectSlot | undefined, seed: number): number[] {
+    const values: number[] = [];
+    const rng = new Rng(seed);
+    rng.setObserver((v) => values.push(v));
+    resolveHarvest(metaWith(slot), ORE_NODE!, 0, rng);
+    rng.setObserver(null);
+    return values;
+  }
+
+  it('draws the same VALUES, not merely the same count, with and without a slot', () => {
+    if (!ORE_NODE) throw new Error('no eastbrook ore node');
+    const without = drawsFor(undefined, 4242);
+    expect(without).toHaveLength(2); // the pinned contract itself
+    // The charm row below builds a state the live game can no longer reach
+    // (R9 refuses it at the mint and drops it at load); it stays as defense
+    // in depth for the slotEffect leaf itself, not as live-path coverage, so
+    // do not delete it as dead or mistake it for one.
+    for (const effectId of ['gatherers_cache', 'artisans_eye', 'quickening_charm'] as const) {
+      const withSlot = drawsFor(slotEffect(effectId, { toolRarity: 'epic' }), 4242);
+      expect(withSlot, `${effectId} moved the stream`).toEqual(without);
+    }
+  });
+
+  it('a denial still draws nothing when an effect is slotted', () => {
+    if (!ORE_NODE) throw new Error('no eastbrook ore node');
+    const meta = metaWith(slotEffect('gatherers_cache'));
+    meta.nodeHarvestReadyAt[ORE_NODE.id] = 1000;
+    let draws = 0;
+    const rng = new Rng(7);
+    rng.setObserver(() => {
+      draws += 1;
+    });
+    const result = resolveHarvest(meta, ORE_NODE, 0, rng);
+    rng.setObserver(null);
+    expect(result.granted).toBe(false);
+    expect(draws).toBe(0);
+    // And the refused harvest spent no charge either.
+    expect(meta.toolEffectSlots?.mining?.durability).toBe(slotEffect('gatherers_cache').durability);
+  });
+
+  it('a quantity effect adds units at the resolver and spends NOTHING there (R42)', () => {
+    if (!ORE_NODE) throw new Error('no eastbrook ore node');
+    const plain = resolveHarvest(metaWith(), ORE_NODE, 0, new Rng(4242));
+    const slot = slotEffect('gatherers_cache', { toolRarity: 'rare' });
+    const before = slot.durability;
+    const meta = metaWith(slot);
+    const bonused = resolveHarvest(meta, ORE_NODE, 0, new Rng(4242));
+    expect(bonused.qty).toBe((plain.qty ?? 0) + 1);
+    // The charge settle moved to the command boundary, which alone can see
+    // whether the extra unit survived capacity truncation (R42): the bare
+    // resolver never spends, and it hands the boundary the same-draw
+    // counterfactual instead. The boundary-side spend and keep arms live in
+    // tests/gather_node_harvest.test.ts.
+    expect(slot.durability).toBe(before);
+    expect(bonused.effectApplied).toBe(true);
+    expect(bonused.baseQty).toBe(plain.qty);
+    expect(bonused.baseItemId).toBe(plain.itemId);
+  });
+
+  it('a quality effect yields the fine grade, and still opens no node the tool cannot', () => {
+    if (!ORE_NODE) throw new Error('no eastbrook ore node');
+    // A tier-1 pick at a tier-1 Eastbrook vein does NOT outclass the material,
+    // so the plain grade is what it yields. The quality effect is what tips it.
+    const plain = resolveHarvest(metaWith(), ORE_NODE, 0, new Rng(4242));
+    expect(plain.itemId).toBe('copper_ore');
+    const withEye = resolveHarvest(
+      metaWith(slotEffect('artisans_eye')),
+      ORE_NODE,
+      0,
+      new Rng(4242),
+    );
+    expect(withEye.itemId).toBe('fine_copper_ore');
+    // Access is untouched, proven through the REAL command rather than the
+    // helper in isolation: the old pin here called canGatherTier(1, 2), which
+    // stays false even if harvestNode started feeding the BOOSTED tier into
+    // the access gate, the exact regression it claimed to guard. Drive the
+    // command: a tier-1 pick with a slotted quality effect at a tier-2 vein
+    // must be denied at harvestNode, with the denial naming the real tier.
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Access');
+    sim.addItem('copper_mining_pick', 1, pid);
+    sim.addItem('artisans_eye', 1, pid); // the charm the slot consumes
+    sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
+    const slotted = (sim.players.get(pid) as PlayerMeta).toolEffectSlots?.mining;
+    expect(slotted?.effectId, 'the effect really is slotted').toBe('artisans_eye');
+    const t2 = GATHER_NODES.find((n) => n.id === 'ore_mirefen_t2');
+    if (!t2) throw new Error('missing ore_mirefen_t2');
+    const p = sim.entities.get(pid);
+    if (!p) throw new Error('missing player entity');
+    p.pos.x = t2.pos.x;
+    p.pos.z = t2.pos.z;
+    p.prevPos = { ...p.pos };
+    sim.drainEvents();
+    expect(sim.harvestNode(t2.id, undefined, pid)).toBe(false);
+    expect(sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
+      { type: 'gatherDenied', pid, surface: 'node', professionId: 'mining', requiredTier: 2 },
+    ]);
+    // The helper-level statement of the same separation still holds.
+    expect(canGatherTier(1, 2)).toBe(false);
   });
 });

@@ -8,6 +8,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, PlayerClass } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // Vitest default (5 s) is far too tight for the 240 s simulated window: after
 // the upstream merge each case runs ~17 s even on an unloaded machine, and
@@ -34,8 +35,15 @@ export type Setup = {
 
 // One identical fight per case: same seed, same mob, same window; only the
 // defender's build differs. Returns landed swings and crits taken.
+// Hand-spawned wolf only: empty ambient world so 240 s of ticks stay cheap
+// (subsystem-world pattern; does not change hit/crit assertions).
 export function critsTaken(setup: Setup): { hits: number; crits: number } {
-  const sim = new Sim({ seed: SEED, playerClass: 'warrior', noPlayer: true });
+  const sim = new Sim({
+    seed: SEED,
+    playerClass: 'warrior',
+    noPlayer: true,
+    world: EMPTY_TEST_WORLD,
+  });
   const pid = sim.addPlayer(setup.cls, 'Defender');
   sim.setPlayerLevel(20, pid);
   if (setup.spec) sim.applyTalents({ spec: setup.spec, rows: {} }, pid);

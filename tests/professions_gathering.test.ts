@@ -3,6 +3,7 @@ import { GATHERING_PROFESSIONS } from '../src/sim/content/professions';
 import {
   drainGatheringGrants,
   emptyGatheringProficiency,
+  foldPendingGatherGrants,
   GATHER_GAIN_TIER_STEP,
   gatherNodeGainMultiplier,
   normalizeGatheringProficiency,
@@ -252,6 +253,74 @@ describe('gathering profession proficiency (#1119)', () => {
     sim.tick(); // one tick = DT = 1/20 second
     expect(meta.pendingGatherGrants.length).toBe(0);
     expect(meta.gatheringProficiency.mining).toBe(5);
+  });
+
+  it('a save between the queueing tick and the draining tick folds the grant in', () => {
+    // The leave-time hazard: a harvest or reel-landed catch queues its grant
+    // for the NEXT tick's drain, and a leave-time save can run in between.
+    // The save folds the queue in (foldPendingGatherGrants); the live meta is
+    // untouched, so the tick-path drain doctrine holds unchanged.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.chat('/dev gather mining 5', pid);
+    const meta = (sim as any).players.get(pid);
+    expect(meta.pendingGatherGrants.length).toBe(1); // still queued, undrained
+    const state = (sim as any).serializeCharacter(pid);
+    // BOTH persisted keys carry the folded value (the legacy dual-write too).
+    expect(state.gatheringProficiency.mining).toBe(5);
+    expect(state.professions.mining).toBe(5);
+    // The fold never mutated the live player: queue intact, counter unmoved.
+    expect(meta.pendingGatherGrants.length).toBe(1);
+    expect(meta.gatheringProficiency.mining).toBe(0);
+
+    // Loading that save resumes with the grant applied and nothing queued.
+    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const loadedPid = sim2.addPlayer('warrior', 'Kept', { state });
+    const meta2 = (sim2 as any).players.get(loadedPid);
+    expect(meta2.gatheringProficiency.mining).toBe(5);
+    expect(meta2.pendingGatherGrants).toEqual([]);
+
+    // No double-apply on the session that kept playing: the tick drains the
+    // same grant the earlier save already folded, and a later save agrees.
+    sim.tick();
+    expect(meta.gatheringProficiency.mining).toBe(5);
+    expect((sim as any).serializeCharacter(pid).gatheringProficiency.mining).toBe(5);
+  });
+
+  it('the save-time fold clamps at the content cap exactly like the tick drain', () => {
+    const meta: any = {
+      pendingGatherGrants: [],
+      gatheringProficiency: { ...emptyGatheringProficiency(), mining: 98 },
+    };
+    queueGatheringGrant(meta, 'mining', 5);
+    const folded = foldPendingGatherGrants(meta);
+    // The literal cap, not GATHERING_PROFESSIONS.mining.maxSkill: production
+    // reads that same constant, so a self-comparison would move with a cap
+    // edit instead of catching it.
+    expect(folded.mining).toBe(100); // 98 + 5 clamps to the mining content cap
+    expect(folded.logging).toBe(0); // untouched professions stay put
+    // Pure: the live record and queue are exactly as they were.
+    expect(meta.gatheringProficiency.mining).toBe(98);
+    expect(meta.pendingGatherGrants.length).toBe(1);
+  });
+
+  it('the fold applies every queued grant, not just the first', () => {
+    // A multi-grant queue is reachable (two /dev gather commands in one tick,
+    // or a harvest completion plus a /dev gather before the next drain), and
+    // the fold's contract covers ANY queue shape regardless, so its own loop
+    // needs a multi-grant arm: same profession accumulating into the clamp,
+    // plus a second profession that must not be dropped.
+    const meta: any = {
+      pendingGatherGrants: [],
+      gatheringProficiency: { ...emptyGatheringProficiency(), mining: 98 },
+    };
+    queueGatheringGrant(meta, 'mining', 1);
+    queueGatheringGrant(meta, 'logging', 2);
+    queueGatheringGrant(meta, 'mining', 1);
+    const folded = foldPendingGatherGrants(meta);
+    expect(folded.mining).toBe(100); // 98 + 1 + 1, exactly at the cap
+    expect(folded.logging).toBe(2);
+    expect(meta.pendingGatherGrants.length).toBe(3); // still pure
   });
 
   it('the /dev gather cheat is gated by devCommands (never a bypass path)', () => {

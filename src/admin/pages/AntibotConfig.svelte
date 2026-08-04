@@ -412,8 +412,8 @@
     border-color: var(--border-subtle);
   }
   .ac-save.ac-save-dirty {
-    background: linear-gradient(#4a3a14, #241c08);
-    color: var(--gold);
+    background: linear-gradient(var(--btn-accent-grad-from), var(--btn-accent-grad-to));
+    color: var(--btn-accent-text);
     border-color: var(--gold-dim);
     font-family: var(--title-font);
     font-weight: 600;

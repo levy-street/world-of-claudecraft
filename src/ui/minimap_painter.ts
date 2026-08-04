@@ -57,6 +57,10 @@ const PLAYER_ARROW_OUTLINE_WIDTH = 1;
 // "actionable" against the dimmer, outline-less cooldown dot.
 const GATHER_NODE_READY_RADIUS = 3;
 const GATHER_NODE_COOLDOWN_RADIUS = 2;
+// How far the lock strike's diagonal overshoots the node disc on each side,
+// so the line reads as a strike THROUGH the dot rather than a chord inside
+// it, at both disc radii.
+const LOCK_STRIKE_OVERREACH = 1.5;
 // Crafting station: an outlined diamond (rotated-square silhouette) so it reads
 // apart from the round gather dots and the axis-aligned loot/mob squares at
 // minimap scale. Half-diagonal in px.
@@ -108,6 +112,12 @@ const NPC_GLYPH_OFFSET_Y = 3;
 const NPC_GLYPH_SPRITE_SIZE = 16;
 const NPC_GLYPH_SPRITE_ORIGIN_X = 2;
 const NPC_GLYPH_SPRITE_BASELINE_Y = 12;
+// The cooldown variant's dim: the repeat-blue '!' blitted at this globalAlpha
+// (a work order inside its cadence window, marked where the NPC previously
+// showed nothing). Applied at drawImage time so the sprite cache stays at one
+// raster per (glyph, color); matches .np-marker.cooldown's opacity so the
+// nameplate and minimap dim identically.
+const NPC_GLYPH_COOLDOWN_ALPHA = 0.55;
 
 // Corpse marker (ghost run): a compact procedural skull, drawn from canvas
 // primitives (cranium + jaw in the corpse color, eye sockets and a nasal notch
@@ -153,11 +163,15 @@ function drawCorpseSkull(
 
 // The `--color-minimap-*` design tokens the painter resolves once and caches (they are
 // static; see resolveColors). These mirror the colors the inline overworld minimap used
-// verbatim.
-const MINIMAP_COLOR_TOKENS = {
+// verbatim. Exported so the suite pins EVERY entry against tokens.css: a token missing
+// there freezes as '' for the whole session once resolveColors caches (the glyph then
+// draws default black on every redraw), and a hand-copied test list cannot see a new
+// entry it was never told about.
+export const MINIMAP_COLOR_TOKENS = {
   allyFriend: '--color-minimap-ally-friend',
   allyGuild: '--color-minimap-ally-guild',
   npcQuest: '--color-minimap-npc-quest',
+  npcQuestRepeat: '--color-minimap-npc-quest-repeat',
   portal: '--color-minimap-portal',
   objectLoot: '--color-minimap-object-loot',
   mobAggro: '--color-minimap-mob-aggro',
@@ -209,8 +223,9 @@ export class MinimapPainter {
   // NPC glyph sprites (see the NPC_GLYPH_* header), keyed color -> glyph. Nested rather
   // than one map on a `${glyph}|${color}` composite so the per-marker lookup in the draw
   // loop allocates NO key string. Bounded without eviction by construction: NpcGlyph is a
-  // closed three-member union and resolveColors freezes one color set for the session, so
-  // the live map holds at most three sprites of 16x16 each.
+  // closed three-member union and resolveColors freezes TWO glyph colors for the session
+  // (the gold npcQuest and the repeat blue), so the live map holds at most six sprites of
+  // 16x16 each (the cooldown variant dims the repeat sprite at blit time, no extra raster).
   private readonly glyphSprites = new Map<string, Map<NpcGlyph, HTMLCanvasElement>>();
 
   constructor(
@@ -283,7 +298,8 @@ export class MinimapPainter {
     ctx.drawImage(bg, sx, sy, sw, sw, 0, 0, S, S);
 
     // Sharp overlay: the current zone's own high-res background, placed by its
-    // world rect so the player sits at centre. +X is map-left, +Z is map-down.
+    // world rect so the player sits at centre. +X is map-left, +Z is map-up
+    // (R61: maxZ lands at the bitmap top).
     if (zoneBg) {
       const r = zoneBg.region;
       const half = S / 2;
@@ -413,7 +429,7 @@ export class MinimapPainter {
           ctx.fill();
           ctx.stroke();
           break;
-        case 'npc':
+        case 'npc': {
           // Blit the cached glyph sprite so its internal fillText origin lands on the
           // inline site's (mx - 2, my + 3) anchor.
           //
@@ -433,12 +449,23 @@ export class MinimapPainter {
           // The tradeoff, deliberately taken: the glyph now snaps to whole pixels where
           // fillText advanced it in quarter-pixel steps. At the minimap's 1.7 px/yard base
           // scale that is a sub-pixel marker shift on a surface that redraws at 10Hz.
+          //
+          // Color by the folded marker state: gold for ready/available and the
+          // neutral dot, the repeat token for a completed repeatable, and the
+          // repeat token dimmed for a work order inside its cadence window.
+          const repeatColored = m.marker === 'repeat' || m.marker === 'cooldown';
+          // Restore the PRIOR alpha, not a literal 1: nothing else dims this
+          // context today, but a literal would hardcode that caller state.
+          const priorAlpha = ctx.globalAlpha;
+          if (m.marker === 'cooldown') ctx.globalAlpha = NPC_GLYPH_COOLDOWN_ALPHA;
           ctx.drawImage(
-            this.npcGlyphSprite(m.glyph, colors.npcQuest),
+            this.npcGlyphSprite(m.glyph, repeatColored ? colors.npcQuestRepeat : colors.npcQuest),
             Math.round(m.mx - NPC_GLYPH_OFFSET_X - NPC_GLYPH_SPRITE_ORIGIN_X),
             Math.round(m.my + NPC_GLYPH_OFFSET_Y - NPC_GLYPH_SPRITE_BASELINE_Y),
           );
+          if (m.marker === 'cooldown') ctx.globalAlpha = priorAlpha;
           break;
+        }
         case 'portal':
           ctx.fillStyle = colors.portal;
           ctx.beginPath();
@@ -545,27 +572,43 @@ export class MinimapPainter {
           ctx.fill();
           ctx.stroke();
           break;
-        case 'gather-node':
+        case 'gather-node': {
           // Tool-tier lock (Professions 2.0) composes with the
           // respawn state: a locked node keeps the ready/cooldown silhouette
           // (radius + outline) but the locked tint replaces the state color,
           // so both dimensions stay readable at once. Actionable info on
           // every graphics tier (fairness invariant: never preset-gated).
+          const radius = m.ready ? GATHER_NODE_READY_RADIUS : GATHER_NODE_COOLDOWN_RADIUS;
           if (m.ready) {
             ctx.fillStyle = m.locked ? colors.gatherLocked : colors.gatherReady;
             ctx.strokeStyle = colors.outline;
             ctx.lineWidth = MARKER_OUTLINE_WIDTH;
             ctx.beginPath();
-            ctx.arc(m.mx, m.my, GATHER_NODE_READY_RADIUS, 0, FULL_CIRCLE);
+            ctx.arc(m.mx, m.my, radius, 0, FULL_CIRCLE);
             ctx.fill();
             ctx.stroke();
           } else {
             ctx.fillStyle = m.locked ? colors.gatherLocked : colors.gatherCooldown;
             ctx.beginPath();
-            ctx.arc(m.mx, m.my, GATHER_NODE_COOLDOWN_RADIUS, 0, FULL_CIRCLE);
+            ctx.arc(m.mx, m.my, radius, 0, FULL_CIRCLE);
             ctx.fill();
           }
+          // The non-hue lock cue (the UX pass, DESIGN.md color independence:
+          // every state pairs color with a second signal): a locked node
+          // carries a diagonal strike through its disc on BOTH respawn
+          // silhouettes, so the lock never rides tint alone. Outline-colored,
+          // so it reads on either fill at every marker size.
+          if (m.locked) {
+            const reach = radius + LOCK_STRIKE_OVERREACH;
+            ctx.strokeStyle = colors.outline;
+            ctx.lineWidth = MARKER_OUTLINE_WIDTH;
+            ctx.beginPath();
+            ctx.moveTo(m.mx - reach, m.my + reach);
+            ctx.lineTo(m.mx + reach, m.my - reach);
+            ctx.stroke();
+          }
           break;
+        }
       }
     }
   }

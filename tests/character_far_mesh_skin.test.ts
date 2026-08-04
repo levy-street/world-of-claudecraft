@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 // Bug: the far-LOD baked character mesh ignored the player's selected body
 // skin. tintedFarMaterials() baked this.farMaterials once in the
 // CharacterVisual constructor with no skin/emissive texture ever passed, and

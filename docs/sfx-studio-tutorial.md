@@ -16,15 +16,16 @@ Install dependencies (this also downloads the bundled FFmpeg and FFprobe static
 binaries the Studio spawns; no system install is needed) and start the Studio:
 
 ```bash
-npm ci
-npm run sfx:studio
+npm install -g pnpm@10.34.5   # once per machine; match package.json packageManager
+pnpm install --frozen-lockfile
+pnpm run sfx:studio
 ```
 
 The command prints the local URL, normally `http://127.0.0.1:5181`. Open that
 URL in a browser. To choose another port, run:
 
 ```bash
-npm run sfx:studio -- --port 5182
+pnpm run sfx:studio -- --port 5182
 ```
 
 Only one Studio process can use a repository at a time. Stop it with `Ctrl-C`
@@ -284,7 +285,8 @@ npm run gate
 
 `FFmpeg is unavailable`
 : The bundled `ffmpeg-static`/`ffprobe-static` binaries are missing (an install
-  that skipped package scripts leaves them undownloaded). Rerun `npm ci`. A `PATH`
+  that skipped package scripts leaves them undownloaded). Rerun
+  `pnpm install --frozen-lockfile`. A `PATH`
   FFmpeg install only restores playback and encoding (which fall back via
   `scripts/sfx/ffmpeg_paths.mjs`); the production bundle export validates with the
   static binaries directly and stays broken until they are reinstalled.

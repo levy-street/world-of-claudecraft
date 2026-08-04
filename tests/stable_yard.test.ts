@@ -4,13 +4,28 @@
 import { describe, expect, it } from 'vitest';
 import { STABLE_PADDOCK, STABLE_PASTURE } from '../src/sim/content/mounts';
 import { ZONE3_PROPS } from '../src/sim/content/zone3';
+import { BUILTIN_WORLD } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import type { Entity } from '../src/sim/types';
+import type { Entity, WorldContent } from '../src/sim/types';
 
 const STABLE_HORSE = 'stable_horse';
 // The live world seed (src/main.ts). The stable yard sits on open ground west of
 // Highwatch at these heights (verified terrain facts in the task brief).
 const WORLD_SEED = 20061;
+
+// Ambient horses only: strip every other camp/NPC/object so the 200 s wander
+// window does not run continent AI. Stable horses are ambient (private rng
+// sub-stream; no shared-stream draws), so horse positions stay seed-stable
+// without the rest of the overworld roster.
+const STABLE_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: BUILTIN_WORLD.camps.filter((camp) => camp.mobId === STABLE_HORSE),
+  npcs: {},
+  groundObjects: [],
+};
+
+const makeStableSim = () =>
+  new Sim({ seed: WORLD_SEED, playerClass: 'warrior', autoEquip: true, world: STABLE_TEST_WORLD });
 
 const PADDOCK = STABLE_PADDOCK;
 const DIVIDER = STABLE_PADDOCK.divider;
@@ -95,7 +110,7 @@ describe('STABLE_PADDOCK geometry contract', () => {
 
 describe('ambient stable horses', () => {
   it('spawns exactly three, all in the north pasture', () => {
-    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', autoEquip: true });
+    const sim = makeStableSim();
     const hs = horses(sim);
     expect(hs).toHaveLength(3);
     for (const h of hs) {
@@ -106,7 +121,7 @@ describe('ambient stable horses', () => {
   // 90s budget: this drives a long real-world tick run (7 to 8s locally) and
   // has hit the 30s default under CI core contention.
   it('stays non-hostile, idle, and in the north pasture over a long run, and wanders', () => {
-    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', autoEquip: true });
+    const sim = makeStableSim();
     const hs = horses(sim);
     const spawns = hs.map((h) => ({ x: h.pos.x, z: h.pos.z }));
     let maxDisplacement = 0;
@@ -137,7 +152,7 @@ describe('ambient stable horses', () => {
   }, 90_000);
 
   it('cannot be targeted as an enemy, attacked, or damaged by a player', () => {
-    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', autoEquip: true });
+    const sim = makeStableSim();
     for (let t = 0; t < 5; t++) sim.tick(); // let the ambient arm settle hostility
     const horse = horses(sim)[0];
     const p = sim.player;
@@ -170,7 +185,7 @@ describe('ambient stable horses', () => {
 
   it('is deterministic (same seed -> same horse positions)', () => {
     const run = () => {
-      const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', autoEquip: true });
+      const sim = makeStableSim();
       for (let t = 0; t < 20 * 30; t++) sim.tick();
       return horses(sim)
         .map((h) => `${h.pos.x.toFixed(4)},${h.pos.z.toFixed(4)}`)
