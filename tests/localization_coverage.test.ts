@@ -387,6 +387,9 @@ describe('i18n Localization Key Coverage', () => {
     questKey: 'L',
     item: 'Rough Bracers',
     key: 'K',
+    // The death recap's slayer (hud.system.deathRecapKiller[Ability]): a mob
+    // or player display name spliced verbatim.
+    killer: 'Gnarltooth',
     kind: 'Weapon',
     slots: 14,
     label: 'Wolf',
