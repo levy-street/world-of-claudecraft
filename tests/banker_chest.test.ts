@@ -6,7 +6,7 @@ import {
   bankerChestPreloadInternalsForTest,
   isBankerNpcForRender,
 } from '../src/render/banker_chest';
-import { GFX } from '../src/render/gfx';
+import { GFX, gfxInternalsForTest } from '../src/render/gfx';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import type { NpcDef } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
@@ -140,9 +140,7 @@ describe('banker chest model and placement', () => {
   });
 
   it('keeps vertex colors when the low tier converts the source to Lambert', () => {
-    const mutableGfx = GFX as unknown as { standardMaterials: boolean };
-    const previousStandardMaterials = mutableGfx.standardMaterials;
-    mutableGfx.standardMaterials = false;
+    const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: false });
     try {
       const sourceMaterial = new THREE.MeshStandardMaterial({
         color: 0xffffff,
@@ -164,7 +162,7 @@ describe('banker chest model and placement', () => {
       expect(converted.emissiveIntensity).toBe(0.4);
       expect(converted.side).toBe(THREE.BackSide);
     } finally {
-      mutableGfx.standardMaterials = previousStandardMaterials;
+      restoreGfx();
     }
   });
 

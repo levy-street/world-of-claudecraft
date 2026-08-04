@@ -612,17 +612,16 @@ export class Editor3DViewport {
     cancelAnimationFrame(this.raf);
     this.raf = 0;
     if (this.renderer) {
-      try {
-        // Release renderer-owned workers, overlay canvases, and document
-        // listeners before the GL context and host surfaces disappear.
-        this.renderer.dispose();
-        this.renderer.editorCam = null;
-        this.renderer.webgl.setAnimationLoop(null);
-        this.renderer.webgl.dispose();
-        this.renderer.webgl.forceContextLoss();
-      } catch {
-        // GL teardown is best-effort.
-      }
+      const renderer = this.renderer;
+      renderer.editorCam = null;
+      void renderer
+        .shutdown()
+        .then(({ context }) => {
+          context.getExtension('WEBGL_lose_context')?.loseContext();
+        })
+        .catch(() => {
+          // GL teardown is best-effort.
+        });
     }
     this.renderer = null;
     this.sim = null;

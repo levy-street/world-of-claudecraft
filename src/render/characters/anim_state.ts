@@ -167,6 +167,24 @@ export function scanAnimRepair(
   return { starvedFrames: 0, repair: true };
 }
 
+/**
+ * Should the touchdown one-shot fire this frame?
+ *
+ * Rigs that ship a landing clip hold their jump pose for the whole airborne
+ * stretch (visual.ts clamps it, since a fall off a ledge outlasts any authored
+ * clip) and play the landing on the grounded edge instead. Death wins: a body
+ * that dies mid-air collapses rather than sticking a landing, and letting the
+ * one-shot through would fight the clamped death clip for the rig.
+ */
+export function shouldPlayLanding(
+  wasAirborne: boolean,
+  airborne: boolean,
+  dead: boolean,
+  hasLandClip: boolean,
+): boolean {
+  return hasLandClip && wasAirborne && !airborne && !dead;
+}
+
 export function desiredBaseState(s: AnimState, hasWalkBackClip: boolean): BaseState {
   if (s.swimming) return 'swim';
   if (s.airborne) return 'jump';

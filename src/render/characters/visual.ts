@@ -20,6 +20,7 @@ import {
   locomotionTimeScale,
   pickProxyHeight,
   scanAnimRepair,
+  shouldPlayLanding,
 } from './anim_state';
 import {
   applyMaterials,
@@ -389,6 +390,8 @@ export class CharacterVisual {
     effectiveWeight: 0,
   };
   private wasDead = false;
+  /** previous frame's airborne flag, for the touchdown edge (see ClipMap.land) */
+  private wasAirborne = false;
   private initialized = false;
   private attackIdx = 0;
   private hitCooldown = 0;
@@ -594,6 +597,17 @@ export class CharacterVisual {
     else if (!s.dead && this.wasDead) this.revive();
     this.wasDead = s.dead;
     this.initialized = true;
+
+    // Touchdown, edge-triggered locally like death/revive. Runs BEFORE the base
+    // machine below so its `currentIsOneShot` latch suppresses the jump->idle
+    // fade; onFinished then hands back to whatever base state we landed into.
+    const landClip = this.def.clips.land;
+    if (
+      landClip &&
+      shouldPlayLanding(this.wasAirborne, s.airborne, s.dead, !!this.action(landClip))
+    )
+      this.playOneShot(landClip, 1);
+    this.wasAirborne = s.airborne;
 
     if (!this.deadLock) {
       const desired = this.desiredBase(s);
@@ -1970,9 +1984,16 @@ export class CharacterVisual {
     next.play();
   }
 
-  /** sit-down transitions play once, then hand off to the sit-idle loop */
+  /** Base clips that play once and CLAMP instead of looping: a sit-down
+   *  transition (which then hands off to the sit-idle loop), and the jump clip
+   *  of a rig that ships a landing one-shot, which holds its airborne pose for
+   *  as long as the body is off the ground. Rigs without a `land` clip keep
+   *  looping `jump` unchanged. */
   private isOnce(a: THREE.AnimationAction): boolean {
-    return this.baseState === 'sit' && a === this.action(this.def.clips.sitDown);
+    if (this.baseState === 'sit') return a === this.action(this.def.clips.sitDown);
+    if (this.baseState === 'jump' && this.def.clips.land)
+      return a === this.action(this.def.clips.jump);
+    return false;
   }
 
   private playOneShot(
@@ -2098,6 +2119,7 @@ function clipNamesOf(def: VisualDef): string[] {
     c.sitIdle,
     c.swim,
     c.jump,
+    c.land,
     c.walkBack,
     c.flourish,
     c.stow,

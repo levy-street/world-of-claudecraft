@@ -1002,6 +1002,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.browserEffectsMinimal': '최소',
   'hudChrome.options.browserEffectsNote':
     '자동은 브라우저와 기기에 맞춰 무거운 CSS 효과(흐림, 글로우, 배경 모션)를 낮춥니다. 인터페이스가 느리게 느껴지면 수동으로 낮추세요.',
+  'hudChrome.options.graphicsApply': '그래픽 적용',
+  'hudChrome.options.graphicsApplying': '그래픽 설정 적용 중...',
+  'hudChrome.options.graphicsApplied': '그래픽 설정이 적용되었습니다.',
+  'hudChrome.options.graphicsSaved':
+    '그래픽 설정이 저장되었습니다. 현재 렌더러가 이미 같은 설정을 사용 중입니다.',
+  'hudChrome.options.graphicsFailed':
+    '그래픽 설정을 적용하지 못했습니다. 이전 설정이 계속 활성화되어 있습니다.',
+  'hudChrome.options.graphicsRetry': '그래픽 다시 시도',
+  'hudChrome.options.graphicsFatal':
+    '그래픽 복구에 실패했습니다. 계속하려면 게임을 다시 불러오세요.',
+  'hudChrome.options.graphicsReload': '게임 다시 불러오기',
+  'hudChrome.options.graphicsDraftChanged': '그래픽 변경 사항을 적용할 수 있습니다.',
   'hudChrome.options.footstepSounds': '발소리',
   'hudChrome.options.interfaceSounds': '인터페이스 및 피드백 소리',
   'hudChrome.options.clickFeedback': '클릭 표시',
@@ -1021,6 +1033,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showItemLevel': '아이템 레벨 표시',
   'hudChrome.options.showSecondaryActionBar': '보조 액션 바 표시',
   'hudChrome.options.showThirdActionBar': '세 번째 액션 바 표시',
+  'hudChrome.options.lockActionBars': '액션 바 잠금',
   'hudChrome.options.showDailyRewardsChest': '일일 보상 보물상자 표시',
   'hudChrome.options.mobileCameraJoystick': '카메라 조이스틱',
   'hudChrome.options.mobileLeftHanded': '왼손잡이 레이아웃',
@@ -1029,6 +1042,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.landing.highContrast': '고대비',
   'hudChrome.landing.highContrastAria':
     '고대비 배경 전환: 움직이는 예고편을 꺼서 시작 화면 텍스트를 읽기 쉽게 유지합니다',
+  'hudChrome.landing.browserSupport.title': '알림: 지원되지 않는 브라우저',
+  'hudChrome.landing.browserSupport.body':
+    '이 브라우저에서는 성능이 저하될 수 있습니다. 최상의 경험을 위해 Windows, macOS 또는 Linux용 데스크톱 앱을 받아보세요. 브라우저에서 계속 플레이하시겠습니까? Chrome이 가장 성능이 좋으며 Firefox와 Safari도 지원됩니다.',
+  'hudChrome.landing.browserSupport.getDesktopApp': '데스크톱 앱 받기',
+  'hudChrome.landing.browserSupport.continueInBrowser': '브라우저에서 계속하기',
+  'hudChrome.landing.browserSupport.dismissAria': '지원되지 않는 브라우저 알림 닫기',
   'hudChrome.talents.defaultBuildName': '빌드 {n}',
   'hudChrome.tips.joinChannels':
     '팁: /join world 또는 /join lfg를 입력하면 월드 전역의 플레이어와 대화할 수 있습니다.',
@@ -1919,6 +1938,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.combat.auraAfflicted': '{target}이 {name} 효과에 걸렸습니다.',
   'hud.combat.auraGainOther': '{target}이 {name} 효과를 얻었습니다.',
   'hud.system.playerDeath': '사망했습니다.',
+  'hud.system.deathRecapKillerAbility': '사망했습니다. {killer}의 {ability}에 쓰러졌습니다.',
+  'hud.system.deathRecapKiller': '사망했습니다. {killer}에게 쓰러졌습니다.',
+  'hud.system.deathRecapAbility': '사망했습니다. {ability}(으)로 사망했습니다.',
+  'hud.system.deathRecapFalling': '사망했습니다. 추락사했습니다.',
+  'hud.system.deathRecapDrowned': '사망했습니다. 익사했습니다.',
   'hud.system.respawn': '다시 온전하고 편안한 상태가 되었습니다.',
   'hud.system.ignoringChat': '{name}의 채팅을 차단합니다.',
   'hud.system.noLongerIgnoring': '{name}을 더 이상 차단하지 않습니다.',
@@ -2355,6 +2379,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useDrink':
     '사용 효과: {seconds}초에 걸쳐 마나 {amount} 회복. 마시는 동안 앉아 있어야 합니다.',
   'itemUi.tooltip.questItem': '퀘스트 아이템',
+  'itemUi.tooltip.questRelated': '퀘스트: {quest}',
+  'itemUi.tooltip.questRules': '판매, 은행에 보관, 거래할 수 없습니다.',
+  'itemUi.tooltip.questOrphaned': '진행 중인 퀘스트에 필요하지 않습니다.',
   'itemUi.tooltip.classes': '직업: {classes}',
   'itemUi.tooltip.sellPrice': '판매 가격: {money}',
   'itemUi.tooltip.clickBuy': '클릭하여 구매',
@@ -8569,6 +8596,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.makersMark': '제작자: {name}',
   'hudChrome.bags.itemAriaInstanced': '{item}, 수량 {count}, 제작자 표식이 있는 사본',
   'hudChrome.bags.itemAriaMasterwork': '{item}, 수량 {count}, 걸작',
+  'hudChrome.bags.itemAriaQuest': '{item}, 수량 {count}, 퀘스트 아이템',
+  'hudChrome.bags.filterQuestCountAria': '퀘스트, 아이템 {count}개',
+  'hudChrome.bags.noQuestItems': '가방에 퀘스트 아이템이 없습니다.',
   'hudChrome.crafting.gatheredBy': '채집자: {name}',
   'hudChrome.crafting.masterworkSeal': '걸작',
   'hudChrome.crafting.stationRequired': '그것을 제작하려면 {station}에 있어야 합니다.',
@@ -8892,6 +8922,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.sortAria': '은행 아이템 정렬',
   'hudChrome.bank.searchAria': '이름으로 은행 아이템 검색',
   'hudChrome.bank.depositAll': '모든 재료 보관',
+  'hudChrome.bank.depositAllTooltip':
+    '가방에 있는 모든 제작 재료와 잡동사니를 한 번에 은행에 보관합니다. 채집 도구, 장착한 장비, 퀘스트 아이템, 소모품은 영향을 받지 않습니다.',
   'hudChrome.bank.depositAllDone': '보관한 재료: {count}.',
   'hudChrome.bank.depositAllFull': '보관한 재료: {count}. 은행이 가득 찼습니다.',
   'hudChrome.bank.depositAllNone': '은행이 가득 참: 아무것도 보관하지 못했습니다.',

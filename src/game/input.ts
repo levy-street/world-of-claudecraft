@@ -510,6 +510,40 @@ export class Input {
     if (hadHeldInput) this.noteIntent('move');
   }
 
+  /**
+   * Reset every transient gameplay-input source before an in-place client
+   * transition. Unlike an ordinary modal suspension, this also drops autorun,
+   * click-to-move, controller/touch/gamepad state, and latched jumps so no old
+   * intent can resume when the transition curtain comes down.
+   */
+  resetForClientTransition(): void {
+    const emoteWheelWasOpen = this.emoteWheelHeldCodes.size > 0;
+    this.keys.clear();
+    this.keyJumpUntil = 0;
+    this.touchJumpUntil = 0;
+    this.autorun = false;
+    this.clearClickMove();
+    this.touchMove = { forward: false, back: false, strafeLeft: false, strafeRight: false };
+    this.gamepadMove = { forward: false, back: false, strafeLeft: false, strafeRight: false };
+    this.touchLookActive = false;
+    this.touchLookVector = { x: 0, y: 0 };
+    this.gamepadLookActive = false;
+    this.controllerMoveInput = null;
+    this.controllerFacing = null;
+    this.leftDown = false;
+    this.rightDown = false;
+    this.cameraDragActive = false;
+    this.downButton = -1;
+    this.pointerLockRequestedForDrag = false;
+    this.releaseHeldSlots();
+    this.emoteWheelHeldCodes.clear();
+    if (emoteWheelWasOpen) this.cb.onEmoteWheel(false);
+    if (document.pointerLockElement === this.canvas) document.exitPointerLock?.();
+    this.suspendMovement = true;
+    this.updateCursor();
+    this.noteIntent('move');
+  }
+
   // Passing null clears an armed capture without invoking a callback, so a
   // caller that abandons a pending capture (Done / Reset confirm) does not
   // leave a stale one-shot handler in place to swallow the player's next

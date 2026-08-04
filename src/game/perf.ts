@@ -420,9 +420,9 @@ export class PerfMonitor {
     this.observeLongTasks();
   }
 
-  setRenderer(renderer: Renderer): void {
+  setRenderer(renderer: Renderer | null): void {
     this.renderer = renderer;
-    renderer.setHitchLogEnabled(this.enabled);
+    renderer?.setHitchLogEnabled(this.enabled);
   }
 
   setHud(hud: { perfStats(): PerfSnapshot['hud'] }): void {

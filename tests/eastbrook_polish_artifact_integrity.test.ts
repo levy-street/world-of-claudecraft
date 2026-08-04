@@ -614,18 +614,16 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   POLISH_ROOT,
   'metadata/after-desktop-ultra.json',
 );
-// Re-pinned for the merged tree, which stacks two independent moves on the same
-// accepted metadata file. src/render/renderer.ts is the rendererIntegration leaf
-// of the polish composite provenance, so gating the shapeshift-form visual swap
-// on async compile (#2571) and the crowd nameplate/presentation batching both
-// rewrite the file's polishProvenance block; PR #2720's Eastbrook fence removal
-// then rewrites its town-contract placement inventory. Neither parent's literal
-// matched the merged bytes, so this is recomputed over the merge. The file still
-// points at the same captured view and no capture was retaken.
+// Re-pinned after stacking this branch's renderer provenance move (the Bear Form
+// visual swap onto the purpose-built quadruped rig) onto a release/v0.34.0 that
+// already carries PR #2720's Eastbrook fence-removal layout evidence and the live
+// graphics rebuild (context recycle plus profile-aware Eastbrook runtime inputs).
+// The accepted file still points at the same captured view; only its swept
+// provenance bytes follow the merged rendererIntegration and layout inputs.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '8106a5f53dbcbdd727c348101cec17cfba8f5c3a182dab81b665750b7464ddb1';
+  '1468f227f023fe556c6b8e4bac04251beb1b8aeb2ab4ca1e3a4fef9362cf81a5';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '6c2a621a6e05e1961950846f394097ab658d7f259cdb15f37cab582293a538ce';
+  '5ac0655a8259de316207a5fad1be70512f508d4e97c94679b83d3c24fa179aed';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1482,16 +1480,15 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(acceptedFiles).toHaveLength(4);
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
-    // src/render/renderer.ts is the rendererIntegration leaf of that composite:
-    // the shapeshift compile gate (#2571) and the crowd nameplate/presentation
-    // batching both edit it, and PR #2720's fence removal separately rewrites
-    // the rebuilt-town placement inventory in the after-* files. The merged tree
-    // stacks both, so this seal follows the merged composite and matched neither
-    // parent's literal. Every measured value (frame timings, draw stats,
-    // triangle and scenario numbers) is byte-identical, and no capture was
-    // retaken.
+    // After stacking this branch's renderer provenance move (the Bear Form rig
+    // swap) onto a base carrying PR #2720's fence-removal content change and the
+    // live graphics rebuild, this seal follows the merged composite, recomputed
+    // last by remint_polish_provenance.mjs. Every measured value (frame timings,
+    // draw stats, triangle and scenario numbers) is byte-identical against the
+    // current release/v0.34.0 tip, no parent's literal matched the merged tree,
+    // and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      'fa4f3b9f5f5a979a2f623ef7127c09069546e5bc276be1d34b850aa83c89fa7c',
+      'b7e5d431d66bf28c45f19b9243ebeacd69b4094045ae14faeb466cf4df0163ab',
     );
   });
 

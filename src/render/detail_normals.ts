@@ -14,20 +14,21 @@
 import * as THREE from 'three';
 import { loadTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
-import { GFX } from './gfx';
+import { GFX, type GfxSettings } from './gfx';
 
 /** Subtle by design: the grain must read as surface response, not noise. */
 export const STONE_DETAIL_NORMAL_SCALE = 0.3;
 const STONE_DETAIL_REPEAT = 3;
 
 let stoneNormal: THREE.Texture | null = null;
+let stoneNormalTask: Promise<void> | null = null;
 
-// Lambert (low tier) ignores normal maps entirely, so skip the fetch there,
-// mirroring terrain.ts's GFX.terrainSplat gate. Consumers fail soft on null:
-// the material simply ships without the detail grain.
-if (GFX.standardMaterials) {
-  registerDeferredPreload(() =>
-    loadTexture('/textures/terrain/Rock051_NormalGL.jpg', { repeat: true }).then((tex) => {
+/** Prepare the shared stone normal selected by an explicit target profile. */
+export function prepareStoneDetailProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
+  if (!target.standardMaterials || stoneNormal) return Promise.resolve();
+  if (stoneNormalTask) return stoneNormalTask;
+  stoneNormalTask = loadTexture('/textures/terrain/Rock051_NormalGL.jpg', { repeat: true })
+    .then((tex) => {
       const detail = tex.clone();
       detail.wrapS = THREE.RepeatWrapping;
       detail.wrapT = THREE.RepeatWrapping;
@@ -35,10 +36,15 @@ if (GFX.standardMaterials) {
       detail.anisotropy = 4;
       detail.needsUpdate = true;
       stoneNormal = detail;
-      return detail;
-    }),
-  );
+    })
+    .catch((err) => {
+      stoneNormalTask = null;
+      throw err;
+    });
+  return stoneNormalTask;
 }
+
+registerDeferredPreload(() => prepareStoneDetailProfileAssets(GFX));
 
 /** Resolved once the preload gate has run (or the first dungeon ensure
  *  completes); null before that and on the Lambert tier. */

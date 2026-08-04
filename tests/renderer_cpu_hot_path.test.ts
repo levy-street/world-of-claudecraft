@@ -41,13 +41,21 @@ describe('renderer CPU hot path', () => {
   });
 
   it('releases the shared canvas and document listeners with the renderer host', () => {
+    // Two release paths must both drop the painter: the direct dispose()
+    // helper, and the terminal shutdown() lifecycle the editor viewport now
+    // drives (disposeRendererResources is its cleanup arm).
     const disposeStart = renderer.indexOf('dispose(): void {');
     const disposeEnd = renderer.indexOf('\n  }', disposeStart);
     const disposeBlock = renderer.slice(disposeStart, disposeEnd);
-
     expect(disposeBlock).toContain('this.nameplatePainter.dispose();');
     expect(disposeBlock).toContain('this.travelSpeedFx.dispose();');
-    expect(editorViewport).toContain('this.renderer.dispose();');
+
+    const terminalStart = renderer.indexOf('private disposeRendererResources(): void {');
+    const terminalEnd = renderer.indexOf('\n  }', terminalStart);
+    const terminalBlock = renderer.slice(terminalStart, terminalEnd);
+    expect(terminalBlock).toContain('this.nameplatePainter.dispose()');
+
+    expect(editorViewport).toContain('.shutdown()');
     expect(renderer).toContain('this.nameplatePainter.remove(id);');
   });
 

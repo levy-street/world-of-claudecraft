@@ -270,6 +270,7 @@ non-commercial. For commercial use, arrange your own licence with the author.
 | Generated prop model (wildheart_giant_fern) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (wildheart_ancestor_ruin) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (wildheart_jungle_canopy_tree) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated creature model + animations (bear_form, the druid Bear Form quadruped) | World of ClaudeCraft | Project-generated Tripo AI 3D sculpt, owned under the Tripo paid-plan license; rigged and animated locally rather than auto-rigged (29 bone deform rig fitted to the sculpt by measurement, distance-solver skinning, and nine IK-authored clips), then KTX2-compressed via glTF-Transform | Project asset | With the project only |
 Assets were optimized for shipping (animation clip pruning, meshopt compression,
 texture resizing) via `scripts/assets/build_assets.mjs`; raw packs are not
 committed.

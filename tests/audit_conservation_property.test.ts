@@ -175,6 +175,23 @@ const store = vi.hoisted(() => {
   };
 });
 
+// The five recorders above are called on EVERY step of EVERY generated
+// sequence, and the sweeps below run thousands of sequences inside a single
+// `it`. A vi.fn retains each call's arguments in `mock.calls` (and its
+// resolved promise in `mock.results`), so every character save blob and guild
+// bank delta payload the harness ever produced stayed reachable for the whole
+// test file: the worker climbed past the ~4 GB CI heap limit and died with
+// "Ineffective mark-compacts near heap limit", taking a whole shard with it.
+// Nothing in this file asserts on the history, so it is bounded to one
+// generated sequence (see runSteps) instead of one `it`.
+const clearStoreHistory = (): void => {
+  store.saveCharacterState.mockClear();
+  store.saveCharacterAndGuildBankState.mockClear();
+  store.saveCharacterAndMarketState.mockClear();
+  store.insertBankLedgerRow.mockClear();
+  store.loadGuildBankRows.mockClear();
+};
+
 // DURABLE guild membership for the escrow-carrier read: the carrier is chosen
 // from socialDb.guildMembers now (a stale session stamp must not put an
 // ex-member on the quarantine-and-kick path), so the harness answers that one
@@ -1038,6 +1055,8 @@ type Check =
   | 'durable-crash';
 
 async function runSteps(steps: Step[], check: Check): Promise<RunResult> {
+  // Bound the mock call history to this one sequence: see clearStoreHistory.
+  clearStoreHistory();
   const w = await makeWorld();
   const initial = effectiveTotals(w);
   const opsSeen = new Set<string>();
@@ -1229,11 +1248,7 @@ const seeds = (n: number, from = 1): number[] => Array.from({ length: n }, (_, i
 
 beforeEach(() => {
   store.reset();
-  store.saveCharacterState.mockClear();
-  store.saveCharacterAndGuildBankState.mockClear();
-  store.saveCharacterAndMarketState.mockClear();
-  store.insertBankLedgerRow.mockClear();
-  store.loadGuildBankRows.mockClear();
+  clearStoreHistory();
 });
 
 // ---------------------------------------------------------------------------
