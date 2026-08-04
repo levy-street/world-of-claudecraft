@@ -2389,6 +2389,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.quest': 'Задание',
   'itemUi.kind.junk': 'Хлам',
   'itemUi.kind.fineMaterial': 'Отборный материал',
+  'itemUi.kind.material': 'Материал',
   'itemUi.kind.food': 'Еда',
   'itemUi.kind.drink': 'Напиток',
   'itemUi.kind.tool': 'Инструмент',
@@ -11042,6 +11043,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Торговцы слепы к происхождению: подписанная вещь продается NPC ровно по своей простой цене. Наценка за подпись существует только между игроками, что как раз и делает ее интересной: стопка руды-находки, подписанная знаменитым собирателем, Prime Cut с удачного сбора, шедевральный клинок с именем ремесленника, что с тех пор ушел на покой, все стоят столько, сколько говорит чья-то память.\n\nКнига деяний играет на том же инстинкте: Pristine Vein, Ancient Heartwood, Moonlit Bloom, A Perfect Specimen и Glimmer of Hope, это коллекционные отметки с нулевой Известностью, что существуют лишь ради доказательства, что миг случился с вами. Сохраните вещь, что заработала деяние, и вы держите расписку. Ничто из этого не сила; происхождение не покупает характеристик и не выигрывает боев, это бумажный след хороших дней игры.',
   'hudChrome.corpseHarvest.components.meat': 'Мясо',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (зачаровано)',
+  'hudChrome.materialHint.cookingCatch': 'Ингредиент для готовки. Сначала нужно приготовить.',
   'hudChrome.materialHint.fineGrade':
     'Отборный сорт. Добывается на жиле полного уровня инструментом выше самого материала и засчитывается вместо обычной версии везде, где она требуется.',
   'hudChrome.materialHint.arcaneDust':

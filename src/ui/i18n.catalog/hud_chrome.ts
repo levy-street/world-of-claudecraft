@@ -2226,6 +2226,10 @@ export const hudChromeStrings = {
     // one of them, and nine copies would be nine chances to drift.
     fineGrade:
       'Fine grade. Gathered from a full-tier vein with a tool ranked above the material, and counts as the ordinary version wherever one is required.',
+    // One key shared by every raw fishing catch (RAW_COOKING_CATCH_IDS): cooking
+    // reagents only; never edible raw. Painted via createTooltipLine, not the
+    // materialHintLine HTML-string path.
+    cookingCatch: 'Cooking ingredient. Must be cooked before eating.',
     arcaneDust: 'Enchanting reagent. Disenchanted from common and uncommon gear.',
     arcaneEssence: 'Enchanting reagent. Disenchanted from rare gear.',
     arcaneShard: 'Enchanting reagent. Disenchanted from epic and legendary gear.',

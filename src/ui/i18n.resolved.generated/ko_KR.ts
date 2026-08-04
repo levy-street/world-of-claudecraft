@@ -1991,6 +1991,7 @@ export const ko_KR: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "상급 등급입니다. 해당 재료보다 높은 등급의 도구로 만렙 채집지에서 캐낸 것이며, 일반 등급이 필요한 곳 어디에서나 대신 사용됩니다.",
+      "cookingCatch": "요리 재료. 먹기 전에 먼저 요리해야 합니다.",
       "arcaneDust": "마법부여 재료. 일반과 고급 장비의 마력을 추출해 얻습니다.",
       "arcaneEssence": "마법부여 재료. 희귀 장비의 마력을 추출해 얻습니다.",
       "arcaneShard": "마법부여 재료. 영웅과 전설 장비의 마력을 추출해 얻습니다.",
@@ -7136,6 +7137,7 @@ export const ko_KR: EnTranslations = {
       "quest": "퀘스트 아이템",
       "junk": "잡동사니",
       "fineMaterial": "상급 재료",
+      "material": "재료",
       "food": "음식",
       "drink": "음료",
       "tool": "도구",

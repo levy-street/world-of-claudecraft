@@ -1991,6 +1991,7 @@ export const id_ID: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Mutu halus. Dikumpulkan dari urat tingkat penuh dengan alat berperingkat di atas materialnya, dan dihitung sebagai versi biasa di mana pun versi biasa dibutuhkan.",
+      "cookingCatch": "Cooking ingredient. Must be cooked before eating.",
       "arcaneDust": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan umum dan tak biasa.",
       "arcaneEssence": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan langka.",
       "arcaneShard": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan epik dan legendaris.",
@@ -7136,6 +7137,7 @@ export const id_ID: EnTranslations = {
       "quest": "Barang Misi",
       "junk": "Rongsokan",
       "fineMaterial": "Bahan Halus",
+      "material": "Material",
       "food": "Makanan",
       "drink": "Minuman",
       "tool": "Perkakas",

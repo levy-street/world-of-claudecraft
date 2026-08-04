@@ -2367,6 +2367,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.quest': 'クエストアイテム',
   'itemUi.kind.junk': '雑貨',
   'itemUi.kind.fineMaterial': '上質な素材',
+  'itemUi.kind.material': '素材',
   'itemUi.kind.food': '食べ物',
   'itemUi.kind.drink': '飲み物',
   'itemUi.kind.tool': '道具',
@@ -10869,6 +10870,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '付与は素材を消費し、特定の一品に印を付けます。鞄の中の品に使えば別個の付与済みの品が返り、装備中の品に使えばその場で付与され、外して着け直す必要はありません。どちらでも効果は永遠にその品に付き従います。一品にひとつ。付与済みの品に別の付与を使うと確認のうえ古い付与をそのまま置き換え、古い付与は素材の返却なしに破棄されます。売却、破棄、分解はどれも無印の品を先に選ぶので、完成品がうっかり食われることはありません。同一の付与品同士は重ねられます。傑作とエンチャントは友人です。傑作は問題なく付与でき、効果は傑作ボーナスにも署名にも触れず上乗せされます。全部を積んだ署名入り傑作のGreater付与が工芸品の頂点で、それでも設計上レイド戦利品の下に座ります。付与済みや署名入りの品も世界市場に出せます。一品ずつの単品出品となり、ツールチップには付与と作り手の銘が表示され、ワタリガラス便でも同じように送れます。素材は今も商いの堅実な半分です。粉、エッセンス、シャードは自由に出品でき、出品無料、手数料は成立時の5%だけです。',
   'hudChrome.corpseHarvest.components.meat': '肉',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat}（エンチャント）',
+  'hudChrome.materialHint.cookingCatch': '料理材料。食べる前に調理が必要です。',
   'hudChrome.materialHint.fineGrade':
     '上質な等級。素材より上位の道具で満位の採取地から採ったもので、通常版が求められる場所ではそのまま代用できます。',
   'hudChrome.materialHint.arcaneDust':

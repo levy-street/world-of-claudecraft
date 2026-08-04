@@ -1991,6 +1991,7 @@ export const zh_TW: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "優質品級。以等級高於該材料的工具在滿級礦脈採集所得，在任何需要普通版本的地方均可替代使用。",
+      "cookingCatch": "烹飪材料。必須先烹飪後才能食用。",
       "arcaneDust": "附魔材料。分解普通和優秀品質的裝備可得。",
       "arcaneEssence": "附魔材料。分解精良品質的裝備可得。",
       "arcaneShard": "附魔材料。分解史詩和傳說品質的裝備可得。",
@@ -7136,6 +7137,7 @@ export const zh_TW: EnTranslations = {
       "quest": "任務物品",
       "junk": "雜物",
       "fineMaterial": "優質材料",
+      "material": "材料",
       "food": "食物",
       "drink": "飲料",
       "tool": "工具",

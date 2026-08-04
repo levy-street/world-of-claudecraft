@@ -1991,6 +1991,7 @@ export const da_DK: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Fin kvalitet. Indsamlet fra en åre på fuldt niveau med et værktøj, der rangerer over materialet, og tæller som den ordinære version, hvor end en sådan kræves.",
+      "cookingCatch": "Cooking ingredient. Must be cooked before eating.",
       "arcaneDust": "Fortryllelsesreagens. Fås ved affortryllelse af almindeligt og ualmindeligt udstyr.",
       "arcaneEssence": "Fortryllelsesreagens. Fås ved affortryllelse af sjældent udstyr.",
       "arcaneShard": "Fortryllelsesreagens. Fås ved affortryllelse af episk og legendarisk udstyr.",
@@ -7136,6 +7137,7 @@ export const da_DK: EnTranslations = {
       "quest": "Opgavegenstand",
       "junk": "Skrammel",
       "fineMaterial": "Fint materiale",
+      "material": "Material",
       "food": "Mad",
       "drink": "Drikke",
       "tool": "Værktøj",

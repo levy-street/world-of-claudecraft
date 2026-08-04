@@ -48,6 +48,10 @@ const itemStringsEn = {
       // KIND stays 'junk' internally (substitution and sell rules key off
       // it) but its tooltip line reads this instead.
       fineMaterial: 'Fine Material',
+      // Honest materials (ores, reagents, raw cooking catches, ...): kind
+      // stays junk for Sell Junk / taxonomy, but the tooltip line reads
+      // Material so they do not look like grey trash.
+      material: 'Material',
       food: 'Food',
       drink: 'Drink',
     },

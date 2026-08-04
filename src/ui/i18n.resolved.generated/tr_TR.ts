@@ -1991,6 +1991,7 @@ export const tr_TR: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Kaliteli derece. Malzemenin üstünde kademelenmiş bir aletle tam kademeli bir damardan toplanır ve sıradan sürümün gerektiği her yerde onun yerine sayılır.",
+      "cookingCatch": "Cooking ingredient. Must be cooked before eating.",
       "arcaneDust": "Sıradan ve az bulunur eşyalardan büyü bozularak elde edilen büyü malzemesi.",
       "arcaneEssence": "Nadir eşyalardan büyü bozularak elde edilen büyü malzemesi.",
       "arcaneShard": "Destansı ve efsanevi eşyalardan büyü bozularak elde edilen büyü malzemesi.",
@@ -7136,6 +7137,7 @@ export const tr_TR: EnTranslations = {
       "quest": "Görev Eşyası",
       "junk": "Döküntü",
       "fineMaterial": "Kaliteli Malzeme",
+      "material": "Material",
       "food": "Yiyecek",
       "drink": "İçecek",
       "tool": "Alet",

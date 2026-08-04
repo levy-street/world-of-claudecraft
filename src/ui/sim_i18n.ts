@@ -174,6 +174,10 @@ const baseEnTable = {
   'error.gatherNodeMissing': 'That resource node does not exist.',
   'error.gatherNodeNotRespawned': 'This resource node has not respawned for you yet.',
   'error.toolEffectSlotFromWindow': 'Open Professions to slot that.',
+  // Raw fishing catches refuse useItem (src/sim/items.ts): cooking reagents
+  // only; cook before eating. EXACT-matched; English falls through per locale
+  // until the release localization pass fills translations.
+  'error.rawCatchCookFirst': 'That is raw. Cook it first.',
   // Profession-choice quest denials (src/sim/quests/quest_commands.ts): the archetype
   // pair or hobby selection fails validation on quest accept or again at turn-in.
   'error.professionChoiceUnavailable': 'That profession choice is not available.',

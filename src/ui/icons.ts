@@ -8,6 +8,7 @@
 // from the ability school / item kind + name keywords, so everything always
 // has a proper icon. Results are cached as data URLs.
 
+import { isRawCookingCatch } from '../sim/content/items';
 import { ABILITIES, ITEMS } from '../sim/data';
 import { DEED_IMAGE_IDS } from './deed_image_ids';
 import { PROFESSION_IMAGE_IDS, professionImageUrl } from './profession_art';
@@ -3537,6 +3538,15 @@ function itemFallback(id: string): IconRecipe | null {
   if (it.kind === 'bag') {
     const isCloth = has(name, ['linen', 'silk', 'woven', 'cloth', 'wool']);
     return r(isCloth ? 'cloth' : 'leather', isCloth ? 'cloth' : 'leather', ['sack'], fx);
+  }
+  // Raw fishing catches left kind food for cooking reagents; keep a fish-like
+  // procedural recipe so they never fall through to generic junk trinkets when
+  // static WebP is missing. Name tokens cover cooked fish siblings and rares.
+  if (
+    isRawCookingCatch(id) ||
+    has(name, ['trout', 'perch', 'pike', 'eel', 'carp', 'koi', 'fish'])
+  ) {
+    return r('drink', 'sky', ['fish'], fx);
   }
   const t = trinketPrimitive(name);
   return r(it.kind === 'quest' ? 'parchment' : 'junk', t.pal, [{ p: t.p, pal: t.pal }], fx);

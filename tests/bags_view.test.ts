@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { RAW_COOKING_CATCH_IDS } from '../src/sim/content/items';
+import { ITEMS as CATALOG_ITEMS } from '../src/sim/data';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 import { DEFAULT_BAG_FILTER, type ItemLookup } from '../src/ui/bag_filter';
 import {
@@ -490,6 +492,20 @@ describe('bagTooltipHintKey', () => {
     expect(bagTooltipHintKey(ITEMS.potion, NO_MODE)).toBe('itemUi.tooltip.clickUseInstant');
     expect(bagTooltipHintKey(ITEMS.rod, NO_MODE)).toBe('itemUi.tooltip.clickUse');
     expect(bagTooltipHintKey({ kind: 'junk' }, NO_MODE)).toBe('');
+  });
+
+  it('raw cooking catches are not clickConsume (junk reagents, no food kind)', () => {
+    // Phase 2: live catalog catches are kind junk with no use; bag affordance
+    // must not advertise consume. Right-click still hits useItem and shows the
+    // refuse toast via the Phase 1 error pipeline.
+    for (const id of RAW_COOKING_CATCH_IDS) {
+      const rawCatch = CATALOG_ITEMS[id];
+      expect(rawCatch, id).toBeTruthy();
+      expect(rawCatch.kind, id).toBe('junk');
+      expect(bagTooltipHintKey(rawCatch, NO_MODE), id).toBe('');
+      expect(bagItemAction(rawCatch, NO_MODE), id).toBe('use');
+      expect(bagItemAction(rawCatch, { ...NO_MODE, petFeed: true }), id).toBe('petFeedBlocked');
+    }
   });
 });
 

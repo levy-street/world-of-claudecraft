@@ -1991,6 +1991,7 @@ export const it_IT: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Grado pregiato. Raccolto da un filone di pieno livello con uno strumento di rango superiore al materiale, e vale come la versione ordinaria ovunque ne venga richiesta una.",
+      "cookingCatch": "Cooking ingredient. Must be cooked before eating.",
       "arcaneDust": "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento comune e non comune.",
       "arcaneEssence": "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento raro.",
       "arcaneShard": "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento epico e leggendario.",
@@ -7136,6 +7137,7 @@ export const it_IT: EnTranslations = {
       "quest": "Oggetto missione",
       "junk": "Cianfrusaglia",
       "fineMaterial": "Materiale pregiato",
+      "material": "Material",
       "food": "Cibo",
       "drink": "Bevanda",
       "tool": "Strumento",

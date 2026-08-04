@@ -2350,6 +2350,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.quest': '퀘스트 아이템',
   'itemUi.kind.junk': '잡동사니',
   'itemUi.kind.fineMaterial': '상급 재료',
+  'itemUi.kind.material': '재료',
   'itemUi.kind.food': '음식',
   'itemUi.kind.drink': '음료',
   'itemUi.kind.tool': '도구',
@@ -10863,6 +10864,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '마법부여는 재료를 소모하고 특정 사본 하나에 표시를 남긴다. 가방 속 사본에 쓰면 별개의 부여된 사본을 돌려받고, 이미 착용 중인 물건에 쓰면 벗었다 다시 입을 필요 없이 그 자리에서 부여된다. 어느 쪽이든 보너스가 영원히 그 물건을 따른다. 한 물건에 하나. 부여된 사본에 다른 마법부여를 쓰면 먼저 확인을 거친 뒤 옛 부여를 그대로 대체하며, 옛 부여는 재료 환불 없이 파괴된다. 판매와 폐기와 분해 모두 무표식 사본을 먼저 집으니 완성품이 실수로 갈리지 않는다. 똑같이 부여된 사본끼리는 겹쳐진다. 걸작과 마법부여는 친구다. 걸작은 온전히 부여 가능하고, 부여는 걸작 보너스와 서명을 건드리지 않고 얹힌다. 모든 것을 쌓은 서명된 걸작의 Greater 부여가 공예품의 정점이며, 그래도 설계상 공격대 전리품 아래에 있다. 이제 부여품과 서명품도 세계 시장에 올릴 수 있다. 한 점씩 단일 등록으로 팔리고, 툴팁에 부여와 제작자의 서명이 표시되며, 큰까마귀 우편으로도 똑같이 보낼 수 있다. 재료는 여전히 장사의 든든한 절반이다. 가루, 정수, 조각은 자유로이 등록되고, 등록은 무료, 수수료는 성사 시 5%뿐이다.',
   'hudChrome.corpseHarvest.components.meat': '고기',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (마법부여)',
+  'hudChrome.materialHint.cookingCatch': '요리 재료. 먹기 전에 먼저 요리해야 합니다.',
   'hudChrome.materialHint.fineGrade':
     '상급 등급입니다. 해당 재료보다 높은 등급의 도구로 만렙 채집지에서 캐낸 것이며, 일반 등급이 필요한 곳 어디에서나 대신 사용됩니다.',
   'hudChrome.materialHint.arcaneDust': '마법부여 재료. 일반과 고급 장비의 마력을 추출해 얻습니다.',

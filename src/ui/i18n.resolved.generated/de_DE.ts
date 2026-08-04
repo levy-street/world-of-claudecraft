@@ -1991,6 +1991,7 @@ export const de_DE: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Feine Güte. An einer Ader voller Stufe mit einem Werkzeug über dem Rang des Materials gesammelt; zählt überall dort als die gewöhnliche Version, wo diese verlangt wird.",
+      "cookingCatch": "Cooking ingredient. Must be cooked before eating.",
       "arcaneDust": "Verzauberungsreagenz. Entzaubert aus gewöhnlicher und ungewöhnlicher Ausrüstung.",
       "arcaneEssence": "Verzauberungsreagenz. Entzaubert aus seltener Ausrüstung.",
       "arcaneShard": "Verzauberungsreagenz. Entzaubert aus epischer und legendärer Ausrüstung.",
@@ -7136,6 +7137,7 @@ export const de_DE: EnTranslations = {
       "quest": "Questgegenstand",
       "junk": "Plunder",
       "fineMaterial": "Feines Material",
+      "material": "Material",
       "food": "Essen",
       "drink": "Getränk",
       "tool": "Werkzeug",
