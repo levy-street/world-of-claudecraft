@@ -370,7 +370,7 @@ describe('Eastbrook polish capture contract', () => {
       // literal. No GLB source fingerprint moved, no pipeline input or geometry
       // value changed, and no capture was retaken. Re-minted with
       // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
-      fingerprint: '38b87f7e206b1666253705a02283b70485b5fa6dd16096d1463d51ef7defe0f4',
+      fingerprint: '729b873a18d1439c13b89dbbfa494f71bcacb86ab1941a7b939fe8415b5abea9',
       components: {
         captureContract: {
           id: 'polish-v2',
