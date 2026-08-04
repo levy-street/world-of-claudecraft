@@ -957,6 +957,11 @@ interface WireAura {
   src?: number;
   // Encounter-owned control marker. Omitted for ordinary auras.
   ub?: 1;
+  // No-player-counter-may-shed marker (the recovery sicknesses). Presence only: the
+  // client reads it through the same isPlayerRemovableAura predicate the sim uses, so
+  // the buff bar never offers a right-click cancel the server would refuse. Omitted for
+  // ordinary auras, and an old server's omission decodes to undefined, as before.
+  und?: 1;
   // Break-threshold ARMED marker (Lingering Dread's soak-before-snap fear):
   // presence only, never the live soak value - the number decrements per hit
   // and would churn the stable aura cache, while the client (the victim-worn
@@ -1108,6 +1113,7 @@ function wireAura(a: Aura): WireAura {
   // (auras_view ownFirst). Omitted for the rare 0/absent source, which decodes to 0.
   if (a.sourceId) w.src = a.sourceId;
   if (a.unbreakableControl) w.ub = 1;
+  if (a.undispellable) w.und = 1;
   if (a.breakThreshold !== undefined) w.bt = 1;
   return w;
 }

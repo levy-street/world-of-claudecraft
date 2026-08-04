@@ -469,6 +469,12 @@ export interface Aura {
   // Encounter-authored control that must land through immunity and cannot be
   // removed by player counters. Natural expiry and encounter cleanup still own it.
   unbreakableControl?: true;
+  // A penalty no player counter may shed: dispel, purge, and cleanse all skip it, and
+  // it is never right-click cancelable. Only its own timer takes it off. The two
+  // recovery sicknesses (src/sim/resurrection.ts) carry it, matching the fact that they
+  // already survive death and relogging; without it a single dispel erased the entire
+  // Pale Keeper / unstuck penalty. See isPlayerRemovableAura in ./aura_classify.ts.
+  undispellable?: true;
   breaksOnDamage?: boolean;
   // Lingering Dread lets a break-on-damage fear absorb this much damage before
   // breaking. Undefined retains the normal break-on-any-damage behavior.

@@ -176,6 +176,7 @@ interface ClientWireAura {
   emp?: Aura['empowerAbilities'];
   src?: number;
   ub?: 1;
+  und?: 1;
   bt?: 1;
 }
 
@@ -2878,6 +2879,9 @@ export class ClientWorld implements IWorld {
             // (auras_view ownFirst). An old server omits it; 0 matches no player id.
             rec.sourceId = a.src ?? 0;
             rec.unbreakableControl = a.ub === 1 ? true : undefined;
+            // Presence-only mirror of the undispellable marker, so the client's
+            // isPlayerRemovableAura answers exactly as the server's does.
+            rec.undispellable = a.und === 1 ? true : undefined;
             // Presence-only mirror of the break-threshold armed marker (the
             // server emits bt = 1 when breakThreshold is defined): the one
             // client reader is the Lingering Dread victim-band alias, which
@@ -2903,6 +2907,7 @@ export class ClientWorld implements IWorld {
             charges: a.charges,
             empowerAbilities: a.emp,
             unbreakableControl: a.ub === 1 ? true : undefined,
+            undispellable: a.und === 1 ? true : undefined,
             breakThreshold: a.bt === 1 ? 1 : undefined,
           }));
         }
