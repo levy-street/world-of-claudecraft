@@ -80,6 +80,21 @@ export interface IWorldDeeds {
   // failure. The payload is the endpoint body verbatim (DeedsRarity above);
   // consumers cache per window-open, so this may re-fetch on each call.
   deedsRarity(): Promise<DeedsRarity | null>;
+  // The SELF player's newest-first unlock ids, capped at DEEDS_RECENT_CAP
+  // (src/sim/deeds.ts), or null where the host has no recency record. The
+  // earned map above only keeps the utcDay, so this read is the one source of
+  // sub-day earn ORDER: the offline Sim serves its live grant order (Map
+  // insertion order, chronological within a session and preserved by the
+  // offline JSON round-trip), the online ClientWorld fetches the owner-scoped
+  // GET /api/characters/:id/deeds-recent (the character_deeds observer table,
+  // exact server timestamps) and resolves null on any fetch failure so the
+  // Book's recent strip falls back to the day-granular order.
+  // Order means RECORD order, not play chronology, for back-credits: a
+  // join-time retro or legacy-milestone grant is recorded when it lands (the
+  // login), so it can head this list on both hosts equally. Accepted: the
+  // record has no per-deed retro marker to filter on, and the strip
+  // self-corrects as live unlocks accrue.
+  deedsRecent(): Promise<readonly string[] | null>;
   // The Renown board (the account-level deeds leaderboard), paged server-side
   // like the other high-score boards; page is 0-based. GLOBAL-ONLY (see
   // DeedsLeaderboardEntry). The offline Sim resolves an empty page; the online

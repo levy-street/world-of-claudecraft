@@ -7781,10 +7781,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.quit': 'Avsluta',
   'desktop.crash.reload': 'Ladda om',
   'desktop.crash.title': 'World of ClaudeCraft',
-  'desktop.update.downloading': 'Laddar ner uppdatering {version}...',
+  'desktop.update.downloadingTitle': 'Laddar ner uppdatering {version}...',
   'desktop.update.later': 'Senare',
-  'desktop.update.ready':
-    'Uppdatering {version} är klar. Den installeras när du avslutar, eller starta om nu.',
+  'desktop.update.readyTitle': 'Uppdatering {version} är klar',
+  'desktop.update.readyBody': 'Den installeras när du avslutar, eller starta om nu.',
   'desktop.update.restart': 'Starta om nu',
   'hudChrome.dailyRewards.close': 'Stäng dagliga belöningar',
   'hudChrome.dailyRewards.endsIn': 'Slutar om {time}',

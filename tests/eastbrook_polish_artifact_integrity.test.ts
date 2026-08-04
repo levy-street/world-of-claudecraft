@@ -621,9 +621,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
 // fingerprint it carries, the same way the compile-storm gear/mount/base-visual
 // gate fix re-pinned these before them.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '1a0a0787c65c5e9e0d83533b66156f5f835a5fa7a79a87b898ee7e5e49abba57';
+  '14234c468472dbdfb5694eb546331e03e1fad83eb63979f71d4e380b3b933269';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '16c2fa150301c7077294987b9d74d713edc9fc4006c3fcfbf924475eb1391019';
+  '6c2a621a6e05e1961950846f394097ab658d7f259cdb15f37cab582293a538ce';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1487,7 +1487,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // triangle and scenario numbers) is byte-identical, and no capture was
     // retaken.
     expect(fingerprint.digest('hex')).toBe(
-      'c42399d2fbd45de1348743cf1cd01b8d69b897045ec5a81cbf44edb18796ab46',
+      '72f82f156c5a37cd7cc7d7834dbbe17256a521ac59844f47cfe4381fff339c91',
     );
   });
 

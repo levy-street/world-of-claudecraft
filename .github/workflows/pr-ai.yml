@@ -3,10 +3,6 @@ name: PR AI assist
 # Informational, non-blocking jobs that help review a pull request. None is a required
 # check, and this workflow never replaces the deterministic CI gate in ci.yml.
 #
-#   screenshots        boots the Vite dev client headless and, ONLY when the diff has a
-#                       visual change, renders the sections it touches (a mapped window, or
-#                       the in-world HUD for a generic visual change), then embeds the PNGs
-#                       inline in a sticky PR comment. A non-visual diff captures nothing.
 #   codex-review        performs a static review through openai/codex-action. The trusted
 #                       base checkout supplies policy, while the nested PR checkout is
 #                       untrusted data and is never executed. Automatic review is limited
@@ -24,7 +20,6 @@ on:
   pull_request:
   issue_comment:
     types: [created]
-  workflow_dispatch:
 
 permissions:
   contents: read
@@ -34,95 +29,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  screenshots:
-    name: Screenshots of changes
-    runs-on: ubuntu-latest
-    # contents:write so the embedded screenshots can be uploaded to the bot-owned asset
-    # branch; pull-requests:write to post the comment. A fork PR still gets a read-only
-    # token, so both degrade to a no-op (the scripts handle it) and never block.
-    permissions:
-      contents: write
-      pull-requests: write
-    # issue_comment fires this workflow on every comment on any issue or PR; without this
-    # guard the full checkout + pnpm install + Vite boot + puppeteer run would fire on every
-    # comment too, even though nothing in this job reads the comment.
-    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v6
-        with:
-          # Full history so the diff against the PR base drives change-aware capture.
-          fetch-depth: 0
-
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.34.5
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 26
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      # The client imports committed-but-derived i18n tables at boot; regenerate to be safe.
-      - name: Generate i18n artifacts
-        run: npm run i18n:gen
-
-      - name: Resolve a Chrome binary
-        run: |
-          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium-browser || command -v chromium || true)"
-          if [ -z "$CHROME" ]; then
-            echo "No system Chrome on PATH; installing a Chrome for Testing build."
-            CHROME="$(npx --yes puppeteer browsers install chrome | awk '{print $NF}')"
-          fi
-          echo "BROWSER_PATH=$CHROME" >> "$GITHUB_ENV"
-          echo "Using browser: $CHROME"
-
-      - name: Start the dev client
-        run: |
-          # strictPort: bind exactly 5173 or fail loudly, never silently bump the port.
-          npm run dev -- --host 127.0.0.1 --port 5173 --strictPort &
-          echo $! > .devpid
-          for i in $(seq 1 60); do
-            curl -sf http://127.0.0.1:5173 >/dev/null && { echo "dev client up"; break; }
-            sleep 2
-          done
-
-      # Change-aware capture: map the diff to the sections it touches (inventory, world map,
-      # or the in-world HUD for a generic visual change) and shoot only those. A diff with no
-      # visual change captures nothing. pr.diff is gitignored.
-      - name: Compute PR diff (for change-aware capture)
-        if: github.event_name == 'pull_request'
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: git diff --no-color "$BASE_SHA" "$HEAD_SHA" > pr.diff || true
-
-      - name: Capture screenshots
-        env:
-          GAME_URL: http://127.0.0.1:5173
-          SHOTS_DIR: pr-shots
-          DIFF_FILE: pr.diff
-        run: node scripts/pr_screenshots.mjs
-
-      - name: Stop the dev client
-        if: always()
-        run: kill "$(cat .devpid)" 2>/dev/null || true
-
-      # Host the PNGs on the bot asset branch and embed them inline in a sticky comment.
-      - name: Embed screenshots in a comment
-        if: always() && github.event_name == 'pull_request'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          SHOTS_DIR: pr-shots
-        run: node scripts/pr_comment_shots.mjs
-
   codex-review:
     name: AI review (Codex)
     runs-on: ubuntu-latest

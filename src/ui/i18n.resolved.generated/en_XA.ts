@@ -2901,6 +2901,7 @@ export const en_XA: EnTranslations = {
       "countLabel": "[{earned}/{total} ðééðš]",
       "completionAria": "[Ðééðš éáŕñéð: {earned} óƒ {total}]",
       "recentLabel": "[Ŕéçéñţ:]",
+      "recentJumpAria": "[Ĵúɱþ ţó {name}]",
       "nearestLabel": "[Ñéáŕļý ţĥéŕé:]",
       "filterGroupAria": "[Ƒíļţéŕ ðééðš]",
       "filterAll": "[Áļļ]",
@@ -6097,10 +6098,16 @@ export const en_XA: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "[Ðóŵñļóáðíñĝ úþðáţé {version}...]",
-      "ready": "[Úþðáţé {version} íš ŕéáðý. Íţ íñšţáļļš ŵĥéñ ýóú ɋúíţ, óŕ ŕéšţáŕţ ñóŵ.]",
+      "checkingTitle": "[Çĥéçķíñĝ ƒóŕ úþðáţéš...]",
+      "checkingBody": "[Ñéŵ ʋéŕšíóñš ðóŵñļóáð ŵĥíļé ýóú þļáý.]",
+      "uptodateTitle": "[Ýóú'ŕé úþ ţó ðáţé]",
+      "downloadingTitle": "[Ðóŵñļóáðíñĝ úþðáţé {version}...]",
+      "downloadingBody": "[Ýóú çáñ ķééþ þļáýíñĝ. Íţ íñšţáļļš ŵĥéñ ýóú ɋúíţ.]",
+      "readyTitle": "[Úþðáţé {version} íš ŕéáðý]",
+      "readyBody": "[Ŕéšţáŕţ ţó íñšţáļļ ñóŵ, óŕ ķééþ þļáýíñĝ áñð íţ íñšţáļļš ŵĥéñ ýóú ɋúíţ.]",
       "restart": "[Ŕéšţáŕţ ñóŵ]",
-      "later": "[Ļáţéŕ]"
+      "later": "[Ļáţéŕ]",
+      "dismiss": "[Ðíšɱíšš]"
     },
     "crash": {
       "title": "[Ŵóŕļð óƒ ÇļáúðéÇŕáƒţ]",

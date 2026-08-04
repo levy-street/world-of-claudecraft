@@ -2901,6 +2901,7 @@ export const fr_FR: EnTranslations = {
       "countLabel": "{earned}/{total} hauts faits",
       "completionAria": "Hauts faits obtenus: {earned} sur {total}",
       "recentLabel": "Récents:",
+      "recentJumpAria": "Jump to {name}",
       "nearestLabel": "Presque au but:",
       "filterGroupAria": "Filtrer les hauts faits",
       "filterAll": "Tous",
@@ -6097,10 +6098,16 @@ export const fr_FR: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "Téléchargement de la mise à jour {version}...",
-      "ready": "La mise à jour {version} est prête. Elle s'installe à la fermeture, ou redémarrez maintenant.",
+      "checkingTitle": "Checking for updates...",
+      "checkingBody": "New versions download while you play.",
+      "uptodateTitle": "You're up to date",
+      "downloadingTitle": "Téléchargement de la mise à jour {version}...",
+      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "readyTitle": "La mise à jour {version} est prête",
+      "readyBody": "Elle s'installe à la fermeture, ou redémarrez maintenant.",
       "restart": "Redémarrer maintenant",
-      "later": "Plus tard"
+      "later": "Plus tard",
+      "dismiss": "Dismiss"
     },
     "crash": {
       "title": "World of ClaudeCraft",

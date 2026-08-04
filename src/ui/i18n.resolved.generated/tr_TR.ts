@@ -2901,6 +2901,7 @@ export const tr_TR: EnTranslations = {
       "countLabel": "{earned}/{total} yiğitlik",
       "completionAria": "{total} yiğitlikten {earned} tanesi kazanıldı",
       "recentLabel": "En son:",
+      "recentJumpAria": "Jump to {name}",
       "nearestLabel": "Ramak kaldı:",
       "filterGroupAria": "Yiğitlikleri filtrele",
       "filterAll": "Tümü",
@@ -6097,10 +6098,16 @@ export const tr_TR: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "{version} güncellemesi indiriliyor...",
-      "ready": "{version} güncellemesi hazır. Çıkış yaptığında kurulur ya da şimdi yeniden başlat.",
+      "checkingTitle": "Checking for updates...",
+      "checkingBody": "New versions download while you play.",
+      "uptodateTitle": "You're up to date",
+      "downloadingTitle": "{version} güncellemesi indiriliyor...",
+      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "readyTitle": "{version} güncellemesi hazır",
+      "readyBody": "Çıkış yaptığında kurulur ya da şimdi yeniden başlat.",
       "restart": "Şimdi Yeniden Başlat",
-      "later": "Daha Sonra"
+      "later": "Daha Sonra",
+      "dismiss": "Dismiss"
     },
     "crash": {
       "title": "World of ClaudeCraft",
