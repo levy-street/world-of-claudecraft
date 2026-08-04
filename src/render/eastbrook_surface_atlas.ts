@@ -358,7 +358,11 @@ export function eastbrookMaterialUsesAtlas(
 }
 
 type MaterialCache = Map<string, THREE.Material>;
-const convertedMaterials = new WeakMap<THREE.Material, MaterialCache>();
+let convertedMaterials = new WeakMap<THREE.Material, MaterialCache>();
+
+export function resetEastbrookSurfaceProfileCaches(): void {
+  convertedMaterials = new WeakMap<THREE.Material, MaterialCache>();
+}
 
 /** Preserve source maps/factors; texture-free Eastbrook materials share the one atlas map. */
 export function eastbrookSurfaceMaterial(

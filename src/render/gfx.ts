@@ -1,6 +1,11 @@
 import * as THREE from 'three';
 import { NATIVE_APP } from '../client_origin';
 import { tightMemoryDeviceHint } from '../device_memory_hint';
+import {
+  type GraphicsSettingsSnapshot,
+  normalizeGraphicsSettingsSnapshot,
+} from '../game/graphics_rebuild_core';
+import { safeStartupGraphicsPreset } from '../game/startup_graphics_safety';
 import { EFFECTS_QUALITY_LOW_CUTOFF } from '../game/ui_effects_profile';
 import { FAR_ANIM_RANGE_SCALE_MAX } from './crowd_lod';
 import { gfxAaPolicy } from './gfx_aa_policy_core';
@@ -95,6 +100,19 @@ export interface GfxRuntimeHints {
   effectsQuality?: number;
   shadowQuality?: number;
   surfaceDetail?: number;
+}
+
+export interface GfxCapabilities {
+  readonly deviceMemory?: number;
+  readonly hardwareConcurrency?: number;
+  readonly maxTouchPoints: number;
+  readonly coarsePointer: boolean;
+  readonly narrowViewport: boolean;
+  readonly gpuRenderer?: string;
+  readonly nativeApp: boolean;
+  readonly tightMemory: boolean;
+  readonly platform: 'ios' | 'android' | 'other';
+  readonly softwareRendering: boolean;
 }
 
 export interface GfxSettings {
@@ -194,6 +212,14 @@ export interface GfxSettings {
    * back to 1 on their own, so this is only the per-tier ceiling.
    */
   readonly farCharacterAnimScale: number;
+}
+
+export interface GfxProfile {
+  readonly settings: Readonly<GfxSettings>;
+  readonly fingerprint: string;
+  readonly forcedTier: GfxTier | null;
+  readonly softwareRendering: boolean;
+  readonly epoch: number;
 }
 
 export interface GfxRuntimeBudget {
@@ -1173,11 +1199,12 @@ export function urlForcedTier(): GfxTier | null {
   return forcedTierFromSearch(location.search);
 }
 
-function runtimeHints(): GfxRuntimeHints {
+type RuntimeDeviceHints = Omit<GfxCapabilities, 'gpuRenderer' | 'softwareRendering'>;
+
+function runtimeDeviceHints(): RuntimeDeviceHints {
   const nav =
     typeof navigator !== 'undefined' ? (navigator as Navigator & { deviceMemory?: number }) : null;
   return {
-    search: typeof location !== 'undefined' ? location.search : '',
     deviceMemory: nav?.deviceMemory,
     hardwareConcurrency: nav?.hardwareConcurrency,
     maxTouchPoints: nav?.maxTouchPoints ?? 0,
@@ -1187,10 +1214,17 @@ function runtimeHints(): GfxRuntimeHints {
       typeof matchMedia !== 'undefined'
         ? matchMedia('(max-width: 940px)').matches || matchMedia('(max-height: 760px)').matches
         : false,
-    gpuRenderer: probeGpuRenderer(),
     nativeApp: NATIVE_APP,
     tightMemory: tightMemoryDeviceHint(),
     platform: mobilePlatformFromNavigator(nav),
+  };
+}
+
+function runtimeHints(): GfxRuntimeHints {
+  return {
+    ...runtimeDeviceHints(),
+    search: typeof location !== 'undefined' ? location.search : '',
+    gpuRenderer: probeGpuRenderer(),
     graphicsPreset: storedNumericSetting('graphicsPreset'),
     terrainDetail: storedNumericSetting('terrainDetail'),
     foliageDensity: storedNumericSetting('foliageDensity'),
@@ -1443,29 +1477,167 @@ export function gfxSoftwareRendering(): boolean {
   return softwareGlDetected;
 }
 
+function deepFreeze<T>(value: T): T {
+  if (value === null || typeof value !== 'object') return value;
+  Object.freeze(value);
+  for (const nested of Object.values(value as Record<string, unknown>)) deepFreeze(nested);
+  return value;
+}
+
+function cloneProfileValue<T>(value: T): T {
+  if (value === null || typeof value !== 'object') return value;
+  if (Array.isArray(value)) return value.map(cloneProfileValue) as T;
+  return Object.fromEntries(
+    Object.entries(value).map(([key, nested]) => [key, cloneProfileValue(nested)]),
+  ) as T;
+}
+
+function stableFingerprintValue(value: unknown): string {
+  if (value === null) return 'null';
+  if (typeof value === 'boolean' || typeof value === 'string') return JSON.stringify(value);
+  if (typeof value === 'number') {
+    if (Number.isNaN(value)) return 'NaN';
+    if (value === Number.POSITIVE_INFINITY) return 'Infinity';
+    if (value === Number.NEGATIVE_INFINITY) return '-Infinity';
+    if (Object.is(value, -0)) return '-0';
+    return String(value);
+  }
+  if (typeof value === 'undefined') return 'undefined';
+  if (Array.isArray(value)) return `[${value.map(stableFingerprintValue).join(',')}]`;
+  if (typeof value === 'object') {
+    return `{${Object.keys(value)
+      .sort()
+      .map(
+        (key) =>
+          `${JSON.stringify(key)}:${stableFingerprintValue((value as Record<string, unknown>)[key])}`,
+      )
+      .join(',')}}`;
+  }
+  throw new TypeError(`Unsupported graphics fingerprint value: ${typeof value}`);
+}
+
+function profileFromHints(
+  hints: GfxRuntimeHints,
+  softwareRendering: boolean,
+  epoch: number,
+): GfxProfile {
+  const tier = tierFromHints(hints, softwareRendering);
+  const settings = deepFreeze(cloneProfileValue(settingsFor(tier, hints)));
+  return Object.freeze({
+    settings,
+    fingerprint: stableFingerprintValue(settings),
+    forcedTier: forcedTierFromSearch(hints.search),
+    softwareRendering,
+    epoch,
+  });
+}
+
+/** Capture device and live-adapter facts without reading graphics preferences. */
+export function captureGfxCapabilities(webgl: THREE.WebGLRenderer): GfxCapabilities {
+  const gpuRenderer = rendererName(webgl);
+  return Object.freeze({
+    ...runtimeDeviceHints(),
+    gpuRenderer,
+    softwareRendering: isSoftwareRendererName(gpuRenderer),
+  });
+}
+
+/** Resolve a candidate profile without activating it or touching persisted settings. */
+export function resolveGfxProfile(
+  capabilities: GfxCapabilities,
+  preferences: GraphicsSettingsSnapshot,
+  search: string,
+): GfxProfile {
+  const { softwareRendering, ...deviceHints } = capabilities;
+  const normalizedPreferences = normalizeGraphicsSettingsSnapshot(preferences);
+  const forcedTier = forcedTierFromSearch(search);
+  const graphicsPreset = forcedTier
+    ? normalizedPreferences.graphicsPreset
+    : safeStartupGraphicsPreset(
+        capabilities.nativeApp,
+        capabilities.platform === 'ios' ? 'webkit' : 'unknown',
+        capabilities.platform === 'ios',
+        normalizedPreferences.graphicsPreset,
+        PRESET_ULTRA,
+        PRESET_HIGH,
+      );
+  return profileFromHints(
+    {
+      ...deviceHints,
+      ...normalizedPreferences,
+      graphicsPreset,
+      search,
+    },
+    softwareRendering,
+    0,
+  );
+}
+
 // Best-guess settings from the URL alone (so module-load consumers see sane
 // values); initGfxTier() re-resolves once the GL context exists. The renderer
 // MUST call initGfxTier() right after creating its WebGLRenderer and before
 // building any scene content.
-export let GFX: GfxSettings = settingsFor(tierFromHints(runtimeHints(), false), runtimeHints());
+const initialHints = runtimeHints();
+export let activeGfxProfile = profileFromHints(initialHints, false, 0);
+export let gfxProfileEpoch = activeGfxProfile.epoch;
+export let GFX: GfxSettings = activeGfxProfile.settings;
+
+export function getActiveGfxProfile(): GfxProfile {
+  return activeGfxProfile;
+}
+
+export function getGfxProfileEpoch(): number {
+  return gfxProfileEpoch;
+}
+
+/** Publish a resolved profile. Epoch changes exactly when derived settings change. */
+export function activateGfxProfile(profile: GfxProfile): GfxProfile {
+  const settings = deepFreeze(cloneProfileValue(profile.settings));
+  const fingerprint = stableFingerprintValue(settings);
+  const epoch =
+    fingerprint === activeGfxProfile.fingerprint ? gfxProfileEpoch : gfxProfileEpoch + 1;
+  const activated = Object.freeze({
+    settings,
+    fingerprint,
+    forcedTier: profile.forcedTier,
+    softwareRendering: profile.softwareRendering,
+    epoch,
+  });
+
+  GFX = settings;
+  softwareGlDetected = activated.softwareRendering;
+  activeGfxProfile = activated;
+  gfxProfileEpoch = epoch;
+  return activated;
+}
 
 export function initGfxTier(webgl: THREE.WebGLRenderer): GfxTier {
   // Install before any scene material compiles. The fixed point-light budget
   // keeps program counts stable with zero-intensity slots; the shader guard
   // makes those stable slots cheap without changing their permutation.
   installPbrPointLightShaderPruning();
-  const hints = { ...runtimeHints(), gpuRenderer: rendererName(webgl) };
-  softwareGlDetected = isSoftwareGL(webgl);
-  const tier = tierFromHints(hints, softwareGlDetected);
-  GFX = settingsFor(tier, hints);
-  return tier;
+  const gpuRenderer = rendererName(webgl);
+  const softwareRendering = isSoftwareRendererName(gpuRenderer);
+  const hints = { ...runtimeHints(), gpuRenderer };
+  return activateGfxProfile(profileFromHints(hints, softwareRendering, 0)).settings.tier;
 }
 
 export const gfxInternalsForTest = {
   settingsFor,
   runtimeHints,
+  stableFingerprintValue,
   mobilePlatformFromNavigator,
   probeGpuRenderer,
+  overrideSettings: (overrides: Partial<GfxSettings>): (() => void) => {
+    const previous = GFX;
+    GFX = deepFreeze({ ...GFX, ...overrides });
+    let restored = false;
+    return () => {
+      if (restored) return;
+      restored = true;
+      GFX = previous;
+    };
+  },
   resetGpuRendererProbe: () => {
     gpuRendererProbed = false;
     probedGpuRenderer = undefined;
@@ -1554,6 +1726,11 @@ export function addRimGlow(mat: THREE.Material): void {
 // meshes share a few dozen programs/uniform sets. Standard on high/ultra,
 // Lambert on low.
 const matCache = new Map<string, THREE.Material>();
+
+/** Drop profile-derived shared materials before rebuilding for a new settings object. */
+export function resetSurfaceMaterialProfileCache(): void {
+  matCache.clear();
+}
 
 export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
   const key = JSON.stringify({

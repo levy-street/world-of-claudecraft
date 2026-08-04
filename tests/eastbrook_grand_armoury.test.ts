@@ -7,7 +7,7 @@ import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it } from 'vitest';
 import { eastbrookGrandArmouryInternalsForTest } from '../src/render/eastbrook_grand_armoury';
-import { GFX } from '../src/render/gfx';
+import { gfxInternalsForTest } from '../src/render/gfx';
 import { stationPropPlacements } from '../src/render/stations_core';
 import {
   BUILDING_TERRAIN_SAMPLE_STEP,
@@ -482,9 +482,7 @@ describe('Eastbrook Grand Armoury render seam', () => {
   });
 
   it('clones an immutable source, preserves Standard material factors, and excludes emissives from shadows', () => {
-    const mutableGfx = GFX as unknown as { standardMaterials: boolean };
-    const originalStandardMaterials = mutableGfx.standardMaterials;
-    mutableGfx.standardMaterials = true;
+    const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: true });
     const source = new THREE.Group();
     const geometry = new THREE.BoxGeometry(1, 1, 1);
     const colors = new Float32Array(geometry.getAttribute('position').count * 3).fill(0.5);
@@ -552,14 +550,12 @@ describe('Eastbrook Grand Armoury render seam', () => {
         crystal,
       ]);
     } finally {
-      mutableGfx.standardMaterials = originalStandardMaterials;
+      restoreGfx();
     }
   });
 
   it('uses the Lambert-compatible Low/native-iOS arm without losing vertex colors or emissive cues', () => {
-    const mutableGfx = GFX as unknown as { standardMaterials: boolean };
-    const originalStandardMaterials = mutableGfx.standardMaterials;
-    mutableGfx.standardMaterials = false;
+    const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: false });
     const geometry = new THREE.BoxGeometry(1, 1, 1);
     geometry.setAttribute(
       'color',
@@ -612,7 +608,7 @@ describe('Eastbrook Grand Armoury render seam', () => {
       );
       expect(meshes.map((mesh) => mesh.castShadow)).toEqual([true, false]);
     } finally {
-      mutableGfx.standardMaterials = originalStandardMaterials;
+      restoreGfx();
     }
   });
 

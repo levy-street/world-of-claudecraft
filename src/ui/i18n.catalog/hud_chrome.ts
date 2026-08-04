@@ -1044,6 +1044,16 @@ export const hudChromeStrings = {
     browserEffectsMinimal: 'Minimal',
     browserEffectsNote:
       'Auto tones down heavy CSS effects (blur, glow, background motion) based on your browser and device. Lower it manually if the interface feels sluggish.',
+    // Renderer-bound graphics draft and its single apply/recovery action.
+    graphicsApply: 'Apply Graphics',
+    graphicsApplying: 'Applying graphics settings...',
+    graphicsApplied: 'Graphics settings applied.',
+    graphicsSaved: 'Graphics settings saved. The active renderer already matches them.',
+    graphicsFailed: 'Graphics could not be applied. Your previous settings are still active.',
+    graphicsRetry: 'Retry Graphics',
+    graphicsFatal: 'Graphics recovery failed. Reload the game to continue.',
+    graphicsReload: 'Reload Game',
+    graphicsDraftChanged: 'Graphics changes are ready to apply.',
     // Interface Mode control (Graphics panel): desktop keyboard/mouse vs the
     // on-screen touch controls. Auto detects the device; the rest force one.
     interfaceMode: 'Interface Mode',

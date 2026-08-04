@@ -209,6 +209,22 @@ describe('entry diagnostics controller', () => {
     expect(events.at(-1)).toBe('runtime-stable');
   });
 
+  it('can resume under a newly applied live graphics preset', () => {
+    const { controller, events } = harness();
+    controller.start(2);
+    controller.checkpoint('runtime-stable');
+    suspendActiveEntryDiagnostics();
+    resumeActiveEntryDiagnostics(4);
+    expect(events).toEqual([
+      'start:2',
+      'scene-build-start',
+      'runtime-stable',
+      'clear',
+      'start:4',
+      'runtime-stable',
+    ]);
+  });
+
   it('uses wall time for persisted checkpoints rather than animation time', () => {
     const { controller, persistence, setWallNow } = harness();
     controller.start(2);
