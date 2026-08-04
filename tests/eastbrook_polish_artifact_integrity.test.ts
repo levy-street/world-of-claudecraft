@@ -614,19 +614,20 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   POLISH_ROOT,
   'metadata/after-desktop-ultra.json',
 );
-// Re-pinned for the merge of release/v0.34.0 into this branch. Four
+// Re-pinned for the merge of release/v0.34.0 into this branch. Five
 // rendererIntegration moves now stack on src/render/renderer.ts: PR #2720's
 // Eastbrook fence-removal layout evidence, the live graphics rebuild (context
-// recycle plus profile-aware Eastbrook runtime inputs, PR #2799) and the Bear
-// Form visual swap onto the purpose-built quadruped rig (PR #2842) from the
-// release side, plus this branch's worldObjectBurning fire-burst cue. The
+// recycle plus profile-aware Eastbrook runtime inputs, PR #2799), the Bear
+// Form visual swap onto the purpose-built quadruped rig (PR #2842) and the
+// far-field sprite impostors, fog-free vista and horizon pass (PR #2793) from
+// the release side, plus this branch's worldObjectBurning fire-burst cue. The
 // accepted file still points at the same captured view; only its swept
 // provenance bytes follow the merged rendererIntegration and layout inputs.
 // Re-minted with scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'ae51856461997e8aea561d3b86b31a5ba9b01898360f59c3a248b32018d8a489';
+  '2bd7b43a27d26ab451b794acee755220041795dd3bcd2f3577205a0e0bd91f13';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '3fb6c92ebd3d226898c4f2911e3982205f0ba4a408bee0e8accec7f954f23091';
+  'b4d66ed9452c75a4838948c9d20ac9cc4293afc458aee33462dce72b353d8987';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1483,16 +1484,17 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(acceptedFiles).toHaveLength(4);
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
-    // Four rendererIntegration moves now stack in that composite (PR #2720's
-    // fence-removal layout evidence, the live graphics rebuild #2799 and the
-    // Bear Form rig swap #2842 from release/v0.34.0, plus this branch's
+    // Five rendererIntegration moves now stack in that composite (PR #2720's
+    // fence-removal layout evidence, the live graphics rebuild #2799, the Bear
+    // Form rig swap #2842 and the far-field impostors, fog-free vista and
+    // horizon pass #2793 from release/v0.34.0, plus this branch's
     // worldObjectBurning fire-burst cue), so this seal follows the merged
     // composite, recomputed last by remint_polish_provenance.mjs. Every measured
     // value (frame timings, draw stats, triangle and scenario numbers) is
     // byte-identical against the current release/v0.34.0 tip, no parent's
     // literal matched the merged tree, and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      '0bfadba27629ae02f1caf1d0340478d8e8300eccbe7cc0e3bd01fd9c70616a97',
+      '2eda1a3b8597ce80d6e77640e63565d93e2a9daa27e1fe8302a0075ef25d76f4',
     );
   });
 

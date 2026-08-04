@@ -627,10 +627,12 @@ describe('Eastbrook Grand Armoury render seam', () => {
   it('dispatches the landmark before the old inn asset branch', () => {
     const source = readFileSync(new URL('../src/render/props.ts', import.meta.url), 'utf8');
     const armouryDispatch = source.indexOf('buildEastbrookGrandArmouryView(b, ground)');
-    // The legacy per-kind asset resolution (the `inn` entry now rides a
-    // kindAsset lookup rather than an inline ternary, so the Veiled Hollow set
-    // can share it) must stay BELOW the landmark dispatch, which `continue`s.
-    const legacyAssetDispatch = source.indexOf('kindAsset[b.kind] ??');
+    // The legacy per-kind asset resolution (now the shared buildingAssetPick
+    // helper, so the impostor collector resolves the SAME asset) must stay
+    // BELOW the landmark dispatch in the building loop, which `continue`s:
+    // an armoury building must never fall through to a generic house pick.
+    // The scan anchors on the loop's CALL SITE, not the helper's internals.
+    const legacyAssetDispatch = source.indexOf('const asset = buildingAssetPick(b);');
     expect(armouryDispatch).toBeGreaterThan(0);
     expect(legacyAssetDispatch).toBeGreaterThan(armouryDispatch);
     expect(source).toMatch(
