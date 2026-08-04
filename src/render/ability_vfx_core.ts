@@ -110,6 +110,11 @@ export interface AbilityVfxBuffSpec {
   // ramp toward the point): Adder's Bite's green-tipped dagger against
   // Festering Venom's full-blade soak. Absent = the whole weapon.
   weaponAuraScope?: 'tip';
+  // Authored opt-out of the long-buff policy: a buff worn for
+  // LONG_BUFF_VFX_SECONDS or more holds no orbit band, ground disc, or shell
+  // unless it morphs/veils or sets persist (ability_vfx_longbuff_core.ts owns
+  // the rule; the policy test pins the silenced set).
+  persist?: boolean;
   shellDur?: number;
   o?: {
     rate?: number;

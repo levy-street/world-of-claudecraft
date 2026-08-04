@@ -172,6 +172,20 @@ for (let i = 0; i < specIds.length; i++) {
 // one buff (rim body glow), one strike where class-appropriate. Asserts the
 // live glow level (abilityVfxGlow), projectile/sequence primitives, and the
 // swing one-shot counter (abilityVfxAttackCount).
+// Buffs the long-buff policy silences while worn (aura >= 300s,
+// src/render/ability_vfx_longbuff_core.ts): the cast ceremony and the
+// first-sighting gain swirl still register primitives, but no held band or
+// ground disc may survive the settle window.
+const LONG_SILENT_BUFFS = new Set([
+  'arcane_intellect',
+  'aspect_of_the_hawk',
+  'battle_shout',
+  'demon_skin',
+  'lightning_shield',
+  'mark_of_the_wild',
+  'power_word_fortitude',
+]);
+
 const REAL_CASTS = {
   // spec: committed spec id, required for spec-gated kit (Blood Toll is
   // arms/prot-only). crusader_strike is talent-GRANTED, not base kit, so the
@@ -290,16 +304,34 @@ async function realCastClass(cls, plan) {
       (id, playerId) => {
         const g = window.__game;
         const st = g.abilityVfxStats()[id] ?? { claimed: 0, primitives: 0 };
-        return { st, attacks: g.abilityVfxAttackCount(), glow: g.abilityVfxGlow(playerId) };
+        return {
+          st,
+          attacks: g.abilityVfxAttackCount(),
+          glow: g.abilityVfxGlow(playerId),
+          groundAuras: g.abilityVfxGroundAuras(playerId),
+        };
       },
       abilityId,
       ids.playerId,
     );
     const primitives = after.st.primitives - before.st.primitives;
     const attacksDelta = after.attacks - before.attacks;
-    const entry = { ability: abilityId, primitives, attacksDelta, glow: after.glow };
+    const entry = {
+      ability: abilityId,
+      primitives,
+      attacksDelta,
+      glow: after.glow,
+      groundAuras: after.groundAuras,
+    };
     if (kind === 'bolt' || kind === 'bolt2') entry.ok = primitives >= 3;
-    else if (kind === 'buff') entry.ok = primitives >= 2 && after.glow > 0.05;
+    else if (kind === 'buff')
+      // Long-silenced buffs (the long-buff policy) keep the cast ceremony +
+      // gain swirl but must hold NO ground disc through the settle; the glow
+      // clause stays on short buffs only, because a silenced buff's only glow
+      // is the application pulse, decayed to zero by the settle read.
+      entry.ok = LONG_SILENT_BUFFS.has(abilityId)
+        ? primitives >= 2 && after.groundAuras === 0
+        : primitives >= 2 && after.glow > 0.05;
     else if (kind === 'strike') entry.ok = primitives >= 2 && attacksDelta >= 1;
     else if (kind === 'extraSpin') entry.ok = attacksDelta >= 1;
     // the offline world is a live ecosystem (wildlife fights, cooldown/GCD
@@ -368,9 +400,10 @@ await page.evaluate(() => {
   }
 });
 
-// A REAL self-buff cast through the sim proves the aura-driven orbit band and
-// swirl pop (no synthesized event involved): battle_shout applies its aura,
-// syncEntity sees it, the band + swirl register as primitives.
+// A REAL self-buff cast through the sim proves the aura-driven gain read (no
+// synthesized event involved): battle_shout applies its 30 min aura,
+// syncEntity sees it, and under the long-buff policy the one-shot gain swirl
+// registers while NO held band or ground disc survives the settle.
 const buffBand = await page.evaluate(() => {
   const g = window.__game;
   const before = g.abilityVfxStats().battle_shout ?? { claimed: 0, primitives: 0 };
@@ -380,9 +413,13 @@ const buffBand = await page.evaluate(() => {
 await new Promise((r) => setTimeout(r, 800));
 await page.screenshot({ path: `${OUT_DIR}/buff_band_battle_shout.png` });
 const buffBandAfter = await page.evaluate(
-  () => window.__game.abilityVfxStats().battle_shout ?? { claimed: 0, primitives: 0 },
+  (playerId) => ({
+    st: window.__game.abilityVfxStats().battle_shout ?? { claimed: 0, primitives: 0 },
+    groundAuras: window.__game.abilityVfxGroundAuras(playerId),
+  }),
+  setup.playerId,
 );
-const buffBandDelta = buffBandAfter.primitives - buffBand.before.primitives;
+const buffBandDelta = buffBandAfter.st.primitives - buffBand.before.primitives;
 
 // Melee auto-attack sequence: a plain swing and a ranged-correlated one. The
 // painter adds the subtle slash ribbon; meleeSpark and the swing anim are the
@@ -423,7 +460,12 @@ const report = {
   withPrimitivesCount: withPrimitives.length,
   failed: failed.map(([id, r]) => ({ id, ...r })),
   autoAttack: { ...auto, pageerrorsDuring: pageerrors.length },
-  buffBand: { ability: 'battle_shout', primitives: buffBandDelta, ok: buffBandDelta >= 2 },
+  buffBand: {
+    ability: 'battle_shout',
+    primitives: buffBandDelta,
+    groundAuras: buffBandAfter.groundAuras,
+    ok: buffBandDelta >= 1 && buffBandAfter.groundAuras === 0,
+  },
   realCasts,
   realCastFails,
   screenshots: shot + 1,
