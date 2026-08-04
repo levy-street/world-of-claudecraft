@@ -277,9 +277,11 @@ describe('item webp icons', () => {
     for (const id of ITEM_ART_PENDING) {
       expect(itemImageUrl(id), `${id} must not resolve to uncommitted art`).toBeNull();
     }
-    expect(ITEM_ART_PENDING.size, 'the accepted painted-art wave clears all enumerated debt').toBe(
-      0,
-    );
+    // The six hunter quivers are the only enumerated art debt: gameplay landed
+    // ahead of the commission (docs/hunter-quiver-art-brief.md). Drop this back
+    // to 0 as the webps land; the per-id assertion above already fails on any id
+    // left here once its art exists, so neither half can go stale quietly.
+    expect(ITEM_ART_PENDING.size, 'only the hunter quiver art commission is outstanding').toBe(6);
     // And the inverse: an id with committed art must still win the static url.
     expect(itemImageUrl('linen_pouch')).toBe('/ui/items/linen_pouch.webp');
   });

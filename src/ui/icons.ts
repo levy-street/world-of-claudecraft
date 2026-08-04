@@ -4496,7 +4496,20 @@ export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 // future development-only item may still use it temporarily. tests/item_icons.test.ts holds
 // the line from both sides: it rejects stale entries after art lands and unenumerated art
 // debt. Do not add to this list merely to silence that failure; commission the art.
-export const ITEM_ART_PENDING = new Set<string>();
+//
+// TEMPORARILY NON-EMPTY: the six hunter quivers ship their gameplay ahead of their art.
+// The brief for the commission is docs/hunter-quiver-art-brief.md; each id leaves this
+// list as its webp lands, and guard A3 fails on any id left here once its art exists, so
+// the debt cannot go stale silently. This is the enumerated-debt path, NOT a waiver: the
+// items render their composed procedural icon meanwhile instead of a 404'd <img>.
+export const ITEM_ART_PENDING = new Set<string>([
+  'moggers_hide_quiver',
+  'cragmaw_huntquiver',
+  'gravewyrm_bone_quiver',
+  'direfang_quiver',
+  'heroic_gravewyrm_bone_quiver',
+  'heroic_direfang_quiver',
+]);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
 export function itemImageUrl(id: string): string | null {

@@ -453,7 +453,12 @@ describe('missing painted item integration', () => {
   it('empties ITEM_ART_PENDING and serves all 101 targets as painted item art', () => {
     const accepted = manifest();
     expect(accepted.targetSets.items).toHaveLength(101);
-    expect(ITEM_ART_PENDING.size).toBe(0);
+    // This wave's own debt must be fully discharged. Scoped to the wave's target
+    // set rather than asserting the list is globally empty: a later change may
+    // legitimately enumerate NEW art debt (the hunter quivers do), and that must
+    // not read as this wave regressing. tests/item_icons.test.ts guard A3 owns
+    // the global count.
+    expect(accepted.targetSets.items.filter((id) => ITEM_ART_PENDING.has(id))).toEqual([]);
     for (const id of accepted.targetSets.items) {
       expect(ITEMS[id], `${id} must remain a live item`).toBeDefined();
       expect(ITEMS[id].kind, `${id} must not enter the weapon icon lane`).not.toBe('weapon');

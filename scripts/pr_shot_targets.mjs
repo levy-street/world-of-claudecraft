@@ -2452,6 +2452,51 @@ export const TARGETS = [
     },
   },
   {
+    key: 'hunter-quiver-paperdoll',
+    label: 'Hunter paperdoll with a quiver in the off-hand',
+    // Quivers are the first items that put anything in a hunter's off-hand, so
+    // the paperdoll is the view that shows the change. Keyed on the quiver
+    // records themselves rather than a ui/ path: the diff is content-only.
+    when: ['content/zone3', 'content/items'],
+    variants: [
+      { key: 'desktop', charClass: 'hunter', charName: 'Fletcher' },
+      { key: 'mobile', mobile: true, charClass: 'hunter', charName: 'Fletcher' },
+    ],
+    async capture(page) {
+      await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        // The epic rung derives a required level from its quality, so raise the
+        // player before equipping or the equip silently refuses.
+        try {
+          sim?.setPlayerLevel?.(20);
+        } catch {}
+        for (const id of [
+          'moggers_hide_quiver',
+          'cragmaw_huntquiver',
+          'gravewyrm_bone_quiver',
+          'direfang_quiver',
+        ]) {
+          try {
+            sim?.addItem(id, 1);
+          } catch {}
+        }
+        try {
+          sim?.equipItem('direfang_quiver');
+        } catch {}
+        const el = document.querySelector('#char-window');
+        if (el) el.style.display = 'none';
+        game?.hud?.toggleChar?.();
+      });
+      await wait(900);
+      const open = await page.evaluate(() => {
+        const w = document.querySelector('#char-window');
+        return !!w && getComputedStyle(w).display !== 'none';
+      });
+      return open ? { clip: '#char-window' } : {};
+    },
+  },
+  {
     key: 'char-window',
     label: 'Character window',
     when: ['ui/char_window', 'ui/char_view', 'ui/stat_tooltip_view'],
