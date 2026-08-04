@@ -3101,17 +3101,18 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
       },
     ],
   },
-  // Collectible mounts (src/sim/mounts.ts mountOwned): soulbound reins items;
-  // owning the item is owning the mount. The toad drops from Korzul the
-  // Gravewyrm, the griffin from Nythraxis (the raid pinnacle drop), the
-  // gobbler from Thunzharr the world boss (a personal-loot chase drop).
+  // Collectible mounts (src/sim/mounts.ts mountOwned): unbound reins items;
+  // owning the item is owning the mount, and the item transfers like any
+  // other. The toad drops from Korzul the Gravewyrm, the griffin from
+  // Nythraxis (the raid pinnacle drop), the gobbler from Thunzharr the world
+  // boss (a personal-loot chase drop).
   reins_shadowjump_toad: {
     id: 'reins_shadowjump_toad',
     name: 'Reins of Kama-Kage the Shadow-Jump Toad',
     kind: 'mount',
     mount: 'shadowjump_toad',
     quality: 'uncommon',
-    soulbound: true,
+    noVendorSell: true,
     noDiscard: true,
     sellValue: 0,
   },
@@ -3121,7 +3122,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     kind: 'mount',
     mount: 'stormfeather_griffin',
     quality: 'uncommon',
-    soulbound: true,
+    noVendorSell: true,
     noDiscard: true,
     sellValue: 0,
   },
@@ -3131,7 +3132,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     kind: 'mount',
     mount: 'thunderstrut_gobbler',
     quality: 'epic',
-    soulbound: true,
+    noVendorSell: true,
     noDiscard: true,
     sellValue: 0,
   },

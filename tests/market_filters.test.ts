@@ -267,6 +267,17 @@ describe('World Market filters', () => {
     );
   });
 
+  // Mount reins are listable now that they are unbound, so their browse home is
+  // newly load-bearing: a listed reins must be findable under the Other chip,
+  // never stranded where only an exact-name search reaches it.
+  it("routes mount reins through the 'other' chip so a listed reins stays browsable", () => {
+    expect(filterIds(['reins_grag_bear'], { itemType: 'other' })).toEqual(['reins_grag_bear']);
+    // And no narrower chip claims it.
+    for (const t of ['weapon', 'armor', 'consumable', 'bag', 'material', 'cosmetic'] as const) {
+      expect(filterIds(['reins_grag_bear'], { itemType: t }), t).toEqual([]);
+    }
+  });
+
   // The exhaustiveness tail in itemMatchesType is a tsc guard, and tsc is erased in
   // the shipped bundle. This drives what SURVIVES that erasure: an item type with no
   // arm must browse as nothing, never as everything. Returning the asserted `never`

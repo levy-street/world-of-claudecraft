@@ -1647,15 +1647,16 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     sellValue: 350,
     requiredClass: WAR,
   },
-  // Collectible mount (Vael the Fogbinder, The Sunken Bastion). Soulbound;
-  // owning the reins item is owning the mount (src/sim/mounts.ts mountOwned).
+  // Collectible mount (Vael the Fogbinder, The Sunken Bastion). Not soulbound;
+  // owning the reins item is owning the mount (src/sim/mounts.ts mountOwned),
+  // and the item transfers like any other.
   reins_stalkglider_snail: {
     id: 'reins_stalkglider_snail',
     name: 'Reins of the Moss-Shell Stalk-Glider',
     kind: 'mount',
     mount: 'stalkglider_snail',
     quality: 'rare',
-    soulbound: true,
+    noVendorSell: true,
     noDiscard: true,
     sellValue: 0,
   },

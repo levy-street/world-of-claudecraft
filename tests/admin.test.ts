@@ -1376,7 +1376,7 @@ describe('legacy guild administration parity', () => {
       purchasedSlots: 30,
       usedSlots: 1,
       dormantSlots: 1,
-      slots: [{ index: 0, itemId: 'reins_grag_bear', count: 1, dormant: true }],
+      slots: [{ index: 0, itemId: 'final_argument_greatblade', count: 1, dormant: true }],
     };
     fakeGameState.adminGuildBankState.mockReturnValueOnce(state);
 
