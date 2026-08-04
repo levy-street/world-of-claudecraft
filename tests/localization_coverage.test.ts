@@ -388,8 +388,9 @@ describe('i18n Localization Key Coverage', () => {
     item: 'Rough Bracers',
     key: 'K',
     // The death recap's slayer (hud.system.deathRecapKiller[Ability]): a mob
-    // or player display name spliced verbatim.
-    killer: 'Gnarltooth',
+    // or player display name spliced verbatim. One sample only, the base and
+    // this branch each added the same key independently.
+    killer: 'Mira',
     kind: 'Weapon',
     slots: 14,
     label: 'Wolf',
