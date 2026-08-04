@@ -209,7 +209,7 @@ describe('Eastbrook polish capture contract', () => {
       sourceComparison: 'feature-worktree',
       views: EASTBROOK_TOWN_CAPTURE_VIEWS,
       placementInventory: EASTBROOK_TOWN_REBUILD_PLACEMENT_INVENTORY,
-      townTriangles: 29_644,
+      townTriangles: 29_436,
       attributionTargets: [
         {
           key: 'town-root',
@@ -233,7 +233,7 @@ describe('Eastbrook polish capture contract', () => {
       sourceComparison: 'polish-baseline-worktree',
       views: EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS,
       placementInventory: EASTBROOK_TOWN_REBUILD_PLACEMENT_INVENTORY,
-      townTriangles: 29_644,
+      townTriangles: 29_436,
       attributionTargets: [
         {
           key: 'town-root',
@@ -255,7 +255,7 @@ describe('Eastbrook polish capture contract', () => {
       layoutId: 'eastbrook_civic_layout_v2',
       sourceComparison: 'polish-v2-worktree',
       placementInventory: EASTBROOK_TOWN_POLISH_V2_PLACEMENT_INVENTORY,
-      townTriangles: 29_110,
+      townTriangles: 28_902,
       attributionTargets: [
         {
           key: 'town-root',
@@ -360,15 +360,17 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned: src/render/renderer.ts is the rendererIntegration
-      // leaf of this composite, so any edit to it moves the leaf's own sha256
-      // and, with it, the composite fingerprint. Prior re-pins in this chain:
-      // the compile-storm gear/mount/base-visual gate fix, then gating the
-      // shapeshift-form visual swap on async compile (#2571). This re-pin: the
-      // quest-dedupe content pass added the worldObjectBurning fire-burst cue
-      // (torched murloc huts, q_deepfen_purge) to renderer.ts. No GLB source
-      // fingerprint moved and no capture was retaken, same as every precedent.
-      fingerprint: '22d18ba8d44ea6108109f8e445133edb0bc438995fba980c394c44df05d80a7c',
+      // Deliberately re-pinned for the merge of release/v0.34.0 into this branch.
+      // src/render/renderer.ts is the rendererIntegration leaf of this composite,
+      // so any edit to it moves the leaf's sha256 and with it the composite. Both
+      // parents re-pinned independently: the release side stacked its renderer
+      // provenance move with PR #2720's fence-removal layout evidence, and this
+      // branch added the worldObjectBurning fire-burst cue (torched murloc huts,
+      // q_deepfen_purge). The merged renderer therefore mints a composite that
+      // matches neither parent's literal. No GLB source fingerprint moved, no
+      // pipeline input or geometry value changed, and no capture was retaken,
+      // same as every precedent in this chain.
+      fingerprint: '2e5613b97636f23a7d4e19d694155f4d4162de355cd42bfbc8e9687da4995821',
       components: {
         captureContract: {
           id: 'polish-v2',
@@ -579,10 +581,10 @@ describe('Eastbrook polish capture contract', () => {
         shadowEnabled: true,
         ...(contractId ? { contractId } : {}),
       });
-    expect(() => assertPerf(29_644)).not.toThrow();
-    expect(() => assertPerf(29_644, 'rebuild-v1')).not.toThrow();
-    expect(() => assertPerf(29_644, 'polish-baseline')).not.toThrow();
-    expect(() => assertPerf(29_110, 'polish-v2')).not.toThrow();
+    expect(() => assertPerf(29_436)).not.toThrow();
+    expect(() => assertPerf(29_436, 'rebuild-v1')).not.toThrow();
+    expect(() => assertPerf(29_436, 'polish-baseline')).not.toThrow();
+    expect(() => assertPerf(28_902, 'polish-v2')).not.toThrow();
     expect(() => assertPerf(29_644, 'polish-v2')).toThrow('draw stats');
   });
 

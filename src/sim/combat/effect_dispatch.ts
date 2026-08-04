@@ -15,7 +15,7 @@
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the
 // shared `ctx.rng` stream, drawn in the exact pre-move order.
 
-import { isDebuffAura, isDispellableAura } from '../aura_classify';
+import { isDebuffAura, isDispellableAura, isPlayerRemovableAura } from '../aura_classify';
 import { ABILITIES, isDelvePos, MOBS } from '../data';
 import { logCascadeCast, recordCascadeInitial } from '../dev/cascade_playtest';
 import { recalcPlayerStats } from '../entity';
@@ -1078,10 +1078,12 @@ export function runEffects(
         // Ice Block strips every player-removable debuff off the caster (control,
         // DoTs, stat saps, ...), broader than breakRoots and breakControl.
         // Encounter-authored unbreakable control stays until its owning script
-        // releases it.
+        // releases it, and an undispellable penalty (the recovery sicknesses) stays
+        // until its own timer runs out: isPlayerRemovableAura is the shared rule this
+        // and the dispel executor both answer to.
         for (let i = p.auras.length - 1; i >= 0; i--) {
           const aura = p.auras[i];
-          if (isDebuffAura(aura.kind, aura.value) && !isUnbreakableControlAura(aura)) {
+          if (isDebuffAura(aura.kind, aura.value) && isPlayerRemovableAura(aura)) {
             p.auras.splice(i, 1);
             ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
           }

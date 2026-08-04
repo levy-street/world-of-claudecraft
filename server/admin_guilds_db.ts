@@ -1,4 +1,5 @@
 import type { PoolClient } from 'pg';
+import { GUILD_BANK_PURGE_ACTION } from './admin_db';
 import { bustAdminGuildListReads, normalizeAdminGuildSearch } from './admin_guilds_read';
 import type { AdminGuildSort, AdminGuildSortDirection } from './admin_guilds_sort';
 import { pool } from './db';
@@ -11,7 +12,7 @@ import { REALM } from './realm';
 import { GUILD_MEMBER_LIMIT, validateGuildName } from './social';
 
 const ADMIN_GUILD_HISTORY_LIMIT = 100;
-const ADMIN_GUILD_REASON_MAX = 500;
+export const ADMIN_GUILD_REASON_MAX = 500;
 
 export interface AdminGuildSummary {
   id: number;
@@ -47,6 +48,8 @@ export interface AdminGuildDetail {
 
 export interface AdminGuildHistoryRow {
   id: number;
+  /** What the row records: 'guild_rename' or 'guild_bank_purge'. */
+  action: string;
   oldName: string;
   newName: string;
   reason: string;
@@ -236,7 +239,7 @@ export async function listAdminGuildHistory(
   ]);
   if (!guild.rows[0]) return null;
   const result = await pool.query(
-    `SELECT action.id, action.old_name, action.new_name, action.reason,
+    `SELECT action.id, action.action, action.old_name, action.new_name, action.reason,
             action.created_at, action.admin_account_id, admin.username AS admin_username
        FROM guild_moderation_actions action
        LEFT JOIN accounts admin ON admin.id = action.admin_account_id
@@ -247,6 +250,7 @@ export async function listAdminGuildHistory(
   );
   return result.rows.map((row) => ({
     id: Number(row.id),
+    action: String(row.action ?? 'guild_rename'),
     oldName: String(row.old_name),
     newName: String(row.new_name),
     reason: String(row.reason),
@@ -333,8 +337,8 @@ export async function renameAdminGuild(
     }
     await client.query(
       `INSERT INTO guild_moderation_actions
-         (guild_id, realm, old_name, new_name, reason, admin_account_id)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
+         (guild_id, realm, action, old_name, new_name, reason, admin_account_id)
+       VALUES ($1, $2, 'guild_rename', $3, $4, $5, $6)`,
       [guildId, REALM, guild.name, newName, reason, adminAccountId],
     );
     await client.query('COMMIT');
@@ -353,4 +357,48 @@ export async function renameAdminGuild(
   } finally {
     client.release();
   }
+}
+
+/** The audited row for an operator dormant-slot guild bank purge (server/game.ts
+ *  adminPurgeGuildBankSlot). The rename precedent, minus the rename: a purge
+ *  never changes the name, so old_name and new_name both carry the guild's
+ *  current name and the row is distinguished by action = 'guild_bank_purge'.
+ *  What was removed is appended to the operator's reason so the realm-wide
+ *  moderation history (which renders reason, not the bank_ledger) is readable
+ *  on its own; the machine-readable evidence stays on the bank_ledger
+ *  admin_purge row (item id, count, and the real instance payload).
+ *  Throws on a DB failure: the caller reports it rather than un-removing the
+ *  item, which it cannot do. */
+export async function recordAdminGuildBankPurge(input: {
+  guildId: number;
+  reason: string;
+  adminAccountId: number;
+  itemId: string;
+  count: number;
+  slotIndex: number;
+}): Promise<void> {
+  const guild = await pool.query('SELECT name FROM guilds WHERE id = $1 AND realm = $2', [
+    input.guildId,
+    REALM,
+  ]);
+  // A guild row can vanish between the purge and this write (a disband racing
+  // the operator); the audit row is a snapshot identifier, not a foreign key,
+  // so record it anyway with an empty name rather than losing the audit.
+  const name = guild.rows[0] ? String(guild.rows[0].name) : '';
+  const detail = `removed guild bank slot ${input.slotIndex} (${input.count}x ${input.itemId}): ${input.reason}`;
+  await pool.query(
+    `INSERT INTO guild_moderation_actions
+       (guild_id, realm, action, old_name, new_name, reason, admin_account_id)
+     VALUES ($1, $2, $6, $3, $3, $4, $5)`,
+    [
+      input.guildId,
+      REALM,
+      name,
+      detail.slice(0, ADMIN_GUILD_REASON_MAX),
+      input.adminAccountId,
+      // The shared constant, never a second copy of the literal: the dashboard
+      // label table and the history union key off the same value.
+      GUILD_BANK_PURGE_ACTION,
+    ],
+  );
 }

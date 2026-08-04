@@ -17,6 +17,7 @@ import type { LetterDef } from './content/letters';
 import type { TalentModifiers } from './content/talents';
 import type { DeedRuntime } from './deeds';
 import type { DelayedEvent, GroundAoE } from './entity_roster';
+import type { GuildBankState } from './guild_bank';
 import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
 import type { MobScanCounters } from './mob/scan_counters';
@@ -246,6 +247,12 @@ export interface SimContextPrimitives {
   // standing near a banker. Sim-owned, mutated only at construction (push), never
   // reassigned, so a live read-only view like `marketListings`.
   readonly bankerIds: number[];
+  // Guild Bank books: guild id -> live GuildBankState, owned by Sim and fed by
+  // the server per realm through guild_bank.ts loadGuildBank (the one write-in
+  // path; Phase 3 wires the DB). Sim-owned Map mutated in place, never
+  // reassigned, so a live read-only view like bankerIds. Always empty offline
+  // (guilds are a server social system).
+  readonly guildBanks: Map<number, GuildBankState>;
   // The Vale Cup boarball state (social/vale_cup.ts): ONE holder object on Sim
   // (queues/deserters/botPids mutated in place, the match slot reassigned INSIDE
   // the holder), so a read-only live view suffices. Consumed by the vale_cup
@@ -1201,6 +1208,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get bankerIds() {
       return host.bankerIds;
+    },
+    get guildBanks() {
+      return host.guildBanks;
     },
     get vcup() {
       return host.vcup;

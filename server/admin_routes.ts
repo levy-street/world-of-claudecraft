@@ -58,6 +58,23 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
     pattern: /^\/admin\/api\/guilds\/(\d+)\/rename$/,
     permission: 'moderation.act',
   },
+  // The guild bank operator READ (the slot list the purge below needs). It is
+  // deliberately WIDER than the purge it serves: reading destroys nothing, and
+  // "is this guild's bank stuck?" is the question whoever picks up the ticket
+  // has to answer before there is anything to escalate. moderation.read, not
+  // accounts.read: this is a guild's private pooled property, so it sits with
+  // the sibling audit panel on the same detail page (guilds/:id/history) rather
+  // than with the roster. The payload is guild-scoped only (item ids, counts,
+  // dormant flags, treasury); the per-copy instance payload with its bind
+  // identity is dropped at the boundary, see server/admin_guild_bank_view.ts.
+  { method: 'GET', pattern: /^\/admin\/api\/guilds\/(\d+)\/bank$/, permission: 'moderation.read' },
+  // The dormant guild bank slot escape hatch: destroys player property, so it
+  // carries its own permission, not moderation.act.
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/guilds\/(\d+)\/bank\/purge-slot$/,
+    permission: 'guildbank.purge',
+  },
 
   { method: 'GET', pattern: '/admin/api/accounts', permission: 'accounts.read' },
   { method: 'GET', pattern: /^\/admin\/api\/accounts\/(\d+)$/, permission: 'accounts.read' },

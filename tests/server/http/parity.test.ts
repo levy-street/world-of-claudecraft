@@ -936,6 +936,14 @@ describe('/admin/api dispatch parity (legacy flag vs new flag)', () => {
       url: '/admin/api/moderation/characters/5/restore-slot',
       label: 'the GM slot restore write',
     },
+    // Guild Bank Phase 4: the operator read behind the dormant-slot hatch. It
+    // exposes a guild's pooled property, so the arms must agree that an
+    // anonymous caller never reaches the live book on either dispatch path.
+    {
+      method: 'GET',
+      url: '/admin/api/guilds/5/bank',
+      label: 'the guild bank operator read',
+    },
     { method: 'PUT', url: '/admin/api/overview', label: 'a wrong method (delegates to legacy)' },
     {
       method: 'HEAD',

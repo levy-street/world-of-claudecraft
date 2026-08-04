@@ -33,6 +33,7 @@ import {
   listAccounts,
   listModerationActions,
 } from '../server/admin_db';
+import { ADMIN_GUILDS_SCHEMA } from '../server/admin_guilds_schema';
 
 describe('admin account detail query', () => {
   beforeEach(() => {
@@ -418,10 +419,18 @@ describe('admin account detail query', () => {
     expect(mocks.query.mock.calls[0][0]).toContain('UNION ALL');
     expect(mocks.query.mock.calls[0][0]).toContain('FROM blocked_ip_actions ip_action');
     expect(mocks.query.mock.calls[0][0]).toContain('FROM guild_moderation_actions guild_action');
-    // The guild arm stamps its action kind as a literal; the dashboard label table
-    // keys off the same constant, so drift between them would silently bucket every
-    // rename into "Other action".
-    expect(mocks.query.mock.calls[0][0]).toContain(`'${GUILD_RENAME_ACTION}' AS action`);
+    // The guild arm reads its action kind from the ROW, not from a hardcoded
+    // literal: guild_moderation_actions gained an additive `action` column so a
+    // guild bank dormant-slot purge shows up in the history as itself instead
+    // of being mislabeled a rename. The literal is still the column's DEFAULT,
+    // which is what keeps every pre-existing row rendering as a rename, and the
+    // dashboard label table keys off the same constant, so drift between them
+    // would silently bucket a real action into "Other action".
+    expect(mocks.query.mock.calls[0][0]).toContain('guild_action.action');
+    expect(mocks.query.mock.calls[0][0]).not.toContain(`'${GUILD_RENAME_ACTION}' AS action`);
+    expect(ADMIN_GUILDS_SCHEMA).toContain(
+      `ADD COLUMN IF NOT EXISTS action TEXT NOT NULL DEFAULT '${GUILD_RENAME_ACTION}'`,
+    );
     // Only the guild arm is realm-scoped: accounts and blocked IPs are global.
     expect(mocks.query.mock.calls[0][0]).toContain('WHERE guild_action.realm = $1');
     expect(mocks.query.mock.calls[0][0]).not.toContain('action_log.realm');

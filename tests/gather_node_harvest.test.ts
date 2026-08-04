@@ -975,6 +975,12 @@ describe('node tool gating over the live server', () => {
 
     meta.nodeHarvestReadyAt.ore_mirefen_t2 = server.sim.time;
     driveFrame({});
+    // Re-hunted for the release/v0.34.0 merge: both parents re-pinned these two
+    // literals independently (the release to 2 and 3 in a456bb5150, this branch
+    // via the dedupe re-hunt in 955d33d032), and the merged content stream lands
+    // on neither. Both unconfirmed mints draw common rarity (1 unit each) under
+    // the merged rng, so the cumulative counts are 1 then 2. Only the rarity
+    // draw moved: the prompt still does not fire, so the charge is kept in both.
     expect(server.sim.countItem('iron_ore', s.pid)).toBe(1);
     expect(slot.durability).toBe(charges - 1);
 

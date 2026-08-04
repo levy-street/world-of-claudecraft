@@ -31,6 +31,12 @@ import { DISCORD_SCHEMA } from './discord_db';
 import { enqueueLinkChange } from './discord_link_changes';
 import { bustDiscordStatus } from './discord_status_cache';
 import { GITHUB_SCHEMA } from './github_db';
+import {
+  GuildBankEscrowRefused,
+  type GuildBankSave,
+  type GuildBankWriteResult,
+  mergeGuildBankRow,
+} from './guild_bank_state';
 import { isUniqueViolation } from './http_util';
 import { MAPS_SCHEMA } from './maps_db';
 import {
@@ -216,9 +222,13 @@ export function getPoolClientErrorCount(): number {
 
 /**
  * Run `fn` inside ONE transaction on a dedicated pooled client whose
- * statement_timeout is raised to `timeoutMs` for the duration (SET LOCAL, so it
- * reverts at COMMIT/ROLLBACK and never leaks to the next checkout). For the known
- * heavy reads whose legitimate runtime can exceed the default DB_STATEMENT_TIMEOUT_MS.
+ * statement_timeout is SET to `timeoutMs` for the duration (SET LOCAL, so it
+ * reverts at COMMIT/ROLLBACK and never leaks to the next checkout). Mostly used
+ * to RAISE the default for the known heavy reads whose legitimate runtime can
+ * exceed DB_STATEMENT_TIMEOUT_MS; it LOWERS it just as well, which is the right
+ * tool for a read whose intended cost is milliseconds and whose degraded cost
+ * would pin a pooled client for the full 15s default (see
+ * GUILD_BANK_LOG_TIMEOUT_MS).
  * The wrapped `query` handed to `fn` runs on the same client inside the same
  * transaction, so every statement it issues is covered by the raised timeout. The
  * transaction runs at the default READ COMMITTED isolation, where each statement
@@ -1061,6 +1071,29 @@ CREATE TABLE IF NOT EXISTS bank_ledger (
 );
 CREATE INDEX IF NOT EXISTS bank_ledger_character ON bank_ledger(character_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS bank_ledger_created ON bank_ledger(created_at);
+-- The COUNTERPARTY side of a guild bank row: what the ACTING CHARACTER'S purse
+-- and bags gave or received under the same op, taken from the same
+-- server-derived before/after snapshot the container side comes from (never
+-- from client data). Without it a guild-side replay is self-consistent BY
+-- CONSTRUCTION: every dupe this feature ever had moved value between a purse
+-- and a book, and none of them were visible to scripts/bank_audit.mjs, which
+-- is the failure mode that audit exists to detect.
+--
+-- Additive and NULLABLE with no default on purpose. NULL means NOT RECORDED,
+-- which is exactly what every pre-feature row is and what every 'personal'
+-- container row still is (the personal bank writes no counterparty side), and
+-- the audit SKIPS those rather than reading a 0 default as a balanced op,
+-- which would turn silence into a false all-clear. Signed from the acting
+-- character's point of view: negative means the purse/bags GAVE.
+--
+-- NOTE on the count column's value domain: every other op writes it as a
+-- POSITIVE magnitude with the direction carried by the op name. The two
+-- anomaly ops ('escrow_deficit' and 'counterparty_orphan') write it SIGNED,
+-- because neither has a direction in its name and direction is the first thing
+-- an operator needs. A reader that assumes a non-negative count must exclude
+-- those two ops.
+ALTER TABLE bank_ledger ADD COLUMN IF NOT EXISTS counterparty_copper_delta BIGINT;
+ALTER TABLE bank_ledger ADD COLUMN IF NOT EXISTS counterparty_count INT;
 -- Earned-deed records: one row per (character, deed), written fire-and-forget
 -- off the game loop by server/deeds_records.ts, an OBSERVER of the sim's
 -- deedUnlocked events. The characters.state blob stays the gameplay source of
@@ -1255,37 +1288,6 @@ export async function ensureSchema(): Promise<void> {
       );
     }
     await client.query('COMMIT');
-    // CREATE INDEX CONCURRENTLY cannot run inside the schema transaction. Keep
-    // the session-level form of the same advisory lock while running this
-    // post-commit migration so simultaneous realm boots cannot race the index
-    // name. The concurrent build permits normal play_sessions writes to continue.
-    // The boot transaction's SET LOCAL statement_timeout = 0 reverted at the
-    // COMMIT above, so re-disable it session-wide first: the advisory-lock wait
-    // and the concurrent build can both outlast an operator-set database- or
-    // role-level statement_timeout, and this dedicated client closes right
-    // after, so the session setting never leaks to pooled connections.
-    await client.query('SET statement_timeout = 0');
-    let concurrentMigrationLocked = false;
-    try {
-      await client.query('SELECT pg_advisory_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
-      concurrentMigrationLocked = true;
-      // A prior boot's build may have died mid-CONCURRENTLY (a deploy-watchdog
-      // restart, a crash), stranding an INVALID index that IF NOT EXISTS would
-      // treat as existing forever. Each entry drops its carcass first so the
-      // build self-heals; the list and its order live in
-      // server/concurrent_indexes.ts.
-      for (const migration of CONCURRENT_INDEX_MIGRATIONS) {
-        const invalidIndex = await client.query(migration.checkSql);
-        if ((invalidIndex.rowCount ?? 0) > 0) {
-          await client.query(migration.dropSql);
-        }
-        await client.query(migration.createSql);
-      }
-    } finally {
-      if (concurrentMigrationLocked) {
-        await client.query('SELECT pg_advisory_unlock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
-      }
-    }
     // Open the market write gate only AFTER a successful COMMIT, so no market
     // write can land before the marker is durable. Opens on the no-op path too
     // (backfill.ran === false, i.e. the marker already existed).
@@ -1295,6 +1297,66 @@ export async function ensureSchema(): Promise<void> {
     throw err;
   } finally {
     // Dedicated client, not a pool checkout: close the connection outright.
+    await client.end().catch(() => {});
+  }
+}
+
+/**
+ * The post-commit CONCURRENTLY index builds. Split out of ensureSchema and run
+ * AFTER the realm is listening (server/main.ts), which is a deliberate change
+ * of what a slow build costs.
+ *
+ * These cannot run inside the schema transaction (CREATE INDEX CONCURRENTLY
+ * forbids it), and they serialize across realm processes on the session-level
+ * form of the schema advisory lock so simultaneous boots cannot race an index
+ * name. On a small table that is invisible. On a genuinely large one it is not:
+ * a concurrent build is two heap scans plus a wait for every transaction that
+ * could see the table, and while the first realm builds it EVERY OTHER REALM
+ * blocks on that lock. Held before `listen`, a rolling restart paid that stall
+ * on every realm at once and none of them served players while they waited.
+ * Held after `listen`, a slow build delays the INDEX, not the realm.
+ *
+ * The trade this makes explicit: a realm can now briefly serve a reader whose
+ * index does not exist yet, so a reader that depends on one of these must carry
+ * its own bound rather than assume the index (see GUILD_BANK_LOG_TIMEOUT_MS).
+ * Failure is loud and NOT fatal: every entry is idempotent and self-healing, so
+ * the next boot retries, and a realm that is already serving should not be
+ * killed by an index build.
+ *
+ * The dedicated client escapes the pool's timeouts entirely, and the session
+ * `SET statement_timeout = 0` additionally overrides any database- or
+ * role-level timeout an operator set server-side; it closes immediately after,
+ * so nothing leaks to pooled connections.
+ */
+export async function runConcurrentIndexMigrations(): Promise<void> {
+  // Resolved at call time, not module scope: many suites module-mock 'pg' with
+  // a Pool-only factory (the ensureSchema precedent above).
+  const { Client } = await import('pg');
+  const client = new Client({ connectionString: DATABASE_URL });
+  let locked = false;
+  try {
+    await client.connect();
+    await client.query('SET statement_timeout = 0');
+    await client.query('SELECT pg_advisory_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
+    locked = true;
+    // A prior build may have died mid-CONCURRENTLY (a deploy-watchdog restart,
+    // a crash), stranding an INVALID index that IF NOT EXISTS would treat as
+    // existing forever, so the reader would sequential-scan for good. Each
+    // entry drops its carcass first; the list and its order live in
+    // server/concurrent_indexes.ts.
+    for (const migration of CONCURRENT_INDEX_MIGRATIONS) {
+      const invalidIndex = await client.query(migration.checkSql);
+      if ((invalidIndex.rowCount ?? 0) > 0) {
+        await client.query(migration.dropSql);
+      }
+      await client.query(migration.createSql);
+    }
+  } finally {
+    if (locked) {
+      await client
+        .query('SELECT pg_advisory_unlock($1)', [SCHEMA_ADVISORY_LOCK_KEY])
+        .catch(() => {});
+    }
     await client.end().catch(() => {});
   }
 }
@@ -3138,6 +3200,34 @@ export async function renameCharacter(
 // pair would race the takeover that steals the lease between the two. The no-nonce path
 // (tests, resumes, meta-less sessions) writes unconditionally and returns true, exactly
 // as before.
+// The ONE fenced character UPDATE the whole save family issues
+// (saveCharacterState, saveCharacterAndMarketState, and the guild bank escrow
+// sibling). Extracted so the lease fence stays byte-identical across the
+// family: the fence rides the write statement itself (never a separate
+// pre-check that would race a takeover), and a nonce that matches no lease row
+// touches nothing, which every caller must treat as "persist NOTHING".
+function characterUpdateStatement(
+  characterId: number,
+  level: number,
+  stateJson: string,
+  leaseNonce: string | undefined,
+): { text: string; values: unknown[] } {
+  return leaseNonce === undefined
+    ? {
+        text: 'UPDATE characters SET level = $2, state = $3, updated_at = now() WHERE id = $1',
+        values: [characterId, level, stateJson],
+      }
+    : {
+        text: `UPDATE characters SET level = $2, state = $3, updated_at = now()
+            WHERE id = $1
+              AND EXISTS (
+                SELECT 1 FROM character_leases
+                 WHERE character_id = $1 AND holder = $4 AND nonce = $5
+              )`,
+        values: [characterId, level, stateJson, PROCESS_LEASE_HOLDER, leaseNonce],
+      };
+}
+
 export async function saveCharacterState(
   characterId: number,
   level: number,
@@ -3148,22 +3238,9 @@ export async function saveCharacterState(
   // A character save should wait out a slow database rather than lose state, so
   // run it on the raised heavy allowance; still bounded so a leave / shutdown
   // flush cannot hang past the container stop grace.
+  const stmt = characterUpdateStatement(characterId, level, JSON.stringify(cleanState), leaseNonce);
   const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
-    leaseNonce === undefined
-      ? query('UPDATE characters SET level = $2, state = $3, updated_at = now() WHERE id = $1', [
-          characterId,
-          level,
-          JSON.stringify(cleanState),
-        ])
-      : query(
-          `UPDATE characters SET level = $2, state = $3, updated_at = now()
-            WHERE id = $1
-              AND EXISTS (
-                SELECT 1 FROM character_leases
-                 WHERE character_id = $1 AND holder = $4 AND nonce = $5
-              )`,
-          [characterId, level, JSON.stringify(cleanState), PROCESS_LEASE_HOLDER, leaseNonce],
-        ),
+    query(stmt.text, stmt.values),
   );
   return leaseNonce === undefined ? true : (res.rowCount ?? 0) > 0;
 }
@@ -3183,6 +3260,14 @@ export async function saveCharacterAndMarketState(
   market: MarketSave,
   mail: MailSave,
   leaseNonce?: string,
+  // Guild bank books dirtied by this character's session (Guild Bank Phase 3):
+  // they are escrows exactly like the market/mail blobs (an item leaves the
+  // bags and becomes a book slot in one Sim action), so a leave flush that
+  // carries both MUST land them in this same fenced transaction. Optional and
+  // additive: omitted (or empty) writes exactly what this function always has.
+  guildBanks?: readonly GuildBankSave[],
+  // Out-parameter, same contract as saveCharacterAndGuildBankState's.
+  results?: GuildBankWriteResult[],
 ): Promise<boolean> {
   // Gate the escrow flush on the boot backfill just like saveMarketState:
   // this writes the realm-market row, so it must not run before ensureSchema
@@ -3203,21 +3288,13 @@ export async function saveCharacterAndMarketState(
     // no row: ROLL BACK before touching the market/mail rows and report false. The
     // escrow halves must never land without the bag half, and a displaced session
     // must not overwrite the realm's shared Market/Ravenpost escrow either.
-    const charRes =
-      leaseNonce === undefined
-        ? await client.query(
-            'UPDATE characters SET level = $2, state = $3, updated_at = now() WHERE id = $1',
-            [characterId, level, JSON.stringify(cleanState)],
-          )
-        : await client.query(
-            `UPDATE characters SET level = $2, state = $3, updated_at = now()
-              WHERE id = $1
-                AND EXISTS (
-                  SELECT 1 FROM character_leases
-                   WHERE character_id = $1 AND holder = $4 AND nonce = $5
-                )`,
-            [characterId, level, JSON.stringify(cleanState), PROCESS_LEASE_HOLDER, leaseNonce],
-          );
+    const stmt = characterUpdateStatement(
+      characterId,
+      level,
+      JSON.stringify(cleanState),
+      leaseNonce,
+    );
+    const charRes = await client.query(stmt.text, stmt.values);
     if (leaseNonce !== undefined && (charRes.rowCount ?? 0) === 0) {
       await client.query('ROLLBACK');
       return false;
@@ -3235,6 +3312,11 @@ export async function saveCharacterAndMarketState(
        ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
       [mailStateKey(REALM), JSON.stringify(mail)],
     );
+    // Guild bank books ride the SAME fenced transaction (Guild Bank Phase 3):
+    // the character UPDATE above already passed the lease fence, so these can
+    // never land for a displaced session, and a failure anywhere rolls back
+    // the character, market, mail, and book halves together.
+    await writeGuildBankRows(client, guildBanks ?? [], results);
     await client.query('COMMIT');
     return true;
   } catch (err) {
@@ -3242,6 +3324,233 @@ export async function saveCharacterAndMarketState(
     throw err;
   } finally {
     client.release();
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Guild bank persistence (Guild Bank Phase 3). One JSONB book per guild in
+// guild_banks (DDL in server/social_db.ts SOCIAL_SCHEMA, the schema family
+// that owns guilds; the row cascades away with its guilds DELETE). The book is
+// an escrow shared with character state: every write rides a transaction that
+// carries the character-lease fence, through saveCharacterAndMarketState above
+// (the leave flush) or saveCharacterAndGuildBankState below (the game-loop
+// save). There is deliberately NO standalone saveGuildBankState: a book write
+// outside the fence is the dupe shape this phase exists to prevent.
+// ---------------------------------------------------------------------------
+
+export type { GuildBankSave, GuildBankWriteResult } from './guild_bank_state';
+export { GuildBankEscrowRefused } from './guild_bank_state';
+
+// Write every carried book inside the already-fenced transaction, then decide
+// the transaction's fate on the result. A refused book half ABORTS the whole
+// thing, character row included: the two halves commit together or not at all,
+// and "commit the character and record that the book could not follow" is a
+// receipt for a mint, not a mitigation. The caller retries; see
+// server/game.ts handleGuildBankEscrowRefusal for what happens when a retry
+// can never succeed.
+async function writeGuildBankRows(
+  client: { query: (text: string, values: unknown[]) => Promise<unknown> },
+  guildBanks: readonly GuildBankSave[],
+  results?: GuildBankWriteResult[],
+): Promise<void> {
+  const written: GuildBankWriteResult[] = [];
+  for (const gb of guildBanks) {
+    written.push(await writeGuildBankRow(client, gb));
+  }
+  results?.push(...written);
+  if (written.some((r) => !r.written)) {
+    await client.query('ROLLBACK', []);
+    throw new GuildBankEscrowRefused(written);
+  }
+}
+
+// The one guild_banks write, only ever issued on a client that is inside the
+// fenced escrow transaction (see the section comment above), and always a
+// READ-MODIFY-WRITE rather than a blind blob overwrite:
+//
+//   SELECT ... FOR UPDATE  ->  mergeGuildBankRow(durable, this session's own
+//   deltas)  ->  upsert
+//
+// The row lock is what makes the merge safe across PROCESSES (in-process, the
+// market serial writer already means no two book transactions overlap, but the
+// lease system exists precisely because more than one process can contend for
+// the same character, and a realm's book rows are reachable from any process
+// holding a lease). It is a primary-key lock, sub-millisecond and free in the
+// uncontended case. Reading OUTSIDE the transaction instead would be a
+// lost-update window: two saves could read the same base and the later write
+// would discard the earlier's deltas.
+//
+// The read is issued AFTER the fenced character UPDATE has already passed, so
+// a fence miss still rolls back before any book row is touched or locked.
+//
+// The same size bound the boot read applies (GUILD_BANK_ROW_MAX_BYTES) is
+// applied here in SQL: an oversized blob never crosses the wire and its row is
+// PRESERVED rather than overwritten, exactly like the boot skip.
+async function writeGuildBankRow(
+  client: { query: (text: string, values: unknown[]) => Promise<unknown> },
+  gb: GuildBankSave,
+): Promise<GuildBankWriteResult> {
+  // Keyed on (guild_id, realm), not guild_id alone. Guild ids are globally
+  // unique, so the realm predicate cannot change which row this finds today; it
+  // is the discipline every sibling statement in this file already carries, and
+  // it means a realm that somehow met another realm's row locks and merges
+  // nothing rather than silently rewriting it.
+  const lockedRead = async () =>
+    (await client.query(
+      `SELECT octet_length(data::text) AS data_bytes,
+              CASE WHEN octet_length(data::text) <= $2 THEN data ELSE NULL END AS data
+         FROM guild_banks
+        WHERE guild_id = $1 AND realm = $3
+          FOR UPDATE`,
+      [gb.guildId, GUILD_BANK_ROW_MAX_BYTES, REALM],
+    )) as { rows: { data_bytes?: unknown; data?: unknown }[] };
+  let read = await lockedRead();
+  if (!read.rows?.[0]) {
+    // FOR UPDATE locks ROWS, so a guild with no row yet locks nothing and two
+    // processes could both merge onto the empty base, the second upsert
+    // discarding the first's deltas. Seed the empty row first (idempotent,
+    // and a no-op for every save after the guild's first), then re-read it
+    // under the lock. Only ever runs once per guild in the whole realm's life.
+    await client.query(
+      `INSERT INTO guild_banks (guild_id, realm, data, updated_at) VALUES ($1, $2, $3, now())
+       ON CONFLICT (guild_id) DO NOTHING`,
+      [gb.guildId, REALM, JSON.stringify({ treasury: 0, inventory: [], purchasedSlots: 0 })],
+    );
+    read = await lockedRead();
+  }
+  const row = read.rows?.[0];
+  const oversized = row ? Number(row.data_bytes) > GUILD_BANK_ROW_MAX_BYTES : false;
+  const merged = mergeGuildBankRow(row ? (row.data ?? null) : null, gb.deltas, { oversized });
+  if (merged.data === null) return { guildId: gb.guildId, ...merged.result };
+  await client.query(
+    `INSERT INTO guild_banks (guild_id, realm, data, updated_at) VALUES ($1, $2, $3, now())
+     ON CONFLICT (guild_id) DO UPDATE SET realm = EXCLUDED.realm, data = EXCLUDED.data,
+       updated_at = now()`,
+    [gb.guildId, REALM, JSON.stringify(merged.data)],
+  );
+  return { guildId: gb.guildId, ...merged.result };
+}
+
+// The game-loop escrow save: the acting character's state AND the guild books
+// their session dirtied, in ONE transaction carrying the character-lease
+// fence. The sibling of saveCharacterAndMarketState for saves that carry no
+// market/mail half (the autosave path); a fence miss rolls back everything and
+// returns false, exactly like the market sibling, so a displaced session can
+// never persist either half. No market gate assertion: this writes no
+// world_state row, and books only exist in the sim after the boot load (or the
+// guild_create seed), both of which run after ensureSchema.
+export async function saveCharacterAndGuildBankState(
+  characterId: number,
+  level: number,
+  state: CharacterState,
+  guildBanks: readonly GuildBankSave[],
+  leaseNonce?: string,
+  // Out-parameter: what each book write did. A refused one aborts the whole
+  // transaction and throws GuildBankEscrowRefused (which carries these too),
+  // so on the COMMITTED path every entry reads written; the parameter exists
+  // for tests and for the defensive check at the call site. An out-parameter
+  // rather than a richer return type because the boolean return IS the fence
+  // signal and every call site (and every test double) reads it as one.
+  results?: GuildBankWriteResult[],
+): Promise<boolean> {
+  const cleanState = sanitizeRemovedZone1Content(state).state;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    // Same rationale as saveCharacterAndMarketState: an escrow flush waits out
+    // a slow database on the heavy allowance. SET LOCAL reverts at COMMIT.
+    await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
+    const stmt = characterUpdateStatement(
+      characterId,
+      level,
+      JSON.stringify(cleanState),
+      leaseNonce,
+    );
+    const charRes = (await client.query(stmt.text, stmt.values)) as { rowCount: number | null };
+    if (leaseNonce !== undefined && (charRes.rowCount ?? 0) === 0) {
+      await client.query('ROLLBACK');
+      return false;
+    }
+    await writeGuildBankRows(client, guildBanks, results);
+    await client.query('COMMIT');
+    return true;
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+// Upper bound on a guild_banks row this process will LOAD, enforced in SQL
+// (octet_length(data::text): UTF-8 BYTES of the serialized blob, which is what
+// the write-side gate in server/guild_bank_state.ts must measure too) so an
+// oversized blob never even crosses the wire. A
+// legitimate book is a few KB (48 slots max by the expansion ladder); a row
+// past this bound is tampered or corrupt, and the boot load SKIPS it entirely,
+// leaving that guild's ops silently inert and the row untouched on disk
+// (items are never destroyed by a load path), rather than loading an empty
+// book that the next save would persist over the real row.
+export const GUILD_BANK_ROW_MAX_BYTES = 262_144;
+
+export interface GuildBankRow {
+  guildId: number;
+  // Parsed JSONB (pg hands objects, never strings), or null when the guild has
+  // no guild_banks row yet (a pre-feature guild: it gets an empty book) or the
+  // row is oversized (skipped; see the flag).
+  data: unknown;
+  oversized: boolean;
+  // Uncompressed serialized size of the stored blob (0 with no row): the boot
+  // load warns well below the hard bound, because a legitimate book is a few
+  // KB and a corrupt-but-well-shaped row far above that would otherwise load
+  // silently and be re-persisted by every save. Optional so test fixtures can
+  // omit it; both loaders always set it.
+  dataBytes?: number;
+}
+
+// Every guild on this realm with its bank book, for the boot load. LEFT JOIN
+// so a guild with no row still appears (data null -> empty book): a realm
+// created before the guild bank shipped loads exactly like one created after.
+// The bound measures the UNCOMPRESSED serialized bytes (octet_length of the
+// text form): pg_column_size reports post-TOAST compressed size, which would
+// let a highly compressible multi-megabyte blob slip under the bound. The
+// length is computed ONCE per row (the LATERAL), because octet_length(::text)
+// detoasts and serializes the whole blob; keyset batches bound the per-
+// statement work and Node-side buffering, and the read rides the heavy
+// statement allowance like every other known-long boot read (a slow boot
+// must load the books, not fail into the all-banks-inert arm).
+export const GUILD_BANK_BOOT_BATCH = 500;
+
+export async function loadGuildBankRows(): Promise<GuildBankRow[]> {
+  const out: GuildBankRow[] = [];
+  let lastId = 0;
+  for (;;) {
+    const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
+      query(
+        `SELECT g.id AS guild_id,
+                (gb.guild_id IS NOT NULL) AS has_row,
+                b.data_bytes,
+                CASE WHEN b.data_bytes <= $2 THEN gb.data ELSE NULL END AS data
+           FROM guilds g
+           LEFT JOIN guild_banks gb ON gb.guild_id = g.id
+           LEFT JOIN LATERAL (SELECT COALESCE(octet_length(gb.data::text), 0) AS data_bytes) b
+             ON true
+          WHERE g.realm = $1 AND g.id > $3
+          ORDER BY g.id
+          LIMIT $4`,
+        [REALM, GUILD_BANK_ROW_MAX_BYTES, lastId, GUILD_BANK_BOOT_BATCH],
+      ),
+    );
+    for (const r of res.rows) {
+      out.push({
+        guildId: Number(r.guild_id),
+        data: r.data ?? null,
+        oversized: r.has_row === true && Number(r.data_bytes) > GUILD_BANK_ROW_MAX_BYTES,
+        dataBytes: Number(r.data_bytes) || 0,
+      });
+    }
+    if (res.rows.length < GUILD_BANK_BOOT_BATCH) return out;
+    lastId = Number(res.rows[res.rows.length - 1].guild_id);
   }
 }
 
@@ -4082,32 +4391,164 @@ export async function pruneChatLogsBatch(
 // ---------------------------------------------------------------------------
 // Bank ledger: one append-only row per SUCCESSFUL bank op, written fire-and-forget
 // off the game loop by server/bank_ledger.ts. See the bank_ledger DDL block in
-// SCHEMA above; realm is passed explicitly (the table carries no DEFAULT), and
-// container is always 'personal' with a NULL container_id until the guild bank
-// lands. `instance` is the item's per-instance payload (or null for a plain
-// fungible stack / a buy_slots row), serialized the same way as characters.state.
+// SCHEMA above; realm is passed explicitly (the table carries no DEFAULT).
+// container discriminates the personal bank ('personal', container_id NULL)
+// from the guild bank ('guild', container_id = guild id; Guild Bank Phase 3).
+// The gold, create_fee, and open_bank ops exist only for the guild container.
+// `instance` is the item's per-instance payload (or null for a plain fungible
+// stack / a copper-only row), serialized the same way as characters.state.
 // ---------------------------------------------------------------------------
 
 export interface BankLedgerRow {
   realm: string;
   characterId: number;
   accountId: number;
-  op: 'deposit' | 'withdraw' | 'buy_slots';
+  op:
+    | 'deposit'
+    | 'withdraw'
+    | 'buy_slots'
+    | 'deposit_gold'
+    | 'withdraw_gold'
+    | 'create_fee'
+    | 'open_bank'
+    // Not an op a player performed: the escrow-deficit ANOMALY marker
+    // (server/bank_ledger.ts GUILD_BANK_ESCROW_DEFICIT_OP), the audit trail
+    // for value one officer consumed that another never made durable.
+    // scripts/bank_audit.mjs reports these and excludes them from every replay.
+    | 'escrow_deficit'
+    // The operator escape hatch: one DORMANT guild bank slot removed
+    // (server/game.ts adminPurgeGuildBankSlot). A real book mutation, so it
+    // replays as an item removal like a withdraw.
+    | 'admin_purge'
+    // Not an op a player performed either: the COUNTERPARTY ORPHAN marker
+    // (server/bank_ledger.ts GUILD_BANK_COUNTERPARTY_ORPHAN_OP). A guild bank
+    // op moved the acting character's purse or bags while the book did not
+    // move at all, which is the mint signature the counterparty columns exist
+    // to make visible: without this row the op writes nothing and the audit
+    // sees a clean, self-consistent book.
+    | 'counterparty_orphan';
   itemId: string | null;
   count: number | null;
   instance: unknown;
   copperDelta: number;
   purchasedSlotsAfter: number;
-  container: 'personal';
-  containerId: null;
+  container: 'personal' | 'guild';
+  containerId: number | null;
+  /** Signed copper the ACTING CHARACTER'S PURSE gained under this op (negative
+   *  means it paid). Omitted / null means NOT RECORDED, which is what every
+   *  personal-container row is: the audit's balance check skips those rather
+   *  than reading absence as balance. */
+  counterpartyCopperDelta?: number | null;
+  /** Signed count of THIS ROW'S item_id the acting character's BAGS gained
+   *  (negative means they gave it up). Null on the same terms as above. */
+  counterpartyCount?: number | null;
+}
+
+// ---------------------------------------------------------------------------
+// The guild bank ACTIVITY LOG read: the newest window of one guild's
+// bank_ledger rows, for the in-game officer-visible history
+// (server/guild_bank_log.ts owns the projection, the gate, and the cache; this
+// is only the statement).
+//
+// PRIVACY IS THE COLUMN LIST. This is the one read whose result reaches
+// players, so it selects the narrowest set that can render a sentence:
+// bank_ledger.account_id, realm, and the instance payload are NOT selected at
+// all, and character_id is resolved to a display name here rather than shipped.
+// Nothing account-scoped can leak through a projection bug downstream, because
+// nothing account-scoped is in the row.
+//
+// The predicate rides bank_ledger_container_recent (container, container_id,
+// id DESC), added through the CONCURRENTLY seam with this reader: see
+// server/bank_ledger_indexes.ts for why the third column carries its weight.
+// `id DESC` (not created_at) is the paging order: BIGSERIAL cannot tie, and it
+// is exactly the index's trailing column, so this is a bounded backwards index
+// scan whose cost is the LIMIT rather than the guild's lifetime row count.
+//
+// The op filter is applied HERE rather than in JS so a suppressed row never
+// crosses the wire into this process at all, and so the LIMIT counts only rows
+// a player can actually see (filtering after the fact would silently return
+// fewer than the window it promised).
+export interface GuildBankLogDbRow {
+  id: number;
+  /** Epoch milliseconds (the column is TIMESTAMPTZ; pg hands back a Date). */
+  at: number;
+  /** The acting character's display name, or null when the character row is
+   *  gone. Never an id. */
+  characterName: string | null;
+  op: string;
+  itemId: string | null;
+  count: number | null;
+  copperDelta: number;
+}
+
+/**
+ * The per-statement bound for the activity log read, deliberately far BELOW the
+ * pool default rather than above it.
+ *
+ * Intended cost is a bounded backward index scan of 50 rows, i.e. single-digit
+ * milliseconds. The cost without its index is a sequential scan of a
+ * keep-forever table, and at the 15s pool default roughly ten of those in
+ * flight would exhaust DB_POOL_MAX_CLIENTS and make every login and autosave on
+ * the realm fail its checkout. That window is reachable now that the
+ * CONCURRENTLY builds run after listen (runConcurrentIndexMigrations), and it
+ * is also what a dropped index or an unhealed INVALID carcass looks like. Two
+ * seconds is ~3 orders of magnitude of headroom over the intended cost and
+ * still fails this ONE read instead of the realm: the caller answers the
+ * player a refusal, which the pane renders.
+ */
+export const GUILD_BANK_LOG_TIMEOUT_MS = 2_000;
+
+export async function loadGuildBankLogRows(
+  guildId: number,
+  limit: number,
+  visibleOps: readonly string[],
+): Promise<GuildBankLogDbRow[]> {
+  const res = await runWithStatementTimeout(GUILD_BANK_LOG_TIMEOUT_MS, (query) =>
+    query(
+      `SELECT bl.id,
+            bl.created_at,
+            bl.op,
+            bl.item_id,
+            bl.count,
+            bl.copper_delta,
+            c.name AS character_name
+       FROM bank_ledger bl
+       LEFT JOIN characters c ON c.id = bl.character_id
+      WHERE bl.container = 'guild'
+        AND bl.container_id = $1
+        -- Realm discipline, matching every sibling statement. A guild lives on
+        -- exactly one realm and guild ids are globally unique, so this cannot
+        -- change which rows match today and cannot make the LIMIT scan wider;
+        -- it is here so a cross-realm row could never be projected into a
+        -- guild's history if that ever stopped being true.
+        AND bl.realm = $4
+        AND bl.op = ANY($2::text[])
+      ORDER BY bl.id DESC
+      LIMIT $3`,
+      [guildId, visibleOps, limit, REALM],
+    ),
+  );
+  return res.rows.map((r) => ({
+    id: Number(r.id),
+    at: r.created_at instanceof Date ? r.created_at.getTime() : Number(new Date(r.created_at)),
+    characterName: typeof r.character_name === 'string' ? r.character_name : null,
+    op: String(r.op),
+    itemId: r.item_id === null || r.item_id === undefined ? null : String(r.item_id),
+    count: r.count === null || r.count === undefined ? null : Number(r.count),
+    // BIGINT arrives as a string from pg; Number() is safe here because every
+    // legitimate copper magnitude is far inside the safe-integer range (the
+    // treasury cap alone is 1e9).
+    copperDelta: Number(r.copper_delta) || 0,
+  }));
 }
 
 export async function insertBankLedgerRow(row: BankLedgerRow): Promise<void> {
   await pool.query(
     `INSERT INTO bank_ledger
        (realm, character_id, account_id, op, item_id, count, instance,
-        copper_delta, purchased_slots_after, container, container_id)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+        copper_delta, purchased_slots_after, container, container_id,
+        counterparty_copper_delta, counterparty_count)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
     [
       row.realm,
       row.characterId,
@@ -4120,6 +4561,8 @@ export async function insertBankLedgerRow(row: BankLedgerRow): Promise<void> {
       row.purchasedSlotsAfter,
       row.container,
       row.containerId,
+      row.counterpartyCopperDelta ?? null,
+      row.counterpartyCount ?? null,
     ],
   );
 }

@@ -252,6 +252,9 @@ const fakeGameState = {
   isIpBlocked: vi.fn(() => false),
   reloadBlockedIps: vi.fn(async () => {}),
   disconnectByIp: vi.fn(),
+  // The guild bank operator read (the legacy ladder arm of
+  // GET /admin/api/guilds/:id/bank). Null is "no loaded book" for that guild.
+  adminGuildBankState: vi.fn((_guildId: number): Record<string, unknown> | null => null),
   adminCharacterState: vi.fn((): Record<string, unknown> | null => ({})),
   adminCharacterOnline: vi.fn(() => true),
   adminRestoreItem: vi.fn((): 'ok' | 'offline' | 'invalid_item' => 'ok'),
@@ -1357,6 +1360,58 @@ describe('legacy guild administration parity', () => {
     expect(historyResponse.body.data).toEqual({
       rows: [{ id: 1, oldName: 'Old Name', newName: 'Keepers' }],
     });
+  });
+
+  it('serves the guild bank operator read, and 404s a guild whose book is not loaded', async () => {
+    // The LEGACY arm of GET /admin/api/guilds/:id/bank (its RouteDef twin is
+    // covered in tests/server/admin.test.ts). Both run one shared body, so what
+    // this proves is that the ladder reaches it at all and answers the same
+    // envelope: a route present only in the RouteDef table would 404 here for
+    // every operator running with API_DISPATCH=legacy.
+    authenticate();
+    const state = {
+      treasury: 12_345,
+      capacity: 30,
+      purchasedSlots: 30,
+      usedSlots: 1,
+      dormantSlots: 1,
+      slots: [{ index: 0, itemId: 'reins_grag_bear', count: 1, dormant: true }],
+    };
+    fakeGameState.adminGuildBankState.mockReturnValueOnce(state);
+
+    const loaded = fakeRes();
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds/4/bank' }),
+      loaded,
+      fakeGame,
+    );
+    expect(fakeGameState.adminGuildBankState).toHaveBeenCalledWith(4);
+    expect(loaded.statusCode).toBe(200);
+    expect(loaded.body.data).toEqual({ guildId: 4, ...state });
+
+    fakeGameState.adminGuildBankState.mockReturnValueOnce(null);
+    const missing = fakeRes();
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds/4/bank' }),
+      missing,
+      fakeGame,
+    );
+    expect(missing.statusCode).toBe(404);
+    expect(missing.body.error).toBe('that guild has no loaded bank');
+  });
+
+  it('denies the guild bank read to a role without moderation.read', async () => {
+    // The central fail-closed gate runs before the ladder arm, so the live sim
+    // is never read for an operator who may not see a guild's property.
+    authenticate(['support-only-unknown-role']);
+    const denied = fakeRes();
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds/4/bank' }),
+      denied,
+      fakeGame,
+    );
+    expect(denied.statusCode).toBe(403);
+    expect(fakeGameState.adminGuildBankState).not.toHaveBeenCalled();
   });
 
   it('returns 503 before a third distinct legacy member-count read can occupy the pool', async () => {
