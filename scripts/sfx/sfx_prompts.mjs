@@ -456,6 +456,23 @@ export const SFX = [
     key: 'flamestrike',
     custom: true,
   },
+  {
+    key: 'frozen_orb',
+    custom: true,
+  },
+  {
+    key: 'glacial_spike',
+    custom: true,
+  },
+  {
+    key: 'blizzard',
+    custom: true,
+    loop: true,
+  },
+  {
+    key: 'blink',
+    custom: true,
+  },
 
   // --- Heals & auras --------------------------------------------------------
   {

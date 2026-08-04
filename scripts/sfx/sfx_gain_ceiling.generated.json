@@ -1,6 +1,8 @@
 {
   "amb_forge": 5,
   "blind": 6.1,
+  "blink": 6.2,
+  "blizzard": 5.8,
   "buff_apply": 7.9,
   "cast_chain_heal": 4.5,
   "cast_lightning_bolt": 5,
@@ -21,6 +23,8 @@
   "foot_water": 5.2,
   "foot_wood": 5.2,
   "frost_nova": 6.2,
+  "frozen_orb": 6.1,
+  "glacial_spike": 5.9,
   "hammer_of_justice": 6.3,
   "heal_impact": 6.1,
   "ice_block": 6.3,

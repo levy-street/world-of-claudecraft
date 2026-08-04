@@ -52,6 +52,8 @@ const NOVA_ABILITY_CUES: Partial<Record<string, SfxId>> = {
 const IMPACT_ABILITY_CUES: Partial<Record<string, SfxId>> = {
   scorch: 'scorch',
   pyroblast: 'pyroblast',
+  frozen_orb: 'frozen_orb',
+  glacial_spike: 'glacial_spike',
 };
 
 // A landed cc (stun/root/incapacitate) has no recording by default (see
@@ -64,6 +66,14 @@ const CC_IMPACT_ABILITY_CUES: Partial<Record<string, SfxId>> = {
   hammer_of_justice: 'hammer_of_justice',
   entangling_roots: 'entangling_roots',
   blind: 'blind',
+};
+
+// fx:'blinkStep' fires from effect_dispatch.ts's blinkForward case, shared by
+// every dash-style teleport (Blink, Shadowstep); no recording covers it by
+// default (archetype 'dash', see ability_sfx_coverage.ts). Only Blink has
+// one so far.
+const BLINK_STEP_ABILITY_CUES: Partial<Record<string, SfxId>> = {
+  blink: 'blink',
 };
 
 // Exported (read-only, `as const`) purely so a test can pin its key set
@@ -227,6 +237,12 @@ export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number 
   if (event.fx === 'fearImpact') return { key: 'fear', anchorId: event.targetId };
   if (event.fx === 'ccImpact') {
     const key = event.ability && CC_IMPACT_ABILITY_CUES[event.ability];
+    return key ? { key, anchorId: event.targetId } : null;
+  }
+  // blinkStep fires for every blinkForward-effect ability (Blink, Shadowstep);
+  // only Blink has a recording so far, keyed the same way as the cc trio.
+  if (event.fx === 'blinkStep') {
+    const key = event.ability && BLINK_STEP_ABILITY_CUES[event.ability];
     return key ? { key, anchorId: event.targetId } : null;
   }
   return null;

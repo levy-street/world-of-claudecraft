@@ -376,6 +376,47 @@ describe('combat SFX policy', () => {
     ).toBe('impact_fire');
   });
 
+  it('gives Frozen Orb and Glacial Spike their own impact instead of the shared impact_frost', () => {
+    for (const [ability, key] of [
+      ['frozen_orb', 'frozen_orb'],
+      ['glacial_spike', 'glacial_spike'],
+    ] as const) {
+      expect(
+        impactCueForDamage(damage({ school: 'frost', ability }), target('mob', 'crypt_shambler')),
+      ).toBe(key);
+    }
+    // Every other frost spell (Ice Lance, etc.) keeps the shared impact_frost.
+    expect(
+      impactCueForDamage(
+        damage({ school: 'frost', ability: 'ice_lance' }),
+        target('mob', 'crypt_shambler'),
+      ),
+    ).toBe('impact_frost');
+  });
+
+  it('gives Blink its own teleport cue; Shadowstep (same blinkForward effect) stays silent', () => {
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 10,
+        school: 'arcane',
+        fx: 'blinkStep',
+        ability: 'blink',
+      }),
+    ).toEqual({ key: 'blink', anchorId: 10 });
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 10,
+        school: 'physical',
+        fx: 'blinkStep',
+        ability: 'shadowstep',
+      }),
+    ).toBeNull();
+  });
+
   it('preserves v0.25 mob families and loaded subfamily overrides', () => {
     expect(mobVoiceFamily('mudfin_murloc')).toBe('mudfin');
     expect(mobVoiceCue('mudfin_murloc', 'aggro')).toBe('mob_mudfin_aggro');

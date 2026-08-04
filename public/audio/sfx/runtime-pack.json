@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "b1d7f3545fe1ad19f43b97778cd7ee0a4a9471baae1d34dc74e62d4616281ebd",
-  "catalogHash": "62cd30609e4d083a14116d86a36b264cddc806d53392979eef4890dbff0ff424",
+  "bundleId": "590675c4d798c16ffe95be6817bb7fb5d2b4eeb315a867ef4a2a1272400bd512",
+  "catalogHash": "b7322d294551460f16c3a3a593e6d390fd5cd8795df975abcad2e6d3759a29d1",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -134,6 +134,30 @@
         }
       ],
       "gain": 2.018366,
+      "playbackRate": 1
+    },
+    "blink": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/blink.mp3?v=047a3074ceea",
+          "bytes": 30763,
+          "sha256": "047a3074ceeafb4803b238b0dd9ed88e660ae57913d73f761b34a0486605a254"
+        }
+      ],
+      "gain": 2.041738,
+      "playbackRate": 1
+    },
+    "blizzard": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/blizzard.mp3?v=945f09b7793b",
+          "bytes": 193767,
+          "sha256": "945f09b7793b74b678c0b0aba2d0dad2fb355b9146f3b4cf13e62e3d9313f754"
+        }
+      ],
+      "gain": 1.949845,
       "playbackRate": 1
     },
     "buff_apply": {
@@ -638,6 +662,30 @@
         }
       ],
       "gain": 2.041738,
+      "playbackRate": 1
+    },
+    "frozen_orb": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/frozen_orb.mp3?v=d0399e657263",
+          "bytes": 47063,
+          "sha256": "d0399e6572636b8927b9fd0082310d227fac1d7ed1e5e26b8d6c8456d27a814f"
+        }
+      ],
+      "gain": 2.018366,
+      "playbackRate": 1
+    },
+    "glacial_spike": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/glacial_spike.mp3?v=241c8385a2ba",
+          "bytes": 27628,
+          "sha256": "241c8385a2ba9bd8dbd1a3ccd1a6a25990fd5414a77d14930ddc9238838e1e9c"
+        }
+      ],
+      "gain": 1.972423,
       "playbackRate": 1
     },
     "hammer_of_justice": {

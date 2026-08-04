@@ -416,6 +416,45 @@ describe('playAt return value', () => {
   });
 });
 
+describe('timedGroundLoop (Blizzard storm)', () => {
+  beforeEach(() => {
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    buffers.set('blizzard', { duration: 8 });
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('starts a loop and auto-stops it after the given duration', () => {
+    sfx.timedGroundLoop('groundZone:blizzard', 'blizzard', 0, 0, 0, 6.5);
+    const loops = (sfx as unknown as { loops: Map<string, unknown> }).loops;
+    expect(loops.has('groundZone:blizzard')).toBe(true);
+    vi.advanceTimersByTime(6500);
+    expect(loops.has('groundZone:blizzard')).toBe(false);
+  });
+
+  it('a fresh call before expiry reschedules the stop instead of stacking timers', () => {
+    sfx.timedGroundLoop('groundZone:blizzard', 'blizzard', 0, 0, 0, 6.5);
+    vi.advanceTimersByTime(5000); // most of the way through, still alive
+    sfx.timedGroundLoop('groundZone:blizzard', 'blizzard', 10, 0, 10, 6.5); // zone lands again
+    const loops = (sfx as unknown as { loops: Map<string, unknown> }).loops;
+    vi.advanceTimersByTime(5000); // the ORIGINAL timer would have fired by now
+    expect(loops.has('groundZone:blizzard')).toBe(true); // still alive: rescheduled
+    vi.advanceTimersByTime(1500);
+    expect(loops.has('groundZone:blizzard')).toBe(false);
+  });
+
+  it('ignores an unknown key entirely', () => {
+    const before = sources.length;
+    sfx.timedGroundLoop('groundZone:nope', 'not_a_real_key', 0, 0, 0, 5);
+    const loops = (sfx as unknown as { loops: Map<string, unknown> }).loops;
+    expect(loops.has('groundZone:nope')).toBe(false);
+    expect(sources.length).toBe(before);
+  });
+});
+
 // Footstep sounds ship OFF by default and are toggleable via the footstepSfx
 // setting. While disabled, footstep() must be a no-op (no source created) for
 // self and other entities alike; re-enabling resumes playback.
