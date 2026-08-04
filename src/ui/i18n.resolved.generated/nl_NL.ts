@@ -1175,6 +1175,15 @@ export const nl_NL: EnTranslations = {
       "browserEffectsReduced": "Beperkt",
       "browserEffectsMinimal": "Minimaal",
       "browserEffectsNote": "Automatisch tempert zware CSS-effecten (vervaging, gloed, achtergrondbeweging) op basis van je browser en apparaat. Verlaag het handmatig als de interface traag aanvoelt.",
+      "graphicsApply": "Apply Graphics",
+      "graphicsApplying": "Applying graphics settings...",
+      "graphicsApplied": "Graphics settings applied.",
+      "graphicsSaved": "Graphics settings saved. The active renderer already matches them.",
+      "graphicsFailed": "Graphics could not be applied. Your previous settings are still active.",
+      "graphicsRetry": "Retry Graphics",
+      "graphicsFatal": "Graphics recovery failed. Reload the game to continue.",
+      "graphicsReload": "Reload Game",
+      "graphicsDraftChanged": "Graphics changes are ready to apply.",
       "interfaceMode": "Interfacemodus",
       "interfaceModeAuto": "Automatisch",
       "interfaceModeDesktop": "Desktop",
@@ -1205,6 +1214,7 @@ export const nl_NL: EnTranslations = {
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Secundaire actiebalk tonen",
       "showThirdActionBar": "Derde actiebalk tonen",
+      "lockActionBars": "Lock Action Bars",
       "showTargetOfTarget": "Doelwit van doelwit tonen",
       "showAttackButton": "Aanvalsknop Tonen",
       "showDailyRewardsChest": "Kist met dagelijkse beloningen tonen",
@@ -1366,7 +1376,14 @@ export const nl_NL: EnTranslations = {
     },
     "landing": {
       "highContrast": "Hoog contrast",
-      "highContrastAria": "Hoog-contrastachtergrond aan/uit: schakelt de bewegende trailer uit zodat de tekst op het startscherm leesbaar blijft"
+      "highContrastAria": "Hoog-contrastachtergrond aan/uit: schakelt de bewegende trailer uit zodat de tekst op het startscherm leesbaar blijft",
+      "browserSupport": {
+        "title": "Heads up: unsupported browser",
+        "body": "You may see reduced performance in this browser. For the best experience, get the desktop app for Windows, macOS, or Linux. Prefer playing in a browser? Chrome performs best, and Firefox and Safari are also supported.",
+        "getDesktopApp": "Get the desktop app",
+        "continueInBrowser": "Continue in browser",
+        "dismissAria": "Dismiss the unsupported browser notice"
+      }
     },
     "warfare": {
       "honorAmount": "{amount} Eer",
@@ -2261,6 +2278,7 @@ export const nl_NL: EnTranslations = {
       "sortAria": "Bankvoorwerpen sorteren",
       "searchAria": "Bankvoorwerpen zoeken op naam",
       "depositAll": "Alle materialen storten",
+      "depositAllTooltip": "Sends every crafting reagent and junk item from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, and consumables are never touched.",
       "depositAllDone": "Materialen gestort: {count}.",
       "depositAllFull": "Materialen gestort: {count}. De bank is nu vol.",
       "depositAllNone": "Bank vol: niets gestort.",

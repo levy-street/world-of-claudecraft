@@ -1175,6 +1175,15 @@ export const tr_TR: EnTranslations = {
       "browserEffectsReduced": "Azaltılmış",
       "browserEffectsMinimal": "En Az",
       "browserEffectsNote": "Otomatik, tarayıcınıza ve cihazınıza göre ağır CSS efektlerini (bulanıklık, parıltı, arka plan hareketi) azaltır. Arayüz yavaş hissettiriyorsa elle düşürün.",
+      "graphicsApply": "Apply Graphics",
+      "graphicsApplying": "Applying graphics settings...",
+      "graphicsApplied": "Graphics settings applied.",
+      "graphicsSaved": "Graphics settings saved. The active renderer already matches them.",
+      "graphicsFailed": "Graphics could not be applied. Your previous settings are still active.",
+      "graphicsRetry": "Retry Graphics",
+      "graphicsFatal": "Graphics recovery failed. Reload the game to continue.",
+      "graphicsReload": "Reload Game",
+      "graphicsDraftChanged": "Graphics changes are ready to apply.",
       "interfaceMode": "Arayüz Modu",
       "interfaceModeAuto": "Otomatik",
       "interfaceModeDesktop": "Masaüstü",
@@ -1205,6 +1214,7 @@ export const tr_TR: EnTranslations = {
       "itemScoreLine": "Puan {score}",
       "showSecondaryActionBar": "İkincil Eylem Çubuğunu Göster",
       "showThirdActionBar": "Üçüncü Eylem Çubuğunu Göster",
+      "lockActionBars": "Lock Action Bars",
       "showTargetOfTarget": "Hedefin Hedefini Göster",
       "showAttackButton": "Saldırı Düğmesini Göster",
       "showDailyRewardsChest": "Günlük Ödül Sandığını Göster",
@@ -1366,7 +1376,14 @@ export const tr_TR: EnTranslations = {
     },
     "landing": {
       "highContrast": "Yüksek Kontrast",
-      "highContrastAria": "Yüksek kontrastlı arka planı aç/kapat: hareketli tanıtımı devre dışı bırakır, böylece başlangıç ekranı metni okunaklı kalır"
+      "highContrastAria": "Yüksek kontrastlı arka planı aç/kapat: hareketli tanıtımı devre dışı bırakır, böylece başlangıç ekranı metni okunaklı kalır",
+      "browserSupport": {
+        "title": "Heads up: unsupported browser",
+        "body": "You may see reduced performance in this browser. For the best experience, get the desktop app for Windows, macOS, or Linux. Prefer playing in a browser? Chrome performs best, and Firefox and Safari are also supported.",
+        "getDesktopApp": "Get the desktop app",
+        "continueInBrowser": "Continue in browser",
+        "dismissAria": "Dismiss the unsupported browser notice"
+      }
     },
     "warfare": {
       "honorAmount": "{amount} Onur",
@@ -2261,6 +2278,7 @@ export const tr_TR: EnTranslations = {
       "sortAria": "Banka eşyalarını sırala",
       "searchAria": "Banka eşyalarını ada göre ara",
       "depositAll": "Tüm malzemeleri yatır",
+      "depositAllTooltip": "Sends every crafting reagent and junk item from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, and consumables are never touched.",
       "depositAllDone": "Yatırılan malzeme: {count}.",
       "depositAllFull": "Yatırılan malzeme: {count}. Banka artık dolu.",
       "depositAllNone": "Banka dolu: hiçbir şey yatırılmadı.",

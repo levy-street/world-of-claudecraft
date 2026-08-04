@@ -614,14 +614,15 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   POLISH_ROOT,
   'metadata/after-desktop-ultra.json',
 );
-// Re-pinned after stacking the base renderer provenance move with PR #2720's
-// Eastbrook fence-removal layout evidence. The accepted file still points at
-// the same captured view and historical polish provenance, but its town-contract
-// inventory bytes follow the merged layout inputs.
+// Re-pinned after merging the live graphics rebuild (context recycle plus
+// profile-aware Eastbrook runtime inputs, the rendererIntegration leaf) onto the
+// base that already carries PR #2720's fence-removal layout evidence. The
+// accepted file still points at the same captured view; only its provenance
+// bytes follow the merged inputs.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'def3cd8b40c856c6ee3bcd8dda2be0092f2b019658b447632b296a83934cba4e';
+  'cca5690d8e306a68a247803dba40948921a6cb689a14825197c3e8794b960a8c';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '2d4e6e0ee7168a0bf25a13ba1a2754f39e8c8f168e6f369ceb6588fe2bb9b2bb';
+  '707c6fbee3c5d9681bb717870125dc1632533b9bd0117b922fdf2767edf47952';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1478,14 +1479,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(acceptedFiles).toHaveLength(4);
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
-    // After stacking the base renderer provenance move with PR #2720's
-    // fence-removal content change (rebuilt-town placement inventory in the
-    // after-* files), this seal follows the merged composite. Every measured
-    // value (frame timings, draw stats, triangle and scenario numbers) is
-    // byte-identical against the current release/v0.34.0 tip, neither parent's
-    // literal matched the merged tree, and no capture was retaken.
+    // After merging the live graphics rebuild (context recycle plus
+    // profile-aware Eastbrook runtime inputs, the rendererIntegration leaf)
+    // onto the base carrying PR #2720's fence-removal layout evidence, this
+    // seal follows the merged composite. Every measured value (frame timings,
+    // draw stats, triangle and scenario numbers) is byte-identical, neither
+    // parent's literal matched the merged tree, and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      '65d63c9d51f9543436bfd0d1f28729fac3346559c9ab03d2092ab789927eaa61',
+      '44fbe6961a5d81e50111aee89a4601fdf304d05fc1c7c6b54d77c793fb6f28d6',
     );
   });
 

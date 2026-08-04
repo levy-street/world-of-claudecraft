@@ -191,6 +191,10 @@ export function valeCupKitDebugSizes(): Record<string, { x: number; y: number; z
 }
 
 let kitDisplayMat: THREE.Material | null = null;
+
+export function resetValeCupStadiumProfileCaches(): void {
+  kitDisplayMat = null;
+}
 function kitMaterial(): THREE.Material {
   if (kitDisplayMat) return kitDisplayMat;
   const map = kitSourceMaterial?.map ?? null;

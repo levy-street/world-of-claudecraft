@@ -14,6 +14,10 @@ interface FrostRootMaterials {
 
 let materials: FrostRootMaterials | null = null;
 
+export function resetFrostNovaRootProfileCaches(): void {
+  materials = null;
+}
+
 export function isFrostNovaRootAura(aura: { id: string; kind: string }): boolean {
   return (
     aura.kind === 'root' && (aura.id === 'frost_nova_root' || aura.id === 'rings_of_frost_root')

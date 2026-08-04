@@ -114,6 +114,7 @@ import { fogFarForBuiltGround } from './chunk_residency_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { buildCliffScree, type CliffScreeView } from './cliff_scree';
 import { CompileGateQueue, settlePendingSwap } from './compile_gate';
+import { preflightWebGL2ContextRecycle, type RecycledRendererContext } from './context_recycle';
 import { trackWebGLContext } from './context_release';
 import {
   animatesEveryFrame,
@@ -1210,6 +1211,11 @@ function canvasDataUrlAsync(
   });
 }
 
+export interface RendererCreateOptions {
+  context?: WebGL2RenderingContext;
+  initializeGfx?: boolean;
+}
+
 export class Renderer {
   scene = new THREE.Scene();
   // A soft light pillar marking the local player's corpse during the ghost run.
@@ -1716,6 +1722,22 @@ export class Renderer {
   private glRenderer = '';
   private contextLostCount = 0;
   private contextRestoredCount = 0;
+  private readonly onWebGLContextLost = (): void => {
+    this.contextLostCount++;
+  };
+  private readonly onWebGLContextRestored = (): void => {
+    this.contextRestoredCount++;
+    this.captureGlIdentity();
+    this.vfx?.onContextRestored();
+  };
+  private readonly onViewportResize = (): void => {
+    if (!this.shutdownStarted) this.resizeViewport();
+  };
+  private readonly onOrientationChange = (): void => {
+    this.onViewportResize();
+    this.resizeTimers.push(window.setTimeout(this.onViewportResize, 250));
+    this.resizeTimers.push(window.setTimeout(this.onViewportResize, 800));
+  };
   private phaseSamples: Record<RendererPhase, NumberSampleRing> = {
     setup: new NumberSampleRing(RENDERER_PHASE_SAMPLE_LIMIT),
     entities: new NumberSampleRing(RENDERER_PHASE_SAMPLE_LIMIT),
@@ -1755,14 +1777,30 @@ export class Renderer {
   private pooledVisualCount = 0;
   private objectPool = new Map<string, PooledObjectView[]>();
   private prewarmDepthMaterials = new Map<string, THREE.MeshDepthMaterial>();
+  private readonly canvas: HTMLCanvasElement;
+  private unregisterWebGLContext: (() => void) | null = null;
+  private shutdownStarted = false;
+  private shutdownTask: Promise<RecycledRendererContext> | null = null;
+  private lifecycleGeneration = 0;
+  private resizeTimers: number[] = [];
+  private devProbeTimer: ReturnType<typeof setTimeout> | null = null;
+  private devProbeBindings: {
+    host: Record<string, unknown>;
+    values: Record<string, unknown>;
+  } | null = null;
+  private rendererResourcesDisposed = false;
 
   constructor(
     private sim: IWorld,
     canvas: HTMLCanvasElement,
     nameplateLayer: HTMLDivElement,
+    options: RendererCreateOptions = {},
   ) {
+    this.canvas = canvas;
     this.nameplateLayer = nameplateLayer;
     this.travelSpeedFx = new TravelSpeedFxPainter(nameplateLayer);
+    // biome-ignore format: Keep the established constructor body stable inside the failure guard.
+    try {
     // The scene root sits at identity forever, but with the default
     // matrixAutoUpdate the root recomposes each frame, which flags
     // matrixWorldNeedsUpdate and FORCE-cascades a matrixWorld multiply through
@@ -1778,22 +1816,25 @@ export class Renderer {
     // after the context exists) with the most expensive setting there is.
     this.webgl = new THREE.WebGLRenderer({
       canvas,
+      context: options.context,
       antialias: false,
       powerPreference: 'high-performance',
     });
+    if (!this.webgl.capabilities.isWebGL2) {
+      throw new Error('Renderer requires WebGL2');
+    }
+    if (options.context && this.webgl.getContext() !== options.context) {
+      throw new Error('Three replaced the supplied WebGL2 context');
+    }
     // Release this context promptly on page teardown so repeated logout/login
     // reloads (location.reload) don't exhaust the browser's WebGL context pool.
-    trackWebGLContext(this.webgl);
+    this.unregisterWebGLContext = trackWebGLContext(this.webgl);
     this.captureGlIdentity();
-    canvas.addEventListener('webglcontextlost', () => {
-      this.contextLostCount++;
-    });
-    canvas.addEventListener('webglcontextrestored', () => {
-      this.contextRestoredCount++;
-      this.captureGlIdentity();
-      this.vfx.onContextRestored();
-    });
-    initGfxTier(this.webgl); // software-GL autodetect needs the live context
+    canvas.addEventListener('webglcontextlost', this.onWebGLContextLost);
+    canvas.addEventListener('webglcontextrestored', this.onWebGLContextRestored);
+    if (options.initializeGfx !== false) {
+      initGfxTier(this.webgl); // software-GL autodetect needs the live context
+    }
     if (GFX.composer || GFX.gradePass) {
       // three r165's render() resets info per pass (after the shadow pass, see
       // draw_stats_core.ts header), so with the composer's multiple passes every
@@ -2473,7 +2514,13 @@ export class Renderer {
     this.ringOfFrostVisuals = new RingOfFrostVisuals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
+    const riftDeathZoneGeneration = this.lifecycleGeneration;
     void import('./rift_death_zone').then(({ RiftDeathZoneVisuals }) => {
+      if (
+        this.shutdownStarted ||
+        riftDeathZoneGeneration !== this.lifecycleGeneration
+      )
+        return;
       this.riftDeathZoneVisuals = new RiftDeathZoneVisuals(this.scene, (x, z) => {
         const base = groundHeight(x, z, this.sim.cfg.seed);
         // Add the rift platform lift so rings on elevated sanctum boss arenas
@@ -2582,25 +2629,32 @@ export class Renderer {
     // probe wiring lives entirely inside the subsystem it measures and the
     // production bundle carries none of it.
     if (import.meta.env.DEV && typeof window !== 'undefined') {
+      const devProbeGeneration = this.lifecycleGeneration;
       const install = () => {
+        if (this.shutdownStarted || devProbeGeneration !== this.lifecycleGeneration) return;
         const g = (window as unknown as { __game?: Record<string, unknown> }).__game;
         if (!g) {
-          setTimeout(install, 250);
+          this.devProbeTimer = setTimeout(install, 250);
           return;
         }
+        this.devProbeTimer = null;
         if (!g.abilityVfxStats) {
-          g.abilityVfxStats = () => this.abilityVfxStats();
-          g.abilityVfxGlow = (id: number) => this.abilityVfxGlow(id);
-          g.abilityVfxGroundAuras = (id: number) => this.abilityVfxGroundAuras(id);
-          g.abilityVfxAttackCount = () => this.abilityVfxAttackCount();
-          g.abilityVfxProbe = {
-            specs: ABILITY_VFX_SPECS,
-            fullSpecs: ABILITY_VFX_FULL_SPECS,
-            abilities: ABILITIES,
+          const values: Record<string, unknown> = {
+            abilityVfxStats: () => this.abilityVfxStats(),
+            abilityVfxGlow: (id: number) => this.abilityVfxGlow(id),
+            abilityVfxGroundAuras: (id: number) => this.abilityVfxGroundAuras(id),
+            abilityVfxAttackCount: () => this.abilityVfxAttackCount(),
+            abilityVfxProbe: {
+              specs: ABILITY_VFX_SPECS,
+              fullSpecs: ABILITY_VFX_FULL_SPECS,
+              abilities: ABILITIES,
+            },
           };
+          Object.assign(g, values);
+          this.devProbeBindings = { host: g, values };
         }
       };
-      setTimeout(install, 250);
+      this.devProbeTimer = setTimeout(install, 250);
     }
     this.pulseAt = (id, school, intensity, duration, range) => {
       const v = this.views.get(id);
@@ -2630,16 +2684,151 @@ export class Renderer {
         { gradeOnly: !GFX.composer },
       );
 
-    const resize = () => this.resizeViewport();
-    window.addEventListener('resize', resize);
-    window.addEventListener('orientationchange', () => {
-      resize();
-      window.setTimeout(resize, 250);
-      window.setTimeout(resize, 800);
-    });
-    window.visualViewport?.addEventListener('resize', resize);
-    window.visualViewport?.addEventListener('scroll', resize);
-    document.addEventListener('fullscreenchange', resize);
+    window.addEventListener('resize', this.onViewportResize);
+    window.addEventListener('orientationchange', this.onOrientationChange);
+    window.visualViewport?.addEventListener('resize', this.onViewportResize);
+    window.visualViewport?.addEventListener('scroll', this.onViewportResize);
+    document.addEventListener('fullscreenchange', this.onViewportResize);
+    } catch (error) {
+      this.beginRendererShutdown();
+      this.disposeRendererResources();
+      if (!options.context) {
+        try {
+          const partial = this as unknown as { webgl?: THREE.WebGLRenderer };
+          partial.webgl?.forceContextLoss();
+        } catch {
+          // A failed fresh construction must not leak its newly-created context.
+        }
+      }
+      throw error;
+    }
+  }
+
+  private beginRendererShutdown(): void {
+    if (this.shutdownStarted) return;
+    this.shutdownStarted = true;
+    this.lifecycleGeneration++;
+    this.onZonePrepared = null;
+    this.audioSink = null;
+    this.visibleZonePrepareQueue = [];
+    try {
+      this.terrainView?.cancelStreaming();
+    } catch {
+      // A partially constructed terrain view may already be unwinding.
+    }
+    this.canvas.removeEventListener('webglcontextlost', this.onWebGLContextLost);
+    this.canvas.removeEventListener('webglcontextrestored', this.onWebGLContextRestored);
+    window.removeEventListener('resize', this.onViewportResize);
+    window.removeEventListener('orientationchange', this.onOrientationChange);
+    window.visualViewport?.removeEventListener('resize', this.onViewportResize);
+    window.visualViewport?.removeEventListener('scroll', this.onViewportResize);
+    document.removeEventListener('fullscreenchange', this.onViewportResize);
+    for (const timer of this.resizeTimers) window.clearTimeout(timer);
+    this.resizeTimers = [];
+    if (this.devProbeTimer !== null) {
+      clearTimeout(this.devProbeTimer);
+      this.devProbeTimer = null;
+    }
+    if (this.devProbeBindings) {
+      const { host, values } = this.devProbeBindings;
+      for (const [key, value] of Object.entries(values)) {
+        if (host[key] === value) delete host[key];
+      }
+      this.devProbeBindings = null;
+    }
+    this.unregisterWebGLContext?.();
+    this.unregisterWebGLContext = null;
+  }
+
+  private disposeRendererResources(): void {
+    if (this.rendererResourcesDisposed) return;
+    this.rendererResourcesDisposed = true;
+    const cleanupErrors: unknown[] = [];
+    const bestEffort = (cleanup: () => void): void => {
+      try {
+        cleanup();
+      } catch (error) {
+        cleanupErrors.push(error);
+      }
+    };
+
+    bestEffort(() => this.post?.dispose());
+    this.post = null;
+    bestEffort(() => this.prewarmRenderTarget?.dispose());
+    this.prewarmRenderTarget = null;
+    bestEffort(() => this.pmremGenerator?.dispose());
+    this.pmremGenerator = null;
+    for (const target of this.envRTs.values()) {
+      bestEffort(() => target.dispose());
+    }
+    this.envRTs.clear();
+    for (const material of this.prewarmDepthMaterials.values()) {
+      bestEffort(() => material.dispose());
+    }
+    this.prewarmDepthMaterials.clear();
+    for (const bubble of this.chatBubbles.values()) bestEffort(() => bubble.el.remove());
+    this.chatBubbles.clear();
+    for (const id of [...this.views.keys()]) bestEffort(() => this.removeView(id, true));
+    this.views.clear();
+    for (const pool of this.visualPool.values()) {
+      for (const visual of pool) bestEffort(() => visual.dispose());
+    }
+    this.visualPool.clear();
+    this.pooledVisualCount = 0;
+    this.objectPool.clear();
+    this.clickTargets.length = 0;
+    this.gatherNodeMeshes = [];
+    this.viewLights.length = 0;
+    // The layer is renderer-owned. Clearing it catches a pending DocumentFragment
+    // batch or any renderer DOM surface added after the explicit maps above.
+    bestEffort(() => this.nameplateLayer.replaceChildren());
+    bestEffort(() => this.travelSpeedFx?.dispose());
+    bestEffort(() => this.scene.clear());
+    const webgl = this.webgl as THREE.WebGLRenderer | undefined;
+    if (webgl) {
+      bestEffort(() => webgl.setAnimationLoop(null));
+      bestEffort(() => webgl.dispose());
+    }
+    if (cleanupErrors.length > 0) {
+      try {
+        console.warn('Renderer terminal cleanup completed with failures', cleanupErrors);
+      } catch {
+        // Reporting must not turn terminal best-effort cleanup into a rejection.
+      }
+    }
+  }
+
+  /**
+   * Quiesce this generation and terminally dispose its Three wrapper without
+   * losing the underlying WebGL2 context. The caller owns the subsequent
+   * WEBGL_lose_context cycle and rebuild on the returned canvas/context pair.
+   */
+  preflightContextRecycle(): void {
+    if (this.shutdownStarted) throw new Error('Renderer is already shutting down');
+    if (!this.webgl.capabilities.isWebGL2) throw new Error('Renderer context is not WebGL2');
+    const context = this.webgl.getContext() as WebGL2RenderingContext;
+    preflightWebGL2ContextRecycle(context);
+  }
+
+  shutdown(): Promise<RecycledRendererContext> {
+    if (this.shutdownTask) return this.shutdownTask;
+    const recycled: RecycledRendererContext = {
+      canvas: this.canvas,
+      context: this.webgl.getContext() as WebGL2RenderingContext,
+    };
+    const pending = [
+      ...this.pendingZonePrepares.values(),
+      ...this.pendingZonePrewarms.values(),
+      ...this.textureUploadTaskSet.values(),
+    ];
+    this.beginRendererShutdown();
+    const queueShutdown = this.backgroundGpuWork.shutdown(new Error('Renderer shut down'));
+    this.shutdownTask = (async () => {
+      await Promise.allSettled([...pending, queueShutdown]);
+      this.disposeRendererResources();
+      return recycled;
+    })();
+    return this.shutdownTask;
   }
 
   private measureViewport(): { width: number; height: number } {
@@ -2845,6 +3034,7 @@ export class Renderer {
     onProgress?: (done: number, total: number) => void,
     opts?: { pace?: 'fast' | 'idle' },
   ): Promise<void> {
+    if (this.shutdownStarted) return Promise.resolve();
     const zoneId = this.zoneIdAt(x, z);
     if (zoneId === null || this.preparedZones.has(zoneId)) {
       onProgress?.(1, 1);
@@ -2961,6 +3151,7 @@ export class Renderer {
   } | null = null;
 
   async prewarmZoneAt(x: number, z: number, opts?: { background?: boolean }): Promise<void> {
+    if (this.shutdownStarted) return;
     const zoneId = this.zoneIdAt(x, z);
     if (zoneId === null || this.prewarmedZonePrograms.has(zoneId)) return;
     const pending = this.pendingZonePrewarms.get(zoneId);
@@ -3071,6 +3262,7 @@ export class Renderer {
     radius: number,
     onProgress?: (done: number, total: number) => void,
   ): Promise<void> {
+    if (this.shutdownStarted) return;
     const worldZones = this.sim.cfg.world?.zones ?? ZONES;
     const zones = zonesWithinStreamingHorizon(worldZones, x, z, radius);
     let done = 0;
@@ -3118,6 +3310,7 @@ export class Renderer {
   }
 
   private pumpVisibleZonePrepareQueue(): void {
+    if (this.shutdownStarted) return;
     if (this.visibleZonePrepareActive) return;
     const zone = this.visibleZonePrepareQueue.shift();
     if (!zone) return;
@@ -3880,7 +4073,9 @@ export class Renderer {
     if (!this.renderDiagnosticsSamplePending && now >= this.renderDiagnosticsNextSampleAt) {
       this.renderDiagnosticsSamplePending = true;
       this.renderDiagnosticsNextSampleAt = now + RENDER_DIAGNOSTICS_SAMPLE_MS;
+      const generation = this.lifecycleGeneration;
       const run = (): void => {
+        if (this.shutdownStarted || generation !== this.lifecycleGeneration) return;
         try {
           this.renderDiagnosticsSnapshot = this.collectRenderDiagnostics();
         } finally {
@@ -4541,6 +4736,7 @@ export class Renderer {
 
   private readonly gpuReadyTextures = new WeakSet<THREE.Texture>();
   private readonly textureUploadTasks = new WeakMap<THREE.Texture, Promise<void>>();
+  private readonly textureUploadTaskSet = new Set<Promise<void>>();
 
   private prewarmTextureInIdle(texture: THREE.Texture | null | undefined): Promise<void> {
     if (!texture || this.gpuReadyTextures.has(texture)) return Promise.resolve();
@@ -4559,8 +4755,10 @@ export class Renderer {
       })
       .finally(() => {
         this.textureUploadTasks.delete(texture);
+        this.textureUploadTaskSet.delete(task);
       });
     this.textureUploadTasks.set(texture, task);
+    this.textureUploadTaskSet.add(task);
     return task;
   }
 
@@ -6962,6 +7160,18 @@ export class Renderer {
     );
   }
 
+  private recoverRejectedCompileGate(
+    error: unknown,
+    generation: number,
+    restore: () => void,
+  ): void {
+    // Shutdown rejects queued GPU work on purpose. A stale completion must not
+    // mutate the next renderer generation or produce a misleading live error.
+    if (this.shutdownStarted || generation !== this.lifecycleGeneration) return;
+    restore();
+    console.error('Live shader compile gate failed', error);
+  }
+
   // Generic anti-freeze layer. A freshly-streamed view links its shader programs
   // SYNCHRONOUSLY on first draw - a 50-1700ms frame stall (the open-world travel
   // hitch). Instead link them OFF the main thread and keep the view hidden until
@@ -6972,14 +7182,26 @@ export class Renderer {
   // optimization: already-compiled spawn content resolves instantly, no pop-in.
   private gateViewOnCompile(view: EntityView, group: THREE.Group): Promise<void> | null {
     if (!this.asyncCompileSupported) return null;
+    const generation = this.lifecycleGeneration;
+    const priorVisibility = group.visible;
     view.compilePending = true;
     group.visible = false;
     // The DOM nameplate, target marker, health, and cast bar remain available
     // while the 3D group is gated, so actionable information has an immediate
     // placeholder without first-drawing a still-linking shader.
-    return this.compileGate(group).then(() => {
-      view.compilePending = false;
-    });
+    return this.compileGate(group).then(
+      () => {
+        if (!this.shutdownStarted && generation === this.lifecycleGeneration) {
+          view.compilePending = false;
+        }
+      },
+      (error) => {
+        this.recoverRejectedCompileGate(error, generation, () => {
+          view.compilePending = false;
+          group.visible = priorVisibility;
+        });
+      },
+    );
   }
 
   // Sibling to gateViewOnCompile for a live material-variant swap on an
@@ -6994,10 +7216,20 @@ export class Renderer {
   // recomputes every tick, use gateSwapFlagOnCompile instead.
   private gateSwapOnCompile(target: THREE.Object3D): void {
     if (!this.asyncCompileSupported || !target.visible) return;
+    const generation = this.lifecycleGeneration;
     target.visible = false;
-    void this.compileGate(target).then(() => {
-      target.visible = true;
-    });
+    void this.compileGate(target).then(
+      () => {
+        if (!this.shutdownStarted && generation === this.lifecycleGeneration) {
+          target.visible = true;
+        }
+      },
+      (error) => {
+        this.recoverRejectedCompileGate(error, generation, () => {
+          target.visible = true;
+        });
+      },
+    );
   }
 
   // Sibling to gateSwapOnCompile for a swap whose .visible the per-frame loop
@@ -7013,7 +7245,15 @@ export class Renderer {
       onSettled();
       return;
     }
-    void this.compileGate(target).then(onSettled);
+    const generation = this.lifecycleGeneration;
+    void this.compileGate(target).then(
+      () => {
+        if (!this.shutdownStarted && generation === this.lifecycleGeneration) onSettled();
+      },
+      (error) => {
+        this.recoverRejectedCompileGate(error, generation, onSettled);
+      },
+    );
   }
 
   /** The visual the player currently sees (form swaps hide the base rig). */
@@ -7918,7 +8158,7 @@ export class Renderer {
   }
 
   // Drop the view of an entity that left the world / our interest area.
-  private removeView(id: number): void {
+  private removeView(id: number, terminal = false): void {
     const v = this.views.get(id);
     if (!v) return;
     this.scene.remove(v.group);
@@ -7936,7 +8176,7 @@ export class Renderer {
     if (v.visual) {
       // Character geometry/materials are shared per-asset caches and must
       // survive interest churn, dispose only per-instance mixer bindings.
-      if (v.visualPoolKey) this.storePooledVisual(v.visualPoolKey, v.visual);
+      if (!terminal && v.visualPoolKey) this.storePooledVisual(v.visualPoolKey, v.visual);
       else v.visual.dispose();
       v.sheepVisual?.dispose();
       v.bearVisual?.dispose();
@@ -7945,7 +8185,7 @@ export class Renderer {
       v.mountVisual?.dispose();
       v.fireballTravelVisual?.dispose();
     } else {
-      if (v.objectPoolKey && v.objectMesh instanceof THREE.Group) {
+      if (!terminal && v.objectPoolKey && v.objectMesh instanceof THREE.Group) {
         this.storePooledObject(v.objectPoolKey, {
           group: v.objectMesh,
           height: v.height,
@@ -8051,6 +8291,7 @@ export class Renderer {
     selfMotion: SelfMotionFrame | null = null,
     selfAuthoritativeDiscontinuity = false,
   ): void {
+    if (this.shutdownStarted) return;
     const totalStart = performance.now();
     let phaseStart = totalStart;
     const frameStats = this.lastFrameStats;
@@ -9733,6 +9974,7 @@ export class Renderer {
   // ~18ms at 1280x720 and blocked the bug-report menu. Returns null on any failure
   // (lost context, tainted canvas) so the caller can degrade gracefully.
   async captureScreenshot(maxEdge = 1280, quality = 0.7): Promise<string | null> {
+    if (this.shutdownStarted) return null;
     try {
       this.camera.updateMatrixWorld();
       this.vfx.prepareDraw(this.camera);

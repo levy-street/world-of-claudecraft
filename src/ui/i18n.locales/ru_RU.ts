@@ -1013,6 +1013,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.browserEffectsMinimal': 'Минимальные',
   'hudChrome.options.browserEffectsNote':
     'Авто снижает тяжёлые CSS-эффекты (размытие, свечение, движение фона) в зависимости от браузера и устройства. Если интерфейс тормозит, понизьте вручную.',
+  'hudChrome.options.graphicsApply': 'Применить графику',
+  'hudChrome.options.graphicsApplying': 'Применение настроек графики...',
+  'hudChrome.options.graphicsApplied': 'Настройки графики применены.',
+  'hudChrome.options.graphicsSaved': 'Настройки графики сохранены. Активный рендерер уже им соответствует.',
+  'hudChrome.options.graphicsFailed': 'Не удалось применить настройки графики. Предыдущие настройки остаются активными.',
+  'hudChrome.options.graphicsRetry': 'Повторить применение',
+  'hudChrome.options.graphicsFatal': 'Не удалось восстановить графику. Перезагрузите игру, чтобы продолжить.',
+  'hudChrome.options.graphicsReload': 'Перезагрузить игру',
+  'hudChrome.options.graphicsDraftChanged': 'Изменения графики готовы к применению.',
   'hudChrome.options.footstepSounds': 'Звуки шагов',
   'hudChrome.options.interfaceSounds': 'Звуки интерфейса и откликов',
   'hudChrome.options.clickFeedback': 'Метка клика',
@@ -1032,6 +1041,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showItemLevel': 'Показывать уровень предмета',
   'hudChrome.options.showSecondaryActionBar': 'Показывать вторичную панель действий',
   'hudChrome.options.showThirdActionBar': 'Показывать третью панель действий',
+  'hudChrome.options.lockActionBars': 'Заблокировать панели действий',
   'hudChrome.options.showDailyRewardsChest': 'Показывать сундук ежедневных наград',
   'hudChrome.options.mobileCameraJoystick': 'Джойстик камеры',
   'hudChrome.options.mobileLeftHanded': 'Раскладка для левшей',
@@ -1040,6 +1050,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.landing.highContrast': 'Высокая контрастность',
   'hudChrome.landing.highContrastAria':
     'Переключить фон высокой контрастности: отключает движущийся ролик, чтобы текст начального экрана оставался читаемым',
+  'hudChrome.landing.browserSupport.title': 'Внимание: неподдерживаемый браузер',
+  'hudChrome.landing.browserSupport.body':
+    'В этом браузере производительность может быть снижена. Для наилучшего результата установите настольное приложение для Windows, macOS или Linux. Предпочитаете играть в браузере? Chrome обеспечивает наилучшую производительность, также поддерживаются Firefox и Safari.',
+  'hudChrome.landing.browserSupport.getDesktopApp': 'Получить настольное приложение',
+  'hudChrome.landing.browserSupport.continueInBrowser': 'Продолжить в браузере',
+  'hudChrome.landing.browserSupport.dismissAria': 'Закрыть уведомление о неподдерживаемом браузере',
   'hudChrome.talents.defaultBuildName': 'Билд {n}',
   'hudChrome.tips.joinChannels':
     'Совет: введите /join world или /join lfg, чтобы общаться с игроками по всему миру.',
@@ -9058,6 +9074,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.sortAria': 'Сортировать предметы в банке',
   'hudChrome.bank.searchAria': 'Поиск предметов в банке по названию',
   'hudChrome.bank.depositAll': 'Положить все материалы',
+  'hudChrome.bank.depositAllTooltip':
+    'Отправляет в банк все материалы для крафта и хлам из ваших сумок за один раз. Инструменты для добычи, надетое снаряжение, квестовые предметы и расходники не затрагиваются.',
   'hudChrome.bank.depositAllDone': 'Материалов положено: {count}.',
   'hudChrome.bank.depositAllFull': 'Материалов положено: {count}. Банк заполнен.',
   'hudChrome.bank.depositAllNone': 'Банк заполнен: ничего не положено.',

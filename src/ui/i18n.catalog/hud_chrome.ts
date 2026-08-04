@@ -1044,6 +1044,16 @@ export const hudChromeStrings = {
     browserEffectsMinimal: 'Minimal',
     browserEffectsNote:
       'Auto tones down heavy CSS effects (blur, glow, background motion) based on your browser and device. Lower it manually if the interface feels sluggish.',
+    // Renderer-bound graphics draft and its single apply/recovery action.
+    graphicsApply: 'Apply Graphics',
+    graphicsApplying: 'Applying graphics settings...',
+    graphicsApplied: 'Graphics settings applied.',
+    graphicsSaved: 'Graphics settings saved. The active renderer already matches them.',
+    graphicsFailed: 'Graphics could not be applied. Your previous settings are still active.',
+    graphicsRetry: 'Retry Graphics',
+    graphicsFatal: 'Graphics recovery failed. Reload the game to continue.',
+    graphicsReload: 'Reload Game',
+    graphicsDraftChanged: 'Graphics changes are ready to apply.',
     // Interface Mode control (Graphics panel): desktop keyboard/mouse vs the
     // on-screen touch controls. Auto detects the device; the rest force one.
     interfaceMode: 'Interface Mode',
@@ -1114,6 +1124,11 @@ export const hudChromeStrings = {
     // Enabled only while the secondary row is visible. Slots remain reachable
     // through keybinds and the mobile action-ring pages while this row is hidden.
     showThirdActionBar: 'Show Third Action Bar',
+    // Interface panel toggle (off by default) that locks the action bar slots
+    // against drag-to-move, drag-to-replace, and clear so an accidental
+    // click-and-drag mid-fight can't disturb a slot. Abilities still fire from
+    // keybinds and clicks while locked.
+    lockActionBars: 'Lock Action Bars',
     // Interface panel toggle for the classic "target of target" mini-frame (off by
     // default): a small unit frame under the target frame showing who your target
     // is targeting.
@@ -1315,6 +1330,16 @@ export const hudChromeStrings = {
     highContrast: 'High Contrast',
     highContrastAria:
       'Toggle high-contrast background: disables the moving trailer so start-screen text stays legible',
+    // Dismissible advisory shown at boot to a player on a browser outside the
+    // supported set (Chrome, Firefox, Safari); never shown in the desktop app or
+    // a native mobile shell (issue #2266). Purely advisory: it never blocks play.
+    browserSupport: {
+      title: 'Heads up: unsupported browser',
+      body: 'You may see reduced performance in this browser. For the best experience, get the desktop app for Windows, macOS, or Linux. Prefer playing in a browser? Chrome performs best, and Firefox and Safari are also supported.',
+      getDesktopApp: 'Get the desktop app',
+      continueInBrowser: 'Continue in browser',
+      dismissAria: 'Dismiss the unsupported browser notice',
+    },
   },
   warfare: {
     honorAmount: '{amount} Honor',
@@ -2524,6 +2549,8 @@ export const hudChromeStrings = {
     // Deposit-all-materials button + its transient summary line. {count} is
     // the number of material stacks moved.
     depositAll: 'Deposit all materials',
+    depositAllTooltip:
+      'Sends every crafting reagent and junk item from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, and consumables are never touched.',
     depositAllDone: 'Materials deposited: {count}.',
     depositAllFull: 'Materials deposited: {count}. Bank now full.',
     depositAllNone: 'Bank full: nothing deposited.',

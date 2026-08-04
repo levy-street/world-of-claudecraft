@@ -1001,6 +1001,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.browserEffectsMinimal': '最小',
   'hudChrome.options.browserEffectsNote':
     '自動はブラウザとデバイスに応じて、負荷の高い CSS エフェクト（ぼかし・グロー・背景アニメーション）を抑えます。動作が重い場合は手動で下げてください。',
+  'hudChrome.options.graphicsApply': 'グラフィックを適用',
+  'hudChrome.options.graphicsApplying': 'グラフィック設定を適用中...',
+  'hudChrome.options.graphicsApplied': 'グラフィック設定を適用しました。',
+  'hudChrome.options.graphicsSaved':
+    'グラフィック設定を保存しました。現在のレンダラーはすでに同じ設定です。',
+  'hudChrome.options.graphicsFailed':
+    'グラフィック設定を適用できませんでした。以前の設定は引き続き有効です。',
+  'hudChrome.options.graphicsRetry': 'グラフィックを再試行',
+  'hudChrome.options.graphicsFatal':
+    'グラフィックの復旧に失敗しました。続行するにはゲームを再読み込みしてください。',
+  'hudChrome.options.graphicsReload': 'ゲームを再読み込み',
+  'hudChrome.options.graphicsDraftChanged': 'グラフィックの変更を適用できます。',
   'hudChrome.options.footstepSounds': '足音',
   'hudChrome.options.interfaceSounds': 'インターフェースとフィードバック音',
   'hudChrome.options.clickFeedback': 'クリックマーカー',
@@ -1020,6 +1032,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showItemLevel': 'アイテムレベルを表示',
   'hudChrome.options.showSecondaryActionBar': 'セカンダリアクションバーを表示',
   'hudChrome.options.showThirdActionBar': '3本目のアクションバーを表示',
+  'hudChrome.options.lockActionBars': 'アクションバーをロック',
   'hudChrome.options.showDailyRewardsChest': 'デイリー報酬の宝箱を表示',
   'hudChrome.options.mobileCameraJoystick': 'カメラスティック',
   'hudChrome.options.mobileLeftHanded': '左利き用レイアウト',
@@ -1028,6 +1041,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.landing.highContrast': '高コントラスト',
   'hudChrome.landing.highContrastAria':
     '高コントラスト背景を切り替えます。動画トレーラーを無効にして、スタート画面のテキストを読みやすくします',
+  'hudChrome.landing.browserSupport.title': 'ご注意：サポート対象外のブラウザです',
+  'hudChrome.landing.browserSupport.body':
+    'このブラウザではパフォーマンスが低下する場合があります。最高の体験のために、Windows、macOS、Linux 向けデスクトップアプリの入手をお勧めします。ブラウザでのプレイをご希望ですか？Chrome が最もパフォーマンスに優れ、Firefox と Safari もサポートされています。',
+  'hudChrome.landing.browserSupport.getDesktopApp': 'デスクトップアプリを入手',
+  'hudChrome.landing.browserSupport.continueInBrowser': 'ブラウザで続ける',
+  'hudChrome.landing.browserSupport.dismissAria': 'サポート対象外ブラウザの通知を閉じる',
   'hudChrome.talents.defaultBuildName': 'ビルド {n}',
   'hudChrome.tips.joinChannels':
     'ヒント：/join world または /join lfg と入力すると、ワールド全体のプレイヤーとチャットできます。',
@@ -8909,6 +8928,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.sortAria': '銀行のアイテムを並べ替える',
   'hudChrome.bank.searchAria': '名前で銀行のアイテムを検索',
   'hudChrome.bank.depositAll': 'すべての素材を預ける',
+  'hudChrome.bank.depositAllTooltip':
+    'カバン内の製作素材とがらくたをまとめて銀行に預けます。採集用道具、装備中の防具、クエストアイテム、消耗品は対象外です。',
   'hudChrome.bank.depositAllDone': '素材を預けました：{count}。',
   'hudChrome.bank.depositAllFull': '素材を預けました：{count}。銀行がいっぱいになりました。',
   'hudChrome.bank.depositAllNone': '銀行がいっぱいです：何も預けられませんでした。',

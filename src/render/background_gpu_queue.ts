@@ -20,12 +20,24 @@ interface PendingGpuWork<T> {
 
 export interface BackgroundGpuQueue {
   run<T>(work: () => T | Promise<T>, priority?: number): Promise<T>;
+  /** Reject queued work, stop accepting more, and await the active unit. */
+  shutdown(reason?: Error): Promise<void>;
 }
 
 export function createBackgroundGpuQueue(): BackgroundGpuQueue {
   const pending: PendingGpuWork<unknown>[] = [];
   let active = false;
+  let accepting = true;
   let nextOrder = 0;
+  let shutdownReason: Error | null = null;
+  let shutdownPromise: Promise<void> | null = null;
+  let resolveShutdown: (() => void) | null = null;
+
+  const settleShutdownIfIdle = (): void => {
+    if (accepting || active || pending.length > 0) return;
+    resolveShutdown?.();
+    resolveShutdown = null;
+  };
 
   const drain = async (): Promise<void> => {
     while (pending.length > 0) {
@@ -51,6 +63,7 @@ export function createBackgroundGpuQueue(): BackgroundGpuQueue {
     // A run() call can land after the loop observes an empty queue but before
     // this async continuation clears active. Start another drain in that case.
     if (pending.length > 0) scheduleDrain();
+    else settleShutdownIfIdle();
   };
 
   const scheduleDrain = (): void => {
@@ -61,6 +74,9 @@ export function createBackgroundGpuQueue(): BackgroundGpuQueue {
 
   return {
     run<T>(work: () => T | Promise<T>, priority = GPU_WORK_PRIORITY.BACKGROUND): Promise<T> {
+      if (!accepting) {
+        return Promise.reject(shutdownReason ?? new Error('Background GPU queue is shut down'));
+      }
       const result = new Promise<T>((resolve, reject) => {
         pending.push({
           order: nextOrder++,
@@ -72,6 +88,17 @@ export function createBackgroundGpuQueue(): BackgroundGpuQueue {
       });
       scheduleDrain();
       return result;
+    },
+    shutdown(reason = new Error('Background GPU queue is shut down')): Promise<void> {
+      if (shutdownPromise) return shutdownPromise;
+      accepting = false;
+      shutdownReason = reason;
+      for (const entry of pending.splice(0)) entry.reject(reason);
+      shutdownPromise = new Promise<void>((resolve) => {
+        resolveShutdown = resolve;
+      });
+      settleShutdownIfIdle();
+      return shutdownPromise;
     },
   };
 }

@@ -14,7 +14,7 @@
     "mode": "composite-sha256",
     "algorithm": "sha256",
     "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-    "fingerprint": "2d4e6e0ee7168a0bf25a13ba1a2754f39e8c8f168e6f369ceb6588fe2bb9b2bb",
+    "fingerprint": "707c6fbee3c5d9681bb717870125dc1632533b9bd0117b922fdf2767edf47952",
     "components": {
       "townAsset": {
         "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -22,7 +22,7 @@
       },
       "authoritativeLayout": {
         "path": "src/sim/eastbrook_layout.ts",
-        "sha256": "c82456e33afb257f271604a0138b7d2ffb01b42218eab386f35f337ba00b2742"
+        "sha256": "a2f80d23e3eb68b404e756b83a95d034eb8fc1f8b439470fea911c8389769fcd"
       },
       "civicShader": {
         "path": "src/render/eastbrook_civic_beacon.ts",
@@ -31,19 +31,19 @@
       "runtimeRender": {
         "town": {
           "path": "src/render/eastbrook_town.ts",
-          "sha256": "b58e12833ba95a8e9ca5a0cff34b6a26fec5a7eec73bd3d30ea25232cc3d79ba"
+          "sha256": "df6cb0d54768ebae85c752e6d94e57466efc327157d51a72418567b649b393f0"
         },
         "mailbox": {
           "path": "src/render/mailbox.ts",
-          "sha256": "20cd65c6850e085123cfdb866ebeca542a0b471a2e44c874468496822b2b9d14"
+          "sha256": "5e8fe3e52e1a1447f2ecc96c66318f891ab616f4cd7e8f40de24ee3514ac2317"
         },
         "noticeboard": {
           "path": "src/render/noticeboard.ts",
-          "sha256": "b1cea4ed6661b3c1603be1865041c969eb5ba34e9e64e687ffa47ccc825c5aa1"
+          "sha256": "5afcf4bfa8a7e6d4db3963886c6e98cd818f02388208a99088ae8d4d0f5a53d2"
         },
         "renderer": {
           "path": "src/render/renderer.ts",
-          "sha256": "8e04c90b2fba4b157cac9f520ab3a95cf22b6d9fb96fc129e0b75905d70c4b17"
+          "sha256": "973d58afee4cb7f98ebee23b46218de17e5cbf2fb9b4554cd2cc79eb8453d105"
         },
         "viewPriorityPolicy": {
           "path": "src/render/prewarm_policy.ts",
@@ -68,7 +68,7 @@
       },
       "captureContract": {
         "id": "polish-v2",
-        "sha256": "352669eac5ae3ca6a281cb65ede355b477aa2c87e31c1f29569b1133d8176a76"
+        "sha256": "dc3d91089f8958f32b0a639b632ca710229761872dba5aee5a731d276fbbd727"
       }
     }
   },

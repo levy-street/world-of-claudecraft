@@ -362,15 +362,16 @@ describe('Eastbrook polish capture contract', () => {
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
       // Deliberately re-pinned for the merge of release/v0.34.0 into this branch.
       // src/render/renderer.ts is the rendererIntegration leaf of this composite,
-      // so any edit to it moves the leaf's sha256 and with it the composite. Both
-      // parents re-pinned independently: the release side stacked its renderer
-      // provenance move with PR #2720's fence-removal layout evidence, and this
-      // branch added the worldObjectBurning fire-burst cue (torched murloc huts,
+      // so any edit to it moves the leaf's sha256 and with it the composite. Three
+      // renderer edits now stack here: PR #2720's fence-removal layout evidence
+      // and the live graphics rebuild (context recycle plus profile-aware
+      // Eastbrook runtime inputs, PR #2799) from the release side, and this
+      // branch's worldObjectBurning fire-burst cue (torched murloc huts,
       // q_deepfen_purge). The merged renderer therefore mints a composite that
       // matches neither parent's literal. No GLB source fingerprint moved, no
       // pipeline input or geometry value changed, and no capture was retaken,
       // same as every precedent in this chain.
-      fingerprint: '2e5613b97636f23a7d4e19d694155f4d4162de355cd42bfbc8e9687da4995821',
+      fingerprint: 'c24b1224ac2ece4186e4c92e170ca61501bdf33453d7c92afef029b3d7ea51ee',
       components: {
         captureContract: {
           id: 'polish-v2',

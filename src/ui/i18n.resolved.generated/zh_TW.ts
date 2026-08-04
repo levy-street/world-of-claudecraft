@@ -1175,6 +1175,15 @@ export const zh_TW: EnTranslations = {
       "browserEffectsReduced": "精簡",
       "browserEffectsMinimal": "最低",
       "browserEffectsNote": "自動模式會根據你的瀏覽器與裝置調低高負擔的 CSS 特效（模糊、光暈、背景動畫）。若介面感覺卡頓，可手動降低。",
+      "graphicsApply": "套用圖形設定",
+      "graphicsApplying": "正在套用圖形設定...",
+      "graphicsApplied": "圖形設定已套用。",
+      "graphicsSaved": "圖形設定已儲存。目前的渲染器已符合這些設定。",
+      "graphicsFailed": "無法套用圖形設定。先前的圖形設定仍然有效。",
+      "graphicsRetry": "重試圖形設定",
+      "graphicsFatal": "圖形復原失敗。請重新載入遊戲以繼續。",
+      "graphicsReload": "重新載入遊戲",
+      "graphicsDraftChanged": "圖形變更已準備好套用。",
       "interfaceMode": "介面模式",
       "interfaceModeAuto": "自動",
       "interfaceModeDesktop": "桌面",
@@ -1205,6 +1214,7 @@ export const zh_TW: EnTranslations = {
       "itemScoreLine": "評分 {score}",
       "showSecondaryActionBar": "顯示副動作列",
       "showThirdActionBar": "顯示第三動作列",
+      "lockActionBars": "鎖定動作列",
       "showTargetOfTarget": "顯示目標的目標",
       "showAttackButton": "顯示攻擊按鈕",
       "showDailyRewardsChest": "顯示每日獎勵寶箱",
@@ -1366,7 +1376,14 @@ export const zh_TW: EnTranslations = {
     },
     "landing": {
       "highContrast": "高對比度",
-      "highContrastAria": "切換高對比度背景：關閉動態預告片，使開始畫面文字保持清晰"
+      "highContrastAria": "切換高對比度背景：關閉動態預告片，使開始畫面文字保持清晰",
+      "browserSupport": {
+        "title": "提示：不受支援的瀏覽器",
+        "body": "此瀏覽器中效能可能會下降。為獲得最佳體驗，請下載適用於 Windows、macOS 或 Linux 的桌面應用程式。想在瀏覽器中遊玩？Chrome 效能最佳，Firefox 和 Safari 也受支援。",
+        "getDesktopApp": "取得桌面應用程式",
+        "continueInBrowser": "繼續在瀏覽器中遊玩",
+        "dismissAria": "關閉不受支援瀏覽器的提示"
+      }
     },
     "warfare": {
       "honorAmount": "{amount} 點榮譽",
@@ -2261,6 +2278,7 @@ export const zh_TW: EnTranslations = {
       "sortAria": "排序銀行物品",
       "searchAria": "依名稱搜尋銀行物品",
       "depositAll": "存入所有材料",
+      "depositAllTooltip": "將背包中的所有製作材料和廢品一次性存入銀行。採集工具、已裝備的裝備、任務物品和消耗品不會受到影響。",
       "depositAllDone": "已存入材料：{count}。",
       "depositAllFull": "已存入材料：{count}。銀行已滿。",
       "depositAllNone": "銀行已滿：未存入任何物品。",

@@ -1992,7 +1992,7 @@
     justify-content: space-between;
     padding: 6vh 0 7vh;
     opacity: 1;
-    transition: opacity 0.35s ease;
+    transition: opacity calc(0.35s * var(--motion-scale)) ease;
   }
   #loading-screen.visible {
     display: flex;
@@ -2027,7 +2027,13 @@
     height: 100%;
     width: 0%;
     background: linear-gradient(180deg, var(--color-primary), var(--color-primary-dim));
-    transition: width 0.2s ease;
+    transition: width calc(0.2s * var(--motion-scale)) ease;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #loading-screen,
+    #ls-fill {
+      transition: none;
+    }
   }
   #ls-status {
     color: var(--color-text-light);
@@ -7990,6 +7996,66 @@
   }
   @media (pointer: coarse) {
     #perf-nudge button {
+      min-height: 40px;
+      min-width: 40px;
+    }
+  }
+
+  /* ---------- unsupported browser notice ---------- */
+  /* Owned by src/game/browser_support_notice.ts: a one-time, dismissible
+     advisory shown at boot to a player on a browser outside the officially
+     supported set (Chrome, Firefox, Safari), never in the desktop app or a
+     native mobile shell (issue #2266). Bottom-left so it never collides with
+     the top-right toast stack (#gpu-notice / #perf-nudge / update toast). */
+  #browser-support-notice {
+    position: fixed;
+    left: calc(var(--spacing-md) + env(safe-area-inset-left, 0px));
+    bottom: calc(var(--spacing-md) + env(safe-area-inset-bottom, 0px));
+    z-index: 260;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    max-width: min(420px, calc(100vw - 2 * var(--spacing-md)));
+    padding: var(--spacing-md);
+    background: linear-gradient(180deg, rgba(21, 21, 31, 0.96) 0%, rgba(11, 11, 18, 0.98) 100%);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-light);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  }
+  .browser-support-notice-title {
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .browser-support-notice-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+  }
+  .browser-support-notice-actions button {
+    padding: 6px 12px;
+    min-height: 24px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    color: inherit;
+    font: inherit;
+    cursor: var(--cursor-point);
+  }
+  .browser-support-notice-desktop {
+    border-color: var(--color-primary);
+  }
+  .browser-support-notice-actions button:hover {
+    border-color: var(--color-primary);
+  }
+  .browser-support-notice-actions button:focus-visible {
+    outline: 3px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  @media (pointer: coarse) {
+    .browser-support-notice-actions button {
       min-height: 40px;
       min-width: 40px;
     }

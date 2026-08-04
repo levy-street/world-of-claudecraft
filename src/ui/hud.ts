@@ -1,6 +1,7 @@
 import { audio } from '../game/audio';
 import { corpseLootAvailability, localPartyMemberIds } from '../game/corpse_loot_availability';
 import type { GamepadKind } from '../game/gamepad_map';
+import type { GraphicsSettingsSnapshot } from '../game/graphics_rebuild_core';
 import { InstanceMusicController } from '../game/instance_music';
 import { type Keybinds, keyCapLabel, keyLabel } from '../game/keybinds';
 import { music } from '../game/music';
@@ -299,6 +300,7 @@ import {
   captureActionBarLayout,
   planActionBarRestore,
 } from './hud/action_bar/action_bar_layout_sync';
+import { isActionBarEditAllowed } from './hud/action_bar/action_bar_lock';
 import { ActionBarPainter, type ActionBarSlotElements } from './hud/action_bar/action_bar_painter';
 import {
   ABILITY_ICON_PREFIX,
@@ -632,6 +634,10 @@ export interface OptionsHooks {
   captureKey(cb: ((code: string | null) => void) | null): void;
   settings: Settings;
   onSettingChange(key: keyof GameSettings, value: GameSettings[keyof GameSettings]): void;
+  /** Current renderer-bound profile. Options clones this into a disposable local draft. */
+  graphicsApplied(): GraphicsSettingsSnapshot;
+  /** Apply one complete six-setting draft. The window owns localized progress/results. */
+  applyGraphics(draft: GraphicsSettingsSnapshot): Promise<GraphicsApplyOutcome>;
   // Switch the active locale at runtime (loads the locale chunk, relocalizes the page,
   // fans out woc:languagechange). onStatus receives localized progress/error text for an
   // aria-live element. Resolves false if the locale failed to load (active locale kept).
@@ -658,6 +664,8 @@ export interface OptionsHooks {
   // without the HUD importing the manager.
   gamepad: GamepadBindingsHooks;
 }
+
+export type GraphicsApplyOutcome = 'applied' | 'saved' | 'failed' | 'fatal';
 
 export interface ThemeHooks {
   get(): ThemeState;
@@ -1680,6 +1688,7 @@ export class Hud {
   private targetTitleDecoration: TitledNameDecoration = { pre: '', post: '' };
   private charPreview: CharacterPreview | null = null;
   private charPreviewCanvas: HTMLCanvasElement | null = null;
+  private restoreCharPreviewAfterGraphicsRebuild = false;
   private readonly skinEvent: SkinEventController;
   // Pending lazy-load of the mech GLB + chromas; the reveal waits on it.
   private mechAssetsPromise: Promise<void> | null = null;
@@ -6310,6 +6319,10 @@ export class Hud {
     return true;
   }
 
+  private actionBarsLocked(): boolean {
+    return Boolean(this.optionsHooks?.settings.get('lockActionBars'));
+  }
+
   private buildActionBar(): void {
     const bar = $('#actionbar');
     const bar2 = $('#actionbar2');
@@ -6402,6 +6415,7 @@ export class Hud {
         // slot 0 (Attack) stays fixed
         btn.draggable = true;
         const clearSlot = () => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'clear')) return;
           this.hotbarActions = clearHotbarSlot(this.hotbarActions, slot - 1);
           this.saveSlotMap();
           btn.classList.add('empty');
@@ -6415,6 +6429,10 @@ export class Hud {
           handleShiftClearKeydown(e, clearSlot);
         });
         btn.addEventListener('dragstart', (e) => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drag')) {
+            e.preventDefault();
+            return;
+          }
           const action = this.actionForSlot(slot);
           if (!action) {
             e.preventDefault();
@@ -6426,6 +6444,7 @@ export class Hud {
           this.hideTooltip();
         });
         btn.addEventListener('dragover', (e) => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drop')) return;
           if (this.tryAcceptAttackDrag(e, btn, slot, 'over')) return;
           const dragged = this.dragAction?.action ?? this.readDraggedAction(e.dataTransfer);
           if (!dragged) return;
@@ -6443,6 +6462,7 @@ export class Hud {
         });
         btn.addEventListener('dragleave', () => btn.classList.remove('drop-target'));
         btn.addEventListener('drop', (e) => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drop')) return;
           if (this.tryAcceptAttackDrag(e, btn, slot, 'drop')) return;
           e.preventDefault();
           btn.classList.remove('drop-target');
@@ -6487,12 +6507,14 @@ export class Hud {
         // for a normal action. The Options toggle restores Attack at any time.
         btn.draggable = true;
         const clearAttackSlotAction = () => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'clear')) return;
           if (this.attackSlotAction === null) return;
           this.attackSlotAction = null;
           this.saveAttackSlotAction();
           this.hideTooltip();
         };
         btn.addEventListener('contextmenu', (e) => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'clear')) return;
           if (this.attackSlotIsAttack()) {
             e.preventDefault();
             this.optionsHooks?.settings.set('showAttackButton', false);
@@ -6506,6 +6528,10 @@ export class Hud {
           handleShiftClearKeydown(e, clearAttackSlotAction);
         });
         btn.addEventListener('dragstart', (e) => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drag')) {
+            e.preventDefault();
+            return;
+          }
           const action = this.actionForSlot(0);
           if (!action) {
             e.preventDefault();
@@ -6518,6 +6544,7 @@ export class Hud {
         });
         // With Attack removed, the freed slot accepts a drag like any other slot.
         btn.addEventListener('dragover', (e) => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drop')) return;
           if (this.tryAcceptAttackDrag(e, btn, slot, 'over')) return;
           if (this.attackSlotIsAttack()) return;
           if (this.dragAction?.sourceAttackSlot) return;
@@ -6529,6 +6556,7 @@ export class Hud {
         });
         btn.addEventListener('dragleave', () => btn.classList.remove('drop-target'));
         btn.addEventListener('drop', (e) => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drop')) return;
           if (this.tryAcceptAttackDrag(e, btn, slot, 'drop')) return;
           e.preventDefault();
           btn.classList.remove('drop-target');
@@ -6959,6 +6987,7 @@ export class Hud {
 
   private bindMobileActionDrag(btn: HTMLButtonElement, slot: number): void {
     btn.addEventListener('pointerdown', (e) => {
+      if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drag')) return;
       if (!document.body.classList.contains('mobile-touch') || e.pointerType !== 'touch') return;
       if (this.empoweredAbilityIdForSlot(slot)) return;
       // Any populated slot (ability or item) can be picked up and swapped by
@@ -7052,6 +7081,7 @@ export class Hud {
   // position's underlying bar slot depends on the current paged page.
   private bindMobileRingDrag(btn: HTMLButtonElement, ringIndex: number): void {
     btn.addEventListener('pointerdown', (e) => {
+      if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drag')) return;
       if (!document.body.classList.contains('mobile-touch') || e.pointerType !== 'touch') return;
       const sourceSlot = this.mobileSourceSlotForButton(ringIndex);
       if (this.empoweredAbilityIdForSlot(sourceSlot)) return;
@@ -14252,6 +14282,30 @@ export class Hud {
   async prewarmArmoryPreview(): Promise<void> {
     if (!this.claudiumHooks) return;
     await this.dailyRewardsWindow.prewarmArmoryPreview();
+  }
+
+  /** Rebind every HUD callback to the newly committed world renderer. */
+  replaceRenderer(renderer: Renderer): void {
+    this.renderer = renderer;
+  }
+
+  /**
+   * Dispose secondary WebGL contexts after target assets are ready but before
+   * the active graphics epoch changes. Their owning windows stay intact.
+   */
+  resetGraphicsPreviewContexts(): void {
+    this.restoreCharPreviewAfterGraphicsRebuild = this.charWindow.isOpen;
+    this.charPreview?.destroy();
+    this.charPreview = null;
+    this.charPreviewCanvas = null;
+    this.dailyRewardsWindow.resetArmoryPreviewForGraphicsRebuild();
+  }
+
+  /** Restore preview surfaces that were visible across the renderer swap. */
+  restoreGraphicsPreviewContexts(): void {
+    if (this.restoreCharPreviewAfterGraphicsRebuild) this.charWindow.renderIfOpen();
+    this.restoreCharPreviewAfterGraphicsRebuild = false;
+    this.dailyRewardsWindow.restoreArmoryPreviewAfterGraphicsRebuild();
   }
 
   /** Populate the small synchronous Canvas caches used by contextual HUD

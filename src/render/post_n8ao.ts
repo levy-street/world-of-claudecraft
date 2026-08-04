@@ -1,20 +1,34 @@
 import { N8AOPass } from 'n8ao';
-import type { Camera, Scene, ShaderMaterial, WebGLRenderer, WebGLRenderTarget } from 'three';
+import type {
+  Camera,
+  DataTexture,
+  Scene,
+  ShaderMaterial,
+  WebGLRenderer,
+  WebGLRenderTarget,
+} from 'three';
 
 interface N8AOFullScreenTriangle {
   material: ShaderMaterial;
   render(renderer: WebGLRenderer): void;
+  dispose(): void;
 }
 
 interface N8AOStaticFrameInternals {
+  beautyRenderTarget: WebGLRenderTarget;
   writeTargetInternal: WebGLRenderTarget;
+  readTargetInternal: WebGLRenderTarget;
   accumulationRenderTarget: WebGLRenderTarget;
   accumulationQuad: N8AOFullScreenTriangle;
+  bluenoise: DataTexture;
   effectShaderQuad?: N8AOFullScreenTriangle;
   poissonBlurQuad?: N8AOFullScreenTriangle;
   effectCompositerQuad: N8AOFullScreenTriangle;
   depthDownsampleTarget?: WebGLRenderTarget | null;
   depthDownsampleQuad?: N8AOFullScreenTriangle | null;
+  transparencyRenderTargetDWFalse?: WebGLRenderTarget | null;
+  transparencyRenderTargetDWTrue?: WebGLRenderTarget | null;
+  depthCopyPass?: N8AOFullScreenTriangle | null;
 }
 
 interface N8AOStaticConfiguration {
@@ -220,6 +234,8 @@ function suppressFullCoverageClear(quad: N8AOFullScreenTriangle | null | undefin
  * performs the same binary16 conversion in shader instead.
  */
 export class StaticOpaqueN8AOPass extends N8AOPass {
+  private resourcesDisposed = false;
+
   constructor(scene: Scene, camera: Camera, width: number, height: number) {
     super(scene, camera, width, height);
     assertStaticShaderConfiguration(this.configuration as unknown as N8AOStaticConfiguration);
@@ -267,5 +283,31 @@ export class StaticOpaqueN8AOPass extends N8AOPass {
     const state = this as unknown as N8AOStaticFrameInternals;
     if (state.depthDownsampleTarget) state.depthDownsampleTarget.depthBuffer = false;
     suppressFullCoverageClear(state.depthDownsampleQuad);
+  }
+
+  override dispose(): void {
+    if (this.resourcesDisposed) return;
+    this.resourcesDisposed = true;
+    const state = this as unknown as N8AOStaticFrameInternals;
+    const targets = new Set<WebGLRenderTarget>([
+      state.beautyRenderTarget,
+      state.writeTargetInternal,
+      state.readTargetInternal,
+      state.accumulationRenderTarget,
+    ]);
+    if (state.depthDownsampleTarget) targets.add(state.depthDownsampleTarget);
+    if (state.transparencyRenderTargetDWFalse) targets.add(state.transparencyRenderTargetDWFalse);
+    if (state.transparencyRenderTargetDWTrue) targets.add(state.transparencyRenderTargetDWTrue);
+    for (const target of targets) target.dispose();
+    state.bluenoise.dispose();
+    const quads = new Set<N8AOFullScreenTriangle>([
+      state.accumulationQuad,
+      state.effectCompositerQuad,
+    ]);
+    if (state.effectShaderQuad) quads.add(state.effectShaderQuad);
+    if (state.poissonBlurQuad) quads.add(state.poissonBlurQuad);
+    if (state.depthDownsampleQuad) quads.add(state.depthDownsampleQuad);
+    if (state.depthCopyPass) quads.add(state.depthCopyPass);
+    for (const quad of quads) quad.dispose();
   }
 }
