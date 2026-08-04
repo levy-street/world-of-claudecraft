@@ -42,7 +42,25 @@ const bundled = await esbuild.build({
   bundle: true,
   format: 'iife',
   platform: 'browser',
-  define: { 'import.meta.env.DEV': 'true', 'import.meta.env.PROD': 'false' },
+  define: {
+    'import.meta.env.DEV': 'true',
+    'import.meta.env.PROD': 'false',
+    // The env-combined base pulled client_origin.ts / runtime.ts into the
+    // renderer's import graph; every VITE_* member they read must be defined
+    // (esbuild matches the FULL member path) or the IIFE shim leaves
+    // import_meta.env undefined and the page crashes before window.renderStill
+    // exists.
+    'import.meta.env.BASE_URL': '"/"',
+    'import.meta.env.VITE_API_ORIGIN': '""',
+    'import.meta.env.VITE_DESKTOP_API_ORIGIN': '""',
+    'import.meta.env.VITE_DESKTOP_APP': '""',
+    'import.meta.env.VITE_DESKTOP_RELATIVE_API': '""',
+    'import.meta.env.VITE_DISCORD_DISABLED': '""',
+    'import.meta.env.VITE_NATIVE_APP': '""',
+    'import.meta.env.VITE_REOWN_PROJECT_ID': '""',
+    'import.meta.env.VITE_TURNSTILE_SITEKEY': '""',
+    'import.meta.env.VITE_WALLET_DISABLED': '""',
+  },
   write: false,
   logLevel: 'silent',
 });

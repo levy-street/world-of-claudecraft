@@ -224,7 +224,10 @@ describe('the Thornpeak corridor is one dense cluster ON PURPOSE', () => {
     );
     expect(merged).toHaveLength(1);
     // Pinned so a future camp addition to this corridor is a visible decision.
-    expect(merged[0].mobCount).toBe(63);
+    // 63 -> 64: the quest-dedupe pass placed Brakka the Wallbreaker (a single
+    // slow-respawn quest capstone elite) at the ogre foothills inside this
+    // corridor.
+    expect(merged[0].mobCount).toBe(64);
   });
 
   it('bounds that cluster by YIELD instead, which is what the tiers fixed', () => {

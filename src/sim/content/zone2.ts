@@ -363,6 +363,9 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
   },
   drowned_warlord: {
     id: 'drowned_warlord',
+    // Named quest capstone: single spawn on the slow elite respawn cadence
+    // (the Old Cragmaw precedent), not the trash farm population.
+    respawnMult: 7.2,
     name: 'The Drowned Warlord',
     minLevel: 12,
     maxLevel: 12,

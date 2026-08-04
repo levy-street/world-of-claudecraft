@@ -53,8 +53,10 @@ describe('mob component-type tags', () => {
     // The complement, so an always-false predicate could not pass the row above
     // by emptying the sweep.
     // 36 since the farm-economy pass added mapped tags to 15 coinless trash
-    // templates; fen_troll is still the only all-unmapped one.
-    expect(tagged.filter((mob) => isHarvestableCorpse(mob.componentTags))).toHaveLength(36);
+    // templates; 37 with the quest-dedupe pass (threnos_first_voice salvages
+    // cloth like the zealot flock he leads); fen_troll is still the only
+    // all-unmapped one.
+    expect(tagged.filter((mob) => isHarvestableCorpse(mob.componentTags))).toHaveLength(37);
   });
 
   it('never lets a template out-pay the tag list it advertises (#2514)', () => {

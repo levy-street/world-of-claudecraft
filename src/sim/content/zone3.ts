@@ -298,6 +298,9 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
   },
   brakka_wallbreaker: {
     id: 'brakka_wallbreaker',
+    // Named quest capstone: single spawn on the slow elite respawn cadence
+    // (the Old Cragmaw precedent), not the trash farm population.
+    respawnMult: 7.2,
     name: 'Brakka the Wallbreaker',
     minLevel: 17,
     maxLevel: 17,
@@ -314,8 +317,11 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     concuss: { chance: 0.3, duration: 2, name: 'Wallbreaker Smash' },
     loot: [
       { copper: 300, chance: 1 },
+      // No cragprowl_belt here: an elite source re-derives an item's level
+      // (+1), and the belt is pinned at 17 from its ogre_crusher source
+      // (tests/itemization_coverage.test.ts). The guaranteed ring plus elite
+      // copper is the drop; the quest pays the real reward.
       { itemId: 'ogre_toe_ring', chance: 1 },
-      { itemId: 'cragprowl_belt', chance: 0.3 },
     ],
     scale: 1.7,
     color: 0x7a5230,
@@ -548,6 +554,9 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
   },
   threnos_first_voice: {
     id: 'threnos_first_voice',
+    // Named quest capstone: single spawn on the slow elite respawn cadence
+    // (the Old Cragmaw precedent), not the trash farm population.
+    respawnMult: 7.2,
     name: 'Threnos the First Voice',
     minLevel: 19,
     maxLevel: 19,

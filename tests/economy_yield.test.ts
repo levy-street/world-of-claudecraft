@@ -47,7 +47,11 @@ function isTrash(template: MobTemplate): boolean {
     !template.boss &&
     !template.dummy &&
     !template.ambient &&
-    template.respawnMult === undefined
+    template.respawnMult === undefined &&
+    // A quest-gated destructible (requiresQuestId, the Broodmother eggs) is a
+    // puzzle object only questers can even damage, not farm population: it
+    // carries neither coin nor harvest components by design (xpMult 0).
+    template.requiresQuestId === undefined
   );
 }
 
