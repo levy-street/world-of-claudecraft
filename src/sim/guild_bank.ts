@@ -400,22 +400,41 @@ function clampTreasury(v: number): number {
  *  sorted recursively, so a payload that round-tripped through Postgres JSONB
  *  (which does NOT preserve key insertion order) still compares equal to its
  *  pre-reload clone. Plain data only (the instance payloads are JSON to begin
- *  with). */
+ *  with).
+ *
+ *  UNDEFINED-VALUED KEYS ARE DROPPED, matching both `JSON.stringify` (which
+ *  omits them, so they can never exist on the DURABLE side) and the repo's
+ *  canonical `itemInstancePayloadsEqual` (which filters them before comparing
+ *  key counts). Without this, `{ signer: undefined }` serialized differently
+ *  from `{}` while the payload it is compared against had round-tripped
+ *  through JSONB and lost the key: the live payload would then compare unequal
+ *  to its own durable clone, `applyGuildBankDeltasTo` would report a spurious
+ *  deficit, and that session's escrow save would be refused forever. No live
+ *  site produces such a payload today; the filter removes the class rather
+ *  than relying on that staying true.
+ *
+ *  DELIBERATELY NOT delegated to `itemInstancePayloadsEqual`: this predicate
+ *  models the JSON ROUND TRIP (which is the actual difference between the two
+ *  sides being compared), and structural `===` disagrees with it on a
+ *  non-finite number, where the durable side reads `null` and the live side
+ *  holds `NaN`. The two now differ only there, and only by splitting a stack
+ *  rather than by moving value. */
 function canonicalJson(value: unknown): string {
   if (value === null || typeof value !== 'object') return JSON.stringify(value);
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
-  const keys = Object.keys(value as Record<string, unknown>).sort();
-  const parts = keys.map(
-    (k) => `${JSON.stringify(k)}:${canonicalJson((value as Record<string, unknown>)[k])}`,
-  );
+  const record = value as Record<string, unknown>;
+  const keys = Object.keys(record)
+    .filter((k) => record[k] !== undefined)
+    .sort();
+  const parts = keys.map((k) => `${JSON.stringify(k)}:${canonicalJson(record[k])}`);
   return `{${parts.join(',')}}`;
 }
 
 /** True when the two instance payloads are the same copy for revert purposes.
- *  Canonical (sorted-key) equality, NOT raw JSON.stringify: one side may have
- *  round-tripped through JSONB (the evict-and-reload arm) and come back with
- *  reordered keys; identical payloads are fungible for conservation, which is
- *  all a revert needs. */
+ *  Canonical (sorted-key, undefined-dropping) equality, NOT raw
+ *  JSON.stringify: one side may have round-tripped through JSONB (the
+ *  evict-and-reload arm) and come back with reordered keys; identical payloads
+ *  are fungible for conservation, which is all a revert needs. */
 function sameInstance(
   a: InvSlot['instance'] | null | undefined,
   b: InvSlot['instance'] | null | undefined,

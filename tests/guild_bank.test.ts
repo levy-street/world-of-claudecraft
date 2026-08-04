@@ -33,6 +33,7 @@ import {
   type GuildBankState,
   type GuildRank,
   guildBankCapacity,
+  guildBankDeltaIdentityKey,
   guildBankNextExpansionPrice,
   guildBankPipeRefusal,
   guildBankRungsBought,
@@ -1931,6 +1932,51 @@ describe('revertGuildBankDeltas: provenance, canonical payloads, and stack caps'
       },
     ]);
     expect(book(sim).inventory).toEqual([]);
+  });
+
+  it('treats an UNDEFINED-valued payload key as absent, like the durable side does', () => {
+    // The other half of the JSONB round trip, and the divergence class the
+    // review found: JSON.stringify OMITS an undefined-valued key, so the
+    // durable clone of `{ signer: 'Ana', enchantId: undefined }` comes back as
+    // `{ signer: 'Ana' }`. A predicate that distinguished them would make a
+    // live payload compare unequal to its own durable clone, which reports a
+    // spurious deficit and refuses that session's escrow save forever.
+    const sim = makeOfficerSim();
+    const live = { signer: 'Ana', enchantId: undefined } as unknown as InvSlot['instance'];
+    book(sim).inventory.push({ itemId: 'wolf_fang', count: 1, instance: live });
+    sim.revertGuildBankDeltas(GUILD_ID, [
+      {
+        op: 'deposit',
+        itemId: 'wolf_fang',
+        count: 1,
+        // What Postgres actually hands back for the payload above.
+        instance: JSON.parse('{"signer":"Ana"}'),
+        copperDelta: 0,
+        purchasedSlotsBefore: 0,
+        purchasedSlotsAfter: 0,
+      },
+    ]);
+    expect(book(sim).inventory).toEqual([]);
+
+    // The same equality feeds the netting identity key the log compactor uses,
+    // so pin it there too rather than only through the revert.
+    const delta = (instance: unknown): GuildBankOpDelta => ({
+      op: 'deposit',
+      itemId: 'wolf_fang',
+      count: 1,
+      instance: instance as InvSlot['instance'],
+      craftedRecipeId: null,
+      copperDelta: 0,
+      purchasedSlotsBefore: 0,
+      purchasedSlotsAfter: 0,
+    });
+    expect(guildBankDeltaIdentityKey(delta({ signer: 'Ana', enchantId: undefined }))).toBe(
+      guildBankDeltaIdentityKey(delta(JSON.parse('{"signer":"Ana"}'))),
+    );
+    // Decisive negative: a DIFFERENT payload still keys differently.
+    expect(guildBankDeltaIdentityKey(delta({ signer: 'Ana' }))).not.toBe(
+      guildBankDeltaIdentityKey(delta({ signer: 'Bru' })),
+    );
   });
 
   it('a withdraw-undo respects the per-item stack cap (grants through addStacked)', () => {
