@@ -47,6 +47,8 @@ export interface MemberTally {
   dmgByMob: Map<number, number>;
   /** damage per ability (pet output keyed under the pet's name) */
   dmgByAbility: Map<string, BreakdownEntry>;
+  /** total damage per controlled pet contributor, independent of ability names */
+  dmgByPet: Map<string, BreakdownEntry>;
   /** healing per ability */
   healByAbility: Map<string, BreakdownEntry>;
 }
@@ -73,6 +75,16 @@ function addBreakdown(
     return;
   }
   map.set(key, { ability, petName, amount });
+}
+
+function addPetBreakdown(map: Map<string, BreakdownEntry>, petName: string | null, amount: number) {
+  if (!petName) return;
+  const entry = map.get(petName);
+  if (entry) {
+    entry.amount += amount;
+    return;
+  }
+  map.set(petName, { ability: null, petName, amount });
 }
 
 export interface Encounter {
@@ -146,6 +158,7 @@ export class MeterData {
       heal: 0,
       dmgByMob: new Map(),
       dmgByAbility: new Map(),
+      dmgByPet: new Map(),
       healByAbility: new Map(),
     };
     enc.tallies.set(pid, t);
@@ -212,6 +225,7 @@ export class MeterData {
           const t = this.tally(enc, who.pid, who.name, who.cls, partyPids);
           t.dmg += ev.amount;
           addBreakdown(t.dmgByAbility, who.petName, ev.ability, ev.amount);
+          addPetBreakdown(t.dmgByPet, who.petName, ev.amount);
           if (enc === this.current) {
             t.dmgByMob.set(ev.targetId, (t.dmgByMob.get(ev.targetId) ?? 0) + ev.amount);
           }
@@ -652,6 +666,23 @@ export class MetersPanel {
       ];
     } else {
       entries = [...(this.tab === 'heal' ? tally.healByAbility : tally.dmgByAbility).values()];
+      if (this.tab === 'dmg') {
+        const representedByPet = new Map<string, number>();
+        for (const entry of entries) {
+          if (!entry.petName) continue;
+          representedByPet.set(
+            entry.petName,
+            (representedByPet.get(entry.petName) ?? 0) + entry.amount,
+          );
+        }
+        const missingPets = [...tally.dmgByPet.values()]
+          .map((entry) => ({
+            ...entry,
+            amount: entry.amount - (representedByPet.get(entry.petName ?? '') ?? 0),
+          }))
+          .filter((entry) => entry.amount > 0);
+        if (missingPets.length > 0) entries = [...entries, ...missingPets];
+      }
     }
 
     const model = buildMeterBreakdown(entries, enc.duration);

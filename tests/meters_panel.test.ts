@@ -31,10 +31,11 @@ const MARKUP = `
 // Hunter (pid 1) with a pet (pid 3), a priest party member (pid 2), and one mob
 // carrying a live hate table.
 function fakeWorld(): IWorld {
-  const entities = new Map<number, any>();
+  const entities = new Map<number, unknown>();
   entities.set(1, { id: 1, kind: 'player', name: 'Hero', templateId: 'hunter' });
   entities.set(2, { id: 2, kind: 'player', name: 'Pal', templateId: 'priest' });
   entities.set(3, { id: 3, kind: 'mob', name: 'Wolf Pet', templateId: 'forest_wolf', ownerId: 1 });
+  entities.set(4, { id: 4, kind: 'mob', name: 'Emberkin', templateId: 'emberkin', ownerId: 1 });
   entities.set(51, {
     id: 51,
     kind: 'mob',
@@ -136,6 +137,32 @@ describe('meters panel', () => {
     expect(tipRows(html)).toEqual([
       ['Aimed Shot', '300 (60%)'],
       ['Wolf Pet: Claw', '200 (40%)'],
+    ]);
+  });
+
+  it('keeps warlock demon damage visible in the owner breakdown when ability rows drift', () => {
+    const { meters, world, visibleRows, tooltipFor } = setup();
+    const party = new Set([1, 2, 4]);
+    meters.data.onEvent(dmg(1, 51, 120, 'Gloom Bolt'), world, party, 1000);
+    meters.data.onEvent(dmg(1, 51, 40, 'Wand'), world, party, 1100);
+    meters.data.onEvent(dmg(4, 51, 55, null), world, party, 1200);
+    const tally = meters.data.current?.tallies.get(1);
+    if (!tally) throw new Error('expected warlock tally');
+    expect(tally.dmg).toBe(215);
+    expect(tally.dmgByPet.get('Emberkin')?.amount).toBe(55);
+
+    // Reproduces the tester symptom: the owner row total has the pet damage,
+    // but the detail map only has direct warlock abilities. The tooltip still
+    // has enough contributor data to show the demon instead of hiding 55 dmg.
+    tally.dmgByAbility.delete('Emberkin\u0000');
+    meters.update();
+    meters.render(true);
+
+    expect(visibleRows()[0].querySelector('.mt-num')?.textContent).toContain('215');
+    expect(tipRows(tooltipFor(visibleRows()[0]))).toEqual([
+      ['Gloom Bolt', '120 (56%)'],
+      ['Emberkin: Melee', '55 (26%)'],
+      ['Wand', '40 (19%)'],
     ]);
   });
 

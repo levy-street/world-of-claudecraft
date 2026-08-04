@@ -266,6 +266,9 @@ describe('combat meters', () => {
     const rows = [...hunter.dmgByAbility.values()];
     expect(rows).toContainEqual({ ability: 'Aimed Shot', petName: null, amount: 30 });
     expect(rows).toContainEqual({ ability: 'Claw', petName: 'Wolf Pet', amount: 18 });
+    expect([...hunter.dmgByPet.values()]).toEqual([
+      { ability: null, petName: 'Wolf Pet', amount: 18 },
+    ]);
     // the folded pet damage counts toward the owner on the threat-tab fallback
     expect(hunter.dmgByMob.get(50)).toBe(48);
   });
