@@ -28,12 +28,13 @@ Deferred (authored, not yet shipped; commission whenever convenient):
 Two new ids from the dragonkin brood rework (`feature/dragonkin-drakelands`),
 same delivery contract as above: one 512x512 RGBA PNG per deed, named exactly by
 deed id, ingested with `npm run assets:deeds <source-dir>`. Both ship with the
-procedural chronicle category crest as fallback until art arrives (authoring rule
-6 in `docs/design/deeds.md`), and both are pinned as the only art-pending live
-deeds by `tests/deed_icons.test.ts`, `tests/missing_painted_icons_wave.test.ts`,
-and `tests/release_v034_additional_art.test.ts`, so the pins fall away in the
-same change that ingests the crests.
+procedural chronicle category crest as fallback until art arrives (the Icons
+authoring rule in `docs/design/deeds.md`), and both are enumerated once as
+`DEED_ART_PENDING` in `src/ui/icons.ts`, which
+`tests/deed_icons.test.ts`, `tests/missing_painted_icons_wave.test.ts` and
+`tests/release_v034_additional_art.test.ts` all read, so removing an id there is
+the single edit that lands with the ingested crest.
 
 Chronicle:
-- `chr_drakemaw_broodlord`, Clutch Breaker: a cracked dragon egg in a scorched nest, a broken broodlord horn laid across the shell, ember orange on slate.
-- `chr_maw_matriarch`, The Sky Goes Quiet: a wide dragon wing folding over a crater rim, a single fleck of ash falling through cold dusk light.
+- [v1] `chr_drakemaw_broodlord`, Clutch Breaker: a cracked dragon egg in a scorched nest, a broken broodlord horn laid across the shell, ember orange on slate.
+- [v1] `chr_maw_matriarch`, The Sky Goes Quiet: a wide dragon wing folding over a crater rim, a single fleck of ash falling through cold dusk light.

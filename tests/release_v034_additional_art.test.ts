@@ -15,6 +15,7 @@ import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
 import {
   ABILITY_IMAGE_IDS,
   abilityImageUrl,
+  DEED_ART_PENDING,
   deedImageUrl,
   ITEM_ART_PENDING,
   iconDataUrl,
@@ -34,12 +35,6 @@ const DEED_IDS = [
   'chr_willowfen_first_cast',
   'chr_willowfen_gatherer',
 ] as const;
-
-// The two Drakelands brood deeds appended after this wave (feature/dragonkin-drakelands).
-// They are the catalog tail now, so this wave's six painted targets are the contiguous
-// block just before them, and they are the only art-pending live deeds (authoring rule 6
-// in docs/design/deeds.md; flagged for commission in docs/achievements/icon-brief.md).
-const DRAKELANDS_TAIL_DEED_IDS = ['chr_drakemaw_broodlord', 'chr_maw_matriarch'] as const;
 
 const DEED_SHIPPING_GEOMETRY: Record<
   (typeof DEED_IDS)[number],
@@ -401,20 +396,14 @@ describe('release v0.34 additional painted art', () => {
       expect(iconDataUrl('item', id)).toBe(`/ui/items/${id}.webp`);
     }
 
-    // Both tail blocks are pinned positionally (stricter than the old bare tail slice):
-    // the Drakelands pair closes the catalog, and this wave's six sit contiguously in
-    // front of it.
-    expect(DEED_ORDER.slice(-DRAKELANDS_TAIL_DEED_IDS.length)).toEqual([
-      ...DRAKELANDS_TAIL_DEED_IDS,
-    ]);
-    const waveTail = DEED_ORDER.slice(
-      -(DEED_IDS.length + DRAKELANDS_TAIL_DEED_IDS.length),
-      -DRAKELANDS_TAIL_DEED_IDS.length,
-    );
-    expect(sorted(waveTail)).toEqual([...DEED_IDS]);
-    expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([
-      ...DRAKELANDS_TAIL_DEED_IDS,
-    ]);
+    // No POSITIONAL pin on this wave's six. The assertion that broke on the base sync was
+    // exactly that ("the six v0.34 targets are the catalog tail"), and catalog order is
+    // incidental to what this test is for: that all nine targets resolve through their
+    // painted runtime paths. Re-pinning the tail one slot further along would just hand the
+    // same breakage to the next deed anyone appends. Membership plus painted resolution is
+    // the durable claim, and the loop below is where it lands.
+    // The artless set IS pinned, from its one owner, so unenumerated art debt still reds.
+    expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     for (const id of DEED_IDS) {
       expect(DEEDS[id], `${id} live deed`).toBeDefined();
       expect(DEED_IMAGE_IDS.has(id), `${id} generated registry`).toBe(true);

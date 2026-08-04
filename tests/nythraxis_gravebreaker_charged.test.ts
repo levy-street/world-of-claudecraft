@@ -231,11 +231,13 @@ describe('Nythraxis Gravebreaker as a charged auto-attack', () => {
     // waits for a swing, so every avoided swing that delays release N shortens
     // the N to N+1 gap by one 2.65s swing interval. Measured over a 45s window
     // (arms at 3/15/27/39): release gaps 10.6/13.25/10.6 with nothing avoided,
-    // 7.95 after one dodge inside a charged window, 5.3 after two - and that
-    // same spread appears on BOTH v0.34.0 merge parents (pre-merge seeds 10, 11
-    // and 16 of 1 to 16 dip under 9s; post-merge seeds 1 and 11 do), so any
-    // fixed gap floor pins the tank's dodge luck rather than the mechanic. The
-    // release schedule is pinned exactly instead, against the arm beat.
+    // 7.95 after one dodge inside a charged window, 5.3 after two. That spread
+    // is not new and is not this branch's: sweeping seeds 1 to 16, the old >=9s
+    // floor already failed on the pre-merge head (seeds 10, 11, 16), on the
+    // release parent (seed 6) and on the merge (seeds 1, 11). It only ever
+    // pinned the tank's dodge luck rather than the mechanic, and passed because
+    // the hunted seed happened to avoid nothing while charged. The release
+    // schedule is pinned exactly instead, against the arm beat.
     const fireTimes = [...new Set(splashes.map((row) => row.at))];
     expect(armTimes.length).toBeGreaterThanOrEqual(2);
     for (let i = 1; i < armTimes.length; i++) {
@@ -250,6 +252,10 @@ describe('Nythraxis Gravebreaker as a charged auto-attack', () => {
       .map((arm) => landed.find((at) => at >= arm))
       .filter((at): at is number => at !== undefined);
     expect(fireTimes).toEqual(expectedFires);
+    // fireTimes dedups by tick, so the row count is what actually rules out two
+    // releases off one charge: exactly one bystander is eligible, so one splash
+    // ROW per release, not merely one tick per release.
+    expect(splashes).toHaveLength(expectedFires.length);
     expect(origin).toBeTruthy();
   });
 
