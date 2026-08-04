@@ -2766,8 +2766,11 @@ export class Renderer {
     this.viewLights.length = 0;
     // The nameplate painter owns the shared canvas and a document.fonts
     // listener; dispose it before clearing the layer so the listener never
-    // outlives the renderer.
-    bestEffort(() => this.nameplatePainter.dispose());
+    // outlives the renderer. Optional-chained like the siblings above because
+    // the painter is built inside the constructor's guarded try, AFTER the
+    // WebGL2 checks that can throw: the partial-construction cleanup arm
+    // reaches here with it still unset.
+    bestEffort(() => this.nameplatePainter?.dispose());
     // The layer is renderer-owned. Clearing it catches a pending DocumentFragment
     // batch or any renderer DOM surface added after the explicit maps above.
     bestEffort(() => this.nameplateLayer.replaceChildren());

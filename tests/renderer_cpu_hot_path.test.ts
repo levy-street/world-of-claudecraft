@@ -41,19 +41,23 @@ describe('renderer CPU hot path', () => {
   });
 
   it('releases the shared canvas and document listeners with the renderer host', () => {
-    // Two release paths must both drop the painter: the direct dispose()
-    // helper, and the terminal shutdown() lifecycle the editor viewport now
-    // drives (disposeRendererResources is its cleanup arm).
+    // The LIVE release path is the terminal one every host reaches:
+    // disposeRendererResources, from shutdown() (the editor viewport teardown
+    // and the live graphics rebuild) and from the constructor's partial-build
+    // catch. Optional-chained there on purpose, see the comment at the call.
+    const terminalStart = renderer.indexOf('private disposeRendererResources(): void {');
+    const terminalEnd = renderer.indexOf('\n  }', terminalStart);
+    const terminalBlock = renderer.slice(terminalStart, terminalEnd);
+    expect(terminalBlock).toContain('this.nameplatePainter?.dispose()');
+
+    // dispose() is the explicit host-teardown helper. It is unreferenced since
+    // the editor viewport moved onto shutdown(), so this keeps its body in step
+    // with the terminal path rather than pinning a second LIVE path.
     const disposeStart = renderer.indexOf('dispose(): void {');
     const disposeEnd = renderer.indexOf('\n  }', disposeStart);
     const disposeBlock = renderer.slice(disposeStart, disposeEnd);
     expect(disposeBlock).toContain('this.nameplatePainter.dispose();');
     expect(disposeBlock).toContain('this.travelSpeedFx.dispose();');
-
-    const terminalStart = renderer.indexOf('private disposeRendererResources(): void {');
-    const terminalEnd = renderer.indexOf('\n  }', terminalStart);
-    const terminalBlock = renderer.slice(terminalStart, terminalEnd);
-    expect(terminalBlock).toContain('this.nameplatePainter.dispose()');
 
     expect(editorViewport).toContain('.shutdown()');
     expect(renderer).toContain('this.nameplatePainter.remove(id);');
