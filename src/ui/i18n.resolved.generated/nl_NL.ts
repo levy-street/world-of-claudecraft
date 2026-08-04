@@ -1989,6 +1989,7 @@ export const nl_NL: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Fijne kwaliteit. Verzameld uit een grondstoffenpunt op volle rang met gereedschap boven de rang van het materiaal, en telt overal waar de gewone versie vereist is als die versie.",
+      "cookingCatch": "Cooking ingredient. Must be cooked before eating.",
       "arcaneDust": "Betoveringsreagens. Verkregen door het onbetoveren van gewone en ongewone uitrusting.",
       "arcaneEssence": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame uitrusting.",
       "arcaneShard": "Betoveringsreagens. Verkregen door het onbetoveren van epische en legendarische uitrusting.",
@@ -7134,6 +7135,7 @@ export const nl_NL: EnTranslations = {
       "quest": "Opdrachtvoorwerp",
       "junk": "Rommel",
       "fineMaterial": "Fijn Materiaal",
+      "material": "Material",
       "food": "Voedsel",
       "drink": "Drank",
       "tool": "Gereedschap",

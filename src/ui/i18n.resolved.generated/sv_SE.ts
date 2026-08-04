@@ -1989,6 +1989,7 @@ export const sv_SE: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Fin kvalitet. Bruten ur en åder av full nivå med ett verktyg som rankar över materialet, och räknas som den vanliga versionen varhelst en sådan krävs.",
+      "cookingCatch": "Cooking ingredient. Must be cooked before eating.",
       "arcaneDust": "Förtrollningsreagens. Fås genom avförtrollning av vanlig och ovanlig utrustning.",
       "arcaneEssence": "Förtrollningsreagens. Fås genom avförtrollning av sällsynt utrustning.",
       "arcaneShard": "Förtrollningsreagens. Fås genom avförtrollning av episk och legendarisk utrustning.",
@@ -7134,6 +7135,7 @@ export const sv_SE: EnTranslations = {
       "quest": "Uppdragsföremål",
       "junk": "Skräp",
       "fineMaterial": "Fint material",
+      "material": "Material",
       "food": "Mat",
       "drink": "Dryck",
       "tool": "Verktyg",

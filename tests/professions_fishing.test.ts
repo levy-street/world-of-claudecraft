@@ -33,7 +33,11 @@ import { type ClientSession, GameServer } from '../server/game';
 import { bagCapacity } from '../src/sim/bags';
 import { updateCasting } from '../src/sim/combat/casting_lifecycle';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
-import { FISHING_TABLES, FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
+import {
+  FISHING_TABLES,
+  FISHING_TABLES_BY_BAND,
+  isRawCookingCatch,
+} from '../src/sim/content/items';
 import { GATHERING_PROFESSIONS } from '../src/sim/content/professions';
 import { DEEPFEN_SHALLOWS_LAKE, ITEMS, LAKE } from '../src/sim/data';
 import {
@@ -725,12 +729,17 @@ describe('fishing catch gain schedule (Professions 2.0)', () => {
       const before = meta.pendingGatherGrants.length;
       const [result] = fishingResultsIn(castOnce(sim, meta).events);
       if (!result) continue; // an empty hook queues nothing on any tier
-      if (ITEMS[result.itemId]?.kind === 'junk') {
+      // Grey fishing junk only (weed/boot by literal id). Raw cooking catches
+      // are also kind junk but still teach; do not recompute production's
+      // isGreyFishingJunk formula here or a co-edit can keep both green.
+      if (result.itemId === WEED || result.itemId === 'soggy_boot') {
         // The junk cutoff composing with the ceiling INSIDE teaching water,
         // which no live drive covered before: past 100 a boot teaches nothing
         // even where the water itself still teaches.
         expect(meta.pendingGatherGrants).toHaveLength(before);
+        expect(isRawCookingCatch(result.itemId)).toBe(false);
       } else if (mirefenOnly.includes(result.itemId)) {
+        expect(isRawCookingCatch(result.itemId)).toBe(true);
         landedFish++;
         // The water the GAIN itself resolved against, straight off the event:
         // the catch table, the deed credit, the telemetry and the gain all read

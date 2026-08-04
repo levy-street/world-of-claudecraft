@@ -17,6 +17,7 @@ import {
   resetMechanicSpacing,
   tickMechanicSpacing,
 } from '../src/sim/mob/mechanic_spacing';
+import { RIFT_MECHANIC_WINDUP_SEC } from '../src/sim/mob/rift_escape_window';
 import { Sim } from '../src/sim/sim';
 import { addThreat } from '../src/sim/threat';
 import { DT, type Entity } from '../src/sim/types';
@@ -135,8 +136,18 @@ describe('rift boss shared mechanic spacing', () => {
     mob.terrifyTimer = 0.001; // both due the same tick
     (sim as any).updateMob(mob);
 
-    expect(stunAura(off)).toBeDefined(); // first in driver order fires
-    expect(fearAura(off)).toBeUndefined(); // second holds behind the shared lock
+    // On a stamped boss the stomp fire is a WINDUP start (the ground-ring
+    // telegraph, rift_escape_window.ts): no stun yet, and the terrify holds
+    // behind the shared lock the windup armed.
+    expect(stunAura(off)).toBeUndefined();
+    expect(fearAura(off)).toBeUndefined();
+    // The stun lands once the windup elapses; the fear is still held.
+    for (let i = 0; i < Math.ceil(RIFT_MECHANIC_WINDUP_SEC / DT) + 1; i++) {
+      holdInRadius(sim, mob, off);
+      (sim as any).updateMob(mob);
+    }
+    expect(stunAura(off)).toBeDefined();
+    expect(fearAura(off)).toBeUndefined();
   });
 
   it('a held mechanic fires the tick the lock clears, not a full cycle later', () => {
@@ -155,10 +166,11 @@ describe('rift boss shared mechanic spacing', () => {
     }
     const waited = ticks * DT;
     expect(fearAura(off)).toBeDefined();
-    // Held AT DUE: the fear lands one spacing after the stomp, nowhere near a
-    // full 15s terrify cycle later.
-    expect(waited).toBeGreaterThanOrEqual(SPACING - 2 * DT);
-    expect(waited).toBeLessThanOrEqual(SPACING + 2 * DT);
+    // Held AT DUE: the fear lands one windup-plus-spacing after the stomp fire
+    // (the stamped stomp arms the lock through its telegraph windup, the
+    // hardcast precedent), nowhere near a full 15s terrify cycle later.
+    expect(waited).toBeGreaterThanOrEqual(RIFT_MECHANIC_WINDUP_SEC + SPACING - 2 * DT);
+    expect(waited).toBeLessThanOrEqual(RIFT_MECHANIC_WINDUP_SEC + SPACING + 2 * DT);
   });
 
   it('a hardcast arms the lock through its whole cast: no instant lands mid-telegraph', () => {
@@ -217,7 +229,13 @@ describe('rift boss shared mechanic spacing', () => {
     let prevStomp = mob.stompTimer;
     let prevTerrify = mob.terrifyTimer;
     let prevCasting: string | null = mob.castingAbility;
-    const ticks = Math.round(60 / DT);
+    // 90s drive: the stamped stomp windup (rift_escape_window.ts) added 1.2s of
+    // lock demand per stomp fire, stretching every cadence a little further, so
+    // the no-starvation floors are re-solved over a longer window. The per-
+    // second stomp rate DROPS versus the pre-windup pin (each fire now spends
+    // windup + spacing of lock instead of spacing alone): an intentional
+    // throughput regression, not a loosened assertion.
+    const ticks = Math.round(90 / DT);
     for (let i = 0; i < ticks; i++) {
       holdInRadius(sim, mob, off);
       (sim as any).updateMob(mob);
@@ -228,9 +246,9 @@ describe('rift boss shared mechanic spacing', () => {
       prevTerrify = mob.terrifyTimer;
       prevCasting = mob.castingAbility;
     }
-    expect(stomps).toBeGreaterThanOrEqual(4);
-    expect(fears).toBeGreaterThanOrEqual(3);
-    expect(casts).toBeGreaterThanOrEqual(2);
+    expect(stomps).toBeGreaterThanOrEqual(5);
+    expect(fears).toBeGreaterThanOrEqual(4);
+    expect(casts).toBeGreaterThanOrEqual(3);
   });
 
   it('the lock dies with the pull: evade home clears it, and only on stamped mobs', () => {

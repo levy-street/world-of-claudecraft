@@ -1989,6 +1989,7 @@ export const pl_PL: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Gatunek wyborny. Zebrany z żyły o pełnym poziomie narzędziem wyższej rangi niż sam materiał; liczy się jako zwykła wersja wszędzie tam, gdzie jest ona wymagana.",
+      "cookingCatch": "Cooking ingredient. Must be cooked before eating.",
       "arcaneDust": "Składnik do zaklinania. Pozyskiwany z rozbrajania pospolitego i niezwykłego ekwipunku.",
       "arcaneEssence": "Składnik do zaklinania. Pozyskiwany z rozbrajania rzadkiego ekwipunku.",
       "arcaneShard": "Składnik do zaklinania. Pozyskiwany z rozbrajania epickiego i legendarnego ekwipunku.",
@@ -7134,6 +7135,7 @@ export const pl_PL: EnTranslations = {
       "quest": "Przedmiot zadania",
       "junk": "Tandeta",
       "fineMaterial": "Wyborny materiał",
+      "material": "Material",
       "food": "Jedzenie",
       "drink": "Napój",
       "tool": "Narzędzie",

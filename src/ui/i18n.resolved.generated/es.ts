@@ -1989,6 +1989,7 @@ export const es: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Calidad fina. Recolectada de una veta de nivel completo con una herramienta de rango superior al material, y cuenta como la versión ordinaria dondequiera que se pida una.",
+      "cookingCatch": "Cooking ingredient. Must be cooked before eating.",
       "arcaneDust": "Reactivo de encantamiento. Se obtiene desencantando equipo común y poco común.",
       "arcaneEssence": "Reactivo de encantamiento. Se obtiene desencantando equipo raro.",
       "arcaneShard": "Reactivo de encantamiento. Se obtiene desencantando equipo épico y legendario.",
@@ -7134,6 +7135,7 @@ export const es: EnTranslations = {
       "quest": "Objeto de misión",
       "junk": "Chatarra",
       "fineMaterial": "Material fino",
+      "material": "Material",
       "food": "Comida",
       "drink": "Bebida",
       "tool": "Herramienta",

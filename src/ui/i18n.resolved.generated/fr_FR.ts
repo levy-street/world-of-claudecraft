@@ -1989,6 +1989,7 @@ export const fr_FR: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Qualité fine. Récolté sur un filon de plein palier avec un outil de rang supérieur au matériau, et compte comme la version ordinaire partout où celle-ci est requise.",
+      "cookingCatch": "Cooking ingredient. Must be cooked before eating.",
       "arcaneDust": "Réactif d'enchantement. Obtenu en désenchantant de l'équipement commun et peu commun.",
       "arcaneEssence": "Réactif d'enchantement. Obtenu en désenchantant de l'équipement rare.",
       "arcaneShard": "Réactif d'enchantement. Obtenu en désenchantant de l'équipement épique et légendaire.",
@@ -7134,6 +7135,7 @@ export const fr_FR: EnTranslations = {
       "quest": "Objet de quête",
       "junk": "Camelote",
       "fineMaterial": "Matériau fin",
+      "material": "Material",
       "food": "Nourriture",
       "drink": "Boisson",
       "tool": "Outil",

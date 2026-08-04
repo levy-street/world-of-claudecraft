@@ -17,6 +17,7 @@
 // (enforced by tests/architecture.test.ts). This region draws NO rng.
 
 import { addStacked, bagCapacity, bagsFullError, countFit, equipBag as equipBagCmd } from './bags';
+import { isRawCookingCatch } from './content/items';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
 import {
@@ -576,6 +577,13 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
   }
   if (def.use?.type === 'skinSelect') {
     ctx.openSkinSelect(meta, def.use.catalog ?? 'class', itemId);
+    return;
+  }
+  // Raw fishing catches are cooking reagents only (kind junk, no foodHp).
+  // Without this arm a right-click is a silent no-op; refuse loudly instead
+  // of letting the player think the item is broken. Does not remove the stack.
+  if (isRawCookingCatch(itemId)) {
+    ctx.error(meta.entityId, 'That is raw. Cook it first.');
     return;
   }
   // A running non-spell cast (fishing/gather) blocks other item use. The

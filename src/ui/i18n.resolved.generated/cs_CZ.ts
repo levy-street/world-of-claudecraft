@@ -1989,6 +1989,7 @@ export const cs_CZ: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Jemná jakost. Sesbírána z naleziště plné úrovně nástrojem vyššího stupně, než je materiál, a počítá se jako běžná verze všude, kde je běžná verze potřeba.",
+      "cookingCatch": "Cooking ingredient. Must be cooked before eating.",
       "arcaneDust": "Reagencie k okouzlení. Získává se rozzačarováním běžné a neobvyklé výbavy.",
       "arcaneEssence": "Reagencie k okouzlení. Získává se rozzačarováním vzácné výbavy.",
       "arcaneShard": "Reagencie k okouzlení. Získává se rozzačarováním epické a legendární výbavy.",
@@ -7134,6 +7135,7 @@ export const cs_CZ: EnTranslations = {
       "quest": "Úkolový předmět",
       "junk": "Odpad",
       "fineMaterial": "Jemný materiál",
+      "material": "Material",
       "food": "Jídlo",
       "drink": "Nápoj",
       "tool": "Nástroj",

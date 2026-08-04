@@ -1989,6 +1989,7 @@ export const ja_JP: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "上質な等級。素材より上位の道具で満位の採取地から採ったもので、通常版が求められる場所ではそのまま代用できます。",
+      "cookingCatch": "料理材料。食べる前に調理が必要です。",
       "arcaneDust": "エンチャントの材料。一般と良質の装備を魔力分解して得られる。",
       "arcaneEssence": "エンチャントの材料。レアの装備を魔力分解して得られる。",
       "arcaneShard": "エンチャントの材料。エピックと伝説の装備を魔力分解して得られる。",
@@ -7134,6 +7135,7 @@ export const ja_JP: EnTranslations = {
       "quest": "クエストアイテム",
       "junk": "雑貨",
       "fineMaterial": "上質な素材",
+      "material": "素材",
       "food": "食べ物",
       "drink": "飲み物",
       "tool": "道具",

@@ -10,7 +10,11 @@
 import { describe, expect, it } from 'vitest';
 import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
-import { FISHING_RARE_ID, FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
+import {
+  FISHING_RARE_ID,
+  FISHING_TABLES_BY_BAND,
+  isRawCookingCatch,
+} from '../src/sim/content/items';
 import { craftMaxSkillFor } from '../src/sim/content/professions';
 import { ALL_RECIPES, ROD_RECIPES, TOOL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS, NPCS } from '../src/sim/data';
@@ -57,9 +61,7 @@ describe('the crafted rod ladder', () => {
     // a fine grade" sweep in tests/material_grades.test.ts.
     let catchReagents = 0;
     for (const recipe of ROD_RECIPES) {
-      const fromWater = recipe.reagents.filter(
-        (r) => ITEMS[r.itemId]?.kind === 'food' || r.itemId === FISHING_RARE_ID,
-      );
+      const fromWater = recipe.reagents.filter((r) => isRawCookingCatch(r.itemId));
       expect(fromWater.length, `${recipe.id} must consume a catch`).toBeGreaterThan(0);
       catchReagents += fromWater.length;
       for (const reagent of recipe.reagents) {

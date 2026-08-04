@@ -16,7 +16,7 @@ import type { ItemDef } from '../src/sim/types';
 
 describe('material_taxonomy as the first-evaluated sim module', () => {
   it('derives the full set with no import of data.ts ahead of it', () => {
-    expect(MATERIAL_ITEM_IDS.size).toBe(45);
+    expect(MATERIAL_ITEM_IDS.size).toBe(52);
     expect(MATERIAL_ITEM_IDS.has('iron_ore')).toBe(true);
     expect(MATERIAL_ITEM_IDS.has('arcanite_bar')).toBe(true);
     expect(isMaterialItem({ id: 'iron_ore' } as ItemDef)).toBe(true);

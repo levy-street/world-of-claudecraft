@@ -1989,6 +1989,7 @@ export const pt_BR: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Grau fino. Coletado de um veio de nível pleno com uma ferramenta de nível acima do material, e conta como a versão comum sempre que uma for exigida.",
+      "cookingCatch": "Cooking ingredient. Must be cooked before eating.",
       "arcaneDust": "Reagente de encantamento. Desencantado de equipamento comum e incomum.",
       "arcaneEssence": "Reagente de encantamento. Desencantado de equipamento raro.",
       "arcaneShard": "Reagente de encantamento. Desencantado de equipamento épico e lendário.",
@@ -7134,6 +7135,7 @@ export const pt_BR: EnTranslations = {
       "quest": "Item de missão",
       "junk": "Sucata",
       "fineMaterial": "Material Fino",
+      "material": "Material",
       "food": "Comida",
       "drink": "Bebida",
       "tool": "Ferramenta",

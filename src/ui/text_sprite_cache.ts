@@ -21,14 +21,12 @@
 // the box has to come from measureText rather than a constant, and the live set
 // has to be bounded and evicted because ally names are player-supplied.
 //
-// THE BOUND AND ITS EVICTION. `beginRedraw` trims the cache back to
-// TEXT_SPRITE_LIMIT in least-recently-used order; a draw during a redraw never
-// evicts. So the cache holds at most TEXT_SPRITE_LIMIT sprites at every redraw
-// boundary, plus whatever that one redraw asked for. That ordering is the whole
-// point: trimming mid-redraw would let a label-heavy redraw evict the sprites it
-// is still drawing and re-rasterize every one of them, every redraw, which is
-// worse than the fillText it replaced. Overshoot is reclaimed by the next
-// `beginRedraw`.
+// THE BOUND AND ITS EVICTION. The default map-label cache uses a redraw-boundary
+// count trim because its known working set fits under TEXT_SPRITE_LIMIT. A
+// caller with DPR-scaled, open-ended labels can also pass a hard backing-store
+// byte budget. That mode evicts least-recently-used sprites immediately after a
+// miss, so neither the count nor RGBA backing bytes can overshoot between
+// redraws. A one-off sprite larger than the budget is drawn but not retained.
 //
 // DOM: needs `document.createElement('canvas')`, so this is a painter-side
 // helper, not a pure core. It stays host-agnostic otherwise (no window, no
@@ -56,6 +54,10 @@ interface TextSprite {
   canvas: HTMLCanvasElement;
   originX: number;
   originY: number;
+  width: number;
+  height: number;
+  advance: number;
+  bytes: number;
 }
 
 /** Ink extents around the anchor, in px: `left`/`right` along the baseline,
@@ -65,6 +67,7 @@ interface TextInk {
   right: number;
   ascent: number;
   descent: number;
+  advance: number;
 }
 
 /** Sprites kept across redraws.
@@ -150,10 +153,26 @@ export class TextSpriteCache {
   // Insertion order IS the LRU order: a cache hit re-inserts, so the oldest
   // live key is always the front of the iteration.
   private readonly sprites = new Map<string, TextSprite>();
+  private pixelRatio = 1;
+  private cachedBytes = 0;
+  private readonly spriteLimit: number;
+  private readonly hardByteLimit: number;
+
+  constructor(spriteLimit = TEXT_SPRITE_LIMIT, hardByteLimit = Number.POSITIVE_INFINITY) {
+    this.spriteLimit = Math.max(1, Math.floor(spriteLimit));
+    this.hardByteLimit = Number.isFinite(hardByteLimit)
+      ? Math.max(0, Math.floor(hardByteLimit))
+      : Number.POSITIVE_INFINITY;
+  }
 
   /** Live sprite count. */
   get size(): number {
     return this.sprites.size;
+  }
+
+  /** RGBA backing-store bytes retained by live sprites. */
+  get bytes(): number {
+    return this.cachedBytes;
   }
 
   /** Drop every sprite. The caller owns the reason: the map painter calls this on
@@ -161,6 +180,16 @@ export class TextSpriteCache {
    *  rasters would otherwise sit in the budget until LRU worked them out. */
   clear(): void {
     this.sprites.clear();
+    this.cachedBytes = 0;
+  }
+
+  /** Rasterize future sprites at the destination backing-store density. Existing
+   * sprites are invalid at a different density, so a real change clears once. */
+  setPixelRatio(pixelRatio: number): void {
+    const next = Math.max(1, Math.min(3, Number.isFinite(pixelRatio) ? pixelRatio : 1));
+    if (next === this.pixelRatio) return;
+    this.pixelRatio = next;
+    this.clear();
   }
 
   /** Open a redraw: trim back to the budget, oldest first. Called BEFORE the
@@ -168,8 +197,8 @@ export class TextSpriteCache {
    *  (see the header). */
   beginRedraw(): void {
     for (const key of this.sprites.keys()) {
-      if (this.sprites.size <= TEXT_SPRITE_LIMIT) return;
-      this.sprites.delete(key);
+      if (this.sprites.size <= this.spriteLimit) return;
+      this.deleteSprite(key);
     }
   }
 
@@ -204,7 +233,20 @@ export class TextSpriteCache {
     if (text === '') return;
     const sprite = this.sprite(text, style);
     if (!sprite) return;
-    ctx.drawImage(sprite.canvas, Math.round(x - sprite.originX), Math.round(y - sprite.originY));
+    const dx = Math.round((x - sprite.originX) * this.pixelRatio) / this.pixelRatio;
+    const dy = Math.round((y - sprite.originY) * this.pixelRatio) / this.pixelRatio;
+    if (this.pixelRatio === 1) {
+      ctx.drawImage(sprite.canvas, dx, dy);
+    } else {
+      ctx.drawImage(sprite.canvas, dx, dy, sprite.width, sprite.height);
+    }
+  }
+
+  /** Logical advance width for inline layout. This uses the same cached
+   * rasterization as draw(), so steady frames never call a canvas text API. */
+  measureAdvance(text: string, style: TextSpriteStyle): number {
+    if (text === '') return 0;
+    return this.sprite(text, style)?.advance ?? 0;
   }
 
   private sprite(text: string, style: TextSpriteStyle): TextSprite | null {
@@ -216,7 +258,7 @@ export class TextSpriteCache {
       this.sprites.set(key, cached);
       return cached;
     }
-    const sprite = rasterize(text, style);
+    const sprite = rasterize(text, style, this.pixelRatio);
     // A transient 2D-context failure must not be cached: freezing a blank canvas
     // would hide that label for the rest of the session. Skipping this redraw's
     // draw self-heals on the next one.
@@ -226,8 +268,26 @@ export class TextSpriteCache {
     // canvas ignores, so the sprite would freeze in the default black. Draw it
     // this redraw (exactly what the inline fillText did on that frame) but never
     // cache it.
-    if (style.fill !== '' && style.stroke !== '') this.sprites.set(key, sprite);
+    if (style.fill !== '' && style.stroke !== '') {
+      this.sprites.set(key, sprite);
+      this.cachedBytes += sprite.bytes;
+      if (Number.isFinite(this.hardByteLimit)) this.trimHardBudget();
+    }
     return sprite;
+  }
+
+  private trimHardBudget(): void {
+    for (const key of this.sprites.keys()) {
+      if (this.sprites.size <= this.spriteLimit && this.cachedBytes <= this.hardByteLimit) return;
+      this.deleteSprite(key);
+    }
+  }
+
+  private deleteSprite(key: string): void {
+    const sprite = this.sprites.get(key);
+    if (!sprite) return;
+    this.cachedBytes -= sprite.bytes;
+    this.sprites.delete(key);
   }
 }
 
@@ -251,7 +311,7 @@ function spriteKey(text: string, style: TextSpriteStyle): string {
 }
 
 // Rasterize one label into its own canvas, or null when the 2D context fails.
-function rasterize(text: string, style: TextSpriteStyle): TextSprite | null {
+function rasterize(text: string, style: TextSpriteStyle, pixelRatio: number): TextSprite | null {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   if (!ctx) return null;
@@ -267,8 +327,11 @@ function rasterize(text: string, style: TextSpriteStyle): TextSprite | null {
   const originY = Math.ceil(ink.ascent) + pad;
   // Assigning width/height RESETS every context property (and clears the
   // canvas), so every draw setting below is applied after the resize.
-  canvas.width = Math.max(1, originX + Math.ceil(ink.right) + pad);
-  canvas.height = Math.max(1, originY + Math.ceil(ink.descent) + pad);
+  const width = Math.max(1, originX + Math.ceil(ink.right) + pad);
+  const height = Math.max(1, originY + Math.ceil(ink.descent) + pad);
+  canvas.width = Math.max(1, Math.ceil(width * pixelRatio));
+  canvas.height = Math.max(1, Math.ceil(height * pixelRatio));
+  if (pixelRatio !== 1) ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
   ctx.font = style.font;
   ctx.textAlign = SPRITE_ALIGN;
   ctx.textBaseline = SPRITE_BASELINE;
@@ -282,7 +345,15 @@ function rasterize(text: string, style: TextSpriteStyle): TextSprite | null {
   }
   ctx.fillStyle = style.fill;
   ctx.fillText(text, originX, originY);
-  return { canvas, originX, originY };
+  return {
+    canvas,
+    originX,
+    originY,
+    width,
+    height,
+    advance: ink.advance,
+    bytes: canvas.width * canvas.height * 4,
+  };
 }
 
 // Ink extents around the anchor the sprite is drawn on. TWO rules keep a sprite
@@ -311,6 +382,7 @@ function measureInk(ctx: CanvasRenderingContext2D, text: string, font: string): 
     right: Math.max(half, finite(m?.actualBoundingBoxRight, half)),
     ascent: Math.max(px, finite(m?.actualBoundingBoxAscent, px)),
     descent: Math.max(descent, finite(m?.actualBoundingBoxDescent, descent)),
+    advance: finite(m?.width, 0),
   };
 }
 

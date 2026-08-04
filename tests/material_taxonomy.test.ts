@@ -1,13 +1,13 @@
 // The honest material taxonomy (src/sim/material_taxonomy.ts): census-style
 // membership pins for the derived source-or-reagent junk set behind the bank
 // "Deposit materials" sweep and the bags/bank Materials chip. The set is pinned
-// by EXACT-set equality against a literal id list (the honest-45 of the
-// 2026-08-01 settlement, docs/design/professions-tuning-packet-review.md phase
-// 19), swept for class exclusions by KIND against the live catalog (never by
-// use type: simple_fishing_pole is use-type 'fishing' and several tools carry
-// no use at all), and closed by a completeness tripwire that enumerates the
-// ONLY non-poor junk allowed to stay unclassified, so a future junk item must
-// be classified here explicitly instead of drifting in or out silently.
+// by EXACT-set equality against a literal id list (staples from the 2026-08-01
+// settlement plus raw fishing catches as junk cooking reagents), swept for
+// class exclusions by KIND against the live catalog (never by use type:
+// simple_fishing_pole is use-type 'fishing' and several tools carry no use at
+// all), and closed by a completeness tripwire that enumerates the ONLY
+// non-poor junk allowed to stay unclassified, so a future junk item must be
+// classified here explicitly instead of drifting in or out silently.
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -35,9 +35,9 @@ import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import { MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import { SALVAGE_MATERIAL_BY_QUALITY } from '../src/sim/professions/salvage';
 
-// The ruled material set, exactly (Q3 to Q6: staples in; grey trash, the five
-// oddments, and raw fish out). A diff here is a deliberate taxonomy change:
-// re-pin it AND re-check the settlement rulings still hold.
+// The ruled material set, exactly (staples in; grey trash and the five oddments
+// out; raw fishing catches IN as junk cooking reagents). A diff here is a
+// deliberate taxonomy change: re-pin it AND re-check the settlement rulings.
 const HONEST_MATERIALS = [
   'arcane_dust',
   'arcane_essence',
@@ -59,6 +59,7 @@ const HONEST_MATERIALS = [
   'fine_thorium_ore',
   'game_meat',
   'glass_vial',
+  'glimmerfin_koi',
   'goldleaf_herb',
   'homespun_cloth',
   'iron_ore',
@@ -68,6 +69,12 @@ const HONEST_MATERIALS = [
   'pristine_hide',
   'pristine_silk',
   'pristine_venom_gland',
+  'raw_bog_eel',
+  'raw_frostgill_trout',
+  'raw_marsh_pike',
+  'raw_mirror_trout',
+  'raw_river_perch',
+  'raw_stonescale_carp',
   'resonant_hide',
   'resonant_links',
   'resonant_steel',
@@ -110,7 +117,7 @@ const VENDOR_STAPLES = [
   'tanning_agent',
 ] as const;
 
-describe('MATERIAL_ITEM_IDS: the honest-45, exactly', () => {
+describe('MATERIAL_ITEM_IDS: the honest material set, exactly', () => {
   it('equals the ruled material set by exact-set equality', () => {
     expect([...MATERIAL_ITEM_IDS].sort()).toEqual([...HONEST_MATERIALS]);
   });
@@ -172,22 +179,40 @@ describe('MATERIAL_ITEM_IDS: class exclusions, keyed on KIND against the live ca
     expect(poor).toBeGreaterThan(15);
   });
 
-  it('excludes the named settlement cases: implements, charms, cosmetics, fish, oddments', () => {
+  it('excludes the named settlement cases: implements, charms, cosmetics, oddments', () => {
     // Belt to the kind sweeps' suspenders: the exact ids the settlement argued
     // over, pinned by name so a kind re-authoring cannot silently re-admit one.
+    // Raw fishing catches are deliberately IN once kind is junk (cooking
+    // reagents); see the membership arm below.
     const ruledOut = [
       'simple_fishing_pole', // kind tool, use-type fishing
       'gatherers_cache', // charm (kind tool by deliberate authoring)
       'artisans_eye', // charm
       'heroic_mark', // kind tool token
       'riding_training', // kind tool token
-      'glimmerfin_koi', // raw-fish cooking reagent (kind food, Q5: out)
-      'raw_river_perch', // raw-fish cooking reagent (kind food, Q5: out)
       ...ALLOWED_UNCLASSIFIED_JUNK, // the five oddments (Q4: out)
     ];
     for (const id of ruledOut) {
       expect(ITEMS[id], `${id} has no ITEMS def`).toBeTruthy();
       expect(MATERIAL_ITEM_IDS.has(id), id).toBe(false);
+    }
+  });
+
+  it('includes every raw fishing catch that recipes consume (junk cooking reagents)', () => {
+    const catches = [
+      'raw_mirror_trout',
+      'raw_river_perch',
+      'raw_marsh_pike',
+      'raw_bog_eel',
+      'raw_frostgill_trout',
+      'raw_stonescale_carp',
+      'glimmerfin_koi',
+    ] as const;
+    for (const id of catches) {
+      expect(ITEMS[id], `${id} has no ITEMS def`).toBeTruthy();
+      expect(ITEMS[id]?.kind, id).toBe('junk');
+      expect(ITEMS[id]?.foodHp, id).toBeUndefined();
+      expect(MATERIAL_ITEM_IDS.has(id), id).toBe(true);
     }
   });
 });

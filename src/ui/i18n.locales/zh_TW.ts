@@ -2266,6 +2266,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.quest': '任務物品',
   'itemUi.kind.junk': '雜物',
   'itemUi.kind.fineMaterial': '優質材料',
+  'itemUi.kind.material': '材料',
   'itemUi.kind.food': '食物',
   'itemUi.kind.drink': '飲料',
   'itemUi.kind.tool': '工具',
@@ -10379,6 +10380,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '施加附魔消耗材料並標記特定的一件副本。用在背包中的副本上，交還一件獨立的附魔副本；用在已穿戴的裝備上，則就地附魔，無需脫下再穿上。無論哪種，加成都永遠跟隨。一件一附魔：對附魔副本施加另一個附魔會先要求確認，然後直接替換舊附魔，舊附魔被摧毀且不退還材料；出售、丟棄與分解都優先取用普通副本，成品不會被誤吞；完全相同的附魔副本還能疊放。傑作與附魔是朋友：傑作完全可附魔，附魔疊加在傑作加成與署名之上互不干擾；署名傑作配Greater附魔是工藝品的極致，仍按設計低於團本戰利品。附魔與署名件如今也能上架：每件以單件掛單出售，物品提示會顯示附魔與製作者印記，渡鴉郵驛同樣可以寄送；材料依舊是穩定的一半：粉塵、精華與碎片自由掛單，掛單免費，成交才抽5%。',
   'hudChrome.corpseHarvest.components.meat': '獸肉',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat}（附魔）',
+  'hudChrome.materialHint.cookingCatch': '烹飪材料。必須先烹飪後才能食用。',
   'hudChrome.materialHint.fineGrade':
     '優質品級。以等級高於該材料的工具在滿級礦脈採集所得，在任何需要普通版本的地方均可替代使用。',
   'hudChrome.materialHint.arcaneDust': '附魔材料。分解普通和優秀品質的裝備可得。',
