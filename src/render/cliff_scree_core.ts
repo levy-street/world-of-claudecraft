@@ -1,4 +1,10 @@
-import { getActiveWorldContent, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
+import {
+  GATHER_NODES,
+  getActiveWorldContent,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_Z,
+} from '../sim/data';
 import { roadDistance, terrainHeight, waterLevel } from '../sim/world';
 
 // Cliff-scree placement for the renderer's moving detail grid. The rocks are
@@ -18,6 +24,14 @@ const APRON_DENSITY = 0.4; // sparser rubble below it
 export const SCREE_SINK = 0.15; // fraction of rock height buried in the ground
 const EDGE = 16; // keep-out margin from the world rectangle
 const HUB_EXCLUSION_RADIUS = 15; // same radius the grass hub exclusion uses
+// Keep-out around every gather node: the 5yd harvest disc (INTERACT_RANGE)
+// plus a yard of visual margin. Scree is walk-through dressing with no
+// collider, so a boulder INSIDE a node's footprint cannot block the harvest,
+// but it can visually bury a low prop (the v0.34.0 merge audit measured two
+// boulders essentially ON nodes at the shipped seed) and only on the tiers
+// that draw scree, which is exactly the cosmetic-richness-vs-actionable-info
+// line the fairness rules draw: the node prop IS actionable info.
+const NODE_EXCLUSION_RADIUS = 6;
 
 // Kit rock dimensions at scale 1, baked from the shipped GLBs
 // (models/foliage/rock_1..3) via gltf-transform getBounds, kept constant so the
@@ -131,6 +145,14 @@ function computeSpot(seed: number, ci: number, cj: number): ScreeSpot | null {
     const dx = x - zone.hub.x;
     const dz = z - zone.hub.z;
     if (dx * dx + dz * dz < HUB_EXCLUSION_RADIUS * HUB_EXCLUSION_RADIUS) return null;
+  }
+  // Static GATHER_NODES by design, unlike the active-content hub read above:
+  // gather nodes are not part of WorldContent, so a custom map has none to
+  // exclude around and the builtin table is the only source there is.
+  for (const node of GATHER_NODES) {
+    const dx = x - node.pos.x;
+    const dz = z - node.pos.z;
+    if (dx * dx + dz * dz < NODE_EXCLUSION_RADIUS * NODE_EXCLUSION_RADIUS) return null;
   }
   const variant = Math.min(
     SCREE_ROCK_DIMS.length - 1,

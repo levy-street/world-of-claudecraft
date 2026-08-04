@@ -89,12 +89,16 @@ export function normalizeArchetypeState(
   if (state.activeArchetype !== null) {
     // The isAdjacent-or-redefault repair below CAN change pairedMajor when the
     // ring order changes between releases (v0.26.0 shipped this field, and the
-    // Professions 2.0 reorder breaks 3 of the 10 old default pairs). That never
-    // fires on a real save today for one reason only: every shipped build kept
-    // the acceptance quests retired, so no production save holds a non-null
-    // activeArchetype. THE INVARIANT THAT KEEPS THIS SAFE: the ring order and
-    // the live quest wiring ship together (both land in PR 2039); never wire
-    // the quests live in a release whose ring a later change intends to reorder.
+    // Professions 2.0 reorder broke 3 of the 10 old default pairs). The
+    // attunement quests are LIVE content now (zone1.ts), so attuned saves are
+    // producible the moment they ship: this repair arm is for corrupt or
+    // hand-edited rows ONLY, never a migration tool. THE INVARIANT THAT KEEPS
+    // IT SAFE: the ring order is FROZEN from the release that wired the
+    // quests live. A future reorder is a real save migration, not a content
+    // edit: it would flip pairedMajor on load, drop attunedPairs history
+    // below, and (via the tier-mail prune that runs right after this on the
+    // load path) silently reset acknowledged tiers for every attuned
+    // character.
     state.pairedMajor =
       typeof saved.pairedMajor === 'string' &&
       isCraftId(saved.pairedMajor) &&
@@ -105,10 +109,10 @@ export function normalizeArchetypeState(
     const savedHistory = Array.isArray(saved.attunedPairs) ? saved.attunedPairs : [];
     // Drop-by-design: any saved pair id not in the CURRENT ARCHETYPE_PAIR_TARGETS
     // is silently discarded here. Safe for the same reason as pairedMajor above:
-    // attunedPairs first ships WITH the reordered ring (and retired quests mean
-    // no shipped save carries profession state at all), so a pre-reorder
-    // canonical id cannot exist in production saves; anything unrecognized is a
-    // hand-edited or corrupt value, and losing it is the intended behavior.
+    // the ring is frozen from the release that wired the quests live, and
+    // attunedPairs first shipped WITH that ring, so a canonical id from some
+    // other ring order cannot exist in production saves; anything unrecognized
+    // is a hand-edited or corrupt value, and losing it is the intended behavior.
     // The current pair is re-derived and re-appended below, so an ACTIVE
     // attunement is never lost, only unrecognized history entries.
     state.attunedPairs = [...new Set(savedHistory.filter(isAdjacentPairTarget))];
@@ -215,8 +219,10 @@ export function hobbyCandidatesForPair(activeArchetype: string, pairedMajor: str
 
 // Craft ids with real, reachable content: at least one recipe in
 // content/recipes.ts (ALL_RECIPES) targets it, or it has an enchanting-style
-// action outside the recipe table (today, only enchanting itself, via
-// disenchanting; see professions/enchanting.ts). Jewelcrafting and
+// action outside the recipe table (only enchanting itself, via disenchanting;
+// see professions/enchanting.ts). Enchanting now also ships recipes in
+// ALL_RECIPES, so its explicit entry is a redundancy that keeps the
+// disenchanting path counted even if those recipes move. Jewelcrafting and
 // Inscription have neither (content/deeds.ts's prog_guildsworn comment: "no
 // live skill-gain path yet, zero recipes, no enchanting-style action"), so
 // defaulting a fresh hobby into either soft-locks the slot: no possible skill

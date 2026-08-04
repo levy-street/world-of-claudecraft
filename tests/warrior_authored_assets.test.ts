@@ -27,6 +27,19 @@ const AUTHORED_ICONS = {
   },
 } as const;
 
+const VALE_CUP_PAINTED_ABILITY_IDS = [
+  'sport_boot',
+  'sport_dive',
+  'sport_feint',
+  'sport_hoof',
+  'sport_kick',
+  'sport_pass',
+  'sport_punt',
+  'sport_second_wind',
+  'sport_shoot',
+  'sport_shoulder',
+] as const;
+
 const WINNING_SOURCE_BLOBS = {
   'public/ui/skills/warrior/anger_management.webp': 'a8af761b3afdbea5927a80acaa0e51b3e3f092ae',
   'public/ui/skills/warrior/attack.webp': '8238b1d88a0930109c89dc7dd99d19a6465f4d4e',
@@ -105,5 +118,33 @@ describe('winning Warrior authored talent icons', () => {
       const path = resolve('public/ui/skills/warrior', expected.output);
       expect(gitBlobHash(path), expected.output).toBe(expected.blob);
     }
+  });
+
+  it('ships ten distinct borderless Vale Cup ability paintings with explicit ownership', () => {
+    const byId = new Map(mapping.abilities.map((entry) => [entry.abilityId, entry]));
+    const hashes = new Set<string>();
+    expect(VALE_CUP_PAINTED_ABILITY_IDS).toHaveLength(10);
+    for (const id of VALE_CUP_PAINTED_ABILITY_IDS) {
+      expect(abilityImageUrl(id), `${id} ability URL`).toBe(`/ui/skills/warrior/${id}.webp`);
+      const entry = byId.get(id) as
+        | {
+            sourcePack?: string;
+            source?: string;
+            owner?: string;
+            license?: string;
+          }
+        | undefined;
+      expect(entry?.sourcePack, `${id} generated source pack`).toBe(
+        'woc_openai_missing_painted_icons_2026_08_01',
+      );
+      expect(entry?.source, `${id} generator`).toBe('OpenAI built-in image generation');
+      expect(entry?.owner, `${id} owner`).toBe('World of ClaudeCraft');
+      expect(entry?.license, `${id} license`).toContain('project asset');
+      const bytes = readFileSync(resolve('public/ui/skills/warrior', `${id}.webp`));
+      const hash = createHash('sha256').update(bytes).digest('hex');
+      expect(hashes.has(hash), `${id} must not duplicate another Vale Cup motion`).toBe(false);
+      hashes.add(hash);
+    }
+    expect(hashes.size).toBe(10);
   });
 });

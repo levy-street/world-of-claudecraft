@@ -541,13 +541,15 @@
   .mobile-btn:focus-visible,
   .crafting-commission-chip:focus-visible,
   .vendor-item:focus-visible,
+  .vendor-qty-btn:focus-visible,
   .vendor-sell-junk:focus-visible,
   .bag-item:focus-visible,
   .bank-item:focus-visible,
   .bank-buy-btn:focus-visible,
   .mkt-tab:focus-visible,
   .mkt-btn:focus-visible,
-  .mkt-list-btn:focus-visible {
+  .mkt-list-btn:focus-visible,
+  .profession-skill-list:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }
@@ -694,6 +696,19 @@
        this forced-colors block, so normal mode is unchanged. */
     #tf-name.hostile {
       text-decoration: underline;
+    }
+    /* The nameplate quest marks carry first-offer-vs-repeatable by color alone
+       (gold '!' vs blue '!'), which the forced palette strips to one
+       CanvasText, so both offers would read identically (the #tf-name.hostile
+       class of failure). Underline the repeat mark as the redundant non-color
+       cue, dotted for the cooldown mark so the dimmed not-yet state stays
+       distinguishable too; the canvas surfaces keep their pixels under
+       forced-colors and need no equivalent. Normal mode is unchanged. */
+    .np-marker.repeat {
+      text-decoration: underline;
+    }
+    .np-marker.cooldown {
+      text-decoration: underline dotted;
     }
     /* Cast progress is shown by the .fill gradient, which forced-colors strips, so the filled
        width that conveys cast / channel PROGRESS would vanish against the bar background. Pin

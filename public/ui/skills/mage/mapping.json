@@ -399,7 +399,108 @@
       "sourcePack": "custom-user",
       "sourceFile": "desktop/combustion.png (combustion crop)",
       "output": "combustion.webp"
+    },
+    {
+      "abilityId": "arcane_power",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/mage/arcane_power.png",
+      "output": "arcane_power.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A mage silhouette inside two concentric arcane rings, one expanding power and one accelerating runes.",
+      "references": [
+        {
+          "path": "public/ui/skills/mage/arcane_missiles.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/mage/fireball.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for mage\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Aether Surge (arcane_power)\nCanonical mechanic: Aether Surge increases spell damage by 20% and spell haste by 10% for 10 sec; 90 sec cooldown.\nSubject: A mage silhouette inside two concentric arcane rings, one expanding power and one accelerating runes.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "cone_of_cold",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/mage/cone_of_cold.png",
+      "output": "cone_of_cold.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A circular sweep of ice shards radiating around the mage's boots.",
+      "references": [
+        {
+          "path": "public/ui/skills/mage/frost_nova.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/mage/arcane_missiles.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for mage\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Frostsweep (cone_of_cold)\nCanonical mechanic: Frostsweep deals 28 to 36 Frost damage to enemies in a caster-centered 8 yd radius; 20 sec cooldown. Despite the legacy ID, it is not a frontal cone.\nSubject: A circular sweep of ice shards radiating around the mage's boots.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "deep_freeze",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/mage/deep_freeze.png",
+      "output": "deep_freeze.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "An enemy encased in cracked blue ice, with a sharp stun star at the fracture.",
+      "references": [
+        {
+          "path": "public/ui/skills/mage/frost_nova.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/mage/fireball.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for mage\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Deadfrost (deep_freeze)\nCanonical mechanic: Deadfrost deals 92 to 116 Frost damage at 30 yd and stuns for 4 sec; 30 sec cooldown.\nSubject: An enemy encased in cracked blue ice, with a sharp stun star at the fracture.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "spellsteal",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/mage/spellsteal.png",
+      "output": "spellsteal.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A glowing buff rune being pulled from an enemy into an open mage hand.",
+      "references": [
+        {
+          "path": "public/ui/skills/mage/counterspell.webp",
+          "role": "subject reference",
+          "provenance": "World of ClaudeCraft project-generated art",
+          "license": "Project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/skills/mage/arcane_missiles.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for mage\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Spellsteal (spellsteal)\nCanonical mechanic: Spellsteal removes one beneficial magic effect from an enemy and transfers it to the caster; 12 sec cooldown.\nSubject: A glowing buff rune being pulled from an enemy into an open mage hand.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
     }
   ],
-  "deferredStayProcedural": []
+  "deferredStayProcedural": [],
+  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 entries are project-generated and explicitly override it."
 }

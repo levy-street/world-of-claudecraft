@@ -614,10 +614,16 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   POLISH_ROOT,
   'metadata/after-desktop-ultra.json',
 );
+// Re-pinned: src/render/renderer.ts is the rendererIntegration leaf of the polish
+// composite provenance, and merging the live graphics rebuild (context recycle in
+// the renderer, plus profile-aware Eastbrook runtime inputs) with the base's
+// shapeshift-form compile gate (#2571) produced a renderer neither prior pin saw,
+// so the metadata file's bytes (its polishProvenance block) and the composite
+// fingerprint move again. No measured capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '04a4dc6f4765ab01d37c31eb244418bab6f20b54f79a2dc4e8a1a5132aebcb02';
+  '001c83844d3cc6358a3bb67d746907070ca98b257ea49eb211c168ecc494cf50';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '2e1377687f4e31d7d71cfcd8c50604dc2124358896abdddeb5b6ff1db92b9534';
+  'd4b7a796ea116fb0dffa9c69cc5b18906e2b1d788f36f216e733837c5d58d816';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1474,11 +1480,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(acceptedFiles).toHaveLength(4);
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
-    // The renderer lifecycle and profile-aware Eastbrook runtime inputs moved,
-    // so the composite provenance and this seal follow them. Every measured
-    // value remains byte-identical, and no capture was retaken.
+    // src/render/renderer.ts is the rendererIntegration leaf of that composite,
+    // so merging the live graphics rebuild (context recycle plus profile-aware
+    // Eastbrook runtime inputs) with the shapeshift-form compile gate (#2571)
+    // moved the composite fingerprint and, with it, this seal follows. Every
+    // measured value (frame timings, draw stats, triangle and scenario numbers)
+    // is byte-identical, and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      '3786210f88822237781ef04b93c6b7107c43c349503baf01d38b622afe207678',
+      '20f43e1a3fd1f1e9202d04b1d2dbed827acf73eafbe8f7ec915ba84380f37d98',
     );
   });
 

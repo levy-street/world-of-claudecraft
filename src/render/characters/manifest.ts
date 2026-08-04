@@ -363,13 +363,20 @@ function itemModelKey(
   extra: Readonly<Record<string, string>> = {},
 ): string | null {
   if (!itemId) return null;
-  const baseId = ITEMS[itemId]?.heroicOf;
-  return (
-    ITEM_WEAPON_VARIANTS[itemId] ??
-    extra[itemId] ??
-    (baseId ? (ITEM_WEAPON_VARIANTS[baseId] ?? extra[baseId]) : undefined) ??
-    null
-  );
+  const direct = Object.hasOwn(ITEM_WEAPON_VARIANTS, itemId)
+    ? ITEM_WEAPON_VARIANTS[itemId]
+    : undefined;
+  const directExtra = Object.hasOwn(extra, itemId) ? extra[itemId] : undefined;
+  if (direct || directExtra) return direct ?? directExtra ?? null;
+
+  const item = Object.hasOwn(ITEMS, itemId) ? ITEMS[itemId] : undefined;
+  const baseId = item?.heroicOf;
+  if (!baseId) return null;
+  const inherited = Object.hasOwn(ITEM_WEAPON_VARIANTS, baseId)
+    ? ITEM_WEAPON_VARIANTS[baseId]
+    : undefined;
+  const inheritedExtra = Object.hasOwn(extra, baseId) ? extra[baseId] : undefined;
+  return inherited ?? inheritedExtra ?? null;
 }
 
 /** GLB url for an equipped mainhand item's held weapon model, or null if the item

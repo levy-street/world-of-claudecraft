@@ -2,7 +2,7 @@
 
 import type { ChatSenderFlair, StreamerLinks } from './account_flair';
 import type { MountKey } from './content/mounts';
-import type { GatheringProfessionId } from './content/professions';
+import type { GatheringProfessionId, ToolEffectId } from './content/professions';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { HarvestYield } from './professions/harvest_yields';
 
@@ -640,7 +640,16 @@ export type ItemUse =
   // it can gather: see src/sim/professions/tools.ts (canGatherTier). This item
   // type never carries a durability field (this repo has no durability
   // mechanic anywhere), so a base tool can never become unusable.
-  | { type: 'gatherTool'; professionId: GatheringProfessionId; tier: number };
+  | { type: 'gatherTool'; professionId: GatheringProfessionId; tier: number }
+  // A crafted tool-effect charm (the acquisition craft): the item form of one
+  // TOOL_EFFECTS entry. Consumed by the slot_tool_effect command through
+  // resolveSlotToolEffect (src/sim/professions/tools.ts), never by useItem:
+  // the resolver is the ONE validation authority for minting a slot, so the
+  // item declares WHICH effect it carries and nothing else. The def is the
+  // single source of the effect-to-item mapping; a guard derives the craftable
+  // set from these defs against the R9 slot policy so no item can exist for an
+  // effect the policy refuses everywhere.
+  | { type: 'toolEffect'; effectId: ToolEffectId };
 
 // Rarity ranks for the cosmetic skin-select event, ordered low → high. A rolled
 // rank unlocks its own tier and every tier below it (epic unlocks rare+uncommon).
@@ -1020,6 +1029,24 @@ export interface InvSlot {
 export function cloneInvSlot<T extends InvSlot>(slot: T): T {
   if (!slot.instance) return { ...slot };
   return { ...slot, instance: cloneItemInstancePayload(slot.instance) };
+}
+
+/** ONE unit lifted out of an inventory slot, carrying BOTH provenance channels
+ *  the slot can hold: the per-instance `instance` payload and the plain-stack
+ *  `craftedRecipeId` marker. Any remover that reports what it consumed must
+ *  return this, never the bare payload: a plain crafted stack has no `instance`
+ *  at all, so a payload-only return silently drops its marker and the re-grant
+ *  launders the copy (the class the trade/market/mail/bank fixes each closed
+ *  at their own boundary). THE shape for this, not one of several: items.ts
+ *  (VendorRemovedUnit, the equip bridge) and professions/enchanting.ts
+ *  (ConsumedDisenchantUnit) alias it rather than redeclare it, so a remover
+ *  cannot quietly grow a third spelling that reports only one channel.
+ *  Returned by Sim.removeEnchantableItem, items.ts removeVendorSellUnits,
+ *  item_instance_transfer.ts removeMatchingInstance, and enchanting.ts's
+ *  victim walks. */
+export interface InventoryUnit {
+  instance: ItemInstancePayload | undefined;
+  craftedRecipeId: string | undefined;
 }
 
 export interface LootSlot extends InvSlot {
@@ -2506,11 +2533,14 @@ export interface GatherNodeDef {
   pos: { x: number; z: number };
   // Effective content level for the profession-XP green/gray curve
   // (professions/profession_xp.ts gatherActionXp), snapshotted at authoring
-  // time from the node's zone levelRange midpoint rather than looked up live.
+  // time as the CEIL of the node's zone levelRange midpoint rather than
+  // looked up live (every shipped node follows the ceil form, pinned by the
+  // level arm in tests/gather_node_placement.test.ts).
   level: number;
   // Access tier (Professions 2.0), 1 = bare-hands: gated via
-  // canGatherTier against the player's best owned matching tool
-  // (professions/tools.ts bestOwnedGatherToolTier). Pure access gating, never
+  // canGatherTier against the player's best WIELDABLE matching tool (R22:
+  // professions/wield_gate.ts bestWieldableGatherToolTierOrNone; an owned but
+  // unwieldable tool no longer opens the node). Pure access gating, never
   // a speed mechanic; every pre-phase node is tier 1.
   tier: number;
 }
@@ -2632,9 +2662,11 @@ export interface ZoneDef {
   // to the Pale Causeway's head so the Wyrmgate opens where the road arrives.
   southPassX?: number;
   // Per-zone override of the open-world trash respawn delay (seconds), which
-  // otherwise comes from this zone's level band (src/sim/respawn_policy.ts
-  // trashRespawnSecondsForZone). An explicit SimConfig.respawnSeconds still
-  // wins over it, and a MobTemplate.respawnSeconds still wins over both.
+  // otherwise is the single world delay TRASH_RESPAWN_SECONDS
+  // (src/sim/respawn_policy.ts trashRespawnSecondsForZone; the level-band tiers
+  // that used to decide it are retired, see that file's header). An explicit
+  // SimConfig.respawnSeconds still wins over it, and a MobTemplate.respawnSeconds
+  // still wins over both.
   trashRespawnSeconds?: number;
 }
 
@@ -2973,6 +3005,10 @@ export interface QuestProgress {
   state: 'active' | 'ready' | 'done';
   selection?: string;
   resolvedCounts?: number[];
+  // Ledger of the distinct objects an `interact` objective has already been
+  // credited off, so one object cannot satisfy a multi-count objective on its
+  // own (see quests/interact_object_credit.ts). Absent until the first credit.
+  creditedObjects?: string[];
 }
 
 export function questObjectiveRequired(
@@ -3237,8 +3273,9 @@ export interface Entity extends ClientMirroredEntityFields {
   // aimed at, captured (server-clamped to range) when the cast begins and read by
   // its area effects when it resolves. null for normal entity/self casts.
   castAim: Vec3 | null;
-  // Hidden per-cast state (Professions 2.0). All three are
-  // transient: initialized inert ('' / 0) at entity creation, nonzero ONLY
+  // Hidden per-cast state (Professions 2.0). Every field here is
+  // transient: initialized inert ('' / 0 / false) at entity creation,
+  // non-inert ONLY
   // between a real cast start and its end, and cleared on EVERY end path
   // (completion, reel, miss, cancelCast). Parity contract: while inert they
   // canonicalize away (omitDefaults), so existing goldens stay byte-identical;
@@ -3247,10 +3284,36 @@ export interface Entity extends ClientMirroredEntityFields {
   // fields only), so the bite timing stays server-hidden.
   /** Node id a running gather cast resolves against at completion ('' = none). */
   gatherCastNodeId: string;
+  /**
+   * Rarity of the best matching-profession tool owned when the running
+   * gather cast STARTED, captured only when the profession had a tool-effect
+   * slot ('' otherwise, and between casts). The R47 use-time ratchet latches
+   * the slot's price ceiling off BOTH ends of the cast (this capture and the
+   * completion-time bag scan), so handing the good tool away mid-cast cannot
+   * take the bonus while dodging the price rung. Cleared wherever
+   * `gatherCastNodeId` clears; inert ('') at rest so it stays out of every
+   * at-rest parity sample.
+   */
+  gatherCastToolRarity: Exclude<ItemDef['quality'], undefined> | '';
+  /**
+   * The R40 per-use consent, captured at gather-cast start from the
+   * harvest command's confirmEffectUse flag, and only when the profession
+   * actually carries a tool-effect slot (false otherwise, and between
+   * casts, so every slot-less frame stays byte-identical). Read once by
+   * completeGatherCast and threaded into the grade resolution and the
+   * grant: a 'prompt' slot fires and spends only when this was true, an
+   * 'always' slot ignores it. Cleared wherever `gatherCastNodeId` clears;
+   * inert (false) at rest.
+   */
+  gatherCastEffectConfirmed: boolean;
   /** Hidden seeded sim tick the fishing bite fires on (0 = no pending bite). */
   fishBiteAtTick: number;
   /** Sim-tick deadline for the fishing reel re-press (0 = window not armed). */
   fishReelDeadlineTick: number;
+  /** Zone id of the water the fishing cast was validated against (the probe
+   *  point's zone, pinned at cast start; '' = no live fishing session).
+   *  completeFishing resolves the catch table and deed credit from it. */
+  fishCastZoneId: string;
   channeling: boolean;
   channelTickTimer: number;
   channelTickEvery: number;
@@ -4509,6 +4572,35 @@ export type SimEvent = { pid?: number } & (
       count?: number;
       reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled' | 'no_bag_space';
     }
+  // Tool-effect action outcome (the acquisition craft): the one result event
+  // for the slot_tool_effect and recharge_tool_effect commands, mirroring
+  // professions/tools.ts resolveSlotToolEffect / resolveRechargeToolEffect so
+  // the client renders the outcome without deciding it (the
+  // disenchant/salvage template above). Personal (pid = the actor). Text-free
+  // on purpose: ids only, localized client-side, so no sim/server i18n
+  // matcher rule is needed. On a recharge, `materialItemId`/`count` carry the
+  // R39 price actually paid (ok) or required (insufficient_materials), so the
+  // client can show the cost without a preview surface. `reason` is absent on
+  // success.
+  | {
+      type: 'toolEffectResult';
+      action: 'slot' | 'recharge';
+      ok: boolean;
+      professionId: string;
+      effectId?: string;
+      materialItemId?: string;
+      count?: number;
+      reason?:
+        | 'invalid_request'
+        | 'no_tool'
+        | 'no_charm'
+        | 'no_gain'
+        | 'no_slot'
+        | 'already_full'
+        | 'tool_capped'
+        | 'insufficient_materials'
+        | 'throttled';
+    }
   // Recipe-training outcome (Professions 2.0): mirrors
   // professions/training.ts TrainResult so the online client can reflect the
   // local result of a train_recipe command without deciding it itself.
@@ -4690,7 +4782,12 @@ export type SimEvent = { pid?: number } & (
         | 'insufficient_essence'
         | 'invalid_stat'
         | 'invalid_gem'
-        | 'sockets_full';
+        | 'sockets_full'
+        // Type-level only: the while-dead refusal is returned to callers but
+        // never emitted (the three dead-gate early returns in
+        // rift/progression.ts sit ABOVE emitResult); its one player-facing
+        // surface is the shared "You can't do that while dead." error line.
+        | 'dead';
       upgradeLevel?: number;
       essenceSpent?: number;
     }
@@ -4714,12 +4811,22 @@ export type SimEvent = { pid?: number } & (
       qty: number;
       // The rare event this harvest rolled (resolveHarvest draw #2), or null.
       rareEvent: GatherRareEventFlavor | null;
+      // The last-charge signal (the UX pass): present, and true, exactly when
+      // THIS harvest's R42 settle spent the slotted effect's final charge, so
+      // the client can say the effect expired instead of stopping silently.
+      // Additive and optional (the phase 11 stale-client doctrine): absent on
+      // every other harvest keeps the event byte-identical to the pre-field
+      // wire, and an old bundle's whole-event decode ignores it.
+      effectDepleted?: true;
     }
   // Gathering tool-gate denial (Professions 2.0, extended by #2343): the
   // player lacks a matching tool of at least `requiredTier` for a node
   // harvest (bare hands never harvest: requiredTier 1 means "no tool owned
-  // at all"), for a corpse harvest's premium (signed/specimen) arm, or lacks
-  // any fishing implement when casting a line (surface 'fishing'). Personal
+  // at all"), or for a corpse harvest's premium (signed/specimen) arm. The
+  // 'fishing' surface carries BOTH fishing refusals and the client splits
+  // them on requiredTier exactly like the node arm: tier 1 is "no tackle at
+  // all" (the implement gate) and tier 2 and up is "this water takes a better
+  // rod" (the per-zone gate, professions/fishing_zones.ts). Personal
   // (pid = the gatherer) and text-free on purpose (like gatherResult above):
   // the client composes its own localized copy off the structured fields.
   // `professionId` is present exactly when surface === 'node' or 'fishing'
@@ -4731,6 +4838,16 @@ export type SimEvent = { pid?: number } & (
       surface: 'node' | 'corpse' | 'fishing';
       requiredTier: number;
       professionId?: GatheringProfessionId;
+      // The R22 wield arm, additive on the wire: present exactly when a tool
+      // COVERING requiredTier is already in the player's bags and only its
+      // proficiency requirement is short. Carries the smallest proficiency at
+      // which something they already carry would work the target (see
+      // professions/wield_gate.ts minWieldRequirementToWork); the client
+      // renders the wield line instead of the tier line when present. A
+      // bundle predating this field ignores it and shows its tier-based
+      // copy: misleading only in wording, never a throw (the stale-client
+      // doctrine of phase 11).
+      wieldProficiency?: number;
     }
   // Gathering-tool item use found nothing to work on (#2343): the player used
   // a pick/axe/sickle from the bags with no matching resource node within
@@ -4797,11 +4914,16 @@ export type SimEvent = { pid?: number } & (
   // structured fields, so no sim/server i18n matcher rule is needed.
   // `quality` is the caught ItemDef's quality (poor for junk catches,
   // uncommon for the rare koi) so the line colors like an item name.
+  // zoneId and band carry the session's pinned water zone and the effective
+  // catch band (min of proficiency band and rod band) for the server-side
+  // fishing telemetry; both resolve draw-free from pure state.
   | {
       type: 'fishingResult';
       pid: number;
       itemId: string;
       quality: NonNullable<ItemDef['quality']>;
+      zoneId: string;
+      band: 0 | 1 | 2;
     }
   // Fishing bite (Professions 2.0): the hidden seeded bite fired
   // for this angler's running fishing session. Personal (pid = the angler)
@@ -4812,10 +4934,22 @@ export type SimEvent = { pid?: number } & (
   // wire never reveals the delay distribution.
   | { type: 'fishingBite'; pid: number }
   // Fishing miss (Professions 2.0): the reel window closed with no
-  // re-press ("it got away"), or a session defensively timed out. Personal
-  // and text-free like fishingBite: the client renders its own localized
-  // got-away line. Costs nothing but the ended cast; recast immediately.
-  | { type: 'fishingGotAway'; pid: number }
+  // re-press ("it got away"), a session defensively timed out, or a landed
+  // catch found no bag room (that branch spent its table draw and lost the
+  // catch, so it IS a got-away). Personal and text-free like fishingBite:
+  // the client renders its own localized got-away line off the type alone,
+  // which on the bags-full branch means DOUBLED feedback on purpose: the
+  // bags-full error (a toast the HUD also mirrors into the chat log)
+  // carries the reason, and this event's line records the loss. Costs
+  // nothing but the ended cast; recast immediately. zoneId/band mirror
+  // fishingResult, for the telemetry.
+  | { type: 'fishingGotAway'; pid: number; zoneId: string; band: 0 | 1 | 2 }
+  // Fishing empty hook (Professions 2.0): the single table draw resolved
+  // the itemId: null row (nothing was biting). Telemetry-only sibling of
+  // fishingResult: the player feedback stays the existing localized log
+  // line, and old clients ignore the unknown type. Emitted exactly where
+  // the null row resolves, draw-free.
+  | { type: 'fishingEmptyHook'; pid: number; zoneId: string; band: 0 | 1 | 2 }
   // Rare gather event (Professions 2.0): a harvest struck a pristine
   // vein / ancient heartwood / moonlit bloom. Soft zone broadcast: one copy is
   // emitted per player currently in the node's zone, `pid` being the RECIPIENT

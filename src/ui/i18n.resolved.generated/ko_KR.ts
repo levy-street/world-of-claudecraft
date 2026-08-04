@@ -957,7 +957,8 @@ export const ko_KR: EnTranslations = {
       "petTaunt": "펫: 도발",
       "petDefensive": "펫: 방어",
       "petAggressive": "펫: 공격적",
-      "mount": "탑승 / 하차"
+      "mount": "탑승 / 하차",
+      "mouseHint": "마우스 버튼도 사용할 수 있습니다. 지정하는 동안 가운데 버튼 (M3) 또는 엄지 버튼 (M4, M5) 을 누르세요. 왼쪽과 오른쪽 버튼은 카메라 조작, 클릭 이동, 월드 클릭용으로 예약되어 있습니다."
     },
     "actionBar": {
       "editKeys": "액션 바 키 편집",
@@ -966,7 +967,7 @@ export const ko_KR: EnTranslations = {
       "bannerCapturing": "키를 눌러 이 슬롯에 지정하세요...",
       "boundToKey": "{key}(으)로 지정되었습니다.",
       "reset": "초기화",
-      "done": "Done",
+      "done": "완료",
       "cancel": "취소",
       "resetConfirmTitle": "액션 바 키를 초기화하시겠습니까?",
       "resetConfirmBody": "첫 번째 바는 기본 키로 되돌아가고, 두 번째와 세 번째 바는 지정 해제됩니다. 이 작업은 되돌릴 수 없습니다."
@@ -1046,6 +1047,7 @@ export const ko_KR: EnTranslations = {
       },
       "awayNote": "양 팀이 같은 깃발을 선택하면 원정 팀이 반전 배색으로 경기합니다.",
       "rolesHeading": "포지션",
+      "rolesSmallBracketNote": "1대1과 2대2 등급에서는 모든 선수가 올라운더로 출전합니다. 3대3 이상 등급이 필요한 업적은 여기서 달성할 수 없습니다.",
       "role": {
         "allrounder": {
           "name": "올라운더",
@@ -1087,6 +1089,7 @@ export const ko_KR: EnTranslations = {
       "guildBoardWl": "{wins}승 {losses}패",
       "practice": "봇 연습 경기",
       "practiceNote": "소우필드에서 봇과의 정식 경기를 즉시 시작합니다.",
+      "practiceUnratedNote": "연습 경기는 등급전이 아닙니다. 전적과 업적의 서 진행도가 반영되지 않습니다.",
       "practicingNow": "연습 중 ({count}):",
       "clock": "{minutes}:{seconds}",
       "indicatorQueued": "베일 컵 대기열: {bracket}, {count}명 중 {position}번째",
@@ -1129,6 +1132,8 @@ export const ko_KR: EnTranslations = {
         "rule5": "누구나 다가와 관중석에서 응원할 수 있습니다.",
         "kitHeading": "내 기술",
         "kitNote": "경기 동안 이 동작들이 직업 능력을 대신합니다.",
+        "unratedNote": "봇이 경기장에 있어 이 경기는 등급전이 아닙니다. 전적은 변하지 않으며 골, 세이브, 클린 시트 업적도 반영되지 않습니다.",
+        "practiceUnratedNote": "이 경기는 연습 경기이므로 등급전이 아닙니다. 전적은 변하지 않으며 업적의 서 진행도도 반영되지 않습니다.",
         "rosterHeading": "출전 명단",
         "you": "나",
         "bot": "봇",
@@ -1745,6 +1750,7 @@ export const ko_KR: EnTranslations = {
       "filterArmor": "방어구",
       "filterConsumable": "소모품",
       "filterMaterial": "재료",
+      "filterTool": "도구",
       "filterQuest": "퀘스트",
       "filterMount": "탈것",
       "sortAria": "가방 아이템 정렬",
@@ -1971,6 +1977,7 @@ export const ko_KR: EnTranslations = {
       "enchantedFallback": "마법부여됨"
     },
     "materialHint": {
+      "fineGrade": "상급 등급입니다. 해당 재료보다 높은 등급의 도구로 만렙 채집지에서 캐낸 것이며, 일반 등급이 필요한 곳 어디에서나 대신 사용됩니다.",
       "arcaneDust": "마법부여 재료. 일반과 고급 장비의 마력을 추출해 얻습니다.",
       "arcaneEssence": "마법부여 재료. 희귀 장비의 마력을 추출해 얻습니다.",
       "arcaneShard": "마법부여 재료. 영웅과 전설 장비의 마력을 추출해 얻습니다.",
@@ -2355,6 +2362,7 @@ export const ko_KR: EnTranslations = {
       "billboard": {
         "label": "길드 게시판",
         "empty": "게시판에 아직 아무 내용도 없습니다.",
+        "loginLine": "길드 게시판: {text}",
         "setBy": "{name} 설정",
         "save": "저장",
         "placeholder": "길드에 전할 메시지를 작성하세요",
@@ -2398,7 +2406,8 @@ export const ko_KR: EnTranslations = {
       "toolTierUnmet": {
         "mining": "이 광맥을 캐려면 {tier}티어 채광 곡괭이가 필요합니다.",
         "logging": "이 나무를 베려면 {tier}티어 벌목 도끼가 필요합니다.",
-        "herbalism": "이 군락을 채집하려면 {tier}티어 약초 낫이 필요합니다."
+        "herbalism": "이 군락을 채집하려면 {tier}티어 약초 낫이 필요합니다.",
+        "fishing": "이 수역에서 낚시하려면 {tier}티어 낚싯대가 필요합니다."
       },
       "toolRequired": {
         "mining": "이 광맥을 캐려면 채광 곡괭이가 필요합니다.",
@@ -2411,6 +2420,12 @@ export const ko_KR: EnTranslations = {
         "logging": "손이 닿는 곳에 벌목 나무가 없습니다.",
         "herbalism": "손이 닿는 곳에 약초 군락이 없습니다."
       },
+      "wieldUnmet": {
+        "mining": "가방에 있는 곡괭이를 휘두르려면 채광 {skill}이(가) 필요합니다.",
+        "logging": "가방에 있는 도끼를 휘두르려면 벌목 {skill}이(가) 필요합니다.",
+        "herbalism": "가방에 있는 낫을 다루려면 약초학 {skill}이(가) 필요합니다."
+      },
+      "wieldUnmetCorpse": "최상급 도구를 제대로 다루려면 채집 기술 {skill}이(가) 필요합니다.",
       "toolTierUnmetCorpse": "최상급 재료를 회수하려면 {tier}티어 채집 도구가 필요합니다.",
       "toolTooltip": {
         "kind": {
@@ -2422,7 +2437,8 @@ export const ko_KR: EnTranslations = {
         "unlocks": {
           "mining": "{tier}티어까지의 광맥을 캐는 데 필요합니다.",
           "logging": "{tier}티어까지의 벌목 나무를 베는 데 필요합니다.",
-          "herbalism": "{tier}티어까지의 약초 군락을 채집하는 데 필요합니다."
+          "herbalism": "{tier}티어까지의 약초 군락을 채집하는 데 필요합니다.",
+          "fishing": "{tier}티어까지의 수역에서 낚시하는 데 필요합니다."
         },
         "use": {
           "mining": "사용: 근처의 광맥을 캡니다.",
@@ -2437,8 +2453,12 @@ export const ko_KR: EnTranslations = {
       },
       "downgradeMark": "가방이 가득 찼습니다: 수확물이 채집자의 표식 없이 보관되었습니다.",
       "downgradeFind": "가방이 가득 찼습니다: 최상급 수확물을 놓쳐 버렸습니다.",
+      "emptyHookNote": "빈 낚싯바늘",
       "stateReady": "채집 가능",
-      "stateCooldown": "재생성 중"
+      "stateCooldown": "재생성 중",
+      "stateCooldownTimed": "{time} 후 재생성",
+      "respawnClock": "{minutes}:{seconds}",
+      "fineGradePreview": "현재 도구로 채집하면 상급 등급을 얻습니다."
     },
     "archetypeTitle": {
       "label": "칭호",
@@ -2528,6 +2548,33 @@ export const ko_KR: EnTranslations = {
       "ceilingRare": "희귀 상한",
       "ceilingCommon": "일반 상한",
       "skillValue": "{skill} / {max}",
+      "toolEffectCharges": "{charges} / {max}회 남음",
+      "toolEffectSpent": "모두 소모됨, 재충전 필요",
+      "toolEffectDepleted": "도구 효과를 모두 소모했습니다",
+      "toolEffectRechargePrice": "재충전: {material} x{count}",
+      "toolEffectModeAsk": "사용할 때마다 확인",
+      "toolEffectModePrompt": "사용 시마다 확인함",
+      "toolEffectConfirmTitle": "{effect}을(를) 사용하시겠습니까?",
+      "toolEffectConfirmBody": "이번 채집에 1회를 소모하시겠습니까? 거절해도 채집은 진행되지만 보너스는 없습니다. 남은 횟수: {charges}회",
+      "toolEffectConfirmAccept": "1회 사용",
+      "toolEffectConfirmDecline": "그냥 채집",
+      "toolEffectName": {
+        "gatherersCache": "채집가의 주머니",
+        "artisansEye": "장인의 눈",
+        "quickeningCharm": "회복의 부적"
+      },
+      "toolEffectSlotButton": "{effect} 장착",
+      "toolEffectRechargeButton": "재충전",
+      "toolEffectSlotted": "{effect}이(가) {profession}에 장착되었습니다.",
+      "toolEffectSlotInvalid": "{effect}은(는) 거기에 장착할 수 없습니다.",
+      "toolEffectNoTool": "먼저 진짜 {profession} 도구가 필요합니다.",
+      "toolEffectNoCharm": "가방에 제작한 {effect}이(가) 필요합니다.",
+      "toolEffectNoGain": "{effect}은(는) 이미 장착되어 있고 충전도 가득합니다.",
+      "toolEffectRecharged": "{effect} 재충전 완료: {material} x{count} 소모.",
+      "toolEffectRechargeNoSlot": "{profession}에 장착된 효과가 없습니다.",
+      "toolEffectRechargeFull": "{effect}은(는) 이미 완전히 충전되어 있습니다.",
+      "toolEffectRechargeToolCapped": "{effect}을(를) 더 충전하려면 더 좋은 {profession} 도구가 필요합니다.",
+      "toolEffectRechargeMaterials": "{effect} 재충전에는 {material} x{count}이(가) 필요합니다.",
       "tierPipAria": "티어 {tier}",
       "nextUnlockTier": "다음 티어까지 숙련도 {points} 남음: 걸작 확률이 높아집니다",
       "nextUnlockSpecialized": "전문화까지 숙련도 {points} 남음: 재료 소모가 줄어듭니다",
@@ -2552,9 +2599,12 @@ export const ko_KR: EnTranslations = {
     "crafting": {
       "title": "제작",
       "close": "제작 닫기",
+      "dialogOption": "제작",
+      "dialogOptionAria": "{craft} 제작 창 열기",
       "craft": "제작",
       "reagentsNeeded": "필요 재료:",
       "reagentLine": "{name}: {have}/{required}",
+      "reagentFineSub": "(상급 등급 {count}개 소모)",
       "empty": "알려진 제작법이 없습니다.",
       "resultAria": "{name} 제작",
       "craftedToast": "제작 완료:{name}",
@@ -2596,6 +2646,8 @@ export const ko_KR: EnTranslations = {
         "colSkill": "기술",
         "colRole": "역할",
         "colCap": "상한",
+        "allCrafts": "모든 제작 분야",
+        "skillListAria": "제작 기술",
         "tutorial": "첫 티어: 한 기술을 숙련도 {skill}까지 올리세요. 제작에 성공하면 다른 지식을 지우지 않고 해당 기술이 성장합니다.",
         "nearTier": "{craft}는 다음 티어까지 숙련도 {points}이 필요합니다.",
         "dormantKnowledge": "{craft} 지식은 유지되지만 해당 조합이나 취미가 활성화될 때까지 비활성 상태입니다."
@@ -2911,7 +2963,7 @@ export const ko_KR: EnTranslations = {
       "lbSelfAccount": "내 계정: {rank}위, 상위 {percent}%, 명성 {renown}",
       "lbSelfRank": "내 계정: {rank}위, 상위 {percent}%",
       "lbEmpty": "아직 순위에 오른 연대기 작가가 없습니다.",
-      "broadcastsLabel": "업적 달성을 길드와 친구에게 공유",
+      "broadcastsLabel": "업적 달성은 길드원과 팔로워에게, 업적과 걸작 카드는 Discord 피드에 공유",
       "titledName": "{name} [{title}]"
     },
     "continentMap": {
@@ -3040,6 +3092,16 @@ export const ko_KR: EnTranslations = {
     },
     "ota_updates": {
       "invalid_input": "입력이 올바르지 않습니다."
+    },
+    "seeker": {
+      "native_only": "Seeker 자격은 네이티브 앱에서만 사용할 수 있습니다.",
+      "attestation_failed": "기기 인증에 실패했습니다. 다시 시도해 주세요.",
+      "solana_artifact_required": "Solana Store 앱을 사용하여 계속해 주세요.",
+      "wallet_required": "먼저 지갑을 연결하고 인증하세요.",
+      "genesis_token_required": "인증된 Seeker Genesis Token이 필요합니다.",
+      "genesis_token_claimed": "해당 Seeker Genesis Token은 이미 등록되었습니다.",
+      "entitlement_required": "인증된 Seeker 자격이 필요합니다.",
+      "current_ownership_required": "현재 Seeker Genesis Token을 보유해야 합니다."
     }
   },
   "guide": {
@@ -4052,7 +4114,7 @@ export const ko_KR: EnTranslations = {
       "deedsHeading": "여정을 새기는 업적",
       "deedsBody": "업적의 서가 모든 걸음에 함께한다. 첫 조율은 Craftsworn을, 첫 걸작은 Masterwright를 주며 둘 다 칭호로 착용할 수 있다. 여덟 제작 기술은 각각 기술 50에 이정표 업적을, 상한 125에 Grandmaster 칭호를 두고, 낚시는 숙련 100에 Old Salt를, 200에 Master Angler 칭호를 준다.\n\n첫 채집과 첫 제작, 야외의 희귀한 발견, 분해 회수의 조용한 페이지도 있다. 전부 장식일 뿐이다. 칭호와 명성만 있을 뿐, 업적은 결코 힘을 주지 않는다.",
       "startHeading": "어디서 시작할까",
-      "startBody": "Eastbrook에 막 도착했다면 Foreman Odell을 찾아 A Trade for Every Hand를 받자. 마을 남서쪽 Copper Dig 주변의 광맥을 알려 준다. 그 뒤로는 여행 중 지나치는 광맥과 나무, 약초를 전부 캐면 된다. 마을에서는 T 키로 제작 창을 열어 누구나 아는 기본 제조법을 만들고, 대장간과 주방, 베틀, 공작소의 장인들을 찾아 무엇을 가르치는지 보고, 작업 주문으로 꾸준한 동전을 벌자. 길드의 편지가 도착할 즈음이면 어느 짝이 내 집인지 이미 알게 된다.",
+      "startBody": "Eastbrook에 막 도착했다면 Foreman Odell을 찾아 A Trade for Every Hand를 받자. 마을 남동쪽 Copper Dig 주변의 광맥을 알려 준다. 그 뒤로는 여행 중 지나치는 광맥과 나무, 약초를 전부 캐면 된다. 마을에서는 T 키로 제작 창을 열어 누구나 아는 기본 제조법을 만들고, 대장간과 주방, 베틀, 공작소의 장인들을 찾아 무엇을 가르치는지 보고, 작업 주문으로 꾸준한 동전을 벌자. 길드의 편지가 도착할 즈음이면 어느 짝이 내 집인지 이미 알게 된다.",
       "colStation": "작업대",
       "colHub": "거점",
       "colMaster": "장인",
@@ -4147,7 +4209,7 @@ export const ko_KR: EnTranslations = {
           "materialsHeading": "낚싯대와 칼이 채우는 찬장",
           "materialsBody": "간판 재료는 낚시가 지역별로 댄다. Eastbrook Vale의 거울 송어와 강 농어, Mirefen Marsh의 늪 창꼬치와 진흙 장어, Thornpeak Heights의 서리아가미 송어와 판지느러미 잉어. 사다리의 각 단은 제 단의 물고기를 요리하니 낚는 요리사는 재료가 마르지 않는다. 푸줏간 쪽은 사체 채집에서 온다. 멧돼지 따위의 사냥 고기, 그리고 희귀 이상 판정에서 나오는 서명된 Prime Cut, 대구이의 주인공이다. 약초가 좋은 접시에 향을 더하고, ashwood 통나무 하나가 장어를 훈제하며, Cooking Salt는 Marlow의 가판에서 한 봉지 8동이다.",
           "ladderHeading": "육포에서 대구이까지",
-          "ladderBody": "Salted Jerky가 야외 제조법이다. 처음부터 알고, 거미 다리 하나면 어디서든 만드는 신출내기의 행군식. 수련 사다리는 광장 서쪽 Eastbrook 주방에서 돈다. 무료 단은 기술 0(농어, Hunter's Game Skewer, Herbed Marsh Pike), 중간 단은 기술 25에 각 25은(Ashwood Smoked Eel, Goldleaf Game Stew, Frostgill Chowder), 희귀 단은 기술 50에 각 1금(Silvered Carp Supper, Angler's Feast Platter, Marlow's Grand Roast). 묶음 요리는 재료를 늘린다. 훈제 장어와 스튜는 한 번에 두 접시, 연회 모둠은 세 접시다.",
+          "ladderBody": "Salted Jerky가 야외 제조법이다. 처음부터 알고, 거미 다리 하나면 어디서든 만드는 신출내기의 행군식. 수련 사다리는 광장 동쪽 Eastbrook 주방에서 돈다. 무료 단은 기술 0(농어, Hunter's Game Skewer, Herbed Marsh Pike), 중간 단은 기술 25에 각 25은(Ashwood Smoked Eel, Goldleaf Game Stew, Frostgill Chowder), 희귀 단은 기술 50에 각 1금(Silvered Carp Supper, Angler's Feast Platter, Marlow's Grand Roast). 묶음 요리는 재료를 늘린다. 훈제 장어와 스튜는 한 번에 두 접시, 연회 모둠은 세 접시다.",
           "routeHeading": "걸작 아닌 특화, 그리고 125까지의 길",
           "routeBody": "요리는 걸작 이야기의 정직한 예외다. 접시에는 올릴 능력치가 없어 걸작이 절대 발동하지 않고, 좇을 이유도 없다. 이 기술의 정점은 75의 특화다. 모든 재료가 5분의 1씩 절약되고(묶음 요리에서 빠르게 불어난다), 이동식 야외 주방으로 던전 문 앞에서 연회를 차린다. 낚은 것을 요리하자. 두 기술이 서로를 먹인다. 육포와 무료 단으로 25, 중간 단으로 50, 희귀 단으로 75. 이후 더 높은 접시가 없어 희귀 요리가 절반과 4분의 1로 줄고, 상한까지 약 150회다. 갈이가 아니라 비축이라 생각하자. 길드는 모든 접시를 비운다. Marlow의 주문은 30분마다 사냥 고기 8점. 기술 50에 Seasoned Chef, 125에 Grandmaster Cooking 칭호다."
         },
@@ -4227,12 +4289,16 @@ export const ko_KR: EnTranslations = {
       "nodesHeading": "지역별 채집물",
       "nodesNote": "채집물의 위치, 티어, 필요한 도구, 산출물. 각 채집물은 내가 채집한 뒤 {respawn}초가 지나야 나에게 다시 생겨난다.",
       "toolsHeading": "도구",
-      "toolsNote": "모든 채집지에는 그 전문직의 도구가 가방에 있어야 하며, 1티어도 예외가 아니다. 곡괭이가 없으면 광석도 없고, 낚싯대가 없으면 물고기도 없다. 상인 사다리는 1티어부터 3티어까지를 다루며 모든 거점 마을에 재고가 있다. 도구는 가방에 들어 있기만 하면 되고, 장착 칸도 내구도도 없어서 한 번만 사면 된다. 조건을 가르는 것은 티어뿐이며, 도구의 희귀도 색은 겉모습일 뿐이다.\n\n상인 사다리 위에는 제작 도구 두 가지, 4티어와 5티어가 있다. 기술자가 도구 공방에서 만들며 어떤 NPC도 팔지 않는다. 현재 3티어를 넘는 채집지는 없으므로 지금 이들의 가치는 속도다. 최상급 도구는 낮은 등급 채집지에서 시전 시간을 최소치로 고정하며, 더 높은 티어의 땅이 열리면 그때의 입장권이 된다.",
+      "toolsNote": "모든 채집물에는 해당 전문 기술의 도구가 가방에 있어야 하며, 1단계도 예외가 아닙니다. 곡괭이가 없으면 광석도 없고, 낚싯대가 없으면 물고기도 없습니다. 상인 사다리는 1단계부터 3단계까지를 다루고, 각 거점은 자기 지역이 필요로 하는 단계만 취급합니다. 그래서 1단계 도구는 모든 지역 거점에서 팔리지만, 그 위 단계는 그것을 필요로 하는 광맥이 있는 곳에서 팔립니다. 상인은 그 단계를 팔기 전에 해당 전문 기술의 숙련도도 요구합니다. 2단계는 {tier2Prof}, 3단계는 {tier3Prof}가 필요하며, 판매 항목에 그 조건이 표시됩니다. 도구는 가방에 있기만 하면 되고 장비 칸도 내구도도 없으므로 한 번만 사면 되며, 이미 가진 도구는 계속 쓸 수 있습니다. 제한에 관여하는 것은 단계뿐입니다. 같은 단계에서 더 희귀한 도구라고 해서 더 열리는 것은 없습니다. 다만 희귀도가 색깔만인 것은 아닙니다. 장착한 도구 효과가 더 오래가고, 낚싯대라면 낚아채는 시간도 넓어집니다.\n\n더 좋은 도구는 두 가지가 아니라 세 가지를 줍니다. 더 높은 단계의 지형을 열고, 채집 시간을 줄이고, 나오는 것을 좋게 합니다. 그 지역 자체의 재료보다 높은 단계의 도구로 광맥을 캐면 평범한 재료 대신 고급 등급이 나옵니다. 대상은 그 지역의 완전 등급 광맥이어야 하므로, 여행자를 위해 남겨둔 쉬운 광맥에서는 여전히 평범한 재료가 나옵니다. 고급 재료는 제작 도구 제조법이 소모하는 것이며, 제조법이나 작업 지시가 평범한 판본을 요구하는 곳이라면 어디서든 고급 등급이 그것을 대신합니다. 그러니 장비를 올린다고 막히는 일은 없습니다. 구리 광석이 고급 구리 광석으로 들어올 뿐입니다.\n\n상인 사다리 위로는 각 전문 기술마다 4단계와 5단계의 제작 도구가 둘 있습니다. 기술자가 도구 공방에서 만들거나, 익사한 연도의 상점에서 탐굴 증표로 살 수 있습니다. 어떤 상인도 동전으로는 팔지 않습니다. 낚시에는 자체 한 쌍이 있으며, 처음부터 아는 것이 아니라 도구 장인에게서 배웁니다. 지금은 3단계를 넘게 요구하는 채집물도 물도 없으므로, 최상위 두 단계가 사는 것은 접근 권한이 아니라 속도와 등급과 넉넉한 낚아채기 시간입니다. 더 높은 단계의 지형이 나오면 그것들이 입장권이 될 것입니다.",
       "toolCrafted": "제작({craft})",
+      "toolCraftedOrMarks": "{craft}(으)로 제작하거나 탐굴 증표 {marks}개로 구매",
+      "toolCraftedOrMarksHeroic": "{craft}(으)로 제작하거나 익사한 연도의 영웅 난이도 공략 후 탐굴 증표 {marks}개로 구매",
       "toolVendor": "{name}({hub})",
       "toolUnavailable": "판매 없음",
       "priceNone": "판매 없음",
       "toolTierReq": "{tier}티어 도구",
+      "colWield": "사용 숙련도",
+      "wieldNone": "제한 없음",
       "yieldsHeading": "채집의 수확물",
       "yieldsBody": "채집마다 품질을 굴리는데, 그 확률은 숙련도가 전부다. 갓 시작한 채집가는 언제나 일반 등급을 얻지만, 숙련이 오를수록 무게가 높은 등급으로 옮겨 가며 절대 후퇴하지 않는다. 상한 100에서는 일반이 완전히 사라져 60% 고급, 30% 희귀, 8% 영웅, 2% 전설이 된다. 품질은 곧 수량이다. 일반 1개, 고급과 희귀 2개, 영웅 3개, 전설 4개. 희귀 이상은 서명이 새겨져(Gathered by) 도착하며, 상한에서는 열 번 중 네 번에 이름이 남는다.",
       "bandsHeading": "숙련도 구간",
@@ -5115,6 +5181,7 @@ export const ko_KR: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "보유자 혜택이 활성화되었습니다. 서명이나 지출이 필요할 때 앱을 연결하세요.",
     "extensionHelp": "여기에 지갑이 표시되려면 Solflare Wallet 같은 브라우저 지갑 확장 프로그램이 활성화되어 있어야 합니다.",
     "mobileAppHelp": "Phantom 또는 Solflare를 선택하세요. 지갑 앱에서 승인을 요청합니다. 게임을 열어 둔 채 완료 후 돌아오세요.",
+    "seekerAppHelp": "Seed Vault Wallet로 계속하세요. Seed Vault에서 연결 및 인증 요청을 확인한 후 게임으로 돌아오세요.",
     "standaloneAppHelp": "홈 화면 앱에서는 아직 지갑 연결을 사용할 수 없습니다. Phantom 또는 Solflare를 사용하려면 Safari나 Chrome에서 World of ClaudeCraft를 여세요.",
     "openAppTitle": "{wallet}에서 계속",
     "openAppHelp": "{wallet}을 열어 이 요청을 확인하세요. 지갑 앱을 사용하는 동안 이 게임 탭을 열어 두세요.",
@@ -6754,6 +6821,10 @@ export const ko_KR: EnTranslations = {
         "officer": "장교",
         "member": "회원"
       },
+      "tenure": {
+        "recruit": "신병",
+        "veteran": "베테랑"
+      },
       "guildHeadOne": "당신은 {rank}, {count}명 회원",
       "guildHeadMany": "당신은 {rank}, {count}명 회원"
     },
@@ -6885,7 +6956,8 @@ export const ko_KR: EnTranslations = {
       "title": "퀘스트",
       "complete": "완료",
       "showOnMap": "{name} 지도에 표시",
-      "hideFromMap": "{name} 지도에서 숨기기"
+      "hideFromMap": "{name} 지도에서 숨기기",
+      "unknownQuest": "알 수 없는 퀘스트 ({id})"
     },
     "log": {
       "title": "퀘스트 기록",
@@ -6897,6 +6969,8 @@ export const ko_KR: EnTranslations = {
       "activeStatus": "진행 중",
       "readyStatus": "완료",
       "completedStatus": "완료됨",
+      "repeatableStatus": "반복 가능",
+      "cooldownStatus": "곧 다시 수령 가능",
       "returnTo": "{name}에게 돌아가기",
       "abandon": "퀘스트 포기",
       "abandonConfirmTitle": "퀘스트 포기",
@@ -6910,6 +6984,7 @@ export const ko_KR: EnTranslations = {
       "greetingFallback": "안녕하세요.",
       "availableQuestAria": "받을 수 있는 퀘스트: {name}",
       "readyQuestAria": "완료 보고 가능한 퀘스트: {name}",
+      "repeatableQuestAria": "반복 가능한 퀘스트: {name}",
       "discussQuest": "{name}에 대해 이야기합니다.",
       "discussQuestAria": "퀘스트 논의: {name}",
       "profIntroHint": "{name}에게 \"{quest}\"을(를) 받으세요.",
@@ -6990,6 +7065,7 @@ export const ko_KR: EnTranslations = {
       "armor": "방어구",
       "quest": "퀘스트 아이템",
       "junk": "잡동사니",
+      "fineMaterial": "상급 재료",
       "food": "음식",
       "drink": "음료",
       "tool": "도구",
@@ -7049,7 +7125,13 @@ export const ko_KR: EnTranslations = {
       "stackCount": "x{count}",
       "destroyTitle": "{item} 파괴",
       "destroyConfirm": "파괴",
-      "destroyCancel": "취소"
+      "destroyCancel": "취소",
+      "unknownItem": "알 수 없는 아이템",
+      "unknownItemAria": "알 수 없는 아이템 {id}, 수량 {count}",
+      "unknownItemAriaMasterwork": "알 수 없는 아이템 {id}, 수량 {count}, 걸작",
+      "unknownItemAriaEnchanted": "알 수 없는 아이템 {id}, 수량 {count}, 마법부여된 사본",
+      "unknownItemAriaBound": "알 수 없는 아이템 {id}, 수량 {count}, 귀속된 사본",
+      "unknownItemAriaInstanced": "알 수 없는 아이템 {id}, 수량 {count}, 제작자 표식이 있는 사본"
     },
     "equipment": {
       "empty": "비어 있음",
@@ -7060,8 +7142,19 @@ export const ko_KR: EnTranslations = {
       "close": "상인 닫기",
       "hint": "이 창이 열려 있을 때 가방의 아이템을 클릭하면 판매합니다.",
       "buyAria": "{price}에 {item} 구매",
-      "buyStack": "Buy {count}",
-      "buyStackAria": "Buy {count} {item} for {price}",
+      "buyAriaWithRequirement": "{price}에 {item} 구매. {requirement}",
+      "buyStack": "{count}개 구매",
+      "buyStackAria": "{price}에 {item} {count}개 구매",
+      "qtyRowAria": "구매 수량",
+      "qtyMultiple": "{count}개",
+      "qtyMultipleAria": "한 번에 {count}개씩 구매",
+      "qtyCustom": "직접 입력",
+      "qtyCustomAria": "구매 수량 직접 입력",
+      "buyCountAria": "{price}에 {item} {count}개 구매",
+      "buyCountAriaWithRequirement": "{price}에 {item} {count}개 구매. {requirement}",
+      "buyQuantityTitle": "{item}을(를) 몇 개 구매하시겠습니까? 최대 {max}개.",
+      "buyQuantityInput": "구매할 수량",
+      "buyQuantityConfirm": "구매",
       "buybackTitle": "되사기",
       "buybackEmpty": "물품 없음",
       "buybackAria": "{item}을(를) {price}에 되사기",
@@ -9542,6 +9635,39 @@ export const ko_KR: EnTranslations = {
       "resonant_timber": {
         "name": "공명의 목재"
       },
+      "fine_copper_ore": {
+        "name": "상급 구리 광석"
+      },
+      "fine_iron_ore": {
+        "name": "상급 철 광석"
+      },
+      "fine_thorium_ore": {
+        "name": "상급 오스뮴 광석"
+      },
+      "fine_ironbark_log": {
+        "name": "상급 무쇠껍질나무 통나무"
+      },
+      "fine_ashwood_log": {
+        "name": "상급 잿빛나무 통나무"
+      },
+      "fine_elderwood_log": {
+        "name": "상급 고산솔 통나무"
+      },
+      "fine_silverleaf_herb": {
+        "name": "상급 윤광잎 약초"
+      },
+      "fine_goldleaf_herb": {
+        "name": "상급 금빛잎 약초"
+      },
+      "fine_sunpetal_herb": {
+        "name": "상급 태양꽃잎 약초"
+      },
+      "stormreel_fishing_rod": {
+        "name": "폭풍릴 낚싯대"
+      },
+      "tidewrought_fishing_rod": {
+        "name": "조수벼림 낚싯대"
+      },
       "duskwisp_essence": {
         "name": "황혼 위습의 정수"
       },
@@ -9859,6 +9985,12 @@ export const ko_KR: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "마지막 요새의 인장"
+      },
+      "gatherers_cache": {
+        "name": "채집가의 주머니"
+      },
+      "artisans_eye": {
+        "name": "장인의 눈"
       },
       "reins_terrorspark_groundshaker": {
         "name": "테러스파크 시동 열쇠"
@@ -11758,7 +11890,7 @@ export const ko_KR: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "검 말고도 할 수 있는 일",
-        "text": "이스트브룩 사람이라면 누구나 검술 말고도 생업 하나는 익히지, {playerName}. 마을 남서쪽 구리 광산 주변 바위에는 광맥이 있다네. 곡괭이를 들고 직접 광맥 5곳을 캐 오게. 속이려 해도 나는 차이를 안다네.",
+        "text": "이스트브룩 사람이라면 누구나 검술 말고도 생업 하나는 익히지, {playerName}. 마을 남동쪽 구리 광산 주변 바위에는 광맥이 있다네. 곡괭이를 들고 직접 광맥 5곳을 캐 오게. 속이려 해도 나는 차이를 안다네.",
         "completion": "보게나. 광석도 모았고 손에는 굳은살도 박였군. 길을 다닐 때도 채광과 벌목, 약초 채집을 계속하게. 마을에 돌아오면 시장 옆의 마을 집중 게시판과 근처 제작대도 잊지 말고. 원한다면 이 모든 일에서 정당한 생계를 찾을 수 있다네.",
         "objectives": {
           "0": {
@@ -11841,7 +11973,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_supplies": {
         "title": "도난당한 보급품",
-        "text": "도적들이 내 마지막 마차를 털었습니다. 도구, 소금, 이스트브룩 아마가 들었습니다. 남동쪽 야영지에서 보급 상자 4개를 되찾아 주십시오.",
+        "text": "도적들이 내 마지막 마차를 털었습니다. 도구, 소금, 이스트브룩 아마가 들었습니다. 남서쪽 야영지에서 보급 상자 4개를 되찾아 주십시오.",
         "completion": "내 상자들입니다! 흠집도 거의 없군요. 대단합니다.",
         "objectives": {
           "0": {
@@ -12223,7 +12355,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_old_cragmaw": {
         "title": "늙은 크래그모",
-        "text": "산사람들은 정찰병이 찾은 발자국의 주인을 알고 있었습니다. 늙은 크래그모, 제 무리의 세 세대를 먼저 보낸 흉터투성이 폭군 고양이입니다. 추적자들이 내 길로 쏟아지는 것도 그놈 때문입니다, {playerName}. 굴은 남쪽 길 위 서편 산등성이에 있습니다. 동료를 데리고 가서 그 늙은 악마를 처치하십시오.",
+        "text": "산사람들은 정찰병이 찾은 발자국의 주인을 알고 있었습니다. 늙은 크래그모, 제 무리의 세 세대를 먼저 보낸 흉터투성이 폭군 고양이입니다. 추적자들이 내 길로 쏟아지는 것도 그놈 때문입니다, {playerName}. 굴은 남쪽 길 위 동편 산등성이에 있습니다. 동료를 데리고 가서 그 늙은 악마를 처치하십시오.",
         "completion": "마침내 쓰러졌군요. 산사람들은 그 고양이가 성벽보다 오래 살 거라 장담했었습니다. 이제 추적자들은 높은 설원에 머물 겁니다, {playerName}. 내 순찰대도 피 흘리지 않고 길을 걷겠지요. 당신 덕분에 산등성이 전체가 조용해졌습니다.",
         "objectives": {
           "0": {
@@ -12462,7 +12594,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_the_codfather": {
         "title": "대구 대부",
-        "text": "대구 대부는 그저 물고기가 아니라네, {playerName}. 냉혈한 살인자지. 노인들은 놈이 늪지 배회자를 아침으로 먹는다고 맹세하고, 미어펜 과부거미조차 순전한 공포 때문에 딥펜 여울 근처에는 거미줄을 치지 않는다네. 놈이 그 물을 지배하지. 낚싯대를 들고 그 늙은 악마를 제 물가에서 끌어내 오게. 그러면 자네가 가족이 되었다고 인정하지.",
+        "text": "대구 대부는 그저 물고기가 아니라네, {playerName}. 냉혈한 살인자지. 노인들은 놈이 늪지 배회자를 아침으로 먹는다고 맹세하고, 미어펜 과부거미조차 순전한 공포 때문에 딥펜 여울 근처에는 거미줄을 치지 않는다네. 놈이 그 물을 지배하고, 늪물에는 다름 아닌 쇠릴 낚싯대가 필요하다네. 내 계산대에서 팔고 있지. 하나 손에 들고 그 늙은 악마를 제 물가에서 끌어내 오게. 그러면 자네가 가족이 되었다고 인정하지.",
         "completion": "축축한 성자들이시여... 대구 대부 그 자체로군. 저 수염 좀 보게. 펜브리지는 이 한 마리로 일 년 내내 이야깃거리를 삼을 걸세, {playerName}.",
         "objectives": {
           "0": {
@@ -12482,7 +12614,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_nythraxis_graves": {
         "title": "잊힌 자들의 무덤",
-        "text": "북쪽 전장 둘레의 세 오래된 무덤에서 이 표식을 본 적이 있습니다. 알드렌 대장은 동쪽 언덕에, 대사제 말릭은 가운데 부서진 길 근처에, 왕실 암살자 보스는 서쪽 절벽 곁에 묻혀 있습니다. 각 무덤을 만지고 귀 기울이십시오, {playerName}. 죽은 자들은 산 자들이 잊은 것을 기억할지도 모릅니다.",
+        "text": "북쪽 전장 둘레의 세 오래된 무덤에서 이 표식을 본 적이 있습니다. 알드렌 대장은 서쪽 언덕에, 대사제 말릭은 서쪽 가장자리를 따라 더 남쪽에, 왕실 암살자 보스는 동쪽 절벽 곁에 묻혀 있습니다. 각 무덤을 만지고 귀 기울이십시오, {playerName}. 죽은 자들은 산 자들이 잊은 것을 기억할지도 모릅니다.",
         "completion": "알드렌은 충성을 지켰고, 말릭은 죽음을 받아들이지 않았으며, 보스는 누구보다 먼저 위험을 보았습니다. 셋 모두 같은 잊힌 왕을 섬겼습니다.",
         "objectives": {
           "0": {
@@ -12498,7 +12630,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_nythraxis_sealed_crypt": {
         "title": "버려진 납골당",
-        "text": "환영은 서쪽 절벽의 버려진 묘실을 가리킵니다. 그 묘실에 한 왕이 있었다는 옛 전설이 있습니다. 말릭의 의식이 그를 죽지 않는 존재로 뒤틀어 놓은 뒤 쏜피크가 그를 아래에 봉인했을지도 모릅니다. 묘실에 들어가 안에 무엇이 남아 있는지 확인하십시오.",
+        "text": "환영은 동쪽 절벽의 버려진 묘실을 가리킵니다. 그 묘실에 한 왕이 있었다는 옛 전설이 있습니다. 말릭의 의식이 그를 죽지 않는 존재로 뒤틀어 놓은 뒤 쏜피크가 그를 아래에 봉인했을지도 모릅니다. 묘실에 들어가 안에 무엇이 남아 있는지 확인하십시오.",
         "completion": "열쇠돌의 두 조각이 맞물리고, 보스의 일지는 그것들이 봉인한 것을 밝힙니다. 니트락시스 왕의 인장 반지입니다. 일지가 사실이라면 그 반지가 그의 무덤으로 가는 열쇠입니다.",
         "objectives": {
           "0": {
@@ -12540,7 +12672,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_mogger": {
         "title": "모거를 쓰러뜨려라",
-        "text": "모거는 수레를 쪼개고 울타리를 납작하게 만들며 계곡 절반을 비울 만큼 가축을 죽였습니다. 혼자 맞서지 마십시오. 강한 동료 둘과 동쪽 초원으로 가서 그 짐승을 끝내십시오.",
+        "text": "모거는 수레를 쪼개고 울타리를 납작하게 만들며 계곡 절반을 비울 만큼 가축을 죽였습니다. 혼자 맞서지 마십시오. 강한 동료 둘과 서쪽 초원으로 가서 그 짐승을 끝내십시오.",
         "completion": "마침내 모거가 죽었습니다. 이스트브룩의 들판은 더 안전해졌고, 당신은 전할 만한 이야기를 하나 더 안고 계곡을 떠납니다.",
         "objectives": {
           "0": {
@@ -12600,7 +12732,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "다시 이은 실",
-        "text": "결국 다시 내 베틀 앞이로군. 원한은 없다, {playerName}. 다만 실은 자신을 놓아 버린 손을 기억하고, 그것을 다시 잡는 값은 매번 더 길게 재어진다. 서쪽 숲을 뒤덮은 흑거미줄 잠복자들을 솎아 내라. 그 노동이 좋은 실을 다시 만지기 전에 네 손을 가라앉혀 줄 것이다.",
+        "text": "결국 다시 내 베틀 앞이로군. 원한은 없다, {playerName}. 다만 실은 자신을 놓아 버린 손을 기억하고, 그것을 다시 잡는 값은 매번 더 길게 재어진다. 동쪽 숲을 뒤덮은 흑거미줄 잠복자들을 솎아 내라. 그 노동이 좋은 실을 다시 만지기 전에 네 손을 가라앉혀 줄 것이다.",
         "completion": "다시 흔들림이 없군. 가죽세공과 재봉이 주 전공으로 네 손에 돌아왔다. 이번에는 떠돌기 전에 두 번 재어라.",
         "objectives": {
           "0": {
@@ -12610,7 +12742,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "다시 화덕 위로",
-        "text": "이런, 누가 다시 내 냄비 앞에 왔나 보게. 서운한 것 없네, {playerName}, 부엌에는 늘 자리가 있으니까. 다만 걸어 나갈 때마다 외상값이 길어지는 건 자네도 알 테지. 동쪽 초원의 야생 멧돼지를 솎아 오게. 정직한 땀이 첫 번째 재료이고, 그것이 자네 손에 이 일을 다시 일깨워 줄 걸세.",
+        "text": "이런, 누가 다시 내 냄비 앞에 왔나 보게. 서운한 것 없네, {playerName}, 부엌에는 늘 자리가 있으니까. 다만 걸어 나갈 때마다 외상값이 길어지는 건 자네도 알 테지. 서쪽 초원의 야생 멧돼지를 솎아 오게. 정직한 땀이 첫 번째 재료이고, 그것이 자네 손에 이 일을 다시 일깨워 줄 걸세.",
         "completion": "옛 맛이 다시 나는군. 연금술과 요리가 주 전공으로 자네 화덕 위에 돌아왔네. 이번엔 좀 오래 머물게.",
         "objectives": {
           "0": {

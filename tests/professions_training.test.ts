@@ -383,7 +383,7 @@ describe('knowing vs crafting stay orthogonal (no use-gate)', () => {
     expect(meta.craftSkills.engineering ?? 0).toBe(0);
     const recipe = recipeById('recipe_thorium_mining_pick')!; // grandfathered known
     placeAt(sim, pid, stationsOfType(STATIONS, recipe.stationType!)[0].pos);
-    for (let i = 0; i < 4; i++) sim.addItem('thorium_ore', 1, pid);
+    for (let i = 0; i < 4; i++) sim.addItem('fine_iron_ore', 1, pid);
     sim.addItem('mithril_mining_pick', 1, pid);
 
     sim.craftItem(recipe.id, false, pid);

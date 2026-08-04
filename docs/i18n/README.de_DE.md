@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.33.1-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.34.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.de_DE.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -92,7 +92,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and choose Play Offline
 ```
 
-Benenne deinen Charakter, wähle eine der neun Klassen, und du startest in **Eastbrook Vale** (Stufen 1-7), einer Marktstadt, umringt von Knotenpunkten: Wolfsreviere im Norden, Eberwiesen im Osten, die Sableweb-Wälder im Westen, Mirror Lake im Nordwesten, eine von Buddlern verseuchte Kupfergrube im Südwesten und eine zerstörte Kapelle der ruhelosen Toten im Nordosten, mit Gorraks Banditenlager im Südosten. Die Nordstraße erklimmt einen Gebirgspass hinauf nach **Mirefen Marsh** (6-13, Knotenpunkt Fenbridge) und weiter hinauf zu den **Thornpeak Heights** (13-20, Knotenpunkt Highwatch). Der Welt-Seed ist in `src/main.ts` fixiert, daher ist es bei jedem Besuch derselbe Ort.
+Benenne deinen Charakter, wähle eine der neun Klassen, und du startest in **Eastbrook Vale** (Stufen 1-7), einer Marktstadt, umringt von Knotenpunkten: Wolfsreviere im Norden, Eberwiesen im Osten, die Sableweb-Wälder im Westen, Mirror Lake im Nordwesten, eine von Buddlern verseuchte Kupfergrube im Südwesten und eine zerstörte Kapelle der ruhelosen Toten im Nordosten, mit Gorraks Banditenlager im Südosten. Die Nordstraße erklimmt einen Gebirgspass hinauf nach **Mirefen Marsh** (6-13, Knotenpunkt Fenbridge) und weiter hinauf zu den **Thornpeak Heights** (13-20, Knotenpunkt Highwatch). Der Welt-Seed ist in `src/sim/world_seed.ts` fixiert, daher ist es bei jedem Besuch derselbe Ort.
 
 ### Desktop-Apps für Windows, Linux und macOS
 

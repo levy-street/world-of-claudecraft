@@ -21,7 +21,10 @@ import {
   resetClaudiumMutationRateLimits,
   resetRateLimitClock,
   resetRateLimits,
+  resetSeekerSpinVerifyRateLimits,
   resetWalletLinkRateLimits,
+  SEEKER_SPIN_VERIFY_MAX_PER_MINUTE,
+  seekerSpinVerifyRateLimited,
   setRateLimitClock,
   WALLET_LINK_MAX_PER_MINUTE,
   WINDOW_MS,
@@ -47,6 +50,7 @@ function pinClock(start: number) {
 function resetAll() {
   resetRateLimits();
   resetClaudiumMutationRateLimits();
+  resetSeekerSpinVerifyRateLimits();
   resetWalletLinkRateLimits();
   resetAuthFailures();
   resetRateLimitClock();
@@ -150,6 +154,22 @@ describe('walletLinkRateLimited: fused IP-AND-account merge', () => {
       remaining: WALLET_LINK_MAX_PER_MINUTE - 2,
       resetSeconds: 60,
     });
+  });
+});
+
+describe('seekerSpinVerifyRateLimited: upstream RPC isolation', () => {
+  it('caps both the account and IP before another ownership RPC can start', () => {
+    pinClock(5_250_000);
+    for (let i = 0; i < SEEKER_SPIN_VERIFY_MAX_PER_MINUTE; i++) {
+      expect(seekerSpinVerifyRateLimited(reqFrom(`10.3.5.${i + 1}`), 42).allowed).toBe(true);
+    }
+    expect(seekerSpinVerifyRateLimited(reqFrom('10.3.5.250'), 42).allowed).toBe(false);
+
+    resetSeekerSpinVerifyRateLimits();
+    for (let i = 0; i < SEEKER_SPIN_VERIFY_MAX_PER_MINUTE; i++) {
+      expect(seekerSpinVerifyRateLimited(reqFrom('10.3.6.1'), 100 + i).allowed).toBe(true);
+    }
+    expect(seekerSpinVerifyRateLimited(reqFrom('10.3.6.1'), 999).allowed).toBe(false);
   });
 });
 

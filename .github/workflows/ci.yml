@@ -39,23 +39,29 @@ concurrency:
 #                 job's wall time is the slowest shard, not the whole suite.
 #
 #   pr-checks     the PR tier's serialized checks (i18n freshness + coverage
-#                 summary, malware gate, game/admin typecheck, env/server/client
+#                 summary, malware gate, game/admin typecheck, env/server/bot/client
 #                 builds), parallel with pr-gate. Same triggers as pr-gate.
 #
-#   release-gate  full 21-locale TEST job. Runs on release/** pushes and on the
-#                 release-to-main PR merge result, with job-level
-#                 I18N_RELEASE_TIER=1 so every shard is release-tier. A merely
-#                 `pending` (untranslated) key cannot survive this gate. Same
-#                 8-shard matrix as pr-gate; tests only (no builds).
+#   release-gate  full TEST job for a release ref. Runs on release/** pushes and on
+#                 the release-to-main PR merge result. Runs at PR tier (no
+#                 I18N_RELEASE_TIER), same 8-shard matrix as pr-gate, tests only
+#                 (no builds), so a red shard here always means a real regression.
+#
+#   release-i18n  the release TIER, alone: the suites that read
+#                 I18N_RELEASE_TIER, run under it, unsharded. A merely `pending`
+#                 (untranslated) key cannot survive this job. Expected red until
+#                 the release-time locale fill, which is exactly why it is its own
+#                 job: on release-gate it used to mask genuine failures (#2820).
 #
 #   release-checks the release tier's serialized checks (same step list as
 #                 pr-checks), parallel with release-gate. Same triggers as
 #                 release-gate. Does not set I18N_RELEASE_TIER (freshness,
-#                 malware, typecheck, and builds do not need it; the test job
+#                 malware, typecheck, and builds do not need it; release-i18n
 #                 alone carries the tier flag).
 #
-# The release tier is a superset: its `npm test` runs every PR-tier check plus the
-# release-only ones; typecheck and the three builds live in release-checks.
+# The release tier is a superset: release-gate runs every PR-tier check and
+# release-i18n adds the release-only assertions on top; typecheck and the four
+# builds live in release-checks.
 #
 # Path filters (D10): a cheap `changes` job classifies pull_request diffs as
 # code vs docs-only. Docs/markdown/screenshot-only PRs keep lint (and any other
@@ -405,24 +411,35 @@ jobs:
       - name: Build server
         run: npm run build:server
 
+      # The Discord bot bundles from the same tree and ships in the same image
+      # (Dockerfile runs build:bot), so a broken bot bundle must fail here rather
+      # than on the production host during docker compose up --build.
+      - name: Build Discord bot
+        run: npm run build:bot
+
       - name: Build client
         run: npm run build
 
-  # The release tier is two parallel jobs: release-gate runs the full 21-locale
-  # test suite while release-checks runs the serialized checks, so the release
-  # critical path is max(tests, checks) instead of tests-then-builds on shard 1.
+  # A release ref runs THREE parallel jobs: release-gate (this one) runs the test
+  # suite at PR tier, release-i18n runs the release TIER over the suites that read
+  # the flag, and release-checks runs the serialized checks, so the release critical
+  # path is max(tests, tier, checks) instead of tests-then-builds on shard 1.
   # Locally `npm run gate` (scripts/gate.mjs) still runs the SAME combined step
-  # list serially with ONE full unsharded vitest by design; keep that script's
-  # step list in sync when adding or removing a step in either job.
+  # list serially with ONE full unsharded vitest by design, plus the same dedicated
+  # release-tier step; keep that script's step list in sync when adding or removing
+  # a step in any of the three jobs.
   release-gate:
-    name: Release gate (full 21-locale)
+    # NOT "21-locale": since #2820 the 21-locale assertions live in release-i18n, and
+    # the label is what an operator reads in the checks list to tell the two reds apart.
+    name: Release gate (tests)
     if: (github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))
     runs-on: ubuntu-latest
 
-    # Job-level: every matrix shard must see the release tier. Moving this onto
-    # a single step would silently run the other shards at PR tier (D8).
-    env:
-      I18N_RELEASE_TIER: '1'
+    # No I18N_RELEASE_TIER here BY DESIGN (D8 revised, issue #2820). This job runs
+    # the suite at PR tier so a red shard always means a real regression. The
+    # release tier lives in the release-i18n job below, over the tier-sensitive
+    # suites only, so "the locale fill has not run yet" can never mask a broken
+    # test the way it did when one job carried both signals.
 
     # Same 8-shard matrix as pr-gate. fail-fast stays off so shards report
     # independently. Serialized checks live in release-checks, not here.
@@ -456,12 +473,52 @@ jobs:
       # the freshness diff lives in release-checks.
       # Full Sim suites are CPU-heavy. Keep each shard at half the runner's
       # available cores, matching the bounded local gate.
-      - name: Run tests (release tier - 21-locale + empty-pending, shard ${{ matrix.shard }} of 8)
+      - name: Run tests (PR tier, shard ${{ matrix.shard }} of 8)
         run: npm test -- --shard=${{ matrix.shard }}/8 --maxWorkers="$(node -p 'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))')"
+
+  # The release tier, alone (issue #2820). Only the suites whose assertions change
+  # under the flag run here, so this job answers exactly one question: has the
+  # 21-locale fill been done? It is EXPECTED to be red for most of a cycle, and that
+  # is the point: it is red on its own name, next to a release-gate that stays green
+  # unless code is genuinely broken. Unsharded and seconds long (five files), so it
+  # costs a runner slot, not runner minutes. The file list is pinned three ways
+  # (this command, I18N_RELEASE_TIER_SUITES in scripts/lib/gate_steps.mjs, and a scan
+  # of tests/ for readers of the flag) by tests/release_i18n_tier_coverage.test.ts,
+  # so a new tier-sensitive suite cannot silently stop running under the tier.
+  release-i18n:
+    name: Release i18n (21-locale fill)
+    if: (github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))
+    runs-on: ubuntu-latest
+
+    env:
+      I18N_RELEASE_TIER: '1'
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 26
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # `npm test` regenerates the i18n artifacts itself (pretest), which these
+      # suites read.
+      - name: Run i18n release-tier suites (21-locale + empty-pending)
+        run: npm test -- tests/deed_i18n.test.ts tests/i18n_status_registry.test.ts tests/i18n_t_behavior.test.ts tests/localization_coverage.test.ts tests/localization_fixes.test.ts
 
   # Runs in parallel with release-gate: same if-condition, no needs edge in
   # either direction. Does not set I18N_RELEASE_TIER; the checks here do not
-  # depend on it, and the test job alone owns the tier flag.
+  # depend on it, and the release-i18n job alone owns the tier flag.
   release-checks:
     name: Release checks (freshness, typecheck, builds)
     if: (github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))
@@ -527,6 +584,11 @@ jobs:
 
       - name: Build server
         run: npm run build:server
+
+      # Same reason as the PR-tier job: the bot bundles from this tree and ships
+      # in the same image, so a broken bot bundle fails here, not on the host.
+      - name: Build Discord bot
+        run: npm run build:bot
 
       - name: Build client
         run: npm run build

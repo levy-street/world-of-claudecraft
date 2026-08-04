@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { DELVES, NPCS, STATIONS } from '../src/sim/data';
+import { DELVES, NPCS, QUESTS, STATIONS } from '../src/sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../src/sim/deeds';
 import type { Entity } from '../src/sim/types';
 import { craftNameText } from '../src/ui/char_window';
@@ -30,7 +30,11 @@ function ordinaryNpcId(): string {
   return entry.id;
 }
 
-function harness(entity = npc(10, ordinaryNpcId()), questState = 'available') {
+function harness(
+  entity = npc(10, ordinaryNpcId()),
+  questState = 'available',
+  identityExtra: Record<string, unknown> = {},
+) {
   document.body.innerHTML = '';
   const element = document.createElement('div');
   element.id = 'quest-dialog';
@@ -60,8 +64,11 @@ function harness(entity = npc(10, ordinaryNpcId()), questState = 'available') {
       switchCount: 0,
       amendsProgress: 0,
       amendsRequired: 5,
+      ...identityExtra,
     },
     questState: vi.fn(() => questState),
+    // The quest-marker inputs the gossip list reads (the phase 23 classifier).
+    questsDone: new Set<string>(),
     targetEntity,
     interact,
     acceptLinkedQuest,
@@ -94,6 +101,7 @@ function harness(entity = npc(10, ordinaryNpcId()), questState = 'available') {
   const openCardDuel = vi.fn();
   const openTrain = vi.fn();
   const openUnbind = vi.fn();
+  const openCrafting = vi.fn();
   const onOpenChange = vi.fn();
   const controller = new QuestDialogController({
     element,
@@ -129,6 +137,7 @@ function harness(entity = npc(10, ordinaryNpcId()), questState = 'available') {
     openCardDuel,
     openTrain,
     openUnbind,
+    openCrafting,
     onOpenChange,
     voice,
   });
@@ -159,6 +168,7 @@ function harness(entity = npc(10, ordinaryNpcId()), questState = 'available') {
     openCardDuel,
     openTrain,
     openUnbind,
+    openCrafting,
     onOpenChange,
   };
 }
@@ -192,6 +202,84 @@ describe('QuestDialogController', () => {
     expect(test.release).toHaveBeenCalledWith(true);
     expect(test.onOpenChange).toHaveBeenLastCalledWith(false);
     expect(test.controller.isOpen).toBe(false);
+  });
+
+  it('renders a completed repeatable as the blue row with the repeatable aria', () => {
+    // The phase 23 gossip arm over the real cadenced work order. Before the
+    // first completion the row keeps the first-offer gold glyph and the
+    // available aria (acceptance (b)'s negative); once questsDone carries the
+    // id, the glyph class flips to quest-repeat and the aria names the
+    // repeatable state (acceptance (e)).
+    const workOrder = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
+    if (!workOrder) throw new Error('expected a cadenced work order');
+    const giver = npc(30, workOrder.giverNpcId);
+    (giver as unknown as { questIds: string[] }).questIds = [workOrder.id];
+
+    const fresh = harness(giver, 'available');
+    fresh.controller.open(30);
+    const freshRow = fresh.element.querySelector(`[data-quest="${workOrder.id}"]`);
+    if (!freshRow) throw new Error('expected the gossip quest row');
+    expect(freshRow.innerHTML).toContain('<span class="gold">!</span>');
+    expect(freshRow.getAttribute('aria-label')).toBe(
+      t('questUi.dialog.availableQuestAria', { name: `quest:${workOrder.id}` }),
+    );
+
+    const giver2 = npc(31, workOrder.giverNpcId);
+    (giver2 as unknown as { questIds: string[] }).questIds = [workOrder.id];
+    const done = harness(giver2, 'available');
+    (done.world as unknown as { questsDone: Set<string> }).questsDone.add(workOrder.id);
+    done.controller.open(31);
+    const doneRow = done.element.querySelector(`[data-quest="${workOrder.id}"]`);
+    if (!doneRow) throw new Error('expected the gossip quest row');
+    expect(doneRow.innerHTML).toContain('<span class="quest-repeat">!</span>');
+    expect(doneRow.getAttribute('aria-label')).toBe(
+      t('questUi.dialog.repeatableQuestAria', { name: `quest:${workOrder.id}` }),
+    );
+
+    // Inside the cadence window the dialog lists NO row for the order (it is
+    // not offerable), exactly the pre-phase dialog: the dimmed marker is an
+    // overhead/map statement, never a dead gossip button.
+    const giver3 = npc(32, workOrder.giverNpcId);
+    (giver3 as unknown as { questIds: string[] }).questIds = [workOrder.id];
+    const blocked = harness(giver3, 'unavailable');
+    (blocked.world as unknown as { questsDone: Set<string> }).questsDone.add(workOrder.id);
+    (
+      blocked.world.craftingIdentity as unknown as { cadenceBlockedQuests: string[] }
+    ).cadenceBlockedQuests = [workOrder.id];
+    blocked.controller.open(32);
+    expect(blocked.element.querySelector(`[data-quest="${workOrder.id}"]`)).toBeNull();
+  });
+
+  it('surfaces a lapsed work order in an OPEN dialog through refreshIfChanged', () => {
+    // A cadence lapse is a pure tick-threshold crossing: the state re-opens
+    // with NO quest event to repaint through, while the dimmed map marker's
+    // "Available again soon" tag walks the player to this very NPC. The
+    // slowHud refreshIfChanged watch must rebuild the row set in place,
+    // and an unchanged signature must never rebuild the focus-trapped DOM.
+    const workOrder = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
+    if (!workOrder) throw new Error('expected a cadenced work order');
+    const giver = npc(33, workOrder.giverNpcId);
+    (giver as unknown as { questIds: string[] }).questIds = [workOrder.id];
+    const test = harness(giver, 'unavailable');
+    (test.world as unknown as { questsDone: Set<string> }).questsDone.add(workOrder.id);
+    test.controller.open(33);
+    expect(test.element.querySelector(`[data-quest="${workOrder.id}"]`)).toBeNull();
+
+    // Unchanged signature: the same DOM nodes survive (identity, not HTML
+    // equality, since a rebuild would produce identical markup).
+    const anchorNode = test.element.querySelector('[data-close]');
+    test.controller.refreshIfChanged();
+    expect(test.element.querySelector('[data-close]')).toBe(anchorNode);
+
+    // The window lapses: the quest state re-opens and the watch repaints.
+    (test.world.questState as ReturnType<typeof vi.fn>).mockReturnValue('available');
+    test.controller.refreshIfChanged();
+    const row = test.element.querySelector(`[data-quest="${workOrder.id}"]`);
+    if (!row) throw new Error('expected the lapsed work order row without close/reopen');
+    expect(row.innerHTML).toContain('<span class="quest-repeat">!</span>');
+    expect(row.getAttribute('aria-label')).toBe(
+      t('questUi.dialog.repeatableQuestAria', { name: `quest:${workOrder.id}` }),
+    );
   });
 
   it('routes bankers and chroniclers through authoritative interaction without gossip', () => {
@@ -249,6 +337,26 @@ describe('QuestDialogController', () => {
 
     expect(ready.turnInQuest).toHaveBeenCalledWith('q_wolves');
     expect(ready.reportTelemetry).toHaveBeenCalledWith('quest_turnin', { timeMs: 0 });
+  });
+
+  it('the preview promises the REMEMBERED hobby when the identity carries one', () => {
+    // The controller must pass identity.questedHobbies through to the view:
+    // with the pass-through dropped, the preview silently reverts to the
+    // skill default, the exact defect the mirror exists to fix.
+    const darva = npc(33, 'forgemistress_darva');
+    darva.questIds = ['q_prof_attune_smith'];
+    const test = harness(darva, 'available', {
+      questedHobbies: { 'weaponcrafting+armorcrafting': 'tailoring' },
+    });
+    test.controller.open(darva.id);
+    test.element.querySelector<HTMLButtonElement>('[data-quest="q_prof_attune_smith"]')?.click();
+    const select = test.element.querySelector<HTMLSelectElement>('[data-profession-selection]');
+    const preview = test.element.querySelector<HTMLElement>('[data-profession-preview]');
+    if (!select) throw new Error('profession selector missing');
+    select.value = 'weaponcrafting+armorcrafting';
+    select.dispatchEvent(new Event('change'));
+    expect(preview?.textContent).toContain('Tailoring');
+    expect(preview?.textContent).not.toContain('Leatherworking');
   });
 
   it('previews and dispatches the selected profession attunement target', () => {
@@ -490,13 +598,54 @@ describe('QuestDialogController', () => {
     expect(plain.element.querySelector('[data-unbind]')).toBeNull();
   });
 
-  it('does not leak Train or Unbind into a world with no authored stations', () => {
+  it('a station master offers the Crafting shortcut and routes its craft to openCrafting', () => {
+    // The Eastbrook forge master: a fresh viewer (no craft skills) resolves
+    // to weaponcrafting, the first forge craft in declaration order. The aria
+    // names the resolved craft (the {craft} placeholder is substituted).
+    const forge = STATIONS.find((station) => station.type === 'forge');
+    if (!forge) throw new Error('forge station fixture not found');
+    const master = harness(npc(51, forge.masterNpcId));
+    master.controller.open(51);
+    const button = master.element.querySelector<HTMLButtonElement>('[data-crafting]');
+    expect(button).not.toBeNull();
+    const aria = button?.getAttribute('aria-label') ?? '';
+    expect(aria).toContain(craftNameText('weaponcrafting'));
+    expect(aria).not.toContain('{craft}');
+    button?.click();
+    expect(master.openCrafting).toHaveBeenCalledWith('weaponcrafting');
+    expect(master.release).toHaveBeenCalledWith(false);
+  });
+
+  it('the Crafting shortcut follows the viewer stronger craft at the two-craft forge', () => {
+    const forge = STATIONS.find((station) => station.type === 'forge');
+    if (!forge) throw new Error('forge station fixture not found');
+    const master = harness(npc(52, forge.masterNpcId), 'available', {
+      craftSkills: { weaponcrafting: 5, armorcrafting: 30 },
+    });
+    master.controller.open(52);
+    master.element.querySelector<HTMLButtonElement>('[data-crafting]')?.click();
+    expect(master.openCrafting).toHaveBeenCalledWith('armorcrafting');
+  });
+
+  it('a non-master NPC renders no Crafting shortcut', () => {
+    const masters = new Set(STATIONS.map((station) => station.masterNpcId));
+    const plainId = Object.values(NPCS).find(
+      (definition) => !definition.banker && !masters.has(definition.id),
+    )?.id;
+    if (!plainId) throw new Error('non-master NPC fixture not found');
+    const plain = harness(npc(53, plainId));
+    plain.controller.open(53);
+    expect(plain.element.querySelector('[data-crafting]')).toBeNull();
+  });
+
+  it('does not leak Train, Crafting, or Unbind into a world with no authored stations', () => {
     const master = harness(npc(50, STATIONS[0].masterNpcId));
     (master.world as unknown as { stationPlacements: typeof STATIONS }).stationPlacements = [];
 
     master.controller.open(50);
 
     expect(master.element.querySelector('[data-train]')).toBeNull();
+    expect(master.element.querySelector('[data-crafting]')).toBeNull();
     expect(master.element.querySelector('[data-unbind]')).toBeNull();
   });
 

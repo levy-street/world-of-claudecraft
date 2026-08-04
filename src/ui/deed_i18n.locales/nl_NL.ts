@@ -825,6 +825,10 @@ export const table: DeedLocaleTable = {
     name: 'Heroïsch: Het Wildhartbekken',
     desc: 'Versla Zulgar, Stem van het Bekken, in het Wildhartbekken op Heroïsche moeilijkheidsgraad.',
   },
+  chr_peaks_gatherer: {
+    name: 'Oogst van de Hoogten',
+    desc: 'Oogst een ertsader, een houtopstand en een kruidenveldje in Doorntop-Hoogten.',
+  },
   chr_marsh_rares_ii: {
     name: 'De Veelvraat, Verrekend',
     desc: 'Dood Wroetkaak de Veelvraat, een vierde naamdragende verschrikking van Slijkveenmoeras die buiten de eerste telling viel.',
@@ -840,5 +844,29 @@ export const table: DeedLocaleTable = {
   chr_hollow_rares: {
     name: 'De Kudde Vergeet Niet',
     desc: 'Dood de Oude Mergschelp en Aurelhorn, Eerste van de Kudde, de twee rondzwervende zeldzame bazen van de Sluierholte.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Overvloed van het Veenland',
+    desc: 'Oogst een ertsader, een houtopstand en een kruidenveldje in het Wilgenveen.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Rimpelingen in de Liliemoerassen',
+    desc: 'Vang een vis in de wateren van het Wilgenveen.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Oogst op de Landtong',
+    desc: 'Oogst een ertsader, een houtopstand en een kruidenveldje op de Windkam.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Een Lijn in de Spiegelplas',
+    desc: 'Vang een vis in de wateren van de Windkam.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Eilandproviand',
+    desc: 'Oogst een ertsader, een houtopstand en een kruidenveldje op de Verrekust.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Wat de Meeuwen Weten',
+    desc: 'Vang een vis in de wateren van de Verrekust.',
   },
 };

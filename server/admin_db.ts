@@ -1031,6 +1031,57 @@ export async function listCharacters(
   };
 }
 
+// R35 GM professions inspector: one character's identity plus its raw state
+// blob (JSONB, already parsed by pg). The handler overlays a live
+// serializeCharacter snapshot when the character is online, then shapes both
+// through the pure characterProfessionsSheet normalizer. `state` is
+// UNDEFINED when the caller suppressed the fetch (includeState false, the
+// live path) and null/object when fetched: undefined-vs-null is what keeps
+// "not fetched" distinguishable from "never entered" (SQL NULL blob), the
+// distinction characterProfessionsSheetFromRow's emptyBlob derivation rides.
+export interface AdminCharacterProfessionsRow {
+  id: number;
+  name: string;
+  class: string;
+  level: number;
+  accountId: number;
+  username: string;
+  state: unknown;
+  updatedAt: string;
+}
+
+export async function characterProfessionsRow(
+  characterId: number,
+  includeState = true,
+): Promise<AdminCharacterProfessionsRow | null> {
+  // includeState false when the caller holds a LIVE serializeCharacter
+  // snapshot: the stored blob would be discarded, and `state` is the widest
+  // column in the schema (a TOASTed detoast for nothing on the shared box).
+  const res = await pool.query(
+    `SELECT c.id, c.name, c.class, c.level, c.account_id, a.username,
+            CASE WHEN $2::boolean THEN c.state ELSE NULL END AS state,
+            c.updated_at
+     FROM characters c
+     JOIN accounts a ON a.id = c.account_id
+     WHERE c.id = $1`,
+    [characterId, includeState],
+  );
+  const r = res.rows[0];
+  if (!r) return null;
+  return {
+    id: r.id,
+    name: r.name,
+    class: r.class,
+    level: r.level,
+    accountId: r.account_id,
+    username: r.username,
+    // Honest suppression: the CASE arm returns SQL NULL when the fetch was
+    // skipped, which would be indistinguishable from a genuinely NULL blob.
+    state: includeState ? r.state : undefined,
+    updatedAt: r.updated_at,
+  };
+}
+
 export interface AccountDetail {
   id: number;
   username: string;

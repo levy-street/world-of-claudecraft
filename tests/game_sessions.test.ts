@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
 import { MECH_CHROMAS } from '../src/sim/content/skins';
 import { MOBS } from '../src/sim/data';
@@ -60,6 +60,7 @@ vi.mock('../server/db', () => ({
 }));
 
 import { saveCharacterAndMarketState, saveCharacterState } from '../server/db';
+import { drainLinkChanges } from '../server/discord_link_changes';
 import { type ClientSession, GameServer } from '../server/game';
 import {
   MSG_ABUSE_SECOND_DROP_FLOOR,
@@ -79,6 +80,12 @@ function expectJoined(result: ClientSession | { error: string }): ClientSession 
   if ('error' in result) throw new Error(result.error);
   return result;
 }
+
+// detectActivity writes into the module-global linked-member change feed, so start
+// every test from an empty queue.
+beforeEach(() => {
+  drainLinkChanges();
+});
 
 describe('GameServer sessions', () => {
   it('keeps profiler invulnerability gated and enables it idempotently', () => {
@@ -804,6 +811,23 @@ describe('GameServer sessions', () => {
     await server.leave(session, 'test');
 
     expect(closePlaySession).toHaveBeenCalledWith(77, 5);
+  });
+
+  it('enqueues a linked-member flex change for every levelup, not just the milestone ones', async () => {
+    const server = new GameServer();
+    const session = expectJoined(server.join(fakeWs(), 25, 205, 'Feedlevel', 'warrior', null));
+
+    // Level 7 is neither the level-5 tracking arm nor the MAX_LEVEL activity card:
+    // the feed cares about all of them, because the flair the bot renders reads the
+    // character's level directly.
+    (server as any).detectActivity([{ type: 'levelup', level: 7, pid: session.pid }]);
+
+    expect(drainLinkChanges()).toEqual([{ accountId: 25, kinds: ['flex'] }]);
+
+    // A levelup for a pid with no session (a bot, or one that just left) has no
+    // account to report.
+    (server as any).detectActivity([{ type: 'levelup', level: 8, pid: 999_999 }]);
+    expect(drainLinkChanges()).toEqual([]);
   });
 
   it('seeds session metrics from the loaded character level', async () => {

@@ -360,9 +360,13 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned after the renderer lifecycle and profile-aware
-      // Eastbrook runtime inputs changed. No measured capture was retaken.
-      fingerprint: '2e1377687f4e31d7d71cfcd8c50604dc2124358896abdddeb5b6ff1db92b9534',
+      // Deliberately re-pinned: src/render/renderer.ts is the rendererIntegration
+      // leaf of this composite, and merging the live graphics rebuild (context
+      // recycle plus profile-aware Eastbrook runtime inputs) with the base's
+      // shapeshift-form compile gate (#2571) yields a renderer neither prior pin
+      // saw, so the leaf's sha256 and the composite fingerprint move again. No
+      // GLB source fingerprint moved and no capture was retaken.
+      fingerprint: 'd4b7a796ea116fb0dffa9c69cc5b18906e2b1d788f36f216e733837c5d58d816',
       components: {
         captureContract: {
           id: 'polish-v2',

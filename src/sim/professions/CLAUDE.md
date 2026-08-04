@@ -18,9 +18,32 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   VIEWER: two players can see the same node differently.
 - `gather_events.ts`: the per-node-type rare events (always signed, five
   times yield) and the zone soft-broadcast `emitToZonePlayers`.
+- `node_persist.ts`: pure leaf persisting per-player node readiness across
+  logout as remaining-time deltas (the `src/sim/cooldown_persist.ts` scheme;
+  D6). `serializeNodeReadiness` writes only still-running timers;
+  `applyNodeReadiness` re-anchors on load, filtered to live node ids and
+  clamped to one respawn (the anti-tamper arm is load-side on purpose).
+- `material_grades.ts`: the fine-material axis. Pure leaf owning the nine
+  base/`fine_` grade pairs, the ZONE tier ladder the upgrade compares against
+  (NOT `material_tier.ts`'s price band, which is a different ladder and puts
+  the Eastbrook yields at 0), and the downward substitution planner the craft
+  and quest consumption paths share. Upgrade needs the tool STRICTLY above the
+  material AND a vein carrying that tier; substitution runs downward only.
 - `fishing.ts`: the fourth gathering row (bite delay, reel window,
-  `FISHING_TABLES_BY_BAND`); hidden per-cast state lives in three transient
-  Entity fields, never wired, never persisted.
+  `FISHING_TABLES_BY_BAND`, and since R19 the gain model: the schedule half
+  `fishingCatchGain` composed with the water's teaching ceiling in
+  `fishingCatchGainAt`, the ONLY function a grant site may call); the TWO
+  sessions' hidden per-cast state lives in
+  transient Entity fields (`gatherCastNodeId`, `gatherCastToolRarity`, and
+  the R40 consent `gatherCastEffectConfirmed` for the gather cast;
+  `fishBiteAtTick`, `fishReelDeadlineTick`,
+  `fishCastZoneId` for fishing), never wired, never persisted, all cleared
+  together on every cast exit path.
+- `session_teardown.ts`: the ONE displacement cancel for a live gather or
+  fishing session (`cancelProfessionSessionOnDisplacement`), called from every
+  hard-displacement site: the sim and server teleport paths, the Vale Cup
+  pitch eject and kickoff placements, and the `/follow` zone-line crossing;
+  gated on `isNonSpellCast`, delegates to `ctx.cancelCast`.
 - `wheel.ts`: flat per-craft skills (`CraftSkills`, `gainCraftSkill`,
   `tierForSkill`/`tierCapability`, the four-state `tierProgressMultiplier`
   curve, perk-eligibility reads).
@@ -35,6 +58,12 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   `archetypeCeilingFor`/`craftCeiling`, `getHobbyCraft`, amends-gated
   switching via `requiredAmendsProgress`). The sim-side ceiling arm is
   `archetypeCeilingFor` ALONE, never `craftCeiling`.
+- `hobby_memory.ts`: the per-pair record of hobbies chosen through the
+  hobby-switch quest (`normalizeHobbyMemoryOnLoad`, `recordQuestedHobby`,
+  `applyPairTransitionHobbyMemory`), so a make-amends RETURN restores the
+  quested hobby instead of re-deriving the skill default. Applied at all three
+  pair-transition entry points beside `applyPairTransitionTierMail`; it reads
+  `archetype.ts`'s pair vocabulary, so `archetype.ts` must never read it back.
 - `combo_eligibility.ts`: the shared attunement gate combo recipes consult in
   both hosts (deny not_attuned / wrong_pair / tier_unmet).
 - `enchanting.ts` / `disenchant_reagents.ts` / `salvage.ts`: disenchant
@@ -57,8 +86,40 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
 - `tools.ts` / `stations.ts` / `focus.ts` / `mobile_station.ts`: pure-leaf
   gates and bonuses (gather-tool tier, per-type crafting stations
   (superseding the retired level-20 hub), town focus allocation, field
-  crafting station). Tool effects/charges in `tools.ts` are PARKED dormant:
-  do not wire, do not delete.
+  crafting station). Tool effects in `tools.ts` are LIVE end to end and this
+  leaf owns every DECISION: `resolveSlotToolEffect` is the one mint
+  authority (it also picks WHICH crafted charm copy the mint consumes, whose
+  signer becomes the slot's `craftedBy`) and `resolveRechargeToolEffect`
+  prices and sizes a refill (R30 fill from the tool held now, R39 material
+  identity, R47 price rung floored at the slot's own ceiling). The R9 slot
+  policy (`slotToolEffectRefused`) keeps Springback and fishing slots
+  refused until their arms have real behavior.
+- `tool_effect_actions.ts`: the slot and recharge COMMAND BODIES behind the
+  seam (`Sim` keeps thin delegates). Everything stateful lives here and, for
+  those TWO, every decision in the `tools.ts` leaf above: resolve first, then
+  consume the price (the charm copy by index, the arcane materials), write the
+  slot, and report through the one text-free personal `toolEffectResult` event
+  so no refusal is silent. Draw-free in every arm. A third export, the
+  admin-only `restoreToolEffectSlotAction` (R35), is deliberately NOT a
+  command body and has NO `Sim` delegate: it is the server admin runtime's GM
+  restore (a charm-free mint the free-grant incident bans from every
+  player-reachable path), callable only from `server/game.ts`, refusing an
+  intact live slot (`already_slotted`) and pinned unreachable by
+  `tests/professions_admin_restore.test.ts`. It is also the one arm that does
+  NOT route through `resolveSlotToolEffect`: it carries its own copy of the
+  shared gate chain, which the same test pins tuple-for-tuple against the
+  resolver so the two cannot drift.
+- `fishing_zones.ts`: the per-zone rod-tier ladder (`rodTierRequiredForZone`,
+  water gated by the WATER's zone) the cast gate and the vendor rows read;
+  since R19 the SAME column also caps how far each water teaches
+  (`fishingTeachingCeilingFor` in `fishing.ts` reads it at the gain site).
+- `wield_gate.ts`: the R22 land-tool USE requirements, a pure leaf like
+  `tools.ts` (items table as a parameter, no player-state import): the one
+  frozen threshold table (40/70/85/100), the wield-filtered bag scans the
+  harvest gate, grade resolution, corpse premium arm, and every client
+  mirror read, and the denial-naming helpers. The ownership scans in
+  `tools.ts` survive for the R47/R30 price family ONLY, with banners
+  saying so.
 - `mastery_reset.ts`: the one-time skill reset behind `masteryResetApplied`;
   `normalizeArchetypeState` must keep running BEFORE `applyMasteryReset`
   (the single load-time reader of pre-reset values).
@@ -141,7 +202,9 @@ hosts, plus the pinned callback-name list in `tests/sim_context.test.ts`.
   `gatheringProficiency` is the current key (preferred on read, always
   written); `professions` is the legacy pre-rename key, still dual-written on
   every save for downgrade back-compat and read only as a fallback when
-  `gatheringProficiency` is absent. Craft-side state persists as separate optional `CharacterState`
+  `gatheringProficiency` is absent. `nodeHarvestCooldowns` is the per-player
+  node-readiness record (nodeId to remaining seconds, zero-default omission,
+  loaded through `node_persist.ts` `applyNodeReadiness`). Craft-side state persists as separate optional `CharacterState`
   fields (`craftSkills`, `knownRecipes`, `archetype`, `equipmentInstance` for
   enchanted copies); see the comments on `CharacterState` in `sim.ts`.
 - The facet's member list is pinned by `tests/world_api_parity.test.ts`

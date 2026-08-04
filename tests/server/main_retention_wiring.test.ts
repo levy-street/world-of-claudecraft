@@ -20,10 +20,11 @@ describe('retention sweep wiring in server/main.ts', () => {
 
   it('runs no retention DELETE before the server is listening', () => {
     // No retention prune may ever block or precede boot again: the old one-shot
-    // boot prunes held boot hostage to an unbounded DELETE on a large table.
-    // ALL nine prune call-forms plus the fold are named: a prune MOVED (not
-    // copied) to a pre-listen one-shot keeps its exactly-once count and only
-    // this list catches it.
+    // boot prunes held boot hostage to an unbounded DELETE on a large table
+    // (and v0.32.0 shipped exactly that shape again for unstuck_reports, which
+    // this list caught at the release merge). EVERY prune call-form plus the
+    // fold is named: a prune MOVED (not copied) to a pre-listen one-shot keeps
+    // its exactly-once count and only this list catches it.
     const preListen = MAIN.slice(0, MAIN.indexOf('server.listen('));
     for (const call of [
       'pruneChatLogs(',
@@ -37,6 +38,8 @@ describe('retention sweep wiring in server/main.ts', () => {
       'pruneSitePresenceSessionsBatch(',
       'prunePlaySessionsBatch(',
       'pruneAccountIpAssociationsBatch(',
+      'pruneUnstuckReports(',
+      'pruneUnstuckReportsBatch(',
       'foldOnlinePeak(',
       'prunePasswordResetRequestsBatch(',
       'pruneEmailChangeRequestsBatch(',
@@ -74,6 +77,7 @@ describe('retention sweep wiring in server/main.ts', () => {
       'pruneSitePresenceSessionsBatch(',
       'prunePlaySessionsBatch(',
       'pruneAccountIpAssociationsBatch(',
+      'pruneUnstuckReportsBatch(',
       'foldOnlinePeak(',
       'distinctOnlineSampleRealms(',
       'dailyRewardEventsCutoffDay(',
@@ -126,6 +130,7 @@ describe('retention sweep wiring in server/main.ts', () => {
     expect(MAIN).toContain(
       'pruneAccountIpAssociationsBatch(pool, config.accountIpAssociationRetentionDays, n)',
     );
+    expect(MAIN).toContain('pruneUnstuckReportsBatch(pool, config.unstuckReportRetentionDays, n)');
     expect(MAIN).toContain(
       'prunePasswordResetRequestsBatch(config.passwordResetRequestRetentionDays, n)',
     );

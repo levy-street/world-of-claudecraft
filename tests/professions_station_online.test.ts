@@ -105,7 +105,7 @@ describe('station gate over the live GameServer wire (session routing)', () => {
     const sc = joinServer(server, fcCraft, 91, 'Fieldsmith');
     joinServer(server, fcOther, 92, 'Bystander');
     placeAt(server, sc.pid, FIELD_POS);
-    server.sim.addItem('thorium_ore', 4, sc.pid);
+    server.sim.addItem('fine_iron_ore', 4, sc.pid);
     server.sim.addItem('mithril_mining_pick', 1, sc.pid);
 
     cmd(server, sc, { cmd: 'craft_item', recipe: RECIPE_ID });
@@ -124,7 +124,7 @@ describe('station gate over the live GameServer wire (session routing)', () => {
     ]);
     expect(craftResultsOf(fcOther.sent)).toEqual([]);
     // No side effect on denial: reagents untouched, nothing produced.
-    expect(server.sim.countItem('thorium_ore', sc.pid)).toBe(4);
+    expect(server.sim.countItem('fine_iron_ore', sc.pid)).toBe(4);
     expect(server.sim.countItem('mithril_mining_pick', sc.pid)).toBe(1);
     expect(server.sim.countItem('thorium_mining_pick', sc.pid)).toBe(0);
   });
@@ -136,7 +136,7 @@ describe('station gate over the live GameServer wire (session routing)', () => {
     placeAt(server, sc.pid, FIELD_POS);
     const meta = metaOf(server, sc.pid);
     meta.craftSkills.engineering = 75; // specialized: placement is gated on it
-    server.sim.addItem('thorium_ore', 4, sc.pid);
+    server.sim.addItem('fine_iron_ore', 4, sc.pid);
     server.sim.addItem('mithril_mining_pick', 1, sc.pid);
 
     // The wire command must land in the sim's transient per-player slot: this
@@ -151,10 +151,10 @@ describe('station gate over the live GameServer wire (session routing)', () => {
     routeTick(server);
 
     expect(server.sim.countItem('thorium_mining_pick', sc.pid)).toBe(1);
-    // 3 of 4 ore consumed: the placer is necessarily specialized (that is the
+    // 3 of 4 fine ore consumed: the placer is necessarily specialized (that is the
     // mobile-station gate), so the #1134 material discount composes with the
     // craft (max(1, floor(4 * 0.8)) = 3).
-    expect(server.sim.countItem('thorium_ore', sc.pid)).toBe(1);
+    expect(server.sim.countItem('fine_iron_ore', sc.pid)).toBe(1);
     const results = craftResultsOf(fcCraft.sent);
     expect(results).toHaveLength(1);
     // toMatchObject, not toEqual: a success draws the masterwork proc roll,

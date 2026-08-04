@@ -841,6 +841,12 @@ export const KNOWN_DEVIATIONS: readonly KnownDeviation[] = [
       '/admin/api/maps/:id/unpublish',
       '/admin/api/user-assets/:id/block',
       '/admin/api/user-assets/:id/unblock',
+      // Phase 15 (R35): the professions inspector and the two audited
+      // restores inherit the same degenerate-digit-string class (no operator
+      // path constructs such an id; registry hygiene only).
+      '/admin/api/characters/:id/professions',
+      '/admin/api/moderation/characters/:id/restore-item',
+      '/admin/api/moderation/characters/:id/restore-slot',
     ],
     currentBehavior:
       'NARROWED by the v0.22.0 release merge: BOTH arms now run the central ' +

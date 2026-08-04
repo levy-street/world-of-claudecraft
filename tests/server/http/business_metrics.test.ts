@@ -1,4 +1,4 @@
-import { Registry } from 'prom-client';
+import { Gauge, Registry } from 'prom-client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   BUSINESS_METRICS_REFRESH_MS,
@@ -25,6 +25,16 @@ import type {
   PlayerBusinessSnapshot,
   PlayerFunnelSnapshot,
 } from '../../../server/player_metrics_db';
+
+// The shared label scanner behind the forbidden-label prohibition loop.
+// [^"]* not [^"]+: an empty-valued forbidden label (realm="") must still
+// count as present, or the prohibition goes blind to exactly the degenerate
+// emission it exists to catch (pinned by its own test below).
+function scanLabelValues(text: string, label: string): Set<string> {
+  return new Set(
+    [...text.matchAll(new RegExp(`${label}="([^"]*)"`, 'g'))].map((match) => match[1]),
+  );
+}
 
 afterEach(() => {
   vi.useRealTimers();
@@ -226,8 +236,7 @@ describe('registerBusinessMetrics', () => {
     expect(funnel).toHaveBeenCalledTimes(1);
 
     const text = await registry.metrics();
-    const labelValues = (label: string) =>
-      new Set([...text.matchAll(new RegExp(`${label}="([^"]+)"`, 'g'))].map((match) => match[1]));
+    const labelValues = (label: string) => scanLabelValues(text, label);
     expect(labelValues('period')).toEqual(new Set(['today', 'yesterday']));
     expect(labelValues('segment')).toEqual(new Set(['new', 'returning', 'all', 'level_20']));
     expect(labelValues('level')).toEqual(new Set(['2', '5']));
@@ -247,9 +256,37 @@ describe('registerBusinessMetrics', () => {
         'reached_level_5',
       ]),
     );
-    for (const forbidden of ['account_id', 'character_id', 'player', 'name', 'ip']) {
+    // No per-player label, and no realm dimension either: realm identity is a
+    // scrape-time target label (one process = one realm; the DB queries filter
+    // on REALM instead), the same prohibition the game-state family pins.
+    for (const forbidden of [
+      'account_id',
+      'character_id',
+      'player',
+      'name',
+      'ip',
+      'realm',
+      'realm_name',
+      'server_name',
+    ]) {
       expect(labelValues(forbidden).size).toBe(0);
     }
+  });
+
+  it('the label scan sees an EMPTY-valued forbidden label (the [^"]* escape)', async () => {
+    // A [^"]+ scan reads realm="" as absent, so a degenerate empty-valued
+    // emission would sail through the prohibition loop above. This pins the
+    // SHARED scanner both tests use, so a regex regression fails here.
+    const registry = new Registry();
+    const gauge = new Gauge({
+      name: 'woc_test_empty_label_probe',
+      help: 'test-only probe for the empty-label escape',
+      labelNames: ['realm'],
+      registers: [registry],
+    });
+    gauge.set({ realm: '' }, 1);
+    const text = await registry.metrics();
+    expect(scanLabelValues(text, 'realm')).toEqual(new Set(['']));
   });
 
   it('counts coalesced refreshes on a per-collector counter that always renders', async () => {

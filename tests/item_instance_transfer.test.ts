@@ -113,12 +113,20 @@ describe('countMatchingUnlocked / holdsMatchingLocked', () => {
 describe('removeMatchingInstance', () => {
   it('consumes the highest-index equal unlocked copy and returns the SLOT payload', () => {
     const low = { itemId: 'hide', count: 1, instance: { signer: 'Ayla' } };
-    const high = { itemId: 'hide', count: 1, instance: { signer: 'Ayla' } };
+    const high = {
+      itemId: 'hide',
+      count: 1,
+      instance: { signer: 'Ayla' },
+      craftedRecipeId: 'recipe_hide',
+    };
     const inventory: InvSlot[] = [low, { itemId: 'hide', count: 3 }, high];
     const { ctx, hookFired } = fakeCtx(inventory);
     const got = removeMatchingInstance(ctx, 'hide', SIGNED, 1);
     // The final unit of a fully-consumed slot returns the ORIGINAL object.
-    expect(got).toBe(high.instance);
+    expect(got?.instance).toBe(high.instance);
+    // Both provenance channels come out, not just the payload: an escrowed copy
+    // can be instanced AND crafted at once.
+    expect(got?.craftedRecipeId).toBe('recipe_hide');
     expect(inventory).toHaveLength(2);
     expect(inventory).toContain(low);
     expect(hookFired()).toBe(1);
@@ -129,8 +137,9 @@ describe('removeMatchingInstance', () => {
     const inventory: InvSlot[] = [stack];
     const { ctx } = fakeCtx(inventory);
     const got = removeMatchingInstance(ctx, 'hide', SIGNED, 1);
-    expect(got).toEqual(SIGNED);
-    expect(got).not.toBe(stack.instance);
+    expect(got?.instance).toEqual(SIGNED);
+    expect(got?.instance).not.toBe(stack.instance);
+    expect(got?.craftedRecipeId).toBeUndefined();
     expect(stack.count).toBe(1);
   });
 
@@ -180,6 +189,53 @@ describe('canGrantCopies / grantCopies: the shared exchange-pipe pair', () => {
     expect(canGrantCopies(craftedStack, 1, 'pristine_hide', 1)).toBe(false);
   });
 
+  it('grant forwards craftedRecipeId on BOTH arms, not just the plain one', () => {
+    // The instanced arm used to drop the marker on the "one or the other, never
+    // both" reading. A row can be instanced AND crafted (a masterwork proc, a
+    // crafted piece enchanted while worn), so the opts the grant passes to
+    // addItemInstance must carry it, exactly as the plain arm's addItem opts do.
+    // Pinned on the shared grant itself, matching the removeMatchingInstance
+    // contract test above: the live market/mail rows exercise it end to end,
+    // but this is the seam both pipes claim through.
+    const calls: { kind: string; craftedRecipeId?: string }[] = [];
+    const ctx = {
+      addItem: (
+        _itemId: string,
+        _count: number,
+        _pid?: number,
+        opts?: { craftedRecipeId?: string },
+      ) => {
+        calls.push({ kind: 'plain', craftedRecipeId: opts?.craftedRecipeId });
+      },
+      addItemInstance: (
+        _itemId: string,
+        _instance: ItemInstancePayload,
+        _pid?: number,
+        _count?: number,
+        opts?: { craftedRecipeId?: string },
+      ) => {
+        calls.push({ kind: 'instanced', craftedRecipeId: opts?.craftedRecipeId });
+      },
+    } as unknown as SimContext;
+
+    grantCopies(ctx, 1, 'pristine_hide', 2, undefined, 'recipe_hide');
+    grantCopies(ctx, 1, 'pristine_hide', 1, { signer: 'Ayla' }, 'recipe_hide');
+    expect(calls).toEqual([
+      { kind: 'plain', craftedRecipeId: 'recipe_hide' },
+      { kind: 'instanced', craftedRecipeId: 'recipe_hide' },
+    ]);
+
+    // A marker-free grant stays marker-free on both arms (no undefined key is
+    // invented, and no marker is fabricated).
+    calls.length = 0;
+    grantCopies(ctx, 1, 'pristine_hide', 1);
+    grantCopies(ctx, 1, 'pristine_hide', 1, { signer: 'Ayla' });
+    expect(calls).toEqual([
+      { kind: 'plain', craftedRecipeId: undefined },
+      { kind: 'instanced', craftedRecipeId: undefined },
+    ]);
+  });
+
   it('grant routes instanced copies through addItemInstance with a DEEP CLONE', () => {
     const calls: { kind: string; instance?: ItemInstancePayload }[] = [];
     const ctx = {
@@ -227,5 +283,42 @@ describe('sanitizeEscrowSlot', () => {
     expect(sanitizeEscrowSlot({ itemId: 'hide', count: 2, instance: 'evil' as never }, 20)).toEqual(
       { itemId: 'hide', count: 2 },
     );
+  });
+
+  it('runs the shared payload bound: an oversized signer drops instead of riding the book', () => {
+    // The phase 18 whole-branch review: the two escrow books were the only
+    // persisted instance loads outside item_instance_load's bound, and a
+    // book row can persist forever with no login to self-heal it.
+    const dropped: string[] = [];
+    const clean = sanitizeEscrowSlot(
+      { itemId: 'hide', count: 1, instance: { signer: 'x'.repeat(5000) } },
+      20,
+      dropped,
+    );
+    expect(clean).toEqual({ itemId: 'hide', count: 1 });
+    expect(dropped).toEqual(['hide.signer', 'hide.payload']);
+  });
+
+  it('drops a clone-mangled ARRAY instance whole (typeof [] passes the object guard)', () => {
+    const dropped: string[] = [];
+    const clean = sanitizeEscrowSlot(
+      { itemId: 'hide', count: 3, instance: [1, 2, 3] as never },
+      20,
+      dropped,
+    );
+    expect(clean).toEqual({ itemId: 'hide', count: 3 });
+    expect(dropped).toEqual(['hide.payload']);
+  });
+
+  it('a legal payload passes the bound byte-identical, so the escrow arm changes nothing legal', () => {
+    const raw = {
+      itemId: 'hide',
+      count: 1,
+      instance: { signer: 'Ayla', rolled: { quality: 'fine', stats: { agi: 2 } } },
+    };
+    const dropped: string[] = [];
+    const clean = sanitizeEscrowSlot(raw, 20, dropped);
+    expect(clean).toEqual(raw);
+    expect(dropped).toEqual([]);
   });
 });

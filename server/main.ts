@@ -17,6 +17,7 @@ import {
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { virtualLevel } from '../src/sim/types';
+import { WORLD_SEED } from '../src/sim/world_seed';
 import {
   type DeedsLeaderboardEntry,
   type DeedsLeaderboardSelf,
@@ -84,7 +85,12 @@ import { bankLedgerIdle } from './bank_ledger';
 import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
 import { createCachedRead } from './cached_read';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
-import { buildCharacterList, configureCharactersRuntime } from './characters';
+import {
+  buildCharacterList,
+  configureCharactersRuntime,
+  purgeDeletedCharacterWorldState,
+  rekeyReclaimedCharacterWorldState,
+} from './characters';
 import {
   claudiumPreAuthMutationRateLimited,
   configureClaudiumRuntime,
@@ -94,6 +100,7 @@ import {
 import { configureCommunityTestAccounts } from './community_test_accounts';
 import {
   bustDailyRewardBoardCache,
+  bustDailyRewardWinnersCache,
   dailyRewardEventsCutoffDay,
   handleDailyRewardApi,
   handleDailyRewardInternalApi,
@@ -201,6 +208,7 @@ import { setAttackSignalSink } from './http/attack_signals';
 import { registerBusinessMetrics } from './http/business_metrics';
 import { handleClientError } from './http/client_error';
 import { type Config, DEFAULT_DISPATCH, type DispatchMode, loadConfig } from './http/config';
+import { registerDiscordBotMetrics } from './http/discord_bot_metrics';
 import {
   type ApiDelegate,
   type ApiDispatcher,
@@ -310,7 +318,7 @@ import {
 import { readStaticSfxSnapshot, type StaticSfxSnapshot } from './static_sfx';
 import { stopSteamMirror } from './steam/mirror';
 import { passesTurnstile } from './turnstile';
-import { pruneUnstuckReports, UNSTUCK_REPORT_RETENTION_DAYS } from './unstuck_db';
+import { pruneUnstuckReportsBatch } from './unstuck_db';
 import { stopUnstuckRecords, UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS } from './unstuck_records';
 import { MAX_ASSET_BYTES } from './user_assets';
 import {
@@ -442,7 +450,7 @@ function initialCharacterState(
   name: string,
   skin: number,
 ): import('../src/sim/sim').CharacterState {
-  const sim = new Sim({ seed: 20061, playerClass: cls, playerName: name });
+  const sim = new Sim({ seed: WORLD_SEED, playerClass: cls, playerName: name });
   sim.setPlayerSkin(sim.playerId, skin);
   const character = sim.serializeCharacter(sim.playerId);
   if (!character) throw new Error('failed to serialize initial character');
@@ -757,6 +765,17 @@ function bustBoardCaches(): void {
   arenaLeaderboardCache['2v2'] = null;
   deedsBoardCache = null;
   bustDailyRewardBoardCache();
+  // Not a board: the Discord winner-announcement snapshot. The daily-reward ban
+  // and IP-ban writes fire this same hook, and they feed the
+  // daily_reward_excluded_accounts view that unannouncedWinnerDays filters its
+  // payouts through, so an exclusion is a content change a warm snapshot would
+  // hide. Without this a just-banned winner's username and wallet pubkey could
+  // still be announced publicly for up to the winners TTL. Scope, honestly: the
+  // bust is per process (the snapshot lives on this process's service singleton),
+  // so it is immediate on the process that served the moderation write; a peer
+  // realm process's warm snapshot converges within one TTL, the same fleet story
+  // every board cache above already has.
+  bustDailyRewardWinnersCache();
 }
 setOnAccountModerated(bustBoardCaches);
 
@@ -1551,8 +1570,22 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           // account, free it (the orphaned character is archived) and retry once;
           // otherwise it is genuinely taken. This is the self-service path that
           // replaces the hidden admin-only reactivate/force-rename recovery.
-          if (!(await reclaimDeactivatedName(name)))
+          const reclaimed = await reclaimDeactivatedName(name);
+          if (!reclaimed)
             return json(res, 409, { error: 'that name is taken', code: 'character.name_taken' });
+          // The SAME post-reclaim world-state rekey the migrated create arm
+          // runs, through the shared helper, so a legacy rollback keeps it.
+          await rekeyReclaimedCharacterWorldState(
+            {
+              rekeyMarketSeller: (id, oldName, newName) =>
+                liveGame().rekeyMarketSeller(id, oldName, newName),
+              saveMarket: () => liveGame().saveMarket(),
+              rekeyMailOwner: (id, oldName, newName) =>
+                liveGame().rekeyMailOwner(id, oldName, newName),
+              saveMail: () => liveGame().saveMail(),
+            },
+            reclaimed,
+          );
           try {
             const c = await create();
             if (!c)
@@ -1743,6 +1776,20 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         });
       }
       const ok = await deleteCharacter(accountId, characterId);
+      if (ok) {
+        // The SAME world-state purge the migrated deleteHandler runs (R43), through
+        // the one shared helper, so an API_DISPATCH=legacy rollback keeps it.
+        await purgeDeletedCharacterWorldState(
+          {
+            purgeMarketSeller: (id, name) => liveGame().purgeMarketSeller(id, name),
+            saveMarket: () => liveGame().saveMarket(),
+            purgeMailOwner: (id, name) => liveGame().purgeMailOwner(id, name),
+            saveMail: () => liveGame().saveMail(),
+          },
+          characterId,
+          character.name,
+        );
+      }
       return json(
         res,
         ok ? 200 : 404,
@@ -2538,9 +2585,11 @@ configureCharactersRuntime({
   rekeyMarketSeller: (characterId, oldName, newName) =>
     liveGame().rekeyMarketSeller(characterId, oldName, newName),
   saveMarket: () => liveGame().saveMarket(),
+  purgeMarketSeller: (characterId, name) => liveGame().purgeMarketSeller(characterId, name),
   rekeyMailOwner: (characterId, oldName, newName) =>
     liveGame().rekeyMailOwner(characterId, oldName, newName),
   saveMail: () => liveGame().saveMail(),
+  purgeMailOwner: (characterId, name) => liveGame().purgeMailOwner(characterId, name),
   initialCharacterState,
   publicOrigin,
 });
@@ -2895,11 +2944,6 @@ export async function startServer(): Promise<http.Server> {
   }
   const orphans = await closeOrphanSessions();
   if (orphans > 0) console.log(`closed ${orphans} orphaned play session(s) from a previous run`);
-  const prunedUnstuckReports = await pruneUnstuckReports(pool);
-  if (prunedUnstuckReports > 0)
-    console.log(
-      `pruned ${prunedUnstuckReports} unstuck report row(s) older than ${UNSTUCK_REPORT_RETENTION_DAYS} days`,
-    );
   await pruneApplePendingLogins(pool);
   await game.loadMarket();
   await game.loadMail();
@@ -2911,9 +2955,6 @@ export async function startServer(): Promise<http.Server> {
     .then((count) => recordSitePresenceSample(count))
     .catch((err) => console.error('site presence sample failed:', err));
   setInterval(() => {
-    void pruneUnstuckReports(pool).catch((err) =>
-      console.error('unstuck report prune failed:', err),
-    );
     void pruneExpiredOAuthGrants(pool).catch((err) =>
       console.error('oauth grant prune failed:', err),
     );
@@ -3031,6 +3072,15 @@ export async function startServer(): Promise<http.Server> {
     simEntities: () => game.sim.entities.size,
     simTickHz: () => game.simTickHz(),
     tickPhaseMillis: () => game.tickPhaseMillis(),
+    // Coerced at the untyped boundary: @types/pg hand-declares these getters,
+    // so a pg upgrade that drops one type-checks clean and would otherwise
+    // fail the ENTIRE scrape at collect time (one bad collector rejects
+    // registry.metrics(), taking every gauge with it).
+    dbPool: () => ({
+      total: Number(pool.totalCount) || 0,
+      idle: Number(pool.idleCount) || 0,
+      waiting: Number(pool.waitingCount) || 0,
+    }),
     lastTickAt: () => game.lastTickAt(),
     loopStartedAt: () => game.loopStartedAt(),
   };
@@ -3040,6 +3090,11 @@ export async function startServer(): Promise<http.Server> {
   // must never touch liveGame() (a health probe constructing a GameServer is the bug
   // tests/server/game_boot_order.test.ts pins against).
   registerLivenessSource(gameStateSource);
+
+  // The Discord bot's own rate-limit and breaker health, pushed in on the presence
+  // request and cached process-locally. No collector and no query: the gauges read
+  // that cache at scrape time and the counters ride the push itself.
+  registerDiscordBotMetrics(httpMetrics.registry);
 
   // Business gauges use isolated, staggered, timeout-protected engagement and
   // funnel snapshots every 15 minutes. Scrapes publish only cached data and never
@@ -3114,6 +3169,13 @@ export async function startServer(): Promise<http.Server> {
         name: 'account_ip_associations',
         pruneBatch: (n) =>
           pruneAccountIpAssociationsBatch(pool, config.accountIpAssociationRetentionDays, n),
+      },
+      {
+        // The unstuck telemetry table (v0.32.0). It shipped as a boot-blocking
+        // one-shot plus a bare interval, the exact shape the sweep exists to
+        // retire; it rides the shared budget and batch size like every sibling.
+        name: 'unstuck_reports',
+        pruneBatch: (n) => pruneUnstuckReportsBatch(pool, config.unstuckReportRetentionDays, n),
       },
       {
         name: 'password_reset_requests',

@@ -7,6 +7,10 @@
 // numbers (cast timing, band thresholds, odds, prices); the mirrored accuracy
 // guards live in tests/guide.test.ts.
 
+import {
+  TIER2_TOOL_GATE_PROFICIENCY,
+  TIER3_TOOL_GATE_PROFICIENCY,
+} from '../../sim/content/vendor_row_gates';
 import { esc } from '../../ui/esc';
 import { formatMoney, formatNumber, type TranslationKey, t } from '../../ui/i18n';
 import {
@@ -27,18 +31,41 @@ export function gatheringById(id: string): GuideProfGathering | undefined {
   return GUIDE_PROF_GATHERING.find((g) => g.id === id);
 }
 
+// The Source cell's one decision, flattened: crafted tools name their craft
+// and, when a delve counter also stocks them, the Marks price behind its
+// clears gate (the eight top tools; naming only the craft made the table
+// contradict the prose above it); bought tools name their counter.
+function toolSource(tool: GuideProfTool): string {
+  if (tool.craftedBy) {
+    const craft = t(`hudChrome.craftName.${tool.craftedBy}` as TranslationKey);
+    if (tool.priceMarks == null) return t('guide.profPages.toolCrafted', { craft });
+    const marks = formatNumber(tool.priceMarks);
+    return tool.marksHeroicClear
+      ? t('guide.profPages.toolCraftedOrMarksHeroic', { craft, marks })
+      : t('guide.profPages.toolCraftedOrMarks', { craft, marks });
+  }
+  if (tool.vendors.length > 0) {
+    return t('guide.profPages.toolVendor', {
+      name: tool.vendors[0].name,
+      hub: tool.vendors[0].hub,
+    });
+  }
+  return t('guide.profPages.toolUnavailable');
+}
+
 function toolRow(tool: GuideProfTool): string {
-  const source = tool.craftedBy
-    ? t('guide.profPages.toolCrafted', {
-        craft: t(`hudChrome.craftName.${tool.craftedBy}` as TranslationKey),
-      })
-    : tool.vendors.length > 0
-      ? t('guide.profPages.toolVendor', { name: tool.vendors[0].name, hub: tool.vendors[0].hub })
-      : t('guide.profPages.toolUnavailable');
+  const source = toolSource(tool);
+  // R22: the wield requirement the harvest gate enforces, or None for tier 1
+  // and every rod (rods are the structural exemption).
+  const wield =
+    tool.wieldProficiency != null
+      ? formatNumber(tool.wieldProficiency)
+      : t('guide.profPages.wieldNone');
   return `<tr>
       <td class="q-${esc(tool.quality)}">${esc(tool.name)}</td>
       <td>${esc(formatNumber(tool.tier))}</td>
       <td>${esc(qualityLabel(tool.quality))}</td>
+      <td>${esc(wield)}</td>
       <td>${esc(tool.priceCopper != null ? formatMoney(tool.priceCopper) : t('guide.profPages.priceNone'))}</td>
       <td>${esc(source)}</td>
     </tr>`;
@@ -47,12 +74,26 @@ function toolRow(tool: GuideProfTool): string {
 function toolsSection(g: GuideProfGathering): string {
   return `<section class="guide-block" id="prof-tools">
       <h2>${esc(t('guide.profPages.toolsHeading'))}</h2>
-      ${paras('guide.profPages.toolsNote')}
-      <div class="guide-table-scroll"><table class="guide-keytable guide-prof-table">
+      ${paras('guide.profPages.toolsNote', {
+        // Fed from the live gate constants, the sibling sections' idiom
+        // (rhythmBody takes the cast curve, nodesNote the respawn), so a
+        // retune moves the prose in all 19 languages instead of leaving a
+        // stale number behind in each of them. Named ...Prof because the
+        // adjacent trainingBody key already uses {tier1}/{tier2} for training
+        // COSTS in copper, and a fill pass reading both should never have to
+        // guess which unit a token carries. The crafted rungs' 85/100 stay
+        // ENGLISH LITERALS in the prose (the long-translated key keeps its
+        // token set); tests/guide.test.ts pins them against the frozen wield
+        // table so a retune fails there instead of rotting here.
+        tier2Prof: formatNumber(TIER2_TOOL_GATE_PROFICIENCY),
+        tier3Prof: formatNumber(TIER3_TOOL_GATE_PROFICIENCY),
+      })}
+      <div class="guide-table-scroll"><table class="guide-keytable guide-prof-table guide-tools-table">
         <thead><tr>
           <th scope="col">${esc(t('guide.profPages.colTool'))}</th>
           <th scope="col">${esc(t('guide.profPages.colTier'))}</th>
           <th scope="col">${esc(t('guide.profPages.colQuality'))}</th>
+          <th scope="col">${esc(t('guide.profPages.colWield'))}</th>
           <th scope="col">${esc(t('guide.profPages.colPrice'))}</th>
           <th scope="col">${esc(t('guide.profPages.colSource'))}</th>
         </tr></thead>

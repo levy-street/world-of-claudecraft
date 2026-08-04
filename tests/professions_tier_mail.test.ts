@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { type LetterDef, MASTER_TIER_LETTERS } from '../src/sim/content/letters';
+import { requiredAmendsProgress } from '../src/sim/professions/archetype';
 import {
   baselineActivePairTierMail,
   normalizeTierMailOnLoad,
+  pruneTierMailToActiveMajors,
   updateTierMailFor,
 } from '../src/sim/professions/tier_mail';
+import { applyProfessionQuestEffect } from '../src/sim/quests/profession_quest_effects';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
+import type { QuestDef, QuestProgress } from '../src/sim/types';
 
 // The Smith pair (weaponcrafting + armorcrafting): the four wave-one masters are
 // the only pairs with tier letters, and this is Forgemistress Darva's.
@@ -268,6 +272,227 @@ describe('tier-crossing master mail (Professions 2.0)', () => {
     const sim = makeSim();
     const saved = sim.serializeCharacter(sim.playerId);
     expect(saved && 'tierMailSent' in saved).toBe(false);
+  });
+
+  it('a pair transition retires the outgoing majors and a return re-baselines silently', () => {
+    // The retroactive-letter bug: an acknowledgement that survives switching
+    // away makes a RETURN skip the silent re-baseline, so a tier crossed
+    // while the pair was dormant would mail at the moment of return. Driven
+    // through the REAL quest attunement path (applyProfessionQuestEffect).
+    const sim = makeSim();
+    const meta = attunedMeta(sim);
+    meta.craftSkills[PRIMARY] = tierSkill(2);
+    meta.craftSkills[SECONDARY] = tierSkill(1);
+    baselineActivePairTierMail(meta); // PRIMARY:2, SECONDARY:1
+    const ctx = (sim as unknown as { ctx: SimContext }).ctx;
+
+    // Attune AWAY to the adjacent pair that SHARES armorcrafting.
+    const away = { completionEffect: { type: 'attunePair', mode: 'new' } } as unknown as QuestDef;
+    const awayProgress = { selection: 'armorcrafting+engineering' } as unknown as QuestProgress;
+    expect(applyProfessionQuestEffect(ctx, away, awayProgress, meta)).toBe(true);
+    // The departing major's acknowledgement is retired; the shared major's
+    // watch never lapsed, so its entry (and any crossing it sees) survives.
+    expect(meta.tierMailSent.has(PRIMARY)).toBe(false);
+    expect(meta.tierMailSent.get(SECONDARY)).toBe(1);
+    // The newly-majored craft baselined at its current tier, silently.
+    expect(meta.tierMailSent.get('engineering')).toBe(0);
+
+    // While the Smith pair is dormant, its old primary crosses two tiers.
+    meta.craftSkills[PRIMARY] = tierSkill(4);
+
+    // RETURN to the Smith pair (mode 'return': the pair is in attunedPairs).
+    const back = {
+      completionEffect: { type: 'attunePair', mode: 'return' },
+    } as unknown as QuestDef;
+    const backProgress = { selection: PAIR } as unknown as QuestProgress;
+    expect(applyProfessionQuestEffect(ctx, back, backProgress, meta)).toBe(true);
+    // The return re-baselined at the CURRENT tier and dropped the pair-B major.
+    expect(meta.tierMailSent.get(PRIMARY)).toBe(4);
+    expect(meta.tierMailSent.has('engineering')).toBe(false);
+    // THE pin: the next sweep books nothing. No retroactive congratulations
+    // for tiers crossed while the pair was dormant.
+    const sweep = recordingCtx();
+    expect(updateTierMailFor(meta, sweep.ctx)).toBe(false);
+    expect(sweep.booked).toEqual([]);
+  });
+
+  it('the legacy switchArchetype command prunes and baselines exactly like the quest path', () => {
+    // The second transition entry point (the sim.ts IWorld command): a
+    // regression that wired the prune or the baseline onto only the quest
+    // path stays green there and must red here.
+    const sim = makeSim();
+    const meta = attunedMeta(sim);
+    meta.craftSkills[PRIMARY] = tierSkill(2);
+    baselineActivePairTierMail(meta); // PRIMARY:2, SECONDARY:0
+    meta.archetype.amendsProgress = requiredAmendsProgress(meta.archetype.switchCount);
+    expect(sim.switchArchetype('alchemy', sim.playerId)).toBe(true);
+    // Neither outgoing major survives (alchemy pairs with engineering, so the
+    // Smith majors both left), and the incoming majors baseline IMMEDIATELY
+    // at their current tier, closing the window before the next 1 Hz sweep.
+    expect(meta.archetype.activeArchetype).toBe('alchemy');
+    expect([...meta.tierMailSent.entries()].sort()).toEqual([
+      ['alchemy', 0],
+      ['engineering', 0],
+    ]);
+  });
+
+  it('the legacy acceptArchetypeQuest command baselines at accept time, so an immediate crossing mails', () => {
+    // The third transition entry point (null to a first pair). Without the
+    // accept-time baseline, a tier crossed between acceptance and the first
+    // 1 Hz sweep is swallowed by the sweep's silent baseline arm; with it,
+    // the crossing books its letter.
+    const sim = makeSim();
+    const meta = sim.players.get(sim.playerId)!;
+    meta.craftSkills[PRIMARY] = tierSkill(1);
+    expect(sim.acceptArchetypeQuest(PRIMARY, sim.playerId)).toBe(true);
+    // Accept derived the Smith pair (armorcrafting is weaponcrafting's combo
+    // partner) and baselined both majors at their current tiers, silently.
+    expect(meta.archetype.pairedMajor).toBe(SECONDARY);
+    expect(meta.tierMailSent.get(PRIMARY)).toBe(1);
+    expect(meta.tierMailSent.get(SECONDARY)).toBe(0);
+
+    // A tier crossed immediately after acceptance, before any sweep ran:
+    // the letter must be booked, not swallowed by a first-sweep baseline.
+    meta.craftSkills[PRIMARY] = tierSkill(2);
+    const sweep = recordingCtx();
+    expect(updateTierMailFor(meta, sweep.ctx)).toBe(true);
+    expect(sweep.booked).toEqual([MASTER_TIER_LETTERS[PAIR][2]]);
+  });
+
+  it('load prunes a stale acknowledgement for a craft that is not a current major', () => {
+    const sim = makeSim();
+    const meta = attunedMeta(sim);
+    meta.craftSkills[PRIMARY] = tierSkill(2);
+    baselineActivePairTierMail(meta);
+    // A pre-prune save could carry an entry for a once-majored craft. DORMANT
+    // is a VALID ring id, so only the majors prune (not the unknown-id arm)
+    // can be what removes it on load.
+    meta.tierMailSent.set(DORMANT, 1);
+    const saved = sim.serializeCharacter(sim.playerId);
+    expect(saved?.tierMailSent).toMatchObject({ [DORMANT]: 1 }); // serialize passes it through
+
+    const reloaded = makeSim(5153);
+    const pid = reloaded.addPlayer('warrior', 'Pruned', { state: saved ?? undefined });
+    const reloadedMeta = reloaded.players.get(pid)!;
+    expect(reloadedMeta.tierMailSent.has(DORMANT)).toBe(false); // healed on load
+    expect(reloadedMeta.tierMailSent.get(PRIMARY)).toBe(2); // majors survive
+    expect(reloadedMeta.tierMailSent.get(SECONDARY)).toBe(0);
+  });
+
+  it('pruneTierMailToActiveMajors keeps majors only, and clears all for unattuned', () => {
+    const sim = makeSim();
+    const meta = attunedMeta(sim);
+    meta.tierMailSent.set(PRIMARY, 2);
+    meta.tierMailSent.set(SECONDARY, 1);
+    meta.tierMailSent.set(HOBBY, 3);
+    meta.tierMailSent.set(DORMANT, 3);
+    pruneTierMailToActiveMajors(meta);
+    expect([...meta.tierMailSent.entries()]).toEqual([
+      [PRIMARY, 2],
+      [SECONDARY, 1],
+    ]);
+
+    const simUnattuned = makeSim(5154);
+    const unattuned = simUnattuned.players.get(simUnattuned.playerId)!;
+    unattuned.tierMailSent.set(PRIMARY, 2);
+    pruneTierMailToActiveMajors(unattuned);
+    expect(unattuned.tierMailSent.size).toBe(0);
+  });
+
+  it('the one-time mastery reset drops saved acknowledgements, so the re-climb mails again', () => {
+    // The reset zeroes craft skills on load; a kept acknowledgement would sit
+    // ABOVE the zeroed tier, and updateTierMailFor only mails on
+    // currentTier > acknowledged, so the whole re-climb through previously
+    // held tiers would pass in silence. Dropping the record re-baselines at
+    // the reset tiers and the re-climb congratulates again.
+    const sim = makeSim();
+    const meta = attunedMeta(sim);
+    meta.craftSkills[PRIMARY] = tierSkill(3);
+    baselineActivePairTierMail(meta); // PRIMARY acknowledged at 3
+    const saved = sim.serializeCharacter(sim.playerId)!;
+    expect(saved.tierMailSent).toMatchObject({ [PRIMARY]: 3 });
+    // Flag forced to literal false: one of the two shapes the reset gate
+    // fires on (the other, the flag ABSENT, is the real pre-curve shape and
+    // has its own arm below). Either way the load must take the
+    // acknowledgements with the skills it zeroes.
+    saved.masteryResetApplied = false;
+
+    const reloaded = makeSim(5155);
+    const pid = reloaded.addPlayer('warrior', 'Reset', { state: saved });
+    const reloadedMeta = reloaded.players.get(pid)!;
+    expect(reloadedMeta.craftSkills[PRIMARY]).toBe(0); // the reset fired
+    expect(reloadedMeta.tierMailSent.size).toBe(0); // acknowledgements went with it
+
+    // First sweep re-baselines at the reset tier silently; the re-climb's
+    // first crossing books its letter instead of being swallowed.
+    const baseline = recordingCtx();
+    expect(updateTierMailFor(reloadedMeta, baseline.ctx)).toBe(false);
+    reloadedMeta.craftSkills[PRIMARY] = tierSkill(1);
+    const recross = recordingCtx();
+    expect(updateTierMailFor(reloadedMeta, recross.ctx)).toBe(true);
+    expect(recross.booked).toEqual([MASTER_TIER_LETTERS[PAIR][1]]);
+  });
+
+  it('a pre-flag save (masteryResetApplied ABSENT) also drops acknowledgements', () => {
+    // The REAL pre-curve shape: old saves carry no masteryResetApplied key at
+    // all (serialize has written literal true since the flag shipped), so the
+    // absent arm is the one every genuine migration hits. Pinned separately
+    // from the false arm above: a drop guard rewritten as `=== false` keeps
+    // that arm green while silently keeping stale acknowledgements above the
+    // zeroed tiers for every real pre-curve character.
+    const sim = makeSim();
+    const meta = attunedMeta(sim);
+    meta.craftSkills[PRIMARY] = tierSkill(3);
+    baselineActivePairTierMail(meta);
+    const saved = sim.serializeCharacter(sim.playerId)!;
+    expect(saved.tierMailSent).toMatchObject({ [PRIMARY]: 3 });
+    delete saved.masteryResetApplied;
+
+    const reloaded = makeSim(5156);
+    const pid = reloaded.addPlayer('warrior', 'PreFlag', { state: saved });
+    const reloadedMeta = reloaded.players.get(pid)!;
+    expect(reloadedMeta.craftSkills[PRIMARY]).toBe(0); // the reset fired
+    expect(reloadedMeta.tierMailSent.size).toBe(0); // acknowledgements went with it
+  });
+
+  it('accept prunes a stale acknowledgement an unattuned character carries', () => {
+    // Belt and braces on the accept entry point: accept refuses when a pair
+    // is already active, so its prune can only ever clear entries that
+    // predate attunement. The DORMANT entry is a synthetic guard probe (the
+    // load prune heals any persisted copy of this state, so only a direct
+    // write reaches it); deleting the transition rule's prune half must red
+    // here.
+    const sim = makeSim();
+    const meta = sim.players.get(sim.playerId)!;
+    meta.tierMailSent.set(DORMANT, 1);
+    expect(sim.acceptArchetypeQuest(PRIMARY, sim.playerId)).toBe(true);
+    expect(meta.tierMailSent.has(DORMANT)).toBe(false);
+    expect(meta.tierMailSent.get(PRIMARY)).toBe(0); // baseline still armed
+    expect(meta.tierMailSent.get(SECONDARY)).toBe(0);
+  });
+
+  it('a refused switch runs no part of the transition rule', () => {
+    // amendsProgress stays at zero, so the switch is refused; neither the
+    // prune nor the baseline may fire on a refusal. Both sentinels are
+    // synthetic direct writes (production cannot reach either state), which
+    // is what makes each half of the guard observable: DORMANT present would
+    // be pruned, SECONDARY absent would be re-baselined, so an unguarded run
+    // of either half moves the record.
+    const sim = makeSim();
+    const meta = attunedMeta(sim);
+    meta.craftSkills[PRIMARY] = tierSkill(2);
+    baselineActivePairTierMail(meta); // PRIMARY:2, SECONDARY:0
+    meta.tierMailSent.set(DORMANT, 1); // prune sentinel
+    meta.tierMailSent.delete(SECONDARY); // baseline sentinel (a gap to re-arm)
+    expect(sim.switchArchetype('alchemy', sim.playerId)).toBe(false);
+    expect(meta.archetype.activeArchetype).toBe(PRIMARY);
+    // Both sides sorted, so the pin does not encode Map insertion order.
+    expect([...meta.tierMailSent.entries()].sort()).toEqual(
+      [
+        [DORMANT, 1],
+        [PRIMARY, 2],
+      ].sort(),
+    );
   });
 
   it('normalizeTierMailOnLoad keeps only KNOWN ring craft ids with valid tiers', () => {

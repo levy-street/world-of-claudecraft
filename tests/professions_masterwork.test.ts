@@ -4,7 +4,7 @@
 // determinism contract over a real Sim (one rng draw per successful craft,
 // zero on denial, proc occurrences reproducible by seed).
 import { describe, expect, it } from 'vitest';
-import { PERK_THRESHOLDS } from '../src/sim/content/professions';
+import { PERK_THRESHOLDS, STATIONS } from '../src/sim/content/professions';
 import { ALL_RECIPES, recipeById } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import { PRIMARY_STATS, primaryStatBudget } from '../src/sim/item_budget';
@@ -27,12 +27,14 @@ import {
   masterworkBumpedQuality,
   masterworkProcChance,
 } from '../src/sim/professions/masterwork';
+import { fineMaterialFor, MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import {
   MASTERWORK_MATERIAL_TIER_CHANCE,
   MATERIAL_TIER_BY_ITEM,
   materialTierBonusForReagents,
   materialTierForItem,
 } from '../src/sim/professions/material_tier';
+import { type StationType, stationsOfType } from '../src/sim/professions/stations';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import type { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
@@ -572,6 +574,70 @@ describe('proc-chance wiring over a real Sim (hunted boundary-window seeds)', ()
     expect(traded.masterwork).toBe(true);
   });
 
+  it('a signed FINE grade feeds the proc chance for a recipe declaring its base', () => {
+    // D8: 26 shipped masterwork-capable recipes declare a material that has a
+    // fine grade, and resolveHarvest mints the signed instance on the RESOLVED
+    // id, so a player who out-tooled the material holds signed FINE copies and
+    // pays the base reagent line with them. Without hasSignedInstance spanning
+    // grades that player silently loses MASTERWORK_SIGNED_CHANCE for having
+    // used the better tool.
+    //
+    // Seed 67, re-hunted on this recipe at the v0.32.0 merge (the expansion
+    // moved the construction-time draws, so the old 69 window and its spares
+    // all collapsed): the single proc draw lands where the 2 percent
+    // signed-reagent term alone decides the outcome. The spares (127, 133,
+    // 337) RUN below rather than sitting on record, so a draw-order shift
+    // that collapses one window fails loudly instead of quietly narrowing
+    // the pin to a lone seed (50 also works but is the count-1 test's own
+    // window below).
+    const SEEDS = [67, 127, 133, 337];
+    const craftLongsword = (seed: number, setup: (sim: Sim, pid: number) => void) => {
+      const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: false });
+      const pid = sim.playerId;
+      const recipe = recipeById('recipe_ironedge_longsword')!;
+      const station = stationsOfType(STATIONS, recipe.stationType as StationType)[0];
+      const e = (sim as any).entities.get(pid);
+      e.pos.x = station.pos.x;
+      e.pos.z = station.pos.z;
+      e.prevPos = { ...e.pos };
+      // Trainer-acquired recipe: grant knowledge directly, the same way the
+      // other live-craft cases in this file reach a gated recipe.
+      (sim as any).players.get(pid)?.knownRecipes?.add(recipe.id);
+      setup(sim, pid);
+      sim.craftItem(recipe.id, false, pid);
+      return { ...(sim as any).lastCraftResult };
+    };
+    const reagentsExceptOre = (sim: Sim, pid: number) => {
+      for (const g of recipeById('recipe_ironedge_longsword')!.reagents) {
+        if (g.itemId === 'iron_ore') continue;
+        for (let i = 0; i < g.count + 2; i++) sim.addItem(g.itemId, 1, pid);
+      }
+    };
+    const ORE_COUNT =
+      (recipeById('recipe_ironedge_longsword')!.reagents.find((g) => g.itemId === 'iron_ore')
+        ?.count ?? 0) + 2;
+    expect(ORE_COUNT).toBeGreaterThan(2); // the recipe really does declare iron_ore
+
+    for (const seed of SEEDS) {
+      const signedFine = craftLongsword(seed, (sim, pid) => {
+        reagentsExceptOre(sim, pid);
+        sim.addItemInstance('fine_iron_ore', { signer: 'Gatherer Friend' }, pid, ORE_COUNT);
+      });
+      expect(signedFine.ok, `seed ${seed}`).toBe(true);
+      expect(signedFine.masterwork, `seed ${seed}`).toBe(true);
+
+      // Control at the SAME seed: identical bag, plain unsigned fine copies.
+      // The draw is the same and must miss, so the proc above is the signed
+      // term, at every seed in the window set.
+      const plainFine = craftLongsword(seed, (sim, pid) => {
+        reagentsExceptOre(sim, pid);
+        for (let i = 0; i < ORE_COUNT; i++) sim.addItem('fine_iron_ore', 1, pid);
+      });
+      expect(plainFine.ok, `seed ${seed}`).toBe(true);
+      expect(plainFine.masterwork, `seed ${seed}`).toBeUndefined();
+    }
+  });
+
   it('a count-1 signed reagent feeds the proc chance (decoupled from the quantity-discount flag)', () => {
     // Same hunted seed-50 window. The signed copy is the SPIDER LEG, whose
     // reagent count is 1: the #1145 reduction floors at 1 so the discount
@@ -632,11 +698,17 @@ describe('material-tier masterwork feed (material_tier.ts)', () => {
     expect(MASTERWORK_MATERIAL_TIER_CHANCE).toBe(0.01);
     expect(MATERIAL_TIER_BY_ITEM).toEqual({
       iron_ore: 1,
+      fine_iron_ore: 1,
       ashwood_log: 1,
+      fine_ashwood_log: 1,
       goldleaf_herb: 1,
+      fine_goldleaf_herb: 1,
       thorium_ore: 1,
+      fine_thorium_ore: 1,
       elderwood_log: 2,
+      fine_elderwood_log: 2,
       sunpetal_herb: 2,
+      fine_sunpetal_herb: 2,
       arcanite_bar: 2,
     });
     // An id absent from the table is tier 0: the baseline mob drops, the
@@ -645,6 +717,43 @@ describe('material-tier masterwork feed (material_tier.ts)', () => {
     expect(materialTierForItem('copper_ore')).toBe(0);
     expect(materialTierForItem('mithril_mining_pick')).toBe(0);
     expect(materialTierForItem('no_such_item')).toBe(0);
+  });
+
+  it('every fine grade inherits its base band, including absence', () => {
+    // The literal above says WHAT the table holds; this arm says WHY, over the
+    // whole grade catalog rather than the seven rows that happen to be listed.
+    // Derived from MATERIAL_GRADES, so a tenth material added later is covered
+    // the day it lands instead of quietly shipping on tier 0.
+    const graded = Object.keys(MATERIAL_GRADES);
+    expect(graded).toHaveLength(9);
+    for (const baseItemId of graded) {
+      const fineItemId = fineMaterialFor(baseItemId);
+      expect(fineItemId, baseItemId).toBeDefined();
+      expect(materialTierForItem(fineItemId as string), fineItemId).toBe(
+        materialTierForItem(baseItemId),
+      );
+    }
+    // Both sides of "including absence" are live, so the loop above is not a
+    // sweep over one uniform case: the eastbrook grades inherit tier 0 (kept
+    // out of the table entirely, protecting the golden-safety arm below), the
+    // other six inherit a real band.
+    const absent = graded.filter((id) => materialTierForItem(id) === 0);
+    const present = graded.filter((id) => materialTierForItem(id) > 0);
+    expect(absent.sort()).toEqual(['copper_ore', 'ironbark_log', 'silverleaf_herb']);
+    expect(present).toHaveLength(6);
+    for (const baseItemId of absent) {
+      expect(MATERIAL_TIER_BY_ITEM[fineMaterialFor(baseItemId) as string]).toBeUndefined();
+    }
+  });
+
+  it('the fine re-spec left every tool recipe proc chance where it was', () => {
+    // The D8 swap moved reagent ids only. Pinned as literals rather than as a
+    // before/after comparison, so a future re-tier that moved BOTH grades
+    // together could not slide through by staying self-consistent.
+    expect(materialTierBonusForReagents(recipeById('recipe_ashwood_axe')!.reagents)).toBe(0.01);
+    expect(materialTierBonusForReagents(recipeById('recipe_goldleaf_sickle')!.reagents)).toBe(0.01);
+    expect(materialTierBonusForReagents(recipeById('recipe_elderwood_axe')!.reagents)).toBe(0.02);
+    expect(materialTierBonusForReagents(recipeById('recipe_sunpetal_sickle')!.reagents)).toBe(0.02);
   });
 
   it('a tier-0-only reagent list resolves to exactly 0 (the golden-safety arm)', () => {

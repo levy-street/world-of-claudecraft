@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.33.1-blue)](package.json)
+[![Version](https://img.shields.io/badge/version-0.34.0-blue)](package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -94,7 +94,7 @@ pnpm install --frozen-lockfile
 pnpm run dev       # then open http://localhost:5173 and choose Play Offline
 ```
 
-Name your character, pick any of the nine classes, and you start in **Eastbrook Vale** (levels 1-7), a market town ringed by hubs: wolf runs to the north, boar meadows east, the Sableweb woods west, Mirror Lake northwest, a burrower-ridden copper dig southwest, and a ruined chapel of restless dead northeast, with Gorrak's bandit camp to the southeast. The north road climbs a mountain pass into **Mirefen Marsh** (6-13, hub Fenbridge) and on up to **Thornpeak Heights** (13-20, hub Highwatch). The world seed is fixed in `src/main.ts`, so it is the same place every visit.
+Name your character, pick any of the nine classes, and you start in **Eastbrook Vale** (levels 1-7), a market town ringed by hubs: wolf runs to the north, boar meadows east, the Sableweb woods west, Mirror Lake northwest, a burrower-ridden copper dig southwest, and a ruined chapel of restless dead northeast, with Gorrak's bandit camp to the southeast. The north road climbs a mountain pass into **Mirefen Marsh** (6-13, hub Fenbridge) and on up to **Thornpeak Heights** (13-20, hub Highwatch). The world seed is fixed in `src/sim/world_seed.ts`, so it is the same place every visit.
 
 ### Desktop apps for Windows, Linux, and macOS
 
@@ -283,7 +283,7 @@ Ranked wins and Fiesta takedowns pay **Honor**, which the quartermaster in town 
 | `Z` / `X` | sheath or draw your weapons, emote wheel |
 | `V` / `R` / `Esc` | nameplates, autorun, close the top window (or open the game menu) |
 
-Every binding is remappable in the keybinds panel. Touch controls (a movement stick, camera drag, and on-screen action buttons) come up automatically on mobile.
+Every binding is remappable in the keybinds panel, and mouse buttons bind like keys: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world. Touch controls (a movement stick, camera drag, and on-screen action buttons) come up automatically on mobile.
 
 ## Architecture (one sim, three hosts)
 

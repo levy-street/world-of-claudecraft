@@ -16,11 +16,23 @@
   :root {
     --gold: #ffd100;
     --gold-dim: #c8a838;
+    /* The deed-unlock banner plate (#banner.banner-deed). Echoes the Book of
+       Deeds card and renown chip so the earned moment and the window that
+       records it read as one family, and so a deed can never be mistaken for
+       the bare --gold level-up banner they used to share. */
+    --color-deed-banner-text: #ffe27a;
+    --color-deed-banner-border: #b8902a;
+    --color-deed-banner-bg: rgb(26 21 12 / 92%);
     --border: #6f5a2a;
     /* --panel-base is the single themeable frame colour; --panel-bg derives the
        shipped gradient from it (overwritten wholesale by the theme system). */
     --panel-base: #15151f;
     --panel-bg: linear-gradient(170deg, #15151ff2 0%, #0b0b12f2 60%, #08080df2 100%);
+    /* quest-marker tooltip TAG text: the rare-adjacent blue lifted to the
+       4.5:1 text tier over the default panel stops (the glyph channels keep
+       the #0070dd anchor). The theme system re-emits this per preset via
+       ensureReadable, so the light Parchment panel darkens it to AA. */
+    --color-quest-tag-text: #3d9bff;
     /* Typography, Cinzel (heraldic display/headings), Alegreya Sans (UI + body),
        Alegreya (serif flavour prose). Legacy token names alias the canonical set
        so every existing usage resolves to the new system. */
@@ -141,13 +153,19 @@
     /* overworld world-map window (resolved by map_window_painter.ts via
        getComputedStyle: a 2D canvas context cannot read a CSS var directly).
        Exact pre-existing values from the inline updateMapWindow/drawMapDetail. */
-    --color-map-ocean: #142c54;
+    /* The zone map's off-plate fill. Matches the deep end of the terrain
+       painter's single sea ramp (map_terrain.ts SEA_DEEP_*), so a plate edge
+       leaves no seam against it. */
+    --color-map-ocean: #1a3a64;
     --color-map-label: #ffe9a0;
     --color-map-outline: #000;
     --color-map-portal-dot: #c084ff;
     --color-map-portal-label: #e0c0ff;
     --color-map-ping: #ffd76a;
     --color-map-npc-quest: #ffd100;
+    /* repeatable turn-in glyph: the rare-item blue (src/ui/icons.ts rare),
+       the classic-fidelity anchor for the blue "!" */
+    --color-map-npc-quest-repeat: #0070dd;
     /* active-quest objective areas: the classic translucent blue quest-POI blob */
     --color-map-quest-area-fill: rgba(72, 132, 232, 0.22);
     --color-map-quest-area-stroke: rgba(120, 170, 255, 0.55);
@@ -184,13 +202,23 @@
        not as the per-zone map's dark off-map backdrop. Sampled from the plate's
        deep-water margin; re-sample it whenever the art is swapped. */
     --color-map-continent-ocean: #0a4d7b;
-    /* continent overview: clickable zone regions (resolved by
-       continent_map_painter.ts). Idle border, hovered fill + border, and the
-       current-zone border, all drawn over the painted world_overview plate. */
-    --color-map-region-stroke: rgba(255, 233, 160, 0.35);
-    --color-map-region-hover-fill: rgba(255, 233, 160, 0.18);
-    --color-map-region-hover-stroke: #ffe9a0;
-    --color-map-region-current-stroke: #ffd100;
+    /* continent overview letterbox: open water beside the plate, deepening toward
+       the window edge. The flat ocean fill alone met the plate's painted sea at a
+       visible seam, so the painter grades it with this darkening (clear where it
+       meets the plate, full at the window edge) and seats the plate on it with the
+       shadow below. Surround treatment, never information. */
+    --color-map-continent-backdrop-dim: rgba(3, 26, 46, 0.85);
+    --color-map-continent-plate-shadow: rgba(0, 0, 0, 0.55);
+    /* continent overview: the zone highlights (resolved by
+       continent_map_painter.ts). No borders: each is a WASH the painter masks to
+       the painted land of the world_overview plate and fades out toward the
+       zone's own bounds, so the alpha here is what decides how strong it reads
+       (the mask contributes coverage only). The hovered wash sits over the
+       quieter permanent one on the zone the player is standing in, whose name is
+       drawn in the current-zone label color. */
+    --color-map-region-hover-fill: rgba(255, 233, 160, 0.36);
+    --color-map-region-current-fill: rgba(255, 209, 0, 0.18);
+    --color-map-region-current-label: #ffd100;
 
     /* overworld minimap markers (resolved by minimap_painter.ts via getComputedStyle:
        a 2D canvas context cannot read a CSS var directly). Exact pre-existing values
@@ -198,6 +226,9 @@
     --color-minimap-ally-friend: #4ade80;
     --color-minimap-ally-guild: #60a5fa;
     --color-minimap-npc-quest: #ffd100;
+    /* repeatable turn-in glyph: the rare-item blue, matching the map token
+       (the two surfaces keep separate token blocks deliberately) */
+    --color-minimap-npc-quest-repeat: #0070dd;
     --color-minimap-portal: #c084ff;
     --color-minimap-object-loot: #ffe97a;
     --color-minimap-mob-aggro: #ff8800;

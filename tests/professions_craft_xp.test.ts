@@ -107,6 +107,9 @@ describe('learning-coupled craft XP: taught-nothing crafts pay nothing', () => {
     const recipe = recipeById('recipe_arcanite_mining_pick')!;
     placeAtStationFor(sim, pid, recipe);
     grantItem(sim, 'arcanite_bar', 2, pid);
+    // The tier-5 pick gained the thornpeak fine grade alongside the refined
+    // bar (D8), so the tier-4 pick has to have actually been swung.
+    grantItem(sim, 'fine_thorium_ore', 2, pid);
     grantItem(sim, 'thorium_mining_pick', 1, pid);
     const before = meta.lifetimeXp;
 

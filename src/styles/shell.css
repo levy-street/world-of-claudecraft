@@ -6310,9 +6310,67 @@
       align-items: center;
       gap: 8px;
     }
-    body.mobile-touch #charselect-panel .cs-wallet,
-    body.mobile-touch #charselect-panel .cs-wallet-hidden-note {
+    body.mobile-touch:not(.seeker-wallet-enabled) #charselect-panel .cs-wallet,
+    body.mobile-touch:not(.seeker-wallet-enabled) #charselect-panel .cs-wallet-hidden-note {
       display: none;
+    }
+    /* Seeker wallet strip: pair the service name and verified helper as one
+       header row, then keep every connection action on the row below. */
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel .cs-wallet-group {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-rows: auto auto;
+      column-gap: 12px;
+      row-gap: 7px;
+      align-items: center;
+    }
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel .cs-wallet-main {
+      display: contents;
+    }
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel .cs-wallet-group > .cs-wallet-label {
+      grid-column: 1;
+      grid-row: 1;
+      align-self: center;
+      width: auto;
+      margin: 0;
+      padding: 0;
+      font-size: 12px;
+      line-height: 1.35;
+      white-space: nowrap;
+    }
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel .cs-wallet-help {
+      grid-column: 2;
+      grid-row: 1;
+      align-self: center;
+      justify-self: start;
+      width: auto;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      text-align: left;
+      line-height: 1.35;
+    }
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel .cs-wallet-actions {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      width: 100%;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel :is(.wallet-cta, .wallet-mini) {
+      min-width: 40px;
+      min-height: 40px;
+      padding: 5px 8px;
+      font-size: 11px;
+    }
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel .wallet-status {
+      min-height: 36px;
+      max-width: 290px;
+      padding: 5px 8px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     body.mobile-touch #charselect-panel .cs-controls {
       gap: 6px;

@@ -133,7 +133,7 @@ describe('content: the five typed reagents are not purchasable anywhere', () => 
     standAt(sim, pid, vendor);
     setCopper(sim, pid, 100000);
     sim.drainEvents();
-    sim.buyItem(vendor.id, R, pid);
+    sim.buyItem(vendor.id, R, undefined, pid);
     const events = sim.drainEvents();
     expect(errorTexts(events)).toContain('That item is not sold here.');
     expect(slotsOf(sim, pid, R)).toHaveLength(0);
