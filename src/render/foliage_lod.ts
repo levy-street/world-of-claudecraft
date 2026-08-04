@@ -138,6 +138,9 @@ export function treeDetailDistance(
  * silhouettes players report in the murky realms. The shader collapses each
  * INSTANCE against these windows instead, so the bucket tests only need to
  * answer "could any instance of this mesh be alive", never "are all of them".
+ * Dressing uses the same coverage rule at its adaptive distance cap, so an
+ * orbiting camera cannot drop nearby bushes just because the bucket center
+ * crossed the cap.
  *
  * Real tree parts live in [0, treeMax); impostors in [impostorMin, fogCull).
  * treeMax and impostorMin are the same number by construction: the windows
@@ -148,16 +151,27 @@ export interface InstanceCullWindows {
   treeMax: number;
   impostorMin: number;
   fogCull: number;
+  dressingMax: number;
 }
 
-export function instanceCullWindows(detailFar: number, fogLimit: number): InstanceCullWindows {
-  return instanceCullWindowsInto(detailFar, fogLimit, { treeMax: 0, impostorMin: 0, fogCull: 0 });
+export function instanceCullWindows(
+  detailFar: number,
+  fogLimit: number,
+  dressingLimit = fogLimit,
+): InstanceCullWindows {
+  return instanceCullWindowsInto(detailFar, fogLimit, dressingLimit, {
+    treeMax: 0,
+    impostorMin: 0,
+    fogCull: 0,
+    dressingMax: 0,
+  });
 }
 
 /** Allocation-free variant for the per-frame caller (the nameplatePlanInto idiom). */
 export function instanceCullWindowsInto(
   detailFar: number,
   fogLimit: number,
+  dressingLimit: number,
   out: InstanceCullWindows,
 ): InstanceCullWindows {
   const fogCull = Math.max(0, fogLimit);
@@ -165,6 +179,7 @@ export function instanceCullWindowsInto(
   out.treeMax = treeMax;
   out.impostorMin = treeMax;
   out.fogCull = fogCull;
+  out.dressingMax = Math.min(Math.max(0, dressingLimit), fogCull);
   return out;
 }
 
@@ -186,6 +201,9 @@ export interface BucketWindowInput {
    */
   minAtDetail?: boolean;
   maxAtDetail?: boolean;
+  /** The max cap is exact in the per-instance shader. The bucket test is
+   * coverage only and may reject the mesh once its near edge leaves the cap. */
+  maxAtInstance?: boolean;
   /** adaptive budget scale applied to the build-time bounds */
   distanceScale: number;
   /** runtime tree-detail boundary (see treeDetailDistance) */
@@ -197,21 +215,24 @@ export interface BucketWindowInput {
 }
 
 /**
- * The build-time caps (the near-fill density cull, rocks, dressing, the early bark
- * cull) are measured against the bucket's CENTER, as they always have been. They
+ * Most build-time caps (the near-fill density cull, rocks, the early bark cull)
+ * are measured against the bucket's CENTER, as they always have been. They
  * are cost controls and a bucket is ~240u deep, so measuring them from the near
  * edge would keep every bucket alive for another half-bucket past its cap and
- * quietly multiply the triangles they exist to cut.
+ * quietly multiply the triangles they exist to cut. Dressing is one exception:
+ * its shader enforces the adaptive cap per instance, so its bucket test uses the
+ * near edge only as a conservative coverage bound.
  *
- * The tree-detail swap is the exception: its two arms are COVERAGE tests, not a
- * partition. The real model draws while any part of the bucket is inside the
- * swap (near edge), the impostor while any part is outside it (far edge), so a
- * bucket straddling the boundary draws both meshes and the per-instance windows
- * (instanceCullWindows, enforced in the vertex shader) split the trees exactly.
- * Keyed on the center, a bucket you are standing at the edge of could already
- * have flipped to impostors, putting cones a few strides away; keyed near-edge
- * only, as this was before the shader owned the boundary, every tree in a
- * 540x240u slab drew at full detail until the whole slab left the swap.
+ * The tree-detail swap is a second, unrelated exception, for a different reason:
+ * its two arms are COVERAGE tests, not a partition. The real model draws while
+ * any part of the bucket is inside the swap (near edge), the impostor while any
+ * part is outside it (far edge), so a bucket straddling the boundary draws both
+ * meshes and the per-instance windows (instanceCullWindows, enforced in the
+ * vertex shader) split the trees exactly. Keyed on the center, a bucket you are
+ * standing at the edge of could already have flipped to impostors, putting
+ * cones a few strides away; keyed near-edge only, as this was before the shader
+ * owned the boundary, every tree in a 540x240u slab drew at full detail until
+ * the whole slab left the swap.
  */
 export function bucketVisible(w: BucketWindowInput): boolean {
   const nearEdge = w.centerDist - w.radius;
@@ -221,7 +242,8 @@ export function bucketVisible(w: BucketWindowInput): boolean {
     w.maxDist === undefined
       ? Number.POSITIVE_INFINITY
       : w.maxDist * w.distanceScale * w.revealScale;
-  if (w.centerDist < minCap || w.centerDist >= maxCap) return false;
+  if (w.centerDist < minCap) return false;
+  if (w.maxAtInstance ? nearEdge >= maxCap : w.centerDist >= maxCap) return false;
 
   if (w.minAtDetail && w.centerDist + w.radius < w.detailFar) return false;
   if (w.maxAtDetail && nearEdge >= w.detailFar) return false;

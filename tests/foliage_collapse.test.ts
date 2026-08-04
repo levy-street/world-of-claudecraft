@@ -80,26 +80,32 @@ describe('foliage collapse: shader injection', () => {
     const tree: CollapsibleMaterial = {};
     const impostor: CollapsibleMaterial = {};
     const plain: CollapsibleMaterial = {};
+    const dressing: CollapsibleMaterial = {};
     applyInstanceCollapse(tree, 'tree');
     applyInstanceCollapse(impostor, 'impostor');
     applyInstanceCollapse(plain, 'plain');
+    applyInstanceCollapse(dressing, 'dressing');
     const shTree = compile(tree);
     const shImpostor = compile(impostor);
     const shPlain = compile(plain);
+    const shDressing = compile(dressing);
 
-    updateCollapseUniforms(instanceCullWindows(138, 146.85));
+    updateCollapseUniforms(instanceCullWindows(138, 146.85, 104));
     expect(shTree.uniforms.uCollapseMin.value).toBe(0);
     expect(shTree.uniforms.uCollapseMax.value).toBe(138);
     expect(shImpostor.uniforms.uCollapseMin.value).toBe(138);
     expect(shImpostor.uniforms.uCollapseMax.value).toBe(146.85);
     expect(shPlain.uniforms.uCollapseMin.value).toBe(0);
     expect(shPlain.uniforms.uCollapseMax.value).toBe(146.85);
+    expect(shDressing.uniforms.uCollapseMin.value).toBe(0);
+    expect(shDressing.uniforms.uCollapseMax.value).toBe(104);
 
     // shared value objects: the next frame's write reaches already-compiled programs
-    updateCollapseUniforms(instanceCullWindows(368, 418.15));
+    updateCollapseUniforms(instanceCullWindows(368, 418.15, 200));
     expect(shTree.uniforms.uCollapseMax.value).toBe(368);
     expect(shImpostor.uniforms.uCollapseMin.value).toBe(368);
     expect(shImpostor.uniforms.uCollapseMax.value).toBe(418.15);
+    expect(shDressing.uniforms.uCollapseMax.value).toBe(200);
   });
 
   it('composes with an existing hook and rejects before its vertex edits', () => {

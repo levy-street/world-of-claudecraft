@@ -324,7 +324,7 @@ describe('foliage LOD: the real-model and impostor windows cover the world', () 
   });
 
   it('a cost cap cuts on the bucket CENTER, not its near edge', () => {
-    // Buckets are ~240u deep. The density/rock/dressing caps exist to cut
+    // Buckets are ~240u deep. The density and rock caps exist to cut
     // triangles, so measuring them from the near edge would keep every bucket
     // alive for another half-bucket past its cap: measured live in the Vale, that
     // one slip took foliage from ~1.0M to ~4.6M triangles a frame. Only the
@@ -341,6 +341,39 @@ describe('foliage LOD: the real-model and impostor windows cover the world', () 
     expect(bucketVisible({ ...pastCap, centerDist: cap - 20 })).toBe(true);
   });
 
+  it('keeps a dressing bucket alive while any instance can be inside its exact cap', () => {
+    // Regression at Evergarden 437,896: the camera orbits across the edge of
+    // a wide dressing bucket. Its center crosses the adaptive cap even though
+    // hedge instances remain a few yards away, so the whole hedge popped out
+    // from one viewing side. Dressing has an exact per-instance shader cap;
+    // the bucket test is only allowed to reject it once its near edge leaves.
+    const dressing = windowFor({
+      centerDist: 210,
+      radius: 120,
+      maxDist: LOD_HIGH.dressFar,
+      maxAtInstance: true,
+    });
+    expect(bucketVisible({ ...dressing, centerDist: 195 })).toBe(true);
+    expect(bucketVisible(dressing)).toBe(true);
+    expect(bucketVisible({ ...dressing, centerDist: 320 })).toBe(false);
+    expect(bucketVisible({ ...dressing, centerDist: 321 })).toBe(false);
+  });
+
+  it('scales the exact per-instance dressing cap by distanceScale too', () => {
+    // The regression above pins the maxAtInstance near-edge compare only at
+    // windowFor's default distanceScale (BEST_SCALE, which is 1): coverage for
+    // the budget actually shrinking that same cap, not just the plain-numeric one.
+    const scaledDressing = windowFor({
+      centerDist: 150,
+      radius: 60,
+      maxDist: LOD_HIGH.dressFar, // 200, scaled to 100 at half budget
+      maxAtInstance: true,
+      distanceScale: 0.5,
+    });
+    expect(bucketVisible(scaledDressing)).toBe(true); // nearEdge 90 < maxCap 100
+    expect(bucketVisible({ ...scaledDressing, centerDist: 160 })).toBe(false); // nearEdge 100 >= 100
+  });
+
   it('the budget still scales build-time bounds, just not the fog-derived one', () => {
     // A plain numeric bound (rocks, dressing, the near-fill cull) keeps shrinking
     // under load, which is the budget's whole point. rockFar 360 at half budget
@@ -353,10 +386,11 @@ describe('foliage LOD: the real-model and impostor windows cover the world', () 
 
 describe('foliage LOD: per-instance collapse windows', () => {
   it('real and impostor windows are exact complements at the swap', () => {
-    const w = instanceCullWindows(368, 418.15);
+    const w = instanceCullWindows(368, 418.15, 180);
     expect(w.treeMax).toBe(368);
     expect(w.impostorMin).toBe(w.treeMax);
     expect(w.fogCull).toBe(418.15);
+    expect(w.dressingMax).toBe(180);
   });
 
   it('a swap at the cull line leaves no impostor band but stays complementary', () => {
@@ -373,13 +407,19 @@ describe('foliage LOD: per-instance collapse windows', () => {
     const w = instanceCullWindows(258, 146.85);
     expect(w.treeMax).toBe(146.85);
     expect(w.impostorMin).toBe(w.treeMax);
+    expect(instanceCullWindows(258, 146.85, 180).dressingMax).toBe(146.85);
+  });
+
+  it('defaults dressing to fog and clamps a negative dressing cap to zero', () => {
+    expect(instanceCullWindows(138, 146.85).dressingMax).toBe(146.85);
+    expect(instanceCullWindows(138, 146.85, -1).dressingMax).toBe(0);
   });
 
   it('the allocation-free variant fills identically', () => {
-    const out = { treeMax: -1, impostorMin: -1, fogCull: -1 };
-    const returned = instanceCullWindowsInto(368, 418.15, out);
+    const out = { treeMax: -1, impostorMin: -1, fogCull: -1, dressingMax: -1 };
+    const returned = instanceCullWindowsInto(368, 418.15, 180, out);
     expect(returned).toBe(out); // fills the caller-owned object, no allocation
-    expect(out).toEqual(instanceCullWindows(368, 418.15));
+    expect(out).toEqual(instanceCullWindows(368, 418.15, 180));
   });
 });
 
@@ -387,6 +427,8 @@ describe('foliage LOD: tiers and purity', () => {
   it('hands the low tier its own, tighter table', () => {
     expect(lodDistsFor(true)).toBe(LOD_LOW);
     expect(lodDistsFor(false)).toBe(LOD_HIGH);
+    expect(LOD_HIGH.dressFar).toBe(200);
+    expect(LOD_LOW.dressFar).toBe(185);
     expect(LOD_LOW.treeDetailFar).toBeLessThan(LOD_HIGH.treeDetailFar);
   });
 

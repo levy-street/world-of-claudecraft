@@ -10,7 +10,7 @@
 //
 // The windows arrive per frame via updateCollapseUniforms (the shared-uniform
 // pattern of gfx.ts sharedUniforms.uTime): every material references the same
-// value objects, so the per-frame cost is three number writes. The decision
+// value objects, so the per-frame cost is four number writes. The decision
 // arithmetic lives in foliage_lod.ts (instanceCullWindows); this module is only
 // the Three-side injection, kept import-free so tests can drive it with plain
 // fakes.
@@ -29,9 +29,10 @@ import type { InstanceCullWindows } from './foliage_lod';
  * Which window a material's instances collapse against:
  * - 'tree': real model parts, alive in [0, treeMax)
  * - 'impostor': the far stand-ins, alive in [impostorMin, fogCull)
- * - 'plain': rocks and dressing, alive in [0, fogCull)
+ * - 'dressing': bushes and ground plants, alive in [0, dressingMax)
+ * - 'plain': rocks, alive in [0, fogCull)
  */
-export type CollapseRole = 'tree' | 'impostor' | 'plain';
+export type CollapseRole = 'tree' | 'impostor' | 'dressing' | 'plain';
 
 interface UniformValue {
   value: number;
@@ -61,12 +62,14 @@ const ZERO: UniformValue = { value: 0 };
 const uTreeMax: UniformValue = { value: FAR_SEED };
 const uImpostorMin: UniformValue = { value: FAR_SEED };
 const uFogCull: UniformValue = { value: FAR_SEED };
+const uDressingMax: UniformValue = { value: FAR_SEED };
 
 /** Per-frame: push the windows every collapse-enabled material reads. */
 export function updateCollapseUniforms(w: InstanceCullWindows): void {
   uTreeMax.value = w.treeMax;
   uImpostorMin.value = w.impostorMin;
   uFogCull.value = w.fogCull;
+  uDressingMax.value = w.dressingMax;
 }
 
 const COLLAPSE_PARS = `
@@ -102,7 +105,7 @@ const COLLAPSE_VERTEX = `
  */
 export function applyInstanceCollapse(mat: CollapsibleMaterial, role: CollapseRole): void {
   const min = role === 'impostor' ? uImpostorMin : ZERO;
-  const max = role === 'tree' ? uTreeMax : uFogCull;
+  const max = role === 'tree' ? uTreeMax : role === 'dressing' ? uDressingMax : uFogCull;
   const prev = mat.onBeforeCompile;
   const prevSrc = typeof prev === 'function' ? prev.toString() : '';
   mat.onBeforeCompile = (shader, renderer) => {
