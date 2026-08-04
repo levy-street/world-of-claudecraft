@@ -1,0 +1,11 @@
+{
+  "note": "The Last Bell of Gullhaven cast: the named defenders of the Farshore, built onto the shipped KayKit Adventurers rigs by scripts/assets/last_bell_crew/model.py (a repainted palette atlas plus bespoke geometry rigidly skinned to single bones). The raw exports already carry the engine's clip vocabulary and one 512 atlas each, so this spec only optimizes them: type:character is geometry-safe (never simplifies, which would corrupt the rigs). Run: CREW_OUT=tmp/asset_src/last_bell_crew blender --background --python scripts/assets/last_bell_crew/model.py && node scripts/assets/build_assets.mjs scripts/assets/specs/last_bell_crew.json && node scripts/build_media_manifest.mjs generate. Raw inputs under tmp/asset_src are gitignored; only the public/models outputs are committed.",
+  "items": [
+    {
+      "srcDir": "tmp/asset_src/last_bell_crew",
+      "outDir": "models/chars/npcs",
+      "type": "character",
+      "maxTex": 512
+    }
+  ]
+}
