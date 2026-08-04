@@ -2470,6 +2470,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.buy': '구매',
   'itemUi.market.reclaim': '회수',
   'itemUi.market.buyAria': '{price}에 {item} 구매',
+  'itemUi.market.buyConfirmTitle': '구매 확인',
+  'itemUi.market.buyConfirmBody': '{price}에 {item}을(를) 구매할까요?',
+  'itemUi.market.buyConfirmBodyStack': '{price}에 {item} x{count}(개당 {each})를 구매할까요?',
+  'itemUi.market.buyConfirmAccept': '구매',
+  'itemUi.market.buyConfirmCancel': '취소',
+  'itemUi.market.buyChanged':
+    '확인하기 전에 등록이 변경되었습니다. 가격을 확인한 후 다시 시도하세요.',
   'itemUi.market.reclaimAria': '{item} 회수',
   'itemUi.market.sellNote':
     '가방의 상품을 올립니다. 아이템이 팔리면 상인이 {cut}%를 가져갑니다. 등록 칸 {used}/{max}개 사용 중입니다.',

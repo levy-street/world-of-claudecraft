@@ -2383,6 +2383,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.buy': '購買',
   'itemUi.market.reclaim': '取回',
   'itemUi.market.buyAria': '以 {price} 購買 {item}',
+  'itemUi.market.buyConfirmTitle': '確認購買',
+  'itemUi.market.buyConfirmBody': '以 {price} 購買 {item}？',
+  'itemUi.market.buyConfirmBodyStack': '以 {price} 購買 {item} x{count}（每個 {each}）？',
+  'itemUi.market.buyConfirmAccept': '購買',
+  'itemUi.market.buyConfirmCancel': '取消',
+  'itemUi.market.buyChanged': '該上架在你確認前已變更。請核對價格後再試一次。',
   'itemUi.market.reclaimAria': '取回 {item}',
   'itemUi.market.sellNote':
     '從背包上架貨物。物品售出時商人抽取 {cut}%。你正在使用 {used}/{max} 個上架位。',

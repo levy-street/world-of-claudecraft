@@ -4204,6 +4204,8 @@ export class Hud {
         this.renderBags();
       }
     },
+    confirmDialog: (title, body, okText, cancelText, onOk) =>
+      this.confirmDialog(title, body, okText, cancelText, onOk),
   });
   // Ravenpost mailbox window painter (mailbox_view.ts core + mailbox_window.ts
   // painter). It owns the mailbox view-state (tab, opened letter, staged

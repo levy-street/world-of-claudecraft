@@ -2512,6 +2512,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.buy': 'Купить',
   'itemUi.market.reclaim': 'Вернуть',
   'itemUi.market.buyAria': 'Купить {item} за {price}',
+  'itemUi.market.buyConfirmTitle': 'Подтвердите покупку',
+  'itemUi.market.buyConfirmBody': 'Купить {item} за {price}?',
+  'itemUi.market.buyConfirmBodyStack': 'Купить {item} x{count} за {price} ({each} за штуку)?',
+  'itemUi.market.buyConfirmAccept': 'Купить',
+  'itemUi.market.buyConfirmCancel': 'Отмена',
+  'itemUi.market.buyChanged': 'Этот лот изменился до вашего подтверждения. Проверьте цену и попробуйте снова.',
   'itemUi.market.reclaimAria': 'Вернуть {item}',
   'itemUi.market.sellNote':
     'Выставляйте товары из сумок. Торговец берет {cut}% при продаже. Использовано мест: {used}/{max}.',

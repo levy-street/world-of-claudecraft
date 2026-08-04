@@ -2381,6 +2381,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.buy': '购买',
   'itemUi.market.reclaim': '取回',
   'itemUi.market.buyAria': '以 {price} 购买 {item}',
+  'itemUi.market.buyConfirmTitle': '确认购买',
+  'itemUi.market.buyConfirmBody': '以 {price} 购买 {item}？',
+  'itemUi.market.buyConfirmBodyStack': '以 {price} 购买 {item} x{count}（每个 {each}）？',
+  'itemUi.market.buyConfirmAccept': '购买',
+  'itemUi.market.buyConfirmCancel': '取消',
+  'itemUi.market.buyChanged': '该上架在你确认前发生了变化。请核对价格后重试。',
   'itemUi.market.reclaimAria': '取回 {item}',
   'itemUi.market.sellNote':
     '从背包上架货物。物品售出时商人抽取 {cut}%。你正在使用 {used}/{max} 个上架位。',
