@@ -192,6 +192,11 @@ const baseEnTable = {
   'groundPickup.graveVossEnough':
     "You have already taken what Royal Assassin Voss's grave will give.",
   'groundPickup.cryptRitualCircleEnough': 'The circle has nothing more to give you.',
+  // Murloc huts (q_deepfen_purge): the pickup deny arm is defensive (hut clicks
+  // route to the firebottle handler first), but the lines exist per the
+  // every-object-has-lines rule and localize like the rest.
+  'groundPickup.murlocHutDeny': 'You have no reason to torch that.',
+  'groundPickup.murlocHutEnough': 'These huts are already smouldering.',
   // The Veiled Hollow pickup surfaces (sealstone puzzle + the three memory
   // monuments): dems added these to GROUND_PICKUP_LINES; their EXACT matcher
   // entries land here so the client re-localizes the sim-emitted lines.
