@@ -35,6 +35,12 @@ const DEED_IDS = [
   'chr_willowfen_gatherer',
 ] as const;
 
+// The two Drakelands brood deeds appended after this wave (feature/dragonkin-drakelands).
+// They are the catalog tail now, so this wave's six painted targets are the contiguous
+// block just before them, and they are the only art-pending live deeds (authoring rule 6
+// in docs/design/deeds.md; flagged for commission in docs/achievements/icon-brief.md).
+const DRAKELANDS_TAIL_DEED_IDS = ['chr_drakemaw_broodlord', 'chr_maw_matriarch'] as const;
+
 const DEED_SHIPPING_GEOMETRY: Record<
   (typeof DEED_IDS)[number],
   { alphaBounds: [number, number, number, number]; visiblePixels: number }
@@ -395,8 +401,20 @@ describe('release v0.34 additional painted art', () => {
       expect(iconDataUrl('item', id)).toBe(`/ui/items/${id}.webp`);
     }
 
-    expect(sorted(DEED_ORDER.slice(-DEED_IDS.length))).toEqual([...DEED_IDS]);
-    expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([]);
+    // Both tail blocks are pinned positionally (stricter than the old bare tail slice):
+    // the Drakelands pair closes the catalog, and this wave's six sit contiguously in
+    // front of it.
+    expect(DEED_ORDER.slice(-DRAKELANDS_TAIL_DEED_IDS.length)).toEqual([
+      ...DRAKELANDS_TAIL_DEED_IDS,
+    ]);
+    const waveTail = DEED_ORDER.slice(
+      -(DEED_IDS.length + DRAKELANDS_TAIL_DEED_IDS.length),
+      -DRAKELANDS_TAIL_DEED_IDS.length,
+    );
+    expect(sorted(waveTail)).toEqual([...DEED_IDS]);
+    expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([
+      ...DRAKELANDS_TAIL_DEED_IDS,
+    ]);
     for (const id of DEED_IDS) {
       expect(DEEDS[id], `${id} live deed`).toBeDefined();
       expect(DEED_IMAGE_IDS.has(id), `${id} generated registry`).toBe(true);

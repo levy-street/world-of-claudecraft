@@ -1116,6 +1116,10 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // name doubles as the mob_charge_stun debuff, localized via AURA_NAME_KEY's
     // 'Charge' row like the other boss mechanics).
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/charge.ts'), 'utf8'),
+    // Dragonkin brood: the counter-stun "unleashes" announce line (same shape as charge.ts
+    // above, resolved by the sim_i18n log.bossUnleashes RULE). Scanned so any FUTURE literal
+    // emit added to this module lands under the drift guard from day one.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/dragonkin_brood.ts'), 'utf8'),
     socialSrc,
     // Whole-directory sweep (the phase 18 whole-branch review): EVERY
     // src/sim/professions module is scanned, the same directory-glob treatment

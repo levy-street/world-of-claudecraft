@@ -482,9 +482,14 @@ describe('yieldingFocusComponents and harvestConcentrationBonus (#2514)', () => 
     // that changed nothing would pass both bounds above. A CORPUS CENSUS like
     // the mixed-template count in tests/mob_component_tags: v0.32.0 authored 30
     // against the release bestiary, and this branch's extra corpses raise two
-    // more picks; the three tagged dragonkin brood corpses raise eight more.
+    // more picks. The three tagged dragonkin brood corpses add NOTHING here:
+    // they carry hide+fang, both mapped, so every harvestable pick on them
+    // concentrates exactly as the pre-#2514 body did and none of them raises.
+    // (They briefly advertised claw and horn, which are unmapped, and did raise
+    // eight picks; the same commit that took those tags back out of the mixed
+    // census left this pin at 40 by oversight.)
     // The two bounds inside the loop are the real assertions.
-    expect(raised).toBe(40);
+    expect(raised).toBe(32);
   });
 
   it('is self-healing: giving claw an item returns every number to the pre-#2514 world', () => {
