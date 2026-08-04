@@ -614,23 +614,24 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   POLISH_ROOT,
   'metadata/after-desktop-ultra.json',
 );
-// Re-pinned for the merge of release/v0.34.0 into this branch. Five
-// rendererIntegration moves now stack on src/render/renderer.ts: PR #2720's
-// Eastbrook fence-removal layout evidence, the live graphics rebuild (context
-// recycle plus profile-aware Eastbrook runtime inputs, PR #2799), the Bear
-// Form visual swap onto the purpose-built quadruped rig (PR #2842) and the
-// far-field sprite impostors, fog-free vista and horizon pass (PR #2793) from
-// the release side, plus this branch's worldObjectBurning fire-burst cue. The
-// release also re-swept this evidence across the combat-audio merge (PR #2861)
-// and that file is adopted verbatim. Both sides move the same leaf, so the
-// merged tree mints literals matching neither parent. The accepted file still
-// points at the same captured view; only its swept provenance bytes follow the
+// Re-pinned for the merge of release/v0.34.0 into this branch. Every
+// rendererIntegration move on both sides now stacks on src/render/renderer.ts:
+// from the release, PR #2720's Eastbrook fence-removal layout evidence, the live
+// graphics rebuild (context recycle plus profile-aware Eastbrook runtime inputs,
+// PR #2799), the Bear Form quadruped rig (PR #2842), the far-field sprite
+// impostors, fog-free vista and horizon pass (PR #2793), the Blizzard timed
+// ground loop on the snowZone spellfx arm (PR #2861), and the brood
+// shout/flourish and attackByAbility wiring; from this branch, the
+// worldObjectBurning fire-burst cue. Both sides move the same leaf, so the merged
+// tree mints literals matching neither parent. The release retook the polish
+// captures and this branch adopts them verbatim: the accepted file still points
+// at the same captured view, and only its swept provenance bytes follow the
 // merged rendererIntegration and layout inputs.
 // Re-minted with scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'ace1523586978c588ac5ca61bb2e3666abe03e01bbc74a66d44eac9fdb17e77b';
+  '9c23de6ea957bf325f7ed50fc37ec3631d898c7c8701e3cdffb6400d20b8de43';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '186fd186dfe660b9d25ceaa0fa1e4f7ff726b847f2e2af85696519b90c926d40';
+  '6b02ff15264e961e2a91ecfecc67f547382c77d76dcce9cedf6218405b94c71d';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1487,18 +1488,19 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(acceptedFiles).toHaveLength(4);
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
-    // Five rendererIntegration moves now stack in that composite (PR #2720's
-    // fence-removal layout evidence, the live graphics rebuild #2799, the Bear
-    // Form rig swap #2842 and the far-field impostors, fog-free vista and
-    // horizon pass #2793 from release/v0.34.0, plus this branch's
-    // worldObjectBurning fire-burst cue), and the release re-swept this evidence
-    // again across the combat-audio merge (PR #2861), so this seal follows the
-    // merged composite, recomputed last by remint_polish_provenance.mjs. Every
-    // measured value (frame timings, draw stats, triangle and scenario numbers)
-    // is byte-identical against the current release/v0.34.0 tip, no parent's
-    // literal matched the merged tree, and no capture was retaken.
+    // It therefore follows the first-order composite, so this merge moves it for
+    // the same reason: every rendererIntegration move on both sides stacks in
+    // that composite (from the release, PR #2720's fence-removal layout
+    // evidence, the live graphics rebuild #2799, the Bear Form rig swap #2842,
+    // the far-field impostors, fog-free vista and horizon pass #2793, the
+    // Blizzard timed ground loop #2861, and the brood shout/flourish wiring;
+    // from this branch, the worldObjectBurning fire-burst cue), recomputed last
+    // by remint_polish_provenance.mjs. The release retook the polish captures, so
+    // every measured value (frame timings, draw stats, triangle and scenario
+    // numbers) is adopted verbatim from the base tip; no parent's literal
+    // matched the merged tree, and no capture was retaken here.
     expect(fingerprint.digest('hex')).toBe(
-      'c5db222600f56d38d3d3ab325a07fc473b727ee017aa02fcd2afd3b0a14b1402',
+      '985ebaa5c0e031e33ef4b781689a9b1e29dca0ae526f21b059e9bfe180bcc707',
     );
   });
 

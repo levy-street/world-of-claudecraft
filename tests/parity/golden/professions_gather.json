@@ -20,8 +20,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 853,
-      "state": "ad9e1fed",
+      "nextId": 946,
+      "state": "9a7ebc25",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -59,7 +59,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 848,
+          "entityId": 941,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -95,7 +95,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 848
+              "sourceId": 941
             }
           ],
           "blockChance": 0.05,
@@ -108,7 +108,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 848,
+          "id": 941,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -152,9 +152,9 @@
     {
       "tick": 51,
       "time": 2.55,
-      "nextId": 853,
-      "state": "a3fc0619",
-      "events": "bfeff6cf",
+      "nextId": 946,
+      "state": "a95e2e01",
+      "events": "de9b037f",
       "rng": {
         "draws": 2,
         "digest": "00a2a78c"
@@ -211,7 +211,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 848,
+          "entityId": 941,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -270,7 +270,7 @@
               "name": "Battle Stance",
               "remaining": 3597.45,
               "school": "physical",
-              "sourceId": 848
+              "sourceId": 941
             }
           ],
           "blockChance": 0.05,
@@ -284,7 +284,7 @@
           "fallStartY": -1.407651,
           "fiveSecondRule": 101.55,
           "hp": 100,
-          "id": 848,
+          "id": 941,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -328,9 +328,9 @@
     {
       "tick": 104,
       "time": 5.2,
-      "nextId": 853,
-      "state": "c049d051",
-      "events": "89c45acb",
+      "nextId": 946,
+      "state": "8ff95a29",
+      "events": "90ee99e3",
       "rng": {
         "draws": 4,
         "digest": "49d036fe"
@@ -398,7 +398,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 848,
+          "entityId": 941,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -466,7 +466,7 @@
               "name": "Battle Stance",
               "remaining": 3594.8,
               "school": "physical",
-              "sourceId": 848
+              "sourceId": 941
             }
           ],
           "blockChance": 0.05,
@@ -480,7 +480,7 @@
           "fallStartY": -1.098601,
           "fiveSecondRule": 104.2,
           "hp": 100,
-          "id": 848,
+          "id": 941,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -524,9 +524,9 @@
     {
       "tick": 500,
       "time": 25,
-      "nextId": 853,
-      "state": "26af6396",
-      "events": "2d7820e7",
+      "nextId": 946,
+      "state": "3ffc7166",
+      "events": "49b25917",
       "rng": {
         "draws": 18,
         "digest": "9145b740"
@@ -535,9 +535,9 @@
     {
       "tick": 1000,
       "time": 50,
-      "nextId": 853,
-      "state": "19d5a022",
-      "events": "0b7a6fa9",
+      "nextId": 946,
+      "state": "8fe69eca",
+      "events": "cdc070a1",
       "rng": {
         "draws": 38,
         "digest": "d0aec0bd"
@@ -546,9 +546,9 @@
     {
       "tick": 1500,
       "time": 75,
-      "nextId": 853,
-      "state": "85c75d9c",
-      "events": "f93fce3e",
+      "nextId": 946,
+      "state": "2db3630c",
+      "events": "4f9ed82e",
       "rng": {
         "draws": 58,
         "digest": "7a44de5f"
@@ -557,9 +557,9 @@
     {
       "tick": 2000,
       "time": 100,
-      "nextId": 853,
-      "state": "2fd822b3",
-      "events": "231425e9",
+      "nextId": 946,
+      "state": "07319783",
+      "events": "ae294671",
       "rng": {
         "draws": 78,
         "digest": "a53e3a06"
@@ -568,9 +568,9 @@
     {
       "tick": 2500,
       "time": 125,
-      "nextId": 853,
-      "state": "587025ae",
-      "events": "e1ce536f",
+      "nextId": 946,
+      "state": "5d80126e",
+      "events": "8022199f",
       "rng": {
         "draws": 96,
         "digest": "618fafda"
@@ -579,9 +579,9 @@
     {
       "tick": 3000,
       "time": 150,
-      "nextId": 853,
-      "state": "521c4284",
-      "events": "231425e9",
+      "nextId": 946,
+      "state": "af3a3bcc",
+      "events": "ae294671",
       "rng": {
         "draws": 116,
         "digest": "6fbace71"
@@ -590,9 +590,9 @@
     {
       "tick": 3500,
       "time": 175,
-      "nextId": 853,
-      "state": "6c4f81d5",
-      "events": "8ff08956",
+      "nextId": 946,
+      "state": "49bb8a9d",
+      "events": "3058ed36",
       "rng": {
         "draws": 136,
         "digest": "33a83e8b"
@@ -601,9 +601,9 @@
     {
       "tick": 4000,
       "time": 200,
-      "nextId": 853,
-      "state": "40724fd2",
-      "events": "95e5cded",
+      "nextId": 946,
+      "state": "3e6329e2",
+      "events": "62bf9df5",
       "rng": {
         "draws": 156,
         "digest": "f0dbf356"
@@ -612,9 +612,9 @@
     {
       "tick": 4500,
       "time": 225,
-      "nextId": 853,
-      "state": "69593701",
-      "events": "89e621a3",
+      "nextId": 946,
+      "state": "eb471a51",
+      "events": "76480adb",
       "rng": {
         "draws": 176,
         "digest": "a0b21a12"
@@ -623,9 +623,9 @@
     {
       "tick": 5000,
       "time": 250,
-      "nextId": 853,
-      "state": "15ec4dae",
-      "events": "c61d635f",
+      "nextId": 946,
+      "state": "b8fe4ae6",
+      "events": "c7b4e43f",
       "rng": {
         "draws": 194,
         "digest": "6647d061"
@@ -634,9 +634,9 @@
     {
       "tick": 5206,
       "time": 260.3,
-      "nextId": 853,
-      "state": "46937cea",
-      "events": "cadaae81",
+      "nextId": 946,
+      "state": "b0a7f4d2",
+      "events": "0b0599f9",
       "rng": {
         "draws": 204,
         "digest": "545d7bf1"
@@ -724,7 +724,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 848,
+          "entityId": 941,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -797,7 +797,7 @@
               "name": "Battle Stance",
               "remaining": 3339.7,
               "school": "physical",
-              "sourceId": 848
+              "sourceId": 941
             }
           ],
           "blockChance": 0.05,
@@ -811,7 +811,7 @@
           "fallStartY": -4.298238,
           "fiveSecondRule": 359.3,
           "hp": 176,
-          "id": 848,
+          "id": 941,
           "kind": "player",
           "level": 3,
           "lootFfaTimer": "Infinity",
@@ -855,8 +855,8 @@
     {
       "tick": 5208,
       "time": 260.4,
-      "nextId": 853,
-      "state": "94ab879b",
+      "nextId": 946,
+      "state": "fea9993b",
       "events": "741638a5",
       "rng": {
         "draws": 204,
@@ -945,7 +945,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 848,
+          "entityId": 941,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1018,7 +1018,7 @@
               "name": "Battle Stance",
               "remaining": 3339.6,
               "school": "physical",
-              "sourceId": 848
+              "sourceId": 941
             }
           ],
           "blockChance": 0.05,
@@ -1032,7 +1032,7 @@
           "fallStartY": -4.298238,
           "fiveSecondRule": 359.4,
           "hp": 176,
-          "id": 848,
+          "id": 941,
           "kind": "player",
           "level": 3,
           "lootFfaTimer": "Infinity",

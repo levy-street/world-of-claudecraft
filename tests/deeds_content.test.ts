@@ -61,9 +61,9 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 232 deeds worth 2795 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(232);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2795);
+  it('ships exactly 234 deeds worth 2815 total Renown', () => {
+    expect(DEED_ORDER.length).toBe(234);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2815);
   });
 
   it('ships the audited per-category counts', () => {
@@ -74,7 +74,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       combat: 10,
       dungeon: 29,
       delve: 13,
-      chronicle: 35,
+      chronicle: 37,
       collection: 28,
       pvp: 28,
       social: 18,
@@ -145,6 +145,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'chr_galecrest_first_cast',
       'chr_farshore_gatherer',
       'chr_farshore_first_cast',
+      // The Drakelands dragonkin brood rework (v0.35): the new standing
+      // broodlord rares, plus quest-trigger credit for Cindraleth, the
+      // shipped capstone the first reckoning never credited.
+      'chr_drakemaw_broodlord',
+      'chr_maw_matriarch',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -211,6 +216,16 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(DEEDS.chr_hollow_rares.trigger).toEqual({
       kind: 'visits',
       markIds: ['slain:old_marrowshell', 'slain:aurelhorn'],
+    });
+    expect(DEEDS.chr_drakemaw_broodlord.renown).toBe(10);
+    expect(DEEDS.chr_drakemaw_broodlord.trigger).toEqual({
+      kind: 'visit',
+      markId: 'slain:drakemaw_broodlord',
+    });
+    expect(DEEDS.chr_maw_matriarch.renown).toBe(10);
+    expect(DEEDS.chr_maw_matriarch.trigger).toEqual({
+      kind: 'quest',
+      questId: 'q_dk_matriarch_of_the_maw',
     });
   });
 
@@ -377,7 +392,12 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Re-baselined for the phase 20 bottom-map chronicle pairs (Q26): six
   // appended deeds, the gatherer and first-cast pair for willowfen,
   // galecrest, and farshore_isle. No shipped trigger or renown changed.
-  const FROZEN_CATALOG_SHA256 = '7edfb6a537592245005cb438f019e5a0fedd86255353c4effde54fbe94358f2a';
+  // Re-baselined at this v0.34.0 sync merge for the Drakelands dragonkin brood
+  // rework (v0.35): two more appended deeds, chr_drakemaw_broodlord (the new
+  // standing broodlord rares) and chr_maw_matriarch (quest-trigger credit for
+  // the shipped Cindraleth capstone). Both parents appended only, so no
+  // shipped trigger or renown changed on either side.
+  const FROZEN_CATALOG_SHA256 = '4421793493830ebbde6691ea8af7f18a99d6917281c94f0b069bb66c1c82e9b1';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -571,7 +591,7 @@ describe('table shape', () => {
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('chr_farshore_first_cast');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('chr_maw_matriarch');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

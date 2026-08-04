@@ -863,6 +863,16 @@ export function assembleModel(
       }
     });
   }
+  // Two-state prop mobs (the dragonkin egg) ship BOTH state meshes at the
+  // origin: seed the ALIVE state (hide the corpse shell); CharacterVisual's
+  // enterDeath/revive flip it (created-already-dead corpses flip on their
+  // first diff, which always runs enterDeath).
+  if (def.corpseMeshSwap) {
+    const swap = def.corpseMeshSwap;
+    root.traverse((o) => {
+      if (o.name === swap.show) o.visible = false;
+    });
+  }
   // Weapons and held props are gameplay-readable silhouettes, not decoration.
   // Low tier still downgrades body/material cost, but keeps attachments visible.
   // Built SKINLESS and drawn: CharacterVisual applies the weapon skin (and any

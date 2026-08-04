@@ -997,6 +997,7 @@ export const nl_NL: EnTranslations = {
       "name_stormfeather_griffin": "Hemelreik Stormveder",
       "name_thunderstrut_gobbler": "Donderstap de Grote Kalkoen",
       "name_terrorspark_groundshaker": "Schrikvonk, de Grondschudder",
+      "name_drakemaw_raptor": "Drakemaw Raptor",
       "desc_valorsteed": "Een sterk, standvastig strijdros dat extra reissnelheid geeft.",
       "desc_grag_bear": "Een sterke, standvastige beer die extra reissnelheid geeft.",
       "desc_stalkglider_snail": "Een taaie, langzaam brandende slak die extra reissnelheid geeft.",
@@ -1004,7 +1005,8 @@ export const nl_NL: EnTranslations = {
       "desc_shadowjump_toad": "Een enorme, standvastige reuzenpad, getraind in bliksemsnelle schaduwsprongen die elk terrein overbruggen.",
       "desc_stormfeather_griffin": "Een koninklijke stormgriffioen die met runenbeslagen klauwen over de grond sluipt, vleugels opgevouwen.",
       "desc_thunderstrut_gobbler": "Een kolossale, uit de storm geboren kalkoen die vanaf de Ontwakende Piek naar beneden stapt, staart gespreid als een onweerswolk.",
-      "desc_terrorspark_groundshaker": "Een compacte gepantserde machine met zware rupsbanden, een grootkaliberkanon en een zadel gebouwd voor onverschrokken piloten."
+      "desc_terrorspark_groundshaker": "Een compacte gepantserde machine met zware rupsbanden, een grootkaliberkanon en een zadel gebouwd voor onverschrokken piloten.",
+      "desc_drakemaw_raptor": "A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash."
     },
     "mountTraining": {
       "mountPrompt": "Druk op {key} om op de trainings-Moedros te stijgen.",
@@ -10086,6 +10088,9 @@ export const nl_NL: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Contactsleutel: Schrikvonk, de Grondschudder"
       },
+      "reins_drakemaw_raptor": {
+        "name": "Reins of the Drakemaw Raptor"
+      },
       "conjured_water4": {
         "name": "Getoverd bronwater"
       },
@@ -11275,6 +11280,18 @@ export const nl_NL: EnTranslations = {
       },
       "cindraleth_maw_matriarch": {
         "name": "Cindraleth de Muilmatriarch"
+      },
+      "dragonkin_egg": {
+        "name": "Dragonkin Egg"
+      },
+      "dragonkin_whelp": {
+        "name": "Dragonkin Whelp"
+      },
+      "dragonkin_broodguard": {
+        "name": "Dragonkin Broodguard"
+      },
+      "drakemaw_broodlord": {
+        "name": "Drakemaw Broodlord"
       },
       "gilded_stag": {
         "name": "Vergulde Hert"

@@ -3233,13 +3233,16 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // every tagged template (it grew with the templates #1584 added), stated so a
     // shrunk sweep reads as wrong rather than merely smaller.
     // Spent rose 86 to 152 with the farm-economy pass, which gave 15 coinless
-    // trash templates their mapped harvest tags, then 152 to 154 with the zones
-    // 1-3 quest-dedupe content pass (threnos_first_voice ships tagged cloth,
-    // adding its two subsets); refused is untouched because that arm counts
-    // all-unmapped corpses, which neither pass added to.
-    expect(spent).toBe(154);
+    // trash templates their mapped harvest tags; refused is untouched because
+    // that arm counts all-unmapped corpses, which neither pass added to.
+    // Then 152 to 164 for the Drakelands brood: whelp, broodguard and
+    // broodlord each carry hide+fang, so each contributes all 4 of its masks
+    // (2 mapped families means no selection can forfeit every yield) and none
+    // to refused, exactly +12/+0. Then 164 to 166 with this branch's zones 1-3
+    // quest-dedupe pass, whose tagged threnos_first_voice adds its two subsets.
+    expect(spent).toBe(166);
     expect(refused).toBe(16);
-    expect(spent + refused).toBe(170);
+    expect(spent + refused).toBe(182);
   });
 
   // The six mapped families and their item ids, spelled out. Deriving them from
@@ -3324,9 +3327,12 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     expect(unmappedOffered).toBe(37);
     // 113 to 217 for the same reason as the spend census above: more mapped
     // families in the corpus, none of them unmapped, so only this half moves.
-    // 217 to 219 with the zones 1-3 quest-dedupe content pass: the tagged
+    // 217 to 235 for the Drakelands brood, on the same footing: three hide+fang
+    // templates extract 2 + 1 + 1 + 2 families across their four masks, so +18
+    // here while unmappedOffered above stays put, since neither tag is unmapped.
+    // Then 235 to 237 with this branch's quest-dedupe pass: the tagged
     // threnos_first_voice adds one cloth extraction on each of its two subsets.
-    expect(extracted).toBe(219);
+    expect(extracted).toBe(237);
   });
 
   it('keeps every mixed template harvestable, so the gate is not a blanket refusal', () => {

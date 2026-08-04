@@ -134,6 +134,9 @@ const CLIPLESS_RIGS = new Set([
   'mob_glimmerwisp',
   'mob_duskwisp',
   'mob_spider_egg_sac',
+  // the dragonkin clutch shell: a two-state prop whose GLB ships no clips
+  // (alive/dead is a mesh-visibility swap, VisualDef.corpseMeshSwap)
+  'mob_dragon_egg',
 ]);
 
 /** mob_yumi_cat is a single-clip objective prop: its ClipMap names the one real

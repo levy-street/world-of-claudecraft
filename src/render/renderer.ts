@@ -365,7 +365,11 @@ import {
   writeViewCandidate,
 } from './view_candidate_pool_core';
 import { ViewCreateRetryGate } from './view_create_retry';
-import { type WarriorCastVisualPlan, warriorCastVisualPlan } from './warrior_cast_fx_core';
+import {
+  isMobEngageCue,
+  type WarriorCastVisualPlan,
+  warriorCastVisualPlan,
+} from './warrior_cast_fx_core';
 import { RecklessSkullPainter } from './warrior_cast_fx_painter';
 import { buildWater, type WaterView } from './water';
 import { buildWaterFlora } from './water_flora';
@@ -6056,8 +6060,32 @@ export class Renderer {
         if (ev.fx === 'windup') {
           // A petSpell windup telegraph: start the throw animation now; the
           // projectile for this throw follows petSpell.windup later, timed to
-          // the clip's release pose.
-          this.triggerAttack(ev.sourceId);
+          // the clip's release pose. `ability` rides along so a mob one-shot
+          // can pick its authored clip via attackByAbility (the dragonkin
+          // brood's Cleave/Stun); every petSpell emitter sends none, so their
+          // rotation is unchanged.
+          this.triggerAttack(ev.sourceId, ev.ability);
+          break;
+        }
+        if (isMobEngageCue(ev.fx, this.sim.entities.get(ev.sourceId)?.kind)) {
+          // A MOB's own cue: 'shout' is the dragonkin brood's rooted engage
+          // bellow (broodguards and the broodlords; the lords' version also
+          // cracks the clutch awake), and 'flourish' is a whelp's hatch pounce.
+          // Both play the visual's flourish one-shot (Shout / JumpAttack); the
+          // shout adds a pulse so the wake-up reads at a distance.
+          //
+          // Gated on the SOURCE so PLAYER castFx keeps reaching the warrior cast
+          // plan below: the six warrior shouts and raised_guard ride these same
+          // two fx kinds. raised_guard was the reachable loss, since the ability
+          // painter above claims 'shout' but never 'flourish', so swallowing it
+          // here traded its authored Block gesture for a playFlourish() no-op on
+          // a rig that has no flourish clip. See isMobEngageCue for why the
+          // ability id is the wrong discriminator and why a reorder does not fix
+          // it, and tests/renderer_spellfx_dispatch_order.test.ts for the pin.
+          const v = this.views.get(ev.sourceId);
+          const vis = v ? this.activeVisual(v) : null;
+          vis?.playFlourish();
+          if (ev.fx === 'shout') this.pulseAt(ev.sourceId, ev.school, 1.8, 0.5);
           break;
         }
         // Player ranged attacks begin when their projectile launches. The live

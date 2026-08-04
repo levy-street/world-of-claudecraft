@@ -797,6 +797,7 @@ export const hudChromeStrings = {
     name_stormfeather_griffin: 'Sky-Reach Stormfeather',
     name_thunderstrut_gobbler: 'Thunderstrut the Grand Gobbler',
     name_terrorspark_groundshaker: 'Terrorspark Groundshaker',
+    name_drakemaw_raptor: 'Drakemaw Raptor',
     desc_valorsteed: 'A hardy, sure-footed steed that provides enhanced travel speed.',
     desc_grag_bear: 'A hardy, sure-footed bear that provides enhanced travel speed.',
     desc_stalkglider_snail: 'A hearty, slow-burning snail that provides enhanced travel speed.',
@@ -810,6 +811,8 @@ export const hudChromeStrings = {
       'A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead.',
     desc_terrorspark_groundshaker:
       'A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.',
+    desc_drakemaw_raptor:
+      'A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash.',
   },
   // The riding lesson at the Highwatch stables (q_riding_lessons): Stablemaster
   // Marla lends the player a training Valorsteed for the paddock race. Finishing

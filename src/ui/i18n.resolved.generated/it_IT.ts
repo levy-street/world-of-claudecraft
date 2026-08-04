@@ -997,6 +997,7 @@ export const it_IT: EnTranslations = {
       "name_stormfeather_griffin": "Piumatempesta Toccacielo",
       "name_thunderstrut_gobbler": "Passotuono, il Gran Tacchino",
       "name_terrorspark_groundshaker": "Terrorscintilla, Scuoteterra",
+      "name_drakemaw_raptor": "Drakemaw Raptor",
       "desc_valorsteed": "Un destriero robusto e dal passo sicuro che aumenta la velocità di viaggio.",
       "desc_grag_bear": "Un orso robusto e dal passo sicuro che aumenta la velocità di viaggio.",
       "desc_stalkglider_snail": "Una lumaca tenace e a combustione lenta che aumenta la velocità di viaggio.",
@@ -1004,7 +1005,8 @@ export const it_IT: EnTranslations = {
       "desc_shadowjump_toad": "Un rospo gigante, massiccio e dal passo sicuro, addestrato a balzi d’ombra fulminei su ogni terreno.",
       "desc_stormfeather_griffin": "Un grifone della tempesta regale che incede al suolo su artigli runici, ali ripiegate.",
       "desc_thunderstrut_gobbler": "Un tacchino colossale nato dalla tempesta che scende impettito dal Picco Risvegliato, con la coda spiegata come un fronte di tempesta.",
-      "desc_terrorspark_groundshaker": "Una macchina corazzata compatta con cingoli pesanti, un cannone di grosso calibro e una sella costruita per piloti impavidi."
+      "desc_terrorspark_groundshaker": "Una macchina corazzata compatta con cingoli pesanti, un cannone di grosso calibro e una sella costruita per piloti impavidi.",
+      "desc_drakemaw_raptor": "A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash."
     },
     "mountTraining": {
       "mountPrompt": "Premi {key} per salire sul Valorsteed di addestramento.",
@@ -10086,6 +10088,9 @@ export const it_IT: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Chiave d’accensione: Terrorscintilla, Scuoteterra"
       },
+      "reins_drakemaw_raptor": {
+        "name": "Reins of the Drakemaw Raptor"
+      },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"
       },
@@ -11275,6 +11280,18 @@ export const it_IT: EnTranslations = {
       },
       "cindraleth_maw_matriarch": {
         "name": "Cindraleth, la Matriarca delle Fauci"
+      },
+      "dragonkin_egg": {
+        "name": "Dragonkin Egg"
+      },
+      "dragonkin_whelp": {
+        "name": "Dragonkin Whelp"
+      },
+      "dragonkin_broodguard": {
+        "name": "Dragonkin Broodguard"
+      },
+      "drakemaw_broodlord": {
+        "name": "Drakemaw Broodlord"
       },
       "gilded_stag": {
         "name": "Cervo Dorato"

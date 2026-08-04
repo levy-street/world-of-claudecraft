@@ -427,7 +427,11 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       { itemId: 'chipped_tusk', chance: 1 },
     ],
     purgeOnHit: { chance: 0.3, name: 'Spellgnaw' },
-    scale: 1.3,
+    // Playtest bump, 75% over the first cut: the Glutton should loom over the
+    // Mirefen trolls he feeds beside. Past the scale-2 threshold his melee
+    // reach needs the bespoke profile in mob_combat.ts (the wildheart whiff
+    // lesson) and his gait refs are re-measured for the bigger stride.
+    scale: 2.275,
     color: 0x145a32,
   },
   gravecaller_cultist: {

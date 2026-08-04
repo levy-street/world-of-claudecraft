@@ -12,6 +12,7 @@ import {
   steadyAngleTo,
 } from '../types';
 import { chainPullTransitHoldsLeash, clearChainPullInbound } from './chain_pull_transit';
+import { dragonkinEngageShout } from './dragonkin_brood';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './healer_channel';
 import { chaseStalledUnreachable } from './reachability';
 import { resetRiftMechanicWindups } from './rift_escape_window';
@@ -120,6 +121,26 @@ export function updateMobCombatProfile(
   }
 
   onEngagedTick?.();
+
+  // Dragonkin engage shout: the brood bellows BEFORE it walks. Fires once per
+  // pull (shoutFired resets on evade/respawn with the other pull state); for
+  // the shout window the mob stands rooted facing its target, not moving and
+  // not swinging (the player's cue to pre-position), while the broodlords'
+  // shout also cracks the surrounding eggs awake and wards their hatchlings
+  // (mob/dragonkin_brood.ts).
+  const shout = MOBS[mob.templateId]?.engageShout;
+  if (shout) {
+    if (!mob.shoutFired) {
+      mob.shoutFired = true;
+      mob.shoutIntroUntil = ctx.time + shout.rootSeconds;
+      dragonkinEngageShout(ctx, mob, shout);
+    }
+    if (mob.shoutIntroUntil !== undefined && ctx.time < mob.shoutIntroUntil) {
+      mob.facing = steadyAngleTo(mob.pos, target.pos, mob.facing);
+      mob.aiState = 'attack';
+      return 'done';
+    }
+  }
 
   // A channelHeal caster (Malric, the Nythraxis spirit healer) is a HEALER, not a
   // bruiser: it holds a standoff near its protectee (the boss) and channels a

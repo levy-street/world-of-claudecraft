@@ -34,6 +34,7 @@ import {
   mobArmorReduction,
   normAngle,
 } from '../types';
+import { applyBroodBurn } from './dragonkin_brood';
 import { RIFT_CLEAVE_HALF_ARC, riftEscapeWindowActive } from './rift_escape_window';
 
 // A "Devour Magic"-strippable beneficial enhancement: a positive buff_* stat
@@ -983,6 +984,70 @@ export function runMobSwingAffixes(
     ctx.rng.chance(purge.chance)
   ) {
     devourBeneficialAura(ctx, target, purge.name);
+  }
+  // Dragonkin whelp pounce landing: the hatch pounce owes its victim ONE
+  // guaranteed burn, paid by the first landed swing (the leap "landing").
+  // Deterministic (no chance roll) and appended after every existing arm, so
+  // no proc above moves its rng stream position.
+  const whelp = MOBS[mob.templateId]?.broodWhelp;
+  if (whelp && mob.hostile && mob.leapBurnPending && !target.dead) {
+    mob.leapBurnPending = false;
+    applyBroodBurn(ctx, mob, target, whelp.burn);
+  }
+  // Dragonkin front-arc cleave (arcCleave): every Nth LANDED swing also
+  // strikes every other player in the frontal arc for mult x the base swing
+  // (armor-reduced per victim) and sets the burn on everyone struck, primary
+  // included. Deterministic cadence: draws no rng, so the arms above keep
+  // their stream positions for any template mix.
+  const arc = MOBS[mob.templateId]?.arcCleave;
+  if (arc && mob.hostile && !mob.dead) {
+    mob.swingCleaveCount = (mob.swingCleaveCount ?? 0) + 1;
+    if (mob.swingCleaveCount >= arc.every) {
+      mob.swingCleaveCount = 0;
+      // 'windup' + ability: the renderer routes the cue through triggerAttack,
+      // whose attackByAbility map picks the authored Cleave one-shot.
+      ctx.emit({
+        type: 'spellfx',
+        sourceId: mob.id,
+        targetId: mob.id,
+        school: 'fire',
+        fx: 'windup',
+        ability: 'brood_cleave',
+      });
+      if (!MOBS[mob.templateId]?.quietMechanics)
+        ctx.emit({
+          type: 'log',
+          text: `${mob.name} unleashes ${arc.name}!`,
+          color: '#ff9933',
+          entityId: mob.id,
+        });
+      const halfArc = (arc.arcDeg * Math.PI) / 180 / 2;
+      for (const meta of ctx.players.values()) {
+        const pe = ctx.entities.get(meta.entityId);
+        if (!pe || pe.dead) continue;
+        const inArc =
+          dist2d(pe.pos, mob.pos) <= arc.range &&
+          Math.abs(normAngle(angleTo(mob.pos, pe.pos) - mob.facing)) <= halfArc;
+        if (!inArc && pe.id !== target.id) continue;
+        // The primary target already ate the base swing: it takes only the
+        // burn. Everyone else in the arc takes the cleave hit, then burns.
+        if (pe.id !== target.id) {
+          let sd = rawDmg * arc.mult;
+          sd *= 1 - mobArmorReduction(mob, pe, ctx.effectiveArmor(pe));
+          ctx.dealDamage(
+            mob,
+            pe,
+            Math.max(1, Math.round(sd)),
+            crit,
+            'physical',
+            arc.name,
+            'hit',
+            true,
+          );
+        }
+        if (arc.burn && !pe.dead) applyBroodBurn(ctx, mob, pe, arc.burn);
+      }
+    }
   }
 }
 

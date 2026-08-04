@@ -1497,6 +1497,14 @@
       "license": "World of ClaudeCraft original art (project-owned render of a project-owned mount model)"
     },
     {
+      "itemId": "reins_drakemaw_raptor",
+      "name": "Reins of the Drakemaw Raptor",
+      "sourcePack": "woc_mount_models",
+      "sourceFile": "drakemaw_raptor.glb",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned render of a project-owned mount model)"
+    },
+    {
       "itemId": "reliquary_cloth_chest",
       "name": "Shroud of the Reliquary",
       "sourcePack": "equipment",

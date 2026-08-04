@@ -2400,6 +2400,7 @@ const ITEM_ENTITY_IDS = [
   'gatherers_cache',
   'artisans_eye',
   'reins_terrorspark_groundshaker',
+  'reins_drakemaw_raptor',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2502,6 +2503,8 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   // folds them into the per-locale arrays.
   firebottle: 'Firebottle',
   murloc_hut: 'Mudfin Hut',
+  // Dragonkin brood rebuild (PR #2811), same English-appended treatment.
+  reins_drakemaw_raptor: 'Reins of the Drakemaw Raptor',
   restless_skull: 'Restless Skull',
   vanguard_bone: 'Vanguard Bone',
 };

@@ -997,6 +997,7 @@ export const ko_KR: EnTranslations = {
       "name_stormfeather_griffin": "하늘닿이 폭풍깃",
       "name_thunderstrut_gobbler": "천둥활보 대왕 칠면조",
       "name_terrorspark_groundshaker": "대지를 뒤흔드는 테러스파크",
+      "name_drakemaw_raptor": "화산구 랩터",
       "desc_valorsteed": "여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.",
       "desc_grag_bear": "여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.",
       "desc_stalkglider_snail": "여행 속도를 높여 주는 끈질기고 느긋한 달팽이입니다.",
@@ -1004,7 +1005,8 @@ export const ko_KR: EnTranslations = {
       "desc_shadowjump_toad": "어떤 지형이든 번개 같은 그림자 도약으로 누비도록 훈련된 거대한 두꺼비입니다.",
       "desc_stormfeather_griffin": "룬 발톱으로 땅을 누비는 위엄 있는 폭풍 그리핀입니다. 날개는 접혀 있습니다.",
       "desc_thunderstrut_gobbler": "깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다.",
-      "desc_terrorspark_groundshaker": "묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다."
+      "desc_terrorspark_groundshaker": "묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다.",
+      "desc_drakemaw_raptor": "화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다."
     },
     "mountTraining": {
       "mountPrompt": "{key} 키를 눌러 훈련용 발러스티드에 탑승한다.",
@@ -10086,6 +10088,9 @@ export const ko_KR: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "테러스파크 시동 열쇠"
       },
+      "reins_drakemaw_raptor": {
+        "name": "화산구 랩터의 고삐"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -11275,6 +11280,18 @@ export const ko_KR: EnTranslations = {
       },
       "cindraleth_maw_matriarch": {
         "name": "화산구의 어미 신드랄레스"
+      },
+      "dragonkin_egg": {
+        "name": "용족 알"
+      },
+      "dragonkin_whelp": {
+        "name": "용족 새끼"
+      },
+      "dragonkin_broodguard": {
+        "name": "용족 둥지 수호병"
+      },
+      "drakemaw_broodlord": {
+        "name": "화산구의 둥지군주"
       },
       "gilded_stag": {
         "name": "금빛 수사슴"

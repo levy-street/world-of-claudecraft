@@ -95,8 +95,8 @@ function ride(sim: Sim, pid: number, key: string): void {
 }
 
 describe('mount catalog', () => {
-  it('has exactly eight mounts with the horse first and the developer tank last', () => {
-    expect(MOUNT_KEYS).toHaveLength(8);
+  it('has exactly nine mounts with the horse first and the developer tank last', () => {
+    expect(MOUNT_KEYS).toHaveLength(9);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
     expect(MOUNT_KEYS.at(-1)).toBe('terrorspark_groundshaker');
     expect(DEFAULT_MOUNT).toBe('valorsteed');
@@ -215,6 +215,16 @@ describe('mount reins items (the collection: owning the item is owning the mount
     // takes equal-rate secondary paths to both rather than a fifth signature
     // mount (owner call, 2026-08-01). Rate parity below is what keeps that
     // honest: every path still pays the one rarity rate.
+    // NO SOURCE YET (owner call, 2026-08-04): the Drakemaw Raptor briefly took an
+    // open-world-rare path, dropping off the four Drakemaw Broodlords. That is
+    // reverted: the broodlord is the 90% source of the quest chain's own
+    // emberwing_scale, so hanging the only farmable epic mount on it camped the
+    // Drakemaw belt and tap-blocked every leveler questing through. The reins move
+    // to a dedicated world boss in a follow-up; until then the def ships with no
+    // acquisition path at all. Listed EXPLICITLY so a sourceless mount is a
+    // decision and never an accident: when the world boss lands, delete the entry
+    // and the rarity-derived rule below takes back over.
+    const NO_SOURCE_YET: readonly string[] = ['reins_drakemaw_raptor'];
     const FIVE_MAN_SOURCES: Record<string, readonly string[]> = {
       reins_stormfeather_griffin: ['morthen'],
       reins_shadowjump_toad: ['vael_the_mistcaller'],
@@ -240,8 +250,26 @@ describe('mount reins items (the collection: owning the item is owning the mount
       );
 
       if (rarity === 'epic') {
-        // Rift S clears are the sole source. Nothing heroic, nothing static.
+        // Rift S clears are the sole source, EXCEPT a mount held sourceless on
+        // purpose. Either way it stays out of every heroic table, so the heroic
+        // tier's mount supply is unchanged.
         expect(heroicEntries, `${itemId} (epic) must not be heroic-reachable`).toEqual([]);
+        if (NO_SOURCE_YET.includes(itemId)) {
+          // The mob-table sweep above already proved it drops off nothing. Pin
+          // the remaining three pools too, so "no path" means no path: the day
+          // its world boss lands, it gets ONE source, not a quiet second one.
+          for (const [pool, name] of [
+            [RIFT_EPIC_MOUNT_REINS, 'rift S'],
+            [RIFT_BLUE_MOUNT_REINS, 'rift blue'],
+            [RIFT_GREEN_MOUNT_REINS, 'rift green'],
+          ] as const) {
+            expect(
+              pool as readonly string[],
+              `${itemId} has no source yet: not in ${name}`,
+            ).not.toContain(itemId);
+          }
+          continue;
+        }
         expect(RIFT_EPIC_MOUNT_REINS as readonly string[]).toContain(itemId);
         continue;
       }

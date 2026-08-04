@@ -542,6 +542,17 @@ const baseEnTable = {
   'aura.bonesplinter': 'Bonesplinter',
   'aura.raggedGash': 'Ragged Gash',
   'aura.soulblaze': 'Soulblaze',
+  // The Drakelands dragonkin brood (v0.35 rework): mechanic labels and the
+  // player-facing burn/ward/stun aura names.
+  'mechanic.broodCleave': 'Brood Cleave',
+  'mechanic.mawCleave': 'Maw Cleave',
+  'mechanic.fireBreath': 'Fire Breath',
+  'mechanic.tailHammer': 'Tail Hammer',
+  'mechanic.broodRipple': 'Brood Ripple',
+  'aura.searedScales': 'Seared Scales',
+  'aura.hatchlingBurn': 'Hatchling Burn',
+  'aura.broodlordsWard': "Broodlord's Ward",
+  'aura.matriarchsWard': "Matriarch's Ward",
   'log.seaFatigue': 'The open sea saps your strength. Swim back to shore!',
   'log.veilEnter': 'A veil of dusk parts before you, and the Hollow opens ahead.',
   'log.veilLeave': 'The veil closes behind you, and the mountain air bites again.',
@@ -7656,6 +7667,17 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Thunderclap: 'mechanic.thunderclap',
   Stormcall: 'mechanic.stormcall',
   'Howling Gale': 'mechanic.howlingGale',
+  // The Drakelands dragonkin brood (v0.35): the broodlord/matriarch kit and
+  // the egg ripple's damage label, plus the burn/ward auras below.
+  'Brood Cleave': 'mechanic.broodCleave',
+  'Maw Cleave': 'mechanic.mawCleave',
+  'Fire Breath': 'mechanic.fireBreath',
+  'Tail Hammer': 'mechanic.tailHammer',
+  'Brood Ripple': 'mechanic.broodRipple',
+  'Seared Scales': 'aura.searedScales',
+  'Hatchling Burn': 'aura.hatchlingBurn',
+  "Broodlord's Ward": 'aura.broodlordsWard',
+  "Matriarch's Ward": 'aura.matriarchsWard',
   // On-hit / DoT / debuff flavor auras applied to players (would otherwise leak raw English
   // in the buff/debuff frame and combat log). Data-driven from src/sim/content/zone*.ts.
   'Spider Venom': 'aura.spiderVenom',

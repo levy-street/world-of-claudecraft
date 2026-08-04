@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { VISUALS } from '../src/render/characters/manifest';
 import {
@@ -5,7 +6,11 @@ import {
   isSpinAttackAbility,
   weaponAttackStyle,
 } from '../src/render/characters/weapon_attack_style_core';
-import { WARRIOR_SHOUT_COLORS, warriorCastVisualPlan } from '../src/render/warrior_cast_fx_core';
+import {
+  isMobEngageCue,
+  WARRIOR_SHOUT_COLORS,
+  warriorCastVisualPlan,
+} from '../src/render/warrior_cast_fx_core';
 import { ABILITIES } from '../src/sim/data';
 
 describe('winning Warrior attack animation routing', () => {
@@ -86,5 +91,94 @@ describe('winning Warrior cast VFX routing', () => {
       abilityId: 'raised_guard',
     });
     expect(warriorCastVisualPlan('projectile', 'heroic_throw')).toBeNull();
+  });
+});
+
+// The renderer's spellfx handler dispatches the mob engage cue BEFORE the warrior
+// cast plan, and both claim fx 'shout' and 'flourish'. Whichever wins first wins
+// outright (the branch breaks), so the split between them is a contract, not an
+// implementation detail: getting it wrong silently cost raised_guard its authored
+// Block gesture, which is exactly the regression this pins. The renderer's own
+// call site is pinned in tests/renderer_spellfx_dispatch_order.test.ts.
+describe('spellfx dispatch order: mob engage cue vs warrior cast plan', () => {
+  // Every shipped ability reaching the two contested fx kinds, pinned as a
+  // literal so the sweep below cannot quietly shrink: adding a castFx 'shout'
+  // ability OR removing one reds this row, and the per-ability assertions then
+  // cover the new arrival for free.
+  const CONTESTED_CAST_FX = ['shout', 'flourish'] as const;
+  const playerCueAbilities = Object.values(ABILITIES)
+    .filter((a) => CONTESTED_CAST_FX.includes(a.castFx as (typeof CONTESTED_CAST_FX)[number]))
+    .map((a) => a.id)
+    .sort();
+
+  it('ships exactly the six warrior shouts plus raised_guard on the contested fx kinds', () => {
+    expect(playerCueAbilities).toEqual([
+      'battle_shout',
+      'defiant_bellow',
+      'demoralizing_shout',
+      'emboldening_roar',
+      'intimidating_shout',
+      'raised_guard',
+      'rallying_cry',
+    ]);
+  });
+
+  it('leaves every player castFx to the warrior plan, never the mob cue', () => {
+    for (const id of playerCueAbilities) {
+      const fx = ABILITIES[id].castFx as string;
+      expect(isMobEngageCue(fx, 'player'), `${id} must not be claimed as a mob cue`).toBe(false);
+      // and it really does reach a live plan, so "not claimed" means "still works"
+      expect(warriorCastVisualPlan(fx, id), `${id} must keep its warrior plan`).not.toBeNull();
+    }
+  });
+
+  it('claims the brood cues, which a mob emits with no ability id', () => {
+    // Mirrors the two live emits in src/sim/mob/dragonkin_brood.ts: the engage
+    // bellow and the whelp hatch pounce, both sourced from a mob.
+    expect(isMobEngageCue('shout', 'mob')).toBe(true);
+    expect(isMobEngageCue('flourish', 'mob')).toBe(true);
+  });
+
+  it('proves the source gate is load-bearing and a reorder would not do', () => {
+    // warriorCastVisualPlan claims ANY 'shout' whatever the ability id, falling
+    // back to a default roar color. So the ONLY thing keeping a mob bellow out
+    // of the warrior path is the source gate: drop it and every brood shout
+    // repaints as a warrior shout, and moving the branch below the plan instead
+    // would do exactly that.
+    expect(warriorCastVisualPlan('shout', undefined)).not.toBeNull();
+    // The ability id is likewise NOT a safe discriminator: a mob one-shot may
+    // carry one to pick its authored clip via attackByAbility, and this stays
+    // a mob cue when it does.
+    expect(isMobEngageCue('shout', 'mob')).toBe(true);
+  });
+
+  // The pure core above cannot see the renderer, and the renderer imports Three,
+  // so it cannot be instantiated here. That gap is exactly how the swallowed
+  // warrior shouts shipped: the core was green throughout. This scans the real
+  // dispatch site instead, so reverting the gate reds a test rather than nothing.
+  it('routes the renderer dispatch through the gate, with no bare fx disjunction', () => {
+    const src = readFileSync('src/render/renderer.ts', 'utf8');
+    // the cue branch asks the predicate, and asks it about the SOURCE entity
+    expect(src).toContain('isMobEngageCue(ev.fx, this.sim.entities.get(ev.sourceId)?.kind)');
+    // and the pre-fix shape, which claimed player castFx too, is gone for good
+    expect(src).not.toMatch(/ev\.fx === 'shout' \|\| ev\.fx === 'flourish'/);
+    // the gate must still sit ABOVE the warrior plan: below it, warriorCastVisualPlan
+    // would claim every ability-less mob bellow first (see the row above)
+    expect(src.indexOf('isMobEngageCue(ev.fx')).toBeLessThan(
+      src.indexOf('warriorCastVisualPlan(ev.fx'),
+    );
+  });
+
+  it('narrows on both dimensions independently', () => {
+    // fx dimension: a mob source does not make every fx kind an engage cue
+    for (const fx of ['projectile', 'weaponAura', 'windup', 'beam']) {
+      expect(isMobEngageCue(fx, 'mob'), fx).toBe(false);
+    }
+    // source dimension: no non-mob source claims the cue, including absent
+    // (an event whose source entity has already left the world mirror)
+    for (const kind of ['player', 'npc', 'object', undefined]) {
+      expect(isMobEngageCue('shout', kind), String(kind)).toBe(false);
+      expect(isMobEngageCue('flourish', kind), String(kind)).toBe(false);
+    }
   });
 });

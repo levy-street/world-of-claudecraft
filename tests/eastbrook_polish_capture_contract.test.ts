@@ -360,23 +360,23 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned. src/render/renderer.ts is the rendererIntegration
-      // leaf of this composite, so any edit to it moves the leaf's own sha256 and
-      // with it the composite. FIVE independent renderer moves now stack here:
-      // from release/v0.34.0, PR #2720's fence-removal layout evidence, the live
-      // graphics rebuild (context recycle plus profile-aware Eastbrook runtime
-      // inputs, PR #2799), the Bear Form swap onto the purpose-built quadruped
-      // rig (PR #2842), and the far-field sprite impostors, fog-free vista and
-      // horizon pass (PR #2793); from this branch, the worldObjectBurning
-      // fire-burst cue (torched murloc huts, q_deepfen_purge). The release also
-      // retook the polish captures and re-swept their metadata and performance
-      // JSONs across the far-field and combat-audio merges, and those files are
-      // adopted verbatim here. The merged tree therefore mints one fingerprint
-      // matching no parent's literal. No GLB source fingerprint moved, no
-      // pipeline input or geometry value changed, and no capture was retaken in
-      // this merge. Re-minted with
+      // Deliberately re-pinned, and this mint stacks every leaf move on both sides
+      // of the merge onto src/render/renderer.ts, the rendererIntegration leaf of
+      // this composite: the pnpm-lock migration (a hashed input to every GLB source
+      // fingerprint), PR #2720's fence-removal layout evidence, release/v0.34.0's
+      // Bear Form quadruped rig (PR #2842), live graphics rebuild (context recycle
+      // plus profile-aware Eastbrook runtime inputs, PR #2799), far-field sprite
+      // impostors and fog-free vista (PR #2793), and brood shout/flourish wiring;
+      // and from this branch the worldObjectBurning fire-burst cue (torched murloc
+      // huts, q_deepfen_purge). The release also retook the polish captures and
+      // re-swept their metadata and performance JSONs, and those files are adopted
+      // verbatim here. Each move shifts the leaf's own sha256 and with it the
+      // composite, so the merged tree mints one fingerprint matching neither
+      // parent's literal. No GLB source fingerprint moved, not one pipeline input
+      // or geometry value changed, and no capture was retaken: Eastbrook itself is
+      // untouched by all of it. Re-minted with
       // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
-      fingerprint: '186fd186dfe660b9d25ceaa0fa1e4f7ff726b847f2e2af85696519b90c926d40',
+      fingerprint: '6b02ff15264e961e2a91ecfecc67f547382c77d76dcce9cedf6218405b94c71d',
       components: {
         captureContract: {
           id: 'polish-v2',

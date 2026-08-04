@@ -7,6 +7,32 @@ export const WARRIOR_SHOUT_COLORS = {
   intimidating_shout: 0x7f8ad0,
 } as const;
 
+/**
+ * Does a mob's OWN cue claim this spellfx, ahead of the warrior cast plan below?
+ *
+ * The dragonkin brood emits the only two of these today: a 'shout' (the rooted
+ * engage bellow, which for a broodlord also cracks the clutch awake) and a
+ * 'flourish' (a whelp's hatch pounce). Both play the visual's flourish one-shot.
+ *
+ * The discriminator is the SOURCE, deliberately, not the ability id. Players
+ * reach the same two fx kinds through `ability.castFx` (the six warrior shouts
+ * and raised_guard), and casting_lifecycle emits every player castFx WITH its
+ * ability id, so an `ability === undefined` test would happen to work today. It
+ * would be a trap: a mob one-shot may legitimately carry an ability id so the
+ * renderer can pick its authored clip via attackByAbility (the brood's own
+ * Cleave and Stun already do), and the day a brood shout wants that, the cue
+ * would silently start falling through to the warrior plan. Source kind cannot
+ * drift that way.
+ *
+ * Order is load-bearing in the other direction too: warriorCastVisualPlan claims
+ * ANY 'shout' whatever the ability id, falling back to a default roar color, so
+ * simply moving this branch below it would repaint every mob bellow as a warrior
+ * shout. The dispatch contract is pinned in tests/warrior_render_contract.test.ts.
+ */
+export function isMobEngageCue(fx: string, sourceKind: string | undefined): boolean {
+  return (fx === 'shout' || fx === 'flourish') && sourceKind === 'mob';
+}
+
 export type WarriorCastVisualPlan =
   | {
       kind: 'shout';
