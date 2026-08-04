@@ -312,8 +312,8 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // the shared stream at spawn and no longer idle on it, which shifts every
     // later draw once. Neither parent's recorded value survives the
     // composition, so this is a fresh hunt, the same cause and protocol as
-    // this merge's parity golden re-mint: the koi bites on session index 42.
-    expect(koiSession).toBe(42);
+    // this merge's parity golden re-mint: the koi bites on session index 2.
+    expect(koiSession).toBe(2);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -341,18 +341,18 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Hunted literals (seed 4242, after every beat above): the harvest index
     // where each flavor's 1-in-90 event fires under the shared stream.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 58 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 92 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 87,
+        hitAt: 1,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 79,
+        hitAt: 48,
       },
     ];
     for (const hunt of hunts) {
@@ -413,8 +413,8 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Hunted literal (seed 4242, after every beat above), re-recorded on this
     // merge, the same three-way stream composition as the koi literal above:
     // the rare-or-better rarity roll that mints the signed specimen lands on
-    // attempt index 2.
-    expect(hitAt).toBe(2);
+    // attempt index 6.
+    expect(hitAt).toBe(6);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);
     expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(true);

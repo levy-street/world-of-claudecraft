@@ -374,7 +374,7 @@ describe('Eastbrook polish capture contract', () => {
       // itself is untouched by all three, following the identical precedent this
       // composite already carries from the compile-storm gear/mount/base-visual
       // gate fix.
-      fingerprint: '2d4e6e0ee7168a0bf25a13ba1a2754f39e8c8f168e6f369ceb6588fe2bb9b2bb',
+      fingerprint: '81ad3b53cf28981b2966933e0e1014d89e4581a73928ac2409455661f28a0c41',
       components: {
         captureContract: {
           id: 'polish-v2',
