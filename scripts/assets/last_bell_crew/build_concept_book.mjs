@@ -75,14 +75,6 @@ async function toSheet(dir, frames, outName, cellW, cellH) {
   return outName;
 }
 
-async function toWebp(src, outName, width) {
-  const out = join(IMG_DIR, outName);
-  let pipe = sharp(src);
-  if (width) pipe = pipe.resize({ width, withoutEnlargement: true });
-  await pipe.webp({ quality: 78, alphaQuality: 85, effort: 6 }).toFile(out);
-  return outName;
-}
-
 function loadManifests() {
   if (!existsSync(PLATES_IN)) throw new Error(`no plates directory: ${PLATES_IN}`);
   const found = readdirSync(PLATES_IN)
@@ -170,16 +162,6 @@ function animRow(entry, sheets) {
 }
 
 function figureSection(entry, images) {
-  const turn = images.turntable.map((f) => `${esc(f)}`);
-  const plates = (entry.plates ?? [])
-    .map(
-      (p, i) => `
-      <figure class="plate">
-        <img src="last-bell-concept-art/${esc(images.plates[i])}" alt="${esc(entry.name)}, ${esc(p.label)}" loading="lazy">
-        <figcaption><b>${esc(p.label)}</b><span>${esc(p.clip)}</span></figcaption>
-      </figure>`,
-    )
-    .join('');
   const notes = (entry.notes ?? []).map((n) => `<li>${esc(n)}</li>`).join('');
 
   return `
@@ -203,17 +185,6 @@ function figureSection(entry, images) {
   </header>
 
   <div class="figure-body">
-    <div class="turn-wrap">
-      <div class="turn" data-frames="${turn.join(',')}" data-dir="last-bell-concept-art">
-        <img class="turn-img" src="last-bell-concept-art/${turn[0]}" alt="${esc(entry.name)}, rotating turnaround">
-      </div>
-      <div class="turn-ctl">
-        <button class="btn spin" type="button" aria-pressed="true">Pause</button>
-        <input class="scrub" type="range" min="0" max="${turn.length - 1}" value="0"
-               aria-label="${esc(entry.name)} turnaround angle">
-      </div>
-    </div>
-
     <div class="prose">
       <p>${esc(entry.blurb)}</p>
       <div class="signature">
@@ -227,7 +198,6 @@ function figureSection(entry, images) {
   </div>
 
   ${animRow(entry, images.anims)}
-  ${plates ? `<div class="plates">${plates}</div>` : ''}
 </section>`;
 }
 
@@ -486,16 +456,11 @@ async function main() {
 
   const sections = [];
   for (const entry of entries) {
-    const images = { turntable: [], plates: [] };
-    for (const f of entry.turntable) {
-      images.turntable.push(await toWebp(join(PLATES_IN, f), f.replace(/\.png$/, '.webp'), 440));
-    }
-    for (const p of entry.plates) {
-      images.plates.push(
-        await toWebp(join(PLATES_IN, p.file), p.file.replace(/\.png$/, '.webp'), 560),
-      );
-    }
-    images.anims = [];
+    // Only the playable clips ship. The bind-pose turntable actively MISREPRESENTS
+    // held props (a shield reads as a serving tray in T-pose) and the static plates
+    // are what let the grip defects through review, so neither earns a place on the
+    // page or the weight in the repo.
+    const images = { turntable: [], plates: [], anims: [] };
     for (const a of entry.anims ?? []) {
       const file = await toSheet(
         PLATES_IN,
@@ -514,13 +479,8 @@ async function main() {
         height: a.height,
       });
     }
-    if (entry.bust) {
-      await toWebp(join(PLATES_IN, entry.bust), entry.bust.replace(/\.png$/, '.webp'), 420);
-    }
     sections.push(figureSection(entry, images));
-    process.stdout.write(
-      `  ${entry.id}: ${images.turntable.length} turntable, ${images.plates.length} plates, ${images.anims.length} clips\n`,
-    );
+    process.stdout.write(`  ${entry.id}: ${images.anims.length} clips\n`);
   }
 
   const toc = entries
