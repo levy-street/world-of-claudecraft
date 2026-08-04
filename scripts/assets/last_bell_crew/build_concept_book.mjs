@@ -75,6 +75,14 @@ async function toSheet(dir, frames, outName, cellW, cellH) {
   return outName;
 }
 
+async function toWebp(src, outName, width) {
+  await sharp(src)
+    .resize({ width, withoutEnlargement: true })
+    .webp({ quality: 78, alphaQuality: 85, effort: 6 })
+    .toFile(join(IMG_DIR, outName));
+  return outName;
+}
+
 function loadManifests() {
   if (!existsSync(PLATES_IN)) throw new Error(`no plates directory: ${PLATES_IN}`);
   const found = readdirSync(PLATES_IN)
@@ -185,6 +193,17 @@ function figureSection(entry, images) {
   </header>
 
   <div class="figure-body">
+    <div class="turn-wrap">
+      <div class="turn" data-frames="${images.turntable.join(',')}" data-dir="last-bell-concept-art">
+        <img class="turn-img" src="last-bell-concept-art/${images.turntable[0]}" alt="${esc(entry.name)}, rotating turnaround">
+      </div>
+      <div class="turn-ctl">
+        <button class="btn spin" type="button" aria-pressed="true">Pause</button>
+        <input class="scrub" type="range" min="0" max="${images.turntable.length - 1}" value="0"
+               aria-label="${esc(entry.name)} turnaround angle">
+      </div>
+    </div>
+
     <div class="prose">
       <p>${esc(entry.blurb)}</p>
       <div class="signature">
@@ -456,11 +475,13 @@ async function main() {
 
   const sections = [];
   for (const entry of entries) {
-    // Only the playable clips ship. The bind-pose turntable actively MISREPRESENTS
-    // held props (a shield reads as a serving tray in T-pose) and the static plates
-    // are what let the grip defects through review, so neither earns a place on the
-    // page or the weight in the repo.
+    // The spinnable turntable stays: orbiting the model is how a silhouette gets
+    // checked. The STATIC pose plates do not, because the playable clips replace
+    // them and they are what let the grip defects through review in the first place.
     const images = { turntable: [], plates: [], anims: [] };
+    for (const f of entry.turntable) {
+      images.turntable.push(await toWebp(join(PLATES_IN, f), f.replace(/\.png$/, '.webp'), 440));
+    }
     for (const a of entry.anims ?? []) {
       const file = await toSheet(
         PLATES_IN,
@@ -508,9 +529,12 @@ async function main() {
     onto a KayKit Adventurers rig by a deterministic Blender factory
     (<code>scripts/assets/last_bell_crew/</code>): a repainted palette atlas, bespoke geometry
     rigidly skinned to single bones, and all 22 of the rig's shipped clips carried through
-    untouched. One material each, so a crew member still costs one draw call. The turnarounds
-    and pose plates below are renders of those exact GLBs, and every pose is a frame of a clip
-    the game really plays.</p>
+    untouched. One material each, so a crew member still costs one draw call. Spin the
+    turnaround to check a silhouette; the clips under &ldquo;In motion&rdquo; are the real ones
+    the game plays, sampled frame by frame off these exact GLBs. Static pose plates are
+    deliberately absent: a prop that reads fine standing still can be plainly wrong the moment
+    a wrist moves, which is how a batch of reversed shields and an upside-down staff survived
+    the first review.</p>
   <ul class="toc">${toc}<li><a href="#scale">Scale</a></li></ul>
 </header>
 

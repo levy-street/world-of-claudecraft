@@ -95,6 +95,7 @@ unless the row says otherwise.
 
 | # | Figure | Defect | Fix | Status |
 |---|---|---|---|---|
+| 2.1b | Ewald | Wanted a bigger, custom beard | `parts.beard` builds a partial shell over the MEASURED jaw: rings at four heights, each following the head profile, widest under the jaw and tapering to a point. Kept strictly BELOW the mouth (the nose apex measures z=1.52, and anything starting above about 1.46 climbs over the mouth and the shipped moustache and reads as a muzzle). Two build errors worth remembering: rings with different vertex counts get stitched across mismatched angles and produce a spiked tangle, so every ring uses the same step count; and `front` is in TURNS, where the face is -0.25 (-pi/2), not -0.5, which put the first beard on his cheek. | **DONE** |
 | 2.1 | Ewald | **Haircut pokes through the hat**, and the crown reads as having no top | Solved GEOMETRICALLY and then MEASURED. `parts.tuck_under_hat` pulls the head's vertices above the brim inward, ramped with height; `parts.outside_shell` ray-casts every head vertex against the hat and the build RAISES if any is outside, so the defect cannot come back silently. Three separate causes were found, only the first of which was the recorded one: (a) hair wider than the crown wall; (b) 49 vertices ABOVE the hat entirely, because the head reaches z=2.253 and the crown stopped at 2.180, so the skull burst out of the top (this is the "no top" read, not a missing cap); (c) after the hair was solved, 4 SKIN vertices at the ear tops still pierced the wall. Fixes: a shrink that starts at 0.72 AT the brim rather than 1.0 (the band just above the brim is where the wall is tightest), a hard z ceiling, a crown raised to 2.235, a flat top ring instead of a single apex (a fan to a point builds a cone), and the tuck applied to skin as well as hair. ORDER IS LOAD-BEARING: the hat is fitted FIRST off the untouched skull, because tucking first shrinks the profile it measures and silently re-sizes the approved geometry. | **DONE** |
 | 2.2 | Saul | "Some messed up things on the front of his shirt" | The four apron patches, unequally guilty: the two white linen ones read as stickers, the leather one reads as a **hole** in the apron, and the tonal canvas one actually reads as a repair. Keep the tonal canvas patch plus ONE enlarged linen patch, drop the other two, and seat them flatter (smaller standoff, thinner). Same numbers pass: pull the whole bib and skirt standoff in slightly; from the side the apron currently reads as a sandwich board with an air gap (`saul_turn_02`, `saul_turn_10`). | FIX |
 | 2.3 | Tam | Reads too much like a **shaman**. Needs normal town clothes. | Drivers ranked by guilt, from the renders: (1) bare torso and arms, shirtless-under-pelt is the core shaman read; (2) the **fang necklace**, trophy teeth are the loudest single signal; (3) the jagged teal fur mantle and zigzag hems; (4) the belt of large pale discs reading as talisman stones. The teal HUE is innocent: it is his entity colour, and the palette chip already promises "the bell-keeper's coat" that the render never delivers. Full recipe below the table. | FIX |
@@ -402,7 +403,12 @@ Two traps worth recording, both hit on the way:
 - `aspect-ratio` takes **unitless** numbers. Feeding it `px` values is invalid and
   collapses the stage to zero height.
 
-Still open from the second pass: **the bind-pose turntable systematically misrepresents
+Resolved differently than the second pass proposed: the turntable STAYS (orbiting a
+model is how a silhouette gets checked) but the static pose plates are gone, so the
+misrepresentation it warned about no longer contradicts anything on the page. Its
+original wording follows.
+
+Second-pass note: **the bind-pose turntable systematically misrepresents
 every held prop** (the shield reads as a serving tray, the sword as an antenna,
 and Saul's lantern reads correct ONLY in T-pose), and it hides grip defects by
 construction; even after the section 1 fixes it will contradict the posed

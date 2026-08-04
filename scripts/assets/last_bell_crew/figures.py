@@ -445,6 +445,22 @@ def build_ewald():
             f"{len(outside)} through the side). Tighten base/shrink or raise crown_z."
         )
 
+    # A fuller beard. The ranger head ships a moustache and a small chin tuft; this
+    # grows them into a jaw-to-jaw beard so he reads as a man who has been on the
+    # strait for thirty years rather than a clean-shaven deckhand. Built off the
+    # MEASURED jaw (nose apex sits at z=1.52, jaw 1.30 to 1.45), widest at the chin
+    # and tapering up toward the sideburns.
+    built.append(parts.beard(
+        "Ewald_Beard", head, "hair", rings=(
+            # Kept BELOW the mouth line. The nose apex measures z=1.52, so anything
+            # starting above about 1.46 climbs over the mouth and the shipped
+            # moustache and reads as a muzzle rather than a beard.
+            (1.442, 0.010, 0.52),      # jaw corners, narrow
+            (1.392, 0.024, 0.82),      # along the jaw
+            (1.334, 0.032, 0.88),      # under the jaw, the fullest course
+            (1.276, 0.024, 0.60),      # the point of the beard
+        ), shade_t=0.58, material=mat, arc=0.30, jut=0.018))
+
     # THE FARE TIN on a neck cord, chest height, reachable
     front = parts.surface_front(body, 1.020) or -0.30
     built.append(parts.strap("Ewald_TinCord", [
@@ -461,7 +477,8 @@ def build_ewald():
                                 (0.215 + r, 0.070, z), 0.026, "tar",
                                 sides=8, shade_t=0.36 + 0.08 * i, material=mat))
     _skinned(built, rig, {
-        "Ewald_Souwester": "head", "Ewald_TinCord": "chest", "Ewald_FareTin": "chest",
+        "Ewald_Souwester": "head", "Ewald_Beard": "head",
+        "Ewald_TinCord": "chest", "Ewald_FareTin": "chest",
         **{f"Ewald_Coil{i}": "upperarm.l" for i in range(3)},
     })
     return _finish("ewald", rig, meshes, built, img, mat)

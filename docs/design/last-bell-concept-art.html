@@ -164,9 +164,12 @@ footer.book ul{padding-left:20px;margin:8px 0 0}
     onto a KayKit Adventurers rig by a deterministic Blender factory
     (<code>scripts/assets/last_bell_crew/</code>): a repainted palette atlas, bespoke geometry
     rigidly skinned to single bones, and all 22 of the rig's shipped clips carried through
-    untouched. One material each, so a crew member still costs one draw call. The turnarounds
-    and pose plates below are renders of those exact GLBs, and every pose is a frame of a clip
-    the game really plays.</p>
+    untouched. One material each, so a crew member still costs one draw call. Spin the
+    turnaround to check a silhouette; the clips under &ldquo;In motion&rdquo; are the real ones
+    the game plays, sampled frame by frame off these exact GLBs. Static pose plates are
+    deliberately absent: a prop that reads fine standing still can be plainly wrong the moment
+    a wrist moves, which is how a batch of reversed shields and an upside-down staff survived
+    the first review.</p>
   <ul class="toc"><li><a href="#ewald">Ewald</a></li><li><a href="#scale">Scale</a></li></ul>
 </header>
 
@@ -181,7 +184,7 @@ footer.book ul{padding-left:20px;margin:8px 0 0}
     <dl class="spec">
       <div><dt>Role</dt><dd>Not a fighter. The only way onto a besieged island.</dd></div>
       <div><dt>Height</dt><dd>2.60 yd</dd></div>
-      <div><dt>Triangles</dt><dd>8,869</dd></div>
+      <div><dt>Triangles</dt><dd>8,967</dd></div>
       <div><dt>Clips</dt><dd>22</dd></div>
       <div><dt>Materials</dt><dd>1 body (one draw)</dd></div>
       <div><dt>Base</dt><dd><code>ranger.glb</code></dd></div>
@@ -191,6 +194,17 @@ footer.book ul{padding-left:20px;margin:8px 0 0}
   </header>
 
   <div class="figure-body">
+    <div class="turn-wrap">
+      <div class="turn" data-frames="ewald_turn_00.webp,ewald_turn_01.webp,ewald_turn_02.webp,ewald_turn_03.webp,ewald_turn_04.webp,ewald_turn_05.webp,ewald_turn_06.webp,ewald_turn_07.webp,ewald_turn_08.webp,ewald_turn_09.webp,ewald_turn_10.webp,ewald_turn_11.webp" data-dir="last-bell-concept-art">
+        <img class="turn-img" src="last-bell-concept-art/ewald_turn_00.webp" alt="Ferryman Ewald, rotating turnaround">
+      </div>
+      <div class="turn-ctl">
+        <button class="btn spin" type="button" aria-pressed="true">Pause</button>
+        <input class="scrub" type="range" min="0" max="11" value="0"
+               aria-label="Ferryman Ewald turnaround angle">
+      </div>
+    </div>
+
     <div class="prose">
       <p>He sells nothing and saves lives anyway. Nobody crosses for the fishing any more, so every passenger he lands is someone who chose to come, and he has learned to tell them the one thing that matters before they step off: mind the bell, the town listens to it the way you listen to weather.</p>
       <div class="signature">
