@@ -1778,7 +1778,17 @@ export const ru_RU: EnTranslations = {
       "backpack": "Рюкзак",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Пустая ячейка для сумки",
-      "unequipHint": "Нажмите, чтобы снять эту сумку"
+      "unequipHint": "Нажмите, чтобы снять эту сумку",
+      "toolbeltTitle": "Пояс с инструментами",
+      "toolbeltNone": "Пояс с инструментами не надет",
+      "toolbeltRemoveHint": "Нажмите, чтобы снять этот пояс",
+      "toolbeltFilled": "Инструментов: {used}/{total}",
+      "toolSlotLabel": "Ячейка для инструмента {slot}",
+      "toolSlotAria": "{slot}: {name}",
+      "toolSlotEmpty": "Пусто",
+      "toolSlotStowHint": "Нажмите, чтобы убрать {name}",
+      "toolSlotTakeHint": "Нажмите, чтобы забрать инструмент",
+      "toolSlotNoTool": "У вас нет инструмента, который можно убрать"
     },
     "raidConvert": {
       "toPartyDone": "Ваш рейд снова преобразован в группу.",
@@ -7144,6 +7154,7 @@ export const ru_RU: EnTranslations = {
       "potion": "Зелье",
       "elixir": "Эликсир",
       "bag": "Сумка",
+      "toolbelt": "Пояс с инструментами",
       "mount": "Транспорт"
     },
     "stats": {
@@ -7190,7 +7201,9 @@ export const ru_RU: EnTranslations = {
       "clickUseInstant": "Нажмите, чтобы мгновенно использовать в бою",
       "clickUse": "Нажмите, чтобы использовать",
       "clickBuyback": "Нажмите, чтобы выкупить",
-      "bagSlots": "Сумка на {slots} ячеек"
+      "bagSlots": "Сумка на {slots} ячеек",
+      "toolbeltSlots": "Вмещает инструментов: {slots}",
+      "toolbeltDesc": "Пояс, в который помещаются инструменты, освобождая место в рюкзаке."
     },
     "bags": {
       "title": "Сумки",
@@ -10090,6 +10103,15 @@ export const ru_RU: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Поводья раптора Дрейкмо"
+      },
+      "basic_toolbelt": {
+        "name": "Простой пояс с инструментами"
+      },
+      "reinforced_toolbelt": {
+        "name": "Укреплённый пояс с инструментами"
+      },
+      "artisans_toolbelt": {
+        "name": "Пояс ремесленника"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"

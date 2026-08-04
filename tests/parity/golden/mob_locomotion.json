@@ -32,7 +32,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 948,
-      "state": "f37ced85",
+      "state": "ab630e1b",
       "events": "c1591c27",
       "rng": {
         "draws": 5,
@@ -92,6 +92,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {}
         },
         {
@@ -149,6 +150,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {}
         }
       ],
@@ -318,7 +320,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 949,
-      "state": "88125344",
+      "state": "14b64232",
       "events": "987b1953",
       "rng": {
         "draws": 10,
@@ -378,6 +380,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {}
         },
         {
@@ -435,6 +438,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {}
         }
       ],
@@ -668,7 +672,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 950,
-      "state": "d7a2cc2d",
+      "state": "0cee657f",
       "events": "38c288bd",
       "rng": {
         "draws": 15,
@@ -728,6 +732,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {}
         },
         {
@@ -785,6 +790,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {}
         }
       ],
@@ -1074,7 +1080,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 951,
-      "state": "c1c8e6c8",
+      "state": "5fd681a2",
       "events": "741638a5",
       "rng": {
         "draws": 17,
@@ -1134,6 +1140,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {}
         },
         {
@@ -1191,6 +1198,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {}
         }
       ],
@@ -1528,7 +1536,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 952,
-      "state": "e13f2b92",
+      "state": "0885eaf4",
       "events": "741638a5",
       "rng": {
         "draws": 18,
@@ -1588,6 +1596,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {}
         },
         {
@@ -1645,6 +1654,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {}
         }
       ],
@@ -2025,7 +2035,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 953,
-      "state": "8a74eba2",
+      "state": "30e36c04",
       "events": "42dbbf87",
       "rng": {
         "draws": 18,
@@ -2085,6 +2095,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {}
         },
         {
@@ -2142,6 +2153,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {}
         }
       ],
@@ -2567,7 +2579,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 953,
-      "state": "960a3555",
+      "state": "2dc58267",
       "events": "741638a5",
       "rng": {
         "draws": 18,
@@ -2627,6 +2639,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {}
         },
         {
@@ -2684,6 +2697,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {}
         }
       ],
@@ -3110,7 +3124,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 953,
-      "state": "960a3555",
+      "state": "2dc58267",
       "events": "741638a5",
       "rng": {
         "draws": 18,
@@ -3170,6 +3184,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {}
         },
         {
@@ -3227,6 +3242,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {}
         }
       ],

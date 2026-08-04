@@ -1778,7 +1778,17 @@ export const ja_JP: EnTranslations = {
       "backpack": "バックパック",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "空のバッグスロット",
-      "unequipHint": "クリックしてこのバッグを外す"
+      "unequipHint": "クリックしてこのバッグを外す",
+      "toolbeltTitle": "ツールベルト",
+      "toolbeltNone": "ツールベルトを装備していません",
+      "toolbeltRemoveHint": "クリックしてこのツールベルトを外す",
+      "toolbeltFilled": "道具 {used}/{total}",
+      "toolSlotLabel": "ツールスロット {slot}",
+      "toolSlotAria": "{slot}: {name}",
+      "toolSlotEmpty": "空",
+      "toolSlotStowHint": "クリックして{name}をしまう",
+      "toolSlotTakeHint": "クリックしてこの道具を取り出す",
+      "toolSlotNoTool": "しまえる道具を持っていません"
     },
     "raidConvert": {
       "toPartyDone": "レイドがパーティに戻りました。",
@@ -7144,6 +7154,7 @@ export const ja_JP: EnTranslations = {
       "potion": "ポーション",
       "elixir": "エリクサー",
       "bag": "バッグ",
+      "toolbelt": "ツールベルト",
       "mount": "マウント"
     },
     "stats": {
@@ -7190,7 +7201,9 @@ export const ja_JP: EnTranslations = {
       "clickUseInstant": "クリックして戦闘中に即使用",
       "clickUse": "クリックして使用",
       "clickBuyback": "クリックして買い戻す",
-      "bagSlots": "{slots}スロットのバッグ"
+      "bagSlots": "{slots}スロットのバッグ",
+      "toolbeltSlots": "道具を{slots}個収納できます",
+      "toolbeltDesc": "道具を収められるベルト。バックパックの空きが増えます。"
     },
     "bags": {
       "title": "バッグ",
@@ -10090,6 +10103,15 @@ export const ja_JP: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "火口のラプトルの手綱"
+      },
+      "basic_toolbelt": {
+        "name": "ベーシックツールベルト"
+      },
+      "reinforced_toolbelt": {
+        "name": "強化ツールベルト"
+      },
+      "artisans_toolbelt": {
+        "name": "職人のツールベルト"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

@@ -1778,7 +1778,17 @@ export const en: EnTranslations = {
       "backpack": "Backpack",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Empty bag slot",
-      "unequipHint": "Click to remove this bag"
+      "unequipHint": "Click to remove this bag",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotLabel": "Tool slot {slot}",
+      "toolSlotAria": "{slot}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow {name}",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You have no tool to stow"
     },
     "raidConvert": {
       "toPartyDone": "Your raid has converted back to a party.",
@@ -7144,6 +7154,7 @@ export const en: EnTranslations = {
       "potion": "Potion",
       "elixir": "Elixir",
       "bag": "Bag",
+      "toolbelt": "Toolbelt",
       "mount": "Mount"
     },
     "stats": {
@@ -7190,7 +7201,9 @@ export const en: EnTranslations = {
       "clickUseInstant": "Click to use instantly in combat",
       "clickUse": "Click to use",
       "clickBuyback": "Click to buy back",
-      "bagSlots": "{slots} Slot Bag"
+      "bagSlots": "{slots} Slot Bag",
+      "toolbeltSlots": "Holds {slots} tools",
+      "toolbeltDesc": "A belt that can hold your tools, freeing up space in your backpack."
     },
     "bags": {
       "title": "Bags",
@@ -10090,6 +10103,15 @@ export const en: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Reins of the Drakemaw Raptor"
+      },
+      "basic_toolbelt": {
+        "name": "Basic Toolbelt"
+      },
+      "reinforced_toolbelt": {
+        "name": "Reinforced Toolbelt"
+      },
+      "artisans_toolbelt": {
+        "name": "Artisan's Toolbelt"
       },
       "conjured_water4": {
         "name": "Conjured Springwater"

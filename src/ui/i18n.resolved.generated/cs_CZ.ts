@@ -1778,7 +1778,17 @@ export const cs_CZ: EnTranslations = {
       "backpack": "Batoh",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Prázdný slot batohu",
-      "unequipHint": "Klikni pro odebrání tohoto batohu"
+      "unequipHint": "Klikni pro odebrání tohoto batohu",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotLabel": "Tool slot {slot}",
+      "toolSlotAria": "{slot}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow {name}",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You have no tool to stow"
     },
     "raidConvert": {
       "toPartyDone": "Tvůj raid byl převeden zpět na skupinu.",
@@ -7144,6 +7154,7 @@ export const cs_CZ: EnTranslations = {
       "potion": "Lektvar",
       "elixir": "Elixír",
       "bag": "Batoh",
+      "toolbelt": "Toolbelt",
       "mount": "Jízdní zvíře"
     },
     "stats": {
@@ -7190,7 +7201,9 @@ export const cs_CZ: EnTranslations = {
       "clickUseInstant": "Kliknutím okamžitě použiješ v boji",
       "clickUse": "Kliknutím použiješ",
       "clickBuyback": "Kliknutím odkoupíš zpět",
-      "bagSlots": "Batoh s {slots} sloty"
+      "bagSlots": "Batoh s {slots} sloty",
+      "toolbeltSlots": "Holds {slots} tools",
+      "toolbeltDesc": "A belt that can hold your tools, freeing up space in your backpack."
     },
     "bags": {
       "title": "Batohy",
@@ -10090,6 +10103,15 @@ export const cs_CZ: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Otěže raptora z Dračí tlamy"
+      },
+      "basic_toolbelt": {
+        "name": "Basic Toolbelt"
+      },
+      "reinforced_toolbelt": {
+        "name": "Reinforced Toolbelt"
+      },
+      "artisans_toolbelt": {
+        "name": "Artisan's Toolbelt"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"

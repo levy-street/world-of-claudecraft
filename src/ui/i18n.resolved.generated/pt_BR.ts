@@ -1778,7 +1778,17 @@ export const pt_BR: EnTranslations = {
       "backpack": "Mochila",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Espaço de bolsa vazio",
-      "unequipHint": "Clique para remover esta bolsa"
+      "unequipHint": "Clique para remover esta bolsa",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotLabel": "Tool slot {slot}",
+      "toolSlotAria": "{slot}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow {name}",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You have no tool to stow"
     },
     "raidConvert": {
       "toPartyDone": "Sua raide foi convertida de volta em um grupo.",
@@ -7144,6 +7154,7 @@ export const pt_BR: EnTranslations = {
       "potion": "Poção",
       "elixir": "Elixir",
       "bag": "Bolsa",
+      "toolbelt": "Toolbelt",
       "mount": "Montaria"
     },
     "stats": {
@@ -7190,7 +7201,9 @@ export const pt_BR: EnTranslations = {
       "clickUseInstant": "Clique para usar instantaneamente em combate",
       "clickUse": "Clique para usar",
       "clickBuyback": "Clique para recomprar",
-      "bagSlots": "Bolsa de {slots} espaços"
+      "bagSlots": "Bolsa de {slots} espaços",
+      "toolbeltSlots": "Holds {slots} tools",
+      "toolbeltDesc": "A belt that can hold your tools, freeing up space in your backpack."
     },
     "bags": {
       "title": "Bolsas",
@@ -10090,6 +10103,15 @@ export const pt_BR: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Rédeas do Raptor de Drakemaw"
+      },
+      "basic_toolbelt": {
+        "name": "Basic Toolbelt"
+      },
+      "reinforced_toolbelt": {
+        "name": "Reinforced Toolbelt"
+      },
+      "artisans_toolbelt": {
+        "name": "Artisan's Toolbelt"
       },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"

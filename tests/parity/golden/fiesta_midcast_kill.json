@@ -31,7 +31,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 949,
-      "state": "8bf1df7d",
+      "state": "cc888d63",
       "events": "2103652b",
       "rng": {
         "draws": 0,
@@ -42,7 +42,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 949,
-      "state": "7250d684",
+      "state": "c9a0d802",
       "events": "965eddf9",
       "rng": {
         "draws": 64,
@@ -53,7 +53,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 949,
-      "state": "3e849432",
+      "state": "1e676cc8",
       "events": "ac5db081",
       "rng": {
         "draws": 280,
@@ -64,7 +64,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 949,
-      "state": "a229780d",
+      "state": "cf471ef3",
       "events": "fdc7c1b9",
       "rng": {
         "draws": 530,
@@ -75,7 +75,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 949,
-      "state": "ce8bf0ca",
+      "state": "a6c5c790",
       "events": "997b316c",
       "rng": {
         "draws": 542,
@@ -151,6 +151,7 @@
             },
             "spec": "arms"
           },
+          "toolbelt": {},
           "townFocus": {}
         },
         {
@@ -220,6 +221,7 @@
             },
             "spec": "arcane"
           },
+          "toolbelt": {},
           "townFocus": {}
         },
         {
@@ -287,6 +289,7 @@
             },
             "spec": "assassination"
           },
+          "toolbelt": {},
           "townFocus": {}
         },
         {
@@ -356,6 +359,7 @@
             },
             "spec": "beast_mastery"
           },
+          "toolbelt": {},
           "townFocus": {}
         }
       ],
@@ -587,7 +591,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 949,
-      "state": "8cdcd7b0",
+      "state": "99c995a2",
       "events": "40c8bf79",
       "rng": {
         "draws": 542,
@@ -663,6 +667,7 @@
             },
             "spec": "arms"
           },
+          "toolbelt": {},
           "townFocus": {}
         },
         {
@@ -732,6 +737,7 @@
             },
             "spec": "arcane"
           },
+          "toolbelt": {},
           "townFocus": {}
         },
         {
@@ -799,6 +805,7 @@
             },
             "spec": "assassination"
           },
+          "toolbelt": {},
           "townFocus": {}
         },
         {
@@ -868,6 +875,7 @@
             },
             "spec": "beast_mastery"
           },
+          "toolbelt": {},
           "townFocus": {}
         }
       ],
@@ -1097,7 +1105,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 949,
-      "state": "afe38577",
+      "state": "0c2200fd",
       "events": "c5309050",
       "rng": {
         "draws": 542,
@@ -1176,6 +1184,7 @@
             },
             "spec": "arms"
           },
+          "toolbelt": {},
           "townFocus": {}
         },
         {
@@ -1245,6 +1254,7 @@
             },
             "spec": "arcane"
           },
+          "toolbelt": {},
           "townFocus": {}
         },
         {
@@ -1313,6 +1323,7 @@
             },
             "spec": "assassination"
           },
+          "toolbelt": {},
           "townFocus": {}
         },
         {
@@ -1382,6 +1393,7 @@
             },
             "spec": "beast_mastery"
           },
+          "toolbelt": {},
           "townFocus": {}
         }
       ],
@@ -1611,7 +1623,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 949,
-      "state": "6611cf7d",
+      "state": "e77db803",
       "events": "741638a5",
       "rng": {
         "draws": 788,
@@ -1622,7 +1634,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 949,
-      "state": "309dc1d2",
+      "state": "8cfa0f38",
       "events": "741638a5",
       "rng": {
         "draws": 973,
@@ -1701,6 +1713,7 @@
             },
             "spec": "arms"
           },
+          "toolbelt": {},
           "townFocus": {}
         },
         {
@@ -1770,6 +1783,7 @@
             },
             "spec": "arcane"
           },
+          "toolbelt": {},
           "townFocus": {}
         },
         {
@@ -1838,6 +1852,7 @@
             },
             "spec": "assassination"
           },
+          "toolbelt": {},
           "townFocus": {}
         },
         {
@@ -1907,6 +1922,7 @@
             },
             "spec": "beast_mastery"
           },
+          "toolbelt": {},
           "townFocus": {}
         }
       ],

@@ -1778,7 +1778,17 @@ export const pl_PL: EnTranslations = {
       "backpack": "Plecak",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Puste gniazdo na torbę",
-      "unequipHint": "Kliknij, aby zdjąć tę torbę"
+      "unequipHint": "Kliknij, aby zdjąć tę torbę",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotLabel": "Tool slot {slot}",
+      "toolSlotAria": "{slot}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow {name}",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You have no tool to stow"
     },
     "raidConvert": {
       "toPartyDone": "Twój rajd został z powrotem przekształcony w drużynę.",
@@ -7144,6 +7154,7 @@ export const pl_PL: EnTranslations = {
       "potion": "Mikstura",
       "elixir": "Eliksir",
       "bag": "Torba",
+      "toolbelt": "Toolbelt",
       "mount": "Wierzchowiec"
     },
     "stats": {
@@ -7190,7 +7201,9 @@ export const pl_PL: EnTranslations = {
       "clickUseInstant": "Kliknij, aby użyć natychmiast w walce",
       "clickUse": "Kliknij, aby użyć",
       "clickBuyback": "Kliknij, aby odkupić",
-      "bagSlots": "Torba z {slots} miejscami"
+      "bagSlots": "Torba z {slots} miejscami",
+      "toolbeltSlots": "Holds {slots} tools",
+      "toolbeltDesc": "A belt that can hold your tools, freeing up space in your backpack."
     },
     "bags": {
       "title": "Torby",
@@ -10090,6 +10103,15 @@ export const pl_PL: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Wodze Raptora Smoczej Paszczy"
+      },
+      "basic_toolbelt": {
+        "name": "Basic Toolbelt"
+      },
+      "reinforced_toolbelt": {
+        "name": "Reinforced Toolbelt"
+      },
+      "artisans_toolbelt": {
+        "name": "Artisan's Toolbelt"
       },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"

@@ -31,7 +31,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 950,
-      "state": "5dab9c04",
+      "state": "68202a25",
       "events": "f96c86ba",
       "rng": {
         "draws": 5,
@@ -97,6 +97,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {},
           "xp": 84
         }
@@ -410,7 +411,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 951,
-      "state": "b9e996c7",
+      "state": "709cb0f4",
       "events": "f01b9521",
       "rng": {
         "draws": 8,
@@ -483,6 +484,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {},
           "xp": 198
         }
@@ -849,7 +851,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 951,
-      "state": "41caddcd",
+      "state": "46cd2936",
       "events": "ff83a7e3",
       "rng": {
         "draws": 9,
@@ -923,6 +925,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {},
           "xp": 198
         }
@@ -1290,7 +1293,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 953,
-      "state": "2a4b16ed",
+      "state": "ca3e764e",
       "events": "c3d6b59a",
       "rng": {
         "draws": 15,
@@ -1364,6 +1367,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {},
           "xp": 282
         }
@@ -1774,7 +1778,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 954,
-      "state": "ad750d6e",
+      "state": "fd7545a9",
       "events": "3faed325",
       "rng": {
         "draws": 20,
@@ -1852,6 +1856,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {},
           "xp": 366
         }
@@ -2317,7 +2322,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 954,
-      "state": "ad750d6e",
+      "state": "fd7545a9",
       "events": "741638a5",
       "rng": {
         "draws": 20,
@@ -2395,6 +2400,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {},
           "xp": 366
         }

@@ -1778,7 +1778,17 @@ export const id_ID: EnTranslations = {
       "backpack": "Ransel",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Slot tas kosong",
-      "unequipHint": "Klik untuk melepas tas ini"
+      "unequipHint": "Klik untuk melepas tas ini",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotLabel": "Tool slot {slot}",
+      "toolSlotAria": "{slot}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow {name}",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You have no tool to stow"
     },
     "raidConvert": {
       "toPartyDone": "Raid Anda telah diubah kembali menjadi rombongan.",
@@ -7144,6 +7154,7 @@ export const id_ID: EnTranslations = {
       "potion": "Ramuan",
       "elixir": "Eliksir",
       "bag": "Tas",
+      "toolbelt": "Toolbelt",
       "mount": "Tunggangan"
     },
     "stats": {
@@ -7190,7 +7201,9 @@ export const id_ID: EnTranslations = {
       "clickUseInstant": "Klik untuk memakai seketika dalam pertempuran",
       "clickUse": "Klik untuk memakai",
       "clickBuyback": "Klik untuk membeli kembali",
-      "bagSlots": "Tas {slots} Slot"
+      "bagSlots": "Tas {slots} Slot",
+      "toolbeltSlots": "Holds {slots} tools",
+      "toolbeltDesc": "A belt that can hold your tools, freeing up space in your backpack."
     },
     "bags": {
       "title": "Tas",
@@ -10090,6 +10103,15 @@ export const id_ID: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Tali Kekang Raptor Drakemaw"
+      },
+      "basic_toolbelt": {
+        "name": "Basic Toolbelt"
+      },
+      "reinforced_toolbelt": {
+        "name": "Reinforced Toolbelt"
+      },
+      "artisans_toolbelt": {
+        "name": "Artisan's Toolbelt"
       },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"

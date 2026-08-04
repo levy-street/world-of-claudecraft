@@ -1778,7 +1778,17 @@ export const nl_NL: EnTranslations = {
       "backpack": "Rugzak",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Leeg tasvak",
-      "unequipHint": "Klik om deze tas af te doen"
+      "unequipHint": "Klik om deze tas af te doen",
+      "toolbeltTitle": "Toolbelt",
+      "toolbeltNone": "No toolbelt worn",
+      "toolbeltRemoveHint": "Click to remove this toolbelt",
+      "toolbeltFilled": "{used}/{total} tools",
+      "toolSlotLabel": "Tool slot {slot}",
+      "toolSlotAria": "{slot}: {name}",
+      "toolSlotEmpty": "Empty",
+      "toolSlotStowHint": "Click to stow {name}",
+      "toolSlotTakeHint": "Click to take this tool back",
+      "toolSlotNoTool": "You have no tool to stow"
     },
     "raidConvert": {
       "toPartyDone": "Je raid is terug omgezet naar een groep.",
@@ -7144,6 +7154,7 @@ export const nl_NL: EnTranslations = {
       "potion": "Toverdrank",
       "elixir": "Elixer",
       "bag": "Tas",
+      "toolbelt": "Toolbelt",
       "mount": "Rijdier"
     },
     "stats": {
@@ -7190,7 +7201,9 @@ export const nl_NL: EnTranslations = {
       "clickUseInstant": "Klik om direct te gebruiken in gevecht",
       "clickUse": "Klik om te gebruiken",
       "clickBuyback": "Klik om terug te kopen",
-      "bagSlots": "Tas met {slots} vakken"
+      "bagSlots": "Tas met {slots} vakken",
+      "toolbeltSlots": "Holds {slots} tools",
+      "toolbeltDesc": "A belt that can hold your tools, freeing up space in your backpack."
     },
     "bags": {
       "title": "Tassen",
@@ -10090,6 +10103,15 @@ export const nl_NL: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Teugels van de Drakenmuil-Raptor"
+      },
+      "basic_toolbelt": {
+        "name": "Basic Toolbelt"
+      },
+      "reinforced_toolbelt": {
+        "name": "Reinforced Toolbelt"
+      },
+      "artisans_toolbelt": {
+        "name": "Artisan's Toolbelt"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"

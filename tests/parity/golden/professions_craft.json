@@ -19,7 +19,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 946,
-      "state": "516985d4",
+      "state": "71277de5",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -77,6 +77,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {}
         }
       ],
@@ -150,7 +151,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 946,
-      "state": "d5e7117f",
+      "state": "3a45a272",
       "events": "95660433",
       "rng": {
         "draws": 0,
@@ -212,6 +213,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {}
         }
       ],
@@ -285,7 +287,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 946,
-      "state": "72431191",
+      "state": "fc9ea708",
       "events": "71a8984f",
       "rng": {
         "draws": 1,
@@ -367,6 +369,7 @@
           "talents": {
             "rows": {}
           },
+          "toolbelt": {},
           "townFocus": {},
           "xp": 24
         }
@@ -441,7 +444,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 946,
-      "state": "65e16bf3",
+      "state": "edfe089e",
       "events": "acd9122e",
       "rng": {
         "draws": 2,
@@ -575,6 +578,7 @@
               0
             ]
           ],
+          "toolbelt": {},
           "townFocus": {},
           "xp": 24
         }
@@ -649,7 +653,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 946,
-      "state": "db035f9f",
+      "state": "bd5b1c62",
       "events": "71a8984f",
       "rng": {
         "draws": 3,
@@ -781,6 +785,7 @@
               0
             ]
           ],
+          "toolbelt": {},
           "townFocus": {},
           "xp": 48
         }
@@ -855,7 +860,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 946,
-      "state": "db035f9f",
+      "state": "bd5b1c62",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -987,6 +992,7 @@
               0
             ]
           ],
+          "toolbelt": {},
           "townFocus": {},
           "xp": 48
         }
