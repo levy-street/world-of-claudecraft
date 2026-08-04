@@ -404,6 +404,60 @@ def tuck_under_hat(host, cells, z_floor, shrink=0.80, ease=0.55, drop=0.02,
     return moved
 
 
+def beard(name, host, cell, rings, shade_t=0.34, material=None, sides=26,
+          arc=0.40, steps=14, front=-0.25, jut=0.0):
+    """A beard mass following the real jaw, built as a partial shell.
+
+    `rings` is a list of (z, pad, arc_scale): the height, how far the mass stands
+    off the measured face at that height, and how much of the front arc it covers.
+    Tapering the arc toward the top is what makes it read as a beard climbing to
+    the sideburns rather than as a bib hung round the neck.
+
+    Only the FRONT arc is built, centred on `front` TURNS of the circle. The face
+    is -Y on these rigs, which is -0.25 turns (-pi/2); -0.5 turns is -X and puts
+    the beard on a cheek, which is exactly where the first attempt built it.
+    """
+    centre = None
+    grid = []
+    for z, pad, arc_scale in rings:
+        prof, centre = hug_profile(host, sides, axis="z", coord=z, pad=pad, centre=centre)
+        cu, cv = centre
+        span = arc * arc_scale * TAU
+        ring = []
+        # EVERY ring gets the same step count; only the span changes. Varying the
+        # count per ring makes consecutive rings topologically mismatched, and the
+        # quad strip then stitches across different angles, which built a spiked
+        # tangle instead of a beard.
+        for i in range(steps + 1):
+            ang = front * TAU + (-span / 2 + span * i / steps)
+            # nearest measured radius for this angle
+            idx = int((ang % TAU) / TAU * sides) % sides
+            r = prof[idx][1]
+            # fuller in the middle of the arc, so the chin carries the bulk
+            mid = 1.0 - abs(i / steps - 0.5) * 2.0
+            rr = r + jut * mid
+            ring.append((cu + math.cos(ang) * rr, cv + math.sin(ang) * rr, z))
+        grid.append(ring)
+
+    verts, faces = [], []
+    offsets = []
+    for ring in grid:
+        offsets.append(len(verts))
+        verts.extend(ring)
+    for gi in range(len(grid) - 1):
+        a0, b0 = offsets[gi], offsets[gi + 1]
+        for i in range(steps):
+            faces.append((a0 + i, a0 + i + 1, b0 + i + 1, b0 + i))
+    # close the underside so the beard reads solid from below
+    last = grid[-1]
+    base = len(verts)
+    cu, cv = centre
+    verts.append((cu, cv, last[0][2] - 0.012))
+    for i in range(steps):
+        faces.append((base, offsets[-1] + i + 1, offsets[-1] + i))
+    return mesh_from(name, verts, faces, cell, shade_t, material)
+
+
 def souwester(name, host, cell, shade_t=0.30, material=None, sides=20,
               crown_z=2.16, brim_z=1.92, pad=0.055, brim=0.30, tail=0.55,
               flat=0.55):
