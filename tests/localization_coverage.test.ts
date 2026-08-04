@@ -387,7 +387,7 @@ describe('i18n Localization Key Coverage', () => {
     questKey: 'L',
     item: 'Rough Bracers',
     key: 'K',
-    killer: 'Gravelord Malruk',
+    killer: 'Mira',
     kind: 'Weapon',
     slots: 14,
     label: 'Wolf',
