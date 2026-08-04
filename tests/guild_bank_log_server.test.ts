@@ -139,7 +139,10 @@ beforeEach(() => {
     },
   ]);
   // A cold cache per test, so one test's warm entry cannot answer the next.
-  resetGuildBankLogCacheForTests();
+  // minRefreshMs 0 disables the COALESCING FLOOR here on purpose: these tests
+  // are about the WIRING (does a real op reach the cache at all), and the floor
+  // itself is measured with an injected clock in tests/server/guild_bank_log.
+  resetGuildBankLogCacheForTests({ minRefreshMs: 0 });
 });
 
 describe('guild_bank_log: the read gate is the BANK gate', () => {

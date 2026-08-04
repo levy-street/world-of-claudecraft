@@ -50,7 +50,7 @@ import {
   type GuildBankLogOp,
   GUILD_BANK_LOG_LIMIT as SEAM_GUILD_BANK_LOG_LIMIT,
 } from '../src/world_api/guild_bank';
-import { KeyedCachedRead } from './cached_read';
+import { KeyedCachedRead, type KeyedCachedReadStats } from './cached_read';
 import { type GuildBankLogDbRow, loadGuildBankLogRows } from './db';
 
 /** The window size, re-exported from the ONE seam constant
@@ -105,6 +105,15 @@ export const GUILD_BANK_LOG_CACHE_TTL_MS = 30_000;
  *  (the grows-without-bound defect server/CLAUDE.md forbids). Past the cap the
  *  coldest guild is evicted and its next read costs one extra query. */
 export const GUILD_BANK_LOG_CACHE_MAX_ENTRIES = 256;
+
+/** The COALESCING FLOOR: the shortest interval between two refreshes of one
+ *  guild's log, whatever the write or read rate. Without it a bust dropped the
+ *  entry outright, so every ledger write made the next read a query and the
+ *  cache did nothing in the exact state it exists for (a guild actively working
+ *  its bank while its officers watch). Two seconds caps refreshes at 0.5/s per
+ *  guild and is still an order of magnitude below the interval a human reads a
+ *  log at, so an op stays effectively immediate. */
+export const GUILD_BANK_LOG_MIN_REFRESH_MS = 2_000;
 
 /**
  * Project one ledger row into the player-visible entry, or null when the row
@@ -173,7 +182,26 @@ const defaultReader: GuildBankLogReader = async (guildId) =>
 
 let reader: GuildBankLogReader = defaultReader;
 let active: KeyedCachedRead<readonly GuildBankLogEntry[]> | null = null;
-let testOverrides: { ttlMs?: number; maxEntries?: number; now?: () => number } | null = null;
+let testOverrides: {
+  ttlMs?: number;
+  maxEntries?: number;
+  now?: () => number;
+  minRefreshMs?: number;
+} | null = null;
+
+// Guilds whose log a write has invalidated but whose coalescing floor has not
+// yet elapsed, with the wall-clock instant their entry may next be refreshed.
+// Bounded by the same maxEntries the cache is (an entry is only ever added for
+// a guild that is being read AND written), and pruned as it drains.
+const dirtyUntil = new Map<number, number>();
+
+function clock(): number {
+  return testOverrides?.now?.() ?? Date.now();
+}
+
+function minRefreshMs(): number {
+  return testOverrides?.minRefreshMs ?? GUILD_BANK_LOG_MIN_REFRESH_MS;
+}
 
 function activeCache(): KeyedCachedRead<readonly GuildBankLogEntry[]> {
   if (active !== null) return active;
@@ -190,30 +218,77 @@ function activeCache(): KeyedCachedRead<readonly GuildBankLogEntry[]> {
  * window share ONE query (single-flight), and a warm entry answers with no
  * query at all.
  *
+ * THE COALESCING FLOOR is what makes this a cache in the state it was built
+ * for. A bust that simply dropped the entry meant that any guild ledger write
+ * made the next read a query, and a guild actively working its bank is exactly
+ * when its officers open the log: the TTL then protected nothing, and the read
+ * degraded to per-request on a keep-forever table. Worse, dropping the entry
+ * mid-flight orphaned the in-flight query, so the next reader minted a SECOND
+ * identical one and the single-flight property the cache advertises stopped
+ * holding under the only write pattern that matters.
+ *
+ * So a bust marks the guild DIRTY with an instant it may next refresh, and the
+ * installed value keeps serving until then. Refreshes per guild are capped at
+ * 1/GUILD_BANK_LOG_MIN_REFRESH_MS no matter how hard the guild is banked or how
+ * many officers are watching, and an op is still visible within that floor,
+ * which is far below the interval any human reads a log at.
+ *
  * The returned array is the SHARED cached instance, deliberately frozen by the
- * reader below so a caller cannot mutate one guild's cached history for every
+ * reader above so a caller cannot mutate one guild's cached history for every
  * other reader.
  */
 export function readGuildBankLog(guildId: number): Promise<readonly GuildBankLogEntry[]> {
+  const due = dirtyUntil.get(guildId);
+  if (due !== undefined && clock() >= due) {
+    // The floor has elapsed and this guild has pending writes: NOW drop the
+    // entry, so this reader refreshes and everyone behind it joins that flight.
+    dirtyUntil.delete(guildId);
+    activeCache().bust(guildId);
+  }
   return activeCache().read(guildId);
 }
 
 /**
- * Drop one guild's cached log. Called by server/bank_ledger.ts on every guild
- * row it writes: once when the op happens (so an entry captured before it can
- * never be served again) and once more after the fire-and-forget inserts have
- * settled (so a read racing the write does not re-install a snapshot taken
- * microseconds before the row landed and then serve it for a whole TTL).
+ * Mark one guild's cached log stale. Called by server/bank_ledger.ts for every
+ * guild row it writes whose op a player can actually SEE: once when the op
+ * happens, and once more after that call's own inserts have settled (a read
+ * racing the write would otherwise refresh from a table that does not contain
+ * the new row yet and then serve that pre-op snapshot).
+ *
+ * This does NOT drop the entry (see readGuildBankLog for why): it records the
+ * earliest instant the entry may be refreshed, and the next read past that
+ * instant does the dropping. A second bust inside an open floor is a no-op
+ * rather than a reset, so a burst of writes cannot push the refresh out
+ * indefinitely.
  */
 export function bustGuildBankLog(guildId: number): void {
-  activeCache().bust(guildId);
+  if (dirtyUntil.has(guildId)) return; // already pending; never extend the window
+  // No entry at all (nothing installed, nothing in flight) means there is
+  // nothing to coalesce: the next read is a cold mint that will see this write
+  // anyway, so a dirty mark would only force a redundant second refresh behind
+  // it. An IN-FLIGHT entry does get a mark, because that flight may have read
+  // the table before this row landed.
+  if (!activeCache().has(guildId)) return;
+  dirtyUntil.set(guildId, clock() + minRefreshMs());
 }
 
-/** Cache telemetry (reads, refreshes, evictions, busts, live entries): the
- *  query rate here is bust rate times officer read rate, which is exactly the
- *  thing that is invisible without a counter. */
-export function guildBankLogCacheStats(): ReturnType<KeyedCachedRead<unknown>['stats']> {
-  return activeCache().stats();
+/** Cache telemetry (reads, refreshes, evictions, busts, live entries) plus the
+ *  guilds currently sitting inside a coalescing floor. The refresh rate here is
+ *  bust rate against read rate against that floor, which is exactly the number
+ *  the design rests on and exactly the one that is invisible without a counter;
+ *  server/http/game_signals.ts exports it.
+ *
+ *  Never CONSTRUCTS the cache (the discordStatusCacheStats precedent): a
+ *  metrics scrape on an idle process must not mint one as a side effect. */
+export function guildBankLogCacheStats(): KeyedCachedReadStats & { dirtyGuilds: number } {
+  const stats = active?.stats() ?? {
+    reads: 0,
+    refreshes: 0,
+    evictions: 0,
+    busts: 0,
+    entries: 0,
+  };
+  return { ...stats, dirtyGuilds: dirtyUntil.size };
 }
 
 /** Test seam: swap the database reader and rebuild the cache. */
@@ -227,10 +302,12 @@ export function configureGuildBankLogReader(read: GuildBankLogReader): void {
 export function resetGuildBankLogCacheForTests(overrides?: {
   ttlMs?: number;
   maxEntries?: number;
+  minRefreshMs?: number;
   now?: () => number;
   reader?: GuildBankLogReader;
 }): void {
   testOverrides = overrides ?? null;
+  dirtyUntil.clear();
   reader = overrides?.reader ?? defaultReader;
   active = null;
 }

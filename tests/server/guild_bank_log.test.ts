@@ -206,20 +206,185 @@ describe('readGuildBankLog: the per-guild cached read', () => {
     expect(calls.sort()).toEqual([7, 9]);
   });
 
-  it('a book change BUSTS the guild entry: the next read re-queries', async () => {
+  it('a book change BUSTS the guild entry: the next read past the floor re-queries', async () => {
+    let now = 0;
+    resetGuildBankLogCacheForTests({
+      now: () => now,
+      minRefreshMs: 2_000,
+      reader: async (guildId) => {
+        calls.push(guildId);
+        return [];
+      },
+    });
     await readGuildBankLog(7);
     expect(calls).toEqual([7]);
     bustGuildBankLog(7);
+    now = 2_000;
     await readGuildBankLog(7);
     expect(calls).toEqual([7, 7]);
   });
 
   it('a bust is scoped to ONE guild (a busy guild never evicts a quiet one)', async () => {
+    let now = 0;
+    resetGuildBankLogCacheForTests({
+      now: () => now,
+      minRefreshMs: 2_000,
+      reader: async (guildId) => {
+        calls.push(guildId);
+        return [];
+      },
+    });
     await readGuildBankLog(7);
     await readGuildBankLog(9);
     bustGuildBankLog(7);
+    now = 5_000;
     await readGuildBankLog(9);
     expect(calls.filter((g) => g === 9)).toEqual([9]);
+  });
+
+  // ---------------------------------------------------------------------
+  // The COALESCING FLOOR. Without it a bust dropped the entry outright, so
+  // every ledger write made the next read a query, and a guild actively
+  // working its bank is exactly the state its officers open the log in: the
+  // cache did nothing in the one state it exists for.
+  // ---------------------------------------------------------------------
+
+  it('serves the installed value through a bust until the floor elapses', async () => {
+    let now = 0;
+    resetGuildBankLogCacheForTests({
+      now: () => now,
+      minRefreshMs: 2_000,
+      reader: async (guildId) => {
+        calls.push(guildId);
+        return [];
+      },
+    });
+    await readGuildBankLog(7);
+    expect(calls.length).toBe(1);
+    bustGuildBankLog(7);
+    now = 1_999;
+    await readGuildBankLog(7);
+    expect(calls.length, 'inside the floor: still served from the installed value').toBe(1);
+    now = 2_000;
+    await readGuildBankLog(7);
+    expect(calls.length, 'past the floor: one refresh').toBe(2);
+  });
+
+  it('caps refreshes at one per floor however hard the guild is banked and read', async () => {
+    // THE number the design rests on. Drive a full second of the op guard's
+    // sustained write ceiling against a reader hammering every 100ms.
+    let now = 0;
+    resetGuildBankLogCacheForTests({
+      now: () => now,
+      minRefreshMs: 2_000,
+      reader: async (guildId) => {
+        calls.push(guildId);
+        return [];
+      },
+    });
+    await readGuildBankLog(7);
+    const cold = calls.length;
+    for (let ms = 0; ms < 10_000; ms += 100) {
+      now = ms;
+      bustGuildBankLog(7); // a write
+      bustGuildBankLog(7); // and another, inside the same tick
+      await readGuildBankLog(7);
+    }
+    const refreshes = calls.length - cold;
+    // 10 seconds at a 2s floor is at most 5 refreshes, not the 100 a
+    // drop-on-bust cache would have produced.
+    expect(refreshes).toBeLessThanOrEqual(5);
+    expect(
+      refreshes,
+      'and it must still refresh, or it is not a cache but a freeze',
+    ).toBeGreaterThan(0);
+  });
+
+  it('a burst of busts cannot push the refresh out indefinitely', async () => {
+    // A second bust inside an open floor must be a NO-OP, never a reset: a
+    // guild banking continuously would otherwise never see its own history.
+    let now = 0;
+    resetGuildBankLogCacheForTests({
+      now: () => now,
+      minRefreshMs: 2_000,
+      reader: async (guildId) => {
+        calls.push(guildId);
+        return [];
+      },
+    });
+    await readGuildBankLog(7);
+    bustGuildBankLog(7);
+    for (let ms = 100; ms < 2_000; ms += 100) {
+      now = ms;
+      bustGuildBankLog(7);
+    }
+    now = 2_000;
+    await readGuildBankLog(7);
+    expect(calls.length).toBe(2);
+  });
+
+  it('a bust never orphans an in-flight query into a second identical one', async () => {
+    // The old drop-on-bust deleted the entry mid-flight, so the next reader
+    // minted a SECOND concurrent identical query and the single-flight property
+    // stopped holding under the only write pattern that matters.
+    const gates: Array<() => void> = [];
+    resetGuildBankLogCacheForTests({
+      minRefreshMs: 2_000,
+      reader: (guildId) =>
+        new Promise((resolve) => {
+          calls.push(guildId);
+          gates.push(() => resolve([]));
+        }),
+    });
+    const first = readGuildBankLog(7);
+    expect(calls).toEqual([7]);
+    bustGuildBankLog(7); // a write lands mid-flight
+    const second = readGuildBankLog(7);
+    expect(calls, 'the in-flight query is joined, not orphaned').toEqual([7]);
+    for (const release of gates) release();
+    await Promise.all([first, second]);
+  });
+
+  it('a bust with nothing cached leaves no mark (a cold mint sees the write anyway)', async () => {
+    let now = 0;
+    resetGuildBankLogCacheForTests({
+      now: () => now,
+      minRefreshMs: 2_000,
+      reader: async (guildId) => {
+        calls.push(guildId);
+        return [];
+      },
+    });
+    bustGuildBankLog(7); // no entry yet
+    await readGuildBankLog(7);
+    now = 5_000;
+    await readGuildBankLog(7);
+    // The cold mint already contained the write, so no redundant refresh sits
+    // queued behind it.
+    expect(calls.length).toBe(1);
+  });
+
+  it('reports the guilds sitting inside a floor, and never constructs the cache to do it', async () => {
+    resetGuildBankLogCacheForTests({
+      minRefreshMs: 2_000,
+      reader: async (guildId) => {
+        calls.push(guildId);
+        return [];
+      },
+    });
+    // A stats read on an untouched process must not mint a cache as a side
+    // effect of being measured (the discordStatusCacheStats precedent).
+    expect(guildBankLogCacheStats()).toEqual({
+      reads: 0,
+      refreshes: 0,
+      evictions: 0,
+      busts: 0,
+      entries: 0,
+      dirtyGuilds: 0,
+    });
+    await readGuildBankLog(7);
+    bustGuildBankLog(7);
+    expect(guildBankLogCacheStats().dirtyGuilds).toBe(1);
   });
 
   it('serves within the TTL and re-queries past it', async () => {

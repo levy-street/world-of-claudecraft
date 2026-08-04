@@ -106,6 +106,11 @@ export const WOC_CHARACTERS_CREATED_TOTAL = 'woc_characters_created_total';
 /** Total guild-bank incidents on the dupe-sensitive paths, by kind. */
 export const WOC_GUILD_BANK_INCIDENTS_TOTAL = 'woc_guild_bank_incidents_total';
 
+/** Guild bank activity log cache readout, labeled by counter name. ONE metric
+ *  with a `kind` label rather than six names: the vocabulary is closed and
+ *  fixed, and an operator reads them together or not at all. */
+export const WOC_GUILD_BANK_LOG_CACHE = 'woc_guild_bank_log_cache';
+
 /** Total copper credited to acting players, labeled by economic surface. */
 export const WOC_COPPER_CREDITED_TOTAL = 'woc_copper_credited_total';
 
@@ -209,6 +214,22 @@ export interface GameStateSource {
    * still reads as stale rather than as warmup forever.
    */
   loopStartedAt(): number | null;
+  /**
+   * The guild bank activity log's per-guild read cache
+   * (server/guild_bank_log.ts). The number the whole design rests on is the
+   * REFRESH rate: the cache exists because one answer serves every officer of a
+   * guild, and its coalescing floor exists because a naive bust made a busy
+   * guild's log uncached exactly when officers read it. None of that is
+   * observable without this readout.
+   */
+  guildBankLogCache(): {
+    reads: number;
+    refreshes: number;
+    evictions: number;
+    busts: number;
+    entries: number;
+    dirtyGuilds: number;
+  };
 }
 
 /**
@@ -355,6 +376,21 @@ export function registerGameStateMetrics(
   // operator alerts on, and an alert rule cannot fire on a series that does
   // not exist until its first incident.
   for (const kind of GUILD_BANK_INCIDENTS) guildBankIncidents.inc({ kind }, 0);
+  new Gauge({
+    name: WOC_GUILD_BANK_LOG_CACHE,
+    help: 'Guild bank activity log read cache: reads, refreshes (the query rate), evictions, busts, live entries, and guilds inside the coalescing floor.',
+    labelNames: ['kind'],
+    registers: [registry],
+    collect() {
+      const stats = source.guildBankLogCache();
+      this.set({ kind: 'reads' }, stats.reads);
+      this.set({ kind: 'refreshes' }, stats.refreshes);
+      this.set({ kind: 'evictions' }, stats.evictions);
+      this.set({ kind: 'busts' }, stats.busts);
+      this.set({ kind: 'entries' }, stats.entries);
+      this.set({ kind: 'dirty_guilds' }, stats.dirtyGuilds);
+    },
+  });
   const copperCredited = new Counter({
     name: WOC_COPPER_CREDITED_TOTAL,
     help: 'Total copper credited to acting players during their own command, by economic surface.',

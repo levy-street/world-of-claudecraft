@@ -14,9 +14,9 @@
 // anything, and the observer can never throw into the caller. A character lives on
 // one realm process, so the FIFO preserves that character's op order.
 
-import type { BankInfo, GuildBankInfo } from '../src/world_api';
+import type { BankInfo, GuildBankInfo, GuildBankLogOp } from '../src/world_api';
 import { insertBankLedgerRow } from './db';
-import { bustGuildBankLog } from './guild_bank_log';
+import { bustGuildBankLog, GUILD_BANK_LOG_VISIBLE_OPS } from './guild_bank_log';
 import { gameMetricsCounters } from './http/game_signals';
 import { REALM } from './realm';
 
@@ -356,6 +356,13 @@ export function recordGuildBankDeltas(
   deltas: readonly BankOpDelta[],
 ): void {
   try {
+    // The inserts THIS call enqueues, so the post-write bust below can wait on
+    // exactly them. The module FIFO `tail` is process-global (every character's
+    // personal and guild rows share it), so chaining on the tail would make one
+    // op's bust fire behind every other insert queued since, potentially
+    // minutes later on a slow database, invalidating an entry that is fresh by
+    // then. That is an extra query at the worst possible moment.
+    const enqueued: Promise<void>[] = [];
     for (const delta of deltas) {
       // The nullable counterparty columns rest entirely on "NULL can only ever
       // mean a row written before they existed". Nothing in the schema enforces
@@ -412,29 +419,32 @@ export function recordGuildBankDeltas(
           gameMetricsCounters().guildBankIncident('ledger_write_failed');
           console.error('bank_ledger guild write failed:', err);
         });
+      enqueued.push(tail);
     }
     // The in-game activity log (server/guild_bank_log.ts) is a CACHE over the
     // very rows this function writes, so its bust belongs HERE, at the one
     // writer, rather than at each of the call sites: a future write site cannot
-    // forget it, and every op that produces a row (player op, operator purge,
-    // create fee, anomaly marker) invalidates the guild's window by
-    // construction.
+    // forget it, and every op that produces a row invalidates the guild's
+    // window by construction.
+    //
+    // Only for an op a player can actually SEE. The two anomaly ops
+    // (escrow_deficit, counterparty_orphan) are filtered out in the read's SQL,
+    // so busting for them would force a refresh whose result is byte-identical,
+    // and it would do that during an escrow rollback, i.e. exactly when the
+    // process is already in trouble.
     //
     // TWICE, on purpose. The immediate bust retires any snapshot taken before
-    // this op. The second one fires after the fire-and-forget inserts have
-    // actually SETTLED, because a reader racing this write would otherwise
-    // refresh from a table that does not contain the new row yet and then serve
-    // that pre-op snapshot for a whole TTL: the op would be invisible to the
-    // guild for 30s precisely when somebody is watching. Failures are ignored
-    // on purpose (a rejected insert already logged and counted); the bust is
-    // correct either way, because a bust only ever costs one extra query.
-    if (deltas.length > 0) {
+    // this op. The second fires once THIS call's inserts have actually SETTLED,
+    // because a reader racing the write would otherwise refresh from a table
+    // that does not contain the new row yet and then serve that pre-op snapshot
+    // for a whole TTL: the op would be invisible to the guild precisely when
+    // somebody is watching for it. Failures are ignored on purpose (a rejected
+    // insert already logged and counted); the bust is correct either way. Note
+    // that a "bust" is now a coalescing MARK, not a drop, so a burst of writes
+    // cannot turn this into a refresh per op.
+    if (deltas.length > 0 && GUILD_BANK_LOG_VISIBLE_OPS.includes(op as GuildBankLogOp)) {
       bustGuildBankLog(guildId);
-      const settled = tail;
-      void settled.then(
-        () => bustGuildBankLog(guildId),
-        () => bustGuildBankLog(guildId),
-      );
+      void Promise.allSettled(enqueued).then(() => bustGuildBankLog(guildId));
     }
   } catch (err) {
     // The observer must never fault the dispatch path.

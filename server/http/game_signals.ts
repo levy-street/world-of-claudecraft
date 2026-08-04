@@ -123,9 +123,14 @@ export const GUILD_BANK_INCIDENTS = [
   'ledger_write_failed',
   'counterparty_orphan',
   'counterparty_unstamped',
+  // The officer-visible activity log's read failed (a cold cache whose query
+  // threw or timed out). Its own kind because the refusal frame the player gets
+  // is byte-identical to "you are not an officer", so without this a total read
+  // outage is indistinguishable from ordinary refusals at the wire.
+  'log_read_failed',
 ] as const;
 
-/** One of the fixed nine guild-bank incident kinds. */
+/** One of the fixed ten guild-bank incident kinds. */
 export type GuildBankIncident = (typeof GUILD_BANK_INCIDENTS)[number];
 
 /**

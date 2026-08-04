@@ -130,21 +130,74 @@ Teardown of docs/guild-bank/ awaits the user's explicit confirmation.
   - CACHING: the answer is identical for every officer, so it rides the cached-read
     seam (`server/cached_read.ts`) per guild: TTL 30s, single-flight (two officers
     racing a cold window share ONE query), stale-on-error, LRU-bounded at 256 entries.
+    `KeyedCachedRead` MOVED from `server/discord_status_cache.ts` into `cached_read.ts`
+    (re-exported there, so every existing caller and test keeps its import path): it is
+    a generic, and a guild bank module importing the Discord module for it would be the
+    wrong seam.
     Freshness does NOT rest on the TTL: `server/bank_ledger.ts recordGuildBankDeltas`
-    busts the guild entry on every guild row it writes, at the ONE writer so a future
-    write site cannot forget, and TWICE (immediately, and again once the
-    fire-and-forget inserts have SETTLED, because a read racing the write would
-    otherwise re-install a pre-op snapshot and serve it for a whole TTL). A guild lives
-    on one realm process and every writer runs there, so the bust is COMPLETE rather
-    than best-effort.
+    busts the guild entry for every VISIBLE-op row it writes, at the ONE writer so a
+    future write site cannot forget, and TWICE (immediately, and again once THAT CALL's
+    own inserts have SETTLED, because a read racing the write would otherwise
+    re-install a pre-op snapshot). The second bust chains on the promises that call
+    enqueued, never the process-global FIFO `tail`: on a slow database the tail can be
+    minutes long and the bust would land on an entry that is fresh by then. The two
+    hidden anomaly ops do NOT bust (their rows are filtered in SQL, so the refresh
+    would be provably identical, fired during a rollback storm).
+  - THE COALESCING FLOOR (`GUILD_BANK_LOG_MIN_REFRESH_MS` = 2s), the database review's
+    F1: a bust that DROPPED the entry made the cache useless in the one state it exists
+    for. Any ledger write made the next read a query, and a guild actively working its
+    bank is exactly when its officers open the log, so the TTL protected nothing; worse,
+    dropping mid-flight orphaned the in-flight query and the next reader minted a second
+    identical one, so the advertised single-flight property did not hold under the only
+    write pattern that matters. A bust now MARKS the guild dirty with the earliest
+    instant it may refresh and the installed value keeps serving until then; the next
+    read past that instant does the dropping. Refreshes are capped at 0.5/s per guild
+    however hard the guild is banked or watched, a repeat bust inside an open window is
+    a no-op rather than a reset (so a burst cannot defer the refresh forever), and a
+    bust with no entry at all leaves no mark (a cold mint sees the write anyway).
+  - A guild lives on one realm process and every writer runs there, so the bust is
+    COMPLETE rather than best-effort. That is a premise of the DEPLOYMENT, not a
+    property of the code: two processes serving one realm would degrade to TTL-bounded
+    staleness (graceful, never corruption).
+  - THE READ'S OWN DEADLINE (`GUILD_BANK_LOG_TIMEOUT_MS` = 2s, set via
+    `runWithStatementTimeout`, which LOWERS as well as raises). Intended cost is
+    single-digit ms; the cost WITHOUT its index is a sequential scan of a keep-forever
+    table, and at the 15s pool default about ten of those in flight would exhaust
+    `DB_POOL_MAX_CLIENTS` and fail every login and autosave on the realm. That window
+    is reachable now that the CONCURRENTLY builds run after listen.
+  - OBSERVABILITY: `woc_guild_bank_log_cache{kind}` (reads / refreshes / evictions /
+    busts / entries / dirty_guilds) through the existing `GameStateSource` gauge seam,
+    read at scrape time and never CONSTRUCTING the cache (the discordStatusCacheStats
+    precedent). The REFRESH count is the number the whole design rests on. Plus a tenth
+    `GUILD_BANK_INCIDENTS` kind, `log_read_failed`, because the refusal frame a player
+    receives is byte-identical for "not an officer" and "the query failed".
   - INDEX (supersedes the deferral recorded under "Accepted risks": the trigger was
     "a per-guild reader exists" and this IS that reader). `bank_ledger_container_recent
-    ON bank_ledger(container, container_id, id DESC)` through the post-boot
-    `server/concurrent_indexes.ts` CONCURRENTLY seam, never boot DDL (bank_ledger is
-    large, live, and keep-forever). The THIRD column is load-bearing and measured: on
-    400k rows the equality pair alone still loses to a backward primary-key scan (252
-    shared buffers, 1.35ms) while the three-column form is a bounded backward index
-    scan (56 buffers, 0.20ms). `id` not `created_at` because BIGSERIAL cannot tie.
+    ON bank_ledger(container_id, id DESC) WHERE container = 'guild'` through the
+    post-boot `server/concurrent_indexes.ts` CONCURRENTLY seam, never boot DDL
+    (bank_ledger is large, live, and keep-forever). Three deliberate choices:
+    `id DESC` trails, because indexing the equality alone still sorts a guild's whole
+    history to find its newest 50 (measured on 400k rows: the equality-only index still
+    loses to a backward primary-key scan at 252 shared buffers / 1.35ms, while the
+    ordered form is 56 buffers / 0.20ms); `id` not `created_at`, because BIGSERIAL
+    cannot tie; and PARTIAL, because `container` is a two-value discriminator this
+    reader only ever passes `'guild'` for, so a full index would carry an entry for
+    every personal-bank row (the large majority of the table) as permanent write
+    amplification for a query that can never ask for one. `op` deliberately stays OUT:
+    a ScalarArrayOpExpr on a middle column would forfeit the ordering guarantee the
+    trailing `id DESC` exists for, and as a trailing Filter it costs only the
+    suppressed rows.
+  - THE CONCURRENT BUILDS MOVED OFF THE PRE-LISTEN PATH (`runConcurrentIndexMigrations`,
+    split out of `ensureSchema` and called after `server.listen`). They serialize across
+    realm processes on the schema advisory lock, and a concurrent build on a table this
+    size is two heap scans plus a wait for every transaction that could see it: held
+    before listen, a rolling restart paid that stall on every realm at once and none of
+    them served players meanwhile. A slow build must delay the INDEX, not the realm.
+    The trade, made explicit: a realm can now briefly serve a reader whose index does
+    not exist yet, which is why this read carries its own 2s deadline. Failure is loud
+    and NOT fatal (every entry is idempotent and drops its own INVALID carcass, so the
+    next boot retries; a realm already serving players must not be killed by an index
+    build).
   - WIRE: `guild_bank_log` (a pure READ token, no mutation) answered on its own
     one-shot `{ t: 'gbanklog', ok, entries }` frame, NEVER a snapshot key: the payload
     is cold, identical per guild, and 50 rows wide. `GUILD_BANK_LOG_LIMIT = 50`.

@@ -13,7 +13,12 @@ vi.mock('pg', () => ({
   },
 }));
 
-import { insertBankLedgerRow } from '../server/db';
+import {
+  DB_STATEMENT_TIMEOUT_MS,
+  GUILD_BANK_LOG_TIMEOUT_MS,
+  insertBankLedgerRow,
+  loadGuildBankLogRows,
+} from '../server/db';
 import { REALM } from '../server/realm';
 
 beforeEach(() => {
@@ -227,5 +232,74 @@ describe('insertBankLedgerRow (guild container rows, Guild Bank Phase 3)', () =>
       null,
       null,
     ]);
+  });
+});
+
+describe('loadGuildBankLogRows: the activity log statement', () => {
+  // The whole index-fit argument for bank_ledger_container_recent lives in this
+  // statement's SHAPE, and every other test in the slice mocks at or above this
+  // function, so nothing else would notice an edit that quietly turned a
+  // bounded backward index scan into a sequential scan of a keep-forever table.
+  async function runOnce() {
+    // runWithStatementTimeout checks out a client and wraps the read in a
+    // transaction, so the statements land on the client, not the pool.
+    const client = { query: vi.fn(), release: vi.fn() };
+    client.query.mockResolvedValue({ rows: [], rowCount: 0 } as never);
+    dbMock.connect.mockResolvedValue(client as never);
+    await loadGuildBankLogRows(913, 50, ['deposit', 'withdraw']);
+    return client;
+  }
+
+  it('reads through a LOWERED statement timeout, not the 15s pool default', async () => {
+    // A degraded read (no index, an unhealed INVALID carcass) would otherwise
+    // pin a pooled client for 15s, and ~10 of those exhaust the pool and fail
+    // every login and autosave on the realm.
+    const client = await runOnce();
+    const statements = client.query.mock.calls.map((c) => String(c[0]));
+    expect(statements[0]).toBe('BEGIN');
+    expect(statements[1]).toBe(`SET LOCAL statement_timeout = ${GUILD_BANK_LOG_TIMEOUT_MS}`);
+    expect(GUILD_BANK_LOG_TIMEOUT_MS).toBeLessThan(DB_STATEMENT_TIMEOUT_MS);
+  });
+
+  it('issues exactly ONE select, fully parameterized, in the index-fitting shape', async () => {
+    const client = await runOnce();
+    const selects = client.query.mock.calls.filter((c) =>
+      String(c[0]).includes('FROM bank_ledger'),
+    );
+    expect(selects.length).toBe(1);
+    const [sql, params] = selects[0] as [string, unknown[]];
+    // The three predicate clauses the partial index and its column order are
+    // chosen for. `container` is a LITERAL, which is what makes the index's
+    // `WHERE container = 'guild'` partial predicate provably matched.
+    expect(sql).toContain("bl.container = 'guild'");
+    expect(sql).toContain('bl.container_id = $1');
+    expect(sql).toContain('bl.op = ANY($2::text[])');
+    // The ORDER BY is the index's trailing column. `created_at` here would
+    // silently sort the guild's whole history instead of walking the LIMIT.
+    expect(sql).toContain('ORDER BY bl.id DESC');
+    expect(sql).not.toContain('ORDER BY bl.created_at');
+    // Bound in SQL, never sliced in JS.
+    expect(sql).toContain('LIMIT $3');
+    expect(params).toEqual([913, ['deposit', 'withdraw'], 50]);
+    // No wrapper around the indexed columns: a COALESCE / lower() / cast on
+    // container_id or id makes the index unusable.
+    expect(sql).not.toMatch(/COALESCE\s*\(\s*bl\.(container_id|id)/i);
+  });
+
+  it('selects nothing account-scoped: privacy is the column list', async () => {
+    const client = await runOnce();
+    const [sql] = client.query.mock.calls.find((c) =>
+      String(c[0]).includes('FROM bank_ledger'),
+    ) as [string];
+    const selectList = sql.slice(0, sql.indexOf('FROM'));
+    expect(selectList).not.toContain('account_id');
+    expect(selectList).not.toContain('realm');
+    expect(selectList).not.toContain('instance');
+    expect(selectList).not.toContain('counterparty');
+    // The character id is RESOLVED to a display name in this same statement,
+    // so no internal id ships either.
+    expect(selectList).not.toMatch(/bl\.character_id/);
+    expect(sql).toContain('LEFT JOIN characters c ON c.id = bl.character_id');
+    expect(selectList).toContain('c.name AS character_name');
   });
 });

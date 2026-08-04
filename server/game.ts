@@ -4616,10 +4616,17 @@ export class GameServer {
         this.send(session, { t: 'gbanklog', ok: true, entries });
       })
       .catch((err) => {
-        // A cold cache whose query failed. Never a stack trace to the player,
-        // and never a silent drop: the pane needs an answer to leave its
-        // loading state, and "refused" is the honest one (we do not know the
-        // history right now).
+        // A cold cache whose query failed or timed out. Never a stack trace to
+        // the player, and never a silent drop: the pane needs an answer to
+        // leave its loading state, and "refused" is the honest one (we do not
+        // know the history right now).
+        //
+        // COUNTED, because the frame a player gets is byte-identical to the
+        // "you are not an officer" refusal: without its own incident kind a
+        // total read outage would look exactly like ordinary refusals at the
+        // wire and nothing would ever page. The counter sits beside the loud
+        // log, never instead of it.
+        gameMetricsCounters().guildBankIncident('log_read_failed');
         console.error(`guild bank log read failed for guild ${guildId}:`, err);
         this.send(session, { t: 'gbanklog', ok: false });
       });

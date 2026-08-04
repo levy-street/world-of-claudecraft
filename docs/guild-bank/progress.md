@@ -30,24 +30,28 @@ the guild, which is the social check the permission model rests on.
       and it is RE-CHECKED after the awaited read (a demotion can land inside
       that window). The guild id comes from the membership stamp; there is no
       guild field on the wire.
-- [x] **Index.** `bank_ledger_container_recent ON bank_ledger(container,
-      container_id, id DESC)` via the post-boot CONCURRENTLY seam
+- [x] **Index.** `bank_ledger_container_recent ON bank_ledger(container_id, id
+      DESC) WHERE container = 'guild'` via the post-boot CONCURRENTLY seam
       (`server/bank_ledger_indexes.ts` + `server/concurrent_indexes.ts`), never
       boot DDL. This resolves the Phase 3 QA deferral whose trigger was "a
       per-guild reader exists". Measured on 400k rows: no index 252 shared
-      buffers / 1.35ms (backward primary-key scan); the equality pair ALONE
-      still loses to that same PK scan (252 buffers / 1.38ms), which is why the
-      third column is not decoration; the three-column form 56 buffers /
-      0.20ms.
+      buffers / 1.35ms (backward primary-key scan); the equality ALONE still
+      loses to that same PK scan (252 buffers / 1.38ms), which is why the
+      ordered column is not decoration; the ordered form 56 buffers / 0.20ms.
+      PARTIAL after the database review: `container` is a two-value column this
+      reader only ever passes 'guild' for, so a full index was permanent write
+      amplification on every personal-bank insert for a query that can never ask
+      for one.
 - [x] **Cache.** Per guild through `server/cached_read.ts` (TTL 30s,
       single-flight, stale-on-error, LRU cap 256). `KeyedCachedRead` MOVED from
       `server/discord_status_cache.ts` to `cached_read.ts` (re-exported there,
       so every existing caller and test keeps its import path): it is a generic,
       and a guild bank module importing the Discord module for it would have
       been the wrong seam. The bust lives in `recordGuildBankDeltas`, the ONE
-      guild row writer, and fires TWICE: at the op, and again once the
-      fire-and-forget inserts SETTLE, because a read racing the write would
-      otherwise re-install a pre-op snapshot and serve it for a whole TTL.
+      guild row writer, fires only for VISIBLE ops, and fires TWICE: at the op,
+      and again once THAT CALL's own inserts settle (chained on those promises,
+      never the process-global FIFO tail, which on a slow database is minutes
+      long). It MARKS dirty rather than dropping: see the coalescing floor.
 - [x] **Withheld.** `escrow_deficit` / `counterparty_orphan` never leave the
       server (filtered in SQL, allowlist re-stated client-side). No account id,
       realm, or instance payload is selected; character ids resolve to display
@@ -69,6 +73,32 @@ the guild, which is the social check the permission model rests on.
       `hudChrome.bank.*` keys with their five non-Latin M16 fills; 40px mobile
       floors for the sub-tabs. `guildTabActive` now requires the CONTENTS view,
       so a bag click on the reading surface cannot silently deposit.
+- [x] **Database review pass** (database-performance-reviewer, verdict BLOCK:
+      0 blocking-labelled but 5 actionable SHOULD-FIX; all five fixed here).
+      - F5 the index is now PARTIAL (above).
+      - F8 `runConcurrentIndexMigrations` split out of `ensureSchema` and called
+        AFTER `server.listen`: the builds serialize every realm on the advisory
+        lock, so before listen a rolling restart stalled every realm at once and
+        none of them served players. Loud, non-fatal, idempotent, self-healing.
+      - F1/F2/F12/F13 the COALESCING FLOOR (`GUILD_BANK_LOG_MIN_REFRESH_MS` 2s):
+        a bust marks dirty instead of dropping, so a busy guild's log stays
+        cached (it was uncached in exactly the state the cache exists for), an
+        in-flight query is never orphaned into a second identical one, hidden
+        ops no longer force a provably no-op refresh, and the settle-bust waits
+        on this call's own inserts.
+      - F3 the statement is pinned by shape (`tests/bank_ledger_db.test.ts`):
+        predicate clauses, `ORDER BY bl.id DESC`, parameterized LIMIT, the
+        lowered timeout, and the absence of account_id/realm/instance from the
+        select list. Every other test in the slice mocks at or above that
+        function, so nothing else would have noticed an edit that silently
+        turned this into a sequential scan.
+      - F11 `woc_guild_bank_log_cache{kind}` through the GameStateSource gauge
+        seam plus the tenth incident kind `log_read_failed`.
+      - Also: the read now carries its OWN 2s statement deadline (the pool
+        default is 15s, and ~10 degraded reads at that bound would exhaust the
+        pool), the stale retention-sweep "no hot reads" justification in
+        `server/main.ts` is corrected, and the two comments the KeyedCachedRead
+        move left dangling are fixed.
 - [x] **Tests.** `tests/guild_bank_log_view.test.ts` (20),
       `tests/guild_bank_log_wire.test.ts` (18),
       `tests/guild_bank_log_server.test.ts` (12, real GameServer),

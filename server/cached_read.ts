@@ -146,8 +146,10 @@ export interface KeyedCachedReadOptions {
 /**
  * A bounded map of per-key CachedRead instances: TTL, single-flight, and
  * stale-on-error per key via createCachedRead; bust-by-key, bust-all, and the
- * entry bound owned here. Keys are account ids; an entry can never be served
- * for any key other than the one it is stored under.
+ * entry bound owned here. A key is whatever the owning domain keys by (account
+ * ids for the Discord status core, guild ids for the guild bank activity log);
+ * each domain holds its OWN instance, so the key domains never meet and an
+ * entry can never be served for any key other than the one it is stored under.
  */
 export interface KeyedCachedReadStats {
   /** read() calls since construction. */
@@ -179,8 +181,10 @@ export class KeyedCachedRead<T> {
     private readonly opts: KeyedCachedReadOptions,
   ) {
     // Loud at wiring time: a non-positive TTL would serve every read stale or
-    // never, and a non-positive cap would refuse every entry. The env parse
-    // above cannot produce either; this guards direct construction.
+    // never, and a non-positive cap would refuse every entry. Callers that read
+    // their bounds from the environment sanitize them first (see
+    // positiveIntFromEnv in discord_status_cache.ts); this guards every direct
+    // construction, including the ones that pass literals.
     if (!Number.isFinite(opts.ttlMs) || opts.ttlMs <= 0)
       throw new Error(`KeyedCachedRead ttlMs must be positive, got ${opts.ttlMs}`);
     if (!Number.isInteger(opts.maxEntries) || opts.maxEntries <= 0)
@@ -236,6 +240,18 @@ export class KeyedCachedRead<T> {
       if (this.entries.get(key) === entry) this.entries.delete(key);
     });
     return flight;
+  }
+
+  /**
+   * Whether a key currently holds an entry at all: an installed value OR an
+   * in-flight first read. Deliberately not `peek`-shaped, because the caller
+   * that needs this (the guild bank log's coalescing floor) must treat a cold
+   * MINT and an in-flight flight the same way: in both cases there is a
+   * refresh already coming, and in neither is there a stale value to coalesce
+   * against. Does not touch the LRU order: this is an observation, not a read.
+   */
+  has(key: number): boolean {
+    return this.entries.has(key);
   }
 
   /** Drop one key's entry; its next read refreshes (see the header on why drop). */

@@ -221,9 +221,13 @@ export function getPoolClientErrorCount(): number {
 
 /**
  * Run `fn` inside ONE transaction on a dedicated pooled client whose
- * statement_timeout is raised to `timeoutMs` for the duration (SET LOCAL, so it
- * reverts at COMMIT/ROLLBACK and never leaks to the next checkout). For the known
- * heavy reads whose legitimate runtime can exceed the default DB_STATEMENT_TIMEOUT_MS.
+ * statement_timeout is SET to `timeoutMs` for the duration (SET LOCAL, so it
+ * reverts at COMMIT/ROLLBACK and never leaks to the next checkout). Mostly used
+ * to RAISE the default for the known heavy reads whose legitimate runtime can
+ * exceed DB_STATEMENT_TIMEOUT_MS; it LOWERS it just as well, which is the right
+ * tool for a read whose intended cost is milliseconds and whose degraded cost
+ * would pin a pooled client for the full 15s default (see
+ * GUILD_BANK_LOG_TIMEOUT_MS).
  * The wrapped `query` handed to `fn` runs on the same client inside the same
  * transaction, so every statement it issues is covered by the raised timeout. The
  * transaction runs at the default READ COMMITTED isolation, where each statement
@@ -1282,37 +1286,6 @@ export async function ensureSchema(): Promise<void> {
       );
     }
     await client.query('COMMIT');
-    // CREATE INDEX CONCURRENTLY cannot run inside the schema transaction. Keep
-    // the session-level form of the same advisory lock while running this
-    // post-commit migration so simultaneous realm boots cannot race the index
-    // name. The concurrent build permits normal play_sessions writes to continue.
-    // The boot transaction's SET LOCAL statement_timeout = 0 reverted at the
-    // COMMIT above, so re-disable it session-wide first: the advisory-lock wait
-    // and the concurrent build can both outlast an operator-set database- or
-    // role-level statement_timeout, and this dedicated client closes right
-    // after, so the session setting never leaks to pooled connections.
-    await client.query('SET statement_timeout = 0');
-    let concurrentMigrationLocked = false;
-    try {
-      await client.query('SELECT pg_advisory_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
-      concurrentMigrationLocked = true;
-      // A prior boot's build may have died mid-CONCURRENTLY (a deploy-watchdog
-      // restart, a crash), stranding an INVALID index that IF NOT EXISTS would
-      // treat as existing forever. Each entry drops its carcass first so the
-      // build self-heals; the list and its order live in
-      // server/concurrent_indexes.ts.
-      for (const migration of CONCURRENT_INDEX_MIGRATIONS) {
-        const invalidIndex = await client.query(migration.checkSql);
-        if ((invalidIndex.rowCount ?? 0) > 0) {
-          await client.query(migration.dropSql);
-        }
-        await client.query(migration.createSql);
-      }
-    } finally {
-      if (concurrentMigrationLocked) {
-        await client.query('SELECT pg_advisory_unlock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
-      }
-    }
     // Open the market write gate only AFTER a successful COMMIT, so no market
     // write can land before the marker is durable. Opens on the no-op path too
     // (backfill.ran === false, i.e. the marker already existed).
@@ -1322,6 +1295,66 @@ export async function ensureSchema(): Promise<void> {
     throw err;
   } finally {
     // Dedicated client, not a pool checkout: close the connection outright.
+    await client.end().catch(() => {});
+  }
+}
+
+/**
+ * The post-commit CONCURRENTLY index builds. Split out of ensureSchema and run
+ * AFTER the realm is listening (server/main.ts), which is a deliberate change
+ * of what a slow build costs.
+ *
+ * These cannot run inside the schema transaction (CREATE INDEX CONCURRENTLY
+ * forbids it), and they serialize across realm processes on the session-level
+ * form of the schema advisory lock so simultaneous boots cannot race an index
+ * name. On a small table that is invisible. On a genuinely large one it is not:
+ * a concurrent build is two heap scans plus a wait for every transaction that
+ * could see the table, and while the first realm builds it EVERY OTHER REALM
+ * blocks on that lock. Held before `listen`, a rolling restart paid that stall
+ * on every realm at once and none of them served players while they waited.
+ * Held after `listen`, a slow build delays the INDEX, not the realm.
+ *
+ * The trade this makes explicit: a realm can now briefly serve a reader whose
+ * index does not exist yet, so a reader that depends on one of these must carry
+ * its own bound rather than assume the index (see GUILD_BANK_LOG_TIMEOUT_MS).
+ * Failure is loud and NOT fatal: every entry is idempotent and self-healing, so
+ * the next boot retries, and a realm that is already serving should not be
+ * killed by an index build.
+ *
+ * The dedicated client escapes the pool's timeouts entirely, and the session
+ * `SET statement_timeout = 0` additionally overrides any database- or
+ * role-level timeout an operator set server-side; it closes immediately after,
+ * so nothing leaks to pooled connections.
+ */
+export async function runConcurrentIndexMigrations(): Promise<void> {
+  // Resolved at call time, not module scope: many suites module-mock 'pg' with
+  // a Pool-only factory (the ensureSchema precedent above).
+  const { Client } = await import('pg');
+  const client = new Client({ connectionString: DATABASE_URL });
+  let locked = false;
+  try {
+    await client.connect();
+    await client.query('SET statement_timeout = 0');
+    await client.query('SELECT pg_advisory_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
+    locked = true;
+    // A prior build may have died mid-CONCURRENTLY (a deploy-watchdog restart,
+    // a crash), stranding an INVALID index that IF NOT EXISTS would treat as
+    // existing forever, so the reader would sequential-scan for good. Each
+    // entry drops its carcass first; the list and its order live in
+    // server/concurrent_indexes.ts.
+    for (const migration of CONCURRENT_INDEX_MIGRATIONS) {
+      const invalidIndex = await client.query(migration.checkSql);
+      if ((invalidIndex.rowCount ?? 0) > 0) {
+        await client.query(migration.dropSql);
+      }
+      await client.query(migration.createSql);
+    }
+  } finally {
+    if (locked) {
+      await client
+        .query('SELECT pg_advisory_unlock($1)', [SCHEMA_ADVISORY_LOCK_KEY])
+        .catch(() => {});
+    }
     await client.end().catch(() => {});
   }
 }
@@ -4431,13 +4464,31 @@ export interface GuildBankLogDbRow {
   copperDelta: number;
 }
 
+/**
+ * The per-statement bound for the activity log read, deliberately far BELOW the
+ * pool default rather than above it.
+ *
+ * Intended cost is a bounded backward index scan of 50 rows, i.e. single-digit
+ * milliseconds. The cost without its index is a sequential scan of a
+ * keep-forever table, and at the 15s pool default roughly ten of those in
+ * flight would exhaust DB_POOL_MAX_CLIENTS and make every login and autosave on
+ * the realm fail its checkout. That window is reachable now that the
+ * CONCURRENTLY builds run after listen (runConcurrentIndexMigrations), and it
+ * is also what a dropped index or an unhealed INVALID carcass looks like. Two
+ * seconds is ~3 orders of magnitude of headroom over the intended cost and
+ * still fails this ONE read instead of the realm: the caller answers the
+ * player a refusal, which the pane renders.
+ */
+export const GUILD_BANK_LOG_TIMEOUT_MS = 2_000;
+
 export async function loadGuildBankLogRows(
   guildId: number,
   limit: number,
   visibleOps: readonly string[],
 ): Promise<GuildBankLogDbRow[]> {
-  const res = await pool.query(
-    `SELECT bl.id,
+  const res = await runWithStatementTimeout(GUILD_BANK_LOG_TIMEOUT_MS, (query) =>
+    query(
+      `SELECT bl.id,
             bl.created_at,
             bl.op,
             bl.item_id,
@@ -4451,7 +4502,8 @@ export async function loadGuildBankLogRows(
         AND bl.op = ANY($2::text[])
       ORDER BY bl.id DESC
       LIMIT $3`,
-    [guildId, visibleOps, limit],
+      [guildId, visibleOps, limit],
+    ),
   );
   return res.rows.map((r) => ({
     id: Number(r.id),
