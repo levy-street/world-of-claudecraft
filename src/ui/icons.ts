@@ -4491,19 +4491,12 @@ export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 // an <img> at a file that 404s. Same shape as the i18n `pending` model: the debt is
 // enumerated rather than silent, and it shrinks as art lands.
 //
-// Only the quest-collect items this branch's dedupe pass added still await painted
-// art (the v0.30.0 every-item-ships-art rule, #2301); the rest were painted in the
-// 2026-08-01 wave on release. tests/item_icons.test.ts holds the line from BOTH sides:
-// a stale entry (art committed but still listed) fails, and a NEW item with no art that
-// is NOT listed here fails too. Do not add here to silence that test; commission art.
-export const ITEM_ART_PENDING = new Set<string>([
-  // zone1.ts (Eastbrook): quest collect item, procedural icon until art ships.
-  'restless_skull',
-  // zone2.ts (Mirefen): a world-object label item (Mudfin Hut), never shown in bags.
-  'murloc_hut',
-  // zone3.ts (Thornpeak): quest collect item, procedural icon until art ships.
-  'vanguard_bone',
-]);
+// Empty after the accepted 2026-08-01 painted-art wave, and empty again after the three
+// quest-collect items this branch's dedupe pass added were painted. Keep the mechanism: a
+// future development-only item may still use it temporarily. tests/item_icons.test.ts holds
+// the line from both sides: it rejects stale entries after art lands and unenumerated art
+// debt. Do not add to this list merely to silence that failure; commission the art.
+export const ITEM_ART_PENDING = new Set<string>();
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
 export function itemImageUrl(id: string): string | null {
