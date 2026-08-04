@@ -290,6 +290,21 @@
   .np-marker.active {
     color: #b9b9b9;
   }
+  /* repeatable turn-in (completed at least once): the rare-item blue "!",
+     matching the map/minimap repeat tokens */
+  .np-marker.repeat {
+    color: #0070dd;
+    text-shadow:
+      0 0 6px #0070dd88,
+      1px 1px 2px #000;
+  }
+  /* a work order inside its cadence window: the blue mark dimmed at the same
+     0.55 the canvas surfaces blit with, where the plate showed nothing */
+  .np-marker.cooldown {
+    color: #0070dd;
+    opacity: 0.55;
+    text-shadow: 1px 1px 2px #000;
+  }
   .np-marker.loot {
     color: var(--gold);
     font-size: 14px;
@@ -2013,6 +2028,60 @@
     }
   }
 
+  /* On-bar action-bar key-binding mode (issue #1238): a plain banner (no window
+     chrome) anchored above the visible action bar(s) via #actionbar-stack's own
+     position: relative. Built/removed by hud.ts on enter/exit. */
+  #actionbar-bind-banner {
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    transform: translateX(-50%);
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: max-content;
+    max-width: 90vw;
+    padding: 8px 14px;
+    border: 2px solid var(--color-border-focus);
+    border-radius: 6px;
+    background: linear-gradient(170deg, #15131fee, #09080eee);
+    box-shadow: 0 2px 10px #000c;
+    color: var(--color-text-light);
+    font-family: var(--ui-font);
+    text-align: center;
+    z-index: 25;
+  }
+  .actionbar-bind-hint {
+    font-size: 13px;
+  }
+  .actionbar-bind-status {
+    min-height: 14px;
+    font-size: 12px;
+    color: var(--gold);
+  }
+  .actionbar-bind-actions {
+    display: flex;
+    gap: 8px;
+  }
+  /* The slot awaiting a keypress: a gold ring distinct from both the .used
+     (currently bound to the ability on the swing/cast state) and :hover looks,
+     so it reads clearly mid-capture. */
+  .action-btn.bind-selected {
+    border-color: var(--gold);
+    box-shadow:
+      0 0 10px #ffd100cc,
+      inset 0 0 0 2px var(--gold);
+  }
+  /* While the mode is active every slot is a click target, whether or not it
+     currently holds anything: a dashed hover ring is the only extra affordance
+     needed, the bar otherwise looks exactly as it does in normal play. */
+  body.actionbar-bind-active .action-btn:hover {
+    outline: 2px dashed var(--gold);
+    outline-offset: 1px;
+  }
+
   /* ---------- chat frame ---------- */
   /* width shrinks on narrower screens so the chat never overlaps the centred
      bottom bar (≈612px wide); caps at 370px when there's room. */
@@ -2581,6 +2650,26 @@
   .qd-obj.done,
   .quest-complete {
     color: var(--color-text-success);
+  }
+  /* Repeatable-quest glyphs and tags (the phase 23 blue "!"): the rare-item
+     blue, matching the map/minimap repeat tokens. Plain color classes so the
+     marker reads on every graphics tier (fairness invariant). */
+  .quest-repeat {
+    color: #0070dd;
+  }
+  /* The map tooltip's TAG texts are 13.5px prose over the panel gradient,
+     where #0070dd reads 4.07:1 (under the 4.5:1 AA floor for text) and a
+     0.55 dim about 2:1, so the TEXT channel lifts to the theme-repaired
+     tag token at full opacity; the glyph channels (the gossip '!', the
+     nameplate marks, both canvas painters) keep the #0070dd anchor and
+     carry the dim. One grouped rule so the accessible blue is stated once,
+     both arms #tooltip-scoped so a future reuse outside the tooltip never
+     silently inherits the text lift: .quest-repeat falls back to its glyph
+     rule above, and .quest-cooldown (tooltip-tag-only, no base rule) would
+     surface unstyled as a prompt to decide its channel. */
+  #tooltip .quest-cooldown,
+  #tooltip .quest-repeat {
+    color: var(--color-quest-tag-text, #3d9bff);
   }
 
   /* ---------- deed tracker ---------- */
@@ -3971,9 +4060,9 @@
   body.native-app #mobile-donate,
   body.native-app #token-ca,
   body.native-app #nav-btn-download,
-  body.native-app .cs-wallet,
-  body.native-app .cs-wallet-hidden-note,
-  body.native-app .account-wallet-card,
+  body.native-app:not(.seeker-wallet-enabled) .cs-wallet,
+  body.native-app:not(.seeker-wallet-enabled) .cs-wallet-hidden-note,
+  body.native-app:not(.seeker-wallet-enabled) .account-wallet-card,
   body.native-app #performance-tip,
   body.native-app .official-site-copy {
     display: none !important;
@@ -5166,6 +5255,30 @@
     object-fit: contain;
     filter: drop-shadow(var(--art-shadow-lg));
   }
+  /* The Book of Deeds variant (hud.ts showBanner variant='deed'). A deed
+     unlock used to fire this element with the level-up's exact colour, size
+     and lifetime, and since an early character trips several deeds inside its
+     first few gathering actions, that is a known cause of players reading
+     routine gathering as leveling. So the deed moment gets its OWN language:
+     a framed parchment plate in the Book of Deeds palette, at a quieter size,
+     against the level-up's bare oversized gold text. Copy and lifetime are
+     untouched: presentation only, never information. */
+  #banner.banner-deed {
+    color: var(--color-deed-banner-text);
+    font-size: 26px;
+    letter-spacing: 0.5px;
+    padding: 8px 22px;
+    border: 1px solid var(--color-deed-banner-border);
+    border-radius: 8px;
+    background: var(--color-deed-banner-bg);
+    /* Scales with the graphics tier like every other decorative shadow here:
+       at the low preset --fx-shadow is 0 and the plate sheds its lift with
+       the rest of the HUD instead of keeping a full-blur outlier. */
+    box-shadow: 0 3px calc(14px * var(--fx-shadow, 1)) var(--color-art-shadow);
+    text-shadow:
+      0 0 10px #00000088,
+      1px 1px 4px #000;
+  }
   /* Reduced-motion celebrations (hud.ts showBanner motion=false): the banner
      appears and clears instantly, same text and duration, no fade. */
   #banner.banner-no-motion {
@@ -6064,6 +6177,20 @@
   .prompt .prompt-number:focus {
     outline: 1px solid var(--gold-dim);
   }
+  /* Touch floor for the .prompt family's action buttons: the three quantity
+     prompts (bags discard/sell, bank withdraw/deposit, vendor buy-quantity)
+     plus the generic invite/trade/duel/ready-check prompts that share the
+     class. The base .btn renders around 30px tall, under the 40px
+     coarse-pointer tap target the rest of the vendor family floors; the
+     vendor prompt made this a mobile PURCHASE surface, so the floor lives on
+     the shared rule and lifts every prompt at once. */
+  @media (pointer: coarse) {
+    .prompt .btn {
+      min-width: 40px;
+      min-height: 40px;
+      box-sizing: border-box;
+    }
+  }
 
   /* ---------- trade window ---------- */
   #trade-window {
@@ -6296,12 +6423,17 @@
   }
   /* ---------- World Market collect indicator ---------- */
   /* The Merchant's coin: sale proceeds or returned items wait for collection.
-     Same rim-satellite family as the envelope; claims the top-RIGHT corner
-     (raid-lockout owns bottom-left, the envelope bottom-right; guarded by
-     tests/minimap_rim_badges.test.ts). */
+     Same rim-satellite family as the envelope, and it claims the top-LEFT
+     corner (raid-lockout owns bottom-left, the envelope bottom-right, the
+     day/night dial top-right). It shipped at top/right, which the dial already
+     held, and the dial is later in the DOM at the same z-index, so the coin was
+     painted over completely: an actionable control buried under an aria-hidden
+     decoration, visible together only when proceeds happen to be waiting, which
+     is why it went unnoticed. tests/minimap_rim_badges.test.ts keeps the four
+     corners one-to-one and holds the touch sheet's re-anchoring to match. */
   #market-indicator {
     position: absolute;
-    right: 4px;
+    left: 4px;
     top: 4px;
     z-index: 3;
     display: inline-flex;

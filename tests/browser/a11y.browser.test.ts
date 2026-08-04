@@ -21,10 +21,12 @@ import { CharWindow } from '../../src/ui/char_window';
 import { FOCUSABLE_SELECTOR } from '../../src/ui/focus_manager';
 import { resolveActionBarVisibility } from '../../src/ui/hud/action_bar/action_bar_visibility_core';
 import { QuestLogWindow } from '../../src/ui/hud/quest/questlog_window';
+import { renderVendorWindow } from '../../src/ui/hud/vendor/vendor_window';
 import { t } from '../../src/ui/i18n';
 import { LeaderboardWindow } from '../../src/ui/leaderboard_window';
 import { MarketWindow } from '../../src/ui/market_window';
 import { OptionsWindow } from '../../src/ui/options_window';
+import { ProfessionsWindow } from '../../src/ui/professions_window';
 import { SocialWindow } from '../../src/ui/social_window';
 import { SpellbookWindow } from '../../src/ui/spellbook_window';
 import { TalentsWindow } from '../../src/ui/talents_window';
@@ -924,5 +926,153 @@ describe('axe: bags discard prompt', () => {
     win.close();
     expect(root.style.display).toBe('none');
     expect(document.activeElement).toBe(opener);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Vendor (#vendor-window) - the R22 advisory turn: requirement rows sell, the
+// sub-line is the sighted advisory, and the combined aria-label is the
+// screen-reader one. Rendered through the real painter with the real styles.
+// ---------------------------------------------------------------------------
+
+describe('axe: vendor window advisory rows', () => {
+  it('advisory and plain rows are clean, and the advisory name folds the requirement', async () => {
+    const root = host('vendor-window');
+    const pick = ITEMS.iron_mining_pick;
+    const bread = Object.values(ITEMS).find((i) => i?.kind === 'food') ?? pick;
+    const view = {
+      goods: [
+        {
+          itemId: bread.id,
+          item: bread,
+          price: { copper: 5, honor: 0 },
+          quantity: 1,
+          affordable: true,
+          requirementUnmet: false,
+        },
+        {
+          itemId: 'iron_mining_pick',
+          item: pick,
+          price: { copper: 120, honor: 0 },
+          quantity: 1,
+          affordable: true,
+          requirementUnmet: true,
+          requirement: { professionId: 'mining' as const, proficiency: 40 },
+        },
+      ],
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+      multiple: 1 as const,
+    };
+    // A literal vendor NAME: the painter interpolates it into the
+    // goodsTitle key itself, so passing a t() result here would nest the
+    // template and render a literal {name}.
+    renderVendorWindow(root, 'Quartermaster Bree', view, {
+      itemIcon: () => '<img alt="">',
+      moneyHtml: (copper: number) => `<span>${copper}c</span>`,
+      itemTooltip: () => '<div></div>',
+      attachTooltip: () => {},
+      hideTooltip: () => {},
+      onBuy: () => {},
+      onQtyChange: () => {},
+      buyCustomMax: () => 0,
+      onBuyBack: () => {},
+      onSellJunk: () => {},
+      onClose: () => {},
+      sellJunk: { enabled: false, proceeds: 0 },
+    });
+    const rows = root.querySelectorAll<HTMLButtonElement>('.vendor-item');
+    expect(rows.length).toBe(2);
+    const advisory = [...rows].find((r) => r.querySelector('.vi-sub'));
+    expect(advisory).toBeTruthy();
+    // The advisory row SELLS and its accessible name carries what the sighted
+    // sub-line says (an aria-label replaces the content as the name).
+    expect(advisory?.disabled).toBe(false);
+    const sub = advisory?.querySelector('.vi-sub')?.textContent ?? '';
+    expect(sub.length).toBeGreaterThan(0);
+    expect(advisory?.getAttribute('aria-label') ?? '').toContain(sub);
+    await expectClean(root);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Professions (#professions-window) - the tool-effect row's interactive chrome
+// (slot/recharge buttons, the R40 "Ask each use" checkbox), rendered through
+// the real window with the real styles. The phase 18 whole-branch review
+// found only the vendor arm covered the packet's new interactive chrome.
+// ---------------------------------------------------------------------------
+
+describe('axe: professions window tool-effect controls', () => {
+  it('slot button, recharge button, and mode checkbox are clean with real names', async () => {
+    const root = host('professions-window');
+    const world = {
+      craftingIdentity: {
+        version: 1,
+        synced: true,
+        craftSkills: {
+          engineering: 0,
+          alchemy: 0,
+          cooking: 30,
+          leatherworking: 0,
+          tailoring: 0,
+          inscription: 0,
+          enchanting: 0,
+          jewelcrafting: 60,
+          weaponcrafting: 25,
+          armorcrafting: 49,
+        },
+        activeArchetype: 'armorcrafting',
+        pairedMajor: 'weaponcrafting',
+        hobbyCraft: 'leatherworking',
+        attunedPairs: ['weaponcrafting+armorcrafting'],
+        switchCount: 2,
+        amendsProgress: 1,
+        amendsRequired: 11,
+      },
+      professionsState: { skills: [{ professionId: 'mining', skill: 30, maxSkill: 300 }] },
+      gatheringProficiency: { mining: 30 },
+      toolEffectSlots: [
+        {
+          professionId: 'mining',
+          effectId: 'gatherers_cache',
+          charges: 12,
+          maxCharges: 30,
+          confirmMode: 'prompt',
+          selfCrafted: true,
+        },
+      ],
+      inventory: [
+        { itemId: 'copper_mining_pick', count: 1 },
+        { itemId: 'artisans_eye', count: 1, instance: { signer: 'Testchar' } },
+      ],
+      player: { name: 'Testchar' },
+    };
+    const win = new ProfessionsWindow(
+      stubDeps({
+        root: () => root,
+        world: () => world as never,
+        consumePeek: () => false,
+        itemIcon: () => '<img alt="">',
+        moneyHtml: (copper: number) => `<span>${copper}c</span>`,
+        itemTooltip: () => '',
+      }),
+    );
+    win.open();
+    // The three controls the review named must actually render: a slot
+    // button (a second effect is slottable from bags), the recharge button
+    // on the live slot, and the R40 per-row mode checkbox.
+    const slot = root.querySelector<HTMLButtonElement>('[data-slot-effect]');
+    const recharge = root.querySelector<HTMLButtonElement>('[data-recharge-profession]');
+    const mode = root.querySelector<HTMLInputElement>('[data-slot-mode]');
+    expect(slot).not.toBeNull();
+    expect(recharge).not.toBeNull();
+    expect(mode).not.toBeNull();
+    // The checkbox's accessible name comes from its wrapping label text.
+    expect(mode?.closest('label')?.textContent?.trim().length ?? 0).toBeGreaterThan(0);
+    // Buttons carry visible text as their accessible names, never bare icons.
+    expect(slot?.textContent?.trim().length ?? 0).toBeGreaterThan(0);
+    expect(recharge?.textContent?.trim().length ?? 0).toBeGreaterThan(0);
+    await expectClean(root);
   });
 });

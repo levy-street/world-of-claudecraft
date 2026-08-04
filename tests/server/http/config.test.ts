@@ -43,6 +43,7 @@ describe('loadConfig', () => {
     expect(cfg.playSessionRetentionDays).toBe(180);
     expect(cfg.accountIpAssociationRetentionDays).toBe(730);
     expect(cfg.playerActivityRetentionDays).toBe(400);
+    expect(cfg.unstuckReportRetentionDays).toBe(90);
     expect(cfg.passwordResetRequestRetentionDays).toBe(30);
     expect(cfg.emailChangeRequestRetentionDays).toBe(30);
     expect(cfg.emailLogRetentionDays).toBe(90);
@@ -270,7 +271,7 @@ describe('loadConfig', () => {
     expect(loadConfig({ ...MIN_ENV, MAX_PLAYERS_PER_REALM: ' 0 ' }).maxPlayersPerRealm).toBe(0);
   });
 
-  it('reads the nine retention day keys on the chat-log contract: empty is the default, whitespace is keep-forever', () => {
+  it('reads every retention day key on the chat-log contract: empty is the default, whitespace is keep-forever', () => {
     const cases = [
       {
         key: 'DAILY_REWARD_EVENTS_RETENTION_DAYS',
@@ -286,6 +287,7 @@ describe('loadConfig', () => {
         dflt: 730,
       },
       { key: 'PLAYER_ACTIVITY_RETENTION_DAYS', field: 'playerActivityRetentionDays', dflt: 400 },
+      { key: 'UNSTUCK_REPORT_RETENTION_DAYS', field: 'unstuckReportRetentionDays', dflt: 90 },
       {
         key: 'PASSWORD_RESET_REQUEST_RETENTION_DAYS',
         field: 'passwordResetRequestRetentionDays',

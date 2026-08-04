@@ -1,6 +1,6 @@
 // Zone identity for fleet perf reports (packet 0 ruling R4). Instance-aware
-// following the instance_music.ts pattern: the overworld reports the zoneAt(z)
-// id, and every far-off instance x-band reports a bounded instance-scoped id
+// following the instance_music.ts pattern: the overworld reports the
+// zoneAt(x, z) id, and every far-off instance x-band reports a bounded id
 // (dungeon:<id>, delve:<id>, arena, yumi_maze) so the crowded-town signal
 // never mixes with raid interiors. Every emitted id comes from the fixed
 // content catalogs, keeping the fleet dimension's cardinality bounded. Pure

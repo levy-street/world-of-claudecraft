@@ -29,8 +29,8 @@ vi.mock('../server/db', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
-import { ClientWorld } from '../src/net/online';
 import type { PlayerClass } from '../src/sim/types';
+import { bareClient } from './helpers/bare_client';
 
 const ITEM_ID = 'eastbrook_ritual_vestments';
 
@@ -70,56 +70,6 @@ function broadcast(server: GameServer): void {
 
 function cmd(server: GameServer, session: ClientSession, msg: Record<string, unknown>): void {
   server.handleMessage(session, JSON.stringify({ t: 'cmd', ...msg }));
-}
-
-// A ClientWorld without the WebSocket plumbing, to drive applySnapshot with the
-// REAL captured server snap (the tests/snapshots.test.ts bareClient idiom,
-// trimmed to the fields the ents decode path touches).
-function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.ownPlayerId = pid;
-  c.ownPlayerClass = playerClass;
-  c.spectating = null;
-  c.cupInfo = null;
-  c.sportRole = null;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.honor = 0;
-  c.lifetimeHonor = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.selectedDungeonDifficulty = 'normal';
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.serverTickHz = null;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  c.spectateFacingPending = false;
-  c.pendingSpectateFacing = null;
-  c.nodeCooldowns = new Map();
-  return c;
 }
 
 describe('eqi over a real server broadcast into applySnapshot (liveness, not shape)', () => {

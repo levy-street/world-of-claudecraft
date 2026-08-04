@@ -117,7 +117,7 @@ describe('gather events over the live server (Professions 2.0)', () => {
   it('a real harvest delivers gatherResult (with qty and rareEvent) to the harvesting client only', () => {
     const { server, fcA, fcB, fcC, sa } = liveSetup();
 
-    expect(server.sim.harvestNode(NODE_ID, sa.pid)).toBe(true);
+    expect(server.sim.harvestNode(NODE_ID, undefined, sa.pid)).toBe(true);
     completeCastNow(server, sa.pid);
     route(server, server.sim.drainEvents());
 
@@ -155,7 +155,7 @@ describe('gather events over the live server (Professions 2.0)', () => {
       meta.inventory.length = 0;
       meta.inventory.push({ itemId: 'copper_mining_pick', count: 1 });
       delete meta.nodeHarvestReadyAt[NODE_ID];
-      expect(server.sim.harvestNode(NODE_ID, sa.pid)).toBe(true);
+      expect(server.sim.harvestNode(NODE_ID, undefined, sa.pid)).toBe(true);
       completeCastNow(server, sa.pid);
       const events = server.sim.drainEvents();
       if (events.some((e) => e.type === 'gatherRareEvent')) hitEvents = events;
@@ -239,7 +239,10 @@ describe('gathering-tool use over the live command path (#2343)', () => {
     expect(deliveredEvents(fcB).filter((e) => e.type === 'gatherToolNoNode')).toHaveLength(0);
 
     // Mirror leg: the exact events frames fcA received, replayed through the
-    // real ClientWorld.onMessage, land in the queue the HUD drains.
+    // real ClientWorld.onMessage, land in the queue the HUD drains. Kept
+    // bespoke on purpose (issue #2088): only eventQueue is needed here, unlike
+    // the shared tests/helpers/bare_client.ts bareClient(), which sets every
+    // declared field.
     const client: any = Object.create(ClientWorld.prototype);
     client.eventQueue = [];
     for (const frame of fcA.sent.filter((m) => m.t === 'events')) {

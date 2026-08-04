@@ -25,12 +25,13 @@ vi.mock('../server/db', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
-import { ClientWorld } from '../src/net/online';
+import type { ClientWorld } from '../src/net/online';
 import { MARKET_MAX_LISTINGS } from '../src/sim/market';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import * as tradeMod from '../src/sim/social/trade';
-import type { Entity, InvSlot, PlayerClass, SimEvent } from '../src/sim/types';
+import type { Entity, InvSlot, SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import { bareClient } from './helpers/bare_client';
 
 const RARE_WEAPON = 'moggers_copper_cudgel'; // rare mace -> resonant_steel
 const COMMON_WEAPON = 'eastbrook_arming_sword';
@@ -51,53 +52,6 @@ type WireMsg = {
 type SnapMsg = WireMsg & {
   t: 'snap';
   self: Record<string, unknown>;
-};
-
-type BareClientWorldState = {
-  cfg: { seed: number; playerClass: PlayerClass };
-  entities: Map<number, Entity>;
-  playerId: number;
-  ownPlayerId: number;
-  ownPlayerClass: PlayerClass;
-  spectating: null;
-  cupInfo: null;
-  lastVcupRemainder: null;
-  lastVcupShared: null;
-  sportRole: null;
-  moveInput: Record<string, never>;
-  inventory: InvSlot[];
-  vendorBuyback: InvSlot[];
-  equipment: Record<string, never>;
-  accountCosmetics: { completedQuestIds: string[]; mechChromaIds: string[] };
-  copper: number;
-  honor: number;
-  lifetimeHonor: number;
-  xp: number;
-  known: string[];
-  questLog: Map<string, unknown>;
-  questsDone: Set<string>;
-  pendingQuestCommands: Map<string, unknown>;
-  partyInfo: null;
-  selectedDungeonDifficulty: 'normal';
-  tradeInfo: null;
-  duelInfo: null;
-  lastSnapAt: number;
-  snapInterval: number;
-  serverTickHz: null;
-  missingSince: Map<number, number>;
-  pendingFacingDelta: number;
-  connected: boolean;
-  eventQueue: SimEvent[];
-  mouselookFacing: null;
-  lastInputSentAt: number;
-  lastInputSig: string;
-  inputSeq: number;
-  pendingInputSeqSentAt: Map<number, number>;
-  ackedInputSeq: number;
-  inputEchoSamples: unknown[];
-  spectateFacingPending: boolean;
-  pendingSpectateFacing: null;
-  nodeCooldowns: Map<string, number>;
 };
 
 function fakeWs(): { sent: WireMsg[]; ws: unknown } {
@@ -185,55 +139,6 @@ function craftedVestSlotIndex(sim: Sim, pid: number): number {
     (slot) =>
       slot.itemId === CRAFTED_COMMON_ARMOR && slot.craftedRecipeId === CRAFTED_COMMON_ARMOR_RECIPE,
   );
-}
-
-function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWorld {
-  const c = Object.create(ClientWorld.prototype) as BareClientWorldState;
-  c.cfg = { seed: 20061, playerClass };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.ownPlayerId = pid;
-  c.ownPlayerClass = playerClass;
-  c.spectating = null;
-  c.cupInfo = null;
-  c.lastVcupRemainder = null;
-  c.lastVcupShared = null;
-  c.sportRole = null;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.honor = 0;
-  c.lifetimeHonor = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.selectedDungeonDifficulty = 'normal';
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.serverTickHz = null;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  c.spectateFacingPending = false;
-  c.pendingSpectateFacing = null;
-  c.nodeCooldowns = new Map();
-  return c as unknown as ClientWorld;
 }
 
 function applySnap(client: ClientWorld, snap: unknown): void {

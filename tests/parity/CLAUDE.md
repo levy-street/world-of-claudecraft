@@ -102,6 +102,18 @@ confirmed each):
   else that must pin an unresolved roll needs the same trick. Extracting one of these should add a scenario that drives it (the
   precedents: `market_round_trip`, `bank_round_trip`, `dungeon_instances`) or sample
   the collection directly.
+- **A fishing SESSION is never driven.** Every fishing reference in this directory
+  hand-assigns `castingAbility = FISHING_CAST_ID` to exercise the `cancelCast` arm;
+  `startFishing` and `completeFishing` are called nowhere here, so no golden covers
+  the bite delay draw, the catch table draw, or the deny arms. Fishing IS
+  stream-visible (its table draws sit in the shared `sim.rng`), so a change to the
+  catch tables or the cast gates moves other subsystems' draw indices while every
+  golden here stays byte-identical. Read a green parity run as saying nothing about
+  fishing, and when you extract or re-tune it, add a scenario that runs a real cast,
+  bite and reel plus one denied cast. The live coverage today is
+  `tests/professions_fishing.test.ts` (literal catch sequences off a fixed seed) and
+  `tests/professions_deeds_playthrough.test.ts` (hunted indices across one shared
+  stream), not this gate.
 - **Construction-time draws + ambient world mobs.** The `Rng` is born inside the Sim
   ctor, so ctor draws are not in the draw digest; ambient camp mobs are spawned but
   never tracked. A same-draw-count reorder of ctor spawns that changes only

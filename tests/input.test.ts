@@ -1420,3 +1420,33 @@ describe('Input camera zoom (issue 1657)', () => {
     expect(changes).toEqual([]);
   });
 });
+
+describe('Input captureNextKey cancellation (issue 1238)', () => {
+  it('captureNextKey(null) clears an armed capture so the next real keypress reaches gameplay', () => {
+    const { input, cb, windowListeners } = makeInput();
+    const captured: (string | null)[] = [];
+    input.captureNextKey((code) => captured.push(code));
+    // Abandon the capture without a keypress, the way Done/Reset does on the
+    // on-bar action-bar key-binding mode.
+    input.captureNextKey(null);
+
+    windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, preventDefault: vi.fn() });
+
+    // The stale capture callback must never fire, and the keypress must fall
+    // through to normal ability dispatch (slot0's default key) instead of
+    // being swallowed.
+    expect(captured).toEqual([]);
+    expect(cb.onAbilityDown).toHaveBeenCalledWith(0);
+  });
+
+  it('a still-armed capture (no cancel) swallows the next keypress instead of dispatching it', () => {
+    const { input, cb, windowListeners } = makeInput();
+    const captured: (string | null)[] = [];
+    input.captureNextKey((code) => captured.push(code));
+
+    windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, preventDefault: vi.fn() });
+
+    expect(captured).toEqual(['Digit1']);
+    expect(cb.onAbilityDown).not.toHaveBeenCalled();
+  });
+});

@@ -196,6 +196,9 @@ describe('Collective Reversal behavior', () => {
 
 describe('Collective Reversal online command path', () => {
   it('uses the standard authoritative no-target cast command', () => {
+    // Kept bespoke on purpose (issue #2088): a hand-picked field subset plus a
+    // `cmd` spy. tests/helpers/bare_client.ts bareClient() is the default for
+    // a new suite that just needs a bare ClientWorld.
     const client = Object.create(ClientWorld.prototype) as {
       castAbility(abilityId: string): void;
       cmd: ReturnType<typeof vi.fn>;

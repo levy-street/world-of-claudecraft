@@ -108,7 +108,7 @@ describe('professions grants suppress BOTH generic hub feedbacks', () => {
     // the actual grant lands later via completeGatherCast once the cast
     // timer runs out. GATHER_CAST_BASE_SEC (2.5s) is the longest possible
     // cast, so 3 seconds of ticks always clears it.
-    expect(sim.harvestNode(NODE_ID, pid)).toBe(true);
+    expect(sim.harvestNode(NODE_ID, undefined, pid)).toBe(true);
     const events: SimEvent[] = [];
     for (let i = 0; i < 20 * 3; i++) events.push(...sim.tick());
     const loot = lootEvents(events);
@@ -356,7 +356,7 @@ describe('the craft output arms each stand their hub line down', () => {
     if (!meta) throw new Error('missing player meta');
     meta.knownRecipes.add('recipe_thorium_mining_pick');
     meta.craftSkills.toolworks = 75;
-    sim.addItem('thorium_ore', 4, pid);
+    sim.addItem('fine_iron_ore', 4, pid);
     sim.addItem('mithril_mining_pick', 1, pid);
     placeAtStationFor(sim, pid, 'toolworks');
     sim.tick(); // drain the (loud) reagent grants

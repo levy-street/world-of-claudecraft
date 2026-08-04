@@ -4,7 +4,7 @@ import type { GatherNodeDef, GatherNodeType } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
-import { NODE_COLOR, NODE_Y_OFFSET } from './gather_nodes_lookup';
+import { NODE_COLOR, NODE_Y_OFFSET, nodeTierScale } from './gather_nodes_lookup';
 import { surfaceMat } from './gfx';
 import { casterShadowMayReachCamera, type ScenerySphere } from './resident_scenery_core';
 
@@ -180,8 +180,27 @@ function addInstancedBatch(
   shadowEntries: GatherNodeShadowEntry[],
 ): void {
   const placement = new THREE.Matrix4();
+  const tierMatrix = new THREE.Matrix4();
   const instanceMatrix = new THREE.Matrix4();
+  const partBox = new THREE.Box3();
   const nodeIds = batch.nodes.map((node) => node.id);
+  // The UNSCALED template bounds, per BUILD and not module-level: the GLBs
+  // can finish loading between one build and a later one (the
+  // fallback-primitive race), and a stale cache would then anchor fresh
+  // GLB instances with the primitive's minY. The base anchor below needs
+  // the geometry-space minY of the whole template (the parts union, each
+  // in its baked local transform, the instanced twin of the old clone's
+  // Box3). A degenerate box (no geometry yet) reads 0 and the anchor is a
+  // no-op.
+  const templateBox = new THREE.Box3();
+  for (const part of parts) {
+    if (!part.geometry.boundingBox) part.geometry.computeBoundingBox();
+    if (part.geometry.boundingBox) {
+      partBox.copy(part.geometry.boundingBox).applyMatrix4(part.matrix);
+      templateBox.union(partBox);
+    }
+  }
+  const minY = Number.isFinite(templateBox.min.y) ? templateBox.min.y : 0;
   // Instance transforms are baked into world space. Union every mesh part so
   // one castShadow decision conservatively covers the regional batch.
   const batchBounds = new THREE.Box3();
@@ -198,8 +217,21 @@ function addInstancedBatch(
     copyMeshRenderState(part.source, mesh);
     for (const [instanceId, node] of batch.nodes.entries()) {
       const y = terrainHeight(node.pos.x, node.pos.z, seed);
-      placement.makeTranslation(node.pos.x, y + NODE_Y_OFFSET[node.type], node.pos.z);
-      instanceMatrix.multiplyMatrices(placement, part.matrix);
+      // Tier differentiation (the UX pass): size, never hue, identical on
+      // every preset (gather_nodes_lookup.ts nodeTierScale), anchored at
+      // the BASE and not the geometry center (the phase 14 QA): the prop
+      // geometries are centered in Y, so a center-anchored upscale pushes
+      // the base (s - 1) * |minY| deeper and a tier-3 prop sinks visibly
+      // into the terrain. Compensate so the base sits at the same height
+      // above ground at every tier.
+      const tierScale = nodeTierScale(node.tier);
+      placement.makeTranslation(
+        node.pos.x,
+        y + NODE_Y_OFFSET[node.type] - (tierScale - 1) * minY,
+        node.pos.z,
+      );
+      tierMatrix.makeScale(tierScale, tierScale, tierScale);
+      instanceMatrix.multiplyMatrices(placement, tierMatrix).multiply(part.matrix);
       mesh.setMatrixAt(instanceId, instanceMatrix);
     }
     mesh.instanceMatrix.needsUpdate = true;
@@ -233,7 +265,15 @@ function addIndividualNode(
 ): void {
   const obj = template.clone(true);
   const y = terrainHeight(node.pos.x, node.pos.z, seed);
-  obj.position.set(node.pos.x, y + NODE_Y_OFFSET[node.type], node.pos.z);
+  // Tier scale with the same base anchor as the instanced path: measure the
+  // clone's UNSCALED bounds at the origin (fresh per build, the
+  // fallback-primitive race), then compensate the upscale's push so the
+  // prop base sits at the same height above ground at every tier.
+  const templateBox = new THREE.Box3().setFromObject(obj);
+  const minY = Number.isFinite(templateBox.min.y) ? templateBox.min.y : 0;
+  const tierScale = nodeTierScale(node.tier);
+  obj.scale.setScalar(tierScale);
+  obj.position.set(node.pos.x, y + NODE_Y_OFFSET[node.type] - (tierScale - 1) * minY, node.pos.z);
   obj.name = node.id;
   obj.userData.gatherNodeId = node.id;
   group.add(obj);

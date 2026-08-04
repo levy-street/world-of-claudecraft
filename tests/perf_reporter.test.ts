@@ -407,6 +407,26 @@ describe('perf reporter payload', () => {
     ).toBe(420_000);
   });
 
+  it('carries the four dropped browser longtask fields into raw summary (#2479)', () => {
+    // longTaskCount and longTaskP95Ms already ship as top-level fields; these
+    // four (totalMs, avg, max, lastAge) used to be silently dropped. max is
+    // the independent corroboration of a multi-second stall, so it matters
+    // most, but all four ride together in one raw-summary block.
+    const settings = new Settings();
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      settings,
+      'sess1',
+      42,
+    )!;
+
+    expect(body.longTaskCount).toBe(2);
+    expect(body.longTaskP95Ms).toBe(80);
+    expect(
+      (body.rawSummary as { browser?: { longTasks?: Record<string, number> } }).browser?.longTasks,
+    ).toEqual({ totalMs: 120, avg: 60, max: 80, lastAge: 1000 });
+  });
+
   it('carries the always-on net pipeline and heap sawtooth blocks into raw summary', () => {
     const settings = new Settings();
     const snap = snapshot();

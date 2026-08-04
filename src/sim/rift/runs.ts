@@ -31,6 +31,7 @@ import {
 import type { LootTier } from '../lockpick';
 import { RIFT_MECHANIC_SPACING_SEC } from '../mob/mechanic_spacing';
 import { retargetMob } from '../mob/targeting';
+import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import type { SimContext } from '../sim_context';
 import { DT, dist2d, type Entity, type Vec3 } from '../types';
 import { isInWaterBody } from '../world';
@@ -721,6 +722,9 @@ export function enterRift(
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
   const floor = floorForInstance(inst);
   const p = r.e;
+  // A live gather/fishing session never survives the rift door (the same
+  // every-teleport rule dungeons.ts enterDungeon carries; R28 family).
+  cancelProfessionSessionOnDisplacement(ctx, p);
   p.pos = ctx.groundPos(origin.x + floor.entry.x, origin.z + floor.entry.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
@@ -769,6 +773,9 @@ export function descendRift(ctx: SimContext, pid?: number): void {
   for (const id of descenders) {
     const e = ctx.entities.get(id);
     if (!e) continue;
+    // Same every-teleport teardown as the entry above: a descender can be
+    // mid-cast at the moment the floor advances under the whole party.
+    cancelProfessionSessionOnDisplacement(ctx, e);
     e.pos = ctx.groundPos(newOrigin.x + floor.entry.x, newOrigin.z + floor.entry.z);
     e.prevPos = { ...e.pos };
     ctx.rebucket(e);
@@ -838,6 +845,8 @@ function forceExitRiftPlayer(
   // Walk-in grace so the overworld portal cannot re-swallow the player the
   // tick they land next to it (clicking it deliberately still re-enters).
   p.riftReentryGraceUntil = ctx.time + 3;
+  // The exit is a teleport like the entry: the same one-helper teardown.
+  cancelProfessionSessionOnDisplacement(ctx, p);
   p.pos = ctx.groundPos(dest.x, dest.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);

@@ -199,6 +199,7 @@ export type {
   DisenchantResultView,
   PlayerProfessionsView,
   RecipeDef,
+  ToolEffectSlotView,
 } from './world_api/professions';
 export type {
   DevLeaderboardEntry,
@@ -470,6 +471,16 @@ export const COMMAND_NAMES = [
   // Recipe training (Professions 2.0): learn a trainer-taught recipe
   // at its craft's station (Sim.trainRecipe via professions/training.ts).
   'train_recipe',
+  // Tool effect slotting: attach a catalog effect to one gathering
+  // profession's tool (Sim.slotToolEffect via professions/tools.ts slotEffect),
+  // consuming one crafted charm copy from the sender's bags (the acquisition
+  // craft). Keyed per PROFESSION rather than per tool item, because the live
+  // harvest path resolves a tool tier and never a tool.
+  'slot_tool_effect',
+  // Tool effect recharge: refill the sender's slotted effect at the R39
+  // arcane-material price and the R30 re-derived maximum
+  // (Sim.rechargeToolEffect via professions/tools.ts resolveRechargeToolEffect).
+  'recharge_tool_effect',
   // Per-character action-bar layout persistence: the owning client uploads its
   // full arranged layout (debounced) so it restores at login on any device.
   'save_hotbar_layout',

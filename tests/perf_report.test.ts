@@ -559,6 +559,142 @@ describe('perf report ingestion', () => {
     );
   });
 
+  it('stores the four browser longtask fields inside raw summary, bounded (#2479)', async () => {
+    const res = fakeRes();
+
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'longtask-fields',
+        longTaskCount: 3,
+        longTaskP95Ms: 90,
+        rawSummary: {
+          seconds: 30,
+          browser: { longTasks: { totalMs: 260, avg: 86.7, max: 130, lastAge: 4200 } },
+        },
+      }),
+      res,
+    );
+
+    expect(res.statusCode).toBe(200);
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        longTaskCount: 3,
+        longTaskP95Ms: 90,
+        rawSummary: {
+          seconds: 30,
+          browser: { longTasks: { totalMs: 260, avg: 86.7, max: 130, lastAge: 4200 } },
+        },
+      }),
+    );
+  });
+
+  it('clamps a hostile browser longtask block and drops a malformed one', async () => {
+    const { LONG_TASK_RAW_MS_MAX, LONG_TASK_RAW_AGE_MS_MAX } = perfReportInternalsForTest;
+    const hostile = fakeRes();
+
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'longtask-hostile',
+        rawSummary: {
+          browser: {
+            longTasks: { totalMs: 9e9, avg: -50, max: 1e12, lastAge: 9e12 },
+          },
+        },
+      }),
+      hostile,
+    );
+
+    expect(hostile.statusCode).toBe(200);
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        rawSummary: {
+          browser: {
+            longTasks: {
+              totalMs: LONG_TASK_RAW_MS_MAX,
+              avg: 0,
+              max: LONG_TASK_RAW_MS_MAX,
+              lastAge: LONG_TASK_RAW_AGE_MS_MAX,
+            },
+          },
+        },
+      }),
+    );
+
+    vi.mocked(insertClientPerfReport).mockClear();
+    const nonNumericAge = fakeRes();
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'longtask-age-nan',
+        rawSummary: {
+          browser: { longTasks: { totalMs: 10, avg: 10, max: 10, lastAge: 'not-a-number' } },
+        },
+      }),
+      nonNumericAge,
+    );
+    expect(nonNumericAge.statusCode).toBe(200);
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        // Falls back to the client's own "no long task recorded yet" sentinel,
+        // not the age ceiling.
+        rawSummary: { browser: { longTasks: { totalMs: 10, avg: 10, max: 10, lastAge: -1 } } },
+      }),
+    );
+
+    vi.mocked(insertClientPerfReport).mockClear();
+    const malformed = fakeRes();
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'longtask-malformed',
+        rawSummary: { seconds: 12, browser: { longTasks: 'not-an-object' } },
+      }),
+      malformed,
+    );
+    expect(malformed.statusCode).toBe(200);
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({ rawSummary: { seconds: 12 } }),
+    );
+
+    vi.mocked(insertClientPerfReport).mockClear();
+    const missing = fakeRes();
+    await handlePerfReport(
+      fakeReq({ sessionId: 'longtask-missing', rawSummary: { seconds: 5 } }),
+      missing,
+    );
+    expect(missing.statusCode).toBe(200);
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({ rawSummary: { seconds: 5 } }),
+    );
+  });
+
+  it('preserves the browser longtask block when public raw summaries are truncated', async () => {
+    const res = fakeRes();
+
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'longtask-truncated',
+        rawSummary: {
+          seconds: 30,
+          browser: { longTasks: { totalMs: 200, avg: 66.7, max: 150, lastAge: 900 } },
+          oversized: 'x'.repeat(40_000),
+        },
+      }),
+      res,
+    );
+
+    expect(res.statusCode).toBe(200);
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        rawSummary: expect.objectContaining({
+          truncated: true,
+          seconds: 30,
+          browser: { longTasks: { totalMs: 200, avg: 66.7, max: 150, lastAge: 900 } },
+        }),
+      }),
+    );
+    const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    expect((stored.rawSummary as Record<string, unknown>).oversized).toBeUndefined();
+  });
+
   it('preserves the net pipeline and heap sawtooth blocks when raw summaries are truncated', async () => {
     const res = fakeRes();
     const netPipeline = {

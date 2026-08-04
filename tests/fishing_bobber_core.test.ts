@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { type BobberAnchor, bobberAnchorInto } from '../src/render/fishing_bobber_core';
 import { LAKE } from '../src/sim/content/zone1';
 import { PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
-import { FISHING_SAMPLE_DISTANCES } from '../src/sim/professions/fishing';
+import { FISHING_SAMPLE_DISTANCES, firstFishableSampleAhead } from '../src/sim/professions/fishing';
 import { groundHeight, waterLevelAt } from '../src/sim/world';
 
 const SEED = 1;
@@ -79,5 +79,37 @@ describe('fishing bobber anchor core', () => {
     // shape without a conscious re-pin here (the bobber and the cast
     // validation must always walk the same ring).
     expect(FISHING_SAMPLE_DISTANCES).toEqual([4, 8, 12, 16, 20, 24]);
+  });
+});
+
+describe('the bobber walk stays in lockstep with the sim probe walk', () => {
+  // The render side deliberately keeps its own allocation-free ring walk;
+  // this pin is what stops the two copies drifting: for a sweep of poses on
+  // and off the vale shore, both walks must agree on found-ness and, when
+  // found, on the exact sample point and water height.
+  it('bobberAnchorInto and firstFishableSampleAhead agree over a pose sweep', () => {
+    const seed = 4242;
+    const poses: { x: number; z: number; facing: number }[] = [];
+    const pz = LAKE.z - LAKE.radius - 2;
+    for (let i = 0; i < 16; i++) {
+      poses.push({ x: LAKE.x + (i - 8) * 3, z: pz, facing: (i / 16) * Math.PI * 2 });
+    }
+    poses.push({ x: 0, z: 0, facing: Math.PI }); // plaza, dry in every ring sample
+    let found = 0;
+    for (const pose of poses) {
+      const sample = firstFishableSampleAhead(pose.x, pose.z, pose.facing, seed);
+      const out = { x: 0, y: 0, z: 0 };
+      const anchored = bobberAnchorInto(out, pose.x, pose.z, pose.facing, seed);
+      expect(anchored, JSON.stringify(pose)).toBe(sample !== null);
+      if (sample) {
+        found += 1;
+        expect(out.x).toBe(sample.x);
+        expect(out.z).toBe(sample.z);
+        expect(out.y).toBe(sample.water);
+      }
+    }
+    // Non-vacuity: the sweep really exercised both arms.
+    expect(found).toBeGreaterThan(0);
+    expect(found).toBeLessThan(poses.length);
   });
 });

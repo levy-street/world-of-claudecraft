@@ -335,6 +335,19 @@ function payloadFromSnapshot(
       hud: snapshot.hud,
       netPipeline: snapshot.netPipeline,
       heapSawtooth: snapshot.heapSawtooth,
+      // The two top-level longtask fields (longTaskCount, longTaskP95Ms) cannot
+      // corroborate a rare multi-second stall: a single event never moves a
+      // p95. These four ride here (issue #2479) rather than as new top-level
+      // columns, so storing them needs no DDL; the server bounds them on
+      // ingest (server/perf_report.ts).
+      browser: {
+        longTasks: {
+          totalMs: longTasks.totalMs,
+          avg: longTasks.avg,
+          max: longTasks.max,
+          lastAge: longTasks.lastAge,
+        },
+      },
       ...(snapshot.devTrace ? { devTrace: snapshot.devTrace } : {}),
     },
   };

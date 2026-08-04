@@ -14,10 +14,11 @@ vi.mock('../server/db', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
-import { ClientWorld } from '../src/net/online';
+import type { ClientWorld } from '../src/net/online';
 import { grantDeed } from '../src/sim/deeds';
 import type { PlayerClass } from '../src/sim/types';
 import type { FriendInfo, SocialInfo } from '../src/world_api/social_graph';
+import { bareClient } from './helpers/bare_client';
 
 // W9 ULTRACODE: event-frame parity for the two NON-SNAPSHOT facets the W0a
 // round-trip gate is structurally blind to. `IWorldSocialGraph.socialInfo` rides
@@ -60,47 +61,6 @@ function joinServer(
 
 function broadcast(server: GameServer): void {
   (server as any).broadcastSnapshots();
-}
-
-// A ClientWorld without the WebSocket plumbing, so we can feed it raw server frames
-// via the private onMessage and drive applySnapshot directly (the snapshots.test.ts
-// scaffolding).
-function bareClient(pid: number): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass: 'warrior' };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.socialInfo = null;
-  c.arenaInfo = null;
-  c.lockpickState = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  return c;
 }
 
 function feed(c: ClientWorld, frame: Record<string, unknown>): void {

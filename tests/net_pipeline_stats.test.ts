@@ -3,7 +3,7 @@ import {
   createNetPipelineStats,
   type NetPipelineSnapshotSample,
 } from '../src/net/net_pipeline_stats';
-import { ClientWorld } from '../src/net/online';
+import { bareClient } from './helpers/bare_client';
 
 function sample(overrides: Partial<NetPipelineSnapshotSample> = {}): NetPipelineSnapshotSample {
   return {
@@ -135,58 +135,6 @@ describe('net pipeline stats module', () => {
     expect(stats.summary().gapMs.max).toBe(1);
   });
 });
-
-// A ClientWorld without the WebSocket plumbing (the snapshots.test.ts pattern):
-// Object.create skips field initializers, which is exactly what the lazy-init
-// holder in online.ts must survive.
-function bareClient(pid: number): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass: 'warrior' };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.ownPlayerId = pid;
-  c.ownPlayerClass = 'warrior';
-  c.spectating = null;
-  c.cupInfo = null;
-  c.lastVcupRemainder = null;
-  c.lastVcupShared = null;
-  c.sportRole = null;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.honor = 0;
-  c.lifetimeHonor = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.selectedDungeonDifficulty = 'normal';
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.serverTickHz = null;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  c.spectateFacingPending = false;
-  c.pendingSpectateFacing = null;
-  c.nodeCooldowns = new Map();
-  return c;
-}
 
 function wirePlayer(id: number, name: string) {
   return {

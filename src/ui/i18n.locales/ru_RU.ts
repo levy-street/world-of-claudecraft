@@ -1315,6 +1315,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Чтобы кошелек появился здесь, держите активным браузерное расширение кошелька, например Solflare Wallet.',
   'wallet.mobileAppHelp':
     'Выберите Phantom или Solflare. Приложение кошелька запросит подтверждение. Не закрывайте игру и вернитесь в нее после завершения.',
+  'wallet.seekerAppHelp':
+    'Продолжите с Seed Vault Wallet. Проверьте запросы на подключение и подтверждение в Seed Vault, затем вернитесь в игру.',
   'wallet.standaloneAppHelp':
     'Подключение кошелька пока недоступно в приложении с главного экрана. Для Phantom или Solflare откройте World of ClaudeCraft в Safari или Chrome.',
   'wallet.openAppTitle': 'Продолжить в {wallet}',
@@ -2264,6 +2266,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'questUi.tracker.complete': 'Готово',
   'questUi.tracker.showOnMap': 'Показать {name} на карте',
   'questUi.tracker.hideFromMap': 'Скрыть {name} с карты',
+  'questUi.tracker.unknownQuest': 'Неизвестное задание ({id})',
   'questUi.log.title': 'Журнал заданий',
   'questUi.log.close': 'Закрыть журнал заданий',
   'questUi.log.summary': 'Активно: {active} / Завершено: {completed}',
@@ -2273,6 +2276,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'questUi.log.activeStatus': 'Активно',
   'questUi.log.readyStatus': 'Готово',
   'questUi.log.completedStatus': 'Завершено',
+  'questUi.log.repeatableStatus': 'Повторяемое',
+  'questUi.log.cooldownStatus': 'Скоро снова будет доступно',
   'questUi.log.returnTo': 'Вернитесь к {name}',
   'questUi.log.abandon': 'Отказаться от задания',
   'questUi.log.abandonConfirmTitle': 'Отказаться от задания',
@@ -2284,6 +2289,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'questUi.dialog.greetingFallback': 'Приветствую.',
   'questUi.dialog.availableQuestAria': 'Доступное задание: {name}',
   'questUi.dialog.readyQuestAria': 'Задание готово к сдаче: {name}',
+  'questUi.dialog.repeatableQuestAria': 'Повторяемое задание: {name}',
   'questUi.dialog.browseGoods': 'Покажите ваши товары.',
   'questUi.dialog.browseGoodsAria': 'Посмотреть товары у {name}',
   'questUi.dialog.worldMarket': 'Покажите мне мировой рынок.',
@@ -2350,6 +2356,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.armor': 'Броня',
   'itemUi.kind.quest': 'Задание',
   'itemUi.kind.junk': 'Хлам',
+  'itemUi.kind.fineMaterial': 'Отборный материал',
   'itemUi.kind.food': 'Еда',
   'itemUi.kind.drink': 'Напиток',
   'itemUi.kind.tool': 'Инструмент',
@@ -2403,6 +2410,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.bags.empty': 'Ваши сумки пусты.',
   'itemUi.bags.itemAria': '{item}, количество {count}',
   'itemUi.bags.stackCount': 'x{count}',
+  'itemUi.bags.unknownItem': 'Неизвестный предмет',
+  'itemUi.bags.unknownItemAria': 'Неизвестный предмет {id}, количество {count}',
+  'itemUi.bags.unknownItemAriaMasterwork': 'Неизвестный предмет {id}, количество {count}, шедевр',
+  'itemUi.bags.unknownItemAriaEnchanted': 'Неизвестный предмет {id}, количество {count}, зачарованный экземпляр',
+  'itemUi.bags.unknownItemAriaBound': 'Неизвестный предмет {id}, количество {count}, привязанный экземпляр',
+  'itemUi.bags.unknownItemAriaInstanced': 'Неизвестный предмет {id}, количество {count}, копия с клеймом мастера',
   'itemUi.bags.destroyTitle': 'Уничтожить {item}',
   'itemUi.bags.destroyConfirm': 'Уничтожить',
   'itemUi.bags.destroyCancel': 'Отмена',
@@ -2412,6 +2425,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.close': 'Закрыть торговца',
   'itemUi.vendor.hint': 'Нажмите на предмет в сумках, чтобы продать его, пока это окно открыто.',
   'itemUi.vendor.buyAria': 'Купить {item} за {price}',
+  'itemUi.vendor.buyAriaWithRequirement': 'Купить {item} за {price}. {requirement}',
   'itemUi.vendor.buybackTitle': 'Выкуп',
   'itemUi.vendor.buybackEmpty': 'Нет предметов',
   'itemUi.vendor.buybackAria': 'Выкупить {item} за {price}',
@@ -2419,6 +2433,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.sellQuantityInput': 'Количество для продажи',
   'itemUi.vendor.sellQuantityConfirm': 'Продать',
   'itemUi.vendor.sellQuantityCancel': 'Отмена',
+  'itemUi.vendor.qtyRowAria': 'Количество покупки',
+  'itemUi.vendor.qtyMultipleAria': 'Покупать по {count} за раз',
+  'itemUi.vendor.qtyCustom': 'Другое',
+  'itemUi.vendor.qtyCustomAria': 'Указать своё количество',
+  'itemUi.vendor.buyQuantityTitle': 'Сколько купить: {item}? Не более {max}.',
+  'itemUi.vendor.buyQuantityInput': 'Количество для покупки',
   'itemUi.vendor.sellJunk': 'Продать хлам',
   'itemUi.vendor.sellJunkAria': 'Продать весь хлам за {price}',
   'itemUi.vendor.sellJunkHint': 'Продает все серые предметы в сумках, кроме предметов заданий.',
@@ -3155,6 +3175,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_dust.name': 'Пыль перезвона',
   'entities.items.arcane_essence.name': 'Эссенция перезвона',
   'entities.items.arcane_shard.name': 'Осколок перезвона',
+  'entities.items.gatherers_cache.name': 'Сумка собирателя',
+  'entities.items.artisans_eye.name': 'Глаз ремесленника',
   'entities.items.linen_scrap.name': 'Лоскут льна',
   'entities.items.fen_muster_order.name': 'Приказ о сборе в Фенбридже',
   'entities.items.mire_prowler_pelt.name': 'Шкура болотного хищника',
@@ -3553,7 +3575,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Омут пьёт лунный свет, {className}, и возвращает утопленников. Тридцать ночей я наблюдаю за теми вратами — и нынче ночью они открыты.',
   'entities.quests.q_prof_intro.title': 'Ремесло для каждой руки',
   'entities.quests.q_prof_intro.text':
-    'В Иствруке каждый владеет каким-нибудь ремеслом помимо меча, {playerName}. В скалах вокруг Медного прииска к юго-западу от города есть рудные жилы. Берите кирку и сами разработайте 5 жил — меня не обманешь, я замечу разницу.',
+    'В Иствруке каждый владеет каким-нибудь ремеслом помимо меча, {playerName}. В скалах вокруг Медного прииска к юго-востоку от города есть рудные жилы. Берите кирку и сами разработайте 5 жил — меня не обманешь, я замечу разницу.',
   'entities.quests.q_prof_intro.completion':
     'Вот видите? Руда добыта, а на руках появились мозоли. В дороге продолжайте добывать руду, рубить лес и собирать травы. Вернувшись в город, не забудьте о доске городского направления у рынка и ремесленном столе рядом. Если захотите, все эти занятия обеспечат честный заработок.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Рудная жила разработана',
@@ -3597,7 +3619,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_bones.objectives.0.label': 'Беспокойные кости: упокоено',
   'entities.quests.q_supplies.title': 'Украденные припасы',
   'entities.quests.q_supplies.text':
-    'Бандиты увели мой последний воз: инструменты, соль и добрый истврукский лен. Верните 4 ящика из лагеря на юго-востоке.',
+    'Бандиты увели мой последний воз: инструменты, соль и добрый истврукский лен. Верните 4 ящика из лагеря на юго-западе.',
   'entities.quests.q_supplies.completion': 'Мои ящики! Почти без царапин. Вы просто чудо.',
   'entities.quests.q_supplies.objectives.0.label': 'Украденный ящик припасов',
   'entities.quests.q_whispers.title': 'Шепот внизу',
@@ -3820,7 +3842,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_stalker_cloaks.objectives.0.label': 'Шкура хребтового охотника',
   'entities.quests.q_old_cragmaw.title': 'Старый Крэгмо',
   'entities.quests.q_old_cragmaw.text':
-    'Горцы знают имя тому, чьи следы нашла моя разведчица: Старый Крэгмо, покрытый шрамами кот-тиран, переживший три поколения собственной стаи. Это из-за него охотники заполонили мою дорогу, {playerName}. Его логово на западном хребте над южной дорогой. Возьмите напарника и покончите со старым дьяволом.',
+    'Горцы знают имя тому, чьи следы нашла моя разведчица: Старый Крэгмо, покрытый шрамами кот-тиран, переживший три поколения собственной стаи. Это из-за него охотники заполонили мою дорогу, {playerName}. Его логово на восточном хребте над южной дорогой. Возьмите напарника и покончите со старым дьяволом.',
   'entities.quests.q_old_cragmaw.completion':
     'Наконец-то он пал. Горцы клялись, что этот кот переживет саму стену. Теперь охотники останутся в своих высоких снегах, {playerName}, и мои патрули пройдут по дороге, не проливая крови. Весь хребет затих благодаря вам.',
   'entities.quests.q_old_cragmaw.objectives.0.label': 'Старый Крэгмо: убит',
@@ -3957,7 +3979,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gravewyrm.objectives.0.label': 'Корзул Могильный Вирм: убито',
   'entities.quests.q_mogger.title': 'Моггер должен пасть',
   'entities.quests.q_mogger.text':
-    'Моггер расколол повозки, расплющил изгороди и перебил столько скота, что хватило бы опустошить половину долины. Не выходите против него в одиночку. Возьмите двух сильных спутников на восточный луг и добейте зверя навсегда.',
+    'Моггер расколол повозки, расплющил изгороди и перебил столько скота, что хватило бы опустошить половину долины. Не выходите против него в одиночку. Возьмите двух сильных спутников на западный луг и добейте зверя навсегда.',
   'entities.quests.q_mogger.completion':
     'Моггер наконец мертв. Поля Истврука стали безопаснее, а вы покидаете долину с еще одной историей, достойной пересказа.',
   'entities.quests.q_mogger.objectives.0.label': 'Моггер убит',
@@ -4377,7 +4399,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.the_codfather.name': 'Крестная треска',
   'entities.quests.q_the_codfather.title': 'Крестная треска',
   'entities.quests.q_the_codfather.text':
-    'Крестная треска не просто рыба, {playerName}, а хладнокровный убийца. Старики клянутся, что она ест болотных рыскунов на завтрак, и даже мирефенские вдовы от ужаса не плетут паутину у отмелей Дипфена. Она правит этими водами. Возьми удочку, вытащи этого старого дьявола из его вод, и я признаю, что ты вошел в семью.',
+    'Крестная треска не просто рыба, {playerName}, а хладнокровный убийца. Старики клянутся, что она ест болотных рыскунов на завтрак, и даже мирефенские вдовы от ужаса не плетут паутину у отмелей Дипфена. Она правит этими водами, а болотная вода требует ни много ни мало удочку с железной катушкой - такие продаются у моего прилавка. Возьми ее в руки, вытащи этого старого дьявола из его вод, и я признаю, что ты вошел в семью.',
   'entities.quests.q_the_codfather.completion':
     'Во имя промокших святых... Сама Крестная треска. Только взгляни на эти усы. Фенбридж будет целый год кормиться историями об этом улове, {playerName}.',
   'entities.quests.q_the_codfather.objectives.0.label': 'Крестная треска',
@@ -4478,7 +4500,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_restless_dead.objectives.0.label': 'Рунный костяной осколок',
   'entities.quests.q_nythraxis_graves.title': 'Могилы забытых',
   'entities.quests.q_nythraxis_graves.text':
-    'Я уже видел эти знаки на трех старых могилах вокруг северного поля боя. Капитан Алдрен лежит на восточной возвышенности, верховный жрец Малрик - у разбитой центральной дороги, а королевский убийца Восс - у западного утеса. Коснитесь каждой могилы и слушайте, {playerName}. Мертвые могут помнить то, что живые забыли.',
+    'Я уже видел эти знаки на трех старых могилах вокруг северного поля боя. Капитан Алдрен лежит на западной возвышенности, верховный жрец Малрик - южнее, вдоль западного края, а королевский убийца Восс - у восточного утеса. Коснитесь каждой могилы и слушайте, {playerName}. Мертвые могут помнить то, что живые забыли.',
   'entities.quests.q_nythraxis_graves.completion':
     'Алдрен остался верен, Малрик отказался принять смерть, а Восс увидел опасность раньше всех. Все трое служили одному забытому королю.',
   'entities.quests.q_nythraxis_graves.objectives.0.label': 'Видение у могилы капитана Алдрена',
@@ -4488,7 +4510,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Видение у могилы королевского убийцы Восса',
   'entities.quests.q_nythraxis_sealed_crypt.title': 'Заброшенный склеп',
   'entities.quests.q_nythraxis_sealed_crypt.text':
-    'Видения указывают на заброшенную крипту в западном утесе. Есть старая легенда, что в крипте покоился король. Возможно, Терновые высоты запечатали его там после того, как ритуал Малрика исказил его во что-то бессмертное. Войдите в крипту и посмотрите, что осталось внутри.',
+    'Видения указывают на заброшенную крипту в восточном утесе. Есть старая легенда, что в крипте покоился король. Возможно, Терновые высоты запечатали его там после того, как ритуал Малрика исказил его во что-то бессмертное. Войдите в крипту и посмотрите, что осталось внутри.',
   'entities.quests.q_nythraxis_sealed_crypt.completion':
     'Две половины ключ-камня сходятся, а дневник Восса называет то, что они запечатали: перстень короля Нитраксиса. Если дневник говорит правду, этот перстень - ключ к его гробнице.',
   'entities.quests.q_nythraxis_sealed_crypt.objectives.0.label': 'Верхняя часть ключ-камня',
@@ -5118,6 +5140,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.glimmerfin_koi.name': 'Кои солнечного блика',
   'entities.items.ironreel_fishing_rod.name': 'Удочка с железной катушкой',
   'entities.items.silverstream_fishing_rod.name': 'Удочка серебряного ручья',
+  'entities.items.stormreel_fishing_rod.name': 'Удочка со штормовой катушкой',
+  'entities.items.tidewrought_fishing_rod.name': 'Удочка приливной ковки',
   'entities.items.raw_bog_eel.name': 'Сырой болотный угорь',
   'entities.items.raw_frostgill_trout.name': 'Сырая морозожаберная форель',
   'entities.items.raw_marsh_pike.name': 'Сырая болотная щука',
@@ -5180,6 +5204,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.elderwood_log.name': 'Бревно горной сосны',
   'entities.items.goldleaf_herb.name': 'Трава золотолист',
   'entities.items.sunpetal_herb.name': 'Трава солнцелепест',
+  // Отборные материалы: добываются инструментом выше уровня материала (D8).
+  // Прилагательное согласовано с родом существительного: руда/трава (ж), бревно (ср).
+  'entities.items.fine_copper_ore.name': 'Отборная медная руда',
+  'entities.items.fine_iron_ore.name': 'Отборная железная руда',
+  'entities.items.fine_thorium_ore.name': 'Отборная осмиевая руда',
+  'entities.items.fine_ironbark_log.name': 'Отборное бревно железнокорого дерева',
+  'entities.items.fine_ashwood_log.name': 'Отборное бревно пепельного дерева',
+  'entities.items.fine_elderwood_log.name': 'Отборное бревно горной сосны',
+  'entities.items.fine_silverleaf_herb.name': 'Отборная трава глянцелист',
+  'entities.items.fine_goldleaf_herb.name': 'Отборная трава золотолист',
+  'entities.items.fine_sunpetal_herb.name': 'Отборная трава солнцелепест',
   'entities.items.copper_ore.name': 'Медная руда',
   'entities.items.iron_ore.name': 'Железная руда',
   'entities.items.ironbark_log.name': 'Бревно железнокорого дерева',
@@ -5650,6 +5685,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterArmor': 'Броня',
   'hudChrome.bags.filterConsumable': 'Расходники',
   'hudChrome.bags.filterMaterial': 'Материалы',
+  'hudChrome.bags.filterTool': 'Инструменты',
   'hudChrome.bags.filterMount': 'Транспорт',
   'hudChrome.bags.filterQuest': 'Задания',
   'hudChrome.bags.sortAria': 'Сортировать предметы в сумках',
@@ -7558,6 +7594,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.identity.colSkill': 'Навык',
   'hudChrome.crafting.identity.colRole': 'Роль',
   'hudChrome.crafting.identity.colCap': 'Потолок',
+  'hudChrome.crafting.identity.allCrafts': 'Все ремёсла',
+  'hudChrome.crafting.identity.skillListAria': 'Навыки ремёсел',
   'hudChrome.crafting.identity.tutorial':
     'Первый ранг: достигните навыка {skill} в одном ремесле. Успешные рецепты развивают это ремесло, не стирая остальные знания.',
   'hudChrome.crafting.identity.nearTier':
@@ -8235,6 +8273,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.steam.disabled': 'Привязка Steam сейчас недоступна.',
   'apiError.wallet.handoff_invalid':
     'Срок действия авторизации кошелька истек или ее не удалось проверить. Повторите попытку.',
+  'apiError.seeker.native_only': 'Права Seeker доступны только в нативном приложении.',
+  'apiError.seeker.attestation_failed': 'Не удалось подтвердить устройство. Повторите попытку.',
+  'apiError.seeker.solana_artifact_required': 'Продолжите в версии приложения из Solana Store.',
+  'apiError.seeker.wallet_required': 'Сначала привяжите и подтвердите кошелек.',
+  'apiError.seeker.genesis_token_required': 'Требуется подтвержденный Seeker Genesis Token.',
+  'apiError.seeker.genesis_token_claimed': 'Этот Seeker Genesis Token уже был зарегистрирован.',
+  'apiError.seeker.entitlement_required': 'Требуются подтвержденные права Seeker.',
+  'apiError.seeker.current_ownership_required': 'Требуется текущее владение Seeker Genesis Token.',
   'apiError.steam.invalid_ticket':
     'Steam не смог подтвердить этот запрос на привязку. Повторите попытку из настольного приложения.',
   'apiError.steam.banned': 'Этот аккаунт Steam нельзя привязать.',
@@ -8504,8 +8550,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Чтобы срубить этот древостой, нужен лесорубный топор {tier} уровня.',
   'hudChrome.gathering.toolTierUnmet.herbalism':
     'Чтобы собрать эти заросли, нужен серп травника {tier} уровня.',
+  'hudChrome.gathering.toolTierUnmet.fishing':
+    'Чтобы рыбачить в этих водах, нужна удочка {tier} уровня.',
   'hudChrome.gathering.toolTierUnmetCorpse':
     'Чтобы добыть лучшие материалы, нужен инструмент сбора {tier} уровня.',
+  'hudChrome.gathering.wieldUnmet.mining':
+    'Чтобы махать шахтерской киркой, которая уже лежит в ваших сумках, нужен навык горного дела {skill}.',
+  'hudChrome.gathering.wieldUnmet.logging':
+    'Чтобы махать лесорубным топором, который уже лежит в ваших сумках, нужен навык лесозаготовки {skill}.',
+  'hudChrome.gathering.wieldUnmet.herbalism':
+    'Чтобы работать серпом травника, который уже лежит в ваших сумках, нужен навык травничества {skill}.',
+  'hudChrome.gathering.wieldUnmetCorpse':
+    'Чтобы пустить в ход свой лучший инструмент, нужен навык сбора {skill}.',
   'hudChrome.gathering.requiresTool.mining': 'Требуется шахтерская кирка',
   'hudChrome.gathering.requiresTool.logging': 'Требуется лесорубный топор',
   'hudChrome.gathering.requiresTool.herbalism': 'Требуется серп травника',
@@ -8525,6 +8581,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.unlocks.logging': 'Нужен для валки древостоев до {tier} уровня.',
   'hudChrome.gathering.toolTooltip.unlocks.herbalism':
     'Нужен для сбора зарослей трав до {tier} уровня.',
+  'hudChrome.gathering.toolTooltip.unlocks.fishing': 'Нужна для рыбалки в водах до {tier} уровня.',
   'hudChrome.gathering.toolTooltip.use.mining': 'Использование: добыть руду из ближайшей жилы.',
   'hudChrome.gathering.toolTooltip.use.logging': 'Использование: срубить ближайший древостой.',
   'hudChrome.gathering.toolTooltip.use.herbalism':
@@ -8537,8 +8594,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Открывает более богатый улов при навыке рыбалки от {skill}.',
   'hudChrome.gathering.downgradeMark': 'Сумки полны: добыча сохранена без метки сборщика.',
   'hudChrome.gathering.downgradeFind': 'Сумки полны: превосходная находка ускользнула.',
+  'hudChrome.gathering.emptyHookNote': 'Пустой крючок',
   'hudChrome.gathering.stateReady': 'Готово',
   'hudChrome.gathering.stateCooldown': 'Восстанавливается',
+  'hudChrome.gathering.stateCooldownTimed': 'Восстановится через {time}',
+  'hudChrome.gathering.fineGradePreview': 'Ваш инструмент даёт здесь отборный сорт добычи.',
   'gatherEvent.pristineVein': '{finder} находит нетронутую жилу!',
   'gatherEvent.ancientHeartwood': '{finder} добывает древнюю сердцевину!',
   'gatherEvent.moonlitBloom': '{finder} находит лунный цветок!',
@@ -8566,6 +8626,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.craftName.tailoring': 'Портняжное дело',
   'hudChrome.craftName.leatherworking': 'Кожевничество',
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  'hudChrome.crafting.reagentFineSub': '(потратит отборный сорт: {count})',
   // Protect Yumi locale fill (M16 wordy-key floor).
   'yumi.hud.collapse': 'Свернуть полосы Protect Yumi',
   'yumi.hud.expand': 'Развернуть полосы Protect Yumi',
@@ -8672,6 +8733,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.awayNote':
     'Если обе стороны подняли одно знамя, гости играют в инвертированных цветах.',
   'hudChrome.vcup.rolesHeading': 'Игровая роль',
+  'hudChrome.vcup.rolesSmallBracketNote':
+    'В категориях 1 на 1 и 2 на 2 каждый игрок выходит как Универсал. Деяния, требующие категории 3 на 3 или больше, здесь получить нельзя.',
   'hudChrome.vcup.role.allrounder.name': 'Универсал',
   'hudChrome.vcup.role.allrounder.desc':
     'Всего понемногу: удар, дальний удар и честный толчок плечом.',
@@ -8706,6 +8769,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.boardWins': 'побед: {count}',
   'hudChrome.vcup.practice': 'Тренировка с ботами',
   'hudChrome.vcup.practiceNote': 'Немедленно начинает полный матч с ботами на Свином поле.',
+  'hudChrome.vcup.practiceUnratedNote':
+    'Тренировочные матчи не рейтинговые: счёт и прогресс Книги деяний не засчитываются.',
   'hudChrome.vcup.clock': '{minutes}:{seconds}',
   'hudChrome.vcup.indicatorQueued': 'Очередь Кубка Долины: {bracket}, место {position} из {count}',
   'hudChrome.vcup.indicatorLive': 'Кубок Долины',
@@ -8747,6 +8812,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.briefing.rule5': 'Любой может подойти и поболеть за вас с трибун.',
   'hudChrome.vcup.briefing.kitHeading': 'Ваш набор',
   'hudChrome.vcup.briefing.kitNote': 'На время матча эти приёмы заменяют способности класса.',
+  'hudChrome.vcup.briefing.unratedNote':
+    'На поле есть боты, поэтому этот матч не рейтинговый: результаты не меняются, а деяния за голы, сейвы и сухие матчи не засчитываются.',
+  'hudChrome.vcup.briefing.practiceUnratedNote':
+    'Это тренировочный матч, поэтому он не рейтинговый: результаты не меняются, а прогресс Книги деяний не засчитывается.',
   'hudChrome.vcup.briefing.rosterHeading': 'Список состава',
   'hudChrome.vcup.briefing.you': 'Вы',
   'hudChrome.vcup.briefing.bot': 'Бот',
@@ -9200,7 +9269,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ваша учётная запись: место {rank}, лучшие {percent} процентов, Известность {renown}',
   'hudChrome.deeds.lbSelfRank': 'Ваша учётная запись: место {rank}, лучшие {percent} процентов',
   'hudChrome.deeds.lbEmpty': 'В рейтинге пока нет летописцев.',
-  'hudChrome.deeds.broadcastsLabel': 'Делиться деяниями с гильдией и друзьями',
+  'hudChrome.deeds.broadcastsLabel': 'Делиться деяниями с согильдейцами и подписчиками, а карточками деяний и шедевров с лентой Discord',
   'guide.deedsPage.catHeading': '{label} ({count})',
   'guide.deedsPage.colName': 'Деяние',
   'guide.deedsPage.featTag': 'Подвиг',
@@ -9227,6 +9296,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Совет: вызовите другого игрока на дружескую дуэль или встаньте в очередь на арену Пепельного Колизея, чтобы испытать свой билд.',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': 'Сесть / Спешиться',
+  // On-bar action-bar key-binding mode (issue #1238). M16 wordy fills.
+  'hudChrome.actionBar.editKeys': 'Настроить клавиши панели действий',
+  'hudChrome.actionBar.editKeysHint':
+    'Щёлкните ячейку на панели действий, затем нажмите клавишу, чтобы назначить её.',
+  'hudChrome.actionBar.bannerHint':
+    'Щёлкните ячейку, затем нажмите клавишу, чтобы назначить её. По завершении нажмите «Готово».',
+  'hudChrome.actionBar.bannerCapturing': 'Нажмите клавишу, чтобы назначить её этой ячейке...',
+  'hudChrome.actionBar.boundToKey': 'Назначено на {key}.',
+  'hudChrome.actionBar.reset': 'Сбросить',
+  'hudChrome.actionBar.cancel': 'Отмена',
+  'hudChrome.actionBar.resetConfirmTitle': 'Сбросить клавиши панели действий?',
+  'hudChrome.actionBar.resetConfirmBody':
+    'Первая панель вернётся к клавишам по умолчанию, а вторая и третья панели останутся без назначенных клавиш. Это действие нельзя отменить.',
   'hudChrome.mobile.mounts': 'Транспорт',
   'hudChrome.mounts.title': 'Транспорт',
   'hudChrome.mounts.close': 'Закрыть',
@@ -10167,6 +10249,33 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.wildgrowth_leggings.name': 'Поножи дикого роста',
   'entities.items.wildsoul_maul.name': 'Молот дикой души',
   'hudChrome.professions.skillValue': '{skill} / {max}',
+  'guide.profPages.toolsNote':
+    'Для каждой залежи нужен инструмент её ремесла в сумках, включая 1-й уровень: нет кирки, нет руды, нет удочки, нет рыбы. Торговая лестница охватывает уровни с 1-го по 3-й, и каждый узел держит только те уровни, которых требует его собственная земля, поэтому инструмент 1-го уровня продаётся в узле каждой зоны, а ступени выше продаются там, где лежат жилы, которым они нужны. За эти ступени торговцы спрашивают ещё и мастерство в самом ремесле инструмента: {tier2Prof} для 2-го уровня и {tier3Prof} для 3-го, и строка называет это требование. Инструменту достаточно лежать в сумках, ячейки экипировки и прочности у него нет, так что каждый покупается один раз, а то, чем вы уже владеете, продолжает работать. На ограничение влияет только уровень: более редкий инструмент того же уровня не открывает ничего сверх того. Но редкость не только цвет. Она продлевает вставленный эффект инструмента, а на удочке расширяет окно подсечки.\n\nХороший инструмент даёт три вещи, а не две. Он открывает землю более высокого уровня, сокращает сбор и улучшает то, что выходит: обработайте жилу инструментом рангом ВЫШЕ собственного материала зоны, и добыча даст тонкий сорт вместо обычного. Жила должна быть одной из полносортных жил зоны, поэтому лёгкие жилы, которые зона хранит для странников, по-прежнему дают обычный материал. Тонкие материалы — это то, что потребляют рецепты кованых инструментов, и тонкий сорт считается своей обычной версией всюду, где рецепт или наряд просит обычную, так что улучшение никогда не заводит в тупик: ваша медная руда просто приходит как тонкая медная руда.\n\nВыше торговой лестницы у каждого ремесла есть два кованых инструмента, 4-го и 5-го уровня, сделанные инженерами в мастерской инструментов или купленные за метки вылазок у стойки Утонувшей литании. Ни один торговец не продаёт их за монету. У рыбалки своя пара, и ей учат у мастера инструментов, а не знают с самого начала. Сегодня ни одна залежь и ни одна вода не требуют больше 3-го уровня, поэтому две верхние ступени покупают скорость, сорт и более щадящее окно подсечки, а не доступ, и они станут входным билетом, когда появится земля более высокого уровня.',
+  'hudChrome.professions.toolEffectName.quickeningCharm': 'Оберег возрождения',
+  'hudChrome.professions.toolEffectName.artisansEye': 'Глаз ремесленника',
+  'hudChrome.professions.toolEffectName.gatherersCache': 'Сумка собирателя',
+  'hudChrome.professions.toolEffectSlotButton': 'Установить {effect}',
+  'hudChrome.professions.toolEffectRechargeButton': 'Перезарядить',
+  'hudChrome.professions.toolEffectNoGain': '{effect} уже установлен и полностью заряжен.',
+  'hudChrome.professions.toolEffectRechargeToolCapped': 'Чтобы зарядить {effect} дальше, возьмите инструмент получше ({profession}).',
+  'hudChrome.professions.toolEffectSlotted': '{effect} установлен: {profession}.',
+  'hudChrome.professions.toolEffectSlotInvalid': '{effect} нельзя установить сюда.',
+  'hudChrome.professions.toolEffectNoTool': 'Сначала нужен настоящий инструмент ({profession}).',
+  'hudChrome.professions.toolEffectNoCharm': 'В сумках нужен изготовленный талисман: {effect}.',
+  'hudChrome.professions.toolEffectRecharged': '{effect} перезаряжен: израсходовано {material} x{count}.',
+  'hudChrome.professions.toolEffectRechargeNoSlot': 'Эффект не установлен: {profession}.',
+  'hudChrome.professions.toolEffectRechargeFull': '{effect} уже полностью заряжен.',
+  'hudChrome.professions.toolEffectRechargeMaterials': 'Для перезарядки {effect} нужно {material} x{count}.',
+  'hudChrome.professions.toolEffectSpent': 'Израсходовано, нужна подзарядка',
+  'hudChrome.professions.toolEffectDepleted': 'Эффект инструмента израсходован',
+  'hudChrome.professions.toolEffectRechargePrice': 'Подзарядка: {material} x{count}',
+  'hudChrome.professions.toolEffectModeAsk': 'Спрашивать при каждом использовании',
+  'hudChrome.professions.toolEffectModePrompt': 'Спрашивает при каждом использовании',
+  'hudChrome.professions.toolEffectConfirmTitle': 'Использовать {effect}?',
+  'hudChrome.professions.toolEffectConfirmBody': 'Потратить заряд на эту добычу? Если отказаться, добыча всё равно произойдёт, но без бонуса. Осталось зарядов: {charges}.',
+  'hudChrome.professions.toolEffectConfirmAccept': 'Потратить заряд',
+  'hudChrome.professions.toolEffectConfirmDecline': 'Добыть без бонуса',
+  'hudChrome.professions.toolEffectCharges': 'Осталось зарядов: {charges} из {max}',
   'entities.items.resonant_thread.name': 'Резонирующая нить',
   'entities.items.resonant_hide.name': 'Резонирующая шкура',
   'entities.items.resonant_links.name': 'Резонирующие звенья',
@@ -10293,13 +10402,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_amends_smith.objectives.0.label': 'Лесной волк убит',
   'entities.quests.q_prof_amends_outfitter.title': 'Нити воссоединены',
   'entities.quests.q_prof_amends_outfitter.text':
-    'Всё же снова у моего станка. Я не держу обиды, {playerName}, но нить помнит руку, что её отпустила, и цена, чтобы взяться за неё вновь, отмеряется длиннее всякий раз. Истреби пауков-скрытней Сейблвеба, что заполонили западный лес, и этот труд успокоит твои руки, прежде чем они снова коснутся доброго шёлка.',
+    'Всё же снова у моего станка. Я не держу обиды, {playerName}, но нить помнит руку, что её отпустила, и цена, чтобы взяться за неё вновь, отмеряется длиннее всякий раз. Истреби пауков-скрытней Сейблвеба, что заполонили восточный лес, и этот труд успокоит твои руки, прежде чем они снова коснутся доброго шёлка.',
   'entities.quests.q_prof_amends_outfitter.completion':
     'Снова твёрдо. Кожевничество и портняжное дело возвращаются к тебе основными ремёслами. На этот раз отмерь дважды, прежде чем уходить.',
   'entities.quests.q_prof_amends_outfitter.objectives.0.label': 'Паук-скрытень Сейблвеба истреблён',
   'entities.quests.q_prof_amends_apothecary.title': 'Снова на плите',
   'entities.quests.q_prof_amends_apothecary.text':
-    'Ну, гляди-ка, кто вернулся к моему котлу. Без обид, {playerName}, на кухне всегда найдётся место, но ты знаешь, что счёт растёт всякий раз, как ты уходишь. Ступай проредить диких кабанов на восточном лугу, ведь честный пот, это первый ингредиент, и он напомнит твоим рукам о работе.',
+    'Ну, гляди-ка, кто вернулся к моему котлу. Без обид, {playerName}, на кухне всегда найдётся место, но ты знаешь, что счёт растёт всякий раз, как ты уходишь. Ступай проредить диких кабанов на западном лугу, ведь честный пот, это первый ингредиент, и он напомнит твоим рукам о работе.',
   'entities.quests.q_prof_amends_apothecary.completion':
     'Вот он, прежний вкус. Алхимия и кулинария снова на твоей плите как основные ремёсла. На этот раз задержись подольше.',
   'entities.quests.q_prof_amends_apothecary.objectives.0.label': 'Дикий кабан добыт',
@@ -10590,9 +10699,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.nodesNote':
     'Где лежат залежи, их уровень, нужный инструмент и добыча; каждая залежь возрождается лично для вас через {respawn} секунд после вашего сбора.',
   'guide.profPages.toolsHeading': 'Инструменты',
-  'guide.profPages.toolsNote':
-    'Для любой залежи нужен инструмент своего ремесла в сумках, в том числе для залежей 1 уровня: без кирки нет руды, без удочки нет рыбы. У торговцев есть инструменты с 1 по 3 уровень, и их держат в каждом узловом городе; инструменту достаточно лежать в сумках, ячейки экипировки и прочности у него нет, так что покупка разовая. Для проверки важен только уровень инструмента: цвет редкости чисто декоративный.\n\nВыше торговой лестницы стоят два создаваемых инструмента, 4 и 5 уровня: их делают инженеры в мастерской, и ни один NPC их не продаёт. Сегодня ни одной залежи не нужно больше 3 уровня, поэтому их ценность сейчас в скорости: лучший инструмент удерживает время сбора на минимуме на низких залежах и станет пропуском, когда появятся угодья более высоких уровней.',
   'guide.profPages.toolCrafted': 'Создается ({craft})',
+  'guide.profPages.toolCraftedOrMarks': 'Изготовление ({craft}) или {marks} меток вылазок',
+  'guide.profPages.toolCraftedOrMarksHeroic': 'Изготовление ({craft}) или {marks} меток вылазок после героического прохождения Утонувшей Литании',
   'guide.profPages.toolVendor': '{name} ({hub})',
   'guide.profPages.toolUnavailable': 'Не продается',
   'guide.profPages.priceNone': 'Не продается',
@@ -10695,7 +10804,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Книга деяний идет рядом с каждым шагом. Первая настройка приносит титул Присягнувшего ремеслу, а первый шедевр, Мастера-шедевральника, и оба носятся как титулы. Каждое из восьми зарабатываемых ремесел отмечает рубежное деяние на 50 навыке и венчает свой предел титулом Grandmaster, а Fishing дает Old Salt на 100 мастерства и титул Master Angler на 200.\n\nЕсть и более тихие страницы: деяния за первый сбор и первое изделие, за редкие находки, что удача подбрасывает в поле, и за то, что вы взялись за утилизацию. Все это чисто косметическое, только титулы и Известность. Деяние никогда не дает силы; оно лишь свидетельствует, что вы там были.',
   'guide.professions.startHeading': 'С чего начать',
   'guide.professions.startBody':
-    'Только с дороги в Eastbrook? Найдите Foreman Odell и возьмите A Trade for Every Hand: он укажет вам на рудные жилы вокруг Copper Dig к юго-западу от города и набьет вам первые мозоли. С этого момента собирайте каждую жилу, лесопосадку и грядку трав, что встречаете в странствиях; мастерство приходит к путешественникам само собой.\n\nВ городе нажмите T, чтобы открыть окно ремесла и работать над общими рецептами, которые каждый персонаж знает с самого начала. Загляните к мастерам у forge, kitchens, loom и toolworks, посмотрите, чему они учат, и берите их рабочие заказы ради устойчивого дохода. К тому времени, как вас найдет письмо Гильдии, вы уже будете знать, какая пара ощущается домом.',
+    'Только с дороги в Eastbrook? Найдите Foreman Odell и возьмите A Trade for Every Hand: он укажет вам на рудные жилы вокруг Copper Dig к юго-востоку от города и набьет вам первые мозоли. С этого момента собирайте каждую жилу, лесопосадку и грядку трав, что встречаете в странствиях; мастерство приходит к путешественникам само собой.\n\nВ городе нажмите T, чтобы открыть окно ремесла и работать над общими рецептами, которые каждый персонаж знает с самого начала. Загляните к мастерам у forge, kitchens, loom и toolworks, посмотрите, чему они учат, и берите их рабочие заказы ради устойчивого дохода. К тому времени, как вас найдет письмо Гильдии, вы уже будете знать, какая пара ощущается домом.',
   'guide.profPages.craftProse.weaponcrafting.identityHeading':
     'Клинок, за которым идет каждый боец',
   'guide.profPages.craftProse.weaponcrafting.identityBody':
@@ -10753,7 +10862,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Fishing поставляет фирменные ингредиенты, зона за зоной: mirror trout и river perch из вод Eastbrook Vale, marsh pike и bog eel из Mirefen Marsh, frostgill trout и slatefin carp из Thornpeak Heights. Каждая ступень лестницы готовит рыбу своего уровня, так что повар, что ловит, никогда не остается без запаса.\n\nМясницкая сторона приходит с туш, прошедших сбор: game meat с вепрей и их родни, а на редкий или лучше бросок сбора, подписанный Prime Cut, центральная часть grand roast. Травы приправляют лучшие блюда, одно бревно ashwood коптит eel, а Cooking Salt идет по 8 меди за мешочек у собственного лотка Marlow.',
   'guide.profPages.craftProse.cooking.ladderHeading': 'От вяленого мяса до grand roast',
   'guide.profPages.craftProse.cooking.ladderBody':
-    "Salted Jerky, это полевой рецепт: известен с начала, одна spider leg, куется где угодно, походная еда каждого свежего искателя приключений. Лестница тренера готовит у кухонь Eastbrook на западной стороне площади: бесплатная ступень на 0 навыке (perch, Hunter's Game Skewer, Herbed Marsh Pike), средняя ступень на 25 навыке по 25 серебра за рецепт (Ashwood Smoked Eel, Goldleaf Game Stew, Frostgill Chowder) и редкая ступень на 50 навыке по 1 золоту каждый (Silvered Carp Supper, Angler's Feast Platter, Marlow's Grand Roast).\n\nПартийные блюда растягивают ингредиенты: smoked eel и game stew дают по две порции за готовку, а feast platter, три. Marlow учит каждой ступени в тот миг, как ваш разряд в Cooking ее достигает.",
+    "Salted Jerky, это полевой рецепт: известен с начала, одна spider leg, куется где угодно, походная еда каждого свежего искателя приключений. Лестница тренера готовит у кухонь Eastbrook на восточной стороне площади: бесплатная ступень на 0 навыке (perch, Hunter's Game Skewer, Herbed Marsh Pike), средняя ступень на 25 навыке по 25 серебра за рецепт (Ashwood Smoked Eel, Goldleaf Game Stew, Frostgill Chowder) и редкая ступень на 50 навыке по 1 золоту каждый (Silvered Carp Supper, Angler's Feast Platter, Marlow's Grand Roast).\n\nПартийные блюда растягивают ингредиенты: smoked eel и game stew дают по две порции за готовку, а feast platter, три. Marlow учит каждой ступени в тот миг, как ваш разряд в Cooking ее достигает.",
   'guide.profPages.craftProse.cooking.routeHeading': 'Специализация, а не шедевры, и путь к 125',
   'guide.profPages.craftProse.cooking.routeBody':
     'Cooking, это честное исключение из истории шедевров: у блюда нет строки характеристик для улучшения, так что блюда не срабатывают никогда, и ни одному повару не стоит за этим гнаться. Мастерство ремесла, это специализация на 75: на пятую часть меньше каждого ингредиента, что быстро складывается на партийных блюдах, и мобильная полевая кухня, чтобы пир готовился у дверей подземелья.\n\nГотовьте то, что ловите: сочетайте подъем с рыбалкой, и два навыка кормят друг друга всю дорогу вверх. Jerky и бесплатная ступень несут вас до 25 по очку за готовку, средняя ступень до 50, а редкая до 75; за 75 пока нет блюда выше, так что редкие блюда гаснут до половины, а потом до четверти отдачи, примерно 150 готовок до предела. Относитесь к этому как к запасанию, а не гринду: гильдия съедает каждую порцию.\n\nРабочий заказ кухонь Marlow покупает восемь game meat каждые 30 минут за монеты и опыт, а Книга деяний отмечает Seasoned Chef на 50 навыке по пути к титулу Grandmaster Cooking на 125.',
@@ -10820,6 +10929,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Торговцы слепы к происхождению: подписанная вещь продается NPC ровно по своей простой цене. Наценка за подпись существует только между игроками, что как раз и делает ее интересной: стопка руды-находки, подписанная знаменитым собирателем, Prime Cut с удачного сбора, шедевральный клинок с именем ремесленника, что с тех пор ушел на покой, все стоят столько, сколько говорит чья-то память.\n\nКнига деяний играет на том же инстинкте: Pristine Vein, Ancient Heartwood, Moonlit Bloom, A Perfect Specimen и Glimmer of Hope, это коллекционные отметки с нулевой Известностью, что существуют лишь ради доказательства, что миг случился с вами. Сохраните вещь, что заработала деяние, и вы держите расписку. Ничто из этого не сила; происхождение не покупает характеристик и не выигрывает боев, это бумажный след хороших дней игры.',
   'hudChrome.corpseHarvest.components.meat': 'Мясо',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (зачаровано)',
+  'hudChrome.materialHint.fineGrade':
+    'Отборный сорт. Добывается на жиле полного уровня инструментом выше самого материала и засчитывается вместо обычной версии везде, где она требуется.',
   'hudChrome.materialHint.arcaneDust':
     'Реагент для наложения чар. Выпадает при распылении обычного и необычного снаряжения.',
   'hudChrome.materialHint.arcaneEssence':
@@ -10936,4 +11047,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.heatingUp': 'Разогрев',
   'hudChrome.auraOverlay.procs.arcaneCharge': 'Чародейские заряды',
   'hudChrome.auraOverlay.procs.aetherRush': 'Эфирный натиск',
+  'itemUi.vendor.buyStack': 'Купить {count}',
+  'itemUi.vendor.buyStackAria': 'Купить {count} {item} за {price}',
 };

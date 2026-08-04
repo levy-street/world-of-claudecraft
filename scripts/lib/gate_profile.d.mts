@@ -88,6 +88,8 @@ export declare function parseGateProfileArgs(argv: ReadonlyArray<string>): GateP
 export declare function buildGateProfileSteps(
   workers: number,
   opts?: {
+    /** Forwarded to buildFullGateSteps: adds the dedicated release-tier i18n step. */
+    releaseTier?: boolean;
     skipBrowser?: boolean;
     skipBuilds?: boolean;
     skipVitest?: boolean;
@@ -99,6 +101,8 @@ export declare function formatMachineFacts(
   facts: MachineFacts,
   extra?: {
     workers?: number;
+    /** Availability the clamp budgeted against (lib/gate_memory.mjs), when resolved. */
+    availableMemGb?: number;
     gitSha?: string;
     npmVersion?: string;
     dateUtc?: string;

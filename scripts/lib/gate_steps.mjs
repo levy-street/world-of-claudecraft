@@ -5,6 +5,28 @@
 import { gateVitestSkipPretestEnv } from './gate_artifact_skip.mjs';
 import { turboRunArgs } from './gate_task_cache.mjs';
 
+// The suites whose ASSERTIONS change under I18N_RELEASE_TIER=1 (they read the flag
+// and tighten from "key is registered" to "every locale is filled"). They are the
+// only tests the release tier needs to run differently, so they run twice: once at
+// PR tier inside the ordinary full suite, and once here under the flag.
+//
+// Why this list exists at all. The tier used to be a job-level env var over the whole
+// release test job, which cannot be forgotten but mixes two signals: a release branch
+// is red for un-filled locales through most of a cycle, so a genuine regression hides
+// inside expected noise (a dungeon-finder regression sat unnoticed in exactly that way,
+// see issue #2820). Splitting the tier onto its own job separates "code is broken" from
+// "the release fill has not run yet", at the cost of a list that could rot. The list is
+// therefore pinned three ways by tests/release_i18n_tier_coverage.test.ts: this constant,
+// the ci.yml job's command, and a scan of tests/ for files reading the flag must all name
+// the same set, so a new tier-sensitive suite cannot quietly stop running under the tier.
+export const I18N_RELEASE_TIER_SUITES = Object.freeze([
+  'tests/deed_i18n.test.ts',
+  'tests/i18n_status_registry.test.ts',
+  'tests/i18n_t_behavior.test.ts',
+  'tests/localization_coverage.test.ts',
+  'tests/localization_fixes.test.ts',
+]);
+
 export const I18N_ARTIFACTS = Object.freeze([
   'src/ui/i18n.resolved.generated',
   'src/admin/i18n.resolved.generated',
@@ -21,6 +43,7 @@ export const I18N_ARTIFACTS = Object.freeze([
  *
  * @param {number} workers
  * @param {{
+ *   releaseTier?: boolean,
  *   skipBrowser?: boolean,
  *   skipBuilds?: boolean,
  *   skipVitest?: boolean,
@@ -79,6 +102,18 @@ export function buildFullGateSteps(workers, opts = {}) {
       args: ['test', '--', `--maxWorkers=${workers}`],
       env: gateVitestSkipPretestEnv(),
     });
+    // Release tier is a SEPARATE step over the tier-sensitive suites only, mirroring
+    // the release-i18n job in ci.yml. The full suite above stays at PR tier, so a red
+    // there always means a real regression, never an outstanding locale fill.
+    if (opts.releaseTier) {
+      steps.push({
+        name: 'vitest (release-tier i18n)',
+        cmd: 'npm',
+        args: ['test', '--', ...I18N_RELEASE_TIER_SUITES, `--maxWorkers=${workers}`],
+        env: { ...gateVitestSkipPretestEnv(), I18N_RELEASE_TIER: '1' },
+        hint: 'release-tier i18n is red until every locale is filled: run the i18n-locale-fill workflow (docs/i18n-scaling/translation-workflow.md). It does NOT indicate a code regression.',
+      });
+    }
   }
   if (!opts.skipBrowser) {
     steps.push({
@@ -93,9 +128,9 @@ export function buildFullGateSteps(workers, opts = {}) {
   // tasks so --skip-* still measures what it claims.
   if (!opts.skipTypes && !opts.skipBuilds) {
     steps.push({
-      name: 'typecheck + env/server builds',
+      name: 'typecheck + env/server/bot builds',
       cmd: 'npx',
-      args: turboRunArgs(['check:types', 'build:env', 'build:server']),
+      args: turboRunArgs(['check:types', 'build:env', 'build:server', 'build:bot']),
     });
     steps.push({
       name: 'client build',
@@ -121,6 +156,11 @@ export function buildFullGateSteps(workers, opts = {}) {
           name: 'server build',
           cmd: 'npx',
           args: turboRunArgs(['build:server']),
+        },
+        {
+          name: 'bot build',
+          cmd: 'npx',
+          args: turboRunArgs(['build:bot']),
         },
         {
           name: 'client build',

@@ -48,6 +48,12 @@ describe('GLB texture KTX2 compression', () => {
     let converted = 0;
     let skins = 0;
     for (const file of walkGlbs(MODELS)) {
+      // tests/sfx_studio_server_security.test.ts plants (and can leak) a
+      // sfx-studio-security-<pid>.glb symlink in public/models during the
+      // parallel suite; it is not a shipped model and its target is not a
+      // GLB. Same filter tests/server/new_endpoint.test.ts applies to its
+      // git-status sweep for the same leak.
+      if (/^sfx-studio-security-\d+\.glb$/.test(path.basename(file))) continue;
       const json = glbJsonChunk(fs.readFileSync(file));
       const mimes = (json.images ?? []).map((i) => i.mimeType);
       if (mimes.length === 0) continue;

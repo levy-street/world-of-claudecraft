@@ -9,12 +9,20 @@
 // injected resolver (the bank searches the displayed name, unlike bags which
 // matches the raw English item.name today; that divergence is intentional).
 //
-// Bare-named like bag_filter.ts, so it escapes the architecture.test.ts *_view /
-// *_core on-disk sweep and needs no UI_PURE_CORES registration (verified against
-// the sweep's /_(?:view|core)\.ts$/ regex + the BARE_NAMED forward-completeness
-// cross-check, which only lists REGISTERED bare cores).
+// Bare-named, so it escapes the architecture.test.ts *_view / *_core on-disk
+// sweep and needs no UI_PURE_CORES registration (verified against the sweep's
+// /_(?:view|core)\.ts$/ regex + the BARE_NAMED forward-completeness cross-check,
+// which only lists REGISTERED bare cores). bag_filter.ts, once in the same
+// boat, IS registered now: phase 19 gave it a runtime sim import
+// (material_taxonomy), so its purity is scanned.
 
-import { type BagFilterState, type ItemLookup, matchesCategory, qualityRank } from './bag_filter';
+import {
+  type BagFilterState,
+  type ItemLookup,
+  matchesCategory,
+  qualityRank,
+  UNKNOWN_QUALITY_RANK,
+} from './bag_filter';
 import type { BankSlotModel } from './bank_view';
 
 // Resolve an item id to its localized display name (itemDisplayName in the painter).
@@ -25,12 +33,15 @@ export type BankNameResolver = (itemId: string) => string;
 // Filter, then sort a bank grid model. Returns a NEW array; never mutates the input.
 // slotIndex is preserved verbatim through both filter and sort (it is the exact
 // bankWithdraw/bankDeposit wire argument, so a filtered/sorted cell must still act on
-// its ORIGINAL slot). Unknown-id slots (a dormant/tampered save whose itemId is not in
-// the table) are EXCLUDED from every filtered view, mirroring bag_filter's
-// applyBagFilter (which drops a slot when the lookup misses) and the bank painter's
-// own fillGrid, which already skips an unknown id; they never carry a category or a
-// name to match. Sorts are stable (spec-stable Array.prototype.sort), so 'recent' is
-// simply the unsorted filtered list in original slot order.
+// its ORIGINAL slot). Unknown-id slots (bank contents are server truth, so a stale
+// bundle can hold ids it predates, R34) stay VISIBLE in the everything view exactly
+// like bag_filter's applyBagFilter: they occupy real, counted bank slots, and hiding
+// them is how a slot turns invisible. A category chip or a name search still excludes
+// them (no def means no kind to classify; the injected nameOf resolves an unknown id
+// to the raw id, but a player searches display names, not ids). Sorts are stable
+// (spec-stable Array.prototype.sort), so 'recent' is simply the unsorted filtered
+// list in original slot order; unknown-id slots rank below poor in the quality sort
+// and name-sort by what nameOf returns for them (the raw id).
 export function filterBankSlots(
   models: readonly BankSlotModel[],
   lookup: ItemLookup,
@@ -40,13 +51,17 @@ export function filterBankSlots(
   const query = state.search.trim().toLowerCase();
   const filtered = models.filter((m) => {
     const item = lookup(m.itemId);
-    if (!item) return false;
+    if (!item) return state.category === 'all' && !query;
     if (!matchesCategory(item, state.category)) return false;
     if (query && !nameOf(m.itemId).toLowerCase().includes(query)) return false;
     return true;
   });
   if (state.sort === 'quality') {
-    filtered.sort((a, b) => qualityRank(lookup(a.itemId)!) - qualityRank(lookup(b.itemId)!));
+    const rank = (m: BankSlotModel) => {
+      const item = lookup(m.itemId);
+      return item ? qualityRank(item) : UNKNOWN_QUALITY_RANK;
+    };
+    filtered.sort((a, b) => rank(a) - rank(b));
   } else if (state.sort === 'name') {
     filtered.sort((a, b) => nameOf(a.itemId).localeCompare(nameOf(b.itemId)));
   }

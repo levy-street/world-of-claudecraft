@@ -224,6 +224,7 @@ export function parseGateProfileArgs(argv) {
  *
  * @param {number} workers
  * @param {{
+ *   releaseTier?: boolean,
  *   skipBrowser?: boolean,
  *   skipBuilds?: boolean,
  *   skipVitest?: boolean,
@@ -246,6 +247,12 @@ export function formatMachineFacts(facts, extra = {}) {
     `  Node:            ${facts.nodeVersion}`,
     `  GATE_MAX_WORKERS:${facts.gateMaxWorkers == null ? ' (unset)' : ` ${facts.gateMaxWorkers}`}`,
   ];
+  // Availability (lib/gate_memory.mjs) is what the worker clamp actually budgets against,
+  // and on macOS it is far above freemem. Printed only when the caller resolved it, so a
+  // reader can tell why the worker count does not follow the free figure above.
+  if (extra.availableMemGb != null) {
+    lines.push(`  RAM available:   ${extra.availableMemGb} GiB`);
+  }
   if (extra.workers != null) lines.push(`  gate workers:    ${extra.workers}`);
   if (extra.gitSha) lines.push(`  git SHA:         ${extra.gitSha}`);
   if (extra.npmVersion) lines.push(`  npm:             ${extra.npmVersion}`);

@@ -186,6 +186,9 @@ describe('ClientWorld.targetEntity with a dead player', () => {
   it('mirrors the dead-player selection optimistically before the server reply', () => {
     const viewer = ent({ id: 1, kind: 'player', dead: false, hostile: false });
     const fallen = ent({ id: 5, kind: 'player', dead: true, hostile: false });
+    // Kept bespoke on purpose (issue #2088): a hand-picked field subset plus a
+    // `cmd` spy. tests/helpers/bare_client.ts bareClient() is the default for
+    // a new suite that just needs a bare ClientWorld.
     const client = Object.create(ClientWorld.prototype) as {
       playerId: number;
       entities: Map<number, Entity>;

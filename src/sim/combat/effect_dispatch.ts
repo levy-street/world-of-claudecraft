@@ -2703,7 +2703,12 @@ export function runEffects(
   // plants Winter's Chill on its surviving target. Inert for everyone else.
   frostMageAfterCast(ctx, p, meta, ability, target);
 
-  if (ability.spendsCombo && spentCombo > 0) {
+  // A finisher cast fully free via next_cast_free/next_execute_free (Borrowed
+  // Tempo's Cutthroat Tempo proc) still uses the banked combo points to scale
+  // its effect (spentCombo above), but does not spend them: "free" means the
+  // whole cast, not just the resource bill (issue #2426). A next_cast_cheap/
+  // next_cast_instant discount never sets freeCast, so those still spend as normal.
+  if (ability.spendsCombo && spentCombo > 0 && !res.freeCast) {
     p.comboPoints = 0;
     ctx.emit({ type: 'comboPoint', points: 0, pid: p.id });
   }

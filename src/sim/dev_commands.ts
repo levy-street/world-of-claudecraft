@@ -9,6 +9,7 @@ import { mountItemId, mountOwned } from './mounts';
 import { MOUNT_TRAIN_MIN_LEVEL } from './mounts_training';
 import { isGatheringProfessionId, queueGatheringGrant } from './professions/gathering';
 import { placeMobileStationForPlayer } from './professions/mobile_station';
+import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
 import { completeAllQuestsForDev } from './quests/dev_quest_commands';
 import { RIFT_RANK_BASE_LEVEL, riftRankForBaseLevel } from './rift/ranks';
 import { generateRiftPlan, isSetPieceSeed } from './rift/rift_gen';
@@ -141,6 +142,7 @@ export function handleDevChat(
   if (teleportMatch) {
     const entity = ctx.entities.get(pid);
     if (entity) {
+      cancelProfessionSessionOnDisplacement(ctx, entity);
       const pos = ctx.groundPos(Number(teleportMatch[1]), Number(teleportMatch[2]));
       entity.pos = pos;
       entity.prevPos = { ...pos };
@@ -235,6 +237,9 @@ export function handleDevChat(
       const leveled = entity.level < gate;
       if (leveled) ctx.setPlayerLevel(gate, pid);
       meta.copper += 100 * 10000;
+      // Every teleport, the dev ones included, runs the one session teardown
+      // (the same call /dev tp makes above).
+      cancelProfessionSessionOnDisplacement(ctx, entity);
       const pos = ctx.groundPos(marla.pos.x + 2, marla.pos.z + 1);
       entity.pos = pos;
       entity.prevPos = { ...pos };

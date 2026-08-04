@@ -8,7 +8,10 @@ vi.mock('../server/db', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../server/db')>();
   return { ...actual, pool: mocks };
 });
-vi.mock('../server/realm', () => ({ REALM: 'test-realm' }));
+vi.mock('../server/realm', () => ({
+  REALM: 'test-realm',
+  REALM_DIRECTORY: [{ name: 'test-realm', url: '', type: 'Normal' }],
+}));
 
 import { PgDailyRewardDb, pruneDailyRewardEventsBatch } from '../server/daily_rewards_db';
 import { DAILY_REWARD_EXCLUDED_ACCOUNTS_VIEW_SQL, ELIGIBLE_ACCOUNT_SQL } from '../server/db';
