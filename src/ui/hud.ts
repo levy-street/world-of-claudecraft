@@ -175,6 +175,7 @@ import {
   mobVoiceActionForDamage,
   mobVoiceCue,
   mobVoiceCueWithFallback,
+  novaAbilityCue,
   playerSwingCueForDamage,
   shouldPlayCombatImpactForTarget,
   shouldPlayCritSfxForTarget,
@@ -10007,7 +10008,7 @@ export class Hud {
         // on the same floor, so the player's own y is the right height anchor.
         if (ev.fx !== 'nova') return;
         const y = sim.player.pos.y;
-        this.combat('spell_nova', ev.x, y, ev.z, 0.6, { cooldown: 0.08 });
+        this.combat(novaAbilityCue(ev.ability), ev.x, y, ev.z, 0.6, { cooldown: 0.08 });
         this.combat(`impact_${ev.school}`, ev.x, y, ev.z, 0.5, { rate: 0.8, cooldown: 0.08 });
         return;
       }

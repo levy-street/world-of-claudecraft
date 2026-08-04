@@ -363,6 +363,7 @@ export function runEffects(
           // Ability-scoped crit talents (ResolvedAbilityMod.critPct, e.g. the
           // Redhanded Craven Thrust mastery) ride the shared hit table.
           critBonus: mods.abilities[ability.id]?.critPct ?? 0,
+          abilityId: ability.id,
           onDealt:
             areaEcho || sweeping
               ? (amount) => {
@@ -1397,8 +1398,13 @@ export function runEffects(
         });
         // Fear-flavored incapacitates (Harrow) sound at the target, distinct
         // from plain stuns/incapacitates (Eye Jab, Wyvern Sting), which have
-        // no dedicated fear audio.
-        if (ability.fearDr) {
+        // no dedicated fear audio. Gated to ability.id, not the broader
+        // fearDr flag: death_coil (Morrowlash) also carries fearDr for its
+        // diminishing-returns/break-chance treatment but has no fear
+        // recording of its own and is absent from FEAR_IMPACT_ABILITIES, so
+        // a flag-only gate here made it double up its own shadow damage
+        // impact with Harrow's fear sound (review finding, PR #2861).
+        if (ability.id === 'fear') {
           ctx.emit({
             type: 'spellfx',
             sourceId: p.id,

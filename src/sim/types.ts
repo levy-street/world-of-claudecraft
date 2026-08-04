@@ -3942,6 +3942,16 @@ export type SimEvent = { pid?: number } & (
       crit: boolean;
       school: string;
       ability: string | null;
+      // The stable content id of the ability that dealt this damage, when
+      // known (dealDamage's own abilityId param, see combat/damage.ts).
+      // `ability` above stays the DISPLAY LABEL (player-facing combat log,
+      // playerSwingCueForDamage's 'Auto Shot' check): a display-only rename
+      // must never break a client-side lookup keyed off it, the way
+      // IMPACT_ABILITY_CUES (src/ui/combat_sfx.ts) was before this field
+      // existed. Not populated by every dealDamage caller (only the sites
+      // that already pass abilityId through for talent-proc filtering), so
+      // client code must fall back to school/material when this is absent.
+      abilityId?: string | null;
       kind: DamageEventKind;
       absorbed?: number;
       // Presentation-only correlation: this hit belongs to a ranged shot whose
@@ -4334,10 +4344,13 @@ export type SimEvent = { pid?: number } & (
         | 'bubbleBeam'
         | 'tick'
         | 'nova'
-        // A fear-flavored incapacitate actually lands on a target (Harrow,
-        // Terror Canticle, Dread Chorus): audio-only, sounds at the target,
-        // distinct from the caster-anchored 'nova' cast moment those two AoE
-        // fears also emit.
+        // A fear-flavored incapacitate actually lands on a target (Harrow):
+        // audio-only, sounds at the target, distinct from the caster-anchored
+        // 'nova' cast moment the three AoE fears (Terror Canticle, Dread
+        // Chorus, Intimidating Shout) also emit. Gated to ability.id ===
+        // 'fear' at the emit site (effect_dispatch.ts), not the broader
+        // fearDr flag death_coil (Morrowlash) also carries: Morrowlash has no
+        // fear recording of its own.
         | 'fearImpact'
         // A cc effect actually lands on a target (Sundering Gavel/Hammer of
         // Justice's stun, Gripping Roots/entangling_roots, Dirt Toss/blind's

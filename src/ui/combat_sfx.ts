@@ -44,6 +44,17 @@ const NOVA_ABILITY_CUES: Partial<Record<string, SfxId>> = {
   flamestrike: 'flamestrike',
 };
 
+// Shared by both nova-shaped events: the caster-anchored fx:'spellfx' nova
+// (self-centered/entity-anchored bursts) AND the world-anchored
+// fx:'spellfxAt' nova (ground-targeted bursts like Flamestrike, which always
+// takes the castAim branch and never the entity-anchored one). Exported so
+// hud.ts's spellfxAt handler can resolve the same override instead of
+// hardcoding 'spell_nova' regardless of ability (review finding, PR #2861:
+// the Flamestrike entry above could never fire on a real cast without this).
+export function novaAbilityCue(ability: string | undefined): SfxId {
+  return (ability && NOVA_ABILITY_CUES[ability]) || 'spell_nova';
+}
+
 // A damage-landing archetype (bolt/burst/strike/nova/beam/dot) always
 // resolves the shared impact_<school> cue (impactCueForDamage below). A few
 // abilities get their own distinct impact instead, keyed off
@@ -230,8 +241,14 @@ export function materialImpactCue(target: Entity): SfxId {
 }
 
 export function impactCueForDamage(event: DamageEvent, target: Entity): SfxId | null {
-  if (event.ability) {
-    const override = IMPACT_ABILITY_CUES[event.ability];
+  // Keyed off the stable abilityId, not the display-label `ability` field:
+  // a display rename (Scald/Pyrelance/Aether Surge/Dirt Nap/Wicked Slash/
+  // Craven Thrust/Lurker's Strike/Throat Wire all differ from their id)
+  // would otherwise silently break every entry in IMPACT_ABILITY_CUES
+  // (review finding, PR #2861). abilityId is not populated by every
+  // dealDamage caller, so a missing one just falls through below.
+  if (event.abilityId) {
+    const override = IMPACT_ABILITY_CUES[event.abilityId];
     if (override) return override;
   }
   if (!event.school || event.school === 'physical') return materialImpactCue(target);
@@ -250,8 +267,7 @@ export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number 
     return { key, anchorId: event.sourceId };
   }
   if (event.fx === 'nova') {
-    const key = (event.ability && NOVA_ABILITY_CUES[event.ability]) || 'spell_nova';
-    return { key, anchorId: event.targetId };
+    return { key: novaAbilityCue(event.ability), anchorId: event.targetId };
   }
   if (event.fx === 'fearImpact') return { key: 'fear', anchorId: event.targetId };
   if (event.fx === 'ccImpact') {

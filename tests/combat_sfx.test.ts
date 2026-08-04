@@ -359,36 +359,61 @@ describe('combat SFX policy', () => {
   });
 
   it('gives Scorch and Pyroblast their own impact instead of the shared impact_fire', () => {
-    for (const [ability, key] of [
+    for (const [abilityId, key] of [
       ['scorch', 'scorch'],
       ['pyroblast', 'pyroblast'],
     ] as const) {
       expect(
-        impactCueForDamage(damage({ school: 'fire', ability }), target('mob', 'crypt_shambler')),
+        impactCueForDamage(
+          damage({ school: 'fire', ability: 'display label', abilityId }),
+          target('mob', 'crypt_shambler'),
+        ),
       ).toBe(key);
     }
     // Every other fire spell (Fireball, etc.) keeps the shared impact_fire.
     expect(
       impactCueForDamage(
-        damage({ school: 'fire', ability: 'fireball' }),
+        damage({ school: 'fire', ability: 'Fireball', abilityId: 'fireball' }),
+        target('mob', 'crypt_shambler'),
+      ),
+    ).toBe('impact_fire');
+  });
+
+  it('resolves the impact override off the stable abilityId, never the display-label ability field (#2861)', () => {
+    // Scorch's real display label is "Scald", not "scorch": a lookup keyed
+    // off the label instead of abilityId would silently never match.
+    expect(
+      impactCueForDamage(
+        damage({ school: 'fire', ability: 'Scald', abilityId: 'scorch' }),
+        target('mob', 'crypt_shambler'),
+      ),
+    ).toBe('scorch');
+    // An event with the id as its label but no abilityId (a caller that
+    // never threads one through) must NOT match by coincidence.
+    expect(
+      impactCueForDamage(
+        damage({ school: 'fire', ability: 'scorch', abilityId: undefined }),
         target('mob', 'crypt_shambler'),
       ),
     ).toBe('impact_fire');
   });
 
   it('gives Frozen Orb and Glacial Spike their own impact instead of the shared impact_frost', () => {
-    for (const [ability, key] of [
+    for (const [abilityId, key] of [
       ['frozen_orb', 'frozen_orb'],
       ['glacial_spike', 'glacial_spike'],
     ] as const) {
       expect(
-        impactCueForDamage(damage({ school: 'frost', ability }), target('mob', 'crypt_shambler')),
+        impactCueForDamage(
+          damage({ school: 'frost', ability: 'display label', abilityId }),
+          target('mob', 'crypt_shambler'),
+        ),
       ).toBe(key);
     }
     // Every other frost spell (Ice Lance, etc.) keeps the shared impact_frost.
     expect(
       impactCueForDamage(
-        damage({ school: 'frost', ability: 'ice_lance' }),
+        damage({ school: 'frost', ability: 'Ice Lance', abilityId: 'ice_lance' }),
         target('mob', 'crypt_shambler'),
       ),
     ).toBe('impact_frost');
@@ -397,21 +422,21 @@ describe('combat SFX policy', () => {
   it('gives Aether Surge (arcane_surge) the arcane_blast cue instead of the shared impact_arcane', () => {
     expect(
       impactCueForDamage(
-        damage({ school: 'arcane', ability: 'arcane_surge' }),
+        damage({ school: 'arcane', ability: 'Aether Surge', abilityId: 'arcane_surge' }),
         target('mob', 'crypt_shambler'),
       ),
     ).toBe('arcane_blast');
     // Every other arcane spell keeps the shared impact_arcane.
     expect(
       impactCueForDamage(
-        damage({ school: 'arcane', ability: 'arcane_missiles' }),
+        damage({ school: 'arcane', ability: 'Arcane Missiles', abilityId: 'arcane_missiles' }),
         target('mob', 'crypt_shambler'),
       ),
     ).toBe('impact_arcane');
   });
 
   it('gives Ambush, Backstab, Garrote, Sinister Strike, and Eviscerate their own impact instead of the shared material impact', () => {
-    for (const [ability, key] of [
+    for (const [abilityId, key] of [
       ['ambush', 'ambush'],
       ['backstab', 'backstab'],
       ['garrote', 'garrote'],
@@ -420,7 +445,7 @@ describe('combat SFX policy', () => {
     ] as const) {
       expect(
         impactCueForDamage(
-          damage({ school: 'physical', ability }),
+          damage({ school: 'physical', ability: 'display label', abilityId }),
           target('mob', 'crypt_shambler'),
         ),
       ).toBe(key);
@@ -428,7 +453,7 @@ describe('combat SFX policy', () => {
     // Every other physical rogue strike keeps the shared material impact.
     expect(
       impactCueForDamage(
-        damage({ school: 'physical', ability: 'mutilate' }),
+        damage({ school: 'physical', ability: 'Mutilate', abilityId: 'mutilate' }),
         target('mob', 'crypt_shambler'),
       ),
     ).toBe('impact_bone');
@@ -441,7 +466,7 @@ describe('combat SFX policy', () => {
     // exactly like the HoT tick-silencing precedent (#2271, heal side).
     expect(
       impactCueForDamage(
-        damage({ school: 'physical', ability: 'rupture' }),
+        damage({ school: 'physical', ability: 'Bleed Out', abilityId: 'rupture' }),
         target('mob', 'crypt_shambler'),
       ),
     ).toBe('impact_bone');

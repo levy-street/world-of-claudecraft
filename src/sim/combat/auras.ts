@@ -278,6 +278,10 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             // Banks copied from resolved damage (Ignite) skip the source-output
             // multipliers so the payout equals what was banked, once.
             a.finalDamage === true,
+            // The aura's own id, so client-side impact-cue lookups (Rupture)
+            // can key off a stable id instead of the display name a.name
+            // above (review finding, PR #2861).
+            a.id,
           );
           if (a.leechPct !== undefined) {
             const src = ctx.entities.get(a.sourceId);
