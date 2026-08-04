@@ -615,6 +615,10 @@ export interface SimContextCallbacks {
   // is the shared ground-AoE entry point the drain pulses.
   resolve(pid?: number): { meta: PlayerMeta; e: Entity } | null;
   groundPos(x: number, z: number): Vec3;
+  /** MemorialDef id for a spawned memorial anchor entity, else null. */
+  memorialIdForEntity(entityId: number): string | null;
+  /** Read radius for a memorial anchor entity, else null (not a memorial). */
+  memorialInteractionRadius(entityId: number): number | null;
   playerMods(meta: PlayerMeta): TalentModifiers;
   delveRunForPlayer(pid: number): DelveRun | null;
   delveModuleEntry(run: DelveRun): Vec3;
@@ -1459,6 +1463,8 @@ export function createSimContext(host: SimContextHost): SimContext {
     rebucket: host.rebucket,
     resolve: host.resolve,
     groundPos: host.groundPos,
+    memorialIdForEntity: host.memorialIdForEntity,
+    memorialInteractionRadius: host.memorialInteractionRadius,
     playerMods: host.playerMods,
     delveRunForPlayer: host.delveRunForPlayer,
     delveModuleEntry: host.delveModuleEntry,

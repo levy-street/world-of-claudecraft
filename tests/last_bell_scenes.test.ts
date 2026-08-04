@@ -539,7 +539,9 @@ describe('the voyage cinematic', () => {
       outOpenWater: {
         start: { x: 157.48, y: 0, z: -8.994, yaw: -1.935526 },
         end: { x: 209.481, y: 0, z: -8.995, yaw: -1.935526 },
-        duration: 5.7,
+        // The 9 s open-water leg sails the same reviewed 52 yd of water, so
+        // the glide stretches in time rather than reaching for new water.
+        duration: 8.8,
         ease: 'linear',
       },
       outArrival: {
@@ -557,7 +559,7 @@ describe('the voyage cinematic', () => {
       backOpenWater: {
         start: { x: 290.615, y: 0, z: -5.869, yaw: 1.206066 },
         end: { x: 342.615, y: 0, z: -5.868, yaw: 1.206066 },
-        duration: 5.7,
+        duration: 8.8,
         ease: 'linear',
       },
       backArrival: {
@@ -575,23 +577,73 @@ describe('the voyage cinematic', () => {
     expect(back).toBeDefined();
     expect(q0).toBeDefined();
     if (!out || !back || !q0) return;
-    expect(out.duration).toBeCloseTo(27.15, 8);
-    expect(back.duration).toBeCloseTo(27.15, 8);
-    expect(q0.duration).toBeCloseTo(34.7, 8);
+    expect(out.duration).toBeCloseTo(30.15, 8);
+    expect(back.duration).toBeCloseTo(30.15, 8);
+    expect(q0.duration).toBeCloseTo(37.65, 8);
     const cameraTimes = (scene: typeof out): number[] =>
       scene.ops.flatMap((op) => (op.kind === 'camera' ? [op.at] : []));
-    expect(cameraTimes(out)).toEqual([0, 7, 13, 19.05, 26.3]);
-    expect(cameraTimes(back)).toEqual([0, 7, 13, 19.05, 26.3]);
-    expect(cameraTimes(q0)).toEqual([0, 7, 13, 19.05, 26.95, 33.85]);
+    // The open-water leg holds 1.5x the legs on either side of it (7s to 16s
+    // against 6s for cast-off and the approach), and every beat from the
+    // arrival cut on is the old timing shifted by that same 3s.
+    expect(cameraTimes(out)).toEqual([0, 7, 16, 22.05, 29.3]);
+    expect(cameraTimes(back)).toEqual([0, 7, 16, 22.05, 29.3]);
+    expect(cameraTimes(q0)).toEqual([0, 7, 16, 22.05, 29.9, 36.8]);
 
     for (const scene of [out, back, q0]) {
       // Owner pass three: the scene opens on a hard cut, no fade at 0.
       expect(scene.ops.filter((op) => op.at === 0 && op.kind === 'fade')).toEqual([]);
       const finalFade = scene.ops.filter((op) => op.kind === 'fade').at(-1);
-      expect(finalFade).toMatchObject({ kind: 'fade', to: 'clear', dur: 2 });
+      // The tightened film shape: 1.2s down, 0.8s of black, 1.6s up.
+      expect(finalFade).toMatchObject({ kind: 'fade', to: 'clear', dur: 1.6 });
       // The LAST fade in the whole scene is the second journey fade's
       // reveal (the toll cut's for Q0): everything after is fade-free.
-      expect(finalFade?.at).toBeCloseTo(scene === q0 ? 27.45 : 13.5, 8);
+      expect(finalFade?.at).toBeCloseTo(scene === q0 ? 30.3 : 16.4, 8);
+    }
+    // Every fade in the voyage carries the authored film shape, in order:
+    // down over 1.2s, the instant black stamp at the cut, up over 1.6s.
+    const fadeShapes = (scene: typeof out) =>
+      scene.ops.flatMap((op) => (op.kind === 'fade' ? [{ to: op.to, dur: op.dur }] : []));
+    const oneCoveredCut = [
+      { to: 'black', dur: 1.2 },
+      { to: 'black', dur: 0 },
+      { to: 'clear', dur: 1.6 },
+    ];
+    expect(fadeShapes(out)).toEqual([...oneCoveredCut, ...oneCoveredCut]);
+    expect(fadeShapes(back)).toEqual([...oneCoveredCut, ...oneCoveredCut]);
+    // Q0 covers its two story cuts with the same pair.
+    expect(fadeShapes(q0)).toEqual([
+      ...oneCoveredCut,
+      ...oneCoveredCut,
+      ...oneCoveredCut,
+      ...oneCoveredCut,
+    ]);
+    // Black lands 0.4s (half the hold) before each cut and clears 0.4s after
+    // it, so the camera never moves while anything is visible.
+    const blackHolds = (scene: typeof out) =>
+      scene.ops.flatMap((op) =>
+        op.kind === 'fade' && op.to === 'black' && op.dur === 0 ? [op.at] : [],
+      );
+    expect(blackHolds(out)).toEqual([7, 16]);
+    expect(blackHolds(q0)).toEqual([7, 16, 22.05, 29.9]);
+    for (const cutAt of blackHolds(q0)) {
+      expect(
+        q0.ops.some(
+          (op) =>
+            op.kind === 'fade' &&
+            op.to === 'black' &&
+            op.dur === 1.2 &&
+            Math.abs(op.at - (cutAt - 1.6)) < 1e-8,
+        ),
+      ).toBe(true);
+      expect(
+        q0.ops.some(
+          (op) =>
+            op.kind === 'fade' &&
+            op.to === 'clear' &&
+            op.dur === 1.6 &&
+            Math.abs(op.at - (cutAt + 0.4)) < 1e-8,
+        ),
+      ).toBe(true);
     }
 
     const shotKinds = (scene: typeof out): string[] =>
@@ -609,7 +661,7 @@ describe('the voyage cinematic', () => {
       );
     expect(dollySpecs(out)).toEqual([
       {
-        at: 19.05,
+        at: 22.05,
         shot: {
           kind: 'dolly',
           points: [
@@ -639,7 +691,7 @@ describe('the voyage cinematic', () => {
     ]);
     expect(dollySpecs(back)).toEqual([
       {
-        at: 19.05,
+        at: 22.05,
         shot: {
           kind: 'dolly',
           points: [
@@ -666,7 +718,7 @@ describe('the voyage cinematic', () => {
     ]);
     expect(dollySpecs(q0)).toEqual([
       {
-        at: 19.05,
+        at: 22.05,
         shot: {
           kind: 'dolly',
           // Hale's memorial moved to the berm crest north of the redoubt, so
@@ -680,8 +732,9 @@ describe('the voyage cinematic', () => {
           ],
           lookAt: {
             kind: 'point',
-            // 3.4 up holds the figure, not the plinth
-            point: { x: 805, z: 139, height: 3.4 },
+            // 5.9 holds the figure, not the column: the memorial column carries
+            // the bronze from 4.48 to 7.48, where the old plinth topped out at 4.8
+            point: { x: 805, z: 139, height: 5.9 },
           },
           dur: 4.8,
           entry: 'snap',
@@ -689,7 +742,7 @@ describe('the voyage cinematic', () => {
         },
       },
       {
-        at: 26.95,
+        at: 29.9,
         shot: {
           kind: 'dolly',
           points: [
@@ -768,13 +821,13 @@ describe('the voyage cinematic', () => {
         op.kind === 'playerWalk' ? [{ at: op.at, to: op.to, speed: op.speed }] : [],
       );
     expect(walks(out)).toHaveLength(1);
-    expect(walks(out)[0]?.at).toBeCloseTo(19.05, 8);
+    expect(walks(out)[0]?.at).toBeCloseTo(22.05, 8);
     expect(walks(out)[0]).toMatchObject({
       to: { x: GULLHAVEN_HARBOR.gangplank.x, z: GULLHAVEN_HARBOR.gangplank.z },
       speed: 2.75,
     });
     expect(walks(back)).toHaveLength(1);
-    expect(walks(back)[0]?.at).toBeCloseTo(19.05, 8);
+    expect(walks(back)[0]?.at).toBeCloseTo(22.05, 8);
     expect(walks(back)[0]).toMatchObject({
       to: { x: MAINLAND_HARBOR.gangplank.x, z: MAINLAND_HARBOR.gangplank.z },
       speed: 2.75,
@@ -785,17 +838,17 @@ describe('the voyage cinematic', () => {
     for (const scene of [out, back]) {
       // Owner pass three: the park transition is a HARD CUT, not a fade.
       // No fade op lands between the arrival cut's reveal and the release.
-      const lateFades = scene.ops.filter((op) => op.kind === 'fade' && op.at > 13.5);
+      const lateFades = scene.ops.filter((op) => op.kind === 'fade' && op.at > 16.4);
       expect(lateFades).toEqual([]);
       const parkShot = scene.ops.find(
-        (op) => op.kind === 'camera' && Math.abs(op.at - 19.05) < 1e-8,
+        (op) => op.kind === 'camera' && Math.abs(op.at - 22.05) < 1e-8,
       );
       expect(parkShot).toMatchObject({ kind: 'camera', shot: { kind: 'dolly', entry: 'snap' } });
     }
 
     const arrivalCutKinds = (scene: typeof out) =>
       scene.ops
-        .filter((op) => Math.abs(op.at - 19.05) < 1e-8)
+        .filter((op) => Math.abs(op.at - 22.05) < 1e-8)
         .map((op) => (op.kind === 'prop' ? `${op.kind}/${op.cue}` : op.kind));
     expect(arrivalCutKinds(out)).toEqual([`prop/${LB_PROP_CUE_PARK}`, 'playerWalk', 'camera']);
     expect(arrivalCutKinds(back)).toEqual([`prop/${LB_PROP_CUE_PARK}`, 'playerWalk', 'camera']);
@@ -809,9 +862,9 @@ describe('the voyage cinematic', () => {
       { key: 'lb.q0.scene.toll', dur: 6.5 },
     ]);
     expect(q0Lines.map((line) => line.at)).toEqual([
-      expect.closeTo(14.7, 8),
-      expect.closeTo(19.25, 8),
-      expect.closeTo(27.15, 8),
+      expect.closeTo(17.7, 8),
+      expect.closeTo(22.25, 8),
+      expect.closeTo(30.1, 8),
     ]);
     expect(
       q0.ops.filter((op) => op.kind === 'music' && op.directive === 'lb_bell_toll_one'),
@@ -831,15 +884,16 @@ describe('the voyage cinematic', () => {
     board(sim, 238, -47.5, 'ch_lb_ferry_fare_out');
     expect(sim.player.pos.x).toBeGreaterThan(600); // teleported to Gullhaven
     expect(sim.sceneActiveForLocalPlayer()).toBe(true);
-    // And it clears once the scene finishes.
-    collect(sim, 30 * 20);
+    // And it clears once the scene finishes (the re-ride runs 30.15s).
+    collect(sim, 31 * 20);
     expect(sim.sceneActiveForLocalPlayer()).toBe(false);
   });
 
   it('the first paid crossing plays the spliced voyage: ship cue, bell, then the arrival', () => {
     const sim = makeRider();
     board(sim, 238, -47.5, 'ch_lb_ferry_fare_out');
-    const ops = sceneOps(collect(sim, 21 * 20));
+    // Past the 22.05s park beat, which is the last of the four prop cues.
+    const ops = sceneOps(collect(sim, 24 * 20));
     expect(ops.every((e) => e.sceneId === 'scn_lb_q0_voyage')).toBe(true);
     const props = ops
       .filter((e): e is typeof e & { op: { kind: 'prop'; target: string; cue: string } } => {
@@ -913,13 +967,14 @@ describe('the voyage cinematic', () => {
     const sim = makeRider();
     sim.ctx.players.get(sim.playerId)?.questsDone.add(Q0);
     board(sim, 238, -47.5, 'ch_lb_ferry_fare_out');
-    // Let the outbound departure finish before riding back.
-    collect(sim, 29 * 20);
+    // Let the outbound departure finish before riding back (30.15s).
+    collect(sim, 31 * 20);
     expect(sim.player.pos).toEqual(
       sim.groundPos(GULLHAVEN_HARBOR.gangplank.x, GULLHAVEN_HARBOR.gangplank.z),
     );
     board(sim, GULLHAVEN_HARBOR.boarding.x, GULLHAVEN_HARBOR.boarding.z, 'ch_lb_ferry_fare_back');
-    const ops = sceneOps(collect(sim, 14 * 20));
+    // Past the 16s arrival cue, short of the 22.05s park cue and walk.
+    const ops = sceneOps(collect(sim, 17 * 20));
     expect(ops.length).toBeGreaterThan(0);
     expect(ops.every((e) => e.sceneId === 'scn_lb_ferry_depart_back')).toBe(true);
     const props = ops

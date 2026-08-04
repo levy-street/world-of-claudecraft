@@ -4735,6 +4735,9 @@ export type SimEvent = {
       x: number;
       z: number;
     }
+  // Read a war memorial. Carries the MemorialDef id only: both hosts hold the
+  // roll of honour as content, so the names never travel over the wire.
+  | { type: 'memorial'; memorialId: string }
   | { type: 'mailArrived'; senderName: string; letterId?: string }
   | { type: 'mailResult'; code: MailResultCode; value?: number; name?: string }
   // Guild calendar outcome. Emitted only by the server's SocialService (the
@@ -6039,12 +6042,76 @@ export interface GraveyardDef {
   z: number;
 }
 
+/** One name on a memorial's Roll of Honour. Proper nouns: never localized. */
+export interface MemorialRollEntry {
+  /** Space-separated initials, e.g. "J T". May be a single letter. */
+  initials: string;
+  surname: string;
+}
+
+/**
+ * An interactable war memorial. The monument itself is a decor prop with its
+ * own collider; this record is the gameplay anchor that makes it readable, so
+ * the roll of honour stays data rather than baked lettering.
+ */
+export interface MemorialDef {
+  id: string;
+  x: number;
+  z: number;
+  /** Yards from the anchor within which the plaque can be read. */
+  interactionRadius: number;
+  /** Where a reader stands to face the inscribed side. */
+  frontStandingPoint: { x: number; z: number };
+  /**
+   * Radius the scatter keeps clear of trees and rocks. A memorial precinct
+   * needs sky and sightlines; wild forest crowding the mound is what made the
+   * first pass read as a statue lost in a wood.
+   */
+  clearingRadius: number;
+  /** Oldest first, so the newest name is last and the space after it is bare. */
+  roll: readonly MemorialRollEntry[];
+  /** The rail ring: renders and collides from these same numbers. */
+  rail: MemorialRailDef;
+}
+
+/** One upright of a memorial's rail. Square in plan. */
+export interface MemorialRailPost {
+  x: number;
+  z: number;
+}
+
+/** One rail panel. `rot` 0 runs the panel's long axis along X. */
+export interface MemorialRailPanel {
+  x: number;
+  z: number;
+  rot?: number;
+}
+
+/**
+ * The rail ring around a memorial precinct. ONE source of truth: the renderer
+ * derives its prop placements from this and colliders.ts derives an oriented
+ * box per member from the same numbers, so what you see and what stops you
+ * cannot drift apart. Half-extents are measured off the shipping GLBs.
+ */
+export interface MemorialRailDef {
+  /** Half-extent of a square post (garden_iron_pillar is 0.5 across). */
+  postHalf: number;
+  /** Half-length of a panel along its own long axis (the panel is 4.0). */
+  panelHalfLength: number;
+  /** Half-depth of a panel across it (the panel is 0.5 thick). */
+  panelHalfDepth: number;
+  height: number;
+  posts: readonly MemorialRailPost[];
+  panels: readonly MemorialRailPanel[];
+}
+
 /** Optional static gameplay anchors supplied by a world definition. */
 export interface WorldServicesDef {
   stations?: readonly StationDef[];
   mailboxes?: readonly MailboxDef[];
   noticeboards?: readonly NoticeboardDef[];
   musterBoards?: readonly MusterBoardDef[];
+  memorials?: readonly MemorialDef[];
   graveyards?: readonly GraveyardDef[];
 }
 
