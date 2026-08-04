@@ -31,6 +31,7 @@ import { applyCanopyDetail } from './canopy_detail';
 import {
   applyInstanceCollapse,
   type CollapseRole,
+  type CollapseWindowValues,
   updateCollapseUniforms,
 } from './foliage_collapse';
 import {
@@ -40,12 +41,19 @@ import {
   insideGrassHubExclusion,
 } from './foliage_core';
 import {
+  createImpostorSession,
+  type ImpostorBucketHandle,
+  type ImpostorCategory,
+  type ImpostorSession,
+  impostorPrewarmMeshes,
+  impostorsActive,
+} from './foliage_impostor';
+import { IMPOSTOR_SWAP_FADE, spriteSwapDistance } from './foliage_impostor_core';
+import {
   type BucketWindowInput,
   bucketVisible,
   foliageDistanceScale,
   foliageFogLimit,
-  type InstanceCullWindows,
-  instanceCullWindowsInto,
   type LodDists,
   lodDistsFor,
   treeDetailDistance,
@@ -81,6 +89,7 @@ import {
   projectedPixelSize,
   reorderInstanceDataByStableRank,
 } from './perceptual_lod_core';
+import { collectBuildingImpostors } from './props';
 import { attachShadowPassOnlyGate } from './shadow_pass_gate_core';
 import { freezeStaticMatrices } from './static_matrix';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
@@ -209,8 +218,18 @@ const TREE_MODEL_URLS: ReadonlySet<string> = new Set([
   ...FOLIAGE_MODEL_URLS_HIGH.twisted,
   ...FOLIAGE_MODEL_URLS_HIGH.dead,
 ]);
+// Bush kinds hand off to sprites at the dress swap on the sprite arm; ferns
+// and mushrooms are sub-pixel long before their cull and stay plain.
+const DRESS_SPRITE_URLS: ReadonlySet<string> = new Set([
+  FOLIAGE_MODEL_URLS_HIGH.bush[0],
+  FOLIAGE_MODEL_URLS_HIGH.bushFlowers[0],
+]);
 const collapseRoleForUrl = (url: string): CollapseRole =>
-  TREE_MODEL_URLS.has(url) ? 'tree' : 'plain';
+  TREE_MODEL_URLS.has(url)
+    ? 'tree'
+    : impostorsActive() && DRESS_SPRITE_URLS.has(url)
+      ? 'dress'
+      : 'plain';
 
 // kick off fetches at import; buildFoliage assumes the cache is populated
 const loadedModels = new Map<string, GLTF>();
@@ -473,9 +492,9 @@ export interface FoliageView {
    * Per-frame: grass fade + ring rebuild, fog culling of far tree buckets.
    * `fogNear`/`fogFar` are the LIVE fog (residency-clamped): they drive the
    * cull. `atmosFogNear`/`atmosFogFar` are the atmospheric fog (authored
-   * preset x day-night scale, pre-clamp): they drive the real-model/impostor
-   * swap, so a streaming fog wall never drags impostor cones toward the
-   * camera (see treeDetailDistance's input contract in foliage_lod.ts).
+   * preset x day-night scale, pre-clamp): they drive the real-model/sprite
+   * handoff, so a streaming fog wall never drags the boundary toward the
+   * camera (input contracts in foliage_lod.ts and foliage_impostor_core.ts).
    */
   update(
     px: number,
@@ -570,6 +589,8 @@ interface BucketMesh {
   minAtDetail?: boolean;
   maxAtDetail?: boolean;
   lod: 'core' | 'near-fill' | 'shadow' | 'proxy' | 'impostor' | 'rock' | 'dressing';
+  /** sprite rows: which per-frame swap the row keys its window on */
+  spriteCategory?: ImpostorCategory;
   draws: number;
   triangles: number;
 }
@@ -986,66 +1007,19 @@ interface SpeciesSpec {
   sink: number; // x instance scale, beyond the model's own below-ground roots
   leafTint: Record<BiomeId, number> | number;
   castBarkShadow: boolean;
-  proxyShape: 'pine' | 'round' | 'twisted' | 'dead';
+  /**
+   * Tint family the whole SPRITE takes past the swap. One sprite covers bark
+   * and canopy, so the dominant surface wins: canopied species ride the leaf
+   * tint, the bare dead trees the trunk family. Same rule the old cone
+   * stand-ins used, kept so the handoff does not shift a tree's color.
+   */
+  spriteTint: 'leaf' | 'trunk';
+  /** atlas archetype per model variant, filled while the sprite arm builds */
+  impostorRows?: number[];
   /** hide the heavy bark mesh beyond BARK_FAR (needs a canopy that covers) */
   cullBarkFar?: boolean;
   /** beyond BARK_FAR swap the bark for a cheap cylinder (straight trunks) */
   farTrunkProxy?: boolean;
-}
-
-const farTreeProxyGeoCache = new Map<SpeciesSpec['proxyShape'], THREE.BufferGeometry>();
-const farTreeProxyMatCache = new Map<string, THREE.Material>();
-
-function withWhiteVertexColors(geo: THREE.BufferGeometry): THREE.BufferGeometry {
-  const count = geo.getAttribute('position')?.count ?? 0;
-  geo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(count * 3).fill(1), 3));
-  return geo;
-}
-
-function farTreeProxyGeo(shape: SpeciesSpec['proxyShape']): THREE.BufferGeometry {
-  const cached = farTreeProxyGeoCache.get(shape);
-  if (cached) return cached;
-  let geo: THREE.BufferGeometry;
-  if (shape === 'pine') {
-    geo = new THREE.ConeGeometry(2.2, 7.2, 7, 2);
-    geo.translate(0, 3.6, 0);
-  } else if (shape === 'dead') {
-    geo = new THREE.CylinderGeometry(0.18, 0.42, 6.4, 7, 2, true);
-    geo.translate(0, 3.2, 0);
-  } else if (shape === 'twisted') {
-    geo = new THREE.ConeGeometry(2.6, 5.6, 8, 2);
-    geo.scale(1.15, 1, 0.75);
-    geo.translate(0, 2.8, 0);
-  } else {
-    geo = new THREE.SphereGeometry(2.35, 8, 5);
-    geo.scale(1.15, 0.9, 1.15);
-    geo.translate(0, 4.4, 0);
-  }
-  geo = withWhiteVertexColors(geo);
-  farTreeProxyGeoCache.set(shape, geo);
-  return geo;
-}
-
-function farTreeProxyMaterial(shape: SpeciesSpec['proxyShape']): THREE.Material {
-  const cached = farTreeProxyMatCache.get(shape);
-  if (cached) return cached;
-  const fallback =
-    shape === 'dead'
-      ? 0xbca784
-      : shape === 'pine'
-        ? 0xb8d7a5
-        : shape === 'twisted'
-          ? 0xb7cda0
-          : 0xc0d8a8;
-  const mat = new THREE.MeshLambertMaterial({
-    color: fallback,
-    vertexColors: true,
-    fog: true,
-  });
-  mat.name = `foliage:far-${shape}`;
-  applyInstanceCollapse(mat, 'impostor');
-  farTreeProxyMatCache.set(shape, mat);
-  return mat;
 }
 
 // Compile every foliage shader program up front. The renderer streams its tree /
@@ -1101,12 +1075,11 @@ export function buildFoliageMaterialPrewarmGroup(): THREE.Group {
   for (const url of speciesUrls) {
     for (const part of extractParts(url)) add(part.geometry, part.material);
   }
-  // Far-tree impostors (gated exactly like the live tree builder).
-  if (GFX.standardMaterials && !GFX.leanFoliage) {
-    for (const shape of ['pine', 'round', 'twisted', 'dead'] as const) {
-      add(farTreeProxyGeo(shape), farTreeProxyMaterial(shape));
-    }
-  }
+  // Far-foliage sprite impostors: one 1-instance mesh per category material,
+  // attributes included, so their programs link in this pass too. Empty until
+  // buildFoliage has baked the atlas (renderer builds the world before the
+  // prewarm pass runs) and on the arms without sprites.
+  for (const mesh of impostorPrewarmMeshes()) group.add(mesh);
   return group;
 }
 
@@ -1190,6 +1163,7 @@ function placeSpecies(
     atDetail?: { min?: boolean; max?: boolean },
   ) => void,
   hideRegistry: TreeHideable[],
+  impostorBucket: ImpostorBucketHandle | null,
 ): void {
   if (items.length === 0) return;
   const subset = variantSubset(
@@ -1233,41 +1207,43 @@ function placeSpecies(
       hideRegistry.push(...handles);
       return { ...g, handles };
     });
-    if (GFX.standardMaterials && !GFX.leanFoliage) {
+    // Every tree in the group, near-fill included, contributes a sprite to
+    // the bucket's shared impostor mesh: placement, yaw, scale and height
+    // jitter mirror the real instance exactly so the handoff never moves,
+    // resizes or recolors a tree. Near-fill trees used to vanish outright at
+    // treeFillFar; their sprites now carry the density to the fog wall.
+    if (impostorBucket && spec.impostorRows) {
+      const row = spec.impostorRows[subset[gi]];
       for (const group of handlesByLod) {
-        if (group.maxDist !== undefined && group.maxDist <= treeDetailFar) continue;
-        const proxy = new THREE.InstancedMesh(
-          farTreeProxyGeo(spec.proxyShape),
-          farTreeProxyMaterial(spec.proxyShape),
-          group.items.length,
-        );
-        group.items.forEach((d, i) => {
+        for (const d of group.items) {
           const y = terrainHeight(d.x, d.z, seed);
           const s = d.scale * spec.baseScale;
-          q.setFromAxisAngle(up, d.variant * 2.1 + hashAt(d.x, d.z, 11) * Math.PI * 2);
-          m.compose(v.set(d.x, y - spec.sink * s, d.z), q, sv.set(s, s, s));
-          proxy.setMatrixAt(i, m);
+          const heightJitter = 1 + (hashAt(d.x, d.z, 31) - 0.5) * 0.18;
+          const yaw = d.variant * 2.1 + hashAt(d.x, d.z, 11) * Math.PI * 2;
           const tintHex =
-            spec.proxyShape === 'dead'
+            spec.spriteTint === 'trunk'
               ? TRUNK_TINT[d.biome]
               : typeof spec.leafTint === 'number'
                 ? spec.leafTint
                 : spec.leafTint[d.biome];
-          proxy.setColorAt(
-            i,
+          impostorBucket.add(
+            row,
+            d.x,
+            y - spec.sink * s,
+            d.z,
+            yaw,
+            s,
+            heightJitter,
             softTint(
               d.x,
               d.z,
               tintHex,
               c,
-              spec.proxyShape === 'dead' ? BARK_TINT_SOFTEN : leafSoften(d.biome),
+              spec.spriteTint === 'trunk' ? BARK_TINT_SOFTEN : leafSoften(d.biome),
+              spec.spriteTint === 'trunk' ? 0.5 : 1,
             ),
           );
-        });
-        if (proxy.instanceColor) proxy.instanceColor.needsUpdate = true;
-        proxy.receiveShadow = true;
-        parent.add(proxy);
-        register(proxy, 'impostor', undefined, group.maxDist, { min: true });
+        }
       }
     }
     for (const part of spec.sets[subset[gi]]) {
@@ -1302,7 +1278,11 @@ function placeSpecies(
         // and (for species whose canopy covers the trunk) the early bark cull.
         // The swap itself is symbolic: it follows fog, so only update() knows it.
         const numericCaps: number[] = [];
-        if (group.maxDist !== undefined) numericCaps.push(group.maxDist);
+        // On the sprite arm the near-fill cap is retired: instances collapse at
+        // the shared tree swap anyway (always inside the cap), and the
+        // center-measured bucket cull used to drop a slab's still-near trees
+        // with no sprite behind them.
+        if (group.maxDist !== undefined && !impostorsActive()) numericCaps.push(group.maxDist);
         if (cullBark) numericCaps.push(barkFar);
         const maxDist = numericCaps.length > 0 ? Math.min(...numericCaps) : undefined;
         register(im, group.lod, undefined, maxDist, { max: true });
@@ -1331,7 +1311,7 @@ function placeSpecies(
             maxDist === undefined ? treeDetailFar : Math.min(maxDist, treeDetailFar);
           register(shadow, 'shadow', undefined, shadowMax, { max: true });
         }
-        if (GFX.standardMaterials && !part.isLeaf && spec.farTrunkProxy) {
+        if (GFX.standardMaterials && !impostorsActive() && !part.isLeaf && spec.farTrunkProxy) {
           const proxy = cloneInstancedTo(im, farTrunkGeo(part.geometry), part.material);
           proxy.receiveShadow = true;
           for (let i = 0; i < group.items.length; i++) {
@@ -1356,6 +1336,7 @@ function buildTrees(
   seed: number,
   registry: BucketMesh[],
   hideRegistry: TreeHideable[],
+  session: ImpostorSession | null,
 ): void {
   const modelUrls = foliageModelUrls();
   // The Evergarden curates its trees: no random trees or boulders inside a
@@ -1401,7 +1382,7 @@ function buildTrees(
     sink: 0.05,
     leafTint: PINE_TINT,
     castBarkShadow: false,
-    proxyShape: 'pine',
+    spriteTint: 'leaf',
     cullBarkFar: true, // pine canopies start ~2u up: no proxy needed in fog
   };
   // Mild oak leaf lift. The old 6.5x here was calibrated on a whole-atlas
@@ -1425,7 +1406,7 @@ function buildTrees(
     sink: 0.05,
     leafTint: OAK_TINT,
     castBarkShadow: false,
-    proxyShape: 'round',
+    spriteTint: 'leaf',
     farTrunkProxy: true, // oak crowns float without a trunk stand-in
   };
   const twistedSpec: SpeciesSpec = {
@@ -1434,10 +1415,9 @@ function buildTrees(
     salt: 57,
     baseScale: 0.5,
     sink: 0.05,
-    // twisted trunks sprawl sideways — no cheap proxy fits, keep them whole
     leafTint: SWAMP_CANOPY_TINT,
     castBarkShadow: false,
-    proxyShape: 'twisted',
+    spriteTint: 'leaf',
   };
   const deadSpec: SpeciesSpec = {
     sets: modelUrls.dead.map(extractParts),
@@ -1445,11 +1425,29 @@ function buildTrees(
     salt: 60,
     baseScale: 0.7,
     sink: 0.05,
-    // dead trees have no canopy — the bark must cast or they go shadowless
+    // dead trees have no canopy, so the bark must cast or they go shadowless
     leafTint: TRUNK_TINT.marsh,
     castBarkShadow: true,
-    proxyShape: 'dead',
+    spriteTint: 'trunk',
   };
+  if (session) {
+    // one atlas row per model variant, keyed by source URL so a species list
+    // change re-keys its rows with it
+    pineSpec.impostorRows = pineSpec.sets.map((parts, i) =>
+      session.registerArchetype('tree', modelUrls.pine[i], parts),
+    );
+    oakSpec.impostorRows = oakSpec.sets.map((parts, i) =>
+      session.registerArchetype('tree', modelUrls.oak[i], parts),
+    );
+    twistedSpec.impostorRows = twistedSpec.sets.map((parts, i) =>
+      session.registerArchetype('tree', modelUrls.twisted[i], parts),
+    );
+    // windMul 0: the dead species is bare rigid wood; the leafy 0.08 sway
+    // that sells a canopy reads as the whole trunk bending on a snag
+    deadSpec.impostorRows = deadSpec.sets.map((parts, i) =>
+      session.registerArchetype('tree', modelUrls.dead[i], parts, 0),
+    );
+  }
 
   // rocks: 3 single variants + a merged 3-boulder cluster, each in a mossy-top
   // and a snow-dusted colorway (baked vertex colors over the rock texture)
@@ -1461,7 +1459,7 @@ function buildTrees(
   const rockMat = (rockParts[0][0].material as THREE.MeshStandardMaterial).clone();
   rockMat.vertexColors = true;
   // clone() drops shader hooks, so the clone re-takes its collapse window
-  applyInstanceCollapse(rockMat, 'plain');
+  applyInstanceCollapse(rockMat, impostorsActive() ? 'rock' : 'plain');
   const colorway = (tint: THREE.Color): THREE.BufferGeometry[] => {
     const singles = rockParts.map((parts) => bakeTopTint(parts[0].geometry.clone(), tint));
     const member = (
@@ -1484,6 +1482,19 @@ function buildTrees(
   };
   const mossRocks = colorway(new THREE.Color(0.62, 0.82, 0.45));
   const snowRocks = colorway(new THREE.Color(1.5, 1.55, 1.65));
+  const rockPart = (geometry: THREE.BufferGeometry) => [
+    { geometry, material: rockMat as THREE.Material, isLeaf: false },
+  ];
+  const rockRows = session
+    ? {
+        moss: mossRocks.map((g, i) =>
+          session.registerArchetype('rock', `rock:moss:${i}`, rockPart(g)),
+        ),
+        snow: snowRocks.map((g, i) =>
+          session.registerArchetype('rock', `rock:snow:${i}`, rockPart(g)),
+        ),
+      }
+    : null;
 
   for (const bucket of buckets.values()) {
     const { items } = bucket;
@@ -1517,6 +1528,7 @@ function buildTrees(
       minDist?: number,
       maxDist?: number,
       atDetail?: { min?: boolean; max?: boolean },
+      spriteCategory?: ImpostorCategory,
     ): void => {
       registry.push({
         mesh,
@@ -1528,14 +1540,19 @@ function buildTrees(
         minAtDetail: atDetail?.min,
         maxAtDetail: atDetail?.max,
         lod,
+        spriteCategory,
         ...bucketMeshCost(mesh),
       });
     };
 
-    placeSpecies(parent, seed, bucket, pines, pineSpec, register, hideRegistry);
-    placeSpecies(parent, seed, bucket, oaks, oakSpec, register, hideRegistry);
-    placeSpecies(parent, seed, bucket, twisteds, twistedSpec, register, hideRegistry);
-    placeSpecies(parent, seed, bucket, deads, deadSpec, register, hideRegistry);
+    const treeSprites =
+      session && pines.length + oaks.length + twisteds.length + deads.length > 0
+        ? session.bucket('tree', bx, bz, bRadius)
+        : null;
+    placeSpecies(parent, seed, bucket, pines, pineSpec, register, hideRegistry, treeSprites);
+    placeSpecies(parent, seed, bucket, oaks, oakSpec, register, hideRegistry, treeSprites);
+    placeSpecies(parent, seed, bucket, twisteds, twistedSpec, register, hideRegistry, treeSprites);
+    placeSpecies(parent, seed, bucket, deads, deadSpec, register, hideRegistry, treeSprites);
 
     if (rocks.length > 0) {
       const isCluster = (r: Decoration): boolean => hashAt(r.x, r.z, 7) > 0.72;
@@ -1547,13 +1564,23 @@ function buildTrees(
       // [singles..., cluster], and the low-tier model list ships fewer single
       // variants than the high tier, so a hardcoded index (set[3]) resolved to
       // undefined there and handed an undefined geometry to the instancer.
-      const groupGeo = (r: Decoration): THREE.BufferGeometry => {
-        const set = isSnowy(r) ? snowRocks : mossRocks;
+      const groupPick = (r: Decoration): { snow: boolean; index: number } => {
+        const snow = isSnowy(r);
+        const set = snow ? snowRocks : mossRocks;
         const singles = Math.max(1, set.length - 1); // last entry is the cluster
-        if (isCluster(r)) return set[set.length - 1];
-        const pick = singleSubset[Math.floor(hashAt(r.x, r.z, 72) * singleSubset.length)];
-        return set[Math.min(pick, singles - 1)];
+        const index = isCluster(r)
+          ? set.length - 1
+          : Math.min(
+              singleSubset[Math.floor(hashAt(r.x, r.z, 72) * singleSubset.length)],
+              singles - 1,
+            );
+        return { snow, index };
       };
+      const groupGeo = (r: Decoration): THREE.BufferGeometry => {
+        const pick = groupPick(r);
+        return (pick.snow ? snowRocks : mossRocks)[pick.index];
+      };
+      const rockSprites = session && rockRows ? session.bucket('rock', bx, bz, bRadius) : null;
       const groups = new Map<THREE.BufferGeometry, Decoration[]>();
       for (const r of rocks) {
         const geo = groupGeo(r);
@@ -1590,11 +1617,36 @@ function buildTrees(
           // stone — pale rocks on green foothill grass read as eggs
           const rockHex = r.biome === 'peaks' && !isSnowy(r) ? 0x6f6e62 : ROCK_TINT[r.biome];
           rockMesh.setColorAt(i, softTint(r.x, r.z, rockHex, c, ROCK_TINT_SOFTEN));
+          // The rock's sprite mirrors the placement (yaw, footprint, seated
+          // height, tint); the tilt folds into the baked views well enough at
+          // the rock swap range, where a boulder is a handful of pixels.
+          if (rockSprites && rockRows) {
+            const pick = groupPick(r);
+            const widthScale = (sxz1 + sxz2) / 2;
+            rockSprites.add(
+              rockRows[pick.snow ? 'snow' : 'moss'][pick.index],
+              r.x,
+              y - ROCK_SINK_UNITS * sy,
+              r.z,
+              r.variant * 1.7 + h3 * 2.0,
+              widthScale,
+              sy / Math.max(widthScale, 1e-4),
+              c,
+            );
+          }
         });
         // no rock shadows cast: sub-pixel at typical camera range, real draw cost
         rockMesh.receiveShadow = true;
         parent.add(rockMesh);
-        register(rockMesh, 'rock', undefined, lodDists().rockFar);
+        if (impostorsActive()) {
+          // Radius-aware cull against the rock swap (spriteCategory routes it
+          // in update()): the old center-measured cap dropped a slab's still
+          // near rocks in one step, and with sprites visible beyond the drop
+          // the missing annulus finally read as a hole.
+          register(rockMesh, 'rock', undefined, undefined, { max: true }, 'rock');
+        } else {
+          register(rockMesh, 'rock', undefined, lodDists().rockFar);
+        }
       }
     }
   }
@@ -1613,6 +1665,73 @@ interface DressingSpot {
   scale: number;
   /** authored bloom tint (parterre roses); unset spots pick by biome hash */
   bloomTint?: number;
+}
+
+// Per-spot dressing tint, shared by the real instanced meshes and the sprite
+// impostors so the handoff never shifts a bush's color. Extracted verbatim
+// from the placement loop; every arm writes into `out` and returns it.
+function dressingSpotTint(
+  kind: DressKind,
+  s: DressingSpot,
+  seed: number,
+  out: THREE.Color,
+): THREE.Color {
+  if (kind === 'mushroom') {
+    // mushrooms keep their painted cap colors: brightness jitter only
+    return out.setScalar(0.85 + hashAt(s.x, s.z, 47) * 0.3);
+  }
+  const biome = zoneBiomeAt(s.x, s.z);
+  if (kind === 'bushFlowers' && biome === 'amber') {
+    return out.set(AMBER_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * AMBER_BLOOM_TINTS.length)]);
+  }
+  if (kind === 'bushFlowers' && biome === 'fen') {
+    return out.set(FEN_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * FEN_BLOOM_TINTS.length)]);
+  }
+  if (kind === 'bushFlowers' && biome === 'night') {
+    // the nightblooms take their tint raw: pale petals must pop against the
+    // dark ground, not soften toward it
+    return out.set(NIGHT_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * NIGHT_BLOOM_TINTS.length)]);
+  }
+  if (kind === 'bushFlowers' && biome === 'garden') {
+    // the roses take their tint raw too: a rose bed should read red.
+    // Parterre roses carry their bed's authored color.
+    return out.set(
+      s.bloomTint ??
+        GARDEN_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * GARDEN_BLOOM_TINTS.length)],
+    );
+  }
+  if (kind === 'bushFlowers' && biome === 'gale') {
+    // sea thrift takes its tint raw: pink heads over silver grass
+    return out.set(GALE_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * GALE_BLOOM_TINTS.length)]);
+  }
+  if (kind === 'bushFlowers' && biome === 'dusk') {
+    // the Hollow's flowering bushes bloom in several colors, not one
+    const tint = DUSK_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * DUSK_BLOOM_TINTS.length)];
+    return softTint(
+      s.x,
+      s.z,
+      tint,
+      out,
+      GFX.leanFoliage ? DRESS_TINT_SOFTEN_LOW : DRESS_TINT_SOFTEN,
+    );
+  }
+  // Bushes and ferns grow out of the same meadow as the grass tufts: key
+  // their tint to the ground colour, then ride the biome accent so authored
+  // casts survive. The kit albedo is dark, hence the lift gain; a flat biome
+  // constant left them reading as near-black clumps on the open field.
+  const dressAccent = DRESS_ACCENT[biome] ?? [1, 1, 1];
+  groundGrassColorAt(s.x, s.z, seed, out);
+  out.setRGB(
+    Math.min(1.5, DRESS_GROUND_GAIN[0] * dressAccent[0] * (0.65 + 0.7 * out.r)),
+    Math.min(1.5, DRESS_GROUND_GAIN[1] * dressAccent[1] * (0.65 + 0.7 * out.g)),
+    Math.min(1.5, DRESS_GROUND_GAIN[2] * dressAccent[2] * (0.65 + 0.7 * out.b)),
+  );
+  out.offsetHSL(
+    (hashAt(s.x, s.z, 1) - 0.5) * 0.03,
+    (hashAt(s.x, s.z, 2) - 0.5) * 0.06,
+    (hashAt(s.x, s.z, 3) - 0.5) * 0.05,
+  );
+  return out;
 }
 
 const DRESS_STEP_HIGH = 12;
@@ -1798,7 +1917,12 @@ function generateDressing(seed: number): DressingSpot[] {
   return out;
 }
 
-function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]): void {
+function buildDressing(
+  parent: THREE.Group,
+  seed: number,
+  registry: BucketMesh[],
+  session: ImpostorSession | null,
+): void {
   const modelUrls = foliageModelUrls();
   const kindParts: Record<DressKind, ModelPart[]> = {
     bush: extractParts(modelUrls.bush[0]),
@@ -1829,6 +1953,16 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
       (part.material as THREE.MeshStandardMaterial).color.setRGB(lift[0], lift[1], lift[2]);
     }
   }
+  const dressRows = session
+    ? {
+        bush: session.registerArchetype('dress', modelUrls.bush[0], kindParts.bush),
+        bushFlowers: session.registerArchetype(
+          'dress',
+          modelUrls.bushFlowers[0],
+          kindParts.bushFlowers,
+        ),
+      }
+    : null;
   const buckets = new Map<string, DressingSpot[]>();
   for (const spot of generateDressing(seed)) {
     const key = `${Math.floor((spot.z - WORLD_MIN_Z) / BUCKET_DEPTH)}:${spot.x < 0 ? 0 : 1}`;
@@ -1863,7 +1997,37 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
     // higher ROI than adding more far canopy or post-processing work.
     const maxKinds = 4;
     const kept = [...byKind.entries()].sort((a, b) => b[1].length - a[1].length).slice(0, maxKinds);
+    // One shared dress sprite mesh per bucket: both bush kinds accumulate
+    // into it, so the far band stays a single draw.
+    const dressSprites =
+      session && dressRows && kept.some(([kind]) => kind === 'bush' || kind === 'bushFlowers')
+        ? session.bucket('dress', bx, bz, bRadius)
+        : null;
     for (const [kind, list] of kept) {
+      // Bush kinds hand off to sprites at the dress swap; the sprite takes
+      // the same per-spot tint the real instance takes (dressingSpotTint) so
+      // the handoff never shifts a bush's color.
+      const spriteRow =
+        dressRows && kind === 'bush'
+          ? dressRows.bush
+          : dressRows && kind === 'bushFlowers'
+            ? dressRows.bushFlowers
+            : null;
+      if (dressSprites && spriteRow !== null) {
+        for (const spot of list) {
+          const y = terrainHeight(spot.x, spot.z, seed);
+          dressSprites.add(
+            spriteRow,
+            spot.x,
+            y - 0.04 * spot.scale,
+            spot.z,
+            hashAt(spot.x, spot.z, 46) * Math.PI * 2,
+            spot.scale,
+            1,
+            dressingSpotTint(kind, spot, seed, c),
+          );
+        }
+      }
       for (const part of kindParts[kind]) {
         const im = new THREE.InstancedMesh(part.geometry, part.material, list.length);
         list.forEach((s, i) => {
@@ -1871,77 +2035,22 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
           q.setFromAxisAngle(up, hashAt(s.x, s.z, 46) * Math.PI * 2);
           m.compose(v.set(s.x, y - 0.04 * s.scale, s.z), q, sv.set(s.scale, s.scale, s.scale));
           im.setMatrixAt(i, m);
-          if (kind === 'mushroom') {
-            // mushrooms keep their painted cap colors — brightness jitter only
-            im.setColorAt(i, c.setScalar(0.85 + hashAt(s.x, s.z, 47) * 0.3));
-          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.x, s.z) === 'amber') {
-            const tint =
-              AMBER_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * AMBER_BLOOM_TINTS.length)];
-            im.setColorAt(i, c.set(tint));
-          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.x, s.z) === 'fen') {
-            const tint = FEN_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * FEN_BLOOM_TINTS.length)];
-            im.setColorAt(i, c.set(tint));
-          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.x, s.z) === 'night') {
-            // the nightblooms take their tint raw: pale petals must pop
-            // against the dark ground, not soften toward it
-            const tint =
-              NIGHT_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * NIGHT_BLOOM_TINTS.length)];
-            im.setColorAt(i, c.set(tint));
-          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.x, s.z) === 'garden') {
-            // the roses take their tint raw too: a rose bed should read red.
-            // Parterre roses carry their bed's authored color.
-            const tint =
-              s.bloomTint ??
-              GARDEN_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * GARDEN_BLOOM_TINTS.length)];
-            im.setColorAt(i, c.set(tint));
-          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.x, s.z) === 'gale') {
-            // sea thrift takes its tint raw: pink heads over silver grass
-            const tint =
-              GALE_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * GALE_BLOOM_TINTS.length)];
-            im.setColorAt(i, c.set(tint));
-          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.x, s.z) === 'dusk') {
-            // the Hollow's flowering bushes bloom in several colors, not one
-            const tint =
-              DUSK_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * DUSK_BLOOM_TINTS.length)];
-            im.setColorAt(
-              i,
-              softTint(
-                s.x,
-                s.z,
-                tint,
-                c,
-                GFX.leanFoliage ? DRESS_TINT_SOFTEN_LOW : DRESS_TINT_SOFTEN,
-              ),
-            );
-          } else {
-            // Bushes and ferns grow out of the same meadow as the grass
-            // tufts: key their tint to the ground colour, then ride the
-            // biome accent so authored casts survive. The kit albedo is
-            // dark, hence the lift gain; a flat biome constant left them
-            // reading as near-black clumps on the open field.
-            const dressAccent = DRESS_ACCENT[zoneBiomeAt(s.x, s.z)] ?? [1, 1, 1];
-            groundGrassColorAt(s.x, s.z, seed, c);
-            c.setRGB(
-              Math.min(1.5, DRESS_GROUND_GAIN[0] * dressAccent[0] * (0.65 + 0.7 * c.r)),
-              Math.min(1.5, DRESS_GROUND_GAIN[1] * dressAccent[1] * (0.65 + 0.7 * c.g)),
-              Math.min(1.5, DRESS_GROUND_GAIN[2] * dressAccent[2] * (0.65 + 0.7 * c.b)),
-            );
-            c.offsetHSL(
-              (hashAt(s.x, s.z, 1) - 0.5) * 0.03,
-              (hashAt(s.x, s.z, 2) - 0.5) * 0.06,
-              (hashAt(s.x, s.z, 3) - 0.5) * 0.05,
-            );
-            im.setColorAt(i, c);
-          }
+          im.setColorAt(i, dressingSpotTint(kind, s, seed, c));
         });
         im.receiveShadow = true; // dressing casts nothing: too small to matter
         parent.add(im);
+        const spriteBacked = spriteRow !== null && dressSprites !== null;
         registry.push({
           mesh: im,
           x: bx,
           z: bz,
           radius: bRadius,
-          maxDist: lodDists().dressFar,
+          // Sprite-backed kinds cull radius-aware against the dress swap
+          // (spriteCategory routes it in update()); ferns and mushrooms have
+          // no sprite side and keep the numeric cap.
+          maxDist: spriteBacked ? undefined : lodDists().dressFar,
+          maxAtDetail: spriteBacked ? true : undefined,
+          spriteCategory: spriteBacked ? 'dress' : undefined,
           lod: 'dressing',
           ...bucketMeshCost(im),
         });
@@ -3094,7 +3203,7 @@ function updateTreeHides(
   }
 }
 
-export function buildFoliage(seed: number): FoliageView {
+export function buildFoliage(seed: number, webgl?: THREE.WebGLRenderer): FoliageView {
   const group = new THREE.Group();
   group.name = 'foliage';
   const bucketMeshes: BucketMesh[] = [];
@@ -3128,9 +3237,86 @@ export function buildFoliage(seed: number): FoliageView {
     fogLimit: 0,
   };
   // Reused per frame for the same reason as bucketWindow above.
-  const collapseWindows: InstanceCullWindows = { treeMax: 0, impostorMin: 0, fogCull: 0 };
-  buildTrees(group, seed, bucketMeshes, treeHideables);
-  buildDressing(group, seed, bucketMeshes);
+  const collapseWindows: CollapseWindowValues = {
+    treeMax: 0,
+    rockMax: 0,
+    dressMax: 0,
+    buildingMax: 0,
+    fogCull: 0,
+    fade: 0,
+    spriteFar: 0,
+  };
+  const session = webgl ? createImpostorSession() : null;
+  buildTrees(group, seed, bucketMeshes, treeHideables, session);
+  buildDressing(group, seed, bucketMeshes, session);
+  // The sprite swap law engages only once sprite meshes really exist: if the
+  // bake throws (a grown kit overflowing the atlas, a lost context) the far
+  // field falls back to the lean law instead of collapsing real trees with
+  // nothing behind them. World entry survives either way.
+  let spritesLive = false;
+  if (session && webgl) {
+    try {
+      // Village buildings and skyline decor join the same atlas: the far
+      // field shows civilization, not just forest. Placement math comes
+      // from props.ts (collectBuildingImpostors) so a sprite is always the
+      // asset the near view really renders.
+      const buildings = collectBuildingImpostors(seed);
+      const buildingRows = new Map<string, number>();
+      for (const src of buildings.sources) {
+        buildingRows.set(src.asset, session.registerArchetype('building', src.asset, src.parts));
+      }
+      if (buildings.instances.length > 0) {
+        let minX = Infinity;
+        let maxX = -Infinity;
+        let minZ = Infinity;
+        let maxZ = -Infinity;
+        for (const inst of buildings.instances) {
+          minX = Math.min(minX, inst.x);
+          maxX = Math.max(maxX, inst.x);
+          minZ = Math.min(minZ, inst.z);
+          maxZ = Math.max(maxZ, inst.z);
+        }
+        const acc = session.bucket(
+          'building',
+          (minX + maxX) / 2,
+          (minZ + maxZ) / 2,
+          Math.hypot(maxX - minX, maxZ - minZ) / 2 + 20,
+        );
+        const white = new THREE.Color(1, 1, 1);
+        for (const inst of buildings.instances) {
+          const row = buildingRows.get(inst.asset);
+          if (row === undefined) continue;
+          acc.add(
+            row,
+            inst.x,
+            inst.y,
+            inst.z,
+            inst.rot,
+            inst.widthScale,
+            inst.heightScale / Math.max(inst.widthScale, 1e-6),
+            white,
+          );
+        }
+      }
+      // One atlas bake, then one quad InstancedMesh per (bucket, category):
+      // the whole far field costs a handful of draws and 2 triangles per plant.
+      for (const reg of session.finalize(webgl, group, seed)) {
+        bucketMeshes.push({
+          mesh: reg.mesh,
+          x: reg.x,
+          z: reg.z,
+          radius: reg.radius,
+          minAtDetail: true,
+          lod: 'impostor',
+          spriteCategory: reg.category,
+          ...bucketMeshCost(reg.mesh),
+        });
+      }
+      spritesLive = true;
+    } catch (err) {
+      console.error('foliage: impostor bake failed, far field keeps the lean law', err);
+    }
+  }
   for (const b of bucketMeshes) {
     modelBucketsByLod[b.lod] = (modelBucketsByLod[b.lod] ?? 0) + 1;
     modelDraws += b.draws;
@@ -3186,25 +3372,55 @@ export function buildFoliage(seed: number): FoliageView {
         dt,
         reducedMotion,
       );
-      // Buckets fully behind the fog wall are pure overdraw. The windows
-      // themselves, including the real-model -> impostor swap (which follows the
-      // zone's fog rather than a build-time constant, so a cone is never caught
-      // standing in clear air), are decided in foliage_lod.ts and unit-tested
-      // there. The cull tracks the LIVE fog; the swap tracks the ATMOSPHERE
-      // (see the update() doc above).
+      // Buckets fully behind the fog wall are pure overdraw. The handoff laws
+      // are decided in foliage_impostor_core.ts (sprite arm) and
+      // foliage_lod.ts (lean arm) and unit-tested there. The cull tracks the
+      // LIVE fog; the handoff tracks the ATMOSPHERE (see the update() doc).
       const distanceScale = foliageDistanceScale(modelQuality, GFX.leanFoliage);
       const fogLimit = foliageFogLimit(fogFar, modelQuality);
-      const detailFar = treeDetailDistance(
-        lodDists().treeDetailFar,
-        atmosFogNear,
-        atmosFogFar,
-        distanceScale,
-        fogLimit,
-      );
+      const dists = lodDists();
+      const spritesOn = spritesLive;
+      // Sprite arm: the handoff follows the budget (sprites are legible in
+      // clear air); lean arm: the old fog-blend law, trees end in the murk.
+      const detailFar = spritesOn
+        ? spriteSwapDistance(
+            dists.treeDetailFar,
+            distanceScale,
+            atmosFogNear,
+            atmosFogFar,
+            fogLimit,
+          )
+        : treeDetailDistance(
+            dists.treeDetailFar,
+            atmosFogNear,
+            atmosFogFar,
+            distanceScale,
+            fogLimit,
+          );
+      // Real geometry never outlives the foliage cull (the model-quality trim
+      // exists to shed triangles); only the SPRITES run past it to the wall.
+      const rockSwap = Math.min(dists.rockFar * distanceScale, fogLimit);
+      const dressSwap = Math.min(dists.dressFar * distanceScale, fogLimit);
+      // Real buildings die with the detail horizon (props band culls), so
+      // their sprites step in a little inside it: the overlap band hides
+      // behind the real building it pictures.
+      const buildingSwap = Math.max(0, fogFar - 40);
       // The vertex shaders enforce these same boundaries per INSTANCE, so a
       // surviving slab no longer drags its whole tree population along with it
-      // (foliage_collapse.ts; the windows themselves are instanceCullWindows).
-      updateCollapseUniforms(instanceCullWindowsInto(detailFar, fogLimit, collapseWindows));
+      // (foliage_collapse.ts), and each sprite starts where its real twin
+      // collapsed (foliage_impostor.ts binds the same uniforms).
+      collapseWindows.treeMax = detailFar;
+      collapseWindows.rockMax = spritesOn ? rockSwap : fogLimit;
+      collapseWindows.dressMax = spritesOn ? dressSwap : fogLimit;
+      collapseWindows.buildingMax = spritesOn ? buildingSwap : fogLimit;
+      collapseWindows.fogCull = fogLimit;
+      collapseWindows.fade = spritesOn ? IMPOSTOR_SWAP_FADE : 0;
+      // Sprites run to the view horizon: with outdoor fog gone the renderer
+      // passes the whole-world envelope through atmosFogFar, so the far
+      // field carries every tree to the world rim; under a live fog (an
+      // interior, the lean arm) the wall still bounds them.
+      collapseWindows.spriteFar = Math.max(fogFar, atmosFogFar);
+      updateCollapseUniforms(collapseWindows);
       modelVisibleBuckets = 0;
       modelVisibleDraws = 0;
       modelVisibleTriangles = 0;
@@ -3229,9 +3445,19 @@ export function buildFoliage(seed: number): FoliageView {
         bucketWindow.minAtDetail = b.minAtDetail;
         bucketWindow.maxAtDetail = b.maxAtDetail;
         bucketWindow.distanceScale = distanceScale;
-        bucketWindow.detailFar = detailFar;
+        bucketWindow.detailFar =
+          b.spriteCategory === 'rock'
+            ? rockSwap
+            : b.spriteCategory === 'dress'
+              ? dressSwap
+              : b.spriteCategory === 'building'
+                ? buildingSwap
+                : detailFar;
         bucketWindow.revealScale = revealScale;
         bucketWindow.fogLimit = fogLimit;
+        bucketWindow.spriteRow = b.lod === 'impostor';
+        bucketWindow.swapFade = collapseWindows.fade;
+        bucketWindow.spriteFar = collapseWindows.spriteFar;
         b.mesh.visible = bucketVisible(bucketWindow);
         // "Visible" counts SUBMITTED instances: shader-collapsed ones still
         // count here (the collapse saves raster work, not submission).
