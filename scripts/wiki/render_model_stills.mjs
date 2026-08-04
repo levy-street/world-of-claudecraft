@@ -35,12 +35,16 @@ mkdirSync(outDir, { recursive: true });
 //    root-relative /<logical> paths our static server maps into public/), which esbuild leaves
 //    intact for a classic IIFE <script src> and would be a SyntaxError. esbuild matches each
 //    FULL member path exactly (a bare `import.meta.env` define does NOT fold `.DEV`), so define
-//    every Vite flag a module the bundle graph reaches reads: media.ts / i18n.ts read
-//    DEV/PROD, and render/gfx.ts pulls in client_origin.ts and (transitively) runtime.ts for
-//    native/desktop-app origin detection (VITE_NATIVE_APP, VITE_API_ORIGIN,
-//    VITE_DESKTOP_APP, VITE_DESKTOP_API_ORIGIN, VITE_DESKTOP_RELATIVE_API), none of which
-//    apply to this static headless render. The assert below fails loudly if a transitive
-//    module ever reads another import.meta field this define misses.
+//    every Vite flag a transitive module reads (`grep -rho 'import\.meta\.env\.[A-Za-z_]*' src/`):
+//    media.ts / i18n.ts read DEV/PROD, and render/gfx.ts pulls in client_origin.ts and
+//    (transitively) runtime.ts for native/desktop-app origin detection, none of which apply to
+//    this static headless render.
+//
+//    The `raw import.meta` assert below is necessary but NOT sufficient: for an iife bundle
+//    esbuild folds an undefined member path down to `({}).env`, so a missed field leaves no
+//    literal `import.meta` to catch and instead throws at runtime reading a property of
+//    undefined (which surfaces only as a PAGEERR and a 20s wait-for timeout). client_origin.ts
+//    reading VITE_NATIVE_APP hit exactly that, so keep this list exhaustive.
 const bundled = await esbuild.build({
   entryPoints: [path.join(root, 'scripts', 'wiki', 'stills_render_entry.js')],
   bundle: true,

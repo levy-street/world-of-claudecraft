@@ -360,18 +360,19 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned for the merge of release/v0.34.0 into this branch.
-      // src/render/renderer.ts is the rendererIntegration leaf of this composite,
-      // so any edit to it moves the leaf's sha256 and with it the composite. Three
-      // renderer edits now stack here: PR #2720's fence-removal layout evidence
-      // and the live graphics rebuild (context recycle plus profile-aware
-      // Eastbrook runtime inputs, PR #2799) from the release side, and this
-      // branch's worldObjectBurning fire-burst cue (torched murloc huts,
-      // q_deepfen_purge). The merged renderer therefore mints a composite that
-      // matches neither parent's literal. No GLB source fingerprint moved, no
-      // pipeline input or geometry value changed, and no capture was retaken,
-      // same as every precedent in this chain.
-      fingerprint: 'c24b1224ac2ece4186e4c92e170ca61501bdf33453d7c92afef029b3d7ea51ee',
+      // Deliberately re-pinned. src/render/renderer.ts is the rendererIntegration
+      // leaf of this composite, so any edit to it moves the leaf's own sha256 and
+      // with it the composite. FOUR independent renderer moves now stack here:
+      // from release/v0.34.0, PR #2720's fence-removal layout evidence, the live
+      // graphics rebuild (context recycle plus profile-aware Eastbrook runtime
+      // inputs, PR #2799), and the Bear Form swap onto the purpose-built
+      // quadruped rig (PR #2842); from this branch, the worldObjectBurning
+      // fire-burst cue (torched murloc huts, q_deepfen_purge). The merged tree
+      // therefore mints one fingerprint matching no parent's literal. No GLB
+      // source fingerprint moved, no pipeline input or geometry value changed,
+      // and no capture was retaken. Re-minted with
+      // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
+      fingerprint: '3fb6c92ebd3d226898c4f2911e3982205f0ba4a408bee0e8accec7f954f23091',
       components: {
         captureContract: {
           id: 'polish-v2',
