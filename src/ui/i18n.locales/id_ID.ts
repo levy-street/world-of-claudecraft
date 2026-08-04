@@ -11148,4 +11148,12 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Atur ulang tab {channel}: seret, atau gunakan Alt+Kiri dan Alt+Kanan',
   'itemUi.vendor.buyStack': 'Beli {count}',
   'itemUi.vendor.buyStackAria': 'Beli {count} {item} seharga {price}',
+  'desktop.update.checkingTitle': 'Memeriksa pembaruan...',
+  'desktop.update.checkingBody': 'Versi baru diunduh saat kamu bermain.',
+  'desktop.update.dismiss': 'Tutup',
+  'desktop.update.downloadingBody': 'Kamu bisa terus bermain; akan dipasang saat keluar.',
+  'desktop.update.uptodateTitle': 'Kamu sudah memakai versi terbaru.',
+  'hudChrome.crafting.dialogOption': 'Kerajinan',
+  'hudChrome.crafting.dialogOptionAria': 'Buka jendela kerajinan untuk {craft}',
+  'hudChrome.deeds.recentJumpAria': 'Lompat ke {name}',
 };

@@ -11218,4 +11218,12 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Reordenar la pestaña {channel}: arrástrala, o usa Alt+Izquierda y Alt+Derecha',
   'itemUi.vendor.buyStack': 'Comprar {count}',
   'itemUi.vendor.buyStackAria': 'Comprar {count} {item} por {price}',
+  'desktop.update.checkingTitle': 'Buscando actualizaciones...',
+  'desktop.update.checkingBody': 'Las nuevas versiones se descargan mientras juegas.',
+  'desktop.update.dismiss': 'Cerrar',
+  'desktop.update.downloadingBody': 'Puedes seguir jugando; se instalará cuando salgas.',
+  'desktop.update.uptodateTitle': 'Ya tienes la versión más reciente.',
+  'hudChrome.crafting.dialogOption': 'Elaboración',
+  'hudChrome.crafting.dialogOptionAria': 'Abrir la ventana de elaboración para {craft}',
+  'hudChrome.deeds.recentJumpAria': 'Saltar a {name}',
 };

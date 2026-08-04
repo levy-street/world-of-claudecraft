@@ -9,170 +9,25 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "desktop.update.checkingBody",
-    "desktop.update.checkingTitle",
-    "desktop.update.dismiss",
-    "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle",
-    "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
-  ],
-  "es_ES": [
-    "desktop.update.checkingBody",
-    "desktop.update.checkingTitle",
-    "desktop.update.dismiss",
-    "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle",
-    "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
-  ],
-  "fr_FR": [
-    "desktop.update.checkingBody",
-    "desktop.update.checkingTitle",
-    "desktop.update.dismiss",
-    "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle",
-    "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
-  ],
-  "fr_CA": [
-    "desktop.update.checkingBody",
-    "desktop.update.checkingTitle",
-    "desktop.update.dismiss",
-    "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle",
-    "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
-  ],
+  "es": [],
+  "es_ES": [],
+  "fr_FR": [],
+  "fr_CA": [],
   "en_CA": [],
-  "it_IT": [
-    "desktop.update.checkingBody",
-    "desktop.update.checkingTitle",
-    "desktop.update.dismiss",
-    "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle",
-    "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
-  ],
-  "de_DE": [
-    "desktop.update.checkingBody",
-    "desktop.update.checkingTitle",
-    "desktop.update.dismiss",
-    "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle",
-    "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
-  ],
-  "zh_CN": [
-    "hudChrome.deeds.recentJumpAria"
-  ],
-  "zh_TW": [
-    "hudChrome.deeds.recentJumpAria"
-  ],
-  "ko_KR": [
-    "hudChrome.deeds.recentJumpAria"
-  ],
-  "ja_JP": [
-    "hudChrome.deeds.recentJumpAria"
-  ],
-  "pt_BR": [
-    "desktop.update.checkingBody",
-    "desktop.update.checkingTitle",
-    "desktop.update.dismiss",
-    "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle",
-    "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
-  ],
-  "ru_RU": [
-    "hudChrome.deeds.recentJumpAria"
-  ],
-  "cs_CZ": [
-    "desktop.update.checkingBody",
-    "desktop.update.checkingTitle",
-    "desktop.update.dismiss",
-    "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle",
-    "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
-  ],
-  "nl_NL": [
-    "desktop.update.checkingBody",
-    "desktop.update.checkingTitle",
-    "desktop.update.dismiss",
-    "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle",
-    "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
-  ],
-  "pl_PL": [
-    "desktop.update.checkingBody",
-    "desktop.update.checkingTitle",
-    "desktop.update.dismiss",
-    "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle",
-    "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
-  ],
-  "id_ID": [
-    "desktop.update.checkingBody",
-    "desktop.update.checkingTitle",
-    "desktop.update.dismiss",
-    "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle",
-    "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
-  ],
-  "tr_TR": [
-    "desktop.update.checkingBody",
-    "desktop.update.checkingTitle",
-    "desktop.update.dismiss",
-    "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle",
-    "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
-  ],
-  "sv_SE": [
-    "desktop.update.checkingBody",
-    "desktop.update.checkingTitle",
-    "desktop.update.dismiss",
-    "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle",
-    "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
-  ],
-  "vi_VN": [
-    "desktop.update.checkingBody",
-    "desktop.update.checkingTitle",
-    "desktop.update.dismiss",
-    "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle",
-    "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
-  ],
-  "da_DK": [
-    "desktop.update.checkingBody",
-    "desktop.update.checkingTitle",
-    "desktop.update.dismiss",
-    "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle",
-    "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
-  ]
+  "it_IT": [],
+  "de_DE": [],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
+  "pt_BR": [],
+  "ru_RU": [],
+  "cs_CZ": [],
+  "nl_NL": [],
+  "pl_PL": [],
+  "id_ID": [],
+  "tr_TR": [],
+  "sv_SE": [],
+  "vi_VN": [],
+  "da_DK": []
 };

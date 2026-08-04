@@ -2590,8 +2590,8 @@ export const nl_NL: EnTranslations = {
     "crafting": {
       "title": "Knutselen",
       "close": "Sluit het maken",
-      "dialogOption": "Crafting",
-      "dialogOptionAria": "Open the crafting window for {craft}",
+      "dialogOption": "Ambacht",
+      "dialogOptionAria": "Open het ambachtsvenster voor {craft}",
       "craft": "Ambacht",
       "reagentsNeeded": "Vereist:",
       "reagentLine": "{name}: {have}/{required}",
@@ -2901,7 +2901,7 @@ export const nl_NL: EnTranslations = {
       "countLabel": "{earned}/{total} daden",
       "completionAria": "Daden behaald: {earned} van {total}",
       "recentLabel": "Recent:",
-      "recentJumpAria": "Jump to {name}",
+      "recentJumpAria": "Spring naar {name}",
       "nearestLabel": "Bijna zover:",
       "filterGroupAria": "Filter de daden",
       "filterAll": "Alle",
@@ -6098,16 +6098,16 @@ export const nl_NL: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "checkingTitle": "Checking for updates...",
-      "checkingBody": "New versions download while you play.",
-      "uptodateTitle": "You're up to date",
+      "checkingTitle": "Controleren op updates...",
+      "checkingBody": "Nieuwe versies downloaden terwijl je speelt.",
+      "uptodateTitle": "Je hebt al de nieuwste versie.",
       "downloadingTitle": "Update {version} wordt gedownload...",
-      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "downloadingBody": "Je kunt blijven spelen; de installatie gebeurt bij afsluiten.",
       "readyTitle": "Update {version} is klaar",
       "readyBody": "Deze wordt geïnstalleerd wanneer je afsluit, of herstart nu.",
       "restart": "Nu herstarten",
       "later": "Later",
-      "dismiss": "Dismiss"
+      "dismiss": "Sluiten"
     },
     "crash": {
       "title": "World of ClaudeCraft",

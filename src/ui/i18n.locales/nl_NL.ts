@@ -11141,4 +11141,12 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Tabblad {channel} herschikken: sleep het, of gebruik Alt+Links en Alt+Rechts',
   'itemUi.vendor.buyStack': 'Koop {count}',
   'itemUi.vendor.buyStackAria': 'Koop {count} {item} voor {price}',
+  'desktop.update.checkingTitle': 'Controleren op updates...',
+  'desktop.update.checkingBody': 'Nieuwe versies downloaden terwijl je speelt.',
+  'desktop.update.dismiss': 'Sluiten',
+  'desktop.update.downloadingBody': 'Je kunt blijven spelen; de installatie gebeurt bij afsluiten.',
+  'desktop.update.uptodateTitle': 'Je hebt al de nieuwste versie.',
+  'hudChrome.crafting.dialogOption': 'Ambacht',
+  'hudChrome.crafting.dialogOptionAria': 'Open het ambachtsvenster voor {craft}',
+  'hudChrome.deeds.recentJumpAria': 'Spring naar {name}',
 };

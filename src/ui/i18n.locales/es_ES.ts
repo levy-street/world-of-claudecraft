@@ -365,4 +365,12 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'Se ha anulado una invitación de hermandad pendiente porque la hermandad ha cambiado de nombre.',
   'hud.prompts.guildRenamed':
     'Tu hermandad ha sido renombrada a {name} por el equipo de moderación.',
+  'desktop.update.checkingTitle': 'Buscando actualizaciones...',
+  'desktop.update.checkingBody': 'Las nuevas versiones se descargan mientras juegas.',
+  'desktop.update.dismiss': 'Cerrar',
+  'desktop.update.downloadingBody': 'Puedes seguir jugando; se instalará cuando salgas.',
+  'desktop.update.uptodateTitle': 'Ya tienes la versión más reciente.',
+  'hudChrome.crafting.dialogOption': 'Elaboración',
+  'hudChrome.crafting.dialogOptionAria': 'Abrir la ventana de elaboración para {craft}',
+  'hudChrome.deeds.recentJumpAria': 'Saltar a {name}',
 };

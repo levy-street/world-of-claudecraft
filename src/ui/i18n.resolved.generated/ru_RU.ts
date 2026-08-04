@@ -2901,7 +2901,7 @@ export const ru_RU: EnTranslations = {
       "countLabel": "Деяния: {earned}/{total}",
       "completionAria": "Получено деяний: {earned} из {total}",
       "recentLabel": "Недавние:",
-      "recentJumpAria": "Jump to {name}",
+      "recentJumpAria": "Перейти к {name}",
       "nearestLabel": "Почти готово:",
       "filterGroupAria": "Фильтр деяний",
       "filterAll": "Все",

@@ -10401,4 +10401,5 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.aetherRush': '以太奔涌',
   'itemUi.vendor.buyStack': '购买 {count} 个',
   'itemUi.vendor.buyStackAria': '以 {price} 购买 {count} 个 {item}',
+  'hudChrome.deeds.recentJumpAria': '跳转到{name}',
 };

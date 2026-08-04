@@ -11087,4 +11087,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zmień kolejność karty {channel}: przeciągnij ją lub użyj Alt+Lewo i Alt+Prawo',
   'itemUi.vendor.buyStack': 'Kup {count}',
   'itemUi.vendor.buyStackAria': 'Kup {count} {item} za {price}',
+  'desktop.update.checkingTitle': 'Sprawdzanie aktualizacji...',
+  'desktop.update.checkingBody': 'Nowe wersje pobierają się podczas gry.',
+  'desktop.update.dismiss': 'Zamknij',
+  'desktop.update.downloadingBody': 'Możesz dalej grać; instalacja nastąpi po zamknięciu.',
+  'desktop.update.uptodateTitle': 'Masz już najnowszą wersję.',
+  'hudChrome.crafting.dialogOption': 'Rzemiosło',
+  'hudChrome.crafting.dialogOptionAria': 'Otwórz okno rzemiosła dla {craft}',
+  'hudChrome.deeds.recentJumpAria': 'Przejdź do {name}',
 };

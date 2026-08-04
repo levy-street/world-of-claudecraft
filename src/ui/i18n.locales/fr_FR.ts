@@ -11289,4 +11289,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Réorganiser l'onglet {channel} : faites-le glisser, ou utilisez Alt+Gauche et Alt+Droite",
   'itemUi.vendor.buyStack': 'Acheter {count}',
   'itemUi.vendor.buyStackAria': 'Acheter {count} {item} pour {price}',
+  'desktop.update.checkingTitle': 'Recherche de mises à jour...',
+  'desktop.update.checkingBody': 'Les nouvelles versions se téléchargent pendant que vous jouez.',
+  'desktop.update.dismiss': 'Fermer',
+  'desktop.update.downloadingBody': "Vous pouvez continuer à jouer; elle s'installera à la fermeture.",
+  'desktop.update.uptodateTitle': 'Vous utilisez déjà la dernière version.',
+  'hudChrome.crafting.dialogOption': 'Artisanat',
+  'hudChrome.crafting.dialogOptionAria': "Ouvrir la fenêtre d'artisanat pour {craft}",
+  'hudChrome.deeds.recentJumpAria': 'Aller à {name}',
 };

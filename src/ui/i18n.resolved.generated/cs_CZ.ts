@@ -2590,8 +2590,8 @@ export const cs_CZ: EnTranslations = {
     "crafting": {
       "title": "Výroba",
       "close": "Zavřít výrobu",
-      "dialogOption": "Crafting",
-      "dialogOptionAria": "Open the crafting window for {craft}",
+      "dialogOption": "Výroba",
+      "dialogOptionAria": "Otevřít okno výroby pro {craft}",
       "craft": "Vyrobit",
       "reagentsNeeded": "Vyžaduje:",
       "reagentLine": "{name} x{have}/{required}",
@@ -2901,7 +2901,7 @@ export const cs_CZ: EnTranslations = {
       "countLabel": "{earned}/{total} skutků",
       "completionAria": "Vykonáno {earned} z {total} skutků",
       "recentLabel": "Nedávné:",
-      "recentJumpAria": "Jump to {name}",
+      "recentJumpAria": "Přejít na {name}",
       "nearestLabel": "Skoro tam:",
       "filterGroupAria": "Filtrovat skutky",
       "filterAll": "Vše",
@@ -6098,16 +6098,16 @@ export const cs_CZ: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "checkingTitle": "Checking for updates...",
-      "checkingBody": "New versions download while you play.",
-      "uptodateTitle": "You're up to date",
+      "checkingTitle": "Kontrola aktualizací...",
+      "checkingBody": "Nové verze se stahují během hraní.",
+      "uptodateTitle": "Už máš nejnovější verzi.",
       "downloadingTitle": "Stahuje se aktualizace {version}...",
-      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "downloadingBody": "Můžeš pokračovat ve hře; nainstaluje se při ukončení.",
       "readyTitle": "Aktualizace {version} je připravena",
       "readyBody": "Nainstaluje se při ukončení, nebo restartuj hned.",
       "restart": "Restartovat hned",
       "later": "Později",
-      "dismiss": "Dismiss"
+      "dismiss": "Zavřít"
     },
     "crash": {
       "title": "World of ClaudeCraft",

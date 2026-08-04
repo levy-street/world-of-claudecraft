@@ -10987,4 +10987,12 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Sắp xếp lại tab {channel}: kéo nó, hoặc dùng Alt+Trái và Alt+Phải',
   'itemUi.vendor.buyStack': 'Mua {count}',
   'itemUi.vendor.buyStackAria': 'Mua {count} {item} với giá {price}',
+  'desktop.update.checkingTitle': 'Đang kiểm tra cập nhật...',
+  'desktop.update.checkingBody': 'Phiên bản mới sẽ tải xuống khi bạn chơi.',
+  'desktop.update.dismiss': 'Đóng',
+  'desktop.update.downloadingBody': 'Bạn có thể tiếp tục chơi; bản cập nhật sẽ cài khi thoát.',
+  'desktop.update.uptodateTitle': 'Bạn đã dùng phiên bản mới nhất.',
+  'hudChrome.crafting.dialogOption': 'Chế tạo',
+  'hudChrome.crafting.dialogOptionAria': 'Mở cửa sổ chế tạo cho {craft}',
+  'hudChrome.deeds.recentJumpAria': 'Chuyển đến {name}',
 };

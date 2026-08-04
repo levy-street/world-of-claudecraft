@@ -11073,4 +11073,5 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.aetherRush': 'Эфирный натиск',
   'itemUi.vendor.buyStack': 'Купить {count}',
   'itemUi.vendor.buyStackAria': 'Купить {count} {item} за {price}',
+  'hudChrome.deeds.recentJumpAria': 'Перейти к {name}',
 };

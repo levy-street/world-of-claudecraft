@@ -2590,8 +2590,8 @@ export const pl_PL: EnTranslations = {
     "crafting": {
       "title": "Rzemiosło",
       "close": "Zamknij rzemiosło",
-      "dialogOption": "Crafting",
-      "dialogOptionAria": "Open the crafting window for {craft}",
+      "dialogOption": "Rzemiosło",
+      "dialogOptionAria": "Otwórz okno rzemiosła dla {craft}",
       "craft": "Rzemiosło",
       "reagentsNeeded": "Wymaga:",
       "reagentLine": "{name}: {have}/{required}",
@@ -2901,7 +2901,7 @@ export const pl_PL: EnTranslations = {
       "countLabel": "{earned}/{total} czynów",
       "completionAria": "Zdobyte czyny: {earned} z {total}",
       "recentLabel": "Ostatnie:",
-      "recentJumpAria": "Jump to {name}",
+      "recentJumpAria": "Przejdź do {name}",
       "nearestLabel": "Prawie u celu:",
       "filterGroupAria": "Filtruj czyny",
       "filterAll": "Wszystkie",
@@ -6098,16 +6098,16 @@ export const pl_PL: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "checkingTitle": "Checking for updates...",
-      "checkingBody": "New versions download while you play.",
-      "uptodateTitle": "You're up to date",
+      "checkingTitle": "Sprawdzanie aktualizacji...",
+      "checkingBody": "Nowe wersje pobierają się podczas gry.",
+      "uptodateTitle": "Masz już najnowszą wersję.",
       "downloadingTitle": "Pobieranie aktualizacji {version}...",
-      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "downloadingBody": "Możesz dalej grać; instalacja nastąpi po zamknięciu.",
       "readyTitle": "Aktualizacja {version} jest gotowa",
       "readyBody": "Zainstaluje się przy zamknięciu lub uruchom ponownie teraz.",
       "restart": "Uruchom ponownie teraz",
       "later": "Później",
-      "dismiss": "Dismiss"
+      "dismiss": "Zamknij"
     },
     "crash": {
       "title": "World of ClaudeCraft",

@@ -11023,4 +11023,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ordna om fliken {channel}: dra den, eller använd Alt+vänster och Alt+höger',
   'itemUi.vendor.buyStack': 'Köp {count}',
   'itemUi.vendor.buyStackAria': 'Köp {count} {item} för {price}',
+  'desktop.update.checkingTitle': 'Söker efter uppdateringar...',
+  'desktop.update.checkingBody': 'Nya versioner laddas ner medan du spelar.',
+  'desktop.update.dismiss': 'Stäng',
+  'desktop.update.downloadingBody': 'Du kan fortsätta spela; den installeras när du avslutar.',
+  'desktop.update.uptodateTitle': 'Du har redan den senaste versionen.',
+  'hudChrome.crafting.dialogOption': 'Hantverk',
+  'hudChrome.crafting.dialogOptionAria': 'Öppna hantverksfönstret för {craft}',
+  'hudChrome.deeds.recentJumpAria': 'Hoppa till {name}',
 };

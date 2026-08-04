@@ -11239,4 +11239,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Reiter {channel} neu anordnen: ziehen Sie ihn, oder verwenden Sie Alt+Links und Alt+Rechts',
   'itemUi.vendor.buyStack': '{count} kaufen',
   'itemUi.vendor.buyStackAria': '{count} {item} für {price} kaufen',
+  'desktop.update.checkingTitle': 'Suche nach Updates...',
+  'desktop.update.checkingBody': 'Neue Versionen werden heruntergeladen, während du spielst.',
+  'desktop.update.dismiss': 'Schließen',
+  'desktop.update.downloadingBody': 'Du kannst weiterspielen; die Installation erfolgt beim Beenden.',
+  'desktop.update.uptodateTitle': 'Du hast bereits die neueste Version.',
+  'hudChrome.crafting.dialogOption': 'Handwerk',
+  'hudChrome.crafting.dialogOptionAria': 'Handwerksfenster für {craft} öffnen',
+  'hudChrome.deeds.recentJumpAria': 'Zu {name} springen',
 };

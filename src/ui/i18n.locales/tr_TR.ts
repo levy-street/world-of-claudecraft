@@ -11039,4 +11039,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     '{channel} sekmesini yeniden sırala: sürükleyin veya Alt+Sol ve Alt+Sağ tuşlarını kullanın',
   'itemUi.vendor.buyStack': '{count} adet satın al',
   'itemUi.vendor.buyStackAria': '{item} eşyasından {count} adet, {price} karşılığında satın al',
+  'desktop.update.checkingTitle': 'Güncellemeler denetleniyor...',
+  'desktop.update.checkingBody': 'Yeni sürümler sen oynarken indirilir.',
+  'desktop.update.dismiss': 'Kapat',
+  'desktop.update.downloadingBody': 'Oynamaya devam edebilirsin; çıkışta kurulacak.',
+  'desktop.update.uptodateTitle': 'Zaten en yeni sürümdesin.',
+  'hudChrome.crafting.dialogOption': 'Üretim',
+  'hudChrome.crafting.dialogOptionAria': '{craft} için üretim penceresini aç',
+  'hudChrome.deeds.recentJumpAria': '{name} konumuna atla',
 };

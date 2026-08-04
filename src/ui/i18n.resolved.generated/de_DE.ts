@@ -2590,8 +2590,8 @@ export const de_DE: EnTranslations = {
     "crafting": {
       "title": "Basteln",
       "close": "Enges Basteln",
-      "dialogOption": "Crafting",
-      "dialogOptionAria": "Open the crafting window for {craft}",
+      "dialogOption": "Handwerk",
+      "dialogOptionAria": "Handwerksfenster für {craft} öffnen",
       "craft": "Handwerk",
       "reagentsNeeded": "Erfordert:",
       "reagentLine": "{name}: {have}/{required}",
@@ -2901,7 +2901,7 @@ export const de_DE: EnTranslations = {
       "countLabel": "{earned}/{total} Taten",
       "completionAria": "Errungene Taten: {earned} von {total}",
       "recentLabel": "Zuletzt:",
-      "recentJumpAria": "Jump to {name}",
+      "recentJumpAria": "Zu {name} springen",
       "nearestLabel": "Kurz davor:",
       "filterGroupAria": "Taten filtern",
       "filterAll": "Alle",
@@ -6098,16 +6098,16 @@ export const de_DE: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "checkingTitle": "Checking for updates...",
-      "checkingBody": "New versions download while you play.",
-      "uptodateTitle": "You're up to date",
+      "checkingTitle": "Suche nach Updates...",
+      "checkingBody": "Neue Versionen werden heruntergeladen, während du spielst.",
+      "uptodateTitle": "Du hast bereits die neueste Version.",
       "downloadingTitle": "Update {version} wird heruntergeladen...",
-      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "downloadingBody": "Du kannst weiterspielen; die Installation erfolgt beim Beenden.",
       "readyTitle": "Update {version} ist bereit",
       "readyBody": "Es wird beim Beenden installiert, oder starte jetzt neu.",
       "restart": "Jetzt neu starten",
       "later": "Später",
-      "dismiss": "Dismiss"
+      "dismiss": "Schließen"
     },
     "crash": {
       "title": "World of ClaudeCraft",

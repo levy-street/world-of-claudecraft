@@ -2590,8 +2590,8 @@ export const id_ID: EnTranslations = {
     "crafting": {
       "title": "kerajinan",
       "close": "Tutup kerajinan",
-      "dialogOption": "Crafting",
-      "dialogOptionAria": "Open the crafting window for {craft}",
+      "dialogOption": "Kerajinan",
+      "dialogOptionAria": "Buka jendela kerajinan untuk {craft}",
       "craft": "Keahlian",
       "reagentsNeeded": "Memerlukan:",
       "reagentLine": "{name}: {have}/{required}",
@@ -2901,7 +2901,7 @@ export const id_ID: EnTranslations = {
       "countLabel": "{earned}/{total} jasa",
       "completionAria": "Jasa yang diraih: {earned} dari {total}",
       "recentLabel": "Terbaru:",
-      "recentJumpAria": "Jump to {name}",
+      "recentJumpAria": "Lompat ke {name}",
       "nearestLabel": "Hampir tercapai:",
       "filterGroupAria": "Saring jasa",
       "filterAll": "Semua",
@@ -6098,16 +6098,16 @@ export const id_ID: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "checkingTitle": "Checking for updates...",
-      "checkingBody": "New versions download while you play.",
-      "uptodateTitle": "You're up to date",
+      "checkingTitle": "Memeriksa pembaruan...",
+      "checkingBody": "Versi baru diunduh saat kamu bermain.",
+      "uptodateTitle": "Kamu sudah memakai versi terbaru.",
       "downloadingTitle": "Mengunduh pembaruan {version}...",
-      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "downloadingBody": "Kamu bisa terus bermain; akan dipasang saat keluar.",
       "readyTitle": "Pembaruan {version} siap",
       "readyBody": "Akan terpasang saat kamu keluar, atau mulai ulang sekarang.",
       "restart": "Mulai Ulang Sekarang",
       "later": "Nanti",
-      "dismiss": "Dismiss"
+      "dismiss": "Tutup"
     },
     "crash": {
       "title": "World of ClaudeCraft",

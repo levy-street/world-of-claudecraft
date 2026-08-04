@@ -10957,4 +10957,12 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Přeuspořádat kartu {channel}: přetáhněte ji, nebo použijte Alt+vlevo a Alt+vpravo',
   'itemUi.vendor.buyStack': 'Koupit {count}',
   'itemUi.vendor.buyStackAria': 'Koupit {count} {item} za {price}',
+  'desktop.update.checkingTitle': 'Kontrola aktualizací...',
+  'desktop.update.checkingBody': 'Nové verze se stahují během hraní.',
+  'desktop.update.dismiss': 'Zavřít',
+  'desktop.update.downloadingBody': 'Můžeš pokračovat ve hře; nainstaluje se při ukončení.',
+  'desktop.update.uptodateTitle': 'Už máš nejnovější verzi.',
+  'hudChrome.crafting.dialogOption': 'Výroba',
+  'hudChrome.crafting.dialogOptionAria': 'Otevřít okno výroby pro {craft}',
+  'hudChrome.deeds.recentJumpAria': 'Přejít na {name}',
 };

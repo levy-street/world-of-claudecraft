@@ -2590,8 +2590,8 @@ export const sv_SE: EnTranslations = {
     "crafting": {
       "title": "Hantverk",
       "close": "Nära hantverk",
-      "dialogOption": "Crafting",
-      "dialogOptionAria": "Open the crafting window for {craft}",
+      "dialogOption": "Hantverk",
+      "dialogOptionAria": "Öppna hantverksfönstret för {craft}",
       "craft": "Hantverk",
       "reagentsNeeded": "Kräver:",
       "reagentLine": "{name}: {have}/{required}",
@@ -2901,7 +2901,7 @@ export const sv_SE: EnTranslations = {
       "countLabel": "{earned}/{total} bedrifter",
       "completionAria": "Fullbordade bedrifter: {earned} av {total}",
       "recentLabel": "Nyligen:",
-      "recentJumpAria": "Jump to {name}",
+      "recentJumpAria": "Hoppa till {name}",
       "nearestLabel": "Nästan framme:",
       "filterGroupAria": "Filtrera bedrifter",
       "filterAll": "Alla",
@@ -6098,16 +6098,16 @@ export const sv_SE: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "checkingTitle": "Checking for updates...",
-      "checkingBody": "New versions download while you play.",
-      "uptodateTitle": "You're up to date",
+      "checkingTitle": "Söker efter uppdateringar...",
+      "checkingBody": "Nya versioner laddas ner medan du spelar.",
+      "uptodateTitle": "Du har redan den senaste versionen.",
       "downloadingTitle": "Laddar ner uppdatering {version}...",
-      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "downloadingBody": "Du kan fortsätta spela; den installeras när du avslutar.",
       "readyTitle": "Uppdatering {version} är klar",
       "readyBody": "Den installeras när du avslutar, eller starta om nu.",
       "restart": "Starta om nu",
       "later": "Senare",
-      "dismiss": "Dismiss"
+      "dismiss": "Stäng"
     },
     "crash": {
       "title": "World of ClaudeCraft",

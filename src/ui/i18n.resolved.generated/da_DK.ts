@@ -2590,8 +2590,8 @@ export const da_DK: EnTranslations = {
     "crafting": {
       "title": "Håndværk",
       "close": "Tæt håndværk",
-      "dialogOption": "Crafting",
-      "dialogOptionAria": "Open the crafting window for {craft}",
+      "dialogOption": "Håndværk",
+      "dialogOptionAria": "Åbn håndværksvinduet for {craft}",
       "craft": "Håndværk",
       "reagentsNeeded": "Kræver:",
       "reagentLine": "{name}: {have}/{required}",
@@ -2901,7 +2901,7 @@ export const da_DK: EnTranslations = {
       "countLabel": "{earned}/{total} bedrifter",
       "completionAria": "Bedrifter opnået: {earned} af {total}",
       "recentLabel": "Seneste:",
-      "recentJumpAria": "Jump to {name}",
+      "recentJumpAria": "Gå til {name}",
       "nearestLabel": "Næsten i mål:",
       "filterGroupAria": "Filtrer bedrifter",
       "filterAll": "Alle",
@@ -6098,16 +6098,16 @@ export const da_DK: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "checkingTitle": "Checking for updates...",
-      "checkingBody": "New versions download while you play.",
-      "uptodateTitle": "You're up to date",
+      "checkingTitle": "Søger efter opdateringer...",
+      "checkingBody": "Nye versioner hentes, mens du spiller.",
+      "uptodateTitle": "Du har allerede den nyeste version.",
       "downloadingTitle": "Downloader opdatering {version}...",
-      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "downloadingBody": "Du kan fortsætte med at spille; den installeres, når du afslutter.",
       "readyTitle": "Opdatering {version} er klar",
       "readyBody": "Den installeres, når du afslutter, eller genstart nu.",
       "restart": "Genstart nu",
       "later": "Senere",
-      "dismiss": "Dismiss"
+      "dismiss": "Luk"
     },
     "crash": {
       "title": "World of ClaudeCraft",

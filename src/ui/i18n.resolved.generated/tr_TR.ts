@@ -2590,8 +2590,8 @@ export const tr_TR: EnTranslations = {
     "crafting": {
       "title": "işçiliği",
       "close": "İşçiliği kapat",
-      "dialogOption": "Crafting",
-      "dialogOptionAria": "Open the crafting window for {craft}",
+      "dialogOption": "Üretim",
+      "dialogOptionAria": "{craft} için üretim penceresini aç",
       "craft": "Zanaat",
       "reagentsNeeded": "Gereklilikler:",
       "reagentLine": "{name}: {have}/{required}",
@@ -2901,7 +2901,7 @@ export const tr_TR: EnTranslations = {
       "countLabel": "{earned}/{total} yiğitlik",
       "completionAria": "{total} yiğitlikten {earned} tanesi kazanıldı",
       "recentLabel": "En son:",
-      "recentJumpAria": "Jump to {name}",
+      "recentJumpAria": "{name} konumuna atla",
       "nearestLabel": "Ramak kaldı:",
       "filterGroupAria": "Yiğitlikleri filtrele",
       "filterAll": "Tümü",
@@ -6098,16 +6098,16 @@ export const tr_TR: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "checkingTitle": "Checking for updates...",
-      "checkingBody": "New versions download while you play.",
-      "uptodateTitle": "You're up to date",
+      "checkingTitle": "Güncellemeler denetleniyor...",
+      "checkingBody": "Yeni sürümler sen oynarken indirilir.",
+      "uptodateTitle": "Zaten en yeni sürümdesin.",
       "downloadingTitle": "{version} güncellemesi indiriliyor...",
-      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "downloadingBody": "Oynamaya devam edebilirsin; çıkışta kurulacak.",
       "readyTitle": "{version} güncellemesi hazır",
       "readyBody": "Çıkış yaptığında kurulur ya da şimdi yeniden başlat.",
       "restart": "Şimdi Yeniden Başlat",
       "later": "Daha Sonra",
-      "dismiss": "Dismiss"
+      "dismiss": "Kapat"
     },
     "crash": {
       "title": "World of ClaudeCraft",

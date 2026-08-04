@@ -2590,8 +2590,8 @@ export const vi_VN: EnTranslations = {
     "crafting": {
       "title": "Chế tạo",
       "close": "Đóng chế tạo",
-      "dialogOption": "Crafting",
-      "dialogOptionAria": "Open the crafting window for {craft}",
+      "dialogOption": "Chế tạo",
+      "dialogOptionAria": "Mở cửa sổ chế tạo cho {craft}",
       "craft": "thủ công",
       "reagentsNeeded": "Yêu cầu:",
       "reagentLine": "{name}: {have}/{required}",
@@ -2901,7 +2901,7 @@ export const vi_VN: EnTranslations = {
       "countLabel": "{earned}/{total} kỳ công",
       "completionAria": "Kỳ công đã lập: {earned} trên {total}",
       "recentLabel": "Gần đây:",
-      "recentJumpAria": "Jump to {name}",
+      "recentJumpAria": "Chuyển đến {name}",
       "nearestLabel": "Sắp đạt:",
       "filterGroupAria": "Lọc kỳ công",
       "filterAll": "Tất Cả",
@@ -6098,16 +6098,16 @@ export const vi_VN: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "checkingTitle": "Checking for updates...",
-      "checkingBody": "New versions download while you play.",
-      "uptodateTitle": "You're up to date",
+      "checkingTitle": "Đang kiểm tra cập nhật...",
+      "checkingBody": "Phiên bản mới sẽ tải xuống khi bạn chơi.",
+      "uptodateTitle": "Bạn đã dùng phiên bản mới nhất.",
       "downloadingTitle": "Đang tải bản cập nhật {version}...",
-      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "downloadingBody": "Bạn có thể tiếp tục chơi; bản cập nhật sẽ cài khi thoát.",
       "readyTitle": "Bản cập nhật {version} đã sẵn sàng",
       "readyBody": "Sẽ tự cài khi bạn thoát, hoặc khởi động lại ngay.",
       "restart": "Khởi động lại ngay",
       "later": "Để sau",
-      "dismiss": "Dismiss"
+      "dismiss": "Đóng"
     },
     "crash": {
       "title": "World of ClaudeCraft",

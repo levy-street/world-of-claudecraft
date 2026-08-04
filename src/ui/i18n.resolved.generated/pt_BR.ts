@@ -2590,8 +2590,8 @@ export const pt_BR: EnTranslations = {
     "crafting": {
       "title": "Artesanato",
       "close": "Fechar elaboração",
-      "dialogOption": "Crafting",
-      "dialogOptionAria": "Open the crafting window for {craft}",
+      "dialogOption": "Criação",
+      "dialogOptionAria": "Abrir a janela de criação para {craft}",
       "craft": "Arte",
       "reagentsNeeded": "Requer:",
       "reagentLine": "{name}x{have}/{required}",
@@ -2901,7 +2901,7 @@ export const pt_BR: EnTranslations = {
       "countLabel": "{earned}/{total} feitos",
       "completionAria": "Feitos conquistados: {earned} de {total}",
       "recentLabel": "Recentes:",
-      "recentJumpAria": "Jump to {name}",
+      "recentJumpAria": "Ir para {name}",
       "nearestLabel": "Quase lá:",
       "filterGroupAria": "Filtrar feitos",
       "filterAll": "Todos",
@@ -6098,16 +6098,16 @@ export const pt_BR: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "checkingTitle": "Checking for updates...",
-      "checkingBody": "New versions download while you play.",
-      "uptodateTitle": "You're up to date",
+      "checkingTitle": "Verificando atualizações...",
+      "checkingBody": "Novas versões baixam enquanto você joga.",
+      "uptodateTitle": "Você já está na versão mais recente.",
       "downloadingTitle": "Baixando atualização {version}...",
-      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "downloadingBody": "Você pode continuar jogando; será instalada ao sair.",
       "readyTitle": "A atualização {version} está pronta",
       "readyBody": "Ela será instalada ao sair, ou reinicie agora.",
       "restart": "Reiniciar agora",
       "later": "Depois",
-      "dismiss": "Dismiss"
+      "dismiss": "Fechar"
     },
     "crash": {
       "title": "World of ClaudeCraft",

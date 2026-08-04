@@ -2901,7 +2901,7 @@ export const ko_KR: EnTranslations = {
       "countLabel": "업적 {earned}/{total}",
       "completionAria": "획득한 업적: {earned}/{total}",
       "recentLabel": "최근:",
-      "recentJumpAria": "Jump to {name}",
+      "recentJumpAria": "{name}로 이동",
       "nearestLabel": "달성 임박:",
       "filterGroupAria": "업적 필터",
       "filterAll": "전체",
