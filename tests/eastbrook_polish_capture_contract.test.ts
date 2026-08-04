@@ -209,7 +209,7 @@ describe('Eastbrook polish capture contract', () => {
       sourceComparison: 'feature-worktree',
       views: EASTBROOK_TOWN_CAPTURE_VIEWS,
       placementInventory: EASTBROOK_TOWN_REBUILD_PLACEMENT_INVENTORY,
-      townTriangles: 29_644,
+      townTriangles: 29_436,
       attributionTargets: [
         {
           key: 'town-root',
@@ -233,7 +233,7 @@ describe('Eastbrook polish capture contract', () => {
       sourceComparison: 'polish-baseline-worktree',
       views: EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS,
       placementInventory: EASTBROOK_TOWN_REBUILD_PLACEMENT_INVENTORY,
-      townTriangles: 29_644,
+      townTriangles: 29_436,
       attributionTargets: [
         {
           key: 'town-root',
@@ -255,7 +255,7 @@ describe('Eastbrook polish capture contract', () => {
       layoutId: 'eastbrook_civic_layout_v2',
       sourceComparison: 'polish-v2-worktree',
       placementInventory: EASTBROOK_TOWN_POLISH_V2_PLACEMENT_INVENTORY,
-      townTriangles: 29_110,
+      townTriangles: 28_902,
       attributionTargets: [
         {
           key: 'town-root',
@@ -360,18 +360,17 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned, stacked causes on the renderer-integration
-      // leaf: the far-field work moved it (the impostor bake + fog-free
-      // vista split + horizonHazePlan band, then the #2793 review round:
-      // vistaLive readiness gate, far-layer teardown, stroke-end far-tile
-      // invalidation, the shared farFieldPolicy source) and the release
-      // moved it again gating the shapeshift-form visual swap on async
-      // compile (#2571); before that the local-gate-perf migration moved
-      // the lockfile leaf to pnpm-lock.yaml, re-minting every GLB source
-      // fingerprint. Not one Eastbrook pipeline input or geometry value
-      // changed, and no capture was retaken (the per-asset seal suites
-      // stay green untouched).
-      fingerprint: '40c318ca9a185aa39e9141c924b870d21a271c8f5fb72be868710952e00f3f3e',
+      // Deliberately re-pinned, stacked causes across merges: the far-field
+      // branch moved the renderer-integration leaf repeatedly (impostor bake,
+      // fog-free vista split, horizonHazePlan, the #2793 review round), the
+      // local-gate-perf migration moved the lockfile leaf to pnpm-lock.yaml,
+      // and the release side stacked its own moves (shapeshift compile gate,
+      // then PR #2720's fence-removal layout evidence over the base renderer
+      // provenance move). Each merge mints one composite that matches neither
+      // parent's literal. No Eastbrook pipeline input or geometry value
+      // changed, and no capture was retaken (the per-asset seal suites stay
+      // green untouched).
+      fingerprint: 'c15d64f6868a3afac3fe3ec2e6297fbff3f1445a0ffac58bfd7f4ed38fd5c107',
       components: {
         captureContract: {
           id: 'polish-v2',
@@ -582,10 +581,10 @@ describe('Eastbrook polish capture contract', () => {
         shadowEnabled: true,
         ...(contractId ? { contractId } : {}),
       });
-    expect(() => assertPerf(29_644)).not.toThrow();
-    expect(() => assertPerf(29_644, 'rebuild-v1')).not.toThrow();
-    expect(() => assertPerf(29_644, 'polish-baseline')).not.toThrow();
-    expect(() => assertPerf(29_110, 'polish-v2')).not.toThrow();
+    expect(() => assertPerf(29_436)).not.toThrow();
+    expect(() => assertPerf(29_436, 'rebuild-v1')).not.toThrow();
+    expect(() => assertPerf(29_436, 'polish-baseline')).not.toThrow();
+    expect(() => assertPerf(28_902, 'polish-v2')).not.toThrow();
     expect(() => assertPerf(29_644, 'polish-v2')).toThrow('draw stats');
   });
 

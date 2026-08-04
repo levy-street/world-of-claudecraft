@@ -1236,12 +1236,19 @@ export async function dailyRewardPointEvents(
 
 export type ModerationHistoryTab = 'all' | 'mine' | 'notes';
 
-// The one action kind the guild arm can carry. Guild moderation writes exactly one
-// row shape (a rename), so the audit query stamps the discriminator as a literal
-// rather than reading a stored column; a second guild action would add the column
-// and this constant goes away. The dashboard's label table keys off it, and
-// tests/admin_account_db.test.ts pins the SQL literal against it.
+// The action kinds the guild arm can carry, the guild-scoped sibling of the
+// account-scoped MODERATION_ACTIONS (server/moderation_db.ts). Guild moderation
+// used to write exactly one row shape, so the audit query stamped the
+// discriminator as a literal; the dormant-slot bank purge made it two, so
+// guild_moderation_actions gained an additive `action` column (defaulting to
+// the rename literal, which is what keeps every pre-existing row correct) and
+// the union now reads that column. The dashboard's label table
+// (src/admin/labels.ts) keys off these constants and
+// tests/admin/moderation_action_labels.test.ts pins the whole closed set
+// against it, so a third guild action cannot regress to "Other action".
 export const GUILD_RENAME_ACTION = 'guild_rename';
+export const GUILD_BANK_PURGE_ACTION = 'guild_bank_purge';
+export const GUILD_MODERATION_ACTIONS = [GUILD_RENAME_ACTION, GUILD_BANK_PURGE_ACTION] as const;
 
 export interface ModerationActionHistoryEntry {
   source: 'account' | 'ip' | 'guild';
@@ -1340,7 +1347,7 @@ export async function listModerationActions(
                 NULL::int AS account_id,
                 NULL::text AS username,
                 NULL::text AS ip,
-                'guild_rename' AS action,
+                guild_action.action,
                 guild_action.reason,
                 guild_action.created_at,
                 NULL::timestamptz AS expires_at,

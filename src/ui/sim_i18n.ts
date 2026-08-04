@@ -45,6 +45,43 @@ const baseEnTable = {
   'error.bankMaxSlots': 'Your bank cannot be expanded further.',
   'error.bankTooFar': 'You are too far from the banker.',
   'log.bankSlotsPurchased': 'You purchase additional bank slots.',
+  // Guild Bank (src/sim/guild_bank.ts): the officer-plus shared treasury +
+  // item store. The error.* lines are the refusal toasts (too-far, quest-item,
+  // and "Not enough money." reuse the existing rows above / the hud arm); the
+  // log.* lines are the success notices. The four parameterized log.* rows are
+  // matched by RULES entries; the rest register in the EXACT matcher
+  // automatically.
+  // Deliberately NOT the bare 'You are not in a guild.': that exact sentence is
+  // already server_i18n's guild.notInOne (emitted 8x from server/social.ts), and
+  // the hud runs the server matcher FIRST, so a duplicate row here would be dead
+  // at runtime while still shipping a second per-locale copy free to diverge.
+  // The guild-bank refusal names its own feature instead, so this row is the
+  // ONE that renders it.
+  'error.guildBankNoGuild': 'You must be in a guild to use the guild bank.',
+  'error.guildBankRank': 'Only guild officers may use the guild bank.',
+  'error.guildBankFull': 'The guild bank is full.',
+  // The anonymous-pipe item policy refusals (guildBankPipeRefusal). DEPOSIT names
+  // the dimension: quest and soulbound get their own lines; noMarketList and
+  // transfer-locked copies share the generic one (the mail noMailQuestItems
+  // grouping precedent). WITHDRAW is one line for every dimension, because the
+  // deposit wording ("you cannot store that") is false once the copy is already
+  // in the book and the officer asked to take it out; that arm is reachable only
+  // from a tampered or legacy row, which the guild pane renders as dormant.
+  'error.guildBankQuestItem': 'You cannot store quest items in the guild bank.',
+  'error.guildBankSoulbound': 'You cannot store soulbound items in the guild bank.',
+  'error.guildBankNoTransfer': 'That item cannot be stored in the guild bank.',
+  'error.guildBankWithdrawRefused': 'That item cannot be withdrawn from the guild bank.',
+  'error.guildBankTreasuryCap': 'The guild treasury cannot hold that much.',
+  'error.guildBankTreasuryShort': 'The guild treasury does not hold that much.',
+  'error.guildBankCarryCap': 'You cannot carry that much money.',
+  'error.guildBankCannotAfford': 'Your guild cannot afford that expansion.',
+  'error.guildBankMaxSlots': 'The guild bank cannot be expanded further.',
+  'log.guildBankOpened': 'You open the guild bank.',
+  'log.guildBankSlotsPurchased': 'You purchase additional guild bank slots.',
+  'log.guildBankDepositGold': 'You deposit {money} into the guild treasury.',
+  'log.guildBankWithdrawGold': 'You withdraw {money} from the guild treasury.',
+  'log.guildBankDepositItem': 'You deposit {item} into the guild bank.',
+  'log.guildBankWithdrawItem': 'You withdraw {item} from the guild bank.',
   'error.specLevel': 'You may choose a specialization at level {level}.',
   'error.equipLevel': 'You must be level {level} to equip that.',
   'error.mountLevel': 'You must be level {level} to ride that mount.',
@@ -3788,6 +3825,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.lineOfSight': '目标不在视线内。',
     'error.bagsFull': '你的背包已满。',
     'error.bankQuestItem': '你无法将任务物品存入银行。',
+    'error.guildBankQuestItem': '你无法将任务物品存入公会银行。',
+    'error.guildBankWithdrawRefused': '该物品无法从公会银行取出。',
     'error.bankFull': '你的银行已满。',
     'error.bankCannotAfford': '你无力支付该银行扩展费用。',
     'error.bankMaxSlots': '你的银行无法再扩展了。',
@@ -4188,6 +4227,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.lineOfSight': '目標不在視線內。',
     'error.bagsFull': '你的背包已滿。',
     'error.bankQuestItem': '你無法將任務物品存入銀行。',
+    'error.guildBankQuestItem': '你無法將任務物品存入公會銀行。',
+    'error.guildBankWithdrawRefused': '該物品無法從公會銀行取出。',
     'error.bankFull': '你的銀行已滿。',
     'error.bankCannotAfford': '你無力支付該銀行擴充費用。',
     'error.bankMaxSlots': '你的銀行無法再擴充了。',
@@ -4594,6 +4635,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.lineOfSight': '시야가 막혀 있습니다.',
     'error.bagsFull': '가방이 가득 찼습니다.',
     'error.bankQuestItem': '퀘스트 아이템은 은행에 보관할 수 없습니다.',
+    'error.guildBankQuestItem': '퀘스트 아이템은 길드 은행에 보관할 수 없습니다.',
+    'error.guildBankWithdrawRefused': '해당 아이템은 길드 은행에서 꺼낼 수 없습니다.',
     'error.bankFull': '은행이 가득 찼습니다.',
     'error.bankCannotAfford': '그 은행 확장을 구매할 돈이 부족합니다.',
     'error.bankMaxSlots': '은행을 더 이상 확장할 수 없습니다.',
@@ -5011,6 +5054,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.lineOfSight': '視線が通っていません。',
     'error.bagsFull': 'バッグがいっぱいです。',
     'error.bankQuestItem': 'クエストアイテムは銀行に預けられません。',
+    'error.guildBankQuestItem': 'クエストアイテムはギルド銀行に預けられません。',
+    'error.guildBankWithdrawRefused': 'そのアイテムはギルド銀行から引き出せません。',
     'error.bankFull': '銀行がいっぱいです。',
     'error.bankCannotAfford': 'その銀行拡張を購入するにはお金が足りません。',
     'error.bankMaxSlots': '銀行をこれ以上拡張できません。',
@@ -5844,6 +5889,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.lineOfSight': 'Нет прямой видимости.',
     'error.bagsFull': 'Ваши сумки полны.',
     'error.bankQuestItem': 'Предметы заданий нельзя хранить в банке.',
+    'error.guildBankQuestItem': 'Предметы заданий нельзя хранить в банке гильдии.',
+    'error.guildBankWithdrawRefused': 'Этот предмет нельзя забрать из банка гильдии.',
     'error.bankFull': 'Ваш банк полон.',
     'error.bankCannotAfford': 'У вас недостаточно денег на это расширение банка.',
     'error.bankMaxSlots': 'Ваш банк больше нельзя расширить.',
@@ -9741,6 +9788,27 @@ const RULES: Rule[] = [
   {
     re: /^Card Duel requires another player online\.$/,
     build: () => tSim('error.cardDuelUnavailable'),
+  },
+  // Guild Bank success notices (src/sim/guild_bank.ts). The money fragment is
+  // sim-formatted ("3g 5s 7c") and splices verbatim like the market price rows;
+  // item names re-localize through the entity dictionary. The "treasury" /
+  // "guild bank" sentence tails are deliberately distinct so the money and item
+  // forms can never shadow each other.
+  {
+    re: /^You deposit (.+) into the guild treasury\.$/,
+    build: (m) => tSim('log.guildBankDepositGold', { money: m[1] }),
+  },
+  {
+    re: /^You withdraw (.+) from the guild treasury\.$/,
+    build: (m) => tSim('log.guildBankWithdrawGold', { money: m[1] }),
+  },
+  {
+    re: /^You deposit (.+) into the guild bank\.$/,
+    build: (m) => tSim('log.guildBankDepositItem', { item: locItem(m[1]) }),
+  },
+  {
+    re: /^You withdraw (.+) from the guild bank\.$/,
+    build: (m) => tSim('log.guildBankWithdrawItem', { item: locItem(m[1]) }),
   },
 ];
 

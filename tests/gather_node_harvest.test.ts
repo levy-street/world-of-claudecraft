@@ -975,12 +975,12 @@ describe('node tool gating over the live server', () => {
 
     meta.nodeHarvestReadyAt.ore_mirefen_t2 = server.sim.time;
     driveFrame({});
-    expect(server.sim.countItem('iron_ore', s.pid)).toBe(1);
+    expect(server.sim.countItem('iron_ore', s.pid)).toBe(2);
     expect(slot.durability).toBe(charges - 1);
 
     meta.nodeHarvestReadyAt.ore_mirefen_t2 = server.sim.time;
     driveFrame({ confirmUse: 'yes' });
-    expect(server.sim.countItem('iron_ore', s.pid)).toBe(2);
+    expect(server.sim.countItem('iron_ore', s.pid)).toBe(3);
     expect(slot.durability).toBe(charges - 1);
   });
 });

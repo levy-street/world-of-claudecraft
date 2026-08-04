@@ -12,12 +12,18 @@
 // Colors live in the extracted stylesheet: item-quality tint comes
 // from the shared QUALITY_COLOR map, the unranked fallback is a CSS token, so no
 // raw hex sits in this painter.
+//
+// The Browse tab's Buy button dispatches through a confirm prompt rather than
+// straight to IWorld: the terms it states and the confirm-time recheck that
+// guards the dispatch are the pure core market_buy_confirm_core.ts, and the
+// prompt itself is Hud's one #confirm-dialog, injected as a dep.
 
 import { audio } from '../game/audio';
 import type { ItemInstancePayload, ItemSlot } from '../sim/types';
 import {
   type IWorld,
   type MarketInfo,
+  type MarketListingView,
   queryDiffersFromEcho,
   searchDiffersFromEcho,
 } from '../world_api';
@@ -28,6 +34,11 @@ import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
+import {
+  type MarketBuyConfirm,
+  marketBuyConfirm,
+  recheckMarketBuy,
+} from './market_buy_confirm_core';
 import {
   MARKET_ARMOR_CLASS_FILTERS,
   MARKET_ITEM_TYPE_FILTERS,
@@ -87,6 +98,16 @@ export interface MarketWindowDeps extends PainterHostPresentation {
   slotName(slot: ItemSlot): string;
   /** Render the bags window and, when `open`, reveal it alongside the market. */
   syncBags(open: boolean): void;
+  /** Hud's one modal confirm prompt (the #confirm-dialog family), used to gate a
+   *  buyout: the coin leaves the purse the instant the command lands and no
+   *  buyback records it, so the Browse tab asks before it dispatches. */
+  confirmDialog(
+    title: string,
+    body: string,
+    okText: string,
+    cancelText: string,
+    onOk: () => void,
+  ): void;
 }
 
 export class MarketWindow {
@@ -620,9 +641,12 @@ export class MarketWindow {
         }),
       );
       btn.addEventListener('click', () => {
-        if (l.mine) this.deps.world().marketCancel(l.id);
-        else this.deps.world().marketBuy(l.id);
         audio.click();
+        // Reclaim returns the player's own goods and costs nothing, so it stays one
+        // click; a buyout spends coin outright, so it asks first (the bank
+        // slot-purchase precedent).
+        if (l.mine) this.deps.world().marketCancel(l.id);
+        else this.promptBuy(l, itemName);
       });
       row.appendChild(btn);
       this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, l.instance));
@@ -667,6 +691,51 @@ export class MarketWindow {
       });
       list.appendChild(pager);
     }
+  }
+
+  // The Browse tab's buy gate. It captures the row's terms in the pure core and
+  // states them in Hud's one modal confirm prompt; nothing is sent until OK.
+  private promptBuy(listing: MarketListingView, itemName: string): void {
+    const pending = marketBuyConfirm(listing);
+    // A stack quotes both the total ask and the per-unit ask the row showed, so the
+    // prompt can never read as the price of a single item.
+    const body =
+      pending.unitPrice === null
+        ? t('itemUi.market.buyConfirmBody', {
+            item: itemName,
+            price: formatLocalizedMoney(pending.price),
+          })
+        : t('itemUi.market.buyConfirmBodyStack', {
+            item: itemName,
+            count: formatNumber(pending.count, { maximumFractionDigits: 0 }),
+            price: formatLocalizedMoney(pending.price),
+            each: formatLocalizedMoney(pending.unitPrice),
+          });
+    this.deps.confirmDialog(
+      t('itemUi.market.buyConfirmTitle'),
+      body,
+      t('itemUi.market.buyConfirmAccept'),
+      t('itemUi.market.buyConfirmCancel'),
+      () => this.commitBuy(pending),
+    );
+  }
+
+  // OK pressed: re-resolve the captured listing against the LIVE snapshot before
+  // dispatching. The prompt is modal but the market under it is not frozen (the
+  // refresh band repaints rows, a listing can sell to someone else, expire, or be
+  // replaced at a reused id), so a stale capture must never buy a different stack,
+  // or the same one at a price the player never read. Both refusals send nothing and
+  // say why; the browse list repaints itself on the next snapshot either way.
+  private commitBuy(pending: MarketBuyConfirm): void {
+    const check = recheckMarketBuy(this.deps.world().marketInfo, pending);
+    if (check.state !== 'ok') {
+      this.deps.showError(
+        t(check.state === 'gone' ? 'itemUi.errors.listingUnavailable' : 'itemUi.market.buyChanged'),
+      );
+      return;
+    }
+    this.deps.world().marketBuy(pending.listingId);
+    audio.coin();
   }
 
   private renderSell(body: HTMLElement, view: MarketSellBody, meta: MarketSellMeta): void {

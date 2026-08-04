@@ -1869,6 +1869,32 @@ export const TARGETS = [
     },
   },
   {
+    key: 'market-buy-confirm',
+    label: 'World Market buy confirmation prompt (Browse tab, Buy pressed)',
+    when: ['ui/market_window', 'ui/market_buy_confirm_core'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    // Clips the whole HUD rather than #confirm-dialog: on the BASE commit the Buy click
+    // buys outright and no dialog exists, so a dialog-only clip would capture nothing at
+    // all and leave the pair with no "before" to contrast. The HUD frame shows both
+    // states honestly (market alone, versus market with the prompt over it).
+    async capture(page) {
+      if (!(await openMarketBrowse(page))) return {};
+      const pressed = await page.evaluate(() => {
+        // The first row offering Buy (rows the viewer owns read Reclaim and carry the
+        // .cancel modifier); the Merchant's standing stock guarantees at least one.
+        const btn = [...document.querySelectorAll('.mkt-row .mkt-btn')].find(
+          (el) => !el.classList.contains('cancel'),
+        );
+        if (!btn) return false;
+        btn.click();
+        return true;
+      });
+      if (!pressed) return {};
+      await wait(400);
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'market-armor-filters',
     label: 'World Market armor filters (responsive search and filter grid)',
     when: ['ui/market_window', 'ui/market_view', 'ui/market_filters'],

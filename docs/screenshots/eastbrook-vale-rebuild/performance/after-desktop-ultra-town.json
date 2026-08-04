@@ -516,7 +516,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -648,7 +648,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -780,7 +780,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -912,7 +912,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -1044,7 +1044,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -1176,7 +1176,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -1308,7 +1308,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -1440,7 +1440,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -1808,7 +1808,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -1841,7 +1841,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -1874,7 +1874,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -1907,7 +1907,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -1940,7 +1940,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -1973,7 +1973,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -2006,7 +2006,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -2039,7 +2039,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -2096,19 +2096,19 @@
         "deltas": {
           "townWithoutShadows": {
             "calls": 18,
-            "triangles": 29644,
+            "triangles": 29436,
             "lines": 0,
             "points": 0
           },
           "townWithShadows": {
             "calls": 27,
-            "triangles": 57692,
+            "triangles": 57276,
             "lines": 0,
             "points": 0
           },
           "shadowPassAttribution": {
             "calls": 9,
-            "triangles": 28048,
+            "triangles": 27840,
             "lines": 0,
             "points": 0
           }
@@ -2117,19 +2117,19 @@
       "deltas": {
         "townWithoutShadows": {
           "calls": 18,
-          "triangles": 29644,
+          "triangles": 29436,
           "lines": 0,
           "points": 0
         },
         "townWithShadows": {
           "calls": 27,
-          "triangles": 57692,
+          "triangles": 57276,
           "lines": 0,
           "points": 0
         },
         "shadowPassAttribution": {
           "calls": 9,
-          "triangles": 28048,
+          "triangles": 27840,
           "lines": 0,
           "points": 0
         }
@@ -2181,7 +2181,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -2313,7 +2313,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -2445,7 +2445,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -2577,7 +2577,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -2709,7 +2709,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -2841,7 +2841,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -2973,7 +2973,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -3105,7 +3105,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -3473,7 +3473,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -3506,7 +3506,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -3539,7 +3539,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -3572,7 +3572,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -3605,7 +3605,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -3638,7 +3638,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -3671,7 +3671,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -3704,7 +3704,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -3761,19 +3761,19 @@
         "deltas": {
           "townWithoutShadows": {
             "calls": 18,
-            "triangles": 29644,
+            "triangles": 29436,
             "lines": 0,
             "points": 0
           },
           "townWithShadows": {
             "calls": 27,
-            "triangles": 57692,
+            "triangles": 57276,
             "lines": 0,
             "points": 0
           },
           "shadowPassAttribution": {
             "calls": 9,
-            "triangles": 28048,
+            "triangles": 27840,
             "lines": 0,
             "points": 0
           }
@@ -3782,19 +3782,19 @@
       "deltas": {
         "townWithoutShadows": {
           "calls": 18,
-          "triangles": 29644,
+          "triangles": 29436,
           "lines": 0,
           "points": 0
         },
         "townWithShadows": {
           "calls": 27,
-          "triangles": 57692,
+          "triangles": 57276,
           "lines": 0,
           "points": 0
         },
         "shadowPassAttribution": {
           "calls": 9,
-          "triangles": 28048,
+          "triangles": 27840,
           "lines": 0,
           "points": 0
         }
@@ -3846,7 +3846,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -3978,7 +3978,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -4110,7 +4110,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -4242,7 +4242,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -4374,7 +4374,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -4506,7 +4506,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -4638,7 +4638,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -4770,7 +4770,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -5138,7 +5138,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -5171,7 +5171,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -5204,7 +5204,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -5237,7 +5237,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -5270,7 +5270,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -5303,7 +5303,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -5336,7 +5336,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -5369,7 +5369,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -5426,19 +5426,19 @@
         "deltas": {
           "townWithoutShadows": {
             "calls": 18,
-            "triangles": 29644,
+            "triangles": 29436,
             "lines": 0,
             "points": 0
           },
           "townWithShadows": {
             "calls": 27,
-            "triangles": 57692,
+            "triangles": 57276,
             "lines": 0,
             "points": 0
           },
           "shadowPassAttribution": {
             "calls": 9,
-            "triangles": 28048,
+            "triangles": 27840,
             "lines": 0,
             "points": 0
           }
@@ -5447,19 +5447,19 @@
       "deltas": {
         "townWithoutShadows": {
           "calls": 18,
-          "triangles": 29644,
+          "triangles": 29436,
           "lines": 0,
           "points": 0
         },
         "townWithShadows": {
           "calls": 27,
-          "triangles": 57692,
+          "triangles": 57276,
           "lines": 0,
           "points": 0
         },
         "shadowPassAttribution": {
           "calls": 9,
-          "triangles": 28048,
+          "triangles": 27840,
           "lines": 0,
           "points": 0
         }
@@ -5511,7 +5511,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -5643,7 +5643,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -5775,7 +5775,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -5907,7 +5907,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -6039,7 +6039,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -6171,7 +6171,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -6303,7 +6303,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -6435,7 +6435,7 @@
           "drawStats": {
             "colorDraws": 18,
             "shadowDraws": 9,
-            "triangles": 29644,
+            "triangles": 29436,
             "buildingCount": 6,
             "roofHideTargetCount": 6,
             "microBatchCount": 2,
@@ -6803,7 +6803,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -6836,7 +6836,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -6869,7 +6869,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -6902,7 +6902,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -6935,7 +6935,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -6968,7 +6968,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -7001,7 +7001,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -7034,7 +7034,7 @@
             "drawStats": {
               "colorDraws": 18,
               "shadowDraws": 9,
-              "triangles": 29644,
+              "triangles": 29436,
               "buildingCount": 6,
               "roofHideTargetCount": 6,
               "microBatchCount": 2,
@@ -7091,19 +7091,19 @@
         "deltas": {
           "townWithoutShadows": {
             "calls": 18,
-            "triangles": 29644,
+            "triangles": 29436,
             "lines": 0,
             "points": 0
           },
           "townWithShadows": {
             "calls": 27,
-            "triangles": 57692,
+            "triangles": 57276,
             "lines": 0,
             "points": 0
           },
           "shadowPassAttribution": {
             "calls": 9,
-            "triangles": 28048,
+            "triangles": 27840,
             "lines": 0,
             "points": 0
           }
@@ -7112,19 +7112,19 @@
       "deltas": {
         "townWithoutShadows": {
           "calls": 18,
-          "triangles": 29644,
+          "triangles": 29436,
           "lines": 0,
           "points": 0
         },
         "townWithShadows": {
           "calls": 27,
-          "triangles": 57692,
+          "triangles": 57276,
           "lines": 0,
           "points": 0
         },
         "shadowPassAttribution": {
           "calls": 9,
-          "triangles": 28048,
+          "triangles": 27840,
           "lines": 0,
           "points": 0
         }
