@@ -154,6 +154,7 @@ export function dealDamage(
         crit: false,
         school,
         ability,
+        abilityId,
         kind,
         ...(attackAnimationStarted ? { attackAnimationStarted: true as const } : {}),
       });
@@ -183,6 +184,7 @@ export function dealDamage(
         crit: false,
         school,
         ability,
+        abilityId,
         kind: 'evade',
       });
     }
@@ -558,6 +560,7 @@ export function dealDamage(
         crit,
         school,
         ability,
+        abilityId,
         kind,
         absorbed: totalAbsorbed || undefined,
         ...attackAnimation,
@@ -623,6 +626,7 @@ export function dealDamage(
         crit,
         school,
         ability,
+        abilityId,
         kind,
         absorbed: totalAbsorbed || undefined,
         ...attackAnimation,
@@ -654,6 +658,7 @@ export function dealDamage(
         crit,
         school,
         ability,
+        abilityId,
         kind,
         ...attackAnimation,
       });
@@ -688,6 +693,7 @@ export function dealDamage(
         crit,
         school,
         ability,
+        abilityId,
         kind,
         absorbed: totalAbsorbed || undefined,
         ...attackAnimation,
@@ -773,6 +779,7 @@ export function dealDamage(
     crit,
     school,
     ability,
+    abilityId,
     kind,
     absorbed: totalAbsorbed || undefined,
     ...attackAnimation,

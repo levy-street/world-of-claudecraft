@@ -369,13 +369,14 @@ describe('Eastbrook polish capture contract', () => {
       // rig (PR #2842), and the far-field sprite impostors, fog-free vista and
       // horizon pass (PR #2793); from this branch, the worldObjectBurning
       // fire-burst cue (torched murloc huts, q_deepfen_purge). The release also
-      // retook the polish captures at the far-field merge, and their metadata and
-      // performance JSONs and pins are adopted verbatim here. The merged tree
-      // therefore mints one fingerprint matching no parent's literal. No GLB
-      // source fingerprint moved, no pipeline input or geometry value changed,
-      // and no capture was retaken in this merge. Re-minted with
+      // retook the polish captures and re-swept their metadata and performance
+      // JSONs across the far-field and combat-audio merges, and those files are
+      // adopted verbatim here. The merged tree therefore mints one fingerprint
+      // matching no parent's literal. No GLB source fingerprint moved, no
+      // pipeline input or geometry value changed, and no capture was retaken in
+      // this merge. Re-minted with
       // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
-      fingerprint: 'b4d66ed9452c75a4838948c9d20ac9cc4293afc458aee33462dce72b353d8987',
+      fingerprint: '66df0e1d6106a804ed92ddef88b7a853732dc553c4d08196128ece70ec6df9e0',
       components: {
         captureContract: {
           id: 'polish-v2',

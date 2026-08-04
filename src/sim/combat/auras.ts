@@ -273,7 +273,13 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             true,
             undefined,
             // Periodic (DoT) ticks are not a direct attack: they must not walk a
-            // mob's leash anchor, so a DoT-kited mob still leashes home.
+            // mob's leash anchor, so a DoT-kited mob still leashes home. Ticks
+            // also deliberately carry NO abilityId (the label above is FCT and
+            // combat-log only): a hybrid ability's dot shares its ability id
+            // (Throat Wire's bleed is aura id 'garrote'), so a tick that carried
+            // the id would replay the ability's dedicated impact recording
+            // (IMPACT_ABILITY_CUES) every interval, the exact per-tick spam the
+            // one-shot dotApply moment exists to avoid.
             false,
             false,
             // Banks copied from resolved damage (Ignite) skip the source-output

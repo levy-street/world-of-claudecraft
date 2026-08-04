@@ -621,13 +621,16 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
 // Form visual swap onto the purpose-built quadruped rig (PR #2842) and the
 // far-field sprite impostors, fog-free vista and horizon pass (PR #2793) from
 // the release side, plus this branch's worldObjectBurning fire-burst cue. The
-// accepted file still points at the same captured view; only its swept
-// provenance bytes follow the merged rendererIntegration and layout inputs.
+// release also re-swept this evidence across the combat-audio merge (PR #2861)
+// and that file is adopted verbatim. Both sides move the same leaf, so the
+// merged tree mints literals matching neither parent. The accepted file still
+// points at the same captured view; only its swept provenance bytes follow the
+// merged rendererIntegration and layout inputs.
 // Re-minted with scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '2bd7b43a27d26ab451b794acee755220041795dd3bcd2f3577205a0e0bd91f13';
+  '280bce4648ccb366bb59a5fec8caa6de3e928e7e2c05b09cee0b665c3eeee395';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'b4d66ed9452c75a4838948c9d20ac9cc4293afc458aee33462dce72b353d8987';
+  '66df0e1d6106a804ed92ddef88b7a853732dc553c4d08196128ece70ec6df9e0';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1488,13 +1491,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // fence-removal layout evidence, the live graphics rebuild #2799, the Bear
     // Form rig swap #2842 and the far-field impostors, fog-free vista and
     // horizon pass #2793 from release/v0.34.0, plus this branch's
-    // worldObjectBurning fire-burst cue), so this seal follows the merged
-    // composite, recomputed last by remint_polish_provenance.mjs. Every measured
-    // value (frame timings, draw stats, triangle and scenario numbers) is
-    // byte-identical against the current release/v0.34.0 tip, no parent's
+    // worldObjectBurning fire-burst cue), and the release re-swept this evidence
+    // again across the combat-audio merge (PR #2861), so this seal follows the
+    // merged composite, recomputed last by remint_polish_provenance.mjs. Every
+    // measured value (frame timings, draw stats, triangle and scenario numbers)
+    // is byte-identical against the current release/v0.34.0 tip, no parent's
     // literal matched the merged tree, and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      '2eda1a3b8597ce80d6e77640e63565d93e2a9daa27e1fe8302a0075ef25d76f4',
+      '2a8689a52d793b090d6bf3be6dfbd1faecaa77a506dcb8d70eff98cbb5dcdd89',
     );
   });
 
