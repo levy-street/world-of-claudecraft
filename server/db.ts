@@ -3468,7 +3468,9 @@ export async function saveCharacterAndGuildBankState(
 }
 
 // Upper bound on a guild_banks row this process will LOAD, enforced in SQL
-// (pg_column_size) so an oversized blob never even crosses the wire. A
+// (octet_length(data::text): UTF-8 BYTES of the serialized blob, which is what
+// the write-side gate in server/guild_bank_state.ts must measure too) so an
+// oversized blob never even crosses the wire. A
 // legitimate book is a few KB (48 slots max by the expansion ladder); a row
 // past this bound is tampered or corrupt, and the boot load SKIPS it entirely,
 // leaving that guild's ops silently inert and the row untouched on disk

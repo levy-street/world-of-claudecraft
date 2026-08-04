@@ -1092,6 +1092,46 @@ describe('mergeGuildBankRow (the escrow merge, unit)', () => {
     }
   });
 
+  it('measures the merged blob in UTF-8 BYTES, the unit both SQL gates use', () => {
+    // REGRESSION (the write/read unit mismatch): the SQL gates bound
+    // octet_length(data::text), i.e. BYTES, while this gate used to measure
+    // JS string LENGTH (UTF-16 code units). A book padded with multi-byte
+    // text therefore passed the write gate and landed durable at a size the
+    // BOOT READ then skips as oversized, quarantining that guild's book for
+    // good: the exact failure this bound exists to prevent.
+    //
+    // The padding rides itemId, which is deliberately UNCAPPED by the load
+    // path (an unknown-but-string id is dormant recoverable data: items are
+    // never destroyed), so it is what a tampered row can actually carry
+    // through to a write. One 3-byte character per code unit, sized to sit
+    // UNDER the bound by string length and OVER it by bytes; the assertions
+    // below fix both measurements so a future edit cannot make this vacuous.
+    const padding = '一'.repeat(100_000); // 100k units, 300k UTF-8 bytes
+    const book = {
+      treasury: 0,
+      inventory: [{ itemId: padding, count: 1 }],
+      purchasedSlots: 24,
+    };
+    const serialized = JSON.stringify(book);
+    expect(serialized.length).toBeLessThan(262_144); // would have PASSED the old gate
+    expect(Buffer.byteLength(serialized, 'utf8')).toBeGreaterThan(262_144); // SQL sees this
+    const merged = mergeGuildBankRow(book, []);
+    expect(merged.data).toBeNull();
+    expect(merged.result.rowUnusable).toBe(true);
+
+    // Control: the same book with ASCII padding of the same BYTE size is
+    // refused too, and an ordinary book still writes. Without these the test
+    // could pass on a gate that refuses everything.
+    const ascii = { ...book, inventory: [{ itemId: 'a'.repeat(300_000), count: 1 }] };
+    expect(mergeGuildBankRow(ascii, []).result.rowUnusable).toBe(true);
+    const ordinary = {
+      treasury: 5,
+      inventory: [{ itemId: 'wolf_fang', count: 1 }],
+      purchasedSlots: 24,
+    };
+    expect(mergeGuildBankRow(ordinary, []).result.rowUnusable).toBe(false);
+  });
+
   it('reports a DEFICIT (and writes nothing) when durable truth cannot satisfy the replay', () => {
     const withdraw = {
       op: 'withdraw_gold' as const,

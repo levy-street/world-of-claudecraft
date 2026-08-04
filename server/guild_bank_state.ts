@@ -63,12 +63,23 @@ export class GuildBankEscrowRefused extends Error {
   }
 }
 
-// The merged blob a save may write, in bytes. The READ bound alone is not
+// The merged blob a save may write, in BYTES. The READ bound alone is not
 // enough: the replay deliberately skips the capacity re-check, so a book that
 // grew past the bound would become permanently unreadable and every later save
 // would refuse forever. Refusing the WRITE keeps the row inside the bound the
 // read enforces. A legitimate book is a few KB (60 slots at most), so this can
 // only fire on a tampered one.
+//
+// The unit is load-bearing and must match both SQL gates, which measure
+// `octet_length(data::text)`, i.e. UTF-8 BYTES (server/db.ts writeGuildBankRow
+// and loadGuildBankRows, same 262,144 bound). Measuring JS string LENGTH here
+// instead would count UTF-16 code units, which is smaller than the byte count
+// for every non-ASCII character: a book carrying multi-byte text (a crafter
+// name, a signer, a tampered id) could pass this gate at, say, 200k units while
+// its UTF-8 encoding is past 262,144 bytes, land durable through a SQL gate
+// that only bounds the READ side of the same statement, and then be skipped by
+// the boot load as oversized forever. That is exactly the permanent quarantine
+// this bound exists to prevent, so the measurement is Buffer.byteLength.
 export const GUILD_BANK_MERGED_MAX_BYTES = 262_144;
 
 export interface GuildBankBootResult {
@@ -188,7 +199,9 @@ function sized(data: GuildBankState): {
   data: GuildBankState | null;
   result: Omit<GuildBankWriteResult, 'guildId'>;
 } {
-  if (JSON.stringify(data).length > GUILD_BANK_MERGED_MAX_BYTES) {
+  // BYTES, not string length: the SQL gates measure octet_length(data::text).
+  // See the constant's note for why the mismatch quarantines a book forever.
+  if (Buffer.byteLength(JSON.stringify(data), 'utf8') > GUILD_BANK_MERGED_MAX_BYTES) {
     return { data: null, result: { written: false, deficit: null, rowUnusable: true } };
   }
   return { data, result: { written: true, deficit: null, rowUnusable: false } };
