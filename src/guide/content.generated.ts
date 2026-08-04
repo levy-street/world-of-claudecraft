@@ -2465,9 +2465,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 5,
         "rare": false,
         "templateId": "breach_wretch",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "model": "mob_breach_wretch",
+        "still": "/guide-stills/mob_breach_wretch.webp"
       },
       {
         "name": "Gleamfolk Pixie",
@@ -2897,9 +2896,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 4,
         "rare": false,
         "templateId": "riftspawn",
-        "model": "mob_demonalt",
-        "tint": "#7a3fb0",
-        "still": "/guide-stills/mob_demonalt__7a3fb0.webp"
+        "model": "mob_riftspawn",
+        "still": "/guide-stills/mob_riftspawn.webp"
       }
     ]
   }
@@ -10079,5 +10077,15 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "bone": "handslot.r"
       }
     ]
+  },
+  "mob_riftspawn": {
+    "url": "models/chars/npcs/riftspawn.glb",
+    "idle": "Idle_Combat",
+    "height": 2.1
+  },
+  "mob_breach_wretch": {
+    "url": "models/chars/npcs/breach_wretch.glb",
+    "idle": "Idle_Combat",
+    "height": 2.1
   }
 };

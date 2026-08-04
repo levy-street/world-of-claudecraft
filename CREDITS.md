@@ -92,6 +92,7 @@ than free, so ask before you rely on it.
 | Dungeon modular kit (walls, floors, pillars, torches, banners, chests, furniture; also the Drakelands castle structure set) | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Dungeon-Remastered-1.0 | CC0 1.0 | Yes |
 | Graveyard/crypt props, dead trees, lanterns | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0 | CC0 1.0 | Yes |
 | Extra character animation library (Rig_Medium) | Kay Lousberg (KayKit) | https://kaylousberg.itch.io/kaykit-character-animations | CC0 1.0 | Yes |
+| The Last Bell of Gullhaven cast (`models/chars/npcs/`): derivative bodies built onto the KayKit Adventurers and Skeletons rigs above, repainted palette atlases plus original geometry, by `scripts/assets/last_bell_crew/` | Kay Lousberg (KayKit), derivative work by this project | https://github.com/KayKit-Game-Assets | CC0 1.0 | Yes |
 | Animated creatures (wolf, bull, fox, stag, alpaca, spider, frog, goblin, orc, yeti, giant, demon, ghost, goleling, glub, tribal, velociraptor, dragon) | Quaternius | https://poly.pizza/u/Quaternius · https://quaternius.com | CC0 1.0 | Yes |
 | Stylized Nature MegaKit (trees, rocks, bushes, mushrooms, grass) | Quaternius | https://quaternius.itch.io/stylized-nature-megakit | CC0 1.0 | Yes |
 | Medieval Village Pack (houses, inn, blacksmith, well, market, cart) | Quaternius | https://quaternius.com/packs/medievalvillage.html | CC0 1.0 | Yes |
