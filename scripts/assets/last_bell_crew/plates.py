@@ -23,6 +23,11 @@ import preview
 TURN_FRAMES = 12
 TURN_RES = (560, 740)
 POSE_RES = (700, 880)
+# Playback: 12 samples across a clip at 12fps is close to real time for the KayKit
+# clips (about a second each) and keeps a sprite sheet to a sane width.
+ANIM_FRAMES = 12
+ANIM_FPS = 12
+ANIM_RES = (300, 380)
 
 # Clip slots to look for when a figure's rig is not the KayKit humanoid (the
 # creature rigs each name their clips differently). Order is the preference order.
@@ -99,6 +104,33 @@ def render_member(member, out_dir, turn_frames=TURN_FRAMES):
             preview.shoot(cam, os.path.join(out_dir, name), target, dist, 32, 6)
             plates.append({"file": name, "clip": clip, "frame": frame, "label": label})
     entry["plates"] = plates
+
+    # PLAYABLE clips. Static plates are what let the reversed shields, the sideways
+    # spear and the inverted staff through review: a prop that reads fine standing
+    # still is obviously wrong once the wrist moves. Each clip is sampled evenly
+    # across its whole range from ONE fixed camera station (the pose plates re-fit
+    # per frame, which would make a walk cycle bob in and out), then stitched into a
+    # sprite sheet by `build_concept_book.mjs`.
+    anims = []
+    if rig is not None and wanted:
+        cam = preview.setup(res=ANIM_RES, transparent=True)
+        for clip, _frame, label in wanted:
+            action = bpy.data.actions.get(clip)
+            if action is None:
+                continue
+            preview.pose(rig, clip, None)
+            target, dist = preview.fit(figure_objs, pad=1.52)
+            start, end = action.frame_range
+            files = []
+            for i in range(ANIM_FRAMES):
+                f = start + (end - start) * (i / ANIM_FRAMES)   # exclusive end: loops clean
+                bpy.context.scene.frame_set(int(round(f)))
+                name = f"{member}_anim_{clip}_{i:02d}.png"
+                preview.shoot(cam, os.path.join(out_dir, name), target, dist, 32, 6)
+                files.append(name)
+            anims.append({"clip": clip, "label": label, "frames": files,
+                          "fps": ANIM_FPS, "width": ANIM_RES[0], "height": ANIM_RES[1]})
+    entry["anims"] = anims
 
     # a bust for the cast list (a portrait crop, or the whole thing if it has no head)
     if rig is not None:

@@ -63,10 +63,11 @@ CAST = {
             "The hat is doing the characterisation. A dark coat alone read as a "
             "generic villager; the sou'wester makes him a sailor in one silhouette.",
         ],
-        "weapons": [
-            {"url": "weapons/spear_a.glb", "bone": "handslot.r", "grip": "pole",
-             "why": "A boat gaff, not a spear: he fends off a pier with it and hooks lines aboard."},
-        ],
+        # No weapon. He is a declared non-combatant, and the spear the first pass
+        # gave him was `spear_a.glb`, the tribal one, tassels and all: in the Cheer
+        # plate the shaft crossed his face and he read as biting it. The outfit
+        # carries him without it.
+        "weapons": [],
         "poses": [
             ("Idle", 7, "At the gangplank"),
             ("Walking_A", 6, "Working the deck"),

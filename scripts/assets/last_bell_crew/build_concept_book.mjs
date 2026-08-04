@@ -46,6 +46,35 @@ const esc = (s) =>
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 
+// Stitch a clip's frames into one horizontal sprite sheet. One request and one
+// shared palette per clip beats N files, and CSS `steps()` can play it with no JS
+// timer at all.
+async function toSheet(dir, frames, outName, cellW, cellH) {
+  // N frames plus a DUPLICATE of the first, so the sheet holds N+1 cells. With
+  // percentage background-position, 0% aligns the image's left edge and 100% its
+  // right, so the reachable offset range is (cells - 1) cell widths. Padding to
+  // N+1 makes `steps(N)` over 0% to 100% land exactly on cells 0..N-1 and wrap
+  // clean; without the pad, every step lands a fraction of a cell off and the
+  // animation smears.
+  const cells = [...frames, frames[0]];
+  const composites = [];
+  for (let i = 0; i < cells.length; i++) {
+    composites.push({ input: join(dir, cells[i]), left: i * cellW, top: 0 });
+  }
+  await sharp({
+    create: {
+      width: cellW * cells.length,
+      height: cellH,
+      channels: 4,
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
+    },
+  })
+    .composite(composites)
+    .webp({ quality: 80, alphaQuality: 85, effort: 6 })
+    .toFile(join(IMG_DIR, outName));
+  return outName;
+}
+
 async function toWebp(src, outName, width) {
   const out = join(IMG_DIR, outName);
   let pipe = sharp(src);
@@ -118,6 +147,28 @@ function paletteRow(palette = []) {
   return `<ul class="palette">${chips}</ul>`;
 }
 
+function animRow(entry, sheets) {
+  if (!sheets.length) return '';
+  const cells = sheets
+    .map(
+      (a) => `
+      <figure class="anim">
+        <div class="anim-stage" data-frames="${a.frames}" data-fps="${a.fps}"
+             style="--sheet:url('last-bell-concept-art/${esc(a.file)}');--arw:${a.width};--arh:${a.height};--n:${a.frames};--cells:${a.frames + 1};--dur:${(a.frames / a.fps).toFixed(2)}s"></div>
+        <figcaption><b>${esc(a.label)}</b><span>${esc(a.clip)}</span></figcaption>
+      </figure>`,
+    )
+    .join('');
+  return `
+  <div class="anims">
+    <div class="anims-head">
+      <h3>In motion</h3>
+      <button class="btn anims-toggle" type="button" aria-pressed="true">Pause all</button>
+    </div>
+    <div class="anim-grid">${cells}</div>
+  </div>`;
+}
+
 function figureSection(entry, images) {
   const turn = images.turntable.map((f) => `${esc(f)}`);
   const plates = (entry.plates ?? [])
@@ -175,6 +226,7 @@ function figureSection(entry, images) {
     </div>
   </div>
 
+  ${animRow(entry, images.anims)}
   ${plates ? `<div class="plates">${plates}</div>` : ''}
 </section>`;
 }
@@ -293,6 +345,30 @@ h1 small{display:block;font-size:clamp(14px,1.7vw,19px);color:var(--faint);font-
 .weapons code{color:var(--gold-300);font-family:ui-monospace,Menlo,monospace;font-size:11px;
   margin-left:7px}
 .weapons em{display:block;color:var(--faint);font-style:normal;margin-top:2px}
+/* Playable clips. The sheet is one horizontal strip; steps() walks it a cell at a
+   time, so playback needs no JS timer and stays in sync with itself. */
+.anims{margin-top:28px;border-top:1px solid rgba(146,99,33,.28);padding-top:20px}
+.anims-head{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.anims-head h3{margin:0;font:600 11.5px/1.3 ui-sans-serif,system-ui,sans-serif;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--gold-500)}
+.anim-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:14px}
+.anim{margin:0;background:linear-gradient(180deg,#0d1c24,#060f14);
+  border:1px solid rgba(146,99,33,.3);border-radius:3px;overflow:hidden}
+/* aspect-ratio takes UNITLESS numbers; feeding it px values is invalid and
+   collapses the stage to zero height, which is exactly what it did first time. */
+.anim-stage{width:100%;aspect-ratio:var(--arw)/var(--arh);
+  background-image:var(--sheet);background-repeat:no-repeat;
+  background-size:calc(var(--cells) * 100%) 100%;
+  animation:sprite-walk var(--dur) steps(var(--n)) infinite;
+  image-rendering:auto}
+.anim.paused .anim-stage{animation-play-state:paused}
+@keyframes sprite-walk{from{background-position-x:0%}to{background-position-x:100%}}
+.anim figcaption{padding:8px 11px 10px;border-top:1px solid rgba(146,99,33,.24);
+  font:400 11.5px/1.35 ui-sans-serif,system-ui,sans-serif;display:flex;
+  flex-direction:column;gap:2px}
+.anim figcaption b{color:var(--parch);font-weight:600}
+.anim figcaption span{color:var(--faint);font-family:ui-monospace,Menlo,monospace;font-size:10.5px}
+@media (prefers-reduced-motion:reduce){.anim-stage{animation-play-state:paused}}
 .plates{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:14px;margin-top:30px;
   border-top:1px solid rgba(146,99,33,.28);padding-top:24px}
 .plate{margin:0;background:linear-gradient(180deg,#0d1c24,#060f14);border:1px solid rgba(146,99,33,.3);
@@ -332,6 +408,21 @@ const JS = `
 // Honours prefers-reduced-motion by starting paused.
 (function () {
   var calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Playable clips: CSS drives the frames, so this only owns play/pause.
+  document.querySelectorAll('.anims').forEach(function (block) {
+    var btn = block.querySelector('.anims-toggle');
+    var cells = block.querySelectorAll('.anim');
+    function set(paused) {
+      cells.forEach(function (c) { c.classList.toggle('paused', paused); });
+      btn.textContent = paused ? 'Play all' : 'Pause all';
+      btn.setAttribute('aria-pressed', String(!paused));
+    }
+    if (calm) set(true);
+    btn.addEventListener('click', function () {
+      set(!cells[0].classList.contains('paused'));
+    });
+  });
   document.querySelectorAll('.turn-wrap').forEach(function (wrap) {
     var stage = wrap.querySelector('.turn');
     var img = wrap.querySelector('.turn-img');
@@ -404,12 +495,31 @@ async function main() {
         await toWebp(join(PLATES_IN, p.file), p.file.replace(/\.png$/, '.webp'), 560),
       );
     }
+    images.anims = [];
+    for (const a of entry.anims ?? []) {
+      const file = await toSheet(
+        PLATES_IN,
+        a.frames,
+        `${entry.id}_anim_${a.clip}.webp`,
+        a.width,
+        a.height,
+      );
+      images.anims.push({
+        file,
+        clip: a.clip,
+        label: a.label,
+        frames: a.frames.length,
+        fps: a.fps,
+        width: a.width,
+        height: a.height,
+      });
+    }
     if (entry.bust) {
       await toWebp(join(PLATES_IN, entry.bust), entry.bust.replace(/\.png$/, '.webp'), 420);
     }
     sections.push(figureSection(entry, images));
     process.stdout.write(
-      `  ${entry.id}: ${images.turntable.length} turntable, ${images.plates.length} plates\n`,
+      `  ${entry.id}: ${images.turntable.length} turntable, ${images.plates.length} plates, ${images.anims.length} clips\n`,
     );
   }
 
