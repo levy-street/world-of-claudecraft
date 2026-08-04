@@ -752,14 +752,16 @@ export const DRAKELANDS_ITEMS: Record<string, ItemDef> = {
   // chain's own 90% scale source camped the Drakemaw belt. The reins move to a
   // dedicated world boss in a follow-up; the def stays so the mount, its GLB,
   // and its strings keep shipping. Owning the reins IS owning the mount
-  // (src/sim/mounts.ts mountOwned): soulbound, never transfers.
+  // (src/sim/mounts.ts mountOwned). Unbound like every player reins (the
+  // tradable-reins policy): only the dev tank stays soulbound, and while this
+  // has no acquisition path there is nothing to trade anyway.
   reins_drakemaw_raptor: {
     id: 'reins_drakemaw_raptor',
     name: 'Reins of the Drakemaw Raptor',
     kind: 'mount',
     mount: 'drakemaw_raptor',
     quality: 'epic',
-    soulbound: true,
+    noVendorSell: true,
     noDiscard: true,
     sellValue: 0,
   },
