@@ -1002,6 +1002,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.browserEffectsMinimal': '최소',
   'hudChrome.options.browserEffectsNote':
     '자동은 브라우저와 기기에 맞춰 무거운 CSS 효과(흐림, 글로우, 배경 모션)를 낮춥니다. 인터페이스가 느리게 느껴지면 수동으로 낮추세요.',
+  'hudChrome.options.graphicsApply': '그래픽 적용',
+  'hudChrome.options.graphicsApplying': '그래픽 설정 적용 중...',
+  'hudChrome.options.graphicsApplied': '그래픽 설정이 적용되었습니다.',
+  'hudChrome.options.graphicsSaved':
+    '그래픽 설정이 저장되었습니다. 현재 렌더러가 이미 같은 설정을 사용 중입니다.',
+  'hudChrome.options.graphicsFailed':
+    '그래픽 설정을 적용하지 못했습니다. 이전 설정이 계속 활성화되어 있습니다.',
+  'hudChrome.options.graphicsRetry': '그래픽 다시 시도',
+  'hudChrome.options.graphicsFatal':
+    '그래픽 복구에 실패했습니다. 계속하려면 게임을 다시 불러오세요.',
+  'hudChrome.options.graphicsReload': '게임 다시 불러오기',
+  'hudChrome.options.graphicsDraftChanged': '그래픽 변경 사항을 적용할 수 있습니다.',
   'hudChrome.options.footstepSounds': '발소리',
   'hudChrome.options.interfaceSounds': '인터페이스 및 피드백 소리',
   'hudChrome.options.clickFeedback': '클릭 표시',

@@ -2062,6 +2062,18 @@ export class ClientWorld implements IWorld {
     return this.sendInput(now, true);
   }
 
+  /**
+   * Drop every mirrored movement bit and send an unconditional neutral packet
+   * before the client pauses for an in-place renderer transition. This bypasses
+   * the changed-only cadence gate so a matching signature or a just-sent input
+   * can never leave the authoritative player moving during the pause.
+   */
+  neutralizeInputForClientPause(now = performance.now()): boolean {
+    Object.assign(this.moveInput, emptyMoveInput());
+    this.mouselookFacing = null;
+    return this.sendInput(now);
+  }
+
   consumeInputEchoSamples(): number[] {
     const samples = this.inputEchoSamples;
     this.inputEchoSamples = [];

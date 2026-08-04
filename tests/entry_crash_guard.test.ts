@@ -310,7 +310,9 @@ describe('entry diagnostics wiring', () => {
   const mainSource = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
 
   it('retains recovery evidence before consuming the one-shot probe', () => {
-    const planAt = mainSource.indexOf('const entryRecovery = planEntryCrashRecovery(');
+    const planAt = mainSource.indexOf(
+      'planEntryCrashRecovery(readEntryProbeRaw(), entryRecoveryAt)',
+    );
     const persistAt = mainSource.indexOf('persistEntryRecoveryLog(entryRecovery, entryRecoveryAt)');
     const clearAt = mainSource.indexOf('clearEntryProbe();', persistAt);
     expect(planAt).toBeGreaterThan(-1);

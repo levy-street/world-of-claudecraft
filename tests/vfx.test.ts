@@ -320,7 +320,6 @@ describe('pooled VFX cloud', () => {
     expect(source).toContain(`this.vfx.update(dt);
     this.vfx.prepareDraw(this.camera);
     this.frozenOrbFx.update(dt);`);
-    expect(source).toContain(`this.captureGlIdentity();
-      this.vfx.onContextRestored();`);
+    expect(source).toMatch(/this\.captureGlIdentity\(\);\s+this\.vfx\?\.onContextRestored\(\);/);
   });
 });

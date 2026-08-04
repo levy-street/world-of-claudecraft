@@ -1,6 +1,7 @@
 import { audio } from '../game/audio';
 import { corpseLootAvailability, localPartyMemberIds } from '../game/corpse_loot_availability';
 import type { GamepadKind } from '../game/gamepad_map';
+import type { GraphicsSettingsSnapshot } from '../game/graphics_rebuild_core';
 import { InstanceMusicController } from '../game/instance_music';
 import { type Keybinds, keyCapLabel, keyLabel } from '../game/keybinds';
 import { music } from '../game/music';
@@ -632,6 +633,10 @@ export interface OptionsHooks {
   captureKey(cb: ((code: string | null) => void) | null): void;
   settings: Settings;
   onSettingChange(key: keyof GameSettings, value: GameSettings[keyof GameSettings]): void;
+  /** Current renderer-bound profile. Options clones this into a disposable local draft. */
+  graphicsApplied(): GraphicsSettingsSnapshot;
+  /** Apply one complete six-setting draft. The window owns localized progress/results. */
+  applyGraphics(draft: GraphicsSettingsSnapshot): Promise<GraphicsApplyOutcome>;
   // Switch the active locale at runtime (loads the locale chunk, relocalizes the page,
   // fans out woc:languagechange). onStatus receives localized progress/error text for an
   // aria-live element. Resolves false if the locale failed to load (active locale kept).
@@ -658,6 +663,8 @@ export interface OptionsHooks {
   // without the HUD importing the manager.
   gamepad: GamepadBindingsHooks;
 }
+
+export type GraphicsApplyOutcome = 'applied' | 'saved' | 'failed' | 'fatal';
 
 export interface ThemeHooks {
   get(): ThemeState;
@@ -1680,6 +1687,7 @@ export class Hud {
   private targetTitleDecoration: TitledNameDecoration = { pre: '', post: '' };
   private charPreview: CharacterPreview | null = null;
   private charPreviewCanvas: HTMLCanvasElement | null = null;
+  private restoreCharPreviewAfterGraphicsRebuild = false;
   private readonly skinEvent: SkinEventController;
   // Pending lazy-load of the mech GLB + chromas; the reveal waits on it.
   private mechAssetsPromise: Promise<void> | null = null;
@@ -14252,6 +14260,30 @@ export class Hud {
   async prewarmArmoryPreview(): Promise<void> {
     if (!this.claudiumHooks) return;
     await this.dailyRewardsWindow.prewarmArmoryPreview();
+  }
+
+  /** Rebind every HUD callback to the newly committed world renderer. */
+  replaceRenderer(renderer: Renderer): void {
+    this.renderer = renderer;
+  }
+
+  /**
+   * Dispose secondary WebGL contexts after target assets are ready but before
+   * the active graphics epoch changes. Their owning windows stay intact.
+   */
+  resetGraphicsPreviewContexts(): void {
+    this.restoreCharPreviewAfterGraphicsRebuild = this.charWindow.isOpen;
+    this.charPreview?.destroy();
+    this.charPreview = null;
+    this.charPreviewCanvas = null;
+    this.dailyRewardsWindow.resetArmoryPreviewForGraphicsRebuild();
+  }
+
+  /** Restore preview surfaces that were visible across the renderer swap. */
+  restoreGraphicsPreviewContexts(): void {
+    if (this.restoreCharPreviewAfterGraphicsRebuild) this.charWindow.renderIfOpen();
+    this.restoreCharPreviewAfterGraphicsRebuild = false;
+    this.dailyRewardsWindow.restoreArmoryPreviewAfterGraphicsRebuild();
   }
 
   /** Populate the small synchronous Canvas caches used by contextual HUD

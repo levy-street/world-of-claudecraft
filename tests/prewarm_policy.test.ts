@@ -359,8 +359,10 @@ describe('mandatory interaction-landmark prewarm', () => {
     expect(gate).toContain(
       'The DOM nameplate, target marker, health, and cast bar remain available',
     );
-    expect(gate).toContain('void this.compileGate(target).then(() => {');
-    expect(gate).toContain('void this.compileGate(target).then(onSettled);');
+    expect(gate).toContain('void this.compileGate(target).then(');
+    expect(gate.match(/this\.recoverRejectedCompileGate\(/g)).toHaveLength(3);
+    expect(gate).toContain('group.visible = priorVisibility;');
+    expect(gate).toContain('this.recoverRejectedCompileGate(error, generation, onSettled);');
     expect(gate).not.toContain('onTimeout');
 
     const compileGateStart = renderer.indexOf('private compileGate(');

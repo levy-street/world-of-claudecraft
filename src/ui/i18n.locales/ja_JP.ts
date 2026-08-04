@@ -1001,6 +1001,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.browserEffectsMinimal': '最小',
   'hudChrome.options.browserEffectsNote':
     '自動はブラウザとデバイスに応じて、負荷の高い CSS エフェクト（ぼかし・グロー・背景アニメーション）を抑えます。動作が重い場合は手動で下げてください。',
+  'hudChrome.options.graphicsApply': 'グラフィックを適用',
+  'hudChrome.options.graphicsApplying': 'グラフィック設定を適用中...',
+  'hudChrome.options.graphicsApplied': 'グラフィック設定を適用しました。',
+  'hudChrome.options.graphicsSaved':
+    'グラフィック設定を保存しました。現在のレンダラーはすでに同じ設定です。',
+  'hudChrome.options.graphicsFailed':
+    'グラフィック設定を適用できませんでした。以前の設定は引き続き有効です。',
+  'hudChrome.options.graphicsRetry': 'グラフィックを再試行',
+  'hudChrome.options.graphicsFatal':
+    'グラフィックの復旧に失敗しました。続行するにはゲームを再読み込みしてください。',
+  'hudChrome.options.graphicsReload': 'ゲームを再読み込み',
+  'hudChrome.options.graphicsDraftChanged': 'グラフィックの変更を適用できます。',
   'hudChrome.options.footstepSounds': '足音',
   'hudChrome.options.interfaceSounds': 'インターフェースとフィードバック音',
   'hudChrome.options.clickFeedback': 'クリックマーカー',

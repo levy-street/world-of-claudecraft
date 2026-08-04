@@ -20,7 +20,7 @@ import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { retryDelayMs as gltfRetryDelayMs } from '../assets/load_retry';
 import { loadGltf, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
-import { addRimGlow, EMISSIVE_GLOW, GFX } from '../gfx';
+import { addRimGlow, EMISSIVE_GLOW, GFX, type GfxSettings } from '../gfx';
 import { applySurfaceDetail, riggedWornFamilyFor } from '../worn_stone';
 import { backGripFor } from './back_grips';
 import { dequantizeAttribute } from './dequantize_attribute';
@@ -30,6 +30,7 @@ import {
   characterPreloadUrls,
   itemOffhandModelUrl,
   itemWeaponModelUrl,
+  manifestUrlsForGraphics,
   offhandModelUrl,
   SKIN_EMISSIVE,
   SKINS,
@@ -462,7 +463,7 @@ function assetUrl(url: string): string {
 // tier via assetUrl(), and resolvedGltf() throws "character asset not preloaded"
 // synchronously, so the preload set must be a superset of any tier's placement set or
 // world entry crashes (the character-side twin of the v0.16.0 props P0).
-const allPreloadUrls = characterPreloadUrls(GFX.standardMaterials);
+const allPreloadUrls = characterPreloadUrls(false);
 
 // Packaged iOS carves the mob bodies out of the boot gate and STREAMS them after
 // first frame instead. They are the heaviest character content (creature +
@@ -485,13 +486,30 @@ const STREAMED_URL_PREFIXES = ['models/creatures/', 'models/chars/enemies/'];
 // swapAttachDef guard below) instead of throwing. Base item weapons stay
 // resident so the player's own hands are never empty at spawn.
 const streamedSkinUrls = new Set(weaponSkinModelUrls());
-const streamedUrls = GFX.nativeIosMemoryProfile
-  ? allPreloadUrls.filter(
-      (u) => STREAMED_URL_PREFIXES.some((p) => u.includes(p)) || streamedSkinUrls.has(u),
-    )
-  : [];
-const streamedUrlSet = new Set(streamedUrls);
-const preloadUrls = allPreloadUrls.filter((u) => !streamedUrlSet.has(u));
+const streamableUrls = allPreloadUrls.filter(
+  (url) =>
+    STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix)) || streamedSkinUrls.has(url),
+);
+let streamedUrls = GFX.nativeIosMemoryProfile ? streamableUrls : [];
+let streamedUrlSet = new Set(streamedUrls);
+const preloadUrls = allPreloadUrls.filter((url) => !streamedUrlSet.has(url));
+const characterLoadTasks = new Map<string, Promise<void>>();
+
+function prepareCharacterUrl(url: string): Promise<void> {
+  if (gltfByUrl.has(url)) return Promise.resolve();
+  const existing = characterLoadTasks.get(url);
+  if (existing) return existing;
+  const task = loadGltf(url)
+    .then((gltf) => {
+      gltfByUrl.set(url, gltf);
+    })
+    .catch((err) => {
+      characterLoadTasks.delete(url);
+      throw err;
+    });
+  characterLoadTasks.set(url, task);
+  return task;
+}
 
 /** True when a character GLB is resident and attach/build paths may resolve it. */
 function characterAssetResident(url: string): boolean {
@@ -525,11 +543,7 @@ function residentOrEnsure(url: string | null): string | null {
 }
 
 for (const url of preloadUrls) {
-  registerPreload(
-    loadGltf(url).then((g) => {
-      gltfByUrl.set(url, g);
-    }),
-  );
+  registerPreload(prepareCharacterUrl(url));
 }
 
 let streamedStarted = false;
@@ -594,6 +608,26 @@ if (eagerSkinAtlases) {
   for (const url of bootSkinUrls) registerPreload(loadSkinTexInto(url, skinTexByUrl));
 }
 
+/** Prepare character sources and cosmetic atlases selected by an explicit target profile. */
+export async function prepareCharacterProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
+  const nextStreamedUrls = target.nativeIosMemoryProfile ? streamableUrls : [];
+  const nextStreamedSet = new Set(nextStreamedUrls);
+  const requiredGltf = manifestUrlsForGraphics(target.standardMaterials).filter(
+    (url) => !nextStreamedSet.has(url),
+  );
+  const skinTasks =
+    target.nativeIosMemoryProfile || target.tightMemory
+      ? []
+      : [...bootSkinUrls].map((url) =>
+          skinTexByUrl.has(url) ? Promise.resolve() : loadSkinTexInto(url, skinTexByUrl),
+        );
+  await Promise.all([...requiredGltf.map(prepareCharacterUrl), ...skinTasks]);
+  const nextSignature = nextStreamedUrls.join('|');
+  if (nextSignature !== streamedUrls.join('|')) streamedStarted = false;
+  streamedUrls = nextStreamedUrls;
+  streamedUrlSet = nextStreamedSet;
+}
+
 /** Resolve once every boot-time character GLB + skin atlas is cached, retrying
  *  whatever is still missing instead of depending on the site-wide assetsReady()
  *  barrier. That barrier is one shared promise over EVERY registered preload
@@ -616,7 +650,7 @@ export async function charactersReady(maxAttempts = 3): Promise<void> {
     // Deferred atlases (native iOS) are not boot assets: gating the preview on
     // them would re-create the exact entry-footprint spike the deferral removes.
     const missingSkins = eagerSkinAtlases
-      ? [...bootSkinUrls].filter((u) => !skinTexByUrl.has(u))
+      ? [...bootSkinUrls].filter((url) => !skinTexByUrl.has(url))
       : [];
     if (missingGltf.length === 0 && missingSkins.length === 0) return;
     if (attempt > 1) {
@@ -1244,6 +1278,13 @@ export interface PreparedVisual {
 }
 
 const prepared = new Map<string, PreparedVisual>();
+
+/** Drop profile-derived character templates/materials while retaining loaded source assets. */
+export function resetCharacterProfileCaches(): void {
+  optimizedSceneCache.clear();
+  matCache.clear();
+  prepared.clear();
+}
 
 export function prepareVisual(key: string): PreparedVisual {
   const hit = prepared.get(key);

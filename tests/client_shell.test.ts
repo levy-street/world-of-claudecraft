@@ -253,6 +253,54 @@ describe('client HTML shell', () => {
     }
   });
 
+  it('removes loading-curtain and progress motion for reduced-motion players', () => {
+    expect(shellCss).toContain('transition: opacity calc(0.35s * var(--motion-scale)) ease;');
+    expect(shellCss).toContain('transition: width calc(0.2s * var(--motion-scale)) ease;');
+    const reducedMotion = shellCss.match(
+      /@media \(prefers-reduced-motion: reduce\) \{([\s\S]*?)\n {2}\}/,
+    )?.[1];
+    expect(reducedMotion).toContain('#loading-screen');
+    expect(reducedMotion).toContain('#ls-fill');
+    expect(reducedMotion).toContain('transition: none;');
+    expect(mainTs).toContain(
+      "return loadingCurtainFadeMs(new Settings().get('reduceMotion') || osReducedMotion);",
+    );
+    expect(mainTs.match(/}, loadingCurtainFadeDelayMs\(\)\);/g)).toHaveLength(2);
+  });
+
+  it('restores graphics preview contexts only after rebinding the committed renderer', () => {
+    const commitAt = mainTs.indexOf('commit: (next, target) => {');
+    const progressAt = mainTs.indexOf('onProgress:', commitAt);
+    const commit = mainTs.slice(commitAt, progressAt);
+    const replaceAt = commit.indexOf('hud.replaceRenderer(next);');
+    const restoreAt = commit.indexOf('hud.restoreGraphicsPreviewContexts();');
+    expect(commitAt).toBeGreaterThan(-1);
+    expect(progressAt).toBeGreaterThan(commitAt);
+    expect(replaceAt).toBeGreaterThan(-1);
+    expect(restoreAt).toBeGreaterThan(replaceAt);
+  });
+
+  it('keeps live graphics rebuilds bound to the existing world and online session', () => {
+    const buildAt = mainTs.indexOf('buildRenderer: (target, recycled) => {');
+    const prepareAt = mainTs.indexOf('prepareCurrentZone:', buildAt);
+    const build = mainTs.slice(buildAt, prepareAt);
+    expect(buildAt).toBeGreaterThan(-1);
+    expect(prepareAt).toBeGreaterThan(buildAt);
+    expect(build).toContain('new Renderer(world, recycled.canvas, nameplates, {');
+    expect(mainTs).toContain('online?.neutralizeInputForClientPause();');
+  });
+
+  it('attempts both auxiliary graphics teardown arms before reporting reset failures', () => {
+    const resetAt = mainTs.indexOf('resetAuxiliaryRenderers: () => {');
+    const captureAt = mainTs.indexOf('captureRendererContext:', resetAt);
+    const reset = mainTs.slice(resetAt, captureAt);
+    expect(resetAt).toBeGreaterThan(-1);
+    expect(captureAt).toBeGreaterThan(resetAt);
+    expect(reset).toMatch(/try\s*\{\s*hud\.resetGraphicsPreviewContexts\(\);\s*\} catch/);
+    expect(reset).toMatch(/try\s*\{\s*resetPortraitRendererForGraphicsRebuild\(\);\s*\} catch/);
+    expect(reset).toContain('throw new AggregateError');
+  });
+
   it('places skip links as the first focusable elements in BOTH entries', () => {
     for (const entry of [html, playHtml]) {
       const skipMain = entry.indexOf('class="hud-skip" href="#ui"');

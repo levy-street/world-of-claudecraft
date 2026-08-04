@@ -48,6 +48,7 @@ let renderer: THREE.WebGLRenderer | null = null;
 let scene: THREE.Scene | null = null;
 let camera: THREE.PerspectiveCamera | null = null;
 let mount: THREE.Group | null = null;
+let unregisterContext: (() => void) | null = null;
 
 const cache = new Map<string, string>();
 const readyListeners = new Set<() => void>();
@@ -78,7 +79,7 @@ function ensureRig(): void {
   renderer.setSize(PORTRAIT_SIZE, PORTRAIT_SIZE, false);
   renderer.shadowMap.enabled = false;
   // Hand this offscreen context back on page teardown (see context_release.ts).
-  trackWebGLContext(renderer);
+  unregisterContext = trackWebGLContext(renderer);
 
   scene = new THREE.Scene();
   // fov/position/aim are recomputed per-model per-framing from its bounding
@@ -225,4 +226,28 @@ export function onPortraitUpdate(cb: (visualKey: string, skin: number) => void):
 /** True once portraits can be generated synchronously. */
 export function portraitsReady(): boolean {
   return assetsAreReady;
+}
+
+/**
+ * Drop the profile-bound offscreen renderer and its captured PNGs before a
+ * live graphics rebuild. Asset readiness/listeners remain valid; the next
+ * portrait request lazily creates one context against the newly active profile.
+ */
+export function resetPortraitRendererForGraphicsRebuild(): void {
+  cache.clear();
+  if (mount && scene) scene.remove(mount);
+  unregisterContext?.();
+  unregisterContext = null;
+  if (renderer) {
+    try {
+      renderer.forceContextLoss();
+    } catch {
+      // The context may already have been evicted by the browser.
+    }
+    renderer.dispose();
+  }
+  renderer = null;
+  scene = null;
+  camera = null;
+  mount = null;
 }

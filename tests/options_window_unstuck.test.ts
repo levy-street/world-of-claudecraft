@@ -41,6 +41,10 @@ class FakeElement {
     return null;
   }
 
+  setAttribute(_name: string, _value: string): void {}
+
+  removeAttribute(_name: string): void {}
+
   click(): void {
     for (const listener of this.listeners.get('click') ?? []) listener();
   }

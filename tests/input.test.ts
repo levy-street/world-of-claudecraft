@@ -270,6 +270,37 @@ describe('Input autorun', () => {
     expect(input.readMoveInput().forward).toBe(true);
     expect(input.debugState().keys).toEqual([]);
   });
+
+  it('clears every movement source for an in-place client transition', () => {
+    const { input, windowListeners, cb } = makeInput();
+    input.setAutorun(true);
+    input.setTouchMove({ forward: false, back: true, strafeLeft: false, strafeRight: false });
+    input.setGamepadMove({ forward: false, back: false, strafeLeft: true, strafeRight: false });
+    input.setControllerMoveInput({ forward: true, jump: true });
+    input.setClickMoveTarget({ x: 4, z: 8 }, 0.5);
+    windowListeners.get('keydown')!({
+      code: 'Digit1',
+      repeat: false,
+      preventDefault: vi.fn(),
+    });
+
+    input.resetForClientTransition();
+
+    expect(input.autorun).toBe(false);
+    expect(input.clickMoveTarget).toBeNull();
+    expect(input.clickMoveGoal).toBeNull();
+    expect(input.controllerFacingOverride()).toBeNull();
+    expect(input.readMoveInput()).toEqual({
+      forward: false,
+      back: false,
+      turnLeft: false,
+      turnRight: false,
+      strafeLeft: false,
+      strafeRight: false,
+      jump: false,
+    });
+    expect(cb.onAbilityUp).toHaveBeenCalledWith(0);
+  });
 });
 
 describe('Input pet bar chords', () => {

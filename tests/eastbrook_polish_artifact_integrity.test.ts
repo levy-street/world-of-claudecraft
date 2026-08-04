@@ -615,14 +615,15 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   'metadata/after-desktop-ultra.json',
 );
 // Re-pinned after stacking this branch's renderer provenance move (the Bear Form
-// visual swap onto the purpose-built quadruped rig) with PR #2720's Eastbrook
-// fence-removal layout evidence from release/v0.34.0. The accepted file still
-// points at the same captured view and historical polish provenance, but its
-// swept provenance blocks follow the merged rendererIntegration and layout inputs.
+// visual swap onto the purpose-built quadruped rig) onto a release/v0.34.0 that
+// already carries PR #2720's Eastbrook fence-removal layout evidence and the live
+// graphics rebuild (context recycle plus profile-aware Eastbrook runtime inputs).
+// The accepted file still points at the same captured view; only its swept
+// provenance bytes follow the merged rendererIntegration and layout inputs.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '97e7011bab1bca6bf3b611f10a58470c5630f727ecde4b37f3225d6f00ef400f';
+  'cc85733f3d8b76363977b65eee4868018493e20f00aa85c1de1fcc98d1776f24';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '120f80aee6f52baeaeabeed3f33e290d64dc2df6bc8d3929a87fa774d16bd360';
+  '38b87f7e206b1666253705a02283b70485b5fa6dd16096d1463d51ef7defe0f4';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1480,14 +1481,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
     // After stacking this branch's renderer provenance move (the Bear Form rig
-    // swap) with PR #2720's fence-removal content change (rebuilt-town placement
-    // inventory in the after-* files), this seal follows the merged composite,
-    // recomputed last by remint_polish_provenance.mjs. Every measured
-    // value (frame timings, draw stats, triangle and scenario numbers) is
-    // byte-identical against the current release/v0.34.0 tip, neither parent's
-    // literal matched the merged tree, and no capture was retaken.
+    // swap) onto a base carrying PR #2720's fence-removal content change and the
+    // live graphics rebuild, this seal follows the merged composite, recomputed
+    // last by remint_polish_provenance.mjs. Every measured value (frame timings,
+    // draw stats, triangle and scenario numbers) is byte-identical against the
+    // current release/v0.34.0 tip, no parent's literal matched the merged tree,
+    // and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      'd9955a5805d1d6a62bdb5d03c0cf8d4c355ff6fbcc5b31b048831c3011e07789',
+      '7dff3a2a3aaa221a40e3abca1464b0510986ee85c7d7d1922d034b1b7a82f37a',
     );
   });
 
