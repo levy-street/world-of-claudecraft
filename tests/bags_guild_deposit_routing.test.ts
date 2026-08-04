@@ -34,7 +34,10 @@ interface Harness {
   errors: string[];
 }
 
-function harness(inventory: InvSlot[], guildTab: boolean): Harness {
+/** `guildTab` arms the guild deposit; `personalTab` arms the personal one.
+ *  BOTH false is the guild pane's LOG view: a reading surface where neither
+ *  grid is on screen, so a bag click must deposit nowhere. */
+function harness(inventory: InvSlot[], guildTab: boolean, personalTab = !guildTab): Harness {
   document.body.innerHTML = '<div id="prompt-stack"></div>';
   const calls: string[] = [];
   const errors: string[] = [];
@@ -71,7 +74,8 @@ function harness(inventory: InvSlot[], guildTab: boolean): Harness {
     tradeOpen: () => false,
     isMarketSell: () => false,
     isMailAttach: () => false,
-    isBankOpen: () => true, // the bank window is open in both scenarios
+    isBankOpen: () => true, // the bank window is open in every scenario
+    isPersonalBankTab: () => personalTab,
     isGuildBankTab: () => guildTab,
     pendingPetFeed: () => false,
     closeVendor: noop,
@@ -124,6 +128,17 @@ describe('guild-tab bag click routing (behavioral, real BagsWindow)', () => {
     const h = harness([{ itemId: plainId, count: 1 }], false);
     clickCellFor(h.root, plainId);
     expect(h.calls).toEqual(['bankDeposit:0']);
+  });
+
+  it('routes to NEITHER bank while the guild pane shows its log', () => {
+    // REGRESSION: the guild side was disarmed for the log view, but the
+    // fallback (`isBankOpen() && !isGuildBankTab()`) then armed the PERSONAL
+    // deposit, whose grid is off screen behind the guild pane too. A bag click
+    // while reading the history silently banked the item either way.
+    const h = harness([{ itemId: plainId, count: 1 }], false, false);
+    clickCellFor(h.root, plainId);
+    expect(h.calls).toEqual([]);
+    expect(h.errors).toEqual([]); // and it is a no-op, not a refusal line
   });
 
   it('the shift split prompt submit sends guildBankDeposit(index, count)', () => {

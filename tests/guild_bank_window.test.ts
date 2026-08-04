@@ -976,14 +976,24 @@ describe('guild_bank_window: the activity log view', () => {
     expect(logRows(h)[0].startsWith(' ')).toBe(false);
   });
 
-  it('bag clicks do NOT route to the guild bank while the log is showing', () => {
-    // The bag-deposit routing exists because the guild GRID is on screen to
-    // drop into. On a reading surface a bag click must not silently deposit.
+  it('bag clicks route to NEITHER bank while the log is showing', () => {
+    // The bag-deposit routing exists because a GRID is on screen to drop into.
+    // On a reading surface a bag click must not silently deposit, and that
+    // holds for the PERSONAL grid too: it is off screen behind the guild pane
+    // exactly like the guild grid is, so disarming only the guild side just
+    // moved the same trap one bank over (the fallback used to be
+    // `isBankOpen() && !isGuildBankTab()`, which is true here).
     const h = harness(guildInfo());
     h.window.open();
     clickGuildTab(h);
     expect(h.window.guildTabActive).toBe(true);
+    expect(h.window.personalTabActive).toBe(false);
     clickLogTab(h);
+    expect(h.window.guildTabActive).toBe(false);
+    expect(h.window.personalTabActive).toBe(false);
+    // Positive control: back on the Personal tab, the personal deposit IS armed.
+    (h.root.querySelector('.bank-tab[data-tab="personal"]') as HTMLElement).click();
+    expect(h.window.personalTabActive).toBe(true);
     expect(h.window.guildTabActive).toBe(false);
   });
 

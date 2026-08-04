@@ -185,8 +185,14 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   isMarketSell(): boolean;
   /** The Ravenpost mailbox is open on its Send tab (clicks attach parcels). */
   isMailAttach(): boolean;
-  /** The bank window is open (docked beside the bags): a click deposits the stack. */
+  /** The bank window is open (docked beside the bags): the mobile close arm
+   *  collapses the whole cluster through it. NOT the deposit predicate, which
+   *  is isPersonalBankTab below. */
   isBankOpen(): boolean;
+  /** The bank window is open ON ITS PERSONAL TAB: a click deposits the stack.
+   *  Open-and-not-guild is NOT the same test: while the guild pane's Log view
+   *  shows, the personal grid is off screen too, so neither deposit is armed. */
+  isPersonalBankTab(): boolean;
   /** The bank window is open ON ITS GUILD TAB: a click deposits into the guild
    *  bank instead (officer-plus only; the tab exists only while guildBankInfo
    *  is non-null, so this can never be true for a member or offline). */
@@ -1361,9 +1367,11 @@ export class BagsWindow {
       mailAttach: this.deps.isMailAttach(),
       marketSell: this.deps.isMarketSell(),
       vendorOpen: this.deps.vendorOpen(),
-      // At most ONE of the two bank modes: the guild tab claims the click while
-      // it is active, else the open bank deposits to the personal pane.
-      bankDeposit: this.deps.isBankOpen() && !this.deps.isGuildBankTab(),
+      // At most ONE of the two bank modes, and possibly NEITHER: each is armed
+      // only while its own grid is actually on screen to drop into. The guild
+      // pane's Log view arms neither, because a bag click while reading the
+      // history must not silently deposit the item that was clicked.
+      bankDeposit: this.deps.isPersonalBankTab(),
       guildBankDeposit: this.deps.isGuildBankTab(),
       petFeed: this.deps.pendingPetFeed(),
     };

@@ -261,6 +261,19 @@ export class BankWindow {
     return this.opened;
   }
 
+  /** True while the window is open on the PERSONAL pane: the bags companion
+   *  reads this (via Hud) to route a bag click to bankDeposit.
+   *
+   *  It is deliberately NOT "open and not on the guild CONTENTS view": the
+   *  guild pane's Log view is a reading surface, and while it shows, the
+   *  personal grid is off screen behind it exactly like the guild grid is. A
+   *  bag click there must arm NEITHER deposit, or reading the history silently
+   *  banks the item that was clicked, which is the same trap guildTabActive
+   *  documents below. */
+  get personalTabActive(): boolean {
+    return this.opened && this.tab === 'personal';
+  }
+
   /** True while the window is open on the Guild pane: the bags companion
    *  reads this (via Hud) to route a bag click to guildBankDeposit. Also
    *  requires guildBankInfo to be live RIGHT NOW, so the one-frame window

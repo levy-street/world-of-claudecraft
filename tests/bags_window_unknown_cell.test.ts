@@ -59,6 +59,7 @@ function harness(inventory: InvSlot[]): {
     isMarketSell: () => false,
     isMailAttach: () => false,
     isBankOpen: () => true,
+    isPersonalBankTab: () => true,
     pendingPetFeed: () => false,
     closeVendor: noop,
     closeBank: noop,

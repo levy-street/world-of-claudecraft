@@ -80,6 +80,7 @@ function harness(startCopper = 1000, inventory: InvSlot[] = SWORD): Harness {
     isMarketSell: () => false,
     isMailAttach: () => false,
     isBankOpen: () => false,
+    isPersonalBankTab: () => false,
     isGuildBankTab: () => false,
     pendingPetFeed: () => false,
     closeVendor: noop,

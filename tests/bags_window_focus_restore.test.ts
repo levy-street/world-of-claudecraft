@@ -45,6 +45,7 @@ function harness(inventory: InvSlot[]): { root: HTMLElement; w: BagsWindow; inv:
     isMarketSell: () => false,
     isMailAttach: () => false,
     isBankOpen: () => false,
+    isPersonalBankTab: () => false,
     pendingPetFeed: () => false,
     closeVendor: noop,
     closeBank: noop,

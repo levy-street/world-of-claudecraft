@@ -78,18 +78,19 @@ describe('bags_window: bank-deposit mode wiring', () => {
   it('reads the bank-open mode fresh each click through the injected dep', () => {
     // The mode flag is HUD state; the painter must read it via the dep each click,
     // never cache it, mirroring vendorOpen / isMailAttach.
-    expect(painter).toContain('isBankOpen(): boolean;');
+    expect(painter).toContain('isPersonalBankTab(): boolean;');
     expect(painter).toContain('isGuildBankTab(): boolean;');
-    // At most ONE of the two bank modes: the guild tab claims the click while
-    // active, else the open bank deposits to the personal pane.
-    expect(painter).toContain(
-      'bankDeposit: this.deps.isBankOpen() && !this.deps.isGuildBankTab(),',
-    );
+    // At most ONE of the two bank modes, and possibly NEITHER: each is armed
+    // only while its own grid is on screen to drop into, so the guild pane's
+    // log view (a reading surface) arms neither. `isBankOpen && !guildTab` is
+    // NOT the personal predicate: it armed the personal deposit behind the log.
+    expect(painter).toContain('bankDeposit: this.deps.isPersonalBankTab(),');
     expect(painter).toContain('guildBankDeposit: this.deps.isGuildBankTab(),');
   });
 
   it('hud wires isBankOpen to the live bank-window open state', () => {
     expect(hud).toContain('isBankOpen: () => this.bankWindow.isOpen,');
+    expect(hud).toContain('isPersonalBankTab: () => this.bankWindow.personalTabActive,');
     expect(hud).toContain('isGuildBankTab: () => this.bankWindow.guildTabActive,');
   });
 
