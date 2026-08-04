@@ -187,6 +187,12 @@ export const BOOL_SETTINGS = {
   // startAutoAttack still no-ops unless a valid hostile target is in range, and
   // heals / buffs / damage-breakable CC (gouge, sap, sheep) never trigger it.
   startAttackOnAbilityUse: { def: true },
+  // off by default: lock the action bar slots against drag-to-move,
+  // drag-to-replace, and clear (right-click / shift+clear-key) so an
+  // accidental click-and-drag mid-fight can't move or wipe a slot. Abilities
+  // still fire from keybinds and clicks while locked (see ui/action_bar_lock.ts
+  // and the hud.ts drag/drop/clear wiring it gates).
+  lockActionBars: { def: false },
   // on by default: slot 0 shows the classic fixed Attack (auto-attack) toggle.
   // Turning it off (or right-clicking the Attack button) removes it from the bar,
   // freeing slot 0 and its keybind to hold a normal assignable action.

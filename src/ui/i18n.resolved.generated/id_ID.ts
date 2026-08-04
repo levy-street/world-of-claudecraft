@@ -1214,6 +1214,7 @@ export const id_ID: EnTranslations = {
       "itemScoreLine": "Skor {score}",
       "showSecondaryActionBar": "Tampilkan Bilah Aksi Sekunder",
       "showThirdActionBar": "Tampilkan Bilah Tindakan Ketiga",
+      "lockActionBars": "Lock Action Bars",
       "showTargetOfTarget": "Tampilkan Sasaran dari Sasaran",
       "showAttackButton": "Tampilkan Tombol Serang",
       "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian",
@@ -1375,7 +1376,14 @@ export const id_ID: EnTranslations = {
     },
     "landing": {
       "highContrast": "Kontras Tinggi",
-      "highContrastAria": "Alihkan latar belakang kontras tinggi: menonaktifkan cuplikan bergerak agar teks layar mulai tetap terbaca"
+      "highContrastAria": "Alihkan latar belakang kontras tinggi: menonaktifkan cuplikan bergerak agar teks layar mulai tetap terbaca",
+      "browserSupport": {
+        "title": "Heads up: unsupported browser",
+        "body": "You may see reduced performance in this browser. For the best experience, get the desktop app for Windows, macOS, or Linux. Prefer playing in a browser? Chrome performs best, and Firefox and Safari are also supported.",
+        "getDesktopApp": "Get the desktop app",
+        "continueInBrowser": "Continue in browser",
+        "dismissAria": "Dismiss the unsupported browser notice"
+      }
     },
     "warfare": {
       "honorAmount": "{amount} Kehormatan",
@@ -1744,6 +1752,7 @@ export const id_ID: EnTranslations = {
       "itemAriaEnchanted": "{item}, jumlah {count}, salinan dimantrai",
       "itemAriaBound": "{item}, jumlah {count}, salinan terikat",
       "itemAriaMasterwork": "{item}, jumlah {count}, karya master",
+      "itemAriaQuest": "{item}, quantity {count}, quest item",
       "filterGroupAria": "Saring tas menurut kategori",
       "filterAll": "Semua",
       "filterWeapon": "Senjata",
@@ -1752,6 +1761,7 @@ export const id_ID: EnTranslations = {
       "filterMaterial": "Bahan",
       "filterTool": "Perkakas",
       "filterQuest": "Misi",
+      "filterQuestCountAria": "Quest, {count} items",
       "filterMount": "Tunggangan",
       "sortAria": "Urutkan barang tas",
       "sortRecent": "Terbaru",
@@ -1760,6 +1770,7 @@ export const id_ID: EnTranslations = {
       "searchPlaceholder": "Cari barang",
       "searchAria": "Cari barang tas berdasarkan nama",
       "noMatch": "Tidak ada barang yang cocok dengan saringanmu.",
+      "noQuestItems": "No quest items in your bags.",
       "capacity": "{used}/{total}",
       "capacityAria": "Slot tas terpakai: {used} dari {total}",
       "backpack": "Ransel",
@@ -2270,6 +2281,7 @@ export const id_ID: EnTranslations = {
       "sortAria": "Urutkan barang bank",
       "searchAria": "Cari barang bank menurut nama",
       "depositAll": "Setor semua bahan",
+      "depositAllTooltip": "Sends every crafting reagent and junk item from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, and consumables are never touched.",
       "depositAllDone": "Bahan disetor: {count}.",
       "depositAllFull": "Bahan disetor: {count}. Bank kini penuh.",
       "depositAllNone": "Bank penuh: tidak ada yang disetor.",
@@ -6627,6 +6639,11 @@ export const id_ID: EnTranslations = {
     },
     "system": {
       "playerDeath": "Kamu telah tewas.",
+      "deathRecapKillerAbility": "You have died. Slain by {killer}'s {ability}.",
+      "deathRecapKiller": "You have died. Slain by {killer}.",
+      "deathRecapAbility": "You have died. Slain by {ability}.",
+      "deathRecapFalling": "You have died. You fell to your death.",
+      "deathRecapDrowned": "You have died. You drowned.",
       "respawn": "Kamu merasa segar dan pulih kembali.",
       "ignoringChat": "Mengabaikan obrolan dari {name}.",
       "noLongerIgnoring": "Tidak lagi mengabaikan {name}.",
@@ -7149,6 +7166,9 @@ export const id_ID: EnTranslations = {
       "useFood": "Pakai: Memulihkan {amount} nyawa selama {seconds} detik. Harus tetap duduk selama makan.",
       "useDrink": "Pakai: Memulihkan {amount} mana selama {seconds} detik. Harus tetap duduk selama minum.",
       "questItem": "Barang Misi",
+      "questRelated": "Quest: {quest}",
+      "questRules": "Cannot be sold, banked, or traded.",
+      "questOrphaned": "Not needed for any active quest.",
       "classes": "Kelas: {classes}",
       "sellPrice": "Harga jual: {money}",
       "clickBuy": "Klik untuk membeli",

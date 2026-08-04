@@ -1214,6 +1214,7 @@ export const cs_CZ: EnTranslations = {
       "itemScoreLine": "Skóre {score}",
       "showSecondaryActionBar": "Zobrazit sekundární akční lištu",
       "showThirdActionBar": "Zobrazit třetí panel akcí",
+      "lockActionBars": "Lock Action Bars",
       "showTargetOfTarget": "Zobrazit cíl cíle",
       "showAttackButton": "Zobrazit tlačítko útoku",
       "showDailyRewardsChest": "Zobrazit truhlu denních odměn",
@@ -1375,7 +1376,14 @@ export const cs_CZ: EnTranslations = {
     },
     "landing": {
       "highContrast": "Vysoký kontrast",
-      "highContrastAria": "Přepnout vysoce kontrastní pozadí: vypne pohyblivý trailer, aby text úvodní obrazovky zůstal čitelný"
+      "highContrastAria": "Přepnout vysoce kontrastní pozadí: vypne pohyblivý trailer, aby text úvodní obrazovky zůstal čitelný",
+      "browserSupport": {
+        "title": "Heads up: unsupported browser",
+        "body": "You may see reduced performance in this browser. For the best experience, get the desktop app for Windows, macOS, or Linux. Prefer playing in a browser? Chrome performs best, and Firefox and Safari are also supported.",
+        "getDesktopApp": "Get the desktop app",
+        "continueInBrowser": "Continue in browser",
+        "dismissAria": "Dismiss the unsupported browser notice"
+      }
     },
     "warfare": {
       "honorAmount": "{amount} cti",
@@ -1744,6 +1752,7 @@ export const cs_CZ: EnTranslations = {
       "itemAriaEnchanted": "{item}, množství {count}, okouzlená kopie",
       "itemAriaBound": "{item}, množství {count}, vázaná kopie",
       "itemAriaMasterwork": "{item}, množství {count}, mistrovské dílo",
+      "itemAriaQuest": "{item}, quantity {count}, quest item",
       "filterGroupAria": "Filtrovat batohy podle kategorie",
       "filterAll": "Vše",
       "filterWeapon": "Zbraně",
@@ -1752,6 +1761,7 @@ export const cs_CZ: EnTranslations = {
       "filterMaterial": "Materiály",
       "filterTool": "Nástroje",
       "filterQuest": "Úkolové",
+      "filterQuestCountAria": "Quest, {count} items",
       "filterMount": "Jezdecká zvířata",
       "sortAria": "Řadit předměty v batozích",
       "sortRecent": "Nedávné",
@@ -1760,6 +1770,7 @@ export const cs_CZ: EnTranslations = {
       "searchPlaceholder": "Hledat předměty",
       "searchAria": "Hledat předměty v batozích podle názvu",
       "noMatch": "Tvým filtrům neodpovídají žádné předměty.",
+      "noQuestItems": "No quest items in your bags.",
       "capacity": "{used}/{total}",
       "capacityAria": "Použité sloty batohu: {used} z {total}",
       "backpack": "Batoh",
@@ -2270,6 +2281,7 @@ export const cs_CZ: EnTranslations = {
       "sortAria": "Seřadit předměty v bance",
       "searchAria": "Hledat předměty v bance podle názvu",
       "depositAll": "Uložit všechny materiály",
+      "depositAllTooltip": "Sends every crafting reagent and junk item from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, and consumables are never touched.",
       "depositAllDone": "Uloženo materiálů: {count}.",
       "depositAllFull": "Uloženo materiálů: {count}. Banka je teď plná.",
       "depositAllNone": "Banka je plná: nic nebylo uloženo.",
@@ -6627,6 +6639,11 @@ export const cs_CZ: EnTranslations = {
     },
     "system": {
       "playerDeath": "Zemřel(a) jsi.",
+      "deathRecapKillerAbility": "You have died. Slain by {killer}'s {ability}.",
+      "deathRecapKiller": "You have died. Slain by {killer}.",
+      "deathRecapAbility": "You have died. Slain by {ability}.",
+      "deathRecapFalling": "You have died. You fell to your death.",
+      "deathRecapDrowned": "You have died. You drowned.",
       "respawn": "Cítíš se odpočatě a znovu celý(á).",
       "ignoringChat": "Ignoruješ chat od {name}.",
       "noLongerIgnoring": "Už neignoruješ {name}.",
@@ -7149,6 +7166,9 @@ export const cs_CZ: EnTranslations = {
       "useFood": "Použití: Obnoví {amount} zdraví během {seconds} s. Při jídle musíš zůstat sedět.",
       "useDrink": "Použití: Obnoví {amount} many během {seconds} s. Při pití musíš zůstat sedět.",
       "questItem": "Úkolový předmět",
+      "questRelated": "Quest: {quest}",
+      "questRules": "Cannot be sold, banked, or traded.",
+      "questOrphaned": "Not needed for any active quest.",
       "classes": "Třídy: {classes}",
       "sellPrice": "Prodejní cena: {money}",
       "clickBuy": "Kliknutím koupíš",

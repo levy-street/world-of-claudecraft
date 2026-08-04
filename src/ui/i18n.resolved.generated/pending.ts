@@ -15,7 +15,11 @@ export const pending: Record<string, readonly string[]> = {
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
     "desktop.update.uptodateTitle",
+    "hudChrome.bags.filterQuestCountAria",
+    "hudChrome.bags.itemAriaQuest",
+    "hudChrome.bags.noQuestItems",
     "hudChrome.bank.cannotDepositNow",
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.bank.guildBuyConfirm",
     "hudChrome.bank.guildBuyNote",
     "hudChrome.bank.guildCannotDeposit",
@@ -76,7 +80,10 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.market.buyConfirmBody",
     "itemUi.market.buyConfirmBodyStack",
     "itemUi.market.buyConfirmCancel",
-    "itemUi.market.buyConfirmTitle"
+    "itemUi.market.buyConfirmTitle",
+    "itemUi.tooltip.questOrphaned",
+    "itemUi.tooltip.questRelated",
+    "itemUi.tooltip.questRules"
   ],
   "es_ES": [
     "desktop.update.checkingBody",
@@ -84,7 +91,11 @@ export const pending: Record<string, readonly string[]> = {
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
     "desktop.update.uptodateTitle",
+    "hudChrome.bags.filterQuestCountAria",
+    "hudChrome.bags.itemAriaQuest",
+    "hudChrome.bags.noQuestItems",
     "hudChrome.bank.cannotDepositNow",
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.bank.guildBuyConfirm",
     "hudChrome.bank.guildBuyNote",
     "hudChrome.bank.guildCannotDeposit",
@@ -145,7 +156,10 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.market.buyConfirmBody",
     "itemUi.market.buyConfirmBodyStack",
     "itemUi.market.buyConfirmCancel",
-    "itemUi.market.buyConfirmTitle"
+    "itemUi.market.buyConfirmTitle",
+    "itemUi.tooltip.questOrphaned",
+    "itemUi.tooltip.questRelated",
+    "itemUi.tooltip.questRules"
   ],
   "fr_FR": [
     "desktop.update.checkingBody",
@@ -153,7 +167,11 @@ export const pending: Record<string, readonly string[]> = {
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
     "desktop.update.uptodateTitle",
+    "hudChrome.bags.filterQuestCountAria",
+    "hudChrome.bags.itemAriaQuest",
+    "hudChrome.bags.noQuestItems",
     "hudChrome.bank.cannotDepositNow",
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.bank.guildBuyConfirm",
     "hudChrome.bank.guildBuyNote",
     "hudChrome.bank.guildCannotDeposit",
@@ -214,7 +232,10 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.market.buyConfirmBody",
     "itemUi.market.buyConfirmBodyStack",
     "itemUi.market.buyConfirmCancel",
-    "itemUi.market.buyConfirmTitle"
+    "itemUi.market.buyConfirmTitle",
+    "itemUi.tooltip.questOrphaned",
+    "itemUi.tooltip.questRelated",
+    "itemUi.tooltip.questRules"
   ],
   "fr_CA": [
     "desktop.update.checkingBody",
@@ -222,7 +243,11 @@ export const pending: Record<string, readonly string[]> = {
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
     "desktop.update.uptodateTitle",
+    "hudChrome.bags.filterQuestCountAria",
+    "hudChrome.bags.itemAriaQuest",
+    "hudChrome.bags.noQuestItems",
     "hudChrome.bank.cannotDepositNow",
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.bank.guildBuyConfirm",
     "hudChrome.bank.guildBuyNote",
     "hudChrome.bank.guildCannotDeposit",
@@ -283,7 +308,10 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.market.buyConfirmBody",
     "itemUi.market.buyConfirmBodyStack",
     "itemUi.market.buyConfirmCancel",
-    "itemUi.market.buyConfirmTitle"
+    "itemUi.market.buyConfirmTitle",
+    "itemUi.tooltip.questOrphaned",
+    "itemUi.tooltip.questRelated",
+    "itemUi.tooltip.questRules"
   ],
   "en_CA": [],
   "it_IT": [
@@ -292,7 +320,11 @@ export const pending: Record<string, readonly string[]> = {
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
     "desktop.update.uptodateTitle",
+    "hudChrome.bags.filterQuestCountAria",
+    "hudChrome.bags.itemAriaQuest",
+    "hudChrome.bags.noQuestItems",
     "hudChrome.bank.cannotDepositNow",
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.bank.guildBuyConfirm",
     "hudChrome.bank.guildBuyNote",
     "hudChrome.bank.guildCannotDeposit",
@@ -353,7 +385,10 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.market.buyConfirmBody",
     "itemUi.market.buyConfirmBodyStack",
     "itemUi.market.buyConfirmCancel",
-    "itemUi.market.buyConfirmTitle"
+    "itemUi.market.buyConfirmTitle",
+    "itemUi.tooltip.questOrphaned",
+    "itemUi.tooltip.questRelated",
+    "itemUi.tooltip.questRules"
   ],
   "de_DE": [
     "desktop.update.checkingBody",
@@ -361,7 +396,11 @@ export const pending: Record<string, readonly string[]> = {
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
     "desktop.update.uptodateTitle",
+    "hudChrome.bags.filterQuestCountAria",
+    "hudChrome.bags.itemAriaQuest",
+    "hudChrome.bags.noQuestItems",
     "hudChrome.bank.cannotDepositNow",
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.bank.guildBuyConfirm",
     "hudChrome.bank.guildBuyNote",
     "hudChrome.bank.guildCannotDeposit",
@@ -422,7 +461,10 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.market.buyConfirmBody",
     "itemUi.market.buyConfirmBodyStack",
     "itemUi.market.buyConfirmCancel",
-    "itemUi.market.buyConfirmTitle"
+    "itemUi.market.buyConfirmTitle",
+    "itemUi.tooltip.questOrphaned",
+    "itemUi.tooltip.questRelated",
+    "itemUi.tooltip.questRules"
   ],
   "zh_CN": [
     "hudChrome.deeds.recentJumpAria"
@@ -442,7 +484,11 @@ export const pending: Record<string, readonly string[]> = {
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
     "desktop.update.uptodateTitle",
+    "hudChrome.bags.filterQuestCountAria",
+    "hudChrome.bags.itemAriaQuest",
+    "hudChrome.bags.noQuestItems",
     "hudChrome.bank.cannotDepositNow",
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.bank.guildBuyConfirm",
     "hudChrome.bank.guildBuyNote",
     "hudChrome.bank.guildCannotDeposit",
@@ -452,7 +498,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.guildDepositGoldTitle",
     "hudChrome.bank.guildDepositHint",
     "hudChrome.bank.guildDormantAria",
-    "hudChrome.bank.guildDormantHint",
+    "hudChrome.bank.guildDormantHint",https://github.com/levy-street/world-of-claudecraft/pull/2715
     "hudChrome.bank.guildDormantNote",
     "hudChrome.bank.guildEmpty",
     "hudChrome.bank.guildGoldAvailable",
@@ -503,7 +549,10 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.market.buyConfirmBody",
     "itemUi.market.buyConfirmBodyStack",
     "itemUi.market.buyConfirmCancel",
-    "itemUi.market.buyConfirmTitle"
+    "itemUi.market.buyConfirmTitle",
+    "itemUi.tooltip.questOrphaned",
+    "itemUi.tooltip.questRelated",
+    "itemUi.tooltip.questRules"
   ],
   "ru_RU": [
     "hudChrome.deeds.recentJumpAria"
@@ -514,7 +563,11 @@ export const pending: Record<string, readonly string[]> = {
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
     "desktop.update.uptodateTitle",
+    "hudChrome.bags.filterQuestCountAria",
+    "hudChrome.bags.itemAriaQuest",
+    "hudChrome.bags.noQuestItems",
     "hudChrome.bank.cannotDepositNow",
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.bank.guildBuyConfirm",
     "hudChrome.bank.guildBuyNote",
     "hudChrome.bank.guildCannotDeposit",
@@ -575,7 +628,10 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.market.buyConfirmBody",
     "itemUi.market.buyConfirmBodyStack",
     "itemUi.market.buyConfirmCancel",
-    "itemUi.market.buyConfirmTitle"
+    "itemUi.market.buyConfirmTitle",
+    "itemUi.tooltip.questOrphaned",
+    "itemUi.tooltip.questRelated",
+    "itemUi.tooltip.questRules"
   ],
   "nl_NL": [
     "desktop.update.checkingBody",
@@ -583,7 +639,11 @@ export const pending: Record<string, readonly string[]> = {
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
     "desktop.update.uptodateTitle",
+    "hudChrome.bags.filterQuestCountAria",
+    "hudChrome.bags.itemAriaQuest",
+    "hudChrome.bags.noQuestItems",
     "hudChrome.bank.cannotDepositNow",
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.bank.guildBuyConfirm",
     "hudChrome.bank.guildBuyNote",
     "hudChrome.bank.guildCannotDeposit",
@@ -644,7 +704,10 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.market.buyConfirmBody",
     "itemUi.market.buyConfirmBodyStack",
     "itemUi.market.buyConfirmCancel",
-    "itemUi.market.buyConfirmTitle"
+    "itemUi.market.buyConfirmTitle",
+    "itemUi.tooltip.questOrphaned",
+    "itemUi.tooltip.questRelated",
+    "itemUi.tooltip.questRules"
   ],
   "pl_PL": [
     "desktop.update.checkingBody",
@@ -652,7 +715,11 @@ export const pending: Record<string, readonly string[]> = {
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
     "desktop.update.uptodateTitle",
+    "hudChrome.bags.filterQuestCountAria",
+    "hudChrome.bags.itemAriaQuest",
+    "hudChrome.bags.noQuestItems",
     "hudChrome.bank.cannotDepositNow",
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.bank.guildBuyConfirm",
     "hudChrome.bank.guildBuyNote",
     "hudChrome.bank.guildCannotDeposit",
@@ -713,7 +780,10 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.market.buyConfirmBody",
     "itemUi.market.buyConfirmBodyStack",
     "itemUi.market.buyConfirmCancel",
-    "itemUi.market.buyConfirmTitle"
+    "itemUi.market.buyConfirmTitle",
+    "itemUi.tooltip.questOrphaned",
+    "itemUi.tooltip.questRelated",
+    "itemUi.tooltip.questRules"
   ],
   "id_ID": [
     "desktop.update.checkingBody",
@@ -721,7 +791,11 @@ export const pending: Record<string, readonly string[]> = {
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
     "desktop.update.uptodateTitle",
+    "hudChrome.bags.filterQuestCountAria",
+    "hudChrome.bags.itemAriaQuest",
+    "hudChrome.bags.noQuestItems",
     "hudChrome.bank.cannotDepositNow",
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.bank.guildBuyConfirm",
     "hudChrome.bank.guildBuyNote",
     "hudChrome.bank.guildCannotDeposit",
@@ -782,7 +856,10 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.market.buyConfirmBody",
     "itemUi.market.buyConfirmBodyStack",
     "itemUi.market.buyConfirmCancel",
-    "itemUi.market.buyConfirmTitle"
+    "itemUi.market.buyConfirmTitle",
+    "itemUi.tooltip.questOrphaned",
+    "itemUi.tooltip.questRelated",
+    "itemUi.tooltip.questRules"
   ],
   "tr_TR": [
     "desktop.update.checkingBody",
@@ -790,7 +867,11 @@ export const pending: Record<string, readonly string[]> = {
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
     "desktop.update.uptodateTitle",
+    "hudChrome.bags.filterQuestCountAria",
+    "hudChrome.bags.itemAriaQuest",
+    "hudChrome.bags.noQuestItems",
     "hudChrome.bank.cannotDepositNow",
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.bank.guildBuyConfirm",
     "hudChrome.bank.guildBuyNote",
     "hudChrome.bank.guildCannotDeposit",
@@ -851,7 +932,10 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.market.buyConfirmBody",
     "itemUi.market.buyConfirmBodyStack",
     "itemUi.market.buyConfirmCancel",
-    "itemUi.market.buyConfirmTitle"
+    "itemUi.market.buyConfirmTitle",
+    "itemUi.tooltip.questOrphaned",
+    "itemUi.tooltip.questRelated",
+    "itemUi.tooltip.questRules"
   ],
   "sv_SE": [
     "desktop.update.checkingBody",
@@ -859,7 +943,11 @@ export const pending: Record<string, readonly string[]> = {
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
     "desktop.update.uptodateTitle",
+    "hudChrome.bags.filterQuestCountAria",
+    "hudChrome.bags.itemAriaQuest",
+    "hudChrome.bags.noQuestItems",
     "hudChrome.bank.cannotDepositNow",
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.bank.guildBuyConfirm",
     "hudChrome.bank.guildBuyNote",
     "hudChrome.bank.guildCannotDeposit",
@@ -920,7 +1008,10 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.market.buyConfirmBody",
     "itemUi.market.buyConfirmBodyStack",
     "itemUi.market.buyConfirmCancel",
-    "itemUi.market.buyConfirmTitle"
+    "itemUi.market.buyConfirmTitle",
+    "itemUi.tooltip.questOrphaned",
+    "itemUi.tooltip.questRelated",
+    "itemUi.tooltip.questRules"
   ],
   "vi_VN": [
     "desktop.update.checkingBody",
@@ -928,7 +1019,11 @@ export const pending: Record<string, readonly string[]> = {
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
     "desktop.update.uptodateTitle",
+    "hudChrome.bags.filterQuestCountAria",
+    "hudChrome.bags.itemAriaQuest",
+    "hudChrome.bags.noQuestItems",
     "hudChrome.bank.cannotDepositNow",
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.bank.guildBuyConfirm",
     "hudChrome.bank.guildBuyNote",
     "hudChrome.bank.guildCannotDeposit",
@@ -989,7 +1084,10 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.market.buyConfirmBody",
     "itemUi.market.buyConfirmBodyStack",
     "itemUi.market.buyConfirmCancel",
-    "itemUi.market.buyConfirmTitle"
+    "itemUi.market.buyConfirmTitle",
+    "itemUi.tooltip.questOrphaned",
+    "itemUi.tooltip.questRelated",
+    "itemUi.tooltip.questRules"
   ],
   "da_DK": [
     "desktop.update.checkingBody",
@@ -997,7 +1095,11 @@ export const pending: Record<string, readonly string[]> = {
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
     "desktop.update.uptodateTitle",
+    "hudChrome.bags.filterQuestCountAria",
+    "hudChrome.bags.itemAriaQuest",
+    "hudChrome.bags.noQuestItems",
     "hudChrome.bank.cannotDepositNow",
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.bank.guildBuyConfirm",
     "hudChrome.bank.guildBuyNote",
     "hudChrome.bank.guildCannotDeposit",
@@ -1058,6 +1160,9 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.market.buyConfirmBody",
     "itemUi.market.buyConfirmBodyStack",
     "itemUi.market.buyConfirmCancel",
-    "itemUi.market.buyConfirmTitle"
+    "itemUi.market.buyConfirmTitle",
+    "itemUi.tooltip.questOrphaned",
+    "itemUi.tooltip.questRelated",
+    "itemUi.tooltip.questRules"
   ]
 };

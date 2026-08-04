@@ -1214,6 +1214,7 @@ export const ja_JP: EnTranslations = {
       "itemScoreLine": "スコア {score}",
       "showSecondaryActionBar": "セカンダリアクションバーを表示",
       "showThirdActionBar": "3本目のアクションバーを表示",
+      "lockActionBars": "アクションバーをロック",
       "showTargetOfTarget": "ターゲットのターゲットを表示",
       "showAttackButton": "攻撃ボタンを表示",
       "showDailyRewardsChest": "デイリー報酬の宝箱を表示",
@@ -1375,7 +1376,14 @@ export const ja_JP: EnTranslations = {
     },
     "landing": {
       "highContrast": "高コントラスト",
-      "highContrastAria": "高コントラスト背景を切り替えます。動画トレーラーを無効にして、スタート画面のテキストを読みやすくします"
+      "highContrastAria": "高コントラスト背景を切り替えます。動画トレーラーを無効にして、スタート画面のテキストを読みやすくします",
+      "browserSupport": {
+        "title": "ご注意：サポート対象外のブラウザです",
+        "body": "このブラウザではパフォーマンスが低下する場合があります。最高の体験のために、Windows、macOS、Linux 向けデスクトップアプリの入手をお勧めします。ブラウザでのプレイをご希望ですか？Chrome が最もパフォーマンスに優れ、Firefox と Safari もサポートされています。",
+        "getDesktopApp": "デスクトップアプリを入手",
+        "continueInBrowser": "ブラウザで続ける",
+        "dismissAria": "サポート対象外ブラウザの通知を閉じる"
+      }
     },
     "warfare": {
       "honorAmount": "名誉 {amount}",
@@ -1744,6 +1752,7 @@ export const ja_JP: EnTranslations = {
       "itemAriaEnchanted": "{item}、数量 {count}、エンチャント済みの品",
       "itemAriaBound": "{item}、数量 {count}、バインド済みの品",
       "itemAriaMasterwork": "{item}、数量 {count}、傑作",
+      "itemAriaQuest": "{item}、数量 {count}、クエストアイテム",
       "filterGroupAria": "バッグをカテゴリーで絞り込む",
       "filterAll": "すべて",
       "filterWeapon": "武器",
@@ -1752,6 +1761,7 @@ export const ja_JP: EnTranslations = {
       "filterMaterial": "素材",
       "filterTool": "道具",
       "filterQuest": "クエスト",
+      "filterQuestCountAria": "クエスト、{count} 個のアイテム",
       "filterMount": "マウント",
       "sortAria": "バッグのアイテムを並べ替える",
       "sortRecent": "最近",
@@ -1760,6 +1770,7 @@ export const ja_JP: EnTranslations = {
       "searchPlaceholder": "アイテムを検索",
       "searchAria": "名前でバッグのアイテムを検索",
       "noMatch": "条件に一致するアイテムはありません。",
+      "noQuestItems": "バッグにクエストアイテムはありません。",
       "capacity": "{used}/{total}",
       "capacityAria": "使用中のバッグスロット: {total}個中{used}個",
       "backpack": "バックパック",
@@ -2270,6 +2281,7 @@ export const ja_JP: EnTranslations = {
       "sortAria": "銀行のアイテムを並べ替える",
       "searchAria": "名前で銀行のアイテムを検索",
       "depositAll": "すべての素材を預ける",
+      "depositAllTooltip": "カバン内の製作素材とがらくたをまとめて銀行に預けます。採集用道具、装備中の防具、クエストアイテム、消耗品は対象外です。",
       "depositAllDone": "素材を預けました：{count}。",
       "depositAllFull": "素材を預けました：{count}。銀行がいっぱいになりました。",
       "depositAllNone": "銀行がいっぱいです：何も預けられませんでした。",
@@ -6627,6 +6639,11 @@ export const ja_JP: EnTranslations = {
     },
     "system": {
       "playerDeath": "死亡しました。",
+      "deathRecapKillerAbility": "死亡しました。{killer}の{ability}に倒されました。",
+      "deathRecapKiller": "死亡しました。{killer}に倒されました。",
+      "deathRecapAbility": "死亡しました。{ability}によって死亡しました。",
+      "deathRecapFalling": "死亡しました。転落死しました。",
+      "deathRecapDrowned": "死亡しました。溺死しました。",
       "respawn": "再び休まり、完全な状態になりました。",
       "ignoringChat": "{name}のチャットを無視します。",
       "noLongerIgnoring": "{name}の無視を解除しました。",
@@ -7149,6 +7166,9 @@ export const ja_JP: EnTranslations = {
       "useFood": "使用: {seconds}秒かけて体力を{amount}回復します。食事中は座ったままでいる必要があります。",
       "useDrink": "使用: {seconds}秒かけてマナを{amount}回復します。飲んでいる間は座ったままでいる必要があります。",
       "questItem": "クエストアイテム",
+      "questRelated": "クエスト：{quest}",
+      "questRules": "売却、銀行預け入れ、取引はできません。",
+      "questOrphaned": "進行中のクエストでは必要ありません。",
       "classes": "クラス: {classes}",
       "sellPrice": "売却価格: {money}",
       "clickBuy": "クリックして購入",

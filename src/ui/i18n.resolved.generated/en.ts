@@ -1214,6 +1214,7 @@ export const en: EnTranslations = {
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Show Secondary Action Bar",
       "showThirdActionBar": "Show Third Action Bar",
+      "lockActionBars": "Lock Action Bars",
       "showTargetOfTarget": "Show Target of Target",
       "showAttackButton": "Show Attack Button",
       "showDailyRewardsChest": "Show Daily Rewards Chest",
@@ -1375,7 +1376,14 @@ export const en: EnTranslations = {
     },
     "landing": {
       "highContrast": "High Contrast",
-      "highContrastAria": "Toggle high-contrast background: disables the moving trailer so start-screen text stays legible"
+      "highContrastAria": "Toggle high-contrast background: disables the moving trailer so start-screen text stays legible",
+      "browserSupport": {
+        "title": "Heads up: unsupported browser",
+        "body": "You may see reduced performance in this browser. For the best experience, get the desktop app for Windows, macOS, or Linux. Prefer playing in a browser? Chrome performs best, and Firefox and Safari are also supported.",
+        "getDesktopApp": "Get the desktop app",
+        "continueInBrowser": "Continue in browser",
+        "dismissAria": "Dismiss the unsupported browser notice"
+      }
     },
     "warfare": {
       "honorAmount": "{amount} Honor",
@@ -1744,6 +1752,7 @@ export const en: EnTranslations = {
       "itemAriaEnchanted": "{item}, quantity {count}, enchanted copy",
       "itemAriaBound": "{item}, quantity {count}, bound copy",
       "itemAriaMasterwork": "{item}, quantity {count}, masterwork",
+      "itemAriaQuest": "{item}, quantity {count}, quest item",
       "filterGroupAria": "Filter bags by category",
       "filterAll": "All",
       "filterWeapon": "Weapons",
@@ -1752,6 +1761,7 @@ export const en: EnTranslations = {
       "filterMaterial": "Materials",
       "filterTool": "Tools",
       "filterQuest": "Quest",
+      "filterQuestCountAria": "Quest, {count} items",
       "filterMount": "Mounts",
       "sortAria": "Sort bag items",
       "sortRecent": "Recent",
@@ -1760,6 +1770,7 @@ export const en: EnTranslations = {
       "searchPlaceholder": "Search items",
       "searchAria": "Search bag items by name",
       "noMatch": "No items match your filters.",
+      "noQuestItems": "No quest items in your bags.",
       "capacity": "{used}/{total}",
       "capacityAria": "Bag slots used: {used} of {total}",
       "backpack": "Backpack",
@@ -2270,6 +2281,7 @@ export const en: EnTranslations = {
       "sortAria": "Sort bank items",
       "searchAria": "Search bank items by name",
       "depositAll": "Deposit all materials",
+      "depositAllTooltip": "Sends every crafting reagent and junk item from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, and consumables are never touched.",
       "depositAllDone": "Materials deposited: {count}.",
       "depositAllFull": "Materials deposited: {count}. Bank now full.",
       "depositAllNone": "Bank full: nothing deposited.",
@@ -6627,6 +6639,11 @@ export const en: EnTranslations = {
     },
     "system": {
       "playerDeath": "You have died.",
+      "deathRecapKillerAbility": "You have died. Slain by {killer}'s {ability}.",
+      "deathRecapKiller": "You have died. Slain by {killer}.",
+      "deathRecapAbility": "You have died. Slain by {ability}.",
+      "deathRecapFalling": "You have died. You fell to your death.",
+      "deathRecapDrowned": "You have died. You drowned.",
       "respawn": "You feel rested and whole again.",
       "ignoringChat": "Ignoring chat from {name}.",
       "noLongerIgnoring": "No longer ignoring {name}.",
@@ -7149,6 +7166,9 @@ export const en: EnTranslations = {
       "useFood": "Use: Restores {amount} health over {seconds} sec. Must remain seated while eating.",
       "useDrink": "Use: Restores {amount} mana over {seconds} sec. Must remain seated while drinking.",
       "questItem": "Quest Item",
+      "questRelated": "Quest: {quest}",
+      "questRules": "Cannot be sold, banked, or traded.",
+      "questOrphaned": "Not needed for any active quest.",
       "classes": "Classes: {classes}",
       "sellPrice": "Sell price: {money}",
       "clickBuy": "Click to buy",

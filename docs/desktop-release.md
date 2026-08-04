@@ -227,15 +227,19 @@ platforms automatically:
   (`codesign --verify --deep --strict`, `spctl -a -t exec`) before uploading
   and refuses to run at all without the Apple secrets, so an ad-hoc build can
   never publish.
-- Windows: the Key-Vault-signed universal NSIS installer (one exe covering
-  x64 + arm64) + its `.exe.blockmap` + the per-arch zips, `SHA256SUMS-windows`,
-  and `latest.yml`. The job verifies the installer is Authenticode-signed
+- Windows: the Key-Vault-signed per-arch NSIS installers (`build.nsis.
+  buildUniversalInstaller: false`, one `-win-x64.exe` and one `-win-arm64.exe`
+  instead of a single dual-arch exe) + their `.exe.blockmap` files + the
+  per-arch zips, `SHA256SUMS-windows`, and `latest.yml` (both installers list
+  in the SAME feed file; Windows update-info filenames carry no arch suffix).
+  The job verifies every installer is Authenticode-signed
   (`Get-AuthenticodeSignature` must report `Valid`) before uploading and
   refuses to run at all without the Azure Key Vault secrets, so an unsigned
-  build can never publish. Because the universal installer's exact filename is
+  build can never publish. Because the installers' exact filenames are
   defined by what electron-builder emits, the job takes the artifact list from
   `latest.yml` (and rejects a `dev*.yml` misbake) instead of pinning literal
-  names like the linux/mac jobs do.
+  names like the linux/mac jobs do; it iterates every file the feed
+  references, so it verifies and uploads both arches without change.
 
 The platform jobs are independent: a mac signing failure never blocks the
 Linux publish and vice versa.
@@ -306,9 +310,13 @@ SHA256SUMS-mac --ignore-missing` on macOS) from their download directory.
 
 1. Bump `version` in `package.json` (the feed is version-ordered; see rollback),
    and match `DESKTOP_VERSION` in `src/game/desktop_download.ts` so the download
-   page links point at the new build (the static hrefs in `index.html` are the
-   no-JS fallback; keep them on the same version). The page offers macOS (dmg),
-   Windows (the combined x64/arm64 NSIS installer), and Linux (AppImage).
+   page links point at the new build (the static hrefs in `index.html` and
+   `play.html` are the no-JS fallback; keep them on the same version). The page
+   offers macOS (dmg), Windows (the x64 NSIS installer; `build.nsis.
+   buildUniversalInstaller: false` makes electron-builder emit one installer per
+   arch instead of a single dual-arch exe, and the download page links x64,
+   matching every other channel's precedent of running Windows-on-ARM visitors
+   under x64 emulation), and Linux (AppImage).
 2. Build on each OS runner with signing env present: `npm run electron:build`,
    with `VITE_DESKTOP_API_ORIGIN` unset or set to the production origin. All
    three platforms are built and published by CI on the release tag (see
@@ -334,13 +342,17 @@ SHA256SUMS-mac --ignore-missing` on macOS) from their download directory.
      `...-mac-universal.zip` + `.zip.blockmap` (updater), `latest-mac.yml`.
    - Windows: handled by CI (which takes the artifact list from `latest.yml`,
      see "Publishing from CI"). For a manual upload, should CI ever be
-     bypassed: with x64+arm64 and no `nsis` block, electron-builder's
-     `buildUniversalInstaller` default (true) emits ONE combined NSIS installer
-     covering both arches (not per-arch `-win-x64.exe` / `-win-arm64.exe`), plus
-     its `.exe.blockmap` and `latest.yml`. Upload exactly what `release/` holds;
-     verify the emitted installer filename and the `path` in `latest.yml` on the
-     first Windows build. To ship separate per-arch installers instead, set
-     `build.nsis.buildUniversalInstaller: false`.
+     bypassed: `build.nsis.buildUniversalInstaller: false` makes electron-builder
+     build a SEPARATE installer per arch instead of one dual-arch exe:
+     `world-of-claudecraft-<v>-win-x64.exe` and `...-win-arm64.exe`, each with
+     its own `.exe.blockmap`. Both artifacts write into the SAME `latest.yml`
+     (Windows update-info filenames carry no arch suffix): its `files:` list
+     carries one entry per arch (x64 sorts first, so the legacy top-level
+     `path`/`sha512` fields point at the x64 installer), and electron-updater
+     on each running install downloads the entry matching its own arch. Upload
+     every `.exe` + `.exe.blockmap` pair `release/` holds, plus `latest.yml`;
+     verify both installer filenames and the `files:` entries in `latest.yml`
+     on the first Windows build after this change.
    - Linux: handled by CI (see "Publishing from CI" above); the manual list,
      should CI ever be bypassed: `...-linux-x86_64.AppImage` (x64) /
      `...-linux-arm64.AppImage`

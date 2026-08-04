@@ -1214,6 +1214,7 @@ export const da_DK: EnTranslations = {
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Vis sekundær handlingslinje",
       "showThirdActionBar": "Vis tredje handlingslinje",
+      "lockActionBars": "Lock Action Bars",
       "showTargetOfTarget": "Vis målets mål",
       "showAttackButton": "Vis angrebsknap",
       "showDailyRewardsChest": "Vis kisten med daglige belønninger",
@@ -1375,7 +1376,14 @@ export const da_DK: EnTranslations = {
     },
     "landing": {
       "highContrast": "Høj kontrast",
-      "highContrastAria": "Slå baggrund med høj kontrast til/fra: deaktiverer den bevægende trailer, så teksten på startskærmen forbliver læselig"
+      "highContrastAria": "Slå baggrund med høj kontrast til/fra: deaktiverer den bevægende trailer, så teksten på startskærmen forbliver læselig",
+      "browserSupport": {
+        "title": "Heads up: unsupported browser",
+        "body": "You may see reduced performance in this browser. For the best experience, get the desktop app for Windows, macOS, or Linux. Prefer playing in a browser? Chrome performs best, and Firefox and Safari are also supported.",
+        "getDesktopApp": "Get the desktop app",
+        "continueInBrowser": "Continue in browser",
+        "dismissAria": "Dismiss the unsupported browser notice"
+      }
     },
     "warfare": {
       "honorAmount": "{amount} Ære",
@@ -1744,6 +1752,7 @@ export const da_DK: EnTranslations = {
       "itemAriaEnchanted": "{item}, antal {count}, fortryllet kopi",
       "itemAriaBound": "{item}, antal {count}, bundet kopi",
       "itemAriaMasterwork": "{item}, antal {count}, mesterværk",
+      "itemAriaQuest": "{item}, quantity {count}, quest item",
       "filterGroupAria": "Filtrér tasker efter kategori",
       "filterAll": "Alle",
       "filterWeapon": "Våben",
@@ -1752,6 +1761,7 @@ export const da_DK: EnTranslations = {
       "filterMaterial": "Materialer",
       "filterTool": "Værktøjer",
       "filterQuest": "Quest",
+      "filterQuestCountAria": "Quest, {count} items",
       "filterMount": "Ridedyr",
       "sortAria": "Sortér taskegenstande",
       "sortRecent": "Nyeste",
@@ -1760,6 +1770,7 @@ export const da_DK: EnTranslations = {
       "searchPlaceholder": "Søg genstande",
       "searchAria": "Søg i taskegenstande efter navn",
       "noMatch": "Ingen genstande matcher dine filtre.",
+      "noQuestItems": "No quest items in your bags.",
       "capacity": "{used}/{total}",
       "capacityAria": "Taskepladser brugt: {used} af {total}",
       "backpack": "Rygsæk",
@@ -2270,6 +2281,7 @@ export const da_DK: EnTranslations = {
       "sortAria": "Sortér bankens genstande",
       "searchAria": "Søg i bankens genstande efter navn",
       "depositAll": "Indsæt alle materialer",
+      "depositAllTooltip": "Sends every crafting reagent and junk item from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, and consumables are never touched.",
       "depositAllDone": "Materialer indsat: {count}.",
       "depositAllFull": "Materialer indsat: {count}. Banken er nu fuld.",
       "depositAllNone": "Banken er fuld: intet indsat.",
@@ -6627,6 +6639,11 @@ export const da_DK: EnTranslations = {
     },
     "system": {
       "playerDeath": "Du er død.",
+      "deathRecapKillerAbility": "You have died. Slain by {killer}'s {ability}.",
+      "deathRecapKiller": "You have died. Slain by {killer}.",
+      "deathRecapAbility": "You have died. Slain by {ability}.",
+      "deathRecapFalling": "You have died. You fell to your death.",
+      "deathRecapDrowned": "You have died. You drowned.",
       "respawn": "Du føler dig udhvilet og hel igen.",
       "ignoringChat": "Ignorerer chat fra {name}.",
       "noLongerIgnoring": "Ignorerer ikke længere {name}.",
@@ -7149,6 +7166,9 @@ export const da_DK: EnTranslations = {
       "useFood": "Brug: Genopretter {amount} helbred over {seconds} sek. Skal forblive siddende mens du spiser.",
       "useDrink": "Brug: Genopretter {amount} mana over {seconds} sek. Skal forblive siddende mens du drikker.",
       "questItem": "Questgenstand",
+      "questRelated": "Quest: {quest}",
+      "questRules": "Cannot be sold, banked, or traded.",
+      "questOrphaned": "Not needed for any active quest.",
       "classes": "Klasser: {classes}",
       "sellPrice": "Salgspris: {money}",
       "clickBuy": "Klik for at købe",
