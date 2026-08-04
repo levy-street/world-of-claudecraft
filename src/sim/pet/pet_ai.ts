@@ -329,6 +329,17 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
  * Hunter-only on purpose. A warlock demon and the mage Water Elemental are authored
  * as pets with their own tuned pools; a tamed beast is a wild mob template that was
  * never balanced to be a companion, which is the gap this closes.
+ *
+ * KNOWN LIMITATION, pre-existing and deliberately not addressed here: a PERCENT
+ * stamina aura (buff_sta_pct / buff_stats_pct) removes itself by taking a cut of the
+ * pet's CURRENT maxHp (applyNonPlayerStatAura), which is only exact if the pool did
+ * not move while the buff was up. Re-deriving the share inside a buff window
+ * therefore leaves a small residue (measured at 9 hp on a 587 pool). syncPetLevel
+ * already had the same asymmetry, and worse, since it rebuilds the pool from the
+ * template and drops the aura's contribution outright. Making the removal exact
+ * means having that aura record the hp it actually added, which is a change to the
+ * shared non-player aura bookkeeping (warlock pets included) and belongs in its own
+ * commit with its own golden re-mint, not in a hunter balance pass.
  */
 export function applyPetOwnerScaling(ctx: SimContext, pet: Entity): void {
   if (pet.ownerId === null) return;
