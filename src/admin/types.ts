@@ -318,6 +318,30 @@ export interface GuildRenameHistoryData {
   rows: GuildRenameHistoryRow[];
 }
 
+/** One slot of a guild's live bank as GET /admin/api/guilds/:id/bank answers
+ *  it. `index` is the exact `slot` argument the purge takes and `itemId` is its
+ *  confirmation token; `dormant` means the anonymous-pipe policy refuses the
+ *  copy in both directions, so the guild can neither withdraw it nor disband
+ *  while it sits there, and it is the ONLY thing the purge will remove.
+ *  Deliberately carries no per-copy instance payload (see
+ *  server/admin_guild_bank_view.ts). */
+export interface GuildBankSlot {
+  index: number;
+  itemId: string;
+  count: number;
+  dormant: boolean;
+}
+
+export interface GuildBankStateData {
+  guildId: number;
+  treasury: number;
+  capacity: number;
+  purchasedSlots: number;
+  usedSlots: number;
+  dormantSlots: number;
+  slots: GuildBankSlot[];
+}
+
 export interface IpAssociationsData {
   ip: string;
   blocked: boolean;

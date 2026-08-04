@@ -614,15 +614,14 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   POLISH_ROOT,
   'metadata/after-desktop-ultra.json',
 );
-// Re-pinned: src/render/renderer.ts is the rendererIntegration leaf of the polish
-// composite provenance, so adding the Blizzard timed ground loop to its snowZone
-// spellfx arm moves the metadata file's bytes (its polishProvenance block) and the
-// composite fingerprint it carries, the same way the shapeshift async-compile gate
-// and the compile-storm gear/mount/base-visual fix re-pinned these before it.
+// Re-pinned after stacking the base renderer provenance move with PR #2720's
+// Eastbrook fence-removal layout evidence. The accepted file still points at
+// the same captured view and historical polish provenance, but its town-contract
+// inventory bytes follow the merged layout inputs.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '697e46d296c7c6587ba4d43f67fefa3fc29274ff3ab0795f17534f9b7a167e0e';
+  'def3cd8b40c856c6ee3bcd8dda2be0092f2b019658b447632b296a83934cba4e';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '35a73d73ae56abff042936a85b78c20dd561d2e7a1ab4f13e72d7f376c11ba8b';
+  '2d4e6e0ee7168a0bf25a13ba1a2754f39e8c8f168e6f369ceb6588fe2bb9b2bb';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -924,7 +923,7 @@ describe('Eastbrook polish committed capture artifacts', () => {
   // implicit fact resting on two sha comparisons above.
   it('declares the frozen evidence triangle count as deliberately stale against the live contract', () => {
     expect(ACCEPTED_POLISH_V2_TOWN_CONTRACT.townTriangles).toBe(28_330);
-    expect(EASTBROOK_TOWN_CAPTURE_CONTRACTS['polish-v2'].townTriangles).toBe(29_110);
+    expect(EASTBROOK_TOWN_CAPTURE_CONTRACTS['polish-v2'].townTriangles).toBe(28_902);
   });
 
   it('pins the exact historical metadata inventory to every base capture and motion frame', () => {
@@ -1479,13 +1478,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(acceptedFiles).toHaveLength(4);
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
-    // src/render/renderer.ts is the rendererIntegration leaf of that composite,
-    // so adding the Blizzard timed ground loop to its snowZone spellfx arm moved
-    // the composite fingerprint and, with it, this seal follows. Every measured
+    // After stacking the base renderer provenance move with PR #2720's
+    // fence-removal content change (rebuilt-town placement inventory in the
+    // after-* files), this seal follows the merged composite. Every measured
     // value (frame timings, draw stats, triangle and scenario numbers) is
-    // byte-identical, and no capture was retaken.
+    // byte-identical against the current release/v0.34.0 tip, neither parent's
+    // literal matched the merged tree, and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      'ee65722daa3b88b525b9c1c96d0cc39596682b54bf0c8b60aa221ba6142455d2',
+      '65d63c9d51f9543436bfd0d1f28729fac3346559c9ab03d2092ab789927eaa61',
     );
   });
 

@@ -1,5 +1,6 @@
 import type { PoolClient } from 'pg';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { GUILD_BANK_PURGE_ACTION } from '../server/admin_db';
 
 const mocks = vi.hoisted(() => ({
   query: vi.fn(),
@@ -27,6 +28,7 @@ import {
   adminGuildDetail,
   listAdminGuildHistory,
   listAdminGuilds,
+  recordAdminGuildBankPurge,
   renameAdminGuild,
 } from '../server/admin_guilds_db';
 
@@ -248,6 +250,8 @@ describe('admin guild database access', () => {
     await expect(listAdminGuildHistory(4)).resolves.toEqual([
       {
         id: 9,
+        // A row written before the additive `action` column reads as a rename.
+        action: 'guild_rename',
         oldName: 'Old Name',
         newName: 'New Name',
         reason: 'offensive name',
@@ -515,5 +519,77 @@ describe('admin guild database access', () => {
     mocks.query.mockResolvedValueOnce({ rows: [] });
     await expect(listAdminGuildHistory(404)).resolves.toBeNull();
     expect(mocks.query).toHaveBeenCalledTimes(2);
+  });
+});
+
+// The audited row for the operator dormant-slot guild bank purge. A purge never
+// renames, so it is distinguished by action = 'guild_bank_purge' with old_name
+// and new_name both carrying the guild's current name.
+describe('recordAdminGuildBankPurge', () => {
+  beforeEach(() => {
+    mocks.query.mockReset();
+  });
+
+  it('writes an audited guild_bank_purge row naming the operator, the reason, and the item', async () => {
+    mocks.query
+      .mockResolvedValueOnce({ rows: [{ name: 'Iron Vanguard' }] })
+      .mockResolvedValueOnce({ rows: [] });
+
+    await recordAdminGuildBankPurge({
+      guildId: 913,
+      reason: 'stuck rift-gear copy',
+      adminAccountId: 7,
+      itemId: 'wolf_fang',
+      count: 2,
+      slotIndex: 3,
+    });
+
+    const [sql, params] = mocks.query.mock.calls[1];
+    expect(sql).toContain('INSERT INTO guild_moderation_actions');
+    // The action kind is BOUND, not inlined, so this row and the dashboard's
+    // label table read the one shared constant (server/admin_db.ts
+    // GUILD_MODERATION_ACTIONS) instead of two copies of a literal.
+    expect(sql).not.toContain("'guild_bank_purge'");
+    expect(params[5]).toBe(GUILD_BANK_PURGE_ACTION);
+    expect(GUILD_BANK_PURGE_ACTION).toBe('guild_bank_purge');
+    // old_name and new_name share $3: a purge never renames.
+    expect(sql).toContain('VALUES ($1, $2, $6, $3, $3, $4, $5)');
+    expect(params[0]).toBe(913);
+    expect(params[2]).toBe('Iron Vanguard');
+    // The reason carries what was removed, so the moderation history reads on
+    // its own without joining the bank_ledger.
+    expect(params[3]).toBe('removed guild bank slot 3 (2x wolf_fang): stuck rift-gear copy');
+    expect(params[4]).toBe(7); // the acting operator, never the carrier
+  });
+
+  it('still records the audit row when the guild row is already gone', async () => {
+    // A disband can race the operator; the audit row is a snapshot identifier,
+    // not a foreign key, so losing the name must not lose the record.
+    mocks.query.mockResolvedValueOnce({ rows: [] }).mockResolvedValueOnce({ rows: [] });
+    await recordAdminGuildBankPurge({
+      guildId: 913,
+      reason: 'why',
+      adminAccountId: 7,
+      itemId: 'wolf_fang',
+      count: 1,
+      slotIndex: 0,
+    });
+    expect(mocks.query).toHaveBeenCalledTimes(2);
+    expect(mocks.query.mock.calls[1][1][2]).toBe('');
+  });
+
+  it('clamps an oversized detail line to the reason cap', async () => {
+    mocks.query
+      .mockResolvedValueOnce({ rows: [{ name: 'G' }] })
+      .mockResolvedValueOnce({ rows: [] });
+    await recordAdminGuildBankPurge({
+      guildId: 913,
+      reason: 'x'.repeat(500),
+      adminAccountId: 7,
+      itemId: 'wolf_fang',
+      count: 1,
+      slotIndex: 0,
+    });
+    expect((mocks.query.mock.calls[1][1][3] as string).length).toBe(500);
   });
 });

@@ -7920,10 +7920,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.quit': 'Salir',
   'desktop.crash.reload': 'Recargar',
   'desktop.crash.title': 'World of ClaudeCraft',
-  'desktop.update.downloading': 'Descargando actualización {version}...',
+  'desktop.update.downloadingTitle': 'Descargando actualización {version}...',
   'desktop.update.later': 'Más tarde',
-  'desktop.update.ready':
-    'La actualización {version} está lista. Se instala al salir, o reinicia ahora.',
+  'desktop.update.readyTitle': 'La actualización {version} está lista',
+  'desktop.update.readyBody': 'Se instala al salir, o reinicia ahora.',
   'desktop.update.restart': 'Reiniciar ahora',
   'hudChrome.dailyRewards.close': 'Cerrar recompensas diarias',
   'hudChrome.dailyRewards.endsIn': 'Termina en {time}',

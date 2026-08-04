@@ -41,6 +41,8 @@
 //                                            content + basic crafting action landed in #1127)
 //   bank.ts             IWorldBank           per-character deposit box (proximity-gated info +
 //                                            deposit/withdraw/buy-slots)
+//   guild_bank.ts       IWorldGuildBank      shared guild treasury + item store (officer-plus,
+//                                            proximity-gated info + gold/item/buy-slots commands)
 //   vale_cup.ts         IWorldValeCup        Vale Cup boarball queue/roles/betting/practice
 //   mounts.ts           IWorldMounts         rideable ground mounts: pick + mount/dismount
 //   dungeon_finder.ts   IWorldDungeonFinder  Dungeon Finder queue/proposals/premade board
@@ -71,6 +73,7 @@ import type { IWorldDuelArena } from './world_api/duel_arena';
 import type { IWorldDungeonFinder } from './world_api/dungeon_finder';
 import type { IWorldDungeons } from './world_api/dungeons';
 import type { IWorldEntityRoster } from './world_api/entity_roster';
+import type { IWorldGuildBank } from './world_api/guild_bank';
 import type { IWorldInteraction } from './world_api/interaction';
 import type { IWorldInventory } from './world_api/inventory';
 import type { IWorldLoot } from './world_api/loot';
@@ -187,6 +190,13 @@ export type {
   DungeonFinderQueueView,
 } from './world_api/dungeon_finder';
 export type { RaidLockout, RiftFloorView } from './world_api/dungeons';
+export {
+  GUILD_BANK_LOG_LIMIT,
+  type GuildBankInfo,
+  type GuildBankLogEntry,
+  type GuildBankLogOp,
+  type GuildBankLogView,
+} from './world_api/guild_bank';
 export type { WorldInteractionOutcome } from './world_api/interaction';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
@@ -261,6 +271,7 @@ export interface IWorld
     IWorldTelemetry,
     IWorldProfessions,
     IWorldBank,
+    IWorldGuildBank,
     IWorldValeCup,
     IWorldDungeonFinder,
     IWorldActionBar,
@@ -502,6 +513,24 @@ export const COMMAND_NAMES = [
   // Profiler-only server authority: idempotently prevents incoming damage while
   // preserving normal outgoing damage and incoming hit presentation.
   'dev_profiler_invulnerable',
+  // The Guild Bank cluster (officer-plus shared treasury + item store,
+  // src/sim/guild_bank.ts). Its own guild_bank_* tokens forever, NEVER a reuse
+  // of the personal bank_* strings (state.md decision; pinned by
+  // tests/command_facets.test.ts). `slot` is a container index and `count`
+  // optional (the bank_* wire idiom); `amount` is copper. The Sim owns every
+  // gameplay rule (banker proximity, officer-plus rank, quest-bind, caps,
+  // table price); the server validates shape only.
+  'guild_bank_deposit_gold',
+  'guild_bank_withdraw_gold',
+  'guild_bank_deposit',
+  'guild_bank_withdraw',
+  'guild_bank_buy_slots',
+  // The guild bank ACTIVITY LOG request (the officer-visible history of the
+  // append-only bank_ledger rows). A pure READ token: it mutates nothing, and
+  // its answer comes back on its own one-shot 'gbanklog' frame rather than the
+  // 20 Hz snapshot, because the payload is cold, identical for every officer of
+  // the guild, and 50 rows wide. Sent only while the log view is open.
+  'guild_bank_log',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -576,6 +605,7 @@ export type WorldFacet =
   | 'IWorldDailyRewards'
   | 'IWorldTelemetry'
   | 'IWorldBank'
+  | 'IWorldGuildBank'
   | 'IWorldValeCup'
   | 'IWorldDungeonFinder'
   | 'IWorldActionBar'
@@ -753,6 +783,15 @@ export const COMMAND_FACETS = {
   bank_deposit: 'IWorldBank',
   bank_withdraw: 'IWorldBank',
   bank_buy_slots: 'IWorldBank',
+  // IWorldGuildBank: the officer-plus shared guild treasury + item store
+  // (snake_case wire strings, by design; its OWN tokens, never a bank_* reuse).
+  // guildBankInfo is a proximity + rank gated snapshot read (no send, untagged).
+  guild_bank_deposit_gold: 'IWorldGuildBank',
+  guild_bank_withdraw_gold: 'IWorldGuildBank',
+  guild_bank_deposit: 'IWorldGuildBank',
+  guild_bank_withdraw: 'IWorldGuildBank',
+  guild_bank_buy_slots: 'IWorldGuildBank',
+  guild_bank_log: 'IWorldGuildBank',
   // IWorldValeCup: the Vale Cup boarball queue. cupInfo is a snapshot read (no
   // send); vcup_practice starts a private instanced practice bout (online + off).
   vcup_queue: 'IWorldValeCup',

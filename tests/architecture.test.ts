@@ -76,11 +76,22 @@ function stripComments(src: string): string {
 }
 
 // A specifier a host-agnostic sim file must never import. Returns the offending
-// layer/package, or null when the import is allowed.
+// layer/package, or null when the import is allowed. `server/` is banned like the
+// browser host layers (even type-only): server modules drag Node-only deps (pg,
+// node:*) that would break the sim in the browser, and shared server contracts are
+// REDECLARED in the sim with a test-side lockstep pin instead (the GuildRank
+// precedent: src/sim/guild_bank.ts GUILD_RANKS pinned by tests/guild_bank.test.ts).
 function forbiddenImport(spec: string): string | null {
   if (spec === 'three' || spec.startsWith('three/')) return 'three';
-  const layer = spec.match(/(?:^|\/)(render|ui|game|net)\//);
-  return layer ? layer[1] : null;
+  // The trailing slash is not required: `../server` and `../../server.js` are
+  // the same ban, and the slash-only form let both through. A layer name must
+  // therefore END the specifier, take a `/` (a file inside it), or take a `.js`
+  // extension. The leading `(?:^|\/)` still anchors the name to a path segment,
+  // so `my_server_helper` and `src/uiverse/x` are not matches.
+  const layer = spec.match(
+    /(?:^|\/)(render|ui|game|net|server)(?:\/|\.js)?$|(?:^|\/)(render|ui|game|net|server)\//,
+  );
+  return layer ? (layer[1] ?? layer[2]) : null;
 }
 
 // Same idea for a src/ui pure core: it lives in ui and may lean on sibling pure
@@ -197,6 +208,8 @@ const UI_PURE_CORES = [
   'src/ui/bag_instance_glyph_view.ts',
   'src/ui/item_slot_labels.ts',
   'src/ui/bank_view.ts',
+  'src/ui/guild_bank_log_view.ts',
+  'src/ui/guild_bank_view.ts',
   'src/ui/item_set_tooltip_view.ts',
   'src/ui/weapon_proc_view.ts',
   'src/ui/options_view.ts',
@@ -220,6 +233,7 @@ const UI_PURE_CORES = [
   'src/ui/profession_tutorial_view.ts',
   'src/ui/professions_view.ts',
   'src/ui/market_view.ts',
+  'src/ui/market_buy_confirm_core.ts',
   'src/ui/mailbox_view.ts',
   'src/ui/calendar_view.ts',
   'src/ui/char_view.ts',
@@ -470,9 +484,45 @@ describe('src/sim architecture invariants', () => {
     expect(simFiles.length).toBeGreaterThan(10);
   });
 
-  it('imports nothing from render/ui/game/net or three (host-agnostic core)', () => {
+  it('imports nothing from render/ui/game/net/server or three (host-agnostic core)', () => {
     const violations = scanImports(simFiles, forbiddenImport);
     expect(violations, `src/sim must stay host-agnostic:\n${violations.join('\n')}`).toEqual([]);
+  });
+
+  it('the ban actually FIRES on every spelling a sim file could reach a host by', () => {
+    // A guard with no self-test is a guard nobody has seen fail. The
+    // directory-with-trailing-slash spellings were caught; the BARE ones
+    // (`../server`, `../../server.js`) were not, and a type-only
+    // `import type { X } from '../server'` is exactly the shape a sim file
+    // drifts into first.
+    for (const spec of [
+      '../server',
+      '../../server.js',
+      '../../server/game',
+      './server/db',
+      '../net',
+      '../net/online',
+      '../ui/hud',
+      '../render/renderer',
+      '../game/input',
+      'three',
+      'three/examples/jsm/x',
+    ]) {
+      expect(forbiddenImport(spec), spec).not.toBeNull();
+    }
+    // ...and does NOT fire on the legitimate neighbours, so it can never be
+    // satisfied by a rule that simply bans everything.
+    for (const spec of [
+      './types',
+      '../world_api',
+      '../world_api/guild_bank',
+      './professions/training',
+      'node:assert',
+      './my_server_helper',
+      './renderer_notes',
+    ]) {
+      expect(forbiddenImport(spec), spec).toBeNull();
+    }
   });
 
   it('touches no DOM/browser globals', () => {
@@ -1302,6 +1352,7 @@ const UI_DOM_MODULES = [
   'src/ui/armory_inspect.ts',
   'src/ui/bag_item_action_menu.ts',
   'src/ui/bags_window.ts',
+  'src/ui/bank_quantity_prompt.ts',
   'src/ui/bank_window.ts',
   'src/ui/calendar_window.ts',
   'src/ui/camera_prompt.ts',
@@ -1325,6 +1376,8 @@ const UI_DOM_MODULES = [
   'src/ui/form_draft.ts',
   'src/ui/gather_node_tooltip_controller.ts',
   'src/ui/gpu_notice_toast.ts',
+  'src/ui/guild_bank_log_window.ts',
+  'src/ui/guild_bank_window.ts',
   'src/ui/hud.ts',
   'src/ui/hud/chat/chat_geometry_controller.ts',
   'src/ui/hud/chat/chat_window_controller.ts',

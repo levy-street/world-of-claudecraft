@@ -218,6 +218,21 @@ export const META_EXCLUDE: ReadonlySet<string> = new Set([
   // persisted, never sim-mutated. The bonus CAPACITY it explains IS pinned (the
   // sampled meta.bank.bonusSlots), so excluding the rows loses no gameplay net.
   'bankBonusSources',
+  // Server-stamped guild membership (id + rank) behind the Guild Bank's officer
+  // gate; session-only exactly like bankBonusSources (never persisted, never
+  // sim-mutated, always null offline), so sampling it would churn goldens for
+  // no gameplay reason. The book state it authorizes IS sim-owned and testable
+  // directly (Sim.guildBanks).
+  // Re-audited for Phase 2 (the officer gate now READS the stamp): the
+  // exclusion stays correct because the field remains a host-injected
+  // AUTHORIZATION INPUT, not sim-evolved state. Offline it is always null, so
+  // every guild bank op refuses and mutates nothing there (pinned in
+  // tests/guild_bank.test.ts); online only the authoritative server's sim runs
+  // the ops and the client mirrors results via the maybe('guildBank')
+  // snapshot. No cross-host divergence can hide behind the exclusion: the
+  // state the stamp gates (Sim.guildBanks, player copper/inventory) is fully
+  // sampled, so a gate misfire would surface THERE.
+  'guildMembership',
   'known', // derived from class/level/talents
   'talentMods', // derived from talents (recomputed)
   'fiestaMods', // derived from talentMods + augments

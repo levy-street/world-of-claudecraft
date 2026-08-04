@@ -149,6 +149,7 @@ describe('assertLoopbackDatabaseUrl', () => {
 // deleted import away from silently vanishing from a call site while the unit
 // tests above stayed green, so the call sites are pinned too.
 const GUARDED_SCRIPTS = [
+  'scripts/admin_guild_bank_shot.mjs',
   'scripts/admin_professions_shot.mjs',
   'scripts/load_players.mjs',
   'scripts/load_professions.mjs',

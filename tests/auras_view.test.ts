@@ -242,6 +242,28 @@ describe('createAurasView: derivation per mode', () => {
     ).toBe(false);
   });
 
+  // The sibling of the case above, for the other arm of isPlayerRemovableAura. A
+  // helpful (positive-value) aura is the only shape where the removability term
+  // decides the affordance: a debuff is refused by the isDebuff term regardless. The
+  // flag rides the wire as `und` (server/game.ts wireAura), so this is what keeps the
+  // online buff bar from offering a cancel the server would refuse.
+  it('never offers a right-click cancel on an undispellable helpful aura', () => {
+    const ordinaryBoon = aura({ id: 'ordinary_boon', kind: 'buff_ap', value: 50 });
+    const boundBoon = aura({
+      id: 'bound_boon',
+      kind: 'buff_ap',
+      value: 50,
+      undispellable: true,
+    });
+
+    expect(createAurasView('buffs', deps()).tick(entity([ordinaryBoon])).slots[0].cancelable).toBe(
+      true,
+    );
+    expect(createAurasView('buffs', deps()).tick(entity([boundBoon])).slots[0].cancelable).toBe(
+      false,
+    );
+  });
+
   it('emits one slot PER aura even when two share an id (no core-side dedup)', () => {
     // The sim dedups by id+sourceId, so one entity can carry two auras with the same id
     // from different sources. The core must NOT collapse them (that is the painter's job,

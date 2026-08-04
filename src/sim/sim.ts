@@ -225,6 +225,8 @@ import * as escortMod from './escort';
 import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } from './escort';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
+import type { GuildBankState, GuildMembership } from './guild_bank';
+import * as guildBankMod from './guild_bank';
 import * as interaction from './interaction';
 import {
   boundCraftedRecipeIdOnLoad,
@@ -332,6 +334,7 @@ import {
   hobbyCraftFor,
   normalizeArchetypeState,
   requiredAmendsProgress,
+  serializeArchetypeState,
   switchArchetype as switchArchetypeImpl,
 } from './professions/archetype';
 import {
@@ -903,6 +906,11 @@ export interface ArenaReturnPools {
   cooldowns: Map<string, number>;
   abilityCharges: Record<string, AbilityChargeState>;
   ccDr: Map<CrowdControlDrCategory, CrowdControlDrState>;
+  // The recovery sickness the fighter owed on the way in, by id and remaining
+  // seconds. The bout runs on the arena clean slate, but the debt follows them out
+  // (restoreArenaReturnPools), so queueing is not a way to shed the penalty.
+  // Absent when they entered healthy.
+  sickness?: { id: string; remaining: number };
 }
 
 export interface ArenaMatch {
@@ -1157,6 +1165,14 @@ export interface PlayerMeta {
   // never persisted, never sim-mutated, always [] offline; capacity itself rides
   // bank.bonusSlots. Excluded from the parity meta sample (tests/parity/trace.ts).
   bankBonusSources: BankBonusSource[];
+  // Server-stamped guild membership (guild id + rank), the authorization input
+  // the Guild Bank's officer-plus gate reads; written only through
+  // setPlayerGuildMembership (guild_bank.ts). Session-only exactly like
+  // bankBonusSources: guilds live in the server social DB, so this is never
+  // serialized into CharacterState (the server re-stamps at join and on every
+  // membership or rank change), never sim-mutated, always null offline.
+  // Excluded from the parity meta sample (tests/parity/trace.ts).
+  guildMembership: GuildMembership | null;
   vendorBuyback: InvSlot[];
   copper: number;
   equipment: PlayerEquipment;
@@ -1729,6 +1745,16 @@ function freshCounters(): RewardCounters {
   };
 }
 
+// The offline guild bank log answer: a FROZEN empty ready view. Offline play
+// never has a guild (guilds live in the server social DB) and there is no
+// bank_ledger to read, so the log is empty rather than loading or refused. One
+// shared frozen instance so the inert facet arm can never be mutated by a
+// caller into a per-Sim divergence.
+const OFFLINE_GUILD_BANK_LOG: import('../world_api').GuildBankLogView = Object.freeze({
+  state: 'ready' as const,
+  entries: Object.freeze([]) as readonly import('../world_api').GuildBankLogEntry[],
+});
+
 // isPetClass relocated to types.ts (P1b; imported in the './types' block above). The
 // cast-toggle predicates (isFormToggle/isToggleBuff/isStealthToggle/preservesStealth/
 // isShamanShock/ignoresDamagePushback) live in combat/casting_lifecycle.ts (C4a).
@@ -1889,6 +1915,11 @@ export class Sim {
   // sim needs, and any banker is a valid place to stand and use the bank. Exposed
   // as a live SimContext view so bank.ts gates deposit/withdraw/buy on proximity.
   bankerIds: number[] = [];
+  // Guild Bank books: guild id -> live GuildBankState, loaded by the server per
+  // realm through loadGuildBank (guild_bank.ts owns the shape; Phase 3 wires the
+  // DB) and exposed as a live SimContext view. Always empty offline: guilds are
+  // a server social system, so the offline sim never creates a book.
+  guildBanks: Map<number, GuildBankState> = new Map();
   /** When true, /dev level|tp|give chat commands are accepted (local dev only). */
   readonly devCommands: boolean;
   // Entities spawned by the last /dev sandbox (dummy + practice bots), so re-running
@@ -2575,6 +2606,7 @@ export class Sim {
       bags: Array<string | null>(BAG_SOCKETS).fill(null),
       bank: { inventory: [], purchasedSlots: 0, bonusSlots: 0 },
       bankBonusSources: [],
+      guildMembership: null,
       vendorBuyback: [],
       copper: 0,
       equipment: {
@@ -3739,7 +3771,7 @@ export class Sim {
       // floored display makes the heal unrepeatable by design. No PlayerMeta
       // mirror here either.
       proficiencyDisplayHealApplied: true,
-      archetype: { ...meta.archetype, attunedPairs: [...meta.archetype.attunedPairs] },
+      archetype: serializeArchetypeState(meta.archetype),
       delveMarks: meta.delveMarks,
       delveClears: { ...meta.delveClears },
       companionUpgrades: { ...meta.companionUpgrades },
@@ -4023,6 +4055,16 @@ export class Sim {
     if (!e || e.guild !== oldName) return;
     valeCupMod.vcupRenameGuild(this.ctx, pid, oldName, newName);
     e.guild = newName;
+  }
+
+  /** Server-callable session stamp of a player's guild membership (id + rank),
+   *  the authorization input the Guild Bank gates on; the id/rank contract and
+   *  the session-only rationale live on PlayerMeta.guildMembership. Called at
+   *  join and on every membership or rank change; pass null on leave, kick, or
+   *  disband. Offline/headless never call it, so the stamp stays null there.
+   *  Thin delegate into guild_bank.ts. */
+  setPlayerGuildMembership(pid: number, membership: GuildMembership | null): void {
+    guildBankMod.stampGuildMembership(this.ctx, pid, membership);
   }
 
   /** Cosmetic skin-select event: rolls a rarity rank (once) and emits the
@@ -4670,6 +4712,11 @@ export class Sim {
       // NPC id, read by bank.ts's proximity gate. Sim-owned, never reassigned.
       get bankerIds() {
         return sim.bankerIds;
+      },
+      // Guild Bank book map: guild id -> live book, read and written only
+      // through the guild_bank.ts helpers. Sim-owned, never reassigned.
+      get guildBanks() {
+        return sim.guildBanks;
       },
       // The Vale Cup holder (queues/deserters/botPids mutated in place; the
       // match slot reassigned inside the holder, so no setter is needed).
@@ -9129,6 +9176,24 @@ export class Sim {
   guildEventCreate(_day: string, _hour: number | null, _title: string, _note: string): void {}
   guildEventRemove(_eventId: number): void {}
   guildSetMotd(_text: string): void {}
+  // The Guild Bank is a guild feature, and guilds live in the server social DB,
+  // so offline play never has one: the read is null and the commands are inert
+  // (the socialInfo idiom), forever. The online path is live: ClientWorld sends
+  // the guild_bank_* tokens and the server acts for an explicit pid through the
+  // guildBank*For entry points (see the Guild Bank facade section below).
+  guildBankInfo: null = null;
+  guildBankDepositGold(_amount: number): void {}
+  guildBankWithdrawGold(_amount: number): void {}
+  guildBankDeposit(_slotIndex: number, _count?: number): void {}
+  guildBankWithdraw(_slotIndex: number, _count?: number): void {}
+  guildBankBuySlots(): void {}
+  /** Offline has no guild and no bank_ledger, so the log is EMPTY and READY,
+   *  never 'loading' (nothing is ever in flight) and never 'refused' (nothing
+   *  declined it). The Guild pane never renders offline anyway, so this is the
+   *  inert-arm answer that keeps the facet total: no request, no wire send. */
+  guildBankLog(): import('../world_api').GuildBankLogView {
+    return OFFLINE_GUILD_BANK_LOG;
+  }
   searchCharacters(_query: string): Promise<import('../world_api').CharacterSearchResult[]> {
     return Promise.resolve([]);
   }
@@ -9730,6 +9795,103 @@ export class Sim {
 
   bankInfoFor(pid: number): import('../world_api').BankInfo | null {
     return bankMod.bankInfoFor(this.ctx, pid);
+  }
+
+  // -------------------------------------------------------------------------
+  // The Guild Bank: the shared guild treasury + item store (Phase 1 foundation)
+  // -------------------------------------------------------------------------
+
+  // Thin delegates to the guild bank free functions (guild_bank.ts). The books
+  // live on Sim (guildBanks, a SimContext view keyed by guild id); the server
+  // feeds and drains them through this pure shape-in/shape-out seam in Phase 3
+  // (it owns the SQL).
+
+  loadGuildBank(guildId: number, raw: unknown): void {
+    guildBankMod.loadGuildBank(this.ctx, guildId, raw);
+  }
+
+  serializeGuildBank(guildId: number): GuildBankState | null {
+    return guildBankMod.serializeGuildBank(this.ctx, guildId);
+  }
+
+  // The sanctioned evict (disband, or the first half of an evict-then-load
+  // reload). The server's guild_banks row cascades away with the guilds DELETE.
+  evictGuildBank(guildId: number): void {
+    guildBankMod.evictGuildBank(this.ctx, guildId);
+  }
+
+  // The disband guard's read: what the LIVE book holds, or null when no book
+  // is loaded (callers fail closed on null; an unloaded book proves nothing).
+  guildBankHoldings(guildId: number): { copper: number; items: number } | null {
+    return guildBankMod.guildBankHoldings(this.ctx, guildId);
+  }
+
+  // Reserve-at-gate (state.md, revised by Phase 3 QA): the server charges this
+  // synchronously at the guild_create dispatch gate, before any DB work, and
+  // refunds on every refusal arm. Returns the copper actually charged.
+  chargeGuildCreationFeeFor(pid: number): number {
+    return guildBankMod.chargeGuildCreationFee(this.ctx, pid);
+  }
+
+  // The refusal arm of the reserve-at-gate flow: return a reserved creation
+  // fee to the purse. Returns the copper actually refunded.
+  refundGuildCreationFeeFor(pid: number, amount: number): number {
+    return guildBankMod.refundGuildCreationFee(this.ctx, pid, amount);
+  }
+
+  // Surgically undo a dead session's unflushed guild bank ops on the live book
+  // (the fence-out arm where another session's legitimate unflushed ops make
+  // an evict-and-reload destructive). See guild_bank.ts revertGuildBankDeltas.
+  revertGuildBankDeltas(guildId: number, deltas: readonly guildBankMod.GuildBankOpDelta[]): void {
+    guildBankMod.revertGuildBankDeltas(this.ctx, guildId, deltas);
+  }
+
+  // The five op bodies + the gated info read, as pid-first SERVER entry points
+  // (the bankInfoFor pattern). These are deliberately distinct from the IWorld
+  // facet members (guildBankDeposit etc. in the social no-op block above): the
+  // offline facet arm is inert forever because offline play never has a guild,
+  // while the authoritative server acts for an explicit pid through these. All
+  // gameplay rules (proximity, rank, quest-bind, caps, capacity) live in
+  // guild_bank.ts; the server validates shape only.
+
+  guildBankDepositGoldFor(pid: number, amount: number): void {
+    guildBankMod.guildBankDepositGold(this.ctx, amount, pid);
+  }
+
+  guildBankWithdrawGoldFor(pid: number, amount: number): void {
+    guildBankMod.guildBankWithdrawGold(this.ctx, amount, pid);
+  }
+
+  guildBankDepositFor(pid: number, slotIndex: number, count?: number): void {
+    guildBankMod.guildBankDeposit(this.ctx, slotIndex, count, pid);
+  }
+
+  guildBankWithdrawFor(pid: number, slotIndex: number, count?: number): void {
+    guildBankMod.guildBankWithdraw(this.ctx, slotIndex, count, pid);
+  }
+
+  guildBankBuySlotsFor(pid: number): void {
+    guildBankMod.guildBankBuySlots(this.ctx, pid);
+  }
+
+  guildBankInfoFor(pid: number): import('../world_api').GuildBankInfo | null {
+    return guildBankMod.guildBankInfoFor(this.ctx, pid);
+  }
+
+  // The OPERATOR pair (server-only, never IWorld): the ungated guild-id-scoped
+  // book read the admin escape hatch diffs around its mutation, and the hatch
+  // itself, which removes exactly one DORMANT (pipe-refused) slot and returns
+  // the removed copy as evidence. See guild_bank.ts for the scope contract.
+  guildBankInfoForGuild(guildId: number): import('../world_api').GuildBankInfo | null {
+    return guildBankMod.guildBankInfoForGuild(this.ctx, guildId);
+  }
+
+  purgeDormantGuildBankSlot(
+    guildId: number,
+    slotIndex: number,
+    expectItemId: string,
+  ): InvSlot | null {
+    return guildBankMod.purgeDormantGuildBankSlot(this.ctx, guildId, slotIndex, expectItemId);
   }
 
   // -------------------------------------------------------------------------

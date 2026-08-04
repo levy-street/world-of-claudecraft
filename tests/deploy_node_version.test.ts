@@ -92,11 +92,12 @@ describe('deploy and CI Node version pin', () => {
     expect(ciWorkflow).toContain(`node-version: ${TARGET_MAJOR}`);
   });
 
-  it('pins every pr-ai.yml node-version to the target Node major', () => {
-    const values = nodeVersionValues(prAiWorkflow);
-    expect(values.length).toBeGreaterThan(0);
-    for (const value of values) expect(value).toBe(TARGET_MAJOR);
-    expect(prAiWorkflow).toContain(`node-version: ${TARGET_MAJOR}`);
+  // pr-ai.yml runs only the codex-action review jobs and deliberately sets up no Node
+  // toolchain of its own, so there is no version for the cross-carrier pin to hold. Do
+  // not delete this arm if a Node step returns: swap it back to the pinned form above
+  // (every value equals TARGET_MAJOR, non-empty) so the new carrier joins the bump.
+  it('keeps pr-ai.yml free of a Node toolchain the cross-carrier pin would miss', () => {
+    expect(nodeVersionValues(prAiWorkflow)).toEqual([]);
   });
 
   // DEPLOY.md's containerized tsc-gate builds the type check inside
