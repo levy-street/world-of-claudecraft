@@ -173,6 +173,15 @@ export class MeterData {
     };
   }
 
+  private partyAttributionPid(world: IWorld, entityId: number, partyPids: Set<number>): number | null {
+    if (partyPids.has(entityId)) return entityId;
+    const entity = world.entities.get(entityId);
+    if (entity?.kind === 'mob' && entity.ownerId !== null && partyPids.has(entity.ownerId)) {
+      return entity.ownerId;
+    }
+    return null;
+  }
+
   /** party membership check is supplied by the caller (self + party pids) */
   onEvent(ev: SimEvent, world: IWorld, partyPids: Set<number>, now: number): void {
     if (ev.type !== 'damage' && ev.type !== 'heal2') return;
@@ -182,16 +191,16 @@ export class MeterData {
     // can also legitimately land at amount 0 (full HP, fully absorbed) and that
     // real cast should still count as party activity.
     if (ev.type === 'heal2' && ev.cueOnly) return;
-    const sourceInParty = partyPids.has(ev.sourceId);
-    const targetInParty = partyPids.has(ev.targetId);
-    if (!sourceInParty && !targetInParty) return;
+    const sourcePartyPid = this.partyAttributionPid(world, ev.sourceId, partyPids);
+    const targetPartyPid = this.partyAttributionPid(world, ev.targetId, partyPids);
+    if (sourcePartyPid === null && targetPartyPid === null) return;
 
     // any party-involved combat keeps the encounter alive (tanking without
     // dealing damage must not end the segment)
     if (!this.current) this.current = newEncounter(now);
     this.lastActivity = now;
 
-    if (ev.type === 'damage' && sourceInParty && ev.kind === 'hit' && ev.amount > 0) {
+    if (ev.type === 'damage' && sourcePartyPid !== null && ev.kind === 'hit' && ev.amount > 0) {
       const target = world.entities.get(ev.targetId);
       if (target && target.kind === 'mob') {
         const who = this.attribute(world, ev.sourceId, partyPids);
@@ -212,7 +221,7 @@ export class MeterData {
           this.current.mainMobId = ev.targetId;
         }
       }
-    } else if (ev.type === 'heal2' && sourceInParty && ev.amount > 0) {
+    } else if (ev.type === 'heal2' && sourcePartyPid !== null && ev.amount > 0) {
       const who = this.attribute(world, ev.sourceId, partyPids);
       for (const enc of [this.current, this.allTime]) {
         const t = this.tally(enc, who.pid, who.name, who.cls, partyPids);

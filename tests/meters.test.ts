@@ -165,7 +165,7 @@ describe('combat meters', () => {
 
   it('folds controlled pet damage into its owner row instead of giving the pet its own', () => {
     const w = fakeWorld();
-    const party = new Set([1, 2, 3]);
+    const party = new Set([1, 2]);
     (w.entities as Map<number, any>).set(3, {
       id: 3,
       kind: 'mob',
@@ -220,7 +220,7 @@ describe('combat meters', () => {
 
   it('folds a pet heal into its owner row too', () => {
     const w = fakeWorld();
-    const party = new Set([1, 2, 4]);
+    const party = new Set([1, 2]);
     (w.entities as Map<number, any>).set(4, {
       id: 4,
       kind: 'mob',
@@ -282,7 +282,7 @@ describe('combat meters', () => {
       templateId: 'imp',
       ownerId: 2,
     });
-    const party = new Set([1, 2, 10, 11]);
+    const party = new Set([1, 2]);
     const m = new MeterData(0);
     m.onEvent(dmg(10, 50, 20, 'Firebolt'), w, party, 1000);
     m.onEvent(dmg(11, 50, 30, 'Firebolt'), w, party, 1500);
