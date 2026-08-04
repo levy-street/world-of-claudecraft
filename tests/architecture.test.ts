@@ -83,8 +83,15 @@ function stripComments(src: string): string {
 // precedent: src/sim/guild_bank.ts GUILD_RANKS pinned by tests/guild_bank.test.ts).
 function forbiddenImport(spec: string): string | null {
   if (spec === 'three' || spec.startsWith('three/')) return 'three';
-  const layer = spec.match(/(?:^|\/)(render|ui|game|net|server)\//);
-  return layer ? layer[1] : null;
+  // The trailing slash is not required: `../server` and `../../server.js` are
+  // the same ban, and the slash-only form let both through. A layer name must
+  // therefore END the specifier, take a `/` (a file inside it), or take a `.js`
+  // extension. The leading `(?:^|\/)` still anchors the name to a path segment,
+  // so `my_server_helper` and `src/uiverse/x` are not matches.
+  const layer = spec.match(
+    /(?:^|\/)(render|ui|game|net|server)(?:\/|\.js)?$|(?:^|\/)(render|ui|game|net|server)\//,
+  );
+  return layer ? (layer[1] ?? layer[2]) : null;
 }
 
 // Same idea for a src/ui pure core: it lives in ui and may lean on sibling pure
@@ -475,6 +482,42 @@ describe('src/sim architecture invariants', () => {
   it('imports nothing from render/ui/game/net/server or three (host-agnostic core)', () => {
     const violations = scanImports(simFiles, forbiddenImport);
     expect(violations, `src/sim must stay host-agnostic:\n${violations.join('\n')}`).toEqual([]);
+  });
+
+  it('the ban actually FIRES on every spelling a sim file could reach a host by', () => {
+    // A guard with no self-test is a guard nobody has seen fail. The
+    // directory-with-trailing-slash spellings were caught; the BARE ones
+    // (`../server`, `../../server.js`) were not, and a type-only
+    // `import type { X } from '../server'` is exactly the shape a sim file
+    // drifts into first.
+    for (const spec of [
+      '../server',
+      '../../server.js',
+      '../../server/game',
+      './server/db',
+      '../net',
+      '../net/online',
+      '../ui/hud',
+      '../render/renderer',
+      '../game/input',
+      'three',
+      'three/examples/jsm/x',
+    ]) {
+      expect(forbiddenImport(spec), spec).not.toBeNull();
+    }
+    // ...and does NOT fire on the legitimate neighbours, so it can never be
+    // satisfied by a rule that simply bans everything.
+    for (const spec of [
+      './types',
+      '../world_api',
+      '../world_api/guild_bank',
+      './professions/training',
+      'node:assert',
+      './my_server_helper',
+      './renderer_notes',
+    ]) {
+      expect(forbiddenImport(spec), spec).toBeNull();
+    }
   });
 
   it('touches no DOM/browser globals', () => {

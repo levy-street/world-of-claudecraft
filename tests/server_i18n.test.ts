@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { GUILD_CREATION_FEE_COPPER } from '../src/sim/guild_bank';
 import { ensureLocaleLoaded, setLanguage, supportedLanguages } from '../src/ui/i18n';
 import { localizeServerText, tServer } from '../src/ui/server_i18n';
 
@@ -173,6 +174,25 @@ describe('server-sent message localization', () => {
         expect(found, `${lang}.${key} placeholders`).toBe(expected[key]);
       }
     }
+    setLanguage('en');
+  });
+});
+
+describe('the guild creation fee line stays matchable', () => {
+  it('the fee is whole gold, so the integer-splicing RULE keeps matching it', async () => {
+    // The matcher splices `(\d+)`: a fee that stopped being whole gold would
+    // emit "You need 1.5 gold..." and ship raw English to every locale with
+    // nothing else reddening. Driven from the REAL content constant, not a
+    // literal, so changing the price is what fails this.
+    const gold = GUILD_CREATION_FEE_COPPER / 10_000;
+    expect(Number.isInteger(gold), `fee must be whole gold, got ${gold}`).toBe(true);
+    expect(gold).toBeGreaterThan(0);
+    await ensureLocaleLoaded('es');
+    setLanguage('es');
+    const line = `You need ${gold} gold to found a guild.`;
+    const localized = localizeServerText(line);
+    expect(localized).not.toBe(line); // it really matched
+    expect(localized).toContain(String(gold)); // ...and kept the amount
     setLanguage('en');
   });
 });

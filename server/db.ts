@@ -3380,14 +3380,19 @@ async function writeGuildBankRow(
   client: { query: (text: string, values: unknown[]) => Promise<unknown> },
   gb: GuildBankSave,
 ): Promise<GuildBankWriteResult> {
+  // Keyed on (guild_id, realm), not guild_id alone. Guild ids are globally
+  // unique, so the realm predicate cannot change which row this finds today; it
+  // is the discipline every sibling statement in this file already carries, and
+  // it means a realm that somehow met another realm's row locks and merges
+  // nothing rather than silently rewriting it.
   const lockedRead = async () =>
     (await client.query(
       `SELECT octet_length(data::text) AS data_bytes,
               CASE WHEN octet_length(data::text) <= $2 THEN data ELSE NULL END AS data
          FROM guild_banks
-        WHERE guild_id = $1
+        WHERE guild_id = $1 AND realm = $3
           FOR UPDATE`,
-      [gb.guildId, GUILD_BANK_ROW_MAX_BYTES],
+      [gb.guildId, GUILD_BANK_ROW_MAX_BYTES, REALM],
     )) as { rows: { data_bytes?: unknown; data?: unknown }[] };
   let read = await lockedRead();
   if (!read.rows?.[0]) {
@@ -4501,10 +4506,16 @@ export async function loadGuildBankLogRows(
        LEFT JOIN characters c ON c.id = bl.character_id
       WHERE bl.container = 'guild'
         AND bl.container_id = $1
+        -- Realm discipline, matching every sibling statement. A guild lives on
+        -- exactly one realm and guild ids are globally unique, so this cannot
+        -- change which rows match today and cannot make the LIMIT scan wider;
+        -- it is here so a cross-realm row could never be projected into a
+        -- guild's history if that ever stopped being true.
+        AND bl.realm = $4
         AND bl.op = ANY($2::text[])
       ORDER BY bl.id DESC
       LIMIT $3`,
-      [guildId, visibleOps, limit],
+      [guildId, visibleOps, limit, REALM],
     ),
   );
   return res.rows.map((r) => ({

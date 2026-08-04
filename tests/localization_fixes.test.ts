@@ -1200,7 +1200,7 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     if (tern) return tern[1] || tern[2];
     if (/\?[^:]*:/.test(expr)) return '';
     if (
-      /rank|level|count|players|roll|prestige|amount|seconds|percent|\bN\b|MAX_|FIRST_|threshold|number|\.length|Math|round|parseInt|\*\s*100|suggested/i.test(
+      /rank|level|count|players|roll|prestige|amount|seconds|percent|\bN\b|MAX_|FIRST_|threshold|number|\.length|Math|round|parseInt|\*\s*100|suggested|FEE_GOLD/i.test(
         expr,
       )
     )

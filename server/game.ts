@@ -1483,6 +1483,24 @@ export interface PerfCaptureStatus {
   last: PerfCaptureResult | null;
 }
 
+// The creation fee as WHOLE GOLD, computed once for the two refusal emits.
+//
+// The client matcher splices an INTEGER (src/ui/server_i18n.ts guild.createFee,
+// `You need (\\d+) gold to found a guild.`), so a fee that stopped being whole
+// gold would emit "1.5" and silently ship raw English to every locale with
+// nothing reddening. The requirement is asserted HERE, where the number is
+// made, rather than left to a comment: a non-whole fee fails at import (and so
+// in every server test) instead of at a player's screen.
+const GUILD_CREATION_FEE_GOLD = ((): number => {
+  const gold = GUILD_CREATION_FEE_COPPER / 10_000;
+  if (!Number.isInteger(gold) || gold <= 0) {
+    throw new Error(
+      `GUILD_CREATION_FEE_COPPER must be a positive whole number of gold for the guild.createFee matcher, got ${GUILD_CREATION_FEE_COPPER}`,
+    );
+  }
+  return gold;
+})();
+
 export class GameServer {
   sim: Sim;
   clients = new Map<number, ClientSession>(); // by pid
@@ -6602,10 +6620,10 @@ export class GameServer {
           // tests/server_i18n.test.ts).
           const meta = this.sim.meta(pid);
           if (!meta || meta.copper < GUILD_CREATION_FEE_COPPER) {
-            // 10,000 copper to the gold; the whole-gold amount keeps the
-            // emitted line matchable by the guild.createFee RULE.
-            const goldAmount = GUILD_CREATION_FEE_COPPER / 10_000;
-            this.sendChatNotice(session, `You need ${goldAmount} gold to found a guild.`);
+            this.sendChatNotice(
+              session,
+              `You need ${GUILD_CREATION_FEE_GOLD} gold to found a guild.`,
+            );
             break;
           }
           // At most one reservation per character: a pipelined second create
@@ -6625,8 +6643,10 @@ export class GameServer {
             // found a discounted or free guild: return whatever was taken and
             // refuse with the same line.
             if (charged > 0) this.sim.refundGuildCreationFeeFor(pid, charged);
-            const goldAmount = GUILD_CREATION_FEE_COPPER / 10_000;
-            this.sendChatNotice(session, `You need ${goldAmount} gold to found a guild.`);
+            this.sendChatNotice(
+              session,
+              `You need ${GUILD_CREATION_FEE_GOLD} gold to found a guild.`,
+            );
             break;
           }
           this.pendingGuildCreateFees.set(session.characterId, {

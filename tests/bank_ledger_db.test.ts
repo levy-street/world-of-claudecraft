@@ -280,7 +280,12 @@ describe('loadGuildBankLogRows: the activity log statement', () => {
     expect(sql).not.toContain('ORDER BY bl.created_at');
     // Bound in SQL, never sliced in JS.
     expect(sql).toContain('LIMIT $3');
-    expect(params).toEqual([913, ['deposit', 'withdraw'], 50]);
+    // Realm discipline, matching every sibling statement in db.ts. It is a
+    // PREDICATE, not a selected column (the privacy pin below still holds), and
+    // it cannot widen the LIMIT walk: a guild lives on one realm and guild ids
+    // are globally unique, so it matches every row the container predicate does.
+    expect(sql).toContain('bl.realm = $4');
+    expect(params).toEqual([913, ['deposit', 'withdraw'], 50, 'Claudemoon']);
     // No wrapper around the indexed columns: a COALESCE / lower() / cast on
     // container_id or id makes the index unusable.
     expect(sql).not.toMatch(/COALESCE\s*\(\s*bl\.(container_id|id)/i);
