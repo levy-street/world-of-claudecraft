@@ -77,7 +77,13 @@ function dismissBankPrompts(): void {
 
 // The bank's window-local filter preferences persist under their OWN key, distinct
 // from the bags' 'woc_bag_filter': the two windows share the state SHAPE (BagFilterState)
-// and the tolerant serialize/parse, but keep independent category/sort/search choices.
+// and the tolerant serialize/parse, but keep independent category/sort choices. The
+// SEARCH is per-visit only: close() resets the live value, persistFilter strips it
+// from every write, and construction never restores it (and eagerly scrubs a
+// non-empty stored query so storage never holds one even if the player never opens
+// the bank this session). A reopened bank always starts unfiltered (a stale query
+// silently hides slots). The bags window still keeps its search across sessions;
+// aligning the family is a named follow-up, not an accident of this module.
 const BANK_FILTER_KEY = 'woc_bank_filter';
 
 // How long the transient deposit-all summary stays on screen before it clears. The
@@ -176,13 +182,29 @@ export class BankWindow {
   private openerFocus: HTMLElement | null = null;
   private openedAt = 0;
 
-  // Window-local filter state: category chips + sort + live search, persisted across
-  // sessions under BANK_FILTER_KEY. Pure logic lives in bank_filter.ts (reusing
-  // bag_filter.ts); this is the consumer. Tolerant parse: corrupt storage falls back
-  // to the default filter, never throwing.
+  // Window-local filter state: category chips + sort persist across sessions under
+  // BANK_FILTER_KEY; the live search is per-visit and starts empty even when a
+  // reload while the bank sat open left a query in storage (close() never ran, see
+  // BANK_FILTER_KEY). A non-empty stored search is also rewritten out at boot so
+  // storage never holds a stranded query when the player never opens the bank.
+  // Pure logic lives in bank_filter.ts (reusing bag_filter.ts); this is the
+  // consumer. Tolerant parse: corrupt storage falls back to the default filter,
+  // never throwing.
   private filter: BagFilterState = (() => {
     try {
-      return parseBagFilter(localStorage.getItem(BANK_FILTER_KEY));
+      const parsed = parseBagFilter(localStorage.getItem(BANK_FILTER_KEY));
+      const next = { ...parsed, search: '' };
+      // Scrub a legacy or reload-stranded query at construction so storage never
+      // holds a search value even if the player never opens the bank this session.
+      // Category/sort stay; private-mode write failures are ignored like persistFilter.
+      if (parsed.search !== '') {
+        try {
+          localStorage.setItem(BANK_FILTER_KEY, serializeBagFilter(next));
+        } catch {
+          /* storage unavailable (private mode); live state is still search-free */
+        }
+      }
+      return next;
     } catch {
       return { ...DEFAULT_BAG_FILTER };
     }
@@ -237,6 +259,12 @@ export class BankWindow {
     // flashes a stale line, and no late timer fires render() on the hidden window.
     this.clearDepositStatus();
     this.clearDepositAllPending();
+    // The search is a per-visit filter: left set, the next open would start
+    // pre-narrowed to a stale query (slots hidden with no cue why). Reset the
+    // live value; the persist rewrite also scrubs any legacy pre-fix query out
+    // of storage (persistFilter never stores the search). Category/sort stay.
+    this.filter.search = '';
+    this.persistFilter();
     const el = this.deps.root();
     el.style.display = 'none';
     el.inert = false;
@@ -580,7 +608,10 @@ export class BankWindow {
 
   private persistFilter(): void {
     try {
-      localStorage.setItem(BANK_FILTER_KEY, serializeBagFilter(this.filter));
+      // The search is stripped at the serialize boundary: it is per-visit state
+      // (close() resets it; construction never restores it), so no keystroke,
+      // chip, sort, or close write ever lands a query in storage.
+      localStorage.setItem(BANK_FILTER_KEY, serializeBagFilter({ ...this.filter, search: '' }));
     } catch {
       /* storage unavailable (private mode); the filter still works in-session */
     }

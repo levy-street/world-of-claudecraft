@@ -490,7 +490,18 @@ export class PostOffice {
     for (const s of items) {
       if (s.instance && typeof s.instance === 'object') {
         const escrowed = removeMatchingInstance(this.ctx, s.itemId, s.instance, meta.entityId);
-        if (escrowed) parcels.push({ itemId: s.itemId, count: 1, instance: escrowed });
+        // The craft marker rides alongside the payload: an instanced parcel can
+        // be crafted too (a masterwork proc, an enchanted crafted piece), so it
+        // is carried rather than assumed absent on this arm.
+        if (escrowed?.instance)
+          parcels.push({
+            itemId: s.itemId,
+            count: 1,
+            instance: escrowed.instance,
+            ...(escrowed.craftedRecipeId === undefined
+              ? {}
+              : { craftedRecipeId: escrowed.craftedRecipeId }),
+          });
       } else {
         const count = Math.floor(s.count);
         const consumed = removeVendorSellUnits(

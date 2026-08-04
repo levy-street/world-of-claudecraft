@@ -957,7 +957,8 @@ export const zh_TW: EnTranslations = {
       "petTaunt": "寵物：嘲諷",
       "petDefensive": "寵物：防禦",
       "petAggressive": "寵物：攻擊性",
-      "mount": "騎乘 / 下騎"
+      "mount": "騎乘 / 下騎",
+      "mouseHint": "滑鼠按鍵同樣可用：綁定時按下中鍵 (M3) 或拇指鍵 (M4、M5)。左鍵與右鍵保留給鏡頭、點擊移動與點擊世界中的目標使用。"
     },
     "actionBar": {
       "editKeys": "編輯動作列按鍵",
@@ -966,7 +967,7 @@ export const zh_TW: EnTranslations = {
       "bannerCapturing": "按下按鍵以綁定該欄位……",
       "boundToKey": "已綁定至 {key}。",
       "reset": "重設",
-      "done": "完畢",
+      "done": "完成",
       "cancel": "取消",
       "resetConfirmTitle": "重設動作列按鍵？",
       "resetConfirmBody": "第一列動作列將恢復為預設按鍵，第二列與第三列將變為未綁定狀態。此操作無法復原。"
@@ -2447,7 +2448,7 @@ export const zh_TW: EnTranslations = {
       "stateReady": "可採集",
       "stateCooldown": "恢復中",
       "stateCooldownTimed": "{time}後恢復",
-      "respawnClock": "{minutes}：{seconds}",
+      "respawnClock": "{minutes}:{seconds}",
       "fineGradePreview": "使用當前工具採集可獲得優質品級。"
     },
     "archetypeTitle": {
@@ -2589,6 +2590,8 @@ export const zh_TW: EnTranslations = {
     "crafting": {
       "title": "製作",
       "close": "關閉製作",
+      "dialogOption": "製作",
+      "dialogOptionAria": "開啟{craft}製作視窗",
       "craft": "製作",
       "reagentsNeeded": "需要:",
       "reagentLine": "{name}: {have}/{required}",
@@ -2898,6 +2901,7 @@ export const zh_TW: EnTranslations = {
       "countLabel": "{earned}/{total} 項功績",
       "completionAria": "已獲得功績：{earned}/{total}",
       "recentLabel": "最近：",
+      "recentJumpAria": "Jump to {name}",
       "nearestLabel": "即將達成：",
       "filterGroupAria": "篩選功績",
       "filterAll": "全部",
@@ -4285,8 +4289,8 @@ export const zh_TW: EnTranslations = {
       "toolUnavailable": "無販售",
       "priceNone": "無販售",
       "toolTierReq": "{tier}階工具",
-      "colWield": "使用於",
-      "wieldNone": "任何",
+      "colWield": "使用熟練度",
+      "wieldNone": "不限",
       "yieldsHeading": "一次採集的收穫",
       "yieldsBody": "每次採集都會擲出品質，而熟練度決定一切：新手永遠採到普通品，熟練度越高，權重越向高品質移動，絕不倒退。到100上限時普通品完全消失：60%優秀、30%精良、8%史詩、2%傳說。品質也意味著數量：普通1個，優秀與精良2個，史詩3個，傳說4個。精良及以上的收穫都會以你的名字署名（Gathered by），封頂時十次採集有四次帶著你的名字。",
       "bandsHeading": "熟練度區間",
@@ -6094,10 +6098,16 @@ export const zh_TW: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "正在下載更新 {version}...",
-      "ready": "更新 {version} 已就緒。離開遊戲時將自動安裝，也可立即重新啟動。",
+      "checkingTitle": "正在檢查更新...",
+      "checkingBody": "遊戲會自動保持最新版本。",
+      "uptodateTitle": "目前已是最新版本。",
+      "downloadingTitle": "正在下載更新 {version}...",
+      "downloadingBody": "可以繼續遊戲，更新將在離開遊戲時安裝。",
+      "readyTitle": "更新 {version} 已就緒",
+      "readyBody": "離開遊戲時將自動安裝，也可立即重新啟動。",
       "restart": "立即重新啟動",
-      "later": "稍後"
+      "later": "稍後",
+      "dismiss": "關閉"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7134,15 +7144,15 @@ export const zh_TW: EnTranslations = {
       "buyStack": "購買 {count} 個",
       "buyStackAria": "以 {price} 購買 {count} 個 {item}",
       "qtyRowAria": "購買數量",
-      "qtyMultiple": "{count}x",
+      "qtyMultiple": "{count} 個",
       "qtyMultipleAria": "每次購買 {count} 份",
       "qtyCustom": "自訂",
       "qtyCustomAria": "選擇自訂購買數量",
-      "buyCountAria": "為 {price} 購買 {item} 的 {count}",
-      "buyCountAriaWithRequirement": "為 {price} 購買 {item} 的 {count}。 {requirement}",
+      "buyCountAria": "以 {price} 購買 {count} 個 {item}",
+      "buyCountAriaWithRequirement": "以 {price} 購買 {count} 個 {item}。{requirement}",
       "buyQuantityTitle": "購買多少 {item}？最多 {max}。",
       "buyQuantityInput": "要購買的數量",
-      "buyQuantityConfirm": "買",
+      "buyQuantityConfirm": "購買",
       "buybackTitle": "買回",
       "buybackEmpty": "沒有物品",
       "buybackAria": "以 {price} 買回 {item}",

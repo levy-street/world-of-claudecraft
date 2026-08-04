@@ -734,6 +734,13 @@ export const hudChromeStrings = {
     petAggressive: 'Pet: Aggressive',
     // Rideable mounts: the Z toggle (opens the stable while nothing is picked).
     mount: 'Mount / Dismount',
+    // Mouse buttons are bindable pseudo-keys (src/game/mouse_binds.ts). The note
+    // sits under the Key Bindings header so the capture prompt does not have to
+    // spell it out. M3, M4, and M5 are the on-screen keycap labels, so they stay
+    // identical across locales. Wordy (M16): the five non-Latin fills land in
+    // this same change.
+    mouseHint:
+      'Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world.',
   },
   // On-bar action-bar key-binding mode (issue #1238): the Key Bindings menu's
   // single "Edit action bar keys" entry (replacing the wall of per-slot rebind
@@ -3022,6 +3029,11 @@ export const hudChromeStrings = {
   crafting: {
     title: 'Crafting',
     close: 'Close crafting',
+    // The gossip-dialog Crafting option on a station master: opens the
+    // crafting window straight to the master's own craft tab. {craft} in the
+    // aria is the localized craft name (craftName above).
+    dialogOption: 'Crafting',
+    dialogOptionAria: 'Open the crafting window for {craft}',
     craft: 'Craft',
     reagentsNeeded: 'Requires:',
     reagentLine: '{name} x{have}/{required}',
@@ -3542,6 +3554,7 @@ export const hudChromeStrings = {
     countLabel: '{earned}/{total} deeds',
     completionAria: 'Deeds earned: {earned} of {total}',
     recentLabel: 'Recent:',
+    recentJumpAria: 'Jump to {name}',
     nearestLabel: 'Nearly there:',
     filterGroupAria: 'Filter deeds',
     filterAll: 'All',

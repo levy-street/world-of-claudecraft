@@ -736,6 +736,10 @@ export const table: DeedLocaleTable = {
     name: '영웅: 야생심장 분지',
     desc: '영웅 난이도의 야생심장 분지에서 분지의 목소리 줄가르를 처치하십시오.',
   },
+  chr_peaks_gatherer: {
+    name: '고지의 수확',
+    desc: '쏜피크 고지에서 광맥, 나무 군락, 약초밭을 하나씩 채집하십시오.',
+  },
   chr_marsh_rares_ii: {
     name: '폭식가, 셈에 오르다',
     desc: '첫 셈에서 빠졌던 마이어펜 습지의 네 번째 이름난 공포, 폭식가 그럽조를 처치하십시오.',
@@ -752,32 +756,28 @@ export const table: DeedLocaleTable = {
     name: '무리는 기억한다',
     desc: '장막의 골짜기를 떠도는 희귀 우두머리 둘, 늙은 매로우셸과 무리의 첫째 아우렐혼을 처치하십시오.',
   },
-  chr_peaks_gatherer: {
-    name: '고지대의 수확',
-    desc: 'Thornpeak Heights에서 광맥, 나무 군락, 약초 더미를 하나씩 채집하세요.',
-  },
   chr_willowfen_gatherer: {
-    name: '펜랜드 바운티',
-    desc: '버드나무늪에서 광맥, 나무 스탠드, 허브 밭을 수확하세요.',
+    name: '버들늪의 결실',
+    desc: '버들늪에서 광맥, 나무 군락, 약초밭을 하나씩 채집하십시오.',
   },
   chr_willowfen_first_cast: {
-    name: '릴리무어의 잔물결',
-    desc: '버드나무늪 물에서 물고기를 잡아보세요.',
+    name: '수련 습지에 이는 물결',
+    desc: '버들늪의 물에서 물고기 한 마리를 낚으십시오.',
   },
   chr_galecrest_gatherer: {
-    name: '곶에서의 수확',
-    desc: 'Galecrest에서 광맥, 나무 스탠드, 허브 패치를 수확하세요.',
+    name: '곶에서 거둔 것',
+    desc: '게일크레스트에서 광맥, 나무 군락, 약초밭을 하나씩 채집하십시오.',
   },
   chr_galecrest_first_cast: {
-    name: '거울 속의 선 Tarn',
-    desc: 'Galecrest의 물에서 물고기를 잡으세요.',
+    name: '거울 호수에 드리운 낚싯줄',
+    desc: '게일크레스트의 물에서 물고기 한 마리를 낚으십시오.',
   },
   chr_farshore_gatherer: {
-    name: '섬 조항',
-    desc: '파쇼어(Farshore)에서 광맥, 나무 스탠드, 허브 패치를 수확하세요.',
+    name: '섬살이 채비',
+    desc: '먼바다 해안에서 광맥, 나무 군락, 약초밭을 하나씩 채집하십시오.',
   },
   chr_farshore_first_cast: {
-    name: '갈매기가 아는 것',
-    desc: 'Farshore의 물에서 물고기를 잡으세요.',
+    name: '갈매기는 알고 있다',
+    desc: '먼바다 해안의 물에서 물고기 한 마리를 낚으십시오.',
   },
 };

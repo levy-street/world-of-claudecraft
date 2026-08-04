@@ -3916,6 +3916,15 @@
   body.mobile-touch #deeds-window .deeds-cat-titles.active {
     border-top-color: #6a5320;
   }
+  /* The recent-strip jump buttons keep the 40px touch floor on EVERY touch
+     device (unconditional, not just short-landscape phones: a landscape
+     tablet is body.mobile-touch too). The strip wraps horizontally, and on
+     short viewports the entry list is the flex arm that yields, so the
+     taller row cannot push the filter bar out. */
+  body.mobile-touch #deeds-window .deeds-recent-item {
+    min-width: 40px;
+    min-height: 40px;
+  }
   /* Short landscape phones: the pinned chrome (title bar, summary, recent and
      nearest strips, chip row, filter bar) can eat the whole panel height and
      clip the filter bar below the window edge. The strips tighten and the

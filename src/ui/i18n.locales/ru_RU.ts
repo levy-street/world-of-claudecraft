@@ -14,6 +14,8 @@ import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.all': 'Все',
+  'hudChrome.actionBar.done': 'Готово',
+  'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
   'hudChrome.crafting.identity.ceilingRare': 'Потолок редкого',
   'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -22,8 +24,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.legend': 'ЛЕГЕНДА',
   'hudChrome.discord.roleTag.shill': 'ГЛАШАТАЙ',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
+  'guide.profPages.colWield': 'Нужно мастерство',
+  'guide.profPages.wieldNone': 'Любое',
   'guide.profPages.fish.pctFmt': '{pct}%',
   'questUi.dialog.profIntroHint': 'Обратитесь к {name} за заданием «{quest}».',
+  'itemUi.vendor.qtyMultiple': 'x{count}',
+  'itemUi.vendor.buyCountAria': 'Купить {count} {item} за {price}',
+  'itemUi.vendor.buyCountAriaWithRequirement': 'Купить {count} {item} за {price}. {requirement}',
+  'itemUi.vendor.buyQuantityConfirm': 'Купить',
   'entities.items.eastbrook_greatsword.name': 'Истврукский двуручный меч',
   'entities.items.highwatch_greatsword.name': 'Двуручный меч Хайвотча',
   'entities.items.highwatch_wallshield.name': 'Стенной щит Хайвотча',
@@ -7557,6 +7565,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.wtb.label': 'Куплю',
   'hudChrome.discord.relay.help.label': 'Нужна помощь',
   'hudChrome.crafting.title': 'Крафт',
+  'hudChrome.crafting.dialogOption': 'Крафт',
+  'hudChrome.crafting.dialogOptionAria': 'Открыть окно крафта: {craft}',
   'hudChrome.crafting.close': 'Закрыть крафт',
   'hudChrome.crafting.craft': 'Создать',
   'hudChrome.crafting.reagentsNeeded': 'Требуется:',
@@ -7644,11 +7654,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Удерживайте правую кнопку мыши и двигайте мышью, чтобы поворачивать камеру.',
   'hudChrome.cameraPrompt.changeLater': 'Это можно изменить позже в меню Esc, раздел «Клавиши».',
   'hudChrome.cameraPrompt.confirm': 'Подтвердить',
-  'desktop.update.downloading': 'Загрузка обновления {version}...',
-  'desktop.update.ready':
-    'Обновление {version} готово. Оно установится при выходе из игры, либо перезапустите сейчас.',
+  'desktop.update.checkingTitle': 'Проверка обновлений...',
+  'desktop.update.checkingBody': 'Игра обновляется автоматически.',
+  'desktop.update.uptodateTitle': 'У вас последняя версия игры.',
+  'desktop.update.downloadingTitle': 'Загрузка обновления {version}...',
+  'desktop.update.downloadingBody':
+    'Можно продолжать играть. Обновление установится при выходе из игры.',
+  'desktop.update.readyTitle': 'Обновление {version} готово',
+  'desktop.update.readyBody': 'Оно установится при выходе из игры, либо перезапустите сейчас.',
   'desktop.update.restart': 'Перезапустить сейчас',
   'desktop.update.later': 'Позже',
+  'desktop.update.dismiss': 'Закрыть',
   'desktop.crash.title': 'World of ClaudeCraft',
   'desktop.crash.body': 'Игровой экран перестал отвечать. Перезагрузить его?',
   'desktop.crash.reload': 'Перезагрузить',
@@ -9301,6 +9317,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Совет: вызовите другого игрока на дружескую дуэль или встаньте в очередь на арену Пепельного Колизея, чтобы испытать свой билд.',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': 'Сесть / Спешиться',
+  // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.
+  'hudChrome.keybinds.mouseHint':
+    'Кнопки мыши тоже работают: во время назначения нажмите среднюю кнопку (M3) или боковую (M4, M5). Левая и правая остаются зарезервированы для камеры, перемещения кликом и кликов по миру.',
   // On-bar action-bar key-binding mode (issue #1238). M16 wordy fills.
   'hudChrome.actionBar.editKeys': 'Настроить клавиши панели действий',
   'hudChrome.actionBar.editKeysHint':
@@ -11054,13 +11073,4 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.aetherRush': 'Эфирный натиск',
   'itemUi.vendor.buyStack': 'Купить {count}',
   'itemUi.vendor.buyStackAria': 'Купить {count} {item} за {price}',
-  "guide.profPages.colWield": "Используйте в",
-  "guide.profPages.wieldNone": "Любой",
-  "hudChrome.actionBar.done": "Сделанный",
-  "hudChrome.gathering.respawnClock": "{minutes}:{seconds}",
-  "itemUi.vendor.buyCountAria": "Купите {count} из {item} за {price}",
-  "itemUi.vendor.buyCountAriaWithRequirement": "Купите {count} из {item} за {price}. {requirement}",
-  "itemUi.vendor.buyQuantityConfirm": "Купить",
-  "itemUi.vendor.qtyMultiple": "{count}x",
 };
-

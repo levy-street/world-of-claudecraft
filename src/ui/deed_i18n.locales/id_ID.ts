@@ -819,6 +819,10 @@ export const table: DeedLocaleTable = {
     name: 'Heroik: Cekungan Hati Liar',
     desc: 'Kalahkan Zulgar, Suara Cekungan, di Cekungan Hati Liar pada tingkat kesulitan Heroik.',
   },
+  chr_peaks_gatherer: {
+    name: 'Tuaian dari Dataran Tinggi',
+    desc: 'Panen satu urat bijih, satu tegakan kayu, dan satu petak herba di Dataran Tinggi Thornpeak.',
+  },
   chr_marsh_rares_ii: {
     name: 'Sang Pelahap, Diperhitungkan',
     desc: 'Bantai Grubjaw sang Pelahap, teror bernama keempat di Rawa Mirefen yang luput dari perhitungan pertama.',
@@ -835,32 +839,28 @@ export const table: DeedLocaleTable = {
     name: 'Kawanan Itu Ingat',
     desc: 'Bantai Marrowshell Tua dan Aurelhorn, yang Pertama dari Kawanan, dua bos langka pengembara di Ceruk Terselubung.',
   },
-  chr_peaks_gatherer: {
-    name: 'Panen dari Ketinggian',
-    desc: 'Panen urat bijih, tegakan kayu, dan petak herba di Thornpeak Heights.',
-  },
   chr_willowfen_gatherer: {
-    name: 'Hadiah Fenland',
-    desc: 'Panen urat bijih, tegakan kayu, dan petak herba di Willowfen.',
+    name: 'Limpahan Tanah Paya',
+    desc: 'Panen satu urat bijih, satu tegakan kayu, dan satu petak herba di Paya Willow.',
   },
   chr_willowfen_first_cast: {
-    name: 'Riak di Lilymoors',
-    desc: 'Tangkap ikan dari perairan Willowfen.',
+    name: 'Riak di Paya Lili',
+    desc: 'Pancing seekor ikan dari perairan Paya Willow.',
   },
   chr_galecrest_gatherer: {
-    name: 'Panen di Tanjung',
-    desc: 'Panen urat bijih, tegakan kayu, dan petak herba di Galecrest.',
+    name: 'Tuaian di Ujung Tanjung',
+    desc: 'Panen satu urat bijih, satu tegakan kayu, dan satu petak herba di Puncak Angin.',
   },
   chr_galecrest_first_cast: {
-    name: 'Garis di Cermin Tarn',
-    desc: 'Tangkap ikan dari perairan Galecrest.',
+    name: 'Seutas Kail di Danau Cermin',
+    desc: 'Pancing seekor ikan dari perairan Puncak Angin.',
   },
   chr_farshore_gatherer: {
-    name: 'Ketentuan Pulau',
-    desc: 'Panen urat bijih, tegakan kayu, dan petak herba di Farshore.',
+    name: 'Perbekalan dari Pulau',
+    desc: 'Panen satu urat bijih, satu tegakan kayu, dan satu petak herba di Pesisir Jauh.',
   },
   chr_farshore_first_cast: {
-    name: 'Apa yang Diketahui Burung Camar',
-    desc: 'Tangkap ikan dari perairan Farshore.',
+    name: 'Yang Diketahui Para Camar',
+    desc: 'Pancing seekor ikan dari perairan Pesisir Jauh.',
   },
 };

@@ -14,6 +14,8 @@ import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.all': 'すべて',
+  'hudChrome.actionBar.done': '完了',
+  'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
   'hudChrome.crafting.identity.ceilingRare': 'レア上限',
   'hudChrome.crafting.pairOptionLabel': '{pair}（{craftA} + {craftB}）',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -22,8 +24,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.legend': 'レジェンド',
   'hudChrome.discord.roleTag.shill': 'サポーター',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
+  'guide.profPages.colWield': '使用熟練度',
+  'guide.profPages.wieldNone': '制限なし',
   'guide.profPages.fish.pctFmt': '{pct}%',
   'questUi.dialog.profIntroHint': '{name}から「{quest}」を受けましょう。',
+  'itemUi.vendor.qtyMultiple': '{count}個',
+  'itemUi.vendor.buyCountAria': '{item}を{count}個、{price}で購入',
+  'itemUi.vendor.buyCountAriaWithRequirement': '{item}を{count}個、{price}で購入。{requirement}',
+  'itemUi.vendor.buyQuantityConfirm': '購入',
   'entities.items.eastbrook_greatsword.name': 'イーストブルックの大剣',
   'entities.items.highwatch_greatsword.name': 'ハイウォッチの大剣',
   'entities.items.highwatch_wallshield.name': 'ハイウォッチの壁盾',
@@ -7440,6 +7448,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.wtb.label': '購入希望',
   'hudChrome.discord.relay.help.label': 'ヘルプが必要',
   'hudChrome.crafting.title': '製作',
+  'hudChrome.crafting.dialogOption': '製作',
+  'hudChrome.crafting.dialogOptionAria': '{craft}の製作ウィンドウを開く',
   'hudChrome.crafting.close': '製作を閉じる',
   'hudChrome.crafting.craft': '製作',
   'hudChrome.crafting.reagentsNeeded': '必要素材:',
@@ -7527,11 +7537,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cameraPrompt.classicDesc': '右クリックを押しながらマウスを動かして視点を回します。',
   'hudChrome.cameraPrompt.changeLater': 'この設定は後で Esc の「キー割り当て」から変更できます。',
   'hudChrome.cameraPrompt.confirm': '決定',
-  'desktop.update.downloading': 'アップデート {version} をダウンロード中...',
-  'desktop.update.ready':
-    'アップデート {version} の準備ができました。ゲーム終了時に自動でインストールされます。今すぐ再起動もできます。',
+  'desktop.update.checkingTitle': 'アップデートを確認中...',
+  'desktop.update.checkingBody': 'ゲームは自動的に最新の状態に保たれます。',
+  'desktop.update.uptodateTitle': 'お使いのバージョンは最新です。',
+  'desktop.update.downloadingTitle': 'アップデート {version} をダウンロード中...',
+  'desktop.update.downloadingBody':
+    'プレイは続けられます。アップデートはゲーム終了時にインストールされます。',
+  'desktop.update.readyTitle': 'アップデート {version} の準備ができました',
+  'desktop.update.readyBody': 'ゲーム終了時に自動でインストールされます。今すぐ再起動もできます。',
   'desktop.update.restart': '今すぐ再起動',
   'desktop.update.later': '後で',
+  'desktop.update.dismiss': '閉じる',
   'desktop.crash.title': 'World of ClaudeCraft',
   'desktop.crash.body': 'ゲーム画面が停止しました。再読み込みしますか？',
   'desktop.crash.reload': '再読み込み',
@@ -9150,6 +9166,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ヒント：他のプレイヤーに友好的な決闘を申し込むか、灰塵のコロシアムに参加してビルドを試してみましょう。',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': '騎乗 / 降車',
+  // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.
+  'hudChrome.keybinds.mouseHint':
+    'マウスボタンも使えます。割り当て中に中ボタン (M3) やサイドボタン (M4、M5) を押してください。左右のボタンはカメラ操作、クリック移動、ワールド内のクリックに予約されています。',
   // On-bar action-bar key-binding mode (issue #1238). M16 wordy fills.
   'hudChrome.actionBar.editKeys': 'アクションバーのキーを編集',
   'hudChrome.actionBar.editKeysHint':
@@ -10876,13 +10895,4 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.aetherRush': 'エーテルラッシュ',
   'itemUi.vendor.buyStack': '{count}個購入',
   'itemUi.vendor.buyStackAria': '{item}を{count}個、{price}で購入',
-  'guide.profPages.colWield': 'で使用します',
-  'guide.profPages.wieldNone': 'どれでも',
-  'hudChrome.actionBar.done': '終わり',
-  'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
-  'itemUi.vendor.buyCountAria': '{price} で {item} の {count} を購入',
-  'itemUi.vendor.buyCountAriaWithRequirement':
-    '{price} で {item} の {count} を購入します。 {requirement}',
-  'itemUi.vendor.buyQuantityConfirm': '買う',
-  'itemUi.vendor.qtyMultiple': '{count}x',
 };

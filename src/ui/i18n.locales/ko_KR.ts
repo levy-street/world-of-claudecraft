@@ -14,6 +14,8 @@ import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.all': '전체',
+  'hudChrome.actionBar.done': '완료',
+  'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
   'hudChrome.crafting.identity.ceilingRare': '희귀 상한',
   'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -22,8 +24,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.legend': '전설',
   'hudChrome.discord.roleTag.shill': '홍보대사',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
+  'guide.profPages.colWield': '사용 숙련도',
+  'guide.profPages.wieldNone': '제한 없음',
   'guide.profPages.fish.pctFmt': '{pct}%',
   'questUi.dialog.profIntroHint': '{name}에게 "{quest}"을(를) 받으세요.',
+  'itemUi.vendor.qtyMultiple': '{count}개',
+  'itemUi.vendor.buyCountAria': '{price}에 {item} {count}개 구매',
+  'itemUi.vendor.buyCountAriaWithRequirement': '{price}에 {item} {count}개 구매. {requirement}',
+  'itemUi.vendor.buyQuantityConfirm': '구매',
   'entities.items.eastbrook_greatsword.name': '이스트브룩 대검',
   'entities.items.highwatch_greatsword.name': '하이워치 대검',
   'entities.items.highwatch_wallshield.name': '하이워치 벽방패',
@@ -7434,6 +7442,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.wtb.label': '구매 희망',
   'hudChrome.discord.relay.help.label': '도움 요청',
   'hudChrome.crafting.title': '제작',
+  'hudChrome.crafting.dialogOption': '제작',
+  'hudChrome.crafting.dialogOptionAria': '{craft} 제작 창 열기',
   'hudChrome.crafting.close': '제작 닫기',
   'hudChrome.crafting.craft': '제작',
   'hudChrome.crafting.reagentsNeeded': '필요 재료:',
@@ -7522,11 +7532,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cameraPrompt.changeLater':
     '이 설정은 나중에 Esc 메뉴의 키 설정에서 변경할 수 있습니다.',
   'hudChrome.cameraPrompt.confirm': '확인',
-  'desktop.update.downloading': '업데이트 {version} 다운로드 중...',
-  'desktop.update.ready':
-    '업데이트 {version} 준비 완료. 게임을 종료하면 자동으로 설치되며, 지금 다시 시작할 수도 있습니다.',
+  'desktop.update.checkingTitle': '업데이트 확인 중...',
+  'desktop.update.checkingBody': '게임은 자동으로 최신 상태로 유지됩니다.',
+  'desktop.update.uptodateTitle': '현재 최신 버전입니다.',
+  'desktop.update.downloadingTitle': '업데이트 {version} 다운로드 중...',
+  'desktop.update.downloadingBody':
+    '계속 플레이할 수 있습니다. 업데이트는 게임 종료 시 설치됩니다.',
+  'desktop.update.readyTitle': '업데이트 {version} 준비 완료',
+  'desktop.update.readyBody': '게임을 종료하면 자동으로 설치되며, 지금 다시 시작할 수도 있습니다.',
   'desktop.update.restart': '지금 다시 시작',
   'desktop.update.later': '나중에',
+  'desktop.update.dismiss': '닫기',
   'desktop.crash.title': 'World of ClaudeCraft',
   'desktop.crash.body': '게임 화면이 응답하지 않습니다. 다시 불러올까요?',
   'desktop.crash.reload': '다시 불러오기',
@@ -9138,6 +9154,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '팁: 다른 플레이어에게 친선 결투를 신청하거나 잿빛 콜로세움 투기장에 참가해 빌드를 시험해보세요.',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': '탑승 / 하차',
+  // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.
+  'hudChrome.keybinds.mouseHint':
+    '마우스 버튼도 사용할 수 있습니다. 지정하는 동안 가운데 버튼 (M3) 또는 엄지 버튼 (M4, M5) 을 누르세요. 왼쪽과 오른쪽 버튼은 카메라 조작, 클릭 이동, 월드 클릭용으로 예약되어 있습니다.',
   // On-bar action-bar key-binding mode (issue #1238). M16 wordy fills.
   'hudChrome.actionBar.editKeys': '액션 바 키 편집',
   'hudChrome.actionBar.editKeysHint': '액션 바의 슬롯을 클릭한 다음 키를 눌러 지정하세요.',
@@ -10868,13 +10887,4 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.aetherRush': '에테르 쇄도',
   'itemUi.vendor.buyStack': '{count}개 구매',
   'itemUi.vendor.buyStackAria': '{price}에 {item} {count}개 구매',
-  'guide.profPages.colWield': '사용 장소',
-  'guide.profPages.wieldNone': '어느',
-  'hudChrome.actionBar.done': '완료',
-  'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
-  'itemUi.vendor.buyCountAria': '{price}에 {item} 중 {count} 구매',
-  'itemUi.vendor.buyCountAriaWithRequirement':
-    '{price}에 {item} 중 {count}을(를) 구매하세요. {requirement}',
-  'itemUi.vendor.buyQuantityConfirm': '구입하다',
-  'itemUi.vendor.qtyMultiple': '{count}x',
 };

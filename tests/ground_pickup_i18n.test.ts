@@ -71,6 +71,10 @@ const PENDING_LOCALE_KEYS = new Set<string>([
   'groundPickup.wreckfieldFlotsamCrateEnough',
   'groundPickup.gullhavenWatchbellDeny',
   'groundPickup.gullhavenWatchbellEnough',
+  // The one item-agnostic line in the family (same contributor-English model):
+  // the refusal when a multi-count `interact` objective has already taken this
+  // object's credit. Not a deny/enough pair, so it has no partner key.
+  'groundPickup.objectAlreadyCredited',
 ]);
 
 describe('ground-pickup line localization (the S3-invisible surface)', () => {
@@ -81,10 +85,16 @@ describe('ground-pickup line localization (the S3-invisible surface)', () => {
     }
   });
 
-  it('covers 82 distinct lines with groundPickup.* keys', () => {
+  it('covers 83 distinct lines with groundPickup.* keys', () => {
     // 42 through the Veiled Hollow merge, plus 40 (20 deny/enough pairs) from
-    // the new-realm quest pass.
-    expect(GROUND_PICKUP_KEYS.length).toBe(82);
+    // the new-realm quest pass, plus the item-agnostic already-credited refusal.
+    expect(GROUND_PICKUP_KEYS.length).toBe(83);
+  });
+
+  it('recognizes the already-credited refusal via the EXACT matcher', () => {
+    // Emitted from interactObjectForQuests as a bare literal, so it is the sim
+    // matcher's job to re-localize it on the client.
+    expect(localizeSimText('You have already done this one.')).not.toBeNull();
   });
 
   it('pins a known literal per representative locale', () => {

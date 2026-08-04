@@ -957,7 +957,8 @@ export const ru_RU: EnTranslations = {
       "petTaunt": "Питомец: провокация",
       "petDefensive": "Питомец: защита",
       "petAggressive": "Питомец: агрессия",
-      "mount": "Сесть / Спешиться"
+      "mount": "Сесть / Спешиться",
+      "mouseHint": "Кнопки мыши тоже работают: во время назначения нажмите среднюю кнопку (M3) или боковую (M4, M5). Левая и правая остаются зарезервированы для камеры, перемещения кликом и кликов по миру."
     },
     "actionBar": {
       "editKeys": "Настроить клавиши панели действий",
@@ -966,7 +967,7 @@ export const ru_RU: EnTranslations = {
       "bannerCapturing": "Нажмите клавишу, чтобы назначить её этой ячейке...",
       "boundToKey": "Назначено на {key}.",
       "reset": "Сбросить",
-      "done": "Сделанный",
+      "done": "Готово",
       "cancel": "Отмена",
       "resetConfirmTitle": "Сбросить клавиши панели действий?",
       "resetConfirmBody": "Первая панель вернётся к клавишам по умолчанию, а вторая и третья панели останутся без назначенных клавиш. Это действие нельзя отменить."
@@ -2589,6 +2590,8 @@ export const ru_RU: EnTranslations = {
     "crafting": {
       "title": "Крафт",
       "close": "Закрыть крафт",
+      "dialogOption": "Крафт",
+      "dialogOptionAria": "Открыть окно крафта: {craft}",
       "craft": "Создать",
       "reagentsNeeded": "Требуется:",
       "reagentLine": "{name}: {have}/{required}",
@@ -2898,6 +2901,7 @@ export const ru_RU: EnTranslations = {
       "countLabel": "Деяния: {earned}/{total}",
       "completionAria": "Получено деяний: {earned} из {total}",
       "recentLabel": "Недавние:",
+      "recentJumpAria": "Jump to {name}",
       "nearestLabel": "Почти готово:",
       "filterGroupAria": "Фильтр деяний",
       "filterAll": "Все",
@@ -4285,8 +4289,8 @@ export const ru_RU: EnTranslations = {
       "toolUnavailable": "Не продается",
       "priceNone": "Не продается",
       "toolTierReq": "Инструмент {tier} уровня",
-      "colWield": "Используйте в",
-      "wieldNone": "Любой",
+      "colWield": "Нужно мастерство",
+      "wieldNone": "Любое",
       "yieldsHeading": "Что дает сбор",
       "yieldsBody": "Каждый сбор катит качество для того, что он дает, и ваше мастерство, это вся история этого броска. Совсем новый собиратель всегда тянет обычный материал; каждое очко навыка стабильно переносит вес из обычного в высшие сорта и никогда назад, пока на пределе в 100 обычный сорт не исчезнет совсем: 60 процентов необычного, 30 процентов редкого, 8 процентов эпического и 2 процента легендарного, каждый раз.\n\nКачество означает и количество: обычный бросок дает 1 единицу, необычный и редкий дают 2, эпический 3, а легендарный 4. Любая редкая, эпическая или легендарная добыча приходит подписанным экземпляром с клеймом Gathered by you: на пределе это четыре сбора из десяти несут ваше имя, а правила происхождения на странице Crafting Economy объясняют, почему ремесленники платят сверху ровно за такие стопки.",
       "bandsHeading": "Разряды мастерства",
@@ -6094,10 +6098,16 @@ export const ru_RU: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "Загрузка обновления {version}...",
-      "ready": "Обновление {version} готово. Оно установится при выходе из игры, либо перезапустите сейчас.",
+      "checkingTitle": "Проверка обновлений...",
+      "checkingBody": "Игра обновляется автоматически.",
+      "uptodateTitle": "У вас последняя версия игры.",
+      "downloadingTitle": "Загрузка обновления {version}...",
+      "downloadingBody": "Можно продолжать играть. Обновление установится при выходе из игры.",
+      "readyTitle": "Обновление {version} готово",
+      "readyBody": "Оно установится при выходе из игры, либо перезапустите сейчас.",
       "restart": "Перезапустить сейчас",
-      "later": "Позже"
+      "later": "Позже",
+      "dismiss": "Закрыть"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7134,12 +7144,12 @@ export const ru_RU: EnTranslations = {
       "buyStack": "Купить {count}",
       "buyStackAria": "Купить {count} {item} за {price}",
       "qtyRowAria": "Количество покупки",
-      "qtyMultiple": "{count}x",
+      "qtyMultiple": "x{count}",
       "qtyMultipleAria": "Покупать по {count} за раз",
       "qtyCustom": "Другое",
       "qtyCustomAria": "Указать своё количество",
-      "buyCountAria": "Купите {count} из {item} за {price}",
-      "buyCountAriaWithRequirement": "Купите {count} из {item} за {price}. {requirement}",
+      "buyCountAria": "Купить {count} {item} за {price}",
+      "buyCountAriaWithRequirement": "Купить {count} {item} за {price}. {requirement}",
       "buyQuantityTitle": "Сколько купить: {item}? Не более {max}.",
       "buyQuantityInput": "Количество для покупки",
       "buyQuantityConfirm": "Купить",

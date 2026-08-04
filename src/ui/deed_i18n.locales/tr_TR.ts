@@ -776,6 +776,10 @@ export const table: DeedLocaleTable = {
     name: 'Kahramanca: Yaban Yürek Çukuru',
     desc: "Yaban Yürek Çukuru'nda Zulgar, Çukurun Sesi'ni Kahramanca zorlukta alt et.",
   },
+  chr_peaks_gatherer: {
+    name: 'Yükseklerin Hasadı',
+    desc: "Dikenzirve Tepeleri'nde bir cevher damarı, bir kesimlik ağaç ve bir şifalı ot öbeği topla.",
+  },
   chr_marsh_rares_ii: {
     name: 'Obur, Hesaba Katıldı',
     desc: "Mirefen Bataklığı'nın ilk sayımda atlanan dördüncü namlı dehşeti Obur Grubjaw'ı öldür.",
@@ -792,32 +796,28 @@ export const table: DeedLocaleTable = {
     name: 'Sürü Unutmaz',
     desc: "Örtülü Vadi'nin iki gezgin ender patronunu öldür: Yaşlı Marrowshell ve Sürünün İlki Aurelhorn.",
   },
-  chr_peaks_gatherer: {
-    name: 'Tepelerin Hasadı',
-    desc: "Thornpeak Heights'ta bir cevher damarı, bir ahşap stand ve bir bitki tarlası hasat edin.",
-  },
   chr_willowfen_gatherer: {
-    name: 'Fenland Ödülü',
-    desc: "Willowfen'de bir cevher damarı, bir ahşap stand ve bir bitki tarlası hasat edin.",
+    name: 'Söğütlük Bereketi',
+    desc: "Söğüt Bataklığı'nda bir cevher damarı, bir kesimlik ağaç ve bir şifalı ot öbeği topla.",
   },
   chr_willowfen_first_cast: {
-    name: "Lilymoors'taki dalgalanmalar",
-    desc: "Willowfen'in sularından bir balık yakalayın.",
+    name: "Zambak Bozkırları'nda Su Halkaları",
+    desc: "Söğüt Bataklığı'nın sularından bir balık tut.",
   },
   chr_galecrest_gatherer: {
-    name: 'Burunda Hasat',
-    desc: "Galecrest'te bir cevher damarı, bir ahşap stand ve bir bitki tarlası hasat edin.",
+    name: 'Yamaç Başında Hasat',
+    desc: "Fırtına Sırtı'nda bir cevher damarı, bir kesimlik ağaç ve bir şifalı ot öbeği topla.",
   },
   chr_galecrest_first_cast: {
-    name: "Ayna Tarn'daki Bir Çizgi",
-    desc: "Galecrest'in sularından bir balık yakalayın.",
+    name: "Ayna Gölü'nde Bir Misina",
+    desc: "Fırtına Sırtı'nın sularından bir balık tut.",
   },
   chr_farshore_gatherer: {
-    name: 'Ada Hükümleri',
-    desc: "Farshore'da bir cevher damarı, bir ahşap stand ve bir bitki tarlası hasat edin.",
+    name: 'Ada Erzağı',
+    desc: "Uzak Kıyı'da bir cevher damarı, bir kesimlik ağaç ve bir şifalı ot öbeği topla.",
   },
   chr_farshore_first_cast: {
     name: 'Martıların Bildiği',
-    desc: "Farshore'un sularından bir balık yakalayın.",
+    desc: "Uzak Kıyı'nın sularından bir balık tut.",
   },
 };

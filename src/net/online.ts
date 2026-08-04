@@ -37,7 +37,7 @@ import {
   resolveDelveShopOffers,
 } from '../sim/data';
 import { deadTargetSelectable } from '../sim/dead_target';
-import { freshDeedStats } from '../sim/deeds';
+import { DEEDS_RECENT_CAP, freshDeedStats } from '../sim/deeds';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MarketQuery } from '../sim/market_query';
@@ -4578,6 +4578,29 @@ export class ClientWorld implements IWorld {
         return null;
       }
       return data;
+    } catch {
+      return null;
+    }
+  }
+  // Newest-first unlock ids for the SELF character from the server's
+  // character_deeds record (exact earn timestamps; the mirrored `deeds` map
+  // only carries the utcDay). Owner-scoped bearer read; null on any failure,
+  // the facet's documented no-data value (the recent strip then falls back to
+  // the day-granular order).
+  async deedsRecent(): Promise<readonly string[] | null> {
+    try {
+      const res = await fetch(
+        apiUrl(`/api/characters/${this.characterId}/deeds-recent`, this.base),
+        { headers: { Authorization: `Bearer ${this.token}` } },
+      );
+      if (!res.ok) return null;
+      const data = (await res.json()) as { deeds?: unknown };
+      if (!Array.isArray(data?.deeds)) return null;
+      const ids: string[] = [];
+      for (const id of data.deeds) if (typeof id === 'string') ids.push(id);
+      // Clamp to the shared cap so all three enforcement points (Sim slice,
+      // server LIMIT, this read) stay identical even against an older server.
+      return ids.slice(0, DEEDS_RECENT_CAP);
     } catch {
       return null;
     }

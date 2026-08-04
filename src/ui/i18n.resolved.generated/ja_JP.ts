@@ -957,7 +957,8 @@ export const ja_JP: EnTranslations = {
       "petTaunt": "ペット：挑発",
       "petDefensive": "ペット：防御",
       "petAggressive": "ペット：攻撃的",
-      "mount": "騎乗 / 降車"
+      "mount": "騎乗 / 降車",
+      "mouseHint": "マウスボタンも使えます。割り当て中に中ボタン (M3) やサイドボタン (M4、M5) を押してください。左右のボタンはカメラ操作、クリック移動、ワールド内のクリックに予約されています。"
     },
     "actionBar": {
       "editKeys": "アクションバーのキーを編集",
@@ -966,7 +967,7 @@ export const ja_JP: EnTranslations = {
       "bannerCapturing": "キーを押してこのスロットに割り当てます…",
       "boundToKey": "{key} に割り当てました。",
       "reset": "リセット",
-      "done": "終わり",
+      "done": "完了",
       "cancel": "キャンセル",
       "resetConfirmTitle": "アクションバーのキーをリセットしますか？",
       "resetConfirmBody": "1本目のバーはデフォルトのキーに戻り、2本目と3本目のバーは未設定になります。この操作は取り消せません。"
@@ -2589,6 +2590,8 @@ export const ja_JP: EnTranslations = {
     "crafting": {
       "title": "製作",
       "close": "製作を閉じる",
+      "dialogOption": "製作",
+      "dialogOptionAria": "{craft}の製作ウィンドウを開く",
       "craft": "製作",
       "reagentsNeeded": "必要素材:",
       "reagentLine": "{name}: {have}/{required}",
@@ -2898,6 +2901,7 @@ export const ja_JP: EnTranslations = {
       "countLabel": "功績 {earned}/{total}",
       "completionAria": "獲得済みの功績: {earned}/{total}",
       "recentLabel": "最近:",
+      "recentJumpAria": "Jump to {name}",
       "nearestLabel": "あと少し:",
       "filterGroupAria": "功績を絞り込む",
       "filterAll": "すべて",
@@ -4285,8 +4289,8 @@ export const ja_JP: EnTranslations = {
       "toolUnavailable": "非売品",
       "priceNone": "非売品",
       "toolTierReq": "ティア{tier}の道具",
-      "colWield": "で使用します",
-      "wieldNone": "どれでも",
+      "colWield": "使用熟練度",
+      "wieldNone": "制限なし",
       "yieldsHeading": "採集の実り",
       "yieldsBody": "採集のたびに品質が抽選され、その確率は熟練度がすべてです。始めたばかりの採集者は常にコモン品ですが、熟練が上がるほど高い等級へ重みが移り、決して後退しません。上限100ではコモンが完全に消え、60%が良質、30%がレア、8%がエピック、2%が伝説になります。品質は量でもあります。コモンは1個、良質とレアは2個、エピックは3個、伝説は4個。レア以上の収穫はあなたの署名入り（Gathered by）で届き、上限では十回に四回、名前が刻まれます。",
       "bandsHeading": "熟練度バンド",
@@ -6094,10 +6098,16 @@ export const ja_JP: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "アップデート {version} をダウンロード中...",
-      "ready": "アップデート {version} の準備ができました。ゲーム終了時に自動でインストールされます。今すぐ再起動もできます。",
+      "checkingTitle": "アップデートを確認中...",
+      "checkingBody": "ゲームは自動的に最新の状態に保たれます。",
+      "uptodateTitle": "お使いのバージョンは最新です。",
+      "downloadingTitle": "アップデート {version} をダウンロード中...",
+      "downloadingBody": "プレイは続けられます。アップデートはゲーム終了時にインストールされます。",
+      "readyTitle": "アップデート {version} の準備ができました",
+      "readyBody": "ゲーム終了時に自動でインストールされます。今すぐ再起動もできます。",
       "restart": "今すぐ再起動",
-      "later": "後で"
+      "later": "後で",
+      "dismiss": "閉じる"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7134,15 +7144,15 @@ export const ja_JP: EnTranslations = {
       "buyStack": "{count}個購入",
       "buyStackAria": "{item}を{count}個、{price}で購入",
       "qtyRowAria": "購入数量",
-      "qtyMultiple": "{count}x",
+      "qtyMultiple": "{count}個",
       "qtyMultipleAria": "一度に{count}個ずつ購入",
       "qtyCustom": "カスタム",
       "qtyCustomAria": "購入数を自分で指定",
-      "buyCountAria": "{price} で {item} の {count} を購入",
-      "buyCountAriaWithRequirement": "{price} で {item} の {count} を購入します。 {requirement}",
+      "buyCountAria": "{item}を{count}個、{price}で購入",
+      "buyCountAriaWithRequirement": "{item}を{count}個、{price}で購入。{requirement}",
       "buyQuantityTitle": "{item}をいくつ購入しますか？最大{max}。",
       "buyQuantityInput": "購入する数量",
-      "buyQuantityConfirm": "買う",
+      "buyQuantityConfirm": "購入",
       "buybackTitle": "買い戻し",
       "buybackEmpty": "アイテムなし",
       "buybackAria": "{item}を{price}で買い戻す",

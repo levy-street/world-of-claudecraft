@@ -817,6 +817,10 @@ export const table: DeedLocaleTable = {
     name: 'Heroisch: Das Wildherzbecken',
     desc: 'Besiege Zulgar, Stimme des Beckens, im Wildherzbecken auf heroischem Schwierigkeitsgrad.',
   },
+  chr_peaks_gatherer: {
+    name: 'Die Ernte der Höhen',
+    desc: 'Ernte in den Thornpeak-Höhen eine Erzader, ein Gehölz und ein Kräuterbeet.',
+  },
   chr_marsh_rares_ii: {
     name: 'Der Vielfraß, nachgetragen',
     desc: 'Erlege Grubjaw den Vielfraß, einen vierten namhaften Schrecken des Mirefen-Moors, den die erste Zählung ausließ.',
@@ -833,32 +837,28 @@ export const table: DeedLocaleTable = {
     name: 'Die Herde vergisst nicht',
     desc: 'Erlege die Alte Markschale und Aurelhorn, den Ersten der Herde, die beiden wandernden seltenen Bosse der Schleiersenke.',
   },
-  chr_peaks_gatherer: {
-    name: 'Ernte der Höhen',
-    desc: 'Ernte eine Erzader, einen Holzbestand und ein Kräuterbeet in den Thornpeak-Höhen.',
-  },
   chr_willowfen_gatherer: {
-    name: 'Fenland-Kopfgeld',
-    desc: 'Ernten Sie eine Erzader, einen Holzbestand und ein Kräuterbeet im Weidenmoor.',
+    name: 'Gaben des Moorlands',
+    desc: 'Ernte im Weidenmoor eine Erzader, ein Gehölz und ein Kräuterbeet.',
   },
   chr_willowfen_first_cast: {
-    name: 'Wellen in den Lilymoors',
-    desc: 'Fangen Sie einen Fisch aus den Gewässern des Willowfen.',
+    name: 'Wellenkreise in den Lilienmooren',
+    desc: 'Fange einen Fisch aus den Gewässern des Weidenmoors.',
   },
   chr_galecrest_gatherer: {
     name: 'Ernte auf der Landzunge',
-    desc: 'Ernten Sie eine Erzader, einen Holzbestand und ein Kräuterbeet im Galecrest.',
+    desc: 'Ernte auf dem Windkamm eine Erzader, ein Gehölz und ein Kräuterbeet.',
   },
   chr_galecrest_first_cast: {
-    name: 'Eine Linie im Mirror Tarn',
-    desc: 'Fangen Sie einen Fisch aus den Gewässern des Galecrest.',
+    name: 'Eine Schnur im Spiegelweiher',
+    desc: 'Fange einen Fisch aus den Gewässern des Windkamms.',
   },
   chr_farshore_gatherer: {
-    name: 'Inselversorgung',
-    desc: 'Ernten Sie eine Erzader, einen Waldbestand und ein Kräuterbeet an der Farshore.',
+    name: 'Inselproviant',
+    desc: 'Ernte auf der Fernküste eine Erzader, ein Gehölz und ein Kräuterbeet.',
   },
   chr_farshore_first_cast: {
     name: 'Was die Möwen wissen',
-    desc: 'Fangen Sie einen Fisch aus den Gewässern der Farshore.',
+    desc: 'Fange einen Fisch aus den Gewässern der Fernküste.',
   },
 };

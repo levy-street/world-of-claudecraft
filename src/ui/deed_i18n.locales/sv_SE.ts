@@ -753,6 +753,10 @@ export const table: DeedLocaleTable = {
     name: 'Heroisk: Vildhjärtats bassäng',
     desc: 'Besegra Zulgar, Bassängens röst, i Vildhjärtats bassäng på heroisk svårighetsgrad.',
   },
+  chr_peaks_gatherer: {
+    name: 'Höjdernas skörd',
+    desc: 'Skörda en malmåder, en virkesdunge och en örttäppa i Törntoppshöjderna.',
+  },
   chr_marsh_rares_ii: {
     name: 'Frossaren, uppräknad',
     desc: 'Dräp Grävkäft Frossaren, en fjärde namnkunnig fasa i Dykärrsträsket som lämnades utanför den första räkningen.',
@@ -769,32 +773,28 @@ export const table: DeedLocaleTable = {
     name: 'Hjorden minns',
     desc: 'Dräp Gamla Märgskal och Aurelhorn, Först i hjorden, Slöjhålans två vandrande sällsynta bossar.',
   },
-  chr_peaks_gatherer: {
-    name: 'Höjdernas skörd',
-    desc: 'Skörda en malmåder, ett vedställ och en örtlapp i Thornpeak Heights.',
-  },
   chr_willowfen_gatherer: {
-    name: 'Kärrmarkens byte',
-    desc: 'Skörda en malmåder, ett vedställ och en örtlapp i Willowfen.',
+    name: 'Kärrmarkens gåvor',
+    desc: 'Skörda en malmåder, en virkesdunge och en örttäppa i Pilkärret.',
   },
   chr_willowfen_first_cast: {
-    name: 'Ripples i Lilymoors',
-    desc: 'Fånga en fisk från Willowfens vatten.',
+    name: 'Ringar på Liljemyrarna',
+    desc: 'Fånga en fisk ur Pilkärrets vatten.',
   },
   chr_galecrest_gatherer: {
-    name: 'Skörd på udden',
-    desc: 'Skörda en malmåder, ett vedställ och en örtlapp i Galecrest.',
+    name: 'Skörd på näset',
+    desc: 'Skörda en malmåder, en virkesdunge och en örttäppa i Stormkammen.',
   },
   chr_galecrest_first_cast: {
-    name: 'En linje i spegeln Tarn',
-    desc: 'Fånga en fisk från vattnet i Galecrest.',
+    name: 'En lina i Spegeltjärnen',
+    desc: 'Fånga en fisk ur Stormkammens vatten.',
   },
   chr_farshore_gatherer: {
-    name: 'Ö bestämmelser',
-    desc: 'Skörda en malmåder, ett vedställ och en örtlapp på Farshore.',
+    name: 'Öns proviant',
+    desc: 'Skörda en malmåder, en virkesdunge och en örttäppa på Fjärrkusten.',
   },
   chr_farshore_first_cast: {
-    name: 'Vad måsarna vet',
-    desc: 'Fånga en fisk från Farshores vatten.',
+    name: 'Det måsarna vet',
+    desc: 'Fånga en fisk ur Fjärrkustens vatten.',
   },
 };

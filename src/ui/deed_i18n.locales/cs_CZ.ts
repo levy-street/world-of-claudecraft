@@ -788,6 +788,10 @@ export const table: DeedLocaleTable = {
     name: 'Hrdinská: Kotlina Divokého srdce',
     desc: 'Poraz Zulgara, hlas Kotliny, v Kotlině Divokého srdce na hrdinské obtížnosti.',
   },
+  chr_peaks_gatherer: {
+    name: 'Sklizeň z výšin',
+    desc: 'Vytěž v Thornpeakských výšinách rudnou žílu, porost dřeva i záhon bylin.',
+  },
   chr_marsh_rares_ii: {
     name: 'Žrout, dopočítán',
     desc: 'Zab Hltavou Červočelist, čtvrtou pojmenovanou hrůzu Mirefenského močálu, která zůstala mimo první sčítání.',
@@ -804,32 +808,28 @@ export const table: DeedLocaleTable = {
     name: 'Stádo nezapomíná',
     desc: 'Zab Starou Morkoskořápku a Aurelhorna, Prvního ze stáda, dva putující vzácné bosse Zahalené kotliny.',
   },
-  chr_peaks_gatherer: {
-    name: 'Sklizeň výšin',
-    desc: 'Sklizeň rudné žíly, dřevěného stojanu a bylinkového záhonu v Thornpeak Heights.',
-  },
   chr_willowfen_gatherer: {
-    name: 'Kořist mokřin',
-    desc: 'Sklizeň rudné žíly, dřevěného porostu a bylinkového záhonu ve Willowfen.',
+    name: 'Štědrost bažin',
+    desc: 'Vytěž ve Vrbové bažině rudnou žílu, porost dřeva i záhon bylin.',
   },
   chr_willowfen_first_cast: {
-    name: 'Vlnky v Lilymoors',
-    desc: 'Chyťte rybu z vod Willowfen.',
+    name: 'Vlnky na Liliovém vřesovišti',
+    desc: 'Chyť rybu ve vodách Vrbové bažiny.',
   },
   chr_galecrest_gatherer: {
-    name: 'Sklizeň na ostrohu',
-    desc: 'Sklizeň rudné žíly, dřevěného porostu a bylinkové záhony v Galecrest.',
+    name: 'Sklizeň na hřebeni',
+    desc: 'Vytěž na Vichrném hřebeni rudnou žílu, porost dřeva i záhon bylin.',
   },
   chr_galecrest_first_cast: {
-    name: 'Čára v Mirror Tarn',
-    desc: 'Chyťte rybu z vod Galecrest.',
+    name: 'Vlasec v Zrcadlovém jezírku',
+    desc: 'Chyť rybu ve vodách Vichrného hřebene.',
   },
   chr_farshore_gatherer: {
-    name: 'Ostrovní ustanovení',
-    desc: 'Sklizeň rudné žíly, dřevěného porostu a bylinkového záhonu na Farshore.',
+    name: 'Ostrovní zásoby',
+    desc: 'Vytěž na Vzdáleném pobřeží rudnou žílu, porost dřeva i záhon bylin.',
   },
   chr_farshore_first_cast: {
-    name: 'Co Rackové vědí',
-    desc: 'Chyťte rybu z vod Farshore.',
+    name: 'Co vědí rackové',
+    desc: 'Chyť rybu ve vodách Vzdáleného pobřeží.',
   },
 };

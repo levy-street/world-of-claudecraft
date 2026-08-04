@@ -508,6 +508,10 @@ export const table: DeedLocaleTable = {
     name: '英雄：荒野之心盆地',
     desc: '以英雄難度在荒野之心盆地擊敗盆地之聲祖爾加。',
   },
+  chr_peaks_gatherer: {
+    name: '高地的收成',
+    desc: '在荊峰高地採集一處礦脈、一處林木與一叢草藥。',
+  },
   chr_marsh_rares_ii: {
     name: '暴食者，終得清算',
     desc: '斬殺暴食者蛆顎，泥沼濕地第四個有名有姓的惡煞，首次清算時被漏記在冊。',
@@ -524,32 +528,28 @@ export const table: DeedLocaleTable = {
     name: '鹿群不忘',
     desc: '斬殺老髓殼與鹿群之首金輝角，帷幕幽谷的兩個遊蕩稀有首領。',
   },
-  chr_peaks_gatherer: {
-    name: '高地採收',
-    desc: '在 Thornpeak Heights 採收一處礦脈、一片林木和一叢草藥。',
-  },
   chr_willowfen_gatherer: {
-    name: '芬蘭賞金',
-    desc: '在威洛芬收穫一條礦脈、一個木樁和一片藥草。',
+    name: '沼地的餽贈',
+    desc: '在柳澤沼地採集一處礦脈、一處林木與一叢草藥。',
   },
   chr_willowfen_first_cast: {
-    name: '百合沼澤的漣漪',
-    desc: '從柳沼水域捕獲一條魚。',
+    name: '睡蓮澤的漣漪',
+    desc: '在柳澤沼地的水域釣起一條魚。',
   },
   chr_galecrest_gatherer: {
-    name: '岬角的收穫',
-    desc: '在 Galecrest 中收穫一條礦脈、一個木樁和一片藥草。',
+    name: '海岬上的收穫',
+    desc: '在疾風崖採集一處礦脈、一處林木與一叢草藥。',
   },
   chr_galecrest_first_cast: {
-    name: '鏡中線塔恩',
-    desc: '從 Galecrest 水域捕獲一條魚。',
+    name: '鏡湖垂綸',
+    desc: '在疾風崖的水域釣起一條魚。',
   },
   chr_farshore_gatherer: {
-    name: '島嶼規定',
-    desc: '在遠岸收穫一條礦脈、木樁和一片藥草。',
+    name: '島上的補給',
+    desc: '在遠岸採集一處礦脈、一處林木與一叢草藥。',
   },
   chr_farshore_first_cast: {
-    name: '海鷗知道什麼',
-    desc: '從遠岸水域捕獲一條魚。',
+    name: '鷗鳥所知',
+    desc: '在遠岸的水域釣起一條魚。',
   },
 };

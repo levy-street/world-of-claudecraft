@@ -852,6 +852,10 @@ export const table: DeedLocaleTable = {
     name: 'Eroico: Il Bacino di Wildheart',
     desc: 'Sconfiggi Zulgar, Voce del Bacino, nel Bacino di Wildheart in difficoltà Eroica.',
   },
+  chr_peaks_gatherer: {
+    name: 'Raccolto delle Alture',
+    desc: "Raccogli una vena di minerale, un ceppo di legname e una macchia d'erbe sulle Alture di Thornpeak.",
+  },
   chr_marsh_rares_ii: {
     name: 'Il Ghiottone, Messo in Conto',
     desc: 'Uccidi Grubjaw il Ghiottone, un quarto terrore famigerato della Palude di Mirefen rimasto fuori dal primo conteggio.',
@@ -868,32 +872,28 @@ export const table: DeedLocaleTable = {
     name: 'Il Branco Ricorda',
     desc: 'Uccidi il Vecchio Marrowshell e Aurelhorn, Primo del Branco, i due boss rari erranti della Valletta.',
   },
-  chr_peaks_gatherer: {
-    name: 'Raccolto delle alture',
-    desc: 'Raccogli una vena mineraria, un supporto in legno e un appezzamento di erbe a Thornpeak Heights.',
-  },
   chr_willowfen_gatherer: {
-    name: 'Taglia della Fenland',
-    desc: 'Raccogli una vena mineraria, un supporto di legno e un appezzamento di erbe a Willowfen.',
+    name: "L'Abbondanza del Willowfen",
+    desc: "Raccogli una vena di minerale, un ceppo di legname e una macchia d'erbe nel Willowfen.",
   },
   chr_willowfen_first_cast: {
     name: 'Increspature nelle Lilymoors',
-    desc: 'Cattura un pesce dalle acque del Willowfen.',
+    desc: 'Pesca un pesce nelle acque del Willowfen.',
   },
   chr_galecrest_gatherer: {
-    name: 'Raccolto sul promontorio',
-    desc: 'Raccogli una vena mineraria, un supporto di legno e un appezzamento di erbe nel Galecrest.',
+    name: 'Raccolto sul Promontorio',
+    desc: "Raccogli una vena di minerale, un ceppo di legname e una macchia d'erbe nel Galecrest.",
   },
   chr_galecrest_first_cast: {
-    name: 'Una linea nel Tarn dello specchio',
-    desc: 'Cattura un pesce dalle acque del Galecrest.',
+    name: 'Una Lenza nel Laghetto Specchio',
+    desc: 'Pesca un pesce nelle acque del Galecrest.',
   },
   chr_farshore_gatherer: {
-    name: "Disposizioni sull'isola",
-    desc: 'Raccogli una vena mineraria, un supporto di legno e un appezzamento di erbe sulla Riva Lunga.',
+    name: "Provviste dell'Isola",
+    desc: "Raccogli una vena di minerale, un ceppo di legname e una macchia d'erbe sul Farshore.",
   },
   chr_farshore_first_cast: {
-    name: 'Quello che sanno i gabbiani',
-    desc: 'Cattura un pesce dalle acque della Riva Lunga.',
+    name: 'Ciò che Sanno i Gabbiani',
+    desc: 'Pesca un pesce nelle acque del Farshore.',
   },
 };

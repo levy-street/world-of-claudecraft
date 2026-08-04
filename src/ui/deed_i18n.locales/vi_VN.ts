@@ -822,6 +822,10 @@ export const table: DeedLocaleTable = {
     name: 'Anh Hùng: Lòng Chảo Trái Tim Hoang Dã',
     desc: 'Đánh bại Zulgar, Tiếng Nói Của Vùng Trũng, trong Lòng Chảo Trái Tim Hoang Dã ở độ khó Anh Hùng.',
   },
+  chr_peaks_gatherer: {
+    name: 'Mùa Gặt Chốn Non Cao',
+    desc: 'Thu hoạch một mạch quặng, một cụm gỗ và một khóm thảo dược tại Cao Nguyên Đỉnh Gai.',
+  },
   chr_marsh_rares_ii: {
     name: 'Kẻ Phàm Ăn, Được Ghi Sổ',
     desc: 'Hạ Grubjaw Phàm Ăn, nỗi kinh hoàng hữu danh thứ tư của Đầm Lầy Bùn Sâu bị bỏ sót trong lần điểm danh đầu tiên.',
@@ -838,32 +842,28 @@ export const table: DeedLocaleTable = {
     name: 'Bầy Đàn Ghi Nhớ',
     desc: 'Hạ Marrowshell Già và Aurelhorn, Kẻ Đầu Đàn, hai trùm hiếm lang thang của Thung Lũng Sương Phủ.',
   },
-  chr_peaks_gatherer: {
-    name: 'Thu hoạch vùng cao',
-    desc: 'Thu hoạch quặng, giá gỗ và mảnh thảo mộc ở Thornpeak Heights.',
-  },
   chr_willowfen_gatherer: {
-    name: 'Tiền thưởng Fenland',
-    desc: 'Thu hoạch quặng, giá gỗ và mảnh thảo mộc ở Willowfen.',
+    name: 'Lộc Trời Đầm Liễu',
+    desc: 'Thu hoạch một mạch quặng, một cụm gỗ và một khóm thảo dược tại Đầm Liễu.',
   },
   chr_willowfen_first_cast: {
-    name: 'Gợn sóng ở Lilymoors',
-    desc: 'Bắt một con cá từ vùng nước Willowfen.',
+    name: 'Gợn Sóng Nơi Lilymoors',
+    desc: 'Câu một con cá từ vùng nước của Đầm Liễu.',
   },
   chr_galecrest_gatherer: {
-    name: 'Thu hoạch trên mũi đất',
-    desc: 'Thu hoạch quặng, giá gỗ và mảnh thảo mộc ở Galecrest.',
+    name: 'Mùa Gặt Trên Mũi Đất',
+    desc: 'Thu hoạch một mạch quặng, một cụm gỗ và một khóm thảo dược tại Đỉnh Gió Lộng.',
   },
   chr_galecrest_first_cast: {
-    name: 'Một đường kẻ trong gương Tarn',
-    desc: 'Bắt một con cá từ vùng biển Galecrest.',
+    name: 'Buông Câu Xuống Hồ Gương',
+    desc: 'Câu một con cá từ vùng nước của Đỉnh Gió Lộng.',
   },
   chr_farshore_gatherer: {
-    name: 'Quy định về đảo',
-    desc: 'Thu hoạch quặng, giá gỗ và thảm thảo mộc ở Farshore.',
+    name: 'Lương Thảo Hải Đảo',
+    desc: 'Thu hoạch một mạch quặng, một cụm gỗ và một khóm thảo dược tại Bờ Biển Xa Xôi.',
   },
   chr_farshore_first_cast: {
-    name: 'Những gì mòng biển biết',
-    desc: 'Bắt một con cá từ vùng biển Farshore.',
+    name: 'Điều Lũ Mòng Biển Biết',
+    desc: 'Câu một con cá từ vùng nước của Bờ Biển Xa Xôi.',
   },
 };

@@ -810,6 +810,10 @@ export const table: DeedLocaleTable = {
     name: 'Heroiczna: Kotlina Dzikiego Serca',
     desc: 'Pokonaj Zulgara, Głos Kotliny, w Kotlinie Dzikiego Serca na heroicznym poziomie trudności.',
   },
+  chr_peaks_gatherer: {
+    name: 'Plon z wyżyn',
+    desc: 'Pozyskaj żyłę rudy, drzewostan i kępę ziół na Wyżynach Ciernistego Szczytu.',
+  },
   chr_marsh_rares_ii: {
     name: 'Żarłok, doliczony',
     desc: 'Zabij Robakopaszczego Żarłoka, czwartą osławioną zgrozę Trzęsawiska Mokrzawia pominiętą w pierwszym rachunku.',
@@ -826,32 +830,28 @@ export const table: DeedLocaleTable = {
     name: 'Stado pamięta',
     desc: 'Zabij Starego Szpikoskorupa i Aurelhorna, Pierwszego ze Stada, dwóch wędrownych rzadkich bossów Zasłoniętej Kotliny.',
   },
-  chr_peaks_gatherer: {
-    name: 'Żniwa na Wzgórzach',
-    desc: 'Zbierz żyłę rudy, stojak na drewno i grządkę ziół w Thornpeak Heights.',
-  },
   chr_willowfen_gatherer: {
-    name: 'Nagroda Fenlanda',
-    desc: 'Zbierz żyłę rudy, drzewostan i grządkę ziół w Willowfen.',
+    name: 'Obfitość mokradeł',
+    desc: 'Pozyskaj żyłę rudy, drzewostan i kępę ziół na Wierzbowych Mokradłach.',
   },
   chr_willowfen_first_cast: {
-    name: 'Fale w Lilymoors',
-    desc: 'Złów rybę z wód Wierzby.',
+    name: 'Kręgi na Liliowych Wrzosowiskach',
+    desc: 'Złów rybę w wodach Wierzbowych Mokradeł.',
   },
   chr_galecrest_gatherer: {
-    name: 'Żniwa na cyplu',
-    desc: 'Zbierz żyłę rudy, stojak na drewno i grządkę ziół w Galecrest.',
+    name: 'Zbiory na przylądku',
+    desc: 'Pozyskaj żyłę rudy, drzewostan i kępę ziół na Wichrowym Grzbiecie.',
   },
   chr_galecrest_first_cast: {
-    name: 'Linia w Lustrzanym Tarnie',
-    desc: 'Złów rybę z wód Galecrest.',
+    name: 'Żyłka w Lustrzanym Jeziorku',
+    desc: 'Złów rybę w wodach Wichrowego Grzbietu.',
   },
   chr_farshore_gatherer: {
-    name: 'Przepisy wyspy',
-    desc: 'Zdobądź żyłę rudy, drzewostan i pole ziół na Farshore.',
+    name: 'Wyspiarskie zapasy',
+    desc: 'Pozyskaj żyłę rudy, drzewostan i kępę ziół na Dalekim Wybrzeżu.',
   },
   chr_farshore_first_cast: {
     name: 'Co wiedzą mewy',
-    desc: 'Złów rybę z wód Farshore.',
+    desc: 'Złów rybę w wodach Dalekiego Wybrzeża.',
   },
 };

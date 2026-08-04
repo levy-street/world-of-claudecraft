@@ -752,6 +752,10 @@ export const table: DeedLocaleTable = {
     name: 'Heroisk: Vildhjertebassinet',
     desc: 'Besejr Zulgar, Bassinets Stemme, i Vildhjertebassinet på heroisk sværhedsgrad.',
   },
+  chr_peaks_gatherer: {
+    name: 'Høst fra Højderne',
+    desc: 'Høst en malmåre, en skovbevoksning og et urtebed i Tornetop Højder.',
+  },
   chr_marsh_rares_ii: {
     name: 'Den Grådige, Gjort Op',
     desc: 'Dræb Gravekæft den Grådige, en fjerde navngiven rædsel i Mosekær Sump, som blev glemt i den første optælling.',
@@ -768,32 +772,28 @@ export const table: DeedLocaleTable = {
     name: 'Flokken Husker',
     desc: 'Dræb Gamle Marvskal og Aurelhorn, Første af Flokken, de to omstrejfende sjældne bosser i Den Tilslørede Hule.',
   },
-  chr_peaks_gatherer: {
-    name: 'Højdernes høst',
-    desc: 'Høst en malmåre, et træstativ og et urteplaster i Thornpeak Heights.',
-  },
   chr_willowfen_gatherer: {
-    name: 'Kærlandets udbytte',
-    desc: 'Høst en malmåre, en træstativ og en urteplet i pilefladen.',
+    name: 'Kærets Overflod',
+    desc: 'Høst en malmåre, en skovbevoksning og et urtebed i Pilekæret.',
   },
   chr_willowfen_first_cast: {
-    name: 'Ripples i Lilymoors',
-    desc: 'Fang en fisk fra vandet i Willowfen.',
+    name: 'Ringe i Liljemoserne',
+    desc: 'Fang en fisk i Pilekærets vande.',
   },
   chr_galecrest_gatherer: {
-    name: 'Høst på næsset',
-    desc: 'Høst en malmåre, et træstativ og en urteplet i Galecrest.',
+    name: 'Høst på Næsset',
+    desc: 'Høst en malmåre, en skovbevoksning og et urtebed i Stormkammen.',
   },
   chr_galecrest_first_cast: {
-    name: 'En linje i spejlet Tarn',
-    desc: 'Fang en fisk fra vandet i Galecrest.',
+    name: 'En Snøre i Spejltjørnet',
+    desc: 'Fang en fisk i Stormkammens vande.',
   },
   chr_farshore_gatherer: {
-    name: 'Ø-bestemmelser',
-    desc: 'Høst en malmåre, et træstativ og en urteplet på Farshore.',
+    name: 'Øens Proviant',
+    desc: 'Høst en malmåre, en skovbevoksning og et urtebed på Fjernkysten.',
   },
   chr_farshore_first_cast: {
-    name: 'Hvad mågerne ved',
-    desc: 'Fang en fisk fra vandet i Farshore.',
+    name: 'Hvad Mågerne Ved',
+    desc: 'Fang en fisk i Fjernkystens vande.',
   },
 };

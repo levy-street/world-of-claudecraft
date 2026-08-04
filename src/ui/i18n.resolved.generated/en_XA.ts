@@ -957,7 +957,8 @@ export const en_XA: EnTranslations = {
       "petTaunt": "[Þéţ: Ţáúñţ]",
       "petDefensive": "[Þéţ: Ðéƒéñšíʋé]",
       "petAggressive": "[Þéţ: Áĝĝŕéššíʋé]",
-      "mount": "[Ɱóúñţ / Ðíšɱóúñţ]"
+      "mount": "[Ɱóúñţ / Ðíšɱóúñţ]",
+      "mouseHint": "[Ɱóúšé ƀúţţóñš ŵóŕķ ţóó: þŕéšš ţĥé ɱíððļé ƀúţţóñ (Ɱ3) óŕ á ţĥúɱƀ ƀúţţóñ (Ɱ4, Ɱ5) ŵĥíļé ƀíñðíñĝ. Ļéƒţ áñð ŕíĝĥţ šţáý ŕéšéŕʋéð ƒóŕ ţĥé çáɱéŕá, çļíçķ ţó ɱóʋé, áñð çļíçķíñĝ ţĥíñĝš íñ ţĥé ŵóŕļð.]"
     },
     "actionBar": {
       "editKeys": "[Éðíţ áçţíóñ ƀáŕ ķéýš]",
@@ -2589,6 +2590,8 @@ export const en_XA: EnTranslations = {
     "crafting": {
       "title": "[Çŕáƒţíñĝ]",
       "close": "[Çļóšé çŕáƒţíñĝ]",
+      "dialogOption": "[Çŕáƒţíñĝ]",
+      "dialogOptionAria": "[Óþéñ ţĥé çŕáƒţíñĝ ŵíñðóŵ ƒóŕ {craft}]",
       "craft": "[Çŕáƒţ]",
       "reagentsNeeded": "[Ŕéɋúíŕéš:]",
       "reagentLine": "[{name} ẋ{have}/{required}]",
@@ -2898,6 +2901,7 @@ export const en_XA: EnTranslations = {
       "countLabel": "[{earned}/{total} ðééðš]",
       "completionAria": "[Ðééðš éáŕñéð: {earned} óƒ {total}]",
       "recentLabel": "[Ŕéçéñţ:]",
+      "recentJumpAria": "[Ĵúɱþ ţó {name}]",
       "nearestLabel": "[Ñéáŕļý ţĥéŕé:]",
       "filterGroupAria": "[Ƒíļţéŕ ðééðš]",
       "filterAll": "[Áļļ]",
@@ -6094,10 +6098,16 @@ export const en_XA: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "[Ðóŵñļóáðíñĝ úþðáţé {version}...]",
-      "ready": "[Úþðáţé {version} íš ŕéáðý. Íţ íñšţáļļš ŵĥéñ ýóú ɋúíţ, óŕ ŕéšţáŕţ ñóŵ.]",
+      "checkingTitle": "[Çĥéçķíñĝ ƒóŕ úþðáţéš...]",
+      "checkingBody": "[Ñéŵ ʋéŕšíóñš ðóŵñļóáð ŵĥíļé ýóú þļáý.]",
+      "uptodateTitle": "[Ýóú'ŕé úþ ţó ðáţé]",
+      "downloadingTitle": "[Ðóŵñļóáðíñĝ úþðáţé {version}...]",
+      "downloadingBody": "[Ýóú çáñ ķééþ þļáýíñĝ. Íţ íñšţáļļš ŵĥéñ ýóú ɋúíţ.]",
+      "readyTitle": "[Úþðáţé {version} íš ŕéáðý]",
+      "readyBody": "[Ŕéšţáŕţ ţó íñšţáļļ ñóŵ, óŕ ķééþ þļáýíñĝ áñð íţ íñšţáļļš ŵĥéñ ýóú ɋúíţ.]",
       "restart": "[Ŕéšţáŕţ ñóŵ]",
-      "later": "[Ļáţéŕ]"
+      "later": "[Ļáţéŕ]",
+      "dismiss": "[Ðíšɱíšš]"
     },
     "crash": {
       "title": "[Ŵóŕļð óƒ ÇļáúðéÇŕáƒţ]",

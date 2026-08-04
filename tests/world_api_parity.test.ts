@@ -389,6 +389,7 @@ export const IWORLD_MEMBERS = [
   { name: 'activeTitle', kind: 'data' },
   { name: 'setActiveTitle', kind: 'method' },
   { name: 'deedsRarity', kind: 'method' },
+  { name: 'deedsRecent', kind: 'method' },
   { name: 'deedsLeaderboard', kind: 'method' },
   // IWorldActionBar: per-character action-bar layout persistence + login restore.
   { name: 'saveActionBarLayout', kind: 'method' },
@@ -513,10 +514,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // riftCollisionToken (data) with third-person camera collision,
     // leaving 280; a later v0.34.0 sync re-adds riftCollisionToken (data)
     // so client-side swept-landing and click-to-move pathing can treat
-    // rift walls as solid, leaving 281.
-    expect(IWORLD_MEMBERS.length).toBe(281);
+    // rift walls as solid, leaving 281; the Book of Deeds recent strip adds
+    // the deedsRecent order read (method) for 282.
+    expect(IWORLD_MEMBERS.length).toBe(282);
     expect(DATA_MEMBERS.length).toBe(73);
-    expect(METHOD_MEMBERS.length).toBe(208);
+    expect(METHOD_MEMBERS.length).toBe(209);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -591,6 +593,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'deedsEarned',
       'deedsLeaderboard',
       'deedsRarity',
+      'deedsRecent',
       'deleteLoadout',
       'delveBuyShopItem',
       'delveDaily',
@@ -934,6 +937,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'dailyRewards',
       'deedsLeaderboard',
       'deedsRarity',
+      'deedsRecent',
       'deleteLoadout',
       'delveBuyShopItem',
       'delveInteract',
@@ -1568,6 +1572,7 @@ const FACET_DEEDS = [
   'activeTitle',
   'setActiveTitle',
   'deedsRarity',
+  'deedsRecent',
   'deedsLeaderboard',
 ] as const satisfies readonly (keyof IWorldDeeds)[];
 type _ExhaustDeeds = AssertNever<Exclude<keyof IWorldDeeds, (typeof FACET_DEEDS)[number]>>;
@@ -1644,8 +1649,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(281);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(281);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(282);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(282);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);
