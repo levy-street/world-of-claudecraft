@@ -13,6 +13,7 @@ import { describe, expect, it } from 'vitest';
 import {
   CAMPS,
   DELVE_X_MIN,
+  GATHER_NODES,
   PROPS,
   QUESTS,
   STRIP_MAX_X,
@@ -104,6 +105,15 @@ function makeOverworldWorld(
       ],
     },
   };
+  // The quest-marker inputs both worlds expose (the phase 23 classifier):
+  // questsDone always, and the crafting identity whose cadenceBlockedQuests
+  // mirror drives the cooldown variant. The sim shape carries the fuller
+  // identity a live Sim builds; the client shape carries only what the cprof
+  // mirror guarantees, so the core must not read past it.
+  const craftingIdentity =
+    shape === 'sim'
+      ? { version: 1, synced: true, attunedPairs: [], cadenceBlockedQuests: [] }
+      : { version: 1, synced: false, cadenceBlockedQuests: [] };
   return {
     player,
     entities,
@@ -113,6 +123,8 @@ function makeOverworldWorld(
     playerId: 1,
     questState: (q: string) => (q === GIVER_QUEST.id ? 'available' : 'unavailable'),
     questLog,
+    questsDone: new Set<string>(),
+    craftingIdentity,
   } as unknown as IWorld;
 }
 
@@ -419,11 +431,11 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     const model = buildOverworldMapModel(input(makeOverworldWorld('sim'), LABELS_ZOOM));
     expect(model.player).not.toBeNull();
     expect(model.player?.angle).toBe(-0.5);
-    // the npc has an available quest from its own giver -> one '!' (not ready) glyph
+    // the npc has an available quest from its own giver -> one gold '!' glyph
     expect(model.npcs).toHaveLength(1);
-    expect(model.npcs[0].ready).toBe(false);
+    expect(model.npcs[0].kind).toBe('available');
     // the glyph carries its quest identity for the hover tooltip
-    expect(model.npcs[0].quests).toEqual([{ questId: GIVER_QUEST.id, ready: false }]);
+    expect(model.npcs[0].quests).toEqual([{ questId: GIVER_QUEST.id, kind: 'available' }]);
   });
 
   it('hit-tests the nearest glyph within the hover radius (and misses outside it)', () => {
@@ -444,8 +456,8 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     world.entities.delete(2); // the seeded giver npc; only the player remains
     const model = buildOverworldMapModel(input(world as unknown as IWorld, 1));
     expect(model.npcs).toHaveLength(1);
-    expect(model.npcs[0].ready).toBe(false);
-    expect(model.npcs[0].quests).toEqual([{ questId: GIVER_QUEST.id, ready: false }]);
+    expect(model.npcs[0].kind).toBe('available');
+    expect(model.npcs[0].quests).toEqual([{ questId: GIVER_QUEST.id, kind: 'available' }]);
   });
 
   it("marks the glyph ready when a turn-in is ready (the '?' branch, not '!')", () => {
@@ -462,7 +474,43 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     world.questState = (q) => (q === READY_QUEST.id ? 'ready' : 'unavailable');
     const model = buildOverworldMapModel(input(world as unknown as IWorld, LABELS_ZOOM));
     expect(model.npcs).toHaveLength(1);
-    expect(model.npcs[0].ready).toBe(true);
+    expect(model.npcs[0].kind).toBe('ready');
+  });
+
+  it('classifies the repeat and cooldown variants identically for both world shapes', () => {
+    // Acceptance (a)'s both-worlds arm at the map surface: a real cadenced
+    // work order (giver in this test's zone), driven through a Sim-shaped
+    // and a ClientWorld-mirror-shaped stub. After one completion the offer
+    // is the blue repeat glyph; inside the window it is the dimmed cooldown
+    // glyph; and a non-repeatable quest stays pixel-identical gold
+    // (acceptance (b)'s negative, the GIVER_QUEST arm above). This pins the
+    // CLASSIFIER over each world's data shape; true world-to-world parity
+    // of the inputs rests on the online cadence/attunement suites pinning
+    // the qdone and cprof mirrors.
+    const workOrder = QUESTS['q_prof_workorder_forge'];
+    expect(workOrder.repeatable).toBe(true);
+    for (const shape of ['sim', 'client'] as const) {
+      const world = makeOverworldWorld(shape) as unknown as {
+        questsDone: Set<string>;
+        craftingIdentity: { cadenceBlockedQuests: string[] };
+        questState: (q: string) => string;
+      };
+      world.questsDone = new Set([workOrder.id]);
+      world.questState = (q) => (q === workOrder.id ? 'available' : 'unavailable');
+      const offered = buildOverworldMapModel(input(world as unknown as IWorld, 1));
+      const offeredGlyph = offered.npcs.find((n) =>
+        n.quests.some((q) => q.questId === workOrder.id),
+      );
+      expect(offeredGlyph?.kind, `${shape}: offered again`).toBe('repeat');
+
+      world.questState = () => 'unavailable';
+      world.craftingIdentity.cadenceBlockedQuests = [workOrder.id];
+      const blocked = buildOverworldMapModel(input(world as unknown as IWorld, 1));
+      const blockedGlyph = blocked.npcs.find((n) =>
+        n.quests.some((q) => q.questId === workOrder.id),
+      );
+      expect(blockedGlyph?.kind, `${shape}: inside the window`).toBe('cooldown');
+    }
   });
 
   it('projects only current-zone POIs and portals by the zone-local transform', () => {
@@ -700,6 +748,53 @@ describe('active-quest objective areas (the classic POI blobs)', () => {
     const model = buildOverworldMapModel(input(makeOverworldWorld('sim', activeLog()), 1));
     // single-quest log: every area carries badge number 1
     for (const a of model.questAreas) expect(a.numbers).toEqual([1]);
+  });
+
+  it('plots one blob per gather-node cluster, and the zone cull keeps them', () => {
+    // The gather branch of questObjectiveAreas is the one that groups a flat node
+    // table into clusters (quest_targets.ts pushNodeCluster), and it is the one
+    // this pure core can silently swallow: the zone-band cull here reads a
+    // circle's CENTRE, so a cluster centroid landing outside the committed band
+    // drops the blob from every map with nothing red. Nothing exercised a gather
+    // objective through this core before, so nothing would have caught it.
+    const gatherQuest = Object.values(QUESTS).find((q) =>
+      q.objectives.some((o) => o.type === 'gather' && o.nodeType === 'ore'),
+    );
+    expect(gatherQuest, 'expected a quest with an ore gather objective').toBeDefined();
+    if (!gatherQuest) return;
+    const log: Map<string, QuestProgress> = new Map([
+      [
+        gatherQuest.id,
+        {
+          questId: gatherQuest.id,
+          counts: gatherQuest.objectives.map(() => 0),
+          state: 'active' as const,
+        },
+      ],
+    ]);
+    const model = buildOverworldMapModel(input(makeOverworldWorld('sim', log), 1));
+    // Both IWorld shapes, through the clustering path specifically. The existing
+    // two-shape identity test above runs with an EMPTY quest log, so it never
+    // reaches the gather branch at all; this makes the host-parity claim for that
+    // branch real rather than structural.
+    const client = buildOverworldMapModel(input(makeOverworldWorld('client', log), 1));
+    expect(client.questAreas).toEqual(model.questAreas);
+    const zoneOre = GATHER_NODES.filter(
+      (n) => n.type === 'ore' && n.pos.z >= ZONE.zMin && n.pos.z < ZONE.zMax,
+    );
+    expect(zoneOre.length).toBeGreaterThan(1);
+    // Survived the cull, and fewer blobs than nodes: a per-node implementation
+    // would put one on each, which is the smear this replaced.
+    expect(model.questAreas.length).toBeGreaterThan(0);
+    expect(
+      model.questAreas.length,
+      `${model.questAreas.length} blobs for ${zoneOre.length} in-zone ore nodes`,
+    ).toBeLessThan(zoneOre.length);
+    for (const a of model.questAreas) {
+      expect(Number.isFinite(a.mx)).toBe(true);
+      expect(Number.isFinite(a.my)).toBe(true);
+      expect(a.radius).toBeGreaterThan(0);
+    }
   });
 
   it('hit-tests a hovered point to the objective identities under it (deduped)', () => {

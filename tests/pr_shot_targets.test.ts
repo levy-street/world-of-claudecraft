@@ -143,6 +143,68 @@ describe('classifyDiff', () => {
     expect(target?.capture.toString()).toContain('knownRecipes: []');
   });
 
+  it('maps the identity card and view modules to the crafting target (phase 22)', () => {
+    // A rename or when-list trim would silently stop capturing the identity
+    // card framings; pin the routing per module the phase added.
+    const cardPlan = classifyDiff(['src/ui/profession_identity_card.ts']);
+    expect(cardPlan.isVisual).toBe(true);
+    expect(cardPlan.specific.map((t: { key: string }) => t.key)).toContain('crafting');
+    const viewPlan = classifyDiff(['src/ui/profession_identity_view.ts']);
+    expect(viewPlan.specific.map((t: { key: string }) => t.key)).toContain('crafting');
+    const crafting = cardPlan.specific.find(
+      (candidate: { key: string }) => candidate.key === 'crafting',
+    );
+    expect((crafting?.variants ?? []).map((v: { key: string } | null) => v?.key)).toEqual(
+      expect.arrayContaining([
+        'desktop-identity-attuned',
+        'mobile-identity-attuned',
+        'desktop-identity-compact',
+      ]),
+    );
+  });
+
+  it('maps the quest-marker classifier to the repeat-marker target (phase 23)', () => {
+    // A rename or when-list trim would silently stop capturing the marker
+    // pairs (the phase 22 pin's lesson). Only the classifier leaf routes
+    // here: the surface files route to their own specific targets (the
+    // nameplate painter to holder-tier, minimap/map to world-map, the
+    // gossip controller to attunement-legibility), so a colour-only marker
+    // change captures no marker pair by design.
+    const plan = classifyDiff(['src/sim/quests/quest_marker_kind.ts']);
+    expect(plan.isVisual).toBe(true);
+    expect(plan.specific.map((t: { key: string }) => t.key)).toContain('quest-marker-repeat');
+    const target = plan.specific.find(
+      (candidate: { key: string }) => candidate.key === 'quest-marker-repeat',
+    );
+    expect((target?.variants ?? []).map((v: { key: string }) => v.key)).toEqual([
+      'repeat-desktop',
+      'cooldown-desktop',
+      'repeat-map-desktop',
+      'repeat-mobile',
+    ]);
+  });
+
+  it('maps the Vale Cup unrated-gates UI change to its two targets, per path (#2767)', () => {
+    // One classifyDiff per path, so each target's `when` routing is proven on
+    // its own rather than through the OR of the union.
+    const windowKeys = classifyDiff(['src/ui/vale_cup_window.ts']).specific.map(
+      (t: { key: string }) => t.key,
+    );
+    expect(windowKeys).toContain('vale-cup-unrated-notes');
+    expect(windowKeys).not.toContain('vale-cup-briefing-unrated');
+    const briefingPlan = classifyDiff(['src/ui/vale_cup_briefing.ts']);
+    const briefingKeys = briefingPlan.specific.map((t: { key: string }) => t.key);
+    expect(briefingKeys).toContain('vale-cup-briefing-unrated');
+    expect(briefingKeys).not.toContain('vale-cup-unrated-notes');
+    for (const key of ['vale-cup-unrated-notes', 'vale-cup-briefing-unrated']) {
+      const target = classifyDiff([
+        'src/ui/vale_cup_window.ts',
+        'src/ui/vale_cup_briefing.ts',
+      ]).specific.find((candidate: { key: string }) => candidate.key === key);
+      expect(target?.variants).toEqual([{ key: 'desktop' }, { key: 'mobile', mobile: true }]);
+    }
+  });
+
   it('maps a deed catalog copy change to the Book of Deeds target (#2767)', () => {
     const plan = classifyDiff(['src/sim/content/deeds.ts']);
     expect(plan.isVisual).toBe(true);
@@ -187,5 +249,92 @@ describe('diffChangedPaths', () => {
     const plan = classifyDiff(diffChangedPaths(diff));
     expect(plan.isVisual).toBe(true);
     expect(plan.generic).toEqual(['hud-desktop', 'hud-mobile']);
+  });
+
+  it('the vendor row gate resolves its own target from the sim table and both view halves', () => {
+    // The gate spans a sim content table and the two vendor-window halves, and
+    // only the sim table is outside src/ui, so a gate-table-only change would
+    // fall through to "nothing to shoot" without its own `when` entry. Pinning
+    // the resolved key ORDER also catches a typo in either list.
+    expect(
+      resolveTargets(['src/sim/content/vendor_row_gates.ts']).map((t: { key: string }) => t.key),
+    ).toEqual(['vendor-tool-gate']);
+    // Both view halves resolve the advisory target AND the phase 21 count-row
+    // target (both windows change when either half changes), and nothing else.
+    // Worth pinning because it is easy to assume otherwise: the bags target
+    // lists 'ui/vendor' in its own `when`, but these modules live at
+    // src/ui/hud/vendor/, so that entry does not substring-match them and
+    // never shot this window.
+    expect(
+      resolveTargets(['src/ui/hud/vendor/vendor_view.ts']).map((t: { key: string }) => t.key),
+    ).toEqual(['vendor-tool-gate', 'vendor-buy-count']);
+    expect(
+      resolveTargets(['src/ui/hud/vendor/vendor_window.ts']).map((t: { key: string }) => t.key),
+    ).toEqual(['vendor-tool-gate', 'vendor-buy-count']);
+    // The count leaf and the prompt module reach ONLY the count-row target.
+    expect(
+      resolveTargets(['src/sim/vendor_buy_stack.ts']).map((t: { key: string }) => t.key),
+    ).toEqual(['vendor-buy-count']);
+    expect(
+      resolveTargets(['src/ui/hud/vendor/buy_quantity_prompt_window.ts']).map(
+        (t: { key: string }) => t.key,
+      ),
+    ).toEqual(['vendor-buy-count']);
+    // A sim-only content change is still visual, because the gate changes what
+    // the goods grid paints.
+    expect(classifyDiff(['src/sim/content/vendor_row_gates.ts']).isVisual).toBe(true);
+  });
+
+  it('gather-node content shoots all three surfaces it is visible on', () => {
+    // Gather-node placement shows up in three places: the world map's terrain and
+    // labels, the quest-objective blobs, and the in-world props. A `when` list that
+    // only names the blobs would silently skip the other two, and the omission is
+    // invisible because a missing target just means one fewer screenshot. Pinning
+    // the resolved key ORDER makes a typo in either list red instead.
+    expect(
+      resolveTargets(['src/sim/content/gather_nodes.ts']).map((t: { key: string }) => t.key),
+    ).toEqual(['world-map', 'gather-quest-map-areas', 'gather-node']);
+    // The quest-blob geometry lives in the sim leaf, and only the blob target
+    // depends on it, so that path resolves to exactly one.
+    expect(resolveTargets(['src/sim/quest_targets.ts']).map((t: { key: string }) => t.key)).toEqual(
+      ['gather-quest-map-areas'],
+    );
+    // Both are visual, so a placement-only or geometry-only change never falls
+    // through to "nothing to shoot".
+    expect(classifyDiff(['src/sim/content/gather_nodes.ts']).isVisual).toBe(true);
+    expect(classifyDiff(['src/sim/quest_targets.ts']).isVisual).toBe(true);
+  });
+
+  it('maps the gossip Crafting shortcut from both the core and the dialog controller', () => {
+    // A rename of the target key or a `when` trim would silently stop
+    // capturing (a missing target is just one fewer screenshot), so pin the
+    // routing from BOTH implicating paths and the variant list. The dialog
+    // controller path also implies the attunement-legibility target, so use
+    // toContain, not toEqual, for that arm.
+    const fromCore = classifyDiff(['src/ui/hud/quest/master_craft_core.ts']);
+    expect(fromCore.specific.map((t: { key: string }) => t.key)).toContain(
+      'gossip-crafting-shortcut',
+    );
+    expect(
+      classifyDiff(['src/ui/hud/quest/quest_dialog_controller.ts']).specific.map(
+        (t: { key: string }) => t.key,
+      ),
+    ).toContain('gossip-crafting-shortcut');
+    const target = fromCore.specific.find(
+      (t: { key: string }) => t.key === 'gossip-crafting-shortcut',
+    );
+    expect(target?.variants.map((v: { key: string }) => v.key)).toEqual([
+      'dialog-desktop',
+      'dialog-mobile',
+      'window-desktop',
+    ]);
+    // Every variant must seed the camera-mode prompt flag before the document
+    // loads: page.screenshot clips paint overlapping chrome into the dialog
+    // region, and a live prompt was covering the Crafting row in the after
+    // desktop dialog shot. beforeLoad is a function (evaluateOnNewDocument),
+    // so pin presence rather than its body string.
+    for (const variant of target?.variants ?? []) {
+      expect(typeof variant.beforeLoad, `${variant.key} beforeLoad`).toBe('function');
+    }
   });
 });

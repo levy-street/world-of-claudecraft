@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { PERK_THRESHOLDS } from '../src/sim/content/professions';
 import { requiredReagentCount, resolveCraftForRecipe } from '../src/sim/professions/crafting';
 import { isStationActive, placeMobileCraftingStation } from '../src/sim/professions/mobile_station';
-import { rechargeCost, slotEffect } from '../src/sim/professions/tools';
+import { rechargeDiscountFor, slotEffect } from '../src/sim/professions/tools';
 import {
   isSpecialized,
   materialCostMultiplier,
@@ -138,29 +138,33 @@ describe('material-cost discount when crafting (#1134, crafting.ts)', () => {
 });
 
 describe('specialized recharge discount composes with the original-crafter discount (#1134, tools.ts)', () => {
-  it('a specialized original recharger pays strictly less than a merely-original (non-specialized) recharger', () => {
-    const specializedSlot = slotEffect('gatherers_cache', { craftedBy: 'player_alice' });
-    const plainSlot = slotEffect('gatherers_cache', { craftedBy: 'player_alice' });
-    const specializedCost = rechargeCost(specializedSlot, 'player_alice', {
-      [CRAFT_ID]: THRESHOLD,
-    });
-    const plainOriginalCost = rechargeCost(plainSlot, 'player_alice');
-    expect(specializedCost.materials).toBeLessThanOrEqual(plainOriginalCost.materials);
-    expect(specializedCost.ticks).toBeLessThan(plainOriginalCost.ticks);
+  it('a specialized original recharger pays a strictly deeper discount than a merely-original one', () => {
+    const slot = slotEffect('gatherers_cache', { craftedBy: 'player_alice' });
+    const specialized = rechargeDiscountFor(slot, 'player_alice', { [CRAFT_ID]: THRESHOLD });
+    const plainOriginal = rechargeDiscountFor(slot, 'player_alice');
+    expect(specialized).toBeLessThan(plainOriginal);
+    // Composition, not replacement: the specialization multiplier multiplies
+    // INTO the original-crafter half (R39: both discounts compose into the
+    // count unchanged).
+    expect(specialized).toBeCloseTo(
+      plainOriginal * rechargeDiscountMultiplier({ [CRAFT_ID]: THRESHOLD }, CRAFT_ID),
+      10,
+    );
   });
 
   it('a specialized NON-original recharger gets no additional discount: the perk is for recharging your own work', () => {
     const slot = slotEffect('gatherers_cache', { craftedBy: 'player_alice' });
-    const genericCost = rechargeCost(slot, 'player_bob');
-    const specializedButNotOriginal = rechargeCost(slot, 'player_bob', { [CRAFT_ID]: THRESHOLD });
-    expect(specializedButNotOriginal).toEqual(genericCost);
+    expect(rechargeDiscountFor(slot, 'player_bob', { [CRAFT_ID]: THRESHOLD })).toBe(
+      rechargeDiscountFor(slot, 'player_bob'),
+    );
+    expect(rechargeDiscountFor(slot, 'player_bob')).toBe(1);
   });
 
-  it('omitting rechargerSkills behaves exactly like the pre-#1134 original-crafter-only discount', () => {
+  it('omitting rechargerSkills behaves exactly like the original-crafter-only discount', () => {
     const slot = slotEffect('gatherers_cache', { craftedBy: 'player_alice' });
-    const withEmptySkills = rechargeCost(slot, 'player_alice', {});
-    const withNoArg = rechargeCost(slot, 'player_alice');
-    expect(withEmptySkills).toEqual(withNoArg);
+    expect(rechargeDiscountFor(slot, 'player_alice', {})).toBe(
+      rechargeDiscountFor(slot, 'player_alice'),
+    );
   });
 });
 

@@ -424,15 +424,18 @@ describe('dungeon finder view core', () => {
     expect(view.board.listings[0].canApply).toBe(false);
   });
 
-  it('a leader OWN listing leaves Open listings for the myListing panel, lockout or not (#2030 followup, superseded by #2031)', () => {
-    // Reconciles the #2030-followup contract with #2724 (issue 2031, "hide
-    // premade groups the player already belongs to"): the leader's own
-    // listing no longer renders as a board row AT ALL (it lives in the
-    // separate myListing panel), so the old law "a mid-run lockout must not
-    // drop my own row" is now vacuous for the board. What survives of
-    // #2030 here: the own-group hide must come from MEMBERSHIP, never from
-    // the lockout filter, so the myListing panel keeps rendering it and a
-    // lockout still cannot orphan the leader's controls.
+  it('hides the leader OWN listing from Open listings, lockout or not; the myListing panel keeps it (issue 2031, superseding the #2030 followup)', () => {
+    // History: the #2030 followup pinned the leader's own row VISIBLE in Open
+    // listings under a lockout, so the leader would not lose their row. Issue
+    // 2031 then hid every already-in-group listing from the browse list (the
+    // row's home is the myListing panel), which deliberately supersedes that
+    // expectation; the release landed the filter without updating this test,
+    // reddening its own tip. The lockout stays in the input so the #2030
+    // path is still exercised: it must neither resurrect the row nor lose
+    // the myListing panel. The release later landed its own reconciliation
+    // of the same red (33729a9716); this merge unions the two, keeping the
+    // positive-control and unlocked arms and adopting the release's full
+    // myListing object assertion.
     const heroicListing = {
       id: 8,
       activityId: 'hollow_crypt_heroic',
@@ -444,19 +447,60 @@ describe('dungeon finder view core', () => {
       members: [{ cls: 'warrior' as const, level: 20, role: 'tank' as const }],
     };
     const myListing = { id: 8, activityId: 'hollow_crypt_heroic', tags: [], applicants: [] };
-    const view = live(
+    // The positive control: an unrelated leader's unlocked listing must
+    // SURVIVE both arms, so an empty result can only mean the own row was
+    // hidden, never that the loop produced nothing (a content-id rename
+    // would otherwise green this test forever).
+    const otherListing = {
+      id: 9,
+      activityId: 'hollow_crypt_normal',
+      leaderName: 'Other',
+      tags: [],
+      size: 1,
+      capacity: 5,
+      needed: { tank: 0, healer: 1, dps: 3 },
+      members: [{ cls: 'warrior' as const, level: 20, role: 'tank' as const }],
+    };
+    const locked = live(
       buildDungeonFinderView(
         input({
           tab: 'board',
           playerLevel: 20,
-          board: [heroicListing],
+          board: [heroicListing, otherListing],
           info: makeInfo('sim', { myListing }),
           lockouts: [{ id: 'hollow_crypt:heroic', msRemaining: 3_600_000 }],
         }),
       ),
     );
-    expect(view.board.listings.map((l) => l.id)).toEqual([]);
-    expect(view.board.myListing).toEqual(myListing);
+    expect(locked.board.listings.map((l) => l.id)).toEqual([9]);
+    // The lockout must not filter the leader's own management panel (the
+    // release's full-object assertion, adopted at the merge).
+    expect(locked.board.myListing).toEqual({
+      id: 8,
+      activityId: 'hollow_crypt_heroic',
+      tags: [],
+      applicants: [],
+    });
+    // Same shape without the lockout: the hide comes from the
+    // already-in-group rule, not the lockout path.
+    const unlocked = live(
+      buildDungeonFinderView(
+        input({
+          tab: 'board',
+          playerLevel: 20,
+          board: [heroicListing, otherListing],
+          info: makeInfo('sim', { myListing }),
+          lockouts: [],
+        }),
+      ),
+    );
+    expect(unlocked.board.listings.map((l) => l.id)).toEqual([9]);
+    expect(unlocked.board.myListing).toEqual({
+      id: 8,
+      activityId: 'hollow_crypt_heroic',
+      tags: [],
+      applicants: [],
+    });
   });
 
   it('does not hide a listing over a lockout on a DIFFERENT dungeon or a lockout-free difficulty (#2030 followup)', () => {

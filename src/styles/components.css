@@ -4688,6 +4688,13 @@
     background: linear-gradient(#8a6a26, #5a4413 55%, #473409);
     color: #ffe6a8;
   }
+  /* Coarse-pointer touch floor for the whole confirm family (the R40 dialog
+     made this modal a routine mobile surface; the prof-effect-btn idiom). */
+  @media (pointer: coarse) {
+    #confirm-dialog .cd-actions .btn {
+      min-height: 40px;
+    }
+  }
 
   .native-update-backdrop {
     position: fixed;
@@ -5161,6 +5168,17 @@
     opacity: 0.45;
     cursor: default;
   }
+  /* A row whose tool carries a wield requirement the viewer has not met yet
+     (vendor_row_gates.ts, the R22 advisory surface). The row itself stays
+     enabled and sells; only the .vi-sub requirement line marks the state, so
+     it takes the same error tint an unsatisfied cost takes just below rather
+     than the dim sub-line grey it would otherwise inherit. Information,
+     never decoration: the line states the requirement in text, and the tint
+     only says the requirement is the unmet one. The class name predates the
+     advisory turn; it is a style hook, not a claim the row refuses. */
+  .vendor-item.vendor-locked .vi-sub {
+    color: var(--color-text-error);
+  }
   /* An unaffordable fee (train and unbind rows emit .unaffordable) tints
      like an unsatisfied cost everywhere else in the language; the row's
      disabled opacity alone left the reason invisible. */
@@ -5178,6 +5196,61 @@
   }
   .vendor-item-bulk .vi-name {
     color: var(--gold);
+  }
+  /* The 1x/5x/10x/custom purchase control row (phase 21): one strip of
+     toggle chips above the goods grid. The selected state rides
+     aria-pressed (the same attribute the painter sets), so style and
+     semantics cannot drift apart. */
+  .vendor-qty-row {
+    display: flex;
+    gap: 4px;
+    margin: 4px 0 6px;
+  }
+  .vendor-qty-btn {
+    flex: 0 0 auto;
+    min-width: 34px;
+    padding: 3px 8px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    cursor: var(--cursor-point);
+    background: transparent;
+    color: inherit;
+    font-family: var(--ui-font);
+    font-size: 11px;
+  }
+  .vendor-qty-btn:hover {
+    background: #ffffff20;
+  }
+  .vendor-qty-btn[aria-pressed="true"] {
+    border-color: var(--gold-dim);
+    background: #ffffff20;
+    color: var(--gold);
+  }
+  /* forced-colors drops the gold border/fill/text tints above to the same
+     system values as an unpressed chip, so the armed multiple would read by
+     colour alone. Pin the pressed chip to the system highlight pair (the
+     .ui-icon-art forced-color-adjust precedent in base.css; the
+     crafting-commission chip solves the same problem with a redundant
+     non-colour pip instead). */
+  @media (forced-colors: active) {
+    .vendor-qty-btn[aria-pressed="true"] {
+      background: Highlight;
+      color: HighlightText;
+      forced-color-adjust: none;
+    }
+  }
+  /* The count chip on a multiplied row: the control row's own {count}x
+     grammar in a muted read, sitting just before the whole-count price. */
+  .vendor-item .vi-qty {
+    margin-right: 4px;
+    opacity: 0.85;
+  }
+  @media (pointer: coarse) {
+    .vendor-qty-btn {
+      min-width: 40px;
+      min-height: 40px;
+      box-sizing: border-box;
+    }
   }
   .vendor-sell-junk {
     display: flex;
@@ -5383,10 +5456,26 @@
     flex: 1 1 0;
     min-width: 0;
   }
+  /* One block on purpose (a second same-specificity block for the cap
+     invited a cascade surprise): the flex column slot, plus the height cap.
+     The family rows are taller than the retired 10px grid, and the card is
+     pinned above the scrolling .crafting-body: without the cap the attuned
+     card (two-line rows with chips) runs past 500px and squeezes the recipe
+     pane to its 120px minimum even at 1600x900, and DESIGN.md names
+     1366x768 a supported target. So the LIST scrolls internally past 264px
+     (the mobile arm's card cap is the precedent; hud.mobile.css lifts this
+     cap because there the CARD is the one scroller). The collapsed list
+     opts back out below: its one-line rows are what the collapse buys, the
+     whole list fits, and capping it would just add a needless scrollbar. */
   .profession-identity-card .profession-skill-list {
     flex: 1 1 0;
     min-width: 0;
     align-self: start;
+    max-height: 264px;
+    overflow-y: auto;
+  }
+  .profession-identity-card .profession-skill-list.uniform-collapsed {
+    max-height: none;
   }
   .profession-identity-card h3 {
     margin: 0 0 8px;
@@ -5398,6 +5487,15 @@
   }
   .profession-archetype-crest {
     filter: drop-shadow(var(--art-shadow-lg));
+  }
+  /* Every card paragraph sits on the 12px narrative floor: without this the
+     return-cost line and the unattuned / syncing narratives (bare <p> with no
+     class rule) inherited the 16px document default, out-typing the card's
+     own 13px heading. :where() keeps this at zero class specificity so the
+     card's CLASSED paragraph rules (tutorial below) stay authoritative for
+     their own elements. */
+  :where(.profession-identity-card) p {
+    font-size: 12px;
   }
   .profession-identity-heading {
     display: flex;
@@ -5419,7 +5517,11 @@
     grid-template-columns: max-content 1fr;
     gap: 3px 8px;
     margin: 0 0 8px;
-    font-size: 11px;
+    /* 12px, never lower: DESIGN.md's authored-body floor. Phase 22 raised
+       the card's narrative text to it; the two settled exemptions below it
+       are the family's bordered 10px pill chips and its 11px tabular-nums
+       skill value (the Q28 family spec). */
+    font-size: 12px;
   }
   .profession-identity-summary dt {
     color: var(--color-text-muted);
@@ -5433,39 +5535,44 @@
     padding: 0;
     list-style: none;
   }
-  /* The list owns the column tracks and each row subgrids into them: auto-sized
-     role/cap columns would otherwise resize per row (each li its own grid), so
-     "Hobby" and "Major" rows drifted out of column with "Dormant knowledge". */
+  /* The skill rows reuse the professions window's row family (phase 22, the
+     Q28 ruling: .prof-craft-row head + chips anatomy, 13px names, the 11px
+     right-aligned tabular-nums value, bordered pill chips), so the card no
+     longer carries the app's only sub-11px data rows or its 9px uppercase
+     header. Card-scope overrides keep the compact inset rhythm without
+     forking the family; dormant rows dim through the family's own
+     .role-dormant name mute. */
   .profession-skill-list {
-    display: grid;
-    grid-template-columns: minmax(90px, 1fr) 38px minmax(72px, auto) minmax(88px, auto);
-    column-gap: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
   }
-  .profession-skill-row {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: subgrid;
+  .profession-identity-card .prof-craft-row {
     padding: 3px 0;
-    font-size: 10px;
+    border-radius: 0;
+    background: none;
   }
-  .profession-skill-header {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: subgrid;
-    padding: 2px 0 3px;
+  /* The uniform-chips caption (the option 3 collapse): when every row shares
+     one role and one cap the card states the pair once here and the rows
+     render craft plus skill only. Its .profession-skill-uniform-label child
+     is deliberately unstyled: plain caption text inheriting this rule's 12px
+     and muted color (the class is a structural and test hook, not an orphan
+     of the phase 14 kind). */
+  .profession-skill-uniform {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 0 0 5px;
+    margin-bottom: 3px;
     border-bottom: 1px solid var(--color-border-default);
+    font-size: 12px;
     color: var(--color-text-muted);
-    font-size: 9px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-  .profession-skill-row.role-dormant {
-    opacity: 0.72;
   }
   .profession-identity-tutorial,
   .profession-identity-nudges {
     color: var(--color-text-muted);
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.35;
   }
   /* One recipe card (the showcase inset-card idiom): the whole first row stays
@@ -5526,6 +5633,12 @@
      in the text are the actual signal (the tint is a redundant hint). */
   .crafting-reagent.unsat {
     color: var(--color-text-error);
+  }
+  /* The fine-substitution suffix (the UX pass): a tint over words that are
+     already the signal (the color-independence rule), never the signal
+     itself. */
+  .crafting-fine-sub {
+    color: var(--gold-dim);
   }
   /* The Craft affordance chip: the gold-gradient primary the mailbox send
      button established. It is decoration inside the row-button (the whole row
@@ -5949,6 +6062,18 @@
   }
   .bag-item:hover {
     filter: brightness(1.25);
+  }
+  /* An unknown-id stack (stale-client fallback cell) exposes no click action,
+     so it must not wear the click affordance: no hover lift, and the themed
+     arrow cursor WHENEVER the cell is not draggable (trade or vendor open).
+     While it IS draggable, the later .bag-item[draggable="true"] rule wins at
+     equal specificity by source order, deliberately: the grab cursor is the
+     honest affordance for the cell's one live action. */
+  .bag-item[aria-disabled="true"] {
+    cursor: var(--cursor-arrow);
+  }
+  .bag-item[aria-disabled="true"]:hover {
+    filter: none;
   }
   .bag-item .item-icon {
     /* a replaced element keeps its intrinsic size under width:auto even when
@@ -6569,6 +6694,26 @@
   .deeds-strip-label {
     font-family: var(--title-font);
   }
+  /* A recent-strip crest is a jump button to its deed's card: a quiet chrome
+     reset around the crest, with the affordance carried by hover/focus. */
+  .deeds-recent-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    margin: 0;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    background: none;
+    cursor: var(--cursor-point);
+  }
+  .deeds-recent-item:hover {
+    border-color: var(--gold-dim);
+  }
+  .deeds-recent-item:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
   .deeds-nearest-row {
     display: inline-flex;
     align-items: center;
@@ -6659,6 +6804,30 @@
   .deed-card.earned {
     border-color: #6a5320;
     background: linear-gradient(160deg, #221b0e, #120e08);
+  }
+  /* The jump spotlight (a chat deed-link or recent-strip landing): one gold
+     pulse that fades on its own, no timer in the painter. Reduced motion
+     swaps in a static ring, cleared by the next repaint. */
+  .deed-card-flash {
+    animation: deed-card-flash 1.6s ease-out 1;
+  }
+  @keyframes deed-card-flash {
+    0% {
+      box-shadow:
+        inset 0 0 0 2px var(--gold),
+        0 0 12px 2px rgba(230, 199, 106, 0.55);
+    }
+    100% {
+      box-shadow:
+        inset 0 0 0 2px transparent,
+        0 0 0 0 rgba(230, 199, 106, 0);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .deed-card-flash {
+      animation: none;
+      box-shadow: inset 0 0 0 2px var(--gold-dim);
+    }
   }
   .deed-crest {
     width: 40px;
@@ -7167,6 +7336,88 @@
     height: 100%;
     background: linear-gradient(180deg, var(--gold), var(--gold-dim) 85%);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  }
+  /* The slotted tool effect, under its profession's skill bar. Quieter than the
+     bar above it on purpose: it is a state readout, not progress, and it must
+     not compete with the thing the row is actually about. Wraps rather than
+     truncates, because both halves (which effect, how many charges) are the
+     whole content and a clipped one says nothing. */
+  .prof-effect {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 8px;
+    font-size: 11px;
+    color: var(--color-text-light);
+  }
+  .prof-effect-name {
+    color: var(--gold-dim);
+  }
+  /* Spent dims the whole line rather than recolouring it red: the effect being
+     used up is the expected end of its life, not a fault. */
+  .prof-effect-spent {
+    opacity: 0.65;
+  }
+  /* Tabular figures so a ticking charge count does not jitter its own row,
+     matching .prof-skill-value directly above it. */
+  .prof-effect-charges {
+    font-variant-numeric: tabular-nums;
+  }
+  /* The recharge cost preview beside the button (the UX pass): reads as a
+     price, so it takes the same gold the effect name carries, dimmed a
+     step under it, with tabular figures for the count (the charges rule
+     above). Previously an orphan class inheriting the row default (the
+     phase 14 QA). */
+  .prof-effect-price {
+    color: var(--gold-dim);
+    opacity: 0.85;
+    font-variant-numeric: tabular-nums;
+  }
+  /* The slot/recharge affordances the acquisition craft opened: compact
+     .btn variants on the effect line and in their own wrapping action row.
+     Padding narrows on fine pointers; coarse pointers get the explicit
+     40px target floor the sibling window buttons set (the delve board
+     idiom), since .btn itself carries no floor. */
+  .prof-effect-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    margin-top: 4px;
+  }
+  .prof-effect-btn {
+    margin-top: 0;
+    margin-right: 0;
+    padding: 2px 10px;
+    font-size: 11px;
+  }
+  /* The R40 prompt-mode chip on a live slot line: words, not hue, per the
+     color-independence rule (the chip IS the second signal). */
+  .prof-effect-mode {
+    font-size: 10px;
+    color: var(--color-text-light);
+    border: 1px solid currentcolor;
+    border-radius: 3px;
+    padding: 0 4px;
+    opacity: 0.85;
+  }
+  /* The "Ask each use" toggle beside the slot buttons: a real labeled
+     checkbox, baseline-aligned with the compact buttons. */
+  .prof-effect-mode-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--color-text-light);
+    cursor: pointer;
+  }
+  @media (pointer: coarse) {
+    .prof-effect-btn {
+      min-height: 40px;
+    }
+    /* The checkbox target grows with the buttons on coarse pointers. */
+    .prof-effect-mode-toggle {
+      min-height: 40px;
+    }
   }
   .prof-pips {
     display: inline-flex;
@@ -9493,6 +9744,16 @@
   .vcupb-rule-mark.r5 {
     border-radius: 2px;
     background: #b8e8a0;
+  }
+  /* unrated-bout notice (practice / bot-backfill): a warning-tinted extra row.
+     Inverted triangle: r4 already owns the upright one, and the section rule
+     is a distinct glyph per row. */
+  .vcupb-rule-mark.unrated {
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    background: #e8b8a0;
+  }
+  .vcupb-rule.vcupb-unrated {
+    color: #e8c9a8;
   }
   .vcupb-rule-text {
     min-width: 0;

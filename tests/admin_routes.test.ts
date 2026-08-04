@@ -84,6 +84,18 @@ describe('admin route permission map', () => {
     expect(permissionForAdminRoute('POST', '/admin/api/maps/9/unpublish')).toBe('content.moderate');
     expect(permissionForAdminRoute('GET', '/admin/api/me')).toBe('any');
     expect(permissionForAdminRoute('POST', '/admin/api/staff/roles')).toBe('staff.manage');
+    // R35 GM professions tooling: the inspector is a read; the two restores
+    // MINT value onto a character, so the write permission is the whole gate
+    // (a downgrade to a read permission would let any viewer mint items).
+    expect(permissionForAdminRoute('GET', '/admin/api/characters/42/professions')).toBe(
+      'accounts.read',
+    );
+    expect(
+      permissionForAdminRoute('POST', '/admin/api/moderation/characters/42/restore-item'),
+    ).toBe('moderation.act');
+    expect(
+      permissionForAdminRoute('POST', '/admin/api/moderation/characters/42/restore-slot'),
+    ).toBe('moderation.act');
   });
 
   it('distinguishes wrong-method hits from unknown paths', () => {

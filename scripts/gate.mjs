@@ -4,8 +4,10 @@
 // 8-shard matrix; this script runs the SAME combined step list serially with
 // ONE full unsharded vitest run by design (no shard flag). The parallel lint
 // job's changed-files biome is pulled forward as an early fast-fail; on a
-// release/** branch the steps run release-tier (I18N_RELEASE_TIER=1), mirroring
-// the release-gate test job's job-level flag. This script exists because
+// release/** branch the step list ADDS one dedicated release-tier step
+// (I18N_RELEASE_TIER=1 over the suites that read it), mirroring the release-i18n
+// job; the full suite stays at PR tier in both places so an outstanding locale
+// fill can never mask a real test failure (#2820). This script exists because
 // ad-hoc shell chains get the gate wrong in two known ways: piping `npm test`
 // through `tail` masks vitest's exit code (a red run can print "PASS"), and an
 // unbounded full run saturates every core and flakes the heavy sim suites when
@@ -19,6 +21,7 @@
 // changed-file biome are never treated as cacheable "green forever".
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
+import { resolveAvailableMemoryBytes } from './lib/gate_memory.mjs';
 import { buildFullGateSteps } from './lib/gate_steps.mjs';
 import { computeGateWorkers, resolveGateWorkerTierCap } from './lib/gate_workers.mjs';
 import {
@@ -32,13 +35,18 @@ import { FFMPEG_PATH, FFPROBE_PATH } from './sfx/ffmpeg_paths.mjs';
 // second `npm run gate` (or any other heavy vitest run) is happening in a sibling
 // worktree on the same machine, which this repo's own parallel-worktree workflow makes
 // routine. computeGateWorkers additionally clamps to available memory, since a vitest
-// fork worker that starts swapping presents as a flaky failure, not a slow one. Optional
-// GATE_WORKER_TIER=low|medium|high applies a further cap AFTER the free-mem clamp (never
-// instead of it). GATE_MAX_WORKERS=<n> remains the expert absolute override when you
-// deliberately share the machine or raise workers on a quiet high-tier host.
+// fork worker that starts swapping presents as a flaky failure, not a slow one. The
+// availability figure comes from resolveAvailableMemoryBytes, because os.freemem() reads
+// near zero on a healthy macOS host and used to collapse the clamp to a single worker (see
+// lib/gate_memory.mjs). Optional GATE_WORKER_TIER=low|medium|high applies a further cap
+// AFTER that clamp (never instead of it). GATE_MAX_WORKERS=<n> remains the expert absolute
+// override when you deliberately share the machine or raise workers on a quiet high-tier host.
 const workers = computeGateWorkers({
   cpuCount: os.availableParallelism(),
-  freeMemBytes: os.freemem(),
+  freeMemBytes: resolveAvailableMemoryBytes({
+    platform: process.platform,
+    freeMemBytes: os.freemem(),
+  }),
   envOverride: process.env.GATE_MAX_WORKERS,
   tierCap: resolveGateWorkerTierCap(process.env.GATE_WORKER_TIER),
 });
@@ -106,13 +114,21 @@ const branch =
   spawnSync('git', ['branch', '--show-current'], { encoding: 'utf8', shell }).stdout?.trim() ?? '';
 const releaseTier = branch.startsWith('release/');
 // Base env for every step. Per-step overlays (e.g. pretest skip on vitest) merge on top.
-const baseEnv = releaseTier ? { ...process.env, I18N_RELEASE_TIER: '1' } : { ...process.env };
+// The release tier is NOT applied here. It rides on the one dedicated vitest step
+// buildFullGateSteps adds for a release branch (lib/gate_steps.mjs), mirroring the
+// release-i18n job in ci.yml: the full suite stays at PR tier so a red there always
+// means a real regression, never an outstanding locale fill (issue #2820).
+const baseEnv = { ...process.env };
 
 // Shared step list (Phase 2 generate-once + Phase 8 turbo cacheable pure steps).
-const steps = buildFullGateSteps(workers);
+// The bot build rides inside buildFullGateSteps (scripts/lib/gate_steps.mjs), so
+// the packet's R7 step stays in every consumer of the shared list.
+const steps = buildFullGateSteps(workers, { releaseTier });
 
 if (releaseTier) {
-  console.log(`[gate] release branch "${branch}": running release-tier (I18N_RELEASE_TIER=1)`);
+  console.log(
+    `[gate] release branch "${branch}": adding the release-tier i18n step (I18N_RELEASE_TIER=1)`,
+  );
 }
 
 for (const { name, cmd, args, hint, env: envOverlay } of steps) {

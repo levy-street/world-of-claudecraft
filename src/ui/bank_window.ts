@@ -46,11 +46,16 @@ import {
 import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
-import { FOCUSABLE_SELECTOR } from './focus_manager';
 import { formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
+import { knownItemDef } from './known_item';
 import type { PainterHostPresentation } from './painter_host';
+import {
+  installPromptDialog as installModalPromptDialog,
+  type PromptDialogHandle,
+} from './prompt_dialog';
 import { svgIcon } from './ui_icons';
+import { unknownItemIconHtml } from './unknown_item_icon';
 
 // The unranked quality fallback as a CSS custom property. The shared QUALITY_COLOR
 // map carries the real per-quality hex; this token covers an item with no quality
@@ -62,10 +67,6 @@ const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
 // MAIL_INFO_GRACE_MS semantics with a bank-named constant, same 3000 value).
 const BANK_INFO_GRACE_MS = 3_000;
 
-// Monotonic id source for the ad-hoc prompt dialogs' aria-labelledby target, so the
-// id never couples to class ordering (mirrors bags' promptDialogSeq).
-let promptDialogSeq = 0;
-
 // The confirm / quantity prompts mount into #prompt-stack (outside #bank-window). A
 // window-level close() removes any that are open so it never leaves an orphaned
 // aria-modal dialog floating over the closed window.
@@ -76,7 +77,13 @@ function dismissBankPrompts(): void {
 
 // The bank's window-local filter preferences persist under their OWN key, distinct
 // from the bags' 'woc_bag_filter': the two windows share the state SHAPE (BagFilterState)
-// and the tolerant serialize/parse, but keep independent category/sort/search choices.
+// and the tolerant serialize/parse, but keep independent category/sort choices. The
+// SEARCH is per-visit only: close() resets the live value, persistFilter strips it
+// from every write, and construction never restores it (and eagerly scrubs a
+// non-empty stored query so storage never holds one even if the player never opens
+// the bank this session). A reopened bank always starts unfiltered (a stale query
+// silently hides slots). The bags window still keeps its search across sessions;
+// aligning the family is a named follow-up, not an accident of this module.
 const BANK_FILTER_KEY = 'woc_bank_filter';
 
 // How long the transient deposit-all summary stays on screen before it clears. The
@@ -95,6 +102,7 @@ const BANK_CATEGORY_LABEL_KEYS: Record<BagCategory, TranslationKey> = {
   armor: 'hudChrome.bags.filterArmor',
   consumable: 'hudChrome.bags.filterConsumable',
   material: 'hudChrome.bags.filterMaterial',
+  tool: 'hudChrome.bags.filterTool',
   quest: 'hudChrome.bags.filterQuest',
   mount: 'hudChrome.bags.filterMount',
 };
@@ -174,13 +182,29 @@ export class BankWindow {
   private openerFocus: HTMLElement | null = null;
   private openedAt = 0;
 
-  // Window-local filter state: category chips + sort + live search, persisted across
-  // sessions under BANK_FILTER_KEY. Pure logic lives in bank_filter.ts (reusing
-  // bag_filter.ts); this is the consumer. Tolerant parse: corrupt storage falls back
-  // to the default filter, never throwing.
+  // Window-local filter state: category chips + sort persist across sessions under
+  // BANK_FILTER_KEY; the live search is per-visit and starts empty even when a
+  // reload while the bank sat open left a query in storage (close() never ran, see
+  // BANK_FILTER_KEY). A non-empty stored search is also rewritten out at boot so
+  // storage never holds a stranded query when the player never opens the bank.
+  // Pure logic lives in bank_filter.ts (reusing bag_filter.ts); this is the
+  // consumer. Tolerant parse: corrupt storage falls back to the default filter,
+  // never throwing.
   private filter: BagFilterState = (() => {
     try {
-      return parseBagFilter(localStorage.getItem(BANK_FILTER_KEY));
+      const parsed = parseBagFilter(localStorage.getItem(BANK_FILTER_KEY));
+      const next = { ...parsed, search: '' };
+      // Scrub a legacy or reload-stranded query at construction so storage never
+      // holds a search value even if the player never opens the bank this session.
+      // Category/sort stay; private-mode write failures are ignored like persistFilter.
+      if (parsed.search !== '') {
+        try {
+          localStorage.setItem(BANK_FILTER_KEY, serializeBagFilter(next));
+        } catch {
+          /* storage unavailable (private mode); live state is still search-free */
+        }
+      }
+      return next;
     } catch {
       return { ...DEFAULT_BAG_FILTER };
     }
@@ -235,6 +259,12 @@ export class BankWindow {
     // flashes a stale line, and no late timer fires render() on the hidden window.
     this.clearDepositStatus();
     this.clearDepositAllPending();
+    // The search is a per-visit filter: left set, the next open would start
+    // pre-narrowed to a stale query (slots hidden with no cue why). Reset the
+    // live value; the persist rewrite also scrubs any legacy pre-fix query out
+    // of storage (persistFilter never stores the search). Category/sort stay.
+    this.filter.search = '';
+    this.persistFilter();
     const el = this.deps.root();
     el.style.display = 'none';
     el.inert = false;
@@ -290,7 +320,7 @@ export class BankWindow {
     // every rebuild, so capture its scroll offset and reapply it to the fresh one,
     // else a withdraw snaps the list back to the top (the bags idiom).
     const prevScrollTop = el.querySelector('.bank-scroll')?.scrollTop ?? 0;
-    const model = buildBankView(this.deps.world().bankInfo, (id) => ITEMS[id]);
+    const model = buildBankView(this.deps.world().bankInfo, (id) => knownItemDef(ITEMS, id));
     el.innerHTML =
       `<div class="panel-title"><span>${esc(t('hudChrome.bank.title'))} <span class="panel-subtitle">${esc(t('hudChrome.bank.subtitle'))}</span></span>` +
       `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.bank.close'))}">${svgIcon('close')}</button></div>`;
@@ -387,12 +417,14 @@ export class BankWindow {
       return;
     }
     // Apply the window-local filter/sort. slotIndex rides through, so a filtered or
-    // sorted cell still acts on its ORIGINAL bank slot; filterBankSlots drops unknown-id
-    // (dormant) slots exactly as the bags filter does.
+    // sorted cell still acts on its ORIGINAL bank slot; filterBankSlots keeps
+    // unknown-id slots visible in the everything view (bank contents are server
+    // truth, so a stale bundle can hold ids it predates, R34) and excludes them
+    // only from category chips and name searches, exactly as the bags filter does.
     const isDefault = bagFilterIsDefault(this.filter);
     const visible = filterBankSlots(
       slots,
-      (id) => ITEMS[id],
+      (id) => knownItemDef(ITEMS, id),
       this.filter,
       (id) => this.itemNameOf(id),
     );
@@ -405,19 +437,24 @@ export class BankWindow {
       return;
     }
     for (const slot of visible) {
-      const item = ITEMS[slot.itemId];
-      if (!item) continue;
+      const item = knownItemDef(ITEMS, slot.itemId);
       const cell = document.createElement('button');
       cell.type = 'button';
       cell.className = `bank-item q-${slot.qualityKey}`;
       const qColor = QUALITY_COLOR[slot.qualityKey] ?? QUALITY_DEFAULT_COLOR;
       cell.style.setProperty('--bank-slot-quality', qColor);
-      const itemName = itemDisplayName(item);
+      // Stale-client guard (R34): an id this bundle predates still holds a
+      // real, counted bank slot, so it renders (fallback icon, raw id as the
+      // label) instead of vanishing. The withdraw click stays live because the
+      // server resolves it by slotIndex, no def needed; only the def-derived
+      // tooltip body is replaced.
       cell.setAttribute(
         'aria-label',
-        t('itemUi.bags.itemAria', { item: itemName, count: this.fmt(slot.count) }),
+        item
+          ? t('itemUi.bags.itemAria', { item: itemDisplayName(item), count: this.fmt(slot.count) })
+          : t('itemUi.bags.unknownItemAria', { id: slot.itemId, count: this.fmt(slot.count) }),
       );
-      cell.innerHTML = `${this.deps.itemIcon(item)}<span class="bank-count">${slot.showCount ? esc(t('itemUi.bags.stackCount', { count: this.fmt(slot.count) })) : ''}</span>`;
+      cell.innerHTML = `${item ? this.deps.itemIcon(item) : unknownItemIconHtml(slot.itemId)}<span class="bank-count">${slot.showCount ? esc(t('itemUi.bags.stackCount', { count: this.fmt(slot.count) })) : ''}</span>`;
       cell.addEventListener('click', (ev) => {
         // On touch, the click that ends a long-press peek inspects the slot (its
         // tooltip is already shown) instead of withdrawing: the release dismisses
@@ -432,7 +469,10 @@ export class BankWindow {
         const partial = slot.showCount
           ? `<div class="tt-sub">${esc(t('hudChrome.bank.withdrawPartialHint'))}</div>`
           : '';
-        return `${this.deps.itemTooltip(item, slot.instance)}<div class="tt-sub">${esc(t('hudChrome.bank.withdrawHint'))}</div>${partial}`;
+        const body = item
+          ? this.deps.itemTooltip(item, slot.instance)
+          : `<div class="tt-title">${esc(slot.itemId)}</div><div class="tt-sub">${esc(t('itemUi.bags.unknownItem'))}</div>`;
+        return `${body}<div class="tt-sub">${esc(t('hudChrome.bank.withdrawHint'))}</div>${partial}`;
       });
       grid.appendChild(cell);
     }
@@ -453,10 +493,10 @@ export class BankWindow {
   }
 
   // Localized display name, used for search matching AND the name-sort so both agree
-  // with the visible cell. An unknown id (already dropped by filterBankSlots) falls back
-  // to the raw id defensively.
+  // with the visible cell. An unknown id falls back to the raw id: that is the label
+  // its cell renders (the stale-client guard above), so sort and search stay agreed.
   private itemNameOf(itemId: string): string {
-    const item = ITEMS[itemId];
+    const item = knownItemDef(ITEMS, itemId);
     return item ? itemDisplayName(item) : itemId;
   }
 
@@ -469,7 +509,7 @@ export class BankWindow {
     if (!grid) return;
     const info = this.deps.world().bankInfo;
     if (!info) return; // walked away; refreshIfChanged owns the grace-close
-    const model = buildBankView(info, (id) => ITEMS[id]);
+    const model = buildBankView(info, (id) => knownItemDef(ITEMS, id));
     if (model.kind !== 'bank') return;
     // The offset lives on the .bank-scroll wrapper; emptying the grid momentarily
     // collapses the wrapper's scroll height (clamping scrollTop to 0), so capture
@@ -558,7 +598,7 @@ export class BankWindow {
     deposit.textContent = t('hudChrome.bank.depositAll');
     deposit.disabled =
       this.depositAllPending ||
-      !hasDepositableMaterials(this.deps.world().inventory, (id) => ITEMS[id]);
+      !hasDepositableMaterials(this.deps.world().inventory, (id) => knownItemDef(ITEMS, id));
     deposit.addEventListener('click', () => this.onDepositAll());
     tools.appendChild(deposit);
 
@@ -568,7 +608,10 @@ export class BankWindow {
 
   private persistFilter(): void {
     try {
-      localStorage.setItem(BANK_FILTER_KEY, serializeBagFilter(this.filter));
+      // The search is stripped at the serialize boundary: it is per-visit state
+      // (close() resets it; construction never restores it), so no keystroke,
+      // chip, sort, or close write ever lands a query in storage.
+      localStorage.setItem(BANK_FILTER_KEY, serializeBagFilter({ ...this.filter, search: '' }));
     } catch {
       /* storage unavailable (private mode); the filter still works in-session */
     }
@@ -582,11 +625,8 @@ export class BankWindow {
     const world = this.deps.world();
     const info = world.bankInfo;
     if (!info) return; // walked away between render and click
-    const plan = planDepositAllMaterials(
-      world.inventory,
-      info.slots,
-      info.capacity,
-      (id) => ITEMS[id],
+    const plan = planDepositAllMaterials(world.inventory, info.slots, info.capacity, (id) =>
+      knownItemDef(ITEMS, id),
     );
     if (plan.sends.length === 0 && !plan.full) return; // nothing to do (button was disabled)
     for (const send of plan.sends) world.bankDeposit(send.slot, send.count);
@@ -798,7 +838,7 @@ export class BankWindow {
     dismissBankPrompts();
     const opener = document.activeElement as HTMLElement | null;
     const slot = this.deps.world().bankInfo?.slots[slotIndex];
-    const item = slot ? ITEMS[slot.itemId] : undefined;
+    const item = slot ? knownItemDef(ITEMS, slot.itemId) : undefined;
     const stack = document.getElementById('prompt-stack');
     if (!stack) return;
     const prompt = document.createElement('div');
@@ -859,81 +899,17 @@ export class BankWindow {
     }, 0);
   }
 
-  // WCAG 2.2 AA modal prompt wiring (the bags installPromptDialog recipe): role=dialog
-  // + aria-modal + aria-labelledby (the prompt text), a self-contained Tab cycle among
-  // the prompt's controls (mounted in #prompt-stack, outside this window's reach, so
-  // they own their own trap), an Escape close, and focus return to the opener. EVERY
-  // teardown path routes through dismiss(), which clears the #bank-window inert this
-  // sets BEFORE the prompt is removed; close() clears it too as a force-close backstop,
-  // so the window is never left inert while hidden.
+  // WCAG 2.2 AA modal prompt wiring, the shared recipe (src/ui/prompt_dialog.ts):
+  // #bank-window is the inert root while a prompt is open; close() clears it too
+  // as a force-close backstop, so the window is never left inert while hidden.
   private installPromptDialog(
     prompt: HTMLElement,
     opener: HTMLElement | null,
     close: () => void,
-  ): { dismiss: () => void; dismissAndReturn: () => void } {
-    prompt.setAttribute('role', 'dialog');
-    prompt.setAttribute('aria-modal', 'true');
-    const bankRoot = this.deps.root();
-    bankRoot.inert = true;
-    const titleEl = prompt.querySelector('.prompt-text') as HTMLElement | null;
-    if (titleEl) {
-      if (!titleEl.id) titleEl.id = `bank-prompt-title-${promptDialogSeq++}`;
-      prompt.setAttribute('aria-labelledby', titleEl.id);
-      // Name an unlabeled quantity field by the prompt's own question when it lacks a
-      // dedicated aria-label (WCAG 1.3.1 / 4.1.2).
-      const numInput = prompt.querySelector('.prompt-number');
-      if (numInput && !numInput.hasAttribute('aria-label')) {
-        numInput.setAttribute('aria-labelledby', titleEl.id);
-      }
-    }
-    const dismiss = (): void => {
-      bankRoot.inert = false;
-      close();
-    };
-    const dismissAndReturn = (): void => {
-      dismiss();
-      opener?.focus();
-    };
-    prompt.addEventListener('keydown', (e) => {
-      const ke = e as KeyboardEvent;
-      // Escape: stopPropagation, not just preventDefault. The input layer's
-      // window-level keydown runs the global escape action (closeAll) regardless of
-      // defaultPrevented, and prompt BUTTONS are not tag-exempt like inputs, so
-      // without it one keypress dismisses the prompt AND closes the whole window.
-      if (ke.key === 'Escape') {
-        ke.preventDefault();
-        ke.stopPropagation();
-        dismissAndReturn();
-        return;
-      }
-      // Enter / Space: stopPropagation for the same reason, keeping the default so
-      // native activation (Enter/Space on the confirm and cancel buttons) survives.
-      // A submit handler on the quantity input runs at the target phase and removes
-      // the prompt DURING this keydown, so a window-level gate keyed on the prompt's
-      // presence runs too late: without the stop, the same press hits the global
-      // chat/jump bind and steals the WCAG 2.4.3 focus return. The event path is
-      // fixed at dispatch, so this listener still runs after the detach; only THEN
-      // cancel the default too, or the browser runs the key's activation against
-      // the freshly re-landed focus (Enter ghost-clicking [data-close] and closing
-      // the whole window).
-      if (ke.key === 'Enter' || ke.key === ' ' || ke.code === 'Space') {
-        ke.stopPropagation();
-        if (!prompt.isConnected) ke.preventDefault();
-        return;
-      }
-      if (ke.key !== 'Tab') return;
-      const f = Array.from(prompt.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
-      if (f.length === 0) return;
-      const first = f[0];
-      const last = f[f.length - 1];
-      if (ke.shiftKey && document.activeElement === first) {
-        ke.preventDefault();
-        last.focus();
-      } else if (!ke.shiftKey && document.activeElement === last) {
-        ke.preventDefault();
-        first.focus();
-      }
+  ): PromptDialogHandle {
+    return installModalPromptDialog(prompt, opener, close, {
+      inertRoot: this.deps.root(),
+      idPrefix: 'bank-prompt-title',
     });
-    return { dismiss, dismissAndReturn };
   }
 }

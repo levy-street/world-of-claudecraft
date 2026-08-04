@@ -65,7 +65,13 @@ const PORTAL_DOT_RADIUS = 5;
 const PORTAL_NAME_OFFSET_Y = 9; // name drawn this many px above the dot
 const NPC_GLYPH_FONT = 'bold 15px Georgia';
 const NPC_GLYPH_READY = '?'; // a turn-in is ready
-const NPC_GLYPH_AVAILABLE = '!'; // a quest is available
+const NPC_GLYPH_AVAILABLE = '!'; // a quest is available (gold, blue, or dimmed by kind)
+// The cooldown variant's dim: the repeat-blue '!' drawn at this globalAlpha (a
+// work order inside its cadence window, marked where the NPC previously showed
+// nothing). Applied around the sprite blit, so the label cache keeps one
+// raster per (glyph, style); matches the minimap's NPC_GLYPH_COOLDOWN_ALPHA
+// and .np-marker.cooldown's opacity so all three surfaces dim identically.
+const NPC_GLYPH_COOLDOWN_ALPHA = 0.55;
 const ALLY_FONT = 'bold 11px Georgia';
 const ALLY_DOT_RADIUS = 4;
 const ALLY_NAME_OFFSET_Y = 8; // name drawn this many px above the dot
@@ -91,8 +97,10 @@ const QUEST_BADGE_LINE_WIDTH = 1.5;
 const QUEST_BADGE_TEXT_LIFT = 4; // px above the arc center to optically center digits
 
 // The `--color-map-*` design tokens the painter resolves once per redraw. These
-// mirror the colors the inline overworld-map render used verbatim.
-const MAP_COLOR_TOKENS = {
+// mirror the colors the inline overworld-map render used verbatim. Exported so the
+// suite pins EVERY entry against tokens.css (the minimap table's rationale; a missing
+// declaration resolves '' and the mark draws in default ink).
+export const MAP_COLOR_TOKENS = {
   ocean: '--color-map-ocean',
   label: '--color-map-label',
   outline: '--color-map-outline',
@@ -100,6 +108,7 @@ const MAP_COLOR_TOKENS = {
   portalLabel: '--color-map-portal-label',
   ping: '--color-map-ping',
   npcQuest: '--color-map-npc-quest',
+  npcQuestRepeat: '--color-map-npc-quest-repeat',
   questAreaFill: '--color-map-quest-area-fill',
   questAreaStroke: '--color-map-quest-area-stroke',
   questBadgeFill: '--color-map-quest-badge-fill',
@@ -237,7 +246,8 @@ export class MapWindowPainter {
     this.labels.beginRedraw();
 
     // Open ocean under everything, then composite only the current zone's cached
-    // terrain at its world position (+X is map-left, +Z map-down).
+    // terrain at its world position (+X is map-left, +Z map-up; R61: maxZ
+    // lands at the bitmap top, see the destY math below).
     // Smoothing stays ON for the scaled terrain blit, which is exactly why every
     // label blit below rounds its destination.
     const r = model.region;
@@ -364,18 +374,32 @@ export class MapWindowPainter {
       ctx.lineWidth = LABEL_LINE_WIDTH;
     }
 
-    // Quest-giver glyphs ('?' turn-in ready, '!' available): two sprites for the
-    // life of a resolved color set. The anchor is untouched, so the hover
-    // hit-test (npcMarkerAt, over the same mx/my) still lines up with the glyph.
+    // Quest-giver glyphs ('?' turn-in ready; '!' available in gold, repeat in
+    // the rare blue, cooldown in the blue dimmed): at most three sprites for
+    // the life of a resolved color set. The anchor is untouched, so the hover
+    // hit-test (npcMarkerAt, over the same mx/my) still lines up with the
+    // glyph. Never tier- or preset-gated: the marker is actionable info.
     const npcGlyph: TextSpriteStyle = {
       font: NPC_GLYPH_FONT,
       fill: colors.npcQuest,
       stroke: colors.outline,
       lineWidth: LABEL_LINE_WIDTH,
     };
+    const npcGlyphRepeat: TextSpriteStyle = {
+      font: NPC_GLYPH_FONT,
+      fill: colors.npcQuestRepeat,
+      stroke: colors.outline,
+      lineWidth: LABEL_LINE_WIDTH,
+    };
     for (const npc of model.npcs) {
-      const glyph = npc.ready ? NPC_GLYPH_READY : NPC_GLYPH_AVAILABLE;
-      this.labels.draw(ctx, glyph, npc.mx, npc.my, npcGlyph);
+      const glyph = npc.kind === 'ready' ? NPC_GLYPH_READY : NPC_GLYPH_AVAILABLE;
+      const repeatColored = npc.kind === 'repeat' || npc.kind === 'cooldown';
+      // Restore the PRIOR alpha, not a literal 1: nothing else dims this
+      // context today, but a literal would hardcode that caller state.
+      const priorAlpha = ctx.globalAlpha;
+      if (npc.kind === 'cooldown') ctx.globalAlpha = NPC_GLYPH_COOLDOWN_ALPHA;
+      this.labels.draw(ctx, glyph, npc.mx, npc.my, repeatColored ? npcGlyphRepeat : npcGlyph);
+      if (npc.kind === 'cooldown') ctx.globalAlpha = priorAlpha;
     }
 
     // Local player facing arrow.

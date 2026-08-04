@@ -157,10 +157,19 @@ class FakeDb implements SocialDb {
   setLastLogin(id: number, iso: string): void {
     this.lastLogins.set(id, iso);
   }
-  async guildMembers(
-    guildId: number,
-  ): Promise<
-    (CharInfo & { rank: GuildRank; lastLogin: string | null; activeTitle: string | null })[]
+  // Epoch-ms guild-join stamps (guild_members.joined_at). Unstamped members
+  // report null (the wire's defensive arm), never a fake epoch-0 "Veteran".
+  private joinedAts = new Map<number, number>();
+  setJoinedAt(id: number, epochMs: number): void {
+    this.joinedAts.set(id, epochMs);
+  }
+  async guildMembers(guildId: number): Promise<
+    (CharInfo & {
+      rank: GuildRank;
+      lastLogin: string | null;
+      activeTitle: string | null;
+      joinedAt: number | null;
+    })[]
   > {
     return [...this.members.entries()]
       .filter(([, m]) => m.guildId === guildId)
@@ -168,6 +177,7 @@ class FakeDb implements SocialDb {
         ...this.chars.get(cid)!,
         rank: m.rank,
         lastLogin: this.lastLogins.get(cid) ?? null,
+        joinedAt: this.joinedAts.get(cid) ?? null,
       }));
   }
   guildCount(): number {
@@ -315,12 +325,15 @@ class FakeTransport implements SocialTransport {
   }
 }
 
-// Test harness: characters 1..N, with helpers to flip presence.
-function setup() {
+// Test harness: characters 1..N, with helpers to flip presence. Tests that
+// exercise guild-name screening inject their own predicate; everything else
+// runs with the harness default (screen nothing). The constructor itself has
+// no default: every host must decide what it screens.
+function setup(cfg: { isNameOffensive?: (name: string) => boolean } = {}) {
   const db = new FakeDb();
   const tx = new FakeTransport(db);
   let clock = 1000;
-  const svc = new SocialService(db, tx, () => clock);
+  const svc = new SocialService(db, tx, () => clock, cfg.isNameOffensive ?? (() => false));
   const actors = new Map<number, { characterId: number; name: string }>();
   const add = (id: number, name: string, opts: { cls?: string; level?: number } = {}) => {
     db.addChar(id, name, opts.cls, opts.level);
@@ -696,6 +709,19 @@ describe('guilds', () => {
     expect(aleph?.lastLogin).toBeNull(); // never stamped
   });
 
+  it('carries each guild member joined_at through the snapshot as epoch ms', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    const joined = Date.UTC(2026, 6, 3, 12, 0, 0);
+    h.db.setJoinedAt(2, joined);
+    const snap = await h.svc.snapshot(1);
+    const bet = snap.guild?.members.find((m) => m.name === 'Bet');
+    const aleph = snap.guild?.members.find((m) => m.name === 'Aleph');
+    expect(bet?.joinedAt).toBe(joined);
+    expect(aleph?.joinedAt).toBeNull(); // never stamped in the fake
+  });
+
   it("refreshes guildmates' panels when a member comes online, even non-friends (#100)", async () => {
     await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
     await h.svc.guildInvite(h.actor(1), 'Bet');
@@ -756,6 +782,89 @@ describe('guilds', () => {
     h.tx.clear();
     await h.svc.guildCreate(h.actor(2), 'iron vanguard');
     expect(h.tx.errorsFor(2).join()).toMatch(/already exists/i);
+  });
+
+  it('refuses an offensive guild name at creation via the injected screen', async () => {
+    const screened: string[] = [];
+    const s = setup({
+      isNameOffensive: (name) => {
+        screened.push(name);
+        return /forbidden/i.test(name);
+      },
+    });
+    s.add(1, 'Aleph');
+    s.tx.setOnline(1);
+    await s.svc.guildCreate(s.actor(1), '  Forbidden Legion  ');
+    // The exact English literal is load-bearing: server_i18n's EXACT matcher
+    // localizes it byte-for-byte (guild.nameNotAllowed).
+    expect(s.tx.errorsFor(1)).toEqual(['That guild name is not allowed.']);
+    // The screen sees the VALIDATED (trimmed) name, after the format gate.
+    expect(screened).toEqual(['Forbidden Legion']);
+    // A refused create leaves nothing behind: no guild row, no founder credit,
+    // no membership.
+    expect(s.db.guildCount()).toBe(0);
+    expect(s.tx.founded).toEqual([]);
+    expect((await s.svc.snapshot(1)).guild).toBeNull();
+  });
+
+  it('accepts a clean guild name through the same screen', async () => {
+    const s = setup({ isNameOffensive: (name) => /forbidden/i.test(name) });
+    s.add(1, 'Aleph');
+    s.tx.setOnline(1);
+    await s.svc.guildCreate(s.actor(1), 'Iron Vanguard');
+    expect(s.tx.errorsFor(1)).toEqual([]);
+    expect(s.tx.founded).toEqual([1]);
+    expect((await s.svc.snapshot(1)).guild?.name).toBe('Iron Vanguard');
+  });
+
+  it('does not screen when the harness injects no predicate (screen-nothing default)', async () => {
+    // The harness default screens nothing: FakeDb suites that never inject a
+    // predicate must keep creating guilds freely.
+    await h.svc.guildCreate(h.actor(1), 'Forbidden Legion');
+    expect(h.tx.errorsFor(1)).toEqual([]);
+    expect((await h.svc.snapshot(1)).guild?.name).toBe('Forbidden Legion');
+  });
+
+  it('refuses a format-invalid name with the rules message before the screen ever runs', async () => {
+    // Ordering pin, negative arm: validateGuildName gates FIRST, so a name that
+    // fails the format rules is refused with nameRules and the predicate is
+    // never consulted (swapping the two blocks flips which error this gets).
+    const screened: string[] = [];
+    const s = setup({
+      isNameOffensive: (name) => {
+        screened.push(name);
+        return true;
+      },
+    });
+    s.add(1, 'Aleph');
+    s.tx.setOnline(1);
+    await s.svc.guildCreate(s.actor(1), 'xx');
+    expect(s.tx.errorsFor(1).join()).toMatch(/3-24/);
+    expect(screened).toEqual([]);
+  });
+
+  it('requires every SocialService construction site to choose a screening predicate', () => {
+    const db = new FakeDb();
+    const tx = new FakeTransport(db);
+    // Fail-closed pin: the 4th constructor param deliberately has no default,
+    // so a host that forgets it fails to compile. Restoring a fail-open
+    // default makes this construction legal and tsc then rejects the
+    // unused expect-error, failing the gate.
+    // @ts-expect-error three args must not construct a SocialService
+    const svc = new SocialService(db, tx, () => 1000);
+    expect(svc).toBeInstanceOf(SocialService);
+  });
+
+  it('wires the real offensiveName screen at the production construction site (source pin)', async () => {
+    // The whole suite injects its own predicates, so the one edge connecting
+    // the tested service to the real screen is server/game.ts; pin it at the
+    // source level (title_reads precedent) so replacing it with () => false
+    // cannot ship silently.
+    const { readFileSync } = await import('node:fs');
+    const game = readFileSync(new URL('../server/game.ts', import.meta.url), 'utf8');
+    const site = game.slice(game.indexOf('new SocialService('));
+    expect(site.length).toBeGreaterThan(0);
+    expect(site.slice(0, 400)).toContain('offensiveName(');
   });
 
   it('fires onGuildFounded exactly once, on the committed create only (the soc_guild_founded feed)', async () => {

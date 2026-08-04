@@ -4,6 +4,7 @@ import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from '../src/sim/dungeon_layout';
 import { createMob } from '../src/sim/entity';
 import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
+import { FISHING_CAST_ID } from '../src/sim/types';
 
 const SEED = 5150;
 const makeSim = () => new Sim({ seed: SEED, playerClass: 'warrior' });
@@ -102,6 +103,54 @@ describe('Knockback on-hit affix (Crushing Sweep)', () => {
     const finalDistance = side * (p.pos.x - o.x);
     expect(finalDistance).toBeGreaterThanOrEqual(startDistance - 1e-6);
     expect(finalDistance).toBeLessThanOrEqual(insideLimit + 1e-6);
+  });
+
+  it('a fully absorbed knockback swing cancels a fishing session AND still displaces', () => {
+    // The hit counts both ways: the shield soaks every point (no hp loss),
+    // the session ends, and the shove lands exactly as it always did. There
+    // is no absorb-conditional physics branch anywhere in the chain.
+    const sim = makeSim();
+    const p = sim.entities.get(sim.playerId)!;
+    // NOT gm: the gm gate would skip dealDamage entirely and this pin is
+    // about the absorb path INSIDE it. The shield keeps the warrior alive.
+    p.pos.x = 2;
+    p.pos.z = 0;
+    p.pos.y = 0;
+    p.castingAbility = FISHING_CAST_ID;
+    p.castTotal = 15;
+    p.castRemaining = 15;
+    p.fishBiteAtTick = 100;
+    p.fishCastZoneId = 'eastbrook_vale';
+    p.auras.push({
+      id: 'test_absorb',
+      name: 'Test Barrier',
+      kind: 'absorb',
+      value: 1_000_000,
+      remaining: 300,
+      duration: 300,
+      sourceId: p.id,
+      school: 'arcane',
+    } as (typeof p.auras)[number]);
+    const hpBefore = p.hp;
+    const tmpl = MOBS.marrowlord_varkas;
+    const saved = tmpl.knockback!.chance;
+    tmpl.knockback!.chance = 1;
+    try {
+      const mob = createMob(900710, tmpl, p.level, { x: 0, y: 0, z: 0 });
+      const startGap = dist2d(p.pos, mob.pos);
+      let moved = false;
+      for (let i = 0; i < 80 && !moved; i++) {
+        (sim as any).mobSwing(mob, p);
+        moved = dist2d(p.pos, mob.pos) > startGap + 1;
+      }
+      expect(moved).toBe(true);
+      expect(p.hp).toBe(hpBefore);
+      expect(p.castingAbility).toBeNull();
+      expect(p.fishBiteAtTick).toBe(0);
+      expect(p.fishCastZoneId).toBe('');
+    } finally {
+      tmpl.knockback!.chance = saved;
+    }
   });
 
   it('a mob without knockback never displaces the player', () => {

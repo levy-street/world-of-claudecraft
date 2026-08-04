@@ -453,7 +453,7 @@ describe('mount purchase (Marla sells reins for 10g after ridingTrained)', () =>
     meta.copper = 2_000_000;
     meta.ridingTrained = false; // explicitly not trained
     const npcId = standAtStable(sim, pid);
-    sim.buyItem(npcId, 'reins_valorsteed', pid);
+    sim.buyItem(npcId, 'reins_valorsteed', undefined, pid);
     expect(errorTexts(sim.tick())).toContain(
       'You must learn to ride first. Find a riding trainer.',
     );

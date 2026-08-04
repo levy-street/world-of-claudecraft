@@ -13,10 +13,16 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no rng, no clock
 // (enforced by tests/architecture.test.ts). Pure bookkeeping, zero draws.
 
+import { sanitizeItemInstancePayloadOnLoad } from './item_instance_load';
 import { itemInstancePayloadsEqual } from './item_instance_merge';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { cloneItemInstancePayload, type InvSlot, type ItemInstancePayload } from './types';
+import {
+  cloneItemInstancePayload,
+  type InventoryUnit,
+  type InvSlot,
+  type ItemInstancePayload,
+} from './types';
 
 /** True when this copy is locked out of the anonymous exchange pipes (market
  *  listing, mail attachment): armed (bindOnTrade) or bound (boundTo). The
@@ -84,9 +90,12 @@ export function holdsMatchingLocked(
 
 /** Escrow removal for one instanced unit: consumes the highest-index unlocked
  *  copy whose payload equals `instance` (removeItem's walk order) and returns
- *  the SLOT'S OWN payload, never the caller's needle, so a wire-supplied
- *  selector can never mint state: what enters escrow is exactly what left the
- *  bags. Clone-on-survival per removeItem's contract: the final unit of a
+ *  the SLOT'S OWN payload plus its craftedRecipeId marker, never the caller's
+ *  needle, so a wire-supplied selector can never mint state: what enters escrow
+ *  is exactly what left the bags. Both channels, because a slot can carry both:
+ *  a masterwork proc or an enchanted crafted piece is instanced AND crafted,
+ *  and returning the payload alone dropped the marker at the escrow boundary.
+ *  Clone-on-survival per removeItem's contract: the final unit of a
  *  fully-consumed slot returns the original object (its slot is gone), a
  *  surviving stack's payload is deep-cloned out. Returns null (and removes
  *  nothing) when no matching unlocked copy is held. Fires the same
@@ -96,7 +105,7 @@ export function removeMatchingInstance(
   itemId: string,
   instance: ItemInstancePayload,
   pid?: number,
-): ItemInstancePayload | null {
+): InventoryUnit | null {
   const r = ctx.resolve(pid);
   if (!r) return null;
   const { meta } = r;
@@ -108,10 +117,11 @@ export function removeMatchingInstance(
     if (isTransferLockedInstance(s.instance)) continue;
     if (!itemInstancePayloadsEqual(s.instance, instance)) continue;
     const consumed = s.count === 1 ? s.instance : cloneItemInstancePayload(s.instance);
+    const craftedRecipeId = s.craftedRecipeId;
     s.count -= 1;
     if (s.count <= 0) inventory.splice(i, 1);
     ctx.onInventoryChangedForQuests?.(meta);
-    return consumed;
+    return { instance: consumed, craftedRecipeId };
   }
   return null;
 }
@@ -127,13 +137,14 @@ export function removeMatchingInstance(
  *  pre-check (bags.ts canGrantCopies, this function's twin).
  *
  *  `craftedRecipeId` (bags.ts InvSlot.craftedRecipeId, professions/crafting.ts)
- *  is the PLAIN-STACK provenance marker, orthogonal to `instance`: a row on
- *  the market/mail book carries one or the other, never both (an instanced
- *  copy is escrowed through marketListInstance/its own pipe; a plain crafted
- *  stack through marketList/mailSendResolved). It is a no-op on the instanced
- *  arm and threaded into the plain grant otherwise, so a market/mail round
- *  trip never launders a crafted item's provenance and reopens the disenchant
- *  anti-farming gate (professions/enchanting.ts isCraftedDisenchantVictim). */
+ *  is the plain-stack provenance marker, ORTHOGONAL to `instance` rather than
+ *  exclusive with it: a row can carry both, and the shapes that do are exactly
+ *  the ones worth protecting (a masterwork proc, or a crafted piece enchanted
+ *  while worn). It is threaded into BOTH arms, so a market/mail round trip
+ *  never launders a crafted item's provenance and reopens the disenchant
+ *  anti-farming gate (professions/enchanting.ts isCraftedDisenchantVictim).
+ *  This read used to be "one or the other, never both", which silently dropped
+ *  the marker from every instanced-AND-crafted row that rode these pipes. */
 export function grantCopies(
   ctx: SimContext,
   pid: number,
@@ -142,7 +153,10 @@ export function grantCopies(
   instance?: ItemInstancePayload,
   craftedRecipeId?: string,
 ): void {
-  if (instance) ctx.addItemInstance(itemId, cloneItemInstancePayload(instance), pid, count);
+  if (instance)
+    ctx.addItemInstance(itemId, cloneItemInstancePayload(instance), pid, count, {
+      craftedRecipeId,
+    });
   else ctx.addItem(itemId, count, pid, { craftedRecipeId });
 }
 
@@ -152,10 +166,23 @@ export function grantCopies(
  *  load's instancedCountCap rule), and payloads deep-clone so a loaded book
  *  never aliases the raw save object. `cap` is instancedCountCap(def, instance)
  *  from bags.ts, passed in so this module stays free of the ITEMS table. */
-export function sanitizeEscrowSlot(raw: InvSlot, cap: number): InvSlot {
+export function sanitizeEscrowSlot(raw: InvSlot, cap: number, dropped?: string[]): InvSlot {
   const count = Math.min(Math.max(1, raw.count | 0), cap);
   if (!raw.instance || typeof raw.instance !== 'object') {
     return { itemId: raw.itemId, count };
   }
-  return { itemId: raw.itemId, count, instance: cloneItemInstancePayload(raw.instance) };
+  // The SAME load-side payload bound the four character-blob containers take
+  // (item_instance_load.ts), on the clone this function owns: the phase 18
+  // whole-branch review found the two persisted escrow books (mail
+  // attachments, market listings and collections) were the only load arms
+  // outside it, and unlike a character blob these rows can persist forever
+  // with no later login to self-heal them. The bound also catches the
+  // clone-mangled array case (typeof [] is 'object', so the guard above
+  // passes an array into the spread, and the numeric-key arm drops the
+  // junk whole). `dropped` aggregates for the caller's one-per-book log.
+  const clone = cloneItemInstancePayload(raw.instance);
+  const { payload, dropped: drops } = sanitizeItemInstancePayloadOnLoad(clone);
+  if (dropped) for (const d of drops) dropped.push(`${raw.itemId}.${d}`);
+  if (!payload) return { itemId: raw.itemId, count };
+  return { itemId: raw.itemId, count, instance: payload };
 }

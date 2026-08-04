@@ -3,39 +3,59 @@
 // A pure leaf (no SimContext, no state): a Vitest imports it directly, and the
 // one live caller is the death site in combat/damage.ts.
 //
-// WHY THIS EXISTS: every open-world mob used to respawn on one flat 25s timer,
-// so a farmed camp regenerated about three times a minute and dense pack strips
-// paid gold and XP far past what the zone was tuned for. Respawn now scales with
-// the zone's level band, so a low-level starter camp still churns for questing
-// while endgame packs come back on a farm-resistant cadence.
+// WHY THIS EXISTS: this is a deliberate content-tuning knob, not a classic-era
+// formula. It is stated once here and pinned by tests/respawn_policy.test.ts,
+// with the downstream farm ceilings pinned by tests/economy_yield.test.ts.
 //
-// The tiers are a deliberate content-tuning knob, not a classic-era formula:
-// they are stated once here and pinned by tests/respawn_policy.test.ts, with the
-// downstream farm ceilings they protect pinned by tests/economy_yield.test.ts.
+// HISTORY, because this number has now moved twice and the reasoning matters:
+//
+//  1. The world shipped for months on one flat 25s timer for every open-world
+//     mob.
+//  2. That was replaced by three respawn tiers keyed to a zone's level band (60
+//     / 120 / 180s), on the argument that a farmed camp regenerating three times
+//     a minute paid gold and XP past what the zone was tuned for.
+//  3. The tiers are now retired, back to a single 60s delay. Measuring the tiers
+//     against how players actually farm did not support them:
+//
+//     - Respawn was never the binding constraint for a solo player. Even at
+//       180s the densest route in the world (Thornpeak's Glimmermere corridor,
+//       63 standing mobs) supported about 20 kills a minute, and a player who
+//       kills one mob every 8 seconds wants 7. Nobody was ever waiting on a
+//       spawn. The tiers only ever throttled AoE multi-pulls and several players
+//       sharing a route.
+//     - The per-hour ceilings that justified the tiers assume a farmer who
+//       kills every mob the instant it respawns with zero travel: at the top
+//       cluster that is 1.01 kills per SECOND, sustained, across 130 yards. It
+//       is a bound, not a forecast, and the tiers were sized against a pace no
+//       player can reach.
+//     - The one genuine outlier turned out to be a single mob rather than a
+//       tier: Warlord Drogmar is boss: true with boss-tier loot but declared no
+//       cadence, so he inherited the trash timer and was 24% of that corridor's
+//       gold by himself. He now carries an explicit respawnMult (zone3.ts).
+//
+// The thinner zones are what motivated the revisit: the ten expansion zones
+// share the old endgame band but not its density (their largest cluster is
+// Galecrest's 14-mob shipwreck against Glimmermere's 63), so 180s there bought
+// no farm resistance and only made thin country feel empty.
+//
+// ZoneDef.trashRespawnSeconds remains the per-zone escape hatch. If a specific
+// zone ever needs its own cadence, set it there rather than reintroducing bands.
 
 import { zoneContaining } from './data';
 import type { ZoneDef } from './types';
 
 /**
- * Starter bands (zones capped at level 7): quest-paced, still fast.
+ * The open-world trash respawn delay, everywhere, for every level band.
  *
- * 60 rather than the band formula's own logic, and deliberately: this tier lands
- * on a player's first hour, who has no second camp to rotate to and no mount, so
- * it was checked against supply rather than assumed. A starter camp of 5 to 8
- * mobs now returns 5 to 8 kills a minute (down from 12 to 19), while a new
- * character needs 10 to 20 seconds per kill including the walk, so 3 to 6 a
- * minute. Supply still exceeds demand at every authored starter camp, and the
- * paired camps (two forest_wolf, two wild_boar, two vale_bandit) double it
- * again, so a "kill 10" objective never waits on a spawn.
- *
- * If starter-zone feel ever regresses anyway, prefer ZoneDef.trashRespawnSeconds
- * on the one zone over moving this constant, which governs Farshore Isle too.
+ * 60 was already the starter-band value and was checked against SUPPLY rather
+ * than assumed: a starter camp of 5 to 8 mobs returns 5 to 8 kills a minute,
+ * while a new character needs 10 to 20 seconds per kill including the walk, so
+ * 3 to 6 a minute. Supply exceeds demand at every authored camp in the world,
+ * and the paired camps (two forest_wolf, two wild_boar, two vale_bandit) double
+ * it again, so a "kill 10" objective never waits on a spawn. Applying it
+ * world-wide extends that property to every zone rather than only the first two.
  */
-export const TRASH_RESPAWN_SECONDS_LOW = 60;
-/** Mid bands (zones capped at level 14). */
-export const TRASH_RESPAWN_SECONDS_MID = 120;
-/** Endgame bands (everything above level 14). */
-export const TRASH_RESPAWN_SECONDS_HIGH = 180;
+export const TRASH_RESPAWN_SECONDS = 60;
 
 /**
  * Fallback for a mob standing outside every authored zone rect: the far-east
@@ -46,17 +66,18 @@ export const TRASH_RESPAWN_SECONDS_HIGH = 180;
 export const DEFAULT_RESPAWN_SECONDS = 25;
 
 /**
- * The trash respawn delay for one zone, by its level band. A zone may override
- * its tier with ZoneDef.trashRespawnSeconds. A null zone (nowhere in the
- * authored world) takes DEFAULT_RESPAWN_SECONDS.
+ * The trash respawn delay for one zone. Every authored zone takes the single
+ * world delay unless it overrides with ZoneDef.trashRespawnSeconds; a null zone
+ * (nowhere in the authored world) takes DEFAULT_RESPAWN_SECONDS.
+ *
+ * The zone argument is still taken, and the override still honored, precisely so
+ * a future per-zone cadence needs no caller change: the level band is what was
+ * retired, not per-zone control.
  */
 export function trashRespawnSecondsForZone(zone: ZoneDef | null | undefined): number {
   if (!zone) return DEFAULT_RESPAWN_SECONDS;
   if (zone.trashRespawnSeconds !== undefined) return zone.trashRespawnSeconds;
-  const bandCap = zone.levelRange[1];
-  if (bandCap <= 7) return TRASH_RESPAWN_SECONDS_LOW;
-  if (bandCap <= 14) return TRASH_RESPAWN_SECONDS_MID;
-  return TRASH_RESPAWN_SECONDS_HIGH;
+  return TRASH_RESPAWN_SECONDS;
 }
 
 /**

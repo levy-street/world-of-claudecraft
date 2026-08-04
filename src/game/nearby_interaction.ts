@@ -7,7 +7,11 @@ import {
 } from '../sim/types';
 import { corpseLootAvailability, localPartyMemberIds } from './corpse_loot_availability';
 import { decideEscortPress, handleEscortPress } from './escort_interact';
-import { type GatherNodeToolGate, handleGatherNodeInteract } from './gather_node_interact';
+import {
+  type GatherEffectConfirmGate,
+  type GatherNodeToolGate,
+  handleGatherNodeInteract,
+} from './gather_node_interact';
 import type { InteractionOutcome } from './interaction_autorun';
 import { objectInteractionRange } from './interactions';
 
@@ -34,7 +38,7 @@ export interface NearbyInteractionWorld {
   leaveDungeon(): InteractionOutcome;
   pickUpObject(id: number): InteractionOutcome;
   nodeHarvestableByMe(nodeId: string): boolean;
-  harvestNode(nodeId: string): InteractionOutcome;
+  harvestNode(nodeId: string, confirmEffectUse?: boolean): InteractionOutcome;
 }
 
 export interface NearbyInteractionHud {
@@ -64,6 +68,8 @@ export function tryNearbyInteraction(
   escortAwayText: string,
   nothingToInteractText: string,
   harvestStateReliable = true,
+  // The R40 per-use effect confirm gate, threaded to the node dispatch.
+  effectConfirm?: GatherEffectConfirmGate,
 ): InteractionOutcome {
   const player = world.player;
   const playerId = world.playerId ?? player.id;
@@ -190,6 +196,7 @@ export function tryNearbyInteraction(
       tooFarText,
       notReadyText,
       nodeToolGateFor?.(bestNode),
+      effectConfirm,
     );
   }
   // The away line is a LAST resort that only replaces the generic

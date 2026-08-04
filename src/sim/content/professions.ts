@@ -80,14 +80,15 @@ export const GATHERING_PROFESSION_IDS: GatheringProfessionId[] = [
 
 // Tool effect slotting (#1136): a slottable bonus layered on top of a base
 // gathering tool's tier (see ../professions/tools.ts). Each effect carries its
-// own starting durability, separate from the base tool's tier gating. Whether
-// a given use spends a charge is NOT a fixed per-effect chance: it is rolled
-// from the rarity-scaled consumption curve (#1139,
-// `../professions/tools.ts` `effectConsumptionChance`), comparing the tool's
-// own rarity against the rarity of what it is being used on, so the same
-// effect sips charges against a low-rarity target and spends them every use
-// against an equal-or-higher-rarity one. `kind` selects which harvest/craft
-// outcome field the bonus adjusts.
+// own starting durability, separate from the base tool's tier gating.
+// Depletion is DETERMINISTIC and CONDITIONAL: a use spends exactly one charge
+// when the bonus actually changed the granted outcome (R42, settled at the
+// gather command boundary), and never draws rng to decide it (the #1139
+// rolled-consumption idea was retired so the harvest path could keep its
+// pinned two-draw contract),
+// and the tool's rarity enters at MINT time instead, as extra starting
+// charges (startingDurabilityFor). `kind` selects which harvest/craft outcome
+// field the bonus adjusts.
 // Corpse-harvest yield map (#1141): component tag -> the item id a profession
 // harvest of a tagged corpse yields (claim logic: src/sim/professions/gathering.ts,
 // command body: src/sim/interaction.ts harvestCorpse). Only tags with a concrete
@@ -134,8 +135,9 @@ export const HARVEST_COMPONENT_ITEMS: Readonly<Record<string, string>> = {
 
 // Monster material access tiers (Professions 2.0): which tool tier
 // the corpse-harvest premium (signed/specimen) arm requires per component
-// family, checked against the player's best owned gathering tool of ANY
-// profession (professions/tools.ts bestOwnedAnyGatherToolTier). EVERY
+// family, checked against the player's best WIELDABLE gathering tool of ANY
+// profession (R22/R50: professions/wield_gate.ts
+// bestWieldableAnyGatherToolTier). EVERY
 // HARVEST_COMPONENT_ITEMS key is listed explicitly, ALL at 1 in wave one
 // (the prime directive: all pre-existing content stays bare-hands
 // harvestable); future corpse families may ship higher.
@@ -170,11 +172,11 @@ export const HARVEST_COMPONENT_SPECIMENS: Readonly<Record<string, string>> = {
 
 // Tool effect slotting (#1136): a slottable bonus layered on top of a base
 // gathering tool's tier (see ../professions/tools.ts). Each effect carries its
-// own starting durability, separate from the base tool's tier gating. Whether
-// a given use spends a charge is rolled from the rarity-scaled consumption
-// curve (#1139, ../professions/tools.ts effectConsumptionChance), not a fixed
-// per-effect chance. `kind` selects which harvest/craft outcome field the
-// bonus adjusts.
+// own starting durability, separate from the base tool's tier gating. A use
+// spends exactly one charge, deterministically (depleteEffect, rng-free) and
+// only when the bonus changed the granted outcome (R42); tool rarity buys
+// extra STARTING charges rather than cheaper spends. `kind` selects which
+// harvest/craft outcome field the bonus adjusts.
 export type ToolEffectId = 'gatherers_cache' | 'artisans_eye' | 'quickening_charm';
 
 export interface ToolEffectDef {
@@ -412,6 +414,11 @@ export const STATION_RADIUS = 20;
 // Which station type serves each craft. Crafts absent from this table
 // (jewelcrafting, inscription, enchanting) have no physical station and no
 // station-bound recipes today.
+// Key ORDER is load-bearing: professions/stations.ts craftsForStationType
+// returns keys in this order and the gossip Crafting shortcut
+// (src/ui/hud/quest/master_craft_core.ts) takes the first as its tie-break
+// (weaponcrafting before armorcrafting at the forge); pinned in
+// tests/professions_crafting_hub.test.ts.
 export const STATION_TYPE_BY_CRAFT: Readonly<Record<string, StationType>> = {
   weaponcrafting: 'forge',
   armorcrafting: 'forge',

@@ -50,6 +50,7 @@ describe('gate cache inventory vs turbo.json', () => {
       'check:types',
       'build:env',
       'build:server',
+      'build:bot',
       'build:bundle',
     ]);
     for (const task of GATE_CACHEABLE_TASKS) {
@@ -96,10 +97,17 @@ describe('buildFullGateSteps orchestration', () => {
     expect(byName['vitest (full suite)'].env).toEqual({ WOC_SKIP_PRETEST: '1' });
     expect(byName['browser regressions'].cmd).toBe('npm');
 
-    const typesBuilds = byName['typecheck + env/server builds'];
+    const typesBuilds = byName['typecheck + env/server/bot builds'];
     expect(typesBuilds.cmd).toBe('npx');
     expect(typesBuilds.args).toEqual(
-      expect.arrayContaining(['turbo', 'run', 'check:types', 'build:env', 'build:server']),
+      expect.arrayContaining([
+        'turbo',
+        'run',
+        'check:types',
+        'build:env',
+        'build:server',
+        'build:bot',
+      ]),
     );
     expect(isTurboGateStep(byName['client build'].cmd, byName['client build'].args)).toBe(true);
     expect(byName['client build'].args).toContain('build:bundle');
@@ -149,6 +157,7 @@ describe('buildFullGateSteps orchestration', () => {
       'sfx check',
       'env build',
       'server build',
+      'bot build',
       'client build',
     ]);
   });

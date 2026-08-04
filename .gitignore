@@ -63,8 +63,9 @@ pr.diff
 # Vitest Browser Mode failure screenshots + attachments (opt-in test:browser suite)
 tests/browser/__screenshots__/
 .vitest-attachments/
-# Mobile safe-area E2E before/after PNG output (scripts/mobile_*_safe_area.mjs)
-screenshots/
+# Mobile safe-area E2E before/after PNG output (scripts/mobile_*_safe_area.mjs,
+# root-anchored: a bare screenshots/ would swallow new files under docs/screenshots/)
+/screenshots/
 
 # i18n release-fill worklist (generated; regenerate via `npm run i18n:worklist`)
 docs/i18n-scaling/worklist/
@@ -96,6 +97,8 @@ Thumbs.db
 !.claude/commands/
 !.claude/hooks/
 !.claude/settings.json
+# Per-session QA/build scratch (gate logs, probe scripts); never committed.
+.claude-scratch/
 .cursor/
 
 # local SDK/tooling dump (extracted command-line tools, not project source)

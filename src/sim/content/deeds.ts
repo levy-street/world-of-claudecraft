@@ -1942,12 +1942,12 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 5,
     trigger: { kind: 'quest', questId: 'q_prof_intro' },
   },
-  // Reagent sourcing: every toolworks recipe requires one of the six tier
-  // 4/5 reagents (thorium_ore, arcanite_bar, ashwood_log, elderwood_log,
-  // goldleaf_herb, sunpetal_herb), sold by Quartermaster Bree at the
-  // Highwatch hub (zone3.ts), so this deed (and feat_book_complete through
-  // it) is completable in live play. The vendor-to-craft-to-grant chain is
-  // pinned by tests/professions_crafting_hub.test.ts. The stat key stays
+  // Completability: the trigger is ONE station-bound craft at ANY station, not
+  // a toolworks tool recipe and not any single vendor's stock, so no change to
+  // what a counter sells can strand this deed (or feat_book_complete through
+  // it). What it does need is that every station recipe has a live reagent
+  // source, a vendor row or a gather node, which is what
+  // tests/professions_crafting_hub.test.ts pins. The stat key stays
   // 'hubCraftsPerformed' (persisted): it counts station-bound
   // crafts at any station (see professions/crafting.ts craftItem).
   prog_tools_of_the_trade: {
@@ -2239,6 +2239,27 @@ export const DEEDS: Record<string, DeedDef> = {
       count: 1,
     },
   },
+  // The zone-3 rung of the per-zone gatherer chronicle line (R21): the
+  // gather:thornpeak_heights:* marks have been written by completeGatherCast
+  // since the t3 veins shipped, with no consumer until this deed. Unlike its
+  // vale and marsh siblings it is NOT a chapter prerequisite: the peaks
+  // chapter deedIds were already shipped, and shipped triggers are frozen
+  // (authoring rule 9), so this deed stands alone.
+  chr_peaks_gatherer: {
+    id: 'chr_peaks_gatherer',
+    name: 'Harvest of the Heights',
+    desc: 'Harvest an ore vein, a wood stand, and an herb patch in Thornpeak Heights.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: [
+        'gather:thornpeak_heights:ore',
+        'gather:thornpeak_heights:wood',
+        'gather:thornpeak_heights:herb',
+      ],
+    },
+  },
   // Two camp rares shipped alongside their zones but were left off the first
   // reckoning of named terrors (chr_marsh_rares / chr_peaks_rares). Design
   // rule 9 forbids widening those shipped trigger lists, so the missed
@@ -2282,6 +2303,78 @@ export const DEEDS: Record<string, DeedDef> = {
     category: 'chronicle',
     renown: 10,
     trigger: { kind: 'visits', markIds: ['slain:old_marrowshell', 'slain:aurelhorn'] },
+  },
+  // The phase 20 density pass brought the three bottom-map zones to the
+  // strip's own gathering density (Q26 in
+  // docs/design/professions-tuning-packet-review.md): each gets the zone
+  // chronicle pair the strip zones carry, the gatherer chronicle (the R21
+  // line) and the first-cast deed. The gather marks have been written by
+  // completeGatherCast since the v0.32.0 starter kits shipped; the fish
+  // marks fire through ZONE_FISH rows listing the Vale-fallback draws these
+  // zones' waters actually yield until the zone-4 pass authors their own
+  // catch tables. Standalone chronicles with no chapter meta (the
+  // chr_peaks_gatherer precedent; shipped chapter triggers are frozen,
+  // authoring rule 9).
+  chr_willowfen_gatherer: {
+    id: 'chr_willowfen_gatherer',
+    name: 'Fenland Bounty',
+    desc: 'Harvest an ore vein, a wood stand, and an herb patch in the Willowfen.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: ['gather:willowfen:ore', 'gather:willowfen:wood', 'gather:willowfen:herb'],
+    },
+  },
+  chr_willowfen_first_cast: {
+    id: 'chr_willowfen_first_cast',
+    name: 'Ripples in the Lilymoors',
+    desc: 'Catch a fish from the waters of the Willowfen.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'fish:willowfen' },
+  },
+  chr_galecrest_gatherer: {
+    id: 'chr_galecrest_gatherer',
+    name: 'Harvest on the Headland',
+    desc: 'Harvest an ore vein, a wood stand, and an herb patch in the Galecrest.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: ['gather:galecrest:ore', 'gather:galecrest:wood', 'gather:galecrest:herb'],
+    },
+  },
+  chr_galecrest_first_cast: {
+    id: 'chr_galecrest_first_cast',
+    name: 'A Line in the Mirror Tarn',
+    desc: 'Catch a fish from the waters of the Galecrest.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'fish:galecrest' },
+  },
+  chr_farshore_gatherer: {
+    id: 'chr_farshore_gatherer',
+    name: 'Island Provisions',
+    desc: 'Harvest an ore vein, a wood stand, and an herb patch on the Farshore.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: [
+        'gather:farshore_isle:ore',
+        'gather:farshore_isle:wood',
+        'gather:farshore_isle:herb',
+      ],
+    },
+  },
+  chr_farshore_first_cast: {
+    id: 'chr_farshore_first_cast',
+    name: 'What the Gulls Know',
+    desc: 'Catch a fish from the waters of the Farshore.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'fish:farshore_isle' },
   },
 };
 

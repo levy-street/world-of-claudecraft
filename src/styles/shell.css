@@ -6304,9 +6304,67 @@
       align-items: center;
       gap: 8px;
     }
-    body.mobile-touch #charselect-panel .cs-wallet,
-    body.mobile-touch #charselect-panel .cs-wallet-hidden-note {
+    body.mobile-touch:not(.seeker-wallet-enabled) #charselect-panel .cs-wallet,
+    body.mobile-touch:not(.seeker-wallet-enabled) #charselect-panel .cs-wallet-hidden-note {
       display: none;
+    }
+    /* Seeker wallet strip: pair the service name and verified helper as one
+       header row, then keep every connection action on the row below. */
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel .cs-wallet-group {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-rows: auto auto;
+      column-gap: 12px;
+      row-gap: 7px;
+      align-items: center;
+    }
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel .cs-wallet-main {
+      display: contents;
+    }
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel .cs-wallet-group > .cs-wallet-label {
+      grid-column: 1;
+      grid-row: 1;
+      align-self: center;
+      width: auto;
+      margin: 0;
+      padding: 0;
+      font-size: 12px;
+      line-height: 1.35;
+      white-space: nowrap;
+    }
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel .cs-wallet-help {
+      grid-column: 2;
+      grid-row: 1;
+      align-self: center;
+      justify-self: start;
+      width: auto;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      text-align: left;
+      line-height: 1.35;
+    }
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel .cs-wallet-actions {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      width: 100%;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel :is(.wallet-cta, .wallet-mini) {
+      min-width: 40px;
+      min-height: 40px;
+      padding: 5px 8px;
+      font-size: 11px;
+    }
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel .wallet-status {
+      min-height: 36px;
+      max-width: 290px;
+      padding: 5px 8px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     body.mobile-touch #charselect-panel .cs-controls {
       gap: 6px;
@@ -7562,33 +7620,153 @@
   }
 
   /* ---------- desktop update toast (Electron shell) ---------- */
-  /* Owned by src/ui/desktop_update_toast.ts: a fixed, non-blocking notice for
+  /* Owned by src/ui/desktop_update_toast.ts: a fixed, non-blocking card for
      the auto-updater (website desktop builds only). Lives at shell level so it
-     renders on both the pre-game shell and in-world. */
+     renders on both the pre-game shell and in-world. One FIXED width (not a
+     max-width over a single flex row): the old layout let the buttons squeeze
+     the message column until it clipped; the card now stacks title, body,
+     progress, and actions so every localized string gets the full width. */
   #desktop-update-toast {
     position: fixed;
-    top: var(--spacing-md);
-    right: var(--spacing-md);
+    /* Same safe-area handling as the sibling toasts below: inert on the
+       desktop shell today, correct if the card ever meets a notch. */
+    top: calc(var(--spacing-md) + env(safe-area-inset-top, 0px));
+    right: calc(var(--spacing-md) + env(safe-area-inset-right, 0px));
     z-index: 260;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: var(--spacing-sm);
-    max-width: min(440px, calc(100vw - 2 * var(--spacing-md)));
-    padding: var(--spacing-sm) var(--spacing-md);
-    background: linear-gradient(180deg, rgba(21, 21, 31, 0.96) 0%, rgba(11, 11, 18, 0.98) 100%);
+    width: min(400px, calc(100vw - 2 * var(--spacing-md)));
+    padding: var(--spacing-md);
+    background: linear-gradient(180deg, rgba(21, 21, 31, 0.97) 0%, rgba(11, 11, 18, 0.98) 100%);
+    /* Even 1px border on all sides (same language as #gpu-notice / #perf-nudge).
+       No accent left stripe: that read as generic toast chrome. */
     border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     color: var(--color-text-light);
     font-family: var(--font-sans);
     font-size: 13px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    line-height: 1.45;
+    box-shadow:
+      0 12px 32px rgba(0, 0, 0, 0.65),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    animation: desktop-update-in 240ms ease-out;
   }
   #desktop-update-toast[hidden] {
     display: none;
   }
-  #desktop-update-toast button {
+  @keyframes desktop-update-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .desktop-update-icon {
     flex-shrink: 0;
-    padding: 4px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    /* Token-only halo: the accent presets recompute --color-primary-glow, so
+       a literal outer stop would stay gold while the inner stop follows the
+       accent; fading to transparent keeps it one hue under every preset. */
+    background: radial-gradient(circle at 35% 30%, var(--color-primary-glow), transparent 75%);
+    border: 1px solid var(--color-border-default);
+    color: var(--color-primary);
+  }
+  .desktop-update-icon .ui-icon {
+    width: 15px;
+    height: 15px;
+  }
+  .desktop-update-spinner {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--color-primary-glow);
+    border-top-color: var(--color-primary);
+    animation: desktop-update-spin 900ms linear infinite;
+  }
+  @keyframes desktop-update-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .desktop-update-content {
+    flex: 1;
+    min-width: 0;
+    /* One title line plus one body line (the checking card's height), so the
+       title-only up-to-date card resolves in place instead of shrinking. */
+    min-height: 42px;
+  }
+  .desktop-update-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-primary);
+    /* Room for the corner dismiss control, so a long localized title can
+       never run underneath it. */
+    padding-right: var(--spacing-lg);
+    overflow-wrap: break-word;
+  }
+  #desktop-update-toast[data-mode="ready"] .desktop-update-title {
+    padding-right: 0;
+  }
+  .desktop-update-body {
+    margin-top: 2px;
+    color: var(--color-text-muted);
+    overflow-wrap: break-word;
+  }
+  .desktop-update-body[hidden] {
+    display: none;
+  }
+  .desktop-update-progress {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+  }
+  .desktop-update-progress[hidden] {
+    display: none;
+  }
+  .desktop-update-progress-track {
+    flex: 1;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+  }
+  .desktop-update-progress-fill {
+    height: 100%;
+    width: 0;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--color-primary-dim), var(--color-primary));
+    transition: width 300ms ease;
+  }
+  .desktop-update-progress-pct {
+    flex-shrink: 0;
+    min-width: 34px;
+    text-align: right;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .desktop-update-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+  }
+  .desktop-update-actions[hidden] {
+    display: none;
+  }
+  .desktop-update-actions button {
+    min-height: 28px;
+    padding: 4px 14px;
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-sm);
@@ -7596,11 +7774,93 @@
     font: inherit;
     cursor: var(--cursor-point);
   }
-  #desktop-update-toast button:hover {
+  .desktop-update-actions .desktop-update-restart {
+    background: var(--color-primary-glow);
+    border-color: var(--color-primary-dim);
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+  .desktop-update-actions .desktop-update-restart:hover {
+    background: var(--color-primary-glow-heavy);
     border-color: var(--color-primary);
   }
-  #desktop-update-toast .desktop-update-restart {
+  .desktop-update-actions .desktop-update-later:hover {
     border-color: var(--color-primary);
+  }
+  .desktop-update-close {
+    position: absolute;
+    top: var(--spacing-xs);
+    right: var(--spacing-xs);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+  }
+  .desktop-update-close:hover {
+    color: var(--color-text-light);
+  }
+  .desktop-update-close[hidden] {
+    display: none;
+  }
+  .desktop-update-close .ui-icon {
+    width: 12px;
+    height: 12px;
+  }
+  #desktop-update-toast button:focus-visible {
+    outline: 3px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #desktop-update-toast {
+      animation: none;
+    }
+    .desktop-update-spinner {
+      /* A frozen partial ring reads as a stuck control; solid-color the ring
+         so it stays a state glyph when the rotation is dropped. */
+      animation: none;
+      border-color: var(--color-primary);
+    }
+    .desktop-update-progress-fill {
+      transition: none;
+    }
+  }
+  /* The card is desktop-Electron-only, but Electron ships on touchscreen
+     laptops: give its controls the coarse-pointer touch floor the sibling
+     toasts carry, and keep the title clear of the enlarged corner dismiss. */
+  @media (pointer: coarse) {
+    .desktop-update-actions button,
+    .desktop-update-close {
+      min-height: 40px;
+      min-width: 40px;
+    }
+    .desktop-update-title {
+      padding-right: 44px;
+    }
+    #desktop-update-toast[data-mode="ready"] .desktop-update-title {
+      padding-right: 0;
+    }
+  }
+  /* Download progress is conveyed by the .fill gradient, which forced-colors
+     strips (same failure class the cast bars pin in base.css): pin the fill
+     to Highlight so the filled width survives. Same layer and later in the
+     sheet than the base fill rule, so no !important is needed here. The
+     forced palette also flattens the spinner's four border colors into one,
+     which turns the rotation into invisible motion: stop it and let the
+     solid ring read as the state glyph, like the reduced-motion arm above. */
+  @media (forced-colors: active) {
+    .desktop-update-progress-fill {
+      background: Highlight;
+    }
+    .desktop-update-spinner {
+      animation: none;
+    }
   }
 
   /* ---------- software rendering notice ---------- */
@@ -7628,6 +7888,15 @@
     font-family: var(--font-sans);
     font-size: 13px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  }
+  /* Only a shell that actually mints the update card (the class is stamped by
+     initDesktopUpdateToast once its bridge capability check passes) reserves
+     the taller first slot; every other session keeps the original 56px slot.
+     216px covers the tallest localized ready card under pointer:coarse
+     (32px padding + 2px borders + two 20.3px title lines + three 18.85px
+     body lines + 8px margin + 40px actions is about 201px). */
+  body.desktop-update-card #gpu-notice {
+    top: calc(var(--spacing-md) + 216px + env(safe-area-inset-top, 0px));
   }
   #gpu-notice[hidden] {
     display: none;
@@ -7670,10 +7939,10 @@
   #perf-nudge {
     position: fixed;
     /* Same safe-area handling as #gpu-notice: clear of a notch on mobile
-       shells, zero everywhere else; 112px clears both toast slots above.
-       Unlike the pre-game portrait sibling, this toast surfaces IN-GAME,
-       where web mobile is landscape-only, so the right edge also clears a
-       rotated notch / rounded corner. */
+       shells, zero everywhere else; 112px clears the update-toast slot (56px)
+       plus the gpu-notice slot. Unlike the pre-game portrait sibling, this
+       toast surfaces IN-GAME, where web mobile is landscape-only, so the
+       right edge also clears a rotated notch / rounded corner. */
     top: calc(var(--spacing-md) + 112px + env(safe-area-inset-top, 0px));
     right: calc(var(--spacing-md) + env(safe-area-inset-right, 0px));
     z-index: 260;
@@ -7689,6 +7958,11 @@
     font-family: var(--font-sans);
     font-size: 13px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  }
+  /* The update card's taller slot (216px, see #gpu-notice) pushes this third
+     slot down with it; sessions without the card keep the 112px stack. */
+  body.desktop-update-card #perf-nudge {
+    top: calc(var(--spacing-md) + 272px + env(safe-area-inset-top, 0px));
   }
   #perf-nudge[hidden] {
     display: none;

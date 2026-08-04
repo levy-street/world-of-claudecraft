@@ -44,6 +44,7 @@
 import type * as http from 'node:http';
 import { rekeyInstanceSigner } from '../src/sim/character_rename';
 import { resolveActiveWeaponSkin } from '../src/sim/content/weapon_skin_rules';
+import { DEEDS_RECENT_CAP } from '../src/sim/deeds';
 import type { CharacterState } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { normalizeCharName, offensiveName } from './auth';
@@ -157,10 +158,14 @@ export interface CharactersRuntime {
   rekeyMarketSeller(characterId: number, oldName: string, newName: string): boolean;
   /** game.saveMarket: persist the World Market after a rekey. */
   saveMarket(): Promise<void>;
+  /** game.purgeMarketSeller: drop a deleted character's listings + collection. */
+  purgeMarketSeller(characterId: number, name: string): boolean;
   /** game.rekeyMailOwner: re-key the character's Ravenpost mailbox after a rename. */
   rekeyMailOwner(characterId: number, oldName: string, newName: string): boolean;
   /** game.saveMail: persist the Ravenpost mail book after a rekey. */
   saveMail(): Promise<void>;
+  /** game.purgeMailOwner: clear a deleted character's Ravenpost mailbox. */
+  purgeMailOwner(characterId: number, name: string): boolean;
   /** main.ts initialCharacterState: the serialized fresh-character state for create. */
   initialCharacterState(cls: PlayerClass, name: string, skin: number): CharacterState;
   /** main.ts publicOrigin: canonical share origin for the owner-sheet URLs. */
@@ -281,6 +286,107 @@ export function buildCharacterList(
       ),
     })),
   };
+}
+
+/**
+ * The world-state rekey that follows a successful deactivated-name reclaim: the
+ * orphaned holder was just archived out of the freed name (a rename in effect),
+ * so ALL THREE of renameHandler's rekeys run here too. The market rows and the
+ * mailbox move onto the stable id plus the archived name; without that, the
+ * next holder of the display name could claim the orphan's escrow through the
+ * name-fallback read arms. The orphan's OWN signed item instances (bags, bank,
+ * equipped) are swept to the archived name; without that, their persisted blob
+ * keeps signing a name that now belongs to a stranger (the #1145 self-signed
+ * discount, Battlefield Experience attribution, and the eqi inspect wire all
+ * compare signer to a live display name). Every rekey matches the holder's
+ * STORED casing (reclaimed.freedName), never the requester's typed casing: the
+ * db lookup is case-insensitive and the book matches are exact. The no-nonce
+ * blob save is safe for the same reason renameHandler's is: a deactivated
+ * account cannot hold a live session, so no lease fence is in play. Like the
+ * DB reclaim itself, this runs BEFORE the create retry; a crash between the
+ * committed reclaim and these rekeys leaves the orphan archived with its
+ * world state still name-keyed (the same class of unrecoverable window the
+ * delete purge documents below; nothing re-triggers the rekey).
+ * Exported so BOTH create dispatch arms share it.
+ */
+export async function rekeyReclaimedCharacterWorldState(
+  rt: Pick<CharactersRuntime, 'rekeyMarketSeller' | 'saveMarket' | 'rekeyMailOwner' | 'saveMail'>,
+  reclaimed: {
+    id: number;
+    archivedName: string;
+    freedName: string;
+    level: number;
+    state: CharacterState | null;
+  },
+): Promise<void> {
+  if (rt.rekeyMarketSeller(reclaimed.id, reclaimed.freedName, reclaimed.archivedName)) {
+    await rt.saveMarket();
+  }
+  if (rt.rekeyMailOwner(reclaimed.id, reclaimed.freedName, reclaimed.archivedName)) {
+    await rt.saveMail();
+  }
+  if (
+    reclaimed.state &&
+    rekeyInstanceSigner(reclaimed.state, reclaimed.freedName, reclaimed.archivedName)
+  ) {
+    // Swallow-and-log like the market and mail save wrappers above: this is
+    // the helper's one await that can reject, and a throw here would skip
+    // the caller's create retry and 500 a reclaim that already committed.
+    // The cost of swallowing is bounded and accepted: a failed blob save
+    // leaves the orphan's signers on the freed name with nothing to
+    // re-trigger the sweep, the same unrecoverable-window class the purge
+    // and crash comments record.
+    try {
+      await charactersDb.saveCharacterState(reclaimed.id, reclaimed.level, reclaimed.state);
+    } catch (err) {
+      console.error('failed to save the reclaimed holder signer sweep:', err);
+    }
+  }
+}
+
+/**
+ * The world-state purge that follows a successful character delete (R43). A deleted
+ * character can never collect again, so its World Market listings, its Merchant
+ * collection, and its Ravenpost mailbox leave the realm's shared books here instead
+ * of sitting uncollectable forever.
+ *
+ * The purge mutates the LIVE sim through the injected runtime and only then persists:
+ * the realm process serving this request is the one running the world, and it
+ * re-persists the market and mail blobs from memory every autosave, so editing the
+ * world_state rows alone (inside db.deleteCharacter, say) would be clobbered within
+ * seconds. Each save is skipped when its purge reports no change. This assumes the
+ * current one-process-per-realm topology: a second process serving the same realm
+ * would re-persist its own un-purged copy. The two saves are deliberately NOT one
+ * transaction (unlike the leave path, whose atomicity guards an item duplicating
+ * between a bag and its escrow): a market listing and a mail parcel are independent
+ * escrows and each half is idempotent. The autosave bounds a SAVE FAILURE (the
+ * wrappers swallow write errors; memory re-persists within thirty seconds); a
+ * process CRASH between the two saves loses the un-saved half permanently, the
+ * same unrecoverable window the delete handler's comment records, because the
+ * committed row delete leaves nothing to re-trigger the purge.
+ *
+ * Exported so BOTH delete dispatch arms share one behavior: this module's
+ * deleteHandler and the retained legacy ladder arm in main.ts (the API_DISPATCH=legacy
+ * rollback path), the buildCharacterList delegation precedent. Call it only AFTER the
+ * DB delete reports success, mirroring renameHandler: a delete that matched no row
+ * must never purge a live character's escrow.
+ */
+export async function purgeDeletedCharacterWorldState(
+  rt: Pick<CharactersRuntime, 'purgeMarketSeller' | 'saveMarket' | 'purgeMailOwner' | 'saveMail'>,
+  characterId: number,
+  name: string,
+): Promise<void> {
+  // Never let a purge failure turn a COMMITTED delete into a 500: the row is
+  // gone and a client retry would 404 with the mail half never purged. The
+  // live-book mutations self-heal through the autosave (the save wrappers
+  // swallow their own write errors already); this catch covers the walks
+  // themselves, matching that posture.
+  try {
+    if (rt.purgeMarketSeller(characterId, name)) await rt.saveMarket();
+    if (rt.purgeMailOwner(characterId, name)) await rt.saveMail();
+  } catch (err) {
+    console.error('failed to purge deleted character world state:', err);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -424,10 +530,12 @@ async function createCharacterHandler(ctx: Ctx): Promise<void> {
     if (!isUniqueViolation(err)) throw err;
     // The name collided. Free it if held only by a deactivated account, then retry
     // once; otherwise it is genuinely taken.
-    if (!(await charactersDb.reclaimDeactivatedName(name))) {
+    const reclaimed = await charactersDb.reclaimDeactivatedName(name);
+    if (!reclaimed) {
       json(ctx.res, 409, NAME_TAKEN);
       return;
     }
+    await rekeyReclaimedCharacterWorldState(rt, reclaimed);
     try {
       const c = await create();
       if (!c) {
@@ -480,6 +588,20 @@ async function ownerSheetHandler(ctx: Ctx): Promise<void> {
   );
 }
 
+/**
+ * GET /api/characters/:id/deeds-recent: the owner's newest-first deed unlock
+ * ids from the character_deeds observer table, `{ deeds: [id, ...] }` capped
+ * at DEEDS_RECENT_CAP. The state blob only keeps the earn DAY, so this read is
+ * the client's one source of exact earn order (the Book of Deeds recent
+ * strip). Ids only: the owner's Book already holds every earned day, and the
+ * timestamps stay server-side.
+ */
+async function deedsRecentHandler(ctx: Ctx): Promise<void> {
+  const character = ownedCharacter(ctx);
+  const rows = await charactersDb.recentDeedsForCharacter(character.id, DEEDS_RECENT_CAP);
+  json(ctx.res, 200, { deeds: rows.map((row) => row.deedId) });
+}
+
 /** POST /api/characters/:id/rename: moderator-sanctioned rename (force_rename gated). */
 async function renameHandler(ctx: Ctx): Promise<void> {
   const rt = useRuntime();
@@ -528,17 +650,19 @@ async function renameHandler(ctx: Ctx): Promise<void> {
     if (rt.rekeyMailOwner(character.id, character.name, c.name)) {
       await rt.saveMail();
     }
-    // The renamed character's OWN signed instances (bags, bank, equipped) still
-    // carry the old signer name in their persisted blob; sweep it so the
-    // self-signed crafting discount, Battlefield Experience attribution, and
-    // the eqi inspect wire follow the new name. Only the persisted blob needs
-    // the sweep: the market/mail rekeys above reach WORLD state that lives in
-    // the running server regardless of sessions, but a character's live
-    // entity/meta exists only while joined, and the isCharacterOnline gate
-    // above guarantees there is none at rename time. Foreign-held copies
-    // signed with the old name live in other characters' blobs and are out of
-    // scope. renameCharacter's RETURNING row carries the current blob, and the
-    // no-nonce save is safe for the same offline reason.
+    // The renamed character's OWN signed instances still carry the old signer
+    // name; two sweeps split the work by WHERE the copies live. The market and
+    // mail rekeys above cover the world-state books (ownership keys, display
+    // names, AND the renamer's own escrowed payload signers, the fix-round
+    // completion); this blob sweep covers the five signer-bearing regions of
+    // the persisted character state, so the self-signed crafting discount,
+    // Battlefield Experience attribution, and the eqi inspect wire follow the
+    // new name everywhere a copy can come back from. A live entity/meta needs
+    // no sweep: the isCharacterOnline gate above guarantees there is none at
+    // rename time. Foreign-held copies signed with the old name live in other
+    // characters' blobs or parcels and are out of scope. renameCharacter's
+    // RETURNING row carries the current blob, and the no-nonce save is safe
+    // for the same offline reason.
     if (c.state && rekeyInstanceSigner(c.state, character.name, c.name)) {
       await charactersDb.saveCharacterState(c.id, c.level, c.state);
     }
@@ -581,6 +705,15 @@ async function deleteHandler(ctx: Ctx): Promise<void> {
     return;
   }
   const ok = await charactersDb.deleteCharacter(accountId, character.id);
+  // The row is gone; take its shared world state with it (R43). Read freshness
+  // comes from the SYNCHRONOUS in-memory purge (both reads serve from the live
+  // sim in this process). The AWAITED saves NARROW the crash window before the
+  // 200: a death after the committed DELETE but before the blobs persist would
+  // reload listings and mail keyed to a character that no longer exists, with
+  // no way to re-trigger the purge. They cannot close it outright (the game
+  // save wrappers swallow their own errors and answer anyway; the 30 s
+  // autosave is the failure-path backstop), but do not drop the await.
+  if (ok) await purgeDeletedCharacterWorldState(rt, character.id, character.name);
   json(ctx.res, ok ? 200 : 404, ok ? { ok: true } : NOT_FOUND);
 }
 
@@ -634,6 +767,16 @@ export const routes: RouteDef[] = [
     surface: 'api',
     middleware: [readGuard, requireOwnedCharacter(CHARACTER_NOT_FOUND)],
     handler: ownerSheetHandler,
+    meta: OWNED_CHARACTER_META,
+  },
+  {
+    method: 'GET',
+    path: '/api/characters/:id/deeds-recent',
+    surface: 'api',
+    // Registry-only (the new-route rule): no legacy ladder twin. Read-tier
+    // bearer + ownership, the owner-sheet gate pair exactly.
+    middleware: [readGuard, requireOwnedCharacter(CHARACTER_NOT_FOUND)],
+    handler: deedsRecentHandler,
     meta: OWNED_CHARACTER_META,
   },
   {

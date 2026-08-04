@@ -37,6 +37,7 @@ import {
 } from './data';
 import { createNpc, recalcPlayerStats } from './entity';
 import { releaseSpiritInDelve } from './entity_roster';
+import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
 import {
   aurasSurvivingDeath,
   RES_SICKNESS_STAT_MULT,
@@ -172,6 +173,12 @@ export function moveToGraveyardForUnstuck(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r || r.e.dead || r.e.ghost) return;
   const { meta, e: p } = r;
+  // The unstuck gates reject a casting player, so no live gather or fishing
+  // session can reach this today; the shared displacement teardown still
+  // runs because EVERY living-player teleport routes through it (the
+  // professions doctrine), keeping this path safe if a session state ever
+  // stops riding castingAbility.
+  cancelProfessionSessionOnDisplacement(ctx, p);
   // Resolve the graveyard before the move takes the player out of its instance band.
   const gy = ghostGraveyard(ctx, p);
   p.pos = ctx.groundPos(gy.x, gy.z);
@@ -347,6 +354,9 @@ function reviveAt(
   p.ghost = false;
   p.corpsePos = null;
   p.corpseInstanceId = null;
+  // revivePlayerAt teleports even a LIVE target (wasDead only gates the
+  // respawn event), so a running gather/fishing session must end here too.
+  cancelProfessionSessionOnDisplacement(ctx, p);
   p.pos = ctx.groundPos(pos.x, pos.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
@@ -407,6 +417,11 @@ function applySickness(
     value,
     sourceId: p.id,
     school: 'shadow',
+    // The penalty is the whole point of both sicknesses, so no player counter may take
+    // it off: a dispel (warlock Voidfeast, paladin Cleansing Verdict), a cleanse (mage
+    // Cold Coffin), and the buff-bar right-click all skip it, exactly as dying and
+    // relogging already do (aurasSurvivingDeath). Only the timer clears it.
+    undispellable: true,
   });
 }
 

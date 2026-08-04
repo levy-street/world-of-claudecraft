@@ -10,7 +10,7 @@ import { POWERUPS } from '../src/sim/content/augments';
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from '../src/sim/content/deeds';
 import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
 import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
-import { FISHING_TABLES } from '../src/sim/content/items';
+import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
 import { MAGE_PET_MOBS } from '../src/sim/content/mage_pets';
 import {
   CRAFT_RING,
@@ -35,10 +35,13 @@ import {
   GROUND_PICKUP_PROVING_QUESTS,
   MAX_CREDITABLE_MOB_LEVEL,
   MILESTONE_DEED_TO_LEGACY,
+  onFishCaughtForDeeds,
   RARE_SLAIN_TEMPLATES,
   VISITED_MARK_NAMESPACES,
+  ZONE_FISH,
 } from '../src/sim/deeds';
 import { RIFT_LEVEL_CAP, RIFT_MAX_MOB_LEVEL } from '../src/sim/rift/rift_gen';
+import { type PlayerMeta, Sim } from '../src/sim/sim';
 import { DEED_STAT_KEYS, type DeedCategory, MILESTONES } from '../src/sim/types';
 
 const ALL = DEED_ORDER.map((id) => DEEDS[id]);
@@ -58,9 +61,9 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 225 deeds worth 2760 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(225);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2760);
+  it('ships exactly 232 deeds worth 2795 total Renown', () => {
+    expect(DEED_ORDER.length).toBe(232);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2795);
   });
 
   it('ships the audited per-category counts', () => {
@@ -71,7 +74,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       combat: 10,
       dungeon: 29,
       delve: 13,
-      chronicle: 28,
+      chronicle: 35,
       collection: 28,
       pvp: 28,
       social: 18,
@@ -124,12 +127,24 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // Professions 2.0 tail (the release base merge put that tail first).
       'dgn_wildheart_basin',
       'dgn_wildheart_basin_heroic',
+      // The zone-3 gatherer chronicle (R21) closes the per-zone gatherer
+      // line; its marks had been written unconsumed since the t3 veins.
+      'chr_peaks_gatherer',
       // Camp rares missed by the first reckoning (bug fix; see the
       // RARE_SLAIN_TEMPLATES coverage test below).
       'chr_marsh_rares_ii',
       'chr_peaks_rares_ii',
       'chr_gleamstag',
       'chr_hollow_rares',
+      // The phase 20 bottom-map chronicle pairs (Q26): the gatherer and
+      // first-cast deeds the strip zones carry, for the three zones the
+      // density pass brought to strip density.
+      'chr_willowfen_gatherer',
+      'chr_willowfen_first_cast',
+      'chr_galecrest_gatherer',
+      'chr_galecrest_first_cast',
+      'chr_farshore_gatherer',
+      'chr_farshore_first_cast',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -351,13 +366,18 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Re-baselined at the release/v0.30.0 base merge: the catalog appends the
   // Wildheart Basin dungeon deed pair (2 new deeds); no shipped
   // trigger or renown changed.
-  // Re-baselined again for the RARE_SLAIN_TEMPLATES coverage fix: four more
-  // appended deeds, chr_marsh_rares_ii (Grubjaw), chr_peaks_rares_ii (Old
-  // Cragmaw, Shardlord Kazzix), chr_gleamstag, and chr_hollow_rares (Old
-  // Marrowshell, Aurelhorn), all uncredited camp rares found by the same
-  // coverage test after rebasing onto release/v0.33.0. No shipped trigger or
-  // renown changed.
-  const FROZEN_CATALOG_SHA256 = '15329b9c0bed71a46d009cb9dbe38db889dd55b235682f88001b775ae2c41fd1';
+  // Re-baselined for the zone-3 gatherer chronicle (chr_peaks_gatherer, R21):
+  // one appended deed; no shipped trigger or renown changed.
+  // Re-baselined again at the release/v0.33.0 sync merge, which brings the
+  // RARE_SLAIN_TEMPLATES coverage fix: four more appended deeds,
+  // chr_marsh_rares_ii (Grubjaw), chr_peaks_rares_ii (Old Cragmaw, Shardlord
+  // Kazzix), chr_gleamstag, and chr_hollow_rares (Old Marrowshell, Aurelhorn),
+  // all uncredited camp rares found by the same coverage test. No shipped
+  // trigger or renown changed.
+  // Re-baselined for the phase 20 bottom-map chronicle pairs (Q26): six
+  // appended deeds, the gatherer and first-cast pair for willowfen,
+  // galecrest, and farshore_isle. No shipped trigger or renown changed.
+  const FROZEN_CATALOG_SHA256 = '7edfb6a537592245005cb438f019e5a0fedd86255353c4effde54fbe94358f2a';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -546,12 +566,12 @@ describe('table shape', () => {
   it('DEED_ORDER holds the append-only authored order (first and last pinned)', () => {
     // DEED_ORDER derives from the table keys, so covering DEEDS is inherent;
     // what CAN drift is the authored order itself. Pin the endpoints as
-    // literals: prog_first_steps opens the catalog and chr_peaks_rares_ii
-    // closes the tail, and either moving would signal a reorder
+    // literals: prog_first_steps opens the catalog and the farshore
+    // first-cast closes the tail, and either moving would signal a reorder
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('chr_hollow_rares');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('chr_farshore_first_cast');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {
@@ -684,7 +704,38 @@ describe('trigger references resolve against the real content tables', () => {
       } else if (ns === 'npc') {
         expect(NPCS[mark.slice(4)], `${deedId}: ${mark}`).toBeDefined();
       } else if (ns === 'fish') {
-        expect(FISHING_TABLES[mark.slice(5)], `${deedId}: ${mark}`).toBeDefined();
+        // Earnability against the tables the zone ACTUALLY draws: the mark
+        // writer (onFishCaughtForDeeds) fires only for a caught item listed
+        // in ZONE_FISH[zone], and the resolver reads the zone's own catch
+        // table when one exists, else the Vale fallback
+        // (professions/fishing.ts). Before the phase 20 pass this branch
+        // demanded an own-table row, which was true of the three strip zones
+        // and nothing else; the starter-zone first-cast deeds fish Vale rows
+        // under their own zone id, so the guard now mirrors the resolver's
+        // read. The rollout checklist still demands own-table rows with NO
+        // fallback for every 'complete' zone, so this loosening cannot leak
+        // into a rollout flip.
+        const zoneId = mark.slice(5);
+        expect(
+          ZONES.some((z) => z.id === zoneId),
+          `${deedId}: ${mark} names no real zone`,
+        ).toBe(true);
+        const rows = ZONE_FISH[zoneId] ?? [];
+        expect(rows.length, `${deedId}: ${mark} needs ZONE_FISH rows to ever fire`).toBeGreaterThan(
+          0,
+        );
+        const drawn = new Set<string>();
+        for (const band of FISHING_TABLES_BY_BAND) {
+          for (const entry of band[zoneId] ?? band.eastbrook_vale) {
+            if (entry.itemId !== null) drawn.add(entry.itemId);
+          }
+        }
+        for (const itemId of rows) {
+          expect(
+            drawn.has(itemId),
+            `${deedId}: ${mark} lists ${itemId}, never drawn in that zone's waters`,
+          ).toBe(true);
+        }
       } else if (ns === 'gather') {
         const [, zoneId, type] = mark.split(':');
         expect(zonePoiIds.has(zoneId), `${deedId}: ${mark}`).toBe(true);
@@ -711,6 +762,82 @@ describe('trigger references resolve against the real content tables', () => {
         for (const mark of def.trigger.markIds) checkMark(def.id, mark);
       }
     }
+  });
+
+  it('a Vale-fallback catch in each bottom-map zone earns its first-cast deed (live)', () => {
+    // The witness for the fallback-aware guard above: the mark writer fires
+    // for a Vale fish caught under a starter zone's own id (which is what
+    // the resolver actually draws there), and the deed grants through the
+    // real visit path, for ALL THREE zones (the review round: one positive
+    // arm of a three-zone claim proves one zone). A fish the zone never
+    // draws must NOT fire it.
+    const CASES = [
+      ['willowfen', 'chr_willowfen_first_cast'],
+      ['galecrest', 'chr_galecrest_first_cast'],
+      ['farshore_isle', 'chr_farshore_first_cast'],
+    ] as const;
+    for (const [zoneId, deedId] of CASES) {
+      const sim = new Sim({ seed: 11, playerClass: 'warrior', autoEquip: false });
+      const meta = sim.meta(sim.playerId) as PlayerMeta;
+      // markVisited only dirties the evaluation key; the deed evaluator runs
+      // in the tick phase, so each probe ticks before reading the grant.
+      onFishCaughtForDeeds(sim.ctx, meta, zoneId, 'raw_marsh_pike'); // a Mirefen fish
+      sim.tick();
+      expect(meta.deedsEarned.has(deedId), `${deedId} on a wrong-zone fish`).toBe(false);
+      onFishCaughtForDeeds(sim.ctx, meta, zoneId, 'raw_mirror_trout');
+      sim.tick();
+      expect(meta.deedsEarned.has(deedId), deedId).toBe(true);
+      // Zone-keyed: this zone's catch earned nothing for the sibling zones.
+      for (const [, otherDeed] of CASES) {
+        if (otherDeed === deedId) continue;
+        expect(meta.deedsEarned.has(otherDeed), `${otherDeed} cross-zone leak`).toBe(false);
+      }
+    }
+  });
+
+  it('the three gather marks earn each bottom-map gatherer chronicle (live)', () => {
+    // The gatherer twin of the fish witness: the chronicle waits on the
+    // three gather:<zone>:<type> marks (the exact ids completeGatherCast
+    // writes; the rollout suite's live arm pins that producer-template
+    // equality for the complete zones), and two marks must NOT grant.
+    const CASES = [
+      ['willowfen', 'chr_willowfen_gatherer'],
+      ['galecrest', 'chr_galecrest_gatherer'],
+      ['farshore_isle', 'chr_farshore_gatherer'],
+    ] as const;
+    for (const [zoneId, deedId] of CASES) {
+      const sim = new Sim({ seed: 11, playerClass: 'warrior', autoEquip: false });
+      const meta = sim.meta(sim.playerId) as PlayerMeta;
+      sim.ctx.markVisited(meta, `gather:${zoneId}:ore`);
+      sim.ctx.markVisited(meta, `gather:${zoneId}:wood`);
+      sim.tick();
+      expect(meta.deedsEarned.has(deedId), `${deedId} granted at two of three marks`).toBe(false);
+      sim.ctx.markVisited(meta, `gather:${zoneId}:herb`);
+      sim.tick();
+      expect(meta.deedsEarned.has(deedId), deedId).toBe(true);
+      for (const [, otherDeed] of CASES) {
+        if (otherDeed === deedId) continue;
+        expect(meta.deedsEarned.has(otherDeed), `${otherDeed} cross-zone leak`).toBe(false);
+      }
+    }
+  });
+
+  it('every ZONE_FISH row belongs to a shipped first-cast deed (the reverse sweep)', () => {
+    // The other direction of the fish-guard intersection above: a ZONE_FISH
+    // key with no deed consuming its fish:<zone> mark is inert authoring
+    // debt, so the table and the deed catalog must cover each other exactly.
+    const deedFishZones = new Set<string>();
+    for (const def of ALL) {
+      if (def.trigger.kind === 'visit' && def.trigger.markId.startsWith('fish:')) {
+        deedFishZones.add(def.trigger.markId.slice(5));
+      }
+      if (def.trigger.kind === 'visits') {
+        for (const mark of def.trigger.markIds) {
+          if (mark.startsWith('fish:')) deedFishZones.add(mark.slice(5));
+        }
+      }
+    }
+    expect([...Object.keys(ZONE_FISH)].sort()).toEqual([...deedFishZones].sort());
   });
 
   it('every static-zone poi carries a stable id, unique within its zone', () => {

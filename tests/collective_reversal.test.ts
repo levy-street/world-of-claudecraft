@@ -45,9 +45,15 @@ describe('Collective Reversal content', () => {
       specs: ['arcane'],
       learnLevel: 8,
       castTime: 7,
+      cooldown: 300,
       requiresTarget: false,
       requiresOutOfCombat: true,
     });
+    // requiresOutOfCombat is not a throttle on its own: a caster who never draws
+    // aggro drops combat mid-fight, so the cooldown is what stops a mass rez from
+    // being chained inside one encounter. It must outlast a cast plus the combat
+    // linger the caster waits out to become eligible again.
+    expect(def.cooldown).toBeGreaterThan(def.castTime + 5);
     expect(def.effects).toContainEqual({ type: 'massResurrectGroup', hpFrac: 0.3 });
 
     const known = (spec: 'arcane' | 'fire' | 'frost') =>
@@ -175,6 +181,41 @@ describe('Collective Reversal behavior', () => {
     expect(fallen.dead).toBe(true);
     expect(mage.resource).toBe(mana);
     expect(events).toContainEqual({ type: 'castStop', entityId: mage.id, success: false });
+  });
+
+  it('refuses a second cast while the cooldown runs, even fully out of combat', () => {
+    const { sim, mage } = chronomancer();
+    const fallen = addToGroup(sim, mage, 'warrior', 'Fallen Twice');
+    killAt(fallen, mage.pos.x + 2, mage.pos.z);
+
+    sim.castAbility(ABILITY_ID);
+    expect(mage.castingAbility).toBe(ABILITY_ID);
+    for (let tick = 0; tick < 141; tick++) sim.tick();
+    expect(mage.castingAbility).toBeNull();
+    sim.respondToResurrection(true, fallen.id);
+    expect(fallen.dead).toBe(false);
+
+    const remaining = mage.cooldowns.get(ABILITY_ID) ?? 0;
+    expect(remaining).toBeGreaterThan(290);
+    expect(remaining).toBeLessThanOrEqual(300);
+
+    // The same group member dies again and the mage is unambiguously out of combat
+    // with a full mana pool: only the cooldown may refuse this cast.
+    killAt(fallen, mage.pos.x + 2, mage.pos.z);
+    mage.inCombat = false;
+    mage.combatTimer = 99;
+    mage.resource = mage.maxResource;
+    const mana = mage.resource;
+    sim.castAbility(ABILITY_ID);
+    expect(mage.castingAbility).toBeNull();
+    expect(mage.resource).toBe(mana);
+    expect(fallen.dead).toBe(true);
+
+    // Clearing only the cooldown lets the identical cast start, proving the refusal
+    // above was the cooldown and not the out-of-combat or dead-member gate.
+    mage.cooldowns.delete(ABILITY_ID);
+    sim.castAbility(ABILITY_ID);
+    expect(mage.castingAbility).toBe(ABILITY_ID);
   });
 
   it('cancels cleanly if another source revives every group member first', () => {

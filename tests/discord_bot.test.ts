@@ -34,9 +34,12 @@ import {
   stripLevelSuffix,
   tierRoleName,
   topSpecialRoleKeyFor,
+  VC_NATION_LABELS,
   voiceMembersForChannel,
 } from '../bot/logic';
+import type { ActivityKind } from '../server/discord_activity';
 import { DEFAULT_JSON_BODY_MAX_BYTES } from '../server/http_util';
+import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
 
 describe('gateway protocol helpers', () => {
   it('requests the privileged member + presence intents', () => {
@@ -577,6 +580,219 @@ describe('significant-activity cards', () => {
     }) as { allowed_mentions: { users: string[] }; embeds: Array<Record<string, any>> };
     expect(msg.embeds[0].description).toContain('Ghost'); // plain, no mention
     expect(msg.allowed_mentions.users).toEqual(['111']);
+  });
+
+  // The server has enqueued vale_cup cards since the Vale Cup shipped, but the
+  // bot's builder had no case for the kind, so every card posted as an embed
+  // with an undefined title/description/color (the empty-embed render).
+  it('vale-cup card names the winning nation, bracket, and score, tagging the side', () => {
+    const msg = buildActivityMessage({
+      kind: 'vale_cup',
+      realm: 'Claudemoon',
+      profileUrl: null,
+      bracket: 3,
+      scoreA: 2,
+      scoreB: 5,
+      winnerNation: 'copperdig',
+      participants: [linked('Aldric', '111'), linked('Mira', '222')],
+    }) as {
+      content: string;
+      allowed_mentions: { users: string[] };
+      embeds: Array<Record<string, any>>;
+    };
+    expect(msg.embeds[0].title).toContain('The Copper Dig');
+    expect(msg.embeds[0].title).toContain('3v3');
+    // Winning score reads first regardless of which team's column it sat in.
+    expect(msg.embeds[0].description).toContain('5 to 2');
+    expect(msg.embeds[0].description).toContain('<@111>');
+    expect(msg.embeds[0].description).toContain('<@222>');
+    expect(msg.allowed_mentions.users.sort()).toEqual(['111', '222']);
+    expect(typeof msg.embeds[0].color).toBe('number');
+  });
+
+  it('vale-cup card falls back to the raw nation id when the label map misses', () => {
+    const msg = buildActivityMessage({
+      kind: 'vale_cup',
+      realm: 'Claudemoon',
+      profileUrl: null,
+      bracket: 1,
+      scoreA: 3,
+      scoreB: 0,
+      winnerNation: 'newnation',
+      participants: [linked('Aldric', '111')],
+    }) as { embeds: Array<Record<string, any>> };
+    expect(msg.embeds[0].title).toContain('newnation');
+  });
+
+  // The bot's nation labels are a deliberate COPY of the game catalog's English
+  // values: bot/logic.ts must not import the ui catalog (the bot bundle stays
+  // standalone), so only this test, which imports BOTH, notices the two drifting
+  // apart. Reword hudChrome.vcup.nation.* and the bot copy reddens here.
+  it('pins the bot Vale Cup nation labels to the game catalog English values', () => {
+    const catalog: Record<string, string> = hudChromeStrings.vcup.nation;
+    expect(Object.keys(VC_NATION_LABELS).sort()).toEqual(Object.keys(catalog).sort());
+    expect(Object.keys(VC_NATION_LABELS)).toHaveLength(8);
+    for (const [id, label] of Object.entries(VC_NATION_LABELS)) {
+      expect(label, `nation ${id}`).toBe(catalog[id]);
+    }
+  });
+
+  it('masterwork card names the crafted item and pings the crafter', () => {
+    const msg = buildActivityMessage({
+      kind: 'masterwork',
+      realm: 'Claudemoon',
+      profileUrl: 'https://woc.test/c/Aldric',
+      itemName: 'Osmium Breastplate',
+      participants: [linked('Aldric', '111')],
+    }) as {
+      content: string;
+      allowed_mentions: { users: string[] };
+      embeds: Array<Record<string, any>>;
+    };
+    expect(msg.embeds[0].title).toBe('Osmium Breastplate');
+    expect(msg.embeds[0].description).toContain('masterwork');
+    expect(msg.embeds[0].description).toContain('<@111>');
+    expect(msg.allowed_mentions.users).toEqual(['111']);
+  });
+
+  it('deed-title card names the deed and the earned title', () => {
+    const msg = buildActivityMessage({
+      kind: 'deed',
+      realm: 'Claudemoon',
+      profileUrl: null,
+      deedId: 'prog_masterwright',
+      deedName: 'Masterwright',
+      deedTitle: 'Masterwright',
+      participants: [linked('Aldric', '111')],
+    }) as { embeds: Array<Record<string, any>> };
+    expect(msg.embeds[0].title).toBe('Masterwright');
+    expect(msg.embeds[0].description).toContain('"Masterwright"');
+    expect(msg.embeds[0].description).toContain('title');
+    expect(msg.embeds[0].description).toContain('<@111>');
+  });
+
+  it('first-koi card reads as a catch, not a generic deed', () => {
+    const msg = buildActivityMessage({
+      kind: 'deed',
+      realm: 'Claudemoon',
+      profileUrl: null,
+      deedId: 'col_glimmerfin',
+      deedName: 'Glimmer of Hope',
+      itemName: 'Sunglint Koi',
+      participants: [linked('Aldric', '111')],
+    }) as { embeds: Array<Record<string, any>> };
+    expect(msg.embeds[0].title).toBe('Glimmer of Hope');
+    expect(msg.embeds[0].description).toContain('first Sunglint Koi');
+    expect(msg.embeds[0].description).toContain('<@111>');
+  });
+
+  // Same empty-embed class, one layer in: an item name the server sends as an
+  // EMPTY string (not absent) must fall back to the generic title. `??` keeps
+  // the empty string and Discord rejects a blank embed title, so every title
+  // fallback in buildActivityMessage is `||`.
+  it('degrades an empty item or deed name to the generic title', () => {
+    const titleOf = (item: ActivityItem): string =>
+      (buildActivityMessage(item) as { embeds: Array<{ title: string }> }).embeds[0].title;
+    const base = { realm: 'Claudemoon', profileUrl: null, participants: [linked('Aldric', '111')] };
+    expect(titleOf({ ...base, kind: 'rareloot', itemName: '' })).toBe('A rare item');
+    expect(titleOf({ ...base, kind: 'masterwork', itemName: '' })).toBe('A masterwork piece');
+    expect(titleOf({ ...base, kind: 'deed', deedId: 'col_glimmerfin', deedName: '' })).toBe(
+      'A rare catch',
+    );
+    expect(titleOf({ ...base, kind: 'deed', deedId: 'prog_masterwright', deedName: '' })).toBe(
+      'A deed of renown',
+    );
+  });
+
+  // The empty-embed class guard: a kind this bot build does not know (a newer
+  // server mid-deploy) must skip the post entirely, never render a blank card.
+  it('returns null for an unknown activity kind', () => {
+    const msg = buildActivityMessage({
+      kind: 'parade' as never,
+      realm: 'Claudemoon',
+      profileUrl: null,
+      participants: [linked('Aldric', '111')],
+    });
+    expect(msg).toBeNull();
+  });
+
+  // Server-to-bot kind parity, the drift class that broke vale_cup (the server
+  // enqueued the kind for months while the bot union lacked it, so every card
+  // rendered an author-less empty embed Discord rejects). The wire crosses
+  // processes as unchecked JSON, so tsc alone never sees the drift; this list
+  // is pinned to the server union in BOTH directions at tsc time (a server
+  // kind missing from the list reddens the conditional-type line; a listed
+  // kind the bot cannot take reddens the buildActivityMessage call) and every
+  // kind must render a real card at runtime.
+  const SERVER_KINDS = [
+    'levelup',
+    'rareloot',
+    'duel',
+    'arena',
+    'vale_cup',
+    'masterwork',
+    'deed',
+  ] as const satisfies readonly ActivityKind[];
+  type MissingServerKind = Exclude<ActivityKind, (typeof SERVER_KINDS)[number]>;
+  // Deliberately a TYPE-level pin: the initializer is literally null, so the
+  // runtime expect below is a tautology; the teeth are that this line fails
+  // `tsc --noEmit` (which the gate and the pre-push floor run) the moment the
+  // server union gains a kind the list lacks.
+  const noMissingServerKinds: MissingServerKind extends never ? null : MissingServerKind = null;
+
+  it('renders a fully populated card for every kind the server can enqueue', () => {
+    expect(noMissingServerKinds).toBeNull();
+    for (const kind of SERVER_KINDS) {
+      const msg = buildActivityMessage({
+        kind,
+        realm: 'Claudemoon',
+        profileUrl: null,
+        level: 20,
+        participants: [linked('Aldric', '111')],
+      }) as { embeds: Array<Record<string, any>> } | null;
+      expect(msg, `kind ${kind} must render a card`).not.toBeNull();
+      // Non-null is not enough: the production failure was a card that rendered
+      // with an EMPTY author ({}) and an undefined title/description, which
+      // Discord 400s. author.name is the field that 400s first, so every kind
+      // is pinned on all three universal embed fields being real, non-blank
+      // text (the item here carries only the fields the server always sends,
+      // so any kind leaning on an optional field must still fill them).
+      const embed = (msg as { embeds: Array<Record<string, any>> }).embeds[0];
+      expect(embed, `kind ${kind} must render one embed`).toBeDefined();
+      for (const [field, value] of [
+        ['author.name', embed.author?.name],
+        ['title', embed.title],
+        ['description', embed.description],
+      ] as const) {
+        expect(typeof value, `kind ${kind} ${field} must be a string`).toBe('string');
+        expect(
+          String(value).trim().length,
+          `kind ${kind} ${field} must not be blank`,
+        ).toBeGreaterThan(0);
+      }
+      expect(typeof embed.color, `kind ${kind} must set an accent color`).toBe('number');
+    }
+  });
+
+  it('buildActivityMessage answers null for an unknown kind, never an empty embed', () => {
+    // The never-post-an-empty-embed rule (the vale_cup failure): a kind this
+    // build does not know maps to null, and the outbox io seam drops the null
+    // instead of posting (tests/discord_bot_outbox.test.ts pins the drop).
+    // Known kinds keep building full payloads.
+    const known = (kind: ActivityItem['kind']): ActivityItem => ({
+      kind,
+      realm: 'Claudemoon',
+      profileUrl: null,
+      level: 20,
+      participants: [linked('Aldric', '111')],
+    });
+    expect(buildActivityMessage({ ...known('rareloot'), kind: 'parade' as never })).toBeNull();
+    const levelup = buildActivityMessage(known('levelup'));
+    if (!levelup) throw new Error('the levelup payload must build');
+    expect((levelup.embeds as Array<{ title: string }>)[0].title).toContain('level 20');
+    const masterwork = buildActivityMessage(known('masterwork'));
+    if (!masterwork) throw new Error('the masterwork payload must build');
+    expect((masterwork.embeds as Array<{ title: string }>)[0].title).toBe('A masterwork piece');
   });
 });
 

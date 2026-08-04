@@ -41,6 +41,7 @@ import { announceAttunement } from '../src/sim/professions/attunement_events';
 import { WORK_ORDER_CADENCE_TICKS } from '../src/sim/professions/cadence';
 import type { PlayerMeta } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
+import { buildAttunementPreview } from '../src/ui/profession_identity_view';
 import type { CraftingIdentityView } from '../src/world_api/professions';
 
 const SMITH_PAIR = 'weaponcrafting+armorcrafting';
@@ -369,4 +370,132 @@ describe('tier mail over the live GameServer wire (session routing)', () => {
     },
     ONLINE_SUITE_TIMEOUT_MS,
   );
+});
+
+// A ClientWorld without the WebSocket plumbing, able to drive applySnapshot
+// with a REAL captured wire frame (the professions_fishing bareClient idiom;
+// the file's own bareClient above builds the identity directly and cannot
+// exercise the applySnapshot mirror line).
+function snapshotClient(pid: number): ClientWorld {
+  const c: any = Object.create(ClientWorld.prototype);
+  c.cfg = { seed: 20061, playerClass: 'warrior' };
+  c.entities = new Map();
+  c.playerId = pid;
+  c.ownPlayerId = pid;
+  c.ownPlayerClass = 'warrior';
+  c.spectating = null;
+  c.cupInfo = null;
+  c.sportRole = null;
+  c.moveInput = {};
+  c.inventory = [];
+  c.vendorBuyback = [];
+  c.equipment = {};
+  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
+  c.copper = 0;
+  c.honor = 0;
+  c.lifetimeHonor = 0;
+  c.xp = 0;
+  c.known = [];
+  c.questLog = new Map();
+  c.questsDone = new Set();
+  c.pendingQuestCommands = new Map();
+  c.partyInfo = null;
+  c.selectedDungeonDifficulty = 'normal';
+  c.tradeInfo = null;
+  c.duelInfo = null;
+  c.lastSnapAt = 0;
+  c.snapInterval = 50;
+  c.serverTickHz = null;
+  c.missingSince = new Map();
+  c.pendingFacingDelta = 0;
+  c.connected = true;
+  c.eventQueue = [];
+  c.mouselookFacing = null;
+  c.lastInputSentAt = 0;
+  c.lastInputSig = '';
+  c.inputSeq = 0;
+  c.pendingInputSeqSentAt = new Map();
+  c.ackedInputSeq = 0;
+  c.inputEchoSamples = [];
+  c.spectateFacingPending = false;
+  c.pendingSpectateFacing = null;
+  c.nodeCooldowns = new Map();
+  return c;
+}
+
+describe('the quested-hobby record rides the cprof mirror', () => {
+  it('a recorded hobby reaches the owner wire frame, and an empty record stays absent', () => {
+    const server = new GameServer();
+    const fcOwner = fakeWs();
+    const so = joinServer(server, fcOwner, 131, 'Rememberer');
+    const meta = playersOf(server).get(so.pid)!;
+
+    // Featureless baseline: the field is ABSENT from the cprof frame (the
+    // zero-default omission that keeps the delta signature still).
+    (server as unknown as { broadcastSnapshots(): void }).broadcastSnapshots();
+    const before = fcOwner.sent
+      .filter((m) => m.t === 'snap' && m.self?.cprof)
+      .map((m) => m.self!.cprof!);
+    expect(before.length).toBeGreaterThan(0);
+    expect('questedHobbies' in before[before.length - 1]).toBe(false);
+
+    // The record appears (the hobby-switch quest writes it in real flow;
+    // written directly here, the per-pid state idiom) and the next broadcast
+    // diffs a NEW cprof frame carrying it.
+    meta.questedHobbies.set('weaponcrafting+armorcrafting', 'tailoring');
+    routeOf(server)(server.sim.tick());
+    (server as unknown as { broadcastSnapshots(): void }).broadcastSnapshots();
+    const after = fcOwner.sent
+      .filter((m) => m.t === 'snap' && m.self?.cprof)
+      .map((m) => m.self!.cprof!);
+    expect(after.length).toBeGreaterThan(before.length);
+    expect(after[after.length - 1].questedHobbies).toEqual({
+      'weaponcrafting+armorcrafting': 'tailoring',
+    });
+
+    // Close the loop through the REAL client mirror: applySnapshot on the
+    // captured frames. The featureless frame leaves the field absent, the
+    // carrying frame mirrors it, and re-applying the featureless frame drops
+    // it again (cprof replaces the identity wholesale).
+    const client = snapshotClient(so.pid);
+    const lastSnapWith = (frames: unknown[], want: boolean) => {
+      const snaps = (frames as { t?: string; self?: { cprof?: unknown } }[]).filter(
+        (m) => m.t === 'snap' && m.self?.cprof !== undefined,
+      );
+      for (let i = snaps.length - 1; i >= 0; i--) {
+        const cprof = snaps[i].self?.cprof as { questedHobbies?: unknown };
+        if (!!cprof.questedHobbies === want) return snaps[i];
+      }
+      throw new Error('no matching cprof frame captured');
+    };
+    (client as any).applySnapshot(lastSnapWith(fcOwner.sent, false));
+    expect('questedHobbies' in client.craftingIdentity).toBe(false);
+    (client as any).applySnapshot(lastSnapWith(fcOwner.sent, true));
+    expect(client.craftingIdentity.questedHobbies).toEqual({
+      'weaponcrafting+armorcrafting': 'tailoring',
+    });
+    // Close the composition: the wire-mirrored identity drives the REAL
+    // preview core (the quest dialog's thin pass-through is pinned in its
+    // own suite), so the JSON-shaped record and the view's lookup cannot
+    // drift apart without a test moving.
+    const mirrored = client.craftingIdentity;
+    const preview = buildAttunementPreview(
+      'weaponcrafting+armorcrafting',
+      mirrored.craftSkills,
+      mirrored.switchCount,
+      mirrored.questedHobbies,
+    );
+    expect(preview?.hobbyCraft).toBe('tailoring');
+    (client as any).applySnapshot(lastSnapWith(fcOwner.sent, false));
+    expect('questedHobbies' in client.craftingIdentity).toBe(false);
+    // And absent-record parity: the same call off the featureless mirror
+    // falls back to the skill default, never a stale remembered hobby.
+    const fallback = buildAttunementPreview(
+      'weaponcrafting+armorcrafting',
+      client.craftingIdentity.craftSkills,
+      client.craftingIdentity.switchCount,
+      client.craftingIdentity.questedHobbies,
+    );
+    expect(fallback?.hobbyCraft).toBe('leatherworking');
+  });
 });

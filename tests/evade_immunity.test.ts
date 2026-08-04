@@ -7,6 +7,7 @@ import { dealDamage } from '../src/sim/combat/damage';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { dist2d } from '../src/sim/types';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
 function makeSim() {
   return new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
@@ -183,7 +184,6 @@ describe('attacks against an evading mob report an Evade result', () => {
 // pinned on their own camp props and blocked progression. Once stalled, the mob
 // phases through the blocker just far enough to clear it, then walks home and resets.
 describe('an evading mob that cannot path home recovers instead of getting stuck', () => {
-  const WORLD_SEED = 20061; // the live world seed
   const CAMP_TENT = { x: -3, z: 505, y: 0 }; // the prop the summoners pin against
 
   // the summoner that spawns closest to the camp tent — the one players see stuck

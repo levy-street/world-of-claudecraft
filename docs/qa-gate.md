@@ -52,7 +52,9 @@ It runs, in order:
 
 It deliberately skips full unsharded vitest, browser regressions, SFX conformance,
 i18n generate/freshness, wiki content, and env/server/client builds. Those stay on the
-full gate. Vitest workers still use `computeGateWorkers` (CPU/2 and free-mem clamp).
+full gate. Vitest workers still use `computeGateWorkers` (CPU/2 and available-memory clamp;
+the sensor is `scripts/lib/gate_memory.mjs`, which reads `vm_stat` on macOS because
+`os.freemem()` under-reports availability there).
 Optional `GATE_WORKER_TIER=low|medium|high` caps workers after that clamp; see
 [`docs/local-gate-perf/tier-workers.md`](local-gate-perf/tier-workers.md). Opt in to
 branch-wide `vitest --changed <ref>` with `GATE_FAST_BASE=<ref>` when you deliberately
@@ -84,14 +86,14 @@ Phase 5). Default environment remains `node`.
 `npm run gate` (or `pnpm run gate`) is the **merge and "done" contract**. It mirrors CI:
 generated i18n freshness, malware scanning, changed-file formatting, the SFX conformance
 check, the full test suite, the browser regression suite (`npm run test:browser`, which
-drives Chromium through Playwright), the typecheck, and env, server, and client builds.
-Release branches use the release i18n tier. It stops at the first failure and bounds
-Vitest workers to avoid load flakes on shared machines. It resolves FFmpeg (`ffmpeg`
-and `ffprobe`) from the bundled `ffmpeg-static`/`ffprobe-static` npm packages, falling
-back to PATH, and refuses to run when neither source yields a working binary.
+drives Chromium through Playwright), the typecheck, and env, server, bot, and client
+builds. Release branches use the release i18n tier. It stops at the first failure and
+bounds Vitest workers to avoid load flakes on shared machines. It resolves FFmpeg
+(`ffmpeg` and `ffprobe`) from the bundled `ffmpeg-static`/`ffprobe-static` npm packages,
+falling back to PATH, and refuses to run when neither source yields a working binary.
 
 **Task cache (Turborepo):** pure artifact steps (`i18n:gen`, `wiki:content`, `sfx:check`,
-`check:types`, `build:env`, `build:server`, `build:bundle`) run through `npx turbo run`
+`check:types`, `build:env`, `build:server`, `build:bot`, `build:bundle`) run through `npx turbo run`
 with inputs/outputs in root `turbo.json`. A warm second gate on an unchanged tree
 replays those steps from `.turbo/` (often under a second). Full vitest, browser tests,
 malware, changed-file Biome, and the i18n freshness `git diff` always run (they are not

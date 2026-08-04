@@ -118,6 +118,32 @@
   body.mobile-touch.game-active #ui {
     z-index: 80;
   }
+  /* The touch item-drag drop window (the phase 14 QA blocker): while a bag
+     stack is mid-drag the action ring must be REACHABLE over the open
+     window, or every release hit-tests the sheet and the drag-to-slot flow
+     cannot be performed at all. #mobile-controls and #ui are body-level
+     siblings, so the deciding comparison is against #ui's window-open
+     z-index (90, the rule above the backdrop block), not the sheet's own
+     95 inside it; 96 clears both. The drag lifecycle stamps
+     body.touch-item-dragging (src/ui/touch_item_drag.ts); raising the
+     controls layer for exactly that window floats the ring over the bags
+     corner as the visible drop target, and the release restores normal
+     stacking. */
+  body.mobile-touch.game-active.touch-item-dragging #mobile-controls {
+    z-index: 96;
+  }
+  /* Only the RING is the drop target: the raise lifts the whole controls
+     subtree (a child's z-index cannot escape its parent stacking context),
+     so every other pointer-active control up there (the move zone, the
+     joystick, the menu cluster) would silently eat drops meant for the
+     window beneath it, e.g. an equip socket under the move zone in the
+     paired char+bags layout (the fix-round review's blocker). Neutralize
+     everything but the ring for exactly the drag window; hit-testing then
+     falls through to the sheet and the paperdoll as before. */
+  body.mobile-touch.game-active.touch-item-dragging #mobile-controls > :not(#mobile-action-ring),
+  body.mobile-touch.game-active.touch-item-dragging #mobile-controls > :not(#mobile-action-ring) * {
+    pointer-events: none;
+  }
   body.mobile-touch.game-active #ui,
   body.mobile-touch.game-active #nameplates,
   body.mobile-touch.game-active #mobile-controls {
@@ -1404,6 +1430,50 @@
   body.mobile-touch #daily-rewards-button {
     display: none !important;
   }
+  /* Seeker promotes the existing mobile reward action out of More and into the
+     shortcut grid directly below Chat. Keep the same element/listener and show
+     only the established desktop chest artwork. */
+  body.mobile-touch.seeker-wallet-enabled #mobile-combat-controls {
+    column-gap: 12px;
+    row-gap: 8px;
+  }
+  body.mobile-touch.seeker-wallet-enabled
+    #mobile-combat-controls
+    #mobile-daily-rewards:not([hidden]) {
+    grid-column: 1;
+    grid-row: 2;
+    position: static;
+    display: flex;
+    width: 58px;
+    height: 54px;
+    min-width: 58px;
+    min-height: 54px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: url("/ui/daily-rewards/treasure_chest.webp") center / 48px 48px no-repeat;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    pointer-events: auto;
+  }
+  body.mobile-touch.seeker-wallet-enabled
+    #mobile-combat-controls
+    #mobile-daily-rewards
+    :is(.ui-icon, .mobile-label) {
+    display: none !important;
+  }
+  body.mobile-touch.seeker-wallet-enabled #mobile-combat-controls #mobile-daily-rewards:active {
+    transform: scale(0.92);
+  }
+  body.mobile-touch.seeker-wallet-enabled
+    #mobile-combat-controls
+    #mobile-daily-rewards:focus-visible {
+    border-radius: 8px;
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
   /* Idle-fade (mobile_chrome_fade.ts arms .mobile-chrome-idle on body after a
      stretch of no touch): recedes the low-frequency chrome (the top-left
      Chat/Social/More trio and the daily-chest rail), instantly restored on
@@ -1756,6 +1826,13 @@
     transform: scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
     transform-origin: left top;
   }
+  /* The Seeker chest occupies the shortcut grid's second row. Reserve that
+     row before seating actionable unit frames, including the maximum 1.3
+     Action Button Size setting, with at least an 8px gap below the 54px chest.
+     Non-Seeker mobile keeps the compact +72px target seat. */
+  body.mobile-touch.seeker-wallet-enabled #target-frame {
+    top: calc(max(8px, env(safe-area-inset-top)) + 140px);
+  }
   /* Target of Target on mobile: a DELIBERATE placement, not fallthrough.
      showTargetOfTarget is a user-chosen HUD option (reachable from the mobile
      options sheet; graphics-settings fairness does not apply to user options),
@@ -1785,6 +1862,9 @@
     align-items: flex-start;
     width: auto;
     z-index: 5;
+  }
+  body.mobile-touch.seeker-wallet-enabled #party-frames {
+    top: calc(max(8px, env(safe-area-inset-top)) + 142px);
   }
   /* The member-rows wrapper carries the adaptive double-stack the container used to: a
      CSS grid with grid-auto-flow: column and 2 explicit rows does the adaptive part with
@@ -2106,6 +2186,11 @@
   }
   /* The Merchant's coin continues the same disc-control row, left of the envelope. */
   body.mobile-touch #market-indicator {
+    /* Clear the desktop anchor before re-anchoring on the other side: the coin
+       pins left on the disc, and left + width + right all non-auto is
+       over-constrained (LTR drops `right`), so without this it never joins the
+       row. Same reason #raid-lockout clears left and #mail-indicator bottom. */
+    left: auto;
     right: calc(100% + 138px);
     top: 156px;
     width: 44px;
@@ -2381,6 +2466,15 @@
   }
   body.mobile-touch #banner.banner-with-art {
     gap: 6px;
+  }
+  /* The deed plate scales with the rest of the touch chrome; the desktop
+     26px would eat a phone's width once the plate's padding is added. One
+     rule covers both orientations: the landscape block below restates plain
+     `body.mobile-touch #banner`, which is a class less specific than this, so
+     it cannot win the size back no matter the source order. */
+  body.mobile-touch #banner.banner-deed {
+    font-size: calc(19px * var(--mobile-chrome-scale, 1));
+    padding: 6px 14px;
   }
   body.mobile-touch #banner .banner-art {
     width: 34px;
@@ -2751,18 +2845,18 @@
     min-height: 40px;
     white-space: nowrap;
   }
-  /* The LIST owns the tracks (rows subgrid into it, see components.css), so the
-     tighter mobile template lands on the list; the cap column wraps below. */
-  body.mobile-touch .profession-skill-list {
-    grid-template-columns: minmax(82px, 1fr) 34px minmax(68px, auto);
-  }
-  body.mobile-touch .profession-skill-row > :last-child {
-    grid-column: 1 / -1;
-  }
-  /* The cap value wraps to its own line per row on mobile (no cap column
-     exists), so the Cap column header would float over nothing: hide it. */
-  body.mobile-touch .profession-skill-header > :last-child {
-    display: none;
+  /* Phase 22 retired the mobile-only track override, the full-width Cap wrap,
+     and the Cap-header hide with the grid table itself: the rows are the
+     professions row family now (name + value line, labeled pill chips), so
+     nothing wraps unlabeled and there is no column header to hide. The card
+     keeps only its height cap above, and stays the ONE scroller: the desktop
+     list cap must lift here, because a capped (overflow-y: auto) list is a
+     flex child with a zero automatic minimum, and inside the height-capped
+     column card it shrinks to nothing, hiding every row. */
+  body.mobile-touch .profession-identity-card .profession-skill-list {
+    flex: none;
+    max-height: none;
+    overflow-y: visible;
   }
   body.mobile-touch .qd-profession-choice select {
     min-height: 40px;
@@ -3306,9 +3400,11 @@
     border-bottom-left-radius: 0;
     border-left: 0;
   }
-  /* The six category chips wrap to two rows at half-viewport width and eat the grid,
-     so keep them one horizontally scrollable row inside the cluster (the bank pairing
-     does the same); nothing is hidden and every chip keeps its full tap height. */
+  /* One horizontally scrollable chip row, like everywhere on mobile: the base
+     .bag-chips rule near the top of this layer already forces nowrap + scroll for
+     every mobile chip row, and this restates it for the paired cluster so the
+     containment survives if the base rule ever narrows (the bank pairing does the
+     same); nothing is hidden and every chip keeps its full tap height. */
   body.mobile-touch.char-bags-paired #bags .bag-chips {
     flex-wrap: nowrap;
     overflow-x: auto;
@@ -3723,12 +3819,12 @@
     border-bottom-right-radius: 0;
     border-right-width: 1px;
   }
-  /* Short landscape phones: the six category chips wrap to two rows at half-viewport
-     width and eat the grid (a sub-row sliver at 360px tall). Keep them one
-     horizontally scrollable row inside the bank AND market clusters (both panels, so
-     each pair stays visually consistent; the vendor cluster and standalone bags keep
-     the family wrap). Nothing is hidden: every chip stays reachable by scroll and
-     keeps its full tap height. */
+  /* One horizontally scrollable chip row inside the bank AND market clusters,
+     like everywhere on mobile (the base .bag-chips rule near the top of this
+     layer already forces nowrap + scroll, and like it this rule is
+     unconditioned, not media-scoped); restated per cluster so both panels of
+     each pair keep identical scroll containment. Nothing is hidden: every chip
+     stays reachable by scroll and keeps its full tap height. */
   body.mobile-touch #bank-window .bag-chips,
   body.mobile-touch.bank-open #bags .bag-chips,
   body.mobile-touch.market-open #bags .bag-chips {
@@ -3820,6 +3916,15 @@
   body.mobile-touch #deeds-window .deeds-cat-titles.active {
     border-top-color: #6a5320;
   }
+  /* The recent-strip jump buttons keep the 40px touch floor on EVERY touch
+     device (unconditional, not just short-landscape phones: a landscape
+     tablet is body.mobile-touch too). The strip wraps horizontally, and on
+     short viewports the entry list is the flex arm that yields, so the
+     taller row cannot push the filter bar out. */
+  body.mobile-touch #deeds-window .deeds-recent-item {
+    min-width: 40px;
+    min-height: 40px;
+  }
   /* Short landscape phones: the pinned chrome (title bar, summary, recent and
      nearest strips, chip row, filter bar) can eat the whole panel height and
      clip the filter bar below the window edge. The strips tighten and the
@@ -3906,6 +4011,17 @@
   }
   body.mobile-touch #professions-window .prof-list {
     grid-template-columns: minmax(0, 1fr);
+  }
+  /* The tool-effect controls' touch floors, the body.mobile-touch twin of the
+     @media (pointer: coarse) rules in components.css (the map-zoom-btn idiom):
+     the coarse-pointer media rule serves real devices, and this class-scoped
+     twin serves the touch layout AND makes the floor measurable by the
+     browser target-size suite, whose Playwright context is fine-pointer and
+     can never match the media query. */
+  body.mobile-touch .prof-effect-btn,
+  body.mobile-touch .prof-effect-mode-toggle,
+  body.mobile-touch #confirm-dialog .cd-actions .btn {
+    min-height: 40px;
   }
   /* On touch, stack the categories back into a single column so the large
      touch targets keep their full width. */
@@ -5014,9 +5130,17 @@
       top: calc(max(6px, env(safe-area-inset-top)) + 56px);
       transform: scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
     }
+    /* Landscape buttons use a 48px first row and 10px gap. Reserve the scaled
+       two-row grid at the maximum Action Button Size before seating target. */
+    body.mobile-touch.seeker-wallet-enabled #target-frame {
+      top: calc(max(6px, env(safe-area-inset-top)) + 132px);
+    }
     body.mobile-touch #party-frames {
       left: max(6px, env(safe-area-inset-left));
       top: calc(max(6px, env(safe-area-inset-top)) + 58px);
+    }
+    body.mobile-touch.seeker-wallet-enabled #party-frames {
+      top: calc(max(6px, env(safe-area-inset-top)) + 134px);
     }
     body.mobile-touch #party-frames .party-rows {
       max-width: calc(100dvw - max(6px, env(safe-area-inset-left)) - 10px);

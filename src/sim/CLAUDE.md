@@ -52,6 +52,7 @@ talk only to the **`SimContext` seam** (`sim_context.ts`).
 - `threat.ts`: classic-era hate-table math (`addThreat`, `threatModifier`, taunt, stealth detection). Already pure; modules import it directly.
 - `spatial.ts`: `SpatialGrid` entity hash for radius queries; re-bucketed at end of tick. Pure; imported directly.
 - `format_money.ts`: the sim's plain-English money formatter (`"3g 5s"` fragments for loot/quest/vendor/market emit text). A leaf module so `sim.ts`, `market.ts`, and `loot/loot_roll.ts` share it without a value-cycle. NOT the i18n `formatMoney` (see Player-facing text).
+- `world_seed.ts`: `WORLD_SEED`, the one shipped world seed. Every host that builds THE world and every suite asserting its geometry imports it; never re-declare the literal.
 - `obs.ts`: RL surface: `ACTIONS`/`applyAction`/`encodeObs`/`obsSize`. Consumed by `headless/` + `python/` (see those dirs).
 
 ## System modules behind SimContext (who owns what)
@@ -89,6 +90,8 @@ Each module owns the FUNCTIONS for one system; the backing STATE stays on `Sim` 
 | `bags.ts` | pooled bag capacity: the backpack plus equipped bag items raise one flat slot budget |
 | `quests/quest_credit.ts` | kill/collect quest credit + turn-in readiness |
 | `quests/quest_commands.ts` | accept/abandon/turn-in verbs + `queueQuestLetter` (W4; dev arm in `quests/dev_quest_commands.ts`) |
+| `quests/quest_item_presence.ts` | `playerHoldsQuestItem`: the accept-time re-grant predicate over bags/bank/mail/market escrow |
+| `quests/quest_marker_kind.ts` | `QuestMarkerKind` + `questMarkerKind`/`npcQuestMarkerKind`/`strongerQuestMarker`/`questMarkerRank`: the ONE quest-indicator classification rule the four presentation surfaces consume (nameplate, minimap, world map, gossip list); a pure leaf like `quest_targets.ts`, no SimContext, no rng, no clock |
 | `instances/dungeons.ts` | door triggers, enter/leave, instance slots, raid lockouts + raid gates, and the manual instance-reset lifecycle (`resetDungeonInstances` behind `/dungeon reset`, character-keyed cooldowns on the `dungeonResetLocks` primitive, `inheritDungeonResetLocks` on party join) |
 | `rift/runs.ts` + `rift/portals.ts` | procedural "Rift" run lifecycle (enter/descend/exit, floor gates, level-20 gate, Heroic Mark rewards) + the ranked (C/B/A/S) world-portal scheduler. See `docs/design/rift-portals.md` |
 | `instances/difficulty.ts` + `instances/heroic_vendor.ts` | heroic dungeons: tuning + `dungeonDifficulty`/`setDungeonDifficulty`, `awardHeroicMarks` and kill lockouts; the Heroic Quartermaster marks vendor |
@@ -114,6 +117,7 @@ Each module owns the FUNCTIONS for one system; the backing STATE stays on `Sim` 
 | `bank.ts` | the personal pooled bank (The Gilded Strongbox): capacity math + the container-agnostic `moveBetweenContainers`, `bankDeposit`/`bankWithdraw`/`bankBuySlots`, `bankInfoFor` (boundary-clones), `sanitizeBankState` (the one load path), `nearBanker`; state on `PlayerMeta.bank`, the `bankerIds` anchor list on `Sim`; draws NO rng |
 | `loot/loot_roll.ts` + `loot/loot_ffa.ts` | loot rolls, corpse loot, party-loot strategy, `rollLoot`; the tap-lock FFA timeout |
 | `deeds.ts` | the Book of Deeds evaluator (`updateDeeds`): runs at the very end of the tick tail (grant evaluation over dirty players only via `markDeedsDirty`, plus a 1 Hz proximity sweep for visit marks), draws NO rng, grants into `PlayerMeta.deedsEarned` + maintains `deedStats`/`renown`, emits id-based `deedUnlocked` (retro on join); plus the bespoke `manual`-deed grant sites and the session-only `DeedRuntime` encounter tracking. Authoring contract: `docs/design/deeds.md` |
+| `dead_gate.ts` | `refusedWhileDead`: the shared while-dead refusal for the profession-action wrappers on `Sim` (craft/train/salvage/disenchant/enchant-apply/unbind), mobile-station placement, the tool-effect slot/recharge arms, and the rift forge; emits the matcher-covered error line and suppresses any result event, draws NO rng |
 | `professions/` | gathering/crafting/enchanting/salvage/archetypes; governed by its own `CLAUDE.md` (hooks `drainGatheringGrants` into the per-player tick) |
 | `pvp/` | WARFARE honor currency + combat-rating rules (`honor.ts` behind the seam; pure rating math in `power.ts`); governed by its own `CLAUDE.md` |
 
@@ -131,6 +135,8 @@ launch-era completeness records ONLY: never validate a slot against it, use
 `cooldown_persist.ts` (cooldown save/load), `unstuck_cooldown.ts` (the hidden
 recovery timer across competitive resets), `tab_target.ts`/`assist.ts`/
 `dead_target.ts` (target cycling, /assist, dead-target selectability), `flee_speed.ts`,
+`professions/node_persist.ts` (per-player node-readiness save/load, the
+`cooldown_persist.ts` scheme applied to gather nodes),
 `mob/scan_counters.ts` (the per-tick mob scan-visit tally the server reads post-tick),
 `mob/mechanic_spacing.ts` (the rift boss shared mechanic spacing lock and its
 oldest-due drain; stamped per-spawn by `rift/runs.ts`, consumed by the
@@ -139,8 +145,15 @@ oldest-due drain; stamped per-spawn by `rift/runs.ts`, consumed by the
 (the custom-map document/validator), `geometry2d.ts`, `market_query.ts`,
 `market_listing_ids.ts` (the World Market's id allocator: the reserved house band plus
 the load-time reissue that keeps one row per id),
-`vendor_stack.ts`, `loot_master.ts`, `aura_classify.ts` (buff-vs-debuff, shared with the
-HUD), `resurrection.ts` (both sicknesses, The Keeper's Toll and the shorter Unstuck one,
+`vendor_stack.ts`, `vendor_buy_stack.ts` (vendor purchase quantity math: the bulk verb,
+count sanitize, overflow-guarded totals, the Q23 force-1 predicate, and the prompt cap,
+shared by `items.ts` buyItem and the vendor window's preview so no affordance can promise
+a quantity the buy path refuses; also exports `VendorBuyOptions`, the one buyItem request
+shape), `loot_master.ts`, `aura_classify.ts` (buff-vs-debuff, shared with the
+HUD), `material_taxonomy.ts` (the honest depositable/browsable material set, derived
+from the node-yield/grade/harvest/salvage/reagent content tables; consumed ONLY by
+`src/ui`, never by the sim itself, and no `src/sim` file may import it, see its header),
+`resurrection.ts` (both sicknesses, The Keeper's Toll and the shorter Unstuck one,
 shared by every death site), and the combat
 leaves `spell_resist.ts`/`ranged_shot.ts`/`aura_stacking.ts`/`aura_cancel.ts`/
 `exclusive_aura.ts`/`form_swing.ts`, `jail.ts` (moderation-jail cage layout, gate

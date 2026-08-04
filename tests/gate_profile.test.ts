@@ -244,7 +244,7 @@ describe('buildGateProfileSteps', () => {
       'sfx check',
       'vitest (full suite)',
       'browser regressions',
-      'typecheck + env/server builds',
+      'typecheck + env/server/bot builds',
       'client build',
     ]);
     const vitest = steps.find((s) => s.name === 'vitest (full suite)');
@@ -300,6 +300,15 @@ describe('formatters and help', () => {
     expect(text).toContain('Tier:            high');
     expect(text).toContain('gate workers:    8');
     expect(text).not.toMatch(/[\u2013\u2014]/);
+    // Availability is optional: omitted here, so the block must not invent the line.
+    expect(text).not.toContain('RAM available:');
+
+    // When the caller resolves it (gate_profile.mjs does, through the same sensor the
+    // gate uses), it prints alongside the free figure so a macOS worker count that does
+    // not follow freemem is explainable rather than surprising.
+    const withAvailable = formatMachineFacts(facts, { workers: 8, availableMemGb: 41.5 });
+    expect(withAvailable).toContain('RAM total/free:  128 / 12 GiB');
+    expect(withAvailable).toContain('RAM available:   41.5 GiB');
 
     const timings = formatStepTimings([
       { name: 'i18n artifacts', seconds: 12.34, status: 'ok' },

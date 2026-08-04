@@ -44,9 +44,9 @@ describe('deed_i18n English resolution', () => {
 
   it('manifests one row per name and desc plus one per title reward', () => {
     const manifest = deedTranslationManifest();
-    // 225 deeds x (name + desc) + the 30 shipped title rewards (both counts
+    // 232 deeds x (name + desc) + the 30 shipped title rewards (both counts
     // pinned by tests/deeds_content.test.ts).
-    expect(manifest.length).toBe(225 * 2 + 30);
+    expect(manifest.length).toBe(232 * 2 + 30);
     expect(manifest.filter((row) => row.field === 'title').length).toBe(30);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',
@@ -73,13 +73,16 @@ describe('deedBroadcastLine (the guild-chat news line)', () => {
   it('the HUD switch arm stays wired to this composer with the guild-chat green', () => {
     // hud.ts cannot be unit-driven (DOM monolith); the live wiring was
     // verified end to end against a real server, and this source pin keeps
-    // the arm from being dropped or detached from the pinned composer.
+    // the arm from being dropped or detached from the pinned composer. The
+    // deed slot renders as the splice sentinel so the name lands as a
+    // clickable jump node (deed_chat_line.ts); the template still comes from
+    // this module (deedBroadcastRendered, which deedBroadcastLine shares).
     const hudSrc = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
     const arm = hudSrc.slice(hudSrc.indexOf("case 'deedBroadcast'"));
     expect(arm.length).toBeGreaterThan(0);
-    expect(arm.slice(0, 600)).toContain(
-      "this.log(deedBroadcastLine(ev.characterName, ev.deedId), '#40d264');",
-    );
+    expect(arm.slice(0, 900)).toContain('deedBroadcastRendered(ev.characterName, DEED_NAME_TOKEN)');
+    expect(arm.slice(0, 900)).toContain("'#40d264'");
+    expect(arm.slice(0, 900)).toContain('this.deedsWindow.openWithDeed(ev.deedId)');
   });
 });
 

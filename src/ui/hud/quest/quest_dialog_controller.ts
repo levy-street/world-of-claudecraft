@@ -2,13 +2,8 @@ import { DELVES, ITEMS, NPCS, QUESTS, questRewardItem } from '../../../sim/data'
 import { CHRONICLER_TEMPLATE_IDS } from '../../../sim/deeds';
 import { craftsForPairTarget } from '../../../sim/professions/archetype';
 import { professionQuestSelectionTargets } from '../../../sim/quests/profession_quest_effects';
-import {
-  dist2d,
-  type Entity,
-  type ItemDef,
-  isQuestTurnInNpc,
-  questObjectiveRequired,
-} from '../../../sim/types';
+import { npcQuestMarkerKind, type QuestMarkerKind } from '../../../sim/quests/quest_marker_kind';
+import { dist2d, type Entity, type ItemDef, questObjectiveRequired } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { archetypeTitleText, craftNameText } from '../../char_window';
 import { decorativeArtImg } from '../../decorative_art';
@@ -18,12 +13,19 @@ import { esc } from '../../esc';
 import type { FocusTrapHandle } from '../../focus_manager';
 import { t } from '../../i18n';
 import { QUALITY_COLOR } from '../../icons';
+import { NPC_WINDOW_CLOSE_RANGE } from '../../npc_service_range';
 import { archetypeImageUrl } from '../../profession_art';
 import { buildAttunementPreview } from '../../profession_identity_view';
 import { svgIcon } from '../../ui_icons';
 import { isStationMasterNpc } from '../vendor/train_view';
 import { gossipMenuIsEmpty } from './gossip_menu';
+import { masterCraftTarget } from './master_craft_core';
 import { PROF_INTRO_QUEST_ID, professionIntroHintVisible } from './prof_intro_hint_core';
+
+/** One string per offerable-row set, for cheap open-dialog change detection
+ *  (the refreshIfChanged staleness signature). */
+const gossipRowSig = (rows: { questId: string; kind: QuestMarkerKind }[]): string =>
+  rows.map((r) => `${r.questId}:${r.kind}`).join('|');
 
 export interface QuestDialogTextPort {
   npcName(templateId: string): string;
@@ -64,6 +66,9 @@ export interface QuestDialogControllerDeps {
   openHeroicVendor(npcId: number, opener?: HTMLElement | null): void;
   openTrain(npcId: number): void;
   openUnbind(npcId: number): void;
+  /** Open the crafting window straight to `craftId`'s tab (the station
+   *  master's Crafting shortcut; master_craft_core.ts resolves the craft). */
+  openCrafting(craftId: string): void;
   openMarket(): void;
   openDelveBoard(npcId: number): void;
   openValeCup(): void;
@@ -85,10 +90,13 @@ interface ProfessionPreviewContent {
 export class QuestDialogController {
   private npcId: number | null = null;
   private detailQuestId: string | null = null;
-  // The profession-intro hint visibility as of the last gossip render (null =
-  // no gossip list currently painted): the one identity-driven row in this
-  // dialog, so it is the whole staleness signature refreshIfChanged watches.
+  // The staleness signature refreshIfChanged watches, as of the last gossip
+  // render (null = no gossip list currently painted): the profession-intro
+  // hint visibility (the one identity-driven row), plus the offerable-row
+  // signature (a cadence lapse re-offers a work order by a pure
+  // tick-threshold crossing, with NO quest event to repaint through).
   private lastIntroHintVisible: boolean | null = null;
+  private lastGossipRowSig: string | null = null;
   private trap: FocusTrapHandle | null = null;
   private openedAt = 0;
   private voiceNpcId: number | null = null;
@@ -181,6 +189,7 @@ export class QuestDialogController {
     this.npcId = null;
     this.detailQuestId = null;
     this.lastIntroHintVisible = null;
+    this.lastGossipRowSig = null;
     this.deps.hideTooltip();
     this.trap?.release(restoreFocus);
     this.trap = null;
@@ -197,10 +206,13 @@ export class QuestDialogController {
     else this.close();
   }
 
-  /** Repaint the open gossip list only when the profession-intro hint's
-   *  visibility flipped under it: online, the cprof identity mirror can land
-   *  AFTER the dialog opened (attunement retires the hint), and no quest
-   *  event fires for that edge. The quest-detail view never shows the hint
+  /** Repaint the open gossip list only when its staleness signature flipped
+   *  under it. Two watches, both edges no quest event covers: the
+   *  profession-intro hint (online, the cprof identity mirror can land AFTER
+   *  the dialog opened; attunement retires the hint), and the offerable-row
+   *  set (a cadence lapse re-offers a work order by a pure tick-threshold
+   *  crossing while the dimmed map marker's "Available again soon" tag walks
+   *  the player to this very dialog). The quest-detail view shows neither
    *  and is left alone; everything else in the gossip list repaints through
    *  the quest event arms, so an unchanged signature never rebuilds the DOM
    *  (the dialog holds focus-trapped buttons). */
@@ -209,7 +221,12 @@ export class QuestDialogController {
     if (this.detailQuestId !== null || this.lastIntroHintVisible === null) return;
     const npc = this.deps.world().entities.get(this.npcId);
     if (!npc) return;
-    if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible) this.refresh();
+    if (
+      this.introHintVisibleFor(npc) !== this.lastIntroHintVisible ||
+      gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig
+    ) {
+      this.refresh();
+    }
   }
 
   relocalize(): void {
@@ -241,7 +258,7 @@ export class QuestDialogController {
     if (this.npcId === null) return;
     const world = this.deps.world();
     const npc = world.entities.get(this.npcId);
-    if (!npc || dist2d(world.player.pos, npc.pos) > 8) this.close();
+    if (!npc || dist2d(world.player.pos, npc.pos) > NPC_WINDOW_CLOSE_RANGE) this.close();
   }
 
   clearVoiceSource(): void {
@@ -272,16 +289,39 @@ export class QuestDialogController {
     );
   }
 
+  /** The gossip's offerable rows for one NPC, per the shared
+   *  quest_marker_kind rule: the gold '?'/'!' rows as before, plus the blue
+   *  '!' for a repeatable already completed at least once. The 'active' and
+   *  'cooldown' kinds stay out of the list (in-progress quests have their
+   *  own discuss rows, and a work order inside its window is not offerable),
+   *  matching the pre-phase dialog exactly for every non-repeat state. The
+   *  cadence-blocked set is deliberately NOT resolved here: with it a
+   *  window's quest classifies 'cooldown' and without it 'none', both
+   *  filtered, so this one surface needs no mirror read. */
+  private offerableRows(npc: Entity): { questId: string; kind: QuestMarkerKind }[] {
+    const world = this.deps.world();
+    const rows: { questId: string; kind: QuestMarkerKind }[] = [];
+    for (const questId of npc.questIds) {
+      const quest = QUESTS[questId];
+      if (!quest) continue;
+      const kind = npcQuestMarkerKind(
+        quest,
+        npc.templateId,
+        world.questState(questId),
+        world.questsDone,
+      );
+      if (kind === 'ready' || kind === 'available' || kind === 'repeat') {
+        rows.push({ questId, kind });
+      }
+    }
+    return rows;
+  }
+
   private renderGossip(npc: Entity, closeIfEmpty = false): void {
     const world = this.deps.world();
     const definition = NPCS[npc.templateId];
-    const interesting = npc.questIds.filter((questId) => {
-      const state = world.questState(questId);
-      return (
-        (state === 'available' && QUESTS[questId].giverNpcId === npc.templateId) ||
-        (state === 'ready' && isQuestTurnInNpc(QUESTS[questId], npc.templateId))
-      );
-    });
+    const interesting = this.offerableRows(npc);
+    this.lastGossipRowSig = gossipRowSig(interesting);
     const discussionQuests = [...world.questLog.values()]
       .filter((progress) => progress.state === 'active' && npc.questIds.includes(progress.questId))
       .filter((progress) =>
@@ -346,15 +386,20 @@ export class QuestDialogController {
         }),
       )}</div>`;
     }
-    for (const questId of interesting) {
-      const state = world.questState(questId);
+    for (const { questId, kind } of interesting) {
       const icon =
-        state === 'ready' ? '<span class="gold">?</span> ' : '<span class="gold">!</span> ';
+        kind === 'ready'
+          ? '<span class="gold">?</span> '
+          : kind === 'repeat'
+            ? '<span class="quest-repeat">!</span> '
+            : '<span class="gold">!</span> ';
       const title = this.deps.text.questTitle(questId);
       const aria =
-        state === 'ready'
+        kind === 'ready'
           ? t('questUi.dialog.readyQuestAria', { name: title })
-          : t('questUi.dialog.availableQuestAria', { name: title });
+          : kind === 'repeat'
+            ? t('questUi.dialog.repeatableQuestAria', { name: title })
+            : t('questUi.dialog.availableQuestAria', { name: title });
       html += `<button type="button" class="qd-list-item" data-quest="${esc(questId)}" aria-label="${esc(aria)}">${icon}${esc(title)}</button>`;
     }
     for (const questId of discussionQuests) {
@@ -364,8 +409,27 @@ export class QuestDialogController {
     if (hasVendor) {
       html += `<button type="button" class="qd-list-item" data-vendor="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}"><span class="quest-complete">$</span> ${esc(t('questUi.dialog.browseGoods'))}</button>`;
     }
+    // Crafting shortcut: the master's Crafting option opens the crafting
+    // window straight to their own craft's tab (the viewer's stronger craft
+    // when the station serves two), skipping the keybind-then-find-the-tab
+    // hop. Same isStationMasterNpc gate as Train/Unbind, so the empty-menu
+    // check needs no new arm. The pick binds at render and is deliberately
+    // NOT in the staleness signature: online, a dialog opened before the
+    // first cprof mirror lands defaults to declaration order, which is
+    // cosmetic (the row label never changes, and resolveSelectedCraft plus
+    // the craftOwnsTab persist gate still guard the open).
+    const masterCraft = hasTraining
+      ? masterCraftTarget(
+          npc.templateId,
+          world.stationPlacements,
+          world.craftingIdentity.craftSkills,
+        )
+      : null;
     if (hasTraining) {
       html += `<button type="button" class="qd-list-item" data-train="1" aria-label="${esc(t('hudChrome.training.dialogOptionAria', { name: npcName }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('hudChrome.training.dialogOption'))}</button>`;
+      if (masterCraft !== null) {
+        html += `<button type="button" class="qd-list-item" data-crafting="1" aria-label="${esc(t('hudChrome.crafting.dialogOptionAria', { craft: craftNameText(masterCraft) }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('hudChrome.crafting.dialogOption'))}</button>`;
+      }
       // Maker's Bond unbind service (Professions 2.0): every
       // station master offers it beside training (the same isStationMasterNpc
       // gate, so the empty-menu check needs no new arm).
@@ -403,6 +467,9 @@ export class QuestDialogController {
     this.bindRoute('[data-vendor]', (opener) => this.deps.openVendor(npc.id, opener));
     this.bindRoute('[data-heroic-shop]', (opener) => this.deps.openHeroicVendor(npc.id, opener));
     this.bindRoute('[data-train]', () => this.deps.openTrain(npc.id));
+    if (masterCraft !== null) {
+      this.bindRoute('[data-crafting]', () => this.deps.openCrafting(masterCraft));
+    }
     this.bindRoute('[data-unbind]', () => this.deps.openUnbind(npc.id));
     this.bindRoute('[data-market]', this.deps.openMarket);
     this.bindRoute('[data-delve-board]', () => this.deps.openDelveBoard(npc.id));
@@ -483,7 +550,12 @@ export class QuestDialogController {
             crestUrl: null,
           };
         }
-        const preview = buildAttunementPreview(target, identity.craftSkills, identity.switchCount);
+        const preview = buildAttunementPreview(
+          target,
+          identity.craftSkills,
+          identity.switchCount,
+          identity.questedHobbies,
+        );
         if (!preview) return { text: '', crestUrl: null };
         // The pre-commit picture: majors, hobby, and retained-but-dormant
         // knowledge, PLUS the escalating make-amends return cost (closing the

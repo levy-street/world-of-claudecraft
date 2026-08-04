@@ -10,11 +10,20 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
+import { audio } from '../src/game/audio';
+import { deedName } from '../src/ui/deed_i18n';
+import { Hud } from '../src/ui/hud';
 
 // This file runs under jsdom (for the keyboard-guard behavioral test below),
 // where import.meta.url is an http URL that readFileSync rejects; resolve the
 // source-guard reads from __dirname instead.
 const read = (rel: string): string => readFileSync(join(__dirname, rel), 'utf8');
+
+// Source-text pins must not be satisfiable by PROSE: several of the methods
+// pinned below carry comments that name the very tokens the pins look for.
+// Only WHOLE-line comments: a trailing-comment or URL-bearing code line must
+// survive intact, or the pins below would stop seeing the code they guard.
+const stripLineComments = (src: string): string => src.replace(/^\s*\/\/.*$/gm, '');
 
 const painter = read('../src/ui/deeds_window.ts');
 const tracker = read('../src/ui/deed_tracker_painter.ts');
@@ -108,8 +117,13 @@ describe('painter hygiene', () => {
 
   it('elides slow-band repaints through the pure refresh-signature builders', () => {
     // Both builders live in deeds_view.ts where every repaint dimension is
-    // unit-pinned; the painter must not grow a private signature again.
-    expect(painter).toContain('const sig = deedsRefreshSig({');
+    // unit-pinned; the painter must not grow a private signature again. The
+    // one currentSig() helper feeds BOTH the slow-band diff and the
+    // post-paint latch (render() stamping lastSig is what keeps the first
+    // slow-band tick after a jump from wiping the spotlight).
+    expect(painter).toContain('return deedsRefreshSig({');
+    expect(painter).toContain('const sig = this.currentSig();');
+    expect(painter).toContain('this.lastSig = this.currentSig();');
     expect(painter).toContain('statsDigest: deedStatsDigest(world.deedStats),');
     expect(painter).not.toMatch(/private statsDigest\(/);
   });
@@ -154,8 +168,311 @@ describe('hud wiring', () => {
     expect(body).toMatch(
       /if \(plan\.retroCount > 0\) \{\s*const retroText = t\('hudChrome\.deeds\.retroSummary'/,
     );
-    expect(body.match(/showBanner/g)?.length).toBe(1);
+    expect(body.match(/showCelebrationBanner/g)?.length).toBe(1);
     expect(body.match(/audio\.achievement/g)?.length).toBe(1);
+  });
+
+  it("the level-up arm's three banners all ride the 'levelup' class (source pin)", () => {
+    // Commit 81a0dc2037's claim, previously unpinned (the phase 14 QA): the
+    // level banner, the talent-row toast, and the first-point banner all
+    // queue under 'levelup', the class that files ahead of queued deeds.
+    // Comment-stripped so the arm's own prose cannot satisfy the pin.
+    const start = hud.indexOf("case 'levelup': {");
+    expect(start).toBeGreaterThan(-1);
+    const end = hud.indexOf("case 'virtualLevelUp'", start);
+    expect(end).toBeGreaterThan(start);
+    const body = stripLineComments(hud.slice(start, end));
+    expect(body.match(/showCelebrationBanner\([^;]*'levelup'\)/g)?.length).toBe(3);
+  });
+
+  it('the duel and arena countdown arms lay a log line exactly when their banner is deferred', () => {
+    // The durable-record arm (the phase 14 QA): a countdown banner parked
+    // or aged out behind a celebration leaves the log line; an on-screen
+    // one leaves none. Both arms carry the same shape.
+    for (const anchor of ["case 'duelCountdown': {", "case 'arenaCountdown': {"]) {
+      const start = hud.indexOf(anchor);
+      expect(start, anchor).toBeGreaterThan(-1);
+      const body = stripLineComments(hud.slice(start, hud.indexOf('break;', start)));
+      expect(body, anchor).toContain(
+        "if (this.showBanner(text) !== 'show') this.log(text, '#fa6');",
+      );
+    }
+  });
+
+  it("paints the earned moment in the deed variant, not the level-up's gold banner", () => {
+    // A deed unlock used to fire the level-up's exact banner, and an early
+    // character trips several deeds in its first few gathering actions, so the
+    // two moments were unreadable apart. The variant is presentation only:
+    // same copy, same lifetime, and the announcer push stays (information is
+    // never gated on a visual).
+    const start = hud.indexOf('private handleDeedUnlocks(');
+    expect(start).toBeGreaterThan(-1);
+    // Strip line comments first: this method's prose names the 'deed' variant,
+    // so an uncommented slice would let a reworded comment satisfy the pin.
+    const body = stripLineComments(hud.slice(start, hud.indexOf('log(text: string', start)));
+    // The deed variant AND the R38 'deed' banner class both ride the call
+    // (the celebration wrapper's second and third arguments): the class is
+    // what queues it behind a live level-up instead of replacing it, the
+    // variant is the visual split from the level-up gold.
+    expect(body).toContain("this.showCelebrationBanner(bannerText, 'deed', 'deed');");
+    expect(body).toContain('this.combatAnnouncer.push(bannerText, performance.now());');
+  });
+
+  it('gives the deed banner its own plate in CSS, on desktop and touch', () => {
+    const tokensCss = read('../src/styles/tokens.css');
+    // Bound the match to the rule's own block: an unbounded [\s\S]*? would
+    // happily match a declaration in some LATER rule and go vacuous the day
+    // another selector uses these tokens.
+    const plateIdx = hudCss.indexOf('#banner.banner-deed');
+    expect(plateIdx).toBeGreaterThan(-1);
+    const plate = hudCss.slice(plateIdx, hudCss.indexOf('}', plateIdx));
+    expect(plate).toMatch(/color:\s*var\(--color-deed-banner-text\)/);
+    expect(plate).toMatch(/border:[^;]*var\(--color-deed-banner-border\)/);
+    expect(plate).toMatch(/background:\s*var\(--color-deed-banner-bg\)/);
+    // The decorative lift sheds with the graphics tier like its neighbours.
+    expect(plate).toMatch(/box-shadow:[^;]*var\(--fx-shadow/);
+    // Tokens carry real values, and the deed text colour is NOT the level-up
+    // gold: aliasing it to --gold would keep every other pin green while
+    // erasing the entire point of the variant.
+    const tokenValue = (name: string): string => {
+      const m = tokensCss.match(new RegExp(`${name}:\\s*([^;]+);`));
+      expect(m, `${name} missing from tokens.css`).toBeTruthy();
+      return (m?.[1] ?? '').trim();
+    };
+    for (const name of [
+      '--color-deed-banner-text',
+      '--color-deed-banner-border',
+      '--color-deed-banner-bg',
+    ]) {
+      expect(tokenValue(name).length).toBeGreaterThan(2);
+    }
+    expect(tokenValue('--color-deed-banner-text')).not.toBe('var(--gold)');
+    expect(tokenValue('--color-deed-banner-text').toLowerCase()).not.toBe('#ffd100');
+    // ONE touch rule covers both orientations: it is a class more specific
+    // than the landscape block's plain `body.mobile-touch #banner`, so a
+    // second copy inside the media query would be dead CSS.
+    expect(hudMobile.match(/body\.mobile-touch #banner\.banner-deed/g)?.length).toBe(1);
+  });
+
+  // The two source pins above prove hud.ts PASSES 'deed' and that showBanner
+  // SETS the class, but neither executes the join. This drives the real
+  // earned-moment arm end to end on the real Hud.prototype method.
+  it('paints the real deed unlock as a deed-variant banner, with copy and lifetime intact', () => {
+    vi.useFakeTimers();
+    const achievement = vi.spyOn(audio, 'achievement').mockImplementation(() => {});
+    try {
+      const h = Object.create(Hud.prototype) as unknown as {
+        bannerEl: HTMLElement;
+        bannerTimer: number | undefined;
+        log: ReturnType<typeof vi.fn>;
+        logNodes: ReturnType<typeof vi.fn>;
+        deedsWindow: { noteUnlocks: ReturnType<typeof vi.fn> };
+        combatAnnouncer: { push: ReturnType<typeof vi.fn> };
+        handleDeedUnlocks(events: { deedId: string; retro?: boolean }[]): void;
+        showBanner(text: string): void;
+      };
+      h.bannerEl = document.createElement('div');
+      h.bannerTimer = undefined;
+      h.log = vi.fn();
+      h.logNodes = vi.fn();
+      h.deedsWindow = { noteUnlocks: vi.fn() };
+      h.combatAnnouncer = { push: vi.fn() };
+
+      h.handleDeedUnlocks([{ deedId: 'prog_first_steps' }]);
+
+      // The variant actually reached the element.
+      expect(h.bannerEl.classList.contains('banner-deed')).toBe(true);
+      // Copy is unchanged: the localized unlock line, naming the deed, and it
+      // still reaches the polite live region.
+      const copy = h.bannerEl.querySelector('.banner-copy')?.textContent ?? '';
+      expect(copy).toContain(deedName('prog_first_steps'));
+      expect(h.combatAnnouncer.push).toHaveBeenCalledTimes(1);
+      expect(h.combatAnnouncer.push.mock.calls[0][0]).toBe(copy);
+      expect(achievement).toHaveBeenCalledTimes(1);
+
+      // Lifetime is unchanged: the deed plate holds for the same 2600 ms the
+      // shared slot has always used, so the variant cannot quietly linger.
+      expect(h.bannerEl.style.opacity).toBe('1');
+      vi.advanceTimersByTime(2599);
+      expect(h.bannerEl.style.opacity).toBe('1');
+      vi.advanceTimersByTime(1);
+      expect(h.bannerEl.style.opacity).toBe('0');
+      // The R38 advance gap: the slot stays claimed for the fade gap, then
+      // frees (an arrival inside the gap would queue, not replace).
+      vi.advanceTimersByTime(250);
+
+      // THE R38 COLLISION, end to end on the real method: a deed landing
+      // while the level-up banner is live queues behind it instead of
+      // replacing it, and takes the slot whole after the gap.
+      (
+        h as unknown as {
+          showBanner(
+            text: string,
+            motion?: boolean,
+            icon?: string,
+            variant?: string,
+            subtext?: string,
+            durationMs?: number,
+            source?: null,
+            bannerClass?: string,
+          ): void;
+        }
+      ).showBanner('Level 2!', true, undefined, 'default', undefined, 2600, null, 'levelup');
+      expect(h.bannerEl.textContent).toBe('Level 2!');
+      h.handleDeedUnlocks([{ deedId: 'prog_first_steps' }]);
+      // Still the level-up: the deed did NOT replace it.
+      expect(h.bannerEl.textContent).toBe('Level 2!');
+      vi.advanceTimersByTime(2600 + 250);
+      // The queued deed now owns the slot, in its own variant.
+      expect(h.bannerEl.textContent).toContain(deedName('prog_first_steps'));
+      expect(h.bannerEl.classList.contains('banner-deed')).toBe(true);
+      vi.advanceTimersByTime(2600 + 250);
+      expect(h.bannerEl.style.opacity).toBe('0');
+
+      // ...and a default banner through the same slot holds exactly as long.
+      h.showBanner('Level 12!');
+      expect(h.bannerEl.classList.contains('banner-deed')).toBe(false);
+      expect(h.bannerEl.style.opacity).toBe('1');
+      vi.advanceTimersByTime(2600);
+      expect(h.bannerEl.style.opacity).toBe('0');
+    } finally {
+      vi.useRealTimers();
+      vi.restoreAllMocks();
+    }
+  });
+
+  // Shared rig for the queue-lifecycle arms below: the same bare-prototype
+  // shape the collision drive uses.
+  function bannerRig() {
+    const h = Object.create(Hud.prototype) as unknown as {
+      bannerEl: HTMLElement;
+      bannerTimer: number | undefined;
+      bannerSource: 'unstuck' | null;
+      log: ReturnType<typeof vi.fn>;
+      logNodes: ReturnType<typeof vi.fn>;
+      deedsWindow: { noteUnlocks: ReturnType<typeof vi.fn> };
+      combatAnnouncer: { push: ReturnType<typeof vi.fn> };
+      handleDeedUnlocks(events: { deedId: string; retro?: boolean }[]): void;
+      showBanner(
+        text: string,
+        motion?: boolean,
+        icon?: string,
+        variant?: string,
+        subtext?: string,
+        durationMs?: number,
+        source?: 'unstuck' | null,
+        bannerClass?: string,
+      ): string;
+      showCelebrationBanner(text: string, bannerClass: 'levelup' | 'deed'): void;
+      hideBannerImmediately(): void;
+      clearUnstuckBanner(): void;
+    };
+    h.bannerEl = document.createElement('div');
+    h.bannerTimer = undefined;
+    h.bannerSource = null;
+    h.log = vi.fn();
+    h.logNodes = vi.fn();
+    h.deedsWindow = { noteUnlocks: vi.fn() };
+    h.combatAnnouncer = { push: vi.fn() };
+    return h;
+  }
+
+  it('the mount-race takeover (hideBannerImmediately) keeps queued celebrations', () => {
+    // The phase 14 QA finding: the takeover used clear(), silently
+    // discarding queued level-up and deed banners. hideLive keeps them: the
+    // race countdown claims the slot NOW, and the celebrations play after.
+    vi.useFakeTimers();
+    const achievement = vi.spyOn(audio, 'achievement').mockImplementation(() => {});
+    try {
+      const h = bannerRig();
+      h.showCelebrationBanner('Level 2!', 'levelup');
+      h.handleDeedUnlocks([{ deedId: 'prog_first_steps' }]);
+      expect(h.bannerEl.textContent).toBe('Level 2!');
+      h.hideBannerImmediately();
+      expect(h.bannerEl.style.opacity).toBe('0');
+      // The takeover's own ambient shows immediately in the freed slot...
+      expect(h.showBanner('3')).toBe('show');
+      expect(h.bannerEl.textContent).toBe('3');
+      // ...and the queued deed still plays after it.
+      vi.advanceTimersByTime(2600 + 250);
+      expect(h.bannerEl.textContent).toContain(deedName('prog_first_steps'));
+      expect(achievement).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+      vi.restoreAllMocks();
+    }
+  });
+
+  it('a takeover that never shows its own banner still advances the queue after the gap', () => {
+    // The fix-round review: hideBannerImmediately freed the slot but armed
+    // no advance, so surviving celebrations waited on an unrelated future
+    // banner. The self-armed gap timer closes it; a takeover that DOES
+    // paint (the mount-race arm above) clears that timer through its own
+    // paint, so this arm drives the hide with no show at all.
+    vi.useFakeTimers();
+    const achievement = vi.spyOn(audio, 'achievement').mockImplementation(() => {});
+    try {
+      const h = bannerRig();
+      h.showCelebrationBanner('Level 2!', 'levelup');
+      h.handleDeedUnlocks([{ deedId: 'prog_first_steps' }]);
+      h.hideBannerImmediately();
+      expect(h.bannerEl.style.opacity).toBe('0');
+      vi.advanceTimersByTime(250);
+      expect(h.bannerEl.textContent).toContain(deedName('prog_first_steps'));
+      expect(achievement).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+      vi.restoreAllMocks();
+    }
+  });
+
+  it('clearUnstuckBanner ends the unstuck line early and advances to a waiting celebration', () => {
+    // docs/design/banner-queue.md's contract for the unstuck purge, driven
+    // on the real methods (the pure retainQueued arm alone cannot see the
+    // Hud half): the live unstuck banner clears and the queued level-up
+    // takes the slot immediately.
+    vi.useFakeTimers();
+    try {
+      const h = bannerRig();
+      h.showBanner('Stuck? Hold still.', true, undefined, 'default', undefined, 2600, 'unstuck');
+      h.showCelebrationBanner('Level 3!', 'levelup');
+      expect(h.bannerEl.textContent).toBe('Stuck? Hold still.');
+      h.clearUnstuckBanner();
+      expect(h.bannerEl.textContent).toBe('Level 3!');
+      expect(h.bannerEl.style.opacity).toBe('1');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('a parked ambient older than the defer window is dropped, a fresh one replays', () => {
+    // The phase 14 QA finding: an ambient is current-state, so replaying it
+    // seconds late misleads. Behind ONE celebration (2850ms) it is still
+    // fresh and replays; behind a celebration CHAIN (5700ms) it ages out.
+    // performance must be faked alongside the timers or the stamp cannot
+    // age with advanceTimersByTime.
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] });
+    try {
+      const fresh = bannerRig();
+      fresh.showCelebrationBanner('Level 2!', 'levelup');
+      fresh.showBanner('Mirefen Marsh');
+      vi.advanceTimersByTime(2600 + 250);
+      expect(fresh.bannerEl.textContent).toBe('Mirefen Marsh');
+
+      const stale = bannerRig();
+      stale.showCelebrationBanner('Level 2!', 'levelup');
+      stale.showCelebrationBanner('Level 3!', 'levelup');
+      stale.showBanner('Mirefen Marsh');
+      vi.advanceTimersByTime(2600 + 250);
+      expect(stale.bannerEl.textContent).toBe('Level 3!');
+      vi.advanceTimersByTime(2600 + 250);
+      // The parked zone line aged past AMBIENT_MAX_DEFER_MS while the chain
+      // played: dropped, the slot goes idle instead of replaying it.
+      expect(stale.bannerEl.textContent).not.toBe('Mirefen Marsh');
+      expect(stale.bannerEl.style.opacity).toBe('0');
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('announces the unlock and the retro summary through the polite #combat-live region', () => {
@@ -169,9 +486,16 @@ describe('hud wiring', () => {
     expect(body.match(/combatAnnouncer\.push/g)?.length).toBe(2);
   });
 
-  it('marks the watch toggle state and names the recent-strip crests', () => {
+  it('marks the watch toggle state and names the recent-strip jump buttons', () => {
     expect(painter).toContain('aria-pressed="${entry.watched}"');
-    expect(painter).toMatch(/deed-crest-mini[^>]*alt="\$\{esc\(deedName\(r\.id\)\)\}"/);
+    // The strip crest is a jump button: the accessible name rides the button
+    // (aria-label + title from the deed name), and the crest img inside stays
+    // alt="" so the deed is not announced twice.
+    expect(painter).toMatch(/deeds-recent-item" data-recent="\$\{esc\(r\.id\)\}"/);
+    expect(painter).toMatch(
+      /aria-label="\$\{esc\(t\('hudChrome\.deeds\.recentJumpAria', \{ name: deedName\(r\.id\) \}\)\)\}"/,
+    );
+    expect(painter).toMatch(/deed-crest-mini[^>]*alt=""/);
   });
 
   it('shows the active title and earned border badges on the character sheet', () => {
@@ -461,6 +785,32 @@ describe('chrome keys and CSS floors', () => {
     );
     expect(hudCss).toMatch(
       /@media \(pointer: coarse\) \{\s*#deed-tracker \.dt-header \{\s*min-height: 40px;/,
+    );
+    // The recent-strip jump buttons: the floor lives in hud.mobile.css and
+    // must be UNCONDITIONAL under body.mobile-touch (a landscape tablet never
+    // enters the short-phone media block).
+    expect(hudMobile).toMatch(
+      /body\.mobile-touch #deeds-window \.deeds-recent-item \{\s*min-width: 40px;\s*min-height: 40px;/,
+    );
+  });
+
+  it('the jump spotlight flashes once and degrades to a static ring under reduced motion', () => {
+    expect(components).toMatch(
+      /\.deed-card-flash \{\s*animation: deed-card-flash 1\.6s ease-out 1;/,
+    );
+    // The reduced-motion arm swaps the pulse for a persistent ring: the only
+    // landing cue those users get, so it must not silently vanish.
+    expect(components).toMatch(
+      /@media \(prefers-reduced-motion: reduce\) \{\s*\.deed-card-flash \{\s*animation: none;\s*box-shadow: inset 0 0 0 2px var\(--gold-dim\);/,
+    );
+  });
+
+  it('the chat deed link carries the shared focus ring and link affordance', () => {
+    expect(hudCss).toMatch(
+      /\.chat-deed-link \{\s*cursor: var\(--cursor-point\);\s*text-decoration: underline;/,
+    );
+    expect(hudCss).toMatch(
+      /\.chat-deed-link:focus-visible \{\s*outline: 2px solid var\(--color-border-focus\);/,
     );
   });
 

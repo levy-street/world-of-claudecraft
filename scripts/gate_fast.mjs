@@ -8,7 +8,9 @@
 // script as a substitute for that bar.
 //
 // Cross-platform: same win32 shell spawn pattern as gate.mjs. Worker count uses
-// computeGateWorkers (free-mem clamp kept). Optional GATE_WORKER_TIER=low|medium|high
+// computeGateWorkers (available-memory clamp kept; the sensor is lib/gate_memory.mjs, which
+// reads vm_stat on darwin because os.freemem() under-reports there). Optional
+// GATE_WORKER_TIER=low|medium|high
 // caps workers after the clamp; GATE_MAX_WORKERS is the expert absolute override.
 //
 // Vitest day-loop uses `vitest related` on changed code paths (and explicit
@@ -24,6 +26,7 @@ import {
   GATE_FAST_STEP_NAMES,
   resolveFastChangedBase,
 } from './lib/gate_fast_plan.mjs';
+import { resolveAvailableMemoryBytes } from './lib/gate_memory.mjs';
 import {
   computeGateWorkers,
   parseGateWorkerTier,
@@ -38,7 +41,12 @@ const tier = parseGateWorkerTier(tierRaw);
 const tierCap = resolveGateWorkerTierCap(tierRaw);
 const workers = computeGateWorkers({
   cpuCount: os.availableParallelism(),
-  freeMemBytes: os.freemem(),
+  // See lib/gate_memory.mjs: os.freemem() under-reports availability on macOS and used to
+  // pin this day-loop path to a single worker too.
+  freeMemBytes: resolveAvailableMemoryBytes({
+    platform: process.platform,
+    freeMemBytes: os.freemem(),
+  }),
   envOverride: process.env.GATE_MAX_WORKERS,
   tierCap,
 });

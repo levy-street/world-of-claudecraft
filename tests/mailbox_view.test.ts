@@ -7,12 +7,14 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildMailboxView,
+  canStageInstancedCopy,
   clampParcelQty,
   mailIndicatorView,
   mailSendBlocked,
   mailSendCost,
   parseParcelQty,
   recipientSuggestions,
+  stagedInstancedCopies,
   wrappedSuggestionIndex,
 } from '../src/ui/mailbox_view';
 import type { MailInfo } from '../src/world_api';
@@ -248,5 +250,47 @@ describe('parseParcelQty: the typed quantity gate', () => {
 
   it('never NaN-poisons: even NaN fallback resolves to a legal count', () => {
     expect(parseParcelQty('abc', 5, Number.NaN)).toBe(1);
+  });
+});
+
+describe('staging instanced parcels (byte-equal copies are counted, not deduped)', () => {
+  const SIGNED = { signer: 'Ayla' };
+  const OTHER = { signer: 'Bram' };
+  const staged = (n: number) =>
+    Array.from({ length: n }, () => ({ itemId: 'ore', count: 1, instance: { signer: 'Ayla' } }));
+
+  it('counts only byte-equal copies of the same item id', () => {
+    const rows = [
+      { itemId: 'ore', count: 1, instance: { signer: 'Ayla' } },
+      { itemId: 'ore', count: 1, instance: { signer: 'Bram' } },
+      { itemId: 'hide', count: 1, instance: { signer: 'Ayla' } },
+      { itemId: 'ore', count: 4 },
+    ];
+    expect(stagedInstancedCopies(rows, 'ore', SIGNED)).toBe(1);
+    expect(stagedInstancedCopies(rows, 'ore', OTHER)).toBe(1);
+    expect(stagedInstancedCopies(rows, 'ore', { signer: 'Nobody' })).toBe(0);
+  });
+
+  it('allows a SECOND byte-equal copy when the player holds one (the old bug)', () => {
+    // The window used to dedupe byte-equal instanced copies down to one chip,
+    // so a stack of identically-signed rare materials could only be mailed one
+    // copy per letter at full postage, even though the sim accepts several.
+    expect(canStageInstancedCopy(staged(1), 'ore', SIGNED, 3, 3)).toBe(true);
+    expect(canStageInstancedCopy(staged(2), 'ore', SIGNED, 3, 3)).toBe(true);
+  });
+
+  it('stops at what the player actually holds unlocked', () => {
+    expect(canStageInstancedCopy(staged(2), 'ore', SIGNED, 2, 3)).toBe(false);
+    expect(canStageInstancedCopy(staged(0), 'ore', SIGNED, 0, 3)).toBe(false);
+  });
+
+  it('stops at the letter parcel limit even with copies to spare', () => {
+    expect(canStageInstancedCopy(staged(3), 'ore', SIGNED, 9, 3)).toBe(false);
+  });
+
+  it('treats a differently-signed copy as its own budget', () => {
+    // Two chips staged, both Ayla's; Bram's copy is a distinct payload and is
+    // bounded by ITS own owned count, not by Ayla's staged ones.
+    expect(canStageInstancedCopy(staged(2), 'ore', OTHER, 1, 3)).toBe(true);
   });
 });

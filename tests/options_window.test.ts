@@ -296,6 +296,19 @@ describe('options_window: keybind rebind dispatch (cluster 5)', () => {
     expect(painter).toContain('this.deps.keybinds().bind(actionId, index, code)');
     expect(painter).toContain('this.deps.refreshKeybindLabels()');
   });
+
+  it('notes the bindable mouse buttons through t(), on pointer devices only', () => {
+    // The hint is the one place the panel tells the player a mouse button binds
+    // like a key; it must be localized and hidden on touch, which has no mouse.
+    const keybinds = painter.slice(
+      painter.indexOf('private renderKeybinds(): void {'),
+      painter.indexOf('private beginCapture('),
+    );
+    expect(keybinds).toContain("t('hudChrome.keybinds.mouseHint')");
+    const hintIdx = keybinds.indexOf("t('hudChrome.keybinds.mouseHint')");
+    const gateIdx = keybinds.lastIndexOf('if (!useTouchInterface()) {', hintIdx);
+    expect(gateIdx).toBeGreaterThan(-1);
+  });
 });
 
 describe('options_window: viewport resync on open (PR #1118)', () => {

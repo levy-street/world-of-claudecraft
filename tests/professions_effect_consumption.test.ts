@@ -1,124 +1,130 @@
 import { describe, expect, it } from 'vitest';
+import { TOOL_EFFECT_IDS, TOOL_EFFECTS } from '../src/sim/content/professions';
 import type { MaterialRarity } from '../src/sim/professions/gathering';
 import {
-  CONSUMPTION_CHANCE_FLOOR,
+  applyToolEffectUse,
   depleteEffect,
-  effectConsumptionChance,
+  RARITY_DURABILITY_BONUS,
+  RECHARGE_CHARGES_PER_MATERIAL,
+  rechargeDiscountFor,
   slotEffect,
+  startingDurabilityFor,
 } from '../src/sim/professions/tools';
-import { Rng } from '../src/sim/rng';
 
-// Rarity-scaled effect durability consumption curve (#1139). Depends on
-// #1136 (tool effect slotting/durability) and #1122 (the rarity ladder /
-// rollMaterialRarity), both merged into this branch already.
-describe('rarity-scaled effect durability consumption curve (#1139)', () => {
-  // Statistical tolerance for the trial-based assertions below, expressed in
-  // percentage points (matches the issue's "+/-10 percentage points" bar).
-  const TOLERANCE = 0.1;
-  const TRIALS = 20_000;
+// Effect charge consumption. This file used to pin a PROBABILISTIC curve: a
+// slotted effect rolled `Rng.chance` per use at a rate scaled by how far the
+// tool's rarity outclassed the target's, and the roll happened even at zero
+// durability so the depletion sequence stayed independent of remaining
+// charges.
+//
+// That model could not be wired. The live harvest path draws exactly twice per
+// granted harvest and is golden-pinned there, so a depletion roll would have
+// been a THIRD draw for every player who owned a slot, and the pinned contract
+// would have held only for players who owned none. The rarity intent moved to
+// where it costs nothing: rarity now buys CHARGES up front instead of
+// discounting a hidden per-use rate.
+//
+// So the assertions below are about a deterministic ladder and a draw-free
+// decrement. The draw-count contract itself is pinned where it can actually be
+// observed, against the real harvest path, in tests/gathering.test.ts.
+const RARITY_LADDER: readonly MaterialRarity[] = [
+  'common',
+  'uncommon',
+  'rare',
+  'epic',
+  'legendary',
+];
 
-  // Runs `trials` independent single-use depletion rolls (a FRESH slot each
-  // time, well above 0 durability, so the floor never caps the observed
-  // rate) and returns the observed consumption rate.
-  function observedRate(
-    toolRarity: MaterialRarity,
-    targetRarity: MaterialRarity,
-    seed: number,
-    trials = TRIALS,
-  ): number {
-    const rng = new Rng(seed);
-    let consumed = 0;
-    for (let i = 0; i < trials; i++) {
-      const slot = slotEffect('gatherers_cache');
-      slot.durability = 1000; // never hits 0 mid-trial
-      if (depleteEffect(slot, toolRarity, targetRarity, rng)) consumed++;
-    }
-    return consumed / trials;
-  }
-
-  it('exact formula values match the issue worked example for an epic tool', () => {
-    // "an epic tool with +3 quantity spends 1 durability on an epic target,
-    // about 60 percent on rare, about 10 percent on common"
-    expect(effectConsumptionChance('epic', 'epic')).toBe(1);
-    expect(effectConsumptionChance('epic', 'rare')).toBeCloseTo(0.6, 10);
-    expect(effectConsumptionChance('epic', 'common')).toBeCloseTo(0.1, 10);
-  });
-
-  it('the floor is respected for gaps wider than the worked example covers', () => {
-    // epic vs uncommon: tierGap 2 -> 1 - 0.4*2 = 0.2
-    expect(effectConsumptionChance('epic', 'uncommon')).toBeCloseTo(0.2, 10);
-    // legendary vs common: tierGap 4 -> formula goes negative, floored
-    expect(effectConsumptionChance('legendary', 'common')).toBe(CONSUMPTION_CHANCE_FLOOR);
-    // legendary vs uncommon: tierGap 3 -> also floored
-    expect(effectConsumptionChance('legendary', 'uncommon')).toBe(CONSUMPTION_CHANCE_FLOOR);
-  });
-
-  it('an equal-or-higher-rarity target always consumes a charge, regardless of tool rarity', () => {
-    const pairs: [MaterialRarity, MaterialRarity][] = [
-      ['common', 'common'],
-      ['common', 'rare'],
-      ['rare', 'rare'],
-      ['rare', 'legendary'],
-      ['legendary', 'legendary'],
-    ];
-    for (const [toolRarity, targetRarity] of pairs) {
-      expect(effectConsumptionChance(toolRarity, targetRarity)).toBe(1);
+describe('rarity buys charges, and spending one draws nothing', () => {
+  it('starting charges are the catalog base plus one rarity step per rung', () => {
+    for (const effectId of TOOL_EFFECT_IDS) {
+      const base = TOOL_EFFECTS[effectId].startingDurability;
+      RARITY_LADDER.forEach((rarity, rung) => {
+        expect(startingDurabilityFor(effectId, rarity), `${effectId} at ${rarity}`).toBe(
+          base + RARITY_DURABILITY_BONUS * rung,
+        );
+      });
     }
   });
 
-  it('consumption chance is non-increasing as the tool outclasses its target by more tiers', () => {
-    const order: MaterialRarity[] = ['legendary', 'epic', 'rare', 'uncommon', 'common'];
-    for (let i = 1; i < order.length; i++) {
-      const wider = effectConsumptionChance('legendary', order[i]);
-      const narrower = effectConsumptionChance('legendary', order[i - 1]);
-      expect(wider).toBeLessThanOrEqual(narrower);
-    }
-  });
-
-  it('scripted statistical test: epic tool vs epic target consumes ~100% of the time', () => {
-    const rate = observedRate('epic', 'epic', 1);
-    expect(rate).toBeCloseTo(1, 1);
-    expect(Math.abs(rate - 1)).toBeLessThanOrEqual(TOLERANCE);
-  });
-
-  it('scripted statistical test: epic tool vs rare target consumes ~60% of the time', () => {
-    const rate = observedRate('epic', 'rare', 2);
-    expect(Math.abs(rate - 0.6)).toBeLessThanOrEqual(TOLERANCE);
-  });
-
-  it('scripted statistical test: epic tool vs common target consumes ~10% of the time', () => {
-    const rate = observedRate('epic', 'common', 3);
-    expect(Math.abs(rate - 0.1)).toBeLessThanOrEqual(TOLERANCE);
-  });
-
-  it('draws exactly one Rng value per call, via Rng.chance (never Math.random)', () => {
-    // Two independent Rng streams seeded identically must agree call-for-call:
-    // if the roll ever consumed a different number of draws (or fell back to
-    // Math.random), the two durability sequences would eventually diverge.
-    const runSequence = (seed: number): number[] => {
-      const rng = new Rng(seed);
-      const slot = slotEffect('artisans_eye');
-      const history: number[] = [];
-      for (let i = 0; i < 40; i++) {
-        depleteEffect(slot, 'epic', 'rare', rng);
-        history.push(slot.durability);
+  it('the ladder is strictly increasing, so a rarer tool is never a downgrade', () => {
+    for (const effectId of TOOL_EFFECT_IDS) {
+      for (let i = 1; i < RARITY_LADDER.length; i++) {
+        expect(
+          startingDurabilityFor(effectId, RARITY_LADDER[i]),
+          `${effectId}: ${RARITY_LADDER[i]} vs ${RARITY_LADDER[i - 1]}`,
+        ).toBeGreaterThan(startingDurabilityFor(effectId, RARITY_LADDER[i - 1]));
       }
-      return history;
-    };
-    expect(runSequence(555)).toEqual(runSequence(555));
-
-    // A single roll consumes exactly one rng.next() draw: advancing a second
-    // rng by exactly one manual `next()` call per roll reproduces the same
-    // sequence of decisions as depleteEffect's internal draw.
-    const seeded = new Rng(777);
-    const mirror = new Rng(777);
-    const slot = slotEffect('artisans_eye');
-    for (let i = 0; i < 40; i++) {
-      const before = slot.durability;
-      depleteEffect(slot, 'epic', 'rare', seeded);
-      const roll = mirror.next();
-      const shouldConsume = roll < effectConsumptionChance('epic', 'rare') && before > 0;
-      expect(slot.durability).toBe(shouldConsume ? before - 1 : before);
     }
+    // The step is load-bearing rather than decorative: a zero bonus would
+    // satisfy every "is a number" check above while flattening the ladder.
+    expect(RARITY_DURABILITY_BONUS).toBeGreaterThan(0);
+  });
+
+  it('slotEffect mints at the tool rarity it was given, and defaults to common', () => {
+    const epic = slotEffect('gatherers_cache', { toolRarity: 'epic' });
+    expect(epic.durability).toBe(startingDurabilityFor('gatherers_cache', 'epic'));
+    expect(epic.maxDurability).toBe(epic.durability);
+    const defaulted = slotEffect('gatherers_cache');
+    expect(defaulted.durability).toBe(startingDurabilityFor('gatherers_cache', 'common'));
+    // The default is the BOTTOM of the ladder, not merely some rung: a default
+    // of 'epic' would also pass a "has a default" check.
+    expect(defaulted.durability).toBeLessThan(epic.durability);
+  });
+
+  it('spends exactly one charge per fire, with no rng parameter to spend', () => {
+    const slot = slotEffect('gatherers_cache', { toolRarity: 'rare' });
+    const start = slot.durability;
+    // depleteEffect takes ONE argument. A depletion roll cannot be
+    // reintroduced without changing this call, which is the point: the
+    // draw-free contract is enforced by the signature, not by discipline.
+    expect(depleteEffect.length).toBe(1);
+    for (let i = 1; i <= 5; i++) {
+      expect(depleteEffect(slot)).toBe(true);
+      expect(slot.durability).toBe(start - i);
+    }
+  });
+
+  it('a depleted slot stops decrementing and reports that it did not', () => {
+    const slot = slotEffect('gatherers_cache');
+    slot.durability = 1;
+    expect(depleteEffect(slot)).toBe(true);
+    expect(slot.durability).toBe(0);
+    expect(depleteEffect(slot)).toBe(false);
+    expect(slot.durability).toBe(0); // never negative
+    expect(depleteEffect(undefined)).toBe(false);
+  });
+
+  it('an unconfirmed prompt slot applies nothing and changes nothing', () => {
+    const slot = slotEffect('gatherers_cache', { confirmMode: 'prompt', toolRarity: 'epic' });
+    const before = slot.durability;
+    const outcome = { quantity: 2, gradeToolTier: 3 };
+    const result = applyToolEffectUse(slot, outcome, false);
+    expect(result.applied).toBe(false);
+    expect(result.outcome).toEqual(outcome);
+    expect(slot.durability).toBe(before);
+    // Confirming it fires, so the arm above is a refusal rather than a slot
+    // that never worked at all. The apply half never spends (R42): the
+    // charge settle lives at the command boundary, against the granted
+    // outcome, and is pinned in tests/gather_node_harvest.test.ts.
+    const confirmed = applyToolEffectUse(slot, outcome, true);
+    expect(confirmed.applied).toBe(true);
+    expect(confirmed.outcome.quantity).toBe(outcome.quantity + 1);
+    expect(slot.durability).toBe(before);
+  });
+
+  it('the recharge scale and discount ladder hold the R39 shape at the leaf', () => {
+    // The scale factor is what turns a fill size into a material count; the
+    // shipped rungs (20..50 charges) divide into the ruling's stated 2..5
+    // band exactly when it is 10. The full behavioral pricing pins (material
+    // identity per rung, partial fills, the R30 re-derive) live in
+    // tests/professions_tools.test.ts and the command suite; this leaf pin is
+    // the constant itself, so a both-sides retune cannot drift silently.
+    expect(RECHARGE_CHARGES_PER_MATERIAL).toBe(10);
+    const original = slotEffect('gatherers_cache', { craftedBy: 'p1' });
+    expect(rechargeDiscountFor(original, 'p1')).toBe(0.5);
+    expect(rechargeDiscountFor(original, 'p2')).toBe(1);
+    const anonymous = slotEffect('gatherers_cache');
+    expect(rechargeDiscountFor(anonymous, 'p1')).toBe(1);
   });
 });
