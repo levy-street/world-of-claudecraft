@@ -27,13 +27,24 @@ interface SeekerEntitlementRuntime {
   verifySeekerSolanaArtifactAttestation: typeof verifySeekerSolanaArtifactAttestation;
 }
 
+// Each entry FORWARDS at call time instead of capturing the imported binding here.
+// Capturing eagerly made this module-scope literal read every import the moment the
+// module loaded, which is fine in production but detonates under Vitest: a suite that
+// mocks `./db` with an explicit factory throws on the first export its factory happens
+// to omit, at IMPORT time, so the whole test file fails to collect. Adding
+// `walletForAccount` to db broke 37 unrelated suites that way (xp, markers,
+// ip_block_kick, ...), none of which touch Seeker at all. Deferring the read scopes that
+// blast radius to the tests that actually call the path, and the next db export added
+// here cannot repeat it. The arrows also survive the `{ ...REAL_RUNTIME }` spread below,
+// which a getter-based version would not (spreading reads getters).
 const REAL_RUNTIME: SeekerEntitlementRuntime = {
-  walletForAccount,
-  findSeekerGenesisToken,
-  findSeekerGenesisTokens,
-  claimAvailableSeekerEntitlement,
-  seekerEntitlementForAccount,
-  verifySeekerSolanaArtifactAttestation,
+  walletForAccount: (...args) => walletForAccount(...args),
+  findSeekerGenesisToken: (...args) => findSeekerGenesisToken(...args),
+  findSeekerGenesisTokens: (...args) => findSeekerGenesisTokens(...args),
+  claimAvailableSeekerEntitlement: (...args) => claimAvailableSeekerEntitlement(...args),
+  seekerEntitlementForAccount: (...args) => seekerEntitlementForAccount(...args),
+  verifySeekerSolanaArtifactAttestation: (...args) =>
+    verifySeekerSolanaArtifactAttestation(...args),
 };
 
 let runtime = REAL_RUNTIME;
