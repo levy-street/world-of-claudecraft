@@ -214,6 +214,10 @@ Teardown of docs/guild-bank/ awaits the user's explicit confirmation.
   - THREE STATES ARE THREE RENDERINGS, deliberately: loading, refused, empty. "You may
     not read this" and "nobody has done anything" are opposite facts, and a drained
     bank must never be able to look like an untouched one because a frame went missing.
+  - SCREENSHOTS: `docs/screenshots/guild-bank-tab/after-{desktop,mobile}-guild-log*.png`
+    via `scripts/guild_bank_log_shot.mjs`. The empty-state shot drives the real
+    pane with an empty model rather than faking an image: founding a guild always
+    writes a `create_fee` row, so a genuinely empty log is unreachable in play.
   - UI: a Contents / Log sub-strip inside the Guild pane (its own `gbank-view-tab`
     class, NOT `.bank-tab`, because the outer strip is wired by querying `.bank-tab`).
     `BankWindow.guildTabActive` now also requires the CONTENTS view, so a bag click on

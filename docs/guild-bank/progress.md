@@ -99,6 +99,20 @@ the guild, which is the social check the permission model rests on.
         pool), the stale retention-sweep "no hot reads" justification in
         `server/main.ts` is corrected, and the two comments the KeyedCachedRead
         move left dangling are fixed.
+- [x] **Screenshots** (`scripts/guild_bank_log_shot.mjs`, the
+      guild_bank_tab_shot sibling; captured against a real server with
+      ALLOW_DEV_COMMANDS=1 after everything else was committed):
+      `docs/screenshots/guild-bank-tab/after-desktop-guild-log.png` (+ the
+      full-frame variant), `after-desktop-guild-log-empty.png`,
+      `after-mobile-guild-log.png`, `after-mobile-guild-log-empty.png`. The
+      populated shots are end to end: the guild is founded, opened, expanded,
+      banked and un-banked through the real facet commands, so the pane shows
+      one line of every sentence it can draw. The EMPTY shot is driven, not
+      faked: founding a guild always writes a create_fee row, so an empty log is
+      unreachable through play, and the script swaps the WORLD's guildBankLog()
+      read for an empty ready view and lets the real core and painter draw it.
+      The same session also proved the relocated index build end to end: the
+      index was dropped, the server restarted, and it was rebuilt AFTER listen.
 - [x] **Tests.** `tests/guild_bank_log_view.test.ts` (20),
       `tests/guild_bank_log_wire.test.ts` (18),
       `tests/guild_bank_log_server.test.ts` (12, real GameServer),
