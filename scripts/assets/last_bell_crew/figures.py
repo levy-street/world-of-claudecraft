@@ -417,12 +417,34 @@ def build_ewald():
     # silhouette tucked inward. Tucking first shrinks the profile `souwester`
     # measures and quietly re-sizes the approved hat, which is the one thing this
     # fix is not allowed to do.
-    BRIM_Z = 1.92
+    # Hat FIRST, off the untouched skull, so its fit is measured against the real
+    # head; then the hair is tucked under it. Tucking first shrinks the profile
+    # `souwester` measures and silently re-sizes the hat.
+    BRIM_Z, CROWN_Z = 1.92, 2.235
     built = [parts.souwester("Ewald_Souwester", head, "cloth", shade_t=0.22,
-                             material=mat, brim=0.30, tail=0.60, brim_z=BRIM_Z)]
-    tucked = parts.tuck_under_hat(head, "hair", BRIM_Z, shrink=0.78, ease=0.55)
-    if not tucked:
-        raise ValueError("Ewald: no hair vertices tucked; the hat will still be pierced")
+                             material=mat, brim=0.30, tail=0.60,
+                             brim_z=BRIM_Z, crown_z=CROWN_Z, flat=0.55)]
+    # Values SOLVED against the ray-cast coverage test below, not guessed. The
+    # baseline was 82 hair vertices outside the shell; 0.95/0.86 left 60, 0.80/0.62
+    # left 2, and 0.72/0.54 reaches zero with margin. `base` matters more than
+    # `shrink`: the band just above the brim is where the crown wall is tightest, and
+    # a ramp starting at 1.0 leaves exactly that band untouched. The z ceiling is the
+    # separate guarantee that nothing rises through the top.
+    # SKIN as well as hair: above the brow the scalp and the ear tops belong under
+    # the hat, and four skin vertices at the ear tops were the last thing poking
+    # through the crown wall after the hair was solved.
+    parts.tuck_under_hat(head, ("hair", "skin"), BRIM_Z, base=0.72, shrink=0.54,
+                         ease=0.5, drop=0.05, z_ceiling=CROWN_Z - 0.085)
+    # MEASURE it, do not eyeball it, and measure EVERY head vertex rather than just
+    # the hair: scoping the first check to hair is what let the ear tops through.
+    above, outside = parts.outside_shell(
+        head, range(len(head.data.vertices)), built[0], BRIM_Z)
+    if above or outside:
+        raise ValueError(
+            f"Ewald: the hat does not cover the head ({len(above)} above the crown, "
+            f"{len(outside)} through the side). Tighten base/shrink or raise crown_z."
+        )
+
     # THE FARE TIN on a neck cord, chest height, reachable
     front = parts.surface_front(body, 1.020) or -0.30
     built.append(parts.strap("Ewald_TinCord", [

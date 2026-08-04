@@ -295,8 +295,65 @@ def hood(name, host, cell, shade_t=0.34, material=None, sides=18, rings=5,
     return mesh_from(name, verts, faces, cell, shade_t, material)
 
 
-def tuck_under_hat(host, cell, z_floor, shrink=0.80, ease=0.55, drop=0.02,
-                   slots=None):
+def cell_verts(host, cells, slots=None):
+    """Indices of a host's vertices that sample any of `cells`."""
+    if isinstance(cells, str):
+        cells = (cells,)
+    table = slots or atlas.active_slots()
+    want = {(int(a[1]), int(a[3])) for a in (table.get(c, c) for c in cells)}
+    uvl = host.data.uv_layers.active.data
+    found = set()
+    for poly in host.data.polygons:
+        for li in poly.loop_indices:
+            u, v = uvl[li].uv
+            if (int((1.0 - v) * atlas.ROWS), int(u * atlas.COLS)) in want:
+                found.update(poly.vertices)
+                break
+    return found
+
+
+def outside_shell(host, verts, shell, z_floor, margin=0.004):
+    """Which of `verts` poke OUT of `shell` above `z_floor`.
+
+    RAY CAST, not binning. The first version of this binned the shell's vertices
+    into (angle, height) cells and compared radii, which is wrong for a shell built
+    from a handful of discrete rings: a sou'wester has geometry at five heights
+    only, so four of eight height bands came back empty, reported radius zero, and
+    flagged every vertex in the gaps. It condemned the model for a defect in the
+    measurement.
+
+    The honest test asks the geometry directly. For each vertex, cast a ray from the
+    host's centre axis outward through the vertex; if the shell is hit BEYOND the
+    vertex, the shell encloses it. Returns (above_top, outside_side).
+    """
+    pts = [shell.matrix_world @ v.co for v in shell.data.vertices]
+    z_hi = max(p.z for p in pts)
+    cx = (min(p.x for p in pts) + max(p.x for p in pts)) / 2
+    cy = (min(p.y for p in pts) + max(p.y for p in pts)) / 2
+    to_local = shell.matrix_world.inverted()
+
+    above, outside = [], []
+    for idx in verts:
+        p = host.matrix_world @ host.data.vertices[idx].co
+        if p.z <= z_floor:
+            continue
+        if p.z > z_hi + margin:
+            above.append(idx)
+            continue
+        axis = Vector((cx, cy, p.z))
+        out = Vector((p.x, p.y, p.z)) - axis
+        reach = out.length
+        if reach < 1e-5:
+            continue
+        direction = out / reach
+        hit, loc, _n, _i = shell.ray_cast(to_local @ axis, to_local.to_3x3() @ direction)
+        if not hit or ((shell.matrix_world @ loc) - axis).length < reach - margin:
+            outside.append(idx)
+    return above, outside
+
+
+def tuck_under_hat(host, cells, z_floor, shrink=0.80, ease=0.55, drop=0.02,
+                   z_ceiling=None, base=1.0, slots=None):
     """Pull a host's HAIR vertices in under a hat, in place.
 
     Surgical on purpose. The alternative fix, re-UV'ing the hair to the hat's
@@ -305,28 +362,17 @@ def tuck_under_hat(host, cell, z_floor, shrink=0.80, ease=0.55, drop=0.02,
     offending vertices instead, so the hat's outline is the hat's outline.
 
     Only vertices ABOVE `z_floor` (the brim line) and only those whose UVs sit in
-    `cell` are touched, so the hair below the brim, at the ears and the nape, is
-    left exactly as authored. The shrink ramps in with height (`ease`), because a
+    one of `cells` are touched, so anything below the brim, at the ears and the
+    nape, is left exactly as authored. Pass the SKIN cell as well as the hair:
+    above the brow the scalp and ear tops belong under the hat too, and four skin
+    vertices at the ear tops were the last thing breaking the crown wall. The shrink ramps in with height (`ease`), because a
     hat narrows toward the crown and so must the tuck; `drop` settles the crown
     hair a little as it comes in, which keeps it from tenting the hat's top.
 
     Returns the number of vertices moved, so a build can assert it did something.
     """
     mesh = host.data
-    addr = (slots or atlas.active_slots()).get(cell, cell)
-    row, col = int(addr[1]), int(addr[3])
-    uvl = mesh.uv_layers.active.data
-
-    # Which vertices belong to the hair? A vertex is hair if any loop on it
-    # samples the hair cell.
-    hair = set()
-    for poly in mesh.polygons:
-        for li in poly.loop_indices:
-            u, v = uvl[li].uv
-            if int(u * atlas.COLS) == col and int((1.0 - v) * atlas.ROWS) == row:
-                hair.update(poly.vertices)
-                break
-
+    hair = cell_verts(host, cells, slots)
     pts = [host.matrix_world @ vert.co for vert in mesh.vertices]
     top = max(p.z for p in pts)
     if top <= z_floor:
@@ -342,17 +388,25 @@ def tuck_under_hat(host, cell, z_floor, shrink=0.80, ease=0.55, drop=0.02,
             continue
         # 0 at the brim, 1 at the crown, eased so the tuck comes in gently
         t = min(1.0, (world.z - z_floor) / max(top - z_floor, 1e-6)) ** ease
-        factor = 1.0 - (1.0 - shrink) * t
+        # `base` is the shrink AT the brim and `shrink` the shrink at the crown.
+        # Starting from 1.0 leaves the hair just above the brim untouched, which is
+        # precisely where the crown wall is tightest, so that band poked through.
+        factor = base - (base - shrink) * t
         world.x = cx + (world.x - cx) * factor
         world.y = cy + (world.y - cy) * factor
         world.z -= drop * t
+        # A relative drop is not a guarantee. `z_ceiling` is: nothing hairy ends up
+        # above it, which is how the skull stops bursting through the crown.
+        if z_ceiling is not None and world.z > z_ceiling:
+            world.z = z_ceiling
         mesh.vertices[idx].co = inv @ world
         moved += 1
     return moved
 
 
 def souwester(name, host, cell, shade_t=0.30, material=None, sides=20,
-              crown_z=2.16, brim_z=1.92, pad=0.055, brim=0.30, tail=0.55):
+              crown_z=2.16, brim_z=1.92, pad=0.055, brim=0.30, tail=0.55,
+              flat=0.55):
     """A sailor's oilskin hat: low crown, brim turned down, longer at the back.
 
     The single most legible way to say SAILOR at gameplay distance. Sized off the
@@ -369,7 +423,7 @@ def souwester(name, host, cell, shade_t=0.30, material=None, sides=20,
         back = max(0.0, math.sin(ang - math.pi / 2) * -1.0)
         return brim + tail * brim * back
 
-    ring_inner, ring_outer, ring_crown, ring_top = [], [], [], []
+    ring_inner, ring_outer, ring_crown, ring_top, ring_flat = [], [], [], [], []
     for si, (ang, r) in enumerate(prof_brim):
         c, s = math.cos(ang), math.sin(ang)
         ring_inner.append((cu + c * r, cv + s * r, brim_z + 0.03))
@@ -378,21 +432,25 @@ def souwester(name, host, cell, shade_t=0.30, material=None, sides=20,
     for si, (ang, r) in enumerate(prof_crown):
         c, s = math.cos(ang), math.sin(ang)
         ring_crown.append((cu + c * r, cv + s * r, brim_z + 0.05))
-        ring_top.append((cu + c * r * 0.86, cv + s * r * 0.86, crown_z))
+        ring_top.append((cu + c * r * 0.90, cv + s * r * 0.90, crown_z - 0.045))
+        # A flat top ring, not a single apex: a fan straight to a point builds a
+        # CONE, which is what made the crown read as having no top at all.
+        ring_flat.append((cu + c * r * flat, cv + s * r * flat, crown_z))
 
-    for ring in (ring_inner, ring_outer, ring_crown, ring_top):
+    for ring in (ring_inner, ring_outer, ring_crown, ring_top, ring_flat):
         verts.extend(ring)
     n = sides
-    I, O, C, T = 0, n, 2 * n, 3 * n
+    I, O, C, T, F = 0, n, 2 * n, 3 * n, 4 * n
     for si in range(n):
         j = (si + 1) % n
         faces.append((I + si, I + j, O + j, O + si))      # brim, upper face
         faces.append((O + si, O + j, C + j, C + si))      # brim, under face
         faces.append((C + si, C + j, T + j, T + si))      # crown wall
+        faces.append((T + si, T + j, F + j, F + si))      # crown shoulder
     cap = len(verts)
-    verts.append((cu, cv, crown_z + 0.02))
+    verts.append((cu, cv, crown_z + 0.012))
     for si in range(n):
-        faces.append((cap, T + (si + 1) % n, T + si))
+        faces.append((cap, F + (si + 1) % n, F + si))     # the top itself
     return mesh_from(name, verts, faces, cell, shade_t, material)
 
 

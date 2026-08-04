@@ -95,7 +95,7 @@ unless the row says otherwise.
 
 | # | Figure | Defect | Fix | Status |
 |---|---|---|---|---|
-| 2.1 | Ewald | **Haircut pokes through the hat.** The hat itself is the best thing in the pass and stays exactly as it is. | Solved GEOMETRICALLY, not by recolour: `parts.tuck_under_hat` pulls the head mesh's hair vertices above the brim line inward, ramped with height, so the crown silhouette is the hat's alone. Chosen over the re-UV because a recolour only hides the poke-through, it does not remove it: the geometry still breaks the outline, it just stops being a different colour. Hair below the brim (ears, nape) is untouched and still reads. ORDER IS LOAD-BEARING: the hat is fitted FIRST off the untouched skull, then the hair is tucked. Tucking first shrinks the profile `souwester` measures and silently re-sizes the approved hat. | **DONE** |
+| 2.1 | Ewald | **Haircut pokes through the hat**, and the crown reads as having no top | Solved GEOMETRICALLY and then MEASURED. `parts.tuck_under_hat` pulls the head's vertices above the brim inward, ramped with height; `parts.outside_shell` ray-casts every head vertex against the hat and the build RAISES if any is outside, so the defect cannot come back silently. Three separate causes were found, only the first of which was the recorded one: (a) hair wider than the crown wall; (b) 49 vertices ABOVE the hat entirely, because the head reaches z=2.253 and the crown stopped at 2.180, so the skull burst out of the top (this is the "no top" read, not a missing cap); (c) after the hair was solved, 4 SKIN vertices at the ear tops still pierced the wall. Fixes: a shrink that starts at 0.72 AT the brim rather than 1.0 (the band just above the brim is where the wall is tightest), a hard z ceiling, a crown raised to 2.235, a flat top ring instead of a single apex (a fan to a point builds a cone), and the tuck applied to skin as well as hair. ORDER IS LOAD-BEARING: the hat is fitted FIRST off the untouched skull, because tucking first shrinks the profile it measures and silently re-sizes the approved geometry. | **DONE** |
 | 2.2 | Saul | "Some messed up things on the front of his shirt" | The four apron patches, unequally guilty: the two white linen ones read as stickers, the leather one reads as a **hole** in the apron, and the tonal canvas one actually reads as a repair. Keep the tonal canvas patch plus ONE enlarged linen patch, drop the other two, and seat them flatter (smaller standoff, thinner). Same numbers pass: pull the whole bib and skirt standoff in slightly; from the side the apron currently reads as a sandwich board with an air gap (`saul_turn_02`, `saul_turn_10`). | FIX |
 | 2.3 | Tam | Reads too much like a **shaman**. Needs normal town clothes. | Drivers ranked by guilt, from the renders: (1) bare torso and arms, shirtless-under-pelt is the core shaman read; (2) the **fang necklace**, trophy teeth are the loudest single signal; (3) the jagged teal fur mantle and zigzag hems; (4) the belt of large pale discs reading as talisman stones. The teal HUE is innocent: it is his entity colour, and the palette chip already promises "the bell-keeper's coat" that the render never delivers. Full recipe below the table. | FIX |
 | 2.4 | Tam | Needs **hair** (currently bald) | Route now known, no Tripo needed: a short cropped **grey horseshoe band**, temple around the nape to temple, bald crown kept (nobody else in the cast is balding, the elder dome is a good silhouette), joining the existing beard line. Build it as a `parts.hug_profile` band hugging the skull (the `parts.souwester` technique), painted the grey hair ramp `build_tam` ALREADY authors and the bald head never samples. Tripo only if the faceted band fails at bust size. Also fixes the worst back view in the cast: `tam_turn_06` currently reads as one continuous naked mass, bald dome into bare back. | FIX |
@@ -445,6 +445,21 @@ the copy fixed; none should stand.
 | Tidemill stalker | Palette chip "tidemill slate, roof it has not shed"; design note "carries star-glass for now" | `build_creature` builds no bespoke geometry; neither slate nor star-glass appears in any render | Fix the copy now (the page currently misrepresents the model in exactly the way its own design notes call unacceptable); the model catches up via section 4. Also delete the dead shard params (`shards`, `shard_len`, `shard_base`) still carried in `cast.py` for both stalkers. |
 
 ## 9. Cross-cutting sweeps
+
+- **Measure the defect, do not eyeball it, and check the measurement itself.**
+  The first coverage test for 2.1 binned the hat's vertices into (angle, height)
+  cells and compared radii. A sou'wester has geometry at five heights only, so
+  four of eight height bands came back empty, reported radius zero, and flagged
+  every vertex in the gaps: it reported 93 failures that were artefacts of the
+  test and did not move when the model changed. The give-away was that the count
+  barely responded to a parameter that should have driven it. Replaced with a ray
+  cast from the head axis through each vertex, which asks the geometry directly;
+  the same figure then reported 82 with no tuck falling monotonically to 0. Any
+  coverage or containment check on a low-poly shell should ray-cast, and a check
+  whose output does not respond to the input is a broken check, not a stubborn bug.
+- **Scope a check to the whole surface, not the part you suspect.** The same
+  assertion, scoped to hair vertices, passed while four skin vertices at the ear
+  tops still pierced the crown.
 
 - **Base-accessory audit.** Two figures shipped unbuilt base-mesh accessories
   on default palette cells (Edda's ear cluster 2.13, Saul's belt book 2.15).
