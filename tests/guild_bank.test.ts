@@ -246,6 +246,39 @@ describe('sanitizeGuildBankState (the ONE load path)', () => {
     expect('craftedRecipeId' in out[2]).toBe(false);
   });
 
+  it('takes the SHARED load bounds on the payload and the crafted marker', () => {
+    // REGRESSION (the one-sanitizer doctrine, src/sim/item_instance_load.ts):
+    // this arm used to take `instance` verbatim and accept any non-empty
+    // craftedRecipeId string, so an oversized signer or an unbounded marker
+    // rode every autosave of the book forever. Both now answer to the same
+    // helpers the personal bank arm uses.
+    const out = sanitizeGuildBankState({
+      inventory: [
+        {
+          itemId: 'wolf_fang',
+          count: 1,
+          instance: { signer: 'x'.repeat(5000), junkKey: 'nope' },
+          craftedRecipeId: 'r'.repeat(5000),
+        },
+        // A legal payload beside it is untouched: the bound drops keys, never rows.
+        { itemId: 'wolf_fang', count: 1, instance: { signer: 'Ana' }, craftedRecipeId: 'jerky' },
+      ],
+    }).inventory;
+    // The row survives (items are never destroyed) with the junk gone.
+    expect(out).toHaveLength(2);
+    expect(out[0].itemId).toBe('wolf_fang');
+    expect(out[0].instance?.signer).toBeUndefined();
+    expect('craftedRecipeId' in out[0]).toBe(false);
+    expect(JSON.stringify(out)).not.toContain('xxxxx');
+    expect(JSON.stringify(out)).not.toContain('rrrrr');
+    expect(out[1]).toEqual({
+      itemId: 'wolf_fang',
+      count: 1,
+      instance: { signer: 'Ana' },
+      craftedRecipeId: 'jerky',
+    });
+  });
+
   it('tolerates an overstacked PLAIN slot uncapped (the bank.ts pre-bag idiom, pinned)', () => {
     // Deliberate choice, shared with sanitizeBankState: a plain (non-instanced)
     // slot's count has no tamper ceiling (instancedCountCap returns Infinity
@@ -279,6 +312,14 @@ describe('sanitizeGuildBankState (the ONE load path)', () => {
         { itemId: 'unknown_id_xyz', count: 30, instance: { signer: 'Ana' } },
         { itemId: 'wolf_fang', count: 2, craftedRecipeId: 'jerky' },
         { itemId: 'wolf_fang', count: 2, craftedRecipeId: '' },
+        // The shared load bounds: an oversized signer, a junk key, and an
+        // unbounded crafted marker must be dropped IDENTICALLY by both arms.
+        {
+          itemId: 'wolf_fang',
+          count: 1,
+          instance: { signer: 'x'.repeat(5000), junkKey: 'nope' },
+          craftedRecipeId: 'r'.repeat(5000),
+        },
       ],
     };
     expect(sanitizeGuildBankState(hostile).inventory).toEqual(sanitizeBankState(hostile).inventory);

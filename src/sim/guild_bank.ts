@@ -26,6 +26,11 @@ import { addStacked, bagCapacity, bagsFullError, instancedCountCap } from './bag
 import { moveBetweenContainers, nearBanker } from './bank';
 import { ITEMS } from './data';
 import { formatMoney } from './format_money';
+import {
+  boundCraftedRecipeIdOnLoad,
+  sanitizeItemInstancePayloadOnLoad,
+  warnDroppedInstanceKeys,
+} from './item_instance_load';
 import { isTransferLockedInstance, publicInstanceView } from './item_instance_transfer';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -145,11 +150,32 @@ export function createEmptyGuildBankState(): GuildBankState {
  *  precedent); over-capacity inventories are tolerated (never truncated).
  *  treasury clamps into [0, GUILD_BANK_TREASURY_CAP]; purchasedSlots clamps
  *  into range and floors to a VALID ladder position (0, 24, 30, ..., 60) so
- *  price indexing stays coherent. */
-export function sanitizeGuildBankState(raw: unknown): GuildBankState {
+ *  price indexing stays coherent.
+ *
+ *  Every row takes the SHARED load-side bounds (src/sim/item_instance_load.ts),
+ *  exactly like the personal bank arm beside it: the crafted-recipe marker
+ *  through `boundCraftedRecipeIdOnLoad` and the instance payload through
+ *  `sanitizeItemInstancePayloadOnLoad`, junk KEYS dropping while the row itself
+ *  never does. This arm used to take both verbatim, which broke the
+ *  one-sanitizer doctrine for the newest persisted container: an oversized
+ *  marker or a signer string would then ride EVERY autosave of that book
+ *  forever, which is also the realistic road to a book past the row size bound.
+ *
+ *  The rift REBUILD the personal arm can do is deliberately skipped here: it
+ *  keys on an owning character and a book has no owner, which is the same
+ *  branch `sanitizeBankState` takes for an ownerId-less caller. A rift copy in
+ *  a book is a tampered or legacy row in the first place (rift gear rides
+ *  noMarketList, so the anonymous pipe refuses it in both directions); it stays
+ *  as dormant recoverable data for the operator hatch rather than being
+ *  destroyed here.
+ *
+ *  `droppedSink` aggregates the drop diagnostics for a caller loading many
+ *  books (the boot load); a sink-less call logs one aggregate line per CALL. */
+export function sanitizeGuildBankState(raw: unknown, droppedSink?: string[]): GuildBankState {
   if (!raw || typeof raw !== 'object') return createEmptyGuildBankState();
   const r = raw as { treasury?: unknown; inventory?: unknown; purchasedSlots?: unknown };
   const inventory: InvSlot[] = [];
+  const localDrops: string[] = droppedSink ?? [];
   if (Array.isArray(r.inventory)) {
     for (const entry of r.inventory) {
       if (!entry || typeof entry !== 'object') continue;
@@ -161,22 +187,37 @@ export function sanitizeGuildBankState(raw: unknown): GuildBankState {
       };
       if (typeof e.itemId !== 'string' || e.itemId === '') continue;
       const hasInstance = !!e.instance && typeof e.instance === 'object';
-      const craftedRecipeId =
-        typeof e.craftedRecipeId === 'string' && e.craftedRecipeId !== ''
-          ? e.craftedRecipeId
-          : undefined;
+      // The shared doctrine helper judges the RAW marker, so a non-string or
+      // oversized one is dropped AND reported rather than silently kept.
+      const rawMarker: { itemId: string; craftedRecipeId?: unknown } = {
+        itemId: e.itemId,
+        craftedRecipeId: e.craftedRecipeId,
+      };
+      boundCraftedRecipeIdOnLoad(rawMarker, localDrops, 'guildbank');
+      const craftedRecipeId = rawMarker.craftedRecipeId as string | undefined;
       const instanceCap = instancedCountCap(
         ITEMS[e.itemId],
         hasInstance ? (e.instance as InvSlot['instance']) : undefined,
       );
+      // Computed from the payload AS STORED, so dropping a junk key below can
+      // never widen a tampered stack.
       const count = Math.min(instanceCap, Math.max(1, Math.floor(Number(e.count)) || 1));
       const slot: InvSlot = hasInstance
         ? { itemId: e.itemId, count, instance: e.instance as InvSlot['instance'] }
         : { itemId: e.itemId, count };
       if (craftedRecipeId !== undefined) slot.craftedRecipeId = craftedRecipeId;
-      inventory.push(cloneInvSlot(slot));
+      const cleaned = cloneInvSlot(slot);
+      // Applied to the CLONE, never to the stored row this function does not own.
+      if (cleaned.instance) {
+        const { payload, dropped } = sanitizeItemInstancePayloadOnLoad(cleaned.instance);
+        for (const d of dropped) localDrops.push(`guildbank.${cleaned.itemId}.${d}`);
+        if (payload) cleaned.instance = payload;
+        else delete cleaned.instance;
+      }
+      inventory.push(cleaned);
     }
   }
+  if (!droppedSink) warnDroppedInstanceKeys('guildbank', localDrops);
   const maxPurchased = GUILD_BANK_LADDER_POSITIONS[GUILD_BANK_LADDER_POSITIONS.length - 1];
   let purchasedSlots = Math.max(
     0,
