@@ -360,13 +360,12 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned after merging the live graphics rebuild (context
-      // recycle plus profile-aware Eastbrook runtime inputs in the renderer, the
-      // rendererIntegration leaf) onto the release/v0.34.0 tip that already
-      // carries PR #2720's fence-removal layout evidence. The merged tree mints
-      // one composite matching neither parent's literal. No pipeline input or
-      // geometry value changed and no capture was retaken.
-      fingerprint: '707c6fbee3c5d9681bb717870125dc1632533b9bd0117b922fdf2767edf47952',
+      // Deliberately re-pinned again: src/render/renderer.ts is the
+      // rendererIntegration leaf of this composite, and adding the Blizzard timed
+      // ground loop to its snowZone spellfx arm moves the leaf's own sha256 on top
+      // of the live graphics rebuild the release tip already carries. No pipeline
+      // input or geometry value changed and no capture was retaken.
+      fingerprint: '32233c17b92750cb0e470094ca59a8445eaa50f3778b537c62fa4981d573e30b',
       components: {
         captureContract: {
           id: 'polish-v2',
