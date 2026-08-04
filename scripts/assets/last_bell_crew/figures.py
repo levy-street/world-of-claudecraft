@@ -450,16 +450,19 @@ def build_ewald():
     # strait for thirty years rather than a clean-shaven deckhand. Built off the
     # MEASURED jaw (nose apex sits at z=1.52, jaw 1.30 to 1.45), widest at the chin
     # and tapering up toward the sideburns.
+    # Laid on the face by ray cast, and shaped like a beard rather than a strap: the
+    # top edge sits below the mouth at the chin (the nose apex measures z=1.52, so
+    # anything above about 1.46 climbs over the shipped moustache) and rises to the
+    # sideburns at the sides, while the bottom hangs lowest at the front and tucks up
+    # under the jaw corners.
     built.append(parts.beard(
-        "Ewald_Beard", head, "hair", rings=(
-            # Kept BELOW the mouth line. The nose apex measures z=1.52, so anything
-            # starting above about 1.46 climbs over the mouth and the shipped
-            # moustache and reads as a muzzle rather than a beard.
-            (1.442, 0.010, 0.52),      # jaw corners, narrow
-            (1.392, 0.024, 0.82),      # along the jaw
-            (1.334, 0.032, 0.88),      # under the jaw, the fullest course
-            (1.276, 0.024, 0.60),      # the point of the beard
-        ), shade_t=0.58, material=mat, arc=0.30, jut=0.018))
+        # shade matched to the shipped moustache above it: at 0.58 the beard read as
+        # a darker, separate object stuck to his chin
+        "Ewald_Beard", head, "hair", shade_t=0.44, material=mat,
+        rows=7, steps=20, spread=0.150,
+        front_top=1.448, front_bot=1.262,
+        side_top=1.598, side_bot=1.402,
+        pad_front=0.032, pad_side=0.012))
 
     # THE FARE TIN on a neck cord, chest height, reachable
     front = parts.surface_front(body, 1.020) or -0.30
