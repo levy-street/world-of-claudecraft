@@ -2352,6 +2352,7 @@ export const fr_CA: EnTranslations = {
       "billboard": {
         "label": "Tableau d'affichage de la guilde",
         "empty": "Rien sur le tableau d'affichage pour le moment.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Défini par {name}",
         "save": "Enregistrer",
         "placeholder": "Écrivez un message pour la guilde",
@@ -3079,6 +3080,16 @@ export const fr_CA: EnTranslations = {
     },
     "ota_updates": {
       "invalid_input": "Saisie invalide."
+    },
+    "seeker": {
+      "native_only": "Seeker entitlement is available only in the native app.",
+      "attestation_failed": "Device verification failed. Please try again.",
+      "solana_artifact_required": "Use the Solana Store app to continue.",
+      "wallet_required": "Link and verify a wallet first.",
+      "genesis_token_required": "A verified Seeker Genesis Token is required.",
+      "genesis_token_claimed": "That Seeker Genesis Token has already been claimed.",
+      "entitlement_required": "Verified Seeker entitlement is required.",
+      "current_ownership_required": "Current Seeker Genesis Token ownership is required."
     }
   },
   "guide": {
@@ -5158,6 +5169,7 @@ export const fr_CA: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "Les avantages de détenteur sont actifs. Connectez l'appli lorsque vous devez signer ou dépenser.",
     "extensionHelp": "Pour voir un portefeuille ici, gardez active une extension de portefeuille de navigateur telle que Solflare Wallet.",
     "mobileAppHelp": "Choisissez Phantom ou Solflare. Votre application de portefeuille demandera une approbation. Gardez ce jeu ouvert et revenez-y une fois terminé.",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "Les connexions de portefeuille ne sont pas encore disponibles dans l'application de l'écran d'accueil. Ouvrez World of ClaudeCraft dans Safari ou Chrome pour utiliser Phantom ou Solflare.",
     "openAppTitle": "Continuer dans {wallet}",
     "openAppHelp": "Ouvrez {wallet} pour examiner cette demande. Gardez cet onglet de jeu ouvert pendant que l'application de portefeuille est active.",
@@ -6796,6 +6808,10 @@ export const fr_CA: EnTranslations = {
         "leader": "Maître de guilde",
         "officer": "Officier",
         "member": "Membre"
+      },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
       },
       "guildHeadOne": "vous êtes {rank}, {count} membre",
       "guildHeadMany": "vous êtes {rank}, {count} membres"

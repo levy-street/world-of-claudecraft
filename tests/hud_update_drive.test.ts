@@ -1068,6 +1068,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the social window; a struct change rebuilds, a content change refreshes the list only',
   },
   {
+    call: 'this.updateGuildBillboardEcho',
+    band: 'slow',
+    gate: '',
+    surface: 'chrome',
+    why: 'appends one guild-billboard line to the chat log, latched on the MOTD value in guild_motd_login.ts (login and mid-session changes only, never on unrelated social re-pushes)',
+  },
+  {
     call: 'this.marketWindow.close',
     band: 'slow',
     gate: 'this.marketWindow.isOpen && !this.nearbyMarketNpc()',
@@ -1415,7 +1422,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
-    ).toEqual({ window: 41, chrome: 71, none: 15 });
+    ).toEqual({ window: 41, chrome: 72, none: 15 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

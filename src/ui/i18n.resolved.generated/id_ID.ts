@@ -2352,6 +2352,7 @@ export const id_ID: EnTranslations = {
       "billboard": {
         "label": "Papan Pengumuman Serikat",
         "empty": "Belum ada apa pun di papan pengumuman.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Ditetapkan oleh {name}",
         "save": "Simpan",
         "placeholder": "Tulis pesan untuk serikat",
@@ -3079,6 +3080,16 @@ export const id_ID: EnTranslations = {
     },
     "ota_updates": {
       "invalid_input": "Masukan tidak valid."
+    },
+    "seeker": {
+      "native_only": "Seeker entitlement is available only in the native app.",
+      "attestation_failed": "Device verification failed. Please try again.",
+      "solana_artifact_required": "Use the Solana Store app to continue.",
+      "wallet_required": "Link and verify a wallet first.",
+      "genesis_token_required": "A verified Seeker Genesis Token is required.",
+      "genesis_token_claimed": "That Seeker Genesis Token has already been claimed.",
+      "entitlement_required": "Verified Seeker entitlement is required.",
+      "current_ownership_required": "Current Seeker Genesis Token ownership is required."
     }
   },
   "guide": {
@@ -5158,6 +5169,7 @@ export const id_ID: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "Manfaat pemegang aktif. Hubungkan aplikasi saat Anda perlu menandatangani atau membelanjakan.",
     "extensionHelp": "Agar dompet tampil di sini, biarkan ekstensi dompet peramban seperti Solflare Wallet tetap aktif.",
     "mobileAppHelp": "Pilih Phantom atau Solflare. Aplikasi dompetmu akan meminta persetujuan. Jaga permainan ini tetap terbuka dan kembali ke sana saat selesai.",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "Koneksi dompet belum tersedia di aplikasi Layar Utama. Buka World of ClaudeCraft di Safari atau Chrome untuk menggunakan Phantom atau Solflare.",
     "openAppTitle": "Lanjutkan di {wallet}",
     "openAppHelp": "Buka {wallet} untuk meninjau permintaan ini. Jaga tab permainan ini tetap terbuka saat aplikasi dompet aktif.",
@@ -6796,6 +6808,10 @@ export const id_ID: EnTranslations = {
         "leader": "Pemimpin Serikat",
         "officer": "Perwira",
         "member": "Anggota"
+      },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
       },
       "guildHeadOne": "Anda adalah {rank}, {count} anggota",
       "guildHeadMany": "Anda adalah {rank}, {count} anggota"

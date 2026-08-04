@@ -2352,6 +2352,7 @@ export const zh_TW: EnTranslations = {
       "billboard": {
         "label": "公會公告板",
         "empty": "公告板上還沒有內容。",
+        "loginLine": "公會公告板：{text}",
         "setBy": "由 {name} 設定",
         "save": "儲存",
         "placeholder": "給公會寫一則訊息",
@@ -3079,6 +3080,16 @@ export const zh_TW: EnTranslations = {
     },
     "ota_updates": {
       "invalid_input": "輸入無效。"
+    },
+    "seeker": {
+      "native_only": "Seeker 權益僅可在原生應用程式中使用。",
+      "attestation_failed": "裝置驗證失敗。請再試一次。",
+      "solana_artifact_required": "請使用 Solana Store 版應用程式繼續。",
+      "wallet_required": "請先連結並驗證錢包。",
+      "genesis_token_required": "需要已驗證的 Seeker Genesis Token。",
+      "genesis_token_claimed": "該 Seeker Genesis Token 已被領取。",
+      "entitlement_required": "需要已驗證的 Seeker 權益。",
+      "current_ownership_required": "需要目前持有 Seeker Genesis Token。"
     }
   },
   "guide": {
@@ -5158,6 +5169,7 @@ export const zh_TW: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "持有者特權已啟用。需要簽名或花費時請連接應用程式。",
     "extensionHelp": "若要在此處看到錢包，請保持 Solflare Wallet 等瀏覽器錢包擴充功能處於啟用狀態。",
     "mobileAppHelp": "選擇 Phantom 或 Solflare。錢包應用程式會要求核准。請保持遊戲開啟，完成後返回遊戲。",
+    "seekerAppHelp": "使用 Seed Vault Wallet 繼續。在 Seed Vault 中檢視連線與驗證要求，然後返回遊戲。",
     "standaloneAppHelp": "主畫面應用程式目前尚不支援連接錢包。若要使用 Phantom 或 Solflare，請在 Safari 或 Chrome 中開啟 World of ClaudeCraft。",
     "openAppTitle": "在 {wallet} 中繼續",
     "openAppHelp": "開啟 {wallet} 檢視此請求。錢包應用程式啟用時，請保持此遊戲分頁開啟。",
@@ -6796,6 +6808,10 @@ export const zh_TW: EnTranslations = {
         "leader": "會長",
         "officer": "幹部",
         "member": "成員"
+      },
+      "tenure": {
+        "recruit": "新兵",
+        "veteran": "老兵"
       },
       "guildHeadOne": "你是{rank}，{count}名成員",
       "guildHeadMany": "你是{rank}，{count}名成員"

@@ -879,15 +879,36 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: 'wocBalanceRateLimited',
     requireOwnedExpected: null,
   },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/seeker/entitlement',
+    handler: 'server/seeker_entitlement.ts entitlementStatusHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/seeker/entitlement',
+    handler: 'server/seeker_entitlement.ts entitlementClaimHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: 'rateLimit(WALLET_LINK_POLICY)',
+    requireOwnedExpected: null,
+  },
   // Daily-rewards player family (v0.19.0, server/daily_rewards.ts): served by
   // the handleDailyRewardApi sub-dispatcher behind the main.ts PREFIX arm
   // `url.startsWith('/api/daily-rewards')`, which runs bearerActiveAccount
   // (full active session, read tokens 403) BEFORE delegating, method- and
   // subpath-agnostic. The prefix has NO trailing-slash boundary, so a no-slash
   // sibling like '/api/daily-rewardsfoo' also enters the family (auth first,
-  // then the in-family 404) instead of falling through the ladder. No rate
-  // limiter on any of the three (spin relies on the one-spin-per-day 409 guard
-  // only). In-family fallthrough (wrong method or unknown subpath, after auth)
+  // then the in-family 404) instead of falling through the ladder. Native Seeker
+  // spins additionally use the shared handler's IP-and-account RPC-work limiter;
+  // web spins retain the one-spin-per-day 409 guard. In-family fallthrough
+  // (wrong method or unknown subpath, after auth)
   // is 404 { error: 'unknown endpoint' }.
   {
     dispatcher: DISPATCH.mainApi,
@@ -918,7 +939,7 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     handler: 'handleDailyRewardApi arm: /api/daily-rewards/spin',
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.full,
-    limiter: null,
+    limiter: 'SEEKER_SPIN_VERIFY_POLICY (native Seeker only)',
     requireOwnedExpected: null,
   },
   {

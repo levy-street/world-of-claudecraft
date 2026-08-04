@@ -123,6 +123,7 @@ export const API_CONTENT_TYPE: Readonly<Record<string, ContentTypeClass>> = {
   '/api/auth/github/callback': HTML,
   '/api/github': PROBLEM_JSON,
   '/api/woc/balance': PROBLEM_JSON,
+  '/api/seeker/entitlement': PROBLEM_JSON,
   '/api/daily-rewards': PROBLEM_JSON,
   '/api/daily-rewards/leaderboard': PROBLEM_JSON,
   '/api/daily-rewards/spin': PROBLEM_JSON,

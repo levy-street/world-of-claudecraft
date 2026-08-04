@@ -2352,6 +2352,7 @@ export const de_DE: EnTranslations = {
       "billboard": {
         "label": "Gildenpinnwand",
         "empty": "Noch nichts an der Pinnwand.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Festgelegt von {name}",
         "save": "Speichern",
         "placeholder": "Schreib eine Nachricht für die Gilde...",
@@ -3079,6 +3080,16 @@ export const de_DE: EnTranslations = {
     },
     "ota_updates": {
       "invalid_input": "Ungültige Eingabe."
+    },
+    "seeker": {
+      "native_only": "Seeker entitlement is available only in the native app.",
+      "attestation_failed": "Device verification failed. Please try again.",
+      "solana_artifact_required": "Use the Solana Store app to continue.",
+      "wallet_required": "Link and verify a wallet first.",
+      "genesis_token_required": "A verified Seeker Genesis Token is required.",
+      "genesis_token_claimed": "That Seeker Genesis Token has already been claimed.",
+      "entitlement_required": "Verified Seeker entitlement is required.",
+      "current_ownership_required": "Current Seeker Genesis Token ownership is required."
     }
   },
   "guide": {
@@ -5158,6 +5169,7 @@ export const de_DE: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "Inhaberboni sind aktiv. Verbindet die App, wenn Ihr unterschreiben oder ausgeben müsst.",
     "extensionHelp": "Damit hier eine Wallet erscheint, halte eine Browser-Wallet-Erweiterung wie Solflare Wallet aktiv.",
     "mobileAppHelp": "Wähle Phantom oder Solflare. Deine Wallet-App wird um Genehmigung bitten. Halte dieses Spiel geöffnet und kehre zu ihm zurück, wenn du fertig bist.",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "Wallet-Verbindungen sind in der Startbildschirm-App noch nicht verfügbar. Öffne World of ClaudeCraft in Safari oder Chrome, um Phantom oder Solflare zu nutzen.",
     "openAppTitle": "Weiter in {wallet}",
     "openAppHelp": "Öffne {wallet}, um diese Anfrage zu prüfen. Halte diesen Spieltab geöffnet, während die Wallet-App aktiv ist.",
@@ -6796,6 +6808,10 @@ export const de_DE: EnTranslations = {
         "leader": "Gildenmeister",
         "officer": "Offizier",
         "member": "Mitglied"
+      },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
       },
       "guildHeadOne": "Ihr seid {rank}, {count} Mitglied",
       "guildHeadMany": "Ihr seid {rank}, {count} Mitglieder"

@@ -52,6 +52,7 @@ import {
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM, REALM_DIRECTORY } from './realm';
 import { chooseArchiveName } from './reclaim_name';
+import { SEEKER_ENTITLEMENT_SCHEMA } from './seeker_entitlement_db';
 import { SOCIAL_SCHEMA } from './social_db';
 import { UNSTUCK_SCHEMA } from './unstuck_db';
 import { USER_ASSETS_SCHEMA } from './user_assets_db';
@@ -1181,6 +1182,7 @@ export async function ensureSchema(): Promise<void> {
     await client.query(DAILY_REWARD_EXCLUDED_ACCOUNTS_VIEW_SQL);
     await client.query(SOCIAL_SCHEMA);
     await client.query(ADMIN_GUILDS_SCHEMA);
+    await client.query(SEEKER_ENTITLEMENT_SCHEMA);
     await client.query(OAUTH_SCHEMA);
     // Discord integration tables (links, oauth states, pending logins, reward
     // economy). FK-references accounts(id), so it runs after SCHEMA. Applied
@@ -2312,6 +2314,13 @@ export async function exportAccountData(
       ORDER BY last_seen_at DESC`,
     [accountId],
   );
+  const seekerEntitlements = await pool.query(
+    `SELECT mint, claimant_wallet, proof_version, verification_slot, claimed_at
+       FROM seeker_entitlement_claims
+      WHERE account_id = $1
+      ORDER BY claimed_at`,
+    [accountId],
+  );
   return {
     exportedAt: new Date().toISOString(),
     account: {
@@ -2333,6 +2342,7 @@ export async function exportAccountData(
     })),
     playtimeTotals: playtimeTotals.rows,
     ipAssociations: ipAssociations.rows,
+    seekerEntitlements: seekerEntitlements.rows,
   };
 }
 

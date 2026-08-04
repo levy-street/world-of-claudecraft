@@ -1608,7 +1608,13 @@ export class GameServer {
     });
     this.riftUpgrader = new RiftUpgradeCoordinator(riftUpgraderConfigFromEnv());
     this.riftAssets = new RiftAssetCoordinator(riftAssetConfigFromEnv());
-    this.social = new SocialService(this.socialDb, this.socialTransport());
+    this.social = new SocialService(
+      this.socialDb,
+      this.socialTransport(),
+      () => Date.now(),
+      // Guild names run the same offensive-name screen as character names.
+      (name) => offensiveName(name),
+    );
     this.moderation = new ModerationService(this.moderationHost(), {
       recordAction: (input) => recordInGameAction(input),
       mute: (input) => muteAccountChat(input),
