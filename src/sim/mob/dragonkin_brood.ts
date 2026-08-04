@@ -144,7 +144,14 @@ function pickWhelpVictim(ctx: SimContext, pos: Vec3): Entity | null {
 
 /** Crack a living egg open NOW through the normal death path (the renderer
  *  swaps closed -> open shell on the death event; xpMult 0 pays no XP). The
- *  next brood pass sees the corpse and hatches the whelp. */
+ *  next brood pass sees the corpse and hatches the whelp.
+ *
+ *  Draws no rng, and what carries that is the NULL killer, not xpMult: with no
+ *  killer and no tapper, handleDeath's creditId resolves to null and the whole
+ *  credited-kill block is skipped, rollLoot included (combat/damage.ts). xpMult
+ *  0 only zeroes the XP INSIDE that block. Giving chain/shout/ambush cracks a
+ *  killer would start drawing shared rng per egg and drift every seeded roll
+ *  downstream, so that change owes this comment a second look. */
 function crackEgg(ctx: SimContext, egg: Entity): void {
   if (egg.dead) return;
   ctx.dealDamage(null, egg, Math.max(1, egg.hp), false, 'physical', 'Brood Ripple', 'hit', true);

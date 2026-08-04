@@ -20,6 +20,11 @@
 // trace AND rng draw-order log stay byte-identical. The in-place Entity mutation is
 // intentional (the refactor's immutability waiver). The Nythraxis death-dialogue
 // branch is factored out behind ctx.onBossDeath (its body stays on Sim for N1).
+// One deliberate post-move exception: the idle wander draws and the resetEvadingMob
+// wander re-roll go through the shared idleRng helper (mob/idle_rng.ts) rather than
+// ctx.rng directly, so an off-stream mob's PASSIVE draws stay private. The helper's
+// fallback returns ctx.rng ITSELF, so every shared-stream mob's draw position is
+// byte-identical (pinned by tests/off_stream_rng.test.ts).
 //
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts). data/types/world/threat/pathfind and the
@@ -42,7 +47,9 @@ import {
   riftRankForBaseLevel,
 } from '../rift/ranks';
 import { instancePlayerIds } from '../rift/runs';
-import { Rng } from '../rng';
+// Type only: the idle sub-stream is threaded through the wander step as a local.
+// The helper that CONSTRUCTS one lives in mob/idle_rng.ts.
+import type { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
 import { clearThreat, hasEscapeStealth, stealthDetectionRadius } from '../threat';
 import {
@@ -74,6 +81,7 @@ import {
 } from './charge';
 import { updateMobCombatProfile } from './combat_profile';
 import { applyBroodBurn } from './dragonkin_brood';
+import { idleRng, wanderPause } from './idle_rng';
 import {
   claimMechanicSpacing,
   mechanicSlotHeld,
@@ -110,18 +118,6 @@ const NYTHRAXIS_HEROIC_ADD_IDS = new Set([
   'nythraxis_heroic_priest_add',
   'nythraxis_heroic_rogue_add',
 ]);
-
-/** The rng an `offStreamRng` mob's PASSIVE idle draws come from: a private
- *  sub-stream seeded from the sim clock and the mob's id, exactly as the
- *  ambient stable horses do (mob/ambient.ts), so a new herd of idle content
- *  never drifts the shared world stream. Every other mob keeps `ctx.rng`, so
- *  no shipped mob's draw order moves. Deterministic and wall-clock free, so
- *  offline, server and headless agree. */
-function idleRng(ctx: SimContext, mob: Entity): Rng {
-  if (!mob.offStreamRng) return ctx.rng;
-  const seed = (((ctx.tickCount * 0x9e3779b1) >>> 0) ^ ((mob.id * 0x85ebca6b) >>> 0)) >>> 0;
-  return new Rng(seed);
-}
 
 export function updateMob(ctx: SimContext, mob: Entity): void {
   if (mob.dead) {
@@ -406,17 +402,24 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         break;
       }
       mob.wanderTimer -= DT;
+      // ONE idle sub-stream for the whole wander step, threaded through all three
+      // draw sites below (the ambient stable horses do the same, mob/ambient.ts).
+      // Two of them can fire on the SAME tick (a fresh target the mob already
+      // stands on arrives immediately) and idleRng re-seeds an off-stream mob from
+      // the tick plus its id, so a second call would hand the pause the very value
+      // the target angle just used. Taken on first draw, so an idle off-stream mob
+      // allocates nothing on the ticks that roll nothing; a shared-stream mob still
+      // gets ctx.rng, the same instance as before, so no draw moves position,
+      // order, or count.
+      let rng: Rng | null = null;
       if (mob.wanderTimer <= 0) {
+        rng = idleRng(ctx, mob);
         if (mob.wanderTarget) {
           mob.wanderTarget = null;
-          // wanderHaste divides the pause AFTER the draw (identical rng
-          // stream for every template; see the MobTemplate field comment).
-          mob.wanderTimer =
-            idleRng(ctx, mob).range(3, 10) / (MOBS[mob.templateId]?.wanderHaste ?? 1);
+          mob.wanderTimer = wanderPause(rng, mob, 3, 10);
         } else {
-          const wr = idleRng(ctx, mob);
-          const ang = wr.range(0, Math.PI * 2);
-          const r = wr.range(MIN_WANDER_RADIUS, MAX_WANDER_RADIUS);
+          const ang = rng.range(0, Math.PI * 2);
+          const r = rng.range(MIN_WANDER_RADIUS, MAX_WANDER_RADIUS);
           mob.wanderTarget = ctx.groundPos(
             mob.spawnPos.x + Math.sin(ang) * r,
             mob.spawnPos.z + Math.cos(ang) * r,
@@ -425,10 +428,31 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         }
       }
       if (mob.wanderTarget) {
-        const arrived = ctx.moveToward(mob, mob.wanderTarget, mob.moveSpeed * 0.35);
-        if (arrived) {
+        // The same pause the walk-budget arm rolls, hasted the same way: arrival is
+        // the arm a quick mob actually reaches (a whelp ambles at moveSpeed 10 x
+        // 0.35, crossing the whole wander ring in about 5s), so dividing only the
+        // 30s timeout left the knob dead for the very mobs it was authored for.
+        const settle = () => {
           mob.wanderTarget = null;
-          mob.wanderTimer = idleRng(ctx, mob).range(3, 10);
+          mob.wanderTimer = wanderPause(rng ?? idleRng(ctx, mob), mob, 3, 10);
+        };
+        // An authored-immobile mob (moveSpeed 0: the egg/sac puzzle objects, and
+        // the Drakelands clutch parks 75 of them in one zone) can never close the
+        // 2 to 9 yd its pick sits away, so the step below is a guaranteed no-op
+        // that still pays a full moveToward: a slide-fan collider resolve plus
+        // the groundHeight sample that dominates this whole lap. Reproduce the
+        // two outcomes directly instead. Inside the arrival band moveToward
+        // returns true and writes nothing else, so the draw above still fires on
+        // the same tick and the shared rng stream cannot move; outside it, a zero
+        // step puts every fan candidate back on the mob's own position, so the
+        // bearing write (`f` on the wire) is all that survives. The only effect
+        // dropped is the fan's un-wedge nudge, and an immobile mob has nowhere to
+        // be nudged to.
+        if (mob.moveSpeed <= 0) {
+          if (dist2d(mob.pos, mob.wanderTarget) < 0.3) settle();
+          else mob.facing = angleTo(mob.pos, mob.wanderTarget);
+        } else if (ctx.moveToward(mob, mob.wanderTarget, mob.moveSpeed * 0.35)) {
+          settle();
         }
       }
       break;
@@ -1173,6 +1197,24 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.counterStunReadyAt = undefined;
   mob.shoutFired = undefined;
   mob.shoutIntroUntil = undefined;
+  // The whelp pounce state dies with the pull too (the respawnMob twin): the
+  // speed burst ends here, so the authored template speed is restored BEFORE
+  // leapUntil clears (the brood pass's own restore is gated on a LIVE leapUntil,
+  // dragonkin_brood.ts, and could never run again once this clears it), the
+  // re-pounce cooldown lifts so the next pull opens with the jump attack, and
+  // neither the unpaid pounce burn (mob_swing pays it on the first landed swing,
+  // whichever pull that is) nor an unspent one-hit ward carries into it.
+  // The four EGG fields respawnMob also clears deliberately stay out: a mob
+  // reaching here is alive, so broodCracked/broodHatched (corpse state) cannot
+  // be set, broodChainAt is a live clutch ripple no pull reset should cancel,
+  // and broodWardOnHatch is meant to outlive the egg's death.
+  if (mob.leapUntil !== undefined) {
+    mob.moveSpeed = MOBS[mob.templateId]?.moveSpeed ?? mob.moveSpeed;
+  }
+  mob.leapUntil = undefined;
+  mob.leapReadyAt = undefined;
+  mob.leapBurnPending = undefined;
+  mob.wardOneHit = undefined;
   if (
     (bigCastDef && mob.castingAbility === bigCastDef.castId) ||
     (deathZoneCastDef && mob.castingAbility === deathZoneCastDef.castId) ||
@@ -1195,7 +1237,9 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
       }
     }
   }
-  mob.wanderTimer = ctx.rng.range(2, 8);
+  // The reset re-seeds the idle timer, so an off-stream mob rolls it off-stream too
+  // (idleRng's fallback IS ctx.rng, so every other mob's draw is unmoved).
+  mob.wanderTimer = wanderPause(idleRng(ctx, mob), mob, 2, 8);
   if (mob.templateId === NYTHRAXIS_BOSS_ID) ctx.resetNythraxisEncounter(mob);
   if (mob.templateId === SISTER_NHALIA_BOSS_ID) resetDrownedLitanyBossEncounter(ctx, mob);
   // No bossId check needed here: clearDelveRaiseDeadChannel is a no-op for every

@@ -273,6 +273,7 @@ import {
 } from './mob/combat_profile';
 import { updateDragonkinBrood } from './mob/dragonkin_brood';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './mob/healer_channel';
+import { wanderPause } from './mob/idle_rng';
 import * as lifecycle from './mob/lifecycle';
 import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
@@ -2127,12 +2128,13 @@ export class Sim {
         const mob = createMob(this.nextId++, template, level, pos);
         mob.facing = campRng.range(-Math.PI, Math.PI);
         mob.prevFacing = mob.facing;
-        mob.wanderTimer = campRng.range(2, 10);
+        mob.wanderTimer = wanderPause(campRng, mob, 2, 10);
         // Carry the off-stream contract onto the spawn: its passive idle draws
         // must stay private too, or the herd drifts the shared stream anyway
-        // (see Entity.offStreamRng). A template flagged offStreamIdle gets the
-        // same treatment even in a shared-stream camp slot.
-        if (camp.offStream || template.offStreamIdle) mob.offStreamRng = true;
+        // (see Entity.offStreamRng). This is the CAMP arm only; the TEMPLATE arm
+        // (MobTemplate.offStreamIdle, which also covers a shared-stream camp slot)
+        // is stamped for every spawn path in createMob.
+        if (camp.offStream) mob.offStreamRng = true;
         this.addEntity(mob);
       }
     }

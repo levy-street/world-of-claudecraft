@@ -1256,13 +1256,20 @@ export interface MobTemplate {
   // must stay on the shared stream (so the replaced camp's own spawns do not
   // move) but the new mob's idling must not drift it: a swap with a different
   // moveSpeed arrives at its wander targets on a different cadence, which
-  // re-rolls the shared stream for every mob after it.
+  // re-rolls the shared stream for every mob after it. Stamped onto the spawn in
+  // createMob (src/sim/entity.ts), so the contract holds through EVERY spawn path
+  // (the camp loop, a brood egg hatching a whelp, a dev spawn), not just one.
   offStreamIdle?: boolean;
-  // Idle-wander liveliness multiplier (default 1). Divides the wander PAUSE
-  // rolled between hops, so a restless creature (the dragonkin whelp) putters
-  // around its patch instead of standing statuesque. Applied AFTER the shared
-  // rng draw: the draw count, order, and drawn values are identical for every
-  // template, so the parity draw digest never moves.
+  // Idle-wander liveliness multiplier (default 1). Divides the wander PAUSE at
+  // EVERY site that rolls one, so a restless creature (the dragonkin whelp)
+  // putters around its patch instead of standing statuesque: the two in the idle
+  // wander step (arrival and the 30s walk-budget timeout), the camp spawn, the
+  // respawn reset, and the evade-home reset. All five go through the one owner,
+  // wanderPause in mob/idle_rng.ts, because a knob honored at only SOME of them
+  // does nothing measurable: a quick mob only ever reaches arrival, which is how
+  // this shipped dead when only the timeout divided. Applied AFTER the draw: the
+  // draw count, order, and drawn values are identical for every template, so the
+  // parity draw digest never moves.
   wanderHaste?: number;
   // Purely-ambient decoration (the Highwatch stable horses): never hostile,
   // never aggros/fights, un-attackable and un-tameable, but wanders a bounded
@@ -2617,7 +2624,9 @@ export interface CampDef {
   // world seed plus the camp's own authored identity (see campPrivateRng in
   // sim.ts), so its own spawns stay deterministic across all three hosts.
   // Use it for NEW camps added to shipped content; a camp that already shipped
-  // on the shared stream must stay there, or its own spawns move.
+  // on the shared stream must stay there, or its own spawns move. Both halves are
+  // pinned by tests/off_stream_rng.test.ts: zero shared draws at world build, and
+  // spawn stability under camp reordering.
   offStream?: boolean;
 }
 
@@ -3559,6 +3568,12 @@ export interface Entity extends ClientMirroredEntityFields {
   // the shared stream: those only happen because a player engaged, which is a
   // real gameplay event rather than passive world churn. Same principle as the
   // ambient stable horses (mob/ambient.ts), generalized to a fighting mob.
+  // PASSIVE means every draw that re-rolls the idle wander timer: the three in the
+  // idle arm (mob/locomotion.ts), the evade-home reset (resetEvadingMob, same file),
+  // and the respawn reset (mob/lifecycle.ts). All five call sites route through the
+  // one idleRng helper (mob/idle_rng.ts), whose fallback returns ctx.rng ITSELF, so
+  // no shared-stream mob's draw position moves. Pinned by
+  // tests/off_stream_rng.test.ts.
   offStreamRng?: boolean;
   enraged: boolean; // enrage mechanic active
   // Heroic-instance mechanic scaling (instances/difficulty.ts applyDungeonMobTuning).

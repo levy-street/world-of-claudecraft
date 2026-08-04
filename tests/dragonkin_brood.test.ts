@@ -1,17 +1,24 @@
 // The Drakelands dragonkin brood (v0.35 rework): eggs, whelps, and the
 // broodlord kit (src/sim/mob/dragonkin_brood.ts + the arcCleave/breathCone
-// arms). Covers the crack -> hatch path, the chain ripple, the proximity
-// ambush, the pounce (burn + priority targeting + speed burst), the engage
-// shout (root window, egg break radius, the one-hit ward), the counter-stun
-// trade, the every-Nth front-arc cleave, and the fire-breath cone facing.
+// arms). Covers the crack -> hatch path, the broodCracked gate that keeps a
+// FIAT-killed corpse inert (and the shared rng stream still), the chain ripple
+// with its stagger, the proximity ambush, the pounce (burn + priority
+// targeting + speed burst), the engage shout (root window, egg break radius,
+// the one-hit ward, once per pull) plus the broodguard's bellow-only variant,
+// the counter-stun trade, the every-Nth front-arc cleave with the out-of-arc
+// negative case, and the fire-breath cone facing.
 import { describe, expect, it } from 'vitest';
 import { MOBS } from '../src/sim/data';
 import { createMob, recalcPlayerStats } from '../src/sim/entity';
+import { respawnMob } from '../src/sim/mob/lifecycle';
 import { Sim } from '../src/sim/sim';
+import type { SimContext } from '../src/sim/sim_context';
 import { dist2d, type PlayerClass } from '../src/sim/types';
+import { despawnMobs } from './sim_shared';
 
 const SEED = 24601;
 const makeSim = () => new Sim({ seed: SEED, playerClass: 'warrior' });
+const ctxOf = (sim: Sim): SimContext => (sim as unknown as { ctx: SimContext }).ctx;
 
 let nextTestId = 990001;
 function spawn(sim: Sim, templateId: string, x: number, z: number, level = 20) {
@@ -48,18 +55,32 @@ function levelUp(sim: Sim, pid: number, cls: PlayerClass, level = 30) {
 
 describe('dragonkin brood content', () => {
   it('the brood templates carry their mechanic data', () => {
-    expect(MOBS.dragonkin_egg.broodEgg).toBeDefined();
+    // Pinned as LITERALS, because the geometry every behavior test below
+    // stands on is exactly what drifted unnoticed once already: the first
+    // tuning pass moved chainRadius 7 -> 5.5 and proximityRadius 3.5 -> 3 with
+    // nothing red, leaving only the comments wrong.
+    expect(MOBS.dragonkin_egg.broodEgg).toEqual({
+      chainRadius: 5.5,
+      chainDelay: 0.3,
+      proximityRadius: 3,
+      hatchMobId: 'dragonkin_whelp',
+    });
     expect(MOBS.dragonkin_egg.xpMult).toBe(0);
     expect(MOBS.dragonkin_egg.hpBase).toBe(1);
     expect(MOBS.dragonkin_egg.hpPerLevel).toBe(0);
     expect(MOBS.dragonkin_whelp.broodWhelp).toBeDefined();
-    expect(MOBS.dragonkin_broodguard.engageShout).toBeDefined();
+    // The broodguard's shout is a BELLOW and nothing else: a root window, no
+    // break radius. A breakEggsRadius here would crack a clutch on every guard
+    // pull, so the absence is content, not an omission.
+    expect(MOBS.dragonkin_broodguard.engageShout).toEqual({ rootSeconds: 1.3 });
     const lord = MOBS.drakemaw_broodlord;
     expect(lord.engageShout?.breakEggsRadius).toBeGreaterThan(0);
     expect(lord.engageShout?.wardWhelps).toBeDefined();
     expect(lord.arcCleave?.every).toBe(5);
+    expect(lord.arcCleave?.arcDeg).toBe(150);
+    expect(lord.arcCleave?.range).toBe(8);
     expect(lord.breathCone).toBeDefined();
-    expect(lord.counterStun).toBeDefined();
+    expect(lord.counterStun).toEqual({ seconds: 2, cooldown: 25, name: 'Tail Hammer' });
     // the matriarch runs the same kit, scaled
     const maw = MOBS.cindraleth_maw_matriarch;
     expect(maw.engageShout?.breakEggsRadius).toBeGreaterThan(0);
@@ -99,26 +120,128 @@ describe('egg crack, hatch, and ripple', () => {
     expect(sim.entities.get(egg.id)).toBeDefined();
   });
 
-  it('a break ripples to neighboring eggs on the chain stagger', () => {
+  it('an egg FIAT-flagged dead stays inert; only a real death cracks it', () => {
+    const sim = makeSim();
+    const egg = spawn(sim, 'dragonkin_egg', 30, 0);
+    // despawnMobs (tests/sim_shared.ts) is the silencing idiom the gather,
+    // profession, and core sim suites all use: it writes dead/hp 0 straight
+    // onto every mob and never goes near dealDamage, so handleDeath never runs
+    // and broodCracked is never set. That is the whole reason for the gate.
+    despawnMobs(sim);
+    expect(egg.dead).toBe(true);
+    expect(egg.broodCracked).toBeUndefined();
+    tick(sim, 5);
+    // Nothing hatched: not this egg, and not one of the shipped Drakelands
+    // clutches despawnMobs just fiat-killed alongside it.
+    expect(egg.broodHatched).toBeUndefined();
+    expect(whelpsOf(sim).length).toBe(0);
+    // The positive control, in the SAME silenced world: an egg that dies
+    // through the REAL damage path still cracks and hatches, so the gate
+    // discriminates rather than just switching hatching off.
+    const real = spawn(sim, 'dragonkin_egg', 40, 0);
+    (sim as any).dealDamage(null, real, 1, false, 'physical', 'test', 'hit', true);
+    expect(real.broodCracked).toBe(true);
+    tick(sim, 1);
+    expect(whelpsOf(sim).length).toBe(1);
+    // ...and exactly once: broodHatched keeps the corpse from re-hatching.
+    tick(sim, 3);
+    expect(whelpsOf(sim).length).toBe(1);
+  });
+
+  it('a world of fiat-killed eggs costs the shared rng stream nothing', () => {
+    // Why the gate is load-bearing rather than tidy: a hatch draws the whelp's
+    // level band, and the loose whelp then wanders on the shared stream. A
+    // fiat-killed clutch hatching inside an unrelated suite would shift every
+    // seeded roll downstream (the fix in 125a8db9a). Differential rather than
+    // an absolute 0, so ambient world draws cancel instead of flaking.
+    const drawsAfterSilencing = (withExtraEgg: boolean): number => {
+      const sim = makeSim();
+      if (withExtraEgg) spawn(sim, 'dragonkin_egg', 30, 0);
+      despawnMobs(sim);
+      let draws = 0;
+      sim.rng.setObserver(() => draws++);
+      try {
+        tick(sim, 5);
+      } finally {
+        sim.rng.setObserver(null);
+      }
+      return draws;
+    };
+    expect(drawsAfterSilencing(true)).toBe(drawsAfterSilencing(false));
+  });
+
+  it('a break ripples to neighboring eggs on the chain stagger, never instantly', () => {
     const sim = makeSim();
     const a = spawn(sim, 'dragonkin_egg', 30, 0);
-    const b = spawn(sim, 'dragonkin_egg', 35, 0); // 5yd: inside chainRadius 7
+    const b = spawn(sim, 'dragonkin_egg', 35, 0); // 5yd: inside chainRadius 5.5
     const far = spawn(sim, 'dragonkin_egg', 50, 0); // 20yd: out of the chain
     (sim as any).dealDamage(null, a, 1, false, 'physical', 'test', 'hit', true);
-    // chainDelay 0.3s = 6 ticks, plus the hatch/crack pass ticks
-    tick(sim, 12);
+    // Tick 1 hatches `a` and ARMS the ripple at +chainDelay (0.3s, 6 ticks).
+    // 3 ticks in (0.15s) the neighbor must still be whole: this is the arm that
+    // reds if the stagger is dropped and a clutch unzips inside one tick.
+    tick(sim, 3);
+    expect(b.broodChainAt).toBeDefined();
+    expect(b.dead).toBe(false);
+    // 5 more (0.4s total) carries past the stagger: now it cracks and clears.
+    tick(sim, 5);
     expect(b.dead).toBe(true);
+    expect(b.broodChainAt).toBeUndefined();
+    tick(sim, 1); // the pass after the crack hatches its whelp
     expect(far.dead).toBe(false);
     expect(whelpsOf(sim).length).toBe(2);
   });
 
   it('a player walking onto an egg springs it', () => {
     const sim = makeSim();
-    const egg = spawn(sim, 'dragonkin_egg', 2, 0); // inside proximityRadius 3.5
+    const egg = spawn(sim, 'dragonkin_egg', 2, 0); // 2yd: inside proximityRadius 3
     tick(sim, 2);
     expect(egg.dead).toBe(true);
     expect(whelpsOf(sim).length).toBe(1);
   });
+});
+
+describe('whelp pounce state dies with the pull', () => {
+  /** A freshly hatched whelp mid-pounce: speed burst live, burn owed, cooldown
+   *  armed, and warded by the shout that cracked its egg. */
+  function pouncingWhelp() {
+    const sim = makeSim();
+    const egg = spawn(sim, 'dragonkin_egg', 6, 0);
+    egg.broodWardOnHatch = MOBS.drakemaw_broodlord.engageShout!.wardWhelps;
+    (sim as any).dealDamage(null, egg, 1, false, 'physical', 'test', 'hit', true);
+    tick(sim, 1);
+    const [whelp] = whelpsOf(sim);
+    const def = MOBS.dragonkin_whelp;
+    expect(whelp.leapUntil).toBeGreaterThan((sim as any).time);
+    expect(whelp.leapBurnPending).toBe(true);
+    expect(whelp.leapReadyAt).toBeGreaterThan((sim as any).time);
+    expect(whelp.wardOneHit).toBe(true);
+    expect(whelp.moveSpeed).toBeCloseTo(def.moveSpeed * def.broodWhelp!.leapSpeedMult);
+    return { sim, whelp, def };
+  }
+
+  // The two resets are TWINS and drifted apart: resetEvadingMob cleared the five
+  // broodlord fields but none of the four whelp ones, so a whelp that leashed
+  // home kept leapBurnPending and made the NEXT pull's first landed swing pay a
+  // pounce burn no pounce earned, while a stale leapReadyAt held that pull's
+  // opening pounce. Both twins are asserted, so neither can drift again.
+  for (const [label, reset] of [
+    ['resetEvadingMob (leashes home)', (sim: Sim, m: any) => (sim as any).resetEvadingMob(m)],
+    // respawnMob lives behind the SimContext seam, not on Sim (mob/lifecycle.ts).
+    ['respawnMob (a fresh life)', (sim: Sim, m: any) => respawnMob(ctxOf(sim), m)],
+  ] as const) {
+    it(`${label} clears the whole pounce kit and restores the authored speed`, () => {
+      const { sim, whelp, def } = pouncingWhelp();
+      reset(sim, whelp);
+      expect(whelp.leapUntil).toBeUndefined();
+      expect(whelp.leapReadyAt).toBeUndefined();
+      expect(whelp.leapBurnPending).toBeUndefined();
+      expect(whelp.wardOneHit).toBeUndefined();
+      // The ORDER matters, not just the clears: the brood pass only restores the
+      // authored speed while leapUntil is still live, so a reset that cleared it
+      // first would strand the whelp at burst speed for the rest of its life.
+      expect(whelp.moveSpeed).toBeCloseTo(def.moveSpeed);
+    });
+  }
 });
 
 describe('whelp pounce', () => {
@@ -196,6 +319,23 @@ describe('whelp pounce', () => {
     const [whelp] = whelpsOf(sim);
     expect(whelp.aggroTargetId).toBe(healer.id);
   });
+
+  it('with no healer up, the hatch still takes the dps over a CLOSER tank', () => {
+    const sim = makeSim();
+    const tank = sim.entities.get(sim.playerId)!;
+    (sim as any).players.get(sim.playerId).talentMods.role = 'tank';
+    const dpsPid = sim.addPlayer('mage', 'Blast');
+    const dps = sim.entities.get(dpsPid)!;
+    (sim as any).players.get(dpsPid).talentMods.role = 'dps';
+    // dps farther from the egg (8yd) than the tank (6yd), both inside hatch
+    // range: the middle band has to beat distance, or only a lone tank is safe.
+    dps.pos = { x: tank.pos.x + 14, y: tank.pos.y, z: tank.pos.z };
+    const egg = spawn(sim, 'dragonkin_egg', 6, 0);
+    (sim as any).dealDamage(null, egg, 1, false, 'physical', 'test', 'hit', true);
+    tick(sim, 1);
+    const [whelp] = whelpsOf(sim);
+    expect(whelp.aggroTargetId).toBe(dps.id);
+  });
 });
 
 describe('broodlord kit', () => {
@@ -233,6 +373,68 @@ describe('broodlord kit', () => {
     expect(dist2d(lord.pos, posAtShout)).toBeGreaterThan(0.5);
   });
 
+  it('the shout fires once per pull: an egg laid after it sleeps through the fight', () => {
+    const sim = makeSim();
+    // Level-1 tester on purpose: aggro range is level-scaled (a level-30
+    // player shrinks a level-20 lord's 20yd to 5), so levelling here would
+    // mean the lord never pulls at all.
+    const player = sim.entities.get(sim.playerId)!;
+    player.maxHp = 5000;
+    player.hp = 5000;
+    const lord = spawn(sim, 'drakemaw_broodlord', 15, 0);
+    tick(sim, 3); // aggro + the one shout
+    expect(lord.shoutFired).toBe(true);
+    // A whole egg placed INSIDE the break radius AFTER the shout: the shout is
+    // spent for this pull, so the engaged arm must not run it a second time.
+    const late = spawn(sim, 'dragonkin_egg', 15, 6);
+    expect(dist2d(late.pos, lord.pos)).toBeLessThan(
+      MOBS.drakemaw_broodlord.engageShout!.breakEggsRadius!,
+    );
+    let reShouts = 0;
+    for (let i = 0; i < 20; i++) {
+      player.hp = player.maxHp;
+      for (const ev of sim.tick()) {
+        if (ev.type === 'spellfx' && ev.fx === 'shout' && ev.sourceId === lord.id) reShouts++;
+      }
+    }
+    expect(reShouts).toBe(0);
+    expect(late.dead).toBe(false);
+    expect(late.broodWardOnHatch).toBeUndefined();
+    expect(whelpsOf(sim).length).toBe(0);
+  });
+
+  it("the broodguard's shout roots it too, and cracks nothing (no break radius)", () => {
+    const sim = makeSim();
+    const player = sim.entities.get(sim.playerId)!;
+    player.maxHp = 5000;
+    player.hp = 5000;
+    // aggroRadius 14, so a level-1 tester at 12yd pulls it; egg at its feet
+    const guard = spawn(sim, 'dragonkin_broodguard', 12, 0);
+    const egg = spawn(sim, 'dragonkin_egg', 12, 2);
+    for (let i = 0; i < 20 && !guard.shoutFired; i++) tick(sim, 1);
+    expect(guard.shoutFired).toBe(true);
+    const posAtShout = { ...guard.pos };
+    // rooted: 1.0s into the 1.3s window it has not advanced a step
+    for (let i = 0; i < 20; i++) {
+      player.hp = player.maxHp;
+      tick(sim, 1);
+    }
+    expect(dist2d(guard.pos, posAtShout)).toBeLessThan(0.01);
+    // The guard's shout carries NO breakEggsRadius, so the clutch sleeps
+    // through it. Dropping dragonkinEngageShout's `if (!shout.breakEggsRadius)
+    // return` makes the radius test compare against undefined (NaN, never
+    // greater), which would crack every egg alive on any broodguard pull.
+    expect(egg.dead).toBe(false);
+    expect(egg.broodWardOnHatch).toBeUndefined();
+    expect(whelpsOf(sim).length).toBe(0);
+    // past the window it comes on
+    for (let i = 0; i < 20; i++) {
+      player.hp = player.maxHp;
+      tick(sim, 1);
+    }
+    expect(dist2d(guard.pos, posAtShout)).toBeGreaterThan(0.5);
+  });
+
   it('a player stun is answered with the counter-stun, once per cooldown', () => {
     const sim = makeSim();
     const player = sim.entities.get(sim.playerId)!;
@@ -253,7 +455,10 @@ describe('broodlord kit', () => {
     const counter = player.auras.find((a) => a.id === 'brood_counter_stun');
     expect(counter?.kind).toBe('stun');
     expect(counter?.sourceId).toBe(lord.id);
-    expect(counter?.remaining).toBeCloseTo(MOBS.drakemaw_broodlord.counterStun!.seconds, 1);
+    // The LITERAL 2s authored in drakelands.ts, not the template field this
+    // code copies into `remaining`: a self-comparison passes at any duration.
+    expect(counter?.remaining).toBeCloseTo(2, 1);
+    expect(counter?.name).toBe('Tail Hammer');
     // the lord is still stunned itself: the trade landed both ways
     expect(lord.auras.some((a: any) => a.kind === 'stun')).toBe(true);
     // a second stun inside the cooldown is NOT answered again
@@ -281,9 +486,13 @@ describe('broodlord kit', () => {
     const buddy = sim.entities.get(buddyPid)!;
     buddy.maxHp = 50000;
     buddy.hp = 50000;
+    const flankPid = sim.addPlayer('rogue', 'Edge');
+    const flank = sim.entities.get(flankPid)!;
+    flank.maxHp = 50000;
+    flank.hp = 50000;
     const lord = spawn(sim, 'drakemaw_broodlord', 300, 0);
-    // stand both players down the lord's facing: the primary at melee reach,
-    // the buddy just past them, inside arcCleave range 6 and the 150deg arc
+    // stand two players down the lord's facing: the primary at melee reach,
+    // the buddy just past them, inside arcCleave range 8 and the 150deg arc
     lord.facing = 0.7;
     player.pos = {
       x: lord.pos.x + Math.sin(lord.facing) * 3,
@@ -295,6 +504,16 @@ describe('broodlord kit', () => {
       y: lord.pos.y,
       z: lord.pos.z + Math.cos(lord.facing) * 4.5,
     };
+    // ...and the third square on the lord's flank: comfortably INSIDE range 8,
+    // 90deg off the facing, so the 150deg arc (halfArc 75deg) is the only
+    // thing that can spare them. Any widening past 180deg sweeps them in.
+    const flankAngle = lord.facing + Math.PI / 2;
+    flank.pos = {
+      x: lord.pos.x + Math.sin(flankAngle) * 4,
+      y: lord.pos.y,
+      z: lord.pos.z + Math.cos(flankAngle) * 4,
+    };
+    expect(dist2d(flank.pos, lord.pos)).toBeLessThan(8);
     let landed = 0;
     let cleaved = false;
     for (let i = 0; i < 200 && !cleaved; i++) {
@@ -316,6 +535,13 @@ describe('broodlord kit', () => {
     expect(cleaveHit).toBeDefined();
     expect(buddy.auras.some((a) => a.name === 'Seared Scales')).toBe(true);
     expect(player.auras.some((a) => a.name === 'Seared Scales')).toBe(true);
+    // The NEGATIVE arc arm: the flanker stood inside the cleave's range the
+    // whole time and took nothing, so this really is a 150deg front arc and
+    // not a radius. (No tick runs in this test, so sim.events is the full log.)
+    expect(
+      (sim as any).events.some((ev: any) => ev.type === 'damage' && ev.targetId === flank.id),
+    ).toBe(false);
+    expect(flank.auras.some((a) => a.name === 'Seared Scales')).toBe(false);
   });
 
   it('the fire breath lands in the facing cone and spares a player behind the lord', () => {
@@ -337,16 +563,22 @@ describe('broodlord kit', () => {
     // before the 14s cadence, and any aura application recalcs the player
     // (clamping hand-inflated pools back to the real level-1 99), so keep
     // both players alive by topping the REAL pool up every tick instead.
-    let breathLanded = false;
+    //
+    // WHO the breath hit is read off its own ability-tagged damage events, not
+    // off 'Seared Scales': the every-5th front-arc cleave refreshes that same
+    // debuff name (one shared row, by design), and the lord is in melee here,
+    // so the burn alone cannot tell the cone from a cleave.
+    const breathHits: number[] = [];
     for (let i = 0; i < Math.ceil((breath.every + breath.castTime + 6) * 20); i++) {
       player.hp = player.maxHp;
       back.hp = back.maxHp;
-      const evs = sim.tick();
-      if (evs.some((ev) => ev.type === 'log' && ev.text.includes('Fire Breath')))
-        breathLanded = true;
-      if (breathLanded) break;
+      for (const ev of sim.tick()) {
+        if (ev.type === 'damage' && ev.ability === 'Fire Breath') breathHits.push(ev.targetId);
+      }
+      if (breathHits.length > 0) break;
     }
-    expect(breathLanded).toBe(true);
+    // the cone landed on the player in front and on nobody else
+    expect(breathHits).toEqual([player.id]);
     expect(player.auras.some((a) => a.name === 'Seared Scales')).toBe(true);
     expect(back.auras.some((a) => a.name === 'Seared Scales')).toBe(false);
   });
