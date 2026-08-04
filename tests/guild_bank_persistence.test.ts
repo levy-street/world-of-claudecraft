@@ -21,8 +21,23 @@ const dbMock = vi.hoisted(() => ({
   loadGuildBankRows: vi.fn(async (): Promise<unknown[]> => []),
 }));
 
+// DURABLE guild membership, the source the escrow CARRIER is now chosen from
+// (GameServer.guildBankSaveCarrier reads socialDb.guildMembers, not the session
+// stamp, because a refused escrow quarantines and DISCONNECTS the carrier).
+// Keyed by guild id; `stampMember` below seats a row and the matching stamp.
+const dbGuildMembers = new Map<number, { id: number; rank: string }[]>();
+
 vi.mock('../server/db', () => ({
-  pool: { query: vi.fn(async () => ({ rows: [] })) },
+  pool: {
+    query: vi.fn(async (text: string, values?: unknown[]) => {
+      // The one statement these tests answer for real: PgSocialDb.guildMembers.
+      if (text.includes('FROM guild_members gm JOIN characters c')) {
+        const guildId = Number((values ?? [])[0]);
+        return { rows: dbGuildMembers.get(guildId) ?? [] };
+      }
+      return { rows: [] };
+    }),
+  },
   GUILD_BANK_ROW_MAX_BYTES: 262144,
   saveCharacterState: dbMock.saveCharacterState,
   saveCharacterAndGuildBankState: dbMock.saveCharacterAndGuildBankState,
@@ -146,9 +161,25 @@ function moveToBanker(server: GameServer, pid: number): void {
 
 // A fully authorized officer at a banker with a loaded (OPENED: rung 0
 // bought, 24 slots) book and copper.
+/** Seat a character's guild membership on BOTH sides: the session stamp the
+ *  ops gate reads, and the durable row the escrow carrier is chosen from. Pass
+ *  `{ durable: false }` to seat a STALE stamp (a player kicked since login). */
+function stampMember(
+  server: GameServer,
+  session: ClientSession,
+  rank: 'leader' | 'officer' | 'member',
+  opts: { durable?: boolean } = {},
+): void {
+  server.sim.setPlayerGuildMembership(session.pid, { guildId: GUILD_ID, rank });
+  if (opts.durable === false) return;
+  const rows = dbGuildMembers.get(GUILD_ID) ?? [];
+  rows.push({ id: session.characterId, rank });
+  dbGuildMembers.set(GUILD_ID, rows);
+}
+
 function officerSetup(server: GameServer, session: ClientSession, treasury = 100_000): void {
   moveToBanker(server, session.pid);
-  server.sim.setPlayerGuildMembership(session.pid, { guildId: GUILD_ID, rank: 'officer' });
+  stampMember(server, session, 'officer');
   server.sim.loadGuildBank(GUILD_ID, { treasury, inventory: [], purchasedSlots: 24 });
   // Durable truth starts EQUAL to the live book, exactly as the boot load
   // leaves it: the live book is loaded FROM the row.
@@ -170,6 +201,7 @@ beforeEach(() => {
   durableBooks.clear();
   durableChars.clear();
   oversizedGuilds.clear();
+  dbGuildMembers.clear();
   dbMock.saveCharacterState.mockImplementation(
     async (characterId: number, _level: number, state: unknown) => {
       durableChars.set(characterId, JSON.parse(JSON.stringify(state)));
@@ -2123,8 +2155,8 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
     const server = new GameServer();
     const member = joinServer(server, 1, 'Grunt').session;
     const officer = joinServer(server, 2, 'Boss').session;
-    server.sim.setPlayerGuildMembership(member.pid, { guildId: GUILD_ID, rank: 'member' });
-    server.sim.setPlayerGuildMembership(officer.pid, { guildId: GUILD_ID, rank: 'officer' });
+    stampMember(server, member, 'member');
+    stampMember(server, officer, 'officer');
     seatBook(server, { treasury: 0, inventory: [{ ...DORMANT_SLOT }], purchasedSlots: 24 });
     const result = await server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'wolf_fang', OPERATOR);
     expect(result.ok && result.carrierCharacterId).toBe(officer.characterId);
@@ -2136,7 +2168,7 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
   it('a member-only guild still gets a carrier (the fallback)', async () => {
     const server = new GameServer();
     const member = joinServer(server, 1, 'Grunt').session;
-    server.sim.setPlayerGuildMembership(member.pid, { guildId: GUILD_ID, rank: 'member' });
+    stampMember(server, member, 'member');
     seatBook(server, { treasury: 0, inventory: [{ ...DORMANT_SLOT }], purchasedSlots: 24 });
     const result = await server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'wolf_fang', OPERATOR);
     expect(result.ok && result.carrierCharacterId).toBe(member.characterId);
@@ -2172,13 +2204,11 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
     expect(durableBook()).toEqual({ treasury: 100_000, inventory: [], purchasedSlots: 24 });
   });
 
-  it('a STALE membership stamp can still carry, and the carrier is never charged', async () => {
-    // The carrier is chosen off the SESSION stamp, so a player kicked from the
-    // guild since login can still lend their escrow transaction. That is
-    // harmless by design: pin that the carrier's own purse and bags are
-    // untouched and that the row names the operator, not them.
+  it('a carrier is never charged for the purge it carries', async () => {
+    // The carrier only lends its escrow transaction: pin that its own purse and
+    // bags are untouched (the row names the operator, pinned separately).
     const server = new GameServer();
-    const { session } = joinServer(server, 1, 'ExMember');
+    const { session } = joinServer(server, 1, 'Officer');
     officerSetup(server, session);
     seatDormant(server);
     const meta = server.sim.players.get(session.pid);
@@ -2189,6 +2219,55 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
     expect(result.ok).toBe(true);
     expect(meta.copper).toBe(purse);
     expect(JSON.stringify(meta.inventory)).toBe(bags);
+  });
+
+  it('will NOT carry on a stale stamp: an ex-member is not put on the kick path', async () => {
+    // REGRESSION (the review's carrier finding): the carrier used to be chosen
+    // off the SESSION stamp, on the reasoning that a stale one is harmless
+    // because a carrier only lends its transaction. That holds until the arm
+    // that matters: a REFUSED escrow QUARANTINES and DISCONNECTS the carrier,
+    // so a stamp lagging a kick would roll back and kick a player who is no
+    // longer in the guild, for an operator's act. Membership is now a fresh
+    // durable read.
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'ExMember');
+    moveToBanker(server, session.pid);
+    stampMember(server, session, 'officer', { durable: false }); // kicked since login
+    server.sim.loadGuildBank(GUILD_ID, { treasury: 0, inventory: [], purchasedSlots: 24 });
+    durableBooks.set(GUILD_ID, { treasury: 0, inventory: [], purchasedSlots: 24 });
+    seatDormant(server);
+
+    expect(await server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'wolf_fang', OPERATOR)).toEqual({
+      ok: false,
+      reason: 'no_carrier',
+    });
+    // Refused means REFUSED: nothing mutated, nothing marked, nothing logged.
+    expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toHaveLength(1);
+    expect(session.dirtyGuildBanks.size).toBe(0);
+    await bankLedgerIdle();
+    expect(dbMock.insertBankLedgerRow).not.toHaveBeenCalled();
+
+    // Positive control: the SAME session carries once the durable row exists,
+    // so the refusal above is the membership read and not the scaffolding.
+    dbGuildMembers.set(GUILD_ID, [{ id: session.characterId, rank: 'officer' }]);
+    const ok = await server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'wolf_fang', OPERATOR);
+    expect(ok.ok && ok.carrierCharacterId).toBe(session.characterId);
+  });
+
+  it('refuses (never falls back to the stamp) when the membership read fails', async () => {
+    // Fail closed: an unavailable database must not silently reopen the stale
+    // carrier path the fresh read exists to close.
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'Officer');
+    officerSetup(server, session);
+    seatDormant(server);
+    const poolMock = vi.mocked((await import('../server/db')).pool.query);
+    poolMock.mockRejectedValueOnce(new Error('db down'));
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const result = await server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'wolf_fang', OPERATOR);
+    errSpy.mockRestore();
+    expect(result).toEqual({ ok: false, reason: 'no_carrier' });
+    expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toHaveLength(1);
   });
 
   it('reports save_failed (never a bare success) when the escrow save throws', async () => {

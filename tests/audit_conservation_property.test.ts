@@ -175,8 +175,20 @@ const store = vi.hoisted(() => {
   };
 });
 
+// DURABLE guild membership for the escrow-carrier read: the carrier is chosen
+// from socialDb.guildMembers now (a stale session stamp must not put an
+// ex-member on the quarantine-and-kick path), so the harness answers that one
+// statement from the live actor set. Kept in sync by stampAll below.
+const guildMemberRows: { id: number; rank: string }[] = [];
+
 vi.mock('../server/db', () => ({
-  pool: { query: vi.fn(async () => ({ rows: [] })) },
+  pool: {
+    query: vi.fn(async (text: string) =>
+      text.includes('FROM guild_members gm JOIN characters c')
+        ? { rows: guildMemberRows }
+        : { rows: [] },
+    ),
+  },
   GUILD_BANK_ROW_MAX_BYTES: 262144,
   saveCharacterState: store.saveCharacterState,
   saveCharacterAndGuildBankState: store.saveCharacterAndGuildBankState,
@@ -653,6 +665,9 @@ async function makeWorld(): Promise<World> {
  *  left, no carrier, a delete window, a save that did not survive) is a no-op
  *  by design and is tallied so the sweep can report which arms it reached. */
 async function applyPurge(w: World): Promise<void> {
+  // The purge is an injected event, so it does not pass through applyOp's
+  // stamping; refresh both halves of membership here for the same reason.
+  stampAll(w);
   const book = w.server.sim.guildBanks.get(GUILD_ID);
   if (!book) return;
   const index = book.inventory.findIndex(
@@ -718,9 +733,13 @@ function syncRepairState(w: World): void {
  *  await in the harness can clear it; the stamp is host wiring with no
  *  conservation content, so re-applying it before every op is safe. */
 function stampAll(w: World): void {
+  guildMemberRows.length = 0;
   for (const a of w.actors) {
     if (!a.alive) continue;
     w.server.sim.setPlayerGuildMembership(a.pid, { guildId: GUILD_ID, rank: 'officer' });
+    // The DURABLE half of the same fact, which is what the escrow carrier read
+    // consults; a dead actor is left out so a purge cannot pick a gone session.
+    guildMemberRows.push({ id: a.session.characterId, rank: 'officer' });
   }
 }
 

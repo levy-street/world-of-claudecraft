@@ -284,7 +284,7 @@ import {
   StableAuraWireCache,
   StableSelfTimerWireCache,
 } from './snapshot_timer_wire';
-import type { Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
+import type { GuildRank, Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
 import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
 import { reconcileOnLogin as reconcileSteamOnLogin } from './steam/mirror';
@@ -4688,10 +4688,19 @@ export class GameServer {
    *  unrelated player's, so the dirty mark and the fence-out revert stay among
    *  that guild's own sessions. With nobody from the guild online there is no
    *  carrier and the purge is refused rather than mutating a live book it could
-   *  not persist. The membership read is the SESSION STAMP, so a player kicked
-   *  from the guild since login can still be the carrier until their stamp
-   *  refreshes: harmless (the carrier only lends its escrow transaction; it is
-   *  never charged, credited, or named as the actor), and pinned by test.
+   *  not persist. Membership is a FRESH DATABASE READ (see
+   *  guildBankSaveCarrier): it used to be the session stamp, on the reasoning
+   *  that a stale carrier is harmless because it only lends its transaction,
+   *  which is true right up to the arm that matters: a REFUSED escrow
+   *  quarantines and DISCONNECTS the carrier, so a stamp lagging a kick would
+   *  put a player who is no longer in the guild on a rollback-and-kick path for
+   *  an operator's act.
+   *
+   *  OPERATOR-VISIBLE CONSEQUENCE, stated because it is not obvious: a purge
+   *  rides a live guild member's save. In the rare refusal arm that member's
+   *  session is rolled back and disconnected (they reconnect and lose nothing
+   *  durable, but they ARE kicked). The dashboard says so before the operator
+   *  confirms.
    *
    *  DURABILITY IS AWAITED, not optimistic: a fenced-out escrow save REVERTS
    *  the purge (revertOwnGuildBookOps replays the admin_purge delta backward
@@ -4735,7 +4744,7 @@ export class GameServer {
     }
     const before = this.sim.guildBankHoldings(guildId);
     if (before === null) return { ok: false, reason: 'no_book' };
-    const carrier = this.guildBankSaveCarrier(guildId);
+    const carrier = await this.guildBankSaveCarrier(guildId);
     if (!carrier) return { ok: false, reason: 'no_carrier' };
     let purged: { itemId: string; count: number } | null = null;
     this.runGuildBankOp(carrier, { guildId, actorAccountId }, 'admin_purge', () => {
@@ -4779,14 +4788,34 @@ export class GameServer {
   /** A live session that can carry guild `guildId`'s book into a fenced escrow
    *  save: an officer-plus member first (the rank that already moves this book
    *  every day), else any member. Null when nobody from the guild is online.
-   *  Reads the SESSION membership stamp, so it can pick a player whose stamp is
-   *  stale (see adminPurgeGuildBankSlot for why that is harmless). */
-  private guildBankSaveCarrier(guildId: number): ClientSession | null {
+   *
+   *  Membership comes from a FRESH database read, not the session stamp. The
+   *  stamp can lag a kick or a leave, and carrying is NOT a free favour: if the
+   *  escrow save is refused, the carrier's session is QUARANTINED and
+   *  DISCONNECTED (the rollback arm), so a stale stamp would put a player who
+   *  is no longer even a member of the guild on a rollback-and-kick path for an
+   *  operator's act. One indexed read per operator purge is the right price for
+   *  that. A read failure answers null (fail closed: no carrier, no purge)
+   *  rather than falling back to the stamp.
+   *
+   *  Which BOOK gets flushed does not depend on this choice: the flush is
+   *  driven by the session's own `dirtyGuildBanks` mark, which runGuildBankOp
+   *  set for the target guild. The carrier only lends its escrow transaction;
+   *  it is never charged, credited, or named as the actor. */
+  private async guildBankSaveCarrier(guildId: number): Promise<ClientSession | null> {
+    let rankByCharacterId: Map<number, GuildRank>;
+    try {
+      const members = await this.socialDb.guildMembers(guildId);
+      rankByCharacterId = new Map(members.map((m) => [m.id, m.rank]));
+    } catch (err) {
+      console.error(`guild bank carrier lookup failed for guild ${guildId}:`, err);
+      return null;
+    }
     let fallback: ClientSession | null = null;
     for (const session of this.sessionsByCharacterId.values()) {
-      const m = this.sim.meta(session.pid)?.guildMembership;
-      if (!m || m.guildId !== guildId) continue;
-      if (m.rank === 'leader' || m.rank === 'officer') return session;
+      const rank = rankByCharacterId.get(session.characterId);
+      if (rank === undefined) continue;
+      if (rank === 'leader' || rank === 'officer') return session;
       fallback ??= session;
     }
     return fallback;

@@ -546,6 +546,7 @@ export const cs_CZ: AdminTranslations = {
   "guilds.bankPurgeTitle": "Remove a stuck guild bank item",
   "guilds.bankPurgeClose": "Close the remove-item dialog",
   "guilds.bankPurgeWarning": "This destroys the item permanently. There is no in-game undo, and the guild cannot get it back.",
+  "guilds.bankPurgeCarrierWarning": "The change is saved through an online member of this guild. In the rare case that save is refused, that member is disconnected and reconnects with nothing durable lost.",
   "guilds.bankPurgeReasonPlaceholder": "Internal moderation reason",
   "guilds.bankPurgeConfirmation": "I confirm that this item should be destroyed.",
   "guilds.bankPurgeConfirm": "Remove item",

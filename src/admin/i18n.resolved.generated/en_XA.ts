@@ -546,6 +546,7 @@ export const en_XA: AdminTranslations = {
   "guilds.bankPurgeTitle": "[Ŕéɱóʋé á šţúçķ ĝúíļð ƀáñķ íţéɱ]",
   "guilds.bankPurgeClose": "[Çļóšé ţĥé ŕéɱóʋé-íţéɱ ðíáļóĝ]",
   "guilds.bankPurgeWarning": "[Ţĥíš ðéšţŕóýš ţĥé íţéɱ þéŕɱáñéñţļý. Ţĥéŕé íš ñó íñ-ĝáɱé úñðó, áñð ţĥé ĝúíļð çáññóţ ĝéţ íţ ƀáçķ.]",
+  "guilds.bankPurgeCarrierWarning": "[Ţĥé çĥáñĝé íš šáʋéð ţĥŕóúĝĥ áñ óñļíñé ɱéɱƀéŕ óƒ ţĥíš ĝúíļð. Íñ ţĥé ŕáŕé çášé ţĥáţ šáʋé íš ŕéƒúšéð, ţĥáţ ɱéɱƀéŕ íš ðíšçóññéçţéð áñð ŕéçóññéçţš ŵíţĥ ñóţĥíñĝ ðúŕáƀļé ļóšţ.]",
   "guilds.bankPurgeReasonPlaceholder": "[Íñţéŕñáļ ɱóðéŕáţíóñ ŕéášóñ]",
   "guilds.bankPurgeConfirmation": "[Í çóñƒíŕɱ ţĥáţ ţĥíš íţéɱ šĥóúļð ƀé ðéšţŕóýéð.]",
   "guilds.bankPurgeConfirm": "[Ŕéɱóʋé íţéɱ]",

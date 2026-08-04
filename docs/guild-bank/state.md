@@ -894,10 +894,18 @@ What remains accepted:
   the one delta a compaction or a netted rescue silently drops.
   Two accepted limits remain: the purge needs a live session OF THAT GUILD to carry the
   escrow save (books never persist standalone), so it refuses `no_carrier` when nobody from
-  the guild is online (the carrier is chosen off the session membership stamp, so a stale
-  ex-member can still carry: harmless, it only lends its escrow transaction and is never
-  charged, credited, or named as the actor); and it PURGES rather than mailing the copy
-  back (the book keeps no depositor identity, and the mail pipe refuses the same copy).
+  the guild is online; and it PURGES rather than mailing the copy back (the book keeps no
+  depositor identity, and the mail pipe refuses the same copy).
+  THE CARRIER IS CHOSEN FROM A FRESH DURABLE MEMBERSHIP READ (`socialDb.guildMembers`),
+  REVISED 2026-08-03: it used to come off the SESSION membership stamp, on the recorded
+  reasoning that a stale ex-member carrying is "harmless" because it only lends its escrow
+  transaction. That is true of every arm except the one that matters: a REFUSED escrow
+  QUARANTINES AND DISCONNECTS the carrier, so a stamp lagging a kick put a player who is
+  no longer in the guild on a rollback-and-kick path for an operator's act. The read fails
+  CLOSED (a database error answers `no_carrier`, never a fallback to the stamp), and the
+  operator-visible consequence is now stated in the dashboard confirm step before they
+  commit: the save rides an online member, and in the refusal arm that member is
+  disconnected and reconnects with nothing durable lost.
   THE READ + UI DEFERRAL IS CLOSED (2026-08-03), so an operator no longer discovers slot
   indices out of band with SQL on `guild_banks`:
   - `GET /admin/api/guilds/:id/bank` (both dispatch arms over one shared body,

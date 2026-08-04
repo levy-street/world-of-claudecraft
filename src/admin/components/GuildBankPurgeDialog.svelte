@@ -81,6 +81,11 @@
       </dl>
 
       <p class="warning" role="note">{t('guilds.bankPurgeWarning')}</p>
+      <!-- The carrier consequence: a book persists only inside a live member's
+           fenced escrow transaction, and a REFUSED save rolls that session back
+           and disconnects it. Rare, but it is a real effect on a bystander, so
+           the operator is told before they confirm rather than after. -->
+      <p class="carrier-note">{t('guilds.bankPurgeCarrierWarning')}</p>
 
       <label>
         <span>{t('dialog.reason')}</span>
@@ -185,6 +190,12 @@
     border-radius: 4px;
     background: var(--callout-bg);
     color: var(--text-soft);
+  }
+
+  .carrier-note {
+    margin: -8px 0 0;
+    color: var(--text-dim);
+    font-size: 12px;
   }
 
   label:not(.confirm-check) {

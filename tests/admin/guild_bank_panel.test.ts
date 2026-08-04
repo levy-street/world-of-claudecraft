@@ -105,6 +105,9 @@ describe('GuildBankPanel', () => {
     // stale-listing guard and only means something if it came from this read.
     expect(within(dialog).getByText('reins_grag_bear')).toBeInTheDocument();
     expect(within(dialog).getByText(t('guilds.bankPurgeWarning'))).toBeInTheDocument();
+    // The carrier consequence is stated BEFORE confirming: the save rides an
+    // online guild member, and a refused save disconnects them.
+    expect(within(dialog).getByText(t('guilds.bankPurgeCarrierWarning'))).toBeInTheDocument();
     const submit = within(dialog).getByRole('button', { name: t('guilds.bankPurgeConfirm') });
     expect(submit).toBeDisabled();
 
