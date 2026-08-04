@@ -112,7 +112,104 @@ function captureOnce(sim: Sim, match: BgMatch, carrier: number) {
   sim.tick();
 }
 
-describe('Thornhollow Fields: the flag is carried on foot', () => {
+describe('Thornhollow Fields: the whole match is fought on foot', () => {
+  // Ten queued champions, one of them already riding (and mid-summon of a
+  // second mount), NOT yet seated: the tick that follows is the one that seats
+  // the teams, which is the moment under test.
+  function tenQueuedWithRider(): { sim: Sim; pids: number[]; rider: number } {
+    const sim = makeWorld();
+    const pids: number[] = [];
+    const classes = ['warrior', 'mage', 'priest', 'rogue', 'hunter'] as const;
+    for (let i = 0; i < 10; i++) {
+      const pid = sim.addPlayer(classes[i % 5], `P${i}`);
+      tp(sim, pid, (i % 5) * 2 - 4, -40);
+      sim.entities.get(pid)!.level = 20;
+      pids.push(pid);
+    }
+    for (const pid of pids) sim.bgQueueJoin(pid);
+    const rider = pids[0];
+    const e = sim.entities.get(rider)!;
+    e.mountKey = 'valorsteed';
+    e.mountCastRemaining = 1.5;
+    e.mountCastKey = 'valorsteed';
+    return { sim, pids, rider };
+  }
+
+  it('dismounts every fighter the moment the match seats them on the field', () => {
+    const { sim, rider } = tenQueuedWithRider();
+    const e = sim.entities.get(rider)!;
+    expect(e.mountKey, 'the fixture really did put them in the saddle').toBe('valorsteed');
+    sim.tick(); // matchmakeBg seats the two teams (placeInBg)
+    expect(sim.bgMatchFor(rider), 'the seat really happened').not.toBeNull();
+    expect(e.mountKey, 'rode into the battleground').toBe('');
+    expect(e.mountCastRemaining, 'a summon survived the seat').toBe(0);
+    expect(e.mountCastKey).toBe('');
+  });
+
+  it('refuses the reins during form-up AND during the active match', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    expect(match.state, 'the form-up gate is where this starts').toBe('countdown');
+    const pid = match.teams[0][0];
+    const e = sim.entities.get(pid)!;
+    sim.addItem('reins_valorsteed', 1, pid);
+    // Riding is a permanent capability gate and answers first, so train the
+    // rider: what is under test is the battleground rule.
+    sim.players.get(pid)!.ridingTrained = true;
+
+    expect(summonMountItem(sim.ctx, pid, 'valorsteed')).toBe(false);
+    expect(errorTexts(sim.tick())).toContain("You can't ride in a battleground.");
+    expect(e.mountKey).toBe('');
+
+    toActive(sim, match);
+    expect(match.state).toBe('active');
+    expect(summonMountItem(sim.ctx, pid, 'valorsteed')).toBe(false);
+    expect(errorTexts(sim.tick())).toContain("You can't ride in a battleground.");
+    expect(e.mountKey).toBe('');
+    // Not carrying anything: the old rule was about the flag, this one is not.
+    expect(bgCarryingFlag(sim.ctx, pid)).toBe(false);
+  });
+
+  it('refuses the riding-lesson toggle in-match too', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    const e = sim.entities.get(pid)!;
+    // The lesson branch is the one summon path with no reins to click, so it
+    // carries its own copy of every gate.
+    sim.players.get(pid)!.mountTraining = {
+      sessionId: 'mt_test',
+      ownerId: pid,
+      anchor: { x: 0, z: 0 },
+      state: 'IN_PROGRESS',
+      phase: 'ride',
+    };
+    expect(toggleMount(sim.ctx, pid)).toBe(false);
+    expect(errorTexts(sim.tick())).toContain("You can't ride in a battleground.");
+    expect(e.mountKey).toBe('');
+    expect(e.mountCastKey, 'no lesson summon channel started either').toBe('');
+  });
+
+  it('gives riding back once the match is over and the fighters go home', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    sim.addItem('reins_valorsteed', 1, pid);
+    sim.players.get(pid)!.ridingTrained = true;
+    expect(summonMountItem(sim.ctx, pid, 'valorsteed')).toBe(false);
+
+    endBgMatch(sim.ctx, match, 0, 'caps');
+    for (let i = 0; i < 20 * (BG_END_HOLD + 1); i++) sim.tick(); // run out the hold
+    expect(sim.bgMatchFor(pid), 'released home').toBeNull();
+    const e = sim.entities.get(pid)!;
+    e.dead = false;
+    e.ghost = false;
+    e.inCombat = false;
+    expect(summonMountItem(sim.ctx, pid, 'valorsteed')).toBe(true);
+  });
+
   it('throws a mounted runner out of the saddle when they take the flag', () => {
     const { sim, pids } = tenInQueue();
     const match = sim.bgMatchFor(pids[0])!;
@@ -135,7 +232,10 @@ describe('Thornhollow Fields: the flag is carried on foot', () => {
     expect(e.mountCastKey).toBe('');
   });
 
-  it('refuses the saddle while carrying, and gives it back once the flag is gone', () => {
+  // The carrier case is now a SUBSET of the whole-match rule, not a rule of its
+  // own: dropping the flag no longer gives the saddle back, because the match
+  // has not ended. This arm used to assert the narrower message.
+  it('keeps refusing the saddle after the carrier drops the flag: the match is the rule', () => {
     const { sim, pids } = tenInQueue();
     const match = sim.bgMatchFor(pids[0])!;
     toActive(sim, match);
@@ -143,7 +243,7 @@ describe('Thornhollow Fields: the flag is carried on foot', () => {
     const e = sim.entities.get(crimson)!;
     sim.addItem('reins_valorsteed', 1, crimson);
     // Riding is a permanent capability gate and answers before this one, so
-    // train the rider: what is under test is the transient flag rule.
+    // train the rider: what is under test is the battleground rule.
     sim.players.get(crimson)!.ridingTrained = true;
     const azure = match.flags[1];
     tp(sim, crimson, azure.pos.x, azure.pos.z);
@@ -152,13 +252,12 @@ describe('Thornhollow Fields: the flag is carried on foot', () => {
     expect(azure.carrier).toBe(crimson);
     // Both mount entry points refuse: the item summon and the Mount toggle.
     expect(summonMountItem(sim.ctx, crimson, 'valorsteed')).toBe(false);
-    expect(errorTexts(sim.tick())).toContain("You can't ride while carrying the flag.");
+    expect(errorTexts(sim.tick())).toContain("You can't ride in a battleground.");
     expect(e.mountKey).toBe('');
     expect(toggleMount(sim.ctx, crimson)).toBe(false);
     expect(e.mountKey).toBe('');
-    // Drop it, and riding is allowed again: the rule is about the flag, not
-    // about being in a battleground. (Killing the carrier is how a flag comes
-    // loose; revive the body so the dead/ghost refusal is not what answers.)
+    // Drop it (killing the carrier is how a flag comes loose) and revive the
+    // body so the dead/ghost refusal is not what answers: still no saddle.
     kill(sim, crimson);
     sim.tick();
     expect(azure.carrier).toBeNull();
@@ -167,7 +266,8 @@ describe('Thornhollow Fields: the flag is carried on foot', () => {
     revived.dead = false;
     revived.ghost = false;
     revived.inCombat = false;
-    expect(summonMountItem(sim.ctx, crimson, 'valorsteed')).toBe(true);
+    expect(summonMountItem(sim.ctx, crimson, 'valorsteed')).toBe(false);
+    expect(errorTexts(sim.tick())).toContain("You can't ride in a battleground.");
   });
 });
 

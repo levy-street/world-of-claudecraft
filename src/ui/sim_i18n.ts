@@ -95,10 +95,9 @@ const baseEnTable = {
   // mount or select a mount without having purchased the riding skill from Marla.
   // Placeholder-free, so it registers in the EXACT matcher automatically.
   'error.ridingUntrained': 'You must learn to ride first. Find a riding trainer.',
-  // The battleground flag is carried on foot (src/sim/mounts.ts refuses the
-  // saddle; the grab itself dismounts). Placeholder-free, so it registers in
-  // the EXACT matcher automatically.
-  'error.mountCarryingFlag': "You can't ride while carrying the flag.",
+  // (The narrower "You can't ride while carrying the flag." row lived here
+  // until the mount ban widened to the whole battleground; its replacement is
+  // the BG_EXTRA errMountInBg RULE below, beside the mode's other refusals.)
   // Riding skill purchase (learnRiding in src/sim/mounts_training.ts).
   'error.ridingAlreadyLearned': 'You have already learned Riding.',
   'error.ridingTrainLevel': 'You must be level 20 to learn Riding.',
@@ -8536,7 +8535,11 @@ type BgExtraKey =
   | 'errTalentsDuringBg'
   | 'errLevelTooLow'
   | 'errMemberLevelTooLow'
-  | 'heldAtGate';
+  | 'heldAtGate'
+  // The whole-match mount ban (src/sim/mounts.ts). It lives in THIS table, not
+  // the mount rows in baseEnTable, because the rule and its wording belong to
+  // the battleground: every locale reuses the mode's own glossary for it.
+  | 'errMountInBg';
 
 const BG_EXTRA_EN: Record<BgExtraKey, string> = {
   joinQueue: 'You join the Thornhollow Fields queue. Need {count} champions to start a match.',
@@ -8561,6 +8564,7 @@ const BG_EXTRA_EN: Record<BgExtraKey, string> = {
   errLevelTooLow: 'Thornhollow Fields requires level {level}.',
   errMemberLevelTooLow: 'Every party member must be level {level} to queue for Thornhollow Fields.',
   heldAtGate: 'The gates open when the battle begins.',
+  errMountInBg: "You can't ride in a battleground.",
 };
 
 export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
@@ -8588,6 +8592,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeBattleRune: '你夺得了战斗符文!',
     seizeWardRune: '你夺得了守护符文!',
     heldAtGate: '战斗开始时城门才会打开。',
+    errMountInBg: '战场中无法骑乘坐骑。',
   },
   zh_TW: {
     joinQueue: '你加入了荊谷原野佇列。需要{count}名勇士才能開始比賽。',
@@ -8612,6 +8617,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeBattleRune: '你奪得了戰鬥符文!',
     seizeWardRune: '你奪得了守護符文!',
     heldAtGate: '戰鬥開始時城門才會打開。',
+    errMountInBg: '戰場中無法騎乘坐騎。',
   },
   ja_JP: {
     joinQueue: 'ソーンホロウ平原のキューに参加しました。試合開始には{count}人の勇者が必要です。',
@@ -8638,6 +8644,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMemberLevelTooLow:
       'ソーンホロウ平原のキューに参加するには、パーティ全員がレベル{level}である必要があります。',
     heldAtGate: '門は戦闘開始とともに開かれます。',
+    errMountInBg: '戦場では騎乗できません。',
     seizeBattleRune: 'バトルルーンを手に入れた!',
     seizeWardRune: 'ウォードルーンを手に入れた!',
   },
@@ -8666,6 +8673,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMemberLevelTooLow:
       '쏜할로우 평원 대기열에 참가하려면 모든 파티원이 레벨 {level} 이상이어야 합니다.',
     heldAtGate: '전투가 시작되면 성문이 열립니다.',
+    errMountInBg: '전장에서는 탈것을 탈 수 없습니다.',
     seizeBattleRune: '전투 룬을 차지했습니다!',
     seizeWardRune: '수호 룬을 차지했습니다!',
   },
@@ -8693,6 +8701,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMemberLevelTooLow:
       'Чтобы встать в очередь Терновой Лощины, каждый в группе должен иметь уровень {level}.',
     heldAtGate: 'Ворота откроются с началом битвы.',
+    errMountInBg: 'На поле боя нельзя ездить верхом.',
     seizeBattleRune: 'Вы подобрали руну битвы!',
     seizeWardRune: 'Вы подобрали руну защиты!',
   },
@@ -8721,6 +8730,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMemberLevelTooLow:
       'Every party member must be level {level} to queue for Thornhollow Fields.',
     heldAtGate: 'The gates open when the battle begins.',
+    errMountInBg: "You can't ride in a battleground.",
   },
   es: {
     joinQueue:
@@ -8751,6 +8761,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMemberLevelTooLow:
       'Todos los miembros del grupo deben ser de nivel {level} para entrar en la cola de los Campos de Thornhollow.',
     heldAtGate: 'Las puertas se abren cuando comienza la batalla.',
+    errMountInBg: 'No puedes montar en un campo de batalla.',
   },
   es_ES: {
     joinQueue:
@@ -8781,6 +8792,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMemberLevelTooLow:
       'Todos los miembros del grupo deben ser de nivel {level} para entrar en la cola de los Campos de Thornhollow.',
     heldAtGate: 'Las puertas se abren cuando comienza la batalla.',
+    errMountInBg: 'No puedes montar en un campo de batalla.',
   },
   fr_FR: {
     joinQueue:
@@ -8811,6 +8823,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMemberLevelTooLow:
       'Chaque membre du groupe doit être de niveau {level} pour rejoindre la file des Champs de Thornhollow.',
     heldAtGate: 'Les portes s’ouvrent au début de la bataille.',
+    errMountInBg: 'Vous ne pouvez pas monter en selle sur un champ de bataille.',
   },
   fr_CA: {
     joinQueue:
@@ -8841,6 +8854,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMemberLevelTooLow:
       'Chaque membre du groupe doit être de niveau {level} pour rejoindre la file des Champs de Thornhollow.',
     heldAtGate: 'Les portes s’ouvrent au début de la bataille.',
+    errMountInBg: 'Vous ne pouvez pas monter en selle sur un champ de bataille.',
   },
   it_IT: {
     joinQueue:
@@ -8871,6 +8885,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMemberLevelTooLow:
       'Ogni membro del gruppo deve essere di livello {level} per entrare in coda per i Campi di Thornhollow.',
     heldAtGate: 'I cancelli si aprono quando inizia la battaglia.',
+    errMountInBg: 'Non puoi cavalcare in un campo di battaglia.',
   },
   de_DE: {
     joinQueue:
@@ -8902,6 +8917,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMemberLevelTooLow:
       'Jedes Gruppenmitglied muss Stufe {level} sein, um sich für die Thornhollow-Felder anzumelden.',
     heldAtGate: 'Die Tore öffnen sich, wenn die Schlacht beginnt.',
+    errMountInBg: 'Auf einem Schlachtfeld kannst du nicht reiten.',
   },
   pt_BR: {
     joinQueue:
@@ -8932,6 +8948,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMemberLevelTooLow:
       'Todos os membros do grupo precisam ser nível {level} para entrar na fila dos Campos de Thornhollow.',
     heldAtGate: 'Os portões se abrem quando a batalha começa.',
+    errMountInBg: 'Você não pode montar em um campo de batalha.',
   },
   cs_CZ: {
     joinQueue:
@@ -8960,6 +8977,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMemberLevelTooLow:
       'Každý ve skupině musí mít úroveň {level}, aby se mohl zařadit do fronty na Thornhollowská pole.',
     heldAtGate: 'Brány se otevřou, až začne bitva.',
+    errMountInBg: 'Na bojišti nemůžeš používat jezdecké zvíře.',
   },
   nl_NL: {
     joinQueue:
@@ -8990,6 +9008,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMemberLevelTooLow:
       'Elk groepslid moet niveau {level} zijn om zich aan te melden voor de Doornholte-Velden.',
     heldAtGate: 'De poorten gaan open zodra de slag begint.',
+    errMountInBg: 'Je kunt niet rijden op een slagveld.',
   },
   pl_PL: {
     joinQueue:
@@ -9019,6 +9038,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMemberLevelTooLow:
       'Każdy członek drużyny musi mieć poziom {level}, aby dołączyć do kolejki na Pola Ciernistej Kotliny.',
     heldAtGate: 'Bramy otwierają się wraz z początkiem bitwy.',
+    errMountInBg: 'Na polu bitwy nie możesz dosiadać wierzchowca.',
   },
   id_ID: {
     joinQueue:
@@ -9049,6 +9069,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMemberLevelTooLow:
       'Setiap anggota kelompok harus level {level} untuk mengantre Padang Thornhollow.',
     heldAtGate: 'Gerbang terbuka saat pertempuran dimulai.',
+    errMountInBg: 'Kamu tidak bisa menunggang tunggangan di medan perang.',
   },
   tr_TR: {
     joinQueue:
@@ -9076,6 +9097,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMemberLevelTooLow:
       'Dikenvadi Ovaları sırasına girmek için grubun her üyesi {level}. seviye olmalı.',
     heldAtGate: 'Savaş başlayınca kapılar açılır.',
+    errMountInBg: 'Savaş alanında binek kullanamazsın.',
   },
   sv_SE: {
     joinQueue:
@@ -9102,6 +9124,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMemberLevelTooLow:
       'Varje gruppmedlem måste vara nivå {level} för att köa till Törnhålefälten.',
     heldAtGate: 'Portarna öppnas när slaget börjar.',
+    errMountInBg: 'Du kan inte rida på ett slagfält.',
   },
   vi_VN: {
     joinQueue: 'Bạn vào hàng chờ Cánh Đồng Thung Gai. Cần {count} nhà vô địch để bắt đầu trận đấu.',
@@ -9129,6 +9152,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMemberLevelTooLow:
       'Mọi thành viên tổ đội phải đạt cấp {level} để vào hàng chờ Cánh Đồng Thung Gai.',
     heldAtGate: 'Cổng sẽ mở khi trận chiến bắt đầu.',
+    errMountInBg: 'Bạn không thể cưỡi thú cưỡi ở chiến trường.',
   },
   da_DK: {
     joinQueue:
@@ -9157,6 +9181,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errMemberLevelTooLow:
       'Hvert gruppemedlem skal være niveau {level} for at stille sig i kø til Tornehule Sletter.',
     heldAtGate: 'Portene åbner, når slaget begynder.',
+    errMountInBg: 'Du kan ikke ride på en slagmark.',
   },
 };
 
@@ -10429,6 +10454,13 @@ const RULES: Rule[] = [
   {
     re: /^The gates open when the battle begins\.$/,
     build: () => tBg('heldAtGate'),
+  },
+  // The whole-match mount ban (src/sim/mounts.ts summonMountItem + the
+  // toggleMount lesson branch). It replaced the narrower carrying-the-flag
+  // refusal, whose baseEnTable row went in the same change.
+  {
+    re: /^You can't ride in a battleground\.$/,
+    build: () => tBg('errMountInBg'),
   },
   // Delve / lockpicking sim text. Re-localized through t() against the sim.delve.* /
   // sim.lockpick.* keys (src/ui/i18n.catalog/index.ts). The module-enter banner is two

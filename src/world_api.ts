@@ -149,6 +149,7 @@ export type { BankBonusSource, BankInfo } from './world_api/bank';
 export type {
   BgFlagInfo,
   BgInfo,
+  BgLadderEntry,
   BgMatchInfo,
   BgPlayerInfo,
 } from './world_api/battleground';
