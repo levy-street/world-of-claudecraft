@@ -6,7 +6,7 @@ import {
   bankerChestPreloadInternalsForTest,
   isBankerNpcForRender,
 } from '../src/render/banker_chest';
-import { GFX } from '../src/render/gfx';
+import { GFX, gfxInternalsForTest } from '../src/render/gfx';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import type { NpcDef } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
@@ -140,9 +140,7 @@ describe('banker chest model and placement', () => {
   });
 
   it('keeps vertex colors when the low tier converts the source to Lambert', () => {
-    const mutableGfx = GFX as unknown as { standardMaterials: boolean };
-    const previousStandardMaterials = mutableGfx.standardMaterials;
-    mutableGfx.standardMaterials = false;
+    const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: false });
     try {
       const sourceMaterial = new THREE.MeshStandardMaterial({
         color: 0xffffff,
@@ -164,7 +162,7 @@ describe('banker chest model and placement', () => {
       expect(converted.emissiveIntensity).toBe(0.4);
       expect(converted.side).toBe(THREE.BackSide);
     } finally {
-      mutableGfx.standardMaterials = previousStandardMaterials;
+      restoreGfx();
     }
   });
 
@@ -182,9 +180,10 @@ describe('banker chest model and placement', () => {
     const expectedOffsets: Record<string, readonly [number, number]> = {
       // The bank facade stands directly behind Fernando, so his behind-side
       // candidates sample blocked and the chest takes the pushed-out front
-      // corner; the other two towns keep the behind-and-beside spot.
+      // corner. Petra's rebuilt exterior teller likewise keeps the bank facade
+      // directly behind her, so its first fully clear spot is also in front.
       bursar_fernando: [2.0, 0.9],
-      bursar_petra_vell: [-1.15, -1.6],
+      bursar_petra_vell: [2.0, 0.9],
       bursar_aldous_crane: [2.0, 0.9],
     };
     for (const [templateId, expected] of Object.entries(expectedOffsets)) {

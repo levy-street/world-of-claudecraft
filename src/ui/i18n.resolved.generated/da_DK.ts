@@ -998,6 +998,7 @@ export const da_DK: EnTranslations = {
       "name_stormfeather_griffin": "Himmelrækkende Stormfjer",
       "name_thunderstrut_gobbler": "Tordenspanker den Store Kalkun",
       "name_terrorspark_groundshaker": "Skrækgnist, jordrysteren",
+      "name_drakemaw_raptor": "Dragegabets Raptor",
       "desc_valorsteed": "En hårdfør, sikker ganger, der giver øget rejsehastighed.",
       "desc_grag_bear": "En hårdfør, sikker bjørn, der giver øget rejsehastighed.",
       "desc_stalkglider_snail": "En robust, langsomt forbrændende snegl, der giver øget rejsehastighed.",
@@ -1005,7 +1006,8 @@ export const da_DK: EnTranslations = {
       "desc_shadowjump_toad": "En enorm, sikker kæmpetudse, trænet i lynhurtige skyggehop, der dækker ethvert terræn.",
       "desc_stormfeather_griffin": "En kongelig stormgrif, der bevæger sig hen over jorden på runebeslåede kløer, med sammenfoldede vinger.",
       "desc_thunderstrut_gobbler": "En kolossal, stormudklækket kalkun, der spankulerer ned fra Den Opvågnende Tinde, med halen udfoldet som en tordensky.",
-      "desc_terrorspark_groundshaker": "En kompakt panseret maskine med tunge larvebånd, en grovkalibret kanon og en saddel bygget til frygtløse førere."
+      "desc_terrorspark_groundshaker": "En kompakt panseret maskine med tunge larvebånd, en grovkalibret kanon og en saddel bygget til frygtløse førere.",
+      "desc_drakemaw_raptor": "En saddelvant yngelraptor fra Dragegabets Caldera, kun sener og spurt, som stadig lugter svagt af aske."
     },
     "mountTraining": {
       "mountPrompt": "Tryk på {key} for at stige op på trænings-Modgangeren.",
@@ -1246,6 +1248,15 @@ export const da_DK: EnTranslations = {
       "browserEffectsReduced": "Reduceret",
       "browserEffectsMinimal": "Minimal",
       "browserEffectsNote": "Auto dæmper tunge CSS-effekter (slør, glød, baggrundsbevægelse) baseret på din browser og enhed. Sænk den manuelt, hvis grænsefladen føles træg.",
+      "graphicsApply": "Anvend grafik",
+      "graphicsApplying": "Anvender grafikindstillinger...",
+      "graphicsApplied": "Grafikindstillinger anvendt.",
+      "graphicsSaved": "Grafikindstillinger gemt. Den aktive grafikmotor matcher dem allerede.",
+      "graphicsFailed": "Grafikken kunne ikke anvendes. Dine tidligere indstillinger er stadig aktive.",
+      "graphicsRetry": "Prøv grafik igen",
+      "graphicsFatal": "Gendannelse af grafik mislykkedes. Genindlæs spillet for at fortsætte.",
+      "graphicsReload": "Genindlæs spillet",
+      "graphicsDraftChanged": "Grafikændringer er klar til at blive anvendt.",
       "interfaceMode": "Grænsefladetilstand",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Skrivebord",
@@ -1276,6 +1287,7 @@ export const da_DK: EnTranslations = {
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Vis sekundær handlingslinje",
       "showThirdActionBar": "Vis tredje handlingslinje",
+      "lockActionBars": "Lås handlingsbjælker",
       "showTargetOfTarget": "Vis målets mål",
       "showAttackButton": "Vis angrebsknap",
       "showDailyRewardsChest": "Vis kisten med daglige belønninger",
@@ -1437,7 +1449,14 @@ export const da_DK: EnTranslations = {
     },
     "landing": {
       "highContrast": "Høj kontrast",
-      "highContrastAria": "Slå baggrund med høj kontrast til/fra: deaktiverer den bevægende trailer, så teksten på startskærmen forbliver læselig"
+      "highContrastAria": "Slå baggrund med høj kontrast til/fra: deaktiverer den bevægende trailer, så teksten på startskærmen forbliver læselig",
+      "browserSupport": {
+        "title": "Bemærk: ikke-understøttet browser",
+        "body": "Du kan opleve reduceret ydeevne i denne browser. For den bedste oplevelse kan du hente skrivebordsappen til Windows, macOS eller Linux. Foretrækker du at spille i en browser? Chrome fungerer bedst, og Firefox og Safari understøttes også.",
+        "getDesktopApp": "Hent skrivebordsappen",
+        "continueInBrowser": "Fortsæt i browseren",
+        "dismissAria": "Afvis meddelelsen om ikke-understøttet browser"
+      }
     },
     "warfare": {
       "honorAmount": "{amount} Ære",
@@ -1810,6 +1829,7 @@ export const da_DK: EnTranslations = {
       "itemAriaEnchanted": "{item}, antal {count}, fortryllet kopi",
       "itemAriaBound": "{item}, antal {count}, bundet kopi",
       "itemAriaMasterwork": "{item}, antal {count}, mesterværk",
+      "itemAriaQuest": "{item}, antal {count}, opgavegenstand",
       "filterGroupAria": "Filtrér tasker efter kategori",
       "filterAll": "Alle",
       "filterWeapon": "Våben",
@@ -1818,6 +1838,7 @@ export const da_DK: EnTranslations = {
       "filterMaterial": "Materialer",
       "filterTool": "Værktøjer",
       "filterQuest": "Quest",
+      "filterQuestCountAria": "Quest, {count} genstande",
       "filterMount": "Ridedyr",
       "sortAria": "Sortér taskegenstande",
       "sortRecent": "Nyeste",
@@ -1826,6 +1847,7 @@ export const da_DK: EnTranslations = {
       "searchPlaceholder": "Søg genstande",
       "searchAria": "Søg i taskegenstande efter navn",
       "noMatch": "Ingen genstande matcher dine filtre.",
+      "noQuestItems": "Ingen opgavegenstande i dine tasker.",
       "capacity": "{used}/{total}",
       "capacityAria": "Taskepladser brugt: {used} af {total}",
       "backpack": "Rygsæk",
@@ -2044,6 +2066,7 @@ export const da_DK: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Fin kvalitet. Indsamlet fra en åre på fuldt niveau med et værktøj, der rangerer over materialet, og tæller som den ordinære version, hvor end en sådan kræves.",
+      "cookingCatch": "Madlavningsingrediens. Skal tilberedes, før den kan spises.",
       "arcaneDust": "Fortryllelsesreagens. Fås ved affortryllelse af almindeligt og ualmindeligt udstyr.",
       "arcaneEssence": "Fortryllelsesreagens. Fås ved affortryllelse af sjældent udstyr.",
       "arcaneShard": "Fortryllelsesreagens. Fås ved affortryllelse af episk og legendarisk udstyr.",
@@ -2325,7 +2348,7 @@ export const da_DK: EnTranslations = {
       "depositHint": "Klik for at indsætte",
       "depositPartialHint": "Shift-klik for at indsætte et mindre antal",
       "cannotDeposit": "Kan ikke lægges i banken",
-      "cannotDepositNow": "Cannot be deposited right now",
+      "cannotDepositNow": "Kan ikke indsættes lige nu",
       "depositQuantityTitle": "Indsæt {item}",
       "depositQuantityInput": "Antal at indsætte",
       "depositQuantityConfirm": "Indsæt",
@@ -2336,6 +2359,7 @@ export const da_DK: EnTranslations = {
       "sortAria": "Sortér bankens genstande",
       "searchAria": "Søg i bankens genstande efter navn",
       "depositAll": "Indsæt alle materialer",
+      "depositAllTooltip": "Sender alle håndværksmaterialer og skrammelgenstande fra dine tasker til banken på én gang. Indsamlingsværktøjer, udrustet udstyr, opgavegenstande og forbrugsvarer røres aldrig.",
       "depositAllDone": "Materialer indsat: {count}.",
       "depositAllFull": "Materialer indsat: {count}. Banken er nu fuld.",
       "depositAllNone": "Banken er fuld: intet indsat.",
@@ -2352,49 +2376,49 @@ export const da_DK: EnTranslations = {
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "Invitér en ven: når din ven når niveau 10, optjener I hver især 2 pladser, op til 5 venner.",
       "bonusSectionAria": "Bonuspladser i banken, og hvordan du optjener flere",
-      "tabsAria": "Bank tabs",
-      "personalTab": "Personal",
-      "guildTab": "Guild",
-      "guildCapacityAria": "Guild bank slots used: {used} of {total}",
-      "guildEmpty": "The guild bank is empty.",
-      "guildTreasury": "Guild treasury",
-      "guildDepositGold": "Deposit money",
-      "guildWithdrawGold": "Withdraw money",
-      "guildDepositGoldTitle": "Deposit money into the guild treasury",
-      "guildWithdrawGoldTitle": "Withdraw money from the guild treasury",
-      "guildGoldAvailable": "Available: {amount}",
-      "guildBuyConfirm": "Purchase {count} additional guild bank slots for {price} from the guild treasury?",
-      "guildBuyNote": "Paid from the guild treasury",
-      "guildTreasuryShort": "Treasury short",
-      "guildOpenBank": "Open the guild bank",
-      "guildOpenConfirm": "Open the guild bank for {price}? This is paid from your own money.",
-      "guildOpenAccept": "Open",
-      "guildOpenNote": "Paid from your own money, not the guild treasury",
-      "guildPurseShort": "Not enough money",
-      "guildDormantNote": "Locked items cannot be withdrawn and prevent disbanding the guild.",
-      "guildDormantHint": "This item is locked in the guild bank and cannot be withdrawn.",
-      "guildDormantAria": "{item}, quantity {count}, cannot be withdrawn",
-      "guildUnknownItem": "Unknown item",
-      "guildDepositHint": "Click to deposit into the guild bank",
-      "guildCannotDeposit": "Cannot go in the guild bank",
-      "guildGoldCannotMove": "That amount cannot be moved right now.",
-      "guildViewsAria": "Guild bank views",
-      "guildContentsTab": "Contents",
+      "tabsAria": "Bankfaneblade",
+      "personalTab": "Personlig",
+      "guildTab": "Laug",
+      "guildCapacityAria": "Brugte laugsbankpladser: {used} af {total}",
+      "guildEmpty": "Laugsbanken er tom.",
+      "guildTreasury": "Laugets skatkammer",
+      "guildDepositGold": "Indsæt penge",
+      "guildWithdrawGold": "Tag penge ud",
+      "guildDepositGoldTitle": "Indsæt penge i laugets skatkammer",
+      "guildWithdrawGoldTitle": "Tag penge ud af laugets skatkammer",
+      "guildGoldAvailable": "Tilgængeligt: {amount}",
+      "guildBuyConfirm": "Køb {count} ekstra laugsbankpladser for {price} fra laugets skatkammer?",
+      "guildBuyNote": "Betalt fra laugets skatkammer",
+      "guildTreasuryShort": "Ikke nok i skatkammeret",
+      "guildOpenBank": "Åbn laugsbanken",
+      "guildOpenConfirm": "Åbn laugsbanken for {price}? Dette betales af dine egne penge.",
+      "guildOpenAccept": "Åbn",
+      "guildOpenNote": "Betalt af dine egne penge, ikke laugets skatkammer",
+      "guildPurseShort": "Ikke nok penge",
+      "guildDormantNote": "Låste genstande kan ikke tages ud og forhindrer, at lauget kan opløses.",
+      "guildDormantHint": "Denne genstand er låst i laugsbanken og kan ikke tages ud.",
+      "guildDormantAria": "{item}, antal {count}, kan ikke tages ud",
+      "guildUnknownItem": "Ukendt genstand",
+      "guildDepositHint": "Klik for at indsætte i laugsbanken",
+      "guildCannotDeposit": "Kan ikke lægges i laugsbanken",
+      "guildGoldCannotMove": "Det beløb kan ikke flyttes lige nu.",
+      "guildViewsAria": "Laugsbankens visninger",
+      "guildContentsTab": "Indhold",
       "guildLogTab": "Log",
-      "logAria": "Guild bank activity log",
-      "logNote": "The {count} most recent guild bank actions.",
-      "logLoading": "Loading the guild bank log...",
-      "logEmpty": "Nothing has been moved in or out of the guild bank yet.",
-      "logRefused": "Only guild officers can read the guild bank log.",
-      "logFormerMember": "A former guild member",
-      "logDepositItem": "{actor} deposited {count} {item}",
-      "logWithdrawItem": "{actor} withdrew {count} {item}",
-      "logDepositMoney": "{actor} deposited {amount}",
-      "logWithdrawMoney": "{actor} withdrew {amount}",
-      "logBuySlots": "{actor} bought a bank expansion for {amount}",
-      "logOpenBank": "{actor} opened the guild bank for {amount}",
-      "logCharterFee": "{actor} paid the guild charter fee of {amount}",
-      "logAdminPurge": "An administrator removed {count} {item}"
+      "logAria": "Laugsbankens aktivitetslog",
+      "logNote": "De {count} seneste handlinger i laugsbanken.",
+      "logLoading": "Indlæser laugsbankens log...",
+      "logEmpty": "Der er endnu ikke flyttet noget ind i eller ud af laugsbanken.",
+      "logRefused": "Kun laugsofficerer kan læse laugsbankens log.",
+      "logFormerMember": "Et tidligere laugsmedlem",
+      "logDepositItem": "{actor} indsatte {count} {item}",
+      "logWithdrawItem": "{actor} tog {count} {item} ud",
+      "logDepositMoney": "{actor} indsatte {amount}",
+      "logWithdrawMoney": "{actor} tog {amount} ud",
+      "logBuySlots": "{actor} købte en bankudvidelse for {amount}",
+      "logOpenBank": "{actor} åbnede laugsbanken for {amount}",
+      "logCharterFee": "{actor} betalte laugets stiftelsesgebyr på {amount}",
+      "logAdminPurge": "En administrator fjernede {count} {item}"
     },
     "calendar": {
       "title": "Begivenhedskalender",
@@ -2705,8 +2729,8 @@ export const da_DK: EnTranslations = {
     "crafting": {
       "title": "Håndværk",
       "close": "Tæt håndværk",
-      "dialogOption": "Crafting",
-      "dialogOptionAria": "Open the crafting window for {craft}",
+      "dialogOption": "Håndværk",
+      "dialogOptionAria": "Åbn håndværksvinduet for {craft}",
       "craft": "Håndværk",
       "reagentsNeeded": "Kræver:",
       "reagentLine": "{name}: {have}/{required}",
@@ -3016,7 +3040,7 @@ export const da_DK: EnTranslations = {
       "countLabel": "{earned}/{total} bedrifter",
       "completionAria": "Bedrifter opnået: {earned} af {total}",
       "recentLabel": "Seneste:",
-      "recentJumpAria": "Jump to {name}",
+      "recentJumpAria": "Hop til {name}",
       "nearestLabel": "Næsten i mål:",
       "filterGroupAria": "Filtrer bedrifter",
       "filterAll": "Alle",
@@ -6212,16 +6236,16 @@ export const da_DK: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "checkingTitle": "Checking for updates...",
-      "checkingBody": "New versions download while you play.",
-      "uptodateTitle": "You're up to date",
+      "checkingTitle": "Tjekker for opdateringer...",
+      "checkingBody": "Nye versioner downloades, mens du spiller.",
+      "uptodateTitle": "Du er opdateret",
       "downloadingTitle": "Downloader opdatering {version}...",
-      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "downloadingBody": "Du kan blive ved med at spille. Den installeres, når du lukker spillet.",
       "readyTitle": "Opdatering {version} er klar",
       "readyBody": "Den installeres, når du afslutter, eller genstart nu.",
       "restart": "Genstart nu",
       "later": "Senere",
-      "dismiss": "Dismiss"
+      "dismiss": "Afvis"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -6687,6 +6711,11 @@ export const da_DK: EnTranslations = {
     },
     "system": {
       "playerDeath": "Du er død.",
+      "deathRecapKillerAbility": "Du er død. Dræbt af {killer}s {ability}.",
+      "deathRecapKiller": "Du er død. Dræbt af {killer}.",
+      "deathRecapAbility": "Du er død. Dræbt af {ability}.",
+      "deathRecapFalling": "Du er død. Du faldt i døden.",
+      "deathRecapDrowned": "Du er død. Du druknede.",
       "respawn": "Du føler dig udhvilet og hel igen.",
       "ignoringChat": "Ignorerer chat fra {name}.",
       "noLongerIgnoring": "Ignorerer ikke længere {name}.",
@@ -7177,6 +7206,7 @@ export const da_DK: EnTranslations = {
       "quest": "Opgavegenstand",
       "junk": "Skrammel",
       "fineMaterial": "Fint materiale",
+      "material": "Materiale",
       "food": "Mad",
       "drink": "Drikke",
       "tool": "Værktøj",
@@ -7209,6 +7239,9 @@ export const da_DK: EnTranslations = {
       "useFood": "Brug: Genopretter {amount} helbred over {seconds} sek. Skal forblive siddende mens du spiser.",
       "useDrink": "Brug: Genopretter {amount} mana over {seconds} sek. Skal forblive siddende mens du drikker.",
       "questItem": "Questgenstand",
+      "questRelated": "Opgave: {quest}",
+      "questRules": "Kan ikke sælges, lægges i banken eller byttes.",
+      "questOrphaned": "Ikke nødvendig for nogen aktiv quest.",
       "classes": "Klasser: {classes}",
       "sellPrice": "Salgspris: {money}",
       "clickBuy": "Klik for at købe",
@@ -7344,12 +7377,12 @@ export const da_DK: EnTranslations = {
       "reclaim": "Tag tilbage",
       "buyAria": "Køb {item} for {price}",
       "reclaimAria": "Tag {item} tilbage",
-      "buyConfirmTitle": "Confirm Purchase",
-      "buyConfirmBody": "Buy {item} for {price}?",
-      "buyConfirmBodyStack": "Buy {item} x{count} for {price} ({each} each)?",
-      "buyConfirmAccept": "Buy",
-      "buyConfirmCancel": "Cancel",
-      "buyChanged": "That listing changed before you confirmed. Check the price and try again.",
+      "buyConfirmTitle": "Bekræft køb",
+      "buyConfirmBody": "Køb {item} for {price}?",
+      "buyConfirmBodyStack": "Køb {item} x{count} for {price} ({each} stykket)?",
+      "buyConfirmAccept": "Køb",
+      "buyConfirmCancel": "Annullér",
+      "buyChanged": "Den vare ændrede sig, før du bekræftede. Tjek prisen, og prøv igen.",
       "sellNote": "Sæt varer fra dine tasker til salg. Købmanden tager {cut}% i afgift, når en genstand sælges. Du bruger {used}/{max} salgspladser.",
       "sellPickEmpty": "Klik på en genstand i dine tasker for at vælge, hvad du vil sælge.",
       "quantity": "Antal",
@@ -8837,6 +8870,18 @@ export const da_DK: EnTranslations = {
       "fen_muster_order": {
         "name": "Kærbro Mønstringsordre"
       },
+      "firebottle": {
+        "name": "Ildflaske"
+      },
+      "murloc_hut": {
+        "name": "Mudfin-hytte"
+      },
+      "restless_skull": {
+        "name": "Rastløst Kranie"
+      },
+      "vanguard_bone": {
+        "name": "Fortrops Ben"
+      },
       "mire_prowler_pelt": {
         "name": "Sumplusker-Pels"
       },
@@ -10112,6 +10157,9 @@ export const da_DK: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Tændingsnøgle: Skrækgnist, jordrysteren"
       },
+      "reins_drakemaw_raptor": {
+        "name": "Tøjler til Dragegabets Raptor"
+      },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
       },
@@ -11107,6 +11155,21 @@ export const da_DK: EnTranslations = {
       "spider_egg_sac": {
         "name": "Edderkoppe-Ægsæk"
       },
+      "spider_egg": {
+        "name": "Yngelmoder-Æg"
+      },
+      "widow_hatchling": {
+        "name": "Enkeyngel"
+      },
+      "drowned_warlord": {
+        "name": "Den Druknede Krigsherre"
+      },
+      "brakka_wallbreaker": {
+        "name": "Brakka Murbryderen"
+      },
+      "threnos_first_voice": {
+        "name": "Threnos Førstestemmen"
+      },
       "grave_silt_bulwark": {
         "name": "Gravdynd-Bolværk"
       },
@@ -11286,6 +11349,18 @@ export const da_DK: EnTranslations = {
       },
       "cindraleth_maw_matriarch": {
         "name": "Cindraleth Gabmatriarken"
+      },
+      "dragonkin_egg": {
+        "name": "Drageæts Æg"
+      },
+      "dragonkin_whelp": {
+        "name": "Drageæts Unge"
+      },
+      "dragonkin_broodguard": {
+        "name": "Drageæts Yngelvagt"
+      },
+      "drakemaw_broodlord": {
+        "name": "Dragegabets Yngelherre"
       },
       "gilded_stag": {
         "name": "Forgyldt Hjort"
@@ -12319,7 +12394,7 @@ export const da_DK: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Ingen Hvile i Sivene",
-        "text": "Riten på de røgelseskar binder de druknede til at rejse sig, hvor end sumpen rører dem - og sumpen rører alt. Der bliver ingen hvile i disse siv, før de døde er flere end de levende. Vi kan ikke ophæve riten endnu, men vi kan tømme den for soldater. Sted 14 flere af de Druknede Døde til hvile.",
+        "text": "Riten på de røgelseskar binder de druknede til at rejse sig, og nu har den oprejst én, der er stærk nok til at lede dem. Vogterne kalder ham Den Druknede Krigsherre, og mens han holder Det Druknede Kapel, holder de døde deres rækker. Knæk ham, {playerName}, og resten vil spredes tilbage i mosen.",
         "completion": "Du giver de døde mere nåde, end deres mestre nogensinde gjorde. Tag dette - du har mere end fortjent det.",
         "objectives": {
           "0": {
@@ -12597,9 +12672,6 @@ export const da_DK: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Ormekult-Zelot dræbt"
-          },
-          "1": {
-            "label": "Ormekult-Ordrer"
           }
         }
       },
@@ -12610,9 +12682,6 @@ export const da_DK: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Ormekult-Nekromantiker dræbt"
-          },
-          "1": {
-            "label": "Rituelt Fylakterie"
           }
         }
       },

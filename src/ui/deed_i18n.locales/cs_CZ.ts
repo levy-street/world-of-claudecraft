@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: 'Lamač líhně',
+    desc: 'Zab Pána líhně Dračí tlamy uprostřed jeho vajec, skrz řev, sek i oheň.',
+  },
+  chr_maw_matriarch: {
+    name: 'Obloha zmlkla',
+    desc: 'Zab Cindraleth, matriarchu Tlamy, v jejím kráterovém hnízdišti nad Dračí tlamou.',
+  },
   pvp_card_duel_first_win: {
     name: 'Vlastní pravidla',
     desc: 'Vyhraj Karetní souboj u Karetního mistra.',

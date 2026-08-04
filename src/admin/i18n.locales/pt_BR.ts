@@ -7,6 +7,54 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const pt_BR: Record<string, string> = {
+  'error.guildBankDeleting':
+    'Esta guilda está sendo excluída, então seu banco está fechado. Nada foi alterado.',
+  'error.guildBankItemRequired': 'Informe o id do item que você espera encontrar nesse espaço.',
+  'error.guildBankNoCarrier':
+    'Um membro desta guilda precisa estar online para que a alteração possa ser salva.',
+  'error.guildBankNotLoaded': 'O banco desta guilda não está carregado neste realm no momento.',
+  'error.guildBankPurgeRefused': 'A alteração no banco da guilda foi recusada.',
+  'error.guildBankSaveFailed':
+    'A alteração não pôde ser salva e foi revertida. Tente novamente em instantes.',
+  'error.guildBankSlotNotStuck':
+    'Esse espaço contém um item comum que a própria guilda pode retirar, então ele não pode ser removido por aqui.',
+  'error.guildBankSlotRequired': 'Informe o número do espaço do banco da guilda a remover.',
+  'guilds.bankColCount': 'Quantidade',
+  'guilds.bankColItem': 'Objeto',
+  'guilds.bankColSlot': 'Espaço',
+  'guilds.bankColStatus': 'Situação',
+  'guilds.bankDormantCount': 'Itens travados',
+  'guilds.bankEmpty': 'Este banco da guilda não contém itens.',
+  'guilds.bankLoadFailed': 'Falha ao carregar este banco da guilda.',
+  'guilds.bankPurgeAction': 'Remover item',
+  'guilds.bankPurgeCarrierWarning':
+    'A alteração é salva através de um membro online desta guilda. No raro caso de a gravação ser recusada, esse membro é desconectado e reconecta sem perda permanente de dados.',
+  'guilds.bankPurgeClose': 'Fechar a caixa de diálogo de remoção de item',
+  'guilds.bankPurgeConfirm': 'Remover item',
+  'guilds.bankPurgeConfirmation': 'Confirmo que este item deve ser destruído.',
+  'guilds.bankPurgeFailed': 'Falha ao remover o item.',
+  'guilds.bankPurgeItemRequired': 'Este espaço não tem um id de item para confirmar.',
+  'guilds.bankPurgeReasonPlaceholder': 'Motivo interno de moderação',
+  'guilds.bankPurgeReasonRequired': 'Informe um motivo de moderação.',
+  'guilds.bankPurgeReasonTooLong': 'Reduza o motivo de moderação para 500 caracteres ou menos.',
+  'guilds.bankPurgeSlotRequired': 'Escolha um espaço do banco da guilda para remover.',
+  'guilds.bankPurgeTitle': 'Remover um item travado do banco da guilda',
+  'guilds.bankPurgeUnaudited':
+    'O item foi removido, mas o registro de moderação não pôde ser gravado. Reporte isso.',
+  'guilds.bankPurgeWarning':
+    'Isso destrói o item permanentemente. Não há como desfazer isso dentro do jogo, e a guilda não poderá recuperá-lo.',
+  'guilds.bankPurging': 'Removendo...',
+  'guilds.bankRefresh': 'Atualizar banco',
+  'guilds.bankSlotsUsed': 'Espaços usados',
+  'guilds.bankSlotsUsedValue': '{used} de {capacity}',
+  'guilds.bankStatusNormal': 'Pode ser retirado',
+  'guilds.bankStatusStuck': 'Travado',
+  'guilds.bankStuckExplainer':
+    'Um item travado não pode ser movido em nenhuma direção, então a guilda nunca conseguirá esvaziar o banco ou se dissolver enquanto ele estiver lá. Removê-lo destrói o item permanentemente.',
+  'guilds.bankTitle': 'Banco da guilda',
+  'guilds.bankTreasury': 'Tesouraria',
+  'guilds.bankUnopened': 'Esta guilda ainda não abriu seu banco.',
+  'moderationHistory.actionGuildBankPurge': 'Remoção do banco da guilda',
   'onlinePlayers.autoRefresh': 'Atualização automática ({minutes} min)',
   'onlinePlayers.count': '{count} on-line',
   'onlinePlayers.countFiltered': '{shown} de {total} on-line',

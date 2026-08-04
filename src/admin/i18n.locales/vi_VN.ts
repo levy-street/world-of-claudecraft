@@ -7,6 +7,54 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const vi_VN: Record<string, string> = {
+  'error.guildBankDeleting':
+    'Bang hội này đang bị xóa, nên ngân hàng của nó đã bị đóng. Không có gì được thay đổi.',
+  'error.guildBankItemRequired': 'Nhập mã vật phẩm mà bạn cho rằng ô đó đang chứa.',
+  'error.guildBankNoCarrier':
+    'Phải có một thành viên của bang hội này đang trực tuyến thì thay đổi mới có thể được lưu.',
+  'error.guildBankNotLoaded': 'Ngân hàng của bang hội này hiện chưa được tải trên realm này.',
+  'error.guildBankPurgeRefused': 'Thay đổi ngân hàng bang hội đã bị từ chối.',
+  'error.guildBankSaveFailed':
+    'Không thể lưu thay đổi và đã được khôi phục lại. Hãy thử lại sau giây lát.',
+  'error.guildBankSlotNotStuck':
+    'Ô đó đang chứa một vật phẩm thông thường mà bang hội có thể tự rút ra, nên không thể xóa tại đây.',
+  'error.guildBankSlotRequired': 'Nhập số ô ngân hàng bang hội cần xóa.',
+  'guilds.bankColCount': 'Số Lượng',
+  'guilds.bankColItem': 'Vật Phẩm',
+  'guilds.bankColSlot': 'Ô',
+  'guilds.bankColStatus': 'Trạng Thái',
+  'guilds.bankDormantCount': 'Vật phẩm bị kẹt',
+  'guilds.bankEmpty': 'Ngân hàng bang hội này không chứa vật phẩm nào.',
+  'guilds.bankLoadFailed': 'Không thể tải ngân hàng bang hội này.',
+  'guilds.bankPurgeAction': 'Xóa vật phẩm',
+  'guilds.bankPurgeCarrierWarning':
+    'Thay đổi được lưu thông qua một thành viên đang trực tuyến của bang hội này. Trong trường hợp hiếm gặp việc lưu bị từ chối, thành viên đó sẽ bị ngắt kết nối và kết nối lại mà không mất bất kỳ dữ liệu lâu dài nào.',
+  'guilds.bankPurgeClose': 'Đóng hộp thoại xóa vật phẩm',
+  'guilds.bankPurgeConfirm': 'Xóa vật phẩm',
+  'guilds.bankPurgeConfirmation': 'Tôi xác nhận vật phẩm này nên bị phá hủy.',
+  'guilds.bankPurgeFailed': 'Không thể xóa vật phẩm.',
+  'guilds.bankPurgeItemRequired': 'Ô này không có mã vật phẩm nào để xác nhận.',
+  'guilds.bankPurgeReasonPlaceholder': 'Lý do kiểm duyệt nội bộ',
+  'guilds.bankPurgeReasonRequired': 'Nhập lý do kiểm duyệt.',
+  'guilds.bankPurgeReasonTooLong': 'Rút ngắn lý do kiểm duyệt xuống còn 500 ký tự trở xuống.',
+  'guilds.bankPurgeSlotRequired': 'Chọn một ô ngân hàng bang hội để xóa.',
+  'guilds.bankPurgeTitle': 'Xóa một vật phẩm bị kẹt trong ngân hàng bang hội',
+  'guilds.bankPurgeUnaudited':
+    'Vật phẩm đã được xóa, nhưng không thể ghi lại mục nhật ký kiểm duyệt. Hãy báo cáo việc này.',
+  'guilds.bankPurgeWarning':
+    'Thao tác này sẽ phá hủy vật phẩm vĩnh viễn. Không có cách hoàn tác trong trò chơi, và bang hội sẽ không thể lấy lại được.',
+  'guilds.bankPurging': 'Đang xóa...',
+  'guilds.bankRefresh': 'Làm mới ngân hàng',
+  'guilds.bankSlotsUsed': 'Ô đã dùng',
+  'guilds.bankSlotsUsedValue': '{used} trên {capacity}',
+  'guilds.bankStatusNormal': 'Có thể rút',
+  'guilds.bankStatusStuck': 'Bị kẹt',
+  'guilds.bankStuckExplainer':
+    'Một vật phẩm bị kẹt không thể rút ra theo bất kỳ hướng nào, vì vậy bang hội sẽ không bao giờ có thể làm trống ngân hàng hoặc giải tán khi vật phẩm đó còn ở đó. Xóa nó sẽ phá hủy vật phẩm vĩnh viễn.',
+  'guilds.bankTitle': 'Ngân hàng bang hội',
+  'guilds.bankTreasury': 'Ngân Khố',
+  'guilds.bankUnopened': 'Bang hội này chưa mở ngân hàng của mình.',
+  'moderationHistory.actionGuildBankPurge': 'Xóa ngân hàng bang hội',
   'onlinePlayers.autoRefresh': 'Tự động làm mới ({minutes} phút)',
   'onlinePlayers.count': '{count} đang trực tuyến',
   'onlinePlayers.countFiltered': '{shown} trên {total} đang trực tuyến',

@@ -7,6 +7,54 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const da_DK: Record<string, string> = {
+  'error.guildBankDeleting':
+    'Dette laug er ved at blive slettet, så dets bank er lukket. Intet blev ændret.',
+  'error.guildBankItemRequired':
+    'Indtast det genstands-id, du forventer, at pladsen skal indeholde.',
+  'error.guildBankNoCarrier': 'Et medlem af dette laug skal være online, før ændringen kan gemmes.',
+  'error.guildBankNotLoaded': 'Dette laugs bank er ikke indlæst i denne verden lige nu.',
+  'error.guildBankPurgeRefused': 'Ændringen af laugsbanken blev afvist.',
+  'error.guildBankSaveFailed':
+    'Ændringen kunne ikke gemmes og blev rullet tilbage. Prøv igen om et øjeblik.',
+  'error.guildBankSlotNotStuck':
+    'Den plads indeholder en almindelig genstand, som lauget selv kan tage ud, så den kan ikke fjernes her.',
+  'error.guildBankSlotRequired': 'Indtast nummeret på den laugsbankplads, der skal fjernes.',
+  'guilds.bankColCount': 'Antal',
+  'guilds.bankColItem': 'Genstand',
+  'guilds.bankColSlot': 'Plads',
+  'guilds.bankColStatus': 'Status',
+  'guilds.bankDormantCount': 'Fastlåste genstande',
+  'guilds.bankEmpty': 'Denne laugsbank indeholder ingen genstande.',
+  'guilds.bankLoadFailed': 'Kunne ikke indlæse denne laugsbank.',
+  'guilds.bankPurgeAction': 'Fjern genstand',
+  'guilds.bankPurgeCarrierWarning':
+    'Ændringen gemmes via et online medlem af dette laug. I det sjældne tilfælde, hvor gemningen afvises, bliver det medlem afbrudt og genopretter forbindelsen uden at miste noget varigt.',
+  'guilds.bankPurgeClose': 'Luk dialogen for fjernelse af genstand',
+  'guilds.bankPurgeConfirm': 'Fjern genstand',
+  'guilds.bankPurgeConfirmation': 'Jeg bekræfter, at denne genstand skal destrueres.',
+  'guilds.bankPurgeFailed': 'Kunne ikke fjerne genstanden.',
+  'guilds.bankPurgeItemRequired': 'Denne plads har intet genstands-id at bekræfte imod.',
+  'guilds.bankPurgeReasonPlaceholder': 'Intern moderationsårsag',
+  'guilds.bankPurgeReasonRequired': 'Indtast en moderationsårsag.',
+  'guilds.bankPurgeReasonTooLong': 'Afkort moderationsårsagen til højst 500 tegn.',
+  'guilds.bankPurgeSlotRequired': 'Vælg en laugsbankplads, der skal fjernes.',
+  'guilds.bankPurgeTitle': 'Fjern en fastlåst genstand fra laugsbanken',
+  'guilds.bankPurgeUnaudited':
+    'Genstanden blev fjernet, men moderationslog-posten kunne ikke skrives. Rapportér dette.',
+  'guilds.bankPurgeWarning':
+    'Dette destruerer genstanden permanent. Der er ingen fortryd-funktion i spillet, og lauget kan ikke få den tilbage.',
+  'guilds.bankPurging': 'Fjerner...',
+  'guilds.bankRefresh': 'Opdater bank',
+  'guilds.bankSlotsUsed': 'Pladser brugt',
+  'guilds.bankSlotsUsedValue': '{used} af {capacity}',
+  'guilds.bankStatusNormal': 'Kan tages ud',
+  'guilds.bankStatusStuck': 'Fastlåst',
+  'guilds.bankStuckExplainer':
+    'En fastlåst genstand kan ikke tages ud i nogen af retningerne, så lauget kan aldrig tømme sin bank eller opløses, så længe den er der. Fjernelse af den destruerer genstanden permanent.',
+  'guilds.bankTitle': 'Laugsbank',
+  'guilds.bankTreasury': 'Skatkammer',
+  'guilds.bankUnopened': 'Dette laug har endnu ikke åbnet sin bank.',
+  'moderationHistory.actionGuildBankPurge': 'Fjernelse fra laugsbank',
   'onlinePlayers.autoRefresh': 'Automatisk opdatering ({minutes} min.)',
   'onlinePlayers.count': '{count} spillere online',
   'onlinePlayers.countFiltered': '{shown} af {total} online',

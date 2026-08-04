@@ -6085,6 +6085,31 @@
     border: 0;
     border-radius: 4px;
   }
+  /* A firebottle mid-throw-cooldown (q_deepfen_purge) drains this dark curtain from
+     its seeded height to empty over the remaining seconds. bags_window seeds
+     --cd-start / --cd-dur from world.player.firebottleCdRemaining, and the sweep is a
+     self-contained CSS animation: the bags window is a cold window with no per-frame
+     driver, so it runs without JS. Same bottom-up curtain language as the action
+     bar recharge veil. */
+  .bag-item .bag-cd-curtain {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--cd-start, 0%);
+    background: #000c;
+    border-radius: 0 0 4px 4px;
+    pointer-events: none;
+    animation: bag-cd-drain var(--cd-dur, 0s) linear forwards;
+  }
+  @keyframes bag-cd-drain {
+    from {
+      height: var(--cd-start, 0%);
+    }
+    to {
+      height: 0%;
+    }
+  }
   /* the cell owns the quality border; a soft outer glow from the same quality
      color (set by the painter from the shared QUALITY_COLOR map) lifts rare+ */
   .bag-item[class*=" q-"] {
@@ -6098,6 +6123,20 @@
   .bag-item.q-common {
     border-color: #4a3d26 !important;
     box-shadow: inset 0 1px 4px #000c;
+  }
+  /* Quest-purpose cells (kind === quest): thin quest-gold rim, soft inner
+     wash, optional outer glow. Purpose class, not a quality tier: never
+     reuses green/blue/purple rarity borders. Placed after the common/poor
+     neutral reset so the quest rim wins at equal specificity. Always-on on
+     every graphics preset (no --fx-* gate, fairness). Reduced motion must
+     not drop the rim or seal (only optional future pulse may yield). */
+  .bag-item.bag-quest {
+    border-color: var(--color-bag-quest-rim) !important;
+    box-shadow:
+      inset 0 0 10px var(--color-bag-quest-wash),
+      inset 0 0 0 1px color-mix(in srgb, var(--color-bag-quest-rim) 45%, transparent),
+      inset 0 1px 4px #000c,
+      0 0 5px color-mix(in srgb, var(--color-bag-quest-rim) 28%, transparent);
   }
   .bag-item .bi-count {
     position: absolute;
@@ -6166,6 +6205,57 @@
     object-fit: contain;
     pointer-events: none;
     filter: drop-shadow(var(--art-shadow-sm));
+  }
+  /* Quest-purpose corner seal: small questlog glyph in quest gold, top-left.
+     Same always-on, preset-independent contract as .bi-glyph / .bi-instance
+     (no --fx-* gate, no hover reveal). Aria-hidden; the cell accessible name
+     carries the quest fact. Glyph priority: masterwork seal outranks this;
+     this outranks enchanted / signed / bound / generic instance marks. */
+  .bag-item .bi-quest-seal {
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: 12px;
+    height: 12px;
+    display: block;
+    color: var(--color-bag-quest-seal);
+    pointer-events: none;
+    filter: drop-shadow(0 1px 1px #000);
+  }
+  .bag-item .bi-quest-seal .ui-icon {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  /* Ready-to-turn-in: brighter static seal (shape stays primary). Optional
+     soft pulse is decorative only and yields under prefers-reduced-motion;
+     the brighter seal and rim/wash never hide (fairness). */
+  .bag-item.bag-quest-ready .bi-quest-seal,
+  .bag-item .bi-quest-seal-ready {
+    color: var(--color-bag-quest-seal-ready);
+    filter: drop-shadow(0 1px 1px #000)
+      drop-shadow(0 0 3px color-mix(in srgb, var(--color-bag-quest-seal-ready) 70%, transparent));
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .bag-item.bag-quest-ready .bi-quest-seal-ready {
+      animation: bag-quest-ready-pulse 1.8s ease-in-out infinite;
+    }
+  }
+  @keyframes bag-quest-ready-pulse {
+    0%,
+    100% {
+      filter: drop-shadow(0 1px 1px #000)
+        drop-shadow(0 0 2px color-mix(in srgb, var(--color-bag-quest-seal-ready) 55%, transparent));
+    }
+    50% {
+      filter: drop-shadow(0 1px 1px #000)
+        drop-shadow(0 0 5px color-mix(in srgb, var(--color-bag-quest-seal-ready) 85%, transparent));
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bag-item.bag-quest-ready .bi-quest-seal-ready {
+      animation: none;
+    }
   }
   .bag-item.empty {
     cursor: default;
@@ -6271,6 +6361,42 @@
   .bag-chip:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 1px;
+  }
+  /* Quest filter chip stack-count badge (bagQuestItemCount). Quest gold so
+     the purpose class is glanceable on the chip row; aria-hidden (the chip
+     aria-label carries the count). Always-on, no --fx gate. */
+  .bag-chip .bag-chip-count {
+    display: inline-block;
+    margin-left: 5px;
+    min-width: 1.1em;
+    padding: 1px 5px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #15110a;
+    background: var(--color-quest);
+  }
+  .bag-chip.active .bag-chip-count {
+    background: color-mix(in srgb, var(--color-quest) 85%, #15110a);
+    color: #15110a;
+  }
+  /* Soft Quest section header in a derived bag list only (not All+recent
+     manual cells). Thin parchment caption using quest gold; not a drop
+     target. Spans the full grid row via grid-column. */
+  .bag-grid .bag-section-header {
+    grid-column: 1 / -1;
+    margin: 4px 0 2px;
+    padding: 2px 4px 1px;
+    font-family: var(--ui-font);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-quest);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-quest) 35%, transparent);
+    pointer-events: none;
+    user-select: none;
   }
   body.mobile-touch .bag-chip {
     min-height: 40px;
@@ -11481,6 +11607,36 @@
     color: #b9ac82;
     margin: 6px 0 2px;
     line-height: 1.4;
+  }
+  .graphics-controls-disabled {
+    opacity: 0.55;
+  }
+  .graphics-apply {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    min-height: 40px;
+    margin: 8px 0;
+    padding: 8px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 5px;
+    background: var(--color-bg-input);
+  }
+  .graphics-apply-status {
+    min-width: 0;
+    min-height: 1.4em;
+    color: var(--color-text-muted);
+    font-size: 11.5px;
+    line-height: 1.4;
+  }
+  .graphics-apply-status[role="alert"] {
+    color: var(--color-text-error);
+    font-weight: 700;
+  }
+  .graphics-apply-btn {
+    min-width: 132px;
+    margin: 0;
   }
   .set-seg {
     display: flex;

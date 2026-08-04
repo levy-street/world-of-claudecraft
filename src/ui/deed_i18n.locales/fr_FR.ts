@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: 'Brise-Couvée',
+    desc: 'Terrassez un Seigneur de couvée du Drakemaw au milieu de ses œufs, à travers le cri, le fauchage et le feu.',
+  },
+  chr_maw_matriarch: {
+    name: 'Le ciel se tait',
+    desc: 'Terrassez Cindraleth, Matriarche de la Gueule, dans son perchoir de cratère au-dessus du Drakemaw.',
+  },
   pvp_card_duel_first_win: {
     name: 'Faire la loi',
     desc: 'Remportez un Duel de cartes auprès du Maître des cartes.',

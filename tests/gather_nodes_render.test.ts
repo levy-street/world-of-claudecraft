@@ -25,8 +25,8 @@ describe('gather node rendering', () => {
     // batches (11 new zone:type:band combos across willowfen, galecrest,
     // and farshore_isle).
     expect(GATHER_NODES).toHaveLength(156);
-    expect(expectedBatches.size).toBe(68);
-    expect(meshes).toHaveLength(68);
+    expect(expectedBatches.size).toBe(69);
+    expect(meshes).toHaveLength(69);
     expect(meshes.reduce((sum, mesh) => sum + mesh.count, 0)).toBe(GATHER_NODES.length);
     expect(new Set(meshes.map((mesh) => mesh.geometry)).size).toBe(3);
     expect(new Set(meshes.map((mesh) => mesh.material)).size).toBe(3);

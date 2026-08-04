@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: 'Kẻ Phá Vỡ Ổ Trứng',
+    desc: 'Hạ gục một Lãnh Chúa Bầy Drakemaw giữa bầy trứng của nó, vượt qua tiếng gầm, đòn chém bổ, và ngọn lửa.',
+  },
+  chr_maw_matriarch: {
+    name: 'Bầu Trời Lặng Yên',
+    desc: 'Hạ gục Cindraleth Mẫu Chúa Hàm trong tổ miệng núi lửa của nó, phía trên Drakemaw.',
+  },
   pvp_card_duel_first_win: {
     name: 'Luật Của Ta',
     desc: 'Thắng một ván Đấu Bài tại Bậc Thầy Bài.',

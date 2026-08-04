@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: '碎巢者',
+    desc: '在龍喉巢主的卵群之間將牠擊殺，撐過牠的怒吼、順劈斬與烈焰。',
+  },
+  chr_maw_matriarch: {
+    name: '長空歸寂',
+    desc: '在龍喉上方的火山口棲地中，擊殺辛卓蕾絲，龍喉之母。',
+  },
   pvp_card_duel_first_win: {
     name: '我的地盤我的規矩',
     desc: '在牌局大師處贏得一場紙牌對決。',

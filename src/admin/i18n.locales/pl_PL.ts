@@ -7,6 +7,56 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const pl_PL: Record<string, string> = {
+  'error.guildBankDeleting':
+    'Ta gildia jest usuwana, więc jej bank jest zamknięty. Nic nie zostało zmienione.',
+  'error.guildBankItemRequired':
+    'Podaj identyfikator przedmiotu, który powinien znajdować się w tym miejscu.',
+  'error.guildBankNoCarrier':
+    'Zanim zmiana zostanie zapisana, jakiś członek tej gildii musi być online.',
+  'error.guildBankNotLoaded': 'Bank tej gildii nie jest obecnie wczytany na tej sferze.',
+  'error.guildBankPurgeRefused': 'Zmiana w banku gildii została odrzucona.',
+  'error.guildBankSaveFailed':
+    'Nie udało się zapisać zmiany, więc została cofnięta. Spróbuj ponownie za chwilę.',
+  'error.guildBankSlotNotStuck':
+    'To miejsce zawiera zwykły przedmiot, który gildia może sama wyjąć, więc nie można go stąd usunąć.',
+  'error.guildBankSlotRequired': 'Podaj numer miejsca w banku gildii do usunięcia.',
+  'guilds.bankColCount': 'Liczba',
+  'guilds.bankColItem': 'Przedmiot',
+  'guilds.bankColSlot': 'Miejsce',
+  'guilds.bankColStatus': 'Stan',
+  'guilds.bankDormantCount': 'Zablokowane przedmioty',
+  'guilds.bankEmpty': 'Ten bank gildii nie zawiera żadnych przedmiotów.',
+  'guilds.bankLoadFailed': 'Nie udało się wczytać tego banku gildii.',
+  'guilds.bankPurgeAction': 'Usuń przedmiot',
+  'guilds.bankPurgeCarrierWarning':
+    'Zmiana jest zapisywana za pośrednictwem członka tej gildii będącego online. W rzadkim przypadku, gdy zapis zostanie odrzucony, ten członek zostaje rozłączony i ponownie się łączy bez trwałej utraty czegokolwiek.',
+  'guilds.bankPurgeClose': 'Zamknij okno usuwania przedmiotu',
+  'guilds.bankPurgeConfirm': 'Usuń przedmiot',
+  'guilds.bankPurgeConfirmation': 'Potwierdzam, że ten przedmiot ma zostać zniszczony.',
+  'guilds.bankPurgeFailed': 'Nie udało się usunąć przedmiotu.',
+  'guilds.bankPurgeItemRequired':
+    'To miejsce nie ma identyfikatora przedmiotu, względem którego można potwierdzić.',
+  'guilds.bankPurgeReasonPlaceholder': 'Wewnętrzny powód moderacji',
+  'guilds.bankPurgeReasonRequired': 'Podaj powód moderacji.',
+  'guilds.bankPurgeReasonTooLong': 'Skróć powód moderacji do 500 znaków lub mniej.',
+  'guilds.bankPurgeSlotRequired': 'Wybierz miejsce w banku gildii do usunięcia.',
+  'guilds.bankPurgeTitle': 'Usuń zablokowany przedmiot z banku gildii',
+  'guilds.bankPurgeUnaudited':
+    'Przedmiot został usunięty, ale nie udało się zapisać wpisu w dzienniku moderacji. Zgłoś to.',
+  'guilds.bankPurgeWarning':
+    'To trwale niszczy przedmiot. Nie ma cofnięcia w grze, a gildia nie odzyska go z powrotem.',
+  'guilds.bankPurging': 'Usuwanie...',
+  'guilds.bankRefresh': 'Odśwież bank',
+  'guilds.bankSlotsUsed': 'Wykorzystane miejsca',
+  'guilds.bankSlotsUsedValue': '{used} z {capacity}',
+  'guilds.bankStatusNormal': 'Można wyjąć',
+  'guilds.bankStatusStuck': 'Zablokowany',
+  'guilds.bankStuckExplainer':
+    'Zablokowanego przedmiotu nie można przenieść w żadną stronę, więc gildia nigdy nie opróżni banku ani nie rozwiąże się, dopóki on tam jest. Usunięcie go niszczy przedmiot trwale.',
+  'guilds.bankTitle': 'Bank gildii',
+  'guilds.bankTreasury': 'Skarbiec',
+  'guilds.bankUnopened': 'Ta gildia jeszcze nie otworzyła swojego banku.',
+  'moderationHistory.actionGuildBankPurge': 'Usunięcie przedmiotu z banku gildii',
   'onlinePlayers.autoRefresh': 'Automatyczne odświeżanie ({minutes} min)',
   'onlinePlayers.count': '{count} graczy online',
   'onlinePlayers.countFiltered': '{shown} z {total} online',

@@ -7,6 +7,58 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const fr_FR: Record<string, string> = {
+  'error.guildBankDeleting':
+    "Cette guilde est en cours de suppression, sa banque est donc fermée. Rien n'a été modifié.",
+  'error.guildBankItemRequired':
+    "Saisissez l'identifiant de l'objet que cet emplacement doit contenir.",
+  'error.guildBankNoCarrier':
+    'Un membre de cette guilde doit être en ligne avant que la modification puisse être enregistrée.',
+  'error.guildBankNotLoaded':
+    "La banque de cette guilde n'est pas chargée sur ce royaume pour le moment.",
+  'error.guildBankPurgeRefused': 'La modification de la banque de guilde a été refusée.',
+  'error.guildBankSaveFailed':
+    "La modification n'a pas pu être enregistrée et a été annulée. Réessayez dans un instant.",
+  'error.guildBankSlotNotStuck':
+    'Cet emplacement contient un objet ordinaire que la guilde peut retirer elle-même : il ne peut donc pas être supprimé ici.',
+  'error.guildBankSlotRequired':
+    "Saisissez le numéro de l'emplacement de banque de guilde à supprimer.",
+  'guilds.bankColCount': 'Quantité',
+  'guilds.bankColItem': 'Objet',
+  'guilds.bankColSlot': 'Emplacement',
+  'guilds.bankColStatus': 'Statut',
+  'guilds.bankDormantCount': 'Objets bloqués',
+  'guilds.bankEmpty': 'Cette banque de guilde ne contient aucun objet.',
+  'guilds.bankLoadFailed': 'Échec du chargement de cette banque de guilde.',
+  'guilds.bankPurgeAction': "Supprimer l'objet",
+  'guilds.bankPurgeCarrierWarning':
+    "La modification est enregistrée par l'intermédiaire d'un membre en ligne de cette guilde. Dans le rare cas où l'enregistrement serait refusé, ce membre est déconnecté puis se reconnecte sans perte durable.",
+  'guilds.bankPurgeClose': "Fermer la boîte de dialogue de suppression d'objet",
+  'guilds.bankPurgeConfirm': "Supprimer l'objet",
+  'guilds.bankPurgeConfirmation': 'Je confirme que cet objet doit être détruit.',
+  'guilds.bankPurgeFailed': "Échec de la suppression de l'objet.",
+  'guilds.bankPurgeItemRequired':
+    "Cet emplacement n'a aucun identifiant d'objet permettant de confirmer.",
+  'guilds.bankPurgeReasonPlaceholder': 'Motif de modération interne',
+  'guilds.bankPurgeReasonRequired': 'Saisissez un motif de modération.',
+  'guilds.bankPurgeReasonTooLong': 'Réduisez le motif de modération à 500 caractères maximum.',
+  'guilds.bankPurgeSlotRequired': 'Choisissez un emplacement de banque de guilde à supprimer.',
+  'guilds.bankPurgeTitle': 'Supprimer un objet bloqué de la banque de guilde',
+  'guilds.bankPurgeUnaudited':
+    "L'objet a été supprimé, mais l'entrée du journal de modération n'a pas pu être écrite. Signalez ce problème.",
+  'guilds.bankPurgeWarning':
+    "Cette action détruit l'objet de façon permanente. Il n'existe aucune annulation en jeu, et la guilde ne pourra pas le récupérer.",
+  'guilds.bankPurging': 'Suppression en cours...',
+  'guilds.bankRefresh': 'Actualiser la banque',
+  'guilds.bankSlotsUsed': 'Emplacements utilisés',
+  'guilds.bankSlotsUsedValue': '{used} sur {capacity}',
+  'guilds.bankStatusNormal': 'Retirable',
+  'guilds.bankStatusStuck': 'Bloqué',
+  'guilds.bankStuckExplainer':
+    "Un objet bloqué ne peut être retiré dans aucun des deux sens : tant qu'il reste là, la guilde ne peut ni vider sa banque ni se dissoudre. Le supprimer détruit l'objet de façon permanente.",
+  'guilds.bankTitle': 'Banque de guilde',
+  'guilds.bankTreasury': 'Trésorerie',
+  'guilds.bankUnopened': "Cette guilde n'a pas encore ouvert sa banque.",
+  'moderationHistory.actionGuildBankPurge': 'Purge de la banque de guilde',
   'onlinePlayers.autoRefresh': 'Actualisation automatique ({minutes} min)',
   'onlinePlayers.count': '{count} en ligne',
   'onlinePlayers.countFiltered': '{shown} sur {total} en ligne',

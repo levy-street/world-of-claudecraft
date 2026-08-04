@@ -98,6 +98,42 @@ describe('impact: the landing belongs to the recorded impact_ pack', () => {
     }
   });
 
+  it('is recorded for the fear-family override regardless of archetype', () => {
+    // Harrow is archetype 'cc' (normally uncovered above); the two AoE fear
+    // shouts are archetype 'shout' (also normally uncovered). All three now
+    // have a real recording for the landed-fear moment (the 'fear' cue).
+    expect(
+      isAbilityMomentRecorded('impact', { school: 'shadow', archetype: 'cc', abilityId: 'fear' }),
+    ).toBe(true);
+    for (const abilityId of ['psychic_scream', 'howl_of_terror', 'intimidating_shout']) {
+      expect(
+        isAbilityMomentRecorded('impact', { school: 'shadow', archetype: 'shout', abilityId }),
+      ).toBe(true);
+    }
+    // An ordinary cc/shout ability keeps the procedural read.
+    expect(
+      isAbilityMomentRecorded('impact', {
+        school: 'shadow',
+        archetype: 'cc',
+        abilityId: 'polymorph',
+      }),
+    ).toBe(false);
+  });
+
+  it('is recorded for the plain cc override (hammer_of_justice, entangling_roots, blind, cheap_shot, sap)', () => {
+    for (const abilityId of [
+      'hammer_of_justice',
+      'entangling_roots',
+      'blind',
+      'cheap_shot',
+      'sap',
+    ]) {
+      expect(
+        isAbilityMomentRecorded('impact', { school: 'physical', archetype: 'cc', abilityId }),
+      ).toBe(true);
+    }
+  });
+
   it('pins the recorded impact archetype set', () => {
     expect([...RECORDED_IMPACT_ARCHETYPES].sort()).toEqual([
       'beam',

@@ -176,8 +176,13 @@ describe('every multi-count interact objective has enough distinct objects to fi
     ),
   );
 
-  it('covers the 20 multi-count objectives the exploit applied to', () => {
-    expect(interactObjectives.filter((o) => o.count > 1).length).toBe(20);
+  it('covers the 21 multi-count objectives the exploit applied to', () => {
+    // 20 at the ledger's introduction, plus the quest-dedupe murloc-hut burn
+    // (q_deepfen_purge, count 5 over 5 authored huts). The huts route to the
+    // firebottle handler before the generic interact path, so their re-credit
+    // pacing is the timed burnedObjects cooldown, not this ledger; the
+    // distinct-objects floor above still holds for them.
+    expect(interactObjectives.filter((o) => o.count > 1).length).toBe(21);
   });
 
   it.each(interactObjectives.filter((o) => o.count > 1))(

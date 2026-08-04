@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: 'Quebra-Ninhada',
+    desc: 'Derrote um Senhor da Ninhada de Drakemaw em meio aos seus ovos, enfrentando o brado, o golpe em arco e o fogo.',
+  },
+  chr_maw_matriarch: {
+    name: 'O Céu Se Cala',
+    desc: 'Derrote Cindraleth, a Matriarca das Fauces, em seu poleiro na cratera acima do Drakemaw.',
+  },
   pvp_card_duel_first_win: {
     name: 'Regras da Casa',
     desc: 'Vença um Duelo de Cartas no Mestre das Cartas.',

@@ -998,6 +998,7 @@ export const de_DE: EnTranslations = {
       "name_stormfeather_griffin": "Himmelsgreif Sturmfeder",
       "name_thunderstrut_gobbler": "Donnerstolz der Große Puter",
       "name_terrorspark_groundshaker": "Schreckfunke, der Bodenerschütterer",
+      "name_drakemaw_raptor": "Drakenrachen-Raptor",
       "desc_valorsteed": "Ein robustes, trittsicheres Ross, das die Reisegeschwindigkeit erhöht.",
       "desc_grag_bear": "Ein robuster, trittsicherer Bär, der die Reisegeschwindigkeit erhöht.",
       "desc_stalkglider_snail": "Eine herzhafte, ausdauernde Schnecke, die die Reisegeschwindigkeit erhöht.",
@@ -1005,7 +1006,8 @@ export const de_DE: EnTranslations = {
       "desc_shadowjump_toad": "Eine massige, trittsichere Riesenkröte, geschult in blitzschnellen Schattensprüngen über jedes Gelände.",
       "desc_stormfeather_griffin": "Ein königlicher Sturmgreif, der mit runenbeschlagenen Klauen und angelegten Schwingen über den Boden pirscht.",
       "desc_thunderstrut_gobbler": "Ein kolossaler sturmgeborener Puter, der vom Erwachenden Gipfel herabstolziert, den Schwanz gefächert wie eine Gewitterfront.",
-      "desc_terrorspark_groundshaker": "Eine kompakte gepanzerte Maschine mit schweren Ketten, einer großkalibrigen Kanone und einem Sattel für furchtlose Piloten."
+      "desc_terrorspark_groundshaker": "Eine kompakte gepanzerte Maschine mit schweren Ketten, einer großkalibrigen Kanone und einem Sattel für furchtlose Piloten.",
+      "desc_drakemaw_raptor": "Ein zugerittener Brutraptor aus der Drakenrachen-Caldera, ganz Sehne und Sprint, der noch schwach nach Asche riecht."
     },
     "mountTraining": {
       "mountPrompt": "Drücke {key}, um das Übungs-Valorross zu besteigen.",
@@ -1246,6 +1248,15 @@ export const de_DE: EnTranslations = {
       "browserEffectsReduced": "Reduziert",
       "browserEffectsMinimal": "Minimal",
       "browserEffectsNote": "Der Automatikmodus reduziert aufwendige CSS-Effekte (Unschärfe, Leuchten, Hintergrundbewegung) je nach Browser und Gerät. Senke ihn manuell, wenn sich die Oberfläche träge anfühlt.",
+      "graphicsApply": "Grafik anwenden",
+      "graphicsApplying": "Grafikeinstellungen werden angewendet...",
+      "graphicsApplied": "Grafikeinstellungen angewendet.",
+      "graphicsSaved": "Grafikeinstellungen gespeichert. Der aktive Renderer entspricht ihnen bereits.",
+      "graphicsFailed": "Grafik konnte nicht angewendet werden. Deine vorherigen Einstellungen sind weiterhin aktiv.",
+      "graphicsRetry": "Grafik erneut versuchen",
+      "graphicsFatal": "Grafik-Wiederherstellung fehlgeschlagen. Lade das Spiel neu, um fortzufahren.",
+      "graphicsReload": "Spiel neu laden",
+      "graphicsDraftChanged": "Grafikänderungen sind bereit zum Anwenden.",
       "interfaceMode": "Steuerungsmodus",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Desktop",
@@ -1276,6 +1287,7 @@ export const de_DE: EnTranslations = {
       "itemScoreLine": "Wertung {score}",
       "showSecondaryActionBar": "Zweite Aktionsleiste anzeigen",
       "showThirdActionBar": "Dritte Aktionsleiste anzeigen",
+      "lockActionBars": "Aktionsleisten sperren",
       "showTargetOfTarget": "Ziel des Ziels anzeigen",
       "showAttackButton": "Angriffs-Schaltflache anzeigen",
       "showDailyRewardsChest": "Truhe der täglichen Belohnungen anzeigen",
@@ -1437,7 +1449,14 @@ export const de_DE: EnTranslations = {
     },
     "landing": {
       "highContrast": "Hoher Kontrast",
-      "highContrastAria": "Hintergrund mit hohem Kontrast umschalten: deaktiviert den bewegten Trailer, damit der Text des Startbildschirms lesbar bleibt"
+      "highContrastAria": "Hintergrund mit hohem Kontrast umschalten: deaktiviert den bewegten Trailer, damit der Text des Startbildschirms lesbar bleibt",
+      "browserSupport": {
+        "title": "Achtung: nicht unterstützter Browser",
+        "body": "In diesem Browser kann es zu verringerter Leistung kommen. Für das beste Erlebnis lade dir die Desktop-App für Windows, macOS oder Linux herunter. Du spielst lieber im Browser? Chrome läuft am besten, und Firefox sowie Safari werden ebenfalls unterstützt.",
+        "getDesktopApp": "Desktop-App herunterladen",
+        "continueInBrowser": "Im Browser fortfahren",
+        "dismissAria": "Hinweis zum nicht unterstützten Browser schließen"
+      }
     },
     "warfare": {
       "honorAmount": "{amount} Ehre",
@@ -1810,6 +1829,7 @@ export const de_DE: EnTranslations = {
       "itemAriaEnchanted": "{item}, Menge {count}, verzauberte Kopie",
       "itemAriaBound": "{item}, Menge {count}, gebundene Kopie",
       "itemAriaMasterwork": "{item}, Menge {count}, Meisterwerk",
+      "itemAriaQuest": "{item}, Menge {count}, Questgegenstand",
       "filterGroupAria": "Taschen nach Kategorie filtern",
       "filterAll": "Alle",
       "filterWeapon": "Waffen",
@@ -1818,6 +1838,7 @@ export const de_DE: EnTranslations = {
       "filterMaterial": "Materialien",
       "filterTool": "Werkzeuge",
       "filterQuest": "Quest",
+      "filterQuestCountAria": "Quest, {count} Gegenstände",
       "filterMount": "Reittiere",
       "sortAria": "Taschengegenstände sortieren",
       "sortRecent": "Neueste",
@@ -1826,6 +1847,7 @@ export const de_DE: EnTranslations = {
       "searchPlaceholder": "Gegenstände durchsuchen",
       "searchAria": "Taschengegenstände nach Namen durchsuchen",
       "noMatch": "Keine Gegenstände entsprechen Euren Filtern.",
+      "noQuestItems": "Keine Questgegenstände in Euren Taschen.",
       "capacity": "{used}/{total}",
       "capacityAria": "Belegte Taschenplätze: {used} von {total}",
       "backpack": "Rucksack",
@@ -2044,6 +2066,7 @@ export const de_DE: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Feine Güte. An einer Ader voller Stufe mit einem Werkzeug über dem Rang des Materials gesammelt; zählt überall dort als die gewöhnliche Version, wo diese verlangt wird.",
+      "cookingCatch": "Kochzutat. Muss vor dem Verzehr gekocht werden.",
       "arcaneDust": "Verzauberungsreagenz. Entzaubert aus gewöhnlicher und ungewöhnlicher Ausrüstung.",
       "arcaneEssence": "Verzauberungsreagenz. Entzaubert aus seltener Ausrüstung.",
       "arcaneShard": "Verzauberungsreagenz. Entzaubert aus epischer und legendärer Ausrüstung.",
@@ -2325,7 +2348,7 @@ export const de_DE: EnTranslations = {
       "depositHint": "Klicke, um einzulagern",
       "depositPartialHint": "Umschalt-Klick, um eine Teilmenge einzulagern",
       "cannotDeposit": "Kann nicht eingelagert werden",
-      "cannotDepositNow": "Cannot be deposited right now",
+      "cannotDepositNow": "Kann derzeit nicht eingelagert werden",
       "depositQuantityTitle": "{item} einlagern",
       "depositQuantityInput": "Einzulagernde Menge",
       "depositQuantityConfirm": "Einlagern",
@@ -2336,6 +2359,7 @@ export const de_DE: EnTranslations = {
       "sortAria": "Bankgegenstände sortieren",
       "searchAria": "Bankgegenstände nach Namen durchsuchen",
       "depositAll": "Alle Materialien einlagern",
+      "depositAllTooltip": "Sendet jeden Handwerksreagenz und Ramschgegenstand aus deinen Taschen in einem Rutsch zur Bank. Sammelwerkzeuge, angelegte Ausrüstung, Questgegenstände und Verbrauchsgüter werden nie angetastet.",
       "depositAllDone": "Eingelagerte Materialien: {count}.",
       "depositAllFull": "Eingelagerte Materialien: {count}. Die Bank ist jetzt voll.",
       "depositAllNone": "Bank voll: nichts eingelagert.",
@@ -2352,49 +2376,49 @@ export const de_DE: EnTranslations = {
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "Lade einen Freund ein: Erreicht er Stufe 10, erhaltet ihr beide 2 Fächer, bis zu 5 Freunde.",
       "bonusSectionAria": "Bonus-Bankfächer und wie du mehr davon verdienst",
-      "tabsAria": "Bank tabs",
-      "personalTab": "Personal",
-      "guildTab": "Guild",
-      "guildCapacityAria": "Guild bank slots used: {used} of {total}",
-      "guildEmpty": "The guild bank is empty.",
-      "guildTreasury": "Guild treasury",
-      "guildDepositGold": "Deposit money",
-      "guildWithdrawGold": "Withdraw money",
-      "guildDepositGoldTitle": "Deposit money into the guild treasury",
-      "guildWithdrawGoldTitle": "Withdraw money from the guild treasury",
-      "guildGoldAvailable": "Available: {amount}",
-      "guildBuyConfirm": "Purchase {count} additional guild bank slots for {price} from the guild treasury?",
-      "guildBuyNote": "Paid from the guild treasury",
-      "guildTreasuryShort": "Treasury short",
-      "guildOpenBank": "Open the guild bank",
-      "guildOpenConfirm": "Open the guild bank for {price}? This is paid from your own money.",
-      "guildOpenAccept": "Open",
-      "guildOpenNote": "Paid from your own money, not the guild treasury",
-      "guildPurseShort": "Not enough money",
-      "guildDormantNote": "Locked items cannot be withdrawn and prevent disbanding the guild.",
-      "guildDormantHint": "This item is locked in the guild bank and cannot be withdrawn.",
-      "guildDormantAria": "{item}, quantity {count}, cannot be withdrawn",
-      "guildUnknownItem": "Unknown item",
-      "guildDepositHint": "Click to deposit into the guild bank",
-      "guildCannotDeposit": "Cannot go in the guild bank",
-      "guildGoldCannotMove": "That amount cannot be moved right now.",
-      "guildViewsAria": "Guild bank views",
-      "guildContentsTab": "Contents",
-      "guildLogTab": "Log",
-      "logAria": "Guild bank activity log",
-      "logNote": "The {count} most recent guild bank actions.",
-      "logLoading": "Loading the guild bank log...",
-      "logEmpty": "Nothing has been moved in or out of the guild bank yet.",
-      "logRefused": "Only guild officers can read the guild bank log.",
-      "logFormerMember": "A former guild member",
-      "logDepositItem": "{actor} deposited {count} {item}",
-      "logWithdrawItem": "{actor} withdrew {count} {item}",
-      "logDepositMoney": "{actor} deposited {amount}",
-      "logWithdrawMoney": "{actor} withdrew {amount}",
-      "logBuySlots": "{actor} bought a bank expansion for {amount}",
-      "logOpenBank": "{actor} opened the guild bank for {amount}",
-      "logCharterFee": "{actor} paid the guild charter fee of {amount}",
-      "logAdminPurge": "An administrator removed {count} {item}"
+      "tabsAria": "Bank-Reiter",
+      "personalTab": "Persönlich",
+      "guildTab": "Gilde",
+      "guildCapacityAria": "Belegte Gildenbankfächer: {used} von {total}",
+      "guildEmpty": "Die Gildenbank ist leer.",
+      "guildTreasury": "Gildenkasse",
+      "guildDepositGold": "Geld einzahlen",
+      "guildWithdrawGold": "Geld abheben",
+      "guildDepositGoldTitle": "Geld in die Gildenkasse einzahlen",
+      "guildWithdrawGoldTitle": "Geld aus der Gildenkasse abheben",
+      "guildGoldAvailable": "Verfügbar: {amount}",
+      "guildBuyConfirm": "{count} zusätzliche Gildenbankfächer für {price} aus der Gildenkasse kaufen?",
+      "guildBuyNote": "Aus der Gildenkasse bezahlt",
+      "guildTreasuryShort": "Kasse reicht nicht",
+      "guildOpenBank": "Die Gildenbank eröffnen",
+      "guildOpenConfirm": "Die Gildenbank für {price} eröffnen? Dies wird aus Eurem eigenen Geld bezahlt.",
+      "guildOpenAccept": "Eröffnen",
+      "guildOpenNote": "Aus Eurem eigenen Geld bezahlt, nicht aus der Gildenkasse",
+      "guildPurseShort": "Nicht genug Geld",
+      "guildDormantNote": "Gesperrte Gegenstände können nicht entnommen werden und verhindern die Auflösung der Gilde.",
+      "guildDormantHint": "Dieser Gegenstand ist in der Gildenbank gesperrt und kann nicht entnommen werden.",
+      "guildDormantAria": "{item}, Menge {count}, kann nicht entnommen werden",
+      "guildUnknownItem": "Unbekannter Gegenstand",
+      "guildDepositHint": "Klickt, um in die Gildenbank einzulagern",
+      "guildCannotDeposit": "Kann nicht in die Gildenbank gelegt werden",
+      "guildGoldCannotMove": "Dieser Betrag kann derzeit nicht bewegt werden.",
+      "guildViewsAria": "Gildenbank-Ansichten",
+      "guildContentsTab": "Inhalt",
+      "guildLogTab": "Protokoll",
+      "logAria": "Aktivitätsprotokoll der Gildenbank",
+      "logNote": "Die {count} letzten Aktionen der Gildenbank.",
+      "logLoading": "Protokoll der Gildenbank wird geladen...",
+      "logEmpty": "Es wurde noch nichts in die Gildenbank eingelagert oder aus ihr entnommen.",
+      "logRefused": "Nur Gildenoffiziere können das Protokoll der Gildenbank einsehen.",
+      "logFormerMember": "Ein ehemaliges Gildenmitglied",
+      "logDepositItem": "{actor} hat {count} {item} eingelagert",
+      "logWithdrawItem": "{actor} hat {count} {item} entnommen",
+      "logDepositMoney": "{actor} hat {amount} eingezahlt",
+      "logWithdrawMoney": "{actor} hat {amount} abgehoben",
+      "logBuySlots": "{actor} hat eine Bankerweiterung für {amount} gekauft",
+      "logOpenBank": "{actor} hat die Gildenbank für {amount} eröffnet",
+      "logCharterFee": "{actor} hat die Gildengründungsgebühr von {amount} bezahlt",
+      "logAdminPurge": "Ein Administrator hat {count} {item} entfernt"
     },
     "calendar": {
       "title": "Ereigniskalender",
@@ -2705,8 +2729,8 @@ export const de_DE: EnTranslations = {
     "crafting": {
       "title": "Basteln",
       "close": "Enges Basteln",
-      "dialogOption": "Crafting",
-      "dialogOptionAria": "Open the crafting window for {craft}",
+      "dialogOption": "Basteln",
+      "dialogOptionAria": "Bastelfenster für {craft} öffnen",
       "craft": "Handwerk",
       "reagentsNeeded": "Erfordert:",
       "reagentLine": "{name}: {have}/{required}",
@@ -3016,7 +3040,7 @@ export const de_DE: EnTranslations = {
       "countLabel": "{earned}/{total} Taten",
       "completionAria": "Errungene Taten: {earned} von {total}",
       "recentLabel": "Zuletzt:",
-      "recentJumpAria": "Jump to {name}",
+      "recentJumpAria": "Zu {name} springen",
       "nearestLabel": "Kurz davor:",
       "filterGroupAria": "Taten filtern",
       "filterAll": "Alle",
@@ -6212,16 +6236,16 @@ export const de_DE: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "checkingTitle": "Checking for updates...",
-      "checkingBody": "New versions download while you play.",
-      "uptodateTitle": "You're up to date",
+      "checkingTitle": "Suche nach Updates...",
+      "checkingBody": "Neue Versionen werden heruntergeladen, während du spielst.",
+      "uptodateTitle": "Du bist auf dem neuesten Stand",
       "downloadingTitle": "Update {version} wird heruntergeladen...",
-      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "downloadingBody": "Du kannst weiterspielen. Es installiert sich, wenn du das Spiel beendest.",
       "readyTitle": "Update {version} ist bereit",
       "readyBody": "Es wird beim Beenden installiert, oder starte jetzt neu.",
       "restart": "Jetzt neu starten",
       "later": "Später",
-      "dismiss": "Dismiss"
+      "dismiss": "Schließen"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -6687,6 +6711,11 @@ export const de_DE: EnTranslations = {
     },
     "system": {
       "playerDeath": "Ihr seid gestorben.",
+      "deathRecapKillerAbility": "Ihr seid gestorben. Erschlagen durch {killer}s {ability}.",
+      "deathRecapKiller": "Ihr seid gestorben. Erschlagen von {killer}.",
+      "deathRecapAbility": "Ihr seid gestorben. Erschlagen durch {ability}.",
+      "deathRecapFalling": "Ihr seid gestorben. Ihr seid in den Tod gestürzt.",
+      "deathRecapDrowned": "Ihr seid gestorben. Ihr seid ertrunken.",
       "respawn": "Ihr fühlt Euch wieder ausgeruht und unversehrt.",
       "ignoringChat": "Chat von {name} wird ignoriert.",
       "noLongerIgnoring": "{name} wird nicht mehr ignoriert.",
@@ -7177,6 +7206,7 @@ export const de_DE: EnTranslations = {
       "quest": "Questgegenstand",
       "junk": "Plunder",
       "fineMaterial": "Feines Material",
+      "material": "Material",
       "food": "Essen",
       "drink": "Getränk",
       "tool": "Werkzeug",
@@ -7209,6 +7239,9 @@ export const de_DE: EnTranslations = {
       "useFood": "Benutzen: Stellt über {seconds} Sek. {amount} Gesundheit wieder her. Ihr müsst beim Essen sitzen bleiben.",
       "useDrink": "Benutzen: Stellt über {seconds} Sek. {amount} Mana wieder her. Ihr müsst beim Trinken sitzen bleiben.",
       "questItem": "Questgegenstand",
+      "questRelated": "Quest: {quest}",
+      "questRules": "Kann nicht verkauft, eingelagert oder gehandelt werden.",
+      "questOrphaned": "Für keine aktive Quest benötigt.",
       "classes": "Klassen: {classes}",
       "sellPrice": "Verkaufspreis: {money}",
       "clickBuy": "Zum Kaufen klicken",
@@ -7344,12 +7377,12 @@ export const de_DE: EnTranslations = {
       "reclaim": "Zurückholen",
       "buyAria": "{item} für {price} kaufen",
       "reclaimAria": "{item} zurückholen",
-      "buyConfirmTitle": "Confirm Purchase",
-      "buyConfirmBody": "Buy {item} for {price}?",
-      "buyConfirmBodyStack": "Buy {item} x{count} for {price} ({each} each)?",
-      "buyConfirmAccept": "Buy",
-      "buyConfirmCancel": "Cancel",
-      "buyChanged": "That listing changed before you confirmed. Check the price and try again.",
+      "buyConfirmTitle": "Kauf bestätigen",
+      "buyConfirmBody": "{item} für {price} kaufen?",
+      "buyConfirmBodyStack": "{item} x{count} für {price} kaufen ({each} pro Stück)?",
+      "buyConfirmAccept": "Kaufen",
+      "buyConfirmCancel": "Abbrechen",
+      "buyChanged": "Dieses Angebot hat sich geändert, bevor Ihr bestätigt habt. Prüft den Preis und versucht es erneut.",
       "sellNote": "Stellt Waren aus Euren Taschen ein. Der Händler nimmt {cut}% beim Verkauf. Ihr nutzt {used}/{max} Verkaufsplätze.",
       "sellPickEmpty": "Klickt auf einen Gegenstand in Euren Taschen, um ihn zu verkaufen.",
       "quantity": "Menge",
@@ -8837,6 +8870,18 @@ export const de_DE: EnTranslations = {
       "fen_muster_order": {
         "name": "Musterungsbefehl von Fenbridge"
       },
+      "firebottle": {
+        "name": "Feuerflasche"
+      },
+      "murloc_hut": {
+        "name": "Mudfin-Hütte"
+      },
+      "restless_skull": {
+        "name": "Ruheloser Schädel"
+      },
+      "vanguard_bone": {
+        "name": "Vorhut-Knochen"
+      },
       "mire_prowler_pelt": {
         "name": "Balg eines Moorpirschers"
       },
@@ -10112,6 +10157,9 @@ export const de_DE: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Zündschlüssel: Schreckfunke, der Bodenerschütterer"
       },
+      "reins_drakemaw_raptor": {
+        "name": "Zügel des Drakenrachen-Raptors"
+      },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"
       },
@@ -11107,6 +11155,21 @@ export const de_DE: EnTranslations = {
       "spider_egg_sac": {
         "name": "Spinnen-Eikokon"
       },
+      "spider_egg": {
+        "name": "Brutmutter-Ei"
+      },
+      "widow_hatchling": {
+        "name": "Witwen-Schlüpfling"
+      },
+      "drowned_warlord": {
+        "name": "Der Ertrunkene Kriegsherr"
+      },
+      "brakka_wallbreaker": {
+        "name": "Brakka der Mauerbrecher"
+      },
+      "threnos_first_voice": {
+        "name": "Threnos, die Erste Stimme"
+      },
       "grave_silt_bulwark": {
         "name": "Grabschlick-Bollwerk"
       },
@@ -11286,6 +11349,18 @@ export const de_DE: EnTranslations = {
       },
       "cindraleth_maw_matriarch": {
         "name": "Cindraleth, die Rachen-Matriarchin"
+      },
+      "dragonkin_egg": {
+        "name": "Drachkin-Ei"
+      },
+      "dragonkin_whelp": {
+        "name": "Drachkin-Welpe"
+      },
+      "dragonkin_broodguard": {
+        "name": "Drachkin-Brutwächter"
+      },
+      "drakemaw_broodlord": {
+        "name": "Drakenrachen-Brutfürst"
       },
       "gilded_stag": {
         "name": "Vergoldeter Hirsch"
@@ -12319,7 +12394,7 @@ export const de_DE: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Keine Ruhe im Schilf",
-        "text": "Dieser Ritus lässt Ertrunkene überall auferstehen, wo das Moor sie berührt. Wir können ihn noch nicht brechen; nimm ihren Herren 14 Soldaten.",
+        "text": "Der Ritus auf jenen Räuchergefäßen zwingt die Ertrunkenen, sich zu erheben, und nun hat er einen erweckt, der stark genug ist, sie zu führen. Die Wärter nennen ihn den Ertrunkenen Kriegsherrn, und solange er die Ertrunkene Kapelle hält, halten die Toten ihre Reihen. Brich ihn, {playerName}, und der Rest zerstreut sich zurück ins Moor.",
         "completion": "Du schenkst den Toten mehr Gnade als ihre Meister. Nimm dies, du hast es verdient.",
         "objectives": {
           "0": {
@@ -12597,9 +12672,6 @@ export const de_DE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Wyrmkult-Eiferer getötet"
-          },
-          "1": {
-            "label": "Befehle des Wyrmkults"
           }
         }
       },
@@ -12610,9 +12682,6 @@ export const de_DE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Wyrmkult-Nekromant getötet"
-          },
-          "1": {
-            "label": "Rituelles Seelengefäß"
           }
         }
       },

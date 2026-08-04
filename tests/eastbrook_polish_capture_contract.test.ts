@@ -360,13 +360,27 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned after stacking the base renderer provenance move
-      // with PR #2720's fence-removal layout evidence. The authoritativeLayout/
-      // townTriangles/placementInventory inputs and the upstream provenance
-      // leaves now mint one merged composite against the current release/v0.34.0
-      // tip that matches neither parent's literal. No pipeline input or geometry
-      // value changed and no capture was retaken.
-      fingerprint: '9c3984d008038096b0d9269fd21dba530a1d95eae037b1ed1831b599925f0b76',
+      // Deliberately re-pinned, and this mint stacks every leaf move on both sides
+      // of the merge onto src/render/renderer.ts, the rendererIntegration leaf of
+      // this composite: the pnpm-lock migration (a hashed input to every GLB source
+      // fingerprint), PR #2720's fence-removal layout evidence, release/v0.34.0's
+      // Bear Form quadruped rig (PR #2842), live graphics rebuild (context recycle
+      // plus profile-aware Eastbrook runtime inputs, PR #2799), far-field sprite
+      // impostors and fog-free vista (PR #2793), and brood shout/flourish wiring;
+      // and from this branch the worldObjectBurning fire-burst cue (torched murloc
+      // huts, q_deepfen_purge). The release also retook the polish captures and
+      // re-swept their metadata and performance JSONs, and those files are adopted
+      // verbatim here. Each move shifts the leaf's own sha256 and with it the
+      // composite, so the merged tree mints one fingerprint matching neither
+      // parent's literal. No GLB source fingerprint moved, not one pipeline input
+      // or geometry value changed, and no capture was retaken: Eastbrook itself is
+      // untouched by all of it. Re-minted with
+      // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
+      // Re-pinned at the Thornhollow v0.35.0 base merge: that branch edits
+      // src/render/renderer.ts (battleground occluder fade and ward state),
+      // the renderer-integration leaf, so the composite re-mints. Re-derive
+      // whenever renderer.ts changes.
+      fingerprint: 'af546b486f634ae92ef0659029a882e83e24344c8ff8ea44a334c54169b2068d',
       components: {
         captureContract: {
           id: 'polish-v2',

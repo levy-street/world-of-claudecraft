@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest';
+import { RAW_COOKING_CATCH_IDS } from '../src/sim/content/items';
+import { ITEMS as CATALOG_ITEMS } from '../src/sim/data';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 import { DEFAULT_BAG_FILTER, type ItemLookup } from '../src/ui/bag_filter';
 import {
   type BagMode,
   bagDestroyAction,
   bagItemAction,
+  bagNoMatchKind,
   bagQualityKey,
+  bagQuestSectionHeadersAllowed,
   bagShiftLinks,
   bagStackIndex,
   bagsMoneyRowStale,
@@ -13,6 +17,7 @@ import {
   bagTooltipHintKey,
   bankDepositOpensPrompt,
   buildBagGrid,
+  buildBagListRows,
   resolveDepositSubmit,
 } from '../src/ui/bags_view';
 
@@ -488,6 +493,20 @@ describe('bagTooltipHintKey', () => {
     expect(bagTooltipHintKey(ITEMS.rod, NO_MODE)).toBe('itemUi.tooltip.clickUse');
     expect(bagTooltipHintKey({ kind: 'junk' }, NO_MODE)).toBe('');
   });
+
+  it('raw cooking catches are not clickConsume (junk reagents, no food kind)', () => {
+    // Phase 2: live catalog catches are kind junk with no use; bag affordance
+    // must not advertise consume. Right-click still hits useItem and shows the
+    // refuse toast via the Phase 1 error pipeline.
+    for (const id of RAW_COOKING_CATCH_IDS) {
+      const rawCatch = CATALOG_ITEMS[id];
+      expect(rawCatch, id).toBeTruthy();
+      expect(rawCatch.kind, id).toBe('junk');
+      expect(bagTooltipHintKey(rawCatch, NO_MODE), id).toBe('');
+      expect(bagItemAction(rawCatch, NO_MODE), id).toBe('use');
+      expect(bagItemAction(rawCatch, { ...NO_MODE, petFeed: true }), id).toBe('petFeedBlocked');
+    }
+  });
 });
 
 describe('bagQualityKey', () => {
@@ -592,6 +611,107 @@ describe('buildBagGrid', () => {
     expect(buildBagGrid(inv, lookup, DEFAULT_BAG_FILTER)).toEqual(
       buildBagGrid(inv, lookup, DEFAULT_BAG_FILTER),
     );
+  });
+});
+
+describe('bagNoMatchKind (empty filter copy)', () => {
+  it('selects the warm quest empty copy only for the quest category', () => {
+    expect(bagNoMatchKind({ category: 'quest', sort: 'recent', search: '' })).toBe('quest');
+    expect(bagNoMatchKind({ category: 'quest', sort: 'quality', search: 'x' })).toBe('quest');
+  });
+
+  it('keeps the generic no-match line for every other filter', () => {
+    expect(bagNoMatchKind(DEFAULT_BAG_FILTER)).toBe('generic');
+    expect(bagNoMatchKind({ category: 'weapon', sort: 'recent', search: '' })).toBe('generic');
+    expect(bagNoMatchKind({ category: 'all', sort: 'recent', search: 'zzzz' })).toBe('generic');
+  });
+});
+
+describe('bagQuestSectionHeadersAllowed + buildBagListRows (soft Quest section)', () => {
+  // Locked decision 7: soft Quest section headers must not break bag cell drop
+  // indices. In All + recent (bagOrderIsManual true) the painter uses model.cells
+  // and never inserts section nodes; pure helpers must also refuse headers there
+  // so a future list-path call cannot reintroduce the bug.
+  const mixed: InvSlot[] = [
+    { itemId: 'sword', count: 1 },
+    { itemId: 'questItem', count: 2 },
+    { itemId: 'potion', count: 3 },
+    { itemId: 'questItem', count: 1 },
+  ];
+
+  it('forbids section headers in All + recent (manual drop-target cell stream)', () => {
+    expect(bagQuestSectionHeadersAllowed(DEFAULT_BAG_FILTER)).toBe(false);
+    const rows = buildBagListRows(mixed, lookup, DEFAULT_BAG_FILTER);
+    expect(rows.every((r) => r.kind === 'stack')).toBe(true);
+    expect(rows.map((r) => (r.kind === 'stack' ? r.slot.itemId : r.section))).toEqual([
+      'sword',
+      'questItem',
+      'potion',
+      'questItem',
+    ]);
+  });
+
+  it('allows headers in derived lists (quality/name sort, category, search)', () => {
+    expect(bagQuestSectionHeadersAllowed({ ...DEFAULT_BAG_FILTER, sort: 'quality' })).toBe(true);
+    expect(bagQuestSectionHeadersAllowed({ ...DEFAULT_BAG_FILTER, sort: 'name' })).toBe(true);
+    expect(bagQuestSectionHeadersAllowed({ category: 'quest', sort: 'recent', search: '' })).toBe(
+      true,
+    );
+    expect(bagQuestSectionHeadersAllowed({ category: 'all', sort: 'recent', search: 'x' })).toBe(
+      true,
+    );
+  });
+
+  it('emits a Quest section then quest stacks then rest when the list is mixed', () => {
+    const filter = { ...DEFAULT_BAG_FILTER, sort: 'quality' as const };
+    const rows = buildBagListRows(mixed, lookup, filter);
+    expect(rows[0]).toEqual({ kind: 'section', section: 'quest' });
+    // Quest stacks keep relative order; rest keep relative order after them.
+    expect(rows.slice(1).map((r) => (r.kind === 'stack' ? r.slot.itemId : r.section))).toEqual([
+      'questItem',
+      'questItem',
+      'sword',
+      'potion',
+    ]);
+    // Exactly one section header (never nested or duplicated).
+    expect(rows.filter((r) => r.kind === 'section')).toHaveLength(1);
+  });
+
+  it('omits the header when every visible stack is quest (category quest)', () => {
+    const onlyQuest: InvSlot[] = [
+      { itemId: 'questItem', count: 1 },
+      { itemId: 'questItem', count: 2 },
+    ];
+    const filter = { category: 'quest' as const, sort: 'recent' as const, search: '' };
+    const rows = buildBagListRows(onlyQuest, lookup, filter);
+    expect(rows.every((r) => r.kind === 'stack')).toBe(true);
+    expect(rows.map((r) => (r.kind === 'stack' ? r.slot.itemId : ''))).toEqual([
+      'questItem',
+      'questItem',
+    ]);
+  });
+
+  it('omits the header when no quest stacks are visible', () => {
+    const noQuest: InvSlot[] = [
+      { itemId: 'sword', count: 1 },
+      { itemId: 'potion', count: 1 },
+    ];
+    const filter = { ...DEFAULT_BAG_FILTER, sort: 'name' as const };
+    const rows = buildBagListRows(noQuest, lookup, filter);
+    expect(rows.every((r) => r.kind === 'stack')).toBe(true);
+  });
+
+  it('manual All+recent buildBagGrid keeps real cells with no section stream', () => {
+    // Drop-index integrity: the pristine view paints model.cells by index.
+    // Section headers are list-only; cells path never consults buildBagListRows.
+    // Pin that the manual grid still exposes one entry per capacity square.
+    const model = buildBagGrid(mixed, lookup, DEFAULT_BAG_FILTER, 8);
+    expect(model.state).toBe('items');
+    expect(model.cells.length).toBe(8);
+    // Occupied cell indices match layout order; no header can shift bagIndex.
+    const occupied = model.cells.map((s, i) => (s ? i : -1)).filter((i) => i >= 0);
+    expect(occupied).toEqual([0, 1, 2, 3]);
+    expect(bagQuestSectionHeadersAllowed(DEFAULT_BAG_FILTER)).toBe(false);
   });
 });
 

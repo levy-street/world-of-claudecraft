@@ -7,6 +7,55 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const ru_RU: Record<string, string> = {
+  'error.guildBankDeleting':
+    'Эта гильдия удаляется, поэтому её банк закрыт. Ничего не было изменено.',
+  'error.guildBankItemRequired':
+    'Введите идентификатор предмета, который должен находиться в этом слоте.',
+  'error.guildBankNoCarrier':
+    'Чтобы сохранить изменение, в сети должен быть хотя бы один участник этой гильдии.',
+  'error.guildBankNotLoaded': 'Банк этой гильдии сейчас не загружен на этом сервере.',
+  'error.guildBankPurgeRefused': 'Изменение банка гильдии было отклонено.',
+  'error.guildBankSaveFailed':
+    'Изменение не удалось сохранить, поэтому оно было отменено. Повторите попытку чуть позже.',
+  'error.guildBankSlotNotStuck':
+    'В этом слоте находится обычный предмет, который гильдия может забрать сама, поэтому удалить его здесь нельзя.',
+  'error.guildBankSlotRequired': 'Введите номер слота банка гильдии, который нужно удалить.',
+  'guilds.bankColCount': 'Количество',
+  'guilds.bankColItem': 'Предмет',
+  'guilds.bankColSlot': 'Слот',
+  'guilds.bankColStatus': 'Статус',
+  'guilds.bankDormantCount': 'Заблокированные предметы',
+  'guilds.bankEmpty': 'В банке этой гильдии нет предметов.',
+  'guilds.bankLoadFailed': 'Не удалось загрузить банк этой гильдии.',
+  'guilds.bankPurgeAction': 'Удалить предмет',
+  'guilds.bankPurgeCarrierWarning':
+    'Изменение сохраняется через участника этой гильдии, который сейчас в сети. В редком случае, если сохранение будет отклонено, этот участник будет отключён и переподключится, не потеряв ничего постоянного.',
+  'guilds.bankPurgeClose': 'Закрыть диалог удаления предмета',
+  'guilds.bankPurgeConfirm': 'Удалить предмет',
+  'guilds.bankPurgeConfirmation': 'Я подтверждаю, что этот предмет нужно уничтожить.',
+  'guilds.bankPurgeFailed': 'Не удалось удалить предмет.',
+  'guilds.bankPurgeItemRequired': 'В этом слоте нет идентификатора предмета для подтверждения.',
+  'guilds.bankPurgeReasonPlaceholder': 'Внутренняя причина модерации',
+  'guilds.bankPurgeReasonRequired': 'Укажите причину модерации.',
+  'guilds.bankPurgeReasonTooLong': 'Сократите причину модерации до 500 символов или меньше.',
+  'guilds.bankPurgeSlotRequired': 'Выберите слот банка гильдии для удаления.',
+  'guilds.bankPurgeTitle': 'Удаление заблокированного предмета из банка гильдии',
+  'guilds.bankPurgeUnaudited':
+    'Предмет удалён, но запись в журнале модерации не создана. Сообщите об этом.',
+  'guilds.bankPurgeWarning':
+    'Это безвозвратно уничтожит предмет. Отменить это в игре нельзя, и гильдия не сможет его вернуть.',
+  'guilds.bankPurging': 'Удаление...',
+  'guilds.bankRefresh': 'Обновить банк',
+  'guilds.bankSlotsUsed': 'Занято ячеек',
+  'guilds.bankSlotsUsedValue': '{used} из {capacity}',
+  'guilds.bankStatusNormal': 'Доступен',
+  'guilds.bankStatusStuck': 'Заблокирован',
+  'guilds.bankStuckExplainer':
+    'Заблокированный предмет невозможно забрать никаким способом, поэтому, пока он там лежит, гильдия не сможет опустошить банк или распуститься. Удаление уничтожает предмет безвозвратно.',
+  'guilds.bankTitle': 'Банк гильдии',
+  'guilds.bankTreasury': 'Казна',
+  'guilds.bankUnopened': 'Эта гильдия ещё не открыла свой банк.',
+  'moderationHistory.actionGuildBankPurge': 'Удаление предмета из банка гильдии',
   'onlinePlayers.autoRefresh': 'Автообновление ({minutes} мин)',
   'onlinePlayers.count': '{count} в сети',
   'onlinePlayers.countFiltered': '{shown} из {total} в сети',

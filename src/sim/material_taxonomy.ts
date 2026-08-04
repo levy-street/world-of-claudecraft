@@ -14,14 +14,14 @@
 // content in any of those tables self-registers its material here with no
 // code change. The union is then filtered to kind 'junk' against the live
 // catalog, which makes every settlement exclusion structural rather than a
-// special case: kind-tool implements and charms fall out on kind, the raw-fish
-// cooking reagents fall out on kind ('food'), quality-poor trash is in no
-// source table (guarded by tests/crafting_materials_quality.test.ts for the
-// reagent slice, and by the member plus per-source arms of
-// tests/material_taxonomy.test.ts for the rest), and the unclassified
-// non-poor trophies/keepsakes are in no source table either (the completeness
-// tripwire in tests/material_taxonomy.test.ts enumerates them, so a future
-// junk item must be classified explicitly).
+// special case: kind-tool implements and charms fall out on kind, raw fishing
+// catches that recipes consume land IN once they are kind junk (honest cooking
+// reagents), quality-poor trash is in no source table (guarded by
+// tests/crafting_materials_quality.test.ts for the reagent slice, and by the
+// member plus per-source arms of tests/material_taxonomy.test.ts for the
+// rest), and the unclassified non-poor trophies/keepsakes are in no source
+// table either (the completeness tripwire in tests/material_taxonomy.test.ts
+// enumerates them, so a future junk item must be classified explicitly).
 //
 // Deliberately NOT consulted by the sim's own deposit path: bankDeposit
 // self-stores ANY non-quest item one stack at a time by design (src/sim/bank.ts
@@ -80,8 +80,8 @@ export function deriveMaterialItemIds(tables: MaterialSourceTables): ReadonlySet
   // by an enchant, the no-dead-end rule disenchant_reagents.ts records).
   for (const id of Object.values(tables.salvageMaterialByQuality)) sources.add(id);
   // Everything a crafting recipe or an enchant consumes. The kind filter below
-  // drops the tool/rod reagents and the raw-fish cooking reagents (kind
-  // 'food'), per the settlement: only junk-kind reagents are materials.
+  // drops tool/rod reagents (kind tool); raw fishing catches are kind junk and
+  // stay IN as honest cooking reagents. Only junk-kind reagents are materials.
   for (const recipe of tables.recipes) {
     for (const reagent of recipe.reagents) sources.add(reagent.itemId);
   }

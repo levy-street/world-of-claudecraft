@@ -7,6 +7,54 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const ja_JP: Record<string, string> = {
+  'error.guildBankDeleting':
+    'このギルドは削除処理中のため、銀行は閉鎖されています。変更は行われませんでした。',
+  'error.guildBankItemRequired': 'そのスロットに入っているはずのアイテムIDを入力してください。',
+  'error.guildBankNoCarrier':
+    '変更を保存するには、このギルドのメンバーが1人以上オンラインである必要があります。',
+  'error.guildBankNotLoaded': 'このギルドの銀行は現在このレルムに読み込まれていません。',
+  'error.guildBankPurgeRefused': 'ギルド銀行の変更が拒否されました。',
+  'error.guildBankSaveFailed':
+    '変更を保存できなかったため、ロールバックされました。しばらくしてからもう一度お試しください。',
+  'error.guildBankSlotNotStuck':
+    'そのスロットにはギルド自身が引き出せる通常のアイテムが入っているため、ここでは削除できません。',
+  'error.guildBankSlotRequired': '削除するギルド銀行のスロット番号を入力してください。',
+  'guilds.bankColCount': '個数',
+  'guilds.bankColItem': 'アイテム',
+  'guilds.bankColSlot': 'スロット',
+  'guilds.bankColStatus': '状態',
+  'guilds.bankDormantCount': '詰まったアイテム',
+  'guilds.bankEmpty': 'このギルド銀行にはアイテムがありません。',
+  'guilds.bankLoadFailed': 'このギルド銀行の読み込みに失敗しました。',
+  'guilds.bankPurgeAction': 'アイテムを削除',
+  'guilds.bankPurgeCarrierWarning':
+    'この変更は、このギルドのオンラインメンバーを通じて保存されます。まれに保存が拒否された場合、そのメンバーは切断されますが、再接続すれば永続的な損失はありません。',
+  'guilds.bankPurgeClose': 'アイテム削除ダイアログを閉じる',
+  'guilds.bankPurgeConfirm': 'アイテムを削除',
+  'guilds.bankPurgeConfirmation': 'このアイテムを破棄することを確認します。',
+  'guilds.bankPurgeFailed': 'アイテムの削除に失敗しました。',
+  'guilds.bankPurgeItemRequired': 'このスロットには確認対象となるアイテムIDがありません。',
+  'guilds.bankPurgeReasonPlaceholder': '内部向けのモデレーション理由',
+  'guilds.bankPurgeReasonRequired': 'モデレーション理由を入力してください。',
+  'guilds.bankPurgeReasonTooLong': 'モデレーション理由は500文字以内に短縮してください。',
+  'guilds.bankPurgeSlotRequired': '削除するギルド銀行のスロットを選択してください。',
+  'guilds.bankPurgeTitle': '詰まったギルド銀行アイテムを削除',
+  'guilds.bankPurgeUnaudited':
+    'アイテムは削除されましたが、モデレーションログへの記録に失敗しました。この件を報告してください。',
+  'guilds.bankPurgeWarning':
+    'この操作はアイテムを完全に破棄します。ゲーム内に取り消し手段はなく、ギルドはそのアイテムを二度と取り戻せません。',
+  'guilds.bankPurging': '削除中...',
+  'guilds.bankRefresh': '銀行を更新',
+  'guilds.bankSlotsUsed': '使用中のスロット',
+  'guilds.bankSlotsUsedValue': '{capacity}個中{used}個',
+  'guilds.bankStatusNormal': '引き出し可能',
+  'guilds.bankStatusStuck': '詰まり',
+  'guilds.bankStuckExplainer':
+    '詰まったアイテムはどちらの方向にも引き出せないため、それが残っている限り、ギルドは銀行を空にすることも解散することもできません。削除するとアイテムは完全に破棄されます。',
+  'guilds.bankTitle': 'ギルド銀行',
+  'guilds.bankTreasury': '金庫',
+  'guilds.bankUnopened': 'このギルドはまだ銀行を開設していません。',
+  'moderationHistory.actionGuildBankPurge': 'ギルド銀行アイテムの削除',
   'onlinePlayers.autoRefresh': '自動更新（{minutes} 分）',
   'onlinePlayers.count': '{count} 人がオンライン',
   'onlinePlayers.countFiltered': 'オンライン {total} 人中 {shown} 人',

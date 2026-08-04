@@ -231,6 +231,11 @@ export const RARE_SLAIN_TEMPLATES = new Set([
   'gleamstag',
   'old_marrowshell',
   'aurelhorn',
+  // The Drakelands dragonkin brood rework (v0.35): the four standing
+  // broodlords (rare-flagged camp elites). Cindraleth's deed rides her kill
+  // QUEST trigger instead of a slain mark, so the shipped boss template
+  // needs no rare flag.
+  'drakemaw_broodlord',
 ]);
 
 // Zone fishing catches that count as "a fish" for the chr_ first-cast deeds

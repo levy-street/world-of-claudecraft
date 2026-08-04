@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.deeds.recentJumpAria': 'Перейти к {name}',
   'hudChrome.targetAuras.all': 'Все',
   'hudChrome.actionBar.done': 'Готово',
   'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
@@ -1106,6 +1107,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.browserEffectsMinimal': 'Минимальные',
   'hudChrome.options.browserEffectsNote':
     'Авто снижает тяжёлые CSS-эффекты (размытие, свечение, движение фона) в зависимости от браузера и устройства. Если интерфейс тормозит, понизьте вручную.',
+  'hudChrome.options.graphicsApply': 'Применить графику',
+  'hudChrome.options.graphicsApplying': 'Применение настроек графики...',
+  'hudChrome.options.graphicsApplied': 'Настройки графики применены.',
+  'hudChrome.options.graphicsSaved': 'Настройки графики сохранены. Активный рендерер уже им соответствует.',
+  'hudChrome.options.graphicsFailed': 'Не удалось применить настройки графики. Предыдущие настройки остаются активными.',
+  'hudChrome.options.graphicsRetry': 'Повторить применение',
+  'hudChrome.options.graphicsFatal': 'Не удалось восстановить графику. Перезагрузите игру, чтобы продолжить.',
+  'hudChrome.options.graphicsReload': 'Перезагрузить игру',
+  'hudChrome.options.graphicsDraftChanged': 'Изменения графики готовы к применению.',
   'hudChrome.options.footstepSounds': 'Звуки шагов',
   'hudChrome.options.interfaceSounds': 'Звуки интерфейса и откликов',
   'hudChrome.options.clickFeedback': 'Метка клика',
@@ -1125,6 +1135,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showItemLevel': 'Показывать уровень предмета',
   'hudChrome.options.showSecondaryActionBar': 'Показывать вторичную панель действий',
   'hudChrome.options.showThirdActionBar': 'Показывать третью панель действий',
+  'hudChrome.options.lockActionBars': 'Заблокировать панели действий',
   'hudChrome.options.showDailyRewardsChest': 'Показывать сундук ежедневных наград',
   'hudChrome.options.mobileCameraJoystick': 'Джойстик камеры',
   'hudChrome.options.mobileLeftHanded': 'Раскладка для левшей',
@@ -1133,6 +1144,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.landing.highContrast': 'Высокая контрастность',
   'hudChrome.landing.highContrastAria':
     'Переключить фон высокой контрастности: отключает движущийся ролик, чтобы текст начального экрана оставался читаемым',
+  'hudChrome.landing.browserSupport.title': 'Внимание: неподдерживаемый браузер',
+  'hudChrome.landing.browserSupport.body':
+    'В этом браузере производительность может быть снижена. Для наилучшего результата установите настольное приложение для Windows, macOS или Linux. Предпочитаете играть в браузере? Chrome обеспечивает наилучшую производительность, также поддерживаются Firefox и Safari.',
+  'hudChrome.landing.browserSupport.getDesktopApp': 'Получить настольное приложение',
+  'hudChrome.landing.browserSupport.continueInBrowser': 'Продолжить в браузере',
+  'hudChrome.landing.browserSupport.dismissAria': 'Закрыть уведомление о неподдерживаемом браузере',
   'hudChrome.talents.defaultBuildName': 'Билд {n}',
   'hudChrome.tips.joinChannels':
     'Совет: введите /join world или /join lfg, чтобы общаться с игроками по всему миру.',
@@ -2048,6 +2065,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.combat.auraAfflicted': '{target} поражен эффектом {name}.',
   'hud.combat.auraGainOther': '{target} получает {name}.',
   'hud.system.playerDeath': 'Вы погибли.',
+  'hud.system.deathRecapKillerAbility': 'Вы погибли. Убиты: {killer} ({ability}).',
+  'hud.system.deathRecapKiller': 'Вы погибли. Убиты: {killer}.',
+  'hud.system.deathRecapAbility': 'Вы погибли. Причина: {ability}.',
+  'hud.system.deathRecapFalling': 'Вы погибли. Вы разбились насмерть.',
+  'hud.system.deathRecapDrowned': 'Вы погибли. Вы утонули.',
   'hud.system.respawn': 'Вы снова чувствуете себя отдохнувшим и целым.',
   'hud.system.ignoringChat': 'Чат от {name} игнорируется.',
   'hud.system.noLongerIgnoring': '{name} больше не игнорируется.',
@@ -2460,6 +2482,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.quest': 'Задание',
   'itemUi.kind.junk': 'Хлам',
   'itemUi.kind.fineMaterial': 'Отборный материал',
+  'itemUi.kind.material': 'Материал',
   'itemUi.kind.food': 'Еда',
   'itemUi.kind.drink': 'Напиток',
   'itemUi.kind.tool': 'Инструмент',
@@ -2489,6 +2512,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useDrink':
     'Использование: восстанавливает {amount} маны за {seconds} сек. Нужно оставаться сидя во время питья.',
   'itemUi.tooltip.questItem': 'Предмет задания',
+  'itemUi.tooltip.questRelated': 'Задание: {quest}',
+  'itemUi.tooltip.questRules': 'Нельзя продать, положить в банк или обменять.',
+  'itemUi.tooltip.questOrphaned': 'Не нужен ни для одного активного задания.',
   'itemUi.tooltip.classes': 'Классы: {classes}',
   'itemUi.tooltip.sellPrice': 'Цена продажи: {money}',
   'itemUi.tooltip.clickBuy': 'Нажмите, чтобы купить',
@@ -3488,6 +3514,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.deepfen_murloc.name': 'Глубинный щелкун',
   'entities.mobs.mire_widow.name': 'Мирефенская вдова',
   'entities.mobs.mirefen_broodmother.name': 'Матка выводка',
+  'entities.mobs.spider_egg.name': 'Яйцо Матки выводка',
+  'entities.mobs.widow_hatchling.name': 'Детеныш вдовы',
+  'entities.mobs.drowned_warlord.name': 'Утопший военачальник',
+  'entities.mobs.brakka_wallbreaker.name': 'Бракка Стенолом',
+  'entities.mobs.threnos_first_voice.name': 'Тренос Первый Голос',
+  'entities.items.firebottle.name': 'Зажигательная бутыль',
+  'entities.items.murloc_hut.name': 'Хижина илогривов',
+  'entities.items.restless_skull.name': 'Беспокойный череп',
+  'entities.items.vanguard_bone.name': 'Кость авангарда',
   'entities.mobs.drowned_dead.name': 'Утопший мертвец',
   'entities.mobs.fen_troll.name': 'Мирефенский тролль',
   'entities.mobs.grubjaw.name': 'Грубджо Обжора',
@@ -3861,7 +3896,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_drowned_censers.objectives.0.label': 'Ржавое кадило',
   'entities.quests.q_no_rest.title': 'Нет покоя в камышах',
   'entities.quests.q_no_rest.text':
-    'Этот обряд поднимает утопших всюду, где топь их коснется. Мы еще не можем разрушить его, но можем лишить хозяев 14 солдат.',
+    'Этот обряд на курильницах поднимает утопших, а теперь он поднял того, кто способен их возглавить. Смотрители зовут его Утопшим военачальником, и, пока он держит Затонувшую часовню, мертвецы не покидают строя. Сразите его, {playerName}, и остальные разбегутся обратно в топь.',
   'entities.quests.q_no_rest.completion':
     'Вы дали мертвым больше милости, чем их господа. Возьмите это.',
   'entities.quests.q_no_rest.objectives.0.label': 'Утопший мертвец: упокоено',
@@ -4025,14 +4060,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     'Этот почерк я видел в гримуаре Мортена. Одна рука вела каждую могилу, {playerName}.',
   'entities.quests.q_cult_orders.objectives.0.label': 'Фанатик Культа Вирма: убито',
-  'entities.quests.q_cult_orders.objectives.1.label': 'Приказы Культа Вирма',
   'entities.quests.q_necromancers.title': 'Кольцо филактерий',
   'entities.quests.q_necromancers.text':
     'В приказах сказано о кольце филактерий, сосудах душ, {playerName}, вокруг святилища. Убейте 8 некромантов и принесите 3 целыми.',
   'entities.quests.q_necromancers.completion':
     'Свет, прости нас. В них мертвые долины и топи. Это была не армия, {playerName}. Это была десятина.',
   'entities.quests.q_necromancers.objectives.0.label': 'Некромант Культа Вирма: убито',
-  'entities.quests.q_necromancers.objectives.1.label': 'Ритуальная филактерия',
   'entities.quests.q_revenants.title': 'Поля ревенантов',
   'entities.quests.q_revenants.text':
     'К востоку от дороги старое поле боя. Культ поднял кости в ржавых латах. Верните 12 в землю, {playerName}.',
@@ -8285,6 +8318,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ключ зажигания: эфирный ховерцикл турнирного бойца',
   'entities.items.reins_shadowjump_toad.name': 'Поводья Кама-Кагэ, жабы теневых прыжков',
   'entities.items.reins_stormfeather_griffin.name': 'Поводья Штормокрыла Поднебесного',
+  'entities.items.reins_drakemaw_raptor.name': 'Поводья раптора Дрейкмо',
   'entities.items.reins_thunderstrut_gobbler.name': 'Поводья Громоступа, великого индюка',
   'entities.mobs.drowned_cantor.name': 'Утопший Кантор',
   'entities.mobs.reedbound_acolyte.name': 'Тростниковый Послушник',
@@ -8779,6 +8813,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.makersMark': 'Создатель: {name}',
   'hudChrome.bags.itemAriaInstanced': '{item}, количество {count}, копия с клеймом мастера',
   'hudChrome.bags.itemAriaMasterwork': '{item}, количество {count}, шедевр',
+  'hudChrome.bags.itemAriaQuest': '{item}, количество {count}, предмет задания',
+  'hudChrome.bags.filterQuestCountAria': 'Задания, предметов: {count}',
+  'hudChrome.bags.noQuestItems': 'В сумках нет предметов заданий.',
   'hudChrome.crafting.gatheredBy': 'Сборщик: {name}',
   'hudChrome.crafting.masterworkSeal': 'Шедевр',
   'hudChrome.crafting.stationRequired': 'Для изготовления нужно находиться у станции "{station}".',
@@ -9112,6 +9149,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.sortAria': 'Сортировать предметы в банке',
   'hudChrome.bank.searchAria': 'Поиск предметов в банке по названию',
   'hudChrome.bank.depositAll': 'Положить все материалы',
+  'hudChrome.bank.depositAllTooltip':
+    'Отправляет в банк все материалы для крафта и хлам из ваших сумок за один раз. Инструменты для добычи, надетое снаряжение, квестовые предметы и расходники не затрагиваются.',
   'hudChrome.bank.depositAllDone': 'Материалов положено: {count}.',
   'hudChrome.bank.depositAllFull': 'Материалов положено: {count}. Банк заполнен.',
   'hudChrome.bank.depositAllNone': 'Банк заполнен: ничего не положено.',
@@ -9465,6 +9504,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_aether_hover_cycle': 'Эфирный ховерцикл турнирного бойца',
   'hudChrome.mounts.name_shadowjump_toad': 'Кама-Кагэ, жаба теневых прыжков',
   'hudChrome.mounts.name_stormfeather_griffin': 'Штормокрыл Поднебесный',
+  'hudChrome.mounts.name_drakemaw_raptor': 'Раптор Дрейкмо',
+  'hudChrome.mounts.desc_drakemaw_raptor': 'Приученный к седлу выводковый раптор из кальдеры Дрейкмо: сплошные жилы и бег, и от него всё ещё едва пахнет пеплом.',
   'hudChrome.mounts.name_thunderstrut_gobbler': 'Громоступ, великий индюк',
   'hudChrome.mounts.name_terrorspark_groundshaker': 'Страхоискр, сотрясатель земли',
   'hudChrome.mounts.desc_valorsteed':
@@ -10267,6 +10308,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.apprentice_wren.name': 'Ученица Рен',
   'entities.mobs.barrow_wight.name': 'Курганное умертвие',
   'entities.mobs.castaway_navigator.name': 'Штурман Сули',
+  'entities.mobs.dragonkin_egg.name': 'Яйцо драконида',
+  'entities.mobs.dragonkin_whelp.name': 'Драконид-детёныш',
+  'entities.mobs.dragonkin_broodguard.name': 'Выводковый страж драконидов',
+  'entities.mobs.drakemaw_broodlord.name': 'Выводковый лорд Дрейкмо',
   'entities.mobs.cindraleth_maw_matriarch.name': 'Синдралет, Матриарх Дрейкмо',
   'entities.mobs.drowned_deckhand.name': 'Утонувший матрос',
   'entities.mobs.fisher_bram.name': 'Рыбак Брам',
@@ -11067,6 +11112,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Торговцы слепы к происхождению: подписанная вещь продается NPC ровно по своей простой цене. Наценка за подпись существует только между игроками, что как раз и делает ее интересной: стопка руды-находки, подписанная знаменитым собирателем, Prime Cut с удачного сбора, шедевральный клинок с именем ремесленника, что с тех пор ушел на покой, все стоят столько, сколько говорит чья-то память.\n\nКнига деяний играет на том же инстинкте: Pristine Vein, Ancient Heartwood, Moonlit Bloom, A Perfect Specimen и Glimmer of Hope, это коллекционные отметки с нулевой Известностью, что существуют лишь ради доказательства, что миг случился с вами. Сохраните вещь, что заработала деяние, и вы держите расписку. Ничто из этого не сила; происхождение не покупает характеристик и не выигрывает боев, это бумажный след хороших дней игры.',
   'hudChrome.corpseHarvest.components.meat': 'Мясо',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (зачаровано)',
+  'hudChrome.materialHint.cookingCatch': 'Ингредиент для готовки. Сначала нужно приготовить.',
   'hudChrome.materialHint.fineGrade':
     'Отборный сорт. Добывается на жиле полного уровня инструментом выше самого материала и засчитывается вместо обычной версии везде, где она требуется.',
   'hudChrome.materialHint.arcaneDust':

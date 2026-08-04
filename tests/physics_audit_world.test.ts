@@ -329,17 +329,26 @@ describe('chapel flows', () => {
   });
 });
 
-// The legacy gabled market stand now lives outside Eastbrook (the rebuild
-// stalls have their own flat-canopy suite above); the zone2 Fenwick stall at
-// (-5, 310.5) rot PI/2 keeps the sloped-canopy physics pinned.
-const LEGACY_STALL = { x: -5, z: 310.5, rot: Math.PI / 2 };
+// Generic gabled market stand (no assetId) keeps the sloped-canopy physics
+// pinned. The old Fenbridge (-5, 310.5) stand was replaced by the rebuild
+// provision stall GLB, so this suite uses an open-field zone2 stand instead.
+const LEGACY_STALL = { x: -365, z: 359, rot: 0.5 };
+// local +Z (eave approach) in the stall yaw convention.
+const LEGACY_STALL_APPROACH = {
+  x: Math.sin(LEGACY_STALL.rot),
+  z: Math.cos(LEGACY_STALL.rot),
+} as const;
 
 describe('stall rim behavior', () => {
   it('standing dead still on the canopy stays put (no depenetration jitter)', () => {
     const sim = makeSim();
-    // The gable's eave faces are the stall's local +-z; rot PI/2 maps local
-    // +z onto world +x, so approach along x.
-    teleport(sim, LEGACY_STALL.x + 2.6, LEGACY_STALL.z, -Math.PI / 2);
+    // Approach the eave along local +Z, facing the stall.
+    teleport(
+      sim,
+      LEGACY_STALL.x + LEGACY_STALL_APPROACH.x * 2.6,
+      LEGACY_STALL.z + LEGACY_STALL_APPROACH.z * 2.6,
+      Math.atan2(-LEGACY_STALL_APPROACH.x, -LEGACY_STALL_APPROACH.z),
+    );
     const p = sim.player;
     let onCanopy = false;
     for (let i = 0; i < 120 && !onCanopy; i++) {
@@ -399,7 +408,14 @@ describe('dock flows', () => {
 describe('abilities x collision', () => {
   it('Heroic Leap onto the stall canopy seats on the sampled gable, and off again', () => {
     const sim = makeSim();
-    teleport(sim, LEGACY_STALL.x + 5.5, LEGACY_STALL.z, -Math.PI / 2);
+    const approachX = LEGACY_STALL.x + LEGACY_STALL_APPROACH.x * 5.5;
+    const approachZ = LEGACY_STALL.z + LEGACY_STALL_APPROACH.z * 5.5;
+    teleport(
+      sim,
+      approachX,
+      approachZ,
+      Math.atan2(-LEGACY_STALL_APPROACH.x, -LEGACY_STALL_APPROACH.z),
+    );
     const p = sim.player;
     sim.castAbility('heroic_leap', p.id, { x: LEGACY_STALL.x, z: LEGACY_STALL.z });
     for (let i = 0; i < 40 && p.leap; i++) sim.tick();
@@ -412,7 +428,7 @@ describe('abilities x collision', () => {
     p.cooldowns.clear();
     p.resource = 100; // rage for the recast
     p.gcdRemaining = 0;
-    sim.castAbility('heroic_leap', p.id, { x: LEGACY_STALL.x + 5.5, z: LEGACY_STALL.z });
+    sim.castAbility('heroic_leap', p.id, { x: approachX, z: approachZ });
     for (let i = 0; i < 40 && p.leap; i++) sim.tick();
     expect(p.pos.y - groundHeight(p.pos.x, p.pos.z, SEED)).toBeLessThan(0.15);
   });

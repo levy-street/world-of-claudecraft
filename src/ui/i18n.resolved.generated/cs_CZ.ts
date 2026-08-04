@@ -998,6 +998,7 @@ export const cs_CZ: EnTranslations = {
       "name_stormfeather_griffin": "Nebeský Bouřepero",
       "name_thunderstrut_gobbler": "Hromokrok, Velký krocan",
       "name_terrorspark_groundshaker": "Hrůzojiskra, otřásač země",
+      "name_drakemaw_raptor": "Raptor z Dračí tlamy",
       "desc_valorsteed": "Otužilý, jistonohý oř poskytující zvýšenou rychlost cestování.",
       "desc_grag_bear": "Otužilý, jistonohý medvěd poskytující zvýšenou rychlost cestování.",
       "desc_stalkglider_snail": "Statný, pomalu se pohybující plž poskytující zvýšenou rychlost cestování.",
@@ -1005,7 +1006,8 @@ export const cs_CZ: EnTranslations = {
       "desc_shadowjump_toad": "Mohutná, jistonohá obří ropucha, vycvičená v bleskurychlých stínových skocích, které zvládnou jakýkoli terén.",
       "desc_stormfeather_griffin": "Vznešený bouřný gryf, který se plíží po zemi na rounami okovaných spárech, se složenými křídly.",
       "desc_thunderstrut_gobbler": "Kolosální krocan zrozený z bouře, který se hrdě prochází z Probouzejícího se vrcholu, s ocasem rozevřeným jako bouřkový mrak.",
-      "desc_terrorspark_groundshaker": "Kompaktní obrněný stroj s těžkými pásy, velkorážním kanónem a sedlem pro nebojácné piloty."
+      "desc_terrorspark_groundshaker": "Kompaktní obrněný stroj s těžkými pásy, velkorážním kanónem a sedlem pro nebojácné piloty.",
+      "desc_drakemaw_raptor": "Osedlaný raptor z líhně v Kaldeře Dračí tlamy, samé šlachy a hbitost, ještě slabě páchnoucí popelem."
     },
     "mountTraining": {
       "mountPrompt": "Stiskni {key} pro nasednutí na cvičného Udatného oře.",
@@ -1246,6 +1248,15 @@ export const cs_CZ: EnTranslations = {
       "browserEffectsReduced": "Snížené",
       "browserEffectsMinimal": "Minimální",
       "browserEffectsNote": "Automaticky omezí náročné CSS efekty (rozmazání, záři, pohyb pozadí) podle prohlížeče a zařízení. Sniž ručně, pokud rozhraní působí pomalu.",
+      "graphicsApply": "Použít grafiku",
+      "graphicsApplying": "Nastavování grafiky...",
+      "graphicsApplied": "Nastavení grafiky použito.",
+      "graphicsSaved": "Nastavení grafiky uloženo. Aktivní renderer už mu odpovídá.",
+      "graphicsFailed": "Grafiku se nepodařilo použít. Stále platí tvé předchozí nastavení.",
+      "graphicsRetry": "Zkusit grafiku znovu",
+      "graphicsFatal": "Obnova grafiky selhala. Pro pokračování hru znovu načti.",
+      "graphicsReload": "Znovu načíst hru",
+      "graphicsDraftChanged": "Změny grafiky jsou připravené k použití.",
       "interfaceMode": "Režim rozhraní",
       "interfaceModeAuto": "Automaticky",
       "interfaceModeDesktop": "Desktop",
@@ -1276,6 +1287,7 @@ export const cs_CZ: EnTranslations = {
       "itemScoreLine": "Skóre {score}",
       "showSecondaryActionBar": "Zobrazit sekundární akční lištu",
       "showThirdActionBar": "Zobrazit třetí panel akcí",
+      "lockActionBars": "Uzamknout akční lišty",
       "showTargetOfTarget": "Zobrazit cíl cíle",
       "showAttackButton": "Zobrazit tlačítko útoku",
       "showDailyRewardsChest": "Zobrazit truhlu denních odměn",
@@ -1437,7 +1449,14 @@ export const cs_CZ: EnTranslations = {
     },
     "landing": {
       "highContrast": "Vysoký kontrast",
-      "highContrastAria": "Přepnout vysoce kontrastní pozadí: vypne pohyblivý trailer, aby text úvodní obrazovky zůstal čitelný"
+      "highContrastAria": "Přepnout vysoce kontrastní pozadí: vypne pohyblivý trailer, aby text úvodní obrazovky zůstal čitelný",
+      "browserSupport": {
+        "title": "Upozornění: nepodporovaný prohlížeč",
+        "body": "V tomto prohlížeči můžeš zaznamenat nižší výkon. Pro nejlepší zážitek si stáhni desktopovou aplikaci pro Windows, macOS nebo Linux. Raději hraješ v prohlížeči? Nejlépe si vede Chrome, podporované jsou i Firefox a Safari.",
+        "getDesktopApp": "Stáhnout desktopovou aplikaci",
+        "continueInBrowser": "Pokračovat v prohlížeči",
+        "dismissAria": "Zavřít upozornění na nepodporovaný prohlížeč"
+      }
     },
     "warfare": {
       "honorAmount": "{amount} cti",
@@ -1810,6 +1829,7 @@ export const cs_CZ: EnTranslations = {
       "itemAriaEnchanted": "{item}, množství {count}, okouzlená kopie",
       "itemAriaBound": "{item}, množství {count}, vázaná kopie",
       "itemAriaMasterwork": "{item}, množství {count}, mistrovské dílo",
+      "itemAriaQuest": "{item}, množství {count}, úkolový předmět",
       "filterGroupAria": "Filtrovat batohy podle kategorie",
       "filterAll": "Vše",
       "filterWeapon": "Zbraně",
@@ -1818,6 +1838,7 @@ export const cs_CZ: EnTranslations = {
       "filterMaterial": "Materiály",
       "filterTool": "Nástroje",
       "filterQuest": "Úkolové",
+      "filterQuestCountAria": "Úkolové, {count} předmětů",
       "filterMount": "Jezdecká zvířata",
       "sortAria": "Řadit předměty v batozích",
       "sortRecent": "Nedávné",
@@ -1826,6 +1847,7 @@ export const cs_CZ: EnTranslations = {
       "searchPlaceholder": "Hledat předměty",
       "searchAria": "Hledat předměty v batozích podle názvu",
       "noMatch": "Tvým filtrům neodpovídají žádné předměty.",
+      "noQuestItems": "V batozích nemáš žádné úkolové předměty.",
       "capacity": "{used}/{total}",
       "capacityAria": "Použité sloty batohu: {used} z {total}",
       "backpack": "Batoh",
@@ -2044,6 +2066,7 @@ export const cs_CZ: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Jemná jakost. Sesbírána z naleziště plné úrovně nástrojem vyššího stupně, než je materiál, a počítá se jako běžná verze všude, kde je běžná verze potřeba.",
+      "cookingCatch": "Kuchařská ingredience. Před snědením ji musíš uvařit.",
       "arcaneDust": "Reagencie k okouzlení. Získává se rozzačarováním běžné a neobvyklé výbavy.",
       "arcaneEssence": "Reagencie k okouzlení. Získává se rozzačarováním vzácné výbavy.",
       "arcaneShard": "Reagencie k okouzlení. Získává se rozzačarováním epické a legendární výbavy.",
@@ -2325,7 +2348,7 @@ export const cs_CZ: EnTranslations = {
       "depositHint": "Kliknutím uložíš",
       "depositPartialHint": "Shift + kliknutí uloží jen část množství",
       "cannotDeposit": "Nelze uložit do banky",
-      "cannotDepositNow": "Cannot be deposited right now",
+      "cannotDepositNow": "Teď nelze uložit",
       "depositQuantityTitle": "Uložit {item}",
       "depositQuantityInput": "Množství k uložení",
       "depositQuantityConfirm": "Uložit",
@@ -2336,6 +2359,7 @@ export const cs_CZ: EnTranslations = {
       "sortAria": "Seřadit předměty v bance",
       "searchAria": "Hledat předměty v bance podle názvu",
       "depositAll": "Uložit všechny materiály",
+      "depositAllTooltip": "Pošle všechny řemeslné suroviny a odpadní předměty z tvých batohů do banky najednou. Sběrných nástrojů, nasazené výbavy, úkolových předmětů a spotřebních předmětů se nikdy nedotkne.",
       "depositAllDone": "Uloženo materiálů: {count}.",
       "depositAllFull": "Uloženo materiálů: {count}. Banka je teď plná.",
       "depositAllNone": "Banka je plná: nic nebylo uloženo.",
@@ -2352,49 +2376,49 @@ export const cs_CZ: EnTranslations = {
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "Pozvi přítele: až dosáhne úrovně 10, získáte oba po 2 slotech, nejvýše za 5 přátel.",
       "bonusSectionAria": "Bonusové sloty banky a jak získat další",
-      "tabsAria": "Bank tabs",
-      "personalTab": "Personal",
-      "guildTab": "Guild",
-      "guildCapacityAria": "Guild bank slots used: {used} of {total}",
-      "guildEmpty": "The guild bank is empty.",
-      "guildTreasury": "Guild treasury",
-      "guildDepositGold": "Deposit money",
-      "guildWithdrawGold": "Withdraw money",
-      "guildDepositGoldTitle": "Deposit money into the guild treasury",
-      "guildWithdrawGoldTitle": "Withdraw money from the guild treasury",
-      "guildGoldAvailable": "Available: {amount}",
-      "guildBuyConfirm": "Purchase {count} additional guild bank slots for {price} from the guild treasury?",
-      "guildBuyNote": "Paid from the guild treasury",
-      "guildTreasuryShort": "Treasury short",
-      "guildOpenBank": "Open the guild bank",
-      "guildOpenConfirm": "Open the guild bank for {price}? This is paid from your own money.",
-      "guildOpenAccept": "Open",
-      "guildOpenNote": "Paid from your own money, not the guild treasury",
-      "guildPurseShort": "Not enough money",
-      "guildDormantNote": "Locked items cannot be withdrawn and prevent disbanding the guild.",
-      "guildDormantHint": "This item is locked in the guild bank and cannot be withdrawn.",
-      "guildDormantAria": "{item}, quantity {count}, cannot be withdrawn",
-      "guildUnknownItem": "Unknown item",
-      "guildDepositHint": "Click to deposit into the guild bank",
-      "guildCannotDeposit": "Cannot go in the guild bank",
-      "guildGoldCannotMove": "That amount cannot be moved right now.",
-      "guildViewsAria": "Guild bank views",
-      "guildContentsTab": "Contents",
-      "guildLogTab": "Log",
-      "logAria": "Guild bank activity log",
-      "logNote": "The {count} most recent guild bank actions.",
-      "logLoading": "Loading the guild bank log...",
-      "logEmpty": "Nothing has been moved in or out of the guild bank yet.",
-      "logRefused": "Only guild officers can read the guild bank log.",
-      "logFormerMember": "A former guild member",
-      "logDepositItem": "{actor} deposited {count} {item}",
-      "logWithdrawItem": "{actor} withdrew {count} {item}",
-      "logDepositMoney": "{actor} deposited {amount}",
-      "logWithdrawMoney": "{actor} withdrew {amount}",
-      "logBuySlots": "{actor} bought a bank expansion for {amount}",
-      "logOpenBank": "{actor} opened the guild bank for {amount}",
-      "logCharterFee": "{actor} paid the guild charter fee of {amount}",
-      "logAdminPurge": "An administrator removed {count} {item}"
+      "tabsAria": "Záložky banky",
+      "personalTab": "Osobní",
+      "guildTab": "Cech",
+      "guildCapacityAria": "Využito slotů cechovní banky: {used} z {total}",
+      "guildEmpty": "Cechovní banka je prázdná.",
+      "guildTreasury": "Cechovní pokladna",
+      "guildDepositGold": "Uložit peníze",
+      "guildWithdrawGold": "Vybrat peníze",
+      "guildDepositGoldTitle": "Uložit peníze do cechovní pokladny",
+      "guildWithdrawGoldTitle": "Vybrat peníze z cechovní pokladny",
+      "guildGoldAvailable": "K dispozici: {amount}",
+      "guildBuyConfirm": "Koupit {count} dalších slotů cechovní banky za {price} z cechovní pokladny?",
+      "guildBuyNote": "Placeno z cechovní pokladny",
+      "guildTreasuryShort": "Nedostatek v pokladně",
+      "guildOpenBank": "Otevřít cechovní banku",
+      "guildOpenConfirm": "Otevřít cechovní banku za {price}? Platí se to z tvých vlastních peněz.",
+      "guildOpenAccept": "Otevřít",
+      "guildOpenNote": "Placeno z tvých vlastních peněz, ne z cechovní pokladny",
+      "guildPurseShort": "Nedostatek peněz",
+      "guildDormantNote": "Uzamčené předměty nelze vybrat a brání rozpuštění cechu.",
+      "guildDormantHint": "Tento předmět je v cechovní bance uzamčen a nelze ho vybrat.",
+      "guildDormantAria": "{item}, množství {count}, nelze vybrat",
+      "guildUnknownItem": "Neznámý předmět",
+      "guildDepositHint": "Kliknutím uložíš do cechovní banky",
+      "guildCannotDeposit": "Nelze vložit do cechovní banky",
+      "guildGoldCannotMove": "Tuto částku teď nelze přesunout.",
+      "guildViewsAria": "Zobrazení cechovní banky",
+      "guildContentsTab": "Obsah",
+      "guildLogTab": "Deník",
+      "logAria": "Deník aktivity cechovní banky",
+      "logNote": "{count} nejnovějších akcí cechovní banky.",
+      "logLoading": "Načítání deníku cechovní banky...",
+      "logEmpty": "Do cechovní banky ani z ní se zatím nic nepřesunulo.",
+      "logRefused": "Deník cechovní banky smí číst pouze důstojníci.",
+      "logFormerMember": "Bývalý člen cechu",
+      "logDepositItem": "{actor}: vklad {count}x {item}",
+      "logWithdrawItem": "{actor}: výběr {count}x {item}",
+      "logDepositMoney": "{actor}: vklad {amount}",
+      "logWithdrawMoney": "{actor}: výběr {amount}",
+      "logBuySlots": "{actor}: nákup rozšíření banky za {amount}",
+      "logOpenBank": "{actor}: otevření cechovní banky za {amount}",
+      "logCharterFee": "{actor}: úhrada cechovního zakládacího poplatku {amount}",
+      "logAdminPurge": "Administrátor: odstranění {count}x {item}"
     },
     "calendar": {
       "title": "Kalendář událostí",
@@ -2705,8 +2729,8 @@ export const cs_CZ: EnTranslations = {
     "crafting": {
       "title": "Výroba",
       "close": "Zavřít výrobu",
-      "dialogOption": "Crafting",
-      "dialogOptionAria": "Open the crafting window for {craft}",
+      "dialogOption": "Výroba",
+      "dialogOptionAria": "Otevřít okno výroby pro {craft}",
       "craft": "Vyrobit",
       "reagentsNeeded": "Vyžaduje:",
       "reagentLine": "{name} x{have}/{required}",
@@ -3016,7 +3040,7 @@ export const cs_CZ: EnTranslations = {
       "countLabel": "{earned}/{total} skutků",
       "completionAria": "Vykonáno {earned} z {total} skutků",
       "recentLabel": "Nedávné:",
-      "recentJumpAria": "Jump to {name}",
+      "recentJumpAria": "Přejít na {name}",
       "nearestLabel": "Skoro tam:",
       "filterGroupAria": "Filtrovat skutky",
       "filterAll": "Vše",
@@ -6212,16 +6236,16 @@ export const cs_CZ: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "checkingTitle": "Checking for updates...",
-      "checkingBody": "New versions download while you play.",
-      "uptodateTitle": "You're up to date",
+      "checkingTitle": "Kontrola aktualizací...",
+      "checkingBody": "Nové verze se stahují, zatímco hraješ.",
+      "uptodateTitle": "Máš aktuální verzi",
       "downloadingTitle": "Stahuje se aktualizace {version}...",
-      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "downloadingBody": "Můžeš dál hrát. Nainstaluje se, až hru ukončíš.",
       "readyTitle": "Aktualizace {version} je připravena",
       "readyBody": "Nainstaluje se při ukončení, nebo restartuj hned.",
       "restart": "Restartovat hned",
       "later": "Později",
-      "dismiss": "Dismiss"
+      "dismiss": "Zavřít"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -6687,6 +6711,11 @@ export const cs_CZ: EnTranslations = {
     },
     "system": {
       "playerDeath": "Zemřel(a) jsi.",
+      "deathRecapKillerAbility": "Tvá postava zemřela. Příčina: {ability} od {killer}.",
+      "deathRecapKiller": "Tvá postava zemřela. Příčina: {killer}.",
+      "deathRecapAbility": "Tvá postava zemřela. Příčina: {ability}.",
+      "deathRecapFalling": "Tvá postava zemřela. Spadla k smrti.",
+      "deathRecapDrowned": "Tvá postava zemřela. Utopila se.",
       "respawn": "Cítíš se odpočatě a znovu celý(á).",
       "ignoringChat": "Ignoruješ chat od {name}.",
       "noLongerIgnoring": "Už neignoruješ {name}.",
@@ -7177,6 +7206,7 @@ export const cs_CZ: EnTranslations = {
       "quest": "Úkolový předmět",
       "junk": "Odpad",
       "fineMaterial": "Jemný materiál",
+      "material": "Materiál",
       "food": "Jídlo",
       "drink": "Nápoj",
       "tool": "Nástroj",
@@ -7209,6 +7239,9 @@ export const cs_CZ: EnTranslations = {
       "useFood": "Použití: Obnoví {amount} zdraví během {seconds} s. Při jídle musíš zůstat sedět.",
       "useDrink": "Použití: Obnoví {amount} many během {seconds} s. Při pití musíš zůstat sedět.",
       "questItem": "Úkolový předmět",
+      "questRelated": "Úkol: {quest}",
+      "questRules": "Nelze prodat, uložit do banky ani směnit.",
+      "questOrphaned": "Není potřeba pro žádný aktivní úkol.",
       "classes": "Třídy: {classes}",
       "sellPrice": "Prodejní cena: {money}",
       "clickBuy": "Kliknutím koupíš",
@@ -7344,12 +7377,12 @@ export const cs_CZ: EnTranslations = {
       "reclaim": "Získat zpět",
       "buyAria": "Koupit {item} za {price}",
       "reclaimAria": "Získat zpět {item}",
-      "buyConfirmTitle": "Confirm Purchase",
-      "buyConfirmBody": "Buy {item} for {price}?",
-      "buyConfirmBodyStack": "Buy {item} x{count} for {price} ({each} each)?",
-      "buyConfirmAccept": "Buy",
-      "buyConfirmCancel": "Cancel",
-      "buyChanged": "That listing changed before you confirmed. Check the price and try again.",
+      "buyConfirmTitle": "Potvrdit nákup",
+      "buyConfirmBody": "Koupit {item} za {price}?",
+      "buyConfirmBodyStack": "Koupit {item} x{count} za {price} (každý {each})?",
+      "buyConfirmAccept": "Koupit",
+      "buyConfirmCancel": "Zrušit",
+      "buyChanged": "Tato nabídka se před potvrzením změnila. Zkontroluj cenu a zkus to znovu.",
       "sellNote": "Nabídni zboží ze svých batohů. Obchodník si při prodeji vezme provizi {cut} %. Používáš {used}/{max} slotů pro nabídky.",
       "sellPickEmpty": "Klikni na předmět v batozích a vyber, co chceš prodat.",
       "quantity": "Množství",
@@ -8837,6 +8870,18 @@ export const cs_CZ: EnTranslations = {
       "fen_muster_order": {
         "name": "Fenbridgeský svolávací rozkaz"
       },
+      "firebottle": {
+        "name": "Zápalná láhev"
+      },
+      "murloc_hut": {
+        "name": "Chýše bahenních ploutví"
+      },
+      "restless_skull": {
+        "name": "Neklidná lebka"
+      },
+      "vanguard_bone": {
+        "name": "Kost předvoje"
+      },
       "mire_prowler_pelt": {
         "name": "Kožešina slatinného plížence"
       },
@@ -10112,6 +10157,9 @@ export const cs_CZ: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Klíček zapalování: Hrůzojiskra, otřásač země"
       },
+      "reins_drakemaw_raptor": {
+        "name": "Otěže raptora z Dračí tlamy"
+      },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
       },
@@ -11107,6 +11155,21 @@ export const cs_CZ: EnTranslations = {
       "spider_egg_sac": {
         "name": "Pavoučí váček vajec"
       },
+      "spider_egg": {
+        "name": "Vejce Matky snůšky"
+      },
+      "widow_hatchling": {
+        "name": "Vdoví mládě"
+      },
+      "drowned_warlord": {
+        "name": "Utopený válečný pán"
+      },
+      "brakka_wallbreaker": {
+        "name": "Brakka Hradbolam"
+      },
+      "threnos_first_voice": {
+        "name": "Threnos, První hlas"
+      },
       "grave_silt_bulwark": {
         "name": "Hradba z hrobového bahna"
       },
@@ -11286,6 +11349,18 @@ export const cs_CZ: EnTranslations = {
       },
       "cindraleth_maw_matriarch": {
         "name": "Cindraleth, matriarcha Tlamy"
+      },
+      "dragonkin_egg": {
+        "name": "Dračí vejce"
+      },
+      "dragonkin_whelp": {
+        "name": "Dračí mládě"
+      },
+      "dragonkin_broodguard": {
+        "name": "Strážce dračí líhně"
+      },
+      "drakemaw_broodlord": {
+        "name": "Pán líhně Dračí tlamy"
       },
       "gilded_stag": {
         "name": "Pozlacený jelen"
@@ -12319,7 +12394,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Bez odpočinku v rákosí",
-        "text": "Rituál na těch kadidelnicích váže utopené, aby povstali všude, kam dosáhne močál, a močál dosáhne všude. V tomhle rákosí nebude klid, dokud mrtví nepřevýší živé. Rituál zatím zrušit neumíme, ale můžeme ho zbavit vojáků. Ulož k odpočinku dalších 14 utopených mrtvých.",
+        "text": "Obřad na těch kadidelnicích nutí utopené vstávat a teď mezi nimi pozvedl jednoho dost silného, aby je vedl. Strážci mu říkají Utopený válečný pán, a dokud drží Utopenou kapli, mrtví drží řady. Zlom ho, {playerName}, a zbytek se rozprchne zpět do bažiny.",
         "completion": "Dáváš mrtvým víc milosti, než jim kdy dali jejich páni. Vezmi si tohle, víc než sis to zasloužil.",
         "objectives": {
           "0": {
@@ -12597,9 +12672,6 @@ export const cs_CZ: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Fanatik kultu draka zabit"
-          },
-          "1": {
-            "label": "Rozkazy kultu draka"
           }
         }
       },
@@ -12610,9 +12682,6 @@ export const cs_CZ: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Nekromant kultu draka zabit"
-          },
-          "1": {
-            "label": "Rituální fylakterie"
           }
         }
       },

@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.deeds.recentJumpAria': '{name}へ移動',
   'hudChrome.targetAuras.all': 'すべて',
   'hudChrome.actionBar.done': '完了',
   'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
@@ -1092,6 +1093,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.browserEffectsMinimal': '最小',
   'hudChrome.options.browserEffectsNote':
     '自動はブラウザとデバイスに応じて、負荷の高い CSS エフェクト（ぼかし・グロー・背景アニメーション）を抑えます。動作が重い場合は手動で下げてください。',
+  'hudChrome.options.graphicsApply': 'グラフィックを適用',
+  'hudChrome.options.graphicsApplying': 'グラフィック設定を適用中...',
+  'hudChrome.options.graphicsApplied': 'グラフィック設定を適用しました。',
+  'hudChrome.options.graphicsSaved':
+    'グラフィック設定を保存しました。現在のレンダラーはすでに同じ設定です。',
+  'hudChrome.options.graphicsFailed':
+    'グラフィック設定を適用できませんでした。以前の設定は引き続き有効です。',
+  'hudChrome.options.graphicsRetry': 'グラフィックを再試行',
+  'hudChrome.options.graphicsFatal':
+    'グラフィックの復旧に失敗しました。続行するにはゲームを再読み込みしてください。',
+  'hudChrome.options.graphicsReload': 'ゲームを再読み込み',
+  'hudChrome.options.graphicsDraftChanged': 'グラフィックの変更を適用できます。',
   'hudChrome.options.footstepSounds': '足音',
   'hudChrome.options.interfaceSounds': 'インターフェースとフィードバック音',
   'hudChrome.options.clickFeedback': 'クリックマーカー',
@@ -1111,6 +1124,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showItemLevel': 'アイテムレベルを表示',
   'hudChrome.options.showSecondaryActionBar': 'セカンダリアクションバーを表示',
   'hudChrome.options.showThirdActionBar': '3本目のアクションバーを表示',
+  'hudChrome.options.lockActionBars': 'アクションバーをロック',
   'hudChrome.options.showDailyRewardsChest': 'デイリー報酬の宝箱を表示',
   'hudChrome.options.mobileCameraJoystick': 'カメラスティック',
   'hudChrome.options.mobileLeftHanded': '左利き用レイアウト',
@@ -1119,6 +1133,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.landing.highContrast': '高コントラスト',
   'hudChrome.landing.highContrastAria':
     '高コントラスト背景を切り替えます。動画トレーラーを無効にして、スタート画面のテキストを読みやすくします',
+  'hudChrome.landing.browserSupport.title': 'ご注意：サポート対象外のブラウザです',
+  'hudChrome.landing.browserSupport.body':
+    'このブラウザではパフォーマンスが低下する場合があります。最高の体験のために、Windows、macOS、Linux 向けデスクトップアプリの入手をお勧めします。ブラウザでのプレイをご希望ですか？Chrome が最もパフォーマンスに優れ、Firefox と Safari もサポートされています。',
+  'hudChrome.landing.browserSupport.getDesktopApp': 'デスクトップアプリを入手',
+  'hudChrome.landing.browserSupport.continueInBrowser': 'ブラウザで続ける',
+  'hudChrome.landing.browserSupport.dismissAria': 'サポート対象外ブラウザの通知を閉じる',
   'hudChrome.talents.defaultBuildName': 'ビルド {n}',
   'hudChrome.tips.joinChannels':
     'ヒント：/join world または /join lfg と入力すると、ワールド全体のプレイヤーとチャットできます。',
@@ -2024,6 +2044,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.combat.auraAfflicted': '{target}は{name}を受けています。',
   'hud.combat.auraGainOther': '{target}は{name}を得ました。',
   'hud.system.playerDeath': '死亡しました。',
+  'hud.system.deathRecapKillerAbility': '死亡しました。{killer}の{ability}に倒されました。',
+  'hud.system.deathRecapKiller': '死亡しました。{killer}に倒されました。',
+  'hud.system.deathRecapAbility': '死亡しました。{ability}によって死亡しました。',
+  'hud.system.deathRecapFalling': '死亡しました。転落死しました。',
+  'hud.system.deathRecapDrowned': '死亡しました。溺死しました。',
   'hud.system.respawn': '再び休まり、完全な状態になりました。',
   'hud.system.ignoringChat': '{name}のチャットを無視します。',
   'hud.system.noLongerIgnoring': '{name}の無視を解除しました。',
@@ -2433,6 +2458,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.quest': 'クエストアイテム',
   'itemUi.kind.junk': '雑貨',
   'itemUi.kind.fineMaterial': '上質な素材',
+  'itemUi.kind.material': '素材',
   'itemUi.kind.food': '食べ物',
   'itemUi.kind.drink': '飲み物',
   'itemUi.kind.tool': '道具',
@@ -2462,6 +2488,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useDrink':
     '使用: {seconds}秒かけてマナを{amount}回復します。飲んでいる間は座ったままでいる必要があります。',
   'itemUi.tooltip.questItem': 'クエストアイテム',
+  'itemUi.tooltip.questRelated': 'クエスト：{quest}',
+  'itemUi.tooltip.questRules': '売却、銀行預け入れ、取引はできません。',
+  'itemUi.tooltip.questOrphaned': '進行中のクエストでは必要ありません。',
   'itemUi.tooltip.classes': 'クラス: {classes}',
   'itemUi.tooltip.sellPrice': '売却価格: {money}',
   'itemUi.tooltip.clickBuy': 'クリックして購入',
@@ -3461,6 +3490,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.deepfen_murloc.name': 'ディープフェンのスナッパー',
   'entities.mobs.mire_widow.name': 'マイアフェンのウィドウ',
   'entities.mobs.mirefen_broodmother.name': '群れの母',
+  'entities.mobs.spider_egg.name': '群れの母の卵',
+  'entities.mobs.widow_hatchling.name': 'ウィドウの幼体',
+  'entities.mobs.drowned_warlord.name': '溺れの武将',
+  'entities.mobs.brakka_wallbreaker.name': '壁砕きのブラッカ',
+  'entities.mobs.threnos_first_voice.name': '第一の声スレノス',
+  'entities.items.firebottle.name': '火炎瓶',
+  'entities.items.murloc_hut.name': '泥ひれの小屋',
+  'entities.items.restless_skull.name': '安らがぬ頭蓋骨',
+  'entities.items.vanguard_bone.name': '先兵の骨',
   'entities.mobs.drowned_dead.name': '溺れ死者',
   'entities.mobs.fen_troll.name': 'マイアフェン・トロル',
   'entities.mobs.grubjaw.name': '大食いグラブジョー',
@@ -3834,7 +3872,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_drowned_censers.objectives.0.label': '錆びた香炉',
   'entities.quests.q_no_rest.title': '葦の中に安息なし',
   'entities.quests.q_no_rest.text':
-    'その儀式は湿地が触れる場所で溺死者を起こします。まだ壊せませんが、兵を14体減らせます。',
+    'その香炉の儀式は溺れ死者を起こします。そして今、彼らを率いるほど強い者まで蘇らせました。番人たちは彼を「溺れの武将」と呼びます。彼が沈んだ礼拝堂を占める限り、死者は隊列を崩しません。{playerName}、彼を打ち倒してください。残りは泥沼へ散り散りに戻るはずです。',
   'entities.quests.q_no_rest.completion':
     'あなたは死者に、主たちより多くの慈悲を与えました。受け取ってください。',
   'entities.quests.q_no_rest.objectives.0.label': '溺れ死者を安息させる',
@@ -3995,14 +4033,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     'この筆跡はモーセンの魔導書と同じです。すべての墓を導いた同じ手です、{playerName}。',
   'entities.quests.q_cult_orders.objectives.0.label': 'ワーム教団の狂信者を討伐',
-  'entities.quests.q_cult_orders.objectives.1.label': 'ワーム教団の命令書',
   'entities.quests.q_necromancers.title': '経箱の輪',
   'entities.quests.q_necromancers.text':
     '命令は経箱の輪を語っています。{playerName}、聖所を養う魂の器です。死霊術師を8人倒し、3つを壊さず持ってきてください。',
   'entities.quests.q_necromancers.completion':
     '光よ、赦したまえ。谷と湿地の死者が入っています。{playerName}、これは軍ではなく、貢ぎ物でした。',
   'entities.quests.q_necromancers.objectives.0.label': 'ワーム教団の死霊術師を討伐',
-  'entities.quests.q_necromancers.objectives.1.label': '儀式の経箱',
   'entities.quests.q_revenants.title': '亡霊の野',
   'entities.quests.q_revenants.text':
     '聖所道の東には古い戦場があります。教団は錆びた甲冑の骨を起こしました。{playerName}、12体を土へ戻してください。',
@@ -8156,6 +8192,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_aether_hover_cycle.name': '起動キー：エーテルジャウスター・ホバーサイクル',
   'entities.items.reins_shadowjump_toad.name': '影跳びのカマカゲの手綱',
   'entities.items.reins_stormfeather_griffin.name': 'スカイリーチ・ストームフェザーの手綱',
+  'entities.items.reins_drakemaw_raptor.name': '火口のラプトルの手綱',
   'entities.items.reins_thunderstrut_gobbler.name': '大七面鳥サンダーストラットの手綱',
   'entities.mobs.drowned_cantor.name': '溺れた聖歌者',
   'entities.mobs.reedbound_acolyte.name': '葦縛りの信徒',
@@ -8644,6 +8681,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.makersMark': '製作者：{name}',
   'hudChrome.bags.itemAriaInstanced': '{item}、数量 {count}、銘入りの品',
   'hudChrome.bags.itemAriaMasterwork': '{item}、数量 {count}、傑作',
+  'hudChrome.bags.itemAriaQuest': '{item}、数量 {count}、クエストアイテム',
+  'hudChrome.bags.filterQuestCountAria': 'クエスト、{count} 個のアイテム',
+  'hudChrome.bags.noQuestItems': 'バッグにクエストアイテムはありません。',
   'hudChrome.crafting.gatheredBy': '採集者：{name}',
   'hudChrome.crafting.masterworkSeal': '傑作',
   'hudChrome.crafting.stationRequired': 'それを製作するには{station}にいる必要があります。',
@@ -8962,6 +9002,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.sortAria': '銀行のアイテムを並べ替える',
   'hudChrome.bank.searchAria': '名前で銀行のアイテムを検索',
   'hudChrome.bank.depositAll': 'すべての素材を預ける',
+  'hudChrome.bank.depositAllTooltip':
+    'カバン内の製作素材とがらくたをまとめて銀行に預けます。採集用道具、装備中の防具、クエストアイテム、消耗品は対象外です。',
   'hudChrome.bank.depositAllDone': '素材を預けました：{count}。',
   'hudChrome.bank.depositAllFull': '素材を預けました：{count}。銀行がいっぱいになりました。',
   'hudChrome.bank.depositAllNone': '銀行がいっぱいです：何も預けられませんでした。',
@@ -9314,6 +9356,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_aether_hover_cycle': 'エーテルジャウスター・ホバーサイクル',
   'hudChrome.mounts.name_shadowjump_toad': '影跳びのカマカゲ',
   'hudChrome.mounts.name_stormfeather_griffin': 'スカイリーチ・ストームフェザー',
+  'hudChrome.mounts.name_drakemaw_raptor': '火口のラプトル',
+  'hudChrome.mounts.desc_drakemaw_raptor':
+    '火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '大七面鳥サンダーストラット',
   'hudChrome.mounts.name_terrorspark_groundshaker': '地揺らしのテラースパーク',
   'hudChrome.mounts.desc_valorsteed': '頑健で足取り確かな駿馬。移動速度を高める。',
@@ -10096,6 +10141,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.apprentice_wren.name': '見習いレン',
   'entities.mobs.barrow_wight.name': '塚のワイト',
   'entities.mobs.castaway_navigator.name': '航海士スリ',
+  'entities.mobs.dragonkin_egg.name': 'ドラゴンキンの卵',
+  'entities.mobs.dragonkin_whelp.name': 'ドラゴンキンの仔',
+  'entities.mobs.dragonkin_broodguard.name': 'ドラゴンキンの巣守り',
+  'entities.mobs.drakemaw_broodlord.name': '火口の巣主',
   'entities.mobs.cindraleth_maw_matriarch.name': 'シンドラレス、火口の母竜',
   'entities.mobs.drowned_deckhand.name': '溺れた甲板員',
   'entities.mobs.fisher_bram.name': '漁師ブラム',
@@ -10889,6 +10938,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '付与は素材を消費し、特定の一品に印を付けます。鞄の中の品に使えば別個の付与済みの品が返り、装備中の品に使えばその場で付与され、外して着け直す必要はありません。どちらでも効果は永遠にその品に付き従います。一品にひとつ。付与済みの品に別の付与を使うと確認のうえ古い付与をそのまま置き換え、古い付与は素材の返却なしに破棄されます。売却、破棄、分解はどれも無印の品を先に選ぶので、完成品がうっかり食われることはありません。同一の付与品同士は重ねられます。傑作とエンチャントは友人です。傑作は問題なく付与でき、効果は傑作ボーナスにも署名にも触れず上乗せされます。全部を積んだ署名入り傑作のGreater付与が工芸品の頂点で、それでも設計上レイド戦利品の下に座ります。付与済みや署名入りの品も世界市場に出せます。一品ずつの単品出品となり、ツールチップには付与と作り手の銘が表示され、ワタリガラス便でも同じように送れます。素材は今も商いの堅実な半分です。粉、エッセンス、シャードは自由に出品でき、出品無料、手数料は成立時の5%だけです。',
   'hudChrome.corpseHarvest.components.meat': '肉',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat}（エンチャント）',
+  'hudChrome.materialHint.cookingCatch': '料理材料。食べる前に調理が必要です。',
   'hudChrome.materialHint.fineGrade':
     '上質な等級。素材より上位の道具で満位の採取地から採ったもので、通常版が求められる場所ではそのまま代用できます。',
   'hudChrome.materialHint.arcaneDust':

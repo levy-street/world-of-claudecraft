@@ -7,6 +7,56 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const de_DE: Record<string, string> = {
+  'error.guildBankDeleting':
+    'Diese Gilde wird gerade gelöscht, daher ist ihre Bank geschlossen. Es wurde nichts geändert.',
+  'error.guildBankItemRequired':
+    'Geben Sie die Gegenstands-ID ein, die dieses Fach enthalten soll.',
+  'error.guildBankNoCarrier':
+    'Ein Mitglied dieser Gilde muss online sein, damit die Änderung gespeichert werden kann.',
+  'error.guildBankNotLoaded': 'Die Bank dieser Gilde ist derzeit auf dieser Welt nicht geladen.',
+  'error.guildBankPurgeRefused': 'Die Änderung an der Gildenbank wurde abgelehnt.',
+  'error.guildBankSaveFailed':
+    'Die Änderung konnte nicht gespeichert werden und wurde zurückgesetzt. Versuchen Sie es in Kürze erneut.',
+  'error.guildBankSlotNotStuck':
+    'Dieses Fach enthält einen gewöhnlichen Gegenstand, den die Gilde selbst entnehmen kann, daher kann er hier nicht entfernt werden.',
+  'error.guildBankSlotRequired':
+    'Geben Sie die Nummer des zu entfernenden Fachs der Gildenbank ein.',
+  'guilds.bankColCount': 'Anzahl',
+  'guilds.bankColItem': 'Gegenstand',
+  'guilds.bankColSlot': 'Fach',
+  'guilds.bankColStatus': 'Status',
+  'guilds.bankDormantCount': 'Blockierte Gegenstände',
+  'guilds.bankEmpty': 'Diese Gildenbank enthält keine Gegenstände.',
+  'guilds.bankLoadFailed': 'Das Laden dieser Gildenbank ist fehlgeschlagen.',
+  'guilds.bankPurgeAction': 'Gegenstand entfernen',
+  'guilds.bankPurgeCarrierWarning':
+    'Die Änderung wird über ein online befindliches Mitglied dieser Gilde gespeichert. Wird das Speichern im seltenen Fall abgelehnt, wird dieses Mitglied getrennt und verbindet sich neu, ohne dass etwas dauerhaft verloren geht.',
+  'guilds.bankPurgeClose': 'Dialog zum Entfernen des Gegenstands schließen',
+  'guilds.bankPurgeConfirm': 'Gegenstand entfernen',
+  'guilds.bankPurgeConfirmation': 'Ich bestätige, dass dieser Gegenstand zerstört werden soll.',
+  'guilds.bankPurgeFailed': 'Der Gegenstand konnte nicht entfernt werden.',
+  'guilds.bankPurgeItemRequired': 'Dieses Fach hat keine Gegenstands-ID zum Abgleichen.',
+  'guilds.bankPurgeReasonPlaceholder': 'Interner Moderationsgrund',
+  'guilds.bankPurgeReasonRequired': 'Geben Sie einen Moderationsgrund ein.',
+  'guilds.bankPurgeReasonTooLong': 'Kürzen Sie den Moderationsgrund auf höchstens 500 Zeichen.',
+  'guilds.bankPurgeSlotRequired': 'Wählen Sie ein zu entfernendes Fach der Gildenbank.',
+  'guilds.bankPurgeTitle': 'Einen blockierten Gegenstand aus der Gildenbank entfernen',
+  'guilds.bankPurgeUnaudited':
+    'Der Gegenstand wurde entfernt, aber der Moderationsprotokoll-Eintrag konnte nicht geschrieben werden. Bitte melden Sie dies.',
+  'guilds.bankPurgeWarning':
+    'Dies zerstört den Gegenstand dauerhaft. Es gibt kein Rückgängigmachen im Spiel, und die Gilde kann ihn nicht zurückerhalten.',
+  'guilds.bankPurging': 'Wird entfernt...',
+  'guilds.bankRefresh': 'Bank aktualisieren',
+  'guilds.bankSlotsUsed': 'Belegte Fächer',
+  'guilds.bankSlotsUsedValue': '{used} von {capacity}',
+  'guilds.bankStatusNormal': 'Entnehmbar',
+  'guilds.bankStatusStuck': 'Blockiert',
+  'guilds.bankStuckExplainer':
+    'Ein blockierter Gegenstand kann in keine Richtung bewegt werden, sodass die Gilde ihre Bank nie leeren oder sich auflösen kann, solange er dort liegt. Das Entfernen zerstört den Gegenstand dauerhaft.',
+  'guilds.bankTitle': 'Gildenbank',
+  'guilds.bankTreasury': 'Gildenkasse',
+  'guilds.bankUnopened': 'Diese Gilde hat ihre Bank noch nicht eröffnet.',
+  'moderationHistory.actionGuildBankPurge': 'Gildenbank-Bereinigung',
   'onlinePlayers.autoRefresh': 'Automatisch aktualisieren ({minutes} Min.)',
   'onlinePlayers.count': '{count} Spieler online',
   'onlinePlayers.countFiltered': '{shown} von {total} online',

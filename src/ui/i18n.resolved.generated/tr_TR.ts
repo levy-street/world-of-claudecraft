@@ -998,6 +998,7 @@ export const tr_TR: EnTranslations = {
       "name_stormfeather_griffin": "Gökyüzü Erişimli Fırtınatüy",
       "name_thunderstrut_gobbler": "Gürlemeadım, Büyük Hindi",
       "name_terrorspark_groundshaker": "Dehşetkıvılcım, Yer Sarsan",
+      "name_drakemaw_raptor": "Ejder Ağzı Raptoru",
       "desc_valorsteed": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir küheylan.",
       "desc_grag_bear": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir ayı.",
       "desc_stalkglider_snail": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve yavaş yanan bir salyangoz.",
@@ -1005,7 +1006,8 @@ export const tr_TR: EnTranslations = {
       "desc_shadowjump_toad": "Her arazi türünü aşan, şimşek hızındaki gölgeli sıçramalarla eğitilmiş, dev ve sağlam adımlı bir kurbağa.",
       "desc_stormfeather_griffin": "Rün nallı pençeleriyle yerde süzülen, kanatları katlı, asil bir fırtına grifonu.",
       "desc_thunderstrut_gobbler": "Uyanan Zirve'den kabararak inen, kuyruğu bir fırtına bulutu gibi açılmış devasa bir fırtına hindisi.",
-      "desc_terrorspark_groundshaker": "Ağır paletleri, büyük çaplı bir topu ve korkusuz pilotlar için yapılmış bir eyeri olan kompakt zırhlı bir makine."
+      "desc_terrorspark_groundshaker": "Ağır paletleri, büyük çaplı bir topu ve korkusuz pilotlar için yapılmış bir eyeri olan kompakt zırhlı bir makine.",
+      "desc_drakemaw_raptor": "Ejder Ağzı Kalderası'ndan gelen, eyere alıştırılmış bir yuva raptoru: tepeden tırnağa kas ve hız, hâlâ hafiften kül kokuyor."
     },
     "mountTraining": {
       "mountPrompt": "Eğitim Yiğit Küheylanına binmek için {key} tuşuna bas.",
@@ -1246,6 +1248,15 @@ export const tr_TR: EnTranslations = {
       "browserEffectsReduced": "Azaltılmış",
       "browserEffectsMinimal": "En Az",
       "browserEffectsNote": "Otomatik, tarayıcınıza ve cihazınıza göre ağır CSS efektlerini (bulanıklık, parıltı, arka plan hareketi) azaltır. Arayüz yavaş hissettiriyorsa elle düşürün.",
+      "graphicsApply": "Grafikleri Uygula",
+      "graphicsApplying": "Grafik ayarları uygulanıyor...",
+      "graphicsApplied": "Grafik ayarları uygulandı.",
+      "graphicsSaved": "Grafik ayarları kaydedildi. Etkin oluşturucu zaten bu ayarlarla eşleşiyor.",
+      "graphicsFailed": "Grafikler uygulanamadı. Önceki ayarların hâlâ etkin.",
+      "graphicsRetry": "Grafikleri Tekrar Dene",
+      "graphicsFatal": "Grafik kurtarma başarısız oldu. Devam etmek için oyunu yeniden yükle.",
+      "graphicsReload": "Oyunu Yeniden Yükle",
+      "graphicsDraftChanged": "Grafik değişiklikleri uygulanmaya hazır.",
       "interfaceMode": "Arayüz Modu",
       "interfaceModeAuto": "Otomatik",
       "interfaceModeDesktop": "Masaüstü",
@@ -1276,6 +1287,7 @@ export const tr_TR: EnTranslations = {
       "itemScoreLine": "Puan {score}",
       "showSecondaryActionBar": "İkincil Eylem Çubuğunu Göster",
       "showThirdActionBar": "Üçüncü Eylem Çubuğunu Göster",
+      "lockActionBars": "Eylem Çubuklarını Kilitle",
       "showTargetOfTarget": "Hedefin Hedefini Göster",
       "showAttackButton": "Saldırı Düğmesini Göster",
       "showDailyRewardsChest": "Günlük Ödül Sandığını Göster",
@@ -1437,7 +1449,14 @@ export const tr_TR: EnTranslations = {
     },
     "landing": {
       "highContrast": "Yüksek Kontrast",
-      "highContrastAria": "Yüksek kontrastlı arka planı aç/kapat: hareketli tanıtımı devre dışı bırakır, böylece başlangıç ekranı metni okunaklı kalır"
+      "highContrastAria": "Yüksek kontrastlı arka planı aç/kapat: hareketli tanıtımı devre dışı bırakır, böylece başlangıç ekranı metni okunaklı kalır",
+      "browserSupport": {
+        "title": "Dikkat: desteklenmeyen tarayıcı",
+        "body": "Bu tarayıcıda performans düşüklüğü yaşayabilirsin. En iyi deneyim için Windows, macOS veya Linux masaüstü uygulamasını indir. Tarayıcıda oynamayı mı tercih edersin? Chrome en iyi performansı verir, Firefox ve Safari da desteklenir.",
+        "getDesktopApp": "Masaüstü uygulamasını indir",
+        "continueInBrowser": "Tarayıcıda devam et",
+        "dismissAria": "Desteklenmeyen tarayıcı bildirimini kapat"
+      }
     },
     "warfare": {
       "honorAmount": "{amount} Onur",
@@ -1810,6 +1829,7 @@ export const tr_TR: EnTranslations = {
       "itemAriaEnchanted": "{item}, adet {count}, büyülü kopya",
       "itemAriaBound": "{item}, adet {count}, bağlı kopya",
       "itemAriaMasterwork": "{item}, adet {count}, şaheser",
+      "itemAriaQuest": "{item}, adet {count}, görev eşyası",
       "filterGroupAria": "Çantaları kategoriye göre filtrele",
       "filterAll": "Tümü",
       "filterWeapon": "Silahlar",
@@ -1818,6 +1838,7 @@ export const tr_TR: EnTranslations = {
       "filterMaterial": "Malzemeler",
       "filterTool": "Aletler",
       "filterQuest": "Görev",
+      "filterQuestCountAria": "Görev, {count} öge",
       "filterMount": "Binekler",
       "sortAria": "Çanta ögelerini sırala",
       "sortRecent": "En son",
@@ -1826,6 +1847,7 @@ export const tr_TR: EnTranslations = {
       "searchPlaceholder": "Öge ara",
       "searchAria": "Çanta ögelerini ada göre ara",
       "noMatch": "Filtrelerinizle eşleşen öge yok.",
+      "noQuestItems": "Çantalarında görev eşyası yok.",
       "capacity": "{used}/{total}",
       "capacityAria": "Kullanılan çanta yuvaları: {used} / {total}",
       "backpack": "Sırt Çantası",
@@ -2044,6 +2066,7 @@ export const tr_TR: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Kaliteli derece. Malzemenin üstünde kademelenmiş bir aletle tam kademeli bir damardan toplanır ve sıradan sürümün gerektiği her yerde onun yerine sayılır.",
+      "cookingCatch": "Pişirme malzemesi. Yemeden önce pişirilmelidir.",
       "arcaneDust": "Sıradan ve az bulunur eşyalardan büyü bozularak elde edilen büyü malzemesi.",
       "arcaneEssence": "Nadir eşyalardan büyü bozularak elde edilen büyü malzemesi.",
       "arcaneShard": "Destansı ve efsanevi eşyalardan büyü bozularak elde edilen büyü malzemesi.",
@@ -2325,7 +2348,7 @@ export const tr_TR: EnTranslations = {
       "depositHint": "Yatırmak için tıkla",
       "depositPartialHint": "Bir kısmını yatırmak için Shift ile tıkla",
       "cannotDeposit": "Bankaya konulamaz",
-      "cannotDepositNow": "Cannot be deposited right now",
+      "cannotDepositNow": "Şu anda yatırılamaz",
       "depositQuantityTitle": "{item} yatır",
       "depositQuantityInput": "Yatırılacak miktar",
       "depositQuantityConfirm": "Yatır",
@@ -2336,6 +2359,7 @@ export const tr_TR: EnTranslations = {
       "sortAria": "Banka eşyalarını sırala",
       "searchAria": "Banka eşyalarını ada göre ara",
       "depositAll": "Tüm malzemeleri yatır",
+      "depositAllTooltip": "Çantalarındaki tüm zanaat malzemelerini ve döküntü eşyaları tek seferde bankaya gönderir. Toplama aletlerine, kuşanılan teçhizata, görev eşyalarına ve sarf malzemelerine asla dokunulmaz.",
       "depositAllDone": "Yatırılan malzeme: {count}.",
       "depositAllFull": "Yatırılan malzeme: {count}. Banka artık dolu.",
       "depositAllNone": "Banka dolu: hiçbir şey yatırılmadı.",
@@ -2352,49 +2376,49 @@ export const tr_TR: EnTranslations = {
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "Bir arkadaşını davet et: arkadaşın 10. seviyeye ulaştığında ikiniz de 2 yuva kazanırsınız (en fazla 5 arkadaş).",
       "bonusSectionAria": "Bonus banka yuvaları ve daha fazlasını kazanmanın yolları",
-      "tabsAria": "Bank tabs",
-      "personalTab": "Personal",
-      "guildTab": "Guild",
-      "guildCapacityAria": "Guild bank slots used: {used} of {total}",
-      "guildEmpty": "The guild bank is empty.",
-      "guildTreasury": "Guild treasury",
-      "guildDepositGold": "Deposit money",
-      "guildWithdrawGold": "Withdraw money",
-      "guildDepositGoldTitle": "Deposit money into the guild treasury",
-      "guildWithdrawGoldTitle": "Withdraw money from the guild treasury",
-      "guildGoldAvailable": "Available: {amount}",
-      "guildBuyConfirm": "Purchase {count} additional guild bank slots for {price} from the guild treasury?",
-      "guildBuyNote": "Paid from the guild treasury",
-      "guildTreasuryShort": "Treasury short",
-      "guildOpenBank": "Open the guild bank",
-      "guildOpenConfirm": "Open the guild bank for {price}? This is paid from your own money.",
-      "guildOpenAccept": "Open",
-      "guildOpenNote": "Paid from your own money, not the guild treasury",
-      "guildPurseShort": "Not enough money",
-      "guildDormantNote": "Locked items cannot be withdrawn and prevent disbanding the guild.",
-      "guildDormantHint": "This item is locked in the guild bank and cannot be withdrawn.",
-      "guildDormantAria": "{item}, quantity {count}, cannot be withdrawn",
-      "guildUnknownItem": "Unknown item",
-      "guildDepositHint": "Click to deposit into the guild bank",
-      "guildCannotDeposit": "Cannot go in the guild bank",
-      "guildGoldCannotMove": "That amount cannot be moved right now.",
-      "guildViewsAria": "Guild bank views",
-      "guildContentsTab": "Contents",
-      "guildLogTab": "Log",
-      "logAria": "Guild bank activity log",
-      "logNote": "The {count} most recent guild bank actions.",
-      "logLoading": "Loading the guild bank log...",
-      "logEmpty": "Nothing has been moved in or out of the guild bank yet.",
-      "logRefused": "Only guild officers can read the guild bank log.",
-      "logFormerMember": "A former guild member",
-      "logDepositItem": "{actor} deposited {count} {item}",
-      "logWithdrawItem": "{actor} withdrew {count} {item}",
-      "logDepositMoney": "{actor} deposited {amount}",
-      "logWithdrawMoney": "{actor} withdrew {amount}",
-      "logBuySlots": "{actor} bought a bank expansion for {amount}",
-      "logOpenBank": "{actor} opened the guild bank for {amount}",
-      "logCharterFee": "{actor} paid the guild charter fee of {amount}",
-      "logAdminPurge": "An administrator removed {count} {item}"
+      "tabsAria": "Banka sekmeleri",
+      "personalTab": "Kişisel",
+      "guildTab": "Lonca",
+      "guildCapacityAria": "Kullanılan lonca bankası yuvaları: {used} / {total}",
+      "guildEmpty": "Lonca bankası boş.",
+      "guildTreasury": "Lonca hazinesi",
+      "guildDepositGold": "Para Yatır",
+      "guildWithdrawGold": "Para Çek",
+      "guildDepositGoldTitle": "Lonca hazinesine para yatır",
+      "guildWithdrawGoldTitle": "Lonca hazinesinden para çek",
+      "guildGoldAvailable": "Kullanılabilir: {amount}",
+      "guildBuyConfirm": "Lonca hazinesinden {price} karşılığında {count} ek lonca bankası yuvası satın alınsın mı?",
+      "guildBuyNote": "Lonca hazinesinden ödenir",
+      "guildTreasuryShort": "Hazine yetersiz",
+      "guildOpenBank": "Lonca bankasını aç",
+      "guildOpenConfirm": "Lonca bankası {price} karşılığında açılsın mı? Bu, kendi paranından ödenir.",
+      "guildOpenAccept": "Aç",
+      "guildOpenNote": "Lonca hazinesinden değil, kendi paranından ödenir",
+      "guildPurseShort": "Yeterli para yok",
+      "guildDormantNote": "Kilitli eşyalar çekilemez ve loncanın dağıtılmasını engeller.",
+      "guildDormantHint": "Bu eşya lonca bankasında kilitli ve çekilemez.",
+      "guildDormantAria": "{item}, adet {count}, çekilemez",
+      "guildUnknownItem": "Bilinmeyen eşya",
+      "guildDepositHint": "Lonca bankasına yatırmak için tıkla",
+      "guildCannotDeposit": "Lonca bankasına konulamaz",
+      "guildGoldCannotMove": "O miktar şu anda taşınamaz.",
+      "guildViewsAria": "Lonca bankası görünümleri",
+      "guildContentsTab": "İçerik",
+      "guildLogTab": "Günlük",
+      "logAria": "Lonca bankası etkinlik günlüğü",
+      "logNote": "En son {count} lonca bankası işlemi.",
+      "logLoading": "Lonca bankası günlüğü yükleniyor...",
+      "logEmpty": "Lonca bankasına henüz bir şey girmedi ya da çıkmadı.",
+      "logRefused": "Lonca bankası günlüğünü yalnızca subaylar okuyabilir.",
+      "logFormerMember": "Eski bir lonca üyesi",
+      "logDepositItem": "{actor}, {count} {item} yatırdı",
+      "logWithdrawItem": "{actor}, {count} {item} çekti",
+      "logDepositMoney": "{actor}, {amount} yatırdı",
+      "logWithdrawMoney": "{actor}, {amount} çekti",
+      "logBuySlots": "{actor}, {amount} karşılığında banka genişletmesi satın aldı",
+      "logOpenBank": "{actor}, lonca bankasını {amount} karşılığında açtı",
+      "logCharterFee": "{actor}, {amount} tutarında lonca kuruluş ücretini ödedi",
+      "logAdminPurge": "Bir yönetici {count} {item} kaldırdı"
     },
     "calendar": {
       "title": "Etkinlik Takvimi",
@@ -2705,8 +2729,8 @@ export const tr_TR: EnTranslations = {
     "crafting": {
       "title": "işçiliği",
       "close": "İşçiliği kapat",
-      "dialogOption": "Crafting",
-      "dialogOptionAria": "Open the crafting window for {craft}",
+      "dialogOption": "Üretim",
+      "dialogOptionAria": "{craft} için üretim penceresini aç",
       "craft": "Zanaat",
       "reagentsNeeded": "Gereklilikler:",
       "reagentLine": "{name}: {have}/{required}",
@@ -3016,7 +3040,7 @@ export const tr_TR: EnTranslations = {
       "countLabel": "{earned}/{total} yiğitlik",
       "completionAria": "{total} yiğitlikten {earned} tanesi kazanıldı",
       "recentLabel": "En son:",
-      "recentJumpAria": "Jump to {name}",
+      "recentJumpAria": "{name} konumuna atla",
       "nearestLabel": "Ramak kaldı:",
       "filterGroupAria": "Yiğitlikleri filtrele",
       "filterAll": "Tümü",
@@ -6212,16 +6236,16 @@ export const tr_TR: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "checkingTitle": "Checking for updates...",
-      "checkingBody": "New versions download while you play.",
-      "uptodateTitle": "You're up to date",
+      "checkingTitle": "Güncellemeler kontrol ediliyor...",
+      "checkingBody": "Yeni sürümler siz oynarken indirilir.",
+      "uptodateTitle": "En güncel sürümdesin",
       "downloadingTitle": "{version} güncellemesi indiriliyor...",
-      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "downloadingBody": "Oynamaya devam edebilirsin. Çıkış yaptığında kurulur.",
       "readyTitle": "{version} güncellemesi hazır",
       "readyBody": "Çıkış yaptığında kurulur ya da şimdi yeniden başlat.",
       "restart": "Şimdi Yeniden Başlat",
       "later": "Daha Sonra",
-      "dismiss": "Dismiss"
+      "dismiss": "Kapat"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -6687,6 +6711,11 @@ export const tr_TR: EnTranslations = {
     },
     "system": {
       "playerDeath": "Öldün.",
+      "deathRecapKillerAbility": "Öldün. {killer} tarafından {ability} ile öldürüldün.",
+      "deathRecapKiller": "Öldün. {killer} tarafından öldürüldün.",
+      "deathRecapAbility": "Öldün. {ability} tarafından öldürüldün.",
+      "deathRecapFalling": "Öldün. Düşerek can verdin.",
+      "deathRecapDrowned": "Öldün. Boğuldun.",
       "respawn": "Kendini dinlenmiş ve yeniden sapasağlam hissediyorsun.",
       "ignoringChat": "{name} oyuncusunun sohbeti görmezden geliniyor.",
       "noLongerIgnoring": "{name} artık görmezden gelinmiyor.",
@@ -7177,6 +7206,7 @@ export const tr_TR: EnTranslations = {
       "quest": "Görev Eşyası",
       "junk": "Döküntü",
       "fineMaterial": "Kaliteli Malzeme",
+      "material": "Malzeme",
       "food": "Yiyecek",
       "drink": "İçecek",
       "tool": "Alet",
@@ -7209,6 +7239,9 @@ export const tr_TR: EnTranslations = {
       "useFood": "Kullanım: {seconds} saniyede {amount} can yeniler. Yerken oturur kalmalısın.",
       "useDrink": "Kullanım: {seconds} saniyede {amount} mana yeniler. İçerken oturur kalmalısın.",
       "questItem": "Görev Eşyası",
+      "questRelated": "Görev: {quest}",
+      "questRules": "Satılamaz, bankaya konulamaz veya takas edilemez.",
+      "questOrphaned": "Aktif hiçbir görev için gerekli değil.",
       "classes": "Sınıflar: {classes}",
       "sellPrice": "Satış fiyatı: {money}",
       "clickBuy": "Satın almak için tıkla",
@@ -7344,12 +7377,12 @@ export const tr_TR: EnTranslations = {
       "reclaim": "Geri al",
       "buyAria": "{item} eşyasını {price} karşılığında satın al",
       "reclaimAria": "{item} eşyasını geri al",
-      "buyConfirmTitle": "Confirm Purchase",
-      "buyConfirmBody": "Buy {item} for {price}?",
-      "buyConfirmBodyStack": "Buy {item} x{count} for {price} ({each} each)?",
-      "buyConfirmAccept": "Buy",
-      "buyConfirmCancel": "Cancel",
-      "buyChanged": "That listing changed before you confirmed. Check the price and try again.",
+      "buyConfirmTitle": "Satın Alma İşlemini Onayla",
+      "buyConfirmBody": "{item}, {price} karşılığında satın alınsın mı?",
+      "buyConfirmBodyStack": "{item} x{count}, {price} karşılığında (her biri {each}) satın alınsın mı?",
+      "buyConfirmAccept": "Satın Al",
+      "buyConfirmCancel": "İptal",
+      "buyChanged": "Bu ilan sen onaylamadan önce değişti. Fiyatı kontrol et ve tekrar dene.",
       "sellNote": "Çantalarınızdaki malları satışa koyun. Bir eşya satıldığında Tüccar %{cut} pay alır. {max} ilan yuvasından {used} tanesini kullanıyorsunuz.",
       "sellPickEmpty": "Satılacak eşyayı seçmek için çantalarınızdaki bir eşyaya tıklayın.",
       "quantity": "Miktar",
@@ -8837,6 +8870,18 @@ export const tr_TR: EnTranslations = {
       "fen_muster_order": {
         "name": "Fenbridge Seferberlik Emri"
       },
+      "firebottle": {
+        "name": "Ateş Şişesi"
+      },
+      "murloc_hut": {
+        "name": "Mudfin Kulübesi"
+      },
+      "restless_skull": {
+        "name": "Huzursuz Kafatası"
+      },
+      "vanguard_bone": {
+        "name": "Öncü Kemiği"
+      },
       "mire_prowler_pelt": {
         "name": "Bataklık Sinsisi Postu"
       },
@@ -10112,6 +10157,9 @@ export const tr_TR: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Kontak Anahtarı: Dehşetkıvılcım, Yer Sarsan"
       },
+      "reins_drakemaw_raptor": {
+        "name": "Ejder Ağzı Raptoru'nun Dizginleri"
+      },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"
       },
@@ -11107,6 +11155,21 @@ export const tr_TR: EnTranslations = {
       "spider_egg_sac": {
         "name": "Örümcek Yumurta Kesesi"
       },
+      "spider_egg": {
+        "name": "Kuluçka Anası Yumurtası"
+      },
+      "widow_hatchling": {
+        "name": "Dul Yumurcağı"
+      },
+      "drowned_warlord": {
+        "name": "Boğulmuş Savaş Lordu"
+      },
+      "brakka_wallbreaker": {
+        "name": "Duvar Kıran Brakka"
+      },
+      "threnos_first_voice": {
+        "name": "İlk Ses Threnos"
+      },
       "grave_silt_bulwark": {
         "name": "Mezarbalçığı Siperi"
       },
@@ -11286,6 +11349,18 @@ export const tr_TR: EnTranslations = {
       },
       "cindraleth_maw_matriarch": {
         "name": "Ağız Anaerkili Cindraleth"
+      },
+      "dragonkin_egg": {
+        "name": "Ejder Soyu Yumurtası"
+      },
+      "dragonkin_whelp": {
+        "name": "Ejder Soyu Yavrusu"
+      },
+      "dragonkin_broodguard": {
+        "name": "Ejder Soyu Yuva Bekçisi"
+      },
+      "drakemaw_broodlord": {
+        "name": "Ejder Ağzı Yuva Lordu"
       },
       "gilded_stag": {
         "name": "Yaldızlı Geyik"
@@ -12319,7 +12394,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Sazlıkta Huzur Yok",
-        "text": "O buhurdanlıklardaki ayin, boğulmuşları bataklığın değdiği her yerde dirilmeye bağlıyor; bataklık ise her şeye değiyor. Ölüler, dirilerden fazla olana dek bu sazlıklarda huzur olmayacak. Ayini henüz bozamayız, ama onu askerlerinden boşaltabiliriz. 14 Boğulmuş Ölüyü daha huzura kavuştur.",
+        "text": "Bu buhurdanların üzerindeki ayin boğulmuşları ayağa kalkmaya zorluyor ve şimdi onlara önderlik edecek kadar güçlü birini de ayağa kaldırdı. Muhafızlar ona Boğulmuş Savaş Lordu diyor; o Boğulmuş Şapel'i elinde tuttuğu sürece ölüler saflarını korur. Onu yere ser, {playerName}, geri kalanlar bataklığa dağılıp gitsin.",
         "completion": "Ölülere, efendilerinin hiç göstermediği kadar merhamet gösteriyorsun. Şunu al; fazlasıyla hak ettin.",
         "objectives": {
           "0": {
@@ -12597,9 +12672,6 @@ export const tr_TR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Ejdertarikatı Bağnazı öldürüldü"
-          },
-          "1": {
-            "label": "Ejdertarikatı Emirleri"
           }
         }
       },
@@ -12610,9 +12682,6 @@ export const tr_TR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Ejder Tarikatı Nekromatiği öldürüldü"
-          },
-          "1": {
-            "label": "Ayinsel Filakter"
           }
         }
       },

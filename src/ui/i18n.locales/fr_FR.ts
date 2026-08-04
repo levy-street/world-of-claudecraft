@@ -13,6 +13,128 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const fr_FR: Partial<Record<TranslationKey, string>> = {
+  'hud.system.deathRecapAbility': 'Vous êtes mort. Tué par {ability}.',
+  'hud.system.deathRecapDrowned': 'Vous êtes mort. Vous vous êtes noyé.',
+  'hud.system.deathRecapFalling': 'Vous êtes mort. Vous avez fait une chute mortelle.',
+  'hud.system.deathRecapKiller': 'Vous êtes mort. Tué par {killer}.',
+  'hud.system.deathRecapKillerAbility': 'Vous êtes mort. Tué par {ability} de {killer}.',
+  'hudChrome.bags.filterQuestCountAria': 'Quête, {count} objets',
+  'hudChrome.bags.itemAriaQuest': '{item}, quantité {count}, objet de quête',
+  'hudChrome.bags.noQuestItems': 'Aucun objet de quête dans vos sacs.',
+  'hudChrome.bank.cannotDepositNow': 'Ne peut pas être déposé maintenant',
+  'hudChrome.bank.depositAllTooltip':
+    "Envoie en un seul geste tous les réactifs d'artisanat et objets de rebut de vos sacs vers la banque. Les outils de récolte, l'équipement porté, les objets de quête et les consommables ne sont jamais touchés.",
+  'hudChrome.bank.guildBuyConfirm':
+    'Acheter {count} emplacements de banque de guilde supplémentaires pour {price}, prélevés sur la trésorerie de la guilde ?',
+  'hudChrome.bank.guildBuyNote': 'Payé depuis la trésorerie de la guilde',
+  'hudChrome.bank.guildCannotDeposit': 'Ne peut pas être déposé dans la banque de guilde',
+  'hudChrome.bank.guildCapacityAria':
+    'Emplacements de banque de guilde utilisés : {used} sur {total}',
+  'hudChrome.bank.guildContentsTab': 'Contenu',
+  'hudChrome.bank.guildDepositGold': "Déposer de l'argent",
+  'hudChrome.bank.guildDepositGoldTitle': "Déposer de l'argent dans la trésorerie de la guilde",
+  'hudChrome.bank.guildDepositHint': 'Cliquez pour déposer dans la banque de guilde',
+  'hudChrome.bank.guildDormantAria': '{item}, quantité {count}, ne peut pas être retiré',
+  'hudChrome.bank.guildDormantHint':
+    'Cet objet est verrouillé dans la banque de guilde et ne peut pas être retiré.',
+  'hudChrome.bank.guildDormantNote':
+    'Les objets verrouillés ne peuvent pas être retirés et empêchent la dissolution de la guilde.',
+  'hudChrome.bank.guildEmpty': 'La banque de guilde est vide.',
+  'hudChrome.bank.guildGoldAvailable': 'Disponible : {amount}',
+  'hudChrome.bank.guildGoldCannotMove': 'Ce montant ne peut pas être déplacé pour le moment.',
+  'hudChrome.bank.guildLogTab': 'Journal',
+  'hudChrome.bank.guildOpenAccept': 'Ouvrir',
+  'hudChrome.bank.guildOpenBank': 'Ouvrir la banque de guilde',
+  'hudChrome.bank.guildOpenConfirm':
+    'Ouvrir la banque de guilde pour {price} ? Cette somme est prélevée sur votre propre argent.',
+  'hudChrome.bank.guildOpenNote':
+    'Payé avec votre propre argent, et non depuis la trésorerie de la guilde',
+  'hudChrome.bank.guildPurseShort': "Pas assez d'argent",
+  'hudChrome.bank.guildTab': 'Guilde',
+  'hudChrome.bank.guildTreasury': 'Trésorerie de la guilde',
+  'hudChrome.bank.guildTreasuryShort': 'Trésorerie insuffisante',
+  'hudChrome.bank.guildUnknownItem': 'Objet inconnu',
+  'hudChrome.bank.guildViewsAria': 'Vues de la banque de guilde',
+  'hudChrome.bank.guildWithdrawGold': "Retirer de l'argent",
+  'hudChrome.bank.guildWithdrawGoldTitle': "Retirer de l'argent de la trésorerie de la guilde",
+  'hudChrome.bank.logAdminPurge': 'Un administrateur a retiré {count} {item}',
+  'hudChrome.bank.logAria': "Journal d'activité de la banque de guilde",
+  'hudChrome.bank.logBuySlots': '{actor} a acheté une extension de banque pour {amount}',
+  'hudChrome.bank.logCharterFee': '{actor} a payé les frais de charte de guilde de {amount}',
+  'hudChrome.bank.logDepositItem': '{actor} a déposé {count} {item}',
+  'hudChrome.bank.logDepositMoney': '{actor} a déposé {amount}',
+  'hudChrome.bank.logEmpty': "Rien n'a encore été déposé ou retiré de la banque de guilde.",
+  'hudChrome.bank.logFormerMember': 'Un ancien membre de la guilde',
+  'hudChrome.bank.logLoading': 'Chargement du journal de la banque de guilde...',
+  'hudChrome.bank.logNote': 'Les {count} actions les plus récentes de la banque de guilde.',
+  'hudChrome.bank.logOpenBank': '{actor} a ouvert la banque de guilde pour {amount}',
+  'hudChrome.bank.logRefused':
+    'Seuls les officiers de la guilde peuvent consulter le journal de la banque de guilde.',
+  'hudChrome.bank.logWithdrawItem': '{actor} a retiré {count} {item}',
+  'hudChrome.bank.logWithdrawMoney': '{actor} a retiré {amount}',
+  'hudChrome.bank.personalTab': 'Personnel',
+  'hudChrome.bank.tabsAria': 'Onglets de la banque',
+  'hudChrome.crafting.dialogOption': 'Artisanat',
+  'hudChrome.crafting.dialogOptionAria': "Ouvrir la fenêtre d'artisanat pour {craft}",
+  'hudChrome.deeds.recentJumpAria': 'Aller à {name}',
+  'hudChrome.landing.browserSupport.body':
+    "Les performances peuvent être réduites dans ce navigateur. Pour la meilleure expérience, téléchargez l'application de bureau pour Windows, macOS ou Linux. Vous préférez jouer dans un navigateur ? Chrome offre les meilleures performances, et Firefox et Safari sont également pris en charge.",
+  'hudChrome.landing.browserSupport.continueInBrowser': 'Continuer dans le navigateur',
+  'hudChrome.landing.browserSupport.dismissAria': "Fermer l'avis de navigateur non pris en charge",
+  'hudChrome.landing.browserSupport.getDesktopApp': "Télécharger l'application de bureau",
+  'hudChrome.landing.browserSupport.title': 'Attention : navigateur non pris en charge',
+  'hudChrome.materialHint.cookingCatch':
+    "Ingrédient de cuisine. Doit être cuit avant d'être consommé.",
+  'hudChrome.mounts.desc_drakemaw_raptor':
+    "Un raptor de couvée dressé à la selle, originaire de la Caldeira de Drakemaw : tout en muscles et en vitesse, encore empreint d'une légère odeur de cendre.",
+  'hudChrome.mounts.name_drakemaw_raptor': 'Raptor du Drakemaw',
+  'hudChrome.options.graphicsApplied': 'Paramètres graphiques appliqués.',
+  'hudChrome.options.graphicsApply': 'Appliquer les graphismes',
+  'hudChrome.options.graphicsApplying': 'Application des paramètres graphiques...',
+  'hudChrome.options.graphicsDraftChanged':
+    'Les modifications graphiques sont prêtes à être appliquées.',
+  'hudChrome.options.graphicsFailed':
+    "Impossible d'appliquer les graphismes. Vos anciens paramètres restent actifs.",
+  'hudChrome.options.graphicsFatal':
+    'Échec de la récupération graphique. Rechargez le jeu pour continuer.',
+  'hudChrome.options.graphicsReload': 'Recharger le jeu',
+  'hudChrome.options.graphicsRetry': 'Réessayer les graphismes',
+  'hudChrome.options.graphicsSaved':
+    'Paramètres graphiques enregistrés. Le moteur de rendu actif les applique déjà.',
+  'hudChrome.options.lockActionBars': "Verrouiller les barres d'action",
+  'itemUi.kind.material': 'Matériau',
+  'itemUi.market.buyChanged':
+    'Cette annonce a changé avant votre confirmation. Vérifiez le prix et réessayez.',
+  'itemUi.market.buyConfirmAccept': 'Acheter',
+  'itemUi.market.buyConfirmBody': 'Acheter {item} pour {price} ?',
+  'itemUi.market.buyConfirmBodyStack': 'Acheter {item} x{count} pour {price} ({each} chacun) ?',
+  'itemUi.market.buyConfirmCancel': 'Annuler',
+  'itemUi.market.buyConfirmTitle': "Confirmer l'achat",
+  'itemUi.tooltip.questOrphaned': "N'est nécessaire pour aucune quête active.",
+  'itemUi.tooltip.questRelated': 'Quête : {quest}',
+  'itemUi.tooltip.questRules': 'Ne peut être vendu, mis en banque, ni échangé.',
+  'desktop.update.checkingBody': 'Les nouvelles versions se téléchargent pendant que vous jouez.',
+  'desktop.update.checkingTitle': 'Recherche de mises à jour...',
+  'desktop.update.dismiss': 'Fermer',
+  'desktop.update.downloadingBody':
+    "Vous pouvez continuer à jouer. L'installation se fera à la fermeture.",
+  'desktop.update.uptodateTitle': 'Vous êtes à jour',
+  'entities.items.firebottle.name': 'Fiole de feu',
+  'entities.items.murloc_hut.name': 'Hutte de Mudfin',
+  'entities.items.reins_drakemaw_raptor.name': 'Rênes du Raptor du Drakemaw',
+  'entities.items.restless_skull.name': 'Crâne agité',
+  'entities.items.vanguard_bone.name': "Os d'avant-garde",
+  'entities.mobs.brakka_wallbreaker.name': 'Brakka le Brise-Rempart',
+  'entities.mobs.dragonkin_broodguard.name': 'Gardien de couvée draconien',
+  'entities.mobs.dragonkin_egg.name': 'Œuf draconien',
+  'entities.mobs.dragonkin_whelp.name': 'Dragonnet draconien',
+  'entities.mobs.drakemaw_broodlord.name': 'Seigneur de couvée du Drakemaw',
+  'entities.mobs.drowned_warlord.name': 'Le Seigneur de guerre noyé',
+  'entities.mobs.spider_egg.name': 'Œuf de la Mère des couvées',
+  'entities.mobs.threnos_first_voice.name': 'Threnos, Première Voix',
+  'entities.mobs.widow_hatchling.name': 'Larve de veuve',
+  'entities.quests.q_no_rest.text':
+    "Le rite gravé sur ces encensoirs contraint les noyés à se relever, et il vient d'en élever un assez puissant pour les commander. Les gardiens l'appellent le Seigneur de guerre noyé, et tant qu'il tient la Chapelle noyée, les morts gardent leurs rangs. Brisez-le, {playerName}, et le reste refluera dans la fagne.",
   'hud.social.tenure.recruit': 'Recrue',
   'hud.social.tenure.veteran': 'Vétéran',
   'hudChrome.keybinds.mouseHint':
@@ -5730,8 +5852,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Comme je le craignais: ils brûlaient de la cendre de tombe, et le rite porte le nom de Voss.',
   'entities.quests.q_drowned_censers.objectives.0.label': 'Encensoir rouillé',
   'entities.quests.q_no_rest.title': 'Pas de repos dans les roseaux',
-  'entities.quests.q_no_rest.text':
-    'Ce rite relève les noyés partout où le marais les touche. Nous ne pouvons le défaire encore; retirez 14 soldats à leurs maîtres.',
   'entities.quests.q_no_rest.completion':
     "Vous donnez aux morts plus de pitié que leurs maîtres. Prenez ceci, vous l'avez mérité.",
   'entities.quests.q_no_rest.objectives.0.label': 'Mort noyé rendu au repos',
@@ -5879,14 +5999,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     'Cette écriture vient du grimoire de Morthen. La même main a guidé chaque tombe, {playerName}.',
   'entities.quests.q_cult_orders.objectives.0.label': 'Zélote du Culte du Wyrm tué',
-  'entities.quests.q_cult_orders.objectives.1.label': 'Ordres du Culte du Wyrm',
   'entities.quests.q_necromancers.title': "L'anneau des phylactères",
   'entities.quests.q_necromancers.text':
     "Les ordres parlent d'un anneau de phylactères, {playerName}, vases d'âme autour du Sanctuaire. Tuez 8 nécromanciens et rapportez-en 3 intacts.",
   'entities.quests.q_necromancers.completion':
     "Que la Lumière nous pardonne. Ils contiennent les morts du Val et du marais; ce n'était pas une armée qu'ils bâtissaient, {playerName}, c'était une dîme.",
   'entities.quests.q_necromancers.objectives.0.label': 'Nécromancien du Culte du Wyrm tué',
-  'entities.quests.q_necromancers.objectives.1.label': 'Phylactère rituel',
   'entities.quests.q_revenants.title': 'Les champs des revenants',
   'entities.quests.q_revenants.text':
     "À l'est de la route dort un vieux champ de bataille. Le culte a relevé ses os en armures rouillées. Remettez-en 12 en terre, {playerName}.",

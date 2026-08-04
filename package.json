@@ -184,7 +184,17 @@
       "build/icon.ico",
       "build/icon.icns",
       "package.json",
-      "!node_modules/**"
+      "!node_modules/**",
+      "!dist/models/**",
+      "!dist/textures/**",
+      "!dist/env/**",
+      "!dist/vfx/**",
+      "!dist/*.pdf",
+      "!dist/press.html",
+      "!dist/merch.html",
+      "!dist/links.html",
+      "!dist/CLAUDE.md",
+      "!dist/guide-stills/**"
     ],
     "directories": {
       "buildResources": "build",
@@ -249,7 +259,8 @@
       ]
     },
     "nsis": {
-      "include": "build/installer.nsh"
+      "include": "build/installer.nsh",
+      "buildUniversalInstaller": false
     },
     "linux": {
       "category": "Game",

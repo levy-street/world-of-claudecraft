@@ -7,6 +7,54 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const ko_KR: Record<string, string> = {
+  'error.guildBankDeleting':
+    '이 길드는 삭제되는 중이라 은행이 닫혀 있습니다. 아무것도 변경되지 않았습니다.',
+  'error.guildBankItemRequired': '해당 칸에 있어야 할 아이템 ID를 입력하십시오.',
+  'error.guildBankNoCarrier':
+    '변경 사항을 저장하려면 이 길드의 멤버가 한 명 이상 접속해 있어야 합니다.',
+  'error.guildBankNotLoaded': '이 길드의 은행이 현재 이 서버에 로드되어 있지 않습니다.',
+  'error.guildBankPurgeRefused': '길드 은행 변경이 거부되었습니다.',
+  'error.guildBankSaveFailed':
+    '변경 사항을 저장하지 못해 롤백되었습니다. 잠시 후 다시 시도하십시오.',
+  'error.guildBankSlotNotStuck':
+    '해당 칸에는 길드가 직접 꺼낼 수 있는 일반 아이템이 들어 있으므로 여기서는 삭제할 수 없습니다.',
+  'error.guildBankSlotRequired': '삭제할 길드 은행 칸 번호를 입력하십시오.',
+  'guilds.bankColCount': '수량',
+  'guilds.bankColItem': '아이템',
+  'guilds.bankColSlot': '칸',
+  'guilds.bankColStatus': '상태',
+  'guilds.bankDormantCount': '잠긴 아이템',
+  'guilds.bankEmpty': '이 길드 은행에는 아이템이 없습니다.',
+  'guilds.bankLoadFailed': '이 길드 은행을 불러오지 못했습니다.',
+  'guilds.bankPurgeAction': '아이템 삭제',
+  'guilds.bankPurgeCarrierWarning':
+    '이 변경 사항은 이 길드의 접속 중인 멤버를 통해 저장됩니다. 드물게 저장이 거부될 경우 해당 멤버의 연결이 끊기며, 재접속 시 영구적으로 손실되는 것은 없습니다.',
+  'guilds.bankPurgeClose': '아이템 삭제 대화상자 닫기',
+  'guilds.bankPurgeConfirm': '아이템 삭제',
+  'guilds.bankPurgeConfirmation': '이 아이템을 삭제하는 데 동의합니다.',
+  'guilds.bankPurgeFailed': '아이템을 삭제하지 못했습니다.',
+  'guilds.bankPurgeItemRequired': '이 칸에는 대조할 아이템 ID가 없습니다.',
+  'guilds.bankPurgeReasonPlaceholder': '내부 조치 사유',
+  'guilds.bankPurgeReasonRequired': '조치 사유를 입력하십시오.',
+  'guilds.bankPurgeReasonTooLong': '조치 사유를 500자 이하로 줄이십시오.',
+  'guilds.bankPurgeSlotRequired': '삭제할 길드 은행 칸을 선택하십시오.',
+  'guilds.bankPurgeTitle': '잠긴 길드 은행 아이템 삭제',
+  'guilds.bankPurgeUnaudited':
+    '아이템은 삭제되었지만 조치 기록을 남기지 못했습니다. 이 문제를 보고하십시오.',
+  'guilds.bankPurgeWarning':
+    '이 작업은 아이템을 영구히 삭제합니다. 게임 내에서 되돌릴 방법이 없으며, 길드는 이를 되찾을 수 없습니다.',
+  'guilds.bankPurging': '삭제하는 중...',
+  'guilds.bankRefresh': '은행 새로고침',
+  'guilds.bankSlotsUsed': '사용한 칸',
+  'guilds.bankSlotsUsedValue': '{capacity}칸 중 {used}칸',
+  'guilds.bankStatusNormal': '인출 가능',
+  'guilds.bankStatusStuck': '잠김',
+  'guilds.bankStuckExplainer':
+    '잠긴 아이템은 어느 방향으로도 꺼낼 수 없어, 그 아이템이 있는 한 길드는 은행을 비우거나 해산할 수 없습니다. 삭제하면 아이템이 영구히 사라집니다.',
+  'guilds.bankTitle': '길드 은행',
+  'guilds.bankTreasury': '금고',
+  'guilds.bankUnopened': '이 길드는 아직 은행을 개설하지 않았습니다.',
+  'moderationHistory.actionGuildBankPurge': '길드 은행 아이템 삭제',
   'onlinePlayers.autoRefresh': '자동 새로 고침({minutes}분)',
   'onlinePlayers.count': '{count}명 접속 중',
   'onlinePlayers.countFiltered': '접속 중 {total}명 중 {shown}명',

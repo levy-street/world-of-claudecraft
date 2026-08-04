@@ -352,6 +352,15 @@ describe('the material-saving bonus and the output-variance roll apply at craft 
 // exactly at JACK_CEILING_TIER, so the masterwork effect gate still passes
 // for a Jack) so a 'worse' or 'better' roll's effect on the SAME underlying
 // masterwork mechanism is directly observable.
+// Both hunted seeds re-hunted (worse 45 -> 51, better 39 -> 96) after the zones
+// 1-3 quest-dedupe content pass added camps, mobs, and items: the extra
+// world-gen draws move the post-construction rng position, so the old seeds no
+// longer land in the required roll bands. The semantic profile is preserved on
+// both arms (the worse arm's proc roll still sits under the capped 0.15 chance
+// it would have procced on, the better arm's still between the 0.03 base and
+// the 0.08 boosted chance). Spares on record: 53, 100, 239, and 358 for the
+// worse arm; 432, 701, 733, and 782 for the better arm. The seed-1 'normal'
+// case still lands unchanged and is left alone.
 describe('the variance roll actually changes the masterwork outcome (#1296, hunted seeds)', () => {
   function vestmentsScenario(sim: Sim, pid: number, meta: PlayerMeta, maxChance: boolean) {
     attuneJackOfAllTrades(ctxOf(sim), pid);
@@ -366,8 +375,8 @@ describe('the variance roll actually changes the masterwork outcome (#1296, hunt
     sim.addItem('spool_of_thread', 5, pid);
   }
 
-  it('a worse roll forces the masterwork bump off even though the proc roll alone would have hit (seed 45)', () => {
-    const sim = makeSim(45);
+  it('a worse roll forces the masterwork bump off even though the proc roll alone would have hit (seed 51)', () => {
+    const sim = makeSim(51);
     const pid = sim.playerId;
     const meta = metaOf(sim, pid);
     vestmentsScenario(sim, pid, meta, true);
@@ -386,8 +395,8 @@ describe('the variance roll actually changes the masterwork outcome (#1296, hunt
     expect(sim.lastCraftResult?.masterwork).toBeUndefined();
   });
 
-  it('a better roll improves the odds enough to turn an otherwise-miss into a masterwork hit (seed 39)', () => {
-    const sim = makeSim(39);
+  it('a better roll improves the odds enough to turn an otherwise-miss into a masterwork hit (seed 96)', () => {
+    const sim = makeSim(96);
     const pid = sim.playerId;
     const meta = metaOf(sim, pid);
     vestmentsScenario(sim, pid, meta, false);

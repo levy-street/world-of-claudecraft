@@ -133,6 +133,7 @@ export class DailyRewardsWindow {
   private storeItems: WocStoreItemInput[] = [];
   private armorySections: ArmorySection[] = [];
   private armoryInspect: ArmoryInspect | null = null;
+  private armoryGraphicsRestoreSkinId: string | null = null;
   private storeLoading = false;
   private storeReady = false;
   private storeError = false;
@@ -163,6 +164,22 @@ export class DailyRewardsWindow {
   async prewarmArmoryPreview(): Promise<void> {
     if (!this.storeEnabled()) return;
     await this.ensureArmoryInspect().prewarm(WEAPON_SKIN_LIST.map((skin) => skin.id));
+  }
+
+  /** Dispose the profile-bound Armory context; the next open rebuilds it lazily. */
+  resetArmoryPreviewForGraphicsRebuild(): void {
+    this.armoryGraphicsRestoreSkinId = this.armoryInspect?.openSkinId ?? null;
+    this.armoryInspect?.destroy();
+    this.armoryInspect = null;
+  }
+
+  /** Reopen an inspect overlay that was visible when its old profile context was reset. */
+  restoreArmoryPreviewAfterGraphicsRebuild(): void {
+    const skinId = this.armoryGraphicsRestoreSkinId;
+    this.armoryGraphicsRestoreSkinId = null;
+    if (!skinId || !this.isOpen) return;
+    const row = this.armoryRowById(skinId);
+    if (row) this.openArmoryInspect(row);
   }
 
   toggle(): void {

@@ -7,6 +7,55 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const nl_NL: Record<string, string> = {
+  'error.guildBankDeleting':
+    'Deze gilde wordt verwijderd, dus de bank ervan is gesloten. Er is niets gewijzigd.',
+  'error.guildBankItemRequired':
+    'Voer het voorwerp-id in dat volgens jou in dat vak hoort te zitten.',
+  'error.guildBankNoCarrier':
+    'Een lid van deze gilde moet online zijn voordat de wijziging kan worden opgeslagen.',
+  'error.guildBankNotLoaded': 'De bank van deze gilde is momenteel niet geladen op dit rijk.',
+  'error.guildBankPurgeRefused': 'De wijziging aan de gildebank is geweigerd.',
+  'error.guildBankSaveFailed':
+    'De wijziging kon niet worden opgeslagen en is teruggedraaid. Probeer het zo dadelijk opnieuw.',
+  'error.guildBankSlotNotStuck':
+    'Dat vak bevat een gewoon voorwerp dat de gilde zelf kan opnemen, dus het kan hier niet worden verwijderd.',
+  'error.guildBankSlotRequired': 'Voer het nummer van het gildebankvak in dat je wilt verwijderen.',
+  'guilds.bankColCount': 'Aantal',
+  'guilds.bankColItem': 'Voorwerp',
+  'guilds.bankColSlot': 'Vak',
+  'guilds.bankColStatus': 'Status',
+  'guilds.bankDormantCount': 'Vastzittende voorwerpen',
+  'guilds.bankEmpty': 'Deze gildebank bevat geen voorwerpen.',
+  'guilds.bankLoadFailed': 'Laden van deze gildebank is mislukt.',
+  'guilds.bankPurgeAction': 'Voorwerp verwijderen',
+  'guilds.bankPurgeCarrierWarning':
+    'De wijziging wordt opgeslagen via een online lid van deze gilde. In het zeldzame geval dat die opslag wordt geweigerd, wordt dat lid losgekoppeld en maakt het opnieuw verbinding zonder dat er iets blijvends verloren gaat.',
+  'guilds.bankPurgeClose': 'Het dialoogvenster voor het verwijderen van een voorwerp sluiten',
+  'guilds.bankPurgeConfirm': 'Voorwerp verwijderen',
+  'guilds.bankPurgeConfirmation': 'Ik bevestig dat dit voorwerp vernietigd moet worden.',
+  'guilds.bankPurgeFailed': 'Verwijderen van het voorwerp is mislukt.',
+  'guilds.bankPurgeItemRequired': 'Dit vak heeft geen voorwerp-id waartegen bevestigd kan worden.',
+  'guilds.bankPurgeReasonPlaceholder': 'Interne moderatiereden',
+  'guilds.bankPurgeReasonRequired': 'Voer een moderatiereden in.',
+  'guilds.bankPurgeReasonTooLong': 'Beperk de moderatiereden tot 500 tekens of minder.',
+  'guilds.bankPurgeSlotRequired': 'Kies een gildebankvak om te verwijderen.',
+  'guilds.bankPurgeTitle': 'Een vastzittend voorwerp uit de gildebank verwijderen',
+  'guilds.bankPurgeUnaudited':
+    'Het voorwerp is verwijderd, maar de moderatielogboekvermelding kon niet worden geschreven. Meld dit.',
+  'guilds.bankPurgeWarning':
+    'Dit vernietigt het voorwerp permanent. Er is geen manier om dit binnen het spel ongedaan te maken, en de gilde kan het niet terugkrijgen.',
+  'guilds.bankPurging': 'Bezig met verwijderen...',
+  'guilds.bankRefresh': 'Bank vernieuwen',
+  'guilds.bankSlotsUsed': 'Vakken gebruikt',
+  'guilds.bankSlotsUsedValue': '{used} van {capacity}',
+  'guilds.bankStatusNormal': 'Opneembaar',
+  'guilds.bankStatusStuck': 'Vastzittend',
+  'guilds.bankStuckExplainer':
+    'Een vastzittend voorwerp kan geen van beide kanten op worden verplaatst, dus de gilde kan haar bank nooit legen of zichzelf ontbinden zolang het daar ligt. Het verwijderen ervan vernietigt het voorwerp permanent.',
+  'guilds.bankTitle': 'Gildebank',
+  'guilds.bankTreasury': 'Kas',
+  'guilds.bankUnopened': 'Deze gilde heeft haar bank nog niet geopend.',
+  'moderationHistory.actionGuildBankPurge': 'Gildebankverwijdering',
   'onlinePlayers.autoRefresh': 'Automatisch verversen ({minutes} min)',
   'onlinePlayers.count': '{count} spelers online',
   'onlinePlayers.countFiltered': '{shown} van {total} online',

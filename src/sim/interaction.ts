@@ -36,6 +36,7 @@ import {
 } from './encounters/nythraxis';
 import { tryStartEscort } from './escort';
 import { isInRaidInstance } from './instances/dungeons';
+import { HUT_OBJECT_ID, tryBurnHut } from './interactions/firebottle_hut';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
   awardSharedLootItem,
@@ -757,6 +758,12 @@ export function pickUpObject(
   const beforeRelicNextId = ctx.nextId;
   if (activateNythraxisRelic(ctx, obj, meta)) {
     return obj.lootable !== beforeRelicLootable || ctx.nextId !== beforeRelicNextId;
+  }
+  // Murloc huts (q_deepfen_purge) are torched with a thrown firebottle, not a
+  // plain click: route them to the firebottle handler (which does its own
+  // gating, cooldown, and objective credit) so a bare click never burns one.
+  if (objectItemId === HUT_OBJECT_ID) {
+    return tryBurnHut(ctx, obj, p, meta);
   }
   const beforeQuestProgress = meta.counters.questProgress;
   const beforeQuestNextId = ctx.nextId;

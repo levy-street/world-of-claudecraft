@@ -1,9 +1,12 @@
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { StaticOpaqueN8AOPass } from '../src/render/post_n8ao';
 
 interface N8AOShaderInternals {
   beautyRenderTarget: THREE.WebGLRenderTarget;
+  writeTargetInternal: THREE.WebGLRenderTarget;
+  readTargetInternal: THREE.WebGLRenderTarget;
+  bluenoise: THREE.DataTexture;
   effectShaderQuad: {
     material: THREE.ShaderMaterial;
   };
@@ -107,5 +110,26 @@ describe('static N8AO shader specialization', () => {
     }).toThrow(
       'Static N8AO shaders require accumulation, bias adjustment, and screen-space radius off',
     );
+  });
+
+  it('disposes owned render targets and textures idempotently', () => {
+    const pass = new StaticOpaqueN8AOPass(
+      new THREE.Scene(),
+      new THREE.PerspectiveCamera(),
+      1280,
+      720,
+    );
+    const internals = pass as unknown as N8AOShaderInternals;
+    const disposals = [
+      vi.spyOn(internals.beautyRenderTarget, 'dispose'),
+      vi.spyOn(internals.writeTargetInternal, 'dispose'),
+      vi.spyOn(internals.readTargetInternal, 'dispose'),
+      vi.spyOn(internals.bluenoise, 'dispose'),
+    ];
+
+    pass.dispose();
+    pass.dispose();
+
+    for (const dispose of disposals) expect(dispose).toHaveBeenCalledTimes(1);
   });
 });

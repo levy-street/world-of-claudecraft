@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: 'Gelegebrecher',
+    desc: 'Einen Drakenrachen-Brutfürsten inmitten seiner Eier erlegen, durch Schrei, Hieb und Feuer hindurch.',
+  },
+  chr_maw_matriarch: {
+    name: 'Der Himmel verstummt',
+    desc: 'Cindraleth, die Rachen-Matriarchin, in ihrem Kraterhorst über dem Drakenrachen erlegen.',
+  },
   pvp_card_duel_first_win: {
     name: 'Nach eigenen Regeln',
     desc: 'Gewinne einen Kartenkampf beim Kartenmeister.',

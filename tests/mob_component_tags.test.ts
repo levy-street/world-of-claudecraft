@@ -52,9 +52,14 @@ describe('mob component-type tags', () => {
     expect(allUnmapped).toEqual(['fen_troll']);
     // The complement, so an always-false predicate could not pass the row above
     // by emptying the sweep.
-    // 36 since the farm-economy pass added mapped tags to 15 coinless trash
-    // templates; fen_troll is still the only all-unmapped one.
-    expect(tagged.filter((mob) => isHarvestableCorpse(mob.componentTags))).toHaveLength(36);
+    // 36 after the farm-economy pass added mapped tags to 15 coinless trash
+    // templates, then 39 once the Drakelands brood (whelp, broodguard,
+    // broodlord) shipped hide+fang, and 40 with this branch's quest-dedupe pass
+    // (threnos_first_voice salvages cloth like the zealot flock he leads).
+    // fen_troll is still the only all-unmapped one: the brood deliberately
+    // carries mapped families only, since claw and horn would yield nothing
+    // while still widening the concentration bonus.
+    expect(tagged.filter((mob) => isHarvestableCorpse(mob.componentTags))).toHaveLength(40);
   });
 
   it('never lets a template out-pay the tag list it advertises (#2514)', () => {

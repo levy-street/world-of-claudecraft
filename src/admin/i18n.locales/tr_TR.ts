@@ -7,6 +7,53 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const tr_TR: Record<string, string> = {
+  'error.guildBankDeleting':
+    'Bu lonca siliniyor, bu yüzden bankası kapatıldı. Hiçbir şey değiştirilmedi.',
+  'error.guildBankItemRequired': 'O yuvada olmasını beklediğin eşyanın kimliğini gir.',
+  'error.guildBankNoCarrier':
+    'Değişiklik kaydedilmeden önce bu loncadan bir üyenin çevrimiçi olması gerekir.',
+  'error.guildBankNotLoaded': 'Bu loncanın bankası şu anda bu diyarda yüklü değil.',
+  'error.guildBankPurgeRefused': 'Lonca bankası değişikliği reddedildi.',
+  'error.guildBankSaveFailed': 'Değişiklik kaydedilemedi ve geri alındı. Birazdan tekrar dene.',
+  'error.guildBankSlotNotStuck':
+    'O yuva, loncanın kendisinin çekebileceği sıradan bir eşya içeriyor, bu yüzden buradan kaldırılamaz.',
+  'error.guildBankSlotRequired': 'Kaldırılacak lonca bankası yuva numarasını gir.',
+  'guilds.bankColCount': 'Adet',
+  'guilds.bankColItem': 'Eşya',
+  'guilds.bankColSlot': 'Yuva',
+  'guilds.bankColStatus': 'Durum',
+  'guilds.bankDormantCount': 'Sıkışmış eşyalar',
+  'guilds.bankEmpty': 'Bu lonca bankasında eşya yok.',
+  'guilds.bankLoadFailed': 'Bu lonca bankası yüklenemedi.',
+  'guilds.bankPurgeAction': 'Eşyayı kaldır',
+  'guilds.bankPurgeCarrierWarning':
+    'Değişiklik, bu loncadan çevrimiçi bir üye üzerinden kaydedilir. Kaydın nadiren reddedildiği durumlarda, o üyenin bağlantısı kesilir ve kalıcı bir kayıp olmadan yeniden bağlanır.',
+  'guilds.bankPurgeClose': 'Eşya kaldırma penceresini kapat',
+  'guilds.bankPurgeConfirm': 'Eşyayı kaldır',
+  'guilds.bankPurgeConfirmation': 'Bu eşyanın yok edilmesi gerektiğini onaylıyorum.',
+  'guilds.bankPurgeFailed': 'Eşya kaldırılamadı.',
+  'guilds.bankPurgeItemRequired': 'Bu yuvada onaylanacak bir eşya kimliği yok.',
+  'guilds.bankPurgeReasonPlaceholder': 'Dahili moderasyon gerekçesi',
+  'guilds.bankPurgeReasonRequired': 'Bir moderasyon gerekçesi gir.',
+  'guilds.bankPurgeReasonTooLong': 'Moderasyon gerekçesini 500 karakter veya daha kısa yap.',
+  'guilds.bankPurgeSlotRequired': 'Kaldırılacak bir lonca bankası yuvası seç.',
+  'guilds.bankPurgeTitle': 'Sıkışmış bir lonca bankası eşyasını kaldır',
+  'guilds.bankPurgeUnaudited':
+    'Eşya kaldırıldı, ancak moderasyon günlüğü kaydı yazılamadı. Bunu bildir.',
+  'guilds.bankPurgeWarning':
+    'Bu, eşyayı kalıcı olarak yok eder. Oyun içinde geri alma yoktur ve lonca onu bir daha geri alamaz.',
+  'guilds.bankPurging': 'Kaldırılıyor...',
+  'guilds.bankRefresh': 'Bankayı yenile',
+  'guilds.bankSlotsUsed': 'Kullanılan yuvalar',
+  'guilds.bankSlotsUsedValue': '{used} / {capacity}',
+  'guilds.bankStatusNormal': 'Çekilebilir',
+  'guilds.bankStatusStuck': 'Sıkışmış',
+  'guilds.bankStuckExplainer':
+    'Sıkışmış bir eşya hiçbir şekilde hareket ettirilemez, bu yüzden orada durduğu sürece lonca ne bankasını boşaltabilir ne de dağılabilir. Kaldırmak, eşyayı kalıcı olarak yok eder.',
+  'guilds.bankTitle': 'Lonca bankası',
+  'guilds.bankTreasury': 'Hazine',
+  'guilds.bankUnopened': 'Bu lonca bankasını henüz açmadı.',
+  'moderationHistory.actionGuildBankPurge': 'Lonca bankası eşya kaldırma',
   'onlinePlayers.autoRefresh': 'Otomatik yenileme ({minutes} dk)',
   'onlinePlayers.count': '{count} çevrimiçi',
   'onlinePlayers.countFiltered': '{total} çevrimiçi oyuncudan {shown} tanesi',

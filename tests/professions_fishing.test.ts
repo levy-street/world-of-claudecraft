@@ -33,7 +33,11 @@ import { type ClientSession, GameServer } from '../server/game';
 import { bagCapacity } from '../src/sim/bags';
 import { updateCasting } from '../src/sim/combat/casting_lifecycle';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
-import { FISHING_TABLES, FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
+import {
+  FISHING_TABLES,
+  FISHING_TABLES_BY_BAND,
+  isRawCookingCatch,
+} from '../src/sim/content/items';
 import { GATHERING_PROFESSIONS } from '../src/sim/content/professions';
 import { DEEPFEN_SHALLOWS_LAKE, ITEMS, LAKE } from '../src/sim/data';
 import {
@@ -150,77 +154,62 @@ function catchSequenceLive(sim: Sim, meta: PlayerMeta, n: number): (string | nul
 }
 
 // The literal band-0 catch sequence at seed 467 under the LIVE loop,
-// re-recorded on the v0.32.0 release merge (the rift, mounts, and new-zone
-// world-gen all move construction-time draws, so neither parent's recording
-// holds): each session consumes TWO draws, draw 2i the hidden bite delay and
-// draw 2i+1 the table walk against the band-0 Vale rows (trout 46 / perch 31
-// / weed 12 / koi 1 / null 10). Any accidental extra draw, band-boundary
-// change, or band-0 table drift breaks this pin.
+// re-recorded after the zones 1-3 quest-dedupe content pass (its new camps,
+// mobs, and items all move construction-time draws, so the v0.32.0 recording
+// no longer holds): each session consumes TWO draws, draw 2i the hidden bite
+// delay and draw 2i+1 the table walk against the band-0 Vale rows (trout 46 /
+// perch 31 / weed 12 / koi 1 / null 10). Any accidental extra draw,
+// band-boundary change, or band-0 table drift breaks this pin.
 const B0_SEQ_467: (string | null)[] = [
   TROUT,
-  TROUT,
-  TROUT,
-  TROUT,
-  null,
   WEED,
   TROUT,
-  TROUT,
-  null,
-  PERCH,
   WEED,
   TROUT,
+  PERCH,
+  TROUT,
+  TROUT,
+  TROUT,
+  TROUT,
+  TROUT,
+  PERCH,
+  TROUT,
+  PERCH,
+  PERCH,
+  WEED,
+  PERCH,
   TROUT,
   null,
   PERCH,
-  PERCH,
-  PERCH,
-  TROUT,
-  KOI,
-  PERCH,
-  PERCH,
-  TROUT,
-  TROUT,
-  TROUT,
-  TROUT,
   TROUT,
   PERCH,
   TROUT,
   PERCH,
-  TROUT,
+  PERCH,
+  WEED,
+  WEED,
+  PERCH,
+  PERCH,
+  PERCH,
 ];
 
 // The literal band-1 live-loop sequence for the SAME seed with fishing
 // proficiency 150 (band-1 Vale weights trout 49 / perch 32 / weed 8 / koi 3 /
-// null 8). It first diverges from B0_SEQ_467 at index 8 (the koi where band 0
-// pulls an empty hook: the koi row rises 1 to 3 and the empty falls 10 to 8
-// across that band step), again at 10 (perch, not band 0's tangled weed: the
-// junk de-weighting) and at 13, so matching the full 30-cast walk proves the
-// live path actually switched tables; indices 4 and 5 are the hunted band
-// DISCRIMINATORS against band 2 (the empty hook and the weed here, the koi
-// there both times). The divergence is asserted rather than described: see
-// the discriminator pin below, which fails if the walks ever collapse onto
-// each other. Re-recorded on the v0.32.0 release merge.
+// null 8). It first diverges from B0_SEQ_467 at index 13 (trout where band 0
+// draws a perch: the trout row rises 46 to 49 across that band step), again
+// at 15 (perch, not band 0's tangled weed: the junk de-weighting) and at 24,
+// so matching the full 30-cast walk proves the live path actually switched
+// tables; index 1 is the hunted band DISCRIMINATOR against band 2 (the
+// tangled weed here, the perch there: the junk row falls 8 to 4 across that
+// step). The divergence is asserted rather than described: see the
+// discriminator pin below, which fails if the walks ever collapse onto each
+// other. Re-recorded after the zones 1-3 quest-dedupe content pass.
 const B1_SEQ_467: (string | null)[] = [
   TROUT,
-  TROUT,
-  TROUT,
-  TROUT,
-  null,
   WEED,
   TROUT,
+  WEED,
   TROUT,
-  KOI,
-  PERCH,
-  PERCH,
-  TROUT,
-  TROUT,
-  KOI,
-  PERCH,
-  PERCH,
-  PERCH,
-  TROUT,
-  KOI,
-  PERCH,
   PERCH,
   TROUT,
   TROUT,
@@ -229,41 +218,41 @@ const B1_SEQ_467: (string | null)[] = [
   TROUT,
   PERCH,
   TROUT,
+  TROUT,
+  PERCH,
+  PERCH,
   PERCH,
   TROUT,
+  null,
+  PERCH,
+  TROUT,
+  PERCH,
+  TROUT,
+  PERCH,
+  TROUT,
+  WEED,
+  WEED,
+  PERCH,
+  PERCH,
+  PERCH,
 ];
 
 // The literal band-2 live-loop sequence for the SAME seed with fishing
 // proficiency 200 (band-2 Vale weights trout 50 / perch 34 / weed 4 / koi 6 /
 // null 6) against the same interleaved stream. It diverges, decisively, from
-// BOTH the band-0 and band-1 walks at indices 4 and 5: those table draws land
-// where the lower bands yield the empty hook (4) and tangled weed (5) but
-// band 2 yields the koi both times (the hunted divergence window under the
-// two-draw stream), so matching this sequence proves the live path resolved
-// FISHING_TABLES_BY_BAND[2], not a band-1 collapse (the top-band wiring was
-// previously unpinned on the live path). Re-recorded on the v0.32.0 release
-// merge.
+// BOTH the band-0 and band-1 walks at index 1: that table draw lands where
+// the lower bands yield tangled weed but band 2 yields the perch (the junk
+// row falls to 4 and the perch span widens across the band step, the hunted
+// divergence cell under the two-draw stream), so matching this sequence
+// proves the live path resolved FISHING_TABLES_BY_BAND[2], not a band-1
+// collapse (the top-band wiring was previously unpinned on the live path).
+// Re-recorded after the zones 1-3 quest-dedupe content pass.
 const B2_SEQ_467: (string | null)[] = [
   TROUT,
-  TROUT,
-  TROUT,
-  TROUT,
-  KOI,
-  KOI,
-  TROUT,
-  TROUT,
-  KOI,
-  PERCH,
   PERCH,
   TROUT,
+  WEED,
   TROUT,
-  KOI,
-  PERCH,
-  PERCH,
-  PERCH,
-  TROUT,
-  KOI,
-  PERCH,
   PERCH,
   TROUT,
   TROUT,
@@ -272,8 +261,23 @@ const B2_SEQ_467: (string | null)[] = [
   TROUT,
   PERCH,
   TROUT,
+  TROUT,
+  PERCH,
+  PERCH,
   PERCH,
   TROUT,
+  null,
+  PERCH,
+  TROUT,
+  PERCH,
+  TROUT,
+  PERCH,
+  TROUT,
+  WEED,
+  WEED,
+  PERCH,
+  PERCH,
+  PERCH,
 ];
 
 // Probe candidate shore spots around the Deepfen Shallows lake with the REAL
@@ -486,12 +490,12 @@ describe('fishing draw contract (pin 2, the bite-and-reel shape)', () => {
     }
     // The capacity gate sits AFTER the table roll, so the session still spent
     // both draws (bite delay plus table); at seed 467 the first table draw
-    // resolves a perch (B0_SEQ_467[0]) that simply gets away.
+    // resolves a trout (B0_SEQ_467[0]) that simply gets away.
     expect(draws).toBe(2);
     expect(sim.events).toContainEqual(
       expect.objectContaining({ type: 'error', text: 'Your bags are full.' }),
     );
-    expect(sim.countItem(PERCH)).toBe(0);
+    expect(sim.countItem(TROUT)).toBe(0);
     expect(fishingResultsIn(sim.events)).toHaveLength(0);
     expect(meta.pendingGatherGrants).toHaveLength(0);
     sim.tick();
@@ -725,12 +729,17 @@ describe('fishing catch gain schedule (Professions 2.0)', () => {
       const before = meta.pendingGatherGrants.length;
       const [result] = fishingResultsIn(castOnce(sim, meta).events);
       if (!result) continue; // an empty hook queues nothing on any tier
-      if (ITEMS[result.itemId]?.kind === 'junk') {
+      // Grey fishing junk only (weed/boot by literal id). Raw cooking catches
+      // are also kind junk but still teach; do not recompute production's
+      // isGreyFishingJunk formula here or a co-edit can keep both green.
+      if (result.itemId === WEED || result.itemId === 'soggy_boot') {
         // The junk cutoff composing with the ceiling INSIDE teaching water,
         // which no live drive covered before: past 100 a boot teaches nothing
         // even where the water itself still teaches.
         expect(meta.pendingGatherGrants).toHaveLength(before);
+        expect(isRawCookingCatch(result.itemId)).toBe(false);
       } else if (mirefenOnly.includes(result.itemId)) {
+        expect(isRawCookingCatch(result.itemId)).toBe(true);
         landedFish++;
         // The water the GAIN itself resolved against, straight off the event:
         // the catch table, the deed credit, the telemetry and the gain all read
@@ -925,19 +934,19 @@ describe('fishing table structure (pin 5)', () => {
     // above green on identical arrays and prove nothing about band selection.
     expect(B0_SEQ_467).not.toEqual(B1_SEQ_467);
     expect(B1_SEQ_467).not.toEqual(B2_SEQ_467);
-    expect(B0_SEQ_467[8]).not.toBe(B1_SEQ_467[8]);
-    expect(B1_SEQ_467[4]).not.toBe(B2_SEQ_467[4]);
+    expect(B0_SEQ_467[13]).not.toBe(B1_SEQ_467[13]);
+    expect(B1_SEQ_467[1]).not.toBe(B2_SEQ_467[1]);
     // The EXACT divergence sets, so every comment naming an index is held to
-    // the recording rather than trusted: bands 0 and 1 part at 8, 10, and 13
-    // only; the two upper bands part at 4 and 5 only.
+    // the recording rather than trusted: bands 0 and 1 part at 13, 15, and 24
+    // only; the two upper bands part at 1 only.
     const differing01 = B0_SEQ_467.map((v, i) => (v === B1_SEQ_467[i] ? -1 : i)).filter(
       (i) => i >= 0,
     );
-    expect(differing01).toEqual([8, 10, 13]);
+    expect(differing01).toEqual([13, 15, 24]);
     const differing = B1_SEQ_467.map((v, i) => (v === B2_SEQ_467[i] ? -1 : i)).filter(
       (i) => i >= 0,
     );
-    expect(differing).toEqual([4, 5]);
+    expect(differing).toEqual([1]);
   });
 
   it('FISHING_TABLES is the identical band-0 object (alias identity, not a copy)', () => {
@@ -967,7 +976,7 @@ describe('fishing band selection liveness (pin 6)', () => {
     // rod-independent given the band.
     sim.addItem('ironreel_fishing_rod', 1);
     teleportToValeShore(sim);
-    // B1_SEQ_467 first diverges from B0_SEQ_467 at index 8 for the same rng
+    // B1_SEQ_467 first diverges from B0_SEQ_467 at index 13 for the same rng
     // stream, so this full-walk match proves the live path actually switched
     // tables.
     expect(catchSequenceLive(sim, meta, 30)).toEqual(B1_SEQ_467);
@@ -980,10 +989,10 @@ describe('fishing band selection liveness (pin 6)', () => {
     // Band 2 needs the tier-3 rod (band b requires tool tier b + 1).
     sim.addItem('silverstream_fishing_rod', 1);
     teleportToValeShore(sim);
-    // Indices 4 and 5 are the hunted band-discriminating cells (the koi here,
-    // where the band-1 table yields the empty hook and tangled weed; see the
-    // B2_SEQ_467 derivation comment), so this match proves the live path
-    // resolved the TOP band, not a band-1 collapse.
+    // Index 1 is the hunted band-discriminating cell (the perch here, where
+    // the band-1 table yields tangled weed; see the B2_SEQ_467 derivation
+    // comment), so this match proves the live path resolved the TOP band, not
+    // a band-1 collapse.
     expect(catchSequenceLive(sim, meta, 30)).toEqual(B2_SEQ_467);
   });
 });
@@ -1005,7 +1014,7 @@ describe('fishing band tool cap (Professions 2.0)', () => {
     // arm's intent, unchanged.
     sim.addItem('simple_fishing_pole', 1);
     teleportToValeShore(sim);
-    // B0 and B1 diverge at indices 8, 10, and 13 on this stream, so the
+    // B0 and B1 diverge at indices 13, 15, and 24 on this stream, so the
     // full 30-session walk is decisive: band-1 proficiency without a rod
     // still walks the SHIPPED band-0 table, and nothing else changes (no
     // error, no event).
@@ -1018,10 +1027,10 @@ describe('fishing band tool cap (Professions 2.0)', () => {
     meta.gatheringProficiency.fishing = 250;
     sim.addItem('ironreel_fishing_rod', 1);
     teleportToValeShore(sim);
-    // Index 8 (the koi, not band 0's empty hook) proves the walk left band 0;
-    // indices 4 and 5 are the hunted band DISCRIMINATORS: those table draws
-    // land where band 2 yields the koi but band 1 yields the empty hook and
-    // tangled weed (the B2_SEQ_467 derivation comment), so those cells prove
+    // Indices 13, 15, and 24 (trout and perch, not band 0's perch and weed)
+    // prove the walk left band 0; index 1 is the hunted band DISCRIMINATOR:
+    // that table draw lands where band 2 yields the perch but band 1 yields
+    // tangled weed (the B2_SEQ_467 derivation comment), so that cell proves
     // the tier-2 rod held the walk at band 1 despite band-2 proficiency.
     expect(catchSequenceLive(sim, meta, 30)).toEqual(B1_SEQ_467);
   });
@@ -1043,8 +1052,8 @@ describe('fishing band tool cap (Professions 2.0)', () => {
     // allowedBand): a fresh buyer of the 150c rod cannot fish the band-2
     // table. Every other cap test binds the rod arm or the equal case, so
     // this is the only guard against the min() collapsing to allowedBand
-    // alone. B0 diverges from B2 at index 4 (the empty hook vs the koi), so
-    // 12 sessions are decisive.
+    // alone. B0 diverges from B2 at index 1 (the tangled weed vs the perch),
+    // so 12 sessions are decisive.
     sim.addItem('silverstream_fishing_rod', 1);
     teleportToValeShore(sim);
     expect(catchSequenceLive(sim, meta, 12)).toEqual(B0_SEQ_467.slice(0, 12));
@@ -1176,7 +1185,10 @@ describe('fishingResult event (pin 7)', () => {
     const meta = sim.meta(sim.playerId)!;
     sim.events = [];
     const { caught, events } = castOnce(sim, meta);
-    expect(caught).toBe(PERCH); // the first shared-stream table draw at seed 467
+    // The first shared-stream table draw at seed 467, re-recorded after the
+    // zones 1-3 quest-dedupe content pass: the tangled weed, which is still a
+    // landed catch (junk emits the event too, at its own def quality).
+    expect(caught).toBe(WEED);
     const results = fishingResultsIn(events);
     expect(results).toHaveLength(1);
     // Exact shape: ids plus values only (the gatherResult precedent), so a
@@ -1184,13 +1196,13 @@ describe('fishingResult event (pin 7)', () => {
     expect(results[0]).toEqual({
       type: 'fishingResult',
       pid: sim.playerId,
-      itemId: PERCH,
-      quality: 'common',
+      itemId: WEED,
+      quality: 'poor',
       zoneId: 'eastbrook_vale',
       band: 0,
     });
     // The loot grant still happens alongside the event.
-    expect(sim.countItem(PERCH)).toBe(1);
+    expect(sim.countItem(WEED)).toBe(1);
   });
 
   it('quality mirrors the caught ItemDef (poor for weed, uncommon for koi); silent on no-bite', () => {
@@ -1220,8 +1232,9 @@ describe('fishingResult event (pin 7)', () => {
         if (caught === KOI) koiEvent = results[0];
       }
     }
-    // The seed 4242 band-2 run covers all three arms (re-recorded on the
-    // v0.32.0 release merge): the empty hook at 1, weed at 3, the koi at 25.
+    // The seed 4242 band-2 run covers all three arms (re-recorded after the
+    // zones 1-3 quest-dedupe content pass): the empty hook at 6, weed at 18,
+    // the koi at 5 and again at 20.
     expect(sawNoBite).toBe(true);
     expect(weedEvent?.quality).toBe('poor');
     expect(koiEvent?.quality).toBe('uncommon');
@@ -1247,11 +1260,12 @@ describe('landed-catch grant flags (pin 11)', () => {
     const meta = sim.meta(sim.playerId)!;
     sim.events = [];
     const { caught, events } = castOnce(sim, meta);
-    // Seed 4242's first band-0 cast, re-recorded at the origin/main base merge
-    // (the merged content moves the shared rng before the cast). Pinned to the
-    // fish rather than "not null" so the case still proves a real catch landed,
-    // which is what makes the grant flags below meaningful.
-    expect(caught).toBe(TROUT);
+    // Seed 4242's first band-0 cast, re-recorded after the zones 1-3
+    // quest-dedupe content pass (any content add moves the shared rng before
+    // the cast). Pinned to the fish rather than "not null" so the case still
+    // proves a real catch landed, which is what makes the grant flags below
+    // meaningful.
+    expect(caught).toBe(PERCH);
     const loot = lootIn(events);
     expect(loot).toHaveLength(1);
     expect(loot[0].silent).toBe(true);
@@ -1300,7 +1314,10 @@ describe('landed-catch grant flags (pin 11)', () => {
 
 describe('fishing deeds through the extracted module path (pin 9)', () => {
   it('a landed real fish via completeFishing still marks fish:<zone>', () => {
-    const sim = makeSim(467);
+    // Seed 4, re-hunted after the zones 1-3 quest-dedupe content pass (467's
+    // first table draw now resolves the tangled weed, which the ZONE_FISH
+    // filter deliberately ignores): the first cast lands the perch.
+    const sim = makeSim(4);
     const meta = sim.meta(sim.playerId)!;
     expect(meta.deedStats.visited.has('fish:eastbrook_vale')).toBe(false);
     const { caught } = castOnce(sim, meta);
@@ -1356,10 +1373,12 @@ describe('fishing deeds through the extracted module path (pin 9)', () => {
     meta.gatheringProficiency.fishing = 200;
     sim.addItem('silverstream_fishing_rod', 1);
     let koiAt = -1;
-    for (let i = 0; i < 26; i++) {
+    // Re-hunted after the zones 1-3 quest-dedupe content pass: the koi now
+    // lands on cast index 5 of the seed 4242 band-2 walk.
+    for (let i = 0; i < 6; i++) {
       if (castOnce(sim, meta).caught === KOI) koiAt = i;
     }
-    expect(koiAt).toBe(25);
+    expect(koiAt).toBe(5);
     expect(sim.events).toContainEqual(
       expect.objectContaining({
         type: 'log',

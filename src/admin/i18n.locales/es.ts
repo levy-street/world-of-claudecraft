@@ -7,6 +7,56 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const es: Record<string, string> = {
+  'error.guildBankDeleting':
+    'Esta hermandad se está eliminando, así que su banco está cerrado. No se realizó ningún cambio.',
+  'error.guildBankItemRequired': 'Introduce el id del objeto que esperas que contenga esa ranura.',
+  'error.guildBankNoCarrier':
+    'Un miembro de esta hermandad debe estar conectado antes de poder guardar el cambio.',
+  'error.guildBankNotLoaded':
+    'El banco de esta hermandad no está cargado en este reino ahora mismo.',
+  'error.guildBankPurgeRefused': 'Se rechazó el cambio en el banco de la hermandad.',
+  'error.guildBankSaveFailed':
+    'No se pudo guardar el cambio y se revirtió. Inténtalo de nuevo en un momento.',
+  'error.guildBankSlotNotStuck':
+    'Esa ranura contiene un objeto normal que la hermandad puede retirar por su cuenta, así que no se puede eliminar aquí.',
+  'error.guildBankSlotRequired':
+    'Introduce el número de ranura del banco de la hermandad que quieres eliminar.',
+  'guilds.bankColCount': 'Cantidad',
+  'guilds.bankColItem': 'Objeto',
+  'guilds.bankColSlot': 'Ranura',
+  'guilds.bankColStatus': 'Estado',
+  'guilds.bankDormantCount': 'Objetos atascados',
+  'guilds.bankEmpty': 'Este banco de la hermandad no contiene objetos.',
+  'guilds.bankLoadFailed': 'No se pudo cargar este banco de la hermandad.',
+  'guilds.bankPurgeAction': 'Eliminar objeto',
+  'guilds.bankPurgeCarrierWarning':
+    'El cambio se guarda a través de un miembro conectado de esta hermandad. En el raro caso de que se rechace el guardado, ese miembro se desconecta y se reconecta sin perder nada permanente.',
+  'guilds.bankPurgeClose': 'Cerrar el cuadro de diálogo de eliminación de objeto',
+  'guilds.bankPurgeConfirm': 'Eliminar objeto',
+  'guilds.bankPurgeConfirmation': 'Confirmo que este objeto debe destruirse.',
+  'guilds.bankPurgeFailed': 'No se pudo eliminar el objeto.',
+  'guilds.bankPurgeItemRequired': 'Esta ranura no tiene un id de objeto con el que confirmar.',
+  'guilds.bankPurgeReasonPlaceholder': 'Motivo interno de moderación',
+  'guilds.bankPurgeReasonRequired': 'Introduce un motivo de moderación.',
+  'guilds.bankPurgeReasonTooLong': 'Reduce el motivo de moderación a 500 caracteres o menos.',
+  'guilds.bankPurgeSlotRequired': 'Elige una ranura del banco de la hermandad para eliminar.',
+  'guilds.bankPurgeTitle': 'Eliminar un objeto atascado del banco de la hermandad',
+  'guilds.bankPurgeUnaudited':
+    'El objeto se eliminó, pero no se pudo escribir la entrada del registro de moderación. Informa de esto.',
+  'guilds.bankPurgeWarning':
+    'Esto destruye el objeto de forma permanente. No hay manera de deshacerlo en el juego, y la hermandad no podrá recuperarlo.',
+  'guilds.bankPurging': 'Eliminando...',
+  'guilds.bankRefresh': 'Actualizar banco',
+  'guilds.bankSlotsUsed': 'Ranuras usadas',
+  'guilds.bankSlotsUsedValue': '{used} de {capacity}',
+  'guilds.bankStatusNormal': 'Retirable',
+  'guilds.bankStatusStuck': 'Atascado',
+  'guilds.bankStuckExplainer':
+    'Un objeto atascado no se puede mover en ningún sentido, así que la hermandad nunca podrá vaciar su banco ni disolverse mientras esté ahí. Eliminarlo destruye el objeto de forma permanente.',
+  'guilds.bankTitle': 'Banco de la hermandad',
+  'guilds.bankTreasury': 'Tesorería',
+  'guilds.bankUnopened': 'Esta hermandad aún no ha abierto su banco.',
+  'moderationHistory.actionGuildBankPurge': 'Purga del banco de la hermandad',
   'onlinePlayers.autoRefresh': 'Actualización automática ({minutes} min)',
   'onlinePlayers.count': '{count} en línea',
   'onlinePlayers.countFiltered': '{shown} de {total} en línea',

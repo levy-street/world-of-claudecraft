@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: 'Разоритель кладки',
+    desc: 'Выводковый лорд Дрейкмо повержен среди своей кладки: рёв, секущий удар и огонь остались позади.',
+  },
+  chr_maw_matriarch: {
+    name: 'Небо смолкает',
+    desc: 'Синдралет, Матриарх Дрейкмо, повержена в своём кратерном гнездовье над Дрейкмо.',
+  },
   pvp_card_duel_first_win: {
     name: 'Свои правила',
     desc: 'Победите в карточной дуэли у Карточного мастера.',

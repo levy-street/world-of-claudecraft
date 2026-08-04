@@ -911,13 +911,13 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
   // per dimension, on the deposit side AND the tampered-book withdraw side.
   it('refuses soulbound items on deposit (the anonymous-pipe policy), mutating nothing', () => {
     const sim = makeOfficerSim();
-    expect(ITEMS.reins_grag_bear.soulbound).toBe(true); // fixture guard
-    meta(sim).inventory.push({ itemId: 'reins_grag_bear', count: 1 });
+    expect(ITEMS.final_argument_greatblade.soulbound).toBe(true); // fixture guard
+    meta(sim).inventory.push({ itemId: 'final_argument_greatblade', count: 1 });
     const before = fingerprint(sim);
     sim.drainEvents();
     sim.guildBankDepositFor(
       sim.playerId,
-      meta(sim).inventory.findIndex((s) => s.itemId === 'reins_grag_bear'),
+      meta(sim).inventory.findIndex((s) => s.itemId === 'final_argument_greatblade'),
     );
     expect(fingerprint(sim)).toBe(before);
     expect(hasErr(sim.drainEvents(), 'You cannot store soulbound items in the guild bank.')).toBe(
@@ -959,7 +959,7 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     // one; the copy must stay dormant in the book, never reach another player.
     const sim = makeOfficerSim();
     book(sim).inventory.push(
-      { itemId: 'reins_grag_bear', count: 1 }, // soulbound def
+      { itemId: 'final_argument_greatblade', count: 1 }, // soulbound def
       { itemId: 'wolf_fang', count: 1, instance: { boundTo: 424242 } }, // bound copy
     );
     const before = fingerprint(sim);
@@ -990,7 +990,7 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     const out = 'That item cannot be withdrawn from the guild bank.';
     const rows: { slot: Record<string, unknown>; err: string }[] = [
       { slot: { itemId: questItemId, count: 1 }, err: out },
-      { slot: { itemId: 'reins_grag_bear', count: 1 }, err: out },
+      { slot: { itemId: 'final_argument_greatblade', count: 1 }, err: out },
       { slot: { itemId: noListId, count: 1 }, err: out },
       { slot: { itemId: 'wolf_fang', count: 1, instance: { boundTo: 424242 } }, err: out },
       { slot: { itemId: 'wolf_fang', count: 1, instance: { bindOnTrade: true } }, err: out },
@@ -1012,7 +1012,7 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     if (!questItemId) throw new Error('missing quest fixture');
     const refused = [
       { itemId: questItemId, count: 1 },
-      { itemId: 'reins_grag_bear', count: 1 },
+      { itemId: 'final_argument_greatblade', count: 1 },
       { itemId: 'riding_training', count: 1 },
       { itemId: 'wolf_fang', count: 1, instance: { boundTo: 424242 } },
       { itemId: 'wolf_fang', count: 1, instance: { bindOnTrade: true } },
@@ -2524,7 +2524,7 @@ describe('applyGuildBankDeltasTo / revertGuildBankDeltasTo (the forward + invers
 
 describe('purgeDormantGuildBankSlot (the admin escape hatch)', () => {
   const DORMANT = [
-    { itemId: 'reins_grag_bear', count: 1 }, // soulbound def
+    { itemId: 'final_argument_greatblade', count: 1 }, // soulbound def
     { itemId: 'riding_training', count: 1 }, // noMarketList def
     { itemId: 'wolf_fang', count: 1, instance: { boundTo: 424242 } }, // bound copy
     { itemId: 'wolf_fang', count: 1, instance: { bindOnTrade: true } }, // armed copy
@@ -2568,11 +2568,11 @@ describe('purgeDormantGuildBankSlot (the admin escape hatch)', () => {
     // dormant copy than the one they read.
     const sim = makeOfficerSim();
     book(sim).inventory.push(
-      { itemId: 'reins_grag_bear', count: 1 },
+      { itemId: 'final_argument_greatblade', count: 1 },
       { itemId: 'riding_training', count: 1 },
     );
     const before = fingerprint(sim);
-    expect(sim.purgeDormantGuildBankSlot(GUILD_ID, 1, 'reins_grag_bear')).toBeNull();
+    expect(sim.purgeDormantGuildBankSlot(GUILD_ID, 1, 'final_argument_greatblade')).toBeNull();
     expect(sim.purgeDormantGuildBankSlot(GUILD_ID, 0, '')).toBeNull();
     expect(fingerprint(sim)).toBe(before);
     // The matching name still purges.
@@ -2593,17 +2593,17 @@ describe('purgeDormantGuildBankSlot (the admin escape hatch)', () => {
 
   it('refuses a missing book, and every out-of-range or malformed index, mutating nothing', () => {
     const sim = makeOfficerSim();
-    book(sim).inventory.push({ itemId: 'reins_grag_bear', count: 1 });
+    book(sim).inventory.push({ itemId: 'final_argument_greatblade', count: 1 });
     const before = fingerprint(sim);
     for (const bad of [-1, 1, 99, 0.5, Number.NaN, Number.POSITIVE_INFINITY]) {
       expect(
-        sim.purgeDormantGuildBankSlot(GUILD_ID, bad, 'reins_grag_bear'),
+        sim.purgeDormantGuildBankSlot(GUILD_ID, bad, 'final_argument_greatblade'),
         String(bad),
       ).toBeNull();
     }
     expect(fingerprint(sim)).toBe(before);
     // No book for that guild at all: refuse, never mint one.
-    expect(sim.purgeDormantGuildBankSlot(GUILD_ID + 1, 0, 'reins_grag_bear')).toBeNull();
+    expect(sim.purgeDormantGuildBankSlot(GUILD_ID + 1, 0, 'final_argument_greatblade')).toBeNull();
     expect(sim.guildBanks.has(GUILD_ID + 1)).toBe(false);
   });
 
@@ -2611,15 +2611,15 @@ describe('purgeDormantGuildBankSlot (the admin escape hatch)', () => {
     // The whole reason the hatch exists: guildBankHoldings is the disband
     // guard's read, and a dormant slot keeps it non-zero forever.
     const sim = makeOfficerSim({ treasury: 0 });
-    book(sim).inventory.push({ itemId: 'reins_grag_bear', count: 1 });
+    book(sim).inventory.push({ itemId: 'final_argument_greatblade', count: 1 });
     expect(sim.guildBankHoldings(GUILD_ID)).toEqual({ copper: 0, items: 1 });
-    expect(sim.purgeDormantGuildBankSlot(GUILD_ID, 0, 'reins_grag_bear')).not.toBeNull();
+    expect(sim.purgeDormantGuildBankSlot(GUILD_ID, 0, 'final_argument_greatblade')).not.toBeNull();
     expect(sim.guildBankHoldings(GUILD_ID)).toEqual({ copper: 0, items: 0 });
   });
 
   it('draws no rng (the purge and the operator read are pure book work)', () => {
     const sim = makeOfficerSim();
-    book(sim).inventory.push({ itemId: 'reins_grag_bear', count: 1 });
+    book(sim).inventory.push({ itemId: 'final_argument_greatblade', count: 1 });
     let draws = 0;
     sim.rng.setObserver(() => {
       draws++;
@@ -2628,8 +2628,8 @@ describe('purgeDormantGuildBankSlot (the admin escape hatch)', () => {
     expect(draws).toBe(1); // positive control
     draws = 0;
     sim.guildBankInfoForGuild(GUILD_ID);
-    sim.purgeDormantGuildBankSlot(GUILD_ID, 0, 'reins_grag_bear'); // the success arm
-    sim.purgeDormantGuildBankSlot(GUILD_ID, 0, 'reins_grag_bear'); // and a refusal
+    sim.purgeDormantGuildBankSlot(GUILD_ID, 0, 'final_argument_greatblade'); // the success arm
+    sim.purgeDormantGuildBankSlot(GUILD_ID, 0, 'final_argument_greatblade'); // and a refusal
     expect(draws).toBe(0);
     sim.rng.setObserver(null);
   });

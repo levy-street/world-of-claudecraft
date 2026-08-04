@@ -998,6 +998,7 @@ export const id_ID: EnTranslations = {
       "name_stormfeather_griffin": "Stormfeather Penjelajah Langit",
       "name_thunderstrut_gobbler": "Thunderstrut Sang Kalkun Agung",
       "name_terrorspark_groundshaker": "Percik Teror, Pengguncang Bumi",
+      "name_drakemaw_raptor": "Raptor Drakemaw",
       "desc_valorsteed": "Kuda tunggangan tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
       "desc_grag_bear": "Beruang tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
       "desc_stalkglider_snail": "Siput ulet berenergi tahan lama yang memberikan kecepatan perjalanan tambahan.",
@@ -1005,7 +1006,8 @@ export const id_ID: EnTranslations = {
       "desc_shadowjump_toad": "Kodok raksasa masif berpijakan mantap, terlatih dalam lompatan bayangan secepat kilat yang mampu menjangkau medan apa pun.",
       "desc_stormfeather_griffin": "Griffin badai yang anggun, melangkah di tanah dengan cakar bersepatu rune, sayap terlipat rapat.",
       "desc_thunderstrut_gobbler": "Kalkun raksasa tetasan badai yang melenggak-lenggok turun dari Puncak yang Terjaga, ekornya terkembang bagai awan guntur.",
-      "desc_terrorspark_groundshaker": "Mesin lapis baja ringkas dengan rantai roda berat, meriam berkaliber besar, dan pelana yang dibuat untuk pilot tanpa rasa takut."
+      "desc_terrorspark_groundshaker": "Mesin lapis baja ringkas dengan rantai roda berat, meriam berkaliber besar, dan pelana yang dibuat untuk pilot tanpa rasa takut.",
+      "desc_drakemaw_raptor": "Seekor raptor sarang dari Kaldera Drakemaw yang telah dijinakkan untuk ditunggangi, seluruhnya otot dan kecepatan, masih samar berbau abu."
     },
     "mountTraining": {
       "mountPrompt": "Tekan {key} untuk menaiki Valorsteed latihan.",
@@ -1246,6 +1248,15 @@ export const id_ID: EnTranslations = {
       "browserEffectsReduced": "Berkurang",
       "browserEffectsMinimal": "Minimal",
       "browserEffectsNote": "Otomatis meredam efek CSS berat (buram, cahaya, gerak latar) berdasarkan peramban dan perangkat Anda. Turunkan secara manual jika antarmuka terasa lamban.",
+      "graphicsApply": "Terapkan Grafis",
+      "graphicsApplying": "Menerapkan pengaturan grafis...",
+      "graphicsApplied": "Pengaturan grafis diterapkan.",
+      "graphicsSaved": "Pengaturan grafis disimpan. Perender aktif sudah sesuai dengannya.",
+      "graphicsFailed": "Grafis tidak dapat diterapkan. Pengaturan Anda yang sebelumnya masih aktif.",
+      "graphicsRetry": "Coba Lagi Grafis",
+      "graphicsFatal": "Pemulihan grafis gagal. Muat ulang game untuk melanjutkan.",
+      "graphicsReload": "Muat Ulang Game",
+      "graphicsDraftChanged": "Perubahan grafis siap diterapkan.",
       "interfaceMode": "Mode Antarmuka",
       "interfaceModeAuto": "Otomatis",
       "interfaceModeDesktop": "Desktop",
@@ -1276,6 +1287,7 @@ export const id_ID: EnTranslations = {
       "itemScoreLine": "Skor {score}",
       "showSecondaryActionBar": "Tampilkan Bilah Aksi Sekunder",
       "showThirdActionBar": "Tampilkan Bilah Tindakan Ketiga",
+      "lockActionBars": "Kunci Bilah Aksi",
       "showTargetOfTarget": "Tampilkan Sasaran dari Sasaran",
       "showAttackButton": "Tampilkan Tombol Serang",
       "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian",
@@ -1437,7 +1449,14 @@ export const id_ID: EnTranslations = {
     },
     "landing": {
       "highContrast": "Kontras Tinggi",
-      "highContrastAria": "Alihkan latar belakang kontras tinggi: menonaktifkan cuplikan bergerak agar teks layar mulai tetap terbaca"
+      "highContrastAria": "Alihkan latar belakang kontras tinggi: menonaktifkan cuplikan bergerak agar teks layar mulai tetap terbaca",
+      "browserSupport": {
+        "title": "Perhatian: peramban tidak didukung",
+        "body": "Kamu mungkin mengalami performa yang menurun di peramban ini. Untuk pengalaman terbaik, dapatkan aplikasi desktop untuk Windows, macOS, atau Linux. Lebih suka bermain di peramban? Chrome memberikan performa terbaik, dan Firefox serta Safari juga didukung.",
+        "getDesktopApp": "Dapatkan aplikasi desktop",
+        "continueInBrowser": "Lanjutkan di peramban",
+        "dismissAria": "Tutup pemberitahuan peramban yang tidak didukung"
+      }
     },
     "warfare": {
       "honorAmount": "{amount} Kehormatan",
@@ -1810,6 +1829,7 @@ export const id_ID: EnTranslations = {
       "itemAriaEnchanted": "{item}, jumlah {count}, salinan dimantrai",
       "itemAriaBound": "{item}, jumlah {count}, salinan terikat",
       "itemAriaMasterwork": "{item}, jumlah {count}, karya master",
+      "itemAriaQuest": "{item}, jumlah {count}, barang misi",
       "filterGroupAria": "Saring tas menurut kategori",
       "filterAll": "Semua",
       "filterWeapon": "Senjata",
@@ -1818,6 +1838,7 @@ export const id_ID: EnTranslations = {
       "filterMaterial": "Bahan",
       "filterTool": "Perkakas",
       "filterQuest": "Misi",
+      "filterQuestCountAria": "Misi, {count} barang",
       "filterMount": "Tunggangan",
       "sortAria": "Urutkan barang tas",
       "sortRecent": "Terbaru",
@@ -1826,6 +1847,7 @@ export const id_ID: EnTranslations = {
       "searchPlaceholder": "Cari barang",
       "searchAria": "Cari barang tas berdasarkan nama",
       "noMatch": "Tidak ada barang yang cocok dengan saringanmu.",
+      "noQuestItems": "Tidak ada barang misi di dalam tasmu.",
       "capacity": "{used}/{total}",
       "capacityAria": "Slot tas terpakai: {used} dari {total}",
       "backpack": "Ransel",
@@ -2044,6 +2066,7 @@ export const id_ID: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Mutu halus. Dikumpulkan dari urat tingkat penuh dengan alat berperingkat di atas materialnya, dan dihitung sebagai versi biasa di mana pun versi biasa dibutuhkan.",
+      "cookingCatch": "Bahan masakan. Harus dimasak sebelum dimakan.",
       "arcaneDust": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan umum dan tak biasa.",
       "arcaneEssence": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan langka.",
       "arcaneShard": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan epik dan legendaris.",
@@ -2325,7 +2348,7 @@ export const id_ID: EnTranslations = {
       "depositHint": "Klik untuk menyetor",
       "depositPartialHint": "Shift-klik untuk menyetor sebagian",
       "cannotDeposit": "Tidak dapat disimpan di bank",
-      "cannotDepositNow": "Cannot be deposited right now",
+      "cannotDepositNow": "Tidak dapat disetor saat ini",
       "depositQuantityTitle": "Setor {item}",
       "depositQuantityInput": "Jumlah yang disetor",
       "depositQuantityConfirm": "Setor",
@@ -2336,6 +2359,7 @@ export const id_ID: EnTranslations = {
       "sortAria": "Urutkan barang bank",
       "searchAria": "Cari barang bank menurut nama",
       "depositAll": "Setor semua bahan",
+      "depositAllTooltip": "Mengirim semua reagen kerajinan dan barang rongsokan dari tasmu ke bank dalam satu kali jalan. Alat pengumpul, perlengkapan yang dipakai, barang misi, dan barang habis pakai tidak pernah disentuh.",
       "depositAllDone": "Bahan disetor: {count}.",
       "depositAllFull": "Bahan disetor: {count}. Bank kini penuh.",
       "depositAllNone": "Bank penuh: tidak ada yang disetor.",
@@ -2352,49 +2376,49 @@ export const id_ID: EnTranslations = {
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "Undang seorang teman: saat ia mencapai level 10, kalian masing-masing mendapat 2 slot, hingga 5 teman.",
       "bonusSectionAria": "Slot bank bonus dan cara mendapat lebih banyak",
-      "tabsAria": "Bank tabs",
-      "personalTab": "Personal",
+      "tabsAria": "Tab bank",
+      "personalTab": "Pribadi",
       "guildTab": "Guild",
-      "guildCapacityAria": "Guild bank slots used: {used} of {total}",
-      "guildEmpty": "The guild bank is empty.",
-      "guildTreasury": "Guild treasury",
-      "guildDepositGold": "Deposit money",
-      "guildWithdrawGold": "Withdraw money",
-      "guildDepositGoldTitle": "Deposit money into the guild treasury",
-      "guildWithdrawGoldTitle": "Withdraw money from the guild treasury",
-      "guildGoldAvailable": "Available: {amount}",
-      "guildBuyConfirm": "Purchase {count} additional guild bank slots for {price} from the guild treasury?",
-      "guildBuyNote": "Paid from the guild treasury",
-      "guildTreasuryShort": "Treasury short",
-      "guildOpenBank": "Open the guild bank",
-      "guildOpenConfirm": "Open the guild bank for {price}? This is paid from your own money.",
-      "guildOpenAccept": "Open",
-      "guildOpenNote": "Paid from your own money, not the guild treasury",
-      "guildPurseShort": "Not enough money",
-      "guildDormantNote": "Locked items cannot be withdrawn and prevent disbanding the guild.",
-      "guildDormantHint": "This item is locked in the guild bank and cannot be withdrawn.",
-      "guildDormantAria": "{item}, quantity {count}, cannot be withdrawn",
-      "guildUnknownItem": "Unknown item",
-      "guildDepositHint": "Click to deposit into the guild bank",
-      "guildCannotDeposit": "Cannot go in the guild bank",
-      "guildGoldCannotMove": "That amount cannot be moved right now.",
-      "guildViewsAria": "Guild bank views",
-      "guildContentsTab": "Contents",
+      "guildCapacityAria": "Slot bank guild terpakai: {used} dari {total}",
+      "guildEmpty": "Bank guild kosong.",
+      "guildTreasury": "Kas guild",
+      "guildDepositGold": "Setor uang",
+      "guildWithdrawGold": "Tarik uang",
+      "guildDepositGoldTitle": "Setor uang ke kas guild",
+      "guildWithdrawGoldTitle": "Tarik uang dari kas guild",
+      "guildGoldAvailable": "Tersedia: {amount}",
+      "guildBuyConfirm": "Beli {count} slot bank guild tambahan seharga {price} dari kas guild?",
+      "guildBuyNote": "Dibayar dari kas guild",
+      "guildTreasuryShort": "Kas kurang",
+      "guildOpenBank": "Buka bank guild",
+      "guildOpenConfirm": "Buka bank guild seharga {price}? Ini dibayar dari uangmu sendiri.",
+      "guildOpenAccept": "Buka",
+      "guildOpenNote": "Dibayar dari uangmu sendiri, bukan dari kas guild",
+      "guildPurseShort": "Uang tidak cukup",
+      "guildDormantNote": "Barang yang terkunci tidak dapat ditarik dan mencegah guild dibubarkan.",
+      "guildDormantHint": "Barang ini terkunci di bank guild dan tidak dapat ditarik.",
+      "guildDormantAria": "{item}, jumlah {count}, tidak dapat ditarik",
+      "guildUnknownItem": "Barang tidak dikenal",
+      "guildDepositHint": "Klik untuk menyetor ke bank guild",
+      "guildCannotDeposit": "Tidak dapat disimpan di bank guild",
+      "guildGoldCannotMove": "Jumlah itu tidak dapat dipindahkan saat ini.",
+      "guildViewsAria": "Tampilan bank guild",
+      "guildContentsTab": "Isi",
       "guildLogTab": "Log",
-      "logAria": "Guild bank activity log",
-      "logNote": "The {count} most recent guild bank actions.",
-      "logLoading": "Loading the guild bank log...",
-      "logEmpty": "Nothing has been moved in or out of the guild bank yet.",
-      "logRefused": "Only guild officers can read the guild bank log.",
-      "logFormerMember": "A former guild member",
-      "logDepositItem": "{actor} deposited {count} {item}",
-      "logWithdrawItem": "{actor} withdrew {count} {item}",
-      "logDepositMoney": "{actor} deposited {amount}",
-      "logWithdrawMoney": "{actor} withdrew {amount}",
-      "logBuySlots": "{actor} bought a bank expansion for {amount}",
-      "logOpenBank": "{actor} opened the guild bank for {amount}",
-      "logCharterFee": "{actor} paid the guild charter fee of {amount}",
-      "logAdminPurge": "An administrator removed {count} {item}"
+      "logAria": "Log aktivitas bank guild",
+      "logNote": "{count} tindakan bank guild terbaru.",
+      "logLoading": "Memuat log bank guild...",
+      "logEmpty": "Belum ada yang keluar masuk bank guild.",
+      "logRefused": "Hanya perwira guild yang dapat membaca log bank guild.",
+      "logFormerMember": "Mantan anggota guild",
+      "logDepositItem": "{actor} menyetor {count} {item}",
+      "logWithdrawItem": "{actor} menarik {count} {item}",
+      "logDepositMoney": "{actor} menyetor {amount}",
+      "logWithdrawMoney": "{actor} menarik {amount}",
+      "logBuySlots": "{actor} membeli perluasan bank seharga {amount}",
+      "logOpenBank": "{actor} membuka bank guild seharga {amount}",
+      "logCharterFee": "{actor} membayar biaya piagam guild sebesar {amount}",
+      "logAdminPurge": "Seorang administrator menghapus {count} {item}"
     },
     "calendar": {
       "title": "Kalender Acara",
@@ -2705,8 +2729,8 @@ export const id_ID: EnTranslations = {
     "crafting": {
       "title": "kerajinan",
       "close": "Tutup kerajinan",
-      "dialogOption": "Crafting",
-      "dialogOptionAria": "Open the crafting window for {craft}",
+      "dialogOption": "Kerajinan",
+      "dialogOptionAria": "Buka jendela kerajinan untuk {craft}",
       "craft": "Keahlian",
       "reagentsNeeded": "Memerlukan:",
       "reagentLine": "{name}: {have}/{required}",
@@ -3016,7 +3040,7 @@ export const id_ID: EnTranslations = {
       "countLabel": "{earned}/{total} jasa",
       "completionAria": "Jasa yang diraih: {earned} dari {total}",
       "recentLabel": "Terbaru:",
-      "recentJumpAria": "Jump to {name}",
+      "recentJumpAria": "Lompat ke {name}",
       "nearestLabel": "Hampir tercapai:",
       "filterGroupAria": "Saring jasa",
       "filterAll": "Semua",
@@ -6212,16 +6236,16 @@ export const id_ID: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "checkingTitle": "Checking for updates...",
-      "checkingBody": "New versions download while you play.",
-      "uptodateTitle": "You're up to date",
+      "checkingTitle": "Memeriksa pembaruan...",
+      "checkingBody": "Versi baru diunduh selagi kamu bermain.",
+      "uptodateTitle": "Kamu sudah menggunakan versi terbaru",
       "downloadingTitle": "Mengunduh pembaruan {version}...",
-      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "downloadingBody": "Kamu tetap bisa bermain. Ini akan terpasang saat kamu keluar.",
       "readyTitle": "Pembaruan {version} siap",
       "readyBody": "Akan terpasang saat kamu keluar, atau mulai ulang sekarang.",
       "restart": "Mulai Ulang Sekarang",
       "later": "Nanti",
-      "dismiss": "Dismiss"
+      "dismiss": "Tutup"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -6687,6 +6711,11 @@ export const id_ID: EnTranslations = {
     },
     "system": {
       "playerDeath": "Kamu telah tewas.",
+      "deathRecapKillerAbility": "Kamu telah tewas. Tewas oleh {ability} milik {killer}.",
+      "deathRecapKiller": "Kamu telah tewas. Tewas oleh {killer}.",
+      "deathRecapAbility": "Kamu telah tewas. Tewas oleh {ability}.",
+      "deathRecapFalling": "Kamu telah tewas. Kamu jatuh hingga tewas.",
+      "deathRecapDrowned": "Kamu telah tewas. Kamu tenggelam.",
       "respawn": "Kamu merasa segar dan pulih kembali.",
       "ignoringChat": "Mengabaikan obrolan dari {name}.",
       "noLongerIgnoring": "Tidak lagi mengabaikan {name}.",
@@ -7177,6 +7206,7 @@ export const id_ID: EnTranslations = {
       "quest": "Barang Misi",
       "junk": "Rongsokan",
       "fineMaterial": "Bahan Halus",
+      "material": "Bahan",
       "food": "Makanan",
       "drink": "Minuman",
       "tool": "Perkakas",
@@ -7209,6 +7239,9 @@ export const id_ID: EnTranslations = {
       "useFood": "Pakai: Memulihkan {amount} nyawa selama {seconds} detik. Harus tetap duduk selama makan.",
       "useDrink": "Pakai: Memulihkan {amount} mana selama {seconds} detik. Harus tetap duduk selama minum.",
       "questItem": "Barang Misi",
+      "questRelated": "Misi: {quest}",
+      "questRules": "Tidak dapat dijual, disimpan di bank, atau ditukar.",
+      "questOrphaned": "Tidak dibutuhkan untuk misi aktif mana pun.",
       "classes": "Kelas: {classes}",
       "sellPrice": "Harga jual: {money}",
       "clickBuy": "Klik untuk membeli",
@@ -7344,12 +7377,12 @@ export const id_ID: EnTranslations = {
       "reclaim": "Tarik Kembali",
       "buyAria": "Beli {item} seharga {price}",
       "reclaimAria": "Tarik kembali {item}",
-      "buyConfirmTitle": "Confirm Purchase",
-      "buyConfirmBody": "Buy {item} for {price}?",
-      "buyConfirmBodyStack": "Buy {item} x{count} for {price} ({each} each)?",
-      "buyConfirmAccept": "Buy",
-      "buyConfirmCancel": "Cancel",
-      "buyChanged": "That listing changed before you confirmed. Check the price and try again.",
+      "buyConfirmTitle": "Konfirmasi Pembelian",
+      "buyConfirmBody": "Beli {item} seharga {price}?",
+      "buyConfirmBodyStack": "Beli {item} x{count} seharga {price} ({each} per buah)?",
+      "buyConfirmAccept": "Beli",
+      "buyConfirmCancel": "Batal",
+      "buyChanged": "Daftar itu berubah sebelum kamu mengonfirmasi. Periksa harganya dan coba lagi.",
       "sellNote": "Pajang barang dari tasmu. Pedagang mengambil potongan {cut}% saat barang terjual. Kamu memakai {used}/{max} slot daftar jual.",
       "sellPickEmpty": "Klik barang di tasmu untuk memilih yang akan dijual.",
       "quantity": "Jumlah",
@@ -8837,6 +8870,18 @@ export const id_ID: EnTranslations = {
       "fen_muster_order": {
         "name": "Perintah Mobilisasi Fenbridge"
       },
+      "firebottle": {
+        "name": "Botol Api"
+      },
+      "murloc_hut": {
+        "name": "Gubuk Mudfin"
+      },
+      "restless_skull": {
+        "name": "Tengkorak Gelisah"
+      },
+      "vanguard_bone": {
+        "name": "Tulang Garda Depan"
+      },
       "mire_prowler_pelt": {
         "name": "Kulit Bulu Pengendap Rawa"
       },
@@ -10112,6 +10157,9 @@ export const id_ID: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Kunci Kontak: Percik Teror, Pengguncang Bumi"
       },
+      "reins_drakemaw_raptor": {
+        "name": "Tali Kekang Raptor Drakemaw"
+      },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
       },
@@ -11107,6 +11155,21 @@ export const id_ID: EnTranslations = {
       "spider_egg_sac": {
         "name": "Kantung Telur Laba-laba"
       },
+      "spider_egg": {
+        "name": "Telur Induk Sarang"
+      },
+      "widow_hatchling": {
+        "name": "Tukik Janda"
+      },
+      "drowned_warlord": {
+        "name": "Sang Panglima Tenggelam"
+      },
+      "brakka_wallbreaker": {
+        "name": "Brakka sang Pendobrak Tembok"
+      },
+      "threnos_first_voice": {
+        "name": "Threnos sang Suara Pertama"
+      },
       "grave_silt_bulwark": {
         "name": "Benteng Lanau Kubur"
       },
@@ -11286,6 +11349,18 @@ export const id_ID: EnTranslations = {
       },
       "cindraleth_maw_matriarch": {
         "name": "Cindraleth Sang Matriark Rahang"
+      },
+      "dragonkin_egg": {
+        "name": "Telur Naga"
+      },
+      "dragonkin_whelp": {
+        "name": "Tukik Naga"
+      },
+      "dragonkin_broodguard": {
+        "name": "Penjaga Sarang Naga"
+      },
+      "drakemaw_broodlord": {
+        "name": "Penguasa Sarang Drakemaw"
       },
       "gilded_stag": {
         "name": "Rusa Bersepuh Emas"
@@ -12319,7 +12394,7 @@ export const id_ID: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Tiada Ketenangan di Antara Alang-Alang",
-        "text": "Ritus pada pedupaan itu mengikat para tenggelam untuk bangkit di mana pun rawa menyentuh mereka - dan rawa menyentuh segalanya. Tidak akan ada ketenangan di antara alang-alang ini sampai para mati melebihi jumlah yang hidup. Kita belum bisa membatalkan ritus itu, tapi kita bisa menguras prajuritnya. Istirahatkan 14 lagi dari Drowned Dead.",
+        "text": "Ritus pada pedupaan itu mengikat yang tenggelam untuk bangkit, dan kini ritus itu telah membangkitkan satu yang cukup kuat untuk memimpin mereka. Para penjaga menyebutnya Sang Panglima Tenggelam, dan selama ia menguasai Kapel Tenggelam, yang mati tetap berbaris. Tumpaskan dia, {playerName}, dan sisanya akan tercerai-berai kembali ke rawa.",
         "completion": "Kau memberi para mati lebih banyak belas kasih daripada yang pernah diberikan tuan-tuan mereka. Ambillah ini - kau lebih dari pantas mendapatkannya.",
         "objectives": {
           "0": {
@@ -12597,9 +12672,6 @@ export const id_ID: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Fanatik Wyrmcult terbunuh"
-          },
-          "1": {
-            "label": "Perintah Wyrmcult"
           }
         }
       },
@@ -12610,9 +12682,6 @@ export const id_ID: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Wyrmcult Necromancer dibunuh"
-          },
-          "1": {
-            "label": "Filakteri Ritual"
           }
         }
       },

@@ -998,6 +998,7 @@ export const vi_VN: EnTranslations = {
       "name_stormfeather_griffin": "Stormfeather Vươn Trời",
       "name_thunderstrut_gobbler": "Thunderstrut, Gà Tây Vĩ Đại",
       "name_terrorspark_groundshaker": "Tia Kinh Hoàng, Kẻ Rung Chuyển Mặt Đất",
+      "name_drakemaw_raptor": "Cuồng Long Drakemaw",
       "desc_valorsteed": "Một con chiến mã khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
       "desc_grag_bear": "Một chú gấu khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
       "desc_stalkglider_snail": "Một chú ốc sên bền bỉ, dẻo dai, giúp tăng tốc độ di chuyển.",
@@ -1005,7 +1006,8 @@ export const vi_VN: EnTranslations = {
       "desc_shadowjump_toad": "Một con cóc khổng lồ, bước chân vững chãi, được huấn luyện những cú nhảy bóng tối nhanh như chớp có thể vượt qua mọi địa hình.",
       "desc_stormfeather_griffin": "Một con sư tử đầu chim bão uy nghi, rảo bước trên mặt đất bằng những móng vuốt được bọc rune, đôi cánh xếp gọn.",
       "desc_thunderstrut_gobbler": "Một con gà tây khổng lồ nở ra từ giông bão, sải bước xuống từ Đỉnh Tỉnh Thức, đuôi xòe rộng như đám mây giông.",
-      "desc_terrorspark_groundshaker": "Một cỗ máy bọc giáp nhỏ gọn với bánh xích nặng, pháo nòng lớn và yên ngồi dành cho những người lái gan dạ."
+      "desc_terrorspark_groundshaker": "Một cỗ máy bọc giáp nhỏ gọn với bánh xích nặng, pháo nòng lớn và yên ngồi dành cho những người lái gan dạ.",
+      "desc_drakemaw_raptor": "Một con Cuồng Long thuộc bầy đàn đã được thuần yên cương từ Miệng Núi Lửa Drakemaw, toàn thân gân cốt và tốc lực, vẫn còn phảng phất mùi tro tàn."
     },
     "mountTraining": {
       "mountPrompt": "Nhấn {key} để cưỡi Valorsteed huấn luyện.",
@@ -1246,6 +1248,15 @@ export const vi_VN: EnTranslations = {
       "browserEffectsReduced": "Giảm Bớt",
       "browserEffectsMinimal": "Tối Thiểu",
       "browserEffectsNote": "Tự Động giảm bớt các hiệu ứng CSS nặng (làm mờ, phát sáng, chuyển động nền) dựa trên trình duyệt và thiết bị của bạn. Hãy hạ thủ công nếu giao diện cảm thấy chậm chạp.",
+      "graphicsApply": "Áp Dụng Đồ Họa",
+      "graphicsApplying": "Đang áp dụng cài đặt đồ họa...",
+      "graphicsApplied": "Đã áp dụng cài đặt đồ họa.",
+      "graphicsSaved": "Đã lưu cài đặt đồ họa. Bộ kết xuất hiện tại đã khớp với cài đặt này.",
+      "graphicsFailed": "Không thể áp dụng cài đặt đồ họa. Cài đặt trước đó của bạn vẫn đang hoạt động.",
+      "graphicsRetry": "Thử Lại Đồ Họa",
+      "graphicsFatal": "Khôi phục đồ họa thất bại. Hãy tải lại trò chơi để tiếp tục.",
+      "graphicsReload": "Tải Lại Trò Chơi",
+      "graphicsDraftChanged": "Các thay đổi đồ họa đã sẵn sàng để áp dụng.",
       "interfaceMode": "Chế Độ Giao Diện",
       "interfaceModeAuto": "Tự Động",
       "interfaceModeDesktop": "Máy Tính",
@@ -1276,6 +1287,7 @@ export const vi_VN: EnTranslations = {
       "itemScoreLine": "Điểm {score}",
       "showSecondaryActionBar": "Hiện Thanh Hành Động Phụ",
       "showThirdActionBar": "Hiển thị thanh hành động thứ ba",
+      "lockActionBars": "Khóa Thanh Hành Động",
       "showTargetOfTarget": "Hiện Mục Tiêu Của Mục Tiêu",
       "showAttackButton": "Hiển Thị Nút Tấn Công",
       "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày",
@@ -1437,7 +1449,14 @@ export const vi_VN: EnTranslations = {
     },
     "landing": {
       "highContrast": "Tương Phản Cao",
-      "highContrastAria": "Bật/tắt nền tương phản cao: tắt đoạn phim nền chuyển động để chữ trên màn hình bắt đầu vẫn dễ đọc"
+      "highContrastAria": "Bật/tắt nền tương phản cao: tắt đoạn phim nền chuyển động để chữ trên màn hình bắt đầu vẫn dễ đọc",
+      "browserSupport": {
+        "title": "Lưu ý: trình duyệt không được hỗ trợ",
+        "body": "Bạn có thể gặp hiệu năng giảm sút trên trình duyệt này. Để có trải nghiệm tốt nhất, hãy tải ứng dụng máy tính cho Windows, macOS, hoặc Linux. Muốn chơi trên trình duyệt hơn? Chrome cho hiệu năng tốt nhất, và Firefox cùng Safari cũng được hỗ trợ.",
+        "getDesktopApp": "Tải ứng dụng máy tính",
+        "continueInBrowser": "Tiếp tục trên trình duyệt",
+        "dismissAria": "Bỏ qua thông báo trình duyệt không được hỗ trợ"
+      }
     },
     "warfare": {
       "honorAmount": "Danh dự {amount}",
@@ -1810,6 +1829,7 @@ export const vi_VN: EnTranslations = {
       "itemAriaEnchanted": "{item}, số lượng {count}, bản đã pháp khắc",
       "itemAriaBound": "{item}, số lượng {count}, bản sao ràng buộc",
       "itemAriaMasterwork": "{item}, số lượng {count}, kiệt tác",
+      "itemAriaQuest": "{item}, số lượng {count}, vật phẩm nhiệm vụ",
       "filterGroupAria": "Lọc túi đồ theo danh mục",
       "filterAll": "Tất cả",
       "filterWeapon": "Vũ khí",
@@ -1818,6 +1838,7 @@ export const vi_VN: EnTranslations = {
       "filterMaterial": "Nguyên liệu",
       "filterTool": "Dụng cụ",
       "filterQuest": "Nhiệm vụ",
+      "filterQuestCountAria": "Nhiệm vụ, {count} vật phẩm",
       "filterMount": "Vật cưỡi",
       "sortAria": "Sắp xếp vật phẩm trong túi",
       "sortRecent": "Gần đây",
@@ -1826,6 +1847,7 @@ export const vi_VN: EnTranslations = {
       "searchPlaceholder": "Tìm vật phẩm",
       "searchAria": "Tìm vật phẩm trong túi theo tên",
       "noMatch": "Không có vật phẩm nào khớp với bộ lọc của bạn.",
+      "noQuestItems": "Không có vật phẩm nhiệm vụ nào trong túi đồ của bạn.",
       "capacity": "{used}/{total}",
       "capacityAria": "Ô túi đã dùng: {used} trên {total}",
       "backpack": "Ba Lô",
@@ -2044,6 +2066,7 @@ export const vi_VN: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Phẩm cấp hảo hạng. Thu được từ mạch đủ bậc bằng công cụ xếp trên nguyên liệu, và được tính như bản thường ở bất cứ đâu cần đến.",
+      "cookingCatch": "Nguyên liệu nấu ăn. Phải nấu chín trước khi ăn.",
       "arcaneDust": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trang bị phổ thông và khác thường.",
       "arcaneEssence": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trang bị hiếm.",
       "arcaneShard": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trang bị sử thi và huyền thoại.",
@@ -2325,7 +2348,7 @@ export const vi_VN: EnTranslations = {
       "depositHint": "Nhấp để gửi vào",
       "depositPartialHint": "Shift-click để gửi vào một phần",
       "cannotDeposit": "Không thể gửi vào ngân hàng",
-      "cannotDepositNow": "Cannot be deposited right now",
+      "cannotDepositNow": "Hiện không thể gửi vào",
       "depositQuantityTitle": "Gửi {item}",
       "depositQuantityInput": "Số lượng cần gửi",
       "depositQuantityConfirm": "Gửi Vào",
@@ -2336,6 +2359,7 @@ export const vi_VN: EnTranslations = {
       "sortAria": "Sắp xếp vật phẩm ngân hàng",
       "searchAria": "Tìm vật phẩm ngân hàng theo tên",
       "depositAll": "Gửi tất cả nguyên liệu",
+      "depositAllTooltip": "Gửi toàn bộ nguyên liệu chế tác và vật phẩm linh tinh từ túi đồ của bạn vào ngân hàng chỉ trong một lần. Dụng cụ thu thập, trang bị đang mặc, vật phẩm nhiệm vụ, và vật phẩm tiêu hao sẽ không bao giờ bị động đến.",
       "depositAllDone": "Nguyên liệu đã gửi: {count}.",
       "depositAllFull": "Nguyên liệu đã gửi: {count}. Ngân hàng hiện đã đầy.",
       "depositAllNone": "Ngân hàng đầy: không gửi được gì.",
@@ -2352,49 +2376,49 @@ export const vi_VN: EnTranslations = {
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "Mời một người bạn: khi họ đạt cấp 10, cả bạn lẫn họ mỗi người nhận 2 ô, tối đa 5 người bạn.",
       "bonusSectionAria": "Ô ngân hàng thưởng và cách kiếm thêm",
-      "tabsAria": "Bank tabs",
-      "personalTab": "Personal",
-      "guildTab": "Guild",
-      "guildCapacityAria": "Guild bank slots used: {used} of {total}",
-      "guildEmpty": "The guild bank is empty.",
-      "guildTreasury": "Guild treasury",
-      "guildDepositGold": "Deposit money",
-      "guildWithdrawGold": "Withdraw money",
-      "guildDepositGoldTitle": "Deposit money into the guild treasury",
-      "guildWithdrawGoldTitle": "Withdraw money from the guild treasury",
-      "guildGoldAvailable": "Available: {amount}",
-      "guildBuyConfirm": "Purchase {count} additional guild bank slots for {price} from the guild treasury?",
-      "guildBuyNote": "Paid from the guild treasury",
-      "guildTreasuryShort": "Treasury short",
-      "guildOpenBank": "Open the guild bank",
-      "guildOpenConfirm": "Open the guild bank for {price}? This is paid from your own money.",
-      "guildOpenAccept": "Open",
-      "guildOpenNote": "Paid from your own money, not the guild treasury",
-      "guildPurseShort": "Not enough money",
-      "guildDormantNote": "Locked items cannot be withdrawn and prevent disbanding the guild.",
-      "guildDormantHint": "This item is locked in the guild bank and cannot be withdrawn.",
-      "guildDormantAria": "{item}, quantity {count}, cannot be withdrawn",
-      "guildUnknownItem": "Unknown item",
-      "guildDepositHint": "Click to deposit into the guild bank",
-      "guildCannotDeposit": "Cannot go in the guild bank",
-      "guildGoldCannotMove": "That amount cannot be moved right now.",
-      "guildViewsAria": "Guild bank views",
-      "guildContentsTab": "Contents",
-      "guildLogTab": "Log",
-      "logAria": "Guild bank activity log",
-      "logNote": "The {count} most recent guild bank actions.",
-      "logLoading": "Loading the guild bank log...",
-      "logEmpty": "Nothing has been moved in or out of the guild bank yet.",
-      "logRefused": "Only guild officers can read the guild bank log.",
-      "logFormerMember": "A former guild member",
-      "logDepositItem": "{actor} deposited {count} {item}",
-      "logWithdrawItem": "{actor} withdrew {count} {item}",
-      "logDepositMoney": "{actor} deposited {amount}",
-      "logWithdrawMoney": "{actor} withdrew {amount}",
-      "logBuySlots": "{actor} bought a bank expansion for {amount}",
-      "logOpenBank": "{actor} opened the guild bank for {amount}",
-      "logCharterFee": "{actor} paid the guild charter fee of {amount}",
-      "logAdminPurge": "An administrator removed {count} {item}"
+      "tabsAria": "Các thẻ ngân hàng",
+      "personalTab": "Cá Nhân",
+      "guildTab": "Bang Hội",
+      "guildCapacityAria": "Ô ngân hàng bang hội đã dùng: {used} trên {total}",
+      "guildEmpty": "Ngân hàng bang hội trống rỗng.",
+      "guildTreasury": "Ngân khố bang hội",
+      "guildDepositGold": "Gửi tiền",
+      "guildWithdrawGold": "Rút tiền",
+      "guildDepositGoldTitle": "Gửi tiền vào ngân khố bang hội",
+      "guildWithdrawGoldTitle": "Rút tiền từ ngân khố bang hội",
+      "guildGoldAvailable": "Khả dụng: {amount}",
+      "guildBuyConfirm": "Mua thêm {count} ô ngân hàng bang hội với giá {price} từ ngân khố bang hội?",
+      "guildBuyNote": "Thanh toán từ ngân khố bang hội",
+      "guildTreasuryShort": "Ngân khố không đủ",
+      "guildOpenBank": "Mở ngân hàng bang hội",
+      "guildOpenConfirm": "Mở ngân hàng bang hội với giá {price}? Khoản này được thanh toán từ tiền của chính bạn.",
+      "guildOpenAccept": "Mở",
+      "guildOpenNote": "Thanh toán từ tiền của chính bạn, không phải từ ngân khố bang hội",
+      "guildPurseShort": "Không đủ tiền",
+      "guildDormantNote": "Vật phẩm bị khóa không thể rút ra và ngăn cản việc giải tán bang hội.",
+      "guildDormantHint": "Vật phẩm này đang bị khóa trong ngân hàng bang hội và không thể rút ra.",
+      "guildDormantAria": "{item}, số lượng {count}, không thể rút ra",
+      "guildUnknownItem": "Vật phẩm không xác định",
+      "guildDepositHint": "Nhấp để gửi vào ngân hàng bang hội",
+      "guildCannotDeposit": "Không thể cất vào ngân hàng bang hội",
+      "guildGoldCannotMove": "Số tiền đó hiện không thể chuyển được.",
+      "guildViewsAria": "Các chế độ xem ngân hàng bang hội",
+      "guildContentsTab": "Nội Dung",
+      "guildLogTab": "Nhật Ký",
+      "logAria": "Nhật ký hoạt động ngân hàng bang hội",
+      "logNote": "{count} hoạt động ngân hàng bang hội gần đây nhất.",
+      "logLoading": "Đang tải nhật ký ngân hàng bang hội...",
+      "logEmpty": "Chưa có gì được chuyển vào hoặc ra khỏi ngân hàng bang hội.",
+      "logRefused": "Chỉ sĩ quan bang hội mới có thể xem nhật ký ngân hàng bang hội.",
+      "logFormerMember": "Một cựu thành viên bang hội",
+      "logDepositItem": "{actor} đã gửi {count} {item}",
+      "logWithdrawItem": "{actor} đã rút {count} {item}",
+      "logDepositMoney": "{actor} đã gửi {amount}",
+      "logWithdrawMoney": "{actor} đã rút {amount}",
+      "logBuySlots": "{actor} đã mua mở rộng ngân hàng với giá {amount}",
+      "logOpenBank": "{actor} đã mở ngân hàng bang hội với giá {amount}",
+      "logCharterFee": "{actor} đã trả phí thành lập bang hội là {amount}",
+      "logAdminPurge": "Một quản trị viên đã xóa {count} {item}"
     },
     "calendar": {
       "title": "Lịch Sự Kiện",
@@ -2705,8 +2729,8 @@ export const vi_VN: EnTranslations = {
     "crafting": {
       "title": "Chế tạo",
       "close": "Đóng chế tạo",
-      "dialogOption": "Crafting",
-      "dialogOptionAria": "Open the crafting window for {craft}",
+      "dialogOption": "Chế Tác",
+      "dialogOptionAria": "Mở cửa sổ chế tác cho {craft}",
       "craft": "thủ công",
       "reagentsNeeded": "Yêu cầu:",
       "reagentLine": "{name}: {have}/{required}",
@@ -3016,7 +3040,7 @@ export const vi_VN: EnTranslations = {
       "countLabel": "{earned}/{total} kỳ công",
       "completionAria": "Kỳ công đã lập: {earned} trên {total}",
       "recentLabel": "Gần đây:",
-      "recentJumpAria": "Jump to {name}",
+      "recentJumpAria": "Nhảy đến {name}",
       "nearestLabel": "Sắp đạt:",
       "filterGroupAria": "Lọc kỳ công",
       "filterAll": "Tất Cả",
@@ -6212,16 +6236,16 @@ export const vi_VN: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "checkingTitle": "Checking for updates...",
-      "checkingBody": "New versions download while you play.",
-      "uptodateTitle": "You're up to date",
+      "checkingTitle": "Đang kiểm tra cập nhật...",
+      "checkingBody": "Phiên bản mới sẽ được tải trong khi bạn chơi.",
+      "uptodateTitle": "Bạn đang dùng phiên bản mới nhất",
       "downloadingTitle": "Đang tải bản cập nhật {version}...",
-      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "downloadingBody": "Bạn có thể tiếp tục chơi. Bản cập nhật sẽ được cài đặt khi bạn thoát.",
       "readyTitle": "Bản cập nhật {version} đã sẵn sàng",
       "readyBody": "Sẽ tự cài khi bạn thoát, hoặc khởi động lại ngay.",
       "restart": "Khởi động lại ngay",
       "later": "Để sau",
-      "dismiss": "Dismiss"
+      "dismiss": "Bỏ Qua"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -6687,6 +6711,11 @@ export const vi_VN: EnTranslations = {
     },
     "system": {
       "playerDeath": "Bạn đã chết.",
+      "deathRecapKillerAbility": "Bạn đã chết. Bị hạ gục bởi {ability} của {killer}.",
+      "deathRecapKiller": "Bạn đã chết. Bị hạ gục bởi {killer}.",
+      "deathRecapAbility": "Bạn đã chết. Bị hạ gục bởi {ability}.",
+      "deathRecapFalling": "Bạn đã chết. Bạn đã ngã tử vong.",
+      "deathRecapDrowned": "Bạn đã chết. Bạn đã chết đuối.",
       "respawn": "Bạn cảm thấy đã được nghỉ ngơi và hồi phục hoàn toàn.",
       "ignoringChat": "Đang bỏ qua tin nhắn từ {name}.",
       "noLongerIgnoring": "Không còn bỏ qua {name} nữa.",
@@ -7177,6 +7206,7 @@ export const vi_VN: EnTranslations = {
       "quest": "Vật Phẩm Nhiệm Vụ",
       "junk": "Đồ Vụn",
       "fineMaterial": "Nguyên Liệu Hảo Hạng",
+      "material": "Nguyên Liệu",
       "food": "Thức Ăn",
       "drink": "Đồ Uống",
       "tool": "Dụng Cụ",
@@ -7209,6 +7239,9 @@ export const vi_VN: EnTranslations = {
       "useFood": "Dùng: Hồi {amount} sinh lực trong {seconds} giây. Phải ngồi yên khi ăn.",
       "useDrink": "Dùng: Hồi {amount} mana trong {seconds} giây. Phải ngồi yên khi uống.",
       "questItem": "Vật Phẩm Nhiệm Vụ",
+      "questRelated": "Nhiệm vụ: {quest}",
+      "questRules": "Không thể bán, gửi ngân hàng, hoặc trao đổi.",
+      "questOrphaned": "Không cần thiết cho bất kỳ nhiệm vụ đang thực hiện nào.",
       "classes": "Lớp nhân vật: {classes}",
       "sellPrice": "Giá bán: {money}",
       "clickBuy": "Nhấp để mua",
@@ -7344,12 +7377,12 @@ export const vi_VN: EnTranslations = {
       "reclaim": "Thu hồi",
       "buyAria": "Mua {item} với giá {price}",
       "reclaimAria": "Thu hồi {item}",
-      "buyConfirmTitle": "Confirm Purchase",
-      "buyConfirmBody": "Buy {item} for {price}?",
-      "buyConfirmBodyStack": "Buy {item} x{count} for {price} ({each} each)?",
-      "buyConfirmAccept": "Buy",
-      "buyConfirmCancel": "Cancel",
-      "buyChanged": "That listing changed before you confirmed. Check the price and try again.",
+      "buyConfirmTitle": "Xác Nhận Mua",
+      "buyConfirmBody": "Mua {item} với giá {price}?",
+      "buyConfirmBodyStack": "Mua {item} x{count} với giá {price} ({each} mỗi cái)?",
+      "buyConfirmAccept": "Mua",
+      "buyConfirmCancel": "Hủy",
+      "buyChanged": "Rao bán đó đã thay đổi trước khi bạn xác nhận. Hãy kiểm tra giá và thử lại.",
       "sellNote": "Rao bán hàng hóa từ túi của bạn. Thương Nhân thu {cut}% phí khi vật phẩm được bán. Bạn đang dùng {used}/{max} ô rao bán.",
       "sellPickEmpty": "Nhấp vào một vật phẩm trong túi để chọn món muốn bán.",
       "quantity": "Số lượng",
@@ -8837,6 +8870,18 @@ export const vi_VN: EnTranslations = {
       "fen_muster_order": {
         "name": "Lệnh Tập Hợp Fenbridge"
       },
+      "firebottle": {
+        "name": "Bình Lửa"
+      },
+      "murloc_hut": {
+        "name": "Túp Lều Mudfin"
+      },
+      "restless_skull": {
+        "name": "Hài Cốt Bất An"
+      },
+      "vanguard_bone": {
+        "name": "Xương Tiên Phong"
+      },
       "mire_prowler_pelt": {
         "name": "Da Lông Thú Rình Bùn"
       },
@@ -10112,6 +10157,9 @@ export const vi_VN: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Chìa Khóa Khởi Động: Tia Kinh Hoàng, Kẻ Rung Chuyển Mặt Đất"
       },
+      "reins_drakemaw_raptor": {
+        "name": "Dây Cương Cuồng Long Drakemaw"
+      },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
       },
@@ -11107,6 +11155,21 @@ export const vi_VN: EnTranslations = {
       "spider_egg_sac": {
         "name": "Bọc Trứng Nhện"
       },
+      "spider_egg": {
+        "name": "Trứng Nhện Mẹ"
+      },
+      "widow_hatchling": {
+        "name": "Nhện Con Góa Phụ"
+      },
+      "drowned_warlord": {
+        "name": "Chiến Tướng Chết Chìm"
+      },
+      "brakka_wallbreaker": {
+        "name": "Brakka Kẻ Phá Thành"
+      },
+      "threnos_first_voice": {
+        "name": "Threnos Giọng Nói Đầu Tiên"
+      },
       "grave_silt_bulwark": {
         "name": "Thành Lũy Bùn Mộ"
       },
@@ -11286,6 +11349,18 @@ export const vi_VN: EnTranslations = {
       },
       "cindraleth_maw_matriarch": {
         "name": "Cindraleth Mẫu Chúa Hàm"
+      },
+      "dragonkin_egg": {
+        "name": "Trứng Long Tộc"
+      },
+      "dragonkin_whelp": {
+        "name": "Rồng Con Long Tộc"
+      },
+      "dragonkin_broodguard": {
+        "name": "Vệ Bầy Long Tộc"
+      },
+      "drakemaw_broodlord": {
+        "name": "Lãnh Chúa Bầy Drakemaw"
       },
       "gilded_stag": {
         "name": "Hươu Đực Dát Vàng"
@@ -12319,7 +12394,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Không Yên Nghỉ Giữa Lau Sậy",
-        "text": "Nghi lễ trên những chiếc lư hương ấy buộc kẻ chết chìm trỗi dậy ở bất cứ nơi nào đầm lầy chạm đến chúng - và đầm lầy chạm đến mọi thứ. Sẽ không có yên nghỉ giữa những lau sậy này cho đến khi kẻ chết đông hơn người sống. Ta chưa thể hóa giải nghi lễ, nhưng ta có thể tước đi binh lính của nó. Hãy đưa thêm 14 Kẻ Chết Chìm về an nghỉ.",
+        "text": "Nghi thức trên những chiếc lư hương đó buộc kẻ chết chìm phải trỗi dậy, và giờ nó đã dựng lên một kẻ đủ mạnh để dẫn dắt chúng. Các vệ binh gọi hắn là Chiến Tướng Chết Chìm, và chừng nào hắn còn giữ Nhà Nguyện Chết Chìm thì đám xác chết vẫn còn giữ vững hàng ngũ. Hãy đánh gục hắn, {playerName}, và phần còn lại sẽ tán loạn trở về đầm lầy.",
         "completion": "Ngươi ban cho người chết nhiều lòng thương xót hơn những kẻ chủ của chúng từng làm. Hãy nhận lấy thứ này - ngươi xứng đáng còn hơn thế.",
         "objectives": {
           "0": {
@@ -12597,9 +12672,6 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Đã hạ Cuồng Tín Long Giáo"
-          },
-          "1": {
-            "label": "Mệnh Lệnh Long Giáo"
           }
         }
       },
@@ -12610,9 +12682,6 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Đã hạ Pháp Sư Tử Linh Long Giáo"
-          },
-          "1": {
-            "label": "Hồn Hộp Nghi Lễ"
           }
         }
       },

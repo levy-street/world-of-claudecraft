@@ -7,6 +7,54 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const id_ID: Record<string, string> = {
+  'error.guildBankDeleting':
+    'Guild ini sedang dihapus, sehingga banknya ditutup. Tidak ada yang diubah.',
+  'error.guildBankItemRequired': 'Masukkan id barang yang Anda perkirakan berada di slot itu.',
+  'error.guildBankNoCarrier':
+    'Seorang anggota guild ini harus daring sebelum perubahan dapat disimpan.',
+  'error.guildBankNotLoaded': 'Bank guild ini tidak dimuat di realm ini saat ini.',
+  'error.guildBankPurgeRefused': 'Perubahan bank guild ditolak.',
+  'error.guildBankSaveFailed':
+    'Perubahan tidak dapat disimpan dan telah dikembalikan. Coba lagi sesaat lagi.',
+  'error.guildBankSlotNotStuck':
+    'Slot itu berisi barang biasa yang dapat ditarik sendiri oleh guild, sehingga tidak dapat dihapus di sini.',
+  'error.guildBankSlotRequired': 'Masukkan nomor slot bank guild yang akan dihapus.',
+  'guilds.bankColCount': 'Jumlah',
+  'guilds.bankColItem': 'Barang',
+  'guilds.bankColSlot': 'Slot',
+  'guilds.bankColStatus': 'Status',
+  'guilds.bankDormantCount': 'Barang macet',
+  'guilds.bankEmpty': 'Bank guild ini tidak berisi barang.',
+  'guilds.bankLoadFailed': 'Gagal memuat bank guild ini.',
+  'guilds.bankPurgeAction': 'Hapus barang',
+  'guilds.bankPurgeCarrierWarning':
+    'Perubahan disimpan melalui anggota guild yang sedang daring. Pada kasus langka saat penyimpanan itu ditolak, anggota tersebut akan terputus dan tersambung kembali tanpa kehilangan apa pun secara permanen.',
+  'guilds.bankPurgeClose': 'Tutup dialog hapus barang',
+  'guilds.bankPurgeConfirm': 'Hapus barang',
+  'guilds.bankPurgeConfirmation': 'Saya mengonfirmasi bahwa barang ini harus dihancurkan.',
+  'guilds.bankPurgeFailed': 'Gagal menghapus barang.',
+  'guilds.bankPurgeItemRequired': 'Slot ini tidak memiliki id barang untuk dikonfirmasi.',
+  'guilds.bankPurgeReasonPlaceholder': 'Alasan moderasi internal',
+  'guilds.bankPurgeReasonRequired': 'Masukkan alasan moderasi.',
+  'guilds.bankPurgeReasonTooLong': 'Persingkat alasan moderasi menjadi 500 karakter atau kurang.',
+  'guilds.bankPurgeSlotRequired': 'Pilih slot bank guild yang akan dihapus.',
+  'guilds.bankPurgeTitle': 'Hapus barang bank guild yang macet',
+  'guilds.bankPurgeUnaudited':
+    'Barang telah dihapus, tetapi entri log moderasi tidak dapat ditulis. Laporkan hal ini.',
+  'guilds.bankPurgeWarning':
+    'Ini menghancurkan barang secara permanen. Tidak ada cara membatalkan tindakan ini di dalam game, dan guild tidak dapat mendapatkannya kembali.',
+  'guilds.bankPurging': 'Menghapus...',
+  'guilds.bankRefresh': 'Segarkan bank',
+  'guilds.bankSlotsUsed': 'Slot terpakai',
+  'guilds.bankSlotsUsedValue': '{used} dari {capacity}',
+  'guilds.bankStatusNormal': 'Dapat ditarik',
+  'guilds.bankStatusStuck': 'Macet',
+  'guilds.bankStuckExplainer':
+    'Barang yang macet tidak dapat ditarik ke arah mana pun, sehingga guild tidak akan pernah bisa mengosongkan banknya atau membubarkan diri selama barang itu ada di sana. Menghapusnya akan menghancurkan barang tersebut secara permanen.',
+  'guilds.bankTitle': 'Bank guild',
+  'guilds.bankTreasury': 'Kas',
+  'guilds.bankUnopened': 'Guild ini belum membuka banknya.',
+  'moderationHistory.actionGuildBankPurge': 'Penghapusan bank guild',
   'onlinePlayers.autoRefresh': 'Segarkan otomatis ({minutes} mnt)',
   'onlinePlayers.count': '{count} daring',
   'onlinePlayers.countFiltered': '{shown} dari {total} daring',

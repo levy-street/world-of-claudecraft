@@ -17,6 +17,7 @@
 // resolve, proc, and yield, only skill gain stops.
 
 import { EASTBROOK_STATIONS_BY_ID } from '../eastbrook_layout';
+import { FENBRIDGE_STATIONS_BY_ID } from '../fenbridge_layout';
 import type { ProfessionRecord } from '../professions/types';
 import type { StationDef, StationType } from '../types';
 import { ZONE1_ZONE } from './zone1';
@@ -469,8 +470,7 @@ export const STATIONS: readonly StationDef[] = [
     id: 'station_fenbridge_tannery',
     type: 'tannery',
     zoneId: ZONE2_ZONE.id,
-    // Northwest edge of Fenbridge, downwind of the square.
-    pos: { x: -13, z: 314 },
+    pos: { ...FENBRIDGE_STATIONS_BY_ID.station_fenbridge_tannery.position },
     masterNpcId: 'tanner_hesk',
   },
   {

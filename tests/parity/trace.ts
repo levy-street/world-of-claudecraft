@@ -171,6 +171,7 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   'skin', // appearance
   'skinCatalog',
   'potionCdRemaining', // derived display copy of potionCooldownUntil (the pinned authority)
+  'firebottleCdRemaining', // derived display copy of PlayerMeta.firebottleReadyAt (the authority)
   'mainhandItemId', // render-only; "the sim never reads it for gameplay"
   'weaponSkinLoadout', // cosmetic weapon-skin selection; never read for gameplay
   'weaponSkinId', // render-only resolved weapon-skin mirror

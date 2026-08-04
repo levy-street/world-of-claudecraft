@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: 'Pemusnah Tetasan',
+    desc: 'Tumpaskan seekor Penguasa Sarang Drakemaw di tengah telur-telurnya, menembus raungan, tebasan, dan apinya.',
+  },
+  chr_maw_matriarch: {
+    name: 'Langit Membisu',
+    desc: 'Tumpaskan Cindraleth Sang Matriark Rahang di sarang kawahnya di atas Drakemaw.',
+  },
   pvp_card_duel_first_win: {
     name: 'Aturan Sendiri',
     desc: 'Menangkan Duel Kartu di hadapan Ahli Kartu.',

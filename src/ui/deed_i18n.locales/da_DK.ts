@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: 'Yngelknuseren',
+    desc: 'Dræb en Dragegabets Yngelherre midt blandt dens æg, gennem brølet, kløvningen og ilden.',
+  },
+  chr_maw_matriarch: {
+    name: 'Himlen Bliver Stille',
+    desc: 'Dræb Cindraleth Gabmatriarken i hendes kraterrede over Dragegabet.',
+  },
   pvp_card_duel_first_win: {
     name: 'Husets Regler',
     desc: 'Vind en Kortduel hos Kortmesteren.',

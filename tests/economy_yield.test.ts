@@ -60,7 +60,19 @@ function isTrash(template: MobTemplate): boolean {
     !template.boss &&
     !template.dummy &&
     !template.ambient &&
-    template.respawnMult === undefined
+    // A puzzle-object mob (xpMult 0: the 1 HP dragonkin egg, the spider egg-sac
+    // pattern) is not trash to be farmed and pays neither XP nor coin BY
+    // DESIGN: the fight it hatches is the reward, and a lootable shell would
+    // sparkle every corpse in a clutch. Same principled gate
+    // tests/progression.test.ts uses for its unconditional-loot rule.
+    template.xpMult !== 0 &&
+    template.respawnMult === undefined &&
+    // A quest-gated destructible (requiresQuestId, the Broodmother eggs) is a
+    // puzzle object only questers can even damage, not farm population: it
+    // carries neither coin nor harvest components by design. Kept alongside the
+    // xpMult gate above: the two arrived from opposite sides of this merge and
+    // state different intents, so neither is folded into the other.
+    template.requiresQuestId === undefined
   );
 }
 

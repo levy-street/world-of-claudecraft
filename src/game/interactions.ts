@@ -1,3 +1,4 @@
+import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
 import {
   dist2d,
   EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS,
@@ -188,6 +189,10 @@ export function handlePickedEntity(
 ): InteractionOutcome {
   const e = world.entities.get(id);
   if (!e) return false;
+
+  // Quest-gated mobs (Broodmother eggs) are inert scenery to a player not on the
+  // gating quest: not targetable or interactable until they take the quest.
+  if (isQuestGatedEntityHidden(e, world.questLog)) return false;
 
   if (e.kind !== 'object') world.targetEntity(id);
 

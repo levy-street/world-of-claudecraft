@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: 'Rompenidos',
+    desc: 'Abate a un Señor de la Nidada de Drakemaw entre sus huevos, sorteando el grito, el tajo y el fuego.',
+  },
+  chr_maw_matriarch: {
+    name: 'El Cielo Enmudece',
+    desc: 'Abate a Cindraleth, la Matriarca de las Fauces, en su nido de cráter sobre el Drakemaw.',
+  },
   pvp_card_duel_first_win: {
     name: 'La baza es mía',
     desc: 'Gana un Duelo de Cartas en el Maestro de Cartas.',

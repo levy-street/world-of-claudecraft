@@ -382,6 +382,11 @@ export class AbilityVfxFx implements SequencerHost {
     private camera: THREE.Camera,
     private anchor: RibbonAnchor,
     private groundY: (x: number, z: number) => number,
+    /** Caster's world facing (radians), for the STATIONARY spirit path only:
+     *  the anchor seam carries no facing, so everything else here works in
+     *  screen space. Optional so a host that cannot supply it keeps the old
+     *  camera-relative behaviour. */
+    private facingOf?: (id: number) => number | null,
   ) {
     const tex = abilityVfxTextures();
     this.ribbons = new AbilityVfxRibbons(scene, anchor, tex);
@@ -900,6 +905,25 @@ export class AbilityVfxFx implements SequencerHost {
     return this.groundAuras.hold(entityId, band, colorHex, spin, this.frame);
   }
 
+  // Presentation-culling transition for one entity. Semantic held state lives
+  // in the painter, while scarce render pools are released immediately so an
+  // offscreen actor consumes no overlay, shell, ground-aura, or glow work.
+  sleepEntity(entityId: number): void {
+    this.windups.delete(entityId);
+    const bands = this.orbits.get(entityId);
+    if (bands) {
+      this.orbitBandCount -= bands.length;
+      this.orbits.delete(entityId);
+    }
+    this.shells.sleepEntity(entityId);
+    this.groundAuras.sleepEntity(entityId);
+    const glow = this.glows.get(entityId);
+    if (glow) {
+      this.applyGlow?.(entityId, glow.color, 0);
+      this.glows.delete(entityId);
+    }
+  }
+
   burstAt(
     x: number,
     y: number,
@@ -1108,6 +1132,19 @@ export class AbilityVfxFx implements SequencerHost {
     }
     const scale = spirit.scale ?? 1;
     const path = asSpiritPath(spirit.path);
+    // 'rise' is the stationary ceremonial apparition (a shapeshift, a summon):
+    // nothing travels, so there is no caster->target direction and the fallback
+    // above leaves it broadside to the camera. That reads as the spirit standing
+    // sideways next to a caster it is supposed to mirror, so point it the way the
+    // caster is actually facing. The moving paths keep the camera-relative
+    // fallback: a self-cast lunge still has to cross the screen to read at all.
+    if (path === 'rise') {
+      const facing = this.facingOf?.(casterId);
+      if (facing != null && Number.isFinite(facing)) {
+        dirX = Math.sin(facing);
+        dirZ = Math.cos(facing);
+      }
+    }
     const tint = spirit.tint ? abilityHexColor(spirit.tint) : colorHex;
     const gy = this.groundY(ax, az);
     const ok = this.spirits.spawn({

@@ -1813,7 +1813,8 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "welcome": "Hot wind rolls off the wastes ahead. Dragons wheel over the Drakemaw, and troll fires burn in the dunes.",
     "families": [
       "troll",
-      "undead"
+      "undead",
+      "dragonkin"
     ]
   },
   {
@@ -2136,9 +2137,7 @@ export const GUIDE_DRUID_FORMS: GuideDruidForm[] = [
   {
     "id": "form_bear",
     "model": "form_bear",
-    "tint": "#5a4030",
-    "tintStrength": 0.55,
-    "still": "/guide-stills/form_bear__5a4030__s55.webp"
+    "still": "/guide-stills/form_bear.webp"
   },
   {
     "id": "form_cat",
@@ -2387,6 +2386,15 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "tint": "#283747",
         "tintStrength": 0.35,
         "still": "/guide-stills/mob_spider__283747__s35.webp"
+      },
+      {
+        "name": "Broodmother Egg",
+        "min": 10,
+        "max": 10,
+        "rare": false,
+        "templateId": "spider_egg",
+        "model": "mob_spider_egg_sac",
+        "still": "/guide-stills/mob_spider_egg_sac.webp"
       },
       {
         "name": "Canopy Weaver",
@@ -2709,10 +2717,10 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 12,
         "rare": true,
         "templateId": "grubjaw",
-        "model": "mob_troll",
+        "model": "mob_grubjaw",
         "tint": "#145a32",
-        "tintStrength": 0.12,
-        "still": "/guide-stills/mob_troll__145a32__s12.webp"
+        "tintStrength": 0.04,
+        "still": "/guide-stills/mob_grubjaw__145a32__s4.webp"
       },
       {
         "name": "Dune Troll",
@@ -2960,6 +2968,28 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "tint": "#bcd2e6",
         "tintStrength": 0.2,
         "still": "/guide-stills/mob_dragonkin__bcd2e6__s20.webp"
+      },
+      {
+        "name": "Dragonkin Broodguard",
+        "min": 19,
+        "max": 20,
+        "rare": false,
+        "templateId": "dragonkin_broodguard",
+        "model": "mob_dragonkin_broodguard",
+        "tint": "#3e6b4f",
+        "tintStrength": 0.1,
+        "still": "/guide-stills/mob_dragonkin_broodguard__3e6b4f__s10.webp"
+      },
+      {
+        "name": "Dragonkin Egg",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "dragonkin_egg",
+        "model": "mob_dragon_egg",
+        "tint": "#69a06a",
+        "tintStrength": 0.08,
+        "still": "/guide-stills/mob_dragon_egg__69a06a__s8.webp"
       }
     ]
   },
@@ -4896,6 +4926,20 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "renown": 5,
     "feat": false,
     "crest": "/ui/deeds/chr_farshore_first_cast.webp"
+  },
+  {
+    "id": "chr_drakemaw_broodlord",
+    "name": "Clutch Breaker",
+    "category": "chronicle",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "chr_maw_matriarch",
+    "name": "The Sky Goes Quiet",
+    "category": "chronicle",
+    "renown": 10,
+    "feat": false
   }
 ];
 
@@ -10198,10 +10242,9 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     ]
   },
   "form_bear": {
-    "url": "models/creatures/yetialt.glb",
+    "url": "models/creatures/bear_form.glb",
     "idle": "Idle",
-    "height": 2.4,
-    "tintStrength": 0.55
+    "height": 2.35
   },
   "form_cat": {
     "url": "models/creatures/wolf_basic.glb",
@@ -10283,11 +10326,22 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "height": 2.5,
     "tintStrength": 0.25
   },
+  "mob_spider_egg_sac": {
+    "url": "models/creatures/spider_egg_sac.glb",
+    "idle": "Idle",
+    "height": 1.8
+  },
   "mob_troll": {
     "url": "models/creatures/orc.glb",
     "idle": "Idle",
     "height": 2.4,
     "tintStrength": 0.12
+  },
+  "mob_grubjaw": {
+    "url": "models/creatures/grubjaw.glb",
+    "idle": "Idle",
+    "height": 2.9,
+    "tintStrength": 0.04
   },
   "mob_dark_caster": {
     "url": "models/chars/players/mage.glb",
@@ -10367,6 +10421,18 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "height": 1.4,
     "hover": 0.15,
     "tintStrength": 0.45
+  },
+  "mob_dragon_egg": {
+    "url": "models/creatures/dragon_egg.glb",
+    "idle": "Idle",
+    "height": 0.95,
+    "tintStrength": 0.08
+  },
+  "mob_dragonkin_broodguard": {
+    "url": "models/creatures/dragonkin_mob.glb",
+    "idle": "Idle",
+    "height": 2.2,
+    "tintStrength": 0.1
   },
   "mob_ghost": {
     "url": "models/creatures/ghost.glb",

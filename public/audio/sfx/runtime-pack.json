@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "242e90b0bcd7c91dd00676576b85a2302bd2e37ab401b227396a4207ed619325",
-  "catalogHash": "84cbcbe7eaed06729e9ca12e47d7e01d2ebdad196ec7222f788322a16e8fe0c5",
+  "bundleId": "92efd3f13cb4814e891f4976fbbeb19ba3f93c30cf2df22adce0b520bbe46b13",
+  "catalogHash": "52f3fdd334381464a3580c620a1610dce80f9adf0b61a9c0bf7644c84a56bb98",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -124,6 +124,78 @@
       "gain": 1,
       "playbackRate": 1
     },
+    "ambush": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ambush.mp3?v=fca4a69b4917",
+          "bytes": 13208,
+          "sha256": "fca4a69b4917a36d62121906395beb635bf406854d449318b7adf78ad7452cda"
+        }
+      ],
+      "gain": 1.798871,
+      "playbackRate": 1
+    },
+    "arcane_blast": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/arcane_blast.mp3?v=1000eafc3c93",
+          "bytes": 29509,
+          "sha256": "1000eafc3c9389c456828d982db3db49e5eda4ec0dacc4c57170b99e7fb0fd9a"
+        }
+      ],
+      "gain": 1.995262,
+      "playbackRate": 1
+    },
+    "backstab": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/backstab.mp3?v=65fa47a9f8b3",
+          "bytes": 13835,
+          "sha256": "65fa47a9f8b3fba703085eb4541e5f42c00803192daf8eec65dc9fc252a599ca"
+        }
+      ],
+      "gain": 1.819701,
+      "playbackRate": 1
+    },
+    "blind": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/blind.mp3?v=ef52e2c1df10",
+          "bytes": 25747,
+          "sha256": "ef52e2c1df10815a09921754705f5229e7d15fad4dfff5c7be2f71930ec92d36"
+        }
+      ],
+      "gain": 2.018366,
+      "playbackRate": 1
+    },
+    "blink": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/blink.mp3?v=047a3074ceea",
+          "bytes": 30763,
+          "sha256": "047a3074ceeafb4803b238b0dd9ed88e660ae57913d73f761b34a0486605a254"
+        }
+      ],
+      "gain": 2.041738,
+      "playbackRate": 1
+    },
+    "blizzard": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/blizzard.mp3?v=945f09b7793b",
+          "bytes": 193767,
+          "sha256": "945f09b7793b74b678c0b0aba2d0dad2fb355b9146f3b4cf13e62e3d9313f754"
+        }
+      ],
+      "gain": 1.949845,
+      "playbackRate": 1
+    },
     "buff_apply": {
       "variants": [
         {
@@ -232,6 +304,30 @@
       "gain": 1,
       "playbackRate": 1
     },
+    "cheap_shot": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/cheap_shot.mp3?v=949ae18c2f9d",
+          "bytes": 13208,
+          "sha256": "949ae18c2f9d9227e9aa5f83baea53b8822f918bd994f6065504763c03adc0a6"
+        }
+      ],
+      "gain": 1.840772,
+      "playbackRate": 1
+    },
+    "cloak_of_shadows": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/cloak_of_shadows.mp3?v=e20dd2e65dc1",
+          "bytes": 43301,
+          "sha256": "e20dd2e65dc171bd2704a18571c359f1f1c6d52fc73bb41286995c6633e90279"
+        }
+      ],
+      "gain": 2.041738,
+      "playbackRate": 1
+    },
     "combat_block": {
       "variants": [
         {
@@ -338,6 +434,66 @@
         }
       ],
       "gain": 1.698244,
+      "playbackRate": 1
+    },
+    "entangling_roots": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/entangling_roots.mp3?v=111433444b16",
+          "bytes": 67752,
+          "sha256": "111433444b16f0e4ca86351b4c1d471a9fee865b56a509e2378404e7e9d85c75"
+        }
+      ],
+      "gain": 1.883649,
+      "playbackRate": 1
+    },
+    "eviscerate": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/eviscerate.mp3?v=285b13821a6b",
+          "bytes": 18224,
+          "sha256": "285b13821a6bbcdda949fda8f343cd29ebeca6b2fa00ee38b08bd1c690aaaa99"
+        }
+      ],
+      "gain": 1.798871,
+      "playbackRate": 1
+    },
+    "fear": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/fear.mp3?v=d53ac41693da",
+          "bytes": 65871,
+          "sha256": "d53ac41693da8601fdac31490a9f7cf4b36552a60abda3bfcc9c5d48c3948c73"
+        }
+      ],
+      "gain": 2.238721,
+      "playbackRate": 1
+    },
+    "fear_shout": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/fear_shout.mp3?v=ad9932ebeb8d",
+          "bytes": 43301,
+          "sha256": "ad9932ebeb8d577c52c0ea7100f9e760c6e6d3d0adc9eb5a0eb20e1e66c6a5cb"
+        }
+      ],
+      "gain": 2.06538,
+      "playbackRate": 1
+    },
+    "flamestrike": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/flamestrike.mp3?v=d57a0627c1bf",
+          "bytes": 60229,
+          "sha256": "d57a0627c1bfe6daacd67706c2359347af522be0c89ba13466dcb58d94b77416"
+        }
+      ],
+      "gain": 2.041738,
       "playbackRate": 1
     },
     "foot_dirt": {
@@ -556,6 +712,66 @@
       "gain": 1.819701,
       "playbackRate": 1
     },
+    "frost_nova": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/frost_nova.mp3?v=431e8b38044c",
+          "bytes": 34524,
+          "sha256": "431e8b38044c8e07d58000140684b499c9cd4c9a0eca1daf02bb25b5a84d7017"
+        }
+      ],
+      "gain": 2.041738,
+      "playbackRate": 1
+    },
+    "frozen_orb": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/frozen_orb.mp3?v=d0399e657263",
+          "bytes": 47063,
+          "sha256": "d0399e6572636b8927b9fd0082310d227fac1d7ed1e5e26b8d6c8456d27a814f"
+        }
+      ],
+      "gain": 2.018366,
+      "playbackRate": 1
+    },
+    "garrote": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/garrote.mp3?v=3bf7f6ed44d4",
+          "bytes": 13835,
+          "sha256": "3bf7f6ed44d4598b208a0f6ae0f47833161a50938fb71bd8e389bc01070c0f18"
+        }
+      ],
+      "gain": 1.862087,
+      "playbackRate": 1
+    },
+    "glacial_spike": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/glacial_spike.mp3?v=241c8385a2ba",
+          "bytes": 27628,
+          "sha256": "241c8385a2ba9bd8dbd1a3ccd1a6a25990fd5414a77d14930ddc9238838e1e9c"
+        }
+      ],
+      "gain": 1.972423,
+      "playbackRate": 1
+    },
+    "hammer_of_justice": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/hammer_of_justice.mp3?v=ba14e91d594a",
+          "bytes": 69006,
+          "sha256": "ba14e91d594addfea95d828987a9c92f650c7404478f09cb1fcbc2a6b01d2e8e"
+        }
+      ],
+      "gain": 2.06538,
+      "playbackRate": 1
+    },
     "heal_impact": {
       "variants": [
         {
@@ -566,6 +782,18 @@
         }
       ],
       "gain": 1.840772,
+      "playbackRate": 1
+    },
+    "ice_block": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ice_block.mp3?v=5282a23f4bc8",
+          "bytes": 42048,
+          "sha256": "5282a23f4bc8195b36a63f50818d017d0fdc31dc7e428f83f71f8909cafb78f2"
+        }
+      ],
+      "gain": 2.06538,
       "playbackRate": 1
     },
     "impact_arcane": {
@@ -2566,6 +2794,18 @@
       "gain": 1,
       "playbackRate": 1
     },
+    "mount_run_drakemaw_raptor": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_drakemaw_raptor.mp3?v=b01e419b8171",
+          "bytes": 11328,
+          "sha256": "b01e419b817154035271ee47bf23e051fda675a6ab9ef61ebefbfabbf3379e2c"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 0.92
+    },
     "mount_run_grag_bear": {
       "variants": [
         {
@@ -2944,6 +3184,18 @@
       "gain": 1.883649,
       "playbackRate": 1
     },
+    "pyroblast": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/pyroblast.mp3?v=46d9a02dab7b",
+          "bytes": 37659,
+          "sha256": "46d9a02dab7b747e386c249d986e92281ab092a552d491002e4c24abb2b17cbc"
+        }
+      ],
+      "gain": 2.041738,
+      "playbackRate": 1
+    },
     "quest_accept": {
       "variants": [
         {
@@ -2980,6 +3232,54 @@
       "gain": 2.570396,
       "playbackRate": 1
     },
+    "sap": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/sap.mp3?v=d8a1740b6963",
+          "bytes": 7566,
+          "sha256": "d8a1740b69631ef751e43f858c2c5c5ecd62aa2b6fdfb12efe2b7837cf1e9149"
+        }
+      ],
+      "gain": 1.927525,
+      "playbackRate": 1
+    },
+    "scorch": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/scorch.mp3?v=7f312cad2cd6",
+          "bytes": 19478,
+          "sha256": "7f312cad2cd6ebf8a2b9bf73c6b70efe9030b3ccc0d86d3d54e90c761acab940"
+        }
+      ],
+      "gain": 1.840772,
+      "playbackRate": 1
+    },
+    "shadowstep": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/shadowstep.mp3?v=48340db25382",
+          "bytes": 18224,
+          "sha256": "48340db253824ef7e05bb0226b44b915dedb24eab4e071fececce5d2ce248413"
+        }
+      ],
+      "gain": 1.840772,
+      "playbackRate": 1
+    },
+    "sinister_strike": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/sinister_strike.mp3?v=1744e663c766",
+          "bytes": 13208,
+          "sha256": "1744e663c766b768177e69723b2d6039ca59ecb51c2cfac8662bef24fcbb66ca"
+        }
+      ],
+      "gain": 2.660725,
+      "playbackRate": 1
+    },
     "spell_nova": {
       "variants": [
         {
@@ -2990,6 +3290,18 @@
         }
       ],
       "gain": 1.678804,
+      "playbackRate": 1
+    },
+    "stealth": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/stealth.mp3?v=f747fb4d474b",
+          "bytes": 48944,
+          "sha256": "f747fb4d474b96fab39745fd7ba0e3d6f559dd82547dd0755c8df6b1a6e3c415"
+        }
+      ],
+      "gain": 2.162719,
       "playbackRate": 1
     },
     "temporal_clock": {
@@ -3932,6 +4244,18 @@
         }
       ],
       "gain": 1,
+      "playbackRate": 1
+    },
+    "vanish": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/vanish.mp3?v=a3722758320e",
+          "bytes": 30763,
+          "sha256": "a3722758320ee78d59e635baa95adf1bda8165dd157758214819d26f2fd77991"
+        }
+      ],
+      "gain": 2.06538,
       "playbackRate": 1
     },
     "wand_arcane": {

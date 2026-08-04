@@ -167,9 +167,10 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       else purgeItem('eastbrook_ritual_vestments'); // keep the bags clear between attempts
     }
     // Hunted literal (seed 4242, this exact beat order, re-recorded after the
-    // Eastbrook camp respacing thinned the zone-1 camp counts, which shifts every
-    // world-gen draw downstream): the proc lands on attempt index 3.
-    expect(procAt).toBe(3);
+    // zones 1-3 quest-dedupe content pass added camps, mobs, and items, which
+    // shifts every world-gen draw downstream): the proc lands on attempt
+    // index 7.
+    expect(procAt).toBe(7);
     expect(meta.deedStats.counters.masterworksCrafted).toBe(1);
     const evs = sim.tick();
     const ev = deedEvents(evs).find((e) => e.deedId === 'prog_masterwright');
@@ -259,10 +260,10 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false);
   });
 
-  // 90s budget: the re-hunted koi session sits at index 26 in the shared
+  // 90s budget: the re-hunted koi session sits at index 7 in the shared
   // stream, and every session ticks the REAL world to its bite.
   // Raised timeout (the climb_slope idiom): this beat drives thousands of
-  // REAL world ticks (9 bite-and-reel sessions plus bounded combat waits),
+  // REAL world ticks (8 bite-and-reel sessions plus bounded combat waits),
   // which overruns the 5s default under CI/core contention; every loop is
   // guard-bounded, so a genuine hang still terminates into a failed pin.
   it('beat 11: the koi lands through the REAL bite-and-reel loop and the deed fires on the catch', {
@@ -302,13 +303,16 @@ describe('scripted playthrough (one sim, live sites only)', () => {
         sawBiteOnKoiSession = bit;
       }
     }
-    // Hunted literal (seed 4242, after every beat above, re-recorded on the
-    // v0.34.0 release merge: BOTH parents moved the shared stream since the
-    // last recording, the packet's tuned band tables and world-gen on one
-    // side and the release's Idol Guardian phasesThroughObstacles wander
-    // timing on the other, the same cause as this merge's parity golden
-    // re-mint): the koi bites on session index 42.
-    expect(koiSession).toBe(42);
+    // Hunted literal (seed 4242, after every beat above), re-recorded on this
+    // v0.34.0 sync merge, where the release side's shifts (the packet's tuned
+    // band tables and world-gen, the Idol Guardian phasesThroughObstacles wander
+    // timing, and the Dragonkin brood replacing the emberwing drakes in shipped
+    // camp slots) compose with this branch's zones 1-3 quest-dedupe content pass,
+    // whose added camps, mobs and items move every shared-stream draw downstream.
+    // Neither parent's recorded value survives the composition, so this is a
+    // fresh hunt, the same cause and protocol as this merge's parity golden
+    // re-mint: the koi bites on session index 0.
+    expect(koiSession).toBe(0);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -322,11 +326,10 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // no later beat reads the inventory. Pure state cleanup, zero draws.
     meta.inventory.length = 0;
     // Hunted literals (seed 4242, after every beat above, re-recorded after
-    // the Idol Guardian gained phasesThroughObstacles on this branch: its
-    // ambient wander no longer stalls on the Sunken Idol relic colliders, so
-    // every shared-stream draw after its wander-arrival shifts, the same
-    // cause as this branch's parity golden re-mint): the harvest index where
-    // each flavor's 1-in-90 event fires under the shared stream.
+    // the zones 1-3 quest-dedupe content pass: its added camps, mobs, and
+    // items move every shared-stream draw downstream, the same cause as that
+    // pass's parity scenario re-hunt): the harvest index where each flavor's
+    // 1-in-90 event fires under the shared stream.
     // #2343: each hunt's harvest needs its profession's tool in bags. The
     // tier-1 tools ride the whole beat (purgeItem never touches them) and
     // addItem draws no rng, so the hunted hitAt literals hold.
@@ -336,18 +339,18 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Hunted literals (seed 4242, after every beat above): the harvest index
     // where each flavor's 1-in-90 event fires under the shared stream.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 58 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 100 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 87,
+        hitAt: 319,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 79,
+        hitAt: 130,
       },
     ];
     for (const hunt of hunts) {
@@ -405,11 +408,11 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       sim.harvestCorpse(mob.id, ['hide'], pid);
       if (sim.countItem('pristine_hide', pid) > 0) hitAt = i;
     }
-    // Hunted literal (seed 4242, after every beat above, re-recorded on the
-    // v0.34.0 release merge, the same both-parents stream shift as the koi
-    // literal above): the rare-or-better rarity roll that mints the signed
-    // specimen lands on attempt index 2.
-    expect(hitAt).toBe(2);
+    // Hunted literal (seed 4242, after every beat above), re-recorded on this
+    // merge, the same composed stream shift as the koi literal above: the
+    // rare-or-better rarity roll that mints the signed specimen lands on
+    // attempt index 8.
+    expect(hitAt).toBe(8);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);
     expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(true);

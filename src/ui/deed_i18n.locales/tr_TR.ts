@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: 'Kuluçka Kırıcı',
+    desc: "Bir Ejder Ağzı Yuva Lordu'nu, narasına, yarma darbesine ve ateşine rağmen, yumurtalarının ortasında öldür.",
+  },
+  chr_maw_matriarch: {
+    name: 'Gök Sessizleşiyor',
+    desc: "Ağız Anaerkili Cindraleth'i, Ejder Ağzı'nın üzerindeki krater tüneğinde öldür.",
+  },
   pvp_card_duel_first_win: {
     name: 'Ev Kuralları',
     desc: "Kart Ustası'nın yanında bir Kart Düellosu kazan.",

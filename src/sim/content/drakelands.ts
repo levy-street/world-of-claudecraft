@@ -123,9 +123,15 @@ export const DRAKELANDS_ROADS: { x: number; z: number }[][] = [
   ], // the Cinder Dunes -> west to the Snowline crossing (fire meets ice)
 ];
 
-// The wastes' first inhabitants: emberwing drakes wheel over the Drakemaw,
+// The wastes' first inhabitants: the dragonkin brood nests across the
+// Drakemaw belt (broodlords ring their egg clutches, broodguards patrol
+// between them, and whelps hatch out of any egg a boot or a shout cracks),
 // the ashbone dead muster in the dunes, and the troll clans raid the roads.
 export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
+  // RETIRED from spawning (v0.35 dragonkin brood rework): the wheeling drake
+  // is replaced by the ground brood below. The template stays so nothing that
+  // recorded the id (kill credit in old saves, combat logs) dangles; it has
+  // no camp, so it never spawns. Its quest scale drop moved to the brood.
   emberwing_drake: {
     id: 'emberwing_drake',
     name: 'Emberwing Drake',
@@ -147,6 +153,185 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.4,
     color: 0xd84028,
+  },
+  // The brood clutch: a 1 HP puzzle-object mob (the spider_egg_sac pattern).
+  // Shooting or striking one cracks it open; src/sim/mob/dragonkin_brood.ts
+  // hatches a whelp out of it, ripples the break to neighboring eggs, and
+  // springs the ambush when a player walks too close.
+  dragonkin_egg: {
+    id: 'dragonkin_egg',
+    name: 'Dragonkin Egg',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'dragonkin',
+    hpBase: 1,
+    hpPerLevel: 0,
+    dmgBase: 0,
+    dmgPerLevel: 0,
+    attackSpeed: 999,
+    armorPerLevel: 0,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    loot: [],
+    scale: 1.1,
+    color: 0x69a06a,
+    // Dies to any single hit; the hatched whelp is the real fight.
+    xpMult: 0,
+    // Chain 5.5 (under the ring spacing) so shooting one egg ripples its
+    // neighbors without a single roadside egg unzipping a whole scatter
+    // field; proximity 3 means a boot practically ON the shell.
+    offStreamIdle: true,
+    broodEgg: {
+      chainRadius: 5.5,
+      chainDelay: 0.3,
+      proximityRadius: 3,
+      hatchMobId: 'dragonkin_whelp',
+    },
+  },
+  // The hatchling ambusher: glass cannon. One player hit kills it, but its
+  // pounce hits like a wagon and sets the victim burning. Hatches hating the
+  // nearest healer or damage-dealer (the brood smells soft targets); only
+  // when nobody fragile is in reach does it settle for whoever is closest.
+  dragonkin_whelp: {
+    id: 'dragonkin_whelp',
+    name: 'Dragonkin Whelp',
+    minLevel: 19,
+    maxLevel: 20,
+    family: 'dragonkin',
+    hpBase: 26,
+    hpPerLevel: 1,
+    dmgBase: 13,
+    dmgPerLevel: 2.6,
+    attackSpeed: 1.5,
+    armorPerLevel: 4,
+    moveSpeed: 10,
+    aggroRadius: 12,
+    // Coin is GUARANTEED, never a lottery: the economy curve
+    // (tests/economy_yield.test.ts) requires an unconditional copper drop on
+    // every camp-spawned combat mob, and a 60% chance failed that rule.
+    loot: [{ copper: 15, chance: 1 }],
+    componentTags: ['hide', 'fang'],
+    scale: 0.85,
+    color: 0x4e8a5f,
+    // Swarm chaff: a sliver of kill XP each so a cracked clutch is a hazard,
+    // not an XP farm.
+    xpMult: 0.3,
+    // Restless hatchlings: the wander pause divides by 3, so loose whelps
+    // skitter around their patch instead of standing statuesque.
+    wanderHaste: 3,
+    // The pounce is a CALCULATED leap: duration derives from the live
+    // distance at launch (speed = moveSpeed x leapSpeedMult, capped at
+    // leapSeconds), triggered from anywhere inside leapRange, and loose
+    // whelps re-pounce on aggro after a cooldown (dragonkin_brood.ts).
+    offStreamIdle: true,
+    broodWhelp: {
+      leapRange: 24,
+      leapSpeedMult: 2.6,
+      leapSeconds: 1.5,
+      burn: { perTick: 5, interval: 1, duration: 6, name: 'Hatchling Burn' },
+    },
+  },
+  // The brood's rank and file. Bellows a challenge the moment it spots prey
+  // (rooted mid-shout, the player's cue to pre-position), then comes on.
+  dragonkin_broodguard: {
+    id: 'dragonkin_broodguard',
+    name: 'Dragonkin Broodguard',
+    minLevel: 19,
+    maxLevel: 20,
+    family: 'dragonkin',
+    hpBase: 60,
+    hpPerLevel: 20,
+    dmgBase: 12,
+    dmgPerLevel: 2.5,
+    attackSpeed: 2.0,
+    armorPerLevel: 14,
+    moveSpeed: 8.5,
+    aggroRadius: 14,
+    loot: [
+      { copper: 90, chance: 1 },
+      { itemId: 'emberwing_scale', chance: 0.5, questId: 'q_dk_scales_of_the_maw' },
+    ],
+    // Only MAPPED families (HARVEST_COMPONENT_ITEMS): claw and horn read well on
+    // a dragonkin but yield no item, so they would be dead weight that still
+    // inflates the concentration bonus (the denominator is the advertised tag
+    // count), which is the #2514 shape tests/mob_component_tags.test.ts guards.
+    componentTags: ['hide', 'fang'],
+    offStreamIdle: true,
+    // Playtest bump: 30% over the first cut. Still inside the stock melee
+    // profile's honest reach (the bespoke-reach threshold is the scale-2
+    // wildheart case); the menace ladder reads whelp 0.85 -> guard 1.5 ->
+    // broodlord 2.25 -> matriarch 2.85.
+    scale: 1.5,
+    color: 0x3e6b4f,
+    engageShout: { rootSeconds: 1.3 },
+  },
+  // The clutch-lords of the Drakemaw: four stand across the dragon belt, each
+  // ringed by eggs. The opening shout cracks every egg around it and wards
+  // the hatchlings (one free hit each); in the fight it counters any stun
+  // with a tail hammer of its own, cleaves the whole front arc on a cadence,
+  // and hoses a fire cone on a timer.
+  drakemaw_broodlord: {
+    id: 'drakemaw_broodlord',
+    name: 'Drakemaw Broodlord',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'dragonkin',
+    hpBase: 150,
+    hpPerLevel: 34,
+    dmgBase: 17,
+    dmgPerLevel: 3.0,
+    attackSpeed: 2.4,
+    armorPerLevel: 17,
+    moveSpeed: 9.5,
+    aggroRadius: 20,
+    hardLeashRadius: 50,
+    elite: true,
+    offStreamIdle: true,
+    // Rare-flagged: the 4x respawn window (respawn_policy.ts) keeps the four
+    // lords feeling like standing minibosses, and rare camp mobs feed the
+    // 'slain:' deed credit (RARE_SLAIN_TEMPLATES).
+    rare: true,
+    loot: [
+      { copper: 100, chance: 1 },
+      { itemId: 'emberwing_scale', chance: 0.9, questId: 'q_dk_scales_of_the_maw' },
+    ],
+    // Menace scale: half again over the first cut. Its melee reach follows
+    // through the bespoke combat profile (mob_combat.ts), never the visual
+    // alone (the Wildheart whiff lesson).
+    // Mapped families only, same reasoning as the broodguard above.
+    componentTags: ['hide', 'fang'],
+    scale: 2.25,
+    color: 0x50392e,
+    yells: {
+      engage: 'The brood wakes! Rise, hatchlings, and strip their bones!',
+    },
+    engageShout: {
+      rootSeconds: 1.6,
+      breakEggsRadius: 26,
+      wardWhelps: { duration: 20, name: "Broodlord's Ward" },
+    },
+    arcCleave: {
+      every: 5,
+      arcDeg: 150,
+      // reaches past the scale-2.25 body's own melee arc (mob_combat.ts)
+      range: 8,
+      mult: 1.0,
+      name: 'Brood Cleave',
+      burn: { perTick: 4, interval: 1, duration: 8, name: 'Seared Scales' },
+    },
+    breathCone: {
+      castId: 'broodlord_fire_breath',
+      name: 'Fire Breath',
+      castTime: 1.6,
+      every: 14,
+      range: 13,
+      arcDeg: 60,
+      min: 26,
+      max: 34,
+      school: 'fire',
+      burn: { perTick: 4, interval: 1, duration: 8, name: 'Seared Scales' },
+    },
+    counterStun: { seconds: 2, cooldown: 25, name: 'Tail Hammer' },
   },
   ashbone_raider: {
     id: 'ashbone_raider',
@@ -213,10 +398,13 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     scale: 1.15,
     color: 0xb07040,
   },
-  // The brood-mother of every emberwing in the Drakemaw sky, gold as a coal
-  // about to catch against her red-scaled children (q_dk_matriarch_of_the_maw).
+  // The brood-mother of the whole Drakemaw clutch, gold as a coal about to
+  // catch against her green-scaled children (q_dk_matriarch_of_the_maw).
   // Spawned by the quest camps appended at the END of the merged CAMPS array
-  // (draw-order rule); her crater roost sits well off every road.
+  // (draw-order rule); her crater roost sits well off every road, ringed by
+  // her own eggs. She runs the full broodlord kit, scaled up: the wake-shout
+  // that cracks and wards her clutch, the cadenced front-arc cleave, the fire
+  // cone, and the counter-stun tail.
   cindraleth_maw_matriarch: {
     id: 'cindraleth_maw_matriarch',
     name: 'Cindraleth the Maw Matriarch',
@@ -232,9 +420,42 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 9,
     aggroRadius: 20,
     elite: true,
+    offStreamIdle: true,
     loot: [{ copper: 100, chance: 1 }],
-    scale: 1.9,
+    // The matriarch keeps her half-again margin over the grown broodlords
+    // (reach profile beside theirs in mob_combat.ts).
+    scale: 2.85,
     color: 0xf0b040,
+    yells: {
+      engage: 'You crunch across MY nursery, little thief. The Maw remembers its own.',
+    },
+    engageShout: {
+      rootSeconds: 1.6,
+      breakEggsRadius: 30,
+      wardWhelps: { duration: 20, name: "Matriarch's Ward" },
+    },
+    arcCleave: {
+      every: 5,
+      arcDeg: 150,
+      // reaches past the scale-2.85 body's own melee arc (mob_combat.ts)
+      range: 9,
+      mult: 1.0,
+      name: 'Maw Cleave',
+      burn: { perTick: 5, interval: 1, duration: 8, name: 'Seared Scales' },
+    },
+    breathCone: {
+      castId: 'matriarch_fire_breath',
+      name: 'Fire Breath',
+      castTime: 1.6,
+      every: 12,
+      range: 14,
+      arcDeg: 60,
+      min: 30,
+      max: 38,
+      school: 'fire',
+      burn: { perTick: 5, interval: 1, duration: 8, name: 'Seared Scales' },
+    },
+    counterStun: { seconds: 2, cooldown: 25, name: 'Tail Hammer' },
   },
 };
 // The folk of the wastes: the gatecaptain and her quartermaster hold
@@ -525,6 +746,25 @@ export const DRAKELANDS_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 72, sta: 6, int: 4 },
     sellValue: 2200,
   },
+  // --- the Drakemaw legendary ---
+  // Has NO acquisition path yet: the broodlord drop was pulled (owner call,
+  // 2026-08-04) because hanging the only farmable epic mount on the quest
+  // chain's own 90% scale source camped the Drakemaw belt. The reins move to a
+  // dedicated world boss in a follow-up; the def stays so the mount, its GLB,
+  // and its strings keep shipping. Owning the reins IS owning the mount
+  // (src/sim/mounts.ts mountOwned). Unbound like every player reins (the
+  // tradable-reins policy): only the dev tank stays soulbound, and while this
+  // has no acquisition path there is nothing to trade anyway.
+  reins_drakemaw_raptor: {
+    id: 'reins_drakemaw_raptor',
+    name: 'Reins of the Drakemaw Raptor',
+    kind: 'mount',
+    mount: 'drakemaw_raptor',
+    quality: 'epic',
+    noVendorSell: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
 };
 export const DRAKELANDS_CAMPS: CampDef[] = [
   { mobId: 'dune_troll', center: { x: 460, z: 2140 }, radius: 10, count: 3 },
@@ -532,10 +772,14 @@ export const DRAKELANDS_CAMPS: CampDef[] = [
   { mobId: 'ashbone_raider', center: { x: 356, z: 2086 }, radius: 10, count: 3 },
   { mobId: 'ashbone_raider', center: { x: 296, z: 2184 }, radius: 10, count: 3 },
   { mobId: 'ashbone_warcaller', center: { x: 448, z: 2106 }, radius: 8, count: 2 },
-  // the dens sit on the probed level shelves at the volcano feet, so the
-  // hoard and egg clutches (render/ember_features.ts) rest on flat ground
-  { mobId: 'emberwing_drake', center: { x: 419, z: 2266 }, radius: 8, count: 1 },
-  { mobId: 'emberwing_drake', center: { x: 302, z: 2258 }, radius: 8, count: 1 },
+  // Brood rework: the two drake-den rows were REPLACED IN PLACE (same array
+  // slots, same count) by two of the four broodlords, so every later camp in
+  // the merged CAMPS array keeps its world-gen rng draws. The dens still sit
+  // on the probed level shelves at the volcano feet (render/ember_features.ts
+  // hoards rest on flat ground); the second den moved west into Bloodglass
+  // for even spread (a center move changes no draw count).
+  { mobId: 'drakemaw_broodlord', center: { x: 419, z: 2266 }, radius: 8, count: 1 },
+  { mobId: 'drakemaw_broodlord', center: { x: 288, z: 2278 }, radius: 8, count: 1 },
 ];
 export const DRAKELANDS_OBJECTS: GroundObjectDef[] = [
   {
@@ -570,10 +814,108 @@ export const DRAKELANDS_OBJECTS: GroundObjectDef[] = [
 // untouched.
 export const DRAKELANDS_QUEST_CAMPS: CampDef[] = [
   { mobId: 'ashbone_warcaller', center: { x: 302, z: 2180 }, radius: 8, count: 2 },
-  { mobId: 'emberwing_drake', center: { x: 322, z: 2252 }, radius: 8, count: 1 },
+  // Brood rework: the far-ranging drake's slot (same count) now spawns the
+  // third broodlord, moved deep onto the crater's north rim for even spread.
+  { mobId: 'drakemaw_broodlord', center: { x: 352, z: 2352 }, radius: 8, count: 1 },
   // Cindraleth's roost: a lava crater on the Drakemaw's eastern flank, well
   // away from every marked road.
   { mobId: 'cindraleth_maw_matriarch', center: { x: 436, z: 2348 }, radius: 6, count: 1 },
+];
+
+// The dragonkin brood belt (v0.35 rework): the fourth broodlord, the egg
+// clutches ringing every broodlord and the matriarch, the loose scatter
+// fields between nests, and the broodguard patrols. A NEW list appended at
+// the very END of the merged CAMPS array in data.ts (below even the
+// quest-camp block): every pre-existing camp keeps its world-gen rng draws,
+// so no shipped spawn moves. Whelps have no camp: they hatch from eggs at
+// runtime (src/sim/mob/dragonkin_brood.ts).
+export const DRAKELANDS_BROOD_CAMPS: CampDef[] = [
+  // the fourth broodlord: the southeast rim over the wargate approach
+  {
+    mobId: 'drakemaw_broodlord',
+    center: { x: 458, z: 2302 },
+    radius: 8,
+    count: 1,
+    offStream: true,
+  },
+  // egg clutches: a ring around each broodlord...
+  { mobId: 'dragonkin_egg', center: { x: 419, z: 2266 }, radius: 9, count: 7, offStream: true },
+  { mobId: 'dragonkin_egg', center: { x: 288, z: 2278 }, radius: 9, count: 7, offStream: true },
+  { mobId: 'dragonkin_egg', center: { x: 352, z: 2352 }, radius: 9, count: 7, offStream: true },
+  { mobId: 'dragonkin_egg', center: { x: 458, z: 2302 }, radius: 9, count: 7, offStream: true },
+  // ...and the matriarch's own clutch in the crater
+  { mobId: 'dragonkin_egg', center: { x: 436, z: 2348 }, radius: 10, count: 8, offStream: true },
+  // loose scatter fields between the nests (sparser than the rings, so a
+  // careless boot pops a local cascade, not the whole field). The first
+  // field sits EAST of the crater-rim road terminus (390, 2298): centered on
+  // the road it cascaded on every walk-by and read as pre-hatched.
+  { mobId: 'dragonkin_egg', center: { x: 404, z: 2318 }, radius: 10, count: 5, offStream: true },
+  { mobId: 'dragonkin_egg', center: { x: 330, z: 2300 }, radius: 12, count: 5, offStream: true },
+  { mobId: 'dragonkin_egg', center: { x: 430, z: 2380 }, radius: 12, count: 5, offStream: true },
+  // broodguard patrols: the caldera belt, Bloodglass, and the dune approach
+  {
+    mobId: 'dragonkin_broodguard',
+    center: { x: 378, z: 2242 },
+    radius: 9,
+    count: 3,
+    offStream: true,
+  },
+  {
+    mobId: 'dragonkin_broodguard',
+    center: { x: 392, z: 2296 },
+    radius: 9,
+    count: 3,
+    offStream: true,
+  },
+  {
+    mobId: 'dragonkin_broodguard',
+    center: { x: 352, z: 2282 },
+    radius: 8,
+    count: 2,
+    offStream: true,
+  },
+  {
+    mobId: 'dragonkin_broodguard',
+    center: { x: 418, z: 2338 },
+    radius: 8,
+    count: 2,
+    offStream: true,
+  },
+  {
+    mobId: 'dragonkin_broodguard',
+    center: { x: 302, z: 2302 },
+    radius: 9,
+    count: 3,
+    offStream: true,
+  },
+  {
+    mobId: 'dragonkin_broodguard',
+    center: { x: 268, z: 2252 },
+    radius: 8,
+    count: 2,
+    offStream: true,
+  },
+  {
+    mobId: 'dragonkin_broodguard',
+    center: { x: 438, z: 2384 },
+    radius: 8,
+    count: 2,
+    offStream: true,
+  },
+  // Guard clutches (playtest wave 2, appended at this list's tail so every
+  // camp above keeps its world-gen draws): a loose scatter of eggs beside
+  // each broodguard patrol, so the guards walk among shells and a fight in
+  // the pack risks waking hatchlings. Centers sit offset from the patrols
+  // AND clear of the road lines (the crater-rim, north-rim, and dune-fork
+  // legs), so no walk-by pops them; the guards themselves never can (only a
+  // player inside proximityRadius springs a shell).
+  { mobId: 'dragonkin_egg', center: { x: 372, z: 2242 }, radius: 7, count: 4, offStream: true },
+  { mobId: 'dragonkin_egg', center: { x: 401, z: 2303 }, radius: 7, count: 4, offStream: true },
+  { mobId: 'dragonkin_egg', center: { x: 344, z: 2286 }, radius: 6, count: 3, offStream: true },
+  { mobId: 'dragonkin_egg', center: { x: 421, z: 2334 }, radius: 7, count: 3, offStream: true },
+  { mobId: 'dragonkin_egg', center: { x: 306, z: 2308 }, radius: 7, count: 4, offStream: true },
+  { mobId: 'dragonkin_egg', center: { x: 264, z: 2258 }, radius: 7, count: 3, offStream: true },
+  { mobId: 'dragonkin_egg', center: { x: 441, z: 2380 }, radius: 7, count: 3, offStream: true },
 ];
 
 export const DRAKELANDS_PROPS: ZonePropsDef = {

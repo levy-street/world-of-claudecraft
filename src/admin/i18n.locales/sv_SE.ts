@@ -7,6 +7,54 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const sv_SE: Record<string, string> = {
+  'error.guildBankDeleting':
+    'Det här gillet håller på att raderas, så dess bank är stängd. Inget ändrades.',
+  'error.guildBankItemRequired': 'Ange det föremåls-id du förväntar dig att facket innehåller.',
+  'error.guildBankNoCarrier':
+    'En medlem av det här gillet måste vara online innan ändringen kan sparas.',
+  'error.guildBankNotLoaded': 'Det här gillets bank är inte inladdad på den här världen just nu.',
+  'error.guildBankPurgeRefused': 'Ändringen av gillesbanken nekades.',
+  'error.guildBankSaveFailed':
+    'Ändringen kunde inte sparas och rullades tillbaka. Försök igen om en liten stund.',
+  'error.guildBankSlotNotStuck':
+    'Det facket innehåller ett vanligt föremål som gillet kan ta ut själv, så det kan inte tas bort här.',
+  'error.guildBankSlotRequired': 'Ange facknumret i gillesbanken som ska tas bort.',
+  'guilds.bankColCount': 'Antal',
+  'guilds.bankColItem': 'Föremål',
+  'guilds.bankColSlot': 'Fack',
+  'guilds.bankColStatus': 'Status',
+  'guilds.bankDormantCount': 'Fastlåsta föremål',
+  'guilds.bankEmpty': 'Den här gillesbanken innehåller inga föremål.',
+  'guilds.bankLoadFailed': 'Det gick inte att ladda den här gillesbanken.',
+  'guilds.bankPurgeAction': 'Ta bort föremål',
+  'guilds.bankPurgeCarrierWarning':
+    'Ändringen sparas via en uppkopplad medlem av det här gillet. I det sällsynta fallet att sparandet nekas kopplas den medlemmen ner och ansluter igen utan att något beständigt går förlorat.',
+  'guilds.bankPurgeClose': 'Stäng dialogrutan för borttagning av föremål',
+  'guilds.bankPurgeConfirm': 'Ta bort föremål',
+  'guilds.bankPurgeConfirmation': 'Jag bekräftar att det här föremålet ska förstöras.',
+  'guilds.bankPurgeFailed': 'Det gick inte att ta bort föremålet.',
+  'guilds.bankPurgeItemRequired': 'Det här facket har inget föremåls-id att bekräfta mot.',
+  'guilds.bankPurgeReasonPlaceholder': 'Intern modereringsanledning',
+  'guilds.bankPurgeReasonRequired': 'Ange en modereringsanledning.',
+  'guilds.bankPurgeReasonTooLong': 'Korta ner modereringsanledningen till högst 500 tecken.',
+  'guilds.bankPurgeSlotRequired': 'Välj ett fack i gillesbanken att ta bort.',
+  'guilds.bankPurgeTitle': 'Ta bort ett fastlåst föremål i gillesbanken',
+  'guilds.bankPurgeUnaudited':
+    'Föremålet togs bort, men modereringsloggposten kunde inte skrivas. Rapportera detta.',
+  'guilds.bankPurgeWarning':
+    'Detta förstör föremålet permanent. Det finns ingen ångerfunktion i spelet, och gillet kan inte få tillbaka det.',
+  'guilds.bankPurging': 'Tar bort...',
+  'guilds.bankRefresh': 'Uppdatera bank',
+  'guilds.bankSlotsUsed': 'Använda fack',
+  'guilds.bankSlotsUsedValue': '{used} av {capacity}',
+  'guilds.bankStatusNormal': 'Uttagbar',
+  'guilds.bankStatusStuck': 'Fastlåst',
+  'guilds.bankStuckExplainer':
+    'Ett fastlåst föremål kan inte tas ut åt något håll, så gillet kan aldrig tömma sin bank eller upplösas så länge det ligger kvar. Att ta bort det förstör föremålet permanent.',
+  'guilds.bankTitle': 'Gillesbank',
+  'guilds.bankTreasury': 'Kassa',
+  'guilds.bankUnopened': 'Det här gillet har inte öppnat sin bank ännu.',
+  'moderationHistory.actionGuildBankPurge': 'Rensning av gillesbank',
   'onlinePlayers.autoRefresh': 'Automatisk uppdatering ({minutes} min)',
   'onlinePlayers.count': '{count} spelare online',
   'onlinePlayers.countFiltered': '{shown} av {total} online',

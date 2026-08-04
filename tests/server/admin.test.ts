@@ -3386,7 +3386,7 @@ describe('guild bank operator read', () => {
     dormantSlots: 1,
     slots: [
       { index: 0, itemId: 'wolf_fang', count: 3, dormant: false },
-      { index: 1, itemId: 'reins_grag_bear', count: 1, dormant: true },
+      { index: 1, itemId: 'final_argument_greatblade', count: 1, dormant: true },
     ],
   };
 

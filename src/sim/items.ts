@@ -17,6 +17,7 @@
 // (enforced by tests/architecture.test.ts). This region draws NO rng.
 
 import { addStacked, bagCapacity, bagsFullError, countFit, equipBag as equipBagCmd } from './bags';
+import { isRawCookingCatch } from './content/items';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
 import {
@@ -29,6 +30,7 @@ import {
   weaponHand,
 } from './equipment_rules';
 import { formatMoney } from './format_money';
+import { throwFirebottleAtNearestHut } from './interactions/firebottle_hut';
 import { moveStackToCell } from './inventory_order';
 import { canStackInstancePayloads, itemInstancePayloadsEqual } from './item_instance_merge';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
@@ -577,6 +579,13 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     ctx.openSkinSelect(meta, def.use.catalog ?? 'class', itemId);
     return;
   }
+  // Raw fishing catches are cooking reagents only (kind junk, no foodHp).
+  // Without this arm a right-click is a silent no-op; refuse loudly instead
+  // of letting the player think the item is broken. Does not remove the stack.
+  if (isRawCookingCatch(itemId)) {
+    ctx.error(meta.entityId, 'That is raw. Cook it first.');
+    return;
+  }
   // A running non-spell cast (fishing/gather) blocks other item use. The
   // Demon Heal channel is deliberately NOT folded in: items stay usable
   // during it, as today.
@@ -585,6 +594,10 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     return;
   }
   if (p.dead) return;
+  if (def.use?.type === 'throw') {
+    throwFirebottleAtNearestHut(ctx, p, meta);
+    return;
+  }
   if (def.kind === 'food' || def.kind === 'drink') {
     if (p.inCombat) {
       ctx.error(meta.entityId, "You can't do that while in combat.");

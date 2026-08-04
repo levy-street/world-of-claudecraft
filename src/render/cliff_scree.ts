@@ -3,7 +3,7 @@ import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { compactScreeMatrices, SCREE_CELL, screeSinkY, screeSpotAt } from './cliff_scree_core';
-import { GFX } from './gfx';
+import { GFX, type GfxSettings } from './gfx';
 import { applySurfaceDetail } from './worn_stone';
 
 // Cliff scree: boulders scattered over steep slopes and piled at their feet,
@@ -54,12 +54,27 @@ const loadedRocks: GLTF[] = [];
 // over one already in flight. The build retry below shares the same promise.
 let rocksReady: Promise<void> | null = null;
 function loadRocks(): Promise<void> {
-  rocksReady ??= Promise.all(MODEL_URLS.map((url) => loadGltf(url))).then((gltfs) => {
-    loadedRocks.push(...gltfs);
-  });
+  if (loadedRocks.length === MODEL_URLS.length) return Promise.resolve();
+  rocksReady ??= Promise.all(MODEL_URLS.map((url) => loadGltf(url)))
+    .then((gltfs) => {
+      loadedRocks.length = 0;
+      loadedRocks.push(...gltfs);
+      rocksReady = null;
+    })
+    .catch((err) => {
+      rocksReady = null;
+      throw err;
+    });
   return rocksReady;
 }
-registerDeferredPreload(loadRocks);
+
+export function prepareCliffScreeProfileAssets(
+  target: Pick<GfxSettings, 'cliffScree'>,
+): Promise<void> {
+  return target.cliffScree ? loadRocks() : Promise.resolve();
+}
+
+registerDeferredPreload(() => prepareCliffScreeProfileAssets(GFX));
 
 // media-manifest coverage hook (tests/render_glb_replacement_assets.test.ts)
 export const cliffScreePreloadInternalsForTest = { rockUrls: MODEL_URLS };
@@ -117,6 +132,10 @@ interface BakedRocks {
 // contract foliage.ts keeps with its extractedParts cache)
 let baked: BakedRocks | null = null;
 
+export function resetCliffScreeProfileCaches(): void {
+  baked = null;
+}
+
 function bakeRocks(): BakedRocks | null {
   if (baked) return baked;
   if (loadedRocks.length < MODEL_URLS.length) return null;
@@ -153,14 +172,17 @@ function bakeRocks(): BakedRocks | null {
   return baked;
 }
 
-export function buildCliffScree(seed: number): CliffScreeView {
+export function buildCliffScree(
+  seed: number,
+  settings: Pick<GfxSettings, 'cliffScree'> = GFX,
+): CliffScreeView {
   const group = new THREE.Group();
   group.name = 'cliffScree';
   // Form shadows are the whole point of the scatter, and it is one of the
   // graphics-overhaul detail layers: HIGH AND UP only (GFX.detailLayers).
   // Medium keeps its pre-overhaul look and frame budget (the round-10 medium
   // regate). The omitted dressing does not alter the shared walkable surface.
-  if (!GFX.cliffScree) {
+  if (!settings.cliffScree) {
     return { group, update: () => undefined, invalidate: () => undefined };
   }
 

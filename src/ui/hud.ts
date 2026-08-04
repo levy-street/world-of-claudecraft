@@ -1,6 +1,7 @@
 import { audio } from '../game/audio';
 import { corpseLootAvailability, localPartyMemberIds } from '../game/corpse_loot_availability';
 import type { GamepadKind } from '../game/gamepad_map';
+import type { GraphicsSettingsSnapshot } from '../game/graphics_rebuild_core';
 import { InstanceMusicController } from '../game/instance_music';
 import { type Keybinds, keyCapLabel, keyLabel } from '../game/keybinds';
 import { music } from '../game/music';
@@ -175,6 +176,7 @@ import {
   mobVoiceActionForDamage,
   mobVoiceCue,
   mobVoiceCueWithFallback,
+  novaAbilityCue,
   playerSwingCueForDamage,
   shouldPlayCombatImpactForTarget,
   shouldPlayCritSfxForTarget,
@@ -184,6 +186,7 @@ import {
 import { type CardinalId, compassView } from './compass';
 import { ContinentMapPainter } from './continent_map_painter';
 import { type ContinentZoneRegion, continentZoneAt } from './continent_map_view';
+import { cookingCatchHintKey } from './cooking_catch_hint_view';
 import { formatMinimapCoords } from './coords';
 import {
   buildCraftCelebrationPlan,
@@ -201,6 +204,7 @@ import {
 import { renderCraftingWindow, stationNameText } from './crafting_window';
 import { shouldRefreshDailyRewardsLauncher } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow } from './daily_rewards_window';
+import { deathRecapFeedback } from './death_recap_feedback';
 import { decorativeArtImg } from './decorative_art';
 import {
   deedBroadcastRendered,
@@ -299,6 +303,7 @@ import {
   captureActionBarLayout,
   planActionBarRestore,
 } from './hud/action_bar/action_bar_layout_sync';
+import { isActionBarEditAllowed } from './hud/action_bar/action_bar_lock';
 import { ActionBarPainter, type ActionBarSlotElements } from './hud/action_bar/action_bar_painter';
 import {
   ABILITY_ICON_PREFIX,
@@ -432,6 +437,7 @@ import {
   itemStatName,
 } from './item_instance_tooltip';
 import { itemKindLabel, itemQualityLabel } from './item_kind_label';
+import { itemNameColor } from './item_name_color';
 import { itemSetMemberCounts, itemSetTooltipModel } from './item_set_tooltip_view';
 import { itemSlotLabel as itemSlotName } from './item_slot_labels';
 import { knownItemDef, ownEntry } from './known_item';
@@ -539,6 +545,12 @@ import {
 import { buildProfessionTutorialModel } from './profession_tutorial_view';
 import { renderProfessionTutorial } from './profession_tutorial_window';
 import { ProfessionsWindow } from './professions_window';
+import {
+  QUEST_ITEM_TOOLTIP_COLOR,
+  type QuestItemTooltipModel,
+  questItemTooltipModel,
+  questItemTooltipRelatedKey,
+} from './quest_item_tooltip_view';
 import { questMarkerTooltipTag } from './quest_marker_tags';
 import { questProgressEventText } from './quest_progress_text';
 import { lockoutParts, lockoutShape } from './raid_lockout';
@@ -579,6 +591,7 @@ import { targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { toolEffectNameKey } from './tool_effect_name';
+import { createTooltipLine } from './tooltip_line';
 import { SharedTooltipOwner } from './tooltip_owner';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
@@ -639,6 +652,10 @@ export interface OptionsHooks {
   captureKey(cb: ((code: string | null) => void) | null): void;
   settings: Settings;
   onSettingChange(key: keyof GameSettings, value: GameSettings[keyof GameSettings]): void;
+  /** Current renderer-bound profile. Options clones this into a disposable local draft. */
+  graphicsApplied(): GraphicsSettingsSnapshot;
+  /** Apply one complete six-setting draft. The window owns localized progress/results. */
+  applyGraphics(draft: GraphicsSettingsSnapshot): Promise<GraphicsApplyOutcome>;
   // Switch the active locale at runtime (loads the locale chunk, relocalizes the page,
   // fans out woc:languagechange). onStatus receives localized progress/error text for an
   // aria-live element. Resolves false if the locale failed to load (active locale kept).
@@ -665,6 +682,8 @@ export interface OptionsHooks {
   // without the HUD importing the manager.
   gamepad: GamepadBindingsHooks;
 }
+
+export type GraphicsApplyOutcome = 'applied' | 'saved' | 'failed' | 'fatal';
 
 export interface ThemeHooks {
   get(): ThemeState;
@@ -1692,6 +1711,7 @@ export class Hud {
   private targetTitleDecoration: TitledNameDecoration = { pre: '', post: '' };
   private charPreview: CharacterPreview | null = null;
   private charPreviewCanvas: HTMLCanvasElement | null = null;
+  private restoreCharPreviewAfterGraphicsRebuild = false;
   private readonly skinEvent: SkinEventController;
   // Pending lazy-load of the mech GLB + chromas; the reveal waits on it.
   private mechAssetsPromise: Promise<void> | null = null;
@@ -5046,9 +5066,15 @@ export class Hud {
   // sizing onto one of these. Returns the measured author-space box size so the
   // caller can cache it (attachTooltip's mousemove clamp reuses it instead of
   // re-reading offsetWidth/Height, which would force a reflow per mousemove).
-  private paintTooltipAt(html: string, x: number, y: number): { w: number; h: number } {
+  // Accepts a legacy HTML string or a prebuilt Node / DocumentFragment so
+  // createElement painters can mount without forcing every caller onto strings.
+  private paintTooltipAt(content: string | Node, x: number, y: number): { w: number; h: number } {
     this.tooltipEl.classList.remove('mob-tooltip');
-    this.tooltipEl.innerHTML = html;
+    if (typeof content === 'string') {
+      this.tooltipEl.innerHTML = content;
+    } else {
+      this.tooltipEl.replaceChildren(content);
+    }
     this.tooltipEl.style.display = 'block';
     // offsetWidth/Height are author-space (zoom-immune) layout sizes, but x/y
     // arrive in visual (zoomed) space, so map x/y into author space (÷ scale)
@@ -5170,21 +5196,35 @@ export class Hud {
   // fungible stacks and def-only surfaces (the crafting window's result rows),
   // so those render exactly as before.
   private itemTooltip(item: ItemDef, compare = true, instance?: ItemInstancePayload): string {
-    const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
+    // Quest items are a purpose class, not a quality tier: title and kind use
+    // quest gold, and the kind line is "Quest Item" alone (never "Common Quest
+    // Item"). Story lines (related quest, progress, rules, orphaned) come from
+    // the pure model; escape and tEntity stay in this host.
+    const questModel = this.questItemTooltipFor(item);
+    // Shared helper: quest kind paints quest gold; all other kinds use quality.
+    const qColor = itemNameColor(item);
     let html = `<div class="tt-title" style="color:${qColor}">${esc(itemDisplayName(item))}</div>`;
     // Quality/kind line, e.g. "Epic Armor". Heroic items (dungeon upgraded variants
     // via heroicOf, bespoke heroic-tier raid gear via heroic) append a gold
     // "[HEROIC]" tag here (never in the name) so the drop reads "Epic Armor [HEROIC]".
-    let qualityKindHtml = esc(
-      t('itemUi.tooltip.qualityKind', {
-        quality: itemQualityLabel(item.quality),
-        kind: itemKindLabel(item.kind, item.id),
-      }),
-    );
-    if (item.heroicOf || item.heroic) {
-      qualityKindHtml += ` <span style="color:#e5cc80">${esc(t('hudChrome.itemHeroicTag'))}</span>`;
+    // Quest kinds skip the quality half so the line is a single quest-gold
+    // "Quest Item" (no redundant Common + second Quest Item desc).
+    if (questModel && !questModel.showQuality) {
+      html += `<div class="tt-sub" style="color:${QUEST_ITEM_TOOLTIP_COLOR}">${esc(
+        t(questModel.kindLineKey),
+      )}</div>`;
+    } else {
+      let qualityKindHtml = esc(
+        t('itemUi.tooltip.qualityKind', {
+          quality: itemQualityLabel(item.quality),
+          kind: itemKindLabel(item.kind, item.id),
+        }),
+      );
+      if (item.heroicOf || item.heroic) {
+        qualityKindHtml += ` <span style="color:#e5cc80">${esc(t('hudChrome.itemHeroicTag'))}</span>`;
+      }
+      html += `<div class="tt-sub">${qualityKindHtml}</div>`;
     }
-    html += `<div class="tt-sub">${qualityKindHtml}</div>`;
     // Weapon type (Sword/Dagger/Mace/...) as its own plain line under the
     // quality/kind line and above the slot/handedness line, classic-style, so a
     // player can tell a dagger from a sword at a glance (rogues need daggers). It
@@ -5327,12 +5367,20 @@ export class Hud {
     // keys the table by item id): what the reagent is for and which gear
     // disenchants into it. Every other item id renders nothing here.
     html += materialHintLine(item.id);
+    // Raw cooking catches: pure key table + createElement line (no foodHp /
+    // restore-health line; no materialHintLine HTML growth). outerHTML bridges
+    // the node into the legacy string tooltip stack.
+    const cookingHintKey = cookingCatchHintKey(item.id);
+    if (cookingHintKey) {
+      html += createTooltipLine(t(cookingHintKey), 'tt-desc').outerHTML;
+    }
     if (item.potionHp)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useHealingPotion', { amount: itemNumber(item.potionHp) }))}</div>`;
     if (item.potionMana)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useManaPotion', { amount: itemNumber(item.potionMana) }))}</div>`;
-    if (item.kind === 'quest')
-      html += `<div class="tt-desc">${esc(t('itemUi.tooltip.questItem'))}</div>`;
+    // Quest story block (related quest, progress, rules, orphaned). Replaces the
+    // old plain "Quest Item" desc that doubled the kind line.
+    if (questModel) html += this.questItemTooltipStoryHtml(questModel);
     if (item.kind === 'bag' && item.bagSlots)
       html += `<div class="tt-stat">${esc(t('itemUi.tooltip.bagSlots', { slots: itemNumber(item.bagSlots) }))}</div>`;
     // Collectible mount reins: the mount's flavor + specialty numbers + its
@@ -5556,6 +5604,56 @@ export class Hud {
       current: this.questNumber(current),
       total: this.questNumber(total),
     });
+  }
+
+  /** Pure quest-item tooltip model for one def, or null for non-quest kinds. */
+  private questItemTooltipFor(item: ItemDef): QuestItemTooltipModel | null {
+    if (item.kind !== 'quest') return null;
+    const questId = item.questId;
+    const quest = questId ? QUESTS[questId] : undefined;
+    const log = questId ? this.sim.questLog.get(questId) : undefined;
+    return questItemTooltipModel({
+      kind: item.kind,
+      itemId: item.id,
+      questId,
+      questKnown: !!quest,
+      log: log
+        ? {
+            counts: log.counts,
+            state: log.state,
+            resolvedCounts: log.resolvedCounts,
+          }
+        : null,
+      objectives: quest?.objectives.map((objective) => ({
+        type: objective.type,
+        itemId: 'itemId' in objective ? objective.itemId : undefined,
+        count: objective.count,
+      })),
+    });
+  }
+
+  /** Story lines under the quest kind row: related quest, progress, rules, orphaned. */
+  private questItemTooltipStoryHtml(model: QuestItemTooltipModel): string {
+    let html = '';
+    if (model.relatedQuestId) {
+      html += `<div class="tt-sub" style="color:${QUEST_ITEM_TOOLTIP_COLOR}">${esc(
+        t(questItemTooltipRelatedKey(), { quest: questTitle(model.relatedQuestId) }),
+      )}</div>`;
+    }
+    if (model.progress && model.relatedQuestId) {
+      html += `<div class="tt-sub">${esc(
+        this.questProgressText(
+          questObjectiveLabel(model.relatedQuestId, model.progress.objectiveIndex),
+          model.progress.current,
+          model.progress.required,
+        ),
+      )}</div>`;
+    }
+    html += `<div class="tt-desc">${esc(t(model.rulesKey))}</div>`;
+    if (model.orphaned) {
+      html += `<div class="tt-desc">${esc(t(model.orphanedKey))}</div>`;
+    }
+    return html;
   }
 
   private questSuggestedPlayersHtml(count?: number): string {
@@ -6338,6 +6436,10 @@ export class Hud {
     return true;
   }
 
+  private actionBarsLocked(): boolean {
+    return Boolean(this.optionsHooks?.settings.get('lockActionBars'));
+  }
+
   private buildActionBar(): void {
     const bar = $('#actionbar');
     const bar2 = $('#actionbar2');
@@ -6430,6 +6532,7 @@ export class Hud {
         // slot 0 (Attack) stays fixed
         btn.draggable = true;
         const clearSlot = () => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'clear')) return;
           this.hotbarActions = clearHotbarSlot(this.hotbarActions, slot - 1);
           this.saveSlotMap();
           btn.classList.add('empty');
@@ -6443,6 +6546,10 @@ export class Hud {
           handleShiftClearKeydown(e, clearSlot);
         });
         btn.addEventListener('dragstart', (e) => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drag')) {
+            e.preventDefault();
+            return;
+          }
           const action = this.actionForSlot(slot);
           if (!action) {
             e.preventDefault();
@@ -6454,6 +6561,7 @@ export class Hud {
           this.hideTooltip();
         });
         btn.addEventListener('dragover', (e) => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drop')) return;
           if (this.tryAcceptAttackDrag(e, btn, slot, 'over')) return;
           const dragged = this.dragAction?.action ?? this.readDraggedAction(e.dataTransfer);
           if (!dragged) return;
@@ -6471,6 +6579,7 @@ export class Hud {
         });
         btn.addEventListener('dragleave', () => btn.classList.remove('drop-target'));
         btn.addEventListener('drop', (e) => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drop')) return;
           if (this.tryAcceptAttackDrag(e, btn, slot, 'drop')) return;
           e.preventDefault();
           btn.classList.remove('drop-target');
@@ -6515,12 +6624,14 @@ export class Hud {
         // for a normal action. The Options toggle restores Attack at any time.
         btn.draggable = true;
         const clearAttackSlotAction = () => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'clear')) return;
           if (this.attackSlotAction === null) return;
           this.attackSlotAction = null;
           this.saveAttackSlotAction();
           this.hideTooltip();
         };
         btn.addEventListener('contextmenu', (e) => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'clear')) return;
           if (this.attackSlotIsAttack()) {
             e.preventDefault();
             this.optionsHooks?.settings.set('showAttackButton', false);
@@ -6534,6 +6645,10 @@ export class Hud {
           handleShiftClearKeydown(e, clearAttackSlotAction);
         });
         btn.addEventListener('dragstart', (e) => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drag')) {
+            e.preventDefault();
+            return;
+          }
           const action = this.actionForSlot(0);
           if (!action) {
             e.preventDefault();
@@ -6546,6 +6661,7 @@ export class Hud {
         });
         // With Attack removed, the freed slot accepts a drag like any other slot.
         btn.addEventListener('dragover', (e) => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drop')) return;
           if (this.tryAcceptAttackDrag(e, btn, slot, 'over')) return;
           if (this.attackSlotIsAttack()) return;
           if (this.dragAction?.sourceAttackSlot) return;
@@ -6557,6 +6673,7 @@ export class Hud {
         });
         btn.addEventListener('dragleave', () => btn.classList.remove('drop-target'));
         btn.addEventListener('drop', (e) => {
+          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drop')) return;
           if (this.tryAcceptAttackDrag(e, btn, slot, 'drop')) return;
           e.preventDefault();
           btn.classList.remove('drop-target');
@@ -6987,6 +7104,7 @@ export class Hud {
 
   private bindMobileActionDrag(btn: HTMLButtonElement, slot: number): void {
     btn.addEventListener('pointerdown', (e) => {
+      if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drag')) return;
       if (!document.body.classList.contains('mobile-touch') || e.pointerType !== 'touch') return;
       if (this.empoweredAbilityIdForSlot(slot)) return;
       // Any populated slot (ability or item) can be picked up and swapped by
@@ -7080,6 +7198,7 @@ export class Hud {
   // position's underlying bar slot depends on the current paged page.
   private bindMobileRingDrag(btn: HTMLButtonElement, ringIndex: number): void {
     btn.addEventListener('pointerdown', (e) => {
+      if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drag')) return;
       if (!document.body.classList.contains('mobile-touch') || e.pointerType !== 'touch') return;
       const sourceSlot = this.mobileSourceSlotForButton(ringIndex);
       if (this.empoweredAbilityIdForSlot(sourceSlot)) return;
@@ -10071,6 +10190,14 @@ export class Hud {
         // on the same floor, so the player's own y is the right height anchor.
         if (ev.fx !== 'nova') return;
         const y = sim.player.pos.y;
+        // A per-ability nova recording (Flamestrike) is the whole read on the
+        // aimed path too, at the same 1.0 the entity-anchored spellfx path
+        // plays it; the generic burst keeps its school-flavored layer.
+        const novaKey = novaAbilityCue(ev.ability);
+        if (novaKey !== 'spell_nova') {
+          this.combat(novaKey, ev.x, y, ev.z, 1.0, { cooldown: 0.08 });
+          return;
+        }
         this.combat('spell_nova', ev.x, y, ev.z, 0.6, { cooldown: 0.08 });
         this.combat(`impact_${ev.school}`, ev.x, y, ev.z, 0.5, { rate: 0.8, cooldown: 0.08 });
         return;
@@ -12207,7 +12334,13 @@ export class Hud {
           break;
         }
         case 'playerDeath': {
-          this.log(t('hud.system.playerDeath'), '#ff4444');
+          const killer = ev.killerId !== undefined ? sim.entities.get(ev.killerId) : undefined;
+          const killerName = killer ? entityDisplayName(killer) : undefined;
+          const abilityName = ev.killerAbility
+            ? abilityDisplayNameFromSource(ev.killerAbility)
+            : undefined;
+          const feedback = deathRecapFeedback(killerName, ev.killerAbility, abilityName);
+          this.log(t(feedback.key, feedback.values), '#ff4444');
           audio.playerDeath();
           break;
         }
@@ -12673,8 +12806,10 @@ export class Hud {
   }
 
   // Render a [[i:id]] chat segment as a quality-colored, inspectable item link.
-  // Hover/focus shows the same item tooltip the bags window uses; an unknown id
-  // (e.g. content drift between players) degrades to a plain [?].
+  // Quest kinds use quest gold (purpose class) via itemNameColor so chat matches
+  // bag / tooltip / loot name language. Hover/focus shows the same item tooltip
+  // the bags window uses; an unknown id (e.g. content drift between players)
+  // degrades to a plain [?].
   private appendChatItemLink(parent: HTMLElement, itemId: string): void {
     // knownItemDef, not bare truthiness: the token charset admits prototype
     // keys ([[i:constructor]] is peer-typed text), and the bare read sent
@@ -12686,7 +12821,7 @@ export class Hud {
     }
     const link = document.createElement('span');
     link.className = 'chat-item-link';
-    link.style.color = QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
+    link.style.color = itemNameColor(item);
     link.textContent = `[${itemDisplayName(item)}]`;
     link.tabIndex = 0;
     this.attachTooltip(link, () => this.itemTooltip(item));
@@ -14408,6 +14543,30 @@ export class Hud {
   async prewarmArmoryPreview(): Promise<void> {
     if (!this.claudiumHooks) return;
     await this.dailyRewardsWindow.prewarmArmoryPreview();
+  }
+
+  /** Rebind every HUD callback to the newly committed world renderer. */
+  replaceRenderer(renderer: Renderer): void {
+    this.renderer = renderer;
+  }
+
+  /**
+   * Dispose secondary WebGL contexts after target assets are ready but before
+   * the active graphics epoch changes. Their owning windows stay intact.
+   */
+  resetGraphicsPreviewContexts(): void {
+    this.restoreCharPreviewAfterGraphicsRebuild = this.charWindow.isOpen;
+    this.charPreview?.destroy();
+    this.charPreview = null;
+    this.charPreviewCanvas = null;
+    this.dailyRewardsWindow.resetArmoryPreviewForGraphicsRebuild();
+  }
+
+  /** Restore preview surfaces that were visible across the renderer swap. */
+  restoreGraphicsPreviewContexts(): void {
+    if (this.restoreCharPreviewAfterGraphicsRebuild) this.charWindow.renderIfOpen();
+    this.restoreCharPreviewAfterGraphicsRebuild = false;
+    this.dailyRewardsWindow.restoreArmoryPreviewAfterGraphicsRebuild();
   }
 
   /** Populate the small synchronous Canvas caches used by contextual HUD

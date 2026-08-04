@@ -8,6 +8,7 @@
 // from the ability school / item kind + name keywords, so everything always
 // has a proper icon. Results are cached as data URLs.
 
+import { isRawCookingCatch } from '../sim/content/items';
 import { ABILITIES, ITEMS } from '../sim/data';
 import { DEED_IMAGE_IDS } from './deed_image_ids';
 import { PROFESSION_IMAGE_IDS, professionImageUrl } from './profession_art';
@@ -3052,6 +3053,16 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   ),
   sanctum_key_shard: r('arcane', 'sky', ['gem'], ['sparkle', 'glow']),
   blessed_wax: r('holy', 'holyGold', [{ p: 'droplet', pal: 'holyGold' }], ['sparkle']),
+  // A pitch-filled bottle with a lit rag: a bottle body under a rising flame.
+  firebottle: r(
+    'fire',
+    'ember',
+    [
+      { p: 'potion', pal: 'ember' },
+      { p: 'flame', s: 0.5, y: -9 },
+    ],
+    ['glow'],
+  ),
   ghostly_essence: r('shadow', 'silverWhite', [{ p: 'flame', pal: 'silverWhite' }], ['sparkle']),
   webwood_silk: r('shadow', 'silverWhite', ['web']),
   supply_crate: r('wood', 'earthBrown', ['crate']),
@@ -3549,6 +3560,15 @@ function itemFallback(id: string): IconRecipe | null {
   if (it.kind === 'bag') {
     const isCloth = has(name, ['linen', 'silk', 'woven', 'cloth', 'wool']);
     return r(isCloth ? 'cloth' : 'leather', isCloth ? 'cloth' : 'leather', ['sack'], fx);
+  }
+  // Raw fishing catches left kind food for cooking reagents; keep a fish-like
+  // procedural recipe so they never fall through to generic junk trinkets when
+  // static WebP is missing. Name tokens cover cooked fish siblings and rares.
+  if (
+    isRawCookingCatch(id) ||
+    has(name, ['trout', 'perch', 'pike', 'eel', 'carp', 'koi', 'fish'])
+  ) {
+    return r('drink', 'sky', ['fish'], fx);
   }
   const t = trinketPrimitive(name);
   return r(it.kind === 'quest' ? 'parchment' : 'junk', t.pal, [{ p: t.p, pal: t.pal }], fx);
@@ -4483,10 +4503,11 @@ export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 // an <img> at a file that 404s. Same shape as the i18n `pending` model: the debt is
 // enumerated rather than silent, and it shrinks as art lands.
 //
-// Empty after the accepted 2026-08-01 painted-art wave. Keep the mechanism: a future
-// development-only item may still use it temporarily. tests/item_icons.test.ts holds the line
-// from both sides: it rejects stale entries after art lands and unenumerated art debt. Do not
-// add to this list merely to silence that failure; commission the art.
+// Empty after the accepted 2026-08-01 painted-art wave, and empty again after the three
+// quest-collect items this branch's dedupe pass added were painted. Keep the mechanism: a
+// future development-only item may still use it temporarily. tests/item_icons.test.ts holds
+// the line from both sides: it rejects stale entries after art lands and unenumerated art
+// debt. Do not add to this list merely to silence that failure; commission the art.
 export const ITEM_ART_PENDING = new Set<string>();
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
@@ -4503,6 +4524,22 @@ export function itemImageUrl(id: string): string | null {
 // a consumer.
 const DEED_ICON_DIR = '/ui/deeds';
 const DEED_CREST_PREFIX = 'deed_';
+
+// Deeds whose crest art is COMMISSIONED BUT NOT YET COMMITTED, the ITEM_ART_PENDING model one
+// screen up. The Icons authoring rule in docs/design/deeds.md permits this by design ("an artless
+// deed falls back to its procedural category crest, so art can trail the deed"), so the point of
+// the list is not to change behavior (deedImageUrl already declines any id absent from
+// DEED_IMAGE_IDS) but to make the debt ENUMERATED rather than silent, and to give the art tests
+// one name to agree on instead of three copies of the same literal pair.
+// tests/deed_icons.test.ts holds the line from both sides: a stale entry once art lands, and
+// unenumerated debt. Do not add an id here merely to silence that failure; commission the art and
+// file it in docs/achievements/icon-brief.md.
+export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
+  // The Drakelands dragonkin brood rework (v0.35): both are 'chronicle', so both fall back to
+  // the deed_cat_chronicle crest until their commissioned art lands.
+  'chr_drakemaw_broodlord',
+  'chr_maw_matriarch',
+]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {
   if (!crestId.startsWith(DEED_CREST_PREFIX)) return null;

@@ -40,6 +40,9 @@ const mapPainter = stripComments(
 const baseCss = stripComments(
   readFileSync(new URL('../src/styles/base.css', import.meta.url), 'utf8'),
 );
+const nameplateCanvas = stripComments(
+  readFileSync(new URL('../src/render/nameplate_canvas.ts', import.meta.url), 'utf8'),
+);
 
 // The one blue and the one dim, stated here as the cross-surface contract.
 // The blue is DERIVED from its stated design anchor (the rare item quality
@@ -96,6 +99,15 @@ describe('quest marker style agreement across surfaces', () => {
         's',
       ),
     );
+  });
+
+  it('paints the batched canvas nameplate marks in the same blue and dim', () => {
+    // The batched canvas surface replaced the DOM plates, so the LIVE
+    // nameplate glyph channel is nameplate_canvas.ts, pinned here the same
+    // way as the two src/ui canvas painters below; the .np-marker CSS blocks
+    // above are the legacy DOM surface, kept until their cleanup lands.
+    expect(nameplateCanvas).toContain(`'${RARE_BLUE}'`);
+    expect(nameplateCanvas).toContain(`* ${COOLDOWN_ALPHA}`);
   });
 
   it('keeps the gossip glyph on the anchor blue and lifts BOTH tooltip tags to the tag token', () => {

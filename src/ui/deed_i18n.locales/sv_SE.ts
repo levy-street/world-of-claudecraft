@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: 'Kullbrytaren',
+    desc: 'Fäll en Drakgapets kullherre bland dess ägg, genom vrålet, klyvhugget och elden.',
+  },
+  chr_maw_matriarch: {
+    name: 'Himlen tystnar',
+    desc: 'Fäll Cindraleth, Gapets matriark, i hennes kraterbo ovanför Drakgapet.',
+  },
   pvp_card_duel_first_win: {
     name: 'Husregler',
     desc: 'Vinn en kortduell hos Kortmästaren.',

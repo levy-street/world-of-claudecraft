@@ -13,6 +13,129 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const it_IT: Partial<Record<TranslationKey, string>> = {
+  'hud.system.deathRecapAbility': 'Sei morto. Ucciso da {ability}.',
+  'hud.system.deathRecapDrowned': 'Sei morto. Sei annegato.',
+  'hud.system.deathRecapFalling': 'Sei morto. Sei caduto nel vuoto.',
+  'hud.system.deathRecapKiller': 'Sei morto. Ucciso da {killer}.',
+  'hud.system.deathRecapKillerAbility': 'Sei morto. Ucciso da {ability} di {killer}.',
+  'hudChrome.bags.filterQuestCountAria': 'Missione, {count} oggetti',
+  'hudChrome.bags.itemAriaQuest': '{item}, quantita {count}, oggetto missione',
+  'hudChrome.bags.noQuestItems': 'Nessun oggetto missione nelle tue borse.',
+  'hudChrome.bank.cannotDepositNow': 'Al momento non depositabile',
+  'hudChrome.bank.depositAllTooltip':
+    'Invia in banca in un solo viaggio ogni reagente di fabbricazione e oggetto di scarto dalle tue borse. Strumenti di raccolta, equipaggiamento indossato, oggetti missione e consumabili non vengono mai toccati.',
+  'hudChrome.bank.guildBuyConfirm':
+    'Acquistare {count} spazi aggiuntivi della banca della gilda per {price} dalla tesoreria della gilda?',
+  'hudChrome.bank.guildBuyNote': 'Pagato dalla tesoreria della gilda',
+  'hudChrome.bank.guildCannotDeposit': 'Non depositabile nella banca della gilda',
+  'hudChrome.bank.guildCapacityAria': 'Spazi della banca della gilda usati: {used} di {total}',
+  'hudChrome.bank.guildContentsTab': 'Contenuto',
+  'hudChrome.bank.guildDepositGold': 'Deposita denaro',
+  'hudChrome.bank.guildDepositGoldTitle': 'Deposita denaro nella tesoreria della gilda',
+  'hudChrome.bank.guildDepositHint': 'Clicca per depositare nella banca della gilda',
+  'hudChrome.bank.guildDormantAria': '{item}, quantita {count}, non ritirabile',
+  'hudChrome.bank.guildDormantHint':
+    'Questo oggetto è bloccato nella banca della gilda e non può essere ritirato.',
+  'hudChrome.bank.guildDormantNote':
+    'Gli oggetti bloccati non possono essere ritirati e impediscono di sciogliere la gilda.',
+  'hudChrome.bank.guildEmpty': 'La banca della gilda è vuota.',
+  'hudChrome.bank.guildGoldAvailable': 'Disponibile: {amount}',
+  'hudChrome.bank.guildGoldCannotMove': 'Quella cifra non può essere spostata in questo momento.',
+  'hudChrome.bank.guildLogTab': 'Registro',
+  'hudChrome.bank.guildOpenAccept': 'Apri',
+  'hudChrome.bank.guildOpenBank': 'Apri la banca della gilda',
+  'hudChrome.bank.guildOpenConfirm':
+    'Aprire la banca della gilda per {price}? Verrà pagata dal tuo denaro personale.',
+  'hudChrome.bank.guildOpenNote':
+    'Pagato dal tuo denaro personale, non dalla tesoreria della gilda',
+  'hudChrome.bank.guildPurseShort': 'Denaro insufficiente',
+  'hudChrome.bank.guildTab': 'Gilda',
+  'hudChrome.bank.guildTreasury': 'Tesoreria della gilda',
+  'hudChrome.bank.guildTreasuryShort': 'Tesoreria insufficiente',
+  'hudChrome.bank.guildUnknownItem': 'Oggetto sconosciuto',
+  'hudChrome.bank.guildViewsAria': 'Visualizzazioni della banca della gilda',
+  'hudChrome.bank.guildWithdrawGold': 'Ritira denaro',
+  'hudChrome.bank.guildWithdrawGoldTitle': 'Ritira denaro dalla tesoreria della gilda',
+  'hudChrome.bank.logAdminPurge': 'Un amministratore ha rimosso {count} {item}',
+  'hudChrome.bank.logAria': 'Registro attività della banca della gilda',
+  'hudChrome.bank.logBuySlots': '{actor} ha acquistato un ampliamento della banca per {amount}',
+  'hudChrome.bank.logCharterFee':
+    '{actor} ha pagato la quota di fondazione della gilda di {amount}',
+  'hudChrome.bank.logDepositItem': '{actor} ha depositato {count} {item}',
+  'hudChrome.bank.logDepositMoney': '{actor} ha depositato {amount}',
+  'hudChrome.bank.logEmpty':
+    'Nulla è stato ancora spostato dentro o fuori dalla banca della gilda.',
+  'hudChrome.bank.logFormerMember': 'Un ex membro della gilda',
+  'hudChrome.bank.logLoading': 'Caricamento del registro della banca della gilda...',
+  'hudChrome.bank.logNote': 'Le {count} azioni più recenti della banca della gilda.',
+  'hudChrome.bank.logOpenBank': '{actor} ha aperto la banca della gilda per {amount}',
+  'hudChrome.bank.logRefused':
+    'Solo gli ufficiali della gilda possono leggere il registro della banca della gilda.',
+  'hudChrome.bank.logWithdrawItem': '{actor} ha ritirato {count} {item}',
+  'hudChrome.bank.logWithdrawMoney': '{actor} ha ritirato {amount}',
+  'hudChrome.bank.personalTab': 'Personale',
+  'hudChrome.bank.tabsAria': 'Schede della banca',
+  'hudChrome.crafting.dialogOption': 'Fabbricazione',
+  'hudChrome.crafting.dialogOptionAria': 'Apri la finestra di fabbricazione per {craft}',
+  'hudChrome.deeds.recentJumpAria': 'Vai a {name}',
+  'hudChrome.landing.browserSupport.body':
+    "Potresti notare prestazioni ridotte in questo browser. Per l'esperienza migliore, scarica l'app desktop per Windows, macOS o Linux. Preferisci giocare da browser? Chrome offre le prestazioni migliori, e sono supportati anche Firefox e Safari.",
+  'hudChrome.landing.browserSupport.continueInBrowser': 'Continua nel browser',
+  'hudChrome.landing.browserSupport.dismissAria': "Chiudi l'avviso sul browser non supportato",
+  'hudChrome.landing.browserSupport.getDesktopApp': "Scarica l'app desktop",
+  'hudChrome.landing.browserSupport.title': 'Attenzione: browser non supportato',
+  'hudChrome.materialHint.cookingCatch':
+    'Ingrediente da cucina. Deve essere cucinato prima di essere mangiato.',
+  'hudChrome.mounts.desc_drakemaw_raptor':
+    'Un raptor da covata domato per la sella, proveniente dalla Caldera di Drakemaw, tutto muscoli e scatto, che sa ancora vagamente di cenere.',
+  'hudChrome.mounts.name_drakemaw_raptor': 'Raptor di Drakemaw',
+  'hudChrome.options.graphicsApplied': 'Impostazioni grafiche applicate.',
+  'hudChrome.options.graphicsApply': 'Applica grafica',
+  'hudChrome.options.graphicsApplying': 'Applicazione delle impostazioni grafiche...',
+  'hudChrome.options.graphicsDraftChanged':
+    'Le modifiche alla grafica sono pronte per essere applicate.',
+  'hudChrome.options.graphicsFailed':
+    'Impossibile applicare la grafica. Le impostazioni precedenti sono ancora attive.',
+  'hudChrome.options.graphicsFatal':
+    'Ripristino della grafica non riuscito. Ricarica il gioco per continuare.',
+  'hudChrome.options.graphicsReload': 'Ricarica il gioco',
+  'hudChrome.options.graphicsRetry': 'Riprova grafica',
+  'hudChrome.options.graphicsSaved':
+    'Impostazioni grafiche salvate. Il renderer attivo corrisponde già a esse.',
+  'hudChrome.options.lockActionBars': 'Blocca le barre azione',
+  'itemUi.kind.material': 'Materiale',
+  'itemUi.market.buyChanged':
+    "Quell'inserzione è cambiata prima che tu confermassi. Controlla il prezzo e riprova.",
+  'itemUi.market.buyConfirmAccept': 'Compra',
+  'itemUi.market.buyConfirmBody': 'Comprare {item} per {price}?',
+  'itemUi.market.buyConfirmBodyStack': 'Comprare {item} x{count} per {price} ({each} ciascuno)?',
+  'itemUi.market.buyConfirmCancel': 'Annulla',
+  'itemUi.market.buyConfirmTitle': 'Conferma acquisto',
+  'itemUi.tooltip.questOrphaned': 'Non serve per nessuna missione attiva.',
+  'itemUi.tooltip.questRelated': 'Missione: {quest}',
+  'itemUi.tooltip.questRules': 'Non può essere venduto, depositato in banca o scambiato.',
+  'desktop.update.checkingBody': 'Le nuove versioni si scaricano mentre giochi.',
+  'desktop.update.checkingTitle': 'Controllo aggiornamenti...',
+  'desktop.update.dismiss': 'Ignora',
+  'desktop.update.downloadingBody':
+    "Puoi continuare a giocare. L'installazione avviene quando esci.",
+  'desktop.update.uptodateTitle': 'Sei aggiornato',
+  'entities.items.firebottle.name': 'Bottiglia incendiaria',
+  'entities.items.murloc_hut.name': 'Capanna Mudfin',
+  'entities.items.reins_drakemaw_raptor.name': 'Redini del Raptor di Drakemaw',
+  'entities.items.restless_skull.name': 'Teschio irrequieto',
+  'entities.items.vanguard_bone.name': "Osso dell'avanguardia",
+  'entities.mobs.brakka_wallbreaker.name': 'Brakka lo Sfondamura',
+  'entities.mobs.dragonkin_broodguard.name': 'Guardiano draconico della covata',
+  'entities.mobs.dragonkin_egg.name': 'Uovo draconico',
+  'entities.mobs.dragonkin_whelp.name': 'Cucciolo draconico',
+  'entities.mobs.drakemaw_broodlord.name': 'Signore della covata di Drakemaw',
+  'entities.mobs.drowned_warlord.name': 'Signore della guerra annegato',
+  'entities.mobs.spider_egg.name': 'Uovo della madre della covata',
+  'entities.mobs.threnos_first_voice.name': 'Threnos la Prima Voce',
+  'entities.mobs.widow_hatchling.name': 'Piccolo di Vedova',
+  'entities.quests.q_no_rest.text':
+    'Il rito su quei turiboli costringe gli annegati a risorgere, e ora ne ha sollevato uno abbastanza forte da guidarli. I guardiani lo chiamano il Signore della guerra annegato, e finché tiene la Cappella annegata i morti mantengono i ranghi. Abbattilo, {playerName}, e il resto si disperderà di nuovo nella palude.',
   'hud.social.tenure.recruit': 'Recluta',
   'hud.social.tenure.veteran': 'Veterano',
   'hudChrome.keybinds.mouseHint':
@@ -5266,8 +5389,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Come temevo: bruciavano cenere di tomba, e il rito è firmato Voss.',
   'entities.quests.q_drowned_censers.objectives.0.label': 'Incensiere arrugginito',
   'entities.quests.q_no_rest.title': 'Nessun riposo tra le canne',
-  'entities.quests.q_no_rest.text':
-    'Quel rito rialza gli annegati ovunque la palude li tocchi. Non possiamo disfarlo ancora; togli 14 soldati ai loro padroni.',
   'entities.quests.q_no_rest.completion':
     "Offri ai morti più misericordia dei loro padroni. Prendi questo, l'hai meritato.",
   'entities.quests.q_no_rest.objectives.0.label': 'Morto annegato restituito al riposo',
@@ -5415,14 +5536,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     'Questa scrittura viene dal grimorio di Morthen. La stessa mano ha guidato ogni tomba, {playerName}.',
   'entities.quests.q_cult_orders.objectives.0.label': 'Zelota del Culto del Wyrm ucciso',
-  'entities.quests.q_cult_orders.objectives.1.label': 'Ordini del Culto del Wyrm',
   'entities.quests.q_necromancers.title': 'Anello di filatteri',
   'entities.quests.q_necromancers.text':
     "Gli ordini parlano di un anello di filatteri, vasi d'anima attorno al Santuario, {playerName}. Uccidi 8 negromanti e portane 3 intatti.",
   'entities.quests.q_necromancers.completion':
     'Che la Luce ci perdoni. Contengono i morti della Valle e della palude; non stavano costruendo un esercito, {playerName}, raccoglievano una decima.',
   'entities.quests.q_necromancers.objectives.0.label': 'Negromante del Culto del Wyrm ucciso',
-  'entities.quests.q_necromancers.objectives.1.label': 'Filatterio rituale',
   'entities.quests.q_revenants.title': 'Campi dei revenant',
   'entities.quests.q_revenants.text':
     'A est della strada giace un vecchio campo di battaglia. Il culto ne ha rialzato le ossa in piastre arrugginite. Rimettine 12 a terra, {playerName}.',

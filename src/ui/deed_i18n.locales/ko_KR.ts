@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: '둥지 파괴자',
+    desc: '화산구의 둥지군주를 알 무더기 한복판에서, 포효와 가르기와 불길을 뚫고 처치하십시오.',
+  },
+  chr_maw_matriarch: {
+    name: '하늘의 침묵',
+    desc: '화산구의 어미 신드랄레스를 드레이크모 위 분화구 둥지에서 처치하십시오.',
+  },
   pvp_card_duel_first_win: {
     name: '패를 보여줘',
     desc: '카드 마스터에게서 카드 대결에 승리하십시오.',

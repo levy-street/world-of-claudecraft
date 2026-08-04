@@ -7,6 +7,57 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const it_IT: Record<string, string> = {
+  'error.guildBankDeleting':
+    'Questa gilda è in fase di eliminazione, quindi la sua banca è chiusa. Nessuna modifica è stata effettuata.',
+  'error.guildBankItemRequired':
+    "Inserisci l'id dell'oggetto che ti aspetti si trovi in quello spazio.",
+  'error.guildBankNoCarrier':
+    'Un membro di questa gilda deve essere online prima che la modifica possa essere salvata.',
+  'error.guildBankNotLoaded':
+    'La banca di questa gilda non è attualmente caricata su questo reame.',
+  'error.guildBankPurgeRefused': 'La modifica alla banca della gilda è stata rifiutata.',
+  'error.guildBankSaveFailed':
+    'Non è stato possibile salvare la modifica, che è stata annullata. Riprova tra un momento.',
+  'error.guildBankSlotNotStuck':
+    'Quello spazio contiene un oggetto ordinario che la gilda può ritirare autonomamente, quindi non può essere rimosso da qui.',
+  'error.guildBankSlotRequired':
+    'Inserisci il numero dello spazio della banca della gilda da rimuovere.',
+  'guilds.bankColCount': 'Quantità',
+  'guilds.bankColItem': 'Oggetto',
+  'guilds.bankColSlot': 'Spazio',
+  'guilds.bankColStatus': 'Stato',
+  'guilds.bankDormantCount': 'Oggetti bloccati',
+  'guilds.bankEmpty': 'Questa banca della gilda non contiene oggetti.',
+  'guilds.bankLoadFailed': 'Impossibile caricare questa banca della gilda.',
+  'guilds.bankPurgeAction': 'Rimuovi oggetto',
+  'guilds.bankPurgeCarrierWarning':
+    'La modifica viene salvata tramite un membro online di questa gilda. Nel raro caso in cui il salvataggio venga rifiutato, quel membro viene disconnesso e si riconnette senza perdite permanenti.',
+  'guilds.bankPurgeClose': 'Chiudi la finestra di rimozione oggetto',
+  'guilds.bankPurgeConfirm': 'Rimuovi oggetto',
+  'guilds.bankPurgeConfirmation': 'Confermo che questo oggetto deve essere distrutto.',
+  'guilds.bankPurgeFailed': "Impossibile rimuovere l'oggetto.",
+  'guilds.bankPurgeItemRequired': 'Questo spazio non ha un id oggetto con cui confermare.',
+  'guilds.bankPurgeReasonPlaceholder': 'Motivo di moderazione interno',
+  'guilds.bankPurgeReasonRequired': 'Inserisci un motivo di moderazione.',
+  'guilds.bankPurgeReasonTooLong': 'Accorcia il motivo di moderazione a 500 caratteri o meno.',
+  'guilds.bankPurgeSlotRequired': 'Scegli uno spazio della banca della gilda da rimuovere.',
+  'guilds.bankPurgeTitle': 'Rimuovi un oggetto bloccato della banca della gilda',
+  'guilds.bankPurgeUnaudited':
+    "L'oggetto è stato rimosso, ma non è stato possibile scrivere la voce nel registro di moderazione. Segnala questo problema.",
+  'guilds.bankPurgeWarning':
+    "Questo distrugge l'oggetto in modo permanente. Non esiste un annullamento in gioco, e la gilda non potrà riaverlo.",
+  'guilds.bankPurging': 'Rimozione...',
+  'guilds.bankRefresh': 'Aggiorna banca',
+  'guilds.bankSlotsUsed': 'Spazi usati',
+  'guilds.bankSlotsUsedValue': '{used} di {capacity}',
+  'guilds.bankStatusNormal': 'Ritirabile',
+  'guilds.bankStatusStuck': 'Bloccato',
+  'guilds.bankStuckExplainer':
+    "Un oggetto bloccato non può essere ritirato in nessuna direzione, quindi la gilda non potrà mai svuotare la banca né sciogliersi finché resta lì. Rimuoverlo distrugge l'oggetto in modo permanente.",
+  'guilds.bankTitle': 'Banca della gilda',
+  'guilds.bankTreasury': 'Tesoreria',
+  'guilds.bankUnopened': 'Questa gilda non ha ancora aperto la propria banca.',
+  'moderationHistory.actionGuildBankPurge': 'Rimozione dalla banca della gilda',
   'onlinePlayers.autoRefresh': 'Aggiornamento automatico ({minutes} min)',
   'onlinePlayers.count': '{count} giocatori online',
   'onlinePlayers.countFiltered': '{shown} di {total} online',

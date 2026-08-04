@@ -1589,14 +1589,15 @@ function masterLoot(): Scenario {
       'convertMasterRollToNeedGreed over a candidate subset',
       'resolveLootRoll tie-break rng.int over tied need rolls',
     ],
-    // Seed re-hunted 1091 -> 1326 by the release/v0.32.0 base merge. This branch
-    // never touches master-loot logic (src/sim/loot/loot_roll.ts has no commits
-    // here); its extra content just moves the shared rng before the rolls, and at
-    // 1091 the need rolls stopped TYING. The tie is the whole point of the
-    // scenario's last coverage line (resolveLootRoll's tie-break rng.int), so the
-    // seed is re-hunted to keep two rollers level rather than re-recorded to
-    // whatever the new draw happens to be.
-    build: () => new Sim({ seed: 1326, playerClass: 'warrior', noPlayer: true }),
+    // Seed re-hunted 1091 -> 1326 by the release/v0.32.0 base merge, then
+    // 1326 -> 1383 by the zones 1 to 3 quest-dedupe content. This branch never
+    // touches master-loot logic (src/sim/loot/loot_roll.ts has no commits
+    // here); its extra content just moves the shared rng before the rolls, and
+    // at the old seed the need rolls stopped TYING. The tie is the whole point
+    // of the scenario's last coverage line (resolveLootRoll's tie-break
+    // rng.int), so the seed is re-hunted to keep two rollers level rather than
+    // re-recorded to whatever the new draw happens to be.
+    build: () => new Sim({ seed: 1383, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
       const sim = rec.sim as AnySim;
       const a = sim.addPlayer('warrior', 'Aaa');
@@ -3888,7 +3889,12 @@ function hitRatingHeroic(withHitGear: boolean): Scenario {
       'same shared-RNG draw count/order as the ungeared spell-resist path',
     ],
     sampleEvery: 10,
-    build: () => new Sim({ seed: 1021, playerClass: 'mage' }),
+    // Seed re-hunted 1021 -> 1022 by the zones 1 to 3 quest-dedupe content: the
+    // shifted world stream made the geared arm's fight unfold onto a
+    // gear-conditional draw at 1021 (765 vs 761 draws), breaking the pair
+    // invariant the scenario exists to pin. Re-hunted so both arms draw
+    // identically again rather than relaxing the assert.
+    build: () => new Sim({ seed: 1022, playerClass: 'mage' }),
     drive(rec: Recorder) {
       const sim = rec.sim as AnySim;
       sim.setPlayerLevel(20);
@@ -4521,11 +4527,11 @@ function cardDuel(): Scenario {
 // masterwork chance and the proc fires inside the recorded run; only the found
 // literal is pinned here. Re-hunted after the new-realm quest pass shifted the
 // construction-time draw stream (quest camps + escort NPC spawns across the new
-// realms), and again after the Eastbrook camp respacing thinned the zone-1 camp
-// counts (fewer camp mobs means fewer construction-time draws, which moves every
-// later draw). Spare seeds 36 and 39 were also verified to fire the proc for this
-// drive.
-function professionsCraft(seed = 10): Scenario {
+// realms), again after the Eastbrook camp respacing thinned the zone-1 camp
+// counts, and again (10 -> 5) after the zones 1 to 3 quest-dedupe content (egg
+// clutch camps, the new elites) moved the shared stream once more. Spare seeds
+// 14 and 27 were also verified to fire the proc for this drive.
+function professionsCraft(seed = 5): Scenario {
   return {
     name: 'professions_craft',
     coverage: [

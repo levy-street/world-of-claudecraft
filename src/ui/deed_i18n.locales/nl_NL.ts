@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: 'Broedselbreker',
+    desc: 'Versla een Drakenmuil-Broedheer te midden van zijn eieren, door het gebrul, de maaislag en het vuur heen.',
+  },
+  chr_maw_matriarch: {
+    name: 'De Hemel Valt Stil',
+    desc: 'Versla Cindraleth de Muilmatriarch in haar kraternest boven de Drakenmuil.',
+  },
   pvp_card_duel_first_win: {
     name: 'Eigen Spelregels',
     desc: 'Win een Kaartduel bij de Kaartmeester.',

@@ -2142,7 +2142,9 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
     const { session } = joinServer(server, 1, 'Officer');
     officerSetup(server, session);
     seatDormant(server);
-    expect(await server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'reins_grag_bear', OPERATOR)).toEqual({
+    expect(
+      await server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'final_argument_greatblade', OPERATOR),
+    ).toEqual({
       ok: false,
       reason: 'not_dormant',
     });

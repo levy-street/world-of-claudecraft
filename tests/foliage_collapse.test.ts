@@ -3,9 +3,10 @@ import { describe, expect, it } from 'vitest';
 import {
   applyInstanceCollapse,
   type CollapsibleMaterial,
+  collapseWindowUniforms,
   updateCollapseUniforms,
 } from '../src/render/foliage_collapse';
-import { instanceCullWindows } from '../src/render/foliage_lod';
+import { IMPOSTOR_JITTER_GLSL, IMPOSTOR_SWAP_FADE } from '../src/render/foliage_impostor_core';
 
 // The exact anchors three's WebGLProgram vertex template exposes; the module
 // only ever string-replaces against these two includes.
@@ -37,6 +38,7 @@ describe('foliage collapse: shader injection', () => {
     const sh = compile(mat);
     expect(sh.vertexShader).toContain('uniform float uCollapseMin;');
     expect(sh.vertexShader).toContain('uniform float uCollapseMax;');
+    expect(sh.vertexShader).toContain('uniform float uCollapseFade;');
     // camera-relative XZ distance to the instance's world base, nothing else
     expect(sh.vertexShader).toContain(
       'vec2 collapseOrigin = vec2(instanceMatrix[3][0], instanceMatrix[3][2]);',
@@ -44,9 +46,16 @@ describe('foliage collapse: shader injection', () => {
     expect(sh.vertexShader).toContain(
       'float collapseDist = distance(collapseOrigin, cameraPosition.xz);',
     );
-    // window arithmetic: alive on [min, max)
+    // the per-instance jittered handoff: the sprite side of the swap
+    // evaluates the byte-identical hash (foliage_impostor_core.ts), so the
+    // two shaders agree on every tree's swap distance
+    expect(sh.vertexShader).toContain(`float collapseJitter = ${IMPOSTOR_JITTER_GLSL};`);
     expect(sh.vertexShader).toContain(
-      'float collapseKeep = step(uCollapseMin, collapseDist) * (1.0 - step(uCollapseMax, collapseDist));',
+      'float collapseEnd = uCollapseMax - uCollapseFade * collapseJitter;',
+    );
+    // window arithmetic: alive on [min, jittered end)
+    expect(sh.vertexShader).toContain(
+      'float collapseKeep = step(uCollapseMin, collapseDist) * (1.0 - step(collapseEnd, collapseDist));',
     );
     expect(sh.vertexShader).toContain('if (collapseKeep == 0.0) {');
     expect(sh.vertexShader).toContain('gl_Position = vec4(2.0, 2.0, 2.0, 1.0);');
@@ -64,42 +73,85 @@ describe('foliage collapse: shader injection', () => {
     expect(projectAt).toBeGreaterThan(beginAt);
     // The return stays inside the instancing guard, so a non-instanced draw
     // reaches the unchanged UV and later stock chunks.
-    expect(sh.vertexShader).toContain(`#ifdef USE_INSTANCING
-  vec2 collapseOrigin = vec2(instanceMatrix[3][0], instanceMatrix[3][2]);
-  float collapseDist = distance(collapseOrigin, cameraPosition.xz);
-  float collapseKeep = step(uCollapseMin, collapseDist) * (1.0 - step(uCollapseMax, collapseDist));
-  if (collapseKeep == 0.0) {
-    gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
-    return;
-  }
-#endif
-#include <uv_vertex>`);
+    const guardAt = sh.vertexShader.indexOf('#ifdef USE_INSTANCING');
+    const endifAt = sh.vertexShader.indexOf('#endif');
+    expect(guardAt).toBeGreaterThan(-1);
+    expect(guardAt).toBeLessThan(returnAt);
+    expect(endifAt).toBeGreaterThan(returnAt);
+    expect(endifAt).toBeLessThan(uvAt);
   });
 
-  it('each role reads its own live window: tree ends where the impostor begins', () => {
+  it('each role reads its own live window; plain never takes the fade', () => {
     const tree: CollapsibleMaterial = {};
-    const impostor: CollapsibleMaterial = {};
+    const rock: CollapsibleMaterial = {};
+    const dress: CollapsibleMaterial = {};
     const plain: CollapsibleMaterial = {};
     applyInstanceCollapse(tree, 'tree');
-    applyInstanceCollapse(impostor, 'impostor');
+    applyInstanceCollapse(rock, 'rock');
+    applyInstanceCollapse(dress, 'dress');
     applyInstanceCollapse(plain, 'plain');
     const shTree = compile(tree);
-    const shImpostor = compile(impostor);
+    const shRock = compile(rock);
+    const shDress = compile(dress);
     const shPlain = compile(plain);
 
-    updateCollapseUniforms(instanceCullWindows(138, 146.85));
+    updateCollapseUniforms({
+      treeMax: 300,
+      rockMax: 345.6,
+      dressMax: 192,
+      buildingMax: 660,
+      fogCull: 546,
+      fade: IMPOSTOR_SWAP_FADE,
+      spriteFar: 700,
+    });
     expect(shTree.uniforms.uCollapseMin.value).toBe(0);
-    expect(shTree.uniforms.uCollapseMax.value).toBe(138);
-    expect(shImpostor.uniforms.uCollapseMin.value).toBe(138);
-    expect(shImpostor.uniforms.uCollapseMax.value).toBe(146.85);
+    expect(shTree.uniforms.uCollapseMax.value).toBe(300);
+    expect(shTree.uniforms.uCollapseFade.value).toBe(IMPOSTOR_SWAP_FADE);
+    expect(shRock.uniforms.uCollapseMax.value).toBe(345.6);
+    expect(shRock.uniforms.uCollapseFade.value).toBe(IMPOSTOR_SWAP_FADE);
+    expect(shDress.uniforms.uCollapseMax.value).toBe(192);
     expect(shPlain.uniforms.uCollapseMin.value).toBe(0);
-    expect(shPlain.uniforms.uCollapseMax.value).toBe(146.85);
+    expect(shPlain.uniforms.uCollapseMax.value).toBe(546);
+    // ferns and mushrooms have no sprite side, so their boundary never
+    // jitters: a fade there would open per-instance holes before the cull
+    expect(shPlain.uniforms.uCollapseFade.value).toBe(0);
 
-    // shared value objects: the next frame's write reaches already-compiled programs
-    updateCollapseUniforms(instanceCullWindows(368, 418.15));
+    // shared value objects: the next frame's write reaches compiled programs
+    updateCollapseUniforms({
+      treeMax: 368,
+      rockMax: 259.2,
+      dressMax: 144,
+      buildingMax: 300,
+      fogCull: 418.15,
+      fade: 0,
+      spriteFar: 340,
+    });
     expect(shTree.uniforms.uCollapseMax.value).toBe(368);
-    expect(shImpostor.uniforms.uCollapseMin.value).toBe(368);
-    expect(shImpostor.uniforms.uCollapseMax.value).toBe(418.15);
+    expect(shTree.uniforms.uCollapseFade.value).toBe(0);
+    expect(shRock.uniforms.uCollapseMax.value).toBe(259.2);
+    expect(shPlain.uniforms.uCollapseMax.value).toBe(418.15);
+  });
+
+  it('exposes the same value objects to the sprite side', () => {
+    // foliage_impostor.ts binds these directly, so the sprite half of each
+    // handoff reads the very numbers the real half collapsed against.
+    const u = collapseWindowUniforms();
+    updateCollapseUniforms({
+      treeMax: 111,
+      rockMax: 222,
+      dressMax: 33,
+      buildingMax: 555,
+      fogCull: 444,
+      fade: 5,
+      spriteFar: 666,
+    });
+    expect(u.uTreeMax.value).toBe(111);
+    expect(u.uRockMax.value).toBe(222);
+    expect(u.uDressMax.value).toBe(33);
+    expect(u.uBuildingMax.value).toBe(555);
+    expect(u.uFogCull.value).toBe(444);
+    expect(u.uFade.value).toBe(5);
+    expect(u.uSpriteFar.value).toBe(666);
   });
 
   it('composes with an existing hook and rejects before its vertex edits', () => {
@@ -152,11 +204,14 @@ describe('foliage collapse: shader injection', () => {
     expect(keyOf(windless)).toBe(keyOf(windlessToo));
   });
 
-  it('stays runtime-import-free so plain fakes keep driving it', () => {
+  it('keeps its imports to the pure impostor core so plain fakes keep driving it', () => {
     // Not a *_core (it mutates materials and holds shared uniform state), so
     // the architecture sweep never scans it; this is the targeted equivalent.
-    // Type-only imports are fine: they erase at build.
+    // The one allowed runtime import is foliage_impostor_core (itself a
+    // registered pure core): the two shader sides must share the jitter GLSL
+    // from one source of truth. Type-only imports erase at build.
     const src = readFileSync(new URL('../src/render/foliage_collapse.ts', import.meta.url), 'utf8');
-    expect(src).not.toMatch(/^import (?!type )/m);
+    const runtimeImports = [...src.matchAll(/^import (?!type ).*from '(.*)';$/gm)].map((m) => m[1]);
+    expect(runtimeImports).toEqual(['./foliage_impostor_core']);
   });
 });

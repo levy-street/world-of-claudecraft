@@ -282,6 +282,7 @@ describe('tick perf capture lifecycle', () => {
       'sim.mob.update',
       'sim.mob.auras',
       'sim.ent.misc',
+      'sim.dragonkinBrood',
       'sim.engaged',
       'sim.duels',
       'sim.cardDuel',

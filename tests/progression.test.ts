@@ -149,14 +149,28 @@ describe('content referential integrity', () => {
     // spawns are the practice target and the ambient stable horse (both
     // non-combat fixtures by design), plus the Gilded Stag: the farm-yield
     // economy model (tests/economy_yield.test.ts) uses it as the quest-only,
-    // zero-coin exemplar on purpose.
-    const LOOTLESS_FIXTURES = new Set(['training_dummy', 'stable_horse', 'gilded_stag']);
+    // zero-coin exemplar on purpose. The quest-dedupe content pass added the
+    // Broodmother egg clutch (spider_egg): a destructible quest object, not a
+    // combatant (dmgBase 0, moveSpeed 0, aggroRadius 0, xpMult 0, damageable
+    // only on q_broodmother via requiresQuestId), so it is lootless by design
+    // like the other fixtures, not a v0.32.0-style empty-loot regression.
+    const LOOTLESS_FIXTURES = new Set([
+      'training_dummy',
+      'stable_horse',
+      'gilded_stag',
+      'spider_egg',
+    ]);
     const problems: string[] = [];
     const seen = new Set<string>();
     for (const c of CAMPS) {
       if (seen.has(c.mobId) || LOOTLESS_FIXTURES.has(c.mobId)) continue;
       seen.add(c.mobId);
       const t = MOBS[c.mobId];
+      // Puzzle-object mobs (xpMult 0: the 1 HP dragonkin egg, the spider
+      // egg-sac pattern) pay no XP and carry no loot BY DESIGN: the hatched
+      // fight is the reward, and a lootable shell would sparkle every corpse
+      // in a clutch. The xpMult-0 marker is the principled gate.
+      if (t?.xpMult === 0) continue;
       if (t && !t.loot.some((l) => !l.questId))
         problems.push(`${c.mobId} spawns from a camp with no unconditional loot`);
     }

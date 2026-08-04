@@ -23,6 +23,10 @@
 //   --compare baseline.json        diff this run against a saved baseline
 //   --label tag                    label the run
 //   BROWSER_PATH=/path/to/chrome   browser binary
+//
+// Exact one-off 40-player sample used alongside the curve gate above:
+//   node scripts/profile.mjs crowd --crowd 40 --tier ultra --dpr 1 --ms 4000 \
+//     --label pr-2789-head --out tmp/profile-crowd-40-head.json
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -205,6 +209,7 @@ function fmtRow(s) {
     `p99 ${String(f.p99Ms ?? s.frameP99).padStart(6)}ms`,
     `max ${String(f.maxMs ?? s.frameMax).padStart(6)}ms`,
     `jank ${String(f.jankPct ?? '-').padStart(5)}%`,
+    `np ${String(s.phaseNameplatesMs).padStart(5)}ms`,
     `sub ${String(s.phaseSubmitMs).padStart(5)}ms`,
     `hitch[${z.worstMs ?? 0}ms ${causes}]`,
   ].join('  ');
@@ -271,6 +276,7 @@ export async function main() {
         fpsLow1: after.frame?.fpsLow1 ?? 0,
         p99Ms: after.frame?.p99Ms ?? after.frameP99,
         calls: after.calls,
+        phaseNameplatesMs: after.phaseNameplatesMs,
         phaseSubmitMs: after.phaseSubmitMs,
       };
       const b = {
@@ -278,6 +284,7 @@ export async function main() {
         fpsLow1: before.frame?.fpsLow1 ?? 0,
         p99Ms: before.frame?.p99Ms ?? before.frameP99,
         calls: before.calls,
+        phaseNameplatesMs: before.phaseNameplatesMs,
         phaseSubmitMs: before.phaseSubmitMs,
       };
       const d = diffMetrics(b, a);
@@ -286,7 +293,7 @@ export async function main() {
           ? `${k} ${d[k].before}->${d[k].after} (${d[k].delta > 0 ? '+' : ''}${d[k].pct}% ${d[k].better})`
           : '';
       console.log(
-        `${after.label.padEnd(14)} ${cell('fps')}  ${cell('fpsLow1')}  ${cell('p99Ms')}  ${cell('calls')}`,
+        `${after.label.padEnd(14)} ${cell('fps')}  ${cell('fpsLow1')}  ${cell('p99Ms')}  ${cell('calls')}  ${cell('phaseNameplatesMs')}`,
       );
     }
   }

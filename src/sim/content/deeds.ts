@@ -2416,6 +2416,29 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 5,
     trigger: { kind: 'visit', markId: 'fish:farshore_isle' },
   },
+  // The Drakelands dragonkin brood rework (v0.35): the Drakemaw Broodlords
+  // are the zone's new standing elites (shout, egg clutch, cleave, breath,
+  // counter-stun), and Cindraleth, the shipped quest capstone, was never
+  // wired into slain-mark credit (the Gleamstag gap class; both templates
+  // now sit in RARE_SLAIN_TEMPLATES).
+  chr_drakemaw_broodlord: {
+    id: 'chr_drakemaw_broodlord',
+    name: 'Clutch Breaker',
+    desc: 'Slay a Drakemaw Broodlord amid its eggs, through the shout, the cleave, and the fire.',
+    category: 'chronicle',
+    renown: 10,
+    trigger: { kind: 'visit', markId: 'slain:drakemaw_broodlord' },
+  },
+  chr_maw_matriarch: {
+    id: 'chr_maw_matriarch',
+    name: 'The Sky Goes Quiet',
+    desc: 'Slay Cindraleth the Maw Matriarch in her crater roost above the Drakemaw.',
+    category: 'chronicle',
+    renown: 10,
+    // Rides the shipped kill quest (retro-grantable for every veteran who
+    // already finished the chain), so the boss template needs no rare flag.
+    trigger: { kind: 'quest', questId: 'q_dk_matriarch_of_the_maw' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

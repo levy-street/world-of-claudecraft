@@ -309,6 +309,16 @@ const hudStringsEn = {
     },
     system: {
       playerDeath: 'You have died.',
+      deathRecapKillerAbility: "You have died. Slain by {killer}'s {ability}.",
+      deathRecapKiller: 'You have died. Slain by {killer}.',
+      deathRecapAbility: 'You have died. Slain by {ability}.',
+      // Environmental causes get their own sentence shape rather than being
+      // interpolated into deathRecapAbility: the raw cause string ('Falling',
+      // 'Fatigue') is not a translatable ability/aura name, and a bare "Slain by
+      // Falling" is awkward and hard to translate/inflect (see
+      // death_recap_feedback.ts).
+      deathRecapFalling: 'You have died. You fell to your death.',
+      deathRecapDrowned: 'You have died. You drowned.',
       respawn: 'You feel rested and whole again.',
       ignoringChat: 'Ignoring chat from {name}.',
       noLongerIgnoring: 'No longer ignoring {name}.',

@@ -7,6 +7,53 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const cs_CZ: Record<string, string> = {
+  'error.guildBankDeleting': 'Tento cech se maže, takže jeho banka je uzavřená. Nic se nezměnilo.',
+  'error.guildBankItemRequired': 'Zadej ID předmětu, který má být v tomto slotu.',
+  'error.guildBankNoCarrier':
+    'Aby šlo změnu uložit, musí být online alespoň jeden člen tohoto cechu.',
+  'error.guildBankNotLoaded': 'Banka tohoto cechu není v tomto světě momentálně načtená.',
+  'error.guildBankPurgeRefused': 'Změna cechovní banky byla odmítnuta.',
+  'error.guildBankSaveFailed':
+    'Změnu se nepodařilo uložit a byla vrácena zpět. Zkus to za chvíli znovu.',
+  'error.guildBankSlotNotStuck':
+    'Tento slot obsahuje běžný předmět, který si cech může vybrat sám, takže ho tady nelze odstranit.',
+  'error.guildBankSlotRequired': 'Zadej číslo slotu cechovní banky, který chceš odstranit.',
+  'guilds.bankColCount': 'Počet',
+  'guilds.bankColItem': 'Předmět',
+  'guilds.bankColSlot': 'Slot',
+  'guilds.bankColStatus': 'Stav',
+  'guilds.bankDormantCount': 'Uvízlé předměty',
+  'guilds.bankEmpty': 'Tato cechovní banka neobsahuje žádné předměty.',
+  'guilds.bankLoadFailed': 'Nepodařilo se načíst tuto cechovní banku.',
+  'guilds.bankPurgeAction': 'Odstranit předmět',
+  'guilds.bankPurgeCarrierWarning':
+    'Změna se ukládá přes online člena tohoto cechu. Ve vzácném případě, kdy je uložení odmítnuto, se tento člen odpojí a znovu připojí, aniž by trvale přišel o cokoli.',
+  'guilds.bankPurgeClose': 'Zavřít dialog pro odstranění předmětu',
+  'guilds.bankPurgeConfirm': 'Odstranit předmět',
+  'guilds.bankPurgeConfirmation': 'Potvrzuji, že tento předmět má být zničen.',
+  'guilds.bankPurgeFailed': 'Nepodařilo se odstranit předmět.',
+  'guilds.bankPurgeItemRequired': 'Tento slot nemá ID předmětu k potvrzení.',
+  'guilds.bankPurgeReasonPlaceholder': 'Interní důvod moderace',
+  'guilds.bankPurgeReasonRequired': 'Zadej důvod moderace.',
+  'guilds.bankPurgeReasonTooLong': 'Zkrať důvod moderace na 500 znaků nebo méně.',
+  'guilds.bankPurgeSlotRequired': 'Vyber slot cechovní banky, který chceš odstranit.',
+  'guilds.bankPurgeTitle': 'Odstranit uvízlý předmět z cechovní banky',
+  'guilds.bankPurgeUnaudited':
+    'Předmět byl odstraněn, ale záznam do moderačního deníku se nepodařilo zapsat. Nahlas to.',
+  'guilds.bankPurgeWarning':
+    'Tímto se předmět trvale zničí. Ve hře to nelze vzít zpět a cech ho už nezíská.',
+  'guilds.bankPurging': 'Odstraňování...',
+  'guilds.bankRefresh': 'Obnovit banku',
+  'guilds.bankSlotsUsed': 'Využité sloty',
+  'guilds.bankSlotsUsedValue': '{used} z {capacity}',
+  'guilds.bankStatusNormal': 'Lze vybrat',
+  'guilds.bankStatusStuck': 'Uvízlý',
+  'guilds.bankStuckExplainer':
+    'Uvízlý předmět nejde přesunout žádným směrem, takže dokud v bance zůstává, cech ji nemůže vyprázdnit ani se rozpustit. Jeho odstranění předmět trvale zničí.',
+  'guilds.bankTitle': 'Cechovní banka',
+  'guilds.bankTreasury': 'Pokladna',
+  'guilds.bankUnopened': 'Tento cech si ještě neotevřel banku.',
+  'moderationHistory.actionGuildBankPurge': 'Vyčištění cechovní banky',
   'onlinePlayers.autoRefresh': 'Automatické obnovení ({minutes} min)',
   'onlinePlayers.count': '{count} hráčů online',
   'onlinePlayers.countFiltered': '{shown} z {total} online',

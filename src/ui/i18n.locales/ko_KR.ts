@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.deeds.recentJumpAria': '{name}(으)로 이동',
   'hudChrome.targetAuras.all': '전체',
   'hudChrome.actionBar.done': '완료',
   'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
@@ -1090,6 +1091,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.browserEffectsMinimal': '최소',
   'hudChrome.options.browserEffectsNote':
     '자동은 브라우저와 기기에 맞춰 무거운 CSS 효과(흐림, 글로우, 배경 모션)를 낮춥니다. 인터페이스가 느리게 느껴지면 수동으로 낮추세요.',
+  'hudChrome.options.graphicsApply': '그래픽 적용',
+  'hudChrome.options.graphicsApplying': '그래픽 설정 적용 중...',
+  'hudChrome.options.graphicsApplied': '그래픽 설정이 적용되었습니다.',
+  'hudChrome.options.graphicsSaved':
+    '그래픽 설정이 저장되었습니다. 현재 렌더러가 이미 같은 설정을 사용 중입니다.',
+  'hudChrome.options.graphicsFailed':
+    '그래픽 설정을 적용하지 못했습니다. 이전 설정이 계속 활성화되어 있습니다.',
+  'hudChrome.options.graphicsRetry': '그래픽 다시 시도',
+  'hudChrome.options.graphicsFatal':
+    '그래픽 복구에 실패했습니다. 계속하려면 게임을 다시 불러오세요.',
+  'hudChrome.options.graphicsReload': '게임 다시 불러오기',
+  'hudChrome.options.graphicsDraftChanged': '그래픽 변경 사항을 적용할 수 있습니다.',
   'hudChrome.options.footstepSounds': '발소리',
   'hudChrome.options.interfaceSounds': '인터페이스 및 피드백 소리',
   'hudChrome.options.clickFeedback': '클릭 표시',
@@ -1109,6 +1122,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showItemLevel': '아이템 레벨 표시',
   'hudChrome.options.showSecondaryActionBar': '보조 액션 바 표시',
   'hudChrome.options.showThirdActionBar': '세 번째 액션 바 표시',
+  'hudChrome.options.lockActionBars': '액션 바 잠금',
   'hudChrome.options.showDailyRewardsChest': '일일 보상 보물상자 표시',
   'hudChrome.options.mobileCameraJoystick': '카메라 조이스틱',
   'hudChrome.options.mobileLeftHanded': '왼손잡이 레이아웃',
@@ -1117,6 +1131,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.landing.highContrast': '고대비',
   'hudChrome.landing.highContrastAria':
     '고대비 배경 전환: 움직이는 예고편을 꺼서 시작 화면 텍스트를 읽기 쉽게 유지합니다',
+  'hudChrome.landing.browserSupport.title': '알림: 지원되지 않는 브라우저',
+  'hudChrome.landing.browserSupport.body':
+    '이 브라우저에서는 성능이 저하될 수 있습니다. 최상의 경험을 위해 Windows, macOS 또는 Linux용 데스크톱 앱을 받아보세요. 브라우저에서 계속 플레이하시겠습니까? Chrome이 가장 성능이 좋으며 Firefox와 Safari도 지원됩니다.',
+  'hudChrome.landing.browserSupport.getDesktopApp': '데스크톱 앱 받기',
+  'hudChrome.landing.browserSupport.continueInBrowser': '브라우저에서 계속하기',
+  'hudChrome.landing.browserSupport.dismissAria': '지원되지 않는 브라우저 알림 닫기',
   'hudChrome.talents.defaultBuildName': '빌드 {n}',
   'hudChrome.tips.joinChannels':
     '팁: /join world 또는 /join lfg를 입력하면 월드 전역의 플레이어와 대화할 수 있습니다.',
@@ -2006,6 +2026,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.combat.auraAfflicted': '{target}이 {name} 효과에 걸렸습니다.',
   'hud.combat.auraGainOther': '{target}이 {name} 효과를 얻었습니다.',
   'hud.system.playerDeath': '사망했습니다.',
+  'hud.system.deathRecapKillerAbility': '사망했습니다. {killer}의 {ability}에 쓰러졌습니다.',
+  'hud.system.deathRecapKiller': '사망했습니다. {killer}에게 쓰러졌습니다.',
+  'hud.system.deathRecapAbility': '사망했습니다. {ability}(으)로 사망했습니다.',
+  'hud.system.deathRecapFalling': '사망했습니다. 추락사했습니다.',
+  'hud.system.deathRecapDrowned': '사망했습니다. 익사했습니다.',
   'hud.system.respawn': '다시 온전하고 편안한 상태가 되었습니다.',
   'hud.system.ignoringChat': '{name}의 채팅을 차단합니다.',
   'hud.system.noLongerIgnoring': '{name}을 더 이상 차단하지 않습니다.',
@@ -2413,6 +2438,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.quest': '퀘스트 아이템',
   'itemUi.kind.junk': '잡동사니',
   'itemUi.kind.fineMaterial': '상급 재료',
+  'itemUi.kind.material': '재료',
   'itemUi.kind.food': '음식',
   'itemUi.kind.drink': '음료',
   'itemUi.kind.tool': '도구',
@@ -2442,6 +2468,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useDrink':
     '사용 효과: {seconds}초에 걸쳐 마나 {amount} 회복. 마시는 동안 앉아 있어야 합니다.',
   'itemUi.tooltip.questItem': '퀘스트 아이템',
+  'itemUi.tooltip.questRelated': '퀘스트: {quest}',
+  'itemUi.tooltip.questRules': '판매, 은행에 보관, 거래할 수 없습니다.',
+  'itemUi.tooltip.questOrphaned': '진행 중인 퀘스트에 필요하지 않습니다.',
   'itemUi.tooltip.classes': '직업: {classes}',
   'itemUi.tooltip.sellPrice': '판매 가격: {money}',
   'itemUi.tooltip.clickBuy': '클릭하여 구매',
@@ -3439,6 +3468,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.deepfen_murloc.name': '딥펜 무는이',
   'entities.mobs.mire_widow.name': '마이어펜 과부거미',
   'entities.mobs.mirefen_broodmother.name': '거미어미',
+  'entities.mobs.spider_egg.name': '거미어미의 알',
+  'entities.mobs.widow_hatchling.name': '과부거미 새끼',
+  'entities.mobs.drowned_warlord.name': '익사한 전쟁군주',
+  'entities.mobs.brakka_wallbreaker.name': '성벽파괴자 브라카',
+  'entities.mobs.threnos_first_voice.name': '첫 번째 목소리 스레노스',
+  'entities.items.firebottle.name': '화염병',
+  'entities.items.murloc_hut.name': '진흙지느러미 오두막',
+  'entities.items.restless_skull.name': '불안한 두개골',
+  'entities.items.vanguard_bone.name': '선봉대의 뼈',
   'entities.mobs.drowned_dead.name': '익사한 망자',
   'entities.mobs.fen_troll.name': '마이어펜 트롤',
   'entities.mobs.grubjaw.name': '대식가 그럽죠',
@@ -3812,7 +3850,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_drowned_censers.objectives.0.label': '녹슨 향로',
   'entities.quests.q_no_rest.title': '갈대밭에 안식은 없다',
   'entities.quests.q_no_rest.text':
-    '그 의식은 습지가 닿는 곳마다 익사자를 일으킵니다. 아직 풀 수 없지만, 병사 14구를 주인에게서 빼앗을 수 있습니다.',
+    '그 향로의 의식은 익사자를 일으키고, 이제 그들을 이끌 만큼 강한 자까지 일으켰습니다. 파수꾼들은 그를 익사한 전쟁군주라 부릅니다. 그가 잠긴 예배당을 차지하고 있는 한 망자들은 대열을 지킵니다. {playerName}이여, 그를 쓰러뜨리십시오. 남은 것들은 진창으로 흩어져 돌아갈 것입니다.',
   'entities.quests.q_no_rest.completion':
     '당신은 죽은 자들에게 주인들보다 큰 자비를 베풀었습니다. 받으십시오.',
   'entities.quests.q_no_rest.objectives.0.label': '익사한 망자 안식시킴',
@@ -3976,14 +4014,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     '이 필체는 모르덴의 마법서에서 본 것입니다. 모든 무덤을 같은 손이 이끌었습니다, {playerName}.',
   'entities.quests.q_cult_orders.objectives.0.label': '고룡교단 광신도 처치',
-  'entities.quests.q_cult_orders.objectives.1.label': '고룡교단 명령서',
   'entities.quests.q_necromancers.title': '성물함의 고리',
   'entities.quests.q_necromancers.text':
     '명령서는 성소 둘레의 성물함 고리를 말합니다. 영혼 그릇입니다, {playerName}이여. 강령술사 8명을 죽이고 3개를 온전하게 가져오십시오.',
   'entities.quests.q_necromancers.completion':
     '빛이여 용서하소서. 계곡과 습지의 죽은 자들이 담겨 있습니다. {playerName}이여, 그들은 군대를 만든 것이 아니라 십일조를 거두고 있었습니다.',
   'entities.quests.q_necromancers.objectives.0.label': '고룡교단 강령술사 처치',
-  'entities.quests.q_necromancers.objectives.1.label': '의식 성물함',
   'entities.quests.q_revenants.title': '망령 들판',
   'entities.quests.q_revenants.text':
     '성소 길 동쪽에는 오래된 전장이 있습니다. 교단이 녹슨 갑옷의 뼈들을 일으켰습니다. {playerName}이여, 12구를 흙으로 돌려보내십시오.',
@@ -8136,6 +8172,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_aether_hover_cycle.name': '시동 열쇠: 에테르 기사 호버사이클',
   'entities.items.reins_shadowjump_toad.name': '그림자 도약 두꺼비 카마카게의 고삐',
   'entities.items.reins_stormfeather_griffin.name': '하늘닿이 폭풍깃의 고삐',
+  'entities.items.reins_drakemaw_raptor.name': '화산구 랩터의 고삐',
   'entities.items.reins_thunderstrut_gobbler.name': '천둥활보 대왕 칠면조의 고삐',
   'entities.mobs.drowned_cantor.name': '익사한 영창자',
   'entities.mobs.reedbound_acolyte.name': '갈대에 묶인 신도',
@@ -8626,6 +8663,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.makersMark': '제작자: {name}',
   'hudChrome.bags.itemAriaInstanced': '{item}, 수량 {count}, 제작자 표식이 있는 사본',
   'hudChrome.bags.itemAriaMasterwork': '{item}, 수량 {count}, 걸작',
+  'hudChrome.bags.itemAriaQuest': '{item}, 수량 {count}, 퀘스트 아이템',
+  'hudChrome.bags.filterQuestCountAria': '퀘스트, 아이템 {count}개',
+  'hudChrome.bags.noQuestItems': '가방에 퀘스트 아이템이 없습니다.',
   'hudChrome.crafting.gatheredBy': '채집자: {name}',
   'hudChrome.crafting.masterworkSeal': '걸작',
   'hudChrome.crafting.stationRequired': '그것을 제작하려면 {station}에 있어야 합니다.',
@@ -8949,6 +8989,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.sortAria': '은행 아이템 정렬',
   'hudChrome.bank.searchAria': '이름으로 은행 아이템 검색',
   'hudChrome.bank.depositAll': '모든 재료 보관',
+  'hudChrome.bank.depositAllTooltip':
+    '가방에 있는 모든 제작 재료와 잡동사니를 한 번에 은행에 보관합니다. 채집 도구, 장착한 장비, 퀘스트 아이템, 소모품은 영향을 받지 않습니다.',
   'hudChrome.bank.depositAllDone': '보관한 재료: {count}.',
   'hudChrome.bank.depositAllFull': '보관한 재료: {count}. 은행이 가득 찼습니다.',
   'hudChrome.bank.depositAllNone': '은행이 가득 참: 아무것도 보관하지 못했습니다.',
@@ -9297,6 +9339,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_aether_hover_cycle': '에테르 기사 호버사이클',
   'hudChrome.mounts.name_shadowjump_toad': '그림자 도약 두꺼비 카마카게',
   'hudChrome.mounts.name_stormfeather_griffin': '하늘닿이 폭풍깃',
+  'hudChrome.mounts.name_drakemaw_raptor': '화산구 랩터',
+  'hudChrome.mounts.desc_drakemaw_raptor':
+    '화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다.',
   'hudChrome.mounts.name_thunderstrut_gobbler': '천둥활보 대왕 칠면조',
   'hudChrome.mounts.name_terrorspark_groundshaker': '대지를 뒤흔드는 테러스파크',
   'hudChrome.mounts.desc_valorsteed': '여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.',
@@ -10082,6 +10127,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.apprentice_wren.name': '견습생 렌',
   'entities.mobs.barrow_wight.name': '봉분 망자',
   'entities.mobs.castaway_navigator.name': '항해사 술리',
+  'entities.mobs.dragonkin_egg.name': '용족 알',
+  'entities.mobs.dragonkin_whelp.name': '용족 새끼',
+  'entities.mobs.dragonkin_broodguard.name': '용족 둥지 수호병',
+  'entities.mobs.drakemaw_broodlord.name': '화산구의 둥지군주',
   'entities.mobs.cindraleth_maw_matriarch.name': '화산구의 어미 신드랄레스',
   'entities.mobs.drowned_deckhand.name': '익사한 갑판원',
   'entities.mobs.fisher_bram.name': '어부 브람',
@@ -10880,6 +10929,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '마법부여는 재료를 소모하고 특정 사본 하나에 표시를 남긴다. 가방 속 사본에 쓰면 별개의 부여된 사본을 돌려받고, 이미 착용 중인 물건에 쓰면 벗었다 다시 입을 필요 없이 그 자리에서 부여된다. 어느 쪽이든 보너스가 영원히 그 물건을 따른다. 한 물건에 하나. 부여된 사본에 다른 마법부여를 쓰면 먼저 확인을 거친 뒤 옛 부여를 그대로 대체하며, 옛 부여는 재료 환불 없이 파괴된다. 판매와 폐기와 분해 모두 무표식 사본을 먼저 집으니 완성품이 실수로 갈리지 않는다. 똑같이 부여된 사본끼리는 겹쳐진다. 걸작과 마법부여는 친구다. 걸작은 온전히 부여 가능하고, 부여는 걸작 보너스와 서명을 건드리지 않고 얹힌다. 모든 것을 쌓은 서명된 걸작의 Greater 부여가 공예품의 정점이며, 그래도 설계상 공격대 전리품 아래에 있다. 이제 부여품과 서명품도 세계 시장에 올릴 수 있다. 한 점씩 단일 등록으로 팔리고, 툴팁에 부여와 제작자의 서명이 표시되며, 큰까마귀 우편으로도 똑같이 보낼 수 있다. 재료는 여전히 장사의 든든한 절반이다. 가루, 정수, 조각은 자유로이 등록되고, 등록은 무료, 수수료는 성사 시 5%뿐이다.',
   'hudChrome.corpseHarvest.components.meat': '고기',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (마법부여)',
+  'hudChrome.materialHint.cookingCatch': '요리 재료. 먹기 전에 먼저 요리해야 합니다.',
   'hudChrome.materialHint.fineGrade':
     '상급 등급입니다. 해당 재료보다 높은 등급의 도구로 만렙 채집지에서 캐낸 것이며, 일반 등급이 필요한 곳 어디에서나 대신 사용됩니다.',
   'hudChrome.materialHint.arcaneDust': '마법부여 재료. 일반과 고급 장비의 마력을 추출해 얻습니다.',

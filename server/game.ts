@@ -447,6 +447,9 @@ export const SIM_LAP_PHASES = [
   'mob.update',
   'mob.auras',
   'ent.misc',
+  // The Drakelands dragonkin brood pass (src/sim/mob/dragonkin_brood.ts):
+  // egg proximity/chain/hatch, whelp upkeep, broodlord counter-stun.
+  'dragonkinBrood',
   'engaged',
   'duels',
   'cardDuel',
@@ -7946,6 +7949,7 @@ export class GameServer {
       copper: meta.copper,
       gcd: round2(p.gcdRemaining),
       pcd: round2(p.potionCdRemaining),
+      fcd: round2(p.firebottleCdRemaining),
       swing: round2(p.swingTimer),
       combo: p.comboPoints,
       target: p.targetId,

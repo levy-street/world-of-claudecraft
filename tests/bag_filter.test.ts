@@ -10,6 +10,7 @@ import {
   type BagFilterState,
   bagFilterIsDefault,
   bagOrderIsManual,
+  bagQuestItemCount,
   DEFAULT_BAG_FILTER,
   matchesCategory,
   parseBagFilter,
@@ -333,6 +334,56 @@ describe('bagOrderIsManual (the reorder gate)', () => {
     expect(bagOrderIsManual({ category: 'all', sort: 'name', search: '' })).toBe(false);
     expect(bagOrderIsManual({ category: 'weapon', sort: 'recent', search: '' })).toBe(false);
     expect(bagOrderIsManual({ category: 'all', sort: 'recent', search: 'clo' })).toBe(false);
+  });
+});
+
+describe('bagQuestItemCount (Quest chip badge metric)', () => {
+  // Metric lock (Phase 3): total STACK COUNT of quest pieces, not unique stack
+  // count. "Boar Hide x5" + "Fang x1" reads 6 on the chip, matching cell badges
+  // and tracker progress. Unknown defs contribute 0.
+  it('sums stack counts of kind===quest items only', () => {
+    const inv: InvSlot[] = [
+      { itemId: 'blade', count: 1 },
+      { itemId: 'keystone', count: 1 },
+      { itemId: 'potion', count: 3 },
+    ];
+    expect(bagQuestItemCount(inv, lookup)).toBe(1);
+  });
+
+  it('sums multi-count quest stacks (prefer total pieces over unique stacks)', () => {
+    // Two quest stacks: keystone x1 and a second keystone stack x4 = 5 pieces.
+    // Unique-stack count would wrongly report 2.
+    const inv: InvSlot[] = [
+      { itemId: 'keystone', count: 1 },
+      { itemId: 'blade', count: 1 },
+      { itemId: 'keystone', count: 4 },
+    ];
+    expect(bagQuestItemCount(inv, lookup)).toBe(5);
+  });
+
+  it('returns 0 when the bag holds no quest items', () => {
+    const inv: InvSlot[] = [
+      { itemId: 'blade', count: 1 },
+      { itemId: 'potion', count: 2 },
+    ];
+    expect(bagQuestItemCount(inv, lookup)).toBe(0);
+    expect(bagQuestItemCount([], lookup)).toBe(0);
+  });
+
+  it('ignores unknown-def slots and floors fractional counts', () => {
+    const inv: InvSlot[] = [
+      { itemId: 'ghost', count: 9 },
+      { itemId: 'keystone', count: 2.7 },
+    ];
+    expect(bagQuestItemCount(inv, lookup)).toBe(2);
+  });
+
+  it('clamps negative stack counts to zero (never shrinks the badge)', () => {
+    const inv: InvSlot[] = [
+      { itemId: 'keystone', count: -3 },
+      { itemId: 'keystone', count: 2 },
+    ];
+    expect(bagQuestItemCount(inv, lookup)).toBe(2);
   });
 });
 

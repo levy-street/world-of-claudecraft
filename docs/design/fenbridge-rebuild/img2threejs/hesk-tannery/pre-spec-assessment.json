@@ -1,0 +1,198 @@
+{
+  "targetName": "Fenbridge Hesk Tannery",
+  "sourceImage": "docs/design/fenbridge-rebuild/img2threejs/hesk-tannery/zones/hero.png",
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "wide exterior tannery and leather workshop",
+      "primaryDomain": "object",
+      "formLanguage": ["stylized low-poly", "swamp timber workshop", "open-sided craft bay"],
+      "structureKind": [
+        "closed main shell",
+        "raised dry apron",
+        "lean-to awning",
+        "exterior work scenery"
+      ],
+      "motionPotential": [
+        "static town building",
+        "fixed tannery station socket",
+        "nonblocking attached craft props"
+      ],
+      "materialFamilies": [
+        "dark timber",
+        "damp stone",
+        "oxidized teal shingles",
+        "cured hide",
+        "water and iron"
+      ],
+      "notes": "Hides remain clean abstract stretched panels; no anatomical detail, blood or gore is admitted."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 3,
+        "componentCount": 3,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 2,
+        "materialLayerCount": 2,
+        "localDetailDensity": 3,
+        "occlusionRisk": 2,
+        "actionReadinessNeed": 2
+      },
+      "estimatedCounts": {
+        "macroComponents": 2,
+        "mesoComponents": 4,
+        "microFeatureGroups": 13,
+        "materialLayers": 2,
+        "repetitionSystems": 3
+      },
+      "reasoning": [
+        "The identity is the asymmetric union of a tall left workshop and an open right hide-and-vat awning on one raised apron.",
+        "Two stretched hides, a shallow vat, workbench, hanging strips and drainage trough must remain exterior-readable.",
+        "Exact drain destination, hook count and hide outline vary or are occluded, so the shipping arrangement is deterministic and abstract."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Tannery function depends on the open bay's real negative space and distinct exterior work modules."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "four admitted component-zone crops with hero cross-check",
+      "targetMinDetails": 10,
+      "details": [
+        {
+          "id": "asymmetric-workshop-awning",
+          "kind": "contour",
+          "mapsTo": { "type": "component.localFeatures", "ref": "open-right-work-bay" }
+        },
+        {
+          "id": "raised-dry-apron",
+          "kind": "contour",
+          "mapsTo": { "type": "component.localFeatures", "ref": "piled-dry-apron" }
+        },
+        {
+          "id": "roof-smokestack",
+          "kind": "seam",
+          "mapsTo": { "type": "component.localFeatures", "ref": "smokestack-courses" }
+        },
+        {
+          "id": "hide-frame-pair",
+          "kind": "contour",
+          "mapsTo": { "type": "component.localFeatures", "ref": "stretched-hide-pair" }
+        },
+        {
+          "id": "hide-lacing",
+          "kind": "linework",
+          "mapsTo": { "type": "component.localFeatures", "ref": "hide-frame-lacing" }
+        },
+        {
+          "id": "shallow-vat",
+          "kind": "contour",
+          "mapsTo": { "type": "component.localFeatures", "ref": "shallow-tanning-vat" }
+        },
+        {
+          "id": "vat-water",
+          "kind": "gloss",
+          "mapsTo": { "type": "material.localOverrides", "ref": "fenbridge-opaque/vat-water-sheen" }
+        },
+        {
+          "id": "drainage-trough",
+          "kind": "groove",
+          "mapsTo": { "type": "component.localFeatures", "ref": "front-drainage-trough" }
+        },
+        {
+          "id": "workbench-tools",
+          "kind": "linework",
+          "mapsTo": { "type": "component.localFeatures", "ref": "bench-hook-and-roll-system" }
+        },
+        {
+          "id": "cured-hide-matte",
+          "kind": "stain",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "fenbridge-opaque/cured-hide-matte"
+          }
+        }
+      ]
+    },
+    "anatomy": { "applies": false }
+  },
+  "qualityContract": {
+    "qualityBar": "complex game-ready exterior",
+    "definitionOfDone": [
+      "The 9 by 7.2 by 7 yard exterior reads unmistakably as Hesk's tannery through its open right bay, two hide frames, shallow vat, dry apron and drain while local x=0 remains the entrance anchor."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 2,
+      "mesoComponents": 4,
+      "microFeatureGroups": 10,
+      "materialLayers": 2,
+      "repetitionSystems": 2,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "tannery-silhouette",
+        "name": "Asymmetric workshop and open awning",
+        "required": true,
+        "qualityCriteria": ["Tall shell, lower work bay, smokestack and apron remain distinct."],
+        "evidenceRefs": ["front", "hero"],
+        "failureModes": ["reads as a generic longhouse"]
+      },
+      {
+        "id": "hide-system",
+        "name": "Two clean stretched hide frames",
+        "required": true,
+        "qualityCriteria": ["Both abstract panels sit visibly within timber frames without gore."],
+        "evidenceRefs": ["front", "side", "rear"],
+        "failureModes": ["craft function is ambiguous"]
+      },
+      {
+        "id": "vat-drain-system",
+        "name": "Shallow vat and drainage trough",
+        "required": true,
+        "qualityCriteria": [
+          "Vat rim, water surface and front drain remain attached and clear of approach."
+        ],
+        "evidenceRefs": ["front", "hero"],
+        "failureModes": ["station cue is absent"]
+      },
+      {
+        "id": "material-separation",
+        "name": "Timber, teal roof, hide, iron and water separation",
+        "required": true,
+        "qualityCriteria": ["Two-bucket merge preserves clean workshop material families."],
+        "evidenceRefs": ["hero"],
+        "failureModes": ["bay becomes undifferentiated clutter"]
+      }
+    ],
+    "visualDeltaChecks": [
+      "asymmetric tall-and-low silhouette",
+      "open awning negative space",
+      "two hide panels",
+      "vat rim and water",
+      "clear x=0 door approach"
+    ],
+    "antiShallowSpecRules": [
+      "Do not close the work awning.",
+      "Do not model an interior behind the workshop door."
+    ],
+    "mustNotDo": ["No blood or gore.", "No loose service-lane clutter.", "No readable sign."]
+  },
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Fenbridge Hesk tannery workshop hide frames vat drainage awning procedural low-poly",
+    "indexFingerprint": "6857e5ab528b42ac12f4f411f862610a0bffce8e47aee3610a7603c318072fe8",
+    "sourceRefs": [
+      "grimoire/glossary/3d_vocabulary.md",
+      "grimoire/intake/surface_topology.md",
+      "grimoire/build/geometry_patterns.md"
+    ],
+    "evidenceRefs": ["core.topology-intent", "core.pbr-hand-painted-vs-pbr-texture"]
+  }
+}

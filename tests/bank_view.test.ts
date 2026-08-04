@@ -634,6 +634,7 @@ describe('deposit-all narrows to the honest taxonomy (phase 19)', () => {
     'bone_fragments', // salvage return
     'spider_leg', // mob-drop reagent
     'arcanite_bar', // vendor staple (Q6: in)
+    'raw_river_perch', // raw fishing catch (junk cooking reagent: in)
   ] as const;
   // ...and of every excluded class the settlement ruled on.
   const EXCLUDED = [
@@ -641,7 +642,6 @@ describe('deposit-all narrows to the honest taxonomy (phase 19)', () => {
     'gatherers_cache', // charm (kind tool by deliberate authoring)
     'amber_hide', // grey vendor trash (Q3: out)
     'guardian_core', // non-poor junk oddment (Q4: out)
-    'raw_river_perch', // raw-fish cooking reagent (Q5: out)
     'boar_hide', // quest item
     'linen_pouch', // bag item
     'reins_valorsteed', // mount item
@@ -665,7 +665,6 @@ describe('deposit-all narrows to the honest taxonomy (phase 19)', () => {
       gatherers_cache: { kind: 'tool' },
       amber_hide: { kind: 'junk', quality: 'poor' },
       guardian_core: { kind: 'junk' },
-      raw_river_perch: { kind: 'food' },
       boar_hide: { kind: 'quest' },
       linen_pouch: { kind: 'bag' },
       reins_valorsteed: { kind: 'mount' },

@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: 'Pogromca Wylęgu',
+    desc: 'Zgładź Władcę Wylęgu Smoczej Paszczy pośród jego jaj, przez ryk, rozcinający cios i ogień.',
+  },
+  chr_maw_matriarch: {
+    name: 'Niebo Milknie',
+    desc: 'Zgładź Cindraleth, Matriarchinię Paszczy, w jej kraterowym gnieździe nad Smoczą Paszczą.',
+  },
   pvp_card_duel_first_win: {
     name: 'Zasady Domu',
     desc: 'Wygraj Pojedynek Karciany u Mistrza Kart.',
