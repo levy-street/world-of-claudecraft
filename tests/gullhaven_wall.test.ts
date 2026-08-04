@@ -16,7 +16,8 @@ import { FARSHORE_NPCS, FARSHORE_PROPS, FARSHORE_ROADS } from '../src/sim/conten
 import {
   GULLHAVEN_BUILDINGS,
   GULLHAVEN_GATES,
-  GULLHAVEN_TERRAIN_EDITS,
+  GULLHAVEN_PLOT_PADS,
+  GULLHAVEN_TOWN_BENCHES,
   GULLHAVEN_WALL,
   GULLHAVEN_WALL_LINE,
   gullhavenWallProps,
@@ -39,10 +40,17 @@ interface Box {
   d: number;
   rot: number;
 }
+/**
+ * The sim's own convention, copied from `building_layout.buildingLocalToWorld`
+ * and `colliders.rotY`: local +X lands on (cos rot, -sin rot) and local +Z on
+ * (sin rot, cos rot). Getting this backwards uses the INVERSE rotation, which
+ * mirrors every non-square footprint and flips which way a door faces, so the
+ * checks below would be measuring a building the sim never places.
+ */
 function localToWorld(b: Box, lx: number, lz: number): { x: number; z: number } {
   return {
-    x: b.x + lx * Math.cos(b.rot) - lz * Math.sin(b.rot),
-    z: b.z + lx * Math.sin(b.rot) + lz * Math.cos(b.rot),
+    x: b.x + lx * Math.cos(b.rot) + lz * Math.sin(b.rot),
+    z: b.z - lx * Math.sin(b.rot) + lz * Math.cos(b.rot),
   };
 }
 /** The footprint outline, sampled densely enough to catch an edge in a road. */
@@ -65,8 +73,8 @@ function doorstep(b: Box): { x: number; z: number } {
 }
 function boxesOverlap(a: Box, b: Box): boolean {
   const axes = [a, b].flatMap((o) => [
-    [Math.cos(o.rot), Math.sin(o.rot)],
-    [-Math.sin(o.rot), Math.cos(o.rot)],
+    [Math.cos(o.rot), -Math.sin(o.rot)],
+    [Math.sin(o.rot), Math.cos(o.rot)],
   ]);
   const corners = (o: Box) => [
     localToWorld(o, -o.w / 2, -o.d / 2),
@@ -146,7 +154,6 @@ describe('Gullhaven curtain wall: one record, two consumers', () => {
       kcasWall: [4, 1],
       kcasWallCracked: [4, 1.259],
       kcasWallPillar: [4, 1.5],
-      kcasPillar: [2.232, 1.71],
     };
     for (const piece of GULLHAVEN_WALL) {
       const want = FOOTPRINT[piece.key];
@@ -244,29 +251,35 @@ describe('Gullhaven gates', () => {
       const mine = JAMBS.filter((j) => j.id.includes(gate.id));
       expect(mine, `the ${gate.id} gate has no jamb pair`).toHaveLength(2);
       for (const jamb of mine) {
-        // the jamb's inner face lands on the 3 yard half-opening
-        const along = Math.hypot(jamb.x - gate.x, jamb.z - gate.z);
-        expect(along).toBeCloseTo(3 + 2.232 / 2, 3);
+        expect(jamb.key).toBe('kcasWallPillar');
         expect(jamb.parts?.map((p) => p.key)).toEqual(['kcasTorchMounted']);
       }
-      // and they sit on opposite sides of the opening
+      // A 6 yard clear opening: two 4 yard modules whose centres sit 10 apart.
       const [a, b] = mine;
-      expect(Math.hypot(a.x - b.x, a.z - b.z)).toBeCloseTo(2 * (3 + 2.232 / 2), 3);
+      expect(Math.hypot(a.x - b.x, a.z - b.z)).toBeGreaterThan(9.5);
+      expect(Math.hypot(a.x - b.x, a.z - b.z)).toBeLessThan(10.1);
     }
   });
 
-  it('terminates each run beside a gate in a pier, not a cut panel', () => {
+  it('closes the joint: the curtain butts up to every jamb', () => {
+    // The defect this pins: panels used to be skipped by RADIUS from the gate
+    // while the run carried on with its own fixed spacing, so the first surviving
+    // panel landed wherever the rhythm put it, anywhere from the bay edge to a
+    // full spacing past it. Every gate had up to four yards of open grass between
+    // its jamb and the wall. Runs are now measured in arc length BETWEEN bays and
+    // filled with whole panels, so each run's first and last piece lands flush.
     for (const gate of GULLHAVEN_GATES) {
-      // the two panels nearest the gateway, one on each side of it
-      const byDistance = [...PANELS].sort(
-        (a, b) => Math.hypot(a.x - gate.x, a.z - gate.z) - Math.hypot(b.x - gate.x, b.z - gate.z),
-      );
-      const flanking = byDistance.slice(0, 2);
-      expect(flanking.length, `the ${gate.id} gate has no flanking run`).toBe(2);
-      for (const p of flanking)
-        expect(p.key, `the ${gate.id} gate's run ends in ${p.key}, not a pier`).toBe(
-          'kcasWallPillar',
-        );
+      for (const jamb of JAMBS.filter((j) => j.id.includes(gate.id))) {
+        let nearest = Number.POSITIVE_INFINITY;
+        for (const panel of PANELS) {
+          // centre-to-centre of two 4 yard modules: 4.0 is exactly touching
+          nearest = Math.min(nearest, Math.hypot(panel.x - jamb.x, panel.z - jamb.z));
+        }
+        expect(
+          nearest,
+          `${jamb.id} stands ${nearest.toFixed(2)} from the nearest panel, leaving a hole`,
+        ).toBeLessThan(4.1);
+      }
     }
   });
 
@@ -398,11 +411,13 @@ describe('Gullhaven town buildings', () => {
   });
 
   it('gives every plot its own pad, derived from the building list', () => {
-    // Two stamps per building (a smooth blend and a flat floor) on top of the
-    // three town benches, each three passes.
-    expect(GULLHAVEN_TERRAIN_EDITS).toHaveLength(9 + GULLHAVEN_BUILDINGS.length * 2);
+    // Three town benches of three passes each, plus two stamps per building (a
+    // smooth blend and a flat floor). The pads are a SEPARATE export because they
+    // land after the memorial's grading in data.ts, not with the benches.
+    expect(GULLHAVEN_TOWN_BENCHES).toHaveLength(9);
+    expect(GULLHAVEN_PLOT_PADS).toHaveLength(GULLHAVEN_BUILDINGS.length * 2);
     for (const b of GULLHAVEN_BUILDINGS) {
-      const mine = GULLHAVEN_TERRAIN_EDITS.filter((e) => e.x === b.x && e.z === b.z);
+      const mine = GULLHAVEN_PLOT_PADS.filter((e) => e.x === b.x && e.z === b.z);
       expect(mine, `no plot pad for the building at (${b.x}, ${b.z})`).toHaveLength(2);
       for (const stamp of mine) {
         expect(stamp.mode).toBe('level');
@@ -417,10 +432,10 @@ describe('Gullhaven town buildings', () => {
 describe("Gullhaven's grading stays inside the town", () => {
   /** The same world with Gullhaven's stamps removed, for a before and after. */
   function ungraded<T>(body: (baseline: (x: number, z: number) => number) => T): T {
-    const skip = new Set<unknown>(GULLHAVEN_TERRAIN_EDITS);
+    const skip = new Set<unknown>([...GULLHAVEN_TOWN_BENCHES, ...GULLHAVEN_PLOT_PADS]);
     setActiveWorldContent({
       ...BUILTIN_WORLD,
-      terrainEdits: (BUILTIN_WORLD.terrainEdits ?? []).filter((e) => !skip.has(e)),
+      terrainEdits: (BUILTIN_WORLD.terrainEdits ?? []).filter((e: unknown) => !skip.has(e)),
     });
     try {
       const snapshot = new Map<string, number>();

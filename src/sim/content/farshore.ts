@@ -63,6 +63,13 @@ export const FARSHORE_ZONE: ZoneDef = {
   welcomeQuestId: 'q_fs_bell_at_the_landing',
 };
 
+// Every road through Gullhaven meets at ONE junction node, (822, 118), the
+// square's centre. They used to START a few yards apart from each other near it
+// (the Watch Meadow road at (826, 114), the Wreckfields road at (820, 128)),
+// which put three near-parallel painted bands through the middle of the town and
+// left the market and the houses as two clusters with a smear of track between
+// them. Sharing the node makes it read as a crossroads, which is what a market
+// square is, and gives the blocks between the roads back to the town.
 export const FARSHORE_ROADS: { x: number; z: number }[][] = [
   [
     { x: 784, z: 118 },
@@ -72,7 +79,8 @@ export const FARSHORE_ROADS: { x: number; z: number }[][] = [
     { x: 822, z: 118 },
   ], // the harbour pier -> the west gate -> Gullhaven
   [
-    { x: 826, z: 114 },
+    { x: 822, z: 118 },
+    { x: 831, z: 110 },
     { x: 880, z: 70 },
     { x: 935, z: 35 },
     { x: 985, z: 12 },
@@ -95,7 +103,8 @@ export const FARSHORE_ROADS: { x: number; z: number }[][] = [
     { x: 1098, z: -24 },
   ], // the Watch Meadow -> the Sundered Cliffs' foot
   [
-    { x: 820, z: 128 },
+    { x: 822, z: 118 },
+    { x: 826, z: 130 },
     { x: 855, z: 165 },
     { x: 880, z: 195 },
   ], // Gullhaven -> the Wreckfields
@@ -109,13 +118,16 @@ export const FARSHORE_ROADS: { x: number; z: number }[][] = [
     { x: 818, z: 108 },
     { x: 822, z: 118 },
   ], // the shore road -> the north gate -> Gullhaven
-  // The town -> Warden Hale's memorial. It CONTOURS the mound's west flank
+  // The town -> Warden Hale's memorial. It now BRANCHES at (807, 123) instead of
+  // starting at (814, 121): that first leg ran 1.5 to 2.6 yards from the harbour
+  // road and parallel to it, so the two painted bands merged into one wide smear
+  // across the square's west side rather than reading as a junction.
+  // It CONTOURS the mound's west flank
   // rather than climbing the face: the same curve MEMORIAL_TERRAIN_EDITS
   // grades, so the painted road always sits on graded ground and the climb
   // stays at about 0.2 per yard. You come round the hill and the bronze
   // arrives in view, instead of trudging straight at it.
   [
-    { x: 814, z: 121 },
     { x: 807, z: 123 },
     { x: 801, z: 124.5 },
     { x: 797, z: 127.5 },
@@ -756,8 +768,11 @@ export const FARSHORE_PROPS: ZonePropsDef = {
     [823, 108], // ration and quarrel stores against the siege
     [805, 120],
   ],
+  // No watchfire in the square. Gullhaven builds in STONE: a stone curtain, a
+  // stone bell tower, mortared houses. A campfire on the market cobbles read as
+  // a war camp pitched on top of a town rather than a town holding a line. The
+  // two that remain are outposts with no roof over them, which is the point.
   campfires: [
-    [819, 114], // the muster fire
     [782, -26], // the Landing's brazier on the west shore
     [992, 6], // the Watch Meadow's signal fire, kept burning for the vigil
   ],
@@ -767,12 +782,10 @@ export const FARSHORE_PROPS: ZonePropsDef = {
   // where the stray collision up there came from. The siege reads through the
   // war camp, the watchfires and the redoubt itself, not a rail fence.
   fences: [],
-  // the war camp: tents crowd the market where the fish stalls used to stand
-  tents: [
-    { x: 815, z: 108, rot: 0.4, scale: 1 },
-    { x: 829, z: 118, rot: -1.8, scale: 1 },
-    { x: 807, z: 110, rot: 2.3, scale: 1 },
-  ],
+  // No tents either, for the same reason: canvas beside a stone bell tower and
+  // mortared houses is two different towns in one frame. The siege now reads
+  // through the curtain wall, the gates and the salvage on the quay.
+  tents: [],
   // The Landing's small fishing jetty on the west shore. Gullhaven's own
   // waterfront is the authored harbor below, which replaced the interim
   // single-dock town pier (a dock deck seats on its anchor's terrain, so it

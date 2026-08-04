@@ -42,7 +42,7 @@ import type { HeightStamp, StaticObbPropDef } from '../types';
  * levelled to a target MEASURED off the natural ground under it rather than
  * chosen, so every pass is a shallow cut and fill and no rim becomes a cliff:
  *
- *   the east quarter  (843, 117) natural 5.5 to 6.9  ->  6.30
+ *   the east quarter  (843, 121) natural 5.5 to 6.9  ->  6.30
  *   the north knoll   (826, 101) natural 4.9 to 8.1  ->  6.10
  *   the south bench   (824, 146) natural 7.4 to 9.6  ->  7.90
  *
@@ -61,9 +61,9 @@ import type { HeightStamp, StaticObbPropDef } from '../types';
  */
 const TOWN_BENCHES: readonly HeightStamp[] = Object.freeze([
   // the east quarter: the town's houses, cut into the foot of the spine
-  { x: 843, z: 117, radius: 22, delta: 6.3, falloff: 'smooth', mode: 'level' },
-  { x: 843, z: 117, radius: 15, delta: 6.3, falloff: 'smooth', mode: 'level' },
-  { x: 843, z: 117, radius: 9.5, delta: 6.3, falloff: 'flat', mode: 'level' },
+  { x: 843, z: 121, radius: 22, delta: 6.3, falloff: 'smooth', mode: 'level' },
+  { x: 843, z: 121, radius: 15, delta: 6.3, falloff: 'smooth', mode: 'level' },
+  { x: 843, z: 121, radius: 10, delta: 6.3, falloff: 'flat', mode: 'level' },
   // the north knoll, above the square, inside the north gate
   { x: 826, z: 101, radius: 17, delta: 6.1, falloff: 'smooth', mode: 'level' },
   { x: 826, z: 101, radius: 11, delta: 6.1, falloff: 'smooth', mode: 'level' },
@@ -105,19 +105,32 @@ export interface GullhavenBuilding {
 }
 
 export const GULLHAVEN_BUILDINGS: readonly GullhavenBuilding[] = Object.freeze([
-  // The east quarter: the menders' hall and the houses that face it, on the
-  // bench cut into the spine's foot.
-  { kind: 'chapel', x: 840.8, z: 115.5, w: 5, d: 7, rot: -2.498, pad: 6.3 },
-  { kind: 'house', x: 848.2, z: 110.5, w: 5, d: 5, rot: -2.5, pad: 6.83 },
-  { kind: 'house', x: 847.5, z: 119.1, w: 5, d: 5, rot: -2.486, pad: 6.3 },
-  { kind: 'house', x: 842.5, z: 125, w: 5, d: 5, rot: -0.829, pad: 6.25 },
-  // The muster hall, on the knoll inside the north gate: the first roof you
-  // see coming down the shore road, and it looks over the square.
-  { kind: 'inn', x: 826.1, z: 101.4, w: 6, d: 7, rot: 0.676, pad: 6.1 },
-  // The south bench, the fisher row above the Wreckfields road.
-  { kind: 'house', x: 822, z: 143, w: 5, d: 5, rot: 2.361, pad: 8.27 },
-  { kind: 'house', x: 817.4, z: 148.7, w: 5, d: 5, rot: 2.345, pad: 8.7 },
-  { kind: 'house', x: 827, z: 149.5, w: 5, d: 5, rot: 2.375, pad: 7.9 },
+  // ---- the east quarter: ONE STREET, two facing rows, closed at its head ----
+  // A lane runs north to south along x 842.5 on the levelled bench, with a row of
+  // houses either side of it and the menders' hall across its head. Every
+  // rotation here is a right angle, and the pairs sit opposite each other at the
+  // same z: that is what makes it read as a street a town laid out rather than
+  // as houses that happened to land nearby. Doors face the lane (local +z lands
+  // on (sin rot, cos rot), so rot -PI/2 faces west and PI/2 faces east).
+  { kind: 'house', x: 838, z: 118, w: 5, d: 5, rot: Math.PI / 2, pad: 6.3 },
+  { kind: 'house', x: 847, z: 118, w: 5, d: 5, rot: -Math.PI / 2, pad: 6.3 },
+  { kind: 'house', x: 838, z: 126, w: 5, d: 5, rot: Math.PI / 2, pad: 6.3 },
+  { kind: 'house', x: 847, z: 126, w: 5, d: 5, rot: -Math.PI / 2, pad: 6.3 },
+  // The menders' hall closes the lane's south head, facing back up it: the one
+  // building you are looking at the whole way down the street.
+  { kind: 'chapel', x: 842.5, z: 134, w: 5, d: 7, rot: Math.PI, pad: 6.3 },
+
+  // ---- the knoll inside the north gate ----
+  // The muster hall stands square to the shore road on the knoll above the town,
+  // so it is the first roof over the wall as you come down to the north gate,
+  // and it addresses the square below.
+  { kind: 'inn', x: 826, z: 99, w: 6, d: 7, rot: 0, pad: 6.1 },
+
+  // ---- the south bench: the fisher row ----
+  // Two cottages in one line at the same z, facing north back at the town, on
+  // the levelled bench above the Wreckfields road.
+  { kind: 'house', x: 816, z: 145, w: 5, d: 5, rot: Math.PI, pad: 7.9 },
+  { kind: 'house', x: 824, z: 145, w: 5, d: 5, rot: Math.PI, pad: 7.9 },
 ]);
 
 /**
@@ -145,10 +158,21 @@ function plotPads(): HeightStamp[] {
   return out;
 }
 
-export const GULLHAVEN_TERRAIN_EDITS: readonly HeightStamp[] = Object.freeze([
-  ...TOWN_BENCHES,
-  ...plotPads(),
-]);
+/**
+ * The town's benches. These land BEFORE the memorial's grading, so the memorial
+ * still cuts its own terrace and contour path into the result.
+ */
+export const GULLHAVEN_TOWN_BENCHES: readonly HeightStamp[] = TOWN_BENCHES;
+
+/**
+ * The plot pads, which land AFTER the memorial's grading. A building floor has to
+ * be flat wherever it is, and the memorial's outer domes reach the town's south
+ * bench: with the pads landing first, that dome re-tilted the fisher row's plots
+ * by up to 0.77 yards corner to corner. Each pad is small and sits at least
+ * eleven yards clear of the memorial's own 10.40 terrace, so winning locally
+ * here costs the precinct nothing.
+ */
+export const GULLHAVEN_PLOT_PADS: readonly HeightStamp[] = Object.freeze(plotPads());
 
 /**
  * The curtain's waypoints, west shore to south-west shore. Verified against the
@@ -214,33 +238,42 @@ const PIECES = {
     thick: 1.259,
     tall: 4,
   },
-  pier: {
+  /**
+   * The gate jamb: the kit's wall module WITH an integrated pier, so it is the
+   * same 4 yard bay as the curtain and lines up with it exactly. The first pass
+   * used the freestanding `kcasPillar` (2.23 long, and narrower and thinner than
+   * the wall), which read as two isolated shrine posts standing near a hole in
+   * the wall rather than as a gateway.
+   */
+  jamb: {
     key: 'kcasWallPillar',
     assetId: '/models/biome/kcas_wall_pillar.glb',
     long: 4,
     thick: 1.5,
     tall: 4,
   },
-  jamb: {
-    key: 'kcasPillar',
-    assetId: '/models/biome/kcas_pillar.glb',
-    long: 2.232,
-    thick: 1.71,
-    tall: 4,
-  },
 } as const;
 
 /**
- * Pieces are laid every 3.9 yards along a 4.0 yard asset, so a run reads as one
- * wall rather than a dashed line, and each collider is the asset's own footprint
- * instead of a stretched box. The previous pass sized each collider to
- * `edgeLength / panelCount`, which drifted from the 4.0 yard model on every
- * edge whose length was not a multiple of four.
+ * Pieces are laid at most every 3.9 yards along a 4.0 yard asset, so a run reads
+ * as one wall rather than a dashed line, and each collider is the asset's own
+ * footprint instead of a stretched box.
  */
 const PIECE_SPACING = 3.9;
 
-/** A gate bay swallows the opening plus both jambs, so nothing is placed inside it. */
-const GATE_BAY_CLEAR = GATE_HALF_OPENING + PIECES.jamb.long + PIECES.panel.long / 2 + 0.1;
+/** Jamb centres sit this far along the curve from the gate, one either side. */
+const JAMB_OFFSET = GATE_HALF_OPENING + PIECES.jamb.long / 2;
+
+/**
+ * Half the gate bay: the opening plus both jambs. A curtain run BUTTS UP to this,
+ * which is the whole point of measuring the bay in arc length. The first pass
+ * skipped any panel whose centre fell within a radius of the gate and let the run
+ * carry on with its own fixed spacing, so the first surviving panel landed
+ * wherever the rhythm happened to put it: anywhere from the bay edge to a full
+ * spacing past it, leaving up to four yards of open grass between the jamb and
+ * the wall at every gate.
+ */
+const GATE_BAY_HALF = JAMB_OFFSET + PIECES.jamb.long / 2;
 
 /** The town's heart, used only to decide which side of the wall a torch faces. */
 const TOWN_CENTRE = { x: 822, z: 118 } as const;
@@ -284,88 +317,131 @@ function tangentRot(dx: number, dz: number): number {
   return Math.atan2(-dz, dx);
 }
 
+/** A point on the curtain's centreline: position, distance travelled, tangent. */
+interface CurtainPoint {
+  x: number;
+  z: number;
+  /** arc length from the north end */
+  s: number;
+  rot: number;
+}
+
+function sampleCurtain(): CurtainPoint[] {
+  const pts = densify(GULLHAVEN_WALL_LINE, 0.25);
+  const out: CurtainPoint[] = [];
+  let s = 0;
+  for (let i = 0; i < pts.length; i++) {
+    if (i > 0) s += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+    const a = pts[Math.max(0, i - 1)];
+    const b = pts[Math.min(pts.length - 1, i + 1)];
+    out.push({ x: pts[i][0], z: pts[i][1], s, rot: tangentRot(b[0] - a[0], b[1] - a[1]) });
+  }
+  return out;
+}
+
+/** The curtain point at arc length `s`, interpolated between samples. */
+function atArcLength(curve: readonly CurtainPoint[], s: number): CurtainPoint {
+  if (s <= curve[0].s) return curve[0];
+  const last = curve[curve.length - 1];
+  if (s >= last.s) return last;
+  let lo = 0;
+  let hi = curve.length - 1;
+  while (hi - lo > 1) {
+    const mid = (lo + hi) >> 1;
+    if (curve[mid].s <= s) lo = mid;
+    else hi = mid;
+  }
+  const a = curve[lo];
+  const b = curve[hi];
+  const span = b.s - a.s;
+  const t = span > 0 ? (s - a.s) / span : 0;
+  return { x: a.x + (b.x - a.x) * t, z: a.z + (b.z - a.z) * t, s, rot: a.rot };
+}
+
 /**
- * Walk the densified curve by arc length, dropping a piece every PIECE_SPACING
- * and skipping each gate bay. Every fourth piece is battered: the town has held
- * this watch for twelve centuries and is currently losing, so a tidy curtain
- * would be the wrong read.
+ * Build the curtain as RUNS BETWEEN GATE BAYS, measured in arc length. Each run
+ * gets whole panels distributed to fill it exactly (count rounded UP, so the
+ * spacing shrinks below the 4 yard module and neighbours overlap rather than
+ * gap), which lands the first and last panel of every run flush against the
+ * jamb beside it and flush with the shore at either end of the line.
+ *
+ * Every fourth panel is battered: the town has held this watch for twelve
+ * centuries and is currently losing, so a tidy curtain would be the wrong read.
  */
 function buildWall(): GullhavenWallPiece[] {
-  const curve = densify(GULLHAVEN_WALL_LINE, 0.5);
+  const curve = sampleCurtain();
+  const total = curve[curve.length - 1].s;
   const out: GullhavenWallPiece[] = [];
-  let travelled = 0;
-  let next = PIECE_SPACING / 2;
+
+  // each gate's position along the curve, in order from the north end
+  const gates = GULLHAVEN_GATES.map((gate) => {
+    let best = curve[0];
+    let bestD = Number.POSITIVE_INFINITY;
+    for (const p of curve) {
+      const d = Math.hypot(p.x - gate.x, p.z - gate.z);
+      if (d < bestD) {
+        bestD = d;
+        best = p;
+      }
+    }
+    return { ...gate, s: best.s, rot: best.rot };
+  }).sort((a, b) => a.s - b.s);
+
+  // the curtain runs: shore to first bay, bay to bay, last bay to shore
+  const runs: [number, number][] = [];
+  let cursor = 0;
+  for (const gate of gates) {
+    runs.push([cursor, gate.s - GATE_BAY_HALF]);
+    cursor = gate.s + GATE_BAY_HALF;
+  }
+  runs.push([cursor, total]);
+
   let placed = 0;
-  for (let i = 1; i < curve.length; i++) {
-    const a = curve[i - 1];
-    const b = curve[i];
-    const segLen = Math.hypot(b[0] - a[0], b[1] - a[1]);
-    if (segLen <= 0) continue;
-    while (next <= travelled + segLen) {
-      const t = (next - travelled) / segLen;
-      const x = a[0] + (b[0] - a[0]) * t;
-      const z = a[1] + (b[1] - a[1]) * t;
-      next += PIECE_SPACING;
-      if (GULLHAVEN_GATES.some((g) => Math.hypot(x - g.x, z - g.z) < GATE_BAY_CLEAR)) continue;
+  for (const [from, to] of runs) {
+    const len = to - from;
+    if (len < PIECES.panel.long / 2) continue;
+    const count = Math.max(1, Math.ceil(len / PIECE_SPACING));
+    const step = len / count;
+    for (let i = 0; i < count; i++) {
+      const at = atArcLength(curve, from + step * (i + 0.5));
       const piece = placed % 4 === 3 ? PIECES.battered : PIECES.panel;
       placed++;
       out.push({
         id: `gullhaven_wall_${out.length}`,
         key: piece.key,
         assetId: piece.assetId,
-        x,
-        z,
+        x: at.x,
+        z: at.z,
         w: piece.long,
         d: piece.thick,
-        rot: tangentRot(b[0] - a[0], b[1] - a[1]),
+        rot: at.rot,
         height: piece.tall,
         camGhost: true,
       });
     }
-    travelled += segLen;
   }
 
-  // The piece nearest each gate on either side becomes a pier, so the curtain
-  // terminates in a mass rather than a cut edge.
-  for (const gate of GULLHAVEN_GATES) {
-    const rot = wallRotAt(curve, gate.x, gate.z);
-    const along = (p: GullhavenWallPiece): number =>
-      (p.x - gate.x) * Math.cos(rot) - (p.z - gate.z) * Math.sin(rot);
+  // The jambs: the two wall-and-pier modules that frame each opening, placed ON
+  // the curve so they follow it exactly, each carrying a bracket torch on the
+  // town-facing side so the gateway is lit from inside.
+  for (const gate of gates) {
     for (const side of [-1, 1]) {
-      // The NEAREST surviving panel on this side, with no distance cap: the bay
-      // clearing plus the piece spacing means the first panel can land anywhere
-      // from GATE_BAY_CLEAR to a full spacing beyond it, so a fixed window
-      // silently leaves some gates with a cut panel instead of a pier.
-      let best: GullhavenWallPiece | undefined;
-      for (const p of out) {
-        if (Math.hypot(p.x - gate.x, p.z - gate.z) > GATE_BAY_CLEAR + 2 * PIECE_SPACING) continue;
-        if (Math.sign(along(p)) !== side) continue;
-        if (!best || Math.abs(along(p)) < Math.abs(along(best))) best = p;
-      }
-      if (!best) continue;
-      best.key = PIECES.pier.key;
-      best.assetId = PIECES.pier.assetId;
-      best.d = PIECES.pier.thick;
-    }
-    // The jambs: two freestanding pillars whose inner faces sit exactly on the
-    // opening, each carrying a bracket torch on the town-facing side so the
-    // gateway is lit from inside.
-    const cos = Math.cos(rot);
-    const sin = Math.sin(rot);
-    const offset = GATE_HALF_OPENING + PIECES.jamb.long / 2;
-    // Local +z lands on (sin rot, cos rot); the sign that points at the town is
-    // the side a torch bracket belongs on.
-    const inside = (TOWN_CENTRE.x - gate.x) * sin + (TOWN_CENTRE.z - gate.z) * cos >= 0 ? 1 : -1;
-    for (const side of [-1, 1]) {
+      const at = atArcLength(curve, gate.s + side * JAMB_OFFSET);
+      // Local +z lands on (sin rot, cos rot); the sign that points at the town
+      // is the side a torch bracket belongs on.
+      const inside =
+        (TOWN_CENTRE.x - at.x) * Math.sin(at.rot) + (TOWN_CENTRE.z - at.z) * Math.cos(at.rot) >= 0
+          ? 1
+          : -1;
       out.push({
         id: `gullhaven_gate_${gate.id}_${side > 0 ? 'a' : 'b'}`,
         key: PIECES.jamb.key,
         assetId: PIECES.jamb.assetId,
-        x: gate.x + cos * side * offset,
-        z: gate.z - sin * side * offset,
+        x: at.x,
+        z: at.z,
         w: PIECES.jamb.long,
         d: PIECES.jamb.thick,
-        rot,
+        rot: at.rot,
         height: PIECES.jamb.tall,
         camGhost: true,
         parts: [
@@ -380,24 +456,6 @@ function buildWall(): GullhavenWallPiece[] {
     }
   }
   return out;
-}
-
-/** The curve's tangent rotation nearest (x, z). */
-function wallRotAt(curve: readonly [number, number][], x: number, z: number): number {
-  let best = 0;
-  let bestD = Number.POSITIVE_INFINITY;
-  for (let i = 1; i < curve.length; i++) {
-    const a = curve[i - 1];
-    const b = curve[i];
-    const mx = (a[0] + b[0]) / 2;
-    const mz = (a[1] + b[1]) / 2;
-    const d = Math.hypot(x - mx, z - mz);
-    if (d < bestD) {
-      bestD = d;
-      best = tangentRot(b[0] - a[0], b[1] - a[1]);
-    }
-  }
-  return best;
 }
 
 export const GULLHAVEN_WALL: readonly GullhavenWallPiece[] = Object.freeze(buildWall());
@@ -428,22 +486,23 @@ export const GULLHAVEN_TOWN_PROPS = Object.freeze([
   // THE BELL. The campaign is named for it, the zone's welcome text promises it
   // ("Gullhaven's bell will find you before the town does"), and Tam's greeting
   // spells out its code. Until now all three watchbells stood OUTSIDE the town
-  // and `bellTower` was a prop no content in the game placed. It stands on the
-  // square's north side, where the shore road comes down off the knoll: a street
-  // can hear it and stop to count.
-  { key: 'bellTower', x: 820.4, z: 105.6, rot: 0, r: 1.1, h: 4.76 },
-  // Edda's forge, on the square's south side within reach of her arming table.
-  // She is the Redoubt Armorer and reforges the Bellheart's voice at her forge
-  // in the finale; she stood in open air until now.
-  { key: 'blacksmith', x: 820, z: 124.5, rot: 2.84, r: 1.9, h: 3 },
-  { key: 'anvil', x: 822.5, z: 126.5, rot: 0.4, r: 0.5, h: 1 },
-  // Triage outside the menders' hall: Saul treats every patient by name, and
-  // the last break cost the watch "a morning and two stretchers".
-  { key: 'cart', x: 836, z: 111, rot: 0.82, r: 1.1, h: 1.8 },
-  { key: 'barrel', x: 835.5, z: 113.3, rot: 0, r: 0.5, h: 1.1 },
+  // and `bellTower` was a prop no content in the game placed. It stands where the
+  // square meets the head of the houses' street, so it closes the market's east
+  // side and every road out of the junction passes under it.
+  { key: 'bellTower', x: 832.6, z: 119.3, rot: 0, r: 1.1, h: 4.76 },
+  // Edda's forge on the square's south-east shoulder, turned back toward the
+  // market, with her anvil out front. She is the Redoubt Armorer and reforges the
+  // Bellheart's voice at her forge in the finale; she stood in open air until now.
+  { key: 'blacksmith', x: 832, z: 123.5, rot: -2.6, r: 1.9, h: 3 },
+  { key: 'anvil', x: 833.5, z: 126.5, rot: 0.4, r: 0.5, h: 1 },
+  // Triage beside the menders' hall, off the lane so it never blocks the door:
+  // Saul treats every patient by name, and the last break cost the watch "a
+  // morning and two stretchers".
+  { key: 'cart', x: 847, z: 133, rot: 1.9, r: 1.1, h: 1.8 },
+  { key: 'barrel', x: 846.4, z: 135.4, rot: 0, r: 0.5, h: 1.1 },
   // Star-glass salvage stacked for the mainland buyers Q0 names, on the apron
   // where the harbour road comes up off the pier.
-  { key: 'crate', x: 796.2, z: 117.4, rot: 0.3, r: 0.6, h: 1.1 },
-  { key: 'crate', x: 800.5, z: 116.5, rot: -0.7, r: 0.6, h: 1.1 },
-  { key: 'barrel', x: 794.2, z: 117.7, rot: 0, r: 0.5, h: 1.1 },
+  { key: 'crate', x: 800.5, z: 116.5, rot: 0.3, r: 0.6, h: 1.1 },
+  { key: 'crate', x: 802.6, z: 115.6, rot: -0.7, r: 0.6, h: 1.1 },
+  { key: 'barrel', x: 798.6, z: 117.4, rot: 0, r: 0.5, h: 1.1 },
 ]);

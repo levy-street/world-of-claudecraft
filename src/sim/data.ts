@@ -130,7 +130,7 @@ import {
   SPIRIT_HEALER_NPC_ID,
 } from './content/graveyards';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
-import { GULLHAVEN_TERRAIN_EDITS } from './content/gullhaven';
+import { GULLHAVEN_PLOT_PADS, GULLHAVEN_TOWN_BENCHES } from './content/gullhaven';
 import { LAST_BELL_DUNGEON_DEFS } from './content/last_bell';
 import {
   LAST_BELL_CAMPAIGN_MOBS,
@@ -741,12 +741,15 @@ export const BUILTIN_WORLD: WorldContent = {
   // broader harbor pads it overlaps at the berm.
   // Gullhaven's town benches land after the harbour grading (whose 4.40 street
   // pocket they stay clear of) and BEFORE the memorial's, which then cuts its
-  // own terrace and contour path into the result.
+  // own terrace and contour path into the result. Its building PLOT PADS land
+  // last of all: a house floor must be flat wherever it stands, and the
+  // memorial's outer domes reach the town's south bench.
   terrainEdits: [
     ...JAIL_TERRAIN_EDITS,
     ...HARBOR_TERRAIN_EDITS,
-    ...GULLHAVEN_TERRAIN_EDITS,
+    ...GULLHAVEN_TOWN_BENCHES,
     ...MEMORIAL_TERRAIN_EDITS,
+    ...GULLHAVEN_PLOT_PADS,
   ],
 };
 
