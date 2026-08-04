@@ -1,18 +1,40 @@
 """Bespoke geometry for The Last Bell's cast, built onto the KayKit rigs.
 
+THE RULE, learned the hard way: when adding something to an existing body, DERIVE IT
+FROM THE HOST'S OWN GEOMETRY. Do not build a shape from numbers and fit it over the
+model. `grow_patch` is the primitive for that: it copies the host's own faces and
+swells them along their normals, tapering to zero at the patch rim, so the addition
+matches the surface BY CONSTRUCTION and its edges stay welded flush.
+
+Ewald's beard was attempted twice the wrong way, first as a revolved profile and then
+as a lofted ray-cast shell, and both were rejected as reading like a dark panel taped
+to his cheek. The failure is structural, not parametric: a shell is unrelated to the
+surface it sits on, so it lands as a slab with a hard rim however it is tuned. The
+second attempt even hugged the surface with ray casts and still failed, because
+hugging a surface with a separate object is not the same as being that surface. If a
+result reads as a slab and small parameter changes do not improve it, change the
+method rather than the numbers.
+
+Exploratory work belongs in the LIVE Blender session through the MCP, editing the real
+mesh with real modelling operations and rendering between steps; the settled operation
+is then baked back into this module so the pipeline stays re-runnable. Always re-render
+the HEADLESS output afterwards to confirm it matches what the session showed: the two
+diverged once, over a subdivide flag added on the way into the script.
+
+The revolve-and-loft helpers below (`hug_profile`, `hug_band`, `comb_crest`,
+`souwester`, `lames`) are still the right tool for HARD props that are genuinely
+separate objects and read as manufactured: a bronze circlet, a helm crest, an oilskin
+hat, a stack of pauldron lames. They are the wrong tool for anything organic or
+anything that should look continuous with the body.
+
 Every builder here returns a mesh object that is:
 
-  * authored in BIND space (the rigs import with an identity world matrix, so
-    bind space and world space are the same thing and a part can be placed from
-    measured numbers rather than by eye),
-  * rigidly skinned to ONE bone (a hard prop on a stylized character does not
-    want spread weights), and
-  * UV'd into a single cell of the character's palette atlas, so the part joins
-    the body's one material and the character still costs one draw.
-
-`hug_profile` is why the parts sit ON the surface: it measures the host mesh's
-radius per angle at the band's height, so a circlet follows the real skull
-instead of floating off a guessed cylinder.
+  * authored in BIND space (the rigs import with an identity world matrix, so bind
+    space and world space are the same thing),
+  * rigidly skinned to ONE bone (a hard prop on a stylized character does not want
+    spread weights), and
+  * UV'd into a single cell of the character's palette atlas, so the part joins the
+    body's one material and the character still costs one draw.
 
 Deterministic: same inputs -> same GLB. No randomness, no time.
 """
