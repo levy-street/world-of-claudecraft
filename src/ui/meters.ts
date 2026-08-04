@@ -170,12 +170,20 @@ export class MeterData {
    * OWNER (folding hunter/warlock/mage pet output into the player's row) and
    * keeps its own name for the breakdown; anything else reports itself.
    */
-  private attribute(world: IWorld, sourceId: number, partyPids: Set<number>): Attribution {
+  private attribute(
+    world: IWorld,
+    sourceId: number,
+    partyPids: Set<number>,
+    ev?: Extract<SimEvent, { type: 'damage' | 'heal2' }>,
+  ): Attribution {
     const src = world.entities.get(sourceId);
-    const ownerId = src?.kind === 'mob' ? (src.ownerId ?? null) : null;
+    const ownerId =
+      src?.kind === 'mob'
+        ? (src.ownerId ?? ev?.sourceOwnerId ?? null)
+        : (ev?.sourceOwnerId ?? null);
     const owned = ownerId !== null && partyPids.has(ownerId);
     const pid = owned && ownerId !== null ? ownerId : sourceId;
-    const petName = owned ? (src?.name ?? null) : null;
+    const petName = owned ? (src?.name ?? ev?.sourceName ?? null) : null;
     const member = world.partyInfo?.members.find((m) => m.pid === pid);
     const entity = world.entities.get(pid);
     return {
@@ -190,12 +198,14 @@ export class MeterData {
     world: IWorld,
     entityId: number,
     partyPids: Set<number>,
+    eventOwnerId: number | null = null,
   ): number | null {
     if (partyPids.has(entityId)) return entityId;
     const entity = world.entities.get(entityId);
     if (entity?.kind === 'mob' && entity.ownerId !== null && partyPids.has(entity.ownerId)) {
       return entity.ownerId;
     }
+    if (eventOwnerId !== null && partyPids.has(eventOwnerId)) return eventOwnerId;
     return null;
   }
 
@@ -208,8 +218,18 @@ export class MeterData {
     // can also legitimately land at amount 0 (full HP, fully absorbed) and that
     // real cast should still count as party activity.
     if (ev.type === 'heal2' && ev.cueOnly) return;
-    const sourcePartyPid = this.partyAttributionPid(world, ev.sourceId, partyPids);
-    const targetPartyPid = this.partyAttributionPid(world, ev.targetId, partyPids);
+    const sourcePartyPid = this.partyAttributionPid(
+      world,
+      ev.sourceId,
+      partyPids,
+      ev.sourceOwnerId ?? null,
+    );
+    const targetPartyPid = this.partyAttributionPid(
+      world,
+      ev.targetId,
+      partyPids,
+      ev.targetOwnerId ?? null,
+    );
     if (sourcePartyPid === null && targetPartyPid === null) return;
 
     // any party-involved combat keeps the encounter alive (tanking without
@@ -220,7 +240,7 @@ export class MeterData {
     if (ev.type === 'damage' && sourcePartyPid !== null && ev.kind === 'hit' && ev.amount > 0) {
       const target = world.entities.get(ev.targetId);
       if (target && target.kind === 'mob') {
-        const who = this.attribute(world, ev.sourceId, partyPids);
+        const who = this.attribute(world, ev.sourceId, partyPids, ev);
         for (const enc of [this.current, this.allTime]) {
           const t = this.tally(enc, who.pid, who.name, who.cls, partyPids);
           t.dmg += ev.amount;
@@ -240,7 +260,7 @@ export class MeterData {
         }
       }
     } else if (ev.type === 'heal2' && sourcePartyPid !== null && ev.amount > 0) {
-      const who = this.attribute(world, ev.sourceId, partyPids);
+      const who = this.attribute(world, ev.sourceId, partyPids, ev);
       for (const enc of [this.current, this.allTime]) {
         const t = this.tally(enc, who.pid, who.name, who.cls, partyPids);
         t.heal += ev.amount;

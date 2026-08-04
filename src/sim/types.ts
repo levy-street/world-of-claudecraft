@@ -3922,6 +3922,14 @@ export type SimEvent = { pid?: number } & (
       ability: string | null;
       kind: DamageEventKind;
       absorbed?: number;
+      /** Live fan-out hint: source is a controlled pet owned by this player. */
+      sourceOwnerId?: number;
+      /** Live fan-out hint: target is a controlled pet owned by this player. */
+      targetOwnerId?: number;
+      /** Live fan-out hint for pet-folded meter breakdowns. */
+      sourceName?: string;
+      /** Live fan-out hint for target-side party participation. */
+      targetName?: string;
       // Presentation-only correlation: this hit belongs to a ranged shot whose
       // one-shot animation already began at projectile launch.
       attackAnimationStarted?: true;
@@ -4277,6 +4285,14 @@ export type SimEvent = { pid?: number } & (
       // health" and "a blight ate the whole heal", and those need opposite
       // feedback. See src/ui/heal_landing_feedback_core.ts.
       absorbed?: number;
+      /** Live fan-out hint: source is a controlled pet owned by this player. */
+      sourceOwnerId?: number;
+      /** Live fan-out hint: target is a controlled pet owned by this player. */
+      targetOwnerId?: number;
+      /** Live fan-out hint for pet-folded meter breakdowns. */
+      sourceName?: string;
+      /** Live fan-out hint for target-side party participation. */
+      targetName?: string;
       // Set only by a HoT's periodic tick (auras.ts), never a direct cast or the
       // one-shot application emit below: the client uses this to silence the
       // repeated per-tick sound (see hud.ts), since a HoT fires this every couple

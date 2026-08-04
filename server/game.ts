@@ -7249,6 +7249,7 @@ export class GameServer {
     // scope, where the recipient has no entity record for them. Sparse by design:
     // an ordinary player's chat event is untouched.
     for (const ev of events) {
+      this.stampCombatEventAttribution(ev);
       if (ev.type !== 'chat') continue;
       const flair = this.chatFlairForPid(ev.fromPid);
       // The sender's top STAFF Discord role (the anti-impersonation chat tag)
@@ -7385,6 +7386,20 @@ export class GameServer {
       (err, session) =>
         console.error(`[events] failed to route events for pid ${session.pid}, skipping:`, err),
     );
+  }
+
+  private stampCombatEventAttribution(ev: SimEvent): void {
+    if (ev.type !== 'damage' && ev.type !== 'heal2') return;
+    const source = this.sim.entities.get(ev.sourceId);
+    if (source?.kind === 'mob' && source.ownerId !== null) {
+      ev.sourceOwnerId = source.ownerId;
+      ev.sourceName = source.name;
+    }
+    const target = this.sim.entities.get(ev.targetId);
+    if (target?.kind === 'mob' && target.ownerId !== null) {
+      ev.targetOwnerId = target.ownerId;
+      ev.targetName = target.name;
+    }
   }
 
   // Maps a chat event's source pid to its character id and checks the

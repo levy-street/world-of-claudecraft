@@ -273,6 +273,68 @@ describe('combat meters', () => {
     expect(hunter.dmgByMob.get(50)).toBe(48);
   });
 
+  it('starts and updates a warlock meter fight from a live pet-only damage event', () => {
+    const w = fakeWorld();
+    w.entities.set(
+      1,
+      testEntity({ id: 1, kind: 'player', name: 'Feltester', templateId: 'warlock' }),
+    );
+    w.player = expectEntity(w, 1);
+    const party = new Set([1]);
+    const m = new MeterData(0);
+    m.onEvent(
+      {
+        ...dmg(30, 50, 42, 'Ashbolt'),
+        sourceOwnerId: 1,
+        sourceName: 'Emberkin',
+      } as SimEvent,
+      w,
+      party,
+      1000,
+    );
+    expect(m.current).not.toBeNull();
+    expect(expectCurrent(m).label).toBe('Wolf');
+    expect(expectCurrent(m).tallies.has(30)).toBe(false);
+    const warlock = expectTally(m, 1);
+    expect(warlock.name).toBe('Feltester');
+    expect(warlock.dmg).toBe(42);
+    expect(warlock.dmgByMob.get(50)).toBe(42);
+    expect([...warlock.dmgByAbility.values()]).toEqual([
+      { ability: 'Ashbolt', petName: 'Emberkin', amount: 42 },
+    ]);
+  });
+
+  it('includes Emberkin Ashbolt contribution in a mixed owner damage breakdown', () => {
+    const w = fakeWorld();
+    w.entities.set(
+      1,
+      testEntity({ id: 1, kind: 'player', name: 'Feltester', templateId: 'warlock' }),
+    );
+    w.player = expectEntity(w, 1);
+    const party = new Set([1]);
+    const m = new MeterData(0);
+    m.onEvent(dmg(1, 50, 18, 'Wand'), w, party, 1000);
+    m.onEvent(
+      {
+        ...dmg(30, 50, 27, 'Ashbolt'),
+        sourceOwnerId: 1,
+        sourceName: 'Emberkin',
+      } as SimEvent,
+      w,
+      party,
+      1200,
+    );
+    const warlock = expectTally(m, 1);
+    expect(warlock.dmg).toBe(45);
+    expect([...warlock.dmgByAbility.values()]).toEqual([
+      { ability: 'Wand', petName: null, amount: 18 },
+      { ability: 'Ashbolt', petName: 'Emberkin', amount: 27 },
+    ]);
+    expect([...warlock.dmgByPet.values()]).toEqual([
+      { ability: null, petName: 'Emberkin', amount: 27 },
+    ]);
+  });
+
   it('breaks a member damage and healing down per ability, merging repeat casts', () => {
     const w = fakeWorld();
     const party = new Set([1, 2]);
