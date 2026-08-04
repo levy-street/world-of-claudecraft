@@ -971,6 +971,7 @@ describe('admin api auth', () => {
         avgEffectiveRenderScale: 0.9,
       },
       byPreset: [],
+      byGfxTier: [],
       byGpu: [],
       byBrowser: [],
       byOs: [],

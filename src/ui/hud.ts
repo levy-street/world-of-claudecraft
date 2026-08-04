@@ -202,6 +202,7 @@ import {
 import { renderCraftingWindow, stationNameText } from './crafting_window';
 import { shouldRefreshDailyRewardsLauncher } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow } from './daily_rewards_window';
+import { deathRecapFeedback } from './death_recap_feedback';
 import { decorativeArtImg } from './decorative_art';
 import {
   deedBroadcastRendered,
@@ -12077,7 +12078,13 @@ export class Hud {
           break;
         }
         case 'playerDeath': {
-          this.log(t('hud.system.playerDeath'), '#ff4444');
+          const killer = ev.killerId !== undefined ? sim.entities.get(ev.killerId) : undefined;
+          const killerName = killer ? entityDisplayName(killer) : undefined;
+          const abilityName = ev.killerAbility
+            ? abilityDisplayNameFromSource(ev.killerAbility)
+            : undefined;
+          const feedback = deathRecapFeedback(killerName, ev.killerAbility, abilityName);
+          this.log(t(feedback.key, feedback.values), '#ff4444');
           audio.playerDeath();
           break;
         }

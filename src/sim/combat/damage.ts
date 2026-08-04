@@ -694,7 +694,7 @@ export function dealDamage(
       });
       // Book of Deeds: the clamped terminal hit counts (zero rng).
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
-      handleDeath(ctx, target, source);
+      handleDeath(ctx, target, source, ability);
       const loserTeam = ctx.arenaTeamOf(match, target.id);
       if (loserTeam && ctx.isArenaTeamWiped(match, loserTeam)) {
         ctx.endArenaMatch(match, loserTeam === 'A' ? 'B' : 'A', 'defeat');
@@ -1015,7 +1015,7 @@ export function dealDamage(
       // the permanent death + graveyard flow.
       ctx.yumiPlayerDown(fmatch, target, null);
     } else {
-      handleDeath(ctx, target, source);
+      handleDeath(ctx, target, source, ability);
     }
   }
   return amount;
@@ -1105,7 +1105,12 @@ function reflectSpellWard(
   );
 }
 
-export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): void {
+export function handleDeath(
+  ctx: SimContext,
+  e: Entity,
+  killer: Entity | null,
+  killerAbility?: string | null,
+): void {
   resetProcState(e);
   e.dead = true;
   e.hp = 0;
@@ -1184,7 +1189,18 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     e.chargePath = [];
     if (e.leap !== undefined) e.leap = null;
     e.followTargetId = null;
-    ctx.emit({ type: 'playerDeath', pid: e.id });
+    // Classic-era death recap: the killer entity id (real kill credit already
+    // lives on the killer entity passed in here, the same source kill-credit /
+    // loot resolution reuses) plus the raw killing-ability name, if any. The
+    // client resolves and localizes both, and renders the ONE death log line
+    // (no separate sim-side notice: two lines on every death, and a doubled
+    // "You have died." for the no-killer case, was the earlier bug here).
+    ctx.emit({
+      type: 'playerDeath',
+      pid: e.id,
+      killerId: killer && killer.id !== e.id ? killer.id : undefined,
+      killerAbility: killerAbility ?? undefined,
+    });
     for (const m of ctx.entities.values()) {
       if (m.kind === 'mob' && !m.dead && m.aggroTargetId === e.id && m.aiState !== 'dead') {
         // turn on the next nearby attacker; go home only if nobody is left
@@ -1197,7 +1213,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     // Route it through handleDeath so the owned-mob branch below applies: warlock
     // demons unravel, a hunter's beast leaves a revivable corpse (Revive Pet).
     const pet = ctx.petOf(e.id);
-    if (pet) handleDeath(ctx, pet, killer);
+    if (pet) handleDeath(ctx, pet, killer, killerAbility);
     return;
   }
 

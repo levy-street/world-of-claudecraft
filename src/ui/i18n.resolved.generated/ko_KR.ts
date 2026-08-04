@@ -6636,6 +6636,11 @@ export const ko_KR: EnTranslations = {
     },
     "system": {
       "playerDeath": "사망했습니다.",
+      "deathRecapKillerAbility": "사망했습니다. {killer}의 {ability}에 쓰러졌습니다.",
+      "deathRecapKiller": "사망했습니다. {killer}에게 쓰러졌습니다.",
+      "deathRecapAbility": "사망했습니다. {ability}(으)로 사망했습니다.",
+      "deathRecapFalling": "사망했습니다. 추락사했습니다.",
+      "deathRecapDrowned": "사망했습니다. 익사했습니다.",
       "respawn": "다시 온전하고 편안한 상태가 되었습니다.",
       "ignoringChat": "{name}의 채팅을 차단합니다.",
       "noLongerIgnoring": "{name}을 더 이상 차단하지 않습니다.",
