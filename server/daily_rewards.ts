@@ -26,15 +26,22 @@ import {
 import { buildSeedKey, runSeedOnce } from './daily_rewards_seed_gate';
 import { accountAndScopeForToken, moderationStatusForAccount, walletForAccount } from './db';
 import { ctxAccountId } from './http/context';
-import { type BearerActiveGuardDb, createActiveGuard } from './http/middleware/bearer_active_guard';
+import { HttpError } from './http/errors';
+import { createActiveGuard } from './http/middleware/bearer_active_guard';
+import { rateLimit, SEEKER_SPIN_VERIFY_POLICY } from './http/middleware/rate_limit';
 import {
   DAILY_REWARD_SECRET_ENV,
   DAILY_REWARD_SECRET_HEADER,
   requireInternalSecretFailClosed,
 } from './http/middleware/require_internal_secret';
-import type { Ctx, RouteDef } from './http/types';
+import type { Ctx, Middleware, RouteDef } from './http/types';
 import { json, readBody } from './http_util';
+import { verifySeekerSolanaArtifactAttestation } from './native_attestation';
+import { requestIp } from './ratelimit';
 import { REALM } from './realm';
+import { verifyCurrentSeekerEntitlement } from './seeker_entitlement';
+import { hasSeekerEntitlement } from './seeker_entitlement_db';
+import { isNativeAppRequest } from './web_login_guard';
 import { cachedWocBalance } from './woc_balance';
 
 const DEFAULT_MIN_USD = 20;
@@ -1624,6 +1631,18 @@ function internalAuthorized(req: http.IncomingMessage): boolean {
 
 export const dailyRewardService = new DailyRewardService();
 
+let seekerSpinArtifactVerifier = verifySeekerSolanaArtifactAttestation;
+
+export function setDailyRewardSeekerArtifactVerifierForTests(
+  verifier: typeof verifySeekerSolanaArtifactAttestation,
+): void {
+  seekerSpinArtifactVerifier = verifier;
+}
+
+export function resetDailyRewardSeekerArtifactVerifierForTests(): void {
+  seekerSpinArtifactVerifier = verifySeekerSolanaArtifactAttestation;
+}
+
 // main.ts wires this into bustBoardCaches: the board cache is instance-scoped
 // on the module singleton above, so a bust exported from the cache module
 // itself would hold no handle to the live instance.
@@ -1648,6 +1667,41 @@ export async function handleDailyRewardApi(
   accountId: number,
 ): Promise<void> {
   const url = new URL(req.url ?? '/', 'http://localhost');
+  const nativeSpin =
+    isNativeAppRequest(req) && req.method === 'POST' && url.pathname === '/api/daily-rewards/spin';
+  if (
+    nativeSpin &&
+    !globallyAdmittedSeekerSpins.has(req) &&
+    !(await admitLegacySeekerSpin(req, res, accountId))
+  ) {
+    return;
+  }
+  if (nativeSpin) {
+    const body = await readBody(req);
+    const attestation = await seekerSpinArtifactVerifier(
+      req,
+      body.nativeAttestation,
+      'seeker-spin',
+    );
+    if (!attestation) {
+      return json(res, 403, {
+        error: 'Solana Store app verification required',
+        code: 'seeker.solana_artifact_required',
+      });
+    }
+  }
+  if (isNativeAppRequest(req) && !(await dailyRewardGuardDb().hasSeekerEntitlement(accountId))) {
+    return json(res, 403, {
+      error: 'verified Seeker entitlement required',
+      code: 'seeker.entitlement_required',
+    });
+  }
+  if (nativeSpin && !(await verifyCurrentSeekerEntitlement(accountId))) {
+    return json(res, 403, {
+      error: 'current Seeker Genesis Token ownership required',
+      code: 'seeker.current_ownership_required',
+    });
+  }
   if (req.method === 'GET' && url.pathname === '/api/daily-rewards') {
     return json(res, 200, await dailyRewardService.status(accountId));
   }
@@ -1783,8 +1837,8 @@ export async function handleDailyRewardInternalApi(
 // the ladder serves (handleDailyRewardApi / handleDailyRewardInternalApi)
 // UNCHANGED, so every body, the in-family 404 'unknown endpoint', the lenient
 // Number(...)|| limit decodes, and mark-payout's validation prose are
-// byte-identical with zero dual-edit drift. No withBody anywhere: spin reads no
-// body (a body reader would invent 400/413 behavior legacy does not have) and
+// byte-identical with zero dual-edit drift. No withBody anywhere: native Seeker
+// spins self-read their artifact proof while web spins remain body-free, and
 // mark-payout SELF-READS via the core's un-caught readBody (the
 // dailyRewardsOpsBodyValidationRemap deviation). Off-table shapes (wrong
 // method, unknown subpath, the no-slash '/api/daily-rewardsX' sibling, HEAD)
@@ -1799,10 +1853,9 @@ export async function handleDailyRewardInternalApi(
 // RESTART_COUNTDOWN_SECRET fallback). The gated core re-runs its own
 // internalAuthorized check (same env + header, per request), which passes
 // whenever the gate passed; keeping the core's check intact is what keeps the
-// composite delegate's legacy behavior frozen. NO rate limiter on any of the
-// eleven (legacy has none; spin's only guards are the one-spin-per-day 409 and
-// the wallet-eligibility 403, and adding a throttle is a maintainer fork, not
-// a silent add).
+// composite delegate's legacy behavior frozen. Native Seeker spin alone adds
+// the shared ip+account ownership-verification admission policy in both
+// dispatch modes; the other ten routes retain their previous limiter behavior.
 // dailyRewardService stays module-owned and importable by game.ts regardless of
 // route-table state; no boot injection is needed.
 
@@ -1811,12 +1864,12 @@ export async function handleDailyRewardInternalApi(
 // an eager literal would break every test that partial-mocks server/db and
 // loads the game (the lazy-db-bundle rule).
 function makeRealDailyRewardDb() {
-  return { accountAndScopeForToken, moderationStatusForAccount };
+  return { accountAndScopeForToken, moderationStatusForAccount, hasSeekerEntitlement };
 }
 type DailyRewardGuardDb = ReturnType<typeof makeRealDailyRewardDb>;
 let realDailyRewardDb: DailyRewardGuardDb | undefined;
 let dailyRewardDbOverride: DailyRewardGuardDb | undefined;
-function dailyRewardGuardDb(): BearerActiveGuardDb {
+function dailyRewardGuardDb(): DailyRewardGuardDb {
   if (dailyRewardDbOverride) return dailyRewardDbOverride;
   realDailyRewardDb ??= makeRealDailyRewardDb();
   return realDailyRewardDb;
@@ -1835,6 +1888,47 @@ export function resetDailyRewardDbForTests(): void {
 
 /** Full active session gate (mirrors the prefix arm's bearerActiveAccount). */
 const activeGuard = createActiveGuard(() => dailyRewardGuardDb());
+const globallyAdmittedSeekerSpins = new WeakSet<http.IncomingMessage>();
+
+async function admitLegacySeekerSpin(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+  accountId: number,
+): Promise<boolean> {
+  let admitted = false;
+  // The retained legacy dispatcher has no pipeline Ctx. This narrow adapter
+  // supplies exactly the fields the shared ip+account policy reads, so rollback
+  // mode receives the same process-local and PostgreSQL-global admission gate.
+  const ctx = {
+    req,
+    res,
+    ip: requestIp(req),
+    account: { accountId, scope: 'full' },
+  } as Ctx;
+  try {
+    await rateLimit(SEEKER_SPIN_VERIFY_POLICY)(ctx, async () => {
+      admitted = true;
+    });
+  } catch (err) {
+    if (!(err instanceof HttpError) || err.status !== 429) throw err;
+    for (const [name, value] of Object.entries(err.headers ?? {})) {
+      res.setHeader(name, value);
+    }
+    json(res, 429, { error: 'rate limited' });
+  }
+  return admitted;
+}
+
+const seekerSpinAdmission: Middleware = async (ctx, next) => {
+  if (!isNativeAppRequest(ctx.req)) {
+    await next();
+    return;
+  }
+  await rateLimit(SEEKER_SPIN_VERIFY_POLICY)(ctx, async () => {
+    globallyAdmittedSeekerSpins.add(ctx.req);
+    await next();
+  });
+};
 
 /** The fail-closed payout-service gate, one instance shared by the seven ops routes. */
 const dailyRewardOpsGate = requireInternalSecretFailClosed({
@@ -1879,7 +1973,7 @@ export const routes: RouteDef[] = [
     method: 'POST',
     path: '/api/daily-rewards/spin',
     surface: 'api',
-    middleware: [activeGuard],
+    middleware: [activeGuard, seekerSpinAdmission],
     handler: dailyRewardPlayerHandler,
   },
   {

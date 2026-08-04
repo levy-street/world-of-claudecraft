@@ -957,7 +957,8 @@ export const ru_RU: EnTranslations = {
       "petTaunt": "Питомец: провокация",
       "petDefensive": "Питомец: защита",
       "petAggressive": "Питомец: агрессия",
-      "mount": "Сесть / Спешиться"
+      "mount": "Сесть / Спешиться",
+      "mouseHint": "Кнопки мыши тоже работают: во время назначения нажмите среднюю кнопку (M3) или боковую (M4, M5). Левая и правая остаются зарезервированы для камеры, перемещения кликом и кликов по миру."
     },
     "actionBar": {
       "editKeys": "Настроить клавиши панели действий",
@@ -2395,6 +2396,7 @@ export const ru_RU: EnTranslations = {
       "billboard": {
         "label": "Доска объявлений гильдии",
         "empty": "На доске объявлений пока пусто.",
+        "loginLine": "Доска объявлений гильдии: {text}",
         "setBy": "Разместил(а): {name}",
         "save": "Сохранить",
         "placeholder": "Напишите сообщение для гильдии",
@@ -3122,6 +3124,16 @@ export const ru_RU: EnTranslations = {
     },
     "ota_updates": {
       "invalid_input": "Недопустимые данные."
+    },
+    "seeker": {
+      "native_only": "Права Seeker доступны только в нативном приложении.",
+      "attestation_failed": "Не удалось подтвердить устройство. Повторите попытку.",
+      "solana_artifact_required": "Продолжите в версии приложения из Solana Store.",
+      "wallet_required": "Сначала привяжите и подтвердите кошелек.",
+      "genesis_token_required": "Требуется подтвержденный Seeker Genesis Token.",
+      "genesis_token_claimed": "Этот Seeker Genesis Token уже был зарегистрирован.",
+      "entitlement_required": "Требуются подтвержденные права Seeker.",
+      "current_ownership_required": "Требуется текущее владение Seeker Genesis Token."
     }
   },
   "guide": {
@@ -5201,6 +5213,7 @@ export const ru_RU: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "Привилегии держателя активны. Подключайте приложение, когда нужно подписать или потратить.",
     "extensionHelp": "Чтобы кошелек появился здесь, держите активным браузерное расширение кошелька, например Solflare Wallet.",
     "mobileAppHelp": "Выберите Phantom или Solflare. Приложение кошелька запросит подтверждение. Не закрывайте игру и вернитесь в нее после завершения.",
+    "seekerAppHelp": "Продолжите с Seed Vault Wallet. Проверьте запросы на подключение и подтверждение в Seed Vault, затем вернитесь в игру.",
     "standaloneAppHelp": "Подключение кошелька пока недоступно в приложении с главного экрана. Для Phantom или Solflare откройте World of ClaudeCraft в Safari или Chrome.",
     "openAppTitle": "Продолжить в {wallet}",
     "openAppHelp": "Откройте {wallet}, чтобы проверить этот запрос. Не закрывайте вкладку с игрой, пока открыто приложение кошелька.",
@@ -6839,6 +6852,10 @@ export const ru_RU: EnTranslations = {
         "leader": "Глава гильдии",
         "officer": "Офицер",
         "member": "Участник"
+      },
+      "tenure": {
+        "recruit": "Новобранец",
+        "veteran": "Ветеран"
       },
       "guildHeadOne": "вы {rank}, {count} участник",
       "guildHeadMany": "вы {rank}, {count} участников"

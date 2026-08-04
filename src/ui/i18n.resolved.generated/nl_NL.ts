@@ -957,7 +957,8 @@ export const nl_NL: EnTranslations = {
       "petTaunt": "Huisdier: Uitdagen",
       "petDefensive": "Huisdier: Verdedigend",
       "petAggressive": "Huisdier: Agressief",
-      "mount": "Opstijgen / Afstijgen"
+      "mount": "Opstijgen / Afstijgen",
+      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
     },
     "actionBar": {
       "editKeys": "Edit action bar keys",
@@ -2395,6 +2396,7 @@ export const nl_NL: EnTranslations = {
       "billboard": {
         "label": "Gildeprikbord",
         "empty": "Nog niets op het prikbord.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Geplaatst door {name}",
         "save": "Opslaan",
         "placeholder": "Schrijf een bericht voor de gilde",
@@ -3122,6 +3124,16 @@ export const nl_NL: EnTranslations = {
     },
     "ota_updates": {
       "invalid_input": "Ongeldige invoer."
+    },
+    "seeker": {
+      "native_only": "Seeker entitlement is available only in the native app.",
+      "attestation_failed": "Device verification failed. Please try again.",
+      "solana_artifact_required": "Use the Solana Store app to continue.",
+      "wallet_required": "Link and verify a wallet first.",
+      "genesis_token_required": "A verified Seeker Genesis Token is required.",
+      "genesis_token_claimed": "That Seeker Genesis Token has already been claimed.",
+      "entitlement_required": "Verified Seeker entitlement is required.",
+      "current_ownership_required": "Current Seeker Genesis Token ownership is required."
     }
   },
   "guide": {
@@ -5201,6 +5213,7 @@ export const nl_NL: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "Houdervoordelen zijn actief. Verbind de app wanneer je moet ondertekenen of uitgeven.",
     "extensionHelp": "Om hier een portemonnee te zien, houd je een browserextensie voor portemonnees zoals Solflare Wallet actief.",
     "mobileAppHelp": "Kies Phantom of Solflare. Je portemonnee-app vraagt om goedkeuring. Houd dit spel open en keer ernaar terug wanneer je klaar bent.",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "Portemonneeverbindingen zijn nog niet beschikbaar in de beginscherm-app. Open World of ClaudeCraft in Safari of Chrome om Phantom of Solflare te gebruiken.",
     "openAppTitle": "Doorgaan in {wallet}",
     "openAppHelp": "Open {wallet} om dit verzoek te bekijken. Houd dit speltabblad open terwijl de portemonnee-app actief is.",
@@ -6839,6 +6852,10 @@ export const nl_NL: EnTranslations = {
         "leader": "Gildemeester",
         "officer": "Officier",
         "member": "Lid"
+      },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
       },
       "guildHeadOne": "je bent {rank}, {count} lid",
       "guildHeadMany": "je bent {rank}, {count} leden"

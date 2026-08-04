@@ -271,8 +271,13 @@ describe('CI workflow parity', () => {
       expect(job).not.toContain('paths-ignore');
       expect(job).not.toContain('paths:');
     }
-    expect(releaseGate).toContain("\n    env:\n      I18N_RELEASE_TIER: '1'");
+    // The tier flag lives in release-i18n ALONE (issue #2820): release-gate runs the
+    // suite at PR tier so a red shard is always a real regression, and release-checks
+    // never needed it. The job/list/scan three-way pin for release-i18n itself lives in
+    // tests/release_i18n_tier_coverage.test.ts.
+    expect(releaseGate).not.toMatch(/^\s{4}env:\n\s{6}I18N_RELEASE_TIER/m);
     expect(releaseChecks).not.toContain('I18N_RELEASE_TIER');
+    expect(jobSource('release-i18n')).toContain("\n    env:\n      I18N_RELEASE_TIER: '1'");
   });
 
   it('splits the PR tier into parallel test and checks jobs that cover every step', () => {
@@ -395,7 +400,12 @@ describe('CI workflow parity', () => {
 
     // Red-path structural: a paths-ignore on either release job would silently
     // shrink release-tier enforcement on a docs-only release push.
-    for (const name of ['release-gate', 'release-checks', 'release-version-gate'] as const) {
+    for (const name of [
+      'release-gate',
+      'release-i18n',
+      'release-checks',
+      'release-version-gate',
+    ] as const) {
       const job = jobSource(name);
       expect(job).not.toContain('paths-ignore');
       expect(job).not.toContain('needs.changes');
@@ -454,7 +464,7 @@ describe('CI workflow parity', () => {
     expect(vitest?.args).toEqual(['test', '--', '--maxWorkers=8']);
     expect(vitest?.env).toEqual({ WOC_SKIP_PRETEST: '1' });
     // gate.mjs still binds workers into the shared step builder.
-    expect(gate).toContain('buildFullGateSteps(workers)');
+    expect(gate).toContain('buildFullGateSteps(workers, { releaseTier })');
     expect(gate).toContain('computeGateWorkers');
     // Both check jobs stay single unsharded jobs: serialized checks run once.
     for (const job of [prChecks, releaseChecks]) {
@@ -467,12 +477,21 @@ describe('CI workflow parity', () => {
     expect(prGate).not.toContain('matrix.shard == 1');
     expect(releaseGate).not.toContain('matrix.shard == 1');
     // The release TEST step itself must stay un-gated (run on every shard):
-    // name-to-run adjacency proves no if: line sits between them.
+    // name-to-run adjacency proves no if: line sits between them. Since #2820 this
+    // job runs at PR tier (the release tier is the separate release-i18n job), so the
+    // step name matches pr-gate's; the adjacency requirement is unchanged.
     expect(releaseGate).toMatch(
       new RegExp(
-        String.raw`- name: Run tests \(release tier[^\n]*\n {8}run: npm test -- --shard=\$\{\{ matrix\.shard \}\}\/${SHARD_N}`,
+        String.raw`- name: Run tests \(PR tier[^\n]*\n {8}run: npm test -- --shard=\$\{\{ matrix\.shard \}\}\/${SHARD_N}`,
       ),
     );
+    // release-i18n is the tier job: unsharded, one test step, no if: between name and run.
+    const releaseI18n = jobSource('release-i18n');
+    expect(releaseI18n).toMatch(
+      /- name: Run i18n release-tier suites[^\n]*\n {8}run: npm test -- tests\//,
+    );
+    expect(releaseI18n).not.toContain('--shard=');
+    expect(releaseI18n.match(/\n {6}- name: /g)).toHaveLength(5);
     // Structural step counts: each test job is exactly checkout, setup-pnpm,
     // setup-node, pnpm install, and the sharded test run. An unconditioned
     // addition would run N times per push; a dropped step shrinks the job silently.

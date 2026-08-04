@@ -49,6 +49,10 @@ describe('server-sent message localization', () => {
     // literal and these matchers ships English to every locale.
     'You need 1 gold to found a guild.',
     'The guild bank must be emptied before the guild can be disbanded.',
+    // guildCreate's screened-name refusal (guild.nameNotAllowed): emitted from
+    // server/social.ts, which the S3 guard does not scan, so the emit literal
+    // is pinned to the EXACT matcher here like the tiers above.
+    'That guild name is not allowed.',
     'You have been removed from <Knights>.',
     'Mira has been removed from the guild by Bob.',
     'Mira has entered World of ClaudeCraft.',

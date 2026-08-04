@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'org.jetbrains.kotlin.android'
 
 def playIntegrityCloudProjectNumber = providers
     .environmentVariable("PLAY_INTEGRITY_CLOUD_PROJECT_NUMBER")
@@ -9,6 +10,7 @@ def playIntegrityCloudProjectNumber = providers
 android {
     namespace = "com.worldofclaudecraft"
     compileSdk = rootProject.ext.compileSdkVersion
+    flavorDimensions += "distribution"
     buildFeatures {
         buildConfig true
     }
@@ -24,6 +26,16 @@ android {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    productFlavors {
+        play {
+            dimension "distribution"
+            buildConfigField "String", "SOLANA_MOBILE_DISTRIBUTION", '"google-play"'
+        }
+        solanaStore {
+            dimension "distribution"
+            buildConfigField "String", "SOLANA_MOBILE_DISTRIBUTION", '"solana-dapp-store"'
         }
     }
     buildTypes {
@@ -47,6 +59,12 @@ dependencies {
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
     implementation "com.google.android.play:app-update:2.1.0"
     implementation "com.google.android.play:integrity:1.4.0"
+    solanaStoreImplementation("com.solanamobile:mobile-wallet-adapter-clientlib-ktx:2.0.3") {
+        exclude group: "androidx.test.ext", module: "junit-ktx"
+    }
+    solanaStoreImplementation "com.solanamobile:web3-solana:0.2.5"
+    solanaStoreImplementation "com.solanamobile:rpc-core:0.2.7"
+    solanaStoreImplementation "io.github.funkatronics:multimult:0.2.3"
     implementation project(':capacitor-android')
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"

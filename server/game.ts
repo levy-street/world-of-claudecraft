@@ -62,6 +62,7 @@ import { effectiveFishingBand } from '../src/sim/professions/fishing';
 import { cancelProfessionSessionOnDisplacement } from '../src/sim/professions/session_teardown';
 import { restoreToolEffectSlotAction } from '../src/sim/professions/tool_effect_actions';
 import type { ToolEffectConfirmMode } from '../src/sim/professions/tools';
+import { questProgressForWire } from '../src/sim/quests/interact_object_credit';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
 import type { CharacterState, PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
@@ -1764,7 +1765,13 @@ export class GameServer {
     });
     this.riftUpgrader = new RiftUpgradeCoordinator(riftUpgraderConfigFromEnv());
     this.riftAssets = new RiftAssetCoordinator(riftAssetConfigFromEnv());
-    this.social = new SocialService(this.socialDb, this.socialTransport());
+    this.social = new SocialService(
+      this.socialDb,
+      this.socialTransport(),
+      () => Date.now(),
+      // Guild names run the same offensive-name screen as character names.
+      (name) => offensiveName(name),
+    );
     this.moderation = new ModerationService(this.moderationHost(), {
       recordAction: (input) => recordInGameAction(input),
       mute: (input) => muteAccountChat(input),
@@ -8154,7 +8161,10 @@ export class GameServer {
       maybe('equip', meta.equipment);
       maybe('einst', meta.equipmentInstance);
       maybe('cosmetics', anchorSession.accountCosmetics);
-      maybe('qlog', [...meta.questLog.values()]);
+      // questProgressForWire strips the server-only per-object interact ledger:
+      // the client never reads it, and this snapshot's build + stringify is the
+      // dominant avoidable broadcast cost, so it does not carry bookkeeping.
+      maybe('qlog', [...meta.questLog.values()].map(questProgressForWire));
       maybe('qdone', [...meta.questsDone]);
       maybe('milestones', [...meta.unlockedMilestones]);
       // Book of Deeds: the earned map (deed id -> utcDay) and the COMPLETE

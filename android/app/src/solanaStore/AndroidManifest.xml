@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application
+        android:dataExtractionRules="@xml/solana_mobile_data_extraction_rules"
+        android:fullBackupContent="@xml/solana_mobile_backup_rules" />
+</manifest>

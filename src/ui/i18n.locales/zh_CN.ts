@@ -693,6 +693,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.hideOfflineTitle': '隐藏离线公会成员',
   'hudChrome.social.billboard.label': '公会公告板',
   'hudChrome.social.billboard.empty': '公告板上还没有内容。',
+  'hudChrome.social.billboard.loginLine': '公会公告板：{text}',
   'hudChrome.social.billboard.setBy': '由 {name} 设置',
   'hudChrome.social.billboard.save': '保存',
   'hudChrome.social.billboard.placeholder': '给公会写一条消息',
@@ -1244,6 +1245,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '若要在此处看到钱包，请保持 Solflare Wallet 等浏览器钱包扩展处于启用状态。',
   'wallet.mobileAppHelp':
     '选择 Phantom 或 Solflare。钱包应用会请求批准。请保持游戏打开，完成后返回游戏。',
+  'wallet.seekerAppHelp':
+    '使用 Seed Vault Wallet 继续。在 Seed Vault 中查看连接和验证请求，然后返回游戏。',
   'wallet.standaloneAppHelp':
     '主屏幕应用暂不支持连接钱包。若要使用 Phantom 或 Solflare，请在 Safari 或 Chrome 中打开 World of ClaudeCraft。',
   'wallet.openAppTitle': '在 {wallet} 中继续',
@@ -2031,6 +2034,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.social.ranks.leader': '会长',
   'hud.social.ranks.officer': '官员',
   'hud.social.ranks.member': '成员',
+  'hud.social.tenure.recruit': '新兵',
+  'hud.social.tenure.veteran': '老兵',
   'hud.social.guildHeadOne': '你是{rank}，{count}名成员',
   'hud.social.guildHeadMany': '你是{rank}，{count}名成员',
   'hud.trade.title': '与 {name} 交易',
@@ -7778,6 +7783,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'apiError.ota_updates.invalid_input': '输入无效。',
   'apiError.steam.disabled': 'Steam 关联当前不可用。',
   'apiError.wallet.handoff_invalid': '钱包授权已过期或无法验证。请重试。',
+  'apiError.seeker.native_only': 'Seeker 权益仅可在原生应用中使用。',
+  'apiError.seeker.attestation_failed': '设备验证失败。请重试。',
+  'apiError.seeker.solana_artifact_required': '请使用 Solana Store 版应用继续。',
+  'apiError.seeker.wallet_required': '请先关联并验证钱包。',
+  'apiError.seeker.genesis_token_required': '需要已验证的 Seeker Genesis Token。',
+  'apiError.seeker.genesis_token_claimed': '该 Seeker Genesis Token 已被领取。',
+  'apiError.seeker.entitlement_required': '需要已验证的 Seeker 权益。',
+  'apiError.seeker.current_ownership_required': '需要当前持有 Seeker Genesis Token。',
   'apiError.steam.invalid_ticket': 'Steam 无法验证此关联请求。请在桌面客户端中重试。',
   'apiError.steam.banned': '该 Steam 账号无法关联。',
   'apiError.steam.already_linked': '你的账号已关联一个 Steam 账号。',
@@ -8766,6 +8779,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'loading.tips.pvp': '提示：向其他玩家发起友谊决斗，或报名灰烬竞技场，来检验你的 build。',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': '骑乘 / 下骑',
+  // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.
+  'hudChrome.keybinds.mouseHint':
+    '鼠标按键同样可用：绑定时按下中键 (M3) 或拇指键 (M4、M5)。左键和右键保留给镜头、点击移动和点击世界中的目标使用。',
   // On-bar action-bar key-binding mode (issue #1238). M16 wordy fills.
   'hudChrome.actionBar.editKeys': '编辑动作条按键',
   'hudChrome.actionBar.editKeysHint': '点击动作条上的一个槽位，然后按下按键进行绑定。',

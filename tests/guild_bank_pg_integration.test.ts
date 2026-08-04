@@ -855,7 +855,14 @@ describeDb('guild bank persistence (REAL Postgres)', () => {
     const tx = new DisbandTransport(holdings, () =>
       pool.query('SELECT 1 FROM guilds WHERE id = $1', [guildId]).then((r) => r.rowCount === 0),
     );
-    const svc = new social.SocialService(new socialDb.PgSocialDb(pool as never), tx as never);
+    const svc = new social.SocialService(
+      new socialDb.PgSocialDb(pool as never),
+      tx as never,
+      () => Date.now(),
+      // Screening is irrelevant to the disband/cascade cases under test; the
+      // ctor requires it explicitly so no site fails open by omission.
+      () => false,
+    );
     return { guildId, charId, tx, svc };
   }
 });

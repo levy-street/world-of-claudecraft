@@ -302,6 +302,10 @@ const baseEnTable = {
   'groundPickup.wreckfieldFlotsamCrateEnough': 'You have salvaged all the flotsam Edda marked.',
   'groundPickup.gullhavenWatchbellDeny': "The watchbell answers only the bellkeeper's errand.",
   'groundPickup.gullhavenWatchbellEnough': 'Every coastal watchbell has been rung.',
+  // Item-agnostic: every multi-count `interact` objective credits once per
+  // distinct object, so this covers all of them (bells rung, lanterns relit,
+  // banners planted, carts righted). Emitted from interactObjectForQuests.
+  'groundPickup.objectAlreadyCredited': 'You have already done this one.',
   'error.vcupDeserter': 'The Groundskeeper remembers. Come back later.',
   'error.vcupPartyTooBig': 'That bracket needs a smaller party.',
   'error.vcupNoNation': 'Pick a banner nation first.',

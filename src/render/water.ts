@@ -297,7 +297,10 @@ const WATER_FRAG = /* glsl */ `
     }
     vec3 N = normalize(vec3(nm + waveSlope * 9.5, 3.1).xzy);
     vec3 V = normalize(cameraPosition - vWPos);
-    float fresnel = 0.05 + 0.95 * pow(1.0 - max(dot(N, V), 0.0), 4.0);
+    // clamp(), not max(): max() leaves the upper bound open, and a normalized
+    // dot product that overshoots 1.0 by an ulp makes the pow() base negative,
+    // which is NaN. One NaN pixel becomes a black rectangle after the bloom blur.
+    float fresnel = 0.05 + 0.95 * pow(1.0 - clamp(dot(N, V), 0.0, 1.0), 4.0);
     // The seabed is hard clamped at ${WATER_SEABED_CLAMP_YARDS} yards. A linear ramp spends the
     // whole palette in the shallows, and an exponential is still climbing when
     // it reaches the clamp, which creases the colour field along the clamp
