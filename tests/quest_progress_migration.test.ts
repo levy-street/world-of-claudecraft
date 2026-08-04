@@ -73,6 +73,23 @@ describe('quest progress migration (QuestDef.rev)', () => {
     for (const id of reworked) expect(QUESTS[id]?.rev, id).toBe(1);
   });
 
+  it('re-syncs collect counts from the restored inventory after a reset', () => {
+    // Four of the nine reworked quests have collect objectives, and collect
+    // counts are derived state only onInventoryChangedForQuests re-credits: a
+    // migrated character already holding the items must be ready at login, not
+    // stuck at 0 of N until an unrelated inventory change.
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', playerName: 'Col', autoEquip: false });
+    sim.addItem('restless_skull', 8);
+    // Pre-rework shape: q_bones was a kill quest at 3 of 8, no rev stamp.
+    sim.questLog.set('q_bones', { questId: 'q_bones', counts: [3], state: 'active' });
+    const state = sim.serializeCharacter(sim.playerId)!;
+    const reloaded = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
+    const pid = reloaded.addPlayer('warrior', 'Col', { state });
+    const q = reloaded.serializeCharacter(pid)!.questLog.find((x) => x.questId === 'q_bones');
+    expect(q?.counts).toEqual([8]);
+    expect(q?.state).toBe('ready');
+  });
+
   it('a pre-rework in-flight save resets once on restore, then keeps new progress', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warrior', playerName: 'Mig', autoEquip: false });
     // A pre-rework save: 9 of the old 14 Drowned Dead, no rev stamp. Under the

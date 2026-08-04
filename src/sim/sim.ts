@@ -2875,6 +2875,7 @@ export class Sim {
       // field and sanitizes to an empty bank). See bank.ts sanitizeBankState.
       meta.bank = sanitizeBankState(s.bank, meta.name, droppedInstanceJunk, player.id);
       warnDroppedInstanceKeys(meta.name, droppedInstanceJunk);
+      let questRevReset = false;
       for (const q of s.questLog) {
         // Prune unknown quest ids at load (normalize on load, never crash): a save
         // mid a since-deleted quest (e.g. the retirement of
@@ -2883,31 +2884,38 @@ export class Sim {
         // tick op dereferences QUESTS[qp.questId].objectives and TypeErrors inside
         // the server tick (quest_credit.ts + interactNpcForQuests). questsDone is
         // membership-only (never dereferenced), so it is preserved as history below.
-        if (q.state !== 'done' && QUESTS[q.questId])
+        if (q.state !== 'done' && QUESTS[q.questId]) {
           // migrateRestoredQuestProgress resets an in-flight run whose QuestDef.rev
           // moved under it (the objective rework migration); the burnedObjects
           // filter drops pre-stable-key rows (a legacy {id, at} save) so they can
           // never alias a live hut key.
-          meta.questLog.set(
-            q.questId,
-            migrateRestoredQuestProgress(QUESTS[q.questId], {
-              questId: q.questId,
-              counts: [...q.counts],
-              state: q.state,
-              ...(q.selection === undefined ? {} : { selection: q.selection }),
-              ...(q.resolvedCounts === undefined ? {} : { resolvedCounts: [...q.resolvedCounts] }),
-              ...(q.burnedObjects === undefined
-                ? {}
-                : {
-                    burnedObjects: q.burnedObjects
-                      .filter((b) => typeof b.key === 'string')
-                      .map((b) => ({ key: b.key, at: b.at })),
-                  }),
-              ...(q.rev === undefined ? {} : { rev: q.rev }),
-            }),
-          );
+          const restored = {
+            questId: q.questId,
+            counts: [...q.counts],
+            state: q.state,
+            ...(q.selection === undefined ? {} : { selection: q.selection }),
+            ...(q.resolvedCounts === undefined ? {} : { resolvedCounts: [...q.resolvedCounts] }),
+            ...(q.burnedObjects === undefined
+              ? {}
+              : {
+                  burnedObjects: q.burnedObjects
+                    .filter((b) => typeof b.key === 'string')
+                    .map((b) => ({ key: b.key, at: b.at })),
+                }),
+            ...(q.rev === undefined ? {} : { rev: q.rev }),
+          };
+          const migrated = migrateRestoredQuestProgress(QUESTS[q.questId], restored);
+          if (migrated !== restored) questRevReset = true;
+          meta.questLog.set(q.questId, migrated);
+        }
       }
       for (const q of s.questsDone) meta.questsDone.add(q);
+      // A rev reset zeroes COLLECT counts too, and those are derived state only
+      // onInventoryChangedForQuests re-credits: re-sync once (inventory is already
+      // restored above) so a migrated character holding the collect items is not
+      // stuck at 0 of N until an unrelated inventory change. Non-migrated quests
+      // are already in sync, so this emits nothing for them.
+      if (questRevReset) this.ctx.onInventoryChangedForQuests(meta);
       if (s.talents)
         // Revalidate the persisted build against the current rules + level budget
         // before it is baked into the flat mods below. A stored allocation replays

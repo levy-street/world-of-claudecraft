@@ -67,7 +67,13 @@ export function sanitizeRemovedZone1Content(state: CharacterState): {
       ...(quest.resolvedCounts === undefined ? {} : { resolvedCounts: [...quest.resolvedCounts] }),
       ...(quest.burnedObjects === undefined
         ? {}
-        : { burnedObjects: quest.burnedObjects.map((b) => ({ key: b.key, at: b.at })) }),
+        : {
+            // Drop pre-stable-key rows (a legacy {id, at} save) here too, so the
+            // sanitized state written back to the DB never carries a keyless stamp.
+            burnedObjects: quest.burnedObjects
+              .filter((b) => typeof b.key === 'string')
+              .map((b) => ({ key: b.key, at: b.at })),
+          }),
       ...(quest.rev === undefined ? {} : { rev: quest.rev }),
     }));
   const questsDone = state.questsDone.filter((questId) => !REMOVED_QUESTS.has(questId));

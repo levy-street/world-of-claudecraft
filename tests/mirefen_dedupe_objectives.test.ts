@@ -8,6 +8,7 @@ import {
   firebottleBurnCheck,
   HUT_BURN_RANGE,
   HUT_REBURN_COOLDOWN_SECS,
+  stableHutKey,
   throwFirebottleAtNearestHut,
 } from '../src/sim/interactions/firebottle_hut';
 import { isQuestGatedEntityHidden } from '../src/sim/quest_gated_entity';
@@ -355,6 +356,18 @@ describe('firebottle lifecycle: giver re-grant and removal on finish (q_deepfen_
       { key: 'murloc_hut@-78,269', at: 100 },
       { key: 'murloc_hut@-83,266', at: 140 },
     ]);
+  });
+
+  it('every authored hut position yields a distinct stable burn key', () => {
+    // stableHutKey rounds positions to integers, so two huts within a unit of
+    // each other would alias into one shared re-burn cooldown; pin that the
+    // authored placements stay distinct under the rounding.
+    const huts = ZONE2_OBJECTS.find((o) => o.itemId === 'murloc_hut');
+    if (!huts) throw new Error('no murloc_hut objects');
+    const keys = huts.positions.map((p) =>
+      stableHutKey({ objectItemId: 'murloc_hut', pos: { x: p.x, z: p.z } } as unknown as Entity),
+    );
+    expect(new Set(keys).size).toBe(huts.positions.length);
   });
 
   it('keeps the mining pick on abandon: only quest-owned items strip', () => {
