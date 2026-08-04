@@ -455,14 +455,23 @@ def build_ewald():
     # anything above about 1.46 climbs over the shipped moustache) and rises to the
     # sideburns at the sides, while the bottom hangs lowest at the front and tucks up
     # under the jaw corners.
-    built.append(parts.beard(
-        # shade matched to the shipped moustache above it: at 0.58 the beard read as
-        # a darker, separate object stuck to his chin
-        "Ewald_Beard", head, "hair", shade_t=0.44, material=mat,
-        rows=7, steps=20, spread=0.150,
-        front_top=1.448, front_bot=1.262,
-        side_top=1.598, side_bot=1.402,
-        pad_front=0.032, pad_side=0.012))
+    # A beard GROWN FROM HIS OWN JAW, not a shell fitted over it. `grow_patch`
+    # copies the head's front-lower faces and swells them along their normals with
+    # the displacement tapered to zero at the patch rim, so the mass is his face and
+    # the edges stay welded flush. The two earlier attempts built revolved and lofted
+    # shells; both landed as a dark panel taped to his cheek, because a shell is
+    # unrelated to the surface it sits on however it is tuned.
+    #
+    # The upper boundary is beard-shaped: low at the chin (the nose apex measures
+    # z=1.52, so anything above about 1.44 climbs over the shipped moustache) rising
+    # toward the sideburns with |x|.
+    def jaw(centre, normal):
+        limit = 1.435 + 0.30 * (abs(centre.x) / 0.53) ** 1.4
+        return centre.y < -0.05 and 1.20 <= centre.z <= limit
+
+    built.append(parts.grow_patch(
+        "Ewald_Beard", head, jaw, "hair", pad=0.055, shade_t=0.44,
+        material=mat, exclude_cells=("hair",)))
 
     # THE FARE TIN on a neck cord, chest height, reachable
     front = parts.surface_front(body, 1.020) or -0.30
