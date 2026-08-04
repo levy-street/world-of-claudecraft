@@ -65,6 +65,9 @@ export function sanitizeRemovedZone1Content(state: CharacterState): {
       state: quest.state,
       ...(quest.selection === undefined ? {} : { selection: quest.selection }),
       ...(quest.resolvedCounts === undefined ? {} : { resolvedCounts: [...quest.resolvedCounts] }),
+      ...(quest.burnedObjects === undefined
+        ? {}
+        : { burnedObjects: quest.burnedObjects.map((b) => ({ id: b.id, at: b.at })) }),
     }));
   const questsDone = state.questsDone.filter((questId) => !REMOVED_QUESTS.has(questId));
   // cloneInvSlot, not a shallow spread: buyback and bag rows can carry instance

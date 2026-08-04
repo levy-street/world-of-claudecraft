@@ -5960,6 +5960,31 @@
     border: 0;
     border-radius: 4px;
   }
+  /* A firebottle mid-throw-cooldown (q_deepfen_purge) drains this dark curtain from
+     its seeded height to empty over the remaining seconds. bags_window seeds
+     --cd-start / --cd-dur from world.player.firebottleCdRemaining, and the sweep is a
+     self-contained CSS animation: the bags window is a cold window with no per-frame
+     driver, so it runs without JS. Same bottom-up curtain language as the action
+     bar recharge veil. */
+  .bag-item .bag-cd-curtain {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--cd-start, 0%);
+    background: #000c;
+    border-radius: 0 0 4px 4px;
+    pointer-events: none;
+    animation: bag-cd-drain var(--cd-dur, 0s) linear forwards;
+  }
+  @keyframes bag-cd-drain {
+    from {
+      height: var(--cd-start, 0%);
+    }
+    to {
+      height: 0%;
+    }
+  }
   /* the cell owns the quality border; a soft outer glow from the same quality
      color (set by the painter from the shared QUALITY_COLOR map) lifts rare+ */
   .bag-item[class*=" q-"] {

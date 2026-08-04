@@ -2687,6 +2687,9 @@ export class Sim {
             state: q.state,
             ...(q.selection === undefined ? {} : { selection: q.selection }),
             ...(q.resolvedCounts === undefined ? {} : { resolvedCounts: [...q.resolvedCounts] }),
+            ...(q.burnedObjects === undefined
+              ? {}
+              : { burnedObjects: q.burnedObjects.map((b) => ({ id: b.id, at: b.at })) }),
           });
       }
       for (const q of s.questsDone) meta.questsDone.add(q);
@@ -3398,6 +3401,9 @@ export class Sim {
         state: q.state,
         ...(q.selection === undefined ? {} : { selection: q.selection }),
         ...(q.resolvedCounts === undefined ? {} : { resolvedCounts: [...q.resolvedCounts] }),
+        ...(q.burnedObjects === undefined
+          ? {}
+          : { burnedObjects: q.burnedObjects.map((b) => ({ id: b.id, at: b.at })) }),
       })),
       questsDone: [...meta.questsDone],
       arenaRating: meta.arenaRating,
@@ -8263,6 +8269,23 @@ export class Sim {
     for (const qp of meta.questLog.values()) {
       if (qp.state !== 'active') continue;
       const quest = QUESTS[qp.questId];
+      // Talking to the giver of an active quest re-grants any required item the
+      // player has lost (a deleted firebottle for q_deepfen_purge, say), so a
+      // missing prerequisite item can never permanently strand the quest. The
+      // accept path does the same grant (finalizeQuestAccept); this is its
+      // in-progress twin.
+      if (quest.giverNpcId === npc.templateId && quest.requiredItems) {
+        for (const itemId of quest.requiredItems) {
+          if (this.ctx.countItem(itemId, meta.entityId) > 0) continue;
+          this.ctx.addItem(itemId, 1, meta.entityId);
+          this.emit({
+            type: 'log',
+            text: 'You recover a quest item you were missing.',
+            color: '#ff0',
+            pid: meta.entityId,
+          });
+        }
+      }
       quest.objectives.forEach((objective, objectiveIndex) => {
         if (objective.type !== 'interact' || objective.targetNpcId !== npc.templateId) return;
         const required = questObjectiveRequired(quest, qp, objectiveIndex);

@@ -298,6 +298,9 @@ const baseEnTable = {
   // Per-member ready-check follow-up lines (social/ready_check.ts finalizeReadyCheck).
   'log.readyCheckNotReady': '{name} is not ready.',
   'log.readyCheckNoResponse': '{name} did not respond to the ready check.',
+  // Talking to a quest giver re-grants a lost required item (a deleted firebottle
+  // for q_deepfen_purge); placeholder-free, so it registers in the EXACT matcher.
+  'log.questItemRecovered': 'You recover a quest item you were missing.',
   'loot.rollWin': '{winner} wins {item} ({roll})',
   'loot.rollWinnerOffline': '{winner} was offline; {item} returned to the corpse.',
   'loot.rollNeed': 'Need Roll - {roll} for {item} by {name}',

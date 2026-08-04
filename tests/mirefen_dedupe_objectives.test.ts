@@ -7,10 +7,12 @@ import {
   FIREBOTTLE_COOLDOWN_SECS,
   firebottleBurnCheck,
   HUT_BURN_RANGE,
+  HUT_REBURN_COOLDOWN_SECS,
   throwFirebottleAtNearestHut,
 } from '../src/sim/interactions/firebottle_hut';
 import { isQuestGatedEntityHidden } from '../src/sim/quest_gated_entity';
 import type { PlayerMeta } from '../src/sim/sim';
+import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import type { Entity, QuestProgress } from '../src/sim/types';
 
@@ -150,7 +152,7 @@ describe('Mirefen quest de-duplication', () => {
       distance: 1,
       time: 100,
       bottleReadyAt: 0,
-      alreadyBurned: false,
+      hutOnCooldown: false,
     };
     it('succeeds up against the hut, holding a ready bottle, on the quest', () => {
       expect(firebottleBurnCheck(base)).toEqual({ ok: true });
@@ -167,13 +169,14 @@ describe('Mirefen quest de-duplication', () => {
       });
       expect(firebottleBurnCheck({ ...base, distance: HUT_BURN_RANGE })).toEqual({ ok: true });
     });
-    it('enforces the 5s bottle cooldown and blocks an already-burned hut', () => {
+    it('enforces the 5s bottle cooldown and blocks a hut still on its re-burn cooldown', () => {
       expect(FIREBOTTLE_COOLDOWN_SECS).toBe(5);
+      expect(HUT_REBURN_COOLDOWN_SECS).toBe(120);
       expect(firebottleBurnCheck({ ...base, bottleReadyAt: 101 })).toMatchObject({
         reason: 'onCooldown',
       });
-      expect(firebottleBurnCheck({ ...base, alreadyBurned: true })).toMatchObject({
-        reason: 'alreadyBurned',
+      expect(firebottleBurnCheck({ ...base, hutOnCooldown: true })).toMatchObject({
+        reason: 'hutOnCooldown',
       });
     });
   });
@@ -208,8 +211,12 @@ describe('Mirefen quest de-duplication', () => {
       const { ctx, events } = makeCtx(hut, 100);
       const meta = onQuestMeta();
       throwFirebottleAtNearestHut(ctx, player, meta);
-      expect(meta.questLog.get('q_deepfen_purge')?.burnedObjectIds).toContain(5);
+      expect(meta.questLog.get('q_deepfen_purge')?.burnedObjects?.map((b) => b.id)).toContain(5);
       expect(meta.firebottleReadyAt).toBe(100 + FIREBOTTLE_COOLDOWN_SECS);
+      // The bag cooldown swipe reads this materialized remaining value.
+      expect((player as unknown as { firebottleCdRemaining: number }).firebottleCdRemaining).toBe(
+        FIREBOTTLE_COOLDOWN_SECS,
+      );
       expect(meta.questLog.get('q_deepfen_purge')?.counts[0]).toBe(1);
       expect(events.some((e) => e.type === 'worldObjectBurning')).toBe(true);
       expect(events.some((e) => e.type === 'questProgress')).toBe(true);
@@ -220,21 +227,26 @@ describe('Mirefen quest de-duplication', () => {
       const { ctx, events } = makeCtx(hut, 100);
       const meta = onQuestMeta();
       throwFirebottleAtNearestHut(ctx, player, meta);
-      expect(meta.questLog.get('q_deepfen_purge')?.burnedObjectIds ?? []).toHaveLength(0);
+      expect(meta.questLog.get('q_deepfen_purge')?.burnedObjects ?? []).toHaveLength(0);
       expect(events.some((e) => e.type === 'error')).toBe(true);
     });
 
-    it('will not burn the same hut twice: the second throw warns and does not re-credit', () => {
+    it('blocks a re-burn within the 2-minute cooldown, then allows it once lapsed', () => {
       const hut = { id: 5, pos: { x: 0, z: 0 }, objectItemId: 'murloc_hut' } as unknown as Entity;
       const meta = onQuestMeta();
       throwFirebottleAtNearestHut(makeCtx(hut, 100).ctx, player, meta);
       expect(meta.questLog.get('q_deepfen_purge')?.counts[0]).toBe(1);
-      // second throw at the same hut, past the bottle cooldown, is a warning only
-      const second = makeCtx(hut, 200);
-      throwFirebottleAtNearestHut(second.ctx, player, meta);
+      // Within the cooldown (50s later): a warning only, no re-credit, no burn fx.
+      const within = makeCtx(hut, 150);
+      throwFirebottleAtNearestHut(within.ctx, player, meta);
       expect(meta.questLog.get('q_deepfen_purge')?.counts[0]).toBe(1);
-      expect(second.events.some((e) => e.type === 'error')).toBe(true);
-      expect(second.events.some((e) => e.type === 'worldObjectBurning')).toBe(false);
+      expect(within.events.some((e) => e.type === 'error')).toBe(true);
+      expect(within.events.some((e) => e.type === 'worldObjectBurning')).toBe(false);
+      // Past the cooldown: the same hut torches again and credits again.
+      const after = makeCtx(hut, 100 + HUT_REBURN_COOLDOWN_SECS + 1);
+      throwFirebottleAtNearestHut(after.ctx, player, meta);
+      expect(meta.questLog.get('q_deepfen_purge')?.counts[0]).toBe(2);
+      expect(after.events.some((e) => e.type === 'worldObjectBurning')).toBe(true);
     });
   });
 
@@ -257,5 +269,83 @@ describe('Mirefen quest de-duplication', () => {
       expect(isQuestGatedEntityHidden(widow, log())).toBe(false);
       expect(isQuestGatedEntityHidden(object, log())).toBe(false);
     });
+  });
+});
+
+describe('firebottle lifecycle: giver re-grant and removal on finish (q_deepfen_purge)', () => {
+  const HUT_QUEST = 'q_deepfen_purge';
+  const makeSim = (): Sim =>
+    new Sim({ seed: 4242, playerClass: 'warrior', playerName: 'Fenn', autoEquip: false });
+  const standAtFenwick = (sim: Sim): Entity => {
+    const npc = [...sim.entities.values()].find(
+      (e) => e.kind === 'npc' && e.templateId === 'warden_fenwick',
+    );
+    if (!npc) throw new Error('warden_fenwick not found');
+    const pos = sim.groundPos(npc.pos.x + 1, npc.pos.z);
+    sim.player.pos = { ...pos };
+    sim.player.prevPos = { ...pos };
+    return npc;
+  };
+
+  it('re-grants a lost firebottle when you talk to the giver mid-quest', () => {
+    const sim = makeSim();
+    const npc = standAtFenwick(sim);
+    // Set the quest active directly (bypassing accept), so no firebottle is granted.
+    sim.questLog.set(HUT_QUEST, { questId: HUT_QUEST, counts: [0], state: 'active' });
+    expect(sim.countItem('firebottle')).toBe(0);
+    sim.talkToNpc(npc.id);
+    expect(sim.countItem('firebottle')).toBe(1);
+  });
+
+  it('does not hand out a second firebottle when you still hold one', () => {
+    const sim = makeSim();
+    const npc = standAtFenwick(sim);
+    sim.questLog.set(HUT_QUEST, { questId: HUT_QUEST, counts: [0], state: 'active' });
+    sim.addItem('firebottle', 1);
+    sim.talkToNpc(npc.id);
+    expect(sim.countItem('firebottle')).toBe(1);
+  });
+
+  it('removes the firebottle on turn-in', () => {
+    const sim = makeSim();
+    standAtFenwick(sim);
+    sim.addItem('firebottle', 1);
+    sim.questLog.set(HUT_QUEST, { questId: HUT_QUEST, counts: [5], state: 'ready' });
+    expect(sim.questState(HUT_QUEST)).toBe('ready');
+    sim.turnInQuest(HUT_QUEST);
+    expect(sim.questState(HUT_QUEST)).toBe('done');
+    expect(sim.countItem('firebottle')).toBe(0);
+  });
+
+  it('removes the firebottle on abandon', () => {
+    const sim = makeSim();
+    standAtFenwick(sim);
+    sim.addItem('firebottle', 1);
+    sim.questLog.set(HUT_QUEST, { questId: HUT_QUEST, counts: [0], state: 'active' });
+    sim.abandonQuest(HUT_QUEST);
+    expect(sim.countItem('firebottle')).toBe(0);
+    expect(sim.questLog.has(HUT_QUEST)).toBe(false);
+  });
+
+  it('persists burned huts (burnedObjects) across a save and reload', () => {
+    const sim = makeSim();
+    sim.questLog.set(HUT_QUEST, {
+      questId: HUT_QUEST,
+      counts: [2],
+      state: 'active',
+      burnedObjects: [
+        { id: 5, at: 100 },
+        { id: 6, at: 140 },
+      ],
+    });
+    const state = sim.serializeCharacter(sim.playerId)!;
+    const reloaded = makeSim();
+    const pid = reloaded.addPlayer('warrior', 'Reload', { state });
+    const restored = reloaded.serializeCharacter(pid)!;
+    const q = restored.questLog.find((x) => x.questId === HUT_QUEST);
+    expect(q?.burnedObjects).toEqual([
+      { id: 5, at: 100 },
+      { id: 6, at: 140 },
+    ]);
   });
 });

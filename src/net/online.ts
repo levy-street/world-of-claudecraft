@@ -1275,6 +1275,7 @@ function blankEntity(id: number): Entity {
     overpowerUntil: -1,
     potionCooldownUntil: -1,
     potionCdRemaining: 0,
+    firebottleCdRemaining: 0,
     savedMana: 0,
     chargeTargetId: null,
     chargeTimeLeft: 0,
@@ -3014,6 +3015,7 @@ export class ClientWorld implements IWorld {
       }
       e.gcdRemaining = s.gcd ?? 0;
       e.potionCdRemaining = s.pcd ?? 0;
+      e.firebottleCdRemaining = s.fcd ?? 0;
       e.comboPoints = s.combo ?? 0;
       // Routed through the pending-target echo guard: a stale in-flight
       // snapshot must not clobber an optimistic targetEntity write (the target

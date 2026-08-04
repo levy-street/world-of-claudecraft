@@ -1,10 +1,12 @@
 // Firebottle huts (q_deepfen_purge / "Back to the Shallows"). The player gets a
 // reusable firebottle on accept; USING it hurls it at the nearest murloc hut they
 // are standing against, torching it. Gated on holding the bottle, being right up
-// against a hut, and the bottle's throw cooldown. Each hut credits the objective
-// ONCE per quest run (tracked on the QuestProgress), so you cannot burn the same
-// hut five times: re-torching one you already burned is a red warning. The pure
-// check is unit-tested.
+// against a hut, and the bottle's throw cooldown. A freshly torched hut smolders on
+// a per-player HUT_REBURN_COOLDOWN_SECS cooldown (recorded on the QuestProgress);
+// while it is smoldering a re-throw is a warning, but once the cooldown lapses the
+// same hut can be torched and credited again. So the objective is forgiving (five
+// distinct huts, or one hut re-burned every couple of minutes) and no permanent
+// per-run state can strand it. The pure check is unit-tested.
 import { QUESTS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -15,8 +17,10 @@ export const FIREBOTTLE_ITEM_ID = 'firebottle';
 export const HUT_OBJECT_ID = 'murloc_hut';
 export const HUT_BURN_RANGE = 5; // must be right up against the hut
 export const FIREBOTTLE_COOLDOWN_SECS = 5;
+// A torched hut smolders for two minutes before it can be burned (and credited) again.
+export const HUT_REBURN_COOLDOWN_SECS = 120;
 
-export type HutBurnReason = 'notOnQuest' | 'noBottle' | 'onCooldown' | 'tooFar' | 'alreadyBurned';
+export type HutBurnReason = 'notOnQuest' | 'noBottle' | 'onCooldown' | 'tooFar' | 'hutOnCooldown';
 export type HutBurnResult = { ok: true } | { ok: false; reason: HutBurnReason };
 
 export function firebottleBurnCheck(opts: {
@@ -25,13 +29,13 @@ export function firebottleBurnCheck(opts: {
   distance: number;
   time: number;
   bottleReadyAt: number;
-  alreadyBurned: boolean;
+  hutOnCooldown: boolean;
 }): HutBurnResult {
   if (!opts.onQuest) return { ok: false, reason: 'notOnQuest' };
   if (!opts.hasBottle) return { ok: false, reason: 'noBottle' };
   if (opts.bottleReadyAt > opts.time) return { ok: false, reason: 'onCooldown' };
   if (opts.distance > HUT_BURN_RANGE) return { ok: false, reason: 'tooFar' };
-  if (opts.alreadyBurned) return { ok: false, reason: 'alreadyBurned' };
+  if (opts.hutOnCooldown) return { ok: false, reason: 'hutOnCooldown' };
   return { ok: true };
 }
 
@@ -40,10 +44,19 @@ const REASON_MESSAGE: Record<HutBurnReason, string | null> = {
   noBottle: 'You need a firebottle to torch that.',
   onCooldown: 'Your firebottle is not ready yet.',
   tooFar: 'Get right up against a hut to torch it.',
-  alreadyBurned: 'This hut is already burning.',
+  hutOnCooldown: 'This hut is still burning.',
 };
 
-const burnedHuts = (qp: QuestProgress): number[] => qp.burnedObjectIds ?? [];
+const burnedList = (qp: QuestProgress): { id: number; at: number }[] => qp.burnedObjects ?? [];
+
+// A hut is on its re-burn cooldown if it was torched within the last
+// HUT_REBURN_COOLDOWN_SECS. A burn stamped in the FUTURE (a server restart reset
+// sim-time under a persisted run) reads as lapsed, never stuck forever.
+function hutOnReburnCooldown(qp: QuestProgress, hutId: number, now: number): boolean {
+  const entry = burnedList(qp).find((b) => b.id === hutId);
+  if (!entry) return false;
+  return now >= entry.at && now - entry.at < HUT_REBURN_COOLDOWN_SECS;
+}
 
 // Credit the q_deepfen_purge "burn huts" interact objective by one, capped at its
 // required count. Called once per NEWLY burned hut.
@@ -78,8 +91,14 @@ function burnHut(
   qp: QuestProgress,
 ): void {
   meta.firebottleReadyAt = ctx.time + FIREBOTTLE_COOLDOWN_SECS;
-  // Mark this hut burned for THIS quest run so it can never be credited twice.
-  qp.burnedObjectIds = [...burnedHuts(qp), hut.id];
+  // Materialized remaining seconds so the bag can paint the throw-cooldown swipe.
+  player.firebottleCdRemaining = FIREBOTTLE_COOLDOWN_SECS;
+  // Stamp this hut's burn time, keeping only the latest entry per hut, so it goes
+  // on its re-burn cooldown and can be torched again once the cooldown lapses.
+  qp.burnedObjects = [
+    ...burnedList(qp).filter((b) => b.id !== hut.id),
+    { id: hut.id, at: ctx.time },
+  ];
   // Throw animation (windup) + the bottle arcing to the hut + the blaze itself.
   ctx.emit({
     type: 'spellfx',
@@ -119,14 +138,14 @@ export function throwFirebottleAtNearestHut(
   }
   const qp = meta.questLog.get(HUT_QUEST_ID);
   const onQuest = !!qp && (qp.state === 'active' || qp.state === 'ready');
-  const alreadyBurned = !!qp && !!nearest && burnedHuts(qp).includes(nearest.id);
+  const hutOnCooldown = !!qp && !!nearest && hutOnReburnCooldown(qp, nearest.id, ctx.time);
   const result = firebottleBurnCheck({
     onQuest,
     hasBottle: ctx.countItem(FIREBOTTLE_ITEM_ID, meta.entityId) > 0,
     distance: nearest ? nearestD : Number.POSITIVE_INFINITY,
     time: ctx.time,
     bottleReadyAt: meta.firebottleReadyAt ?? 0,
-    alreadyBurned,
+    hutOnCooldown,
   });
   if (!result.ok) {
     const msg = REASON_MESSAGE[result.reason];
@@ -152,7 +171,7 @@ export function tryBurnHut(
     distance: dist2d(player.pos, hut.pos),
     time: ctx.time,
     bottleReadyAt: meta.firebottleReadyAt ?? 0,
-    alreadyBurned: !!qp && burnedHuts(qp).includes(hut.id),
+    hutOnCooldown: !!qp && hutOnReburnCooldown(qp, hut.id, ctx.time),
   });
   if (!result.ok) {
     const msg = REASON_MESSAGE[result.reason];

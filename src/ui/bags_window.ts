@@ -20,6 +20,7 @@
 import { audio } from '../game/audio';
 import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
 import { ITEMS } from '../sim/data';
+import { FIREBOTTLE_COOLDOWN_SECS, FIREBOTTLE_ITEM_ID } from '../sim/interactions/firebottle_hut';
 import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
 import {
@@ -641,6 +642,23 @@ export class BagsWindow {
         ? `<img class="bi-masterwork-seal" src="${MASTERWORK_SEAL_IMAGE_URL}" alt="" aria-hidden="true" draggable="false">`
         : '';
       row.innerHTML = `${this.deps.itemIcon(item)}${instanceMark}${masterworkSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+      // A firebottle mid-throw-cooldown paints a draining curtain on its slot so the
+      // 5s throw pacing is visible in the bag. The bag is a cold window with no
+      // per-frame driver, so the sweep is a self-contained CSS animation seeded from
+      // the wired remaining seconds (world.player.firebottleCdRemaining), not a
+      // per-frame-repainted --cd-fill like the action bar.
+      if (item.id === FIREBOTTLE_ITEM_ID && world.player.firebottleCdRemaining > 0) {
+        const remaining = world.player.firebottleCdRemaining;
+        const curtain = document.createElement('span');
+        curtain.className = 'bag-cd-curtain';
+        curtain.setAttribute('aria-hidden', 'true');
+        curtain.style.setProperty(
+          '--cd-start',
+          `${Math.min(100, (remaining / FIREBOTTLE_COOLDOWN_SECS) * 100)}%`,
+        );
+        curtain.style.setProperty('--cd-dur', `${remaining}s`);
+        row.appendChild(curtain);
+      }
       row.addEventListener('click', (ev) => {
         // On touch, the click that ends a long-press peek inspects the stack (its
         // tooltip is already shown) instead of running its action (use / sell /

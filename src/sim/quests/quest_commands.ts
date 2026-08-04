@@ -239,11 +239,22 @@ export function acceptLinkedQuest(
   if (sharer) ctx.notice(sharerPid, `${meta.name} accepted your shared quest.`);
 }
 
+// Strip a quest's required items (tools for the run, e.g. the firebottle for
+// q_deepfen_purge, NOT rewards) from the bag. Run on both turn-in and abandon so a
+// quest you are done with never leaves its tool behind.
+function stripRequiredItems(ctx: SimContext, quest: QuestDef, meta: PlayerMeta): void {
+  for (const itemId of quest.requiredItems ?? []) {
+    const have = ctx.countItem(itemId, meta.entityId);
+    if (have > 0) ctx.removeItem(itemId, have, meta.entityId);
+  }
+}
+
 export function abandonQuest(ctx: SimContext, questId: string, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta } = r;
   if (!meta.questLog.has(questId)) return;
+  stripRequiredItems(ctx, QUESTS[questId], meta);
   meta.questLog.delete(questId);
   ctx.emit({
     type: 'log',
@@ -325,6 +336,9 @@ export function turnInQuestCore(
       ctx.removeItem(obj.itemId, questObjectiveRequired(quest, qp, index), meta.entityId);
     }
   }
+  // Required items (tools, not rewards) leave with the finished quest, so a spent
+  // firebottle does not linger in the bag after "Back to the Shallows".
+  stripRequiredItems(ctx, quest, meta);
   qp.state = 'done';
   meta.questLog.delete(questId);
   const firstCompletion = !meta.questsDone.has(questId);
