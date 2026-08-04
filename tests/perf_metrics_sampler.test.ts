@@ -169,4 +169,19 @@ describe('createMetricsSampler', () => {
     expect(sample.renderScale).toBeNull();
     expect(sample.gpu).toBeNull();
   });
+
+  it('reads a replacement renderer through the mutable getter', () => {
+    let renderer = fakeRenderer({ calls: 10, glRenderer: 'Old GPU' });
+    const sample = createMetricsSampler(
+      makeDeps({
+        getRenderer: () => renderer,
+      }),
+    );
+    expect(sample().drawCalls).toBe(10);
+    expect(sample().gpu).toBe('Old GPU');
+
+    renderer = fakeRenderer({ calls: 77, glRenderer: 'Rebuilt GPU' });
+    expect(sample().drawCalls).toBe(77);
+    expect(sample().gpu).toBe('Rebuilt GPU');
+  });
 });

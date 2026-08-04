@@ -365,12 +365,15 @@ describe('Eastbrook polish capture contract', () => {
       // fog-free vista split, horizonHazePlan, the #2793 review round), the
       // local-gate-perf migration moved the lockfile leaf to pnpm-lock.yaml,
       // and the release side stacked its own moves (shapeshift compile gate,
-      // then PR #2720's fence-removal layout evidence over the base renderer
-      // provenance move). Each merge mints one composite that matches neither
-      // parent's literal. No Eastbrook pipeline input or geometry value
-      // changed, and no capture was retaken (the per-asset seal suites stay
-      // green untouched).
-      fingerprint: 'c15d64f6868a3afac3fe3ec2e6297fbff3f1445a0ffac58bfd7f4ed38fd5c107',
+      // PR #2720's fence-removal layout evidence over the base renderer
+      // provenance move, and now PR #2799's apply-without-reload graphics
+      // rebuild, which recycles the context and makes the Eastbrook runtime
+      // inputs profile-aware, moving the rendererIntegration leaf again and
+      // re-minting the release-side metadata and performance evidence). Each
+      // merge mints one composite that matches neither parent's literal. No
+      // Eastbrook pipeline input or geometry value changed, and no capture was
+      // retaken (the per-asset seal suites stay green untouched).
+      fingerprint: '9ae51dfb488186579f3bf4182c39b858fb4aa1d148055ce48a4e25216d6cadf1',
       components: {
         captureContract: {
           id: 'polish-v2',

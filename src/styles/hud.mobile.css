@@ -4117,6 +4117,13 @@
     flex: 0 0 auto;
     min-height: 40px;
   }
+  body.mobile-touch .graphics-apply {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body.mobile-touch .graphics-apply-btn {
+    width: 100%;
+    min-height: 40px;
+  }
   /* The master header stays centered + prominent on touch too. */
   body.mobile-touch .perf-master {
     text-align: center;

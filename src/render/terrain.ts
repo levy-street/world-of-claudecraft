@@ -16,7 +16,7 @@ import { roadDistance, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { loadTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { type ChunkGrid, type GroundPendingAt, orderCellsForEntry } from './chunk_residency_core';
-import { GFX, SUN_DIR } from './gfx';
+import { GFX, type GfxSettings, SUN_DIR } from './gfx';
 import { renderLayerDisabled } from './render_dev_flags';
 
 // The terrain relief ladder (GFX.terrainRelief, one source for the tier
@@ -89,51 +89,64 @@ const IDLE_BUILD_TIMEOUT_MS = 200;
 // ---------------------------------------------------------------------------
 
 const TERRAIN_TEX: Record<string, THREE.Texture> = {};
+const terrainTexTasks = new Map<string, Promise<void>>();
 const ALBEDO_ANISOTROPY = 8;
 const NORMAL_ANISOTROPY = 4;
 
-function kickTerrainTex(key: string, file: string, srgb: boolean): void {
-  registerDeferredPreload(() =>
-    loadTexture(`/textures/terrain/${file}`, { srgb, repeat: true }).then((tex) => {
+function prepareTerrainTex(key: string, file: string, srgb: boolean): Promise<void> {
+  if (TERRAIN_TEX[key]) return Promise.resolve();
+  const existing = terrainTexTasks.get(key);
+  if (existing) return existing;
+  const task = loadTexture(`/textures/terrain/${file}`, { srgb, repeat: true })
+    .then((tex) => {
       tex.anisotropy = srgb ? ALBEDO_ANISOTROPY : NORMAL_ANISOTROPY;
       TERRAIN_TEX[key] = tex;
-      return tex;
-    }),
-  );
+    })
+    .catch((err) => {
+      terrainTexTasks.delete(key);
+      throw err;
+    });
+  terrainTexTasks.set(key, task);
+  return task;
 }
 
-// ~15MB of JPEGs — skip when the URL already forces the Lambert tier (an
-// auto-detected low tier still fetches them; the URL guess can't know yet)
-if (GFX.terrainSplat) {
-  kickTerrainTex('grassC', 'Grass001_Color.jpg', true);
-  kickTerrainTex('grassN', 'Grass001_NormalGL.jpg', false);
-  // Ground023 (leaf-littered packed earth), not Ground048: at the splat tile
-  // scale 048 is one uniform high-frequency crumble (measured large/fine
-  // luminance-std ratio 0.21, saturation 0.39, R/G 1.35) and paths read as
-  // pink carpet. 023 carries real medium-scale features (ratio 0.47), an
-  // earthier desaturated hue (R/G 1.15, saturation 0.26), a clean row/col
-  // variance ratio (1.34, no corduroy) and a usable AO map (sd 0.117).
-  kickTerrainTex('dirtC', 'Ground023_Color.jpg', true);
-  kickTerrainTex('dirtN', 'Ground023_NormalGL.jpg', false);
-  // Rock026 (fractured cliff plates), not Rock051: Rock051's striations are
-  // directional (anisotropy 2.57), and wall-projecting them at one scale is
-  // what gave mountainsides the vertical corduroy. Rock051 stays on disk for
-  // voxel_terrain.
-  kickTerrainTex('rockC', 'Rock026_Color.jpg', true);
-  kickTerrainTex('rockN', 'Rock026_NormalGL.jpg', false);
-  kickTerrainTex('sandC', 'Ground080_Color.jpg', true);
-  kickTerrainTex('sandN', 'Ground080_NormalGL.jpg', false);
-  kickTerrainTex('mudC', 'Ground071_Color.jpg', true); // marsh wet mud (dirt variant)
-  kickTerrainTex('snowC', 'Snow010A_Color.jpg', true);
-  // The packs' relief channels, packed offline into one RGBA texture by
-  // scripts/assets/pack_ground_ao.mjs (R grass AO, G dirt AO, B rock height,
-  // A sand AO): one sampler instead of four keeps the splat material under
-  // the 16-sampler fragment limit. B is a Rock026+Rock060 displacement blend,
-  // not an AO map: Rock026's authored AO is near-white, and displacement is
-  // the honest cavity signal for the new rocks. Linear data: cavity = dark,
-  // open surface = bright.
-  kickTerrainTex('groundAO', 'GroundAO_Packed.png', false);
+/** Prepare the terrain texture channel selected by an explicit target profile. */
+export function prepareTerrainProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
+  if (!target.terrainSplat) return Promise.resolve();
+  const tasks = [
+    prepareTerrainTex('grassC', 'Grass001_Color.jpg', true),
+    prepareTerrainTex('grassN', 'Grass001_NormalGL.jpg', false),
+    // Ground023 (leaf-littered packed earth), not Ground048: at the splat tile
+    // scale 048 is one uniform high-frequency crumble (measured large/fine
+    // luminance-std ratio 0.21, saturation 0.39, R/G 1.35) and paths read as
+    // pink carpet. 023 carries real medium-scale features (ratio 0.47), an
+    // earthier desaturated hue (R/G 1.15, saturation 0.26), a clean row/col
+    // variance ratio (1.34, no corduroy) and a usable AO map (sd 0.117).
+    prepareTerrainTex('dirtC', 'Ground023_Color.jpg', true),
+    prepareTerrainTex('dirtN', 'Ground023_NormalGL.jpg', false),
+    // Rock026 (fractured cliff plates), not Rock051: Rock051's striations are
+    // directional (anisotropy 2.57), and wall-projecting them at one scale is
+    // what gave mountainsides the vertical corduroy. Rock051 stays on disk for
+    // voxel_terrain.
+    prepareTerrainTex('rockC', 'Rock026_Color.jpg', true),
+    prepareTerrainTex('rockN', 'Rock026_NormalGL.jpg', false),
+    prepareTerrainTex('sandC', 'Ground080_Color.jpg', true),
+    prepareTerrainTex('sandN', 'Ground080_NormalGL.jpg', false),
+    prepareTerrainTex('mudC', 'Ground071_Color.jpg', true),
+    prepareTerrainTex('snowC', 'Snow010A_Color.jpg', true),
+    // The packs' relief channels, packed offline into one RGBA texture by
+    // scripts/assets/pack_ground_ao.mjs (R grass AO, G dirt AO, B rock height,
+    // A sand AO): one sampler instead of four keeps the splat material under
+    // the 16-sampler fragment limit. B is a Rock026+Rock060 displacement blend,
+    // not an AO map: Rock026's authored AO is near-white, and displacement is
+    // the honest cavity signal for the new rocks. Linear data: cavity = dark,
+    // open surface = bright.
+    prepareTerrainTex('groundAO', 'GroundAO_Packed.png', false),
+  ];
+  return Promise.all(tasks).then(() => undefined);
 }
+
+registerDeferredPreload(() => prepareTerrainProfileAssets(GFX));
 
 export function hasTerrainSplatAssets(): boolean {
   return Boolean(

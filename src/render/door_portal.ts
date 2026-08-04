@@ -77,6 +77,13 @@ let nythraxisClickMat: THREE.MeshBasicMaterial | null = null;
 // on both inputs just keeps the builder correct for any caller and unit-testable.
 const portalMats = new Map<string, THREE.MeshBasicMaterial>();
 
+export function resetDoorPortalProfileCaches(): void {
+  stoneMat = null;
+  nythraxisClickMat = null;
+  portalMats.clear();
+  riftPortalMats.clear();
+}
+
 // Height the Blood Orb hovers at: clear of the citadel's altar model (1.2yd native,
 // placed at scale 1.5, see src/sim/content/rift/infernal_citadel.ts).
 const ORB_Y = 2.15;

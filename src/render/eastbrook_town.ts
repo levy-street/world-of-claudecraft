@@ -71,14 +71,36 @@ const ASSET_INSTANCE_COUNTS = (() => {
 
 const loadedSources = new Map<string, THREE.Group>();
 const preparedTemplates = new Map<string, TownAssetTemplate>();
+const sourceLoadTasks = new Map<string, Promise<void>>();
+
+function prepareTownSource(url: string): Promise<void> {
+  if (loadedSources.has(url)) return Promise.resolve();
+  const existing = sourceLoadTasks.get(url);
+  if (existing) return existing;
+  const task = loadGltf(url)
+    .then((gltf) => {
+      loadedSources.set(url, gltf.scene);
+      sourceLoadTasks.delete(url);
+    })
+    .catch((err) => {
+      sourceLoadTasks.delete(url);
+      throw err;
+    });
+  sourceLoadTasks.set(url, task);
+  return task;
+}
+
+export function prepareEastbrookTownProfileAssets(): Promise<void> {
+  return Promise.all(ALL_ASSET_URLS.map(prepareTownSource)).then(() => undefined);
+}
+
+export function resetEastbrookTownProfileCaches(): void {
+  preparedTemplates.clear();
+}
 
 if (typeof window !== 'undefined') {
   for (const url of ALL_ASSET_URLS) {
-    registerDeferredPreload(() =>
-      loadGltf(url).then((gltf) => {
-        loadedSources.set(url, gltf.scene);
-      }),
-    );
+    registerDeferredPreload(() => prepareTownSource(url));
   }
 }
 

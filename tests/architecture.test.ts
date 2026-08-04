@@ -144,6 +144,54 @@ const NONDETERMINISM_RE = /\b(Math\.random|Date\.now|performance\.now)\b/;
 
 const simFiles = walk(simRoot);
 
+describe('live graphics profile architecture', () => {
+  it('resolves renderer-bound layout and deferred preload choices from live GFX', () => {
+    const renderSource = (relativePath: string): string =>
+      readFileSync(join(repoRoot, 'src', 'render', relativePath), 'utf8');
+    const props = renderSource('props.ts');
+    const foliage = renderSource('foliage.ts');
+
+    expect(props).not.toMatch(/\bconst\s+MERGE_BAND_DEPTH\s*=\s*GFX\b/);
+    expect(props).toContain('const mergeBandDepth = ():');
+    expect(props).toContain('deferredPropKeys ??= preloadPropKeys(GFX.standardMaterials)');
+    expect(foliage).not.toMatch(/\bconst\s+MODEL_URLS\s*=\s*GFX\b/);
+    expect(foliage).toContain('const foliageModelUrls = ():');
+    expect(foliage).toContain('foliageModelUrlsFor(GFX)');
+
+    const directDeferredProfiles = [
+      ['terrain.ts', 'prepareTerrainProfileAssets'],
+      ['water.ts', 'prepareWaterProfileAssets'],
+      ['detail_normals.ts', 'prepareStoneDetailProfileAssets'],
+      ['worn_stone.ts', 'prepareSurfaceDetailProfileAssets'],
+      ['canopy_detail.ts', 'prepareCanopyDetailProfileAssets'],
+      ['great_tree_prewarm.ts', 'prepareGreatTreeProfileAssets'],
+    ] as const;
+    for (const [relativePath, prepare] of directDeferredProfiles) {
+      expect(renderSource(relativePath)).toContain(
+        `registerDeferredPreload(() => ${prepare}(GFX))`,
+      );
+    }
+  });
+
+  it('registers every exported profile cache reset in the central invalidator', () => {
+    const renderFiles = walk(join(repoRoot, 'src', 'render'));
+    const resetNames = new Set<string>();
+    for (const file of renderFiles) {
+      const source = stripComments(readFileSync(file, 'utf8'));
+      for (const match of source.matchAll(/\bexport function (reset\w+ProfileCaches?)\s*\(/g)) {
+        resetNames.add(match[1]);
+      }
+    }
+
+    const coordinator = stripComments(
+      readFileSync(join(repoRoot, 'src', 'render', 'assets', 'graphics_profile.ts'), 'utf8'),
+    );
+    const resetTable = coordinator.slice(coordinator.indexOf('const RESETTERS'));
+    expect(resetNames.size).toBeGreaterThan(20);
+    for (const resetName of resetNames) expect(resetTable).toContain(resetName);
+  });
+});
+
 // Curated src/ui pure cores: host-agnostic view models hud.ts imports, each
 // paired with a DOM painter that is deliberately NOT registered here. Seeded with
 // the cores that already exist on v0.16.0; extend as new pure cores land (later
@@ -301,6 +349,7 @@ const UI_PURE_CORES = [
   'src/ui/loading_slow_hint_core.ts',
   'src/ui/reconnect_status_core.ts',
   'src/ui/chat_bubble_style.ts',
+  'src/game/graphics_rebuild_core.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
   'src/ui/trade_view.ts',
