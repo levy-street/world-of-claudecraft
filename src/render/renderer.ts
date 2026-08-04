@@ -6221,12 +6221,28 @@ export class Renderer {
           break;
         }
         if (ev.fx === 'snowZone') {
+          const zoneDuration = ev.duration ?? 6;
           this.mageGroundFx.spawnSnow({
             x: ev.x,
             z: ev.z,
             radius: ev.radius ?? 7,
-            duration: ev.duration ?? 6,
+            duration: zoneDuration,
           });
+          // Blizzard specifically: the storm loops for the zone's whole life.
+          // Keyed by ability id (spellfxAt carries no per-cast/caster id), so
+          // two casters both storming at once share one audio voice; a real
+          // edge case, not a correctness issue.
+          if (ev.ability === 'blizzard') {
+            const zoneY = groundHeight(ev.x, ev.z, this.sim.cfg.seed);
+            this.audioSink?.timedGroundLoop(
+              `groundZone:${ev.ability}`,
+              'blizzard',
+              ev.x,
+              zoneY,
+              ev.z,
+              zoneDuration,
+            );
+          }
           break;
         }
         if (ev.fx === 'runeCircle') {

@@ -4103,6 +4103,20 @@ export type SimEvent = { pid?: number } & (
       crit: boolean;
       school: string;
       ability: string | null;
+      // The stable content id of the ability that dealt this damage, when
+      // known (dealDamage's own abilityId param, see combat/damage.ts).
+      // `ability` above stays the DISPLAY LABEL (player-facing combat log,
+      // playerSwingCueForDamage's 'Auto Shot' check): a display-only rename
+      // must never break a client-side lookup keyed off it, the way
+      // IMPACT_ABILITY_CUES (src/ui/combat_sfx.ts) was before this field
+      // existed. Populated only for the PRIMARY direct hit: auto-attacks,
+      // DoT ticks, and echoed or fanned-out copies (Power Echo, Bladed Echo,
+      // Sweeping Strikes) deliberately omit it, so a dedicated impact cue
+      // fires once where the ability lands and never replays per tick or
+      // per extra target (a hybrid's dot shares the ability id: Throat
+      // Wire's bleed is aura id 'garrote'). Client code must fall back to
+      // school/material when this is absent.
+      abilityId?: string | null;
       kind: DamageEventKind;
       absorbed?: number;
       // Presentation-only correlation: this hit belongs to a ranged shot whose
@@ -4501,6 +4515,21 @@ export type SimEvent = { pid?: number } & (
         | 'bubbleBeam'
         | 'tick'
         | 'nova'
+        // A fear-flavored incapacitate actually lands on a target (Harrow):
+        // audio-only, sounds at the target, distinct from the caster-anchored
+        // 'nova' cast moment the three AoE fears (Terror Canticle, Dread
+        // Chorus, Intimidating Shout) also emit. Gated to ability.id ===
+        // 'fear' at the emit site (effect_dispatch.ts), not the broader
+        // fearDr flag death_coil (Morrowlash) also carries: Morrowlash has no
+        // fear recording of its own.
+        | 'fearImpact'
+        // A cc effect actually lands on a target (Sundering Gavel/Hammer of
+        // Justice's stun, Gripping Roots/entangling_roots, Dirt Toss/blind's
+        // incapacitate): audio-only, sounds at the target. Gated per-ability
+        // (CC_IMPACT_ABILITY_CUES, src/ui/combat_sfx.ts) rather than by
+        // effect type, since most stun/root/incapacitate abilities have no
+        // dedicated recording and stay silent here.
+        | 'ccImpact'
         | 'chainHeal'
         | 'windup'
         | 'lightning'
@@ -4525,6 +4554,12 @@ export type SimEvent = { pid?: number } & (
         // A teleport step (Flickerstep / Shadowstep): the renderer SNAPS the
         // mover instead of arcing the reposition like a leap.
         | 'blinkStep'
+        // A DoT landing on its target the moment it is APPLIED (Rupture): audio-only,
+        // fires once at ctx.applyAura time, distinct from the periodic 'tick' fx the
+        // same DoT emits every interval thereafter. Gated per-ability
+        // (DOT_APPLY_ABILITY_CUES, src/ui/combat_sfx.ts) so a DoT with no dedicated
+        // recording stays silent here, exactly like 'ccImpact' above.
+        | 'dotApply'
         // A cast completing with no castFx and no other event of its own: the
         // only completion cue such casts emit, so the per-ability VFX layer
         // can stage their read. Untargeted/self ceremonies (forms, summon

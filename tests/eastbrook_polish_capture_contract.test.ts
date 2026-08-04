@@ -373,15 +373,17 @@ describe('Eastbrook polish capture contract', () => {
       // moved, not one pipeline input or geometry value changed, and no capture was
       // retaken: Eastbrook itself is untouched by all of it. Re-minted with
       // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
-      // Re-pinned again at the far-field merge: the release retook the polish
-      // captures, so their metadata and performance JSONs are adopted verbatim
-      // from the base here, but this branch's own edits to src/render/renderer.ts
-      // (the brood shout/flourish and attackByAbility wiring, then gating that
-      // cue on a mob source) still move the rendererIntegration leaf on top of
-      // the release's impostor bake, fog-free vista, and haze band. The merged
-      // composite therefore matches neither parent's literal. No capture was
-      // retaken on this branch.
-      fingerprint: '0f60d8018c882564cbcb4fc2303610a1d599fa7dc2f65710573ba232e79ee7ef',
+      // Re-pinned again at the custom-combat-audio merge. The release retook the
+      // polish captures, so their metadata and performance JSONs are adopted
+      // verbatim from the base, and it moved the rendererIntegration leaf twice
+      // over (the impostor bake, fog-free vista, and haze band of #2793, then
+      // the Blizzard timed ground loop on the snowZone spellfx arm of #2861).
+      // This branch's own edits to src/render/renderer.ts (the brood
+      // shout/flourish and attackByAbility wiring, then gating that cue on a mob
+      // source) stack on top. Both sides moved the same leaf, so the merged
+      // composite matches neither parent's literal. No GLB source fingerprint
+      // moved and no capture was retaken on this branch.
+      fingerprint: '7fbcf44ee83c4bcac356e19ad20b4ba73d2d1a9703fbf1591b3edb52e6a212c2',
       components: {
         captureContract: {
           id: 'polish-v2',

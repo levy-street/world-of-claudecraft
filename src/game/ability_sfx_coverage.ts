@@ -41,7 +41,37 @@ export interface AbilityMomentContext {
    *  cast completion): those emit no projectile spellfx, so no proj_ recording
    *  sounds and the procedural whoosh must keep carrying their launch. */
   isProjectile?: boolean;
+  /** The casting ability's id, needed only for the narrow per-ability
+   *  overrides below (FEAR_IMPACT_ABILITIES); every other check reads purely
+   *  off school/archetype. */
+  abilityId?: string;
 }
+
+/** The fear-family abilities whose landed-fear moment now has a dedicated
+ *  recording (the 'fear' cue, effect_dispatch.ts's fx:'fearImpact'), even
+ *  though their archetype is 'cc' (normally uncovered, see
+ *  RECORDED_IMPACT_ARCHETYPES): Harrow (single-target), plus the three AoE
+ *  fear shouts (Terror Canticle, Dread Chorus, Intimidating Shout, archetype
+ *  'shout', also normally uncovered). */
+export const FEAR_IMPACT_ABILITIES: ReadonlySet<string> = new Set([
+  'fear',
+  'psychic_scream',
+  'howl_of_terror',
+  'intimidating_shout',
+]);
+
+/** Plain (non-fear) cc abilities whose landed moment now has a dedicated
+ *  recording (fx:'ccImpact'): Sundering Gavel/hammer_of_justice (stun),
+ *  Gripping Roots/entangling_roots (root), Dirt Toss/blind (incapacitate),
+ *  Gut Punch/cheap_shot (stun, the stealth opener). All four are archetype
+ *  'cc' (normally uncovered). */
+export const CC_IMPACT_ABILITIES: ReadonlySet<string> = new Set([
+  'hammer_of_justice',
+  'entangling_roots',
+  'blind',
+  'cheap_shot',
+  'sap',
+]);
 
 /** The six schools with a recorded launch whoosh (combat_sfx.ts SCHOOL_CUES
  *  .projectile: proj_fire, proj_frost, proj_arcane, proj_shadow, proj_holy,
@@ -93,6 +123,12 @@ export function isAbilityMomentRecorded(
         ctx.isProjectile !== false && !!ctx.school && RECORDED_PROJECTILE_SCHOOLS.has(ctx.school)
       );
     case 'impact':
+      // The per-ability overrides win regardless of archetype: Harrow's is
+      // 'cc', the fear shouts' is 'shout', the plain cc trio's is 'cc' too
+      // (all normally uncovered), and all now have a real recording for
+      // this moment (see FEAR_IMPACT_ABILITIES / CC_IMPACT_ABILITIES).
+      if (ctx.abilityId && FEAR_IMPACT_ABILITIES.has(ctx.abilityId)) return true;
+      if (ctx.abilityId && CC_IMPACT_ABILITIES.has(ctx.abilityId)) return true;
       return !!ctx.archetype && RECORDED_IMPACT_ARCHETYPES.has(ctx.archetype);
     // combat_crit is a recording and plays on every crit against a non-boss.
     // A boss is exempt by design (a crit sting is the wrong beat mid-boss

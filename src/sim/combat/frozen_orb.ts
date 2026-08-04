@@ -194,7 +194,24 @@ function pulseOrb(ctx: SimContext, orb: FrozenOrbState, source: Entity): void {
     if (!ctx.hasLineOfSight(source, target)) continue;
     const raw = ctx.rng.range(orb.min, orb.max) + orb.spBonus;
     const dmg = Math.round(raw * spellDamageMultFromAuras(source));
-    ctx.dealDamage(source, target, dmg, false, 'frost', orb.abilityName, 'hit');
+    ctx.dealDamage(
+      source,
+      target,
+      dmg,
+      false,
+      'frost',
+      orb.abilityName,
+      'hit',
+      false,
+      undefined,
+      true,
+      false,
+      false,
+      // Stable id, so client-side impact-cue lookups (frozen_orb) can key off
+      // it instead of orb.abilityName's display label (review finding, PR
+      // #2861).
+      orb.abilityId,
+    );
     ctx.applyAura(target, {
       id: 'frozen_orb_slow',
       name: orb.abilityName,

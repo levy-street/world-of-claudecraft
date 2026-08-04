@@ -162,9 +162,9 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the release catalog, all 9 mount cues, and all 62 UI cues in one 219-key inventory', () => {
+  it('keeps the release catalog, all 9 mount cues, and all 62 UI cues in one 245-key inventory', () => {
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(219);
+    expect(keys.size).toBe(245);
     expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(62);
     for (const key of [
       'cast_lightning_bolt',
@@ -186,6 +186,32 @@ describe('buildManifest', () => {
       'mount_run_terrorspark_groundshaker',
       // the Drakemaw Raptor, the ninth mount cue (the brood rework's legendary)
       'mount_run_drakemaw_raptor',
+      'fear_shout',
+      'fear',
+      'ice_block',
+      'frost_nova',
+      'hammer_of_justice',
+      'entangling_roots',
+      'blind',
+      'cloak_of_shadows',
+      'scorch',
+      'pyroblast',
+      'flamestrike',
+      'frozen_orb',
+      'glacial_spike',
+      'blizzard',
+      'blink',
+      'arcane_blast',
+      'shadowstep',
+      'vanish',
+      'cheap_shot',
+      'ambush',
+      'backstab',
+      'garrote',
+      'sap',
+      'sinister_strike',
+      'eviscerate',
+      'stealth',
     ]) {
       expect(keys.has(key), key).toBe(true);
     }
@@ -198,7 +224,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(219);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(245);
   });
 });
 

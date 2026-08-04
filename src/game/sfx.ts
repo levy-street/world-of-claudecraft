@@ -158,6 +158,8 @@ class Sfx {
   private active = 0;
   private lastPlay = new Map<string, number>();
   private loops = new Map<string, LoopSlot>();
+  // Pending auto-stop timers for timedGroundLoop, keyed the same as `loops`.
+  private groundLoopTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private footstepsOn = false; // off by default; driven by the footstepSfx setting
   private lx = 0;
   private lz = 0; // cached listener position
@@ -783,6 +785,33 @@ class Sfx {
     return this.loops.has(id);
   }
 
+  /** A fixed-duration ground zone loop (Blizzard's storm): starts `key`
+   *  looping at (x,y,z) and schedules its own unloop after `duration`
+   *  seconds. A fresh call with the same id (a new zone landing while the
+   *  previous one's fade is still pending, or simply repositioning) cancels
+   *  any pending stop and reschedules from the new call, matching a real
+   *  zone's actual lifetime rather than the first one that ever fired. */
+  timedGroundLoop(
+    id: string,
+    key: string,
+    x: number,
+    y: number,
+    z: number,
+    duration: number,
+  ): void {
+    if (!(key in SFX_CLIPS)) return;
+    this.loop(id, key, 0.85, x, y, z);
+    const pending = this.groundLoopTimers.get(id);
+    if (pending) clearTimeout(pending);
+    this.groundLoopTimers.set(
+      id,
+      setTimeout(() => {
+        this.groundLoopTimers.delete(id);
+        this.unloop(id);
+      }, duration * 1000),
+    );
+  }
+
   // --- SpatialAudioSink surface (driven by the renderer) -------------------
   // Implemented here so the surface→clip and ambience→loop mappings live in one
   // place; the renderer depends only on the SpatialAudioSink interface.
@@ -1032,6 +1061,7 @@ class Sfx {
         school: def?.school,
         archetype: arch,
         isProjectile: def?.projectile,
+        abilityId: opts?.abilityId,
       })
     ) {
       return;

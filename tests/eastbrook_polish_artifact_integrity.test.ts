@@ -618,14 +618,17 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
 // shout/flourish and attackByAbility wiring, then gating that cue on a mob
 // source) onto a release/v0.34.0 that already carries PR #2720's Eastbrook
 // fence-removal layout evidence, the Bear Form quadruped rig, the live graphics
-// rebuild, and the far-field impostor bake plus fog-free vista. The release
-// retook the polish captures and this branch adopts them verbatim: the accepted
-// file still points at the same captured view, and only its swept provenance
-// bytes follow the merged rendererIntegration and layout inputs.
+// rebuild, the far-field work (sprite impostors, the fog-free vista, and the
+// horizon pass, PR #2793), and the Blizzard timed ground loop on the snowZone
+// spellfx arm (PR #2861). Both sides move the same rendererIntegration leaf, so
+// the merged tree mints literals matching neither parent. The release retook the
+// polish captures and this branch adopts them verbatim: the accepted file still
+// points at the same captured view, and only its swept provenance bytes follow
+// the merged rendererIntegration and layout inputs.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '7ab529a9793e3ab488601108a0883556ba43edf4ad9754b3eb750d70a0e35541';
+  'bbbde9788a3c34ea1e1cd38f16e8ba72561c96074ce2ce087cef052117ce9410';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '0f60d8018c882564cbcb4fc2303610a1d599fa7dc2f65710573ba232e79ee7ef';
+  '7fbcf44ee83c4bcac356e19ad20b4ba73d2d1a9703fbf1591b3edb52e6a212c2';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1486,13 +1489,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // for the same reason: this branch's renderer provenance move (the brood
     // shout/flourish and attackByAbility wiring) stacked onto a base carrying
     // PR #2720's fence-removal content change, the Bear Form quadruped rig, the
-    // live graphics rebuild, and the far-field impostor bake plus fog-free vista,
-    // recomputed last by remint_polish_provenance.mjs. The release retook the
-    // polish captures, so every measured value (frame timings, draw stats,
-    // triangle and scenario numbers) is adopted verbatim from the base tip; no
-    // parent's literal matched the merged tree, and no capture was retaken here.
+    // live graphics rebuild, the far-field work (PR #2793), and the Blizzard
+    // timed ground loop (PR #2861), recomputed last by
+    // remint_polish_provenance.mjs. The release retook the polish captures, so
+    // every measured value (frame timings, draw stats, triangle and scenario
+    // numbers) is adopted verbatim from the base tip; no parent's literal
+    // matched the merged tree, and no capture was retaken here.
     expect(fingerprint.digest('hex')).toBe(
-      '9c3db81629fb5f7e743d5dc4b38013d9bb9d2afc84dd069f79f16998d8d1733e',
+      'a58e86c734d1872e462170ca6140c27fa6f3cc0aab518d80e605398749f57e59',
     );
   });
 
