@@ -3,17 +3,6 @@
 `.github/workflows/pr-ai.yml` contains informational, non-blocking pull-request helpers.
 They do not replace the required checks in `ci.yml`.
 
-## Screenshot assist
-
-The `screenshots` job starts the Vite client and captures only surfaces implied by the
-diff. A window-specific change opens that window, a generic visual change captures the
-HUD, and a non-visual change captures nothing. Mobile surfaces add a phone-sized capture.
-
-`scripts/pr_shot_targets.mjs` owns path-to-screen mapping. Captures are written by
-`scripts/pr_screenshots.mjs`, hosted on the bot-owned `bot-pr-screenshots` branch by
-`scripts/gh_image_host.mjs`, and embedded in a sticky comment. The job degrades to no
-comment when a fork token cannot write.
-
 ## Codex review assist
 
 The `codex-review` job performs static review through
@@ -104,6 +93,11 @@ default; posting still requires an explicit user request.
 
 ## Local screenshot capture
 
+Screenshots are captured locally and committed with the PR; no CI job posts them. The
+capture is change-aware: `scripts/pr_shot_targets.mjs` owns path-to-screen mapping, so a
+window-specific change opens that window, a generic visual change captures the HUD, a
+non-visual change captures nothing, and mobile surfaces add a phone-sized capture.
+
 ```sh
 npm run dev
 git diff --no-color <release-base> > pr.diff
@@ -111,4 +105,5 @@ BROWSER_PATH=/path/to/chrome DIFF_FILE=pr.diff node scripts/pr_screenshots.mjs
 ```
 
 `BROWSER_PATH` is needed only when no Chrome, Edge, or Chromium binary is on a standard
-path and the diff contains a visual change.
+path and the diff contains a visual change. The full recipe, including the before/after
+protocol, lives in the `pr-screenshots` skill.

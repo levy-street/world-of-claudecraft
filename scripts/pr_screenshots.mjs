@@ -9,7 +9,7 @@
 //                      -> the in-world desktop HUD, plus the mobile HUD when the change
 //                      touches the mobile/responsive surface.
 //   nothing           a backend/data/i18n-only diff is not visual, so it captures no frames
-//                      at all (the comment step then posts no screenshots).
+//                      at all, and the PR needs no screenshot section.
 // There is no fixed tour: it never shoots unrelated parts of the game just to have something.
 //
 // Run locally:  npm run dev   (in another terminal, serves :5173)
@@ -69,7 +69,7 @@ const { BROWSER_PATH } = await import('./browser_path.mjs');
 
 const browser = await puppeteer.launch({
   executablePath: BROWSER_PATH,
-  // Software GL so it runs on a headless CI box with no GPU, matching the other tours.
+  // Software GL so it runs on a headless box with no GPU, matching the other tours.
   headless: 'new',
   args: ['--window-size=1600,900', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
   defaultViewport: { width: 1600, height: 900 },
@@ -241,12 +241,13 @@ try {
   await browser.close();
 }
 
-// Record the manifest so the comment step can list what was captured without re-reading.
+// Record the manifest as a local index of the run: what mode it chose and which frames it
+// produced, so the PR write-up can list them without re-reading every PNG.
 const mode = plan.specific.length ? 'change-aware' : 'generic-hud';
 fs.writeFileSync(`${OUT}/manifest.json`, JSON.stringify({ mode, captured, errors }, null, 2));
 
 if (errors.length) console.log(`notes during capture:\n${errors.join('\n')}`);
 console.log(`captured ${captured.length} screenshot(s) into ${OUT}/`);
 // Non-zero only if a visual change captured nothing at all, so a partial run still keeps
-// its frames while a total capture failure surfaces in the job log.
+// its frames while a total capture failure fails the invoking command.
 process.exit(captured.length > 0 && failedTargets === 0 ? 0 : 1);

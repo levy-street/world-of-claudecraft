@@ -8564,10 +8564,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.quit': 'Keluar',
   'desktop.crash.reload': 'Muat Ulang',
   'desktop.crash.title': 'World of ClaudeCraft',
-  'desktop.update.downloading': 'Mengunduh pembaruan {version}...',
+  'desktop.update.downloadingTitle': 'Mengunduh pembaruan {version}...',
   'desktop.update.later': 'Nanti',
-  'desktop.update.ready':
-    'Pembaruan {version} siap. Akan terpasang saat kamu keluar, atau mulai ulang sekarang.',
+  'desktop.update.readyTitle': 'Pembaruan {version} siap',
+  'desktop.update.readyBody': 'Akan terpasang saat kamu keluar, atau mulai ulang sekarang.',
   'desktop.update.restart': 'Mulai Ulang Sekarang',
   'hudChrome.dailyRewards.close': 'Tutup hadiah harian',
   'hudChrome.dailyRewards.endsIn': 'Berakhir dalam {time}',

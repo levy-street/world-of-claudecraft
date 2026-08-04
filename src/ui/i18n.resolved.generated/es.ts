@@ -2901,6 +2901,7 @@ export const es: EnTranslations = {
       "countLabel": "{earned}/{total} gestas",
       "completionAria": "Gestas conseguidas: {earned} de {total}",
       "recentLabel": "Recientes:",
+      "recentJumpAria": "Jump to {name}",
       "nearestLabel": "A un paso:",
       "filterGroupAria": "Filtrar gestas",
       "filterAll": "Todas",
@@ -6097,10 +6098,16 @@ export const es: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "Descargando actualización {version}...",
-      "ready": "La actualización {version} está lista. Se instala al salir, o reinicia ahora.",
+      "checkingTitle": "Checking for updates...",
+      "checkingBody": "New versions download while you play.",
+      "uptodateTitle": "You're up to date",
+      "downloadingTitle": "Descargando actualización {version}...",
+      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "readyTitle": "La actualización {version} está lista",
+      "readyBody": "Se instala al salir, o reinicia ahora.",
       "restart": "Reiniciar ahora",
-      "later": "Más tarde"
+      "later": "Más tarde",
+      "dismiss": "Dismiss"
     },
     "crash": {
       "title": "World of ClaudeCraft",

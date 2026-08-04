@@ -7773,10 +7773,10 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.quit': 'Afslut',
   'desktop.crash.reload': 'Genindlæs',
   'desktop.crash.title': 'World of ClaudeCraft',
-  'desktop.update.downloading': 'Downloader opdatering {version}...',
+  'desktop.update.downloadingTitle': 'Downloader opdatering {version}...',
   'desktop.update.later': 'Senere',
-  'desktop.update.ready':
-    'Opdatering {version} er klar. Den installeres, når du afslutter, eller genstart nu.',
+  'desktop.update.readyTitle': 'Opdatering {version} er klar',
+  'desktop.update.readyBody': 'Den installeres, når du afslutter, eller genstart nu.',
   'desktop.update.restart': 'Genstart nu',
   'hudChrome.dailyRewards.close': 'Luk daglige belønninger',
   'hudChrome.dailyRewards.endsIn': 'Slutter om {time}',

@@ -8501,10 +8501,10 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.quit': 'Thoát',
   'desktop.crash.reload': 'Tải lại',
   'desktop.crash.title': 'World of ClaudeCraft',
-  'desktop.update.downloading': 'Đang tải bản cập nhật {version}...',
+  'desktop.update.downloadingTitle': 'Đang tải bản cập nhật {version}...',
   'desktop.update.later': 'Để sau',
-  'desktop.update.ready':
-    'Bản cập nhật {version} đã sẵn sàng. Sẽ tự cài khi bạn thoát, hoặc khởi động lại ngay.',
+  'desktop.update.readyTitle': 'Bản cập nhật {version} đã sẵn sàng',
+  'desktop.update.readyBody': 'Sẽ tự cài khi bạn thoát, hoặc khởi động lại ngay.',
   'desktop.update.restart': 'Khởi động lại ngay',
   'hudChrome.dailyRewards.close': 'Đóng phần thưởng hằng ngày',
   'hudChrome.dailyRewards.endsIn': 'Kết thúc sau {time}',

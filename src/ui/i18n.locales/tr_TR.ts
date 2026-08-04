@@ -8511,10 +8511,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.quit': 'Çık',
   'desktop.crash.reload': 'Yeniden Yükle',
   'desktop.crash.title': 'World of ClaudeCraft',
-  'desktop.update.downloading': '{version} güncellemesi indiriliyor...',
+  'desktop.update.downloadingTitle': '{version} güncellemesi indiriliyor...',
   'desktop.update.later': 'Daha Sonra',
-  'desktop.update.ready':
-    '{version} güncellemesi hazır. Çıkış yaptığında kurulur ya da şimdi yeniden başlat.',
+  'desktop.update.readyTitle': '{version} güncellemesi hazır',
+  'desktop.update.readyBody': 'Çıkış yaptığında kurulur ya da şimdi yeniden başlat.',
   'desktop.update.restart': 'Şimdi Yeniden Başlat',
   'hudChrome.dailyRewards.close': 'Günlük ödülleri kapat',
   'hudChrome.dailyRewards.endsIn': 'Bitmesine {time}',

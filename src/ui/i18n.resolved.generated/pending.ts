@@ -10,6 +10,11 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "desktop.update.checkingBody",
+    "desktop.update.checkingTitle",
+    "desktop.update.dismiss",
+    "desktop.update.downloadingBody",
+    "desktop.update.uptodateTitle",
     "entities.items.firebottle.name",
     "entities.items.murloc_hut.name",
     "entities.items.restless_skull.name",
@@ -22,9 +27,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_no_rest.objectives.0.label",
     "entities.quests.q_no_rest.text",
     "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria"
+    "hudChrome.crafting.dialogOptionAria",
+    "hudChrome.deeds.recentJumpAria"
   ],
   "es_ES": [
+    "desktop.update.checkingBody",
+    "desktop.update.checkingTitle",
+    "desktop.update.dismiss",
+    "desktop.update.downloadingBody",
+    "desktop.update.uptodateTitle",
     "entities.items.firebottle.name",
     "entities.items.murloc_hut.name",
     "entities.items.restless_skull.name",
@@ -37,9 +48,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_no_rest.objectives.0.label",
     "entities.quests.q_no_rest.text",
     "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria"
+    "hudChrome.crafting.dialogOptionAria",
+    "hudChrome.deeds.recentJumpAria"
   ],
   "fr_FR": [
+    "desktop.update.checkingBody",
+    "desktop.update.checkingTitle",
+    "desktop.update.dismiss",
+    "desktop.update.downloadingBody",
+    "desktop.update.uptodateTitle",
     "entities.items.firebottle.name",
     "entities.items.murloc_hut.name",
     "entities.items.restless_skull.name",
@@ -51,9 +68,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.widow_hatchling.name",
     "entities.quests.q_no_rest.text",
     "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria"
+    "hudChrome.crafting.dialogOptionAria",
+    "hudChrome.deeds.recentJumpAria"
   ],
   "fr_CA": [
+    "desktop.update.checkingBody",
+    "desktop.update.checkingTitle",
+    "desktop.update.dismiss",
+    "desktop.update.downloadingBody",
+    "desktop.update.uptodateTitle",
     "entities.items.firebottle.name",
     "entities.items.murloc_hut.name",
     "entities.items.restless_skull.name",
@@ -65,10 +88,16 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.widow_hatchling.name",
     "entities.quests.q_no_rest.text",
     "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria"
+    "hudChrome.crafting.dialogOptionAria",
+    "hudChrome.deeds.recentJumpAria"
   ],
   "en_CA": [],
   "it_IT": [
+    "desktop.update.checkingBody",
+    "desktop.update.checkingTitle",
+    "desktop.update.dismiss",
+    "desktop.update.downloadingBody",
+    "desktop.update.uptodateTitle",
     "entities.items.firebottle.name",
     "entities.items.murloc_hut.name",
     "entities.items.restless_skull.name",
@@ -80,9 +109,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.widow_hatchling.name",
     "entities.quests.q_no_rest.text",
     "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria"
+    "hudChrome.crafting.dialogOptionAria",
+    "hudChrome.deeds.recentJumpAria"
   ],
   "de_DE": [
+    "desktop.update.checkingBody",
+    "desktop.update.checkingTitle",
+    "desktop.update.dismiss",
+    "desktop.update.downloadingBody",
+    "desktop.update.uptodateTitle",
     "entities.items.firebottle.name",
     "entities.items.murloc_hut.name",
     "entities.items.restless_skull.name",
@@ -94,13 +129,27 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.widow_hatchling.name",
     "entities.quests.q_no_rest.text",
     "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria"
+    "hudChrome.crafting.dialogOptionAria",
+    "hudChrome.deeds.recentJumpAria"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.deeds.recentJumpAria"
+  ],
+  "zh_TW": [
+    "hudChrome.deeds.recentJumpAria"
+  ],
+  "ko_KR": [
+    "hudChrome.deeds.recentJumpAria"
+  ],
+  "ja_JP": [
+    "hudChrome.deeds.recentJumpAria"
+  ],
   "pt_BR": [
+    "desktop.update.checkingBody",
+    "desktop.update.checkingTitle",
+    "desktop.update.dismiss",
+    "desktop.update.downloadingBody",
+    "desktop.update.uptodateTitle",
     "entities.items.firebottle.name",
     "entities.items.murloc_hut.name",
     "entities.items.restless_skull.name",
@@ -112,10 +161,18 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.widow_hatchling.name",
     "entities.quests.q_no_rest.text",
     "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria"
+    "hudChrome.crafting.dialogOptionAria",
+    "hudChrome.deeds.recentJumpAria"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.deeds.recentJumpAria"
+  ],
   "cs_CZ": [
+    "desktop.update.checkingBody",
+    "desktop.update.checkingTitle",
+    "desktop.update.dismiss",
+    "desktop.update.downloadingBody",
+    "desktop.update.uptodateTitle",
     "entities.items.firebottle.name",
     "entities.items.murloc_hut.name",
     "entities.items.restless_skull.name",
@@ -127,9 +184,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.widow_hatchling.name",
     "entities.quests.q_no_rest.text",
     "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria"
+    "hudChrome.crafting.dialogOptionAria",
+    "hudChrome.deeds.recentJumpAria"
   ],
   "nl_NL": [
+    "desktop.update.checkingBody",
+    "desktop.update.checkingTitle",
+    "desktop.update.dismiss",
+    "desktop.update.downloadingBody",
+    "desktop.update.uptodateTitle",
     "entities.items.firebottle.name",
     "entities.items.murloc_hut.name",
     "entities.items.restless_skull.name",
@@ -141,9 +204,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.widow_hatchling.name",
     "entities.quests.q_no_rest.text",
     "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria"
+    "hudChrome.crafting.dialogOptionAria",
+    "hudChrome.deeds.recentJumpAria"
   ],
   "pl_PL": [
+    "desktop.update.checkingBody",
+    "desktop.update.checkingTitle",
+    "desktop.update.dismiss",
+    "desktop.update.downloadingBody",
+    "desktop.update.uptodateTitle",
     "entities.items.firebottle.name",
     "entities.items.murloc_hut.name",
     "entities.items.restless_skull.name",
@@ -155,9 +224,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.widow_hatchling.name",
     "entities.quests.q_no_rest.text",
     "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria"
+    "hudChrome.crafting.dialogOptionAria",
+    "hudChrome.deeds.recentJumpAria"
   ],
   "id_ID": [
+    "desktop.update.checkingBody",
+    "desktop.update.checkingTitle",
+    "desktop.update.dismiss",
+    "desktop.update.downloadingBody",
+    "desktop.update.uptodateTitle",
     "entities.items.firebottle.name",
     "entities.items.murloc_hut.name",
     "entities.items.restless_skull.name",
@@ -169,9 +244,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.widow_hatchling.name",
     "entities.quests.q_no_rest.text",
     "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria"
+    "hudChrome.crafting.dialogOptionAria",
+    "hudChrome.deeds.recentJumpAria"
   ],
   "tr_TR": [
+    "desktop.update.checkingBody",
+    "desktop.update.checkingTitle",
+    "desktop.update.dismiss",
+    "desktop.update.downloadingBody",
+    "desktop.update.uptodateTitle",
     "entities.items.firebottle.name",
     "entities.items.murloc_hut.name",
     "entities.items.restless_skull.name",
@@ -183,9 +264,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.widow_hatchling.name",
     "entities.quests.q_no_rest.text",
     "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria"
+    "hudChrome.crafting.dialogOptionAria",
+    "hudChrome.deeds.recentJumpAria"
   ],
   "sv_SE": [
+    "desktop.update.checkingBody",
+    "desktop.update.checkingTitle",
+    "desktop.update.dismiss",
+    "desktop.update.downloadingBody",
+    "desktop.update.uptodateTitle",
     "entities.items.firebottle.name",
     "entities.items.murloc_hut.name",
     "entities.items.restless_skull.name",
@@ -197,9 +284,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.widow_hatchling.name",
     "entities.quests.q_no_rest.text",
     "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria"
+    "hudChrome.crafting.dialogOptionAria",
+    "hudChrome.deeds.recentJumpAria"
   ],
   "vi_VN": [
+    "desktop.update.checkingBody",
+    "desktop.update.checkingTitle",
+    "desktop.update.dismiss",
+    "desktop.update.downloadingBody",
+    "desktop.update.uptodateTitle",
     "entities.items.firebottle.name",
     "entities.items.murloc_hut.name",
     "entities.items.restless_skull.name",
@@ -211,9 +304,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.widow_hatchling.name",
     "entities.quests.q_no_rest.text",
     "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria"
+    "hudChrome.crafting.dialogOptionAria",
+    "hudChrome.deeds.recentJumpAria"
   ],
   "da_DK": [
+    "desktop.update.checkingBody",
+    "desktop.update.checkingTitle",
+    "desktop.update.dismiss",
+    "desktop.update.downloadingBody",
+    "desktop.update.uptodateTitle",
     "entities.items.firebottle.name",
     "entities.items.murloc_hut.name",
     "entities.items.restless_skull.name",
@@ -225,6 +324,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.widow_hatchling.name",
     "entities.quests.q_no_rest.text",
     "hudChrome.crafting.dialogOption",
-    "hudChrome.crafting.dialogOptionAria"
+    "hudChrome.crafting.dialogOptionAria",
+    "hudChrome.deeds.recentJumpAria"
   ]
 };

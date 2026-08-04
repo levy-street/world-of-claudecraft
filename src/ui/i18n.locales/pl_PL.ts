@@ -8019,10 +8019,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.quit': 'Zakończ',
   'desktop.crash.reload': 'Załaduj ponownie',
   'desktop.crash.title': 'World of ClaudeCraft',
-  'desktop.update.downloading': 'Pobieranie aktualizacji {version}...',
+  'desktop.update.downloadingTitle': 'Pobieranie aktualizacji {version}...',
   'desktop.update.later': 'Później',
-  'desktop.update.ready':
-    'Aktualizacja {version} jest gotowa. Zainstaluje się przy zamknięciu lub uruchom ponownie teraz.',
+  'desktop.update.readyTitle': 'Aktualizacja {version} jest gotowa',
+  'desktop.update.readyBody': 'Zainstaluje się przy zamknięciu lub uruchom ponownie teraz.',
   'desktop.update.restart': 'Uruchom ponownie teraz',
   'hudChrome.dailyRewards.close': 'Zamknij codzienne nagrody',
   'hudChrome.dailyRewards.endsIn': 'Kończy się za {time}',

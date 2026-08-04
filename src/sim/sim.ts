@@ -4354,6 +4354,14 @@ export class Sim {
   deedsRarity(): Promise<import('../world_api').DeedsRarity | null> {
     return Promise.resolve(null);
   }
+  // Newest-first unlock ids from the live grant order: Map insertion order is
+  // chronological within a session, and the offline save round-trips through
+  // JSON (which preserves key order), so the offline Book keeps true recency
+  // without any clock. Deterministic, no fetch (the deedsRarity doctrine).
+  deedsRecent(): Promise<readonly string[] | null> {
+    const ids = [...this.primary.deedsEarned.keys()];
+    return Promise.resolve(ids.slice(-deedsMod.DEEDS_RECENT_CAP).reverse());
+  }
   raidLockouts(): import('../world_api').RaidLockout[] {
     const now = this.lockoutNowMs();
     const out: import('../world_api').RaidLockout[] = [];

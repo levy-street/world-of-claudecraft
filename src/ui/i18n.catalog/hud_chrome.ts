@@ -3554,6 +3554,7 @@ export const hudChromeStrings = {
     countLabel: '{earned}/{total} deeds',
     completionAria: 'Deeds earned: {earned} of {total}',
     recentLabel: 'Recent:',
+    recentJumpAria: 'Jump to {name}',
     nearestLabel: 'Nearly there:',
     filterGroupAria: 'Filter deeds',
     filterAll: 'All',
