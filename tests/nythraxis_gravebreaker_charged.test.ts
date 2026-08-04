@@ -139,8 +139,11 @@ describe('Nythraxis Gravebreaker as a charged auto-attack', () => {
   it('releases on a landed swing: splash on the front bystander only, same tick, 1.5x, charge consumed', () => {
     // Seed hunted (post-merge camp order) so no avoided swing delays a
     // release inside the 45s window: a held charge compresses the next
-    // release gap below the >=9s cadence floor. Spares: 3, 5.
-    const sim = makeWorld(1);
+    // release gap below the >=9s cadence floor. Re-hunted after the
+    // quest-dedupe content pass shifted the shared stream (seed 1 grew a held
+    // charge and a 7.95s gap); the prior spare 3 releases at 5.30, 15.90,
+    // 29.15, 39.75. Spares: 5, 6.
+    const sim = makeWorld(3);
     const tankPid = sim.addPlayer('warrior', 'Tank');
     const origin = enterRaid(sim, tankPid);
     const tank = sim.entities.get(tankPid)!;

@@ -149,8 +149,17 @@ describe('content referential integrity', () => {
     // spawns are the practice target and the ambient stable horse (both
     // non-combat fixtures by design), plus the Gilded Stag: the farm-yield
     // economy model (tests/economy_yield.test.ts) uses it as the quest-only,
-    // zero-coin exemplar on purpose.
-    const LOOTLESS_FIXTURES = new Set(['training_dummy', 'stable_horse', 'gilded_stag']);
+    // zero-coin exemplar on purpose. The quest-dedupe content pass added the
+    // Broodmother egg clutch (spider_egg): a destructible quest object, not a
+    // combatant (dmgBase 0, moveSpeed 0, aggroRadius 0, xpMult 0, damageable
+    // only on q_broodmother via requiresQuestId), so it is lootless by design
+    // like the other fixtures, not a v0.32.0-style empty-loot regression.
+    const LOOTLESS_FIXTURES = new Set([
+      'training_dummy',
+      'stable_horse',
+      'gilded_stag',
+      'spider_egg',
+    ]);
     const problems: string[] = [];
     const seen = new Set<string>();
     for (const c of CAMPS) {

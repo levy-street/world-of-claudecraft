@@ -361,12 +361,14 @@ describe('Eastbrook polish capture contract', () => {
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
       // Deliberately re-pinned: src/render/renderer.ts is the rendererIntegration
-      // leaf of this composite, and editing it to gate the shapeshift-form visual
-      // swap on async compile (#2571) moves the leaf's own sha256 and, with it,
-      // the composite fingerprint. No GLB source fingerprint moved and no
-      // capture was retaken, following the identical precedent this composite
-      // already carries from the compile-storm gear/mount/base-visual gate fix.
-      fingerprint: '2d4e6e0ee7168a0bf25a13ba1a2754f39e8c8f168e6f369ceb6588fe2bb9b2bb',
+      // leaf of this composite, so any edit to it moves the leaf's own sha256
+      // and, with it, the composite fingerprint. Prior re-pins in this chain:
+      // the compile-storm gear/mount/base-visual gate fix, then gating the
+      // shapeshift-form visual swap on async compile (#2571). This re-pin: the
+      // quest-dedupe content pass added the worldObjectBurning fire-burst cue
+      // (torched murloc huts, q_deepfen_purge) to renderer.ts. No GLB source
+      // fingerprint moved and no capture was retaken, same as every precedent.
+      fingerprint: '22d18ba8d44ea6108109f8e445133edb0bc438995fba980c394c44df05d80a7c',
       components: {
         captureContract: {
           id: 'polish-v2',

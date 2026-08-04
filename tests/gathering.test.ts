@@ -264,12 +264,15 @@ describe('isHarvestableCorpse', () => {
     // 36 since the farm-economy pass: beast, spider and reptile trash pays in
     // harvestable components instead of coin, so 15 previously untagged
     // templates gained mapped tags (tests/economy_yield.test.ts enforces it).
-    expect(included).toHaveLength(36);
-    // ...and the untagged templates are counted rather than assumed: 184 of them
-    // ship, all excluded before this change and all excluded after it, which is
+    // 37 since the zones 1-3 quest-dedupe content pass: threnos_first_voice
+    // ships with a mapped cloth tag.
+    expect(included).toHaveLength(37);
+    // ...and the untagged templates are counted rather than assumed: 188 of them
+    // ship (184 before the quest-dedupe content pass added four untagged camp
+    // mobs), all excluded before this change and all excluded after it, which is
     // the path fen_troll now joins instead of getting one of its own.
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
-    expect(untagged).toHaveLength(184);
+    expect(untagged).toHaveLength(188);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read
