@@ -194,6 +194,38 @@ consolidation and the two reviewers flagged.
       runs the real admin entry point inside the P2, P3 and P4 sweeps, with a
       state-derived destruction term in the oracle. Measured over 3062 runs and 102123
       steps: 0 failures before, 0 after, 2616 purges actually removing a copy.
+- [x] **Loose end (d): the admin dashboard control.** CLOSES deferral (b) recorded under
+      Slice 3 (a PR-review should-fix: the branch shipped a superadmin purge, its audit
+      row, and a full set of t()-keyed operator strings with no component rendering any of
+      it, so the strings alone read as if it were done).
+      - READ: `GET /admin/api/guilds/:id/bank`, both dispatch arms over one shared
+        `guildBankStateOutcome`, permission `moderation.read` (deliberately wider than the
+        superadmin-only purge it serves; the reasoning and the payload boundary are in
+        state.md). It reuses the ungated `guildBankInfoForGuild` snapshot the purge already
+        mutates through rather than inventing a second read, and
+        `server/admin_guild_bank_view.ts` projects it: treasury, capacity, purchasedSlots,
+        usedSlots, dormantSlots, and per slot `index` / `itemId` / `count` / `dormant`.
+        The per-copy instance payload (another character's bind identity) is DROPPED at
+        that boundary; nothing account-scoped rides the response.
+      - UI: `GuildBankPanel` on the guild detail page beside the rename audit, plus
+        `GuildBankPurgeDialog` and the pure `src/admin/guild_bank_purge.ts`. Stuck slots
+        render visibly distinct and are never hidden; the removal is offered on a stuck
+        slot alone and only to `guildbank.purge`; the confirm step shows slot / item /
+        count, takes a reason at the server's 500-char bar, and needs an explicit tick.
+        The `itemId` comes from the listing, never the keyboard, so the server's
+        index-shift guard still means something. Each refusal renders as itself (not
+        stuck or stale, no carrier, guild deleting, save rolled back, bank not loaded)
+        through the ADMIN_ERROR_KEYS rows that already existed: no new operator prose, and
+        no new matcher row, was needed.
+      - Pins: route permission + payload shape + both arms
+        (`tests/server/admin.test.ts`, `tests/admin.test.ts`, `tests/admin_routes.test.ts`),
+        the surface-inventory row and the `adminIdParamDecode` ledger entry, the
+        view/hatch agreement sweep (`tests/server/admin_guild_bank_view.test.ts`), and the
+        component + pure-helper suites (`tests/admin/guild_bank_panel.test.ts`,
+        `tests/admin/guild_bank_purge.test.ts`).
+      - STILL DEFERRED from Slice 3: (a) mail delivery of the purged copy back to its
+        depositor (the book keeps no depositor identity and the mail pipe refuses the same
+        copy).
 
 ## Follow-ups (2026-08-03, branch `feature/guild-bank-followups` off `feature/guild-bank`)
 Three independent slices, one commit each.
@@ -279,6 +311,8 @@ Three independent slices, one commit each.
         discovers slot indices out of band (SQL on `guild_banks`). The six operator error
         strings already carry their `ADMIN_ERROR_KEYS` matcher rows and English catalog
         entries so the UI follow-up is drop-in.
+        DEFERRAL (b) IS NOW CLOSED: see "Loose end (d): the admin dashboard control"
+        above. (a) still stands.
 
 - [x] **Slice 3 review pass** (privacy-security-review CHANGES REQUESTED 0 BLOCKING /
       3 SHOULD-FIX / 8 NIT; architecture-reviewer 0 BLOCKING / 5 SHOULD-FIX / 6 NOTE).

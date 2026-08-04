@@ -892,17 +892,45 @@ What remains accepted:
   inverse, the replay-equivalent netting (`netGuildBankOpLogForReplay`), and the
   unflushed-log compactor (`compactGuildBankOpLog`), so an operator purge can never be
   the one delta a compaction or a netted rescue silently drops.
-  Three accepted limits: the purge needs a live session OF THAT GUILD to carry the escrow
-  save (books never persist standalone), so it refuses `no_carrier` when nobody from the
-  guild is online (the carrier is chosen off the session membership stamp, so a stale
+  Two accepted limits remain: the purge needs a live session OF THAT GUILD to carry the
+  escrow save (books never persist standalone), so it refuses `no_carrier` when nobody from
+  the guild is online (the carrier is chosen off the session membership stamp, so a stale
   ex-member can still carry: harmless, it only lends its escrow transaction and is never
-  charged, credited, or named as the actor); it PURGES rather than mailing the copy back
-  (the book keeps no depositor identity, and the mail pipe refuses the same copy); and
-  there is no admin READ surface yet, so an operator discovers slot indices out of band
-  (SQL on `guild_banks`) until the UI follow-up. The admin dashboard control is that
-  follow-up: it needs a guild-bank read endpoint (slot list with indices + dormant flags)
-  plus a confirm flow; the operator error strings already carry their ADMIN_ERROR_KEYS
-  matcher rows and English catalog entries so it is drop-in.
+  charged, credited, or named as the actor); and it PURGES rather than mailing the copy
+  back (the book keeps no depositor identity, and the mail pipe refuses the same copy).
+  THE READ + UI DEFERRAL IS CLOSED (2026-08-03), so an operator no longer discovers slot
+  indices out of band with SQL on `guild_banks`:
+  - `GET /admin/api/guilds/:id/bank` (both dispatch arms over one shared body,
+    `guildBankStateOutcome`) -> `GameServer.adminGuildBankState` -> the SAME ungated
+    `guildBankInfoForGuild` snapshot the purge mutates through, so a listing and the
+    refusal that may follow it cannot disagree, projected by
+    `server/admin_guild_bank_view.ts` into treasury, capacity, purchasedSlots, usedSlots,
+    dormantSlots, and one row per slot (`index`, `itemId`, `count`, `dormant`). The
+    dormant flag IS `guildBankPipeRefusal(slot) !== null`, the hatch's own predicate, so
+    what the panel offers is exactly what the hatch accepts (pinned by driving both over
+    one book in `tests/server/admin_guild_bank_view.test.ts`).
+  - PERMISSION `moderation.read`, deliberately WIDER than the superadmin-only
+    `guildbank.purge` it serves: reading destroys nothing, and "is this guild's bank
+    stuck?" is what whoever picks up the ticket must answer before there is anything to
+    escalate, so gating discovery at the destructive permission would make a moderator
+    escalate blind. It is `moderation.read` rather than the detail page's own
+    `accounts.read` because a guild's pooled property is private business, so it sits with
+    the sibling rename-audit panel rather than with the roster.
+  - THE PROJECTION IS THE PRIVACY BOUNDARY. The source read is deliberately UNprojected
+    (the ledger row needs the real payload as evidence), so the view DROPS the per-copy
+    `instance` payload rather than reshaping it: no `boundTo`, no armed `bindOnTrade`, and
+    nothing account-scoped (no account id, character id or name, realm, or IP) reaches the
+    dashboard. Pinned at both layers (the view test and the route's payload-shape test).
+  - The dashboard control is `src/admin/components/GuildBankPanel.svelte` plus
+    `GuildBankPurgeDialog.svelte` and the pure `src/admin/guild_bank_purge.ts`. A stuck
+    slot renders visibly distinct and is never hidden (the in-game Guild tab's rule), the
+    removal is offered on a stuck slot ALONE and only to `guildbank.purge`, and the
+    request carries the `itemId` LISTED at that index rather than a typed one: the
+    stale-listing guard only means something if the token comes from the same read the
+    index did. Every refusal renders as itself through the ADMIN_ERROR_KEYS rows that
+    already existed (no new operator prose was minted), a refusal keeps the dialog open
+    and refetches the listing, and a 200 with `audited: false` says the item went but its
+    moderation row did not.
 - Guild bank incidents are metered (2026-08-03): `woc_guild_bank_incidents_total{kind}`
   over the fixed NINE `GUILD_BANK_INCIDENTS` (escrow_save_failed, escrow_refused_retry,
   save_fenced_out, escrow_quarantined, reconcile, book_unloaded, ledger_write_failed,
