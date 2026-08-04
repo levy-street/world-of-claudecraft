@@ -38,7 +38,7 @@ read wrong.
 | 1.3 | Marsh | Spear sits **sideways** in the animations | `pole` is `(0, 0, 0)`. Needs its own grid pass in `Idle`, `Block` AND `1H_Melee_Attack_Chop`: a pose that reads at rest can still be wrong mid-swing, and this one is wrong in Idle too. | FIX |
 | 1.4 | Ollun | Staff is **upside down** (brass crown at the bottom) | `stave` is `(90, 0, 0)`; invert to `(-90, 0, 0)`. Grid it in `Idle` AND `Spellcast_Raise`: the inversion only reads in raised-arm clips. | FIX |
 | 1.5 | Ollun | Holds the open journal **like a shield**, out in front | Remove `tools/journal_open.glb` from his `weapons` in `cast.py` (one line). If the record should stay visible, a closed book at the hip is a small `parts.plate` two-slab plus strap skinned to the hips in `build_ollun`, same idiom as the satchel. Preference stands: closed book at the hip or satchel only. | FIX (removal) / OPEN (hip book) |
-| 1.6 | Ewald | Should carry **no weapon at all** | Remove the boat gaff from his `weapons` list. His outfit carries him without it. | FIX |
+| 1.6 | Ewald | Should carry **no weapon at all** | Remove the boat gaff from his `weapons` list. His outfit carries him without it. | **DONE** |
 | 1.7 | Edda | Remove the second-hand item, keep only the hammer | Drop `tools/tongs.glb` from her `weapons`. | FIX |
 | 1.8 | Saul | Not holding the lantern properly | Direction proposed: take it out of the hand entirely and **hang it from his belt at the left hip** (strap loop plus lantern skinned to the hips in `build_saul`, same idiom as the satchel and tool roll), with warm emissive glass (see 2.16). Reads in every clip from every angle, no wrist-rotation failure mode, and makes "the one person whose hands are the tools" literally true with both hands empty. Fallback stays the recorded one: remove it. In-hand is the worst of the three options. | OPEN (belt hang proposed) |
 | 1.9 | Marsh | Spear reads as a **tribal** spear, not a warrior's | `spear_a.glb` is the only spear in the kit and it is the tribal one. Either re-point him at a different shipped polearm (`halberd.glb`) or generate a plain militia spear through the Tripo pipeline (section 4). Whichever route: also raise the `pole` grip scale from 0.62 toward 0.8 in the same pass; at current scale the spear is a torso and a half long and reads as a javelin, not a road-holder. | OPEN |
@@ -95,7 +95,7 @@ unless the row says otherwise.
 
 | # | Figure | Defect | Fix | Status |
 |---|---|---|---|---|
-| 2.1 | Ewald | **Haircut pokes through the hat.** The hat itself is the best thing in the pass and stays exactly as it is. | Preferred: re-UV the hair to the oilskin cell (`crew.reuv(head, "hair", "cloth")` in `build_ewald`), the way Ollun's is, so anything that pokes through reads as hat. The hat geometry stays byte-identical, which is the point: it is the approved item. Growing the crown pad instead risks a bulbous crown. Side effect of the re-UV, arguably a bonus: the under-brim hair at ears and nape turns oilskin and reads as a sou'wester neck flap. | FIX |
+| 2.1 | Ewald | **Haircut pokes through the hat.** The hat itself is the best thing in the pass and stays exactly as it is. | Solved GEOMETRICALLY, not by recolour: `parts.tuck_under_hat` pulls the head mesh's hair vertices above the brim line inward, ramped with height, so the crown silhouette is the hat's alone. Chosen over the re-UV because a recolour only hides the poke-through, it does not remove it: the geometry still breaks the outline, it just stops being a different colour. Hair below the brim (ears, nape) is untouched and still reads. ORDER IS LOAD-BEARING: the hat is fitted FIRST off the untouched skull, then the hair is tucked. Tucking first shrinks the profile `souwester` measures and silently re-sizes the approved hat. | **DONE** |
 | 2.2 | Saul | "Some messed up things on the front of his shirt" | The four apron patches, unequally guilty: the two white linen ones read as stickers, the leather one reads as a **hole** in the apron, and the tonal canvas one actually reads as a repair. Keep the tonal canvas patch plus ONE enlarged linen patch, drop the other two, and seat them flatter (smaller standoff, thinner). Same numbers pass: pull the whole bib and skirt standoff in slightly; from the side the apron currently reads as a sandwich board with an air gap (`saul_turn_02`, `saul_turn_10`). | FIX |
 | 2.3 | Tam | Reads too much like a **shaman**. Needs normal town clothes. | Drivers ranked by guilt, from the renders: (1) bare torso and arms, shirtless-under-pelt is the core shaman read; (2) the **fang necklace**, trophy teeth are the loudest single signal; (3) the jagged teal fur mantle and zigzag hems; (4) the belt of large pale discs reading as talisman stones. The teal HUE is innocent: it is his entity colour, and the palette chip already promises "the bell-keeper's coat" that the render never delivers. Full recipe below the table. | FIX |
 | 2.4 | Tam | Needs **hair** (currently bald) | Route now known, no Tripo needed: a short cropped **grey horseshoe band**, temple around the nape to temple, bald crown kept (nobody else in the cast is balding, the elder dome is a good silhouette), joining the existing beard line. Build it as a `parts.hug_profile` band hugging the skull (the `parts.souwester` technique), painted the grey hair ramp `build_tam` ALREADY authors and the bald head never samples. Tripo only if the faceted band fails at bust size. Also fixes the worst back view in the cast: `tam_turn_06` currently reads as one continuous naked mass, bald dome into bare back. | FIX |
@@ -381,17 +381,28 @@ the sim entity colour so the runtime tint reinforces instead of vanishing
 
 ## 5. Review-page requirement
 
-**The page must play the animations, not just show stills.** Idle, walk,
-`1H_Melee_Attack_Chop` and Block, per figure, playable, so poses and props can be
-judged in motion. Static plates hid exactly the defects in section 1: a shield
-that reads fine standing still is obviously reversed once it moves.
+**DONE.** Idle, walk, the attack and Block now play per figure under "In motion",
+with a pause-all control, honouring `prefers-reduced-motion`.
 
-Implementation: render each clip as a frame sequence, stitch to one sprite sheet
-per clip, and drive it with a CSS `steps()` animation plus a play or pause control.
-Sprite sheets rather than one file per frame keeps the request count and the
-committed weight sane.
+Static plates hid exactly the defects in section 1: a shield that reads fine
+standing still is obviously reversed once it moves.
 
-Second-pass addition: **the bind-pose turntable systematically misrepresents
+Implementation as landed: `plates.py` samples 12 frames across each clip from ONE
+fixed camera station (the pose plates re-fit per frame, which would make a walk
+cycle bob in and out), `build_concept_book.mjs` stitches them to a sprite sheet,
+and CSS `steps()` walks it with no JS timer.
+
+Two traps worth recording, both hit on the way:
+
+- The sheet carries **N+1 cells**, the last a duplicate of the first. With
+  percentage `background-position`, 0 percent aligns the image's left edge and 100
+  percent its right, so the reachable range is `(cells - 1)` cell widths. Padding
+  to N+1 makes `steps(N)` land exactly on cells 0 to N-1 and wrap clean; without
+  it every step lands a fraction of a cell off and the animation smears.
+- `aspect-ratio` takes **unitless** numbers. Feeding it `px` values is invalid and
+  collapses the stage to zero height.
+
+Still open from the second pass: **the bind-pose turntable systematically misrepresents
 every held prop** (the shield reads as a serving tray, the sword as an antenna,
 and Saul's lantern reads correct ONLY in T-pose), and it hides grip defects by
 construction; even after the section 1 fixes it will contradict the posed

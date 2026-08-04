@@ -22,6 +22,7 @@ import bpy
 import math
 from mathutils import Matrix, Vector
 
+import atlas
 from atlas import cell_uv
 
 TAU = math.tau
@@ -292,6 +293,62 @@ def hood(name, host, cell, shade_t=0.34, material=None, sides=18, rings=5,
     for si in range(sides):
         faces.append((cap, top + (si + 1) % sides, top + si))
     return mesh_from(name, verts, faces, cell, shade_t, material)
+
+
+def tuck_under_hat(host, cell, z_floor, shrink=0.80, ease=0.55, drop=0.02,
+                   slots=None):
+    """Pull a host's HAIR vertices in under a hat, in place.
+
+    Surgical on purpose. The alternative fix, re-UV'ing the hair to the hat's
+    colour, hides the poke-through by recolouring it: the geometry still breaks
+    the hat's silhouette, it just stops being a different colour. This moves the
+    offending vertices instead, so the hat's outline is the hat's outline.
+
+    Only vertices ABOVE `z_floor` (the brim line) and only those whose UVs sit in
+    `cell` are touched, so the hair below the brim, at the ears and the nape, is
+    left exactly as authored. The shrink ramps in with height (`ease`), because a
+    hat narrows toward the crown and so must the tuck; `drop` settles the crown
+    hair a little as it comes in, which keeps it from tenting the hat's top.
+
+    Returns the number of vertices moved, so a build can assert it did something.
+    """
+    mesh = host.data
+    addr = (slots or atlas.active_slots()).get(cell, cell)
+    row, col = int(addr[1]), int(addr[3])
+    uvl = mesh.uv_layers.active.data
+
+    # Which vertices belong to the hair? A vertex is hair if any loop on it
+    # samples the hair cell.
+    hair = set()
+    for poly in mesh.polygons:
+        for li in poly.loop_indices:
+            u, v = uvl[li].uv
+            if int(u * atlas.COLS) == col and int((1.0 - v) * atlas.ROWS) == row:
+                hair.update(poly.vertices)
+                break
+
+    pts = [host.matrix_world @ vert.co for vert in mesh.vertices]
+    top = max(p.z for p in pts)
+    if top <= z_floor:
+        return 0
+    inv = host.matrix_world.inverted()
+    cx = (min(p.x for p in pts) + max(p.x for p in pts)) / 2
+    cy = (min(p.y for p in pts) + max(p.y for p in pts)) / 2
+
+    moved = 0
+    for idx in hair:
+        world = host.matrix_world @ mesh.vertices[idx].co
+        if world.z <= z_floor:
+            continue
+        # 0 at the brim, 1 at the crown, eased so the tuck comes in gently
+        t = min(1.0, (world.z - z_floor) / max(top - z_floor, 1e-6)) ** ease
+        factor = 1.0 - (1.0 - shrink) * t
+        world.x = cx + (world.x - cx) * factor
+        world.y = cy + (world.y - cy) * factor
+        world.z -= drop * t
+        mesh.vertices[idx].co = inv @ world
+        moved += 1
+    return moved
 
 
 def souwester(name, host, cell, shade_t=0.30, material=None, sides=20,

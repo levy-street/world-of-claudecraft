@@ -412,8 +412,17 @@ def build_ewald():
     img, mat = crew.repaint(meshes, "ewald", palette)
     body, head = _body(meshes), _body(meshes, HEAD)
 
+    # The hat is the approved item and its geometry must not change, so it is FITTED
+    # FIRST, off the untouched skull. Only then is the HAIR that was breaking its
+    # silhouette tucked inward. Tucking first shrinks the profile `souwester`
+    # measures and quietly re-sizes the approved hat, which is the one thing this
+    # fix is not allowed to do.
+    BRIM_Z = 1.92
     built = [parts.souwester("Ewald_Souwester", head, "cloth", shade_t=0.22,
-                             material=mat, brim=0.30, tail=0.60)]
+                             material=mat, brim=0.30, tail=0.60, brim_z=BRIM_Z)]
+    tucked = parts.tuck_under_hat(head, "hair", BRIM_Z, shrink=0.78, ease=0.55)
+    if not tucked:
+        raise ValueError("Ewald: no hair vertices tucked; the hat will still be pierced")
     # THE FARE TIN on a neck cord, chest height, reachable
     front = parts.surface_front(body, 1.020) or -0.30
     built.append(parts.strap("Ewald_TinCord", [
