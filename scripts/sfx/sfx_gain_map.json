@@ -154,9 +154,11 @@
     "quest_complete": 4.5,
     "quest_ready": 8.2,
     "scorch": 5.3,
+    "shadowstep": 5.3,
     "spell_nova": 4.5,
     "ui_achievement": 4.8,
     "ui_level_up": 5.0,
+    "vanish": 6.3,
     "wand_arcane": 5.2,
     "wand_holy": 5.3,
     "wand_shadow": 5.2

@@ -410,7 +410,7 @@ describe('combat SFX policy', () => {
     ).toBe('impact_arcane');
   });
 
-  it('gives Blink its own teleport cue; Shadowstep (same blinkForward effect) stays silent', () => {
+  it('gives Blink and Shadowstep their own teleport cue (same blinkForward effect)', () => {
     expect(
       spellFxCue({
         type: 'spellfx',
@@ -429,6 +429,17 @@ describe('combat SFX policy', () => {
         school: 'physical',
         fx: 'blinkStep',
         ability: 'shadowstep',
+      }),
+    ).toEqual({ key: 'shadowstep', anchorId: 10 });
+    // An ability sharing the effect with no recording of its own stays silent.
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 10,
+        school: 'physical',
+        fx: 'blinkStep',
+        ability: 'heroic_leap',
       }),
     ).toBeNull();
   });
@@ -570,6 +581,13 @@ describe('combat SFX policy', () => {
     );
     // Every other absorb shield keeps the shared chime.
     expect(auraApplyCue(gained, { ...aura('absorb'), id: 'power_word_shield' })).toBe('buff_apply');
+  });
+
+  it('gives Vanish its own apply cue too (a toggle stealth selfBuff, same apply path)', () => {
+    const gained = { type: 'aura', targetId: 1, name: 'Test Aura', gained: true } as const;
+    expect(auraApplyCue(gained, { ...aura('stealth'), id: 'vanish' })).toBe('vanish');
+    // Rogue Stealth (the base ability, not the Vanish cooldown) keeps the shared chime.
+    expect(auraApplyCue(gained, { ...aura('stealth'), id: 'stealth' })).toBe('buff_apply');
   });
 
   it('uses unarmed swings in both druid combat forms', () => {

@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "0d4309c412dd71d337d937308ae72b5a088d58c749af98786c6dbd24e3285a0b",
-  "catalogHash": "e3f813a937843693097219af1277df5b80097f55d66d08901756e043440bc9cf",
+  "bundleId": "8edb9c60cc73a8ca57897760c7a17424bf8e5ef5dc1d5396355cd40bfce41eb2",
+  "catalogHash": "c818596c3614804241aaa70a1bf47db3ecc05bd0ab8be9b0123c4fc4e2cf2a1b",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -3172,6 +3172,18 @@
       "gain": 1.840772,
       "playbackRate": 1
     },
+    "shadowstep": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/shadowstep.mp3?v=48340db25382",
+          "bytes": 18224,
+          "sha256": "48340db253824ef7e05bb0226b44b915dedb24eab4e071fececce5d2ce248413"
+        }
+      ],
+      "gain": 1.840772,
+      "playbackRate": 1
+    },
     "spell_nova": {
       "variants": [
         {
@@ -4124,6 +4136,18 @@
         }
       ],
       "gain": 1,
+      "playbackRate": 1
+    },
+    "vanish": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/vanish.mp3?v=a3722758320e",
+          "bytes": 30763,
+          "sha256": "a3722758320ee78d59e635baa95adf1bda8165dd157758214819d26f2fd77991"
+        }
+      ],
+      "gain": 2.06538,
       "playbackRate": 1
     },
     "wand_arcane": {

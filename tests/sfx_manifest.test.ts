@@ -162,9 +162,9 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the release catalog, all 8 mount cues, and all 62 UI cues in one 234-key inventory', () => {
+  it('keeps the release catalog, all 8 mount cues, and all 62 UI cues in one 236-key inventory', () => {
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(234);
+    expect(keys.size).toBe(236);
     expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(62);
     for (const key of [
       'cast_lightning_bolt',
@@ -200,6 +200,8 @@ describe('buildManifest', () => {
       'blizzard',
       'blink',
       'arcane_blast',
+      'shadowstep',
+      'vanish',
     ]) {
       expect(keys.has(key), key).toBe(true);
     }
@@ -212,7 +214,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(234);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(236);
   });
 });
 

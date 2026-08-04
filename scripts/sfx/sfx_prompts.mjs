@@ -477,6 +477,14 @@ export const SFX = [
     key: 'arcane_blast',
     custom: true,
   },
+  {
+    key: 'shadowstep',
+    custom: true,
+  },
+  {
+    key: 'vanish',
+    custom: true,
+  },
 
   // --- Heals & auras --------------------------------------------------------
   {
