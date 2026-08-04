@@ -2501,8 +2501,15 @@ export class Renderer {
     };
     this.vfx = new Vfx(this.scene, vfxAnchor);
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
-    this.abilityVfxFx = new AbilityVfxFx(this.scene, this.camera, vfxAnchor, (x, z) =>
-      groundHeight(x, z, this.sim.cfg.seed),
+    this.abilityVfxFx = new AbilityVfxFx(
+      this.scene,
+      this.camera,
+      vfxAnchor,
+      (x, z) => groundHeight(x, z, this.sim.cfg.seed),
+      // the DISPLAYED facing, not e.facing: the view group carries the smoothed
+      // yaw actually on screen, so a stationary spirit lines up with the body it
+      // is rising out of instead of with a pose one frame ahead of the draw
+      (id) => this.views.get(id)?.group.rotation.y ?? this.sim.entities.get(id)?.facing ?? null,
     );
     this.abilityVfxFx.setViewportScale(
       this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(),
