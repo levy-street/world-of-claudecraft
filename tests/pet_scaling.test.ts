@@ -120,6 +120,23 @@ describe('pet_scaling: heel speed', () => {
     const fastest = RUN_SPEED * 1.8;
     expect(petHeelSpeed(8, fastest)).toBeGreaterThan(fastest);
   });
+
+  it('tracks a non-mount speed buff on the owner', () => {
+    // moveSpeedMult folds buffs and mounts alike, so a Courser's Guise owner pulls
+    // the pet along the same way a mount does.
+    const buffed = RUN_SPEED * 1.3;
+    expect(petHeelSpeed(5.2, buffed)).toBeCloseTo(buffed * PET_CATCHUP_SPEED_MULT, 5);
+  });
+
+  it('does not sprint a pet past a snared owner', () => {
+    // The deliberate other half of tracking the owner: behind a slowed owner the pet
+    // now falls back to its OWN speed instead of the old flat 7.7 floor. It still
+    // closes, because its own speed comfortably beats the snared owner's.
+    const snared = RUN_SPEED * 0.5;
+    expect(petHeelSpeed(5.2, snared)).toBe(5.2);
+    expect(petHeelSpeed(5.2, snared)).toBeLessThan(RUN_SPEED * 1.1);
+    expect(petHeelSpeed(5.2, snared)).toBeGreaterThan(snared);
+  });
 });
 
 describe('pet_scaling: a tamed beast inherits from its hunter', () => {
@@ -138,10 +155,28 @@ describe('pet_scaling: a tamed beast inherits from its hunter', () => {
     expect(pet.attackPower).toBeGreaterThan(0);
   });
 
+  it('inherits on a same-level tame, where syncPetLevel does nothing', () => {
+    // syncPetLevel early-returns when the pet is already the owner's level, so this
+    // is the ONLY case that exercises completeTame's own scaling call, and it is the
+    // common one in play (and what the balance sweep does).
+    const { sim, hid, hunter } = hunterWorld(20);
+    completeTame(sim.ctx, hunter, spawnWolf(sim, hunter, 20));
+    const pet = petOf(sim.ctx, hid) as AnyEntity;
+    expect(pet.level).toBe(hunter.level);
+    const share = petOwnerScaling(ownerStats(hunter));
+    expect(pet.maxHp).toBe(templateHp('forest_wolf', 20) + share.hp);
+    expect(pet.hp).toBe(pet.maxHp);
+    expect(pet.attackPower).toBe(share.attackPower);
+    expect(pet.attackPower).toBeGreaterThan(0);
+  });
+
   it('adds the owner armor share on top of the template armor', () => {
     const { hunter, pet } = tamedWolf();
-    const baseArmor = Math.round(MOBS.forest_wolf.armorPerLevel * (pet.level - 1));
-    expect(pet.stats.armor).toBe(baseArmor + petOwnerScaling(ownerStats(hunter)).armor);
+    // Derive the template half from the real producer, not from a copy of the
+    // formula the implementation uses, so the two cannot move together silently.
+    const fresh = createMob(-1, MOBS.forest_wolf, pet.level, pet.pos) as AnyEntity;
+    expect(pet.stats.armor).toBe(fresh.stats.armor + petOwnerScaling(ownerStats(hunter)).armor);
+    expect(pet.stats.armor).toBeGreaterThan(fresh.stats.armor);
   });
 
   it('compresses the tame lottery: a starter beast gains proportionally more', () => {
@@ -180,10 +215,15 @@ describe('pet_scaling: re-deriving is safe', () => {
 
   it('clamps a shrinking pet into the smaller pool instead of overflowing', () => {
     const { sim, hunter, pet } = tamedWolf();
+    const base = templateHp('forest_wolf', pet.level);
     hunter.maxHp = Math.round(hunter.maxHp / 2);
+    const smaller = petOwnerScaling(ownerStats(hunter)).hp;
     applyPetOwnerScaling(sim.ctx, pet);
-    expect(pet.hp).toBeLessThanOrEqual(pet.maxHp);
-    expect(pet.maxHp).toBeGreaterThan(0);
+    // Exact pool and exact health, not merely "hp <= maxHp", which almost any
+    // implementation satisfies (including one that zeroes the pool).
+    expect(pet.maxHp).toBe(base + smaller);
+    expect(pet.petOwnerHpBonus).toBe(smaller);
+    expect(pet.hp).toBe(pet.maxHp); // was at full, so it stays capped at full
   });
 
   it('never revives a dead pet by growing its pool', () => {

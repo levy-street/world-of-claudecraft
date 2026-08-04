@@ -2,7 +2,12 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
 import * as esbuild from 'esbuild';
-import { engagementDistance } from './lib/sweep_engagement.mjs';
+import {
+  attributeSweepDamage,
+  DAMAGE_EFFECTS,
+  engagementDistance,
+  station,
+} from './lib/sweep_engagement.mjs';
 
 const root = process.cwd();
 const outDir = path.join(root, 'docs', 'balance');
@@ -42,17 +47,6 @@ const dataUrl = `data:text/javascript;base64,${Buffer.from(build.outputFiles[0].
 const { ALL_CLASSES, CHOICE_ROWS, CLASSES, MOBS, MAX_LEVEL, Sim, TALENTS, createMob } =
   await import(dataUrl);
 
-const damageEffects = new Set([
-  'aoeDamage',
-  'aoeRoot',
-  'directDamage',
-  'dot',
-  'drainTick',
-  'finisherDamage',
-  'groundAoE',
-  'weaponDamage',
-  'weaponStrike',
-]);
 const healingEffects = new Set(['aoeHeal', 'heal', 'hot']);
 // Real healers only. The hunter was in this set, which pinned it to 60% health every
 // tick and re-pointed its heal abilities at itself, so the sweep spent the hunter's
@@ -122,31 +116,22 @@ function pinDummy(dummy, pos) {
   dummy.vz = 0;
 }
 
-// Hold the character at its engagement distance. Closes like the old approach() did,
-// and now also backs off, so a class with a minimum range (the hunter's 8 yd dead
-// zone) is not parked inside it with its whole kit refusing to fire.
-function station(player, target, reach) {
-  const dx = target.pos.x - player.pos.x;
-  const dz = target.pos.z - player.pos.z;
-  const dist = Math.hypot(dx, dz);
-  if (dist === 0 || player.castingAbility) return;
-  const gap = dist - reach;
-  if (Math.abs(gap) < 0.05) return;
-  const step = Math.sign(gap) * Math.min(Math.abs(gap), approachSpeed / ticksPerSecond);
-  player.pos.x += (dx / dist) * step;
-  player.pos.z += (dz / dist) * step;
-}
-
 // Give a pet class its pet before the run. Hunters tame through the real ability so
 // the pet goes through completeTame/syncPetLevel exactly as it would in play.
 function equipPet(sim, cls, pid, player) {
   const summon = { warlock: 'summon_felguard', mage: 'summon_water_elemental' }[cls];
   if (summon) {
+    // Spec-gated summons (the mage Water Elemental is frost-only, and this sweep
+    // always runs specs[0]) are simply absent for most builds. Only insist on a pet
+    // when the build can actually cast for one.
+    if (!sim.meta(pid).known.some((ability) => ability.def.id === summon)) return;
     sim.castAbility(summon, pid);
     for (let i = 0; i < 4 * ticksPerSecond; i++) sim.tick();
+    requirePet(sim, cls, pid);
     return;
   }
   if (cls !== 'hunter') return;
+  if (!MOBS[sweepTameTemplate]) throw new Error(`unknown tame template ${sweepTameTemplate}`);
   const beast = createMob(sim.nextId++, MOBS[sweepTameTemplate], MAX_LEVEL, {
     x: player.pos.x + 3,
     y: player.pos.y,
@@ -157,6 +142,15 @@ function equipPet(sim, cls, pid, player) {
   sim.targetEntity(beast.id, pid);
   sim.castAbility('tame_beast', pid);
   for (let i = 0; i < 7 * ticksPerSecond; i++) sim.tick();
+  requirePet(sim, cls, pid);
+}
+
+// A silently petless run reads as a low class score, which is exactly the defect
+// this sweep was fixed for. Fail loudly instead if a cast time, cooldown, or id
+// drifts out from under the fixed tick budgets above.
+function requirePet(sim, cls, pid) {
+  for (const e of sim.entities.values()) if (e.kind === 'mob' && e.ownerId === pid) return;
+  throw new Error(`${cls}: expected a pet after setup, got none`);
 }
 
 function optionIds(build) {
@@ -183,16 +177,11 @@ function runBuild(cls, build, seconds) {
   let healing = 0;
   sim.emit = (event) => {
     if (event?.type === 'damage' && event.targetId === dummy.id) {
-      if (event.sourceId === pid) {
-        damage += event.amount || 0;
-      } else {
-        // A controlled pet's output is its owner's on every real meter, so count it
-        // here too rather than dropping roughly half of a pet class's damage.
-        const source = sim.entities.get(event.sourceId);
-        if (source && source.kind === 'mob' && source.ownerId === pid) {
-          petDamage += event.amount || 0;
-        }
-      }
+      // A controlled pet's output is its owner's on every real meter, so count it
+      // here too rather than dropping roughly half of a pet class's damage.
+      const who = attributeSweepDamage(event.sourceId, pid, sim.entities.get(event.sourceId));
+      if (who === 'player') damage += event.amount || 0;
+      else if (who === 'pet') petDamage += event.amount || 0;
     }
     if (
       (event?.type === 'heal' || event?.type === 'heal2') &&
@@ -206,11 +195,11 @@ function runBuild(cls, build, seconds) {
   const known = sim.meta(pid).known;
   const actionIds = known
     .filter(
-      (ability) => hasAnyEffect(ability, damageEffects) || hasAnyEffect(ability, healingEffects),
+      (ability) => hasAnyEffect(ability, DAMAGE_EFFECTS) || hasAnyEffect(ability, healingEffects),
     )
     .map((ability) => ability.def.id);
   const reach = engagementDistance(
-    known.filter((ability) => hasAnyEffect(ability, damageEffects)).map((ability) => ability.def),
+    known.filter((ability) => hasAnyEffect(ability, DAMAGE_EFFECTS)).map((ability) => ability.def),
     CLASSES[cls]?.ranged,
   );
   let actionCursor = 0;
@@ -224,7 +213,7 @@ function runBuild(cls, build, seconds) {
       player.hp = Math.floor(player.maxHp * 0.6);
     face(player, dummy);
     sim.targetEntity(dummy.id, pid);
-    station(player, dummy, reach);
+    station(player, dummy, reach, approachSpeed, ticksPerSecond);
 
     if (!player.castingAbility && player.gcdRemaining <= 0 && actionIds.length > 0) {
       for (let scan = 0; scan < actionIds.length; scan++) {

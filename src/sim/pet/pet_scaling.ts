@@ -28,9 +28,13 @@ import type { MobFamily } from '../types';
  */
 export const TAMEABLE_FAMILIES: readonly MobFamily[] = ['beast', 'spider'];
 
+// Set lookup rather than a scan of the array above: the scaling gate consults this
+// for every hunter pet on every tick.
+const TAMEABLE_FAMILY_SET: ReadonlySet<MobFamily> = new Set(TAMEABLE_FAMILIES);
+
 /** Whether a hunter can tame this family (and so whether its pets inherit). */
 export function isTameableFamily(family: MobFamily): boolean {
-  return TAMEABLE_FAMILIES.includes(family);
+  return TAMEABLE_FAMILY_SET.has(family);
 }
 
 /**
