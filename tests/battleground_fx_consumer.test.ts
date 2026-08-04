@@ -29,6 +29,7 @@ function bgInfo(flags: [BgFlagInfo, BgFlagInfo]): BgInfo {
     queued: false,
     queueSize: 0,
     queuedParty: 0,
+    ladder: [],
     match: {
       state: 'active',
       myTeam: 0,

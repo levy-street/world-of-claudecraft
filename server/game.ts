@@ -101,6 +101,7 @@ import { isAtSowfield } from '../src/sim/vale_cup_layout';
 import { WORLD_SEED } from '../src/sim/world_seed';
 import {
   type BankBonusSource,
+  type BgLadderEntry,
   COMMAND_NAMES,
   type CommandName,
   type DungeonFinderBoard,
@@ -1648,6 +1649,14 @@ export class GameServer {
   // above there is no realm-global dueness tracker: each session keeps its own
   // lastDfWireTick gate, and the memo only collapses same-tick evaluations.
   private readonly dfBoardReadout = createRealmReadoutMemo<DungeonFinderBoard>();
+  // Live Thornhollow Fields online ladder, the memo's third tenant. It rides
+  // INSIDE each viewer's own `bg` key (so no shared JSON fragment of its own,
+  // hence realmReadoutObject and never realmReadoutJson), but the ROWS are
+  // viewer-identical and scanning every online player once per session per
+  // BG_WIRE_HZ tick is exactly the uncached viewer-identical read the hot-path
+  // rules call a defect. Built once per broadcast pass and handed to every
+  // bgInfoFor call in that pass instead.
+  private readonly bgLadderReadout = createRealmReadoutMemo<BgLadderEntry[]>();
   // When the realm-wide Vale Cup readout is next due, tracked realm-global (not
   // per session) so every viewer still gates together in one pass and the memo
   // above builds once. `>=` against this, never `tickCount % interval`:
@@ -8132,7 +8141,13 @@ export class GameServer {
     // in-match viewers share one build; only the per-viewer scalars differ.
     if (this.sim.tickCount - session.lastBgWireTick >= BG_WIRE_INTERVAL_TICKS) {
       session.lastBgWireTick = this.sim.tickCount;
-      maybe('bg', this.sim.bgInfoFor(anchorSession.pid));
+      // The live online ladder inside that readout is realm-wide and identical
+      // for every viewer, so it is built once per broadcast pass through the
+      // realm-readout memo and reused (the dfb/vcupb precedent).
+      const ladder = realmReadoutObject(this.bgLadderReadout, this.sim.tickCount, () =>
+        this.sim.bgLadder(),
+      );
+      maybe('bg', this.sim.bgInfoFor(anchorSession.pid, ladder));
     }
     // Vale Cup readout at its own UI cadence (VC_WIRE_HZ). Dueness (`vcupDue`) is
     // decided once per broadcast pass in broadcastSnapshots and realm-global, so the

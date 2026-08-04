@@ -50,6 +50,30 @@ describe('arena_window: WCAG chrome (focusable controls + focus-return)', () => 
     expect(code).toContain('this.openerFocus = this.deps.captureFocus()');
   });
 
+  // Both ranked tabs now carry the same two ladder sections in the same order:
+  // who is online right now, then the all-time board. The Thornhollow arm
+  // reuses the arena's ladder-row markup family rather than a bespoke one.
+  it('renders the live online ladder above the all-time board on the Thornhollow tab', () => {
+    expect(code).toContain("t('hudChrome.bg.ladderOnline')");
+    expect(code).toContain("t('hudChrome.bg.noChallengers')");
+    expect(code).toContain('this.bgOnlineLadderHtml(view.ladder)');
+    // Order inside the Thornhollow body: online section, then all-time.
+    expect(code).toContain('this.bgActionHtml(view.action) + onlineSection + allTimeSection');
+    // The shared row family (the arena's ladderHtml markup), not a bespoke one:
+    // read the new builder's own body rather than counting occurrences.
+    const body = code.slice(
+      code.indexOf('private bgOnlineLadderHtml('),
+      code.indexOf('private bgLadderHtml('),
+    );
+    expect(body.length).toBeGreaterThan(0); // both builders present, in that order
+    expect(body).toContain('class="ladder-row');
+    expect(body).toContain('class="ladder-empty"');
+    expect(body).toContain('class="rank"');
+    expect(body).toContain("t('hudChrome.bg.playerClassTitle'");
+    // The live rows carry no level: that title key belongs to the all-time board.
+    expect(body).not.toContain('playerLevelClassTitle');
+  });
+
   it('keeps the offline / not-yet-synced unavailable note on both tabs', () => {
     expect(code).toContain("t('hud.arena.offlineNote')");
     expect(code).toContain("t('hudChrome.bg.offlineNote')");

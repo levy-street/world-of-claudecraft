@@ -37,6 +37,7 @@ import { esc } from './esc';
 import {
   type BgAllTimeEntry,
   type BgAllTimeRow,
+  type BgLadderRow,
   type BgWindowAction,
   type BgWindowView,
   buildBgWindowView,
@@ -350,11 +351,16 @@ export class ArenaWindow {
         t('hudChrome.bg.ratingSummary', { wins: num(view.wins), losses: num(view.losses) }),
       )}</span></div>` +
       `<div class="bg-captures">${esc(t('hudChrome.bg.careerCaptures', { count: num(view.captures) }))}</div>`;
+    // The LIVE online ladder sits above the all-time board, the same order the
+    // arena tabs use (arenaBodyHtml below): who is here now, then the record.
+    const onlineSection =
+      `<div class="bg-sub">${esc(t('hudChrome.bg.ladderOnline'))}</div>` +
+      this.bgOnlineLadderHtml(view.ladder);
     const allTimeSection =
       view.allTime && view.allTime.length > 0
         ? `<div class="bg-sub">${esc(t('hudChrome.bg.ladderAllTime'))}</div>${this.bgLadderHtml(view.allTime)}`
         : `<div class="bg-sub">${esc(t('hudChrome.bg.ladderAllTime'))}</div><div class="ladder-empty">${esc(t('hudChrome.bg.noRanked'))}</div>`;
-    return blurb + rank + this.bgActionHtml(view.action) + allTimeSection;
+    return blurb + rank + this.bgActionHtml(view.action) + onlineSection + allTimeSection;
   }
 
   private bgActionHtml(action: BgWindowAction): string {
@@ -406,6 +412,25 @@ export class ArenaWindow {
         t('hudChrome.bg.levelRequirement', { level: num(action.requiredLevel) }),
       )}</div>`
     );
+  }
+
+  /** The LIVE online ladder rows (the arena's ladderHtml twin: same
+   *  ladder-row/rank markup family, no level in the row title). */
+  private bgOnlineLadderHtml(rows: BgLadderRow[]): string {
+    const html = rows
+      .map((r) => {
+        const cls = r.knownClass ? classDisplayName(r.cls as PlayerClass) : r.cls;
+        return (
+          `<div class="ladder-row${r.me ? ' me' : ''}"><span class="rank">${esc(num(r.rank))}</span>` +
+          `<span class="lr-name" title="${esc(
+            t('hudChrome.bg.playerClassTitle', { name: r.name, className: cls }),
+          )}">${esc(r.name)}</span>` +
+          `<span class="lr-rating">${esc(num(r.rating))}</span>` +
+          `<span class="lr-wl">${esc(num(r.wins))}-${esc(num(r.losses))}</span></div>`
+        );
+      })
+      .join('');
+    return html || `<div class="ladder-empty">${esc(t('hudChrome.bg.noChallengers'))}</div>`;
   }
 
   private bgLadderHtml(rows: BgAllTimeRow[]): string {

@@ -883,7 +883,14 @@ export const hudChromeStrings = {
     matchInProgress: 'Battle in progress. {crimson}:{azure}.',
     ladderAllTime: 'Ladder. All-Time',
     noRanked: 'No champions ranked yet. Be the first.',
+    // The live section above the all-time board: rated champions connected
+    // right now, best first (the arena tabs' hud.arena.ladderOnline twin).
+    ladderOnline: 'Ladder. Online Now',
+    noChallengers: 'No champions online right now. Be the first.',
     playerLevelClassTitle: '{name}. Level {level} {className}',
+    // The live rows carry no level (they are drawn from the connected roster,
+    // not the stored board), so they get their own name + class title.
+    playerClassTitle: '{name}. {className}',
     // the in-match scoreboard strip
     crimson: 'Crimson',
     azure: 'Azure',

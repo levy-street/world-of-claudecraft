@@ -1,7 +1,9 @@
 // Thornhollow Fields: the ranked 5v5 capture-the-flag battleground. The HUD reads
-// `bgInfo` (queue state + the live match view) and sends the queue commands
-// plus the deliberate flag-action press. The persistent ladder is served over
-// REST (`GET /api/battleground/leaderboard`), not this facet.
+// `bgInfo` (queue state, the live match view, and the LIVE online ladder) and
+// sends the queue commands plus the deliberate flag-action press. The persistent
+// ALL-TIME ladder is served over REST (`GET /api/battleground/leaderboard`), not
+// this facet; the live one rides `bgInfo.ladder` here, mirroring how the arena
+// ships `ArenaInfo.ladders` inside its own snapshot key (world_api/duel_arena.ts).
 import type { PlayerClass } from '../sim/types';
 
 export interface BgFlagInfo {
@@ -64,6 +66,20 @@ export interface BgMatchInfo {
   winner: number | null; // ended only: the winning team, null for a draw
 }
 
+/** One row of the LIVE online battleground ladder: rated champions currently
+ *  connected, best first. The exact shape of the arena's `ArenaLadderEntry`
+ *  (world_api/duel_arena.ts), because it is the exact same readout for the
+ *  other ranked mode; the all-time REST board carries a `level` this one does
+ *  not, since a live row is drawn from the connected roster, not a stored one. */
+export interface BgLadderEntry {
+  pid: number;
+  name: string;
+  cls: PlayerClass;
+  rating: number;
+  wins: number;
+  losses: number;
+}
+
 export interface BgInfo {
   rating: number;
   wins: number;
@@ -73,6 +89,17 @@ export interface BgInfo {
   queueSize: number; // champions waiting across all groups
   queuedParty: number; // size of your own queued group
   match: BgMatchInfo | null;
+  // Live standings of the rated champions currently online, best first, capped
+  // at BG_LADDER_SIZE. Rides INSIDE this key rather than a facet member of its
+  // own, exactly as the arena ships its live ladders inside `arenaInfo`: the
+  // ClientWorld mirror is then free (the whole key is assigned from the wire).
+  // Cadence: the `bg` key refreshes at BG_WIRE_HZ (server/game.ts) plus the
+  // BG_WIRE_RESET_EVENTS that force a send. A ladder row only ever MOVES at
+  // endBgMatch, and `bgEnd` is one of those reset events, so the ten fighters
+  // whose ratings just changed see the new order on the very next snapshot;
+  // every other viewer picks it up on their own 1 Hz poll, which is the same
+  // staleness the queue-size and match clocks already carry.
+  ladder: BgLadderEntry[];
 }
 
 export interface IWorldBattleground {

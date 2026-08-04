@@ -34,6 +34,7 @@ const baseInfo = (over: Partial<BgInfo> = {}): BgInfo => ({
   queueSize: 0,
   queuedParty: 1,
   match: null,
+  ladder: [],
   ...over,
 });
 
@@ -99,9 +100,18 @@ const baseMatch = (over: Partial<BgMatchInfo> = {}): BgMatchInfo => ({
 // src/sim/social/battleground.ts (bgInfoFor + sharedMatchView), serialized onto
 // the snapshot by server/game.ts `maybe('bg', ...)`.
 const BG_WIRE_KEYS = new Set<string>([
-  ...['rating', 'wins', 'losses', 'captures', 'queued', 'queueSize', 'queuedParty', 'match'].map(
-    (k) => `.${k}`,
-  ),
+  ...[
+    'rating',
+    'wins',
+    'losses',
+    'captures',
+    'queued',
+    'queueSize',
+    'queuedParty',
+    'match',
+    'ladder',
+  ].map((k) => `.${k}`),
+  ...['pid', 'name', 'cls', 'rating', 'wins', 'losses'].map((k) => `ladder[].${k}`),
   ...[
     'state',
     'myTeam',
@@ -296,8 +306,14 @@ describe('battleground window view (pure core)', () => {
     //     live Map, a prototype accessor); the online arm is that same object
     //     after the exact JSON.parse(JSON.stringify(...)) hop the wire does.
     //     The two views must be equal, so the shapes genuinely differ.
-    const live = baseInfo({ rating: 1616, wins: 4, match: baseMatch() }) as BgInfo &
-      Record<string, unknown>;
+    const live = baseInfo({
+      rating: 1616,
+      wins: 4,
+      match: baseMatch(),
+      // Non-empty so the live-ladder rows are really walked by the proxy: an
+      // empty array would let a misnamed row field pass unnoticed.
+      ladder: [{ pid: 7, name: 'Ravven', cls: 'warrior', rating: 1616, wins: 4, losses: 1 }],
+    }) as BgInfo & Record<string, unknown>;
     // Sim-side baggage the wire cannot carry, on the object AND on its prototype.
     live.simOnlyUndefined = undefined;
     live.simOnlyMap = new Map([[7, 'Ravven']]);
@@ -325,7 +341,75 @@ describe('battleground window view (pure core)', () => {
     // Non-vacuous: the cores really did read through the proxy.
     expect(seen.size).toBeGreaterThan(10);
     expect(seen).toContain('match.players[].pid');
+    expect(seen).toContain('ladder[].rating');
     expect([...seen].filter((path) => !BG_WIRE_KEYS.has(path))).toEqual([]);
+  });
+
+  // The Thornhollow tab's LIVE online ladder, the arena tabs' section for the
+  // other ranked mode. Ranked by the order the snapshot ships (the sim already
+  // sorted), "me" resolved by PID (never by name, which two characters can
+  // share), and unknown class ids flagged for the painter to fall back on.
+  it('ranks the live online ladder, marks me by pid, and flags unknown classes', () => {
+    const v = buildBgWindowView({
+      info: baseInfo({
+        ladder: [
+          { pid: 4, name: 'Top', cls: 'mage', rating: 1800, wins: 12, losses: 3 },
+          { pid: 9, name: 'Me', cls: 'warrior', rating: 1520, wins: 3, losses: 2 },
+          {
+            pid: 5,
+            name: 'Odd',
+            cls: 'not_a_class' as never,
+            rating: 1400,
+            wins: 0,
+            losses: 5,
+          },
+        ],
+      }),
+      // Same NAME as the top row, a different pid: the live ladder marks me by
+      // identity, so this row must NOT come back as me.
+      playerName: 'Top',
+      playerLevel: 20,
+      party: null,
+      playerId: 9,
+      allTime: null,
+    });
+    if (v.kind !== 'live') throw new Error('expected live');
+    expect(v.ladder.map((r) => [r.rank, r.name, r.me, r.knownClass])).toEqual([
+      [1, 'Top', false, true],
+      [2, 'Me', true, true],
+      [3, 'Odd', false, false],
+    ]);
+    expect(v.ladder[1]).toMatchObject({ rating: 1520, wins: 3, losses: 2 });
+    // A ladder move re-renders: the signature carries the raw rows.
+    const moved = buildBgWindowView({
+      info: baseInfo({
+        ladder: [{ pid: 9, name: 'Me', cls: 'warrior', rating: 1520, wins: 3, losses: 2 }],
+      }),
+      playerName: 'Top',
+      playerLevel: 20,
+      party: null,
+      playerId: 9,
+      allTime: null,
+    });
+    if (moved.kind !== 'live') throw new Error('expected live');
+    expect(moved.sig).not.toBe(v.sig);
+  });
+
+  // Rolling deploy: a client can mirror a `bg` payload from a server that
+  // predates the field. The section renders empty instead of throwing.
+  it('survives a snapshot with no ladder field at all', () => {
+    const legacy = baseInfo();
+    delete (legacy as Partial<BgInfo>).ladder;
+    const v = buildBgWindowView({
+      info: legacy,
+      playerName: 'X',
+      playerLevel: 20,
+      party: null,
+      playerId: 1,
+      allTime: null,
+    });
+    if (v.kind !== 'live') throw new Error('expected live');
+    expect(v.ladder).toEqual([]);
   });
 });
 

@@ -9610,8 +9610,18 @@ export class Sim {
     return bgMod.bgMatchFor(this.ctx, pid);
   }
 
-  bgInfoFor(pid: number): import('../world_api').BgInfo | null {
-    return bgMod.bgInfoFor(this.ctx, pid);
+  // The live online battleground ladder (the arenaLadder twin). Viewer-
+  // identical, so the server builds ONE per broadcast pass and hands it to
+  // every bgInfoFor call in that pass.
+  bgLadder(): import('../world_api').BgLadderEntry[] {
+    return bgMod.bgLadder(this.ctx);
+  }
+
+  bgInfoFor(
+    pid: number,
+    ladder?: import('../world_api').BgLadderEntry[],
+  ): import('../world_api').BgInfo | null {
+    return bgMod.bgInfoFor(this.ctx, pid, ladder);
   }
 
   // Resolve a mid-match leave/jail/disconnect before the server's leave save:

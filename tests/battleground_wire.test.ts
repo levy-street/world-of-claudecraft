@@ -165,6 +165,55 @@ describe('the bg self key over the wire', () => {
     (client as any).applySnapshot(snap);
     expect(client.bgInfo).toEqual(snap.self.bg);
   });
+
+  it('carries the LIVE online ladder, ranked, with the viewer on it', () => {
+    const server = new GameServer();
+    const fcA = fakeWs();
+    const fcB = fakeWs();
+    const a = joinBgServer(server, fcA, 1, 'Topper');
+    const b = joinBgServer(server, fcB, 2, 'Runnerup');
+    // Move one rating so the order is decided by the sort, not by join order.
+    server.sim.players.get(a.pid)!.bgRating = 1700;
+    server.sim.players.get(a.pid)!.bgWins = 3;
+
+    (server as any).broadcastSnapshots();
+    const ladder = lastSnap(fcA.sent).self.bg.ladder;
+    expect(ladder.map((r: { name: string }) => r.name)).toEqual(['Topper', 'Runnerup']);
+    expect(ladder[0]).toEqual({
+      pid: a.pid,
+      name: 'Topper',
+      cls: 'warrior',
+      rating: 1700,
+      wins: 3,
+      losses: 0,
+    });
+    // Realm-wide, so the other viewer receives the identical rows (this is what
+    // makes the read viewer-identical, and therefore worth memoizing).
+    expect(lastSnap(fcB.sent).self.bg.ladder).toEqual(ladder);
+    expect(b.pid).not.toBe(a.pid);
+
+    // ...and it mirrors onto ClientWorld with the rest of the key.
+    const client = bareClient(a.pid);
+    (client as any).applySnapshot(lastSnap(fcA.sent));
+    expect(client.bgInfo!.ladder).toEqual(ladder);
+  });
+
+  it('builds the viewer-identical ladder ONCE per broadcast pass', () => {
+    // The hot-path rule: bgInfoFor runs per session at BG_WIRE_HZ, and the
+    // ladder scans every online player. A per-viewer build would count 2 here.
+    const server = new GameServer();
+    const fcA = fakeWs();
+    const fcB = fakeWs();
+    joinBgServer(server, fcA, 1, 'MemoOne');
+    joinBgServer(server, fcB, 2, 'MemoTwo');
+    const memo = (server as any).bgLadderReadout;
+    expect(memo.objectBuilds).toBe(0);
+    (server as any).broadcastSnapshots();
+    expect(memo.objectBuilds).toBe(1);
+    // Both sessions really did receive it from that one build.
+    expect(lastSnap(fcA.sent).self.bg.ladder).toHaveLength(2);
+    expect(lastSnap(fcB.sent).self.bg.ladder).toHaveLength(2);
+  });
 });
 
 describe('match-scoped interest: own team and field objects, never enemy players', () => {

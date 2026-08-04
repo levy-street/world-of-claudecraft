@@ -45,6 +45,10 @@ import { formBgTeamParty, unwindBgAutoPartyFor, unwindBgTeamParties } from './ba
 export const BG_BASE_RATING = 1500; // every character starts here on the ladder
 export const BG_MIN_RATING = 100; // rating floor so a losing streak can't go absurd
 export const BG_TEAM_SIZE = 5; // players per team: a full match is 5v5
+// Rows of the LIVE online ladder shipped to clients. Matches the arena's
+// ARENA_LADDER_SIZE (src/sim/sim.ts) on purpose: the same panel family renders
+// both, so the two sections have to be the same height.
+export const BG_LADDER_SIZE = 10;
 // Queue floor: an under-leveled body on one side decides ranked matches, so
 // every queued champion (and every member of a queued party) must be 20.
 export const BG_MIN_LEVEL = 20;
@@ -740,6 +744,16 @@ function placeInBg(
   e.ghost = false;
   e.corpsePos = null;
   e.corpseInstanceId = null;
+  // Thornhollow Fields is fought on foot. Seating a fighter on the field is the
+  // one place the whole roster passes through (match start AND the form-up
+  // set-back), so it is where a mount summoned in the open world before the
+  // queue popped is taken away, along with any channel still in flight (the
+  // flag-grab arm's own pattern: a summon started a second and a half ago must
+  // not land a rider inside the keep). The refusal in src/sim/mounts.ts is the
+  // other half: this clears what is already there, that stops anything new.
+  ctx.forceDismount(e);
+  e.mountCastRemaining = 0;
+  e.mountCastKey = '';
 }
 
 function spawnFlagEntity(ctx: SimContext, flag: BgFlagState): void {
@@ -1289,12 +1303,25 @@ export function bgOnPlayerDeath(ctx: SimContext, e: Entity, killer: Entity | nul
 
 /**
  * Is this player carrying an enemy flag right now? The one place the question
- * is answered, because more than the battleground asks it: the mount gate
- * refuses a saddle to a carrier, and a runner may only hold one flag.
+ * is answered: a runner may only hold one flag, and the grab itself throws the
+ * runner out of the saddle. (It is no longer the mount GATE: mounts are banned
+ * for the whole match, see `bgInMatch`.)
  */
 export function bgCarryingFlag(ctx: SimContext, pid: number): boolean {
   const match = ctx.bgMatches.get(pid);
   return match ? match.flags.some((f) => f.carrier === pid) : false;
+}
+
+/**
+ * Is this player seated in a live battleground right now? True for EVERY match
+ * state: the form-up countdown, active play, and the frozen post-match hold,
+ * because a fighter stands on the field through all three and only leaves the
+ * roster when releaseBgFighters sends them home. The one gate every mount
+ * summon path asks (src/sim/mounts.ts): Thornhollow Fields is fought on foot,
+ * not just carried on foot.
+ */
+export function bgInMatch(ctx: SimContext, pid: number): boolean {
+  return ctx.bgMatches.has(pid);
 }
 
 /** Disconnect/leave/jail mid-match: the deserter takes the rating loss and a
@@ -1518,9 +1545,43 @@ function clonePools(src: ArenaReturnPools['abilityCharges']): ArenaReturnPools['
   return out;
 }
 
+/** Live standings of the rated champions currently online, best first. The
+ *  battleground twin of `Sim.arenaLadder` (src/sim/sim.ts), down to the sort
+ *  keys and the row cap, because it is the same readout for the other ranked
+ *  mode. Draws no rng and reads no clock.
+ *
+ *  VIEWER-IDENTICAL, so it is deliberately NOT built inside `bgInfoFor`: the
+ *  server passes one instance built once per broadcast pass through its
+ *  realm-readout memo (server/game.ts `bgLadderReadout`), the same build-once
+ *  seam the Vale Cup and dungeon-finder shared fragments ride. Offline the Sim
+ *  builds it per read, which is one row. */
+export function bgLadder(ctx: SimContext): import('../../world_api').BgLadderEntry[] {
+  const rows: import('../../world_api').BgLadderEntry[] = [];
+  for (const meta of ctx.players.values()) {
+    if (!ctx.entities.get(meta.entityId)) continue;
+    rows.push({
+      pid: meta.entityId,
+      name: meta.name,
+      cls: meta.cls,
+      rating: meta.bgRating,
+      wins: meta.bgWins,
+      losses: meta.bgLosses,
+    });
+  }
+  rows.sort((x, y) => y.rating - x.rating || y.wins - x.wins);
+  return rows.slice(0, BG_LADDER_SIZE);
+}
+
 // The per-viewer wire view. The viewer-identical match core is memoized per
-// tick on the match (build-once; the per-viewer remainder is three scalars).
-export function bgInfoFor(ctx: SimContext, pid: number): import('../../world_api').BgInfo | null {
+// tick on the match (build-once; the per-viewer remainder is three scalars),
+// and the equally viewer-identical online ladder is passed IN by the caller
+// that already built it once for this broadcast pass. A caller with no shared
+// instance (offline, tests, the RL host) gets one built here.
+export function bgInfoFor(
+  ctx: SimContext,
+  pid: number,
+  ladder?: import('../../world_api').BgLadderEntry[],
+): import('../../world_api').BgInfo | null {
   const meta = ctx.players.get(pid);
   if (!meta) return null;
   const match = ctx.bgMatches.get(pid);
@@ -1547,6 +1608,7 @@ export function bgInfoFor(ctx: SimContext, pid: number): import('../../world_api
     queueSize: bgQueueSize(ctx),
     queuedParty: group?.pids.length ?? 1,
     match: matchInfo,
+    ladder: ladder ?? bgLadder(ctx),
   };
 }
 

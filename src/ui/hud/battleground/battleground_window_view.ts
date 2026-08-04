@@ -8,9 +8,11 @@
 // merged PvP window (src/ui/arena_window.ts, renderThornhollowFields: Thornhollow Fields is
 // that window's primary tab); rendering is driven off the structure here.
 //
-// Unlike the arena there is no live-online ladder on the wire: the persistent
-// ladder is the server's cached REST board (GET /api/battleground/leaderboard),
-// held in the painter-owned all-time cache fed in here.
+// Two ladders, exactly like the arena tabs: the LIVE online one rides the `bg`
+// snapshot key (BgInfo.ladder, built by src/sim/social/battleground.ts
+// bgLadder), and the persistent all-time one is the server's cached REST board
+// (GET /api/battleground/leaderboard) held in the painter-owned cache fed in
+// here.
 //
 // DOM-free and i18n-free: rows carry the raw class id plus a `knownClass` flag
 // the painter localizes; CLASSES is read here only to decide that flag.
@@ -29,17 +31,23 @@ export interface BgAllTimeEntry {
   losses: number;
 }
 
-/** An all-time ladder row: rank + the raw class id (painter localizes when known). */
-export interface BgAllTimeRow {
+/** A LIVE-ladder row: rank + the raw class id (painter localizes when known).
+ *  The arena's ArenaLadderRow shape (arena_window_view.ts); no `level`, because
+ *  the live rows are drawn from the connected roster, not the stored board. */
+export interface BgLadderRow {
   rank: number;
   me: boolean;
   name: string;
   cls: string;
   knownClass: boolean;
-  level: number;
   rating: number;
   wins: number;
   losses: number;
+}
+
+/** An all-time ladder row: a live row plus the player level the title shows. */
+export interface BgAllTimeRow extends BgLadderRow {
+  level: number;
 }
 
 /** The main action affordance for the current state. */
@@ -67,6 +75,8 @@ export type BgWindowView =
       losses: number;
       captures: number;
       action: BgWindowAction;
+      /** Rated champions online right now, best first (BgInfo.ladder). */
+      ladder: BgLadderRow[];
       allTime: BgAllTimeRow[] | null;
       /** Identity of the rendered content; the painter skips a rebuild when equal. */
       sig: string;
@@ -110,6 +120,21 @@ export function buildBgWindowView(input: BgWindowViewInput): BgWindowView {
           queueDisabled: partySize > 1 && !isLeader,
         };
 
+  // The live online ladder off the snapshot. `?? []` guards a snapshot mirrored
+  // from an older server that predates the field during a rolling deploy (the
+  // ArenaInfo.match.map precedent); the section renders its empty state then.
+  const ladderRows = b.ladder ?? [];
+  const ladder: BgLadderRow[] = ladderRows.map((r, i) => ({
+    rank: i + 1,
+    me: r.pid === playerId,
+    name: r.name,
+    cls: r.cls,
+    knownClass: Boolean((CLASSES as Record<string, unknown>)[r.cls]),
+    rating: r.rating,
+    wins: r.wins,
+    losses: r.losses,
+  }));
+
   const allTimeRows: BgAllTimeRow[] | null = allTime
     ? allTime.map((r, i) => ({
         rank: i + 1,
@@ -131,7 +156,12 @@ export function buildBgWindowView(input: BgWindowViewInput): BgWindowView {
     losses: b.losses,
     captures: b.captures,
     action,
+    ladder,
     allTime: allTimeRows,
+    // The live rows go in whole (rank, identity, rating, record), so any move
+    // on the ladder rebuilds the panel; the all-time rows keep their existing
+    // narrower digest. Both are the DERIVED rows, never the raw payload: the
+    // payload is the caller's object and may not be JSON-safe.
     sig: JSON.stringify([
       b.rating,
       b.wins,
@@ -139,6 +169,7 @@ export function buildBgWindowView(input: BgWindowViewInput): BgWindowView {
       b.captures,
       action,
       partySize,
+      ladder,
       allTimeRows?.map((r) => [r.name, r.rating, r.wins, r.losses]) ?? null,
     ]),
   };
