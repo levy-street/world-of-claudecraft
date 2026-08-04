@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "51ee52f68aeb619f30568827d9fb74bdbe42cb12ea2ac541a921adf6ebcf5486",
-  "catalogHash": "e162ce72f7c128fcd2763138640d6676dbbffe8fbea5ee7fd838bdd9614727d2",
+  "bundleId": "6562253f37445999dee7889b3fcb4d7ce02a4dc4749f6160e01bad9b6165b820",
+  "catalogHash": "01c3ac4374e7517a6072e5c62812461a1657d87fcc646c8dcf2aae2b9daf9376",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -590,6 +590,18 @@
         }
       ],
       "gain": 1.840772,
+      "playbackRate": 1
+    },
+    "ice_block": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ice_block.mp3?v=5282a23f4bc8",
+          "bytes": 42048,
+          "sha256": "5282a23f4bc8195b36a63f50818d017d0fdc31dc7e428f83f71f8909cafb78f2"
+        }
+      ],
+      "gain": 2.06538,
       "playbackRate": 1
     },
     "impact_arcane": {

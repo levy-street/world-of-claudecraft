@@ -31,11 +31,14 @@ const WAND_CUES: Partial<Record<MagicSchool, SfxId>> = {
 
 // A 'nova' fx event normally plays the shared spell_nova cue (every
 // self-centered or ground-targeted burst: Frost Nova, Arcane Explosion,
-// Ring of Frost, ...). The two AoE fear shouts get their own distinct cast
-// cue instead, keyed off the casting ability id the event already carries.
+// Ring of Frost, ...). The three AoE fear shouts (priest Psychic Scream,
+// warlock Howl of Terror, warrior Intimidating Shout, all archetype
+// aoeFear) get their own distinct cast cue instead, keyed off the casting
+// ability id the event already carries.
 const NOVA_ABILITY_CUES: Partial<Record<string, SfxId>> = {
   psychic_scream: 'fear_shout',
   howl_of_terror: 'fear_shout',
+  intimidating_shout: 'fear_shout',
 };
 
 // Exported (read-only, `as const`) purely so a test can pin its key set
@@ -196,9 +199,17 @@ export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number 
   return null;
 }
 
+// Per-ability overrides for a buff's apply moment: normally every buff plays
+// the shared buff_apply chime, keyed off Aura.id (the ability that applied
+// it). Ice Block (Cold Coffin) gets its own distinct freeze-in cue instead.
+const BUFF_APPLY_ABILITY_CUES: Partial<Record<string, SfxId>> = {
+  ice_block: 'ice_block',
+};
+
 export function auraApplyCue(event: AuraEvent, aura: Aura | null): SfxId | null {
   if (!event.gained || !aura) return null;
-  return isAuraDebuff(aura) ? 'debuff_apply' : 'buff_apply';
+  if (isAuraDebuff(aura)) return 'debuff_apply';
+  return BUFF_APPLY_ABILITY_CUES[aura.id] ?? 'buff_apply';
 }
 
 type HealEvent = Extract<SimEvent, { type: 'heal' }>;

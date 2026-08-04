@@ -253,8 +253,8 @@ describe('combat SFX policy', () => {
     ).toEqual({ key: 'spell_nova', anchorId: 20 });
   });
 
-  it('gives the two AoE fear shouts their own nova cue instead of the shared spell_nova', () => {
-    for (const ability of ['psychic_scream', 'howl_of_terror']) {
+  it('gives the three AoE fear shouts their own nova cue instead of the shared spell_nova', () => {
+    for (const ability of ['psychic_scream', 'howl_of_terror', 'intimidating_shout']) {
       expect(
         spellFxCue({
           type: 'spellfx',
@@ -425,6 +425,13 @@ describe('combat SFX policy', () => {
     expect(auraApplyCue(gained, aura('buff_ap', -5))).toBe('debuff_apply');
     expect(auraApplyCue({ ...gained, gained: false }, aura('dot'))).toBeNull();
     expect(auraApplyCue(gained, null)).toBeNull();
+  });
+
+  it('gives Ice Block its own apply cue instead of the shared buff_apply', () => {
+    const gained = { type: 'aura', targetId: 1, name: 'Test Aura', gained: true } as const;
+    expect(auraApplyCue(gained, { ...aura('buff_ap'), id: 'ice_block' })).toBe('ice_block');
+    // Every other buff keeps the shared chime.
+    expect(auraApplyCue(gained, { ...aura('buff_ap'), id: 'ice_barrier' })).toBe('buff_apply');
   });
 
   it('uses unarmed swings in both druid combat forms', () => {

@@ -420,6 +420,10 @@ export const SFX = [
     key: 'fear',
     custom: true,
   },
+  {
+    key: 'ice_block',
+    custom: true,
+  },
 
   // --- Heals & auras --------------------------------------------------------
   {
