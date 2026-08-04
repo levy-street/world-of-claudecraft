@@ -2,7 +2,23 @@ import { describe, expect, it, vi } from 'vitest';
 import { AbilityVfx, type AbilityVfxEntityState } from '../src/render/ability_vfx';
 import type { AbilityVfxFx } from '../src/render/ability_vfx/fx';
 
-function persistentBattleShout(): AbilityVfxEntityState {
+// battle_shout is policy-silenced while worn (the long-buff rule in
+// ability_vfx_longbuff_core.ts: >= 300s buffs hold no disc/band), so the
+// held-read case below wears a SHORT buff that legitimately keeps all three
+// reads (disc, band, gain swirl); the latch-prune case keeps battle_shout,
+// whose policy gain swirl rides the same semantic stamps.
+function wornPresenceOfMind(): AbilityVfxEntityState {
+  return {
+    id: 41,
+    castingAbility: null,
+    castRemaining: 0,
+    castTotal: 0,
+    auras: [{ id: 'presence_of_mind' }],
+    queuedOnSwing: null,
+  };
+}
+
+function wornBattleShout(): AbilityVfxEntityState {
   return {
     id: 41,
     castingAbility: null,
@@ -155,7 +171,7 @@ describe('ability VFX offscreen presentation sleep', () => {
       },
       () => 0,
     );
-    const entity = persistentBattleShout();
+    const entity = wornPresenceOfMind();
 
     abilityVfx.syncEntity(entity);
     abilityVfx.update(1 / 60);
@@ -212,7 +228,7 @@ describe('ability VFX offscreen presentation sleep', () => {
     const h = painterHarness();
     const semantic = h.abilityVfx as unknown as { heldSemantic: Map<number, unknown> };
 
-    h.abilityVfx.syncEntity(persistentBattleShout());
+    h.abilityVfx.syncEntity(wornBattleShout());
     h.abilityVfx.update(1 / 60);
     expect(semantic.heldSemantic.has(41)).toBe(true);
     expect(h.buffSwirl).toHaveBeenCalledTimes(1);
@@ -222,7 +238,7 @@ describe('ability VFX offscreen presentation sleep', () => {
 
     h.heldGround.clear();
     h.heldOrbits.clear();
-    h.abilityVfx.syncEntity(persistentBattleShout());
+    h.abilityVfx.syncEntity(wornBattleShout());
     expect(h.buffSwirl).toHaveBeenCalledTimes(2);
   });
 });
