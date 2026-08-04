@@ -14,6 +14,8 @@ import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.all': 'すべて',
+  'hudChrome.actionBar.done': '完了',
+  'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
   'hudChrome.crafting.identity.ceilingRare': 'レア上限',
   'hudChrome.crafting.pairOptionLabel': '{pair}（{craftA} + {craftB}）',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -22,8 +24,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.legend': 'レジェンド',
   'hudChrome.discord.roleTag.shill': 'サポーター',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
+  'guide.profPages.colWield': '使用熟練度',
+  'guide.profPages.wieldNone': '制限なし',
   'guide.profPages.fish.pctFmt': '{pct}%',
   'questUi.dialog.profIntroHint': '{name}から「{quest}」を受けましょう。',
+  'itemUi.vendor.qtyMultiple': '{count}個',
+  'itemUi.vendor.buyCountAria': '{item}を{count}個、{price}で購入',
+  'itemUi.vendor.buyCountAriaWithRequirement': '{item}を{count}個、{price}で購入。{requirement}',
+  'itemUi.vendor.buyQuantityConfirm': '購入',
   'entities.items.eastbrook_greatsword.name': 'イーストブルックの大剣',
   'entities.items.highwatch_greatsword.name': 'ハイウォッチの大剣',
   'entities.items.highwatch_wallshield.name': 'ハイウォッチの壁盾',

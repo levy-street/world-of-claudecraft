@@ -14,6 +14,8 @@ import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.all': '全部',
+  'hudChrome.actionBar.done': '完成',
+  'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
   'hudChrome.crafting.identity.ceilingRare': '稀有品质上限',
   'hudChrome.crafting.pairOptionLabel': '{pair}（{craftA} + {craftB}）',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -22,8 +24,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.legend': '传奇',
   'hudChrome.discord.roleTag.shill': '布道者',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
+  'guide.profPages.colWield': '使用熟练度',
+  'guide.profPages.wieldNone': '不限',
   'guide.profPages.fish.pctFmt': '{pct}%',
   'questUi.dialog.profIntroHint': '请找{name}接取《{quest}》。',
+  'itemUi.vendor.qtyMultiple': '{count}个',
+  'itemUi.vendor.buyCountAria': '以 {price} 购买 {count} 个 {item}',
+  'itemUi.vendor.buyCountAriaWithRequirement': '以 {price} 购买 {count} 个 {item}。{requirement}',
+  'itemUi.vendor.buyQuantityConfirm': '购买',
   'entities.items.eastbrook_greatsword.name': '东溪巨剑',
   'entities.items.highwatch_greatsword.name': '高望巨剑',
   'entities.items.highwatch_wallshield.name': '高望壁盾',

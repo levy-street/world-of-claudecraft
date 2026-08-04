@@ -14,6 +14,8 @@ import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.all': '전체',
+  'hudChrome.actionBar.done': '완료',
+  'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
   'hudChrome.crafting.identity.ceilingRare': '희귀 상한',
   'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -22,8 +24,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.legend': '전설',
   'hudChrome.discord.roleTag.shill': '홍보대사',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
+  'guide.profPages.colWield': '사용 숙련도',
+  'guide.profPages.wieldNone': '제한 없음',
   'guide.profPages.fish.pctFmt': '{pct}%',
   'questUi.dialog.profIntroHint': '{name}에게 "{quest}"을(를) 받으세요.',
+  'itemUi.vendor.qtyMultiple': '{count}개',
+  'itemUi.vendor.buyCountAria': '{price}에 {item} {count}개 구매',
+  'itemUi.vendor.buyCountAriaWithRequirement': '{price}에 {item} {count}개 구매. {requirement}',
+  'itemUi.vendor.buyQuantityConfirm': '구매',
   'entities.items.eastbrook_greatsword.name': '이스트브룩 대검',
   'entities.items.highwatch_greatsword.name': '하이워치 대검',
   'entities.items.highwatch_wallshield.name': '하이워치 벽방패',

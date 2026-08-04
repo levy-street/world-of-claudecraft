@@ -14,6 +14,8 @@ import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.all': 'Все',
+  'hudChrome.actionBar.done': 'Готово',
+  'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
   'hudChrome.crafting.identity.ceilingRare': 'Потолок редкого',
   'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -22,8 +24,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.legend': 'ЛЕГЕНДА',
   'hudChrome.discord.roleTag.shill': 'ГЛАШАТАЙ',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
+  'guide.profPages.colWield': 'Нужно мастерство',
+  'guide.profPages.wieldNone': 'Любое',
   'guide.profPages.fish.pctFmt': '{pct}%',
   'questUi.dialog.profIntroHint': 'Обратитесь к {name} за заданием «{quest}».',
+  'itemUi.vendor.qtyMultiple': 'x{count}',
+  'itemUi.vendor.buyCountAria': 'Купить {count} {item} за {price}',
+  'itemUi.vendor.buyCountAriaWithRequirement': 'Купить {count} {item} за {price}. {requirement}',
+  'itemUi.vendor.buyQuantityConfirm': 'Купить',
   'entities.items.eastbrook_greatsword.name': 'Истврукский двуручный меч',
   'entities.items.highwatch_greatsword.name': 'Двуручный меч Хайвотча',
   'entities.items.highwatch_wallshield.name': 'Стенной щит Хайвотча',
