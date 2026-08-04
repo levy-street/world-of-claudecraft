@@ -465,6 +465,90 @@ describe('desktopBuilderConfig', () => {
   });
 });
 
+// The REAL package.json "build" block, as opposed to the miniature `base`
+// fixture above: these pins guard the actual per-arch-installer + media-dedup
+// derivation (issue 2013), not just the desktopBuilderConfig mechanics.
+const realBuild = JSON.parse(
+  readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
+).build;
+
+describe('package.json build block: per-arch NSIS installer + media dedup (issue 2013)', () => {
+  it('disables the universal NSIS installer so the website channel emits one exe per arch', () => {
+    // electron-builder's NSIS default (buildUniversalInstaller: true) folds both
+    // complete x64 and arm64 payloads into a single installer exe (roughly 450MB
+    // each, so ~1GB combined). Setting this false makes app-builder-lib emit a
+    // separate, single-arch installer per arch instead.
+    expect(realBuild.nsis.buildUniversalInstaller).toBe(false);
+    // The customUnInstall include (pinned separately by desktop_uninstall_cleanup.test.ts)
+    // must survive alongside the new flag.
+    expect(realBuild.nsis.include).toBe('build/installer.nsh');
+  });
+
+  it('excludes the unhashed media originals but keeps the hashed dist/media copies', () => {
+    // scripts/build_media_manifest.mjs emit() copies models/textures/env/vfx into
+    // dist/media under content-hashed names, and the production client only ever
+    // resolves through those hashed copies (src/render/assets/loader.ts assetUrl(),
+    // backed by MEDIA_ASSETS; the raw-path branch is dev-only and compiled out of
+    // production builds). The unhashed originals are therefore dead weight in a
+    // packaged app and must be excluded, while dist/media/** must never be.
+    expect(realBuild.files).toContain('!dist/models/**');
+    expect(realBuild.files).toContain('!dist/textures/**');
+    expect(realBuild.files).toContain('!dist/env/**');
+    expect(realBuild.files).toContain('!dist/vfx/**');
+    expect(realBuild.files.some((f: string) => f.startsWith('!dist/media'))).toBe(false);
+  });
+
+  it('optionally sheds the website-only whitepaper, press/merch/links pages, CLAUDE.md, and guide stills', () => {
+    expect(realBuild.files).toContain('!dist/*.pdf');
+    expect(realBuild.files).toContain('!dist/press.html');
+    expect(realBuild.files).toContain('!dist/merch.html');
+    expect(realBuild.files).toContain('!dist/links.html');
+    expect(realBuild.files).toContain('!dist/CLAUDE.md');
+    expect(realBuild.files).toContain('!dist/guide-stills/**');
+  });
+
+  it('the media and website-only excludes survive channel derivation for website, steam, and epic', () => {
+    // desktopBuilderConfig derives every channel from this SAME base block; steam
+    // and epic must inherit the slimming, not lose it when they layer their own
+    // files/target overrides on top (Steam re-includes steamworks.js by APPENDING
+    // to config.files, which must not undo the excludes already present).
+    const excludes = [
+      '!dist/models/**',
+      '!dist/textures/**',
+      '!dist/env/**',
+      '!dist/vfx/**',
+      '!dist/*.pdf',
+      '!dist/press.html',
+      '!dist/merch.html',
+      '!dist/links.html',
+      '!dist/CLAUDE.md',
+      '!dist/guide-stills/**',
+    ];
+    const website = desktopBuilderConfig({ base: realBuild, distribution: 'website' });
+    const steam = desktopBuilderConfig({
+      base: realBuild,
+      distribution: 'steam',
+      steamAppId: '480',
+    });
+    const epic = desktopBuilderConfig({
+      base: realBuild,
+      distribution: 'epic',
+      epicProductId: 'epic-product-id',
+      epicDeploymentId: 'epic-deployment-id',
+      epicClientId: 'epic-client-id',
+    });
+    for (const config of [website, steam, epic]) {
+      for (const exclude of excludes) expect(config.files).toContain(exclude);
+    }
+    // buildUniversalInstaller stays false for every channel: nothing in the
+    // derivation touches config.nsis, so the setting is a pure passthrough.
+    type WithNsis = { nsis: { buildUniversalInstaller?: boolean } };
+    expect((website as unknown as WithNsis).nsis.buildUniversalInstaller).toBe(false);
+    expect((steam as unknown as WithNsis).nsis.buildUniversalInstaller).toBe(false);
+    expect((epic as unknown as WithNsis).nsis.buildUniversalInstaller).toBe(false);
+  });
+});
+
 describe('isChannelFeedFile', () => {
   it('matches only the channel feed files electron-builder emits', () => {
     expect(isChannelFeedFile('latest-mac.yml', 'latest')).toBe(true);

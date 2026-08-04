@@ -2633,6 +2633,15 @@
   #quest-tracker .qt-title:hover {
     color: #fff;
   }
+  /* Bag-hover highlight: matching quest title while a quest stack is hovered
+     in bags. Information-add, always-on (no --fx gate). Quest gold wash, not
+     a second yellow. Shape of the title row is unchanged. */
+  #quest-tracker .qt-title.qt-bag-hover {
+    color: var(--color-quest-tracker-bag-hover);
+    text-shadow:
+      0 0 6px color-mix(in srgb, var(--color-quest-tracker-bag-hover) 55%, transparent),
+      1px 1px 2px #000;
+  }
   #quest-tracker .qt-title:focus-visible {
     outline: 2px solid var(--gold);
     outline-offset: 2px;

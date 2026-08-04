@@ -33,6 +33,11 @@
        the #0070dd anchor). The theme system re-emits this per preset via
        ensureReadable, so the light Parchment panel darkens it to AA. */
     --color-quest-tag-text: #3d9bff;
+    /* Quest moments (DESIGN.md section 4.3 / principle 4): tracked titles,
+       bag-grid quest purpose marks, map quest markers. Bright saturated
+       yellow reserved for quest, never chrome. Distinct from --gold / --color-accent
+       structural house gold. */
+    --color-quest: #ffd12d;
     /* Typography, Cinzel (heraldic display/headings), Alegreya Sans (UI + body),
        Alegreya (serif flavour prose). Legacy token names alias the canonical set
        so every existing usage resolves to the new system. */
@@ -134,6 +139,17 @@
     --color-bag-glyph-enchanted: var(--color-stat-bonus);
     --color-bag-glyph-signed: var(--color-accent);
     --color-bag-glyph-bound: #7fb0e6;
+    /* Bag-grid quest-purpose treatment (components.css .bag-item.bag-quest /
+       .bi-quest-seal, painted by bags_window.ts as a class, never an inline
+       color). Purpose class, not a rarity tier: thin rim + soft wash + small
+       seal from the --color-quest lineage. Shape is primary, tint is redundant
+       (fairness). Always-on, no --fx-* gate. Ready seal brightens the same
+       lineage (never a second yellow). Tracker bag-hover uses the same gold. */
+    --color-bag-quest-rim: var(--color-quest);
+    --color-bag-quest-wash: color-mix(in srgb, var(--color-quest) 16%, transparent);
+    --color-bag-quest-seal: var(--color-quest);
+    --color-bag-quest-seal-ready: color-mix(in srgb, var(--color-quest) 55%, #fff);
+    --color-quest-tracker-bag-hover: var(--color-quest);
 
     /* Empty paperdoll slot greys (char_window.ts uses these so the painter carries
        no raw hex): the muted "Empty" label and the dimmed placeholder-icon border.

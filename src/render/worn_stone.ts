@@ -34,7 +34,7 @@
 import type * as THREE from 'three';
 import { loadTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
-import { GFX, type SurfaceMatOpts, surfaceMat } from './gfx';
+import { GFX, type GfxSettings, type SurfaceMatOpts, surfaceMat } from './gfx';
 import { renderLayerDisabled } from './render_dev_flags';
 
 export type SurfaceFamily = 'stone' | 'rock' | 'wood' | 'plaster' | 'bark' | 'fabric' | 'metal';
@@ -375,47 +375,53 @@ const scaledFadeBands = (parallaxDepth: number, tileScale: number): SurfaceDetai
   };
 };
 
-// Tiers below high never compile the layer (GFX.surfaceDetail: the round-10
-// medium regate measured the residual detail taps as the whole medium-town
-// gap, so medium keeps its pre-overhaul surfaces), so skip the fetches there
-// (the detail_normals.ts pattern). Loader cache results are immutable: we own
-// CLONES (shared decoded image, one extra GPU texture each), so the
-// anisotropy tweak cannot leak into another consumer of the same URL. All
-// maps are non-color data and stay in linear space. Every fetch keys off the
-// IMPORT-TIME tier guess: if the live tier lands lower the textures merely
-// idle. A high import-time policy loads the base layer without displacement;
-// if the live policy later requests ultra parallax, it fails soft to that base
-// material (the detail_normals null contract, the canopy_detail precedent).
-if (GFX.surfaceDetail) {
-  const wantDisp = parallaxTierTaps() > 0;
-  for (const fam of Object.values(FAMILIES)) {
-    const prep = (name: string): Promise<THREE.Texture> =>
-      loadTexture(`${fam.dir ?? '/textures/structures/'}${fam.prefix}_${name}.jpg`, {
-        repeat: true,
-      }).then((tex) => {
-        const t = tex.clone();
-        t.anisotropy = 4;
-        t.needsUpdate = true;
-        return t;
-      });
-    registerDeferredPreload(() =>
-      Promise.all([
-        prep('NormalGL'),
-        // aoSpan 0 also means the set ships no AmbientOcclusion (Metal013)
-        fam.aoSpan > 0 ? prep('AmbientOcclusion') : Promise.resolve(null),
-        prep('Roughness'),
-        wantDisp ? prep('Displacement') : Promise.resolve(null),
-        fam.metalMix !== undefined ? prep('Metalness') : Promise.resolve(null),
-      ]).then(([n, a, r, d, m]) => {
-        fam.tex.normal = n;
-        fam.tex.ao = a;
-        fam.tex.rough = r;
-        fam.tex.disp = d;
-        fam.tex.metal = m;
-      }),
-    );
-  }
+const surfaceTextureTasks = new Map<string, Promise<void>>();
+
+function prepareFamilyTexture(
+  family: SurfaceFamily,
+  channel: keyof FamilyTextures,
+  suffix: string,
+): Promise<void> {
+  const fam = FAMILIES[family];
+  if (fam.tex[channel]) return Promise.resolve();
+  const key = `${family}:${channel}`;
+  const existing = surfaceTextureTasks.get(key);
+  if (existing) return existing;
+  const task = loadTexture(`${fam.dir ?? '/textures/structures/'}${fam.prefix}_${suffix}.jpg`, {
+    repeat: true,
+  })
+    .then((tex) => {
+      const clone = tex.clone();
+      clone.anisotropy = 4;
+      clone.needsUpdate = true;
+      fam.tex[channel] = clone;
+    })
+    .catch((err) => {
+      surfaceTextureTasks.delete(key);
+      throw err;
+    });
+  surfaceTextureTasks.set(key, task);
+  return task;
 }
+
+/** Prepare surface-detail texture channels selected by an explicit target profile. */
+export function prepareSurfaceDetailProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
+  if (!target.surfaceDetail) return Promise.resolve();
+  const tasks: Promise<void>[] = [];
+  for (const family of Object.keys(FAMILIES) as SurfaceFamily[]) {
+    const fam = FAMILIES[family];
+    tasks.push(prepareFamilyTexture(family, 'normal', 'NormalGL'));
+    if (fam.aoSpan > 0) tasks.push(prepareFamilyTexture(family, 'ao', 'AmbientOcclusion'));
+    tasks.push(prepareFamilyTexture(family, 'rough', 'Roughness'));
+    if (target.surfaceDetailTaps > 0) {
+      tasks.push(prepareFamilyTexture(family, 'disp', 'Displacement'));
+    }
+    if (fam.metalMix !== undefined) tasks.push(prepareFamilyTexture(family, 'metal', 'Metalness'));
+  }
+  return Promise.all(tasks).then(() => undefined);
+}
+
+registerDeferredPreload(() => prepareSurfaceDetailProfileAssets(GFX));
 
 // Material.clone() copies userData (a false "already applied" marker on
 // clones, which deliberately DROP the onBeforeCompile hook), so the real
@@ -1004,6 +1010,11 @@ export function surfaceDetailPrewarmTextures(): THREE.Texture[] {
 // ---------------------------------------------------------------------------
 
 const detailedMats = new Map<string, THREE.Material>();
+
+/** Drop profile-derived material variants while retaining loaded source textures. */
+export function resetSurfaceDetailProfileCaches(): void {
+  detailedMats.clear();
+}
 
 /**
  * A surfaceMat with the surface-detail family attached. surfaceMat dedupes

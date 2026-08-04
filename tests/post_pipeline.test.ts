@@ -257,4 +257,24 @@ describe('live post pipeline', () => {
     ]);
     expect(post.composer.renderTarget1).not.toBe(post.composer.renderTarget2);
   });
+
+  it('disposes every pass and the composer exactly once', async () => {
+    const { buildComposer } = await import('../src/render/post');
+    const post = buildComposer(
+      rendererStub(),
+      new THREE.Scene(),
+      new THREE.PerspectiveCamera(),
+      1280,
+      720,
+      { gradeOnly: true },
+    );
+    const passDisposals = post.composer.passes.map((pass) => vi.spyOn(pass, 'dispose'));
+    const composerDispose = vi.spyOn(post.composer, 'dispose');
+
+    post.dispose();
+    post.dispose();
+
+    for (const dispose of passDisposals) expect(dispose).toHaveBeenCalledTimes(1);
+    expect(composerDispose).toHaveBeenCalledTimes(1);
+  });
 });

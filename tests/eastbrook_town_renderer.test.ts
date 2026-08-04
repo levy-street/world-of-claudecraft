@@ -25,14 +25,19 @@ import {
   eastbrookRoofVisibilityPlanInto,
   newEastbrookRoofVisibilityPlan,
 } from '../src/render/eastbrook_town_visibility_core';
-import { GFX } from '../src/render/gfx';
+import { gfxInternalsForTest } from '../src/render/gfx';
 import { vertexColorEmissiveInternalsForTest } from '../src/render/vertex_color_emissive';
 import { BUILDING_TERRAIN_SAMPLE_STEP } from '../src/sim/building_layout';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import { EASTBROOK_LAYOUT, localToWorld } from '../src/sim/eastbrook_layout';
 import { terrainHeight } from '../src/sim/world';
 
-const ORIGINAL_STANDARD_MATERIALS = GFX.standardMaterials;
+let restoreGfx: (() => void) | null = null;
+
+function setStandardMaterials(value: boolean): void {
+  restoreGfx?.();
+  restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: value });
+}
 
 function sourceAsset(withEmissive: boolean): THREE.Group {
   const source = new THREE.Group();
@@ -68,8 +73,8 @@ function meshesOf(root: THREE.Object3D): THREE.Mesh[] {
 }
 
 afterEach(() => {
-  (GFX as unknown as { standardMaterials: boolean }).standardMaterials =
-    ORIGINAL_STANDARD_MATERIALS;
+  restoreGfx?.();
+  restoreGfx = null;
 });
 
 const ROTATED_ROOF: EastbrookRoofVisibilityTarget = {
@@ -311,7 +316,7 @@ describe('Eastbrook town renderer', () => {
   });
 
   it('uses Lambert vertex-color materials on Low without changing geometry or draw counts', () => {
-    (GFX as unknown as { standardMaterials: boolean }).standardMaterials = false;
+    setStandardMaterials(false);
     const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
     const meshes = meshesOf(view.group);
     expect(meshes).toHaveLength(18);
@@ -436,7 +441,7 @@ describe('Eastbrook town renderer', () => {
 
   it('preserves mixed vertex-color emissive cues in the shared Lambert and Standard shader arms', () => {
     for (const standardMaterials of [false, true]) {
-      (GFX as unknown as { standardMaterials: boolean }).standardMaterials = standardMaterials;
+      setStandardMaterials(standardMaterials);
       const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
       const emissiveMaterials = meshesOf(view.group)
         .filter((mesh) => mesh.name.includes('Emissive'))

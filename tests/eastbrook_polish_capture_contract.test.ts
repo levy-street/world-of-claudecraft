@@ -360,18 +360,20 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned, and this mint stacks every leaf move to date: the
-      // pnpm-lock migration (a hashed input to every GLB source fingerprint), the
-      // base renderer provenance move plus PR #2720's fence-removal layout
-      // evidence, and this branch's own edits to src/render/renderer.ts, the
-      // rendererIntegration leaf (the brood shout/flourish and attackByAbility
-      // wiring, then gating that cue on a mob source so player castFx keeps
-      // reaching the warrior plan). The authoritativeLayout / townTriangles /
-      // placementInventory inputs and the upstream provenance leaves mint one
-      // merged composite matching neither parent's literal. Not one pipeline
-      // input or geometry value changed, and no capture was retaken: Eastbrook
-      // itself is untouched by all of it.
-      fingerprint: '866519f0219669c38cdcb6475194b0ec51f53a82990448bde5ca47e5fb3be008',
+      // Deliberately re-pinned, and this mint stacks every leaf move on both sides
+      // of the merge onto src/render/renderer.ts, the rendererIntegration leaf of
+      // this composite: the pnpm-lock migration (a hashed input to every GLB source
+      // fingerprint), PR #2720's fence-removal layout evidence, release/v0.34.0's
+      // Bear Form quadruped rig and live graphics rebuild (context recycle plus
+      // profile-aware Eastbrook runtime inputs), and this branch's own brood
+      // shout/flourish and attackByAbility wiring (then gating that cue on a mob
+      // source so player castFx keeps reaching the warrior plan). Each moves the
+      // leaf's own sha256 and with it the composite, so the merged tree mints one
+      // fingerprint matching neither parent's literal. No GLB source fingerprint
+      // moved, not one pipeline input or geometry value changed, and no capture was
+      // retaken: Eastbrook itself is untouched by all of it. Re-minted with
+      // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
+      fingerprint: '43744314ffd1751887724b4cafa4c76d1169fa08073641f8e4979e88a21ed8bf',
       components: {
         captureContract: {
           id: 'polish-v2',

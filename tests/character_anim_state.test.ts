@@ -8,6 +8,7 @@ import {
   locomotionTimeScale,
   needsAnimRepair,
   scanAnimRepair,
+  shouldPlayLanding,
 } from '../src/render/characters/anim_state';
 
 // A three.js SkinnedMesh renders BIND POSE (arms out, the T-pose) whenever the
@@ -205,5 +206,29 @@ describe('locomotionTimeScale', () => {
     // an authored walkBack clip plays FORWARD; only the reversed fallback negates
     expect(locomotionTimeScale('walkBack', back)).toBeCloseTo(1);
     expect(locomotionTimeScale('walk', { ...back, backwards: false })).toBeCloseTo(1);
+  });
+});
+
+describe('shouldPlayLanding', () => {
+  // (wasAirborne, airborne, dead, hasLandClip)
+  it('fires exactly on the airborne -> grounded edge', () => {
+    expect(shouldPlayLanding(true, false, false, true)).toBe(true);
+  });
+
+  it('stays silent while still airborne, so the jump pose keeps its hold', () => {
+    expect(shouldPlayLanding(true, true, false, true)).toBe(false);
+  });
+
+  it('stays silent on the ground and on the takeoff edge', () => {
+    expect(shouldPlayLanding(false, false, false, true)).toBe(false);
+    expect(shouldPlayLanding(false, true, false, true)).toBe(false);
+  });
+
+  it('does nothing for a rig with no landing clip (every pre-existing rig)', () => {
+    expect(shouldPlayLanding(true, false, false, false)).toBe(false);
+  });
+
+  it('yields to death: a body killed mid-air collapses, it does not stick a landing', () => {
+    expect(shouldPlayLanding(true, false, true, true)).toBe(false);
   });
 });

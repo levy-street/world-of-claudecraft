@@ -284,6 +284,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/chars/players/rogue_hooded.glb": "/media/models/chars/players/rogue_hooded.876d60366dc2.glb",
   "models/creatures/alpaca.glb": "/media/models/creatures/alpaca.a0de882ed487.glb",
   "models/creatures/aurelhorn.glb": "/media/models/creatures/aurelhorn.a72e8eeee246.glb",
+  "models/creatures/bear_form.glb": "/media/models/creatures/bear_form.bff8bb3c9419.glb",
   "models/creatures/bull.glb": "/media/models/creatures/bull.a00c2c292526.glb",
   "models/creatures/chicken_cow.glb": "/media/models/creatures/chicken_cow.b1235f3a04bf.glb",
   "models/creatures/crabenemy.glb": "/media/models/creatures/crabenemy.8d3c9c7a231c.glb",

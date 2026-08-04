@@ -181,6 +181,12 @@ function decorateScroll(root: THREE.Object3D, itemId: string): void {
 // itemId, so this stays a handful of materials for the whole session.
 const surfaceDetailCache = new Map<string, THREE.Material>();
 
+export function resetQuestObjectProfileCaches(): void {
+  preparedByItem.clear();
+  proceduralByItem.clear();
+  surfaceDetailCache.clear();
+}
+
 function convertMaterial(src: THREE.Material, itemId: string): THREE.Material {
   const s = src as THREE.MeshStandardMaterial;
   const ov = ITEM_MAT_OVERRIDES[itemId];

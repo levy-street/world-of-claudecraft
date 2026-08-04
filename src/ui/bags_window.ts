@@ -19,7 +19,7 @@
 
 import { audio } from '../game/audio';
 import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
-import { ITEMS } from '../sim/data';
+import { ITEMS, QUESTS } from '../sim/data';
 import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
 import {
@@ -29,17 +29,22 @@ import {
   type BagFilterState,
   type BagSort,
   bagOrderIsManual,
+  bagQuestItemCount,
   DEFAULT_BAG_FILTER,
   parseBagFilter,
   serializeBagFilter,
 } from './bag_filter';
 import { type BagInstanceGlyphKind, bagInstanceGlyphKind } from './bag_instance_glyph_view';
 import { bagItemHasContextActions } from './bag_item_context_menu';
+import { bagQuestMarkKind, bagQuestMarkProgressFromLog } from './bag_quest_mark_view';
+import { BagQuestTrackerHighlight } from './bag_quest_tracker_highlight';
+import { bagQuestTrackerHighlightId } from './bag_quest_tracker_highlight_view';
 import {
   type BagDestroyAction,
   type BagMode,
   bagDestroyAction,
   bagItemAction,
+  bagNoMatchKind,
   bagQualityKey,
   bagShiftLinks,
   bagStackIndex,
@@ -49,6 +54,7 @@ import {
   bankDepositOpensPrompt,
   buildBagBar,
   buildBagGrid,
+  buildBagListRows,
   resolveDepositSubmit,
 } from './bags_view';
 import { showQuantityPrompt } from './bank_quantity_prompt';
@@ -109,6 +115,8 @@ const BAG_GLYPH_ICONS: Readonly<Record<'enchanted' | 'signed' | 'bound', UiIconN
 // three visual kinds must not collapse back into one label. 'signed' and the
 // unclassified 'generic' both keep the pre-existing maker-marked wording, which
 // is accurate for a signer payload and is the status quo for the rest.
+// Quest stacks use itemAriaQuest instead (purpose class outranks copy flags for
+// the spoken name; the rim/wash always marks them as quest for sighted players).
 const BAG_GLYPH_ARIA_KEYS: Readonly<Record<NonNullable<BagInstanceGlyphKind>, TranslationKey>> = {
   masterwork: 'hudChrome.bags.itemAriaMasterwork',
   enchanted: 'hudChrome.bags.itemAriaEnchanted',
@@ -292,6 +300,11 @@ export class BagsWindow {
   // a window shown without a paint would always converge on the first probe.
   private lastMoneyCopper = -1;
 
+  // Bag hover/focus -> quest-tracker title highlight. One active row at a time;
+  // cleared on leave/focusout, programmatic tooltip hide, rebuild, and close so
+  // a stale class never sticks after the cell is torn down.
+  private readonly trackerHighlight = new BagQuestTrackerHighlight(document);
+
   constructor(private readonly deps: BagsWindowDeps) {}
 
   /**
@@ -372,6 +385,7 @@ export class BagsWindow {
     dismissBagPrompts();
     el.style.display = 'none';
     el.inert = false;
+    this.clearTrackerHighlight();
     this.deps.hideTooltip();
     this.deps.cancelPetFeed();
     this.deps.restoreFocus(this.openerFocus);
@@ -380,6 +394,8 @@ export class BagsWindow {
   }
 
   render(): void {
+    // Rebuild tears down hovered cells without mouseleave; drop any tracker glow.
+    this.clearTrackerHighlight();
     const el = this.deps.root();
     const world = this.deps.world();
     // The focused control's identity, carried across the rebuild (the vendor
@@ -566,6 +582,10 @@ export class BagsWindow {
   private buildFilterBar(): HTMLElement {
     const bar = document.createElement('div');
     bar.className = 'bag-filter-bar';
+    const world = this.deps.world();
+    // Quest chip badge: total stack count of quest items (bagQuestItemCount).
+    // Only painted when N > 0 so an empty bag of quest pieces stays quiet.
+    const questCount = bagQuestItemCount(world.inventory, (id) => knownItemDef(ITEMS, id));
 
     const chips = document.createElement('div');
     chips.className = 'bag-chips';
@@ -576,7 +596,17 @@ export class BagsWindow {
       chip.type = 'button';
       chip.className = `bag-chip${this.filter.category === category ? ' active' : ''}`;
       chip.dataset.focusKey = `bagchip:${category}`;
-      chip.textContent = t(BAG_CATEGORY_LABEL_KEYS[category]);
+      const label = t(BAG_CATEGORY_LABEL_KEYS[category]);
+      if (category === 'quest' && questCount > 0) {
+        const countText = formatNumber(questCount, { maximumFractionDigits: 0 });
+        chip.innerHTML = `${esc(label)}<span class="bag-chip-count" aria-hidden="true">${esc(countText)}</span>`;
+        chip.setAttribute(
+          'aria-label',
+          t('hudChrome.bags.filterQuestCountAria', { count: countText }),
+        );
+      } else {
+        chip.textContent = label;
+      }
       chip.setAttribute('aria-pressed', this.filter.category === category ? 'true' : 'false');
       chip.addEventListener('click', () => {
         if (this.filter.category === category) return;
@@ -648,7 +678,13 @@ export class BagsWindow {
       return;
     }
     if (model.state === 'noMatch') {
-      grid.innerHTML = `<div class="bag-empty">${esc(t('hudChrome.bags.noMatch'))}</div>`;
+      // Warm purpose-class copy when the Quest chip matches nothing; generic
+      // no-match line for every other filter (bagNoMatchKind pure discriminant).
+      const noMatchKey =
+        bagNoMatchKind(this.filter) === 'quest'
+          ? 'hudChrome.bags.noQuestItems'
+          : 'hudChrome.bags.noMatch';
+      grid.innerHTML = `<div class="bag-empty">${esc(t(noMatchKey))}</div>`;
       return;
     }
     // The pristine view paints the bag's REAL cells (model.cells): every stack sits in
@@ -656,6 +692,9 @@ export class BagsWindow {
     // other view (a filter, a search, a sort) is a derived LIST, whose squares hold no
     // position: those are still drop targets, but the drop is REFUSED with a toast
     // rather than silently doing nothing, which is what a broken drag looks like.
+    // Soft Quest section headers are NEVER inserted here: bagOrderIsManual is true,
+    // and a header node in the cell stream would shift bagIndex drop targets
+    // (state.md locked decision 7). Rim/seal alone marks quest stacks in this view.
     if (model.cells.length > 0) {
       for (let cell = 0; cell < model.cells.length; cell++) {
         const stack = model.cells[cell];
@@ -673,13 +712,38 @@ export class BagsWindow {
       }
       return;
     }
-    for (const s of model.visible) {
-      const item = knownItemDef(ITEMS, s.itemId);
-      grid.appendChild(
-        item ? this.buildStackCell(s, item, null) : this.buildUnknownStackCell(s, null),
-      );
+    // Derived list: soft Quest section headers only when buildBagListRows allows
+    // them (not manual All+recent; mixed quest + non-quest). Section rows are not
+    // drop targets and carry no bag cell index. No `continue` in this loop: the
+    // R34 pin holds fillGrid to zero continues so an unknown stack can never be
+    // skipped (tests/bags_window.test.ts).
+    for (const row of buildBagListRows(
+      model.visible,
+      (id) => knownItemDef(ITEMS, id),
+      this.filter,
+    )) {
+      if (row.kind === 'section') {
+        grid.appendChild(this.buildSectionHeader(row.section));
+      } else {
+        const s = row.slot;
+        const item = knownItemDef(ITEMS, s.itemId);
+        grid.appendChild(
+          item ? this.buildStackCell(s, item, null) : this.buildUnknownStackCell(s, null),
+        );
+      }
     }
     for (let i = 0; i < model.emptyCells; i++) grid.appendChild(this.buildEmptyCell(null));
+  }
+
+  // Soft parchment section caption for a derived bag list (Quest grouping). Not a
+  // drop target, not focusable, not counted as a bag cell.
+  private buildSectionHeader(_section: 'quest'): HTMLElement {
+    const el = document.createElement('div');
+    el.className = 'bag-section-header bag-section-quest';
+    el.setAttribute('role', 'presentation');
+    // Reuse the Quest chip label so the section and filter share one string.
+    el.textContent = t(BAG_CATEGORY_LABEL_KEYS.quest);
+    return el;
   }
 
   // One occupied square. `cell` is the bag CELL it sits in (the drop-target position), or
@@ -693,7 +757,12 @@ export class BagsWindow {
     {
       const row = document.createElement('button');
       row.type = 'button';
-      row.className = `bag-item q-${bagQualityKey(item)}`;
+      // Quest-purpose mark (bag_quest_mark_view.ts): kind===quest gets the
+      // .bag-quest rim/wash class; questReady adds .bag-quest-ready for the
+      // brighter seal. Purpose class, not a quality tier.
+      const questMark = bagQuestMarkKind(item, this.questMarkProgress(item));
+      const questReady = questMark === 'questReady';
+      row.className = `bag-item q-${bagQualityKey(item)}${questMark ? ' bag-quest' : ''}${questReady ? ' bag-quest-ready' : ''}`;
       // The stack's live inventory INDEX, resolved by REFERENCE (duplicate stacks and
       // instanced copies share an itemId): that is what the move command sends as `from`.
       const index = bagStackIndex(world.inventory, s);
@@ -711,16 +780,21 @@ export class BagsWindow {
       this.bindBagCellDrop(row, cell);
       const qColor = QUALITY_COLOR[bagQualityKey(item)] ?? QUALITY_DEFAULT_COLOR;
       const itemName = itemDisplayName(item);
-      // The single corner-glyph decision for this stack (bag_instance_glyph_view.ts
-      // owns the priority: masterwork, then enchanted, signed, bound, generic).
+      // Corner-glyph priority (composed from bag_instance_glyph_view +
+      // bag_quest_mark_view): masterwork > quest seal > enchanted / signed /
+      // bound > generic wedge. Rim/wash for quest is independent of the seal.
       const glyphKind = bagInstanceGlyphKind(s.instance);
       const isMasterwork = glyphKind === 'masterwork';
+      const showQuestSeal = questMark !== null && !isMasterwork;
       row.style.setProperty('--bag-slot-quality', qColor);
-      // An instanced stack's accessible name carries the per-copy flag the
-      // aria-hidden corner glyph shows sighted players (the review's a11y arm),
-      // now per KIND so the two channels agree; plain stacks keep the plain
-      // label.
-      const itemAriaKey = glyphKind ? BAG_GLYPH_ARIA_KEYS[glyphKind] : 'itemUi.bags.itemAria';
+      // Accessible name: quest stacks always announce quest item (the seal is
+      // aria-hidden). Non-quest instanced stacks keep their per-copy flag.
+      // Plain stacks keep the plain label.
+      const itemAriaKey = questMark
+        ? 'hudChrome.bags.itemAriaQuest'
+        : glyphKind
+          ? BAG_GLYPH_ARIA_KEYS[glyphKind]
+          : 'itemUi.bags.itemAria';
       row.setAttribute(
         'aria-label',
         t(itemAriaKey, {
@@ -728,31 +802,44 @@ export class BagsWindow {
           count: formatNumber(s.count, { maximumFractionDigits: 0 }),
         }),
       );
-      // The instanced-slot corner marker (Professions 2.0): one glyph per
-      // stack, naming WHICH kind of special copy it is. A masterwork keeps the
-      // authored seal exactly as before; enchanted / signed / bound each get
-      // their own procedural glyph (no new binary asset); an instanced payload
-      // matching none of them keeps the pre-existing generic tab, so no copy
-      // silently loses its marker. Exactly one treatment ever renders, it
-      // composes with the bottom-right count badge, and it stays visible
-      // without hover on desktop and touch, identical on every graphics preset.
-      const instanceMark =
-        glyphKind === 'generic'
-          ? '<span class="bi-instance" aria-hidden="true"></span>'
-          : glyphKind === 'enchanted' || glyphKind === 'signed' || glyphKind === 'bound'
-            ? `<span class="bi-glyph bi-glyph-${glyphKind}" aria-hidden="true">${svgIcon(BAG_GLYPH_ICONS[glyphKind])}</span>`
-            : '';
+      // Exactly one corner treatment ever renders: masterwork seal, quest seal,
+      // or an instance glyph/tab. Composes with the bottom-right count badge,
+      // always visible without hover on desktop and touch, identical on every
+      // graphics preset (no --fx gate). Ready seals share the seal markup and
+      // brighten via .bi-quest-seal-ready (static; optional pulse is CSS-only).
       const masterworkSeal = isMasterwork
         ? `<img class="bi-masterwork-seal" src="${MASTERWORK_SEAL_IMAGE_URL}" alt="" aria-hidden="true" draggable="false">`
         : '';
-      row.innerHTML = `${this.deps.itemIcon(item)}${instanceMark}${masterworkSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+      const questSeal = showQuestSeal
+        ? `<span class="bi-quest-seal${questReady ? ' bi-quest-seal-ready' : ''}" aria-hidden="true">${svgIcon('questlog')}</span>`
+        : '';
+      const instanceMark =
+        !isMasterwork && !showQuestSeal
+          ? glyphKind === 'generic'
+            ? '<span class="bi-instance" aria-hidden="true"></span>'
+            : glyphKind === 'enchanted' || glyphKind === 'signed' || glyphKind === 'bound'
+              ? `<span class="bi-glyph bi-glyph-${glyphKind}" aria-hidden="true">${svgIcon(BAG_GLYPH_ICONS[glyphKind])}</span>`
+              : ''
+          : '';
+      row.innerHTML = `${this.deps.itemIcon(item)}${instanceMark}${masterworkSeal}${questSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+      // Bag hover / keyboard focus lights the matching quest-tracker title
+      // (information-add). Mouse and focus both drive the same highlight so Tab
+      // navigation matches pointer hover; leave/focusout clear it. Touch peek
+      // still relies on the tooltip path alone (no mouseenter on long-press).
+      const trackerQuestId = bagQuestTrackerHighlightId(item);
+      if (trackerQuestId) {
+        row.addEventListener('mouseenter', () => this.trackerHighlight.set(trackerQuestId));
+        row.addEventListener('mouseleave', () => this.clearTrackerHighlight());
+        row.addEventListener('focusin', () => this.trackerHighlight.set(trackerQuestId));
+        row.addEventListener('focusout', () => this.clearTrackerHighlight());
+      }
       row.addEventListener('click', (ev) => {
         // On touch, the click that ends a long-press peek inspects the stack (its
         // tooltip is already shown) instead of running its action (use / sell /
         // deposit / feed): the release dismisses the tooltip and fires nothing. A
         // plain tap / desktop click falls through.
         if (this.deps.consumePeek()) {
-          this.deps.hideTooltip();
+          this.hideTooltipClearingTracker();
           return;
         }
         // The synthetic click that trails a completed touch drag must not ALSO run
@@ -836,7 +923,8 @@ export class BagsWindow {
           e.dataTransfer.effectAllowed = 'copyMove';
         }
         this.deps.markEquipDropTargets(s.itemId);
-        this.deps.hideTooltip();
+        // Drag dismisses the tooltip without mouseleave; clear the tracker glow too.
+        this.hideTooltipClearingTracker();
       });
       row.addEventListener('dragend', () => {
         this.deps.dragState.end();
@@ -864,7 +952,7 @@ export class BagsWindow {
               },
         ghostHtml: () => this.deps.itemIcon(item),
         onStart: () => {
-          this.deps.hideTooltip();
+          this.hideTooltipClearingTracker();
           this.deps.markEquipDropTargets(s.itemId);
         },
         onMove: () => {
@@ -1356,9 +1444,44 @@ export class BagsWindow {
     });
   }
 
+  /** Plain progress inputs for bagQuestMarkKind (questReady). Null when the
+   *  stack is not a quest kind or the player does not hold the related quest. */
+  private questMarkProgress(item: ItemDef) {
+    if (item.kind !== 'quest' || !item.questId) return null;
+    // Optional chain: thin IWorld fakes in unit harnesses may omit questLog.
+    const log = this.deps.world().questLog?.get(item.questId);
+    if (!log) return null;
+    const quest = QUESTS[item.questId];
+    return bagQuestMarkProgressFromLog(
+      item.id,
+      {
+        counts: log.counts,
+        state: log.state,
+        resolvedCounts: log.resolvedCounts,
+      },
+      quest?.objectives.map((objective) => ({
+        type: objective.type,
+        itemId: 'itemId' in objective ? objective.itemId : undefined,
+        count: objective.count,
+      })),
+    );
+  }
+
+  private clearTrackerHighlight(): void {
+    this.trackerHighlight.clear();
+  }
+
+  /** Hide the shared tooltip and drop any bag-driven tracker highlight. */
+  private hideTooltipClearingTracker(): void {
+    this.clearTrackerHighlight();
+    this.deps.hideTooltip();
+  }
+
   // Refresh only the grid contents (used by live search) so the search input keeps
   // focus and caret position across keystrokes.
   private refreshGrid(): void {
+    // Grid rebuild tears down hovered cells without mouseleave.
+    this.clearTrackerHighlight();
     const grid = this.deps.root().querySelector('.bag-grid') as HTMLElement | null;
     if (!grid) return;
     const prevScrollTop = grid.scrollTop;

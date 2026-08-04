@@ -37,6 +37,11 @@ export interface ClipMap {
   swim?: string;
   /** airborne base pose while jumping/falling */
   jump?: string;
+  /** Touchdown one-shot. Naming one opts the rig into the held-jump treatment:
+   *  `jump` stops looping and CLAMPS on its last frame (its airborne pose) for
+   *  however long the body stays off the ground, then this fires on the landing
+   *  edge. A rig without it keeps looping `jump` exactly as before. */
+  land?: string;
   walkBack?: string;
   /** one-shot played on respawn (skeleton awaken / boss taunt) */
   flourish?: string;
@@ -274,6 +279,31 @@ const WOLF_BAKED: ClipMap = {
   sitIdle: 'Sit',
   swim: 'Walk',
   jump: 'Fall',
+};
+
+// Druid Bear Form: a purpose-built quadruped rig (29 deform bones; the gaits are
+// authored as IK foot paths, so walkRef/runRef below are MEASURED off the clips
+// rather than guessed). Jump/Land are a pair: `land` opts the rig into the held
+// airborne treatment (see ClipMap.land).
+//
+// It deliberately names no `cast`, no `emote` and no `attackByAbility`. Bear-form
+// abilities are instant, and the ability-VFX painter gates its ceremonial cast
+// gesture on an authored per-ability clip (hasGestureClip) while the cast base
+// state falls back to idle without a `cast` clip. Leaving all three out is what
+// keeps an instant cast from firing a swipe; real attacks still resolve `attack`.
+const BEAR_FORM: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Attack'],
+  hit: ['Hit'],
+  death: 'Death',
+  jump: 'Jump',
+  land: 'Land',
+  sitIdle: 'Sit',
+  // a paddling walk beats the steep no-clip procedural prone on a quadruped,
+  // the same call the wolf forms make
+  swim: 'Walk',
 };
 
 // Custom wild boar rig (wild_boar.glb)
@@ -875,12 +905,19 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 1.2,
     clips: animal(['Attack_Headbutt']),
   },
+  // Purpose-built quadruped (replaced a brown-tinted yeti, which was a biped
+  // standing in for a bear). No tint: the sculpt ships its own texture.
+  // walkRef/runRef are measured from the clips themselves (a planted foot slides
+  // backwards relative to the hips at exactly body speed), scaled by
+  // height/rawHeight = 2.35/0.588. They put full run (RUN_SPEED 7) at timeScale
+  // 1.30, clear of the 1.6 clamp where feet start skating.
   form_bear: {
-    url: `${CREATURES}/yetialt.glb`,
-    height: 2.4,
-    clips: BIPED14,
-    tint: 0x5a4030,
-    tintStrength: 0.55,
+    url: `${CREATURES}/bear_form.glb`,
+    height: 2.35,
+    clips: BEAR_FORM,
+    walkRef: 1.6,
+    runRef: 5.4,
+    attackTimeScale: 1,
   },
   // Druid Wolf Form AND shaman Shadewolf (ghost_wolf renders this visual with
   // the ghost material on top). Same custom baked wolf as the world wolves;

@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { tintedMaterial } from '../src/render/characters/assets';
 import { VISUALS } from '../src/render/characters/manifest';
-import { GFX } from '../src/render/gfx';
+import { gfxInternalsForTest } from '../src/render/gfx';
 import {
   MOUNT_VISUAL_SPECS,
   mountBobY,
@@ -50,9 +50,7 @@ describe('mount visual specs cover the sim catalog', () => {
   });
 
   it('preserves authored vertex colors when Low converts mount materials to Lambert', () => {
-    const mutableGfx = GFX as unknown as { standardMaterials: boolean };
-    const original = mutableGfx.standardMaterials;
-    mutableGfx.standardMaterials = false;
+    const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: false });
     try {
       const source = new THREE.MeshStandardMaterial({
         color: 0x8c65a7,
@@ -63,7 +61,7 @@ describe('mount visual specs cover the sim catalog', () => {
       expect((converted as THREE.MeshLambertMaterial).vertexColors).toBe(true);
       expect((converted as THREE.MeshLambertMaterial).color.getHex()).not.toBe(0xffffff);
     } finally {
-      mutableGfx.standardMaterials = original;
+      restoreGfx();
     }
   });
 });

@@ -33,14 +33,18 @@ mkdirSync(outDir, { recursive: true });
 
 // 1) Bundle the browser entry. loadGltf -> assetUrl reads import.meta.env.DEV (DEV gates the
 //    root-relative /<logical> paths our static server maps into public/). esbuild matches each
-//    FULL member path exactly (a bare `import.meta.env` define does NOT fold `.DEV`), so every
-//    env field the transitive graph reads needs its own define: the Vite flags media.ts /
-//    i18n.ts read, plus the runtime/client-origin fields (src/runtime.ts, src/client_origin.ts)
-//    the graph pulled in with the v0.34 native/desktop work, all defined to their web-browser
-//    defaults. An UN-defined field no longer surfaces as a raw `import.meta` SyntaxError:
-//    current esbuild rewrites `import.meta` to an EMPTY OBJECT in an IIFE (with a warning), so
-//    `({}).env.X` TypeErrors at page boot and the harness hangs at the __ready wait instead.
-//    The guard below therefore scans for the rewritten empty-object env reads too.
+//    FULL member path exactly (a bare `import.meta.env` define does NOT fold `.DEV`), so define
+//    every Vite flag a transitive module reads (`grep -rho 'import\.meta\.env\.[A-Za-z_]*' src/`):
+//    media.ts / i18n.ts read DEV/PROD, and render/gfx.ts pulls in client_origin.ts and
+//    (transitively) runtime.ts for native/desktop-app origin detection, none of which apply to
+//    this static headless render. Keep the list exhaustive and at web-browser defaults.
+//
+//    A missed define no longer surfaces as a raw `import.meta` SyntaxError: current esbuild
+//    rewrites `import.meta` to an EMPTY OBJECT in an IIFE (with a warning), so `({}).env.X`
+//    TypeErrors at page boot and the harness hangs at the __ready wait instead (surfacing only
+//    as a PAGEERR and a 20s wait-for timeout). client_origin.ts reading VITE_NATIVE_APP hit
+//    exactly that. The guard below therefore checks BOTH shapes: a literal `import.meta` and
+//    the rewritten empty-object env reads.
 const bundled = await esbuild.build({
   entryPoints: [path.join(root, 'scripts', 'wiki', 'stills_render_entry.js')],
   bundle: true,
@@ -49,12 +53,16 @@ const bundled = await esbuild.build({
   define: {
     'import.meta.env.DEV': 'true',
     'import.meta.env.PROD': 'false',
-    // web-browser defaults for the runtime/client-origin reads (all "off"):
-    'import.meta.env.VITE_NATIVE_APP': "''",
-    'import.meta.env.VITE_API_ORIGIN': "''",
-    'import.meta.env.VITE_DESKTOP_APP': "''",
-    'import.meta.env.VITE_DESKTOP_API_ORIGIN': "''",
-    'import.meta.env.VITE_DESKTOP_RELATIVE_API': "''",
+    'import.meta.env.BASE_URL': '"/"',
+    'import.meta.env.VITE_API_ORIGIN': '""',
+    'import.meta.env.VITE_DESKTOP_API_ORIGIN': '""',
+    'import.meta.env.VITE_DESKTOP_APP': '""',
+    'import.meta.env.VITE_DESKTOP_RELATIVE_API': '""',
+    'import.meta.env.VITE_DISCORD_DISABLED': '""',
+    'import.meta.env.VITE_NATIVE_APP': '""',
+    'import.meta.env.VITE_REOWN_PROJECT_ID': '""',
+    'import.meta.env.VITE_TURNSTILE_SITEKEY': '""',
+    'import.meta.env.VITE_WALLET_DISABLED': '""',
   },
   write: false,
   logLevel: 'silent',
