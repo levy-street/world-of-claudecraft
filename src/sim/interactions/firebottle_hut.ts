@@ -47,13 +47,21 @@ const REASON_MESSAGE: Record<HutBurnReason, string | null> = {
   hutOnCooldown: 'This hut is still burning.',
 };
 
-const burnedList = (qp: QuestProgress): { id: number; at: number }[] => qp.burnedObjects ?? [];
+const burnedList = (qp: QuestProgress): { key: string; at: number }[] => qp.burnedObjects ?? [];
+
+// STABLE per-hut key for the persisted burn stamps: the object item id plus the
+// rounded spawn position. Runtime entity ids are spawn-order-assigned, so a
+// persisted id could alias a different object after a reboot or a content change
+// that shifts spawn order; the content position cannot.
+export function stableHutKey(hut: Entity): string {
+  return `${hut.objectItemId}@${Math.round(hut.pos.x)},${Math.round(hut.pos.z)}`;
+}
 
 // A hut is on its re-burn cooldown if it was torched within the last
 // HUT_REBURN_COOLDOWN_SECS. A burn stamped in the FUTURE (a server restart reset
 // sim-time under a persisted run) reads as lapsed, never stuck forever.
-function hutOnReburnCooldown(qp: QuestProgress, hutId: number, now: number): boolean {
-  const entry = burnedList(qp).find((b) => b.id === hutId);
+function hutOnReburnCooldown(qp: QuestProgress, hutKey: string, now: number): boolean {
+  const entry = burnedList(qp).find((b) => b.key === hutKey);
   if (!entry) return false;
   return now >= entry.at && now - entry.at < HUT_REBURN_COOLDOWN_SECS;
 }
@@ -95,9 +103,10 @@ function burnHut(
   player.firebottleCdRemaining = FIREBOTTLE_COOLDOWN_SECS;
   // Stamp this hut's burn time, keeping only the latest entry per hut, so it goes
   // on its re-burn cooldown and can be torched again once the cooldown lapses.
+  const hutKey = stableHutKey(hut);
   qp.burnedObjects = [
-    ...burnedList(qp).filter((b) => b.id !== hut.id),
-    { id: hut.id, at: ctx.time },
+    ...burnedList(qp).filter((b) => b.key !== hutKey),
+    { key: hutKey, at: ctx.time },
   ];
   // Throw animation (windup) + the bottle arcing to the hut + the blaze itself.
   ctx.emit({
@@ -138,7 +147,8 @@ export function throwFirebottleAtNearestHut(
   }
   const qp = meta.questLog.get(HUT_QUEST_ID);
   const onQuest = !!qp && (qp.state === 'active' || qp.state === 'ready');
-  const hutOnCooldown = !!qp && !!nearest && hutOnReburnCooldown(qp, nearest.id, ctx.time);
+  const hutOnCooldown =
+    !!qp && !!nearest && hutOnReburnCooldown(qp, stableHutKey(nearest), ctx.time);
   const result = firebottleBurnCheck({
     onQuest,
     hasBottle: ctx.countItem(FIREBOTTLE_ITEM_ID, meta.entityId) > 0,
@@ -171,7 +181,7 @@ export function tryBurnHut(
     distance: dist2d(player.pos, hut.pos),
     time: ctx.time,
     bottleReadyAt: meta.firebottleReadyAt ?? 0,
-    hutOnCooldown: !!qp && hutOnReburnCooldown(qp, hut.id, ctx.time),
+    hutOnCooldown: !!qp && hutOnReburnCooldown(qp, stableHutKey(hut), ctx.time),
   });
   if (!result.ok) {
     const msg = REASON_MESSAGE[result.reason];

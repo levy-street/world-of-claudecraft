@@ -502,6 +502,7 @@ import {
   onNodeGatheredForQuests,
   onRecipeCraftedForQuests,
 } from './quests/quest_credit';
+import { migrateRestoredQuestProgress } from './quests/quest_progress_migration';
 import { type NaturalRiftPortal, updateRiftPortals as updateRiftPortalsImpl } from './rift/portals';
 import {
   enchantRiftItem as enchantRiftItemImpl,
@@ -2883,16 +2884,28 @@ export class Sim {
         // the server tick (quest_credit.ts + interactNpcForQuests). questsDone is
         // membership-only (never dereferenced), so it is preserved as history below.
         if (q.state !== 'done' && QUESTS[q.questId])
-          meta.questLog.set(q.questId, {
-            questId: q.questId,
-            counts: [...q.counts],
-            state: q.state,
-            ...(q.selection === undefined ? {} : { selection: q.selection }),
-            ...(q.resolvedCounts === undefined ? {} : { resolvedCounts: [...q.resolvedCounts] }),
-            ...(q.burnedObjects === undefined
-              ? {}
-              : { burnedObjects: q.burnedObjects.map((b) => ({ id: b.id, at: b.at })) }),
-          });
+          // migrateRestoredQuestProgress resets an in-flight run whose QuestDef.rev
+          // moved under it (the objective rework migration); the burnedObjects
+          // filter drops pre-stable-key rows (a legacy {id, at} save) so they can
+          // never alias a live hut key.
+          meta.questLog.set(
+            q.questId,
+            migrateRestoredQuestProgress(QUESTS[q.questId], {
+              questId: q.questId,
+              counts: [...q.counts],
+              state: q.state,
+              ...(q.selection === undefined ? {} : { selection: q.selection }),
+              ...(q.resolvedCounts === undefined ? {} : { resolvedCounts: [...q.resolvedCounts] }),
+              ...(q.burnedObjects === undefined
+                ? {}
+                : {
+                    burnedObjects: q.burnedObjects
+                      .filter((b) => typeof b.key === 'string')
+                      .map((b) => ({ key: b.key, at: b.at })),
+                  }),
+              ...(q.rev === undefined ? {} : { rev: q.rev }),
+            }),
+          );
       }
       for (const q of s.questsDone) meta.questsDone.add(q);
       if (s.talents)
@@ -3660,7 +3673,8 @@ export class Sim {
         ...(q.resolvedCounts === undefined ? {} : { resolvedCounts: [...q.resolvedCounts] }),
         ...(q.burnedObjects === undefined
           ? {}
-          : { burnedObjects: q.burnedObjects.map((b) => ({ id: b.id, at: b.at })) }),
+          : { burnedObjects: q.burnedObjects.map((b) => ({ key: b.key, at: b.at })) }),
+        ...(q.rev === undefined ? {} : { rev: q.rev }),
       })),
       questsDone: [...meta.questsDone],
       arenaRating: meta.arenaRating,
@@ -8565,26 +8579,13 @@ export class Sim {
 
   private interactNpcForQuests(npc: Entity, meta: PlayerMeta): boolean {
     let progressed = false;
+    // Talking to the giver of an active quest re-grants a lost required item
+    // (quests/quest_commands.ts regrantMissingQuestItems, the accept grant's
+    // in-progress twin, on the same recoverable-stores predicate).
+    questCommands.regrantMissingQuestItems(this.ctx, meta, npc.templateId);
     for (const qp of meta.questLog.values()) {
       if (qp.state !== 'active') continue;
       const quest = QUESTS[qp.questId];
-      // Talking to the giver of an active quest re-grants any required item the
-      // player has lost (a deleted firebottle for q_deepfen_purge, say), so a
-      // missing prerequisite item can never permanently strand the quest. The
-      // accept path does the same grant (finalizeQuestAccept); this is its
-      // in-progress twin.
-      if (quest.giverNpcId === npc.templateId && quest.requiredItems) {
-        for (const itemId of quest.requiredItems) {
-          if (this.ctx.countItem(itemId, meta.entityId) > 0) continue;
-          this.ctx.addItem(itemId, 1, meta.entityId);
-          this.emit({
-            type: 'log',
-            text: 'You recover a quest item you were missing.',
-            color: '#ff0',
-            pid: meta.entityId,
-          });
-        }
-      }
       quest.objectives.forEach((objective, objectiveIndex) => {
         if (objective.type !== 'interact' || objective.targetNpcId !== npc.templateId) return;
         const required = questObjectiveRequired(quest, qp, objectiveIndex);

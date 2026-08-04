@@ -11,6 +11,7 @@ import {
   throwFirebottleAtNearestHut,
 } from '../src/sim/interactions/firebottle_hut';
 import { isQuestGatedEntityHidden } from '../src/sim/quest_gated_entity';
+import { regrantMissingQuestItems } from '../src/sim/quests/quest_commands';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
@@ -211,7 +212,11 @@ describe('Mirefen quest de-duplication', () => {
       const { ctx, events } = makeCtx(hut, 100);
       const meta = onQuestMeta();
       throwFirebottleAtNearestHut(ctx, player, meta);
-      expect(meta.questLog.get('q_deepfen_purge')?.burnedObjects?.map((b) => b.id)).toContain(5);
+      // Burn stamps key by the STABLE content key (item id + rounded position),
+      // never the runtime entity id (which can alias across a reboot).
+      expect(meta.questLog.get('q_deepfen_purge')?.burnedObjects?.map((b) => b.key)).toContain(
+        'murloc_hut@0,0',
+      );
       expect(meta.firebottleReadyAt).toBe(100 + FIREBOTTLE_COOLDOWN_SECS);
       // The bag cooldown swipe reads this materialized remaining value.
       expect((player as unknown as { firebottleCdRemaining: number }).firebottleCdRemaining).toBe(
@@ -329,14 +334,17 @@ describe('firebottle lifecycle: giver re-grant and removal on finish (q_deepfen_
 
   it('persists burned huts (burnedObjects) across a save and reload', () => {
     const sim = makeSim();
+    // rev: 1 marks this run as accepted under the reworked objective list, so
+    // the restore-time migration passes it through untouched.
     sim.questLog.set(HUT_QUEST, {
       questId: HUT_QUEST,
       counts: [2],
       state: 'active',
       burnedObjects: [
-        { id: 5, at: 100 },
-        { id: 6, at: 140 },
+        { key: 'murloc_hut@-78,269', at: 100 },
+        { key: 'murloc_hut@-83,266', at: 140 },
       ],
+      rev: 1,
     });
     const state = sim.serializeCharacter(sim.playerId)!;
     const reloaded = makeSim();
@@ -344,8 +352,67 @@ describe('firebottle lifecycle: giver re-grant and removal on finish (q_deepfen_
     const restored = reloaded.serializeCharacter(pid)!;
     const q = restored.questLog.find((x) => x.questId === HUT_QUEST);
     expect(q?.burnedObjects).toEqual([
-      { id: 5, at: 100 },
-      { id: 6, at: 140 },
+      { key: 'murloc_hut@-78,269', at: 100 },
+      { key: 'murloc_hut@-83,266', at: 140 },
     ]);
+  });
+
+  it('keeps the mining pick on abandon: only quest-owned items strip', () => {
+    // q_prof_intro grants the copper_mining_pick through requiredItems, but the
+    // pick is a durable profession TOOL (kind 'tool'), not the quest's own item:
+    // finishing or abandoning the quest must never delete it, or the player
+    // cannot harvest again until they buy another (the #2343 tool gate).
+    const sim = makeSim();
+    sim.questLog.set('q_prof_intro', { questId: 'q_prof_intro', counts: [0], state: 'active' });
+    sim.addItem('copper_mining_pick', 1);
+    sim.abandonQuest('q_prof_intro');
+    expect(sim.countItem('copper_mining_pick')).toBe(1);
+    expect(sim.questLog.has('q_prof_intro')).toBe(false);
+  });
+
+  it('does not mint a banked tool through the giver re-grant', () => {
+    // The mid-quest re-grant uses playerHoldsQuestItem (bags + bank + mail +
+    // market escrow), the same predicate as accept: a pick parked in the bank
+    // still counts as held, so talking to the giver mints nothing. A bags-only
+    // read here was the unbounded starter-tool mint.
+    const sim = makeSim();
+    sim.questLog.set('q_prof_intro', { questId: 'q_prof_intro', counts: [0], state: 'active' });
+    const meta = (sim as unknown as { players: Map<number, PlayerMeta> }).players.get(
+      sim.playerId,
+    )!;
+    const bank = (meta as unknown as { bank: { inventory: { itemId: string; count: number }[] } })
+      .bank;
+    bank.inventory.push({ itemId: 'copper_mining_pick', count: 1 });
+    const ctx = (sim as unknown as { ctx: SimContext }).ctx;
+    regrantMissingQuestItems(ctx, meta, 'foreman_odell');
+    expect(sim.countItem('copper_mining_pick')).toBe(0);
+    // The genuinely-lost case (no copy anywhere) still re-grants.
+    bank.inventory.length = 0;
+    regrantMissingQuestItems(ctx, meta, 'foreman_odell');
+    expect(sim.countItem('copper_mining_pick')).toBe(1);
+  });
+
+  it('refuses a firebottle throw while dead', () => {
+    const sim = makeSim();
+    const hut = [...sim.entities.values()].find((e) => e.objectItemId === 'murloc_hut');
+    if (!hut) throw new Error('no murloc hut in the world');
+    const pos = sim.groundPos(hut.pos.x + 1, hut.pos.z);
+    sim.player.pos = { ...pos };
+    sim.player.prevPos = { ...pos };
+    sim.questLog.set(HUT_QUEST, { questId: HUT_QUEST, counts: [0], state: 'active', rev: 1 });
+    sim.addItem('firebottle', 1);
+    // Alive control: the same spot burns and starts the cooldown.
+    sim.useItem('firebottle');
+    expect(sim.questLog.get(HUT_QUEST)?.counts[0]).toBe(1);
+    // Dead: the use path's dead guard refuses before the throw arm runs.
+    sim.questLog.set(HUT_QUEST, { questId: HUT_QUEST, counts: [0], state: 'active', rev: 1 });
+    sim.player.dead = true;
+    sim.player.firebottleCdRemaining = 0;
+    (sim as unknown as { players: Map<number, PlayerMeta> }).players.get(
+      sim.playerId,
+    )!.firebottleReadyAt = 0;
+    sim.useItem('firebottle');
+    expect(sim.questLog.get(HUT_QUEST)?.counts[0]).toBe(0);
+    expect(sim.player.firebottleCdRemaining).toBe(0);
   });
 });

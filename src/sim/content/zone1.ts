@@ -932,6 +932,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
   },
   q_bones: {
     id: 'q_bones',
+    rev: 1, // objective rework (zones 1-3 dedupe): pre-rework in-flight runs reset on restore
     name: 'The Restless Dead',
     giverNpcId: 'brother_aldric',
     turnInNpcId: 'brother_aldric',

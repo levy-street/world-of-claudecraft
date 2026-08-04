@@ -960,6 +960,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
   },
   q_deepfen_purge: {
     id: 'q_deepfen_purge',
+    rev: 1, // objective rework (zones 1-3 dedupe): pre-rework in-flight runs reset on restore
     name: 'Back to the Shallows',
     giverNpcId: 'warden_fenwick',
     turnInNpcId: 'warden_fenwick',
@@ -994,6 +995,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
   },
   q_broodmother: {
     id: 'q_broodmother',
+    rev: 1, // objective rework (zones 1-3 dedupe): pre-rework in-flight runs reset on restore
     name: 'The Broodmother',
     giverNpcId: 'herbalist_yara',
     turnInNpcId: 'herbalist_yara',
@@ -1046,6 +1048,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
   },
   q_no_rest: {
     id: 'q_no_rest',
+    rev: 1, // objective rework (zones 1-3 dedupe): pre-rework in-flight runs reset on restore
     name: 'No Rest in the Reeds',
     giverNpcId: 'brother_aldric_fen',
     turnInNpcId: 'brother_aldric_fen',

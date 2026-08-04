@@ -2972,6 +2972,14 @@ export interface QuestDef {
   // Resolve the first objective's count from the character's return history at
   // acceptance time. The snapshotted value stays stable while the quest is active.
   resolvedObjectiveCounts?: 'archetypeAmends';
+  // Objective-list revision. Bump when a rework changes what an objective INDEX
+  // means (a new target, type, or count under the same quest id), so an
+  // in-flight save's index-keyed counts stop applying: on restore, a
+  // QuestProgress whose stamped rev differs is reset to a fresh run
+  // (quests/quest_progress_migration.ts). Without this, a carried count at or
+  // above the new requirement can never flip ready (the credit paths skip an
+  // at-cap objective before their ready check) and the quest strands.
+  rev?: number;
 }
 
 export function questTurnInNpcIds(quest: QuestDef): readonly string[] {
@@ -2995,9 +3003,15 @@ export interface QuestProgress {
   // World objects torched THIS quest run (burned murloc huts), each with the
   // sim-time it was last burned. A hut is on cooldown until HUT_REBURN_COOLDOWN_SECS
   // after that, then it can be torched (and credited) again. Only the latest burn
-  // per object id is kept. Fresh (empty) on accept; persisted with the run
+  // per object is kept, keyed by the STABLE content key (object item id plus
+  // rounded spawn position, firebottle_hut.ts stableHutKey), never the runtime
+  // entity id, which is spawn-order-assigned and can alias across a reboot or a
+  // content change. Fresh (empty) on accept; persisted with the run
   // (serialize/restore in sim.ts). See src/sim/interactions/firebottle_hut.ts.
-  burnedObjects?: { id: number; at: number }[];
+  burnedObjects?: { key: string; at: number }[];
+  // The QuestDef.rev this progress was accepted (or migrated) under; restore
+  // resets the run when the def's rev has moved (quest_progress_migration.ts).
+  rev?: number;
 }
 
 export function questObjectiveRequired(

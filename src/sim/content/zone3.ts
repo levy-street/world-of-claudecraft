@@ -1526,6 +1526,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
   },
   q_ogre_bounty: {
     id: 'q_ogre_bounty',
+    rev: 1, // objective rework (zones 1-3 dedupe): pre-rework in-flight runs reset on restore
     name: "The Captain's Bounty",
     giverNpcId: 'captain_thessaly',
     turnInNpcId: 'captain_thessaly',
@@ -1656,6 +1657,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
   },
   q_cult_orders: {
     id: 'q_cult_orders',
+    rev: 1, // objective rework (zones 1-3 dedupe): pre-rework in-flight runs reset on restore
     name: 'Orders from Below',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
@@ -1672,6 +1674,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
   },
   q_necromancers: {
     id: 'q_necromancers',
+    rev: 1, // objective rework (zones 1-3 dedupe): pre-rework in-flight runs reset on restore
     name: 'The Phylactery Ring',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
@@ -1710,6 +1713,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
   },
   q_revenant_vanguard: {
     id: 'q_revenant_vanguard',
+    rev: 1, // objective rework (zones 1-3 dedupe): pre-rework in-flight runs reset on restore
     name: 'Bones of the Vanguard',
     giverNpcId: 'captain_thessaly',
     turnInNpcId: 'captain_thessaly',
@@ -1766,6 +1770,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
   },
   q_voice_below: {
     id: 'q_voice_below',
+    rev: 1, // objective rework (zones 1-3 dedupe): pre-rework in-flight runs reset on restore
     name: 'The Voice Below',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
