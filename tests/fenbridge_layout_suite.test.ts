@@ -525,9 +525,17 @@ describe('Fenbridge content projection and preservation', () => {
       { mobId: 'mire_widow', center: { x: 70, z: 300 }, radius: 20, count: 7 },
       { mobId: 'mire_widow', center: { x: 95, z: 340 }, radius: 16, count: 6 },
       { mobId: 'mirefen_broodmother', center: { x: 98, z: 348 }, radius: 3, count: 1 },
+      // The quest-dedupe pass interleaves the Broodmother egg clutch with the
+      // widow packs (it reuses their two camp centers and radii deliberately, so
+      // the clutch reads as part of the nest rather than a separate pile) and
+      // adds the Drowned Warlord elite capstone. Every Fenbridge coordinate
+      // above and below is untouched, which is what this pin exists to prove.
+      { mobId: 'spider_egg', center: { x: 70, z: 300 }, radius: 20, count: 7 },
+      { mobId: 'spider_egg', center: { x: 95, z: 340 }, radius: 16, count: 6 },
       { mobId: 'drowned_dead', center: { x: 90, z: 420 }, radius: 20, count: 8 },
       { mobId: 'drowned_dead', center: { x: 115, z: 450 }, radius: 16, count: 6 },
       { mobId: 'sloomtooth_the_drowned', center: { x: 118, z: 455 }, radius: 5, count: 1 },
+      { mobId: 'drowned_warlord', center: { x: 98, z: 432 }, radius: 3, count: 1 },
       { mobId: 'fen_troll', center: { x: -80, z: 420 }, radius: 22, count: 7 },
       { mobId: 'fen_troll', center: { x: -105, z: 455 }, radius: 18, count: 6 },
       { mobId: 'grubjaw', center: { x: -120, z: 480 }, radius: 8, count: 1 },
@@ -569,7 +577,22 @@ describe('Fenbridge content projection and preservation', () => {
       'q_mistcaller',
       'q_prof_workorder_tannery',
     ]);
+    // The quest-dedupe pass prepends the burnable Mudfin huts (q_deepfen_purge),
+    // so the Fenbridge muster order sits at index 1 rather than 0. Its two
+    // positions are unchanged, and the slice below proves every later Fenbridge
+    // ground object is untouched in both content and order.
     expect(ZONE2_OBJECTS[0]).toEqual({
+      itemId: 'murloc_hut',
+      name: 'Mudfin Hut',
+      positions: [
+        { x: -78, z: 269 },
+        { x: -83, z: 266 },
+        { x: -74, z: 275 },
+        { x: -117, z: 346 },
+        { x: -123, z: 354 },
+      ],
+    });
+    expect(ZONE2_OBJECTS[1]).toEqual({
       itemId: 'fen_muster_order',
       name: 'Fenbridge Muster Order',
       positions: [
@@ -577,7 +600,7 @@ describe('Fenbridge content projection and preservation', () => {
         { x: 3.75, z: 274.8 },
       ],
     });
-    expect(ZONE2_OBJECTS.slice(1)).toEqual([
+    expect(ZONE2_OBJECTS.slice(2)).toEqual([
       {
         itemId: 'lost_caravan_goods',
         name: 'Lost Caravan Goods',
