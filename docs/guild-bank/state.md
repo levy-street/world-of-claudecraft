@@ -4,9 +4,12 @@ Current phase: Phase 4 QA complete, plus the 2026-08-03 audit-trail hardening
 (payer-side `bank_ledger` counterparty columns and three consolidation loose
 ends) and the 2026-08-03 IN-GAME ACTIVITY LOG (the final feature slice: the
 officer-visible read of the `bank_ledger` rows every op already wrote; see
-progress.md). The packet is closed and the branch
-is PR-ready (merged over origin/release/v0.34.0 at fbf4d35a1, full gate green).
-Teardown of docs/guild-bank/ awaits the user's explicit confirmation.
+progress.md), plus the 2026-08-03 REAL-POSTGRES VERIFICATION PASS that closes the
+duplication audit's one stated limitation ("the protocol above the SQL is proven;
+the SQL is not") and supplies the database review's demanded runtime evidence for
+the log-read index. See "Real-Postgres verification" below. The packet is closed
+and the branch is PR-ready (merged over origin/release/v0.34.0 at fbf4d35a1, full
+gate green). Teardown of docs/guild-bank/ awaits the user's explicit confirmation.
 
 ## Locked design decisions
 - Base `release/v0.34.0`, branch `feature/guild-bank`. PR A (`feature/guild-social-v1`)
@@ -187,6 +190,55 @@ Teardown of docs/guild-bank/ awaits the user's explicit confirmation.
     a ScalarArrayOpExpr on a middle column would forfeit the ordering guarantee the
     trailing `id DESC` exists for, and as a trailing Filter it costs only the
     suppressed rows.
+    RUNTIME PROOF AT SCALE (2026-08-03, the database review's demanded evidence;
+    see "Real-Postgres verification" below for the harness). 5,200,000 `bank_ledger`
+    rows on PostgreSQL 16.14, 5,000,000 personal and 200,000 guild across 500 guilds,
+    interleaved by id as a live realm produces them, skewed so guild 1 carries 40,000
+    lifetime rows and the tail carries about 245 each. READ THE ABSOLUTE TIMINGS AS
+    RATIOS, not as production numbers: this is the dev `postgres:16-alpine` container
+    (`shared_buffers` 128MB, `work_mem` 4MB, `max_parallel_workers_per_gather` 2) on
+    an Apple M4 Pro with a warm cache, so a production box with more cache is faster
+    and a cold one is slower. The heap is 580MB and the whole table 1,067MB, which is
+    what makes the without-index numbers below meaningful rather than a cache artifact.
+    `EXPLAIN (ANALYZE, BUFFERS)` of the exact `loadGuildBankLogRows` statement:
+    | guild shape | node | index-scan buffers | total buffers | exec |
+    |---|---|---|---|---|
+    | 1 (40,000 lifetime rows) | Index Scan using bank_ledger_container_recent | 57 | 207 | 0.90 ms |
+    | 250 (245 lifetime rows) | same | 37 | 187 | 0.45 ms |
+    | 501 (300 rows, all at the OLDEST ids) | same | 5 | 155 | 0.09 ms |
+    ONE CORRECTION to the review's wording, worth stating because it reads as a
+    regression otherwise: the plan node is `Index Scan`, NOT `Index Scan Backward`.
+    That is the `id DESC` in the index definition doing its job. A `(container_id,
+    id)` ASC index would be walked BACKWARD to answer `ORDER BY id DESC`; because
+    the DESC is baked into the index, a FORWARD walk already emits descending ids.
+    Either way there is NO Sort node in any plan, which is the property that
+    matters. `container = 'guild'` never appears in the Index Cond either: the
+    partial predicate proves it, which is the partial index working as designed.
+    The op filter removes NEAR-ZERO rows, as the "op stays OUT" decision assumed:
+    `Rows Removed by Filter: 1` for guild 1 and no removals at all for the others
+    (the two hidden diagnostic ops are 400 of 200,000 guild rows, 0.2%). Buffers
+    track the LIMIT and not lifetime rows: the index-scan node reads 57 buffers for
+    the 40,000-row guild and 5 for the 300-row one, and the bulk of each total is
+    the 50-loop `characters_pkey` lookup, i.e. exactly proportional to the LIMIT.
+    WITHOUT the index the same statement degrades exactly as feared, and worse for
+    an OLD guild than a busy one: guild 1 gets a parallel backward primary-key scan
+    (1,440 buffers, 7.8 ms, 18,977 rows removed by filter), but guild 501, whose
+    rows are all old, gets a PARALLEL SEQ SCAN of the whole keep-forever table
+    (75,211 buffers, 5.2M rows scanned, 128 ms warm on 3 workers). That is the
+    read the 2s `GUILD_BANK_LOG_TIMEOUT_MS` exists to bound, and it confirms the
+    deadline is a real backstop rather than a formality.
+    WRITE-AMPLIFICATION SIZING (`pg_relation_size` at the same scale):
+    | index | size | entries |
+    |---|---|---|
+    | `bank_ledger_container_recent` (shipped, PARTIAL) | 6,340,608 B (6.2 MB) | 200,300 |
+    | `(container_id, id DESC)`, non-partial | 164,052,992 B (156 MB) | 5,200,300 |
+    | `(container, container_id, id DESC)`, non-partial | 256,835,584 B (245 MB) | 5,200,300 |
+    The partial index is 26x smaller than the narrowest full equivalent and 40x
+    smaller than the one that actually mirrors the predicate, against a 580 MB heap.
+    Directly measured insert cost for 100,000 PERSONAL rows (the rows a full index
+    would carry for nothing): 1.33 to 1.41 s with the partial index alone, 1.57 to
+    1.61 s with both full equivalents also present, about 16% slower, forever, plus
+    their WAL. The write-amplification argument is therefore quantified, not asserted.
   - THE CONCURRENT BUILDS MOVED OFF THE PRE-LISTEN PATH (`runConcurrentIndexMigrations`,
     split out of `ensureSchema` and called after `server.listen`). They serialize across
     realm processes on the schema advisory lock, and a concurrent build on a table this
@@ -198,6 +250,18 @@ Teardown of docs/guild-bank/ awaits the user's explicit confirmation.
     and NOT fatal (every entry is idempotent and drops its own INVALID carcass, so the
     next boot retries; a realm already serving players must not be killed by an index
     build).
+    MEASURED BUILD COST at the 5.2M-row scale above (2026-08-03): the shipped partial
+    index builds in 707 ms UNCONTENDED. With one unrelated transaction already open
+    that had touched `bank_ledger` and then slept 25s, the SAME build took 23.0s: it
+    waited out essentially the whole remaining life of that transaction and then
+    finished in its usual sub-second. That is the number this decision turns on. The
+    build's cost is NOT a function of the table (sub-second at 5.2M rows) but of the
+    LONGEST CONCURRENT TRANSACTION, which is unbounded and which a boot cannot
+    predict. Held before `listen` that wait is a realm serving nobody; held after, it
+    is an index arriving late while the realm serves normally, which is exactly what
+    the read's own 2s deadline covers. For reference the non-partial equivalents cost
+    2.6s and 3.4s uncontended, so the partial form is also the cheapest thing to
+    rebuild after a carcass drop.
   - WIRE: `guild_bank_log` (a pure READ token, no mutation) answered on its own
     one-shot `{ t: 'gbanklog', ok, entries }` frame, NEVER a snapshot key: the payload
     is cold, identical per guild, and 50 rows wide. `GUILD_BANK_LOG_LIMIT = 50`.
@@ -882,6 +946,11 @@ What remains accepted:
   than only within one. A later commit can no longer discard an earlier one, so book
   writes no longer NEED the market serial writer; taking the autosave arm off it is
   recorded as a follow-up (escrow-fix-plan.md section 3.6), not done here.
+  PROVEN AGAINST REAL POSTGRES on 2026-08-03, not merely reasoned about: see
+  "Real-Postgres verification" below, where deleting the `FOR UPDATE` from the
+  statement makes three concurrent writers of one book land 2,000 copper instead of
+  6,000, and deleting the seed-then-relock makes three concurrent writers of a
+  BRAND-NEW book land 100 instead of 300.
 - guild_banks.realm is written on every upsert but never read by the load paths
   (which key off guilds.realm); kept for operator forensics and a future
   cross-realm audit dimension.
@@ -907,6 +976,91 @@ What remains accepted:
 - Books deliberately share the market serial writer (no second queue): the leave
   flush writes market, mail, AND books in one transaction, so a separate book queue
   would reopen the interleaving the single writer exists to prevent.
+
+## Real-Postgres verification (2026-08-03)
+
+A duplication audit closed seven defects and then stated one honest limitation:
+all four escrow harnesses mock `server/db` with in-memory stores that honour the
+lease fence, so "the protocol above the SQL is proven; the SQL is not". Real
+transaction rollback, row-lock ordering, the FK cascade and the statements
+themselves were untested. That gap is now closed by
+`tests/guild_bank_pg_integration.test.ts`, an opt-in suite gated on
+`TEST_DATABASE_URL` like every other `*_integration.test.ts` (without it the file
+skips green, so CI's DB-free floor is unchanged).
+
+It DROPs and CREATEs its own disposable database (`wocc_guild_bank_verify`) on the
+server the URL points at, refuses to run if that name would collide with the URL's
+own database, and boots the REAL `ensureSchema()` plus
+`runConcurrentIndexMigrations()` into it, so every statement under test runs
+against production's columns, defaults, constraints and indexes. 18 cases, about
+6 seconds. What each one PROVED (all against PostgreSQL 16.14):
+
+- **The escrow transaction, both halves.** A committed save lands the character
+  row AND the `guild_banks` row. A save with a stale lease nonce returns false and
+  leaves BOTH halves at their previous values. The decisive arm is the DEFICIT
+  case: the character UPDATE SUCCEEDS inside the transaction, the book half is then
+  refused, and the real ROLLBACK undoes the already-successful UPDATE. A mocked
+  client cannot produce that; only a real transaction can. The leave-flush sibling
+  (`saveCharacterAndMarketState` with a books array) was proven to carry the same
+  fence and the same rollback.
+- **The FK cascade.** The real `PgSocialDb.deleteGuild` DELETE was driven against
+  real rows: `guild_banks` and `guild_members` cascade away, and `bank_ledger`
+  does NOT (its `container_id` is a plain BIGINT with no FK), so the keep-forever
+  anti-dupe audit trail SURVIVES a disband. That last one is now pinned, because a
+  well-meaning future FK there would silently delete the evidence a dupe
+  investigation depends on. The guards were then driven through the REAL
+  `SocialService.guildDisband` over a REAL `PgSocialDb`: a book holding copper
+  refuses and the row survives; null holdings fail CLOSED and the row survives;
+  an empty book deletes, and the delete window is still OPEN at the post-commit
+  hook, with the guilds row confirmed already gone at that instant. That is
+  finding 4's destructive ordering shown to be unreachable, against the real
+  cascade rather than a description of it.
+- **Row-lock ordering.** A deterministic negative control takes two
+  `guild_banks` row locks in REVERSED order behind a barrier and gets a real
+  Postgres `40P01 deadlock detected`; the same harness in ASCENDING order never
+  deadlocks over ten runs. Then the real thing: 6 sessions x 30 rounds of
+  `saveCharacterAndGuildBankState`, each carrying all 4 books collected through
+  the real `collectGuildBankDeltas`, each session handing it a DIFFERENT hostile
+  order. Zero failures and exact conservation (1,800 copper into every book).
+  MUTATION-CHECKED: deleting the ascending sort from `collectGuildBankDeltas`
+  turns that case into a storm of real `40P01`s. An earlier draft of this test
+  handed every session the SAME order and therefore survived that mutation, which
+  is worth recording as the trap: overlapping book SETS are not enough, the orders
+  have to DISAGREE.
+- **`SELECT ... FOR UPDATE` in the merge path.** Three concurrent writers x 20
+  rounds against one existing book land all 6,000 copper. Deleting `FOR UPDATE`
+  from the statement lands 2,000. The no-row window has its own case, because it
+  is the only state the seed-then-relock exists for and it happens once per guild
+  for a realm's whole life: 25 BRAND-NEW guilds, 3 concurrent writers each, all
+  300 copper lands on every one and exactly one row exists. Deleting the
+  seed-then-relock lands 100. A raw unlocked read-modify-write is included as a
+  positive control and does lose an update, so the assertions are demonstrably
+  capable of failing.
+- **Boot idempotency on a POPULATED database.** After every case above has filled
+  the database with accounts, characters, leases, guilds, books and ledger rows,
+  `ensureSchema()` and `runConcurrentIndexMigrations()` are each re-applied TWICE.
+  A full fingerprint (every `information_schema.columns` row, every `pg_indexes`
+  row, every `pg_constraint` definition in `public`) is byte-identical before and
+  after, and no row or treasury total moved. The new surface is pinned
+  specifically: `guild_banks`' four columns, the two counterparty columns as
+  NULLABLE WITH NO DEFAULT (a `DEFAULT 0` would turn every legacy row into a false
+  all-clear for the audit), and `bank_ledger_container_recent` present, partial,
+  ordered and `indisvalid`.
+- **The log read's actual SQL.** `loadGuildBankLogRows` against real rows: the op
+  allowlist is enforced IN SQL (the two hidden diagnostic ops never appear), rows
+  come back id-DESC, the LIMIT holds, another guild's rows are excluded, and
+  `character_id` resolves to a display name in the same statement.
+
+WHAT THIS DOES NOT COVER, so the residual risk is stated rather than implied: it
+runs against one PostgreSQL 16.14 instance with the dev container's settings
+(`shared_buffers` 128MB, `work_mem` 4MB, `deadlock_timeout` 1s) on one machine, so
+it proves SEMANTICS and not production timing; the concurrency cases are wide
+rather than exhaustive (a scheduler that never interleaves would let them pass
+vacuously, which is why every one of them is mutation-checked); it drives the db
+layer and `SocialService` directly rather than a live `GameServer` over WebSockets,
+so the dispatch, session and tick layers above the SQL remain covered only by the
+existing mocked suites; and nothing here exercises a multi-PROCESS realm, which is
+the deployment premise the cache bust and the single-writer narrowing both rest on.
 
 ## Known gotchas
 - `SimContext` is append-only: add views/callbacks, never rename or repurpose existing ones.

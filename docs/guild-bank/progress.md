@@ -14,6 +14,48 @@
 | Follow-ups (stacked branch, 3 slices) | Done | 2026-08-03 | 2026-08-03 |
 | Audit-trail hardening (payer-side ledger column + 3 loose ends) | Done | 2026-08-03 | 2026-08-03 |
 | In-game bank log (final feature slice) | Done | 2026-08-03 | 2026-08-03 |
+| Real-Postgres verification + index runtime proof | Done | 2026-08-03 | 2026-08-03 |
+
+## Real-Postgres verification (2026-08-03, on `feature/guild-bank`)
+The duplication audit closed seven defects and stated one limitation: every escrow
+harness mocks `server/db`, so the protocol above the SQL was proven and the SQL was
+not. This pass closes it and supplies the runtime evidence the database review
+demanded for the log-read index. Full detail, including the numbers, lives beside
+the decisions in state.md ("Real-Postgres verification", plus the INDEX and
+CONCURRENT BUILDS blocks).
+
+- [x] **`tests/guild_bank_pg_integration.test.ts`**, opt-in on `TEST_DATABASE_URL`
+      like every other `*_integration.test.ts`. Drops and creates its own
+      disposable database, boots the REAL `ensureSchema()` and
+      `runConcurrentIndexMigrations()` into it, and drives the real exported
+      functions. 18 cases, about 6 s. Escrow commit and both rollback arms (fence
+      miss AND book-half refusal, the latter undoing a character UPDATE that had
+      already succeeded inside the transaction); the real `deleteGuild` cascade,
+      with `bank_ledger` proven to SURVIVE it; the two disband guards through the
+      real `SocialService` over a real `PgSocialDb`; row-lock ordering; the
+      `FOR UPDATE` merge and its no-row seed-then-relock; and `ensureSchema`
+      idempotency re-confirmed against a POPULATED database by a full
+      column/index/constraint fingerprint.
+- [x] **Every load-bearing case mutation-checked**, because a concurrency test
+      that never interleaves passes vacuously. Removing `FOR UPDATE`: 2,000 copper
+      instead of 6,000. Removing the seed-then-relock: 100 instead of 300. Removing
+      the ascending sort in `collectGuildBankDeltas`: real `40P01 deadlock
+      detected`. A deliberate `40P01` negative control and a lost-update positive
+      control are checked in beside the real cases.
+- [x] **One harness defect found and fixed IN THIS PASS.** The first draft of the
+      concurrent-escrow case handed every session the SAME hostile guild order, so
+      all six transactions still agreed on a lock order and the case SURVIVED the
+      sort-removal mutation. Fixed by giving each session a distinct rotated and
+      reversed order; the mutation is now caught. No product defect: the mutation
+      check found a hole in the test, not in the code.
+- [x] **Index runtime proof at 5.2M rows** (5,000,000 personal + 200,000 guild
+      across 500 guilds, skewed). `EXPLAIN (ANALYZE, BUFFERS)` of the exact
+      statement, index sizes for the partial form versus both non-partial
+      equivalents, a directly measured insert-cost delta, and `CREATE INDEX
+      CONCURRENTLY` wall clock with and without a concurrently open long
+      transaction. One wording correction recorded: the plan node is `Index Scan`,
+      not `Index Scan Backward`, because the `id DESC` is baked into the index; no
+      Sort node appears either way.
 
 ## In-game bank log (2026-08-03, on `feature/guild-bank`)
 Three commits (server read path, facet + wire, UI). The final feature slice: the
