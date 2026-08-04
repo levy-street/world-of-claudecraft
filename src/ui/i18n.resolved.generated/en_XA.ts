@@ -10094,6 +10094,9 @@ export const en_XA: EnTranslations = {
       "moggers_hide_quiver": {
         "name": "[Ɱóĝĝéŕ'š Ĥíðé Ɋúíʋéŕ]"
       },
+      "cragmaw_huntquiver": {
+        "name": "[Çŕáĝɱáŵ Ĥúñţɋúíʋéŕ]"
+      },
       "gravewyrm_bone_quiver": {
         "name": "[Ĝŕáʋéŵýŕɱ Ɓóñé Ɋúíʋéŕ]"
       },

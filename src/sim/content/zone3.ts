@@ -168,6 +168,9 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       { itemId: 'cragmaw_prowlboots', chance: 0.3 },
       { itemId: 'cragward_pauldrons', chance: 0.25 },
       { itemId: 'cragthorn_greatstaff', chance: 0.2 },
+      // Independent roll like every other piece on this table, so the quiver
+      // costs the existing drops nothing.
+      { itemId: 'cragmaw_huntquiver', chance: 0.25 },
     ],
     scale: 1.3,
     color: 0x6e6453,
@@ -2477,6 +2480,20 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'rare',
     stats: { armor: 44, agi: 5, sta: 3 },
     sellValue: 340,
+  },
+  cragmaw_huntquiver: {
+    id: 'cragmaw_huntquiver',
+    name: 'Cragmaw Huntquiver',
+    kind: 'held_offhand',
+    slot: 'offhand',
+    quality: 'rare',
+    // The quiver ladder's early-Thornpeak rung, off the same beast that already
+    // anchors the zone's agi-leather line (Huntcord above, Prowlboots): Old
+    // Cragmaw (level 14) -> item level 17, offhand budget 7. Fills the long
+    // stretch between Mogger's uncommon (item level 7) and Korzul's rare (23).
+    stats: { agi: 4, sta: 3 },
+    sellValue: 240,
+    requiredClass: HUNTER_ONLY,
   },
   // --- Level-20 endgame loot: Korzul (5-player Gravewyrm Sanctum) and Nythraxis
   // (10-player raid). Every piece below is NORMALIZED to the stat budget its item

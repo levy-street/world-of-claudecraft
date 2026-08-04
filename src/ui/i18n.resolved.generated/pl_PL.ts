@@ -10094,6 +10094,9 @@ export const pl_PL: EnTranslations = {
       "moggers_hide_quiver": {
         "name": "Mogger's Hide Quiver"
       },
+      "cragmaw_huntquiver": {
+        "name": "Cragmaw Huntquiver"
+      },
       "gravewyrm_bone_quiver": {
         "name": "Gravewyrm Bone Quiver"
       },

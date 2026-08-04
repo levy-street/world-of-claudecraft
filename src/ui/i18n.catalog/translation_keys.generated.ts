@@ -1748,6 +1748,7 @@ export type TranslationKeyFlat =
   | 'entities.items.crag_warden_cudgel.name'
   | 'entities.items.craghorn_staff.name'
   | 'entities.items.cragmaw_huntcord.name'
+  | 'entities.items.cragmaw_huntquiver.name'
   | 'entities.items.cragmaw_prowlboots.name'
   | 'entities.items.cragprowl_belt.name'
   | 'entities.items.cragthorn_greatstaff.name'

@@ -9,7 +9,12 @@ import { ALL_CLASSES, type ItemDef, type PlayerClass } from '../src/sim/types';
 // permanently empty offhand). Held offhands equip by their literal
 // requiredClass alone, which is the whole reason a hunter-only offhand needs no
 // engine change: see src/sim/equipment_rules.ts canEquipItem.
-const QUIVERS = ['moggers_hide_quiver', 'gravewyrm_bone_quiver', 'direfang_quiver'] as const;
+const QUIVERS = [
+  'moggers_hide_quiver',
+  'cragmaw_huntquiver',
+  'gravewyrm_bone_quiver',
+  'direfang_quiver',
+] as const;
 
 const primaryStatSum = (item: ItemDef): number => {
   const s = item.stats ?? {};
@@ -74,10 +79,12 @@ describe('hunter quivers', () => {
     }
   });
 
-  it('ladders the three quivers up by item level and quality', () => {
+  it('ladders the four quivers up by item level and quality', () => {
     const levels = QUIVERS.map((id) => itemLevel(ITEMS[id]));
-    expect(levels).toEqual([7, 23, 29]);
-    expect(QUIVERS.map((id) => ITEMS[id].quality)).toEqual(['uncommon', 'rare', 'epic']);
+    expect(levels).toEqual([7, 17, 23, 29]);
+    // Two rare rungs on purpose: each quiver matches the tier of the table it
+    // drops from, and Cragmaw's own gear line is rare.
+    expect(QUIVERS.map((id) => ITEMS[id].quality)).toEqual(['uncommon', 'rare', 'rare', 'epic']);
     // Strictly increasing, so no rung is a sidegrade of the one below it.
     for (let i = 1; i < levels.length; i++) {
       expect(levels[i]!, QUIVERS[i]).toBeGreaterThan(levels[i - 1]!);
@@ -89,12 +96,14 @@ describe('hunter quivers', () => {
     // rating, and the sub-epic rungs seed no rating at all.
     expect(ITEMS.direfang_quiver.hitRating).toBe(20);
     expect(ITEMS.moggers_hide_quiver.hitRating ?? 0).toBe(0);
+    expect(ITEMS.cragmaw_huntquiver.hitRating ?? 0).toBe(0);
     expect(ITEMS.gravewyrm_bone_quiver.hitRating ?? 0).toBe(0);
   });
 
   it('sources each quiver from a distinct live loot table', () => {
     const sources: Record<string, string> = {
       moggers_hide_quiver: 'mogger',
+      cragmaw_huntquiver: 'old_cragmaw',
       gravewyrm_bone_quiver: 'korzul_the_gravewyrm',
       direfang_quiver: 'nythraxis_scourge_of_thornpeak',
     };
@@ -105,7 +114,7 @@ describe('hunter quivers', () => {
         `${mobId} drops ${itemId}`,
       ).toBe(true);
     }
-    expect(new Set(Object.values(sources)).size).toBe(3);
+    expect(new Set(Object.values(sources)).size).toBe(4);
   });
 
   it('keeps the caster offhand line untouched at the shared Mogger source', () => {

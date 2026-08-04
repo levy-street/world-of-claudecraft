@@ -213,6 +213,7 @@ describe('held weapon models', () => {
       .map((item) => item.id)
       .sort();
     expect(unmapped).toEqual([
+      'cragmaw_huntquiver',
       'direfang_quiver',
       'gravewyrm_bone_quiver',
       'heroic_direfang_quiver',
