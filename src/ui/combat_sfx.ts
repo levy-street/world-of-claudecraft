@@ -29,6 +29,15 @@ const WAND_CUES: Partial<Record<MagicSchool, SfxId>> = {
   shadow: 'wand_shadow',
 };
 
+// A 'nova' fx event normally plays the shared spell_nova cue (every
+// self-centered or ground-targeted burst: Frost Nova, Arcane Explosion,
+// Ring of Frost, ...). The two AoE fear shouts get their own distinct cast
+// cue instead, keyed off the casting ability id the event already carries.
+const NOVA_ABILITY_CUES: Partial<Record<string, SfxId>> = {
+  psychic_scream: 'fear_shout',
+  howl_of_terror: 'fear_shout',
+};
+
 // Exported (read-only, `as const`) purely so a test can pin its key set
 // against SFX_MOB_EXTENSION_FAMILIES: a family added to one and forgotten in
 // the other currently resolves at runtime to a key with no clip, which plays
@@ -179,7 +188,11 @@ export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number 
       : SCHOOL_CUES[school].projectile;
     return { key, anchorId: event.sourceId };
   }
-  if (event.fx === 'nova') return { key: 'spell_nova', anchorId: event.targetId };
+  if (event.fx === 'nova') {
+    const key = (event.ability && NOVA_ABILITY_CUES[event.ability]) || 'spell_nova';
+    return { key, anchorId: event.targetId };
+  }
+  if (event.fx === 'fearImpact') return { key: 'fear', anchorId: event.targetId };
   return null;
 }
 

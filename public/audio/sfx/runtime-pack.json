@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "242e90b0bcd7c91dd00676576b85a2302bd2e37ab401b227396a4207ed619325",
-  "catalogHash": "84cbcbe7eaed06729e9ca12e47d7e01d2ebdad196ec7222f788322a16e8fe0c5",
+  "bundleId": "51ee52f68aeb619f30568827d9fb74bdbe42cb12ea2ac541a921adf6ebcf5486",
+  "catalogHash": "e162ce72f7c128fcd2763138640d6676dbbffe8fbea5ee7fd838bdd9614727d2",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -338,6 +338,30 @@
         }
       ],
       "gain": 1.698244,
+      "playbackRate": 1
+    },
+    "fear": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/fear.mp3?v=d53ac41693da",
+          "bytes": 65871,
+          "sha256": "d53ac41693da8601fdac31490a9f7cf4b36552a60abda3bfcc9c5d48c3948c73"
+        }
+      ],
+      "gain": 2.238721,
+      "playbackRate": 1
+    },
+    "fear_shout": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/fear_shout.mp3?v=ad9932ebeb8d",
+          "bytes": 43301,
+          "sha256": "ad9932ebeb8d577c52c0ea7100f9e760c6e6d3d0adc9eb5a0eb20e1e66c6a5cb"
+        }
+      ],
+      "gain": 2.06538,
       "playbackRate": 1
     },
     "foot_dirt": {

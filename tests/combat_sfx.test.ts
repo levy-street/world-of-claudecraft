@@ -253,6 +253,45 @@ describe('combat SFX policy', () => {
     ).toEqual({ key: 'spell_nova', anchorId: 20 });
   });
 
+  it('gives the two AoE fear shouts their own nova cue instead of the shared spell_nova', () => {
+    for (const ability of ['psychic_scream', 'howl_of_terror']) {
+      expect(
+        spellFxCue({
+          type: 'spellfx',
+          sourceId: 10,
+          targetId: 10,
+          school: 'shadow',
+          fx: 'nova',
+          ability,
+        }),
+      ).toEqual({ key: 'fear_shout', anchorId: 10 });
+    }
+    // Every other nova ability keeps the shared cue.
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 10,
+        school: 'frost',
+        fx: 'nova',
+        ability: 'frost_nova',
+      }),
+    ).toEqual({ key: 'spell_nova', anchorId: 10 });
+  });
+
+  it('anchors the landed-fear moment to the feared target', () => {
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 20,
+        school: 'shadow',
+        fx: 'fearImpact',
+        ability: 'fear',
+      }),
+    ).toEqual({ key: 'fear', anchorId: 20 });
+  });
+
   it('uses explicit cast and impact school maps', () => {
     expect(castCueForAbility('fireball')).toBe('cast_fire');
     expect(castCueForAbility('lightning_bolt')).toBe('cast_lightning_bolt');

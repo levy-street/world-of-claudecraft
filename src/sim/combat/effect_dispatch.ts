@@ -1055,6 +1055,17 @@ export function runEffects(
             breakThreshold:
               fearBreakPct > 0 ? Math.max(1, Math.round(hostile.maxHp * fearBreakPct)) : undefined,
           });
+          // The shout above (fx:'nova') is the cast moment, once, at the
+          // caster; this is the landed-fear moment, once per creature
+          // actually feared, at that creature.
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: hostile.id,
+            school: ability.school,
+            fx: 'fearImpact',
+            ability: ability.id,
+          });
           ctx.enterCombat(p, hostile);
           if (hostile.kind === 'mob' && hostile.hostile) {
             addThreat(hostile, p.id, 10 * ctx.threatMod(p, ability.school));
@@ -1348,6 +1359,19 @@ export function runEffects(
           // break; plain incapacitates (Eye Jab, Wyvern Sting) insta-break.
           breakChanceScale: ability.fearDr ? FEAR_BREAK_CHANCE_SCALE : undefined,
         });
+        // Fear-flavored incapacitates (Harrow) sound at the target, distinct
+        // from plain stuns/incapacitates (Eye Jab, Wyvern Sting), which have
+        // no dedicated fear audio.
+        if (ability.fearDr) {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: target.id,
+            school: ability.school,
+            fx: 'fearImpact',
+            ability: ability.id,
+          });
+        }
         if (ability.awardsCombo && !comboAwarded) {
           ctx.awardCombo(p, target, ability.awardsCombo);
           comboAwarded = true;

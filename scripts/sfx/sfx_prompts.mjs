@@ -412,6 +412,14 @@ export const SFX = [
     prompt:
       'An expanding magical nova shockwave bursting outward in all directions. Single burst, no music.',
   },
+  {
+    key: 'fear_shout',
+    custom: true,
+  },
+  {
+    key: 'fear',
+    custom: true,
+  },
 
   // --- Heals & auras --------------------------------------------------------
   {

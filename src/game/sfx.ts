@@ -1032,6 +1032,7 @@ class Sfx {
         school: def?.school,
         archetype: arch,
         isProjectile: def?.projectile,
+        abilityId: opts?.abilityId,
       })
     ) {
       return;

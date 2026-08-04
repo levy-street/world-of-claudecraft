@@ -4334,6 +4334,11 @@ export type SimEvent = { pid?: number } & (
         | 'bubbleBeam'
         | 'tick'
         | 'nova'
+        // A fear-flavored incapacitate actually lands on a target (Harrow,
+        // Terror Canticle, Dread Chorus): audio-only, sounds at the target,
+        // distinct from the caster-anchored 'nova' cast moment those two AoE
+        // fears also emit.
+        | 'fearImpact'
         | 'chainHeal'
         | 'windup'
         | 'lightning'
