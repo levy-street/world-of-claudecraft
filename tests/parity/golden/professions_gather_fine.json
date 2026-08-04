@@ -12,13 +12,13 @@
     "gatherResult itemId carries the resolved grade"
   ],
   "draws": 6,
-  "drawDigest": "de061ff8",
+  "drawDigest": "1272a77a",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 832,
-      "state": "2ecb744c",
+      "nextId": 853,
+      "state": "ad9e1fed",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -56,7 +56,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 827,
+          "entityId": 848,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -92,7 +92,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 827
+              "sourceId": 848
             }
           ],
           "blockChance": 0.05,
@@ -105,7 +105,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 827,
+          "id": 848,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -149,12 +149,12 @@
     {
       "tick": 51,
       "time": 2.55,
-      "nextId": 832,
-      "state": "2b700253",
-      "events": "dd3d9178",
+      "nextId": 853,
+      "state": "678862bc",
+      "events": "0b544961",
       "rng": {
         "draws": 2,
-        "digest": "ad89c14b"
+        "digest": "00a2a78c"
       },
       "label": "fine-grade-at-full-tier-vein",
       "players": [
@@ -210,7 +210,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 827,
+          "entityId": 848,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -266,7 +266,7 @@
               "name": "Battle Stance",
               "remaining": 3597.45,
               "school": "physical",
-              "sourceId": 827
+              "sourceId": 848
             }
           ],
           "blockChance": 0.05,
@@ -280,7 +280,7 @@
           "fallStartY": -2.136687,
           "fiveSecondRule": 101.55,
           "hp": 100,
-          "id": 827,
+          "id": 848,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -324,12 +324,12 @@
     {
       "tick": 104,
       "time": 5.2,
-      "nextId": 832,
-      "state": "c1a53df7",
-      "events": "fbd0ab54",
+      "nextId": 853,
+      "state": "5f8c58b9",
+      "events": "142b95e1",
       "rng": {
         "draws": 4,
-        "digest": "313f85da"
+        "digest": "49d036fe"
       },
       "label": "plain-grade-at-lower-tier-vein",
       "players": [
@@ -386,7 +386,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 827,
+          "entityId": 848,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -417,6 +417,9 @@
             },
             {
               "count": 2,
+              "instance": {
+                "signer": "Adventurer"
+              },
               "itemId": "iron_ore"
             }
           ],
@@ -447,7 +450,7 @@
               "name": "Battle Stance",
               "remaining": 3594.8,
               "school": "physical",
-              "sourceId": 827
+              "sourceId": 848
             }
           ],
           "blockChance": 0.05,
@@ -461,7 +464,7 @@
           "fallStartY": -2.314273,
           "fiveSecondRule": 104.2,
           "hp": 100,
-          "id": 827,
+          "id": 848,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -505,12 +508,12 @@
     {
       "tick": 157,
       "time": 7.85,
-      "nextId": 832,
-      "state": "b67edca8",
-      "events": "21729bc0",
+      "nextId": 853,
+      "state": "f8ccfeff",
+      "events": "ca67b4f3",
       "rng": {
         "draws": 6,
-        "digest": "de061ff8"
+        "digest": "1272a77a"
       },
       "label": "wrong-profession-tool-does-not-upgrade",
       "players": [
@@ -569,7 +572,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 827,
+          "entityId": 848,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -600,10 +603,16 @@
             },
             {
               "count": 2,
+              "instance": {
+                "signer": "Adventurer"
+              },
               "itemId": "iron_ore"
             },
             {
               "count": 2,
+              "instance": {
+                "signer": "Adventurer"
+              },
               "itemId": "goldleaf_herb"
             }
           ],
@@ -635,7 +644,7 @@
               "name": "Battle Stance",
               "remaining": 3592.15,
               "school": "physical",
-              "sourceId": 827
+              "sourceId": 848
             }
           ],
           "blockChance": 0.05,
@@ -649,7 +658,7 @@
           "fallStartY": -2.962996,
           "fiveSecondRule": 106.85,
           "hp": 100,
-          "id": 827,
+          "id": 848,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -693,12 +702,12 @@
     {
       "tick": 159,
       "time": 7.95,
-      "nextId": 832,
-      "state": "48c6942d",
+      "nextId": 853,
+      "state": "427b750e",
       "events": "741638a5",
       "rng": {
         "draws": 6,
-        "digest": "de061ff8"
+        "digest": "1272a77a"
       },
       "label": "final",
       "players": [
@@ -757,7 +766,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 827,
+          "entityId": 848,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -788,10 +797,16 @@
             },
             {
               "count": 2,
+              "instance": {
+                "signer": "Adventurer"
+              },
               "itemId": "iron_ore"
             },
             {
               "count": 2,
+              "instance": {
+                "signer": "Adventurer"
+              },
               "itemId": "goldleaf_herb"
             }
           ],
@@ -823,7 +838,7 @@
               "name": "Battle Stance",
               "remaining": 3592.05,
               "school": "physical",
-              "sourceId": 827
+              "sourceId": 848
             }
           ],
           "blockChance": 0.05,
@@ -837,7 +852,7 @@
           "fallStartY": -2.962996,
           "fiveSecondRule": 106.95,
           "hp": 100,
-          "id": 827,
+          "id": 848,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
