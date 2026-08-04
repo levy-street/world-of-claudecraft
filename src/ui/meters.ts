@@ -173,7 +173,11 @@ export class MeterData {
     };
   }
 
-  private partyAttributionPid(world: IWorld, entityId: number, partyPids: Set<number>): number | null {
+  private partyAttributionPid(
+    world: IWorld,
+    entityId: number,
+    partyPids: Set<number>,
+  ): number | null {
     if (partyPids.has(entityId)) return entityId;
     const entity = world.entities.get(entityId);
     if (entity?.kind === 'mob' && entity.ownerId !== null && partyPids.has(entity.ownerId)) {
@@ -247,10 +251,10 @@ export class MeterData {
         return;
       }
     }
-    this.endEncounter(now);
+    this.endEncounter();
   }
 
-  endEncounter(now: number): void {
+  endEncounter(): void {
     const enc = this.current;
     if (!enc) return;
     this.current = null;
