@@ -105,7 +105,7 @@ describe('impact: the landing belongs to the recorded impact_ pack', () => {
     expect(
       isAbilityMomentRecorded('impact', { school: 'shadow', archetype: 'cc', abilityId: 'fear' }),
     ).toBe(true);
-    for (const abilityId of ['psychic_scream', 'howl_of_terror']) {
+    for (const abilityId of ['psychic_scream', 'howl_of_terror', 'intimidating_shout']) {
       expect(
         isAbilityMomentRecorded('impact', { school: 'shadow', archetype: 'shout', abilityId }),
       ).toBe(true);
@@ -118,6 +118,14 @@ describe('impact: the landing belongs to the recorded impact_ pack', () => {
         abilityId: 'polymorph',
       }),
     ).toBe(false);
+  });
+
+  it('is recorded for the plain cc override (hammer_of_justice, entangling_roots, blind)', () => {
+    for (const abilityId of ['hammer_of_justice', 'entangling_roots', 'blind']) {
+      expect(
+        isAbilityMomentRecorded('impact', { school: 'physical', archetype: 'cc', abilityId }),
+      ).toBe(true);
+    }
   });
 
   it('pins the recorded impact archetype set', () => {

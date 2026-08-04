@@ -1314,6 +1314,19 @@ export function runEffects(
           eff.duration,
           ability.school,
         );
+        // Gripping Roots (entangling_roots) sounds at the target; every other
+        // root ability has no dedicated recording and stays silent here (see
+        // CC_IMPACT_ABILITY_CUES, src/ui/combat_sfx.ts).
+        if (ability.id === 'entangling_roots') {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: target.id,
+            school: ability.school,
+            fx: 'ccImpact',
+            ability: ability.id,
+          });
+        }
         ctx.enterCombat(p, target);
         break;
       }
@@ -1336,6 +1349,18 @@ export function runEffects(
           sourceId: p.id,
           school: ability.school,
         });
+        // Sundering Gavel (hammer_of_justice) sounds at the target; every
+        // other stun has no dedicated recording and stays silent here.
+        if (ability.id === 'hammer_of_justice') {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: target.id,
+            school: ability.school,
+            fx: 'ccImpact',
+            ability: ability.id,
+          });
+        }
         ctx.enterCombat(p, target);
         break;
       }
@@ -1369,6 +1394,17 @@ export function runEffects(
             targetId: target.id,
             school: ability.school,
             fx: 'fearImpact',
+            ability: ability.id,
+          });
+        }
+        // Dirt Toss (blind) sounds at the target too.
+        if (ability.id === 'blind') {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: target.id,
+            school: ability.school,
+            fx: 'ccImpact',
             ability: ability.id,
           });
         }

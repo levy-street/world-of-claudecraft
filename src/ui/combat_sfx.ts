@@ -42,6 +42,18 @@ const NOVA_ABILITY_CUES: Partial<Record<string, SfxId>> = {
   frost_nova: 'frost_nova',
 };
 
+// A landed cc (stun/root/incapacitate) has no recording by default (see
+// ability_sfx_coverage.ts's RECORDED_IMPACT_ARCHETYPES, which deliberately
+// excludes 'cc'); these three now have one, keyed off the casting ability
+// id the fx:'ccImpact' event carries (effect_dispatch.ts gates the emit to
+// exactly this set, so no other stun/root/incapacitate fires the event at
+// all).
+const CC_IMPACT_ABILITY_CUES: Partial<Record<string, SfxId>> = {
+  hammer_of_justice: 'hammer_of_justice',
+  entangling_roots: 'entangling_roots',
+  blind: 'blind',
+};
+
 // Exported (read-only, `as const`) purely so a test can pin its key set
 // against SFX_MOB_EXTENSION_FAMILIES: a family added to one and forgotten in
 // the other currently resolves at runtime to a key with no clip, which plays
@@ -197,6 +209,10 @@ export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number 
     return { key, anchorId: event.targetId };
   }
   if (event.fx === 'fearImpact') return { key: 'fear', anchorId: event.targetId };
+  if (event.fx === 'ccImpact') {
+    const key = event.ability && CC_IMPACT_ABILITY_CUES[event.ability];
+    return key ? { key, anchorId: event.targetId } : null;
+  }
   return null;
 }
 

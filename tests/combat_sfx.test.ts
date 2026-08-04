@@ -305,6 +305,34 @@ describe('combat SFX policy', () => {
     ).toEqual({ key: 'fear', anchorId: 20 });
   });
 
+  it('anchors the landed cc moment to the target for the covered trio, and stays silent otherwise', () => {
+    for (const ability of ['hammer_of_justice', 'entangling_roots', 'blind']) {
+      expect(
+        spellFxCue({
+          type: 'spellfx',
+          sourceId: 10,
+          targetId: 20,
+          school: 'physical',
+          fx: 'ccImpact',
+          ability,
+        }),
+      ).toEqual({ key: ability, anchorId: 20 });
+    }
+    // No ability id, or an ability not in the covered set: no cue at all
+    // (the sim only ever emits ccImpact for these three, but the client
+    // resolver stays defensive regardless).
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 20,
+        school: 'physical',
+        fx: 'ccImpact',
+        ability: 'polymorph',
+      }),
+    ).toBeNull();
+  });
+
   it('uses explicit cast and impact school maps', () => {
     expect(castCueForAbility('fireball')).toBe('cast_fire');
     expect(castCueForAbility('lightning_bolt')).toBe('cast_lightning_bolt');

@@ -11,6 +11,7 @@
   },
   "keyTrimDb": {
     "amb_forge": 5,
+    "blind": 6.1,
     "buff_apply": 4.5,
     "cast_chain_heal": 4.5,
     "cast_lightning_bolt": 5,
@@ -19,6 +20,7 @@
     "combat_dodge": 5.3,
     "combat_parry": 5.2,
     "debuff_apply": 4.6,
+    "entangling_roots": 5.5,
     "fear": 7,
     "fear_shout": 6.3,
     "foot_dirt": 5.2,
@@ -28,6 +30,7 @@
     "foot_water": 5.2,
     "foot_wood": 5.2,
     "frost_nova": 6.2,
+    "hammer_of_justice": 6.3,
     "heal_impact": 5.3,
     "ice_block": 6.3,
     "impact_arcane": 4.6,

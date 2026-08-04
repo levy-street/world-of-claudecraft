@@ -428,6 +428,18 @@ export const SFX = [
     key: 'frost_nova',
     custom: true,
   },
+  {
+    key: 'hammer_of_justice',
+    custom: true,
+  },
+  {
+    key: 'entangling_roots',
+    custom: true,
+  },
+  {
+    key: 'blind',
+    custom: true,
+  },
 
   // --- Heals & auras --------------------------------------------------------
   {
