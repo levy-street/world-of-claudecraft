@@ -843,6 +843,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.dualPrice': '{money} + {honor}',
   'hudChrome.warfare.balance': '名誉: {amount}',
   'hudChrome.warfare.honorFloat': '名誉 +{amount}',
+  'hudChrome.warfare.honorFloatReason': '名誉 +{amount}（{reason}）',
   'hudChrome.warfare.honorGain': '名誉を {amount} 獲得しました（{reason}）。',
   'hudChrome.warfare.notEnoughHonor': '名誉が足りません。',
   'hudChrome.warfare.reasons.arenaWin': 'アリーナ勝利',
@@ -853,6 +854,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.battlegroundComplete': 'ソーンホロウ平原参戦',
   'hudChrome.warfare.reasons.battlegroundKill': '名誉ある撃破',
   'hudChrome.warfare.reasons.battlegroundAssist': '撃破アシスト',
+  'hudChrome.warfare.floatReasons.kill': '撃破',
+  'hudChrome.warfare.floatReasons.assist': 'アシスト',
   'hudChrome.keybinds.bgFlag': '戦場フラッグアクション',
   'hudChrome.pvp.launcherTitle': 'PvP:ソーンホロウ平原と闘技場',
   'hudChrome.pvp.mobileLabel': 'PvP',
@@ -897,6 +900,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.flagTakenLog': '{name}が{team}の旗を奪った!',
   'hudChrome.bg.flagDroppedLog': '{team}の旗が落とされた。',
   'hudChrome.bg.flagReturnedLog': '{team}の旗が戻された。',
+  'hudChrome.bg.dropFlagConfirmTitle': '旗を落としますか？',
+  'hudChrome.bg.dropFlagConfirmBody':
+    '敵の旗を運搬中です。落とすと旗は地面に残り、どちらの陣営も拾えます。',
+  'hudChrome.bg.dropFlagConfirmAccept': '旗を落とす',
   'hudChrome.bg.yourTeamTitle': 'あなたのチーム',
   'hudChrome.bg.boardToggleLabel': '試合スコアボード。Enterで全体ボードを固定表示します。',
   'hudChrome.bg.levelRequirement': 'この戦場のキュー参加はレベル{level}で解放されます。',
@@ -7308,6 +7315,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.haste': '攻撃速度と詠唱速度を{pct}%上昇させる',
   'hudChrome.auraEffect.dmgDone': '与えるダメージを{pct}%上昇させる',
   'hudChrome.auraEffect.dmgDoneReduce': '与えるダメージを{pct}%低下させる',
+  'hudChrome.auraEffect.carriedFlag': '敵の旗を運搬中です。このバフを解除すると旗を落とします。',
   'hudChrome.auraEffect.elementalConvergencePrimed':
     '次に異なる属性の呪文を唱えると、エレメンタル・コンバージェンスが発動します',
   'hudChrome.auraEffect.heatingUp':

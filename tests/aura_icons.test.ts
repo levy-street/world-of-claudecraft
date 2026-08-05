@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { ABILITIES } from '../src/sim/data';
 import {
   BATTLE_RUNE_AURA_ID,
+  CARRIED_FLAG_AURA_ID,
   SPRINT_RUNE_AURA_ID,
   WARD_RUNE_AURA_ID,
 } from '../src/sim/social/battleground';
@@ -63,5 +64,14 @@ describe('aura icons reuse image-based ability art', () => {
     for (const id of [SPRINT_RUNE_AURA_ID, BATTLE_RUNE_AURA_ID, WARD_RUNE_AURA_ID]) {
       expect(hasAuraRecipe(id), `${id} needs its identity recipe`).toBe(true);
     }
+  });
+
+  it('the carried-flag buff carries its own banner recipe', () => {
+    // Its kind ('flag_carried') is deliberately read by nothing, so it has no
+    // aura_<kind> generic to fall back to: without this row the one buff the
+    // carrier must recognize at a glance paints the unknown icon.
+    expect(hasAuraRecipe(CARRIED_FLAG_AURA_ID), 'the carried-flag buff needs its recipe').toBe(
+      true,
+    );
   });
 });

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { isDispellableAura } from '../src/sim/aura_classify';
 import { BG_GRAVEYARDS, BG_POWER_RUNES, BG_SPEED_RUNES } from '../src/sim/battleground_layout';
 import { GREATER_INVISIBILITY_DR_AURA_ID } from '../src/sim/combat/greater_invisibility';
 import { offerResurrection } from '../src/sim/combat/resurrection_offer';
@@ -28,6 +29,7 @@ import {
   type BgMatch,
   bgCarryingFlag,
   bgResolveDesertion,
+  CARRIED_FLAG_AURA_ID,
   devEndBg,
   devStartBg,
   endBgMatch,
@@ -1390,6 +1392,254 @@ describe('Thornhollow Fields: carrier vulnerability (Focused Assault lineage)', 
     sim.tick();
     expect(match.scores[0]).toBe(1);
     expect(e.auras.some((a) => a.id === 'bg_carrier_vulnerability')).toBe(false);
+  });
+});
+
+describe('Thornhollow Fields: the carried-flag buff and the voluntary drop', () => {
+  // Seat a match, take the azure flag with the deliberate press, and hand back
+  // everything an arm needs. The carrier is on team 0, so flags[1] (azure) is the
+  // enemy flag they run and flags[0] (crimson) is their own stand.
+  function carryingMatch() {
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const carrier = match.teams[0][0];
+    tp(sim, carrier, match.flags[1].home.x, match.flags[1].home.z);
+    sim.bgFlagAction(carrier);
+    sim.tick();
+    // Off the stand, so nothing in an arm resolves as an incidental capture.
+    tp(sim, carrier, match.flags[1].home.x + 6, match.flags[1].home.z - 8);
+    return { sim, match, carrier, e: sim.entities.get(carrier)!, flag: match.flags[1] };
+  }
+
+  const hasFlagAura = (sim: Sim, pid: number) =>
+    sim.entities.get(pid)!.auras.some((a) => a.id === CARRIED_FLAG_AURA_ID);
+
+  it('is worn from the FIRST tick of the carry, not after the fatigue delay', () => {
+    const { sim, carrier, e, flag } = carryingMatch();
+    expect(flag.carrier).toBe(carrier);
+    expect(hasFlagAura(sim, carrier)).toBe(true);
+    // The point of the pair: fatigue is still 75s away, the carry buff is not.
+    expect(e.auras.some((a) => a.id === 'bg_carrier_vulnerability')).toBe(false);
+    const aura = e.auras.find((a) => a.id === CARRIED_FLAG_AURA_ID)!;
+    expect(aura.name).toBe('Carrying the Flag');
+    expect(aura.kind).toBe('flag_carried');
+    // Longer than any match, so natural expiry can never take it mid-carry.
+    expect(aura.remaining).toBe(BG_MAX_DURATION);
+  });
+
+  it('nobody else in the match wears it', () => {
+    const { sim, match, carrier } = carryingMatch();
+    for (const pid of [...match.teams[0], ...match.teams[1]]) {
+      if (pid === carrier) continue;
+      expect(hasFlagAura(sim, pid), `pid ${pid}`).toBe(false);
+    }
+  });
+
+  // Every path the flag can leave the carrier by, each asserting the SAME
+  // coupling: the buff is gone and the carry is over, together.
+  it('leaves on a CAPTURE, together with the flag', () => {
+    const { sim, match, carrier, flag } = carryingMatch();
+    tp(sim, carrier, match.flags[0].home.x, match.flags[0].home.z);
+    sim.tick();
+    expect(match.scores[0]).toBe(1);
+    expect(flag.state).toBe('home');
+    expect(hasFlagAura(sim, carrier)).toBe(false);
+  });
+
+  it('leaves on DEATH, in the same call that drops the flag', () => {
+    const { sim, carrier, flag } = carryingMatch();
+    // handleDeath strips auras (aurasSurvivingDeath) BEFORE it calls the
+    // battleground death hook, so this arm is what proves the two halves land
+    // together rather than the aura outliving the carry by a tick.
+    kill(sim, carrier);
+    expect(flag.state).toBe('dropped');
+    expect(flag.carrier).toBeNull();
+    expect(hasFlagAura(sim, carrier)).toBe(false);
+  });
+
+  it('leaves on the STEALTH drop, together with the flag', () => {
+    const { sim, carrier, e, flag } = carryingMatch();
+    e.auras.push({
+      id: 'stealth',
+      name: 'Stealth',
+      kind: 'stealth',
+      value: 0,
+      remaining: 60,
+      duration: 60,
+      sourceId: e.id,
+      school: 'physical',
+    });
+    e.stealthed = true;
+    sim.tick();
+    expect(flag.state).toBe('dropped');
+    expect(hasFlagAura(sim, carrier)).toBe(false);
+  });
+
+  it('leaves on DESERTION, together with the flag', () => {
+    const { sim, carrier, flag } = carryingMatch();
+    bgResolveDesertion(sim.ctx, carrier);
+    expect(flag.state).toBe('dropped');
+    expect(hasFlagAura(sim, carrier)).toBe(false);
+  });
+
+  it('leaves when the played-out match ENDS and the flags come home', () => {
+    const { sim, carrier, flag } = carryingMatch();
+    expect(devEndBg(sim.ctx, carrier)).toBe(true);
+    expect(flag.state).toBe('home');
+    expect(hasFlagAura(sim, carrier)).toBe(false);
+  });
+
+  it('leaves on the forfeit TEARDOWN, which never routes through returnFlag', () => {
+    const { sim, match, carrier } = carryingMatch();
+    // endBgMatch resolves and releases in one call: the flag entity is destroyed
+    // rather than returned, so the teardown arm of clearCarrierAuras is the only
+    // thing standing between a forfeited carrier and a permanent buff.
+    endBgMatch(sim.ctx, match, 0, 'forfeit');
+    expect(hasFlagAura(sim, carrier)).toBe(false);
+  });
+
+  it('no enemy dispel can take it (that would strip the buff and keep the flag)', () => {
+    const { sim, carrier, e } = carryingMatch();
+    const aura = e.auras.find((a) => a.id === CARRIED_FLAG_AURA_ID)!;
+    // The physical school is what refuses it: an offensive dispel strips helpful
+    // MAGIC only, so the one removal path a player could aim at it is the cancel.
+    expect(isDispellableAura(aura, true)).toBe(false);
+    expect(isDispellableAura(aura, false)).toBe(false);
+    expect(hasFlagAura(sim, carrier)).toBe(true);
+  });
+
+  describe('right-clicking the buff drops the flag', () => {
+    it('drops it at the carrier feet, catchable, on the existing dropped call', () => {
+      const { sim, match, carrier, e, flag } = carryingMatch();
+      const feet = { x: e.pos.x, y: e.pos.y, z: e.pos.z };
+      sim.cancelAura(CARRIED_FLAG_AURA_ID, carrier);
+
+      expect(flag.state).toBe('dropped');
+      expect(flag.carrier).toBeNull();
+      expect(flag.pos.x).toBeCloseTo(feet.x, 6);
+      expect(flag.pos.z).toBeCloseTo(feet.z, 6);
+      // Armed for the same 20s auto-return every other drop gets.
+      expect(flag.dropTimer).toBe(20);
+      expect(hasFlagAura(sim, carrier)).toBe(false);
+      expect(bgCarryingFlag(sim.ctx, carrier)).toBe(false);
+      // The ground entity followed it, so it is a real object on the field.
+      const body = sim.entities.get(flag.entityId)!;
+      expect(body.pos.x).toBeCloseTo(feet.x, 6);
+      // ...and the state machine took no new cause: it is the ordinary drop.
+      const events = sim.tick().filter((ev) => ev.type === 'bgFlag');
+      expect(events.every((ev) => ev.action !== 'taken')).toBe(true);
+      expect(match.scores).toEqual([0, 0]);
+    });
+
+    it('emits the ordinary dropped call to all ten', () => {
+      const { sim, match, carrier } = carryingMatch();
+      // Drain the pickup batch first so only the cancel's events are read.
+      sim.tick();
+      sim.cancelAura(CARRIED_FLAG_AURA_ID, carrier);
+      const dropped = sim
+        .tick()
+        .filter((ev): ev is Extract<SimEvent, { type: 'bgFlag' }> => ev.type === 'bgFlag');
+      expect(dropped.length).toBe(10);
+      for (const ev of dropped) {
+        expect(ev.action).toBe('dropped');
+        expect(ev.team).toBe(1); // the azure flag's home team
+      }
+      expect(new Set(dropped.map((ev) => ev.pid)).size).toBe(10);
+      expect(match.scores).toEqual([0, 0]);
+    });
+
+    it('the dropped flag is re-takeable by the enemy team', () => {
+      const { sim, match, carrier, flag } = carryingMatch();
+      sim.cancelAura(CARRIED_FLAG_AURA_ID, carrier);
+      const mate = match.teams[0][1];
+      tp(sim, mate, flag.pos.x, flag.pos.z);
+      sim.bgFlagAction(mate);
+      sim.tick();
+      expect(flag.carrier).toBe(mate);
+      expect(hasFlagAura(sim, mate)).toBe(true);
+      expect(hasFlagAura(sim, carrier)).toBe(false);
+    });
+
+    it('the dropped flag is returnable by its own team walking over it', () => {
+      const { sim, match, carrier, flag } = carryingMatch();
+      sim.cancelAura(CARRIED_FLAG_AURA_ID, carrier);
+      const owner = match.teams[1][0];
+      tp(sim, owner, flag.pos.x, flag.pos.z);
+      sim.tick();
+      expect(flag.state).toBe('home');
+      expect(hasFlagAura(sim, carrier)).toBe(false);
+    });
+
+    it('a NON-carrier cancelling the id is a no-op: the carry is untouched', () => {
+      const { sim, match, carrier, flag } = carryingMatch();
+      const bystander = match.teams[0][1];
+      sim.cancelAura(CARRIED_FLAG_AURA_ID, bystander);
+      expect(flag.state).toBe('carried');
+      expect(flag.carrier).toBe(carrier);
+      expect(hasFlagAura(sim, carrier)).toBe(true);
+    });
+
+    it('cancelling it outside a match is a no-op', () => {
+      const { sim, match, carrier, flag } = carryingMatch();
+      // Same runner, after the match is torn down: nothing to drop, nothing to throw.
+      endBgMatch(sim.ctx, match, 0, 'forfeit');
+      expect(bgCarryingFlag(sim.ctx, carrier)).toBe(false);
+      expect(() => sim.cancelAura(CARRIED_FLAG_AURA_ID, carrier)).not.toThrow();
+      expect(hasFlagAura(sim, carrier)).toBe(false);
+      // The torn-down match object is discarded, so its flag body is gone from
+      // the world rather than re-dropped by the stray cancel.
+      expect(sim.entities.has(flag.entityId)).toBe(false);
+    });
+
+    it('a STALE aura with no flag to drop is spliced normally, never left stuck', () => {
+      // The interception swallows the cancel ONLY on the arm that actually drops.
+      // If the buff is somehow worn with no carry behind it (an inconsistency this
+      // module's lifetime rules say cannot happen), splicing is exactly right:
+      // swallowing there would turn a self-healing inconsistency into a buff the
+      // player can never take off. No match, so nothing to drop.
+      const sim = makeWorld();
+      const pid = sim.addPlayer('warrior', 'Stranded');
+      const e = sim.entities.get(pid)!;
+      expect(sim.bgMatchFor(pid)).toBeNull();
+      e.auras.push({
+        id: CARRIED_FLAG_AURA_ID,
+        name: 'Carrying the Flag',
+        kind: 'flag_carried',
+        value: 0,
+        remaining: BG_MAX_DURATION,
+        duration: BG_MAX_DURATION,
+        sourceId: e.id,
+        school: 'physical',
+      });
+
+      sim.cancelAura(CARRIED_FLAG_AURA_ID, pid);
+
+      expect(e.auras.some((a) => a.id === CARRIED_FLAG_AURA_ID)).toBe(false);
+      // ...and no drop happened, because there was no flag: no bgFlag event at all.
+      expect(sim.tick().some((ev) => ev.type === 'bgFlag')).toBe(false);
+    });
+
+    it('a stale aura on a player whose match is no longer ACTIVE is also spliced', () => {
+      // The other non-dropping arm: seated in a match that has ended. Same rule.
+      const { sim, match, carrier, e } = carryingMatch();
+      match.state = 'ended';
+      expect(e.auras.some((a) => a.id === CARRIED_FLAG_AURA_ID)).toBe(true);
+      sim.cancelAura(CARRIED_FLAG_AURA_ID, carrier);
+      expect(e.auras.some((a) => a.id === CARRIED_FLAG_AURA_ID)).toBe(false);
+    });
+
+    it('the cancel never falls through to a raw splice that keeps the flag', () => {
+      // The regression this whole interception exists for: if Sim.cancelAura had
+      // reached removeCancelableAura, the buff would be gone (it is helpful and
+      // player-removable) while flag.carrier stayed set. Assert the pair, not the
+      // aura alone.
+      const { sim, carrier, flag } = carryingMatch();
+      sim.cancelAura(CARRIED_FLAG_AURA_ID, carrier);
+      expect(hasFlagAura(sim, carrier)).toBe(false);
+      expect(flag.carrier).toBeNull();
+      expect(flag.state).toBe('dropped');
+    });
   });
 });
 

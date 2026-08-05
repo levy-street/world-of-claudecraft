@@ -1078,6 +1078,9 @@ export const zh_TW: EnTranslations = {
       "flagTakenLog": "{name}奪走了{team}的旗幟!",
       "flagDroppedLog": "{team}的旗幟掉落了。",
       "flagReturnedLog": "{team}的旗幟已歸還。",
+      "dropFlagConfirmTitle": "丟下旗幟？",
+      "dropFlagConfirmBody": "你正攜帶敵方旗幟。丟下後旗幟會留在地上，雙方都可以拾取。",
+      "dropFlagConfirmAccept": "丟下旗幟",
       "boardToggleLabel": "比賽記分板。按 Enter 固定展開完整榜單。",
       "levelRequirement": "你需要達到{level}級才能解鎖此戰場的排隊。",
       "board": {
@@ -1466,6 +1469,7 @@ export const zh_TW: EnTranslations = {
       "dualPrice": "{money} + {honor}",
       "balance": "榮譽：{amount}",
       "honorFloat": "+{amount} 榮譽",
+      "honorFloatReason": "+{amount} 榮譽（{reason}）",
       "honorGain": "你獲得了 {amount} 點榮譽（{reason}）。",
       "notEnoughHonor": "榮譽不足。",
       "reasons": {
@@ -1477,6 +1481,10 @@ export const zh_TW: EnTranslations = {
         "battlegroundComplete": "荊谷原野參戰",
         "battlegroundKill": "榮譽擊殺",
         "battlegroundAssist": "助攻擊殺"
+      },
+      "floatReasons": {
+        "kill": "擊殺",
+        "assist": "助攻"
       }
     },
     "charSheet": {
@@ -1884,6 +1892,7 @@ export const zh_TW: EnTranslations = {
       "dmgDoneReduce": "造成的傷害降低 {pct}%",
       "heatingUp": "你的下一個火焰生成技能若連續造成致命一擊，會獲得熾熱連擊；未造成致命一擊則移除熱力迸發",
       "elementalConvergencePrimed": "你的下一個不同元素學派法術將觸發元素匯聚",
+      "carriedFlag": "你正攜帶敵方旗幟。取消該增益即可丟下旗幟。",
       "battleStance": "戰鬥姿態：怒氣產生提高 10%",
       "berserkerStance": "狂暴姿態：暴擊機率提高 3%，暴擊傷害提高 3%",
       "crit": "暴擊機率提高 {pct}%",

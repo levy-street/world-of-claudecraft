@@ -1078,6 +1078,9 @@ export const pt_BR: EnTranslations = {
       "flagTakenLog": "{name} has taken the {team} flag!",
       "flagDroppedLog": "The {team} flag was dropped.",
       "flagReturnedLog": "The {team} flag was returned.",
+      "dropFlagConfirmTitle": "Drop the flag?",
+      "dropFlagConfirmBody": "You are carrying the enemy flag. Dropping it leaves it on the ground, where either team can reach it.",
+      "dropFlagConfirmAccept": "Drop the flag",
       "boardToggleLabel": "Match scoreboard. Press Enter to pin the full board open.",
       "levelRequirement": "You must reach level {level} to unlock queueing for this battleground.",
       "board": {
@@ -1466,6 +1469,7 @@ export const pt_BR: EnTranslations = {
       "dualPrice": "{money} + {honor}",
       "balance": "Honra: {amount}",
       "honorFloat": "+{amount} de Honra",
+      "honorFloatReason": "+{amount} Honor ({reason})",
       "honorGain": "Você recebe {amount} de Honra ({reason}).",
       "notEnoughHonor": "Honra insuficiente.",
       "reasons": {
@@ -1477,6 +1481,10 @@ export const pt_BR: EnTranslations = {
         "battlegroundComplete": "Thornhollow Fields battle fought",
         "battlegroundKill": "honorable kill",
         "battlegroundAssist": "killing blow assisted"
+      },
+      "floatReasons": {
+        "kill": "Kill",
+        "assist": "Assist"
       }
     },
     "charSheet": {
@@ -1884,6 +1892,7 @@ export const pt_BR: EnTranslations = {
       "dmgDoneReduce": "Reduz o dano causado em {pct}%",
       "heatingUp": "Seu próximo acerto crítico consecutivo de construção de Fogo concede Embalo Ardente; um acerto não crítico remove o Aquecendo",
       "elementalConvergencePrimed": "Seu próximo feitiço da outra escola elemental concede Convergência Elemental",
+      "carriedFlag": "You are carrying the enemy flag. Cancel this buff to drop it.",
       "battleStance": "Postura de Batalha: 10% mais geração de raiva",
       "berserkerStance": "Postura de Berserker: críticos 3% mais frequentes e 3% mais fortes",
       "crit": "Aumenta a chance de acerto crítico em {pct}%",

@@ -1078,6 +1078,9 @@ export const it_IT: EnTranslations = {
       "flagTakenLog": "{name} has taken the {team} flag!",
       "flagDroppedLog": "The {team} flag was dropped.",
       "flagReturnedLog": "The {team} flag was returned.",
+      "dropFlagConfirmTitle": "Drop the flag?",
+      "dropFlagConfirmBody": "You are carrying the enemy flag. Dropping it leaves it on the ground, where either team can reach it.",
+      "dropFlagConfirmAccept": "Drop the flag",
       "boardToggleLabel": "Match scoreboard. Press Enter to pin the full board open.",
       "levelRequirement": "You must reach level {level} to unlock queueing for this battleground.",
       "board": {
@@ -1466,6 +1469,7 @@ export const it_IT: EnTranslations = {
       "dualPrice": "{money} + {honor}",
       "balance": "Onore: {amount}",
       "honorFloat": "+{amount} Onore",
+      "honorFloatReason": "+{amount} Honor ({reason})",
       "honorGain": "Ottieni {amount} Onore ({reason}).",
       "notEnoughHonor": "Onore insufficiente.",
       "reasons": {
@@ -1477,6 +1481,10 @@ export const it_IT: EnTranslations = {
         "battlegroundComplete": "Thornhollow Fields battle fought",
         "battlegroundKill": "honorable kill",
         "battlegroundAssist": "killing blow assisted"
+      },
+      "floatReasons": {
+        "kill": "Kill",
+        "assist": "Assist"
       }
     },
     "charSheet": {
@@ -1884,6 +1892,7 @@ export const it_IT: EnTranslations = {
       "dmgDoneReduce": "Riduce i danni inflitti del {pct}%",
       "heatingUp": "Il prossimo colpo critico consecutivo con un costruttore del Fuoco concede Vampata; un costruttore non critico rimuove Surriscaldamento",
       "elementalConvergencePrimed": "Il prossimo incantesimo dall'altra scuola elementale concede Convergenza Elementale",
+      "carriedFlag": "You are carrying the enemy flag. Cancel this buff to drop it.",
       "battleStance": "Posizione di Battaglia: 10% di generazione di rabbia in più",
       "berserkerStance": "Posizione del Berserker: colpi critici il 3% più frequenti e il 3% più potenti",
       "crit": "Aumenta la probabilità di colpo critico del {pct}%",

@@ -22,6 +22,8 @@ function state(): AurasState {
         effectHtml: '',
         own: true,
         expiring: false,
+        toggle: false,
+        alwaysRender: false,
       },
       {
         key: 'own_hot',
@@ -38,6 +40,8 @@ function state(): AurasState {
         effectHtml: '',
         own: true,
         expiring: false,
+        toggle: false,
+        alwaysRender: false,
       },
       {
         key: 'foreign_dot',
@@ -54,6 +58,8 @@ function state(): AurasState {
         effectHtml: '',
         own: false,
         expiring: true,
+        toggle: false,
+        alwaysRender: false,
       },
       {
         key: 'foreign_buff',
@@ -70,6 +76,8 @@ function state(): AurasState {
         effectHtml: '',
         own: false,
         expiring: false,
+        toggle: false,
+        alwaysRender: false,
       },
     ],
   };

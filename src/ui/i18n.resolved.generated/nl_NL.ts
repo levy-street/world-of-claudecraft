@@ -1078,6 +1078,9 @@ export const nl_NL: EnTranslations = {
       "flagTakenLog": "{name} has taken the {team} flag!",
       "flagDroppedLog": "The {team} flag was dropped.",
       "flagReturnedLog": "The {team} flag was returned.",
+      "dropFlagConfirmTitle": "Drop the flag?",
+      "dropFlagConfirmBody": "You are carrying the enemy flag. Dropping it leaves it on the ground, where either team can reach it.",
+      "dropFlagConfirmAccept": "Drop the flag",
       "boardToggleLabel": "Match scoreboard. Press Enter to pin the full board open.",
       "levelRequirement": "You must reach level {level} to unlock queueing for this battleground.",
       "board": {
@@ -1466,6 +1469,7 @@ export const nl_NL: EnTranslations = {
       "dualPrice": "{money} + {honor}",
       "balance": "Eer: {amount}",
       "honorFloat": "+{amount} Eer",
+      "honorFloatReason": "+{amount} Honor ({reason})",
       "honorGain": "Je krijgt {amount} eer ({reason}).",
       "notEnoughHonor": "Niet genoeg eer.",
       "reasons": {
@@ -1477,6 +1481,10 @@ export const nl_NL: EnTranslations = {
         "battlegroundComplete": "Thornhollow Fields battle fought",
         "battlegroundKill": "honorable kill",
         "battlegroundAssist": "killing blow assisted"
+      },
+      "floatReasons": {
+        "kill": "Kill",
+        "assist": "Assist"
       }
     },
     "charSheet": {
@@ -1884,6 +1892,7 @@ export const nl_NL: EnTranslations = {
       "dmgDoneReduce": "Vermindert aangerichte schade met {pct}%",
       "heatingUp": "Je volgende opeenvolgende kritieke treffer van een Vuur-opbouwer verleent Hete reeks; een niet-kritieke opbouwer verwijdert Opwarmen",
       "elementalConvergencePrimed": "Je volgende spreuk van de andere elementaire school verleent Elementaire Convergentie",
+      "carriedFlag": "You are carrying the enemy flag. Cancel this buff to drop it.",
       "battleStance": "Strijdhouding: 10% meer woedeopbouw",
       "berserkerStance": "Berserkerhouding: kritieke treffers landen 3% vaker en raken 3% harder",
       "crit": "Verhoogt kans op kritieke treffers met {pct}%",

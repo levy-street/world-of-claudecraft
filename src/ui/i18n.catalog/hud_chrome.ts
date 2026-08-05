@@ -919,6 +919,12 @@ export const hudChromeStrings = {
     flagTakenLog: '{name} has taken the {team} flag!',
     flagDroppedLog: 'The {team} flag was dropped.',
     flagReturnedLog: 'The {team} flag was returned.',
+    // The touch-host confirm for the voluntary flag drop (a long press is also the
+    // tooltip-peek gesture, so this cancel is the one that must not fire by accident).
+    dropFlagConfirmTitle: 'Drop the flag?',
+    dropFlagConfirmBody:
+      'You are carrying the enemy flag. Dropping it leaves it on the ground, where either team can reach it.',
+    dropFlagConfirmAccept: 'Drop the flag',
     // Across-screen banner variants (separate sink, separate length budget)
     boardToggleLabel: 'Match scoreboard. Press Enter to pin the full board open.',
     levelRequirement: 'You must reach level {level} to unlock queueing for this battleground.',
@@ -1446,6 +1452,9 @@ export const hudChromeStrings = {
     dualPrice: '{money} + {honor}',
     balance: 'Honor: {amount}',
     honorFloat: '+{amount} Honor',
+    // The reason-naming variant of the float above (src/ui/honor_float_view.ts):
+    // the per-kill / per-assist drip says which one just paid.
+    honorFloatReason: '+{amount} Honor ({reason})',
     honorGain: 'You gain {amount} Honor ({reason}).',
     notEnoughHonor: 'Not enough Honor.',
     reasons: {
@@ -1457,6 +1466,12 @@ export const hudChromeStrings = {
       battlegroundComplete: 'Thornhollow Fields battle fought',
       battlegroundKill: 'honorable kill',
       battlegroundAssist: 'killing blow assisted',
+    },
+    // Short labels for the floating text over your own character. Kept apart from
+    // `reasons` above, which are mid-sentence fragments for the chat line.
+    floatReasons: {
+      kill: 'Kill',
+      assist: 'Assist',
     },
   },
   // Character sheet showcase layout: the two titled stat-panel headings under the
@@ -2060,6 +2075,9 @@ export const hudChromeStrings = {
       'Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up',
     elementalConvergencePrimed:
       'Your next spell from the other elemental school grants Elemental Convergence',
+    // The carried-flag buff's tooltip: the ONLY place the voluntary-drop
+    // affordance is spelled out, so the player can find it without folklore.
+    carriedFlag: 'You are carrying the enemy flag. Cancel this buff to drop it.',
     battleStance: 'Battle Stance: 10% more rage generation',
     berserkerStance: 'Berserker Stance: crits 3% more often and hit 3% harder',
     crit: 'Increases critical strike chance by {pct}%',

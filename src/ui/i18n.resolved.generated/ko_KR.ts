@@ -1078,6 +1078,9 @@ export const ko_KR: EnTranslations = {
       "flagTakenLog": "{name}이(가) {team} 깃발을 빼앗았습니다!",
       "flagDroppedLog": "{team} 깃발이 떨어졌습니다.",
       "flagReturnedLog": "{team} 깃발이 반환되었습니다.",
+      "dropFlagConfirmTitle": "깃발을 내려놓을까요?",
+      "dropFlagConfirmBody": "적의 깃발을 운반하고 있습니다. 내려놓으면 깃발이 바닥에 남아 양 팀 모두 주울 수 있습니다.",
+      "dropFlagConfirmAccept": "깃발 내려놓기",
       "boardToggleLabel": "경기 점수판. Enter 키로 전체 보드를 고정합니다.",
       "levelRequirement": "이 전장의 대기열은 레벨 {level}에 도달하면 잠금 해제됩니다.",
       "board": {
@@ -1466,6 +1469,7 @@ export const ko_KR: EnTranslations = {
       "dualPrice": "{money} + {honor}",
       "balance": "명예: {amount}",
       "honorFloat": "명예 +{amount}",
+      "honorFloatReason": "명예 +{amount} ({reason})",
       "honorGain": "명예를 {amount} 획득했습니다({reason}).",
       "notEnoughHonor": "명예가 부족합니다.",
       "reasons": {
@@ -1477,6 +1481,10 @@ export const ko_KR: EnTranslations = {
         "battlegroundComplete": "쏜할로우 평원 참전",
         "battlegroundKill": "명예로운 처치",
         "battlegroundAssist": "처치 도움"
+      },
+      "floatReasons": {
+        "kill": "처치",
+        "assist": "도움"
       }
     },
     "charSheet": {
@@ -1884,6 +1892,7 @@ export const ko_KR: EnTranslations = {
       "dmgDoneReduce": "입히는 피해가 {pct}% 감소합니다",
       "heatingUp": "다음 화염 생성기가 연속으로 치명타를 적중하면 몰아치는 열기를 얻고, 치명타가 아니면 달아오름이 제거됩니다",
       "elementalConvergencePrimed": "다음에 다른 원소 계열 주문을 시전하면 원소 융합이 발동합니다",
+      "carriedFlag": "적의 깃발을 운반하고 있습니다. 이 버프를 해제하면 깃발을 내려놓습니다.",
       "battleStance": "전투 태세: 분노 생성 10% 증가",
       "berserkerStance": "광전사 태세: 치명타 확률 3% 증가, 피해 3% 증가",
       "crit": "치명타 확률이 {pct}% 증가합니다",

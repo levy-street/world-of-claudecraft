@@ -1078,6 +1078,9 @@ export const ru_RU: EnTranslations = {
       "flagTakenLog": "{name} забирает флаг команды {team}!",
       "flagDroppedLog": "Флаг команды {team} уронен.",
       "flagReturnedLog": "Флаг команды {team} возвращен.",
+      "dropFlagConfirmTitle": "Бросить флаг?",
+      "dropFlagConfirmBody": "Вы несете вражеский флаг. Если бросить его, он останется на земле и его сможет подобрать любая команда.",
+      "dropFlagConfirmAccept": "Бросить флаг",
       "boardToggleLabel": "Табло матча. Нажмите Enter, чтобы закрепить полную таблицу.",
       "levelRequirement": "Очередь на это поле боя открывается на уровне {level}.",
       "board": {
@@ -1466,6 +1469,7 @@ export const ru_RU: EnTranslations = {
       "dualPrice": "{money} + {honor}",
       "balance": "Честь: {amount}",
       "honorFloat": "+{amount} чести",
+      "honorFloatReason": "+{amount} чести ({reason})",
       "honorGain": "Вы получаете {amount} очк. чести ({reason}).",
       "notEnoughHonor": "Недостаточно чести.",
       "reasons": {
@@ -1477,6 +1481,10 @@ export const ru_RU: EnTranslations = {
         "battlegroundComplete": "Битва в Терновой Лощине",
         "battlegroundKill": "Почётное убийство",
         "battlegroundAssist": "Помощь в убийстве"
+      },
+      "floatReasons": {
+        "kill": "Убийство",
+        "assist": "Помощь"
       }
     },
     "charSheet": {
@@ -1884,6 +1892,7 @@ export const ru_RU: EnTranslations = {
       "dmgDoneReduce": "Снижает наносимый урон на {pct}%",
       "heatingUp": "Следующий критический удар огненного заклинания в серии дает «Полосу везения»; некритический удар снимает «Разогрев»",
       "elementalConvergencePrimed": "Следующее заклинание другой стихийной школы активирует Стихийное слияние",
+      "carriedFlag": "Вы несете вражеский флаг. Отмените этот эффект, чтобы бросить его.",
       "battleStance": "Боевая стойка: на 10% больше создания ярости",
       "berserkerStance": "Стойка берсерка: крит. удары на 3% чаще и на 3% сильнее",
       "crit": "Повышает шанс критического удара на {pct}%",

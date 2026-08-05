@@ -992,6 +992,11 @@ export interface SimContextCallbacks {
   bgOnPlayerDamaged(victim: Entity, source: Entity): void;
   /** Heal hook: remember allied support so a kill can pay the healers too. */
   bgOnPlayerHealed(target: Entity, source: Entity): void;
+  /** Buff-cancel hook: `Sim.cancelAura` offers every cancel here FIRST. Returns
+   *  true when the id is the battleground's carried-flag buff, which is a DROP
+   *  affordance rather than a plain buff, so the generic aura splice must not
+   *  run for it (a carrier's cancel drops the flag; anyone else's is a no-op). */
+  bgCancelFlagAura(e: Entity, auraId: string): boolean;
 }
 
 // The seam consumed by extracted modules.
@@ -1514,5 +1519,6 @@ export function createSimContext(host: SimContextHost): SimContext {
     bgOnPlayerDeath: host.bgOnPlayerDeath,
     bgOnPlayerDamaged: host.bgOnPlayerDamaged,
     bgOnPlayerHealed: host.bgOnPlayerHealed,
+    bgCancelFlagAura: host.bgCancelFlagAura,
   };
 }

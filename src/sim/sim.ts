@@ -5300,6 +5300,7 @@ export class Sim {
       bgOnPlayerDeath: (e, killer) => bgMod.bgOnPlayerDeath(sim.ctx, e, killer),
       bgOnPlayerDamaged: (victim, source) => bgMod.bgOnPlayerDamaged(sim.ctx, victim, source),
       bgOnPlayerHealed: (target, source) => bgMod.bgOnPlayerHealed(sim.ctx, target, source),
+      bgCancelFlagAura: (e, auraId) => bgMod.bgCancelCarriedFlagAura(sim.ctx, e, auraId),
     };
     return createSimContext(host);
   }
@@ -6388,6 +6389,12 @@ export class Sim {
     const r = this.resolve(pid);
     if (!r) return;
     const { e, meta } = r;
+    // The battleground's carried-flag buff is a DROP affordance wearing a buff's
+    // clothes, so it is offered to its owner FIRST: cancelling it must route
+    // through the authoritative flag drop (flag at the runner's feet, catchable,
+    // the bgFlag 'dropped' call to all ten), never the generic splice below,
+    // which would strip the buff and leave the flag carried.
+    if (this.ctx.bgCancelFlagAura(e, auraId)) return;
     const removed = removeCancelableAura(e.auras, auraId);
     if (!removed) return;
     this.emit({ type: 'aura', targetId: e.id, name: removed.name, gained: false });

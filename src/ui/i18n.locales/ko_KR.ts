@@ -841,6 +841,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.dualPrice': '{money} + {honor}',
   'hudChrome.warfare.balance': '명예: {amount}',
   'hudChrome.warfare.honorFloat': '명예 +{amount}',
+  'hudChrome.warfare.honorFloatReason': '명예 +{amount} ({reason})',
   'hudChrome.warfare.honorGain': '명예를 {amount} 획득했습니다({reason}).',
   'hudChrome.warfare.notEnoughHonor': '명예가 부족합니다.',
   'hudChrome.warfare.reasons.arenaWin': '투기장 승리',
@@ -851,6 +852,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.battlegroundComplete': '쏜할로우 평원 참전',
   'hudChrome.warfare.reasons.battlegroundKill': '명예로운 처치',
   'hudChrome.warfare.reasons.battlegroundAssist': '처치 도움',
+  'hudChrome.warfare.floatReasons.kill': '처치',
+  'hudChrome.warfare.floatReasons.assist': '도움',
   'hudChrome.keybinds.bgFlag': '전장 깃발 행동',
   'hudChrome.pvp.launcherTitle': 'PvP: 쏜할로우 평원과 투기장',
   'hudChrome.pvp.mobileLabel': 'PvP',
@@ -895,6 +898,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.flagTakenLog': '{name}이(가) {team} 깃발을 빼앗았습니다!',
   'hudChrome.bg.flagDroppedLog': '{team} 깃발이 떨어졌습니다.',
   'hudChrome.bg.flagReturnedLog': '{team} 깃발이 반환되었습니다.',
+  'hudChrome.bg.dropFlagConfirmTitle': '깃발을 내려놓을까요?',
+  'hudChrome.bg.dropFlagConfirmBody':
+    '적의 깃발을 운반하고 있습니다. 내려놓으면 깃발이 바닥에 남아 양 팀 모두 주울 수 있습니다.',
+  'hudChrome.bg.dropFlagConfirmAccept': '깃발 내려놓기',
   'hudChrome.bg.yourTeamTitle': '내 팀',
   'hudChrome.bg.boardToggleLabel': '경기 점수판. Enter 키로 전체 보드를 고정합니다.',
   'hudChrome.bg.levelRequirement': '이 전장의 대기열은 레벨 {level}에 도달하면 잠금 해제됩니다.',
@@ -7302,6 +7309,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.haste': '공격 속도와 시전 속도를 {pct}% 증가시킵니다',
   'hudChrome.auraEffect.dmgDone': '입히는 피해가 {pct}% 증가합니다',
   'hudChrome.auraEffect.dmgDoneReduce': '입히는 피해가 {pct}% 감소합니다',
+  'hudChrome.auraEffect.carriedFlag':
+    '적의 깃발을 운반하고 있습니다. 이 버프를 해제하면 깃발을 내려놓습니다.',
   'hudChrome.auraEffect.elementalConvergencePrimed':
     '다음에 다른 원소 계열 주문을 시전하면 원소 융합이 발동합니다',
   'hudChrome.auraEffect.heatingUp':

@@ -116,6 +116,21 @@ export const BG_PREMADE_HOLD = 20;
 export const BG_PREMADE_SIZE = 4;
 
 const CARRIER_VULN_AURA_ID = 'bg_carrier_vulnerability';
+/**
+ * The always-visible "you have the flag" buff, and the classic WSG affordance
+ * that comes with it: cancelling the buff drops the flag on purpose (a desktop
+ * right-click, a confirmed long press on touch). Exported because the HUD's
+ * toggle list, its never-shed list and the icon registry all name the same id,
+ * and the tests assert the aura's lifetime per flag path.
+ *
+ * Its lifetime is exactly the carry. It is applied at the ONE pickup site and
+ * removed by `clearCarrierAuras`, which every flag-leaving path already crosses
+ * (capture, proximity return, auto-return, death drop, stealth drop, desertion,
+ * match end, teardown). A cancel while it is really being carried is intercepted
+ * by `bgCancelCarriedFlagAura` and routed into the authoritative drop instead of
+ * a raw aura splice, so the buff can never come off while the flag stays on.
+ */
+export const CARRIED_FLAG_AURA_ID = 'bg_carried_flag';
 export const SPRINT_RUNE_AURA_ID = 'bg_sprint_rune';
 export const BATTLE_RUNE_AURA_ID = 'bg_battle_rune';
 export const WARD_RUNE_AURA_ID = 'bg_ward_rune';
@@ -962,6 +977,22 @@ function tickFlags(ctx: SimContext, match: BgMatch): void {
       ctx.forceDismount(e);
       e.mountCastRemaining = 0;
       e.mountCastKey = '';
+      // The carry itself is now WORN, from the first tick and not only once the
+      // fatigue delay bites: the runner can see they have it, their team can see
+      // it on them, and right-clicking it drops the flag on purpose (the classic
+      // voluntary drop, intercepted in bgCancelCarriedFlagAura). The duration
+      // mirrors Carrier Fatigue's: longer than any match, so natural expiry can
+      // never fire and clearCarrierAuras stays the only way off.
+      ctx.applyAura(e, {
+        id: CARRIED_FLAG_AURA_ID,
+        name: 'Carrying the Flag',
+        kind: 'flag_carried',
+        value: 0,
+        remaining: BG_MAX_DURATION,
+        duration: BG_MAX_DURATION,
+        sourceId: e.id,
+        school: 'physical',
+      });
       const byName = ctx.players.get(pid)?.name ?? '?';
       bgEmitAll(ctx, match, (mp) =>
         ctx.emit({
@@ -1041,16 +1072,52 @@ function tickCarriedFlag(ctx: SimContext, match: BgMatch, flag: BgFlagState): vo
   }
 }
 
-function clearCarrierVuln(ctx: SimContext, flag: BgFlagState): void {
+/**
+ * The ONE seam every flag-leaving path crosses (capture, proximity return,
+ * auto-return, death drop, stealth drop, desertion, match end, teardown): reset
+ * the carry clock and take BOTH carrier-worn auras off the runner. Keeping the
+ * carried-flag buff on the same seam as Carrier Fatigue is what makes "worn
+ * exactly while carrying" true by construction rather than by nine call sites
+ * remembering to do it.
+ */
+function clearCarrierAuras(ctx: SimContext, flag: BgFlagState): void {
   const carrier = flag.carrier !== null ? ctx.entities.get(flag.carrier) : null;
   flag.carrySeconds = 0;
   flag.vulnStacks = 0;
   if (!carrier) return;
-  const idx = carrier.auras.findIndex((a) => a.id === CARRIER_VULN_AURA_ID);
-  if (idx >= 0) {
-    const [aura] = carrier.auras.splice(idx, 1);
-    ctx.emit({ type: 'aura', targetId: carrier.id, name: aura.name, gained: false });
+  for (const auraId of [CARRIER_VULN_AURA_ID, CARRIED_FLAG_AURA_ID]) {
+    const idx = carrier.auras.findIndex((a) => a.id === auraId);
+    if (idx >= 0) {
+      const [aura] = carrier.auras.splice(idx, 1);
+      ctx.emit({ type: 'aura', targetId: carrier.id, name: aura.name, gained: false });
+    }
   }
+}
+
+/**
+ * Right-click-cancel of the carried-flag buff: the classic voluntary drop.
+ *
+ * Returns TRUE only on the arm that actually DROPS (live carrier in an active
+ * match), which is what stops `Sim.cancelAura` falling through to the generic
+ * splice there: a raw removal would take the buff off and leave the flag
+ * carried, a flag state machine and a HUD that disagree.
+ *
+ * Every other arm returns FALSE on purpose, including for our own id. If there
+ * is no flag to drop then the aura is stale (an inconsistency this module's
+ * lifetime rules say cannot happen), and the right answer is to let the generic
+ * splice clean it: swallowing the cancel there would convert a self-healing
+ * inconsistency into a buff the player can never take off.
+ */
+export function bgCancelCarriedFlagAura(ctx: SimContext, e: Entity, auraId: string): boolean {
+  if (auraId !== CARRIED_FLAG_AURA_ID) return false;
+  const match = ctx.bgMatches.get(e.id);
+  if (!match || match.state !== 'active') return false;
+  const flag = match.flags.find((f) => f.carrier === e.id);
+  if (!flag) return false;
+  // The same authoritative drop the stealth path takes: the flag lands at the
+  // runner's feet, arms its return timer, and calls the drop to all ten.
+  dropFlag(ctx, match, flag, e);
+  return true;
 }
 
 function syncFlagEntity(ctx: SimContext, flag: BgFlagState): void {
@@ -1102,7 +1169,7 @@ function returnFlag(
   byName: string,
   silent = false,
 ): void {
-  clearCarrierVuln(ctx, flag);
+  clearCarrierAuras(ctx, flag);
   flag.state = 'home';
   flag.carrier = null;
   flag.dropTimer = 0;
@@ -1147,7 +1214,7 @@ function bgBreakStealth(ctx: SimContext, e: Entity): void {
 
 function dropFlag(ctx: SimContext, match: BgMatch, flag: BgFlagState, at: Entity | null): void {
   const carrierName = flag.carrier !== null ? (ctx.players.get(flag.carrier)?.name ?? '?') : '?';
-  clearCarrierVuln(ctx, flag);
+  clearCarrierAuras(ctx, flag);
   flag.state = 'dropped';
   flag.carrier = null;
   flag.dropTimer = BG_FLAG_RETURN_TIME;
@@ -1495,7 +1562,7 @@ function releaseBgFighters(ctx: SimContext, match: BgMatch): void {
   // land before the fighters are teleported home (premades stay intact).
   unwindBgTeamParties(ctx, match.autoPartyPids);
   for (const flag of match.flags) {
-    clearCarrierVuln(ctx, flag);
+    clearCarrierAuras(ctx, flag);
     if (flag.entityId >= 0 && ctx.entities.has(flag.entityId)) ctx.dropEntity(flag.entityId);
   }
   for (const rune of match.runes) {

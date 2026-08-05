@@ -343,6 +343,7 @@ const UI_PURE_CORES = [
   'src/ui/gather_tool_tooltip.ts',
   'src/ui/fct_core.ts',
   'src/ui/fct_event.ts',
+  'src/ui/honor_float_view.ts',
   'src/ui/heal_landing_feedback_core.ts',
   'src/ui/window_drag_core.ts',
   'src/ui/window_resize_core.ts',

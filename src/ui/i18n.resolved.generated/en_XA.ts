@@ -1078,6 +1078,9 @@ export const en_XA: EnTranslations = {
       "flagTakenLog": "[{name} ĥáš ţáķéñ ţĥé {team} ƒļáĝ!]",
       "flagDroppedLog": "[Ţĥé {team} ƒļáĝ ŵáš ðŕóþþéð.]",
       "flagReturnedLog": "[Ţĥé {team} ƒļáĝ ŵáš ŕéţúŕñéð.]",
+      "dropFlagConfirmTitle": "[Ðŕóþ ţĥé ƒļáĝ?]",
+      "dropFlagConfirmBody": "[Ýóú áŕé çáŕŕýíñĝ ţĥé éñéɱý ƒļáĝ. Ðŕóþþíñĝ íţ ļéáʋéš íţ óñ ţĥé ĝŕóúñð, ŵĥéŕé éíţĥéŕ ţéáɱ çáñ ŕéáçĥ íţ.]",
+      "dropFlagConfirmAccept": "[Ðŕóþ ţĥé ƒļáĝ]",
       "boardToggleLabel": "[Ɱáţçĥ šçóŕéƀóáŕð. Þŕéšš Éñţéŕ ţó þíñ ţĥé ƒúļļ ƀóáŕð óþéñ.]",
       "levelRequirement": "[Ýóú ɱúšţ ŕéáçĥ ļéʋéļ {level} ţó úñļóçķ ɋúéúéíñĝ ƒóŕ ţĥíš ƀáţţļéĝŕóúñð.]",
       "board": {
@@ -1466,6 +1469,7 @@ export const en_XA: EnTranslations = {
       "dualPrice": "[{money} + {honor}]",
       "balance": "[Ĥóñóŕ: {amount}]",
       "honorFloat": "[+{amount} Ĥóñóŕ]",
+      "honorFloatReason": "[+{amount} Ĥóñóŕ ({reason})]",
       "honorGain": "[Ýóú ĝáíñ {amount} Ĥóñóŕ ({reason}).]",
       "notEnoughHonor": "[Ñóţ éñóúĝĥ Ĥóñóŕ.]",
       "reasons": {
@@ -1477,6 +1481,10 @@ export const en_XA: EnTranslations = {
         "battlegroundComplete": "[Ţĥóŕñĥóļļóŵ Ƒíéļðš ƀáţţļé ƒóúĝĥţ]",
         "battlegroundKill": "[ĥóñóŕáƀļé ķíļļ]",
         "battlegroundAssist": "[ķíļļíñĝ ƀļóŵ áššíšţéð]"
+      },
+      "floatReasons": {
+        "kill": "[Ķíļļ]",
+        "assist": "[Áššíšţ]"
       }
     },
     "charSheet": {
@@ -1884,6 +1892,7 @@ export const en_XA: EnTranslations = {
       "dmgDoneReduce": "[Ŕéðúçéš ðáɱáĝé ðéáļţ ƀý {pct}%]",
       "heatingUp": "[Ýóúŕ ñéẋţ çóñšéçúţíʋé Ƒíŕé ƀúíļðéŕ çŕíţíçáļ šţŕíķé ĝŕáñţš Ĥóţ Šţŕéáķ; á ñóñ-çŕíţíçáļ ƀúíļðéŕ ŕéɱóʋéš Ĥéáţíñĝ Úþ]",
       "elementalConvergencePrimed": "[Ýóúŕ ñéẋţ šþéļļ ƒŕóɱ ţĥé óţĥéŕ éļéɱéñţáļ šçĥóóļ ĝŕáñţš Éļéɱéñţáļ Çóñʋéŕĝéñçé]",
+      "carriedFlag": "[Ýóú áŕé çáŕŕýíñĝ ţĥé éñéɱý ƒļáĝ. Çáñçéļ ţĥíš ƀúƒƒ ţó ðŕóþ íţ.]",
       "battleStance": "[Ɓáţţļé Šţáñçé: 10% ɱóŕé ŕáĝé ĝéñéŕáţíóñ]",
       "berserkerStance": "[Ɓéŕšéŕķéŕ Šţáñçé: çŕíţš 3% ɱóŕé óƒţéñ áñð ĥíţ 3% ĥáŕðéŕ]",
       "crit": "[Íñçŕéášéš çŕíţíçáļ šţŕíķé çĥáñçé ƀý {pct}%]",

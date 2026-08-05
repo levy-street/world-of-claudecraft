@@ -75,6 +75,12 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
   if (a.id === 'convergence_mark' && a.kind === 'internal_cd') {
     return { key: `${KEY}.elementalConvergencePrimed`, nums: {} };
   }
+  // Thornhollow Fields' carried-flag buff. Unlike every other row here it does not
+  // describe a stat: it names the AFFORDANCE, because right-click-to-drop is
+  // otherwise undiscoverable and this hover is the only surface that can teach it.
+  if (a.id === 'bg_carried_flag' && a.kind === 'flag_carried') {
+    return { key: `${KEY}.carriedFlag`, nums: {} };
+  }
   switch (a.kind) {
     case 'dot':
       return {

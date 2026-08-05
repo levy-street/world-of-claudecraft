@@ -414,6 +414,8 @@ const baseEnTable = {
   // Cauterize's 5 min lockout debuff (combat/fire_mage.ts); survives death.
   'aura.cauterizeFatigue': 'Cauterize Fatigue',
   'aura.carrierFatigue': 'Carrier Fatigue',
+  // The always-worn carried-flag buff; right-clicking it drops the flag on purpose.
+  'aura.carriedFlag': 'Carrying the Flag',
   'aura.sprintRune': 'Sprint',
   'aura.battleRune': 'Battle Rune',
   'aura.wardRune': 'Ward Rune',
@@ -4141,6 +4143,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.temporalExhaustion': '时光疲惫',
     'aura.cauterizeFatigue': '烧灼疲乏',
     'aura.carrierFatigue': '旗手疲劳',
+    'aura.carriedFlag': '携带旗帜',
     'aura.sprintRune': '疾跑',
     'aura.battleRune': '战斗符文',
     'aura.wardRune': '守护符文',
@@ -4565,6 +4568,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.temporalExhaustion': '時光疲憊',
     'aura.cauterizeFatigue': '燒灼疲乏',
     'aura.carrierFatigue': '旗手疲勞',
+    'aura.carriedFlag': '攜帶旗幟',
     'aura.sprintRune': '疾跑',
     'aura.battleRune': '戰鬥符文',
     'aura.wardRune': '守護符文',
@@ -4998,6 +5002,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.temporalExhaustion': '시간의 탈진',
     'aura.cauterizeFatigue': '소작의 피로',
     'aura.carrierFatigue': '기수 피로',
+    'aura.carriedFlag': '깃발 운반 중',
     'aura.sprintRune': '질주',
     'aura.battleRune': '전투 룬',
     'aura.wardRune': '수호 룬',
@@ -5440,6 +5445,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.temporalExhaustion': '時の疲弊',
     'aura.cauterizeFatigue': '焼灼の疲労',
     'aura.carrierFatigue': '旗手の疲弊',
+    'aura.carriedFlag': '旗を運搬中',
     'aura.sprintRune': 'スプリント',
     'aura.battleRune': 'バトルルーン',
     'aura.wardRune': 'ウォードルーン',
@@ -6317,6 +6323,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.temporalExhaustion': 'Временное истощение',
     'aura.cauterizeFatigue': 'Усталость от прижигания',
     'aura.carrierFatigue': 'Усталость знаменосца',
+    'aura.carriedFlag': 'Несет флаг',
     'aura.sprintRune': 'Спринт',
     'aura.battleRune': 'Руна битвы',
     'aura.wardRune': 'Руна защиты',
@@ -8070,8 +8077,10 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Temporal Exhaustion': 'aura.temporalExhaustion',
   'Cauterize Fatigue': 'aura.cauterizeFatigue',
   // Thornhollow Fields battleground auras (src/sim/social/battleground.ts): spawn
-  // protection, the carrier-fatigue vulnerability, and the sprint-rune haste.
+  // protection, the carrier-fatigue vulnerability, the carried-flag buff, and the
+  // sprint-rune haste.
   'Carrier Fatigue': 'aura.carrierFatigue',
+  'Carrying the Flag': 'aura.carriedFlag',
   Sprint: 'aura.sprintRune',
   'Battle Rune': 'aura.battleRune',
   'Ward Rune': 'aura.wardRune',

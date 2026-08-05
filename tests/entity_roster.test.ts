@@ -398,6 +398,7 @@ function makeCtx() {
     bgOnPlayerDeath: vi.fn(),
     bgOnPlayerDamaged: vi.fn(),
     bgOnPlayerHealed: vi.fn(),
+    bgCancelFlagAura: vi.fn(() => false),
   };
   const ctx = createSimContext(host);
   return {

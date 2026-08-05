@@ -140,7 +140,7 @@ import { type AuraEffectInput, auraEffectDescriptor } from './aura_effect';
 import { auraGainLogKeyFor, findAuraForGainEvent } from './aura_gain_log';
 import { AuraOverlayController } from './aura_overlay_controller';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
-import { type AurasDeps, createAurasView } from './auras_view';
+import { type AurasDeps, auraCancelNeedsConfirm, createAurasView } from './auras_view';
 import { attachAvatarFallback } from './avatar_fallback';
 import { BagItemActionMenu, CTX_MENU_PICKER_CLASS } from './bag_item_action_menu';
 import { bagsWindowShown } from './bags_view';
@@ -280,6 +280,7 @@ import {
   shouldFloatHealLanding,
   shouldShowHealLanding,
 } from './heal_landing_feedback_core';
+import { honorFloatText } from './honor_float_view';
 import { isSelfOnlyAbility } from './hud/action_bar/ability_self_only';
 import {
   type ActionBarBindState,
@@ -4007,8 +4008,17 @@ export class Hud {
   };
   private readonly aurasPainterDeps: AurasPainterDeps = {
     resolveIconUrl: (iconKey) => `url(${iconDataUrl('aura', iconKey)})`,
-    renderTooltip: (name, remaining, effectHtml) =>
-      `<div class="tt-title">${esc(name)}</div>${effectHtml}<div class="tt-sub">${esc(tPlural('hudChrome.plurals.secondsRemaining', Math.ceil(remaining)))}</div>`,
+    // A MODE aura (form, stance, stealth, Ghost Wolf, the carried flag) prints NO
+    // seconds-remaining line. The sim backs each with a long finite duration
+    // (3600s, or a whole match) purely so nothing can expire it; surfacing that
+    // number is the same lie the suppressed countdown label already avoids, and
+    // on the carried flag it would read as "the flag leaves me in 12 minutes".
+    renderTooltip: (name, remaining, effectHtml, toggle) =>
+      `<div class="tt-title">${esc(name)}</div>${effectHtml}${
+        toggle
+          ? ''
+          : `<div class="tt-sub">${esc(tPlural('hudChrome.plurals.secondsRemaining', Math.ceil(remaining)))}</div>`
+      }`,
     attachTooltip: (el, html) => this.attachTooltip(el, html),
   };
   // Player auras split across two rows (classic layout): buffs in #buff-bar, debuffs in
@@ -4038,6 +4048,25 @@ export class Hud {
         if (auraId === null) return;
         ev.preventDefault();
         this.hideTooltip();
+        // Cancelling most buffs only un-buffs you, so it fires immediately. A few
+        // are GAMEPLAY actions (today: the carried flag, whose cancel drops it),
+        // and on a TOUCH host the cancel gesture is a long press, which is also
+        // the tooltip-peek gesture: an unconfirmed cancel there would drop the
+        // flag mid-run by accident, and touch players would otherwise have no
+        // drop path at all. So touch gets the shared confirm-dialog family and a
+        // real affordance; a desktop right-click is deliberate and stays instant.
+        // The touch-interface signal is body.mobile-touch, the same class main.ts
+        // toggles from useTouchInterface()/NATIVE_APP and the item-drag deps read.
+        if (auraCancelNeedsConfirm(auraId) && document.body.classList.contains('mobile-touch')) {
+          this.confirmDialog(
+            t('hudChrome.bg.dropFlagConfirmTitle'),
+            t('hudChrome.bg.dropFlagConfirmBody'),
+            t('hudChrome.bg.dropFlagConfirmAccept'),
+            t('hud.chat.context.cancel'),
+            () => this.sim.cancelAura(auraId),
+          );
+          return;
+        }
         this.sim.cancelAura(auraId);
       });
     },
@@ -10569,10 +10598,14 @@ export class Hud {
           });
           const honorShape = fctSpawnShape({ type: 'honor' });
           if (honorShape) {
+            // Over your OWN character (target: sim.player), like the xp float. The
+            // personal-event gate above already dropped every other player's honor,
+            // so this only ever pops for the player who gained it. The reason-naming
+            // copy decision is the pure core's, not this switch's.
             this.fctPainter.spawn(
               {
                 ...honorShape,
-                text: t('hudChrome.warfare.honorFloat', { amount }),
+                text: honorFloatText(ev.reason, ev.amount),
                 target: sim.player,
               },
               now,

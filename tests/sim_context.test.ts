@@ -570,6 +570,7 @@ function makeFakeHost() {
     bgOnPlayerDeath: vi.fn(),
     bgOnPlayerDamaged: vi.fn(),
     bgOnPlayerHealed: vi.fn(),
+    bgCancelFlagAura: vi.fn(() => false),
   };
   return { host, rng, entities, clock };
 }

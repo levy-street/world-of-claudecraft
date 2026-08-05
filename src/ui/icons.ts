@@ -3228,6 +3228,10 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   bg_sprint_rune: r('fire', 'ember', ['boot'], ['motion', 'glow']),
   bg_battle_rune: r('blood', 'blood', ['sword'], ['glow']),
   bg_ward_rune: r('frost', 'ice', ['shield'], ['glow']),
+  // The carried-flag buff, worn for the whole carry: a banner on its pole (the
+  // red_banner ability's staff-plus-sunburst language) on the objective gold, so
+  // it reads as the flag itself and not as another rune.
+  bg_carried_flag: r('fury', 'gold', ['staff', { p: 'sunburst', ...TR, pal: 'gold' }], ['motion']),
 };
 
 /** True when `id` has a dedicated aura recipe (the hud iconId resolver lets
