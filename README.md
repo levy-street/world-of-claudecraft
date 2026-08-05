@@ -307,6 +307,7 @@ The sim is a fixed 20 Hz tick (`DT = 1/20`), all randomness flows through one se
 | `server/http/` | The REST request pipeline: table router, middleware, and per-domain route definitions. |
 | `headless/` + `python/` | RL env server (`env_server.ts`) and Python Gym bindings. |
 | `bot/` | Discord bot (roles, relay, activity feed). |
+| `farmbot/` | Autonomous farming client for a live realm (gathers, fishes, fights; own `CLAUDE.md`). |
 | `electron/`, `android/`, `ios/` | Desktop (Steam) and native mobile shells. |
 | `tests/` | Vitest suite. |
 | `scripts/` | Build, asset, i18n, SFX, screenshot, and browser E2E tooling. |

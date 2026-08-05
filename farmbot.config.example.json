@@ -1,0 +1,44 @@
+{
+  "serverUrl": "http://localhost:8787",
+  "characterName": "Farmhand",
+  "zoneId": "eastbrook_vale",
+  "zones": ["eastbrook_vale", "mirefen_marsh"],
+  "mode": "gather-fish",
+  "nodeTypes": ["herb", "ore", "wood"],
+  "nodePriority": ["herb", "ore", "wood"],
+  "maxNodeTier": 99,
+  "nodeBlacklist": [],
+  "nodeWhitelist": [],
+  "fishing": {
+    "enabled": true,
+    "spots": [{ "x": -72.4, "z": 65.3 }, { "x": -75, "z": 68.4 }],
+    "castsPerSpot": 5
+  },
+  "combat": {
+    "abilitySlots": [0, 1],
+    "rotationMode": "auto",
+    "grind": false,
+    "flee": "outleveled",
+    "fleeAboveLevelDelta": 3,
+    "eatItemId": "baked_bread",
+    "drinkItemId": "spring_water",
+    "eatBelowHpPct": 50,
+    "drinkBelowManaPct": 30
+  },
+  "death": {
+    "waitUntilFull": true,
+    "maxDeaths": 0,
+    "avoidDeathSpotMinutes": 30
+  },
+  "safety": {
+    "whisperAction": "alarm",
+    "playerPause": { "enabled": true, "radiusYd": 40, "seconds": 20 },
+    "schedule": { "sessionMinutes": 0, "breakMinutes": 20, "breakAction": "idle" }
+  },
+  "bags": {
+    "fullPolicy": "sell-junk",
+    "sellAllowlist": [],
+    "mailItems": "all"
+  },
+  "maxRuntimeMinutes": 0
+}

@@ -121,6 +121,7 @@ discord_bot_info.txt
 
 # bot build output
 dist-bot/
+dist-farmbot/
 chrome-headless-shell/
 docs/music/renders/
 
