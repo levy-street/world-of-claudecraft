@@ -19,6 +19,7 @@
     "build:bundle": "npm run sitemap:build && npm run sfx:manifest && node scripts/build_media_manifest.mjs generate && vite build && node scripts/check_backdrop_survival.mjs && node scripts/build_media_manifest.mjs emit",
     "build": "npm run i18n:gen && npm run wiki:content && npm run build:bundle",
     "wiki:content": "node scripts/wiki/build_content.mjs",
+    "parse:content": "node scripts/parse/build_content_pack.mjs",
     "wiki:stills": "node scripts/wiki/render_model_stills.mjs",
     "sitemap:build": "node scripts/build_sitemap.mjs",
     "build:native": "VITE_NATIVE_APP=1 VITE_API_ORIGIN=${VITE_API_ORIGIN:-https://worldofclaudecraft.com} npm run build && node scripts/build_media_manifest.mjs prune",
