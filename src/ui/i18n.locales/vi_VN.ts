@@ -2310,9 +2310,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Tu Huynh Halven đánh dấu vào những tấm bản đồ của mình: một ngày lành để thử sức Thánh Tích Sụp Đổ.',
   'hudChrome.calendar.events.delveDay.title': 'Ngày Hang Sâu',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'Võ đài Fiesta 2v2 đón đám đông cuồng nhiệt nhất vào tối nay.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Đêm Fiesta',
   'hudChrome.calendar.events.fishingDerby.note':
     'Cần thủ xếp hàng quanh các hồ nước. Hãy mang theo cần câu và trao đổi chuyện câu cá.',
   'hudChrome.calendar.events.fishingDerby.title': 'Hội Thi Câu Cá',
@@ -5465,7 +5462,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'FIESTA HÒA! Quá sít sao để phân thắng bại!',
   'fiesta.end.loss': 'FIESTA THUA! Chơi lại nào!',
   'fiesta.end.win': 'FIESTA THẮNG! 🎉 Một bữa tiệc tuyệt vời!',
-  'fiesta.enterQueue': 'Tham gia Fiesta!',
   'fiesta.error.leaderOnly': 'Chỉ trưởng nhóm mới có thể xếp hàng cho đội của ngươi vào {label}.',
   'fiesta.error.noAugment': 'Ngươi không có cường hóa nào để chọn lúc này.',
   'fiesta.error.notOnOffer': 'Cường hóa đó không được đề nghị.',
@@ -5482,9 +5478,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': 'Khổng Tượng',
   'fiesta.powerup.pow_moon_boots.name': 'Giày Mặt Trăng',
   'fiesta.powerup.pow_speed_demon.name': 'Quỷ Tốc Độ',
-  'fiesta.practice': '🎉 Luyện Tập với Bot',
-  'fiesta.practiceNote':
-    'Luyện tập ngoại tuyến: triệu hồi 3 bot AI và xếp hàng cho ngươi vào Fiesta 2v2. Bấm lần nữa để dừng.',
   'fiesta.queue.join': 'Ngươi vào hàng chờ Fiesta 2v2. Sẵn sàng QUẨY nào…',
   'fiesta.queue.leave': 'Ngươi rời hàng chờ Fiesta 2v2.',
   'fiesta.queue.teamLeave': 'Đội của ngươi rời hàng chờ Fiesta 2v2.',
@@ -5733,38 +5726,18 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Đánh trúng mọi thứ quanh bạn và làm chậm đòn tấn công của chúng.',
   'guide.abilityHook.wrath':
     'Một tia tự nhiên ném vào mục tiêu từ xa, đòn chủ lực quen thuộc của bạn.',
-  'guide.arenaPage.augmentsNote':
-    'Cường hóa và tăng lực chỉ kéo dài trong trận đấu. Chúng là về những lối chơi ngẫu hứng, vui nhộn ngay tại chỗ, chứ không phải sức mạnh lâu dài, nên không ai mua được chiến thắng.',
   'guide.arenaPage.coliseumBody':
     'Coliseum là đấu trường của vương quốc, nơi bạn đối đầu với những người chơi khác trong các trận xếp hạng, một đấu một hoặc hai đấu hai. Mỗi hạng đấu giữ bảng xếp hạng riêng, nên một chiến thắng đưa bạn leo cao trên thang đó cho cả vương quốc cùng chiêm ngưỡng. Mở cửa sổ Đấu Trường để đăng ký một hạng đấu, một mình hay cùng người đồng đội của bạn.',
   'guide.arenaPage.coliseumHeading': 'Đấu Trường Tro Tàn',
   'guide.arenaPage.duelsBody':
     'Thách đấu giao hữu bất kỳ người chơi nào bạn gặp. Chẳng có gì đặt cược ngoài lòng tự tôn, nên đây là cách dễ nhất để học một thế đối đầu hay phân định một cuộc tranh luận thân tình.',
   'guide.arenaPage.duelsHeading': 'Đấu Tay Đôi',
-  'guide.arenaPage.fiestaBody':
-    'Fiesta là một trận ẩu đả nhanh, hai đấu hai diễn ra như một hiệp liền mạch, với mọi đấu thủ được đưa về cùng một vạch xuất phát. Khi trận đấu diễn ra bạn chọn cường hóa, những đòn tăng lực nhanh tái định hình bộ kỹ năng của bạn ngay tức thì, nên không trận nào giống trận nào.',
-  'guide.arenaPage.fiestaHeading': 'Fiesta Hai Đấu Hai',
   'guide.arenaPage.heading': 'Đấu Trường và PvP',
   'guide.arenaPage.intro':
     'Muốn thử sức với những người chơi khác? Chế độ người chơi đấu người chơi có sẵn, và đó luôn là lựa chọn của bạn, không bao giờ bị ép buộc.',
   'guide.arenaPage.ladderBody':
     'Chế độ xếp hạng theo dõi thứ hạng của bạn theo thời gian. Xem bảng xếp hạng để biết bạn đang ở đâu và ai đang đứng đầu vương quốc.',
   'guide.arenaPage.ladderHeading': 'Leo Bảng Xếp Hạng',
-  'guide.arenaPage.powerupsBody':
-    'Những quả cầu phát sáng cũng rơi vào đấu trường giữa trận, miễn phí cho ai chạm tới đầu tiên. Chúng được thiết kế phóng đại có chủ đích và chỉ kéo dài trong chốc lát: Quỷ Tốc cho một thoáng vận tốc chói lóa, Khổng Lồ để phình to thành gã khổng lồ nặng nề, Giày Mặt Trăng cho một cú nhảy nảy bật trọng lực thấp, và Cuồng Bạo cho một đợt phẫn nộ dâng trào đột ngột.',
-  'guide.arenaPage.powerupsTitle': 'Tăng lực trong vòng đấu',
-  'guide.arenaPage.waveGoldBody':
-    'Đợt giữa: những tổ hợp hai mặt nơi lối xây dựng của bạn bắt đầu thành hình và phát huy.',
-  'guide.arenaPage.waveGoldTitle': 'Vàng',
-  'guide.arenaPage.wavePrismaticBody':
-    'Đợt cuối cùng: những đòn bùng phát định hình lối chơi, làm tan chảy màn hình, được tạo ra để cảm thấy lố bịch theo cách tuyệt vời nhất.',
-  'guide.arenaPage.wavePrismaticTitle': 'Lăng Kính',
-  'guide.arenaPage.waveSilverBody':
-    'Đợt mở màn: những đòn tăng lực đơn chỉ số gọn gàng giúp mài giũa nền tảng cơ bản của lớp nhân vật bạn.',
-  'guide.arenaPage.waveSilverTitle': 'Bạc',
-  'guide.arenaPage.wavesBody':
-    'Một trận Fiesta trao cho bạn những lượt chọn mới khi nó diễn ra, và các lựa chọn càng táo bạo hơn khi trận đấu kéo dài. Bạn xây dựng từ đợt này sang đợt khác, mỗi lần chọn một trong vài tùy chọn và giữ nó cho hết phần còn lại của trận.',
-  'guide.arenaPage.wavesTitle': 'Cường hóa ập đến theo từng đợt',
   'guide.bestiary.flavor.gravecaller_cultist':
     'Những kẻ phục dịch khoác áo choàng của giáo phái tử thần, kẻ mà công việc làm ô uế những nấm mồ từ Thung Lũng đến những đỉnh núi. Nơi chúng tụ họp, người chết không được yên nghỉ.',
   'guide.bestiary.flavor.grubjaw':
@@ -6778,7 +6751,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapCanvasLabel': 'Bản Đồ',
   'hud.core.mapSummary': 'Bản đồ của {zone}.',
   'hud.core.maxLevel': 'CẤP TỐI ĐA',
-  'hud.core.mobileArena': 'Đấu Trường',
   'hud.core.mobileAttack': 'Tấn Công',
   'hud.core.mobileCamera': 'Máy quay — chạm hai lần để căn giữa lại',
   'hud.core.mobileChat': 'Trò Chuyện',
@@ -6872,7 +6844,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hud.errors.whisperMissing': "Không có người chơi nào tên '{name}' đang trực tuyến.",
   'hud.errors.whisperSelf': 'Bạn lẩm bẩm một mình. Không ai nghe thấy cả.',
   'hud.keybinds.actions.actionBarSlot': 'Thanh Kỹ Năng {slot}',
-  'hud.keybinds.actions.arena': 'Đấu Trường (Ashen Coliseum)',
   'hud.keybinds.actions.attack': 'Tấn Công',
   'hud.keybinds.actions.attackMove': 'Di Chuyển Tấn Công',
   'hud.keybinds.actions.autorun': 'Bật/Tắt Tự Chạy',
@@ -8901,9 +8872,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Xẻ toạc giáp của mục tiêu, giảm {damage}% mỗi lần áp dụng. Cộng dồn tối đa 5 lần. Tạo ra lượng đe dọa lớn.',
   'entities.mobs.training_dummy.name': 'Hình Nộm Tập Luyện',
   'entities.mobs.yumi_cat.name': 'Yumi',
-  'guide.arenaPage.yumiBody':
-    'Bảo Vệ Yumi là chế độ tranh mục tiêu theo đội chơi trong một mê cung: mỗi bên canh giữ linh thú mèo của mình trong khi săn lùng con của đối phương. Thỉnh thoảng cả hai chú mèo lại chớp dịch tới những góc mới của mê cung, nên trận đấu xoay vần giữa việc phòng thủ, săn lùng và chạy đua đi tìm lại chúng. Xếp hàng chờ theo dạng ba đấu ba hoặc năm đấu năm; gục ngã trong trận chỉ khiến bạn phải ngồi ngoài trong chốc lát.',
-  'guide.arenaPage.yumiHeading': 'Bảo Vệ Yumi',
   'hudChrome.archetypeTitle.hobbyLabel': 'Sở Thích',
   'hudChrome.auraEffect.armorPct': 'Giảm giáp đi {pct}%',
   'hudChrome.auraEffect.armorPctStacks': 'Giảm giáp đi {pct}% ({stacks} tích trữ)',
@@ -8923,7 +8891,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'yumi.bracket5': 'Yumi 5 đấu 5',
   'yumi.end.loss': 'THẤT BẠI! Yumi của bạn đã gục ngã.',
   'yumi.end.win': 'CHIẾN THẮNG! Yumi đã an toàn!',
-  'yumi.enterQueue': 'Tham Gia Bảo Vệ Yumi!',
   'yumi.error.partyTooBig3': 'Bảo Vệ Yumi 3 đấu 3 chỉ cho phép tổ đội tối đa ba người.',
   'yumi.error.partyTooBig5': 'Bảo Vệ Yumi 5 đấu 5 chỉ cho phép tổ đội tối đa năm người.',
   'yumi.hud.aria': 'Yumi của bạn còn {mine} trên {max} máu, Yumi địch còn {theirs}.',

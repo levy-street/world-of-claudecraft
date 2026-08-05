@@ -82,6 +82,7 @@ import {
 import { configureAuthRuntime } from './auth_routes';
 import { computeBankBonus } from './bank_entitlements';
 import { bankLedgerIdle } from './bank_ledger';
+import { configureBattlegroundRuntime, readBgLeaderboard } from './battleground';
 import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
 import { createCachedRead } from './cached_read';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
@@ -111,6 +112,7 @@ import {
   accountAndScopeForToken,
   accountById,
   acquireCharacterLease,
+  type BgLeaderRow,
   bankBonusFactsForAccount,
   type CharacterRow,
   characterCountsByRealm,
@@ -159,6 +161,7 @@ import {
   setAccountEmail,
   type TokenScope,
   topArenaRatings,
+  topBgRatings,
   topGuilds,
   topLifetimeXp,
   touchLogin,
@@ -643,6 +646,39 @@ async function getArenaLeaderboard(format: '1v1' | '2v2'): Promise<ArenaLeaderRo
   }
 }
 
+// Thornhollow Fields ladder cache. ONE entry (the battleground has a single format),
+// same compute-once / serve-from-memory shape as the arena ladder above. Wired
+// into bustBoardCaches below because the ladder is character-faced and
+// moderation-visible: a ban delists immediately in-process while cross-process
+// peers converge within one TTL, the same tradeoff the other boards make.
+// readBgLeaderboard (server/battleground.ts) is the INNER read, so
+// BG_LEADERBOARD_LIMIT stays the one place the ladder depth is set.
+let bgLeaderboardCache: { at: number; leaders: BgLeaderRow[] } | null = null;
+
+async function refreshBg(): Promise<BgLeaderRow[]> {
+  const epoch = boardEpoch;
+  const { leaders } = await readBgLeaderboard({ topBgRatings });
+  // Skip the install if a moderation bust landed mid-refresh (see boardEpoch).
+  if (boardEpoch === epoch) bgLeaderboardCache = { at: Date.now(), leaders };
+  return leaders;
+}
+
+// Single-flight keyed on boardEpoch exactly like the player/guild/arena
+// refreshes, so a moderation bust (which bumps boardEpoch) drops any in-flight
+// pre-ban refresh instead of handing a post-bust reader its pre-ban snapshot.
+const refreshBgShared = singleFlight(refreshBg, () => boardEpoch);
+
+async function getBgLeaderboard(): Promise<BgLeaderRow[]> {
+  const cached = bgLeaderboardCache;
+  if (cached && Date.now() - cached.at < LEADERBOARD_TTL_MS) return cached.leaders;
+  try {
+    return await refreshBgShared();
+  } catch (err) {
+    console.error('battleground leaderboard refresh failed:', err);
+    return cached?.leaders ?? [];
+  }
+}
+
 // Renown (deeds) board cache. Same compute-once/serve-from-memory shape as
 // the boards above, but ONE entry, not one per scope: the board is
 // account-level and accounts span realms, so it is GLOBAL-ONLY by design.
@@ -765,6 +801,7 @@ function bustBoardCaches(): void {
   guildLeaderboardCache.global = null;
   arenaLeaderboardCache['1v1'] = null;
   arenaLeaderboardCache['2v2'] = null;
+  bgLeaderboardCache = null;
   deedsBoardCache = null;
   bustDailyRewardBoardCache();
   // Not a board: the Discord winner-announcement snapshot. The daily-reward ban
@@ -874,12 +911,14 @@ export const boardReadTestSeam = {
   getLeaderboard,
   getGuildLeaderboard,
   getArenaLeaderboard,
+  getBgLeaderboard,
   getAccountsCreatedCount,
   getCharactersCreatedCount,
   refreshDeedsRarityShared,
   refreshLeaderboardShared,
   refreshGuildLeaderboardShared,
   refreshArenaShared,
+  refreshBgShared,
   bustBoardCaches,
   reset(): void {
     leaderboardCache.realm = null;
@@ -888,6 +927,7 @@ export const boardReadTestSeam = {
     guildLeaderboardCache.global = null;
     arenaLeaderboardCache['1v1'] = null;
     arenaLeaderboardCache['2v2'] = null;
+    bgLeaderboardCache = null;
     deedsBoardCache = null;
     deedsRarityCache = null;
     projectStatsCache.bust();
@@ -2549,6 +2589,14 @@ configureLeaderboardRuntime({
   releasesMaxLimit: RELEASES_SIZE,
   publicOrigin,
   toSheetRank,
+});
+
+// Inject the main.ts runtime the Thornhollow Fields ladder handler
+// (server/battleground.ts) needs but cannot import without a cycle: the
+// cache-fronted ladder read. Done at module load, before any request,
+// mirroring configureLeaderboardRuntime above.
+configureBattlegroundRuntime({
+  getBgLeaderboard,
 });
 
 // Inject the main.ts runtime the deeds handlers (server/deeds.ts) need but

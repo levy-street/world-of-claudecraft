@@ -51,6 +51,8 @@ function auraState(): AurasState {
         effectHtml: 'shadow damage',
         own: true,
         expiring: false,
+        toggle: false,
+        alwaysRender: false,
       },
       {
         key: 'fortitude',
@@ -67,6 +69,8 @@ function auraState(): AurasState {
         effectHtml: 'stamina',
         own: false,
         expiring: false,
+        toggle: false,
+        alwaysRender: false,
       },
     ],
   };

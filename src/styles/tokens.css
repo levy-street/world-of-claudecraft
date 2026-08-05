@@ -280,6 +280,15 @@
        bright mob red, so the lock reads at minimap marker size. */
     --color-minimap-node-locked: #8a4a3a;
 
+    /* Thornhollow Fields M-map chrome (resolved by battleground_map_painter.ts via
+       getComputedStyle, same one-pass resolve as the minimap tokens above). The
+       carry ring shares its orange with the scoreboard's .bg-fstate.carried so the
+       two surfaces can never disagree about the carried-flag color. */
+    --color-bg-carry-ring: #ffb03c;
+    --color-bg-field-edge: #262c38;
+    --color-bg-mid-line: #00000026;
+    --color-bg-map-ink: #00000090;
+
     /* Talents window: tree arrows + tooltip accents (talents_window.ts references
        these via var() so the painter carries no raw hex). Exact pre-existing values. */
     --color-talent-arrow: #f5c843;

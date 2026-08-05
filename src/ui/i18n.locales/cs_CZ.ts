@@ -2969,7 +2969,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'FIESTA REMÍZA! Příliš těsné na rozhodnutí!',
   'fiesta.end.loss': 'FIESTA PROHRÁNA! Dej si odvetu!',
   'fiesta.end.win': 'FIESTA VYHRÁNA! To byla párty!',
-  'fiesta.enterQueue': 'Připojit se k Fiestě!',
   'fiesta.error.leaderOnly': 'Do fronty na {label} může tým zařadit jen vůdce skupiny.',
   'fiesta.error.noAugment': 'Teď nemáš žádné vylepšení k výběru.',
   'fiesta.error.notOnOffer': 'Toto vylepšení není v nabídce.',
@@ -2985,9 +2984,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': 'Kolos',
   'fiesta.powerup.pow_moon_boots.name': 'Měsíční boty',
   'fiesta.powerup.pow_speed_demon.name': 'Démon rychlosti',
-  'fiesta.practice': 'Trénink proti botům',
-  'fiesta.practiceNote':
-    'Offline trénink: vytvoří 3 AI boty a zařadí tě do 2v2 Fiesty. Klikni znovu pro zastavení.',
   'fiesta.queue.join': 'Připojuješ se do fronty 2v2 Fiesty. Připrav se na PÁRTY...',
   'fiesta.queue.leave': 'Opouštíš frontu 2v2 Fiesty.',
   'fiesta.queue.teamLeave': 'Tvůj tým opouští frontu 2v2 Fiesty.',
@@ -3415,7 +3411,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapCanvasLabel': 'Mapa',
   'hud.core.mapSummary': 'Mapa oblasti {zone}.',
   'hud.core.maxLevel': 'MAX. ÚROVEŇ',
-  'hud.core.mobileArena': 'Aréna',
   'hud.core.mobileAttack': 'Útok',
   'hud.core.mobileCamera': 'Kamera - dvojitým klepnutím vycentruješ',
   'hud.core.mobileChat': 'Chat',
@@ -3507,7 +3502,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hud.errors.whisperMissing': 'Žádný hráč jménem {name} není online.',
   'hud.errors.whisperSelf': 'Mumláš si pro sebe. Nikdo to neslyší.',
   'hud.keybinds.actions.actionBarSlot': 'Akční lišta {slot}',
-  'hud.keybinds.actions.arena': 'Aréna (Popelavé koloseum)',
   'hud.keybinds.actions.attack': 'Útok',
   'hud.keybinds.actions.attackMove': 'Útok pohybem',
   'hud.keybinds.actions.autorun': 'Přepnout automatický běh',
@@ -4315,9 +4309,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Bratr Halven značí mapy: skvělý den pro odvahu ve Zhrouceném relikviáři.',
   'hudChrome.calendar.events.delveDay.title': 'Den výprav',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'Kruh 2v2 Fiesty dnes večer přitahuje nejhlasitější davy.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Fiesta noc',
   'hudChrome.calendar.events.fishingDerby.note':
     'Rybáři lemují jezera. Přines prut a vyměň si rybářské historky.',
   'hudChrome.calendar.events.fishingDerby.title': 'Rybářské derby',
@@ -7815,26 +7806,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.coliseumHeading': 'Popelavé koloseum',
   'guide.arenaPage.coliseumBody':
     'Koloseum je aréna světa, kde čelíš ostatním hráčům v hodnocených zápasech jeden na jednoho nebo dva na dva. Každý bracket má vlastní pořadí, takže výhra tě v jeho žebříku posune pro celý svět. Otevři okno Arény a přihlas se do bracketu, sám nebo se svým partnerem.',
-  'guide.arenaPage.fiestaHeading': 'Fiesta dva na dva',
-  'guide.arenaPage.fiestaBody':
-    'Fiesta je rychlá řež dva na dva hraná jako jeden souvislý souboj, kde jsou všichni bojovníci postaveni na stejnou startovní čáru. Jak boj běží, draftuješ augmenty, rychlá posílení, která za běhu přetvarují tvůj kit, takže žádné dva zápasy nehrají stejně.',
-  'guide.arenaPage.augmentsNote':
-    'Augmenty a power-upy trvají jen pro zápas. Jsou o hravých, okamžitých buildech, ne o trvalé síle, takže si nikdo nekoupí cestu k výhře.',
-  'guide.arenaPage.wavesTitle': 'Augmenty přicházejí ve vlnách',
-  'guide.arenaPage.wavesBody':
-    'Souboj Fiesty ti podává čerstvé volby, jak běží, a volby jsou s délkou boje odvážnější. Stavíš od jedné vlny k další, pokaždé vybíráš jednu z několika možností a necháváš si ji do konce souboje.',
-  'guide.arenaPage.waveSilverTitle': 'Stříbrná',
-  'guide.arenaPage.waveSilverBody':
-    'Úvodní vlna: čistá posílení jedné statistiky, která zostří základy třídy.',
-  'guide.arenaPage.waveGoldTitle': 'Zlatá',
-  'guide.arenaPage.waveGoldBody':
-    'Prostřední vlna: dvousečné kombinace, kde se build začíná tvarovat a zpívat.',
-  'guide.arenaPage.wavePrismaticTitle': 'Prizmatická',
-  'guide.arenaPage.wavePrismaticBody':
-    'Závěrečná vlna: build určující, obrazovku tavící špičky, které mají působit směšně tím nejlepším způsobem.',
-  'guide.arenaPage.powerupsTitle': 'Power-upy v ringu',
-  'guide.arenaPage.powerupsBody':
-    'Do arény během boje padají také zářící orby, volné pro toho, kdo k nim doběhne první. Záměrně přehánějí a trvají jen krátce: Rychlostní démon pro záblesk oslepujícího tempa, Kolos pro nabobtnání v těžkopádného obra, Měsíční boty pro skákavý skok s nízkou gravitací a Berserker pro náhlý příval zuřivosti.',
   'guide.arenaPage.ladderHeading': 'Stoupání po žebříku',
   'guide.arenaPage.ladderBody':
     'Hodnocené hraní sleduje tvoje postavení v čase. Podívej se na žebříček, kde sedíš a kdo drží vrchol světa.',
@@ -8181,9 +8152,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.sunpetal_herb.name': 'Sluncokvět',
   'entities.mobs.training_dummy.name': 'Cvičný panák',
   'entities.mobs.yumi_cat.name': 'Yumi',
-  'guide.arenaPage.yumiBody':
-    'Ochraňte Yumi je týmový objektivní režim, který se hraje v bludišti: každá strana hlídá svého vlastního kočičího společníka a zároveň loví toho druhého. Čas od času se obě kočky přenesou do nových koutů bludiště, takže se boj přelévá mezi obranou, lovem a závodem o to, kdo je najde dřív. Zařaď se do fronty jako tři na tři nebo pět na pět; pád v boji tě odstaví jen na okamžik.',
-  'guide.arenaPage.yumiHeading': 'Ochraňte Yumi',
   'hudChrome.archetypeTitle.hobbyLabel': 'Koníček',
   'hudChrome.auraEffect.armorPct': 'Snižuje brnění o {pct} %',
   'hudChrome.auraEffect.armorPctStacks': 'Snižuje brnění o {pct} % ({stacks} stacků)',
@@ -8203,7 +8171,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'yumi.bracket5': 'Yumi 5 na 5',
   'yumi.end.loss': 'PORÁŽKA! Tvoje Yumi padla.',
   'yumi.end.win': 'VÍTĚZSTVÍ! Yumi je v bezpečí!',
-  'yumi.enterQueue': 'Zapoj se do Ochraňte Yumi!',
   'yumi.error.partyTooBig3': 'Ochraňte Yumi 3 na 3 umožňuje skupinu až o třech členech.',
   'yumi.error.partyTooBig5': 'Ochraňte Yumi 5 na 5 umožňuje skupinu až o pěti členech.',
   'yumi.hud.aria': 'Tvoje Yumi má {mine} z {max} zdraví, nepřátelská Yumi {theirs}.',

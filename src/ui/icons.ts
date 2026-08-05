@@ -3627,7 +3627,23 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   // Breachmaker's source-scoped vulnerability debuff (kind 'vuln_source'), shown
   // on the target's debuff frame: a cracked guard struck by a blade
   aura_vuln_source: r('blood', 'earthBrown', ['sword', { p: 'sunburst', ...BR }], ['crack']),
+  // Thornhollow Fields rune buffs, keyed by AURA id (the hud iconId resolver passes
+  // ids with a recipe through): identity beyond hue, per the owner direction:
+  // boots for Sprint, a sword for Battle, a shield for Ward.
+  bg_sprint_rune: r('fire', 'ember', ['boot'], ['motion', 'glow']),
+  bg_battle_rune: r('blood', 'blood', ['sword'], ['glow']),
+  bg_ward_rune: r('frost', 'ice', ['shield'], ['glow']),
+  // The carried-flag buff, worn for the whole carry: a banner on its pole (the
+  // red_banner ability's staff-plus-sunburst language) on the objective gold, so
+  // it reads as the flag itself and not as another rune.
+  bg_carried_flag: r('fury', 'gold', ['staff', { p: 'sunburst', ...TR, pal: 'gold' }], ['motion']),
 };
+
+/** True when `id` has a dedicated aura recipe (the hud iconId resolver lets
+ *  such ids through instead of collapsing them to the aura_<kind> generic). */
+export function hasAuraRecipe(id: string): boolean {
+  return id in AURA_RECIPES;
+}
 
 // Crests: class / mob-family / status glyphs, painted with the same primitive
 // vocabulary so unit-frame portraits and party rows match the spellbook art
@@ -5077,6 +5093,14 @@ const DEED_CREST_PREFIX = 'deed_';
 // unenumerated debt. Do not add an id here merely to silence that failure; commission the art and
 // file it in docs/achievements/icon-brief.md.
 export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
+  // Catalog order (the art tests compare in DEED_ORDER order).
+  // Thornhollow Fields battleground deeds: all four are 'pvp', so they fall
+  // back to the deed_cat_pvp crest until their commissioned art lands
+  // (docs/achievements/icon-brief.md).
+  'pvp_bg_first_capture',
+  'pvp_bg_first_win',
+  'pvp_bg_wins_25',
+  'pvp_bg_captures_100',
   // The Drakelands dragonkin brood rework (v0.35): both are 'chronicle', so both fall back to
   // the deed_cat_chronicle crest until their commissioned art lands.
   'chr_drakemaw_broodlord',

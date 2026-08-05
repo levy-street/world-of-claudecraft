@@ -104,7 +104,7 @@ than free, so ask before you rely on it.
 | Pirate Kit (palm trees, docks, ship, chests, cannon, anchor, beach rocks, beach house) | Quaternius | https://quaternius.com/packs/piratekit.html | CC0 1.0 | Yes |
 | LowPoly Animated Fish (dolphin, shark, manta ray, whale, clownfish, blue tang, puffer, swordfish, anglerfish, koi) | Quaternius | https://poly.pizza/u/Quaternius | CC0 1.0 | Yes |
 | Modular Dungeons Pack (stone walls, arches, pillar, floor tile, wall banner, trap door, horse statue, cobweb, coin piles) | Quaternius | https://poly.pizza/u/Quaternius | CC0 1.0 | Yes |
-| Medieval Village MegaKit (wagon, crate, fences, vines, arch, exterior stairs) | Quaternius | https://quaternius.com/packs/medievalvillagemegakit.html | CC0 1.0 | Yes |
+| Medieval Village MegaKit (wagon, crate, fences, vines, arch, exterior stairs, castle bases, castle stairs) | Quaternius | https://quaternius.com/packs/medievalvillagemegakit.html | CC0 1.0 | Yes |
 | Survival Kit (tents, bedrolls, campfires, signpost, sand rocks) | Kenney | https://kenney.nl/assets/survival-kit | CC0 1.0 | Yes |
 | Watercraft Kit (sail boats, fishing boat, rowboat, buoys) | Kenney | https://kenney.nl/assets/watercraft-kit | CC0 1.0 | Yes |
 | Modular Dungeon Kit (corridor and room tiles, stairs, gates) | Kenney | https://kenney.nl/assets/modular-dungeon-kit | CC0 1.0 | Yes |
@@ -114,6 +114,10 @@ than free, so ask before you rely on it.
 | Mines and Cave Modular Set (mine carts, rails, ladder, cave rocks, entrances, supports, platforms) | loafbrr | https://loafbrr.itch.io/mines-and-cave-set | CC0 1.0 | Yes |
 | Terrain PBR textures (Grass001, Ground023, Rock026, Rock051, Rock060, Ground071, Ground080, PavingStones046, Snow010A) | ambientCG | https://ambientcg.com | CC0 1.0 | Yes |
 | Terrain PBR textures, biome set (Ground054, Ground095A, Ground093A, Rock029, Lava004, Gravel024, Rock035) | ambientCG | https://ambientcg.com | CC0 1.0 | Yes |
+| Thornhollow battleground terrain textures (`public/textures/battleground/*.jpg`) | ambientCG | https://ambientcg.com | CC0 1.0 | Yes |
+| Thornhollow wall tower (`public/models/city/wall_tower.glb`) | World of ClaudeCraft | Project-generated deterministic geometry (generator script not checked into this repository) | Project asset | With the project only |
+| Thornhollow ground decals (`public/textures/battleground/decals/*.webp`) | World of ClaudeCraft | Project-generated deterministic shape and noise synthesis (generator script not checked into this repository) | Project asset | With the project only |
+| Thornhollow Fields rune pad bodies (`public/models/battleground/rune_damage.glb`, `rune_defense.glb`, `rune_sprint.glb`) | World of ClaudeCraft | Project-generated via Tripo AI (text-to-3D), owned under the Tripo paid-plan license, then optimized to KTX2 with glTF-Transform. These three predate their generator being checked in, so no exporter script or pipeline spec is committed for them; the shipped binaries are pinned by sha256 and parsed shape in `tests/battleground_rune_models.test.ts` instead | Project asset | With the project only |
 | Surface-detail PBR textures for the triplanar material families (Bark012, Bricks076A/B, Fabric030, Metal013 incl. Metalness, Plaster007; Color/NormalGL/AmbientOcclusion/Roughness/Displacement under `public/textures/structures/`) | ambientCG | https://ambientcg.com | CC0 1.0 | Yes |
 | Canopy clump-detail textures (Moss002; NormalGL/AmbientOcclusion under `public/textures/foliage/`) | ambientCG | https://ambientcg.com | CC0 1.0 | Yes |
 | Worn-metal surface-detail PBR texture (RustCoarse01, from rust_coarse_01; NormalGL/AmbientOcclusion/Roughness/Displacement under `public/textures/structures/`) | Poly Haven | https://polyhaven.com/a/rust_coarse_01 | CC0 1.0 | Yes |

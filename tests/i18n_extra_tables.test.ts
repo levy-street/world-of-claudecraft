@@ -3,7 +3,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { type SupportedLanguage, supportedLanguages } from '../src/ui/i18n';
 import { RESTART_MESSAGES } from '../src/ui/server_i18n';
-import { ARENA_EXTRA, ITEM_EXTRA, QUEST_EXTRA } from '../src/ui/sim_i18n';
+import { ARENA_EXTRA, BG_EXTRA, ITEM_EXTRA, QUEST_EXTRA } from '../src/ui/sim_i18n';
 
 // Guards for the sim/server localization tables that live OUTSIDE the registry-tracked
 // DICT and so are invisible to the status registry, the release-gate pending check, and
@@ -82,6 +82,7 @@ const ALL: Logical[] = [
     'QUEST_EXTRA',
     QUEST_EXTRA as unknown as Record<string, Record<string, string>>,
   ),
+  ...fromLocaleKeyed('BG_EXTRA', BG_EXTRA as unknown as Record<string, Record<string, string>>),
   ...fromLocaleKeyed('ITEM_EXTRA', ITEM_EXTRA as unknown as Record<string, Record<string, string>>),
   ...fromEnglishKeyed(
     'RESTART_MESSAGES',

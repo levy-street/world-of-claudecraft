@@ -1118,12 +1118,113 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.dualPrice': '{money} + {honor}',
   'hudChrome.warfare.balance': '名誉: {amount}',
   'hudChrome.warfare.honorFloat': '名誉 +{amount}',
+  'hudChrome.warfare.honorFloatReason': '名誉 +{amount}（{reason}）',
   'hudChrome.warfare.honorGain': '名誉を {amount} 獲得しました（{reason}）。',
   'hudChrome.warfare.notEnoughHonor': '名誉が足りません。',
   'hudChrome.warfare.reasons.arenaWin': 'アリーナ勝利',
   'hudChrome.warfare.reasons.fiestaKill': 'フィエスタ撃破',
   'hudChrome.warfare.reasons.fiestaComplete': 'フィエスタ完遂',
   'hudChrome.warfare.reasons.fiestaWin': 'フィエスタ勝利',
+  'hudChrome.warfare.reasons.battlegroundWin': 'ソーンホロウ平原勝利',
+  'hudChrome.warfare.reasons.battlegroundComplete': 'ソーンホロウ平原参戦',
+  'hudChrome.warfare.reasons.battlegroundKill': '名誉ある撃破',
+  'hudChrome.warfare.reasons.battlegroundAssist': '撃破アシスト',
+  'hudChrome.warfare.floatReasons.kill': '撃破',
+  'hudChrome.warfare.floatReasons.assist': 'アシスト',
+  'hudChrome.keybinds.bgFlag': '戦場フラッグアクション',
+  'hudChrome.pvp.launcherTitle': 'PvP:ソーンホロウ平原と闘技場',
+  'hudChrome.pvp.mobileLabel': 'PvP',
+  'hudChrome.bg.title': 'ソーンホロウ平原',
+  'hudChrome.bg.blurb':
+    'ソーンピークの影が落ちる、壁に囲まれた窪地を挟んで二つの廃城が向かい合う。南に真紅、北に蒼藍、その間には未だどちらの手にも落ちていない古い廃墟の中庭が横たわる。五対五、旗は各一本。相手の旗を五度持ち帰った側が戦場を制する。',
+  'hudChrome.bg.modeTag': '5v5キャプチャー・ザ・フラッグ',
+  'hudChrome.bg.offlineNote': 'ソーンホロウ平原は同期中です。レルムの応答後にキューが開きます。',
+  'hudChrome.bg.ratingSummary': 'レーティング。{wins}勝 / {losses}敗',
+  'hudChrome.bg.careerCaptures': '通算キャプチャー:{count}',
+  'hudChrome.bg.enterQueue': 'キューに参加',
+  'hudChrome.bg.enterQueueParty': 'キューに参加({count}人パーティ)',
+  'hudChrome.bg.leaveQueue': 'キューを離脱',
+  'hudChrome.bg.searching': '検索中。キュー {count}/{size}。',
+  'hudChrome.bg.queuedParty': '{count}人パーティ。',
+  'hudChrome.bg.queueNote':
+    '5人ずつの2チーム。敵の軍旗を奪い、自軍の砦へ持ち帰れ。先に5回キャプチャーしたチームの勝利。最大5人のパーティで一緒に参加可能。スプリントルーンを拾い、遮蔽物を縫って追手を振り切ろう。',
+  'hudChrome.bg.matchInProgress': '戦闘中。{crimson}:{azure}。',
+  'hudChrome.bg.ladderAllTime': 'ラダー。歴代ランキング',
+  'hudChrome.bg.noRanked': 'まだ誰もランクインしていません。一番乗りを目指せ。',
+  'hudChrome.bg.ladderOnline': 'ラダー。オンライン中',
+  'hudChrome.bg.noChallengers': '今オンラインの勇者はいません。一番乗りを目指せ。',
+  'hudChrome.bg.playerClassTitle': '{name}。{className}',
+  'hudChrome.bg.playerLevelClassTitle': '{name}。レベル{level} {className}',
+  'hudChrome.bg.crimson': 'クリムゾン',
+  'hudChrome.bg.azure': 'アズール',
+  'hudChrome.bg.formUp': '整列:{seconds}',
+  'hudChrome.bg.firstTo': '先取{caps}キャプチャー',
+  'hudChrome.bg.flagState.home': '旗は砦にある',
+  'hudChrome.bg.flagState.carried': '旗が奪われた!',
+  'hudChrome.bg.flagState.dropped': '旗は地面にある',
+  'hudChrome.bg.respawnIn': '次のウェーブ:{seconds}秒後に復活',
+  'hudChrome.bg.killFeed': '{killer}が{victim}を倒した',
+  'hudChrome.bg.killFeedFallen': '{victim}が倒れた',
+  'hudChrome.bg.resultVictory': '勝利!',
+  'hudChrome.bg.resultDefeat': '敗北',
+  'hudChrome.bg.resultDraw': '引き分け',
+  'hudChrome.bg.leavingIn': '{seconds}秒後に戦場を離れます',
+  'hudChrome.bg.foundBanner': 'マッチ成立。あなたは{team}として戦います!',
+  'hudChrome.bg.countdownBanner': 'ソーンホロウ平原開始まで{seconds}',
+  'hudChrome.bg.startBanner': '旗を奪え!',
+  'hudChrome.bg.flagTakenLog': '{name}が{team}の旗を奪った!',
+  'hudChrome.bg.flagDroppedLog': '{team}の旗が落とされた。',
+  'hudChrome.bg.flagReturnedLog': '{team}の旗が戻された。',
+  'hudChrome.bg.dropFlagConfirmTitle': '旗を落としますか？',
+  'hudChrome.bg.dropFlagConfirmBody':
+    '敵の旗を運搬中です。落とすと旗は地面に残り、どちらの陣営も拾えます。',
+  'hudChrome.bg.dropFlagConfirmAccept': '旗を落とす',
+  'hudChrome.bg.yourTeamTitle': 'あなたのチーム',
+  'hudChrome.bg.boardToggleLabel': '試合スコアボード。Enterで全体ボードを固定表示します。',
+  'hudChrome.bg.levelRequirement': 'この戦場のキュー参加はレベル{level}で解放されます。',
+  'hudChrome.bg.board.kills': 'キル',
+  'hudChrome.bg.board.assists': 'アシスト',
+  'hudChrome.bg.board.deaths': 'デス',
+  'hudChrome.bg.board.captures': '奪取',
+  'hudChrome.bg.capturedTeamBanner': '{takers}が{team}の旗をキャプチャー!{crimson}:{azure}',
+  'hudChrome.bg.flagTakenBanner': '{takers}が{team}の旗を奪った!',
+  'hudChrome.bg.flagReturnedBanner': '{team}の旗が戻された!',
+  'hudChrome.bg.capturedLog': '{name}が{team}の旗をキャプチャー。スコア{crimson}:{azure}。',
+  'hudChrome.bg.victoryBanner':
+    '勝利!ソーンホロウ平原{crimson}:{azure}。レーティング{rating}({delta})',
+  'hudChrome.bg.defeatBanner':
+    '敗北。ソーンホロウ平原{crimson}:{azure}。レーティング{rating}({delta})',
+  'hudChrome.bg.drawBanner':
+    'ソーンホロウ平原引き分け{crimson}:{azure}。レーティング{rating}({delta})',
+  'hudChrome.bg.endLog': 'ソーンホロウ平原終了、{crimson}:{azure}。レーティング{rating}({delta})。',
+  'hudChrome.bg.map.crimsonKeep': '真紅の城塞',
+  'hudChrome.bg.map.azureKeep': '蒼藍の城塞',
+  'hudChrome.bg.map.ruinCourtyard': '廃墟の中庭',
+  'hudChrome.bg.map.graveyard': '墓地',
+  'guide.nav.thornhollow': 'ソーンホロウ平原',
+  'guide.thornhollowPage.heading': 'ソーンホロウ平原',
+  'guide.thornhollowPage.intro':
+    'ソーンピークの下、古い森に抱かれた壁に囲まれた窪地で戦うランク制5対5の旗奪取戦場。峡谷の両端で二つの廃城が向かい合い、その間にはどちらの手にも落ちたことのない、より古い中庭が横たわる。五人ずつ、城は二つ、目的は一つ。相手の旗を奪い、こちらの旗を奪われる前に持ち帰れ。',
+  'guide.thornhollowPage.queueHeading': 'キューへの参加',
+  'guide.thornhollowPage.queueBody':
+    'ソーンホロウ平原パネルを開けばソロで参加できるほか、最大5人のパーティで一緒に並べます。パーティは必ず同じチームに配置され、残りの席はソロの勇者で埋まります。10人が揃うと両チームが砦に配置され、短い整列ののち旗が有効になります。',
+  'guide.thornhollowPage.fieldHeading': '戦場',
+  'guide.thornhollowPage.fieldBody':
+    '壁に囲まれた野外の戦場は、3つの区画に分かれています。両チームそれぞれの前庭と、その間に挟まれた「廃墟の中庭」です。全幅を貫く2枚の隔壁が境界となり、区画間の移動は必ず争奪点を通ります。広い正門と、隔壁をまたぐ門楼です。門楼の2つの扉は互い違いに開いており、伏撃の角を回り込む必要があります。各砦は正面口以外が完全に封じられているため、旗をめぐる出入りは必ず同じ開口部を通ります。その正面口には低いバリケードが立ち、まっすぐな突撃を阻みます。中庭には空洞の中心遺跡と側翼の2つのスプリントルーンがあり、残る2つは旗への進路に待っています。さらに各正門の中庭側入口にはバトルルーンまたはウォードルーン(短時間、与ダメージ増加か被ダメージ軽減)が待機:両方の台は同じ面で試合を開始し、取得のたびに面が切り替わります。',
+  'guide.thornhollowPage.flagsHeading': '旗',
+  'guide.thornhollowPage.flagsBody':
+    '各砦は自軍の旗を守っています。敵の旗を奪って自軍の旗座まで運べば得点。先に5回キャプチャーしたチームの勝利で、時間切れの戦いはスコアで決着します。倒された運び手はその場に旗を落とします。敵は拾い直せますが、旗の持ち主チームは近づくだけで即座に旗を戻せます。また、旗は決して隠れません。旗を拾うとステルスは解除され、運び手がどんな手段であれ姿を消せば、旗はその場に落ちます。',
+  'guide.thornhollowPage.respawnBody':
+    '死は古典の儀式のまま:遺体はあなた自身が解放するまでその場に残り、魂は自陣キープの傍らの柵に囲まれた墓地に現れ、次のチーム復活ウェーブまでそこに縛られます。ウェーブは待機中の霊体を全員同時に蘇らせます。両チームのウェーブは意図的にずらされており、戦いが同時に完全リセットされることはありません。遺体走りも、スピリットヒーラーとの取引もありません:解放し、ウェーブを待ち、戦うのみ。',
+  'guide.thornhollowPage.pickupNote':
+    '旗を拾うのは常に戦場アクションキーの意図的な押下です。誤って旗の上を走り抜けて運び手になることはありません。',
+  'guide.thornhollowPage.respawnHeading': '戦場での死',
+  'guide.thornhollowPage.carrierHeading': '旗の運搬',
+  'guide.thornhollowPage.carrierBody':
+    '敵の旗を長く持ちすぎた運び手はどんどん脆くなり、旗がキャプチャー、ドロップ、返還されるまで被ダメージが増え続けます。旗を抱えて隠れるのは負け筋。持ち帰るのが勝ち筋です。',
+  'guide.thornhollowPage.ladderHeading': 'ラダー',
+  'guide.thornhollowPage.ladderBody':
+    '勝っても負けても、毎試合キャラクターごとの戦場レーティングが動き、歴代ランキングがレルムの王者を記録します。勝利と最後まで戦い抜いた敗北にはウォーフェアシステムを通じて名誉も支払われます。',
   'hudChrome.charSheet.offense': '攻撃',
   'hudChrome.charSheet.defense': '防御',
   'hudChrome.statInfo.fromYour': 'あなたの{stat}{value}による効果:',
@@ -2014,7 +2115,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileMore': 'その他',
   'hud.core.mobileMoreAria': 'その他のメニューを表示',
   'hud.core.mobileSocial': 'ソーシャル',
-  'hud.core.mobileArena': 'アリーナ',
   'hud.core.mobileMenu': 'メニュー',
   'hud.core.mobileSettings': '設定',
   'hud.core.mobileUse': '使用',
@@ -2101,6 +2201,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.options.mouseCamera': 'マウスカメラ',
   'hud.options.keybindHelpMouseCamera':
     'マウスカメラオフ: A/Dで旋回、ドラッグで周回（クラシック）。オン: カメラ基準のWASD、A/Dで横移動。キー欄をクリックして割り当て変更、Escでキャンセル。',
+  'hud.keybinds.actions.arena': 'PvP(ソーンホロウ平原とアリーナ)',
   'hud.keybinds.categories.movement': '移動',
   'hud.keybinds.categories.targeting': 'ターゲット',
   'hud.keybinds.categories.interface': 'インターフェース',
@@ -2123,7 +2224,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.keybinds.actions.nameplates': 'ネームプレート切り替え',
   'hud.keybinds.actions.meters': 'ダメージメーター',
   'hud.keybinds.actions.social': 'フレンド & ギルド',
-  'hud.keybinds.actions.arena': 'アリーナ（灰の闘技場）',
   'hud.keybinds.actions.chat': 'チャットを開く',
   'hud.keybinds.actions.attack': '攻撃',
   'hud.keybinds.actions.actionBarSlot': 'アクションバー {slot}',
@@ -5685,7 +5785,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'Fiesta引き分け！僅差で決着つかず！',
   'fiesta.end.loss': 'Fiesta敗北！もう一戦だ！',
   'fiesta.end.win': 'Fiesta勝利！🎉 最高のパーティだ！',
-  'fiesta.enterQueue': 'Fiestaに参加！',
   'fiesta.error.leaderOnly': '{label}にチームをキュー登録できるのはパーティリーダーだけです。',
   'fiesta.error.noAugment': '今は選べるオーグメントがありません。',
   'fiesta.error.notOnOffer': 'そのオーグメントは提示されていません。',
@@ -5702,9 +5801,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': '巨像',
   'fiesta.powerup.pow_moon_boots.name': 'ムーンブーツ',
   'fiesta.powerup.pow_speed_demon.name': 'スピードデーモン',
-  'fiesta.practice': '🎉 ボットとの練習',
-  'fiesta.practiceNote':
-    'オフライン練習：AIボットを3体出現させ、2v2 Fiestaのキューに登録します。もう一度クリックで停止。',
   'fiesta.queue.join': '2v2 Fiestaのキューに参加しました。パーティの準備を…',
   'fiesta.queue.leave': '2v2 Fiestaのキューを離れました。',
   'fiesta.queue.teamLeave': 'あなたのチームは2v2 Fiestaのキューを離れました。',
@@ -6705,17 +6801,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.thorns': '味方を守り、近接で攻撃してきた相手に反射ダメージを与えます。',
   'guide.abilityHook.thunder_clap': '周囲のすべてに当たり、相手の攻撃を遅くします。',
   'guide.abilityHook.wrath': '遠距離から標的に放つネイチャーのボルト。主力の火力です。',
-  'guide.arenaPage.augmentsNote':
-    'オーグメントやパワーアップはそのマッチの間だけ続きます。持続的な強さではなく、その場で組む遊び心のあるビルドが目的なので、課金で勝ちを買えるわけではありません。',
   'guide.arenaPage.coliseumBody':
     '灰の闘技場はレルムのアリーナで、ランクマッチで他のプレイヤーと対戦します。一対一、あるいは二対二です。各ブラケットはそれぞれ独自の順位を保つので、勝てばそのラダーを駆け上がり、レルム全体に見てもらえます。アリーナのウィンドウを開き、一人で、あるいはパートナーとブラケットに登録しましょう。',
   'guide.arenaPage.coliseumHeading': '灰のコロシアム',
   'guide.arenaPage.duelsBody':
     '出会った相手なら誰でも友好的な決闘に挑めます。賭けるのはプライドだけなので、相性を学んだり仲間内の言い争いに決着をつけたりするのに一番手軽な方法です。',
   'guide.arenaPage.duelsHeading': '決闘',
-  'guide.arenaPage.fiestaBody':
-    'フィエスタは、一つの途切れない試合として行うテンポの速い2対2の乱戦で、すべての戦士が対等な条件で戦います。試合が進むにつれてオーグメント、つまりその場で構成を組み替える手早い強化をドラフトするので、同じマッチは二つとありません。',
-  'guide.arenaPage.fiestaHeading': '2対2のフィエスタ',
   'guide.arenaPage.heading': 'アリーナとPvP',
   'guide.arenaPage.intro':
     '他のプレイヤーと腕試しをしたいですか。プレイヤー対プレイヤーは標準で備わっていて、常に自分で選ぶものであり、強制されることは決してありません。',
@@ -6894,21 +6985,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '南から北へ三つのゾーンが並び、それぞれレベルが一段ずつ上がります。クエストの道筋をたどれば、土地が谷から峰々へとあなたを運んでいきます。',
   'guide.worldPage.places': '注目の場所',
   'guide.worldPage.residents': '出会う者たち',
-  'guide.arenaPage.powerupsBody':
-    '戦いの最中、光り輝くオーブがアリーナに落ちてきます。先に取った者の自由になり、しかも狙い通りに度を越していて、効果はほんの一瞬だけ。スピードデーモンは目もくらむ速さへ、コロッサスはのっそりと歩く巨人へ、ムーンブーツは低重力で跳ね回るジャンプへ、バーサーカーは突如あふれる怒りへとあなたを変えます。',
-  'guide.arenaPage.powerupsTitle': 'リングのパワーアップ',
-  'guide.arenaPage.waveGoldBody':
-    '中盤のウェーブ。両刃の組み合わせが並び、あなたのビルドが形を成して輝き始めます。',
-  'guide.arenaPage.waveGoldTitle': 'ゴールド',
-  'guide.arenaPage.wavePrismaticBody':
-    '最後のウェーブ。ビルドを決定づける、画面を溶かすほどのスパイク。最高の意味でばかげていると感じられるよう作られています。',
-  'guide.arenaPage.wavePrismaticTitle': 'プリズマティック',
-  'guide.arenaPage.waveSilverBody':
-    '最初のウェーブ。単一ステータスを伸ばすシンプルな強化で、クラスの基本を研ぎ澄まします。',
-  'guide.arenaPage.waveSilverTitle': 'シルバー',
-  'guide.arenaPage.wavesBody':
-    'フィエスタの試合では、進行に応じて新たな一手が手に入り、試合が長引くほどその一手は大胆になっていきます。一つのウェーブから次へとビルドを築き上げ、毎回いくつかの候補から一つを選び、残りの試合の間はそれを持ち続けます。',
-  'guide.arenaPage.wavesTitle': 'オーグメントはウェーブで訪れる',
   'guide.bestiary.flavor.gravecaller_cultist':
     '死のカルトに仕えるローブ姿の僕たち。その業は渓谷から高地まで墓を汚し、彼らが集う場所では死者が安らぎません。',
   'guide.bestiary.flavor.grubjaw':
@@ -7724,6 +7800,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.pyreGuardian':
     '{ruinInterval}秒ごとにルインを{ruin}生成し、{damageInterval}秒ごとに{radius}ヤード内へ{damage}の火ダメージを与える',
   'hudChrome.auraEffect.perfectMoment': 'エーテル・ダーツが秘術チャージを消費しない',
+  'hudChrome.auraEffect.carriedFlag': '敵の旗を運搬中です。このバフを解除すると旗を落とします。',
   'hudChrome.auraEffect.elementalConvergencePrimed':
     '次に異なる属性の呪文を唱えると、エレメンタル・コンバージェンスが発動します',
   'hudChrome.auraEffect.hunterFerocity':
@@ -8930,8 +9007,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.marketDay.title': '市の日',
   'hudChrome.calendar.events.marketDay.note':
     '商人が新しい品を待っている。ワールドマーケットを見て回るのに良い日。',
-  'hudChrome.calendar.events.fiestaNight.title': 'フィエスタナイト',
-  'hudChrome.calendar.events.fiestaNight.note': '今夜の2v2フィエスタのリングは大賑わい。',
   'hudChrome.calendar.events.arenaClash.title': 'アリーナ激突',
   'hudChrome.calendar.events.arenaClash.note':
     '決闘者たちが灰燼の闘技場へ。キューに並んでラダーを駆け上がろう。',
@@ -9048,9 +9123,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   // Protect Yumi locale fill (M16 wordy-key floor).
   'yumi.hud.collapse': 'Protect Yumiのバーを折りたたむ',
   'yumi.hud.expand': 'Protect Yumiのバーを展開する',
-  'guide.arenaPage.yumiHeading': 'Yumiを守れ',
-  'guide.arenaPage.yumiBody':
-    'Protect Yumiは迷路で行うチーム目標モード。各チームは自分の猫の使い魔を守りながら、敵の使い魔を狙います。二匹の猫は時折迷路の別の場所へ転移するため、防衛、追撃、捜索の間で戦況が揺れ動きます。3対3か5対5でキューに参加でき、倒れても少しの間ベンチに下がるだけです。',
   'yumi.queue.join': 'Protect Yumiのキューに参加しました。使い魔を守りましょう…',
   'yumi.queue.leave': 'Protect Yumiのキューを離れました。',
   'yumi.queue.teamLeave': 'チームがProtect Yumiのキューを離れました。',
@@ -9059,7 +9131,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'yumi.log.start': 'Protect Yumi！自分の使い魔を守り、敵の使い魔を狙え。',
   'yumi.bracket3': 'Yumi 3v3',
   'yumi.bracket5': 'Yumi 5v5',
-  'yumi.enterQueue': 'Protect Yumiに参加！',
   'yumi.hud.title': 'PROTECT YUMI',
   'yumi.hud.getReady': '準備して…',
   'yumi.hud.teleportIn': 'Yumiの転移まで{s}秒',

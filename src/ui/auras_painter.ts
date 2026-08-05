@@ -84,8 +84,12 @@ export interface AurasPainterDeps {
   resolveIconUrl(iconKey: string): string;
   /** Render the tooltip HTML from the LIVE aura name + remaining (host: the
    *  tt-title/tt-sub markup with esc + tPlural). Called lazily on hover, reading the
-   *  pooled record's current fields. */
-  renderTooltip(name: string, remaining: number, effectHtml: string): string;
+   *  pooled record's current fields. `toggle` marks a MODE aura (a form, a stance,
+   *  stealth, Ghost Wolf, the carried flag): the host omits the seconds-remaining
+   *  line for it, because the long finite duration the sim backs those with is
+   *  scaffolding, not information, and printing it is the same lie the suppressed
+   *  countdown label avoids. */
+  renderTooltip(name: string, remaining: number, effectHtml: string, toggle: boolean): string;
   /** Attach a lazily-built tooltip to a node (host: Hud.attachTooltip). Called ONCE per
    *  pooled node; the closure reads the live record. */
   attachTooltip(el: HTMLElement, html: () => string): void;
@@ -116,6 +120,10 @@ interface PooledAura {
   /** The one-line effect summary HTML (or '' when the aura has no descriptor), read live
    *  by the tooltip closure alongside name/remaining. */
   effectHtml: string;
+  /** Whether the aura this node currently shows is a MODE (no countdown anywhere),
+   *  read live by the tooltip closure so a recycled node never keeps the previous
+   *  aura's answer. */
+  toggle: boolean;
   /** The last icon key written, so the expensive data-URL resolve + write fire only on
    *  change. null until the first paint (never equals a real key). */
   lastIconKey: string | null;
@@ -182,9 +190,19 @@ export class AurasPainter {
     let rendered = 0;
     for (let i = 0; i < count; i++) {
       const s = slots[i];
-      // Never a debuff, and never an id on the always-visible list (Divine Ascension
-      // joined it from #2428): shed ordinary buff overflow only.
-      if (!s.isDebuff && rendered >= cap && !ALWAYS_VISIBLE_AURA_IDS.has(s.key)) continue;
+      // Never a debuff, never an id on the always-visible list (Divine Ascension
+      // joined it from #2428), and never an ACTIONABLE buff (`alwaysRender`,
+      // auras_view NEVER_SHED_IDS): the budget rests on buffs being cosmetic; an
+      // aura whose icon IS the affordance is not, and the carried-flag buff is
+      // applied at the pickup so it sorts LAST and a flat first-N cap would shed
+      // it first.
+      if (
+        !s.isDebuff &&
+        !s.alwaysRender &&
+        rendered >= cap &&
+        !ALWAYS_VISIBLE_AURA_IDS.has(s.key)
+      )
+        continue;
       rendered++;
       // Resolve the pool key. The common case (a unique aura id this frame) takes the
       // base key directly. If the base key is already claimed THIS frame, this is a
@@ -210,6 +228,7 @@ export class AurasPainter {
       rec.auraId = s.key;
       rec.cancelable = s.cancelable;
       rec.effectHtml = s.effectHtml;
+      rec.toggle = s.toggle;
       rec.seen = this.frame;
       // Cancel affordance: only when this painter has an attachCancel dep (the player buff bar)
       // and the view marked the aura as cancelable. Read live by the contextmenu closure.
@@ -273,11 +292,12 @@ export class AurasPainter {
       name: '',
       remaining: 0,
       effectHtml: '',
+      toggle: false,
       lastIconKey: null,
       seen: 0,
     };
     this.deps.attachTooltip(el, () =>
-      this.deps.renderTooltip(rec.name, rec.remaining, rec.effectHtml),
+      this.deps.renderTooltip(rec.name, rec.remaining, rec.effectHtml, rec.toggle),
     );
     // Right-click-cancel: attached ONCE per pooled node via the injected helper (the
     // buff-bar painter only). The closure reads the live record so a recycled node cancels

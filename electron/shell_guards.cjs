@@ -102,13 +102,20 @@ const CSP_ORIGINS = {
     'https://api.web3modal.org',
     'https://pulse.walletconnect.org',
   ],
-  // tracking-pixel image beacons.
+  // Image origins the web client loads: tracking-pixel beacons, WalletConnect
+  // modal art, and Discord linked profile pictures (nameplates, HUD widget,
+  // target frame, inspect). Discord PFPs use DISCORD_CDN_BASE in
+  // server/discord_oauth.ts (`cdn.discordapp.com`); without that origin here the
+  // desktop CSP blocks every avatar while the browser build (no CSP) still
+  // paints them, which is exactly the desktop-only regression we hit on
+  // release/v0.34.0.
   img: [
     'https://www.google-analytics.com',
     'https://www.facebook.com',
     'https://secure.walletconnect.com',
     'https://secure.walletconnect.org',
     'https://api.web3modal.org',
+    'https://cdn.discordapp.com',
   ],
   // Cloudflare Turnstile: api.js (script) plus the challenge iframe (frame).
   turnstile: 'https://challenges.cloudflare.com',

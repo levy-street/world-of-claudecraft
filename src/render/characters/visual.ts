@@ -402,6 +402,10 @@ export class CharacterVisual {
     new Map<THREE.Material, THREE.Material>(),
   ];
   private ascensionMaterials = new Map<THREE.Material, THREE.Material>();
+  // Thornhollow Fields rune buffs: a slight whole-body lean toward the rune's color
+  // (weakest treatment: every form/death tint above wins). Keyed per source
+  // material AND color, since the wearer can chain different runes.
+  private runeTintMaterials = new Map<string, THREE.Material>();
   // Ability VFX body glow (the gallery rim read): per-visual material clones
   // carrying an emissive tint while a spec'd cast or buff aura is live. Cloned
   // once per original because base materials are SHARED per-asset caches;
@@ -479,6 +483,7 @@ export class CharacterVisual {
   private metamorphElapsed = 0;
   private metamorphPulse = 0;
   private metamorphWasVisible = false;
+  private runeTint: number | null = null;
   private bobPhase = Math.random() * Math.PI * 2;
 
   constructor(
@@ -1423,6 +1428,13 @@ export class CharacterVisual {
     this.applyVisualMaterials();
   }
 
+  /** Slight whole-body color lean while a Thornhollow Fields rune buff rides (null = off). */
+  setRuneTint(color: number | null): void {
+    if (color === this.runeTint) return;
+    this.runeTint = color;
+    this.applyVisualMaterials();
+  }
+
   private applyVisualMaterials(): void {
     for (const [mesh, original] of this.originalMaterials) {
       mesh.material = this.effectMaterial(original);
@@ -2093,6 +2105,7 @@ export class CharacterVisual {
     if (this.shadowform) return this.shadowformMaterial(material);
     if (this.ferocityStage > 0) return this.ferocityMaterial(material, this.ferocityStage);
     if (this.ascended) return this.ascensionMaterial(material);
+    if (this.runeTint !== null) return this.runeTintMaterial(material, this.runeTint);
     // lowest priority: the ability VFX buff/cast body glow
     if (this.auraGlowIntensity > 0.01) return this.auraGlowMaterial(material);
     return material;
@@ -2120,6 +2133,27 @@ export class CharacterVisual {
       );
     }
     cache.set(material, marked);
+    return marked;
+  }
+
+  private runeTintMaterial(material: THREE.Material, tint: number): THREE.Material {
+    const key = `${tint}:${material.uuid}`;
+    const cached = this.runeTintMaterials.get(key);
+    if (cached) return cached;
+    const marked = material.clone();
+    const withColor = marked as THREE.Material & {
+      color?: THREE.Color;
+      emissive?: THREE.Color;
+      emissiveIntensity?: number;
+    };
+    // "Very slight": lean the base color toward the rune color and add a low
+    // emissive of the same hue so the read survives bright daylight floors.
+    if (withColor.color) withColor.color.lerp(new THREE.Color(tint), 0.3);
+    if (withColor.emissive) {
+      withColor.emissive.setHex(tint);
+      withColor.emissiveIntensity = 0.18;
+    }
+    this.runeTintMaterials.set(key, marked);
     return marked;
   }
 

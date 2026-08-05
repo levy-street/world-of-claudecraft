@@ -1115,7 +1115,6 @@ export const en = {
   yumi: {
     bracket3: 'Yumi 3v3',
     bracket5: 'Yumi 5v5',
-    enterQueue: 'Join Protect Yumi!',
     queue: {
       join: 'You join the Protect Yumi queue. Guard your familiar…',
       leave: 'You leave the Protect Yumi queue.',
@@ -1153,10 +1152,6 @@ export const en = {
   },
   fiesta: {
     bracket: 'Fiesta',
-    enterQueue: 'Join the Fiesta!',
-    practice: '🎉 Practice vs Bots',
-    practiceNote:
-      'Offline practice: spawns 3 AI bots and queues you for a 2v2 Fiesta. Click again to stop.',
     banner: {
       wave: 'WAVE {wave}/{total} — CHOOSE AN AUGMENT!',
       augmentGained: 'Augment gained: {name}!',

@@ -28,7 +28,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 948,
-      "state": "512bcd80",
+      "state": "69268970",
       "events": "5f84dfa8",
       "rng": {
         "draws": 2,
@@ -48,6 +48,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -109,6 +110,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},

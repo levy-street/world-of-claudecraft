@@ -81,6 +81,7 @@ export const API_CONTENT_TYPE: Readonly<Record<string, ContentTypeClass>> = {
   '/api/status': PROBLEM_JSON,
   '/api/perf': PROBLEM_JSON,
   '/api/arena/leaderboard': PROBLEM_JSON,
+  '/api/battleground/leaderboard': PROBLEM_JSON,
   '/api/leaderboard': PROBLEM_JSON,
   '/api/releases': PROBLEM_JSON,
   '/api/account': PROBLEM_JSON,

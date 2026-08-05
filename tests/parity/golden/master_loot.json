@@ -32,7 +32,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 950,
-      "state": "7c24ac35",
+      "state": "a3a50f7d",
       "events": "aeed6342",
       "rng": {
         "draws": 0,
@@ -52,6 +52,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -106,6 +107,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -163,6 +165,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
@@ -216,6 +219,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
@@ -542,7 +546,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 950,
-      "state": "7c24ac35",
+      "state": "a3a50f7d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -562,6 +566,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -616,6 +621,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -673,6 +679,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
@@ -726,6 +733,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
@@ -1052,7 +1060,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 950,
-      "state": "b5a6e035",
+      "state": "ca78448d",
       "events": "130c946c",
       "rng": {
         "draws": 0,
@@ -1072,6 +1080,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -1126,6 +1135,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -1188,6 +1198,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
@@ -1241,6 +1252,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
@@ -1567,7 +1579,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 950,
-      "state": "96e0a545",
+      "state": "b5652b21",
       "events": "8399dfff",
       "rng": {
         "draws": 0,
@@ -1587,6 +1599,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -1641,6 +1654,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -1703,6 +1717,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
@@ -1761,6 +1776,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
@@ -2087,7 +2103,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 950,
-      "state": "96e0a545",
+      "state": "b5652b21",
       "events": "92a9cc0c",
       "rng": {
         "draws": 0,
@@ -2107,6 +2123,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -2161,6 +2178,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -2223,6 +2241,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
@@ -2281,6 +2300,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
@@ -2607,7 +2627,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 950,
-      "state": "500013c1",
+      "state": "7e5f939d",
       "events": "c161f108",
       "rng": {
         "draws": 4,
@@ -2627,6 +2647,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -2681,6 +2702,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -2747,6 +2769,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
@@ -2805,6 +2828,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
@@ -3131,7 +3155,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 950,
-      "state": "774bac8a",
+      "state": "4d32c0f6",
       "events": "49c566a5",
       "rng": {
         "draws": 4,
@@ -3151,6 +3175,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -3212,6 +3237,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -3285,6 +3311,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
@@ -3350,6 +3377,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},

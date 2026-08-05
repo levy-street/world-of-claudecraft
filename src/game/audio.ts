@@ -162,8 +162,13 @@ export class GameAudio {
     sfx.init();
   }
 
-  private play(key: UiCue, opts?: { cooldown?: number }): void {
-    sfx.playUi(key, { jitter: false, cooldown: opts?.cooldown });
+  private play(key: UiCue, opts?: { cooldown?: number; rate?: number; gain?: number }): void {
+    sfx.playUi(key, {
+      jitter: false,
+      cooldown: opts?.cooldown,
+      rate: opts?.rate,
+      gain: opts?.gain,
+    });
   }
 
   /** Play a cue only when interface/feedback sounds are enabled. The notification
@@ -317,6 +322,23 @@ export class GameAudio {
 
   fiestaRevive(): void {
     this.play(UI_CUES.fiestaRevive);
+  }
+
+  // Thornhollow Fields flag moments want WEIGHT. No dedicated recordings yet (the SFX
+  // asset flow is a follow-up), so each layers two existing cues into one
+  // bigger hit: a WAR-HORN stack for a take (the challenge horn doubled with
+  // a deep detuned layer carrying the weight and the fight-starts hit on the
+  // front edge; the old down-sting layer read as a boop, owner note), and the
+  // fanfare over the fight-starts hit for a capture.
+  bgFlagTaken(): void {
+    this.play(UI_CUES.duelChallenge, { rate: 0.58 });
+    this.play(UI_CUES.duelChallenge, { rate: 0.87, gain: 0.7 });
+    this.play(UI_CUES.duelStart, { gain: 0.85 });
+  }
+
+  bgCapture(): void {
+    this.play(UI_CUES.achievement);
+    this.play(UI_CUES.duelStart);
   }
 
   // Card Duel: live in-match feedback, same ungated category as the Fiesta

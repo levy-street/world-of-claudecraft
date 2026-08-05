@@ -29,7 +29,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 947,
-      "state": "136f9333",
+      "state": "66d4fb4f",
       "events": "56a54df9",
       "rng": {
         "draws": 38,
@@ -40,7 +40,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 947,
-      "state": "47dfb9b0",
+      "state": "2e610f14",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -51,7 +51,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 947,
-      "state": "e35399de",
+      "state": "15582422",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -62,7 +62,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 947,
-      "state": "0be02047",
+      "state": "fff4a32f",
       "events": "23dbb992",
       "rng": {
         "draws": 38,
@@ -73,7 +73,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 947,
-      "state": "1fe073f8",
+      "state": "101eea78",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -84,7 +84,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 947,
-      "state": "be56664d",
+      "state": "e668bbbd",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -95,7 +95,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 947,
-      "state": "4868e2f5",
+      "state": "d63ed025",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -106,7 +106,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 947,
-      "state": "a21a1934",
+      "state": "22569054",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -117,7 +117,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 947,
-      "state": "20af0c65",
+      "state": "a5cfb555",
       "events": "741638a5",
       "rng": {
         "draws": 44,
@@ -137,6 +137,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -192,6 +193,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},

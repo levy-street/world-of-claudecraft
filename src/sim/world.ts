@@ -1,3 +1,4 @@
+import { bgFieldHeightLocal } from './battleground_field';
 import { beaconSpiralLift } from './beacon_spiral';
 import {
   castleLift,
@@ -9,6 +10,7 @@ import {
 import { STABLE_FLAT, STABLE_PADDOCK } from './content/mounts';
 import { PALMREACH_PROPS } from './content/palmreach';
 import {
+  bgOriginAt,
   CAMPS,
   COLUMN_ZONES,
   columnBlendAt,
@@ -19,6 +21,7 @@ import {
   getContentGeneration,
   instanceOrigin,
   instanceSlotForZ,
+  isBgPos,
   ROADS,
   STRIP_MAX_X,
   STRIP_MIN_X,
@@ -3384,6 +3387,13 @@ function applyReachPoolWalkwayBed(x: number, z: number, h: number): number {
 // the raised boss dais where the room stacks one), the walkable Vale Cup
 // grandstand lift, raised docks, and custom-map sculpt edits.
 export function groundHeight(x: number, z: number, seed: number): number {
+  if (isBgPos(x)) {
+    // The battleground band is the one instanced region with REAL terrain:
+    // the Thornhollow field's sculpted heightfield, identical for sim,
+    // renderer and server (see src/sim/battleground_field.ts).
+    const o = bgOriginAt(z);
+    return bgFieldHeightLocal(x - o.x, z - o.z);
+  }
   if (x > DUNGEON_X_THRESHOLD) {
     const dungeon = dungeonAt(x);
     if (dungeon?.interior === 'wildheart') {
@@ -4038,8 +4048,14 @@ let steepnessCacheGeneration = -1;
 export function terrainSteepnessAt(x: number, z: number, seed: number): number {
   // Instanced interiors (dungeons/arena/delves/rifts) are flat floors; skip the
   // cache entirely so their far-off coordinates never enter (or overflow) the
-  // packed key space, which is sized for the overworld.
-  if (x > DUNGEON_X_THRESHOLD) return 0;
+  // packed key space, which is sized for the overworld. The battleground band is
+  // the exception with REAL terrain: its ravine walls are the field's out-of-play
+  // boundary, so the slope gate must see them. Uncached: the band hosts ten
+  // fighters, not the overworld's mob population.
+  if (x > DUNGEON_X_THRESHOLD) {
+    if (isBgPos(x)) return terrainSteepness(Math.round(x), Math.round(z), seed);
+    return 0;
+  }
   const gen = getContentGeneration();
   if (gen !== steepnessCacheGeneration) {
     steepnessCache.clear();
@@ -4071,6 +4087,10 @@ export function terrainSteepnessAt(x: number, z: number, seed: number): number {
 // sim.ts). Adapted to dems's BORDER_EDGES + rim (the strip-era ZONE_RIDGES this
 // once screened are gone).
 export function nearSteepWalls(x: number, z: number): boolean {
+  // Thornhollow is an instanced band with real authored relief. Pets, mobs,
+  // and feared players use this cheap screen before the exact slope test, so
+  // it must opt in before the generic flat-interior early return below.
+  if (isBgPos(x)) return true;
   if (x > DUNGEON_X_THRESHOLD) return false; // instanced interiors: flat floors
   if (
     x > WORLD_MAX_X - 40 ||

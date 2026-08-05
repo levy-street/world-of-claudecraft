@@ -34,7 +34,8 @@ function findLeader(
     if (c.name.toLowerCase() === wanted) ci.push(c);
   }
   if (ci.length === 1) return ci[0];
-  if (ci.length > 1) return { error: `Several players match '${typedName}'. Use exact capitalization.` };
+  if (ci.length > 1)
+    return { error: `Several players match '${typedName}'. Use exact capitalization.` };
   return { error: `There is no player named '${typedName}' online.` };
 }
 
@@ -55,8 +56,12 @@ export function resolveAssist(
     // No name: assist whoever the caster currently has targeted, but only if that
     // target is itself a player in the roster (assisting a mob is meaningless).
     const caster = list.find((c) => c.entityId === casterId);
-    const current = caster && caster.targetId !== null ? list.find((c) => c.entityId === caster.targetId) : undefined;
-    if (!current) return { kind: 'error', message: 'Assist whom? Target a player or use /assist <name>.' };
+    const current =
+      caster && caster.targetId !== null
+        ? list.find((c) => c.entityId === caster.targetId)
+        : undefined;
+    if (!current)
+      return { kind: 'error', message: 'Assist whom? Target a player or use /assist <name>.' };
     leader = current;
   }
 

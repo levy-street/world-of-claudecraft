@@ -520,7 +520,7 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // docs/achievements/icon-brief.md). Read from DEED_ART_PENDING, the one enumeration of
     // that debt (src/ui/icons.ts), so this file cannot end up naming a different pending
     // set than the other two art suites. Exhaustive: a third artless deed still reds here.
-    expect(DEED_ORDER).toHaveLength(234);
+    expect(DEED_ORDER).toHaveLength(238);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(

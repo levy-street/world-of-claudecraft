@@ -1361,6 +1361,58 @@ describe('meter triggers (negative then positive per resolver)', () => {
       expect(meta.deedsEarned.has('pvp_arena_first_match'), arm).toBe(true);
     }
   });
+
+  it('the battleground meters grant the first-win and first-capture deeds off PlayerMeta', () => {
+    // bgWins and bgCaptures are separate resolvers reading the persisted
+    // Thornhollow Fields standing: each arm gets a fresh Sim so a resolver that
+    // read the wrong field could not be masked by the other counter.
+    const winArm = makeSim();
+    const wm = primary(winArm).meta;
+    expect(wm.bgWins).toBe(0);
+    wm.bgWins = 1;
+    winArm.ctx.markDeedsDirty(wm.entityId);
+    winArm.tick();
+    expect(wm.deedsEarned.has('pvp_bg_first_win')).toBe(true);
+    // The capture deed must NOT ride along on a win.
+    expect(wm.deedsEarned.has('pvp_bg_first_capture')).toBe(false);
+
+    const capArm = makeSim();
+    const cm = primary(capArm).meta;
+    expect(cm.bgCaptures).toBe(0);
+    cm.bgCaptures = 1;
+    capArm.ctx.markDeedsDirty(cm.entityId);
+    capArm.tick();
+    expect(cm.deedsEarned.has('pvp_bg_first_capture')).toBe(true);
+    expect(cm.deedsEarned.has('pvp_bg_first_win')).toBe(false);
+  });
+
+  it('the battleground career deeds gate exactly at 25 wins and 100 captures', () => {
+    // Two-sided per threshold, fresh Sim per arm: the sticky grant means a
+    // single sim could never prove the below-threshold side after the fact.
+    const cases: { deedId: string; field: 'bgWins' | 'bgCaptures'; amount: number }[] = [
+      { deedId: 'pvp_bg_wins_25', field: 'bgWins', amount: 25 },
+      { deedId: 'pvp_bg_captures_100', field: 'bgCaptures', amount: 100 },
+    ];
+    for (const c of cases) {
+      // Pin the authored threshold so a content edit cannot silently drift the
+      // number this test claims to cover.
+      expect(DEEDS[c.deedId].trigger).toEqual({ kind: 'meter', meter: c.field, amount: c.amount });
+
+      const below = makeSim();
+      const bm = primary(below).meta;
+      bm[c.field] = c.amount - 1;
+      below.ctx.markDeedsDirty(bm.entityId);
+      below.tick();
+      expect(bm.deedsEarned.has(c.deedId), `${c.deedId} one short`).toBe(false);
+
+      const at = makeSim();
+      const am = primary(at).meta;
+      am[c.field] = c.amount;
+      at.ctx.markDeedsDirty(am.entityId);
+      at.tick();
+      expect(am.deedsEarned.has(c.deedId), `${c.deedId} at threshold`).toBe(true);
+    }
+  });
 });
 
 describe('flag triggers (one negative and one positive per predicate)', () => {

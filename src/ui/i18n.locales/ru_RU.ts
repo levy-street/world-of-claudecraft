@@ -1127,12 +1127,114 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.dualPrice': '{money} + {honor}',
   'hudChrome.warfare.balance': 'Честь: {amount}',
   'hudChrome.warfare.honorFloat': '+{amount} чести',
+  'hudChrome.warfare.honorFloatReason': '+{amount} чести ({reason})',
   'hudChrome.warfare.honorGain': 'Вы получаете {amount} очк. чести ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Недостаточно чести.',
   'hudChrome.warfare.reasons.arenaWin': 'Победа на арене',
   'hudChrome.warfare.reasons.fiestaKill': 'Устранение на Фиесте',
   'hudChrome.warfare.reasons.fiestaComplete': 'Завершение Фиесты',
   'hudChrome.warfare.reasons.fiestaWin': 'Победа на Фиесте',
+  'hudChrome.warfare.reasons.battlegroundWin': 'Победа в Терновой Лощине',
+  'hudChrome.warfare.reasons.battlegroundComplete': 'Битва в Терновой Лощине',
+  'hudChrome.warfare.reasons.battlegroundKill': 'Почётное убийство',
+  'hudChrome.warfare.reasons.battlegroundAssist': 'Помощь в убийстве',
+  'hudChrome.warfare.floatReasons.kill': 'Убийство',
+  'hudChrome.warfare.floatReasons.assist': 'Помощь',
+  'hudChrome.keybinds.bgFlag': 'Действие с флагом',
+  'hudChrome.pvp.launcherTitle': 'PvP: Терновая Лощина и арены',
+  'hudChrome.pvp.mobileLabel': 'PvP',
+  'hudChrome.bg.title': 'Терновая Лощина',
+  'hudChrome.bg.blurb':
+    'Две разрушенные крепости смотрят друг на друга через обнесённую стеной лощину в тени Тернового пика: Багровые на юге, Лазурные на севере, а между ними старый Двор Руин, который так и не достался никому. Пятеро на пятеро, по одному знамени, и первый, кто пять раз донесёт чужое знамя домой, забирает поле.',
+  'hudChrome.bg.modeTag': 'Захват флага 5 на 5',
+  'hudChrome.bg.offlineNote':
+    'Терновая Лощина синхронизируется. Очередь откроется после ответа мира.',
+  'hudChrome.bg.ratingSummary': 'Рейтинг. Побед: {wins} / поражений: {losses}',
+  'hudChrome.bg.careerCaptures': 'Захватов за карьеру: {count}',
+  'hudChrome.bg.enterQueue': 'Встать в очередь',
+  'hudChrome.bg.enterQueueParty': 'Встать в очередь (группа из {count})',
+  'hudChrome.bg.leaveQueue': 'Покинуть очередь',
+  'hudChrome.bg.searching': 'Поиск. В очереди {count}/{size}.',
+  'hudChrome.bg.queuedParty': 'Группа из {count}.',
+  'hudChrome.bg.queueNote':
+    'Две команды по пять бойцов. Украдите вражеское знамя и принесите его в свою крепость. Побеждает команда, первой захватившая флаг 5 раз. Собирайте группу до 5 человек и вставайте в очередь вместе; подбирайте руны спринта и уходите от погони между укрытиями.',
+  'hudChrome.bg.matchInProgress': 'Идет битва. {crimson}:{azure}.',
+  'hudChrome.bg.ladderAllTime': 'Таблица. За все время',
+  'hudChrome.bg.noRanked': 'Пока никто не в рейтинге. Станьте первым.',
+  'hudChrome.bg.ladderOnline': 'Таблица. Сейчас в сети',
+  'hudChrome.bg.noChallengers': 'Сейчас в сети нет бойцов. Станьте первым.',
+  'hudChrome.bg.playerClassTitle': '{name}. {className}',
+  'hudChrome.bg.playerLevelClassTitle': '{name}. Уровень {level}, {className}',
+  'hudChrome.bg.crimson': 'Багровые',
+  'hudChrome.bg.azure': 'Лазурные',
+  'hudChrome.bg.formUp': 'Построение: {seconds}',
+  'hudChrome.bg.firstTo': 'До {caps} захватов',
+  'hudChrome.bg.flagState.home': 'Флаг в крепости',
+  'hudChrome.bg.flagState.carried': 'Флаг украден!',
+  'hudChrome.bg.flagState.dropped': 'Флаг на земле',
+  'hudChrome.bg.respawnIn': 'Следующая волна: возрождение через {seconds}',
+  'hudChrome.bg.killFeed': '{killer} сразил(а) {victim}',
+  'hudChrome.bg.killFeedFallen': '{victim} пал(а) в бою',
+  'hudChrome.bg.resultVictory': 'Победа!',
+  'hudChrome.bg.resultDefeat': 'Поражение',
+  'hudChrome.bg.resultDraw': 'Ничья',
+  'hudChrome.bg.leavingIn': 'Вы покинете поле боя через {seconds}',
+  'hudChrome.bg.foundBanner': 'Битва найдена. Вы сражаетесь за {team}!',
+  'hudChrome.bg.countdownBanner': 'Терновая Лощина начнется через {seconds}',
+  'hudChrome.bg.startBanner': 'Захватите флаг!',
+  'hudChrome.bg.flagTakenLog': '{name} забирает флаг команды {team}!',
+  'hudChrome.bg.flagDroppedLog': 'Флаг команды {team} уронен.',
+  'hudChrome.bg.flagReturnedLog': 'Флаг команды {team} возвращен.',
+  'hudChrome.bg.dropFlagConfirmTitle': 'Бросить флаг?',
+  'hudChrome.bg.dropFlagConfirmBody': 'Вы несете вражеский флаг. Если бросить его, он останется на земле и его сможет подобрать любая команда.',
+  'hudChrome.bg.dropFlagConfirmAccept': 'Бросить флаг',
+  'hudChrome.bg.yourTeamTitle': 'Ваша команда',
+  'hudChrome.bg.boardToggleLabel': 'Табло матча. Нажмите Enter, чтобы закрепить полную таблицу.',
+  'hudChrome.bg.levelRequirement': 'Очередь на это поле боя открывается на уровне {level}.',
+  'hudChrome.bg.board.kills': 'Убийства',
+  'hudChrome.bg.board.assists': 'Помощь',
+  'hudChrome.bg.board.deaths': 'Смерти',
+  'hudChrome.bg.board.captures': 'Захваты',
+  'hudChrome.bg.capturedTeamBanner':
+    'Команда {takers} захватывает флаг команды {team}! {crimson}:{azure}',
+  'hudChrome.bg.flagTakenBanner': 'Команда {takers} забирает флаг команды {team}!',
+  'hudChrome.bg.flagReturnedBanner': 'Флаг команды {team} возвращен!',
+  'hudChrome.bg.capturedLog': '{name} захватывает флаг команды {team}. Счет {crimson}:{azure}.',
+  'hudChrome.bg.victoryBanner':
+    'Победа! Терновая Лощина {crimson}:{azure}. Рейтинг {rating} ({delta})',
+  'hudChrome.bg.defeatBanner':
+    'Поражение. Терновая Лощина {crimson}:{azure}. Рейтинг {rating} ({delta})',
+  'hudChrome.bg.drawBanner':
+    'Ничья в Терновой Лощине {crimson}:{azure}. Рейтинг {rating} ({delta})',
+  'hudChrome.bg.endLog': 'Терновая Лощина завершена, {crimson}:{azure}. Рейтинг {rating} ({delta}).',
+  'hudChrome.bg.map.crimsonKeep': 'Багровая крепость',
+  'hudChrome.bg.map.azureKeep': 'Лазурная крепость',
+  'hudChrome.bg.map.ruinCourtyard': 'Двор Руин',
+  'hudChrome.bg.map.graveyard': 'Кладбище',
+  'guide.nav.thornhollow': 'Терновая Лощина',
+  'guide.thornhollowPage.heading': 'Терновая Лощина',
+  'guide.thornhollowPage.intro':
+    'Рейтинговое поле боя 5 на 5 за захват флага в обнесённой стеной лощине среди старого леса под Терновым пиком, где две разрушенные крепости смотрят друг на друга вдоль ущелья, а между ними лежит двор постарше, так и не доставшийся никому. Две команды по пять, две крепости, одна цель: унести чужое знамя домой раньше, чем унесут ваше.',
+  'guide.thornhollowPage.queueHeading': 'Очередь',
+  'guide.thornhollowPage.queueBody':
+    'Откройте панель Терновой Лощины и встаньте в очередь в одиночку или соберите группу до пяти человек и вставайте вместе: группа всегда попадает в одну команду, а свободные места заполняют одиночные бойцы. Когда готовы десять, матч рассаживает обе команды по крепостям для короткого построения, после чего флаги оживают.',
+  'guide.thornhollowPage.fieldHeading': 'Поле',
+  'guide.thornhollowPage.fieldBody':
+    'Обнесенное стенами открытое поле разделено на три зоны: собственное поле каждой команды и Двор Руин между ними. Две куртины во всю ширину образуют границы, и любой переход между зонами идет через спорную точку: широкие главные ворота или надвратный дом, оседлавший куртину, чьи смещенные двери заставляют огибать угол засады. Каждая крепость наглухо закрыта со всех сторон, кроме входа, так что путь к флагу и от него лежит через один и тот же проем, а низкая баррикада у ворот ломает прямой натиск. Во дворе ждут полое сердце руин и две фланговые руны спринта; еще две стоят на подходах к флагам.У дворового входа каждых главных ворот ждет руна битвы или руна защиты (ненадолго больше урона или меньше получаемого урона): оба постамента открывают матч одной стороной и переворачиваются с каждым захватом.',
+  'guide.thornhollowPage.flagsHeading': 'Флаги',
+  'guide.thornhollowPage.flagsBody':
+    'Каждая крепость хранит флаг своей команды. Возьмите вражеский флаг и донесите его до своей стойки, чтобы забить: побеждает команда, первой захватившая флаг пять раз, а истекшее время решается по счету. Павший знаменосец роняет флаг на месте: враг может подхватить его снова, а своя команда возвращает его домой мгновенно, просто добравшись до него. Флаг не терпит скрытности: подбирая его, вы выходите из невидимости, а знаменосец, ставший невидимым любым способом, роняет флаг на месте.',
+  'guide.thornhollowPage.respawnBody':
+    'Смерть хранит классический обряд: тело лежит там, где пало, пока ВЫ не отпустите дух; дух поднимается на огороженном кладбище подле вашей крепости, связанный оберегом до следующей волны возрождения вашей команды. Волна поднимает всех ожидающих духов разом; волны двух команд нарочно смещены, так что бой никогда не обнуляется целиком. Здесь нет бега за телом и сделки с Целителем душ: отпустил, дождался волны, в бой.',
+  'guide.thornhollowPage.pickupNote':
+    'Поднять флаг можно только осознанным нажатием клавиши действия на поле боя: никто не станет знаменосцем, случайно пробежав по флагу.',
+  'guide.thornhollowPage.respawnHeading': 'Гибель в бою',
+  'guide.thornhollowPage.carrierHeading': 'Ноша знаменосца',
+  'guide.thornhollowPage.carrierBody':
+    'Знаменосец, слишком долго удерживающий вражеский флаг, становится все уязвимее и получает все больше урона, пока флаг не будет захвачен, уронен или возвращен. Прятаться с флагом значит проиграть; нести его домой значит победить.',
+  'guide.thornhollowPage.ladderHeading': 'Рейтинг',
+  'guide.thornhollowPage.ladderBody':
+    'Каждый матч, победный или нет, двигает постоянный рейтинг персонажа, а таблица за все время хранит чемпионов мира. Победы и доигранные до конца поражения также приносят Честь через систему Войны.',
   'hudChrome.charSheet.offense': 'Атака',
   'hudChrome.charSheet.defense': 'Защита',
   'hudChrome.statInfo.fromYour': 'От вашей характеристики ({value} {stat}):',
@@ -2040,7 +2142,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileMore': 'Еще',
   'hud.core.mobileMoreAria': 'Показать еще меню',
   'hud.core.mobileSocial': 'Общение',
-  'hud.core.mobileArena': 'Арена',
   'hud.core.mobileMenu': 'Меню',
   'hud.core.mobileSettings': 'Настройки',
   'hud.core.mobileUse': 'Использовать',
@@ -2128,6 +2229,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.options.mouseCamera': 'Камера мышью',
   'hud.options.keybindHelpMouseCamera':
     'Камера мышью выкл.: A/D поворачивает, перетаскивание облетает (классика). Вкл.: WASD относительно камеры, A/D стрейф. Щелкните ячейку клавиши для переназначения; Esc отменяет.',
+  'hud.keybinds.actions.arena': 'PvP (Терновая Лощина и арены)',
   'hud.keybinds.categories.movement': 'Передвижение',
   'hud.keybinds.categories.targeting': 'Цели',
   'hud.keybinds.categories.interface': 'Интерфейс',
@@ -2150,7 +2252,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.keybinds.actions.nameplates': 'Индикаторы здоровья',
   'hud.keybinds.actions.meters': 'Счетчики урона',
   'hud.keybinds.actions.social': 'Друзья и гильдия',
-  'hud.keybinds.actions.arena': 'Арена (Пепельный Колизей)',
   'hud.keybinds.actions.chat': 'Открыть чат',
   'hud.keybinds.actions.attack': 'Атака',
   'hud.keybinds.actions.actionBarSlot': 'Панель действий {slot}',
@@ -5745,7 +5846,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'НИЧЬЯ В FIESTA! Слишком близко, не разобрать!',
   'fiesta.end.loss': 'FIESTA ПРОИГРАНА! Отыграйся!',
   'fiesta.end.win': 'FIESTA ВЫИГРАНА! 🎉 Вот это праздник!',
-  'fiesta.enterQueue': 'Присоединиться к Fiesta!',
   'fiesta.error.leaderOnly': 'Только лидер группы может записать вашу команду на {label}.',
   'fiesta.error.noAugment': 'Сейчас вам нечего выбирать из усилений.',
   'fiesta.error.notOnOffer': 'Это усиление не предлагается.',
@@ -5762,9 +5862,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': 'Колосс',
   'fiesta.powerup.pow_moon_boots.name': 'Лунные сапоги',
   'fiesta.powerup.pow_speed_demon.name': 'Демон скорости',
-  'fiesta.practice': '🎉 Тренировка с ботами',
-  'fiesta.practiceNote':
-    'Тренировка офлайн: создаёт 3 ботов с ИИ и записывает вас на Fiesta 2 на 2. Нажмите снова, чтобы остановить.',
   'fiesta.queue.join': 'Вы встаёте в очередь Fiesta 2 на 2. Готовьтесь ЗАЖИГАТЬ…',
   'fiesta.queue.leave': 'Вы покидаете очередь Fiesta 2 на 2.',
   'fiesta.queue.teamLeave': 'Ваша команда покидает очередь Fiesta 2 на 2.',
@@ -6821,17 +6918,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.thunder_clap': 'Бьет по всем вокруг вас и замедляет их атаки.',
   'guide.abilityHook.wrath':
     'Удар силами природы, запущенный в цель с дистанции, ваш основной способ бить.',
-  'guide.arenaPage.augmentsNote':
-    'Улучшения и усиления действуют только в рамках матча. Они нужны для забавных импровизированных сборок, а не для постоянного превосходства, так что никто не сможет купить себе победу.',
   'guide.arenaPage.coliseumBody':
     'Колизей, это арена королевства, где вы сходитесь с другими игроками в рейтинговых матчах: один на один или два на два. У каждой категории своя таблица рейтинга, так что победа поднимает вас по этой лестнице на виду у всего королевства. Откройте окно арены, чтобы записаться в категорию, в одиночку или с напарником.',
   'guide.arenaPage.coliseumHeading': 'Пепельный Колизей',
   'guide.arenaPage.duelsBody':
     'Вызовите любого встречного игрока на дружескую дуэль. На кону только гордость, так что это самый простой способ изучить противостояние или разрешить дружеский спор.',
   'guide.arenaPage.duelsHeading': 'Дуэли',
-  'guide.arenaPage.fiestaBody':
-    'Фиеста, это быстрая схватка два на два, что идёт одним непрерывным боем, где все бойцы уравнены в силах. По ходу боя вы набираете улучшения, быстрые усиления, которые на ходу меняют ваш набор, так что нет двух одинаковых матчей.',
-  'guide.arenaPage.fiestaHeading': 'Фиеста два на два',
   'guide.arenaPage.heading': 'Арена и PvP',
   'guide.arenaPage.intro':
     'Хотите проверить себя в схватке с другими игроками? Режим игрок против игрока встроен в игру, и это всегда ваш выбор, вас никогда не принуждают к нему.',
@@ -7014,21 +7106,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Три зоны, с юга на север, каждая на ступень выше по уровню. Следуйте за цепочкой заданий, и сама земля проведет вас от долины к вершинам.',
   'guide.worldPage.places': 'Примечательные места',
   'guide.worldPage.residents': 'Кого вы встретите',
-  'guide.arenaPage.powerupsBody':
-    'Прямо посреди схватки на арену падают и светящиеся сферы, доступные тому, кто доберётся до них первым. Они нарочно сделаны вызывающе яркими и держатся лишь короткий миг: Демон скорости дарит вспышку слепящей прыти, Колосс раздувает вас в неповоротливого великана, Лунные ботинки превращают шаг в прыжок при пониженной гравитации, а Берсерк дарует внезапный прилив неистовства.',
-  'guide.arenaPage.powerupsTitle': 'Усиления на ринге',
-  'guide.arenaPage.waveGoldBody':
-    'Средняя волна: двусторонние сочетания, в которых ваша сборка начинает обретать форму и звучать в полную силу.',
-  'guide.arenaPage.waveGoldTitle': 'Золото',
-  'guide.arenaPage.wavePrismaticBody':
-    'Финальная волна: определяющие сборку, выжигающие экран всплески, которым положено казаться нелепо мощными в самом лучшем смысле.',
-  'guide.arenaPage.wavePrismaticTitle': 'Радужный',
-  'guide.arenaPage.waveSilverBody':
-    'Первая волна: чистые усиления одной характеристики, что оттачивают основы вашего класса.',
-  'guide.arenaPage.waveSilverTitle': 'Серебро',
-  'guide.arenaPage.wavesBody':
-    'Бой Фиесты по ходу подкидывает вам свежий выбор, и варианты становятся всё смелее, чем дольше длится схватка. Вы выстраиваете сборку от волны к волне, каждый раз беря один из нескольких вариантов и оставляя его до конца боя.',
-  'guide.arenaPage.wavesTitle': 'Улучшения приходят волнами',
   'guide.bestiary.flavor.gravecaller_cultist':
     'Облачённые в рясы прислужники культа смерти, чьи труды оскверняют могилы от Долины до самых вершин. Там, где они собираются, мёртвым нет покоя.',
   'guide.bestiary.flavor.grubjaw':
@@ -7824,6 +7901,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.duskfireClaim': 'Смерть цели даёт {value} Разрушения',
   'hudChrome.auraEffect.pyreGuardian': 'Создаёт {ruin} Разрушения раз в {ruinInterval} сек. и наносит {damage} ед. урона от огня в радиусе {radius} м раз в {damageInterval} сек.',
   'hudChrome.auraEffect.perfectMoment': 'Эфирные стрелы не поглощают заряды тайной магии',
+  'hudChrome.auraEffect.carriedFlag': 'Вы несете вражеский флаг. Отмените этот эффект, чтобы бросить его.',
   'hudChrome.auraEffect.elementalConvergencePrimed':
     'Следующее заклинание другой стихийной школы активирует Стихийное слияние',
   'hudChrome.auraEffect.hunterFerocity':
@@ -9051,9 +9129,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.marketDay.title': 'Ярмарочный день',
   'hudChrome.calendar.events.marketDay.note':
     'Торговец ждёт свежий товар. Отличный день, чтобы заглянуть на Мировой рынок.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Ночь фиесты',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'Сегодня ринг фиесты 2 на 2 собирает самые шумные толпы.',
   'hudChrome.calendar.events.arenaClash.title': 'Битва на арене',
   'hudChrome.calendar.events.arenaClash.note':
     'Дуэлянты стекаются в Пепельный Колизей. Вставайте в очередь и поднимайтесь по лестнице.',
@@ -9172,9 +9247,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   // Protect Yumi locale fill (M16 wordy-key floor).
   'yumi.hud.collapse': 'Свернуть полосы Protect Yumi',
   'yumi.hud.expand': 'Развернуть полосы Protect Yumi',
-  'guide.arenaPage.yumiHeading': 'Защитите Yumi',
-  'guide.arenaPage.yumiBody':
-    'Protect Yumi: командный режим с целью, который разыгрывается в лабиринте. Каждая команда защищает свою кошку-фамильяра и охотится на чужую. Время от времени обе кошки переносятся в новые углы лабиринта, и бой качается между защитой, охотой и поиском. Очередь на 3 на 3 или 5 на 5; павший лишь ненадолго садится на скамью.',
   'yumi.queue.join': 'Вы встаёте в очередь Protect Yumi. Берегите своего фамильяра…',
   'yumi.queue.leave': 'Вы покидаете очередь Protect Yumi.',
   'yumi.queue.teamLeave': 'Ваша команда покидает очередь Protect Yumi.',
@@ -9183,7 +9255,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'yumi.log.start': 'Protect Yumi! Защищайте своего фамильяра и охотьтесь на чужого.',
   'yumi.bracket3': 'Yumi 3 на 3',
   'yumi.bracket5': 'Yumi 5 на 5',
-  'yumi.enterQueue': 'В бой за Yumi!',
   'yumi.hud.title': 'PROTECT YUMI',
   'yumi.hud.getReady': 'Приготовьтесь…',
   'yumi.hud.teleportIn': 'Yumi переместятся через {s}',

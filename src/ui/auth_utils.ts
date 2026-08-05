@@ -42,10 +42,10 @@ export function validateForm(form: HTMLFormElement): boolean {
 
   for (const input of inputs) {
     const fieldValid = syncInputAriaState(input);
-    
+
     // Apply fallback dirty/invalid classes
     input.classList.toggle('user-invalid-fallback', !fieldValid);
-    
+
     // For browsers/tests, toggle error display block
     const errorEl = form.querySelector(`#${input.id}-error`) as HTMLElement | null;
     if (errorEl) {
@@ -93,4 +93,3 @@ export function validateCharacterName(name: string): boolean {
   const trimmed = name.trim();
   return /^[A-Za-z][A-Za-z' -]{1,15}$/.test(trimmed);
 }
-

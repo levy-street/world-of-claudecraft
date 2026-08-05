@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 946,
-      "state": "9c720ec8",
+      "state": "5440d3ce",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -37,6 +37,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
@@ -143,7 +144,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 960,
-      "state": "40ddf3a4",
+      "state": "286958c2",
       "events": "9accd8b6",
       "rng": {
         "draws": 3,
@@ -154,7 +155,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 960,
-      "state": "c1af5276",
+      "state": "960d7b1c",
       "events": "5c135d1d",
       "rng": {
         "draws": 3,
@@ -165,7 +166,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 960,
-      "state": "d2c4432c",
+      "state": "023df0aa",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -176,7 +177,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 960,
-      "state": "4fda2b2a",
+      "state": "c8efd890",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -187,7 +188,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 960,
-      "state": "3cf3f6c4",
+      "state": "c5472922",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -198,7 +199,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 960,
-      "state": "1776b3a6",
+      "state": "d3b0f7ac",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -209,7 +210,7 @@
       "tick": 69,
       "time": 3.45,
       "nextId": 961,
-      "state": "e88f3f9e",
+      "state": "98740034",
       "events": "9ce30670",
       "rng": {
         "draws": 5,
@@ -230,6 +231,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
           "copper": 10,
@@ -417,7 +419,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 961,
-      "state": "2407f6f8",
+      "state": "390255ee",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -428,7 +430,7 @@
       "tick": 71,
       "time": 3.55,
       "nextId": 961,
-      "state": "e5274166",
+      "state": "10ccaafc",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -449,6 +451,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
           "copper": 10,

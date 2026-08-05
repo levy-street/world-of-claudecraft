@@ -42,10 +42,12 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // Warlock pet's signature-skill command and autocast toggle, +5 on BOTH sides for the
 // guild_bank_* cluster (Guild Bank Phase 2), +1 on both for guild_bank_log
 // (the activity log's on-demand READ request; its answer comes back on its own
-// one-shot 'gbanklog' frame, not the snapshot).
-const EXPECTED_SEND_COUNT = 184;
-const EXPECTED_DISPATCH_COUNT = 196;
-const EXPECTED_DISPATCH_ONLY_COUNT = 12;
+// one-shot 'gbanklog' frame, not the snapshot); the battleground adds three
+// sends plus the dev-only force start, and the class wave adds the controlled
+// Warlock pet's signature-skill command and autocast toggle.
+const EXPECTED_SEND_COUNT = 187; // +3 battleground sends, +2 warlock pet
+const EXPECTED_DISPATCH_COUNT = 200; // +3 battleground sends, +1 dev_bg_start, +2 warlock pet
+const EXPECTED_DISPATCH_ONLY_COUNT = 13; // + dev_bg_start + dev_profiler_invulnerable
 
 // The chat sub-channel routing switch (server/game.ts `switch
 // (session.rememberedChat.channel)`) is NOT a msg.cmd dispatch; its labels must

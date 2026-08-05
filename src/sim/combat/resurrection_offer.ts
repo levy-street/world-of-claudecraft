@@ -16,6 +16,9 @@ export function offerResurrection(
   hpFrac: number,
 ): boolean {
   if (target.kind !== 'player' || !target.dead) return false;
+  // Thornhollow Fields revives on the team wave only: no player-cast rez (including
+  // mass resurrection, which routes through here) bypasses the release rite.
+  if (ctx.bgMatches.has(target.id)) return false;
   ctx.pendingResurrections.set(target.id, {
     casterId: caster.id,
     hpFrac,

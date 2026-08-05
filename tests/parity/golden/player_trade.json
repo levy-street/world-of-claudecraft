@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 947,
-      "state": "134c296d",
+      "state": "0edc4b5d",
       "events": "c004d47f",
       "rng": {
         "draws": 0,
@@ -50,6 +50,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 100,
@@ -108,6 +109,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "copper": 50,
@@ -272,7 +274,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 947,
-      "state": "f33a8d3f",
+      "state": "45b9c817",
       "events": "46ae762b",
       "rng": {
         "draws": 0,
@@ -292,6 +294,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 80,
@@ -352,6 +355,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "copper": 70,
@@ -523,7 +527,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 947,
-      "state": "f33a8d3f",
+      "state": "45b9c817",
       "events": "f1d3d629",
       "rng": {
         "draws": 0,
@@ -543,6 +547,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 80,
@@ -603,6 +608,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "copper": 70,
@@ -774,7 +780,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 947,
-      "state": "f33a8d3f",
+      "state": "45b9c817",
       "events": "c64fccc6",
       "rng": {
         "draws": 0,
@@ -794,6 +800,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 80,
@@ -854,6 +861,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "copper": 70,
@@ -1025,7 +1033,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 947,
-      "state": "0d9c28b0",
+      "state": "72b48970",
       "events": "4678d61f",
       "rng": {
         "draws": 0,
@@ -1045,6 +1053,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 80,
@@ -1112,6 +1121,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "copper": 70,
@@ -1291,7 +1301,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 947,
-      "state": "0d9c28b0",
+      "state": "72b48970",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1311,6 +1321,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 80,
@@ -1378,6 +1389,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "copper": 70,

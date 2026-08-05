@@ -4601,6 +4601,25 @@
     min-height: 40px;
     box-sizing: border-box;
   }
+  /* Thornhollow Fields scoreboard: compacted for the 844x390 landscape HUD so it clears
+     the top button clusters; the respawn overlay rides the same midline. */
+  body.mobile-touch #bg-scoreboard {
+    top: 4px;
+    min-width: 250px;
+    padding: 3px 10px 5px;
+  }
+  body.mobile-touch #bg-scoreboard .bg-score {
+    font-size: 19px;
+  }
+  body.mobile-touch #bg-scoreboard .bg-team {
+    font-size: 11px;
+  }
+  body.mobile-touch #bg-scoreboard .bg-under {
+    font-size: 11px;
+  }
+  body.mobile-touch #bg-respawn {
+    font-size: 18px;
+  }
   /* Vale Cup: the join/leave .btn and the guild-record toggle (its pickers already
      carry a pointer:coarse floor). */
   body.mobile-touch #valecup-window .btn,

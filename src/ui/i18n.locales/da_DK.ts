@@ -2283,9 +2283,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Broder Halven markerer sine kort: en fin dag at trodse Det Sammenstyrtede Relikvarium.',
   'hudChrome.calendar.events.delveDay.title': 'Delve-Dag',
-  'hudChrome.calendar.events.fiestaNight.note':
-    '2v2-Fiesta-ringen trækker sine mest højrøstede tilskuere i aften.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Fiesta-Aften',
   'hudChrome.calendar.events.fishingDerby.note':
     'Lystfiskere står langs søerne. Tag en stang med, og udveksl fiskehistorier.',
   'hudChrome.calendar.events.fishingDerby.title': 'Fiskederby',
@@ -4594,7 +4591,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'FIESTA UAFGJORT! Alt for tæt på!',
   'fiesta.end.loss': 'FIESTA TABT! Tag revanche!',
   'fiesta.end.win': 'FIESTA VUNDET! 🎉 Sikke en fest!',
-  'fiesta.enterQueue': 'Deltag i Fiestaen!',
   'fiesta.error.leaderOnly': 'Kun gruppelederen kan sætte jeres hold i kø til {label}.',
   'fiesta.error.noAugment': 'Du har ingen forstærkning at vælge lige nu.',
   'fiesta.error.notOnOffer': 'Den forstærkning tilbydes ikke.',
@@ -4611,9 +4607,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': 'Koloss',
   'fiesta.powerup.pow_moon_boots.name': 'Månestøvler',
   'fiesta.powerup.pow_speed_demon.name': 'Fartdæmon',
-  'fiesta.practice': '🎉 Træning mod Bots',
-  'fiesta.practiceNote':
-    'Offline-træning: frembringer 3 AI-bots og sætter dig i kø til en 2v2 Fiesta. Klik igen for at stoppe.',
   'fiesta.queue.join': 'Du går i kø til 2v2 Fiesta. Gør dig klar til at FESTE…',
   'fiesta.queue.leave': 'Du forlader 2v2 Fiesta-køen.',
   'fiesta.queue.teamLeave': 'Dit hold forlader 2v2 Fiesta-køen.',
@@ -4859,38 +4852,18 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Beskytter en allieret så nærkampsangribere skader sig selv når de slår.',
   'guide.abilityHook.thunder_clap': 'Rammer alt omkring dig og sløver deres angreb.',
   'guide.abilityHook.wrath': 'Et naturlyn kastet mod et mål på afstand, din foretrukne bombe.',
-  'guide.arenaPage.augmentsNote':
-    'Forstærkninger og power-ups varer kun under kampen. De handler om legende, spontane builds, ikke om varig styrke, så ingen køber sig til en sejr.',
   'guide.arenaPage.coliseumBody':
     'Coliseum er rigets arena, hvor du møder andre spillere i rangerede kampe, en mod en eller to mod to. Hver kategori har sin egen placering, så en sejr løfter dig op ad den rangliste for hele riget at se. Åbn Arena-vinduet for at melde dig til en kategori, alene eller med din makker.',
   'guide.arenaPage.coliseumHeading': 'Det Askegrå Colosseum',
   'guide.arenaPage.duelsBody':
     'Udfordr enhver spiller du møder til en venskabelig duel. Intet andet end stolthed står på spil, så det er den nemmeste måde at lære en kamp at kende eller bilægge en venskabelig uenighed.',
   'guide.arenaPage.duelsHeading': 'Dueller',
-  'guide.arenaPage.fiestaBody':
-    'Fiesta er en hurtig to-mod-to-kamp, spillet som én sammenhængende dyst, hvor hver kæmper stilles lige. Efterhånden som kampen skrider frem, vælger du forstærkninger, hurtige boosts der omformer dit udstyr undervejs, så ingen kampe spilles helt ens.',
-  'guide.arenaPage.fiestaHeading': 'To mod to Fiesta',
   'guide.arenaPage.heading': 'Arena og PvP',
   'guide.arenaPage.intro':
     'Vil du teste dig selv mod andre spillere? Spiller mod spiller er indbygget, og det er altid noget du vælger, aldrig noget der tvinges på dig.',
   'guide.arenaPage.ladderBody':
     'Rangeret spil følger din placering over tid. Tjek ranglisten for at se hvor du ligger og hvem der holder toppen af riget.',
   'guide.arenaPage.ladderHeading': 'At klatre op ad rangstigen',
-  'guide.arenaPage.powerupsBody':
-    'Glødende kugler falder også ned i arenaen midt i kampen, gratis for den der når dem først. De er bevidst overdrevne og varer kun et kort øjeblik: Speed Demon for et glimt af blændende fart, Colossus for at svulme op til en kluntet kæmpe, Moon Boots for et hoppende, lavtyngdekrafts-hop, og Berserker for et pludseligt udbrud af raseri.',
-  'guide.arenaPage.powerupsTitle': 'Power-ups i ringen',
-  'guide.arenaPage.waveGoldBody':
-    'Den midterste bølge: tveæggede kombinationer hvor din build begynder at tage form og synge.',
-  'guide.arenaPage.waveGoldTitle': 'Guld',
-  'guide.arenaPage.wavePrismaticBody':
-    'Den sidste bølge: build-definerende, skærm-smeltende spidser der skal føles latterlige på den bedste måde.',
-  'guide.arenaPage.wavePrismaticTitle': 'Prismatisk',
-  'guide.arenaPage.waveSilverBody':
-    'Den indledende bølge: rene boosts på én egenskab der skærper grundlaget for din klasse.',
-  'guide.arenaPage.waveSilverTitle': 'Sølv',
-  'guide.arenaPage.wavesBody':
-    'En Fiesta-dyst rækker dig friske valg undervejs, og valgene bliver dristigere, jo længere kampen kører. Du bygger fra én bølge til den næste, vælger en af nogle få muligheder hver gang og beholder den resten af dysten.',
-  'guide.arenaPage.wavesTitle': 'Forstærkninger ankommer i bølger',
   'guide.bestiary.flavor.gravecaller_cultist':
     'Kappeklædte tjenere af dødskulten hvis virke besudler gravene fra Dalen til toppene. Hvor de samles, hviler de døde ikke.',
   'guide.bestiary.flavor.grubjaw':
@@ -5964,7 +5937,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapCanvasLabel': 'Kort',
   'hud.core.mapSummary': 'Kort over {zone}.',
   'hud.core.maxLevel': 'MAKS NIVEAU',
-  'hud.core.mobileArena': 'Arena',
   'hud.core.mobileAttack': 'Angrib',
   'hud.core.mobileCamera': 'Kamera — dobbelttryk for at centrere',
   'hud.core.mobileChat': 'Chat',
@@ -6060,7 +6032,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hud.errors.whisperMissing': "Der er ingen spiller ved navn '{name}' online.",
   'hud.errors.whisperSelf': 'Du mumler for dig selv. Ingen hører det.',
   'hud.keybinds.actions.actionBarSlot': 'Handlingslinje {slot}',
-  'hud.keybinds.actions.arena': 'Arena (Ashen Coliseum)',
   'hud.keybinds.actions.attack': 'Angrib',
   'hud.keybinds.actions.attackMove': 'Angrebsbevægelse',
   'hud.keybinds.actions.autorun': 'Skift automatisk løb',
@@ -8274,9 +8245,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Flænger målets rustning og sænker den med {damage}% pr. anvendelse. Stakker op til 5 gange. Skaber en stor mængde trussel.',
   'entities.mobs.training_dummy.name': 'Træningsdukke',
   'entities.mobs.yumi_cat.name': 'Yumi',
-  'guide.arenaPage.yumiBody':
-    'Beskyt Yumi er en holdbaseret måltilstand, der spilles i en labyrint: hver side vogter sin egen katfølgesvend, mens den jager modstanderens. Med jævne mellemrum blinker begge katte til nye hjørner af labyrinten, så kampen svinger mellem at forsvare, jage og kapløbet om at finde dem igen. Stil op som tre mod tre eller fem mod fem; at falde i kamp sætter dig kun på bænken et øjeblik.',
-  'guide.arenaPage.yumiHeading': 'Beskyt Yumi',
   'hudChrome.archetypeTitle.hobbyLabel': 'Fritid',
   'hudChrome.auraEffect.armorPct': 'Reducerer rustning med {pct}%',
   'hudChrome.auraEffect.armorPctStacks': 'Reducerer rustning med {pct}% ({stacks} stakke)',
@@ -8296,7 +8264,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'yumi.bracket5': 'Yumi 5 mod 5',
   'yumi.end.loss': 'NEDERLAG! Din Yumi er faldet.',
   'yumi.end.win': 'SEJR! Yumi er i sikkerhed!',
-  'yumi.enterQueue': 'Tilmeld dig Beskyt Yumi!',
   'yumi.error.partyTooBig3': 'Beskyt Yumi 3 mod 3 tillader en gruppe på op til tre.',
   'yumi.error.partyTooBig5': 'Beskyt Yumi 5 mod 5 tillader en gruppe på op til fem.',
   'yumi.hud.aria': 'Din Yumi på {mine} af {max} helbred, fjendens Yumi på {theirs}.',

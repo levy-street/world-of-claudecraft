@@ -1,3 +1,11 @@
+import { isBgPos } from '../sim/data';
+import {
+  BATTLE_RUNE_AURA_ID,
+  RUNE_VISUALS,
+  SPRINT_RUNE_AURA_ID,
+  WARD_RUNE_AURA_ID,
+} from '../sim/social/battleground';
+import type { Entity } from '../sim/types';
 import type { Aura, Entity } from '../sim/types';
 import { abilityHexColor } from './ability_vfx_core';
 import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
@@ -136,4 +144,18 @@ export function characterVeilboundState(e: Entity): CharacterVeilboundState {
   if (e.auras.some((a) => a.id === 'veilbound_march')) return 'march';
   if (e.auras.some((a) => a.id === 'veilbound_mark')) return 'mark';
   return 'none';
+}
+
+/** The whole-body tint color for an active Thornhollow Fields rune buff (null = none). */
+export function characterRuneTintColor(e: Entity): number | null {
+  // Rune pads exist only on the Thornhollow field, so the open world (where
+  // this runs for every character in view, every frame) settles on one band
+  // check instead of walking each character's aura list.
+  if (!isBgPos(e.pos.x)) return null;
+  for (const a of e.auras) {
+    if (a.id === SPRINT_RUNE_AURA_ID) return RUNE_VISUALS.sprint.color;
+    if (a.id === BATTLE_RUNE_AURA_ID) return RUNE_VISUALS.damage.color;
+    if (a.id === WARD_RUNE_AURA_ID) return RUNE_VISUALS.defense.color;
+  }
+  return null;
 }
