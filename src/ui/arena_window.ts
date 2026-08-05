@@ -360,7 +360,31 @@ export class ArenaWindow {
       view.allTime && view.allTime.length > 0
         ? `<div class="bg-sub">${esc(t('hudChrome.bg.ladderAllTime'))}</div>${this.bgLadderHtml(view.allTime)}`
         : `<div class="bg-sub">${esc(t('hudChrome.bg.ladderAllTime'))}</div><div class="ladder-empty">${esc(t('hudChrome.bg.noRanked'))}</div>`;
-    return blurb + rank + this.bgActionHtml(view.action) + onlineSection + allTimeSection;
+    return (
+      blurb +
+      rank +
+      this.bgFirstWinChipHtml(view.firstWinBonus) +
+      this.bgActionHtml(view.action) +
+      onlineSection +
+      allTimeSection
+    );
+  }
+
+  /** The available-bonus chip, immediately above the queue affordance so the
+   *  invitation and the button that acts on it read as one thing. Absent once
+   *  today's win has claimed it (the pure view decides, never this painter).
+   *
+   *  Everything it has to say is VISIBLE: no `title` tooltip, which on a
+   *  non-focusable div is unreachable by keyboard, unreliably announced, and
+   *  simply absent on touch (and this panel ships to phones). The glyph is
+   *  decoration beside real text, so it is aria-hidden rather than named. */
+  private bgFirstWinChipHtml(bonus: { honor: number } | null): string {
+    if (!bonus) return '';
+    const label = t('hudChrome.bg.firstWinBonusLine', { honor: num(bonus.honor) });
+    return (
+      `<div class="bg-firstwin-chip"><span aria-hidden="true">${svgIcon('battleground')}</span>` +
+      `<span>${esc(label)}</span></div>`
+    );
   }
 
   private bgActionHtml(action: BgWindowAction): string {

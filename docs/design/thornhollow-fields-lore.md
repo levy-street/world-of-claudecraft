@@ -24,7 +24,7 @@ Anchors this is written against (change these and the fiction has to move):
 > Two ruined keeps face each other across a walled hollow in the shadow of
 > Thornpeak: Crimson to the south, Azure to the north, and the older Ruin
 > Courtyard between them that neither has ever held. Five a side, one banner
-> each, and the first to carry five of theirs home takes the field.
+> each, and the first to carry three of theirs home takes the field.
 
 **The map document's own description** (`build_battleground_map.mjs` meta), and
 the guide's Thornhollow Fields page, which is deliberately mechanical: how the
@@ -88,8 +88,9 @@ it. Any line that makes one side the rightful holder is wrong.
 
 What they are fighting over is not the ground. It is the **banner** each keep
 still flies, and the fact that the other side can take it and carry it home.
-Five captures ends it because five is what the hosts agreed on, not because
-anything on the field changes hands.
+Three captures ends it because three is what the hosts agreed on, not because
+anything on the field changes hands. (The count is `BG_CAPS_TO_WIN`, a tuning
+constant; the fiction only cares that the hosts agreed on a number.)
 
 The graveyards beside each keep are the hosts' own, and they are old enough to
 be full. A fallen champion rises in their team's plot and waits for the wave,

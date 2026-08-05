@@ -2464,6 +2464,19 @@
     white-space: normal;
     overflow-wrap: anywhere;
   }
+  /* The secondary lines scale with the title. Without this they stay at the
+     desktop 18px while the verdict drops to 26px, so on a phone a three-line
+     battleground result reads as four near-equal lines instead of one headline
+     over its detail, and the taller block runs into the result scoreboard
+     below it. */
+  body.mobile-touch #banner .banner-subtext {
+    font-size: calc(13px * var(--mobile-chrome-scale, 1));
+    line-height: 1.25;
+    margin-top: 4px;
+  }
+  body.mobile-touch #banner .banner-subtext + .banner-subtext {
+    margin-top: 1px;
+  }
   body.mobile-touch #banner.banner-with-art {
     gap: 6px;
   }

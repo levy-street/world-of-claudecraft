@@ -9309,6 +9309,35 @@
     margin: 4px 0 2px;
     font-family: Georgia, serif;
   }
+  /* The first-win-of-the-day invitation, sitting directly above the queue
+     button. A gold-edged chip rather than another grey note line, because the
+     whole point is that it is the one thing on this panel worth acting on
+     today; it removes itself once the win claims it. Wraps instead of
+     overflowing on a narrow panel (no viewport units, layout-stable). */
+  .bg-firstwin-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 6px 0 8px;
+    padding: 6px 10px;
+    border: 1px solid var(--gold, #c8a857);
+    border-radius: 6px;
+    /* Derived from the accent rather than a one-off literal, so the theme
+       picker moves the chip with the rest of the gold chrome. */
+    background: color-mix(in srgb, var(--gold, #c8a857) 12%, transparent);
+    color: var(--gold, #c8a857);
+    font-family: var(--title-font);
+    font-size: 12.5px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+  .bg-firstwin-chip .ui-icon {
+    flex: 0 0 auto;
+    width: 15px;
+    height: 15px;
+  }
   .bg-queue-status {
     font-size: 12px;
     color: #7fd4ff;
@@ -9447,10 +9476,13 @@
     text-align: left;
     font-family: var(--ui-font);
   }
+  /* `.ended` is deliberately NOT in this list. The result-hold reveal is driven
+     by the painter (battleground_scoreboard_painter), which also writes
+     aria-expanded: a second, invisible reveal here left the aria state lying to
+     assistive tech and made the outside-click dismissal inert during the hold. */
   #bg-scoreboard:hover .bg-board,
   #bg-scoreboard:focus-within .bg-board,
-  #bg-scoreboard.expanded .bg-board,
-  #bg-scoreboard.ended .bg-board {
+  #bg-scoreboard.expanded .bg-board {
     display: block;
   }
   /* the frozen post-match result screen: verdict header over the pinned board */

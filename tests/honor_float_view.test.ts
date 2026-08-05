@@ -17,13 +17,16 @@ const ALL_REASONS: HonorReason[] = [
   'fiesta_complete',
   'fiesta_win',
   'battleground_win',
+  'battleground_first_win',
   'battleground_complete',
   'battleground_kill',
   'battleground_assist',
 ];
 
-// The two the drip pays, and the six that keep the plain float.
-const NAMED: HonorReason[] = ['battleground_kill', 'battleground_assist'];
+// The two the drip pays plus the once-a-day bonus (which lands in the same
+// instant as the ordinary win award and must say which float is which), and the
+// six that keep the plain float.
+const NAMED: HonorReason[] = ['battleground_kill', 'battleground_assist', 'battleground_first_win'];
 const PLAIN = ALL_REASONS.filter((r) => !NAMED.includes(r));
 
 afterEach(() => setLanguage('en'));
@@ -51,7 +54,15 @@ describe('the Honor float names the battleground drip and nothing else', () => {
     }
   });
 
-  it('the two named reasons are exactly the two mapped ones', () => {
+  it('the first win of the day floats the First Win variant', () => {
+    // It pays beside `battleground_win`, which stays plain: two unlabelled
+    // floats over the same character in the same instant is exactly the case
+    // the reason label exists for.
+    expect(honorFloatText('battleground_first_win', 120)).toBe('+120 Honor (First Win)');
+    expect(honorFloatReasonKey('battleground_win')).toBeNull();
+  });
+
+  it('the named reasons are exactly the mapped ones', () => {
     expect(Object.keys(HONOR_FLOAT_REASON_KEYS).sort()).toEqual([...NAMED].sort());
     for (const reason of NAMED) expect(honorFloatReasonKey(reason), reason).not.toBeNull();
   });

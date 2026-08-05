@@ -851,17 +851,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.fiestaComplete': 'フィエスタ完遂',
   'hudChrome.warfare.reasons.fiestaWin': 'フィエスタ勝利',
   'hudChrome.warfare.reasons.battlegroundWin': 'ソーンホロウ平原勝利',
+  'hudChrome.warfare.reasons.battlegroundFirstWin': '本日のソーンホロウ平原初勝利',
   'hudChrome.warfare.reasons.battlegroundComplete': 'ソーンホロウ平原参戦',
   'hudChrome.warfare.reasons.battlegroundKill': '名誉ある撃破',
   'hudChrome.warfare.reasons.battlegroundAssist': '撃破アシスト',
   'hudChrome.warfare.floatReasons.kill': '撃破',
   'hudChrome.warfare.floatReasons.assist': 'アシスト',
+  'hudChrome.warfare.floatReasons.firstWin': '初勝利',
   'hudChrome.keybinds.bgFlag': '戦場フラッグアクション',
   'hudChrome.pvp.launcherTitle': 'PvP:ソーンホロウ平原と闘技場',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.bg.title': 'ソーンホロウ平原',
   'hudChrome.bg.blurb':
-    'ソーンピークの影が落ちる、壁に囲まれた窪地を挟んで二つの廃城が向かい合う。南に真紅、北に蒼藍、その間には未だどちらの手にも落ちていない古い廃墟の中庭が横たわる。五対五、旗は各一本。相手の旗を五度持ち帰った側が戦場を制する。',
+    'ソーンピークの影が落ちる、壁に囲まれた窪地を挟んで二つの廃城が向かい合う。南に真紅、北に蒼藍、その間には未だどちらの手にも落ちていない古い廃墟の中庭が横たわる。五対五、旗は各一本。相手の旗を三度持ち帰った側が戦場を制する。',
   'hudChrome.bg.modeTag': '5v5キャプチャー・ザ・フラッグ',
   'hudChrome.bg.offlineNote': 'ソーンホロウ平原は同期中です。レルムの応答後にキューが開きます。',
   'hudChrome.bg.ratingSummary': 'レーティング。{wins}勝 / {losses}敗',
@@ -872,7 +874,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.searching': '検索中。キュー {count}/{size}。',
   'hudChrome.bg.queuedParty': '{count}人パーティ。',
   'hudChrome.bg.queueNote':
-    '5人ずつの2チーム。敵の軍旗を奪い、自軍の砦へ持ち帰れ。先に5回キャプチャーしたチームの勝利。最大5人のパーティで一緒に参加可能。スプリントルーンを拾い、遮蔽物を縫って追手を振り切ろう。',
+    '5人ずつの2チーム。敵の軍旗を奪い、自軍の砦へ持ち帰れ。先に3回キャプチャーしたチームの勝利。最大5人のパーティで一緒に参加可能。スプリントルーンを拾い、遮蔽物を縫って追手を振り切ろう。',
   'hudChrome.bg.matchInProgress': '戦闘中。{crimson}:{azure}。',
   'hudChrome.bg.ladderAllTime': 'ラダー。歴代ランキング',
   'hudChrome.bg.noRanked': 'まだ誰もランクインしていません。一番乗りを目指せ。',
@@ -922,6 +924,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.drawBanner':
     'ソーンホロウ平原引き分け{crimson}:{azure}。レーティング{rating}({delta})',
   'hudChrome.bg.endLog': 'ソーンホロウ平原終了、{crimson}:{azure}。レーティング{rating}({delta})。',
+  'hudChrome.bg.endBannerDetail':
+    'ソーンホロウ平原{crimson}:{azure}。レーティング{rating}({delta})',
+  'hudChrome.bg.endedTimer': '時間切れ',
+  'hudChrome.bg.endedForfeit': 'この試合は棄権で終了しました',
+  'hudChrome.bg.endedTimerLog': '試合時間が尽き、得点の高い側が戦場を制しました。',
+  'hudChrome.bg.endedForfeitLog': 'この試合は棄権で終了しました。',
+  'hudChrome.bg.firstWinBonusLine': '本日の初勝利:名誉+{honor}',
+  'hudChrome.bg.firstWinBonusLog': '本日の初勝利:追加で名誉を{honor}獲得しました。',
+  'hudChrome.bg.timeWarningMinutes': '残り{minutes}分',
+  'hudChrome.bg.timeWarningOneMinute': '残り1分',
+  'hudChrome.bg.timeWarningMinutesLog': '戦闘は残り{minutes}分です。',
+  'hudChrome.bg.timeWarningOneMinuteLog': '戦闘は残り1分です。',
   'hudChrome.bg.map.crimsonKeep': '真紅の城塞',
   'hudChrome.bg.map.azureKeep': '蒼藍の城塞',
   'hudChrome.bg.map.ruinCourtyard': '廃墟の中庭',
@@ -938,7 +952,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '壁に囲まれた野外の戦場は、3つの区画に分かれています。両チームそれぞれの前庭と、その間に挟まれた「廃墟の中庭」です。全幅を貫く2枚の隔壁が境界となり、区画間の移動は必ず争奪点を通ります。広い正門と、隔壁をまたぐ門楼です。門楼の2つの扉は互い違いに開いており、伏撃の角を回り込む必要があります。各砦は正面口以外が完全に封じられているため、旗をめぐる出入りは必ず同じ開口部を通ります。その正面口には低いバリケードが立ち、まっすぐな突撃を阻みます。中庭には空洞の中心遺跡と側翼の2つのスプリントルーンがあり、残る2つは旗への進路に待っています。さらに各正門の中庭側入口にはバトルルーンまたはウォードルーン(短時間、与ダメージ増加か被ダメージ軽減)が待機:両方の台は同じ面で試合を開始し、取得のたびに面が切り替わります。',
   'guide.thornhollowPage.flagsHeading': '旗',
   'guide.thornhollowPage.flagsBody':
-    '各砦は自軍の旗を守っています。敵の旗を奪って自軍の旗座まで運べば得点。先に5回キャプチャーしたチームの勝利で、時間切れの戦いはスコアで決着します。倒された運び手はその場に旗を落とします。敵は拾い直せますが、旗の持ち主チームは近づくだけで即座に旗を戻せます。また、旗は決して隠れません。旗を拾うとステルスは解除され、運び手がどんな手段であれ姿を消せば、旗はその場に落ちます。',
+    '各砦は自軍の旗を守っています。敵の旗を奪って自軍の旗座まで運べば得点。先に3回キャプチャーしたチームの勝利で、時間切れの戦いはスコアで決着します。倒された運び手はその場に旗を落とします。敵は拾い直せますが、旗の持ち主チームは近づくだけで即座に旗を戻せます。また、旗は決して隠れません。旗を拾うとステルスは解除され、運び手がどんな手段であれ姿を消せば、旗はその場に落ちます。',
   'guide.thornhollowPage.respawnBody':
     '死は古典の儀式のまま:遺体はあなた自身が解放するまでその場に残り、魂は自陣キープの傍らの柵に囲まれた墓地に現れ、次のチーム復活ウェーブまでそこに縛られます。ウェーブは待機中の霊体を全員同時に蘇らせます。両チームのウェーブは意図的にずらされており、戦いが同時に完全リセットされることはありません。遺体走りも、スピリットヒーラーとの取引もありません:解放し、ウェーブを待ち、戦うのみ。',
   'guide.thornhollowPage.pickupNote':

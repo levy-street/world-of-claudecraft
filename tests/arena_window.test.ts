@@ -57,8 +57,20 @@ describe('arena_window: WCAG chrome (focusable controls + focus-return)', () => 
     expect(code).toContain("t('hudChrome.bg.ladderOnline')");
     expect(code).toContain("t('hudChrome.bg.noChallengers')");
     expect(code).toContain('this.bgOnlineLadderHtml(view.ladder)');
-    // Order inside the Thornhollow body: online section, then all-time.
-    expect(code).toContain('this.bgActionHtml(view.action) + onlineSection + allTimeSection');
+    // Order inside the Thornhollow body: the first-win chip, the queue
+    // affordance it invites a click on, then the online section, then all-time.
+    expect(code).toContain('this.bgFirstWinChipHtml(view.firstWinBonus)');
+    expect(code).toContain('this.bgActionHtml(view.action)');
+    // The COMPOSED expression, not the declarations above it: the sections are
+    // built in a different order than they are concatenated.
+    const bgBody = code.slice(
+      code.indexOf('private bgBodyHtml'),
+      code.indexOf('private bgActionHtml'),
+    );
+    const composed = bgBody.slice(bgBody.indexOf('return ('));
+    expect(composed.indexOf('bgFirstWinChipHtml')).toBeLessThan(composed.indexOf('bgActionHtml'));
+    expect(composed.indexOf('bgActionHtml')).toBeLessThan(composed.indexOf('onlineSection'));
+    expect(composed.indexOf('onlineSection')).toBeLessThan(composed.indexOf('allTimeSection'));
     // The shared row family (the arena's ladderHtml markup), not a bespoke one:
     // read the new builder's own body rather than counting occurrences.
     const body = code.slice(

@@ -1,3 +1,5 @@
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { isDispellableAura } from '../src/sim/aura_classify';
 import { BG_GRAVEYARDS, BG_POWER_RUNES, BG_SPEED_RUNES } from '../src/sim/battleground_layout';
@@ -6,13 +8,17 @@ import { offerResurrection } from '../src/sim/combat/resurrection_offer';
 import { battlegroundOrigin, instanceOrigin, isBgPos } from '../src/sim/data';
 import { summonMountItem, toggleMount } from '../src/sim/mounts';
 import {
+  awardBattlegroundHonor,
   BATTLEGROUND_ASSIST_HONOR,
+  BATTLEGROUND_FIRST_WIN_BONUS_HONOR,
+  BATTLEGROUND_FIRST_WIN_BONUS_MULT,
   BATTLEGROUND_KILL_HONOR,
   BATTLEGROUND_LOSS_HONOR,
   BATTLEGROUND_WIN_HONOR,
 } from '../src/sim/pvp';
 import { eloDelta, Sim } from '../src/sim/sim';
 import {
+  BG_CAPS_TO_WIN,
   BG_CARRIER_VULN_DELAY,
   BG_CARRIER_VULN_INTERVAL,
   BG_END_HOLD,
@@ -24,9 +30,11 @@ import {
   BG_PREMADE_HOLD,
   BG_RATING_BAND,
   BG_TEAM_SIZE,
+  BG_TIME_WARNINGS,
   BG_WAVE_OFFSET,
   BG_WAVE_PERIOD,
   type BgMatch,
+  bgAllPids,
   bgCarryingFlag,
   bgResolveDesertion,
   CARRIED_FLAG_AURA_ID,
@@ -36,6 +44,12 @@ import {
   startBgMatch,
   updateBattleground,
 } from '../src/sim/social/battleground';
+import {
+  BG_OUTCOME_LOG_CAP,
+  createBgOutcomeLog,
+  drainBgOutcomes,
+  recordBgOutcome,
+} from '../src/sim/social/battleground_outcomes';
 import { DT, type SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
@@ -996,7 +1010,7 @@ describe('Thornhollow Fields: deliberate pickup + automatic return', () => {
     expect(match.flags[1].state).toBe('home');
   });
 
-  it('grab, run it home, score; first to five captures wins and cleans up', () => {
+  it('grab, run it home, score; first to BG_CAPS_TO_WIN captures wins and cleans up', () => {
     const { sim, pids } = tenInQueue();
     const match = sim.bgMatchFor(pids[0])!;
     toActive(sim, match);
@@ -1004,19 +1018,20 @@ describe('Thornhollow Fields: deliberate pickup + automatic return', () => {
     const returnPos = match.returns.get(carrier)!;
 
     let ended = false;
-    for (let cap = 0; cap < 5; cap++) {
+    for (let cap = 0; cap < BG_CAPS_TO_WIN; cap++) {
       captureOnce(sim, match, carrier);
       expect(match.scores[0]).toBe(cap + 1);
-      if (cap < 4) expect(match.flags[1].state).toBe('home'); // captured flag resets home
+      // captured flag resets home, except on the winning capture
+      if (cap < BG_CAPS_TO_WIN - 1) expect(match.flags[1].state).toBe('home');
     }
-    // The fifth capture freezes the match on the result screen first; the
+    // The WINNING capture freezes the match on the result screen first; the
     // release home comes only after the BG_END_HOLD lapses.
     expect(match.state).toBe('ended');
     expect(sim.bgMatchFor(carrier)).toBe(match);
     for (let i = 0; i < 20 * (BG_END_HOLD + 1); i++) sim.tick();
     ended = sim.bgMatchFor(carrier) === null;
     expect(ended).toBe(true);
-    expect(match.scores[0]).toBe(5);
+    expect(match.scores[0]).toBe(BG_CAPS_TO_WIN);
     // restored to the overworld exactly where they queued
     const e = sim.entities.get(carrier)!;
     expect(isBgPos(e.pos.x)).toBe(false);
@@ -1024,7 +1039,7 @@ describe('Thornhollow Fields: deliberate pickup + automatic return', () => {
     expect(e.pos.z).toBeCloseTo(returnPos.z, 3);
     // meta recorded the result + captures
     expect(sim.meta(carrier)!.bgWins).toBe(1);
-    expect(sim.meta(carrier)!.bgCaptures).toBe(5);
+    expect(sim.meta(carrier)!.bgCaptures).toBe(BG_CAPS_TO_WIN);
     expect(sim.meta(match.teams[1][0])!.bgLosses).toBe(1);
   });
 
@@ -1650,6 +1665,11 @@ describe('Thornhollow Fields: runes, hostility, and the match clock', () => {
     expect(BG_CARRIER_VULN_DELAY).toBe(75); // ~two 236yd flag runs
     expect(BG_CARRIER_VULN_INTERVAL).toBe(15);
     expect(BG_MAX_DURATION).toBe(720); // 12 minute cap, scaled with the field
+    // Retuned from the launch value of 5 to the classic first-to-3 convention:
+    // at 5, a dominating side still needed about 8 minutes, so the CLOCK rather
+    // than the winning capture decided most matches.
+    expect(BG_CAPS_TO_WIN).toBe(3);
+    expect(BG_TIME_WARNINGS).toEqual([120, 60]);
     expect(BG_WAVE_PERIOD).toBe(10);
     expect(BG_WAVE_OFFSET).toBe(5);
     expect(BG_POWER_RUNE_VALUE).toBeCloseTo(0.15, 10);
@@ -1666,7 +1686,7 @@ describe('Thornhollow Fields: runes, hostility, and the match clock', () => {
     const winner = match.teams[0][0];
     const loser = match.teams[1][0];
     sim.meta(loser)!.bgRating = BG_MIN_RATING + 1; // one point above the floor
-    for (let cap = 0; cap < 5; cap++) captureOnce(sim, match, winner);
+    for (let cap = 0; cap < BG_CAPS_TO_WIN; cap++) captureOnce(sim, match, winner);
     expect(sim.meta(loser)!.bgRating).toBe(BG_MIN_RATING); // clamped, not negative
     expect(sim.meta(winner)!.bgRating).toBeGreaterThan(1500); // winner unaffected
   });
@@ -1755,7 +1775,7 @@ describe('Thornhollow Fields: runes, hostility, and the match clock', () => {
     );
     const winners = [...match.teams[0]];
     const losers = [...match.teams[1]];
-    for (let cap = 0; cap < 5; cap++) captureOnce(sim, match, winners[0]);
+    for (let cap = 0; cap < BG_CAPS_TO_WIN; cap++) captureOnce(sim, match, winners[0]);
     const after = [...winners, ...losers].reduce((s, p) => s + sim.meta(p)!.bgRating, 0);
     expect(after).toBe(before); // zero-sum (no one near the floor)
     expect(sim.meta(winners[0])!.bgRating).toBeGreaterThan(1500);
@@ -1819,6 +1839,14 @@ describe('Thornhollow Fields: review-hardening pins', () => {
     expect(powerRune.type, 'a claimed power pad flips its face').toBe(
       faceBefore === 'damage' ? 'defense' : 'damage',
     );
+
+    // The remaining-time calls fire far past the 20s window above, so drive the
+    // clock to a crossing INSIDE the observer: a phase that emits ten events is
+    // exactly the shape that could quietly grow a draw later.
+    match.timer = BG_MAX_DURATION - BG_TIME_WARNINGS[0] - DT;
+    updateBattleground(sim.ctx);
+    expect(match.timeWarningsFired.has(BG_TIME_WARNINGS[0]), 'the call really fired').toBe(true);
+    expect(draws, 'the remaining-time call draws nothing either').toBe(0);
   });
 
   it('a single deserter takes the rating loss and the recorded L; the team fights on', () => {
@@ -1898,7 +1926,7 @@ describe('Thornhollow Fields: review-hardening pins', () => {
     const match = sim.bgMatchFor(pids[0])!;
     toActive(sim, match);
     const winner = match.teams[0][0];
-    for (let cap = 0; cap < 5; cap++) captureOnce(sim, match, winner);
+    for (let cap = 0; cap < BG_CAPS_TO_WIN; cap++) captureOnce(sim, match, winner);
     const daily = sim.meta(winner)!.honorArenaDaily!;
     expect(daily.bgResultsByOpponent).toBeTruthy();
     expect(Object.values(daily.bgResultsByOpponent!)).toEqual([1]);
@@ -1913,14 +1941,19 @@ describe('Thornhollow Fields: review-hardening pins', () => {
     const rematch = sim.bgMatchFor(winner)!;
     toActive(sim, rematch);
     const rewinner = rematch.teams[0].includes(winner) ? winner : rematch.teams[1][0];
-    for (let cap = 0; cap < 5; cap++) captureOnce(sim, rematch, rematch.teams[0][0]);
+    for (let cap = 0; cap < BG_CAPS_TO_WIN; cap++) captureOnce(sim, rematch, rematch.teams[0][0]);
     const team0Won = rematch.teams[0].includes(rewinner);
     const meta = sim.meta(rewinner)!;
     expect(meta.honorArenaDaily!.date).toBe('2026-07-27'); // window re-keyed
     expect(Object.values(meta.honorArenaDaily!.bgResultsByOpponent ?? {})).toEqual([1]);
-    // full price again, NOT the same-day repeat decay
+    // full price again, NOT the same-day repeat decay. A WIN on the new day
+    // also re-arms the first-win-of-the-day bonus, so it pays base + bonus.
     const paid = meta.honor - (rewinner === winner ? honorAfterDayOne : 0);
-    expect(paid).toBe(team0Won ? BATTLEGROUND_WIN_HONOR : BATTLEGROUND_LOSS_HONOR);
+    expect(paid).toBe(
+      team0Won
+        ? BATTLEGROUND_WIN_HONOR + BATTLEGROUND_FIRST_WIN_BONUS_HONOR
+        : BATTLEGROUND_LOSS_HONOR,
+    );
     // persists across a save/load round trip (the anti-win-trading window)
     const state = sim.serializeCharacter(winner)!;
     expect(state.honorArenaDaily!.bgResultsByOpponent).toEqual(daily.bgResultsByOpponent);
@@ -2215,9 +2248,14 @@ describe('Thornhollow Fields: honor + persistence', () => {
     toActive(sim, match);
     const winner = match.teams[0][0];
     const loser = match.teams[1][0];
-    for (let cap = 0; cap < 5; cap++) captureOnce(sim, match, winner);
-    expect(sim.meta(winner)!.honor).toBe(BATTLEGROUND_WIN_HONOR);
-    expect(sim.meta(winner)!.lifetimeHonor).toBe(BATTLEGROUND_WIN_HONOR);
+    for (let cap = 0; cap < BG_CAPS_TO_WIN; cap++) captureOnce(sim, match, winner);
+    // This is also the day's FIRST win, so it carries the daily bonus; the
+    // decay arm below is what this case is really about, and it is measured
+    // against the win award alone once the bonus is spent.
+    const firstDayWin = BATTLEGROUND_WIN_HONOR + BATTLEGROUND_FIRST_WIN_BONUS_HONOR;
+    expect(sim.meta(winner)!.honor).toBe(firstDayWin);
+    expect(sim.meta(winner)!.lifetimeHonor).toBe(firstDayWin);
+    // A LOSS never arms or claims the daily bonus.
     expect(sim.meta(loser)!.honor).toBe(BATTLEGROUND_LOSS_HONOR);
     for (let i = 0; i < 20 * (BG_END_HOLD + 1); i++) sim.tick(); // run out the result screen
 
@@ -2236,9 +2274,11 @@ describe('Thornhollow Fields: honor + persistence', () => {
     expect(rematch.teams[1]).toEqual(teamB);
     toActive(sim, rematch);
     const winner2 = rematch.teams[0][0];
-    for (let cap = 0; cap < 5; cap++) captureOnce(sim, rematch, winner2);
+    for (let cap = 0; cap < BG_CAPS_TO_WIN; cap++) captureOnce(sim, rematch, winner2);
     const w2meta = sim.meta(winner2)!;
-    expect(w2meta.honor).toBe(BATTLEGROUND_WIN_HONOR + Math.floor(BATTLEGROUND_WIN_HONOR * 0.5));
+    // The second win of the same day pays the decayed base and NOTHING else:
+    // the daily bonus was already claimed by the first win above.
+    expect(w2meta.honor).toBe(firstDayWin + Math.floor(BATTLEGROUND_WIN_HONOR * 0.5));
   });
 
   it('battleground standing round-trips through CharacterState and stays absent until first result', () => {
@@ -2261,5 +2301,587 @@ describe('Thornhollow Fields: honor + persistence', () => {
     expect(sim2.meta(a2)!.bgRating).toBe(1633);
     expect(sim2.meta(a2)!.bgWins).toBe(7);
     expect(sim2.meta(a2)!.bgCaptures).toBe(19);
+  });
+});
+
+describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
+  // The bonus rides the honorArenaDaily window, which only rolls over when the
+  // host supplies a calendar, so every arm here sets one explicitly.
+  const bonusEvents = (evs: SimEvent[], pid: number) =>
+    evs.filter(
+      (e): e is Extract<SimEvent, { type: 'honor' }> =>
+        e.type === 'honor' && e.pid === pid && e.reason === 'battleground_first_win',
+    );
+
+  function playedOutWin(sim: Sim, match: BgMatch, winner: number): SimEvent[] {
+    const seen: SimEvent[] = [];
+    const azure = match.flags[1];
+    const crimsonHome = match.flags[0].home;
+    for (let cap = 0; cap < BG_CAPS_TO_WIN; cap++) {
+      tp(sim, winner, azure.pos.x, azure.pos.z);
+      sim.bgFlagAction(winner);
+      seen.push(...sim.tick());
+      tp(sim, winner, crimsonHome.x, crimsonHome.z);
+      seen.push(...sim.tick());
+    }
+    return seen;
+  }
+
+  it('the bonus is N times the ordinary win award, paid on top of it', () => {
+    // The one tunable, pinned to the exported multiple rather than a literal so
+    // retuning N moves the const and this assertion together.
+    expect(BATTLEGROUND_FIRST_WIN_BONUS_MULT).toBe(2);
+    expect(BATTLEGROUND_FIRST_WIN_BONUS_HONOR).toBe(
+      BATTLEGROUND_WIN_HONOR * BATTLEGROUND_FIRST_WIN_BONUS_MULT,
+    );
+  });
+
+  it('pays exactly once per UTC day, under its own honor reason', () => {
+    const { sim, pids } = tenInQueue();
+    sim.utcDay = '2026-07-26';
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const winner = match.teams[0][0];
+    const loser = match.teams[1][0];
+    const evs = playedOutWin(sim, match, winner);
+
+    const paid = bonusEvents(evs, winner);
+    expect(paid.length, 'exactly one bonus grant').toBe(1);
+    expect(paid[0].amount).toBe(BATTLEGROUND_FIRST_WIN_BONUS_HONOR);
+    expect(sim.meta(winner)!.honor).toBe(
+      BATTLEGROUND_WIN_HONOR + BATTLEGROUND_FIRST_WIN_BONUS_HONOR,
+    );
+    expect(sim.meta(winner)!.honorArenaDaily!.bgFirstWinClaimed).toBe(true);
+    // The LOSING side neither claims nor is paid it.
+    expect(bonusEvents(evs, loser).length).toBe(0);
+    expect(sim.meta(loser)!.honorArenaDaily!.bgFirstWinClaimed).toBeUndefined();
+    expect(sim.meta(loser)!.honor).toBe(BATTLEGROUND_LOSS_HONOR);
+  });
+
+  it('a SECOND win the same day pays the base award only', () => {
+    const { sim, pids } = tenInQueue();
+    sim.utcDay = '2026-07-26';
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const winner = match.teams[0][0];
+    playedOutWin(sim, match, winner);
+    const afterFirst = sim.meta(winner)!.honor;
+    for (let i = 0; i < 20 * (BG_END_HOLD + 1); i++) sim.tick();
+
+    // Fresh opposing identity so the repeat DR on the BASE award is not what is
+    // being measured: only the bonus should be missing the second time.
+    const fresh: number[] = [];
+    for (let i = 0; i < 5; i++) {
+      const p = sim.addPlayer('mage', `Fresh${i}`);
+      tp(sim, p, 0, -40);
+      sim.entities.get(p)!.level = BG_MIN_LEVEL;
+      fresh.push(p);
+    }
+    startBgMatch(sim.ctx, [...match.teams[0]], fresh);
+    const rematch = sim.bgMatchFor(winner)!;
+    toActive(sim, rematch);
+    const evs = playedOutWin(sim, rematch, winner);
+    expect(bonusEvents(evs, winner).length, 'the day is spent').toBe(0);
+    expect(sim.meta(winner)!.honor - afterFirst).toBe(BATTLEGROUND_WIN_HONOR);
+  });
+
+  it('the UTC rollover re-arms it, and the claim survives a save/load round trip', () => {
+    const { sim, pids } = tenInQueue();
+    sim.utcDay = '2026-07-26';
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const winner = match.teams[0][0];
+    playedOutWin(sim, match, winner);
+
+    // PERSISTENCE: the claimed flag is written and reloaded, so a relog on the
+    // same day cannot re-earn it.
+    const state = sim.serializeCharacter(winner)!;
+    expect(state.honorArenaDaily!.bgFirstWinClaimed).toBe(true);
+    const sim2 = makeWorld();
+    sim2.utcDay = '2026-07-26';
+    const reloaded = sim2.addPlayer('warrior', 'Reload', { state });
+    expect(sim2.meta(reloaded)!.honorArenaDaily!.bgFirstWinClaimed).toBe(true);
+    expect(sim2.bgInfoFor(reloaded)!.firstWinBonusReady, 'still spent after a relog').toBe(false);
+    // ...and the NEXT day re-arms it without any award having run.
+    sim2.utcDay = '2026-07-27';
+    expect(sim2.bgInfoFor(reloaded)!.firstWinBonusReady).toBe(true);
+
+    // A clean character writes NOTHING (byte-stable saves): absent until claimed.
+    const sim3 = makeWorld();
+    const clean = sim3.addPlayer('warrior', 'Clean');
+    expect(sim3.serializeCharacter(clean)!.honorArenaDaily?.bgFirstWinClaimed).toBeUndefined();
+
+    for (let i = 0; i < 20 * (BG_END_HOLD + 1); i++) sim.tick();
+    sim.utcDay = '2026-07-27';
+    expect(sim.bgInfoFor(winner)!.firstWinBonusReady, 'a new day re-arms the chip').toBe(true);
+    const before = sim.meta(winner)!.honor;
+    startBgMatch(sim.ctx, [...match.teams[0]], [...match.teams[1]]);
+    const rematch = sim.bgMatchFor(winner)!;
+    toActive(sim, rematch);
+    const evs = playedOutWin(sim, rematch, winner);
+    expect(bonusEvents(evs, winner).length).toBe(1);
+    // The base award decays (same opponents, but the DR window rolled over too),
+    // so the bonus is measured on its own.
+    expect(sim.meta(winner)!.honor - before).toBe(
+      BATTLEGROUND_WIN_HONOR + BATTLEGROUND_FIRST_WIN_BONUS_HONOR,
+    );
+  });
+
+  it('an UNRATED dev match never claims it', () => {
+    const sim = makeWorld();
+    sim.utcDay = '2026-07-26';
+    const pids: number[] = [];
+    for (let i = 0; i < 4; i++) {
+      const p = sim.addPlayer('warrior', `D${i}`);
+      tp(sim, p, 0, -40);
+      sim.entities.get(p)!.level = BG_MIN_LEVEL;
+      sim.bgQueueJoin(p);
+      pids.push(p);
+    }
+    devStartBg(sim.ctx);
+    const match = sim.bgMatchFor(pids[0])!;
+    expect(match.rated).toBe(false);
+    toActive(sim, match);
+    const winner = match.teams[0][0];
+    const evs = [...sim.tick()];
+    endBgMatch(sim.ctx, match, 0, 'caps');
+    evs.push(...sim.tick());
+    expect(bonusEvents(evs, winner).length).toBe(0);
+    expect(sim.meta(winner)!.honorArenaDaily?.bgFirstWinClaimed).toBeUndefined();
+    expect(sim.bgInfoFor(winner)!.firstWinBonusReady, 'still on the table').toBe(true);
+  });
+
+  it('a FORFEIT win never claims it (forfeits pay no honor at all)', () => {
+    const { sim, pids } = tenInQueue();
+    sim.utcDay = '2026-07-26';
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const winner = match.teams[0][0];
+    const before = sim.meta(winner)!.honor;
+    endBgMatch(sim.ctx, match, 0, 'forfeit');
+    const evs = sim.tick();
+    expect(bonusEvents(evs, winner).length).toBe(0);
+    expect(sim.meta(winner)!.honor).toBe(before);
+    expect(sim.meta(winner)!.honorArenaDaily?.bgFirstWinClaimed).toBeUndefined();
+  });
+
+  it('a DRAW never claims it', () => {
+    const { sim, pids } = tenInQueue();
+    sim.utcDay = '2026-07-26';
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    endBgMatch(sim.ctx, match, null, 'timeout');
+    const evs = sim.tick();
+    expect(bonusEvents(evs, pid).length).toBe(0);
+    expect(sim.meta(pid)!.honorArenaDaily!.bgFirstWinClaimed).toBeUndefined();
+    expect(sim.bgInfoFor(pid)!.firstWinBonusReady).toBe(true);
+  });
+
+  it('the bgEnd event carries the bonus so the finish surface can name it', () => {
+    const { sim, pids } = tenInQueue();
+    sim.utcDay = '2026-07-26';
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const winner = match.teams[0][0];
+    const loser = match.teams[1][0];
+    const evs = playedOutWin(sim, match, winner);
+    const ends = evs.filter((e): e is Extract<SimEvent, { type: 'bgEnd' }> => e.type === 'bgEnd');
+    expect(ends.find((e) => e.pid === winner)!.firstWinBonus).toBe(
+      BATTLEGROUND_FIRST_WIN_BONUS_HONOR,
+    );
+    expect(ends.find((e) => e.pid === loser)!.firstWinBonus, 'a loss pays no bonus').toBe(0);
+  });
+
+  it('bgInfoFor REPORTS the window without rolling it over', () => {
+    // The readout must never mutate the daily window it reports on: a stale
+    // stored date reads as re-armed, and the stored date is left for the next
+    // real award to roll over.
+    const { sim, pids } = tenInQueue();
+    sim.utcDay = '2026-07-26';
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const winner = match.teams[0][0];
+    playedOutWin(sim, match, winner);
+    sim.utcDay = '2026-07-27';
+    expect(sim.bgInfoFor(winner)!.firstWinBonusReady).toBe(true);
+    expect(sim.meta(winner)!.honorArenaDaily!.date, 'the read wrote nothing').toBe('2026-07-26');
+    expect(sim.meta(winner)!.honorArenaDaily!.bgFirstWinClaimed).toBe(true);
+  });
+});
+
+describe('Thornhollow Fields: the finish surface knows WHY the match ended', () => {
+  const endsFor = (evs: SimEvent[], pid: number) =>
+    evs.filter(
+      (e): e is Extract<SimEvent, { type: 'bgEnd' }> => e.type === 'bgEnd' && e.pid === pid,
+    );
+
+  it("a match played to the capture target carries ended:'caps'", () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const winner = match.teams[0][0];
+    const seen: SimEvent[] = [];
+    const azure = match.flags[1];
+    const crimsonHome = match.flags[0].home;
+    for (let cap = 0; cap < BG_CAPS_TO_WIN; cap++) {
+      tp(sim, winner, azure.pos.x, azure.pos.z);
+      sim.bgFlagAction(winner);
+      seen.push(...sim.tick());
+      tp(sim, winner, crimsonHome.x, crimsonHome.z);
+      seen.push(...sim.tick());
+    }
+    const end = endsFor(seen, winner);
+    expect(end.length).toBe(1);
+    expect(end[0].ended).toBe('caps');
+    expect(end[0].won).toBe(true);
+  });
+
+  it("the match cap resolving on score carries ended:'timer', for all ten", () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    // One capture so the timeout resolves on SCORE rather than as a draw: the
+    // cause must be 'timer' whichever way the score fell.
+    captureOnce(sim, match, match.teams[0][0]);
+    match.timer = BG_MAX_DURATION - DT;
+    const evs = sim.tick();
+    const ends = evs.filter((e): e is Extract<SimEvent, { type: 'bgEnd' }> => e.type === 'bgEnd');
+    expect(ends.length, 'one per fighter').toBe(10);
+    for (const e of ends) expect(e.ended).toBe('timer');
+    expect(ends.filter((e) => e.won).length).toBe(5);
+  });
+
+  it("a forfeit carries ended:'forfeit'", () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const survivor = match.teams[0][0];
+    endBgMatch(sim.ctx, match, 0, 'forfeit');
+    expect(endsFor(sim.tick(), survivor)[0].ended).toBe('forfeit');
+  });
+});
+
+describe('Thornhollow Fields: the clock calls out its last minutes', () => {
+  const warnings = (evs: SimEvent[]) =>
+    evs.filter(
+      (e): e is Extract<SimEvent, { type: 'bgTimeWarning' }> => e.type === 'bgTimeWarning',
+    );
+
+  /** Wind the match clock to DT short of `secondsLeft` remaining, so the very
+   *  next tick is the crossing tick. */
+  function armAt(match: BgMatch, secondsLeft: number) {
+    match.timer = BG_MAX_DURATION - secondsLeft - DT;
+  }
+
+  it('each threshold fires exactly once, on its crossing tick, to all ten', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const roster = bgAllPids(match);
+    expect(roster.length).toBe(10);
+
+    for (const mark of BG_TIME_WARNINGS) {
+      armAt(match, mark);
+      const before = warnings(sim.tick());
+      expect(before.length, `the ${mark}s call fans to all ten`).toBe(10);
+      for (const w of before) expect(w.secondsLeft).toBe(mark);
+      expect([...before.map((w) => w.pid!)].sort((a, b) => a - b)).toEqual(
+        [...roster].sort((a, b) => a - b),
+      );
+      // Rewinding the clock cannot make it speak twice: the once-only claim
+      // lives on the match, not on the clock value.
+      armAt(match, mark);
+      expect(warnings(sim.tick()).length, `the ${mark}s call is once-only`).toBe(0);
+    }
+  });
+
+  it('says nothing during the form-up countdown', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    expect(match.state).toBe('countdown');
+    const seen: SimEvent[] = [];
+    for (let i = 0; i < 20 * 12 && match.state !== 'active'; i++) seen.push(...sim.tick());
+    expect(warnings(seen).length).toBe(0);
+  });
+
+  it('a match decided by captures before the threshold never announces it', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const winner = match.teams[0][0];
+    const seen: SimEvent[] = [];
+    for (let cap = 0; cap < BG_CAPS_TO_WIN; cap++) {
+      const azure = match.flags[1];
+      tp(sim, winner, azure.pos.x, azure.pos.z);
+      sim.bgFlagAction(winner);
+      seen.push(...sim.tick());
+      tp(sim, winner, match.flags[0].home.x, match.flags[0].home.z);
+      seen.push(...sim.tick());
+    }
+    expect(match.state).toBe('ended');
+    // Run the whole end hold out: the hold reuses `timer` as a COUNTDOWN, which
+    // is exactly the value that would look like "120s remaining" to a naive read.
+    for (let i = 0; i < 20 * (BG_END_HOLD + 1); i++) seen.push(...sim.tick());
+    expect(warnings(seen).length).toBe(0);
+  });
+
+  it('the one-minute call precedes the ended:timer result it warned about', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const seen: SimEvent[] = [];
+    armAt(match, 60);
+    seen.push(...sim.tick()); // the 60s call
+    match.timer = BG_MAX_DURATION - DT;
+    seen.push(...sim.tick()); // the cap resolves
+    const warnAt = seen.findIndex((e) => e.type === 'bgTimeWarning');
+    const endAt = seen.findIndex((e) => e.type === 'bgEnd');
+    expect(warnAt).toBeGreaterThanOrEqual(0);
+    expect(endAt).toBeGreaterThan(warnAt);
+    expect((seen[endAt] as Extract<SimEvent, { type: 'bgEnd' }>).ended).toBe('timer');
+  });
+
+  it('a threshold already past at the first active tick is skipped, never fired late', () => {
+    // The crossing rule, not a "remaining <= mark" read: a match seated with
+    // less clock than a threshold must not open by announcing that threshold.
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    // Straight past the 120s mark without a tick in between, then cross 60s.
+    match.timer = BG_MAX_DURATION - 61;
+    const skipped = warnings(sim.tick());
+    expect(skipped.length, 'the 120s mark was never crossed').toBe(0);
+    armAt(match, 60);
+    const spoke = warnings(sim.tick());
+    expect(spoke.length).toBe(10);
+    expect(spoke[0].secondsLeft).toBe(60);
+    expect(match.timeWarningsFired.has(120)).toBe(false);
+  });
+});
+
+describe('Thornhollow Fields: resolved matches leave one operator record', () => {
+  it('writes exactly ONE record per resolved rated match, never one per fighter', () => {
+    // The whole reason the record exists rather than a counter driven off the
+    // bgEnd events: bgEnd is PERSONAL, so an event-driven counter would book
+    // every match ten times.
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const winner = match.teams[0][0];
+    for (let cap = 0; cap < BG_CAPS_TO_WIN - 1; cap++) captureOnce(sim, match, winner);
+    // Wind the match clock rather than ticking five real minutes: the duration
+    // recorded must be the ELAPSED active seconds, not a tick count.
+    match.timer = 300;
+    captureOnce(sim, match, winner);
+
+    const drained = drainBgOutcomes(sim.bgOutcomes);
+    expect(drained.length).toBe(1);
+    expect(drained[0].matchId).toBe(match.id);
+    expect(drained[0].ended).toBe('caps');
+    expect(drained[0].scoreCrimson).toBe(BG_CAPS_TO_WIN);
+    expect(drained[0].scoreAzure).toBe(0);
+    expect(drained[0].durationSec).toBe(300);
+    expect(drained[0].grouped, 'ten solo queuers were never grouped').toBe(false);
+    // Drained means drained: a second drain sees nothing, so a per-tick host
+    // cannot double-count the same match.
+    expect(drainBgOutcomes(sim.bgOutcomes).length).toBe(0);
+    // And the end hold running out records nothing further.
+    for (let i = 0; i < 20 * (BG_END_HOLD + 1); i++) sim.tick();
+    expect(drainBgOutcomes(sim.bgOutcomes).length).toBe(0);
+  });
+
+  it('records the timer ending and the elapsed active seconds', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    captureOnce(sim, match, match.teams[0][0]);
+    match.timer = BG_MAX_DURATION - DT;
+    sim.tick();
+    const [record] = drainBgOutcomes(sim.bgOutcomes);
+    expect(record.ended).toBe('timer');
+    expect(record.durationSec).toBe(BG_MAX_DURATION);
+  });
+
+  it('writes NOTHING for an unrated /dev match', () => {
+    const sim = makeWorld();
+    const pids: number[] = [];
+    for (let i = 0; i < 4; i++) {
+      const p = sim.addPlayer('warrior', `D${i}`);
+      tp(sim, p, 0, -40);
+      sim.entities.get(p)!.level = BG_MIN_LEVEL;
+      sim.bgQueueJoin(p);
+      pids.push(p);
+    }
+    devStartBg(sim.ctx);
+    const match = sim.bgMatchFor(pids[0])!;
+    expect(match.rated).toBe(false);
+    toActive(sim, match);
+    endBgMatch(sim.ctx, match, 0, 'caps');
+    expect(drainBgOutcomes(sim.bgOutcomes).length, 'a dev match must not skew the averages').toBe(
+      0,
+    );
+  });
+
+  it('marks a match seated from a real queued GROUP, and only that', () => {
+    const sim = makeWorld();
+    const leader = sim.addPlayer('warrior', 'Leader');
+    tp(sim, leader, 0, -40);
+    sim.entities.get(leader)!.level = BG_MIN_LEVEL;
+    for (let i = 0; i < 2; i++) {
+      const m = sim.addPlayer('priest', `Mate${i}`);
+      tp(sim, m, 0, -40);
+      sim.entities.get(m)!.level = BG_MIN_LEVEL;
+      sim.partyInvite(m, leader);
+      sim.partyAccept(m);
+    }
+    for (let i = 0; i < 7; i++) {
+      const s = sim.addPlayer('rogue', `Solo${i}`);
+      tp(sim, s, 0, -40);
+      sim.entities.get(s)!.level = BG_MIN_LEVEL;
+      sim.bgQueueJoin(s);
+    }
+    sim.bgQueueJoin(leader); // queues the whole premade as one group
+    sim.tick();
+    const match = sim.bgMatchFor(leader)!;
+    // The flag is snapshotted at START, which is the only moment it is knowable:
+    // by resolve time both teams are welded into match parties.
+    expect(match.grouped).toBe(true);
+    toActive(sim, match);
+    endBgMatch(sim.ctx, match, 0, 'caps');
+    const [record] = drainBgOutcomes(sim.bgOutcomes);
+    expect(record.grouped).toBe(true);
+  });
+
+  it('reads the QUEUED group, not live party membership at match start', () => {
+    // A solo queuer who accepts an invite while WAITING did not queue as a
+    // group, and a live-partyOf read at start would mislabel the whole match.
+    const { sim, pids } = tenInQueue();
+    // tenInQueue already seated them; re-do it with a mid-wait party instead.
+    const sim2 = makeWorld();
+    const queued: number[] = [];
+    for (let i = 0; i < 10; i++) {
+      const p = sim2.addPlayer('warrior', `S${i}`);
+      tp(sim2, p, 0, -40);
+      sim2.entities.get(p)!.level = BG_MIN_LEVEL;
+      sim2.bgQueueJoin(p); // every one of them SOLO
+      queued.push(p);
+    }
+    // ...and only now do two of them party up, still in the queue.
+    sim2.partyInvite(queued[1], queued[0]);
+    sim2.partyAccept(queued[1]);
+    sim2.tick();
+    const match2 = sim2.bgMatchFor(queued[0])!;
+    expect(match2.grouped, 'nobody queued as a group').toBe(false);
+    expect(sim.bgMatchFor(pids[0])!.grouped, 'the plain solo ten too').toBe(false);
+  });
+
+  it('a /dev forced ending writes NOTHING, even on a genuinely rated match', () => {
+    // `rated` alone cannot keep it out: this is a real queued match whose clock
+    // and ending are a dev's, so it would poison the caps-vs-timer ratio.
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    expect(match.rated).toBe(true);
+    toActive(sim, match);
+    expect(devEndBg(sim.ctx, pids[0])).toBe(true);
+    expect(match.resultRecorded, 'the result itself still resolved').toBe(true);
+    expect(drainBgOutcomes(sim.bgOutcomes).length).toBe(0);
+  });
+
+  it('records a forfeit during form-up as a zero duration, never a countdown value', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    expect(match.state).toBe('countdown');
+    endBgMatch(sim.ctx, match, 0, 'forfeit');
+    const [record] = drainBgOutcomes(sim.bgOutcomes);
+    expect(record.ended).toBe('forfeit');
+    expect(record.durationSec).toBe(0);
+  });
+
+  it('caps the undrained log so a host that never drains cannot leak', () => {
+    // The offline and headless hosts never drain at all; the cap is what keeps
+    // that a fixed, trivial tail instead of a slow leak.
+    const log = createBgOutcomeLog();
+    for (let i = 0; i < BG_OUTCOME_LOG_CAP + 25; i++) {
+      recordBgOutcome(log, {
+        matchId: i,
+        durationSec: 100,
+        scoreCrimson: 1,
+        scoreAzure: 0,
+        ended: 'caps',
+        grouped: false,
+      });
+    }
+    expect(log.length).toBe(BG_OUTCOME_LOG_CAP);
+    // The OLDEST are the ones dropped: a stale record is worth less than a fresh one.
+    expect(log[log.length - 1].matchId).toBe(BG_OUTCOME_LOG_CAP + 24);
+    expect(log[0].matchId).toBe(25);
+  });
+});
+
+describe('Thornhollow Fields: the honor award reports what it paid', () => {
+  it('returns the base award and the bonus, and total is their sum', () => {
+    // The bgEnd event needs the BONUS on its own (the finish surface names it),
+    // and the caller needs the total to stay honest about what was credited.
+    const sim = makeWorld();
+    sim.utcDay = '2026-07-26';
+    const pid = sim.addPlayer('warrior', 'Champ');
+    const meta = sim.meta(pid)!;
+
+    const first = awardBattlegroundHonor(sim.ctx, meta, 'team:enemies', 'win');
+    expect(first.firstWinBonus).toBe(BATTLEGROUND_FIRST_WIN_BONUS_HONOR);
+    expect(first.total).toBe(BATTLEGROUND_WIN_HONOR + BATTLEGROUND_FIRST_WIN_BONUS_HONOR);
+    expect(meta.honor).toBe(first.total);
+
+    // A different opposing identity, so the base award is undecayed and the
+    // ONLY difference the second time is the spent daily bonus.
+    const second = awardBattlegroundHonor(sim.ctx, meta, 'team:others', 'win');
+    expect(second.firstWinBonus).toBe(0);
+    expect(second.total).toBe(BATTLEGROUND_WIN_HONOR);
+    expect(meta.honor).toBe(first.total + second.total);
+
+    // A loss pays the completion award and never the bonus.
+    const loss = awardBattlegroundHonor(sim.ctx, meta, 'team:third', 'loss');
+    expect(loss.firstWinBonus).toBe(0);
+    expect(loss.total).toBe(BATTLEGROUND_LOSS_HONOR);
+  });
+
+  it('does not burn the daily claim when the grant credits nothing', () => {
+    // grantHonor credits zero once a purse is at the honor ceiling; spending the
+    // day's one bonus for zero honor is the wrong way to lose that race.
+    const sim = makeWorld();
+    sim.utcDay = '2026-07-26';
+    const pid = sim.addPlayer('warrior', 'Capped');
+    const meta = sim.meta(pid)!;
+    meta.honor = Number.MAX_SAFE_INTEGER;
+    meta.lifetimeHonor = Number.MAX_SAFE_INTEGER;
+
+    const award = awardBattlegroundHonor(sim.ctx, meta, 'team:enemies', 'win');
+    expect(award.firstWinBonus).toBe(0);
+    expect(meta.honorArenaDaily!.bgFirstWinClaimed, 'the claim is still armed').toBeUndefined();
+  });
+});
+
+describe('the outcome log stays observability-only', () => {
+  it('is reached by the write site, the leaf, the seam, and the host drain, and nothing else', () => {
+    // `bgOutcomes` is deliberately HOST-DIVERGENT state: the authoritative
+    // server drains it every tick and the offline / headless hosts never drain
+    // at all, so its CONTENTS legitimately differ across the three hosts. That
+    // is only safe while nothing gameplay-facing reads it, which no type can
+    // express, so the reference set is pinned here.
+    const root = new URL('..', import.meta.url);
+    const hits = execFileSync('grep', ['-rl', 'bgOutcomes', 'src', 'server', 'headless'], {
+      cwd: fileURLToPath(root),
+      encoding: 'utf8',
+    })
+      .split('\n')
+      .filter(Boolean)
+      .sort();
+    expect(hits).toEqual([
+      'server/game.ts', // the one host that drains
+      'src/sim/sim.ts', // the backing array + its ctx binding
+      'src/sim/sim_context.ts', // the live view
+      'src/sim/social/battleground.ts', // the one write site
+    ]);
   });
 });

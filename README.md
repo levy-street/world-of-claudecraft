@@ -243,7 +243,7 @@ Ranked wins and Fiesta takedowns pay **Honor**, which the quartermaster in town 
 
 ### Thornhollow Fields (5v5 capture the flag)
 
-Press `G` to open the PvP window (Thornhollow Fields is its primary tab, beside the 1v1 and 2v2 arena brackets) and Enter the Queue, solo or with a party of up to five (parties stay together; solos fill the rest). Two teams of five fight over a walled, open-air field with a keep at each end: steal the enemy banner with a deliberate press of the battleground action key and run it to your own stand. First to 5 captures wins inside a 12-minute cap.
+Press `G` to open the PvP window (Thornhollow Fields is its primary tab, beside the 1v1 and 2v2 arena brackets) and Enter the Queue, solo or with a party of up to five (parties stay together; solos fill the rest). Two teams of five fight over a walled, open-air field with a keep at each end: steal the enemy banner with a deliberate press of the battleground action key and run it to your own stand. First to 3 captures wins inside a 12-minute cap.
 
 - **Team wave respawns** (no graveyard run): each team's fallen rise together on a staggered wave clock at their keep, briefly spawn-protected until they act.
 - **Anti-turtle carrier fatigue**: hold the enemy flag too long and you take ever-increasing damage until it is captured, dropped, or returned. The flag also refuses to hide: grabbing it breaks stealth, and a carrier who turns invisible drops it on the spot.

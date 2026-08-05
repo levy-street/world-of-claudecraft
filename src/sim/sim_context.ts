@@ -41,6 +41,7 @@ import type {
   TradeSession,
 } from './sim';
 import type { BgMatch, BgQueueGroup } from './social/battleground';
+import type { BgOutcomeRecord } from './social/battleground_outcomes';
 import type { CardDuelMatch } from './social/card_duel';
 import type { FinderFormationUnit } from './social/party';
 import type { VcState } from './social/vale_cup';
@@ -208,6 +209,10 @@ export interface SimContextPrimitives {
   readonly bgMatches: Map<number, BgMatch>;
   readonly bgBusySlots: Set<number>;
   nextBgMatchId: number;
+  // Resolved-match records the authoritative host drains post-tick
+  // (social/battleground_outcomes.ts). Observability only: no gameplay branch
+  // reads it and nothing here draws rng. Live view; the array stays on Sim.
+  readonly bgOutcomes: BgOutcomeRecord[];
   // Escort quest runs keyed by EscortDef id (src/sim/escort.ts owns every
   // mutation; the backing map stays on Sim). Live view.
   readonly escortRuns: Map<string, EscortRunState>;
@@ -1191,6 +1196,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get bgBusySlots() {
       return host.bgBusySlots;
+    },
+    get bgOutcomes() {
+      return host.bgOutcomes;
     },
     get nextBgMatchId() {
       return host.nextBgMatchId;

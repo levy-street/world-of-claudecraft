@@ -1036,7 +1036,7 @@ export const zh_CN: EnTranslations = {
     },
     "bg": {
       "title": "荆谷原野",
-      "blurb": "两座废弃的要塞隔着棘峰阴影下的围墙山谷遥遥相望：绯红在南，蔚蓝在北，而两者之间的古老废墟庭院，谁都不曾真正占据。每方五人，各持一面战旗，先将对方战旗夺回本方五次者赢得战场。",
+      "blurb": "两座废弃的要塞隔着棘峰阴影下的围墙山谷遥遥相望：绯红在南，蔚蓝在北，而两者之间的古老废墟庭院，谁都不曾真正占据。每方五人，各持一面战旗，先将对方战旗夺回本方三次者赢得战场。",
       "modeTag": "5v5夺旗战",
       "offlineNote": "荆谷原野正在同步。待王国响应后即可排队。",
       "ratingSummary": "评分。{wins}胜 / {losses}负",
@@ -1046,7 +1046,7 @@ export const zh_CN: EnTranslations = {
       "leaveQueue": "离开队列",
       "searching": "搜索中。队列 {count}/{size}。",
       "queuedParty": "{count}人小队。",
-      "queueNote": "两队各五人。夺取敌方军旗并送回己方要塞。先夺得5次者获胜。可组满5人小队一同排队;拾取疾行符文,并利用掩体甩开追兵。",
+      "queueNote": "两队各五人。夺取敌方军旗并送回己方要塞。先夺得3次者获胜。可组满5人小队一同排队;拾取疾行符文,并利用掩体甩开追兵。",
       "matchInProgress": "战斗进行中。{crimson}:{azure}。",
       "ladderAllTime": "天梯。历史总榜",
       "noRanked": "尚无勇士上榜。争当第一。",
@@ -1096,7 +1096,18 @@ export const zh_CN: EnTranslations = {
       "victoryBanner": "胜利!荆谷原野{crimson}:{azure}。评分{rating}({delta})",
       "defeatBanner": "战败。荆谷原野{crimson}:{azure}。评分{rating}({delta})",
       "drawBanner": "荆谷原野平局{crimson}:{azure}。评分{rating}({delta})",
+      "endBannerDetail": "荆谷原野{crimson}:{azure}。评分{rating}({delta})",
       "endLog": "荆谷原野结束,{crimson}:{azure}。评分{rating}({delta})。",
+      "endedTimer": "时间到",
+      "endedForfeit": "本场比赛以弃权告终",
+      "endedTimerLog": "比赛时间耗尽,由比分较高的一方拿下战场。",
+      "endedForfeitLog": "本场比赛以弃权告终。",
+      "firstWinBonusLine": "每日首胜:+{honor}荣誉",
+      "firstWinBonusLog": "每日首胜:你额外获得{honor}点荣誉。",
+      "timeWarningMinutes": "还剩{minutes}分钟",
+      "timeWarningOneMinute": "还剩一分钟",
+      "timeWarningMinutesLog": "本场战斗还剩{minutes}分钟。",
+      "timeWarningOneMinuteLog": "本场战斗还剩一分钟。",
       "map": {
         "crimsonKeep": "绯红要塞",
         "azureKeep": "蔚蓝要塞",
@@ -1478,13 +1489,15 @@ export const zh_CN: EnTranslations = {
         "fiestaComplete": "完成嘉年华",
         "fiestaWin": "嘉年华胜利",
         "battlegroundWin": "荆谷原野胜利",
+        "battlegroundFirstWin": "荆谷原野每日首胜",
         "battlegroundComplete": "荆谷原野参战",
         "battlegroundKill": "荣誉击杀",
         "battlegroundAssist": "助攻击杀"
       },
       "floatReasons": {
         "kill": "击杀",
-        "assist": "助攻"
+        "assist": "助攻",
+        "firstWin": "首胜"
       }
     },
     "charSheet": {
@@ -4060,7 +4073,7 @@ export const zh_CN: EnTranslations = {
       "fieldHeading": "战场地形",
       "fieldBody": "一片有围墙的露天战场,被隔成三个区域:两队各自的前场,以及夹在中间的废墟中庭。两道横贯全场的隔墙划出边界,穿行区域之间必须经过争夺点:宽阔的正门,或是骑跨在隔墙上的门楼小屋,其错位的两扇门逼你绕过伏击死角。每座要塞除正门外全部封死,夺旗进出只有这一个口;正门前还有一道矮壁垒挡住直冲的路线。中庭里有空心的中央废墟与两枚侧翼疾行符文,另外两枚守在两旗的接近路上。每个正门的中庭入口处还有一枚战斗或守护符文(短时间内提升伤害或减免伤害):两个符文台开局同面,每次拾取后翻面。",
       "flagsHeading": "旗帜",
-      "flagsBody": "每座要塞守着本队军旗。夺取敌旗并送到己方旗座即可得分;先夺得五次者获胜,超时的战斗按比分定胜负。旗手阵亡时旗帜就地掉落:敌人可以再次拾起,而本队队员只需靠近便能立即将其送回。军旗也绝不藏身:拾旗会解除潜行,旗手若以任何方式隐身,旗帜都会当场掉落。",
+      "flagsBody": "每座要塞守着本队军旗。夺取敌旗并送到己方旗座即可得分;先夺得三次者获胜,超时的战斗按比分定胜负。旗手阵亡时旗帜就地掉落:敌人可以再次拾起,而本队队员只需靠近便能立即将其送回。军旗也绝不藏身:拾旗会解除潜行,旗手若以任何方式隐身,旗帜都会当场掉落。",
       "pickupNote": "拾旗永远需要主动按下战场动作键:没有人会因为跑过旗帜而意外成为旗手。",
       "respawnHeading": "战场阵亡",
       "respawnBody": "死亡保留经典仪式:尸体停在原地,直到你亲自释放灵魂;灵魂会在你方主堡旁的围栏墓地中升起,并被结界束缚,直到你方下一波复活潮。复活潮会同时唤起所有等待的灵魂;两队的复活潮刻意错开,战斗永远不会同时完全重置。这里没有跑尸,也没有灵魂医者的交易:释放、等潮、再战。",

@@ -33,12 +33,14 @@ import {
   awardBattlegroundAssistHonor,
   awardBattlegroundHonor,
   awardBattlegroundKillHonor,
+  bgFirstWinBonusAvailable,
   honorTeamIdentity,
 } from '../pvp';
 import type { ArenaReturnPools } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, DT, type Entity, type Vec3 } from '../types';
 import { eloDelta, snapshotArenaReturnPools } from './arena';
+import { recordBgOutcome } from './battleground_outcomes';
 import { formBgTeamParty, unwindBgAutoPartyFor, unwindBgTeamParties } from './battleground_party';
 
 // --- Thornhollow Fields tuning consts (rating reuses the arena's exported eloDelta) ---
@@ -53,13 +55,28 @@ export const BG_LADDER_SIZE = 10;
 // every queued champion (and every member of a queued party) must be 20.
 export const BG_MIN_LEVEL = 20;
 const BG_COUNTDOWN = 8; // form-up gate at the keeps before the flags go live
-export const BG_CAPS_TO_WIN = 5; // first team to this many captures wins.
-// ^ Tuning knob number one post-launch: fall back to 3 if live cap pace runs
-// slower than the modeled 2-3 minutes per capture on even teams.
-// 12 min cap; resolves on score, ties draw. Scaled with the field: the stands
-// are 236yd apart, so five captures on even teams model out inside the cap and
-// the fifth capture, rather than the clock, decides most matches.
+// First team to this many captures wins. THREE, the classic capture-the-flag
+// battleground convention (Warsong Gulch ran first-to-3 for its whole classic
+// life). Cut from the launch value of 5 on live evidence: a dominating side
+// still needed about 8 minutes to reach 3, so 5 put most matches into the
+// BG_MAX_DURATION cap and let the clock, rather than the fifth capture, decide
+// them. The match-outcome records (the `battleground_outcomes.ts` leaf beside
+// this file, drained onto the metrics in server/battleground_telemetry.ts)
+// exist to re-check exactly this against real matches.
+export const BG_CAPS_TO_WIN = 3;
+// 12 min cap; resolves on score, ties draw. Scaled with the field (the stands
+// are 236yd apart) against the first-to-3 target above: three captures on even
+// teams model out well inside the cap, so the WINNING CAPTURE rather than the
+// clock decides most matches. That is exactly the property the retune from 5
+// restored, and exactly what the match-outcome records measure (the share of
+// results ending 'timer' rather than 'caps').
 export const BG_MAX_DURATION = 720;
+// Remaining-time calls, in seconds left, DESCENDING. A capture push is a
+// minutes-long commitment, so a side that is behind needs to be told the clock
+// is about to decide the match rather than discovering it at 0. Two calls only:
+// the two-minute mark (still time for one more full run of the field) and the
+// one-minute mark (the last-push call). Each fires at most once per match.
+export const BG_TIME_WARNINGS = [120, 60] as const;
 export const BG_END_HOLD = 15; // post-match hold: the frozen result screen
 export const BG_WAVE_PERIOD = 10; // one respawn wave per team every 10s
 export const BG_WAVE_OFFSET = 5; // the two team clocks run staggered half-cycles
@@ -177,6 +194,19 @@ export interface BgMatch {
   // false for /dev bg force-starts (jgyy review): a dev-forced, possibly
   // asymmetric match must never move the real ladder, W/L, or honor.
   rated: boolean;
+  // At least one side was seated from a QUEUED GROUP of 2 or more. Supplied by
+  // the matchmaker at start, because that is the only place the provenance
+  // exists: live party membership answers a different question (a solo queuer
+  // can accept an invite mid-wait, a queued party can dissolve mid-wait), and by
+  // the time the result resolves formBgTeamParty has welded BOTH teams into
+  // match parties so every fighter looks partied. Observability only, no
+  // gameplay branch reads it.
+  //
+  // Deliberately NOT the matchmaker's own `premadeVsPugs` notion, which means a
+  // block of BG_PREMADE_SIZE or more facing nothing but solos: that one drives
+  // the fairness hold, this one is the coarse composition split for the
+  // cap-tuning metrics. Two different questions, kept under two names.
+  grouped: boolean;
   // Per-player match tallies for the scoreboard (seeded to zeros at start;
   // a deserter's row drops with their team entry).
   stats: Map<
@@ -195,6 +225,16 @@ export interface BgMatch {
   autoPartyPids: [number[], number[]];
   resultRecorded: boolean;
   fightersReleased: boolean; // releaseBgFighters ran (teardown is once-only)
+  // `/dev bg end` forced this result. The match may be perfectly RATED (a real
+  // queued one a dev cut short), so `rated` alone cannot keep it out of the
+  // operator record: an arbitrary clock and an arbitrary ending would poison
+  // the very caps-vs-timer ratio those records exist to answer.
+  devEnded: boolean;
+  // Remaining-time calls already announced (BG_TIME_WARNINGS thresholds, in
+  // seconds left). On the MATCH so a threshold fires exactly once per match:
+  // the active-phase clock only moves forward, but the end hold reuses `timer`
+  // as a countdown, and a set makes the once-only claim independent of that.
+  timeWarningsFired: Set<number>;
   // Assist bookkeeping. `recentDamage` maps a VICTIM pid to everyone who has
   // hit them lately and the match-elapsed second of that hit; the death hook
   // reads it, pays everyone but the killer, and drops the row. Pruned on write
@@ -407,12 +447,51 @@ export function updateBattleground(ctx: SimContext): void {
     tickRunes(ctx, match);
     tickFlags(ctx, match);
     match.pendingFlagPress.clear();
+    // AFTER the flag pass above, so a capture that wins the match on this tick
+    // suppresses the call (tickFlags can enter the end hold, and the guard
+    // inside tickTimeWarnings is what reads that); before the cap check below,
+    // so the calls read in narrative order against the ending they precede.
+    tickTimeWarnings(ctx, match);
     if (match.timer >= BG_MAX_DURATION && !match.resultRecorded) {
       // The match cap resolves on score; an equal score is a draw.
       const w: BgTeam | null =
         match.scores[0] === match.scores[1] ? null : match.scores[0] > match.scores[1] ? 0 : 1;
       enterBgEndHold(ctx, match, w, 'timeout');
     }
+  }
+}
+
+/**
+ * The remaining-time calls (BG_TIME_WARNINGS). Pure tick math over the match
+ * clock, zero rng, fanned to all ten members like `bgKill`: the clock is the
+ * whole field's information, not one player's.
+ *
+ * A threshold fires only on the tick its remaining time CROSSES the mark
+ * (strictly above it before this tick's DT, at or below it after), so a match
+ * whose cap is already at or under a mark never announces that mark instead of
+ * announcing it on tick one, and the already-fired set makes the claim
+ * once-only even though the end hold reuses `timer` as a countdown.
+ *
+ * Two SEPARATE guards keep it quiet when there is nothing to say, and the
+ * second is easy to mistake for redundant:
+ *  - the form-up countdown never reaches here at all (the caller's countdown
+ *    arm `continue`s before the active phase);
+ *  - a match ALREADY WON ON THIS TICK does reach here, because `tickFlags` runs
+ *    first in the same straight-line block and can enter the end hold without a
+ *    `continue`. The `resultRecorded` bail below is what suppresses that, NOT
+ *    the caller. Deleting it would leave `timer` reading as BG_END_HOLD, which
+ *    happens not to cross a mark at today's constants, so the bug would sit
+ *    latent until BG_END_HOLD or BG_TIME_WARNINGS changed.
+ */
+function tickTimeWarnings(ctx: SimContext, match: BgMatch): void {
+  if (match.resultRecorded) return;
+  const remainingBefore = BG_MAX_DURATION - (match.timer - DT);
+  const remainingAfter = BG_MAX_DURATION - match.timer;
+  for (const mark of BG_TIME_WARNINGS) {
+    if (remainingBefore <= mark || remainingAfter > mark) continue;
+    if (match.timeWarningsFired.has(mark)) continue;
+    match.timeWarningsFired.add(mark);
+    bgEmitAll(ctx, match, (pid) => ctx.emit({ type: 'bgTimeWarning', secondsLeft: mark, pid }));
   }
 }
 
@@ -499,7 +578,13 @@ function matchmakeBg(ctx: SimContext): void {
     const picked = pickBgTeams(ctx);
     if (!picked) return;
     ctx.bgQueue = ctx.bgQueue.filter((g) => !picked.used.includes(g));
-    startBgMatch(ctx, picked.teams[0], picked.teams[1]);
+    // The QUEUED-GROUP provenance, which only the matchmaker holds: a group of
+    // 2+ queued together. Live party membership is NOT the same question (a
+    // solo queuer can accept an invite while waiting, and a queued party can
+    // dissolve mid-wait), so it is read here rather than from partyOf at start.
+    startBgMatch(ctx, picked.teams[0], picked.teams[1], {
+      grouped: picked.used.some((g) => g.pids.length > 1),
+    });
   }
 }
 
@@ -624,7 +709,7 @@ export function startBgMatch(
   ctx: SimContext,
   teamA: number[],
   teamB: number[],
-  opts?: { rated?: boolean },
+  opts?: { rated?: boolean; grouped?: boolean },
 ): void {
   const slot = freeBgSlot(ctx);
   if (slot === null) {
@@ -698,10 +783,16 @@ export function startBgMatch(
     pendingFlagPress: new Set(),
     honorTeamKeys: [honorTeamIdentity(ctx, teamA), honorTeamIdentity(ctx, teamB)],
     rated: opts?.rated !== false,
+    // Passed IN by the matchmaker, which is the only caller that still knows
+    // which queued groups were seated; a direct-seat caller (tests, /dev) that
+    // says nothing gets the honest default of "no grouped queue".
+    grouped: opts?.grouped === true,
     ratingAvg: [bgTeamAvg(ctx, teamA), bgTeamAvg(ctx, teamB)],
     autoPartyPids: [[], []],
     resultRecorded: false,
     fightersReleased: false,
+    devEnded: false,
+    timeWarningsFired: new Set(),
     recentDamage: new Map(),
     recentSupport: new Map(),
     killHonorPairs: new Map(),
@@ -1464,6 +1555,10 @@ export function devEndBg(ctx: SimContext, pid: number): boolean {
   if (!match || match.resultRecorded) return false;
   const w: BgTeam | null =
     match.scores[0] === match.scores[1] ? null : match.scores[0] > match.scores[1] ? 0 : 1;
+  // Stamp BEFORE resolving: the match itself may be perfectly rated, but its
+  // clock and its ending are a dev's, not a played-out result, so it must stay
+  // out of the operator record (resolveBgResult reads this flag).
+  match.devEnded = true;
   enterBgEndHold(ctx, match, w, 'timeout');
   return true;
 }
@@ -1510,6 +1605,22 @@ function resolveBgResult(
   if (match.resultRecorded) return;
   match.resultRecorded = true;
   match.winner = winnerTeam;
+  // The operator-facing record, RATED matches only: a /dev force-start is
+  // deliberately asymmetric and would poison the cap-tuning averages. Written
+  // here rather than off the `bgEnd` events because those are per-player and a
+  // host counting them would count every match ten times. `timer` is elapsed
+  // ACTIVE seconds; during form-up it is still the countdown, so that resolves
+  // to a duration of zero.
+  if (match.rated && !match.devEnded) {
+    recordBgOutcome(ctx.bgOutcomes, {
+      matchId: match.id,
+      durationSec: match.state === 'countdown' ? 0 : Math.max(0, Math.round(match.timer)),
+      scoreCrimson: match.scores[0],
+      scoreAzure: match.scores[1],
+      ended: reason === 'timeout' ? 'timer' : reason,
+      grouped: match.grouped,
+    });
+  }
   // Team Elo over team-average ratings, zero-sum by construction: one delta is
   // computed from the winner's perspective and applied with opposite signs
   // (the rating floor is the only, deliberate, exception).
@@ -1528,13 +1639,14 @@ function resolveBgResult(
         if (won) meta.bgWins++;
         else meta.bgLosses++;
       }
+      let firstWinBonus = 0;
       if (match.rated && reason !== 'forfeit') {
-        awardBattlegroundHonor(
+        firstWinBonus = awardBattlegroundHonor(
           ctx,
           meta,
           opponentKey,
           winnerTeam === null ? 'draw' : won ? 'win' : 'loss',
-        );
+        ).firstWinBonus;
       }
       ctx.markDeedsDirty(pid);
       ctx.emit({
@@ -1546,6 +1658,12 @@ function resolveBgResult(
         scoreAzure: match.scores[1],
         ratingBefore: before,
         ratingAfter: meta.bgRating,
+        // The internal reason token says 'timeout'; the WIRE vocabulary is
+        // 'timer', which is what the finish surface renders against. Kept as one
+        // mapping here rather than renaming the internal token, so the existing
+        // endBgMatch signature (and every caller of it) is untouched.
+        ended: reason === 'timeout' ? 'timer' : reason,
+        firstWinBonus,
       });
     }
   }
@@ -1674,6 +1792,11 @@ export function bgInfoFor(
     queued: group !== null,
     queueSize: bgQueueSize(ctx),
     queuedParty: group?.pids.length ?? 1,
+    // The first-win-of-the-day bonus is still on the table for this character.
+    // A READ, never the rollover: `bgFirstWinBonusAvailable` reports a stored
+    // date that is not today as re-armed without writing anything, because a
+    // per-viewer wire builder must not mutate the daily window it reports on.
+    firstWinBonusReady: bgFirstWinBonusAvailable(ctx.utcDay, meta),
     match: matchInfo,
     ladder: ladder ?? bgLadder(ctx),
   };

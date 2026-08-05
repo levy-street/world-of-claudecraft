@@ -868,7 +868,7 @@ export const hudChromeStrings = {
     // The one-paragraph pitch above the queue button: what the place is, then
     // what the match is. Kept to two sentences so the panel never scrolls.
     blurb:
-      'Two ruined keeps face each other across a walled hollow in the shadow of Thornpeak: Crimson to the south, Azure to the north, and the older Ruin Courtyard between them that neither has ever held. Five a side, one banner each, and the first to carry five of theirs home takes the field.',
+      'Two ruined keeps face each other across a walled hollow in the shadow of Thornpeak: Crimson to the south, Azure to the north, and the older Ruin Courtyard between them that neither has ever held. Five a side, one banner each, and the first to carry three of theirs home takes the field.',
     modeTag: '5v5 Capture the Flag',
     offlineNote: 'Thornhollow Fields is syncing. The queue opens once the realm answers.',
     ratingSummary: 'Rating. {wins} wins / {losses} losses',
@@ -879,7 +879,7 @@ export const hudChromeStrings = {
     searching: 'Searching. {count}/{size} in queue.',
     queuedParty: 'Party of {count}.',
     queueNote:
-      'Two teams of five. Steal the enemy banner and run it to your keep. First to 5 captures wins. Group up to 5 and queue together; grab Sprint Runes and weave the cover to lose your pursuers.',
+      'Two teams of five. Steal the enemy banner and run it to your keep. First to 3 captures wins. Group up to 5 and queue together; grab Sprint Runes and weave the cover to lose your pursuers.',
     matchInProgress: 'Battle in progress. {crimson}:{azure}.',
     ladderAllTime: 'Ladder. All-Time',
     noRanked: 'No champions ranked yet. Be the first.',
@@ -938,10 +938,36 @@ export const hudChromeStrings = {
     flagReturnedBanner: 'The {team} flag was returned!',
     capturedTeamBanner: 'The {takers} have captured the {team} flag! {crimson}:{azure}',
     capturedLog: '{name} captured the {team} flag. Score {crimson}:{azure}.',
+    // SUPERSEDED, retained: the end moment used to be one long banner sentence.
+    // It now rides the same across-screen banner family as the flag calls above
+    // but as a big one-word verdict (resultVictory / resultDefeat / resultDraw,
+    // reused from the scoreboard) over the secondary lines below. These three
+    // keys stay in `en` because their translations are already shipped in the
+    // maintainer-owned overlays, which a contributor never edits to delete a row.
     victoryBanner: 'Victory! Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})',
     defeatBanner: 'Defeat. Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})',
     drawBanner: 'Thornhollow Fields draw {crimson}:{azure}. Rating {rating} ({delta})',
+    // The verdict banner's first secondary line: the score and the rating swing.
+    endBannerDetail: 'Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})',
     endLog: 'Thornhollow Fields ended {crimson}:{azure}. Rating {rating} ({delta}).',
+    // Why the match ended, when it was not simply played to the capture target.
+    // A timer ending used to read exactly like a played-out one.
+    endedTimer: 'Time expired',
+    endedForfeit: 'The match was forfeited',
+    endedTimerLog: 'The match clock ran out; the higher score took the field.',
+    endedForfeitLog: 'The match was forfeited.',
+    // The first Thornhollow Fields win of each UTC day pays bonus Honor. ONE key
+    // for both sinks (the standing invitation chip on the queue panel and the
+    // verdict banner's bonus line): the sentence is identical, and a second key
+    // would make every locale translate the same string twice. The log line is
+    // its own key because it is past tense.
+    firstWinBonusLine: 'First win of the day: +{honor} Honor',
+    firstWinBonusLog: 'First win of the day: you gain {honor} bonus Honor.',
+    // Remaining-time calls, announced to the whole field (BG_TIME_WARNINGS).
+    timeWarningMinutes: '{minutes} minutes remain',
+    timeWarningOneMinute: 'One minute remains',
+    timeWarningMinutesLog: '{minutes} minutes remain in the battle.',
+    timeWarningOneMinuteLog: 'One minute remains in the battle.',
     // Landmark names written onto the M-key map's atlas plate. Each names a
     // rectangle the authored field itself declares, so they are the place names
     // a player calls out, not decoration: short proper nouns, painted on canvas
@@ -1463,6 +1489,7 @@ export const hudChromeStrings = {
       fiestaComplete: 'Fiesta completed',
       fiestaWin: 'Fiesta victory',
       battlegroundWin: 'Thornhollow Fields victory',
+      battlegroundFirstWin: 'first Thornhollow Fields win today',
       battlegroundComplete: 'Thornhollow Fields battle fought',
       battlegroundKill: 'honorable kill',
       battlegroundAssist: 'killing blow assisted',
@@ -1472,6 +1499,7 @@ export const hudChromeStrings = {
     floatReasons: {
       kill: 'Kill',
       assist: 'Assist',
+      firstWin: 'First Win',
     },
   },
   // Character sheet showcase layout: the two titled stat-panel headings under the

@@ -68,6 +68,7 @@ import { questProgressForWire } from '../src/sim/quests/interact_object_credit';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
 import type { CharacterState, PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
+import { drainBgOutcomes } from '../src/sim/social/battleground_outcomes';
 import { RAID_MAX } from '../src/sim/social/party';
 import type { VcMatch } from '../src/sim/social/vale_cup';
 import {
@@ -124,6 +125,7 @@ import {
   recordGuildBankDeltas,
   recordGuildBankEscrowRollback,
 } from './bank_ledger';
+import { reportBgOutcomes } from './battleground_telemetry';
 import type {
   BotDetector,
   BotTrackingContext,
@@ -2550,6 +2552,7 @@ export class GameServer {
               scan.threatEntryVisits,
               this.perfCaptureDeadlineNs !== null,
             );
+            this.recordBattlegroundOutcomes();
             this.enforceJailStates();
             this.routeEvents(events);
             this.detectActivity(events);
@@ -2629,6 +2632,20 @@ export class GameServer {
       void this.saveRifts();
       void heartbeatCharacterLeases().catch((err) => console.error('lease heartbeat failed:', err));
     }
+  }
+
+  /**
+   * Drain this tick's resolved rated Thornhollow Fields matches onto the
+   * /metrics counters (server/battleground_telemetry.ts).
+   *
+   * Off the sim's own drained record rather than the `bgEnd` events, and that is
+   * the load-bearing choice: `bgEnd` is PERSONAL (one copy per fighter), so a
+   * counter driven from the event stream would book every match ten times and
+   * quietly overstate every rate built on it. The sim writes exactly one record
+   * per resolve, and only for a rated match.
+   */
+  private recordBattlegroundOutcomes(): void {
+    reportBgOutcomes(drainBgOutcomes(this.sim.bgOutcomes), gameMetricsCounters());
   }
 
   private enforceJailStates(): void {

@@ -7,3 +7,4 @@ export * from './battleground_map_view';
 export * from './battleground_scoreboard_painter';
 export * from './battleground_scoreboard_view';
 export * from './battleground_window_view';
+export * from './bg_end_banner_view';

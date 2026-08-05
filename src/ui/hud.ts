@@ -146,7 +146,12 @@ import { BagItemActionMenu, CTX_MENU_PICKER_CLASS } from './bag_item_action_menu
 import { bagsWindowShown } from './bags_view';
 import { BagsWindow, dismissBagPrompts } from './bags_window';
 import { BankWindow } from './bank_window';
-import { type BannerClass, type BannerEnqueueOutcome, BannerQueue } from './banner_queue';
+import {
+  type BannerClass,
+  type BannerEnqueueOutcome,
+  BannerQueue,
+  bannerSubtextLines,
+} from './banner_queue';
 import { CalendarWindow } from './calendar_window';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter, type CastBarPaintInput } from './cast_bar_painter';
@@ -362,8 +367,11 @@ import {
   BattlegroundKillFeed,
   BattlegroundMapPainter,
   BattlegroundScoreboard,
+  type BgEndLogTone,
+  buildBgEndBannerView,
   buildBgMapModel,
   buildBgScoreboardView,
+  buildBgTimeWarningView,
 } from './hud/battleground';
 import { ChatAnnouncer } from './hud/chat/chat_announcer';
 import { chatChannelColor } from './hud/chat/chat_channels';
@@ -926,10 +934,25 @@ const HONOR_REASON_KEYS: Record<HonorReason, TranslationKey> = {
   fiesta_complete: 'hudChrome.warfare.reasons.fiestaComplete',
   fiesta_win: 'hudChrome.warfare.reasons.fiestaWin',
   battleground_win: 'hudChrome.warfare.reasons.battlegroundWin',
+  battleground_first_win: 'hudChrome.warfare.reasons.battlegroundFirstWin',
   battleground_complete: 'hudChrome.warfare.reasons.battlegroundComplete',
   battleground_kill: 'hudChrome.warfare.reasons.battlegroundKill',
   battleground_assist: 'hudChrome.warfare.reasons.battlegroundAssist',
 };
+// The combat-log color for each Thornhollow Fields finish-line tone. WHICH lines
+// exist and what they say is the pure core's decision
+// (hud/battleground/bg_end_banner_view.ts); only the color stays here, because
+// that is the coordinator's own log palette. Total over BgEndLogTone, so a new
+// tone red-fails tsc rather than logging an undefined color.
+const BG_END_LOG_COLORS: Record<BgEndLogTone, string> = {
+  resultWin: '#7fdc4f',
+  resultNotWin: '#ff7a6a',
+  cause: '#cfc6a8',
+  bonus: '#ffd100',
+};
+/** The remaining-time call's own log colour, the same gold the capture line
+ *  uses: it is a match-critical call, not a result. */
+const BG_TIME_WARNING_LOG_COLOR = '#ffd24a';
 // The wire-union fallbacks (R34's enum axis): every code above is a SERVER
 // value a newer deploy can widen, and t() throws on an undefined key, so an
 // off-vocabulary code degrades to the family's most generic line instead of
@@ -977,7 +1000,12 @@ interface BannerPayload {
   motion: boolean;
   decorativeIconUrl?: string;
   variant: BannerVariant;
-  subtext?: string;
+  /** The secondary lines stacked under the title, ALREADY normalized by
+   *  `bannerSubtextLines` (never an empty array, never an empty string). Several
+   *  exist for the battleground verdict, whose facts (score plus rating swing,
+   *  why the match ended, the first-win bonus) are INDEPENDENT sentences: each
+   *  stays its own `t()` key on its own line instead of being concatenated. */
+  subtext?: string[];
   durationMs: number;
   source: 'unstuck' | null;
   /** The R38 class, kept on the payload so the advance chain can tell a
@@ -11833,29 +11861,32 @@ export class Hud {
           );
           break;
         }
+        case 'bgTimeWarning': {
+          // The remaining-time call rides the SAME across-screen banner family
+          // as the flag announcements above (one showBanner, no variant, no
+          // class): the clock closing is a match-critical call like a steal.
+          // The copy decision is the pure core's, not this switch's.
+          const call = buildBgTimeWarningView(ev.secondsLeft);
+          this.showBanner(call.banner);
+          this.combatLog(call.log, BG_TIME_WARNING_LOG_COLOR);
+          audio.duelCountdownTick();
+          break;
+        }
         case 'bgEnd': {
           this.bgKillFeed.clear();
-          const delta = ev.ratingAfter - ev.ratingBefore;
-          const params = {
-            crimson: formatNumber(ev.scoreCrimson, { maximumFractionDigits: 0 }),
-            azure: formatNumber(ev.scoreAzure, { maximumFractionDigits: 0 }),
-            rating: formatNumber(ev.ratingAfter, { maximumFractionDigits: 0 }),
-            // The rating swing reads as a signed delta. The sign is Intl's
-            // (signDisplay: 'always'), never a concatenated ASCII '+': a locale
-            // that writes its own plus sign, or puts it after the digits, gets
-            // that instead of a hardcoded prefix.
-            delta: formatNumber(delta, { maximumFractionDigits: 0, signDisplay: 'always' }),
-          };
-          if (ev.draw) {
-            this.showBanner(t('hudChrome.bg.drawBanner', params));
-          } else if (ev.won) {
-            this.showBanner(t('hudChrome.bg.victoryBanner', params));
-            audio.duelEnd();
-          } else {
-            this.showBanner(t('hudChrome.bg.defeatBanner', params));
-            audio.death();
+          // The verdict is ONE big word through the same banner family the flag
+          // calls use, over its own secondary lines. WHICH strings those are is
+          // the pure core's decision (hud/battleground/bg_end_banner_view.ts).
+          // The end BOARD is deliberately not opened from here: the frozen
+          // result screen is a STATE, so the scoreboard painter opens itself off
+          // the snapshot and self-heals for a player who reconnects into it.
+          const result = buildBgEndBannerView(ev);
+          this.showBanner(result.verdict, true, undefined, 'default', result.lines);
+          if (result.cue === 'victory') audio.duelEnd();
+          else if (result.cue === 'defeat') audio.death();
+          for (const line of result.logLines) {
+            this.combatLog(line.text, BG_END_LOG_COLORS[line.tone]);
           }
-          this.combatLog(t('hudChrome.bg.endLog', params), ev.won ? '#7fdc4f' : '#ff7a6a');
           break;
         }
         case 'dfProposal':
@@ -13427,7 +13458,7 @@ export class Hud {
     motion = true,
     decorativeIconUrl?: string,
     variant: BannerVariant = 'default',
-    subtext?: string,
+    subtext?: string | string[],
     durationMs = 2600,
     source: 'unstuck' | null = null,
     // R38: celebrations queue instead of last-write-wins; ambient (the
@@ -13437,12 +13468,15 @@ export class Hud {
     // durable log line exactly when its banner did NOT show immediately.
     bannerClass: BannerClass = 'ambient',
   ): BannerEnqueueOutcome {
+    const subtextLines = bannerSubtextLines(subtext);
     const payload: BannerPayload = {
       text,
       motion,
       decorativeIconUrl,
       variant,
-      subtext,
+      // Normalized once, here: an EMPTY line list is no subtext at all, and
+      // paintBanner's `!!subtext` gate and the has-subtext class must agree.
+      subtext: subtextLines.length > 0 ? subtextLines : undefined,
       durationMs,
       source,
       bannerClass,
@@ -13480,10 +13514,14 @@ export class Hud {
       const title = document.createElement('span');
       title.className = 'banner-title';
       title.textContent = text;
-      const detail = document.createElement('span');
-      detail.className = 'banner-subtext';
-      detail.textContent = subtext;
-      this.bannerEl.replaceChildren(title, detail);
+      // One span per line; the has-subtext rule already stacks them (flex column).
+      const details = subtext.map((line) => {
+        const detail = document.createElement('span');
+        detail.className = 'banner-subtext';
+        detail.textContent = line;
+        return detail;
+      });
+      this.bannerEl.replaceChildren(title, ...details);
     } else {
       const copy = document.createElement('span');
       copy.className = 'banner-copy';

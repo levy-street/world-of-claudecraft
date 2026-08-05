@@ -5267,6 +5267,13 @@
     font-weight: 600;
     letter-spacing: 0;
   }
+  /* A banner may carry SEVERAL secondary lines (the battleground verdict: the
+     score and rating swing, why the match ended, the first-win bonus). Only the
+     first one needs the gap under the title; the rest stack tight so three lines
+     still read as one block rather than a list. */
+  #banner .banner-subtext + .banner-subtext {
+    margin-top: 2px;
+  }
   #banner.banner-with-art {
     display: flex;
     align-items: center;

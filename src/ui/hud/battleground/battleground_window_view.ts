@@ -18,6 +18,7 @@
 // the painter localizes; CLASSES is read here only to decide that flag.
 
 import { CLASSES } from '../../../sim/data';
+import { BATTLEGROUND_FIRST_WIN_BONUS_HONOR } from '../../../sim/pvp';
 import { BG_MIN_LEVEL } from '../../../sim/social/battleground';
 import type { BgInfo, PartyInfo } from '../../../world_api';
 
@@ -75,6 +76,10 @@ export type BgWindowView =
       losses: number;
       captures: number;
       action: BgWindowAction;
+      /** The first-win-of-the-day Honor bonus chip, or null once today's win has
+       *  claimed it. `honor` is the sim's own constant, imported here the same
+       *  way BG_MIN_LEVEL is, rather than shipped as a second wire field. */
+      firstWinBonus: { honor: number } | null;
       /** Rated champions online right now, best first (BgInfo.ladder). */
       ladder: BgLadderRow[];
       allTime: BgAllTimeRow[] | null;
@@ -156,6 +161,12 @@ export function buildBgWindowView(input: BgWindowViewInput): BgWindowView {
     losses: b.losses,
     captures: b.captures,
     action,
+    // `=== true` on purpose, not a truthiness read: a snapshot mirrored from a
+    // server that predates the field (rolling deploy) leaves it undefined, and
+    // the honest degradation is to omit the chip rather than promise a bonus
+    // that side may not pay. Same guard shape as the `b.ladder ?? []` arm below.
+    firstWinBonus:
+      b.firstWinBonusReady === true ? { honor: BATTLEGROUND_FIRST_WIN_BONUS_HONOR } : null,
     ladder,
     allTime: allTimeRows,
     // The live rows go in whole (rank, identity, rating, record), so any move
@@ -168,6 +179,11 @@ export function buildBgWindowView(input: BgWindowViewInput): BgWindowView {
       b.losses,
       b.captures,
       action,
+      // In the signature so the chip really disappears the moment a win claims
+      // it: without this the panel would keep the stale chip until some other
+      // field moved (and the very win that claims it also moves the record, so
+      // the bug would hide behind that until a draw or a rollover).
+      b.firstWinBonusReady === true,
       partySize,
       ladder,
       allTimeRows?.map((r) => [r.name, r.rating, r.wins, r.losses]) ?? null,

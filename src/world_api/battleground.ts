@@ -88,6 +88,12 @@ export interface BgInfo {
   queued: boolean;
   queueSize: number; // champions waiting across all groups
   queuedParty: number; // size of your own queued group
+  /** The first-win-of-the-day Honor bonus is still unclaimed for this character
+   *  (src/sim/pvp/honor.ts `bgFirstWinBonusAvailable`). Drives the available-bonus
+   *  chip on the Thornhollow Fields tab; goes false the moment a win claims it,
+   *  and back true on the UTC rollover. Rides the `bg` key's own refresh cadence:
+   *  the chip is an invitation, never actionable in-match information. */
+  firstWinBonusReady: boolean;
   match: BgMatchInfo | null;
   // Live standings of the rated champions currently online, best first, capped
   // at BG_LADDER_SIZE. Rides INSIDE this key rather than a facet member of its

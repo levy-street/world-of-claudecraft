@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   BG_BASES,
@@ -10,13 +11,20 @@ import {
   bgFieldPlanWalls,
 } from '../src/sim/battleground_layout';
 import { battlegroundOrigin } from '../src/sim/data';
+import { BATTLEGROUND_FIRST_WIN_BONUS_HONOR } from '../src/sim/pvp';
+import { BG_CAPS_TO_WIN, BG_TIME_WARNINGS } from '../src/sim/social/battleground';
 import {
   BattlegroundScoreboard,
+  BG_END_CAUSE_KEYS,
+  BG_END_CAUSE_LOG_KEYS,
   BG_KILL_FEED_MAX,
   BG_KILL_FEED_TTL,
   type BgAllTimeEntry,
+  type BgEndBannerInput,
+  buildBgEndBannerView,
   buildBgMapModel,
   buildBgScoreboardView,
+  buildBgTimeWarningView,
   buildBgWindowView,
   pruneBgKillLines,
   pushBgKillLine,
@@ -33,6 +41,7 @@ const baseInfo = (over: Partial<BgInfo> = {}): BgInfo => ({
   queued: false,
   queueSize: 0,
   queuedParty: 1,
+  firstWinBonusReady: false,
   match: null,
   ladder: [],
   ...over,
@@ -41,7 +50,7 @@ const baseInfo = (over: Partial<BgInfo> = {}): BgInfo => ({
 const baseMatch = (over: Partial<BgMatchInfo> = {}): BgMatchInfo => ({
   state: 'active',
   myTeam: 0,
-  capsToWin: 5,
+  capsToWin: BG_CAPS_TO_WIN,
   scores: [1, 2],
   flags: [
     { state: 'home', carrierPid: null, carrierName: null, carrierTeam: null },
@@ -108,6 +117,7 @@ const BG_WIRE_KEYS = new Set<string>([
     'queued',
     'queueSize',
     'queuedParty',
+    'firstWinBonusReady',
     'match',
     'ladder',
   ].map((k) => `.${k}`),
@@ -421,7 +431,7 @@ describe('battleground scoreboard view (pure core)', () => {
     expect(v.active).toBe(true);
     expect(v.scoreCrimson).toBe(1);
     expect(v.scoreAzure).toBe(2);
-    expect(v.capsToWin).toBe(5);
+    expect(v.capsToWin).toBe(BG_CAPS_TO_WIN);
     expect(v.minutes).toBe(10);
     expect(v.seconds).toBe(5);
     expect(v.flagStates).toEqual(['home', 'carried']);
@@ -672,7 +682,11 @@ interface FakeEl {
   };
   setAttribute(name: string, value: string): void;
   getAttribute(name: string): string | null;
+  /** The element's own listener book, so a test can drive the real handlers
+   *  (the pin toggle) rather than reaching into painter internals. */
+  listeners: Map<string, Array<(ev: unknown) => void>>;
   addEventListener(type: string, fn: (ev: unknown) => void): void;
+  dispatch(type: string, ev: unknown): void;
   appendChild(child: FakeEl): void;
   remove(): void;
   blur(): void;
@@ -708,7 +722,15 @@ function fakeEl(): FakeEl {
       el.attrWrites.push({ name, value });
     },
     getAttribute: (name: string) => el.attrs.get(name) ?? null,
-    addEventListener(): void {},
+    listeners: new Map(),
+    addEventListener(type: string, fn: (ev: unknown) => void): void {
+      const list = el.listeners.get(type) ?? [];
+      list.push(fn);
+      el.listeners.set(type, list);
+    },
+    dispatch(type: string, ev: unknown): void {
+      for (const fn of el.listeners.get(type) ?? []) fn(ev);
+    },
     appendChild(child: FakeEl): void {
       child.parent = el;
       el.children.push(child);
@@ -824,5 +846,306 @@ describe('battleground scoreboard painter (DOM contract)', () => {
     expect(doc.listeners.get('pointerdown')).toHaveLength(0);
     painter.update(buildBgScoreboardView(baseInfo({ match: baseMatch() }), 7));
     expect(doc.listeners.get('pointerdown')).toHaveLength(1);
+  });
+});
+
+describe('the first-win-of-the-day bonus chip', () => {
+  const liveView = (over: Partial<BgInfo> = {}) =>
+    buildBgWindowView({
+      info: baseInfo(over),
+      playerName: 'Ravven',
+      playerLevel: 30,
+      party: null,
+      playerId: 7,
+      allTime: null,
+    }) as Extract<ReturnType<typeof buildBgWindowView>, { kind: 'live' }>;
+
+  it('offers the chip while the bonus is unclaimed, at the sim constant', () => {
+    const view = liveView({ firstWinBonusReady: true });
+    expect(view.firstWinBonus).toEqual({ honor: BATTLEGROUND_FIRST_WIN_BONUS_HONOR });
+    // Not a UI-side literal: retuning the sim constant moves the chip with it.
+    expect(BATTLEGROUND_FIRST_WIN_BONUS_HONOR).toBeGreaterThan(0);
+  });
+
+  it('drops the chip once today has claimed it', () => {
+    expect(liveView({ firstWinBonusReady: false }).firstWinBonus).toBeNull();
+  });
+
+  it('omits the chip on a snapshot from a server that predates the field', () => {
+    // A rolling deploy leaves it undefined; promising a bonus that side may not
+    // pay is the dishonest degradation, so the read is `=== true`.
+    const stale = baseInfo();
+    delete (stale as Partial<BgInfo>).firstWinBonusReady;
+    const view = buildBgWindowView({
+      info: stale,
+      playerName: 'Ravven',
+      playerLevel: 30,
+      party: null,
+      playerId: 7,
+      allTime: null,
+    }) as Extract<ReturnType<typeof buildBgWindowView>, { kind: 'live' }>;
+    expect(view.firstWinBonus).toBeNull();
+  });
+
+  it('the chip state is in the repaint signature, so it really disappears', () => {
+    // Without this the panel would hold the stale chip until some OTHER field
+    // moved, and the win that claims the bonus also moves the record, which
+    // would hide the bug behind a coincidence.
+    expect(liveView({ firstWinBonusReady: true }).sig).not.toBe(
+      liveView({ firstWinBonusReady: false }).sig,
+    );
+  });
+
+  it('the chip says everything it has to say VISIBLY, with no title tooltip', () => {
+    // A `title` on a non-focusable div is unreachable by keyboard, unreliably
+    // announced, and simply absent on touch, and this panel ships to phones.
+    // (WHERE the chip is painted, relative to the queue button it invites a
+    // click on, is pinned behaviorally in tests/arena_window.test.ts.)
+    const src = readFileSync(new URL('../src/ui/arena_window.ts', import.meta.url), 'utf8');
+    const chip = src.slice(
+      src.indexOf('private bgFirstWinChipHtml'),
+      src.indexOf('private bgOnlineLadderHtml'),
+    );
+    expect(chip.length).toBeGreaterThan(0);
+    expect(chip).not.toContain('title=');
+    // One key, reused by the verdict banner's bonus line: the sentence is
+    // identical, so a second key would translate it twice in every locale.
+    expect(chip).toContain("t('hudChrome.bg.firstWinBonusLine'");
+    // The amount goes through the house formatter like every other number here.
+    expect(chip).toContain('{ honor: num(bonus.honor) }');
+    // The glyph is decoration beside real text, so it is hidden, never named.
+    expect(chip).toContain('aria-hidden="true"');
+  });
+});
+
+describe('the match-end verdict copy (pure core)', () => {
+  const ev = (over: Partial<BgEndBannerInput> = {}): BgEndBannerInput => ({
+    won: true,
+    draw: false,
+    scoreCrimson: 3,
+    scoreAzure: 1,
+    ratingBefore: 1500,
+    ratingAfter: 1520,
+    ended: 'caps',
+    firstWinBonus: 0,
+    ...over,
+  });
+
+  afterEach(async () => {
+    await ensureLocaleLoaded('en');
+    setLanguage('en');
+  });
+
+  it('leads with ONE big word, reusing the scoreboard result keys', () => {
+    // The finish banner and the frozen result strip must not name the same
+    // outcome two different ways.
+    expect(buildBgEndBannerView(ev()).verdict).toBe(t('hudChrome.bg.resultVictory'));
+    expect(buildBgEndBannerView(ev({ won: false })).verdict).toBe(t('hudChrome.bg.resultDefeat'));
+    expect(buildBgEndBannerView(ev({ draw: true, won: false })).verdict).toBe(
+      t('hudChrome.bg.resultDraw'),
+    );
+  });
+
+  it('gives each fact its own line, never one concatenated sentence', () => {
+    const view = buildBgEndBannerView(ev({ ended: 'timer', firstWinBonus: 120 }));
+    expect(view.lines).toEqual([
+      t('hudChrome.bg.endedTimer'),
+      t('hudChrome.bg.endBannerDetail', {
+        crimson: '3',
+        azure: '1',
+        rating: '1,520',
+        delta: '+20',
+      }),
+      t('hudChrome.bg.firstWinBonusLine', { honor: '120' }),
+    ]);
+  });
+
+  it('a caps finish adds no cause line: the score already says it', () => {
+    const view = buildBgEndBannerView(ev({ ended: 'caps' }));
+    expect(view.lines.length).toBe(1);
+    expect(view.lines[0]).toContain('3');
+    expect(view.lines).not.toContain(t('hudChrome.bg.endedTimer'));
+  });
+
+  it('a forfeit names itself, on the banner and in the durable log', () => {
+    const view = buildBgEndBannerView(ev({ ended: 'forfeit' }));
+    expect(view.lines[0]).toBe(t('hudChrome.bg.endedForfeit'));
+    expect(view.logLines.map((l) => l.tone)).toEqual(['resultWin', 'cause']);
+    expect(view.logLines[1].text).toBe(t('hudChrome.bg.endedForfeitLog'));
+  });
+
+  it('omits the bonus line entirely when this result paid none', () => {
+    const view = buildBgEndBannerView(ev({ firstWinBonus: 0 }));
+    expect(view.lines.some((l) => l.includes('First win'))).toBe(false);
+    expect(view.logLines.map((l) => l.tone)).toEqual(['resultWin']);
+  });
+
+  it('degrades to no cause line for an ending a newer server invents', () => {
+    // The wire union can widen and t() throws on an unknown key, so an
+    // off-vocabulary value must lose the line, never kill the event batch.
+    const view = buildBgEndBannerView(ev({ ended: 'surrendered' }));
+    expect(view.lines.length).toBe(1);
+    expect(view.logLines.map((l) => l.tone)).toEqual(['resultWin']);
+  });
+
+  it('the two cause maps are total over the wire union, caps deliberately silent', () => {
+    expect(Object.keys(BG_END_CAUSE_KEYS).sort()).toEqual(['caps', 'forfeit', 'timer']);
+    expect(Object.keys(BG_END_CAUSE_LOG_KEYS).sort()).toEqual(['caps', 'forfeit', 'timer']);
+    expect(BG_END_CAUSE_KEYS.caps).toBeNull();
+    expect(BG_END_CAUSE_LOG_KEYS.caps).toBeNull();
+  });
+
+  it('the result log line keeps its pre-extraction win-vs-not colour split', () => {
+    // A DRAW has always taken the not-a-win colour (the coordinator coloured
+    // this line `ev.won ? green : red`); preserved rather than quietly changed.
+    expect(buildBgEndBannerView(ev()).logLines[0].tone).toBe('resultWin');
+    expect(buildBgEndBannerView(ev({ won: false })).logLines[0].tone).toBe('resultNotWin');
+    expect(buildBgEndBannerView(ev({ draw: true, won: false })).logLines[0].tone).toBe(
+      'resultNotWin',
+    );
+  });
+
+  it('names the audio cue for a win and a loss, and none for a draw', () => {
+    expect(buildBgEndBannerView(ev()).cue).toBe('victory');
+    expect(buildBgEndBannerView(ev({ won: false })).cue).toBe('defeat');
+    expect(buildBgEndBannerView(ev({ draw: true, won: false })).cue).toBeNull();
+  });
+
+  it('formats every number, so a grouped locale groups and the delta signs itself', () => {
+    const view = buildBgEndBannerView(ev({ ratingBefore: 1500, ratingAfter: 12345 }));
+    expect(view.lines[0]).toContain('12,345');
+    expect(view.lines[0]).toContain('+10,845');
+    // A rating LOSS carries its own sign from Intl, never a hardcoded prefix.
+    const down = buildBgEndBannerView(ev({ won: false, ratingBefore: 1520, ratingAfter: 1500 }));
+    expect(down.lines[0]).toContain('-20');
+  });
+
+  it('localizes off the catalog, not English literals', async () => {
+    await ensureLocaleLoaded('ru_RU');
+    setLanguage('ru_RU');
+    const view = buildBgEndBannerView(ev({ ended: 'timer', firstWinBonus: 120 }));
+    expect(view.verdict).not.toBe('Victory!');
+    expect(view.lines[0]).not.toBe('Time expired');
+    expect(view.lines[0]).toBe(t('hudChrome.bg.endedTimer'));
+  });
+});
+
+describe('the remaining-time call copy (pure core)', () => {
+  afterEach(async () => {
+    await ensureLocaleLoaded('en');
+    setLanguage('en');
+  });
+
+  it('speaks whole minutes at the two-minute mark', () => {
+    const call = buildBgTimeWarningView(120);
+    expect(call.banner).toBe(t('hudChrome.bg.timeWarningMinutes', { minutes: '2' }));
+    expect(call.log).toBe(t('hudChrome.bg.timeWarningMinutesLog', { minutes: '2' }));
+  });
+
+  it('the one-minute mark gets its own key, never a "1 minutes" plural', () => {
+    const call = buildBgTimeWarningView(60);
+    expect(call.banner).toBe(t('hudChrome.bg.timeWarningOneMinute'));
+    expect(call.banner).not.toContain('1 ');
+    expect(call.log).toBe(t('hudChrome.bg.timeWarningOneMinuteLog'));
+  });
+
+  it('every BG_TIME_WARNINGS threshold has copy, and it is localized', async () => {
+    for (const mark of BG_TIME_WARNINGS) {
+      expect(buildBgTimeWarningView(mark).banner.length, `${mark}s`).toBeGreaterThan(0);
+    }
+    await ensureLocaleLoaded('ja_JP');
+    setLanguage('ja_JP');
+    expect(buildBgTimeWarningView(120).banner).not.toContain('minutes');
+  });
+});
+
+describe('the scoreboard opens itself over the frozen result screen', () => {
+  const view = (state: 'active' | 'ended') =>
+    buildBgScoreboardView(
+      baseInfo({ match: baseMatch({ state, winner: state === 'ended' ? 0 : null }) }),
+      7,
+    );
+  const gone = () => buildBgScoreboardView(baseInfo({ match: null }), 7);
+
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('opens the full board without a click, then hands it back to the preference', () => {
+    const { painter, root } = mountScoreboard();
+    expect(root.classes.has('expanded')).toBe(false);
+
+    painter.update(view('ended'));
+    expect(root.classes.has('expanded'), 'the final board is readable at once').toBe(true);
+    // The one source of truth: aria never disagrees with what is on screen.
+    expect(root.getAttribute('aria-expanded')).toBe('true');
+
+    painter.update(gone());
+    expect(root.classes.has('expanded')).toBe(false);
+    expect(root.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('self-heals for a player who reconnects INTO the result hold', () => {
+    // Snapshot-driven, not bgEnd-driven: someone who reconnects during the hold
+    // never receives the one-shot event but must still see the final board.
+    const { painter, root } = mountScoreboard();
+    painter.update(view('ended')); // the very first snapshot this client sees
+    expect(root.classes.has('expanded')).toBe(true);
+  });
+
+  it('never overwrites a player who had PINNED the board open', () => {
+    const { painter, root } = mountScoreboard();
+    root.dispatch('click', {}); // the player pins it
+    expect(root.classes.has('expanded')).toBe(true);
+
+    painter.update(view('ended'));
+    expect(root.classes.has('expanded')).toBe(true);
+    // Teardown drops the AUTO half only: the pin is the player's, and survives.
+    painter.update(gone());
+    expect(root.classes.has('expanded'), 'the pin outlives the match').toBe(true);
+    expect(root.getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('a click away really dismisses the result board, and it stays dismissed', () => {
+    const { doc, painter, root } = mountScoreboard();
+    painter.update(view('ended'));
+    expect(root.classes.has('expanded')).toBe(true);
+
+    doc.listeners.get('pointerdown')?.[0]({ target: {} });
+    expect(root.classes.has('expanded')).toBe(false);
+    expect(root.getAttribute('aria-expanded')).toBe('false');
+    // The next snapshot must NOT reopen it: the dismissal latches for this result.
+    painter.update(view('ended'));
+    expect(root.classes.has('expanded')).toBe(false);
+    // ...and the latch clears with the match, so the NEXT one opens normally.
+    painter.update(gone());
+    painter.update(view('ended'));
+    expect(root.classes.has('expanded')).toBe(true);
+  });
+
+  it('a mid-match glance away does NOT disarm the end-of-match board', () => {
+    // The dismissal latch is about THIS RESULT. Latching it on any outside
+    // click would mean a player who read the tallies at minute 2 silently
+    // never sees the auto-opened final board, and the latch survives the
+    // whole match, so nothing would restore it.
+    const { doc, painter, root } = mountScoreboard();
+    painter.update(view('active'));
+    root.dispatch('click', {}); // pin it mid-match to read the tallies
+    expect(root.classes.has('expanded')).toBe(true);
+    doc.listeners.get('pointerdown')?.[0]({ target: {} }); // then click back into the fight
+    expect(root.classes.has('expanded')).toBe(false);
+
+    painter.update(view('ended'));
+    expect(root.classes.has('expanded'), 'the result board still opens itself').toBe(true);
+    expect(root.getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('elides: repeated identical snapshots write aria-expanded once', () => {
+    const { painter, root } = mountScoreboard();
+    const writes = () => root.attrWrites.filter((w) => w.name === 'aria-expanded').length;
+    const atMount = writes();
+    painter.update(view('ended'));
+    expect(writes()).toBe(atMount + 1);
+    painter.update(view('ended'));
+    painter.update(view('ended'));
+    expect(writes(), 'an unchanged state touches nothing').toBe(atMount + 1);
   });
 });

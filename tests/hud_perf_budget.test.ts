@@ -598,15 +598,16 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.innerHTML': 1, '.setAttribute': 3, '.removeAttribute': 3 },
     reflowAllow: {},
   },
-  // The Thornhollow Fields scoreboard rebuilds its skeleton in ONE innerHTML write only
-  // when the STRUCTURAL sig changes (new match / roster change); the seven
-  // setAttribute calls are the mount-time a11y wiring plus the pin toggle
-  // and the outside-click unpin, and the three classList uses are those same
-  // user-event handlers (toggle, stuck-open check, outside-click close).
-  // Every per-frame write is facet-routed.
+  // The Thornhollow Fields scoreboard rebuilds its skeleton in ONE innerHTML write
+  // only when the STRUCTURAL sig changes (new match / roster change). Every
+  // per-frame write is facet-routed.
   {
     file: 'hud/battleground/battleground_scoreboard_painter.ts',
-    allow: { '.innerHTML': 1, '.setAttribute': 7, '.classList': 3 },
+    // The expanded/pinned state now rides ONE elided applier (applyExpanded),
+    // so the three raw classList calls and the raw aria-expanded write are gone;
+    // what is left is the four build-time role/aria-live attributes on the two
+    // self-mounted roots plus the one skeleton innerHTML.
+    allow: { '.innerHTML': 1, '.setAttribute': 4 },
     reflowAllow: {},
   },
   // The bg kill feed rebuilds its tiny stack in ONE innerHTML write, on a

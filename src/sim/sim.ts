@@ -552,6 +552,7 @@ import { completeCurrentQuestsForDev, completeQuestForDev } from './quests/dev_q
 import * as arenaMod from './social/arena';
 import { clearAfkOnMove } from './social/away';
 import * as bgMod from './social/battleground';
+import * as bgOutcomesMod from './social/battleground_outcomes';
 import type { CardDuelMatch } from './social/card_duel';
 import * as cardDuelMod from './social/card_duel';
 import * as duelMod from './social/duel';
@@ -1893,6 +1894,10 @@ export class Sim {
   bgMatches = new Map<number, bgMod.BgMatch>(); // pid -> shared match (all members)
   private bgBusySlots = new Set<number>();
   private nextBgMatchId = 1;
+  // Resolved rated-match records, drained post-tick by the authoritative host
+  // (server/game.ts) and by nobody else; the log caps itself, so the offline
+  // and headless hosts that never drain hold a fixed, trivial tail.
+  readonly bgOutcomes: bgOutcomesMod.BgOutcomeRecord[] = bgOutcomesMod.createBgOutcomeLog();
   // The Vale Cup boarball state (social/vale_cup.ts): ONE holder object (the
   // per-bracket queues, the single Sowfield match slot, the Groundskeeper's
   // deserter book, and the live bot pids), exposed as the live ctx.vcup view.
@@ -3725,6 +3730,10 @@ export class Sim {
               Object.keys(meta.honorArenaDaily.bgResultsByOpponent).length > 0
                 ? { bgResultsByOpponent: { ...meta.honorArenaDaily.bgResultsByOpponent } }
                 : {}),
+              // Same absent-until-claimed rule as the DR window above: a day that
+              // has not paid the first-win bonus writes nothing (back-compat +
+              // parity-stable saves).
+              ...(meta.honorArenaDaily.bgFirstWinClaimed ? { bgFirstWinClaimed: true } : {}),
               totalWins: meta.honorArenaDaily.totalWins,
             },
           }
@@ -4806,6 +4815,9 @@ export class Sim {
       },
       get bgBusySlots() {
         return sim.bgBusySlots;
+      },
+      get bgOutcomes() {
+        return sim.bgOutcomes;
       },
       get nextBgMatchId() {
         return sim.nextBgMatchId;

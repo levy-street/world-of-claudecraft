@@ -54,6 +54,17 @@ export class BattlegroundScoreboard {
   private fstateEls: [HTMLElement | null, HTMLElement | null] = [null, null];
   /** The document-level outside-click closer, held so dispose() can remove it. */
   private onAwayPointerDown: ((ev: PointerEvent) => void) | null = null;
+  // The board is open when EITHER the player pinned it or the end-of-match hold
+  // is showing it. Three flags rather than one because the auto-expand must not
+  // overwrite a preference: `pinned` is only ever written by the player's own
+  // click / Enter / Space / outside-click, `autoExpanded` is derived from the
+  // SNAPSHOT (view.state === 'ended') so a player who reconnects into the result
+  // hold gets the board too, and `endHoldDismissed` is the player's "get out of
+  // the way" for THIS result, cleared with the match. Teardown drops the auto
+  // half and hands the board straight back to `pinned`.
+  private pinned = false;
+  private autoExpanded = false;
+  private endHoldDismissed = false;
   // Expanded-board row cells, aligned with view.board order (structural sig).
   private boardRows: {
     row: HTMLElement;
@@ -69,11 +80,24 @@ export class BattlegroundScoreboard {
   update(view: BgScoreboardView): void {
     const w = this.deps.writers;
     if (!view.active) {
+      // Match teardown: the auto-expand and the dismissal were both about THIS
+      // match's result screen, so they end with the board. The player's own pin
+      // preference survives and is what the next match's strip opens with.
+      this.endHoldDismissed = false;
+      this.setAutoExpanded(false);
       if (this.root) w.setDisplay(this.root, 'none');
       if (this.respawnRoot) w.setDisplay(this.respawnRoot, 'none');
       this.lastSig = view.sig;
       return;
     }
+    // The match ended: hold the full board open over the frozen result screen,
+    // so the final tallies are readable without a click. Driven from the
+    // SNAPSHOT rather than the one-shot bgEnd event on purpose: the result hold
+    // is a STATE, so this self-heals for a player who reconnects into it, and it
+    // keeps ONE source of truth for what the board is showing (the reveal used
+    // to be a second, invisible one in CSS, which left aria-expanded lying and
+    // made the outside-click dismissal inert during the hold).
+    this.setAutoExpanded(view.state === 'ended' && !this.endHoldDismissed);
     const root = this.ensureRoot();
     if (!root) return;
     w.setDisplay(root, 'block');
@@ -183,6 +207,24 @@ export class BattlegroundScoreboard {
     }
   }
 
+  /** Move the result-hold half of the open state, repainting only on a change. */
+  private setAutoExpanded(on: boolean): void {
+    if (this.autoExpanded === on) return;
+    this.autoExpanded = on;
+    this.applyExpanded();
+  }
+
+  /** The one place the expanded state reaches the DOM, and the ONE source of
+   *  truth for whether the board is open, so `aria-expanded` can never disagree
+   *  with what is on screen. Both writes ride the elided writers, so a repeated
+   *  apply with an unchanged state touches nothing. */
+  private applyExpanded(): void {
+    if (!this.root) return;
+    const open = this.pinned || this.autoExpanded;
+    this.deps.writers.toggleClass(this.root, 'expanded', open);
+    this.deps.writers.setAttr(this.root, 'aria-expanded', open ? 'true' : 'false');
+  }
+
   /** Language switch: clear the structural sig so the next update rebuilds, and
    *  re-write the strip's own accessible name. The root is minted ONCE
    *  (ensureRoot early-returns forever), so the toggle's aria-label is the one
@@ -198,6 +240,8 @@ export class BattlegroundScoreboard {
    *  today; it exists so the listener has an owner and cannot outlive the painter
    *  in a host that does discard one (the tests drive it). */
   dispose(): void {
+    this.autoExpanded = false;
+    this.endHoldDismissed = false;
     if (this.onAwayPointerDown) {
       document.removeEventListener('pointerdown', this.onAwayPointerDown);
       this.onAwayPointerDown = null;
@@ -232,14 +276,22 @@ export class BattlegroundScoreboard {
     // rebuild cannot reach, with no stale writer cache in between.
     el.setAttribute('role', 'button');
     this.deps.writers.setAttr(el, 'aria-label', t(BOARD_TOGGLE_KEY));
-    el.setAttribute('aria-expanded', 'false');
     const togglePin = (): void => {
-      const pinned = el.classList.toggle('expanded');
-      el.setAttribute('aria-expanded', pinned ? 'true' : 'false');
+      // The pin is the player's own PREFERENCE and outlives the match; the
+      // applier, never this handler, decides what the element actually shows.
+      this.pinned = !this.pinned;
+      // Unpinning during the result hold is also a dismissal of the hold: the
+      // press must visibly do something, and without this the auto-expand would
+      // hold the board open against the player's own click.
+      if (!this.pinned && this.autoExpanded) {
+        this.endHoldDismissed = true;
+        this.autoExpanded = false;
+      }
+      this.applyExpanded();
       // Unpinning by a second click leaves FOCUS on the strip, and
       // :focus-within alone would hold the board open (the stuck-open bug):
       // release focus with the pin so the board actually closes.
-      if (!pinned) el.blur();
+      if (!this.pinned) el.blur();
     };
     el.addEventListener('click', togglePin);
     el.addEventListener('keydown', (ev) => {
@@ -253,14 +305,26 @@ export class BattlegroundScoreboard {
     // listener on `document` outlives every root this painter owns).
     this.onAwayPointerDown = (ev: PointerEvent): void => {
       if (el.contains(ev.target as Node)) return;
-      if (!el.classList.contains('expanded') && document.activeElement !== el) return;
-      el.classList.remove('expanded');
-      el.setAttribute('aria-expanded', 'false');
+      if (!this.pinned && !this.autoExpanded && document.activeElement !== el) return;
+      // A click away is a deliberate dismissal of whatever is holding the board
+      // open. The result-hold LATCH is set only when the hold is actually up:
+      // an ordinary mid-match "read the tallies, then click back into the
+      // fight" must not silently disarm the end-of-match board minutes later
+      // (the latch survives until teardown, so an unconditional set here killed
+      // the headline behavior for anyone who ever glanced at the board).
+      if (this.autoExpanded) this.endHoldDismissed = true;
+      this.pinned = false;
+      this.autoExpanded = false;
+      this.applyExpanded();
       el.blur();
     };
     document.addEventListener('pointerdown', this.onAwayPointerDown);
     layer.appendChild(el);
     this.root = el;
+    // Stamp the expanded state onto the fresh root through the elided writers
+    // (this also seeds the writer cache): the flags outlive a dispose/re-mount,
+    // so a re-mounted strip must not silently disagree with the player's pin.
+    this.applyExpanded();
     return el;
   }
 

@@ -1036,7 +1036,7 @@ export const zh_TW: EnTranslations = {
     },
     "bg": {
       "title": "荊谷原野",
-      "blurb": "兩座廢棄的要塞隔著棘峰陰影下的圍牆山谷遙遙相望：緋紅在南，蔚藍在北，而兩者之間的古老廢墟庭院，誰都不曾真正佔據。每方五人，各持一面戰旗，先將對方戰旗奪回己方五次者贏得戰場。",
+      "blurb": "兩座廢棄的要塞隔著棘峰陰影下的圍牆山谷遙遙相望：緋紅在南，蔚藍在北，而兩者之間的古老廢墟庭院，誰都不曾真正佔據。每方五人，各持一面戰旗，先將對方戰旗奪回己方三次者贏得戰場。",
       "modeTag": "5v5奪旗戰",
       "offlineNote": "荊谷原野正在同步。待王國回應後即可排隊。",
       "ratingSummary": "評分。{wins}勝 / {losses}敗",
@@ -1046,7 +1046,7 @@ export const zh_TW: EnTranslations = {
       "leaveQueue": "離開佇列",
       "searching": "搜尋中。佇列 {count}/{size}。",
       "queuedParty": "{count}人隊伍。",
-      "queueNote": "兩隊各五人。奪取敵方軍旗並送回己方要塞。先奪得5次者獲勝。可組滿5人隊伍一同排隊;拾取疾行符文,並利用掩體甩開追兵。",
+      "queueNote": "兩隊各五人。奪取敵方軍旗並送回己方要塞。先奪得3次者獲勝。可組滿5人隊伍一同排隊;拾取疾行符文,並利用掩體甩開追兵。",
       "matchInProgress": "戰鬥進行中。{crimson}:{azure}。",
       "ladderAllTime": "天梯。歷史總榜",
       "noRanked": "尚無勇士上榜。爭當第一。",
@@ -1096,7 +1096,18 @@ export const zh_TW: EnTranslations = {
       "victoryBanner": "勝利!荊谷原野{crimson}:{azure}。評分{rating}({delta})",
       "defeatBanner": "戰敗。荊谷原野{crimson}:{azure}。評分{rating}({delta})",
       "drawBanner": "荊谷原野平手{crimson}:{azure}。評分{rating}({delta})",
+      "endBannerDetail": "荊谷原野{crimson}:{azure}。評分{rating}({delta})",
       "endLog": "荊谷原野結束,{crimson}:{azure}。評分{rating}({delta})。",
+      "endedTimer": "時間到",
+      "endedForfeit": "本場比賽以棄權告終",
+      "endedTimerLog": "比賽時間耗盡,由比分較高的一方拿下戰場。",
+      "endedForfeitLog": "本場比賽以棄權告終。",
+      "firstWinBonusLine": "每日首勝:+{honor}榮譽",
+      "firstWinBonusLog": "每日首勝:你額外獲得{honor}點榮譽。",
+      "timeWarningMinutes": "還剩{minutes}分鐘",
+      "timeWarningOneMinute": "還剩一分鐘",
+      "timeWarningMinutesLog": "本場戰鬥還剩{minutes}分鐘。",
+      "timeWarningOneMinuteLog": "本場戰鬥還剩一分鐘。",
       "map": {
         "crimsonKeep": "緋紅要塞",
         "azureKeep": "蔚藍要塞",
@@ -1478,13 +1489,15 @@ export const zh_TW: EnTranslations = {
         "fiestaComplete": "完成嘉年華",
         "fiestaWin": "嘉年華勝利",
         "battlegroundWin": "荊谷原野勝利",
+        "battlegroundFirstWin": "荊谷原野每日首勝",
         "battlegroundComplete": "荊谷原野參戰",
         "battlegroundKill": "榮譽擊殺",
         "battlegroundAssist": "助攻擊殺"
       },
       "floatReasons": {
         "kill": "擊殺",
-        "assist": "助攻"
+        "assist": "助攻",
+        "firstWin": "首勝"
       }
     },
     "charSheet": {
@@ -4060,7 +4073,7 @@ export const zh_TW: EnTranslations = {
       "fieldHeading": "戰場地形",
       "fieldBody": "一片有圍牆的露天戰場,被隔成三個區域:兩隊各自的前場,以及夾在中間的廢墟中庭。兩道橫貫全場的隔牆劃出邊界,穿行區域之間必須經過爭奪點:寬闊的正門,或是騎跨在隔牆上的門樓小屋,其錯位的兩扇門逼你繞過伏擊死角。每座要塞除正門外全部封死,奪旗進出只有這一個口;正門前還有一道矮壁壘擋住直衝的路線。中庭裡有空心的中央廢墟與兩枚側翼疾行符文,另外兩枚守在兩旗的接近路上。每個正門的中庭入口處還有一枚戰鬥或守護符文(短時間內提升傷害或減免傷害):兩個符文台開局同面,每次拾取後翻面。",
       "flagsHeading": "旗幟",
-      "flagsBody": "每座要塞守著本隊軍旗。奪取敵旗並送到己方旗座即可得分;先奪得五次者獲勝,超時的戰鬥按比分定勝負。旗手陣亡時旗幟就地掉落:敵人可以再次拾起,而本隊隊員只需靠近便能立即將其送回。軍旗也絕不藏身:拾旗會解除潛行,旗手若以任何方式隱身,旗幟都會當場掉落。",
+      "flagsBody": "每座要塞守著本隊軍旗。奪取敵旗並送到己方旗座即可得分;先奪得三次者獲勝,超時的戰鬥按比分定勝負。旗手陣亡時旗幟就地掉落:敵人可以再次拾起,而本隊隊員只需靠近便能立即將其送回。軍旗也絕不藏身:拾旗會解除潛行,旗手若以任何方式隱身,旗幟都會當場掉落。",
       "pickupNote": "拾旗永遠需要主動按下戰場動作鍵:沒有人會因為跑過旗幟而意外成為旗手。",
       "respawnHeading": "戰場陣亡",
       "respawnBody": "死亡保留經典儀式:屍體停在原地,直到你親自釋放靈魂;靈魂會在你方主堡旁的圍欄墓地中升起,並被結界束縛,直到你方下一波復活潮。復活潮會同時喚起所有等待的靈魂;兩隊的復活潮刻意錯開,戰鬥永遠不會同時完全重置。這裡沒有跑屍,也沒有靈魂醫者的交易:釋放、等潮、再戰。",

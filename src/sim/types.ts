@@ -76,6 +76,9 @@ export type HonorReason =
   | 'fiesta_complete'
   | 'fiesta_win'
   | 'battleground_win'
+  // The once-per-UTC-day first Thornhollow Fields win bonus, paid as its own
+  // grant beside the ordinary win award so the float and the chat line name it.
+  | 'battleground_first_win'
   | 'battleground_complete'
   | 'battleground_kill'
   | 'battleground_assist';
@@ -90,6 +93,12 @@ export interface HonorArenaDailyState {
   // Thornhollow Fields results per opposing-team identity (optional so pre-battleground
   // saves stay byte-equal; absent until the first battleground result).
   bgResultsByOpponent?: Record<string, number>;
+  // The first-win-of-the-day bonus has been paid for `date` already. Optional and
+  // absent until it is claimed, exactly like `bgResultsByOpponent`, so a save that
+  // predates the bonus (or a day that has not paid it yet) round-trips byte-equal.
+  // It rides THIS window rather than a state of its own because the window already
+  // owns the UTC date string and the one rollover that clears every daily counter.
+  bgFirstWinClaimed?: boolean;
   totalWins: number;
 }
 // Shared cooldown across ALL combat potions (classic-era potion sickness): one
@@ -4478,6 +4487,11 @@ export type SimEvent = { pid?: number } & (
       killerTeam: number | null;
       victimTeam: number;
     }
+  // The match clock crossed a remaining-time threshold (BG_TIME_WARNINGS). One
+  // copy per match member, like bgKill: the call belongs to the whole field.
+  // `secondsLeft` is the threshold itself, not a live clock, so a late-delivered
+  // event never announces a number that has already gone stale.
+  | { type: 'bgTimeWarning'; secondsLeft: number }
   | {
       type: 'bgEnd';
       won: boolean;
@@ -4486,6 +4500,12 @@ export type SimEvent = { pid?: number } & (
       scoreAzure: number;
       ratingBefore: number;
       ratingAfter: number;
+      // WHY the match ended, so the finish surface can say so: played to the
+      // capture target, the match clock ran out, or a side forfeited. A timer
+      // ending used to be indistinguishable from a played-out one on screen.
+      ended: 'caps' | 'timer' | 'forfeit';
+      // The first-win-of-the-day Honor bonus included in THIS result, or 0.
+      firstWinBonus: number;
     }
   // 2v2 Fiesta party mode. All carry pid (personal - delivered to each combatant).
   // `fiestaScore`: the running team tally changed. `fiestaWave`: a new augment

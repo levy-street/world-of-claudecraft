@@ -2310,6 +2310,14 @@ export const DEEDS: Record<string, DeedDef> = {
   // battleground.ts). Meters read the persisted PlayerMeta standing (bgWins /
   // bgCaptures), so they count OUTCOMES, never attendance (rule 6), and
   // retro-grant on load like every meter.
+  //
+  // The career-100 captures deed paces off BG_CAPS_TO_WIN, which was retuned
+  // from 5 to 3: a dominant winner now banks at most 3 captures per match
+  // rather than 5, so that deed's tail lengthens by roughly the same ratio.
+  // Left AS IS deliberately. The meter is career-cumulative with no time
+  // window, deeds are cosmetic-only (a title and Renown, never power), and
+  // re-cutting the threshold every time the match target moves would keep
+  // re-basing a number players are already partway through.
   pvp_bg_first_capture: {
     id: 'pvp_bg_first_capture',
     name: 'Banner in Hand',

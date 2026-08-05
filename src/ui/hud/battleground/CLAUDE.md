@@ -10,11 +10,25 @@ The Thornhollow Fields 5v5 capture-the-flag HUD surface behind the `index.ts` ba
   `GET /api/battleground/leaderboard`. There is no separate battleground
   window, launcher, or keybind anymore; `hud.toggleBattleground()` deep-opens
   the merged window on the Thornhollow Fields tab.
+- `bg_end_banner_view.ts`: the copy model for the two across-screen CALLS that
+  are not flag plays: the match-end verdict (one big word reusing the
+  scoreboard's own `resultVictory`/`resultDefeat`/`resultDraw` keys, over
+  secondary lines that each stay their own `t()` key rather than one
+  concatenated sentence) and the remaining-time warnings. `hud.handleEvents`
+  resolves the copy here and hands it to the banner, so the decision is
+  unit-testable without a DOM.
 - `battleground_scoreboard_view.ts` + `battleground_scoreboard_painter.ts`: the
   in-match strip (#bg-scoreboard, self-mounted) plus the wave-respawn overlay
   (#bg-respawn) and spawn-protection line (#bg-protected). The `ValeCupHud`
   shape: structural sig gates the skeleton; every per-second value rides the
-  PainterHost elided writers.
+  PainterHost elided writers. The painter is also the SINGLE source of truth for
+  whether the expanded board is open: it holds the player's pin, the
+  snapshot-derived result-hold expansion (`view.state === 'ended'`, so a player
+  who reconnects into the hold still gets the final board) and the
+  dismissed-this-result latch behind one elided applier, and it writes
+  `aria-expanded` from that same value. The stylesheet deliberately does NOT
+  reveal the board on `.ended`: a second, invisible reveal there left the aria
+  state lying and made the outside-click dismissal inert.
 
 - `battleground_map_view.ts` + `battleground_map_painter.ts`: the M-key world
   map's Thornhollow surface. The view is the HONEST marker model (self plus

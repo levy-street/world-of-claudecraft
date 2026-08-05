@@ -6,9 +6,12 @@
 // resolves the string here and hands it straight to the FCT painter, so the copy
 // is unit-testable without a DOM, a Sim, or a painter.
 //
-// WHICH gains name a reason, and why only those two: the per-kill and per-assist
+// WHICH gains name a reason, and why only those three: the per-kill and per-assist
 // drip (src/sim/pvp/honor.ts) is a fast, repeating trickle landing mid-fight, and
-// "+5 Honor" alone leaves the player guessing which of the two just paid. Every
+// "+5 Honor" alone leaves the player guessing which of the two just paid. The
+// first-win-of-the-day bonus is the third, for the opposite reason: it lands in the
+// same instant as the ordinary win award, so two unlabelled floats stack over the
+// player and neither says which is the once-a-day one they came back for. Every
 // other reason is a once-per-match award that already has a louder surface (the
 // arena / battleground result banner and its chat line), so it keeps the plain
 // float rather than repeating a banner that is on screen at that moment. A reason
@@ -24,6 +27,7 @@ import { formatNumber, type TranslationKey, t } from './i18n';
 export const HONOR_FLOAT_REASON_KEYS: Partial<Record<HonorReason, TranslationKey>> = {
   battleground_kill: 'hudChrome.warfare.floatReasons.kill',
   battleground_assist: 'hudChrome.warfare.floatReasons.assist',
+  battleground_first_win: 'hudChrome.warfare.floatReasons.firstWin',
 };
 
 /** The float's short reason label key, or null when this gain floats plain. */

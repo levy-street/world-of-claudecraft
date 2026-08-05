@@ -138,6 +138,7 @@ function makeCtx() {
     bgQueue: [],
     bgMatches: new Map(),
     bgBusySlots: new Set(),
+    bgOutcomes: [],
     nextBgMatchId: 1,
     delveRuns: [],
     delvePetStash: new Map(),
