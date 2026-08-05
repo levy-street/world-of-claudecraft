@@ -524,7 +524,19 @@ def build_marsh():
         leather=ramp(0xA98A5C, 0x5B4830),        # hemp and rope: repairs from the docks
         spare_a=ramp(0xA98A5C, 0x5B4830),
         boots=ramp(0x3E3226, 0x1E1811),          # dark boots and under-armour
-        spare_b=ramp(0x8A8F8B, 0x434744),        # the issued helm: the only real metal on him
+        # The issued helm and his halberd's head. Neutral-warm iron, a clear STEP
+        # DOWN in value from the pale jack: it separates the way the rest of him
+        # does, by value, instead of by being the one cold thing on a warm figure.
+        # Fully warm (0x8E8478) folded him back into one flat mass; the original
+        # cold 0x8A8F8B made the helmet win the read on its own.
+        #
+        # Stepped down again, from 0x87837A, because a texture value is not a
+        # rendered value. The hat is the single largest surface on him and its crown
+        # is a faceted dome facing the key almost square on, while the jack is a
+        # rounded torso raking away from it: at 0x87837A the hat measured darker than
+        # the jack in the atlas and still came out the brightest mass in every plate.
+        # The lighting, not the swatch, decides who wins the read.
+        spare_b=ramp(0x76726A, 0x37342F),
         steel_b=ramp(0x6A6A62, 0x343430),        # small iron fittings: buckle, chest patch
         canvas=ramp(0xD2C8AE, 0x82795F),
         cloth=crew.BRONZE,                       # the rank badge, and nothing else
@@ -534,6 +546,7 @@ def build_marsh():
     img, mat = crew.repaint(meshes, "marsh", palette)
     body = _body(meshes)
     helmet = _body(meshes, "Helmet")
+    head = _body(meshes, HEAD)
 
     # THE VALUE FIX, and it needs no geometry at all. On the knight body one cell
     # (`plate`) covers the cuirass, arms, legs AND the helmet, which is exactly why he
@@ -551,8 +564,25 @@ def build_marsh():
     # painting it helm-iron put a pale scrap on his sternum, which is the stray white
     # fleck the review flagged.
     crew.reuv(helmet, "plate", "spare_b", shade_t=0.24)
-    crew.reuv(helmet, "trim", "spare_b", shade_t=0.34)   # and its crown fins with it
+    crew.reuv(helmet, "trim", "spare_b", shade_t=0.34)
     crew.reuv(body, "cloth", "bronze", shade_t=0.30)     # one issued rank badge
+
+    # THE KETTLE HAT. Re-UV'ing the bascinet fixed its colour and never its shape:
+    # a closed knight's helm over a padded cloth jack is a kit that contradicts
+    # itself, and its crown ribs read as a spiked coronet that out-ornamented the
+    # warden. Cut it down to the town-watch chapel-de-fer instead, which agrees with
+    # the jack, is nothing like Coalfast's closed helm, and leaves his face readable.
+    parts.kettle_hat(helmet)
+    # Then ride it clear of his own hair. Nearest-surface alone left a lock through
+    # the crown, because a spike can pass BETWEEN two vertices; the radial pass
+    # measures the scalp along the ray each dome vertex sits on. Assert it, because
+    # a poke-through is invisible in the plate that happens to face the other way.
+    for step in (0.030, 0.034, 0.038):
+        parts.radial_clear(helmet, head, centre=(0.0, -0.025, 1.86), clear=step, above=1.86)
+    parts.clear_of_host(helmet, head, clear=0.026, above=1.86)
+    stuck = parts.pokes_through(helmet, head, above=1.90)
+    if stuck:
+        raise SystemExit(f"marsh: {stuck} hair vertices pierce the kettle hat")
 
     built = []
 
@@ -573,15 +603,31 @@ def build_marsh():
         (0.090, waist - 0.036, 0.986), (0.250, waist + 0.060, 0.972),
     ], width=0.052, thick=0.046, cell="leather", shade_t=0.30,
         material=mat, up=(0, -1, 0)))
-    built.append(parts.strap("Marsh_Lashing1", parts.sash_path(body, -0.200, 0.235,
-                                                              z_hi=1.230, z_lo=0.968),
-                             width=0.046, thick=0.042, cell="leather", shade_t=0.42,
-                             material=mat, up=(0, -1, 0)))
+    # The diagonal is his RANK SASH, so it is built at sash width, not rope width.
+    # At the lashing's 0.046 it was 0.6 percent of his surface area, and recolouring
+    # something that small cannot mark anything. Wide and thin now (a band of cloth
+    # over the jack, not another rope), which is also what lets it hold a colour.
+    sash = parts.strap("Marsh_Lashing1", parts.sash_path(body, -0.200, 0.235,
+                                                         z_hi=1.230, z_lo=0.968),
+                       width=0.098, thick=0.032, cell="leather", shade_t=0.42,
+                       material=mat, up=(0, -1, 0))
+    # A flat ribbon is straight across its width, and his chest is not: at rope width
+    # that error is invisible, at sash width the band's edges cut into the torso. Ride
+    # it out onto the real surface with the same primitive the hat uses.
+    parts.clear_of_host(sash, body, clear=0.010, iters=2)
+    built.append(sash)
 
     _skinned(built, rig, {
         "Marsh_Pauldron": "upperarm.r",
         "Marsh_Lashing0": "chest", "Marsh_Lashing1": "chest",
     })
+    # THE SERGEANT'S SASH. The diagonal goes to bell bronze while the waist wrap
+    # stays hemp, so he keeps the improvised-repair character AND gains the one
+    # marker that separates him from the militia line he commands. Rank has to be
+    # legible against men built on the same body: hat, halberd, pauldron, sash.
+    crew.reuv(next(o for o in built if o.name == "Marsh_Lashing1"),
+              "leather", "bronze", shade_t=0.28)
+
     return _finish("marsh", rig, meshes, built, img, mat)
 
 
@@ -739,11 +785,24 @@ def build_creature(member):
     return {"rig": rig, "meshes": meshes + built, "atlas": None, "material": None}
 
 
+def build_shipped(member):
+    """Photograph a body that is already finished.
+
+    The Riftspawn and the Sundered Horror are no longer repainted skeletons. Both
+    were generated from a concept, rigged onto the KayKit skeleton locally (so they
+    carry all 22 native clips rather than a retargeted subset), and then edited in
+    Blender: the Riftspawn's arm chain was dropped onto its real upper arm pair and
+    its lower pair pinned to the chest bone. Nothing is rebuilt here; the plate has
+    to show the GLB the game actually loads, or the book is lying.
+    """
+    entry = cast.CAST[member]
+    rig, meshes = crew.load_shipped(entry["base"])
+    return {"rig": rig, "meshes": meshes, "atlas": None, "material": None}
+
+
 RECIPES = {
     "ewald": build_ewald,
-    "riftspawn": build_riftspawn,
     "breach_wretch": build_breach_wretch,
-    "sundered_horror": build_sundered_horror,
     "marsh": build_marsh,
     "coalfast": build_coalfast,
     "coalfast_helm": build_coalfast_helm,
@@ -753,6 +812,10 @@ RECIPES = {
     "tam": build_tam,
     "nell": build_nell,
 }
+
+# Already-finished bodies: photographed, never rebuilt.
+for _id in ("riftspawn", "sundered_horror"):
+    RECIPES[_id] = (lambda m: (lambda: build_shipped(m)))(_id)
 
 # The two baked-texture bodies keep the generic creature path.
 for _id in ("void_stalker", "tidemill_stalker"):

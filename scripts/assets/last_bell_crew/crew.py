@@ -35,6 +35,7 @@ REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")
 PLAYERS = f"{REPO}/public/models/chars/players"
 ENEMIES = f"{REPO}/public/models/chars/enemies"
 CREATURES = f"{REPO}/public/models/creatures"
+NPCS = f"{REPO}/public/models/chars/npcs"
 
 
 def base_path(glb):
@@ -156,6 +157,29 @@ def load_creature(glb, hide=()):
     return rig, meshes
 
 
+def load_shipped(glb):
+    """Load an ALREADY FINISHED body out of `chars/npcs` for plate rendering.
+
+    The other loaders here import a stock KayKit base that a recipe then builds
+    onto. These bodies arrive done: generated externally, rigged onto the KayKit
+    skeleton, and edited in Blender before export, so the concept book's job is
+    to photograph the shipping GLB rather than to rebuild it. Same return shape
+    as `load_base`, so `plates.py` needs no special case.
+    """
+    before = set(bpy.data.objects)
+    bpy.ops.import_scene.gltf(filepath=f"{NPCS}/{glb}")
+    new = [o for o in bpy.data.objects if o not in before]
+    rig = next((o for o in new if o.type == "ARMATURE"), None)
+    meshes = [o for o in new if o.type == "MESH" and not o.name.startswith("Icosphere")]
+    for o in [o for o in new if o.type == "MESH" and o not in meshes]:
+        bpy.data.objects.remove(o, do_unlink=True)
+    if rig:
+        rig.data.pose_position = "REST"
+        if rig.animation_data:
+            rig.animation_data.action = None
+    return rig, meshes
+
+
 def repaint(meshes, name, palette, size=512):
     """Swap the shipped palette grid for a repainted one, in place."""
     img = bpy.data.images.new(f"{name}_atlas", size, size, alpha=False)
@@ -251,6 +275,12 @@ def arm(rig, weapons):
     """Mount a figure's held props from its cast `weapons` list."""
     out = []
     for spec in weapons:
+        # A figure whose weapon is BESPOKE builds and mounts it itself (it shares
+        # the body's palette atlas, so it cannot be loaded from a finished GLB
+        # before that atlas exists). The cast entry stays so the book still lists
+        # what he carries.
+        if spec.get("built_in"):
+            continue
         grip = dict(GRIPS[spec["grip"]])
         grip.update(spec.get("tune", {}))
         stem = os.path.basename(spec["url"]).replace(".glb", "")

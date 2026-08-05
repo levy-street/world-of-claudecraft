@@ -20,6 +20,30 @@ that shows the defect so re-review is a file open, not a hunt.
 
 Ordered so the cheap certain fixes land before the speculative art passes.
 
+Third pass, 2026-08-04 (Marsh only), two maintainer items, both **DONE**:
+
+- **The kettle hat brim read as a zigzag.** Cause: the cut that makes the hat is a
+  face-CENTRE test (`parts.kettle_hat`), so the rim it leaves steps by up to a whole
+  face in both radius and height, and all three brim rings are extruded off that rim.
+  A radial push moves each vertex along its OWN direction, so the sawtooth was not
+  merely inherited but amplified, and a uniform per-ring `dz` preserved the height
+  stagger exactly. Fix: `parts._relax_ring` angular-low-passes the loop's radius and
+  height, applied to the cut rim BEFORE anything is extruded and again per ring,
+  ramping to full strength by the outer ring. A filter and not a circle fit, because
+  the dome is offset and slightly oval and snapping it round trades a sawtooth for a
+  tin lid.
+- **The halberd is gone; he carries a sword.** Maintainer decision after the polearm
+  was chased to the bottom: `weapons/adv_sword_1handed.glb` on the shared `blade` grip
+  with a per-weapon `tune` of `scale: 0.78`, so it reads heavier than the warden's
+  arming sword. Everything halberd-specific was reverted with it (the bespoke model,
+  the clip graft, the `militia_polearm` grip, the weapons subdir spec item).
+  The reason it cannot work is measured and recorded in
+  `docs/design/last-bell-polearm-carry.md` section 3: the grip sits 28 percent up the
+  haft so the head starts 0.571 above the hand, while this body's head and hat are 48
+  percent of its height, which puts the blade inside the skull at every roll and scale.
+  Section 4 of that doc records four measurement traps that made a broken solve look
+  verified, and they are worth reading before writing any grip solver.
+
 ---
 
 ## 1. Grip and prop defects (cheap, causes understood)
@@ -34,14 +58,14 @@ read wrong.
 | # | Figure | Defect | Fix | Status |
 |---|---|---|---|---|
 | 1.1 | Coalfast | Shield is **back to front**: the inside faces the enemy | `shield` grip is `(90, 0, 0)`, which presents the BACK. The candidate grid's `-90` variants showed the painted face, so the shield family wants `(-90, 0, 0)`. Re-run the Block-pose grid to confirm before committing, and re-check the `(0, 0.02, 0)` offset sign in the same grid: the flip moves the hand to the other side of the plane. | FIX |
-| 1.2 | Marsh | Shield back to front (same cause as 1.1) | MOOT for Marsh: a sergeant's halberd is two-handed, so he no longer carries a shield. **Still open for Coalfast (1.1)**, and the family fix is still the same one-liner. | **N/A (Marsh)** |
-| 1.3 | Marsh | Spear sits **sideways** in the animations | **DONE** via the halberd and a new `polearm` grip SOLVED numerically: sweep the bone-space rotation and maximise the weapon's verticality with the head up in the Idle pose, giving `(90, 0, -90)`. He now carries it grounded and vertical, head up, butt at his feet, which is the 'my line holds the road' silhouette. The attack clip thrusts it forward (correct for a polearm) and foreshortens at the book's default camera, so that plate carries its own yaw; poses may now specify one. | ~~ `pole` is `(0, 0, 0)`. Needs its own grid pass in `Idle`, `Block` AND `1H_Melee_Attack_Chop`: a pose that reads at rest can still be wrong mid-swing, and this one is wrong in Idle too. | FIX |
+| 1.2 | Marsh | Shield back to front (same cause as 1.1) | MOOT for Marsh: he carries a sword and NOTHING in the off hand, which is also what separates him from Coalfast's heavy square shield now that the polearm is gone. **Still open for Coalfast (1.1)**, and the family fix is still the same one-liner. | **N/A (Marsh)** |
+| 1.3 | Marsh | Spear sits **sideways** in the animations | **DONE by removing the polearm.** Three grips were solved for it (`(90, 0, -90)`, then `(-1.75, 69.06, 178.8)` at 0.86, then `(24, 72, -162)` at 0.94) and each read wrong in a different way; the fourth pass proved by measurement that no grip can work at these proportions. He carries a sword on the shared `blade` family grip, `tune` `scale: 0.78`. | See the third-pass note above and `last-bell-polearm-carry.md`. | **DONE** |
 | 1.4 | Ollun | Staff is **upside down** (brass crown at the bottom) | `stave` is `(90, 0, 0)`; invert to `(-90, 0, 0)`. Grid it in `Idle` AND `Spellcast_Raise`: the inversion only reads in raised-arm clips. | FIX |
 | 1.5 | Ollun | Holds the open journal **like a shield**, out in front | Remove `tools/journal_open.glb` from his `weapons` in `cast.py` (one line). If the record should stay visible, a closed book at the hip is a small `parts.plate` two-slab plus strap skinned to the hips in `build_ollun`, same idiom as the satchel. Preference stands: closed book at the hip or satchel only. | FIX (removal) / OPEN (hip book) |
 | 1.6 | Ewald | Should carry **no weapon at all** | Remove the boat gaff from his `weapons` list. His outfit carries him without it. | **DONE** |
 | 1.7 | Edda | Remove the second-hand item, keep only the hammer | Drop `tools/tongs.glb` from her `weapons`. | FIX |
 | 1.8 | Saul | Not holding the lantern properly | Direction proposed: take it out of the hand entirely and **hang it from his belt at the left hip** (strap loop plus lantern skinned to the hips in `build_saul`, same idiom as the satchel and tool roll), with warm emissive glass (see 2.16). Reads in every clip from every angle, no wrist-rotation failure mode, and makes "the one person whose hands are the tools" literally true with both hands empty. Fallback stays the recorded one: remove it. In-hand is the worst of the three options. | OPEN (belt hang proposed) |
-| 1.9 | Marsh | Spear reads as a **tribal** spear, not a warrior's | **DONE**: `halberd.glb`, at grip scale 0.72. It is a better fit than a plain spear would have been, because a halberd was a sergeant's literal BADGE OF RANK, so his one good possession is also the reason his line can hold a road, and everything else on him being patched now has a point. The old spear was `spear_a.glb`, which has blue crystal blades at both ends and tassels: a magic tribal weapon on a militia conscript. | ~~ `spear_a.glb` is the only spear in the kit and it is the tribal one. Either re-point him at a different shipped polearm (`halberd.glb`) or generate a plain militia spear through the Tripo pipeline (section 4). Whichever route: also raise the `pole` grip scale from 0.62 toward 0.8 in the same pass; at current scale the spear is a torso and a half long and reads as a javelin, not a road-holder. | OPEN |
+| 1.9 | Marsh | Spear reads as a **tribal** spear, not a warrior's | **DONE**: `weapons/adv_sword_1handed.glb`, a plain steel arming sword, carried a size up on the family grip so it reads heavier than the warden's. The old `spear_a.glb` had blue crystal blades at both ends and tassels, a magic tribal weapon on a militia conscript. A bespoke halberd was built and then cut with the whole polearm attempt (see 1.3). One keeper from it: the game had been attaching the SHARED model all along, because `model.py` flattened a built-in weapon's export path into the NPC body directory. | Done. | **DONE** |
 | 1.10 | Coalfast (both forms) | Sword gripped at the ricasso: roughly two fist-heights of bare handle plus the ball pommel dangle below the hand, and the red grip wrap peeks past the fist as a single bright speck that reads as a blood fleck at plate size | Offset the `blade` grip along the bone axis in `GRIPS` so the fist seats mid-grip; buries the red speck for free. | FIX |
 | 1.11 | Edda | The Cheer clip buries the hammer head in her hair; the visible handle stub reads as a club | Pose-specific interpenetration, one plate only. A per-weapon `tune` override on the `haft` grip in `cast.py` could nudge it, but Cheer is a review-page pose, not a gameplay read. Recommendation: accept it. Do NOT re-grid `haft`; the hammer is the best prop in the book (section 3). | OPEN (probably accept) |
 
@@ -541,3 +565,75 @@ Nell details) are explicitly not blockers.
 Waves 1 and 2 are a single sitting and remove roughly half the list. Wave 3 is
 where art judgement re-enters; re-render and re-review each figure on the page
 before marking `DONE`.
+
+---
+
+## 11. Long weapons: what KayKit actually supports
+
+Recorded because the standing assumption was that the kit cannot carry a polearm,
+and half of that is true in a way worth knowing precisely.
+
+**KayKit ships no polearm MODEL.** The Adventurers weapon set is sword (1H and 2H),
+axe (1H and 2H), dagger, crossbow (1H and 2H), arrow, quiver, staff, wand, spellbook,
+shields, mug, smokebomb. There is no spear, halberd, pike or glaive anywhere in it.
+`weapons/halberd.glb` and `weapons/spear_a.glb` are from other packs, which is exactly
+why the halberd arrived carrying saturated star-glass crystal petals.
+
+**KayKit does ship the polearm ANIMATIONS, and this repo throws them away.** The CC0
+Adventurers 1.0 characters carry **76 clips**; `specs/characters_v2.json` keeps 22 by
+`keepClips`, so 54 are dropped, and among the dropped are `2H_Melee_Idle` (a stance
+with both hands on a haft), `2H_Melee_Attack_Stab`, `1H_Melee_Attack_Stab`,
+`2H_Melee_Attack_Slice`, `2H_Melee_Attack_Spin`, `Blocking`, `Block_Attack`,
+`Block_Hit`, four `Dodge_*`, `Throw`, `PickUp`, `Interact`, `Use_Item`, the
+`Unarmed_*` set and the full sit/lie stand-up transitions. The engine's clip
+vocabulary IS the Adventurers 1.0 naming, which is what `renameClips` maps the paid
+1.1 library back onto.
+
+**The rigs are interchangeable.** Adventurers 1.0's rig carries all 23 of the deform
+bones the shipped bodies use, under identical names, at an identical rest pose (checked
+bone by bone; worst delta 0.000 on every skeleton bone). So a clip harvested from the
+free pack grafts onto a shipped body with no retargeting at all. The armature OBJECT is
+named `Rig` in 1.0 and `Rig_Medium` in 2.0, which matters only for the appended action's
+slot identifier (`source/make_clip_lib.py` renames it).
+
+**Where the missing clips should come from.** The right home is `characters_v2.json`:
+add the clip to `renameClips` plus `keepClips` and every character gets it, players
+included. That needs the PAID Character Animations 1.1 pack restored to
+`tmp/asset_src/kaykit/`, which is not in the tree. Until then
+`scripts/assets/last_bell_crew/source/kaykit_polearm_clips.blend` is the stopgap and it
+only reaches figures this factory builds.
+
+**Two traps, both of which look like success.**
+
+1. *A GLB clip library silently loses its clips.* With no mesh worth shipping the
+   library exports with no skin, and with no skin nothing marks the bone nodes as
+   joints, so the importer reads them back as loose OBJECTS and the action returns with
+   one slot PER BONE instead of one for the armature. It binds to nothing and the glTF
+   exporter drops it without a word: the build reports success and is quietly missing a
+   clip. Hence a `.blend` action library, and hence `add_clips` refusing a name the base
+   body already ships rather than letting it arrive suffixed `.001`.
+2. *Grip objectives get gamed, and each failure reads as a win in the numbers.*
+   Minimising vertices inside the body parks the weapon behind his back, where nothing
+   intersects because nothing is visible (already recorded in `crew.GRIPS`). Adding a
+   screen-space penalty for the blade landing on his head then lays the polearm FLAT
+   across his chest, for the same reason; that objective is also unsatisfiable as posed,
+   since a blade carried at shoulder height shares the head's screen box from some yaw
+   whatever you do. What works: pay for verticality, pay for the blade standing clear of
+   the torso axis so hiding it COSTS, pay for apparent width at the hero yaw, and
+   penalise 3D distance to the head shell rather than screen overlap. Penetration then
+   verifies instead of steering, and it verifies well: zero buried vertices across four
+   scored poses where the previous tuning sat at 26 to 28.
+
+**Two-handed locomotion does not exist.** There is no `2H_Walking` or `2H_Running` in
+the 76, so a two-handed carry is an idle-and-attack read only: Marsh walks, runs, takes
+hits and dies with the polearm in one hand. Authoring those clips is the only fix and it
+is out of proportion to the gain.
+
+**Neither two-handed ATTACK clip can hold a polearm.** Both are built around a sword's
+arc, where the blade ends near the wrist, so the same wrist rotation on a haft swings
+the crescent out through the crown of his helmet. Measured against the solved grip,
+`2H_Melee_Attack_Stab` also swings the weapon least of any candidate (46 degrees).
+The clip that reads as a polearm thrust is `1H_Melee_Attack_Slice_Diagonal`, already in
+the 22: it levels the haft down his line of attack (axis 0.96 forward, nearly
+horizontal) and reaches furthest. So the militia, when they are built, want the same
+pair: `2H_Melee_Idle` to stand and the 1H diagonal to strike.
