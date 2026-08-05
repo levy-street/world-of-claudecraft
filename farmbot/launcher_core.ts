@@ -274,7 +274,7 @@ export function assembleConfig(f: LauncherFormConfig): Record<string, unknown> {
     if (f.lootRule) levelGrind.lootRule = f.lootRule;
     out.levelGrind = levelGrind;
   }
-  if (f.mode === 'target') {
+  if (f.mode === 'target' && f.targetItemId !== '') {
     const target: Record<string, unknown> = { itemId: f.targetItemId };
     if (f.targetGoal !== null) target.goal = f.targetGoal;
     if (f.targetSource && f.targetSource !== 'auto') target.source = f.targetSource;

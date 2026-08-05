@@ -621,6 +621,10 @@ $('loadChars').onclick = async () => {
 $('startBtn').onclick = async () => {
   setMsg('runMsg', '', true);
   if (!$('character').value) { setMsg('runMsg', 'load characters and pick one first', false); return; }
+  if ($('mode').value === 'target' && !$('targetItemId').value.trim()) {
+    setMsg('runMsg', 'target mode: pick a material to farm first', false);
+    return;
+  }
   try {
     const config = gatherConfig();
     await api('/api/start', {
