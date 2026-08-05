@@ -8,6 +8,7 @@ import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import type { OverheadEmoteId } from '../../world_api';
 import { GFX } from '../gfx';
+import { cloneMaterialWithHooks } from '../material_clone_hooks';
 import { createWeaponVfx, WEAPON_VFX, type WeaponVfxHandle } from '../weapon_vfx';
 import { weaponVfxTuningFor } from '../weapon_vfx_tuning';
 import {
@@ -1218,7 +1219,11 @@ export class CharacterVisual {
       this.writeAuraGlow(cached);
       return cached;
     }
-    const glow = material.clone();
+    // Program-preserving clone: a bare clone() drops the source's
+    // onBeforeCompile layers, so it both renders un-patched and links a fresh
+    // program on its first draw (material_clone_hooks.ts). That first draw is
+    // the first spec'd hit on this rig, i.e. mid-combat for every mob.
+    const glow = cloneMaterialWithHooks(material);
     this.writeAuraGlow(glow);
     this.auraGlowMaterials.set(material, glow);
     return glow;

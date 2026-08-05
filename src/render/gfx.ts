@@ -1886,6 +1886,14 @@ export function addRimGlow(mat: THREE.Material): void {
     `pbr-rim-reuse|${previousCompileSource}|${previousProgramKey()}`;
 }
 
+/** True when addRimGlow already patched this exact material instance. A
+ *  Material.clone() is NOT the same instance and never carries the hook (clone
+ *  copies userData but drops onBeforeCompile), which is what
+ *  material_clone_hooks.ts re-attaches. */
+export function hasRimGlow(mat: THREE.Material): boolean {
+  return rimGlowMaterials.has(mat);
+}
+
 // Material factory: dedupes by (color|maps|flags) so hundreds of small box
 // meshes share a few dozen programs/uniform sets. Standard on high/ultra,
 // Lambert on low.

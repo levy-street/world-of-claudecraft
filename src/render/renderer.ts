@@ -4846,15 +4846,16 @@ export class Renderer {
       }
     }
     // One EXTRA rig per class wearing the ability-VFX aura glow: setAuraGlow's
-    // on-edge swaps the rig materials for private clones, and on the tinted
-    // player rigs that clone links a NEW program. Without this seed the FIRST
-    // spec'd cast of a session compiles it synchronously mid-frame - the
+    // on-edge swaps the rig materials for private clones, and the FIRST spec'd
+    // cast of a session used to compile them synchronously mid-frame (the
     // measured 'mage' program link landing inside the player's own cast
-    // moment (e.g. mid Solemn Prayer cast bar). Seeding glow-lit copies here
-    // puts the clone materials in front of programs.compile while the base
-    // rigs above still carry the un-glowed originals; the group is removed in
-    // the prewarm finally, but the linked programs stay cached for the
-    // session.
+    // moment, e.g. mid Solemn Prayer cast bar). The clones now keep the
+    // source's shader hooks and therefore its program cache key
+    // (material_clone_hooks.ts), which is what closes that hole for mob rigs
+    // and non-default skins too; this seed stays as the boot-side belt for the
+    // player classes, and for any rig material with no hook to preserve. The
+    // group is removed in the prewarm finally, but linked programs stay cached
+    // for the session.
     for (const cls of ALL_CLASSES) {
       if (performance.now() >= deadline) return { group, visualCount: idx };
       const color = CLASSES[cls]?.color ?? 0xffffff;
