@@ -6432,6 +6432,60 @@ export const TARGETS = [
       return { clip: '#desktop-update-toast' };
     },
   },
+  {
+    key: 'bow-skin-scale',
+    label: 'Bow skin size against the character, on the paperdoll turntable',
+    when: ['characters/weapon_grip'],
+    variants: [
+      { key: 'winterbite-desktop', charClass: 'hunter', charName: 'Sizewick', skin: 'winterbite' },
+      {
+        key: 'fletcher-desktop',
+        charClass: 'hunter',
+        charName: 'Sizewick',
+        skin: 'fletcher_s_guild_bow',
+      },
+    ],
+    async capture(page, variant) {
+      await page.waitForFunction(() => !!window.__game?.sim?.player, {
+        timeout: 90000,
+        polling: 250,
+      });
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      const staged = await page.evaluate((shot) => {
+        const sim = window.__game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return { ok: false, reason: 'offline world unavailable' };
+        sim.setPlayerLevel?.(60, player.id);
+        sim.addItem('direfang_greatblade', 1);
+        sim.equipItem('direfang_greatblade');
+        sim.changeWeaponSkin(shot.skin);
+        return { ok: true };
+      }, variant);
+      if (!staged.ok) throw new Error(`bow scale staging failed: ${staged.reason}`);
+      // The level grant fires a run of deed banners across mid-screen.
+      await wait(9000);
+      // The paperdoll turntable frames the character identically every run, so
+      // the weapon's size against the BODY is comparable shot to shot, which a
+      // world camera at a variable distance is not.
+      await page.evaluate(() => {
+        const b = document.querySelector('#banner');
+        if (b) b.style.display = 'none';
+        window.__game?.hud?.toggleChar?.();
+      });
+      if (!(await pollForSize(page, '#char-model-preview'))) {
+        throw new Error('character sheet paperdoll did not open');
+      }
+      await wait(3500);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return { clip: '#char-model-preview' };
+    },
+  },
 ];
 
 // Grant one staged stack (a plain count, or a specific ItemInstancePayload) and
