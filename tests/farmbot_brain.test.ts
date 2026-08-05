@@ -3474,3 +3474,287 @@ describe('farmbot brain: economy intelligence (phase 14)', () => {
     expect(poor.world.ridingLessons).toEqual([]);
   });
 });
+
+describe('farmbot brain: target mode (phase 17)', () => {
+  const TDEFS: Record<string, ItemDef> = {
+    pole: { id: 'pole', name: 'pole', use: { type: 'fishing' } } as unknown as ItemDef,
+    pick1: {
+      id: 'pick1',
+      name: 'pick1',
+      use: { type: 'gatherTool', professionId: 'mining', tier: 1 },
+    } as unknown as ItemDef,
+  };
+  const tItemDef = (id: string): ItemDef | undefined => TDEFS[id] ?? itemDef(id);
+
+  const T_NODES: GatherNodeDef[] = [
+    { id: 'ore_1', zoneId: 'zone_a', type: 'ore', pos: { x: 10, z: 0 }, level: 1, tier: 1 },
+    { id: 'ore_2', zoneId: 'zone_a', type: 'ore', pos: { x: 40, z: 0 }, level: 1, tier: 1 },
+    { id: 'herb_1', zoneId: 'zone_a', type: 'herb', pos: { x: 20, z: 0 }, level: 1, tier: 1 },
+  ];
+  const T_ZONES = [
+    {
+      id: 'zone_a',
+      zMin: -100,
+      zMax: 100,
+      hub: { x: 0, z: 0, radius: 10, name: 'hub' },
+      lakes: [{ x: 50, z: 0, radius: 10 }],
+    },
+  ] as unknown as ZoneDef[];
+
+  function gatherDeps(over: Record<string, unknown> = {}): Record<string, unknown> {
+    return {
+      nodes: T_NODES,
+      nodeMaterialTable: {
+        ore: { zone_a: { itemId: 'copper_ore', qtyByRarity: { common: 1 } } },
+        wood: {},
+        herb: {},
+      },
+      fishingTables: [{}],
+      mobs: {},
+      camps: [],
+      zones: T_ZONES,
+      items: TDEFS,
+      inventory: [{ itemId: 'pick1', count: 1 }],
+      proficiencies: {},
+      playerLevel: 3,
+      ...over,
+    };
+  }
+
+  function gatherBrain(over: Record<string, unknown> = {}, depsOver: Record<string, unknown> = {}) {
+    return makeBrain(
+      { mode: 'target', target: { itemId: 'copper_ore', ...over } },
+      { nodes: T_NODES, itemDef: tItemDef, targetDeps: gatherDeps(depsOver) as never },
+    );
+  }
+
+  it('gather source restricts the node route to the source nodes', () => {
+    const { state, world } = gatherBrain();
+    expect(state.targetSource?.kind).toBe('gather');
+    expect(state.nodes.map((n) => n.id)).toEqual(['ore_1', 'ore_2']); // herb_1 dropped
+    step(state, world, 0);
+    expect(state.travelNodeId).toBe('ore_1'); // nearest source node
+    expect(world.moveInput.forward).toBe(true);
+  });
+
+  it('fish source injects the resolved spots and drives casts there', () => {
+    const { state, world } = makeBrain(
+      { mode: 'target', target: { itemId: 'raw_test_fish' } },
+      {
+        nodes: T_NODES,
+        itemDef: tItemDef,
+        targetDeps: gatherDeps({
+          nodeMaterialTable: { ore: {}, wood: {}, herb: {} },
+          fishingTables: [{ zone_a: [{ itemId: 'raw_test_fish', weight: 10 }] }],
+          inventory: [{ itemId: 'pole', count: 1 }],
+        }) as never,
+      },
+    );
+    world.inventory = [{ itemId: 'pole', count: 1 }];
+    expect(state.targetSource?.kind).toBe('fish');
+    expect(state.config.fishing.enabled).toBe(true);
+    expect(state.config.fishing.spots.length).toBe(3); // one lake, three arc points
+    expect(state.nodes).toEqual([]); // no gathering on a fish target
+
+    world.player.pos = { x: 0, y: 0, z: 0 };
+    step(state, world, 0);
+    expect(world.moveInput.forward).toBe(true); // walking to spot 0
+    const spot = state.config.fishing.spots[0];
+    world.player.pos = { x: spot.x, y: 0, z: spot.z };
+    const logs = step(state, world, 100);
+    expect(logs.some((l) => l.includes('at fish spot 0'))).toBe(true);
+    expect(state.mode).toBe('FISH_CAST');
+    step(state, world, 200);
+    expect(state.mode).toBe('FISH_WAIT_BITE');
+    step(state, world, 600); // FISH_ARM_MS passed: the cast goes out
+    expect(world.itemsUsed).toEqual(['pole']);
+  });
+
+  it('mob source runs the camp loop even on gray mobs and counts the drop', () => {
+    const { state, world } = makeBrain(
+      { mode: 'target', target: { itemId: 'pelt' } },
+      {
+        nodes: T_NODES,
+        itemDef: tItemDef,
+        grindTables: {
+          camps: [{ mobId: 'wolf', center: { x: 50, z: 0 }, radius: 20, count: 3 }],
+          mobs: {
+            wolf: {
+              id: 'wolf',
+              name: 'wolf',
+              minLevel: 5,
+              maxLevel: 6,
+              loot: [{ itemId: 'pelt', chance: 0.5 }],
+            } as unknown as MobTemplate,
+          },
+          zoneIdAt: () => 'zone_a',
+          xpValue: mobXpValue,
+          zoneDefs: [{ id: 'zone_a', levelRange: [1, 7] }] as unknown as ZoneDef[],
+        },
+        targetDeps: gatherDeps({
+          nodeMaterialTable: { ore: {}, wood: {}, herb: {} },
+          mobs: {
+            wolf: {
+              id: 'wolf',
+              minLevel: 5,
+              maxLevel: 6,
+              loot: [{ itemId: 'pelt', chance: 0.5 }],
+            },
+          } as never,
+          camps: [{ mobId: 'wolf', center: { x: 50, z: 0 }, radius: 20, count: 3 }],
+          playerLevel: 20,
+        }) as never,
+      },
+    );
+    world.player.level = 20; // gray camp: still farmed for the drop
+    expect(state.targetSource?.kind).toBe('mob');
+    world.player.pos = { x: 0, y: 0, z: 0 };
+    step(state, world, 0);
+    expect(world.moveInput.forward).toBe(true); // walking to the camp
+
+    world.player.pos = { x: 45, y: 0, z: 0 };
+    world.player.facing = Math.PI / 2;
+    const wolf = makeEntity({ id: 90, name: 'wolf', level: 5, pos: { x: 48, y: 0, z: 0 } });
+    world.entities.set(90, wolf);
+    let logs = step(state, world, 700);
+    expect(logs.some((l) => l.includes('level: engaging wolf'))).toBe(true);
+    wolf.aggroTargetId = 1;
+    world.player.inCombat = true;
+    step(state, world, 800);
+    expect(state.mode).toBe('COMBAT');
+    wolf.dead = true;
+    world.player.inCombat = false;
+    step(state, world, 900);
+    expect(world.autoLoots).toEqual([90]); // lootRule all rides the LOOT pass
+    // the corpse mirror settles with the pelt in the bags: counted via delta
+    world.inventory = [{ itemId: 'pelt', count: 1 }];
+    logs = step(state, world, 1000);
+    expect(state.stats.targetCount).toBe(1);
+  });
+
+  it('counts gather/fish events without double counting the inventory delta', () => {
+    const { state, world } = gatherBrain();
+    step(state, world, 0); // baseline (empty bags)
+    world.inventory = [{ itemId: 'copper_ore', count: 2 }];
+    step(state, world, 100, [
+      {
+        type: 'gatherResult',
+        nodeId: 'ore_1',
+        nodeType: 'ore',
+        professionId: 'mining',
+        itemId: 'copper_ore',
+        rarity: 'common',
+        qty: 2,
+      } as SimEvent,
+    ]);
+    expect(state.stats.targetCount).toBe(2); // event counted, delta suppressed
+    world.inventory = [{ itemId: 'copper_ore', count: 5 }];
+    step(state, world, 200); // +3 with no event (loot path)
+    expect(state.stats.targetCount).toBe(5);
+    step(state, world, 300, [
+      {
+        type: 'gatherResult',
+        nodeId: 'ore_1',
+        nodeType: 'ore',
+        professionId: 'mining',
+        itemId: 'iron_ore',
+        rarity: 'common',
+        qty: 9,
+      } as SimEvent,
+    ]);
+    expect(state.stats.targetCount).toBe(5); // other items never count
+    world.inventory = [{ itemId: 'copper_ore', count: 6 }];
+    step(state, world, 400, [
+      {
+        type: 'fishingResult',
+        pid: 1,
+        itemId: 'copper_ore',
+        quality: 'common',
+        zoneId: 'zone_a',
+        band: 0,
+      } as SimEvent,
+    ]);
+    expect(state.stats.targetCount).toBe(6);
+  });
+
+  it('goal reached without mail stops the session with a log and alert', () => {
+    const { state, world } = gatherBrain({ goal: 2 });
+    step(state, world, 0);
+    world.inventory = [{ itemId: 'copper_ore', count: 2 }];
+    // the goal check rides the same tick the count lands on
+    const logs = step(state, world, 100, [
+      {
+        type: 'gatherResult',
+        nodeId: 'ore_1',
+        nodeType: 'ore',
+        professionId: 'mining',
+        itemId: 'copper_ore',
+        rarity: 'common',
+        qty: 2,
+      } as SimEvent,
+    ]);
+    expect(state.done).toBe(true);
+    expect(world.logouts).toBe(1);
+    expect(logs.some((l) => l.includes('target: goal 2 copper_ore reached'))).toBe(true);
+    expect(state.alerts.some((a) => a.text.includes('goal 2'))).toBe(true);
+  });
+
+  it('goal with mailToWhenDone mails the stack before stopping', () => {
+    const { state, world } = gatherBrain({ goal: 2, mailToWhenDone: 'Bankalt' });
+    step(state, world, 0);
+    world.inventory = [{ itemId: 'copper_ore', count: 2 }];
+    let logs = step(state, world, 100, [
+      {
+        type: 'gatherResult',
+        nodeId: 'ore_1',
+        nodeType: 'ore',
+        professionId: 'mining',
+        itemId: 'copper_ore',
+        rarity: 'common',
+        qty: 2,
+      } as SimEvent,
+    ]);
+    expect(state.done).toBe(false);
+    expect(state.targetPhase).toBe('mail');
+    expect(logs.some((l) => l.includes('mailing copper_ore to Bankalt'))).toBe(true);
+    world.entities.set(
+      70,
+      makeEntity({
+        id: 70,
+        kind: 'object',
+        templateId: 'mailbox',
+        hostile: false,
+        pos: { x: 3, y: 0, z: 0 },
+      }),
+    );
+    step(state, world, 200);
+    expect(world.mails.length).toBe(1);
+    expect(world.mails[0].to).toBe('Bankalt');
+    expect(world.mails[0].items).toEqual([{ itemId: 'copper_ore', count: 2 }]);
+    world.inventory = []; // the letter is away (mirror settles)
+    logs = step(state, world, 300);
+    expect(state.done).toBe(true);
+    expect(world.logouts).toBe(1);
+  });
+
+  it('goal 0 farms forever', () => {
+    const { state, world } = gatherBrain({ goal: 0 });
+    step(state, world, 0);
+    world.inventory = [{ itemId: 'copper_ore', count: 5 }];
+    step(state, world, 100);
+    expect(state.stats.targetCount).toBe(5);
+    expect(state.done).toBe(false);
+    expect(world.logouts).toBe(0);
+  });
+
+  it('stops with a clear log when the item has no usable source', () => {
+    const { state, world } = makeBrain(
+      { mode: 'target', target: { itemId: 'not_a_mat' } },
+      { nodes: T_NODES, itemDef: tItemDef, targetDeps: gatherDeps() as never },
+    );
+    const logs = step(state, world, 0);
+    expect(state.done).toBe(true);
+    expect(world.logouts).toBe(1);
+    expect(logs.some((l) => l.includes('target: no usable source for not_a_mat'))).toBe(true);
+  });
+});

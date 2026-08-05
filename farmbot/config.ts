@@ -14,7 +14,7 @@ import type { GatherNodeType } from '../src/sim/types';
 // fishing.enabled flag (still accepted; see parseConfig). 'gold' is the
 // dungeon gold-farm mode and 'level' is the camp-grind leveling mode: both
 // bypass gathering and fishing entirely.
-export type FarmMode = 'gather-fish' | 'gather' | 'fish' | 'gold' | 'level';
+export type FarmMode = 'gather-fish' | 'gather' | 'fish' | 'gold' | 'level' | 'target';
 
 export type KeepQuality = 'rare' | 'epic' | 'legendary';
 
@@ -28,6 +28,17 @@ export interface LevelGrindConfig {
   lootRule: 'money-blues' | 'all';
   // Move to the next zone band when every camp in the current zone is gray.
   zoneUp: boolean;
+}
+
+export interface TargetConfig {
+  // The one material to farm (an item id).
+  itemId: string;
+  // Stop after this many gathered/caught/looted; 0 means farm forever.
+  goal: number;
+  // Source override; 'auto' takes the best resolver pick.
+  source: 'auto' | 'gather' | 'fish' | 'mobs';
+  // When the goal is reached, mail the stack to this alt before stopping.
+  mailToWhenDone?: string;
 }
 
 export interface GoldFarmConfig {
@@ -153,6 +164,8 @@ export interface FarmBotConfig {
   goldFarm: GoldFarmConfig;
   // Leveling grind settings (only read when mode is 'level').
   levelGrind: LevelGrindConfig;
+  // Target-mat farming settings (only read when mode is 'target').
+  target: TargetConfig;
   // Auto-equip strictly-better drops after loot (never downgrades, never bags).
   gearUpgrades: boolean;
   // Mount travel for long overworld legs.
@@ -162,7 +175,14 @@ export interface FarmBotConfig {
 }
 
 const BAG_FULL_POLICIES: readonly BagFullPolicy[] = ['sell-junk', 'stop'];
-const FARM_MODES: readonly FarmMode[] = ['gather-fish', 'gather', 'fish', 'gold', 'level'];
+const FARM_MODES: readonly FarmMode[] = [
+  'gather-fish',
+  'gather',
+  'fish',
+  'gold',
+  'level',
+  'target',
+];
 const KEEP_QUALITIES: readonly KeepQuality[] = ['rare', 'epic', 'legendary'];
 const WHISPER_ACTIONS: readonly SafetyConfig['whisperAction'][] = ['log', 'alarm', 'logout'];
 const BREAK_ACTIONS: readonly SafetyConfig['schedule']['breakAction'][] = ['idle', 'logout'];
@@ -267,6 +287,7 @@ export function parseConfig(json: unknown): FarmBotConfig {
       'safety',
       'goldFarm',
       'levelGrind',
+      'target',
       'gearUpgrades',
       'mount',
       'maxRuntimeMinutes',
@@ -743,6 +764,50 @@ export function parseConfig(json: unknown): FarmBotConfig {
     }
   }
 
+  const target: TargetConfig = { itemId: '', goal: 0, source: 'auto' };
+  if (json.target !== undefined) {
+    if (!isRecord(json.target)) {
+      errors.push('target: must be an object');
+    } else {
+      checkNoUnknownKeys(
+        json.target,
+        ['itemId', 'goal', 'source', 'mailToWhenDone'],
+        'target',
+        errors,
+      );
+      if (json.target.itemId !== undefined) {
+        if (isNonEmptyString(json.target.itemId)) target.itemId = json.target.itemId;
+        else errors.push('target.itemId: must be a non-empty string');
+      }
+      if (json.target.goal !== undefined) {
+        if (isNonNegativeInt(json.target.goal)) target.goal = json.target.goal;
+        else errors.push('target.goal: must be an integer >= 0 (0 = forever)');
+      }
+      if (json.target.source !== undefined) {
+        if (
+          json.target.source === 'auto' ||
+          json.target.source === 'gather' ||
+          json.target.source === 'fish' ||
+          json.target.source === 'mobs'
+        ) {
+          target.source = json.target.source;
+        } else {
+          errors.push('target.source: must be auto|gather|fish|mobs');
+        }
+      }
+      if (json.target.mailToWhenDone !== undefined) {
+        if (isNonEmptyString(json.target.mailToWhenDone)) {
+          target.mailToWhenDone = json.target.mailToWhenDone;
+        } else {
+          errors.push('target.mailToWhenDone: must be a non-empty string');
+        }
+      }
+    }
+  }
+  if (mode === 'target' && target.itemId === '') {
+    errors.push('target.itemId: required when mode is target');
+  }
+
   let maxRuntimeMinutes = 0;
   if (json.maxRuntimeMinutes !== undefined) {
     if (isFiniteNumber(json.maxRuntimeMinutes) && json.maxRuntimeMinutes >= 0) {
@@ -800,6 +865,7 @@ export function parseConfig(json: unknown): FarmBotConfig {
     safety,
     goldFarm,
     levelGrind,
+    target,
     gearUpgrades,
     mount,
     maxRuntimeMinutes,

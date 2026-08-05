@@ -91,6 +91,8 @@ export interface Fbstat {
   xp?: number;
   level?: number;
   xpGained?: number;
+  // Target-mat mode payload; present only when the bot runs mode 'target'.
+  target?: { itemId: string; count: number; goal: number };
   inventory: { itemId: string; count: number }[];
 }
 

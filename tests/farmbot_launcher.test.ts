@@ -200,6 +200,12 @@ describe('farmbot launcher FBSTAT parsing', () => {
     expect(parsed?.stats.copperGained).toBe(12345);
   });
 
+  it('passes the target payload through for the live panel', () => {
+    const stat = { ...STAT, target: { itemId: 'copper_ore', count: 12, goal: 50 } };
+    const parsed = parseFbstatLine(`FBSTAT ${JSON.stringify(stat)}`);
+    expect(parsed?.target).toEqual({ itemId: 'copper_ore', count: 12, goal: 50 });
+  });
+
   it('skims FBSTAT lines out of the child stream, latest wins', () => {
     const filter = new FbstatFilter();
     const first = filter.push(`log one\nFBSTAT ${JSON.stringify(STAT)}\nlog two\n`);

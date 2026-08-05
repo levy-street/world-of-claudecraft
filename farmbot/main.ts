@@ -164,6 +164,13 @@ async function main(): Promise<void> {
     fishableAt: (x, z, facing) => firstFishableSampleAhead(x, z, facing, world.cfg.seed) !== null,
     zoneHubAt: (x, z) => zoneAt(x, z).hub,
     rng: Math.random,
+    // Target mode's source resolver gates on this startup snapshot of the
+    // character (tools/rods in bags, proficiency mirror, level).
+    targetContext: {
+      inventory: world.inventory,
+      proficiencies: world.gatheringProficiency,
+      playerLevel: world.player.level,
+    },
   });
   const webhookUrl = config.safety.webhookUrl;
   let lastFbstatAt = 0;
@@ -208,6 +215,15 @@ async function main(): Promise<void> {
             xp: world.xp,
             level: player.level,
             xpGained: brain.stats.xpGained,
+            ...(config.mode === 'target'
+              ? {
+                  target: {
+                    itemId: config.target.itemId,
+                    count: brain.stats.targetCount,
+                    goal: config.target.goal,
+                  },
+                }
+              : {}),
             inventory: world.inventory.map((s) => ({ itemId: s.itemId, count: s.count })),
           })}`,
         );

@@ -114,6 +114,35 @@ describe('farmbot parseConfig', () => {
     expect(() => parseConfig({ ...VALID, mount: { speed: 2 } })).toThrow(/mount/);
   });
 
+  it('parses the target block and requires itemId in target mode', () => {
+    const cfg = parseConfig({
+      ...VALID,
+      mode: 'target',
+      target: { itemId: 'copper_ore', goal: 50, source: 'gather', mailToWhenDone: 'Bankalt' },
+    });
+    expect(cfg.mode).toBe('target');
+    expect(cfg.target).toEqual({
+      itemId: 'copper_ore',
+      goal: 50,
+      source: 'gather',
+      mailToWhenDone: 'Bankalt',
+    });
+    // defaults: goal 0 (forever), source auto
+    const bare = parseConfig({ ...VALID, mode: 'target', target: { itemId: 'raw_marsh_pike' } });
+    expect(bare.target).toEqual({ itemId: 'raw_marsh_pike', goal: 0, source: 'auto' });
+    expect(() => parseConfig({ ...VALID, mode: 'target' })).toThrow(/target\.itemId/);
+    expect(() => parseConfig({ ...VALID, mode: 'target', target: {} })).toThrow(/target\.itemId/);
+    expect(() => parseConfig({ ...VALID, target: { itemId: 'copper_ore', goal: -1 } })).toThrow(
+      /target\.goal/,
+    );
+    expect(() =>
+      parseConfig({ ...VALID, target: { itemId: 'copper_ore', source: 'pets' } }),
+    ).toThrow(/target\.source/);
+    expect(() =>
+      parseConfig({ ...VALID, target: { itemId: 'copper_ore', mailToWhenDone: '' } }),
+    ).toThrow(/target\.mailToWhenDone/);
+  });
+
   it('accepts the outnumbered/both flee values and a custom maxPullSize', () => {
     expect(parseConfig({ ...VALID, combat: { flee: 'outnumbered' } }).combat.flee).toBe(
       'outnumbered',

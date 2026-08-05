@@ -117,6 +117,12 @@ import {
   pickEmergencyAction,
   pickInterrupt,
 } from './survival';
+import {
+  defaultTargetResolverDeps,
+  resolveTarget,
+  type TargetResolverDeps,
+  type TargetSource,
+} from './target_sources';
 import { routeViaGates, WALLED_HUBS } from './village_gates';
 import { buildZoneGraph, findZonePath, type ZoneGraph, type ZoneHop } from './zone_graph';
 
@@ -247,6 +253,15 @@ export interface BrainDeps {
   zoneGraph?: ZoneGraph;
   // Level-mode camp/zone tables; defaults to the real CAMPS/MOBS/ZONES.
   grindTables?: GrindTables;
+  // Target mode (mode 'target'): the character context the source resolver
+  // reads at startup (bags for tools/rods, the gatheringProficiency mirror,
+  // level). Tests override targetDeps with synthetic tables instead.
+  targetContext?: {
+    inventory: readonly InvSlot[];
+    proficiencies: Record<string, number>;
+    playerLevel: number;
+  };
+  targetDeps?: TargetResolverDeps;
 }
 
 export interface BrainState {
@@ -330,6 +345,8 @@ export interface BrainState {
     raresKept: number;
     xpGained: number;
     levelsGained: number;
+    // Target mode: mats gathered/caught/looted toward target.goal.
+    targetCount: number;
   };
   // Gold-farm mode (config.mode 'gold'): phase machine. Gathering, fishing
   // and node logic are bypassed entirely; TRAVEL delegates to stepGold.
@@ -400,12 +417,87 @@ export interface BrainState {
   marketCollectedVisit: boolean;
   // Mount training purchase (mount.buyTraining): fire learnRiding once.
   mountTrainingDone: boolean;
+  // Target mode (mode 'target'): resolved sources (best first) and the active
+  // pick, the inventory-delta baseline plus the event-credit pool that keeps
+  // gather/fish events from double counting against the delta, and the
+  // goal-mail phase state.
+  readonly targetSources: TargetSource[];
+  targetSource: TargetSource | null;
+  targetPhase: 'farm' | 'mail';
+  targetInvLast: number | null;
+  targetEventCredit: number;
+  targetMailSentAtMs: number;
+  targetNoMailboxLogged: boolean;
 }
 
 export function createBrain(config: FarmBotConfig, deps: BrainDeps = {}): BrainState {
+  // Target mode: resolve the source at startup against the character context,
+  // then reshape the session copies of the tables the farming flows read
+  // (config.fishing / config.levelGrind / nodes / grindTables are this
+  // session's own objects; the caller's parsed config values are not shared
+  // back). Empty resolution means a bad item id or every source gated:
+  // stepTarget stops the session with a log line on the first tick.
+  let nodes = deps.nodes ?? GATHER_NODES;
+  let grindTables = deps.grindTables ?? defaultGrindTables();
+  let targetSources: TargetSource[] = [];
+  let targetSource: TargetSource | null = null;
+  let levelZoneIdPreset: string | null = null;
+  if (config.mode === 'target') {
+    const resolverDeps =
+      deps.targetDeps ??
+      defaultTargetResolverDeps(
+        deps.targetContext ?? { inventory: [], proficiencies: {}, playerLevel: 1 },
+      );
+    const resolved = resolveTarget(config.target.itemId, resolverDeps);
+    const wanted = config.target.source;
+    targetSources =
+      wanted === 'auto'
+        ? resolved
+        : resolved.filter((s) => s.kind === (wanted === 'mobs' ? 'mob' : wanted));
+    targetSource = targetSources[0] ?? null;
+    if (targetSource) {
+      // Node picking and the fish spot machinery key off the zone fields, so
+      // point this session's copies at the source zone.
+      config.zoneId = targetSource.zoneId;
+      if (targetSource.kind === 'gather') {
+        const ids = new Set(targetSource.nodeIds);
+        nodes = nodes.filter((n) => ids.has(n.id));
+        config.fishing = { ...config.fishing, enabled: false, spots: [] };
+      } else if (targetSource.kind === 'fish') {
+        nodes = []; // the fish flow owns every tick; no node route
+        config.fishing = { ...config.fishing, enabled: true, spots: targetSource.spots };
+      } else {
+        // Mob source: the level-mode camp loop, but loot-driven, so both xp
+        // gates come off: xpValue always scores (gray mobs still drop the
+        // mat) and the camp mob levels pin to the player (the pickCamp band
+        // [level-2, level+3] is an xp-curve concern, meaningless here).
+        const pinnedMobs = { ...grindTables.mobs };
+        const campMobIds = new Set(targetSource.camps.map((c) => c.mobId));
+        const lvl = Math.max(1, resolverDeps.playerLevel);
+        for (const [mobId, template] of Object.entries(pinnedMobs)) {
+          if (!campMobIds.has(mobId)) continue;
+          pinnedMobs[mobId] = { ...template, minLevel: lvl, maxLevel: lvl };
+        }
+        grindTables = {
+          ...grindTables,
+          camps: targetSource.camps,
+          mobs: pinnedMobs,
+          xpValue: () => 1,
+        };
+        config.levelGrind = {
+          ...config.levelGrind,
+          targetLevel: 99,
+          lootRule: 'all',
+          zoneUp: false,
+        };
+        config.fishing = { ...config.fishing, enabled: false, spots: [] };
+        levelZoneIdPreset = targetSource.zoneId;
+      }
+    }
+  }
   return {
     config,
-    nodes: deps.nodes ?? GATHER_NODES,
+    nodes,
     itemDef: deps.itemDef ?? ((id) => ITEMS[id]),
     fishableAt: deps.fishableAt,
     zoneHubAt: deps.zoneHubAt,
@@ -461,6 +553,7 @@ export function createBrain(config: FarmBotConfig, deps: BrainDeps = {}): BrainS
       raresKept: 0,
       xpGained: 0,
       levelsGained: 0,
+      targetCount: 0,
     },
     goldDungeons: config.goldFarm.dungeons
       .map((id) => DUNGEONS[id])
@@ -473,8 +566,8 @@ export function createBrain(config: FarmBotConfig, deps: BrainDeps = {}): BrainS
     goldNoMobSinceMs: null,
     goldLastPullAtMs: 0,
     goldResetAtMs: {},
-    grindTables: deps.grindTables ?? defaultGrindTables(),
-    levelZoneId: null,
+    grindTables,
+    levelZoneId: levelZoneIdPreset,
     levelCampKey: null,
     levelClearedAt: {},
     levelNoMobSinceMs: null,
@@ -514,6 +607,14 @@ export function createBrain(config: FarmBotConfig, deps: BrainDeps = {}): BrainS
     marketListedIds: new Set(),
     marketCollectedVisit: false,
     mountTrainingDone: false,
+    targetSources,
+    targetSource,
+    targetPhase: 'farm',
+    targetInvLast: null,
+    targetEventCredit: 0,
+    // Negative so the first goal-mail letter is ready immediately.
+    targetMailSentAtMs: -60_000,
+    targetNoMailboxLogged: false,
   };
 }
 
@@ -768,9 +869,17 @@ interface TickEvents {
   mailResult: 'sent' | 'failed' | null;
   // Chat lines the safety watch may care about (whispers to us, nearby says).
   chats: { from: string; text: string; channel?: string; entityId?: number; to?: string }[];
+  // Target mode: units of the target item granted by gatherResult /
+  // fishingResult events this tick (loot has no event; the inventory-delta
+  // pass covers it).
+  targetEventQty: number;
 }
 
-function readEvents(world: BotWorld, events: readonly SimEvent[]): TickEvents {
+function readEvents(
+  world: BotWorld,
+  events: readonly SimEvent[],
+  targetItemId?: string,
+): TickEvents {
   const t: TickEvents = {
     bite: false,
     catchItemId: null,
@@ -782,6 +891,7 @@ function readEvents(world: BotWorld, events: readonly SimEvent[]): TickEvents {
     died: false,
     mailResult: null,
     chats: [],
+    targetEventQty: 0,
   };
   for (const ev of events) {
     switch (ev.type) {
@@ -790,6 +900,12 @@ function readEvents(world: BotWorld, events: readonly SimEvent[]): TickEvents {
         break;
       case 'fishingResult':
         t.catchItemId = ev.itemId;
+        if (targetItemId !== undefined && ev.itemId === targetItemId) t.targetEventQty += 1;
+        break;
+      case 'gatherResult':
+        if (targetItemId !== undefined && ev.itemId === targetItemId) {
+          t.targetEventQty += ev.qty;
+        }
         break;
       case 'fishingGotAway':
       case 'fishingEmptyHook':
@@ -1599,6 +1715,99 @@ function stepLevel(state: BrainState, world: BotWorld, nowMs: number, logs: stri
   }
 }
 
+// --- target-mat mode (mode 'target') -----------------------------------------
+// stepTarget runs the goal/count/mail/zone-travel concerns and then delegates:
+// a mob source rides the level-mode camp loop (stepLevel, tables narrowed at
+// startup), while gather and fish sources fall through to stepTravel's
+// generic node/fish flow (nodes and fishing.spots narrowed at startup).
+// Returns true when it handled the tick.
+
+function targetZoneOf(source: TargetSource): string {
+  return source.zoneId;
+}
+
+function stepTargetMail(state: BrainState, world: BotWorld, nowMs: number, logs: string[]): void {
+  const cfg = state.config.target;
+  const to = cfg.mailToWhenDone ?? '';
+  const p = world.player;
+  const finish = (): void => {
+    world.sendLogout();
+    state.done = true;
+    logs.push(`target: goal ${cfg.goal} ${cfg.itemId} reached, logging out`);
+    alert(state, 'target-goal', `target: goal ${cfg.goal} ${cfg.itemId} reached`, nowMs);
+  };
+  const stacks = world.inventory.filter((s) => s.itemId === cfg.itemId);
+  if (stacks.length === 0) {
+    finish(); // everything is in the mail (or there was nothing to send)
+    return;
+  }
+  const box = nearestMailbox(world);
+  if (!box) {
+    if (!state.targetNoMailboxLogged) {
+      state.targetNoMailboxLogged = true;
+      logs.push('target: no mailbox nearby, keeping the mats');
+    }
+    finish();
+    return;
+  }
+  if (distance(pos2(p), pos2(box)) > INTERACT_RANGE) {
+    stepGuidedWalk(state, world, nowMs, logs, `mailbox:${box.id}`, pos2(box), 'mailbox');
+    return;
+  }
+  stopMoving(world);
+  if (nowMs - state.targetMailSentAtMs < MAIL_RESULT_TIMEOUT_MS) return;
+  const letter = stacks.slice(0, MAIL_MAX_ATTACHMENTS);
+  world.mailSend(to, 'target mats', '', 0, letter);
+  state.targetMailSentAtMs = nowMs;
+  logs.push(`target: mailed ${letter.map((s) => `${s.count}x ${s.itemId}`).join(', ')} to ${to}`);
+}
+
+function stepTarget(state: BrainState, world: BotWorld, nowMs: number, logs: string[]): boolean {
+  const p = world.player;
+  const cfg = state.config.target;
+  const source = state.targetSource;
+  if (!source) {
+    world.sendLogout();
+    state.done = true;
+    logs.push(`target: no usable source for ${cfg.itemId}, stopping`);
+    alert(state, 'target-no-source', `target: no usable source for ${cfg.itemId}`, nowMs);
+    return true;
+  }
+  if (state.targetPhase === 'mail') {
+    stepTargetMail(state, world, nowMs, logs);
+    return true;
+  }
+  if (cfg.goal > 0 && state.stats.targetCount >= cfg.goal) {
+    if (cfg.mailToWhenDone) {
+      state.targetPhase = 'mail';
+      logs.push(`target: goal ${cfg.goal} reached, mailing ${cfg.itemId} to ${cfg.mailToWhenDone}`);
+    } else {
+      world.sendLogout();
+      state.done = true;
+      logs.push(`target: goal ${cfg.goal} ${cfg.itemId} reached, logging out`);
+      alert(state, 'target-goal', `target: goal ${cfg.goal} ${cfg.itemId} reached`, nowMs);
+    }
+    return true;
+  }
+  // Cross-zone source: arm the waypoint chain (the zonePath branch above
+  // drives the leg from the next tick, like stepLevel's zone-up).
+  const from = state.zoneIdAt(p.pos.x, p.pos.z);
+  if (from !== targetZoneOf(source)) {
+    const path = findZonePath(state.zoneGraph, from, targetZoneOf(source));
+    if (path && path.length > 0) {
+      state.zonePath = path;
+      state.stuck.reset();
+      logs.push(`target: traveling to ${targetZoneOf(source)}`);
+      return true;
+    }
+  }
+  if (source.kind === 'mob') {
+    stepLevel(state, world, nowMs, logs);
+    return true;
+  }
+  return false; // gather/fish: the generic node/fish flow below owns the tick
+}
+
 function stepTravel(state: BrainState, world: BotWorld, nowMs: number, logs: string[]): void {
   const p = world.player;
 
@@ -1676,6 +1885,12 @@ function stepTravel(state: BrainState, world: BotWorld, nowMs: number, logs: str
   // stepLevel run through the zonePath branch above like any other leg.
   if (state.config.mode === 'level') {
     stepLevel(state, world, nowMs, logs);
+    return;
+  }
+
+  // Target mode: goal/count/mail/zone checks, then delegate (mob source to
+  // the camp loop, gather/fish sources to the generic flow below).
+  if (state.config.mode === 'target' && stepTarget(state, world, nowMs, logs)) {
     return;
   }
 
@@ -2645,7 +2860,38 @@ export function stepBrain(
   const p = world.player;
   if (!p.dead && !p.ghost) state.lastAlivePos = { x: p.pos.x, z: p.pos.z };
 
-  const tick = readEvents(world, events);
+  const tick = readEvents(
+    world,
+    events,
+    state.config.mode === 'target' ? state.config.target.itemId : undefined,
+  );
+  if (tick.targetEventQty > 0) {
+    state.stats.targetCount += tick.targetEventQty;
+    state.targetEventCredit += tick.targetEventQty;
+  }
+  // Target mode counting (phase 17): event-granted units are counted above
+  // and credited, so this inventory-delta pass (which also sees them a
+  // snapshot later) skips them; a positive delta without credit is loot.
+  if (state.config.mode === 'target') {
+    const itemId = state.config.target.itemId;
+    let bags = 0;
+    for (const s of world.inventory) if (s.itemId === itemId) bags += s.count;
+    if (state.targetInvLast === null) {
+      state.targetInvLast = bags;
+    } else {
+      const delta = bags - state.targetInvLast;
+      state.targetInvLast = bags;
+      if (delta > 0) {
+        const credited = Math.min(delta, state.targetEventCredit);
+        state.targetEventCredit -= credited;
+        state.stats.targetCount += delta - credited;
+      } else if (state.targetEventCredit > 0 && delta < 0) {
+        // Discards/mails eat earlier event credit first (the count is already
+        // banked; the credit pool must not leak into the next acquisition).
+        state.targetEventCredit = Math.max(0, state.targetEventCredit + delta);
+      }
+    }
+  }
 
   // Personal death: count it (circuit breaker), remember the spot (danger
   // memory), then let the DEAD state take over below.
