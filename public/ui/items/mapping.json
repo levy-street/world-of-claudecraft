@@ -7476,6 +7476,41 @@
         "restless_skull",
         "vanguard_bone"
       ]
+    },
+    {
+      "batchId": "hunter-quivers-2026-08-04",
+      "source": "OpenAI gpt-image-2 (images/generations)",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "Calibrated against the shipped set: nighttalon_crown (\"Direfang Crown\"), cragmaw_huntcord, gravewyrm_gauntlets, moggers_stomper_boots and wraithfire_orb. Each quiver borrows the palette its own name family already ships rather than inventing one.",
+      "commonPrompt": "Premium hand-painted classic-fantasy MMORPG inventory icon of one centered object. STYLIZED PAINTED GAME ART, not a photoreal render: clean confident brushwork, bold readable shapes, strong value contrast. The object is BRIGHTLY LIT and richly SATURATED so it pops off a simple dark muted backdrop, and it FILLS ABOUT 80 PERCENT of the square with small even margins. Top-left key light with warm rim accents. Reads instantly at 28 pixels. No UI border, rarity frame, circular halo, text, watermark, character, mannequin, scenic diorama, crop, or exterior glow.\n\nThe subject is a QUIVER: an arrow container worn at the hip or back, shown upright or on a slight diagonal. The vessel is the subject; a few arrow shafts and fletchings read out of its mouth. Never a bow, never loose arrows alone, never a person.",
+      "itemIds": [
+        "moggers_hide_quiver",
+        "cragmaw_huntquiver",
+        "gravewyrm_bone_quiver",
+        "direfang_quiver",
+        "heroic_gravewyrm_bone_quiver",
+        "heroic_direfang_quiver"
+      ],
+      "itemDirections": {
+        "moggers_hide_quiver": {
+          "intendedVisualSubject": "A crude bandit quiver of warm tan and amber stitched hide over a bent frame, dark charcoal leather cap and base, a red-brown cord wrap and a plain iron ring. Rough arrows with grey goose fletching. Warm amber and charcoal palette. Humble field-made gear, lowest tier."
+        },
+        "cragmaw_huntquiver": {
+          "intendedVisualSubject": "A highland hunter quiver of rich tan hide with a band of pale fur on one flank, warm bronze and copper fittings with a carved antler toggle and braided sinew cord, matching the shipped Cragmaw Huntcord palette. Sturdy trophy-built working gear, mid tier."
+        },
+        "gravewyrm_bone_quiver": {
+          "intendedVisualSubject": "A quiver of pale ivory wyrm rib bone lashed with dark cord over amber-orange dragon scale hide, weathered steel and verdigris clasps, matching the shipped Gravewyrm Gauntlets palette. High tier, no magical glow."
+        },
+        "direfang_quiver": {
+          "intendedVisualSubject": "A masterwork quiver of deep crimson-red leather over dark plates, ornate antique-gold fittings and a fanged gold motif at the mouth, matching the shipped Direfang Crown palette. Top tier, no aura."
+        },
+        "heroic_gravewyrm_bone_quiver": {
+          "intendedVisualSubject": "A heroic reforge of the Gravewyrm bone quiver: same silhouette, bone bleached brighter, cord re-wrapped in deep crimson, clasps re-struck in bright gold, hot ember-orange light in the recesses."
+        },
+        "heroic_direfang_quiver": {
+          "intendedVisualSubject": "A heroic reforge of the Direfang quiver: same crimson-and-gold silhouette, fittings re-struck in brilliant gold-bronze, the fanged motif sharper and inlaid, a hot ember rim along the leather seams."
+        }
+      }
     }
   ]
 }
