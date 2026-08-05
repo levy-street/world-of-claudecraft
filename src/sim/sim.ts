@@ -2872,6 +2872,13 @@ export class Sim {
       // the backpack having skipped every bound the carried rows take. It runs
       // ahead of the sweep now, and the sanitizer applies the same per-slot
       // doctrine itself, so a belted slot is bounded whichever side it lands.
+      //
+      // The one thing the move puts before it that was after it: the pre-bag
+      // migration below sizes its granted bags from meta.inventory.length. A
+      // save old enough to need that migration predates the toolbelt entirely,
+      // so it carries no belt to spill and the count is unchanged; and were the
+      // two ever to meet, counting the spilled tools is the RIGHT input, since
+      // those tools need the space too.
       const belt = sanitizeToolbeltState(s.toolbelt, droppedInstanceJunk, player.id);
       meta.toolbelt = belt.state;
       for (const slot of belt.spill) {

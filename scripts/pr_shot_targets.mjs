@@ -746,6 +746,63 @@ export const TARGETS = [
     },
   },
   {
+    key: 'toolbelt-bar',
+    label: 'Toolbelt bar in the bags window: worn belt, and the beltless case',
+    when: ['ui/bags_view', 'ui/bags_window', 'sim/toolbelt'],
+    // Two arms, because the review finding is about BOTH states: the widest
+    // rung worn and filled (the row's worst case for width), and a player with
+    // no belt at all, where the bar must not render a row at all.
+    variants: [
+      { key: 'desktop' },
+      { key: 'mobile', mobile: true },
+      { key: 'beltless-desktop', beltless: true },
+      { key: 'beltless-mobile', mobile: true, beltless: true },
+    ],
+    async capture(page, variant) {
+      // The shared entry flow can fall through on a slow boot and shoot the
+      // loading screen; wait for the real world hook, then clear any overlay a
+      // late boot re-raised (the same patience the crafting-tooltip recipe uses).
+      await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 90000 });
+      await dismissEntryOverlays(page);
+      await page.evaluate((beltless) => {
+        const sim = window.__game?.sim;
+        // A little ordinary cargo either way, so the grid below the bar is not
+        // an empty box in the shot.
+        for (const id of ['baked_bread', 'minor_healing_potion', 'copper_ore']) {
+          try {
+            sim?.addItem(id, 1);
+          } catch {}
+        }
+        if (!beltless) {
+          // Artisan's belt: 4 generic slots, the widest rung, 3 of 4 filled so
+          // the shot shows filled slots, an empty slot, and the counter at once.
+          for (const id of [
+            'artisans_toolbelt',
+            'copper_mining_pick',
+            'handaxe',
+            'gathering_sickle',
+          ]) {
+            try {
+              sim?.addItem(id, 1);
+            } catch {}
+          }
+          try {
+            sim?.equipToolbelt?.('artisans_toolbelt');
+            for (const id of ['copper_mining_pick', 'handaxe', 'gathering_sickle']) {
+              sim?.storeToolInBelt?.(id);
+            }
+          } catch {}
+        }
+        const el = document.querySelector('#bags');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleBags?.();
+      }, !!variant?.beltless);
+      await pollForSize(page, '#bags');
+      await wait(500);
+      return { clip: '#bags' };
+    },
+  },
+  {
     key: 'bank-chips',
     label: 'Bank window with its bags companion: category chips and Deposit materials',
     when: ['ui/bank', 'ui/bag_filter', 'sim/material_taxonomy'],
