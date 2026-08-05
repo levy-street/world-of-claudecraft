@@ -293,7 +293,6 @@ import {
 } from './heal_landing_feedback_core';
 import { abilityRequirementKeys } from './hud/action_bar/ability_requirement_keys';
 import { honorFloatText } from './honor_float_view';
-import { isSelfOnlyAbility } from './hud/action_bar/ability_self_only';
 import {
   type ActionBarBindState,
   actionBarBindEnter,

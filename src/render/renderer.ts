@@ -88,10 +88,6 @@ import { buildCastleFeatures, type CastleFeaturesView } from './castle_features'
 import {
   type CharacterWeaponAura,
   characterRuneTintColor,
-  characterWeaponAuraInto,
-} from './character_effects';
-import {
-  type CharacterWeaponAura,
   characterVeilboundState,
   characterWeaponAuraInto,
   characterWeaponAuraMode,

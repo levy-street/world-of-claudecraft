@@ -5,7 +5,6 @@ import {
   SPRINT_RUNE_AURA_ID,
   WARD_RUNE_AURA_ID,
 } from '../sim/social/battleground';
-import type { Entity } from '../sim/types';
 import type { Aura, Entity } from '../sim/types';
 import { abilityHexColor } from './ability_vfx_core';
 import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
