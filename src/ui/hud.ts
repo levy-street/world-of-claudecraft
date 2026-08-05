@@ -65,7 +65,7 @@ import {
   zoneAt,
 } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
-import { canEquipItem, weaponHand } from '../sim/equipment_rules';
+import { canEquipItem, isUniqueEquipped, weaponHand } from '../sim/equipment_rules';
 import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
@@ -5529,6 +5529,11 @@ export class Hud {
     // classic "Soulbound" line so a player can see it cannot be traded or destroyed.
     if (item.soulbound) {
       html += `<div class="tt-sub" style="color:var(--gold)">${esc(t('hudChrome.itemSoulbound'))}</div>`;
+    }
+    // Unique-equipped marker (every legendary): one worn copy per item id, so
+    // the rule is visible on the tooltip before an equip is refused.
+    if (isUniqueEquipped(item)) {
+      html += `<div class="tt-sub" style="color:var(--gold)">${esc(t('hudChrome.itemUniqueEquipped'))}</div>`;
     }
     // Maker's Bond lines (Professions 2.0): the commission
     // binds-on-first-trade warning or the bound lock, beside the def-level

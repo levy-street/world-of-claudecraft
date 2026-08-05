@@ -1576,6 +1576,7 @@ export const tr_TR: EnTranslations = {
     },
     "itemHeroicTag": "[KAHRAMANCA]",
     "itemSoulbound": "Ruha Bağlı",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"

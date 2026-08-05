@@ -2982,6 +2982,10 @@ export class Sim {
           meta.bags[i] = id && ITEMS[id]?.kind === 'bag' ? id : null;
         }
       }
+      // Legendary items are unique-equipped; a save from before that rule (or
+      // a tampered one) can still wear duplicates. Bench every later copy into
+      // the bags before stats derive from the worn set below.
+      items.benchDuplicateUniqueEquipped(meta);
       // Buyback rows deliberately skip the full instancedCountCap: byte-equal
       // merges past the stack cap are legitimate here (recordVendorBuyback
       // merges an entire multi-unit sale into one row, and buyBackItem

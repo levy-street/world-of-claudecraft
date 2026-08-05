@@ -1,5 +1,6 @@
 import {
   ALL_CLASSES,
+  ALL_EQUIP_SLOTS,
   type ArmorItemDef,
   type ArmorType,
   type EquipSlot,
@@ -77,6 +78,31 @@ export function slotAcceptsItem(item: ItemDef, slot: EquipSlot): boolean {
   if (item.slot === 'ring') return slot === 'ring1' || slot === 'ring2';
   if (item.kind === 'weapon' && slot === 'offhand') return weaponHand(item) !== 'mainhand';
   return item.slot === slot;
+}
+
+// Every legendary item is unique-equipped: a character wears at most one copy
+// of a given legendary item id at a time. Derived from quality rather than a
+// per-item flag so a new legendary can never forget to opt in.
+export function isUniqueEquipped(item: ItemDef): boolean {
+  return item.quality === 'legendary';
+}
+
+// The worn slot that would break the unique-equipped rule if `item` were
+// equipped now, or null when the equip is legal. `ignoreSlots` names the slots
+// this equip empties or overwrites (the target slot itself, plus a slot the
+// swap displaces, e.g. the offhand a two-hander benches), which therefore
+// cannot conflict with the incoming copy.
+export function uniqueEquipConflictSlot(
+  item: ItemDef,
+  equipment: Partial<Record<EquipSlot, string>>,
+  ignoreSlots: readonly EquipSlot[],
+): EquipSlot | null {
+  if (!isUniqueEquipped(item)) return null;
+  for (const slot of ALL_EQUIP_SLOTS) {
+    if (ignoreSlots.includes(slot)) continue;
+    if (equipment[slot] === item.id) return slot;
+  }
+  return null;
 }
 
 export function maxArmorTypeForClass(cls: PlayerClass): ArmorType {

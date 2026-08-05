@@ -1576,6 +1576,7 @@ export const vi_VN: EnTranslations = {
     },
     "itemHeroicTag": "[ANH HÙNG]",
     "itemSoulbound": "Ràng Buộc Linh Hồn",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"

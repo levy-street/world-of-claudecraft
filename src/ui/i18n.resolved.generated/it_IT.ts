@@ -1576,6 +1576,7 @@ export const it_IT: EnTranslations = {
     },
     "itemHeroicTag": "[EROICO]",
     "itemSoulbound": "Vincolato all’anima",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"

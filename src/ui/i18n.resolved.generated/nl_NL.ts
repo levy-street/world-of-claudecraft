@@ -1576,6 +1576,7 @@ export const nl_NL: EnTranslations = {
     },
     "itemHeroicTag": "[HELDHAFTIG]",
     "itemSoulbound": "Zielsgebonden",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"

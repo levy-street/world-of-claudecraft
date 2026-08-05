@@ -25,8 +25,10 @@ import {
   canDualWieldTwoHand,
   canEquipItem,
   canEquipItemInSlot,
+  isUniqueEquipped,
   resolveEquipSlot,
   slotAcceptsItem,
+  uniqueEquipConflictSlot,
   weaponHand,
 } from './equipment_rules';
 import { formatMoney } from './format_money';
@@ -41,6 +43,7 @@ import { useGatherToolItem } from './professions/gathering';
 import type { ItemUseResult, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import {
+  ALL_EQUIP_SLOTS,
   CONSUME_DURATION,
   CONSUME_TICKS,
   cloneItemInstancePayload,
@@ -426,6 +429,17 @@ export function equipItem(
     const titanPair = offhand?.kind === 'weapon' && canDualWieldTwoHand(meta.cls, spec);
     if (meta.equipment.offhand && !titanPair) displacedSlot = 'offhand';
   }
+  // Legendary items are unique-equipped: refuse when another worn slot already
+  // holds this item id. The target slot and a displaced slot are exempt: both
+  // are emptied by this swap, so the copy they hold never coexists with the
+  // incoming one (the Titan Grip same-id NON-legendary pair stays legal).
+  if (
+    isUniqueEquipped(def) &&
+    uniqueEquipConflictSlot(def, meta.equipment, displacedSlot ? [slot, displacedSlot] : [slot])
+  ) {
+    ctx.error(meta.entityId, 'You can only equip one of those.');
+    return;
+  }
   const displacedId = displacedSlot ? meta.equipment[displacedSlot] : undefined;
   const displacedInstance = displacedSlot ? meta.equipmentInstance?.[displacedSlot] : undefined;
   if (displacedSlot && displacedId) {
@@ -498,6 +512,31 @@ export function revalidateOffhandForSpec(ctx: SimContext, pid?: number): void {
     color: '#8f8',
     pid: meta.entityId,
   });
+}
+
+// A character persisted before legendaries became unique-equipped can still
+// wear two copies of one (the dual-wield Thronebane build). The load path runs
+// this after equipment and inventory are restored: the first worn copy in
+// ALL_EQUIP_SLOTS order stays (mainhand before offhand, ring1 before ring2),
+// every later copy is benched into the bags with its instance payload intact.
+// Uncapacitated like the respec offhand bench above: a rule change can never
+// destroy gear. The caller recalcs stats afterward, as with every load.
+export function benchDuplicateUniqueEquipped(meta: PlayerMeta): void {
+  const worn = new Set<string>();
+  for (const slot of ALL_EQUIP_SLOTS) {
+    const itemId = meta.equipment[slot];
+    if (!itemId) continue;
+    const def = ITEMS[itemId];
+    if (!def || !isUniqueEquipped(def)) continue;
+    if (!worn.has(itemId)) {
+      worn.add(itemId);
+      continue;
+    }
+    const instance = meta.equipmentInstance?.[slot];
+    delete meta.equipment[slot];
+    if (meta.equipmentInstance) delete meta.equipmentInstance[slot];
+    returnEquippedItemToBags(meta, itemId, instance);
+  }
 }
 
 // Remove the piece in `slot` back to the bags, leaving the slot empty. Unlike

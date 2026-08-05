@@ -1576,6 +1576,7 @@ export const en_XA: EnTranslations = {
     },
     "itemHeroicTag": "[[ĤÉŔÓÍÇ]]",
     "itemSoulbound": "[Šóúļƀóúñð]",
+    "itemUniqueEquipped": "[Úñíɋúé-Éɋúíþþéð]",
     "itemSet": {
       "header": "[{name} ({have}/{total})]",
       "bonusLine": "[({pieces}) {bonus}]"
