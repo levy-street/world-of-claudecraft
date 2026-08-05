@@ -25,4 +25,6 @@ export function listChangedPaths(io: {
   run: (cmd: string, args: string[]) => { status: number | null; stdout?: string; stderr?: string };
 }): string[];
 
+export function filterExisting(opts: { files: string[]; exists: (p: string) => boolean }): string[];
+
 export function chunkFileArgs(opts: { files: string[]; limit?: number }): string[][];

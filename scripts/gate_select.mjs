@@ -33,12 +33,13 @@
 // paired with a scheduled full run (see docs/qa-gate.md) which re-establishes a
 // known-green baseline off everyone's critical path.
 import { spawnSync } from 'node:child_process';
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   chunkFileArgs,
+  filterExisting,
   listChangedPaths,
   listTestFiles,
   resolveSelectBase,
@@ -167,12 +168,18 @@ if (plan.mode === 'full') {
 } else {
   // Chunked: with shell:true on win32, ~500 paths in one argv exceeds cmd.exe's
   // 8191-character command line and the leg cannot launch at all.
-  const chunks = chunkFileArgs({ files: plan.alwaysRunFiles });
+  // git diff reports deletions, so a deleted test would put a dead path in the
+  // argv; a chunk of only dead paths exits 1 with "No test files found".
+  const runnable = filterExisting({
+    files: plan.alwaysRunFiles,
+    exists: (f) => existsSync(path.join(repoRoot, f)),
+  });
+  const chunks = chunkFileArgs({ files: runnable });
   chunks.forEach((files, i) => {
     vitestSteps.push({
       name:
         chunks.length === 1
-          ? `vitest (always-run, ${plan.alwaysRunFiles.length} files)`
+          ? `vitest (always-run, ${runnable.length} files)`
           : `vitest (always-run ${i + 1}/${chunks.length}, ${files.length} files)`,
       cmd: 'npx',
       args: ['--no-install', 'vitest', ...buildAlwaysRunArgs({ files, workers })],

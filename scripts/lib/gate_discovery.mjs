@@ -107,15 +107,29 @@ export function resolveSelectBase({ env = {}, run }) {
     }
     return { base: explicit, reason: `GATE_SELECT_BASE=${explicit}` };
   }
-  const upstream = run('git', ['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{upstream}']);
-  if (upstream.status === 0 && upstream.stdout?.trim()) {
-    return { base: upstream.stdout.trim(), reason: 'tracking branch (@{upstream})' };
-  }
-  for (const candidate of ['origin/HEAD', 'origin/main']) {
+  // NOT @{upstream}. A feature branch tracks its own pushed copy, so
+  // `@{upstream}...HEAD` is EMPTY the moment you push, and an empty changed set
+  // is precisely the silent-narrowing failure this resolution exists to prevent.
+  // The integration base is what the diff must be taken against: this repo bases
+  // work on the latest release branch (root CLAUDE.md), with main as the fallback.
+  const releases = run('git', [
+    'for-each-ref',
+    '--format=%(refname:short)',
+    '--sort=-v:refname',
+    'refs/remotes/origin/release',
+  ]);
+  const newestRelease =
+    releases.status === 0
+      ? (releases.stdout ?? '')
+          .split('\n')
+          .map((l) => l.trim())
+          .filter(Boolean)[0]
+      : undefined;
+  for (const candidate of [newestRelease, 'origin/main', 'origin/HEAD'].filter(Boolean)) {
     const probe = run('git', ['rev-parse', '--verify', `${candidate}^{commit}`]);
-    if (probe.status === 0) return { base: candidate, reason: `fallback base ${candidate}` };
+    if (probe.status === 0) return { base: candidate, reason: `integration base ${candidate}` };
   }
-  return { base: null, reason: 'no upstream and no origin base could be resolved' };
+  return { base: null, reason: 'no release branch or origin base could be resolved' };
 }
 
 /**
@@ -149,6 +163,22 @@ export function listChangedPaths({ base, run }) {
   collect(['diff', '--name-only', 'HEAD']);
   collect(['ls-files', '--others', '--exclude-standard']);
   return [...out].sort();
+}
+
+/**
+ * Drop paths that no longer exist on disk.
+ *
+ * A changed-test path comes from `git diff`, which reports DELETIONS too, so
+ * deleting a test would otherwise put a dead path into the always-run argv. Most
+ * of the time vitest just matches nothing, but a chunk that happens to contain
+ * only dead paths exits 1 with "No test files found" and fails the gate on a
+ * perfectly legitimate change.
+ *
+ * @param {{ files: string[], exists: (p: string) => boolean }} opts
+ * @returns {string[]}
+ */
+export function filterExisting({ files, exists }) {
+  return (files ?? []).filter((f) => exists(f));
 }
 
 /**

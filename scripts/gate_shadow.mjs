@@ -23,12 +23,13 @@
 // (it runs the suite plus the selection legs). Run it in the background, on a
 // schedule, or over a batch of recent commits.
 import { spawnSync } from 'node:child_process';
-import { appendFileSync, mkdirSync, readdirSync, readFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   chunkFileArgs,
+  filterExisting,
   listChangedPaths,
   listTestFiles,
   resolveSelectBase,
@@ -148,7 +149,12 @@ if (plan.mode === 'full') {
 
 try {
   const selected = new Set();
-  const chunks = chunkFileArgs({ files: plan.alwaysRunFiles });
+  const chunks = chunkFileArgs({
+    files: filterExisting({
+      files: plan.alwaysRunFiles,
+      exists: (f) => existsSync(path.join(repoRoot, f)),
+    }),
+  });
   chunks.forEach((files, i) => {
     console.log(`[gate:shadow] always-run leg ${i + 1}/${chunks.length}`);
     for (const f of runVitest(`always-${i}`, ['run', ...files, `--maxWorkers=${workers}`]).ran) {

@@ -3,6 +3,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   chunkFileArgs,
+  filterExisting,
   isCollectedTestFile,
   listChangedPaths,
   listTestFiles,
@@ -286,15 +287,44 @@ describe('branch diff resolution', () => {
     expect(r.reason).toContain('typo');
   });
 
-  it('falls back to the tracking branch', () => {
+  it('uses the newest release branch as the integration base', () => {
     const r = resolveSelectBase({
       env: {},
       run: (_c, args) =>
-        args.includes('@{upstream}')
-          ? { status: 0, stdout: 'origin/feature/x\n' }
-          : { status: 1, stdout: '' },
+        args[0] === 'for-each-ref'
+          ? { status: 0, stdout: 'origin/release/v0.35.0\norigin/release/v0.34.0\n' }
+          : { status: 0, stdout: '' },
     });
-    expect(r.base).toBe('origin/feature/x');
+    expect(r.base).toBe('origin/release/v0.35.0');
+  });
+
+  // A feature branch tracks its OWN pushed copy, so @{upstream}...HEAD is empty
+  // right after a push. Using it would silently re-introduce the empty-diff bug.
+  it('never consults @{upstream}', () => {
+    const seen: string[][] = [];
+    resolveSelectBase({
+      env: {},
+      run: (_c, args) => {
+        seen.push(args);
+        return args[0] === 'for-each-ref'
+          ? { status: 0, stdout: 'origin/release/v0.35.0\n' }
+          : { status: 0, stdout: '' };
+      },
+    });
+    expect(seen.flat().join(' ')).not.toContain('@{upstream}');
+  });
+
+  it('falls back to main when no release branch exists', () => {
+    const r = resolveSelectBase({
+      env: {},
+      run: (_c, args) => {
+        if (args[0] === 'for-each-ref') return { status: 0, stdout: '' };
+        return args.includes('origin/main^{commit}')
+          ? { status: 0, stdout: '' }
+          : { status: 1, stdout: '' };
+      },
+    });
+    expect(r.base).toBe('origin/main');
   });
 
   it('reports no base when nothing resolves, so the caller can refuse to narrow', () => {
@@ -328,6 +358,29 @@ describe('branch diff resolution', () => {
 
 // cmd.exe caps a command line at 8191 chars and the gate spawns with shell:true
 // on win32, so ~500 paths in one argv cannot launch there.
+describe('deleted test files never reach the argv', () => {
+  it('drops paths that no longer exist', () => {
+    const kept = filterExisting({
+      files: ['tests/alive.test.ts', 'tests/deleted.test.ts'],
+      exists: (f) => f === 'tests/alive.test.ts',
+    });
+    expect(kept).toEqual(['tests/alive.test.ts']);
+  });
+
+  // The plan still ADDS a changed test file (it cannot know it was deleted);
+  // filtering is what keeps the dead path out of the command line.
+  it('is what saves a plan that added a deleted test file', () => {
+    const plan = buildSelectPlan({
+      changedPaths: ['tests/deleted.test.ts'],
+      alwaysRunFiles: ['tests/architecture.test.ts'],
+    });
+    expect(plan.alwaysRunFiles).toContain('tests/deleted.test.ts');
+    expect(
+      filterExisting({ files: plan.alwaysRunFiles, exists: (f) => !f.includes('deleted') }),
+    ).toEqual(['tests/architecture.test.ts']);
+  });
+});
+
 describe('argv chunking for the always-run leg', () => {
   it('keeps every chunk under the limit and loses no file', () => {
     const files = Array.from({ length: 500 }, (_, i) => `tests/some_fairly_long_name_${i}.test.ts`);
