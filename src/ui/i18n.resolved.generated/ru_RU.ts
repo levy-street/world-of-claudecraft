@@ -5062,7 +5062,7 @@ export const ru_RU: EnTranslations = {
       "terrainCapReached": "Достигнут лимит правок рельефа ({max}). Лишние штампы не были добавлены.",
       "placementCapReached": "Достигнут лимит размещений ({max}). Лишние объекты не были добавлены.",
       "blockerCapReached": "Достигнут предел невидимых стен ({max}). Новая стена не добавлена.",
-      "campCapReached": "Camp limit reached ({max}). The new camp was not added.",
+      "campCapReached": "Достигнут предел лагерей ({max}). Новый лагерь не добавлен.",
       "autosaveOff": "Автосохранение отключено: {reason} Сохраните вручную, затем включите снова."
     },
     "confirm": {

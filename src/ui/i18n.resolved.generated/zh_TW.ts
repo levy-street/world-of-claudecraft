@@ -5062,7 +5062,7 @@ export const zh_TW: EnTranslations = {
       "terrainCapReached": "已達到地形編輯上限（{max}）。多餘的雕刻印記未被加入。",
       "placementCapReached": "已達到放置上限（{max}）。多餘的資源未被加入。",
       "blockerCapReached": "已達到空氣牆上限（{max}）。新牆未被加入。",
-      "campCapReached": "Camp limit reached ({max}). The new camp was not added.",
+      "campCapReached": "已達到營地上限（{max}）。新營地未被加入。",
       "autosaveOff": "自動儲存已關閉：{reason} 請手動儲存後再重新開啟。"
     },
     "confirm": {

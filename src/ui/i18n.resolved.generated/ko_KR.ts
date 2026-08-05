@@ -5062,7 +5062,7 @@ export const ko_KR: EnTranslations = {
       "terrainCapReached": "지형 편집 한도에 도달했습니다({max}). 초과된 스컬프트 스탬프는 추가되지 않았습니다.",
       "placementCapReached": "배치 한도에 도달했습니다({max}). 초과된 에셋은 추가되지 않았습니다.",
       "blockerCapReached": "차단벽 한도({max})에 도달했습니다. 새 벽이 추가되지 않았습니다.",
-      "campCapReached": "Camp limit reached ({max}). The new camp was not added.",
+      "campCapReached": "야영지 한도({max})에 도달했습니다. 새 야영지가 추가되지 않았습니다.",
       "autosaveOff": "자동 저장이 꺼졌습니다: {reason} 수동으로 저장한 뒤 다시 켜세요."
     },
     "confirm": {

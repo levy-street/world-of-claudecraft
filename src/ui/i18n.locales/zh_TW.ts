@@ -7461,6 +7461,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'editor.selection.radiusHint': '「自動」依資源縮放推導碰撞半徑；拖曳滑桿可覆寫它。',
   'editor.layers.blocker': '空氣牆',
   'editor.status.blockerCapReached': '已達到空氣牆上限（{max}）。新牆未被加入。',
+  'editor.status.campCapReached': '已達到營地上限（{max}）。新營地未被加入。',
   'editor.help.tool.blocker': '拖曳繪製在試玩中阻擋移動的隱形牆。',
   'editor.inspector.label': '工具選項',
   'editor.brush.title': '筆刷',

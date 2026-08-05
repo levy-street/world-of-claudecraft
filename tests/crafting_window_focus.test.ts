@@ -53,7 +53,6 @@ function craftingDeps(): CraftingWindowDeps {
     hideTooltip: () => {},
     onCraft: () => {},
     onClose: () => {},
-    onOpenOrders: () => {},
     itemIcon: () => '',
     moneyHtml: () => '',
     itemTooltip: () => '',
@@ -62,6 +61,7 @@ function craftingDeps(): CraftingWindowDeps {
     onToggleCommission: () => {},
     selectedCraft: () => null,
     onSelectCraft: () => {},
+    onOpenOrders: () => {},
   };
 }
 
@@ -123,27 +123,33 @@ describe('crafting window: Tab focus trap and restore-on-close', () => {
     const capturedOpener = bridge.captureFocus();
     expect(capturedOpener).toBe(opener);
 
-    // Document order: Close (panel-title), the craft's tab-strip button
-    // (.crafting-tabs), then the Craft row button (.crafting-body).
+    // Document order: the commission-board button then Close (both panel-title),
+    // the craft's tab-strip button (.crafting-tabs), then the Craft row button
+    // (.crafting-body).
+    const ordersBtn = el.querySelector<HTMLButtonElement>('[data-open-orders]');
     const closeBtn = el.querySelector<HTMLButtonElement>('[data-close]');
     const tabBtn = el.querySelector<HTMLButtonElement>('.crafting-tab');
     const craftBtn = el.querySelector<HTMLButtonElement>('.crafting-recipe-btn');
+    expect(ordersBtn).not.toBeNull();
     expect(closeBtn).not.toBeNull();
     expect(tabBtn).not.toBeNull();
     expect(craftBtn).not.toBeNull();
     expect(craftBtn?.disabled).toBe(false); // the craftable fixture precondition
 
-    // Walk the full three-control cycle: every Tab is intercepted (the trap
+    // Walk the full four-control cycle: every Tab is intercepted (the trap
     // is really installed, not a no-op that happens to leave focus alone),
-    // and it wraps back to Close rather than ever reaching the opener or body.
-    closeBtn?.focus();
+    // and it wraps back to the first control rather than ever reaching the
+    // opener or body.
+    ordersBtn?.focus();
+    expect(document.activeElement).toBe(ordersBtn);
+    expect(pressTab()).toBe(true);
     expect(document.activeElement).toBe(closeBtn);
     expect(pressTab()).toBe(true);
     expect(document.activeElement).toBe(tabBtn);
     expect(pressTab()).toBe(true);
     expect(document.activeElement).toBe(craftBtn);
     expect(pressTab()).toBe(true);
-    expect(document.activeElement).toBe(closeBtn); // wraps
+    expect(document.activeElement).toBe(ordersBtn); // wraps
     expect(document.activeElement).not.toBe(opener);
     expect(document.activeElement).not.toBe(document.body);
   });

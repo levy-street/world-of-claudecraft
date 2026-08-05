@@ -7462,6 +7462,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'editor.selection.radiusHint': '“自动”根据资源缩放推导碰撞半径；拖动滑块可覆盖它。',
   'editor.layers.blocker': '空气墙',
   'editor.status.blockerCapReached': '已达到空气墙上限（{max}）。新墙未被添加。',
+  'editor.status.campCapReached': '已达到营地上限（{max}）。新营地未被添加。',
   'editor.help.tool.blocker': '拖动绘制在试玩中阻挡移动的隐形墙。',
   'editor.inspector.label': '工具选项',
   'editor.brush.title': '笔刷',

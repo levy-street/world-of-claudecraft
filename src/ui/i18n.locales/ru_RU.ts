@@ -7902,6 +7902,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'editor.layers.blocker': 'Невидимые стены',
   'editor.status.blockerCapReached':
     'Достигнут предел невидимых стен ({max}). Новая стена не добавлена.',
+  'editor.status.campCapReached': 'Достигнут предел лагерей ({max}). Новый лагерь не добавлен.',
   'editor.help.tool.blocker': 'Рисует невидимые стены, которые блокируют движение в тестовой игре.',
   'editor.inspector.label': 'Параметры инструмента',
   'editor.brush.title': 'Кисть',

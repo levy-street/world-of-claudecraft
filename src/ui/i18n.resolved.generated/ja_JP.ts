@@ -5062,7 +5062,7 @@ export const ja_JP: EnTranslations = {
       "terrainCapReached": "地形編集の上限に達しました（{max}）。超過分のスカルプトは追加されませんでした。",
       "placementCapReached": "配置数の上限に達しました（{max}）。超過分のアセットは追加されませんでした。",
       "blockerCapReached": "ブロッカー壁の上限（{max}）に達しました。新しい壁は追加されませんでした。",
-      "campCapReached": "Camp limit reached ({max}). The new camp was not added.",
+      "campCapReached": "キャンプの上限（{max}）に達しました。新しいキャンプは追加されませんでした。",
       "autosaveOff": "自動保存をオフにしました：{reason} 手動で保存してから、再度オンにしてください。"
     },
     "confirm": {
