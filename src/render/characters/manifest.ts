@@ -814,12 +814,11 @@ export const VISUALS: Record<string, VisualDef> = {
     // hair, and robe together), so this lerp multiplies the entire body, not
     // just the cloth. Measured: 0xf0e9d6 is near white, so even at 0.5 the old
     // strength only shifted the body by roughly (0.983, 0.980, 0.956), a
-    // near-no-op (issue #2678); dropped to 0.15 anyway for consistency with
-    // shaman/warlock, where the saturated tints DID flatten the face and
-    // hands at their old strengths. Kept low like the mob tints below that
-    // hit the same one-material-per-rig trap (mob_troll, mob_kobold, mob_ogre).
+    // near-no-op (issue #2678); dropped further to 0.12, the same faint-wash
+    // strength the manifest already uses elsewhere (mob_troll) to differentiate
+    // a shared model without hiding its base texture.
     tint: 0xf0e9d6,
-    tintStrength: 0.15,
+    tintStrength: 0.12,
   },
   player_shaman: {
     url: `${PLAYERS}/barbarian.glb`,
@@ -838,9 +837,12 @@ export const VISUALS: Record<string, VisualDef> = {
     // Faint cool lift only: barbarian.glb is one merged material for the whole
     // body (skin, fur, and leather together), so this lerp hits the face and
     // hands as hard as the cloth. 0.4 (the class default strength) desaturated
-    // the whole model into a blue-grey wash on character create (issue #2678).
+    // the whole model into a blue-grey wash on character create (issue #2678);
+    // dropped further to 0.12, the same faint-wash strength the manifest
+    // already uses elsewhere (mob_troll) to differentiate a shared model
+    // without hiding its base texture.
     tint: 0x6f8fc9,
-    tintStrength: 0.15,
+    tintStrength: 0.12,
   },
   player_mage: {
     url: `${PLAYERS}/mage.glb`,
@@ -867,9 +869,12 @@ export const VISUALS: Record<string, VisualDef> = {
     // Faint violet lift only, to tell this apart from the mage/priest models
     // it shares mage.glb with (same one-material-per-rig caveat as those two:
     // this multiplies skin and hair along with the robe). 0.45 read as a
-    // saturated full-body purple wash on character create (issue #2678).
+    // saturated full-body purple wash on character create (issue #2678);
+    // dropped further to 0.12, the same faint-wash strength the manifest
+    // already uses elsewhere (mob_troll) to differentiate a shared model
+    // without hiding its base texture.
     tint: 0x8d5fd3,
-    tintStrength: 0.15,
+    tintStrength: 0.12,
   },
   player_druid: {
     url: `${PLAYERS}/druid.glb`,

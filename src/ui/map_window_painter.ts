@@ -44,7 +44,7 @@ import { getActiveWorldContent, type ZoneDef } from '../sim/data';
 import type { GatherNodeType } from '../sim/types';
 import { type Decoration, generateDecorationsInBounds } from '../sim/world';
 import type { IWorld } from '../world_api';
-import { dungeonDisplayName, zoneDisplayName, zonePoiLabel } from './entity_i18n';
+import { dungeonDisplayName, riftFloorLabel, zoneDisplayName, zonePoiLabel } from './entity_i18n';
 import { formatNumber } from './i18n';
 import {
   buildOverworldMapModel,
@@ -356,8 +356,13 @@ export class MapWindowPainter {
       this.drawGatherNodes(ctx, model.gatherNodes, colors);
     }
 
-    // Zone title (drawn on-canvas; the world map has no DOM zone label).
-    this.labels.draw(ctx, zoneDisplayName(model.zoneId), S / 2, TITLE_BASELINE_Y, {
+    // Zone title (drawn on-canvas; the world map has no DOM zone label). Inside
+    // a rift, show the generated floor name + rank instead of the overworld
+    // zone, mirroring minimap_painter's zone-label override.
+    const title = model.rift
+      ? riftFloorLabel(model.rift.name, model.rift.rank)
+      : zoneDisplayName(model.zoneId);
+    this.labels.draw(ctx, title, S / 2, TITLE_BASELINE_Y, {
       font: TITLE_FONT,
       fill: colors.label,
       stroke: colors.outline,

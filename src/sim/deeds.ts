@@ -1894,4 +1894,7 @@ export const VISITED_MARK_NAMESPACES = [
   // already carries (they serialized fine but were dropped on load while the
   // namespace was unregistered).
   'gather_event',
+  // Per-craft rare-tier milestones (issue #2055): the first rare-or-better
+  // output a player crafts IN THAT CRAFT (professions/crafting.ts craftItem).
+  'craft_rare',
 ] as const;

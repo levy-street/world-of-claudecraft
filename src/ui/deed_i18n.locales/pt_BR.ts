@@ -874,4 +874,32 @@ export const table: DeedLocaleTable = {
     name: 'O Que as Gaivotas Sabem',
     desc: 'Pesque um peixe nas águas da Farshore.',
   },
+  prog_engineering_rare: {
+    name: 'Engenharia de Precisão',
+    desc: 'Crie seu primeiro item de qualidade rara em Engenharia.',
+  },
+  prog_alchemy_rare: {
+    name: 'Uma Safra Rara',
+    desc: 'Crie seu primeiro item de qualidade rara em Alquimia.',
+  },
+  prog_cooking_rare: {
+    name: 'Um Prato Memorável',
+    desc: 'Crie seu primeiro item de qualidade rara em Culinária.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Curtimento Fino',
+    desc: 'Crie seu primeiro item de qualidade rara em Couraria.',
+  },
+  prog_tailoring_rare: {
+    name: 'Um Ponto de Mestre',
+    desc: 'Crie seu primeiro item de qualidade rara em Alfaiataria.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Temperado até Brilhar',
+    desc: 'Crie seu primeiro item de qualidade rara em Fabricação de Armas.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Blindado à Perfeição',
+    desc: 'Crie seu primeiro item de qualidade rara em Fabricação de Armaduras.',
+  },
 };

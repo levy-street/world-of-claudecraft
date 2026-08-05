@@ -77,6 +77,38 @@ function heroicDeps(overrides: Partial<Parameters<typeof renderHeroicVendorWindo
   };
 }
 
+describe('renderVendorWindow / renderHeroicVendorWindow: dialog root (accessible name, #2808)', () => {
+  it('renderVendorWindow marks #vendor-window as a labeled dialog', () => {
+    const view: VendorView = {
+      goods: [],
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+      multiple: 1,
+    };
+    const el = document.createElement('div');
+    renderVendorWindow(el, 'Darva', view, deps());
+
+    expect(el.getAttribute('role')).toBe('dialog');
+    expect(el.getAttribute('aria-modal')).toBe('false');
+    expect(el.getAttribute('tabindex')).toBe('-1');
+    expect(el.getAttribute('aria-label')).toBe('Darva: Goods');
+    expect(el.hasAttribute('aria-labelledby')).toBe(false);
+  });
+
+  it('renderHeroicVendorWindow marks #vendor-window as a labeled dialog', () => {
+    const view: HeroicShopView = { rows: [], balance: 0 };
+    const el = document.createElement('div');
+    renderHeroicVendorWindow(el, 'Quartermaster', view, heroicDeps());
+
+    expect(el.getAttribute('role')).toBe('dialog');
+    expect(el.getAttribute('aria-modal')).toBe('false');
+    expect(el.getAttribute('tabindex')).toBe('-1');
+    expect(el.getAttribute('aria-label')).toBe('Quartermaster: Goods');
+    expect(el.hasAttribute('aria-labelledby')).toBe(false);
+  });
+});
+
 describe('renderVendorWindow: goods/buyback grid wrapping', () => {
   it('appends goods rows as children of .vendor-goods-grid', () => {
     const goods: VendorGoodsRow[] = [

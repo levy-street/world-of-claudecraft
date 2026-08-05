@@ -82,13 +82,29 @@ describe('applyPointLightBudget', () => {
     const near = rankedLight(1, 0);
     const mid = rankedLight(5, 0);
     const far = rankedLight(500, 0);
-    // Sorted input: the function skips sorting when everything fits the budget.
+    // Already sorted by distance, so this stays green regardless of the sort guard.
     const ranked = [near, mid, far];
     applyPointLightBudget(ranked, 0, 0, 6, 2, RANGE_SQ);
     expect(near.light.intensity).toBe(5);
     expect(mid.light.intensity).toBe(5);
     expect(far.light.intensity).toBe(0);
     expect(far.light.visible).toBe(true); // counted, but contributes nothing
+  });
+
+  it('sorts by distance when the live budget truncates fewer lights than visibleCount', () => {
+    // liveBudget(2) < ranked.length(3) <= visibleCount(6): a sort guard keyed off
+    // visibleCount alone would skip sorting here even though the live budget still
+    // truncates the ranked list, so array order (not distance) would pick the
+    // winners. All three lights sit inside range so only the live-budget cutoff
+    // is under test.
+    const near = rankedLight(1, 0);
+    const mid = rankedLight(5, 0);
+    const farInRange = rankedLight(50, 0);
+    const ranked = [farInRange, near, mid]; // misordered: farthest listed first
+    applyPointLightBudget(ranked, 0, 0, 6, 2, RANGE_SQ);
+    expect(near.light.intensity).toBe(5);
+    expect(mid.light.intensity).toBe(5);
+    expect(farInRange.light.intensity).toBe(0);
   });
 
   it('leaves base-less (externally driven) light intensity alone while shining', () => {

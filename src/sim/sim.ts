@@ -320,6 +320,7 @@ import {
 } from './pathfind';
 import * as petAi from './pet/pet_ai';
 import * as petCommands from './pet/pet_commands';
+import type { MatchPetSnapshot } from './pet/pet_match_return';
 import {
   isSwimming as isSwimmingImpl,
   moveSpeedMult as moveSpeedMultImpl,
@@ -350,21 +351,34 @@ import {
 } from './professions/cadence';
 import { unbindItem as unbindItemImpl } from './professions/commission';
 import {
+  acceptCommissionOrder as acceptCommissionOrderImpl,
+  type CommissionOrder,
+  type CommissionOrderRow,
+  type CommissionOrderScope,
+  cancelCommissionOrder as cancelCommissionOrderImpl,
+  commissionOrdersFor as commissionOrderRowsFor,
+  deliverCommissionOrder as deliverCommissionOrderImpl,
+  openCommissionOrder as openCommissionOrderImpl,
+  updateCommissionOrders,
+} from './professions/commission_order';
+import {
   type AcquireRecipeResult,
   acquireRecipe as acquireRecipeImpl,
   type CraftResult,
+  completeCraftCast as completeCraftCastImpl,
   craftItem as craftItemImpl,
 } from './professions/crafting';
 import {
   type ApplyEnchantResult,
   applyEnchant as applyEnchantImpl,
+  completeApplyEnchantCast as completeApplyEnchantCastImpl,
+  completeDisenchantCast as completeDisenchantCastImpl,
   type DisenchantResult,
   disenchantItem as disenchantItemImpl,
   isEnchantedInstance,
 } from './professions/enchanting';
 import * as fishing from './professions/fishing';
 import * as professionsFocus from './professions/focus';
-import { announceMasterworkZone } from './professions/gather_events';
 import {
   completeGatherCast as completeGatherCastImpl,
   drainGatheringGrants,
@@ -395,7 +409,11 @@ import {
 } from './professions/node_persist';
 import { updateProfNudges } from './professions/prof_nudges';
 import { healDisplayRoundedProficiency } from './professions/proficiency_display_heal';
-import { type SalvageResult, salvageItem as salvageItemImpl } from './professions/salvage';
+import {
+  completeSalvageCast as completeSalvageCastImpl,
+  type SalvageResult,
+  salvageItem as salvageItemImpl,
+} from './professions/salvage';
 import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
 import {
   applyPairTransitionTierMail,
@@ -403,7 +421,11 @@ import {
   pruneTierMailToActiveMajors,
   updateTierMail,
 } from './professions/tier_mail';
-import { rechargeToolEffectAction, slotToolEffectAction } from './professions/tool_effect_actions';
+import {
+  completeRechargeCast as completeRechargeCastImpl,
+  rechargeToolEffectAction,
+  slotToolEffectAction,
+} from './professions/tool_effect_actions';
 import {
   EMPTY_TOOL_EFFECT_SLOT_VIEWS,
   normalizeToolEffectSlots,
@@ -934,6 +956,12 @@ export interface ArenaMatch {
   // so no arena format can be farmed as a free full-restore (issue #1600).
   // Optional only for compatibility with synthetic/legacy ArenaMatch fixtures.
   preMatchPools?: Map<number, ArenaReturnPools>;
+  // The LIVING pet each fighter walked in with (absent pid = none), so the return
+  // path can stand a beast the bout killed back up instead of sending its owner
+  // home with a corpse. Kept beside the pools rather than inside them because it is
+  // applied LATER: the pet is placed only after its owner is back at their queue
+  // spot. Optional for the same synthetic-fixture reason as preMatchPools.
+  preMatchPets?: Map<number, MatchPetSnapshot>;
   ratingA: number; // team avg at start
   ratingB: number;
   defeated: Set<number>;
@@ -1142,6 +1170,14 @@ export interface PlayerMeta {
   // persisted: src/sim/mount_race.ts owns the rules. Strictly per-player, so
   // simultaneous racers never share or contend on anything.
   mountRace?: MountRaceSession | null;
+  // Optional QoL preference (issue #1358): when true, every target-switch
+  // selector in targeting.ts (targetEntity, tabTarget, targetNearestEnemy,
+  // targetNearestFriendly, friendlyTabTarget) disengages auto-attack instead of
+  // carrying it over to the new target. Session-only, mirrored from the client's
+  // `stopAutoAttackOnTargetSwitch` setting via setStopAutoAttackOnTargetSwitch;
+  // never persisted, and absent/false preserves the classic follow-through
+  // default.
+  stopAutoAttackOnTargetSwitch?: boolean;
   // One-time riding-lesson fee (100g), charged when the first lesson race starts
   // (or through the legacy mount_train_begin command). Optional so absent === false (pre-feature saves and a
   // fresh character stay byte-equal): never explicitly set to false, only ever
@@ -1381,14 +1417,13 @@ export interface PlayerMeta {
   // knownRecipes exactly once (professions/training.ts
   // grandfatherKnownRecipes), then persists true. Persisted in CharacterState.
   recipesGrandfathered: boolean;
-  // Craft output throttle (#1301): a FIXED tumbling window of successful
-  // actions (five consumer families; see professions/action_throttle.ts,
-  // which states the tumbling semantics and their accepted straddle).
-  // Session-only (like lastActiveTick above), never persisted,
-  // and deliberately so: a fresh login gets a fresh 60-second window rather
-  // than carrying a logout-time throttle across sessions. (This used to cite
-  // nodeHarvestReadyAt as its session-only exemplar; that field persists as
-  // remaining deltas now, while this one stays session-only on purpose.)
+  // INERT after Craft Cast System Phase 5: the shared 10-per-60s action
+  // throttle is retired; cast duration paces craft-family actions. This
+  // field was SESSION-ONLY from birth (never persisted, never wired), so no
+  // save shape depends on it; it survives only as the inert shape the
+  // retirement suite pins (tests/professions_action_throttle.test.ts stamps
+  // it and proves gameplay ignores it). The parity sampler excludes it
+  // (tests/parity/trace.ts META_EXCLUDE). Never read or written by gameplay.
   craftThrottle: { windowStart: number; count: number };
   // One-time mastery reset notice pending (Professions 2.0): set by
   // the load-time masteryResetApplied branch, consumed by the tick mail phase
@@ -1952,6 +1987,15 @@ export class Sim {
   // sim needs, and any banker is a valid place to stand and use the bank. Exposed
   // as a live SimContext view so bank.ts gates deposit/withdraw/buy on proximity.
   bankerIds: number[] = [];
+  // Commission order board (Professions 2.0, issue #1298): the live order
+  // list and its id counter, exposed as a live SimContext view (like trades
+  // above); professions/commission_order.ts owns every mutation. Named
+  // `commissionOrderBoard`, not `commissionOrders`, so it never collides with
+  // the IWorldProfessions per-viewer projection below of the same name.
+  // In-memory only, like trades/duels, swept by updateCommissionOrders in
+  // the end-of-tick block.
+  commissionOrderBoard: CommissionOrder[] = [];
+  private nextCommissionOrderId = 1;
   // Guild Bank books: guild id -> live GuildBankState, loaded by the server per
   // realm through loadGuildBank (guild_bank.ts owns the shape; Phase 3 wires the
   // DB) and exposed as a live SimContext view. Always empty offline: guilds are
@@ -3419,9 +3463,10 @@ export class Sim {
       e.hp = Math.max(1, Math.round(e.maxHp * CASCADE_SCENARIO.allyHpFraction));
       // Freeze out-of-combat regen so ONLY the Chronomancer's Echo/initial healing
       // moves these bars (the owner wants to isolate the conversion, not watch the
-      // allies self-heal). A zero-value "food" trips the `!p.eating` regen guard in
-      // updateRegen and heals nothing; an idle, unsitting bot never trips standUp,
-      // and the non-damaging dummy never clears it. Dev scenario only.
+      // allies self-heal). A zero-hpPer2s "food" trips the natural-regen freeze
+      // in updateRegen (auras.ts: `p.eating?.hpPer2s !== 0`) and heals nothing
+      // itself; an idle, unsitting bot never trips standUp, and the
+      // non-damaging dummy never clears it. Dev scenario only.
       e.eating = {
         itemId: 'dev_cascade_freeze',
         kind: 'food',
@@ -4880,6 +4925,17 @@ export class Sim {
       get bankerIds() {
         return sim.bankerIds;
       },
+      // Commission order board (issue #1298): the live order list (mutated
+      // in place by professions/commission_order.ts) and its id counter.
+      get commissionOrderBoard() {
+        return sim.commissionOrderBoard;
+      },
+      get nextCommissionOrderId() {
+        return sim.nextCommissionOrderId;
+      },
+      set nextCommissionOrderId(v) {
+        sim.nextCommissionOrderId = v;
+      },
       // Guild Bank book map: guild id -> live book, read and written only
       // through the guild_bank.ts helpers. Sim-owned, never reassigned.
       get guildBanks() {
@@ -5219,6 +5275,11 @@ export class Sim {
       // Gather cast completion: module-bound with the live ctx,
       // exactly like completeFishing above; no Sim method exists for it.
       completeGatherCast: (p, meta) => completeGatherCastImpl(sim.ctx, p, meta),
+      completeCraftCast: (p, meta) => completeCraftCastImpl(sim.ctx, p, meta),
+      completeDisenchantCast: (p, meta) => completeDisenchantCastImpl(sim.ctx, p, meta),
+      completeApplyEnchantCast: (p, meta) => completeApplyEnchantCastImpl(sim.ctx, p, meta),
+      completeSalvageCast: (p, meta) => completeSalvageCastImpl(sim.ctx, p, meta),
+      completeRechargeCast: (p, meta) => completeRechargeCastImpl(sim.ctx, p, meta),
       applyDemonHealTick: sim.applyDemonHealTick.bind(sim),
       // C4b effect-dispatch surface: the per-effect switch the cast lifecycle hands
       // off to. awardCombo, the stat/LoS helpers, and meleeSwing STAY on Sim
@@ -5693,6 +5754,10 @@ export class Sim {
     this.updateTradesAndInvites();
     this.updateReadyChecks();
     resurrectionOfferMod.updateResurrectionOffers(this.ctx);
+    // Commission order board retention sweep (issue #1298): draws no rng, so
+    // appending here is safe (the Vale Cup zero-rng-phase precedent); expires
+    // stale open orders and prunes terminal ones past their retain window.
+    updateCommissionOrders(this.ctx);
     lap?.('trades');
     this.updateLootRolls();
     lap?.('lootRolls');
@@ -8025,6 +8090,10 @@ export class Sim {
     this.targeting.friendlyTabTarget(pid);
   }
 
+  setStopAutoAttackOnTargetSwitch(enabled: boolean, pid?: number): void {
+    this.targeting.setStopAutoAttackOnTargetSwitch(enabled, pid);
+  }
+
   // -------------------------------------------------------------------------
   // Inventory, items, vendor
   // -------------------------------------------------------------------------
@@ -8464,7 +8533,22 @@ export class Sim {
   // boolean opt-in off the craft command; the resolve honors it
   // only for eligible equipment outputs and mints the bindOnTrade arm
   // server-side (professions/commission.ts), never off client data.
-  craftItem(recipeId: string, commission?: boolean, pid?: number): void {
+  // IWorld: craftItem(recipeId, commission?, count?), the third argument is
+  // ALWAYS the batch count. Crafting for another player (server dispatch,
+  // multi-player tests) REQUIRES the explicit four-arg form
+  // craftItem(recipeId, commission, pid, count): a bare third-arg pid is not
+  // supported, because batch counts and player entity ids share one integer
+  // space and a membership guess (the retired players.has() heuristic) made
+  // "craft N" and "craft as player N" collide silently.
+  craftItem(recipeId: string, commission?: boolean, countOrPid?: number, count?: number): void {
+    let pid: number | undefined;
+    let batchCount = 1;
+    if (count !== undefined) {
+      pid = countOrPid;
+      batchCount = count;
+    } else if (countOrPid !== undefined) {
+      batchCount = countOrPid;
+    }
     // Dead gate for the profession-action family (this wrapper plus
     // trainRecipe/unbindItem/salvageItem/disenchantItem/applyEnchant below):
     // refuse BEFORE the resolver, so no result event is emitted and the
@@ -8473,7 +8557,12 @@ export class Sim {
     // result unconditionally; mobile-station placement and the rift forge
     // emit no wrapper-side event, so their gates live in their own modules.
     if (refusedWhileDead(this.ctx, pid)) return;
-    const result = craftItemImpl(this.ctx, recipeId, commission === true, pid);
+    // Craft Cast System: craftItemImpl starts a cast or returns a start-gate
+    // denial. On casting:true the castStart event is the surface; craftResult
+    // / masterwork / lastCraftResult land only from completeCraftCast.
+    // Phase 3: optional count (default 1) is clamped to batch max + mats-fit.
+    const result = craftItemImpl(this.ctx, recipeId, commission === true, pid, batchCount);
+    if (result.casting) return;
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastCraftResult = result;
     this.emit({
@@ -8487,22 +8576,6 @@ export class Sim {
       reason: result.reason,
       pid: meta?.entityId,
     });
-    // Masterwork proc surface (Professions 2.0): stash the per-player
-    // view (session-only, like lastCraftResult above) and emit the personal
-    // masterwork event, in addition to the craftResult emit.
-    if (result.masterwork && result.itemId && meta) {
-      const proc: MasterworkProc = {
-        recipeId: result.recipeId,
-        itemId: result.itemId,
-        crafter: meta.entityId,
-      };
-      meta.lastMasterwork = proc;
-      this.emit({ type: 'masterwork', ...proc, pid: meta.entityId });
-      // Zone-wide celebration copy: the professions module owns the
-      // fanout and the instance-space exclusion; draws no rng, runs after the
-      // personal emit.
-      announceMasterworkZone(this.ctx, meta.entityId, meta.name, proc);
-    }
   }
 
   // IWorld read surface (IWorldProfessions, #1127): the local viewer's most
@@ -8581,6 +8654,116 @@ export class Sim {
     });
   }
 
+  // Commission order board (Professions 2.0, issue #1298): four thin
+  // entries beside unbindItem above, one per verb (open/cancel/accept/
+  // deliver). Each resolves through professions/commission_order.ts (the
+  // pure validator + mutator) and emits ONE personal, text-free
+  // commissionOrderResult event; the client renders localized copy off
+  // action/reason. The durable order state itself converges through the
+  // per-viewer commissionOrders read below, which re-diffs for every
+  // affected player on the very next snapshot (no extra fan-out needed).
+  // The item id of a still-tracked order (open/accepted/or a terminal order
+  // still inside its retention window), for the open/cancel/accept success
+  // lines below: those three result shapes carry only orderId (deliver's
+  // own DeliverOrderResult is the one that already returns itemId), so this
+  // resolves it off the live board the same tick the mutation applied.
+  private commissionOrderItemId(orderId: number | undefined): string | undefined {
+    if (orderId === undefined) return undefined;
+    return this.commissionOrderBoard.find((o) => o.id === orderId)?.itemId;
+  }
+
+  // The requester's display name off the same still-retained board entry, for
+  // the 'deliver' success line (the acting pid is the CRAFTER there, not the
+  // requester the "You deliver X to {name}" copy needs to name).
+  private commissionOrderRequesterName(orderId: number | undefined): string | undefined {
+    if (orderId === undefined) return undefined;
+    return this.commissionOrderBoard.find((o) => o.id === orderId)?.requesterName;
+  }
+
+  openCommissionOrder(
+    recipeId: string,
+    scope: CommissionOrderScope,
+    crafterName?: string,
+    pid?: number,
+  ): void {
+    const result = openCommissionOrderImpl(this.ctx, recipeId, scope, crafterName, pid);
+    const meta = this.players.get(pid ?? this.primaryId);
+    this.emit({
+      type: 'commissionOrderResult',
+      action: 'open',
+      ok: result.ok,
+      orderId: result.orderId,
+      itemId: result.ok ? this.commissionOrderItemId(result.orderId) : undefined,
+      reason: result.reason,
+      pid: meta?.entityId,
+    });
+  }
+
+  cancelCommissionOrder(orderId: number, pid?: number): void {
+    const itemId = this.commissionOrderItemId(orderId);
+    const result = cancelCommissionOrderImpl(this.ctx, orderId, pid);
+    const meta = this.players.get(pid ?? this.primaryId);
+    this.emit({
+      type: 'commissionOrderResult',
+      action: 'cancel',
+      ok: result.ok,
+      orderId: result.orderId,
+      itemId: result.ok ? itemId : undefined,
+      reason: result.reason,
+      pid: meta?.entityId,
+    });
+  }
+
+  acceptCommissionOrder(orderId: number, pid?: number): void {
+    const itemId = this.commissionOrderItemId(orderId);
+    const result = acceptCommissionOrderImpl(this.ctx, orderId, pid);
+    const meta = this.players.get(pid ?? this.primaryId);
+    this.emit({
+      type: 'commissionOrderResult',
+      action: 'accept',
+      ok: result.ok,
+      orderId: result.orderId,
+      itemId: result.ok ? itemId : undefined,
+      reason: result.reason,
+      pid: meta?.entityId,
+    });
+  }
+
+  deliverCommissionOrder(orderId: number, pid?: number): void {
+    // Resolve the requester's name off the board BEFORE the mutation (deliver
+    // moves the order to 'delivered', so a post-mutation lookup would still
+    // find it inside its retention window, but resolve pre-mutation to match
+    // the itemId precedent above and stay correct if retention ever shrinks).
+    const requesterName = this.commissionOrderRequesterName(orderId);
+    const result = deliverCommissionOrderImpl(this.ctx, orderId, pid);
+    const meta = this.players.get(pid ?? this.primaryId);
+    this.emit({
+      type: 'commissionOrderResult',
+      action: 'deliver',
+      ok: result.ok,
+      orderId: result.orderId,
+      itemId: result.itemId,
+      requesterName: result.ok ? requesterName : undefined,
+      reason: result.reason,
+      pid: meta?.entityId,
+    });
+  }
+
+  // IWorld read surface (IWorldProfessions): the local viewer's projection of
+  // the order board (their own requests at any status, any order they
+  // accepted, and every currently open order the open board or a 'crafter'
+  // scope names them for), newest first.
+  get commissionOrders(): readonly CommissionOrderRow[] {
+    return commissionOrderRowsFor(this.ctx, this.primaryId);
+  }
+
+  /** Per-player form of `commissionOrders`, for the server's `corder`
+   *  self-delta (server/game.ts): a small per-player read, diffed per tick
+   *  like `prof`/`cprof`. */
+  commissionOrdersFor(pid: number): readonly CommissionOrderRow[] {
+    return commissionOrderRowsFor(this.ctx, pid);
+  }
+
   // IWorld read surface (IWorldProfessions): the craft id of the
   // local viewer's own ACTIVE mobile station, or null when none is placed or
   // the placed one has expired (tick-domain expiry, checked live).
@@ -8618,7 +8801,11 @@ export class Sim {
   // on the resolved player's PlayerMeta so lastSalvageResult reflects it.
   salvageItem(itemId: string, pid?: number): void {
     if (refusedWhileDead(this.ctx, pid)) return;
+    // Phase 4: salvageItemImpl starts a cast or returns a start-gate denial.
+    // On casting:true castStart is the surface; salvageResult lands only from
+    // completeSalvageCast.
     const result = salvageItemImpl(this.ctx, itemId, pid);
+    if (result.casting) return;
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastSalvageResult = result;
     // Emit the pid-scoped, text-free outcome, same immediacy arm as
@@ -8670,7 +8857,9 @@ export class Sim {
     const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
     const targetSlotIndex = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
     if (refusedWhileDead(this.ctx, pid)) return;
+    // Phase 4: start cast or deny; result event only on complete or start deny.
     const result = disenchantItemImpl(this.ctx, itemId, pid, targetSlotIndex);
+    if (result.casting) return;
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastDisenchantResult = result;
     this.emit({
@@ -8708,7 +8897,9 @@ export class Sim {
     pid?: number,
   ): void {
     if (refusedWhileDead(this.ctx, pid)) return;
+    // Phase 4: start cast or deny; result event only on complete or start deny.
     const result = applyEnchantImpl(this.ctx, itemId, enchantId, pid, slot, confirmReplace);
+    if (result.casting) return;
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastEnchantResult = result;
     this.emit({

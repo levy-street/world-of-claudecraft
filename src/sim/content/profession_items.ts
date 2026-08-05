@@ -601,11 +601,14 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // at skillReq 0/25/50, apothecary-bound at alchemist_verane. Potions reuse the
   // vendor potionHp/potionMana machinery (instant, in-combat, shared cooldown);
   // elixirs reuse the elixir_of_the_bear shape (a temporary buff_sta aura on
-  // use). Every consumable sits inside the existing ceilings: heal <= 280
-  // (healing_potion), mana <= 360 (mana_potion), elixir buff_sta <= 12 for <=
-  // 900s (elixir_of_the_bear). The three elixir aura display names are localized
-  // client-side through the sim_i18n aura matcher (AURA_NAME_KEY), the same path
-  // as 'Might of the Bear'. Never vendor-stocked (no buyValue).
+  // use). Every rung strictly EXCEEDS its vendor-tier equivalent in items.ts
+  // (minor/lesser/healing_potion, minor/lesser/mana_potion; #1608 retuned that
+  // ladder, so this one moved in lockstep to stay a strict upgrade): heal <= 335
+  // (healing_potion's 320 + headroom), mana <= 425 (mana_potion's 410 +
+  // headroom), elixir buff_sta <= 12 for <= 900s (elixir_of_the_bear). The three
+  // elixir aura display names are localized client-side through the sim_i18n
+  // aura matcher (AURA_NAME_KEY), the same path as 'Might of the Bear'. Never
+  // vendor-stocked (no buyValue).
   silverleaf_healing_draught: {
     id: 'silverleaf_healing_draught',
     name: 'Sheenleaf Healing Draught',
@@ -659,7 +662,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     name: 'Sunpetal Healing Draught',
     kind: 'potion',
     quality: 'rare',
-    potionHp: 280,
+    potionHp: 335,
     sellValue: 32,
   },
   sunpetal_mana_draught: {
@@ -667,7 +670,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     name: 'Sunpetal Mana Draught',
     kind: 'potion',
     quality: 'rare',
-    potionMana: 360,
+    potionMana: 425,
     sellValue: 32,
   },
   elixir_of_the_serpent: {

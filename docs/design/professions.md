@@ -108,6 +108,14 @@ text-free personal bite SimEvent, and a server-authoritative reel window
 (`FISH_REEL_WINDOW_SEC` plus `FISH_REEL_WINDOW_ROD_BONUS_SEC` per rod tier
 above the first plus `FISH_REEL_WINDOW_RARITY_BONUS_SEC` per rarity rung
 above common); reel is re-pressing the pole. A miss costs only the cast.
+A re-press BEFORE the bite reels the line in empty and ends the session
+(the early-reel arm in `startFishing`, its own text-free `fishingEarlyReel`
+SimEvent and `woc_fishing_early_reels_total` series), except inside a short
+post-cast grace (`FISH_EARLY_REEL_GRACE_SEC`, strictly under
+`FISH_BITE_DELAY_MIN_SEC`) where it stays the plain busy denial so an
+accidental double-press cannot burn the cast. The early reel exists because
+a free pre-bite no-op made spam-pressing a guaranteed catch: one press
+always fell inside the armed window. Like a miss, it costs only the cast.
 The wire carries zero bite information (castRemaining decays uniformly), so a
 scripted client can react faster but can never learn the bite early or
 stretch the window: accepted by design, attention over reflexes. Catch
@@ -293,10 +301,27 @@ agi 25, sta 24 for +240 HP, int 24, spi 12, armor 35, roughly 13 to 21
 percent of the recomputed level-20 BiS budget per axis), the
 Greater-beats-base-by-3 step, and runed strict betweenness are all pinned in
 `tests/enchants_magnitude_invariants.test.ts`. Salvage rides the same seam,
-confirm machinery, and shared throttle as disenchant; it grants no craft
-skill (maintainer-accepted). Crafting, disenchant, enchant-apply, and
-salvage share ONE action window (`CRAFT_THROTTLE_MAX_PER_WINDOW` per
-`CRAFT_THROTTLE_WINDOW_SECONDS`).
+confirm machinery as disenchant; it grants no craft skill
+(maintainer-accepted). Crafting, disenchant, enchant-apply, salvage, and
+tool-effect recharge are cast-paced (recipe-band craft durations; fixed
+1.5 s for enchant-family and recharge). Economy brakes are cast time,
+materials, the gold sink, stations, and skill ceilings, not a shared
+action quota. Rate ruling, stated for the record: the retired quota
+allowed 10 actions per minute across the family; cast pacing allows one
+player roughly 15 to 40 per minute depending on band, and that faster
+ceiling is ACCEPTED because every craft still pays materials and the
+copper fee, and the enchant-family faucets stay bounded by the items a
+player actually holds.
+
+Craft cast band rationale (the ladder in `src/sim/content/professions.ts`,
+`CRAFT_CAST_DURATION_*`): skill bands rather than a flat cast so field
+recipes stay snappy while ladder-top and combo recipes read as deliberate
+work; the floor and ceiling clamp every band into the UX range where a
+cast bar is legible but never tedious. Locked starting numbers from the
+implementation plan; retune with evidence (market volume, session
+telemetry), not feel. The enchant family and tool recharge take the flat
+floor-length cast because their pacing brake is the consumed item or
+charge, not the recipe ladder.
 
 ### Commissions and the Maker's Bond
 Opt-in at craft time, equipment only (weapon, armor, held_offhand). The
@@ -316,8 +341,27 @@ report "Kept N bound copies."). Mail and market carry instanced copies
 `isTransferLockedInstance` (`src/sim/item_instance_transfer.ts`) refuses
 `boundTo`-bound and armed (`bindOnTrade`) copies on both pipes. Vendor and
 bank refusal of bound copies stays emergent from fungible-only escrow;
-`tests/professions_bind_on_trade_surfaces.test.ts` remains the wall. The
-commission ORDER workflow stays wave 2 (#1298).
+`tests/professions_bind_on_trade_surfaces.test.ts` remains the wall.
+
+The commission ORDER workflow (#1298) is a first slice on top of the
+primitive above: `src/sim/professions/commission_order.ts` owns an
+in-memory (not persisted across a restart, the trade/duel precedent) order
+board a requester opens (`open` scope admits any crafter, `crafter` scope
+names one by character name, resolved the whisper way) with NO escrow (a
+later extension needs order-time material escrow, still unbuilt); a crafter
+`accept`s, crafts the recipe with the existing commission opt-in exactly as
+before, then `deliver`s the still-unbound commissioned copy face to face
+(the same bind-on-first-trade stamp trade.ts's `grantOffer` applies, in
+range like a trade), which is what makes the recipient the ORDER's
+recipient rather than whoever happens to receive the first trade. The
+requester can `cancel` only before acceptance. A retention sweep
+(`updateCommissionOrders`) expires a stale open order after 24 sim-hours
+and prunes a terminal one after a short retain window. Client UI: a header
+button in the crafting window opens the order board window
+(`src/ui/commission_order_view.ts` + `commission_order_window.ts`).
+Deliberately out of scope for this slice: guild/friends-scoped orders (the
+sim has no offline notion of either, both being account/server-only),
+cross-restart persistence, and recipient-tied required-material escrow.
 
 ### Stations, masters, training
 Stations are master NPCs. Six station types (forge, kitchens, loom,
@@ -434,7 +478,7 @@ guards.
 | maxSkill (crafts / gathering / fishing) | src/sim/content/professions.ts | 125 / 100 / 200 |
 | specializedSkillThreshold / materialDiscountPct | src/sim/content/professions.ts | 75 / 0.2 |
 | CRAFT_GOLD_SINK_COPPER_PER_BUDGET | src/sim/content/professions.ts | 2 |
-| CRAFT_THROTTLE_MAX_PER_WINDOW / WINDOW_SECONDS | src/sim/content/professions.ts | 10 / 60 |
+| CRAFT_CAST_DURATION_* / ENCHANT_FAMILY / TOOL_RECHARGE (sec) | src/sim/content/professions.ts | field 1.75 to ladder 4.0; floor 1.5 / ceiling 5.0; family+recharge 1.5 |
 | TRAINING_FEE_BY_TIER | src/sim/professions/training.ts | [0, 2500, 10000, 40000, 160000] copper, clamp to last |
 | UNBIND_FEE_BY_QUALITY_TIER | src/sim/professions/commission.ts | [2500, 10000, 40000] copper, clamp both ends |
 | GATHER_CAST_BASE / FLOOR / TOOL_TIER / BAND (sec) | src/sim/professions/gathering.ts | 2.5 / 1.5 / 0.4 / 0.15 |
@@ -473,7 +517,7 @@ top-rung materials from ten more zones (the all-zones supply arm in
 about 2.8 gather hours under the deliberately conservative model, floored
 at 2 as its trivially-short alarm), and predated the #2387 Battlefield
 Experience attribution fix; the measured all-levers climb lands nearer 1
-to 3 gathering hours plus the cast, throttle, and travel time, which is
+to 3 gathering hours plus the cast and travel time, which is
 where the band's low end comes from. One access assumption the figures
 rest on, stated: the expansion's thorium faucets are TIER-1 nodes, so
 under R22 they need only the tier-1 pick at any proficiency; only the
@@ -575,8 +619,9 @@ must be re-derived if either number is ever tuned on its own.
   `vendorItems` row anywhere, and priced with the same 4x `buyValue` for the
   same reason.
 - Market: gold buys MATERIALS, never skill. Fungible materials stay
-  listable; the curve, the shared throttle, and material volume are the
-  sanctioned brake on purchased progress.
+  listable; the curve, cast pacing, and material volume are the sanctioned
+  brake on purchased progress (the shared action throttle retired with the
+  Craft Cast System; cast time is the pacing brake now).
 - Unbind fees: never free, monotonic in quality, clamp both ends (the
   clamp-to-first-below reading is maintainer-ratified).
 - Enchant magnitudes are frozen post-launch; tune reagent costs instead.
@@ -781,9 +826,11 @@ must be re-derived if either number is ever tuned on its own.
   (`server/http/game_signals.ts`).
 
 ### Deferred follow-ups (recorded, not scheduled)
-- Wave 2 on #1866/#1298: the commission ORDER workflow, market/mail
-  carriage for instanced goods (must re-enforce the boundTo lock
-  explicitly), batch salvage UI.
+- Wave 2 on #1866: market/mail carriage for instanced goods (must
+  re-enforce the boundTo lock explicitly; #1146), batch salvage UI. The
+  commission ORDER workflow itself shipped a first slice on #1298 (see
+  above); guild/friends-scoped orders, cross-restart persistence, and
+  recipient-tied material escrow remain unbuilt follow-ups on that slice.
 - Two-procs-one-drain masterwork toast coalescing (celebration plan-contract
   change; banner and sound coalescing are by design).
 - Windfall per-instance loot-line burst batching polish.

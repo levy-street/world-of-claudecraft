@@ -388,6 +388,8 @@ export const nl_NL: AdminTranslations = {
   "moderationHistory.actionKill": "Gedood",
   "moderationHistory.actionJail": "Gevangengezet",
   "moderationHistory.actionUnjail": "Vrijgelaten uit gevangenschap",
+  "moderationHistory.actionSpectate": "Spectated",
+  "moderationHistory.actionUnspectate": "Stopped spectating",
   "moderationHistory.actionNote": "Opmerking",
   "moderationHistory.actionResetPassword": "Wachtwoord opnieuw ingesteld",
   "moderationHistory.actionDailyRewardsBan": "Verbannen van dagelijkse beloningen",

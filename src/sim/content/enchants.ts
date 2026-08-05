@@ -6,10 +6,10 @@
 // Scope: a two-tier enchant table, always known (no recipe learning; the
 // free-floor rule in ../professions/enchanting.ts applies to both tiers):
 //   1. Base enchants (arcane_dust, some arcane_essence): the per-slot basics.
-//      They cover the weapon slot plus every armor slot (helmet through ring),
-//      with several stat-axis options per slot so every build (str/agi/int
-//      melee/caster, sta/armor tank, spi healer) has a reachable, cheap
-//      enchant for each of its slots.
+//      They cover the weapon and offhand slots plus every armor slot (helmet
+//      through ring), with several stat-axis options per slot so every build
+//      (str/agi/int melee/caster, sta/armor tank, spi healer) has a
+//      reachable, cheap enchant for each of its slots.
 //   2. Greater enchants (arcane_shard + arcane_essence): a stronger,
 //      shard-consuming top tier on the highest-impact slots (weapon, helmet,
 //      chest, legs, gloves). These were the first consumer of arcane_shard,
@@ -76,6 +76,21 @@ export const ENCHANTS: Record<string, EnchantDef> = {
     itemSlot: 'mainhand',
     reagents: [{ itemId: 'arcane_dust', count: 5 }],
     statBonus: { int: 2 },
+  },
+  // Offhand: the missing per-slot basic (#2825). Every shipped offhand item
+  // (shields such as eastbrook_buckler, held caster offhands such as
+  // valefire_lantern) declares ItemSlot 'offhand', which SLOT_STAT_MULT
+  // (../item_budget.ts) already weights at 0.75, a legitimate stat slot; this
+  // was simply never authored, so every offhand piece refused every enchant
+  // as wrong_slot. A stamina option, same point value and reagent count as
+  // enchant_waist_stamina (a small slot at a comparable 0.7 mult), matching
+  // the magnitude convention above (no new numbers invented).
+  enchant_offhand_stamina: {
+    id: 'enchant_offhand_stamina',
+    name: 'Enchant Offhand - Stamina',
+    itemSlot: 'offhand',
+    reagents: [{ itemId: 'arcane_dust', count: 5 }],
+    statBonus: { sta: 3 },
   },
   enchant_helmet_fortitude: {
     id: 'enchant_helmet_fortitude',

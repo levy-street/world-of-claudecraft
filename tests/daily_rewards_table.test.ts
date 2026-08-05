@@ -16,6 +16,7 @@ import type {
   DailyRewardTaskSeed,
   DailyRewardWinnerAnnouncement,
 } from '../server/daily_rewards_db';
+import { DAILY_REWARD_WINNER_PAYOUTS_SQL } from '../server/daily_rewards_db';
 
 const walletMock = vi.hoisted(() => ({
   row: { account_id: 1, pubkey: 'Wallet1111111111111111111111111111111111111', linked_at: 'now' },
@@ -39,6 +40,7 @@ import {
   dailyRewardPayoutSplits,
   dailyRewardRuntimeConfig,
   nextUtcResetIso,
+  RUNTIME_CONFIG_CACHE_DAYS,
   resetDailyRewardPriceCacheForTests,
   rewardDayForDate,
 } from '../server/daily_rewards';
@@ -240,7 +242,10 @@ class FakeDailyRewardDb implements DailyRewardDb {
   async unannouncedWinnerDays(limit: number): Promise<DailyRewardWinnerAnnouncement[]> {
     this.unannouncedWinnerDaysCalls++;
     this.unannouncedWinnerDaysLimits.push(limit);
-    return this.winnerAnnouncements;
+    // The real read applies its SQL LIMIT, so the fake honors the ask too:
+    // the cache reads at the one-day outbox ask (#2791) and a wider fixture
+    // must not leak extra days past it.
+    return this.winnerAnnouncements.slice(0, limit);
   }
   async markWinnersAnnounced(): Promise<boolean> {
     return this.markWinnersAnnouncedOk;
@@ -409,6 +414,85 @@ describe('daily rewards', () => {
     expect(eligibility).toMatchObject({ wocUsdPrice: 0.5, usdValue: 25 });
     const status = await new DailyRewardService(new FakeDailyRewardDb()).status(1);
     expect(status.prizePoolSol).toBeCloseTo(0.75);
+  });
+
+  describe('the runtime-config cache is a bounded per-day map (#2791)', () => {
+    function configFetchDays(): string[] {
+      return vi
+        .mocked(fetch)
+        .mock.calls.map(([input]) => new URL(String(input)))
+        .filter((url) => url.pathname === '/daily-config')
+        .map((url) => url.searchParams.get('day') ?? '');
+    }
+
+    it('holds several days at once: a second day does not evict the first', async () => {
+      // The reason the map replaced the single slot: the winners refresh asks
+      // about a pending day and its successor, and under one slot each of
+      // those evicted the LIVE day's config underneath the player-facing
+      // status and spin paths, forcing a payout-service round trip per TTL.
+      await dailyRewardRuntimeConfig('2026-07-01');
+      await dailyRewardRuntimeConfig('2026-07-02');
+      expect(configFetchDays()).toEqual(['2026-07-01', '2026-07-02']);
+
+      // Warm within the TTL for BOTH days: no re-fetch (the single slot would
+      // have re-fetched 2026-07-01 here).
+      await dailyRewardRuntimeConfig('2026-07-01');
+      await dailyRewardRuntimeConfig('2026-07-02');
+      expect(configFetchDays()).toEqual(['2026-07-01', '2026-07-02']);
+    });
+
+    it('caps at RUNTIME_CONFIG_CACHE_DAYS, evicting the least recently written day', async () => {
+      const days = ['2026-07-01', '2026-07-02', '2026-07-03', '2026-07-04', '2026-07-05'];
+      expect(days).toHaveLength(RUNTIME_CONFIG_CACHE_DAYS + 1);
+      for (const day of days) await dailyRewardRuntimeConfig(day);
+      expect(configFetchDays()).toEqual(days);
+
+      // The newest four are warm, so re-asking them costs nothing...
+      for (const day of days.slice(1)) await dailyRewardRuntimeConfig(day);
+      expect(configFetchDays()).toEqual(days);
+      // ...while the oldest was evicted by the cap and re-fetches on ask.
+      await dailyRewardRuntimeConfig(days[0]);
+      expect(configFetchDays()).toEqual([...days, days[0]]);
+    });
+
+    it('re-storing a day refreshes its eviction position (least recently WRITTEN)', async () => {
+      // The delete-before-set in storeRuntimeConfig is what makes the bound
+      // evict by WRITE recency: after re-storing the oldest day (requireFresh
+      // forces a store without waiting out the TTL), a fifth day must evict
+      // the SECOND-oldest instead. Without the delete, a re-stored day keeps
+      // its original map position and gets evicted anyway.
+      const days = ['2026-07-01', '2026-07-02', '2026-07-03', '2026-07-04'];
+      for (const day of days) await dailyRewardRuntimeConfig(day);
+      await dailyRewardRuntimeConfig('2026-07-01', true); // re-store, now newest
+      const warmed = [...days, '2026-07-01'];
+      expect(configFetchDays()).toEqual(warmed);
+
+      await dailyRewardRuntimeConfig('2026-07-05'); // cap: evicts 2026-07-02
+      await dailyRewardRuntimeConfig('2026-07-01'); // still warm
+      expect(configFetchDays()).toEqual([...warmed, '2026-07-05']);
+      await dailyRewardRuntimeConfig('2026-07-02'); // evicted: re-fetches
+      expect(configFetchDays()).toEqual([...warmed, '2026-07-05', '2026-07-02']);
+    });
+
+    it('scopes the failure fallback per day: a bad day does not poison its neighbor', async () => {
+      // One 500 for the first asked day: the fallback (enabled: false) must be
+      // cached under THAT day only, while the next day fetches normally and a
+      // warm re-ask of either costs nothing. Under the old single slot the
+      // second day's store evicted the first's fallback, re-fetching a known-bad
+      // upstream every time the two alternated.
+      vi.mocked(fetch).mockImplementationOnce(async () => new Response('nope', { status: 500 }));
+
+      const bad = await dailyRewardRuntimeConfig('2026-07-01');
+      expect(bad.enabled).toBe(false);
+      const good = await dailyRewardRuntimeConfig('2026-07-02');
+      expect(good.enabled).toBe(true);
+
+      // Both days are warm within the TTL: the failed day serves its cached
+      // fallback (no retry storm) and the good day its real config.
+      expect((await dailyRewardRuntimeConfig('2026-07-01')).enabled).toBe(false);
+      expect((await dailyRewardRuntimeConfig('2026-07-02')).enabled).toBe(true);
+      expect(configFetchDays()).toEqual(['2026-07-01', '2026-07-02']);
+    });
   });
 
   it('records one daily spin and awards its points', async () => {
@@ -582,7 +666,7 @@ describe('daily rewards', () => {
     });
     const service = new DailyRewardService(db);
 
-    const result = (await service.discordWinnerAnnouncements(1)) as {
+    const result = (await service.discordWinnerAnnouncements()) as {
       days: Array<{ day: string; taskName: string; nextTaskName: string }>;
     };
 
@@ -628,15 +712,16 @@ describe('daily rewards', () => {
       db.winnerAnnouncements = [winnerDay('2026-06-30')];
       const { service, clock } = cachedService(db);
 
-      const first = await service.discordWinnerAnnouncements(1);
+      const first = await service.discordWinnerAnnouncements();
       clock.ms += DAILY_REWARD_WINNERS_TTL_MS - 1;
-      const second = await service.discordWinnerAnnouncements(1);
+      const second = await service.discordWinnerAnnouncements();
 
       expect(db.unannouncedWinnerDaysCalls).toBe(1);
       expect(second).toEqual(first);
-      // The refresh asks for the ceiling every time, which is what lets ONE
-      // snapshot serve every limit a caller can ask for.
-      expect(db.unannouncedWinnerDaysLimits).toEqual([5]);
+      // The refresh reads at the outbox's own one-day ask: the standalone
+      // winners GET that could ask wider is retired (#2791), so the cache
+      // never over-reads for a caller that no longer exists.
+      expect(db.unannouncedWinnerDaysLimits).toEqual([1]);
     });
 
     it('refreshes once the TTL has elapsed', async () => {
@@ -644,28 +729,35 @@ describe('daily rewards', () => {
       db.winnerAnnouncements = [winnerDay('2026-06-30')];
       const { service, clock } = cachedService(db);
 
-      await service.discordWinnerAnnouncements(1);
+      await service.discordWinnerAnnouncements();
       clock.ms += DAILY_REWARD_WINNERS_TTL_MS - 1;
-      await service.discordWinnerAnnouncements(1);
+      await service.discordWinnerAnnouncements();
       expect(db.unannouncedWinnerDaysCalls).toBe(1);
 
       clock.ms += 1;
-      await service.discordWinnerAnnouncements(1);
+      await service.discordWinnerAnnouncements();
       expect(db.unannouncedWinnerDaysCalls).toBe(2);
     });
 
-    it('slices the cached snapshot to the asked limit instead of re-reading', async () => {
-      const db = new FakeDailyRewardDb();
-      db.winnerAnnouncements = ['2026-06-28', '2026-06-29', '2026-06-30'].map(winnerDay);
-      const { service } = cachedService(db);
-
-      expect(dayNames(await service.discordWinnerAnnouncements(1))).toEqual(['2026-06-28']);
-      expect(dayNames(await service.discordWinnerAnnouncements(3))).toEqual([
-        '2026-06-28',
-        '2026-06-29',
-        '2026-06-30',
-      ]);
-      expect(db.unannouncedWinnerDaysCalls).toBe(1);
+    it('the winner payouts SQL stays announcement-narrow and exclusion-filtered', () => {
+      // The RAW text the call site executes (exported for exactly this pin):
+      // re-widening it is a data-exposure decision (#2791), and the exclusion
+      // filter is what keeps a banned winner out of the announcement.
+      for (const column of [
+        'p.rank',
+        'p.username',
+        'p.points',
+        'p.prize_percent',
+        'p.prize_usd',
+        'p.status',
+      ]) {
+        expect(DAILY_REWARD_WINNER_PAYOUTS_SQL).toContain(column);
+      }
+      expect(DAILY_REWARD_WINNER_PAYOUTS_SQL).not.toMatch(
+        /tx_signature|wallet|paid_at|voided_by|void_reason|voided_at|signed_transaction|error/,
+      );
+      expect(DAILY_REWARD_WINNER_PAYOUTS_SQL).toContain('daily_reward_excluded_accounts');
+      expect(DAILY_REWARD_WINNER_PAYOUTS_SQL).toMatch(/p\.day = \$1 AND p\.realm = \$2/);
     });
 
     it('hands out copies, so a caller mutating its result cannot poison the snapshot', async () => {
@@ -675,13 +767,13 @@ describe('daily rewards', () => {
       db.winnerAnnouncements = [day];
       const { service } = cachedService(db);
 
-      const first = (await service.discordWinnerAnnouncements(1)) as {
+      const first = (await service.discordWinnerAnnouncements()) as {
         days: Array<{ prizePoolUsd: number; payouts: Array<{ username: string }> }>;
       };
       first.days[0].prizePoolUsd = -1;
       first.days[0].payouts[0].username = 'Tampered';
 
-      const second = (await service.discordWinnerAnnouncements(1)) as {
+      const second = (await service.discordWinnerAnnouncements()) as {
         days: Array<{ prizePoolUsd: number; payouts: Array<{ username: string }> }>;
       };
       expect(db.unannouncedWinnerDaysCalls).toBe(1); // same cached snapshot
@@ -693,7 +785,7 @@ describe('daily rewards', () => {
       const db = new FakeDailyRewardDb();
       const { service, clock } = cachedService(db);
 
-      expect(dayNames(await service.discordWinnerAnnouncements(1))).toEqual([]);
+      expect(dayNames(await service.discordWinnerAnnouncements())).toEqual([]);
       expect(db.unannouncedWinnerDaysCalls).toBe(1);
 
       // Finalizing is what puts the day into the unannounced set.
@@ -705,7 +797,7 @@ describe('daily rewards', () => {
       // One millisecond later, deep inside the TTL: without the bust this read
       // would serve the empty snapshot and the day would go unannounced.
       clock.ms += 1;
-      expect(dayNames(await service.discordWinnerAnnouncements(1))).toEqual(['2026-07-01']);
+      expect(dayNames(await service.discordWinnerAnnouncements())).toEqual(['2026-07-01']);
       expect(db.unannouncedWinnerDaysCalls).toBe(2);
     });
 
@@ -714,7 +806,7 @@ describe('daily rewards', () => {
       db.winnerAnnouncements = [winnerDay('2026-06-30')];
       const { service, clock } = cachedService(db);
 
-      expect(dayNames(await service.discordWinnerAnnouncements(1))).toEqual(['2026-06-30']);
+      expect(dayNames(await service.discordWinnerAnnouncements())).toEqual(['2026-06-30']);
       await expect(service.markDiscordWinnersAnnounced({ day: '2026-06-30' })).resolves.toEqual({
         ok: true,
       });
@@ -722,7 +814,7 @@ describe('daily rewards', () => {
       // The marked day has left the set; the fake reflects that.
       db.winnerAnnouncements = [];
       clock.ms += 1;
-      expect(dayNames(await service.discordWinnerAnnouncements(1))).toEqual([]);
+      expect(dayNames(await service.discordWinnerAnnouncements())).toEqual([]);
       expect(db.unannouncedWinnerDaysCalls).toBe(2);
     });
 
@@ -734,14 +826,14 @@ describe('daily rewards', () => {
       db.markWinnersAnnouncedOk = false;
       const { service, clock } = cachedService(db);
 
-      await service.discordWinnerAnnouncements(1);
+      await service.discordWinnerAnnouncements();
       await expect(service.markDiscordWinnersAnnounced({ day: '2026-06-30' })).resolves.toEqual({
         error: 'reward day not found',
         status: 404,
       });
 
       clock.ms += 1;
-      await service.discordWinnerAnnouncements(1);
+      await service.discordWinnerAnnouncements();
       expect(db.unannouncedWinnerDaysCalls).toBe(1);
     });
 
@@ -786,14 +878,14 @@ describe('daily rewards', () => {
       db.voidPayoutResult = { outcome: 'updated', payout: payoutRow('2026-06-30', 1) };
       const { service, clock } = cachedService(db);
 
-      await service.discordWinnerAnnouncements(1);
+      await service.discordWinnerAnnouncements();
       await expect(service.voidPayout(moderationBody('2026-06-30', 1))).resolves.toMatchObject({
         ok: true,
       });
 
       // One millisecond later, deep inside the TTL.
       clock.ms += 1;
-      await service.discordWinnerAnnouncements(1);
+      await service.discordWinnerAnnouncements();
       expect(db.unannouncedWinnerDaysCalls).toBe(2);
     });
 
@@ -803,13 +895,13 @@ describe('daily rewards', () => {
       db.restorePayoutResult = { outcome: 'updated', payout: payoutRow('2026-06-30', 2) };
       const { service, clock } = cachedService(db);
 
-      await service.discordWinnerAnnouncements(1);
+      await service.discordWinnerAnnouncements();
       await expect(service.restorePayout(moderationBody('2026-06-30', 2))).resolves.toMatchObject({
         ok: true,
       });
 
       clock.ms += 1;
-      await service.discordWinnerAnnouncements(1);
+      await service.discordWinnerAnnouncements();
       expect(db.unannouncedWinnerDaysCalls).toBe(2);
     });
 
@@ -822,13 +914,13 @@ describe('daily rewards', () => {
       db.claimPayoutResult = { outcome: 'claimed', payout: payoutRow('2026-06-30', 1) };
       const { service, clock } = cachedService(db);
 
-      await service.discordWinnerAnnouncements(1);
+      await service.discordWinnerAnnouncements();
       await expect(
         service.markPayout({ day: '2026-06-30', rank: 1, status: 'processing', txSignature: 's1' }),
       ).resolves.toMatchObject({ ok: true });
 
       clock.ms += 1;
-      await service.discordWinnerAnnouncements(1);
+      await service.discordWinnerAnnouncements();
       expect(db.unannouncedWinnerDaysCalls).toBe(2);
     });
 
@@ -837,13 +929,13 @@ describe('daily rewards', () => {
       db.winnerAnnouncements = [winnerDay('2026-06-30')];
       const { service, clock } = cachedService(db);
 
-      await service.discordWinnerAnnouncements(1);
+      await service.discordWinnerAnnouncements();
       await expect(
         service.markPayout({ day: '2026-06-30', rank: 1, status: 'paid', txSignature: 's1' }),
       ).resolves.toMatchObject({ ok: true });
 
       clock.ms += 1;
-      await service.discordWinnerAnnouncements(1);
+      await service.discordWinnerAnnouncements();
       expect(db.unannouncedWinnerDaysCalls).toBe(2);
     });
 
@@ -857,13 +949,13 @@ describe('daily rewards', () => {
       db.claimPayoutResult = { outcome: 'existing', payout: payoutRow('2026-06-30', 1) };
       const { service, clock } = cachedService(db);
 
-      await service.discordWinnerAnnouncements(1);
+      await service.discordWinnerAnnouncements();
       await expect(
         service.markPayout({ day: '2026-06-30', rank: 1, status: 'processing', txSignature: 's1' }),
       ).resolves.toMatchObject({ ok: true });
 
       clock.ms += 1;
-      await service.discordWinnerAnnouncements(1);
+      await service.discordWinnerAnnouncements();
       expect(db.unannouncedWinnerDaysCalls).toBe(1);
     });
 
@@ -876,13 +968,13 @@ describe('daily rewards', () => {
       db.markPayoutOutcome = 'already';
       const { service, clock } = cachedService(db);
 
-      await service.discordWinnerAnnouncements(1);
+      await service.discordWinnerAnnouncements();
       await expect(
         service.markPayout({ day: '2026-06-30', rank: 1, status: 'paid', txSignature: 's1' }),
       ).resolves.toMatchObject({ ok: true });
 
       clock.ms += 1;
-      await service.discordWinnerAnnouncements(1);
+      await service.discordWinnerAnnouncements();
       expect(db.unannouncedWinnerDaysCalls).toBe(1);
     });
 
@@ -894,7 +986,7 @@ describe('daily rewards', () => {
       db.winnerAnnouncements = [winnerDay('2026-06-30')];
       const { service, clock } = cachedService(db);
 
-      await service.discordWinnerAnnouncements(1);
+      await service.discordWinnerAnnouncements();
       await expect(
         service.markPayout({
           day: '2026-06-30',
@@ -906,44 +998,25 @@ describe('daily rewards', () => {
       ).resolves.toMatchObject({ ok: true });
 
       clock.ms += 1;
-      await service.discordWinnerAnnouncements(1);
+      await service.discordWinnerAnnouncements();
       expect(db.unannouncedWinnerDaysCalls).toBe(1);
     });
 
-    it('clamps the ask at both edges and serves every limit from ONE snapshot', async () => {
-      // The clamp maths: 0 and NaN fall to the floor of 1, an over-ask is capped
-      // at the 5-day snapshot width. NaN is the treacherous one: unguarded,
-      // Math.max(1, Math.min(5, NaN)) is NaN and slice(0, NaN) is EMPTY, so a
-      // malformed limit would silently serve zero days.
+    it('serves exactly the one-day outbox ask even when more days are pending', async () => {
+      // The limit param and its clamp retired with the standalone winners GET
+      // (#2791): the cache itself reads at DAILY_REWARD_WINNER_DAY_LIMIT, so a
+      // backlog is served one day per poll (announce, mark, next poll) rather
+      // than shipped wide to a caller that only acts on one.
       const db = new FakeDailyRewardDb();
       db.winnerAnnouncements = [
-        winnerDay('2026-06-25'),
-        winnerDay('2026-06-26'),
-        winnerDay('2026-06-27'),
         winnerDay('2026-06-28'),
         winnerDay('2026-06-29'),
         winnerDay('2026-06-30'),
       ];
       const { service } = cachedService(db);
 
-      expect(dayNames(await service.discordWinnerAnnouncements(0))).toEqual(['2026-06-25']);
-      expect(dayNames(await service.discordWinnerAnnouncements(99))).toEqual([
-        '2026-06-25',
-        '2026-06-26',
-        '2026-06-27',
-        '2026-06-28',
-        '2026-06-29',
-      ]);
-      expect(dayNames(await service.discordWinnerAnnouncements(Number.NaN))).toEqual([
-        '2026-06-25',
-      ]);
-      // Infinity is an over-ask, so it clamps UP to the ceiling, not down to the
-      // floor (the NaN guard is NaN-only on purpose).
-      expect(
-        dayNames(await service.discordWinnerAnnouncements(Number.POSITIVE_INFINITY)),
-      ).toHaveLength(5);
-      // Every ask above was a slice of the same snapshot, never a second read.
-      expect(db.unannouncedWinnerDaysCalls).toBe(1);
+      expect(dayNames(await service.discordWinnerAnnouncements())).toEqual(['2026-06-28']);
+      expect(db.unannouncedWinnerDaysLimits).toEqual([1]);
     });
 
     it('collapses two concurrent cold reads into one database read (single-flight)', async () => {
@@ -955,8 +1028,8 @@ describe('daily rewards', () => {
       const { service } = cachedService(db);
 
       const [first, second] = await Promise.all([
-        service.discordWinnerAnnouncements(1),
-        service.discordWinnerAnnouncements(1),
+        service.discordWinnerAnnouncements(),
+        service.discordWinnerAnnouncements(),
       ]);
 
       expect(db.unannouncedWinnerDaysCalls).toBe(1);
@@ -970,7 +1043,7 @@ describe('daily rewards', () => {
       db.winnerAnnouncements = [winnerDay('2026-06-30')];
       const { service, clock } = cachedService(db);
 
-      await service.discordWinnerAnnouncements(1);
+      await service.discordWinnerAnnouncements();
       await expect(service.voidPayout(moderationBody('2026-06-30', 1))).resolves.toEqual({
         error: 'payout not found',
         status: 404,
@@ -981,7 +1054,7 @@ describe('daily rewards', () => {
       });
 
       clock.ms += 1;
-      await service.discordWinnerAnnouncements(1);
+      await service.discordWinnerAnnouncements();
       expect(db.unannouncedWinnerDaysCalls).toBe(1);
     });
 
@@ -992,44 +1065,42 @@ describe('daily rewards', () => {
       // snapshot may still be holding. Those writes fire the post-moderation
       // hook, which main.ts wires to bustDailyRewardWinnersCache, which calls
       // exactly this method on the service singleton. Without it a just-banned
-      // winner's username and wallet pubkey stay announceable for a full TTL.
+      // winner's username stays announceable for a full TTL.
       const db = new FakeDailyRewardDb();
       db.winnerAnnouncements = [winnerDay('2026-06-30'), winnerDay('2026-07-01')];
       const { service, clock } = cachedService(db);
 
-      expect(dayNames(await service.discordWinnerAnnouncements(2))).toEqual([
-        '2026-06-30',
-        '2026-07-01',
-      ]);
+      expect(dayNames(await service.discordWinnerAnnouncements())).toEqual(['2026-06-30']);
 
       // The excluded winner's day drops out of the set entirely (its payouts were
-      // that one account), which is what the next read must see.
+      // that one account), which is what the next read must see at the front of
+      // the one-day ask.
       db.winnerAnnouncements = [winnerDay('2026-07-01')];
       service.bustWinnersCache();
 
       clock.ms += 1;
-      expect(dayNames(await service.discordWinnerAnnouncements(2))).toEqual(['2026-07-01']);
+      expect(dayNames(await service.discordWinnerAnnouncements())).toEqual(['2026-07-01']);
       expect(db.unannouncedWinnerDaysCalls).toBe(2);
     });
 
     it('derives the task names ONCE per refresh, not once per call', async () => {
-      // The config lookups ride dailyRewardRuntimeConfig, a single-slot cache: a
-      // per-call derivation cost up to two fetches on EVERY outbox poll for a
-      // pending day (about 40 a minute at a 3 s poll) and evicted the slot the
-      // player-facing status and spin paths share. A warm winners snapshot must
-      // now cost zero database reads AND zero config fetches.
+      // The config lookups ride dailyRewardRuntimeConfig: a per-call derivation
+      // cost config reads on EVERY outbox poll for a pending day (about 20 a
+      // minute at a 3 s poll). A warm winners snapshot must cost zero database
+      // reads AND zero config fetches, whatever shape the config cache takes
+      // (per-day map since #2791).
       const db = new FakeDailyRewardDb();
       db.winnerAnnouncements = [winnerDay('2026-06-30')];
       const { service, clock } = cachedService(db);
 
-      await service.discordWinnerAnnouncements(1);
+      await service.discordWinnerAnnouncements();
       const fetchesAfterRefresh = vi.mocked(fetch).mock.calls.length;
       // Non-vacuous: the refresh really did fetch (the day and its successor).
       expect(fetchesAfterRefresh).toBeGreaterThan(0);
 
       clock.ms += DAILY_REWARD_WINNERS_TTL_MS - 1;
-      await service.discordWinnerAnnouncements(1);
-      await service.discordWinnerAnnouncements(5);
+      await service.discordWinnerAnnouncements();
+      await service.discordWinnerAnnouncements();
 
       expect(db.unannouncedWinnerDaysCalls).toBe(1);
       expect(vi.mocked(fetch).mock.calls.length).toBe(fetchesAfterRefresh);
@@ -1043,7 +1114,7 @@ describe('daily rewards', () => {
       db.winnerAnnouncements = [winnerDay('2026-06-30')];
       const { service } = cachedService(db);
 
-      const result = (await service.discordWinnerAnnouncements(1)) as {
+      const result = (await service.discordWinnerAnnouncements()) as {
         days: Array<{ day: string; taskName: string; nextTaskName: string }>;
       };
 
@@ -1051,7 +1122,7 @@ describe('daily rewards', () => {
       expect(typeof result.days[0].taskName).toBe('string');
       expect(result.days[0].taskName.length).toBeGreaterThan(0);
       expect(typeof result.days[0].nextTaskName).toBe('string');
-      expect(await service.discordWinnerAnnouncements(1)).toEqual(result);
+      expect(await service.discordWinnerAnnouncements()).toEqual(result);
       expect(db.unannouncedWinnerDaysCalls).toBe(1);
     });
 
@@ -1060,13 +1131,13 @@ describe('daily rewards', () => {
       db.finalizedDays.add(JSON.stringify(['2026-07-01', REALM]));
       const { service, clock } = cachedService(db);
 
-      await service.discordWinnerAnnouncements(1);
+      await service.discordWinnerAnnouncements();
       await expect(
         service.finalizeRewardDay({ day: '2026-07-01' }, new Date('2026-07-02T22:00:00.000Z')),
       ).resolves.toEqual({ ok: true, day: '2026-07-01', outcome: 'already_finalized' });
 
       clock.ms += 1;
-      await service.discordWinnerAnnouncements(1);
+      await service.discordWinnerAnnouncements();
       expect(db.unannouncedWinnerDaysCalls).toBe(1);
     });
   });

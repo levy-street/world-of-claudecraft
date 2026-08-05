@@ -315,8 +315,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Satu biaya tetap per anak tangga resep, ditagih sekali saat seorang master mengajarkannya; setiap anak tangga pada tabel di bawah benar-benar dipakai hari ini, dari resep pemula yang gratis hingga pelajaran joran sang pembuat alat di puncaknya.',
   'guide.profPages.econ.provenanceBody':
     'Sebagian item membawa sebuah nama. Arahkan kursor padanya dan tooltipnya berkata Dikumpulkan oleh si anu pada material mentah, atau Dibuat oleh si anu pada potongan jadi: tanda yang sama, dirumuskan sesuai bagaimana item itu terwujud. Tanda tangan adalah bagian dari item itu sendiri, ikut berkelana bersamanya melewati perdagangan, bank, surat, Pasar Dunia, dan bahkan pembelian kembali oleh penjaja, dan tidak pernah memudar.\n\nPengumpulan menandatangani karya terbaiknya secara otomatis: setiap panen yang melempar langka atau lebih baik datang bertanda tangan, dan temuan langka menandatangani seluruh rejeki lima kali lipatnya. Lemparan beruntung pada panen bangkai menandatangani hasilnya jika keluarga itu tidak punya spesimen untuk diberikan, dan jika punya, hasilnya dibiarkan polos dan spesimen murni bertanda tangan dicetak di sampingnya. Pembuatan menandatangani menurut garis yang sama: setiap salinan keluaran langka atau lebih baik dicetak bertanda tangan, dan karya besar selalu bertanda tangan apa pun mutunya, sehingga versi terhalus dari potongan mana pun selalu menyebut nama pembuatnya. Satu-satunya hal yang bisa merenggut tanda tanganmu adalah tas yang penuh: satu unit bertanda tangan membutuhkan ruang tersendiri, atau tumpukan bertanda tangan yang cocok, untuk mendarat.\n\nSetumpuk item berbagi satu identitas, sehingga dua salinan menyatu hanya bila setiap tandanya cocok persis: item yang sama, penanda tangan yang sama, statistik karya besar yang sama, mantra yang sama, ikatan yang sama. Kayu gelondongan bertanda tangan tidak pernah bergabung dengan tumpukan polos ke arah mana pun (menyatukannya akan menghapus nama seseorang), tetapi muatan yang identik menyatu dengan senang hati, sehingga dua puluh bijih yang ditandatangani pengumpul yang sama duduk dalam satu tumpukan dan sebuah rejeki tidak mencabik-cabik tasmu.\n\nTanda tangan membayar balik para perajin: memegang salinan bertanda tangan mana pun dari reagen yang dibutuhkan di bangku kerja, siapa pun yang menandatanganinya, menambah 2 poin persentase peluang karya besar, dan memegang reagen yang ditandatangani tanganmu sendiri memangkas kuantitas yang diperlukan reagen itu sebanyak satu (tidak pernah di bawah satu). Karyamu sendiri yang bertanda tangan dan bermutu langka atau lebih baik bahkan terus mengajarimu, hari ini hanya lewat labu ramuan: minum ramuan yang kamu tandatangani dan setetes kecil keahlian mengalir kembali ke kerajinan yang menyeduhnya, selama kerajinan itu adalah salah satu kerajinan utamamu yang aktif.',
-  'guide.profPages.econ.throttleBody':
-    'Keluaran punya langit-langit: pembuatan, penghancuran mantra, pemantraan, salvasi, dan pengisian ulang efek alat berbagi satu anggaran sebesar {actions} tindakan berhasil dalam setiap jendela {seconds} detik. Percobaan yang ditolak tidak memakan biaya dan tidak menghabiskan anggaran. Kamu tidak akan pernah merasakannya dalam permainan normal; ini ada agar seorang spesialis mentok dengan bank penuh tidak bisa membanjiri Pasar, seberapa pun keahlian atau timbunannya.',
   'guide.profPages.faq.a4':
     'Kamu mendapat rejeki nomplok. Kira-kira 1 dari 90 panen memicu peristiwa pengumpulan langka (kayu inti kuno pada pohon, urat bijih pilihan pada bijih, mekar yang bersinar di bawah sinar bulan pada herba): peristiwa itu melipatgandakan hasil lima kali, menandatangani setiap unit dengan namamu, dan mengumumkan temuan itu ke seluruh zona. Gulungan kelangkaan langka atau lebih baik pada panen biasa juga menandatangani hasilnya.\n\nMaterial bertanda tangan layak disimpan atau dijual mahal: memegang salinan bertanda tangan mana pun dari reagen yang dibutuhkan di bangku kerja menambah 2 poin persentase pada peluang karya master. Ingat saja bahwa material itu hanya menumpuk dengan salinan yang ditandatangani secara identik, jadi masing-masing memakai slot tasnya sendiri.',
   'guide.profPages.faq.a6':
@@ -695,7 +693,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.collectorsHeading': 'Kolektor, piala, dan harga sebuah cerita',
   'guide.profPages.econ.collectorsBody':
     'Pedagang NPC buta terhadap asal-usul: item bertanda tangan dijual ke NPC dengan harga biasanya. Premium pada tanda tangan hanya ada di antara pemain, dan itulah yang membuatnya menarik: setumpuk bijih rejeki yang ditandatangani oleh pengumpul terkenal, Potongan Utama dari panen yang beruntung, sebuah bilah karya besar yang mencantumkan nama pembuat yang sudah pensiun, semuanya berharga sebanyak yang dikatakan ingatan seseorang.\n\nKitab Jasa bersandar pada naluri yang sama: Urat Murni, Kayu Hati Kuno, Mekar Bulan Purnama, Spesimen Sempurna, dan Kilau Harapan adalah tanda kolektor tanpa Kemasyhuran yang ada semata-mata untuk membuktikan bahwa sebuah momen pernah terjadi padamu. Simpan item yang mendapat jasa tersebut dan kamu memegang kuitansinya. Tidak ada daya di sini; asal-usul tidak membeli stat dan tidak memenangkan pertarungan, itu adalah jejak kertas permainan tentang hari-hari yang baik.',
-  'guide.profPages.econ.throttleHeading': 'Batas tindakan',
   'guide.profPages.econ.doctrineHeading': 'Pemain berdagang dengan pemain',
   'guide.profPages.econ.doctrineBody':
     'Ekonomi kerajinan dibangun di atas satu gagasan: pemain memasok pemain. Pengumpul memberi makan pembuat, pembuat memberi makan pencari misi dan raider, dan pemecah memberi makan pemantrai, dengan pedagang dan master stasiun berdiri di tepi untuk menyerap sampah dan koin alih-alih bersaing dengan kamu. Jika ingin menghasilkan uang dari profesi, pelangganmu adalah manusia: pelajari apa yang dihabiskan pemain lain, tetapkan harga berdasarkan Pasar Dunia, dan perlakukan sistem NPC sebagai lantai di bawah hargamu, bukan pasar itu sendiri.\n\nPerlengkapan buatan disetel untuk berada di bawah batas raid: bahkan karya besar hanya satu tingkat kualitas di atas resepnya, tidak pernah melewati legendaris, dan anggaran statnya tetap di bawah pita jarahan raid. Bengkel mempersiapkanmu untuk konten tersulit; ia tidak menggantikannya. Hal itu menjaga pembuat, raider, dan pasar dalam segitiga yang stabil: item raid tetap menjadi tujuan yang diimpikan, dan item buatan tetap menjadi perlengkapan terbaik yang benar-benar bisa dibeli dengan uang.',
@@ -1451,6 +1448,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Peliharaan: Serang',
   'hudChrome.keybinds.petDefensive': 'Peliharaan: Defensif',
   'hudChrome.keybinds.petStop': 'Peliharaan: Berhenti',
+  'hudChrome.keybinds.targetPet': 'Peliharaan: Bidik',
   'hudChrome.keybinds.petTaunt': 'Peliharaan: Ejek',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Kirim satu {item} lebih sedikit',
   'hudChrome.mailbox.parcelQtyIncreaseAria': 'Kirim satu {item} lebih banyak',
@@ -7687,6 +7685,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Grup {n}',
   'hudChrome.unitFrame.partyLabel': 'Kelompok Anda',
   'hudChrome.unitFrame.playerLabel': 'Pahlawan Anda',
+  'hudChrome.unitFrame.petLabel': 'Peliharaan Anda',
   'hudChrome.unitFrame.targetAnnounce': 'Tandai {name}',
   'hudChrome.unitFrame.targetLabel': 'Sasaran Anda',
   'hudChrome.widgets.clockTitle': 'Waktu lokal - klik untuk beralih 12/24 jam',
@@ -8645,6 +8644,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Umumkan raid, pertemuan, atau acara',
   'hudChrome.discord.relay.help.label': 'Butuh Bantuan',
   'hudChrome.discord.relay.help.hint': 'Minta bantuan dari komunitas',
+  'hudChrome.options.hideUnusedActionSlots': 'Sembunyikan Slot Aksi yang Tidak Terpakai',
   'hudChrome.options.showSecondaryActionBar': 'Tampilkan Bilah Aksi Sekunder',
   'errors.api.desktopCodeInvalid':
     'Kode masuk desktop tidak valid atau kedaluwarsa. Silakan coba lagi.',
@@ -8776,13 +8776,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Ini menghancurkan salinan khusus dari {item} (bertanda tangan, karya besar, atau terpesonan) dan menghasilkan bahan arkan. Tindakan ini tidak dapat dibatalkan.',
   'hudChrome.enchanting.disenchantConfirmTitle': 'Hancurkan pemantraan {item}?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Kamu menghancurkan pemantraan terlalu cepat. Tunggu sebentar dan coba lagi.',
   'hudChrome.enchanting.disenchantedLine': 'Kamu menghancurkan pemantraan {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Kamu memantrai {item} dengan {enchant}.',
   'hudChrome.enchanting.enchantInsufficient': 'Kamu tidak memiliki bahan untuk mantrai itu.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Kamu memantrai terlalu cepat. Tunggu sebentar dan coba lagi.',
   'hudChrome.enchanting.enchantUnknown': 'Mantrai itu tidak ada.',
   'hudChrome.enchanting.enchantWrongSlot': 'Mantrai itu tidak bisa diterapkan pada barang itu.',
   'hudChrome.enchanting.noEnchants': 'Tidak ada mantrai yang menggunakan reagen ini.',
@@ -8796,8 +8792,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'Ini menghancurkan salinan khusus dari {item} (bertanda tangan, karya besar, atau terpesonan) dan menghasilkan bahan kerajinan. Tindakan ini tidak dapat dibatalkan.',
   'hudChrome.enchanting.salvageConfirmTitle': 'Salvasi {item}?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Kamu menyalvasi terlalu cepat. Tunggu sebentar dan coba lagi.',
   'hudChrome.enchanting.salvagedLine': 'Kamu menyalvasi {item}.',
   'hudChrome.enchanting.targetTitle': 'Pilih barang untuk dimantrai',
   'hudChrome.gathering.herbalism': 'Herbalisme',
@@ -8966,7 +8960,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Segala sesuatu di halaman ini ada di dalam game: tekan Esc untuk membuka opsi. Menu terbuka pada Ikhtisar berisi hal-hal penting yang disematkan, dengan kategori-kategori di rel di sampingnya: pengaturan di bawah ini ada di bawah Grafik, Antarmuka, dan Aksesibilitas dalam grup Tampilan, dan Hamparan Kinerja di bawah Sistem. Lebih cepat lagi, ketik sebuah nama di kotak pencarian di puncak dan langsung melompat ke sana.',
   'guide.settingsPage.whyLabel': 'Mengapa ini berhasil:',
   'hudChrome.crafting.close': 'Tutup kerajinan',
-  'hudChrome.crafting.craft': 'Keahlian',
   'hudChrome.crafting.craftedToast': 'Dibuat: {name}',
   'hudChrome.crafting.empty': 'Belum ada resep yang diketahui.',
   'hudChrome.crafting.insufficientMaterials': 'Anda tidak memiliki bahan untuk itu.',
@@ -9060,7 +9053,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Meningkatkan Kecerdasan sebesar {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Meningkatkan Stamina sebesar {pct}%',
   'hudChrome.crafting.recipeNotLearned': 'Kamu belum mempelajari resep itu.',
-  'hudChrome.crafting.throttled': 'Kamu membuat terlalu cepat. Tunggu sejenak dan coba lagi.',
   'hudChrome.mobile.chatPlaceholder': 'Katakan sesuatu...',
   'hudChrome.mobile.hideKeyboard': 'Sembunyikan papan ketik',
   'hudChrome.unitFrame.partyChip': 'Kelompok',
@@ -10178,6 +10170,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': '{ability}-mu dihindari oleh {target}.',
   'hudChrome.options.mouseoverCast': 'Rapal Saat Menyorot Bingkai Kelompok',
   'hudChrome.options.showTargetOfTarget': 'Tampilkan Sasaran dari Sasaran',
+  'hudChrome.options.showPetFrame': 'Tampilkan Peliharaan Anda',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Sasaran dari Sasaran',
   'itemUi.market.rarityLegendary': 'Legendaris',
   'loading.reconnectingAttempt':

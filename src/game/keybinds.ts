@@ -341,6 +341,15 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['Ctrl+Digit5'],
   },
+  // Selects your own pet, the keyboard route to what clicking the pet frame does.
+  // Ctrl+6 continues the pet row (Ctrl+1..5 above) and collides with nothing.
+  {
+    id: 'targetPet',
+    label: 'Pet: Mark',
+    category: 'Pet',
+    kind: 'edge',
+    defaults: ['Ctrl+Digit6'],
+  },
   // Action bar (slot 0 = Attack)
   ...SLOT_DEFAULTS.map(
     (code, i): BindAction => ({

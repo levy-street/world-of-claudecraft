@@ -94,8 +94,11 @@ import {
   ALL_CLASSES,
   type AuraKind,
   CONSUME_DURATION,
+  CRAFT_CAST_ID,
   canPrestige,
+  DISENCHANT_CAST_ID,
   dist2d,
+  ENCHANT_CAST_ID,
   type Entity,
   FAERIE_FIRE_ARMOR_PCT,
   FISHING_CAST_ID,
@@ -105,9 +108,11 @@ import {
   MELEE_RANGE,
   MILESTONES,
   questObjectiveRequired,
+  SALVAGE_CAST_ID,
   type SimEvent,
   SUNDER_ARMOR_PCT_PER_STACK,
   TICK_RATE,
+  TOOL_RECHARGE_CAST_ID,
   virtualLevel,
   xpUntilNextPrestige,
 } from '../sim/types';
@@ -152,6 +157,7 @@ import {
   BannerQueue,
   bannerSubtextLines,
 } from './banner_queue';
+import { blockLandingLogKey } from './block_landing_feedback_core';
 import { CalendarWindow } from './calendar_window';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter, type CastBarPaintInput } from './cast_bar_painter';
@@ -188,11 +194,18 @@ import {
   shouldPlayMobVoiceSfxForEntity,
   spellFxCue,
 } from './combat_sfx';
+import { buildCommissionOrderBoardModel } from './commission_order_view';
+import { renderCommissionOrderWindow } from './commission_order_window';
 import { type CardinalId, compassView } from './compass';
 import { ContinentMapPainter } from './continent_map_painter';
 import { type ContinentZoneRegion, continentZoneAt } from './continent_map_view';
 import { cookingCatchHintKey } from './cooking_catch_hint_view';
 import { formatMinimapCoords } from './coords';
+import {
+  buildCraftCastSession,
+  type CraftCastSessionView,
+  craftCastActivitySig,
+} from './craft_cast_view';
 import {
   buildCraftCelebrationPlan,
   CRAFT_TIER_UP_DRAIN_WINDOW,
@@ -206,7 +219,7 @@ import {
   craftLearnHints,
   craftOwnsTab,
 } from './crafting_view';
-import { renderCraftingWindow, stationNameText } from './crafting_window';
+import { craftCastStripElements, renderCraftingWindow, stationNameText } from './crafting_window';
 import { shouldRefreshDailyRewardsLauncher } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow } from './daily_rewards_window';
 import { deathRecapFeedback } from './death_recap_feedback';
@@ -247,12 +260,14 @@ import {
   dungeonDisplayName,
   itemDisplayName,
   knownLetterId,
+  riftFloorLabel,
   tEntity,
   zoneDisplayName,
   zonePoiLabel,
 } from './entity_i18n';
 import { ERROR_LOG_COLOR, shouldMirrorErrorToast } from './error_toast_log';
 import { esc } from './esc';
+import { blockFctAmountText } from './fct_core';
 import { fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
 import { FocusManager, type FocusTrapHandle } from './focus_manager';
@@ -468,6 +483,7 @@ import {
   nextMapZoom,
   zoomOutExitsZoneLevel,
 } from './map_pinch_zoom_core';
+import { shouldResetMapPanOnZoneCross, showOnMapPanState } from './map_show_on_map_core';
 import {
   type MapRegion,
   mapCanvasHeight,
@@ -526,6 +542,7 @@ import { partyFrameSignature, selectPartyFrameMembers } from './party_frames';
 import { PartyFramesPainter } from './party_frames_painter';
 import type { PerfOverlayHooks } from './perf_overlay_settings';
 import { PET_ACTION_ICONS, petFeedButtonState } from './pet_action_icons';
+import { findOwnPet, petFrameDescriptorInto } from './pet_frame_view';
 import {
   chatPlayerContextActions,
   type PlayerContextAction,
@@ -893,6 +910,11 @@ const PLAYER_TOOLTIP_VIEW_DEPS: PlayerTooltipI18n = {
 const castDisplayName = (id: string): string => {
   if (id === FISHING_CAST_ID) return t('abilityUi.cast.fishing');
   if (id === GATHER_CAST_ID) return t('abilityUi.cast.gathering');
+  if (id === CRAFT_CAST_ID) return t('abilityUi.cast.crafting');
+  if (id === DISENCHANT_CAST_ID) return t('abilityUi.cast.disenchanting');
+  if (id === ENCHANT_CAST_ID) return t('abilityUi.cast.enchanting_apply');
+  if (id === SALVAGE_CAST_ID) return t('abilityUi.cast.salvaging');
+  if (id === TOOL_RECHARGE_CAST_ID) return t('abilityUi.cast.tool_recharge');
   if (id === 'demon_heal') return t('abilityUi.cast.demonHeal');
   if (id === 'thunzharr_stormcall') return t('abilityUi.cast.thunzharrStormcall');
   const riftKey = `abilityUi.cast.${id}` as TranslationKey;
@@ -1400,6 +1422,21 @@ export class Hud {
   // Cached showTargetOfTarget preference (set from main.ts applySetting via
   // setShowTargetOfTarget); when off, the frame is painted hidden every frame.
   private showTargetOfTarget = false;
+  // Pet frame (showPetFrame option): element refs for the #pet-frame strip under the
+  // player frame, resolved ONCE like the refs above. A FOURTH instance of the
+  // unit_frame family (petFramePainter below), driven by pet_frame_view.ts.
+  private petFrameEl = $('#pet-frame');
+  private petNameEl = $('#petf-name');
+  private petLevelEl = $('#petf-level');
+  private petHpEl = $('#petf-hp');
+  private petHpTextEl = $('#petf-hp-text');
+  private petPortraitEl = $('#petf-portrait') as unknown as HTMLCanvasElement;
+  // The pet whose portrait the painter's repaint gate redraws this frame; set just
+  // before the paint() call that fires the gate (mirrors totPortraitSubject).
+  private petPortraitSubject: Entity | null = null;
+  // Cached showPetFrame preference (set from main.ts applySetting via
+  // setShowPetFrame); when off, the frame is painted hidden every frame.
+  private showPetFrame = true;
   // The target whose portrait the family painter's repaint gate redraws this frame.
   // The gate fires synchronously inside the targetFramePainter.paint() call below,
   // so this holds the subject for that one call (the old inline block read `target`
@@ -1559,6 +1596,11 @@ export class Hud {
   private openUnbindNpcId: number | null = null;
   private readonly unbindWindowFocus = this.windowFocus('#unbind-window');
   private unbindOpenerFocus: HTMLElement | null = null;
+  // The crafting window (#1127) was the one standalone-window holdout that
+  // never installed the shared Tab trap or returned focus to its opener: the
+  // same train/unbind shape, added here so it stops being the exception.
+  private readonly craftingWindowFocus = this.windowFocus('#crafting-window');
+  private craftingOpenerFocus: HTMLElement | null = null;
   // Craft tier-up snapshot (Professions 2.0): the last SYNCED
   // craftSkills observation handleEvents diffs for tier crossings. null until
   // the first synced observation, which initializes silently (no toasts for
@@ -1587,6 +1629,39 @@ export class Hud {
   // repaints only on a real move. Same cold-painter posture as the station
   // signature above: never a per-frame repaint.
   private lastCraftingReagentSig = '';
+  // Craft-cast activity signature (active + recipe + batch counters) as of
+  // the last full crafting-window paint. Frame-band
+  // paintOpenCraftingCastProgress rebuilds only when this moves (cast start /
+  // cancel / complete / batch item boundary); fill ticks ride the strip
+  // painter alone. The entity cast/session fields are authoritative on BOTH
+  // hosts (offline direct, online via the self-only `ccast` wire fragment),
+  // so no click-time fallback state exists.
+  private lastCraftingCastSig = '';
+  // True while a craft-cast session is live (re-armed each active frame),
+  // cleared by every craftResult. A session that drops with this still set
+  // produced no result: a movement cancel, announced as cancelled.
+  private craftCastExpectingResult = false;
+  // The static #crafting-live region (index.html/play.html): a polite live
+  // region inside the rebuilt window subtree would be wiped by the same task
+  // that writes it, so announcements ride this never-rebuilt node instead.
+  // Nullable on purpose: test rigs construct Hud over minimal DOMs that
+  // carry neither node, so every consumer guards (the play.html ?. rule).
+  private readonly craftingLiveEl: HTMLElement | null = $('#crafting-live') ?? null;
+  private readonly craftCastReannounce = new ReannounceMarker();
+  // #crafting-window, cached once: paintOpenCraftingCastProgress runs on the
+  // frame band, and a per-frame $() query is barred there (src/ui/CLAUDE.md).
+  private readonly craftingWindowEl: HTMLElement | null = $('#crafting-window') ?? null;
+  // Per-frame strip painter over the CURRENT strip nodes, rebuilt after every
+  // full crafting-window paint (the rebuild replaces the elements). Writes go
+  // through the PainterHost elided writers (CastBarPainter), so identical
+  // frames cost zero DOM mutations and the perf tour's hudHotDomWrites
+  // accounting sees this path.
+  private craftCastStripPainter: CastBarPainter | null = null;
+  // The localized label the strip painter resolves (the active recipe's
+  // display name), refreshed on each full paint.
+  private craftCastStripLabel = '';
+  // Per-recipe qty stepper values (HUD-held so window repaints keep the pick).
+  private readonly craftQtyByRecipe = new Map<string, number>();
   // Character and Crafting are cold painters. Diff the local crafting
   // identity plus the gathering proficiency rows on the slow band so a late
   // online cprof or professions snapshot replaces stale archetype art/title
@@ -1609,6 +1684,12 @@ export class Hud {
       return null;
     }
   })();
+  // Commission order board (issue #1298): whether #commission-board-window
+  // is the viewer's own open window this session. No opener-focus tracking
+  // (the crafting window precedent: a non-modal reference window, not a
+  // trapping dialog), and no location gate (opening/cancelling an order
+  // carries no escrow).
+  private commissionBoardOpen = false;
   private readonly delveBoard: DelveBoardController;
   private readonly delveTracker: DelveTrackerController;
   private readonly riftTracker: RiftFloorTrackerController;
@@ -3248,6 +3329,9 @@ export class Hud {
       case 'crafting-window':
         this.closeCrafting();
         break;
+      case 'commission-board-window':
+        this.closeCommissionBoard();
+        break;
       case 'loot-window':
         this.closeLoot();
         break;
@@ -3385,6 +3469,19 @@ export class Hud {
         onPositioned: (active) => this.setPlayerFrameDetached(active),
       });
     }
+    if (this.petFrameEl) {
+      // The pet frame is a select button (role=button, tabindex=0 in the markup):
+      // clicking or keying it selects your pet, the same action the targetPet
+      // keybind performs. Pets are ordinary targetable entities, and your own pet
+      // stays selectable while DEAD (src/sim/dead_target.ts) so the Revive action on
+      // the pet bar below stays reachable from here.
+      this.petFrameEl.addEventListener('click', () => this.targetOwnPet());
+      this.petFrameEl.addEventListener('keydown', (ev: KeyboardEvent) => {
+        if (ev.key !== 'Enter' && ev.key !== ' ') return;
+        ev.preventDefault();
+        this.targetOwnPet();
+      });
+    }
     this.partyFrameMover = new MovableFrame({
       frame: this.partyFramesEl,
       storageKey: PARTY_FRAME_POS_KEY,
@@ -3429,6 +3526,11 @@ export class Hud {
       const stack = $('#actionbar-stack');
       if (frame.parentElement !== stack) stack.insertBefore(frame, stack.firstChild);
     }
+    // The pet cluster (#pet-cluster: command bar plus health frame) deliberately
+    // does NOT travel with the player frame. It is its own row at the top of the
+    // action-bar stack, holding the pet's controls as well as its health, so it
+    // belongs with the bars rather than hanging off the player frame; dragging the
+    // player frame elsewhere leaves the pet UI where the player put the bars.
   }
 
   // Buffs on the Player Frame (aurasOnPlayerFrame): reparent the player's own
@@ -3820,6 +3922,7 @@ export class Hud {
   private readonly playerFrameBuffer = newUnitFrameBuffer();
   private readonly targetFrameBuffer = newUnitFrameBuffer();
   private readonly totFrameBuffer = newUnitFrameBuffer();
+  private readonly petFrameBuffer = newUnitFrameBuffer();
   private readonly playerFrameDescriptor: UnitFrameDescriptor = {
     present: true,
     hpFrac: 0,
@@ -3844,6 +3947,9 @@ export class Hud {
     ...ABSENT_TARGET_DESCRIPTOR,
   };
   private readonly totFrameDescriptor: UnitFrameDescriptor = {
+    ...ABSENT_TARGET_DESCRIPTOR,
+  };
+  private readonly petFrameDescriptor: UnitFrameDescriptor = {
     ...ABSENT_TARGET_DESCRIPTOR,
   };
   // The per-frame FCT painter: the pooled-div ring that replaced the per-event
@@ -3960,6 +4066,27 @@ export class Hud {
     {
       shownDisplay: 'flex',
       repaintPortrait: () => this.drawTargetOfTargetPortrait(),
+    },
+  );
+  // The pet frame is the FOURTH instance of the unit_frame family. Like the
+  // target-of-target it carries name + level + hp and toggles flex/none, and it
+  // passes NO resource group because a pet has no power type at all (createMob
+  // never sets resourceType) and NO absorb overlay. Unlike the tot frame it DOES
+  // take stateClasses: a dead pet is a real, actionable state (Revive is on the pet
+  // bar right below), so the frame dims itself rather than only reading "Dead".
+  private readonly petFramePainter = new UnitFramePainter(
+    this.writerFacet,
+    {
+      frame: this.petFrameEl,
+      name: this.petNameEl,
+      level: this.petLevelEl,
+      hpFill: this.petHpEl,
+      hpText: this.petHpTextEl,
+    },
+    {
+      shownDisplay: 'flex',
+      repaintPortrait: () => this.drawPetPortrait(),
+      stateClasses: true,
     },
   );
   // Deferred "Auto-Attack on Ability Use" for TIMED casts: set by castSlot when
@@ -4905,6 +5032,32 @@ export class Hud {
     this.showTargetOfTarget = on;
   }
 
+  // A pet is always an ordinary mob entity, so its portrait is the family crest the
+  // target frame draws for any mob. No player branch: a pet is never kind 'player'.
+  private drawPetPortrait(): void {
+    const pet = this.petPortraitSubject;
+    if (!pet) return;
+    this.portraits.drawCrest(
+      this.petPortraitEl,
+      crestIdForEntity(pet.kind, MOBS[pet.templateId]?.family),
+    );
+  }
+
+  // Toggle the pet frame (showPetFrame option), driven from main.ts applySetting.
+  // When off, the per-frame update paints the frame hidden.
+  setShowPetFrame(on: boolean): void {
+    this.showPetFrame = on;
+  }
+
+  /** Select the player's own pet: the pet frame's click/key action and the targetPet
+   *  keybind's handler (main.ts). A no-op when the player has no pet. Deliberately
+   *  independent of the showPetFrame option, so the keybind still works with the
+   *  frame hidden. */
+  targetOwnPet(): void {
+    const pet = this.ownPet();
+    if (pet) this.sim.targetEntity(pet.id);
+  }
+
   private itemIcon(item: ItemDef): string {
     return knownItemIconHtml(item);
   }
@@ -5254,6 +5407,7 @@ export class Hud {
       familyLabel,
       color: mobTooltipConColor(diff, entity.dead, friendlyPet),
       hostile: entity.hostile,
+      rank: targetRankView(template),
       quests: mobQuests.map((q) => ({
         title: questTitle(q.questId),
         progress: this.questProgressText(
@@ -5815,6 +5969,10 @@ export class Hud {
     // string, so a switch can never draw the old language; clearing is about not
     // carrying dead rasters in the sprite budget.
     this.mapPainter.relocalize();
+    // The delve minimap/world-map schematic bakes the localized compass-north
+    // glyph into its cached background canvas, keyed only on module id; a
+    // language switch alone never busts that cache, so force one rebuild.
+    this.delvePainter.relocalize();
     // The unit-frame move/lock buttons' labels are set once at construction + on
     // toggle, so re-localize them in place on a language switch (same reason as
     // the party rows above).
@@ -7564,10 +7722,7 @@ export class Hud {
   }
 
   private ownPet(): Entity | null {
-    for (const e of this.sim.entities.values()) {
-      if (e.kind === 'mob' && e.ownerId === this.sim.playerId) return e;
-    }
-    return null;
+    return findOwnPet(this.sim.entities.values(), this.sim.playerId);
   }
 
   // The warrior stance bar: a small row of stance toggles stacked above the
@@ -7629,9 +7784,11 @@ export class Hud {
     }
   }
 
-  private renderPetBar(): void {
+  // `pet` is resolved ONCE per frame by update() and passed in, shared with the pet
+  // frame above it: both surfaces need the same entity, and each resolving its own
+  // would walk the interest-scoped roster twice per frame.
+  private renderPetBar(pet: Entity | null): void {
     const bar = $('#petbar') as HTMLElement;
-    const pet = this.ownPet();
     // Value-diffed body-class flag the mobile top-band layout reads (see field doc):
     // toggled only on a real transition so the per-frame path stays write-free.
     // Deliberately toggled on EVERY host, not just touch: only body.mobile-touch
@@ -8463,11 +8620,45 @@ export class Hud {
       this.totFramePainter.paint(unitFrameViewInto(this.totFrameBuffer, ABSENT_TARGET_DESCRIPTOR));
     }
 
+    // Pet frame: your own pet's health, under the player frame. Painted EVERY frame
+    // like the player frame rather than on the target frame's tier-throttled cadence,
+    // because pet health is information the owner acts on (Mend Pet, Revive, pulling
+    // it off a mob), and the gameplay-neutral-graphics invariant forbids a tier knob
+    // delaying that. It is cheap to paint at full rate: five writes, all elided, so a
+    // pet whose health has not moved costs zero DOM mutations. When the player has no
+    // pet (six of the nine classes, always) or the option is off, this paints hidden,
+    // which also resets the painter's portrait gate for the next summon or tame.
+    // ONE roster scan per frame, shared with renderPetBar below (it takes `pet` as a
+    // parameter for exactly this reason): the pet bar already resolved the pet every
+    // frame before this change, so the frame adds a surface, not a second walk.
+    const pet = this.ownPet();
+    const framedPet = this.showPetFrame ? pet : null;
+    this.petPortraitSubject = framedPet;
+    this.petFramePainter.paint(
+      unitFrameViewInto(
+        this.petFrameBuffer,
+        petFrameDescriptorInto(this.petFrameDescriptor, framedPet, t('hud.core.dead')),
+      ),
+    );
+
     // cast bar: the player instance localizes the cast id (castDisplayName), layers
     // the mount summon channel (mountSummonBarState) and the player-only eat/drink
     // overlay (consumeBarState), and clears on hide. Priority: spell cast > mount
     // summon > eat/drink (you cannot cast while mounting, but the painter guards it).
     const playerCast = castBarState(p);
+    // Craft-cast single-surface rule: while the crafting window is open its
+    // strip is the ONE progress surface for a craft cast, so the overlay bar
+    // hides for CRAFT_CAST_ID only (closing the window hands the cast back to
+    // this bar, never invisible). Self-only presentation, no other cast and
+    // no other viewer affected; the strip carries the same fill/timer plus
+    // the batch counter, so no actionable information is lost (fairness).
+    if (
+      playerCast.visible &&
+      playerCast.label === CRAFT_CAST_ID &&
+      this.craftingWindowEl?.style.display === 'flex'
+    ) {
+      playerCast.visible = false;
+    }
     const playerMountSummon = mountSummonBarState(p.mountCastRemaining, p.mountCastKey);
     const playerConsume = consumeBarState(p.eating, p.drinking);
     let playerCastInput = this.playerCastBarInput;
@@ -8486,6 +8677,9 @@ export class Hud {
       this.playerCastBarInput = playerCastInput;
     }
     this.playerCastBarPainter.paint(playerCastInput);
+    // Crafting window cast strip: real entity cast fields, fill-only when the
+    // activity signature is stable (no full rebuild per tick).
+    this.paintOpenCraftingCastProgress();
 
     // swing timer: fills between melee/ranged auto-attack swings. swingTimer
     // counts DOWN to 0 (ready); swing_timer.ts recovers the full interval from the
@@ -8555,7 +8749,7 @@ export class Hud {
       };
       this.actionBarWorldInput = actionBarWorld;
     }
-    this.renderPetBar();
+    this.renderPetBar(pet);
     this.renderStanceBar();
     this.flushPendingProcAuraNotes();
     if (this.spellbookWindow.isOpen) this.spellbookWindow.tickOpen();
@@ -9898,14 +10092,21 @@ export class Hud {
 
   // Dungeon Finder "Show on Map": open the world map on the entrance's zone
   // band, pan to the authored door position, and ring it. Never teleports; the
-  // highlight clears when the map closes or is reopened normally.
+  // highlight clears when the map closes or is reopened normally. The pan/zoom
+  // + forced per-zone level all come from showOnMapPanState (map_show_on_map_core.ts):
+  // see its header for why the level write is not optional (the continent
+  // overview branch of updateMapWindow never reads mapPing/mapZoom/mapCenter
+  // at all, so a map left open on that level swallowed the ping silently).
   showFinderOnMap(x: number, z: number): void {
     const el = $('#map-window');
     if (el.style.display !== 'block') this.toggleMap();
-    this.mapZoneOverride = zoneAt(x, z).id;
-    this.mapPing = { x, z };
-    this.mapZoom = Math.max(this.mapZoom, 2);
-    this.mapCenter = { x, z };
+    const next = showOnMapPanState(this.mapZoom, x, z, zoneAt(x, z).id);
+    this.mapZoneOverride = next.zoneOverride;
+    this.mapPing = next.ping;
+    this.mapZoom = next.zoom;
+    this.mapCenter = next.center;
+    this.mapLevel = next.level;
+    this.mapHoverZone = next.hoverZone;
     this.updateMapWindow();
   }
 
@@ -10020,10 +10221,15 @@ export class Hud {
         : (ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.x, p.pos.z));
     // Crossing a zone while the map is open starts that zone at its full frame;
     // a pan target from the previous zone must never leak into the new one.
+    // shouldResetMapPanOnZoneCross (map_show_on_map_core.ts) is what keeps a
+    // pending Show-on-Map ping's own zoom/pan from being clobbered by this
+    // same guard on the redraw right after the ping fires.
     if (this.mapZoneId !== zone.id) {
       this.mapZoneId = zone.id;
-      this.mapZoom = MAP_OPEN_ZOOM;
-      this.mapCenter = null;
+      if (shouldResetMapPanOnZoneCross(this.mapPing !== null, this.mapZoneOverride, zone.id)) {
+        this.mapZoom = MAP_OPEN_ZOOM;
+        this.mapCenter = null;
+      }
     }
     const zoneBg = {
       canvas: this.mapZoneBg(zone),
@@ -10043,7 +10249,14 @@ export class Hud {
     this.mapGatherNodes = result.gatherNodes;
     this.mapGatherTipMemo = null;
     if (!this.mapDrag) canvas.style.cursor = result.cursor;
-    this.setText(summaryEl, t('hud.core.mapSummary', { zone: zoneDisplayName(zone.id) }));
+    // Inside a rift the aria-live summary must name the generated floor, not
+    // the overworld zone the far-off rift x would otherwise resolve to
+    // (mirrors the on-canvas title map_window_painter now draws).
+    const riftFloor = this.sim.riftFloor;
+    const zoneLabel = riftFloor
+      ? riftFloorLabel(riftFloor.name, riftFloor.tier)
+      : zoneDisplayName(zone.id);
+    this.setText(summaryEl, t('hud.core.mapSummary', { zone: zoneLabel }));
   }
 
   // Tooltip body for a hovered zone region on the continent overview: the zone's
@@ -10576,10 +10789,14 @@ export class Hud {
           }
           // A landed hit: the mapper resolves damage-done (player dealt to other) vs
           // damage-taken (player took) vs null (a hit between two non-player entities, which
-          // floats nothing). The amount text + target entity stay at the call site.
+          // floats nothing). A shield block is ALSO a landed hit (still dealing real,
+          // blockValue-reduced damage, unlike the avoidance words above), so it is passed
+          // through here too, but with its own damageKind so it reads with its own colour
+          // and combat-log sentence instead of an indistinguishable plain hit. The amount
+          // text + target entity stay at the call site.
           const hitShape = fctSpawnShape({
             type: 'damage',
-            damageKind: 'hit',
+            damageKind: ev.kind === 'block' ? 'block' : 'hit',
             ability: !!ev.ability,
             crit: ev.crit,
             isPlayerSource,
@@ -10618,6 +10835,56 @@ export class Hud {
             // in the open world only a HEAVY hit kicks the camera (a tenth of
             // max HP in one blow, or any crit), so routine chip damage stays
             // still. addShake is a reduced-motion no-op.
+            if (this.inFiesta()) this.renderer.addShake(ev.crit ? 0.34 : 0.14);
+            else if (tgt && (ev.crit || ev.amount >= tgt.maxHp * 0.1)) {
+              this.renderer.addShake(ev.crit ? 0.26 : 0.16);
+            }
+          } else if (hitShape && hitShape.kind === 'damage-done-block') {
+            this.fctPainter.spawn(
+              {
+                ...hitShape,
+                text: t('hud.combat.floatingBlock', {
+                  amount: blockFctAmountText(ev.amount, ev.crit, false),
+                }),
+                target: tgt,
+              },
+              now,
+            );
+            const logKey = blockLandingLogKey(isPlayerSource, isPlayerTarget);
+            if (logKey)
+              this.combatLog(
+                t(logKey, {
+                  ability: combatAbilityName(ev.ability),
+                  target: entityDisplayName(tgt),
+                  amount: ev.amount,
+                }),
+                '#b8c4d9',
+              );
+            // Same Fiesta/heavy-hit shake feel as an unblocked hit dealt: the block only
+            // changes how the number READS, not the impact.
+            if (this.inFiesta()) this.renderer.addShake(ev.crit ? 0.3 : 0.12);
+          } else if (hitShape && hitShape.kind === 'damage-taken-block') {
+            this.fctPainter.spawn(
+              {
+                ...hitShape,
+                text: t('hud.combat.floatingBlock', {
+                  amount: blockFctAmountText(ev.amount, ev.crit, true),
+                }),
+                target: tgt,
+              },
+              now,
+            );
+            const logKey = blockLandingLogKey(isPlayerSource, isPlayerTarget);
+            if (logKey)
+              this.combatLog(
+                t(logKey, {
+                  source: src ? entityDisplayName(src) : '?',
+                  amount: ev.amount,
+                }),
+                '#7ec8e3',
+              );
+            // Same Fiesta/heavy-hit shake feel as an unblocked hit taken: the block only
+            // changes how the number READS, not the impact.
             if (this.inFiesta()) this.renderer.addShake(ev.crit ? 0.34 : 0.14);
             else if (tgt && (ev.crit || ev.amount >= tgt.maxHp * 0.1)) {
               this.renderer.addShake(ev.crit ? 0.26 : 0.16);
@@ -10812,6 +11079,22 @@ export class Hud {
           break;
         }
         case 'craftResult': {
+          // A result (grant or denial) means the in-flight cast RESOLVED:
+          // a session that later drops without one was cancelled. The paint
+          // band re-arms the flag while a session stays active (mid-batch).
+          this.craftCastExpectingResult = false;
+          if (ev.ok && ev.itemId && this.craftingWindowEl?.style.display === 'flex') {
+            const craftedItem = ITEMS[ev.itemId];
+            // No display name resolves: say nothing (a raw internal id read
+            // aloud is worse than silence).
+            if (craftedItem) {
+              this.announceCraftCast(
+                t('hudChrome.crafting.announceComplete', {
+                  name: itemDisplayName(craftedItem),
+                }),
+              );
+            }
+          }
           // Arm the tier-up state check below: skills only ever change on a
           // craft, and online the cprof mirror can land a few snapshots after
           // this event, so the diff stays armed for a bounded drain window
@@ -10856,8 +11139,8 @@ export class Hud {
                       ? 'hudChrome.crafting.unknownRecipe'
                       : ev.reason === 'combo_requirement_unmet'
                         ? 'hudChrome.crafting.comboRequirementUnmet'
-                        : ev.reason === 'throttled'
-                          ? 'hudChrome.crafting.throttled'
+                        : ev.reason === 'busy' || ev.reason === 'throttled'
+                          ? 'hudChrome.crafting.busy'
                           : ev.reason === 'recipe_not_learned'
                             ? 'hudChrome.crafting.recipeNotLearned'
                             : ev.reason === 'no_bag_space'
@@ -10988,6 +11271,75 @@ export class Hud {
           );
           break;
         }
+        case 'commissionOrderResult': {
+          // Commission order board (issue #1298). Text-free event: derive
+          // the item name from ev.itemId (resolved sim-side off the live
+          // board for every action, not just deliver) plus static content.
+          // ONE chat line either way (the trainResult/unbindResult
+          // single-surface rule: no toast, no extra sound cue).
+          const orderItem = ev.itemId ? ITEMS[ev.itemId] : undefined;
+          const orderItemName = orderItem ? itemDisplayName(orderItem) : (ev.itemId ?? '');
+          if (ev.ok) {
+            const successKey =
+              ev.action === 'open'
+                ? 'hudChrome.commissionBoard.opened'
+                : ev.action === 'cancel'
+                  ? 'hudChrome.commissionBoard.cancelled'
+                  : ev.action === 'accept'
+                    ? 'hudChrome.commissionBoard.accepted'
+                    : 'hudChrome.commissionBoard.delivered';
+            this.log(
+              t(successKey, {
+                item: orderItemName,
+                // Only 'deliver' interpolates {name}, and it names the
+                // REQUESTER (who receives the item), not ev.pid (the
+                // acting crafter): resolve off the event's own
+                // requesterName, never the crafter's own entity name.
+                name: ev.action === 'deliver' ? (ev.requesterName ?? '') : '',
+              }),
+              '#7fdc4f',
+            );
+          } else if (ev.reason) {
+            const denyKey =
+              ev.reason === 'unknown_recipe'
+                ? 'hudChrome.commissionBoard.denyUnknownRecipe'
+                : ev.reason === 'not_commission_eligible'
+                  ? 'hudChrome.commissionBoard.denyNotCommissionEligible'
+                  : ev.reason === 'unknown_crafter'
+                    ? 'hudChrome.commissionBoard.denyUnknownCrafter'
+                    : ev.reason === 'self_crafter'
+                      ? 'hudChrome.commissionBoard.denySelfCrafter'
+                      : ev.reason === 'too_many_open'
+                        ? 'hudChrome.commissionBoard.denyTooManyOpen'
+                        : ev.reason === 'unknown_order'
+                          ? 'hudChrome.commissionBoard.denyUnknownOrder'
+                          : ev.reason === 'order_not_open'
+                            ? 'hudChrome.commissionBoard.denyOrderNotOpen'
+                            : ev.reason === 'self_order'
+                              ? 'hudChrome.commissionBoard.denySelfOrder'
+                              : ev.reason === 'not_eligible_crafter'
+                                ? 'hudChrome.commissionBoard.denyNotEligibleCrafter'
+                                : ev.reason === 'not_your_order'
+                                  ? 'hudChrome.commissionBoard.denyNotYourOrder'
+                                  : ev.reason === 'order_not_accepted'
+                                    ? 'hudChrome.commissionBoard.denyOrderNotAccepted'
+                                    : ev.reason === 'not_your_acceptance'
+                                      ? 'hudChrome.commissionBoard.denyNotYourAcceptance'
+                                      : ev.reason === 'not_crafted'
+                                        ? 'hudChrome.commissionBoard.denyNotCrafted'
+                                        : ev.reason === 'deliver_out_of_range'
+                                          ? 'hudChrome.commissionBoard.denyOutOfRange'
+                                          : 'hudChrome.commissionBoard.denyNoSpace';
+            this.log(t(denyKey), '#ff6b6b');
+          }
+          // Refresh the board window if open (renderCommissionBoard no-ops
+          // when it is not); deliver also touches bags on the crafter's own
+          // arm (the requester's side rides the ordinary loot event's bag
+          // refresh).
+          this.renderCommissionBoard();
+          if (ev.action === 'deliver' && $('#bags').style.display !== 'none') this.renderBags();
+          break;
+        }
         case 'toolEffectResult': {
           // Slot/recharge outcome for the acquisition craft. The event is
           // text-free: the effect and profession names derive from their ids
@@ -11046,8 +11398,11 @@ export class Hud {
                                 material: materialToken,
                                 count: countText,
                               })
-                            : ev.reason === 'throttled'
-                              ? t('hudChrome.crafting.throttled')
+                            : ev.reason === 'busy' || ev.reason === 'throttled'
+                              ? // 'throttled' is the old-server wire reason
+                                // (retired emit): render the busy copy, never
+                                // the wrong slot-invalid line.
+                                t('hudChrome.crafting.busy')
                               : t('hudChrome.professions.toolEffectSlotInvalid', {
                                   effect: effectName,
                                 }),
@@ -11289,6 +11644,14 @@ export class Hud {
           // missed bite would spam an AFK-adjacent moment); the bobber sinks
           // out on its own as the cast ends.
           this.log(t('hudChrome.gathering.gotAwayLine'), '#a8a8a8');
+          break;
+        }
+        case 'fishingEarlyReel': {
+          // The angler reeled in before the bite (the spam-click fix): the
+          // line teaches the mechanic (wait for the bite), in the gotAwayLine
+          // register: grey, log only, NO cue (an early reel costs nothing,
+          // and a spammer would turn a cue into noise).
+          this.log(t('hudChrome.gathering.earlyReelLine'), '#a8a8a8');
           break;
         }
         case 'fishingEmptyHook': {
@@ -12506,9 +12869,21 @@ export class Hud {
           // feedback-gated like other notification cues. Gathering's cue
           // branches by node type (a pickaxe/axe/knife tool-out sound);
           // ev.gatherNodeType is only set on a gather cast (see gathering.ts).
+          // Craft-family non-spell casts (craft / enchant-family / recharge)
+          // share one workbench wind-up (audio.craftCast); completion still
+          // uses craftSuccess / disenchant / enchant / salvage.
           if (ev.entityId === sim.playerId) {
             if (ev.ability === GATHER_CAST_ID) audio.gatherCast(ev.gatherNodeType);
             else if (ev.ability === FISHING_CAST_ID) audio.fishCast();
+            else if (
+              ev.ability === CRAFT_CAST_ID ||
+              ev.ability === DISENCHANT_CAST_ID ||
+              ev.ability === ENCHANT_CAST_ID ||
+              ev.ability === SALVAGE_CAST_ID ||
+              ev.ability === TOOL_RECHARGE_CAST_ID
+            ) {
+              audio.craftCast();
+            }
           }
           break;
         case 'castStop':
@@ -14350,21 +14725,96 @@ export class Hud {
     }
     this.closeOtherWindows('#crafting-window');
     this.renderCrafting();
+    // AFTER the paint, the train / unbind ordering (see toggleTownFocus):
+    // captureFocus records the opener and installs the trap over a root that
+    // is by then populated and displayed. #crafting-window now installs its
+    // own trap (this change), so the craftId branch below only needs to move
+    // focus onto the selected tab within that trap, not chase it back from body.
+    this.craftingOpenerFocus = this.craftingWindowFocus.captureFocus();
     if (craftId !== undefined) {
       const scroller = $('#crafting-window').querySelector('.crafting-body');
       if (scroller) scroller.scrollTop = 0;
       // The gossip route reaches here after the dialog released its focus
-      // trap WITHOUT restoring (the successor-window premise), and
-      // #crafting-window installs no trap of its own: land keyboard focus on
-      // the selected tab (onSelectCraft's refocus target) so the handoff
-      // never strands focus on body. Promoting this window into the
-      // windowFocus system proper is the #2525 town-focus precedent, a
-      // separate ruling, not this change.
+      // trap WITHOUT restoring (the successor-window premise): land keyboard
+      // focus on the selected tab (onSelectCraft's refocus target) so the
+      // handoff never strands focus on body.
       ($('#crafting-window').querySelector('.crafting-tab.sel') as HTMLElement | null)?.focus();
     }
   }
 
-  private renderCrafting(): void {
+  /** Live craft-cast session for the open crafting window: the entity cast
+   *  and session fields, authoritative on BOTH hosts (offline direct, online
+   *  via the self-only `ccast` wire fragment). */
+  private craftCastSessionForPlayer(): CraftCastSessionView {
+    const p = this.sim.player;
+    return buildCraftCastSession({
+      castingAbility: p.castingAbility,
+      castRemaining: p.castRemaining,
+      castTotal: p.castTotal,
+      craftCastRecipeId: p.craftCastRecipeId,
+      craftCastBatchRemaining: p.craftCastBatchRemaining,
+      craftCastBatchTotal: p.craftCastBatchTotal,
+    });
+  }
+
+  /** Write one polite line into the static #crafting-live region. The
+   *  ReannounceMarker forces a byte-different string when the same line
+   *  repeats (two cancels in a row must both announce). */
+  private announceCraftCast(text: string): void {
+    if (this.craftingLiveEl) {
+      this.craftingLiveEl.textContent = this.craftCastReannounce.mark(text);
+    }
+  }
+
+  /**
+   * Frame-band craft-cast strip for an OPEN crafting window. Full rebuild only
+   * when the activity signature moves (start / cancel / complete / batch item
+   * boundary); otherwise the CastBarPainter instance writes fill/label/timer
+   * through the elided writers. A session that drops without a craftResult
+   * was cancelled: announce it.
+   */
+  private paintOpenCraftingCastProgress(): void {
+    // Closed window: never read cast fields or touch the painter (the
+    // cold-window rule; activity signature is latched only while open).
+    if (this.craftingWindowEl?.style.display !== 'flex') return;
+    const session = this.craftCastSessionForPlayer();
+    if (craftCastActivitySig(session) !== this.lastCraftingCastSig) {
+      const prevSig = this.lastCraftingCastSig;
+      const wasActive = prevSig.startsWith('1:');
+      this.lastCraftingCastSig = craftCastActivitySig(session);
+      let focusReturnRecipeId = '';
+      if (wasActive && !session.active) {
+        // The recipe of the session that just ended (sig 1:<recipe>:rem:tot):
+        // the focus ladder hands keyboard focus back to its row button.
+        focusReturnRecipeId = prevSig.split(':')[1] ?? '';
+        if (this.craftCastExpectingResult) {
+          // Session dropped with no craftResult: a movement cancel or other
+          // cast abort. Nothing was consumed.
+          this.craftCastExpectingResult = false;
+          this.announceCraftCast(t('hudChrome.crafting.announceCancel'));
+        }
+      }
+      // Button states + strip visibility need a full paint on activity edges.
+      this.renderCrafting(focusReturnRecipeId);
+      return;
+    }
+    if (!session.active) return;
+    // Re-arm the cancel detector while the session is live: every craftResult
+    // clears it, so a drop with it set means the last cast never resolved.
+    this.craftCastExpectingResult = true;
+    this.craftCastStripPainter?.paint({
+      cast: {
+        visible: true,
+        channel: false,
+        fill: session.progress,
+        label: session.recipeId,
+        fishing: false,
+      },
+      castRemaining: session.remainingSec,
+    });
+  }
+
+  private renderCrafting(focusReturnRecipeId = ''): void {
     // Station range for station-bound rows: the same pure in-range
     // set the sim's station_required deny composes (physical stations plus
     // the own active mobile station), computed once per repaint, so the row
@@ -14378,6 +14828,8 @@ export class Hud {
     // Re-arm the bag diff on EVERY paint, whatever caused it, so a repaint
     // from one edge never leaves another edge owing a second one (#2375).
     this.lastCraftingReagentSig = craftingReagentSig(this.sim.inventory, this.sim.player.name);
+    const session = this.craftCastSessionForPlayer();
+    this.lastCraftingCastSig = craftCastActivitySig(session);
     // The window lists only KNOWN recipes, so an unlearned trainer
     // recipe never renders as a craftable row (it surfaces in the Train
     // ladder instead). The SAME viewer-side predicate the ladder's known
@@ -14401,22 +14853,32 @@ export class Hud {
       {
         ...this.presentationBag,
         hideTooltip: () => this.hideTooltip(),
-        onCraft: (recipeId) => {
+        onCraft: (recipeId, count) => {
           // Commission opt-in: per-craft semantics, the checkbox
-          // arms exactly ONE craft. Consume the opt-in before sending so the
-          // repaint below renders it cleared; the server re-validates
-          // eligibility either way.
+          // arms exactly ONE craft session (every item in a Phase 3 batch
+          // reuses the commission captured at start). Consume the opt-in
+          // before sending so the repaint below renders it cleared; the
+          // server re-validates eligibility either way. The session state
+          // itself (recipe, batch counters) is entity-field truth on both
+          // hosts, so no click-time bookkeeping is kept here.
           const commission = this.craftCommissionOptIn.delete(recipeId);
-          this.sim.craftItem(recipeId, commission);
+          this.sim.craftItem(recipeId, commission, Math.max(1, Math.floor(count)));
           this.renderCrafting();
           if ($('#bags').style.display !== 'none') this.renderBags();
         },
         onClose: () => this.closeCrafting(),
+        onOpenOrders: () => this.openCommissionBoard(),
         commissionChecked: (recipeId) => this.craftCommissionOptIn.has(recipeId),
         onToggleCommission: (recipeId, on) => {
           if (on) this.craftCommissionOptIn.add(recipeId);
           else this.craftCommissionOptIn.delete(recipeId);
         },
+        craftQty: (recipeId) => this.craftQtyByRecipe.get(recipeId) ?? 1,
+        onCraftQty: (recipeId, qty) => {
+          this.craftQtyByRecipe.set(recipeId, Math.max(1, Math.floor(qty)));
+          this.renderCrafting();
+        },
+        announce: (text) => this.announceCraftCast(text),
         selectedCraft: () => this.selectedCraftTab,
         onSelectCraft: (professionId) => {
           this.selectedCraftTab = professionId;
@@ -14436,12 +14898,52 @@ export class Hud {
       // Per-section "learnable at a master" hints: crafts with unlearned
       // trainer recipes, off the same mirrored knownRecipes set (both hosts).
       craftLearnHints(this.sim.craftingIdentity.knownRecipes, this.sim.stationPlacements),
+      session,
+      focusReturnRecipeId,
     );
+    // Rebuild the strip painter over the fresh nodes (the rebuild replaced
+    // them) and paint the current frame immediately, so an active cast never
+    // flashes an empty strip between this paint and the next frame. The label
+    // is the active recipe's RESULT display name; the generic localized
+    // "Crafting" covers a recipe the mirror cannot resolve (never a raw id).
+    const activeRecipe = session.active
+      ? knownRecipes.find((r) => r.id === session.recipeId)
+      : undefined;
+    const resultDef = activeRecipe ? ITEMS[activeRecipe.resultItemId] : undefined;
+    this.craftCastStripLabel = resultDef
+      ? itemDisplayName(resultDef)
+      : castDisplayName(CRAFT_CAST_ID);
+    const strip = this.craftingWindowEl ? craftCastStripElements(this.craftingWindowEl) : null;
+    this.craftCastStripPainter = strip
+      ? new CastBarPainter(this.writerFacet, strip, {
+          resolveCastLabel: () => this.craftCastStripLabel,
+          clearOnHide: true,
+          shownDisplay: 'flex',
+        })
+      : null;
+    this.craftCastStripPainter?.paint({
+      cast: {
+        visible: session.active,
+        channel: false,
+        fill: session.progress,
+        label: session.recipeId,
+        fishing: false,
+      },
+      castRemaining: session.remainingSec,
+    });
   }
 
   closeCrafting(): void {
-    $('#crafting-window').style.display = 'none';
+    if (this.craftingWindowEl) this.craftingWindowEl.style.display = 'none';
+    // The paint latch only: the cast session itself lives on the entity
+    // fields (both hosts), so a mid-cast close/reopen loses nothing, and the
+    // overlay cast bar takes over the moment this window stops being the
+    // craft cast's single progress surface.
+    this.craftCastExpectingResult = false;
+    this.lastCraftingCastSig = '';
     this.hideTooltip();
+    this.craftingWindowFocus.restoreFocus(this.craftingOpenerFocus);
+    this.craftingOpenerFocus = null;
     // Commission opt-ins are per-session-of-the-window: closing it drops any
     // armed-but-uncrafted checkboxes, so reopening always starts clean (the
     // off-by-default rule). The selected tab is persisted separately
@@ -14456,6 +14958,51 @@ export class Hud {
       /* storage unavailable (private mode); tab pick still works in-session */
     }
   }
+
+  // -------------------------------------------------------------------------
+  // Commission order board (issue #1298): a lightweight job board layered on
+  // the Maker's Bond (unbind service above). Opened from the crafting
+  // window's header; non-modal like crafting itself, so no focus trap.
+  // -------------------------------------------------------------------------
+
+  openCommissionBoard(): void {
+    this.closeOtherWindows('#commission-board-window');
+    this.commissionBoardOpen = true;
+    this.renderCommissionBoard();
+  }
+
+  private renderCommissionBoard(): void {
+    if (!this.commissionBoardOpen) return;
+    // The "open a new order" picker is the CUSTOMER side of the board: the
+    // sim accepts a commission for any commission-eligible recipe, whether
+    // or not the requester knows it themselves (that is the crafter's job).
+    // Pass the full recipe catalog, not craftingIdentity.knownRecipes (the
+    // crafting window's own recipe-book gate); buildCommissionOrderBoardModel
+    // narrows it to commission-eligible outputs itself.
+    renderCommissionOrderWindow(
+      $('#commission-board-window'),
+      buildCommissionOrderBoardModel(this.sim.commissionOrders, this.sim.recipeList, ITEMS),
+      {
+        ...this.presentationBag,
+        hideTooltip: () => this.hideTooltip(),
+        onOpen: (recipeId, scope, crafterName) => {
+          this.sim.openCommissionOrder(recipeId, scope, crafterName);
+        },
+        onCancel: (orderId) => this.sim.cancelCommissionOrder(orderId),
+        onAccept: (orderId) => this.sim.acceptCommissionOrder(orderId),
+        onDeliver: (orderId) => this.sim.deliverCommissionOrder(orderId),
+        onClose: () => this.closeCommissionBoard(),
+      },
+    );
+  }
+
+  closeCommissionBoard(): void {
+    if (!this.commissionBoardOpen) return;
+    $('#commission-board-window').style.display = 'none';
+    this.commissionBoardOpen = false;
+    this.hideTooltip();
+  }
+
   // -------------------------------------------------------------------------
   // The World Market — the Merchant's auction house
   // -------------------------------------------------------------------------

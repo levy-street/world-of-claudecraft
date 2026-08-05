@@ -22,6 +22,7 @@ import {
 } from '../src/sim/professions/training';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
+import { runCraft } from './helpers/enchant_family_cast';
 
 // alchemy -> apothecary (station_highwatch_apothecary, zone 3); the deny
 // arms and the happy path all train this trainer-taught combo recipe.
@@ -386,7 +387,7 @@ describe('knowing vs crafting stay orthogonal (no use-gate)', () => {
     for (let i = 0; i < 4; i++) sim.addItem('fine_iron_ore', 1, pid);
     sim.addItem('mithril_mining_pick', 1, pid);
 
-    sim.craftItem(recipe.id, false, pid);
+    runCraft(sim, recipe.id, false, pid);
 
     expect(sim.countItem('thorium_mining_pick', pid)).toBe(1);
   });

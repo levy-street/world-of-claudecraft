@@ -10,13 +10,13 @@
     "companionUpgrade rank bump + refreshDelveDaily day rollover"
   ],
   "draws": 3,
-  "drawDigest": "392af441",
+  "drawDigest": "aec42e04",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 946,
-      "state": "bcf448e3",
+      "nextId": 964,
+      "state": "e836976c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -42,7 +42,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -55,7 +54,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 941,
+          "entityId": 959,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -91,7 +90,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 941
+              "sourceId": 959
             }
           ],
           "blockChance": 0.05,
@@ -104,7 +103,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 941,
+          "id": 959,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -148,23 +147,23 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 967,
-      "state": "5fed2e56",
-      "events": "f8ccc1ed",
+      "nextId": 981,
+      "state": "31528b59",
+      "events": "638383f9",
       "rng": {
         "draws": 1,
-        "digest": "38457ea8"
+        "digest": "a7714531"
       }
     },
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 967,
-      "state": "fc33b6f1",
+      "nextId": 981,
+      "state": "075b8498",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "392af441"
+        "digest": "aec42e04"
       },
       "label": "advanced-to-finale",
       "players": [
@@ -186,7 +185,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -209,7 +207,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 941,
+          "entityId": 959,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -247,7 +245,7 @@
               "name": "Battle Stance",
               "remaining": 3599.65,
               "school": "physical",
-              "sourceId": 941
+              "sourceId": 959
             }
           ],
           "blockChance": 0.05,
@@ -259,7 +257,7 @@
           "dodgeChance": 0.063,
           "fiveSecondRule": 99.35,
           "hp": 50000,
-          "id": 941,
+          "id": 959,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -302,12 +300,12 @@
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 967,
-      "state": "9e0c9ba8",
-      "events": "4a81857f",
+      "nextId": 981,
+      "state": "03e06c62",
+      "events": "d1fea3d9",
       "rng": {
         "draws": 3,
-        "digest": "392af441"
+        "digest": "aec42e04"
       },
       "label": "shop-daily",
       "players": [
@@ -332,7 +330,6 @@
           "copper": 100000,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -359,7 +356,7 @@
             "date": "2099-06-25"
           },
           "delveMarks": 89,
-          "entityId": 941,
+          "entityId": 959,
           "equipment": {
             "chest": "recruit_tunic",
             "legs": "reliquary_legs",
@@ -398,7 +395,7 @@
               "name": "Battle Stance",
               "remaining": 3599.65,
               "school": "physical",
-              "sourceId": 941
+              "sourceId": 959
             }
           ],
           "blockChance": 0.05,
@@ -410,7 +407,7 @@
           "dodgeChance": 0.063,
           "fiveSecondRule": 99.35,
           "hp": 348,
-          "id": 941,
+          "id": 959,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -422,8 +419,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 104200,
-            "z": -1127
+            "x": -5,
+            "z": -52
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -453,12 +450,12 @@
     {
       "tick": 9,
       "time": 0.45,
-      "nextId": 967,
-      "state": "8bc6d077",
+      "nextId": 981,
+      "state": "3a6ea32d",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "392af441"
+        "digest": "aec42e04"
       },
       "label": "final",
       "players": [
@@ -483,7 +480,6 @@
           "copper": 100000,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -510,7 +506,7 @@
             "date": "2099-06-25"
           },
           "delveMarks": 89,
-          "entityId": 941,
+          "entityId": 959,
           "equipment": {
             "chest": "recruit_tunic",
             "legs": "reliquary_legs",
@@ -549,7 +545,7 @@
               "name": "Battle Stance",
               "remaining": 3599.55,
               "school": "physical",
-              "sourceId": 941
+              "sourceId": 959
             }
           ],
           "blockChance": 0.05,
@@ -561,7 +557,7 @@
           "dodgeChance": 0.063,
           "fiveSecondRule": 99.45,
           "hp": 348,
-          "id": 941,
+          "id": 959,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -569,12 +565,12 @@
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
-          "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 104200,
-            "z": -1127
+            "x": -5,
+            "y": -0.04,
+            "z": -52
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",

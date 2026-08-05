@@ -22,6 +22,12 @@ import { Sim } from '../src/sim/sim';
 import { SPIRIT_HEALER_RANGE } from '../src/sim/spirit';
 import { dist2d, type Entity, INTERACT_RANGE, type SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import {
+  runApplyEnchant,
+  runCraft,
+  runDisenchant,
+  runSalvage,
+} from './helpers/enchant_family_cast';
 
 type AnyEntity = Entity & Record<string, any>;
 type AnySim = Sim & Record<string, any>;
@@ -217,7 +223,7 @@ for (const mode of ['unreleased', 'ghost'] as const) {
       // (tough jerky is common-tier cooking, no station, grandfathered), so
       // the dead denial below can only be the gate.
       sim.drainEvents();
-      sim.craftItem('recipe_tough_jerky');
+      runCraft(sim, 'recipe_tough_jerky');
       const aliveEvents = sim.drainEvents();
       expect(
         resultEvents(aliveEvents, 'craftResult').filter((ev: any) => ev.ok === true).length,
@@ -226,7 +232,7 @@ for (const mode of ['unreleased', 'ghost'] as const) {
       expect(sim.countItem('tough_jerky')).toBe(1);
       makeDead(sim, mode);
       sim.drainEvents();
-      sim.craftItem('recipe_tough_jerky');
+      runCraft(sim, 'recipe_tough_jerky');
       const events = sim.drainEvents();
       expect(deadErrors(events)).toBe(1);
       expect(resultEvents(events, 'craftResult').length).toBe(0);
@@ -235,12 +241,12 @@ for (const mode of ['unreleased', 'ghost'] as const) {
     });
 
     for (const [label, type, act] of [
-      ['salvageItem', 'salvageResult', (sim: AnySim) => sim.salvageItem('linen_scrap')],
-      ['disenchantItem', 'disenchantResult', (sim: AnySim) => sim.disenchantItem('linen_scrap')],
+      ['salvageItem', 'salvageResult', (sim: AnySim) => runSalvage(sim, 'linen_scrap')],
+      ['disenchantItem', 'disenchantResult', (sim: AnySim) => runDisenchant(sim, 'linen_scrap')],
       [
         'applyEnchant',
         'enchantResult',
-        (sim: AnySim) => sim.applyEnchant('linen_scrap', 'not_an_enchant'),
+        (sim: AnySim) => runApplyEnchant(sim, 'linen_scrap', 'not_an_enchant'),
       ],
       ['trainRecipe', 'trainResult', (sim: AnySim) => sim.trainRecipe('recipe_tough_jerky')],
       ['unbindItem', 'unbindResult', (sim: AnySim) => sim.unbindItem('linen_scrap')],
@@ -333,7 +339,7 @@ describe('dead-gate: profession actions with an explicit pid (the server arm)', 
     b.hp = 0;
     b.dead = true;
     sim.drainEvents();
-    sim.craftItem('recipe_tough_jerky', false, pidB);
+    runCraft(sim, 'recipe_tough_jerky', false, pidB);
     const events = sim.drainEvents();
     expect(
       events.filter((ev: any) => ev.type === 'error' && ev.text === DEAD_ERROR && ev.pid === pidB)
@@ -343,7 +349,7 @@ describe('dead-gate: profession actions with an explicit pid (the server arm)', 
     expect(events.filter((ev) => ev.type === 'craftResult').length).toBe(0);
     expect(sim.countItem('tough_jerky', pidB)).toBe(0);
     // The alive primary is unaffected by B's refusal and crafts normally.
-    sim.craftItem('recipe_tough_jerky');
+    runCraft(sim, 'recipe_tough_jerky');
     const aliveEvents = sim.drainEvents();
     expect(
       aliveEvents.filter((ev: any) => ev.type === 'craftResult' && ev.ok === true).length,
@@ -358,7 +364,7 @@ describe('dead-gate: profession actions with an explicit pid (the server arm)', 
     // proves both the false arm and that the gate keys on the TARGET pid.
     makeDead(sim, 'ghost');
     sim.drainEvents();
-    sim.craftItem('recipe_tough_jerky', false, 999999);
+    runCraft(sim, 'recipe_tough_jerky', false, 999999);
     expect(deadErrors(sim.drainEvents())).toBe(0);
   });
 });

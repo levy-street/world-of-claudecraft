@@ -90,6 +90,12 @@ export const UI_CUES = {
     epic: 'ui_gather_epic',
     legendary: 'ui_gather_legendary',
   },
+  // Craft-family cast start (Craft Cast System Phase 6): one shared wind-up
+  // for craft, disenchant, apply-enchant, salvage, and tool recharge. Mirrors
+  // gatherCast / fishCast: personal feedback at castStart, distinct from the
+  // completion cues below. Procedural placeholder in scripts/sfx/ui_sfx.mjs
+  // until a custom recording lands.
+  craftCast: 'ui_craft_cast',
   // Crafting completion: one cue per CRAFT_RING craft family, keyed by the
   // recipe's professionId (src/sim/content/professions.ts).
   craftByFamily: {
@@ -389,6 +395,13 @@ export class GameAudio {
   // additional tiered stinger on top of the plain impact.
   gatherRareTier(tier: 'rare' | 'epic' | 'legendary'): void {
     this.playFeedback(UI_CUES.gatherRareTier[tier]);
+  }
+
+  // Craft-family cast start (craft / disenchant / apply-enchant / salvage /
+  // tool recharge). Feedback-gated like gatherCast; completion uses the
+  // family-specific cues below.
+  craftCast(): void {
+    this.playFeedback(UI_CUES.craftCast);
   }
 
   // recipeFamily is the recipe's professionId (a CRAFT_RING id); an unknown

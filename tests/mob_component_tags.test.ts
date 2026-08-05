@@ -54,12 +54,14 @@ describe('mob component-type tags', () => {
     // by emptying the sweep.
     // 36 after the farm-economy pass added mapped tags to 15 coinless trash
     // templates, then 39 once the Drakelands brood (whelp, broodguard,
-    // broodlord) shipped hide+fang, and 40 with this branch's quest-dedupe pass
-    // (threnos_first_voice salvages cloth like the zealot flock he leads).
-    // fen_troll is still the only all-unmapped one: the brood deliberately
-    // carries mapped families only, since claw and horn would yield nothing
-    // while still widening the concentration bonus.
-    expect(tagged.filter((mob) => isHarvestableCorpse(mob.componentTags))).toHaveLength(40);
+    // broodlord) shipped hide+fang, 40 with this branch's quest-dedupe pass
+    // (threnos_first_voice salvages cloth like the zealot flock he leads), and
+    // 41 once shoal_scuttler (Galecrest, meat) gained a quest camp that made it
+    // reachable instead of dead content. fen_troll is still the only
+    // all-unmapped one: the brood deliberately carries mapped families only,
+    // since claw and horn would yield nothing while still widening the
+    // concentration bonus.
+    expect(tagged.filter((mob) => isHarvestableCorpse(mob.componentTags))).toHaveLength(41);
   });
 
   it('never lets a template out-pay the tag list it advertises (#2514)', () => {

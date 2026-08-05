@@ -23,27 +23,28 @@
 // authority cannot silently skip the restore. Every arm is draw-free: nothing
 // in this module can move the rng stream a harvest walks.
 //
-// Throttling is deliberately ASYMMETRIC: the recharge draws the shared
-// craft-action window (it consumes fungible materials, the same pacing every
-// enchanting action pays), while the slot draws none, because every
-// successful slot burns a whole crafted charm (the mint IS the price, and it
-// self-limits harder than any window would) and a denied slot mutates
-// nothing. Both are still under the wire command lane, and the deny events
-// forcing a heavy self re-diff is the accepted amplification (neither
-// command is a HEAVY_SELF_CMDS member; toolEffectResult's HEAVY_SELF_EVENTS
-// membership is what drives the re-diff, and the dispatch comment in
-// server/game.ts records that acceptance).
+// Pacing: Craft Cast System Phase 5 made tool-effect recharge a fixed-duration
+// non-spell cast (TOOL_RECHARGE_CAST_ID). The slot action stays instant: every
+// successful slot burns a whole crafted charm (the mint IS the price) and a
+// denied slot mutates nothing. Both are still under the wire command lane, and
+// the deny events forcing a heavy self re-diff is the accepted amplification
+// (neither command is a HEAVY_SELF_CMDS member; toolEffectResult's
+// HEAVY_SELF_EVENTS membership is what drives the re-diff, and the dispatch
+// comment in server/game.ts records that acceptance).
 
 import {
   GATHERING_PROFESSION_IDS,
   type GatheringProfessionId,
   TOOL_EFFECTS,
+  TOOL_RECHARGE_CAST_DURATION_SEC,
   type ToolEffectId,
 } from '../content/professions';
 import { ITEMS } from '../data';
 import { refusedWhileDead } from '../dead_gate';
+import { forceDismount } from '../mounts';
+import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { recordAction, withinActionThrottle } from './action_throttle';
+import { type Entity, isConsuming, TOOL_RECHARGE_CAST_ID } from '../types';
 import { gatherNodeById, NODE_HARVEST_TABLE } from './gathering';
 import {
   bestOwnedGatherToolFor,
@@ -242,66 +243,131 @@ export function restoreToolEffectSlotAction(
   return 'ok';
 }
 
-/**
- * Recharge `professionId`'s slotted effect for its owner, at the R39 price
- * (the arcane material of the resolved rarity rung, count scaled to the
- * charges restored, the original-crafter and specialization discounts
- * composed into the count) and the R30 fill (sized by the best tool owned
- * NOW, so a borrowed epic pick's inflated mint buys one fill at most). The
- * price rung is floored at the slot's own ceiling per R47, so stashing a
- * good tool cannot buy a cheap fill; the resolver owns that whole decision.
- * Owner-performed and instant behind the shared crafting-action window: the
- * same pacing every enchanting action pays, with the window spent on success
- * only.
- */
-export function rechargeToolEffectAction(
+type RechargeDenyReason =
+  | 'invalid_request'
+  | 'no_slot'
+  | 'no_tool'
+  | 'already_full'
+  | 'tool_capped'
+  | 'busy'
+  // Historical wire reason from the retired shared throttle. Never emitted
+  // after Phase 5; kept in the union so older clients can still type-decode.
+  | 'throttled';
+
+function emitRechargeDeny(
   ctx: SimContext,
-  professionIdWire: string,
-  pid?: number,
+  pid: number,
+  professionId: string,
+  reason: RechargeDenyReason,
+  effectId?: string,
+  materials?: { materialItemId: string; count: number },
 ): void {
-  // Same wire-id clamp as slotToolEffectAction, for the same echo reason.
-  const professionId = boundEchoedWireId(professionIdWire);
-  // Same shared dead gate as slotToolEffectAction, for the same family-
-  // consistency reason (materials must not leave a dead player's bags).
-  if (refusedWhileDead(ctx, pid)) return;
-  const r = ctx.resolve(pid);
-  if (!r) return;
-  // `effectId` rides every deny that HAS a slot resolved: the client renders
-  // the effect's name into the line, and an omitted id renders an empty
-  // name ("  is already fully charged.").
-  const deny = (
-    reason:
-      | 'invalid_request'
-      | 'no_slot'
-      | 'no_tool'
-      | 'already_full'
-      | 'tool_capped'
-      | 'throttled',
-    effectId?: string,
-  ): void => {
+  ctx.emit({
+    type: 'toolEffectResult',
+    action: 'recharge',
+    ok: false,
+    professionId,
+    ...(effectId === undefined ? {} : { effectId }),
+    ...(materials === undefined
+      ? {}
+      : { materialItemId: materials.materialItemId, count: materials.count }),
+    reason,
+    pid,
+  });
+}
+
+/**
+ * Pre-consume admission for a tool-recharge cast: true when the cast may
+ * start; on false the deny event was already emitted. No side effects. The
+ * completion re-resolves slot and price from scratch (resolveRechargeBody),
+ * so nothing resolved here is threaded forward.
+ */
+function evaluateRechargeAdmission(
+  ctx: SimContext,
+  r: NonNullable<ReturnType<SimContext['resolve']>>,
+  professionId: string,
+): boolean {
+  if (!(GATHERING_PROFESSION_IDS as readonly string[]).includes(professionId)) {
+    emitRechargeDeny(ctx, r.meta.entityId, professionId, 'invalid_request');
+    return false;
+  }
+  const slot = r.meta.toolEffectSlots?.[professionId as GatheringProfessionId];
+  if (!slot) {
+    emitRechargeDeny(ctx, r.meta.entityId, professionId, 'no_slot');
+    return false;
+  }
+  const resolved = resolveRechargeToolEffect(
+    r.meta.inventory,
+    professionId,
+    slot,
+    r.meta.name,
+    r.meta.craftSkills,
+    ITEMS,
+  );
+  if (!resolved.ok) {
+    emitRechargeDeny(ctx, r.meta.entityId, professionId, resolved.reason, slot.effectId);
+    return false;
+  }
+  if (ctx.countItem(resolved.materialItemId, r.meta.entityId) < resolved.count) {
+    // insufficient_materials is the one surface that carries the price so the
+    // player learns the cost from the refusal itself.
     ctx.emit({
       type: 'toolEffectResult',
       action: 'recharge',
       ok: false,
       professionId,
-      ...(effectId === undefined ? {} : { effectId }),
-      reason,
+      effectId: slot.effectId,
+      reason: 'insufficient_materials',
+      materialItemId: resolved.materialItemId,
+      count: resolved.count,
       pid: r.meta.entityId,
     });
-  };
-  // Validate the profession id BEFORE indexing the slot record:
-  // toolEffectSlots is a plain object literal, so a wire string like
-  // 'constructor' would otherwise resolve a prototype member as a truthy
-  // slot and carry it into the resolver (harmless only by the resolver's
-  // internal check order). The repo's hasOwn doctrine for plain-object
-  // tables, applied structurally.
+    return false;
+  }
+  return true;
+}
+
+function beginToolRechargeCast(ctx: SimContext, p: Entity, professionId: string): void {
+  if (p.sitting) ctx.standUp(p);
+  if (p.mountKey !== '') forceDismount(ctx, p);
+  if (p.mountCastKey !== '') {
+    p.mountCastRemaining = 0;
+    p.mountCastKey = '';
+  }
+  p.queuedCastAbility = null;
+  p.queuedCastAim = null;
+  const duration = TOOL_RECHARGE_CAST_DURATION_SEC;
+  p.castingAbility = TOOL_RECHARGE_CAST_ID;
+  p.castTotal = duration;
+  p.castRemaining = duration;
+  p.castTargetId = null;
+  p.channeling = false;
+  p.toolRechargeCastProfessionId = professionId;
+  ctx.emit({
+    type: 'castStart',
+    entityId: p.id,
+    ability: TOOL_RECHARGE_CAST_ID,
+    time: duration,
+  });
+}
+
+/**
+ * Apply one admitted recharge: re-resolve price/fill, consume materials, fill
+ * the slot. Emits toolEffectResult. Used by completeRechargeCast after a cast
+ * finishes; materials never leave the bags until this runs successfully.
+ */
+function resolveRechargeBody(
+  ctx: SimContext,
+  r: NonNullable<ReturnType<SimContext['resolve']>>,
+  professionId: string,
+): void {
   if (!(GATHERING_PROFESSION_IDS as readonly string[]).includes(professionId)) {
-    deny('invalid_request');
+    emitRechargeDeny(ctx, r.meta.entityId, professionId, 'invalid_request');
     return;
   }
   const slot = r.meta.toolEffectSlots?.[professionId as GatheringProfessionId];
   if (!slot) {
-    deny('no_slot');
+    emitRechargeDeny(ctx, r.meta.entityId, professionId, 'no_slot');
     return;
   }
   const resolved = resolveRechargeToolEffect(
@@ -313,14 +379,9 @@ export function rechargeToolEffectAction(
     ITEMS,
   );
   if (!resolved.ok) {
-    deny(resolved.reason, slot.effectId);
+    emitRechargeDeny(ctx, r.meta.entityId, professionId, resolved.reason, slot.effectId);
     return;
   }
-  // Materials BEFORE the throttle, the family order (crafting.ts,
-  // enchanting.ts, salvage.ts all validate the action's own inputs first and
-  // check the shared window last, right before consumption): a player who is
-  // both throttled and short still gets the insufficient_materials deny,
-  // which is the one surface carrying the price.
   if (ctx.countItem(resolved.materialItemId, r.meta.entityId) < resolved.count) {
     ctx.emit({
       type: 'toolEffectResult',
@@ -335,12 +396,6 @@ export function rechargeToolEffectAction(
     });
     return;
   }
-  // The shared action window, checked before any consumption and spent on
-  // success only; a denied recharge never paces the player's next craft.
-  if (!withinActionThrottle(r.meta, ctx.time)) {
-    deny('throttled', slot.effectId);
-    return;
-  }
   ctx.removeItem(resolved.materialItemId, resolved.count, r.meta.entityId);
   // The fill is the R30 re-derive (the tool held right now); the ceiling is
   // the R47 high-water mark, raised by a better tool and never lowered by a
@@ -348,7 +403,6 @@ export function rechargeToolEffectAction(
   // cheap fill.
   slot.durability = resolved.newMax;
   slot.maxDurability = resolved.ceiling;
-  recordAction(r.meta);
   ctx.emit({
     type: 'toolEffectResult',
     action: 'recharge',
@@ -359,4 +413,60 @@ export function rechargeToolEffectAction(
     count: resolved.count,
     pid: r.meta.entityId,
   });
+}
+
+/**
+ * Recharge `professionId`'s slotted effect for its owner, at the R39 price
+ * (the arcane material of the resolved rarity rung, count scaled to the
+ * charges restored, the original-crafter and specialization discounts
+ * composed into the count) and the R30 fill (sized by the best tool owned
+ * NOW, so a borrowed epic pick's inflated mint buys one fill at most). The
+ * price rung is floored at the slot's own ceiling per R47, so stashing a
+ * good tool cannot buy a cheap fill; the resolver owns that whole decision.
+ *
+ * Craft Cast System Phase 5: validates and STARTS a TOOL_RECHARGE_CAST_ID
+ * cast. Materials resolve only on completeRechargeCast. No shared action
+ * throttle: cast duration paces the recharge.
+ */
+export function rechargeToolEffectAction(
+  ctx: SimContext,
+  professionIdWire: string,
+  pid?: number,
+): void {
+  // Same wire-id clamp as slotToolEffectAction, for the same echo reason.
+  const professionId = boundEchoedWireId(professionIdWire);
+  // Same shared dead gate as slotToolEffectAction, for the same family-
+  // consistency reason (materials must not leave a dead player's bags).
+  if (refusedWhileDead(ctx, pid)) return;
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const { e: p, meta } = r;
+  if (p.castingAbility || isConsuming(p)) {
+    emitRechargeDeny(ctx, meta.entityId, professionId, 'busy');
+    return;
+  }
+  // Validate the profession id BEFORE indexing the slot record:
+  // toolEffectSlots is a plain object literal, so a wire string like
+  // 'constructor' would otherwise resolve a prototype member as a truthy
+  // slot and carry it into the resolver (harmless only by the resolver's
+  // internal check order). The repo's hasOwn doctrine for plain-object
+  // tables, applied structurally.
+  if (!evaluateRechargeAdmission(ctx, r, professionId)) return;
+  beginToolRechargeCast(ctx, p, professionId);
+}
+
+/**
+ * Completion of a running tool-recharge cast. Re-validates and applies the
+ * resolve body; emits toolEffectResult. Materials never left the bags at start.
+ */
+export function completeRechargeCast(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
+  const professionId = p.toolRechargeCastProfessionId;
+  p.toolRechargeCastProfessionId = '';
+  if (professionId === '') return;
+  const r = ctx.resolve(meta.entityId);
+  if (!r) {
+    emitRechargeDeny(ctx, meta.entityId, professionId, 'invalid_request');
+    return;
+  }
+  resolveRechargeBody(ctx, r, professionId);
 }

@@ -13,6 +13,7 @@ import { LADDER_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS, STATIONS } from '../src/sim/data';
 import { stationsOfType } from '../src/sim/professions/stations';
 import { Sim } from '../src/sim/sim';
+import { runCraft } from './helpers/enchant_family_cast';
 
 const SPECIMEN_IDS = new Set(Object.values(HARVEST_COMPONENT_SPECIMENS));
 
@@ -58,7 +59,7 @@ describe('ladder recipe execution sweep (all 54)', () => {
         }
       }
       placeAt(sim, pid, stationsOfType(STATIONS, recipe.stationType!)[0].pos);
-      sim.craftItem(recipe.id, false, pid);
+      runCraft(sim, recipe.id, false, pid);
       expect(meta.lastCraftResult?.ok, `${recipe.id}: ${meta.lastCraftResult?.reason}`).toBe(true);
       expect(sim.countItem(recipe.resultItemId, pid), `${recipe.id} output`).toBe(
         recipe.resultCount,

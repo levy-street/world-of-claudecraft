@@ -141,6 +141,9 @@ export const WOC_FISHING_KOI_TOTAL = 'woc_fishing_koi_total';
 /** Total fishing got-aways (missed reel, timed-out session, or no bag room), same labels. */
 export const WOC_FISHING_GOT_AWAYS_TOTAL = 'woc_fishing_got_aways_total';
 
+/** Total sessions ended by a pre-bite re-press (the anti-spam early reel), same labels. */
+export const WOC_FISHING_EARLY_REELS_TOTAL = 'woc_fishing_early_reels_total';
+
 /** Total casts whose table draw resolved the empty row (nothing biting), same labels. */
 export const WOC_FISHING_EMPTY_HOOKS_TOTAL = 'woc_fishing_empty_hooks_total';
 
@@ -480,6 +483,10 @@ export function registerGameStateMetrics(
     WOC_FISHING_GOT_AWAYS_TOTAL,
     'Total fishing got-aways (missed reel, timed-out session, or no bag room), by zone and band.',
   );
+  const fishingEarlyReels = fishingCounter(
+    WOC_FISHING_EARLY_REELS_TOTAL,
+    'Total fishing sessions ended by a pre-bite re-press (the anti-spam early reel), by zone and band.',
+  );
   const fishingEmptyHooks = fishingCounter(
     WOC_FISHING_EMPTY_HOOKS_TOTAL,
     'Total fishing casts whose table draw resolved the empty row, by water zone and effective band.',
@@ -641,6 +648,14 @@ export function registerGameStateMetrics(
       try {
         if (!fishingLabelsInVocabulary(zone, band)) return;
         fishingGotAways.inc({ zone, band });
+      } catch {
+        // Drop the sample rather than propagate into the event-routing path.
+      }
+    },
+    fishingEarlyReel(zone: HarvestBand, band: FishingBandLabel): void {
+      try {
+        if (!fishingLabelsInVocabulary(zone, band)) return;
+        fishingEarlyReels.inc({ zone, band });
       } catch {
         // Drop the sample rather than propagate into the event-routing path.
       }

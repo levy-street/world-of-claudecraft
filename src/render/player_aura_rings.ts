@@ -167,6 +167,13 @@ export class PlayerAuraRings {
       for (const view of this.views) {
         disposeDrapedMesh(view.core);
         disposeDrapedMesh(view.glow);
+        // InstancedMesh owns a private instanceMatrix (and instanceColor, when set) GPU
+        // buffer that only releases via its own dispose() call; the shared ornamentGeometries
+        // cache and this view's own material are handled separately (geometry is cached and
+        // deliberately never disposed, the material line below already disposed it), but
+        // skipping this call left the instance-attribute buffer allocated on every
+        // loadout/talent-respec/groundRingBlockScale rebuild.
+        view.ornaments.dispose();
         view.ornamentMaterial.dispose();
       }
       this.group.clear();

@@ -79,7 +79,10 @@ export interface SchematicArrow {
   kind: 'arrow';
   cx: number;
   cy: number;
-  /** canvas rotation in radians (matches -p.facing convention in hud.ts) */
+  /** canvas rotation in radians. Unlike the overworld map (-facing), this
+   *  schematic's localZ-to-canvas-Y mapping is NOT flipped (see
+   *  delveLocalToCanvas), so the arrow needs `facing + PI` to point the
+   *  same way the player is actually walking. */
   angle: number;
   size: number;
   fill: string;
@@ -369,7 +372,12 @@ export function delveSchematicPlayer(
     kind: 'arrow',
     cx,
     cy,
-    angle: -facing, // matches the convention in updateMinimap / updateMapWindow
+    // The overworld map (map_window_view.ts toMap) flips world Z onto canvas Y,
+    // so its arrow uses -facing. This schematic's delveLocalToCanvas maps
+    // localZ to canvas Y WITHOUT flipping it (localZ - zMin, not maxZ - localZ),
+    // so the same -facing formula pointed the arrow backwards at north/south;
+    // facing + PI is the correct rotation for this unflipped mapping.
+    angle: facing + Math.PI,
     size: Math.max(5, canvasSize * 0.045),
     fill: '#fff',
     stroke: '#000',

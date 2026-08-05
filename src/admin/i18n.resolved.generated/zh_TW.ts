@@ -388,6 +388,8 @@ export const zh_TW: AdminTranslations = {
   "moderationHistory.actionKill": "已擊殺",
   "moderationHistory.actionJail": "已監禁",
   "moderationHistory.actionUnjail": "已釋放",
+  "moderationHistory.actionSpectate": "Spectated",
+  "moderationHistory.actionUnspectate": "Stopped spectating",
   "moderationHistory.actionNote": "筆記",
   "moderationHistory.actionResetPassword": "重設密碼",
   "moderationHistory.actionDailyRewardsBan": "已禁止參與每日獎勵",

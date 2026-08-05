@@ -328,8 +328,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Uma taxa fixa por degrau de receita, cobrada uma única vez quando um mestre a ensina; todo degrau da tabela abaixo está em uso de verdade hoje, das receitas iniciais gratuitas até as lições de vara do fabricante de ferramentas no topo.',
   'guide.profPages.econ.provenanceBody':
     'Alguns itens carregam um nome. Passe o cursor sobre um e a dica de item diz Coletado por fulano num material bruto, ou Feito por fulano numa peça acabada: a mesma marca, redigida conforme o item veio a existir. Uma assinatura é parte do próprio item, viaja com ele por negociações, pelo banco, pelo correio, pelo Mercado Mundial e até por uma recompra de vendedor, e nunca desaparece.\n\nA coleta assina seu melhor trabalho automaticamente: toda extração que rola raro ou melhor chega assinada, e os achados raros assinam todo o seu rendimento quíntuplo. A rolagem de sorte de uma colheita de cadáver assina o rendimento quando a família não tem espécime a oferecer, e quando tem, mantém o rendimento simples e cunha o espécime perfeito assinado ao lado dele. A criação assina pela mesma linha: toda cópia de um resultado raro ou melhor é cunhada assinada, e uma obra-prima sempre assina, qualquer que seja sua qualidade, então a versão mais fina de qualquer peça sempre nomeia seu criador. A única coisa que pode lhe custar uma assinatura é uma bolsa cheia: uma unidade assinada precisa de espaço próprio, ou de uma pilha assinada compatível, para pousar.\n\nUma pilha de itens compartilha uma identidade, então duas cópias só se fundem quando cada marca coincide exatamente: mesmo item, mesmo signatário, mesmos atributos de obra-prima, mesmo encantamento, mesmo vínculo. Uma tora assinada nunca se junta a um monte simples em nenhuma das direções (fundi-los apagaria o nome de alguém), mas cargas idênticas se fundem sem problema, então vinte minérios assinados pelo mesmo coletor ficam em uma pilha só e um achado farto não estraçalha suas bolsas.\n\nAs assinaturas recompensam os artesãos: ter na bancada qualquer cópia assinada de um reagente necessário, seja quem for que a assinou, acrescenta 2 pontos percentuais de chance de obra-prima, e ter um reagente assinado pela sua própria mão corta em um a quantidade exigida daquele reagente (nunca abaixo de um). Seu próprio trabalho assinado de qualidade rara ou melhor ainda continua lhe ensinando, hoje só através do frasco: beba uma poção que você assinou e um pequeno fio de habilidade volta para o ofício que a preparou, contanto que esse ofício seja um dos seus principais ativos.',
-  'guide.profPages.econ.throttleBody':
-    'A produção tem um teto: criação, desencantamento, encantamento, salvamento e recargas de efeito de ferramenta dividem um único orçamento de {actions} ações bem-sucedidas a cada janela de {seconds} segundos. Uma tentativa recusada não custa nada e não gasta orçamento. Você nunca vai sentir isso em uma sessão normal; a regra existe para que um especialista no limite com o banco cheio não consiga inundar o Mercado, por maior que seja sua habilidade ou seu estoque.',
   'guide.profPages.faq.a4':
     'Você teve um golpe de sorte. Aproximadamente 1 coleta em 90 dispara um evento de coleta raro (cerne antigo em uma árvore, uma veia imaculada no minério, uma flor ao luar entre as ervas): ele multiplica o rendimento por cinco, assina cada unidade com o seu nome e anuncia o achado para a zona inteira. Uma rolagem de raridade rara ou melhor em uma coleta comum também assina o rendimento.\n\nMateriais assinados valem a pena guardar ou vender caro: ter na bancada qualquer cópia assinada de um reagente exigido soma 2 pontos percentuais à chance de obra-prima. Só lembre que eles se empilham apenas com cópias assinadas de forma idêntica, então ficam em um encaixe de bolsa só deles.',
   'guide.profPages.faq.a6':
@@ -705,7 +703,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.collectorsHeading': 'Colecionadores, troféus e o preço de uma história',
   'guide.profPages.econ.collectorsBody':
     'Os vendedores são cegos à proveniência: um item assinado é vendido a um PNJ exatamente pelo seu preço comum. O prêmio de uma assinatura existe apenas entre jogadores, o que é precisamente o que o torna interessante: uma pilha de minério inesperado assinada por um coletor famoso, um Corte Principal de uma colheita sortuda, uma lâmina obra-prima com o nome de um artesão aposentado, todos custam o que a memória de alguém diz que valem.\n\nO Livro dos Feitos apoia o mesmo instinto: Veia Imaculada, Cerne Ancião, Flor ao Luar, Um Espécime Perfeito e Lampejo de Esperança são marcas de colecionador com zero de Renome que existem apenas para provar que um momento aconteceu com você. Guarde o item que conquistou o feito e você tem o recibo. Nada disso é poder; a proveniência não compra atributos nem vence batalhas, é o rastro de papel do jogo para dias felizes.',
-  'guide.profPages.econ.throttleHeading': 'O limitador de ações',
   'guide.profPages.econ.doctrineHeading': 'Jogadores negociam com jogadores',
   'guide.profPages.econ.doctrineBody':
     'A economia de criação é construída sobre uma ideia: jogadores abastecem jogadores. Coletores alimentam artesãos, artesãos alimentam aventureiros e raideiros, e demolidores alimentam encantadores, com vendedores e mestres de posto nas bordas para absorver itens indesejados e moedas em vez de competir com você. Se quiser ganhar dinheiro com uma profissão, seu cliente é uma pessoa: aprenda o que outros jogadores consomem, precifique em relação ao Mercado Mundial e trate os sistemas de PNJ como um piso para seus preços, não como o mercado em si.\n\nO equipamento criado é ajustado para ficar abaixo do patamar de raide: mesmo uma obra-prima está apenas um nível de qualidade acima da receita, nunca além de lendário, e seu orçamento de atributos fica abaixo da faixa do saque de raide. A forja te prepara para o conteúdo mais difícil; ela não o substitui. Isso mantém artesãos, raideiros e o mercado em um triângulo estável: os drops de raide permanecem aspiracionais, e as peças criadas permanecem o melhor equipamento que o dinheiro pode de fato comprar.',
@@ -2596,6 +2593,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Grupo {n}',
   'hudChrome.unitFrame.partyLabel': 'Seu grupo',
   'hudChrome.unitFrame.playerLabel': 'Seu personagem',
+  'hudChrome.unitFrame.petLabel': 'Seu mascote',
   'hudChrome.unitFrame.targetAnnounce': 'Alvo: {name}',
   'hudChrome.unitFrame.targetLabel': 'Seu alvo',
   'seo.officialLabel': 'Site oficial de World of ClaudeCraft',
@@ -8003,6 +8001,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Anuncie um raide, encontro ou evento',
   'hudChrome.discord.relay.help.label': 'Preciso de Ajuda',
   'hudChrome.discord.relay.help.hint': 'Peça ajuda à comunidade',
+  'hudChrome.options.hideUnusedActionSlots': 'Ocultar Espaços de Ação Não Utilizados',
   'hudChrome.options.showSecondaryActionBar': 'Mostrar Barra de Ação Secundária',
   'errors.api.desktopCodeInvalid':
     'O código de login do desktop é inválido ou expirou. Tente novamente.',
@@ -8253,7 +8252,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Tudo nesta página fica no jogo: pressione Esc para abrir as opções. O menu abre em uma Visão Geral do essencial fixado, com as categorias em uma barra ao lado: as configurações abaixo ficam em Gráficos, Interface e Acessibilidade, no grupo Tela, e a Sobreposição de Desempenho em Sistema. Mais rápido ainda, digite um nome na caixa de busca no topo e vá direto até ele.',
   'guide.settingsPage.whyLabel': 'Por que funciona:',
   'hudChrome.crafting.close': 'Fechar elaboração',
-  'hudChrome.crafting.craft': 'Arte',
   'hudChrome.crafting.craftedToast': 'Feito: {name}',
   'hudChrome.crafting.empty': 'Nenhuma receita conhecida ainda.',
   'hudChrome.crafting.insufficientMaterials': 'Você não tem os materiais para isso.',
@@ -8449,8 +8447,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Aumenta o Intelecto em {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Aumenta o Vigor em {pct}%',
   'hudChrome.crafting.recipeNotLearned': 'Você ainda não aprendeu essa receita.',
-  'hudChrome.crafting.throttled':
-    'Você está criando rápido demais. Espere um momento e tente de novo.',
   'hudChrome.mobile.chatPlaceholder': 'Diga algo...',
   'hudChrome.mobile.hideKeyboard': 'Ocultar teclado',
   'hudChrome.unitFrame.partyChip': 'Grupo',
@@ -9320,6 +9316,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Mascote: atacar',
   'hudChrome.keybinds.petDefensive': 'Mascote: defensivo',
   'hudChrome.keybinds.petStop': 'Mascote: parar',
+  'hudChrome.keybinds.targetPet': 'Mascote: selecionar',
   'hudChrome.keybinds.petTaunt': 'Mascote: provocar',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Enviar um {item} a menos',
   'hudChrome.mailbox.parcelQtyIncreaseAria': 'Enviar um {item} a mais',
@@ -10186,6 +10183,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Sua chance de aparar completamente um ataque corpo a corpo frontal, sem sofrer dano. Um golpe pelas costas não pode ser aparado.',
   'hudChrome.options.mouseoverCast': 'Conjuração ao Apontar nos Quadros do Grupo',
   'hudChrome.options.showTargetOfTarget': 'Mostrar Alvo do Alvo',
+  'hudChrome.options.showPetFrame': 'Mostrar seu mascote',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Alvo do alvo',
   'itemUi.market.rarityLegendary': 'Lendário',
   'loading.reconnectingAttempt':
@@ -10924,13 +10922,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Isso destrói uma cópia especial de {item} (assinada, obra-prima ou encantada) e produz materiais arcanos. Não pode ser desfeito.',
   'hudChrome.enchanting.disenchantConfirmTitle': 'Desencantar {item}?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Você está desencantando rápido demais. Espere um momento e tente de novo.',
   'hudChrome.enchanting.disenchantedLine': 'Você desencanta {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Você encanta {item} com {enchant}.',
   'hudChrome.enchanting.enchantInsufficient': 'Você não tem os materiais para esse encantamento.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Você está encantando rápido demais. Espere um momento e tente de novo.',
   'hudChrome.enchanting.enchantUnknown': 'Esse encantamento não existe.',
   'hudChrome.enchanting.enchantWrongSlot': 'Esse encantamento não pode ser aplicado a esse item.',
   'hudChrome.enchanting.noEnchants': 'Nenhum encantamento usa esse reagente.',
@@ -10944,8 +10938,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'Isso destrói uma cópia especial de {item} (assinada, obra-prima ou encantada) e produz materiais de artesanato. Não pode ser desfeito.',
   'hudChrome.enchanting.salvageConfirmTitle': 'Recuperar {item}?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Você está recuperando rápido demais. Espere um momento e tente de novo.',
   'hudChrome.enchanting.salvagedLine': 'Você recupera {item}.',
   'hudChrome.enchanting.targetTitle': 'Escolha um item para encantar',
   'hudChrome.gathering.biteLine': 'Algo morde a isca!',

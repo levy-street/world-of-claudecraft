@@ -348,6 +348,17 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the other half of the Craft gate: rebuilds the crafting window when the bags move',
   },
   {
+    call: 'this.paintOpenCraftingCastProgress',
+    band: 'frame',
+    gate: '',
+    surface: 'window',
+    guard: {
+      kind: 'hud',
+      proof: 'if (craftCastActivitySig(session) !== this.lastCraftingCastSig) {',
+    },
+    why: 'in-window craft-cast progress strip: full rebuild only when the activity signature moves, fill-only ticks while casting',
+  },
+  {
     call: 'this.playerFramePainter.paint',
     band: 'frame',
     gate: '',
@@ -509,6 +520,20 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: "!(target && target.kind !== 'object')",
     surface: 'chrome',
     why: 'hides the target frame when there is no target',
+  },
+  {
+    call: 'this.ownPet',
+    band: 'frame',
+    gate: '',
+    surface: 'none',
+    why: 'resolves the player-owned pet out of the entity roster ONCE per frame (findOwnPet, pet_frame_view.ts, early-returning), shared by the pet frame here and renderPetBar below, which takes it as a parameter; ungated on purpose because the pet BAR needs it whatever showPetFrame says, and it replaces the scan renderPetBar previously did itself, so the frame costs no extra walk',
+  },
+  {
+    call: 'this.petFramePainter.paint',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'the pet health frame under the player frame, deliberately UNTIERED and on the frame band (pet health is information the owner acts on, so a tier knob may not delay it); every write is elided, so a pet at steady health costs nothing, and a null pet paints it hidden',
   },
   {
     call: 'this.targetAurasWindow.clear',
@@ -1447,7 +1472,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
-    ).toEqual({ window: 42, chrome: 74, none: 15 });
+    ).toEqual({ window: 43, chrome: 75, none: 16 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1460,7 +1485,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       if (row.guard) byKind[row.guard.kind] = (byKind[row.guard.kind] ?? 0) + 1;
     expect(byKind, 'a guard kind changed: say why in the PR, not only in the table').toEqual({
       module: 22,
-      hud: 5,
+      hud: 6,
       callsite: 11,
       none: 4,
     });
@@ -1500,6 +1525,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'deeds_window.ts: if (sig === this.lastSig) return;',
         'dungeon_finder_proposal_popup.ts: if (view.sig !== this.lastSig) {',
         'dungeon_finder_window.ts: if (sig === this.lastSig) {',
+        'hud.ts: if (craftCastActivitySig(session) !== this.lastCraftingCastSig) {',
         'hud.ts: if (craftingReagentSig(this.sim.inventory, this.sim.player.name) === this.lastCraftingReagentSig) return;',
         'hud.ts: if (sig !== this.lastLootSettingsSig) {',
         'hud.ts: if (sig === this.lastProfessionSurfaceSig) return;',

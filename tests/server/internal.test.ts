@@ -1,13 +1,15 @@
 // Unit coverage for the internal route layer (server/internal.ts).
 //
-// The migration moved all 11 /internal endpoints (the deploy-gated restart-countdown
-// plus the 10 Discord-bot-gated routes) off the inline handleInternalApi ladder
+// The migration moved every /internal endpoint (the deploy-gated restart-countdown
+// plus the Discord-bot-gated routes) off the inline handleInternalApi ladder
 // onto RouteDefs the shared dispatcher serves under API_DISPATCH 'new'. It is a
 // PARITY-FIRST migration: each thin handler REPRODUCES its frozen legacy branch
 // byte-for-byte, writing the SAME { success, data, error } envelope via the
 // module's ok()/fail() helpers (the internal envelope IS the admin shape, so the
 // routes carry surface 'internal' + meta.envelope 'admin'). The secret gates move
-// to the requireInternalSecret middleware.
+// to the requireInternalSecret middleware. The three per-endpoint GET pickups
+// the outbox replaced (relay, activity, daily-rewards-winners) were later
+// RETIRED from BOTH arms (#2791), so neither dispatch mode serves them.
 //
 // POST /internal/discord/flex-batch is the exception and is NOT part of that
 // migration: it was born afterwards, so it is RouteDef-ONLY with no legacy ladder
@@ -126,9 +128,10 @@ const DISCORD_SECRET = 'discord-secret';
 const DEPLOY_HEADERS = { 'x-woc-deploy-secret': DEPLOY_SECRET };
 const DISCORD_HEADERS = { 'x-woc-discord-secret': DISCORD_SECRET };
 
-// The 14 routes as [method, path]: the legacy handleInternalApi ladder order
-// (the 11 migrated routes plus flaired-ids, added after the migration on both
-// arms per the dual-edit rule), then flex-batch and outbox, which are
+// The 11 routes as [method, path]: the legacy handleInternalApi ladder order
+// (the migrated routes plus flaired-ids, added after the migration on both
+// arms per the dual-edit rule; the retired relay/activity/winners GETs are
+// gone from both arms, #2791), then flex-batch and outbox, which are
 // RouteDef-ONLY and have no legacy arm by design (a route born after the
 // migration never gets one).
 const EXPECTED_ROUTES: ReadonlyArray<readonly [Method, string]> = [
@@ -138,9 +141,6 @@ const EXPECTED_ROUTES: ReadonlyArray<readonly [Method, string]> = [
   ['POST', '/internal/discord/presence'],
   ['POST', '/internal/discord/grant'],
   ['POST', '/internal/discord/member'],
-  ['GET', '/internal/discord/relay'],
-  ['GET', '/internal/discord/activity'],
-  ['GET', '/internal/discord/daily-rewards-winners'],
   ['POST', '/internal/discord/daily-rewards-winners/mark'],
   ['POST', '/internal/discord/members-meta'],
   ['GET', '/internal/discord/flaired-ids'],
@@ -286,8 +286,8 @@ afterEach(() => {
 // ---------------------------------------------------------------------------
 
 describe('internal route registration', () => {
-  it('registers exactly 14 routes matching the legacy ladder plus the RouteDef-only pair', () => {
-    expect(routes).toHaveLength(14);
+  it('registers exactly 11 routes matching the legacy ladder plus the RouteDef-only pair', () => {
+    expect(routes).toHaveLength(11);
     const actual = routes.map((r) => `${r.method} ${r.path}`).sort();
     const expected = EXPECTED_ROUTES.map(([m, p]) => `${m} ${p}`).sort();
     expect(actual).toEqual(expected);
@@ -1032,113 +1032,46 @@ describe('discord/member', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 8. discord/relay (drain + per-item Discord-identity enrichment).
+// 8-9 (the relay and activity drain GETs) and the winners-GET half of 10
+// RETIRED with the per-endpoint pickup routes (#2791): the outbox block below
+// owns drain enrichment, participant batching, and the winners pass-through
+// now. Numbering is kept so the later section anchors stay stable.
 // ---------------------------------------------------------------------------
 
-describe('discord/relay', () => {
-  it('enriches each drained item, leaving nulls for an unlinked issuer', async () => {
+describe('retired per-endpoint pickup GETs (#2791)', () => {
+  // The decisive absence pin: with the CORRECT secret, the legacy ladder
+  // answers its terminal 404 for each retired path (the arm is gone, not just
+  // the RouteDef), and EXPECTED_ROUTES above already proves the registry side.
+  // Re-adding either arm turns one of these into a 200 and fails here.
+  it.each([
+    '/internal/discord/relay',
+    '/internal/discord/activity',
+    '/internal/discord/daily-rewards-winners',
+  ])('GET %s with a valid secret answers the ladder terminal 404', async (path) => {
     process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
-    vi.mocked(drainRelay).mockReturnValue([relayItem(1, 'a'), relayItem(2, 'b')]);
-    vi.mocked(discordForAccount).mockImplementation(async (_pool, accountId) =>
-      accountId === 1 ? linkRow(1) : null,
-    );
+    const req = makeReq({ method: 'GET', url: path, headers: DISCORD_HEADERS });
+    const res = new FakeRes();
+    await handleInternalApi(req, res as unknown as http.ServerResponse, null as never);
 
-    const r = await runRoute('GET', '/internal/discord/relay', { headers: DISCORD_HEADERS });
-
-    expect(r.status).toBe(200);
-    expect(r.body).toEqual({
-      success: true,
-      data: {
-        items: [
-          {
-            ...relayItem(1, 'a'),
-            discordUserId: 'du1',
-            discordUsername: 'un1',
-            discordAvatar: 'av1',
-          },
-          {
-            ...relayItem(2, 'b'),
-            discordUserId: null,
-            discordUsername: null,
-            discordAvatar: null,
-          },
-        ],
-      },
-      error: null,
+    expect(res.statusCode).toBe(404);
+    expect(JSON.parse(res.body)).toEqual({
+      success: false,
+      data: null,
+      error: 'unknown endpoint',
     });
+    // Nothing was drained on the way to the 404: a retired pickup must never
+    // consume queue items it can no longer deliver.
+    expect(vi.mocked(drainRelay)).not.toHaveBeenCalled();
+    expect(vi.mocked(drainActivity)).not.toHaveBeenCalled();
+    expect(vi.mocked(dailyRewardService.discordWinnerAnnouncements)).not.toHaveBeenCalled();
   });
 });
 
 // ---------------------------------------------------------------------------
-// 9. discord/activity (drain + participant enrichment; drop items with none linked).
+// 10. discord/daily-rewards-winners/mark (POST).
 // ---------------------------------------------------------------------------
 
-describe('discord/activity', () => {
-  it('drops items with no linked participant and strips accountIds/names', async () => {
-    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
-    vi.mocked(drainActivity).mockReturnValue([activityItem(1, 'Alice'), activityItem(2, 'Bob')]);
-    // The drain now batches ONE links read per poll (the N+1 fix).
-    vi.mocked(discordForAccounts).mockImplementation(async (_pool, accountIds) => {
-      const links = new Map();
-      if ((accountIds as number[]).includes(1)) links.set(1, linkRow(1));
-      return links;
-    });
-
-    const r = await runRoute('GET', '/internal/discord/activity', { headers: DISCORD_HEADERS });
-
-    expect(r.status).toBe(200);
-    expect(r.body).toEqual({
-      success: true,
-      data: {
-        items: [
-          {
-            kind: 'levelup',
-            realm: 'R',
-            profileUrl: null,
-            level: 10,
-            participants: [{ name: 'Alice', discordUserId: 'du1', discordAvatar: 'av1' }],
-          },
-        ],
-      },
-      error: null,
-    });
-    // The whole point of the batch: ONE links read per poll, over the
-    // flattened participant ids, with zero per-item singular lookups (a
-    // once-per-item discordForAccounts call would return the same body).
-    expect(discordForAccounts).toHaveBeenCalledTimes(1);
-    expect(vi.mocked(discordForAccounts).mock.calls[0][1]).toEqual([1, 2]);
-    expect(discordForAccount).not.toHaveBeenCalled();
-  });
-});
-
-// ---------------------------------------------------------------------------
-// 10. discord/daily-rewards-winners (GET limit coercion + POST mark).
-// ---------------------------------------------------------------------------
-
-describe('discord/daily-rewards-winners', () => {
-  it('clamps the GET limit (99 -> 5, absent -> 1, 0 -> 1) and ok-wraps the service return', async () => {
-    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
-    const service = vi.mocked(dailyRewardService.discordWinnerAnnouncements);
-    service.mockResolvedValue({ days: [] });
-
-    const r = await runRoute('GET', '/internal/discord/daily-rewards-winners', {
-      url: '/internal/discord/daily-rewards-winners?limit=99',
-      headers: DISCORD_HEADERS,
-    });
-    expect(r.status).toBe(200);
-    expect(r.body).toEqual({ success: true, data: { days: [] }, error: null });
-    expect(service).toHaveBeenLastCalledWith(5);
-
-    await runRoute('GET', '/internal/discord/daily-rewards-winners', { headers: DISCORD_HEADERS });
-    expect(service).toHaveBeenLastCalledWith(1);
-
-    await runRoute('GET', '/internal/discord/daily-rewards-winners', {
-      url: '/internal/discord/daily-rewards-winners?limit=0',
-      headers: DISCORD_HEADERS,
-    });
-    expect(service).toHaveBeenLastCalledWith(1);
-  });
-
+describe('discord/daily-rewards-winners/mark', () => {
   it('mark returns the service fail body on error and ok-wraps success', async () => {
     process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
     const mark = vi.mocked(dailyRewardService.markDiscordWinnersAnnounced);
@@ -1814,12 +1747,12 @@ describe('discord/outbox', () => {
     expect(vi.mocked(discordForAccount)).not.toHaveBeenCalled();
     expect(vi.mocked(discordForAccounts)).not.toHaveBeenCalled();
     // The winner days ride the service's TTL cache, so an idle poll costs at
-    // most one read there and zero on a warm cache. ONE day, not the clamp's
-    // ceiling of five: the bot announces and marks one day per poll, and every
-    // day carries its winners' usernames and wallet pubkeys, so the routine ask
-    // is minimized to what the caller actually consumes.
+    // most one read there and zero on a warm cache. The service itself fixes
+    // the ask at ONE day (DAILY_REWARD_WINNER_DAY_LIMIT): the bot announces
+    // and marks one day per poll, so the handler passes no limit at all (the
+    // limit param retired with the standalone winners GET, #2791).
     expect(vi.mocked(dailyRewardService.discordWinnerAnnouncements)).toHaveBeenCalledTimes(1);
-    expect(vi.mocked(dailyRewardService.discordWinnerAnnouncements)).toHaveBeenCalledWith(1);
+    expect(vi.mocked(dailyRewardService.discordWinnerAnnouncements)).toHaveBeenCalledWith();
     expect(dataOf(r.body)).toEqual({
       relay: { items: [] },
       activity: { items: [] },
@@ -1939,62 +1872,68 @@ describe('discord/outbox', () => {
     expect(Object.keys(dataOf(r.body))).toEqual(['relay', 'activity', 'winners', 'linkChanges']);
   });
 
-  it('emits relay items byte-for-byte identical to the standalone relay GET', async () => {
-    // Shape preservation is what lets Phase 6 reuse the bot-side handlers
-    // unchanged (invariant D11), so it is proved by running ONE fixture through
-    // both endpoints and comparing, not by re-typing the expected shape.
+  it('emits relay items in the retired relay GET item shape, nulls for an unlinked issuer', async () => {
+    // The item shape used to be pinned DIFFERENTIALLY against the standalone
+    // relay GET (invariant D11); that route is retired (#2791), so the shape is
+    // now the outbox's OWN contract with the bot and is pinned literally here.
     process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
-    const fixture = () => [relayItem(1, 'a'), relayItem(2, 'b')];
-    const links = [linkRow(1)]; // account 2 is unlinked
-
-    stubDrains(fixture());
-    vi.mocked(discordForAccount).mockImplementation(async (_pool, accountId) =>
-      accountId === 1 ? linkRow(1) : null,
-    );
-    const old = await runRoute('GET', '/internal/discord/relay', { headers: DISCORD_HEADERS });
-
-    stubDrains(fixture());
+    stubDrains([relayItem(1, 'a'), relayItem(2, 'b')]);
     vi.mocked(dailyRewardService.discordWinnerAnnouncements).mockResolvedValue(NO_WINNERS);
-    vi.mocked(discordLinksForAccounts).mockResolvedValue(links);
-    const outbox = await runRoute('GET', '/internal/discord/outbox', { headers: DISCORD_HEADERS });
+    vi.mocked(discordLinksForAccounts).mockResolvedValue([linkRow(1)]); // account 2 is unlinked
 
-    const oldItems = (dataOf(old.body).items as unknown[]) ?? [];
-    expect(oldItems).toHaveLength(2);
-    expect(dataOf(outbox.body).relay).toEqual({ items: oldItems });
-  });
+    const r = await runRoute('GET', '/internal/discord/outbox', { headers: DISCORD_HEADERS });
 
-  it('emits activity items byte-for-byte identical to the standalone activity GET', async () => {
-    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
-    const fixture = (): QueuedActivity[] => [
-      { ...activityItem(1, 'Alice'), accountIds: [1, 2], names: ['Alice', 'Bob'] },
-      activityItem(3, 'Carol'), // nobody linked: dropped by both endpoints
-    ];
-    const links = [linkRow(1)];
-
-    stubDrains([], fixture());
-    // The standalone GET batches its links read (discordForAccounts, the N+1
-    // fix), so the old arm stubs the BATCH; the singular lookup must stay
-    // uncalled on this path.
-    vi.mocked(discordForAccounts).mockImplementation(async (_pool, accountIds) => {
-      const map = new Map();
-      if ((accountIds as number[]).includes(1)) map.set(1, linkRow(1));
-      return map;
+    expect(dataOf(r.body).relay).toEqual({
+      items: [
+        {
+          ...relayItem(1, 'a'),
+          discordUserId: 'du1',
+          discordUsername: 'un1',
+          discordAvatar: 'av1',
+        },
+        {
+          ...relayItem(2, 'b'),
+          discordUserId: null,
+          discordUsername: null,
+          discordAvatar: null,
+        },
+      ],
     });
-    const old = await runRoute('GET', '/internal/discord/activity', { headers: DISCORD_HEADERS });
-    expect(discordForAccount).not.toHaveBeenCalled();
-
-    stubDrains([], fixture());
-    vi.mocked(dailyRewardService.discordWinnerAnnouncements).mockResolvedValue(NO_WINNERS);
-    vi.mocked(discordLinksForAccounts).mockResolvedValue(links);
-    const outbox = await runRoute('GET', '/internal/discord/outbox', { headers: DISCORD_HEADERS });
-
-    const oldItems = (dataOf(old.body).items as unknown[]) ?? [];
-    // Non-vacuous: the unlinked-only item was dropped and the linked one survived.
-    expect(oldItems).toHaveLength(1);
-    expect(dataOf(outbox.body).activity).toEqual({ items: oldItems });
   });
 
-  it('passes the winner announcements through exactly as the winners GET returns them', async () => {
+  it('emits activity items in the retired activity GET item shape: drops items with no linked participant and strips accountIds/names', async () => {
+    // Same D11 story as the relay pin above: the shape is pinned literally now
+    // that the standalone activity GET is retired (#2791).
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+    stubDrains(
+      [],
+      [
+        { ...activityItem(1, 'Alice'), accountIds: [1, 2], names: ['Alice', 'Bob'] },
+        activityItem(3, 'Carol'), // nobody linked: dropped
+      ],
+    );
+    vi.mocked(dailyRewardService.discordWinnerAnnouncements).mockResolvedValue(NO_WINNERS);
+    vi.mocked(discordLinksForAccounts).mockResolvedValue([linkRow(1)]);
+
+    const r = await runRoute('GET', '/internal/discord/outbox', { headers: DISCORD_HEADERS });
+
+    expect(dataOf(r.body).activity).toEqual({
+      items: [
+        {
+          kind: 'levelup',
+          realm: 'R',
+          profileUrl: null,
+          level: 10,
+          participants: [
+            { name: 'Alice', discordUserId: 'du1', discordAvatar: 'av1' },
+            { name: 'Bob', discordUserId: null, discordAvatar: null },
+          ],
+        },
+      ],
+    });
+  });
+
+  it('passes the winner announcements through exactly as the service returns them', async () => {
     process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
     stubDrains();
     const days = { days: [{ day: '2026-06-30', taskName: 'Complete quests', payouts: [] }] };

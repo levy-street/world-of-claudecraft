@@ -175,6 +175,26 @@ API, while `@typescript/native` provides the `tsc` binary. Things to know:
   its in-progress TypeScript 7 loading (language-tools PR 3073) reads the
   `@typescript/native` alias this repo already uses, so no rename is needed.
 
+### Dependency vulnerabilities
+
+If your change touches `package.json` or `pnpm-lock.yaml`, the dependency audit
+workflow (`.github/workflows/audit.yml`) runs `pnpm audit` on it and fails on any
+finding. It also sweeps weekly on its own, so an advisory published against an
+unchanged tree does not turn an unrelated PR red.
+
+To resolve a finding, prefer a version-scoped `pnpm.overrides` entry pinning the
+fixed floor (`"undici@7": "^7.29.0"`) over bumping the direct dependency. Only
+when no fix exists, or the vulnerable path is provably unreachable here, add the
+advisory to `pnpm.auditConfig.ignoreGhsas`, with its justification recorded in
+`docs/security/dependency-audit-catalog.md`; the gate's test fails on an
+undocumented entry. That catalog holds the full model and the current exception
+register.
+
+One thing to budget for: `pnpm-lock.yaml` is a fingerprinted source input of the
+Eastbrook and Fenbridge asset pipelines, so any lockfile change also means
+re-minting their provenance seals (`scripts/assets/CLAUDE.md`). That is the bulk
+of the work in a dependency bump here, and the reason to batch them.
+
 ## Making your change
 
 1. **Start from the latest release branch, and never from `main`.** Active work is

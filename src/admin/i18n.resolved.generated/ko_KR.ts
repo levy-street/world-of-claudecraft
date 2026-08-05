@@ -388,6 +388,8 @@ export const ko_KR: AdminTranslations = {
   "moderationHistory.actionKill": "처치",
   "moderationHistory.actionJail": "수감",
   "moderationHistory.actionUnjail": "수감 해제",
+  "moderationHistory.actionSpectate": "Spectated",
+  "moderationHistory.actionUnspectate": "Stopped spectating",
   "moderationHistory.actionNote": "메모",
   "moderationHistory.actionResetPassword": "비밀번호 재설정",
   "moderationHistory.actionDailyRewardsBan": "일일 보상 참여 금지",

@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { ClientWorld } from '../src/net/online';
 
 // The market window painter is a DOM module; driving the live DOM + events is the
 // opt-in browser suite. This is the no-DOM-suite equivalent: it
@@ -466,7 +467,7 @@ describe('market_window: reconnect resync (#2416)', () => {
     // of replacing it.
     const chain = mainSrc.slice(
       mainSrc.indexOf('const priorOnReconnected = online.onReconnected;'),
-      mainSrc.indexOf('const priorOnReconnected = online.onReconnected;') + 300,
+      mainSrc.indexOf('const priorOnReconnected = online.onReconnected;') + 600,
     );
     expect(chain, 'main.ts must chain onto the prior handler, not replace it').toContain(
       'priorOnReconnected?.();',
@@ -474,5 +475,100 @@ describe('market_window: reconnect resync (#2416)', () => {
     expect(chain, 'main.ts must call the hud resync hook on reconnect').toContain(
       'hud.marketResyncAfterReconnect();',
     );
+  });
+});
+
+// Bug found in review of #2723: onReconnected() fires from inside the client's
+// `hello` handler BEFORE `this.connected` flips true, so a command sent from an
+// onReconnected callback (main.ts used to re-push stopAutoAttackOnTargetSwitch
+// there) is silently dropped by canSendCommand(). ClientWorld now owns the
+// re-push itself: it remembers the last value passed to
+// setStopAutoAttackOnTargetSwitch and replays it once sends can genuinely reach
+// the socket again, both after a reconnect `hello` and after spectate ends
+// (cmd() drops every non-chat command while spectating too). This is a
+// BEHAVIORAL pin, not a grep over main.ts: it drives onMessage with a real
+// reconnect `hello` frame against a stub socket and asserts the command frame
+// actually lands.
+describe('ClientWorld: reconnect re-push of session preferences (#2723 review)', () => {
+  function bareClientWithSocket(): { client: any; sent: Array<Record<string, unknown>> } {
+    const client: any = Object.create(ClientWorld.prototype);
+    client.cfg = { seed: 1, playerClass: 'warrior' };
+    client.entities = new Map();
+    client.playerId = 1;
+    client.ownPlayerId = 1;
+    client.ownPlayerClass = 'warrior';
+    client.spectating = null;
+    client.spectateFacingPending = false;
+    client.pendingSpectateFacing = null;
+    client.pendingTargetEcho = null;
+    client.pendingInputSeqSentAt = new Map();
+    client.inputEchoSamples = [];
+    client.missingSince = new Map();
+    client.marketInfo = null;
+    client.profanityWords = [];
+    client.profanityDirty = false;
+    client.moveInput = {};
+    client.mouselookFacing = null;
+    client.onReconnected = null;
+    const sent: Array<Record<string, unknown>> = [];
+    client.ws = { readyState: 1, send: (payload: string) => sent.push(JSON.parse(payload)) };
+    return { client, sent };
+  }
+
+  it('re-sends the last stopAutoAttackOnTargetSwitch value once a reconnect hello lands, not before', () => {
+    const oldWebSocket = (globalThis as any).WebSocket;
+    (globalThis as any).WebSocket = { OPEN: 1 };
+    try {
+      const { client, sent } = bareClientWithSocket();
+      client.connected = true;
+      client.setStopAutoAttackOnTargetSwitch(true);
+      expect(sent, 'the initial toggle sends normally while connected').toContainEqual({
+        t: 'cmd',
+        cmd: 'stopAutoAttackOnTargetSwitch',
+        enabled: true,
+      });
+      sent.length = 0;
+
+      // The socket drops and a reconnect is under way: connected is false, so
+      // canSendCommand() would reject anything sent right now.
+      client.connected = false;
+      client.reconnectAttempts = 3;
+      client.conflictRejections = 0;
+      client.timeoutRejections = 0;
+      client.inputSeq = 0;
+      client.lastInputSig = '';
+      client.lastInputSentAt = 0;
+      client.ackedInputSeq = 0;
+      client.lastSnapAt = 0;
+
+      (client as any).onMessage(
+        JSON.stringify({ t: 'hello', pid: 1, seed: 1, realm: 'Claudemoon' }),
+      );
+
+      expect(
+        sent,
+        'the reconnect hello must re-push the preference now that sends actually reach the socket',
+      ).toContainEqual({ t: 'cmd', cmd: 'stopAutoAttackOnTargetSwitch', enabled: true });
+    } finally {
+      (globalThis as any).WebSocket = oldWebSocket;
+    }
+  });
+
+  it('does not send anything on a plain (non-reconnect) hello when the preference was never set', () => {
+    const oldWebSocket = (globalThis as any).WebSocket;
+    (globalThis as any).WebSocket = { OPEN: 1 };
+    try {
+      const { client, sent } = bareClientWithSocket();
+      client.connected = false;
+      client.reconnectAttempts = 0;
+
+      (client as any).onMessage(
+        JSON.stringify({ t: 'hello', pid: 1, seed: 1, realm: 'Claudemoon' }),
+      );
+
+      expect(sent).toEqual([]);
+    } finally {
+      (globalThis as any).WebSocket = oldWebSocket;
+    }
   });
 });

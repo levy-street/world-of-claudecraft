@@ -388,6 +388,8 @@ export const tr_TR: AdminTranslations = {
   "moderationHistory.actionKill": "Öldürüldü",
   "moderationHistory.actionJail": "Hapse atıldı",
   "moderationHistory.actionUnjail": "Hapisten çıkarıldı",
+  "moderationHistory.actionSpectate": "Spectated",
+  "moderationHistory.actionUnspectate": "Stopped spectating",
   "moderationHistory.actionNote": "Not",
   "moderationHistory.actionResetPassword": "Parola sıfırlandı",
   "moderationHistory.actionDailyRewardsBan": "Günlük Ödüllerden yasaklandı",

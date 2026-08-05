@@ -49,6 +49,7 @@ import {
   RUN_SPEED,
   steadyAngleTo,
 } from '../types';
+import { isTameableFamily, petHeelSpeed, petOwnerScaling } from './pet_scaling';
 import { petCanForceTaunt } from './pet_taunt_gate';
 
 const BODY_RADIUS = PLAYER_BODY_RADIUS;
@@ -78,6 +79,10 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
     ctx.despawnPersistentPet(pet);
     return;
   }
+  // Ahead of the channel/stun early-outs so a gear swap reaches the pet on the very
+  // next tick. Idempotent and rng-free, so it costs a few arithmetic ops when the
+  // owner's stats have not moved.
+  applyPetOwnerScaling(ctx, pet);
   if (updateWaterJetChannel(ctx, pet)) return;
   if (ctx.isStunned(pet)) return;
   ctx.syncPetAspect(pet, owner);
@@ -302,8 +307,65 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
 
   const routed = pet.petPath.length > 1;
   const aim = routed ? pet.petPath[0] : owner.pos;
-  const speed = Math.max(pet.moveSpeed, RUN_SPEED * 1.1) * ctx.moveSpeedMult(pet);
+  // Heel against the owner's ACTUAL speed, not a fixed RUN_SPEED floor: mounts add
+  // 60 to 80 percent, so the old 7.7 yd/s floor lost ground to every mounted owner
+  // until the 60 yd teleport rescued the pet. moveSpeedMult(owner) already folds in
+  // the mount, speed buffs, and slows; the pet's own multiplier still applies on top
+  // so a snared pet is still snared.
+  const ownerSpeed = RUN_SPEED * ctx.moveSpeedMult(owner);
+  const speed = petHeelSpeed(pet.moveSpeed, ownerSpeed) * ctx.moveSpeedMult(pet);
   ctx.moveToward(pet, aim, speed);
+}
+
+/**
+ * Re-derive the owner-inherited half of a hunter pet's stats (pet/pet_scaling.ts).
+ *
+ * Idempotent, so updatePet can call it every tick and pick up a gear swap the moment
+ * it lands: armor and attack power are recomputed from the template base plus the
+ * current share, while the health share is swapped as a DELTA rather than recomputed,
+ * because the raid stat auras (applyNonPlayerStatAura) write maxHp too and rebuilding
+ * the pool from the template would silently eat their contribution.
+ *
+ * Hunter-only on purpose. A warlock demon and the mage Water Elemental are authored
+ * as pets with their own tuned pools; a tamed beast is a wild mob template that was
+ * never balanced to be a companion, which is the gap this closes.
+ *
+ * KNOWN LIMITATION, pre-existing and deliberately not addressed here: a PERCENT
+ * stamina aura (buff_sta_pct / buff_stats_pct) removes itself by taking a cut of the
+ * pet's CURRENT maxHp (applyNonPlayerStatAura), which is only exact if the pool did
+ * not move while the buff was up. Re-deriving the share inside a buff window
+ * therefore leaves a small residue (measured at 9 hp on a 587 pool). syncPetLevel
+ * already had the same asymmetry, and worse, since it rebuilds the pool from the
+ * template and drops the aura's contribution outright. Making the removal exact
+ * means having that aura record the hp it actually added, which is a change to the
+ * shared non-player aura bookkeeping (warlock pets included) and belongs in its own
+ * commit with its own golden re-mint, not in a hunter balance pass.
+ */
+export function applyPetOwnerScaling(ctx: SimContext, pet: Entity): void {
+  if (pet.ownerId === null) return;
+  const meta = ctx.players.get(pet.ownerId);
+  if (!meta || meta.cls !== 'hunter') return;
+  const owner = ctx.entities.get(pet.ownerId);
+  if (!owner) return;
+  const template = MOBS[pet.templateId];
+  // Only a pet the hunter could actually have tamed inherits. The owner-class check
+  // alone would also catch a demon parked on a hunter, which cannot happen in play
+  // but is not what this models.
+  if (!template || !isTameableFamily(template.family)) return;
+  const share = petOwnerScaling({
+    maxHp: owner.maxHp,
+    armor: owner.stats.armor,
+    rangedPower: owner.rangedPower,
+  });
+  pet.attackPower = share.attackPower;
+  pet.stats.armor = Math.round(template.armorPerLevel * (pet.level - 1)) + share.armor;
+  const gained = share.hp - pet.petOwnerHpBonus;
+  if (gained === 0) return;
+  pet.petOwnerHpBonus = share.hp;
+  pet.maxHp = Math.max(1, pet.maxHp + gained);
+  // Growing hands the pet the new headroom outright; shrinking clamps it into the
+  // smaller pool. Either way a dead pet stays dead rather than being revived here.
+  pet.hp = pet.dead ? 0 : Math.max(1, Math.min(pet.maxHp, pet.hp + Math.max(0, gained)));
 }
 
 function petDamageMult(ctx: SimContext, pet: Entity): number {

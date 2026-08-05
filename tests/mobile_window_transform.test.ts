@@ -274,4 +274,23 @@ describe('tier player-frame nudges are landscape-gated (hud.mobile.css)', () => 
   it('keys the tablet -10px seat to landscape', () => {
     expect(mediaPrelude('left: calc(50% - 10px)')).toContain('(orientation: landscape)');
   });
+
+  // The compact tier mirrors its narrow-width nudge for .mobile-left-handed
+  // (flipping the sign, same magnitude); the tablet nudge above was missing
+  // that mirror entirely, so left-handed players on a tablet kept the
+  // right-handed -10px seat and the frame stayed pushed into the mirrored
+  // Jump crescent on the left instead of being cleared from it.
+  it('mirrors the tablet -10px seat into a left-handed +10px seat in the same landscape block', () => {
+    expect(mediaPrelude('left: calc(50% + 10px)')).toContain('(orientation: landscape)');
+    // The mirror carries the pet strip too: the client_shell pairing invariant
+    // holds every rule that nudges the cast bar to nudge #pet-frame with it.
+    expect(css).toContain(
+      'body.mobile-touch.hud-mobile-tablet.mobile-left-handed #player-frame,\n' +
+        '    body.mobile-touch.hud-mobile-tablet.mobile-left-handed #castbar,\n' +
+        '    body.mobile-touch.hud-mobile-tablet.mobile-left-handed #swingbar,\n' +
+        '    body.mobile-touch.hud-mobile-tablet.mobile-left-handed #pet-frame {\n' +
+        '      left: calc(50% + 10px);\n' +
+        '    }',
+    );
+  });
 });

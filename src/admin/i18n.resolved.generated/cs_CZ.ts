@@ -388,6 +388,8 @@ export const cs_CZ: AdminTranslations = {
   "moderationHistory.actionKill": "Zabití",
   "moderationHistory.actionJail": "Uvěznění",
   "moderationHistory.actionUnjail": "Propuštění z vězení",
+  "moderationHistory.actionSpectate": "Spectated",
+  "moderationHistory.actionUnspectate": "Stopped spectating",
   "moderationHistory.actionNote": "Poznámka",
   "moderationHistory.actionResetPassword": "Reset hesla",
   "moderationHistory.actionDailyRewardsBan": "Účast v denních odměnách zakázána",

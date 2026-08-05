@@ -23,6 +23,7 @@ import {
 } from '../src/sim/professions/wield_gate';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
+import { completeRechargeCast, runRecharge } from './helpers/enchant_family_cast';
 
 const makeSim = (seed = 11) => new Sim({ seed, playerClass: 'warrior', autoEquip: false });
 const metaOf = (sim: Sim): PlayerMeta => sim.meta(sim.playerId) as PlayerMeta;
@@ -47,7 +48,7 @@ describe('the recharge command: price, consume, refill', () => {
     if (!slot) throw new Error('slot minted');
     slot.durability = 0;
     sim.addItem('arcane_dust', 10);
-    sim.rechargeToolEffect('mining');
+    runRecharge(sim, 'mining');
     const events = sim.tick();
     // Common pick: 20-charge fill, self-crafted slot: ceil((20/10) * 0.5) = 1.
     expect(slot.durability).toBe(20);
@@ -73,7 +74,7 @@ describe('the recharge command: price, consume, refill', () => {
     expect(slot.craftedBy).toBe('Elsewhere');
     slot.durability = 0;
     sim.addItem('arcane_dust', 10);
-    sim.rechargeToolEffect('mining');
+    runRecharge(sim, 'mining');
     sim.tick();
     // Generic rate: ceil(20/10) = 2 dust, no discount for a buyer.
     expect(slot.durability).toBe(20);
@@ -133,35 +134,30 @@ describe('the recharge command: price, consume, refill', () => {
       effectId: 'gatherers_cache',
     });
 
-    // throttled: the shared crafting-action window refuses after the
-    // materials check (the family order: inputs first, window last) and
-    // spends nothing.
-    const paced = simWithSlot();
-    const pSlot = metaOf(paced).toolEffectSlots?.mining;
-    if (!pSlot) throw new Error('slot minted');
-    pSlot.durability = 0;
-    paced.addItem('arcane_dust', 10);
-    metaOf(paced).craftThrottle = { windowStart: 0, count: 1000 };
-    paced.rechargeToolEffect('mining');
-    expect(lastToolEffectResult(paced.tick())).toMatchObject({
+    // Phase 5: concurrent cast denies busy (not the retired throttle).
+    const busySim = simWithSlot();
+    const busySlot = metaOf(busySim).toolEffectSlots?.mining;
+    if (!busySlot) throw new Error('slot minted');
+    busySlot.durability = 0;
+    busySim.addItem('arcane_dust', 10);
+    busySim.rechargeToolEffect('mining'); // starts cast
+    busySim.rechargeToolEffect('mining'); // concurrent deny
+    expect(lastToolEffectResult(busySim.tick())).toMatchObject({
       ok: false,
-      reason: 'throttled',
-      effectId: 'gatherers_cache',
+      reason: 'busy',
     });
-    expect(paced.countItem('arcane_dust')).toBe(10);
-    expect(pSlot.durability).toBe(0);
+    expect(busySim.countItem('arcane_dust')).toBe(10);
+    expect(busySlot.durability).toBe(0);
   });
 
-  it('a throttled AND broke player gets the price-carrying deny, the family order', () => {
-    // crafting.ts, enchanting.ts, and salvage.ts all validate the action's
-    // own inputs before the shared window; insufficient_materials is the one
-    // deny that carries the cost, so it must win the race with throttled.
+  it('insufficient_materials still wins when craftThrottle is exhausted (inputs first)', () => {
+    // Phase 5: craftThrottle is inert; materials check still owns the deny.
     const sim = simWithSlot();
     const slot = metaOf(sim).toolEffectSlots?.mining;
     if (!slot) throw new Error('slot minted');
     slot.durability = 0;
     metaOf(sim).craftThrottle = { windowStart: 0, count: 1000 };
-    sim.rechargeToolEffect('mining');
+    runRecharge(sim, 'mining');
     expect(lastToolEffectResult(sim.tick())).toMatchObject({
       ok: false,
       reason: 'insufficient_materials',
@@ -170,18 +166,16 @@ describe('the recharge command: price, consume, refill', () => {
     });
   });
 
-  it('the recharge paces the shared craft window on success only', () => {
-    // recordAction on the success arm, and NOTHING on a deny: a refused
-    // recharge must not delay the player's next real craft.
+  it('Phase 5: recharge never stamps craftThrottle (cast paces)', () => {
     const sim = simWithSlot();
     const slot = metaOf(sim).toolEffectSlots?.mining;
     if (!slot) throw new Error('slot minted');
     slot.durability = 0;
     sim.addItem('arcane_dust', 10);
     const before = metaOf(sim).craftThrottle?.count ?? 0;
-    sim.rechargeToolEffect('mining');
-    expect(metaOf(sim).craftThrottle?.count ?? 0).toBe(before + 1);
-    // A deny (already full now) leaves the window untouched.
+    runRecharge(sim, 'mining');
+    expect(metaOf(sim).craftThrottle?.count ?? 0).toBe(before);
+    // A deny (already full now) also leaves the inert field untouched.
     const after = metaOf(sim).craftThrottle?.count ?? 0;
     sim.rechargeToolEffect('mining');
     expect(metaOf(sim).craftThrottle?.count ?? 0).toBe(after);
@@ -199,7 +193,7 @@ describe('the recharge command: price, consume, refill', () => {
     slot.durability = 5;
     sim.addItem('arcanite_mining_pick', 1);
     sim.addItem('arcane_shard', 10);
-    sim.rechargeToolEffect('mining');
+    runRecharge(sim, 'mining');
     const events = sim.tick();
     expect(slot.durability).toBe(startingDurabilityFor('gatherers_cache', 'epic'));
     expect(slot.maxDurability).toBe(startingDurabilityFor('gatherers_cache', 'epic'));
@@ -239,14 +233,14 @@ describe('the recharge command: price, consume, refill', () => {
     sim.addItem('arcane_shard', 10);
     // Above what this tool can fill, below the ceiling: the honest distinction.
     slot.durability = 30;
-    sim.rechargeToolEffect('mining');
+    runRecharge(sim, 'mining');
     expect(lastToolEffectResult(sim.tick())).toMatchObject({ ok: false, reason: 'tool_capped' });
     expect(slot.durability).toBe(30);
     expect(slot.maxDurability).toBe(50);
     // Below it: the fill lands at 20, and it costs 2 SHARDS (the ceiling
     // rung), never the 2 dust the carried pick alone would have priced.
     slot.durability = 5;
-    sim.rechargeToolEffect('mining');
+    runRecharge(sim, 'mining');
     expect(lastToolEffectResult(sim.tick())).toMatchObject({
       ok: true,
       materialItemId: 'arcane_shard',
@@ -258,11 +252,11 @@ describe('the recharge command: price, consume, refill', () => {
     expect(sim.countItem('arcane_shard')).toBe(8);
     // At the tool's own fill target with the ceiling above: tool_capped, not
     // "already fully charged", so the line can point at the tool.
-    sim.rechargeToolEffect('mining');
+    runRecharge(sim, 'mining');
     expect(lastToolEffectResult(sim.tick())).toMatchObject({ ok: false, reason: 'tool_capped' });
     // Carrying the epic pick again fills to the ceiling at the same rung.
     sim.addItem('arcanite_mining_pick', 1);
-    sim.rechargeToolEffect('mining');
+    runRecharge(sim, 'mining');
     expect(lastToolEffectResult(sim.tick())).toMatchObject({
       ok: true,
       materialItemId: 'arcane_shard',
@@ -291,7 +285,7 @@ describe('the recharge command: price, consume, refill', () => {
     // carried. The fill is common-sized (20) but billed in shards.
     sim.removeItem('arcanite_mining_pick', 1);
     sim.addItem('copper_mining_pick', 1);
-    sim.rechargeToolEffect('mining');
+    runRecharge(sim, 'mining');
     sim.tick();
     expect(sim.countItem('arcane_dust')).toBe(50);
     expect(sim.countItem('arcane_essence')).toBe(50);
@@ -306,7 +300,7 @@ describe('the recharge command: price, consume, refill', () => {
     // rounding can only make a finer split cost more, never less, so there is
     // no ladder that beats filling honestly.
     sim.addItem('arcanite_mining_pick', 1);
-    sim.rechargeToolEffect('mining');
+    runRecharge(sim, 'mining');
     sim.tick();
     expect(slot.durability).toBe(50);
     expect(sim.countItem('arcane_shard')).toBe(45);
@@ -335,7 +329,7 @@ describe('the recharge command: price, consume, refill', () => {
       metaOf(sim).gatheringProficiency.mining = miningProficiency;
       slot.durability = 0;
       sim.addItem('arcane_essence', 10);
-      sim.rechargeToolEffect('mining');
+      runRecharge(sim, 'mining');
       return { sim, slot, events: sim.tick() };
     };
     const { sim, slot, events } = run(0);
@@ -401,7 +395,7 @@ describe('the recharge command: price, consume, refill', () => {
     const slot = metaOf(sim).toolEffectSlots?.mining;
     if (!slot) throw new Error('slot minted');
     slot.durability = 0;
-    sim.rechargeToolEffect('mining');
+    runRecharge(sim, 'mining');
     sim.rng.setObserver(null);
     expect(drawn).toEqual([]);
     expect(slot.durability).toBe(20);

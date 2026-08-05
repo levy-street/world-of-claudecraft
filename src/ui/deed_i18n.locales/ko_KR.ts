@@ -788,4 +788,32 @@ export const table: DeedLocaleTable = {
     name: '갈매기는 알고 있다',
     desc: '먼바다 해안의 물에서 물고기 한 마리를 낚으십시오.',
   },
+  prog_engineering_rare: {
+    name: '정밀 기계공학',
+    desc: '기계공학에서 처음으로 희귀 등급 아이템을 제작하십시오.',
+  },
+  prog_alchemy_rare: {
+    name: '희귀한 빈티지',
+    desc: '연금술에서 처음으로 희귀 등급 아이템을 제작하십시오.',
+  },
+  prog_cooking_rare: {
+    name: '잊지 못할 요리',
+    desc: '요리에서 처음으로 희귀 등급 아이템을 제작하십시오.',
+  },
+  prog_leatherworking_rare: {
+    name: '정교한 무두질',
+    desc: '가죽세공에서 처음으로 희귀 등급 아이템을 제작하십시오.',
+  },
+  prog_tailoring_rare: {
+    name: '명장의 바느질',
+    desc: '재봉에서 처음으로 희귀 등급 아이템을 제작하십시오.',
+  },
+  prog_weaponcrafting_rare: {
+    name: '광택이 날 때까지 담금질',
+    desc: '무기 제작에서 처음으로 희귀 등급 아이템을 제작하십시오.',
+  },
+  prog_armorcrafting_rare: {
+    name: '완벽을 향한 판금',
+    desc: '방어구 제작에서 처음으로 희귀 등급 아이템을 제작하십시오.',
+  },
 };

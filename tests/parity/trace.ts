@@ -212,6 +212,7 @@ export const META_EXCLUDE: ReadonlySet<string> = new Set([
   'moveInput', // input, not state
   'joinedAt', // session-only clock
   'lastActiveTick', // session-only
+  'craftThrottle', // inert since the Craft Cast System retired the shared throttle; session-only
   'away', // session-only presence
   'lastWhisperFrom', // session-only
   'marketQuery', // session-only browse query (search + filters + page)

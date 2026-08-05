@@ -18,8 +18,12 @@ import type { FctKind } from './fct_core';
 export type FctSpawnSource =
   | {
       readonly type: 'damage';
-      /** The damage event's kind: an avoidance word (miss/dodge/parry/resist/evade) or a landed hit. */
-      readonly damageKind: 'miss' | 'dodge' | 'parry' | 'resist' | 'evade' | 'hit';
+      /**
+       * The damage event's kind: an avoidance word (miss/dodge/parry/resist/evade), a
+       * plain landed hit, or a shield block (also a landed hit, still dealing real
+       * reduced damage, so it is NOT grouped with the avoidance words below).
+       */
+      readonly damageKind: 'miss' | 'dodge' | 'parry' | 'resist' | 'evade' | 'block' | 'hit';
       /** Whether an ability fired (a landed hit splits damage-done into -ability vs -auto). */
       readonly ability: boolean;
       readonly crit: boolean;
@@ -67,14 +71,26 @@ export function fctSpawnShape(src: FctSpawnSource): FctSpawnShape | null {
       // A landed hit: the player dealing it (and not to itself) floats damage-done; the
       // player taking it floats damage-taken; a hit between two non-player entities floats
       // nothing (the live site's `if (isPlayerSource && !isPlayerTarget) ... else if
-      // (isPlayerTarget)` with no else).
+      // (isPlayerTarget)` with no else). A shield block takes the SAME role split (it is
+      // still a landed hit, just reduced by blockValue) but its own -block kind, so it
+      // reads with its own colour/word instead of a plain hit's.
       if (src.isPlayerSource && !src.isPlayerTarget)
         return {
-          kind: src.ability ? 'damage-done-ability' : 'damage-done-auto',
+          kind:
+            src.damageKind === 'block'
+              ? 'damage-done-block'
+              : src.ability
+                ? 'damage-done-ability'
+                : 'damage-done-auto',
           isSelf: false,
           crit: src.crit,
         };
-      if (src.isPlayerTarget) return { kind: 'damage-taken', isSelf: true, crit: src.crit };
+      if (src.isPlayerTarget)
+        return {
+          kind: src.damageKind === 'block' ? 'damage-taken-block' : 'damage-taken',
+          isSelf: true,
+          crit: src.crit,
+        };
       return null;
     }
     case 'absorb':

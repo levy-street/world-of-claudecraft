@@ -1,0 +1,81 @@
+name: Dependency audit
+
+# Advisory gate over the installed dependency tree, deliberately kept OUT of
+# ci.yml. Two reasons. First, event surface: ci.yml's job matrix is tuned around
+# pull_request/push/workflow_dispatch, and adding `schedule` there would newly
+# fire `changes`, `lint`, and `browser-gate` on every cron tick. Second, blast
+# radius: an advisory published upstream is not caused by the PR that happens to
+# be open when it lands, so running this on every PR would turn unrelated work
+# red and train everyone to ignore it.
+#
+# So the trigger is scoped to the two cases where the signal is actionable:
+#   - a PR or push that actually changes the dependency tree (path filter), where
+#     the author is the right person to resolve it
+#   - a weekly cron, which is where a NEW advisory against an unchanged tree gets
+#     discovered, on its own job name, blocking nobody
+#
+# Accepted, non-actionable advisories live in `pnpm.auditConfig.ignoreGhsas`
+# (package.json), each with a justification section and a retirement condition in
+# docs/security/dependency-audit-catalog.md. pnpm still PRINTS
+# an ignored advisory in the report (`1 high (1 ignored)`), so an exception is
+# visible in the log rather than silently swallowed.
+on:
+  pull_request:
+    paths:
+      - package.json
+      - pnpm-lock.yaml
+  push:
+    branches:
+      - main
+      - 'dev-*'
+      - 'release/**'
+    paths:
+      - package.json
+      - pnpm-lock.yaml
+  schedule:
+    # Mondays, 06:17 UTC. Off the hour so this does not pile into the
+    # top-of-hour spike in GitHub's shared cron scheduler.
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    name: pnpm audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 26
+          cache: pnpm
+
+      # The audit reads the resolved tree, so it has to match the lockfile
+      # exactly; a non-frozen install could resolve a fixed version the lockfile
+      # does not actually pin and report a green tree nobody ships.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # audit-level stays at the default (low) rather than high BY DESIGN: with
+      # the overrides in package.json this tree reports zero unignored
+      # advisories, so any new one, at any severity, forces a conscious decision
+      # (bump the override, or add a justified ignore) instead of accumulating
+      # under a threshold. --ignore-registry-errors keeps a GitHub Advisory
+      # outage from presenting as a dependency problem.
+      - name: Audit dependencies
+        run: pnpm audit --ignore-registry-errors

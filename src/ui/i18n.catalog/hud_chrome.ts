@@ -404,6 +404,12 @@ export const hudChromeStrings = {
     // does not trip the untranslated-leak guard; "Band" reads as your group of
     // companions, parallel to playerLabel / targetLabel.
     partyLabel: 'Your Band',
+    // petLabel names the #pet-frame region (the hunter/warlock/mage pet's health
+    // strip under the player frame, which doubles as a button that selects the
+    // pet). Kept NON-WORDY (no run of four+ lowercase) so an English-filled
+    // non-Latin locale does not trip the M16 untranslated-leak guard, parallel to
+    // playerLabel / targetLabel / partyLabel above.
+    petLabel: 'Your Pet',
     // partyChip is the caption on the mobile-only collapse chip that stands in for the
     // expanded party stack (the member frames) on the touch HUD: tap it
     // to reveal the stack, tap again to collapse. A distinct key from the chat channel
@@ -508,10 +514,13 @@ export const hudChromeStrings = {
     // The mobile chat composer's placeholder. The desktop hud.core.chatPlaceholder
     // packs the full slash-command legend (/s, /w, /r, ...), which overflows the
     // compact touch composer strip, so the touch HUD shows this short prompt instead
-    // (activeChatPlaceholder branches on the mobile layout). WORDY by M16
-    // ("something" is a four-plus consecutive-lowercase run), so the five non-Latin
-    // overlays carry real fills and the Latin overlays stay pending.
-    chatPlaceholder: 'Say something...',
+    // (activeChatPlaceholder branches on the mobile layout). Carries the same "!"
+    // community-commands hint as the desktop placeholder (issue #1230): mobile has
+    // no hover for a tooltip, so the always-visible placeholder is the one surface
+    // both platforms share. WORDY by M16 ("something" is a four-plus
+    // consecutive-lowercase run), so the five non-Latin overlays carry real fills
+    // and the Latin overlays stay pending.
+    chatPlaceholder: 'Say something... (! for community commands)',
   },
   // New-adventurer tutorial copy for the touch interface. The default tutorial
   // bodies (hud.tutorial.*Body) reference keyboard/mouse ("W/A/S/D", "press F"),
@@ -738,6 +747,10 @@ export const hudChromeStrings = {
     petTaunt: 'Pet: Taunt',
     petDefensive: 'Pet: Defensive',
     petAggressive: 'Pet: Aggressive',
+    // Selects your own pet as your current target (the pet frame's click, on a key).
+    // "Mark" is this catalog's own term for the target (unitFrame.targetLabel,
+    // targetAnnounce), which also keeps the value NON-WORDY for the M16 guard.
+    targetPet: 'Pet: Mark',
     // Rideable mounts: the Z toggle (opens the stable while nothing is picked).
     mount: 'Mount / Dismount',
     // Mouse buttons are bindable pseudo-keys (src/game/mouse_binds.ts). The note
@@ -1243,6 +1256,10 @@ export const hudChromeStrings = {
     // Interface panel toggle: also engage auto-attack when using an offensive
     // ability, so white swings start without a separate Attack press (on by default).
     startAttackOnAbility: 'Auto-Attack on Ability Use',
+    // Interface panel toggle: disengage auto-attack whenever the target
+    // switches, instead of the classic default of carrying the swing over to
+    // the new target (off by default; issue #1358).
+    stopAutoAttackOnTargetSwitch: 'Stop Auto-Attack on Target Switch',
     // Interface panel toggle: loot corpses by walking past them (off by default).
     walkByAutoloot: 'Walk-by Autoloot',
     groundReticle: 'Ground-Targeting Reticle',
@@ -1263,6 +1280,12 @@ export const hudChromeStrings = {
     // Enabled only while the secondary row is visible. Slots remain reachable
     // through keybinds and the mobile action-ring pages while this row is hidden.
     showThirdActionBar: 'Show Third Action Bar',
+    // Interface panel toggle (off by default): strips the black background,
+    // border, and keybind label from action-bar slots with no ability or item
+    // bound, so an unlearned class's bar reads clean instead of a wall of empty
+    // squares. Bound slots (and the fixed Attack button) are unaffected, so the
+    // slot layout used to arrange buffs/consumables on the extra rows holds.
+    hideUnusedActionSlots: 'Hide Unused Action Slots',
     // Interface panel toggle (off by default) that locks the action bar slots
     // against drag-to-move, drag-to-replace, and clear so an accidental
     // click-and-drag mid-fight can't disturb a slot. Abilities still fire from
@@ -1272,6 +1295,11 @@ export const hudChromeStrings = {
     // default): a small unit frame under the target frame showing who your target
     // is targeting.
     showTargetOfTarget: 'Show Target of Target',
+    // Interface panel toggle for the pet health strip under the player frame (on by
+    // default; it only appears while you actually have a pet). Phrased from the
+    // frame's own accessible name (unitFrame.petLabel) so the value stays NON-WORDY
+    // for the M16 guard.
+    showPetFrame: 'Show Your Pet',
     // Interface panel toggle for the fixed Attack button in the first action-bar
     // slot (on by default). Off frees that slot for a normal action (drag one in;
     // its key then casts it). Right-clicking the Attack button flips this off too.
@@ -2282,10 +2310,12 @@ export const hudChromeStrings = {
   },
   // World mouseover tooltip shown when hovering a mob (mob_tooltip_view.ts):
   // name (colored by the nameplate con-color), then "Level N <type>" ({family}
-  // reuses the existing guide.family.<id>.name bestiary labels), then a
-  // Friendly/Hostile reaction line (green/red, from Entity.hostile). All three
-  // values below are wordy (M16): filled in the five non-Latin locales in this
-  // same change.
+  // reuses the existing guide.family.<id>.name bestiary labels), then an
+  // Elite/Boss rank badge (mirrors the target frame's rank chrome), then a
+  // Friendly/Hostile reaction line (green/red, from Entity.hostile). All the
+  // wordy ones (M16) are filled in the five non-Latin locales in this same
+  // change; "Boss" is not wordy (no four-plus consecutive-lowercase run) so
+  // it stays pending like the rest of a plain-word English addition.
   mobTooltip: {
     levelFamily: 'Level {level} {family}',
     // The one MobFamily with no guide.family.* bestiary entry (demons are
@@ -2294,6 +2324,11 @@ export const hudChromeStrings = {
     familyDemon: 'Demon',
     hostile: 'Hostile',
     friendly: 'Friendly',
+    // Elite/boss rank badge (target_rank_view.ts TargetRank), shown only when
+    // the mob's template carries elite/boss. "Elite" is wordy (M16, the
+    // "lite" run); "Boss" is not.
+    elite: 'Elite',
+    boss: 'Boss',
   },
   // Movable target frame: the small corner toggle that unlocks the frame for
   // dragging and locks it back in place (target_frame_pos.ts + hud.ts wiring).
@@ -2982,6 +3017,11 @@ export const hudChromeStrings = {
     // accessibility); gotAwayLine is the no-cost miss.
     biteLine: 'Something takes the bait!',
     gotAwayLine: 'It got away.',
+    // The early reel (the spam-click fix): a pole re-press before the bite
+    // now ends the session empty, and this line says why, so the player
+    // learns to wait for the bite instead of reading a silent cancel as a
+    // bug. Same grey no-cue register as gotAwayLine.
+    earlyReelLine: 'You reel in too soon. Nothing had taken the bait.',
     // Base tool tier gating (Professions 2.0). The sim's gatherDenied
     // SimEvent and the node hover tooltip are both text-free at the source:
     // every line here is composed client-side off structured fields, keyed per
@@ -3157,6 +3197,7 @@ export const hudChromeStrings = {
   enchantName: {
     enchant_weapon_might: 'Enchant Weapon - Might',
     enchant_weapon_intellect: 'Enchant Weapon - Spellpower',
+    enchant_offhand_stamina: 'Enchant Offhand - Stamina',
     enchant_helmet_fortitude: 'Enchant Helmet - Fortitude',
     enchant_neck_spirit: 'Enchant Necklace - Spirit',
     enchant_shoulder_agility: 'Enchant Shoulders - Agility',
@@ -3340,7 +3381,30 @@ export const hudChromeStrings = {
     // aria is the localized craft name (craftName above).
     dialogOption: 'Crafting',
     dialogOptionAria: 'Open the crafting window for {craft}',
-    craft: 'Craft',
+    // Craft Cast System Phase 2: button label while this recipe's cast runs.
+    crafting: 'Crafting',
+    // Phase 3 batch craft: primary action with the row qty, and mats-limited max.
+    create: 'Create',
+    createAll: 'Create All',
+    createAllAria: 'Create the maximum number of this recipe from materials held',
+    // Qty stepper group for one recipe row.
+    qtyRowAria: 'Craft quantity',
+    qtyDecreaseAria: 'Decrease craft quantity, currently {count}',
+    qtyIncreaseAria: 'Increase craft quantity, currently {count}',
+    qtyValueAria: 'Craft quantity, {count}',
+    // Batch progress on the in-window strip ({remaining} / {total} localized).
+    batchRemaining: '{remaining} of {total} remaining',
+    batchRemainingAria: '{remaining} of {total} crafts remaining',
+    // Compact row chip for expected cast time ({seconds} is a localized number).
+    durationChip: '{seconds}s',
+    // Accessible duration line (aria + tooltip); {seconds} is a localized number.
+    durationAria: 'Cast time: {seconds} seconds',
+    // In-window progress strip accessible name.
+    progressAria: 'Craft progress',
+    // Polite live-region lines for cast start / complete / cancel.
+    announceStart: 'Crafting {name}',
+    announceComplete: 'Finished crafting {name}',
+    announceCancel: 'Crafting cancelled',
     reagentsNeeded: 'Requires:',
     reagentLine: '{name} x{have}/{required}',
     // The fine-substitution suffix (the UX pass): appended to a reagent line
@@ -3443,8 +3507,10 @@ export const hudChromeStrings = {
       loom: 'Loom',
       toolworks: 'Toolworks',
     },
-    // #1301: denied because the rolling craft-output window is full.
-    throttled: 'You are crafting too quickly. Wait a moment and try again.',
+    // Craft Cast System: already casting or consuming when craft_item arrives.
+    // Cast duration paces craft-family actions (busy is the concurrent-cast
+    // deny; the retired 'throttled' wire reason renders this same copy).
+    busy: 'You are busy.',
     // #1299: the recipe exists but this player has not learned it yet.
     recipeNotLearned: 'You have not learned that recipe yet.',
     // #2350: denied because the output cannot fit the bags, even after the
@@ -3546,9 +3612,8 @@ export const hudChromeStrings = {
   // disenchant / apply-enchant / salvage commands (enchanting_view.ts maps each
   // text-free SimEvent to one of these), the destroy-confirm copy (a stronger
   // body when the copy consumed is special), and the Apply Enchant picker chrome.
-  // Each throttled key names ITS OWN action: the 10-per-60s throttle is shared
-  // with crafting and gathering, so a generic "crafting is busy" line would
-  // mis-attribute the deny.
+  // Craft Cast System Phase 5: concurrent-cast denies use per-action busy keys
+  // (cast duration paces; the shared "too quickly" quota is retired).
   enchanting: {
     // The SOLE player-visible lines for these actions (#2430). The grant hub's
     // "You receive:" lines no longer print for a disenchant or a salvage yield
@@ -3575,9 +3640,11 @@ export const hudChromeStrings = {
     notHeld: 'You do not have that item.',
     notDisenchantable: 'You cannot disenchant that.',
     notSalvageable: 'You cannot salvage that.',
-    disenchantThrottled: 'You are disenchanting too quickly. Wait a moment and try again.',
-    salvageThrottled: 'You are salvaging too quickly. Wait a moment and try again.',
-    enchantThrottled: 'You are enchanting too quickly. Wait a moment and try again.',
+    // Craft Cast System Phase 4/5: cast busy gate when another cast is already
+    // running (the retired 'throttled' wire reason renders the same copy).
+    disenchantBusy: 'You are busy.',
+    salvageBusy: 'You are busy.',
+    enchantBusy: 'You are busy.',
     enchantWrongSlot: 'That enchant cannot be applied to that item.',
     enchantUnknown: 'That enchant does not exist.',
     enchantInsufficient: 'You do not have the materials for that enchant.',
@@ -3743,6 +3810,71 @@ export const hudChromeStrings = {
     // #2350: unbinding one copy out of a bound stack needs room for the
     // unbound copy it peels off.
     noSpace: 'You do not have room for the unbound copy.',
+  },
+  // Commission order board (issue #1298): a lightweight job board layered
+  // on the Maker's Bond above. Opened from a button in the crafting
+  // window's header; no location gate, since opening/cancelling an order
+  // carries no escrow. Chat lines answer commissionOrderResult (the
+  // trainResult/unbindResult single-surface rule: one line, no toast).
+  commissionBoard: {
+    title: 'Commission Orders',
+    close: 'Close commission orders',
+    openButton: 'Orders',
+    openButtonAria: 'Open the commission order board',
+    intro: "Commission a crafter to make you a piece, or take on someone else's order.",
+    // The "open a new order" form.
+    formTitle: 'Open a Commission',
+    recipeLabel: 'Item',
+    recipeEmpty: 'You know no craftable equipment recipes yet.',
+    scopeLabel: 'Who can accept',
+    scopeOpen: 'Anyone (open board)',
+    scopeCrafter: 'A specific crafter',
+    crafterNameLabel: 'Crafter name',
+    crafterNamePlaceholder: 'Character name',
+    openSubmit: 'Post Order',
+    // Section headings over the three row groups.
+    sectionMine: 'My Requests',
+    sectionToCraft: 'My Commissions',
+    sectionBoard: 'Open Board',
+    boardEmpty: 'No open orders right now.',
+    mineEmpty: 'You have not opened any commissions.',
+    toCraftEmpty: "You are not crafting anyone's order right now.",
+    // One row's line: "{item} for {requester}" / "for {crafter}" when a
+    // 'crafter'-scope order names a specific target.
+    rowFor: '{item} for {requester}',
+    rowTargeted: '{item} for {requester} (for {crafter})',
+    acceptedBy: 'Accepted by {name}',
+    statusOpen: 'Open',
+    statusAccepted: 'Accepted',
+    statusDelivered: 'Delivered',
+    statusCancelled: 'Cancelled',
+    statusExpired: 'Expired',
+    cancelButton: 'Cancel',
+    acceptButton: 'Accept',
+    deliverButton: 'Deliver',
+    deliverHint:
+      'Craft the commissioned piece (with the commission toggle on), then come back here to deliver it.',
+    // commissionOrderResult chat lines, one success line per action (the
+    // trainResult single-surface rule) plus the shared deny-reason set.
+    opened: 'You post a commission order for {item}.',
+    cancelled: 'You cancel the commission order for {item}.',
+    accepted: 'You accept the commission order for {item}.',
+    delivered: 'You deliver {item} to {name}.',
+    denyUnknownRecipe: 'That recipe does not exist.',
+    denyNotCommissionEligible: 'That recipe cannot be commissioned.',
+    denyUnknownCrafter: 'No character by that name is known.',
+    denySelfCrafter: 'You cannot commission yourself.',
+    denyTooManyOpen: 'You already have too many open commission orders.',
+    denyUnknownOrder: 'That commission order no longer exists.',
+    denyOrderNotOpen: 'That commission order is no longer open.',
+    denySelfOrder: 'You cannot accept your own commission order.',
+    denyNotEligibleCrafter: 'That commission order was posted for someone else.',
+    denyNotYourOrder: 'That is not your commission order.',
+    denyOrderNotAccepted: 'That commission order has not been accepted yet.',
+    denyNotYourAcceptance: 'You did not accept that commission order.',
+    denyNotCrafted: 'Craft the commissioned piece first (with the commission toggle on).',
+    denyOutOfRange: 'You must be near the requester to deliver a commission.',
+    denyNoSpace: 'The requester has no room in their bags.',
   },
   // Dungeon Finder window (docs/prd/dungeon-finder.md). Dungeon, creature,
   // item, quest, and zone NAMES resolve through tEntity/world_entity_i18n,

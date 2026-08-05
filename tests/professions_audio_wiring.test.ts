@@ -79,6 +79,26 @@ describe('gather-cast tool-out audio wiring', () => {
   });
 });
 
+describe('craft-family cast-start audio wiring (Craft Cast System Phase 6)', () => {
+  // Same personal castStart arm as gather/fish: one shared workbench wind-up
+  // for every craft-family non-spell cast id. Completes keep their own cues.
+  const castStartArm = () => {
+    const start = hud.indexOf('ev.ability === GATHER_CAST_ID');
+    expect(start).toBeGreaterThan(-1);
+    return hud.slice(start, hud.indexOf('break;', start));
+  };
+
+  it('plays audio.craftCast for craft, enchant-family, and tool-recharge cast starts', () => {
+    const body = castStartArm();
+    expect(body).toContain('audio.craftCast()');
+    expect(body).toContain('CRAFT_CAST_ID');
+    expect(body).toContain('DISENCHANT_CAST_ID');
+    expect(body).toContain('ENCHANT_CAST_ID');
+    expect(body).toContain('SALVAGE_CAST_ID');
+    expect(body).toContain('TOOL_RECHARGE_CAST_ID');
+  });
+});
+
 describe('craftResult audio wiring', () => {
   // The slice ends at the arm's OWN break, the shape every other block in this
   // file uses. It used to run to `case 'lootRoll'`, roughly fifteen arms

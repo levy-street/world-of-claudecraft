@@ -175,6 +175,7 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 105, chance: 1 }],
     scale: 1.2,
     color: 0x8898a8,
+    componentTags: ['meat'],
   },
   downs_bandit: {
     id: 'downs_bandit',
@@ -626,6 +627,17 @@ export const GALECREST_OBJECTS: GroundObjectDef[] = [
 export const GALECREST_QUEST_CAMPS: CampDef[] = [
   { mobId: 'drowned_deckhand', center: { x: 352, z: 662 }, radius: 10, count: 3 },
   { mobId: 'drowned_deckhand', center: { x: 306, z: 618 }, radius: 9, count: 3 },
+  // Shoal scuttlers along the cliff road above Wickharbor's cove
+  // (q_gc_scuttlers_in_the_pots): they climbed up from the shoals to raid
+  // the crab pots, so their two camps flank the road south of town, clear
+  // of the wreck_thief camp further down at (444, 438).
+  { mobId: 'shoal_scuttler', center: { x: 410, z: 400 }, radius: 9, count: 5 },
+  { mobId: 'shoal_scuttler', center: { x: 440, z: 460 }, radius: 8, count: 5 },
+  // Gale wisps on the high downs beside the Mirror Tarn
+  // (q_gc_wind_against_the_wick): kept east of the tarn itself and clear of
+  // the topiary_wolf pack that already holds its southwest bank.
+  { mobId: 'gale_wisp', center: { x: 330, z: 565 }, radius: 9, count: 4 },
+  { mobId: 'gale_wisp', center: { x: 355, z: 585 }, radius: 8, count: 4 },
 ];
 
 export const GALECREST_PROPS: ZonePropsDef = {

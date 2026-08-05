@@ -397,6 +397,8 @@ describe('byte caps + page sizes hold their literal values', () => {
       DAILY_OPS_PENDING_PAYOUTS_LIMIT,
       DAILY_OPS_PAYOUT_HISTORY_LIMIT,
       DAILY_OPS_LEADERBOARD_PAGE_SIZE,
+      DAILY_REWARD_WINNER_DAY_LIMIT,
+      RUNTIME_CONFIG_CACHE_DAYS,
     } = await import('../../server/daily_rewards');
     expect(DAILY_DEFAULT_PAGE).toBe(0);
     expect(DAILY_PLAYER_LEADERBOARD_PAGE_SIZE).toBe(20);
@@ -404,6 +406,14 @@ describe('byte caps + page sizes hold their literal values', () => {
     expect(DAILY_OPS_PENDING_PAYOUTS_LIMIT).toBe(20);
     expect(DAILY_OPS_PAYOUT_HISTORY_LIMIT).toBe(100);
     expect(DAILY_OPS_LEADERBOARD_PAGE_SIZE).toBe(50);
+    // ONE winner day per outbox poll, the ask the winners cache reads at since
+    // the standalone winners GET retired (#2791).
+    expect(DAILY_REWARD_WINNER_DAY_LIMIT).toBe(1);
+    // The per-day runtime-config map's bound, covering the full working set:
+    // the reward-clock day, the plain utcRewardDay() default the eligibility
+    // and price reads use (a different day inside the dayStartUtcMinutes
+    // window), and the winners refresh's pending day plus its successor.
+    expect(RUNTIME_CONFIG_CACHE_DAYS).toBe(4);
   });
 
   it('inbound gate constants + desktop-login TTL', () => {
