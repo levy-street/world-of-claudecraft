@@ -65,6 +65,7 @@ const FLAGS: ParseFlags = {
   spoolDir: 'unused',
   spoolMaxBytes: 1,
   envLabel: 'dev',
+  censusEnabled: false,
 };
 
 function makeRecorder(sim: FakeSim, clock?: () => number) {

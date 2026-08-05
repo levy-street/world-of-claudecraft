@@ -3,6 +3,8 @@
 // drain, and subsystem.stop() at shutdown; main.ts registers the metrics.
 import { MOBS } from '../../src/sim/data';
 import type { SimEvent } from '../../src/sim/types';
+import { CensusExporter } from './census';
+import { loadCensusRows } from './census_db';
 import type { FightParticipant, ParseEnv } from './contract';
 import { CONTRACT_VERSION } from './contract';
 import { createParseCounters, registerParseMetrics, type ParseCounters } from './counters';
@@ -73,14 +75,24 @@ export function createParseSubsystem(opts: ParseSubsystemOptions): ParseSubsyste
     // segment as trash; the content pack can refine labeling at read time.
     isBossTemplate: (templateId) => MOBS[templateId]?.boss === true,
   });
+  let census: CensusExporter | null = null;
+  if (flags.censusEnabled) {
+    census = new CensusExporter(
+      (snapshotDate) => loadCensusRows(opts.realm, snapshotDate),
+      shipper,
+      counters,
+    );
+    census.start();
+  }
   console.log(
-    `[parse] capture enabled (contract v${CONTRACT_VERSION}, env ${flags.envLabel}, surfaces ${[...flags.surfaces].join(',')})`,
+    `[parse] capture enabled (contract v${CONTRACT_VERSION}, env ${flags.envLabel}, surfaces ${[...flags.surfaces].join(',')}, census ${flags.censusEnabled ? 'on' : 'off'})`,
   );
   return {
     enabled: true,
     counters,
     observe: (events) => recorder.observe(events),
     stop: async () => {
+      census?.stop();
       recorder.stop();
       await shipper.stop();
     },

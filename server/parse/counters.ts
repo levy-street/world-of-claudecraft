@@ -20,6 +20,9 @@ export interface ParseCounters {
   observeMsMax: number;
   /** Set once when the budget breaker disables capture; requires a restart. */
   captureDisabled: number;
+  censusRuns: number;
+  censusRows: number;
+  censusFailures: number;
 }
 
 export function createParseCounters(): ParseCounters {
@@ -39,6 +42,9 @@ export function createParseCounters(): ParseCounters {
     observeMsLast: 0,
     observeMsMax: 0,
     captureDisabled: 0,
+    censusRuns: 0,
+    censusRows: 0,
+    censusFailures: 0,
   };
 }
 
@@ -67,4 +73,7 @@ export function registerParseMetrics(registry: Registry, counters: ParseCounters
   gauge('woc_parse_fights_truncated_total', 'Fights that hit the raw event cap', () => counters.fightsTruncated);
   gauge('woc_parse_observe_ms_max', 'Worst single-tick recorder cost in ms', () => counters.observeMsMax);
   gauge('woc_parse_capture_disabled', 'Budget breaker tripped (1 = capture off)', () => counters.captureDisabled);
+  gauge('woc_parse_census_runs_total', 'Census exports since boot', () => counters.censusRuns);
+  gauge('woc_parse_census_rows_total', 'Census character rows exported since boot', () => counters.censusRows);
+  gauge('woc_parse_census_failures_total', 'Census export failures since boot', () => counters.censusFailures);
 }

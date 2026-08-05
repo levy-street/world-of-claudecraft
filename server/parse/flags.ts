@@ -16,6 +16,8 @@ export interface ParseFlags {
   spoolDir: string;
   spoolMaxBytes: number;
   envLabel: ParseEnv;
+  /** Daily census export rides capture; PARSE_CENSUS=0 opts out. */
+  censusEnabled: boolean;
 }
 
 export function loadParseFlags(env: NodeJS.ProcessEnv = process.env): ParseFlags {
@@ -48,5 +50,6 @@ export function loadParseFlags(env: NodeJS.ProcessEnv = process.env): ParseFlags
       1024 *
       1024,
     envLabel: envLabelRaw !== undefined && ENV_LABELS.has(envLabelRaw) ? envLabelRaw : 'dev',
+    censusEnabled: env.PARSE_CENSUS !== '0',
   };
 }

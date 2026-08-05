@@ -48,6 +48,7 @@ const FLAGS: ParseFlags = {
   spoolDir: 'unused',
   spoolMaxBytes: 1,
   envLabel: 'dev',
+  censusEnabled: false,
 };
 
 /** Players are ids under 100 (they have sessions); mobs never resolve. */

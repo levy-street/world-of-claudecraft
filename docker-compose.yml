@@ -184,6 +184,7 @@ services:
       PARSE_SPOOL_DIR: ${PARSE_SPOOL_DIR:-/app/parse-spool}
       PARSE_SPOOL_MAX_MB: ${PARSE_SPOOL_MAX_MB:-}
       PARSE_ENV_LABEL: ${PARSE_ENV_LABEL:-}
+      PARSE_CENSUS: ${PARSE_CENSUS:-}
       WOC_BUILD_VERSION: ${WOC_BUILD_VERSION:-}
     # loopback-only: the TLS reverse proxy (Caddy) is the public entrance
     ports:
