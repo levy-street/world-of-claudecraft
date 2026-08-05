@@ -752,7 +752,10 @@ export function parseConfig(json: unknown): FarmBotConfig {
     }
   }
 
-  let gearUpgrades = false;
+  // Auto-equip defaults ON in level mode (upgrades while leveling are the
+  // norm); every other mode keeps it opt-in. The requiredLevel gate in
+  // gear.ts already restricts swaps to items the character can wear.
+  let gearUpgrades = mode === 'level';
   if (json.gearUpgrades !== undefined) {
     if (typeof json.gearUpgrades === 'boolean') gearUpgrades = json.gearUpgrades;
     else errors.push('gearUpgrades: must be a boolean');

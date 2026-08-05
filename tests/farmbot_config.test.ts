@@ -200,6 +200,9 @@ describe('farmbot parseConfig', () => {
       lootRule: 'money-blues',
       zoneUp: true,
     });
+    // Auto-equip defaults ON while leveling; explicit false still wins.
+    expect(cfg.gearUpgrades).toBe(true);
+    expect(parseConfig({ ...VALID, mode: 'level', gearUpgrades: false }).gearUpgrades).toBe(false);
   });
 
   it('parses a fully specified levelGrind and rejects bad values', () => {
