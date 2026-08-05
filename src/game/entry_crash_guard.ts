@@ -58,6 +58,7 @@ export const ENTRY_CHECKPOINTS = [
   'hud-built',
   'prewarm-start',
   'prewarm-complete',
+  'far-vista-ready',
   'first-frame',
   'first-paint',
   'rendering',
