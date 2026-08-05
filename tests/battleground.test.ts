@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { isDispellableAura } from '../src/sim/aura_classify';
 import { BG_GRAVEYARDS, BG_POWER_RUNES, BG_SPEED_RUNES } from '../src/sim/battleground_layout';
 import { GREATER_INVISIBILITY_DR_AURA_ID } from '../src/sim/combat/greater_invisibility';
@@ -52,6 +52,12 @@ import {
 } from '../src/sim/social/battleground_outcomes';
 import { DT, type SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+
+// The staged 5v5 arms (graveyard no-auto-release, the 720s cap, the fairness
+// clocks, the honor-DR rollover) legitimately run 10 to 19s each and flake
+// against the repo-wide 20s testTimeout under parallel suite load. Same
+// remedy as the Vale Cup suites: a raised per-suite budget, not thinner arms.
+vi.setConfig({ testTimeout: 30000 });
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
