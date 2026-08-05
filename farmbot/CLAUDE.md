@@ -59,9 +59,12 @@ zone map payload) live in `launcher_core.ts`, tested in
 
 GUI extras: a Live panel (state, uptime, HP/resource bars, bags, items/hour,
 session copper earned + gold/hour, harvests/catches/kills/deaths, and the
-level-mode progression boxes: level, xp, session xpGained, xp/hour), a mode
-dropdown with gold and level field rows (level: targetLevel, lootRule,
-zoneUp; gear upgrades auto-check for level mode), an Advanced: economy
+level-mode progression boxes: level, xp, session xpGained, xp/hour), plus the
+target-mode boxes (count/goal, mats/hour with a rough ETA), a mode
+dropdown with gold, level and target field rows (level: targetLevel,
+lootRule, zoneUp; gear upgrades auto-check for level mode. Target: a
+search-as-you-type material picker over the /api/meta item catalog, goal,
+source override, and a read-only /api/sources preview), an Advanced: economy
 section (gearUpgrades / marketSell / mount toggles), an
 inline-SVG mini map of the current zone (rect, lakes, node dots by type, live
 position), a read-only inventory grid,
@@ -70,7 +73,9 @@ character rotation (checked profiles + interval, driven through stop/start;
 the rotation uses the credentials typed in the page, which are gone on
 reload). Endpoints: `GET /api/live` (`{running, pid?, startedAt?, stat}` from
 the FBSTAT channel), `GET /api/meta` (zones, nodeTypes, defaultServerUrl,
-`zoneInfo` map payload).
+`zoneInfo` map payload, `items` catalog), `POST /api/sources` (target-source
+preview against a reference starter kit; the bot re-resolves at startup
+against the real character).
 
 ## FBSTAT channel
 
@@ -90,7 +95,8 @@ fire-and-forget).
 
 ## Config surface (parseConfig is strict; unknown keys fail)
 
-- `mode`: 'gather-fish' | 'gather' | 'fish' | 'gold' | 'level'. Gate rule:
+- `mode`: 'gather-fish' | 'gather' | 'fish' | 'gold' | 'level' | 'target'.
+  Gate rule:
   'gather' never fishes; 'fish' never gathers; 'gather-fish' fishes only when
   the legacy `fishing.enabled` is true (pre-mode minimal configs keep their
   behavior). 'gold' is the dungeon gold-farm: Rite of Expulsion (`exorcism`)
@@ -107,6 +113,29 @@ fire-and-forget).
   character's spawn zone first**; the route graph (zone_graph.ts over ZONES +
   PORTALS) walks road passes and portals, skips unwalkable targets with a log
   line, and farshore_isle has no walkable route at all.
+- `target` (mode 'target'): farm ONE material. `itemId` (required), `goal`
+  (0 = forever), `source` ('auto'|'gather'|'fish'|'mobs' override),
+  `mailToWhenDone` (mail the stack to an alt at goal, then stop). The
+  resolver (target_sources.ts) inverts the game's own tables at startup:
+  NODE_MATERIAL_TABLE for gather sources (tool-tier gated), the fishing band
+  tables for fish sources (rod tier + proficiency band gated, spots derived
+  from the zone's lakes hub-side), MobTemplate.loot + camps for mob sources.
+  Best-scored source wins; gather rides the node route narrowed to the
+  source's nodes, fish rides the normal FISH_* states at the resolved spots,
+  mobs ride the level-mode camp loop narrowed to the source's camps with the
+  xp gates off (gray mobs still drop loot). Counting: gatherResult /
+  fishingResult events with an inventory-delta loot path (no double count);
+  `targetCount` and the goal ride the FBSTAT `target` payload. The goal stop
+  lives in stepBrain (the fish flow chains casts for minutes without
+  re-entering TRAVEL). Fish spots are re-scanned at startup against the real
+  heightfield when the probes are bound (`scanShoreSpots` over the zone's
+  lakes; geometric arc points are only the seed-free fallback), the fish-spot
+  walk is gate-aware (village walls), and "arrival" is probe-based: the walk
+  ends wherever the offline probe first finds water, not at the tape
+  coordinate. v1 simplifications: the resolver runs once at startup (new
+  tools mid-session do not re-resolve), quest-gated loot entries are skipped,
+  and goal-mail needs a visible mailbox (otherwise the bot keeps the mats and
+  stops).
 - `levelGrind` (mode 'level'): `targetLevel` (logout + alert when reached),
   `restBelowPct` (REST gate between pulls), `lootRule` ('money-blues' rides
   the gold corpse filter + discard sweep; 'all' rides the normal LOOT state),
@@ -231,6 +260,10 @@ Same doctrine as `bot/` (logic vs gateway) and `wallet_link.ts` vs `wallet.ts`:
 - `gear.ts` (pure): `findUpgrades` (strictly-better-by-itemScore per slot,
   level/class gates, weaker-of-two rings). Tested in
   `tests/farmbot_gear.test.ts`.
+- `target_sources.ts` (pure): the target-mat source resolver (`resolveTarget`
+  + `defaultTargetResolverDeps`), shared by the brain (startup, real
+  character) and the launcher (`POST /api/sources`, reference starter kit).
+  Tested in `tests/farmbot_target_sources.test.ts`.
 - `zone_graph.ts` (pure): zone walkability graph from ZONES + PORTALS and a
   BFS path finder. Tested in `tests/farmbot_zone_graph.test.ts`.
 - `main.ts` (IO shell): argv/env, login + character resolution (+ takeover on a
@@ -266,4 +299,5 @@ facing rides `{t:'input', ...}` frames, both of which `ClientWorld` owns.
   `tests/farmbot_brain.test.ts`, `tests/farmbot_launcher.test.ts`,
   `tests/farmbot_rotation.test.ts`, `tests/farmbot_zone_graph.test.ts`,
   `tests/farmbot_village_gates.test.ts`, `tests/farmbot_survival.test.ts`,
-  `tests/farmbot_grind_circuits.test.ts`, `tests/farmbot_gear.test.ts`.
+  `tests/farmbot_grind_circuits.test.ts`, `tests/farmbot_gear.test.ts`,
+  `tests/farmbot_target_sources.test.ts`.

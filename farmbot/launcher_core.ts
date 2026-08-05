@@ -222,6 +222,11 @@ export interface LauncherFormConfig {
   marketSell: boolean;
   mountEnabled: boolean;
   mountBuyTraining: boolean;
+  // Target mode: the one material, optional goal (null = forever), source
+  // override ('auto' | 'gather' | 'fish' | 'mobs').
+  targetItemId: string;
+  targetGoal: number | null;
+  targetSource: string;
 }
 
 // Assemble the plain object that parseConfig validates. Omits optional keys
@@ -269,6 +274,12 @@ export function assembleConfig(f: LauncherFormConfig): Record<string, unknown> {
     if (f.lootRule) levelGrind.lootRule = f.lootRule;
     out.levelGrind = levelGrind;
   }
+  if (f.mode === 'target') {
+    const target: Record<string, unknown> = { itemId: f.targetItemId };
+    if (f.targetGoal !== null) target.goal = f.targetGoal;
+    if (f.targetSource && f.targetSource !== 'auto') target.source = f.targetSource;
+    out.target = target;
+  }
   // Economy: emitted only when enabled, so the defaults stay the defaults.
   if (f.gearUpgrades) out.gearUpgrades = true;
   if (f.marketSell) (out.bags as Record<string, unknown>).marketSell = true;
@@ -276,4 +287,67 @@ export function assembleConfig(f: LauncherFormConfig): Record<string, unknown> {
     out.mount = { enabled: f.mountEnabled, buyTraining: f.mountBuyTraining };
   }
   return out;
+}
+
+// --- target mode (phase 18) ---------------------------------------------------
+// The launcher-side seams for mode 'target': the compact item catalog behind
+// the page's picker, the reference-kit resolver the /api/sources preview
+// runs, and the one-line source descriptions the preview shows. Same purity
+// rule as the rest of this module: no IO, no clock.
+
+import { ITEMS } from '../src/sim/data';
+import type { ItemDef } from '../src/sim/types';
+import { defaultTargetResolverDeps, resolveTarget, type TargetSource } from './target_sources';
+
+export interface ItemCatalogEntry {
+  id: string;
+  name: string;
+  kind?: ItemDef['kind'];
+  quality?: ItemDef['quality'];
+}
+
+// Every item, compactly (the picker's search space; a few hundred entries).
+export function buildItemCatalog(items: Record<string, ItemDef> = ITEMS): ItemCatalogEntry[] {
+  return Object.values(items).map((d) => ({
+    id: d.id,
+    name: d.name,
+    kind: d.kind,
+    quality: d.quality,
+  }));
+}
+
+// The preview character: a reference kit (tier-1 handaxe/pick/sickle plus the
+// simple pole) so gather/eastbrook-fish sources resolve, empty proficiency
+// (band 0), level 20. Documented in the UI note: the preview shows what a
+// starter kitted character could farm; the bot resolves again at startup
+// against the REAL character (tools and proficiency it actually has), so the
+// live pick can differ (e.g. mirefen water needs a tier-2 rod).
+export const SOURCES_PREVIEW_CHARACTER = {
+  inventory: [
+    { itemId: 'copper_mining_pick', count: 1 },
+    { itemId: 'handaxe', count: 1 },
+    { itemId: 'gathering_sickle', count: 1 },
+    { itemId: 'simple_fishing_pole', count: 1 },
+  ],
+  proficiencies: {},
+  playerLevel: 20,
+} as const;
+
+export function resolveSourcesPreview(itemId: string): TargetSource[] {
+  return resolveTarget(itemId, defaultTargetResolverDeps(SOURCES_PREVIEW_CHARACTER));
+}
+
+// One read-only preview line per source (the page renders them in order).
+export function describeSource(source: TargetSource, itemId: string): string {
+  if (source.kind === 'gather') {
+    return `${source.nodeIds.length} ${source.nodeType} nodes in ${source.zoneId}`;
+  }
+  if (source.kind === 'fish') {
+    return `fish in ${source.zoneId}, ${Math.round(source.weightShare * 100)}% per cast at your band`;
+  }
+  const diff =
+    source.levelDiff !== null && source.levelDiff > 4
+      ? ` (warning: ${source.levelDiff} levels above you)`
+      : '';
+  return `${itemId} from ${source.mobId} camps in ${source.zoneId}, ${Math.round(source.chance * 100)}% per kill${diff}`;
 }

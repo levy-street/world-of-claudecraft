@@ -131,7 +131,8 @@ function zoneForPoint(zones: readonly ZoneDef[], x: number, z: number): string |
 }
 
 // Hub-side shore candidates for a lake: three points on the hub-facing arc,
-// just inside the waterline. The brain's fishableAt probe skips dead ones at
+// just OUTSIDE the waterline (the bot must stand on land; the fishable probe
+// reaches the water ahead). The brain's fishableAt probe skips dead ones at
 // runtime, so the resolver stays seed-free.
 export function lakeShoreSpots(
   lake: { x: number; z: number; radius: number },
@@ -140,9 +141,12 @@ export function lakeShoreSpots(
   const dx = hub.x - lake.x;
   const dz = hub.z - lake.z;
   const base = Math.atan2(dx, dz);
-  const r = Math.max(1, lake.radius - 1);
+  const r = lake.radius + 2;
   const out: { x: number; z: number }[] = [];
-  for (const off of [-Math.PI / 4, 0, Math.PI / 4]) {
+  // Center of the hub-facing arc FIRST (the reachable shoreline in practice;
+  // the arc variants are fallbacks: the phase-18 smoke found a variant that
+  // sat on an unclimbable basin rim and stalled the walk).
+  for (const off of [0, -Math.PI / 4, Math.PI / 4]) {
     const a = base + off;
     out.push({
       x: Math.round((lake.x + Math.sin(a) * r) * 10) / 10,
@@ -150,6 +154,36 @@ export function lakeShoreSpots(
     });
   }
   return out;
+}
+
+// Probed shoreline scan (runtime, seed already bound by the caller): walk
+// each arc ray inward and take the first DRY point the offline probe says
+// fishable-from. Geometric shore points cannot see the real heightfield: the
+// phase-18 smoke lake has a broad shallow shelf on its hub side where the
+// player cannot even stand, while only the dock-side arc fishes. Returns up
+// to three standing points, scanning from the hub-facing angle around.
+export function scanShoreSpots(
+  lake: { x: number; z: number; radius: number },
+  hub: { x: number; z: number },
+  isLand: (x: number, z: number) => boolean,
+  probe: (x: number, z: number, facing: number) => boolean,
+): { x: number; z: number }[] {
+  const base = Math.atan2(hub.x - lake.x, hub.z - lake.z);
+  const spots: { x: number; z: number }[] = [];
+  const ARC_STEPS = 24;
+  for (let k = 0; k < ARC_STEPS && spots.length < 3; k++) {
+    const a = base + (k * 2 * Math.PI) / ARC_STEPS;
+    for (let r = lake.radius + 10; r >= lake.radius - 2; r -= 1) {
+      const x = lake.x + Math.sin(a) * r;
+      const z = lake.z + Math.cos(a) * r;
+      if (!isLand(x, z)) continue;
+      const facing = Math.atan2(lake.x - x, lake.z - z);
+      if (!probe(x, z, facing)) continue;
+      spots.push({ x: Math.round(x * 10) / 10, z: Math.round(z * 10) / 10 });
+      break;
+    }
+  }
+  return spots;
 }
 
 export function resolveTarget(itemId: string, deps: TargetResolverDeps): TargetSource[] {

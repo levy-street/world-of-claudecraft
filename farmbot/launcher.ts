@@ -17,16 +17,19 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { Api } from '../src/net/online';
 import { GATHER_NODE_TYPES, GATHER_NODES } from '../src/sim/content/gather_nodes';
-import { ZONES } from '../src/sim/data';
+import { ITEMS, ZONES } from '../src/sim/data';
 import { type FarmBotConfig, parseConfig } from './config';
 import {
   assembleConfig,
+  buildItemCatalog,
   buildZoneMeta,
   deriveZones,
+  describeSource,
   type Fbstat,
   FbstatFilter,
   type LauncherFormConfig,
   RingLog,
+  resolveSourcesPreview,
 } from './launcher_core';
 import { LAUNCHER_PAGE } from './launcher_page';
 import { installNodeShims } from './shims';
@@ -223,6 +226,23 @@ const server = createServer((req, res) => {
           nodeTypes: GATHER_NODE_TYPES,
           defaultServerUrl: 'https://worldofclaudecraft.com',
           zoneInfo: buildZoneMeta(ZONES, GATHER_NODES),
+          items: buildItemCatalog(ITEMS),
+        });
+        return;
+      }
+      if (req.method === 'POST' && url.pathname === '/api/sources') {
+        const body = (await readBody(req)) as Record<string, unknown>;
+        if (typeof body.itemId !== 'string' || body.itemId.length === 0) {
+          json(res, 400, { error: 'itemId is required' });
+          return;
+        }
+        // Reference-kit preview (starter tools, band 0, level 20): the bot
+        // re-resolves at startup against the real character.
+        const sources = resolveSourcesPreview(body.itemId);
+        json(res, 200, {
+          itemId: body.itemId,
+          sources,
+          preview: sources.map((s) => describeSource(s, body.itemId as string)),
         });
         return;
       }

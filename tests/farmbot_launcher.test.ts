@@ -2,12 +2,15 @@ import { describe, expect, it } from 'vitest';
 import { parseConfig } from '../farmbot/config';
 import {
   assembleConfig,
+  buildItemCatalog,
   buildZoneMeta,
   deriveZones,
+  describeSource,
   FbstatFilter,
   formatCopper,
   parseFbstatLine,
   RingLog,
+  resolveSourcesPreview,
 } from '../farmbot/launcher_core';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { ZONES } from '../src/sim/data';
@@ -39,6 +42,9 @@ const FORM = {
   marketSell: false,
   mountEnabled: false,
   mountBuyTraining: false,
+  targetItemId: '',
+  targetGoal: null,
+  targetSource: 'auto',
 };
 
 describe('farmbot launcher RingLog', () => {
@@ -170,6 +176,25 @@ describe('farmbot launcher assembleConfig', () => {
     expect((out.levelGrind as Record<string, unknown>).targetLevel).toBeUndefined();
     expect((out.levelGrind as Record<string, unknown>).lootRule).toBeUndefined();
   });
+
+  it('wires target mode into the document', () => {
+    const cfg = parseConfig(
+      assembleConfig({
+        ...FORM,
+        mode: 'target',
+        targetItemId: 'copper_ore',
+        targetGoal: 50,
+        targetSource: 'gather',
+      }),
+    );
+    expect(cfg.mode).toBe('target');
+    expect(cfg.target).toEqual({ itemId: 'copper_ore', goal: 50, source: 'gather' });
+    // 'auto' and a null goal stay out of the document (defaults carry them)
+    const bare = parseConfig(
+      assembleConfig({ ...FORM, mode: 'target', targetItemId: 'raw_marsh_pike' }),
+    );
+    expect(bare.target).toEqual({ itemId: 'raw_marsh_pike', goal: 0, source: 'auto' });
+  });
 });
 
 describe('farmbot launcher FBSTAT parsing', () => {
@@ -267,5 +292,37 @@ describe('farmbot launcher gold mode config', () => {
   it('omits goldFarm for non-gold modes', () => {
     const doc = assembleConfig({ ...FORM, mode: 'gather-fish' });
     expect('goldFarm' in doc).toBe(false);
+  });
+});
+
+describe('farmbot launcher target-mode seams (phase 18)', () => {
+  it('buildItemCatalog emits the compact picker shape for every item', () => {
+    const catalog = buildItemCatalog();
+    expect(catalog.length).toBeGreaterThan(100);
+    const copper = catalog.find((e) => e.id === 'copper_ore');
+    expect(copper).toBeDefined();
+    expect(typeof copper?.name).toBe('string');
+    expect(catalog.every((e) => typeof e.id === 'string' && typeof e.name === 'string')).toBe(true);
+  });
+
+  it('resolveSourcesPreview resolves with the reference starter kit', () => {
+    const copper = resolveSourcesPreview('copper_ore');
+    expect(copper[0]?.kind).toBe('gather'); // tier-1 pick in the kit
+    const trout = resolveSourcesPreview('raw_mirror_trout');
+    expect(trout[0]?.kind).toBe('fish'); // simple pole, band 0
+    // mirefen water stays gated: the kit's pole is effective tier 1
+    expect(resolveSourcesPreview('raw_marsh_pike')).toEqual([]);
+    expect(resolveSourcesPreview('not_a_real_item')).toEqual([]);
+  });
+
+  it('describeSource renders one line per source kind', () => {
+    const [gather] = resolveSourcesPreview('copper_ore');
+    expect(describeSource(gather, 'copper_ore')).toMatch(/\d+ ore nodes in eastbrook_vale/);
+    const [fish] = resolveSourcesPreview('raw_mirror_trout');
+    expect(describeSource(fish, 'raw_mirror_trout')).toBe(
+      'fish in eastbrook_vale, 46% per cast at your band',
+    );
+    const mob = resolveSourcesPreview('linen_scrap')[0];
+    expect(describeSource(mob, 'linen_scrap')).toMatch(/camps in \w+, \d+% per kill/);
   });
 });

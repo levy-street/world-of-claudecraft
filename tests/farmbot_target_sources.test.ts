@@ -3,6 +3,7 @@ import {
   defaultTargetResolverDeps,
   lakeShoreSpots,
   resolveTarget,
+  scanShoreSpots,
   type TargetResolverDeps,
 } from '../farmbot/target_sources';
 import type { InvSlot } from '../src/sim/types';
@@ -137,15 +138,46 @@ describe('farmbot target_sources resolveTarget (phase 16)', () => {
   });
 });
 
+describe('farmbot target_sources scanShoreSpots', () => {
+  it('takes the first dry probed point per arc, only where the probe passes', () => {
+    const lake = { x: 0, z: 0, radius: 10 };
+    const hub = { x: 100, z: 0 };
+    const isLand = (x: number, z: number) => Math.hypot(x, z) >= 9;
+    // water fishes only on the hub (east) side
+    const probe = (x: number) => x > 0;
+    const spots = scanShoreSpots(lake, hub, isLand, probe);
+    expect(spots.length).toBeGreaterThan(0);
+    expect(spots.length).toBeLessThanOrEqual(3);
+    for (const s of spots) {
+      expect(isLand(s.x, s.z)).toBe(true);
+      expect(s.x).toBeGreaterThan(0); // the dead west side yields nothing
+    }
+  });
+
+  it('returns nothing when no arc stands and fishes', () => {
+    const lake = { x: 0, z: 0, radius: 10 };
+    expect(
+      scanShoreSpots(
+        lake,
+        { x: 0, z: 0 },
+        () => true,
+        () => false,
+      ),
+    ).toEqual([]);
+  });
+});
+
 describe('farmbot target_sources lakeShoreSpots', () => {
-  it('emits three hub-side arc points just inside the waterline', () => {
+  it('emits three hub-side arc points just outside the waterline, center first', () => {
     const spots = lakeShoreSpots({ x: 0, z: 0, radius: 10 }, { x: 100, z: 0 });
     expect(spots.length).toBe(3);
-    // hub is due +x: every point sits ~9 from the center (0.1 rounding), x > 0
+    // hub is due +x: every point sits ~12 from the center (0.1 rounding), x > 0
     for (const s of spots) {
-      expect(Math.hypot(s.x, s.z)).toBeGreaterThan(8.9);
-      expect(Math.hypot(s.x, s.z)).toBeLessThan(9.1);
+      expect(Math.hypot(s.x, s.z)).toBeGreaterThan(11.9);
+      expect(Math.hypot(s.x, s.z)).toBeLessThan(12.1);
       expect(s.x).toBeGreaterThan(0);
     }
+    // the direct hub-side point leads (the reachable shoreline in practice)
+    expect(spots[0]).toEqual({ x: 12, z: 0 });
   });
 });

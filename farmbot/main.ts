@@ -12,6 +12,7 @@ import { readFileSync } from 'node:fs';
 import { Api, ClientWorld } from '../src/net/online';
 import { zoneAt } from '../src/sim/data';
 import { firstFishableSampleAhead } from '../src/sim/professions/fishing';
+import { groundHeight, waterLevelAt } from '../src/sim/world';
 import { createBrain, stepBrain } from './brain';
 import { type FarmBotConfig, parseConfig } from './config';
 import { installNodeShims } from './shims';
@@ -118,13 +119,16 @@ async function main(): Promise<void> {
   process.on('SIGINT', () => shutdown(0));
   process.on('SIGTERM', () => shutdown(0));
 
-  // Readiness: the server's hello frame flips ClientWorld.connected
-  // (online.ts onMessage). onDisconnect fires on any fatal rejection
-  // (bad auth, kick, exhausted reconnects).
+  // Readiness: the server's hello frame flips ClientWorld.connected, and the
+  // first snapshot (lastSnapAt) loads the mirror the target-mode resolver
+  // reads (bags for tools/rods, proficiency, level). Waiting only for the
+  // hello raced the snap and resolved 'no usable source' on an empty
+  // inventory (the phase-18 smoke). onDisconnect fires on any fatal
+  // rejection (bad auth, kick, exhausted reconnects).
   let ready = false;
   await new Promise<void>((resolve, reject) => {
     const poll = setInterval(() => {
-      if (world.connected) {
+      if (world.connected && world.lastSnapAt > 0) {
         ready = true;
         clearInterval(poll);
         resolve();
@@ -162,6 +166,7 @@ async function main(): Promise<void> {
   // authoritative server seed by now: createBrain runs after the hello wait.
   const brain = createBrain(config, {
     fishableAt: (x, z, facing) => firstFishableSampleAhead(x, z, facing, world.cfg.seed) !== null,
+    landAt: (x, z) => groundHeight(x, z, world.cfg.seed) >= waterLevelAt(x, z),
     zoneHubAt: (x, z) => zoneAt(x, z).hub,
     rng: Math.random,
     // Target mode's source resolver gates on this startup snapshot of the

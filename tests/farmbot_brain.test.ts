@@ -609,6 +609,20 @@ describe('farmbot brain: modes, spot rotation, node filters', () => {
     expect(world.harvests).toEqual([]);
   });
 
+  it('stops the spot walk at the fishable shoreline, not the tape', () => {
+    const { state, world } = idleBrain(
+      { fishing: { enabled: true, spots: [{ x: 50, z: 0 }] } },
+      { fishableAt: (x) => x >= 42 }, // water "starts" at x 42; the spot is at 50
+    );
+    world.player.pos = { x: 40, y: 0, z: 0 };
+    step(state, world, 0); // probe from 40 fails: keep walking
+    expect(state.mode).toBe('TRAVEL');
+    world.player.pos = { x: 43, y: 0, z: 0 };
+    const logs = step(state, world, 100); // 7 yd short of the spot: probe passes
+    expect(state.mode).toBe('FISH_CAST');
+    expect(logs.some((l) => l.includes('at fish spot 0'))).toBe(true);
+  });
+
   it('rotates through fishing.spots in order and wraps', () => {
     const { state, world } = idleBrain({
       fishing: {
@@ -620,11 +634,13 @@ describe('farmbot brain: modes, spot rotation, node filters', () => {
         castsPerSpot: 1,
       },
     });
-    // walk to spot 0
+    // walk to spot 0 (gate-aware: (0,0) is inside the eastbrook wall, so the
+    // first hop is the east gate crossing, not the straight line due +x)
     let logs = step(state, world, 0);
     expect(state.mode).toBe('TRAVEL');
     expect(world.moveInput.forward).toBe(true);
-    expect(world.facing).toBeCloseTo(Math.PI / 2); // spot 0 is due +x
+    const gate = { x: 27.443, z: 7.31 }; // real exported crossing (scaled to the radius)
+    expect(world.facing).toBeCloseTo(Math.atan2(gate.x, gate.z), 2);
     world.player.pos = { x: 50, y: 0, z: 0 };
     logs = step(state, world, 100);
     expect(state.mode).toBe('FISH_CAST');
@@ -676,7 +692,10 @@ describe('farmbot brain: modes, spot rotation, node filters', () => {
     expect(logs.some((l) => l.includes('spot 0 not fishable locally, skipping'))).toBe(true);
     expect(state.fishSpotIndex).toBe(1);
     expect(world.moveInput.forward).toBe(true); // walking to spot 1
-    expect(world.facing).toBeCloseTo(Math.PI / 2);
+    // gate-aware walk: (0,0) is inside the eastbrook wall, so the first hop
+    // is the east gate crossing
+    const gate = { x: 27.443, z: 7.31 };
+    expect(world.facing).toBeCloseTo(Math.atan2(gate.x, gate.z), 2);
   });
 
   it('pauses fishing when every rotation spot fails local validation', () => {
@@ -1060,7 +1079,9 @@ describe('farmbot brain: death handling (phase 3)', () => {
     const logs = step(state, world, 200); // revive tick already re-runs TRAVEL
     expect(logs.some((l) => l.includes('spot 0 near a death spot, skipping'))).toBe(true);
     expect(state.fishSpotIndex).toBe(1);
-    expect(world.facing).toBeCloseTo(Math.PI / 2); // walking to spot 1
+    // walking to spot 1, gate-aware: the first hop is the east gate crossing
+    const gate = { x: 27.443, z: 7.31 };
+    expect(world.facing).toBeCloseTo(Math.atan2(gate.x, gate.z), 2);
   });
 
   it('trips the circuit breaker exactly at maxDeaths', () => {
@@ -3703,6 +3724,16 @@ describe('farmbot brain: target mode (phase 17)', () => {
     const { state, world } = gatherBrain({ goal: 2, mailToWhenDone: 'Bankalt' });
     step(state, world, 0);
     world.inventory = [{ itemId: 'copper_ore', count: 2 }];
+    world.entities.set(
+      70,
+      makeEntity({
+        id: 70,
+        kind: 'object',
+        templateId: 'mailbox',
+        hostile: false,
+        pos: { x: 3, y: 0, z: 0 },
+      }),
+    );
     let logs = step(state, world, 100, [
       {
         type: 'gatherResult',
@@ -3717,16 +3748,6 @@ describe('farmbot brain: target mode (phase 17)', () => {
     expect(state.done).toBe(false);
     expect(state.targetPhase).toBe('mail');
     expect(logs.some((l) => l.includes('mailing copper_ore to Bankalt'))).toBe(true);
-    world.entities.set(
-      70,
-      makeEntity({
-        id: 70,
-        kind: 'object',
-        templateId: 'mailbox',
-        hostile: false,
-        pos: { x: 3, y: 0, z: 0 },
-      }),
-    );
     step(state, world, 200);
     expect(world.mails.length).toBe(1);
     expect(world.mails[0].to).toBe('Bankalt');

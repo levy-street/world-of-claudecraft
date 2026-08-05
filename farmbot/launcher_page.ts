@@ -113,6 +113,7 @@ export const LAUNCHER_PAGE = `<!DOCTYPE html>
       <option value="fish">Fish only</option>
       <option value="gold">Gold (dungeons)</option>
       <option value="level">Level (grind camps)</option>
+      <option value="target">Target material</option>
     </select>
     <div id="goldRow" style="display:none">
       <label for="goldDungeons">Dungeons (comma separated)</label>
@@ -133,6 +134,21 @@ export const LAUNCHER_PAGE = `<!DOCTYPE html>
         <label><input type="checkbox" id="zoneUp" checked> Zone up when the band is gray</label>
       </div>
       <div class="note">Gear upgrades default on for level mode (Advanced: economy below).</div>
+    </div>
+    <div id="targetRow" style="display:none">
+      <label for="targetItemId">Material (type to search)</label>
+      <input type="text" id="targetItemId" list="itemList" spellcheck="false" placeholder="copper_ore">
+      <datalist id="itemList"></datalist>
+      <div class="row">
+        <div><label for="targetGoal">Goal (0 = farm forever)</label><input type="number" id="targetGoal" min="0" value="0"></div>
+        <div><label for="targetSource">Source</label><select id="targetSource">
+          <option value="auto">Auto (best pick)</option>
+          <option value="gather">Gather only</option>
+          <option value="fish">Fish only</option>
+          <option value="mobs">Mobs only</option>
+        </select></div>
+      </div>
+      <div class="note" id="targetPreview">Pick a material to see where it comes from (starter-kit preview; the bot re-resolves for your character).</div>
     </div>
     <label for="zone">Zone</label>
     <select id="zone"></select>
@@ -196,6 +212,8 @@ export const LAUNCHER_PAGE = `<!DOCTYPE html>
       <div class="stat"><div class="v" id="lvXp">-</div><div class="k">xp</div></div>
       <div class="stat"><div class="v" id="lvXpGained">0</div><div class="k">xp gained</div></div>
       <div class="stat"><div class="v" id="lvXpRate">-</div><div class="k">xp/hour</div></div>
+      <div class="stat"><div class="v" id="lvTarget">-</div><div class="k">target</div></div>
+      <div class="stat"><div class="v" id="lvTargetRate">-</div><div class="k">mats/hour (eta)</div></div>
     </div>
     <label>HP</label><div class="bar hp"><div id="hpFill" style="width:0"></div></div>
     <label>Mana / resource</label><div class="bar mana"><div id="manaFill" style="width:0"></div></div>
@@ -222,7 +240,7 @@ const ROTATION_KEY = 'farmbot-launcher-rotation';
 const PERSIST_IDS = ['serverUrl','username','character','mode','goldDungeons','goldRestBelowPct','zone','maxNodeTier','abilitySlots','maxRuntimeMinutes',
   'fishingEnabled','spotX','spotZ','castsPerSpot','fullPolicy','eatItemId','eatBelowHpPct',
   'drinkItemId','drinkBelowManaPct','targetLevel','lootRule','zoneUp',
-  'gearUpgrades','marketSell','mountEnabled','mountBuyTraining'];
+  'gearUpgrades','marketSell','mountEnabled','mountBuyTraining','targetItemId','targetGoal','targetSource'];
 let nodeTypeValues = [];
 let zoneInfoById = {};
 let running = false;
@@ -265,6 +283,7 @@ function updateModeRows() {
   const m = $('mode').value;
   $('goldRow').style.display = m === 'gold' ? '' : 'none';
   $('levelRow').style.display = m === 'level' ? '' : 'none';
+  $('targetRow').style.display = m === 'target' ? '' : 'none';
 }
 
 function applyForm(data) {
@@ -439,6 +458,9 @@ function gatherConfig() {
     targetLevel: numOrNull('targetLevel'),
     lootRule: $('lootRule').value,
     zoneUp: $('zoneUp').checked,
+    targetItemId: $('targetItemId').value.trim(),
+    targetGoal: numOrNull('targetGoal'),
+    targetSource: $('targetSource').value,
     gearUpgrades: $('gearUpgrades').checked,
     marketSell: $('marketSell').checked,
     mountEnabled: $('mountEnabled').checked,
@@ -544,6 +566,22 @@ async function pollLive() {
     const xpGained = Number(stat.stats && stat.stats.xpGained) || 0;
     $('lvXpGained').textContent = xpGained;
     $('lvXpRate').textContent = hours > 0.001 ? Math.round(xpGained / hours) : '-';
+    // Target mode: count/goal, mats per hour, and a rough ETA to the goal.
+    if (stat.target) {
+      const t = stat.target;
+      $('lvTarget').textContent = t.goal > 0 ? t.count + ' / ' + t.goal : String(t.count);
+      if (hours > 0.001) {
+        const rate = t.count / hours;
+        let eta = '';
+        if (t.goal > t.count && rate > 0.001) eta = ' (' + fmtUptime(((t.goal - t.count) / rate) * 3600000) + ')';
+        $('lvTargetRate').textContent = rate.toFixed(1) + eta;
+      } else {
+        $('lvTargetRate').textContent = '-';
+      }
+    } else {
+      $('lvTarget').textContent = '-';
+      $('lvTargetRate').textContent = '-';
+    }
     $('hpFill').style.width = (stat.maxHp ? Math.round((100 * stat.hp) / stat.maxHp) : 0) + '%';
     $('manaFill').style.width = (stat.maxResource ? Math.round((100 * stat.resource) / stat.maxResource) : 0) + '%';
     renderMap(stat);
@@ -619,6 +657,33 @@ for (const id of PERSIST_IDS) $(id).addEventListener('change', saveForm);
 $('rotateMinutes').addEventListener('change', saveRotation);
 $('rotateMinutes').value = readRotation().minutes;
 
+// --- target mode picker + source preview ----------------------------------
+let sourcesFetchSeq = 0;
+async function refreshTargetPreview() {
+  const itemId = $('targetItemId').value.trim();
+  const el = $('targetPreview');
+  if (!itemId) {
+    el.textContent = 'Pick a material to see where it comes from (starter-kit preview; the bot re-resolves for your character).';
+    return;
+  }
+  const seq = ++sourcesFetchSeq;
+  try {
+    const r = await api('/api/sources', { itemId });
+    if (seq !== sourcesFetchSeq) return; // a newer pick landed first
+    el.textContent = r.preview.length > 0
+      ? r.preview.join(' | ')
+      : 'No usable source for ' + itemId + ' (unknown item, or every source gated).';
+  } catch (err) {
+    if (seq === sourcesFetchSeq) el.textContent = 'source lookup failed: ' + err.message;
+  }
+}
+let targetDebounce = 0;
+$('targetItemId').addEventListener('input', () => {
+  clearTimeout(targetDebounce);
+  targetDebounce = setTimeout(refreshTargetPreview, 350);
+});
+$('targetItemId').addEventListener('change', refreshTargetPreview);
+
 (async function init() {
   const meta = await api('/api/meta');
   if (!$('serverUrl').value) $('serverUrl').value = meta.defaultServerUrl;
@@ -637,6 +702,13 @@ $('rotateMinutes').value = readRotation().minutes;
     zone.appendChild(opt);
   }
   for (const info of meta.zoneInfo || []) zoneInfoById[info.id] = info;
+  const itemList = $('itemList');
+  for (const it of meta.items || []) {
+    const opt = document.createElement('option');
+    opt.value = it.id;
+    opt.label = it.name + (it.quality ? ' (' + it.quality + ')' : '');
+    itemList.appendChild(opt);
+  }
   loadForm();
   refreshProfileUi();
   refreshStatus();

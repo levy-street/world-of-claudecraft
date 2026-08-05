@@ -120,6 +120,7 @@ import {
 import {
   defaultTargetResolverDeps,
   resolveTarget,
+  scanShoreSpots,
   type TargetResolverDeps,
   type TargetSource,
 } from './target_sources';
@@ -253,6 +254,10 @@ export interface BrainDeps {
   zoneGraph?: ZoneGraph;
   // Level-mode camp/zone tables; defaults to the real CAMPS/MOBS/ZONES.
   grindTables?: GrindTables;
+  // Land probe (main.ts binds groundHeight/waterLevelAt with the world
+  // seed): with fishableAt, target-mode fish spots are re-scanned against
+  // the real heightfield at startup (scanShoreSpots).
+  landAt?: (x: number, z: number) => boolean;
   // Target mode (mode 'target'): the character context the source resolver
   // reads at startup (bags for tools/rods, the gatheringProficiency mirror,
   // level). Tests override targetDeps with synthetic tables instead.
@@ -455,24 +460,43 @@ export function createBrain(config: FarmBotConfig, deps: BrainDeps = {}): BrainS
         ? resolved
         : resolved.filter((s) => s.kind === (wanted === 'mobs' ? 'mob' : wanted));
     targetSource = targetSources[0] ?? null;
-    if (targetSource) {
+    const src = targetSource;
+    if (src) {
       // Node picking and the fish spot machinery key off the zone fields, so
       // point this session's copies at the source zone.
-      config.zoneId = targetSource.zoneId;
-      if (targetSource.kind === 'gather') {
-        const ids = new Set(targetSource.nodeIds);
+      config.zoneId = src.zoneId;
+      if (src.kind === 'gather') {
+        const ids = new Set(src.nodeIds);
         nodes = nodes.filter((n) => ids.has(n.id));
         config.fishing = { ...config.fishing, enabled: false, spots: [] };
-      } else if (targetSource.kind === 'fish') {
+      } else if (src.kind === 'fish') {
         nodes = []; // the fish flow owns every tick; no node route
-        config.fishing = { ...config.fishing, enabled: true, spots: targetSource.spots };
+        // Re-scan the shoreline against the real heightfield when the probes
+        // are bound (the resolver's geometric points are only a seed-free
+        // fallback): picks the arcs that actually stand and fish.
+        let spots = src.spots;
+        if (deps.fishableAt && deps.landAt) {
+          const zone = resolverDeps.zones.find((z) => z.id === src.zoneId);
+          if (zone && zone.lakes.length > 0) {
+            const scanned = zone.lakes.flatMap((lake) =>
+              scanShoreSpots(
+                lake,
+                zone.hub,
+                deps.landAt as (x: number, z: number) => boolean,
+                (x, z, facing) => deps.fishableAt?.(x, z, facing) ?? false,
+              ),
+            );
+            if (scanned.length > 0) spots = scanned;
+          }
+        }
+        config.fishing = { ...config.fishing, enabled: true, spots };
       } else {
         // Mob source: the level-mode camp loop, but loot-driven, so both xp
         // gates come off: xpValue always scores (gray mobs still drop the
         // mat) and the camp mob levels pin to the player (the pickCamp band
         // [level-2, level+3] is an xp-curve concern, meaningless here).
         const pinnedMobs = { ...grindTables.mobs };
-        const campMobIds = new Set(targetSource.camps.map((c) => c.mobId));
+        const campMobIds = new Set(src.camps.map((c) => c.mobId));
         const lvl = Math.max(1, resolverDeps.playerLevel);
         for (const [mobId, template] of Object.entries(pinnedMobs)) {
           if (!campMobIds.has(mobId)) continue;
@@ -480,7 +504,7 @@ export function createBrain(config: FarmBotConfig, deps: BrainDeps = {}): BrainS
         }
         grindTables = {
           ...grindTables,
-          camps: targetSource.camps,
+          camps: src.camps,
           mobs: pinnedMobs,
           xpValue: () => 1,
         };
@@ -491,7 +515,7 @@ export function createBrain(config: FarmBotConfig, deps: BrainDeps = {}): BrainS
           zoneUp: false,
         };
         config.fishing = { ...config.fishing, enabled: false, spots: [] };
-        levelZoneIdPreset = targetSource.zoneId;
+        levelZoneIdPreset = src.zoneId;
       }
     }
   }
@@ -1777,18 +1801,9 @@ function stepTarget(state: BrainState, world: BotWorld, nowMs: number, logs: str
     stepTargetMail(state, world, nowMs, logs);
     return true;
   }
-  if (cfg.goal > 0 && state.stats.targetCount >= cfg.goal) {
-    if (cfg.mailToWhenDone) {
-      state.targetPhase = 'mail';
-      logs.push(`target: goal ${cfg.goal} reached, mailing ${cfg.itemId} to ${cfg.mailToWhenDone}`);
-    } else {
-      world.sendLogout();
-      state.done = true;
-      logs.push(`target: goal ${cfg.goal} ${cfg.itemId} reached, logging out`);
-      alert(state, 'target-goal', `target: goal ${cfg.goal} ${cfg.itemId} reached`, nowMs);
-    }
-    return true;
-  }
+  // The goal stop itself lives in stepBrain: the fish flow chains casts
+  // without ever re-entering TRAVEL, so a TRAVEL-side check never fires
+  // (the phase-18 smoke blew 24 past a goal of 3).
   // Cross-zone source: arm the waypoint chain (the zonePath branch above
   // drives the leg from the next tick, like stepLevel's zone-up).
   const from = state.zoneIdAt(p.pos.x, p.pos.z);
@@ -2042,9 +2057,40 @@ function stepTravel(state: BrainState, world: BotWorld, nowMs: number, logs: str
           }
           state.fishSpotIndex = idx;
         }
-        const steer = steerToward(pos2(p), p.facing, spots[idx], FISH_SPOT_ARRIVE_RANGE);
-        if (!steer.arrived) {
-          world.setMoveInput(steer.input, steer.facing);
+        // Shore arrival by probe, not by tape: when the offline water probe
+        // is injected, walking toward the spot ends as soon as the water is
+        // fishable from where we stand (any facing; the spot coordinate only
+        // steers the walk, and its bearing can point away from the water).
+        // The server validates the cast with the same math and seed, so a
+        // local pass is an exact arrival test, and the fish-cast probe
+        // rotation finds the wet facing from here.
+        if (state.fishableAt) {
+          for (let i = 0; i < FISH_MAX_PROBES; i++) {
+            if (state.fishableAt(p.pos.x, p.pos.z, normAngle(i * FISH_PROBE_STEP))) {
+              stopMoving(world);
+              transition(state, 'FISH_CAST', logs, `at fish spot ${idx}`);
+              return;
+            }
+          }
+        }
+        if (distance2(pos2(p), spots[idx]) > FISH_SPOT_ARRIVE_RANGE * FISH_SPOT_ARRIVE_RANGE) {
+          // Gate-aware walk: resolver/configured spots can sit across a
+          // village wall (the phase-18 smoke: a straight steer pressed the
+          // bot into the eastbrook wall for the whole session).
+          const status = stepGuidedWalk(
+            state,
+            world,
+            nowMs,
+            logs,
+            `fishspot:${idx}`,
+            spots[idx],
+            `fish spot ${idx}`,
+          );
+          if (status === 'gave-up') {
+            state.walkGiveUpKey = null;
+            state.fishSpotIndex = (idx + 1) % spots.length;
+            logs.push(`fishing: spot ${idx} unreachable, skipping it`);
+          }
           return;
         }
         stopMoving(world);
@@ -2890,6 +2936,30 @@ export function stepBrain(
         // banked; the credit pool must not leak into the next acquisition).
         state.targetEventCredit = Math.max(0, state.targetEventCredit + delta);
       }
+    }
+  }
+
+  // Target goal stop: checked here, not in stepTarget, because the fish flow
+  // chains casts for minutes without re-entering TRAVEL (the phase-18 smoke
+  // blew 24 catches past a goal of 3 before the first TRAVEL tick).
+  if (
+    state.config.mode === 'target' &&
+    state.targetPhase === 'farm' &&
+    state.config.target.goal > 0 &&
+    state.stats.targetCount >= state.config.target.goal
+  ) {
+    const cfg = state.config.target;
+    if (cfg.mailToWhenDone) {
+      state.targetPhase = 'mail';
+      stopMoving(world);
+      logs.push(`target: goal ${cfg.goal} reached, mailing ${cfg.itemId} to ${cfg.mailToWhenDone}`);
+      transition(state, 'TRAVEL', logs);
+    } else {
+      world.sendLogout();
+      state.done = true;
+      logs.push(`target: goal ${cfg.goal} ${cfg.itemId} reached, logging out`);
+      alert(state, 'target-goal', `target: goal ${cfg.goal} ${cfg.itemId} reached`, nowMs);
+      return logs;
     }
   }
 
