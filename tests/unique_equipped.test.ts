@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  isUniqueEquipped,
-  uniqueEquipConflictSlot,
-} from '../src/sim/equipment_rules';
+import { isUniqueEquipped, uniqueEquipConflictSlot } from '../src/sim/equipment_rules';
 import { Sim } from '../src/sim/sim';
 import type { ItemDef } from '../src/sim/types';
 
@@ -56,9 +53,7 @@ describe('unique-equipped pure rules (equipment_rules)', () => {
 
   it('ignores a slot this equip displaces', () => {
     const equipment = { mainhand: 'test_legendary_ring', offhand: 'other' };
-    expect(
-      uniqueEquipConflictSlot(legendaryRing, equipment, ['offhand', 'mainhand']),
-    ).toBeNull();
+    expect(uniqueEquipConflictSlot(legendaryRing, equipment, ['offhand', 'mainhand'])).toBeNull();
   });
 
   it('never conflicts for a non-legendary duplicate or a different id', () => {
