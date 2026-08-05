@@ -15,22 +15,42 @@
 // sample of diffs (sim, content, render, ui, i18n, server) is the bar for
 // promoting gate:select to the merge contract.
 //
+// Discovery and changed-path collection are imported from lib/gate_discovery.mjs
+// rather than re-implemented: the first cut duplicated both and they had already
+// drifted, so the validator was validating a different plan than the gate ran.
+//
 // Deliberately NOT part of any gate: it is strictly slower than the full gate
 // (it runs the suite plus the selection legs). Run it in the background, on a
 // schedule, or over a batch of recent commits.
 import { spawnSync } from 'node:child_process';
-import { appendFileSync, readdirSync, readFileSync } from 'node:fs';
+import { appendFileSync, mkdirSync, readdirSync, readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  chunkFileArgs,
+  listChangedPaths,
+  listTestFiles,
+  resolveSelectBase,
+} from './lib/gate_discovery.mjs';
 import { resolveAvailableMemoryBytes } from './lib/gate_memory.mjs';
 import { buildSelectPlan } from './lib/gate_select_plan.mjs';
 import { computeGateWorkers, resolveGateWorkerTierCap } from './lib/gate_workers.mjs';
-import { buildAlwaysRunSet, classifyTestSource } from './lib/test_visibility.mjs';
+import {
+  buildAlwaysRunSet,
+  buildHelperImportPattern,
+  classifyTestSource,
+  FS_HELPER_DIRS,
+  HELPER_FS_PATTERN,
+} from './lib/test_visibility.mjs';
 
 const shell = process.platform === 'win32';
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const LOG = process.env.GATE_SHADOW_LOG ?? path.join(repoRoot, 'tmp', 'gate-shadow.jsonl');
+const TMP = path.join(repoRoot, 'tmp');
+const LOG = process.env.GATE_SHADOW_LOG ?? path.join(TMP, 'gate-shadow.jsonl');
+
+/** @param {string} cmd @param {string[]} args */
+const git = (cmd, args) => spawnSync(cmd, args, { encoding: 'utf8', shell, cwd: repoRoot });
 
 const workers = computeGateWorkers({
   cpuCount: os.availableParallelism(),
@@ -42,135 +62,151 @@ const workers = computeGateWorkers({
   tierCap: resolveGateWorkerTierCap(process.env.GATE_WORKER_TIER),
 });
 
-/** @param {string} dir @param {string[]} out */
-function listTestFiles(dir, out = []) {
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      if (
-        ['node_modules', 'browser', '__snapshots__', 'fixtures', 'helpers'].includes(entry.name)
-      ) {
-        continue;
-      }
-      listTestFiles(full, out);
-      continue;
-    }
-    if (/\.test\.[cm]?ts$/.test(entry.name)) {
-      out.push(path.relative(repoRoot, full).split(path.sep).join('/'));
-    }
-  }
-  return out;
-}
-
-function changedPaths() {
-  const out = new Set();
-  const base = process.env.GATE_SELECT_BASE;
-  const cmds = base ? [['diff', '--name-only', `${base}...HEAD`]] : [];
-  cmds.push(['diff', '--name-only', 'HEAD']);
-  for (const args of cmds) {
-    const r = spawnSync('git', args, { encoding: 'utf8', shell, cwd: repoRoot });
-    if (r.status === 0 && r.stdout) {
-      for (const l of r.stdout.split('\n')) if (l.trim()) out.add(l.trim());
-    }
-  }
-  return [...out];
-}
-
 /**
- * Run vitest with a JSON reporter and return per-file outcomes.
+ * Run one vitest invocation and return per-file outcomes.
+ *
+ * A missing or unparseable report THROWS. The first cut returned empty sets on a
+ * parse failure, which reads downstream as "nothing failed and nothing ran", so
+ * the tool built to detect silent gaps would itself have exited 0 silently.
+ *
+ * @param {string} tag
  * @param {string[]} args
  * @returns {{ ran: Set<string>, failed: Set<string> }}
  */
-function runVitest(args) {
-  const outFile = path.join(repoRoot, 'tmp', `shadow-${args[0]}.json`);
+function runVitest(tag, args) {
+  mkdirSync(TMP, { recursive: true });
+  const outFile = path.join(TMP, `shadow-${tag}.json`);
   spawnSync(
     'npx',
     ['--no-install', 'vitest', ...args, '--reporter=json', `--outputFile=${outFile}`],
-    { stdio: 'inherit', shell, cwd: repoRoot, env: { ...process.env, WOC_SKIP_PRETEST: '1' } },
+    // NOTE: no WOC_SKIP_PRETEST here. It is an npm lifecycle variable and `npx
+    // vitest` never triggers pretest, so setting it was inert.
+    { stdio: 'inherit', shell, cwd: repoRoot },
   );
   const ran = new Set();
   const failed = new Set();
+  let report;
   try {
-    const report = JSON.parse(readFileSync(outFile, 'utf8'));
-    for (const suite of report.testResults ?? []) {
-      const rel = path.relative(repoRoot, suite.name).split(path.sep).join('/');
-      ran.add(rel);
-      if (suite.status === 'failed') failed.add(rel);
-    }
+    report = JSON.parse(readFileSync(outFile, 'utf8'));
   } catch (err) {
-    console.error(`[gate:shadow] could not parse ${outFile}: ${err.message}`);
+    throw new Error(
+      `vitest leg "${tag}" produced no readable report at ${outFile}: ${err.message}`,
+    );
+  }
+  for (const suite of report.testResults ?? []) {
+    const rel = path.relative(repoRoot, suite.name).split(path.sep).join('/');
+    ran.add(rel);
+    if (suite.status === 'failed') failed.add(rel);
   }
   return { ran, failed };
 }
 
-const testFiles = listTestFiles(path.join(repoRoot, 'tests'));
+const io = { root: repoRoot, readdirSync, join: path.join, relative: path.relative, sep: path.sep };
+
+const fsHelpers = FS_HELPER_DIRS.flatMap((dir) => {
+  const full = path.join(repoRoot, dir);
+  try {
+    return readdirSync(full, { withFileTypes: true })
+      .filter((e) => e.isFile() && /\.[cm]?ts$/.test(e.name) && !/\.(test|spec)\./.test(e.name))
+      .filter((e) => HELPER_FS_PATTERN.test(readFileSync(path.join(full, e.name), 'utf8')))
+      .map((e) => `${dir}/${e.name.replace(/\.[cm]?ts$/, '')}`);
+  } catch {
+    return [];
+  }
+});
+const helperImportPattern = buildHelperImportPattern(fsHelpers);
+
+const testFiles = listTestFiles({ ...io, dir: path.join(repoRoot, 'tests') });
 const { alwaysRun } = buildAlwaysRunSet(
   testFiles.map((file) => ({
     file,
-    visibility: classifyTestSource(readFileSync(path.join(repoRoot, file), 'utf8')),
+    visibility: classifyTestSource(readFileSync(path.join(repoRoot, file), 'utf8'), {
+      helperImportPattern,
+    }),
   })),
 );
-const plan = buildSelectPlan({ changedPaths: changedPaths(), alwaysRunFiles: alwaysRun });
 
-console.log(`[gate:shadow] plan mode=${plan.mode} (${plan.reason})`);
+const { base, reason: baseReason } = resolveSelectBase({ env: process.env, run: git });
+if (!base) {
+  console.error(`[gate:shadow] cannot resolve a branch base: ${baseReason}`);
+  process.exit(1);
+}
+let changedPaths;
+try {
+  changedPaths = listChangedPaths({ base, run: git });
+} catch (err) {
+  console.error(`[gate:shadow] ${err.message}`);
+  process.exit(1);
+}
+
+const plan = buildSelectPlan({ changedPaths, alwaysRunFiles: alwaysRun });
+console.log(`[gate:shadow] base=${base} (${baseReason}); plan mode=${plan.mode} (${plan.reason})`);
 if (plan.mode === 'full') {
   console.log('[gate:shadow] planner already falls back to the full suite: no escape possible.');
   process.exit(0);
 }
 
-console.log('[gate:shadow] leg 1/3: always-run set');
-const always = runVitest(['run', ...plan.alwaysRunFiles, `--maxWorkers=${workers}`]);
-console.log('[gate:shadow] leg 2/3: related');
-const related =
-  plan.relatedSources.length > 0
-    ? runVitest([
-        'related',
-        ...plan.relatedSources,
-        '--run',
-        '--passWithNoTests',
-        `--maxWorkers=${workers}`,
-      ])
-    : { ran: new Set(), failed: new Set() };
-console.log('[gate:shadow] leg 3/3: full suite');
-const full = runVitest(['run', `--maxWorkers=${workers}`]);
-
-const selected = new Set([...always.ran, ...related.ran]);
-const escapes = [...full.failed].filter((f) => !selected.has(f)).sort();
-
-const record = {
-  branch:
-    spawnSync('git', ['branch', '--show-current'], {
-      encoding: 'utf8',
-      shell,
-      cwd: repoRoot,
-    }).stdout?.trim() ?? '',
-  head:
-    spawnSync('git', ['rev-parse', '--short', 'HEAD'], {
-      encoding: 'utf8',
-      shell,
-      cwd: repoRoot,
-    }).stdout?.trim() ?? '',
-  planMode: plan.mode,
-  selectedCount: selected.size,
-  fullCount: full.ran.size,
-  fullFailures: [...full.failed].sort(),
-  escapes,
-};
-
 try {
-  appendFileSync(LOG, `${JSON.stringify(record)}\n`);
-} catch {
-  // tmp/ may not exist on a fresh checkout; the console summary is the signal.
-}
+  const selected = new Set();
+  const chunks = chunkFileArgs({ files: plan.alwaysRunFiles });
+  chunks.forEach((files, i) => {
+    console.log(`[gate:shadow] always-run leg ${i + 1}/${chunks.length}`);
+    for (const f of runVitest(`always-${i}`, ['run', ...files, `--maxWorkers=${workers}`]).ran) {
+      selected.add(f);
+    }
+  });
 
-console.log(`\n[gate:shadow] selected ${selected.size} of ${full.ran.size} test files`);
-if (escapes.length === 0) {
-  console.log('[gate:shadow] PASS: no escapes (every full-suite failure was also selected)');
-  process.exit(0);
+  if (plan.relatedSources.length > 0) {
+    console.log('[gate:shadow] related leg');
+    const related = runVitest('related', [
+      'related',
+      ...plan.relatedSources,
+      '--run',
+      '--passWithNoTests',
+      `--maxWorkers=${workers}`,
+    ]);
+    for (const f of related.ran) selected.add(f);
+  }
+
+  console.log('[gate:shadow] full suite leg');
+  const full = runVitest('full', ['run', `--maxWorkers=${workers}`]);
+
+  // A full leg that collected nothing means the comparison is meaningless, and
+  // reporting "no escapes" off it would be exactly the false confidence this
+  // tool exists to prevent.
+  if (full.ran.size === 0) {
+    throw new Error('full suite leg collected 0 test files: cannot compare');
+  }
+
+  const escapes = [...full.failed].filter((f) => !selected.has(f)).sort();
+  const record = {
+    branch: git('git', ['branch', '--show-current']).stdout?.trim() ?? '',
+    head: git('git', ['rev-parse', '--short', 'HEAD']).stdout?.trim() ?? '',
+    base,
+    planMode: plan.mode,
+    selectedCount: selected.size,
+    fullCount: full.ran.size,
+    fullFailures: [...full.failed].sort(),
+    escapes,
+  };
+  mkdirSync(path.dirname(LOG), { recursive: true });
+  appendFileSync(LOG, `${JSON.stringify(record)}\n`);
+
+  console.log(`\n[gate:shadow] selected ${selected.size} of ${full.ran.size} test files`);
+  if (escapes.length === 0) {
+    console.log('[gate:shadow] PASS: no escapes (every full-suite failure was also selected)');
+    process.exit(0);
+  }
+  console.error(
+    `[gate:shadow] ESCAPES (${escapes.length}): selection would have shipped these green`,
+  );
+  for (const e of escapes) console.error(`  - ${e}`);
+  console.error(
+    '[gate:shadow] each escape names a missing rule in scripts/lib/test_visibility.mjs',
+  );
+  process.exit(1);
+} catch (err) {
+  console.error(`[gate:shadow] ABORT: ${err.message}`);
+  console.error('[gate:shadow] no verdict: treat this run as inconclusive, not as a pass.');
+  process.exit(2);
 }
-console.error(
-  `[gate:shadow] ESCAPES (${escapes.length}): selection would have shipped these green`,
-);
-for (const e of escapes) console.error(`  - ${e}`);
-console.error('[gate:shadow] each escape names a missing rule in scripts/lib/test_visibility.mjs');
-process.exit(1);

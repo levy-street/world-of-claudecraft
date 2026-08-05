@@ -7,6 +7,10 @@ const packageJson = JSON.parse(
   readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
 ) as { packageManager?: string };
 const gate = readFileSync(new URL('../scripts/gate.mjs', import.meta.url), 'utf8');
+const preflightCode = readFileSync(
+  new URL('../scripts/lib/gate_preflight.mjs', import.meta.url),
+  'utf8',
+);
 // gate.mjs with its comments removed, BOTH kinds. A raw-substring pin on a step
 // is not a pin at all: commenting the step out leaves the substring in the file,
 // so the assertion stays green while the local gate quietly stops running it.
@@ -170,8 +174,13 @@ describe('CI workflow parity', () => {
     // (sfx_conform.mjs, export_bundle.mjs) bind to the static packages directly.
     // Either way no CI job apt-installs system FFmpeg; reintroducing the install
     // step would put its cost back on every job it touches.
+    // The preflight itself now lives in scripts/lib/gate_preflight.mjs so
+    // gate.mjs and gate_select.mjs share one copy; the pin follows it there and
+    // additionally holds gate.mjs to still invoking it, which is what actually
+    // makes the resolution reachable.
     expect(workflow).not.toContain('apt-get');
-    expect(gateCode).toContain("from './sfx/ffmpeg_paths.mjs'");
+    expect(preflightCode).toContain("from '../sfx/ffmpeg_paths.mjs'");
+    expect(gateCode).toContain('runGatePreflights');
   });
 
   it('runs the opt-in Chromium browser regressions in their own CI job', () => {

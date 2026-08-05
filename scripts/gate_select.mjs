@@ -1,35 +1,32 @@
 // The SELECTIVE gate (`npm run gate:select`).
 //
-// Positioning, because this repo now has three gate paths and the difference
+// Positioning, because this repo has several gate paths and the difference
 // between them is the whole point:
 //
-//   gate:fast   day loop ONLY. Five steps: malware, changed-file biome, two
-//               guard tests, incremental check:ts, and `vitest related`. It skips
-//               i18n gen + freshness, wiki content, sfx, browser, the admin and
-//               bot typechecks, and ALL FOUR BUILDS. A change that breaks the
-//               client bundle or the admin Svelte types passes it cleanly. Never
-//               a merge bar.
+//   gate:fast   day loop ONLY. A high-signal subset that drops most of the
+//               non-test steps, including every build and the admin/bot
+//               typechecks, so a change breaking the client bundle or the admin
+//               Svelte types passes it cleanly. Never a merge bar.
 //
 //   gate        the historical merge bar. Every step, plus one full unsharded
-//               vitest over all ~2200 test files. Provably complete, and on a
-//               14-core/24 GiB host the vitest step alone measures ~751 s.
+//               vitest over the whole suite. Provably complete, and its vitest
+//               step alone dominates the run.
 //
-//   gate:select THIS FILE. The FULL gate's step list, unchanged, with exactly one
-//               substitution: the full vitest run becomes (always-run set) +
-//               (`vitest related` on the diff). Every non-test check stays
-//               identical to `gate`, so build, typecheck, freshness, sfx, malware
-//               and browser coverage are not reduced at all. Only the test
-//               selection is narrowed, and only for changes the planner can
+//   gate:select THIS FILE. The FULL gate's step list, plus the same preflights,
+//               with exactly one substitution: the full vitest run becomes an
+//               always-run leg plus a `vitest related` leg. Every non-test check
+//               stays identical to `gate`, so build, typecheck, freshness, sfx,
+//               malware and browser coverage are not reduced at all. Only the
+//               test selection narrows, and only for changes the planner can
 //               reason about.
 //
 // Why narrowing tests is safe enough to ship a PR on. `vitest related` selects on
-// the STATIC IMPORT GRAPH, which models ~80% of this suite correctly and misses
-// the rest silently. So this gate never trusts the graph alone: it classifies
-// every test file first (scripts/lib/test_visibility.mjs) and ALWAYS runs the
-// ones whose coverage reaches outside the graph (disk scans, subprocesses,
-// dynamic imports), currently ~490 files at roughly 100 s. `related` is used only
-// for the remainder. Any change the planner cannot classify drops the whole run
-// to the full suite.
+// the STATIC IMPORT GRAPH and misses the rest SILENTLY (a skipped test does not
+// error; the gate still prints PASS). So the graph is never trusted alone: every
+// test file is classified first (lib/test_visibility.mjs) and the ones reaching
+// outside the graph (disk scans, subprocesses, dynamic imports, fs-touching
+// shared helpers) ALWAYS run. `related` covers only the graph-visible remainder.
+// Any change the planner cannot classify drops the whole run to the full suite.
 //
 // What it still cannot prove. Selection is empirically complete, not provably
 // complete: the out-of-graph pattern list is a floor. That is why this path is
@@ -40,19 +37,44 @@ import { readdirSync, readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  chunkFileArgs,
+  listChangedPaths,
+  listTestFiles,
+  resolveSelectBase,
+} from './lib/gate_discovery.mjs';
 import { resolveAvailableMemoryBytes } from './lib/gate_memory.mjs';
+import { runGatePreflights } from './lib/gate_preflight.mjs';
 import {
   buildAlwaysRunArgs,
   buildFullSuiteArgs,
   buildRelatedArgs,
   buildSelectPlan,
 } from './lib/gate_select_plan.mjs';
-import { buildFullGateSteps } from './lib/gate_steps.mjs';
+import {
+  buildFullGateSteps,
+  I18N_RELEASE_TIER_SUITES,
+  PRE_VITEST_STEP_NAME,
+} from './lib/gate_steps.mjs';
 import { computeGateWorkers, resolveGateWorkerTierCap } from './lib/gate_workers.mjs';
-import { buildAlwaysRunSet, classifyTestSource } from './lib/test_visibility.mjs';
+import {
+  buildAlwaysRunSet,
+  buildHelperImportPattern,
+  classifyTestSource,
+  FS_HELPER_DIRS,
+  HELPER_FS_PATTERN,
+} from './lib/test_visibility.mjs';
 
 const shell = process.platform === 'win32';
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+/** @param {string} cmd @param {string[]} args */
+const git = (cmd, args) => spawnSync(cmd, args, { encoding: 'utf8', shell, cwd: repoRoot });
+
+// Same preflights as gate.mjs (dependency sync, then ffmpeg/ffprobe by
+// execution). They exist to turn a confusing mid-gate failure into a clear early
+// one, and this path is the one people run most.
+runGatePreflights({ label: 'gate:select', shell });
 
 const workers = computeGateWorkers({
   cpuCount: os.availableParallelism(),
@@ -64,130 +86,125 @@ const workers = computeGateWorkers({
   tierCap: resolveGateWorkerTierCap(process.env.GATE_WORKER_TIER),
 });
 
-/**
- * Every *.test.ts under tests/, repo-relative with POSIX slashes.
- * @param {string} dir
- * @param {string[]} out
- * @returns {string[]}
- */
-function listTestFiles(dir, out = []) {
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      // Mirrors the vitest config exclude list: never walk a nested worktree or
-      // the opt-in browser suite.
-      if (
-        ['node_modules', 'browser', '__snapshots__', 'fixtures', 'helpers'].includes(entry.name)
-      ) {
-        continue;
-      }
-      listTestFiles(full, out);
-      continue;
-    }
-    if (/\.test\.[cm]?ts$/.test(entry.name)) {
-      out.push(path.relative(repoRoot, full).split(path.sep).join('/'));
-    }
-  }
-  return out;
-}
+const io = { root: repoRoot, readdirSync, join: path.join, relative: path.relative, sep: path.sep };
 
-/** Working-tree + committed-vs-base changes. */
-function listChangedPaths() {
-  const out = new Set();
-  const base = process.env.GATE_SELECT_BASE;
-  const ranges = base ? [['diff', '--name-only', `${base}...HEAD`]] : [];
-  ranges.push(['diff', '--name-only', 'HEAD']);
-  for (const args of ranges) {
-    const res = spawnSync('git', args, { encoding: 'utf8', shell, cwd: repoRoot });
-    if (res.status === 0 && res.stdout) {
-      for (const line of res.stdout.split('\n')) {
-        const t = line.trim();
-        if (t) out.add(t);
-      }
-    }
+// Shared helpers that themselves reach outside the graph, so a test delegating
+// its fs access one hop away is not mistaken for pure.
+const fsHelpers = FS_HELPER_DIRS.flatMap((dir) => {
+  const full = path.join(repoRoot, dir);
+  try {
+    return readdirSync(full, { withFileTypes: true })
+      .filter((e) => e.isFile() && /\.[cm]?ts$/.test(e.name) && !/\.(test|spec)\./.test(e.name))
+      .filter((e) => HELPER_FS_PATTERN.test(readFileSync(path.join(full, e.name), 'utf8')))
+      .map((e) => `${dir}/${e.name.replace(/\.[cm]?ts$/, '')}`);
+  } catch {
+    return [];
   }
-  const untracked = spawnSync('git', ['ls-files', '--others', '--exclude-standard'], {
-    encoding: 'utf8',
-    shell,
-    cwd: repoRoot,
-  });
-  if (untracked.status === 0 && untracked.stdout) {
-    for (const line of untracked.stdout.split('\n')) {
-      const t = line.trim();
-      if (t) out.add(t);
-    }
-  }
-  return [...out];
-}
+});
+const helperImportPattern = buildHelperImportPattern(fsHelpers);
 
 // Classify the suite. Recomputed every run rather than read from a committed
 // list, so the always-run set can never go stale as tests are added: a new test
 // that scans from disk joins the set the moment it lands.
-const testFiles = listTestFiles(path.join(repoRoot, 'tests'));
-const entries = testFiles.map((file) => ({
-  file,
-  visibility: classifyTestSource(readFileSync(path.join(repoRoot, file), 'utf8')),
-}));
-const { alwaysRun, counts } = buildAlwaysRunSet(entries);
+const testFiles = listTestFiles({ ...io, dir: path.join(repoRoot, 'tests') });
+const { alwaysRun, counts } = buildAlwaysRunSet(
+  testFiles.map((file) => ({
+    file,
+    visibility: classifyTestSource(readFileSync(path.join(repoRoot, file), 'utf8'), {
+      helperImportPattern,
+    }),
+  })),
+);
 
-const changedPaths = listChangedPaths();
+// The BRANCH diff, not just the dirty working tree: diffing only against HEAD
+// meant a clean committed branch selected nothing and passed green, at exactly
+// the moment a merge bar is run. An unresolvable base is a hard stop rather than
+// a silent narrowing.
+const { base, reason: baseReason } = resolveSelectBase({ env: process.env, run: git });
+if (!base) {
+  console.error(`[gate:select] cannot resolve a branch base to diff against: ${baseReason}`);
+  console.error(
+    '[gate:select] set GATE_SELECT_BASE=<ref>, or run `npm run gate` for the full bar.',
+  );
+  process.exit(1);
+}
+let changedPaths;
+try {
+  changedPaths = listChangedPaths({ base, run: git });
+} catch (err) {
+  console.error(`[gate:select] ${err.message}`);
+  console.error('[gate:select] refusing to narrow the run on an unreadable diff.');
+  process.exit(1);
+}
+
 const plan = buildSelectPlan({ changedPaths, alwaysRunFiles: alwaysRun });
 
 console.log('[gate:select] full gate step list, selective vitest step');
 console.log(
-  `[gate:select] suite visibility: ${counts.graph} graph-visible, ` +
-    `${counts.blind} blind, ${counts.partial} partial (always-run: ${alwaysRun.length})`,
+  `[gate:select] suite: ${testFiles.length} test files ` +
+    `(${counts.graph} graph-visible, ${counts.blind} blind, ${counts.partial} partial); ` +
+    `always-run ${alwaysRun.length}`,
+);
+console.log(
+  `[gate:select] diff base: ${base} (${baseReason}); ${changedPaths.length} changed path(s)`,
 );
 console.log(`[gate:select] mode=${plan.mode} (${plan.reason})`);
 console.log(`[gate:select] workers=${workers}`);
 
-// Same step list as the full gate, with the vitest step replaced below.
-const branch =
-  spawnSync('git', ['branch', '--show-current'], {
-    encoding: 'utf8',
-    shell,
-    cwd: repoRoot,
-  }).stdout?.trim() ?? '';
-const steps = buildFullGateSteps(workers, {
-  releaseTier: branch.startsWith('release/'),
-  skipVitest: true,
-});
+const branch = git('git', ['branch', '--show-current']).stdout?.trim() ?? '';
+const releaseTier = branch.startsWith('release/');
+const steps = buildFullGateSteps(workers, { releaseTier, skipVitest: true });
 
-/** @type {Array<{ name: string, cmd: string, args: string[], hint?: string }>} */
-const vitestSteps =
-  plan.mode === 'full'
-    ? [
-        {
-          name: 'vitest (full suite, planner fell back)',
-          cmd: 'npx',
-          args: ['--no-install', 'vitest', ...buildFullSuiteArgs({ workers })],
-        },
-      ]
-    : [
-        {
-          name: `vitest (always-run, ${plan.alwaysRunFiles.length} files)`,
-          cmd: 'npx',
-          args: [
-            '--no-install',
-            'vitest',
-            ...buildAlwaysRunArgs({ files: plan.alwaysRunFiles, workers }),
-          ],
-          hint: 'these tests reach outside the module graph, so they run on every selective gate',
-        },
-      ];
+/** @type {Array<{ name: string, cmd: string, args: string[], hint?: string, env?: Record<string, string> }>} */
+const vitestSteps = [];
 
-const relatedArgs = buildRelatedArgs({ sources: plan.relatedSources, workers });
-if (plan.mode === 'selective' && relatedArgs) {
+if (plan.mode === 'full') {
   vitestSteps.push({
-    name: `vitest (related to ${plan.relatedSources.length} changed source file(s))`,
+    name: 'vitest (full suite, planner fell back)',
     cmd: 'npx',
-    args: ['--no-install', 'vitest', ...relatedArgs],
+    args: ['--no-install', 'vitest', ...buildFullSuiteArgs({ workers })],
+  });
+} else {
+  // Chunked: with shell:true on win32, ~500 paths in one argv exceeds cmd.exe's
+  // 8191-character command line and the leg cannot launch at all.
+  const chunks = chunkFileArgs({ files: plan.alwaysRunFiles });
+  chunks.forEach((files, i) => {
+    vitestSteps.push({
+      name:
+        chunks.length === 1
+          ? `vitest (always-run, ${plan.alwaysRunFiles.length} files)`
+          : `vitest (always-run ${i + 1}/${chunks.length}, ${files.length} files)`,
+      cmd: 'npx',
+      args: ['--no-install', 'vitest', ...buildAlwaysRunArgs({ files, workers })],
+      hint: 'these tests reach outside the module graph, so they run on every selective gate',
+    });
+  });
+  const relatedArgs = buildRelatedArgs({ sources: plan.relatedSources, workers });
+  if (relatedArgs) {
+    vitestSteps.push({
+      name: `vitest (related to ${plan.relatedSources.length} changed source file(s))`,
+      cmd: 'npx',
+      args: ['--no-install', 'vitest', ...relatedArgs],
+    });
+  }
+}
+
+// buildFullGateSteps nests its release-tier step inside the same `skipVitest`
+// guard as the full suite, so asking for skipVitest drops BOTH. Re-add it here,
+// or a release branch would run gate:select without I18N_RELEASE_TIER=1 and lose
+// the tier signal on exactly the branch where a fast path is most wanted.
+if (releaseTier) {
+  vitestSteps.push({
+    name: 'vitest (release-tier i18n)',
+    cmd: 'npx',
+    args: ['--no-install', 'vitest', 'run', ...I18N_RELEASE_TIER_SUITES, `--maxWorkers=${workers}`],
+    env: { I18N_RELEASE_TIER: '1' },
+    hint: 'release-tier i18n is red until every locale is filled: run the i18n-locale-fill workflow (docs/i18n-scaling/translation-workflow.md). It does NOT indicate a code regression.',
   });
 }
 
-// Insert where the full gate runs its vitest step: after "sfx check".
-const sfxIndex = steps.findIndex((s) => s.name === 'sfx check');
-steps.splice(sfxIndex >= 0 ? sfxIndex + 1 : 0, 0, ...vitestSteps);
+const anchor = steps.findIndex((s) => s.name === PRE_VITEST_STEP_NAME);
+steps.splice(anchor >= 0 ? anchor + 1 : steps.length, 0, ...vitestSteps);
 
 for (const { name, cmd, args, hint, env: envOverlay } of steps) {
   console.log(`\n[gate:select] ${name}: ${cmd} ${args.join(' ')}`);

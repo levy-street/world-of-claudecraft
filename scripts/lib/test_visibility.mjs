@@ -39,12 +39,63 @@ export const OUT_OF_GRAPH_PATTERNS = Object.freeze([
   ['readdirSync', /\breaddirSync\s*\(/],
   ['globSync', /\bglobSync\s*\(/],
   ['readdir', /\breaddir\s*\(/],
+  // existsSync alone is enough: tests/held_weapon_models.test.ts asserts every
+  // weapon GLB and JPG exists under public/ and otherwise classifies as graph,
+  // so deleting an asset (a nonCode path, no related expansion) would fail the
+  // full gate and pass the selective one.
+  ['existsSync', /\bexistsSync\s*\(/],
   ['fs/promises', /from\s*['"]node:fs\/promises['"]|from\s*['"]fs\/promises['"]/],
+  // Whole-module fs / child_process imports, so a helper alias or a destructure
+  // this list does not name by function still counts as reaching outside.
+  ['node:fs', /from\s*['"]node:fs['"]|require\(\s*['"]node:fs['"]\s*\)/],
+  [
+    'node:child_process',
+    /from\s*['"]node:child_process['"]|require\(\s*['"]node:child_process['"]\s*\)/,
+  ],
   ['import.meta.glob', /import\.meta\.glob\s*\(/],
   ['execSync', /\bexecSync\s*\(/],
+  // execFileSync is the form tests/i18n_resolved_equivalence.test.ts uses to
+  // drive the real i18n build (execFileSync(process.execPath, [buildScript])),
+  // so without it a scripts/i18n_build.mjs regression escapes selection.
+  // Deliberately still NOT matching a bare `spawn(`: this sim has mob spawners
+  // (tests/mob_rally.test.ts) and that would be a large false-positive class.
+  ['execFileSync', /\bexecFileSync\s*\(/],
   ['spawnSync', /\bspawnSync\s*\(/],
   ['dynamic-import', /\bawait\s+import\s*\(/],
 ]);
+
+/**
+ * Shared helpers that themselves reach outside the graph. A per-file text scan
+ * cannot see through an import, so a test whose fs access lives one hop away in
+ * `tests/helpers/*` looks pure: tests/i18n_resolved_equivalence.test.ts delegates
+ * its readdirSync/readFileSync to tests/helpers/i18n_determinism. Importing one
+ * of these is therefore itself an out-of-graph signal.
+ *
+ * Derived by scanning the helper directories rather than hand-listed, so a helper
+ * that grows an fs call is covered without anyone remembering to update a list.
+ */
+export const FS_HELPER_DIRS = Object.freeze([
+  'tests/helpers',
+  'tests/server/helpers',
+  'tests/util',
+]);
+
+/** Does a shared helper itself reach outside the graph? */
+export const HELPER_FS_PATTERN =
+  /readFileSync|readdirSync|globSync|existsSync|execFileSync|execSync|spawnSync|from ['"]node:(?:fs|child_process)['"]/;
+
+/**
+ * Build the import-matching regex for a set of fs-touching helper module paths.
+ *
+ * @param {string[]} helperPaths repo-relative, extension stripped
+ * @returns {RegExp | null}
+ */
+export function buildHelperImportPattern(helperPaths) {
+  const names = [...new Set((helperPaths ?? []).map((p) => p.split('/').pop()))].filter(Boolean);
+  if (names.length === 0) return null;
+  const alt = names.map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+  return new RegExp(`from\\s*['"][^'"]*\\/(?:${alt})['"]`);
+}
 
 /** Static imports from the product source trees the graph DOES model. */
 const SRC_IMPORT_RE = /from\s*['"](?:\.\.\/)+(?:src|server|headless|bot)\//;
@@ -60,12 +111,13 @@ const SRC_IMPORT_RE = /from\s*['"](?:\.\.\/)+(?:src|server|headless|bot)\//;
  * @param {string} source
  * @returns {Visibility}
  */
-export function classifyTestSource(source) {
+export function classifyTestSource(source, { helperImportPattern = null } = {}) {
   const text = String(source ?? '');
   const reasons = [];
   for (const [label, re] of OUT_OF_GRAPH_PATTERNS) {
     if (re.test(text)) reasons.push(label);
   }
+  if (helperImportPattern && helperImportPattern.test(text)) reasons.push('fs-helper-import');
   const srcImports = SRC_IMPORT_RE.test(text);
   if (reasons.length === 0) return { klass: 'graph', reasons, srcImports };
   return { klass: srcImports ? 'partial' : 'blind', reasons, srcImports };

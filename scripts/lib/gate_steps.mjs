@@ -27,6 +27,13 @@ export const I18N_RELEASE_TIER_SUITES = Object.freeze([
   'tests/localization_fixes.test.ts',
 ]);
 
+/**
+ * Name of the step the vitest legs follow. gate_select.mjs splices its selective
+ * legs directly after this one, so both sides read the same constant rather than
+ * the selective gate matching a display string that a rename would silently move.
+ */
+export const PRE_VITEST_STEP_NAME = 'sfx check';
+
 export const I18N_ARTIFACTS = Object.freeze([
   'src/ui/i18n.resolved.generated',
   'src/admin/i18n.resolved.generated',
@@ -89,7 +96,7 @@ export function buildFullGateSteps(workers, opts = {}) {
       args: ['run', 'ci:changed'],
     },
     {
-      name: 'sfx check',
+      name: PRE_VITEST_STEP_NAME,
       cmd: 'npx',
       args: turboRunArgs(['sfx:check']),
     },

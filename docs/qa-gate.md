@@ -11,6 +11,7 @@ Codex have different entry points and share the same deterministic scripts and c
 | Instant copy gate | `.claude/hooks/qa-stop.sh` through each runtime's Stop hook | End of an agent turn | Yes, on a hard-invariant hit |
 | Deterministic floor | `.githooks/pre-push` | Before a push | Yes |
 | Day-loop fast path | `npm run gate:fast` through `scripts/gate_fast.mjs` | While iterating (agents and mid/low-tier machines) | No (local only; not merge) |
+| Selective gate | `npm run gate:select` through `scripts/gate_select.mjs` | Same moment as the full gate, when you want it faster | Yes (opt-in; see below) |
 | Full local gate | `npm run gate` through `scripts/gate.mjs` | Before implementation is called ready / pre-merge | Yes |
 | Judgment review | Claude `/qa` or Codex `$woc-qa`, plus scoped reviewers | End of a contribution | Advisory locally |
 
@@ -113,28 +114,32 @@ paths above:
 
 | | Non-test steps | Tests | Merge bar? |
 |---|---|---|---|
-| `gate:fast` | **5 of 13.** No builds, no admin/bot typecheck, no i18n or wiki freshness, no sfx, no browser. | `related` only, plus two guard files | **No** |
-| `gate` | **All.** | **All** ~2200 files | Yes (provably complete) |
-| `gate:select` | **All, byte-identical to `gate`.** | always-run set + `related` | Yes (empirically complete) |
+| `gate:fast` | **A subset.** No builds, no admin/bot typecheck, no i18n or wiki freshness, no sfx, no browser. | `related` plus two guard files | **No** |
+| `gate` | **All**, plus the dep-sync and ffmpeg preflights | **Every** test file | Yes (provably complete) |
+| `gate:select` | **All, and the same preflights** | always-run set + `related` | Yes (empirically complete) |
 
-The distinction that matters: **`gate:fast` is weaker because it drops ten checks;
+The distinction that matters: **`gate:fast` is weaker because it drops whole checks;
 `gate:select` drops none of them.** A change that breaks the client bundle, the admin
 Svelte types, the bot build, i18n freshness, or SFX conformance fails `gate:select`
-exactly as it fails `gate`. Only the test step is narrowed, so the question "is this
-enough to ship a PR" reduces to one question: does the narrowed test step still catch
-what the full one would?
+exactly as it fails `gate`, and on a `release/**` branch it runs the release-tier i18n
+step too. Only the test step is narrowed, so the question "is this enough to ship a PR"
+reduces to one question: does the narrowed test step still catch what the full one would?
 
 **Why the narrowed test step is sufficient.** `vitest related` selects on the static
 import graph, which models most of this suite correctly and misses the rest *silently*
 (a skipped test does not error, so the gate still prints PASS). So selection is never
 trusted alone. `scripts/lib/test_visibility.mjs` classifies every test file first:
 
-- **blind**: reaches outside the graph (disk scan, subprocess, dynamic import) and imports
-  no source. `related` can never select it. `tests/architecture.test.ts`, the determinism
-  and sim-purity guard, is one of these.
+- **blind**: reaches outside the graph (disk scan, subprocess, dynamic import, or an
+  fs-touching shared helper one hop away) and imports no source. `related` can never
+  select it. `tests/architecture.test.ts`, the determinism and sim-purity guard, is one
+  of these.
 - **partial**: reaches outside the graph *and* imports source, so `related` selects it
   only sometimes, which hides better than never.
 - **graph**: pure imports, modelled correctly.
+
+Discovery matches vitest's own collection rule rather than approximating it, because a
+walker that misses a file the suite runs removes it from the always-run set silently.
 
 Every blind and partial file runs on **every** selective gate regardless of the diff.
 Only the graph-visible remainder is left to `related`. The set is recomputed from source
@@ -144,7 +149,10 @@ scans from disk joins it the moment it lands.
 **Safety fallback.** Any change the planner cannot reason about (a lockfile, `package.json`,
 a vite/vitest/tsconfig edit, the shared test helpers or global setup) drops the whole run
 to the full suite. Selection is an optimization for changes we understand; everything else
-gets the old bar. Failing toward *more* tests is the only safe direction.
+gets the old bar. Failing toward *more* tests is the only safe direction, which is also why
+an unresolvable diff base or a failing `git diff` is a hard stop rather than an empty
+changed set. The diff is taken against the BRANCH base, not just the dirty working tree:
+`GATE_SELECT_BASE` overrides it, otherwise the tracking branch is used.
 
 **What it still cannot prove.** The out-of-graph pattern list is a floor, not a proof, so
 this path is empirically complete rather than provably complete. That is why it is paired

@@ -2,6 +2,13 @@ import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
+  chunkFileArgs,
+  isCollectedTestFile,
+  listChangedPaths,
+  listTestFiles,
+  resolveSelectBase,
+} from '../scripts/lib/gate_discovery.mjs';
+import {
   buildAlwaysRunArgs,
   buildFullSuiteArgs,
   buildRelatedArgs,
@@ -10,6 +17,7 @@ import {
 } from '../scripts/lib/gate_select_plan.mjs';
 import {
   buildAlwaysRunSet,
+  buildHelperImportPattern,
   classifyTestSource,
   OUT_OF_GRAPH_PATTERNS,
   requiresAlwaysRun,
@@ -52,7 +60,11 @@ const raw = readFileSync('docs/x.md', 'utf8');`);
     ['readdir', 'await readdir("x");'],
     ['fs/promises', `import { readFile } from 'node:fs/promises';`],
     ['import.meta.glob', 'const m = import.meta.glob("./*.ts");'],
+    ['existsSync', 'expect(existsSync(p)).toBe(true);'],
+    ['node:fs', `import fs from 'node:fs';`],
+    ['node:child_process', `import { execFile } from 'node:child_process';`],
     ['execSync', 'execSync("git status");'],
+    ['execFileSync', 'execFileSync(process.execPath, [script]);'],
     ['spawnSync', 'spawnSync("git", ["status"]);'],
     ['dynamic-import', 'const m = await import(specifier);'],
   ])('detects the %s escape hatch', (label, source) => {
@@ -67,9 +79,13 @@ const raw = readFileSync('docs/x.md', 'utf8');`);
       'readdirSync',
       'globSync',
       'readdir',
+      'existsSync',
       'fs/promises',
+      'node:fs',
+      'node:child_process',
       'import.meta.glob',
       'execSync',
+      'execFileSync',
       'spawnSync',
       'dynamic-import',
     ]);
@@ -133,6 +149,16 @@ describe('selective gate planning', () => {
     expect(plan.alwaysRunFiles).toEqual(ALWAYS);
   });
 
+  // Declaration files are type-only and check:types runs in full regardless, so
+  // they must not drag the whole suite in; every new scripts/lib module ships one.
+  it.each(['scripts/lib/gate_discovery.d.mts', 'src/types/foo.d.ts'])(
+    'treats %s as type-only rather than an unrecognized full-suite trigger',
+    (declFile) => {
+      const plan = buildSelectPlan({ changedPaths: [declFile], alwaysRunFiles: ALWAYS });
+      expect(plan.mode).toBe('selective');
+    },
+  );
+
   it('classifies paths into the four planner buckets', () => {
     const c = classifySelectPaths([
       'src/sim/sim.ts',
@@ -175,30 +201,172 @@ describe('selective gate argv', () => {
   });
 });
 
+// A bare `spawn(` must NOT count: this sim has mob spawners, so matching it
+// would sweep a large false-positive class into the always-run set.
+describe('out-of-graph detection precision', () => {
+  it('does not treat a sim mob spawn as reaching outside the graph', () => {
+    const v = classifyTestSource(`import { Sim } from '../src/sim/sim';
+const mob = spawn('forest_wolf', pos);`);
+    expect(v.klass).toBe('graph');
+  });
+
+  it('flags a test whose fs access lives one hop away in a shared helper', () => {
+    const pattern = buildHelperImportPattern(['tests/helpers/i18n_determinism']);
+    const source = `import { Sim } from '../src/sim/sim';
+import { resolvedTables } from './helpers/i18n_determinism';`;
+    expect(classifyTestSource(source).klass).toBe('graph');
+    const withHelper = classifyTestSource(source, { helperImportPattern: pattern });
+    expect(withHelper.klass).toBe('partial');
+    expect(withHelper.reasons).toContain('fs-helper-import');
+  });
+
+  it('returns null for an empty helper list rather than a regex matching everything', () => {
+    expect(buildHelperImportPattern([])).toBeNull();
+  });
+});
+
+// Discovery must match what vitest actually collects. The first cut matched only
+// `.test.ts` and skipped every `helpers` directory, hiding 20 collected files
+// (8 of them blind) from the always-run set entirely.
+describe('test discovery matches vitest collection', () => {
+  it.each([
+    ['tests/foo.test.ts', true],
+    ['tests/foo.test.mjs', true],
+    ['tests/foo.spec.ts', true],
+    ['tests/foo.test.tsx', true],
+    ['tests/helpers/ts_files_under.test.ts', true],
+    ['tests/server/helpers/golden.test.ts', true],
+    ['tests/browser/a11y.browser.test.ts', false],
+    ['tests/foo.browser.test.ts', false],
+    ['tests/helper.ts', false],
+    ['node_modules/pkg/x.test.ts', false],
+    ['tmp/leftover.test.ts', false],
+  ])('%s -> collected=%s', (p, expected) => {
+    expect(isCollectedTestFile(p)).toBe(expected);
+  });
+
+  it('walks nested directories and returns sorted repo-relative POSIX paths', () => {
+    const tree: Record<string, Array<{ name: string; dir: boolean }>> = {
+      '/r/tests': [
+        { name: 'b.test.ts', dir: false },
+        { name: 'helpers', dir: true },
+        { name: 'node_modules', dir: true },
+      ],
+      '/r/tests/helpers': [{ name: 'a.test.mjs', dir: false }],
+      '/r/tests/node_modules': [{ name: 'nope.test.ts', dir: false }],
+    };
+    const files = listTestFiles({
+      root: '/r',
+      dir: '/r/tests',
+      readdirSync: (p: string) =>
+        (tree[p] ?? []).map((e) => ({ name: e.name, isDirectory: () => e.dir })),
+      join: (...parts: string[]) => parts.join('/'),
+      relative: (from: string, to: string) => to.slice(from.length + 1),
+      sep: '/',
+    });
+    expect(files).toEqual(['tests/b.test.ts', 'tests/helpers/a.test.mjs']);
+  });
+});
+
+// A merge bar must diff the BRANCH. Diffing only the working tree meant a clean
+// committed branch selected nothing and passed green.
+describe('branch diff resolution', () => {
+  const ok = { status: 0, stdout: '' };
+  it('prefers an explicit GATE_SELECT_BASE that resolves', () => {
+    const r = resolveSelectBase({ env: { GATE_SELECT_BASE: 'origin/release/v1' }, run: () => ok });
+    expect(r.base).toBe('origin/release/v1');
+  });
+
+  it('refuses an explicit base that does not resolve', () => {
+    const r = resolveSelectBase({
+      env: { GATE_SELECT_BASE: 'typo' },
+      run: () => ({ status: 1, stdout: '' }),
+    });
+    expect(r.base).toBeNull();
+    expect(r.reason).toContain('typo');
+  });
+
+  it('falls back to the tracking branch', () => {
+    const r = resolveSelectBase({
+      env: {},
+      run: (_c, args) =>
+        args.includes('@{upstream}')
+          ? { status: 0, stdout: 'origin/feature/x\n' }
+          : { status: 1, stdout: '' },
+    });
+    expect(r.base).toBe('origin/feature/x');
+  });
+
+  it('reports no base when nothing resolves, so the caller can refuse to narrow', () => {
+    const r = resolveSelectBase({ env: {}, run: () => ({ status: 128, stdout: '' }) });
+    expect(r.base).toBeNull();
+  });
+
+  // A swallowed git failure narrows the run silently, which is the one direction
+  // this design must never fail in.
+  it('throws rather than returning an empty changed set when git fails', () => {
+    expect(() =>
+      listChangedPaths({
+        base: 'origin/main',
+        run: () => ({ status: 128, stdout: '', stderr: 'bad revision' }),
+      }),
+    ).toThrow(/bad revision/);
+  });
+
+  it('unions branch, working-tree, and untracked changes', () => {
+    const paths = listChangedPaths({
+      base: 'origin/main',
+      run: (_c, args) => {
+        if (args.includes('origin/main...HEAD')) return { status: 0, stdout: 'src/a.ts\n' };
+        if (args[0] === 'diff') return { status: 0, stdout: 'src/b.ts\n' };
+        return { status: 0, stdout: 'src/c.ts\n' };
+      },
+    });
+    expect(paths).toEqual(['src/a.ts', 'src/b.ts', 'src/c.ts']);
+  });
+});
+
+// cmd.exe caps a command line at 8191 chars and the gate spawns with shell:true
+// on win32, so ~500 paths in one argv cannot launch there.
+describe('argv chunking for the always-run leg', () => {
+  it('keeps every chunk under the limit and loses no file', () => {
+    const files = Array.from({ length: 500 }, (_, i) => `tests/some_fairly_long_name_${i}.test.ts`);
+    const chunks = chunkFileArgs({ files, limit: 6000 });
+    expect(chunks.length).toBeGreaterThan(1);
+    expect(chunks.flat()).toEqual(files);
+    for (const c of chunks) {
+      expect(c.join(' ').length).toBeLessThanOrEqual(6000);
+    }
+  });
+
+  it('returns a single chunk when the list already fits', () => {
+    expect(chunkFileArgs({ files: ['tests/a.test.ts'], limit: 6000 })).toEqual([
+      ['tests/a.test.ts'],
+    ]);
+  });
+
+  it('never drops a file longer than the limit', () => {
+    const long = `tests/${'x'.repeat(50)}.test.ts`;
+    expect(chunkFileArgs({ files: [long], limit: 10 }).flat()).toEqual([long]);
+  });
+});
+
 // This is the guard that keeps the whole design honest as the suite grows: the
 // always-run set is recomputed from source on every gate run, so it cannot go
 // stale, but a regression that broke classification would silently shrink it.
 describe('always-run set over the real suite', () => {
-  function listTests(dir: string, out: string[] = []): string[] {
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-      const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        if (
-          ['node_modules', 'browser', '__snapshots__', 'fixtures', 'helpers'].includes(entry.name)
-        )
-          continue;
-        listTests(full, out);
-        continue;
-      }
-      if (/\.test\.[cm]?ts$/.test(entry.name)) {
-        out.push(path.relative(REPO_ROOT, full).split(path.sep).join('/'));
-      }
-    }
-    return out;
-  }
+  const listTests = () =>
+    listTestFiles({
+      root: REPO_ROOT,
+      dir: path.join(REPO_ROOT, 'tests'),
+      readdirSync,
+      join: path.join,
+      relative: path.relative,
+      sep: path.sep,
+    });
 
   it('keeps the known out-of-graph guards in the always-run set', () => {
-    const files = listTests(path.join(REPO_ROOT, 'tests'));
+    const files = listTests();
     const { alwaysRun } = buildAlwaysRunSet(
       files.map((file) => ({
         file,
@@ -211,6 +379,13 @@ describe('always-run set over the real suite', () => {
     expect(alwaysRun).toContain('tests/localization_fixes.test.ts');
     expect(alwaysRun).toContain('tests/ci_workflow.test.ts');
     expect(alwaysRun).toContain('tests/guide.test.ts');
+    // Discovery-fix regressions: these are collected by vitest but were invisible
+    // to the first walker (a `helpers/` directory and a `.mjs` extension).
+    expect(alwaysRun).toContain('tests/helpers/scan_guard_self_audit.test.ts');
+    expect(alwaysRun).toContain('tests/helpers/ts_files_under.test.ts');
+    // Pattern-fix regressions: asset existence and a spawned build script.
+    expect(alwaysRun).toContain('tests/held_weapon_models.test.ts');
+    expect(alwaysRun).toContain('tests/i18n_resolved_equivalence.test.ts');
     // Sanity floor: classification collapsing to "everything is graph-visible"
     // is the exact regression that would make selection unsafe.
     expect(alwaysRun.length).toBeGreaterThan(300);

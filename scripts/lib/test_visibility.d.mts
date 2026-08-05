@@ -8,7 +8,15 @@ export interface Visibility {
 
 export const OUT_OF_GRAPH_PATTERNS: ReadonlyArray<readonly [string, RegExp]>;
 
-export function classifyTestSource(source: string): Visibility;
+export const FS_HELPER_DIRS: readonly string[];
+export const HELPER_FS_PATTERN: RegExp;
+
+export function buildHelperImportPattern(helperPaths: string[]): RegExp | null;
+
+export function classifyTestSource(
+  source: string,
+  opts?: { helperImportPattern?: RegExp | null },
+): Visibility;
 
 export function requiresAlwaysRun(klass: VisibilityClass): boolean;
 

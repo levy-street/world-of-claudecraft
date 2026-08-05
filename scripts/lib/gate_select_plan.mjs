@@ -106,6 +106,15 @@ export function classifySelectPaths(paths) {
       relatedSources.push(p);
       continue;
     }
+    // A TypeScript declaration file is erased at runtime, so it cannot change
+    // behavior any test could observe; it can only change what `tsc` accepts,
+    // and check:types runs in FULL on every selective gate. Without this arm a
+    // .d.mts lands in the unrecognized bucket and forces the whole suite, which
+    // fires on every new scripts/lib module (each ships a hand-written .d.mts).
+    if (/\.d\.[cm]?ts$/.test(p)) {
+      nonCode.push(p);
+      continue;
+    }
     if (isNonCodePath(p)) {
       nonCode.push(p);
       continue;
