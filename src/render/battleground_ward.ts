@@ -65,7 +65,7 @@ const WARD_FRAGMENT = `
     // actually meets this thing (a few yards) a soft wash just fogs the view,
     // while banding still reads as a held barrier without hiding the field
     // behind it. Nothing actionable is behind it during the form-up anyway.
-    float bands = pow(0.5 + 0.5 * sin((vUv.y * 26.0) - uTime * 2.2), 3.0);
+    float bands = pow(max(0.5 + 0.5 * sin((vUv.y * 26.0) - uTime * 2.2), 0.0), 3.0);
     float drift = 0.5 + 0.5 * sin((vUv.x * 7.0) + uTime * 0.9);
     // Fade on ALL FOUR edges, so the sheet has visible bounds at the jambs and
     // never reads as an infinite fog plane filling the view.

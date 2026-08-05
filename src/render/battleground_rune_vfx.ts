@@ -72,7 +72,7 @@ const MOTE_FRAGMENT = /* glsl */ `
     // A hot near-white center falling off to the rune color. Without it the
     // darker runes (Battle's red especially) read as dull specks against the
     // field rather than as something burning.
-    vec3 rgb = mix(uColor, vec3(1.0), pow(core, 3.0) * 0.55);
+    vec3 rgb = mix(uColor, vec3(1.0), pow(max(core, 0.0), 3.0) * 0.55);
     gl_FragColor = vec4(rgb * (0.75 + 0.55 * a), a);
   }
 `;
@@ -155,7 +155,7 @@ const AEGIS_VERTEX = /* glsl */ `
     float y = uRise * band;
     float r = uRadius * sqrt(max(0.0, 1.0 - band * band * 0.55));
     vec3 p = vec3(cos(ang) * r, y, sin(ang) * r);
-    vAlpha = 0.45 + 0.55 * pow(0.5 + 0.5 * sin(ang * 2.0 + uTime * 1.3), 2.0);
+    vAlpha = 0.45 + 0.55 * pow(max(0.5 + 0.5 * sin(ang * 2.0 + uTime * 1.3), 0.0), 2.0);
     vec4 mv = modelViewMatrix * vec4(p, 1.0);
     gl_PointSize = ${MOTE_SIZE_EXPR};
     gl_Position = projectionMatrix * mv;
@@ -260,7 +260,7 @@ const RUNE_RING_FRAGMENT = /* glsl */ `
   varying vec2 vUv;
   void main() {
     // vUv.y runs inner->outer across a RingGeometry; vUv.x runs around it.
-    float streak = pow(0.5 + 0.5 * sin(vUv.x * TAU * 9.0 - uTime * 7.0), 3.0);
+    float streak = pow(max(0.5 + 0.5 * sin(vUv.x * TAU * 9.0 - uTime * 7.0), 0.0), 3.0);
     float band = smoothstep(0.0, 0.25, vUv.y) * (1.0 - smoothstep(0.45, 1.0, vUv.y));
     float a = streak * band * 0.85;
     if (a < 0.01) discard;

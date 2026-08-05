@@ -60,7 +60,7 @@ const FLAME_FRAGMENT = /* glsl */ `
     float core = smoothstep(0.5, 0.05, d);
     float a = core * vAlpha;
     if (a < 0.01) discard;
-    gl_FragColor = vec4(mix(uEdge, uCore, pow(core, 2.2)), a);
+    gl_FragColor = vec4(mix(uEdge, uCore, pow(max(core, 0.0), 2.2)), a);
   }
 `;
 

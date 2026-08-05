@@ -4539,6 +4539,14 @@ const DEED_CREST_PREFIX = 'deed_';
 // unenumerated debt. Do not add an id here merely to silence that failure; commission the art and
 // file it in docs/achievements/icon-brief.md.
 export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
+  // Catalog order (the art tests compare in DEED_ORDER order).
+  // Thornhollow Fields battleground deeds: all four are 'pvp', so they fall
+  // back to the deed_cat_pvp crest until their commissioned art lands
+  // (docs/achievements/icon-brief.md).
+  'pvp_bg_first_capture',
+  'pvp_bg_first_win',
+  'pvp_bg_wins_25',
+  'pvp_bg_captures_100',
   // The Drakelands dragonkin brood rework (v0.35): both are 'chronicle', so both fall back to
   // the deed_cat_chronicle crest until their commissioned art lands.
   'chr_drakemaw_broodlord',
