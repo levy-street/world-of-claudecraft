@@ -222,7 +222,7 @@ import {
   runDespawnDecay,
   tickGroundAoEs,
 } from './entity_roster';
-import { canEquipItem, resolveEquipSlot } from './equipment_rules';
+import { canEquipItem, resolveEquipSlot, uniqueEquipConflictSlot } from './equipment_rules';
 import * as escortMod from './escort';
 import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } from './escort';
 import { fleeSpeed } from './flee_speed';
@@ -2984,8 +2984,13 @@ export class Sim {
       }
       // Legendary items are unique-equipped; a save from before that rule (or
       // a tampered one) can still wear duplicates. Bench every later copy into
-      // the bags before stats derive from the worn set below.
-      items.benchDuplicateUniqueEquipped(meta);
+      // the bags before stats derive from the worn set below, and say so: a
+      // silently changed worn set reads as lost gear (the respec bench and the
+      // bag migration both notice too).
+      for (const benchedId of items.benchDuplicateUniqueEquipped(meta)) {
+        const benchedDef = ITEMS[benchedId];
+        if (benchedDef) this.notice(player.id, `Unequipped ${benchedDef.name}.`);
+      }
       // Buyback rows deliberately skip the full instancedCountCap: byte-equal
       // merges past the stack cap are legitimate here (recordVendorBuyback
       // merges an entire multi-unit sale into one row, and buyBackItem
@@ -8903,6 +8908,10 @@ export class Sim {
     // "must be level N" message belongs.
     const e = this.entities.get(meta.entityId);
     if (e && !meetsLevelRequirement(e.level, def)) return;
+    // Skip silently when a copy of a unique-equipped (legendary) family is
+    // already worn anywhere: equipping the duplicate would be refused, and the
+    // explicit equip path is where that refusal toast belongs.
+    if (uniqueEquipConflictSlot(def, meta.equipment, (id) => ITEMS[id], [])) return;
     if (def.kind === 'weapon') {
       const cur = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand]?.weapon : null;
       const next = def.weapon;

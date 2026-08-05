@@ -4609,6 +4609,8 @@ export type TranslationKeyFlat =
   | 'guide.gear.soulboundTitle'
   | 'guide.gear.sourcesBody'
   | 'guide.gear.sourcesTitle'
+  | 'guide.gear.uniqueBody'
+  | 'guide.gear.uniqueTitle'
   | 'guide.gear.upgradeBody'
   | 'guide.gear.upgradeTitle'
   | 'guide.glossary.aggroDef'

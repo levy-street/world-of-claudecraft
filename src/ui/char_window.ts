@@ -351,7 +351,14 @@ export class CharWindow {
     if (!item) return;
     const world = this.deps.world();
     switch (
-      paperdollDropAction(item, slot, world.cfg.playerClass, world.player.level, world.talentSpec)
+      paperdollDropAction(
+        item,
+        slot,
+        world.cfg.playerClass,
+        world.player.level,
+        world.talentSpec,
+        world.equipment,
+      )
     ) {
       case 'blockedSlot':
         this.deps.showError(tSim('error.wrongEquipSlot'));
@@ -365,6 +372,9 @@ export class CharWindow {
             level: formatNumber(dropRequiredLevel(item), { maximumFractionDigits: 0 }),
           }),
         );
+        return;
+      case 'blockedUnique':
+        this.deps.showError(tSim('error.uniqueEquipped'));
         return;
       case 'equip':
         world.equipItemToSlot(itemId, slot);
@@ -393,6 +403,7 @@ export class CharWindow {
           world.cfg.playerClass,
           world.player.level,
           world.talentSpec,
+          world.equipment,
         ) === 'equip';
       row.classList.toggle('drop-target', accepts);
     }
@@ -415,6 +426,7 @@ export class CharWindow {
           world.cfg.playerClass,
           world.player.level,
           world.talentSpec,
+          world.equipment,
         ) !== 'equip'
       )
         return;

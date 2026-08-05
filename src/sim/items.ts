@@ -25,10 +25,12 @@ import {
   canDualWieldTwoHand,
   canEquipItem,
   canEquipItemInSlot,
+  displacedSlotForEquip,
   isUniqueEquipped,
   resolveEquipSlot,
   slotAcceptsItem,
   uniqueEquipConflictSlot,
+  uniqueEquipFamily,
   weaponHand,
 } from './equipment_rules';
 import { formatMoney } from './format_money';
@@ -417,25 +419,28 @@ export function equipItem(
   const oldInstance = meta.equipmentInstance?.[slot];
   // A two-hander and a shield cannot coexist. Fury's Titan Grip exemption is
   // weapon-only: a valid Fury weapon pair may contain one or two two-handers.
-  let displacedSlot: EquipSlot | null = null;
-  if (slot === 'offhand') {
-    const mainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
-    const titanPair = def.kind === 'weapon' && canDualWieldTwoHand(meta.cls, spec);
-    if (mainhand?.kind === 'weapon' && weaponHand(mainhand) === 'twohand' && !titanPair) {
-      displacedSlot = 'mainhand';
-    }
-  } else if (slot === 'mainhand' && def.kind === 'weapon' && weaponHand(def) === 'twohand') {
-    const offhand = meta.equipment.offhand ? ITEMS[meta.equipment.offhand] : undefined;
-    const titanPair = offhand?.kind === 'weapon' && canDualWieldTwoHand(meta.cls, spec);
-    if (meta.equipment.offhand && !titanPair) displacedSlot = 'offhand';
-  }
+  // The rule body lives in equipment_rules.ts so the paperdoll drop feedback
+  // shares it verbatim.
+  const displacedSlot = displacedSlotForEquip(
+    def,
+    slot,
+    meta.equipment,
+    (id) => ITEMS[id],
+    meta.cls,
+    spec,
+  );
   // Legendary items are unique-equipped: refuse when another worn slot already
-  // holds this item id. The target slot and a displaced slot are exempt: both
-  // are emptied by this swap, so the copy they hold never coexists with the
+  // holds this item's family (the heroic variant of a legendary counts as the
+  // same item). The target slot and a displaced slot are exempt: both are
+  // emptied by this swap, so the copy they hold never coexists with the
   // incoming one (the Titan Grip same-id NON-legendary pair stays legal).
   if (
-    isUniqueEquipped(def) &&
-    uniqueEquipConflictSlot(def, meta.equipment, displacedSlot ? [slot, displacedSlot] : [slot])
+    uniqueEquipConflictSlot(
+      def,
+      meta.equipment,
+      (id) => ITEMS[id],
+      displacedSlot ? [slot, displacedSlot] : [slot],
+    )
   ) {
     ctx.error(meta.entityId, 'You can only equip one of those.');
     return;
@@ -520,23 +525,29 @@ export function revalidateOffhandForSpec(ctx: SimContext, pid?: number): void {
 // ALL_EQUIP_SLOTS order stays (mainhand before offhand, ring1 before ring2),
 // every later copy is benched into the bags with its instance payload intact.
 // Uncapacitated like the respec offhand bench above: a rule change can never
-// destroy gear. The caller recalcs stats afterward, as with every load.
-export function benchDuplicateUniqueEquipped(meta: PlayerMeta): void {
+// destroy gear. Returns the benched item ids so the caller can notice the
+// player (the load path emits the same Unequipped line the respec bench does)
+// and recalc stats afterward, as with every load.
+export function benchDuplicateUniqueEquipped(meta: PlayerMeta): string[] {
   const worn = new Set<string>();
+  const benched: string[] = [];
   for (const slot of ALL_EQUIP_SLOTS) {
     const itemId = meta.equipment[slot];
     if (!itemId) continue;
     const def = ITEMS[itemId];
     if (!def || !isUniqueEquipped(def)) continue;
-    if (!worn.has(itemId)) {
-      worn.add(itemId);
+    const family = uniqueEquipFamily(def);
+    if (!worn.has(family)) {
+      worn.add(family);
       continue;
     }
     const instance = meta.equipmentInstance?.[slot];
     delete meta.equipment[slot];
     if (meta.equipmentInstance) delete meta.equipmentInstance[slot];
     returnEquippedItemToBags(meta, itemId, instance);
+    benched.push(itemId);
   }
+  return benched;
 }
 
 // Remove the piece in `slot` back to the bags, leaving the slot empty. Unlike

@@ -5530,9 +5530,11 @@ export class Hud {
     if (item.soulbound) {
       html += `<div class="tt-sub" style="color:var(--gold)">${esc(t('hudChrome.itemSoulbound'))}</div>`;
     }
-    // Unique-equipped marker (every legendary): one worn copy per item id, so
-    // the rule is visible on the tooltip before an equip is refused.
-    if (isUniqueEquipped(item)) {
+    // Unique-equipped marker (every legendary): one worn copy per item family,
+    // so the rule is visible on the tooltip before an equip is refused. Gated
+    // on `slot` too: the rule lives in the equip path, so a slotless legendary
+    // (a future consumable or token) must not advertise it.
+    if (item.slot && isUniqueEquipped(item)) {
       html += `<div class="tt-sub" style="color:var(--gold)">${esc(t('hudChrome.itemUniqueEquipped'))}</div>`;
     }
     // Maker's Bond lines (Professions 2.0): the commission
