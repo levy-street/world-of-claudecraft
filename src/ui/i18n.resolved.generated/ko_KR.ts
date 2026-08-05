@@ -340,11 +340,14 @@ export const ko_KR: EnTranslations = {
       "menuButton": "갇힘 탈출",
       "help": "탈출: /unstuck은 제자리에서 카운트다운을 시작한 뒤 주변의 도달 가능한 안전한 위치로 이동합니다.",
       "helpAtGraveyard": "탈출: /unstuck은 제자리에서 카운트다운을 시작하고, 완료되면 영혼을 가장 가까운 묘지로 보냅니다. 되살아나려면 영혼 치유사에게서 수호자의 대가를 받아야 합니다.",
+      "helpUnstuckSickness": "탈출: /unstuck은 제자리에서 카운트다운을 시작하고, 완료되면 가장 가까운 묘지로 이동시키며 쓰러져 있었다면 부활시킵니다. 최대 5분 동안 탈출의 후유증이 남습니다.",
       "started": "{seconds}초 후 탈출합니다. 이동, 전투, 피해를 받거나 다른 행동을 시작하면 취소됩니다.",
       "countdown": "갇힘 탈출: {seconds}",
       "completed": "도달할 수 있는 가장 가까운 안전한 위치로 이동했습니다.",
       "completedAtGraveyard": "영혼이 가장 가까운 묘지로 돌아왔습니다. 영혼 치유사에게 말을 걸어 수호자의 대가를 받으세요.",
       "revivedAtGraveyard": "가장 가까운 묘지로 옮겨져 부활했습니다. 수호자의 대가가 당신을 짓누릅니다.",
+      "movedToGraveyard": "가장 가까운 묘지로 이동했습니다. 탈출의 후유증이 당신을 짓누릅니다.",
+      "revivedAtGraveyardUnstuck": "가장 가까운 묘지로 이동해 부활했습니다. 탈출의 후유증이 당신을 짓누릅니다.",
       "cancelledMoved": "이동해서 갇힘 탈출이 취소되었습니다.",
       "cancelledDamaged": "피해를 받아 갇힘 탈출이 취소되었습니다.",
       "cancelledCombat": "전투에 진입해 갇힘 탈출이 취소되었습니다.",
@@ -364,8 +367,8 @@ export const ko_KR: EnTranslations = {
       "unavailable": "현재 상태에서는 갇힘 탈출을 사용할 수 없습니다."
     },
     "scene": {
-      "skipHint": "장면 건너뛰기 (Esc)",
-      "waitingFor": "{name} 대기 중",
+      "skipHint": "장면 건너뛰기(Esc)",
+      "waitingFor": "{name} 님을 기다리는 중",
       "timer": "{seconds}s"
     },
     "fct": {
@@ -807,6 +810,7 @@ export const ko_KR: EnTranslations = {
       "leaderboard": "순위",
       "dailyRewards": "상점",
       "deeds": "업적",
+      "mounts": "탈것",
       "professions": "전문 기술",
       "nameplates": "이름표",
       "haptics": "진동",
@@ -889,6 +893,13 @@ export const ko_KR: EnTranslations = {
       "heroicName": "영웅: {name}",
       "heroicLocked": "영웅 난이도 {name}에 귀속되었습니다."
     },
+    "riftTracker": {
+      "title": "균열",
+      "floor": "{total}층 중 {current}층",
+      "closesIn": "균열이 {time} 후 닫힙니다",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "북",
       "NE": "북동",
@@ -910,7 +921,29 @@ export const ko_KR: EnTranslations = {
       "breakdownOther": "기타 ({count})",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
-      "melee": "근접 공격"
+      "melee": "근접 공격",
+      "move": "드래그하여 이 미터를 이동",
+      "resize": "드래그하여 이 미터의 크기 조절",
+      "dock": "이 미터를 미터 창으로 되돌리기",
+      "separate": "{meter} 분리",
+      "regroup": "{meter} 통합"
+    },
+    "targetAuras": {
+      "title": "대상 오라",
+      "keybindLabel": "대상 강화 및 약화 효과",
+      "all": "전체",
+      "debuffs": "약화 효과",
+      "buffs": "강화 효과",
+      "unlock": "대상 오라 창 이동",
+      "lock": "대상 오라 창 잠금",
+      "configureRows": "대상 오라 설정",
+      "fewerRows": "오라 행 수 줄이기",
+      "moreRows": "오라 행 수 늘리기",
+      "visibleRows": "선호하는 오라 행 수: {count}",
+      "showSources": "오라 시전자 이름 표시",
+      "hideSources": "오라 시전자 이름 숨기기",
+      "ownAura": "내 오라",
+      "opacity": "오라 불투명도: {percent}"
     },
     "petFeed": {
       "disabledFullHp": "펫의 체력이 가득 찼습니다",
@@ -931,9 +964,34 @@ export const ko_KR: EnTranslations = {
       "petAggressive": "펫: 공격적",
       "mount": "탑승 / 하차"
     },
+    "actionBar": {
+      "editKeys": "액션 바 키 편집",
+      "editKeysHint": "액션 바의 슬롯을 클릭한 다음 키를 눌러 지정하세요.",
+      "bannerHint": "슬롯을 클릭한 다음 키를 눌러 지정하세요. 완료되면 \"완료\"를 클릭하세요.",
+      "bannerCapturing": "키를 눌러 이 슬롯에 지정하세요...",
+      "boundToKey": "{key}(으)로 지정되었습니다.",
+      "reset": "초기화",
+      "done": "Done",
+      "cancel": "취소",
+      "resetConfirmTitle": "액션 바 키를 초기화하시겠습니까?",
+      "resetConfirmBody": "첫 번째 바는 기본 키로 되돌아가고, 두 번째와 세 번째 바는 지정 해제됩니다. 이 작업은 되돌릴 수 없습니다."
+    },
     "mounts": {
+      "title": "탈것",
+      "close": "닫기",
+      "select": "선택",
+      "selected": "선택됨",
+      "riding": "탑승 중",
       "mount": "탑승",
+      "dismount": "내리기",
       "useToRide": "사용하여 이 탈것을 소환합니다.",
+      "emptyTitle": "보유한 탈것 없음",
+      "emptyStableHint": "20레벨을 달성한 뒤 하이워치 서쪽 마구간에서 마구간지기 마를라에게 승마를 배우세요.",
+      "emptyDropHint": "더 희귀한 탈것은 영웅 던전 우두머리나 균열 완료를 통해 얻을 수 있습니다.",
+      "clickManage": "클릭하여 탈것 선택",
+      "rarity_common": "일반",
+      "rarity_rare": "희귀",
+      "rarity_epic": "서사",
       "spec_speed": "+{pct}% 추가 기동력",
       "name_valorsteed": "발러스티드",
       "name_grag_bear": "골리앗 그라그곰",
@@ -942,17 +1000,20 @@ export const ko_KR: EnTranslations = {
       "name_shadowjump_toad": "그림자 도약 두꺼비 카마카게",
       "name_stormfeather_griffin": "하늘닿이 폭풍깃",
       "name_thunderstrut_gobbler": "천둥활보 대왕 칠면조",
+      "name_terrorspark_groundshaker": "대지를 뒤흔드는 테러스파크",
       "desc_valorsteed": "여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.",
       "desc_grag_bear": "여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.",
       "desc_stalkglider_snail": "여행 속도를 높여 주는 끈질기고 느긋한 달팽이입니다.",
       "desc_aether_hover_cycle": "낮게 떠서 빠르게 전장을 가로지르도록 설계된 강력한 마도 바이크입니다.",
       "desc_shadowjump_toad": "어떤 지형이든 번개 같은 그림자 도약으로 누비도록 훈련된 거대한 두꺼비입니다.",
       "desc_stormfeather_griffin": "룬 발톱으로 땅을 누비는 위엄 있는 폭풍 그리핀입니다. 날개는 접혀 있습니다.",
-      "desc_thunderstrut_gobbler": "깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다."
+      "desc_thunderstrut_gobbler": "깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다.",
+      "desc_terrorspark_groundshaker": "묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다."
     },
     "mountTraining": {
       "mountPrompt": "{key} 키를 눌러 훈련용 발러스티드에 탑승한다.",
-      "buyReinsPrompt": "이제 탈것을 탈 수 있습니다. 말라에게서 10골드에 발러스티드 고삐를 구매한 뒤 사용해 타세요.",
+      "ownedMountPrompt": "고삐가 가방에 있습니다. 사용하면 탈 수 있습니다.",
+      "buyReinsPrompt": "승마를 배웠습니다. 말라에게서 용맹마 고삐를 10골드에 구입한 뒤 사용하면 탈 수 있습니다.",
       "ridePrompt": "빛나는 표식을 따라 출발선으로 간 뒤 레이스 시작을 누르세요.",
       "begin": "수업 시작",
       "success": "발러스티드를 길들였다.",
@@ -961,13 +1022,13 @@ export const ko_KR: EnTranslations = {
     "mountRace": {
       "startButton": "레이스 시작",
       "cancelButton": "경기 취소",
-      "go": "GO!",
+      "go": "출발!",
       "start": "출발! 모든 장애물을 뛰어넘고 아치로 돌아가 통과하라.",
       "toFinish": "아치로 돌아가 통과하라!",
       "finished": "{seconds}초 만에 완주!",
       "timeout": "레이스 실패",
       "progress": "장애물 {n} / {total}",
-      "timeLeft": "{seconds}s"
+      "timeLeft": "{seconds}초"
     },
     "vcup": {
       "title": "베일 컵",
@@ -991,6 +1052,7 @@ export const ko_KR: EnTranslations = {
       },
       "awayNote": "양 팀이 같은 깃발을 선택하면 원정 팀이 반전 배색으로 경기합니다.",
       "rolesHeading": "포지션",
+      "rolesSmallBracketNote": "1대1과 2대2 등급에서는 모든 선수가 올라운더로 출전합니다. 3대3 이상 등급이 필요한 업적은 여기서 달성할 수 없습니다.",
       "role": {
         "allrounder": {
           "name": "올라운더",
@@ -1032,6 +1094,7 @@ export const ko_KR: EnTranslations = {
       "guildBoardWl": "{wins}승 {losses}패",
       "practice": "봇 연습 경기",
       "practiceNote": "소우필드에서 봇과의 정식 경기를 즉시 시작합니다.",
+      "practiceUnratedNote": "연습 경기는 등급전이 아닙니다. 전적과 업적의 서 진행도가 반영되지 않습니다.",
       "practicingNow": "연습 중 ({count}):",
       "clock": "{minutes}:{seconds}",
       "indicatorQueued": "베일 컵 대기열: {bracket}, {count}명 중 {position}번째",
@@ -1074,6 +1137,8 @@ export const ko_KR: EnTranslations = {
         "rule5": "누구나 다가와 관중석에서 응원할 수 있습니다.",
         "kitHeading": "내 기술",
         "kitNote": "경기 동안 이 동작들이 직업 능력을 대신합니다.",
+        "unratedNote": "봇이 경기장에 있어 이 경기는 등급전이 아닙니다. 전적은 변하지 않으며 골, 세이브, 클린 시트 업적도 반영되지 않습니다.",
+        "practiceUnratedNote": "이 경기는 연습 경기이므로 등급전이 아닙니다. 전적은 변하지 않으며 업적의 서 진행도도 반영되지 않습니다.",
         "rosterHeading": "출전 명단",
         "you": "나",
         "bot": "봇",
@@ -1254,6 +1319,51 @@ export const ko_KR: EnTranslations = {
       "badges": {
         "backgrounded": "백그라운드",
         "offline": "오프라인"
+      }
+    },
+    "auraOverlay": {
+      "title": "오라",
+      "currentClass": "현재 직업: {class}",
+      "previewHint": "위치 설정으로 오라를 옮겨 메뉴를 가리지 마세요.",
+      "noProcs": "이 캐릭터에 지원되는 발동이 없습니다.",
+      "enabled": "오라 표시",
+      "icon": "주문 아이콘",
+      "arcs": "측면 초승달",
+      "groundRing": "지면 고리",
+      "groundRingSpellOrder": "지면 고리: 주문 순서",
+      "crescentsSpellOrder": "측면 초승달: 주문 순서",
+      "size": "크기",
+      "iconSize": "아이콘 크기",
+      "crescentBlockSize": "초승달 블록 크기",
+      "groundRingBlockSize": "지면 고리 블록 크기",
+      "opacity": "불투명도",
+      "color": "색상",
+      "allOn": "모두 켜기",
+      "allOff": "모두 끄기",
+      "reposition": "위치 설정",
+      "positioning": "배치: {aura}",
+      "selectAura": "오라",
+      "done": "완료",
+      "moveLeft": "왼쪽 이동",
+      "moveUp": "위로 이동",
+      "moveDown": "아래로 이동",
+      "moveRight": "오른쪽 이동",
+      "moveEarlier": "주문을 안쪽으로",
+      "moveLater": "주문을 바깥쪽으로",
+      "screenPosition": "화면 위치",
+      "spellOrder": "주문 순서",
+      "reset": "위치 초기화",
+      "spellPosition": "주문 순서 {position} / {count}",
+      "procs": {
+        "revenge": "복수!",
+        "battleTrance": "전투 명상",
+        "overpowerCharge": "적수 강화",
+        "suddenDeath": "급사",
+        "victoryRush": "승리의 돌진",
+        "enrage": "혼란: 격노",
+        "heatingUp": "달아오름",
+        "arcaneCharge": "비전 충전",
+        "aetherRush": "에테르 쇄도"
       }
     },
     "playerCard": {
@@ -1499,6 +1609,10 @@ export const ko_KR: EnTranslations = {
       "twoFactorRecoveryTitle": "복구 코드를 저장하세요",
       "twoFactorRecoveryHint": "각 코드는 한 번만 사용할 수 있습니다. 안전한 곳에 보관하세요. 인증 앱을 잃어버렸을 때 다시 로그인할 수 있는 유일한 방법입니다.",
       "twoFactorDownloadCodes": "코드 다운로드",
+      "recoveryCodesFileHeader": "{brand} 복구 코드",
+      "recoveryCodesFileAccount": "계정: {username}",
+      "recoveryCodesFileHint": "인증 앱에 접근할 수 없게 되면 각 코드는 한 번만 사용할 수 있습니다.",
+      "recoveryCodesFileWarn": "이 파일은 안전하고 개인적인 곳에 보관하세요.",
       "twoFactorDone": "완료",
       "twoFactorDisableHint": "2단계 인증을 끄려면 비밀번호를 입력하세요. 복구 코드는 폐기됩니다.",
       "twoFactorDisableBtn": "2단계 인증 끄기",
@@ -1632,6 +1746,7 @@ export const ko_KR: EnTranslations = {
       "filterArmor": "방어구",
       "filterConsumable": "소모품",
       "filterMaterial": "재료",
+      "filterTool": "도구",
       "filterQuest": "퀘스트",
       "filterMount": "탈것",
       "sortAria": "가방 아이템 정렬",
@@ -1858,6 +1973,7 @@ export const ko_KR: EnTranslations = {
       "enchantedFallback": "마법부여됨"
     },
     "materialHint": {
+      "fineGrade": "상급 등급입니다. 해당 재료보다 높은 등급의 도구로 만렙 채집지에서 캐낸 것이며, 일반 등급이 필요한 곳 어디에서나 대신 사용됩니다.",
       "arcaneDust": "마법부여 재료. 일반과 고급 장비의 마력을 추출해 얻습니다.",
       "arcaneEssence": "마법부여 재료. 희귀 장비의 마력을 추출해 얻습니다.",
       "arcaneShard": "마법부여 재료. 영웅과 전설 장비의 마력을 추출해 얻습니다.",
@@ -2055,6 +2171,14 @@ export const ko_KR: EnTranslations = {
       "benefits": "데스크톱 앱에서 Steam 계정을 연동하면 획득한 업적이 Steam 도전 과제로 반영됩니다.",
       "noTicket": "Steam에서 연동 티켓을 받지 못했습니다. Steam을 실행한 뒤 다시 시도해 주세요."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Epic 연동",
+      "unlink": "Epic 연동 해제",
+      "linked": "Epic 계정 {id}에 연동됨",
+      "benefits": "Epic 데스크톱 앱에서 Epic 계정을 연동하면 획득한 업적이 Epic 도전 과제로 반영됩니다.",
+      "noProof": "Epic에서 연동 증명을 받지 못했습니다. Epic Games Store에서 실행한 뒤 다시 시도해 주세요."
+    },
     "mailbox": {
       "title": "우편함",
       "subtitle": "레이븐포스트",
@@ -2099,6 +2223,7 @@ export const ko_KR: EnTranslations = {
         "noRecipient": "그 이름을 가진 우편함 주인이 없습니다.",
         "tooManyParcels": "편지 하나에는 소포를 최대 {count}개까지 담을 수 있습니다.",
         "noMailQuestItems": "퀘스트 아이템은 우편으로 보낼 수 없습니다.",
+        "noMailBound": "그 아이템은 귀속되어 우편으로 보낼 수 없습니다.",
         "notEnoughItems": "보낼 수 있는 수량이 부족합니다.",
         "cantAffordPostage": "우편 요금을 낼 수 없습니다.",
         "recipientBoxFull": "상대의 우편함이 가득 찼습니다.",
@@ -2276,7 +2401,8 @@ export const ko_KR: EnTranslations = {
       "toolTierUnmet": {
         "mining": "이 광맥을 캐려면 {tier}티어 채광 곡괭이가 필요합니다.",
         "logging": "이 나무를 베려면 {tier}티어 벌목 도끼가 필요합니다.",
-        "herbalism": "이 군락을 채집하려면 {tier}티어 약초 낫이 필요합니다."
+        "herbalism": "이 군락을 채집하려면 {tier}티어 약초 낫이 필요합니다.",
+        "fishing": "이 수역에서 낚시하려면 {tier}티어 낚싯대가 필요합니다."
       },
       "toolRequired": {
         "mining": "이 광맥을 캐려면 채광 곡괭이가 필요합니다.",
@@ -2289,6 +2415,12 @@ export const ko_KR: EnTranslations = {
         "logging": "손이 닿는 곳에 벌목 나무가 없습니다.",
         "herbalism": "손이 닿는 곳에 약초 군락이 없습니다."
       },
+      "wieldUnmet": {
+        "mining": "가방에 있는 곡괭이를 휘두르려면 채광 {skill}이(가) 필요합니다.",
+        "logging": "가방에 있는 도끼를 휘두르려면 벌목 {skill}이(가) 필요합니다.",
+        "herbalism": "가방에 있는 낫을 다루려면 약초학 {skill}이(가) 필요합니다."
+      },
+      "wieldUnmetCorpse": "최상급 도구를 제대로 다루려면 채집 기술 {skill}이(가) 필요합니다.",
       "toolTierUnmetCorpse": "최상급 재료를 회수하려면 {tier}티어 채집 도구가 필요합니다.",
       "toolTooltip": {
         "kind": {
@@ -2300,7 +2432,8 @@ export const ko_KR: EnTranslations = {
         "unlocks": {
           "mining": "{tier}티어까지의 광맥을 캐는 데 필요합니다.",
           "logging": "{tier}티어까지의 벌목 나무를 베는 데 필요합니다.",
-          "herbalism": "{tier}티어까지의 약초 군락을 채집하는 데 필요합니다."
+          "herbalism": "{tier}티어까지의 약초 군락을 채집하는 데 필요합니다.",
+          "fishing": "{tier}티어까지의 수역에서 낚시하는 데 필요합니다."
         },
         "use": {
           "mining": "사용: 근처의 광맥을 캡니다.",
@@ -2315,8 +2448,12 @@ export const ko_KR: EnTranslations = {
       },
       "downgradeMark": "가방이 가득 찼습니다: 수확물이 채집자의 표식 없이 보관되었습니다.",
       "downgradeFind": "가방이 가득 찼습니다: 최상급 수확물을 놓쳐 버렸습니다.",
+      "emptyHookNote": "빈 낚싯바늘",
       "stateReady": "채집 가능",
-      "stateCooldown": "재생성 중"
+      "stateCooldown": "재생성 중",
+      "stateCooldownTimed": "{time} 후 재생성",
+      "respawnClock": "{minutes}:{seconds}",
+      "fineGradePreview": "현재 도구로 채집하면 상급 등급을 얻습니다."
     },
     "archetypeTitle": {
       "label": "칭호",
@@ -2406,6 +2543,33 @@ export const ko_KR: EnTranslations = {
       "ceilingRare": "희귀 상한",
       "ceilingCommon": "일반 상한",
       "skillValue": "{skill} / {max}",
+      "toolEffectCharges": "{charges} / {max}회 남음",
+      "toolEffectSpent": "모두 소모됨, 재충전 필요",
+      "toolEffectDepleted": "도구 효과를 모두 소모했습니다",
+      "toolEffectRechargePrice": "재충전: {material} x{count}",
+      "toolEffectModeAsk": "사용할 때마다 확인",
+      "toolEffectModePrompt": "사용 시마다 확인함",
+      "toolEffectConfirmTitle": "{effect}을(를) 사용하시겠습니까?",
+      "toolEffectConfirmBody": "이번 채집에 1회를 소모하시겠습니까? 거절해도 채집은 진행되지만 보너스는 없습니다. 남은 횟수: {charges}회",
+      "toolEffectConfirmAccept": "1회 사용",
+      "toolEffectConfirmDecline": "그냥 채집",
+      "toolEffectName": {
+        "gatherersCache": "채집가의 주머니",
+        "artisansEye": "장인의 눈",
+        "quickeningCharm": "회복의 부적"
+      },
+      "toolEffectSlotButton": "{effect} 장착",
+      "toolEffectRechargeButton": "재충전",
+      "toolEffectSlotted": "{effect}이(가) {profession}에 장착되었습니다.",
+      "toolEffectSlotInvalid": "{effect}은(는) 거기에 장착할 수 없습니다.",
+      "toolEffectNoTool": "먼저 진짜 {profession} 도구가 필요합니다.",
+      "toolEffectNoCharm": "가방에 제작한 {effect}이(가) 필요합니다.",
+      "toolEffectNoGain": "{effect}은(는) 이미 장착되어 있고 충전도 가득합니다.",
+      "toolEffectRecharged": "{effect} 재충전 완료: {material} x{count} 소모.",
+      "toolEffectRechargeNoSlot": "{profession}에 장착된 효과가 없습니다.",
+      "toolEffectRechargeFull": "{effect}은(는) 이미 완전히 충전되어 있습니다.",
+      "toolEffectRechargeToolCapped": "{effect}을(를) 더 충전하려면 더 좋은 {profession} 도구가 필요합니다.",
+      "toolEffectRechargeMaterials": "{effect} 재충전에는 {material} x{count}이(가) 필요합니다.",
       "tierPipAria": "티어 {tier}",
       "nextUnlockTier": "다음 티어까지 숙련도 {points} 남음: 걸작 확률이 높아집니다",
       "nextUnlockSpecialized": "전문화까지 숙련도 {points} 남음: 재료 소모가 줄어듭니다",
@@ -2433,6 +2597,7 @@ export const ko_KR: EnTranslations = {
       "craft": "제작",
       "reagentsNeeded": "필요 재료:",
       "reagentLine": "{name}: {have}/{required}",
+      "reagentFineSub": "(상급 등급 {count}개 소모)",
       "empty": "알려진 제작법이 없습니다.",
       "resultAria": "{name} 제작",
       "craftedToast": "제작 완료:{name}",
@@ -2474,6 +2639,8 @@ export const ko_KR: EnTranslations = {
         "colSkill": "기술",
         "colRole": "역할",
         "colCap": "상한",
+        "allCrafts": "모든 제작 분야",
+        "skillListAria": "제작 기술",
         "tutorial": "첫 티어: 한 기술을 숙련도 {skill}까지 올리세요. 제작에 성공하면 다른 지식을 지우지 않고 해당 기술이 성장합니다.",
         "nearTier": "{craft}는 다음 티어까지 숙련도 {points}이 필요합니다.",
         "dormantKnowledge": "{craft} 지식은 유지되지만 해당 조합이나 취미가 활성화될 때까지 비활성 상태입니다."
@@ -2789,48 +2956,48 @@ export const ko_KR: EnTranslations = {
       "lbSelfAccount": "내 계정: {rank}위, 상위 {percent}%, 명성 {renown}",
       "lbSelfRank": "내 계정: {rank}위, 상위 {percent}%",
       "lbEmpty": "아직 순위에 오른 연대기 작가가 없습니다.",
-      "broadcastsLabel": "업적 달성을 길드와 친구에게 공유",
+      "broadcastsLabel": "업적 달성은 길드원과 팔로워에게, 업적과 걸작 카드는 Discord 피드에 공유",
       "titledName": "{name} [{title}]"
     },
     "continentMap": {
       "title": "세계 지도",
       "summary": "세계 지도. 지역을 선택하면 해당 지도가 열립니다.",
       "toWorld": "세계 지도",
-      "toZone": "Zone map",
+      "toZone": "지역 지도",
       "toggleAria": "세계 지도와 지역 지도 전환",
       "levels": "레벨 {min}부터 {max}까지"
     }
   },
   "lb": {
     "fixture": {
-      "ferry": "먼바다 나룻배",
-      "tidemill": "조수 물방앗간",
-      "breach": "대균열"
+      "ferry": "파쇼어 연락선",
+      "tidemill": "타이드밀",
+      "breach": "균열"
     },
     "speaker": {
       "tam": "종지기 탐",
-      "coalfast": "수호자 콜패스트",
+      "coalfast": "감시관 콜패스트",
       "ollun": "균열감시자 올룬",
-      "edda": "보급관 에다",
+      "edda": "병참장교 에다",
       "saul": "치유사 사울"
     },
     "fare": {
-      "promptOut": "먼기슭까지의 뱃삯: 동화 {price}닢.",
-      "promptBack": "뭍으로 돌아가는 뱃삯: 동화 {price}닢.",
-      "pay": "뱃삯을 낸다.",
-      "decline": "오늘은 됐다."
+      "promptOut": "파쇼어행 요금: {price}코퍼.",
+      "promptBack": "본토행 요금: {price}코퍼.",
+      "pay": "요금을 낸다.",
+      "decline": "오늘은 됐어."
     },
     "q0": {
       "scene": {
-        "harbor": "일하는 항구. 그물이 마르고, 별유리 인양 상자에는 본토 구매자의 인장이 찍혀 있다.",
-        "plinth": "항구 계단 위에서 청동 수호자가 내륙을 바라본다. 대좌의 가장 새로운 이름은 백 년 전의 것. 수호자 헤일. 그 아래에는 아직 자리가 남아 있다.",
-        "toll": "종이 한 번 울린다. 거리의 모두가 걸음을 멈추고 센다. 뒤따르는 소리는 없고, 거리 전체가 한꺼번에 숨을 내쉰다."
+        "harbor": "분주한 항구다. 그물이 마르고 있고, 별유리 인양 상자에는 본토 구매자의 표식이 찍혀 있다.",
+        "plinth": "항구 계단 위에서 청동 감시관이 내륙을 바라본다. 받침대의 가장 최근 이름조차 백 년 전 것이다. 감시관 헤일. 그 아래에는 더 많은 이름을 새길 자리가 남아 있다.",
+        "toll": "종이 한 번 울린다. 거리의 모두가 걸음을 멈추고 수를 센다. 더는 아무 소리도 없자, 거리 전체가 한꺼번에 숨을 내쉰다."
       },
       "tam": {
-        "stretchers": "지난번 저런 놈 하나에 경비대 전원의 오전과 들것 두 개가 들었지."
+        "stretchers": "지난번 그놈 하나 때문에 경비대 전원이 오전을 다 쓰고 들것도 두 개나 필요했지."
       },
       "coalfast": {
-        "look": "잿빛 사내는 쓰러진 짐승을 보고, 그다음 당신을 조금 더 오래 바라보았다. 그리고 절벽 쪽으로 걸어갔다."
+        "look": "회색 옷의 남자는 죽은 추적자를 본 뒤, 당신을 조금 더 오래 바라본다. 그리고 절벽 쪽으로 돌아간다."
       }
     }
   },
@@ -2938,8 +3105,29 @@ export const ko_KR: EnTranslations = {
       "account_taken": "해당 Steam 계정은 이미 다른 계정에 연결되어 있습니다.",
       "upstream": "Steam이 응답하지 않습니다. 잠시 후 다시 시도해 주세요."
     },
+    "epic": {
+      "disabled": "현재 Epic 연동을 사용할 수 없습니다.",
+      "invalid_token": "Epic이 이 연동 요청을 확인하지 못했습니다. 데스크톱 앱에서 다시 시도해 주세요.",
+      "banned": "해당 Epic 계정은 연동할 수 없습니다.",
+      "already_linked": "계정에 이미 연동된 Epic 계정이 있습니다.",
+      "account_taken": "해당 Epic 계정은 이미 다른 계정에 연결되어 있습니다.",
+      "upstream": "Epic이 응답하지 않습니다. 잠시 후 다시 시도해 주세요."
+    },
     "wallet": {
       "handoff_invalid": "지갑 인증이 만료되었거나 확인할 수 없습니다. 다시 시도해 주세요."
+    },
+    "ota_updates": {
+      "invalid_input": "입력이 올바르지 않습니다."
+    },
+    "seeker": {
+      "native_only": "Seeker 자격은 네이티브 앱에서만 사용할 수 있습니다.",
+      "attestation_failed": "기기 인증에 실패했습니다. 다시 시도해 주세요.",
+      "solana_artifact_required": "Solana Store 앱을 사용하여 계속해 주세요.",
+      "wallet_required": "먼저 지갑을 연결하고 인증하세요.",
+      "genesis_token_required": "인증된 Seeker Genesis Token이 필요합니다.",
+      "genesis_token_claimed": "해당 Seeker Genesis Token은 이미 등록되었습니다.",
+      "entitlement_required": "인증된 Seeker 자격이 필요합니다.",
+      "current_ownership_required": "현재 Seeker Genesis Token을 보유해야 합니다."
     }
   },
   "guide": {
@@ -3540,14 +3728,6 @@ export const ko_KR: EnTranslations = {
         "name": "파충류",
         "desc": "쉭쉭거리는 소리와 날카로운 물어뜯기를 지닌 냉혈 사냥꾼들로, 온혈 야수들과는 뚜렷이 다릅니다."
       },
-      "murloc": {
-        "name": "개굴지느러미족",
-        "desc": "호숫가와 조수 웅덩이에 사는 개골거리는 물고기 인간들로, 물가에 너무 가까이 들어오는 것은 무엇이든 재빨리 떼 지어 덮칩니다."
-      },
-      "kobold": {
-        "name": "장난꾸러기 정령",
-        "desc": "숲속 공터와 산울타리를 종종거리며 뒤지는 약탈꾼과 요정들로, 수가 모이기 전까지는 위협이라기보다 골칫거리에 가깝습니다."
-      },
       "demon": {
         "name": "악마",
         "desc": "균열 너머에서 온 침략자들로, 온통 불길과 악의뿐입니다. 악마 하나가 서 있는 곳이라면, 균열이 결코 멀지 않습니다."
@@ -3960,7 +4140,7 @@ export const ko_KR: EnTranslations = {
       "deedsHeading": "여정을 새기는 업적",
       "deedsBody": "업적의 서가 모든 걸음에 함께한다. 첫 조율은 Craftsworn을, 첫 걸작은 Masterwright를 주며 둘 다 칭호로 착용할 수 있다. 여덟 제작 기술은 각각 기술 50에 이정표 업적을, 상한 125에 Grandmaster 칭호를 두고, 낚시는 숙련 100에 Old Salt를, 200에 Master Angler 칭호를 준다.\n\n첫 채집과 첫 제작, 야외의 희귀한 발견, 분해 회수의 조용한 페이지도 있다. 전부 장식일 뿐이다. 칭호와 명성만 있을 뿐, 업적은 결코 힘을 주지 않는다.",
       "startHeading": "어디서 시작할까",
-      "startBody": "Eastbrook에 막 도착했다면 Foreman Odell을 찾아 A Trade for Every Hand를 받자. 마을 남서쪽 Copper Dig 주변의 광맥을 알려 준다. 그 뒤로는 여행 중 지나치는 광맥과 나무, 약초를 전부 캐면 된다. 마을에서는 T 키로 제작 창을 열어 누구나 아는 기본 제조법을 만들고, 대장간과 주방, 베틀, 공작소의 장인들을 찾아 무엇을 가르치는지 보고, 작업 주문으로 꾸준한 동전을 벌자. 길드의 편지가 도착할 즈음이면 어느 짝이 내 집인지 이미 알게 된다.",
+      "startBody": "Eastbrook에 막 도착했다면 Foreman Odell을 찾아 A Trade for Every Hand를 받자. 마을 남동쪽 Copper Dig 주변의 광맥을 알려 준다. 그 뒤로는 여행 중 지나치는 광맥과 나무, 약초를 전부 캐면 된다. 마을에서는 T 키로 제작 창을 열어 누구나 아는 기본 제조법을 만들고, 대장간과 주방, 베틀, 공작소의 장인들을 찾아 무엇을 가르치는지 보고, 작업 주문으로 꾸준한 동전을 벌자. 길드의 편지가 도착할 즈음이면 어느 짝이 내 집인지 이미 알게 된다.",
       "colStation": "작업대",
       "colHub": "거점",
       "colMaster": "장인",
@@ -4055,7 +4235,7 @@ export const ko_KR: EnTranslations = {
           "materialsHeading": "낚싯대와 칼이 채우는 찬장",
           "materialsBody": "간판 재료는 낚시가 지역별로 댄다. Eastbrook Vale의 거울 송어와 강 농어, Mirefen Marsh의 늪 창꼬치와 진흙 장어, Thornpeak Heights의 서리아가미 송어와 판지느러미 잉어. 사다리의 각 단은 제 단의 물고기를 요리하니 낚는 요리사는 재료가 마르지 않는다. 푸줏간 쪽은 사체 채집에서 온다. 멧돼지 따위의 사냥 고기, 그리고 희귀 이상 판정에서 나오는 서명된 Prime Cut, 대구이의 주인공이다. 약초가 좋은 접시에 향을 더하고, ashwood 통나무 하나가 장어를 훈제하며, Cooking Salt는 Marlow의 가판에서 한 봉지 8동이다.",
           "ladderHeading": "육포에서 대구이까지",
-          "ladderBody": "Salted Jerky가 야외 제조법이다. 처음부터 알고, 거미 다리 하나면 어디서든 만드는 신출내기의 행군식. 수련 사다리는 광장 서쪽 Eastbrook 주방에서 돈다. 무료 단은 기술 0(농어, Hunter's Game Skewer, Herbed Marsh Pike), 중간 단은 기술 25에 각 25은(Ashwood Smoked Eel, Goldleaf Game Stew, Frostgill Chowder), 희귀 단은 기술 50에 각 1금(Silvered Carp Supper, Angler's Feast Platter, Marlow's Grand Roast). 묶음 요리는 재료를 늘린다. 훈제 장어와 스튜는 한 번에 두 접시, 연회 모둠은 세 접시다.",
+          "ladderBody": "Salted Jerky가 야외 제조법이다. 처음부터 알고, 거미 다리 하나면 어디서든 만드는 신출내기의 행군식. 수련 사다리는 광장 동쪽 Eastbrook 주방에서 돈다. 무료 단은 기술 0(농어, Hunter's Game Skewer, Herbed Marsh Pike), 중간 단은 기술 25에 각 25은(Ashwood Smoked Eel, Goldleaf Game Stew, Frostgill Chowder), 희귀 단은 기술 50에 각 1금(Silvered Carp Supper, Angler's Feast Platter, Marlow's Grand Roast). 묶음 요리는 재료를 늘린다. 훈제 장어와 스튜는 한 번에 두 접시, 연회 모둠은 세 접시다.",
           "routeHeading": "걸작 아닌 특화, 그리고 125까지의 길",
           "routeBody": "요리는 걸작 이야기의 정직한 예외다. 접시에는 올릴 능력치가 없어 걸작이 절대 발동하지 않고, 좇을 이유도 없다. 이 기술의 정점은 75의 특화다. 모든 재료가 5분의 1씩 절약되고(묶음 요리에서 빠르게 불어난다), 이동식 야외 주방으로 던전 문 앞에서 연회를 차린다. 낚은 것을 요리하자. 두 기술이 서로를 먹인다. 육포와 무료 단으로 25, 중간 단으로 50, 희귀 단으로 75. 이후 더 높은 접시가 없어 희귀 요리가 절반과 4분의 1로 줄고, 상한까지 약 150회다. 갈이가 아니라 비축이라 생각하자. 길드는 모든 접시를 비운다. Marlow의 주문은 30분마다 사냥 고기 8점. 기술 50에 Seasoned Chef, 125에 Grandmaster Cooking 칭호다."
         },
@@ -4085,7 +4265,7 @@ export const ko_KR: EnTranslations = {
           "levelingHeading": "마법부여 올리는 법",
           "levelingBody": "기술을 움직이는 행동은 둘이다. 분해와 마법부여 시전. 성공마다 최대 1점이고, 일의 무게로 환산된다. 일반 분해와 가루만 드는 마법부여는 일반 일, 고급 분해와 정수 마법부여는 고급, 희귀 분해와 모든 Runed나 Greater 마법부여는 희귀, 영웅과 전설 분해는 그보다 높다. 익숙한 숙달 감쇠가 25점 단위로 걸려 일반 일은 기술 75에, 고급 일은 100에, 희귀 일은 정확히 상한 125에 회색이 된다. 마법부여만의 자비도 하나 있다. 천장을 넘는 입력은 0이 아니라 천장으로 내림되니, 맹세 전의 영웅 분해는 아무것도 못 배우는 대신 희귀로 계산된다. 마법부여가 다른 정체성 뒤에서 휴면하면 모든 것이 일반 일로 계산되어 오름세가 75에 멎고, 취미로 두면 희귀 일이 여전히 값을 하되 75 이후 느려질 뿐이다.",
           "marketHeading": "부여된 사본, 출처, 시장",
-          "marketBody": "마법부여는 재료를 소모하고 특정 사본 하나에 표시를 남긴다. 가방 속 사본에 쓰면 별개의 부여된 사본을 돌려받고, 이미 착용 중인 물건에 쓰면 벗었다 다시 입을 필요 없이 그 자리에서 부여된다. 어느 쪽이든 보너스가 영원히 그 물건을 따른다. 한 물건에 하나. 부여된 사본에 다른 마법부여를 쓰면 먼저 확인을 거친 뒤 옛 부여를 그대로 대체하며, 옛 부여는 재료 환불 없이 파괴된다. 판매와 폐기와 분해 모두 무표식 사본을 먼저 집으니 완성품이 실수로 갈리지 않는다. 똑같이 부여된 사본끼리는 겹쳐진다. 걸작과 마법부여는 친구다. 걸작은 온전히 부여 가능하고, 부여는 걸작 보너스와 서명을 건드리지 않고 얹힌다. 모든 것을 쌓은 서명된 걸작의 Greater 부여가 공예품의 정점이며, 그래도 설계상 공격대 전리품 아래에 있다. 세계 시장은 무표식 일반품만 다루므로 부여품과 서명품은 거래 창에서 직접 오간다. 시장에 올릴 수 있는 절반은 재료 쪽이다. 가루, 정수, 조각은 자유로이 등록되고, 등록은 무료, 수수료는 성사 시 5%뿐이다."
+          "marketBody": "마법부여는 재료를 소모하고 특정 사본 하나에 표시를 남긴다. 가방 속 사본에 쓰면 별개의 부여된 사본을 돌려받고, 이미 착용 중인 물건에 쓰면 벗었다 다시 입을 필요 없이 그 자리에서 부여된다. 어느 쪽이든 보너스가 영원히 그 물건을 따른다. 한 물건에 하나. 부여된 사본에 다른 마법부여를 쓰면 먼저 확인을 거친 뒤 옛 부여를 그대로 대체하며, 옛 부여는 재료 환불 없이 파괴된다. 판매와 폐기와 분해 모두 무표식 사본을 먼저 집으니 완성품이 실수로 갈리지 않는다. 똑같이 부여된 사본끼리는 겹쳐진다. 걸작과 마법부여는 친구다. 걸작은 온전히 부여 가능하고, 부여는 걸작 보너스와 서명을 건드리지 않고 얹힌다. 모든 것을 쌓은 서명된 걸작의 Greater 부여가 공예품의 정점이며, 그래도 설계상 공격대 전리품 아래에 있다. 이제 부여품과 서명품도 세계 시장에 올릴 수 있다. 한 점씩 단일 등록으로 팔리고, 툴팁에 부여와 제작자의 서명이 표시되며, 큰까마귀 우편으로도 똑같이 보낼 수 있다. 재료는 여전히 장사의 든든한 절반이다. 가루, 정수, 조각은 자유로이 등록되고, 등록은 무료, 수수료는 성사 시 5%뿐이다."
         }
       },
       "howHeading": "제작 방법",
@@ -4135,12 +4315,16 @@ export const ko_KR: EnTranslations = {
       "nodesHeading": "지역별 채집물",
       "nodesNote": "채집물의 위치, 티어, 필요한 도구, 산출물. 각 채집물은 내가 채집한 뒤 {respawn}초가 지나야 나에게 다시 생겨난다.",
       "toolsHeading": "도구",
-      "toolsNote": "모든 채집지에는 그 전문직의 도구가 가방에 있어야 하며, 1티어도 예외가 아니다. 곡괭이가 없으면 광석도 없고, 낚싯대가 없으면 물고기도 없다. 상인 사다리는 1티어부터 3티어까지를 다루며 모든 거점 마을에 재고가 있다. 도구는 가방에 들어 있기만 하면 되고, 장착 칸도 내구도도 없어서 한 번만 사면 된다. 조건을 가르는 것은 티어뿐이며, 도구의 희귀도 색은 겉모습일 뿐이다.\n\n상인 사다리 위에는 제작 도구 두 가지, 4티어와 5티어가 있다. 기술자가 도구 공방에서 만들며 어떤 NPC도 팔지 않는다. 현재 3티어를 넘는 채집지는 없으므로 지금 이들의 가치는 속도다. 최상급 도구는 낮은 등급 채집지에서 시전 시간을 최소치로 고정하며, 더 높은 티어의 땅이 열리면 그때의 입장권이 된다.",
+      "toolsNote": "모든 채집물에는 해당 전문 기술의 도구가 가방에 있어야 하며, 1단계도 예외가 아닙니다. 곡괭이가 없으면 광석도 없고, 낚싯대가 없으면 물고기도 없습니다. 상인 사다리는 1단계부터 3단계까지를 다루고, 각 거점은 자기 지역이 필요로 하는 단계만 취급합니다. 그래서 1단계 도구는 모든 지역 거점에서 팔리지만, 그 위 단계는 그것을 필요로 하는 광맥이 있는 곳에서 팔립니다. 상인은 그 단계를 팔기 전에 해당 전문 기술의 숙련도도 요구합니다. 2단계는 {tier2Prof}, 3단계는 {tier3Prof}가 필요하며, 판매 항목에 그 조건이 표시됩니다. 도구는 가방에 있기만 하면 되고 장비 칸도 내구도도 없으므로 한 번만 사면 되며, 이미 가진 도구는 계속 쓸 수 있습니다. 제한에 관여하는 것은 단계뿐입니다. 같은 단계에서 더 희귀한 도구라고 해서 더 열리는 것은 없습니다. 다만 희귀도가 색깔만인 것은 아닙니다. 장착한 도구 효과가 더 오래가고, 낚싯대라면 낚아채는 시간도 넓어집니다.\n\n더 좋은 도구는 두 가지가 아니라 세 가지를 줍니다. 더 높은 단계의 지형을 열고, 채집 시간을 줄이고, 나오는 것을 좋게 합니다. 그 지역 자체의 재료보다 높은 단계의 도구로 광맥을 캐면 평범한 재료 대신 고급 등급이 나옵니다. 대상은 그 지역의 완전 등급 광맥이어야 하므로, 여행자를 위해 남겨둔 쉬운 광맥에서는 여전히 평범한 재료가 나옵니다. 고급 재료는 제작 도구 제조법이 소모하는 것이며, 제조법이나 작업 지시가 평범한 판본을 요구하는 곳이라면 어디서든 고급 등급이 그것을 대신합니다. 그러니 장비를 올린다고 막히는 일은 없습니다. 구리 광석이 고급 구리 광석으로 들어올 뿐입니다.\n\n상인 사다리 위로는 각 전문 기술마다 4단계와 5단계의 제작 도구가 둘 있습니다. 기술자가 도구 공방에서 만들거나, 익사한 연도의 상점에서 탐굴 증표로 살 수 있습니다. 어떤 상인도 동전으로는 팔지 않습니다. 낚시에는 자체 한 쌍이 있으며, 처음부터 아는 것이 아니라 도구 장인에게서 배웁니다. 지금은 3단계를 넘게 요구하는 채집물도 물도 없으므로, 최상위 두 단계가 사는 것은 접근 권한이 아니라 속도와 등급과 넉넉한 낚아채기 시간입니다. 더 높은 단계의 지형이 나오면 그것들이 입장권이 될 것입니다.",
       "toolCrafted": "제작({craft})",
+      "toolCraftedOrMarks": "{craft}(으)로 제작하거나 탐굴 증표 {marks}개로 구매",
+      "toolCraftedOrMarksHeroic": "{craft}(으)로 제작하거나 익사한 연도의 영웅 난이도 공략 후 탐굴 증표 {marks}개로 구매",
       "toolVendor": "{name}({hub})",
       "toolUnavailable": "판매 없음",
       "priceNone": "판매 없음",
       "toolTierReq": "{tier}티어 도구",
+      "colWield": "Use at",
+      "wieldNone": "Any",
       "yieldsHeading": "채집의 수확물",
       "yieldsBody": "채집마다 품질을 굴리는데, 그 확률은 숙련도가 전부다. 갓 시작한 채집가는 언제나 일반 등급을 얻지만, 숙련이 오를수록 무게가 높은 등급으로 옮겨 가며 절대 후퇴하지 않는다. 상한 100에서는 일반이 완전히 사라져 60% 고급, 30% 희귀, 8% 영웅, 2% 전설이 된다. 품질은 곧 수량이다. 일반 1개, 고급과 희귀 2개, 영웅 3개, 전설 4개. 희귀 이상은 서명이 새겨져(Gathered by) 도착하며, 상한에서는 열 번 중 네 번에 이름이 남는다.",
       "bandsHeading": "숙련도 구간",
@@ -4196,7 +4380,7 @@ export const ko_KR: EnTranslations = {
         "sellsHeading": "무엇이 팔리고, 왜 팔리나",
         "sellsBody": "가장 꾸준한 장사는 소모품이다. 쓰면 사라지고 다시 사기 때문이다. 물약, 요리, 마법부여는 모두 소모된다. 검을 한 번 산 전사도 치유 물약은 영원히 산다. 걸작은 프리미엄 시장이다. 주문 제작이 불가능하니 원하는 물건 하나에 진짜 웃돈이 붙고, 그 위의 서명은 걸어 다니는 광고다. 재료가 세 번째 기둥이다. 분해에서 나오는 비전 재료, 분해자에게서 마법부여사에게 곧장 흐르는 Resonant 부산물, 그리고 걸작 발동을 노리는 장인들이 웃돈을 주고 사는 서명된 채집 재료다.",
         "marketHeading": "세계 시장과 수수료",
-        "marketBody": "세계 시장은 Eastbrook의 Merchant와 Highwatch의 Auctioneer Voss가 지키는 서버 전체 거래소다. 등록은 무료다. 보증금이 없고 유찰된 물건은 그대로 돌아온다. 수수료는 성사될 때만 판매가의 5%를 뗀다. 중요한 한계 하나. 시장은 표식 없는 일반품만 다룬다. 서명, 걸작, 마법부여, 귀속된 사본은 등록되지 않으므로, 특별한 물건은 거래 창에서 얼굴을 맞대고 넘긴다. 값은 직접 매기자. 시장은 일반판 시세만 알려 줄 뿐이다.",
+        "marketBody": "세계 시장은 Eastbrook의 Merchant와 Highwatch의 Auctioneer Voss가 지키는 서버 전체 거래소다. 등록은 무료다. 보증금이 없고 유찰된 물건은 그대로 돌아온다. 수수료는 성사될 때만 판매가의 5%를 뗀다. 특별한 물건도 환영이다. 서명, 걸작, 마법부여된 사본은 한 점씩 단일 등록으로 올라가고, 툴팁에 서명까지 그 정체가 그대로 실리며, 일반 더미와 섞이지 않는다. 유일하게 거절되는 것은 귀속된 사본이다. 제작자의 서약에 묶였거나 묶일 예정인 물건은 시장에도 우편에도 오르지 못하니, 서약을 세탁할 길은 없다. 특별한 물건의 값은 직접 매기자. 일반 등록은 일반판 시세만 알려 줄 뿐이다.",
         "workOrdersHeading": "작업 주문",
         "workOrdersNote": "장인마다 자기 단골 재료 한 묶음을 상점가의 {pct}%에 사들이며, {minutes}분마다 되풀이할 수 있다.",
         "colOrder": "작업 주문",
@@ -4255,7 +4439,7 @@ export const ko_KR: EnTranslations = {
       "tradeBody": "가까이 선 사람과는 누구든 얼굴을 맞대고 거래할 수 있습니다. 둘이 함께 쓰는 창에 물건과 동전을 올리고, 양쪽이 모두 확인해야 비로소 교환이 이루어지므로 어느 쪽도 당할 일이 없습니다. 친구에게 전리품을 건네거나 약속을 매듭짓는 간단한 방법입니다.",
       "mailTitle": "레이븐포스트",
       "mailBody": "모든 거점 마을에는 조각한 까마귀 석주가 서 있습니다. 왕국의 편지 배달부, 레이븐포스트의 우편함입니다. 그 앞에 서면 접속 중인 친구든 오래 접속하지 않은 이든 어떤 캐릭터에게나 이름으로 편지를 쓸 수 있고, 약간의 우편 요금으로 동전이나 물건을 편지에 첨부할 수 있습니다. 까마귀가 날아가는 데는 잠시 시간이 걸리며, 도착하면 봉투 표시가 받는 이에게 무언가 기다리고 있음을 알려 줍니다.",
-      "mailHow": "받는 것도 똑같이 거꾸로 하면 됩니다. 어느 석주 앞에서든 편지를 읽고, 담긴 것을 지갑과 가방으로 옮기세요. 편지는 영원히 기다려 주지 않으니, 까마귀가 당신을 포기하기 전에 찾아가세요. 우편이 딱 잘라 거절하는 것이 둘 있습니다. 귀속 아이템과 퀘스트 물품은 당신과 함께 다니거나, 아예 다니지 않습니다. 그리고 보람찬 퀘스트 완료 뒤에는 석주를 눈여겨보세요. 편지를 쓰는 퀘스트 제공자들도 있으니까요.",
+      "mailHow": "받는 것도 똑같이 거꾸로 하면 됩니다. 어느 석주 앞에서든 편지를 읽고, 담긴 것을 지갑과 가방으로 옮기세요. 편지는 영원히 기다려 주지 않으니, 까마귀가 당신을 포기하기 전에 찾아가세요. 우편이 딱 잘라 거절하는 것이 몇 가지 있습니다. 귀속 아이템, 퀘스트 물품, 그리고 이미 귀속되었거나 거래로 귀속될 물건은 당신과 함께 다니거나, 아예 다니지 않습니다. 그리고 보람찬 퀘스트 완료 뒤에는 석주를 눈여겨보세요. 편지를 쓰는 퀘스트 제공자들도 있으니까요.",
       "dailyTitle": "일일 보상",
       "dailyBody": "화면의 보물 상자 버튼을 누르면 일일 보상 창이 열립니다. 매일 몇 가지 과제가 주어지는데, 퀘스트 완수, 잿빛 콜로세움에서의 전투, 베일 컵 경기 승리 등이 있으며, 상품 수레바퀴를 무료로 한 번 돌릴 수도 있습니다. 이 모두가 그날의 순위를 위한 점수가 되고, 그날 최고 점수를 올린 이들은 선택 사항인 커뮤니티 토큰 보유자를 위한 상금 풀을 나눠 갖습니다. 이 중 어느 것도 게임 내에서 힘을 주지는 않습니다. 창 자체가 그날의 규칙과 참가 자격을 설명하고, 순위표를 보여주며, 여러분의 기록을 보관합니다.",
       "marketTitle": "세계 시장",
@@ -4456,23 +4640,23 @@ export const ko_KR: EnTranslations = {
       "show": "패널 표시",
       "hide": "패널 숨기기",
       "scene": "장면",
-      "sceneOption": "{id} ({seconds}초)",
-      "time": "시간",
-      "timeReadout": "{current} / {duration}초",
-      "play": "재생",
+      "sceneOption": "{id} ({seconds}s)",
+      "time": "Time",
+      "timeReadout": "{current} / {duration}s",
+      "play": "Play",
       "pause": "일시 정지",
       "authoredCamera": "연출 카메라",
-      "fade": "페이드: {percent}%",
+      "fade": "Fade: {percent}%",
       "letterboxOn": "레터박스: 켜짐",
       "letterboxOff": "레터박스: 꺼짐",
-      "violations": "위반 항목",
+      "violations": "위반 사항",
       "noViolations": "현재 위반 사항 없음",
-      "violationRow": "{check} | 작업 {opIndex} | {measured}",
+      "violationRow": "{check} | op {opIndex} | {measured}",
       "capture": "키프레임 캡처",
       "copy": "블록 복사",
       "output": "생성된 카메라 캡처",
       "unavailable": "3D 뷰포트 불러오는 중",
-      "seedMismatch": "캡처에는 정식 월드 시드가 필요합니다",
+      "seedMismatch": "캡처에는 배포용 월드 시드가 필요합니다",
       "captureSavedCopied": "저장하고 복사했습니다",
       "captureSaved": "저장했습니다. 아래에 블록이 준비되었습니다",
       "captureCopyOnly": "복사했습니다. 개발용 기록기를 사용할 수 없습니다",
@@ -5050,6 +5234,7 @@ export const ko_KR: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "보유자 혜택이 활성화되었습니다. 서명이나 지출이 필요할 때 앱을 연결하세요.",
     "extensionHelp": "여기에 지갑이 표시되려면 Solflare Wallet 같은 브라우저 지갑 확장 프로그램이 활성화되어 있어야 합니다.",
     "mobileAppHelp": "Phantom 또는 Solflare를 선택하세요. 지갑 앱에서 승인을 요청합니다. 게임을 열어 둔 채 완료 후 돌아오세요.",
+    "seekerAppHelp": "Seed Vault Wallet로 계속하세요. Seed Vault에서 연결 및 인증 요청을 확인한 후 게임으로 돌아오세요.",
     "standaloneAppHelp": "홈 화면 앱에서는 아직 지갑 연결을 사용할 수 없습니다. Phantom 또는 Solflare를 사용하려면 Safari나 Chrome에서 World of ClaudeCraft를 여세요.",
     "openAppTitle": "{wallet}에서 계속",
     "openAppHelp": "{wallet}을 열어 이 요청을 확인하세요. 지갑 앱을 사용하는 동안 이 게임 탭을 열어 두세요.",
@@ -5782,7 +5967,7 @@ export const ko_KR: EnTranslations = {
     },
     "augment": {
       "choose": "증강 선택",
-      "cardAria": "{name} ({category}) - {description}",
+      "cardAria": "{name} ({category}): {description}",
       "aug_brutality": {
         "name": "잔혹함",
         "desc": "당신의 물리 공격이 15% 더 강하게 적중합니다."
@@ -6170,6 +6355,7 @@ export const ko_KR: EnTranslations = {
         "add": "채팅 채널 추가",
         "addTitle": "채널 추가",
         "close": "{channel} 탭 닫기",
+        "moveHint": "{channel} 탭 순서 변경: 드래그하거나 Alt+왼쪽 또는 Alt+오른쪽 사용",
         "sendingTo": "{channel} 채널에 보내기",
         "names": {
           "say": "말하기",
@@ -6226,11 +6412,15 @@ export const ko_KR: EnTranslations = {
       "graphicsPresetMedium": "중간",
       "graphicsPresetHigh": "높음",
       "graphicsPresetUltra": "울트라",
+      "graphicsPresetInsane": "극한",
       "graphicsPresetAdvanced": "고급",
       "terrainDetail": "지형 세부 묘사",
       "foliageDensity": "초목 밀도",
       "effectsQuality": "효과 및 조명",
       "shadowQuality": "그림자 품질",
+      "surfaceDetail": "표면 디테일",
+      "surfaceDetailBasic": "기본",
+      "surfaceDetailFull": "전체",
       "terrainLow": "낮음",
       "terrainHigh": "높음",
       "touchOpacity": "터치 조작 투명도",
@@ -6394,6 +6584,8 @@ export const ko_KR: EnTranslations = {
       "joinParty": "파티 참가",
       "guildInvite": "{name}님이 {guild}에 초대했습니다.",
       "joinGuild": "길드 참가",
+      "guildInviteCancelled": "길드 이름이 변경되어 대기 중인 길드 초대가 취소되었습니다.",
+      "guildRenamed": "운영팀이 회원님의 길드 이름을 {name}(으)로 변경했습니다.",
       "tradeRequest": "{name}님이 거래를 원합니다.",
       "openTrade": "거래 열기",
       "duelRequest": "{name}님이 결투를 신청했습니다!",
@@ -6407,6 +6599,9 @@ export const ko_KR: EnTranslations = {
       "floatingDodge": "회피",
       "floatingParry": "무기 막기",
       "floatingResist": "저항",
+      "floatingEvade": "완전 회피",
+      "floatingHealFull": "가득 참",
+      "floatingHealAbsorbed": "흡수됨",
       "cannotMove": "이동 불가!",
       "attack": "공격",
       "damageDone": "{ability}이 {target}에게 {amount}의 피해를 입혔습니다.",
@@ -6417,10 +6612,15 @@ export const ko_KR: EnTranslations = {
       "dodged": "{target}이 {ability}을 회피했습니다.",
       "parried": "{target}이 당신의 {ability}을 무기로 막았습니다.",
       "resisted": "{target}이 {ability}을 저항했습니다.",
+      "evaded": "{target}이 당신의 {ability}을 완전히 회피했습니다.",
       "healSelf": "{ability}이 자신을 {amount}만큼 치유했습니다.",
       "healSelfCrit": "{ability}이 자신을 치명타 치유로 {amount}만큼 회복했습니다.",
       "healOther": "{ability}이 {target}을 {amount}만큼 치유했습니다.",
       "healOtherCrit": "{ability}이 {target}을 치명타 치유로 {amount}만큼 회복했습니다.",
+      "healSelfFull": "{ability}이 적중했지만 이미 생명력이 가득합니다.",
+      "healOtherFull": "{ability}이 {target}에게 적중했지만 대상은 이미 생명력이 가득합니다.",
+      "healSelfAbsorbed": "당신의 {ability}이(가) 당신에게 걸린 부패에 삼켜졌습니다.",
+      "healOtherAbsorbed": "당신의 {ability}이(가) {target}에게 걸린 부패에 삼켜졌습니다.",
       "death": "{name} 사망.",
       "auraGain": "{name} 효과를 얻었습니다.",
       "auraFade": "{name} 효과가 사라졌습니다.",
@@ -6509,10 +6709,12 @@ export const ko_KR: EnTranslations = {
       "arenaQueueTrading": "거래를 끝낸 뒤 대기열에 들어가세요.",
       "arenaQueueInstance": "인스턴스 안에서는 대기열에 들어갈 수 없습니다.",
       "tradeInProgress": "이미 거래가 진행 중입니다.",
+      "tradeAlreadyTrading": "그 플레이어는 이미 거래 중입니다.",
       "tradeTooFar": "대상이 너무 멀어 거래할 수 없습니다.",
       "tradeExpired": "거래 요청이 만료되었습니다.",
       "tradeFailed": "거래 실패: 아이템이나 돈을 더 이상 사용할 수 없습니다.",
-      "tradeBound": "그 아이템은 귀속되어 거래할 수 없습니다."
+      "tradeBound": "그 아이템은 귀속되어 거래할 수 없습니다.",
+      "marketListBound": "그 아이템은 귀속되어 등록할 수 없습니다."
     },
     "logs": {
       "standUp": "일어섰습니다.",
@@ -6780,22 +6982,22 @@ export const ko_KR: EnTranslations = {
       "gathering": "채집",
       "demonHeal": "악마 치유",
       "thunzharrStormcall": "폭풍의 부름",
-      "rift_frost_execution": "Glacial Grave",
-      "rift_frost_strike": "Absolute Zero",
-      "rift_ember_execution": "Magma Well",
-      "rift_ember_strike": "Core Meltdown",
-      "rift_venom_execution": "Venom Pool",
-      "rift_venom_strike": "Broodmother's Mark",
-      "rift_necro_execution": "Soul Grave",
-      "rift_necro_strike": "Death Sentence",
-      "rift_brute_execution": "Earthshatter",
-      "rift_brute_strike": "Final Judgment",
-      "rift_arcane_execution": "Void Rift",
-      "rift_arcane_strike": "Arcane Annihilation",
-      "rift_storm_execution": "Lightning Rod",
-      "rift_storm_strike": "Stormcaller's Wrath",
-      "rift_tide_execution": "Abyssal Maw",
-      "rift_tide_strike": "Crushing Depth"
+      "rift_frost_execution": "빙하의 무덤",
+      "rift_frost_strike": "절대 영도",
+      "rift_ember_execution": "마그마 우물",
+      "rift_ember_strike": "핵심 용해",
+      "rift_venom_execution": "독액 웅덩이",
+      "rift_venom_strike": "여왕 거미의 낙인",
+      "rift_necro_execution": "영혼의 무덤",
+      "rift_necro_strike": "사망 선고",
+      "rift_brute_execution": "대지 분쇄",
+      "rift_brute_strike": "최후의 심판",
+      "rift_arcane_execution": "공허 균열",
+      "rift_arcane_strike": "비전 소멸",
+      "rift_storm_execution": "피뢰침",
+      "rift_storm_strike": "폭풍 소환사의 분노",
+      "rift_tide_execution": "심연의 아가리",
+      "rift_tide_strike": "분쇄의 심연"
     }
   },
   "questUi": {
@@ -6803,7 +7005,8 @@ export const ko_KR: EnTranslations = {
       "title": "퀘스트",
       "complete": "완료",
       "showOnMap": "{name} 지도에 표시",
-      "hideFromMap": "{name} 지도에서 숨기기"
+      "hideFromMap": "{name} 지도에서 숨기기",
+      "unknownQuest": "알 수 없는 퀘스트 ({id})"
     },
     "log": {
       "title": "퀘스트 기록",
@@ -6815,6 +7018,8 @@ export const ko_KR: EnTranslations = {
       "activeStatus": "진행 중",
       "readyStatus": "완료",
       "completedStatus": "완료됨",
+      "repeatableStatus": "반복 가능",
+      "cooldownStatus": "곧 다시 수령 가능",
       "returnTo": "{name}에게 돌아가기",
       "abandon": "퀘스트 포기",
       "abandonConfirmTitle": "퀘스트 포기",
@@ -6828,6 +7033,7 @@ export const ko_KR: EnTranslations = {
       "greetingFallback": "안녕하세요.",
       "availableQuestAria": "받을 수 있는 퀘스트: {name}",
       "readyQuestAria": "완료 보고 가능한 퀘스트: {name}",
+      "repeatableQuestAria": "반복 가능한 퀘스트: {name}",
       "discussQuest": "{name}에 대해 이야기합니다.",
       "discussQuestAria": "퀘스트 논의: {name}",
       "profIntroHint": "{name}에게 \"{quest}\"을(를) 받으세요.",
@@ -6868,7 +7074,8 @@ export const ko_KR: EnTranslations = {
       "incomplete": "그 퀘스트는 완료되지 않았습니다.",
       "giverMissing": "그 퀘스트를 주는 대상이 근처에 없습니다.",
       "turnInMissing": "그 퀘스트를 보고할 대상이 근처에 없습니다.",
-      "tooFar": "너무 멉니다."
+      "tooFar": "너무 멉니다.",
+      "escortAway": "호송할 대상이 지금 자리에 없습니다. 잠시 후 그곳으로 돌아옵니다."
     }
   },
   "itemUi": {
@@ -6907,6 +7114,7 @@ export const ko_KR: EnTranslations = {
       "armor": "방어구",
       "quest": "퀘스트 아이템",
       "junk": "잡동사니",
+      "fineMaterial": "상급 재료",
       "food": "음식",
       "drink": "음료",
       "tool": "도구",
@@ -6966,7 +7174,13 @@ export const ko_KR: EnTranslations = {
       "stackCount": "x{count}",
       "destroyTitle": "{item} 파괴",
       "destroyConfirm": "파괴",
-      "destroyCancel": "취소"
+      "destroyCancel": "취소",
+      "unknownItem": "알 수 없는 아이템",
+      "unknownItemAria": "알 수 없는 아이템 {id}, 수량 {count}",
+      "unknownItemAriaMasterwork": "알 수 없는 아이템 {id}, 수량 {count}, 걸작",
+      "unknownItemAriaEnchanted": "알 수 없는 아이템 {id}, 수량 {count}, 마법부여된 사본",
+      "unknownItemAriaBound": "알 수 없는 아이템 {id}, 수량 {count}, 귀속된 사본",
+      "unknownItemAriaInstanced": "알 수 없는 아이템 {id}, 수량 {count}, 제작자 표식이 있는 사본"
     },
     "equipment": {
       "empty": "비어 있음",
@@ -6977,6 +7191,19 @@ export const ko_KR: EnTranslations = {
       "close": "상인 닫기",
       "hint": "이 창이 열려 있을 때 가방의 아이템을 클릭하면 판매합니다.",
       "buyAria": "{price}에 {item} 구매",
+      "buyAriaWithRequirement": "{price}에 {item} 구매. {requirement}",
+      "buyStack": "{count}개 구매",
+      "buyStackAria": "{price}에 {item} {count}개 구매",
+      "qtyRowAria": "구매 수량",
+      "qtyMultiple": "{count}x",
+      "qtyMultipleAria": "한 번에 {count}개씩 구매",
+      "qtyCustom": "직접 입력",
+      "qtyCustomAria": "구매 수량 직접 입력",
+      "buyCountAria": "Buy {count} of {item} for {price}",
+      "buyCountAriaWithRequirement": "Buy {count} of {item} for {price}. {requirement}",
+      "buyQuantityTitle": "{item}을(를) 몇 개 구매하시겠습니까? 최대 {max}개.",
+      "buyQuantityInput": "구매할 수량",
+      "buyQuantityConfirm": "Buy",
       "buybackTitle": "되사기",
       "buybackEmpty": "물품 없음",
       "buybackAria": "{item}을(를) {price}에 되사기",
@@ -7256,7 +7483,7 @@ export const ko_KR: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "상급 투명화",
-        "description": "20초 동안 모습을 감춥니다. 지속 피해 효과 2개를 제거하고 투명 상태인 동안과 해제 직후 받는 피해가 90% 감소합니다. (마법사 특성)"
+        "description": "20초 동안 사라지며 지속 피해 효과를 2개 제거합니다. 투명화가 끝나면 2초 동안 받는 피해가 90% 감소합니다. (마법사 특성)"
       },
       "hot_streak": {
         "name": "몰아치는 열기",
@@ -9457,6 +9684,39 @@ export const ko_KR: EnTranslations = {
       "resonant_timber": {
         "name": "공명의 목재"
       },
+      "fine_copper_ore": {
+        "name": "상급 구리 광석"
+      },
+      "fine_iron_ore": {
+        "name": "상급 철 광석"
+      },
+      "fine_thorium_ore": {
+        "name": "상급 오스뮴 광석"
+      },
+      "fine_ironbark_log": {
+        "name": "상급 무쇠껍질나무 통나무"
+      },
+      "fine_ashwood_log": {
+        "name": "상급 잿빛나무 통나무"
+      },
+      "fine_elderwood_log": {
+        "name": "상급 고산솔 통나무"
+      },
+      "fine_silverleaf_herb": {
+        "name": "상급 윤광잎 약초"
+      },
+      "fine_goldleaf_herb": {
+        "name": "상급 금빛잎 약초"
+      },
+      "fine_sunpetal_herb": {
+        "name": "상급 태양꽃잎 약초"
+      },
+      "stormreel_fishing_rod": {
+        "name": "폭풍릴 낚싯대"
+      },
+      "tidewrought_fishing_rod": {
+        "name": "조수벼림 낚싯대"
+      },
       "duskwisp_essence": {
         "name": "황혼 위습의 정수"
       },
@@ -9594,6 +9854,18 @@ export const ko_KR: EnTranslations = {
       },
       "wildheart_fangknife": {
         "name": "줄가르의 송곳니칼"
+      },
+      "fanglords_beastspear": {
+        "name": "송곳니 군주의 야수창"
+      },
+      "bloodmane_warleggings": {
+        "name": "피갈기 전쟁 다리보호구"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "덩굴발톱 잠행 바지"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "태양뼈 의식 사롱"
       },
       "thick_winter_pelt": {
         "name": "두꺼운 겨울 모피"
@@ -9762,6 +10034,15 @@ export const ko_KR: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "마지막 요새의 인장"
+      },
+      "gatherers_cache": {
+        "name": "채집가의 주머니"
+      },
+      "artisans_eye": {
+        "name": "장인의 눈"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "테러스파크 시동 열쇠"
       },
       "conjured_water4": {
         "name": "창조된 샘물"
@@ -10338,6 +10619,24 @@ export const ko_KR: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "용노래 손싸개"
+      },
+      "basin_stalkers_tunic": {
+        "name": "분지 추적자의 튜닉"
+      },
+      "verdant_heart_vestment": {
+        "name": "신록의 심장 예복"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "태양뼈 의식 사슬갑옷"
+      },
+      "greatfang_of_the_basin": {
+        "name": "분지의 대송곳니"
+      },
+      "sunbone_oracles_crown": {
+        "name": "태양뼈 예언자의 왕관"
+      },
+      "bloodmane_war_legguards": {
+        "name": "피갈기 전쟁 다리갑옷"
       },
       "deathless_greatblade": {
         "name": "불사 대검"
@@ -11047,22 +11346,22 @@ export const ko_KR: EnTranslations = {
         "name": "어부 브람"
       },
       "lb_actor_coalfast": {
-        "name": "숯불 워든"
+        "name": "감시관 콜패스트"
       },
       "lb_actor_ollun": {
         "name": "균열감시자 올룬"
       },
       "lb_actor_edda": {
-        "name": "병참관 에다"
+        "name": "병참장교 에다"
       },
       "lb_actor_saul": {
-        "name": "치료사 사울"
+        "name": "치유사 사울"
       },
       "lb_actor_tam": {
         "name": "종지기 탐"
       },
       "tidemill_stalker": {
-        "name": "밀물방앗간 추적자"
+        "name": "타이드밀 추적자"
       },
       "rift_hellguard": {
         "name": "지옥 수호병"
@@ -11621,18 +11920,18 @@ export const ko_KR: EnTranslations = {
       },
       "ferryman_ewald": {
         "name": "뱃사공 에발트",
-        "title": "건너편 해안 나루",
-        "greeting": "건너편 해안으로 가나? 이제 고기잡이 때문에 건너는 사람은 아무도 없어, 친구. 준비되면 배에 타게. 도착하면 종소리를 잘 들어. 그 마을 사람들은 자네가 날씨를 살피듯 종소리를 듣거든."
+        "title": "파쇼어 항로",
+        "greeting": "파쇼어로 가나? 이제 낚시하러 건너는 사람은 아무도 없네, 친구. 준비되면 배에 오르고, 도착하면 종소리를 잘 들어. 이 마을 사람들은 날씨를 살피듯 그 소리를 듣거든."
       },
       "ferryman_ewald_gullhaven": {
         "name": "뱃사공 에발트",
-        "title": "건너편 해안 나루",
-        "greeting": "건너편 해안으로 가나? 이제 고기잡이 때문에 건너는 사람은 아무도 없어, 친구. 준비되면 배에 타게. 도착하면 종소리를 잘 들어. 그 마을 사람들은 자네가 날씨를 살피듯 종소리를 듣거든."
+        "title": "파쇼어 항로",
+        "greeting": "파쇼어로 가나? 이제 낚시하러 건너는 사람은 아무도 없네, 친구. 준비되면 배에 오르고, 도착하면 종소리를 잘 들어. 이 마을 사람들은 날씨를 살피듯 그 소리를 듣거든."
       },
       "sergeant_marsh": {
-        "name": "마시 중사",
+        "name": "마시 병장",
         "title": "마을 민병대",
-        "greeting": "훈련은 받았나? 그럼 오늘 밤의 방식을 알려 주지. 내 전열이 길을 지킨다. 균열이 우리가 쓰러뜨리지 못할 것을 토해 내면 내가 자네를 가리킬 거다. 방앗간은 자네 몫이다. 아무것도 따라 들어가게 하지 말고, 아무것도 우리를 지나 마을로 가게 하지 마라. 가."
+        "greeting": "훈련은 받았나? 그럼 오늘 밤 일을 설명하지. 우리 전열이 길을 지킨다. 균열에서 우리가 쓰러뜨릴 수 없는 게 나오면 자네에게 맡기겠다. 방앗간은 자네 몫이다. 아무것도 자네를 따라 들어가게 하지 말고, 우리를 지나 마을로 가게도 하지 마. 가게."
       },
       "forgemistress_darva": {
         "name": "단조사 다르바",
@@ -11673,7 +11972,7 @@ export const ko_KR: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "검 말고도 할 수 있는 일",
-        "text": "이스트브룩 사람이라면 누구나 검술 말고도 생업 하나는 익히지, {playerName}. 마을 남서쪽 구리 광산 주변 바위에는 광맥이 있다네. 곡괭이를 들고 직접 광맥 5곳을 캐 오게. 속이려 해도 나는 차이를 안다네.",
+        "text": "이스트브룩 사람이라면 누구나 검술 말고도 생업 하나는 익히지, {playerName}. 마을 남동쪽 구리 광산 주변 바위에는 광맥이 있다네. 곡괭이를 들고 직접 광맥 5곳을 캐 오게. 속이려 해도 나는 차이를 안다네.",
         "completion": "보게나. 광석도 모았고 손에는 굳은살도 박였군. 길을 다닐 때도 채광과 벌목, 약초 채집을 계속하게. 마을에 돌아오면 시장 옆의 마을 집중 게시판과 근처 제작대도 잊지 말고. 원한다면 이 모든 일에서 정당한 생계를 찾을 수 있다네.",
         "objectives": {
           "0": {
@@ -11756,7 +12055,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_supplies": {
         "title": "도난당한 보급품",
-        "text": "도적들이 내 마지막 마차를 털었습니다. 도구, 소금, 이스트브룩 아마가 들었습니다. 남동쪽 야영지에서 보급 상자 4개를 되찾아 주십시오.",
+        "text": "도적들이 내 마지막 마차를 털었습니다. 도구, 소금, 이스트브룩 아마가 들었습니다. 남서쪽 야영지에서 보급 상자 4개를 되찾아 주십시오.",
         "completion": "내 상자들입니다! 흠집도 거의 없군요. 대단합니다.",
         "objectives": {
           "0": {
@@ -12138,7 +12437,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_old_cragmaw": {
         "title": "늙은 크래그모",
-        "text": "산사람들은 정찰병이 찾은 발자국의 주인을 알고 있었습니다. 늙은 크래그모, 제 무리의 세 세대를 먼저 보낸 흉터투성이 폭군 고양이입니다. 추적자들이 내 길로 쏟아지는 것도 그놈 때문입니다, {playerName}. 굴은 남쪽 길 위 서편 산등성이에 있습니다. 동료를 데리고 가서 그 늙은 악마를 처치하십시오.",
+        "text": "산사람들은 정찰병이 찾은 발자국의 주인을 알고 있었습니다. 늙은 크래그모, 제 무리의 세 세대를 먼저 보낸 흉터투성이 폭군 고양이입니다. 추적자들이 내 길로 쏟아지는 것도 그놈 때문입니다, {playerName}. 굴은 남쪽 길 위 동편 산등성이에 있습니다. 동료를 데리고 가서 그 늙은 악마를 처치하십시오.",
         "completion": "마침내 쓰러졌군요. 산사람들은 그 고양이가 성벽보다 오래 살 거라 장담했었습니다. 이제 추적자들은 높은 설원에 머물 겁니다, {playerName}. 내 순찰대도 피 흘리지 않고 길을 걷겠지요. 당신 덕분에 산등성이 전체가 조용해졌습니다.",
         "objectives": {
           "0": {
@@ -12377,7 +12676,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_the_codfather": {
         "title": "대구 대부",
-        "text": "대구 대부는 그저 물고기가 아니라네, {playerName}. 냉혈한 살인자지. 노인들은 놈이 늪지 배회자를 아침으로 먹는다고 맹세하고, 미어펜 과부거미조차 순전한 공포 때문에 딥펜 여울 근처에는 거미줄을 치지 않는다네. 놈이 그 물을 지배하지. 낚싯대를 들고 그 늙은 악마를 제 물가에서 끌어내 오게. 그러면 자네가 가족이 되었다고 인정하지.",
+        "text": "대구 대부는 그저 물고기가 아니라네, {playerName}. 냉혈한 살인자지. 노인들은 놈이 늪지 배회자를 아침으로 먹는다고 맹세하고, 미어펜 과부거미조차 순전한 공포 때문에 딥펜 여울 근처에는 거미줄을 치지 않는다네. 놈이 그 물을 지배하고, 늪물에는 다름 아닌 쇠릴 낚싯대가 필요하다네. 내 계산대에서 팔고 있지. 하나 손에 들고 그 늙은 악마를 제 물가에서 끌어내 오게. 그러면 자네가 가족이 되었다고 인정하지.",
         "completion": "축축한 성자들이시여... 대구 대부 그 자체로군. 저 수염 좀 보게. 펜브리지는 이 한 마리로 일 년 내내 이야깃거리를 삼을 걸세, {playerName}.",
         "objectives": {
           "0": {
@@ -12397,7 +12696,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_nythraxis_graves": {
         "title": "잊힌 자들의 무덤",
-        "text": "북쪽 전장 둘레의 세 오래된 무덤에서 이 표식을 본 적이 있습니다. 알드렌 대장은 동쪽 언덕에, 대사제 말릭은 가운데 부서진 길 근처에, 왕실 암살자 보스는 서쪽 절벽 곁에 묻혀 있습니다. 각 무덤을 만지고 귀 기울이십시오, {playerName}. 죽은 자들은 산 자들이 잊은 것을 기억할지도 모릅니다.",
+        "text": "북쪽 전장 둘레의 세 오래된 무덤에서 이 표식을 본 적이 있습니다. 알드렌 대장은 서쪽 언덕에, 대사제 말릭은 서쪽 가장자리를 따라 더 남쪽에, 왕실 암살자 보스는 동쪽 절벽 곁에 묻혀 있습니다. 각 무덤을 만지고 귀 기울이십시오, {playerName}. 죽은 자들은 산 자들이 잊은 것을 기억할지도 모릅니다.",
         "completion": "알드렌은 충성을 지켰고, 말릭은 죽음을 받아들이지 않았으며, 보스는 누구보다 먼저 위험을 보았습니다. 셋 모두 같은 잊힌 왕을 섬겼습니다.",
         "objectives": {
           "0": {
@@ -12413,7 +12712,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_nythraxis_sealed_crypt": {
         "title": "버려진 납골당",
-        "text": "환영은 서쪽 절벽의 버려진 묘실을 가리킵니다. 그 묘실에 한 왕이 있었다는 옛 전설이 있습니다. 말릭의 의식이 그를 죽지 않는 존재로 뒤틀어 놓은 뒤 쏜피크가 그를 아래에 봉인했을지도 모릅니다. 묘실에 들어가 안에 무엇이 남아 있는지 확인하십시오.",
+        "text": "환영은 동쪽 절벽의 버려진 묘실을 가리킵니다. 그 묘실에 한 왕이 있었다는 옛 전설이 있습니다. 말릭의 의식이 그를 죽지 않는 존재로 뒤틀어 놓은 뒤 쏜피크가 그를 아래에 봉인했을지도 모릅니다. 묘실에 들어가 안에 무엇이 남아 있는지 확인하십시오.",
         "completion": "열쇠돌의 두 조각이 맞물리고, 보스의 일지는 그것들이 봉인한 것을 밝힙니다. 니트락시스 왕의 인장 반지입니다. 일지가 사실이라면 그 반지가 그의 무덤으로 가는 열쇠입니다.",
         "objectives": {
           "0": {
@@ -12455,7 +12754,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_mogger": {
         "title": "모거를 쓰러뜨려라",
-        "text": "모거는 수레를 쪼개고 울타리를 납작하게 만들며 계곡 절반을 비울 만큼 가축을 죽였습니다. 혼자 맞서지 마십시오. 강한 동료 둘과 동쪽 초원으로 가서 그 짐승을 끝내십시오.",
+        "text": "모거는 수레를 쪼개고 울타리를 납작하게 만들며 계곡 절반을 비울 만큼 가축을 죽였습니다. 혼자 맞서지 마십시오. 강한 동료 둘과 서쪽 초원으로 가서 그 짐승을 끝내십시오.",
         "completion": "마침내 모거가 죽었습니다. 이스트브룩의 들판은 더 안전해졌고, 당신은 전할 만한 이야기를 하나 더 안고 계곡을 떠납니다.",
         "objectives": {
           "0": {
@@ -12515,7 +12814,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "다시 이은 실",
-        "text": "결국 다시 내 베틀 앞이로군. 원한은 없다, {playerName}. 다만 실은 자신을 놓아 버린 손을 기억하고, 그것을 다시 잡는 값은 매번 더 길게 재어진다. 서쪽 숲을 뒤덮은 흑거미줄 잠복자들을 솎아 내라. 그 노동이 좋은 실을 다시 만지기 전에 네 손을 가라앉혀 줄 것이다.",
+        "text": "결국 다시 내 베틀 앞이로군. 원한은 없다, {playerName}. 다만 실은 자신을 놓아 버린 손을 기억하고, 그것을 다시 잡는 값은 매번 더 길게 재어진다. 동쪽 숲을 뒤덮은 흑거미줄 잠복자들을 솎아 내라. 그 노동이 좋은 실을 다시 만지기 전에 네 손을 가라앉혀 줄 것이다.",
         "completion": "다시 흔들림이 없군. 가죽세공과 재봉이 주 전공으로 네 손에 돌아왔다. 이번에는 떠돌기 전에 두 번 재어라.",
         "objectives": {
           "0": {
@@ -12525,7 +12824,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "다시 화덕 위로",
-        "text": "이런, 누가 다시 내 냄비 앞에 왔나 보게. 서운한 것 없네, {playerName}, 부엌에는 늘 자리가 있으니까. 다만 걸어 나갈 때마다 외상값이 길어지는 건 자네도 알 테지. 동쪽 초원의 야생 멧돼지를 솎아 오게. 정직한 땀이 첫 번째 재료이고, 그것이 자네 손에 이 일을 다시 일깨워 줄 걸세.",
+        "text": "이런, 누가 다시 내 냄비 앞에 왔나 보게. 서운한 것 없네, {playerName}, 부엌에는 늘 자리가 있으니까. 다만 걸어 나갈 때마다 외상값이 길어지는 건 자네도 알 테지. 서쪽 초원의 야생 멧돼지를 솎아 오게. 정직한 땀이 첫 번째 재료이고, 그것이 자네 손에 이 일을 다시 일깨워 줄 걸세.",
         "completion": "옛 맛이 다시 나는군. 연금술과 요리가 주 전공으로 자네 화덕 위에 돌아왔네. 이번엔 좀 오래 머물게.",
         "objectives": {
           "0": {
@@ -12904,7 +13203,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "렌을 바래다주는 길",
-        "text": "내 견습생 렌이 이틀 전에 금빛눈녹이 길을 살피러 나갔다가 돌아오지 않았네. 발자국은 찾았어. 오로라 계단 남서쪽 길표지 아래 웅크리고 있는데, 늑대가 무서워 꼼짝을 못 하고 있지. 나는 늪을 비울 수가 없네, {playerName}. 그 아이를 계단 위 베일라의 야영지까지 데려다주게. 빛 아래라면 안전할 걸세.",
+        "text": "내 견습생 렌이 이틀 전에 금빛눈녹이 길을 살피러 나갔다가 돌아오지 않았네. 발자국은 찾았어. 오로라 계단 북동쪽 길표지 아래 웅크리고 있는데, 늑대가 무서워 꼼짝을 못 하고 있지. 나는 늪을 비울 수가 없네, {playerName}. 그 아이를 계단 위 베일라의 야영지까지 데려다주게. 빛 아래라면 안전할 걸세.",
         "completion": "그 아이는 안에 있네. 내 담요를 절반이나 두르고서 하늘의 별을 다 헤아릴 기세로 떠들고 있지. 오늘 자네는 고운 일을 했어, {playerName}. 서리장막 봉우리에서는 좀처럼 보기 힘든 일이라네.",
         "objectives": {
           "0": {
@@ -13525,8 +13824,8 @@ export const ko_KR: EnTranslations = {
       },
       "q_fs_bell_at_the_landing": {
         "title": "선착장의 종",
-        "text": "나룻배를 타고 왔소, {playerName}? 그렇다면 일주일 만에 처음 온 사람이니, 워든이 그대를 직접 살펴보고 싶어 할 것이오. 걸헤이븐은 선착장에서 올라가면 나오오. 이제 아무도 돌보지 않는 건조대를 지나서 말이오. 숯불 워든에게 뱃길이 아직 이어지고 있다고 전하시오. 그리고 탐이 오늘은 아직 종을 세 번 울리지 않았다고. 아직은 말이오.",
-        "completion": "뱃길이 이어지고 있고, 탐은 아직 세 번 종을 두고 농담할 기운이 남아 있군. 좋아. 우리는 포위당한 섬일세, {playerName}. 나룻배가 실어 오는 손 한 쌍 한 쌍이, 균열이 내 사람들에게 닿기 전에 뚫고 지나야 할 손일세. 걸헤이븐에 온 것을 환영하네.",
+        "text": "모래톱 둑길을 건너왔소, {playerName}? 그렇다면 일주일 만에 처음 온 사람이니, 워든이 그대를 직접 살펴보고 싶어 할 것이오. 걸헤이븐은 물가 길을 올라가면 나오오. 이제 아무도 돌보지 않는 건조대를 지나서 말이오. 숯불 워든에게 둑길이 아직 버티고 있다고 전하시오. 그리고 탐이 오늘은 아직 종을 세 번 울리지 않았다고. 아직은 말이오.",
+        "completion": "둑길이 버티고 있고, 탐은 아직 세 번 종을 두고 농담할 기운이 남아 있군. 좋아. 우리는 포위당한 섬일세, {playerName}. 저 모래톱을 건너오는 손 한 쌍 한 쌍이, 균열이 내 사람들에게 닿기 전에 뚫고 지나야 할 손일세. 걸헤이븐에 온 것을 환영하네.",
         "objectives": {
           "0": {
             "label": "숯불 워든에게 보고"
@@ -13588,7 +13887,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "브람아 돌아오렴",
-        "text": "그물 균열이 열리던 아침에 우리 브람이 배를 몰고 나갔는데, 바다가 그이를 선착장 곶 너머 어딘가로 내던졌어요. 사흘 전 밤에 그이가 물 너머로 부르는 소리를 들었어요, {playerName}. 그런데도 나는 무서워서 가지 못했어요. 지금도 무서워요. 부탁이에요. 그이의 배가 북쪽 물가에 부서져 있어요. 그이를 집까지 데려다주세요.",
+        "text": "그물 균열이 열리던 아침에 우리 브람이 배를 몰고 나갔는데, 바다가 그이를 선착장 곶 너머 어딘가로 내던졌어요. 사흘 전 밤에 그이가 물 너머로 부르는 소리를 들었어요, {playerName}. 그런데도 나는 무서워서 가지 못했어요. 지금도 무서워요. 부탁이에요. 그이의 배가 남쪽 물가에 부서져 있어요. 그이를 집까지 데려다주세요.",
         "completion": "브람! 그이를 성한 몸으로 데려다주셨군요, {playerName}. 우리 둘 다 울었지만 부끄럽지 않아요. 균열이 이 섬에서 다음에 무엇을 앗아 가든, 내 가족만은 안 돼요. 이제 다시는요.",
         "objectives": {
           "0": {
@@ -13618,17 +13917,17 @@ export const ko_KR: EnTranslations = {
       },
       "q_lb_q0_ashore": {
         "title": "상륙",
-        "text": "갈매기항은 밤낮으로 균열의 공격을 받고도 버티고 있다. 그들과 함께 설 생각이라면 마을이 피 흘리는 곳에서 시작하라. 항구 계단과 오래된 조각상을 지나 동쪽으로 가서 감시 초원의 민병대 전열로 향하라.",
-        "completion": "방앗간의 괴물은 자네 혼자 쓰러뜨렸고, 들것에 관한 탐의 말도 과장이 아니더군. 정찰병은 부족하고 지켜야 할 들판은 넘친다. 오늘 밤 자네는 원래 자네 것이 아닌 땅을 지켰다. 그게 이 일의 전부다. 감시대에 온 걸 환영한다.",
+        "text": "걸헤이븐은 밤낮으로 충격을 견디면서도 버티고 있다. 그들과 함께 설 생각이라면 마을이 피 흘리는 곳에서 시작하라. 항구 계단과 오래된 동상을 지나 동쪽 감시 초원의 민병대 전선으로 가라.",
+        "completion": "방앗간의 사냥감은 자네 혼자 쓰러뜨렸고, 탐의 들것 이야기도 과장이 아니었군. 정찰병은 모자라고 지킬 들판은 넘친다. 오늘 밤 자네는 자신의 땅도 아닌 곳을 지켰다. 그게 이 일의 전부다. 경비대에 온 걸 환영한다.",
         "objectives": {
           "0": {
-            "label": "감시 초원의 마시 중사에게 보고"
+            "label": "감시 초원의 마시 병장에게 보고"
           },
           "1": {
-            "label": "균열의 소생물 처치"
+            "label": "균열 피조물 처치"
           },
           "2": {
-            "label": "밀물방앗간 안의 무언가를 처치"
+            "label": "타이드밀 안의 존재 처치"
           }
         }
       },
@@ -13828,7 +14127,7 @@ export const ko_KR: EnTranslations = {
             "label": "소우필드"
           },
           "11": {
-            "label": "먼바다 나루터"
+            "label": "먼바다 해안 모래톱 둑길"
           }
         }
       },
@@ -14173,7 +14472,7 @@ export const ko_KR: EnTranslations = {
       },
       "farshore_isle": {
         "name": "먼바다 해안",
-        "welcome": "나룻배에서 내리면, 마을보다 먼저 걸헤이븐의 종소리가 그대를 맞이할 것이오. 균열은 아무 예고도 없이 찢어지듯 열리고, 이 보루는 그 틈으로 쏟아지는 무엇이든 맞서며 제 해안을 지켜 왔소. 그대 같은 이를 오래도록 기다려 왔다오.",
+        "welcome": "모래톱을 건너면, 마을보다 먼저 걸헤이븐의 종소리가 그대를 맞이할 것이오. 균열은 아무 예고도 없이 찢어지듯 열리고, 이 보루는 그 틈으로 쏟아지는 무엇이든 맞서며 제 해안을 지켜 왔소. 그대 같은 이를 오래도록 기다려 왔다오.",
         "pois": {
           "0": {
             "label": "걸헤이븐"
@@ -14191,10 +14490,10 @@ export const ko_KR: EnTranslations = {
             "label": "균열의 들판"
           },
           "5": {
-            "label": "대균열"
+            "label": "균열"
           },
           "6": {
-            "label": "난파선 벌판"
+            "label": "잔해 벌판"
           }
         }
       }
@@ -14236,47 +14535,47 @@ export const ko_KR: EnTranslations = {
         "leaveText": "요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다."
       },
       "lb_tidemill": {
-        "name": "밀물방앗간",
+        "name": "타이드밀",
         "enterText": "방앗간 문이 열린다. 안에서는 어둠이 귀를 기울이고 있다.",
-        "leaveText": "밀물방앗간을 나와 저녁 공기 속으로 들어선다."
+        "leaveText": "타이드밀을 나와 저녁 공기 속으로 들어선다."
       },
       "lb_riftline": {
-        "name": "해질녘 균열 방어선",
-        "enterText": "순찰대 뒤로 초원의 문이 닫힌다. 오늘 밤은 이 방어선의 것이다.",
-        "leaveText": "균열 방어선을 새벽 경비대에 맡기고 떠난다."
+        "name": "The Rift-Line at Dusk",
+        "enterText": "순찰대 뒤로 초원 문이 닫힌다. 오늘 밤은 이 전선의 것이다.",
+        "leaveText": "균열 전선을 새벽 경비대에 맡긴다."
       },
       "lb_vault": {
-        "name": "가라앉은 첫 번째 보루",
+        "name": "가라앉은 첫 보루",
         "enterText": "밧줄이 어둠 속으로 풀려 내려간다. 아래에는 오래된 보루가 추락한 자리에 누워 있다.",
         "leaveText": "절벽 밧줄을 타고 햇빛 속으로 올라온다."
       },
       "lb_council": {
         "name": "보루 평의회",
         "enterText": "평의회실에는 의자가 여섯 개 있다. 하나는 비어 있다.",
-        "leaveText": "보루 밖으로 나온다."
+        "leaveText": "보루 밖으로 나선다."
       },
       "lb_landing": {
-        "name": "밤의 상륙지",
-        "enterText": "유도 불길이 해변을 따라 타오른다. 함대는 여울 너머에서 기다린다.",
-        "leaveText": "상륙 해변을 뒤로하고 떠난다."
+        "name": "밤의 상륙",
+        "enterText": "유도 불빛이 해변을 따라 타오른다. 함대는 여울 너머에서 기다린다.",
+        "leaveText": "상륙 해변을 뒤로한다."
       },
       "lb_riftfields": {
-        "name": "균열 들판 진입로",
-        "enterText": "네 곳의 수호 지점이 균열을 둘러싼다. 의식은 이곳을 열두 세기 동안 봉인했다.",
-        "leaveText": "균열 들판에서 아래로 걸어 내려온다."
+        "name": "균열 벌판 진입로",
+        "enterText": "네 개의 결계 지점이 균열을 둘러싼다. 의식은 열두 세기 동안 그것을 닫아 두었다.",
+        "leaveText": "균열 벌판에서 다시 내려온다."
       },
       "lb_breach": {
-        "name": "균열 안쪽",
-        "enterText": "빛이 잘못되어 있고 하늘은 더 나쁘다. 핵은 앞쪽의 탁 트인 땅에 있다.",
+        "name": "균열 내부",
+        "enterText": "빛이 이상하고 하늘은 더 나쁘다. 핵은 앞쪽 공터에 놓여 있다.",
         "leaveText": "경계를 넘어 평범한 밤공기 속으로 돌아온다."
       },
       "lb_lastwatch": {
         "name": "마지막 경계",
-        "enterText": "보루는 깨끗하고 비어 있다. 누군가는 이 경계를 끝내야 한다.",
-        "leaveText": "뒤에서 보루의 문을 닫는다."
+        "enterText": "보루는 깨끗하고 텅 비었다. 누군가는 이 경계를 끝내야 한다.",
+        "leaveText": "등 뒤로 보루 문을 닫는다."
       },
       "lb_willowfen": {
-        "name": "우는버들 늪",
+        "name": "윌로위프",
         "enterText": "버드나무는 움직이지 않는다. 물도 마찬가지다.",
         "leaveText": "버드나무를 고요 속에 남겨 두고 떠난다."
       },

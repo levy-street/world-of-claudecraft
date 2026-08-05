@@ -33,6 +33,9 @@ describe('professions wheel: enchanting is reachable', () => {
 
   it('renders an enchanting craft row whose bar reflects craftSkills.enchanting', () => {
     const model = buildProfessionsView({
+      viewerName: 'Testchar',
+      toolEffects: [],
+      inventory: [],
       identity: identity({ enchanting: 40, weaponcrafting: 10 }),
       gathering: [],
     });
@@ -44,8 +47,20 @@ describe('professions wheel: enchanting is reachable', () => {
   });
 
   it('moves the enchanting bar when the skill value moves', () => {
-    const low = buildProfessionsView({ identity: identity({ enchanting: 0 }), gathering: [] });
-    const high = buildProfessionsView({ identity: identity({ enchanting: 100 }), gathering: [] });
+    const low = buildProfessionsView({
+      viewerName: 'Testchar',
+      identity: identity({ enchanting: 0 }),
+      gathering: [],
+      toolEffects: [],
+      inventory: [],
+    });
+    const high = buildProfessionsView({
+      viewerName: 'Testchar',
+      identity: identity({ enchanting: 100 }),
+      gathering: [],
+      toolEffects: [],
+      inventory: [],
+    });
     const skillOf = (m: ReturnType<typeof buildProfessionsView>) =>
       m.crafts.find((c) => c.identity.craftId === 'enchanting')?.bar.skill;
     expect(skillOf(low)).toBe(0);

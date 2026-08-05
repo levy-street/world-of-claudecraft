@@ -52,6 +52,24 @@ function findFlatSpot(): { x: number; z: number } {
 }
 
 const SPOT = findFlatSpot();
+
+// Stricter than findFlatSpot: an interior spot with a near-zero terrain grade,
+// for the one test below that reads an exact overhead value (not just whether
+// a collider is present) off a wide (dz -3..5) probe span.
+function findLevelSpot(): { x: number; z: number } {
+  for (let x = -40; x <= 40; x += 3) {
+    for (let z = -40; z <= 40; z += 3) {
+      if (terrainHeight(x, z, SEED) < WATER_LEVEL + 2) continue;
+      let ok = true;
+      for (let dz = -3; dz <= 5 && ok; dz += 1) {
+        if (terrainSteepnessAt(x, z + dz, SEED) > 0.3) ok = false;
+        if (isBlocked(SEED, x, z + dz, 2.2)) ok = false;
+      }
+      if (ok) return { x, z };
+    }
+  }
+  throw new Error('no level spot');
+}
 const q = (over: Partial<Parameters<typeof findLedgeGrab>[0]> = {}) => ({
   seed: SEED,
   radius: R,
@@ -229,6 +247,42 @@ describe('the climb move', () => {
     expect(p.climb).toBeNull();
   });
 
+  it('a lip inside the vault ceiling stays a silent vault, even below the stall roof ridge', () => {
+    // CLIMB_MIN_OVERHEAD must track the true vault ceiling (jump apex plus
+    // MANTLE_REACH): anything the silent vault already reaches should never
+    // be forced into the scripted climb. Probe a point partway up the stall
+    // canopy's pitched gable, well short of its 2.54 ridge, so the overhead
+    // above the floor lands inside vault reach.
+    //
+    // The shared SPOT fixture (used everywhere else in this file, where only
+    // "flat enough to be collider-free" matters) can resolve to a spot with a
+    // subtle residual terrain grade that this probe is sensitive to (it reads
+    // an exact overhead value, not just presence/absence of a collider), so
+    // this one test finds its own interior, near-zero-grade spot instead.
+    const spot = findLevelSpot();
+    const sz = spot.z + 2.2;
+    setActiveWorldContent(world({ stalls: [{ x: spot.x, z: sz, rot: 0, r: 1.7 }] }));
+    const bodyZ = sz - 0.6 - (R + 0.5);
+    const startY = groundHeight(spot.x, bodyZ, SEED) + 0.6;
+    const grab = findLedgeGrab(q(), spot.x, startY, bodyZ);
+    expect(grab).not.toBeNull();
+    if (!grab) return;
+    const floorY = Math.max(
+      groundHeight(spot.x, bodyZ, SEED),
+      supportHeightAt(SEED, spot.x, bodyZ, R, startY + 1e-3),
+    );
+    const overhead = grab.topY - floorY;
+    const apex = (JUMP_VELOCITY * JUMP_VELOCITY) / (2 * GRAVITY);
+    // Comfortably inside the vault ceiling, so the silent vault already
+    // carries the body up here without any scripted animation.
+    expect(overhead).toBeLessThan(apex + MANTLE_REACH);
+    expect(overhead).toBeGreaterThan(1); // clear of the step/vault floor too
+
+    const p = makeBody(spot.x, startY, bodyZ);
+    expect(tryStartClimb(p, SEED)).toBe(false);
+    expect(p.climb).toBeNull();
+  });
+
   it('drops the body when a stun lands mid-climb', () => {
     const cz = SPOT.z + 2.2;
     setActiveWorldContent(world({ stalls: [{ x: SPOT.x, z: cz, rot: Math.PI / 2, r: 1.7 }] }));
@@ -319,8 +373,11 @@ describe('the climb against real world geometry', () => {
     expect(crossHeight).toBeLessThanOrEqual(climbReach);
     // No dead band in the ladder: everything below the climb's above-the-head
     // floor is inside the silent vault's reach from flat ground, so gating
-    // the pull-up on tall lips never makes any height unreachable.
-    expect(CLIMB_MIN_OVERHEAD).toBeLessThanOrEqual(vaultReach);
+    // the pull-up on tall lips never makes any height unreachable. Pinned
+    // to the exact vault ceiling, not just "under it": a looser bound let
+    // CLIMB_MIN_OVERHEAD drift stale under a later MANTLE_REACH tune and
+    // still pass.
+    expect(CLIMB_MIN_OVERHEAD).toBeCloseTo(vaultReach, 6);
     // And the cross itself still earns the pull-up.
     expect(crossHeight).toBeGreaterThanOrEqual(CLIMB_MIN_OVERHEAD);
   });

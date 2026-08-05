@@ -18,8 +18,8 @@ import type { FctKind } from './fct_core';
 export type FctSpawnSource =
   | {
       readonly type: 'damage';
-      /** The damage event's kind: an avoidance word (miss/dodge/parry/resist) or a landed hit. */
-      readonly damageKind: 'miss' | 'dodge' | 'parry' | 'resist' | 'hit';
+      /** The damage event's kind: an avoidance word (miss/dodge/parry/resist/evade) or a landed hit. */
+      readonly damageKind: 'miss' | 'dodge' | 'parry' | 'resist' | 'evade' | 'hit';
       /** Whether an ability fired (a landed hit splits damage-done into -ability vs -auto). */
       readonly ability: boolean;
       readonly crit: boolean;
@@ -56,7 +56,8 @@ export function fctSpawnShape(src: FctSpawnSource): FctSpawnShape | null {
         src.damageKind === 'miss' ||
         src.damageKind === 'dodge' ||
         src.damageKind === 'parry' ||
-        src.damageKind === 'resist'
+        src.damageKind === 'resist' ||
+        src.damageKind === 'evade'
       )
         return {
           kind: src.damageKind === 'parry' ? 'dodge' : src.damageKind,

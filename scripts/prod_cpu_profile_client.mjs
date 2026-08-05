@@ -2,6 +2,8 @@
 // The production image installs this root-owned helper under /app/ops. The
 // monitor invokes that immutable copy after starting the inspector on loopback.
 
+import WebSocket from 'ws';
+
 const profileMs = Number(process.env.WOC_PROFILE_MS ?? 30_000);
 if (!Number.isFinite(profileMs) || profileMs < 0 || profileMs > 300_000) {
   throw new Error('WOC_PROFILE_MS must be between 0 and 300000');

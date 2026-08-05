@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 import './_setup';
 import { fireEvent, render, screen } from '@testing-library/svelte';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -220,6 +220,92 @@ describe('admin auth flow', () => {
     await vi.waitFor(() => expect(auth.loginError).not.toBe(''));
     expect(passwordInput).toHaveFocus();
     expect(screen.queryByText(t('auth.signOut'))).not.toBeInTheDocument();
+  });
+
+  // Regression coverage for BUG #15: the admin login form previously had no way to
+  // submit a second factor at all, so a 2FA-enabled operator account had to be
+  // (server-side) waved through on password alone. Now the challenge reply reveals
+  // the code field and the second submit completes login with it.
+  it('reveals the 2FA code field after a challenge and completes login with the code', async () => {
+    expect(screen.queryByLabelText(t('auth.authenticatorCode'))).not.toBeInTheDocument();
+    h.apiLogin.mockImplementationOnce(async () => ({ twoFactorRequired: true }));
+    h.apiLogin.mockImplementationOnce(
+      async (_username: string, _password: string, code: string, recoveryCode: string) => {
+        expect(code).toBe('123456');
+        expect(recoveryCode).toBe('');
+        h.setToken('tok');
+        return {
+          username: 'alice',
+          roles: ['superadmin'],
+          permissions: ['analytics.read', 'accounts.read', 'moderation.read', 'moderation.act'],
+        };
+      },
+    );
+    render(App);
+    await fireEvent.input(screen.getByLabelText(t('auth.username')), {
+      target: { value: 'alice' },
+    });
+    await fireEvent.input(screen.getByLabelText(t('auth.password')), { target: { value: 'pw' } });
+    await fireEvent.submit(loginForm());
+
+    const codeInput = await screen.findByLabelText(t('auth.authenticatorCode'));
+    await fireEvent.input(codeInput, { target: { value: '123456' } });
+    await fireEvent.submit(loginForm());
+
+    expect(await screen.findByText(t('auth.signOut'))).toBeInTheDocument();
+    expect(h.apiLogin).toHaveBeenCalledTimes(2);
+    expect(h.apiLogin).toHaveBeenNthCalledWith(1, 'alice', 'pw', '', '');
+    expect(h.apiLogin).toHaveBeenNthCalledWith(2, 'alice', 'pw', '123456', '');
+  });
+
+  it('routes an explicitly selected recovery code through the recovery field', async () => {
+    h.apiLogin.mockImplementationOnce(async () => ({ twoFactorRequired: true }));
+    h.apiLogin.mockImplementationOnce(async () => {
+      h.setToken('tok');
+      return { username: 'alice', roles: ['superadmin'], permissions: [] };
+    });
+    render(App);
+    await fireEvent.input(screen.getByLabelText(t('auth.username')), {
+      target: { value: 'alice' },
+    });
+    await fireEvent.input(screen.getByLabelText(t('auth.password')), { target: { value: 'pw' } });
+    await fireEvent.submit(loginForm());
+
+    // Real-shaped recovery code (generateRecoveryCodes, server/totp.ts): 16 hex
+    // chars grouped in fours with dashes, 19 characters total. A field that
+    // truncates this (regression: maxlength was 14) makes recovery-code login,
+    // the account's own lockout escape hatch, impossible.
+    const recoveryCode = '4f8a-3b1c-9d2e-71ab';
+    await screen.findByLabelText(t('auth.authenticatorCode'));
+    await fireEvent.click(screen.getByRole('button', { name: t('auth.useRecoveryCode') }));
+    const codeInput = screen.getByLabelText(t('auth.recoveryCode'));
+    expect(codeInput).not.toHaveAttribute('maxlength', '14');
+    await fireEvent.input(codeInput, { target: { value: recoveryCode } });
+    expect((codeInput as HTMLInputElement).value).toBe(recoveryCode);
+    await fireEvent.submit(loginForm());
+
+    expect(await screen.findByText(t('auth.signOut'))).toBeInTheDocument();
+    expect(h.apiLogin).toHaveBeenNthCalledWith(2, 'alice', 'pw', '', recoveryCode);
+  });
+
+  it('keeps the code field visible and shows an error when the 2FA code is wrong', async () => {
+    h.apiLogin.mockImplementationOnce(async () => ({ twoFactorRequired: true }));
+    h.apiLogin.mockRejectedValueOnce(new ApiError(401, 'invalid authentication code'));
+    render(App);
+    await fireEvent.input(screen.getByLabelText(t('auth.username')), {
+      target: { value: 'alice' },
+    });
+    await fireEvent.input(screen.getByLabelText(t('auth.password')), { target: { value: 'pw' } });
+    await fireEvent.submit(loginForm());
+
+    const codeInput = await screen.findByLabelText(t('auth.authenticatorCode'));
+    await fireEvent.input(codeInput, { target: { value: '000000' } });
+    await fireEvent.submit(loginForm());
+
+    await vi.waitFor(() => expect(auth.loginError).not.toBe(''));
+    expect(screen.queryByText(t('auth.signOut'))).not.toBeInTheDocument();
+    // The operator can retry the code without re-entering the password.
+    expect(screen.getByLabelText(t('auth.authenticatorCode'))).toBeInTheDocument();
   });
 
   it('logout returns to the login screen with a session message', async () => {

@@ -26,6 +26,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..', '..', '..');
 const SPEC = path.join(ROOT, 'scripts/assets/specs/grand_ferry_ship.json');
 const BUILD_ASSETS = path.join(ROOT, 'scripts/assets/build_assets.mjs');
+const COMPRESS_TEXTURES = path.join(ROOT, 'scripts/assets/compress_glb_textures.mjs');
 const GENERATED_PLAN = path.join(ROOT, 'src/sim/grand_ferry_ship_plan.generated.ts');
 const RAW_OUT = path.join(ROOT, 'tmp/asset_src/grand_ferry_ship/grand_ferry_ship-final.glb');
 const SHIPPING_OUT = path.join(ROOT, 'public/models/props/grand_ferry_ship.glb');
@@ -45,7 +46,11 @@ if (verifyStaged && rawOnly) {
  *  generates; the rest is the artist's. All must survive to the shipped file. */
 const REQUIRED_MESHES = Object.freeze(['GrandFerryDeck', 'GrandFerryMastStep']);
 const TRIANGLE_CEILING = 12_000;
-const SHIPPING_BYTE_CEILING = 320 * 1024;
+// KTX2 keeps the ferry's atlases GPU-compressed at runtime, but the container
+// is larger than the prior WebP artifact. Keep a tight ceiling above the
+// deterministic KTX2 output so an accidental geometry or texture blow-up is
+// still caught.
+const SHIPPING_BYTE_CEILING = 512 * 1024;
 
 function assertCondition(condition, message) {
   if (!condition) throw new Error(message);
@@ -181,6 +186,19 @@ function runOptimizer(outputRoot = null) {
   }
 }
 
+function compressTextures(glbPath) {
+  const result = spawnSync(process.execPath, [COMPRESS_TEXTURES, '--jobs', '1', glbPath], {
+    cwd: ROOT,
+    encoding: 'utf8',
+    maxBuffer: 16 * 1024 * 1024,
+  });
+  if (result.stdout) process.stdout.write(result.stdout);
+  if (result.stderr) process.stderr.write(result.stderr);
+  if (result.status !== 0) {
+    throw new Error(`grand ferry texture compression failed: ${result.status ?? 'unknown'}`);
+  }
+}
+
 function stagedFile(relativePath, maxBuffer = 16 * 1024 * 1024) {
   const result = spawnSync('git', ['cat-file', 'blob', `:${relativePath}`], {
     cwd: ROOT,
@@ -232,7 +250,9 @@ console.log(
 
 if (!rawOnly) {
   runOptimizer(CANDIDATE_ROOT);
+  compressTextures(CANDIDATE_OUT);
   runOptimizer(REPEAT_ROOT);
+  compressTextures(REPEAT_OUT);
   const candidateBytes = readFileSync(CANDIDATE_OUT);
   const repeatBytes = readFileSync(REPEAT_OUT);
   assertCondition(candidateBytes.equals(repeatBytes), 'optimization is nondeterministic');
@@ -251,6 +271,7 @@ if (!rawOnly) {
     console.log(`staged artifact verified: ${candidateStats.sha256}`);
   } else {
     runOptimizer();
+    compressTextures(SHIPPING_OUT);
     assertCondition(
       candidateBytes.equals(readFileSync(SHIPPING_OUT)),
       'shipping grand ferry differs from deterministic candidate',

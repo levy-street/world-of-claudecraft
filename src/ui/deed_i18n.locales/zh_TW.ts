@@ -503,4 +503,25 @@ export const table: DeedLocaleTable = {
     name: '廢料場行家',
     desc: '將50件裝備拆解還原為製作原料。',
   },
+  dgn_wildheart_basin: { name: '盆地反擊', desc: '在荒野之心盆地擊敗盆地之聲祖爾加。' },
+  dgn_wildheart_basin_heroic: {
+    name: '英雄：荒野之心盆地',
+    desc: '以英雄難度在荒野之心盆地擊敗盆地之聲祖爾加。',
+  },
+  chr_marsh_rares_ii: {
+    name: '暴食者，終得清算',
+    desc: '斬殺暴食者蛆顎，泥沼濕地第四個有名有姓的惡煞，首次清算時被漏記在冊。',
+  },
+  chr_peaks_rares_ii: {
+    name: '峭壁上新刻的名字',
+    desc: '斬殺老岩顎與碎片領主卡茲克斯，荊峰高地又兩個有名有姓的惡煞，首次清算時被漏記在冊。',
+  },
+  chr_gleamstag: {
+    name: '從不先出手的傳說',
+    desc: '斬殺微光雄鹿，一頭稀有而避世的精英，只有被逼入絕境才會出手。',
+  },
+  chr_hollow_rares: {
+    name: '鹿群不忘',
+    desc: '斬殺老髓殼與鹿群之首金輝角，帷幕幽谷的兩個遊蕩稀有首領。',
+  },
 };

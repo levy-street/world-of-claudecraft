@@ -35,6 +35,8 @@ import {
   claudiumPreAuthRateLimited,
   DISCORD_MAX_PER_MINUTE,
   discordRateLimited,
+  EPIC_LINK_MAX_PER_MINUTE,
+  epicLinkRateLimited,
   MAP_MUTATION_MAX_PER_MINUTE,
   mapMutationRateLimited,
   mergeFusedOutcomes,
@@ -44,7 +46,9 @@ import {
   rateLimitNow,
   rateLimitTier2Store,
   reportsCreateRateLimited,
+  SEEKER_SPIN_VERIFY_MAX_PER_MINUTE,
   STEAM_LINK_MAX_PER_MINUTE,
+  seekerSpinVerifyRateLimited,
   steamLinkRateLimited,
   WALLET_LINK_MAX_PER_MINUTE,
   WINDOW_MS,
@@ -223,12 +227,33 @@ export const STEAM_LINK_POLICY: RateLimitPolicy = {
   tier2: 'global',
 };
 
+// Epic link attempts (POST /api/epic/link). Twin of STEAM_LINK_POLICY:
+// 'ip+account' (mounts BEHIND the route's auth guard) and deliberately tight
+// for the Phase 5 upstream verify call.
+export const EPIC_LINK_POLICY: RateLimitPolicy = {
+  name: 'epic_link',
+  keyClass: 'ip+account',
+  limit: EPIC_LINK_MAX_PER_MINUTE,
+  windowSeconds: WINDOW_SECONDS,
+  tier1: (ctx) => epicLinkRateLimited(ctx.req, ctxAccountId(ctx)),
+  tier2: 'global',
+};
+
 export const WALLET_LINK_POLICY: RateLimitPolicy = {
   name: 'wallet_link',
   keyClass: 'ip+account',
   limit: WALLET_LINK_MAX_PER_MINUTE,
   windowSeconds: WINDOW_SECONDS,
   tier1: (ctx) => walletLinkRateLimited(ctx.req, ctxAccountId(ctx)),
+  tier2: 'global',
+};
+
+export const SEEKER_SPIN_VERIFY_POLICY: RateLimitPolicy = {
+  name: 'seeker_spin_verify',
+  keyClass: 'ip+account',
+  limit: SEEKER_SPIN_VERIFY_MAX_PER_MINUTE,
+  windowSeconds: WINDOW_SECONDS,
+  tier1: (ctx) => seekerSpinVerifyRateLimited(ctx.req, ctxAccountId(ctx)),
   tier2: 'global',
 };
 

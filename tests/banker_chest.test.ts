@@ -10,8 +10,9 @@ import { GFX } from '../src/render/gfx';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import type { NpcDef } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
-const TEST_WORLD_SEED = 20061;
+const TEST_WORLD_SEED = WORLD_SEED;
 const banker = (templateId: string) => ({ kind: 'npc' as const, templateId });
 
 function placedBuiltInBanker(templateId: string) {
@@ -298,7 +299,7 @@ describe('banker chest renderer integration', () => {
     const preloadStart = moduleSource.indexOf("if (typeof window !== 'undefined')");
     const preloadEnd = moduleSource.indexOf('type BankerNpcRef', preloadStart);
     const preloadBlock = moduleSource.slice(preloadStart, preloadEnd);
-    expect(preloadBlock).toContain('registerPreload(');
+    expect(preloadBlock).toContain('registerDeferredPreload(');
     expect(preloadBlock).toContain('loadGltf(BANKER_CHEST_ASSET_URL)');
     expect(preloadBlock).not.toContain('GFX');
     expect(preloadBlock).not.toContain('getActiveWorldContent');

@@ -71,6 +71,13 @@ import {
   updateMobChargeDash,
 } from './charge';
 import { updateMobCombatProfile } from './combat_profile';
+import {
+  claimMechanicSpacing,
+  mechanicSlotHeld,
+  mechanicSpacingBlocked,
+  resetMechanicSpacing,
+  tickMechanicSpacing,
+} from './mechanic_spacing';
 import { rallyFleeingAllies } from './social_aggro';
 import { isTrivialTo, retargetMob, tickForcedTarget } from './targeting';
 import { emitMobYell } from './yells';
@@ -123,6 +130,16 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     }
     // dungeon mobs stay dead until the instance resets
     const isInstanceMob = mob.spawnPos.x > DUNGEON_X_THRESHOLD;
+    // A slain summoned add unravels once its corpse decays, like the summoned
+    // demon above, rather than respawning into the wild: its spawnPos is
+    // wherever its summoner stood when the wave erupted (a kited boss hatches
+    // adds far from any camp, e.g. Grix dragged to the Eastbrook town square),
+    // and the only other cleanup is despawnSummonedAdds on the summoner's own
+    // respawn, hours away for a rare. The corpse keeps its full loot window.
+    if (!isInstanceMob && mob.summonedAdd) {
+      if (mob.corpseTimer <= 0) ctx.dropEntity(mob.id);
+      return;
+    }
     // Corpse-decay window (classic-faithful, issue #1539): an in-place respawn
     // reuses this entity id and respawnMob wipes the loot, so while the corpse is
     // still lootable the respawn is DEFERRED until its corpse timer elapses. The
@@ -586,15 +603,33 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
   // Every driver below consults riftMechanicSuppressed: a rift boss spawned at
   // a low rank runs only the head of its template's rankMechanics list (C=1 ..
   // S=4, rift/ranks.ts). Inert for every non-rift mob.
+  // Rift bosses additionally share ONE spacing lock across the player-facing
+  // drivers below (mechanic_spacing.ts, armed only when rift/runs.ts stamped
+  // riftMechanicSpacing): a due mechanic holds at due while the lock runs (its
+  // timer drifts negative, aging it) and the oldest-due mechanic fires as the
+  // lock clears, so two mechanics never land on top of each other and no
+  // driver is starved by the fixed driver order on a saturated kit.
+  tickMechanicSpacing(mob);
   // Grave Inferno cadence: melee-gated like every other boss mechanic. At
   // zero the channel arms and updateInfernoChannel owns subsequent ticks.
   // An atHpPct gate arms it immediately regardless of the cadence (and
   // reseeds the cadence), so a fast kill still meets the burn phase.
+  // Spacing: the whole block waits out the shared lock (the cadence freezes
+  // and an hp gate stays un-consumed until the lock clears, so a blocked
+  // threshold burn still happens). While the channel then runs it owns every
+  // engaged tick (updateInfernoChannel preempts this function), so the lock
+  // armed here holds its remaining spacing for after the channel ends.
   const inferno = MOBS[mob.templateId]?.infernoChannel;
-  if (inferno && mob.infernoRemaining <= 0 && !riftMechanicSuppressed(mob, 'infernoChannel')) {
+  if (
+    inferno &&
+    mob.infernoRemaining <= 0 &&
+    !riftMechanicSuppressed(mob, 'infernoChannel') &&
+    !mechanicSpacingBlocked(mob)
+  ) {
     mob.infernoTimer -= DT;
     if (consumeCrossedInfernoGates(mob, inferno) || mob.infernoTimer <= 0) {
       mob.infernoTimer = inferno.every;
+      claimMechanicSpacing(mob);
       mob.infernoRemaining = inferno.duration;
       mob.infernoPulsesFired = 0;
       if (!MOBS[mob.templateId]?.quietMechanics)
@@ -618,8 +653,11 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
   const pulse = MOBS[mob.templateId]?.aoePulse;
   if (pulse && !riftMechanicSuppressed(mob, 'aoePulse')) {
     mob.pulseTimer -= DT;
-    if (mob.pulseTimer <= 0) {
+    // Held (lock running, or an older-due sibling first): no reset, the timer
+    // keeps drifting negative until this driver's turn at the shared slot.
+    if (mob.pulseTimer <= 0 && !mechanicSlotHeld(mob, 'aoePulse')) {
       mob.pulseTimer = pulse.every;
+      claimMechanicSpacing(mob);
       const school = pulse.school ?? 'shadow';
       ctx.emit({
         type: 'spellfx',
@@ -650,8 +688,10 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
   const stomp = MOBS[mob.templateId]?.stomp;
   if (stomp && !riftMechanicSuppressed(mob, 'stomp')) {
     mob.stompTimer -= DT;
-    if (mob.stompTimer <= 0) {
+    // Held: no reset, the timer ages negative until this driver's slot turn.
+    if (mob.stompTimer <= 0 && !mechanicSlotHeld(mob, 'stomp')) {
       mob.stompTimer = stomp.every;
+      claimMechanicSpacing(mob);
       const school = stomp.school ?? 'physical';
       ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
       if (!MOBS[mob.templateId]?.quietMechanics)
@@ -720,8 +760,17 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
       }
     } else {
       mob.bigCastTimer -= DT;
-      if (mob.bigCastTimer <= 0 && mob.castingAbility === null) {
+      // The shared spacing slot holds a due cast the same way a live cast bar
+      // does: the timer keeps drifting negative and the cast starts on this
+      // driver's slot turn. Starting arms the lock for the cast time plus one
+      // spacing window, so no instant lands mid-telegraph or on the detonation.
+      if (
+        mob.bigCastTimer <= 0 &&
+        mob.castingAbility === null &&
+        !mechanicSlotHeld(mob, 'bigCast')
+      ) {
         mob.bigCastTimer = bigCast.every + bigCast.castTime;
+        claimMechanicSpacing(mob, bigCast.castTime);
         mob.castingAbility = bigCast.castId;
         mob.castTotal = bigCast.castTime;
         mob.castRemaining = bigCast.castTime;
@@ -766,6 +815,10 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
     } else {
       mob[timerKey] -= DT;
       if (mob[timerKey] <= 0) {
+        // Shared spacing slot: hold at due BEFORE the cycle reset below (the
+        // cast-exclusivity bail deliberately burns its cycle; a held zone does
+        // not, its timer ages negative until its slot turn).
+        if (mechanicSlotHeld(mob, tmplKey)) return;
         mob[timerKey] = def.every + def.castTime;
         // Skip if already casting (cast exclusivity: two death zones must not stack).
         if (mob.castingAbility !== null) return;
@@ -816,6 +869,10 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
           });
         }
         // Begin casting - cast bar is the visual telegraph for players to move.
+        // The spacing lock covers the whole fuse plus one window after the
+        // detonation, so no instant (a fear above all) lands while players
+        // are stepping out of the zone.
+        claimMechanicSpacing(mob, fuse);
         mob.castingAbility = def.castId;
         mob.castTotal = fuse;
         mob.castRemaining = fuse;
@@ -861,8 +918,10 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
   const terrify = MOBS[mob.templateId]?.terrify;
   if (terrify && !riftMechanicSuppressed(mob, 'terrify')) {
     mob.terrifyTimer -= DT;
-    if (mob.terrifyTimer <= 0) {
+    // Held: no reset, the timer ages negative until this driver's slot turn.
+    if (mob.terrifyTimer <= 0 && !mechanicSlotHeld(mob, 'terrify')) {
       mob.terrifyTimer = terrify.every;
+      claimMechanicSpacing(mob);
       const school = terrify.school ?? 'shadow';
       ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
       if (!MOBS[mob.templateId]?.quietMechanics)
@@ -877,13 +936,25 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
         if (!pe || pe.dead || dist2d(pe.pos, mob.pos) > terrify.radius) continue;
         const remaining = ctx.diminishedCrowdControlDuration(mob, pe, 'fear', terrify.duration);
         if (remaining === null) continue;
+        // Heading drawn BEFORE the tank exemption below, so the rng stream is
+        // identical whether or not the current target stands in radius (the
+        // after-the-draw precedent of mechanicDamageMult at the pulse above).
+        const heading = ctx.rng.range(-Math.PI, Math.PI);
+        // The boss's current target is exempt: fearing the one player holding
+        // the boss sends it careening through the group, and stacked onto any
+        // other mechanic that is unplayable. The tank holds their ground. This
+        // covers EVERY terrify carrier (rift and dungeon alike), and it means
+        // a solo player, as their own tank, is never feared by this driver.
+        // When a pet or escort NPC holds aggro no player is exempt (the boss
+        // stays anchored to the pet, so the tank-fear chaos cannot happen).
+        if (pe.id === mob.aggroTargetId) continue;
         ctx.applyAura(pe, {
           id: 'fear_incap',
           name: terrify.name,
           kind: 'incapacitate',
           remaining,
           duration: remaining,
-          value: ctx.rng.range(-Math.PI, Math.PI),
+          value: heading,
           sourceId: mob.id,
           school,
           breaksOnDamage: true,
@@ -947,6 +1018,14 @@ function pulseLoudYell(ctx: SimContext, mob: Entity): void {
 // An evading mob has reached its spawn (walking or phasing): drop the pull
 // entirely and return to idle at full health, ready to be pulled again.
 export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
+  // A player just left this exact mob mid-combat (issue #2653): defer the
+  // reset while their instance_exit_memory.ts window is still live, so the
+  // mob stays parked in 'evade' (damage-immune, hate table and HP untouched;
+  // see combat/damage.ts) instead of healing and clearing. That keeps it
+  // unreachable to anyone else and preserves the exact state a same-claim
+  // re-entry restores. Once the window lapses this same call site fires
+  // again next tick (still arrived at spawnPos) and performs the real reset.
+  if (mob.combatExitHoldUntil > ctx.time) return;
   mob.aiState = 'idle';
   mob.hp = mob.maxHp;
   mob.auras = [];
@@ -954,6 +1033,13 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.tappedById = null;
   mob.leashAnchor = null;
   mob.evadeStall = 0;
+  mob.chaseStall = 0;
+  // A full evade-home reset ends this pull for good (issue #2653 follow-up):
+  // bump the epoch so a mid-combat exit snapshot stamped against the OLD pull
+  // (instance_exit_memory.ts) is recognized as stale and never reapplied onto
+  // whoever re-pulls this mob fresh inside the same memory window.
+  mob.evadeEpoch++;
+  mob.chainPullInbound = false;
   mob.fleeTimer = 0;
   mob.fleeReturnTimer = 0;
   mob.hasFled = false;
@@ -970,6 +1056,8 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.healedThisPull = false;
   mob.stompTimer = MOBS[mob.templateId]?.stomp?.every ?? 0;
   mob.terrifyTimer = MOBS[mob.templateId]?.terrify?.every ?? 0;
+  // The shared spacing lock dies with the pull like the timers around it.
+  resetMechanicSpacing(mob);
   // A mid-flight inferno channel dies with the pull; the cadence reseeds and
   // the hp gates re-arm alongside firedSummons above.
   mob.infernoTimer = MOBS[mob.templateId]?.infernoChannel?.every ?? 0;
@@ -1053,7 +1141,7 @@ export function blockedTowardSpawn(ctx: SimContext, e: Entity, dest: Vec3): bool
   const nz = e.pos.z + Math.cos(facing) * step;
   if (
     !ctx.mobCanSwim(MOBS[e.templateId]) &&
-    groundHeight(nx, nz, ctx.cfg.seed) < waterLevelAt(nx, nz) - SWIM_DEPTH
+    groundHeight(nx, nz, ctx.cfg.seed) < waterLevelAt(nx, nz, ctx.cfg.seed) - SWIM_DEPTH
   )
     return true;
   const resolved = ctx.resolveMovePoint(nx, nz, BODY_RADIUS, e);

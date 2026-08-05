@@ -95,7 +95,7 @@ function marketSellerKey(pid: number): string {
   return String(pid);
 }
 
-describe('the World Market — the Merchant', () => {
+describe('the World Market: the Merchant', () => {
   it('spawns a single Merchant who keeps standing house stock', () => {
     const sim = makeWorld();
     const merchants = [...sim.entities.values()].filter((e) => e.templateId === 'the_merchant');
@@ -135,6 +135,66 @@ describe('the World Market — the Merchant', () => {
     // Clearing the filter restores the full, unfiltered view.
     sim.marketSearch(q(''), seller);
     expect(sim.marketInfoFor(seller)?.totalCount).toBe(all.totalCount);
+  });
+
+  // Issue #2416: the browse query echo. Before this fix, MarketInfo only echoed the
+  // search text (`filter`); the client had no wire signal telling it whether the
+  // type/subtype/armor-class/primary-stat/rarity filters it was showing still
+  // matched what the server actually applied, so a fresh join silently desynced
+  // them (see the reconnect test below).
+  it('echoes every active filter axis on marketInfoFor, not just the search text', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+
+    sim.marketSearch(
+      q('robe', {
+        itemType: 'armor',
+        subtype: 'chest',
+        armorClass: 'cloth',
+        primaryStat: 'int',
+        rarity: 'rare',
+      }),
+      viewer,
+    );
+
+    const info = marketInfo(sim, viewer);
+    expect(info.filter).toBe('robe');
+    expect(info.itemType).toBe('armor');
+    expect(info.subtype).toBe('chest');
+    expect(info.armorClass).toBe('cloth');
+    expect(info.primaryStat).toBe('int');
+    expect(info.rarity).toBe('rare');
+  });
+
+  // Issue #2416: a fresh join (the server's linkdead grace expired before the socket
+  // came back) never resumes the old session; it hands the reconnecting character a
+  // brand-new PlayerMeta, whose marketQuery starts at defaultMarketQuery() same as any
+  // new session. The echoed query on the next marketInfoFor is the ONLY signal a
+  // reconnecting client has to notice its filter buttons no longer describe what the
+  // server is actually browsing by.
+  it('echoes the reset-to-default query after a fresh join, same as any new session', () => {
+    const sim = makeWorld();
+    const staleSession = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, staleSession);
+    sim.marketSearch(
+      q('', { itemType: 'weapon', subtype: 'axe', primaryStat: 'str' }),
+      staleSession,
+    );
+    expect(marketInfo(sim, staleSession).itemType).toBe('weapon');
+
+    // The old session tears down (grace expired) and the reconnect lands as a fresh
+    // join: a brand-new pid/meta for the same character, not a resume of the old one.
+    sim.removePlayer(staleSession);
+    const freshSession = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, freshSession);
+
+    const info = marketInfo(sim, freshSession);
+    expect(info.itemType).toBe('all');
+    expect(info.subtype).toBe('all');
+    expect(info.armorClass).toBe('all');
+    expect(info.primaryStat).toBe('all');
+    expect(info.rarity).toBe('all');
   });
 
   it('applies armor class and dominant primary stat to the authoritative browse result', () => {
@@ -658,6 +718,59 @@ describe('the World Market — the Merchant', () => {
     expect(new Set(ids).size).toBe(ids.length); // no id collisions
   });
 
+  it('bounds a persisted craftedRecipeId on both book arms like every other marker load', () => {
+    // The v0.34.0 merge-audit finding: the release's marker re-attach (#2605)
+    // kept a persisted craftedRecipeId on a bare typeof check while every
+    // other marker load (bag/buyback/bank) takes boundCraftedRecipeIdOnLoad,
+    // and a market row persists to expiry and grants into live bags with no
+    // login to self-heal it. Driven through the REAL loadMarket path: a legal
+    // marker survives both arms, an over-ceiling and an empty one drop whole.
+    const sim = makeWorld();
+    const listingRow = (id: number, craftedRecipeId: string) => ({
+      id,
+      sellerKey: 'k1',
+      sellerName: 'Seller',
+      itemId: 'wolf_fang',
+      count: 1,
+      price: 100,
+      secondsLeft: 600,
+      craftedRecipeId,
+    });
+    sim.loadMarket({
+      listings: [
+        listingRow(5000, 'recipe_tough_jerky'),
+        listingRow(5001, 'r'.repeat(65)),
+        listingRow(5002, ''),
+      ],
+      collections: [
+        {
+          key: 'k1',
+          copper: 0,
+          items: [
+            { itemId: 'wolf_fang', count: 1, craftedRecipeId: 'recipe_tough_jerky' },
+            { itemId: 'wolf_fang', count: 1, craftedRecipeId: '' },
+            { itemId: 'wolf_fang', count: 1, craftedRecipeId: 'r'.repeat(65) },
+          ],
+        },
+      ],
+      nextListingId: 5003,
+    } as never);
+    const legal = sim.marketListings.find((l) => l.id === 5000);
+    const over = sim.marketListings.find((l) => l.id === 5001);
+    const empty = sim.marketListings.find((l) => l.id === 5002);
+    expect(legal?.craftedRecipeId).toBe('recipe_tough_jerky');
+    expect(over && 'craftedRecipeId' in over).toBe(false);
+    expect(empty && 'craftedRecipeId' in empty).toBe(false);
+    const col = (
+      sim.market as unknown as {
+        marketCollections: Map<string, { items: { itemId: string; craftedRecipeId?: string }[] }>;
+      }
+    ).marketCollections.get('k1');
+    expect(col?.items[0].craftedRecipeId).toBe('recipe_tough_jerky');
+    expect(col && 'craftedRecipeId' in col.items[1]).toBe(false);
+    expect(col && 'craftedRecipeId' in col.items[2]).toBe(false);
+  });
+
   // ---------------------------------------------------------------------------
   // Listing-id bands (#2463). House stock is reseeded from the id counter every
   // boot and is never persisted; player listings are replayed from the save with
@@ -1039,5 +1152,100 @@ describe('marketCollectPendingFor - the collect-indicator bit', () => {
     };
     internals.marketCollections.set(String(sim.playerId), { copper: 95, items: [] });
     expect(sim.marketCollectPending).toBe(true);
+  });
+});
+
+// Character deletion (R43): a deleted character can never stand at the Merchant
+// again, so its listings and collection leave the book rather than sitting
+// uncollectable forever. Dual-key by the rekeyMarketSeller rule: the stable
+// character-id key AND a legacy name-keyed row.
+describe('purgeMarketSeller - deleting a character', () => {
+  function collectionsOf(sim: Sim): Map<string, { copper: number; items: { count: number }[] }> {
+    return (
+      sim.market as unknown as {
+        marketCollections: Map<string, { copper: number; items: { count: number }[] }>;
+      }
+    ).marketCollections;
+  }
+
+  it('removes the deleted seller under BOTH keys, sparing house stock and other sellers', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller', { characterId: 77 });
+    const other = sim.addPlayer('mage', 'Other', { characterId: 88 });
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, other);
+    sim.addItem('wolf_fang', 2, seller);
+    sim.addItem('wolf_fang', 1, other);
+
+    // One id-keyed listing, one legacy name-keyed listing, both the deleted seller's.
+    sim.marketList('wolf_fang', 1, 200, seller);
+    sim.marketList('wolf_fang', 1, 300, seller);
+    const legacy = listingBy(sim, (l) => !l.house && l.price === 300, 'legacy listing');
+    legacy.sellerKey = 'Seller';
+    legacy.sellerName = 'Seller';
+    sim.marketList('wolf_fang', 1, 400, other);
+
+    // A collection under EACH of the seller's keys, plus the other seller's.
+    const collections = collectionsOf(sim);
+    collections.set('77', { copper: 95, items: [] });
+    collections.set('Seller', { copper: 40, items: [] });
+    collections.set('88', { copper: 10, items: [] });
+    const houseBefore = sim.marketListings.filter((l) => l.house).length;
+    expect(houseBefore).toBeGreaterThan(0);
+    // Make the house guard the OPERATIVE cause for one row: a house listing
+    // hand-keyed to the deleted seller's id could only survive through the
+    // `listing.house` skip (real house stock carries sellerKey '', which the
+    // ownership check already refuses, leaving the guard otherwise inert).
+    sim.marketListings.push({
+      ...sim.marketListings.find((l) => l.house)!,
+      id: 990077,
+      sellerKey: '77',
+    });
+
+    expect(sim.purgeMarketSeller(77, 'Seller')).toBe(true);
+
+    // No NON-house row remains under either key (the hand-keyed house probe
+    // above survives by the house guard, checked below).
+    expect(sim.marketListings.some((l) => !l.house && l.sellerKey === '77')).toBe(false);
+    expect(sim.marketListings.some((l) => !l.house && l.sellerKey === 'Seller')).toBe(false);
+    expect(collections.has('77')).toBe(false);
+    expect(collections.has('Seller')).toBe(false);
+    // The other seller and the Merchant's own stock are untouched.
+    expect(sim.marketListings.filter((l) => l.sellerKey === '88' && l.price === 400)).toHaveLength(
+      1,
+    );
+    expect(collections.get('88')?.copper).toBe(10);
+    // houseBefore + the hand-keyed probe: the guard spared it despite the
+    // matching sellerKey.
+    expect(sim.marketListings.filter((l) => l.house)).toHaveLength(houseBefore + 1);
+    expect(sim.marketListings.some((l) => l.house && l.sellerKey === '77')).toBe(true);
+  });
+
+  it('reports no change when the deleted character had nothing on the market', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller', { characterId: 77 });
+    standAtMerchant(sim, seller);
+    sim.addItem('wolf_fang', 1, seller);
+    sim.marketList('wolf_fang', 1, 200, seller);
+    const before = sim.marketListings.length;
+
+    expect(sim.purgeMarketSeller(99, 'Nobody')).toBe(false);
+    expect(sim.marketListings).toHaveLength(before);
+    expect(sim.marketListings.some((l) => l.sellerKey === '77')).toBe(true);
+  });
+
+  it('refuses a non-finite character id rather than purging by name alone', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller', { characterId: 77 });
+    standAtMerchant(sim, seller);
+    sim.addItem('wolf_fang', 1, seller);
+    sim.marketList('wolf_fang', 1, 200, seller);
+    const legacy = listingBy(sim, (l) => !l.house && l.price === 200, 'legacy listing');
+    legacy.sellerKey = 'Seller';
+    collectionsOf(sim).set('Seller', { copper: 40, items: [] });
+
+    expect(sim.purgeMarketSeller(Number.NaN, 'Seller')).toBe(false);
+    expect(sim.marketListings.some((l) => l.sellerKey === 'Seller')).toBe(true);
+    expect(collectionsOf(sim).has('Seller')).toBe(true);
   });
 });

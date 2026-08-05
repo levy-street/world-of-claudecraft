@@ -59,6 +59,14 @@ const EXPECTED_CODES = [
   'moderation.suspended_until',
   'origin.cross_site',
   'rate_limit.exceeded',
+  'seeker.attestation_failed',
+  'seeker.current_ownership_required',
+  'seeker.entitlement_required',
+  'seeker.genesis_token_claimed',
+  'seeker.genesis_token_required',
+  'seeker.native_only',
+  'seeker.solana_artifact_required',
+  'seeker.wallet_required',
   'two_factor.already_enabled',
   'two_factor.code_invalid',
   'two_factor.not_enabled',
@@ -72,6 +80,13 @@ const EXPECTED_CODES = [
   'steam.already_linked',
   'steam.account_taken',
   'steam.upstream',
+  'epic.disabled',
+  'epic.invalid_token',
+  'epic.banned',
+  'epic.already_linked',
+  'epic.account_taken',
+  'epic.upstream',
+  'ota_updates.invalid_input',
 ];
 
 describe('ERROR_CODES catalog', () => {

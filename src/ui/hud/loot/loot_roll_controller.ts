@@ -4,14 +4,24 @@ import type { IWorld } from '../../../world_api';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
-import { iconDataUrl, QUALITY_COLOR } from '../../icons';
+import { QUALITY_COLOR } from '../../icons';
+import { knownItemDef } from '../../known_item';
 import type { PainterHostWriters } from '../../painter_host';
+import { unknownItemIconHtml } from '../../unknown_item_icon';
 import { reconcileLootRolls } from './loot_roll_reconcile';
 import {
   computeLootRollStatusRows,
   type LootRollStatusRow,
   lootRollStatusFingerprint,
 } from './loot_roll_status_view';
+
+// hasOwn-safe read of the quality tint: `quality` is a wire string and
+// QUALITY_COLOR a plain object literal, so a bare bracket read of a prototype
+// key ('constructor') would interpolate a native function's source into the
+// style attribute (no breakout, the declaration just drops, but the same R34
+// doctrine unknownItemIconHtml applies one line over covers it here too).
+const qualityColor = (quality: string): string =>
+  Object.hasOwn(QUALITY_COLOR, quality) ? QUALITY_COLOR[quality] : '#fff';
 
 type LootRollEvent = Extract<SimEvent, { type: 'lootRoll' }>;
 type MasterLootEvent = Extract<SimEvent, { type: 'masterLoot' }>;
@@ -303,7 +313,6 @@ export class LootRollController {
     );
     const fingerprint = lootRollStatusFingerprint(rows);
     if (fingerprint === this.statusFingerprint) return;
-    this.statusFingerprint = fingerprint;
     this.statusRows = rows;
     const live = new Set(rows.map((row) => row.rollId));
     for (const rollId of this.watchTimers.keys()) {
@@ -312,7 +321,21 @@ export class LootRollController {
     for (const row of rows) {
       if (!this.watchTimers.has(row.rollId)) this.watchTimers.set(row.rollId, now);
     }
-    this.render();
+    // The CATCH is the fix (R34 review): an uncontained render throw (a
+    // canvas-exhausted host is enough) used to abort the whole event batch,
+    // eating every concurrent need/greed prompt. The finally commits the
+    // fingerprint on the throwing path too, which is the last-complete-paint
+    // trade, deliberately NOT a retry: identical data never re-renders (so a
+    // persistently-throwing host cannot become a per-frame throw storm), and
+    // the next DATA change re-renders because the committed fingerprint
+    // differs. tests/loot_roll_controller.test.ts pins both halves.
+    try {
+      this.render();
+    } catch (err) {
+      console.error('[hud] loot roll render failed', err);
+    } finally {
+      this.statusFingerprint = fingerprint;
+    }
   }
 
   private updateTimers(now: number): void {
@@ -422,7 +445,7 @@ export class LootRollController {
     }
     for (const [rollId, roll] of this.activeRolls) {
       const event = roll.event;
-      const item = ITEMS[event.itemId];
+      const item = knownItemDef(ITEMS, event.itemId);
       const itemName = item ? itemDisplayName(item) : event.itemName;
       const quality = item?.quality ?? event.quality ?? 'common';
       const status = statusByRoll.get(rollId);
@@ -432,10 +455,10 @@ export class LootRollController {
       this.deps.writers.setStyleProp(row, '--loot-roll-frac', '1.000');
       row.innerHTML = `
         <div class="loot-roll-item">
-          ${item ? this.deps.itemIcon(item) : `<img class="item-icon q-${quality}" src="${iconDataUrl('item', event.itemId)}" alt="" draggable="false">`}
+          ${item ? this.deps.itemIcon(item) : unknownItemIconHtml(event.itemId, quality)}
           <div class="loot-roll-copy">
             <div class="loot-roll-title">${esc(t('itemUi.lootRoll.title'))}</div>
-            <div class="loot-roll-name" style="color:${QUALITY_COLOR[quality] ?? '#fff'}">${esc(itemName)}</div>
+            <div class="loot-roll-name" style="color:${qualityColor(quality)}">${esc(itemName)}</div>
           </div>
         </div>
         <div class="loot-roll-timer" aria-hidden="true"><span></span></div>
@@ -459,7 +482,7 @@ export class LootRollController {
     for (const status of this.statusRows) {
       if (this.activeRolls.has(status.rollId) || this.activeMasterRolls.has(status.rollId))
         continue;
-      const item = ITEMS[status.itemId];
+      const item = knownItemDef(ITEMS, status.itemId);
       const itemName = item ? itemDisplayName(item) : status.itemName;
       const quality = item?.quality ?? status.quality ?? 'common';
       const row = this.deps.document.createElement('div');
@@ -469,10 +492,10 @@ export class LootRollController {
       this.deps.writers.setStyleProp(row, '--loot-roll-frac', '1.000');
       row.innerHTML = `
         <div class="loot-roll-item">
-          ${item ? this.deps.itemIcon(item) : `<img class="item-icon q-${quality}" src="${iconDataUrl('item', status.itemId)}" alt="" draggable="false">`}
+          ${item ? this.deps.itemIcon(item) : unknownItemIconHtml(status.itemId, quality)}
           <div class="loot-roll-copy">
             <div class="loot-roll-title">${esc(t('itemUi.lootRoll.title'))}</div>
-            <div class="loot-roll-name" style="color:${QUALITY_COLOR[quality] ?? '#fff'}">${esc(itemName)}</div>
+            <div class="loot-roll-name" style="color:${qualityColor(quality)}">${esc(itemName)}</div>
           </div>
         </div>
         <div class="loot-roll-timer" aria-hidden="true"><span></span></div>
@@ -491,7 +514,7 @@ export class LootRollController {
     event: MasterLootEvent,
     checked?: Set<number>,
   ): void {
-    const item = ITEMS[event.itemId];
+    const item = knownItemDef(ITEMS, event.itemId);
     const itemName = item ? itemDisplayName(item) : event.itemName;
     const quality = item?.quality ?? event.quality ?? 'common';
     const row = this.deps.document.createElement('div');
@@ -507,10 +530,10 @@ export class LootRollController {
       .join('');
     row.innerHTML = `
       <div class="loot-roll-item">
-        ${item ? this.deps.itemIcon(item) : `<img class="item-icon q-${quality}" src="${iconDataUrl('item', event.itemId)}" alt="" draggable="false">`}
+        ${item ? this.deps.itemIcon(item) : unknownItemIconHtml(event.itemId, quality)}
         <div class="loot-roll-copy">
           <div class="loot-roll-title">${esc(t('hudChrome.masterLoot.assignPrompt', { item: itemName }))}</div>
-          <div class="loot-roll-name" style="color:${QUALITY_COLOR[quality] ?? '#fff'}">${esc(itemName)}</div>
+          <div class="loot-roll-name" style="color:${qualityColor(quality)}">${esc(itemName)}</div>
         </div>
       </div>
       <div class="loot-roll-timer" aria-hidden="true"><span></span></div>

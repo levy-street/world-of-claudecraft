@@ -16,7 +16,7 @@ describe('MobileMoreDialogController', () => {
     const dialog = element();
     const focusFirst = vi.fn();
     const release = vi.fn();
-    const handle = { focusFirst, release } satisfies FocusTrapHandle;
+    const handle = { focusFirst, release, opener: vi.fn(() => null) } satisfies FocusTrapHandle;
     const open = vi.fn((_options: FocusTrapOptions) => handle);
     const controller = new MobileMoreDialogController({ open } as Pick<FocusManager, 'open'>, {
       trigger: () => trigger,
@@ -47,7 +47,11 @@ describe('MobileMoreDialogController', () => {
     const trigger = element();
     const dialog = element();
     const release = vi.fn();
-    const handle = { focusFirst: vi.fn(), release } satisfies FocusTrapHandle;
+    const handle = {
+      focusFirst: vi.fn(),
+      release,
+      opener: vi.fn(() => null),
+    } satisfies FocusTrapHandle;
     const controller = new MobileMoreDialogController(
       { open: vi.fn((_options: FocusTrapOptions) => handle) },
       { trigger: () => trigger, dialog: () => dialog },

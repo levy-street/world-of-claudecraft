@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { type GroundAimGeometryState, sameGroundAimGeometry } from './ground_aim_reticle_core';
 
 const SEGMENTS = 96;
 const INNER_GUIDE_RATIO = 0.62;
@@ -42,6 +43,11 @@ export class GroundAimReticleVisual {
   private elapsed = 0;
   private dimmed = false;
   private disposed = false;
+  private readonly geometryState: GroundAimGeometryState = {
+    x: Number.NaN,
+    z: Number.NaN,
+    radius: Number.NaN,
+  };
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -72,10 +78,19 @@ export class GroundAimReticleVisual {
     if (this.disposed) return;
     if (!aim) {
       this.group.visible = false;
+      this.geometryState.x = Number.NaN;
+      this.geometryState.z = Number.NaN;
+      this.geometryState.radius = Number.NaN;
       return;
     }
 
-    this.rebuild(aim.x, aim.z, Math.max(0, aim.radius));
+    const radius = Math.max(0, aim.radius);
+    if (!sameGroundAimGeometry(this.geometryState, aim.x, aim.z, radius)) {
+      this.rebuild(aim.x, aim.z, radius);
+      this.geometryState.x = aim.x;
+      this.geometryState.z = aim.z;
+      this.geometryState.radius = radius;
+    }
     this.dimmed = aim.dimmed;
     for (const material of [
       this.outerMaterial,

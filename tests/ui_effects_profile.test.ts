@@ -24,7 +24,7 @@ const ULTRA: UiEffectsProfile = {
 
 // The resolver takes a single object input; a tiny helper keeps the cases terse.
 function resolve(
-  presetLabel: 'low' | 'medium' | 'high' | 'ultra' | 'advanced',
+  presetLabel: 'low' | 'medium' | 'high' | 'ultra' | 'insane' | 'advanced',
   effectsQuality: number,
   reduceMotion: boolean,
 ): UiEffectsProfile {
@@ -36,6 +36,10 @@ describe('resolveUiEffectsProfile - base preset mapping', () => {
     expect(resolve('ultra', 1, false)).toEqual(ULTRA);
     expect(resolve('high', 1, false)).toEqual({ ...ULTRA, tier: 'high' });
     expect(resolve('medium', 1, false)).toEqual({ ...ULTRA, tier: 'medium' });
+  });
+
+  it('insane is a 3D-render preset only: the HUD effect ladder tops out at ultra', () => {
+    expect(resolve('insane', 1, false)).toEqual(ULTRA);
   });
 
   it('low preset cuts cost (no heavy shadows, paused ambient, no FCT crit) independent of motion', () => {

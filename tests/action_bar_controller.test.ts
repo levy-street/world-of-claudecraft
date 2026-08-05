@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { ITEMS } from '../src/sim/data';
 import type { PlayerClass } from '../src/sim/types';
 import {
   ACTION_BAR_ABILITY_SLOTS,
@@ -87,6 +88,29 @@ describe('ActionBarController form persistence', () => {
     expect(controller.actions).toHaveLength(33);
     expect(controller.actions[0]).toEqual({ type: 'ability', id: 'sunder_armor' });
     expect(controller.actions.slice(22)).toEqual(Array.from({ length: 11 }, () => null));
+  });
+
+  it('preserves an item id this bundle predates through load and save (R34)', () => {
+    // The layout is per-character SERVER state and the save is a wholesale
+    // overwrite: nulling an unresolvable slot at parse used to DESTROY the
+    // binding for every device the moment any ordinary save fired (a form
+    // switch, a level-up auto-place). The unknown slot rides through as an
+    // inert item action; the known-but-ineligible strip stays.
+    const storage = new MemoryStorage();
+    const stored = bar();
+    stored[0] = { type: 'item', id: 'ghost_tool_from_v33' };
+    stored[1] = { type: 'item', id: 'baked_bread' };
+    stored[2] = { type: 'item', id: 'wolf_fang' }; // known, NOT a hotbar kind
+    storage.setItem('woc_hotbar_warrior_ActionbarTester', JSON.stringify(stored));
+    const { controller } = makeHarness('warrior', [], bar(), storage);
+    controller.init();
+    expect(controller.actions[0]).toEqual({ type: 'item', id: 'ghost_tool_from_v33' });
+    expect(controller.actions[1]).toEqual({ type: 'item', id: 'baked_bread' });
+    expect(controller.actions[2]).toBeNull();
+    controller.saveActions();
+    const roundTrip = JSON.parse(storage.getItem('woc_hotbar_warrior_ActionbarTester') ?? '[]');
+    expect(roundTrip[0]).toEqual({ type: 'item', id: 'ghost_tool_from_v33' });
+    expect(roundTrip[2]).toBeNull();
   });
 
   it('persists the last third-row slot independently across Druid forms and reloads', () => {
@@ -573,5 +597,33 @@ describe('isHotbarItemId: reusable item actions are placeable', () => {
     // Regression companions: the consumable arms and the non-usable negative.
     expect(controller.isHotbarItemId('lesser_healing_potion')).toBe(true);
     expect(controller.isHotbarItemId('copper_ore')).toBe(false);
+  });
+});
+
+describe('isHotbarItemId: reins are placeable now that mounts are items', () => {
+  // The mounts-as-items pivot made every reins item usable through the same
+  // useItem dispatch a potion rides (src/sim/items.ts, kind 'mount' ->
+  // summonMountItem), and that arm's own comment states reins are used from
+  // "bags or an action-bar slot". isHotbarItemId was never widened to match, so
+  // the bag drag never wrote a hotbar payload and the bar could not accept it.
+  it('admits every kind:mount reins item in the shipped content tables', () => {
+    const { controller } = makeHarness('warrior', [], []);
+    const reins = Object.keys(ITEMS).filter((id) => ITEMS[id]?.kind === 'mount');
+    // Guard the guard: if the content tables ever stop shipping mounts this test
+    // must fail loudly rather than vacuously pass on an empty list.
+    expect(reins.length).toBeGreaterThan(0);
+    for (const id of reins) {
+      expect(controller.isHotbarItemId(id), `${id} should be hotbar placeable`).toBe(true);
+    }
+  });
+
+  it('routes a reins drag through the assignable-action path like a potion', () => {
+    const { controller } = makeHarness('warrior', [], []);
+    // isAssignableAction is what the drop target consults; a reins action must
+    // survive it exactly as a potion action does.
+    expect(controller.isAssignableAction({ type: 'item', id: 'reins_valorsteed' })).toBe(true);
+    expect(controller.isAssignableAction({ type: 'item', id: 'lesser_healing_potion' })).toBe(true);
+    // A non-usable material still must not be assignable.
+    expect(controller.isAssignableAction({ type: 'item', id: 'copper_ore' })).toBe(false);
   });
 });

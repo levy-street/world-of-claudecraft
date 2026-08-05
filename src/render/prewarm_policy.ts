@@ -112,6 +112,8 @@ export interface PrewarmPolicyInput {
   asyncCompileSupported: boolean;
   /** LOW_GFX: the Lambert/no-shadow tier (its own smaller view budget already). */
   lowGfx: boolean;
+  /** Keep desktop Insane's full manifest behind the entry cover instead of resuming it live. */
+  finishFullManifestBeforeReveal: boolean;
   /** Desktop defaults, injected so the constants stay owned by renderer.ts. */
   defaultMaxMs: number;
   constrainedMaxMs: number;
@@ -143,6 +145,29 @@ export interface PrewarmPolicy {
   textureBatchSize: number;
   /** Maximum wall-clock time for the bounded constrained texture pass. */
   textureMaxMs: number;
+  /** Ignore the soft manifest deadline so expensive work cannot spill into first live frames. */
+  finishFullManifestBeforeReveal: boolean;
+}
+
+/** True when a soft-deadline manifest entry should resume after world reveal. */
+export function prewarmEntryShouldDefer(
+  entryStartedMs: number,
+  deadlineMs: number,
+  deadlineExempt: boolean,
+  finishFullManifestBeforeReveal: boolean,
+): boolean {
+  return entryStartedMs >= deadlineMs && !deadlineExempt && !finishFullManifestBeforeReveal;
+}
+
+/** Build cutoff paired with the entry policy; full Insane prewarm does not trim archetypes. */
+export function prewarmBuildDeadline(
+  deadlineMs: number,
+  reserveMs: number,
+  finishFullManifestBeforeReveal: boolean,
+): number {
+  return finishFullManifestBeforeReveal
+    ? Number.MAX_SAFE_INTEGER
+    : deadlineMs - Math.max(0, reserveMs);
 }
 
 /**
@@ -165,6 +190,7 @@ export function resolvePrewarmPolicy(input: PrewarmPolicyInput): PrewarmPolicy {
       minimalManifest: false,
       textureBatchSize: 0,
       textureMaxMs: 0,
+      finishFullManifestBeforeReveal: input.finishFullManifestBeforeReveal,
     };
   }
   return {
@@ -185,6 +211,9 @@ export function resolvePrewarmPolicy(input: PrewarmPolicyInput): PrewarmPolicy {
     minimalManifest: true,
     textureBatchSize: CONSTRAINED_TEXTURE_BATCH_SIZE,
     textureMaxMs: CONSTRAINED_TEXTURE_MAX_MS,
+    // Never extend the loading gate on the constrained WebKit profile: its
+    // smaller manifest and hard deadline are process-survival requirements.
+    finishFullManifestBeforeReveal: false,
   };
 }
 

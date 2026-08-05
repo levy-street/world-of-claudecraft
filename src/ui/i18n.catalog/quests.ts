@@ -9,6 +9,10 @@ const questStringsEn = {
       complete: 'Complete',
       showOnMap: 'Show {name} on the map',
       hideFromMap: 'Hide {name} from the map',
+      // Stale-client fallback (R34): a log entry whose quest id this bundle
+      // predates keeps its tracker position, labeled as unknown rather than
+      // as a bare content slug.
+      unknownQuest: 'Unknown quest ({id})',
     },
     log: {
       title: 'Quest Log',
@@ -20,6 +24,11 @@ const questStringsEn = {
       activeStatus: 'Active',
       readyStatus: 'Complete',
       completedStatus: 'Completed',
+      // The map tooltip's tags for the phase 23 marker variants (the status
+      // vocabulary family readyStatus already lends to that tooltip): the
+      // blue repeatable turn-in, and a work order inside its cooldown window.
+      repeatableStatus: 'Repeatable',
+      cooldownStatus: 'Available again soon',
       returnTo: 'Return to {name}',
       abandon: 'Abandon Quest',
       abandonConfirmTitle: 'Abandon Quest',
@@ -33,6 +42,10 @@ const questStringsEn = {
       greetingFallback: 'Greetings.',
       availableQuestAria: 'Available quest: {name}',
       readyQuestAria: 'Quest ready to turn in: {name}',
+      // The gossip row for a repeatable quest already completed at least
+      // once (the blue '!'): the aria names the repeatable state, acceptance
+      // (e) of the phase 23 marker work.
+      repeatableQuestAria: 'Repeatable quest: {name}',
       discussQuest: 'Discuss {name}.',
       discussQuestAria: 'Discuss quest: {name}',
       // The profession masters' locked-quest hint row. Deliberately terse:
@@ -81,6 +94,7 @@ const questStringsEn = {
       giverMissing: 'That quest giver is not nearby.',
       turnInMissing: 'That quest turn-in is not nearby.',
       tooFar: 'Too far away.',
+      escortAway: 'Your escort is not at their post right now. They will return there shortly.',
     },
   },
 };
@@ -159,6 +173,7 @@ export const questStrings = {
         giverMissing: 'El dador de esa misión no está cerca.',
         turnInMissing: 'La entrega de esa misión no está cerca.',
         tooFar: 'Está demasiado lejos.',
+        escortAway: 'Tu escolta no está en su puesto ahora mismo. Volverá allí en breve.',
       },
     },
   },
@@ -235,6 +250,8 @@ export const questStrings = {
         giverMissing: "Le donneur de cette quête n'est pas à proximité.",
         turnInMissing: "Le rendu de cette quête n'est pas à proximité.",
         tooFar: 'Vous êtes trop loin.',
+        escortAway:
+          "Votre escorte n'est pas à son poste pour le moment. Elle y reviendra sous peu.",
       },
     },
   },
@@ -312,6 +329,7 @@ export const questStrings = {
         giverMissing: 'Chi assegna quella missione non è vicino.',
         turnInMissing: 'Il punto di consegna di quella missione non è vicino.',
         tooFar: 'Sei troppo lontano.',
+        escortAway: 'La tua scorta non è al suo posto in questo momento. Vi tornerà a breve.',
       },
     },
   },
@@ -387,6 +405,8 @@ export const questStrings = {
         giverMissing: 'Der Questgeber ist nicht in der Nähe.',
         turnInMissing: 'Die Abgabe dieser Quest ist nicht in der Nähe.',
         tooFar: 'Ihr seid zu weit entfernt.',
+        escortAway:
+          'Eure Eskorte ist gerade nicht an ihrem Platz. Sie kehrt in Kürze dorthin zurück.',
       },
     },
   },
@@ -462,6 +482,7 @@ export const questStrings = {
         giverMissing: '该任务发布者不在附近。',
         turnInMissing: '该任务交付点不在附近。',
         tooFar: '距离太远。',
+        escortAway: '你要护送的人现在不在原处，稍后就会回来。',
       },
     },
   },
@@ -537,6 +558,7 @@ export const questStrings = {
         giverMissing: '該任務發布者不在附近。',
         turnInMissing: '該任務交付點不在附近。',
         tooFar: '距離太遠。',
+        escortAway: '你要護送的人現在不在原處，稍後就會回來。',
       },
     },
   },
@@ -612,6 +634,7 @@ export const questStrings = {
         giverMissing: '그 퀘스트를 주는 대상이 근처에 없습니다.',
         turnInMissing: '그 퀘스트를 보고할 대상이 근처에 없습니다.',
         tooFar: '너무 멉니다.',
+        escortAway: '호송할 대상이 지금 자리에 없습니다. 잠시 후 그곳으로 돌아옵니다.',
       },
     },
   },
@@ -687,6 +710,7 @@ export const questStrings = {
         giverMissing: 'そのクエストの依頼主が近くにいません。',
         turnInMissing: 'そのクエストの報告先が近くにいません。',
         tooFar: '遠すぎます。',
+        escortAway: '護衛する相手は今その場所にいません。しばらくすれば戻ってきます。',
       },
     },
   },
@@ -762,6 +786,7 @@ export const questStrings = {
         giverMissing: 'Quem oferece essa missão não está por perto.',
         turnInMissing: 'A entrega dessa missão não está por perto.',
         tooFar: 'Você está longe demais.',
+        escortAway: 'Sua escolta não está em seu posto agora. Ela voltará para lá em breve.',
       },
     },
   },
@@ -837,6 +862,7 @@ export const questStrings = {
         giverMissing: 'Выдавший это задание не рядом.',
         turnInMissing: 'Место сдачи этого задания не рядом.',
         tooFar: 'Слишком далеко.',
+        escortAway: 'Тот, кого вы должны сопроводить, сейчас не на месте. Он скоро туда вернётся.',
       },
     },
   },

@@ -10,7 +10,10 @@
 // pool of persistent looping sources for ambience and sustained spell casts.
 
 import { apiUrl } from '../client_origin';
+import { ABILITIES } from '../sim/data';
 import type { BiomeId } from '../sim/types';
+import { isAbilityMomentRecorded } from './ability_sfx_coverage';
+import { resumeWhenAllowed } from './audio_unlock';
 import {
   SFX_CATALOG_HASH,
   SFX_CLIPS,
@@ -22,9 +25,15 @@ import { type WaterElementalCue, waterElementalSamples } from './water_elemental
 
 const SAMPLE_GAIN = 0.85; // base level for sampled clips; sfxVolume multiplies this
 const MAX_VOICES = 24; // concurrent one-shot sources (frame-budget guard)
-const REF_DISTANCE = 5; // world units at which a sound is at full volume
-const MAX_DISTANCE = 46; // hard cutoff: beyond this, sources are silent/skipped
-const MAX_DISTANCE_SQ = MAX_DISTANCE * MAX_DISTANCE;
+// Per-ability synth layer (abilityAudio): its own small voice pool, separate
+// from MAX_VOICES so ability spam can never starve footsteps/UI one-shots,
+// and a conservative layer gain that keeps every recipe under the sampled
+// combat one-shots (the gallery tuned these against a 0.4 master + limiter;
+// here they sit inside the 0.85 sample master, hence the extra headroom).
+const ABILITY_VOICES = 8;
+const ABILITY_GAIN = 0.34;
+export const REF_DISTANCE = 5; // world units at which a sound is at full volume
+export const MAX_DISTANCE = 46; // hard cutoff: beyond this, sources are silent/skipped
 const POINT_AMBIENCE_GAIN = 0.18;
 // amb_forge's custom recording still reads quiet in-game even with the
 // catalog's keyTrimDb ceiling (scripts/sfx/sfx_gain_map.json) applied at its
@@ -37,6 +46,24 @@ const POINT_AMBIENCE_GAIN = 0.18;
 // SFX_GAIN_LIMITS.amb_forge) = ~1.11, tuned by ear against the +5dB trim
 // alone (~0.32 effective, still too quiet).
 const FORGE_AMBIENCE_GAIN = 0.625;
+// The forge is a small localized point source (a single station), not a
+// zone-wide bed: it should NOT carry as far as the shared MAX_DISTANCE (46,
+// tuned for things like footsteps/combat that want zone-scale audibility).
+// refDistance stays at the shared default (full volume up close is fine
+// unchanged); only the falloff cutoff narrows.
+//
+// Tuned in-game, live, against Eastbrook Vale's own Smith Haldren stall
+// (9.5, 17.5): the audio listener is the CAMERA position (renderer.ts's
+// sink.setListener call), not the player's own position, and the default
+// camera trails 3 to 22 world units (camDist, input.ts) behind/above the
+// player, so a narrow value (tried 6/7/8/10/20) went silent even standing
+// right next to the forge once the camera's own offset was added in, a real
+// gotcha worth remembering before retuning this. 38 lands it: silent at the
+// PLAYER_START spawn point (2, -2), where the camera listener sits ~31.8
+// units from the forge, audible by the time you reach Marshal Redbrook (4,
+// 6) heading into town, and still 8 units narrower than the shared 46
+// default.
+export const FORGE_MAX_DISTANCE = 38;
 const FOOTSTEP_CUES: Partial<Record<string, string>> = {
   grass: 'foot_grass',
   dirt: 'foot_dirt',
@@ -96,8 +123,16 @@ interface PendingLoop {
   x?: number;
   y?: number;
   z?: number;
+  maxDistance?: number;
 }
 
+// 'kind' is the closed set of point-ambience station sources today (campfire,
+// forge). makePanner/loop/tooFar all accept an optional refDistance/
+// maxDistance override (see FORGE_MAX_DISTANCE, pointAmbient's 'forge'
+// branch), so a future station ambience with its own audible-radius need
+// (e.g. a Professions 2.0 station bed: kitchens/apothecary/tannery/loom/
+// toolworks, see issue #2208) is a new 'kind' plus its own named constant,
+// same pattern, no changes needed to the override mechanism itself.
 interface AmbientPointSource {
   readonly id: string;
   readonly kind: 'campfire' | 'forge';
@@ -126,6 +161,10 @@ class Sfx {
   private footstepsOn = false; // off by default; driven by the footstepSfx setting
   private lx = 0;
   private lz = 0; // cached listener position
+  // per-ability synth layer state (see the abilityAudio section)
+  private synthNoise: AudioBuffer | null = null;
+  private abilityVoiceEnds = new Float64Array(ABILITY_VOICES);
+  private abilityEnd = 0; // max scheduled end of the recipe being built
 
   /** Set SFX volume (0..1). Shares the `sfxVolume` slider with `audio`. */
   setVolume(v: number): void {
@@ -150,9 +189,7 @@ class Sfx {
       this.master = this.ctx.createGain();
       this.master.gain.value = SAMPLE_GAIN * this.vol;
       this.master.connect(this.ctx.destination);
-      void this.ctx.resume?.().catch(() => {
-        /* resumes on the next gesture */
-      });
+      resumeWhenAllowed(this.ctx);
       const l = this.ctx.listener;
       if (l.upX) {
         l.upX.value = 0;
@@ -170,6 +207,13 @@ class Sfx {
         });
       }
       void this.preloadStartup();
+      // The ability layer is procedural only. An ElevenLabs-generated sample
+      // pack briefly rode on top of it and was dropped (44b928819) for
+      // bypassing the audio contract: scripts/sfx_conform.mjs only sees .mp3,
+      // so its 118 takes shipped with no loudness, bitrate or true-peak check.
+      // Any future sampled layer ships as conformed MP3s through scripts/sfx/
+      // (docs/design/sound_effects.md), and must respect ability_sfx_coverage.ts
+      // so it never doubles a hand-recorded cue the way that pack did.
     } catch {
       this.ctx = null;
     }
@@ -274,6 +318,12 @@ class Sfx {
     const ctx = this.ctx;
     if (!ctx) return;
     try {
+      // shared white-noise bed for the per-ability synth recipes (abilityAudio)
+      const noiseLen = Math.floor(ctx.sampleRate * 2);
+      const noise = ctx.createBuffer(1, noiseLen, ctx.sampleRate);
+      const nd = noise.getChannelData(0);
+      for (let i = 0; i < noiseLen; i++) nd[i] = Math.random() * 2 - 1;
+      this.synthNoise = noise;
       this.buffers.set('amb_crowd', this.makeCrowdBuffer(ctx, 6, false));
       this.buffers.set('vcup_crowd_roar', this.makeCrowdBuffer(ctx, 2.6, true));
       for (const cue of [
@@ -360,14 +410,24 @@ class Sfx {
     } else if (p.setPosition) p.setPosition(x, y, z);
   }
 
-  private makePanner(x: number, y: number, z: number): PannerNode {
+  // refDistance/maxDistance default to the shared constants so every existing
+  // caller (footsteps, combat, mob voices, ambience loops) keeps its current
+  // audible range unchanged. A caller with its own falloff (see pointAmbient's
+  // 'forge' branch) passes an override; nothing else needs to.
+  private makePanner(
+    x: number,
+    y: number,
+    z: number,
+    refDistance: number = REF_DISTANCE,
+    maxDistance: number = MAX_DISTANCE,
+  ): PannerNode {
     const ctx = this.ctx;
     if (!ctx) throw new Error('audio context is unavailable');
     const p = ctx.createPanner();
     p.panningModel = 'equalpower'; // cheap; HRTF is overkill for an MMO crowd
     p.distanceModel = 'linear';
-    p.refDistance = REF_DISTANCE;
-    p.maxDistance = MAX_DISTANCE;
+    p.refDistance = refDistance;
+    p.maxDistance = maxDistance;
     p.rolloffFactor = 1;
     this.setPannerPos(p, x, y, z);
     return p;
@@ -407,11 +467,14 @@ class Sfx {
   }
 
   /** Squared distance from the listener. Callers can pre-cull, but playAt also
-   *  guards internally so a far event is a cheap no-op. */
-  private tooFar(x: number, z: number): boolean {
+   *  guards internally so a far event is a cheap no-op. maxDistance defaults to
+   *  the shared MAX_DISTANCE; a caller with its own panner override (see
+   *  makePanner/loop) passes the matching value so this cull threshold lines
+   *  up with where that source actually falls silent. */
+  private tooFar(x: number, z: number, maxDistance: number = MAX_DISTANCE): boolean {
     const dx = x - this.lx,
       dz = z - this.lz;
-    return dx * dx + dz * dz > MAX_DISTANCE_SQ;
+    return dx * dx + dz * dz > maxDistance * maxDistance;
   }
 
   /** Positional one-shot at world (x,y,z). Returns whether this call actually
@@ -574,7 +637,20 @@ class Sfx {
 
   /** Ensure a loop `id` is playing `key` at `target` gain; (x,y,z) makes it
    *  positional. Ramps gain smoothly; creating from scratch fades in from 0. */
-  loop(id: string, key: string, target: number, x?: number, y?: number, z?: number): void {
+  // maxDistance defaults to makePanner's own default (the shared MAX_DISTANCE),
+  // so every existing caller keeps its current audible range; only a caller
+  // that needs its own falloff (pointAmbient's 'forge' branch) passes an
+  // override. refDistance has no caller that overrides it today; add it back
+  // if a future station ambience needs its own near-field radius.
+  loop(
+    id: string,
+    key: string,
+    target: number,
+    x?: number,
+    y?: number,
+    z?: number,
+    maxDistance?: number,
+  ): void {
     const ctx = this.ctx,
       master = this.master;
     if (!ctx || !master) return;
@@ -597,7 +673,7 @@ class Sfx {
           this.pendingLoopVariants.delete(id);
           return;
         }
-        this.pendingLoops.set(id, { key, target, x, y, z });
+        this.pendingLoops.set(id, { key, target, x, y, z, maxDistance });
         this.pendingLoopVariants.set(id, variantIndex);
         if (this.pendingLoopLoads.get(id) !== key) {
           this.pendingLoopLoads.set(id, key);
@@ -614,7 +690,15 @@ class Sfx {
             }
             if (!pending || pending.key !== key) return;
             this.pendingLoops.delete(id);
-            this.loop(id, key, pending.target, pending.x, pending.y, pending.z);
+            this.loop(
+              id,
+              key,
+              pending.target,
+              pending.x,
+              pending.y,
+              pending.z,
+              pending.maxDistance,
+            );
           });
         }
         return;
@@ -625,7 +709,7 @@ class Sfx {
       src.playbackRate.value = this.authoredPlaybackRate(key);
       const g = ctx.createGain();
       g.gain.value = 0;
-      const panner = positional ? this.makePanner(x, y, z) : null;
+      const panner = positional ? this.makePanner(x, y, z, undefined, maxDistance) : null;
       if (panner) src.connect(g).connect(panner).connect(master);
       else src.connect(g).connect(master);
       src.start();
@@ -633,11 +717,21 @@ class Sfx {
       this.pendingLoopVariants.delete(id);
       slot = { key, src, gain: g, panner, target: -1, x, y, z };
       this.loops.set(id, slot);
-    } else if (positional && slot.panner && (slot.x !== x || slot.y !== y || slot.z !== z)) {
-      this.setPannerPos(slot.panner, x, y, z);
-      slot.x = x;
-      slot.y = y;
-      slot.z = z;
+    } else if (positional && slot.panner) {
+      if (slot.x !== x || slot.y !== y || slot.z !== z) {
+        this.setPannerPos(slot.panner, x, y, z);
+        slot.x = x;
+        slot.y = y;
+        slot.z = z;
+      }
+      // Keep an already-live loop's falloff current too, not just position:
+      // ambience() calls loop() every frame for a nearby point source, so a
+      // tuning change to a maxDistance override (e.g. FORGE_MAX_DISTANCE)
+      // takes effect on the NEXT frame rather than only for a loop that
+      // hasn't started yet.
+      const resolvedMax = maxDistance ?? MAX_DISTANCE;
+      if (slot.panner.refDistance !== REF_DISTANCE) slot.panner.refDistance = REF_DISTANCE;
+      if (slot.panner.maxDistance !== resolvedMax) slot.panner.maxDistance = resolvedMax;
     }
     // Only (re)arm the ramp when the target actually changes. loop() is called
     // every frame for active ambience, so this keeps the hot path allocation-free.
@@ -759,7 +853,11 @@ class Sfx {
   }
 
   private pointAmbient(source: AmbientPointSource): void {
-    if (this.tooFar(source.x, source.z)) {
+    // The forge's own, narrower cull distance so it stops (unloops) exactly
+    // where its own falloff (below) would already have gone silent, instead
+    // of lingering as a silent loop out to the shared MAX_DISTANCE.
+    const maxDistance = source.kind === 'forge' ? FORGE_MAX_DISTANCE : undefined;
+    if (this.tooFar(source.x, source.z, maxDistance)) {
       if (this.loops.has(source.id) || this.pendingLoops.has(source.id)) {
         this.unloop(source.id, 0.7);
       }
@@ -767,7 +865,7 @@ class Sfx {
     }
     const key = source.kind === 'campfire' ? 'amb_campfire' : 'amb_forge';
     const gain = source.kind === 'forge' ? FORGE_AMBIENCE_GAIN : POINT_AMBIENCE_GAIN;
-    this.loop(source.id, key, gain, source.x, source.y, source.z);
+    this.loop(source.id, key, gain, source.x, source.y, source.z, maxDistance);
   }
 
   /** Cross-fade the global ambience loops to match the player's surroundings.
@@ -873,6 +971,613 @@ class Sfx {
   /** The stands erupt: the baked crescendo-decay crowd roar (procedural). */
   crowdRoar(gain = 0.9): void {
     this.playUi('vcup_crowd_roar', { gain, cooldown: 0.4 });
+  }
+
+  // --- Per-ability procedural combat audio (src/render/ability_vfx) --------
+  // Ported from the approved gallery's synth engine (arc_bolt_preview.js Sfx
+  // class): the 12 palette impact identities, the release whoosh, a sub-weight
+  // layer scaled by ability power, the crit sting, soft zone-pulse thuds, and
+  // gentle heal/buff chimes. Synthesis recipes only, the gallery's recorded
+  // sample pack is a separate licensing decision and is deliberately NOT here.
+  // Each event is one voice: a gain -> panner chain into the master with every
+  // oscillator/noise primitive scheduled inside it, drawn from its own small
+  // ABILITY_VOICES pool so ability spam can never exhaust MAX_VOICES.
+  // Windup beds and travel loops are a follow-up (they need loop lifecycle
+  // tied to cast state); this layer is one-shots only.
+
+  /** One per-ability audio moment at a world position. `kind`:
+   *  release = the cast lets go (at the caster); impact = the hit lands (at
+   *  the impact point, a ground zone booms AT the zone); pulse = one soft
+   *  zone re-hit; crit = the sting layered over a critical impact; spirit =
+   *  a creature apparition calls at spawn; motif = set-piece foley.
+   *  Gentle archetypes (heal/buff/cc) chime instead of booming and skip the
+   *  release whoosh entirely; opts.lite (spec liteAudio or a degraded visual
+   *  tier) plays a quieter, sub-less version of the same identity.
+   *  THIS LAYER DEFERS TO THE RECORDINGS: a moment already sounded by a
+   *  hand-recorded cue from src/ui/combat_sfx.ts is skipped outright rather
+   *  than doubled (ability_sfx_coverage.ts), so what remains here is only what
+   *  no recording covers. */
+  abilityAudio(
+    kind: 'windup' | 'release' | 'impact' | 'pulse' | 'crit' | 'spirit' | 'motif',
+    palette: string,
+    power: number,
+    x: number,
+    y: number,
+    z: number,
+    opts?: {
+      lite?: boolean;
+      finisher?: boolean;
+      archetype?: string;
+      buffStyle?: string;
+      sample?: string;
+      name?: string;
+      abilityId?: string;
+    },
+  ): void {
+    const ctx = this.ctx,
+      master = this.master;
+    if (!ctx || !master) return;
+    if (this.tooFar(x, z)) return;
+    const arch = opts?.archetype ?? '';
+    // A hand-recorded studio cue already sounds several of these moments from
+    // src/ui/combat_sfx.ts: proj_<school> at the launch, impact_<school> or a
+    // material impact where it lands, combat_crit on a crit, heal_impact,
+    // buff_apply. Those fire at the same instant and position as this layer, so
+    // playing here too masked the recordings under a synthetic double rather
+    // than replacing them. Stay silent and let the recording be the read; the
+    // moments no recording covers keep their procedural voice below.
+    const def = opts?.abilityId ? ABILITIES[opts.abilityId] : undefined;
+    if (
+      isAbilityMomentRecorded(kind, {
+        school: def?.school,
+        archetype: arch,
+        isProjectile: def?.projectile,
+      })
+    ) {
+      return;
+    }
+    const gentle = arch === 'heal' || arch === 'buff' || arch === 'cc';
+    if (kind === 'release' && gentle) return; // their impact chime is the read
+    const now = ctx.currentTime;
+    // per-(kind, palette) cooldown, spirit calls and motif foley key on
+    // their own name instead: a volley or AoE multi-hit plays once, not
+    // as a machine-gun of identical transients
+    const cdKey =
+      kind === 'spirit' || kind === 'motif'
+        ? `abl:${kind}:${opts?.name ?? ''}`
+        : `abl:${kind}:${palette}`;
+    const cd =
+      kind === 'crit'
+        ? 0.25
+        : kind === 'pulse'
+          ? 0.12
+          : kind === 'spirit'
+            ? 0.5
+            : kind === 'motif'
+              ? 0.2
+              : kind === 'windup'
+                ? 0.4
+                : 0.07;
+    if (now - (this.lastPlay.get(cdKey) ?? Number.NEGATIVE_INFINITY) < cd) return;
+    let slot = -1;
+    for (let i = 0; i < ABILITY_VOICES; i++) {
+      if (this.abilityVoiceEnds[i] <= now) {
+        slot = i;
+        break;
+      }
+    }
+    if (slot < 0) return; // saturated: drop rather than crowd the mix
+    const lite = opts?.lite === true;
+    try {
+      const out = ctx.createGain();
+      out.gain.value = ABILITY_GAIN * (lite ? 0.6 : 1);
+      const panner = this.makePanner(x, y, z);
+      out.connect(panner);
+      panner.connect(master);
+      this.abilityEnd = now;
+      switch (kind) {
+        case 'windup':
+          this.windupMoment(out, now, palette, power);
+          break;
+        case 'release':
+          this.releaseMoment(out, now, power);
+          break;
+        case 'impact':
+          this.impactMoment(out, now, palette, power, lite, arch, opts);
+          break;
+        case 'pulse':
+          this.abilityPulse(out, now, palette, power);
+          break;
+        case 'crit':
+          this.abilityCrit(out, now, lite);
+          break;
+        case 'spirit':
+          this.spiritMoment(out, now, opts?.name ?? '');
+          break;
+      }
+      if (this.abilityEnd <= now) {
+        // recipe scheduled nothing (e.g. stubbed context): free the chain now
+        out.disconnect();
+        panner.disconnect();
+        return;
+      }
+      this.lastPlay.set(cdKey, now);
+      this.abilityVoiceEnds[slot] = this.abilityEnd;
+      const src = out,
+        pan = panner;
+      setTimeout(
+        () => {
+          src.disconnect();
+          pan.disconnect();
+        },
+        (this.abilityEnd - now + 0.2) * 1000,
+      );
+    } catch {
+      /* minimal AudioContext stubs may lack synthesis nodes */
+    }
+  }
+
+  /** The pre-release charge bed: a soft rising swell while a cast winds up, so
+   *  a nature/moon cast leads with its OWN character instead of leaving the
+   *  first thing the ear catches to be the palette impact (which read as a
+   *  fire-spell charge to the owner). Gentle and non-percussive - it is the
+   *  "spell is charging" tell, not a hit. Only the palettes that were flagged
+   *  synthesize here; every other palette stays silent (no regression to the
+   *  classes whose windups already read right). */
+  private windupMoment(out: GainNode, t: number, palette: string, power: number): void {
+    const I = 0.6 + 0.4 * Math.min(1.5, power);
+    if (palette === 'nature') {
+      // leaves gathering: a breathy band-passed wind rising under a soft green
+      // triad that blooms in - airy and growing, never a crackle
+      this.aNoise(out, t, {
+        dur: 1.1,
+        freq: 900,
+        sweep: 700,
+        gain: 0.14 * I,
+        type: 'bandpass',
+        q: 0.9,
+        attack: 0.55,
+      });
+      this.aPartials(out, t, {
+        freqs: [392, 588, 784],
+        dur: 1.2,
+        gain: 0.07 * I,
+        stagger: 0.14,
+      });
+      return;
+    }
+    if (palette === 'moon') {
+      // cold starlight winding up: a high airy shimmer swelling in, a soft
+      // rising bell underneath - the stellar charge Starfire was missing
+      this.aNoise(out, t, {
+        dur: 1.2,
+        freq: 5200,
+        gain: 0.07 * I,
+        type: 'highpass',
+        attack: 0.7,
+      });
+      this.aTone(out, t, {
+        freq: 660,
+        slide: 990,
+        dur: 1.1,
+        gain: 0.08 * I,
+        attack: 0.5,
+      });
+      return;
+    }
+    // any other palette: no windup bed (leave those casts exactly as reviewed)
+  }
+
+  /** Cast release at the caster. Only reaches abilities with no recorded
+   *  launch: a physical strike or dash, or a spell that opts out of the
+   *  projectile convention. Every magic-school projectile is carried by its
+   *  proj_<school> recording instead (ability_sfx_coverage.ts). */
+  private releaseMoment(out: GainNode, t: number, power: number): void {
+    this.abilityRelease(out, t, power);
+  }
+
+  /** The impact moment. Only reaches the archetypes no recording covers:
+   *  cc, shout, summon and dash. Every damage landing plays its recorded
+   *  impact_<school> or material impact, and heal/buff land heal_impact /
+   *  buff_apply, all from combat_sfx.ts (see ability_sfx_coverage.ts). */
+  private impactMoment(
+    out: GainNode,
+    t: number,
+    palette: string,
+    power: number,
+    lite: boolean,
+    arch: string,
+    opts?: { finisher?: boolean },
+  ): void {
+    // a crowd-control landing poofs; a shout, summon or dash lands on the
+    // palette impact recipe (its sub weight and finisher toll included)
+    if (arch === 'cc') {
+      this.abilityPoof(out, t);
+      return;
+    }
+    this.abilityImpact(out, t, palette, power, lite, opts?.finisher === true);
+  }
+
+  /** A creature apparition calls at spawn. The recorded spirit voices were an
+   *  ElevenLabs pack take and went with it, so only the stag keeps a voice:
+   *  its take read as a farm-animal moo, wrong for the ghostly deer of Mark of
+   *  the Wild and the nature forms, and was already rerouted to a synthesized
+   *  nature blessing in the owner druid review. The rest stay silent until
+   *  real recordings land through scripts/sfx/. */
+  private spiritMoment(out: GainNode, t: number, model: string): void {
+    if (model === 'stag') this.abilityHeal(out, t, 'nature');
+  }
+
+  // ---- synth primitives (gallery tone2/noise2/partials/ticks/sub) ---------
+
+  private aTone(
+    out: GainNode,
+    t: number,
+    o: {
+      freq: number;
+      dur: number;
+      gain: number;
+      type?: OscillatorType;
+      slide?: number;
+      delay?: number;
+      attack?: number;
+      fmRatio?: number;
+      fmDepth?: number;
+    },
+  ): void {
+    const ctx = this.ctx;
+    if (!ctx || o.gain <= 0.001) return;
+    const at = t + (o.delay ?? 0);
+    const osc = ctx.createOscillator();
+    osc.type = o.type ?? 'sine';
+    osc.frequency.setValueAtTime(o.freq, at);
+    if (o.slide) osc.frequency.exponentialRampToValueAtTime(Math.max(18, o.slide), at + o.dur);
+    if (o.fmRatio && o.fmDepth) {
+      const mod = ctx.createOscillator();
+      mod.frequency.value = o.freq * o.fmRatio;
+      const mg = ctx.createGain();
+      mg.gain.value = o.fmDepth;
+      mod.connect(mg);
+      mg.connect(osc.frequency);
+      mod.start(at);
+      mod.stop(at + o.dur + 0.1);
+    }
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, at);
+    g.gain.exponentialRampToValueAtTime(o.gain, at + Math.max(0.003, o.attack ?? 0.01));
+    g.gain.exponentialRampToValueAtTime(0.0001, at + o.dur);
+    osc.connect(g);
+    g.connect(out);
+    osc.start(at);
+    osc.stop(at + o.dur + 0.1);
+    this.abilityEnd = Math.max(this.abilityEnd, at + o.dur + 0.1);
+  }
+
+  private aNoise(
+    out: GainNode,
+    t: number,
+    o: {
+      dur: number;
+      freq: number;
+      gain: number;
+      type?: BiquadFilterType;
+      q?: number;
+      sweep?: number;
+      delay?: number;
+      attack?: number;
+    },
+  ): void {
+    const ctx = this.ctx,
+      buf = this.synthNoise;
+    if (!ctx || !buf || o.gain <= 0.001) return;
+    const at = t + (o.delay ?? 0);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.loop = true;
+    src.playbackRate.value = 0.8 + Math.random() * 0.4;
+    const f = ctx.createBiquadFilter();
+    f.type = o.type ?? 'lowpass';
+    f.frequency.setValueAtTime(o.freq, at);
+    f.Q.value = o.q ?? 1;
+    if (o.sweep) f.frequency.exponentialRampToValueAtTime(Math.max(30, o.sweep), at + o.dur);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, at);
+    g.gain.exponentialRampToValueAtTime(o.gain, at + Math.max(0.002, o.attack ?? 0.002));
+    g.gain.exponentialRampToValueAtTime(0.0001, at + o.dur);
+    src.connect(f);
+    f.connect(g);
+    g.connect(out);
+    src.start(at, Math.random() * 1.5);
+    src.stop(at + o.dur + 0.1);
+    this.abilityEnd = Math.max(this.abilityEnd, at + o.dur + 0.1);
+  }
+
+  private aPartials(
+    out: GainNode,
+    t: number,
+    o: {
+      freqs: readonly number[];
+      dur: number;
+      gain: number;
+      type?: OscillatorType;
+      stagger?: number;
+      delay?: number;
+    },
+  ): void {
+    for (let i = 0; i < o.freqs.length; i++) {
+      this.aTone(out, t, {
+        freq: o.freqs[i],
+        dur: o.dur * (1 - i * 0.08),
+        gain: o.gain / (1 + i * 0.7),
+        type: o.type,
+        delay: (o.delay ?? 0) + i * (o.stagger ?? 0),
+      });
+    }
+  }
+
+  private aTicks(
+    out: GainNode,
+    t: number,
+    o: { n: number; over: number; fLo?: number; fHi?: number; gain: number; tone?: boolean },
+  ): void {
+    const fLo = o.fLo ?? 3000,
+      fHi = o.fHi ?? 6500;
+    for (let i = 0; i < o.n; i++) {
+      const delay = Math.random() * o.over;
+      const freq = fLo + Math.random() * (fHi - fLo);
+      if (o.tone) this.aTone(out, t, { freq, dur: 0.09, gain: o.gain, delay });
+      else this.aNoise(out, t, { dur: 0.04, freq, gain: o.gain, type: 'highpass', delay });
+    }
+  }
+
+  private aSub(
+    out: GainNode,
+    t: number,
+    o: { from: number; to: number; dur: number; gain: number; delay?: number },
+  ): void {
+    this.aTone(out, t, {
+      freq: o.from,
+      slide: o.to,
+      dur: o.dur,
+      gain: o.gain,
+      delay: o.delay,
+      attack: 0.006,
+    });
+  }
+
+  // ---- recipes -------------------------------------------------------------
+
+  /** Cast lets go: whoosh + spectral snap (the gallery release, synth path). */
+  private abilityRelease(out: GainNode, t: number, power: number): void {
+    const s = 0.8 + 0.2 * Math.min(1.5, power);
+    this.aNoise(out, t, {
+      dur: 0.3,
+      freq: 1400,
+      sweep: 420,
+      gain: 0.28 * s,
+      type: 'bandpass',
+      q: 1.2,
+    });
+    this.aNoise(out, t, { dur: 0.07, freq: 6800, gain: 0.3 * s, type: 'highpass' });
+  }
+
+  /** The 12 palette impact identities (gallery Sfx.impact, synth path). */
+  private abilityImpact(
+    out: GainNode,
+    t: number,
+    palette: string,
+    power: number,
+    lite: boolean,
+    finisher: boolean,
+  ): void {
+    const I = Math.min(1.5, power) * (lite ? 0.6 : 1);
+    const d = finisher ? 0.035 : 0; // pre-gap: silence, then the hit
+    // lite drops the whole sub layer; a finisher's toll partly replaces it
+    const sub = lite ? 0 : finisher ? 0.45 : 1;
+    switch (palette) {
+      case 'storm':
+        this.aNoise(out, t, { dur: 0.1, freq: 7500, gain: 0.5 * I, type: 'highpass', delay: d });
+        this.aNoise(out, t, { dur: 0.9, freq: 420, gain: 0.42 * I, delay: d });
+        this.aSub(out, t, {
+          from: 130,
+          to: I >= 1.2 ? 26 : 32,
+          dur: 0.55 * (0.7 + 0.3 * I),
+          gain: 0.55 * I * sub,
+          delay: d,
+        });
+        this.aTicks(out, t, { n: Math.round(6 * (0.6 + 0.5 * I)), over: 0.4, gain: 0.07 * I });
+        break;
+      case 'fire':
+        this.aNoise(out, t, { dur: 0.5, freq: 520, sweep: 90, gain: 0.55 * I, delay: d });
+        this.aSub(out, t, {
+          from: 100,
+          to: I >= 1.2 ? 32 : 40,
+          dur: 0.45 * (0.7 + 0.3 * I),
+          gain: 0.5 * I * sub,
+          delay: d,
+        });
+        this.aTicks(out, t, {
+          n: Math.round(9 * (0.6 + 0.5 * I)),
+          over: 0.55,
+          fLo: 2800,
+          fHi: 6000,
+          gain: 0.09 * I,
+        });
+        break;
+      case 'blood': // wet squelch signature
+        this.aNoise(out, t, {
+          dur: 0.28,
+          freq: 1200,
+          sweep: 300,
+          gain: 0.32 * I,
+          type: 'bandpass',
+          q: 3,
+          delay: d,
+        });
+        this.aNoise(out, t, { dur: 0.22, freq: 180, sweep: 90, gain: 0.45 * I, delay: d });
+        this.aSub(out, t, { from: 85, to: 45, dur: 0.3, gain: 0.5 * I * sub, delay: d });
+        this.aSub(out, t, { from: 70, to: 40, dur: 0.26, gain: 0.4 * I * sub, delay: d + 0.26 });
+        break;
+      case 'frost':
+        this.aTicks(out, t, {
+          n: 11,
+          over: 0.28,
+          fLo: 1900,
+          fHi: 5400,
+          gain: 0.1 * I,
+          tone: true,
+        });
+        this.aPartials(out, t, {
+          freqs: [1780, 2350, 3160],
+          dur: 0.85,
+          gain: 0.16 * I,
+          stagger: 0.015,
+        });
+        this.aNoise(out, t, { dur: 0.3, freq: 7000, gain: 0.28 * I, type: 'highpass', delay: d });
+        break;
+      case 'moon': // lunar glass: airy + falling cold partials, no FM zip
+        this.aTone(out, t, { freq: 1320, dur: 0.6, gain: 0.2 * I, delay: d });
+        this.aNoise(out, t, {
+          dur: 0.7,
+          freq: 4200,
+          gain: 0.1 * I,
+          type: 'highpass',
+          attack: 0.15,
+          delay: d,
+        });
+        this.aPartials(out, t, {
+          freqs: [1174, 880, 587],
+          dur: 1.3,
+          gain: 0.12 * I,
+          stagger: 0.06,
+        });
+        break;
+      case 'arcane':
+        this.aTone(out, t, {
+          freq: 700,
+          slide: 1500,
+          dur: 0.28,
+          gain: 0.28 * I,
+          fmRatio: 1.6,
+          fmDepth: 380,
+          delay: d,
+        });
+        this.aPartials(out, t, { freqs: [1320, 1980], dur: 0.6, gain: 0.13 * I, stagger: 0.03 });
+        break;
+      case 'shadow':
+        this.aSub(out, t, { from: 160, to: 26, dur: 0.7, gain: 0.55 * I * sub, delay: d });
+        this.aNoise(out, t, { dur: 0.7, freq: 380, gain: 0.35 * I, attack: 0.1, delay: d });
+        this.aNoise(out, t, {
+          dur: 0.5,
+          freq: 5200,
+          gain: 0.1 * I,
+          type: 'highpass',
+          delay: d + 0.08,
+        });
+        break;
+      case 'venom':
+        for (let i = 0; i < 4; i++) {
+          this.aTone(out, t, {
+            freq: 300 - i * 40,
+            slide: 140,
+            dur: 0.12,
+            gain: 0.16 * I,
+            delay: d + i * 0.06,
+          });
+        }
+        this.aNoise(out, t, { dur: 0.6, freq: 5200, gain: 0.14 * I, type: 'highpass', delay: d });
+        break;
+      case 'holy':
+        this.aPartials(out, t, {
+          freqs: [523, 785, 1046, 1568],
+          dur: 1.2,
+          gain: 0.26 * I,
+          stagger: 0.025,
+        });
+        this.aNoise(out, t, { dur: 0.25, freq: 3000, gain: 0.12 * I, type: 'highpass', delay: d });
+        break;
+      case 'gold': // struck treasure, not a second choir
+        this.aPartials(out, t, {
+          freqs: [2140, 3420, 5580],
+          dur: 0.42,
+          gain: 0.2 * I,
+          stagger: 0.02,
+        });
+        this.aPartials(out, t, { freqs: [523, 784], dur: 0.9, gain: 0.16 * I, stagger: 0.04 });
+        this.aSub(out, t, { from: 110, to: 60, dur: 0.35, gain: 0.3 * I * sub, delay: d });
+        break;
+      case 'nature':
+        this.aTone(out, t, { freq: 175, dur: 0.12, gain: 0.35 * I, type: 'triangle', delay: d });
+        this.aNoise(out, t, {
+          dur: 0.45,
+          freq: 1150,
+          gain: 0.24 * I,
+          type: 'bandpass',
+          q: 2,
+          delay: d,
+        });
+        break;
+      default: // physical: woody body knock leads
+        this.aTone(out, t, {
+          freq: 420,
+          slide: 300,
+          dur: 0.14,
+          gain: 0.3 * I,
+          type: 'triangle',
+          delay: d,
+        });
+        this.aNoise(out, t, { dur: 0.16, freq: 260, gain: 0.5 * I, delay: d });
+        this.aSub(out, t, { from: 82, to: 50, dur: 0.24, gain: 0.42 * I * sub, delay: d });
+        this.aPartials(out, t, { freqs: [2870, 3350], dur: 0.15, gain: 0.13 * I });
+        break;
+    }
+    // weight arrives with power, not loudness alone: big hits in sub-less
+    // palettes earn a body thump
+    if (
+      I >= 1.15 &&
+      !lite &&
+      !['storm', 'fire', 'blood', 'shadow', 'physical', 'gold'].includes(palette)
+    ) {
+      this.aSub(out, t, { from: 92, to: 44, dur: 0.28 + 0.1 * I, gain: 0.22 * I, delay: d });
+    }
+    // finisher toll: the low bell under the verdict
+    if (finisher) {
+      this.aPartials(out, t, { freqs: [65, 98], dur: 1.2, gain: 0.3, type: 'triangle' });
+    }
+  }
+
+  /** Heals chime, never boom (gallery heal, synth path). */
+  private abilityHeal(out: GainNode, t: number, palette: string): void {
+    const base =
+      palette === 'nature' || palette === 'venom' ? [392, 494, 587, 784] : [523, 659, 784, 1046];
+    this.aPartials(out, t, { freqs: base, dur: 1.4, gain: 0.2, stagger: 0.09 });
+    this.aNoise(out, t, { dur: 0.8, freq: 2600, gain: 0.06, type: 'highpass', attack: 0.25 });
+  }
+
+  /** CC lands as a soft poof, not a hit (gallery poof, synth path). */
+  private abilityPoof(out: GainNode, t: number): void {
+    this.aNoise(out, t, { dur: 0.2, freq: 2600, gain: 0.24, type: 'highpass' });
+    this.aTone(out, t, { freq: 880, slide: 1500, dur: 0.18, gain: 0.12, type: 'triangle' });
+  }
+
+  /** One soft zone re-hit at the zone (earthquake rumble beats, rain ticks). */
+  private abilityPulse(out: GainNode, t: number, palette: string, power: number): void {
+    const I = Math.min(1.2, power);
+    this.aNoise(out, t, { dur: 0.22, freq: 320, sweep: 120, gain: 0.18 * I });
+    const chime =
+      palette === 'frost' ||
+      palette === 'moon' ||
+      palette === 'holy' ||
+      palette === 'gold' ||
+      palette === 'arcane';
+    if (chime) this.aTone(out, t, { freq: 1180, dur: 0.14, gain: 0.05 * I });
+    else this.aNoise(out, t, { dur: 0.08, freq: 3800, gain: 0.05 * I, type: 'highpass' });
+  }
+
+  /** Crit sting layered over the impact (gallery crit extras, synth path). */
+  private abilityCrit(out: GainNode, t: number, lite: boolean): void {
+    this.aNoise(out, t, { dur: 0.08, freq: 8200, gain: 0.3, type: 'highpass' });
+    if (!lite) this.aSub(out, t, { from: 60, to: 24, dur: 0.7, gain: 0.42, delay: 0.02 });
   }
 }
 

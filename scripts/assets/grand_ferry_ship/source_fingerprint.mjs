@@ -19,10 +19,12 @@ export const GRAND_FERRY_SHIP_SOURCE_FILES = Object.freeze([
   'scripts/assets/lib/mesh_collision.mjs',
   'scripts/assets/lib/glb_geometry.mjs',
   'scripts/assets/lib/glb_edit.mjs',
+  'scripts/assets/lib/glb_texture_compression_core.mjs',
   'scripts/assets/specs/grand_ferry_ship.json',
   'scripts/assets/build_assets.mjs',
+  'scripts/assets/compress_glb_textures.mjs',
   'src/sim/grand_ferry_ship_plan.generated.ts',
-  'package-lock.json',
+  'pnpm-lock.yaml',
 ]);
 
 function lengthDelimiter(byteLength) {

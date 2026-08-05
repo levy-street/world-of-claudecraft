@@ -10,7 +10,8 @@
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
 import { type BagCells, layoutBagCells } from '../sim/inventory_order';
-import type { InvSlot } from '../sim/types';
+import { isTransferLockedInstance } from '../sim/item_instance_transfer';
+import type { InvSlot, ItemInstancePayload } from '../sim/types';
 import {
   applyBagFilter,
   type BagFilterState,
@@ -25,6 +26,8 @@ export type { BagCells };
 export interface BagItemInfo {
   kind: string;
   noMarketList?: boolean;
+  /** Refused by the sim's vendor sell path (src/sim/items.ts sellItem). */
+  noVendorSell?: boolean;
   /** Truthy when the item has a generic "use" effect (e.g. fishing). */
   use?: unknown;
   /** Protected from destruction (the sim's discardItem also no-ops these). */
@@ -58,10 +61,13 @@ export type BagAction =
   | 'trade'
   | 'mailAttach'
   | 'mailAttachBlocked'
+  | 'mailAttachBlockedBound'
   | 'marketSell'
   | 'marketSellBlockedQuest'
   | 'marketSellBlockedNoMarket'
+  | 'marketSellBlockedBound'
   | 'vendorSell'
+  | 'vendorSellBlocked'
   | 'bankDeposit'
   | 'bankDepositBlockedQuest'
   | 'petFeed'
@@ -91,22 +97,37 @@ export type BagTooltipHintKey =
 
 /** Decide what a click on a bag item does. Mirrors the original click handler's
  *  priority order exactly: trade > mail-attach > market-sell > vendor > bank-deposit
- *  > pet-feed > quest > use. */
-export function bagItemAction(item: BagItemInfo, mode: BagMode): BagAction {
+ *  > pet-feed > quest > use. `instance` is the clicked SLOT's payload (issue 1165):
+ *  a transfer-locked copy (bindOnTrade-armed or boundTo-bound,
+ *  isTransferLockedInstance, the sim's pipe rule) blocks mail-attach and
+ *  market-sell in place; an unlocked instanced copy stages as itself. */
+export function bagItemAction(
+  item: BagItemInfo,
+  mode: BagMode,
+  instance?: ItemInstancePayload,
+): BagAction {
   if (item.soulbound && (mode.tradeOpen || mode.mailAttach || mode.marketSell || mode.vendorOpen))
     return 'transferBlockedSoulbound';
   if (mode.tradeOpen) return 'trade';
   if (mode.mailAttach) {
     // Mirrors the sim's mail escrow rule: quest and unmailable items refuse.
     if (item.kind === 'quest' || item.noMarketList) return 'mailAttachBlocked';
+    if (isTransferLockedInstance(instance)) return 'mailAttachBlockedBound';
     return 'mailAttach';
   }
   if (mode.marketSell) {
     if (item.kind === 'quest') return 'marketSellBlockedQuest';
     if (item.noMarketList) return 'marketSellBlockedNoMarket';
+    if (isTransferLockedInstance(instance)) return 'marketSellBlockedBound';
     return 'marketSell';
   }
-  if (mode.vendorOpen) return 'vendorSell';
+  if (mode.vendorOpen) {
+    // Mirrors the sim's vendor rule (src/sim/items.ts sellItem refuses on
+    // noVendorSell), so the click is denied in place with a toast instead of
+    // dispatching a sale the server was always going to refuse.
+    if (item.noVendorSell) return 'vendorSellBlocked';
+    return 'vendorSell';
+  }
   // Window modes cluster before the armed pet-feed cursor (vendor beats pet-feed
   // today); the sim refuses a quest item, so block it in place with the deny toast.
   if (mode.bankDeposit) return item.kind === 'quest' ? 'bankDepositBlockedQuest' : 'bankDeposit';
@@ -117,6 +138,17 @@ export function bagItemAction(item: BagItemInfo, mode: BagMode): BagAction {
   // clicking it summons that mount (sim useItem -> summonMountItem). There is no
   // picker to open any more.
   return 'use';
+}
+
+/** The unknown (def-less) cell's one possible click action, derived from the
+ *  SAME mode ladder bagItemAction walks: every def-needing mode that outranks
+ *  the bank deposit there (trade, mail-attach, market-sell, vendor) means NO
+ *  action on a def-less stack, never a deposit that jumps the ladder. One
+ *  definition so the unknown cell cannot silently diverge when the ladder
+ *  gains a mode or reorders. */
+export function bagUnknownAction(mode: BagMode): 'bankDeposit' | 'none' {
+  if (mode.tradeOpen || mode.mailAttach || mode.marketSell || mode.vendorOpen) return 'none';
+  return mode.bankDeposit ? 'bankDeposit' : 'none';
 }
 
 /** Whether a shift-click on a bag item should link it into chat (classic
@@ -216,24 +248,32 @@ export function bagDestroyAction(item: BagItemInfo, mode: BagMode): BagDestroyAc
 }
 
 /** The tooltip hint sub-line for a bag item, matching the original tooltip's
- *  mode-then-kind branch. Returns '' when no extra hint applies (e.g. a
- *  material, or mount reins whose base item tooltip already owns the use hint). */
-export function bagTooltipHintKey(item: BagItemInfo, mode: BagMode): BagTooltipHintKey {
+ *  mode-then-kind branch. Returns '' when no hint applies (e.g. a material).
+ *  `instance` mirrors bagItemAction's third parameter: a transfer-locked copy
+ *  reads the same cannot-mail / cannot-market hint its click deny shows. Mount
+ *  reins need no extra hint because their base item tooltip owns the use hint. */
+export function bagTooltipHintKey(
+  item: BagItemInfo,
+  mode: BagMode,
+  instance?: ItemInstancePayload,
+): BagTooltipHintKey {
   if (item.soulbound && (mode.tradeOpen || mode.mailAttach || mode.marketSell || mode.vendorOpen))
     return 'hudChrome.itemSoulbound';
   if (mode.tradeOpen) return 'itemUi.tooltip.clickTradeOffer';
   if (mode.mailAttach) {
-    return item.kind === 'quest' || item.noMarketList
+    return item.kind === 'quest' || item.noMarketList || isTransferLockedInstance(instance)
       ? 'hudChrome.mailbox.cannotMail'
       : 'hudChrome.mailbox.clickAttach';
   }
   if (mode.marketSell) {
-    return item.kind === 'quest' || item.noMarketList
+    return item.kind === 'quest' || item.noMarketList || isTransferLockedInstance(instance)
       ? 'itemUi.tooltip.cannotMarket'
       : 'itemUi.tooltip.clickMarketList';
   }
   if (mode.vendorOpen)
-    return item.kind === 'quest' ? 'itemUi.tooltip.cannotVendor' : 'itemUi.tooltip.clickSell';
+    return item.kind === 'quest' || item.noVendorSell
+      ? 'itemUi.tooltip.cannotVendor'
+      : 'itemUi.tooltip.clickSell';
   if (mode.bankDeposit)
     return item.kind === 'quest' ? 'hudChrome.bank.cannotDeposit' : 'hudChrome.bank.depositHint';
   if (item.kind === 'quest') return 'itemUi.tooltip.clickDestroy';

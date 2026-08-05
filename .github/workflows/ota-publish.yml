@@ -1,0 +1,151 @@
+name: OTA publish
+
+# Publishes a self-hosted OTA web bundle for the iOS/Android shells to the
+# update host (the Cloudflare R2 bucket that also serves desktop updates, under
+# https://updates.worldofclaudecraft.com/ota/). The full runbook is
+# docs/ota-updates.md.
+#
+# WHY THIS IS DISPATCH-ONLY, unlike Desktop publish which fires on a release tag:
+# a desktop artifact is self-contained, so a tag is enough. An OTA bundle is not:
+# it replaces the web layer on a phone while the authoritative server keeps
+# running whatever it was already running. A tag says code was merged, not that
+# any server runs it. So a human chooses the moment, and the ref they choose IS
+# the bundle. That also makes the useful case possible: publishing a JS-only fix
+# built from the currently deployed commit, with no server deploy and no restart.
+#
+# There is no main-ancestry guard for the same reason. A hotfix bundle is
+# legitimately built from a branch off the DEPLOYED release, which may not be
+# main's tip. The guard that actually matters is the layout-epoch preflight
+# below, which refuses a bundle the live server would reject at the handshake.
+#
+# Publishing is opt-in per run: the default is a dry run that builds, zips,
+# checksums, and prints the exact keys and URLs it would write, uploading
+# nothing. Tick "publish" to really upload.
+#
+# Rollback is deliberately NOT an input. The plugin already reverts a bundle
+# that fails to boot on its own, so the manual path is for a bundle that boots
+# but is wrong, which is a judgement call worth making at a terminal:
+#   npm run ota:publish -- --rollback <version>
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Upload to the live update host (leave unchecked for a build-only dry run)'
+        type: boolean
+        default: false
+      min_native:
+        description: 'Oldest native shell version this bundle supports (set when the release touched native code)'
+        type: string
+        required: false
+      skip_server_check:
+        description: 'Skip the layout-epoch preflight (only if you have confirmed the epoch by hand)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+# Two publishes must never race on latest.json.
+concurrency:
+  group: ota-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Build and publish the OTA bundle
+    runs-on: ubuntu-latest
+    # A native build plus zipping a bundle of this size is slow; the desktop
+    # jobs sit at 60 to 90 minutes for comparable work.
+    timeout-minutes: 90
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # The one compatibility rule that matters. Fails closed: an inconclusive
+      # probe (rate limited, timed out) does NOT count as permission to publish.
+      - name: Layout-epoch preflight against the live server
+        if: ${{ !inputs.skip_server_check }}
+        run: node scripts/ota/check_server_layout.mjs wss://worldofclaudecraft.com/ws
+
+      # Inputs go through env, never string-interpolated into the shell line.
+      - name: Publish the bundle
+        env:
+          PUBLISH: ${{ inputs.publish }}
+          MIN_NATIVE: ${{ inputs.min_native }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          AWS_EC2_METADATA_DISABLED: 'true'
+          # R2 does not implement the newer S3 default integrity checksums;
+          # these are Cloudflare's documented settings for aws-cli >= 2.23, the
+          # same pair the desktop publish workflow sets.
+          AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+          AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+          OTA_S3_BUCKET: ${{ secrets.R2_BUCKET }}
+          OTA_S3_PREFIX: ota
+          OTA_PUBLIC_BASE_URL: https://updates.worldofclaudecraft.com
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          if [ -z "${AWS_ACCESS_KEY_ID}" ] || [ -z "${AWS_SECRET_ACCESS_KEY}" ] || [ -z "${OTA_S3_BUCKET}" ] || [ -z "${R2_ACCOUNT_ID}" ]; then
+            echo "R2 secrets are not configured (R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET, R2_ACCOUNT_ID). See docs/ota-updates.md." >&2
+            exit 1
+          fi
+          export OTA_S3_ENDPOINT_URL="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+          ARGS=()
+          if [ "${PUBLISH}" != "true" ]; then ARGS+=(--dry-run); fi
+          if [ -n "${MIN_NATIVE}" ]; then ARGS+=(--min-native "${MIN_NATIVE}"); fi
+          npm run ota:publish -- "${ARGS[@]}"
+
+      # A bad publish is SILENT on the server side: an unusable manifest caches
+      # as a successful "no update" with no log line anywhere. So CI performs the
+      # verification the runbook calls the only real signal, rather than trusting
+      # that the upload implies a working update. Polls because the server caches
+      # the manifest for 60 s.
+      - name: Verify the published manifest and the server offer
+        if: ${{ inputs.publish }}
+        run: |
+          set -euo pipefail
+          VERSION="$(node -p "require('./package.json').version")"
+          MANIFEST="https://updates.worldofclaudecraft.com/ota/latest.json"
+          echo "Expecting the update host and the game server to converge on ${VERSION}"
+
+          published="$(curl -sSf --max-time 30 "${MANIFEST}" | jq -r .version)"
+          if [ "${published}" != "${VERSION}" ]; then
+            echo "The published manifest says ${published}, expected ${VERSION}." >&2
+            exit 1
+          fi
+          echo "Update host serves ${published}"
+
+          # The server is the real judge: it re-fetches the manifest and applies
+          # its own validation (https, same-origin bundle URL, checksum present).
+          # An offer coming back proves the whole chain, not just the upload.
+          for attempt in $(seq 1 12); do
+            offered="$(curl -sS --max-time 30 -X POST https://worldofclaudecraft.com/api/ota/updates \
+              -H 'content-type: application/json' \
+              -d '{"platform":"ios","version_name":"builtin","version_build":"0.0.1"}' | jq -r '.version // empty')"
+            if [ "${offered}" = "${VERSION}" ]; then
+              echo "Game server offers ${offered}; publish verified."
+              exit 0
+            fi
+            echo "attempt ${attempt}: server not offering ${VERSION} yet (manifest cache is 60 s), waiting"
+            sleep 15
+          done
+          echo "The game server never offered ${VERSION}. Check that OTA_MANIFEST_URL is set on the server AND present in the compose environment allowlist." >&2
+          exit 1

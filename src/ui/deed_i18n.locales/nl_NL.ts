@@ -817,4 +817,28 @@ export const table: DeedLocaleTable = {
     name: 'Het Slopersveld',
     desc: 'Salvage 50 stuks uitrusting terug tot ruwe grondstoffen.',
   },
+  dgn_wildheart_basin: {
+    name: 'Het Bekken Bijt Terug',
+    desc: 'Versla Zulgar, Stem van het Bekken, in het Wildhartbekken.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Heroïsch: Het Wildhartbekken',
+    desc: 'Versla Zulgar, Stem van het Bekken, in het Wildhartbekken op Heroïsche moeilijkheidsgraad.',
+  },
+  chr_marsh_rares_ii: {
+    name: 'De Veelvraat, Verrekend',
+    desc: 'Dood Wroetkaak de Veelvraat, een vierde naamdragende verschrikking van Slijkveenmoeras die buiten de eerste telling viel.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'Meer Namen in de Rots Gekerfd',
+    desc: 'Dood de Oude Rotsmuil en Scherfheer Kazzix, nog twee naamdragende verschrikkingen van Doorntop-Hoogten die buiten de eerste telling vielen.',
+  },
+  chr_gleamstag: {
+    name: 'De Legende Die Nooit Als Eerste Toesloeg',
+    desc: 'Dood het Glanshert, een zeldzame, schuwe elite die alleen aanvalt wanneer hij in het nauw wordt gedreven.',
+  },
+  chr_hollow_rares: {
+    name: 'De Kudde Vergeet Niet',
+    desc: 'Dood de Oude Mergschelp en Aurelhorn, Eerste van de Kudde, de twee rondzwervende zeldzame bazen van de Sluierholte.',
+  },
 };

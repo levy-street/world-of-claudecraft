@@ -178,6 +178,27 @@ export function canAddItem(
   return countFit(inventory, capacity, itemId, count) >= count;
 }
 
+/** The ONE capacity check the exchange pipes share (market buy/cancel/collect,
+ *  mail claim, vendor buyback), payload-aware on both arms (#2139: the
+ *  pre-check must model the grant identically or the overflow class re-opens):
+ *  with `instance` absent this is canAddItem, with it canGrantItemInstance.
+ *  Also threads the plain-stack `craftedRecipeId` marker: a caller granting a
+ *  crafted plain stack must pre-check with the same marker `grantCopies`
+ *  grants with, or the fit check can see room in a marker-free stack that the
+ *  actual grant (keyed on the marker by addStacked) cannot merge into,
+ *  overfilling the recipient's bags past the modelled cap. Its grant twin is
+ *  item_instance_transfer.ts grantCopies. */
+export function canGrantCopies(
+  inventory: readonly InvSlot[],
+  capacity: number,
+  itemId: string,
+  count: number,
+  instance?: ItemInstancePayload,
+  craftedRecipeId?: string,
+): boolean {
+  return countFit(inventory, capacity, itemId, count, instance, craftedRecipeId) >= count;
+}
+
 /** True when EVERY add in the batch fits together (simulated cumulatively on a
  *  scratch copy, so three 1-slot items against one free slot correctly fail). */
 export function fitsAll(
@@ -240,10 +261,22 @@ export function addStacked(
   }
 }
 
+/** Units of `itemId` a scratch inventory holds, instanced slots included: the
+ *  read half of removeStacked below, for a capacity simulation that has to
+ *  decide HOW MUCH it can take from the scratch copy before taking it (the
+ *  grade-spanning craft consumption in professions/crafting.ts). Mirrors the
+ *  Sim hub's countItem, which sums the same slots. */
+export function countStacked(inventory: readonly InvSlot[], itemId: string): number {
+  let total = 0;
+  for (const s of inventory) if (s.itemId === itemId) total += s.count;
+  return total;
+}
+
 /** Stack-aware removal mirroring the Sim hub's removeItem walk (from the end,
  *  instanced slots included, exactly like removeItem), for capacity simulations
- *  on a scratch copy (e.g. "after handing in the collect items, does the quest
- *  reward fit?"). */
+ *  on a scratch copy whose live path removes with removeItem (the trade swap,
+ *  craft/enchant reagents). The quest turn-in gate instead models its
+ *  prefer-plain hand-in with consumeOneScratch below. */
 export function removeStacked(inventory: InvSlot[], itemId: string, count: number): void {
   let remaining = count;
   for (let i = inventory.length - 1; i >= 0 && remaining > 0; i--) {
@@ -264,7 +297,10 @@ export function removeStacked(inventory: InvSlot[], itemId: string, count: numbe
  *  removeEnchantableItem's second pass), and only then an excluded instanced
  *  slot (highest index: with no preferred copy left, the live paths fall back
  *  to the plain removeItem walk, where only excluded slots remain). With no
- *  `excludeInstance` it models items.ts removePreferFungible (salvage); with
+ *  `excludeInstance` it models items.ts removePreferFungible in its
+ *  predicate-less form, the only form its callers here use (salvage); the
+ *  trade path's `deprioritize` two-pass has its own dedicated mirror,
+ *  trade.ts fitsAfterSwap. With
  *  professions/enchanting.ts isEnchantedInstance it models the
  *  countEnchantableItem >= 1 ? removeEnchantableItem : removeItem split
  *  (disenchant) and removeEnchantableItem alone (apply-enchant, whose

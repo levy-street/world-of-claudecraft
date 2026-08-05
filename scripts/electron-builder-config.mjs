@@ -20,6 +20,15 @@
 //    has nothing to read even if it were reached), and every OS targets 'dir'
 //    because SteamPipe depots upload the loose installed layout (mac: the
 //    signed .app; win: win-unpacked; linux: linux-unpacked), never installers.
+//  - epic: Steam-shaped third channel. publish is nulled (Epic BPT owns patches;
+//    electron-updater must never self-update an EGS install), output is
+//    release-epic/, mac + win only use 'dir' targets (universal .app / win
+//    x64 unpacked; NO linux, D6), and the build stamps the EOS product /
+//    deployment / client ids the packaged main process will init with.
+//    Missing any of those ids refuses the build (WOC_EPIC_* env, twin of
+//    WOC_STEAM_APP_ID). Website and steam builds never require Epic env.
+//    files/asarUnpack hooks are reserved for future EOS native libs (Phase 4);
+//    no real SDK is vendored here.
 //  - windows signing: two routes, each injected only when the caller resolved
 //    a complete credential set from the environment, so unsigned local builds
 //    never trip the signing step. Azure Trusted Signing (WIN_SIGN_*) injects
@@ -86,6 +95,13 @@ function stripArch(targets) {
   );
 }
 
+// Epic product / deployment / client ids are opaque non-empty strings (UUID
+// shaped in practice). Whitespace-only is refused so a set-but-blank CI matrix
+// cell cannot stamp garbage. Server secrets (client secret) never land here.
+function isNonEmptyEpicId(value) {
+  return typeof value === 'string' && value.trim() !== '';
+}
+
 export function desktopBuilderConfig({
   base,
   distribution,
@@ -98,8 +114,11 @@ export function desktopBuilderConfig({
   updateChannel = null,
   steamAppId = '',
   steamworksInstalled = null,
+  epicProductId = '',
+  epicDeploymentId = '',
+  epicClientId = '',
 }) {
-  if (distribution !== 'website' && distribution !== 'steam') {
+  if (distribution !== 'website' && distribution !== 'steam' && distribution !== 'epic') {
     throw new Error(`unknown desktop distribution: ${distribution}`);
   }
   const config = structuredClone(base);
@@ -115,6 +134,10 @@ export function desktopBuilderConfig({
       // steam branch below refuses to build without a numeric id, so the
       // stamp is unconditional here.
       ...(distribution === 'steam' ? { steamAppId } : {}),
+      // EOS product / deployment / client ids the epic shell will init with
+      // (electron/epic.cjs, Phase 4). Stamped for the epic channel only; the
+      // epic branch below refuses without all three, so stamps are unconditional.
+      ...(distribution === 'epic' ? { epicProductId, epicDeploymentId, epicClientId } : {}),
     },
   };
   if (distribution === 'website' && config.publish) {
@@ -212,6 +235,41 @@ export function desktopBuilderConfig({
       ...(Array.isArray(config.asarUnpack) ? config.asarUnpack : []),
       'node_modules/steamworks.js/dist/**',
     ];
+  }
+  if (distribution === 'epic') {
+    // A packaged Epic build cannot recover product/deployment/client ids from
+    // runtime env (packaged stamp is final, same hatch rule as steam). Missing
+    // any of them would ship a build that cannot init EOS and degrades to null
+    // on every path; that mistake must die at build time. Website and steam
+    // builds never reach this branch and need no WOC_EPIC_* env (D3, D16).
+    // Server-only secrets (client secret) must never be stamped into the client.
+    if (
+      !isNonEmptyEpicId(epicProductId) ||
+      !isNonEmptyEpicId(epicDeploymentId) ||
+      !isNonEmptyEpicId(epicClientId)
+    ) {
+      throw new Error(
+        'epic channel builds need non-empty WOC_EPIC_PRODUCT_ID, WOC_EPIC_DEPLOYMENT_ID, ' +
+          `and WOC_EPIC_CLIENT_ID in the build env; got product="${epicProductId}", ` +
+          `deployment="${epicDeploymentId}", client="${epicClientId}". Without them the ` +
+          'packaged Epic build cannot init EOS. Server secrets (client secret) stay out ' +
+          'of the client stamp.',
+      );
+    }
+    config.publish = null;
+    config.directories = { ...(config.directories ?? {}), output: 'release-epic' };
+    // EGS v1 ships Windows + macOS only (D6). Mac is one universal .app; win is
+    // x64 unpacked. Drop the linux block entirely so electron-builder never
+    // emits a linux artifact for this channel (website + steam keep theirs).
+    config.mac = { ...(config.mac ?? {}), target: [{ target: 'dir', arch: ['universal'] }] };
+    config.win = { ...(config.win ?? {}), target: [{ target: 'dir', arch: ['x64'] }] };
+    delete config.linux;
+    // Phase 4 will re-include EOS native libs on this channel only (files +
+    // asarUnpack), the way steam re-includes steamworks.js. Keep the arrays
+    // present and channel-isolated so the future SDK drop is a pure append;
+    // no real binary is vendored in this phase (D8, D24).
+    config.files = [...(config.files ?? [])];
+    config.asarUnpack = [...(Array.isArray(config.asarUnpack) ? config.asarUnpack : [])];
   }
   if (mode === 'pack') {
     for (const os of ['mac', 'win', 'linux']) {

@@ -25,7 +25,7 @@ import { MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { nythraxisGravebreakerOnMobSwing } from '../encounters/nythraxis';
 import type { SimContext } from '../sim_context';
-import { type Aura, armorReduction, dist2d, type Entity, type MobTemplate } from '../types';
+import { type Aura, dist2d, type Entity, type MobTemplate, mobArmorReduction } from '../types';
 
 // A "Devour Magic"-strippable beneficial enhancement: a positive buff_* stat
 // buff, a heal-over-time, an absorb shield, or a weapon imbue. Stances, forms,
@@ -110,7 +110,7 @@ export function runMobSwingAffixes(
       if (!pe || pe.dead || pe.id === target.id) continue;
       if (dist2d(pe.pos, target.pos) > cleave.radius) continue;
       let sd = rawDmg * cleave.mult;
-      sd *= 1 - armorReduction(ctx.effectiveArmor(pe), mob.level);
+      sd *= 1 - mobArmorReduction(mob, pe, ctx.effectiveArmor(pe));
       ctx.dealDamage(
         mob,
         pe,

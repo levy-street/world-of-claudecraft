@@ -212,6 +212,7 @@ describe('handleAccountChangePassword', () => {
       res,
       1,
       'tokA',
+      noHooks,
     );
     expect(parse(res).status).toBe(401);
     expect(writes.some((w) => w.sql.includes('UPDATE accounts SET password_hash'))).toBe(false);
@@ -223,6 +224,7 @@ describe('handleAccountChangePassword', () => {
       res,
       1,
       'tokA',
+      noHooks,
     );
     expect(parse(res).status).toBe(400);
   });
@@ -233,6 +235,7 @@ describe('handleAccountChangePassword', () => {
       res,
       1,
       'tokA',
+      noHooks,
     );
     const { status, data } = parse(res);
     expect(status).toBe(400);
@@ -245,6 +248,7 @@ describe('handleAccountChangePassword', () => {
       res,
       1,
       'tokA',
+      noHooks,
     );
     expect(parse(res).status).toBe(200);
     expect(writes.some((w) => w.sql.includes('UPDATE accounts SET password_hash'))).toBe(true);
@@ -253,6 +257,42 @@ describe('handleAccountChangePassword', () => {
     // The "<> $2" (keep caller) variant, with the caller token as a param.
     expect(revoke!.sql).toContain('token <>');
     expect(revoke!.params).toContain('tokA');
+  });
+  // Token revocation alone does not close an already-open WS: an attacker who
+  // phished the password and is already in-world would otherwise keep playing
+  // on the victim's character after the victim locks them out. A successful
+  // change must also force-disconnect any live session for the account.
+  it('force-disconnects every live WS session for the account, unconditionally', async () => {
+    const disconnectAccount = vi.fn();
+    const res = makeRes();
+    await handleAccountChangePassword(
+      makeReq({ current: CORRECT_PW, next: 'brandnew1' }, '198.51.100.93'),
+      res,
+      1,
+      'tokA',
+      { disconnectAccount },
+    );
+    expect(parse(res).status).toBe(200);
+    // No exception token: a bearer token is a reusable wire credential, not a
+    // per-socket identity, so exempting a live session by token equality could
+    // just as easily spare an attacker's session sharing a stolen token as the
+    // legitimate caller's. disconnectAccount always kicks every live session for
+    // the account (a review finding on the original PR).
+    expect(disconnectAccount).toHaveBeenCalledWith(1, expect.any(String));
+    expect(disconnectAccount.mock.calls[0]).toHaveLength(2);
+  });
+  it('does not disconnect anyone when the change is rejected (wrong current password)', async () => {
+    const disconnectAccount = vi.fn();
+    const res = makeRes();
+    await handleAccountChangePassword(
+      makeReq({ current: 'wrong', next: 'brandnew1' }, '198.51.100.94'),
+      res,
+      1,
+      'tokA',
+      { disconnectAccount },
+    );
+    expect(parse(res).status).toBe(401);
+    expect(disconnectAccount).not.toHaveBeenCalled();
   });
 });
 
@@ -348,6 +388,7 @@ describe('account portal rate limiting (429)', () => {
         last,
         1,
         'tokA',
+        noHooks,
       );
     }
     expect(parse(last).status).toBe(429);
@@ -386,6 +427,7 @@ describe('account portal auth-failure accounting', () => {
       res,
       1,
       'tokA',
+      noHooks,
     );
     expect(parse(res).status).toBe(200);
   });

@@ -814,4 +814,28 @@ export const table: DeedLocaleTable = {
     name: 'O Ferro-Velho',
     desc: 'Recupere 50 pecas de equipamento transformando-as em materiais brutos.',
   },
+  dgn_wildheart_basin: {
+    name: 'A Bacia Revida',
+    desc: 'Derrote Zulgar, Voz da Bacia, na Bacia de Wildheart.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Heroico: A Bacia de Wildheart',
+    desc: 'Derrote Zulgar, Voz da Bacia, na Bacia de Wildheart na dificuldade Heroica.',
+  },
+  chr_marsh_rares_ii: {
+    name: 'O Glutão, Ajustado nas Contas',
+    desc: 'Mate Grubjaw, o Glutão, um quarto terror nomeado do Pântano de Mirefen que ficou fora da primeira contagem.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'Mais Nomes Talhados na Rocha',
+    desc: 'Mate o Velho Cragmaw e o Senhor dos Estilhaços Kazzix, mais dois terrores nomeados das Alturas de Thornpeak que ficaram fora da primeira contagem.',
+  },
+  chr_gleamstag: {
+    name: 'A Lenda Que Não Atacava Primeiro',
+    desc: 'Mate o Cervo Reluzente, um elite raro e arisco que só ataca quando encurralado.',
+  },
+  chr_hollow_rares: {
+    name: 'A Manada Lembra',
+    desc: 'Mate o Velho Marrowshell e Aurelhorn, Primeiro da Manada, os dois chefes raros errantes do Vale.',
+  },
 };

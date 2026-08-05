@@ -743,6 +743,12 @@ export async function serveLibrary({ port = 5180, refresh = null } = {}) {
       if (url === '/wizard_ui.js') return send(res, 200, MIME['.js'], pageModule('wizard_ui.js'));
       if (url === '/' || url === '/index.html') return void serveIndex(res);
       if (url === '/three.bundle.js') return send(res, 200, MIME['.js'], threeBundle);
+      if (url === '/basis/basis_transcoder.js' || url === '/basis/basis_transcoder.wasm') {
+        // Shipped GLB textures are KTX2; the viewer's KTX2Loader fetches its
+        // transcoder from the same origin, mirroring the game client.
+        const p = pjoin(REPO_ROOT, 'public', url.slice(1));
+        return send(res, 200, MIME[extname(p)] ?? 'application/octet-stream', rf(p));
+      }
       if (url === '/viewer_live.js')
         return send(res, 200, MIME['.js'], pageModule('viewer_live.js'));
       if (url === '/weapon_vfx.js') return send(res, 200, MIME['.js'], pageModule('weapon_vfx.js'));

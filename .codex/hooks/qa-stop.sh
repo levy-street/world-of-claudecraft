@@ -32,7 +32,7 @@ stream=$(
 )
 [ -n "$stream" ] || exit 0
 
-out=$(printf '%s' "$stream" | perl -CSD -e '
+out=$(printf '%s' "$stream" | LC_ALL=C LANG=C perl -CSD -e '
   my @hits; my $file = "";
   while (my $line = <STDIN>) {
     if ($line =~ m{^\+\+\+\s+b/(.+)$}) { $file = $1; $file =~ s/\s+$//; next; }

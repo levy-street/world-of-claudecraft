@@ -137,19 +137,40 @@ export async function recentDeedsForCharacter(
   }));
 }
 
+// In-flight collapse for the earned-deeds roll-up: the Steam and Epic mirrors
+// each call this read independently (D21 keeps the observers independent), and
+// on the login reconcile both fire within the same continuation, so without
+// the collapse one join issues the identical SELECT twice. Concurrent callers
+// share one promise; the entry is dropped on settle, so nothing is ever served
+// stale and a rejection is never memoized.
+const earnedDeedIdsInFlight = new Map<number, Promise<string[]>>();
+
 /** Every deed id the account has earned on any character, deduped. Feeds the
- *  Steam reconcile-on-link push (server/steam/mirror.ts): the server store is
- *  canonical and Steam mirrors a subset, so this read is the whole sync. */
-export async function earnedDeedIdsForAccount(accountId: number): Promise<string[]> {
-  const res = await pool.query(
-    'SELECT DISTINCT deed_id FROM character_deeds WHERE account_id = $1',
-    [accountId],
-  );
-  return res.rows.map((row) => String(row.deed_id));
+ *  storefront reconcile pushes (server/steam/mirror.ts, server/epic/mirror.ts):
+ *  the server store is canonical and each storefront mirrors a subset, so this
+ *  read is the whole sync. Concurrent identical reads collapse to one query. */
+export function earnedDeedIdsForAccount(accountId: number): Promise<string[]> {
+  const inFlight = earnedDeedIdsInFlight.get(accountId);
+  if (inFlight !== undefined) return inFlight;
+  const read = pool
+    .query('SELECT DISTINCT deed_id FROM character_deeds WHERE account_id = $1', [accountId])
+    .then((res) => res.rows.map((row: { deed_id: unknown }) => String(row.deed_id)))
+    .finally(() => {
+      earnedDeedIdsInFlight.delete(accountId);
+    });
+  earnedDeedIdsInFlight.set(accountId, read);
+  return read;
 }
 
-/** The broadcast opt-out flag. Missing account reads as TRUE (the column
- *  default): the caller's audience resolution degrades to a no-op anyway. */
+/** The broadcast opt-out flag. A missing account row reads as TRUE (the column
+ *  is NOT NULL DEFAULT TRUE, so a row that EXISTS can never read null). Both
+ *  gated callers publish on a true read: Game.fanOutDeedUnlock (the guild and
+ *  follower marquee plus the Discord feed card) and the masterwork arm of the
+ *  event loop (a Discord card only), so the fail-open is no longer a no-op the
+ *  way it was before the feed existed. It stays acceptable because the arm is
+ *  practically unreachable: every caller holds a live session, whose account
+ *  row exists by construction. server/deeds.ts reads the same flag for the
+ *  settings toggle. */
 export async function getDeedBroadcasts(accountId: number): Promise<boolean> {
   const res = await pool.query('SELECT deed_broadcasts FROM accounts WHERE id = $1', [accountId]);
   return res.rows[0]?.deed_broadcasts ?? true;

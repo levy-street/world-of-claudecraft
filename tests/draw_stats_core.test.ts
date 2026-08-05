@@ -1,16 +1,16 @@
 // Pins for src/render/draw_stats_core.ts: the composer-tier draw-stats
-// accumulator (packet 0 phase 01). The composer-tier legacy constant asserted
-// here is the live-confirmed pre-change governor input: 150/150 sampled
-// frames on both high and ultra read exactly 1 call / 1 triangle / 0 points /
-// 0 lines (the final fullscreen output pass).
+// accumulator and truthful logical-frame signal consumed by the governor.
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
-  COMPOSER_TIER_LEGACY_DRAW_SIGNAL,
   createDrawStatsAccumulator,
+  createLogicalFrameDrawStats,
   type DrawStatsCounters,
   governorDrawSignal,
 } from '../src/render/draw_stats_core';
-import { GFX_CONFIG_VERSION } from '../src/render/gfx';
+import { GFX_BUDGETS, GFX_CONFIG_VERSION } from '../src/render/gfx';
+import { RenderBudgetGovernor } from '../src/render/render_budget';
+import { assertAllocationStable } from './util/alloc_probe';
 
 const counters = (
   calls: number,
@@ -20,6 +20,87 @@ const counters = (
 ): DrawStatsCounters => ({ calls, triangles, points, lines });
 
 describe('draw_stats_core', () => {
+  it('owns post-processing counter setup, frame sampling, governor input, and resets', () => {
+    let resets = 0;
+    const info = {
+      autoReset: true,
+      render: counters(20, 1000, 2, 1),
+      reset: () => {
+        resets++;
+        info.render.calls = 0;
+        info.render.triangles = 0;
+        info.render.points = 0;
+        info.render.lines = 0;
+      },
+    };
+    const logicalFrame = createLogicalFrameDrawStats(info);
+
+    expect(info.autoReset).toBe(false);
+    expect(logicalFrame.currentFrame()).toEqual(counters(0, 0, 0, 0));
+    logicalFrame.beginFrame();
+    info.render.calls += 675;
+    info.render.triangles += 10_200_000;
+    const measured = logicalFrame.beginFrame();
+
+    expect(measured).toBe(logicalFrame.currentFrame());
+    expect(measured).toEqual(counters(675, 10_200_000, 0, 0));
+    expect(logicalFrame.governorSignal('high')).toBe(measured);
+
+    info.render.calls += 37;
+    info.render.triangles += 21_000;
+    logicalFrame.discardOutOfBand();
+    expect(resets).toBe(1);
+    expect(info.render).toEqual(counters(0, 0, 0, 0));
+    info.render.calls = 250;
+    info.render.triangles = 180_000;
+    expect(logicalFrame.beginFrame()).toEqual(counters(250, 180_000, 0, 0));
+  });
+
+  it('wires Renderer lifecycle consumers through the tested logical-frame session', () => {
+    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+
+    expect(source.match(/createLogicalFrameDrawStats\(this\.webgl\.info\)/g)).toHaveLength(1);
+    expect(source).toMatch(
+      /if \(GFX\.composer \|\| GFX\.gradePass\) \{[\s\S]{0,800}createLogicalFrameDrawStats\(this\.webgl\.info\)/,
+    );
+    expect(source.match(/this\.drawStats\.beginFrame\(\)/g)).toHaveLength(1);
+    expect(source.match(/this\.drawStats\.currentFrame\(\)/g)).toHaveLength(2);
+    expect(source.match(/this\.drawStats\.governorSignal\(GFX\.tier\)/g)).toHaveLength(1);
+    expect(source.match(/this\.drawStats\.discardOutOfBand\(\)/g)).toHaveLength(1);
+    expect(source).toMatch(
+      /if \(this\.drawStats\) this\.drawStats\.beginFrame\(\);\n\s*this\.updateAdaptiveResolution\(dt\);/,
+    );
+    expect(source).toContain(
+      'const drawStatsFrame = this.drawStats ? this.drawStats.currentFrame() : null;',
+    );
+    expect(source).toMatch(/calls: drawStatsFrame\s*\? drawStatsFrame\.calls/);
+    expect(source).toMatch(/triangles: drawStatsFrame\s*\? drawStatsFrame\.triangles/);
+    expect(source).toContain(
+      'const drawSignal = this.drawStats ? this.drawStats.governorSignal(GFX.tier) : info.render;',
+    );
+    expect(source).toContain('sample.calls = drawSignal.calls');
+    expect(source).toContain('sample.triangles =\n      drawSignal.triangles');
+    expect(source).toContain('else this.webgl.info.reset();');
+  });
+
+  it('fills one caller-owned frame counter on the composer hot path', () => {
+    const acc = createDrawStatsAccumulator();
+    const read = counters(0, 0, 0, 0);
+    const out = counters(0, 0, 0, 0);
+    acc.beginFrame(read, out);
+    expect(() =>
+      assertAllocationStable(
+        () => {
+          read.calls++;
+          read.triangles += 10;
+          return acc.beginFrame(read, out);
+        },
+        64,
+        'draw stats frame',
+      ),
+    ).not.toThrow();
+  });
+
   it('accumulates across passes: consecutive monotonic reads become per-frame deltas', () => {
     const acc = createDrawStatsAccumulator();
     acc.beginFrame(counters(0, 0, 0, 0)); // baseline capture, return discarded
@@ -62,27 +143,60 @@ describe('draw_stats_core', () => {
     expect(frame.calls).not.toBe(250);
   });
 
-  it('governorDrawSignal pins the frozen legacy constant on composer tiers', () => {
+  it('passes accurate measured logical-frame counters to the governor on every tier', () => {
     const input = counters(641, 2400123, 9, 4);
-    for (const tier of ['high', 'ultra'] as const) {
-      const out = governorDrawSignal(tier, input);
-      // The live-confirmed pre-accumulator governor input, pinned as literals.
-      expect(out).toEqual({ calls: 1, triangles: 1, points: 0, lines: 0 });
-      expect(out.calls).not.toBe(input.calls);
-      expect(out.triangles).not.toBe(input.triangles);
-      expect(out).toBe(COMPOSER_TIER_LEGACY_DRAW_SIGNAL);
-    }
-    expect(Object.isFrozen(COMPOSER_TIER_LEGACY_DRAW_SIGNAL)).toBe(true);
-  });
-
-  it('governorDrawSignal passes the frame through verbatim on low and medium', () => {
-    const input = counters(405, 683731, 4154, 0);
-    for (const tier of ['low', 'medium'] as const) {
+    for (const tier of ['low', 'medium', 'high', 'ultra', 'insane'] as const) {
       const out = governorDrawSignal(tier, input);
       expect(out).toBe(input);
-      expect(out.calls).toBe(405);
-      expect(out.triangles).toBe(683731);
+      expect(out).toEqual({ calls: 641, triangles: 2400123, points: 9, lines: 4 });
     }
+  });
+
+  it('lets the measured High scene sample trigger draw-pressure quality shedding', () => {
+    const governor = new RenderBudgetGovernor({
+      tier: 'high',
+      budget: GFX_BUDGETS.high,
+      enabled: true,
+    });
+    governor.reset(1, 0.7, 1);
+    governor.update({
+      dt: 0.6,
+      frameMs: 16,
+      totalMs: 16,
+      submitMs: 5,
+      calls: 150,
+      triangles: 250000,
+      grassVisibleTufts: 900,
+      grassVisibleChunks: 8,
+      activeViews: 25,
+      createdViews: 0,
+      minRenderScale: 0.7,
+      maxRenderScale: 1,
+    });
+
+    const draw = governorDrawSignal('high', counters(675, 10_200_000, 0, 0));
+    expect(draw.calls).toBe(675);
+    expect(draw.triangles).toBe(10_200_000);
+    const state = governor.update({
+      dt: 1 / 60,
+      frameMs: 18.9,
+      totalMs: 18.9,
+      submitMs: 5,
+      calls: draw.calls,
+      triangles: draw.triangles,
+      grassVisibleTufts: 900,
+      grassVisibleChunks: 8,
+      activeViews: 25,
+      createdViews: 0,
+      minRenderScale: 0.7,
+      maxRenderScale: 1,
+    });
+
+    expect(state.mode).toBe('degrading');
+    expect(state.reason).toBe('draw');
+    expect(state.caps.urgentTriangles).toBe(6_500_000);
+    expect(state.pressure).toBe(2.27);
+    expect(state.levels.foliage).toBe(0.76);
   });
 
   it('discards the first-frame baseline instead of reporting the seed as a delta', () => {
@@ -97,10 +211,10 @@ describe('draw_stats_core', () => {
     expect(first.calls).not.toBe(5300);
   });
 
-  it('pins the R2 config version that segments the new draw-count semantics', () => {
-    // Deliberate future bumps move this pin; it exists to catch an accidental
-    // revert of the packet 0 ruling R2 segmentation marker.
-    expect(GFX_CONFIG_VERSION).toBe(18);
+  it('pins the config version that segments the recovered High preset', () => {
+    // v20 separates the truthful governor signal and reduced High fixed-layer
+    // profile from v19 fleet comparisons.
+    expect(GFX_CONFIG_VERSION).toBe(20);
   });
 
   it('clamps a backward counter jump at zero, per field, and recovers', () => {

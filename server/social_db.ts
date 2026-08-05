@@ -4,6 +4,12 @@
 // stored now so cross-realm friends/guilds need no migration later).
 
 import type { Pool } from 'pg';
+import { bustAdminGuildListReads } from './admin_guilds_read';
+import {
+  GUILD_NAME_ADVISORY_LOCK_SQL,
+  GUILD_NAME_COLLISION_SQL,
+  guildNameLockKey,
+} from './guild_name_db';
 import { REALM } from './realm';
 import type { CharInfo, CharRef, GuildEventRow, GuildRank, SocialDb } from './social';
 
@@ -270,6 +276,12 @@ export class PgSocialDb implements SocialDb {
     const client = await this.pool.connect();
     try {
       await client.query('BEGIN');
+      await client.query(GUILD_NAME_ADVISORY_LOCK_SQL, [guildNameLockKey(DEFAULT_REALM, name)]);
+      const collision = await client.query(GUILD_NAME_COLLISION_SQL, [DEFAULT_REALM, name, null]);
+      if (collision.rows[0]) {
+        await client.query('ROLLBACK');
+        return { error: 'name_taken' };
+      }
       let guildId: number;
       try {
         const res = await client.query(
@@ -295,6 +307,7 @@ export class PgSocialDb implements SocialDb {
         return { error: 'already_in_guild' };
       }
       await client.query('COMMIT');
+      bustAdminGuildListReads();
       return { guildId };
     } catch (err) {
       await client.query('ROLLBACK').catch(() => {});
@@ -306,6 +319,7 @@ export class PgSocialDb implements SocialDb {
 
   async deleteGuild(id: number): Promise<void> {
     await this.pool.query('DELETE FROM guilds WHERE id = $1', [id]);
+    bustAdminGuildListReads();
   }
 
   async guildMembership(
@@ -365,6 +379,7 @@ export class PgSocialDb implements SocialDb {
         return 'already_member';
       }
       await client.query('COMMIT');
+      bustAdminGuildListReads();
       return 'ok';
     } catch (err) {
       await client.query('ROLLBACK').catch(() => {});
@@ -376,6 +391,7 @@ export class PgSocialDb implements SocialDb {
 
   async removeGuildMember(charId: number): Promise<void> {
     await this.pool.query('DELETE FROM guild_members WHERE character_id = $1', [charId]);
+    bustAdminGuildListReads();
   }
 
   async setGuildRank(charId: number, rank: GuildRank): Promise<void> {
@@ -383,6 +399,55 @@ export class PgSocialDb implements SocialDb {
       charId,
       rank,
     ]);
+    bustAdminGuildListReads();
+  }
+
+  async transferGuildLeader(
+    guildId: number,
+    fromCharId: number,
+    toCharId: number,
+  ): Promise<'ok' | 'not_leader' | 'not_member' | 'no_guild'> {
+    const client = await this.pool.connect();
+    try {
+      await client.query('BEGIN');
+      // lock the guild row so a racing transfer serializes behind this one:
+      // without this, two /gleader calls can both read "actor is still
+      // leader" before either write lands, and both promotions go through.
+      const g = await client.query('SELECT id FROM guilds WHERE id = $1 FOR UPDATE', [guildId]);
+      if (g.rowCount === 0) {
+        await client.query('ROLLBACK');
+        return 'no_guild';
+      }
+      const rows = await client.query(
+        'SELECT character_id, rank FROM guild_members WHERE guild_id = $1 AND character_id IN ($2, $3)',
+        [guildId, fromCharId, toCharId],
+      );
+      const fromRow = rows.rows.find((r) => r.character_id === fromCharId);
+      const toRow = rows.rows.find((r) => r.character_id === toCharId);
+      // re-check under the lock: the actor may have lost leadership (or the
+      // target may have left) to a transfer that committed first.
+      if (!fromRow || fromRow.rank !== 'leader') {
+        await client.query('ROLLBACK');
+        return 'not_leader';
+      }
+      if (!toRow) {
+        await client.query('ROLLBACK');
+        return 'not_member';
+      }
+      await client.query("UPDATE guild_members SET rank = 'leader' WHERE character_id = $1", [
+        toCharId,
+      ]);
+      await client.query("UPDATE guild_members SET rank = 'officer' WHERE character_id = $1", [
+        fromCharId,
+      ]);
+      await client.query('COMMIT');
+      return 'ok';
+    } catch (err) {
+      await client.query('ROLLBACK').catch(() => {});
+      throw err;
+    } finally {
+      client.release();
+    }
   }
 
   async setGuildMotd(guildId: number, motd: string, setBy: string): Promise<void> {

@@ -2,6 +2,7 @@
 // client presentation models. Every scene is watched once, then swept across
 // active ticks so authored actor and player movement cannot escape parity.
 
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { SceneDirector } from '../src/game/scene_director';
 import { SCENE_RELEASE_SEC, type SceneLivePose } from '../src/game/scene_director_core';
@@ -557,6 +558,17 @@ function worldProgressionSnapshot(world: WorldStateSnapshot) {
 }
 
 describe('registered scene lifecycle smoke', () => {
+  it('returns before snapshot allocation when no scene or choice is active', () => {
+    const scenes = readFileSync(new URL('../src/sim/scenes/scenes.ts', import.meta.url), 'utf8');
+    const choices = readFileSync(new URL('../src/sim/scenes/choices.ts', import.meta.url), 'utf8');
+    expect(scenes).toContain(
+      'export function updateScenes(ctx: SimContext): void {\n  if (ctx.scenePlaybacks.size === 0) return;',
+    );
+    expect(choices).toContain(
+      'export function updateChoices(ctx: SimContext): void {\n  if (ctx.activeChoices.size === 0) return;',
+    );
+  });
+
   it('pins the complete production registry', () => {
     expect(SCENE_IDS).toEqual(EXPECTED_SCENE_IDS);
   });

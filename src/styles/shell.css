@@ -1419,6 +1419,13 @@
   .hs-vlvl {
     color: var(--color-text-muted, #b9ac82);
   }
+  /* The `<Guild>` tag beside a ranked player's name. It rides inside .hs-name
+     rather than as its own grid column, so both the desktop grid and the mobile
+     stacked areas below keep their existing column/area sets. */
+  .hs-guild {
+    color: var(--color-text-muted, #b9ac82);
+    font-size: 11px;
+  }
   .hs-lvl,
   .hs-vlvl {
     text-align: center;
@@ -3116,15 +3123,16 @@
       justify-content: flex-end;
       margin: 0;
     }
-    /* $WOC Wallet and Developer become two matching stacked cards on the
+    /* Wallet, Developer, Steam, and Epic become matching stacked cards on the
        account bar: the service name reads as the card's own header, the
        action row sits under it, and the helper caption anchors the foot,
        instead of a label floating beside a button row with its caption
        dangling underneath. Overrides the base .cs-wallet row layout (label
        beside actions, separator border-top), which the card/mobile layouts
-       keep. */
+       keep. Each card still starts hidden until its own advert / link state
+       lights it. */
     body:not(.mobile-touch) #charselect-panel.cs-wow
-      :is(.cs-wallet-group, .cs-github-group, .cs-steam-group) {
+      :is(.cs-wallet-group, .cs-github-group, .cs-steam-group, .cs-epic-group) {
       flex-direction: column;
       align-items: stretch;
       justify-content: flex-start;
@@ -3150,13 +3158,27 @@
       max-width: 300px;
       font-size: 10px;
     }
-    /* Below 1800px the two cards (verified wallet + linked developer) plus
-       the realm/sort controls no longer fit the account bar on one line
-       with their helper captions, so the bar wraps tall and eats stage
-       height: drop the captions (every action keeps its title/aria text)
-       so the wrapped cards stay short. */
+    /* Below 1800px the stacked account cards plus the realm/sort controls
+       no longer fit the account bar on one line with their helper captions,
+       so the bar wraps tall and eats stage height: drop the captions (every
+       action keeps its title/aria text) so the wrapped cards stay short. */
     @media (max-width: 1799px) {
       body:not(.mobile-touch) #charselect-panel.cs-wow .cs-wallet-help {
+        display: none;
+      }
+    }
+    /* The 1800px threshold above was tuned for the two-to-three-card bar.
+       With BOTH storefront cards lit (Steam and Epic advertised together,
+       the four-card worst case beside wallet + developer) the captioned
+       cards alone run past 1300px, so a 1920px bar wraps tall again: in
+       that state the captions drop up to a wider threshold. Caption text is
+       helper copy only; every action keeps its title/aria text, so nothing
+       actionable is hidden. */
+    @media (max-width: 2199px) {
+      body:not(.mobile-touch)
+        #charselect-panel.cs-wow
+        .cs-head-row:has(.cs-steam-group:not([hidden])):has(.cs-epic-group:not([hidden]))
+        .cs-wallet-help {
         display: none;
       }
     }
@@ -6282,9 +6304,67 @@
       align-items: center;
       gap: 8px;
     }
-    body.mobile-touch #charselect-panel .cs-wallet,
-    body.mobile-touch #charselect-panel .cs-wallet-hidden-note {
+    body.mobile-touch:not(.seeker-wallet-enabled) #charselect-panel .cs-wallet,
+    body.mobile-touch:not(.seeker-wallet-enabled) #charselect-panel .cs-wallet-hidden-note {
       display: none;
+    }
+    /* Seeker wallet strip: pair the service name and verified helper as one
+       header row, then keep every connection action on the row below. */
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel .cs-wallet-group {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-rows: auto auto;
+      column-gap: 12px;
+      row-gap: 7px;
+      align-items: center;
+    }
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel .cs-wallet-main {
+      display: contents;
+    }
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel .cs-wallet-group > .cs-wallet-label {
+      grid-column: 1;
+      grid-row: 1;
+      align-self: center;
+      width: auto;
+      margin: 0;
+      padding: 0;
+      font-size: 12px;
+      line-height: 1.35;
+      white-space: nowrap;
+    }
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel .cs-wallet-help {
+      grid-column: 2;
+      grid-row: 1;
+      align-self: center;
+      justify-self: start;
+      width: auto;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      text-align: left;
+      line-height: 1.35;
+    }
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel .cs-wallet-actions {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      width: 100%;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel :is(.wallet-cta, .wallet-mini) {
+      min-width: 40px;
+      min-height: 40px;
+      padding: 5px 8px;
+      font-size: 11px;
+    }
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel .wallet-status {
+      min-height: 36px;
+      max-width: 290px;
+      padding: 5px 8px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     body.mobile-touch #charselect-panel .cs-controls {
       gap: 6px;

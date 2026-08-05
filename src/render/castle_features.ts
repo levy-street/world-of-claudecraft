@@ -21,9 +21,10 @@ import {
   WARD_STEPS,
 } from '../sim/castle_layout';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
-import { surfaceMat } from './gfx';
+import { registerDeferredPreload } from './assets/preload';
+import { GFX, surfaceMat } from './gfx';
 import { PROP_ASSET_DEFS } from './props';
+import { applyWornStone } from './worn_stone';
 
 // the castle set: every key resolves through the shared prop registry so
 // the preload gate and the media manifest already cover it
@@ -57,7 +58,7 @@ type CastleKey = (typeof CASTLE_KEYS)[number];
 
 const castleScenes: Partial<Record<CastleKey, THREE.Group>> = {};
 for (const key of CASTLE_KEYS) {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(PROP_ASSET_DEFS[key].url).then((gltf) => {
       castleScenes[key] = gltf.scene;
     }),
@@ -70,6 +71,11 @@ export const castleFeaturesPreloadInternalsForTest = {
 
 /** world scale for the wall modules: the KayKit wall is 4 units long */
 const S = CASTLE.module / 4; // 1.75
+
+// How far south (+z, toward the bailey) the ward stair-cut mesh sits off the
+// terrace edge so its high back does not clip into the terrace face. Cosmetic
+// only: the walkable ramp wedge is unchanged.
+const WARD_STEP_MESH_PUSH = 0.5;
 
 interface Placement {
   x: number;
@@ -103,6 +109,23 @@ const SKIP_PARTS: Partial<Record<CastleKey, RegExp>> = {
   kcasWallDoorway: /_door$/i,
 };
 
+// The kcas kit materials arriving from the loader are SHARED cache instances
+// (immutable; other consumers may read them), so the worn-stone layer goes on
+// a per-source clone, deduped so the kit still renders with a handful of
+// materials. The clones are module-owned: castle features build once and are
+// never disposed with a view (the lastkeep_dressing shared-material caveat).
+const wornKitMats = new Map<THREE.Material, THREE.Material>();
+function wornKitMaterial(src: THREE.Material): THREE.Material {
+  if (!GFX.standardMaterials) return src;
+  let mat = wornKitMats.get(src);
+  if (!mat) {
+    mat = src.clone();
+    applyWornStone(mat as THREE.MeshStandardMaterial);
+    wornKitMats.set(src, mat);
+  }
+  return mat;
+}
+
 // bake a loaded scene into parts, xz-centered with min-y at 0
 function extractParts(
   scene: THREE.Group,
@@ -118,7 +141,7 @@ function extractParts(
     attributeToFloat(geo, 'position');
     attributeToFloat(geo, 'normal');
     geo.applyMatrix4(mesh.matrixWorld);
-    parts.push({ geo, mat: mesh.material as THREE.Material });
+    parts.push({ geo, mat: wornKitMaterial(mesh.material as THREE.Material) });
   });
   const box = new THREE.Box3();
   for (const p of parts) {
@@ -158,13 +181,28 @@ export function buildCastleFeatures(): CastleFeaturesView {
     list.push(p);
   };
 
-  // stone slab helper: the visible floor caps and stair masses
-  const slabMat = surfaceMat({ color: 0x8a7568, roughness: 0.95 });
+  // stone slab helper: the visible floor caps and stair masses. Both carry
+  // the shared worn-stone triplanar layer (one system with the kcas walls and
+  // the other stone structures) so the big flat caps read as laid masonry
+  // instead of painted plastic. The surfaceMat result is CLONED first:
+  // surfaceMat dedupes by (color|maps|flags) across modules, and the layer
+  // must not leak onto an unrelated consumer of the same key.
+  const stoneSlab = (color: number, roughness: number): THREE.Material => {
+    if (!GFX.standardMaterials) return surfaceMat({ color, roughness });
+    const mat = surfaceMat({ color, roughness }).clone();
+    applyWornStone(mat as THREE.MeshStandardMaterial);
+    return mat;
+  };
+  const slabMat = stoneSlab(0x8a7568, 0.95);
   // the solid wedge masses (the wall flights and the ward's stair cuts) are
-  // hand-wound triangle soups, so they draw both faces
-  const wedgeMat = surfaceMat({ color: 0x8a7568, roughness: 0.95 });
+  // hand-wound triangle soups, so they draw both faces. clone() copies
+  // neither the onBeforeCompile hook nor the program cache key, so the wedge
+  // re-attaches the worn layer explicitly (and never shares the lambert
+  // tier's deduped instance, which must not go DoubleSide for everyone).
+  const wedgeMat = stoneSlab(0x8a7568, 0.95).clone();
+  applyWornStone(wedgeMat as THREE.MeshStandardMaterial);
   wedgeMat.side = THREE.DoubleSide;
-  const capMat = surfaceMat({ color: 0x97826f, roughness: 0.9 });
+  const capMat = stoneSlab(0x97826f, 0.9);
   const slab = (
     cx: number,
     cz: number,
@@ -401,11 +439,19 @@ export function buildCastleFeatures(): CastleFeaturesView {
     // leaves the cuts out with the rest of the ward, so this carries them)
     for (const cut of WARD_STEPS) {
       const cx = (cut.x0 + cut.x1) / 2;
+      // kcasStairsWide climbs toward -z at rot 0 (the wall-flight foot treads
+      // below set the convention: rot PI climbs +z, -PI/2 climbs +x). This cut
+      // rises from the bailey at z1+run UP to the terrace at z1, i.e. toward -z,
+      // so the tread faces must point -z; the authored PI had the whole flight
+      // reversed (players read the steps as leading the wrong way off the
+      // terrace). The wedge below is symmetric, so only the mesh yaw was wrong.
+      // Nudged a touch south (+z, toward the bailey) off the terrace edge so the
+      // flight's high back no longer buries itself in the terrace face.
       put('kcasStairsWide', {
         x: cx,
         y: padY,
-        z: w.z1 + WARD_STEP_RUN / 2,
-        rot: Math.PI,
+        z: w.z1 + WARD_STEP_RUN / 2 + WARD_STEP_MESH_PUSH,
+        rot: 0,
         s: 0.62,
       });
       const z0 = w.z1;

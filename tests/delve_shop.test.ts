@@ -1,7 +1,8 @@
 // Delve Marks vendor (Brother Halven's shop): gate unlock logic + the
 // server-authoritative buy path (gate + balance re-validated in the Sim).
 import { describe, expect, it } from 'vitest';
-import { DELVE_SHOPS } from '../src/sim/data';
+import { bagCapacity } from '../src/sim/bags';
+import { DELVE_SHOPS, ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 
@@ -65,6 +66,33 @@ describe('delve shop, buying', () => {
     sim.delveBuyShopItem('collapsed_reliquary', availableEntry.itemId);
     expect(countOf(sim, availableEntry.itemId)).toBe(before);
     expect(sim.delveMarks).toBe(availableEntry.marks - 1);
+  });
+
+  it('rejects a full-bag purchase BEFORE the spend: no Marks debit, no overflow grant', () => {
+    // The grant hub deliberately never capacity-caps (a mid-flight grant must
+    // not vanish), so the buy path itself has to gate, exactly like buyItem:
+    // without the gate the purchase landed past capacity and the counter was
+    // an overflow loophole.
+    const sim = makeSim();
+    const meta = metaOf(sim);
+    meta.delveMarks = 100;
+    const capacity = bagCapacity(meta.bags);
+    const fillerStack = ITEMS.bone_fragments.stackSize ?? 20;
+    while (meta.inventory.length < capacity)
+      sim.addItem('bone_fragments', fillerStack, sim.playerId);
+    expect(meta.inventory.length).toBe(capacity);
+    expect(sim.ctx.canAddItem(availableEntry.itemId, 1, sim.playerId)).toBe(false);
+
+    sim.drainEvents();
+    sim.delveBuyShopItem('collapsed_reliquary', availableEntry.itemId);
+    expect(countOf(sim, availableEntry.itemId)).toBe(0);
+    expect(sim.delveMarks, 'the Marks must survive the refusal').toBe(100);
+    expect(meta.inventory.length).toBe(capacity);
+    // The refusal is TOLD to the player, the same bags-full idiom buyItem
+    // uses: a silent early return would keep every absence assert above green
+    // while the counter just ate the click.
+    const ev = sim.drainEvents();
+    expect(ev.some((e) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(true);
   });
 
   it('rejects a locked clears:3 item until the clears requirement is met', () => {
@@ -156,7 +184,49 @@ describe('Drowned Litany shop stock (data pins)', () => {
       { itemId: 'litany_helm', marks: 24, gate: 'clears:3' },
       { itemId: 'sister_nhalia_choir_plate', marks: 56, gate: 'heroicClear' },
       { itemId: 'drowned_choir_fang', marks: 56, gate: 'heroicClear' },
+      // The crafted top-tier tools, a non-crafter's route to the tool ladder.
+      // Tier 4 on the commitment rung, tier 5 on the Heroic rung.
+      { itemId: 'thorium_mining_pick', marks: 24, gate: 'clears:3' },
+      { itemId: 'ashwood_axe', marks: 24, gate: 'clears:3' },
+      { itemId: 'goldleaf_sickle', marks: 24, gate: 'clears:3' },
+      { itemId: 'stormreel_fishing_rod', marks: 24, gate: 'clears:3' },
+      { itemId: 'arcanite_mining_pick', marks: 56, gate: 'heroicClear' },
+      { itemId: 'elderwood_axe', marks: 56, gate: 'heroicClear' },
+      { itemId: 'sunpetal_sickle', marks: 56, gate: 'heroicClear' },
+      { itemId: 'tidewrought_fishing_rod', marks: 56, gate: 'heroicClear' },
     ]);
+  });
+
+  it('stocks every crafted tier-4/5 tool, each on the rung its tier earns', () => {
+    // DERIVED from the item table, never a second hand-written list: a ninth
+    // crafted tool added to content and forgotten here fails, which is the
+    // whole point of the route existing.
+    const craftedTools = Object.values(ITEMS).filter(
+      (def) => def.use?.type === 'gatherTool' && def.use.tier > 3,
+    );
+    // At-least, not exactly: a ninth crafted tool added WITH its Marks row is
+    // a legitimate content addition, and an exact pin would red on it with a
+    // misleading message. The per-tool loop below is what actually guards the
+    // claim, and the literal stock pin above already fixes today's count.
+    expect(craftedTools.length).toBeGreaterThanOrEqual(8);
+    const rows = new Map(DELVE_SHOPS.drowned_litany.map((e) => [e.itemId, e]));
+    for (const tool of craftedTools) {
+      const row = rows.get(tool.id);
+      expect(row, `${tool.id} must have a Marks route`).toBeDefined();
+      const tier = tool.use?.type === 'gatherTool' ? tool.use.tier : 0;
+      // Tier decides the rung, and the two rungs are genuinely different, so
+      // this cannot pass by every tool landing on one price.
+      expect([row?.marks, row?.gate], tool.id).toEqual(
+        tier === 4 ? [24, 'clears:3'] : [56, 'heroicClear'],
+      );
+    }
+    // Both arms are populated, so neither branch above is dead.
+    expect(
+      craftedTools.filter((t) => t.use?.type === 'gatherTool' && t.use.tier === 4),
+    ).toHaveLength(4);
+    expect(
+      craftedTools.filter((t) => t.use?.type === 'gatherTool' && t.use.tier === 5),
+    ).toHaveLength(4);
   });
 
   it('every Litany slot costs exactly 2x its Collapsed Reliquary price tier', () => {

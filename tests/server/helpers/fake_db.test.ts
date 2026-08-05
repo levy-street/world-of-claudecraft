@@ -35,6 +35,7 @@ function xpRow(name: string, lifetimeXp: number): LifetimeXpLeaderRow {
     lifetimeXp,
     prestigeRank: 0,
     activeTitle: null,
+    guild: null,
   };
 }
 

@@ -33,14 +33,13 @@ vi.mock('../server/db', () => ({
   })),
 }));
 
-import { type ClientSession, GameServer } from '../server/game';
-import { ClientWorld } from '../src/net/online';
+import { GameServer } from '../server/game';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
-import { emptyCraftSkills } from '../src/sim/professions/wheel';
 import { Sim } from '../src/sim/sim';
 import type { InvSlot } from '../src/sim/types';
 import { buildCraftingView, type CraftingRecipeRow } from '../src/ui/crafting_view';
+import { bareClient, broadcast, fakeWs, joinServer, lastSnap } from './helpers/bare_client';
 
 // The armorcrafting+weaponcrafting minTier-1 combo recipe (content pinned by
 // tests/professions_contracts.test.ts; re-priced
@@ -102,99 +101,6 @@ function comboRow(world: ComboWorldReads): CraftingRecipeRow {
     world.craftSkills,
     world.craftingIdentity,
   ).recipes[0];
-}
-
-interface FakeClient {
-  sent: any[];
-  ws: any;
-}
-
-function fakeWs(): FakeClient {
-  const sent: any[] = [];
-  return { sent, ws: { readyState: 1, send: (payload: string) => sent.push(JSON.parse(payload)) } };
-}
-
-function lastSnap(sent: any[]): any {
-  for (let i = sent.length - 1; i >= 0; i--) {
-    if (sent[i].t === 'snap') return sent[i];
-  }
-  return null;
-}
-
-function joinServer(server: GameServer, fc: FakeClient, id: number, name: string): ClientSession {
-  const session = server.join(fc.ws, id, id, name, 'warrior', null);
-  if ('error' in session) throw new Error(session.error);
-  session.blockListLoaded = true;
-  return session;
-}
-
-function broadcast(server: GameServer): void {
-  (server as any).broadcastSnapshots();
-}
-
-// A ClientWorld without the WebSocket plumbing, to drive applySnapshot directly
-// (the snapshots.test.ts bareClient idiom). Object.create skips class field
-// initializers, so the two crafting mirrors are initialized here to their
-// declaration defaults (all-zero skills, synced false), exactly the state a
-// freshly constructed online client holds before its first cprof arrives.
-function bareClient(pid: number): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass: 'warrior' };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.ownPlayerId = pid;
-  c.ownPlayerClass = 'warrior';
-  c.spectating = null;
-  c.cupInfo = null;
-  c.sportRole = null;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.honor = 0;
-  c.lifetimeHonor = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.selectedDungeonDifficulty = 'normal';
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.serverTickHz = null;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  c.spectateFacingPending = false;
-  c.pendingSpectateFacing = null;
-  c.nodeCooldowns = new Map();
-  c.craftSkills = emptyCraftSkills();
-  c.craftingIdentity = {
-    version: 1,
-    synced: false,
-    craftSkills: c.craftSkills,
-    activeArchetype: null,
-    pairedMajor: null,
-    hobbyCraft: null,
-    attunedPairs: [],
-    switchCount: 0,
-    amendsProgress: 0,
-    amendsRequired: 0,
-  };
-  return c;
 }
 
 describe('crafting view combo gate liveness across both IWorld arms', () => {

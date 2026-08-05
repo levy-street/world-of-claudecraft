@@ -34,6 +34,7 @@ import { clearThreat } from '../threat';
 import { dist2d, type Entity, NYTHRAXIS_BOSS_ID } from '../types';
 import { groundHeight } from '../world';
 import { resetMobCharge } from './charge';
+import { resetMechanicSpacing } from './mechanic_spacing';
 
 const PACK_FRENZY_AURA_ID = 'pack_frenzy'; // attack-speed buff granted to surviving packmates
 
@@ -66,6 +67,8 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   }
   mob.leashAnchor = null;
   mob.evadeStall = 0;
+  mob.chaseStall = 0;
+  mob.chainPullInbound = false;
   mob.fleeTimer = 0;
   mob.fleeReturnTimer = 0;
   mob.hasFled = false;
@@ -87,6 +90,8 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.healedThisPull = false;
   mob.stompTimer = MOBS[mob.templateId]?.stomp?.every ?? 0;
   mob.terrifyTimer = MOBS[mob.templateId]?.terrify?.every ?? 0;
+  // The shared spacing lock dies with the life like the timers around it.
+  resetMechanicSpacing(mob);
   // A mid-flight inferno channel dies with the life; the cadence reseeds and
   // the hp gates re-arm alongside firedSummons above.
   mob.infernoTimer = MOBS[mob.templateId]?.infernoChannel?.every ?? 0;

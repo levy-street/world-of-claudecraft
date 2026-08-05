@@ -41,11 +41,19 @@ export interface SquadRun {
   dungeonId: string;
   /** actor id -> live entity id */
   actorIds: Map<string, number>;
+  /** Entity-id membership mirror for allocation-free hostile engagement tests. */
+  actorEntityIds: Set<number>;
   directives: Map<string, SquadDirective>;
   /** While true, lethal damage on any actor clamps to the 1 hp floor. */
   floorEnabled: boolean;
   /** Outgoing-damage multiplier from the human player count at spawn. */
   damageMult: number;
+  /** Per-run hot-path storage. State stays on Sim through squadRuns. */
+  alliesScratch: Entity[];
+  allyEntityIdsScratch: Set<number>;
+  playerQueryScratch: Entity[];
+  targetQueryScratch: Entity[];
+  anchorScratch: { x: number; z: number };
 }
 
 const SQUAD_FOLLOW_DISTANCE = 4.5;
@@ -63,6 +71,9 @@ const SQUAD_HEAL_PCT = 0.08;
 // A downed actor is relieved by a living player standing this close.
 export const SQUAD_RELIEF_RANGE = 3.0;
 const SQUAD_RELIEF_HP_FRACTION = 0.35;
+const SQUAD_ALLY_RANGE = 130;
+const SQUAD_ALLY_RANGE_SQ = SQUAD_ALLY_RANGE * SQUAD_ALLY_RANGE;
+const entityIdOrder = (a: Entity, b: Entity): number => a.id - b.id;
 // The damage share falls as humans join: 1 player 1.0, 2 players ~0.74,
 // 5 players ~0.42.
 function squadDamageMultFor(humanCount: number): number {
@@ -85,9 +96,15 @@ export function spawnSquad(
     claimId: opts.claimId,
     dungeonId: opts.dungeonId,
     actorIds: new Map(),
+    actorEntityIds: new Set(),
     directives: new Map(),
     floorEnabled: opts.floorEnabled ?? true,
     damageMult: squadDamageMultFor(opts.humanCount),
+    alliesScratch: [],
+    allyEntityIdsScratch: new Set(),
+    playerQueryScratch: [],
+    targetQueryScratch: [],
+    anchorScratch: { x: 0, z: 0 },
   };
   for (let i = 0; i < opts.actorIds.length; i++) {
     const actorId = opts.actorIds[i];
@@ -108,6 +125,7 @@ export function spawnSquad(
     actor.squadDamageMult = run.damageMult;
     ctx.addEntity(actor);
     run.actorIds.set(actorId, actor.id);
+    run.actorEntityIds.add(actor.id);
     run.directives.set(actorId, { kind: 'follow', pid: null });
   }
   ctx.squadRuns.set(opts.claimId, run);
@@ -143,23 +161,38 @@ export function isSquadActor(e: Entity): boolean {
   return e.squadActorId !== undefined;
 }
 
-// Players inside this run's instance footprint: the squad's allies.
-function squadAllies(ctx: SimContext, run: SquadRun): Entity[] {
-  const out: Entity[] = [];
-  for (const meta of ctx.players.values()) {
-    const p = ctx.entities.get(meta.entityId);
-    if (p && !p.dead && p.squadClaimId === undefined) out.push(p);
-  }
-  return out.filter((p) => nearRun(ctx, run, p));
-}
-
-function nearRun(ctx: SimContext, run: SquadRun, e: Entity): boolean {
-  // Any run actor within interest range anchors "near": cheap and stable.
+// Players inside this run's footprint, computed once per run/tick. Querying
+// around each actor preserves the old "near any actor" shape without scanning
+// the realm-wide player roster for every actor and healer duty.
+function collectRunAllies(ctx: SimContext, run: SquadRun): Entity[] {
+  const out = run.alliesScratch;
+  const seen = run.allyEntityIdsScratch;
+  out.length = 0;
+  seen.clear();
   for (const entityId of run.actorIds.values()) {
     const actor = ctx.entities.get(entityId);
-    if (actor && dist2d(actor.pos, e.pos) < 130) return true;
+    if (!actor) continue;
+    ctx.playerGrid.collectInRadius(
+      actor.pos.x,
+      actor.pos.z,
+      SQUAD_ALLY_RANGE,
+      run.playerQueryScratch,
+    );
+    for (const player of run.playerQueryScratch) {
+      if (player.dead || player.squadClaimId !== undefined || seen.has(player.id)) continue;
+      // SpatialGrid's radius edge is inclusive; the established squad ally
+      // envelope is strict (< 130), so preserve the gameplay boundary.
+      const dx = player.pos.x - actor.pos.x;
+      const dz = player.pos.z - actor.pos.z;
+      if (dx * dx + dz * dz >= SQUAD_ALLY_RANGE_SQ) continue;
+      seen.add(player.id);
+      out.push(player);
+    }
   }
-  return false;
+  // Spatial buckets are not insertion ordered. Entity ids are monotonic, so
+  // this restores the former players-Map order for equal-distance ties.
+  out.sort(entityIdOrder);
+  return out;
 }
 
 function directiveAnchor(
@@ -167,31 +200,49 @@ function directiveAnchor(
   run: SquadRun,
   actor: Entity,
   directive: SquadDirective,
+  allies: readonly Entity[],
 ): { x: number; z: number } | null {
+  const out = run.anchorScratch;
   if (directive.kind === 'hold' || directive.kind === 'station') {
-    return { x: directive.x, z: directive.z };
+    out.x = directive.x;
+    out.z = directive.z;
+    return out;
   }
   if (directive.pid !== null) {
     const unit = ctx.entities.get(directive.pid);
-    if (unit && !unit.dead) return { x: unit.pos.x, z: unit.pos.z };
+    if (unit && !unit.dead) {
+      out.x = unit.pos.x;
+      out.z = unit.pos.z;
+      return out;
+    }
   }
   // follow with no explicit unit: the nearest living ally.
   let best: Entity | null = null;
   let bestD = Infinity;
-  for (const ally of squadAllies(ctx, run)) {
+  for (const ally of allies) {
     const d = dist2d(actor.pos, ally.pos);
     if (d < bestD) {
       best = ally;
       bestD = d;
     }
   }
-  return best ? { x: best.pos.x, z: best.pos.z } : null;
+  if (!best) return null;
+  out.x = best.pos.x;
+  out.z = best.pos.z;
+  return out;
 }
 
 function pickTarget(ctx: SimContext, run: SquadRun, actor: Entity, leash: number): Entity | null {
   let best: Entity | null = null;
   let bestD = leash;
-  for (const m of ctx.entities.values()) {
+  const candidates = ctx.grid.collectInRadius(
+    actor.pos.x,
+    actor.pos.z,
+    leash,
+    run.targetQueryScratch,
+  );
+  candidates.sort(entityIdOrder);
+  for (const m of candidates) {
     if (m.kind !== 'mob' || m.dead || !m.hostile || m.squadActorId !== undefined) continue;
     const d = dist2d(actor.pos, m.pos);
     if (d >= bestD) continue;
@@ -200,7 +251,7 @@ function pickTarget(ctx: SimContext, run: SquadRun, actor: Entity, leash: number
     const engaged =
       m.aggroTargetId !== null &&
       (m.aggroTargetId === actor.id ||
-        [...run.actorIds.values()].includes(m.aggroTargetId) ||
+        run.actorEntityIds.has(m.aggroTargetId) ||
         ctx.players.has(m.aggroTargetId));
     const threatening = m.threat.size > 0;
     if (!engaged && !threatening) continue;
@@ -210,11 +261,15 @@ function pickTarget(ctx: SimContext, run: SquadRun, actor: Entity, leash: number
   return best;
 }
 
-function relieveDownedActor(ctx: SimContext, actor: Entity): void {
-  for (const meta of ctx.players.values()) {
-    const p = ctx.entities.get(meta.entityId);
-    if (!p || p.dead) continue;
-    if (dist2d(p.pos, actor.pos) <= SQUAD_RELIEF_RANGE) {
+function relieveDownedActor(ctx: SimContext, run: SquadRun, actor: Entity): void {
+  const players = ctx.playerGrid.collectInRadius(
+    actor.pos.x,
+    actor.pos.z,
+    SQUAD_RELIEF_RANGE,
+    run.playerQueryScratch,
+  );
+  for (const p of players) {
+    if (!p.dead) {
       actor.squadDowned = false;
       actor.hp = Math.max(1, Math.round(actor.maxHp * SQUAD_RELIEF_HP_FRACTION));
       ctx.emit({ type: 'heal', targetId: actor.id, amount: actor.hp });
@@ -223,16 +278,22 @@ function relieveDownedActor(ctx: SimContext, actor: Entity): void {
   }
 }
 
-function updateActor(ctx: SimContext, run: SquadRun, actorId: string, actor: Entity): void {
+function updateActor(
+  ctx: SimContext,
+  run: SquadRun,
+  actorId: string,
+  actor: Entity,
+  allies: readonly Entity[],
+): boolean {
   const def = LAST_BELL_SQUAD_ACTORS[actorId];
-  if (!def) return;
-  if (actor.dead) return;
+  if (!def) return false;
+  if (actor.dead) return false;
   if (actor.squadDowned) {
-    relieveDownedActor(ctx, actor);
-    return;
+    relieveDownedActor(ctx, run, actor);
+    return false;
   }
   const directive = run.directives.get(actorId) ?? { kind: 'follow' as const, pid: null };
-  const anchor = directiveAnchor(ctx, run, actor, directive);
+  const anchor = directiveAnchor(ctx, run, actor, directive, allies);
   actor.swingTimer = (actor.swingTimer ?? 0) - DT;
 
   // Healer duty runs on its own clock, whatever the stance.
@@ -240,17 +301,21 @@ function updateActor(ctx: SimContext, run: SquadRun, actorId: string, actor: Ent
     actor.wanderTimer = (actor.wanderTimer ?? 0) - DT;
     if (actor.wanderTimer <= 0) {
       actor.wanderTimer = SQUAD_HEAL_INTERVAL;
-      const candidates: Entity[] = [...squadAllies(ctx, run)];
-      for (const entityId of run.actorIds.values()) {
-        const mate = ctx.entities.get(entityId);
-        if (mate && !mate.dead && mate.id !== actor.id) candidates.push(mate);
-      }
       let healTarget: Entity | null = null;
       let lowest = 1;
-      for (const e of candidates) {
+      for (const e of allies) {
         const frac = e.hp / Math.max(1, e.maxHp);
         if (frac < 1 && frac < lowest && dist2d(actor.pos, e.pos) <= SQUAD_HEAL_RANGE) {
           healTarget = e;
+          lowest = frac;
+        }
+      }
+      for (const entityId of run.actorIds.values()) {
+        const mate = ctx.entities.get(entityId);
+        if (!mate || mate.dead || mate.id === actor.id) continue;
+        const frac = mate.hp / Math.max(1, mate.maxHp);
+        if (frac < 1 && frac < lowest && dist2d(actor.pos, mate.pos) <= SQUAD_HEAL_RANGE) {
+          healTarget = mate;
           lowest = frac;
         }
       }
@@ -297,18 +362,18 @@ function updateActor(ctx: SimContext, run: SquadRun, actorId: string, actor: Ent
         actor.swingTimer = actor.weapon.speed * ctx.swingIntervalMult(actor);
       }
     }
-    if (directive.kind === 'follow') return; // fight where you stand
+    if (directive.kind === 'follow') return false; // fight where you stand
   } else {
     actor.inCombat = false;
   }
 
-  if (!anchor) return;
+  if (!anchor) return false;
   const d = Math.hypot(actor.pos.x - anchor.x, actor.pos.z - anchor.z);
   if (d > SQUAD_TELEPORT_DISTANCE) {
     actor.pos = ctx.groundPos(anchor.x, anchor.z);
     actor.prevPos = { ...actor.pos };
     ctx.rebucket(actor);
-    return;
+    return true;
   }
   const settle = directive.kind === 'follow' ? SQUAD_FOLLOW_DISTANCE : 0.8;
   if (d > settle && !ctx.isRooted(actor) && !target) {
@@ -316,17 +381,23 @@ function updateActor(ctx: SimContext, run: SquadRun, actorId: string, actor: Ent
   } else if (directive.kind === 'station' && directive.facing !== undefined && !target) {
     actor.facing = directive.facing;
   }
+  return false;
 }
 
 // Per-tick driver, called from the Sim tick body after escorts. Zero work
 // (and zero rng) while no squad is live, so the shared draw order never
 // moves for the existing world.
 export function updateSquads(ctx: SimContext): void {
+  if (ctx.squadRuns.size === 0) return;
   for (const run of ctx.squadRuns.values()) {
+    const allies = collectRunAllies(ctx, run);
     for (const [actorId, entityId] of run.actorIds) {
       const actor = ctx.entities.get(entityId);
       if (!actor) continue;
-      updateActor(ctx, run, actorId, actor);
+      // A hard catch-up can move an actor across the 130-yard run envelope.
+      // Refresh only on that exceptional path so later actors retain the old
+      // same-tick live view without restoring per-actor realm scans.
+      if (updateActor(ctx, run, actorId, actor, allies)) collectRunAllies(ctx, run);
     }
   }
 }

@@ -43,7 +43,7 @@ export interface UiEffectsProfile {
 /** The resolved inputs: the static preset label, the effectsQuality slider, and the
  *  effective reduced-motion flag (OS prefers-reduced-motion OR the in-game setting). */
 export interface UiEffectsInput {
-  presetLabel: 'low' | 'medium' | 'high' | 'ultra' | 'advanced';
+  presetLabel: 'low' | 'medium' | 'high' | 'ultra' | 'insane' | 'advanced';
   effectsQuality: number;
   reduceMotion: boolean;
 }
@@ -77,12 +77,17 @@ export const EFFECTS_QUALITY_LOW_CUTOFF = 0.5;
  */
 export function resolveUiEffectsProfile(input: UiEffectsInput): UiEffectsProfile {
   const { presetLabel, effectsQuality, reduceMotion } = input;
+  // INSANE is a 3D-render preset only: the HUD effect ladder tops out at
+  // 'ultra' (full effects), so the everything-on render tier stamps the same
+  // data-fx-level the ultra preset does. No HUD cost difference to buy.
   const tier: UiEffectsTier =
     presetLabel === 'advanced'
       ? effectsQuality < EFFECTS_QUALITY_LOW_CUTOFF
         ? 'low'
         : 'ultra'
-      : presetLabel;
+      : presetLabel === 'insane'
+        ? 'ultra'
+        : presetLabel;
 
   const motion: UiEffectsMotion = reduceMotion ? 'none' : 'full';
 

@@ -58,6 +58,20 @@ describe('spatial grid', () => {
     expect(gridInRadius(grid, 0, 0, 2).has(1)).toBe(false);
   });
 
+  it('fills and reuses a caller-owned radius-query buffer', () => {
+    const grid = new SpatialGrid();
+    const near = { id: 1, pos: { x: 2, y: 0, z: 1 } } as Entity;
+    const far = { id: 2, pos: { x: 40, y: 0, z: 0 } } as Entity;
+    grid.insert(near);
+    grid.insert(far);
+    const out = [far];
+
+    expect(grid.collectInRadius(0, 0, 5, out)).toBe(out);
+    expect(out).toEqual([near]);
+    expect(grid.collectInRadius(40, 0, 2, out)).toBe(out);
+    expect(out).toEqual([far]);
+  });
+
   it('reclaims an emptied cell instead of leaking it forever', () => {
     // remove() used to leave a stale empty array behind in `cells` whenever
     // the last occupant of a cell moved out, so a long-lived process

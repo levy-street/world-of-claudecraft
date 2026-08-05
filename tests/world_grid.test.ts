@@ -7,8 +7,12 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+  BUILTIN_WORLD,
+  COLUMN_ZONES,
+  columnBlendAt,
   STRIP_MAX_X,
   STRIP_MIN_X,
+  setActiveWorldContent,
   WORLD_MAX_X,
   WORLD_MIN_X,
   worldXBoundsAt,
@@ -22,6 +26,7 @@ import {
   inBorderLake,
   inHollowOpenSea,
   terrainHeight,
+  terrainRegionCandidateCountsAt,
   WATER_LEVEL,
 } from '../src/sim/world';
 
@@ -55,6 +60,20 @@ describe('the continent derives the right border set', () => {
     expect(DECORATION_X_END).toBe(WORLD_MAX_X - 14);
     expect(DECORATION_X_START).toBe(-526);
     expect(DECORATION_X_END).toBe(1286);
+  });
+
+  it('preserves column blend poison values for non-finite coordinates', () => {
+    const column = COLUMN_ZONES[0];
+    expect(Number.isNaN(columnBlendAt(column, 0, Number.NaN))).toBe(true);
+    expect(Number.isNaN(columnBlendAt(column, Number.NaN, 0))).toBe(true);
+  });
+
+  it('keeps the production terrain path sparse at town coordinates', () => {
+    expect(terrainRegionCandidateCountsAt(2, -2)).toEqual({
+      appliers: 8,
+      camps: 17,
+      hubs: 1,
+    });
   });
 
   it('every crossing sits where the atlas says', () => {
@@ -107,6 +126,21 @@ describe('the continent derives the right border set', () => {
       expect(worldXBoundsAt(z)).toEqual({ min: -540, max: 540 });
     }
     expect(worldXBoundsAt(2400)).toEqual({ min: 180, max: 540 });
+  });
+
+  it('reuses frozen row bounds and invalidates them on a content generation change', () => {
+    const first = worldXBoundsAt(300);
+    expect(worldXBoundsAt(300)).toBe(first);
+    expect(Object.isFrozen(first)).toBe(true);
+
+    setActiveWorldContent(BUILTIN_WORLD);
+    try {
+      const refreshed = worldXBoundsAt(300);
+      expect(refreshed).not.toBe(first);
+      expect(refreshed).toEqual(first);
+    } finally {
+      setActiveWorldContent(null);
+    }
   });
 });
 

@@ -34,6 +34,16 @@ describe('options_window: no magic values', () => {
   });
 });
 
+describe('options_window: aura menu routing', () => {
+  it('routes the top-level Auras view to its settings panel and placement preview', () => {
+    expect(painter).toContain("case 'auras':");
+    expect(painter).toContain('this.renderAuras();');
+    // Optional chain: unstuck tests (and any pre-wire path) close without hooks.
+    expect(painter).toContain("this.deps.auraOverlays?.().setPlacement(this.view === 'auras')");
+    expect(painter).toContain('this.auraSettings.render(body);');
+  });
+});
+
 describe('options_window: tier boundary', () => {
   it('reads the graphics preset as a plain setting value, never the governor/cutoff', () => {
     expect(painter).not.toContain('ui_effects_profile');
@@ -270,6 +280,16 @@ describe('options_window: bug-report dispatch + async states (cluster 2)', () =>
 });
 
 describe('options_window: keybind rebind dispatch (cluster 5)', () => {
+  it('localizes the Target Buffs and Debuffs row through its chrome key', () => {
+    expect(painter).toContain("targetAuras: 'hudChrome.targetAuras.keybindLabel'");
+    const displayName = painter.slice(
+      painter.indexOf('private actionDisplayName('),
+      painter.indexOf('private gamepadActionOptions('),
+    );
+    expect(displayName).toContain('BIND_ACTION_LABEL_KEYS[actionId]');
+    expect(displayName).toContain('t(BIND_ACTION_LABEL_KEYS[actionId])');
+  });
+
   it('captures a key and binds it to the same action/index', () => {
     expect(painter).toContain('private beginCapture(actionId: string, index: number');
     expect(painter).toContain('hooks.captureKey((code)');
@@ -279,16 +299,27 @@ describe('options_window: keybind rebind dispatch (cluster 5)', () => {
 });
 
 describe('options_window: viewport resync on open (PR #1118)', () => {
-  it('calls syncAppViewport() before the panel flips to display: block', () => {
+  it('calls syncAppViewport() before render() flips the panel visible', () => {
+    // render() is the one place that flips `display` (issue 2569: Performance
+    // needs `flex` for its scroll wrapper, every other sub-view stays `block`),
+    // so the ordering guarantee is now "syncAppViewport() runs before toggle()
+    // hands off to render()", not a literal display-assignment string in toggle().
     expect(painter).toContain("import { syncAppViewport } from '../game/app_viewport'");
     const toggle = painter.slice(painter.indexOf('toggle(): void {'));
     const toggleEnd = toggle.indexOf('\n  }\n');
     const body = toggle.slice(0, toggleEnd);
     const syncIdx = body.indexOf('syncAppViewport()');
-    const displayIdx = body.indexOf("root().style.display = 'block'");
+    const renderIdx = body.indexOf('this.render()');
     expect(syncIdx).toBeGreaterThan(-1);
-    expect(displayIdx).toBeGreaterThan(-1);
-    expect(syncIdx).toBeLessThan(displayIdx);
+    expect(renderIdx).toBeGreaterThan(-1);
+    expect(syncIdx).toBeLessThan(renderIdx);
+
+    const render = painter.slice(painter.indexOf('private render(): void {'));
+    const renderEnd = render.indexOf('\n  }\n');
+    const renderBody = render.slice(0, renderEnd);
+    expect(renderBody).toContain(
+      "el.style.display = this.view === 'performance' ? 'flex' : 'block'",
+    );
   });
 });
 

@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 // Source-guard suite for the Crafting window launchers (issue #1865, the
 // deeds_window.test.ts pattern): the desktop micro-menu button and the mobile
 // More-tray button in BOTH entry HTMLs, the hud.ts click + keycap wiring, the

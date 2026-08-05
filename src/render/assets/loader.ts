@@ -5,7 +5,9 @@ import * as THREE from 'three';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+import { GFX } from '../gfx';
 import { resampleHdrRgba } from '../hdr_resample';
+import { ktx2Loader } from './ktx2_support';
 import { MAX_LOAD_ATTEMPTS, retryDelayMs } from './load_retry';
 import { assetUrl } from './media';
 import { assetLoadStarted, recordAssetLoad } from './stats';
@@ -76,10 +78,71 @@ function withRetry<T>(attemptOnce: () => Promise<T>): Promise<T> {
 
 function loader(): GLTFLoader {
   if (!gltfLoader) {
-    gltfLoader = new GLTFLoader();
-    gltfLoader.setMeshoptDecoder(MeshoptDecoder);
+    // Assemble into a local and publish only on full success: caching a
+    // half-wired loader after a throw here would fail every later KTX2 GLB
+    // parse for the whole session with no recovery path.
+    const assembled = new GLTFLoader();
+    assembled.setMeshoptDecoder(MeshoptDecoder);
+    // Model textures ship as KTX2 (KHR_texture_basisu): without the transcoder
+    // attached, parsing any public/models GLB rejects outright.
+    assembled.setKTX2Loader(ktx2Loader());
+    gltfLoader = assembled;
   }
   return gltfLoader;
+}
+
+// Central GLB texture polish: 4-tap anisotropic filtering on every color and
+// normal map sharpens ground-adjacent props and walls at oblique camera angles
+// for free (mip selection alone smears them). Runs once per parsed GLB, right
+// after parse and before first upload, so no texture ever needs a re-upload;
+// three clamps the value to the device's max anisotropy at bind time. Terrain
+// splats keep their own higher-tap setting (terrain.ts loads via loadTexture,
+// not through here).
+const GLB_TEXTURE_ANISOTROPY = 4;
+
+function polishGltfTextures(gltf: GLTF): void {
+  // Fail soft on partial GLTF shapes (test doubles, exotic parses): the polish
+  // is cosmetic and must never sink an otherwise successful load.
+  if (typeof gltf.scene?.traverse !== 'function') return;
+  const seen = new Set<THREE.Texture>();
+  const lift = (tex: THREE.Texture | null): void => {
+    if (!tex || seen.has(tex)) return;
+    seen.add(tex);
+    tex.anisotropy = Math.max(tex.anisotropy, GLB_TEXTURE_ANISOTROPY);
+  };
+  gltf.scene.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (!mesh.isMesh) return;
+    const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+    for (const m of mats) {
+      const std = m as THREE.MeshStandardMaterial;
+      lift(std.map ?? null);
+      lift(std.normalMap ?? null);
+    }
+  });
+}
+
+// asset fetch start/settle so a device console shows exactly how far through the
+// preload set a WebContent kill lands and which asset preceded it (the iPhone 17
+// Pro entry-kill investigation: WebContent died at 1.54 GB resident mid-decode
+// with no JS error, so sequencing evidence has to come from the console, not
+// from error handlers). Gated like the residency table: dev browsers plus the
+// native iOS profile under diagnosis. The production WEB population must not
+// pay ~700 console lines per entry; the native Release shell suppresses the JS
+// console anyway, and a Debug shell attached for diagnosis sees every line.
+function loadDiagEnabled(): boolean {
+  return import.meta.env.DEV || GFX.nativeIosMemoryProfile;
+}
+let loadDiagSeq = 0;
+function diagStart(kind: string, resolved: string): number {
+  if (!loadDiagEnabled()) return 0;
+  const seq = ++loadDiagSeq;
+  console.info(`[load-diag] ${seq} ${kind} start ${resolved}`);
+  return seq;
+}
+function diagSettle(seq: number, kind: string, resolved: string, ok: boolean): void {
+  if (!loadDiagEnabled()) return;
+  console.info(`[load-diag] ${seq} ${kind} ${ok ? 'done' : 'FAIL'} ${resolved}`);
 }
 
 /** Load + parse a .glb once; subsequent calls share the same parsed scene.
@@ -89,17 +152,28 @@ export function loadGltf(url: string): Promise<GLTF> {
   let p = gltfCache.get(resolved);
   if (!p) {
     const startedAt = assetLoadStarted();
-    p = scheduleLoad(gltfQueue, () =>
-      withRetry(
+    p = scheduleLoad(gltfQueue, () => {
+      const seq = diagStart('gltf', resolved);
+      return withRetry(
         () =>
           new Promise<GLTF>((resolve, reject) => {
             loader().load(resolved, resolve, undefined, () =>
               reject(new Error(`asset load failed: ${url} (missing file or bad GLB)`)),
             );
           }),
-      ),
-    ).then(
+      ).then(
+        (gltf) => {
+          diagSettle(seq, 'gltf', resolved, true);
+          return gltf;
+        },
+        (err: unknown) => {
+          diagSettle(seq, 'gltf', resolved, false);
+          throw err;
+        },
+      );
+    }).then(
       (gltf) => {
+        polishGltfTextures(gltf);
         recordAssetLoad('gltf', resolved, startedAt);
         return gltf;
       },
@@ -123,6 +197,15 @@ export function loadGltf(url: string): Promise<GLTF> {
  *  same url would simply re-fetch. */
 export function releaseGltf(url: string): void {
   gltfCache.delete(assetUrl(url));
+}
+
+/** The texture twin of releaseGltf: drop a loadTexture entry once its pixels
+ *  have been copied into a consumer-owned surface (e.g. the VFX sprite atlas),
+ *  so the decoded source image can be garbage-collected. Pass the SAME opts the
+ *  load used - they are part of the cache key. A later loadTexture re-fetches. */
+export function releaseTexture(url: string, opts: { srgb?: boolean; repeat?: boolean } = {}): void {
+  const resolved = assetUrl(url);
+  texCache.delete(`${resolved}|${opts.srgb ? 's' : 'l'}|${opts.repeat ? 'r' : 'c'}`);
 }
 
 // One shared decode worker (created lazily): fetch + RGBE parse of an 8MB 2k
@@ -294,8 +377,9 @@ export function loadTexture(
   let p = texCache.get(key);
   if (!p) {
     const startedAt = assetLoadStarted();
-    p = scheduleLoad(textureQueue, () =>
-      withRetry(
+    p = scheduleLoad(textureQueue, () => {
+      const seq = diagStart('tex', resolved);
+      return withRetry(
         () =>
           new Promise<THREE.Texture>((resolve, reject) => {
             new THREE.TextureLoader().load(
@@ -309,8 +393,17 @@ export function loadTexture(
               () => reject(new Error(`texture load failed: ${url}`)),
             );
           }),
-      ),
-    ).then(
+      ).then(
+        (tex) => {
+          diagSettle(seq, 'tex', resolved, true);
+          return tex;
+        },
+        (err: unknown) => {
+          diagSettle(seq, 'tex', resolved, false);
+          throw err;
+        },
+      );
+    }).then(
       (tex) => {
         recordAssetLoad('texture', resolved, startedAt);
         return tex;

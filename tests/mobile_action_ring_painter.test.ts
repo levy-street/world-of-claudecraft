@@ -103,12 +103,12 @@ function idleWorld(): ActionBarWorldInput {
       gcdRemaining: 0,
       potionCdRemaining: 0,
       queuedOnSwing: null,
-      stealthed: false,
       auras: [],
       pos: { x: 0, y: 0, z: 0 },
     },
     target: null,
     inventory: [],
+    stealthed: false,
   };
 }
 

@@ -460,7 +460,7 @@ STATUS: ALREADY APPLIED. These documentation edits landed in commit a36a94c7 (th
 
 > Punctuation note: each "Replace:" block reproduces the live CLAUDE.md text verbatim (including its em dashes) so the match is exact; the "With:" blocks are authored em-dash-free per the project's no-em-dash rule, except where a replacement reproduces and extends an existing bullet whose sibling lines use the file's ` -- ` bullet style (the admin `i18n.ts` bullet in 5.3), where the leading punctuation is preserved to keep that bullet consistent with its neighbors. The em dashes that remain in this section are confined to those verbatim-quote and bullet-style-preserving fences, never the doc's own prose.
 
-### 5.1 Root `/Users/fernando/Documents/world-of-claudecraft/CLAUDE.md`
+### 5.1 Root `CLAUDE.md`
 _Applied: live `CLAUDE.md:70-91` already matches the With text for Edits A and B (verified 2026-06-17)._
 
 **Edit A. Soften the invariant intro line (currently around line 70).**
@@ -517,7 +517,7 @@ The replacement deliberately cites only `supportedLanguages` as the authoritativ
 
 > Implementer verification: the root bullet cites the S3 guard as `tests/localization_fixes.test.ts`; confirm the path still exists at implementation time, and if it has moved, fix the reference in the same commit so the two CLAUDE.md files never name different guards.
 
-### 5.2 `/Users/fernando/Documents/world-of-claudecraft/src/ui/CLAUDE.md`
+### 5.2 `src/ui/CLAUDE.md`
 _Applied: live `src/ui/CLAUDE.md` already matches the With text for Edits A (`:71`), B (`:90-95`), and C (`:103-110`) (verified 2026-06-17)._
 
 This file already documents the correct model; the work is alignment, not rewrite.
@@ -583,7 +583,7 @@ that gate.
 
 The file map, the `t()`-behavior paragraph, and the existing pointer to `translation-workflow.md` are already correct and stay unchanged.
 
-### 5.3 `/Users/fernando/Documents/world-of-claudecraft/src/admin/CLAUDE.md`
+### 5.3 `src/admin/CLAUDE.md`
 _Applied: live `src/admin/CLAUDE.md:21` already matches the With text for Edit A (verified 2026-06-17)._
 
 **Edit A. Extend the existing i18n bullet (currently line 21).**
@@ -602,7 +602,7 @@ With:
 
 This mirrors the game contract while flagging the two admin specifics: it is a separate overlay set, and its English source is flat (not nested).
 
-### 5.4 `/Users/fernando/Documents/world-of-claudecraft/docs/i18n-scaling/translation-workflow.md` (ALREADY CREATED)
+### 5.4 `docs/i18n-scaling/translation-workflow.md` (ALREADY CREATED)
 
 Both the root and `src/ui/CLAUDE.md` point here. This file ALREADY EXISTS (102 lines, created in commit a36a94c7) and already covers every section of the structure below, so the pointer is not dangling. The structure below is retained as the record of what the file contains:
 
@@ -818,20 +818,20 @@ Bundle/gzip figures below are pre-v0.10 estimates that need a production build t
 
 ### 11.3 Key files touched by Phase 3 (absolute paths)
 
-- `/Users/fernando/Documents/world-of-claudecraft/scripts/i18n_build.mjs` (Step 1 emit + `I18N_OUT_DIR`)
-- `/Users/fernando/Documents/world-of-claudecraft/scripts/i18n_admin_build.mjs` (Step 1 admin)
-- `/Users/fernando/Documents/world-of-claudecraft/scripts/i18n_scan.mjs` (Step 4 `I18N_OUT_DIR`, optional summary)
-- `/Users/fernando/Documents/world-of-claudecraft/scripts/i18n_resolved_hash.mjs` (Step 3 Option 3b only) (2026-07-14, D4: now a print-only diagnostic; the committed baseline is deleted)
-- `/Users/fernando/Documents/world-of-claudecraft/src/ui/i18n.ts` (Steps 2-3 loader + flip)
-- `/Users/fernando/Documents/world-of-claudecraft/src/main.ts` (Step 2 bootstrap await before `mountGameUi`; picker `switchLanguage`)
-- `/Users/fernando/Documents/world-of-claudecraft/src/admin/i18n.ts` and `/Users/fernando/Documents/world-of-claudecraft/src/admin/main.ts` (admin parity)
-- `/Users/fernando/Documents/world-of-claudecraft/tests/homepage_foundation.test.ts` (Step 3: `await ensureLocaleLoaded` before each non-en `t()` assertion)
-- `/Users/fernando/Documents/world-of-claudecraft/tests/i18n_t_behavior.test.ts` (Step 3: re-point the pending-injection mock to `LOCALE_LOADERS` / `resident`; add sync-`t()` and loader-rejection cases)
-- `/Users/fernando/Documents/world-of-claudecraft/tests/i18n_resolved_equivalence.test.ts`, `/Users/fernando/Documents/world-of-claudecraft/tests/i18n_status_registry.test.ts` (Step 4 gates; 3b also repoints the latter's `../src/ui/i18n` import)
-- `/Users/fernando/Documents/world-of-claudecraft/tests/localization_fixes.test.ts` (the S3 guard; no logic change, now depends on `pretest` for `status.json`; under 3b repoint its 14-const import)
-- `/Users/fernando/Documents/world-of-claudecraft/tests/helpers/i18n_determinism.ts` (new)
-- `/Users/fernando/Documents/world-of-claudecraft/.gitignore` (Step 4 `status.json`)
-- `/Users/fernando/Documents/world-of-claudecraft/.github/workflows/ci.yml` (Step 4 `i18n:gen` step)
-- `/Users/fernando/Documents/world-of-claudecraft/package.json` (Step 4 `i18n:gen` script)
-- `/Users/fernando/Documents/world-of-claudecraft/CLAUDE.md`, `/Users/fernando/Documents/world-of-claudecraft/src/ui/CLAUDE.md`, `/Users/fernando/Documents/world-of-claudecraft/src/admin/CLAUDE.md` (Step 5 policy)
-- `/Users/fernando/Documents/world-of-claudecraft/docs/i18n-scaling/translation-workflow.md` (Step 5, new)
+- `scripts/i18n_build.mjs` (Step 1 emit + `I18N_OUT_DIR`)
+- `scripts/i18n_admin_build.mjs` (Step 1 admin)
+- `scripts/i18n_scan.mjs` (Step 4 `I18N_OUT_DIR`, optional summary)
+- `scripts/i18n_resolved_hash.mjs` (Step 3 Option 3b only) (2026-07-14, D4: now a print-only diagnostic; the committed baseline is deleted)
+- `src/ui/i18n.ts` (Steps 2-3 loader + flip)
+- `src/main.ts` (Step 2 bootstrap await before `mountGameUi`; picker `switchLanguage`)
+- `src/admin/i18n.ts` and `src/admin/main.ts` (admin parity)
+- `tests/homepage_foundation.test.ts` (Step 3: `await ensureLocaleLoaded` before each non-en `t()` assertion)
+- `tests/i18n_t_behavior.test.ts` (Step 3: re-point the pending-injection mock to `LOCALE_LOADERS` / `resident`; add sync-`t()` and loader-rejection cases)
+- `tests/i18n_resolved_equivalence.test.ts`, `tests/i18n_status_registry.test.ts` (Step 4 gates; 3b also repoints the latter's `../src/ui/i18n` import)
+- `tests/localization_fixes.test.ts` (the S3 guard; no logic change, now depends on `pretest` for `status.json`; under 3b repoint its 14-const import)
+- `tests/helpers/i18n_determinism.ts` (new)
+- `.gitignore` (Step 4 `status.json`)
+- `.github/workflows/ci.yml` (Step 4 `i18n:gen` step)
+- `package.json` (Step 4 `i18n:gen` script)
+- `CLAUDE.md`, `src/ui/CLAUDE.md`, `src/admin/CLAUDE.md` (Step 5 policy)
+- `docs/i18n-scaling/translation-workflow.md` (Step 5, new)

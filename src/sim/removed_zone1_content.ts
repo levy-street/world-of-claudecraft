@@ -1,5 +1,5 @@
 import type { CharacterState } from './sim';
-import type { InvSlot } from './types';
+import { cloneInvSlot, type InvSlot } from './types';
 
 export const REMOVED_ZONE1_QUEST_IDS = [
   'q_mogger_tracks',
@@ -67,8 +67,10 @@ export function sanitizeRemovedZone1Content(state: CharacterState): {
       ...(quest.resolvedCounts === undefined ? {} : { resolvedCounts: [...quest.resolvedCounts] }),
     }));
   const questsDone = state.questsDone.filter((questId) => !REMOVED_QUESTS.has(questId));
-  const inventory = state.inventory.filter(keepItem).map((slot) => ({ ...slot }));
-  const vendorBuyback = state.vendorBuyback?.filter(keepItem).map((slot) => ({ ...slot }));
+  // cloneInvSlot, not a shallow spread: buyback and bag rows can carry instance
+  // payloads whose mutable maps must not alias between input and migrated state.
+  const inventory = state.inventory.filter(keepItem).map(cloneInvSlot);
+  const vendorBuyback = state.vendorBuyback?.filter(keepItem).map(cloneInvSlot);
 
   const changed =
     questLog.length !== state.questLog.length ||

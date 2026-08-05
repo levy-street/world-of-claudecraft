@@ -9,7 +9,7 @@
 
 import type { SimContext } from './sim_context';
 import type { Entity } from './types';
-import { inHollowOpenSea, WATER_LEVEL } from './world';
+import { inHollowOpenSea, waterLevel } from './world';
 
 const GRACE_TICKS = 160; // 8s of warning first: real time to turn around
 const PULSE_TICKS = 20; // then one pulse per second
@@ -20,7 +20,9 @@ export const FATIGUE_WARNING = 'The open sea saps your strength. Swim back to sh
 
 export function updateSwimFatigue(ctx: SimContext, p: Entity): void {
   if (p.kind !== 'player') return;
-  const swimmingOut = p.pos.y <= WATER_LEVEL + 0.4 && inHollowOpenSea(p.pos.x, p.pos.z) && !p.dead;
+  // The ACTIVE waterline (custom maps override it); the built-in constant
+  // here silently killed or disabled fatigue on any map with a moved sea.
+  const swimmingOut = p.pos.y <= waterLevel() + 0.4 && inHollowOpenSea(p.pos.x, p.pos.z) && !p.dead;
   if (!swimmingOut) {
     p.fatigueTicks = 0;
     return;

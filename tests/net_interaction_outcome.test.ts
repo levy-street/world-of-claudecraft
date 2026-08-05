@@ -1,13 +1,16 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ClientWorld } from '../src/net/online';
 
+// Kept bespoke on purpose (issue #2088): a hand-picked field subset plus a
+// live `ws` mock, parameterized by connected state. tests/helpers/bare_client.ts
+// bareClient() is the default for a new suite that just needs a bare ClientWorld.
 function rig(connected = true) {
   const sent: string[] = [];
   const world: any = Object.create(ClientWorld.prototype);
   world.connected = connected;
   world.spectating = null;
   world.ws = {
-    readyState: connected ? WebSocket.OPEN : WebSocket.CLOSED,
+    readyState: connected ? 1 : 3,
     send: (payload: string) => sent.push(payload),
   };
   world.moveInput = {};

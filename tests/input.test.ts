@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Input } from '../src/game/input';
 import { stopAutorunForInteraction } from '../src/game/interaction_autorun';
@@ -9,6 +10,7 @@ const VIEWPORT_W = 1920;
 const VIEWPORT_H = 1080;
 const EDGE = { clientX: 6, clientY: 540 };
 const CENTER = { clientX: 960, clientY: 540 };
+const mainSource = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
 
 function installStorage(): void {
   const map = new Map<string, string>();
@@ -1078,6 +1080,45 @@ describe('Input Discord keybind', () => {
   });
 });
 
+describe('Input target buffs and debuffs keybind', () => {
+  it("dispatches onUiKey('targetAuras') for the default Shift+J chord", () => {
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'KeyJ', repeat: false, shiftKey: true });
+
+    expect(cb.onUiKey).toHaveBeenCalledWith('targetAuras');
+    expect(cb.onCycleFriendly).not.toHaveBeenCalled();
+  });
+
+  it('keeps bare J assigned to cycle friendly targets', () => {
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'KeyJ', repeat: false });
+
+    expect(cb.onCycleFriendly).toHaveBeenCalledTimes(1);
+    expect(cb.onUiKey).not.toHaveBeenCalledWith('targetAuras');
+  });
+
+  it('routes both startGame input paths to the HUD toggle', () => {
+    const keyboardStart = mainSource.indexOf('onUiKey: (key) => {');
+    const keyboardRoute = mainSource.slice(
+      keyboardStart,
+      mainSource.indexOf('onEmoteWheel:', keyboardStart),
+    );
+    const gamepadStart = mainSource.indexOf('function dispatchGamepadAction(id: string): void {');
+    const gamepadRoute = mainSource.slice(
+      gamepadStart,
+      mainSource.indexOf('const gamepad =', gamepadStart),
+    );
+    const route = /case 'targetAuras':\s*hud\.toggleTargetAuras\(\);\s*break;/g;
+
+    expect(keyboardStart).toBeGreaterThanOrEqual(0);
+    expect(gamepadStart).toBeGreaterThanOrEqual(0);
+    expect(keyboardRoute.match(route)).toHaveLength(1);
+    expect(gamepadRoute.match(route)).toHaveLength(1);
+  });
+});
+
 describe('Input Book of Deeds keybind', () => {
   it("dispatches onUiKey('deeds') for the default Shift+Z chord", () => {
     const { cb, windowListeners } = makeInput();
@@ -1491,5 +1532,35 @@ describe('Input camera zoom (issue 1657)', () => {
     input.zoomBy(-5); // already at the min, no change
     expect(input.camDist).toBe(3);
     expect(changes).toEqual([]);
+  });
+});
+
+describe('Input captureNextKey cancellation (issue 1238)', () => {
+  it('captureNextKey(null) clears an armed capture so the next real keypress reaches gameplay', () => {
+    const { input, cb, windowListeners } = makeInput();
+    const captured: (string | null)[] = [];
+    input.captureNextKey((code) => captured.push(code));
+    // Abandon the capture without a keypress, the way Done/Reset does on the
+    // on-bar action-bar key-binding mode.
+    input.captureNextKey(null);
+
+    windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, preventDefault: vi.fn() });
+
+    // The stale capture callback must never fire, and the keypress must fall
+    // through to normal ability dispatch (slot0's default key) instead of
+    // being swallowed.
+    expect(captured).toEqual([]);
+    expect(cb.onAbilityDown).toHaveBeenCalledWith(0);
+  });
+
+  it('a still-armed capture (no cancel) swallows the next keypress instead of dispatching it', () => {
+    const { input, cb, windowListeners } = makeInput();
+    const captured: (string | null)[] = [];
+    input.captureNextKey((code) => captured.push(code));
+
+    windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, preventDefault: vi.fn() });
+
+    expect(captured).toEqual(['Digit1']);
+    expect(cb.onAbilityDown).not.toHaveBeenCalled();
   });
 });

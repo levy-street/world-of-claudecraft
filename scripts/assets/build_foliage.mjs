@@ -22,6 +22,7 @@ import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { dedup, meshopt, prune, simplify, textureCompress, weld } from '@gltf-transform/functions';
 import { MeshoptDecoder, MeshoptEncoder, MeshoptSimplifier } from 'meshoptimizer';
 import sharp from 'sharp';
+import { optimizeFoliageVertexDocument } from './foliage_vertex_pipeline.mjs';
 
 // URL.pathname keeps a leading slash before a Windows drive letter, which
 // path.resolve mangles into "D:\D:\..."; fileURLToPath is correct on every OS.
@@ -71,7 +72,7 @@ async function recolorTextures(doc, rules) {
 async function processItem(io, item) {
   const srcPath = resolveSrc(item.src);
   const outPath = path.join(PUBLIC_DIR, item.out);
-  const doc = await io.read(srcPath);
+  let doc = await io.read(srcPath);
 
   stripWhiteVertexColors(doc);
   if (item.recolor) await recolorTextures(doc, item.recolor);
@@ -99,6 +100,13 @@ async function processItem(io, item) {
   }
   transforms.push(meshopt({ encoder: MeshoptEncoder, level: 'high' }));
   await doc.transform(...transforms);
+  // Normalize through the exact encoded/decoded shipping representation.
+  // meshopt's quantization and filters can make formerly different vertices
+  // bitwise-identical only at this boundary.
+  doc = await io.readBinary(await io.writeBinary(doc));
+  // Weld that finalized representation once more, then choose GPU-local
+  // cache/fetch order before writing.
+  await optimizeFoliageVertexDocument(doc, MeshoptEncoder);
 
   let tris = 0;
   for (const mesh of doc.getRoot().listMeshes()) {

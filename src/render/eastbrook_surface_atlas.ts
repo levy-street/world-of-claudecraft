@@ -1,9 +1,18 @@
 import * as THREE from 'three';
 import { loadTexture } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { GFX, surfaceMat } from './gfx';
+import { renderLayerDisabled } from './render_dev_flags';
+import { applySurfaceDetail, type SurfaceFamily } from './worn_stone';
 
 export const EASTBROOK_SURFACE_ATLAS_URL = '/textures/eastbrook_surface_atlas.webp';
+// Baked PBR companions to the color atlas (scripts/assets/eastbrook_town/
+// build_surface_pbr.mjs): same 4x4 cell layout, so the synthesized cell UVs
+// address all three textures at once. Both are non-color data.
+export const EASTBROOK_SURFACE_NORMAL_URL = '/textures/eastbrook_surface_normal.webp';
+export const EASTBROOK_SURFACE_ROUGH_URL = '/textures/eastbrook_surface_rough.webp';
+// Subtle relief for the cozy low-poly art style, not photoreal depth.
+export const EASTBROOK_SURFACE_NORMAL_SCALE = 0.6;
 export const EASTBROOK_SURFACE_ATLAS_SIZE = 512;
 export const EASTBROOK_SURFACE_ATLAS_COLUMNS = 4;
 export const EASTBROOK_SURFACE_ATLAS_ROWS = 4;
@@ -35,19 +44,42 @@ const CELL_SIZE_UV = 1 / EASTBROOK_SURFACE_ATLAS_COLUMNS;
 const CELL_PADDING_UV = CELL_PADDING_PIXELS / EASTBROOK_SURFACE_ATLAS_SIZE;
 
 let loadedAtlas: THREE.Texture | null = null;
+let loadedNormal: THREE.Texture | null = null;
+let loadedRough: THREE.Texture | null = null;
 
 if (typeof window !== 'undefined') {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadTexture(EASTBROOK_SURFACE_ATLAS_URL).then((texture) => {
       // Loader-cache results are immutable shared resources. Eastbrook identity
       // metadata stays module/root-side; consumers bind this exact texture.
       loadedAtlas = texture;
     }),
   );
+  // Non-srgb loads keep loadTexture's default NoColorSpace, which is what
+  // normal/roughness data needs. Preload sets stay tier-independent (the
+  // import-time tier is only a guess); Lambert tiers simply never bind these.
+  registerDeferredPreload(() =>
+    loadTexture(EASTBROOK_SURFACE_NORMAL_URL).then((texture) => {
+      loadedNormal = texture;
+    }),
+  );
+  registerDeferredPreload(() =>
+    loadTexture(EASTBROOK_SURFACE_ROUGH_URL).then((texture) => {
+      loadedRough = texture;
+    }),
+  );
 }
 
 export function eastbrookSurfaceAtlasTexture(): THREE.Texture | undefined {
   return loadedAtlas ?? undefined;
+}
+
+export function eastbrookSurfaceNormalTexture(): THREE.Texture | undefined {
+  return loadedNormal ?? undefined;
+}
+
+export function eastbrookSurfaceRoughnessTexture(): THREE.Texture | undefined {
+  return loadedRough ?? undefined;
 }
 
 export interface EastbrookSurfaceAtlasMetadata {
@@ -218,6 +250,101 @@ export function eastbrookSemanticForMaterial(name: string): EastbrookSurfaceSema
   return 'mediumGrayStone';
 }
 
+// ---------------------------------------------------------------------------
+// Triplanar surface detail OVER the baked atlas. The baked PBR companions
+// stretch one 124px cell across an entire building face (cell UVs come from
+// bounding-box normalization), so their relief is far too low-frequency to
+// read on a keep wall: the town judged FLAT with them alone. The world-space
+// triplanar layer tiles at real-world scale on top, kept conservative
+// (~0.3) so the two never fight; per-cell strengths taper it on canvas,
+// metal, and crystal so one merged vertex-colored batch still reads right.
+// ---------------------------------------------------------------------------
+
+/** Conservative triplanar strength over the baked atlas. */
+export const EASTBROOK_TRIPLANAR_STRENGTH = 0.3;
+
+/** Per-semantic triplanar family for materials with ONE semantic (the Grand
+ *  Armoury's named materials). null = keep clean (crystal glow). */
+const TRIPLANAR_BY_SEMANTIC: Record<
+  EastbrookSurfaceSemantic,
+  { family: SurfaceFamily; strength: number } | null
+> = {
+  darkStoneBlocks: { family: 'stone', strength: 0.3 },
+  lightStoneBlocks: { family: 'stone', strength: 0.3 },
+  warmPlaster: { family: 'plaster', strength: 0.3 },
+  verticalDarkTimber: { family: 'wood', strength: 0.3 },
+  cobaltRoofShingles: { family: 'wood', strength: 0.28 },
+  darkForgedMetal: { family: 'metal', strength: 0.3 },
+  warmGoldMetal: { family: 'metal', strength: 0.25 },
+  horizontalWarmTimber: { family: 'wood', strength: 0.3 },
+  blueCreamCanvas: { family: 'fabric', strength: 0.25 },
+  redCreamCanvas: { family: 'fabric', strength: 0.25 },
+  darkBrownLeather: { family: 'fabric', strength: 0.25 },
+  irregularDarkStone: { family: 'stone', strength: 0.3 },
+  cyanCrystal: null,
+  cobaltPaintedPlanks: { family: 'wood', strength: 0.28 },
+  lightGrayStone: { family: 'stone', strength: 0.3 },
+  mediumGrayStone: { family: 'stone', strength: 0.3 },
+};
+
+/** Per-cell strength mask (16 entries, cell order) for MERGED town batches
+ *  that mix semantics in one material: full weight on stone cells, tapered on
+ *  wood/metal/canvas, zero on crystal. Applied to the stone family, so the
+ *  taper keeps masonry texture off painted canvas. */
+const TOWN_CELL_MASK: readonly number[] = Object.freeze(
+  Object.keys(EASTBROOK_SURFACE_CELLS).map((semantic) => {
+    switch (semantic as EastbrookSurfaceSemantic) {
+      case 'darkStoneBlocks':
+      case 'lightStoneBlocks':
+      case 'irregularDarkStone':
+      case 'lightGrayStone':
+      case 'mediumGrayStone':
+        return 1;
+      case 'warmPlaster':
+        return 0.85;
+      case 'cobaltRoofShingles':
+        return 0.75;
+      case 'verticalDarkTimber':
+      case 'horizontalWarmTimber':
+      case 'cobaltPaintedPlanks':
+        return 0.7;
+      case 'darkForgedMetal':
+        return 0.6;
+      case 'warmGoldMetal':
+      case 'darkBrownLeather':
+        return 0.5;
+      case 'blueCreamCanvas':
+      case 'redCreamCanvas':
+        return 0.45;
+      case 'cyanCrystal':
+        return 0;
+      default:
+        return 0.5;
+    }
+  }),
+);
+
+/**
+ * Attach the conservative triplanar layer to a MERGED multi-semantic town
+ * material (the vertex-colored building/micro/wall batches): the stone family
+ * with the per-cell mask, which reads the material's own atlas UV per
+ * fragment. No-op on Lambert tiers, emissive/atlas-less materials, and
+ * repeated calls (the worn layer's identity guard).
+ */
+export function applyEastbrookTownSurfaceDetail(material: THREE.Material): THREE.Material {
+  const standard = material as THREE.MeshStandardMaterial;
+  if (!GFX.standardMaterials || !standard.isMeshStandardMaterial) return material;
+  // Dev-only perf-attribution kill switch (?ebdetail=off): isolates the
+  // Eastbrook triplanar-over-atlas cost from the rest of the worn layer.
+  if (renderLayerDisabled('ebdetail')) return material;
+  if (standard.emissive.getHex() !== 0 || !standard.map) return material;
+  applySurfaceDetail(standard, 'stone', {
+    strength: EASTBROOK_TRIPLANAR_STRENGTH,
+    cellMask: TOWN_CELL_MASK,
+  });
+  return material;
+}
+
 export function eastbrookMaterialUsesAtlas(
   source: THREE.Material,
   atlas: THREE.Texture | undefined = eastbrookSurfaceAtlasTexture(),
@@ -241,6 +368,13 @@ export function eastbrookSurfaceMaterial(
   const standard = source as THREE.MeshStandardMaterial;
   if (!standard.isMeshStandardMaterial) return source;
   const atlasMap = eastbrookMaterialUsesAtlas(source, atlas) ? atlas : undefined;
+  // The baked PBR companions share the color atlas's cell layout, so they are
+  // only valid on atlas-bound materials (whose UVs were synthesized into
+  // cells). Lambert tiers skip them outright; surfaceMat would drop them.
+  const atlasNormal =
+    atlasMap && GFX.standardMaterials ? eastbrookSurfaceNormalTexture() : undefined;
+  const atlasRough =
+    atlasMap && GFX.standardMaterials ? eastbrookSurfaceRoughnessTexture() : undefined;
   const key = `${GFX.standardMaterials ? 'standard' : 'lambert'}|${atlasMap?.uuid ?? 'none'}`;
   let cache = convertedMaterials.get(source);
   if (!cache) {
@@ -250,14 +384,18 @@ export function eastbrookSurfaceMaterial(
   const cached = cache.get(key);
   if (cached) return cached;
 
+  const injectedRough = !standard.roughnessMap && atlasRough !== undefined;
   const converted = surfaceMat({
     color: standard.color.getHex(),
     map: standard.map ?? atlasMap,
     vertexColors: standard.vertexColors,
-    normalMap: standard.normalMap ?? undefined,
-    roughnessMap: standard.roughnessMap ?? undefined,
+    normalMap: standard.normalMap ?? atlasNormal,
+    roughnessMap: standard.roughnessMap ?? atlasRough,
     aoMap: standard.aoMap ?? undefined,
-    roughness: standard.roughness,
+    // The rough atlas bakes per-cell base roughness, so it becomes the
+    // authority when injected; source-authored factors keep their meaning
+    // whenever the source ships its own roughness data.
+    roughness: injectedRough ? 1 : standard.roughness,
     metalness: standard.metalness,
     flatShading: !GFX.standardMaterials || standard.flatShading,
     emissive: standard.emissive.getHex(),
@@ -266,9 +404,24 @@ export function eastbrookSurfaceMaterial(
   }).clone();
   converted.name = standard.name;
   converted.userData = { ...standard.userData };
+  if (atlasNormal && !standard.normalMap && converted instanceof THREE.MeshStandardMaterial) {
+    converted.normalScale.setScalar(EASTBROOK_SURFACE_NORMAL_SCALE);
+  }
   if (atlasMap) {
+    const semantic = eastbrookSemanticForMaterial(standard.name);
     converted.userData.eastbrookSurfaceAtlas = EASTBROOK_SURFACE_ATLAS_URL;
-    converted.userData.eastbrookSurfaceSemantic = eastbrookSemanticForMaterial(standard.name);
+    converted.userData.eastbrookSurfaceSemantic = semantic;
+    // Single-semantic materials (the Grand Armoury kit) take the properly
+    // routed triplanar family over the baked atlas; crystal stays clean.
+    const triplanar = TRIPLANAR_BY_SEMANTIC[semantic];
+    if (
+      triplanar &&
+      GFX.standardMaterials &&
+      !renderLayerDisabled('ebdetail') &&
+      converted instanceof THREE.MeshStandardMaterial
+    ) {
+      applySurfaceDetail(converted, triplanar.family, { strength: triplanar.strength });
+    }
   }
   cache.set(key, converted);
   return converted;

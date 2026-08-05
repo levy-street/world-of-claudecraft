@@ -151,15 +151,15 @@ export function farAnimRangeScale(
 /** The per-frame character LOD plan: squared band edges plus their cadences. */
 export interface CharacterLodBands {
   /** past this, articulated shadows hand off to the static proxy */
-  readonly shadowRangeSq: number;
+  shadowRangeSq: number;
   /** past this, the rig drops to the low far cadence (still articulated) */
-  readonly lodRangeSq: number;
+  lodRangeSq: number;
   /** past this, the rig collapses to the single-draw frozen far mesh */
-  readonly staticRangeSq: number;
+  staticRangeSq: number;
   /** frozen-mesh edge for an entity whose pose is actionable (see below) */
-  readonly actionableStaticRangeSq: number;
-  readonly midCadence: number;
-  readonly farCadence: number;
+  actionableStaticRangeSq: number;
+  midCadence: number;
+  farCadence: number;
 }
 
 /**
@@ -179,18 +179,43 @@ export function characterLodBands(
   tierFarScale: number,
   pressure = 0,
 ): CharacterLodBands {
+  return characterLodBandsInto(
+    {
+      shadowRangeSq: 0,
+      lodRangeSq: 0,
+      staticRangeSq: 0,
+      actionableStaticRangeSq: 0,
+      midCadence: 1,
+      farCadence: 1,
+    },
+    visibleRigs,
+    baseShadowRangeSq,
+    baseLodRangeSq,
+    tierFarScale,
+    pressure,
+  );
+}
+
+/** Fill a caller-owned crowd LOD plan for the renderer hot path. */
+export function characterLodBandsInto(
+  out: CharacterLodBands,
+  visibleRigs: number,
+  baseShadowRangeSq: number,
+  baseLodRangeSq: number,
+  tierFarScale: number,
+  pressure = 0,
+): CharacterLodBands {
   const crowdSq = crowdLodScaleSq(visibleRigs);
   const lodRangeSq = baseLodRangeSq * crowdSq;
   const farScale = farAnimRangeScale(tierFarScale, visibleRigs, pressure);
   const staticRangeSq = lodRangeSq * farScale * farScale;
-  return {
-    shadowRangeSq: baseShadowRangeSq * crowdSq,
-    lodRangeSq,
-    staticRangeSq,
-    actionableStaticRangeSq: Math.max(staticRangeSq, baseLodRangeSq),
-    midCadence: midAnimCadence(visibleRigs),
-    farCadence: farAnimCadence(visibleRigs),
-  };
+  out.shadowRangeSq = baseShadowRangeSq * crowdSq;
+  out.lodRangeSq = lodRangeSq;
+  out.staticRangeSq = staticRangeSq;
+  out.actionableStaticRangeSq = Math.max(staticRangeSq, baseLodRangeSq);
+  out.midCadence = midAnimCadence(visibleRigs);
+  out.farCadence = farAnimCadence(visibleRigs);
+  return out;
 }
 
 /** Whether a rig at `distSq` draws as the frozen far mesh instead of its rig. */

@@ -1,7 +1,7 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { DELVES, NPCS, STATIONS } from '../src/sim/data';
+import { DELVES, NPCS, QUESTS, STATIONS } from '../src/sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../src/sim/deeds';
 import type { Entity } from '../src/sim/types';
 import { craftNameText } from '../src/ui/char_window';
@@ -30,7 +30,11 @@ function ordinaryNpcId(): string {
   return entry.id;
 }
 
-function harness(entity = npc(10, ordinaryNpcId()), questState = 'available') {
+function harness(
+  entity = npc(10, ordinaryNpcId()),
+  questState = 'available',
+  identityExtra: Record<string, unknown> = {},
+) {
   document.body.innerHTML = '';
   const element = document.createElement('div');
   element.id = 'quest-dialog';
@@ -38,6 +42,7 @@ function harness(entity = npc(10, ordinaryNpcId()), questState = 'available') {
   const entities = new Map([[entity.id, entity]]);
   const targetEntity = vi.fn();
   const interact = vi.fn();
+  const answerSceneChoice = vi.fn();
   const acceptLinkedQuest = vi.fn();
   const acceptQuest = vi.fn();
   const turnInQuest = vi.fn();
@@ -60,10 +65,14 @@ function harness(entity = npc(10, ordinaryNpcId()), questState = 'available') {
       switchCount: 0,
       amendsProgress: 0,
       amendsRequired: 5,
+      ...identityExtra,
     },
     questState: vi.fn(() => questState),
+    // The quest-marker inputs the gossip list reads (the phase 23 classifier).
+    questsDone: new Set<string>(),
     targetEntity,
     interact,
+    answerSceneChoice,
     acceptLinkedQuest,
     acceptQuest,
     turnInQuest,
@@ -71,7 +80,15 @@ function harness(entity = npc(10, ordinaryNpcId()), questState = 'available') {
   } as unknown as IWorld;
   const release = vi.fn();
   const focusFirst = vi.fn();
-  const trap: FocusTrapHandle = { release, focusFirst };
+  // The element the dialog's OWN focus trap recorded as ITS opener (e.g. the
+  // world interact prompt that opened the quest dialog): stays connected and
+  // visible outside #quest-dialog, unlike a button inside the dialog, which
+  // close(false) hides before a successor window's restore() would run.
+  const trapOpener = document.createElement('button');
+  trapOpener.id = 'world-interact-prompt';
+  document.body.appendChild(trapOpener);
+  const trapOpenerFn = vi.fn(() => trapOpener as HTMLElement | null);
+  const trap: FocusTrapHandle = { release, focusFirst, opener: trapOpenerFn };
   const voice = {
     play: vi.fn(),
     isPlaying: vi.fn(() => true),
@@ -133,12 +150,15 @@ function harness(entity = npc(10, ordinaryNpcId()), questState = 'available') {
     world,
     targetEntity,
     interact,
+    answerSceneChoice,
     acceptLinkedQuest,
     acceptQuest,
     turnInQuest,
     reportTelemetry,
     release,
     focusFirst,
+    trapOpener,
+    trapOpenerFn,
     voice,
     openChronicles,
     openVendor,
@@ -184,6 +204,84 @@ describe('QuestDialogController', () => {
     expect(test.controller.isOpen).toBe(false);
   });
 
+  it('renders a completed repeatable as the blue row with the repeatable aria', () => {
+    // The phase 23 gossip arm over the real cadenced work order. Before the
+    // first completion the row keeps the first-offer gold glyph and the
+    // available aria (acceptance (b)'s negative); once questsDone carries the
+    // id, the glyph class flips to quest-repeat and the aria names the
+    // repeatable state (acceptance (e)).
+    const workOrder = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
+    if (!workOrder) throw new Error('expected a cadenced work order');
+    const giver = npc(30, workOrder.giverNpcId);
+    (giver as unknown as { questIds: string[] }).questIds = [workOrder.id];
+
+    const fresh = harness(giver, 'available');
+    fresh.controller.open(30);
+    const freshRow = fresh.element.querySelector(`[data-quest="${workOrder.id}"]`);
+    if (!freshRow) throw new Error('expected the gossip quest row');
+    expect(freshRow.innerHTML).toContain('<span class="gold">!</span>');
+    expect(freshRow.getAttribute('aria-label')).toBe(
+      t('questUi.dialog.availableQuestAria', { name: `quest:${workOrder.id}` }),
+    );
+
+    const giver2 = npc(31, workOrder.giverNpcId);
+    (giver2 as unknown as { questIds: string[] }).questIds = [workOrder.id];
+    const done = harness(giver2, 'available');
+    (done.world as unknown as { questsDone: Set<string> }).questsDone.add(workOrder.id);
+    done.controller.open(31);
+    const doneRow = done.element.querySelector(`[data-quest="${workOrder.id}"]`);
+    if (!doneRow) throw new Error('expected the gossip quest row');
+    expect(doneRow.innerHTML).toContain('<span class="quest-repeat">!</span>');
+    expect(doneRow.getAttribute('aria-label')).toBe(
+      t('questUi.dialog.repeatableQuestAria', { name: `quest:${workOrder.id}` }),
+    );
+
+    // Inside the cadence window the dialog lists NO row for the order (it is
+    // not offerable), exactly the pre-phase dialog: the dimmed marker is an
+    // overhead/map statement, never a dead gossip button.
+    const giver3 = npc(32, workOrder.giverNpcId);
+    (giver3 as unknown as { questIds: string[] }).questIds = [workOrder.id];
+    const blocked = harness(giver3, 'unavailable');
+    (blocked.world as unknown as { questsDone: Set<string> }).questsDone.add(workOrder.id);
+    (
+      blocked.world.craftingIdentity as unknown as { cadenceBlockedQuests: string[] }
+    ).cadenceBlockedQuests = [workOrder.id];
+    blocked.controller.open(32);
+    expect(blocked.element.querySelector(`[data-quest="${workOrder.id}"]`)).toBeNull();
+  });
+
+  it('surfaces a lapsed work order in an OPEN dialog through refreshIfChanged', () => {
+    // A cadence lapse is a pure tick-threshold crossing: the state re-opens
+    // with NO quest event to repaint through, while the dimmed map marker's
+    // "Available again soon" tag walks the player to this very NPC. The
+    // slowHud refreshIfChanged watch must rebuild the row set in place,
+    // and an unchanged signature must never rebuild the focus-trapped DOM.
+    const workOrder = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
+    if (!workOrder) throw new Error('expected a cadenced work order');
+    const giver = npc(33, workOrder.giverNpcId);
+    (giver as unknown as { questIds: string[] }).questIds = [workOrder.id];
+    const test = harness(giver, 'unavailable');
+    (test.world as unknown as { questsDone: Set<string> }).questsDone.add(workOrder.id);
+    test.controller.open(33);
+    expect(test.element.querySelector(`[data-quest="${workOrder.id}"]`)).toBeNull();
+
+    // Unchanged signature: the same DOM nodes survive (identity, not HTML
+    // equality, since a rebuild would produce identical markup).
+    const anchorNode = test.element.querySelector('[data-close]');
+    test.controller.refreshIfChanged();
+    expect(test.element.querySelector('[data-close]')).toBe(anchorNode);
+
+    // The window lapses: the quest state re-opens and the watch repaints.
+    (test.world.questState as ReturnType<typeof vi.fn>).mockReturnValue('available');
+    test.controller.refreshIfChanged();
+    const row = test.element.querySelector(`[data-quest="${workOrder.id}"]`);
+    if (!row) throw new Error('expected the lapsed work order row without close/reopen');
+    expect(row.innerHTML).toContain('<span class="quest-repeat">!</span>');
+    expect(row.getAttribute('aria-label')).toBe(
+      t('questUi.dialog.repeatableQuestAria', { name: `quest:${workOrder.id}` }),
+    );
+  });
+
   it('routes bankers and chroniclers through authoritative interaction without gossip', () => {
     const bankerId = Object.values(NPCS).find((definition) => definition.banker)?.id;
     if (!bankerId) throw new Error('banker fixture not found');
@@ -202,6 +300,29 @@ describe('QuestDialogController', () => {
     expect(chronicler.interact).toHaveBeenCalledTimes(1);
     expect(chronicler.openChronicles).toHaveBeenCalledTimes(1);
     expect(chronicler.element.style.display).not.toBe('block');
+  });
+
+  it('buys ferry passage through the authoritative fare choice before closing gossip', () => {
+    const ferryman = harness(npc(22, 'ferryman_ewald'));
+
+    ferryman.controller.open(22);
+    const fare = ferryman.element.querySelector<HTMLButtonElement>('[data-ferry]');
+    expect(fare).not.toBeNull();
+    expect(fare?.textContent).toContain('10');
+
+    fare?.click();
+
+    expect(ferryman.targetEntity).toHaveBeenCalledWith(22);
+    expect(ferryman.interact).toHaveBeenCalledTimes(1);
+    expect(ferryman.answerSceneChoice).toHaveBeenCalledWith('ch_lb_ferry_fare_out', 'pay');
+    expect(ferryman.targetEntity.mock.invocationCallOrder[0]).toBeLessThan(
+      ferryman.interact.mock.invocationCallOrder[0],
+    );
+    expect(ferryman.interact.mock.invocationCallOrder[0]).toBeLessThan(
+      ferryman.answerSceneChoice.mock.invocationCallOrder[0],
+    );
+    expect(ferryman.element.style.display).toBe('none');
+    expect(ferryman.onOpenChange).toHaveBeenLastCalledWith(false);
   });
 
   it('offers a linked quest only to a current party member and delegates acceptance', () => {
@@ -239,6 +360,26 @@ describe('QuestDialogController', () => {
 
     expect(ready.turnInQuest).toHaveBeenCalledWith('q_wolves');
     expect(ready.reportTelemetry).toHaveBeenCalledWith('quest_turnin', { timeMs: 0 });
+  });
+
+  it('the preview promises the REMEMBERED hobby when the identity carries one', () => {
+    // The controller must pass identity.questedHobbies through to the view:
+    // with the pass-through dropped, the preview silently reverts to the
+    // skill default, the exact defect the mirror exists to fix.
+    const darva = npc(33, 'forgemistress_darva');
+    darva.questIds = ['q_prof_attune_smith'];
+    const test = harness(darva, 'available', {
+      questedHobbies: { 'weaponcrafting+armorcrafting': 'tailoring' },
+    });
+    test.controller.open(darva.id);
+    test.element.querySelector<HTMLButtonElement>('[data-quest="q_prof_attune_smith"]')?.click();
+    const select = test.element.querySelector<HTMLSelectElement>('[data-profession-selection]');
+    const preview = test.element.querySelector<HTMLElement>('[data-profession-preview]');
+    if (!select) throw new Error('profession selector missing');
+    select.value = 'weaponcrafting+armorcrafting';
+    select.dispatchEvent(new Event('change'));
+    expect(preview?.textContent).toContain('Tailoring');
+    expect(preview?.textContent).not.toContain('Leatherworking');
   });
 
   it('previews and dispatches the selected profession attunement target', () => {
@@ -352,8 +493,10 @@ describe('QuestDialogController', () => {
     vendorNpc.vendorItems = ['minor_healing_potion'];
     const vendor = harness(vendorNpc);
     vendor.controller.open(vendorNpc.id);
-    vendor.element.querySelector<HTMLButtonElement>('[data-vendor]')?.click();
-    expect(vendor.openVendor).toHaveBeenCalledWith(vendorNpc.id);
+    const vendorButton = vendor.element.querySelector<HTMLButtonElement>('[data-vendor]');
+    vendorButton?.focus();
+    vendorButton?.click();
+    expect(vendor.openVendor).toHaveBeenCalledWith(vendorNpc.id, vendor.trapOpener);
     expect(vendor.release).toHaveBeenCalledWith(false);
 
     const marketId = Object.values(NPCS).find((definition) => definition.market)?.id;
@@ -367,8 +510,10 @@ describe('QuestDialogController', () => {
 
     const heroic = harness(npc(42, heroicId));
     heroic.controller.open(42);
-    heroic.element.querySelector<HTMLButtonElement>('[data-heroic-shop]')?.click();
-    expect(heroic.openHeroicVendor).toHaveBeenCalledWith(42);
+    const heroicButton = heroic.element.querySelector<HTMLButtonElement>('[data-heroic-shop]');
+    heroicButton?.focus();
+    heroicButton?.click();
+    expect(heroic.openHeroicVendor).toHaveBeenCalledWith(42, heroic.trapOpener);
 
     const boardNpcId = DELVES.collapsed_reliquary.boardNpcId;
     const board = harness(npc(43, boardNpcId));
@@ -385,6 +530,46 @@ describe('QuestDialogController', () => {
     cardMaster.controller.open(45);
     cardMaster.element.querySelector<HTMLButtonElement>('[data-card-duel]')?.click();
     expect(cardMaster.openCardDuel).toHaveBeenCalledTimes(1);
+  });
+
+  it("hands the successor window the DIALOG TRAP's own opener, not the in-dialog button (WCAG 2.4.3)", () => {
+    // Regression for the second review finding on PR #2619: the first fix
+    // captured document.activeElement (the in-dialog gossip button) BEFORE
+    // close(false) hid #quest-dialog, but that button still lives INSIDE the
+    // dialog's own subtree, so by the time the successor window's
+    // focusManager.restore() runs later (after close(false) has taken
+    // effect), the button fails FocusManager.canFocus (display:none ancestor,
+    // getClientRects().length === 0) and focus still falls to <body>. The
+    // real fix hands the successor the quest dialog's OWN trap opener
+    // instead: a sibling element outside the dialog (e.g. the world interact
+    // prompt) that stays connected and visible for the whole time the vendor
+    // window is open, exactly like openBank()'s live side-rail button.
+    const vendorNpc = npc(50, ordinaryNpcId());
+    vendorNpc.vendorItems = ['minor_healing_potion'];
+    const test = harness(vendorNpc);
+    test.controller.open(vendorNpc.id);
+    const vendorButton = test.element.querySelector<HTMLButtonElement>('[data-vendor]');
+    expect(vendorButton).not.toBeNull();
+    vendorButton?.focus();
+    expect(test.document.activeElement).toBe(vendorButton);
+
+    vendorButton?.click();
+
+    // The dialog is hidden by the time openVendor is invoked...
+    expect(test.element.style.display).toBe('none');
+    // ...openVendor received the trap's OWN opener, read from the trap
+    // handle rather than document.activeElement...
+    expect(test.trapOpenerFn).toHaveBeenCalled();
+    expect(test.openVendor).toHaveBeenCalledWith(vendorNpc.id, test.trapOpener);
+    // ...and, unlike the in-dialog button, that element sits OUTSIDE the
+    // hidden #quest-dialog subtree: jsdom never lays out real geometry (so
+    // FocusManager.canFocus's getClientRects() check cannot be exercised
+    // here), but this is the structural precondition it depends on, and it
+    // is exactly what the in-dialog button fails once close(false) hides its
+    // ancestor.
+    expect(test.trapOpener.isConnected).toBe(true);
+    expect(test.element.contains(test.trapOpener)).toBe(false);
+    expect(vendorButton && test.element.contains(vendorButton)).toBe(true);
   });
 
   it('a station master offers the Train option and routes it to openTrain', () => {

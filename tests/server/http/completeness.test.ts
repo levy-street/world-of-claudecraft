@@ -112,6 +112,10 @@ const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/deeds/broadcasts',
   '/api/steam/link',
   '/api/steam/status',
+  '/api/epic/link',
+  '/api/epic/status',
+  '/api/ota/updates',
+  '/api/seeker/entitlement',
 ]);
 
 // Every legacy /api ladder row (dispatcher === main handleApi), minus the
@@ -296,6 +300,8 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'POST', path: '/api/desktop-wallet/claim' },
     { method: 'POST', path: '/api/desktop-wallet/complete' },
     { method: 'POST', path: '/api/desktop-wallet/result' },
+    { method: 'GET', path: '/api/seeker/entitlement' },
+    { method: 'POST', path: '/api/seeker/entitlement' },
     { method: 'GET', path: '/api/daily-rewards' },
     { method: 'POST', path: '/api/daily-rewards/spin' },
     { method: 'GET', path: '/api/daily-rewards/history' },
@@ -311,6 +317,14 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'POST', path: '/api/steam/link' },
     { method: 'DELETE', path: '/api/steam/link' },
     { method: 'GET', path: '/api/steam/status' },
+    // The Epic link trio (server/epic/routes.ts): registry-only twin of Steam,
+    // env-gated dark until EPIC_ENABLED=1.
+    { method: 'POST', path: '/api/epic/link' },
+    { method: 'DELETE', path: '/api/epic/link' },
+    { method: 'GET', path: '/api/epic/status' },
+    // The OTA update check (server/ota_updates.ts): registry-only like the
+    // deeds trio, env-gated dark until OTA_MANIFEST_URL is set.
+    { method: 'POST', path: '/api/ota/updates' },
     // v0.20.0: the paginated daily leaderboard read (the ops-side sibling is
     // asserted with the internal family below).
     { method: 'GET', path: '/api/daily-rewards/leaderboard' },
@@ -562,10 +576,12 @@ describe('registry completeness: oauth + internal surfaces (server/oauth.ts, ser
   it('derives the expected non-empty ladders', () => {
     expect(oauthPostLadder.length).toBe(5);
     expect(oauthGetLadder.length).toBe(2);
-    // 19 = the handleInternalApi twelve (restart-countdown + the 11 Discord-bot
+    // 21 = the handleInternalApi twelve (restart-countdown + the 11 Discord-bot
     // routes, flaired-ids included) plus the seven-route payout and moderation ops
-    // family below.
-    expect(internalLadder.length).toBe(19);
+    // family below, plus the two registry-only rows (POST
+    // /internal/discord/flex-batch and GET /internal/discord/outbox), which have
+    // no legacy ladder arm by design and so are the internal rows with no twin.
+    expect(internalLadder.length).toBe(21);
     expect(opsFamilyRows.length).toBe(7);
   });
 

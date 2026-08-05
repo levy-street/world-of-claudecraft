@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cameraOcclusion, lineOfSightClear, resolveMovement } from '../src/sim/colliders';
+import { lineOfSightClear, resolveMovement } from '../src/sim/colliders';
 import {
   ARENA_SLOT_COUNT,
   ARENA_X_MIN,
@@ -923,16 +923,6 @@ describe('arena: enclosing walls', () => {
         z: o.z,
       };
       expect(lineOfSightClear(sim.cfg.seed, inside, outside)).toBe(false);
-    }
-  });
-
-  it('reports camera occlusion at both side walls', () => {
-    const sim = makeWorld();
-    const o = arenaOrigin(0);
-    for (const side of [-1, 1]) {
-      const insideX = o.x + side * (DUNGEON_WALL_X - 1.5);
-      const outsideX = o.x + side * (DUNGEON_WALL_X + 4);
-      expect(cameraOcclusion(sim.cfg.seed, insideX, 2, o.z, outsideX, 2, o.z, 0.1)).toBeLessThan(1);
     }
   });
 

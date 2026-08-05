@@ -10,7 +10,7 @@ import { EVERGARDEN_PROPS } from '../sim/content/evergarden';
 import { hash2 } from '../sim/rng';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import {
   MAZE_ARCH_SCALE,
   MAZE_WALL_SCALE,
@@ -19,6 +19,7 @@ import {
   planGardenMazePieces,
 } from './garden_maze_core';
 import { GFX } from './gfx';
+import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from './worn_stone';
 
 export interface GardenFeaturesView {
   group: THREE.Group;
@@ -33,7 +34,7 @@ const GARDEN_ZMAX = 1260;
 // evergreen giants.
 const GREAT_TREE_URL = '/models/foliage/twisted_1.glb';
 let greatTreeScene: THREE.Group | null = null;
-registerPreload(
+registerDeferredPreload(() =>
   loadGltf(GREAT_TREE_URL).then((gltf) => {
     greatTreeScene = gltf.scene;
   }),
@@ -46,12 +47,12 @@ const MAZE_WALL_URL = '/models/props/maze_hedge_wall.glb';
 const MAZE_ARCH_URL = '/models/props/maze_hedge_arch.glb';
 let mazeWallScene: THREE.Group | null = null;
 let mazeArchScene: THREE.Group | null = null;
-registerPreload(
+registerDeferredPreload(() =>
   loadGltf(MAZE_WALL_URL).then((gltf) => {
     mazeWallScene = gltf.scene;
   }),
 );
-registerPreload(
+registerDeferredPreload(() =>
   loadGltf(MAZE_ARCH_URL).then((gltf) => {
     mazeArchScene = gltf.scene;
   }),
@@ -264,6 +265,9 @@ export function buildGardenFeatures(seed: number): GardenFeaturesView {
         m2 = source.clone();
         const c = (m2 as THREE.MeshStandardMaterial).color;
         if (c) c.multiply(new THREE.Color(0.62, 0.98, 0.64));
+        // giant specimen trunks take the coarse landmark bark grain
+        if (isBarkMaterialName(source.name))
+          applySurfaceDetail(m2 as THREE.MeshStandardMaterial, 'bark', GREAT_TREE_BARK_DETAIL);
         clipped.set(source.uuid, m2);
       }
       return m2;

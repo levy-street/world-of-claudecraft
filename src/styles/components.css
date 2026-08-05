@@ -2488,9 +2488,12 @@
   }
   /* Players (lifetime-XP) board: the base grid plus the trailing Book of
      Deeds title column (the Renown tab's .lb-deed-title treatment; the muted
-     cell ellipsizes, so a long title never widens the row). */
+     cell ellipsizes, so a long title never widens the row). The name cell now
+     also carries the `<Guild>` tag, so the two text columns SHARE the leftover
+     width (both minmax(0, ...) so either can ellipsize instead of widening the
+     row) with the name taking the larger part. */
   .lb-row-players {
-    grid-template-columns: 44px 1fr 44px 48px 96px 90px;
+    grid-template-columns: 44px minmax(0, 1.9fr) 44px 48px 96px minmax(0, 1fr);
   }
   .lb-row.lb-daily {
     grid-template-columns: 44px 1fr 96px;
@@ -2515,6 +2518,13 @@
     grid-template-columns: 44px 1fr 56px 110px;
   }
   .lb-realm {
+    color: var(--color-text-muted);
+    font-size: 11px;
+  }
+  /* The `<Guild>` tag beside a ranked player's name (player board + the sticky
+     standing row). Rides inside .lb-name like the Renown tab's realm tag, so the
+     shared row grid keeps its column set. */
+  .lb-guild {
     color: var(--color-text-muted);
     font-size: 11px;
   }
@@ -4580,6 +4590,13 @@
     background: linear-gradient(#8a6a26, #5a4413 55%, #473409);
     color: #ffe6a8;
   }
+  /* Coarse-pointer touch floor for the whole confirm family (the R40 dialog
+     made this modal a routine mobile surface; the prof-effect-btn idiom). */
+  @media (pointer: coarse) {
+    #confirm-dialog .cd-actions .btn {
+      min-height: 40px;
+    }
+  }
 
   .native-update-backdrop {
     position: fixed;
@@ -5053,6 +5070,17 @@
     opacity: 0.45;
     cursor: default;
   }
+  /* A row whose tool carries a wield requirement the viewer has not met yet
+     (vendor_row_gates.ts, the R22 advisory surface). The row itself stays
+     enabled and sells; only the .vi-sub requirement line marks the state, so
+     it takes the same error tint an unsatisfied cost takes just below rather
+     than the dim sub-line grey it would otherwise inherit. Information,
+     never decoration: the line states the requirement in text, and the tint
+     only says the requirement is the unmet one. The class name predates the
+     advisory turn; it is a style hook, not a claim the row refuses. */
+  .vendor-item.vendor-locked .vi-sub {
+    color: var(--color-text-error);
+  }
   /* An unaffordable fee (train and unbind rows emit .unaffordable) tints
      like an unsatisfied cost everywhere else in the language; the row's
      disabled opacity alone left the reason invisible. */
@@ -5061,6 +5089,70 @@
   }
   .vendor-item:disabled:hover {
     background: transparent;
+  }
+  /* Bulk ("Buy Stack") tile (#2374): a plain sibling tile beside the ordinary
+     single-unit buy tile (never a nested <button> inside it), so a gold top
+     accent is the only cue distinguishing the two at a glance. */
+  .vendor-item-bulk {
+    border-top: 2px solid var(--gold);
+  }
+  .vendor-item-bulk .vi-name {
+    color: var(--gold);
+  }
+  /* The 1x/5x/10x/custom purchase control row (phase 21): one strip of
+     toggle chips above the goods grid. The selected state rides
+     aria-pressed (the same attribute the painter sets), so style and
+     semantics cannot drift apart. */
+  .vendor-qty-row {
+    display: flex;
+    gap: 4px;
+    margin: 4px 0 6px;
+  }
+  .vendor-qty-btn {
+    flex: 0 0 auto;
+    min-width: 34px;
+    padding: 3px 8px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    cursor: var(--cursor-point);
+    background: transparent;
+    color: inherit;
+    font-family: var(--ui-font);
+    font-size: 11px;
+  }
+  .vendor-qty-btn:hover {
+    background: #ffffff20;
+  }
+  .vendor-qty-btn[aria-pressed="true"] {
+    border-color: var(--gold-dim);
+    background: #ffffff20;
+    color: var(--gold);
+  }
+  /* forced-colors drops the gold border/fill/text tints above to the same
+     system values as an unpressed chip, so the armed multiple would read by
+     colour alone. Pin the pressed chip to the system highlight pair (the
+     .ui-icon-art forced-color-adjust precedent in base.css; the
+     crafting-commission chip solves the same problem with a redundant
+     non-colour pip instead). */
+  @media (forced-colors: active) {
+    .vendor-qty-btn[aria-pressed="true"] {
+      background: Highlight;
+      color: HighlightText;
+      forced-color-adjust: none;
+    }
+  }
+  /* The count chip on a multiplied row: the control row's own {count}x
+     grammar in a muted read, sitting just before the whole-count price. */
+  .vendor-item .vi-qty {
+    margin-right: 4px;
+    opacity: 0.85;
+  }
+  @media (pointer: coarse) {
+    .vendor-qty-btn {
+      min-width: 40px;
+      min-height: 40px;
+      box-sizing: border-box;
+    }
   }
   .vendor-sell-junk {
     display: flex;
@@ -5266,10 +5358,26 @@
     flex: 1 1 0;
     min-width: 0;
   }
+  /* One block on purpose (a second same-specificity block for the cap
+     invited a cascade surprise): the flex column slot, plus the height cap.
+     The family rows are taller than the retired 10px grid, and the card is
+     pinned above the scrolling .crafting-body: without the cap the attuned
+     card (two-line rows with chips) runs past 500px and squeezes the recipe
+     pane to its 120px minimum even at 1600x900, and DESIGN.md names
+     1366x768 a supported target. So the LIST scrolls internally past 264px
+     (the mobile arm's card cap is the precedent; hud.mobile.css lifts this
+     cap because there the CARD is the one scroller). The collapsed list
+     opts back out below: its one-line rows are what the collapse buys, the
+     whole list fits, and capping it would just add a needless scrollbar. */
   .profession-identity-card .profession-skill-list {
     flex: 1 1 0;
     min-width: 0;
     align-self: start;
+    max-height: 264px;
+    overflow-y: auto;
+  }
+  .profession-identity-card .profession-skill-list.uniform-collapsed {
+    max-height: none;
   }
   .profession-identity-card h3 {
     margin: 0 0 8px;
@@ -5281,6 +5389,15 @@
   }
   .profession-archetype-crest {
     filter: drop-shadow(var(--art-shadow-lg));
+  }
+  /* Every card paragraph sits on the 12px narrative floor: without this the
+     return-cost line and the unattuned / syncing narratives (bare <p> with no
+     class rule) inherited the 16px document default, out-typing the card's
+     own 13px heading. :where() keeps this at zero class specificity so the
+     card's CLASSED paragraph rules (tutorial below) stay authoritative for
+     their own elements. */
+  :where(.profession-identity-card) p {
+    font-size: 12px;
   }
   .profession-identity-heading {
     display: flex;
@@ -5302,7 +5419,11 @@
     grid-template-columns: max-content 1fr;
     gap: 3px 8px;
     margin: 0 0 8px;
-    font-size: 11px;
+    /* 12px, never lower: DESIGN.md's authored-body floor. Phase 22 raised
+       the card's narrative text to it; the two settled exemptions below it
+       are the family's bordered 10px pill chips and its 11px tabular-nums
+       skill value (the Q28 family spec). */
+    font-size: 12px;
   }
   .profession-identity-summary dt {
     color: var(--color-text-muted);
@@ -5316,39 +5437,44 @@
     padding: 0;
     list-style: none;
   }
-  /* The list owns the column tracks and each row subgrids into them: auto-sized
-     role/cap columns would otherwise resize per row (each li its own grid), so
-     "Hobby" and "Major" rows drifted out of column with "Dormant knowledge". */
+  /* The skill rows reuse the professions window's row family (phase 22, the
+     Q28 ruling: .prof-craft-row head + chips anatomy, 13px names, the 11px
+     right-aligned tabular-nums value, bordered pill chips), so the card no
+     longer carries the app's only sub-11px data rows or its 9px uppercase
+     header. Card-scope overrides keep the compact inset rhythm without
+     forking the family; dormant rows dim through the family's own
+     .role-dormant name mute. */
   .profession-skill-list {
-    display: grid;
-    grid-template-columns: minmax(90px, 1fr) 38px minmax(72px, auto) minmax(88px, auto);
-    column-gap: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
   }
-  .profession-skill-row {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: subgrid;
+  .profession-identity-card .prof-craft-row {
     padding: 3px 0;
-    font-size: 10px;
+    border-radius: 0;
+    background: none;
   }
-  .profession-skill-header {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: subgrid;
-    padding: 2px 0 3px;
+  /* The uniform-chips caption (the option 3 collapse): when every row shares
+     one role and one cap the card states the pair once here and the rows
+     render craft plus skill only. Its .profession-skill-uniform-label child
+     is deliberately unstyled: plain caption text inheriting this rule's 12px
+     and muted color (the class is a structural and test hook, not an orphan
+     of the phase 14 kind). */
+  .profession-skill-uniform {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 0 0 5px;
+    margin-bottom: 3px;
     border-bottom: 1px solid var(--color-border-default);
+    font-size: 12px;
     color: var(--color-text-muted);
-    font-size: 9px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-  .profession-skill-row.role-dormant {
-    opacity: 0.72;
   }
   .profession-identity-tutorial,
   .profession-identity-nudges {
     color: var(--color-text-muted);
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.35;
   }
   /* One recipe card (the showcase inset-card idiom): the whole first row stays
@@ -5409,6 +5535,12 @@
      in the text are the actual signal (the tint is a redundant hint). */
   .crafting-reagent.unsat {
     color: var(--color-text-error);
+  }
+  /* The fine-substitution suffix (the UX pass): a tint over words that are
+     already the signal (the color-independence rule), never the signal
+     itself. */
+  .crafting-fine-sub {
+    color: var(--gold-dim);
   }
   /* The Craft affordance chip: the gold-gradient primary the mailbox send
      button established. It is decoration inside the row-button (the whole row
@@ -5832,6 +5964,18 @@
   }
   .bag-item:hover {
     filter: brightness(1.25);
+  }
+  /* An unknown-id stack (stale-client fallback cell) exposes no click action,
+     so it must not wear the click affordance: no hover lift, and the themed
+     arrow cursor WHENEVER the cell is not draggable (trade or vendor open).
+     While it IS draggable, the later .bag-item[draggable="true"] rule wins at
+     equal specificity by source order, deliberately: the grab cursor is the
+     honest affordance for the cell's one live action. */
+  .bag-item[aria-disabled="true"] {
+    cursor: var(--cursor-arrow);
+  }
+  .bag-item[aria-disabled="true"]:hover {
+    filter: none;
   }
   .bag-item .item-icon {
     /* a replaced element keeps its intrinsic size under width:auto even when
@@ -7051,6 +7195,88 @@
     background: linear-gradient(180deg, var(--gold), var(--gold-dim) 85%);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
   }
+  /* The slotted tool effect, under its profession's skill bar. Quieter than the
+     bar above it on purpose: it is a state readout, not progress, and it must
+     not compete with the thing the row is actually about. Wraps rather than
+     truncates, because both halves (which effect, how many charges) are the
+     whole content and a clipped one says nothing. */
+  .prof-effect {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 8px;
+    font-size: 11px;
+    color: var(--color-text-light);
+  }
+  .prof-effect-name {
+    color: var(--gold-dim);
+  }
+  /* Spent dims the whole line rather than recolouring it red: the effect being
+     used up is the expected end of its life, not a fault. */
+  .prof-effect-spent {
+    opacity: 0.65;
+  }
+  /* Tabular figures so a ticking charge count does not jitter its own row,
+     matching .prof-skill-value directly above it. */
+  .prof-effect-charges {
+    font-variant-numeric: tabular-nums;
+  }
+  /* The recharge cost preview beside the button (the UX pass): reads as a
+     price, so it takes the same gold the effect name carries, dimmed a
+     step under it, with tabular figures for the count (the charges rule
+     above). Previously an orphan class inheriting the row default (the
+     phase 14 QA). */
+  .prof-effect-price {
+    color: var(--gold-dim);
+    opacity: 0.85;
+    font-variant-numeric: tabular-nums;
+  }
+  /* The slot/recharge affordances the acquisition craft opened: compact
+     .btn variants on the effect line and in their own wrapping action row.
+     Padding narrows on fine pointers; coarse pointers get the explicit
+     40px target floor the sibling window buttons set (the delve board
+     idiom), since .btn itself carries no floor. */
+  .prof-effect-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    margin-top: 4px;
+  }
+  .prof-effect-btn {
+    margin-top: 0;
+    margin-right: 0;
+    padding: 2px 10px;
+    font-size: 11px;
+  }
+  /* The R40 prompt-mode chip on a live slot line: words, not hue, per the
+     color-independence rule (the chip IS the second signal). */
+  .prof-effect-mode {
+    font-size: 10px;
+    color: var(--color-text-light);
+    border: 1px solid currentcolor;
+    border-radius: 3px;
+    padding: 0 4px;
+    opacity: 0.85;
+  }
+  /* The "Ask each use" toggle beside the slot buttons: a real labeled
+     checkbox, baseline-aligned with the compact buttons. */
+  .prof-effect-mode-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--color-text-light);
+    cursor: pointer;
+  }
+  @media (pointer: coarse) {
+    .prof-effect-btn {
+      min-height: 40px;
+    }
+    /* The checkbox target grows with the buttons on coarse pointers. */
+    .prof-effect-mode-toggle {
+      min-height: 40px;
+    }
+  }
   .prof-pips {
     display: inline-flex;
     flex: none;
@@ -7174,7 +7400,12 @@
        Ignored, Blocked, Raid) whose labels are locale-sized, and the guild
        roster rows carry a name + rank + zone + last-seen line. */
     width: 760px;
-    max-width: calc(100vw - 24px);
+    max-width: calc(
+      100vw -
+      24px -
+      env(safe-area-inset-left, 0px) -
+      env(safe-area-inset-right, 0px)
+    );
     height: 480px;
     max-height: calc(100vh - 24px);
     flex-direction: column;
@@ -9372,6 +9603,16 @@
     border-radius: 2px;
     background: #b8e8a0;
   }
+  /* unrated-bout notice (practice / bot-backfill): a warning-tinted extra row.
+     Inverted triangle: r4 already owns the upright one, and the section rule
+     is a distinct glyph per row. */
+  .vcupb-rule-mark.unrated {
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    background: #e8b8a0;
+  }
+  .vcupb-rule.vcupb-unrated {
+    color: #e8c9a8;
+  }
   .vcupb-rule-text {
     min-width: 0;
   }
@@ -10496,12 +10737,355 @@
      the keybind view). Two columns on desktop; collapses to one on narrow/touch. */
   #options-menu.perf-wide {
     width: min(780px, calc(100vw - 32px));
+    /* The gilded corner ornament (its own section, below) is a ::before on this
+       SAME element; the base `.window` rule (layout.css) makes this element the
+       scrolling box (`overflow-y: auto`), which would carry the ornament's
+       pseudo-element away with the scrolled content instead of leaving it
+       pinned to the window frame (issue #2569). Keep this box itself
+       non-scrolling: options_window.ts sets its `display` to `flex` only while
+       this sub-view is open (mirroring #deeds-window), so flex-direction here
+       takes effect exactly then. The .perf-scroll wrapper below owns the
+       actual scroll instead. */
+    overflow: hidden;
+    flex-direction: column;
+  }
+  #options-menu.aura-wide {
+    width: min(780px, calc(100vw - 32px));
+  }
+  #options-menu.aura-placement-hidden {
+    display: none !important;
+  }
+  .aura-placement-toolbar {
+    position: fixed;
+    /* Body-level setup layer: keep it above touch #ui (80/90 while a window is
+       open) and its backdrop (85). Otherwise a live Desktop -> Touch switch can
+       strand this dialog below the HUD until the page is reloaded. */
+    z-index: 100;
+    right: max(12px, env(safe-area-inset-right, 0px));
+    bottom: max(12px, env(safe-area-inset-bottom, 0px));
+    left: max(12px, env(safe-area-inset-left, 0px));
+    display: flex;
+    box-sizing: border-box;
+    width: max-content;
+    max-width: calc(100vw - 24px);
+    max-height: calc(
+      var(--app-vh, 100vh) -
+      24px -
+      env(safe-area-inset-top, 0px) -
+      env(safe-area-inset-bottom, 0px)
+    );
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 auto;
+    padding: 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 8px;
+    background: var(--panel-bg);
+    box-shadow: 0 6px 24px var(--color-art-shadow);
+    overflow-y: auto;
+  }
+  .aura-placement-toolbar strong {
+    flex: 0 0 auto;
+    margin-right: 0;
+    color: var(--color-text-light);
+  }
+  .aura-placement-selection {
+    display: flex;
+    flex: 1 1 940px;
+    min-width: min(100%, 940px);
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .aura-placement-parts {
+    display: grid;
+    flex: 0 0 auto;
+    grid-template-columns: repeat(3, max-content);
+    gap: 8px;
+  }
+  .aura-placement-toolbar .btn.active {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+  .aura-placement-part {
+    min-height: 40px;
+  }
+  .aura-placement-reset,
+  .aura-placement-done {
+    min-width: 112px;
+    min-height: 40px;
+  }
+  .aura-placement-reset {
+    min-width: 160px;
+  }
+  .aura-placement-toolbar .set-row {
+    flex: 1 1 210px;
+    min-width: 190px;
+    margin: 0;
+  }
+  .aura-placement-sliders {
+    display: grid;
+    flex: 1 1 500px;
+    min-width: 460px;
+    max-width: 720px;
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+    align-items: center;
+    gap: 16px;
+  }
+  .aura-placement-sliders .set-row {
+    width: 100%;
+    min-width: 0;
+  }
+  .aura-placement-selector {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-text-muted);
+  }
+  .aura-placement-select {
+    min-width: 150px;
+    min-height: 40px;
+    color-scheme: dark;
+    color: var(--color-text-light);
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    background: var(--color-bg-input);
+  }
+  .aura-placement-select option {
+    background: var(--color-bg-dark);
+    color: var(--color-text-light);
+  }
+  .aura-placement-nudge {
+    position: relative;
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    padding: 0;
+  }
+  .aura-placement-actions {
+    display: grid;
+    grid-column: 2;
+    grid-template-columns: repeat(4, 40px);
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .aura-placement-footer {
+    display: grid;
+    flex: 1 0 100%;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: end;
+    gap: 16px;
+    padding-top: 10px;
+    border-top: 1px solid var(--color-border-showcase);
+  }
+  .aura-placement-footer-actions {
+    display: flex;
+    grid-column: 3;
+    align-items: center;
+    justify-self: end;
+    gap: 8px;
+  }
+  .aura-placement-action-hint {
+    grid-column: 1 / -1;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: normal;
+  }
+  .aura-placement-nudge::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 9px;
+    height: 9px;
+    border-top: 2px solid currentColor;
+    border-left: 2px solid currentColor;
+    translate: -50% -50%;
+  }
+  .aura-placement-left::before {
+    rotate: -45deg;
+  }
+  .aura-placement-up::before {
+    rotate: 45deg;
+  }
+  .aura-placement-down::before {
+    rotate: -135deg;
+  }
+  .aura-placement-right::before {
+    rotate: 135deg;
+  }
+  @media (max-width: 560px) {
+    .aura-placement-toolbar strong {
+      width: 100%;
+      margin-right: 0;
+      text-align: left;
+    }
+    .aura-placement-selector {
+      flex: 1 1 100%;
+      justify-content: flex-start;
+    }
+    .aura-placement-parts {
+      width: 100%;
+      grid-template-columns: 1fr;
+    }
+    .aura-placement-parts .btn {
+      width: 100%;
+    }
+  }
+  @media (max-width: 760px) {
+    .aura-placement-selection {
+      flex-basis: 100%;
+      min-width: 0;
+    }
+    .aura-placement-sliders {
+      flex: 1 0 100%;
+      width: 100%;
+      min-width: 0;
+      max-width: none;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    .aura-placement-footer {
+      grid-template-columns: 1fr;
+    }
+    .aura-placement-actions,
+    .aura-placement-footer-actions {
+      grid-column: 1;
+      justify-self: center;
+    }
+    .aura-placement-footer-actions {
+      display: grid;
+      width: 100%;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .aura-placement-footer-actions .btn {
+      width: 100%;
+      min-width: 0;
+    }
+  }
+  .aura-settings-intro {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+    color: var(--color-text-light);
+  }
+  .aura-settings-intro span {
+    color: var(--color-text-muted);
+  }
+  .aura-bulk-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .aura-bulk-actions .btn {
+    flex: 1;
+  }
+  .aura-settings-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+  .aura-settings-card {
+    margin: 0;
+  }
+  .aura-settings-chip {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--aura-color, var(--color-aura-rpg-gold));
+    margin: 4px 0 8px;
+  }
+  .aura-settings-chip img {
+    width: 36px;
+    height: 36px;
+    border: 2px solid currentColor;
+    border-radius: 6px;
+  }
+  .aura-settings-chip span {
+    color: var(--color-text-light);
+  }
+  .aura-order-row {
+    display: flex;
+    min-height: 40px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+    color: var(--color-text-muted);
+  }
+  .aura-order-buttons {
+    display: flex;
+    gap: 6px;
+  }
+  .aura-order-btn {
+    position: relative;
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    padding: 0;
+  }
+  .aura-order-btn::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    border-top: 2px solid currentColor;
+    border-left: 2px solid currentColor;
+    translate: -50% -50%;
+  }
+  .aura-order-up::before {
+    rotate: 45deg;
+  }
+  .aura-order-down::before {
+    rotate: -135deg;
+  }
+  .aura-settings-chip.aura-overlay-battle {
+    --aura-color: var(--color-aura-rpg-electric);
+  }
+  .aura-settings-chip.aura-overlay-death {
+    --aura-color: var(--color-aura-rpg-violet);
+  }
+  .aura-settings-chip.aura-overlay-victory {
+    --aura-color: var(--color-aura-rpg-gold);
+  }
+  .aura-position-label {
+    margin-top: 8px;
+    color: var(--color-text-light);
+    font-weight: 700;
+  }
+  .aura-reset-btn {
+    width: 100%;
+    margin-top: 8px;
+  }
+  @media (max-width: 680px) {
+    .aura-settings-grid {
+      grid-template-columns: 1fr;
+    }
   }
   /* Streamlined title bar for the perf panel (less bulky than the default chrome). */
   #options-menu.perf-wide .panel-title {
     font-size: 14px;
     padding-bottom: 5px;
     margin-bottom: 7px;
+  }
+  /* The one child that actually scrolls. Bottom padding reserves room for the
+     corner motif's ink reach past the footer buttons (moved off
+     #options-menu.perf-wide itself, which no longer scrolls; see above). */
+  #options-menu.perf-wide .perf-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding-bottom: 64px;
   }
   .perf-panel {
     display: flex;
@@ -10679,13 +11263,11 @@
       inset 0 1px 0 #ffffff14;
     /* The corner motif's ink reaches roughly 60px in from each corner (the
        84px mask box's spiral/tendril geometry, measured against the real
-       render). The base .window pads its body content (and so the footer,
-       its last child) by only --window-pad (12px), which put the footer
-       buttons under the bottom corners. Scoped padding-bottom override
-       clears it; left/right stay at --window-pad since the body's own
-       content never runs that close to the top corners (only the sticky
-       header does, handled below). */
-    padding-bottom: 64px;
+       render). The bottom clearance the footer buttons need past it lives on
+       the .perf-scroll wrapper instead of here (issue #2569): this element is
+       the ornament's own host and must stay non-scrolling (overflow: hidden,
+       above), so its own padding-bottom would sit on a box that never
+       scrolls and could not carry the footer's last pixels into view. */
   }
   #options-menu.perf-wide::before {
     content: "";

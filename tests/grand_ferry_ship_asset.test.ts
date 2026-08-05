@@ -40,8 +40,8 @@ const EXPORTER = path.join(
 // Re-mint deliberately (run the exporter, take the reported values) whenever
 // the art or the build intent changes. A surprise diff here means the shipped
 // boat is not the one this repo builds.
-const ASSET_BYTES = 224640;
-const ASSET_SHA256 = '1995439f005c88ea9b120b2c1458c8df20dcfd65c0e5d01d6e8df3d717748817';
+const ASSET_BYTES = 389540;
+const ASSET_SHA256 = '812b748a462069608a739d421c2ee0f17ca68de1f662c0fbde291e90145a505c';
 const ART_SHA256 = '9bfe1c2d385ce636488f01e0b4c31691e3aacbc5ef5b11e25e65e54d5fcf08d6';
 
 async function shippedTriangles(): Promise<number[][][]> {
@@ -113,6 +113,10 @@ describe('grand ferry shipped artifact', () => {
       'scripts/assets/grand_ferry_ship/source/grand_ferry_ship_art.glb',
     );
     expect(GRAND_FERRY_SHIP_SOURCE_FILES).toContain('scripts/assets/lib/mesh_collision.mjs');
+    expect(GRAND_FERRY_SHIP_SOURCE_FILES).toContain(
+      'scripts/assets/lib/glb_texture_compression_core.mjs',
+    );
+    expect(GRAND_FERRY_SHIP_SOURCE_FILES).toContain('scripts/assets/compress_glb_textures.mjs');
     expect(grandFerryShipSourceFingerprint(REPO_ROOT)).toMatch(/^[0-9a-f]{64}$/);
   });
 

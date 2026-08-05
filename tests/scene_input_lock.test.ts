@@ -359,8 +359,11 @@ describe('scene input lock frame coordination', () => {
       main.indexOf('const echoSamples ='),
     );
 
-    expect(offline.indexOf('runOfflineSceneInputTick(')).toBeLessThan(
-      offline.indexOf('offlineSim.tick()'),
+    expect(offline.indexOf('offlineSim.tick()')).toBeLessThan(
+      offline.indexOf('sceneInputLock.handleEvents(events)'),
+    );
+    expect(offline.indexOf('sceneInputLock.handleEvents(events)')).toBeLessThan(
+      offline.indexOf('acc -= DT'),
     );
     expect(offline.indexOf('offlineSim.tick()')).toBeLessThan(offline.indexOf('acc -= DT'));
     expect(online.indexOf('drainMirroredSceneInput(')).toBeLessThan(online.indexOf('resolveMove('));

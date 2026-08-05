@@ -343,6 +343,10 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 24,
     moveSpeed: 7,
     aggroRadius: 13,
+    // Hard tether: the Tunnelking fights on his own ground. Kiting him past 50
+    // yards of his spawn (the town square is 100+) sends him home to a full
+    // reset, adds swept with him.
+    hardLeashRadius: 50,
     aoePulse: { min: 12, max: 18, radius: 8, every: 9, name: 'Cave-In', school: 'physical' },
     summonAdds: { mobId: 'tunnel_rat', count: 2, atHpPct: [0.55, 0.3] },
     enrage: { belowHpPct: 0.3, dmgMult: 1.4, hasteMult: 1.3 },
@@ -562,15 +566,19 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
       'minor_mana_potion',
       'linen_pouch',
       'travelers_knapsack',
+      // Gathering tools, TIER 1 ONLY (#2343's rule: each zone hub stocks the
+      // tiers its own nodes use). Eastbrook is entirely tier-1 ground, so a
+      // tier-2 or tier-3 land tool opens nothing here; the marsh and the peaks
+      // sell the rungs their own veins need, and this counter used to be the
+      // one place in the world that sold the whole ladder at the front door.
+      // The tiered rods stay, and Wilkes is now the one counter carrying the
+      // WHOLE rod ladder rather than the only one carrying any of it: each
+      // zone's water has a required rod tier of its own now
+      // (professions/fishing_zones.ts), so the marsh and the peaks stock the
+      // rung they ask for and this counter is where you buy ahead.
       'copper_mining_pick',
-      'iron_mining_pick',
-      'mithril_mining_pick',
       'handaxe',
-      'felling_axe',
-      'ironbark_axe',
       'gathering_sickle',
-      'bronze_sickle',
-      'silverleaf_sickle',
       'ironreel_fishing_rod',
       'silverstream_fishing_rod',
     ],
@@ -713,16 +721,13 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     // its escalating make-amends return live here now (moved off Smith Haldren),
     // plus the repeatable forge work order.
     questIds: ['q_prof_attune_smith', 'q_prof_amends_smith', 'q_prof_workorder_forge'],
-    // Station stocking: thorium_ore is the premium reagent the forge
-    // station's own recipe (recipe_sootscale_mantle) consumes, so the master
-    // sells it alongside quartermaster_bree (zone3).
-    vendorItems: [
-      'copper_mining_pick',
-      'iron_mining_pick',
-      'mithril_mining_pick',
-      'smithing_flux',
-      'thorium_ore',
-    ],
+    // Station stocking: the forge master sells the tools and the vendor-only
+    // staple its station's recipes need. thorium_ore, the premium reagent
+    // recipe_sootscale_mantle consumes, is NOT here: it is a node yield, and no
+    // NPC stocks a gathered material (professions.md, Locked rulings). The
+    // pick is tier 1 alone, the tier Eastbrook's own veins use; the higher
+    // rungs moved to the hubs whose ground needs them.
+    vendorItems: ['copper_mining_pick', 'smithing_flux'],
     greeting: 'The forge answers to me, $C. Bring good ore and it will answer to you too.',
   },
   cook_marlow: {
@@ -757,19 +762,11 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     // anchor master. Attunement, make-amends return, and the repeatable loom work
     // order live here.
     questIds: ['q_prof_attune_outfitter', 'q_prof_amends_outfitter', 'q_prof_workorder_loom'],
-    // Station stocking: thorium_ore was stocked as the premium
-    // reagent of the loom's own recipe. An input rework later
-    // moved recipe_wardweave_cowl off osmium (silk plus premium herbs now),
-    // but the stock stays: removing a shipped vendor row is out of that
-    // rework's scope, and loom customers still buy it for the
-    // forge crafts next door.
-    vendorItems: [
-      'linen_pouch',
-      'travelers_knapsack',
-      'gathering_sickle',
-      'spool_of_thread',
-      'thorium_ore',
-    ],
+    // Station stocking: the loom master sells its own goods, the tier-1 sickle,
+    // and the vendor-only thread staple. thorium_ore used to sit here as a
+    // premium reagent; it is a node yield, and no NPC stocks a gathered
+    // material (professions.md, Locked rulings).
+    vendorItems: ['linen_pouch', 'travelers_knapsack', 'gathering_sickle', 'spool_of_thread'],
     greeting: 'Mind the threads, $C. A steady hand at the loom beats a strong one.',
   },
   tinker_gizzel: {
@@ -787,23 +784,16 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
       'q_prof_amends_bombardier',
       'q_prof_workorder_toolworks',
     ],
-    // Station stocking: the six premium reagents the toolworks
-    // recipes (TOOL_RECIPES) consume, previously sold only by
-    // quartermaster_bree (zone3).
-    vendorItems: [
-      'handaxe',
-      'felling_axe',
-      'ironbark_axe',
-      'bronze_sickle',
-      'silverleaf_sickle',
-      'simple_fishing_pole',
-      'thorium_ore',
-      'arcanite_bar',
-      'ashwood_log',
-      'elderwood_log',
-      'goldleaf_herb',
-      'sunpetal_herb',
-    ],
+    // Station stocking: the toolworks tools, plus arcanite_bar, the one premium
+    // reagent TOOL_RECIPES consume that a counter may carry. The other five
+    // (thorium_ore, ashwood_log, elderwood_log, goldleaf_herb, sunpetal_herb)
+    // are node yields, and no NPC stocks a gathered material (professions.md,
+    // Locked rulings): a tool above tier 3 is gathered up to, not bought.
+    // Tier-1 implements only, the tier Eastbrook's own stands and patches use.
+    // The tier-2 and tier-3 axes and sickles moved to the marsh and the peaks;
+    // the tier-1 sickle still sits on Ottilie rather than here, the shipped
+    // split between the two masters.
+    vendorItems: ['handaxe', 'simple_fishing_pole', 'arcanite_bar'],
     greeting:
       'Springs, sprockets, and sharp edges, $C: the toolworks has whatever your hands lack.',
   },
@@ -832,13 +822,21 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'A Trade for Every Hand',
     giverNpcId: 'foreman_odell',
     turnInNpcId: 'foreman_odell',
-    text: "Every soul in Eastbrook works a trade besides the sword, $N. There are ore veins in the rocks around the Copper Dig, southwest of town. Go swing a pick and work 5 of them yourself, mind; I'll know the difference.",
+    text: "Every soul in Eastbrook works a trade besides the sword, $N. There are ore veins in the rocks around the Copper Dig, southeast of town. Go swing a pick and work 5 of them yourself, mind; I'll know the difference.",
     completionText:
       "See? Ore gathered and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
     objectives: [{ type: 'gather', nodeType: 'ore', count: 5, label: 'Ore vein harvested' }],
     xpReward: 150,
     copperReward: 50,
     itemRewards: {},
+    // The quest says to go swing a pick, and under the always-require-tool rule
+    // (#2343) a bare-handed harvest is denied outright. A new character starts
+    // with zero copper, so the game's FIRST quest silently required a detour to
+    // earn 20 copper and buy a pick before its objective could move at all (the
+    // pick is a vendor staple, so this was a dead end only until the player
+    // found that out). questFallbackGrants hands the pick over on accept and
+    // re-grants it if it is ever lost, exactly like a prerequisite quest item.
+    requiredItems: ['copper_mining_pick'],
   },
   q_wolves: {
     id: 'q_wolves',
@@ -957,7 +955,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Stolen Supplies',
     giverNpcId: 'trader_wilkes',
     turnInNpcId: 'trader_wilkes',
-    text: 'Those bandits hit my last wagon and made off with four crates of goods — tools, salt, good Eastbrook linen. The crates are stacked around their camp in the southeast hills. Steal them back for me, would you?',
+    text: 'Those bandits hit my last wagon and made off with four crates of goods: tools, salt, good Eastbrook linen. The crates are stacked around their camp in the southwest hills. Steal them back for me, would you?',
     completionText: 'My crates! Barely a scratch on them. You are a wonder.',
     objectives: [
       { type: 'collect', itemId: 'supply_crate', count: 4, label: 'Stolen Supply Crate' },
@@ -1131,7 +1129,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Mogger Must Fall',
     giverNpcId: 'marshal_redbrook',
     turnInNpcId: 'marshal_redbrook',
-    text: 'Mogger has split carts, flattened fences, and killed enough livestock to empty half the Vale. Do not face him alone. Take two strong companions into the eastern meadow and put the brute down for good.',
+    text: 'Mogger has split carts, flattened fences, and killed enough livestock to empty half the Vale. Do not face him alone. Take two strong companions into the western meadow and put the brute down for good.',
     completionText:
       "Mogger dead at last. Eastbrook's fields are safer, and you leave the Vale with one more tale worth retelling.",
     objectives: [{ type: 'kill', targetMobId: 'mogger', count: 1, label: 'Mogger slain' }],
@@ -1168,6 +1166,9 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     copperReward: 0,
     itemRewards: {},
     shareable: false,
+    // An anchor master is an independent entry point (no q_prof_intro gate), so
+    // this one cannot lean on the intro quest's pick: it grants its own.
+    requiredItems: ['copper_mining_pick'],
     completionEffect: { type: 'attunePair', mode: 'new', pairId: 'weaponcrafting+armorcrafting' },
   },
   q_prof_attune_outfitter: {
@@ -1215,6 +1216,9 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     copperReward: 0,
     itemRewards: {},
     shareable: false,
+    // A herb objective, so this one grants the SICKLE, not the pick: a mining
+    // tool does not satisfy the herbalism tool gate.
+    requiredItems: ['gathering_sickle'],
     completionEffect: { type: 'attunePair', mode: 'new', pairId: 'engineering+alchemy' },
   },
   // Make-amends returns (Professions 2.0): repeatable, one per anchor
@@ -1251,7 +1255,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Threads Rejoined',
     giverNpcId: 'weaver_ottilie',
     turnInNpcId: 'weaver_ottilie',
-    text: 'Back at my loom after all. I hold no grudge, $N, but the thread remembers a hand that let it go, and the cost of taking it up again is measured out longer each time. Cull the webwood spiders crowding the western woods, and the labor will settle your hands before they touch good silk again.',
+    text: 'Back at my loom after all. I hold no grudge, $N, but the thread remembers a hand that let it go, and the cost of taking it up again is measured out longer each time. Cull the webwood spiders crowding the eastern woods, and the labor will settle your hands before they touch good silk again.',
     completionText:
       'Steady again. Leatherworking and Tailoring return to your hands as majors. Measure twice this time before you wander.',
     objectives: [
@@ -1270,7 +1274,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Back on the Stove',
     giverNpcId: 'cook_marlow',
     turnInNpcId: 'cook_marlow',
-    text: 'Well, look who is back at my pot. No hard feelings, $N, a kitchen always has room, but you know the tab runs longer every time you walk out on it. Go thin the wild boars in the east meadow, because honest sweat is the first ingredient, and it will remind your hands of the work.',
+    text: 'Well, look who is back at my pot. No hard feelings, $N, a kitchen always has room, but you know the tab runs longer every time you walk out on it. Go thin the wild boars in the west meadow, because honest sweat is the first ingredient, and it will remind your hands of the work.',
     completionText:
       'There is the old flavor. Alchemy and Cooking are back on your stove as majors. Stay a while this time.',
     objectives: [{ type: 'kill', targetMobId: 'wild_boar', count: 5, label: 'Wild Boar hunted' }],
@@ -1304,7 +1308,8 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
   // Repeatable craft work orders (Professions 2.0): a master takes a
   // stack of their craft's staple material off your hands for coin, a light
   // economy sink on a fixed cadence (repeatCadenceTicks WORK_ORDER_CADENCE_TICKS).
-  // The collect turn-in consumes the materials (turnInQuestCore removeItem).
+  // The collect turn-in consumes the materials (turnInQuestCore via
+  // removePreferFungible: plain stacks first, signed copies last).
   // copperReward is floor(0.5 * summed vendor sell value of the requested
   // materials); xpReward matches the only repeatable-quest precedent in the game,
   // the make-amends band (100), since no zone-2/3 repeatable exists to scale to.
@@ -1399,6 +1404,20 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     requiresQuest: 'q_prof_intro',
     repeatable: true,
     shareable: false,
+    // The same 30-minute window its four work-order siblings carry. The iron
+    // gate on the tool mint is the accept-time presence predicate
+    // (quests/quest_item_presence.ts, spanning bank/mail/escrow). The cadence
+    // bounds ONLY the turn-in loop (armCadence fires in turnInQuestCore;
+    // abandoning arms nothing), so the one transfer route left deliberately
+    // open (direct trade, R10) still moves one sickle per accept-abandon
+    // cycle. What actually bounds that route is the value ceiling: the tools
+    // carry noVendorSell and noMarketList, so a traded copy has no route to
+    // copper (guarded in tests/professions_starter_tools.test.ts).
+    repeatCadenceTicks: WORK_ORDER_CADENCE_TICKS,
+    // Also a herb objective, so also the sickle. This is the repeatable one, so
+    // it is the reason the tier-1 tools carry noVendorSell (items.ts): without
+    // that flag, accept-sell-abandon would be an unbounded copper faucet.
+    requiredItems: ['gathering_sickle'],
     completionEffect: { type: 'switchHobby' },
   },
 };
@@ -1463,19 +1482,24 @@ export const ZONE1_QUEST_ORDER = [
 // Guarded by tests/eastbrook_camp_spacing.test.ts. Row ORDER is a determinism
 // contract (see the CAMPS merge in data.ts): edit values, never reorder.
 export const ZONE1_CAMPS: CampDef[] = [
+  // Compass check for every placement comment and quest text below: the
+  // canonical convention statement lives higher in this file (the pois
+  // block: +z north, +x WEST, east is -x), and reading +X as east is what
+  // produced a run of mirrored quest directions; verify any direction claim
+  // against that note, never against raw signs.
   // Wolves: north woods
   { mobId: 'forest_wolf', center: { x: -27, z: 71 }, radius: 28.5, count: 6 },
   { mobId: 'forest_wolf', center: { x: 24, z: 70 }, radius: 26, count: 5 },
   // Nudged north to stay ahead of the widened wolf runs (q_greyjaw sends the
   // player to "the deep woods north of the wolf runs").
   { mobId: 'old_greyjaw', center: { x: 0, z: 100 }, radius: 8, count: 1 },
-  // Boars: east meadow
+  // Boars: west meadow
   { mobId: 'wild_boar', center: { x: 63, z: 16 }, radius: 26, count: 5 },
   { mobId: 'wild_boar', center: { x: 84, z: -27 }, radius: 23.5, count: 4 },
   { mobId: 'mogger', center: { x: 118, z: -26 }, radius: 5, count: 1 },
-  // Spiders: western woods
+  // Spiders: eastern woods
   { mobId: 'webwood_spider', center: { x: -68, z: 2 }, radius: 28.5, count: 6 },
-  // Murlocs: lake shore northwest, camp still straddles the waterline. This camp is
+  // Murlocs: lake shore northeast, camp still straddles the waterline. This camp is
   // radius-capped by Mirror Lake, not by its neighbours: the terrain flatten disc is
   // radius * 1.8, so a radius wide enough for 11.5 yd spacing drags a 59 yd flatten
   // across the lake and lifts its bed above swim depth (the lake stops needing a
@@ -1488,15 +1512,15 @@ export const ZONE1_CAMPS: CampDef[] = [
   // the documented exception and the lake guard live in
   // tests/eastbrook_camp_spacing.test.ts.
   { mobId: 'mudfin_murloc', center: { x: -75, z: 57 }, radius: 15, count: 5 },
-  // Kobolds: mine southwest. Held in place (the mine and its colliders are here).
+  // Kobolds: mine southeast. Held in place (the mine and its colliders are here).
   { mobId: 'tunnel_rat', center: { x: -82, z: -62 }, radius: 33, count: 8 },
-  // Bandits: southeast camp. Shifted off its own campfire collider and clear of the
+  // Bandits: southwest camp. Shifted off its own campfire collider and clear of the
   // boar meadow; the tents, crates and supply drops all stay inside the disc, and it
   // no longer merges with the outpost below.
   { mobId: 'vale_bandit', center: { x: 50, z: -72 }, radius: 28.5, count: 6 },
   { mobId: 'vale_bandit', center: { x: 90, z: -90 }, radius: 16, count: 5 },
   { mobId: 'gorrak', center: { x: 92, z: -92 }, radius: 2, count: 1 },
-  // Undead: ruins northeast. The chapel guardians below are the same population, so
+  // Undead: ruins northwest. The chapel guardians below are the same population, so
   // they may still flank the altar inside this disc.
   { mobId: 'restless_bones', center: { x: 82, z: 78 }, radius: 28.5, count: 6 },
   { mobId: 'captain_verlan', center: { x: 92, z: 90 }, radius: 4, count: 1 },
@@ -1554,11 +1578,11 @@ export const ZONE1_OBJECTS: GroundObjectDef[] = [
 // Roads from town toward each hub — used for terrain painting and the map.
 export const ZONE1_ROADS: { x: number; z: number }[][] = [
   [...EASTBROOK_LAYOUT.roads[0].points, { x: -8, z: 30 }, { x: -15, z: 55 }, { x: -2, z: 78 }], // north to wolves
-  [...EASTBROOK_LAYOUT.roads[1].points, { x: 30, z: 8 }, { x: 55, z: 12 }], // east to boars
-  [...EASTBROOK_LAYOUT.roads[2].points, { x: 30, z: -30 }, { x: 50, z: -50 }, { x: 65, z: -65 }], // southeast to bandits
-  [...EASTBROOK_LAYOUT.roads[3].points, { x: -35, z: 25 }, { x: -58, z: 48 }, { x: -66, z: 58 }], // northwest to lake
-  [...EASTBROOK_LAYOUT.roads[4].points, { x: -30, z: -28 }, { x: -55, z: -45 }, { x: -70, z: -55 }], // southwest to mine
-  [...EASTBROOK_LAYOUT.roads[5].points, { x: 35, z: 35 }, { x: 60, z: 60 }, { x: 78, z: 74 }], // northeast to ruins
+  [...EASTBROOK_LAYOUT.roads[1].points, { x: 30, z: 8 }, { x: 55, z: 12 }], // west to boars
+  [...EASTBROOK_LAYOUT.roads[2].points, { x: 30, z: -30 }, { x: 50, z: -50 }, { x: 65, z: -65 }], // southwest to bandits
+  [...EASTBROOK_LAYOUT.roads[3].points, { x: -35, z: 25 }, { x: -58, z: 48 }, { x: -66, z: 58 }], // northeast to lake
+  [...EASTBROOK_LAYOUT.roads[4].points, { x: -30, z: -28 }, { x: -55, z: -45 }, { x: -70, z: -55 }], // southeast to mine
+  [...EASTBROOK_LAYOUT.roads[5].points, { x: 35, z: 35 }, { x: 60, z: 60 }, { x: 78, z: 74 }], // northwest to ruins
 ];
 
 // ---------------------------------------------------------------------------
@@ -1595,7 +1619,6 @@ export const ZONE1_PROPS: ZonePropsDef = {
       z: EASTBROOK_LAYOUT.civic.wellBeacon.position.z,
       r: EASTBROOK_LAYOUT.civic.wellBeacon.radius,
       height: EASTBROOK_LAYOUT.civic.wellBeacon.height,
-      camGhost: false,
     },
   ],
   stalls: EASTBROOK_LAYOUT.market.stalls.map((stall) => ({
@@ -1609,7 +1632,6 @@ export const ZONE1_PROPS: ZonePropsDef = {
     d: stall.depth,
     height: stall.height,
     canopyVariant: stall.canopyVariant,
-    camGhost: false,
   })),
   mines: [{ x: -88, z: -68, rot: 0.8 }],
   docks: [{ x: -64, z: 60, rot: -2.2, hutLocal: { x: 2.8, z: 2.4, hw: 1.7, hd: 1.5 } }],
@@ -1665,7 +1687,6 @@ export const ZONE1_PROPS: ZonePropsDef = {
     d: bench.depth,
     rot: bench.rotation,
     height: 1,
-    camGhost: false,
   })),
   walls: EASTBROOK_LAYOUT.wall.segments.map((segment) => ({
     id: segment.id,
@@ -1676,7 +1697,6 @@ export const ZONE1_PROPS: ZonePropsDef = {
     d: segment.footprint.halfDepth * 2,
     rot: segment.footprint.rotation,
     height: segment.height,
-    camGhost: false,
     // The wing's tall lantern pillar sits gate-side on mirrored segments;
     // the collider builder places the pylon colliders from this.
     ...(wallSegmentMirrored(segment) ? { mirrored: true as const } : {}),

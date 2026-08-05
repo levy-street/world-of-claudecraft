@@ -122,6 +122,17 @@ describe('Eastbrook town visibility core', () => {
 });
 
 describe('Eastbrook town renderer', () => {
+  it('re-indexes exact generated surface tuples without changing triangle count', () => {
+    const template = eastbrookTownInternalsForTest.extractTemplate(
+      sourceAsset(false),
+      EASTBROOK_TOWN_ASSET_URLS[0],
+    );
+    const opaque = template.opaque;
+    expect(opaque).not.toBeNull();
+    expect(opaque?.getIndex()?.count).toBe(36);
+    expect(opaque?.getAttribute('position').count).toBe(24);
+  });
+
   it('places the exact canonical buildings and initialization-batches every low prop and wall chord', () => {
     const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 1.5, true);
     expect(view.group.name).toBe(EASTBROOK_TOWN_ROOT_NAME);
@@ -253,27 +264,50 @@ describe('Eastbrook town renderer', () => {
     }
   });
 
-  it('roof-ghosts only building volumes and restores them without touching microgeometry', () => {
+  it('roof-fades only building volumes to 20% and restores them without touching microgeometry', () => {
     const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
     const bank = EASTBROOK_LAYOUT.buildings[0];
     const bankGroup = view.group.getObjectByName(`eastbrookBuilding:${bank.id}`);
     const micro = view.group.getObjectByName('eastbrookTownMicroOpaqueBatch') as THREE.Mesh;
     if (!bankGroup || !micro) throw new Error('renderer fixture lost Eastbrook scene nodes');
     const bankMaterials = meshesOf(bankGroup).map((mesh) => mesh.material as THREE.Material);
+    const authored = bankMaterials.map((material) => ({
+      transparent: material.transparent,
+      opacity: material.opacity,
+      depthWrite: material.depthWrite,
+    }));
     const microMaterial = micro.material as THREE.Material;
 
-    view.update(45, 2, 45, bank.position.x, 2, bank.position.z, 200);
-    expect(bankMaterials.every((material) => !material.colorWrite && !material.depthWrite)).toBe(
-      true,
-    );
-    expect(microMaterial.colorWrite).toBe(true);
+    // Occlusion snaps to the ghost target on its first positive-dt frame.
+    view.update(45, 2, 45, bank.position.x, 2, bank.position.z, 200, 0.05);
+    expect(
+      bankMaterials.every(
+        (material, i) =>
+          material.transparent &&
+          material.depthWrite &&
+          Math.abs(material.opacity - authored[i].opacity * 0.2) < 1e-9,
+      ),
+    ).toBe(true);
+    // Further occluded frames remain at exactly 20% of the authored opacity.
+    view.update(45, 2, 45, bank.position.x, 2, bank.position.z, 200, 10);
+    expect(
+      bankMaterials.every(
+        (material, i) => Math.abs(material.opacity - authored[i].opacity * 0.2) < 1e-9,
+      ),
+    ).toBe(true);
+    expect(microMaterial.opacity).toBe(1);
     expect(microMaterial.depthWrite).toBe(true);
 
-    view.update(45, 30, 45, bank.position.x, 30, bank.position.z, 200);
-    expect(bankMaterials.every((material) => material.colorWrite && material.depthWrite)).toBe(
-      true,
-    );
-    expect(microMaterial.colorWrite).toBe(true);
+    view.update(45, 30, 45, bank.position.x, 30, bank.position.z, 200, 10);
+    expect(
+      bankMaterials.every(
+        (material, i) =>
+          material.transparent === authored[i].transparent &&
+          material.opacity === authored[i].opacity &&
+          material.depthWrite === authored[i].depthWrite,
+      ),
+    ).toBe(true);
+    expect(microMaterial.opacity).toBe(1);
   });
 
   it('uses Lambert vertex-color materials on Low without changing geometry or draw counts', () => {
@@ -338,11 +372,14 @@ describe('Eastbrook town renderer', () => {
 
     const position = mirrored.geometry.getAttribute('position');
     const normal = mirrored.geometry.getAttribute('normal');
-    const a = new THREE.Vector3().fromBufferAttribute(position, 0);
-    const b = new THREE.Vector3().fromBufferAttribute(position, 1);
-    const c = new THREE.Vector3().fromBufferAttribute(position, 2);
+    const index = mirrored.geometry.getIndex();
+    const a = new THREE.Vector3().fromBufferAttribute(position, index?.getX(0) ?? 0);
+    const b = new THREE.Vector3().fromBufferAttribute(position, index?.getX(1) ?? 1);
+    const c = new THREE.Vector3().fromBufferAttribute(position, index?.getX(2) ?? 2);
     const faceNormal = b.clone().sub(a).cross(c.clone().sub(a)).normalize();
-    const storedNormal = new THREE.Vector3().fromBufferAttribute(normal, 0).normalize();
+    const storedNormal = new THREE.Vector3()
+      .fromBufferAttribute(normal, index?.getX(0) ?? 0)
+      .normalize();
     expect(faceNormal.dot(storedNormal)).toBeGreaterThan(0);
   });
 
@@ -432,9 +469,9 @@ describe('Eastbrook town renderer', () => {
       (mesh) => mesh.userData.eastbrookMicroBatch || mesh.userData.eastbrookWallInstances,
     );
     expect(staticBatches).toHaveLength(6);
-    view.update(1000, 5, 1000, 1000, 5, 1000, 100);
+    view.update(1000, 5, 1000, 1000, 5, 1000, 100, 1);
     expect(staticBatches.every((mesh) => !mesh.visible)).toBe(true);
-    view.update(0, 5, 0, 0, 5, 0, 100);
+    view.update(0, 5, 0, 0, 5, 0, 100, 1);
     expect(staticBatches.every((mesh) => mesh.visible)).toBe(true);
   });
 
@@ -450,7 +487,7 @@ describe('Eastbrook town renderer', () => {
       microBatchCount: 0,
       wallBatchCount: 0,
     });
-    expect(() => view.update(0, 0, 0, 0, 0, 0, 100)).not.toThrow();
+    expect(() => view.update(0, 0, 0, 0, 0, 0, 100, 1)).not.toThrow();
   });
 
   it('recognizes only the exact built-in records replaced by the dedicated renderer', () => {
@@ -539,12 +576,12 @@ describe('Eastbrook repeated placement triangle budget', () => {
       budget.assets.find((asset) => asset.assetUrl.endsWith('eastbrook_wall_wing.glb')),
     ).toMatchObject({ instances: EASTBROOK_LAYOUT.wall.segments.length });
     expect(budget.maximumFoundationTriangles).toBe(EASTBROOK_LAYOUT.buildings.length * 12);
-    expect(budget.assetTriangles).toBe(28_258);
+    expect(budget.assetTriangles).toBe(29_038);
     expect(budget.maximumFoundationTriangles).toBe(72);
     expect(budget.maximumRuntimeTriangles).toBe(
       budget.assetTriangles + budget.maximumFoundationTriangles,
     );
-    expect(budget.maximumRuntimeTriangles).toBe(28_330);
+    expect(budget.maximumRuntimeTriangles).toBe(29_110);
     expect(
       budget.maximumRuntimeTriangles,
       JSON.stringify({

@@ -26,7 +26,7 @@ import {
 } from '../src/sim/player_motion';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity, type MoveInput } from '../src/sim/types';
-import { groundHeight, terrainHeight, waterLevelAt } from '../src/sim/world';
+import { groundHeight, isInWaterBody, terrainHeight, waterLevelAt } from '../src/sim/world';
 
 const SEED = 42;
 
@@ -96,7 +96,7 @@ function clientDeps(seed: number): PlayerMotionDeps {
 }
 
 const isDeep = (x: number, z: number, seed: number): boolean => {
-  const wl = waterLevelAt(x, z);
+  const wl = waterLevelAt(x, z, SEED);
   return Number.isFinite(wl) && groundHeight(x, z, seed) < wl - PLAYER_SWIM_DEPTH;
 };
 
@@ -106,8 +106,12 @@ const isDeep = (x: number, z: number, seed: number): boolean => {
 function findDeepLake(seed: number): { x: number; z: number; surfaceY: number } {
   for (let z = -300; z <= 300; z += 4) {
     for (let x = -300; x <= 300; x += 4) {
-      const wl = waterLevelAt(x, z);
+      const wl = waterLevelAt(x, z, SEED);
       if (
+        // scan DECLARED lakes only: the open sea is deep water too now, but a
+        // sea cell found first can sit 50+ yards from any walkable shore and
+        // the axis walk below never reaches land
+        isInWaterBody(x, z) &&
         Number.isFinite(wl) &&
         groundHeight(x, z, seed) < wl - PLAYER_SWIM_DEPTH &&
         !isBlocked(seed, x, z, 1)

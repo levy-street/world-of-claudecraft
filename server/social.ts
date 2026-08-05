@@ -134,6 +134,15 @@ export interface SocialDb {
   ): Promise<'ok' | 'full' | 'already_member' | 'no_guild'>;
   removeGuildMember(charId: number): Promise<void>;
   setGuildRank(charId: number, rank: GuildRank): Promise<void>;
+  // hand off the Guild Master title atomically: locks the guild row, re-checks
+  // that fromCharId is still the leader and toCharId is still a member of the
+  // SAME guild, then promotes/demotes both rows in one transaction, so two
+  // racing transfers can never both succeed and leave two Guild Masters.
+  transferGuildLeader(
+    guildId: number,
+    fromCharId: number,
+    toCharId: number,
+  ): Promise<'ok' | 'not_leader' | 'not_member' | 'no_guild'>;
   guildMembers(
     guildId: number,
   ): Promise<
@@ -185,6 +194,10 @@ export interface SocialTransport {
   deliver(characterId: number, events: SocialEvent[]): void;
   // re-send the full social panel state to a character if online
   pushSnapshot(characterId: number): void;
+  // An admin rename already committed in the DB. Update the online member's
+  // live Sim state and notify their client without re-reading or rebuilding
+  // the full social snapshot.
+  onGuildRenamed(characterId: number, guildId: number, oldName: string, newName: string): void;
   // a character's block set changed; refresh the in-memory chat filter
   onBlocksChanged(characterId: number, blockedIds: number[]): void;
   // a character's ignore set changed; refresh the in-memory chat filter
@@ -237,6 +250,8 @@ export type SocialEvent =
       classId?: PlayerClass;
     }
   | { type: 'guildInvite'; fromName: string; guildName: string }
+  | { type: 'guildInviteCancelled' }
+  | { type: 'guildRenamed'; guildId: number; newName: string }
   // Structured guild-calendar outcome; the client renders the visible line
   // from the code (the sim's mailResult convention, so no server English here).
   | { type: 'calendarResult'; code: CalendarResultCode }
@@ -262,7 +277,11 @@ export type MotdResultCode = 'set' | 'notInGuild' | 'notOfficer';
 const FRIEND_LIMIT = 50;
 const BLOCK_LIMIT = 50;
 const IGNORE_LIMIT = 50;
-const GUILD_MEMBER_LIMIT = 100;
+// Exported because the admin guild backoffice enforces the same roster cap: the
+// detail read pages the roster at it and the rename guard refuses above it. Two
+// copies would drift the day the cap moves, leaving guilds between the values
+// un-renameable and silently truncated in the dashboard.
+export const GUILD_MEMBER_LIMIT = 100;
 const GUILD_INVITE_TTL_MS = 60_000;
 const GUILD_MESSAGE_MAX = 200;
 // Guild billboard: the officer-set message pinned atop the Guild tab.
@@ -313,8 +332,15 @@ const RANK_LABEL: Record<GuildRank, string> = {
 export class SocialService {
   private pendingGuildInvites = new Map<
     number,
-    { guildId: number; guildName: string; fromName: string; expiresAt: number }
+    {
+      guildId: number;
+      guildName: string;
+      fromCharacterId: number;
+      fromName: string;
+      expiresAt: number;
+    }
   >();
+  private pendingGuildInviteesByGuild = new Map<number, Set<number>>();
 
   constructor(
     private readonly db: SocialDb,
@@ -405,6 +431,72 @@ export class SocialService {
 
   private info(charId: number, text: string, color = '#aaf'): void {
     this.tx.deliver(charId, [{ type: 'log', text, color }]);
+  }
+
+  private rememberGuildInvite(
+    inviteeId: number,
+    invite: {
+      guildId: number;
+      guildName: string;
+      fromCharacterId: number;
+      fromName: string;
+      expiresAt: number;
+    },
+  ): void {
+    this.takeGuildInvite(inviteeId);
+    this.pendingGuildInvites.set(inviteeId, invite);
+    let invitees = this.pendingGuildInviteesByGuild.get(invite.guildId);
+    if (!invitees) {
+      invitees = new Set<number>();
+      this.pendingGuildInviteesByGuild.set(invite.guildId, invitees);
+    }
+    invitees.add(inviteeId);
+  }
+
+  private takeGuildInvite(inviteeId: number) {
+    const invite = this.pendingGuildInvites.get(inviteeId);
+    if (!invite) return undefined;
+    this.pendingGuildInvites.delete(inviteeId);
+    const invitees = this.pendingGuildInviteesByGuild.get(invite.guildId);
+    invitees?.delete(inviteeId);
+    if (invitees?.size === 0) this.pendingGuildInviteesByGuild.delete(invite.guildId);
+    return invite;
+  }
+
+  // Called only after the admin DB transaction has committed. The bounded
+  // member ids are already known to that transaction, so this path performs
+  // no DB reads and never fans out full social snapshots. The cap below is
+  // re-applied here on purpose rather than trusted from the caller: the two
+  // bounds are independent, so dropping either one alone cannot turn this
+  // into an unbounded fan-out.
+  guildRenamed(
+    guildId: number,
+    oldName: string,
+    newName: string,
+    memberCharacterIds: readonly number[],
+  ): void {
+    const members = new Set<number>();
+    for (const id of memberCharacterIds) {
+      if (!Number.isInteger(id) || id <= 0) continue;
+      members.add(id);
+      if (members.size >= GUILD_MEMBER_LIMIT) break;
+    }
+    const invitees = [...(this.pendingGuildInviteesByGuild.get(guildId) ?? [])];
+    for (const inviteeId of invitees) {
+      const invite = this.takeGuildInvite(inviteeId);
+      if (!invite) continue;
+      const cancelled: SocialEvent[] = [{ type: 'guildInviteCancelled' }];
+      this.tx.deliver(inviteeId, cancelled);
+      if (invite.fromCharacterId !== inviteeId) {
+        this.tx.deliver(invite.fromCharacterId, cancelled);
+      }
+    }
+
+    for (const characterId of members) {
+      if (this.tx.isOnline(characterId)) {
+        this.tx.onGuildRenamed(characterId, guildId, oldName, newName);
+      }
+    }
   }
 
   // Resolve a target character by name for a friend/block/invite action,
@@ -740,9 +832,10 @@ export class SocialService {
       this.info(actor.characterId, `You have invited ${target.name} to the guild.`);
       return;
     }
-    this.pendingGuildInvites.set(target.id, {
+    this.rememberGuildInvite(target.id, {
       guildId: membership.guildId,
       guildName: membership.guildName,
+      fromCharacterId: actor.characterId,
       fromName: actor.name,
       expiresAt: this.now() + GUILD_INVITE_TTL_MS,
     });
@@ -753,8 +846,7 @@ export class SocialService {
   }
 
   async guildAccept(actor: SocialActor): Promise<void> {
-    const invite = this.pendingGuildInvites.get(actor.characterId);
-    this.pendingGuildInvites.delete(actor.characterId);
+    const invite = this.takeGuildInvite(actor.characterId);
     if (!invite || invite.expiresAt < this.now()) {
       this.err(actor.characterId, 'The guild invitation has expired.');
       return;
@@ -784,7 +876,7 @@ export class SocialService {
   }
 
   guildDecline(actor: SocialActor): void {
-    this.pendingGuildInvites.delete(actor.characterId);
+    this.takeGuildInvite(actor.characterId);
   }
 
   async guildLeave(actor: SocialActor): Promise<void> {
@@ -845,8 +937,24 @@ export class SocialService {
       this.err(actor.characterId, `${target.name} is not in your guild.`);
       return;
     }
-    await this.db.setGuildRank(target.id, 'leader');
-    await this.db.setGuildRank(actor.characterId, 'officer');
+    const result = await this.db.transferGuildLeader(
+      membership.guildId,
+      actor.characterId,
+      target.id,
+    );
+    if (result === 'no_guild') {
+      this.err(actor.characterId, 'That guild no longer exists.');
+      return;
+    }
+    if (result === 'not_leader') {
+      // lost a race with another transfer between the checks above and here
+      this.err(actor.characterId, 'Only the Guild Master may promote a new leader.');
+      return;
+    }
+    if (result === 'not_member') {
+      this.err(actor.characterId, `${target.name} is not in your guild.`);
+      return;
+    }
     await this.broadcastGuild(membership.guildId, [
       {
         type: 'log',
@@ -1188,7 +1296,7 @@ export class SocialService {
 
   // Drop a character's pending invite when they disconnect.
   forget(charId: number): void {
-    this.pendingGuildInvites.delete(charId);
+    this.takeGuildInvite(charId);
   }
 }
 

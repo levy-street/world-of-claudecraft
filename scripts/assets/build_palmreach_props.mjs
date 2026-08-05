@@ -19,7 +19,7 @@ import sharp from 'sharp';
 // 8.4M triangles on beach clutter. The shipped GLB was re-tiered via the
 // second pass above; verified indistinguishable at 8 yards before landing.
 const ITEMS = [{ src: 'coconut+3d+model.glb', out: 'fallen_coconuts.glb', target: 3000 }];
-const SRC_DIR = '/Users/demihenderson/Downloads/palmreach';
+const SRC_DIR = '<redacted-local-path>';
 const OUT_DIR = 'public/models/props';
 
 await MeshoptEncoder.ready;

@@ -164,7 +164,7 @@ describe('buildManifest', () => {
 
   it('keeps the release catalog, mount cues, Last Bell cues, and all UI cues together', () => {
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(220);
+    expect(keys.size).toBe(221);
     expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(62);
     for (const key of [
       'cast_lightning_bolt',
@@ -186,6 +186,7 @@ describe('buildManifest', () => {
       'player_eat_food',
       'player_drink_water',
       'player_drink_potion',
+      'mount_run_terrorspark_groundshaker',
     ]) {
       expect(keys.has(key), key).toBe(true);
     }
@@ -198,7 +199,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(220);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(221);
   });
 });
 

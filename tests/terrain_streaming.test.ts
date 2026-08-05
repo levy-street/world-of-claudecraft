@@ -91,13 +91,17 @@ describe('progressive terrain build', () => {
     const { zoneAt } = await import('../src/sim/data');
 
     const terrain = buildTerrain(20061);
+    terrain.update(0, 0, 0);
     const task = terrain.ensureZone(zoneAt(0, 0));
     await vi.runAllTimersAsync();
     await task;
 
-    // update() must not throw once zone chunks (added after the initial
-    // return) are folded into fog culling.
-    expect(() => terrain.update(0, 0, 1000)).not.toThrow();
+    // The first update cached an empty chunk list. Newly streamed chunks must
+    // invalidate that cache, even when camera and fog inputs are unchanged.
+    expect(() => terrain.update(0, 0, 0)).not.toThrow();
+    expect(terrain.group.children.every((child) => !child.visible)).toBe(true);
+    terrain.update(0, 0, 1000);
+    expect(terrain.group.children.some((child) => child.visible)).toBe(true);
   });
 
   it('freezes matrixAutoUpdate on every streamed-in chunk', async () => {

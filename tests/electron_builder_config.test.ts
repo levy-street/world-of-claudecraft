@@ -127,6 +127,13 @@ describe('desktopBuilderConfig', () => {
     const before = JSON.stringify(base);
     desktopBuilderConfig({ base, distribution: 'steam', steamAppId: '480' });
     desktopBuilderConfig({ base, distribution: 'website', mode: 'pack' });
+    desktopBuilderConfig({
+      base,
+      distribution: 'epic',
+      epicProductId: 'prod',
+      epicDeploymentId: 'dep',
+      epicClientId: 'client',
+    });
     expect(JSON.stringify(base)).toBe(before);
   });
 
@@ -146,7 +153,7 @@ describe('desktopBuilderConfig', () => {
     expect(config.directories.output).toBe('release-steam');
     expect(config.mac.target).toEqual([{ target: 'dir', arch: ['universal'] }]);
     expect(config.win.target).toEqual([{ target: 'dir', arch: ['x64'] }]);
-    expect(config.linux.target).toEqual([{ target: 'dir', arch: ['x64'] }]);
+    expect(config.linux?.target).toEqual([{ target: 'dir', arch: ['x64'] }]);
     // Non-target mac keys survive the override.
     expect(config.mac.hardenedRuntime).toBe(true);
   });
@@ -273,7 +280,7 @@ describe('desktopBuilderConfig', () => {
     const config = desktopBuilderConfig({ base, distribution: 'website', mode: 'pack' });
     expect(config.mac.target).toEqual(['dmg']);
     expect(config.win.target).toEqual(['nsis']);
-    expect(config.linux.target).toEqual(['AppImage']);
+    expect(config.linux?.target).toEqual(['AppImage']);
     const steamPack = desktopBuilderConfig({
       base,
       distribution: 'steam',
@@ -321,6 +328,140 @@ describe('desktopBuilderConfig', () => {
     expect(() => desktopBuilderConfig({ base, distribution: 'beta' })).toThrow(
       /unknown desktop distribution/,
     );
+  });
+
+  // Epic packaging channel (Phase 2): Steam-shaped third channel. Output is
+  // release-epic/, publish null, Win+Mac dir only (no linux), and the three
+  // EOS public ids are required stamps. Website and steam never need them.
+  const epicIds = {
+    epicProductId: 'epic-product-id',
+    epicDeploymentId: 'epic-deployment-id',
+    epicClientId: 'epic-client-id',
+  };
+
+  it('epic: nulls publish, stamps epic, targets dir layouts in release-epic (Win+Mac only)', () => {
+    const config = desktopBuilderConfig({ base, distribution: 'epic', ...epicIds });
+    expect(config.extraMetadata.wocDesktop).toEqual({
+      distribution: 'epic',
+      epicProductId: 'epic-product-id',
+      epicDeploymentId: 'epic-deployment-id',
+      epicClientId: 'epic-client-id',
+    });
+    expect(config.publish).toBeNull();
+    // The update-track split never touches Epic: publish stays nulled and a
+    // dev origin does not trip the production-channel guard.
+    const devEpic = desktopBuilderConfig({
+      base,
+      distribution: 'epic',
+      apiOrigin: 'http://localhost:8787',
+      ...epicIds,
+    });
+    expect(devEpic.publish).toBeNull();
+    expect(config.directories.output).toBe('release-epic');
+    expect(config.mac.target).toEqual([{ target: 'dir', arch: ['universal'] }]);
+    expect(config.win.target).toEqual([{ target: 'dir', arch: ['x64'] }]);
+    // D6: no linux epic target (EGS v1 is Win+Mac only). The linux block is
+    // dropped entirely so electron-builder never emits a linux artifact.
+    expect(config.linux).toBeUndefined();
+    // Non-target mac keys survive the override.
+    expect(config.mac.hardenedRuntime).toBe(true);
+    // No steam stamp leaks onto the epic channel.
+    expect(config.extraMetadata.wocDesktop).not.toHaveProperty('steamAppId');
+  });
+
+  it('epic: refuses a missing or blank WOC_EPIC_* id (no silent empty EOS stamp)', () => {
+    // Without all three public ids the packaged Epic build cannot init EOS and
+    // would degrade to null on every path; that mistake must die at build time.
+    // Server secrets (client secret) are deliberately not part of this stamp.
+    expect(() => desktopBuilderConfig({ base, distribution: 'epic' })).toThrow(/WOC_EPIC_/);
+    expect(() =>
+      desktopBuilderConfig({
+        base,
+        distribution: 'epic',
+        epicProductId: '',
+        epicDeploymentId: 'dep',
+        epicClientId: 'client',
+      }),
+    ).toThrow(/WOC_EPIC_/);
+    expect(() =>
+      desktopBuilderConfig({
+        base,
+        distribution: 'epic',
+        epicProductId: 'prod',
+        epicDeploymentId: '',
+        epicClientId: 'client',
+      }),
+    ).toThrow(/WOC_EPIC_/);
+    expect(() =>
+      desktopBuilderConfig({
+        base,
+        distribution: 'epic',
+        epicProductId: 'prod',
+        epicDeploymentId: 'dep',
+        epicClientId: '',
+      }),
+    ).toThrow(/WOC_EPIC_/);
+    // Whitespace-only is refused the same way as empty (set-but-blank CI cells).
+    expect(() =>
+      desktopBuilderConfig({
+        base,
+        distribution: 'epic',
+        epicProductId: '   ',
+        epicDeploymentId: 'dep',
+        epicClientId: 'client',
+      }),
+    ).toThrow(/WOC_EPIC_/);
+    // Pack mode gets no exemption: a local epic pack wants the same guard.
+    expect(() => desktopBuilderConfig({ base, distribution: 'epic', mode: 'pack' })).toThrow(
+      /WOC_EPIC_/,
+    );
+  });
+
+  it('stamps epic ids for the epic channel only; website and steam never stamp them', () => {
+    const stamped = desktopBuilderConfig({ base, distribution: 'epic', ...epicIds });
+    expect(stamped.extraMetadata.wocDesktop.epicProductId).toBe('epic-product-id');
+    expect(stamped.extraMetadata.wocDesktop.epicDeploymentId).toBe('epic-deployment-id');
+    expect(stamped.extraMetadata.wocDesktop.epicClientId).toBe('epic-client-id');
+    // Website and steam builds need no Epic env and must not carry epic stamps
+    // even if the caller happens to pass the values (D3, D24).
+    const website = desktopBuilderConfig({ base, distribution: 'website', ...epicIds });
+    expect('epicProductId' in website.extraMetadata.wocDesktop).toBe(false);
+    expect('epicDeploymentId' in website.extraMetadata.wocDesktop).toBe(false);
+    expect('epicClientId' in website.extraMetadata.wocDesktop).toBe(false);
+    expect(() => desktopBuilderConfig({ base, distribution: 'website' })).not.toThrow();
+    const steam = desktopBuilderConfig({
+      base,
+      distribution: 'steam',
+      steamAppId: '480',
+      ...epicIds,
+    });
+    expect('epicProductId' in steam.extraMetadata.wocDesktop).toBe(false);
+    expect(() =>
+      desktopBuilderConfig({ base, distribution: 'steam', steamAppId: '480' }),
+    ).not.toThrow();
+  });
+
+  it('epic pack mode strips arch matrix; still no linux target', () => {
+    const epicPack = desktopBuilderConfig({
+      base,
+      distribution: 'epic',
+      mode: 'pack',
+      ...epicIds,
+    });
+    expect(epicPack.mac.target).toEqual(['dir']);
+    expect(epicPack.win.target).toEqual(['dir']);
+    expect(epicPack.linux).toBeUndefined();
+    expect(epicPack.directories.output).toBe('release-epic');
+    expect(epicPack.publish).toBeNull();
+  });
+
+  it('epic: does not re-include steamworks.js (channel isolation)', () => {
+    const epic = desktopBuilderConfig({ base, distribution: 'epic', ...epicIds });
+    expect(epic.files ?? []).not.toContain('node_modules/steamworks.js/**');
+    expect(epic.asarUnpack ?? []).not.toContain('node_modules/steamworks.js/dist/**');
+    // files/asarUnpack stay arrays so Phase 4 can append EOS native paths.
+    expect(Array.isArray(epic.files)).toBe(true);
+    expect(Array.isArray(epic.asarUnpack)).toBe(true);
   });
 });
 

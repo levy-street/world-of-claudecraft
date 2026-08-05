@@ -67,6 +67,7 @@ export class FakeElement extends EventTarget {
   parentElement: FakeElement | null = null;
   textContent: string | null = null;
   title = '';
+  draggable = false;
   type = '';
   value = '';
   placeholder = '';

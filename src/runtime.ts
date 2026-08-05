@@ -95,6 +95,18 @@ export interface DesktopBridge {
   // cancel the outstanding Steam auth ticket promptly (Valve's CancelAuthTicket
   // contract). Absent on older shells: feature-check before use.
   steamLinkSettled?(): Promise<unknown>;
+  // An Epic link proof (string) for POST /api/epic/link, or null when Epic is
+  // unavailable (website/steam build, no launcher session, adapter missing).
+  // Feature-check before use like the other post-trio methods.
+  epicLinkProof?(): Promise<string | null>;
+  // Whether the shell can mint Epic link proofs at all (false on packaged
+  // website/steam builds). Capability may be true even when epicLinkProof
+  // returns null without native EOS. Absent on older shells: fall back to
+  // epicLinkProof presence. Feature-check before use.
+  epicLinkSupported?(): Promise<boolean>;
+  // Signals that the Epic link POST settled so any cancelable adapter handle
+  // can be released. Absent on older shells: feature-check before use.
+  epicLinkSettled?(): Promise<unknown>;
 }
 
 export function desktopBridge(): DesktopBridge | null {

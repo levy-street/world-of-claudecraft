@@ -46,6 +46,11 @@ export const hudChromeStrings = {
     help: 'Recovery: /unstuck starts a stationary countdown to move you to a nearby reachable safe spot.',
     helpAtGraveyard:
       "Recovery: /unstuck starts a stationary countdown, then sends your spirit to the nearest graveyard. Returning through the Pale Keeper requires The Keeper's Toll.",
+    // v0.32.1: Unstuck no longer kills, and charges Unstuck Sickness instead of routing
+    // through the Pale Keeper. New key, because the shipped locale rows for the one above
+    // still promise the old outcome.
+    helpUnstuckSickness:
+      'Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. It leaves you with Unstuck Sickness for up to 5 minutes.',
     started:
       'Unstuck in {seconds} seconds. Moving, fighting, taking damage, or starting another action cancels it.',
     countdown: 'Unstuck: {seconds}',
@@ -54,6 +59,12 @@ export const hudChromeStrings = {
       "Your spirit has returned to the nearest graveyard. Speak to the Pale Keeper to accept The Keeper's Toll.",
     revivedAtGraveyard:
       "You have been returned to the nearest graveyard and revived. The Keeper's Toll weighs on you.",
+    // The two v0.32.1 outcomes. Separate keys from the two above for the same reason as
+    // helpUnstuckSickness: the shipped translations there name The Keeper's Toll.
+    movedToGraveyard:
+      'You have been moved to the nearest graveyard. Unstuck Sickness weighs on you.',
+    revivedAtGraveyardUnstuck:
+      'You have been moved to the nearest graveyard and revived. Unstuck Sickness weighs on you.',
     cancelledMoved: 'Unstuck cancelled because you moved.',
     cancelledDamaged: 'Unstuck cancelled because you took damage.',
     cancelledCombat: 'Unstuck cancelled because you entered combat.',
@@ -455,6 +466,7 @@ export const hudChromeStrings = {
     leaderboard: 'Ranks',
     dailyRewards: 'Store',
     deeds: 'Deeds',
+    mounts: 'Mounts',
     professions: 'Professions',
     nameplates: 'Names',
     haptics: 'Haptics',
@@ -626,6 +638,21 @@ export const hudChromeStrings = {
     // mirrored yet ({name} = dungeon name).
     heroicLocked: 'You are locked to Heroic {name}.',
   },
+  // In-rift HUD tracker (issue #2655): floor position + a live "closes in"
+  // countdown on the rift's backing world event. Digits run through
+  // formatNumber; the clock templates are pre-built mm:ss / h:mm:ss so the
+  // separator stays a plain colon, like every other HUD clock (vcup, finder).
+  riftTracker: {
+    title: 'Rift',
+    // {current}/{total} are 1-based floor numbers (e.g. "Floor 2 of 5").
+    floor: 'Floor {current} of {total}',
+    // {time} is a pre-built clock string (see clockMs/clockHms below). This is
+    // about the overworld ENTRANCE closing to new parties, not the run ending:
+    // an in-progress group keeps playing out past this deadline.
+    closesIn: 'Closes in {time}',
+    clockMs: '{minutes}:{seconds}',
+    clockHms: '{hours}:{minutes}:{seconds}',
+  },
   // Eight-point compass abbreviations as drawn on the heading strip. Each locale
   // overrides with its own established compass abbreviations (e.g. West = "O" in
   // Spanish, "O" in French/Italian/Portuguese, "З" in Russian).
@@ -660,6 +687,33 @@ export const hudChromeStrings = {
     percent: '{value}%',
     petAbility: '{pet}: {ability}',
     melee: 'Melee',
+    // Each meter panel is movable (drag its title bar) and resizable (drag the
+    // corner grip), and the Healing / Threat meters can leave the tabbed window
+    // for one of their own.
+    move: 'Drag to move this meter',
+    resize: 'Drag to resize this meter',
+    dock: 'Dock this meter back into the meters window',
+    // Right-click menu on a meter tab's name. {meter} is the meter's own label
+    // ("Healing", "Threat"), so the row reads as the action on that meter.
+    separate: 'Separate {meter}',
+    regroup: 'Regroup {meter}',
+  },
+  targetAuras: {
+    title: 'Target Auras',
+    keybindLabel: 'Target Buffs and Debuffs',
+    all: 'All',
+    debuffs: 'Debuffs',
+    buffs: 'Buffs',
+    unlock: 'Move target aura window',
+    lock: 'Lock target aura window',
+    configureRows: 'Configure target auras',
+    fewerRows: 'Prefer fewer aura rows',
+    moreRows: 'Prefer more aura rows',
+    visibleRows: 'Preferred aura rows: {count}',
+    showSources: 'Show aura sources',
+    hideSources: 'Hide aura sources',
+    ownAura: 'Your aura',
+    opacity: 'Aura opacity: {percent}',
   },
   // Pet action bar disabled-state tooltips: the feed/heal-pet button stays
   // visible (never hidden) while it cannot currently be used, so a hunter
@@ -689,14 +743,47 @@ export const hudChromeStrings = {
     // Rideable mounts: Z dismounts normally and summons the lesson steed during training.
     mount: 'Mount / Dismount',
   },
-  // Rideable mount labels and the shared reins affordance. Names and descriptions
-  // come from the reference cards
+  // On-bar action-bar key-binding mode (issue #1238): the Key Bindings menu's
+  // single "Edit action bar keys" entry (replacing the wall of per-slot rebind
+  // rows) plus the on-bar banner it opens. Wordy (M16): the five non-Latin
+  // fills land in this same change, except `done`, which is short enough to
+  // stay pending like an ordinary contributor add.
+  actionBar: {
+    editKeys: 'Edit action bar keys',
+    editKeysHint: 'Click a slot on the action bar, then press a key to bind it.',
+    bannerHint: 'Click a slot, then press a key to bind it. Click Done when finished.',
+    bannerCapturing: 'Press a key to bind this slot...',
+    boundToKey: 'Bound to {key}.',
+    reset: 'Reset',
+    done: 'Done',
+    cancel: 'Cancel',
+    resetConfirmTitle: 'Reset action bar keys?',
+    resetConfirmBody:
+      'The first bar returns to its default keys. The second and third bars become unbound. This cannot be undone.',
+  },
+  // The character sheet's mount picker (mount_picker.ts; the old Mounts window
+  // is retired, its keys stay per the retired-but-translated chrome precedent).
+  // Names and descriptions come from the reference cards
   // (src/sim/content/mounts.ts carries the canonical English names for the sim
   // side); useToRide is shared by every reins tooltip surface.
   mounts: {
+    title: 'Mounts',
+    close: 'Close',
+    select: 'Select',
+    selected: 'Selected',
+    riding: 'Riding',
     // Compact label inside the mobile mount/dismount button in index.html/play.html.
     mount: 'Mount',
+    dismount: 'Dismount',
     useToRide: 'Use to summon this mount.',
+    emptyTitle: 'No mounts collected',
+    emptyStableHint:
+      'Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.',
+    emptyDropHint: 'Rarer mounts drop from heroic dungeon bosses and Rift completions.',
+    clickManage: 'Click to choose your mount',
+    rarity_common: 'Common',
+    rarity_rare: 'Rare',
+    rarity_epic: 'Epic',
     spec_speed: '+{pct}% extra mobility',
     name_valorsteed: 'Valorsteed',
     name_grag_bear: 'Goliath Grag-Bear',
@@ -705,6 +792,7 @@ export const hudChromeStrings = {
     name_shadowjump_toad: 'Kama-Kage the Shadow-Jump Toad',
     name_stormfeather_griffin: 'Sky-Reach Stormfeather',
     name_thunderstrut_gobbler: 'Thunderstrut the Grand Gobbler',
+    name_terrorspark_groundshaker: 'Terrorspark Groundshaker',
     desc_valorsteed: 'A hardy, sure-footed steed that provides enhanced travel speed.',
     desc_grag_bear: 'A hardy, sure-footed bear that provides enhanced travel speed.',
     desc_stalkglider_snail: 'A hearty, slow-burning snail that provides enhanced travel speed.',
@@ -716,6 +804,8 @@ export const hudChromeStrings = {
       'A regal storm griffin that stalks the ground on rune-shod talons, wings furled.',
     desc_thunderstrut_gobbler:
       'A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead.',
+    desc_terrorspark_groundshaker:
+      'A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.',
   },
   // The riding lesson at the Highwatch stables (q_riding_lessons): Stablemaster
   // Marla lends the player a training Valorsteed for the paddock race. Finishing
@@ -724,6 +814,7 @@ export const hudChromeStrings = {
   // the current flow starts on the glowing race platform.
   mountTraining: {
     mountPrompt: 'Press {key} to mount the training Valorsteed.',
+    ownedMountPrompt: 'Your reins are in your bags. Use them to ride.',
     // Shown once the riding lesson is turned in. The quest teaches riding but
     // awards no reins; Marla sells the Valorsteed item separately.
     buyReinsPrompt:
@@ -779,6 +870,10 @@ export const hudChromeStrings = {
     },
     awayNote: 'If both sides fly the same banner, the away side plays the inverted palette.',
     rolesHeading: 'Sport role',
+    // Shown under the role picker in the 1v1/2v2 brackets, where the sim seats
+    // every fighter as All-Rounder regardless of the pick (issue 2767).
+    rolesSmallBracketNote:
+      'In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Deeds that call for the 3v3 bracket or larger cannot be earned here.',
     role: {
       allrounder: {
         name: 'All-Rounder',
@@ -821,6 +916,9 @@ export const hudChromeStrings = {
     guildBoardWl: '{wins} W, {losses} L',
     practice: 'Practice vs. Bots',
     practiceNote: 'Starts a private bot match on your own practice pitch right away.',
+    // Practice bouts are deliberately unrated; shown beside the practice button.
+    practiceUnratedNote:
+      'Practice bouts are unrated: standings and Book of Deeds progress do not count.',
     // Region indicator: players currently off in a private practice instance.
     practicingNow: 'Practicing now ({count}):',
     // mm:ss; {seconds} is pre-padded to two digits.
@@ -872,6 +970,16 @@ export const hudChromeStrings = {
       rule5: 'Anyone can walk up and cheer you on from the stands.',
       kitHeading: 'Your kit',
       kitNote: 'These moves replace your class abilities for the match.',
+      // Extra rules-panel row for a bot-backfilled queued bout (issue 2767).
+      // Says "deeds for goals, saves, and clean sheets" rather than all deed
+      // progress: the debut deeds deliberately still credit a backfilled bout.
+      unratedNote:
+        'Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.',
+      // The same row for a private practice bout, which credits NO Cup deed at
+      // all (the debut deeds gate on the queued-bout predicate), so this copy
+      // is the blanket statement the backfill copy cannot make.
+      practiceUnratedNote:
+        'This is a practice bout, so it is unrated: standings do not move, and Book of Deeds progress does not count.',
       rosterHeading: 'The team sheet',
       // Row tags on the team sheet.
       you: 'You',
@@ -1148,6 +1256,51 @@ export const hudChromeStrings = {
     badges: {
       backgrounded: 'Backgrounded',
       offline: 'Offline',
+    },
+  },
+  auraOverlay: {
+    title: 'Auras',
+    currentClass: 'Current class: {class}',
+    previewHint: 'Use Setup Positions to move an aura without covering the menu.',
+    noProcs: 'No supported proc is available for this character.',
+    enabled: 'Show Aura',
+    icon: 'Spell Icon',
+    arcs: 'Side Crescents',
+    groundRing: 'Ground Ring',
+    groundRingSpellOrder: 'Ground Ring: Spell Order',
+    crescentsSpellOrder: 'Side Crescents: Spell Order',
+    size: 'Size',
+    iconSize: 'Icon Size',
+    crescentBlockSize: 'Crescent Block Size',
+    groundRingBlockSize: 'Ground Ring Block Size',
+    opacity: 'Opacity',
+    color: 'Color',
+    allOn: 'All On',
+    allOff: 'All Off',
+    reposition: 'Setup Positions',
+    positioning: 'Positioning: {aura}',
+    selectAura: 'Aura',
+    done: 'Done',
+    moveLeft: 'Move Left',
+    moveUp: 'Move Up',
+    moveDown: 'Move Down',
+    moveRight: 'Move Right',
+    moveEarlier: 'Move spell inward',
+    moveLater: 'Move spell outward',
+    screenPosition: 'Screen Position',
+    spellOrder: 'Spell Order',
+    reset: 'Reset Position',
+    spellPosition: 'Spell order {position} / {count}',
+    procs: {
+      revenge: 'Revenge!',
+      battleTrance: 'Battle Trance',
+      overpowerCharge: 'Redhand Empowerment',
+      suddenDeath: 'Sudden Death',
+      victoryRush: 'Victory Rush',
+      enrage: 'Mayhem: Enraged',
+      heatingUp: 'Heating Up',
+      arcaneCharge: 'Arcane Charges',
+      aetherRush: 'Aether Rush',
     },
   },
   playerCard: {
@@ -1466,6 +1619,13 @@ export const hudChromeStrings = {
     twoFactorRecoveryHint:
       'Each code works once. Store them somewhere safe: they are the only way back in if you lose your authenticator app.',
     twoFactorDownloadCodes: 'Download Codes',
+    // Recovery-codes download file (plain text): formatRecoveryCodesFile in
+    // src/ui/two_factor_setup.ts builds the downloadable file from these.
+    recoveryCodesFileHeader: '{brand} recovery codes',
+    recoveryCodesFileAccount: 'Account: {username}',
+    recoveryCodesFileHint:
+      'Each code can be used once if you lose access to your authenticator app.',
+    recoveryCodesFileWarn: 'Keep this file somewhere safe and private.',
     twoFactorDone: 'Done',
     twoFactorDisableHint:
       'Enter your password to turn two-factor off. Your recovery codes will be discarded.',
@@ -1695,6 +1855,7 @@ export const hudChromeStrings = {
     filterArmor: 'Armor',
     filterConsumable: 'Consumables',
     filterMaterial: 'Materials',
+    filterTool: 'Tools',
     filterQuest: 'Quest',
     filterMount: 'Mounts',
     sortAria: 'Sort bag items',
@@ -2018,6 +2179,10 @@ export const hudChromeStrings = {
   // own routing: DISENCHANT_MATERIAL_BY_QUALITY for the three arcane tiers,
   // ARMOR_SECONDARY_BY_TYPE / TIMBER_WEAPON_TYPES for the five resonants.
   materialHint: {
+    // One key shared by all nine fine grades: the sentence is true of every
+    // one of them, and nine copies would be nine chances to drift.
+    fineGrade:
+      'Fine grade. Gathered from a full-tier vein with a tool ranked above the material, and counts as the ordinary version wherever one is required.',
     arcaneDust: 'Enchanting reagent. Disenchanted from common and uncommon gear.',
     arcaneEssence: 'Enchanting reagent. Disenchanted from rare gear.',
     arcaneShard: 'Enchanting reagent. Disenchanted from epic and legendary gear.',
@@ -2232,6 +2397,20 @@ export const hudChromeStrings = {
       'Link your Steam account from the desktop app to mirror the deeds you earn into Steam achievements.',
     noTicket: 'Steam did not provide a link ticket. Start Steam, then try again.',
   },
+  // Epic account link (the deeds achievement mirror), the stacked card beside
+  // the Steam one on character select. Renders only when the server's
+  // /api/status advert says the Epic surface is lit; linking itself is
+  // desktop epic-channel only (the shell mints the proof), website/steam/web
+  // show status + Unlink. Linking is never a sign-in method (D2).
+  epic: {
+    title: 'Epic',
+    link: 'Link Epic',
+    unlink: 'Unlink Epic',
+    linked: 'Linked to Epic account {id}',
+    benefits:
+      'Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.',
+    noProof: 'Epic did not provide a link proof. Launch from the Epic Games Store, then try again.',
+  },
   // The Ravenpost mailbox window + envelope indicator. Authored letter
   // sender/subject/body localize via entities.letters.* (world_entity_i18n),
   // not here; these are the window chrome and the structured mailResult lines.
@@ -2281,6 +2460,8 @@ export const hudChromeStrings = {
       noRecipient: 'No one by that name holds a mailbox here.',
       tooManyParcels: 'A letter carries at most {count} parcels.',
       noMailQuestItems: 'You cannot mail quest items.',
+      // Wordy, M16: the five non-Latin fills land in this same change.
+      noMailBound: 'That item is bound and cannot be mailed.',
       notEnoughItems: 'You do not have that many to send.',
       cantAffordPostage: 'You cannot afford the postage.',
       recipientBoxFull: 'Their mailbox is full.',
@@ -2520,7 +2701,8 @@ export const hudChromeStrings = {
       herb: 'Herb Patch',
     },
     // Tooltip requirement line for tier 2+ nodes; doubles as the locked-state
-    // line (red while the viewer's owned-best tool falls short).
+    // line (red while the viewer's usable tool falls short: the R22
+    // wield-filtered scan, so an owned but unwieldable tool reads short too).
     tierRequired: {
       mining: 'Requires a tier {tier} mining pick',
       logging: 'Requires a tier {tier} logging axe',
@@ -2533,11 +2715,14 @@ export const hudChromeStrings = {
       logging: 'Requires a logging axe',
       herbalism: 'Requires a herbalism sickle',
     },
-    // gatherDenied error toast, surface 'node', worded per node family.
+    // gatherDenied error toast for a named tier: surface 'node' worded per
+    // node family, plus the fishing arm, which is the ZONE rod gate (this
+    // water takes a better rod than the one you carry) rather than a node.
     toolTierUnmet: {
       mining: 'You need a tier {tier} mining pick to harvest this vein.',
       logging: 'You need a tier {tier} logging axe to fell this stand.',
       herbalism: 'You need a tier {tier} herbalism sickle to gather this patch.',
+      fishing: 'You need a tier {tier} fishing rod to fish these waters.',
     },
     // gatherDenied error toast for requiredTier 1 (#2343): the player owns no
     // matching tool at all, so no tier number is named. The fishing arm is
@@ -2555,9 +2740,22 @@ export const hudChromeStrings = {
       logging: 'There is no timber stand within reach.',
       herbalism: 'There is no herb patch within reach.',
     },
+    // gatherDenied error toast, the R22 wield arm: a covering tool IS in the
+    // bags and only its proficiency requirement is short, so the line names
+    // the counter instead of a tier. {skill} is the smallest proficiency at
+    // which something already carried would work the target
+    // (professions/wield_gate.ts minWieldRequirementToWork).
+    wieldUnmet: {
+      mining: 'You need Mining {skill} to swing the pick already in your bags.',
+      logging: 'You need Logging {skill} to swing the axe already in your bags.',
+      herbalism: 'You need Herbalism {skill} to work the sickle already in your bags.',
+    },
+    // The corpse flavor of the wield arm: profession-neutral like its
+    // tier-based sibling below.
+    wieldUnmetCorpse: 'You need gathering skill {skill} to put your finest tool to work.',
     // gatherDenied error toast, surface 'corpse': profession-neutral (a corpse
-    // harvest is gated by the best owned tool across ALL gathering
-    // professions, so no single tool is named).
+    // harvest is gated by the best WIELDABLE tool across ALL gathering
+    // professions, R22/R50, so no single tool is named).
     toolTierUnmetCorpse: 'You need a tier {tier} gathering tool to recover the finest materials.',
     // Gathering-tool item tooltip lines (#2343): what the tool is, what it is
     // required for, how using it behaves, and its speed/fishing bonuses. All
@@ -2574,6 +2772,12 @@ export const hudChromeStrings = {
         mining: 'Required to mine ore veins up to tier {tier}.',
         logging: 'Required to fell timber stands up to tier {tier}.',
         herbalism: 'Required to gather herb patches up to tier {tier}.',
+        // The rod arm says WATER rather than nodes: fishing has no nodes, and
+        // what a rod tier opens is which zones will take a line at all
+        // (professions/fishing_zones.ts). Without this the rod was the one
+        // tool family whose tooltip never named the access it buys, so the
+        // only way to learn the water refuses you was to be refused.
+        fishing: 'Required to fish waters up to tier {tier}.',
       },
       use: {
         mining: 'Use: Mine a nearby ore vein.',
@@ -2591,9 +2795,25 @@ export const hudChromeStrings = {
     // 'mark' (the yield arrived unsigned) and 'find' (the jackpot dropped).
     downgradeMark: "Bags full: the find was stored without its gatherer's mark.",
     downgradeFind: 'Bags full: a pristine find slipped away.',
-    // Tooltip third line: the per-viewer respawn state.
+    // The empty-hook FCT self-note (the UX pass), fired off the
+    // fishingEmptyHook event beside the sim's grey log line: the reel was
+    // timed right, the hook just came up bare.
+    emptyHookNote: 'Nothing on the hook',
+    // Tooltip third line: the per-viewer respawn state. The timed variant
+    // renders when the world can put a number on the same timer
+    // (IWorldProfessions nodeRespawnSeconds); the plain one stays the
+    // fallback for a null read. {time} is the respawnClock template below.
     stateReady: 'Ready',
     stateCooldown: 'Respawning',
+    stateCooldownTimed: 'Respawns in {time}',
+    // m:ss, the finder-clock token pattern: {minutes} unpadded via
+    // formatNumber, {seconds} pre-padded to two digits.
+    respawnClock: '{minutes}:{seconds}',
+    // Tooltip grade-preview line (the UX pass): shown only when the viewer's
+    // current wieldable tool (plus a usable slotted quality effect) would
+    // mint this node's FINE grade, through the same effectiveGradeToolTier
+    // read the grant runs.
+    fineGradePreview: 'Your tool refines this yield to fine grade.',
   },
   // Archetype title chrome (#1130, pair-named under Professions 2.0):
   // `label` heads the character-sheet title line, `none` is shown before the
@@ -2706,6 +2926,74 @@ export const hudChromeStrings = {
     ceilingRare: 'Rare cap',
     ceilingCommon: 'Common cap',
     skillValue: '{skill} / {max}',
+    // The slotted tool effect under a gathering row. Charges are shown as a
+    // fraction of what the slot was MINTED with, which depends on the rarity of
+    // the tool it went onto, so the denominator is per-slot and not a constant.
+    toolEffectCharges: '{charges} of {max} charges',
+    // Said in words rather than as "0 of 30": a bare zero reads like a broken
+    // tool, and the tool is fine. Only the effect is spent, and it recharges.
+    toolEffectSpent: 'Spent, needs recharging',
+    // The last-charge FCT self-note (the UX pass), fired off the
+    // gatherResult event's effectDepleted flag: the harvest that spent the
+    // final charge says so instead of letting the effect expire silently.
+    toolEffectDepleted: 'Tool effect spent',
+    // The recharge cost preview beside the button (the UX pass): the priced
+    // material and count the resolver would charge right now. Ceil-priced,
+    // so the marginal top-up (one charge short) honestly reads one full
+    // material.
+    toolEffectRechargePrice: 'Recharge: {count} x {material}',
+    // The R40 prompt-mode surfaces. The toggle configures the NEXT slot
+    // action's mint; the chip marks a LIVE 'prompt' slot; the dialog is the
+    // per-use ask (accept spends the charge, decline still gathers, and the
+    // body says so, because a dialog whose cancel still acts must never
+    // surprise).
+    toolEffectModeAsk: 'Ask each use',
+    toolEffectModePrompt: 'Asks each use',
+    toolEffectConfirmTitle: 'Use {effect}?',
+    // Count-neutral on purpose (the phase 14 QA): "one of {charges}
+    // charges" read "one of 1 charges" on the last charge, the moment the
+    // prompt matters most. The label form carries the number without
+    // pluralization; the zh fills already phrased it this way, and the
+    // ja/ko/ru fills were re-worded off the same partitive in the fix
+    // round (the reword-staleness rule: an English reword re-reads every
+    // overlay it invalidates).
+    toolEffectConfirmBody:
+      'Spend a charge on this harvest? Declining still gathers, without the bonus. Charges left: {charges}.',
+    toolEffectConfirmAccept: 'Use a Charge',
+    toolEffectConfirmDecline: 'Gather Without',
+    // The TOOL_EFFECTS catalog by id (src/sim/content/professions.ts). Only two
+    // are slottable today: slotToolEffectRefused refuses every respawnSpeed-kind
+    // effect (quickening_charm) on every profession, so no shipped UI path
+    // offers the third; its name is still reachable through the refusal line,
+    // which echoes a hand-sent effectId, so the key stays localized. The sim is
+    // language-agnostic and emits the id; these are where it becomes a name.
+    toolEffectName: {
+      gatherersCache: "Gatherer's Cache",
+      artisansEye: "Artisan's Eye",
+      quickeningCharm: 'Springback Charm',
+    },
+    // The toolEffectResult event's chat lines (the acquisition craft): one
+    // line per outcome, rendered off ids only (the event is text-free).
+    // {effect} and {profession} splice localized names; {material} splices a
+    // clickable item link, the craftedToast idiom.
+    // The slot/recharge buttons on a gathering row. The slot label names the
+    // charm it consumes; the recharge label stays bare because it sits on the
+    // effect's own line.
+    toolEffectSlotButton: 'Slot {effect}',
+    toolEffectRechargeButton: 'Recharge',
+    toolEffectSlotted: '{effect} slotted on {profession}.',
+    toolEffectSlotInvalid: '{effect} cannot be slotted there.',
+    toolEffectNoTool: 'You need a real {profession} tool first.',
+    toolEffectNoCharm: 'You need a crafted {effect} charm in your bags.',
+    toolEffectNoGain: '{effect} is already slotted and fully charged.',
+    toolEffectRecharged: '{effect} recharged: {material} x{count} consumed.',
+    toolEffectRechargeNoSlot: 'No effect is slotted on {profession}.',
+    toolEffectRechargeFull: '{effect} is already fully charged.',
+    // The R47 distinction: the slot is at everything the carried tool can
+    // fill, but its own ceiling is higher, so the line points at the tool
+    // rather than claiming the slot is full.
+    toolEffectRechargeToolCapped: 'Carry a better {profession} tool to charge {effect} further.',
+    toolEffectRechargeMaterials: 'Recharging {effect} needs {material} x{count}.',
     tierPipAria: 'Tier {tier}',
     nextUnlockTier: '{points} points to the next tier: masterwork odds improve',
     nextUnlockSpecialized: '{points} points to Specialized: material costs drop',
@@ -2737,6 +3025,11 @@ export const hudChromeStrings = {
     craft: 'Craft',
     reagentsNeeded: 'Requires:',
     reagentLine: '{name} x{have}/{required}',
+    // The fine-substitution suffix (the UX pass): appended to a reagent line
+    // when base stock runs short and the craft would spend fine grades (the
+    // D8 downward substitution, 2x gather value), so the spend is stated
+    // before the click instead of silent after it.
+    reagentFineSub: '(spends {count} fine-grade)',
     empty: 'No recipes known yet.',
     resultAria: 'Craft {name}',
     // The SOLE player-visible line for a craft grant (#2430). The grant hub's
@@ -2794,12 +3087,24 @@ export const hudChromeStrings = {
       ceilingRare: 'Rare cap',
       ceilingCommon: 'Common cap',
       skillAria: '{craft}, skill {skill}, tier {tier}, {role}, {ceiling}',
-      // Visual column headers over the skill rows (aria-hidden: each row
-      // already reads as the full skillAria sentence).
+      // RETIRED in place (phase 22): the visual column-header row died with
+      // the row-family rework (rows self-label through their pill chips).
+      // The four keys stay because their fills already exist in the
+      // maintainer-owned overlays, which contributors never edit; drop the
+      // keys and the overlay rows together in a maintainer pass.
       colCraft: 'Craft',
       colSkill: 'Skill',
       colRole: 'Role',
       colCap: 'Cap',
+      // The uniform-chips caption over the skill rows (the option 3
+      // collapse): shown when every craft shares one role and one cap, so
+      // ten rows do not repeat the same two chips. M16: wordy, so the five
+      // non-Latin fills land in the same change.
+      allCrafts: 'All crafts',
+      // aria-label for the capped, internally scrolling skill list (the
+      // attuned card): the scroll region needs a name once it is focusable
+      // for keyboard scrolling. M16 fills as above.
+      skillListAria: 'Craft skills',
       tutorial:
         'First tier: reach skill {skill} in a craft. Successful recipes raise that craft without erasing knowledge elsewhere.',
       nearTier: '{craft} is {points} skill from its next tier.',
@@ -2831,6 +3136,12 @@ export const hudChromeStrings = {
     // line, skill-gain difficulty labels, hub-station badge) plus the
     // masterwork and tier-up celebration copy. Masterwork is a proc with
     // baked bonus stats; the copy never claims a quality-rank upgrade.
+    // Rendered by the crafting window's recipe rows AND by a locked vendor row
+    // in the goods grid (hud/vendor/vendor_window.ts), which reuses it so a
+    // tool gated on gathering proficiency needs no second key saying the same
+    // sentence. {craft} is a NAME slot, not a claim of craftness: the crafting
+    // window passes a craft name, the vendor row a gathering profession name.
+    // Rewording this restyles that vendor line too.
     skillReqLine: 'Requires {craft} {skill}',
     difficultyFull: 'Full skill gain',
     difficultyReduced: 'Reduced skill gain',
@@ -3295,8 +3606,12 @@ export const hudChromeStrings = {
     lbSelfRank: 'Your account: rank {rank}, top {percent} percent',
     lbEmpty: 'No ranked chroniclers yet.',
     // The options-window account row (accounts.deed_broadcasts): whether a
-    // marquee unlock is shared with guildmates and followers.
-    broadcastsLabel: 'Share deed unlocks with guild and friends',
+    // marquee unlock is shared with guildmates and followers, AND whether the
+    // Discord activity feed posts the account's deed and masterwork cards
+    // (R58: one consent flag gates all three surfaces; masterwork cards go
+    // ONLY to Discord, so the label keeps the two audiences distinct).
+    broadcastsLabel:
+      'Share deed unlocks with guildmates and followers, and deed and masterwork cards with the Discord feed',
     // The name-plus-title display pattern every titled surface composes
     // through (chat sender, target frame): the bracket decoration and its
     // placement around the name live HERE so a locale owns both. Non-wordy

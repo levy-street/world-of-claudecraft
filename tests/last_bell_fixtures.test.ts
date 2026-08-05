@@ -310,7 +310,6 @@ describe('Last Bell campaign fixtures', () => {
       z: statue.z,
       // the measured circumscribed footprint, so collision matches the silhouette
       r: 1.26,
-      camGhost: true,
     });
     expect(statueCollider?.cameraTopY).toBeCloseTo(
       groundHeight(statue.x, statue.z, seed) + statue.h,

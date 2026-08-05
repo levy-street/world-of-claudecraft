@@ -101,7 +101,7 @@ describe('Okku stands clear of the Vinefall banyan', () => {
     // Arrange / Act
     const { x, z } = okku.pos;
     const ground = groundHeight(x, z, SEED);
-    const water = waterLevelAt(x, z);
+    const water = waterLevelAt(x, z, SEED);
 
     // Assert: clear at the player body radius AND at the 0.6 radius
     // findSafePos probes with, so neither a player nor the spawner is
@@ -127,7 +127,7 @@ describe('Okku stands clear of the Vinefall banyan', () => {
     if (!spawned) throw new Error('hermit_okku did not spawn in the shipped world');
     expect(spawned.pos.x).toBeCloseTo(okku.pos.x, 6);
     expect(spawned.pos.z).toBeCloseTo(okku.pos.z, 6);
-    const water = waterLevelAt(spawned.pos.x, spawned.pos.z);
+    const water = waterLevelAt(spawned.pos.x, spawned.pos.z, SEED);
     expect(water === -Infinity || spawned.pos.y > water).toBe(true);
   });
 });

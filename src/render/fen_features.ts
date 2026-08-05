@@ -16,7 +16,7 @@ import {
   WATER_LEVEL,
 } from '../sim/world';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 
 export interface FenFeaturesView {
   group: THREE.Group;
@@ -37,7 +37,7 @@ const FEN_PROP_URLS = {
 type FenPropKey = keyof typeof FEN_PROP_URLS;
 const propScenes: Partial<Record<FenPropKey, THREE.Group>> = {};
 for (const key of Object.keys(FEN_PROP_URLS) as FenPropKey[]) {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(FEN_PROP_URLS[key]).then((gltf) => {
       propScenes[key] = gltf.scene;
     }),

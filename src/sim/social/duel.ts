@@ -30,7 +30,7 @@ export function duelRequest(ctx: SimContext, targetPid: number, pid?: number): v
     ctx.error(r.meta.entityId, 'You cannot duel in Nythraxis Raid Arena.');
     return;
   }
-  if (ctx.duels.has(r.meta.entityId) || ctx.duels.has(targetPid)) {
+  if (duelFor(ctx, r.meta.entityId) || duelFor(ctx, targetPid)) {
     ctx.error(r.meta.entityId, 'A duel is already in progress.');
     return;
   }
@@ -77,7 +77,7 @@ export function duelAccept(ctx: SimContext, pid?: number): void {
     ctx.error(r.meta.entityId, 'You cannot duel in Nythraxis Raid Arena.');
     return;
   }
-  if (ctx.duels.has(invite.fromPid) || ctx.duels.has(r.meta.entityId)) {
+  if (duelFor(ctx, invite.fromPid) || duelFor(ctx, r.meta.entityId)) {
     ctx.error(r.meta.entityId, 'A duel is already in progress.');
     return;
   }
@@ -114,6 +114,10 @@ export function updateDuels(ctx: SimContext): void {
   for (const duel of ctx.duels.values()) {
     if (seen.has(duel)) continue;
     seen.add(duel);
+    // Already ended (either by an earlier same-tick lethal hit or a stale
+    // entry awaiting purge): nothing left to evaluate, just fall through to
+    // the purge sweep below.
+    if (duel.endedTick !== undefined) continue;
     const ea = ctx.entities.get(duel.a);
     const eb = ctx.entities.get(duel.b);
     if (!ea || !eb) {
@@ -146,12 +150,24 @@ export function updateDuels(ctx: SimContext): void {
       endDuel(ctx, duel, duel.a);
     }
   }
+  // Purge every duel endDuel() marked ended (this tick or, in the rare case
+  // it was ended outside a tick entirely, an earlier one) now that combat for
+  // this tick has fully resolved. Deferring the delete out of endDuel() is
+  // what lets a reciprocal lethal hit landing later in the SAME tick still
+  // find the duel and get clamped instead of producing a real death.
+  for (const [pid, duel] of ctx.duels) {
+    if (duel.endedTick !== undefined) ctx.duels.delete(pid);
+  }
 }
 
 // winnerPid null = draw/cancelled
 export function endDuel(ctx: SimContext, duel: DuelState, winnerPid: number | null): void {
-  ctx.duels.delete(duel.a);
-  ctx.duels.delete(duel.b);
+  // Idempotent: a same-tick reciprocal lethal hit re-enters here after the
+  // first hit already ended this same duel (the damage-clamp lookup in
+  // combat/damage.ts still matches it via endedTick). Only the first call
+  // performs the actual teardown and stat/emit side effects.
+  if (duel.endedTick !== undefined) return;
+  duel.endedTick = ctx.tickCount;
   const aMeta = ctx.players.get(duel.a);
   const bMeta = ctx.players.get(duel.b);
   const ea = ctx.entities.get(duel.a);
@@ -181,5 +197,10 @@ export function endDuel(ctx: SimContext, duel: DuelState, winnerPid: number | nu
 }
 
 export function duelFor(ctx: SimContext, pid: number): DuelState | null {
-  return ctx.duels.get(pid) ?? null;
+  const duel = ctx.duels.get(pid);
+  // An ended duel lingers in ctx.duels until updateDuels() purges it at
+  // tick-tail (see endDuel above); every consumer except the damage-clamp
+  // lookup in combat/damage.ts must keep seeing it as gone the instant it
+  // ends, matching the old synchronous-delete behavior.
+  return duel && duel.endedTick === undefined ? duel : null;
 }

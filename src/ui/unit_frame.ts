@@ -20,7 +20,12 @@
 // no per-element garbage), exactly as the inline player block computed them.
 
 import type { ResourceType } from '../sim/types';
-import { type AbsorbBarInput, absorbBarView } from './absorb_bar';
+import {
+  type AbsorbBarInput,
+  type AbsorbBarView,
+  absorbBarView,
+  absorbBarViewInto,
+} from './absorb_bar';
 
 /**
  * The resource-bar discriminator the painter routes to a class on the resource
@@ -120,6 +125,14 @@ export interface UnitFrameView {
   outOfRange: boolean;
 }
 
+export interface UnitFrameBuffer {
+  view: UnitFrameView;
+  absorb: AbsorbBarView;
+  absorbTextBase: string;
+  absorbTextTotal: number;
+  absorbText: string;
+}
+
 // The not-present view: every field at a no-op default. A shared constant (no
 // allocation) because the painter ignores everything but `present` when hidden.
 const HIDDEN: UnitFrameView = {
@@ -191,4 +204,96 @@ export function unitFrameView(d: UnitFrameDescriptor): UnitFrameView {
     dead: d.dead,
     outOfRange: d.outOfRange,
   };
+}
+
+/** Allocate the long-lived buffers used by one HUD unit-frame instance. */
+export function newUnitFrameBuffer(): UnitFrameBuffer {
+  return {
+    view: {
+      present: false,
+      hpFrac: 0,
+      hpText: '',
+      resClass: 'none',
+      resFrac: 0,
+      resText: '',
+      levelText: null,
+      name: '',
+      titlePre: '',
+      titlePost: '',
+      portraitKey: '',
+      absorbFrac: 0,
+      absorbStartFrac: 0,
+      absorbSizeFrac: 0,
+      absorbOvershield: false,
+      dead: false,
+      outOfRange: false,
+    },
+    absorb: {
+      total: 0,
+      fillFrac: 0,
+      startFrac: 0,
+      sizeFrac: 0,
+      overshield: false,
+    },
+    absorbTextBase: '',
+    absorbTextTotal: 0,
+    absorbText: '',
+  };
+}
+
+/**
+ * Fill one caller-owned unit-frame view. This is the per-frame HUD path; the
+ * allocating unitFrameView wrapper remains available to pure callers/tests.
+ */
+export function unitFrameViewInto(buffer: UnitFrameBuffer, d: UnitFrameDescriptor): UnitFrameView {
+  const out = buffer.view;
+  if (!d.present) {
+    out.present = false;
+    out.hpFrac = 0;
+    out.hpText = '';
+    out.resClass = 'none';
+    out.resFrac = 0;
+    out.resText = '';
+    out.levelText = null;
+    out.name = '';
+    out.titlePre = '';
+    out.titlePost = '';
+    out.portraitKey = '';
+    out.absorbFrac = 0;
+    out.absorbStartFrac = 0;
+    out.absorbSizeFrac = 0;
+    out.absorbOvershield = false;
+    out.dead = false;
+    out.outOfRange = false;
+    return out;
+  }
+
+  const absorb = d.absorb ? absorbBarViewInto(buffer.absorb, d.absorb) : NO_ABSORB;
+  out.present = true;
+  out.hpFrac = d.hpFrac;
+  if (d.showAbsorbText && absorb.total > 0) {
+    if (d.hpText !== buffer.absorbTextBase || absorb.total !== buffer.absorbTextTotal) {
+      buffer.absorbTextBase = d.hpText;
+      buffer.absorbTextTotal = absorb.total;
+      buffer.absorbText = `${d.hpText} (${absorb.total})`;
+    }
+    out.hpText = buffer.absorbText;
+  } else {
+    out.hpText = d.hpText;
+  }
+  out.resClass = unitResourceClass(d.resourceKind);
+  out.resFrac = d.resFrac;
+  out.resText = d.resText;
+  out.levelText = d.levelText;
+  out.name = d.name;
+  out.titlePre = d.titlePre ?? '';
+  out.titlePost = d.titlePost ?? '';
+  out.portraitKey = d.portraitKey;
+  out.absorbFrac = absorb.fillFrac;
+  out.absorbStartFrac = absorb.startFrac;
+  out.absorbSizeFrac = absorb.sizeFrac;
+  out.absorbOvershield = absorb.overshield;
+  out.dead = d.dead;
+  out.outOfRange = d.outOfRange;
+  return out;
 }

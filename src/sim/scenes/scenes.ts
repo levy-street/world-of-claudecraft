@@ -474,6 +474,7 @@ export function requestSceneSkip(ctx: SimContext, pid?: number): boolean {
 // player movement starts next tick because the player phase already ran.
 // Zero work while no scene is live.
 export function updateScenes(ctx: SimContext): void {
+  if (ctx.scenePlaybacks.size === 0) return;
   for (const playback of [...ctx.scenePlaybacks.values()]) {
     const def = sceneById(playback.sceneId);
     if (!def) {

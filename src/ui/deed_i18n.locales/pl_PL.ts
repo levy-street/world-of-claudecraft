@@ -802,4 +802,28 @@ export const table: DeedLocaleTable = {
     name: 'Dziedziniec Rozbieraczy',
     desc: 'Odzyskaj 50 sztuk ekwipunku, rozkładając je na surowce.',
   },
+  dgn_wildheart_basin: {
+    name: 'Kotlina Odgryza Się',
+    desc: 'Pokonaj Zulgara, Głos Kotliny, w Kotlinie Dzikiego Serca.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Heroiczna: Kotlina Dzikiego Serca',
+    desc: 'Pokonaj Zulgara, Głos Kotliny, w Kotlinie Dzikiego Serca na heroicznym poziomie trudności.',
+  },
+  chr_marsh_rares_ii: {
+    name: 'Żarłok, doliczony',
+    desc: 'Zabij Robakopaszczego Żarłoka, czwartą osławioną zgrozę Trzęsawiska Mokrzawia pominiętą w pierwszym rachunku.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'Więcej imion wyrytych w skale',
+    desc: 'Zabij Starego Skalnopaszczego i Odłamkowładcę Kazzixa, dwie kolejne osławione zgrozy Wyżyn Ciernistego Szczytu pominięte w pierwszym rachunku.',
+  },
+  chr_gleamstag: {
+    name: 'Legenda, która nigdy nie uderzała pierwsza',
+    desc: 'Zabij Lśniącego Jelenia, rzadkiego i płochliwego elitarnego przeciwnika, który atakuje tylko osaczony.',
+  },
+  chr_hollow_rares: {
+    name: 'Stado pamięta',
+    desc: 'Zabij Starego Szpikoskorupa i Aurelhorna, Pierwszego ze Stada, dwóch wędrownych rzadkich bossów Zasłoniętej Kotliny.',
+  },
 };

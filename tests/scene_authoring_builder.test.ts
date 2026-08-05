@@ -70,6 +70,7 @@ const FOCUS_SHOT = {
   actorId: 'tam',
   dist: 6,
   dur: 1.5,
+  entry: 'snap',
 } satisfies SceneCameraShotDef;
 
 const DOLLY_SHOT = {

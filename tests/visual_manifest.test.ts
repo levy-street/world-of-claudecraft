@@ -151,6 +151,24 @@ describe('character visual manifest', () => {
     ).toEqual([]);
   });
 
+  it('points the rogue bespoke abilities at their synthesized clips in the rogue GLB', async () => {
+    const visual = VISUALS.player_rogue;
+    // The strangle one-shot (scripts/_add_garrote_choke_anim.mjs): a wire
+    // pull to the chest, never the dagger swing the default rotation plays.
+    expect(visual.clips.attackByAbility?.garrote).toBe('Garrote_Choke');
+    // Boot kicks (scripts/_add_boot_kick_anim.mjs) and Dirt Toss throws
+    // (scripts/_add_dirt_throw_anim.mjs); neither is a dagger swing.
+    expect(visual.clips.attackByAbility?.kick).toBe('Kick_A');
+    expect(visual.clips.attackByAbility?.blind).toBe('Dirt_Throw');
+    const animationNames = await glbAnimationNames(`public/${visual.url}`);
+    expect(animationNames.has('Garrote_Choke')).toBe(true);
+    expect(animationNames.has('Kick_A')).toBe(true);
+    expect(animationNames.has('Dirt_Throw')).toBe(true);
+    expect(
+      [...new Set(expectedClipNames(visual.clips))].filter((name) => !animationNames.has(name)),
+    ).toEqual([]);
+  });
+
   it('points the Stone Cantor manifest at clips present in the GLB (including the synthesized Hit)', async () => {
     const visual = VISUALS.mob_reedbound_acolyte;
     const animationNames = await glbAnimationNames(`public/${visual.url}`);
@@ -201,6 +219,92 @@ describe('character visual manifest', () => {
       'models/weapons/dagger.glb',
       'models/weapons/dagger.glb',
     ]);
+  });
+
+  it('keeps the five Wildheart GLBs on short, non-loop-closed re-cut takes', async () => {
+    // The original defect: the retarget batch baked an 8.46s 'Death' whose
+    // final keyframe equalled its first (deviation 0.0000 on every channel).
+    // visual.ts clamps death on its LAST frame and snap-seeds corpses to it,
+    // so the corpse froze standing; the 6.6s 'Attack' peaked ~2s in, after the
+    // ravager's 2.25s swing cadence had already reset the one-shot. The clips
+    // are re-cut at build time by scripts/_add_wildheart_death_anim.mjs; this
+    // pins the surgery so a fresh export cannot silently regress it.
+    await MeshoptDecoder.ready;
+    const io = new NodeIO()
+      .registerExtensions(ALL_EXTENSIONS)
+      .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
+    for (const key of [
+      'mob_wildheart_stalker',
+      'mob_wildheart_ravager',
+      'mob_wildheart_hexcaller',
+      'mob_wildheart_beastmaster',
+      'mob_wildheart_high_priest',
+    ] as const) {
+      const visual = VISUALS[key];
+      const doc = await io.read(`public/${visual.url}`);
+      const animations = doc.getRoot().listAnimations();
+      const names = new Set(animations.map((animation) => animation.getName()));
+      expect(names.size).toBeGreaterThan(0);
+      expect(
+        [...new Set(expectedClipNames(visual.clips))].filter((name) => !names.has(name)),
+        key,
+      ).toEqual([]);
+
+      const durationOf = (clipName: string): number => {
+        const animation = animations.find((candidate) => candidate.getName() === clipName);
+        if (!animation) throw new Error(`${key} lost its ${clipName} clip`);
+        let duration = 0;
+        for (const sampler of animation.listSamplers()) {
+          const times = sampler.getInput()?.getArray();
+          if (times && times.length > 0) duration = Math.max(duration, times[times.length - 1]);
+        }
+        return duration;
+      };
+      // Two-sided bounds: the upper edge pins the re-cut (Attack must land
+      // inside the ravager's 2.25s swing cadence, the original defect), the
+      // lower edge rejects a destroyed or stub clip that would also "pass".
+      expect(
+        durationOf('Death'),
+        `${key} Death should stay a game-length take`,
+      ).toBeLessThanOrEqual(2.5);
+      expect(
+        durationOf('Death'),
+        `${key} Death must remain a real topple, not a stub`,
+      ).toBeGreaterThanOrEqual(1.0);
+      expect(
+        durationOf('Attack'),
+        `${key} Attack should stay cut inside the 2.25s swing cadence`,
+      ).toBeLessThanOrEqual(2.25);
+      expect(
+        durationOf('Attack'),
+        `${key} Attack must remain a real strike, not a stub`,
+      ).toBeGreaterThanOrEqual(0.5);
+      // The re-cut Hit is the 0.7s house flinch; a regressed 1.3s take or a
+      // near-zero stub both fail.
+      expect(durationOf('Hit'), `${key} Hit should stay the house flinch`).toBeLessThanOrEqual(
+        0.75,
+      );
+      expect(durationOf('Hit'), `${key} Hit must remain a real flinch`).toBeGreaterThanOrEqual(0.5);
+
+      // A loop-closed death would make the clamped corpse pose the standing
+      // start pose again: the final keyframe must differ from the first.
+      const death = animations.find((candidate) => candidate.getName() === 'Death');
+      if (!death) throw new Error(`${key} lost its Death clip`);
+      let endVsStart = 0;
+      for (const sampler of death.listSamplers()) {
+        const times = sampler.getInput()?.getArray();
+        const values = sampler.getOutput()?.getArray();
+        if (!times || !values) throw new Error(`${key} Death sampler lost its accessors`);
+        const stride = values.length / times.length;
+        for (let component = 0; component < stride; component++) {
+          endVsStart = Math.max(
+            endVsStart,
+            Math.abs(values[values.length - stride + component] - values[component]),
+          );
+        }
+      }
+      expect(endVsStart, `${key} Death must end away from its starting pose`).toBeGreaterThan(0.25);
+    }
   });
 
   it('keeps deepfen_spearjaw on its raptor model despite its reptile family retag', () => {

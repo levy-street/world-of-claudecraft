@@ -2,7 +2,7 @@
 // fixtures live in tests/fixes_shared.ts; the loot/quest-npc/combat shard is
 // tests/fixes_loot_npcs.test.ts.
 import { describe, expect, it } from 'vitest';
-import { cameraOcclusion, isBlocked, resolvePosition } from '../src/sim/colliders';
+import { isBlocked, resolvePosition } from '../src/sim/colliders';
 import {
   CRYPT_DOOR_POS,
   DUNGEON_LIST,
@@ -178,88 +178,16 @@ describe('collision & terrain', () => {
     expect(isBlocked(SEED, 2, 212, 0.5)).toBe(false);
   });
 
-  it('camera ghosts through village buildings (hidden instead of pulling in)', () => {
-    const bank = EASTBROOK_BUILDINGS_BY_ID.eastbrook_bank;
-    const front = localToWorld(
-      bank.position,
-      bank.rotation,
-      0,
-      bank.nativeDimensions.depth / 2 + 4,
-    );
-    const rear = localToWorld(
-      bank.position,
-      bank.rotation,
-      0,
-      -bank.nativeDimensions.depth / 2 - 4,
-    );
-    const groundY = groundHeight(front.x, front.z, SEED);
-    const eyeY = groundY + 2;
-
-    // The ray sweeps through the replacement bank: buildings are camGhost,
-    // so the chase cam no longer pulls in for them — the renderer hides them.
-    const through = cameraOcclusion(SEED, front.x, eyeY, front.z, rear.x, eyeY + 1.5, rear.z, 0.35);
-    expect(through).toBe(1);
-    // but movement still collides with that same bank (camGhost is camera-only)
-    const blocked = resolvePosition(SEED, bank.position.x, bank.position.z, 0.5);
-    expect(
-      Math.abs(blocked.x - bank.position.x) + Math.abs(blocked.z - bank.position.z),
-    ).toBeGreaterThan(0.5);
-
-    const clear = cameraOcclusion(SEED, 0, eyeY, -40, 0, eyeY + 1.5, -48, 0.35);
-    expect(clear).toBe(1);
-
-    const overhead = cameraOcclusion(SEED, front.x, eyeY, front.z, rear.x, eyeY + 24, rear.z, 0.35);
-    expect(overhead).toBe(1);
+  it('keeps campfire bases solid for movement', () => {
+    const [x, z] = PROPS.campfires[0];
+    const blocked = resolvePosition(SEED, x, z, 0.5);
+    expect(Math.abs(blocked.x - x) + Math.abs(blocked.z - z)).toBeGreaterThan(0.5);
   });
 
-  it('camera ghosts through campfires while movement still collides', () => {
-    const [cx, cz] = PROPS.campfires[0];
-    const groundY = groundHeight(cx, cz, SEED);
-
-    const eyeHeightRay = cameraOcclusion(
-      SEED,
-      cx,
-      groundY + 2.0,
-      cz - 8,
-      cx,
-      groundY + 2.2,
-      cz + 8,
-      0.35,
-    );
-    expect(eyeHeightRay).toBe(1);
-
-    const lowRay = cameraOcclusion(
-      SEED,
-      cx,
-      groundY + 0.8,
-      cz - 8,
-      cx,
-      groundY + 0.9,
-      cz + 8,
-      0.35,
-    );
-    expect(lowRay).toBe(1);
-
-    const blocked = resolvePosition(SEED, cx, cz, 0.5);
-    expect(Math.abs(blocked.x - cx) + Math.abs(blocked.z - cz)).toBeGreaterThan(0.5);
-  });
-
-  it('camera ghosts through trees while movement still collides', () => {
-    const tree = decorations().find((d) => d.kind !== 'rock')!;
-    const groundY = groundHeight(tree.x, tree.z, SEED);
-
-    const through = cameraOcclusion(
-      SEED,
-      tree.x,
-      groundY + 1.0,
-      tree.z - 8,
-      tree.x,
-      groundY + 1.2,
-      tree.z + 8,
-      0.35,
-    );
-    expect(through).toBe(1);
-
+  it('keeps generated tree trunks solid for movement', () => {
+    const tree = decorations().find((decoration) => decoration.kind !== 'rock');
+    expect(tree).toBeDefined();
+    if (!tree) throw new Error('expected a generated tree');
     const blocked = resolvePosition(SEED, tree.x, tree.z, 0.5);
     expect(Math.abs(blocked.x - tree.x) + Math.abs(blocked.z - tree.z)).toBeGreaterThan(0.5);
   });
@@ -494,7 +422,17 @@ describe('swimming', () => {
     const p = sim.player;
     teleportTo(sim, LAKE.x, LAKE.z);
     expect(groundHeight(LAKE.x, LAKE.z, SEED)).toBeLessThan(WATER_LEVEL - 0.8);
-    sim.tick();
+    // The water overhaul made buoyancy physical: a body dropped over deep
+    // water RISES to the float band over a few ticks (measured: surfaced at
+    // tick 9 from the lakebed) instead of snapping there in one. The
+    // guarantee this pins is reaching the band promptly and STAYING in it.
+    let surfacedAt = -1;
+    for (let i = 0; i < 40 && surfacedAt < 0; i++) {
+      sim.tick();
+      if (p.pos.y > WATER_LEVEL - 1.0) surfacedAt = i + 1;
+    }
+    expect(surfacedAt, 'reaches the float band within 2s').toBeGreaterThan(0);
+    for (let i = 0; i < 20; i++) sim.tick();
     expect(p.pos.y).toBeGreaterThan(WATER_LEVEL - 1.0);
     expect(p.pos.y).toBeLessThan(WATER_LEVEL);
     expect(sim.isSwimming(p)).toBe(true);

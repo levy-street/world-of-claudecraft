@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 //
 // Panel-level coverage for the meters window: the pooled bars, the pet-aware
 // threat column, and the hover breakdown HTML the shared tooltip paints. The

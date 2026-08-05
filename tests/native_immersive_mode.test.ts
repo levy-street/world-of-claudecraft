@@ -5,7 +5,7 @@ const root = new URL('../', import.meta.url);
 const read = (path: string) => readFileSync(new URL(path, root), 'utf8').replace(/\r\n/g, '\n');
 
 describe('Android immersive mode', () => {
-  const activity = read('android/app/src/main/java/com/worldofclaudecraft/MainActivity.java');
+  const activity = read('android/app/src/main/java/com/worldofclaudecraft/BaseMainActivity.java');
 
   it('hides every system bar while preserving transient swipe access', () => {
     expect(activity).toContain('WindowCompat.getInsetsController(');

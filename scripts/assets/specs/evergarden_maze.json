@@ -1,21 +1,21 @@
 {
   "items": [
     {
-      "src": "/Users/demihenderson/Downloads/evergarden-maze/garden+hedge+3d+model.glb",
+      "src": "garden+hedge+3d+model.glb",
       "out": "models/props/maze_hedge_wall.glb",
       "type": "static",
       "maxTex": 512,
       "simplify": 0.001
     },
     {
-      "src": "/Users/demihenderson/Downloads/evergarden-maze/hege+arch+3d+model.glb",
+      "src": "hege+arch+3d+model.glb",
       "out": "models/props/maze_hedge_arch.glb",
       "type": "static",
       "maxTex": 512,
       "simplify": 0.001
     },
     {
-      "src": "/Users/demihenderson/Downloads/evergarden-maze/leafy+fox+statue+3d+model.glb",
+      "src": "leafy+fox+statue+3d+model.glb",
       "out": "models/props/leafy_fox_statue.glb",
       "type": "static",
       "maxTex": 512,

@@ -9,8 +9,21 @@ import {
   wildheartStreamCenter,
   wildheartWaterMask,
 } from '../sim/wildheart_field';
+import { createGrassTuftMaterial, JUNGLE_GRASS_TINT } from './foliage';
 import { GFX } from './gfx';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
+import { ROUGH_GRASS, terrainSplatTexture } from './terrain';
+import {
+  createWaterSurfaceMaterial,
+  hasWaterShaderAssets,
+  SHALLOW_COLOR,
+  zeroWaveUniforms,
+} from './water';
+// The water shader recovers shoreline distance as depth / slope, so the basin
+// bake samples with the same contract the overworld planes do (against
+// wildheartFieldHeight instead of terrainHeight): import those constants rather
+// than mirroring them, so a water_core retune cannot silently desync the bake.
+import { MIN_SHORE_SLOPE, SHORE_SLOPE_SAMPLE_HALF_WIDTH } from './water_core';
 
 const GROUND_WIDTH = 184;
 const GROUND_DEPTH = 280;
@@ -85,17 +98,45 @@ function jungleSoilTexture(): THREE.CanvasTexture {
 
 const groundMaterials = new Map<boolean, THREE.Material>();
 
+// True when the high tier renders the floor with the overworld's real grass
+// splat layers instead of the canvas soil. Shared by material + vertex paint:
+// the photo albedo multiplies against the paint, so both must agree.
+function usesSplatGround(lowGfx: boolean): boolean {
+  return !lowGfx && Boolean(terrainSplatTexture('grassC') && terrainSplatTexture('grassN'));
+}
+
 function groundMaterial(lowGfx: boolean): THREE.Material {
   const cached = groundMaterials.get(lowGfx);
   if (cached) return cached;
-  const options = {
-    map: jungleSoilTexture(),
-    vertexColors: true,
-    flatShading: true,
-  } as const;
-  const material = lowGfx
-    ? new THREE.MeshLambertMaterial(options)
-    : new THREE.MeshStandardMaterial({ ...options, roughness: 0.98, metalness: 0 });
+  let material: THREE.Material;
+  const grassC = terrainSplatTexture('grassC');
+  const grassN = terrainSplatTexture('grassN');
+  if (usesSplatGround(lowGfx) && grassC && grassN) {
+    // The overworld splat shader samples grass at 0.22 repeats per world yard
+    // (terrain.ts `tuv`); the plane's 0..1 UV needs the same density so the
+    // basin floor's grain is continuous with the jungle outside. Clones keep
+    // the shared textures' own repeat untouched.
+    const map = grassC.clone();
+    const normalMap = grassN.clone();
+    map.repeat.set(GROUND_WIDTH * 0.22, GROUND_DEPTH * 0.22);
+    normalMap.repeat.copy(map.repeat);
+    material = new THREE.MeshStandardMaterial({
+      map,
+      normalMap,
+      vertexColors: true,
+      roughness: ROUGH_GRASS,
+      metalness: 0,
+    });
+  } else {
+    const options = {
+      map: jungleSoilTexture(),
+      vertexColors: true,
+      flatShading: true,
+    } as const;
+    material = lowGfx
+      ? new THREE.MeshLambertMaterial(options)
+      : new THREE.MeshStandardMaterial({ ...options, roughness: 0.98, metalness: 0 });
+  }
   markSharedMaterial(material);
   groundMaterials.set(lowGfx, material);
   return material;
@@ -113,29 +154,51 @@ function routeDistance(x: number, z: number): number {
 
 let groundGeometry: THREE.BufferGeometry | null = null;
 
+// Perimeter skirt drop: the outermost vertex ring hangs this far down, so a
+// camera ray clearing the rim ribs still lands on painted ground instead of
+// the below-horizon slice of the global sky dome (which this open-air
+// interior deliberately keeps, renderer.ts wildheartField).
+const GROUND_SKIRT_DROP_Y = -40;
+const PAINT_WHITE = new THREE.Color(0xffffff);
+// How far the vertex paint recenters toward white on the splat tier: the real
+// grass albedo carries the hue there, and the full-strength sRGB paint would
+// multiply it down to mud (same idea as the overworld splat shader's
+// re-centred vColor tint).
+const SPLAT_PAINT_RECENTER = 0.58;
+
 function buildGround(lowGfx: boolean): THREE.Mesh {
   if (!groundGeometry) {
+    const splat = usesSplatGround(lowGfx);
     groundGeometry = new THREE.PlaneGeometry(GROUND_WIDTH, GROUND_DEPTH, 112, 188).rotateX(
       -Math.PI / 2,
     );
     const positions = groundGeometry.attributes.position;
     const colors = new Float32Array(positions.count * 3);
     const color = new THREE.Color();
+    const edgeX = GROUND_WIDTH / 2 - 1e-4;
+    const edgeZ = GROUND_DEPTH / 2 - 1e-4;
     for (let i = 0; i < positions.count; i++) {
       const x = positions.getX(i);
-      const z = positions.getZ(i) + GROUND_CENTER_Z;
+      const localZ = positions.getZ(i);
+      const z = localZ + GROUND_CENTER_Z;
       const y = wildheartFieldHeight(x, z);
-      positions.setY(i, y);
-      const route = 1 - smoothstep(5, 17, routeDistance(x, z));
-      const water = wildheartWaterMask(x, z);
-      const shoulder = smoothstep(4.5, 10, y);
-      const moss = hash(Math.floor(x / 8), Math.floor(z / 8)) * 0.28;
-      color
-        .copy(SOIL)
-        .lerp(PATH, route * 0.52)
-        .lerp(WET, water * 0.68)
-        .lerp(MOSS, moss + water * 0.18)
-        .lerp(LIMESTONE, shoulder * 0.72);
+      const boundary = Math.abs(x) >= edgeX || Math.abs(localZ) >= edgeZ;
+      positions.setY(i, boundary ? GROUND_SKIRT_DROP_Y : y);
+      if (boundary) {
+        color.copy(SOIL).lerp(LIMESTONE, 0.45).multiplyScalar(0.8);
+      } else {
+        const route = 1 - smoothstep(5, 17, routeDistance(x, z));
+        const water = wildheartWaterMask(x, z);
+        const shoulder = smoothstep(4.5, 10, y);
+        const moss = hash(Math.floor(x / 8), Math.floor(z / 8)) * 0.28;
+        color
+          .copy(SOIL)
+          .lerp(PATH, route * 0.52)
+          .lerp(WET, water * 0.68)
+          .lerp(MOSS, moss + water * 0.18)
+          .lerp(LIMESTONE, shoulder * 0.72);
+        if (splat) color.lerp(PAINT_WHITE, SPLAT_PAINT_RECENTER);
+      }
       colors[i * 3] = color.r;
       colors[i * 3 + 1] = color.g;
       colors[i * 3 + 2] = color.b;
@@ -196,71 +259,163 @@ function buildPath(side: -1 | 1): THREE.Mesh {
   return path;
 }
 
-let waterMaterial: THREE.MeshPhysicalMaterial | THREE.MeshLambertMaterial | null = null;
+let waterMaterial: THREE.Material | null = null;
+let waterFallbackMaterial: THREE.Material | null = null;
 
-function basinWaterMaterial(lowGfx: boolean): THREE.Material {
+function basinWaterMaterial(): THREE.Material {
+  // The basin renders with the overworld's one water surface shader (scrolling
+  // normal maps, fresnel sky, sun glints, shore foam, fog) so its pools belong
+  // to the same sea palette as the Palmreach outside. Wave uniforms stay
+  // zeroed: the interactive height field is owned by the overworld WaterView.
+  // Gate exactly like water.ts buildWater. ONLY the shader material is cached
+  // permanently: a player who reaches the basin before the water normal maps
+  // finish preloading builds this interior on the Lambert fallback, and a
+  // one-shot cache pinned that cheap flat sheet for the whole session (the
+  // live-playtest "still looks like a path" report), the next interior build
+  // must be allowed to upgrade.
   if (waterMaterial) return waterMaterial;
-  waterMaterial = lowGfx
-    ? new THREE.MeshLambertMaterial({
-        color: 0x0a5551,
-        transparent: true,
-        opacity: 0.88,
-        side: THREE.DoubleSide,
-        depthWrite: false,
-      })
-    : new THREE.MeshPhysicalMaterial({
-        color: 0x16776f,
-        emissive: 0x073e39,
-        emissiveIntensity: 0.12,
-        roughness: 0.22,
-        metalness: 0,
-        transparent: true,
-        opacity: 0.78,
-        transmission: 0.08,
-        side: THREE.DoubleSide,
-        depthWrite: false,
-      });
-  markSharedMaterial(waterMaterial);
-  return waterMaterial;
+  if (GFX.standardMaterials && hasWaterShaderAssets()) {
+    // shoreEdgeFade: the basin's strips and pool sit over their own
+    // heightfield with no carved apron, so the waterline must come from the
+    // terrain contour, never the mesh rectangle.
+    waterMaterial = markSharedMaterial(
+      createWaterSurfaceMaterial(zeroWaveUniforms(), { shoreEdgeFade: true }),
+    );
+    return waterMaterial;
+  }
+  waterFallbackMaterial ??= markSharedMaterial(
+    new THREE.MeshLambertMaterial({
+      color: 0x0a5551,
+      transparent: true,
+      opacity: 0.88,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    }),
+  );
+  return waterFallbackMaterial;
+}
+
+/**
+ * Bakes aShoreDepth/aShoreSlope for a basin water geometry. `offsetX/offsetZ`
+ * map geometry-local coordinates into instance-local field coordinates;
+ * `surfaceY` is the water surface height in field space (defaults to each
+ * vertex's own y, for strips that follow the stream downhill).
+ */
+function bakeShoreAttributes(
+  geometry: THREE.BufferGeometry,
+  offsetX: number,
+  offsetZ: number,
+  surfaceY?: number,
+): void {
+  const positions = geometry.attributes.position;
+  const depth = new Float32Array(positions.count);
+  const slope = new Float32Array(positions.count);
+  const h = SHORE_SLOPE_SAMPLE_HALF_WIDTH;
+  for (let i = 0; i < positions.count; i++) {
+    const x = positions.getX(i) + offsetX;
+    const z = positions.getZ(i) + offsetZ;
+    const level = surfaceY ?? positions.getY(i);
+    depth[i] = level - wildheartFieldHeight(x, z);
+    const dx = wildheartFieldHeight(x + h, z) - wildheartFieldHeight(x - h, z);
+    const dz = wildheartFieldHeight(x, z + h) - wildheartFieldHeight(x, z - h);
+    slope[i] = Math.max(Math.hypot(dx, dz) / (2 * h), MIN_SHORE_SLOPE);
+  }
+  geometry.setAttribute('aShoreDepth', new THREE.BufferAttribute(depth, 1));
+  geometry.setAttribute('aShoreSlope', new THREE.BufferAttribute(slope, 1));
 }
 
 let streamGeometry: THREE.BufferGeometry | null = null;
+let cenoteGeometry: THREE.BufferGeometry | null = null;
 
-function buildWater(lowGfx: boolean): THREE.Group {
+// Crosswise vertex columns across the stream strip, so the shader's per-vertex
+// foam band, shallow grading, and contour edge-fade vary smoothly over the
+// width instead of interpolating straight bank to bank.
+const STREAM_COLUMNS = 9;
+const CENOTE_SURFACE_Y = -0.46;
+
+function buildWater(): THREE.Group {
   const group = new THREE.Group();
-  const material = basinWaterMaterial(lowGfx);
+  const material = basinWaterMaterial();
   if (!streamGeometry) {
     const positions: number[] = [];
     const indices: number[] = [];
     const segments = 64;
     for (let i = 0; i <= segments; i++) {
-      const z = 27 + (i / segments) * 150;
+      // From z 34, not 27: the sim's stream carve only ramps in over z 25-42,
+      // and a surface floated over UNCARVED flat ground has no waterline for
+      // the contour fade to find, it reads as a pale painted sheet with
+      // geometry edges (the "footpath" report). Start where the bed exists
+      // and let the emergence taper below do the rest.
+      const z = 34 + (i / segments) * 143;
       const center = wildheartStreamCenter(z);
-      const width = 4.8 + 2.1 * Math.sin((i / segments) * Math.PI) ** 2;
-      for (const side of [-1, 1]) {
-        const x = center + side * width;
-        positions.push(x, wildheartFieldHeight(center, z) + 0.55, z);
+      // Wider than the carved bed on purpose: with the shader's contour
+      // edge-fade the GEOMETRY is only a canvas, the visible bank is wherever
+      // the bed meets the surface, so the strip must overshoot the wet line,
+      // never clip it. Tapered at the emergence so the spring starts as a
+      // trickle instead of a full-width sheet.
+      const emergence = 0.35 + 0.65 * smoothstep(34, 58, z);
+      const width = (8 + 2.5 * Math.sin((i / segments) * Math.PI) ** 2) * emergence;
+      // +0.35, not +0.55: the closer the surface hugs the bed, the sooner the
+      // banks cross the fade threshold and the wet line follows the carve.
+      const y = wildheartFieldHeight(center, z) + 0.35;
+      for (let column = 0; column < STREAM_COLUMNS; column++) {
+        const x = center + ((column / (STREAM_COLUMNS - 1)) * 2 - 1) * width;
+        positions.push(x, y, z);
       }
       if (i < segments) {
-        const a = i * 2;
-        indices.push(a, a + 2, a + 1, a + 1, a + 2, a + 3);
+        const a = i * STREAM_COLUMNS;
+        for (let column = 0; column < STREAM_COLUMNS - 1; column++) {
+          indices.push(
+            a + column,
+            a + STREAM_COLUMNS + column,
+            a + column + 1,
+            a + column + 1,
+            a + STREAM_COLUMNS + column,
+            a + STREAM_COLUMNS + column + 1,
+          );
+        }
       }
     }
     streamGeometry = new THREE.BufferGeometry();
     streamGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
     streamGeometry.setIndex(indices);
     streamGeometry.computeVertexNormals();
+    bakeShoreAttributes(streamGeometry, 0, 0);
+    // Carve a VISUAL channel into the baked bathymetry: the stream surface
+    // floats only 0.55yd over its bed, so every vertex sat inside the shader's
+    // 4.5yd foam band and 6yd shallow ramp, the whole strip rendered as pale
+    // foam ("a footpath of water", per the live playtest). A parabolic
+    // mid-channel boost pushes the center toward the deep color while the true
+    // bank depth keeps the foam exactly on the banks. Presentation only: sim
+    // water (wildheartWaterMask) and collision are untouched.
+    {
+      const depthAttr = streamGeometry.getAttribute('aShoreDepth');
+      for (let i = 0; i < depthAttr.count; i++) {
+        const t = ((i % STREAM_COLUMNS) / (STREAM_COLUMNS - 1)) * 2 - 1;
+        // Cubed falloff, not a bare parabola: the strip overshoots the wet
+        // line for the contour fade, so the deep channel must die out before
+        // the banks or it eats the shoreline foam and shallow grade.
+        depthAttr.setX(i, depthAttr.getX(i) + 4.5 * (1 - t * t) ** 3);
+      }
+      depthAttr.needsUpdate = true;
+    }
     markSharedGeometry(streamGeometry);
   }
   const stream = new THREE.Mesh(streamGeometry, material);
   stream.renderOrder = 2;
   group.add(stream);
 
-  const cenoteGeometry = new THREE.CircleGeometry(35, 48).rotateX(-Math.PI / 2);
-  cenoteGeometry.scale(1, 1, 1.48);
-  markSharedGeometry(cenoteGeometry);
+  if (!cenoteGeometry) {
+    // A gridded plane (~2 yd spacing, the zone planes' density) instead of a
+    // fan: the foam band and depth grading need per-vertex shore samples. The
+    // displaced ground occludes the rectangle outside the pool bowl exactly as
+    // overworld terrain occludes its zone planes.
+    cenoteGeometry = new THREE.PlaneGeometry(74, 104, 37, 52).rotateX(-Math.PI / 2);
+    bakeShoreAttributes(cenoteGeometry, 0, 104, CENOTE_SURFACE_Y);
+    markSharedGeometry(cenoteGeometry);
+  }
   const cenote = new THREE.Mesh(cenoteGeometry, material);
-  cenote.position.set(0, -0.46, 104);
+  cenote.position.set(0, CENOTE_SURFACE_Y, 104);
   cenote.renderOrder = 2;
   group.add(cenote);
   return group;
@@ -420,8 +575,10 @@ function buildFireflies(lowGfx: boolean): THREE.Points {
 
 function buildWaterfalls(lowGfx: boolean): THREE.Group {
   const group = new THREE.Group();
+  // The falls carry the shared shallow-water tint so they match the shader
+  // surface they feed instead of introducing a third cyan.
   waterfallMaterial ??= new THREE.MeshBasicMaterial({
-    color: 0x4db7a5,
+    color: SHALLOW_COLOR,
     transparent: true,
     opacity: lowGfx ? 0.5 : 0.7,
     side: THREE.DoubleSide,
@@ -485,15 +642,286 @@ function buildWaterfalls(lowGfx: boolean): THREE.Group {
   return group;
 }
 
+let basinGrassGeometry: THREE.BufferGeometry | null = null;
+let basinGrassMaterial: THREE.Material | null = null;
+
+// Deterministic hash-grid scatter of the overworld grass-tuft look, baked once
+// as ONE static InstancedMesh (~6k instances, one draw call). High tier only.
+const BASIN_GRASS_STEP = 2.4;
+const BASIN_GRASS_DENSITY = 0.8;
+// Mirror foliage.ts GRASS_MAX_SLOPE / GRASS_SLOPE_EPS: no blades on cliffs.
+const BASIN_GRASS_MAX_SLOPE = 0.62;
+const BASIN_GRASS_SLOPE_EPS = 1.2;
+
+function buildBasinGrass(): THREE.InstancedMesh {
+  if (!basinGrassGeometry) {
+    // The lush crossed-quad tuft card, foliage.ts buildGrassRing's geometry.
+    const quad = new THREE.PlaneGeometry(1.45, 0.9);
+    quad.translate(0, 0.42, 0);
+    const quad2 = quad.clone().rotateY(Math.PI / 2);
+    const merged = mergeGeometries([quad, quad2]);
+    if (!merged) throw new Error('Wildheart grass geometry merge failed');
+    basinGrassGeometry = markSharedGeometry(merged);
+  }
+  basinGrassMaterial ??= markSharedMaterial(createGrassTuftMaterial());
+
+  const spots: { x: number; z: number; y: number; i: number; j: number }[] = [];
+  const columns = Math.floor(GROUND_WIDTH / BASIN_GRASS_STEP);
+  const rows = Math.floor(GROUND_DEPTH / BASIN_GRASS_STEP);
+  const minZ = GROUND_CENTER_Z - GROUND_DEPTH / 2;
+  const eps = BASIN_GRASS_SLOPE_EPS;
+  for (let i = 0; i <= columns; i++) {
+    for (let j = 0; j <= rows; j++) {
+      if (hash(i, j) > BASIN_GRASS_DENSITY) continue;
+      const x =
+        -GROUND_WIDTH / 2 +
+        i * BASIN_GRASS_STEP +
+        (hash(i, j + 101) - 0.5) * BASIN_GRASS_STEP * 1.4;
+      const z = minZ + j * BASIN_GRASS_STEP + (hash(i + 57, j) - 0.5) * BASIN_GRASS_STEP * 1.4;
+      // Stay clear of the dropped skirt ring at the mesh boundary.
+      if (Math.abs(x) > GROUND_WIDTH / 2 - 3 || z < minZ + 3 || z > minZ + GROUND_DEPTH - 3) {
+        continue;
+      }
+      if (wildheartWaterMask(x, z) > 0.2) continue;
+      if (routeDistance(x, z) < 3.2) continue;
+      const slopeX = wildheartFieldHeight(x + eps, z) - wildheartFieldHeight(x - eps, z);
+      const slopeZ = wildheartFieldHeight(x, z + eps) - wildheartFieldHeight(x, z - eps);
+      if (Math.hypot(slopeX, slopeZ) / (2 * eps) > BASIN_GRASS_MAX_SLOPE) continue;
+      spots.push({ x, z, y: wildheartFieldHeight(x, z), i, j });
+    }
+  }
+
+  const mesh = new THREE.InstancedMesh(basinGrassGeometry, basinGrassMaterial, spots.length);
+  mesh.userData.renderCategory = 'grass';
+  mesh.receiveShadow = true; // tufts darken inside canopy shade, like the ring
+  const matrix = new THREE.Matrix4();
+  const quaternion = new THREE.Quaternion();
+  const position = new THREE.Vector3();
+  const scale = new THREE.Vector3();
+  const up = new THREE.Vector3(0, 1, 0);
+  const color = new THREE.Color();
+  for (let n = 0; n < spots.length; n++) {
+    const spot = spots[n];
+    const size = 0.55 + hash(spot.i + 13, spot.j) * 1.1;
+    quaternion.setFromAxisAngle(up, hash(spot.i, spot.j + 7) * 12.4);
+    matrix.compose(position.set(spot.x, spot.y, spot.z), quaternion, scale.set(size, size, size));
+    mesh.setMatrixAt(n, matrix);
+    color.setHex(JUNGLE_GRASS_TINT);
+    color.offsetHSL(
+      (hash(spot.i + 211, spot.j) - 0.5) * 0.05,
+      (hash(spot.i, spot.j + 307) - 0.5) * 0.12,
+      (hash(spot.i + 409, spot.j) - 0.5) * 0.1,
+    );
+    mesh.setColorAt(n, color);
+  }
+  mesh.instanceMatrix.needsUpdate = true;
+  if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  return mesh;
+}
+
+function colorGeometry(geometry: THREE.BufferGeometry, color: number): THREE.BufferGeometry {
+  const count = geometry.attributes.position.count;
+  const base = new THREE.Color(color);
+  const colors = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    const shade = 0.82 + hash(i, color) * 0.22;
+    colors[i * 3] = base.r * shade;
+    colors[i * 3 + 1] = base.g * shade;
+    colors[i * 3 + 2] = base.b * shade;
+  }
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  return geometry;
+}
+
+let rimMaterial: THREE.Material | null = null;
+
+// Opaque flat-shaded vertex-color material for the edge-closing geometry (the
+// module's vertexMaterial() is the translucent path overlay, not reusable).
+function rimVertexMaterial(): THREE.Material {
+  if (rimMaterial) return rimMaterial;
+  rimMaterial = GFX.standardMaterials
+    ? new THREE.MeshStandardMaterial({
+        vertexColors: true,
+        roughness: 0.96,
+        metalness: 0.02,
+        flatShading: true,
+      })
+    : new THREE.MeshLambertMaterial({ vertexColors: true, flatShading: true });
+  markSharedMaterial(rimMaterial);
+  return rimMaterial;
+}
+
+const LIMESTONE_RIB_LIGHT = 0xc7b982;
+const LIMESTONE_RIB_DARK = 0xb9aa76;
+
+let ribsGeometry: THREE.BufferGeometry | null = null;
+
+// Continuous jagged limestone screens along every mesh edge (Orkadia's
+// buildBasaltRibs pattern): the straight terrain cut must never be an open
+// sightline. Merged flat-shaded opaque low-poly stacks, SwiftShader-safe -
+// and NOT part of WILDHEART_FIELD_PLACEMENTS, so sim placement/collider
+// tables are untouched.
+function buildCalderaRimRibs(): THREE.Mesh {
+  if (!ribsGeometry) {
+    const stacks: THREE.BufferGeometry[] = [];
+    const stack = (
+      x: number,
+      z: number,
+      h: number,
+      r: number,
+      spin: number,
+      tone: number,
+    ): void => {
+      const rib = new THREE.CylinderGeometry(r * 0.28, r, h, 5);
+      rib.rotateY(hash(spin, 11) * Math.PI);
+      rib.rotateZ((hash(spin, 13) - 0.5) * 0.14);
+      rib.translate(x, wildheartFieldHeight(x, z) + h * 0.45, z);
+      stacks.push(colorGeometry(rib, tone));
+    };
+    // Side screens: |x| 86-90, OUTSIDE the ±82 collision walls and INSIDE the
+    // ±92 mesh edge, so the stacks are pure scenery and need no colliders.
+    for (let side = -1; side <= 1; side += 2) {
+      for (let i = 0; i < 20; i++) {
+        const z = -28 + i * 14;
+        const x = side * (86 + hash(i, side) * 4);
+        const h = 12 + hash(i, side * 7) * 16;
+        const r = 3 + hash(i, side * 9) * 3.5;
+        stack(x, z, h, r, i * 17 + side, i % 4 === 0 ? LIMESTONE_RIB_LIGHT : LIMESTONE_RIB_DARK);
+      }
+      // Staggered infill offset half a step: an elevated camera (eye ~23yd at
+      // full zoom-out + pitch) sees -8..-10deg below-horizon slivers BETWEEN
+      // the primary stacks; a second offset row closes the gaps without
+      // thickening the silhouette at ground level.
+      for (let i = 0; i < 20; i++) {
+        const z = -21 + i * 14;
+        const x = side * (87.5 + hash(i, side * 21) * 3.5);
+        const h = 10 + hash(i, side * 23) * 14;
+        const r = 2.6 + hash(i, side * 27) * 3;
+        stack(
+          x,
+          z,
+          h,
+          r,
+          i * 19 + side + 700,
+          i % 3 === 0 ? LIMESTONE_RIB_LIGHT : LIMESTONE_RIB_DARK,
+        );
+      }
+    }
+    for (let i = 0; i < 13; i++) {
+      // North end row in the wall-to-cut margin (wall z=242, mesh edge z=249).
+      // The shoulder heightfield stands tall mid-row, but it keys on |x| only
+      // and the temple flat holds the terrace at 10.5, so an elevated camera
+      // (zoom 22, pitch 1.35 puts the eye ~23yd up) sees over short corner
+      // stacks: ramp the heights up toward the corners, where the raycast
+      // probe measured 20-33 deg below-horizon escape bands.
+      const nx = -84 + i * 14 + (hash(i, 51) - 0.5) * 4;
+      const nh = 9 + hash(i, 53) * 9 + Math.max(0, (Math.abs(nx) - 52) / 32) * 15;
+      const nr = 2.6 + hash(i, 55) * 1.6;
+      stack(
+        nx,
+        245.5 + (hash(i, 57) - 0.5) * 2,
+        nh,
+        nr,
+        i + 400,
+        i % 3 === 0 ? LIMESTONE_RIB_LIGHT : LIMESTONE_RIB_DARK,
+      );
+      // South end row (wall z=-24, mesh edge z=-31): the arrival multiplier
+      // flattens the heightfield to 0 at the entry, so these taller stacks
+      // alone must form the crest behind it.
+      const sx = -84 + i * 14 + (hash(i, 61) - 0.5) * 4;
+      const sh = 16 + hash(i, 63) * 10;
+      const sr = 2.8 + hash(i, 65) * 1.6;
+      stack(
+        sx,
+        -28 + (hash(i, 67) - 0.5) * 1.6,
+        sh,
+        sr,
+        i + 500,
+        i % 3 === 0 ? LIMESTONE_RIB_LIGHT : LIMESTONE_RIB_DARK,
+      );
+    }
+    // The four mesh corners (±92, 249) and (±92, -31) sit past both the side
+    // screens (end z 238) and the end rows (span |x| 84): without their own
+    // tall clusters they are exactly the NE/NW/SE/SW diagonal windows the
+    // elevated-camera probe found open.
+    for (let side = -1; side <= 1; side += 2) {
+      stack(side * 88, 242, 24 + hash(side, 71) * 6, 4.4, side * 3 + 600, LIMESTONE_RIB_LIGHT);
+      stack(side * 90, 247.5, 20 + hash(side, 73) * 6, 3.6, side * 5 + 610, LIMESTONE_RIB_DARK);
+      stack(side * 88, -26, 22 + hash(side, 75) * 6, 4.2, side * 7 + 620, LIMESTONE_RIB_DARK);
+      stack(side * 90, -30, 19 + hash(side, 77) * 5, 3.4, side * 9 + 630, LIMESTONE_RIB_LIGHT);
+    }
+    const merged = mergeGeometries(stacks, false);
+    if (!merged) throw new Error('Wildheart rim rib geometry merge failed');
+    ribsGeometry = markSharedGeometry(merged);
+  }
+  const ribs = new THREE.Mesh(ribsGeometry, rimVertexMaterial());
+  ribs.castShadow = true;
+  ribs.receiveShadow = true;
+  return ribs;
+}
+
+const CANOPY_RIDGE_LIGHT = 0x2c4f33;
+const CANOPY_RIDGE_DARK = 0x24422c;
+
+let ridgeGeometry: THREE.BufferGeometry | null = null;
+
+// Distant jungle-canopy silhouettes past both z edges (Orkadia's
+// buildDistantMountain pattern, in jungle greens).
+function buildDistantCanopyRidge(): THREE.Mesh {
+  if (!ridgeGeometry) {
+    const peaks: THREE.BufferGeometry[] = [];
+    // North: 23-35 yd past the z=249 mesh edge, closing the horizon behind the
+    // ritual pyramid. Seated lower than the Orkadia template (base ~y 4, not
+    // ~14): the temple-axis crest here is only ~10.5, so a higher base opens a
+    // sky sliver beneath the canopy line.
+    // 15 peaks spanning x -84..84, not the template's 9 across -46..46: the
+    // mesh corners are at |x|=92, and a ridge that stops at |x|~64 (cone base
+    // included) leaves the NE/NW diagonals from the boss terrace as open
+    // below-horizon windows at elevated camera pitch.
+    for (let i = 0; i < 15; i++) {
+      const x = -84 + i * 12;
+      const h = 34 + hash(i, 81) * 36;
+      const r = 10 + hash(i, 82) * 8;
+      const peak = new THREE.ConeGeometry(r, h, 5);
+      peak.rotateY(hash(i, 83) * Math.PI);
+      peak.translate(x, 6 + h * 0.45, 272 + hash(i, 84) * 12);
+      peaks.push(colorGeometry(peak, i % 2 ? CANOPY_RIDGE_DARK : CANOPY_RIDGE_LIGHT));
+    }
+    // South: a sparser mirrored row behind the entry edge. Unlike Orkadia's
+    // war-gate wall, the jaguar gate is an open arch, so the horizon behind
+    // the arrival flat needs its own canopy line; bases sink below the flat's
+    // y=0 so the perimeter skirt hides them.
+    for (let i = 0; i < 9; i++) {
+      const x = -84 + i * 21 + (hash(i, 91) - 0.5) * 6;
+      const h = 30 + hash(i, 92) * 30;
+      const r = 12 + hash(i, 93) * 8;
+      const peak = new THREE.ConeGeometry(r, h, 5);
+      peak.rotateY(hash(i, 94) * Math.PI);
+      peak.translate(x, h * 0.45 - 2, -55 - hash(i, 95) * 10);
+      peaks.push(colorGeometry(peak, i % 2 ? CANOPY_RIDGE_DARK : CANOPY_RIDGE_LIGHT));
+    }
+    const merged = mergeGeometries(peaks, false);
+    if (!merged) throw new Error('Wildheart canopy ridge geometry merge failed');
+    ridgeGeometry = markSharedGeometry(merged);
+  }
+  const ridge = new THREE.Mesh(ridgeGeometry, rimVertexMaterial());
+  ridge.castShadow = true;
+  ridge.receiveShadow = true;
+  return ridge;
+}
+
 export function buildWildheartTerrain(lowGfx: boolean): THREE.Group {
   const group = new THREE.Group();
   group.name = 'wildheartTerrain';
   group.add(buildGround(lowGfx));
   group.add(buildPath(-1), buildPath(1));
-  group.add(buildWater(lowGfx));
+  group.add(buildWater());
   group.add(buildTempleArena());
   group.add(buildFoliage());
+  if (!lowGfx) group.add(buildBasinGrass());
   group.add(buildWaterfalls(lowGfx));
   group.add(buildFireflies(lowGfx));
+  group.add(buildCalderaRimRibs());
+  group.add(buildDistantCanopyRidge());
   return group;
 }

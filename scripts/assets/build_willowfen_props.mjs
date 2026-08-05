@@ -28,7 +28,7 @@ const ITEMS = [
   { src: 'musroom-clusters.glb', out: 'fen_mushrooms.glb', target: 7000 },
   { src: 'log.glb', out: 'fen_log.glb', target: 5000 },
 ];
-const SRC_DIR = '/Users/demihenderson/Downloads/willowfen';
+const SRC_DIR = '<redacted-local-path>';
 const OUT_DIR = 'public/models/props';
 
 await MeshoptEncoder.ready;

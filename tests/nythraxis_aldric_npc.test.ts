@@ -15,17 +15,17 @@
 
 import { describe, expect, it } from 'vitest';
 import { handlePickedEntity, hoverCursorKind, isAttackableEntity } from '../src/game/interactions';
-import { ClientWorld } from '../src/net/online';
 import { DUNGEONS, instanceOrigin, NPCS, QUESTS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { bareClient } from './helpers/bare_client';
 
 const ALDRIC_ID = 'brother_aldric_raid';
 const FINAL_QUEST = 'q_nythraxis_scourges_end';
 const BOSS_ID = 'nythraxis_scourge_of_thornpeak';
 
-// --- harness (mirrors tests/nythraxis_raid.test.ts) -------------------------
+// --- harness (mirrors tests/nythraxis_raid_unit.test.ts) -------------------------
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
@@ -244,23 +244,8 @@ describe("[GUARD] turning in Scourge's End at Aldric works server-side", () => {
 // --- [SPEC] online client reconstructs Aldric's quest from NPCS -------------
 
 describe('[SPEC] the online client recognizes Aldric as a quest NPC', () => {
-  function bareClient(pid: number): ClientWorld {
-    const c: any = Object.create(ClientWorld.prototype);
-    c.cfg = { seed: 42, playerClass: 'warrior' };
-    c.entities = new Map();
-    c.missingSince = new Map(); // despawn-grace bookkeeping (set by the real field initializer)
-    c.playerId = pid;
-    c.questLog = new Map();
-    c.questsDone = new Set();
-    c.lastSnapAt = 0;
-    c.snapInterval = 50;
-    c.connected = true;
-    c.eventQueue = [];
-    return c;
-  }
-
   it('reconstructs questIds for an Aldric NPC identity record', () => {
-    const client = bareClient(1);
+    const client = bareClient(1, { cfg: { seed: 42, playerClass: 'warrior' } });
     const wire = {
       id: 7,
       k: 'npc',

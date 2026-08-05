@@ -219,7 +219,11 @@ describe('Eastbrook civic beacon shader animation', () => {
     const mask = micro.geometry.getAttribute(EASTBROOK_CIVIC_MASK_ATTRIBUTE);
     const bytes = mask.array as Uint8Array;
     const selectedCount = bytes.reduce((sum, value) => sum + (value === 255 ? 1 : 0), 0);
-    const civicTemplateVertexCount = 36;
+    // The merge preserves exact full-tuple indices instead of de-indexing, so
+    // the box fixture contributes its 24 UNIQUE vertices (4 per face, since the
+    // per-face normals differ) rather than the 36 it expands to when every
+    // triangle carries its own copy. Same rendered geometry, fewer vertices.
+    const civicTemplateVertexCount = 24;
 
     expect(mask.normalized).toBe(true);
     expect(mask.count).toBe(micro.geometry.getAttribute('position').count);
@@ -237,10 +241,10 @@ describe('Eastbrook civic beacon shader animation', () => {
     });
     expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 18, shadowDraws: 9 });
 
-    view.update(0, 5, 0, 0, 0, 0, 100, true);
+    view.update(0, 5, 0, 0, 0, 0, 100, 1, true);
     const shader = compileMaterial(micro.material as THREE.Material);
     expect(shader.uniforms.uEastbrookCivicReducedMotion.value).toBe(1);
-    view.update(0, 5, 0, 0, 0, 0, 100, false);
+    view.update(0, 5, 0, 0, 0, 0, 100, 1, false);
     expect(shader.uniforms.uEastbrookCivicReducedMotion.value).toBe(0);
     expect(view.update.toString()).not.toMatch(/\bnew\s+/);
   });
@@ -322,7 +326,7 @@ describe('Eastbrook civic beacon shader animation', () => {
     });
   });
 
-  it('preserves the committed 28,330 runtime triangle budget without another draw', async () => {
+  it('preserves the committed 29,110 runtime triangle budget without another draw', async () => {
     await MeshoptDecoder.ready;
     const io = new NodeIO()
       .registerExtensions(ALL_EXTENSIONS)
@@ -342,7 +346,7 @@ describe('Eastbrook civic beacon shader animation', () => {
       triangleCountByAsset[assetUrl] = triangles;
     }
     expect(eastbrookTownTriangleBudget(triangleCountByAsset)).toMatchObject({
-      maximumRuntimeTriangles: 28_330,
+      maximumRuntimeTriangles: 29_110,
       withinHardCeiling: true,
       meetsTarget: true,
     });

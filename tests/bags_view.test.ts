@@ -46,6 +46,13 @@ const ITEMS: Record<string, ItemDef> = {
     quality: 'rare',
   } as ItemDef,
   soulbound: { kind: 'quest', name: 'Soulbound Key', quality: 'epic', noDiscard: true } as ItemDef,
+  starterTool: {
+    kind: 'tool',
+    name: 'Gathering Sickle',
+    quality: 'common',
+    noVendorSell: true,
+    noMarketList: true,
+  } as ItemDef,
   mark: {
     kind: 'tool',
     name: 'Heroic Mark',
@@ -141,6 +148,69 @@ describe('bagItemAction priority order', () => {
     expect(bagItemAction(ITEMS.sword, { ...NO_MODE, petFeed: true })).toBe('petFeedBlocked');
     expect(bagItemAction(ITEMS.questItem, NO_MODE)).toBe('discardQuest');
     expect(bagItemAction(ITEMS.potion, NO_MODE)).toBe('use');
+  });
+});
+
+describe('transfer-locked instanced copies (issue 1165)', () => {
+  const ARMED = { bindOnTrade: true };
+  const STAMPED = { bindOnTrade: true, boundTo: 7 };
+  const SIGNED = { signer: 'Ayla' };
+
+  it('blocks a locked copy in market-sell mode, in place, for armed AND stamped', () => {
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, marketSell: true }, ARMED)).toBe(
+      'marketSellBlockedBound',
+    );
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, marketSell: true }, STAMPED)).toBe(
+      'marketSellBlockedBound',
+    );
+  });
+
+  it('blocks a locked copy in mail-attach mode, in place, for armed AND stamped', () => {
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, mailAttach: true }, ARMED)).toBe(
+      'mailAttachBlockedBound',
+    );
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, mailAttach: true }, STAMPED)).toBe(
+      'mailAttachBlockedBound',
+    );
+  });
+
+  it('an UNLOCKED instanced copy stages normally: signed goods list and mail', () => {
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, marketSell: true }, SIGNED)).toBe('marketSell');
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, mailAttach: true }, SIGNED)).toBe('mailAttach');
+  });
+
+  it('the def-level gates still outrank the lock: quest/noMarketList block first', () => {
+    expect(bagItemAction(ITEMS.questItem, { ...NO_MODE, marketSell: true }, STAMPED)).toBe(
+      'marketSellBlockedQuest',
+    );
+    expect(bagItemAction(ITEMS.bound, { ...NO_MODE, mailAttach: true }, STAMPED)).toBe(
+      'mailAttachBlocked',
+    );
+  });
+
+  it('a lock never blocks outside the two pipe modes: vendor/bank/trade are unchanged', () => {
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, tradeOpen: true }, STAMPED)).toBe('trade');
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, vendorOpen: true }, STAMPED)).toBe(
+      'vendorSell',
+    );
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, bankDeposit: true }, STAMPED)).toBe(
+      'bankDeposit',
+    );
+  });
+
+  it('the tooltip hint mirrors the block: cannot-market / cannot-mail for locked copies', () => {
+    expect(bagTooltipHintKey(ITEMS.sword, { ...NO_MODE, marketSell: true }, STAMPED)).toBe(
+      'itemUi.tooltip.cannotMarket',
+    );
+    expect(bagTooltipHintKey(ITEMS.sword, { ...NO_MODE, mailAttach: true }, ARMED)).toBe(
+      'hudChrome.mailbox.cannotMail',
+    );
+    expect(bagTooltipHintKey(ITEMS.sword, { ...NO_MODE, marketSell: true }, SIGNED)).toBe(
+      'itemUi.tooltip.clickMarketList',
+    );
+    expect(bagTooltipHintKey(ITEMS.sword, { ...NO_MODE, mailAttach: true }, SIGNED)).toBe(
+      'hudChrome.mailbox.clickAttach',
+    );
   });
 });
 
@@ -463,5 +533,38 @@ describe('bagsMoneyRowStale', () => {
   it('is not pinned to the current shown value', () => {
     // Mirrors bagsWindowShown's own contract: guard the hidden values, not 'flex'.
     expect(bagsMoneyRowStale('block', 5000, 1000)).toBe(true);
+  });
+});
+
+describe('noVendorSell affordances (the quest-granted starter tools)', () => {
+  it('denies the vendor click in place instead of dispatching a sale the sim refuses', () => {
+    // The sim refuses on noVendorSell (src/sim/items.ts sellItem). Before this
+    // mirror existed the click dispatched anyway and the player's only feedback
+    // was an error toast. A quality-'common' tool with a real sellValue is the
+    // case that made it visible: the tier-1 gathering tools are the first items
+    // to carry noVendorSell AND a nonzero sell price.
+    expect(bagItemAction(ITEMS.starterTool, { ...NO_MODE, vendorOpen: true })).toBe(
+      'vendorSellBlocked',
+    );
+    // Discriminating control: an ordinary sellable item still sells.
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, vendorOpen: true })).toBe('vendorSell');
+  });
+
+  it('labels the tooltip cannot-vendor rather than advertising a click to sell', () => {
+    expect(bagTooltipHintKey(ITEMS.starterTool, { ...NO_MODE, vendorOpen: true })).toBe(
+      'itemUi.tooltip.cannotVendor',
+    );
+    expect(bagTooltipHintKey(ITEMS.sword, { ...NO_MODE, vendorOpen: true })).toBe(
+      'itemUi.tooltip.clickSell',
+    );
+  });
+
+  it('leaves every other mode alone: the flag gates the vendor arm only', () => {
+    // noVendorSell must not leak into trade, bank, or use. The tool is also
+    // noMarketList, so the market and mail arms block on THAT flag, which is a
+    // separate rule with its own pins above.
+    expect(bagItemAction(ITEMS.starterTool, { ...NO_MODE, tradeOpen: true })).toBe('trade');
+    expect(bagItemAction(ITEMS.starterTool, { ...NO_MODE, bankDeposit: true })).toBe('bankDeposit');
+    expect(bagItemAction(ITEMS.starterTool, NO_MODE)).toBe('use');
   });
 });

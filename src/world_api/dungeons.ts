@@ -48,14 +48,27 @@ export interface IWorldDungeons {
   raidLockouts(): RaidLockout[];
   // The active procedural Rift floor for the local player (null outside a rift).
   riftFloor: RiftFloorView | null;
-  // Key into the per-Sim rift collision registry (sim/colliders.ts), used by the
-  // renderer's camera occlusion inside a rift. Per world INSTANCE, not per seed;
-  // 0 where no rift regions are registered (the online ClientWorld).
+  // Key into the per-Sim rift collision registry (sim/colliders.ts). The client
+  // threads this through findPlayerPath/resolvePlayerDestination (click-to-move)
+  // and the swept-landing crest re-resolve behind Blink, Shadowstep, and Heroic
+  // Leap (src/sim/combat/heroic_leap.ts), so those routes treat a rift wall as
+  // solid instead of open floor. Per world INSTANCE, not per seed; 0 (inert,
+  // matching outside-a-rift behavior) where no rift regions are registered, which
+  // is always true for the online ClientWorld: collision resolution there is
+  // server-authoritative, so it never registers a region of its own.
   riftCollisionToken: number;
   // Live lethal death zones on the current rift boss floor (empty outside a rift or
   // before the A-rank mechanic fires). The renderer draws a pulsing red decal ring
   // at each zone position so players can see and react to the telegraph.
   riftBossDeathZones(): RiftBossDeathZoneView[];
+  // Milliseconds remaining before the current rift's backing world event stops
+  // admitting new parties (see closeNaturalRiftPortal in sim/rift/portals.ts: an
+  // already in-progress run plays out past this deadline, only the overworld
+  // entrance closes to new entrants). Null outside a rift (riftFloor is null) or
+  // for a dev-spawned rift, which has no backing event. Recomputed fresh on every
+  // call, like raidLockouts(), so the HUD "closes in" countdown ticks locally
+  // without a snapshot round trip.
+  riftEventMsRemaining(): number | null;
   dungeonDifficulty(): DungeonDifficulty;
   setDungeonDifficulty(difficulty: DungeonDifficulty): void;
   // Buy one Heroic Quartermaster offer (src/sim/content/heroic_vendor.ts),

@@ -2138,6 +2138,7 @@ interface EmissiveRestore {
   roughness: number;
   metalnessMap: THREE.Texture | null;
   roughnessMap: THREE.Texture | null;
+  envMapIntensity: number;
 }
 
 interface EmissiveEntry {
@@ -2157,16 +2158,27 @@ function deriveEmissive(mat: THREE.MeshStandardMaterial, e: WeaponVfxEmissiveSpe
     roughness: mat.roughness,
     metalnessMap: mat.metalnessMap ?? null,
     roughnessMap: mat.roughnessMap ?? null,
+    envMapIntensity: mat.envMapIntensity,
   };
   // Temper the PBR response while the rig owns the material: the generator's
   // metallic map scatters hot metallic texels that explode into blocky glints
-  // under bloom. The codex look is flat-shaded stylized anyway.
+  // under bloom. The codex look is flat-shaded stylized anyway. The metal env
+  // boost from applyWeaponMaterialPolish is neutralized with it (metalness 0
+  // makes it near-inert, but a boosted dielectric still picks up a visible
+  // sheen) and restored on dispose alongside the rest.
   mat.metalness = 0;
   mat.roughness = 1;
   mat.metalnessMap = null;
   mat.roughnessMap = null;
+  mat.envMapIntensity = 1;
   const img = mat.map?.image as HTMLImageElement | HTMLCanvasElement | ImageBitmap | undefined;
-  if (!img?.width) {
+  // A compressed (KTX2) map has a truthy image {width,height} but is not
+  // drawable into a canvas, so it must take the flat-tint fallback. Skin
+  // models with a WEAPON_VFX rig deliberately ship webp for this derivation
+  // (scripts/assets/compress_glb_textures.mjs excludes them); this guard keeps
+  // a future mistakenly-compressed skin subtle instead of throwing mid-frame.
+  const drawable = !(mat.map as { isCompressedTexture?: boolean } | null)?.isCompressedTexture;
+  if (!img?.width || !drawable) {
     mat.emissive = new THREE.Color(e.tint);
     mat.emissiveIntensity = 0.3;
     return { prev, tex: null, albedoTex: null };
@@ -2949,6 +2961,7 @@ export function createWeaponVfx(
         prev.mat.roughness = prev.roughness;
         prev.mat.metalnessMap = prev.metalnessMap;
         prev.mat.roughnessMap = prev.roughnessMap;
+        prev.mat.envMapIntensity = prev.envMapIntensity;
         if (prev.emissive) prev.mat.emissive.copy(prev.emissive);
         prev.mat.emissiveIntensity = prev.emissiveIntensity;
         prev.mat.needsUpdate = true;

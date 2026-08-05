@@ -6,7 +6,6 @@ import {
   setDesktopDownloadVersion,
   setDesktopModuleVersion,
   setGameVersionText,
-  setPackageLockVersion,
   setPackageVersion,
   setReadmeVersionBadge,
 } from '../scripts/release_version.mjs';
@@ -16,25 +15,6 @@ const PACKAGE_JSON = JSON.stringify(
     name: 'world-of-claudecraft',
     version: '0.20.0',
     private: true,
-  },
-  null,
-  2,
-);
-
-const PACKAGE_LOCK = JSON.stringify(
-  {
-    name: 'world-of-claudecraft',
-    version: '0.20.0',
-    lockfileVersion: 3,
-    packages: {
-      '': {
-        name: 'world-of-claudecraft',
-        version: '0.20.0',
-      },
-      'node_modules/example': {
-        version: '9.9.9',
-      },
-    },
   },
   null,
   2,
@@ -119,13 +99,6 @@ describe('release version transforms', () => {
     expect(out.private).toBe(true);
   });
 
-  it('updates the root package lock versions only', () => {
-    const out = JSON.parse(setPackageLockVersion(PACKAGE_LOCK, '0.21.0'));
-    expect(out.version).toBe('0.21.0');
-    expect(out.packages[''].version).toBe('0.21.0');
-    expect(out.packages['node_modules/example'].version).toBe('9.9.9');
-  });
-
   it('updates macOS desktop artifact links', () => {
     const out = setDesktopDownloadVersion(INDEX_HTML, '0.21.0', 'index.html');
     expect(out).toContain('world-of-claudecraft-0.21.0-mac-universal.dmg');
@@ -185,7 +158,6 @@ describe('planReleaseVersion', () => {
     const plan = planReleaseVersion({
       version: '0.21.0',
       packageJson: PACKAGE_JSON,
-      packageLock: PACKAGE_LOCK,
       gradle: GRADLE,
       pbxproj: PBXPROJ,
       desktopModule: DESKTOP_TS,
@@ -199,7 +171,6 @@ describe('planReleaseVersion', () => {
     });
 
     expect(JSON.parse(plan.packageJson).version).toBe('0.21.0');
-    expect(JSON.parse(plan.packageLock).packages[''].version).toBe('0.21.0');
     expect(plan.gradle).toContain('versionName "0.21.0"');
     expect(plan.pbxproj.match(/MARKETING_VERSION = 0\.21\.0;/g)).toHaveLength(2);
     expect(plan.htmlFiles['index.html']).toContain('world-of-claudecraft-0.21.0-mac-universal.dmg');
@@ -219,7 +190,6 @@ describe('collectReleaseVersionFailures', () => {
     const failures = collectReleaseVersionFailures({
       version: '0.21.0',
       packageJson: PACKAGE_JSON,
-      packageLock: PACKAGE_LOCK,
       gradle: GRADLE,
       pbxproj: PBXPROJ,
       desktopModule: DESKTOP_TS,
@@ -235,7 +205,6 @@ describe('collectReleaseVersionFailures', () => {
     expect(failures).toEqual(
       expect.arrayContaining([
         'package.json version is 0.20.0, expected 0.21.0',
-        'package-lock.json root version is 0.20.0, expected 0.21.0',
         'android/app/build.gradle versionName is 0.20.0, expected 0.21.0',
         'ios/App/App.xcodeproj/project.pbxproj MARKETING_VERSION includes 0.20.0, expected all 0.21.0',
         'index.html game-version is v0.10, expected v0.21.0',
@@ -253,7 +222,6 @@ describe('collectReleaseVersionFailures', () => {
     const failures = collectReleaseVersionFailures({
       version: '0.20.0',
       packageJson: PACKAGE_JSON,
-      packageLock: PACKAGE_LOCK,
       gradle: GRADLE,
       pbxproj: PBXPROJ,
       desktopModule: DESKTOP_TS,

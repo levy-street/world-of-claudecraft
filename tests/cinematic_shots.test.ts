@@ -4738,7 +4738,10 @@ describe('cinematic shot mechanical gate', () => {
           (control.expectedMeasured === undefined ||
             violation.measured.includes(control.expectedMeasured)),
       );
-      expect(expected, violations.map(violationMessage).join('\n')).toBeDefined();
+      expect(
+        expected,
+        `${control.def.id}\n${violations.map(violationMessage).join('\n')}`,
+      ).toBeDefined();
       // LOAD-BEARING: several arrival controls trip multiple arms. The expectedMeasured
       // substring keeps per-arm coverage from silently collapsing to whichever arm reports first.
       if (control.expectedMeasured !== undefined) {

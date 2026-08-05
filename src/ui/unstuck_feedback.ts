@@ -28,6 +28,26 @@ const error = (key: TranslationKey): UnstuckFeedback => ({
 
 const seconds = (value: number): string => formatNumber(value, { maximumFractionDigits: 0 });
 
+/**
+ * The two live outcomes both end at the graveyard under Unstuck Sickness and differ only in
+ * whether a revive happened, so they get their own keys. The retired reasons keep their
+ * shipped keys: 'nearest_safe_position' (short-range teleport, historical telemetry) and
+ * 'nearest_graveyard' (the pre-0.32.1 kill-and-release outcome, still emitted by a
+ * not-yet-updated server when an OTA bundle runs ahead of it).
+ */
+function completedKey(reason: Extract<Event, { phase: 'completed' }>['reason']): TranslationKey {
+  switch (reason) {
+    case 'moved_to_graveyard':
+      return 'hudChrome.unstuck.movedToGraveyard';
+    case 'revived_at_graveyard':
+      return 'hudChrome.unstuck.revivedAtGraveyardUnstuck';
+    case 'nearest_graveyard':
+      return 'hudChrome.unstuck.completedAtGraveyard';
+    case 'nearest_safe_position':
+      return 'hudChrome.unstuck.completed';
+  }
+}
+
 export function unstuckFeedback(event: Event): UnstuckFeedback {
   if (event.phase === 'started') {
     return {
@@ -52,10 +72,7 @@ export function unstuckFeedback(event: Event): UnstuckFeedback {
   }
   if (event.phase === 'completed') {
     return {
-      key:
-        event.reason === 'revived_at_graveyard'
-          ? 'hudChrome.unstuck.revivedAtGraveyard'
-          : 'hudChrome.unstuck.completedAtGraveyard',
+      key: completedKey(event.reason),
       kind: 'success',
       banner: true,
       log: true,

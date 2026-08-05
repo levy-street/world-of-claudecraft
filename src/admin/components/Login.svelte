@@ -6,6 +6,9 @@
   // Login screen (fixed overlay). Ids kept (#login, #login-username, #login-password,
   // #login-error) for style + mobile-zoom-check fidelity. Auth is server-gated; this
   // just submits credentials and shows the localized error/session-expiry notice.
+  // The 2FA code field only appears once the server challenges (auth.twoFactorRequired,
+  // set after a password-accepted response with no token): username/password stay in
+  // their fields so the second submit reuses them, mirroring the game client's flow.
   let username = $state('');
   let password = $state('');
   let code = $state('');

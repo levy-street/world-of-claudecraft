@@ -125,30 +125,14 @@ describe('generated chunk geometry is stable', () => {
     expect(inRect.length).toBe(36);
     expect(gapFill.length).toBe(22);
 
-    // Re-minted for the Eastbrook camp respacing (PR #2584, maintainer-ordered):
-    // camp radii drive the terrain flatten aprons, so the deliberate, reviewed
-    // spread of the starter camps regrades the Vale rect. The prior pin
-    // (6f7fb63da247a5eb272dd9d7a42a5fcd) dated from before that change; the
-    // gap-cell fill must still not perturb a single byte of in-rect geometry.
-    // Re-minted for the asymmetric campaign bounds: the same positions/colors
-    // now carry UVs normalized over WORLD_MIN_X..WORLD_MAX_X instead of the
-    // obsolete symmetric -WORLD_MAX_X..WORLD_MAX_X range.
-    expect(digestOf(inRect)).toBe('6e57b2b3457fd7612e6ace78247a2f22');
-    // The gap super-chunks' own pin. Re-mint ONLY for a deliberate, reviewed
-    // visual change.
-    // Re-minted for the ferry fidelity program's harbor terrain edits: the
-    // mainland shore pad and re-authored berth basins (HARBOR_TERRAIN_EDITS,
-    // F2.1/F2.2) deliberately regrade gap chunks around both harbors. The
-    // in-rect Eastbrook pin above is untouched: not one Vale byte moved.
-    // Re-minted for the voyage crossing channel (J2): three deep-level
-    // HARBOR_TERRAIN_EDITS stamps carve honest depth under the filmed
-    // open-water leg on the crossing track. Mid-sea gap cells only; the
-    // in-rect Eastbrook pin above did not move.
-    // Re-minted for the J9 arrival lanes: two deep-level HARBOR_TERRAIN_EDITS
-    // stamps carve the stern-reach water under the re-authored bow-first
-    // docking glides (mainland north strait side, Gullhaven north bay).
-    // Mid-sea gap cells only; the in-rect Eastbrook pin above did not move.
-    expect(digestOf(gapFill)).toBe('d4e5c50eb6f1c475a0227b9c22a7ee1a');
+    // Re-minted for the greenSeamT south-edge skirt: the seam used to switch
+    // on at full strength at z = 170, so the coast appliers it silences came
+    // back all at once and stepped the shore along that whole line. It now
+    // fades in across 154..170, which moves ground in that 16yd band only
+    // (bit-identical from z = 170 north). An INTENDED visual change.
+    expect(digestOf(inRect)).toBe('0a81421c349f44363e06762c52f59199');
+    // The gap super-chunks west of the rect straddle the same 154..170 band.
+    expect(digestOf(gapFill)).toBe('edc996daba4c47f40f211f99c1d738d8');
 
     terrain.cancelStreaming();
   });

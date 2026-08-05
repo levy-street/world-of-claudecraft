@@ -30,8 +30,10 @@ Subdirectories (plus one shared fixture):
 - `browser/`: OPT-IN real-browser Playwright suite (`*.browser.test.ts`,
   `npm run test:browser`) for WebKit/Safari CSS, axe, target-size; never a bare `vitest run`.
 - `progression/`: mirrors `src/sim/progression/` (unit tests for the extracted modules).
-- `helpers/` + `util/`: shared cross-suite utilities (`fake_dom.ts`, the reusable
-  hand-rolled fake DOM for controller suites, `i18n_determinism.ts`, `ts_files_under.ts`
+- `helpers/` + `util/`: shared cross-suite utilities (`bare_client.ts`, the shared
+  `bareClient()`/`fakeWs()`/`lastSnap()`/`joinServer()`/`broadcast()` family, see
+  "Server tests" below; `fake_dom.ts`, the reusable hand-rolled fake DOM for controller
+  suites, `i18n_determinism.ts`, `ts_files_under.ts`
   and `css_tree_under.ts`, the two source walks, `scan_guard_self_audit.ts`, the pin that
   keeps a guard from re-growing its own directory read, `method_call_sites.ts`, the
   `ts.createSourceFile` walk that reports the calls a class method evaluates, each with the
@@ -64,8 +66,13 @@ Postgres is mocked at the top: `vi.mock('../server/db', () => ({ pool, saveChara
 (hoisted; keep it ABOVE the `server/game` import). Drive `new GameServer()` with a
 fake socket: `fakeWs()` collects `JSON.parse`'d sends; `server.join(...)`,
 `server.handleMessage(session, JSON.stringify({t:'cmd',...}))`, `(server as any).broadcastSnapshots()`.
-For the online client path, build a `ClientWorld` with `Object.create(ClientWorld.prototype)`
-(see `bareClient` in `snapshots.test.ts`/`talents.test.ts`) and call `applySnapshot(...)`.
+For the online client path, build a `ClientWorld` without the WebSocket plumbing by importing
+`bareClient(pid, overrides?)` from `tests/helpers/bare_client.ts` (also hosts the `fakeWs`/
+`lastSnap`/`joinServer`/`broadcast` family above) and call `applySnapshot(...)` on the result;
+it mirrors every field `ClientWorld` declares a static default for, so a new field never needs
+a manual sweep across suites. Import it rather than hand-rolling `Object.create(ClientWorld.prototype)`
+again, unless the suite genuinely needs a narrower or differently-shaped fixture (a few do, each
+marked with a one-line "kept bespoke on purpose" comment, issue #2088).
 `server/social.ts` etc. take injected interfaces: implement an in-memory `FakeDb`/
 transport (see `social_system.test.ts`) rather than mocking. REST/RouteDef endpoints
 use the `tests/server/helpers/` fakes (see Map), not a bespoke GameServer rig.

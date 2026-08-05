@@ -139,6 +139,20 @@ class FakeDb implements SocialDb {
     const m = this.members.get(c);
     if (m) m.rank = rank;
   }
+  async transferGuildLeader(
+    guildId: number,
+    fromCharId: number,
+    toCharId: number,
+  ): Promise<'ok' | 'not_leader' | 'not_member' | 'no_guild'> {
+    if (!this.guilds.has(guildId)) return 'no_guild';
+    const fromM = this.members.get(fromCharId);
+    if (!fromM || fromM.guildId !== guildId || fromM.rank !== 'leader') return 'not_leader';
+    const toM = this.members.get(toCharId);
+    if (!toM || toM.guildId !== guildId) return 'not_member';
+    toM.rank = 'leader';
+    fromM.rank = 'officer';
+    return 'ok';
+  }
   private lastLogins = new Map<number, string>();
   setLastLogin(id: number, iso: string): void {
     this.lastLogins.set(id, iso);
@@ -212,6 +226,7 @@ class FakeTransport implements SocialTransport {
   presence = new Map<number, Presence>();
   delivered = new Map<number, SocialEvent[]>();
   snapshotCount = new Map<number, number>();
+  renamed: { id: number; guildId: number; oldName: string; newName: string }[] = [];
   blockSets = new Map<number, number[]>();
   ignoreSets = new Map<number, number[]>();
 
@@ -247,6 +262,10 @@ class FakeTransport implements SocialTransport {
   }
   pushSnapshot(id: number): void {
     this.snapshotCount.set(id, (this.snapshotCount.get(id) ?? 0) + 1);
+  }
+  onGuildRenamed(id: number, guildId: number, oldName: string, newName: string): void {
+    this.renamed.push({ id, guildId, oldName, newName });
+    this.deliver(id, [{ type: 'guildRenamed', guildId, newName }]);
   }
   onBlocksChanged(id: number, ids: number[]): void {
     this.blockSets.set(id, ids);
@@ -292,6 +311,7 @@ class FakeTransport implements SocialTransport {
   clear(): void {
     this.delivered.clear();
     this.snapshotCount.clear();
+    this.renamed = [];
   }
 }
 
@@ -764,6 +784,79 @@ describe('guilds', () => {
     expect(snap.guild?.rank).toBe('member');
     // leader saw the join broadcast
     expect(h.tx.textFor(1).join()).toMatch(/Bet has joined the guild/);
+  });
+
+  it('propagates an admin rename without DB reads or social snapshot fanout', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    h.tx.clear();
+    h.db.guildMembership = () => {
+      throw new Error('rename propagation must not read membership');
+    };
+    h.db.guildMembers = () => {
+      throw new Error('rename propagation must not read members');
+    };
+
+    h.svc.guildRenamed(1, 'Knights', 'Dawn Guard', [1, 1]);
+
+    expect(h.tx.renamed).toEqual([
+      { id: 1, guildId: 1, oldName: 'Knights', newName: 'Dawn Guard' },
+    ]);
+    expect(h.tx.eventsFor(1)).toContainEqual({
+      type: 'guildRenamed',
+      guildId: 1,
+      newName: 'Dawn Guard',
+    });
+    expect(h.tx.snapshotCount.size).toBe(0);
+  });
+
+  it('cancels pending invitations and notifies both online sides without the old name', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildInvite(h.actor(1), 'Gimel');
+    h.tx.clear();
+
+    h.svc.guildRenamed(1, 'Knights', 'Dawn Guard', [1]);
+
+    expect(h.tx.eventsFor(1)).toContainEqual({ type: 'guildInviteCancelled' });
+    expect(h.tx.eventsFor(2)).toEqual([{ type: 'guildInviteCancelled' }]);
+    expect(h.tx.eventsFor(3)).toEqual([{ type: 'guildInviteCancelled' }]);
+    expect(JSON.stringify([...h.tx.delivered.values()])).not.toContain('Knights');
+    await h.svc.guildAccept(h.actor(2));
+    expect(h.tx.errorsFor(2).join()).toMatch(/expired/i);
+    await h.svc.guildAccept(h.actor(3));
+    expect(h.tx.errorsFor(3).join()).toMatch(/expired/i);
+  });
+
+  it('keeps another guild pending invitation intact during a rename', async () => {
+    h.add(4, 'Dalet');
+    h.tx.setOnline(4);
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildCreate(h.actor(3), 'Raiders');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildInvite(h.actor(3), 'Dalet');
+    h.tx.clear();
+
+    h.svc.guildRenamed(1, 'Knights', 'Dawn Guard', [1]);
+
+    expect(h.tx.eventsFor(2)).toEqual([{ type: 'guildInviteCancelled' }]);
+    expect(h.tx.eventsFor(4)).toHaveLength(0);
+    await h.svc.guildAccept(h.actor(4));
+    expect((await h.svc.snapshot(4)).guild?.name).toBe('Raiders');
+  });
+
+  it('hard-bounds malformed admin member lists to the guild member cap', () => {
+    for (let id = 1; id <= 120; id++) h.tx.setOnline(id);
+    h.tx.clear();
+
+    h.svc.guildRenamed(
+      1,
+      'Knights',
+      'Dawn Guard',
+      Array.from({ length: 120 }, (_, index) => index + 1),
+    );
+
+    expect(h.tx.renamed).toHaveLength(100);
+    expect(h.tx.renamed.at(-1)?.id).toBe(100);
   });
 
   it('only officers and leaders may invite', async () => {
@@ -1254,6 +1347,30 @@ describe('guild atomicity (#149)', () => {
     await h.svc.guildAccept(h.actor(2));
     expect(h.tx.errorsFor(2).join()).toMatch(/no longer exists/i);
     expect((await h.svc.snapshot(2)).guild).toBeNull();
+  });
+
+  it('two racing /gleader transfers to different targets never both succeed', async () => {
+    // Both calls read "actor is still Guild Master" before either write
+    // lands. The non-atomic flow (two independent setGuildRank writes with
+    // no lock or re-check between them) let both promotions through, so the
+    // guild ended up with two members simultaneously ranked leader.
+    h.add(3, 'Cee');
+    h.tx.setOnline(3);
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    await h.svc.guildInvite(h.actor(1), 'Cee');
+    await h.svc.guildAccept(h.actor(3));
+    h.tx.clear();
+
+    await Promise.all([
+      h.svc.guildTransferLeader(h.actor(1), 'Bet'),
+      h.svc.guildTransferLeader(h.actor(1), 'Cee'),
+    ]);
+
+    const guildId = (await h.db.guildMembership(1))!.guildId;
+    const leaders = (await h.db.guildMembers(guildId)).filter((m) => m.rank === 'leader');
+    expect(leaders).toHaveLength(1);
   });
 });
 

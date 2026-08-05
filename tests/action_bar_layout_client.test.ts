@@ -6,6 +6,9 @@ import type { ActionBarLayout } from '../src/world_api/action_bar';
 // (no WebSocket plumbing) with fake timers. This pins the write-amplification
 // defenses: a burst of edits collapses to ONE wire save carrying the final
 // layout, and an unchanged re-save sends nothing.
+// Kept bespoke on purpose (issue #2088): this fixture also returns the {client,
+// sent} pair, unlike tests/helpers/bare_client.ts's bareClient(), which is the
+// default for a new suite that just needs a bare ClientWorld.
 function bareClient(): { client: any; sent: any[] } {
   const client: any = Object.create(ClientWorld.prototype);
   client.actionBarSaveTimer = null;

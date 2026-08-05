@@ -11,7 +11,7 @@ import { REALM_PORTALS } from '../sim/content/realm';
 import { hash2 } from '../sim/rng';
 import { terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { flowerTuftTexture } from './textures';
 
 export interface HollowGatesView {
@@ -26,7 +26,7 @@ const GATE_URLS = {
 type GateKey = keyof typeof GATE_URLS;
 const gateScenes: Partial<Record<GateKey, THREE.Group>> = {};
 for (const key of Object.keys(GATE_URLS) as GateKey[]) {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(GATE_URLS[key]).then((gltf) => {
       gateScenes[key] = gltf.scene;
     }),

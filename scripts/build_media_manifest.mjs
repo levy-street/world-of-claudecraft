@@ -6,6 +6,7 @@ import {
   readdirSync,
   readFileSync,
   rmSync,
+  statSync,
   writeFileSync,
 } from 'node:fs';
 import path from 'node:path';
@@ -85,9 +86,85 @@ function emit() {
   );
 }
 
+/**
+ * Decide which hashed-media ORIGINALS a bundle can drop.
+ *
+ * `emit` COPIES public/<logical> to dist/media/<name>.<hash><ext> and leaves the
+ * source in place, while vite separately copies all of public/ into dist/. A web
+ * deploy does not care (a CDN only transfers what is requested), but the native
+ * shells package the whole of dist/ into the app, and the OTA publisher zips it,
+ * so both carried every models/textures/env/vfx asset TWICE. That is what pushed
+ * the Play base module past its 500 MB compressed download ceiling.
+ *
+ * Production runtime resolves these through assetUrl() (src/render/assets/media.ts),
+ * which returns MEDIA_ASSETS[logical] and only falls back to the original path for a
+ * logical path that is NOT in the manifest. Every path this plan drops therefore has
+ * a hashed copy that the app asks for instead, and anything outside the manifest is
+ * never considered here.
+ *
+ * Pure so tests/media_duplicate_prune.test.ts can prove the teeth (including the
+ * refusal below) without a build; `hashedCopyExists` is the injected fs probe.
+ */
+export function planMediaDuplicatePrune(entries, hashedCopyExists) {
+  const drop = [];
+  const kept = [];
+  for (const logical of Object.keys(entries).sort()) {
+    const hashed = entries[logical];
+    // Never delete the only copy: no hashed twin on disk means emit did not run
+    // (or ran against different content), so the original is still load-bearing.
+    if (hashedCopyExists(hashed)) drop.push(logical);
+    else kept.push({ logical, hashed });
+  }
+  return { drop, kept };
+}
+
+function prune() {
+  const entries = manifestEntries();
+  const total = Object.keys(entries).length;
+  if (total === 0) {
+    console.log('media prune: manifest is empty, nothing to prune');
+    return;
+  }
+  const { drop, kept } = planMediaDuplicatePrune(entries, (url) =>
+    existsSync(path.join(distDir, url.replace(/^\//, ''))),
+  );
+  // A wholesale miss means this ran before `emit`, i.e. a build-order bug. Fail
+  // loudly rather than shipping the duplicates again in silence.
+  if (drop.length === 0) {
+    throw new Error(
+      `media prune: none of the ${total} hashed copies exist under dist/media; ` +
+        'run `node scripts/build_media_manifest.mjs emit` first',
+    );
+  }
+  let bytes = 0;
+  let removed = 0;
+  for (const logical of drop) {
+    const original = path.join(distDir, logical);
+    // Idempotent: a second run finds the originals already gone.
+    if (!existsSync(original)) continue;
+    bytes += statSync(original).size;
+    rmSync(original, { force: true });
+    removed++;
+  }
+  console.log(
+    `media prune: dropped ${removed} duplicated originals from dist ` +
+      `(${(bytes / 1048576).toFixed(1)} MB uncompressed; ${drop.length} hashed copies kept)`,
+  );
+  if (kept.length > 0) {
+    console.warn(
+      `media prune: kept ${kept.length} original(s) with no hashed copy on disk: ` +
+        kept
+          .slice(0, 5)
+          .map((k) => k.logical)
+          .join(', '),
+    );
+  }
+}
+
 const cmd = process.argv[2] ?? 'generate';
 if (cmd === 'generate') generate();
 else if (cmd === 'emit') emit();
+else if (cmd === 'prune') prune();
 else {
   console.error(`unknown command: ${cmd}`);
   process.exit(1);

@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
-import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import {
+  deinterleaveGeometry,
+  mergeGeometries,
+} from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { buildingCameraHeight } from '../sim/building_layout';
 import { mineMoundFootprint, STALL_HALF_D, STALL_HALF_W } from '../sim/colliders';
 import { MOUNT_RACE_JUMP_FIXTURES } from '../sim/content/mounts';
@@ -25,7 +28,7 @@ import { hash2 } from '../sim/rng';
 import type { BuildingDef, ZonePropsDef } from '../sim/types';
 import { terrainHeight, WATER_LEVEL, waterLevel } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { buildEastbrookGrandArmouryView } from './eastbrook_grand_armoury';
 import {
   isEastbrookRebuildBuilding,
@@ -33,7 +36,12 @@ import {
   isEastbrookRebuildStall,
   isEastbrookRebuildWell,
 } from './eastbrook_town';
-import { GFX, sharedUniforms, surfaceMat } from './gfx';
+import { indexExactVertexTuples } from './exact_index_geometry';
+import { EMISSIVE_LIGHT, GFX, sharedUniforms, surfaceMat } from './gfx';
+import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
+import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
+import { type PropCellBounds, propCellKey, updatePropCell } from './prop_cell_core';
+import { applySurfaceDetail, reapplySurfaceDetailToClone, wornFamilyFor } from './worn_stone';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
 // fences, graveyards — all real CC0 glTF assets (Quaternius medieval village +
@@ -59,8 +67,8 @@ export interface PropsResult {
   fireLights: THREE.PointLight[];
   /**
    * Hides merged/instanced prop bands that sit entirely past the fog far plane,
-   * and hides any camera-ghost prop crossing the current eye-to-camera segment
-   * so the chase cam can pass through props without a wall in view.
+   * and fades any camera-ghost prop crossing the current eye-to-camera segment
+   * to 20% opacity so the chase cam sees through props without blanking them.
    */
   update(
     camX: number,
@@ -70,6 +78,8 @@ export interface PropsResult {
     eyeY: number,
     eyeZ: number,
     fogFar: number,
+    dt: number,
+    reducedMotion?: boolean,
   ): void;
 }
 
@@ -438,12 +448,37 @@ if (typeof window !== 'undefined') {
   const preloadKeys = preloadPropKeys(GFX.standardMaterials);
   for (const [key, def] of Object.entries(PROP_ASSET_DEFS)) {
     if (!preloadKeys.has(key as PropKey)) continue;
-    registerPreload(
+    registerDeferredPreload(() =>
       loadGltf(def.url).then((gltf) => {
         loadedProps.set(key, gltf);
+        // Packaged iOS: extract IMMEDIATELY and release the parse, instead of
+        // holding all 194 parsed scenes until buildProps runs in the Renderer
+        // ctor. Measured on an iPhone 17 Pro, WebContent died at 1.54 GB mid
+        // preload with the renderer never reached, so build-time extraction
+        // never got the chance to release anything; extracting per-prop as it
+        // lands keeps only the float geometry + converted materials resident
+        // (exactly what build-time extraction retains) and frees the parse's
+        // duplicate buffers progressively. Tier-safe HERE ONLY because
+        // nativeIosMemoryProfile derives from hints alone and pins
+        // standardMaterials=false at import AND live resolve, so the converted
+        // material class cannot drift the way an import-time TIER read would
+        // (the farmCrate P0). Also moves the extraction CPU out of the
+        // synchronous scene build, which shortens the entry stall.
+        if (GFX.nativeIosMemoryProfile) propAsset(key as PropKey);
       }),
     );
   }
+}
+
+/** Dev-channel residency accounting sources (see assets/residency_budget.ts). */
+export function propResidencySources(): {
+  extractedGeometries: THREE.BufferGeometry[];
+  parsedScenes: THREE.Object3D[];
+} {
+  return {
+    extractedGeometries: [...extractCache.values()].flatMap((a) => a.parts.map((p) => p.geo)),
+    parsedScenes: [...loadedProps.values()].map((g) => g.scene),
+  };
 }
 
 /** Test-only window into the preload/prewarm key sets (see tests/render_asset_preload). */
@@ -486,6 +521,13 @@ const MAT_OVERRIDES: Record<
   'grave:colormap': { color: 0xd2d2c8 },
 };
 
+// Kits that take the shared triplanar surface-detail layer route through the
+// one family table in worn_stone.ts (wornFamilyFor): kit-wide stone entries
+// (khex, kiron, minerock) plus per-material-NAME wood/stone/plaster routing
+// for the village-architecture kits. Kit membership and the SOURCE material
+// name are already part of the material cache key below, so application is
+// deterministic per cached material.
+
 // ---------------------------------------------------------------------------
 // Extraction: GLTF scene -> world-baked float-attribute geometry + converted
 // shared materials. Geometries are CLONES — the cached GLTF stays pristine
@@ -505,6 +547,11 @@ export interface PropAsset {
 
 const extractCache = new Map<string, PropAsset>();
 const matConvCache = new Map<string, THREE.Material>();
+
+/** Kit materials whose NAME marks them as metal (measured across the shipped
+ *  kits: MI_Trim_Metal, WornIron, ArmouryMetal, MailboxMetal). Kept in
+ *  lockstep with quest_objects.ts. */
+export const METAL_MAT_NAME = /metal|iron|gold|steel/i;
 
 /** denormalized float copy — meshopt/quantized attrs must not be transformed in place */
 function toFloatAttr(
@@ -527,10 +574,16 @@ function convertMaterial(
 ): THREE.Material {
   const s = src as THREE.MeshStandardMaterial; // basic (unlit) shares the fields we read
   const ov = MAT_OVERRIDES[`${kit}:${s.name}`] ?? MAT_OVERRIDES[s.name];
-  // hasVertexColors and side must key the cache: kits share material names
-  // between COLOR_0 meshes (trim 'Vertex' props) and colorless ones, and GLBs
-  // may reuse a name for both single-sided and double-sided surfaces.
-  const key = `${kit}|${s.name}|${s.color?.getHexString() ?? ''}|${s.map ? 'm' : ''}|${s.side}|${hasVertexColors ? 'v' : ''}|${GFX.standardMaterials ? 's' : 'l'}`;
+  // hasVertexColors must key the cache: kits share material names between
+  // COLOR_0 meshes (trim 'Vertex' props) and colorless ones — a shared
+  // vertexColors:true material would render the colorless meshes black
+  // The alpha cutout and sidedness the asset authored (glTF alphaMode MASK +
+  // alphaCutoff + doubleSided, already resolved by GLTFLoader) must survive the
+  // rebuild, and must key the cache: almost every prop is solid geometry, but a
+  // cutout one (the placeable oak's leaf cards) renders as opaque quads without
+  // them, and would otherwise share a cached material with an opaque namesake.
+  const alphaTest = s.alphaTest ?? 0;
+  const key = `${kit}|${s.name}|${s.color?.getHexString() ?? ''}|${s.map ? 'm' : ''}|${hasVertexColors ? 'v' : ''}|${GFX.standardMaterials ? 's' : 'l'}|a${alphaTest}|d${s.side}`;
   const cached = matConvCache.get(key);
   if (cached) return cached;
   const color =
@@ -550,6 +603,7 @@ function convertMaterial(
     mat = new THREE.MeshStandardMaterial({
       color,
       map,
+      alphaTest,
       side: s.side,
       vertexColors: hasVertexColors,
       flatShading: hollow,
@@ -558,21 +612,51 @@ function convertMaterial(
       metalnessMap: s.metalnessMap ?? null,
       aoMap: s.aoMap ?? null,
       roughness: ov?.roughness ?? (hollow ? 0.85 : s.isMeshStandardMaterial ? s.roughness : 0.9),
-      metalness: ov?.metalness ?? (s.isMeshStandardMaterial ? Math.min(s.metalness, 0.85) : 0),
+      // The kit exporter ships an accidental metallicFactor 0.4 on hundreds
+      // of dielectric palette materials (wood carts outshone actual anvils),
+      // so only metal-NAMED materials keep their authored metalness; every
+      // other family is dielectric, and the metal surface-detail layer below
+      // supplies the real per-texel metalness on top.
+      metalness:
+        ov?.metalness ??
+        (s.isMeshStandardMaterial && METAL_MAT_NAME.test(s.name) ? Math.min(s.metalness, 0.85) : 0),
       emissive: new THREE.Color(hollowEmissive ? 0xffffff : (ov?.emissive ?? 0x000000)),
       emissiveMap: hollowEmissive ? map : null,
       emissiveIntensity: hollowEmissive ? 0.3 : (ov?.emissiveIntensity ?? 1),
+      // Metal-named kit materials (MI_Trim_Metal, WornIron, ...) get a mild
+      // per-material env boost so anvils/fittings catch the sky IBL; the name
+      // is already part of the cache key above. Everything else keeps the
+      // default 1 (the metal surface-detail family below raises its own floor
+      // via envMapMin, taking the max of the two).
+      envMapIntensity: METAL_MAT_NAME.test(s.name) ? 1.3 : 1,
     });
   } else {
     mat = new THREE.MeshLambertMaterial({
       color,
       map,
+      alphaTest,
       side: s.side,
       vertexColors: hasVertexColors,
       flatShading: hollow,
       emissive: new THREE.Color(hollowEmissive ? 0xffffff : (ov?.emissive ?? 0x000000)),
       emissiveMap: hollowEmissive ? map : null,
       emissiveIntensity: hollowEmissive ? 0.2 : (ov?.emissiveIntensity ?? 1) * 0.6,
+    });
+  }
+  // Triplanar surface-detail layer, applied before caching so every consumer
+  // of the shared per-key material carries it (the helper self-gates to
+  // standard materials, so the Lambert branch is a no-op). Routing matches on
+  // the SOURCE material name (s.name), which keys the cache; the context
+  // flags keep emissive/transparent surfaces clean and let Tripo props that
+  // ship their own PBR maps skip the bare-coverage fallback.
+  const worn = wornFamilyFor(kit, s.name, {
+    emissive: !!hollowEmissive || (ov?.emissive ?? 0) !== 0,
+    transparent: s.transparent === true,
+    hasOwnMaps: !!(s.normalMap || s.roughnessMap),
+  });
+  if (worn) {
+    applySurfaceDetail(mat as THREE.MeshStandardMaterial, worn.family, {
+      strength: worn.strength,
     });
   }
   mat.name = `${kit}:${s.name}`;
@@ -718,6 +802,32 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
 // per-point shapes (camp crate kind and scale, relic poses) from the SAME
 // draw, so mesh and physics agree per placement.
 const propRand = propPlacementRoll;
+
+// Village-building pools and heights, shared by the placement loop in
+// buildProps and by the far-field impostor collector below so the sprite a
+// building becomes is always the asset it really renders as.
+const HOUSE_POOL: PropKey[] = ['house1', 'house2', 'blacksmith'];
+const HOUSE_POOL_HOLLOW: PropKey[] = ['kmedHomeA', 'kmedHomeB'];
+const HOUSE_HEIGHT: Record<string, number> = {
+  house1: 8.0,
+  house2: 7.6,
+  blacksmith: 6.6,
+  inn: 7.6,
+  kmedHomeA: 8.0,
+  kmedHomeB: 8.8,
+  kmedTavern: 8.5,
+  kmedChurch: 10.5,
+  kmedBlacksmith: 6.2,
+  kmedMarket: 5.2,
+};
+// single-asset (non-pool) building kinds
+const KIND_ASSET: Partial<Record<BuildingDef['kind'], PropKey>> = {
+  inn: 'inn',
+  hollowInn: 'kmedTavern',
+  hollowChapel: 'kmedChurch',
+  hollowSmith: 'kmedBlacksmith',
+  hollowMarket: 'kmedMarket',
+};
 
 function keyRand(key: number, n: number): number {
   return hash2(Math.round(key * 97), n * 7919, 0x9e3779);
@@ -1003,6 +1113,11 @@ function buildDelveEmbers(
 export function buildProps(seed: number, delveLabel?: (delveId: string) => string): PropsResult {
   const group = new THREE.Group();
   const flames: THREE.Mesh[] = [];
+  // Meshes the far-cell bake must never absorb because the renderer animates
+  // them live (campfire flames, windmill sails): baking one freezes its pose
+  // while the live copy is hidden in far mode. They stay individual in BOTH
+  // modes and keep their own shadow flags.
+  const keepLiveMeshes = new Set<THREE.Mesh>();
   const windmillFans: THREE.Object3D[] = [];
   const fireLights: THREE.PointLight[] = [];
   const activeContent = getActiveWorldContent();
@@ -1010,34 +1125,53 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
 
   const ground = (x: number, z: number) => terrainHeight(x, z, seed);
 
-  // Camera-ghost props (see colliders.ts `camGhost`) stay individual and
-  // un-merged so they can be hidden while the camera ray passes through their
-  // footprint. Footprints mirror the colliders so what hides is exactly what
-  // the camera passes through.
+  // Hideable props stay individual and unmerged so they can be faded while
+  // the camera ray passes through their footprint. Footprints mirror the
+  // colliders so what fades is exactly what the camera passes through.
   const hideables: Hideable[] = [];
   const keepFromMerge = new Set<THREE.Object3D>();
   /**
-   * Mark `g` un-mergeable and register it as hide-when-camera-crossed. Each
-   * mesh's material is cloned so flipping colour/depth writes hides only this
-   * structure (and leaves the shadow pass untouched).
+   * Mark `g` un-mergeable and register it as fade-when-camera-crossed. Each
+   * mesh's material is cloned so the opacity fade touches only this structure
+   * (and leaves the shadow pass untouched). The pre-clone shared material is
+   * recorded per mesh so the far-cell bake can merge distant copies.
    */
   function registerHideable(g: THREE.Group, fp: Footprint): void {
-    const matMap = new Map<THREE.Material, ToggleMat>();
+    const matMap = new Map<THREE.Material, OccluderFadeMat>();
+    const bakeMeshes: HideableBakeMesh[] = [];
     g.traverse((o) => {
       const mesh = o as THREE.Mesh;
       if (!mesh.isMesh) return;
       keepFromMerge.add(mesh);
-      if (lowProps) return;
+      // Animated meshes (flames, windmill sails) and transparent meshes stay
+      // live in both modes (the bake would freeze the animation or break
+      // blend ordering).
+      const srcMat = mesh.material as THREE.Material;
+      if (!keepLiveMeshes.has(mesh) && srcMat.transparent !== true) {
+        bakeMeshes.push({ mesh, srcMat });
+      }
       const src = mesh.material as THREE.Material;
       let tm = matMap.get(src);
       if (!tm) {
-        const mat = src.clone();
-        tm = { mat, depthWrite: mat.depthWrite };
+        const ghostSrc = src.clone();
+        // Material.clone drops onBeforeCompile: re-attach the recorded
+        // surface-detail layer so ghostable buildings keep their texture.
+        reapplySurfaceDetailToClone(ghostSrc);
+        tm = occluderFadeMat(ghostSrc);
         matMap.set(src, tm);
       }
       mesh.material = tm.mat;
     });
-    hideables.push({ group: g, mats: [...matMap.values()], hidden: false, ...fp });
+    hideables.push({
+      group: g,
+      mats: [...matMap.values()],
+      hidden: false,
+      alpha: 1,
+      cellKey: propCellKey(fp.x, fp.z),
+      bakeMeshes,
+      suppressed: false,
+      ...fp,
+    });
   }
 
   // live small materials (decals / glow) — shared, never per-instance
@@ -1048,7 +1182,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   const lanternMat = surfaceMat({
     color: 0xffcc66,
     emissive: 0xff9933,
-    emissiveIntensity: usePbr ? 2 : 1.2,
+    emissiveIntensity: usePbr ? EMISSIVE_LIGHT : 1.2,
     roughness: 0.4,
   });
 
@@ -1108,7 +1242,10 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     if (typeof scale === 'number') tmpScale.setScalar(scale);
     else tmpScale.set(scale[0], scale[1], scale[2]);
     const band = Math.floor((z - WORLD_MIN_Z) / MERGE_BAND_DEPTH);
-    const bucketKey = `${key}:${band}`;
+    // Split bands into x-halves (the foliage bucket pattern): a world-wide
+    // band's bounding sphere always intersects the shadow frustum, so it
+    // re-submits into the shadow map every frame; half-bands cull.
+    const bucketKey = `${key}:${x < 0 ? 'w' : 'e'}:${band}`;
     let bucket = instanceBatches.get(bucketKey);
     if (!bucket) {
       bucket = { key, mats: [] };
@@ -1118,28 +1255,10 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- buildings: village houses / inn / composed chapel ------------------
-  const housePool: PropKey[] = ['house1', 'house2', 'blacksmith'];
-  const hollowPool: PropKey[] = ['kmedHomeA', 'kmedHomeB'];
-  const houseHeight: Record<string, number> = {
-    house1: 8.0,
-    house2: 7.6,
-    blacksmith: 6.6,
-    inn: 7.6,
-    kmedHomeA: 8.0,
-    kmedHomeB: 8.8,
-    kmedTavern: 8.5,
-    kmedChurch: 10.5,
-    kmedBlacksmith: 6.2,
-    kmedMarket: 5.2,
-  };
-  // single-asset (non-pool) building kinds
-  const kindAsset: Partial<Record<BuildingDef['kind'], PropKey>> = {
-    inn: 'inn',
-    hollowInn: 'kmedTavern',
-    hollowChapel: 'kmedChurch',
-    hollowSmith: 'kmedBlacksmith',
-    hollowMarket: 'kmedMarket',
-  };
+  const housePool = HOUSE_POOL;
+  const hollowPool = HOUSE_POOL_HOLLOW;
+  const houseHeight = HOUSE_HEIGHT;
+  const kindAsset = KIND_ASSET;
 
   for (const b of activeContent.props.buildings) {
     const key = b.x * 13.7 + b.z * 3.1;
@@ -1270,6 +1389,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
         pivot.add(fanMesh);
         holder.add(pivot);
         keepFromMerge.add(fanMesh);
+        keepLiveMeshes.add(fanMesh);
         windmillFans.push(pivot);
       }
     }
@@ -1435,7 +1555,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       new THREE.MeshLambertMaterial({
         color: 0xffaa33,
         emissive: 0xff6600,
-        emissiveIntensity: usePbr ? 2.2 : 1.4,
+        emissiveIntensity: usePbr ? EMISSIVE_LIGHT : 1.4,
         transparent: true,
         opacity: 0.92,
       }),
@@ -1444,6 +1564,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     flame.scale.setScalar(1.15);
     g.add(flame);
     flames.push(flame);
+    keepLiveMeshes.add(flame);
     noShadow.add(flame);
     const light = new THREE.PointLight(0xff8830, 12, 16, 2);
     // Root-level, world-positioned: the light must NOT live inside the hideable
@@ -1948,7 +2069,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
         new THREE.MeshLambertMaterial({
           color: 0xffaa33,
           emissive: 0xff6a1e,
-          emissiveIntensity: usePbr ? 2.2 : 1.4,
+          emissiveIntensity: usePbr ? EMISSIVE_LIGHT : 1.4,
           transparent: true,
           opacity: 0.92,
         }),
@@ -1957,6 +2078,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       flame.scale.setScalar(0.72);
       bg.add(flame);
       flames.push(flame);
+      keepLiveMeshes.add(flame);
       noShadow.add(flame);
       const light = new THREE.PointLight(0xff8a3a, 9, 13, 2);
       light.position.y = postH + 0.55;
@@ -2122,7 +2244,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     }
   }
 
-  // animated flames + camera-ghost props (hidden individually) stay un-merged
+  // animated flames + camera-ghost props (faded individually) stay un-merged
   const keep = new Set<THREE.Object3D>(flames);
   for (const m of keepFromMerge) keep.add(m);
   for (const p of delvePortals) keep.add(p); // shader-driven void: keep its transparency/renderOrder
@@ -2131,6 +2253,15 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     const bounds = cullableBounds(sm, sm.geometry.boundingBox, sm.geometry.boundingSphere);
     if (bounds) cullables.push(bounds);
   }
+
+  // Far-cell merged bakes for the hideables (dual representation): identical
+  // world-baked geometry on the SHARED pre-clone materials, one mesh per
+  // (cell, material, castShadow). The per-frame swap lives in update().
+  // Constrained-memory profiles (phone WebKit, native iOS) skip the bake:
+  // duplicating the prop geometry at world entry is exactly the allocation
+  // spike the v0.27.2 memory hotfix class guards against, and the draw-call
+  // win matters most on the desktop tiers.
+  const farCells = GFX.constrainedMemory ? [] : buildFarPropCells(group, hideables);
 
   return {
     group,
@@ -2145,11 +2276,20 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       eyeY: number,
       eyeZ: number,
       fogFar: number,
+      dt: number,
+      reducedMotion = false,
     ): void {
       const fogFarSq = fogFar * fogFar;
       for (let i = 0; i < cullables.length; i++) {
         const c = cullables[i];
         c.obj.visible = cullableVisible(c, camX, camZ, fogFar, fogFarSq);
+      }
+      // Far-cell swap first (prop_cell_core): distant cells draw their merged
+      // bake and suppress the members' individual baked meshes; near cells
+      // (where the ghost fade can fire) draw the individuals while the bake
+      // stays as the shadow-only caster. Pixel-identical both ways.
+      for (const cell of farCells) {
+        updatePropCell(cell, camX, camZ, fogFar);
       }
       for (let i = 0; i < hideables.length; i++) {
         const h = hideables[i];
@@ -2160,46 +2300,58 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
           h.group.visible = false; // fully fogged: drop it (shadow is out of range too)
           continue;
         }
-        // Hide from the camera while still casting a shadow: disable colour +
-        // depth writes, not the object.
-        const hide = cameraSegmentHitsFootprint(h, eyeX, eyeY, eyeZ, camX, camY, camZ);
-        if (h.mats.length === 0) {
-          h.hidden = hide;
-          h.group.visible = !hide;
+        // LOAD-BEARING ORDER: visible=true must be restored BEFORE the
+        // suppressed continue, or a group culled on the prior frame would
+        // stay stranded invisible when its cell enters far mode.
+        h.group.visible = true;
+        // Far mode: the merged cell bake draws instead; flames/transparent
+        // members stay live on the group, and the ghost fade cannot fire. Put
+        // the local clone back at its authored alpha before it can return to
+        // near mode.
+        if (h.suppressed) {
+          h.hidden = false;
+          if (h.alpha !== 1) {
+            h.alpha = 1;
+            applyOccluderFade(h.mats, 1);
+          }
           continue;
         }
-        h.group.visible = true;
-        if (hide !== h.hidden) {
-          h.hidden = hide;
-          for (let j = 0; j < h.mats.length; j++) {
-            const m = h.mats[j];
-            m.mat.colorWrite = !hide;
-            m.mat.depthWrite = hide ? false : m.depthWrite;
-          }
-        }
+        // Ghost on every tier with the same timing while keeping the obstacle's
+        // silhouette and shadow. Per-structure clones keep the change local.
+        const hide = cameraSegmentHitsFootprint(h, eyeX, eyeY, eyeZ, camX, camY, camZ);
+        h.hidden = hide;
+        if (occluderFadeSettled(h.alpha, hide)) continue;
+        h.alpha = stepOccluderFade(h.alpha, hide, dt, reducedMotion);
+        applyOccluderFade(h.mats, h.alpha);
       }
     },
   };
 }
 
-/** One material we flip on/off, remembering its original depth-write state. */
-interface ToggleMat {
-  mat: THREE.Material;
-  depthWrite: boolean;
+// One mesh of a hideable structure plus its pre-clone shared material, the
+// pair the far-cell bake merges on.
+interface HideableBakeMesh {
+  mesh: THREE.Mesh;
+  srcMat: THREE.Material;
 }
 
-// A prop that the camera ghosts through and the renderer hides whenever the
-// eye-to-camera segment crosses its footprint (below `topY`). Either a circle
-// (`r`) or an OBB (`hw`/`hd`/`rot`), matching the collider it mirrors. "Hidden"
-// disables colour/depth writes rather than `visible = false`, so the structure
-// stays in the shadow pass and keeps casting its shadow.
+// A prop that the camera ghosts through and the renderer fades toward 20%
+// opacity whenever the eye-to-camera segment crosses its footprint (below
+// `topY`). Either a circle (`r`) or an OBB (`hw`/`hd`/`rot`), matching the
+// collider it mirrors. Near the camera, the fade animates via
+// occluder_fade_core. Far away, prop_cell_core swaps its opaque baked meshes
+// into the cell merge while transparent and animated members stay live.
 interface Hideable {
   group: THREE.Group;
-  mats: ToggleMat[]; // cloned per-structure so the toggle is local
-  hidden: boolean;
+  mats: OccluderFadeMat[]; // cloned per-structure so the fade is local
+  hidden: boolean; // whether the structure occludes the view this frame
+  alpha: number; // animated fade level (1 = opaque, 0.2 = occluding)
+  cellKey: string; // far-cell membership (prop_cell_core)
+  bakeMeshes: HideableBakeMesh[]; // meshes swapped out in far mode
+  suppressed: boolean; // far mode: baked meshes hidden, merged cell draws
   x: number; // footprint centre (world XZ)
   z: number;
-  topY: number; // roof height; a camera above this never hides the structure
+  topY: number; // roof height; a camera above this never fades the structure
   cull: number; // bounding radius for the fog-far cull
   r?: number; // circle footprint
   hw?: number; // OBB half-extents + yaw
@@ -2207,7 +2359,25 @@ interface Hideable {
   rot?: number;
 }
 
-type Footprint = Omit<Hideable, 'group' | 'mats' | 'hidden'>;
+// One far cell: the merged bakes for every hideable structure whose footprint
+// falls in the cell, plus the members to swap against (prop_cell_core.ts).
+// The bakes are single-instance InstancedMeshes so the near-mode shadow-only
+// gate (count 0 in the color pass, 1 for the shadow draw) can make the bake
+// the cell's ONLY shadow caster in both modes: the individuals never cast,
+// and their union IS the bake, so the shadows are pixel-identical while the
+// per-structure shadow submissions collapse to one per (material, cell).
+interface FarPropCell {
+  bounds: PropCellBounds;
+  meshes: THREE.InstancedMesh[];
+  hideables: Hideable[];
+  farMode: boolean;
+  visible: boolean;
+}
+
+type Footprint = Omit<
+  Hideable,
+  'group' | 'mats' | 'hidden' | 'alpha' | 'cellKey' | 'bakeMeshes' | 'suppressed'
+>;
 
 function circleFootprint(x: number, z: number, r: number, topY: number, cull = r): Footprint {
   return { x, z, r, topY, cull };
@@ -2400,12 +2570,133 @@ function cullableVisible(
   return centerDx * centerDx + centerDz * centerDz < reach * reach;
 }
 
+// Far-cell merged bakes for the camera-ghost hideables (dual representation,
+// see prop_cell_core.ts). Every bakeable mesh of every hideable is baked into
+// world space and merged per (cell, SHARED material, castShadow); the merged
+// meshes start invisible and update() swaps them against the individual
+// structures per cell. Geometry is cloned/de-indexed exactly like
+// mergeStaticMeshes below, so the swap is pixel-identical.
+function buildFarPropCells(group: THREE.Group, hideables: Hideable[]): FarPropCell[] {
+  group.updateMatrixWorld(true);
+  interface CellBucket {
+    material: THREE.Material;
+    castShadow: boolean;
+    receiveShadow: boolean;
+    geoms: THREE.BufferGeometry[];
+  }
+  interface CellBuild {
+    buckets: Map<string, CellBucket>;
+    bounds: PropCellBounds;
+    hideables: Hideable[];
+  }
+  const cells = new Map<string, CellBuild>();
+  const box = new THREE.Box3();
+  for (const h of hideables) {
+    if (h.bakeMeshes.length === 0) continue;
+    let cell = cells.get(h.cellKey);
+    if (!cell) {
+      cell = {
+        buckets: new Map(),
+        bounds: {
+          minX: Infinity,
+          maxX: -Infinity,
+          minZ: Infinity,
+          maxZ: -Infinity,
+        },
+        hideables: [],
+      };
+      cells.set(h.cellKey, cell);
+    }
+    cell.hideables.push(h);
+    for (const { mesh, srcMat } of h.bakeMeshes) {
+      const key = `${srcMat.uuid}:${mesh.castShadow ? 1 : 0}:${mesh.receiveShadow ? 1 : 0}`;
+      let bucket = cell.buckets.get(key);
+      if (!bucket) {
+        bucket = {
+          material: srcMat,
+          castShadow: mesh.castShadow,
+          receiveShadow: mesh.receiveShadow,
+          geoms: [],
+        };
+        cell.buckets.set(key, bucket);
+      }
+      const geo = normalizedStaticGeometry(mesh.geometry);
+      geo.applyMatrix4(mesh.matrixWorld);
+      geo.computeBoundingBox();
+      if (geo.boundingBox) {
+        box.copy(geo.boundingBox);
+        cell.bounds.minX = Math.min(cell.bounds.minX, box.min.x);
+        cell.bounds.maxX = Math.max(cell.bounds.maxX, box.max.x);
+        cell.bounds.minZ = Math.min(cell.bounds.minZ, box.min.z);
+        cell.bounds.maxZ = Math.max(cell.bounds.maxZ, box.max.z);
+      }
+      bucket.geoms.push(geo);
+    }
+  }
+  const out: FarPropCell[] = [];
+  for (const cellBuild of cells.values()) {
+    const meshes: THREE.InstancedMesh[] = [];
+    const cell: FarPropCell = {
+      bounds: cellBuild.bounds,
+      meshes,
+      hideables: cellBuild.hideables,
+      farMode: false,
+      visible: true,
+    };
+    for (const bucket of cellBuild.buckets.values()) {
+      const geo = mergeGeometries(bucket.geoms, false);
+      if (!geo) continue;
+      geo.computeBoundingBox();
+      geo.computeBoundingSphere();
+      // Single-instance so the count gate below can skip the color pass
+      // per frame without touching visibility (three's instanced draw path
+      // is a free no-op at count 0).
+      const mesh = new THREE.InstancedMesh(geo, bucket.material, 1);
+      mesh.setMatrixAt(0, new THREE.Matrix4());
+      mesh.instanceMatrix.needsUpdate = true;
+      // Pin the object bounds to the world-baked geometry bounds NOW: the
+      // frustum test lazily computes an InstancedMesh's bounding sphere from
+      // its CURRENT count, and this mesh spends near mode at count 0, which
+      // would cache an empty sphere and cull the bake (and its shadow)
+      // forever. The single identity instance makes geometry bounds exact.
+      mesh.boundingBox = geo.boundingBox ? geo.boundingBox.clone() : null;
+      mesh.boundingSphere = geo.boundingSphere ? geo.boundingSphere.clone() : null;
+      mesh.castShadow = bucket.castShadow;
+      mesh.receiveShadow = bucket.receiveShadow;
+      // Near mode: shadow draw only. The hooks restore the instance for the
+      // shadow pass and drop it again so the color pass skips the bake while
+      // the individuals draw; far mode leaves the instance up for both.
+      mesh.count = 0;
+      (mesh as { onBeforeShadow: unknown }).onBeforeShadow = () => {
+        mesh.count = 1;
+      };
+      (mesh as { onAfterShadow: unknown }).onAfterShadow = () => {
+        if (!cell.farMode) mesh.count = 0;
+      };
+      group.add(mesh);
+      meshes.push(mesh);
+    }
+    // The individuals never cast: the bake carries the cell's shadows in
+    // both modes (identical union geometry). Flames/transparent meshes are
+    // not in the bake and keep their own flags. Ghost fades keep their
+    // shadow via the bake exactly as they did per-material before; the
+    // lowProps ghost path (whole-group hide) cannot diverge because every
+    // lowProps profile also disables dynamicShadows (gfx.ts:
+    // constrainedMemory is true whenever nativeIosMemoryProfile is).
+    for (const h of cellBuild.hideables) {
+      for (const b of h.bakeMeshes) b.mesh.castShadow = false;
+    }
+    out.push(cell);
+  }
+  return out;
+}
+
 // Bake every static prop mesh into world space and merge per
 // (material, castShadow, z-band). Flames (animated) and InstancedMeshes
 // survive untouched, as do the PointLights (not meshes). The merged meshes
 // replace the originals on the same group; emptied sub-groups are left in
-// place (they carry lights). Geometries are de-indexed before merging so
-// indexed glTF extracts and procedural shapes can share a bucket.
+// place (they carry lights). Non-indexed procedural shapes receive exact tuple
+// indices so they can share indexed glTF buckets without expanding either.
 function mergeStaticMeshes(group: THREE.Group, keep: Set<THREE.Object3D>): THREE.Mesh[] {
   group.updateMatrixWorld(true);
   interface Bucket {
@@ -2419,17 +2710,21 @@ function mergeStaticMeshes(group: THREE.Group, keep: Set<THREE.Object3D>): THREE
     const mesh = o as THREE.Mesh;
     if (!mesh.isMesh || keep.has(mesh) || (mesh as THREE.InstancedMesh).isInstancedMesh) return;
     const material = mesh.material as THREE.Material;
+    const worldX = mesh.matrixWorld.elements[12];
     const worldZ = mesh.matrixWorld.elements[14];
     const band = Math.floor((worldZ - WORLD_MIN_Z) / MERGE_BAND_DEPTH);
-    const key = `${material.uuid}:${mesh.castShadow ? 1 : 0}:${band}`;
+    // x-halved like the instance batches above: world-wide merged bands
+    // defeat shadow-frustum culling (their bounds always intersect it).
+    const key = `${material.uuid}:${mesh.castShadow ? 1 : 0}:${worldX < 0 ? 'w' : 'e'}:${band}`;
     let bucket = buckets.get(key);
     if (!bucket) {
       bucket = { material, castShadow: mesh.castShadow, geoms: [] };
       buckets.set(key, bucket);
     }
-    // clone/de-index: extracted geometries are shared across placements, so
-    // the bake must never mutate them in place
-    const geo = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry.clone();
+    // Extracted geometries are shared across placements, so the bake must
+    // never mutate them in place. Preserve source index reuse and normalize
+    // procedural streams with byte-exact full-tuple indices.
+    const geo = normalizedStaticGeometry(mesh.geometry);
     bucket.geoms.push(geo.applyMatrix4(mesh.matrixWorld));
     merged.push(mesh);
   });
@@ -2447,4 +2742,119 @@ function mergeStaticMeshes(group: THREE.Group, keep: Set<THREE.Object3D>): THREE
     out.push(mesh);
   }
   return out;
+}
+
+function normalizedStaticGeometry(source: THREE.BufferGeometry): THREE.BufferGeometry {
+  const normalized = source.clone();
+  deinterleaveGeometry(normalized);
+  return normalized.index ? normalized : indexExactVertexTuples(normalized);
+}
+
+export const propStaticMergeInternalsForTest = { mergeStaticMeshes };
+
+// ---------------------------------------------------------------------------
+// Far-field building impostors
+// ---------------------------------------------------------------------------
+
+export interface BuildingImpostorPart {
+  geometry: THREE.BufferGeometry;
+  material: THREE.Material;
+  isLeaf: boolean;
+}
+
+export interface BuildingImpostorInstance {
+  asset: string;
+  x: number;
+  y: number;
+  z: number;
+  rot: number;
+  widthScale: number;
+  heightScale: number;
+}
+
+/**
+ * Everything the far-field sprite layer needs to stand in for the village
+ * buildings and the skyline-scale decor (windmills, moored ships) past the
+ * detail horizon: the asset parts to bake and the placements, computed with
+ * the SAME pools, pick hash, scale rules and seating the real placement loop
+ * in buildProps uses, so a sprite can never disagree with the building it
+ * replaces. Chapels reduce to their bell tower: at sprite range the squat
+ * entry hall sits below the treeline. The Eastbrook rebuild kit and the
+ * Grand Armoury keep their bespoke views and are skipped here.
+ */
+export function collectBuildingImpostors(seed: number): {
+  sources: { asset: string; parts: BuildingImpostorPart[] }[];
+  instances: BuildingImpostorInstance[];
+} {
+  const activeContent = getActiveWorldContent();
+  const builtInWorld = activeContent === BUILTIN_WORLD;
+  const used = new Map<string, PropAsset>();
+  const instances: BuildingImpostorInstance[] = [];
+  const use = (key: PropKey): PropAsset => {
+    const a = propAsset(key);
+    used.set(key, a);
+    return a;
+  };
+  for (const b of activeContent.props.buildings) {
+    if (b.landmark) continue;
+    if (builtInWorld && isEastbrookRebuildBuilding(b)) continue;
+    const y = terrainHeight(b.x, b.z, seed);
+    if (b.kind === 'chapel') {
+      const tower = use('bellTower');
+      const w = Math.max(b.w * CHAPEL_TOWER.wScale, b.d * CHAPEL_TOWER.dScale);
+      instances.push({
+        asset: 'bellTower',
+        x: b.x,
+        y: y - CHAPEL_HALL.sink,
+        z: b.z,
+        rot: b.rot,
+        widthScale: w / Math.max(tower.size.x, tower.size.z),
+        heightScale: CHAPEL_TOWER.height / tower.size.y,
+      });
+      continue;
+    }
+    const key = b.x * 13.7 + b.z * 3.1;
+    const pool = b.kind === 'hollowHouse' ? HOUSE_POOL_HOLLOW : HOUSE_POOL;
+    const asset: PropKey =
+      KIND_ASSET[b.kind] ?? pool[Math.floor(keyRand(key, 3) * 0.999 * pool.length)];
+    const a = use(asset);
+    instances.push({
+      asset,
+      x: b.x,
+      y: y - 0.12,
+      z: b.z,
+      rot: b.rot,
+      widthScale: Math.max(b.w, b.d) / Math.max(a.size.x, a.size.z),
+      heightScale: HOUSE_HEIGHT[asset] / a.size.y,
+    });
+  }
+  for (const d of activeContent.props.decorProps ?? []) {
+    if (!(d.key in PROP_ASSET_DEFS)) continue;
+    const a = propAsset(d.key as PropKey);
+    const scale = typeof d.scale === 'number' ? d.scale : 1;
+    // only skyline-scale decor earns a sprite; small dressing is sub-pixel
+    // out where the sprites live
+    if (a.size.y * scale < 7) continue;
+    used.set(d.key, a);
+    const y =
+      d.float !== undefined
+        ? Math.max(terrainHeight(d.x, d.z, seed), WATER_LEVEL - d.float)
+        : terrainHeight(d.x, d.z, seed) - 0.05;
+    instances.push({
+      asset: d.key,
+      x: d.x,
+      y,
+      z: d.z,
+      rot: d.rot ?? 0,
+      widthScale: scale,
+      heightScale: scale,
+    });
+  }
+  return {
+    sources: [...used].map(([asset, a]) => ({
+      asset,
+      parts: a.parts.map((part) => ({ geometry: part.geo, material: part.mat, isLeaf: false })),
+    })),
+    instances,
+  };
 }

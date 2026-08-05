@@ -113,6 +113,7 @@ export const IWORLD_MEMBERS = [
   { name: 'questsDone', kind: 'data' },
   // --- commands + read-returning methods ---
   { name: 'questState', kind: 'method' }, // read-returning (1/6)
+  { name: 'reactiveAbilityWindowRemaining', kind: 'method' },
   { name: 'castAbility', kind: 'method' },
   { name: 'castAbilityAt', kind: 'method' },
   { name: 'castAbilityBySlot', kind: 'method' },
@@ -259,6 +260,7 @@ export const IWORLD_MEMBERS = [
   // --- market commands ---
   { name: 'marketSearch', kind: 'method' },
   { name: 'marketList', kind: 'method' },
+  { name: 'marketListInstance', kind: 'method' },
   { name: 'marketBuy', kind: 'method' },
   { name: 'marketCancel', kind: 'method' },
   { name: 'marketCollect', kind: 'method' },
@@ -298,6 +300,7 @@ export const IWORLD_MEMBERS = [
   { name: 'stationPlacements', kind: 'data' },
   { name: 'craftingIdentity', kind: 'data' },
   { name: 'nodeHarvestableByMe', kind: 'method' }, // read-returning
+  { name: 'nodeRespawnSeconds', kind: 'method' }, // read-returning (countdown of the same timer)
   { name: 'harvestNode', kind: 'method' },
   { name: 'recipeList', kind: 'data' },
   { name: 'lastCraftResult', kind: 'data' },
@@ -317,10 +320,17 @@ export const IWORLD_MEMBERS = [
   { name: 'lastSalvageResult', kind: 'data' },
   // Maker's Bond unbind service (Professions 2.0).
   { name: 'unbindItem', kind: 'method' },
+  // Tool effect slotting: one read row per gathering profession that has a
+  // slotted effect, the command that installs one (consuming a crafted charm
+  // copy), and the recharge command (the R39/R30 refill).
+  { name: 'toolEffectSlots', kind: 'data' },
+  { name: 'slotToolEffect', kind: 'method' },
+  { name: 'rechargeToolEffect', kind: 'method' },
   { name: 'raidLockouts', kind: 'method' }, // read-returning (5/6)
-  { name: 'riftCollisionToken', kind: 'data' }, // per-Sim rift collision registry key
   { name: 'riftFloor', kind: 'data' }, // active procedural rift floor (null outside)
+  { name: 'riftCollisionToken', kind: 'data' }, // per-Sim rift collision registry key
   { name: 'riftBossDeathZones', kind: 'method' }, // live lethal zones on the boss floor
+  { name: 'riftEventMsRemaining', kind: 'method' }, // ms until the rift event stops admitting parties
   { name: 'dungeonDifficulty', kind: 'method' }, // read-returning
   { name: 'setDungeonDifficulty', kind: 'method' },
   { name: 'buyHeroicVendorItem', kind: 'method' },
@@ -500,9 +510,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // items removed selectedMount + selectMount from the prior surface. The
     // v0.32.0 integration adds activeMasterLootRolls. The voyage loading
     // screen suppression adds the synchronous sceneActiveForLocalPlayer.
-    expect(IWORLD_MEMBERS.length).toBe(278);
-    expect(DATA_MEMBERS.length).toBe(73);
-    expect(METHOD_MEMBERS.length).toBe(205);
+    expect(IWORLD_MEMBERS.length).toBe(285);
+    expect(DATA_MEMBERS.length).toBe(74);
+    expect(METHOD_MEMBERS.length).toBe(211);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -677,6 +687,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketCollectPending',
       'marketInfo',
       'marketList',
+      'marketListInstance',
       'marketSearch',
       'mountLessonActive',
       'mountRaceCancel',
@@ -687,6 +698,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'moveInventoryItem',
       'moveRaidMember',
       'nodeHarvestableByMe',
+      'nodeRespawnSeconds',
       'ownedMounts',
       'partyAccept',
       'partyDecline',
@@ -712,8 +724,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'questState',
       'questsDone',
       'raidLockouts',
+      'reactiveAbilityWindowRemaining',
       'readyCheckRespond',
       'realm',
+      'rechargeToolEffect',
       'recipeList',
       'releaseEmpoweredAbility',
       'releaseSpirit',
@@ -729,6 +743,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'ridingTrained',
       'riftBossDeathZones',
       'riftCollisionToken',
+      'riftEventMsRemaining',
       'riftFloor',
       'salvageItem',
       'saveActionBarLayout',
@@ -748,6 +763,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setPetMode',
       'setSpec',
       'setTownFocus',
+      'slotToolEffect',
       'socialInfo',
       'socketRiftGem',
       'spinDailyReward',
@@ -766,6 +782,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'targetNearestFriendly',
       'toggleMounted',
       'toggleWeaponStow',
+      'toolEffectSlots',
       'townFocus',
       'tradeAccept',
       'tradeCancel',
@@ -864,6 +881,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'talentRole',
       'talentSpec',
       'talents',
+      'toolEffectSlots',
       'townFocus',
       'tradeInfo',
       'unlockedMilestones',
@@ -990,6 +1008,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketCancel',
       'marketCollect',
       'marketList',
+      'marketListInstance',
       'marketSearch',
       'mountLessonActive',
       'mountRaceCancel',
@@ -999,6 +1018,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'moveInventoryItem',
       'moveRaidMember',
       'nodeHarvestableByMe',
+      'nodeRespawnSeconds',
       'ownedMounts',
       'partyAccept',
       'partyDecline',
@@ -1016,7 +1036,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'prestige',
       'questState',
       'raidLockouts',
+      'reactiveAbilityWindowRemaining',
       'readyCheckRespond',
+      'rechargeToolEffect',
       'releaseEmpoweredAbility',
       'releaseSpirit',
       'renamePet',
@@ -1028,6 +1050,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'revivePet',
       'ridingTrained',
       'riftBossDeathZones',
+      'riftEventMsRemaining',
       'salvageItem',
       'saveActionBarLayout',
       'saveLoadout',
@@ -1046,6 +1069,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setPetMode',
       'setSpec',
       'setTownFocus',
+      'slotToolEffect',
       'socketRiftGem',
       'spinDailyReward',
       'startAutoAttack',
@@ -1153,6 +1177,7 @@ const FACET_COMBAT = [
   'known',
   'activeFrostRings',
   'activeTemporalHourglasses',
+  'reactiveAbilityWindowRemaining',
   'castAbility',
   'castAbilityAt',
   'castAbilityBySlot',
@@ -1394,6 +1419,7 @@ const FACET_MARKET = [
   'marketCollectPending',
   'marketSearch',
   'marketList',
+  'marketListInstance',
   'marketBuy',
   'marketCancel',
   'marketCollect',
@@ -1422,9 +1448,10 @@ const FACET_DUNGEONS = [
   'enterDungeon',
   'leaveDungeon',
   'raidLockouts',
-  'riftCollisionToken',
   'riftFloor',
+  'riftCollisionToken',
   'riftBossDeathZones',
+  'riftEventMsRemaining',
   'dungeonDifficulty',
   'setDungeonDifficulty',
   'buyHeroicVendorItem',
@@ -1512,6 +1539,7 @@ const FACET_PROFESSIONS = [
   'stationPlacements',
   'craftingIdentity',
   'nodeHarvestableByMe',
+  'nodeRespawnSeconds',
   'harvestNode',
   'recipeList',
   'lastCraftResult',
@@ -1529,6 +1557,9 @@ const FACET_PROFESSIONS = [
   'lastEnchantResult',
   'lastSalvageResult',
   'unbindItem',
+  'toolEffectSlots',
+  'slotToolEffect',
+  'rechargeToolEffect',
 ] as const satisfies readonly (keyof IWorldProfessions)[];
 type _ExhaustProfessions = AssertNever<
   Exclude<keyof IWorldProfessions, (typeof FACET_PROFESSIONS)[number]>
@@ -1626,8 +1657,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(278);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(278);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(285);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(285);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

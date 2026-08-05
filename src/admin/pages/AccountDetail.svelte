@@ -2,6 +2,7 @@
   import type { AccountDetail } from '../types';
   import { classLabel, localizeAdminError, t } from '../i18n';
   import { fmtCopper, fmtDate, fmtDuration, fmtRelative } from '../format';
+  import { guildRankLabel } from '../labels';
   import { apiPost } from '../api';
   import { auth } from '../state/auth.svelte';
   import {
@@ -16,6 +17,7 @@
   import DailyRewardsModerationControls from '../components/DailyRewardsModerationControls.svelte';
   import ModerationActionPrompt from '../components/ModerationActionPrompt.svelte';
   import ModerationHistory from '../components/ModerationHistory.svelte';
+  import GuildLink from '../components/GuildLink.svelte';
 
   // Reusable account body: moderation actions, chat state, characters, and recent
   // sessions. Identity and account status belong to the parent context (table row,
@@ -79,34 +81,46 @@
       {#if detail.characters.length === 0}
         <div class="empty">{t('detail.noCharacters')}</div>
       {:else}
-        <table>
-          <thead>
-            <tr>
-              <th>{t('detail.colName')}</th>
-              <th>{t('characters.colClass')}</th>
-              <th class="num">{t('characters.colLevel')}</th>
-              <th class="num">{t('detail.colXp')}</th>
-              <th class="num">{t('detail.colMoney')}</th>
-              <th class="num">{t('online.colPos')}</th>
-              <th>{t('characters.colLastPlayed')}</th>
-              {#if canModerate}<th>{t('detail.colActions')}</th>{/if}
-            </tr>
-          </thead>
-          <tbody>
-            {#each detail.characters as c}
+        <div class="table-scroll">
+          <table>
+            <thead>
               <tr>
-                <td>{c.name}</td>
-                <td>{classLabel(c.class)}</td>
-                <td class="num">{c.level}</td>
-                <td class="num">{c.xp}</td>
-                <td class="num">{fmtCopper(c.copper)}</td>
-                <td class="num">{c.pos ? `${Math.round(c.pos.x)}, ${Math.round(c.pos.z)}` : t('common.emptyValue')}</td>
-                <td>{fmtRelative(c.updatedAt)}</td>
-                {#if canModerate}<td><button class="btn-sm" onclick={() => (selectedCharacter = c)}>{t('detail.forceNameChange')}</button></td>{/if}
+                <th>{t('detail.colName')}</th>
+                <th>{t('characters.colClass')}</th>
+                <th class="num">{t('characters.colLevel')}</th>
+                <th class="num">{t('detail.colXp')}</th>
+                <th class="num">{t('detail.colMoney')}</th>
+                <th>{t('characters.colGuild')}</th>
+                <th>{t('characters.colGuildRank')}</th>
+                <th class="num">{t('online.colPos')}</th>
+                <th>{t('characters.colLastPlayed')}</th>
+                {#if canModerate}<th>{t('detail.colActions')}</th>{/if}
               </tr>
-            {/each}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {#each detail.characters as c}
+                <tr>
+                  <td>{c.name}</td>
+                  <td>{classLabel(c.class)}</td>
+                  <td class="num">{c.level}</td>
+                  <td class="num">{c.xp}</td>
+                  <td class="num">{fmtCopper(c.copper)}</td>
+                  <td>
+                    {#if c.guildId !== null && c.guildName !== null}
+                      <GuildLink guildId={c.guildId} label={c.guildName} />
+                    {:else}
+                      {t('common.emptyValue')}
+                    {/if}
+                  </td>
+                  <td>{guildRankLabel(c.guildRank)}</td>
+                  <td class="num">{c.pos ? `${Math.round(c.pos.x)}, ${Math.round(c.pos.z)}` : t('common.emptyValue')}</td>
+                  <td>{fmtRelative(c.updatedAt)}</td>
+                  {#if canModerate}<td><button class="btn-sm" onclick={() => (selectedCharacter = c)}>{t('detail.forceNameChange')}</button></td>{/if}
+                </tr>
+              {/each}
+            </tbody>
+          </table>
+        </div>
       {/if}
       {#if selectedCharacter}
         {@const character = selectedCharacter}

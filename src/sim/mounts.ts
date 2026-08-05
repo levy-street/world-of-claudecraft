@@ -28,7 +28,7 @@ import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { DT, type Entity, FORM_AURA_KINDS } from './types';
+import { DT, type Entity, FORM_AURA_KINDS, isNonSpellCast } from './types';
 
 // Summon channel duration (seconds). Mounting is a short cast the player can
 // interrupt by moving into combat or water. Dismounting has NO channel: it is
@@ -66,20 +66,38 @@ export function mountOwned(meta: PlayerMeta, key: string): boolean {
   );
 }
 
+/** The catalog subset present in `slots`, in catalog order. Shared by
+ *  `ownedMounts` (bags + bank) and `bagOwnedMounts` (bags only, #2739
+ *  followup): a single pass collecting reins itemIds into mount keys. */
+function collectMountKeys(slots: readonly { itemId: string }[]): MountKey[] {
+  const owned = new Set<string>();
+  for (const s of slots) {
+    const def = ITEMS[s.itemId];
+    if (def?.kind === 'mount') owned.add(def.mount);
+  }
+  return MOUNT_KEYS.filter((key) => owned.has(key));
+}
+
 /** The owned subset of the catalog, in catalog order. Empty for a fresh player.
  *  Single pass over bags + bank: the server rebuilds this per snapshot, so it
  *  never scans the containers once per catalog mount. */
 export function ownedMounts(meta: PlayerMeta): MountKey[] {
-  const owned = new Set<string>();
-  const collect = (slots: readonly { itemId: string }[]): void => {
-    for (const s of slots) {
-      const def = ITEMS[s.itemId];
-      if (def?.kind === 'mount') owned.add(def.mount);
-    }
-  };
-  collect(meta.inventory);
-  collect(meta.bank.inventory);
-  return MOUNT_KEYS.filter((key) => owned.has(key));
+  return collectMountKeys([...meta.inventory, ...meta.bank.inventory]);
+}
+
+/** The owned subset of the catalog whose reins are in BAGS right now (never
+ *  the bank), in catalog order. `summonMountItem` (routed through
+ *  `IWorldInventory.useItem`) can only click a bagged item: `useItem` gates on
+ *  `Sim.countItem`, which is bags-only by design (a bank withdrawal is a
+ *  separate, deliberate step). A picker built from the wider `ownedMounts()`
+ *  (bags + bank) can therefore hand `useItem` an itemId it will refuse with
+ *  "You don't have that item.", or skip past a bagged mount that sorts after
+ *  a bank-only one in catalog order. Callers that must resolve an itemId to
+ *  actually SUMMON (the mobile quick-action button; `mount_quick_summon.ts`)
+ *  use this instead of `ownedMounts()`; a picker that only ever DISPLAYS the
+ *  collection (the Mounts window) still wants the wider bags+bank list. */
+export function bagOwnedMounts(inventory: readonly { itemId: string }[]): MountKey[] {
+  return collectMountKeys(inventory);
 }
 
 // Recompute the player's derived stats after a mount state change (aura strips,
@@ -236,6 +254,13 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
     if (e.dead || e.ghost) return false;
     if (e.inCombat) {
       ctx.error(pid, "You can't do that while in combat.");
+      return false;
+    }
+    // The profession-cast interlock's third route: the lesson summon is the
+    // one mount path that skips useItem (no reins exist for the training
+    // steed), so it carries the busy refusal the reins click gets for free.
+    if (isNonSpellCast(e.castingAbility)) {
+      ctx.error(pid, 'You are busy.');
       return false;
     }
     cancelFormsAndGhostWolf(ctx, e);

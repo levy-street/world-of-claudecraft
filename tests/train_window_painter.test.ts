@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 // Painter pins for the train window's card treatment: the two-arm fee
 // rendering (the gold action chip on an AFFORDABLE teachable row only, the

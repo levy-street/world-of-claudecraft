@@ -205,6 +205,13 @@ export class GameAudio {
   // minigame/PvP loss chime (fiesta, Yumi, arena rating, Vale Cup all still
   // use death() below): plays the real custom death vocalization instead of
   // the generic UI stinger.
+  //
+  // player_death_female_1..3 exist under public/audio/sfx but are unwired,
+  // same gap as the other player-voice trigger sites in src/ui/hud.ts (search
+  // player_hurt_female / player_death_female there): no gender field exists
+  // on PlayerMeta yet. This is the site to wire for your OWN character's
+  // death vocalization once that field lands, distinct from the OTHER
+  // players' death cue commented in hud.ts.
   playerDeath(): void {
     this.play(UI_CUES.playerDeath);
   }

@@ -10,7 +10,7 @@
 // canvas no-magic-values guard is in tests/minimap_painter.test.ts.
 
 import { describe, expect, it } from 'vitest';
-import { DELVE_X_MIN, QUESTS, STATIONS, YUMI_MAZE_X } from '../src/sim/data';
+import { DELVE_X_MIN, GATHER_NODES, QUESTS, STATIONS, YUMI_MAZE_X } from '../src/sim/data';
 import { isQuestTurnInNpc } from '../src/sim/types';
 import { createMinimapMarkers, type MinimapMarker, minimapMode } from '../src/ui/minimap_markers';
 import type { IWorld } from '../src/world_api';
@@ -107,6 +107,24 @@ function makeWorld(shape: 'sim' | 'client'): IWorld {
     playerId: 1,
     stationPlacements: STATIONS,
     questState: (q: string) => (q === GIVER_QUEST.id ? 'available' : 'unavailable'),
+    // The gather-node reads. This scenario is not about gathering, but the core
+    // consults both members for any node inside the rim, and whether one IS
+    // inside the rim is a fact about world content, not about this fixture. It
+    // used to carry neither member and passed only because no node happened to
+    // sit near (0, PZ); the moment one did, every test in this file threw on
+    // `inventory is not iterable`. Supplying them makes the fixture answer for
+    // itself whatever the map looks like.
+    inventory: [],
+    nodeHarvestableByMe: () => true,
+    // The quest-marker inputs both worlds expose (the phase 23 classifier):
+    // questsDone always, and the crafting identity whose cadenceBlockedQuests
+    // mirror drives the cooldown variant. The sim shape carries a fuller
+    // identity; the client shape only what the cprof mirror guarantees.
+    questsDone: new Set<string>(),
+    craftingIdentity:
+      shape === 'sim'
+        ? { version: 1, synced: true, attunedPairs: [], cadenceBlockedQuests: [] }
+        : { version: 1, synced: false, cadenceBlockedQuests: [] },
   } as unknown as IWorld;
 }
 
@@ -154,6 +172,14 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
     // ally (friend), ally (guild), npc('!'), npc('•'), portal, object-loot, mob(aggro),
     // mob, mob-loot, party-disc (pid 5), party-arrow (pid 16), player. The stranger
     // (id 4) and the party member (id 5) produce NO entity-loop marker; id 14 is culled.
+    //
+    // The two gather-node entries are content, not fixture: wood_eastbrook_4 and
+    // wood_eastbrook_5 sit 25.0 and 40.6 yards from (0, PZ), inside the
+    // 43.53-yard rim, and the node loop runs between the party loop and the
+    // player arrow. They appeared when the Eastbrook wood stands were spread up
+    // the north road instead of clumped at Webwood; a future stand near (0, 100)
+    // legitimately re-mints this list, which is why the whole ordered sequence is
+    // asserted rather than a subset.
     expect(kinds).toEqual([
       'ally',
       'ally',
@@ -166,6 +192,8 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
       'mob-loot',
       'party-disc',
       'party-arrow',
+      'gather-node',
+      'gather-node',
       'player',
     ]);
     const allies = markers.filter((m) => m.kind === 'ally') as Extract<
@@ -188,6 +216,8 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
     >[];
     // The giver has an available (not ready) quest -> '!'; the quiet npc -> '•'.
     expect(npcs.map((n) => n.glyph)).toEqual(['!', '•']);
+    // The marker variant behind each glyph: gold first-offer, neutral none.
+    expect(npcs.map((n) => n.marker)).toEqual(['available', 'none']);
   });
 
   it("renders the '?' glyph when an npc has a ready turn-in (distinct from '!')", () => {
@@ -204,6 +234,95 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
       (m) => m.kind === 'npc',
     ) as Extract<MinimapMarker, { kind: 'npc' }>[];
     expect(npcs[0].glyph).toBe('?');
+    expect(npcs[0].marker).toBe('ready');
+  });
+
+  it('stamps the repeat and cooldown variants identically for both world shapes', () => {
+    // The phase 23 blue "!" at the minimap surface, from a real cadenced work
+    // order re-pointed onto the seeded npc: after one completion the offer
+    // stamps 'repeat'; inside the window (the cadenceBlockedQuests mirror)
+    // it stamps 'cooldown' where the npc previously showed the neutral dot.
+    // Driven through BOTH stub shapes (acceptance (a)'s both-worlds arm).
+    // This pins the CLASSIFIER over each world's data shape; true
+    // world-to-world parity of the inputs themselves rests on the online
+    // cadence/attunement suites pinning the qdone and cprof mirrors.
+    const workOrder = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
+    if (!workOrder) throw new Error('expected a cadenced work order');
+    for (const shape of ['sim', 'client'] as const) {
+      const world = makeWorld(shape) as unknown as {
+        entities: Map<number, { templateId: string; questIds: string[] }>;
+        questState: (q: string) => string;
+        questsDone: Set<string>;
+        craftingIdentity: { cadenceBlockedQuests: string[] };
+      };
+      const npc = world.entities.get(6);
+      if (!npc) throw new Error('expected the seeded giver npc');
+      npc.templateId = workOrder.giverNpcId;
+      npc.questIds = [workOrder.id];
+      world.questsDone = new Set([workOrder.id]);
+      world.questState = (q) => (q === workOrder.id ? 'available' : 'unavailable');
+      const offered = buildMarkers(world as unknown as IWorld).filter(
+        (m) => m.kind === 'npc',
+      ) as Extract<MinimapMarker, { kind: 'npc' }>[];
+      expect(offered[0].glyph, `${shape}: offered again`).toBe('!');
+      expect(offered[0].marker, `${shape}: offered again`).toBe('repeat');
+
+      world.questState = () => 'unavailable';
+      world.craftingIdentity.cadenceBlockedQuests = [workOrder.id];
+      const blocked = buildMarkers(world as unknown as IWorld).filter(
+        (m) => m.kind === 'npc',
+      ) as Extract<MinimapMarker, { kind: 'npc' }>[];
+      expect(blocked[0].glyph, `${shape}: inside the window`).toBe('!');
+      expect(blocked[0].marker, `${shape}: inside the window`).toBe('cooldown');
+
+      // The negative arm: the same unavailable state WITHOUT the mirror set
+      // keeps the pre-phase neutral dot (an older server payload degrades to
+      // today's behavior rather than guessing).
+      world.craftingIdentity.cadenceBlockedQuests = [];
+      const bare = buildMarkers(world as unknown as IWorld).filter(
+        (m) => m.kind === 'npc',
+      ) as Extract<MinimapMarker, { kind: 'npc' }>[];
+      expect(bare[0].glyph, `${shape}: no mirror`).toBe('•');
+      expect(bare[0].marker, `${shape}: no mirror`).toBe('none');
+    }
+  });
+
+  it("folds across an NPC's quests: a ready turn-in beats a completed repeatable", () => {
+    // Acceptance (c) at THIS surface: the fold accumulator (and its break on
+    // ready) runs over more than one quest. The work order's giver also
+    // gives the attune quest; its ready '?' must win the glyph over the
+    // repeat-blue offer.
+    const workOrder = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
+    if (!workOrder) throw new Error('expected a cadenced work order');
+    const attune = Object.values(QUESTS).find(
+      (q) => q.giverNpcId === workOrder.giverNpcId && !q.repeatable,
+    );
+    if (!attune) throw new Error('expected a plain quest at the work-order giver');
+    const world = makeWorld('sim') as unknown as {
+      entities: Map<number, { templateId: string; questIds: string[] }>;
+      questState: (q: string) => string;
+      questsDone: Set<string>;
+    };
+    const npc = world.entities.get(6);
+    if (!npc) throw new Error('expected the seeded giver npc');
+    npc.templateId = workOrder.giverNpcId;
+    world.questsDone = new Set([workOrder.id]);
+    world.questState = (q) =>
+      q === workOrder.id ? 'available' : q === attune.id ? 'ready' : 'unavailable';
+    // BOTH orders: with the ready quest first, a fold degenerated to
+    // last-value-wins answers 'repeat' (the mutation round proved the
+    // ready-last order alone leaves exactly that mutant green).
+    for (const questIds of [
+      [attune.id, workOrder.id],
+      [workOrder.id, attune.id],
+    ]) {
+      npc.questIds = questIds;
+      const npcs = buildMarkers(world as unknown as IWorld).filter(
+        (m) => m.kind === 'npc',
+      ) as Extract<MinimapMarker, { kind: 'npc' }>[];
+      expect(npcs[0].glyph, questIds.join(',')).toBe('?');
+      expect(npcs[0].marker, questIds.join(',')).toBe('ready');
+    }
   });
 
   it('classifies party members: an on-map disc (alive -> pip) and an off-map arrow (dead)', () => {
@@ -301,6 +420,10 @@ describe('station markers (Professions 2.0)', () => {
       stationPlacements: STATIONS,
       questState: () => 'unavailable',
       nodeHarvestableByMe: () => true,
+      // Paired with nodeHarvestableByMe above: both gather-node reads, both
+      // needed by any viewer with a node inside the rim, which the "field
+      // viewer" case below now is (wood_eastbrook_5 is 12 yards from (0, 150)).
+      inventory: [],
       ...over,
     } as unknown as IWorld;
   }
@@ -400,17 +523,30 @@ describe('minimap corpse marker (ghost run)', () => {
 // The gather-node marker's locked dimension. The viewer stands ON
 // the new tier-2 mirefen vein (ore_mirefen_t2), where the rim covers exactly
 // five nodes in GATHER_NODES order: ore_mirefen_1, ore_mirefen_3,
-// herb_mirefen_1, herb_mirefen_3 (all tier 1) and the tier-2 vein itself at
+// wood_mirefen_1, herb_mirefen_3 (all tier 1) and the tier-2 vein itself at
 // the map centre. Actionable info on every preset: locked resolves from the
 // bags, never a graphics knob.
+//
+// The count has moved twice with content, re-minted each time rather than
+// loosened. It read five, then four when herb_mirefen_1 (4 yards under the
+// (60, 380) pool) moved onto dry shore 47.0 yards out, past the 43.53-yard
+// rim; the v0.32.0 merge then moved the anchor vein itself off (48,352)
+// (an expansion collider took the spot), and from (36,350) wood_mirefen_1
+// sits back inside the rim at 32.8 yards. That widens the coverage the arms
+// below care about: an ore vein a pick unlocks beside a herb patch AND a
+// wood stand it does not.
 describe('gather-node markers: the locked dimension', () => {
-  const T2 = { x: 48, z: 352 }; // ore_mirefen_t2, pinned literally
+  const T2 = { x: 36, z: 350 }; // ore_mirefen_t2, pinned literally (moved at the v0.32.0 merge)
 
   function makeGatherWorld(
     shape: 'sim' | 'client',
     opts: {
       inventory?: { itemId: string; count: number }[];
       harvestable?: (id: string) => boolean;
+      /** The viewer's counters (R22): a tooled fixture must also carry the
+       *  proficiency its tools ask, or the wield-filtered scan reads them
+       *  as unusable exactly like the sim's harvest gate would. */
+      gatheringProficiency?: Record<string, number>;
     } = {},
   ): IWorld {
     const junk = shape === 'sim' ? { hp: 100, maxHp: 100, castingAbility: null } : {};
@@ -437,6 +573,7 @@ describe('gather-node markers: the locked dimension', () => {
       playerId: 1,
       stationPlacements: STATIONS,
       inventory: opts.inventory ?? [],
+      gatheringProficiency: opts.gatheringProficiency ?? {},
       nodeHarvestableByMe: opts.harvestable ?? (() => true),
       questState: () => 'unavailable',
     } as unknown as IWorld;
@@ -458,12 +595,25 @@ describe('gather-node markers: the locked dimension', () => {
     expect(centre).toMatchObject({ locked: true, ready: true });
   });
 
-  it('the tier-2 pick unlocks only the ore nodes; herb stays locked without a sickle', () => {
+  it('the WIELDED tier-2 pick unlocks only the ore nodes; herb stays locked without a sickle', () => {
     const tooled = gatherMarkers(
+      makeGatherWorld('sim', {
+        inventory: [{ itemId: 'iron_mining_pick', count: 1 }],
+        // The pick must wield (R22): mining 40, its own requirement.
+        gatheringProficiency: { mining: 40 },
+      }),
+    );
+    // GATHER_NODES rim order: ore t1, ore t1, wood t1, herb t1, ore t2
+    // (centre): the pick unlocks the ores alone; the wood stand and the herb
+    // patch both stay locked without their own implements.
+    expect(tooled.map((m) => m.locked)).toEqual([false, false, true, true, false]);
+    // The R22 arm: the SAME pick with the counter short is unusable, so
+    // every ore row stays locked on the map exactly as the sim's wield
+    // denial would refuse the harvest (owned is not earned).
+    const unearned = gatherMarkers(
       makeGatherWorld('sim', { inventory: [{ itemId: 'iron_mining_pick', count: 1 }] }),
     );
-    // GATHER_NODES rim order: ore t1, ore t1, herb t1, herb t1, ore t2 (centre).
-    expect(tooled.map((m) => m.locked)).toEqual([false, false, true, true, false]);
+    expect(unearned.map((m) => m.locked)).toEqual([true, true, true, true, true]);
     // Locked composes WITH the respawn dimension, never replaces it: a
     // cooling locked vein keeps ready=false (the silhouette the painter keeps
     // readable under the locked tint).
@@ -474,5 +624,144 @@ describe('gather-node markers: the locked dimension', () => {
 
   it('both IWorld shapes produce identical gather markers (decision-15 parity)', () => {
     expect(gatherMarkers(makeGatherWorld('sim'))).toEqual(gatherMarkers(makeGatherWorld('client')));
+  });
+
+  it('the proficiency map is read ONCE per build (the offline getter copies per access)', () => {
+    // The hoist this pins is the change's entire purpose: Sim's
+    // gatheringProficiency getter spread-copies the live map on every access,
+    // so a per-profession read is per-build garbage no reference probe can
+    // see. Model the copying getter and count: the multi-profession rim
+    // (ore + wood + herb professions in range) must cost exactly one read.
+    let reads = 0;
+    const world = makeGatherWorld('sim', {
+      inventory: [{ itemId: 'iron_mining_pick', count: 1 }],
+    }) as { gatheringProficiency?: Record<string, number> };
+    delete world.gatheringProficiency;
+    Object.defineProperty(world, 'gatheringProficiency', {
+      get() {
+        reads++;
+        return { mining: 40 };
+      },
+    });
+    const markers = gatherMarkers(world as unknown as IWorld);
+    expect(markers.length).toBeGreaterThan(0); // the rim really had nodes
+    expect(reads).toBe(1);
+  });
+
+  it('both shapes agree on the R22 wield axis, each locked vector pinned literally', () => {
+    // The toolless parity arm above cannot discriminate on the wield axis: an
+    // empty bag with an empty counter map locks every node in both shapes, so
+    // the two would still agree if the wield filter were wired into only one
+    // of them. These fixtures carry the SAME covering tier-2 pick in BOTH
+    // shapes and differ only in the counter, which is precisely the field a
+    // mirror can drop (the Sim getter copies the live map; ClientWorld
+    // rebuilds it from the gprof wire field). Agreement alone is not the
+    // assertion either: each shape's locked vector is pinned literally, so a
+    // pair that agreed on a WRONG vector still reds.
+    const PICK = [{ itemId: 'iron_mining_pick', count: 1 }];
+    // Covering but unwieldable (R22): mining 0 puts nothing to work, so every
+    // node in the rim stays locked, the tier-1 ores included, even though the
+    // bags hold a pick that covers them.
+    const unearnedSim = gatherMarkers(
+      makeGatherWorld('sim', { inventory: PICK, gatheringProficiency: { mining: 0 } }),
+    );
+    const unearnedClient = gatherMarkers(
+      makeGatherWorld('client', { inventory: PICK, gatheringProficiency: { mining: 0 } }),
+    );
+    expect(unearnedSim.map((m) => m.locked)).toEqual([true, true, true, true, true]);
+    expect(unearnedClient).toEqual(unearnedSim);
+    // The same pick at the pick's own requirement flips the ore rows open
+    // (rim order: ore t1, ore t1, wood t1, herb t1, ore t2 at the centre);
+    // the wood stand and the herb patch keep locking for want of their own
+    // implements, in both shapes.
+    const earnedSim = gatherMarkers(
+      makeGatherWorld('sim', { inventory: PICK, gatheringProficiency: { mining: 40 } }),
+    );
+    const earnedClient = gatherMarkers(
+      makeGatherWorld('client', { inventory: PICK, gatheringProficiency: { mining: 40 } }),
+    );
+    expect(earnedSim.map((m) => m.locked)).toEqual([false, false, true, true, false]);
+    expect(earnedClient).toEqual(earnedSim);
+    // The pair genuinely discriminates: the counter, and nothing else, moved
+    // the vector, so this parity assertion is not two copies of one constant.
+    expect(earnedSim.map((m) => m.locked)).not.toEqual(unearnedSim.map((m) => m.locked));
+  });
+});
+
+describe('gather-node markers scale with the rim, not the node table (phase 16)', () => {
+  // The zone-scaling half of the client projection: the SCANNED set is the
+  // whole authored table (an accepted O(nodes) walk at the minimap's 10 Hz
+  // redraw), but the DRAWN set must stay bounded by the rim cull however many
+  // zones ship nodes. Both arms below fail if the cull is dropped or its
+  // comparison flips; neither moves when a new zone adds nodes.
+  function nodeWorldAt(x: number, z: number): IWorld {
+    const player = {
+      id: 1,
+      kind: 'player',
+      name: 'Me',
+      pos: { x, z },
+      facing: 0,
+      dead: false,
+      lootable: false,
+      aggroTargetId: null,
+      questIds: [],
+      templateId: '',
+    };
+    return {
+      player,
+      entities: new Map([[1, player]]),
+      partyInfo: null,
+      socialInfo: null,
+      delveRun: null,
+      cfg: { seed: 42, playerClass: 'warrior' },
+      playerId: 1,
+      stationPlacements: [],
+      inventory: [],
+      gatheringProficiency: {},
+      nodeHarvestableByMe: () => true,
+      questState: () => 'unavailable',
+    } as unknown as IWorld;
+  }
+  function nodeMarkersAt(x: number, z: number) {
+    return buildMarkers(nodeWorldAt(x, z)).filter((m) => m.kind === 'gather-node');
+  }
+  const RIM_PX = S / 2 - 7; // byte-faithful to the core's half - RIM_INSET
+
+  it('draws exactly the in-rim subset, probed standing on one node of every zone', () => {
+    const zones = [...new Set(GATHER_NODES.map((n) => n.zoneId))];
+    // Every shipped zone carries nodes since the v0.32.0 starter kits, so the
+    // probe genuinely tours the whole world.
+    expect(zones.length).toBeGreaterThanOrEqual(14);
+    for (const zoneId of zones) {
+      const anchor = GATHER_NODES.find((n) => n.zoneId === zoneId);
+      if (!anchor) throw new Error(`no node in ${zoneId}`);
+      const inRim = GATHER_NODES.filter((n) => {
+        const dx = (n.pos.x - anchor.pos.x) * PPY;
+        const dz = (n.pos.z - anchor.pos.z) * PPY;
+        return dx * dx + dz * dz <= RIM_PX * RIM_PX;
+      });
+      const drawn = nodeMarkersAt(anchor.pos.x, anchor.pos.z);
+      expect(drawn, `zone ${zoneId}`).toHaveLength(inRim.length);
+      // Position identity, not just cardinality: a cull that kept the WRONG
+      // nodes at the right count must fail, so pin the projected coordinate
+      // set (markers carry no node id; mx/my is half - delta * PPY).
+      const expectCoords = inRim
+        .map(
+          (n) =>
+            `${S / 2 - (n.pos.x - anchor.pos.x) * PPY},${S / 2 - (n.pos.z - anchor.pos.z) * PPY}`,
+        )
+        .sort();
+      expect(drawn.map((m) => `${m.mx},${m.my}`).sort(), `zone ${zoneId} coords`).toEqual(
+        expectCoords,
+      );
+      // Standing on a node always draws at least that node, and the rim
+      // genuinely culls (far zones never ride along).
+      expect(inRim.length).toBeGreaterThanOrEqual(1);
+      expect(inRim.length).toBeLessThan(GATHER_NODES.length);
+    }
+  });
+
+  it('a viewer far from every node draws zero node markers regardless of the table size', () => {
+    expect(nodeMarkersAt(99000, 99000)).toHaveLength(0);
   });
 });

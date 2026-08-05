@@ -400,19 +400,17 @@ function challengeHullBlocker(
     x: blocker.x - outward.x * (support + 2),
     z: blocker.z - outward.z * (support + 2),
   };
-  stage(sim, start, waterLevelAt(start.x, start.z));
-  pushToward(sim, target, 24);
-  const signedDistance =
-    (sim.player.pos.x - blocker.x) * outward.x + (sim.player.pos.z - blocker.z) * outward.z;
-  expect(signedDistance, `${harbor.id} ${label} crossed ${blockerId}`).toBeGreaterThan(0);
-  expect(
-    pointClearanceFromBlocker(blocker, sim.player.pos),
-    `${harbor.id} ${label} body clearance from ${blockerId}`,
-  ).toBeGreaterThanOrEqual(PLAYER_BODY_RADIUS - RAIL_STANDOFF_EPSILON);
-  expect(
-    pointInsideBlocker(blocker, sim.player.pos),
-    `${harbor.id} ${label} entered the hull`,
-  ).toBe(false);
+  stage(sim, start, waterLevelAt(start.x, start.z, sim.cfg.seed));
+  pushToward(sim, target, 24, (player) => {
+    const clearance = pointClearanceFromBlocker(blocker, player.pos);
+    expect(
+      clearance,
+      `${harbor.id} ${label} body clearance from ${blockerId}`,
+    ).toBeGreaterThanOrEqual(PLAYER_BODY_RADIUS - RAIL_STANDOFF_EPSILON);
+    expect(pointInsideBlocker(blocker, player.pos), `${harbor.id} ${label} entered the hull`).toBe(
+      false,
+    );
+  });
 }
 
 describe('grand ferry boarding walk', () => {

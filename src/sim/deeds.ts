@@ -28,7 +28,9 @@
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from './content/deeds';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
 import { pointsSpent } from './content/talents';
+import { VC_ALLROUNDER_ONLY_MAX_BRACKET } from './content/vale_cup';
 import { ITEMS, MOBS, zoneAt } from './data';
+import { LAUNCH_PAPERDOLL_SLOTS } from './launch_paperdoll_slots';
 import { RESURRECTION_SICKNESS_ID } from './resurrection';
 import type { ArenaMatch, InstanceSlot, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -121,6 +123,9 @@ const FINAL_BOSS_DUNGEONS: Record<string, string> = {
   ysolei: 'drowned_temple',
   korzul_the_gravewyrm: 'gravewyrm_sanctum',
   nythraxis_scourge_of_thornpeak: 'nythraxis_boss_arena',
+  // Without this entry Zulgar kills write no dungeonClears record, so the
+  // dgn_wildheart_basin deed pair ships permanently unearnable (0/1 forever).
+  wildheart_high_priest: 'wildheart_basin',
 };
 
 // Perfection tasks: zero player deaths inside the boss's heroic instance
@@ -195,8 +200,12 @@ const SANCTUM_SPEED_DEED = 'dgn_sanctum_speed';
 
 // The named overworld terrors whose kill credit feeds a 'slain:<templateId>'
 // visited mark (the chr_*_rares deeds). Pinned so the visited set stays
-// bounded by construction.
-const RARE_SLAIN_TEMPLATES = new Set([
+// bounded by construction; every live rare CAMPS mob belongs here UNLESS it
+// already has an alternate credit path (the content-integrity test in
+// tests/deeds_content.test.ts cross-checks the exact set against CAMPS/MOBS,
+// with sethrael_palecoil as the one documented exception: its kill is
+// required by q_palecoil, which already feeds prog_mere_at_rest).
+export const RARE_SLAIN_TEMPLATES = new Set([
   'old_greyjaw',
   'mogger',
   'grix_the_tunnelking',
@@ -205,18 +214,35 @@ const RARE_SLAIN_TEMPLATES = new Set([
   'mirejaw_the_ravenous',
   'sloomtooth_the_drowned',
   'sister_nhalia',
+  'grubjaw',
   'ironvein_foreman',
   'brutok_skullsmasher',
   'voskar_emberwing',
   'marrowlord_varkas',
+  'old_cragmaw',
+  'shardlord_kazzix',
+  'gleamstag',
+  'old_marrowshell',
+  'aurelhorn',
 ]);
 
 // Zone fishing catches that count as "a fish" for the chr_ first-cast deeds
 // (weeds and empty hooks do not count). Pinned to the authored tables.
-const ZONE_FISH: Record<string, readonly string[]> = {
+// Exported for the new-zone checklist (tests/professions_zone_rollout.test.ts):
+// a complete zone's first-cast deed is only earnable if a row here writes its
+// fish:<zone> mark, so the checklist sweeps this table too.
+export const ZONE_FISH: Record<string, readonly string[]> = {
   eastbrook_vale: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
   mirefen_marsh: ['raw_marsh_pike', 'raw_bog_eel', 'glimmerfin_koi'],
   thornpeak_heights: ['raw_frostgill_trout', 'raw_stonescale_carp', 'glimmerfin_koi'],
+  // The three bottom-map zones (the phase 20 chronicle pairs, Q26): their
+  // waters draw the Vale FALLBACK tables until the zone-4 pass authors real
+  // ones (professions/fishing.ts, bandTables[zoneId] ?? eastbrook_vale), so
+  // the rows list the fallback's own fish and the deeds_content guard
+  // intersects them against the tables each zone ACTUALLY draws.
+  willowfen: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
+  galecrest: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
+  farshore_isle: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
 };
 
 // The three Chronicler NPCs (interaction-only). Talking to one feeds an
@@ -232,7 +258,9 @@ const SAUL_TALKS_REQUIRED = 9;
 
 // How close (yards) a POI sweep counts a visit, and the witness radius for
 // chr_peaks_waking_witness (inside interest scope, pinned literal).
-const POI_VISIT_RADIUS = 20;
+// Exported for the placement suite's mirror-lake standability arm, which used
+// to carry its own copy of this number and could drift silently.
+export const POI_VISIT_RADIUS = 20;
 const THUNZHARR_WITNESS_RADIUS = 100;
 
 // ---------------------------------------------------------------------------
@@ -726,24 +754,9 @@ const FLAGS: Record<DeedFlagId, (meta: PlayerMeta, e: Entity) => boolean> = {
   // Guild membership is server-stamped onto the entity; offline it stays ''
   // (never satisfiable there, matching the offline-sandbox model).
   guildMember: (_m, e) => e.guild !== '',
-  // Slot list PINNED as of v1 (the launch EQUIP_SLOTS); a future twelfth slot
-  // does not grow this deed.
-  allEquipSlotsFilled: (m) =>
-    (
-      [
-        'mainhand',
-        'helmet',
-        'neck',
-        'shoulder',
-        'chest',
-        'waist',
-        'legs',
-        'gloves',
-        'feet',
-        'ring1',
-        'ring2',
-      ] as const
-    ).every((slot) => !!m.equipment[slot]),
+  // Slot list PINNED as of v1 (LAUNCH_PAPERDOLL_SLOTS); a future twelfth slot
+  // does not grow this deed, so already-earned rows keep their meaning.
+  allEquipSlotsFilled: (m) => LAUNCH_PAPERDOLL_SLOTS.every((slot) => !!m.equipment[slot]),
   nonDefaultSkin: (m) => m.skinCatalog === 'mech' || m.skin > 0,
   // The marked set resets whenever the authoritative reward window advances,
   // so containment of all four ids already means one complete circuit.
@@ -1660,7 +1673,7 @@ export function onCupGoalForDeeds(
   if (!meta) return;
   grantDeed(ctx, meta, 'pvp_vcup_first_goal');
   if (match.golden) grantDeed(ctx, meta, 'pvp_vcup_golden_goal');
-  if (match.bracket >= 3) {
+  if (match.bracket > VC_ALLROUNDER_ONLY_MAX_BRACKET) {
     let goals = ctx.deedRuntime.cupGoals.get(match.id);
     if (!goals) {
       goals = new Map();
@@ -1672,13 +1685,16 @@ export function onCupGoalForDeeds(
   }
 }
 
-/** A keeper save (shot at or above the save speed floor), rated only. */
+/** A keeper save (shot at or above the save speed floor), rated only. The
+ *  description also promises the 3v3 bracket or larger; today that holds
+ *  emergently (normalizeRole seats no small-bracket keeper), so the explicit
+ *  gate enforces the published rule rather than inferring it. */
 export function onCupSaveForDeeds(
   ctx: SimContext,
   match: CupMatchForDeeds,
   keeperPid: number,
 ): void {
-  if (!match.rated) return;
+  if (!match.rated || match.bracket <= VC_ALLROUNDER_ONLY_MAX_BRACKET) return;
   const meta = ctx.players.get(keeperPid);
   if (meta) grantDeed(ctx, meta, 'pvp_vcup_first_save');
 }
@@ -1696,6 +1712,9 @@ export function onCupStandingForDeeds(
   // The Cup win meters moved in the caller's standing loop: full pass.
   markDeedsDirty(ctx, pid);
   if (winner !== team) return;
+  // Clean sheet promises the 3v3 bracket or larger, like the save deed above:
+  // enforce the published rule directly instead of leaning on normalizeRole.
+  if (match.bracket <= VC_ALLROUNDER_ONLY_MAX_BRACKET) return;
   if (match.roles[pid] !== 'keeper' || match.benched.has(pid)) return;
   const opposingScore = team === 'A' ? match.scoreB : match.scoreA;
   if (opposingScore !== 0) return;

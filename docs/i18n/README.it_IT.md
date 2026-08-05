@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.31.0-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.34.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.it_IT.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -92,7 +92,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and choose Play Offline
 ```
 
-Dai un nome al tuo personaggio, scegli una qualsiasi delle nove classi e parti in **Eastbrook Vale** (livelli 1-7), una città di mercato circondata da hub: i sentieri dei lupi a nord, i prati dei cinghiali a est, i boschi di Sableweb a ovest, Mirror Lake a nordovest, uno scavo di rame infestato dai burrower a sudovest e una cappella in rovina di morti senza pace a nordest, con l'accampamento dei banditi di Gorrak a sudest. La strada del nord risale un passo di montagna fino a **Mirefen Marsh** (6-13, hub Fenbridge) e prosegue su fino a **Thornpeak Heights** (13-20, hub Highwatch). Il seed del mondo è fissato in `src/main.ts`, quindi è lo stesso luogo a ogni visita.
+Dai un nome al tuo personaggio, scegli una qualsiasi delle nove classi e parti in **Eastbrook Vale** (livelli 1-7), una città di mercato circondata da hub: i sentieri dei lupi a nord, i prati dei cinghiali a est, i boschi di Sableweb a ovest, Mirror Lake a nordovest, uno scavo di rame infestato dai burrower a sudovest e una cappella in rovina di morti senza pace a nordest, con l'accampamento dei banditi di Gorrak a sudest. La strada del nord risale un passo di montagna fino a **Mirefen Marsh** (6-13, hub Fenbridge) e prosegue su fino a **Thornpeak Heights** (13-20, hub Highwatch). Il seed del mondo è fissato in `src/sim/world_seed.ts`, quindi è lo stesso luogo a ogni visita.
 
 ### App desktop per Windows, Linux e macOS
 

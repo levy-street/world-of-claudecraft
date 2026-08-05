@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 // Professions 2.0 UI: the commission opt-in control in the crafting
 // window (pure-core eligibility flag + the painter's pill toggle-chip + the

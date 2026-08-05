@@ -470,6 +470,8 @@ export const en = {
       'Choose an installed browser wallet, or open Reown AppKit for Phantom, Solflare, Backpack, and more.',
     mobileAppHelp:
       'Choose Phantom or Solflare. Your wallet app will ask for approval. Keep this game open and return to it when finished.',
+    seekerAppHelp:
+      'Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.',
     standaloneAppHelp:
       'Wallet connections are not available in the Home Screen app yet. Open World of ClaudeCraft in Safari or Chrome to use Phantom or Solflare.',
     openAppTitle: 'Continue in {wallet}',
@@ -748,6 +750,14 @@ export const en = {
       companionMaxRank: 'This companion is already fully upgraded.',
       companionMarksRequired: 'You need {marks} Delve Marks to upgrade {name}.',
       cannotAffordCompanionUpgrade: 'You cannot afford this upgrade.',
+      // ONE producer emits this exact English today, matched to this key by
+      // the one anchored rule in sim_i18n.ts: the delve Marks shop
+      // (delves/runs.ts delveBuyShopItem). The NPC vendor's proficiency row
+      // gate used to be the second producer, but R22 retired that deny
+      // (items.ts buyItem no longer refuses on proficiency; the row renders
+      // an advisory instead). The sentence stays generic because the matcher
+      // keys on the TEXT: a delve-flavored reword is safe now, but re-check
+      // the emitter census first, the way this comment failed to be.
       shopItemLocked: 'You have not unlocked that item yet.',
       shopMarksRequired: 'You need {marks} Delve Marks to buy {name}.',
       shopSealPremiumOnly:
@@ -1376,6 +1386,12 @@ export const en = {
       gravewyrm_claws: { name: 'Gravewyrm Claws' },
       gravescale_girdle: { name: 'Gravescale Girdle' },
       wyrmchoir_handwraps: { name: 'Wyrmchoir Handwraps' },
+      basin_stalkers_tunic: { name: "Basin Stalker's Tunic" },
+      verdant_heart_vestment: { name: 'Verdant-Heart Vestment' },
+      sunbone_ritual_hauberk: { name: 'Sunbone Ritual Hauberk' },
+      greatfang_of_the_basin: { name: 'Greatfang of the Basin' },
+      sunbone_oracles_crown: { name: "Sunbone Oracle's Crown" },
+      bloodmane_war_legguards: { name: 'Bloodmane War-Legguards' },
       deathless_greatblade: { name: 'Deathless Greatblade' },
       soulforged_warplate: { name: 'Soulforged Warplate' },
       stormcallers_focus: { name: "Stormcaller's Focus" },

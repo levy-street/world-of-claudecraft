@@ -106,8 +106,11 @@ function baseEntity(id: number, pos: Vec3): Entity {
     castTargetId: null,
     castAim: null,
     gatherCastNodeId: '',
+    gatherCastToolRarity: '',
+    gatherCastEffectConfirmed: false,
     fishBiteAtTick: 0,
     fishReelDeadlineTick: 0,
+    fishCastZoneId: '',
     channeling: false,
     channelTickTimer: 0,
     channelTickEvery: 0,
@@ -159,6 +162,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     warcryTimer: 0,
     firedSummons: 0,
     summonedIds: [],
+    summonedAdd: false,
     enraged: false,
     healedThisPull: false,
     threat: new Map(),
@@ -174,6 +178,10 @@ function baseEntity(id: number, pos: Vec3): Entity {
     spawnPos: { ...pos },
     leashAnchor: null,
     evadeStall: 0,
+    chaseStall: 0,
+    evadeEpoch: 0,
+    combatExitHoldUntil: 0,
+    chainPullInbound: false,
     fleeTimer: 0,
     fleeReturnTimer: 0,
     hasFled: false,
@@ -512,7 +520,9 @@ export function recalcPlayerStats(
       meetsLevelRequirement(lvl, mainhand)) ||
       (offhand?.kind === 'weapon' && offhand.hand === 'twohand'));
   const activeShield =
-    cls === 'warrior' && isShieldItem(offhand) && meetsLevelRequirement(lvl, offhand);
+    (cls === 'warrior' || cls === 'paladin') &&
+    isShieldItem(offhand) &&
+    meetsLevelRequirement(lvl, offhand);
   e.blockChance = activeShield ? SHIELD_BLOCK_BASE : 0;
   e.blockValue = activeShield ? (offhand.blockValue ?? 0) : 0;
   // The equipped mainhand item id: drives the held weapon model on the client

@@ -40,25 +40,31 @@ Tem lugar para todo mundo aqui:
 
 ## Primeiros passos
 
-Você vai precisar do [Node.js 26](https://nodejs.org/) e do npm, as versões que o
-CI e a imagem de produção usam. Majors mais antigas não são testadas. Para o
-servidor multiplayer, também é bom ter o [Docker](https://www.docker.com/) para
-rodar o Postgres.
+Você vai precisar do [Node.js 26](https://nodejs.org/) e do **pnpm 10.34.x** (o pin exato está em `package.json` em `packageManager`, hoje `pnpm@10.34.5`). Majors mais antigas do Node não são testadas. Para o servidor multijogador você também vai querer [Docker](https://www.docker.com/) para rodar o Postgres.
+
+**Corepack não é obrigatório.** Instale o pnpm uma vez com o npm que vem com o Node. O mesmo caminho vale em macOS, Linux e Windows.
 
 ```bash
 # 1. Fork the repo on GitHub, then clone your fork
 git clone https://github.com/<your-username>/world-of-claudecraft.git
 cd world-of-claudecraft
 
-# 2. Install dependencies
-npm ci
+# 2. Install pnpm once (same command on macOS, Linux, Windows)
+#    Match the packageManager pin in package.json (today: 10.34.5).
+npm install -g pnpm@10.34.5
+pnpm --version   # should print 10.34.5 (or the pin in package.json)
 
-# 3. Point git at the repository hooks (once per clone)
+# 3. Install dependencies (uses the global content-addressable store)
+pnpm install --frozen-lockfile
+
+# 4. Point git at the repository hooks (once per clone)
 git config core.hooksPath .githooks
 
-# 4. Run the offline client (no server or database needed)
-npm run dev          # open the URL it prints (usually http://localhost:5173)
+# 5. Run the offline client (no server or database needed)
+pnpm run dev         # open the URL it prints (usually http://localhost:5173)
 ```
+
+`npm run <script>` ainda funciona depois de uma instalação com pnpm (o Node traz npm), mas **instalação e atualizações do lockfile devem passar pelo pnpm**. Não faça commit de um `package-lock.json`; a única fonte da verdade é o `pnpm-lock.yaml`.
 
 Isso já é o suficiente para jogar o mundo offline e trabalhar na maior parte das
 coisas. Para rodar a stack online completa, você precisa antes de uma senha de
@@ -67,13 +73,13 @@ banco de dados no seu ambiente:
 ```bash
 cp .env.example .env
 # set POSTGRES_PASSWORD and point DATABASE_URL at the same password
-npm run db:up        # start Postgres 16 in Docker (dev DB on port 5433)
-npm run server       # build and run the authoritative game server on :8787
-npm run dev          # in another terminal; the client proxies to the server
+pnpm run db:up       # start Postgres 16 in Docker (dev DB on port 5433)
+pnpm run server      # build and run the authoritative game server on :8787
+pnpm run dev         # in another terminal; the client proxies to the server
 ```
 
 Se você pretende rodar o gate completo descrito abaixo, instale uma vez o
-navegador que ele usa: `npx playwright install chromium`.
+navegador que ele usa: `pnpm exec playwright install chromium`.
 
 O [README](README.pt_BR.md) traz o guia completo de hospedar, desenvolver e jogar, e os
 arquivos `CLAUDE.md` espalhados pelo repositório documentam as convenções de cada
@@ -104,14 +110,7 @@ enquanto o `@typescript/native` fornece o binário `tsc`. Pontos importantes:
   rápido. `--singleThreaded` desliga todo o paralelismo. Checar um único arquivo
   de forma pontual (`npx tsc somefile.ts`) dá erro quando o diretório tem um
   `tsconfig.json`; passe `--ignoreConfig` para o comportamento antigo.
-- **Lockfile.** Gere novamente o `package-lock.json` somente com
-  `npx npm@10 install --package-lock-only`: o arquivo usa a semântica do npm 10, e
-  majors mais novas do npm (incluindo o npm 11 que vem com o Node 26 do CI)
-  descartam silenciosamente as entradas aninhadas de peer opcional do
-  `svelte-check`, o que dessincroniza o `npm ci` no CI. O `npm ci` puro é seguro em
-  qualquer major do npm. Depois de regerar, confirme que o
-  `npm ci --dry-run` está sincronizado tanto no npm 10 quanto no npm da sua
-  estação de trabalho.
+- **Lockfile.** O lockfile é o `pnpm-lock.yaml` (pnpm 10 / lockfileVersion 9). Atualize-o só com `pnpm install`, `pnpm add` ou `pnpm update` na raiz deste repositório (nunca à mão). Faça commit do `pnpm-lock.yaml` junto com as mudanças de `package.json`. O CI instala com `pnpm install --frozen-lockfile`; um lockfile desatualizado falha. Não introduza um segundo lockfile (`package-lock.json` / yarn.lock): lockfiles duplos divergem em silêncio e são proibidos. O ruído de peer dependencies das árvores opcionais de wallet/solana é tolerado via `.npmrc` (`strict-peer-dependencies=false`); não afrouxar mais sem medir.
 - **Quando revisitar.** Unifique o alias duplo de volta em uma única dependência
   `typescript` quando AMBOS forem verdade: a API JS estável do TypeScript 7.1
   tiver sido lançada (o TypeScript 7.0 não traz API JS nenhuma; a substituição é
@@ -164,7 +163,7 @@ Estas são as regras estruturais da base de código. O detalhe completo está no
   `IWorld` (`src/world_api/`) e são implementados tanto no mundo offline quanto no
   online; um novo sistema de simulação fica atrás do `SimContext`; um novo
   endpoint REST é um módulo de rota que você pode gerar com
-  `npm run new:endpoint`.
+  `pnpm run new:endpoint`.
 - **Não edite à mão os arquivos gerados** como os `*.generated.ts`. Gere-os
   novamente pelo build.
 - **Estilo de texto da casa: nada de travessões, meios-traços ou emojis** em lugar
@@ -181,7 +180,7 @@ A formatação é feita pelo [Biome](https://biomejs.dev/), configurado no
 `biome.json`: indentação de 2 espaços, linhas de 100 colunas, aspas simples,
 vírgulas ao final. Formate apenas os arquivos que você tocou
 (`npx @biomejs/biome check --write <your-file.ts>`) e verifique-os com
-`npm run ci:changed`. O CI avalia somente os arquivos alterados, então, por favor,
+`pnpm run ci:changed`. O CI avalia somente os arquivos alterados, então, por favor,
 não reformate a árvore inteira: uma execução no repositório todo traz à tona uma
 dívida antiga que não cabe a você resolver.
 
@@ -190,12 +189,12 @@ dívida antiga que não cabe a você resolver.
 Rode o gate do repositório localmente. Ele é o mesmo contrato que o CI aplica:
 
 ```bash
-npm run gate
+pnpm run gate
 ```
 
 Enquanto você itera, rode uma suite isolada (`npx vitest run tests/sim.test.ts`) e
-o `npm run ci:changed` para formatação; o `npm test` roda tudo, e o mapa das
-suites está no `tests/CLAUDE.md`. O `npm run gate` completo cobre a atualidade dos
+o `pnpm run ci:changed` para formatação; o `pnpm test` roda tudo, e o mapa das
+suites está no `tests/CLAUDE.md`. O `pnpm run gate` completo cobre a atualidade dos
 artefatos gerados, o scan de malware, a formatação dos arquivos alterados, a
 checagem de conformidade dos efeitos sonoros, toda a suite de testes, uma passada
 de regressão em navegador real, a checagem estrita de tipos e os builds do
@@ -221,13 +220,13 @@ checklist curta. Por favor, preencha-a:
 - Vincule qualquer issue relacionada (por exemplo, "Closes #123").
 - Adicione **capturas de tela ou um clipe para alterações de UI**, no desktop e no
   mobile.
-- Confirme que o `npm run gate` passa e que as novas strings voltadas ao jogador
+- Confirme que o `pnpm run gate` passa e que as novas strings voltadas ao jogador
   seguem a política de contribuição English-first descrita abaixo.
 
 No seu PR, o CI roda formatação e lint sobre os arquivos alterados, a suite de
 testes completa em quatro shards paralelos, uma passada de regressão em navegador
 e a checagem de tipos mais os builds do cliente, do servidor e do headless. Isso
-corresponde ao que o `npm run gate` roda localmente, então um gate verde é um bom
+corresponde ao que o `pnpm run gate` roda localmente, então um gate verde é um bom
 indicador de um PR verde.
 
 Uma execução verde do CI e uma checklist completa são o que procuramos antes de
@@ -266,7 +265,7 @@ normalmente adiciona apenas o texto em inglês.
   agnósticos a idioma, precisa ser relocalizado na fronteira do cliente, na mesma
   alteração. O teste de guarda `npx vitest run tests/localization_fixes.test.ts`
   garante isso.
-- Depois de adicionar ou alterar qualquer string, rode `npm run i18n:gen` e faça
+- Depois de adicionar ou alterar qualquer string, rode `pnpm run i18n:gen` e faça
   commit dos bundles regerados na mesma alteração. O gate e o CI comparam os
   artefatos commitados com uma regeração nova, então um bundle desatualizado
   quebra o build.
@@ -290,7 +289,7 @@ escrever nenhum código de jogo para isso:
    painel administrativo tem o conjunto próprio dele em
    `src/admin/i18n.locales/`.
 2. Melhore as traduções existentes ou complete as que soam estranhas.
-3. Rode `npm run i18n:gen`, faça commit dos bundles regerados junto com a sua
+3. Rode `pnpm run i18n:gen`, faça commit dos bundles regerados junto com a sua
    edição de overlay, depois rode as suites de localização
    (`npx vitest run tests/i18n_completeness.test.ts tests/localization_coverage.test.ts`)
    e abra um PR. Só a checagem de tipos não vai te dizer se uma chave está

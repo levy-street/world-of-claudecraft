@@ -9,6 +9,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   FARSHORE_CAMPS,
+  FARSHORE_MOBS,
   FARSHORE_PORTALS,
   FARSHORE_ROADS,
   FARSHORE_ZONE,
@@ -21,10 +22,24 @@ import {
   valeLandness,
   WATER_LEVEL,
 } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
-const SEED = 1337; // matches the fixed client seed in src/main.ts
+// The SHIPPED world seed (src/sim/world_seed.ts, mandated for geometry
+// tests): this file long pinned 1337 under a comment claiming it matched
+// the fixed client seed, but every shipping host seeds WORLD_SEED, so the
+// dry-road and elevation pins were proving a world nobody plays.
+const SEED = WORLD_SEED;
 
 describe('Farshore zone registration', () => {
+  it('keeps the release mob families, guaranteed copper, and component tags', () => {
+    expect(FARSHORE_MOBS.riftspawn.loot[0]).toEqual({ copper: 20, chance: 1 });
+    expect(FARSHORE_MOBS.breach_wretch.family).toBe('burrower');
+    expect(FARSHORE_MOBS.breach_wretch.loot[0]).toEqual({ copper: 20, chance: 1 });
+    expect(FARSHORE_MOBS.void_stalker.loot[0]).toEqual({ copper: 26, chance: 1 });
+    expect(FARSHORE_MOBS.void_stalker.componentTags).toEqual(['hide', 'fang']);
+    expect(FARSHORE_MOBS.sundered_horror.loot[0]).toEqual({ copper: 35, chance: 1 });
+  });
+
   it('pins the established shared-stream budget and private expansion tail', () => {
     expect(FARSHORE_CAMPS.map((camp) => camp.sharedRngCount)).toEqual([
       2,

@@ -4,7 +4,6 @@
     Activity,
     BarPoint,
     LinePoint,
-    LivePlayer,
     OnlineHistory,
     OnlineHistoryRange,
     Overview,
@@ -23,14 +22,13 @@
   import StatCard from '../components/StatCard.svelte';
   import BarChart from '../components/BarChart.svelte';
   import LineChart from '../components/LineChart.svelte';
-  import OnlineTable from '../components/OnlineTable.svelte';
 
-  // Operational overview: live stats and online players (5s), plus activity charts
-  // (60s). Account and character browsers live on their dedicated Players pages.
+  // Operational overview: live server stats (5s) plus activity charts (60s). The
+  // account, character and online-roster browsers live on their dedicated Players
+  // pages.
   const ONLINE_HISTORY_RANGES: OnlineHistoryRange[] = ['24h', '7d', '30d'];
 
   let overview = $state<Overview | null>(null);
-  let online = $state<LivePlayer[]>([]);
   let activity = $state<Activity | null>(null);
   let onlineHistory = $state<OnlineHistory | null>(null);
   let onlineHistoryRange = $state<OnlineHistoryRange>('24h');
@@ -62,12 +60,7 @@
 
   async function refreshLive(): Promise<void> {
     try {
-      const [ov, on] = await Promise.all([
-        apiGet<Overview>('/admin/api/overview'),
-        apiGet<{ players: LivePlayer[] }>('/admin/api/online'),
-      ]);
-      overview = ov;
-      online = on.players;
+      overview = await apiGet<Overview>('/admin/api/overview');
     } catch (err) {
       if (!auth.handleAuthFailure(err)) console.error('live refresh failed:', err);
     }
@@ -123,10 +116,6 @@
     <StatCard value={fmtBytes(overview.server.rssBytes)} label={t('stats.serverRss')} />
   {/if}
 </section>
-
-<Panel title={t('online.title')} hint={t('online.refreshHint')}>
-  <OnlineTable players={online} />
-</Panel>
 
 <section id="charts">
   <Panel

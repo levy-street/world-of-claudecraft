@@ -809,4 +809,28 @@ export const table: DeedLocaleTable = {
     name: 'Der Schrottplatz',
     desc: 'Zerlege 50 Ausrüstungsstücke zu Rohmaterialien.',
   },
+  dgn_wildheart_basin: {
+    name: 'Das Becken beißt zurück',
+    desc: 'Besiege Zulgar, Stimme des Beckens, im Wildherzbecken.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Heroisch: Das Wildherzbecken',
+    desc: 'Besiege Zulgar, Stimme des Beckens, im Wildherzbecken auf heroischem Schwierigkeitsgrad.',
+  },
+  chr_marsh_rares_ii: {
+    name: 'Der Vielfraß, nachgetragen',
+    desc: 'Erlege Grubjaw den Vielfraß, einen vierten namhaften Schrecken des Mirefen-Moors, den die erste Zählung ausließ.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'Mehr in den Fels gemeißelte Namen',
+    desc: 'Erlege den Alten Felsmaul und Splitterlord Kazzix, zwei weitere namhafte Schrecken der Thornpeak-Höhen, die die erste Zählung ausließ.',
+  },
+  chr_gleamstag: {
+    name: 'Die Legende, die nie zuerst zuschlug',
+    desc: 'Erlege den Glanzhirsch, einen seltenen, scheuen Elite, der nur angreift, wenn man ihn in die Enge treibt.',
+  },
+  chr_hollow_rares: {
+    name: 'Die Herde vergisst nicht',
+    desc: 'Erlege die Alte Markschale und Aurelhorn, den Ersten der Herde, die beiden wandernden seltenen Bosse der Schleiersenke.',
+  },
 };

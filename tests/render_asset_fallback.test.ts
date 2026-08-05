@@ -36,12 +36,31 @@ describe('render asset preload fallbacks', () => {
     vi.resetModules();
     mockEmptyAssetLoads();
 
-    const { buildSky, hasSkyHdriAssets } = await import('../src/render/sky');
+    const { buildSky, hasSkyHdriAssets, SKY_BACKGROUND_RENDER_ORDER } = await import(
+      '../src/render/sky'
+    );
     expect(hasSkyHdriAssets()).toBe(false);
 
     const sky = buildSky(false, new THREE.Vector3(90, 140, 50));
     expect(sky.envTexture('vale')).toBe(null);
     expect(sky.dome).toBeInstanceOf(THREE.Mesh);
+    expect(SKY_BACKGROUND_RENDER_ORDER).toBe(1000);
+    expect(sky.dome.renderOrder).toBe(SKY_BACKGROUND_RENDER_ORDER);
+    const material = sky.dome.material as THREE.MeshBasicMaterial;
+    expect(material.depthWrite).toBe(false);
+    const shader = {
+      vertexShader: 'before\n#include <logdepthbuf_vertex>\nafter',
+    } as Parameters<typeof material.onBeforeCompile>[0];
+    material.onBeforeCompile(shader, null as never);
+    expect(shader.vertexShader).toContain(
+      '#include <logdepthbuf_vertex>\ngl_Position.z = gl_Position.w;',
+    );
+    expect(() =>
+      material.onBeforeCompile(
+        { vertexShader: 'missing anchor' } as Parameters<typeof material.onBeforeCompile>[0],
+        null as never,
+      ),
+    ).toThrow('sky shader is missing the pinned log-depth vertex anchor');
   });
 
   it('keeps water construction non-fatal when shader normal maps were not preloaded', async () => {

@@ -26,6 +26,7 @@ import {
   DELVES,
   DUNGEON_X_THRESHOLD,
   instanceOrigin,
+  LAKE,
   MOBS,
   PROPS,
   QUESTS,
@@ -33,7 +34,8 @@ import {
 import { createMob } from '../../src/sim/entity';
 import { solveLockActions } from '../../src/sim/lockpick';
 import { MOUNT_SUMMON_SECONDS } from '../../src/sim/mounts';
-import { gatherCastDurationSec } from '../../src/sim/professions/gathering';
+import { startFishing } from '../../src/sim/professions/fishing';
+import { gatherCastDurationSec, gatherNodeById } from '../../src/sim/professions/gathering';
 import { scenarioRunFor, startScenario } from '../../src/sim/scenarios/scenarios';
 import { Sim } from '../../src/sim/sim';
 import { addThreat } from '../../src/sim/threat';
@@ -78,6 +80,23 @@ function teleport(sim: AnySim, e: AnyEntity, x: number, z: number): void {
   e.onGround = true;
   e.fallStartY = e.pos.y;
   sim.rebucket(e);
+}
+
+// Stand an entity exactly on a gather node, addressed by ID, with the position
+// read from content instead of copied into a literal here.
+//
+// The literal is what rotted: professions_gather_fine shipped its stand point
+// as `teleport(sim, p, 48, 352)` and went quiet when the v0.32.0 merge moved
+// ore_mirefen_t2 to (36, 350). harvestNode gates on INTERACT_RANGE (5 yd), so a
+// 12.2 yd stale stand point turned that scenario's entire fine-grade arm into a
+// "Too far away." denial, which the golden faithfully recorded (0 draws where 2
+// belonged) and no assertion watched. Deriving the position still moves the
+// golden when content moves, since position is sampled, and that is the gate
+// doing its job; what it buys is that the HARVEST stays a harvest.
+function standOnNode(sim: AnySim, e: AnyEntity, nodeId: string): void {
+  const node = gatherNodeById(nodeId);
+  if (!node) throw new Error(`parity scenario: no gather node ${nodeId}`);
+  teleport(sim, e, node.pos.x, node.pos.z);
 }
 
 // Spawn a mob from a template key and register it (entities + spatial grid),
@@ -1157,19 +1176,24 @@ function delveLockpick(): Scenario {
   };
 }
 
-// Delve + lockpick FAIL/jam: enter the same Collapsed Reliquary finale, engage the
-// reward chest, then idle past the server-authoritative per-step clock so the single
-// premium try burns -> the chest jams (attemptAvailable=false) and the surface exit
-// opens (the party is never stranded). Pins the timeout/burn-try/fail path the
-// success-only delve_lockpick golden does not exercise.
-function delveLockpickFail(): Scenario {
+// Delve + lockpick tries-exhausted: enter the same Collapsed Reliquary finale, engage
+// the reward chest, then idle past the server-authoritative per-step clock so the
+// single premium try burns -> tries run out but the chest STILL opens
+// (attemptAvailable=false because the reward was granted, not because it jammed;
+// issue #2585 removed the "lose the chest" failure outcome) and the surface exit
+// opens. This was NOT a solve, so the grant is capped at the base LOW loot tier
+// (never the Premium ante's tier, never the flawless-solve deeds, never the
+// Bountiful Coffer guarantee): idling out a high ante must never beat picking the
+// lock. Pins the timeout/burn-try/unsolved-grant path the success-only
+// delve_lockpick golden does not exercise.
+function delveLockpickTriesExhausted(): Scenario {
   return {
-    name: 'delve_lockpick_fail',
+    name: 'delve_lockpick_tries_exhausted',
     coverage: [
       'delve run (collapsed_reliquary finale)',
-      'lockpick minigame (server-authoritative timeout jam)',
-      'tickLockpickTimeout -> lockpickStepTimeout -> lockpickBurnTry -> lockpickFail',
-      'jammed chest (attemptAvailable=false) + surface exit opens',
+      'lockpick minigame (server-authoritative timeout -> unsolved consolation grant)',
+      'tickLockpickTimeout -> lockpickStepTimeout -> lockpickBurnTry -> lockpickSucceed(solved=false)',
+      'chest opens at LOW tier (attemptAvailable=false, looted=true), no deed, no coffer + surface exit opens',
     ],
     sampleEvery: 10,
     build: () => new Sim({ seed: 2024, playerClass: 'rogue', autoEquip: true }),
@@ -1212,10 +1236,12 @@ function delveLockpickFail(): Scenario {
         sim.lockpickEngage(chestId, 1); // premium ante: a single try
         rec.tick(1);
         // Idle past the single-try step deadline (3000ms / 50ms = 60 ticks) so the sim
-        // clock burns the try -> lockpickFail jams the chest and opens the surface exit.
+        // clock burns the try -> tries exhausted, so lockpickSucceed grants the LOW
+        // consolation tier (not the Premium ante's tier) and opens the surface exit,
+        // without the flawless-solve deeds or the Bountiful Coffer guarantee.
         rec.tick(64);
       }
-      rec.snapshot('lockpick-jammed');
+      rec.snapshot('lockpick-tries-exhausted');
       rec.tick(2);
     },
   };
@@ -2591,7 +2617,7 @@ function mobLocomotion(): Scenario {
     coverage: [
       'attack arm aoePulse rng.range(pulse.min,pulse.max) + spellfx (mogger Ground Pound)',
       'attack arm War Stomp rng.range(stomp.min,stomp.max) + stomp_stun aura (korgath)',
-      'attack arm Banshee terrify rng.range(-PI,PI) fear facing + fear_incap aura (sister_nhalia)',
+      'attack arm Banshee terrify rng.range(-PI,PI) fear facing + fear_incap aura on the non-tank bystander; the aggro target is exempt (sister_nhalia)',
       'idle arm wander draws (range(0,2PI) heading + range(2,9) radius -> groundPos wanderTarget)',
       'evade arm arrival -> resetEvadingMob (rng.range(2,8), full-heal, clearThreat, telegraph re-arm)',
       'cowardly flee: maybeFlee at FLEE_HP_THRESHOLD -> flee arm (fleeMoveSpeed run-away)',
@@ -2604,6 +2630,15 @@ function mobLocomotion(): Scenario {
       const player = sim.entities.get(pid) as AnyEntity;
       rec.track(pid);
       rec.notes.pid = pid;
+      // Terrify spares the boss's current aggro target (the tank exemption), so
+      // a second, non-tank player stands on the tank: the fear heading draw and
+      // the fear_incap aura land on the bystander, and every radius mechanic
+      // (pulse/stomp) now pins its per-player draw loop over two players.
+      const bystanderId = sim.addPlayer('mage', 'Skitter');
+      const bystander = sim.entities.get(bystanderId) as AnyEntity;
+      bystander.pos = { ...player.pos };
+      rec.track(bystanderId);
+      rec.notes.bystanderId = bystanderId;
       // Keep the target alive through every mechanic. beef() on a player does not
       // stick: applyAura -> recalcPlayerStats resets maxHp to the real (level-1)
       // value, so each boss aura would otherwise shrink maxHp and the next mechanic
@@ -2611,6 +2646,7 @@ function mobLocomotion(): Scenario {
       // the draw), so a fresh top-up right before each call keeps every draw firing.
       const reviveTarget = () => {
         player.hp = 1_000_000;
+        bystander.hp = 1_000_000;
       };
 
       // Spawn a boss locked in melee on the player (spawnPos == player pos -> no leash),
@@ -2649,7 +2685,10 @@ function mobLocomotion(): Scenario {
         m.terrifyTimer = 0.001;
       });
       rec.notes.terrifierId = terrifier.id;
-      rec.notes.fearLanded = player.auras.some((a: any) => a.id === 'fear_incap');
+      rec.notes.fearLanded = bystander.auras.some((a: any) => a.id === 'fear_incap');
+      // The tank exemption: the boss's current target draws a heading too (the
+      // stream is identical either way) but is never feared.
+      rec.notes.tankFearLanded = player.auras.some((a: any) => a.id === 'fear_incap');
       rec.snapshot('terrify');
 
       // Idle wander: a mob far out of aggro range whose wanderTimer is due picks a new
@@ -4128,9 +4167,9 @@ function inventoryVendor(): Scenario {
       rec.snapshot('iv-setup');
 
       // 1) buy a food, a drink, and a potion from the merchant (copper - buyValue each).
-      sim.buyItem(wilkes.id, 'baked_bread', buyer);
-      sim.buyItem(wilkes.id, 'spring_water', buyer);
-      sim.buyItem(wilkes.id, 'minor_healing_potion', buyer);
+      sim.buyItem(wilkes.id, 'baked_bread', undefined, buyer);
+      sim.buyItem(wilkes.id, 'spring_water', undefined, buyer);
+      sim.buyItem(wilkes.id, 'minor_healing_potion', undefined, buyer);
       rec.snapshot('bought');
 
       // 2) equip a helmet into the empty slot, then a second helmet to force a SWAP
@@ -4575,6 +4614,67 @@ function professionsCraft(seed = 10): Scenario {
 // sequence, not committed) so the herb window's rare-event draw hits inside
 // the recorded run with all 102 casts resolving: no bags-full denial and no
 // cast-cancelling interference; only the found literal is pinned here.
+// The fishing SESSION path end to end through the real entry points: cast
+// start (bite-delay rng draw), the tick-path bite arming the reel window,
+// and the reel re-press whose completeFishing spends the one table draw.
+// Exists because the reel arm was hoisted above the in-combat and swim
+// denials in phase 10 (a guard reorder that changes WHICH state reaches the
+// table draw), and no other scenario calls startFishing at all: the two
+// casting-lifecycle scenarios assign castingAbility directly and pin only
+// the cancel arm.
+function professionsFishingSession(seed = 1): Scenario {
+  return {
+    name: 'professions_fishing_session',
+    coverage: [
+      'class:warrior (angler)',
+      'startFishing cast start: water probe + bite-delay rng draw',
+      'tick-path bite: updateCasting arms the reel window (fishingBite)',
+      'reel re-press: the hoisted reel arm accepts inside the window',
+      'completeFishing: one table draw, outcome event (catch or empty hook)',
+      'post-completion re-press: a fresh cast begins (no stale session state)',
+    ],
+    sampleEvery: 100,
+    build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const pid = sim.playerId as number;
+      const meta = sim.players.get(pid) as any;
+      const p = sim.player as AnyEntity;
+
+      // No mob interference: a landed hit cancels the session mid-drive
+      // (the professionsGather despawn idiom).
+      for (const e of (sim.entities as Map<number, AnyEntity>).values()) {
+        if (e.kind !== 'mob') continue;
+        e.dead = true;
+        e.hp = 0;
+        e.aiState = 'dead';
+        e.respawnTimer = 9999;
+        e.corpseTimer = 9999;
+        e.inCombat = false;
+      }
+
+      sim.addItem('simple_fishing_pole', 1, pid);
+      const pz = LAKE.z - LAKE.radius - 2;
+      teleport(sim, p, LAKE.x, pz);
+      p.facing = Math.atan2(0, LAKE.z - pz); // due north, into the vale lake
+
+      // Cast: the bite delay is the session's first rng draw.
+      startFishing(sim.ctx, p, meta);
+      rec.snapshot('cast-start');
+      // Ride the tick path to the bite (bounded by the max bite delay).
+      for (let i = 0; i < 400 && !p.fishReelDeadlineTick; i++) rec.tick(1);
+      rec.snapshot('bite-armed');
+      // The reel re-press inside the live window: completeFishing spends
+      // the one catch-table draw and ends the session.
+      startFishing(sim.ctx, p, meta);
+      rec.snapshot('reel-landed');
+      // A fresh cast right after: no stale hidden field blocks a new session.
+      startFishing(sim.ctx, p, meta);
+      rec.tick(8);
+    },
+  };
+}
+
 function professionsGather(seed = 1): Scenario {
   // Worst-case gather cast: tier-1 node, tier-1 tool, band 0 (#2343: every
   // harvest needs the matching tool; a tier-1 tool at a tier-1 node keeps
@@ -4628,9 +4728,9 @@ function professionsGather(seed = 1): Scenario {
       // attempt denied by the player's own cooldown, which must add ZERO
       // draws to the digest.
       teleport(sim, p, -70, -53); // ore_eastbrook_1
-      sim.harvestNode('ore_eastbrook_1', pid);
+      sim.harvestNode('ore_eastbrook_1', undefined, pid);
       rec.tick(castTicks); // the cast completes inside this window
-      sim.harvestNode('ore_eastbrook_1', pid); // denied: own timer, no draw
+      sim.harvestNode('ore_eastbrook_1', undefined, pid); // denied: own timer, no draw
       rec.snapshot('harvest-ore-common-and-denial');
       rec.tick(2);
 
@@ -4639,7 +4739,7 @@ function professionsGather(seed = 1): Scenario {
       // signed-or-fungible grant shape land in the state sample.
       meta.gatheringProficiency.logging = 100;
       teleport(sim, p, -62, 8); // wood_eastbrook_1
-      sim.harvestNode('wood_eastbrook_1', pid);
+      sim.harvestNode('wood_eastbrook_1', undefined, pid);
       rec.tick(castTicks);
       rec.snapshot('harvest-wood-max-proficiency');
       rec.tick(2);
@@ -4656,7 +4756,15 @@ function professionsGather(seed = 1): Scenario {
       // moonlit-bloom sheenleaf) survives into the final inventory sample
       // even when the window hits more than once. The hunted seed's FIRST
       // rare event lands inside this window (gatherRareEvent + x5 yield).
-      teleport(sim, p, -86, 90); // herb_eastbrook_1
+      // Stands ON herb_eastbrook_1, since harvestNode gates on INTERACT_RANGE.
+      // This literal tracked the patch when it sat on the Mirror Lake floor;
+      // the patch moved onto the dry bank and the golden was re-minted for the
+      // new stand point. The re-mint is confined to position: the draw digest,
+      // the 204-draw count, the tick count and every event digest are
+      // byte-identical, and what moved is this position, the state digests that
+      // hash it, and the mirror_lake POI visit the old spot only earned by
+      // being underwater. The two-draw-per-harvest contract is untouched.
+      teleport(sim, p, -59, 91); // herb_eastbrook_1
       for (let i = 0; i < 100; i++) {
         meta.gatheringProficiency.herbalism = 0;
         // The retention filter keeps the three tools (ahead of the gate,
@@ -4668,7 +4776,7 @@ function professionsGather(seed = 1): Scenario {
           ...meta.inventory.filter((s: any) => s.instance?.signer !== undefined).slice(-8),
         ];
         delete meta.nodeHarvestReadyAt.herb_eastbrook_1;
-        sim.harvestNode('herb_eastbrook_1', pid);
+        sim.harvestNode('herb_eastbrook_1', undefined, pid);
         rec.tick(castTicks);
       }
       rec.snapshot('rare-event-window');
@@ -4751,6 +4859,90 @@ function lastBellTidemill(): Scenario {
   };
 }
 
+// The fine-material branch (D8). professionsGather above deliberately runs
+// tier-1 tools on tier-1 veins, so `yieldsFineGrade` is false on all 102 of its
+// harvests and no golden walks the upgrade path at all: its unchanged digest
+// proves the OLD behavior is unmoved, which is the important half, but says
+// nothing about the new one. This scenario records the other side, so a future
+// draw-position slip on the fine branch is caught by the gate rather than by a
+// single hand-written observer count in a unit test.
+//
+// Mirefen is the useful ground because it ships BOTH tiers of vein for one
+// material, so a single tool sits above the material at one vein and not at the
+// other with no content edit.
+function professionsGatherFine(seed = 1): Scenario {
+  // Tier-3 pick on a tier-2 vein: two tiers above the node, so the cast is
+  // shorter than the base. Use the worst case anyway; surplus ticks are plain
+  // world ticks.
+  const castTicks = Math.ceil(gatherCastDurationSec(1, 1, 0) / DT) + 1;
+  return {
+    name: 'professions_gather_fine',
+    coverage: [
+      'class:warrior (out-tooled gatherer)',
+      'tool STRICTLY above the material tier at a full-grade vein: fine grade granted',
+      'same tool at the zone lower-tier vein: plain grade, so the base stays gatherable',
+      'wrong-profession tool never upgrades: tier-3 pick beside a tier-2 sickle at a herb patch',
+      'fine grant costs no extra rng draw (two per granted harvest, unchanged)',
+      'gatherResult itemId carries the resolved grade',
+    ],
+    sampleEvery: 500,
+    build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const pid = sim.playerId as number;
+      const p = sim.player as AnyEntity;
+
+      for (const e of (sim.entities as Map<number, AnyEntity>).values()) {
+        if (e.kind !== 'mob') continue;
+        e.dead = true;
+        e.hp = 0;
+        e.aiState = 'dead';
+        e.respawnTimer = 9999;
+        e.corpseTimer = 9999;
+        e.inCombat = false;
+      }
+
+      // A tier-3 pick (above mirefen ore) and a tier-2 sickle (only AT the
+      // mirefen herb tier). The pair is the cross-profession control: the pick
+      // outclasses the herb too, but it is not the herb's tool.
+      sim.addItem('mithril_mining_pick', 1, pid);
+      sim.addItem('bronze_sickle', 1, pid);
+      // Both tools must WIELD (R22): the tier-3 pick asks mining 70, the
+      // tier-2 sickle herbalism 40. Direct meta writes, the suite's setup
+      // idiom; the values ride every frame's state digest from here on.
+      const meta = (sim as AnySim).meta(pid) as {
+        gatheringProficiency: Record<string, number>;
+      };
+      meta.gatheringProficiency.mining = 70;
+      meta.gatheringProficiency.herbalism = 40;
+
+      // Step 1: the full-grade vein upgrades. The stand point is DERIVED from
+      // the node (standOnNode): this step's inlined literal is the one that
+      // went stale and cost the scenario its headline arm.
+      standOnNode(sim, p, 'ore_mirefen_t2'); // tier 2
+      sim.harvestNode('ore_mirefen_t2', undefined, pid);
+      rec.tick(castTicks);
+      rec.snapshot('fine-grade-at-full-tier-vein');
+      rec.tick(2);
+
+      // Step 2: the SAME tool at the zone's tier-1 vein still yields plain.
+      standOnNode(sim, p, 'ore_mirefen_1'); // tier 1
+      sim.harvestNode('ore_mirefen_1', undefined, pid);
+      rec.tick(castTicks);
+      rec.snapshot('plain-grade-at-lower-tier-vein');
+      rec.tick(2);
+
+      // Step 3: the herb patch, worked by a sickle that is only AT its tier.
+      // The tier-3 pick in the same bags must not leak across professions.
+      standOnNode(sim, p, 'herb_mirefen_t2'); // tier 2
+      sim.harvestNode('herb_mirefen_t2', undefined, pid);
+      rec.tick(castTicks);
+      rec.snapshot('wrong-profession-tool-does-not-upgrade');
+      rec.tick(2);
+    },
+  };
+}
+
 // Mount-reins integration seam: the collectible item is the summon command,
 // the per-tick transition applies its exact catalog mount, using the same reins
 // again dismounts instantly, and ownership remains because reins are reusable.
@@ -4796,6 +4988,130 @@ function mountReins(): Scenario {
   };
 }
 
+// The slotted tool effect on the harvest path (D10 + R42). No scenario in this
+// suite has ever carried a `toolEffectSlots` row at all: the field is created
+// lazily by the mint, so every golden here records a world where the harvest
+// never consults the effect system. The slot command is draw-free and the
+// settle is draw-free, which is exactly why a green gate says nothing about
+// either: a slip that moved the applied bonus, the ratchet capture, or the
+// charge settle across the two draws would leave every OTHER golden
+// byte-identical. This scenario records the world with a live slot, so the
+// two-draw contract is pinned inside it too.
+//
+// A QUANTITY effect (Gatherer's Cache) is the one to record: the use-time
+// suppression rule (`usableToolEffectSlot`) withholds only QUALITY effects, so
+// this bonus fires at any vein and the R42 settle always sees a granted count
+// above the same-draw base. No seed hunting, and the charge spend is
+// unconditional rather than content-dependent.
+function professionsToolEffectSlot(seed = 1): Scenario {
+  // The sibling gather scenarios' worst-case window: a tier-3 pick two tiers
+  // over a tier-2 vein casts shorter than this, and surplus ticks are plain
+  // world ticks.
+  const castTicks = Math.ceil(gatherCastDurationSec(1, 1, 0) / DT) + 1;
+  // The same vein professions_gather_fine works. Named once, and stood on
+  // through standOnNode, so the position comes from content (see that helper
+  // for why an inlined coordinate is the thing that rotted).
+  const VEIN_ID = 'ore_mirefen_t2';
+  return {
+    name: 'professions_tool_effect_slot',
+    coverage: [
+      'class:warrior (gatherer carrying a slotted tool effect)',
+      'slotToolEffect mint: consumes the self-signed charm copy, records craftedBy',
+      'toolEffectSlots row minted lazily (absent in every other scenario)',
+      'the slot command is draw-free: zero draws across the whole mint',
+      'quantity effect fires at the vein: granted qty is the same-draw base plus one',
+      'R42 charge settle at the command boundary: one charge for one bonus-bearing harvest',
+      'the harvest keeps its exact two-draw contract with a live slot applied',
+      'own-timer denial on the same vein: zero draws, no cast, no charge',
+      "R40 prompt re-slot: the mode gain mints, the spent slot's charge resets",
+      'R40 unconfirmed prompt use: two draws, base quantity, charge kept (the fail-safe)',
+      'R40 confirmed prompt use: two draws, bonus applied, charge spent (the consented digest)',
+    ],
+    sampleEvery: 500,
+    build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const pid = sim.playerId as number;
+      const p = sim.player as AnyEntity;
+
+      // No mob interference: mob damage cancels a gather cast mid-drive (the
+      // professionsGather despawn idiom).
+      for (const e of (sim.entities as Map<number, AnyEntity>).values()) {
+        if (e.kind !== 'mob') continue;
+        e.dead = true;
+        e.hp = 0;
+        e.aiState = 'dead';
+        e.respawnTimer = 9999;
+        e.corpseTimer = 9999;
+        e.inCombat = false;
+      }
+
+      // The tier-3 pick: the slot's owned-tool gate reads these same bags, and
+      // the pick's own rarity is what sizes the minted slot's charges. It must
+      // also WIELD (R22, mining 70), the fine scenario's setup idiom, or the
+      // tier-2 vein refuses the harvest below.
+      sim.addItem('mithril_mining_pick', 1, pid);
+      const meta = sim.meta(pid) as {
+        name: string;
+        gatheringProficiency: Record<string, number>;
+      };
+      meta.gatheringProficiency.mining = 70;
+
+      // ONE self-signed charm: the resolver's consume preference takes a copy
+      // the slotter signed themselves ahead of an unsigned or foreign one, so
+      // the minted slot records craftedBy (the original-crafter recharge
+      // identity) rather than leaving it unset. addItemInstance draws no rng.
+      sim.addItemInstance('gatherers_cache', { signer: meta.name }, pid);
+      // The mint: draw-free in every arm, so this checkpoint must still stand
+      // at zero draws with the slot row already present.
+      sim.slotToolEffect('mining', 'gatherers_cache', 'always', pid);
+      rec.snapshot('effect-slotted');
+
+      // The harvest the bonus rides: two draws at completion, the +1 quantity
+      // applied after both of them, and the charge settled against the GRANTED
+      // count at the command boundary.
+      standOnNode(sim, p, VEIN_ID);
+      sim.harvestNode(VEIN_ID, undefined, pid);
+      rec.tick(castTicks); // the cast completes inside this window
+      rec.snapshot('harvest-with-effect-applied');
+      rec.tick(2);
+
+      // The same vein again: the player's own node timer denies it ahead of
+      // every arm that draws or spends, so this adds zero draws and leaves the
+      // slot's remaining charges untouched.
+      sim.harvestNode(VEIN_ID, undefined, pid);
+      rec.snapshot('same-vein-denied-by-own-timer');
+      rec.tick(2);
+
+      // The R40 prompt chapter (the phase 14 QA: no scenario pinned the
+      // CONSENTED digest, so a draw added inside the consent-gated branch
+      // would have passed every shard). Re-slot the same effect in 'prompt'
+      // mode: the spent charge above makes it a real gain, and the second
+      // self-signed charm feeds the mint.
+      sim.addItemInstance('gatherers_cache', { signer: meta.name }, pid);
+      sim.slotToolEffect('mining', 'gatherers_cache', 'prompt', pid);
+      rec.snapshot('prompt-mode-reslotted');
+
+      // Unconfirmed prompt use on the tier-1 vein: the harvest proceeds on
+      // its exact two-draw contract while the effect skips whole (base
+      // quantity, charge kept), the stale-client fail-safe digest.
+      standOnNode(sim, p, 'ore_mirefen_1');
+      sim.harvestNode('ore_mirefen_1', undefined, pid);
+      rec.tick(castTicks);
+      rec.snapshot('prompt-unconfirmed-skips-whole');
+
+      // Confirmed on the second tier-2 vein: the consent-gated branch runs
+      // (bonus applied, charge spent) inside the same two-draw contract, so
+      // a draw added or reordered anywhere in that branch moves THIS digest.
+      standOnNode(sim, p, 'ore_mirefen_t2b');
+      sim.harvestNode('ore_mirefen_t2b', true, pid);
+      rec.tick(castTicks);
+      rec.snapshot('prompt-confirmed-fires-and-spends');
+      rec.tick(2);
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -4815,7 +5131,7 @@ export const SCENARIOS: Scenario[] = [
   duelToWinner(),
   arena2v2Wipe(),
   delveLockpick(),
-  delveLockpickFail(),
+  delveLockpickTriesExhausted(),
   drownedLitany(),
   partyLoot(),
   partyRaid(),
@@ -4856,4 +5172,7 @@ export const SCENARIOS: Scenario[] = [
   professionsGather(),
   lastBellTidemill(),
   mountReins(),
+  professionsGatherFine(),
+  professionsFishingSession(),
+  professionsToolEffectSlot(),
 ];

@@ -47,6 +47,18 @@ function harness() {
 }
 
 describe('HarborShipCueRegistry', () => {
+  it('reports live work only while a registered ship has a complete cue', () => {
+    const { registry } = harness();
+    const ship = parked('mainland');
+    registry.register('mainland', ship);
+
+    expect(registry.hasLiveCue()).toBe(false);
+    registry.cue('mainland', 'castOff');
+    expect(registry.hasLiveCue()).toBe(true);
+    registry.resetAll();
+    expect(registry.hasLiveCue()).toBe(false);
+  });
+
   it('applies a pre-build cue at its original start time', () => {
     const { activate, registry, setNow } = harness();
     const ship = parked('mainland');

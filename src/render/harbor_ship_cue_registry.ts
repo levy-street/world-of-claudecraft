@@ -36,6 +36,15 @@ export class HarborShipCueRegistry<TSegment, THandle extends HarborShipCueHandle
     return this.handles.values();
   }
 
+  /** Cheap renderer guard: avoids scanning the mirrored entity map when no
+   * registered ship has a complete, live cue. */
+  hasLiveCue(): boolean {
+    for (const handle of this.handles.values()) {
+      if (handle.cueStartSec !== null && handle.segment !== null) return true;
+    }
+    return false;
+  }
+
   register(target: string, handle: THandle): void {
     this.handles.set(target, handle);
     const pending = this.pending.get(target);

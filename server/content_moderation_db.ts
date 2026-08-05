@@ -24,9 +24,24 @@ CREATE TABLE IF NOT EXISTS content_moderation_actions (
 );
 CREATE INDEX IF NOT EXISTS content_moderation_actions_resource ON content_moderation_actions(resource_kind, resource_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS content_moderation_actions_created ON content_moderation_actions(created_at DESC, id DESC);
-CREATE INDEX IF NOT EXISTS content_moderation_actions_owner ON content_moderation_actions(owner_account_id);
 CREATE INDEX IF NOT EXISTS content_moderation_actions_admin_created ON content_moderation_actions(admin_account_id, created_at DESC, id DESC);
 `;
+
+// The audit table is retained forever and live in production. Build the owner
+// FK index after the schema transaction through the shared CONCURRENTLY seam,
+// so a campaign upgrade cannot hold a write-blocking boot lock for the scan.
+export const CONTENT_MODERATION_OWNER_CONCURRENT_INDEX_SQL =
+  'CREATE INDEX CONCURRENTLY IF NOT EXISTS content_moderation_actions_owner ON content_moderation_actions(owner_account_id)';
+
+export const CONTENT_MODERATION_OWNER_INVALID_INDEX_CHECK_SQL = `
+SELECT 1
+  FROM pg_index i
+ WHERE i.indexrelid = to_regclass('content_moderation_actions_owner')
+   AND NOT i.indisvalid
+`;
+
+export const CONTENT_MODERATION_OWNER_INVALID_INDEX_DROP_SQL =
+  'DROP INDEX CONCURRENTLY IF EXISTS content_moderation_actions_owner';
 
 /** The resources this audit trail covers. */
 export type ContentModerationResourceKind = 'map' | 'user_asset';

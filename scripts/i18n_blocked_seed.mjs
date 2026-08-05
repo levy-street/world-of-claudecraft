@@ -266,6 +266,49 @@ export const COPIED_ALLOW_IDS = [
   'admin::pt_BR::detail.streamerLabel',
   'admin::sv_SE::detail.streamerLabel',
   'admin::vi_VN::detail.streamerLabel',
+  // Unstuck-reports dashboard (v0.32.0). Three genuine cognates rather than
+  // re-coined words: French "Destination" and German "Hotspots" are the normal
+  // terms in those languages, and Indonesian "area" is a standard loanword.
+  // fr_CA carries no own row for colDestination, so it inherits fr_FR's value
+  // and needs its own shadow entry (the same pairing as who.statusCombat above).
+  'admin::fr_FR::unstuckReports.colDestination',
+  'admin::fr_CA::unstuckReports.colDestination',
+  'admin::de_DE::unstuckReports.hotspotsTitle',
+  'admin::id_ID::unstuckReports.areaId',
+  // Admin Guilds panel (v0.34.0, #2590). "Online"/"Offline" and "Status" repeat
+  // moderation.badgeOnline / detail.status / moderation.colStatus, already
+  // blocked as genuine cognates for these exact locales above; the guild member
+  // table's status column reuses the same established word for consistency
+  // with the moderation panel's status badge elsewhere in the same dashboard.
+  'admin::it_IT::guilds.online',
+  'admin::it_IT::guilds.offline',
+  'admin::de_DE::guilds.online',
+  'admin::de_DE::guilds.offline',
+  'admin::de_DE::guilds.memberStatus',
+  'admin::pt_BR::guilds.online',
+  'admin::pt_BR::guilds.offline',
+  'admin::pt_BR::guilds.memberStatus',
+  'admin::cs_CZ::guilds.online',
+  'admin::cs_CZ::guilds.offline',
+  'admin::nl_NL::guilds.online',
+  'admin::nl_NL::guilds.offline',
+  'admin::nl_NL::guilds.memberStatus',
+  'admin::pl_PL::guilds.online',
+  'admin::pl_PL::guilds.offline',
+  'admin::pl_PL::guilds.memberStatus',
+  'admin::id_ID::guilds.memberStatus',
+  'admin::sv_SE::guilds.online',
+  'admin::sv_SE::guilds.offline',
+  'admin::sv_SE::guilds.memberStatus',
+  'admin::da_DK::guilds.online',
+  'admin::da_DK::guilds.offline',
+  'admin::da_DK::guilds.memberStatus',
+  // "Officer" repeats hud.social.ranks.officer, the game client's own established
+  // (unmodified) rank name for these two locales specifically; every OTHER
+  // locale translates that rank (e.g. de_DE "Offizier", it_IT "Ufficiale"), so
+  // this is locale-specific precedent, not a blanket cognate.
+  'admin::sv_SE::guilds.rank.officer',
+  'admin::da_DK::guilds.rank.officer',
 ];
 
 export const V07_SLASH = [
@@ -313,7 +356,6 @@ export const V07_SLASH = [
   'Quest log (5): Aki.',
   'Spellbook (5): Aki.',
   'Target: Aki (level 5 Aki) — Aki.',
-  'That player is already trading.',
   'Threat is only tracked on enemies; Aki is not one.',
   'Threat on Aki (5): Aki.',
   'Time played this session: Aki.',

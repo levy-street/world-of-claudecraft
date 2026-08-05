@@ -12,6 +12,7 @@
 import {
   EffectComposer,
   GLTFLoader,
+  KTX2Loader,
   MeshoptDecoder,
   OrbitControls,
   OutputPass,
@@ -51,6 +52,7 @@ let scenePref = (() => {
 })();
 
 const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+let ktx2Attached = false;
 const texLoader = new THREE.TextureLoader();
 const KNIGHT = 'public/models/chars/players/knight.glb';
 
@@ -277,6 +279,13 @@ window.LiveViewer = {
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
+    if (!ktx2Attached) {
+      // Shipped GLBs carry KTX2 textures; transcoder served by the library server.
+      ktx2Attached = true;
+      const ktx2 = new KTX2Loader().setTranscoderPath('/basis/');
+      ktx2.detectSupport(renderer);
+      loader.setKTX2Loader(ktx2);
+    }
     const scene = new THREE.Scene();
     const sceneLights = makeLights(scene);
     const sceneLightBase = sceneLights.map((l) => l.intensity);

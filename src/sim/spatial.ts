@@ -94,4 +94,29 @@ export class SpatialGrid {
       }
     }
   }
+
+  // Allocation-free radius collection for hot paths that keep a caller-owned
+  // scratch array. The buffer is cleared in place and returned for convenient
+  // iteration; callers may sort it when they need creation-order tie breaks.
+  collectInRadius(x: number, z: number, radius: number, out: Entity[]): Entity[] {
+    out.length = 0;
+    const cs = this.cellSize;
+    const minCx = Math.floor((x - radius - 1) / cs) + OFFSET;
+    const maxCx = Math.floor((x + radius + 1) / cs) + OFFSET;
+    const minCz = Math.floor((z - radius - 1) / cs) + OFFSET;
+    const maxCz = Math.floor((z + radius + 1) / cs) + OFFSET;
+    const r2 = radius * radius;
+    for (let cx = minCx; cx <= maxCx; cx++) {
+      for (let cz = minCz; cz <= maxCz; cz++) {
+        const list = this.cells.get(cx * 65536 + cz);
+        if (!list) continue;
+        for (const e of list) {
+          const dx = e.pos.x - x;
+          const dz = e.pos.z - z;
+          if (dx * dx + dz * dz <= r2) out.push(e);
+        }
+      }
+    }
+    return out;
+  }
 }

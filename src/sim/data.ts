@@ -765,20 +765,48 @@ export function setActiveWorldContent(world: WorldContent | null): void {
 // as always) and x picks the column within it. Every zone without an
 // explicit x-range spans the original full-width strip, so a one-column
 // world behaves exactly as before.
-// The world's northmost zone, for clamping beyond the north end (append
-// order stopped meaning stack order when the first column landed).
-const NORTHMOST_ZONE: ZoneDef = ZONES.reduce((a, b) => (b.zMax > a.zMax ? b : a));
-
+// Walks the ACTIVE content's zones, not the builtin const, so every
+// consumer (the fishing rod gate, catch tables, deed credit, chat
+// readouts) resolves the same world the water and terrain reads resolve.
+// Byte-identical on every shipped host: BUILTIN_WORLD.zones IS the ZONES
+// reference. A content with an EMPTY zone list (the editor rejects one,
+// but a hand-built WorldContent can carry it) falls back to the builtin
+// zones so the declared non-null return stays true, exactly the totality
+// the builtin walk had. The beyond-the-north-end clamp resolves the
+// RESOLVED list's northmost zone (append order stopped meaning stack
+// order when the first column landed), so a custom map clamps to its own
+// north end; on shipped hosts that reduce sees ZONES.
 export function zoneAt(x: number, z: number): ZoneDef {
+  const active = getActiveWorldContent().zones;
+  const zones = active.length > 0 ? active : BUILTIN_WORLD.zones;
   let fallback: ZoneDef | null = null;
-  for (const zone of ZONES) {
+  for (const zone of zones) {
     if (z >= zone.zMax) continue;
     if (fallback === null || zone.zMax < fallback.zMax) fallback = zone; // southmost band containing z
     const x0 = zone.xMin ?? STRIP_MIN_X;
     const x1 = zone.xMax ?? STRIP_MAX_X;
     if (z >= zone.zMin && x >= x0 && x < x1) return zone;
   }
-  return fallback ?? NORTHMOST_ZONE;
+  return fallback ?? zones.reduce((a, b) => (b.zMax > a.zMax ? b : a));
+}
+
+// Strict rect containment: the zone whose rectangle literally contains (x, z),
+// or null when the point lies outside every authored zone. Unlike zoneAt, which
+// clamps through a southmost-band fallback so an overworld query always yields a
+// zone, this reports "nowhere" honestly. Callers that must distinguish the open
+// world from an instanced interior (the far-east dungeon/arena/delve plane at
+// INSTANCE_X_BASE, which zoneAt would misreport as a real zone) use this one.
+// Reads the static ZONES deliberately, UNLIKE zoneAt (which resolves the
+// active world content so an editor play-test map can reshape lookups): a
+// custom play-test map's zones never redefine world policy.
+export function zoneContaining(x: number, z: number): ZoneDef | null {
+  for (const zone of ZONES) {
+    if (z < zone.zMin || z >= zone.zMax) continue;
+    const x0 = zone.xMin ?? STRIP_MIN_X;
+    const x1 = zone.xMax ?? STRIP_MAX_X;
+    if (x >= x0 && x < x1) return zone;
+  }
+  return null;
 }
 
 // The original strip column and the east/west columns beside it. Sequential
@@ -804,10 +832,21 @@ function sm01(raw: number): number {
 export function columnBlendAt(zone: ZoneDef, x: number, z: number): number {
   const x0 = zone.xMin ?? STRIP_MIN_X;
   const x1 = zone.xMax ?? STRIP_MAX_X;
-  const xT =
-    x0 >= STRIP_MAX_X
-      ? sm01((x - (x0 - 30)) / 65) // an east column, entered moving +x
-      : 1 - sm01((x - (x1 - 35)) / 65); // a west column, entered moving -x
+  const finite = Number.isFinite(x) && Number.isFinite(z);
+  if (finite && (z <= zone.zMin - 30 || z >= zone.zMax + 35)) {
+    // One zT sm01 arm is saturated at these bounds, so zT and the final
+    // product are exactly +0. Skipping both blends is bit-identical.
+    return 0;
+  }
+  const east = x0 >= STRIP_MAX_X;
+  if (finite && (east ? x <= x0 - 30 : x >= x1 + 30)) {
+    // xT is exactly +0 on this side of the column transition, so the final
+    // product is exactly +0. The outer side stays blended until coast shaping.
+    return 0;
+  }
+  const xT = east
+    ? sm01((x - (x0 - 30)) / 65) // an east column, entered moving +x
+    : 1 - sm01((x - (x1 - 35)) / 65); // a west column, entered moving -x
   const zT = sm01((z - (zone.zMin - 30)) / 65) * (1 - sm01((z - (zone.zMax - 30)) / 65));
   return xT * zT;
 }
@@ -815,24 +854,78 @@ export function columnBlendAt(zone: ZoneDef, x: number, z: number): number {
 // East-west extent of the world at a given z: the union of the zone rects
 // in that row. One column today (the original strip everywhere); a column
 // added east or west widens its own rows and nothing else. Beyond the world
-// ends this clamps to the nearest band, like zoneAt.
-export function worldXBoundsAt(z: number): { min: number; max: number } {
+// ends this clamps to the nearest band, like zoneAt. Walks the same RESOLVED
+// zone list zoneAt walks (the active content, builtin fallback): the fallback
+// arm probes zoneAt, so a static-ZONES loop here would return
+// {Infinity, -Infinity} the moment a custom map's bands disagree with the
+// builtin, and that pair reaches the terrain height smoothstep as NaN.
+function computeWorldXBounds(z: number): Readonly<{ min: number; max: number }> {
+  const active = getActiveWorldContent().zones;
+  const zones = active.length > 0 ? active : BUILTIN_WORLD.zones;
   let min = Infinity;
   let max = -Infinity;
-  for (const zone of ZONES) {
+  for (const zone of zones) {
     if (z < zone.zMin || z >= zone.zMax) continue;
     min = Math.min(min, zone.xMin ?? STRIP_MIN_X);
     max = Math.max(max, zone.xMax ?? STRIP_MAX_X);
   }
   if (min > max) {
     const band = zoneAt(0, z);
-    for (const zone of ZONES) {
+    for (const zone of zones) {
       if (zone.zMin !== band.zMin || zone.zMax !== band.zMax) continue;
       min = Math.min(min, zone.xMin ?? STRIP_MIN_X);
       max = Math.max(max, zone.xMax ?? STRIP_MAX_X);
     }
   }
-  return { min, max };
+  return Object.freeze({ min, max });
+}
+
+interface WorldXBoundsIndex {
+  starts: readonly number[];
+  rows: readonly Readonly<{ min: number; max: number }>[];
+  south: Readonly<{ min: number; max: number }>;
+  nan: Readonly<{ min: number; max: number }>;
+}
+
+let worldXBoundsGeneration = -1;
+let worldXBoundsIndex: WorldXBoundsIndex | null = null;
+
+function buildWorldXBoundsIndex(): WorldXBoundsIndex {
+  // The SAME resolved list computeWorldXBounds walks: a custom map's band
+  // boundaries must seed the index rows, or every row between two custom
+  // boundaries reuses bounds computed at the wrong builtin boundary.
+  const active = getActiveWorldContent().zones;
+  const zones = active.length > 0 ? active : BUILTIN_WORLD.zones;
+  const starts = [...new Set(zones.flatMap((zone) => [zone.zMin, zone.zMax]))].sort(
+    (a, b) => a - b,
+  );
+  return {
+    starts,
+    rows: starts.map((z) => computeWorldXBounds(z)),
+    south: computeWorldXBounds(Number.NEGATIVE_INFINITY),
+    nan: computeWorldXBounds(Number.NaN),
+  };
+}
+
+export function worldXBoundsAt(z: number): Readonly<{ min: number; max: number }> {
+  const generation = getContentGeneration();
+  if (generation !== worldXBoundsGeneration || worldXBoundsIndex === null) {
+    worldXBoundsIndex = buildWorldXBoundsIndex();
+    worldXBoundsGeneration = generation;
+  }
+  if (Number.isNaN(z)) return worldXBoundsIndex.nan;
+  if (z < worldXBoundsIndex.starts[0]) return worldXBoundsIndex.south;
+
+  let lo = 0;
+  let hi = worldXBoundsIndex.starts.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >>> 1;
+    if (worldXBoundsIndex.starts[mid] <= z) lo = mid + 1;
+    else hi = mid;
+  }
+  // Zone membership is constant between sorted z boundaries. Reusing the
+  // frozen row removes the zone scan and result allocation bit-identically.
+  return worldXBoundsIndex.rows[lo - 1];
 }
 
 export function zoneWelcomeText(
@@ -1066,9 +1159,12 @@ export const RIFT_BAND_X_MIN = RIFT_X_MIN - 40;
 // only RIFT_REGION_HALF_X wide either side; 1000u of headroom keeps it clear of the
 // relocated Protect Yumi maze band (YUMI_BAND_X_MIN) that now sits past it.
 export const RIFT_BAND_X_MAX = RIFT_X_MIN + 1000;
-export const RIFT_SLOT_COUNT = 8; // normal concurrent-rift capacity
-export const COMMUNITY_RIFT_SLOT_COUNT = 24; // opt-in public-test capacity
-const RIFT_LAYOUT_SLOT_COUNT = COMMUNITY_RIFT_SLOT_COUNT;
+// Concurrent-rift capacity for every host. With one portal per eligible zone
+// and per-event instance caps enforced at entry, the bound is population, not
+// events; slots are only backing records until a group enters, so a large pool
+// costs nothing at rest.
+export const RIFT_SLOT_COUNT = 64;
+const RIFT_LAYOUT_SLOT_COUNT = RIFT_SLOT_COUNT;
 export const RIFT_MAX_FLOORS = 6; // matches rift_gen MAX_FLOORS
 const RIFT_Z0 = -1250;
 // Each FLOOR gets its own z-stacked origin within a slot, so descending builds a
@@ -1223,7 +1319,7 @@ export function delveSlotAt(delveIndex: number, z: number, modules: readonly str
 }
 
 // Memoized: the default chain is a pure function of the static DELVES table, and
-// callers (collision/camera fallback) hit it per-frame inside the delve band, so
+// callers (collision and render fallbacks) hit it per-frame inside the delve band, so
 // cache one frozen array per delve id instead of reallocating each call.
 const DEFAULT_DELVE_MODULES = new Map<string, readonly string[]>();
 

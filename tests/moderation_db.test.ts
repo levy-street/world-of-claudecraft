@@ -444,8 +444,35 @@ describe('moderation report helpers', () => {
     expect(client.query.mock.calls[1][1]).toEqual([2, 'appeal accepted']);
     expect(client.query.mock.calls[2][0]).toMatch(/account_moderation_actions/);
     expect(client.query.mock.calls[2][1]).toEqual([2, 1, 'unban', 'appeal accepted', null]);
-    expect(client.query.mock.calls[4][0]).toBe('COMMIT');
+    // unban is a reversal action, symmetric to unsuspend: it must not touch
+    // player_reports, or a fresh, unreviewed report against an already-banned
+    // account gets silently closed the moment an unrelated appeal is granted.
+    expect(client.query.mock.calls.some((call) => /player_reports/.test(String(call[0])))).toBe(
+      false,
+    );
+    expect(client.query.mock.calls[3][0]).toBe('COMMIT');
+    expect(client.query.mock.calls).toHaveLength(4);
     expect(client.release).toHaveBeenCalledTimes(1);
+  });
+
+  it('leaves a pre-existing open report untouched when unbanning (parity with unsuspend)', async () => {
+    const client = clientStub();
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    await moderateAccount({
+      accountId: 2,
+      adminAccountId: 1,
+      action: 'unban',
+      reason: 'unrelated appeal granted',
+    });
+
+    // moderateAccount never reads player_reports directly: the only way a report
+    // could be affected is the closing UPDATE, so proving that statement is never
+    // issued proves any pre-existing open report on this account is left as-is.
+    const reportUpdate = client.query.mock.calls.find((call) =>
+      /UPDATE player_reports/.test(String(call[0])),
+    );
+    expect(reportUpdate).toBeUndefined();
   });
 
   it('unsuspends an active suspension and writes a dedicated audit action', async () => {

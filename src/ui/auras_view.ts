@@ -130,8 +130,8 @@ export interface AurasEntityInput {
 }
 
 /** Injected host helpers. The core produces localized text without importing the i18n
- *  runtime (testable with spies); each fires its key/lookup every frame so an in-game
- *  language switch lands on the next tick. */
+ *  runtime (testable with spies). Localized lookups normally run every frame; a view
+ *  with effectHtmlCacheVersion reuses effect HTML until that locale version changes. */
 export interface AurasDeps {
   /** The icon identity the painter resolves to a background-image URL (host:
    *  `ABILITIES[id] ? id : 'aura_' + kind`). */
@@ -187,6 +187,10 @@ export interface AuraSlotState {
   name: string;
   /** Raw seconds remaining, for the tooltip (read live by the pooled closure). */
   remaining: number;
+  /** Full authored duration, used by the detailed target-aura window's progress bar. */
+  duration?: number;
+  /** Caster entity id, used by the detailed target-aura window's source label. */
+  sourceId?: number;
   /** Whether this aura is the player's own cancelable buff (mode 'buffs', not a debuff):
    *  the buff bar offers right-click-cancel, a target's debuff strip is read-only. */
   cancelable: boolean;
@@ -208,6 +212,19 @@ export interface AuraSlotState {
 export interface AurasState {
   slots: AuraSlotState[];
   count: number;
+}
+
+interface AuraEffectHtmlCache {
+  version: unknown;
+  id: string;
+  kind: AuraKind;
+  value: number;
+  value2: number | undefined;
+  value3: number | undefined;
+  tickInterval: number | undefined;
+  school: AuraSchool | undefined;
+  stacks: number | undefined;
+  html: string;
 }
 
 export interface AurasView {
@@ -255,6 +272,8 @@ function makeSlotState(): AuraSlotState {
     stacksText: '',
     name: '',
     remaining: 0,
+    duration: undefined,
+    sourceId: undefined,
     cancelable: false,
     effectHtml: '',
     own: false,
@@ -274,15 +293,21 @@ function makeSlotState(): AuraSlotState {
  * the painter renders yours first and bigger. Implemented as two passes over the
  * SAME aura list (own, then the rest): no sort, no per-frame allocation, and the
  * relative order within each group stays the sim-application order.
+ *
+ * opts.effectHtmlCacheVersion enables per-slot tooltip HTML caching. The version
+ * must change whenever localized output can change; descriptor inputs are compared
+ * directly, so countdown-only ticks keep the cached HTML allocation-free.
  */
 export function createAurasView(
   mode: AuraMode,
   deps: AurasDeps,
-  opts?: { ownFirst?: boolean },
+  opts?: { ownFirst?: boolean; effectHtmlCacheVersion?: () => unknown },
 ): AurasView {
   const slots: AuraSlotState[] = [];
+  const effectHtmlCache: Array<AuraEffectHtmlCache | undefined> = [];
   const state: AurasState = { slots, count: 0 };
   const ownFirst = opts?.ownFirst === true;
+  const effectHtmlCacheVersion = opts?.effectHtmlCacheVersion;
 
   return {
     tick(entity: AurasEntityInput): AurasState {
@@ -290,6 +315,7 @@ export function createAurasView(
       // Frame-constant, so read once per tick instead of per aura (it still re-reads each frame,
       // so an in-game language switch lands on the next tick).
       const units = deps.durationUnits();
+      const effectVersion = effectHtmlCacheVersion?.();
       const fill = (a: AuraInput, own: boolean): void => {
         // Temporal Echo marks are shown only to the chronomancer who placed them
         // (owner 2026-07-12): another caster's echo still heals in the sim but never
@@ -305,7 +331,10 @@ export function createAurasView(
         if (mode === 'debuffs' && !debuff) return;
         if (mode === 'buffs' && debuff) return;
         // Grow the pool only when this frame needs a slot it has never held before.
-        if (count >= slots.length) slots.push(makeSlotState());
+        if (count >= slots.length) {
+          slots.push(makeSlotState());
+          effectHtmlCache.push(undefined);
+        }
         const slot = slots[count];
         slot.key = a.id;
         slot.iconKey = deps.iconId(a);
@@ -325,11 +354,58 @@ export function createAurasView(
               : '';
         slot.name = deps.auraName(a);
         slot.remaining = a.remaining;
+        slot.duration = a.duration;
+        slot.sourceId = a.sourceId;
         // The buff bar (mode 'buffs', the player's own auras) offers right-click-cancel;
         // a helpful buff is cancelable, a debuff never. The target debuff strip
         // (mode 'debuffs') is read-only, so nothing there is cancelable.
         slot.cancelable = mode === 'buffs' && !debuff && a.unbreakableControl !== true;
-        slot.effectHtml = deps.auraEffectHtml(a);
+        const cachedEffect = effectHtmlCache[count];
+        if (
+          !effectHtmlCacheVersion ||
+          !cachedEffect ||
+          cachedEffect.version !== effectVersion ||
+          cachedEffect.id !== a.id ||
+          cachedEffect.kind !== a.kind ||
+          cachedEffect.value !== a.value ||
+          cachedEffect.value2 !== a.value2 ||
+          cachedEffect.value3 !== a.value3 ||
+          cachedEffect.tickInterval !== a.tickInterval ||
+          cachedEffect.school !== a.school ||
+          cachedEffect.stacks !== a.stacks
+        ) {
+          const html = deps.auraEffectHtml(a);
+          slot.effectHtml = html;
+          if (effectHtmlCacheVersion) {
+            if (cachedEffect) {
+              cachedEffect.version = effectVersion;
+              cachedEffect.id = a.id;
+              cachedEffect.kind = a.kind;
+              cachedEffect.value = a.value;
+              cachedEffect.value2 = a.value2;
+              cachedEffect.value3 = a.value3;
+              cachedEffect.tickInterval = a.tickInterval;
+              cachedEffect.school = a.school;
+              cachedEffect.stacks = a.stacks;
+              cachedEffect.html = html;
+            } else {
+              effectHtmlCache[count] = {
+                version: effectVersion,
+                id: a.id,
+                kind: a.kind,
+                value: a.value,
+                value2: a.value2,
+                value3: a.value3,
+                tickInterval: a.tickInterval,
+                school: a.school,
+                stacks: a.stacks,
+                html,
+              };
+            }
+          }
+        } else {
+          slot.effectHtml = cachedEffect.html;
+        }
         slot.own = own;
         count++;
       };

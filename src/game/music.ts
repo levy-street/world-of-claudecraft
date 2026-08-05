@@ -10,6 +10,7 @@
 // download. Each fight opens on one of the two battle themes at random.
 
 import type { BiomeId } from '../sim/types';
+import { resumeWhenAllowed } from './audio_unlock';
 import { MUSIC_OVERRIDES } from './music_overrides.generated';
 import { COMBAT_STREAM_URLS, pickCombatTrackIndex, ZONE_STREAM_URLS } from './music_tracks';
 
@@ -4912,7 +4913,7 @@ export class MusicDirector {
         : 0;
     this.bossGain.gain.setTargetAtTime(target, this.ctx.currentTime, target > 0 ? 0.25 : 0.12);
     if (target > 0) {
-      void this.ctx.resume?.();
+      resumeWhenAllowed(this.ctx);
       const element = this.ensureBossElement();
       if (element) {
         element.volume = target;
@@ -5028,7 +5029,7 @@ export class MusicDirector {
       this.sowfieldTrack !== null && this._enabled && !this._menuPaused && !this._sceneSilenced;
     const level = 0.5 * this._vol;
     if (active) {
-      void this.ctx.resume?.();
+      resumeWhenAllowed(this.ctx);
       this.ensureSowfieldElements();
       void this.sowfieldWaitingEl?.play().catch(() => {});
       void this.sowfieldMatchEl?.play().catch(() => {});
@@ -5167,7 +5168,7 @@ export class MusicDirector {
       // While the mix is inaudible do not start the download; the keeper
       // revives the stream the moment it is audible again.
       if (!this.streamsAudible()) return;
-      void this.ctx.resume?.();
+      resumeWhenAllowed(this.ctx);
       this.ensureElement(stream);
       if (stream.el) void stream.el.play().catch(() => {});
     } else {
@@ -5197,7 +5198,7 @@ export class MusicDirector {
         stream.silentAt = -1;
         this.ensureElement(stream);
         if (stream.el?.paused) {
-          void ctx.resume?.();
+          resumeWhenAllowed(ctx);
           void stream.el.play().catch(() => {});
         }
       } else if (stream.silentAt < 0) {
@@ -5229,7 +5230,7 @@ export class MusicDirector {
     if (this._menuPaused) return;
     this._menuPaused = true;
     if (!this.ctx) return;
-    void this.ctx.resume();
+    resumeWhenAllowed(this.ctx);
     if (this.master) {
       this.master.gain.setTargetAtTime(0, this.ctx.currentTime, 0.2);
     }
@@ -5242,7 +5243,7 @@ export class MusicDirector {
     if (!this._menuPaused) return;
     this._menuPaused = false;
     if (!this.ctx) return;
-    void this.ctx.resume();
+    resumeWhenAllowed(this.ctx);
     if (this.master) {
       this.master.gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, 0.35);
     }

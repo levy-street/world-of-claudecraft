@@ -3,6 +3,7 @@ import { verifyLoginTwoFactor } from './account';
 import {
   accountDetail,
   associationsForIp,
+  characterProfessionsRow,
   classDistribution,
   clientPerfRaw,
   clientPerfSummary,
@@ -16,6 +17,19 @@ import {
   registrationsByDay,
   sessionsByDay,
 } from './admin_db';
+import {
+  type AdminGuildRenameError,
+  adminGuildDetail,
+  listAdminGuildHistory,
+  listAdminGuilds,
+  renameAdminGuild,
+} from './admin_guilds_db';
+import {
+  AdminGuildListBusyError,
+  type AdminGuildListRequest,
+  readAdminGuildList,
+} from './admin_guilds_read';
+import { parseAdminGuildSort } from './admin_guilds_sort';
 import { cleanIpAssociationLookup } from './admin_ip_association';
 import { readOverviewCounts } from './admin_overview_cache';
 import {
@@ -39,6 +53,11 @@ import {
   verifyPassword,
 } from './auth';
 import { getBugReportScreenshot, listBugReports } from './bug_report_db';
+import {
+  characterProfessionsSheetFromRow,
+  restoreItemBodyError,
+  restoreSlotBodyError,
+} from './character_professions';
 import {
   addFilterWord,
   chatModeratedAccounts,
@@ -93,6 +112,7 @@ import {
   muteAccountChat,
   reactivateAccountAudited,
   recordPasswordReset,
+  recordProfessionsRestore,
   resetChatStrikesAudited,
   setAccountAiFlag,
   setAccountStreamerFlair,
@@ -137,7 +157,12 @@ const ADMIN_LOGIN_MAX_PER_MINUTE = 10;
 // bad-password response so it never reveals whether the account exists.
 const ADMIN_LOGIN_TOO_MANY_FAILED_ATTEMPTS =
   'too many failed attempts, wait a few minutes and try again';
-const ADMIN_LOGIN_INVALID_TWO_FACTOR = 'invalid authentication code';
+// Second factor, mirroring server/auth_routes.ts loginHandler exactly: an account
+// with TOTP enabled (account.totp_enabled_at) must supply a live code or a recovery
+// code before a token is minted. Without one, the response is a 200 CHALLENGE (never
+// a token), so the client shows the code step; with a wrong one it is a 401 that also
+// counts against the same per-account throttle as a bad password.
+const ADMIN_LOGIN_INVALID_TWO_FACTOR_CODE = 'invalid authentication code';
 const MAX_PAGE_LIMIT = 200;
 const DEFAULT_PAGE_LIMIT = 25;
 const ACTIVITY_WINDOW_DAYS = 30;
@@ -157,6 +182,23 @@ const STREAMER_FLAG_REQUIRED = 'streamer must be a boolean';
 const STREAMER_LINKS_REQUIRED = 'a links object is required';
 const ACCOUNT_FLAIR_FAILED = 'failed to update account flair';
 const DAILY_REWARD_EVENT_DAY_REQUIRED = 'a valid daily rewards date is required';
+
+function guildRenameFailure(error: AdminGuildRenameError): { status: number; message: string } {
+  switch (error) {
+    case 'not_found':
+      return { status: 404, message: 'guild not found' };
+    case 'name_taken':
+      return { status: 409, message: 'guild name is already taken' };
+    case 'same_name':
+      return { status: 400, message: 'guild name must change' };
+    case 'invalid_reason':
+      return { status: 400, message: 'a moderation reason is required (500 chars max)' };
+    case 'member_limit_exceeded':
+      return { status: 409, message: 'guild member limit exceeded' };
+    case 'invalid_name':
+      return { status: 400, message: 'guild name must be 3-24 letters with single spaces' };
+  }
+}
 
 async function dailyRewardEventDay(value: string | null): Promise<string | null> {
   if (value === null) return currentDailyRewardDay();
@@ -319,6 +361,21 @@ function fail(res: http.ServerResponse, status: number, error: string): void {
   json(res, status, { success: false, data: null, error });
 }
 
+async function sendAdminGuildList(
+  res: http.ServerResponse,
+  request: AdminGuildListRequest,
+  load: () => Promise<unknown>,
+): Promise<void> {
+  try {
+    ok(res, await readAdminGuildList(request, load));
+  } catch (err) {
+    if (err instanceof AdminGuildListBusyError) {
+      return fail(res, 503, 'guild list busy, try again');
+    }
+    throw err;
+  }
+}
+
 export interface PageParams {
   page: number;
   limit: number;
@@ -437,7 +494,7 @@ async function handleLogin(req: http.IncomingMessage, res: http.ServerResponse):
     }
     if (!(await verifyLoginTwoFactor(account, code, recoveryCode))) {
       recordAuthFailure(username);
-      return fail(res, 401, ADMIN_LOGIN_INVALID_TWO_FACTOR);
+      return fail(res, 401, ADMIN_LOGIN_INVALID_TWO_FACTOR_CODE);
     }
   }
   clearAuthFailures(username);
@@ -756,6 +813,83 @@ export async function handleAdminApi(
       }
     }
 
+    // R35 GM restores (professions tooling): validate, require online HERE,
+    // audit row, then the sync live mint (the RouteDef twin's exact order).
+    const restoreItemMatch = /^\/admin\/api\/moderation\/characters\/(\d+)\/restore-item$/.exec(
+      path,
+    );
+    if (req.method === 'POST' && restoreItemMatch) {
+      const id = Number(restoreItemMatch[1]);
+      const body = await readBody(req);
+      const bodyError = restoreItemBodyError(body);
+      if (bodyError) return fail(res, 400, bodyError);
+      const itemId = String(body.itemId);
+      const count = Number(body.count);
+      try {
+        if (!game.adminCharacterOnline(id)) {
+          return fail(res, 400, 'character is not online on this realm');
+        }
+        await recordProfessionsRestore({
+          characterId: id,
+          adminAccountId: accountId,
+          action: 'restore_item',
+          detail: `${itemId} x${count}`,
+          reason: body.reason,
+        });
+        const result = game.adminRestoreItem(id, itemId, count);
+        // Defensive twin of the pre-audit body check; reachable only if the
+        // runtime and validator ever disagree about ITEMS.
+        if (result === 'invalid_item') return fail(res, 400, 'unknown item id');
+        if (result !== 'ok') {
+          return fail(res, 400, 'character went offline before the restore landed');
+        }
+        return ok(res, { ok: true });
+      } catch (err) {
+        return fail(res, 400, err instanceof Error ? err.message : 'item restore failed');
+      }
+    }
+    const restoreSlotMatch = /^\/admin\/api\/moderation\/characters\/(\d+)\/restore-slot$/.exec(
+      path,
+    );
+    if (req.method === 'POST' && restoreSlotMatch) {
+      const id = Number(restoreSlotMatch[1]);
+      const body = await readBody(req);
+      const bodyError = restoreSlotBodyError(body);
+      if (bodyError) return fail(res, 400, bodyError);
+      const professionId = String(body.professionId);
+      const effectId = String(body.effectId);
+      try {
+        if (!game.adminCharacterOnline(id)) {
+          return fail(res, 400, 'character is not online on this realm');
+        }
+        await recordProfessionsRestore({
+          characterId: id,
+          adminAccountId: accountId,
+          action: 'restore_slot',
+          detail: `${professionId}/${effectId}`,
+          reason: body.reason,
+        });
+        const result = game.adminRestoreToolEffectSlot(id, professionId, effectId);
+        if (result === 'no_tool') {
+          return fail(res, 400, 'the character owns no tool for that profession');
+        }
+        // A restore is for a row that is GONE: an overwrite would destroy the
+        // live row's provenance, confirm mode, and ratcheted ceiling.
+        if (result === 'already_slotted') {
+          return fail(res, 400, 'that profession already has a slotted effect');
+        }
+        if (result === 'invalid_request') {
+          return fail(res, 400, 'that effect cannot be slotted on that profession');
+        }
+        if (result !== 'ok') {
+          return fail(res, 400, 'character went offline before the restore landed');
+        }
+        return ok(res, { ok: true });
+      } catch (err) {
+        return fail(res, 400, err instanceof Error ? err.message : 'slot restore failed');
+      }
+    }
+
     // Chat filter: lift mute / reset strikes for an account.
     const liftMuteMatch = /^\/admin\/api\/moderation\/accounts\/(\d+)\/lift-mute$/.exec(path);
     if (req.method === 'POST' && liftMuteMatch) {
@@ -885,6 +1019,32 @@ export async function handleAdminApi(
       } catch (err) {
         return fail(res, 400, err instanceof Error ? err.message : ACCOUNT_FLAIR_FAILED);
       }
+    }
+
+    const guildRenameMatch = /^\/admin\/api\/guilds\/(\d+)\/rename$/.exec(path);
+    if (req.method === 'POST' && guildRenameMatch) {
+      const body = await readBody(req);
+      const renamed = await renameAdminGuild(
+        Number(guildRenameMatch[1]),
+        typeof body.name === 'string' ? body.name : '',
+        typeof body.reason === 'string' ? body.reason : '',
+        accountId,
+      );
+      if ('error' in renamed) {
+        const failure = guildRenameFailure(renamed.error);
+        return fail(res, failure.status, failure.message);
+      }
+      game.social.guildRenamed(
+        renamed.result.guildId,
+        renamed.result.oldName,
+        renamed.result.newName,
+        renamed.result.memberCharacterIds,
+      );
+      bustAdminGuildBoardCaches();
+      return ok(res, {
+        id: renamed.result.guildId,
+        name: renamed.result.newName,
+      });
     }
 
     // Chat filter: word list + escalation config management. Every edit reloads
@@ -1076,6 +1236,32 @@ export async function handleAdminApi(
       const search = (url.searchParams.get('search') ?? '').slice(0, 64);
       return ok(res, await listAccounts(search, page, limit));
     }
+    if (path === '/admin/api/guilds') {
+      const { page, limit } = parsePageParams(url.searchParams);
+      const search = url.searchParams.get('search') ?? '';
+      const { sort, dir } = parseAdminGuildSort(url.searchParams);
+      return await sendAdminGuildList(res, { search, page, limit, sort, dir }, () =>
+        listAdminGuilds(search, page, limit, sort, dir),
+      );
+    }
+    const guildHistoryMatch = /^\/admin\/api\/guilds\/(\d+)\/history$/.exec(path);
+    if (guildHistoryMatch) {
+      const rows = await listAdminGuildHistory(Number(guildHistoryMatch[1]));
+      return rows === null ? fail(res, 404, 'guild not found') : ok(res, { rows });
+    }
+    const guildDetailMatch = /^\/admin\/api\/guilds\/(\d+)$/.exec(path);
+    if (guildDetailMatch) {
+      const detail = await adminGuildDetail(Number(guildDetailMatch[1]));
+      if (!detail) return fail(res, 404, 'guild not found');
+      const onlineIds = game.liveCharacterIds();
+      return ok(res, {
+        guild: detail.guild,
+        members: detail.members.map((member) => ({
+          ...member,
+          online: onlineIds.has(member.characterId),
+        })),
+      });
+    }
     if (path === '/admin/api/shared-ips') {
       const { page, limit } = parsePageParams(url.searchParams);
       const { sort, dir } = sharedIpSortParams(url.searchParams);
@@ -1197,6 +1383,22 @@ export async function handleAdminApi(
       const dir = url.searchParams.get('dir') === 'asc' ? 'asc' : 'desc';
       return ok(res, await listCharacters(search, sort, dir, page, limit));
     }
+    // R35 professions inspector (the RouteDef twin's exact shape: live
+    // serializeCharacter snapshot when online, stored blob otherwise). The
+    // explicit GET check matches every sibling branch in this ladder: the
+    // central ADMIN_ROUTE_PERMISSIONS gate already refuses other methods, but
+    // this branch must not silently start serving one the day someone adds a
+    // POST permission for the path.
+    const characterProfessionsMatch = /^\/admin\/api\/characters\/(\d+)\/professions$/.exec(path);
+    if (req.method === 'GET' && characterProfessionsMatch) {
+      const id = Number(characterProfessionsMatch[1]);
+      // Live snapshot FIRST (the RouteDef twin's exact shape): a live read
+      // discards the blob, so the query skips fetching it.
+      const liveState = game.adminCharacterState(id);
+      const row = await characterProfessionsRow(id, liveState === null);
+      if (!row) return fail(res, 404, 'character not found');
+      return ok(res, characterProfessionsSheetFromRow(row, liveState));
+    }
     if (path === '/admin/api/maps') {
       const { page, limit } = parsePageParams(url.searchParams);
       const { rows, total } = await adminMapsDb().listAdmin(limit, (page - 1) * limit);
@@ -1303,6 +1505,7 @@ export type AdminRuntime = Pick<
   | 'isIpBlocked'
   | 'liveSharedIps'
   | 'liveAccountIds'
+  | 'liveCharacterIds'
   | 'disconnectAccount'
   | 'muteAccountChat'
   | 'liftChatMuteLive'
@@ -1317,6 +1520,13 @@ export type AdminRuntime = Pick<
   | 'applyAntibotConfig'
   | 'startPerfCapture'
   | 'perfCaptureStatus'
+  // R35 GM professions tooling: a live character-state snapshot for the
+  // inspector, and the two audited restores (item mint, slot re-mint).
+  | 'adminCharacterState'
+  | 'adminCharacterOnline'
+  | 'adminRestoreItem'
+  | 'adminRestoreToolEffectSlot'
+  | 'social'
 >;
 
 let runtime: AdminRuntime | null = null;
@@ -1364,6 +1574,22 @@ function adminPlayersCap(): number {
   return playersCapSource ? playersCapSource() : 0;
 }
 
+let adminGuildBoardCacheBustSource: (() => void) | null = null;
+
+/** Inject the leaderboard cache invalidation hook used after a committed rename. */
+export function configureAdminGuildBoardCacheBust(fn: () => void): void {
+  adminGuildBoardCacheBustSource = fn;
+}
+
+/** Clear the leaderboard cache invalidation hook for unit tests. */
+export function resetAdminGuildBoardCacheBustForTests(): void {
+  adminGuildBoardCacheBustSource = null;
+}
+
+function bustAdminGuildBoardCaches(): void {
+  adminGuildBoardCacheBustSource?.();
+}
+
 // The DB reads/writes (plus the login-path auth + rate-limit primitives) the admin
 // route layer needs, bundled behind a test-only setter so they can be driven with a
 // fake and no Postgres; production never calls the setter. The same functions the
@@ -1378,6 +1604,7 @@ function makeRealAdminDb() {
   return {
     accountDetail,
     associationsForIp,
+    characterProfessionsRow,
     classDistribution,
     clientPerfRaw,
     clientPerfSummary,
@@ -1385,6 +1612,10 @@ function makeRealAdminDb() {
     levelDistribution,
     listAccounts,
     listCharacters,
+    listAdminGuilds,
+    adminGuildDetail,
+    listAdminGuildHistory,
+    renameAdminGuild,
     listModerationActions,
     listSharedIps,
     onlineHistory,
@@ -1429,6 +1660,7 @@ function makeRealAdminDb() {
     isAdminAccount,
     saveToken,
     reactivateAccountAudited,
+    recordProfessionsRestore,
     touchLogin,
     newToken,
     verifyPassword,
@@ -1512,7 +1744,9 @@ const MODERATION_ACTION_SCHEMA = enum_(['suspend', 'unsuspend', 'ban', 'unban'] 
  * POST /admin/api/login: anonymous, its own in-handler rateLimited limiter PLUS the
  * per-account failed-login throttle (mirrors server/auth_routes.ts loginHandler),
  * so a distributed attack spread across many source IPs cannot bypass a lockout by
- * never repeating an IP.
+ * never repeating an IP. Also mirrors loginHandler's second-factor gate: a staff
+ * account with TOTP enabled must supply a live code or a recovery code before a
+ * token is minted, so 2FA is never bypassable for the highest-privilege surface.
  */
 async function loginHandler(ctx: Ctx): Promise<void> {
   if (!adminDb().rateLimited(ctx.req, ADMIN_LOGIN_MAX_PER_MINUTE).allowed) {
@@ -1543,7 +1777,7 @@ async function loginHandler(ctx: Ctx): Promise<void> {
     }
     if (!(await adminDb().verifyLoginTwoFactor(account, code, recoveryCode))) {
       adminDb().recordAuthFailure(username);
-      return fail(ctx.res, 401, ADMIN_LOGIN_INVALID_TWO_FACTOR);
+      return fail(ctx.res, 401, ADMIN_LOGIN_INVALID_TWO_FACTOR_CODE);
     }
   }
   adminDb().clearAuthFailures(username);
@@ -1768,6 +2002,60 @@ async function accountsHandler(ctx: Ctx): Promise<void> {
   const { page, limit } = parsePageParams(ctx.url.searchParams);
   const search = (ctx.url.searchParams.get('search') ?? '').slice(0, 64);
   ok(ctx.res, await adminDb().listAccounts(search, page, limit));
+}
+
+/** GET /admin/api/guilds: current-realm guild search with bounded pagination. */
+async function guildsHandler(ctx: Ctx): Promise<void> {
+  const { page, limit } = parsePageParams(ctx.url.searchParams);
+  const search = ctx.url.searchParams.get('search') ?? '';
+  const { sort, dir } = parseAdminGuildSort(ctx.url.searchParams);
+  await sendAdminGuildList(ctx.res, { search, page, limit, sort, dir }, () =>
+    adminDb().listAdminGuilds(search, page, limit, sort, dir),
+  );
+}
+
+/** GET /admin/api/guilds/:id: minimal roster with a cheap live online merge. */
+async function guildDetailHandler(ctx: Ctx): Promise<void> {
+  const detail = await adminDb().adminGuildDetail(adminTargetId(ctx));
+  if (!detail) return fail(ctx.res, 404, 'guild not found');
+  const onlineIds = useAdminRuntime().liveCharacterIds();
+  ok(ctx.res, {
+    guild: detail.guild,
+    members: detail.members.map((member) => ({
+      ...member,
+      online: onlineIds.has(member.characterId),
+    })),
+  });
+}
+
+/** GET /admin/api/guilds/:id/history: retained moderation rename audit. */
+async function guildHistoryHandler(ctx: Ctx): Promise<void> {
+  const rows = await adminDb().listAdminGuildHistory(adminTargetId(ctx));
+  if (rows === null) return fail(ctx.res, 404, 'guild not found');
+  ok(ctx.res, { rows });
+}
+
+/** POST /admin/api/guilds/:id/rename: atomic rename, audit, then bounded live push. */
+async function guildRenameHandler(ctx: Ctx): Promise<void> {
+  const body = await readBody(ctx.req);
+  const renamed = await adminDb().renameAdminGuild(
+    adminTargetId(ctx),
+    typeof body.name === 'string' ? body.name : '',
+    typeof body.reason === 'string' ? body.reason : '',
+    ctxAccountId(ctx),
+  );
+  if ('error' in renamed) {
+    const failure = guildRenameFailure(renamed.error);
+    return fail(ctx.res, failure.status, failure.message);
+  }
+  useAdminRuntime().social.guildRenamed(
+    renamed.result.guildId,
+    renamed.result.oldName,
+    renamed.result.newName,
+    renamed.result.memberCharacterIds,
+  );
+  bustAdminGuildBoardCaches();
+  ok(ctx.res, { id: renamed.result.guildId, name: renamed.result.newName });
 }
 
 /** GET /admin/api/shared-ips: paged shared IPs; the online=1 branch reads live. */
@@ -2121,6 +2409,107 @@ async function accountDetailHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, { ...detail, online: rt.liveAccountIds().has(id) });
 }
 
+/** GET /admin/api/characters/:id/professions: the R35 professions inspector.
+ *  A live character reads a fresh serializeCharacter snapshot (the stored
+ *  blob lags the 30s autosave); an offline one reads the stored blob, whose
+ *  updatedAt tells the operator which clock the node timers anchor to. */
+async function characterProfessionsHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const id = adminTargetId(ctx);
+  // Live snapshot FIRST: when one exists the stored blob is discarded, so
+  // the query skips detoasting the widest column in the schema for nothing.
+  const liveState = rt.adminCharacterState(id);
+  const row = await adminDb().characterProfessionsRow(id, liveState === null);
+  if (!row) return fail(ctx.res, 404, 'character not found');
+  ok(ctx.res, characterProfessionsSheetFromRow(row, liveState));
+}
+
+/** POST /admin/api/moderation/characters/:id/restore-item: the R35 GM item
+ *  restore. Order is deliberate: validate (no audit row for an impossible
+ *  grant), require the character online HERE, write the audit row, then the
+ *  sync live mint, so a grant can never exist unaudited; the rare
+ *  leave-between-audit-and-mint race surfaces as an explicit 400 and the
+ *  audit row honestly records the attempt. */
+async function restoreItemHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const id = adminTargetId(ctx);
+  const body = await readBody(ctx.req);
+  const bodyError = restoreItemBodyError(body);
+  if (bodyError) return fail(ctx.res, 400, bodyError);
+  const itemId = String(body.itemId);
+  const count = Number(body.count);
+  try {
+    if (!rt.adminCharacterOnline(id)) {
+      return fail(ctx.res, 400, 'character is not online on this realm');
+    }
+    await adminDb().recordProfessionsRestore({
+      characterId: id,
+      adminAccountId: ctxAccountId(ctx),
+      action: 'restore_item',
+      detail: `${itemId} x${count}`,
+      reason: body.reason,
+    });
+    const result = rt.adminRestoreItem(id, itemId, count);
+    // Defensive twin of the pre-audit body check; reachable only if the
+    // runtime and validator ever disagree about ITEMS.
+    if (result === 'invalid_item') return fail(ctx.res, 400, 'unknown item id');
+    if (result !== 'ok') {
+      return fail(ctx.res, 400, 'character went offline before the restore landed');
+    }
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'item restore failed');
+  }
+}
+
+/** POST /admin/api/moderation/characters/:id/restore-slot: the R35 GM
+ *  tool-effect slot re-mint, same ordering contract as restore-item; the
+ *  sim action refuses no_tool (charges are sized by the best owned tool,
+ *  so the tool must be restored first). */
+async function restoreSlotHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const id = adminTargetId(ctx);
+  const body = await readBody(ctx.req);
+  const bodyError = restoreSlotBodyError(body);
+  if (bodyError) return fail(ctx.res, 400, bodyError);
+  const professionId = String(body.professionId);
+  const effectId = String(body.effectId);
+  try {
+    if (!rt.adminCharacterOnline(id)) {
+      return fail(ctx.res, 400, 'character is not online on this realm');
+    }
+    await adminDb().recordProfessionsRestore({
+      characterId: id,
+      adminAccountId: ctxAccountId(ctx),
+      action: 'restore_slot',
+      detail: `${professionId}/${effectId}`,
+      reason: body.reason,
+    });
+    const result = rt.adminRestoreToolEffectSlot(id, professionId, effectId);
+    if (result === 'no_tool') {
+      return fail(ctx.res, 400, 'the character owns no tool for that profession');
+    }
+    // A restore is for a row that is GONE: an overwrite would destroy the
+    // live row's provenance, confirm mode, and ratcheted ceiling.
+    if (result === 'already_slotted') {
+      return fail(ctx.res, 400, 'that profession already has a slotted effect');
+    }
+    // Defense-in-depth only since the phase 18 close: restoreSlotBodyError
+    // now runs the same pure pair-validity policy BEFORE the audit write, so
+    // this arm is reachable only if the validator and the sim action ever
+    // disagree (a content change landing between the two checks).
+    if (result === 'invalid_request') {
+      return fail(ctx.res, 400, 'that effect cannot be slotted on that profession');
+    }
+    if (result !== 'ok') {
+      return fail(ctx.res, 400, 'character went offline before the restore landed');
+    }
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'slot restore failed');
+  }
+}
+
 /** GET /admin/api/accounts/:id/daily-rewards-events: bounded point-award ledger. */
 async function dailyRewardPointEventsHandler(ctx: Ctx): Promise<void> {
   const day = await dailyRewardEventDay(ctx.url.searchParams.get('day'));
@@ -2470,6 +2859,38 @@ export const routes: RouteDef[] = [
   },
   {
     method: 'GET',
+    path: '/admin/api/guilds',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: guildsHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/guilds/:id',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('guild')],
+    meta: adminTargetMeta('guild'),
+    handler: guildDetailHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/guilds/:id/history',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('guild')],
+    meta: adminTargetMeta('guild'),
+    handler: guildHistoryHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/guilds/:id/rename',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('guild')],
+    meta: adminTargetMeta('guild'),
+    handler: guildRenameHandler,
+  },
+  {
+    method: 'GET',
     path: '/admin/api/shared-ips',
     surface: 'admin',
     middleware: [requireAdmin],
@@ -2499,6 +2920,30 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin, requireAdminTarget('account')],
     meta: adminTargetMeta('account'),
     handler: accountDetailHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/characters/:id/professions',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('character')],
+    meta: adminTargetMeta('character'),
+    handler: characterProfessionsHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/characters/:id/restore-item',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('character')],
+    meta: adminTargetMeta('character'),
+    handler: restoreItemHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/characters/:id/restore-slot',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('character')],
+    meta: adminTargetMeta('character'),
+    handler: restoreSlotHandler,
   },
   {
     method: 'GET',

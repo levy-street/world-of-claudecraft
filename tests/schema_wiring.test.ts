@@ -187,7 +187,7 @@ describe('ensureSchema wires every schema module at boot', () => {
     // with statement_timeout disabled (SET LOCAL, reverts at COMMIT). The pool's own
     // default statement_timeout would otherwise cancel schema setup under a pile-up.
     await ensureSchema();
-    const setLocalIdx = h.calls.findIndex((c) => c === 'SET LOCAL statement_timeout = 0');
+    const setLocalIdx = h.calls.indexOf('SET LOCAL statement_timeout = 0');
     const lockIdx = h.calls.findIndex((c) => c.includes('pg_advisory_xact_lock'));
     expect(setLocalIdx).toBeGreaterThanOrEqual(0);
     // It must run before the advisory-lock wait it exists to protect.
@@ -526,6 +526,25 @@ describe('ensureSchema wires every schema module at boot', () => {
     }
   });
 
+  it('keeps guild moderation history for life and indexes both read and FK paths', async () => {
+    await ensureSchema();
+    const ddl = h.calls.find((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS guild_moderation_actions'),
+    );
+    expect(ddl).toBeDefined();
+    expect(ddl).toContain('guild_id INT NOT NULL');
+    expect(ddl).not.toMatch(/guild_id INT[^\n]*REFERENCES guilds/);
+    expect(ddl).toContain('admin_account_id INT REFERENCES accounts(id) ON DELETE SET NULL');
+    expect(ddl).toContain('guild_moderation_actions(realm, guild_id, created_at DESC, id DESC)');
+    expect(ddl).toContain('guild_moderation_actions(admin_account_id)');
+    expect(ddl).toContain('CREATE OR REPLACE FUNCTION guard_guild_folded_name()');
+    expect(ddl).toContain(
+      "hashtextextended('guild-name:' || NEW.realm || ':' || lower(NEW.name), 0)",
+    );
+    expect(ddl).toContain('BEFORE INSERT OR UPDATE OF name, realm ON guilds');
+    expect(ddl).toContain("CONSTRAINT = 'guilds_realm_lower_name_guard'");
+  });
+
   it('the concurrent-index migration list pins its entry names and order', () => {
     // Order is load-bearing and deliberate (the boot coordinator builds these
     // post-commit, in list order, under the session advisory lock); new entries
@@ -535,7 +554,33 @@ describe('ensureSchema wires every schema module at boot', () => {
       'daily_reward_events_account_day_created_id',
       'play_sessions_open_character',
       'client_perf_reports_worst10s_created',
+      'play_sessions_ended_account',
+      'guilds_realm_lower_name_prefix',
+      'guilds_realm_created_id',
+      'content_moderation_actions_owner',
     ]);
+    const guildPrefix = CONCURRENT_INDEX_MIGRATIONS.find(
+      (m) => m.name === 'guilds_realm_lower_name_prefix',
+    );
+    expect(guildPrefix?.createSql).toContain('ON guilds(realm, lower(name) text_pattern_ops)');
+    expect(guildPrefix?.checkSql).toContain("to_regclass('guilds_realm_lower_name_prefix')");
+    expect(guildPrefix?.dropSql).toBe(
+      'DROP INDEX CONCURRENTLY IF EXISTS guilds_realm_lower_name_prefix',
+    );
+    const guildCreated = CONCURRENT_INDEX_MIGRATIONS.find(
+      (m) => m.name === 'guilds_realm_created_id',
+    );
+    expect(guildCreated?.createSql).toContain('ON guilds(realm, created_at, id)');
+    expect(guildCreated?.checkSql).toContain("to_regclass('guilds_realm_created_id')");
+    expect(guildCreated?.dropSql).toBe('DROP INDEX CONCURRENTLY IF EXISTS guilds_realm_created_id');
+    const contentOwner = CONCURRENT_INDEX_MIGRATIONS.find(
+      (m) => m.name === 'content_moderation_actions_owner',
+    );
+    expect(contentOwner?.createSql).toContain('ON content_moderation_actions(owner_account_id)');
+    expect(contentOwner?.checkSql).toContain("to_regclass('content_moderation_actions_owner')");
+    expect(contentOwner?.dropSql).toBe(
+      'DROP INDEX CONCURRENTLY IF EXISTS content_moderation_actions_owner',
+    );
   });
 
   it('applies the rate-limit schema idempotently (a second boot re-issues the same DDL)', async () => {

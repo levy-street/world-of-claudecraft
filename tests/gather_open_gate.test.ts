@@ -208,6 +208,9 @@ describe('tryNearbyInteraction default arm', () => {
       player: playerAt(0),
       playerId: 1,
       entities: new Map([[e.id, e]]),
+      questLog: new Map(),
+      targetEntity: () => {},
+      interact: () => {},
       lootCorpse,
       harvestCorpse,
       delveInteract: () => false as const,
@@ -232,7 +235,9 @@ describe('tryNearbyInteraction default arm', () => {
   it('dispatches a lootable corpse without any harvest-state argument (the default arm)', () => {
     const withLoot = corpse({ loot: { copper: 5, items: [] } });
     const { world, hud, lootCorpse } = nearbyRig(withLoot);
-    expect(tryNearbyInteraction(world, hud, [], null, 'far', 'notReady', 'nothing')).toBe(true);
+    expect(
+      tryNearbyInteraction(world, hud, [], null, 'far', 'notReady', 'escortAway', 'nothing'),
+    ).toBe(true);
     expect(lootCorpse).toHaveBeenCalledWith(2);
   });
 
@@ -241,7 +246,9 @@ describe('tryNearbyInteraction default arm', () => {
     // press: a harvest-only corpse is a target, and only its harvest half is
     // dispatched (no loot command, so no denial toast on an empty table).
     const { world, hud, lootCorpse, harvestCorpse } = nearbyRig(corpse({}));
-    expect(tryNearbyInteraction(world, hud, [], null, 'far', 'notReady', 'nothing')).toBe(true);
+    expect(
+      tryNearbyInteraction(world, hud, [], null, 'far', 'notReady', 'escortAway', 'nothing'),
+    ).toBe(true);
     expect(harvestCorpse).toHaveBeenCalledWith(2);
     expect(lootCorpse).not.toHaveBeenCalled();
     expect(hud.showError).not.toHaveBeenCalled();
@@ -259,7 +266,9 @@ describe('tryNearbyInteraction default arm', () => {
     } as const;
     const { world, hud, lootCorpse, harvestCorpse, harvestNode } = nearbyRig(blockedCorpse);
 
-    expect(tryNearbyInteraction(world, hud, [node], null, 'far', 'notReady', 'nothing')).toBe(true);
+    expect(
+      tryNearbyInteraction(world, hud, [node], null, 'far', 'notReady', 'escortAway', 'nothing'),
+    ).toBe(true);
     expect(harvestCorpse).not.toHaveBeenCalled();
     expect(lootCorpse).not.toHaveBeenCalled();
     expect(harvestNode).toHaveBeenCalledWith('ore_under_corpse');

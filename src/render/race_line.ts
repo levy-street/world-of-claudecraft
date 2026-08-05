@@ -125,6 +125,9 @@ export class RaceLine {
     this.ribbon = new THREE.Mesh(geo, this.mat);
     this.ribbon.renderOrder = 3;
     this.ribbon.visible = false;
+    // Diagnostics-only census bucket (world-space actionable UI, like the
+    // selection ring and team rings); never a behavior or visibility gate.
+    this.ribbon.userData.renderCategory = 'ui3d';
     this.scene.add(this.ribbon);
 
     // Gate feedback: one amber floating light marks the next recommended jump;
@@ -167,6 +170,7 @@ export class RaceLine {
     }
     this.markerRoot.visible = false;
     this.markerRoot.renderOrder = 4;
+    this.markerRoot.userData.renderCategory = 'ui3d';
     this.scene.add(this.markerRoot);
   }
 

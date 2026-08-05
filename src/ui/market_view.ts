@@ -19,7 +19,8 @@
 // both a Sim-shaped and a ClientWorld-mirror-shaped snapshot.
 
 import { ITEMS } from '../sim/data';
-import type { ItemDef } from '../sim/types';
+import { isTransferLockedInstance } from '../sim/item_instance_transfer';
+import type { ItemDef, ItemInstancePayload } from '../sim/types';
 import type { MarketInfo, MarketListingView } from '../world_api';
 import {
   MARKET_ARMOR_TYPE_FILTERS,
@@ -67,10 +68,14 @@ export type MarketBrowseBody =
 export interface MarketSellForm {
   itemId: string;
   item: ItemDef;
-  /** How many of this item the player holds (the quantity cap). */
+  /** How many of this item the player holds (the quantity cap). Always 1 for
+   *  an instanced staging: instanced listings are single-copy. */
   have: number;
   /** A gentle starting ask, pre-split into gold / silver / copper inputs. */
   suggested: { gold: number; silver: number; copper: number };
+  /** The staged copy's payload (issue 1165): present when the player clicked an
+   *  instanced copy, which lists as ITSELF via marketListInstance. */
+  instance?: ItemInstancePayload;
 }
 
 /**
@@ -94,6 +99,9 @@ export interface MarketSellMeta {
 export interface MarketCollectRow {
   item: ItemDef;
   count: number;
+  /** The returned copy's payload (issue 1165): an expired instanced listing waits
+   *  here with its enchant/signature intact, and the tooltip shows it. */
+  instance?: ItemInstancePayload;
 }
 
 /** The Collect tab body: nothing to collect, or proceeds + item stacks. */
@@ -120,6 +128,8 @@ export interface MarketViewInput {
   sellItemId: string | null;
   /** How many of `sellItemId` the player holds (0 when nothing staged). */
   sellHave: number;
+  /** The staged copy's payload when an instanced copy was clicked (issue 1165). */
+  sellInstance?: ItemInstancePayload | null;
 }
 
 /** True when any dropdown is narrowing the browse. */
@@ -173,12 +183,20 @@ export function buildMarketBrowse(info: MarketInfo, filters: MarketFilters): Mar
   };
 }
 
-/** Build the Sell tab body for the staged item (`sellHave` is its bag count). */
-export function buildMarketSell(sellItemId: string | null, sellHave: number): MarketSellBody {
+/** Build the Sell tab body for the staged item (`sellHave` is its bag count).
+ *  `sellInstance` is the staged copy's payload: an instanced staging is a
+ *  single-copy form (have 1, no quantity stepper), and a transfer-locked copy
+ *  (defence in depth; the bags click already blocks it) cannot market. */
+export function buildMarketSell(
+  sellItemId: string | null,
+  sellHave: number,
+  sellInstance?: ItemInstancePayload | null,
+): MarketSellBody {
   const item = sellItemId ? ITEMS[sellItemId] : null;
   if (!sellItemId || !item || sellHave <= 0) return { state: 'pick-empty' };
   if (item.kind === 'quest' || item.noMarketList || item.soulbound)
     return { state: 'cannot-market' };
+  if (sellInstance && isTransferLockedInstance(sellInstance)) return { state: 'cannot-market' };
   // A gentle starting ask: the vendor shop price when the item has one, but
   // never more than 10x its vendor sell value (the recipe-economy rework re-priced
   // four commons' sellValues while deliberately keeping their historical shop
@@ -194,7 +212,13 @@ export function buildMarketSell(sellItemId: string | null, sellHave: number): Ma
   const copper = suggested % COPPER_PER_SILVER;
   return {
     state: 'form',
-    form: { itemId: sellItemId, item, have: sellHave, suggested: { gold, silver, copper } },
+    form: {
+      itemId: sellItemId,
+      item,
+      have: sellInstance ? 1 : sellHave,
+      suggested: { gold, silver, copper },
+      ...(sellInstance ? { instance: sellInstance } : {}),
+    },
   };
 }
 
@@ -207,7 +231,7 @@ export function buildMarketCollect(info: MarketInfo): MarketCollectBody {
   for (const slot of info.collectionItems) {
     const item = ITEMS[slot.itemId];
     if (!item) continue;
-    rows.push({ item, count: slot.count });
+    rows.push({ item, count: slot.count, ...(slot.instance ? { instance: slot.instance } : {}) });
   }
   return { state: 'items', proceeds: info.collectionCopper, rows };
 }
@@ -224,7 +248,7 @@ export function buildMarketView(input: MarketViewInput): MarketView {
   if (tab === 'sell') {
     return {
       kind: 'sell',
-      body: buildMarketSell(input.sellItemId, input.sellHave),
+      body: buildMarketSell(input.sellItemId, input.sellHave, input.sellInstance),
       meta: {
         cutPct: info.cutPct,
         myListingCount: info.myListingCount,

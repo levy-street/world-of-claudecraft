@@ -15,7 +15,10 @@ vi.mock('pg', () => ({
   }),
 }));
 
-vi.mock('../server/realm', () => ({ REALM: 'test-realm' }));
+vi.mock('../server/realm', () => ({
+  REALM: 'test-realm',
+  REALM_DIRECTORY: [{ name: 'test-realm', url: '', type: 'Normal' }],
+}));
 
 import {
   distinctOnlineSampleRealms,

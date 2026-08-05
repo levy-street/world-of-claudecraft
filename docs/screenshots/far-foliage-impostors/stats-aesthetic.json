@@ -1,0 +1,505 @@
+[
+  {
+    "name": "01-east-hill-yawhalfpi",
+    "pos": {
+      "x": 300,
+      "y": 4.3,
+      "z": 100
+    },
+    "fog": {
+      "near": 5999.999995550106,
+      "far": 6400
+    },
+    "n": 287,
+    "calls": 362,
+    "tris": 2950675,
+    "frameP50": 0,
+    "frameP95": 0,
+    "foliage": {
+      "visibleBuckets": 146,
+      "visibleDraws": 146,
+      "visibleTris": 2858052,
+      "visByLod": {
+        "core": 47,
+        "near-fill": 46,
+        "rock": 14,
+        "shadow": 22,
+        "dressing": 13,
+        "impostor": 4
+      },
+      "drawsByLod": {
+        "core": 47,
+        "near-fill": 46,
+        "rock": 14,
+        "shadow": 22,
+        "dressing": 13,
+        "impostor": 4
+      },
+      "trisByLod": {
+        "core": 1192476,
+        "near-fill": 971979,
+        "rock": 155412,
+        "shadow": 402481,
+        "dressing": 123878,
+        "impostor": 11826
+      }
+    }
+  },
+  {
+    "name": "02-east-hill-yaw3halfpi",
+    "pos": {
+      "x": 300,
+      "y": 4.3,
+      "z": 100
+    },
+    "fog": {
+      "near": 5999.999999936764,
+      "far": 6400
+    },
+    "n": 222,
+    "calls": 633,
+    "tris": 7097229,
+    "frameP50": 0,
+    "frameP95": 0,
+    "foliage": {
+      "visibleBuckets": 113,
+      "visibleDraws": 113,
+      "visibleTris": 2289798,
+      "visByLod": {
+        "rock": 14,
+        "core": 30,
+        "near-fill": 30,
+        "shadow": 22,
+        "dressing": 13,
+        "impostor": 4
+      },
+      "drawsByLod": {
+        "rock": 14,
+        "core": 30,
+        "near-fill": 30,
+        "shadow": 22,
+        "dressing": 13,
+        "impostor": 4
+      },
+      "trisByLod": {
+        "rock": 155412,
+        "core": 841692,
+        "near-fill": 754509,
+        "shadow": 402481,
+        "dressing": 123878,
+        "impostor": 11826
+      }
+    }
+  },
+  {
+    "name": "03-vale-forest",
+    "pos": {
+      "x": -40,
+      "y": 2.5,
+      "z": 60
+    },
+    "fog": {
+      "near": 5999.9999999999745,
+      "far": 6400
+    },
+    "n": 215,
+    "calls": 870,
+    "tris": 5954854,
+    "frameP50": 0,
+    "frameP95": 0,
+    "foliage": {
+      "visibleBuckets": 156,
+      "visibleDraws": 156,
+      "visibleTris": 3064845,
+      "visByLod": {
+        "core": 52,
+        "near-fill": 50,
+        "shadow": 21,
+        "rock": 12,
+        "dressing": 17,
+        "impostor": 4
+      },
+      "drawsByLod": {
+        "core": 52,
+        "near-fill": 50,
+        "shadow": 21,
+        "rock": 12,
+        "dressing": 17,
+        "impostor": 4
+      },
+      "trisByLod": {
+        "core": 1371425,
+        "near-fill": 1129056,
+        "shadow": 292409,
+        "rock": 119680,
+        "dressing": 140449,
+        "impostor": 11826
+      }
+    }
+  },
+  {
+    "name": "04-cliff-south-vista",
+    "pos": {
+      "x": 0,
+      "y": 9.8,
+      "z": 615
+    },
+    "fog": {
+      "near": 5999.999999999983,
+      "far": 6400
+    },
+    "n": 209,
+    "calls": 485,
+    "tris": 10172324,
+    "frameP50": 0,
+    "frameP95": 0,
+    "foliage": {
+      "visibleBuckets": 159,
+      "visibleDraws": 159,
+      "visibleTris": 3833671,
+      "visByLod": {
+        "rock": 23,
+        "core": 48,
+        "near-fill": 50,
+        "shadow": 16,
+        "dressing": 18,
+        "impostor": 4
+      },
+      "drawsByLod": {
+        "rock": 23,
+        "core": 48,
+        "near-fill": 50,
+        "shadow": 16,
+        "dressing": 18,
+        "impostor": 4
+      },
+      "trisByLod": {
+        "rock": 276032,
+        "core": 1337851,
+        "near-fill": 1282532,
+        "shadow": 406032,
+        "dressing": 519398,
+        "impostor": 11826
+      }
+    }
+  },
+  {
+    "name": "05-cliff-southwest",
+    "pos": {
+      "x": 0,
+      "y": 9.8,
+      "z": 615
+    },
+    "fog": {
+      "near": 5999.999999999986,
+      "far": 6400
+    },
+    "n": 219,
+    "calls": 538,
+    "tris": 7638958,
+    "frameP50": 0,
+    "frameP95": 0,
+    "foliage": {
+      "visibleBuckets": 191,
+      "visibleDraws": 191,
+      "visibleTris": 4525265,
+      "visByLod": {
+        "core": 66,
+        "near-fill": 68,
+        "rock": 27,
+        "shadow": 8,
+        "dressing": 18,
+        "impostor": 4
+      },
+      "drawsByLod": {
+        "core": 66,
+        "near-fill": 68,
+        "rock": 27,
+        "shadow": 8,
+        "dressing": 18,
+        "impostor": 4
+      },
+      "trisByLod": {
+        "core": 1799354,
+        "near-fill": 1610913,
+        "rock": 315068,
+        "shadow": 268706,
+        "dressing": 519398,
+        "impostor": 11826
+      }
+    }
+  },
+  {
+    "name": "06-north-at-ridge",
+    "pos": {
+      "x": 0,
+      "y": 4.1,
+      "z": 560
+    },
+    "fog": {
+      "near": 5999.999999999989,
+      "far": 6400
+    },
+    "n": 190,
+    "calls": 953,
+    "tris": 12289358,
+    "frameP50": 0,
+    "frameP95": 0,
+    "foliage": {
+      "visibleBuckets": 201,
+      "visibleDraws": 201,
+      "visibleTris": 4886956,
+      "visByLod": {
+        "core": 74,
+        "near-fill": 76,
+        "rock": 23,
+        "dressing": 24,
+        "impostor": 4
+      },
+      "drawsByLod": {
+        "core": 74,
+        "near-fill": 76,
+        "rock": 23,
+        "dressing": 24,
+        "impostor": 4
+      },
+      "trisByLod": {
+        "core": 2121344,
+        "near-fill": 1902938,
+        "rock": 276032,
+        "dressing": 574816,
+        "impostor": 11826
+      }
+    }
+  },
+  {
+    "name": "07-murk-north",
+    "pos": {
+      "x": 0,
+      "y": 1.2,
+      "z": 300
+    },
+    "fog": {
+      "near": 5999.999999999992,
+      "far": 6400
+    },
+    "n": 174,
+    "calls": 1071,
+    "tris": 15205348,
+    "frameP50": 0,
+    "frameP95": 0,
+    "foliage": {
+      "visibleBuckets": 188,
+      "visibleDraws": 188,
+      "visibleTris": 4387640,
+      "visByLod": {
+        "core": 68,
+        "near-fill": 67,
+        "rock": 20,
+        "shadow": 14,
+        "dressing": 15,
+        "impostor": 4
+      },
+      "drawsByLod": {
+        "core": 68,
+        "near-fill": 67,
+        "rock": 20,
+        "shadow": 14,
+        "dressing": 15,
+        "impostor": 4
+      },
+      "trisByLod": {
+        "core": 2004105,
+        "near-fill": 1684633,
+        "rock": 236674,
+        "shadow": 260091,
+        "dressing": 190311,
+        "impostor": 11826
+      }
+    }
+  },
+  {
+    "name": "08-gale-yawhalfpi",
+    "pos": {
+      "x": 420,
+      "y": 2.5,
+      "z": 360
+    },
+    "fog": {
+      "near": 5999.999999999994,
+      "far": 6400
+    },
+    "n": 316,
+    "calls": 357,
+    "tris": 2414131,
+    "frameP50": 0,
+    "frameP95": 0,
+    "foliage": {
+      "visibleBuckets": 141,
+      "visibleDraws": 141,
+      "visibleTris": 2655479,
+      "visByLod": {
+        "core": 40,
+        "near-fill": 42,
+        "rock": 13,
+        "shadow": 28,
+        "dressing": 14,
+        "impostor": 4
+      },
+      "drawsByLod": {
+        "core": 40,
+        "near-fill": 42,
+        "rock": 13,
+        "shadow": 28,
+        "dressing": 14,
+        "impostor": 4
+      },
+      "trisByLod": {
+        "core": 913149,
+        "near-fill": 832714,
+        "rock": 159918,
+        "shadow": 512068,
+        "dressing": 225804,
+        "impostor": 11826
+      }
+    }
+  },
+  {
+    "name": "09-gale-yaw3halfpi",
+    "pos": {
+      "x": 420,
+      "y": 2.5,
+      "z": 360
+    },
+    "fog": {
+      "near": 5999.9999999999945,
+      "far": 6400
+    },
+    "n": 237,
+    "calls": 951,
+    "tris": 7792239,
+    "frameP50": 0,
+    "frameP95": 0,
+    "foliage": {
+      "visibleBuckets": 108,
+      "visibleDraws": 108,
+      "visibleTris": 2205822,
+      "visByLod": {
+        "core": 34,
+        "near-fill": 34,
+        "rock": 13,
+        "shadow": 14,
+        "dressing": 9,
+        "impostor": 4
+      },
+      "drawsByLod": {
+        "core": 34,
+        "near-fill": 34,
+        "rock": 13,
+        "shadow": 14,
+        "dressing": 9,
+        "impostor": 4
+      },
+      "trisByLod": {
+        "core": 857740,
+        "near-fill": 737801,
+        "rock": 159918,
+        "shadow": 251977,
+        "dressing": 186560,
+        "impostor": 11826
+      }
+    }
+  },
+  {
+    "name": "10-garden-north",
+    "pos": {
+      "x": 320,
+      "y": 2,
+      "z": 810
+    },
+    "fog": {
+      "near": 5999.999999999995,
+      "far": 6400
+    },
+    "n": 288,
+    "calls": 645,
+    "tris": 6834403,
+    "frameP50": 0,
+    "frameP95": 0,
+    "foliage": {
+      "visibleBuckets": 131,
+      "visibleDraws": 131,
+      "visibleTris": 2425703,
+      "visByLod": {
+        "rock": 21,
+        "core": 35,
+        "near-fill": 37,
+        "shadow": 19,
+        "dressing": 15,
+        "impostor": 4
+      },
+      "drawsByLod": {
+        "rock": 21,
+        "core": 35,
+        "near-fill": 37,
+        "shadow": 19,
+        "dressing": 15,
+        "impostor": 4
+      },
+      "trisByLod": {
+        "rock": 269076,
+        "core": 745544,
+        "near-fill": 696379,
+        "shadow": 229732,
+        "dressing": 473146,
+        "impostor": 11826
+      }
+    }
+  },
+  {
+    "name": "11-garden-south",
+    "pos": {
+      "x": 320,
+      "y": 2,
+      "z": 810
+    },
+    "fog": {
+      "near": 5999.999999999996,
+      "far": 6400
+    },
+    "n": 215,
+    "calls": 665,
+    "tris": 7493228,
+    "frameP50": 0,
+    "frameP95": 0,
+    "foliage": {
+      "visibleBuckets": 147,
+      "visibleDraws": 147,
+      "visibleTris": 2778293,
+      "visByLod": {
+        "rock": 21,
+        "core": 43,
+        "near-fill": 45,
+        "shadow": 19,
+        "dressing": 15,
+        "impostor": 4
+      },
+      "drawsByLod": {
+        "rock": 21,
+        "core": 43,
+        "near-fill": 45,
+        "shadow": 19,
+        "dressing": 15,
+        "impostor": 4
+      },
+      "trisByLod": {
+        "rock": 269076,
+        "core": 924979,
+        "near-fill": 869534,
+        "shadow": 229732,
+        "dressing": 473146,
+        "impostor": 11826
+      }
+    }
+  }
+]

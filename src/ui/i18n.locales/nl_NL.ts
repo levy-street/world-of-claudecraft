@@ -2,6 +2,89 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const nl_NL: Partial<Record<TranslationKey, string>> = {
+  'apiError.epic.account_taken': 'Dat Epic-account is al gekoppeld aan een ander account.',
+  'apiError.epic.already_linked': 'Je account heeft al een gekoppeld Epic-account.',
+  'apiError.epic.banned': 'Dat Epic-account kan niet worden gekoppeld.',
+  'apiError.epic.disabled': 'Epic-koppeling is momenteel niet beschikbaar.',
+  'apiError.epic.invalid_token':
+    'Epic kon dit koppelingsverzoek niet verifiëren. Probeer het opnieuw vanuit de desktop-app.',
+  'apiError.epic.upstream': 'Epic reageerde niet. Probeer het zo meteen opnieuw.',
+  'entities.abilities.greater_invisibility.description':
+    'Verdwijn 20 sec. en verwijder 2 effecten met schade over tijd. Wanneer de onzichtbaarheid eindigt, krijg je 2 sec. lang 90% minder schade. (magiërstalent)',
+  'entities.items.reins_terrorspark_groundshaker.name':
+    'Contactsleutel: Schrikvonk, de Grondschudder',
+  'hud.options.graphicsPresetInsane': 'Extreem',
+  'hud.options.surfaceDetail': 'Oppervlaktedetail',
+  'hud.options.surfaceDetailBasic': 'Basis',
+  'hud.options.surfaceDetailFull': 'Volledig',
+  'hudChrome.auraOverlay.allOff': 'Alles uit',
+  'hudChrome.auraOverlay.allOn': 'Alles aan',
+  'hudChrome.auraOverlay.arcs': 'Zijhalvemanen',
+  'hudChrome.auraOverlay.color': 'Kleur',
+  'hudChrome.auraOverlay.crescentBlockSize': 'Blokgrootte halvemaan',
+  'hudChrome.auraOverlay.crescentsSpellOrder': 'Zijhalvemanen: spreukvolgorde',
+  'hudChrome.auraOverlay.currentClass': 'Huidige klasse: {class}',
+  'hudChrome.auraOverlay.done': 'Klaar',
+  'hudChrome.auraOverlay.enabled': 'Aura tonen',
+  'hudChrome.auraOverlay.groundRing': 'Grondring',
+  'hudChrome.auraOverlay.groundRingBlockSize': 'Blokgrootte grondring',
+  'hudChrome.auraOverlay.groundRingSpellOrder': 'Grondring: spreukvolgorde',
+  'hudChrome.auraOverlay.icon': 'Spreukpictogram',
+  'hudChrome.auraOverlay.iconSize': 'Pictogramgrootte',
+  'hudChrome.auraOverlay.moveDown': 'Omlaag verplaatsen',
+  'hudChrome.auraOverlay.moveEarlier': 'Spreuk naar binnen verplaatsen',
+  'hudChrome.auraOverlay.moveLater': 'Spreuk naar buiten verplaatsen',
+  'hudChrome.auraOverlay.moveLeft': 'Naar links verplaatsen',
+  'hudChrome.auraOverlay.moveRight': 'Naar rechts verplaatsen',
+  'hudChrome.auraOverlay.moveUp': 'Omhoog verplaatsen',
+  'hudChrome.auraOverlay.noProcs': 'Er is geen ondersteunde proc beschikbaar voor dit personage.',
+  'hudChrome.auraOverlay.opacity': 'Dekking',
+  'hudChrome.auraOverlay.positioning': 'Positioneren: {aura}',
+  'hudChrome.auraOverlay.previewHint':
+    'Gebruik Posities instellen om een aura te verplaatsen zonder het menu te bedekken.',
+  'hudChrome.auraOverlay.procs.aetherRush': 'Aetherstormloop',
+  'hudChrome.auraOverlay.procs.arcaneCharge': 'Arcane ladingen',
+  'hudChrome.auraOverlay.procs.battleTrance': 'Gevechtstrance',
+  'hudChrome.auraOverlay.procs.enrage': 'Amok: Razend',
+  'hudChrome.auraOverlay.procs.heatingUp': 'Opwarmen',
+  'hudChrome.auraOverlay.procs.overpowerCharge': 'Roodhand-versterking',
+  'hudChrome.auraOverlay.procs.revenge': 'Wraak!',
+  'hudChrome.auraOverlay.procs.suddenDeath': 'Plotse Dood',
+  'hudChrome.auraOverlay.procs.victoryRush': 'Overwinningsroes',
+  'hudChrome.auraOverlay.reposition': 'Posities instellen',
+  'hudChrome.auraOverlay.reset': 'Positie resetten',
+  'hudChrome.auraOverlay.screenPosition': 'Schermpositie',
+  'hudChrome.auraOverlay.selectAura': 'Aura',
+  'hudChrome.auraOverlay.size': 'Grootte',
+  'hudChrome.auraOverlay.spellOrder': 'Spreukvolgorde',
+  'hudChrome.auraOverlay.spellPosition': 'Spreukvolgorde {position} / {count}',
+  'hudChrome.auraOverlay.title': 'Aura’s',
+  'hudChrome.epic.benefits':
+    'Koppel je Epic-account via de Epic-desktop-app om de daden die je verdient te spiegelen naar Epic-prestaties.',
+  'hudChrome.epic.link': 'Epic koppelen',
+  'hudChrome.epic.linked': 'Gekoppeld aan Epic-account {id}',
+  'hudChrome.epic.noProof':
+    'Epic heeft geen koppelingsbewijs geleverd. Start via de Epic Games Store en probeer het opnieuw.',
+  'hudChrome.epic.title': 'Epic',
+  'hudChrome.epic.unlink': 'Epic ontkoppelen',
+  'hudChrome.mounts.desc_terrorspark_groundshaker':
+    'Een compacte gepantserde machine met zware rupsbanden, een grootkaliberkanon en een zadel gebouwd voor onverschrokken piloten.',
+  'hudChrome.mounts.name_terrorspark_groundshaker': 'Schrikvonk, de Grondschudder',
+  'hudChrome.targetAuras.all': 'Alle',
+  'hudChrome.targetAuras.buffs': 'Buffs',
+  'hudChrome.targetAuras.configureRows': 'Auras van het doel instellen',
+  'hudChrome.targetAuras.debuffs': 'Debuffs',
+  'hudChrome.targetAuras.fewerRows': 'Voorkeur voor minder aurarijen',
+  'hudChrome.targetAuras.hideSources': 'Aurabronnen verbergen',
+  'hudChrome.targetAuras.keybindLabel': 'Buffs en debuffs van het doel',
+  'hudChrome.targetAuras.lock': 'Venster met auras van het doel vergrendelen',
+  'hudChrome.targetAuras.moreRows': 'Voorkeur voor meer aurarijen',
+  'hudChrome.targetAuras.opacity': 'Auradekking: {percent}',
+  'hudChrome.targetAuras.ownAura': 'Jouw aura',
+  'hudChrome.targetAuras.showSources': 'Aurabronnen tonen',
+  'hudChrome.targetAuras.title': 'Auras van het doel',
+  'hudChrome.targetAuras.unlock': 'Venster met auras van het doel verplaatsen',
+  'hudChrome.targetAuras.visibleRows': 'Voorkeursaantal aurarijen: {count}',
   'hudChrome.bags.itemAriaMasterwork': '{item}, hoeveelheid {count}, meesterwerk',
   'hudChrome.archetypePair.tailoring+inscription': 'Inktwever',
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Wapen betoveren - Geruned Teken',
@@ -15,11 +98,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.professions.archetypeChooseTitle': 'De Gildebrief, en van gedachten veranderen',
   'guide.professions.archetypeChooseBody':
     'Je hoeft hier niets actief voor op te zoeken. Beoefen je ambachten, en zodra je vaardigheden voor het eerst een duidelijke voorkeur tonen voor een paar, neemt het Ambachtsgilde dat op en stuurt een Ravenpostbrief met de naam van de meester die je moet bezoeken en de quest die je moet aannemen. Die brief komt eenmalig per personage, en alleen als je jezelf nog niet aan een paar hebt verbonden.',
-  'guide.professions.archetypeSwitchBody':
-    'Een verklaring is ook geen levenslange belofte. Een paar dat je nog nooit hebt gehad is gewoon een nieuw atstemmingsquest, maar terugkeren naar een paar dat je hebt verlaten vraagt eerst om genoegdoening: vijf taken de eerste keer, en drie extra per overstap die je al hebt gemaakt. De keuze blijft zinvol zonder ooit een deur voorgoed te sluiten.',
   'guide.professions.whatHeading': 'Een vak naast het zwaard',
-  'guide.professions.whatBody':
-    'Beroepen zijn het werkende leven van de wereld: vier verzamelberoepen die ruwe grondstoffen rechtstreeks uit het land halen, en een ring van tien ambachten die ze omzetten in uitrusting, maaltijden, drankjes en gereedschap. Alles voedt hier iets anders. Het erts dat je mijnt wordt een zwaard, het zwaard krijgt een betovering, en de betovering heeft stof nodig dat uit oud uitrusting wordt gebroken, zodat een verzamelaar, een maker en een knutselaar allemaal schakels in een keten zijn.\n\nEr is geen beroepslimiet om over na te denken. Elk personage kan alle acht ambachten die vandaag inhoud hebben en alle vier verzamelberoepen naast elkaar opbouwen; de enige exclusieve keuze is je archetype, de identiteit waaraan je uiteindelijk zweert, hoewel zodra je je afstemt de ambachten die erachter sluimeren stoppen met stijgen. Vaardigheid daalt nooit, en niets wat je leert wordt ooit weggenomen.',
   'guide.professions.ringHeading': 'Het ambachtswiel',
   'guide.professions.ringBody':
     'Elk ambacht met inhoud vandaag bereikt een grens van 125 vaardigheid: Wapensmeden, Harnasmaken, Kleermaken, Leerbewerken, Koken, Alchemie, Knutselwerk en Betovering. Op een grens blijft het beroep werken, oogsten leveren nog op, vervaardigingen worden nog opgelost en meesterwerken kunnen nog gebeuren; alleen het getal stopt met stijgen. Kies hieronder een kaart voor de volledige receptentabellen en cijfers van een ambacht.',
@@ -31,8 +110,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.professions.gatherHubBody':
     'Vier verzamelberoepen voeden de ring vanuit het veld: Mijnbouw, Houtkap en Kruidenkunde halen erts, hout en kruiden uit het land en bereiken een grens van 100 vaardigheid, terwijl Vissen op zijn eigen aas-en-optrekken-ritme doorloopt tot 200. Elke pagina hieronder bevat de exacte grondstofkaarten, gereedschapsladders en kansen.',
   'guide.professions.archetypesHeading': 'Het wiel en zijn archetypen',
-  'guide.professions.archetypesBody':
-    'De tien ambachten zitten op een vast wiel, en geografie op dat wiel is van belang. Elke twee buren vormen een benoemd paar: Smid voor Wapensmeden en Harnasmaken, Uitrusser voor Leerbewerken en Kleermaken, Apotheker voor Alchemie en Koken, Bommenwerper voor Knutselwerk en Alchemie, en zes meer rond de ring.\n\nAfstemmen op een paar is een quest, geen menuklik. Vier paren kunnen vandaag worden betreden (Smid, Uitrusser, Apotheker en Bommenwerper), elk verankerd door een vaste meester in Eastbrook wiens acceptatiequest de hele afspraak vooraf uitlegt. Totdat je je verklaart, vordert elk ambacht vrij op recepten tot en met de zeldzame rang, zodat je alles kunt proberen voordat je kiest.\n\nZodra je je afstemt, worden je twee paarambachten je hoofdvakken, zonder plafond behalve de grens. De rest van het wiel wordt niet donker: een ambacht tegenover je hoofdvakken blijft als hobby die doorstijgt tot de zeldzame rang (een herhaalbare quest bij de smederij van Smid Haldren laat je wisselen welke dat is), en elk ander ambacht gaat sluimeren. Een sluimerend ambacht behoudt zijn vaardigheid en zijn gewone recepten; het stijgt gewoon niet meer en produceert geen meesterwerken zolang het rust.',
   'guide.professions.pairFmt': '{a} en {b}',
   'guide.professions.curveHeading': 'De Meesterschapscurve',
   'guide.professions.curveBody':
@@ -47,8 +124,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.professions.deedsBody':
     "Het Boek der Daden loopt naast elke stap hiervan mee. Je eerste afstemming verdient Ambachtsgetrouwe en je eerste meesterwerk verdient Meestersmaker, beide te dragen als titels. Elk van de acht te verdienen ambachten markeert een mijlpaaldaad bij vaardigheid 50 en kroont zijn grens met een Grootmeesters-titel, terwijl Vissen Oude Zout krijgt bij 100 vaardigheid en de titel Meesterhengelaar bij 200.\n\nEr zijn ook stillere pagina's: daden voor je eerste oogst en eerste vervaardiging, voor de zeldzame vondsten die geluk in het veld oplevert, en voor het oppakken van salvage. Dit alles is cosmetisch, alleen titels en Roem. Een daad schenkt nooit macht; het bewijst alleen dat je er was.",
   'guide.professions.startHeading': 'Waar te beginnen',
-  'guide.professions.startBody':
-    'Vers van de weg in Eastbrook? Vind Voorman Odell en neem Een Vak voor Elke Hand: hij wijst je op de ertsaders rondom de Kopergat ten zuidwesten van de stad en geeft je je eerste eelt. Oogst daarna elke ader, boomstand en kruidentuin die je tegenkomt tijdens het questen; vaardigheid komt vanzelf aan reizigers.\n\nTerug in de stad druk je op T om het vervaardigingsvenster te openen en werk je de gewone recepten die elk personage al kent vanaf het begin. Bezoek de meesters bij de smederij, keukens, weefgetouw en gereedschapsmakerij om te zien wat ze leren, en neem hun werkopdrachten voor een stabiel inkomen. Tegen de tijd dat de brief van het Gilde je bereikt, weet je al welk paar als thuis aanvoelt.',
   'guide.professions.colStation': 'Station',
   'guide.professions.colHub': 'Hub',
   'guide.professions.colMaster': 'Meester',
@@ -96,32 +171,18 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Koken verandert de vangst van de dag in maaltijden waarbij je 18 seconden rust genezing ontvangt, de goedkoopste genezing in het spel, van Gezouten Boemdrogen tot Marlows Grootse Braadstuk. Iedereen eet, dus geen ambacht is meer universeel welkom in een groep.',
   'guide.profPages.craftIntro.alchemy':
     'Alchemie verandert kruiden, klieren en glas in flesjes die gevechten winnen: genezende en mana-dranken voor het moment dat het misgaat, en uithoudingselixers die de hele kerker op je buffbalk blijven staan.',
-  'guide.profPages.craftIntro.engineering':
-    'Knutselwerk bouwt de gereedschappen die elke serieuze verzamelaar uiteindelijk wil: de rang 4- en rang 5-pikhouwelen, bijlen en sikkels die geen handelaar ooit op voorraad heeft, elk verbruikt het gereedschap eronder.',
-  'guide.profPages.craftIntro.enchanting':
-    'Betovering haalt uitrusting uit elkaar en stopt de kracht er weer in: breek ongewenste stukken af tot arcanematerialen, besteed ze dan aan een permanente statsbonus voor een stuk dat je wilt houden. Geen werkbank, geen leermeester, en iedereen kan op dag een beginnen.',
   'guide.profPages.craftProse.weaponcrafting.identityHeading': 'Het mes dat elke vechter zoekt',
   'guide.profPages.craftProse.weaponcrafting.identityBody':
     'Iemand in elke groep wil het werk van dit ambacht, want de zeldzame trede alleen al dekt alle drie de smaken: het Osmium Strijdkling voor Kracht-melee, het Glyfstaal Oorlogsbijl voor Behendigheids-vechters, en de Hoogden Gevechts-Staf, een Intellect- en Geeststaf voor de gewaden-menigte.\n\nOp de ambachtsring staat het tussen Harnasmaken en Juwelenmaken. Zijn levende identiteit is de Smid, het Wapensmeden- en Harnasmaken-paar, gezworen voor Smidse-meesteres Darva bij de smidse door eigenhandig drie ertsslagaders te bewerken; het Kling-smid-paar met Juwelenmaken staat ook op de ring, maar kan nog niet worden gezworen, omdat Juwelenmaken geen recepten heeft tot een latere zone-uitbreiding.',
   'guide.profPages.craftProse.weaponcrafting.materialsHeading': 'Wat de smidse nodig heeft',
-  'guide.profPages.craftProse.weaponcrafting.materialsBody':
-    'Mijnbouw is de ruggengraat. Kopererts komt van de rang-1-aders in Oostbeekdal, ijzererts uit Slijkveenmoeras, en osmiumerts uit Doorntop-Hoogten; elke trede van de ladder loopt op dezelfde manier. Houtkap telt zwaarder dan je zou verwachten: ijzerbast schacht de everzwijn-speer, essenhout draagt de knots, en een enkele hoogdenblok vormt de gevechtsstaf.\n\nDe rest komt van de jacht en de toonbank. Ruw leer voor handgrepen wordt rechtstreeks van wolf- en everzwijnlijken afgestroopt, botfragmenten vallen van gewone kills, en de smidseladder verbrandt Smedervloeistof, 20 koper per pot bij Darva zelf. Als je eigen mijnbouw achterblijft, verkoopt Darva osmiumerts bij de smidse en Tinker Gizzel levert glyfstaalbaren bij de gereedschapsmakerij, tegen een premie die verzamelende vrienden goedkoop laat lijken.',
   'guide.profPages.craftProse.weaponcrafting.ladderHeading': 'De ladder, trede voor trede',
   'guide.profPages.craftProse.weaponcrafting.ladderBody':
     'Een veldrecept, het Oostbeekse Wapenmes, is iedereen van het begin bekend en kan overal worden gemaakt uit jachtloot (een paar wolfstanden en botfragmenten) plus zes Smedervloeistof van de smidse-balie. De echte ladder bestaat uit negen leermeesters-recepten in drie treden, allemaal smidse-gebonden: de koperen trede (bebaarde bijl, geflensde knots, everzwijn-speer) is gratis te leren op vaardigheid 0, de ijzeren trede (lang mes, strijdknots, dolk) opent op vaardigheid 25 voor 25 zilver per recept, en de osmium-trede (oorlogsmes, oorlogsbijl, gevechts-staf) opent op vaardigheid 50 voor 1 goud elk. Darva leert een recept zodra jouw rang in het ambacht zijn eigen rang bereikt, dus elke trede opent precies wanneer zijn vaardigheidsband begint.\n\nNog een recept rijdt het paar mee: de Gravewyrm-Handschoenen, een door de leermeester onderwezen combinatiestuk dat alleen een afgestemde Smid met zowel Wapensmeden als Harnasmaken op vaardigheid 25 kan maken, en het heeft helemaal geen werkbank nodig.',
   'guide.profPages.craftProse.weaponcrafting.routeHeading':
     'Meesterwerken, en een werkroute naar 125',
-  'guide.profPages.craftProse.weaponcrafting.routeBody':
-    "Elk stuk met een echte statslijn, wat op deze ladder de ijzertrede en hoger inhoudt, kan van het aambeeld komen als meesterwerk; de statloze kopergewone varianten procen nooit, want er valt in hen niets te verbeteren. IJzer telt als rang-1-materiaal voor de meesterwerkbonus, hoogden en glyfstaal als rang 2, dus de bovenste trede procet iets vaker.\n\nRijd de kopertreden tot 25, train de ijzertrede op de dag dat die opengaat en rijd hem tot 50, dan de osmium-trede tot 75. Voorbij 75 is er nog niets hogers beschikbaar, dus de osmiumrecepten zakken naar half en dan kwart winst: reken ruwweg 150 extra vervaardigingen om de cap van 125 te bereiken, en vergeet de gedeelde begrenzing van tien vervaardigingsacties per minuut niet wanneer je in bulk gaat smeden.\n\nBekostig de klim terwijl je onderweg bent: Darva's smidsewerkopdracht neemt elke 30 minuten acht brokken kopererts van je handen voor een beetje munt en ervaringspunten, en de ijzer- en osmiumtreden verkopen eerlijk aan nivellerend melee. Het Boek der Daden markeert Snijvlak en Warmte op vaardigheid 50 en kroont Grootmeester-Wapensmeden op 125.",
   'guide.profPages.craftProse.armorcrafting.identityHeading': 'Maliën voor de frontlinie',
-  'guide.profPages.craftProse.armorcrafting.identityBody':
-    'De ladder van Harnasmaken leest als de loopbaan van een soldaat: de gewone geklonken koperen gordel, laarzen en handschoenen om te beginnen, de ijzerschakel-maliënkolder, beenstukken en schouderstukken met hun eerste echte statistiekregels, en de zeldzame osmiumschubben-helm, kuras en beenstukken, Kracht- en Uithoudingsvermogenstukken met de grootste pantsercijfers die een vakman kan maken.\n\nHet heeft ook een rustige kant: de Oostbeekse Beschermde Beenstukken, een tovenaar-gestatte veldgewone, en de Ovenschubben-Mantel, een zeldzame Intellect- en Geest-maliënschouder op vaardigheid 75, houden de magiegerichte maliëndragers op de klantenlijst. Op de ring staat het tussen Wapensmeden en Knutselwerk; het Smid-paar met Wapensmeden wordt gezworen voor Smidse-meesteres Darva, terwijl het Tandwielsmid-paar met Knutselwerk als naam bestaat maar nog geen eedquest heeft.',
   'guide.profPages.craftProse.armorcrafting.materialsHeading': 'Erts bij de zak',
-  'guide.profPages.craftProse.armorcrafting.materialsBody':
-    'Geen ambacht verbruikt erts sneller. De ijzerschakel-maliënkolder alleen vraagt al vijf ijzererts, en elk osmiumschubbenstuk wil drie of vier osmium plus een glyfstaalstaaf, dus een serieuze harnasmmaker mijnt Slijkveenmoeras en Doorntop-Hoogten of betaalt iemand die dat doet. Koper voedt de eerste trede, rechtstreeks uit de aderen bij de Kopergat.\n\nRondom het metaal gaan de zachte onderdelen: ruwe huid geoogst van wolf- en everzwijnlijken, botfragmenten en linnenresten van gewone jacht, en een pot Smedervloeistof (20 koper bij de smidse) in bijna elk recept. Darva verkoopt osmiumerts aan de balie voor de ongeduldigsten.',
   'guide.profPages.craftProse.armorcrafting.ladderHeading': "Leren bij Darva's smidse",
-  'guide.profPages.craftProse.armorcrafting.ladderBody':
-    'Twee veldgewone stukken, het Oostbeekse Maliënhemd en de Beschermde Beenstukken, zijn van het begin bekend en kunnen overal worden gemaakt. De leermeesters-ladder bestaat uit negen recepten in drie treden bij de Oostbeekse smidse: de koperen trede is gratis op vaardigheid 0, de ijzerschakel-trede kost 25 zilver per recept op vaardigheid 25, en de osmiumschubben-trede kost 1 goud elk op vaardigheid 50, waarbij elke trede leerloos is zodra jouw rang die bereikt.\n\nBuiten de ladder staan twee specials. De Grensteen-Helm is het Smid-combinatierecept, door de leermeester onderwezen, zonder werkbank, en alleen werkbaar door een afgestemde Smid met beide ambachten op vaardigheid 25. De Ovenschubben-Mantel heeft helemaal geen leermeester nodig: iedereen kent hem, maar op vaardigheid 75 en smidsegebonden is het het rang 3-sluitstuk van het ambacht.',
   'guide.profPages.craftProse.armorcrafting.routeHeading':
     'Meesterwerken, en een werkbare weg naar 125',
   'guide.profPages.craftProse.armorcrafting.routeBody':
@@ -144,68 +205,38 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.leatherworking.identityBody':
     'De ladder klimt van de gewone Fenbruggen-leren beenstukken, laarzen en riem door het ongewone moerasspeurder-wambuis, kap en schouderstukken tot de zeldzame moeraswachterset, het beste leer dat een vakman kan snijden. Twee tovenaarsstukken ronden het af: het Oostbeekse Druide-Leer als veldgewone en de Schemerleer-Wikkelaars op vaardigheid 75.\n\nOp de ring staat het tussen Koken en Kleermaken. Zijn levende paar is de Uitrusser, Leerbewerken en Kleermaken, gezworen voor Weefster Ottilie in Oostbeek; het Jager-paar met Koken staat op de ring als naam maar heeft nog geen eedquest.',
   'guide.profPages.craftProse.leatherworking.materialsHeading': 'De jacht is de oogst',
-  'guide.profPages.craftProse.leatherworking.materialsBody':
-    'Leerbewerken is het ambacht waarbij je levelroute en je aanvoerlijn hetzelfde zijn: ruwe huid wordt rechtstreeks geoogst van lijken die huid dragen, wolven en everzwijnen bovenal, en elk lijk dient slechts een verzamelaar, wie er als eerste bij is. Een zeldzame of betere oogstrol geeft ook een Ongeschonden Huid, een gesigneerd exemplaar dat de Moeraswachter-Wambuis oproept, dus sla er elk op dat je vindt.\n\nDe ondersteunende rolbezetting is klein: spin-poten en -zijde, homespun-doek van humanoidvijanden, een enkel osmiumerts in elk zeldzaam moeraswachter-stuk (zes in het Schemerleer-Wikkelaars-sluitstuk), en een Looiersmiddel voor 16 koper van de leerlooijeribalie. Looier Hesk verkoopt ook osmiumerts, als je liever niet mijnt.',
   'guide.profPages.craftProse.leatherworking.ladderHeading': 'Geleerd in Fenbridge',
-  'guide.profPages.craftProse.leatherworking.ladderBody':
-    'Hier is het addertje: de leerlooierij staat in Fenbridge, aan de weg naar Slijkveenmoeras, waardoor Leerbewerken het ene diepe ambacht is dat buiten Oostbeek wordt geleerd. Looier Hesk onderwijst de ladder bij zijn kuipen: de Fenbruggen-leren trede gratis op vaardigheid 0, de moerasspeurder-trede voor 25 zilver per recept vanaf vaardigheid 25, en de moeraswachter-trede voor 1 goud elk vanaf vaardigheid 50, waarbij elke trede opengaat zodra je rang die bereikt.\n\nTwee recepten slaan de leermeester over: de veldgewone stukken (het Gelooid Leren Wambuis en het Druide-Leer) worden overal gemaakt vanaf het begin, en de Schemerleer-Wikkelaars zijn iedereen bekend maar staan op vaardigheid 75 en zijn leerlooierij-gebonden. Merk op dat de Uitrusser-eed zelf terug in Oostbeek bij Ottilie wordt gezworen; alleen het onderwijs vindt in het moeras plaats.',
   'guide.profPages.craftProse.leatherworking.routeHeading':
     'Meesterwerken, en een werkbare weg naar 125',
-  'guide.profPages.craftProse.leatherworking.routeBody':
-    'Vanaf de moerasspeurder-trede omhoog gooit elke vervaardiging de meesterwerkskans, en de Ongeschonden Huid in een Moeraswachter-Wambuis levert de gesigneerde-reagens-bonus automatisch; osmium telt als rang 1-materiaal voor de proc. De statloze leergewone stukken kunnen niet procen.\n\nLevel het op de natuurlijke manier: oogst elke wolf en elk everzwijn dat je doodt vanaf niveau 1, maak de leertrede tot 25 overal waar je staat, train dan in Fenbridge terwijl de quests je toch het moeras in trekken. Moerasspeurder brengt je naar 50 en moeraswachter naar 75; daarna nemen de Schemerleer-Wikkelaars het over, een rang 3-recept van zes osmiumerts, drie Ongeschonden Huid, twee ruwe huid en een Looiersmiddel, dat volle winst betaalt tot 99 en de helft daarna, ruwweg 75 vervaardigingen voor de laatste vijftig punten tot de limiet van 125.\n\nDe mobiele leerlooierij doet er meer toe voor dit ambacht dan enig ander: specialiseer op 75 en een zadeltas vol huiden wordt afgewerkt uitrusting bij het kampvuur in plaats van een terugtocht naar Fenbridge. Hesks leerlooierij-werkopdracht koopt acht ruwe huiden elke 30 minuten, een nette opbrengst voor vellen die je toch verzamelde, en het Boek der Daden markeert Looiers-Handel op vaardigheid 50 met Grootmeester-Leerbewerken bij de limiet.',
   'guide.profPages.craftProse.cooking.identityHeading': 'De pot die de groep voedt',
-  'guide.profPages.craftProse.cooking.identityBody':
-    'Eet een gekookte maaltijd en die geneest je gedurende 18 seconden rust, wat tussen trekken door de goedkoopste genezing in het spel is. De ladder loopt van een Pan-Gebakken Rivierbaars van 90 gezondheid helemaal tot Marlows Grootse Braadstuk op 980, de grootste zitgenezing die bestaat.\n\nOp de ring staat Koken tussen Alchemie en Leerbewerken. Zijn levende paar is de Apotheker, Alchemie en Koken, gezworen voor Kok Marlow bij de Oostbeekse keukens na het jagen op vier wilde everzwijnen voor de pot; het Jager-paar met Leerbewerken staat op de ring als naam maar heeft nog geen eedquest.',
   'guide.profPages.craftProse.cooking.materialsHeading':
     'Een voorraadkast gevoed door hengel en mes',
-  'guide.profPages.craftProse.cooking.materialsBody':
-    'Vissen levert de kenmerkende ingredienten, zone voor zone: spiegelforel en rivierbaars uit de wateren van Oostbeekdal, moerassnoek en veenaal uit Slijkveenmoeras, ijsvinnenforel en leivinkarper uit Doorntop-Hoogten. Elke trede van de ladder kookt de vis van zijn rang, dus een kok die vist droogt nooit op.\n\nDe slagerskant komt van geoogste lijken: wildvlees van everzwijnen en verwanten, en bij een zeldzame of betere oogstrol een gesigneerd Stuk Ossenhaas, het middelpunt van het grootse braadstuk. Kruiden kruiden de betere gerechten, een ashwood-blok rookt de aal, en Kookzout kost 8 koper per zakje bij Marlows eigen stalletje.',
   'guide.profPages.craftProse.cooking.ladderHeading': 'Van boemdrogen tot het grootse braadstuk',
   'guide.profPages.craftProse.cooking.ladderBody':
-    "Gezouten Boemdrogen is het veldrecept: van het begin bekend, een spin-poot, overal te craftten, het reisvoor van elke verse avonturier. De leermeesters-ladder kookt bij de Oostbeekse keukens aan de westkant van het plein: de gratis trede op vaardigheid 0 (de baars, Jager's Wildspies, Gekruidde Moerassnoek), de midtrede op vaardigheid 25 voor 25 zilver per recept (Ashwood Gerookte Aal, Goudblad-Wildstoofpot, Ijsvinnen-Vissoep), en de zeldzame trede op vaardigheid 50 voor 1 goud elk (Zilverkarper-Maaltijd, Hengelaar's Feestschotel, Marlows Grootse Braadstuk).\n\nBatchgerechten strekken je ingredienten: de gerookte aal en de wildstoofpot serveren twee per bereiding, en de feestschotel drie. Marlow leert elke trede zodra jouw rang in Koken die bereikt.",
+    "Gezouten Boemdrogen is het veldrecept: van het begin bekend, een spin-poot, overal te craftten, het reisvoor van elke verse avonturier. De leermeesters-ladder kookt bij de Oostbeekse keukens aan de oostkant van het plein: de gratis trede op vaardigheid 0 (de baars, Jager's Wildspies, Gekruidde Moerassnoek), de midtrede op vaardigheid 25 voor 25 zilver per recept (Ashwood Gerookte Aal, Goudblad-Wildstoofpot, Ijsvinnen-Vissoep), en de zeldzame trede op vaardigheid 50 voor 1 goud elk (Zilverkarper-Maaltijd, Hengelaar's Feestschotel, Marlows Grootse Braadstuk).\n\nBatchgerechten strekken je ingredienten: de gerookte aal en de wildstoofpot serveren twee per bereiding, en de feestschotel drie. Marlow leert elke trede zodra jouw rang in Koken die bereikt.",
   'guide.profPages.craftProse.cooking.routeHeading':
     'Specialisatie, niet meesterwerken, en de weg naar 125',
   'guide.profPages.craftProse.cooking.routeBody':
     'Koken is de eerlijke uitzondering op het meesterwerksverhaal: een maaltijd heeft geen statistiekreeks om te verbeteren, dus gerechten gooien er nooit een, en geen kok zou er achteraan moeten jagen. De meesterschap van het ambacht is specialisatie op 75: een vijfde minder van elk ingredient, wat snel samengesteld wordt bij batchgerechten, en een mobiele veldkeuken zodat het feest wordt gekookt bij de kerkerdeur.\n\nKook wat je vangt: combineer de klim met een vissessie en de twee vaardigheden voeden elkaar helemaal omhoog. Boemdrogen en de gratis trede brengen je naar 25 voor een punt per bereiding, de midtrede naar 50, en de zeldzame trede naar 75; voorbij 75 verschijnt er geen hoger gerecht, dus de zeldzame gerechten vervagen naar halve en daarna kwart winst, ruwweg 150 bereidingen meer tot de limiet. Behandel het als het aanleggen van voorraden, niet als grinden: een gilde eet elke portie.\n\nMarlows keukenswerkopdracht koopt acht wildvlees elke 30 minuten voor munt en XP, en het Boek der Daden markeert Ervaren Kok op vaardigheid 50 op weg naar de titel Grootmeester-Koken op 125.',
   'guide.profPages.craftProse.alchemy.identityHeading': 'Flesjes die gevechten winnen',
-  'guide.profPages.craftProse.alchemy.identityBody':
-    'Het ambacht wordt uitgeoefend bij de apotheek in Hoogstwacht, de thuisbasis van Alchemist Verane, Meester van de Apotheek, die de receptenladder onderwijst, Glazen Flesjes verkoopt voor 12 koper, en munt betaalt voor kruiden via haar werkopdracht.\n\nOp de ambachtsring staat Alchemie bij de ambachten die van vallen en opstaan afhangen, naast Knutselwerk aan de ene kant en Koken aan de andere. Dat geeft het twee paaridentiteiten: de Bommenwerper (Knutselwerk en Alchemie, gezworen voor Tinker Gizzel in Oostbeek) en de Apotheker (Alchemie en Koken, gezworen voor Kok Marlow). Stem af op een van beide paren om Alchemie tot hoofdambacht te maken en de vaardigheid helemaal tot zijn limiet te openen; tot dan werkt het tot de zeldzame rang zoals elk ongedeclareerd ambacht.',
   'guide.profPages.craftProse.alchemy.materialsHeading': 'Kruiden, klieren en glas',
   'guide.profPages.craftProse.alchemy.materialsBody':
     'Elke drank wil een Glazen Flesje plus kruiden die bij zijn trede passen: glansloofkruid groeit in Oostbeekdal, goudblad in Slijkveenmoeras, en zonnebloem in Doorntop-Hoogten, een kruid per zone, zodat je flesjes samen met jou de wereld beklimmen. Kruidenkunde is de logische partnervaardigheid, al werkt kopen bij verzamelaars of op de markt net zo goed; diepere zones herbergen patches van hogere rang die een betere sikkel vereisen, dus houd je gereedschap bij als je zelf plukt.\n\nDe elixerlijn voegt een jagersbestanddeel toe: Gifklieren geoogst van giftige lijken, en het topelixer vraagt een Ongeschonden Gifklier, het zeldzame gesigneerde exemplaar dat een geluksvondst bij een lijkoogst oplevert. Als je zelf niet oogst, zijn dat precies de goederen die het waard zijn om een jagersvriend om te vragen.',
   'guide.profPages.craftProse.alchemy.ladderHeading': 'De receptenladder',
-  'guide.profPages.craftProse.alchemy.ladderBody':
-    'Iedereen kent het Kleine Geneesmiddel van het begin en kan het overal mengen, geen werkbank nodig. De echte ladder bestaat uit negen recepten die Verane bij de apotheek onderwijst, drie op elke trede: de vaardigheid 0-recepten zijn gratis, de trede van vaardigheid 25 kost 25 zilver per recept, en de trede van vaardigheid 50 kost 1 goud per recept. Elke trede bevat een genezende drank, een manadrank en een uithoudingselixer, opklimmend van gewone glansloofkruid-flesjes (120 gezondheid, 160 mana) via ongewone goudblad (200 gezondheid, 260 mana) tot zeldzame zonnebloem (280 gezondheid, 360 mana).\n\nDe elixers klimmen op dezelfde manier: het Elixer van het Everzwijn verleent 6 Uithoudingsvermogen gedurende 10 minuten, het Gifvuur-Elixer 9 gedurende 15 minuten, en het Elixer van de Slang 12 gedurende 15 minuten, waarbij twee flesjes per bereiding worden gebrouwen. Nog een recept staat apart: het Elixer van de Beer, een combinatiebrew dat Verane leert voor 25 zilver zodra je Alchemie 25 bereikt, overal mengbaar, maar alleen door een afgestemde Bommenwerper met zowel Alchemie als Knutselwerk op 25.',
   'guide.profPages.craftProse.alchemy.routeHeading': 'De weg van een brouwer naar 125',
-  'guide.profPages.craftProse.alchemy.routeBody':
-    'Dranken en elixers gooien nooit meesterwerken; dat proc behoort toe aan uitrusting met stats. Je naam reist toch mee: de zeldzame zonnebloem-dranken worden fles voor fles gebrouwen en geleverd met het merkteken van de maker, terwijl het dubbelbatch Elixer van de Slang zonder signatuur blijft. Op vaardigheid 75 specialiseer je, en elk Alchemierecept kost daarna 20 procent minder materialen.\n\nNeem Kruidenkunde vroeg op en pluk terwijl je levelt: glansloofkruid is overal in het Dal, en zodra je bij Veranes apotheek aankomt, draagt de gratis trede je netjes naar vaardigheid 25 op kruiden die je toch al had geplukt. Leer de trede van 25 zodra die opengaat, verschuif je pluk naar het moeras voor goudblad, en laat Veranes werkopdracht (zes Goudblad-Kruiden voor 45 koper, herhaalbaar elke 30 minuten) onderweg wat munt teruggeven.\n\nVanaf 50 brouw je zonnebloemdranken en Slangenbatches van Doorntop-kruiden. De laatste etappe van 100 tot 125 druipt bewust langzaam, dus brouw wat daadwerkelijk verkoopt in plaats van kruiden te verbranden voor het getal, en onthoud dat verbruiksgoederen de ene vervaardigde waar zijn die iedereen voor altijd blijft kopen. Het Boek der Daden markeert Vreemde Brouwsels op vaardigheid 50 en Grootmeester-Alchemie bij de limiet.',
   'guide.profPages.craftProse.engineering.identityHeading':
     'Het monopolie van de gereedschapsmaker',
-  'guide.profPages.craftProse.engineering.identityBody':
-    'Het ambacht wordt uitgeoefend bij de gereedschapsmakerij in de zuidoostelijke hoek van het Oostbeek-plein, thuisbasis van Tinker Gizzel, Meester van de Gereedschapsmakerij. Rang 1 tot en met 3 van elke gereedschapslijn zijn gewone verkopersvoorraad; rang 4 en 5 bestaan alleen via een knutselaar.\n\nOp de ring staat het bij de ambachten die van vallen en opstaan afhangen, naast Alchemie en Harnasmaken, wat hem twee paaridentiteiten geeft: de Bommenwerper (Knutselwerk en Alchemie, gezworen voor Gizzel zelf) en de Tandwielsmid (Harnasmaken en Knutselwerk, als naam maar nog niet zweerbaar). Een waarschuwing is hier belangrijker dan ergens anders: beide receptentreden van Knutselwerk liggen boven het zeldzaam-rang-plafond dat hobbys en ongedeclareerde vakmannen onder werken, dus het vaardigheidsgetal beweegt alleen voor een vakman wiens hoofdambachten Knutselwerk bevatten, wat vandaag de Bommenwerper betekent. Iedereen kan de gereedschappen nog steeds bouwen; een niet-afgestemde vakman leert er gewoon niets van.',
   'guide.profPages.craftProse.engineering.materialsHeading': 'Reagenten en vorige gereedschappen',
-  'guide.profPages.craftProse.engineering.materialsBody':
-    'Elk gereedschapsrecept verbruikt het gereedschap een rang eronder plus een premium-materiaal: vier Osmiumerts en een Hemelzilver Mijnpik worden de Osmium Mijnpik, dan twee Glyfstaalbaren en die osmium-pik worden de Glyfstaal Mijnpik, en de bijl- en sikkellijnen spiegelen dezelfde vorm met Essenhout- en Hoogdenblokken, Goudblad- en Zonnebloem-kruiden.\n\nGizzel verkoopt alle zes premium-reagenten bij de gereedschapsmakerij voor wie snelheid boven marge stelt, maar het erts, de blokken en de kruiden zijn allemaal te verzamelen in Slijkveenmoeras en Doorntop-Hoogten, en verzamelde voorraad is waar de winst ligt. De ene uitzondering is de Glyfstaalstaaf, die alleen bij verkopers beschikbaar is, dus elk glyfstaal-rang-gereedschap heeft een vaste muntbodem ingebouwd in zijn kosten.',
   'guide.profPages.craftProse.engineering.ladderHeading': 'De gereedschappenladder',
-  'guide.profPages.craftProse.engineering.ladderBody':
-    'De gehele ladder bestaat uit zes recepten, allemaal gebonden aan de gereedschapsmakerij en allemaal automatisch bekend, nooit een leermeestersvergoeding: de rang 4-pik, bijl en sikkel op vaardigheid 75, en de rang 5-versies op vaardigheid 150. Dat tweede getal is geen tikfout en staat met opzet boven de huidige limiet van 125: vaardigheidsvereisten blokkeren hier nooit een vervaardiging, ze bepalen alleen de vaardigheidswinst, dus je kunt een rang 5-gereedschap bouwen op de dag dat je zijn reagenten en rang 4-voorganger bezit.\n\nElk afgewerkt gereedschap is van zeldzame of epische kwaliteit en komt gesigneerd uit, dus je naam reist op de gereedschapsriemen van andere spelers door de zones. Knutselwerk ondersteunt ook de helft van een combinatierecept: het Elixer van de Beer, gebrouwen door een afgestemde Bommenwerper met zowel Knutselwerk als Alchemie op 25.',
   'guide.profPages.craftProse.engineering.routeHeading': 'De weg van een knutselaar naar 125',
   'guide.profPages.craftProse.engineering.routeBody':
     'Gereedschappen dragen geen gevechtsstats, dus ze gooien nooit meesterwerken; dat proc behoort toe aan uitrusting met stats. Specialisatie landt nog op vaardigheid 75: 20 procent minder materialen per vervaardiging, en een tijdelijke veldgereedschapsmakerij die elke verzameltrip in een werkplaats verandert. De winstberekening vervaagt hier nauwelijks: de vaardigheid 75-recepten leveren volle winst op tot 100 en de helft daarna, en de vaardigheid 150-recepten leveren volle winst op helemaal tot de limiet van 125, dus de echte beperking zijn reagenten en munt, nooit grijze recepten.\n\nKies eerst je paar, want niets beweegt zonder: neem de Bommenwerper-afstemming van Tinker Gizzel. Voed dan de ladder: level Mijnbouw, Houtkap of Kruidenkunde zelf of bevriend verzamelaars, koop de rang 3-gereedschappen bij verkopers, en behandel Gizzels werkopdracht (acht Ijzerbastblokken voor 16 koper, herhaalbaar elke 30 minuten) als zakgeld.\n\nKnutselwerk is een laagvolumig prestige-ambacht, ruwweg een vaardigheidspunt per afgewerkt gereedschap, dus behandel elke vervaardiging als voorraad voor verkoop. Het verkooppraatje aan je klanten schrijft zichzelf: elke gereedschapsrang boven het eigen niveau van een grondstoffenpunt knipt 0,4 seconden af van de 2,5 seconde verzamelworp (tot een minimum van 1,5 seconde), dus een rang 5-gereedschap is een snelheidsupgrade op elk grondstoffenpunt in de wereld, en alleen jij kunt er een maken. Het Boek der Daden markeert Tandraderen en Veren op vaardigheid 50 en Grootmeester-Knutselwerk op 125.',
   'guide.profPages.craftProse.enchanting.identityHeading':
     'Uitrusting uit elkaar, kracht er weer in',
-  'guide.profPages.craftProse.enchanting.identityBody':
-    'Er is geen werkbank, geen leermeester en geen te kopen receptenlijst: elke betovering is van het begin bekend, iedereen kan van dag een ontbetoveren, en de vaardigheid heeft zijn limiet op 125 zoals elk ambacht.\n\nOp de ring staat het tussen Inscriptie en Juwelenmaken, dus zijn twee paaridentiteiten zijn de Arcaneschrijver (Inscriptie en Betovering) en de Edelsteenbezweerder (Betovering en Juwelenmaken). Geen van beide kan al worden gezworen, omdat beide buren hun eerste recepten nog afwachten, dus vandaag klimt Betovering als ieders ambacht: gratis tot de zeldzame rang voor elke eed, en een logische hobbyvoorkeur voor een Bommenwerper of een Apotheker. Betoveraars houden ook de verzamelwereld draaiende: de drie plaatsbare gereedschapseffecten zijn Betoverings-werk, en een oorspronkelijke vakman herlaadt zijn eigen effecten met korting, nog dieper na specialisatie.',
   'guide.profPages.craftProse.enchanting.levelingHeading': 'Hoe Betovering omhoog gaat',
-  'guide.profPages.craftProse.enchanting.levelingBody':
-    'Twee acties bewegen de vaardigheid: het ontbetoveren van een stuk, en het aanbrengen van een betovering. Elk succes is tot een punt waard, geschaald naar hoe serieus het werk is: de zeldzaamheid van het stuk dat je afbreekt, of de reagenstrang van de betovering die je aanbrengt. Gewone ontbetoveringen en alleen-stof-betoveringen scoren als gewoon werk; ongewone ontbetoveringen en essentiebetoveringen als ongewoon; zeldzame ontbetoveringen en elke Geruned of Grotere betovering als zeldzaam; epische en legendarische ontbetoveringen nog hoger.\n\nDe bekende meesterschapsvervaging geldt op 25-puntsintervallen, dus gewoon-gradige werk wordt grijs op vaardigheid 75, ongewoon werk op 100, en zeldzaam-gradige werk precies bij de limiet van 125. Betovering heeft ook een eigen vriendelijkheid: input boven je archetypenplafond wordt afgerond naar dat plafond in plaats van nul te worden, dus voor je afstemt scoort een epische ontbetovering gewoon als zeldzaam in plaats van niets te leren. Als Betovering slapend achter een andere identiteit eindigt, scoort alles als gewoon werk en stagneert de klim bij 75; houd het als hobby en zeldzaam-gradig werk levert nog op, alleen trager voorbij 75.',
   'guide.profPages.craftProse.enchanting.marketHeading':
     'Betoverde exemplaren, herkomst en de markt',
-  'guide.profPages.craftProse.enchanting.marketBody':
-    'Het aanbrengen van een betovering verbruikt de reagenten en markeert een specifiek exemplaar van het item. Richt je op een exemplaar in de tas, dan krijg je een apart betoverd exemplaar terug; richt je op een stuk dat je al draagt, dan wordt het ter plekke betoverd, zonder af te doen en weer aan te trekken. Hoe dan ook volgt de bonus het stuk voor altijd, door uitkleedmomenten, bankbezoeken en ruilingen. Een betovering per stuk: een andere betovering aanbrengen op een betoverd exemplaar vraagt eerst om bevestiging en vervangt dan de oude betovering meteen; die wordt vernietigd zonder terugbetaling van de materialen. Verkopen, weggooien en ontbetoveren geven de voorkeur eerst aan gewone exemplaren, zodat je afgewerkte stuk niet per ongeluk wordt opgevreten. Identiek betoverde exemplaren stapelen zelfs samen in je tassen.\n\nMeesterwerkuitrusting en betovering zijn vrienden: een meesterwerkstuk blijft volledig betoverbaar, en de betovering telt op bij de meesterwerkbonus zonder hem of de signatuur van de maker te verstoren. Door elke bron te stapelen is een gesigneerd meesterwerk met een Grotere betovering het beste wat een gemaakt stuk kan bereiken, en het zit nog steeds onder de raidvloer.\n\nOp de markt brokeert de Wereld Markt alleen gewone, ongewijzigde voorraad, dus betoverde en gesigneerde stukken wisselen van hand via het ruilvenster. De materialen zijn de vermarktbare helft van het ambacht: Stof, Essentie en Scherven worden vrij genoteerd, notering kost niets, en de Koopman neemt slechts 5 procent van een voltooide verkoop. Dat maakt de twee klassieke betoverings-inkomens: materialen verkopen op de markt, en het stuk van een klant in ruil nemen, het betoveren en teruggeven.',
   'guide.profPages.howHeading': 'Hoe vervaardiging werkt',
-  'guide.profPages.howBody':
-    'Open het vervaardigingsvenster (standaardtoets T) en elk recept dat je kent staat vermeld met wat je nodig hebt en wat je bij de hand hebt. Stationsgebonden recepten vragen je binnen 20 meter van het juiste station in de stad te staan, veldrecepten kun je overal maken, en Betovering heeft nooit een station nodig. Er is geen mislukkingskans: een vervaardiging met de materialen bij de hand slaagt altijd.\n\nTwee kleine wrijvingen houden de economie eerlijk. Elke geslaagde vervaardiging betaalt een vergoeding van 2 koper per punt van het statistiekbudget van het voorwerp, en vervaardigingsacties delen een tempo: maximaal 10 vervaardigingen, onttoveringen, betoveringen of salvages in elke 60 seconden. Geen van beide zal een normale sessie hinderen; beide voorkomen dat een gemaximaliseerde specialist de markt overspoelt.',
   'guide.profPages.recipesHeading': 'Recepten',
   'guide.profPages.recipesNote':
     'Elk recept van het ambacht: het exacte vaardigheidsvereiste en de materialen, waar het geleerd wordt en voor welke vergoeding, en de drie vaardigheidswaarden waarbij de winst daalt naar de helft, een kwart en niets.',
@@ -213,11 +244,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.masteryBody':
     'Elk recept in het venster draagt zijn winstkleur in de klassieke kleuren: oranje betekent volledige winst, geel de helft, groen een kwart, grijs niets. De grenzen zijn exact, elke {step} vaardigheid is een rang, en een recept vervaagt een kleur voor elke rang dat het onder de jouwe valt.\n\nOmdat winsten deterministisch zijn (een vervaardiging met volledige winst verplaatst je altijd precies een punt), kun je een hele klim plannen vanuit de lijst: werk een trede terwijl die oranje is, train de volgende trede zodra die geel wordt, en verspil nooit materialen aan een grijze vervaardiging in de hoop op vooruitgang. Op de grens van {cap} stopt het getal, maar de recepten, de meesterwerkkans en de winsten blijven werken.',
   'guide.profPages.masterworkHeading': 'Meesterwerken',
-  'guide.profPages.masterworkBody':
-    'Elke geslaagde vervaardiging levert precies wat het recept belooft, en soms iets meer: een meesterwerk maakt hetzelfde stuk een kwaliteitsrang fijner af, met de bonusstatistieken ingebakken bij het maken. Het is altijd een toevoeging, nooit een verslechtering, en het blijft onder de raidvloer, zodat gemaakte uitrusting uitstekend kan zijn zonder een raidloot te vervangen.\n\nDe kans is gepubliceerd, niet mysterieus: {base}% basis, plus {perTier}% per rang dat je vaardigheid boven het recept zit, plus {signed}% wanneer een gesigneerd reagens wordt ingevoerd, plus {spec}% zodra je gespecialiseerd bent, waarbij hogere materialen 1 tot 2% extra toevoegen, alles gemaximeerd op {cap}%. Alleen een stuk met echte statistieken kan verbeteren, dus naamloze gewone voorwerpen, gereedschap en verbruiksartikelen produceren er nooit een; een sluimerende vervaardiging produceert er nooit een, en een hobbyvervaardiging kan niet boven zijn zeldzame plafond meesterwerken.\n\nFijn werk draagt zijn maker. Zeldzame en betere enkelvoudige producten zijn gesigneerd (Gemaakt door; verzamelde materialen dragen Verzameld door), een meesterwerk is altijd gesigneerd ongeacht de kwaliteit, en identiek gesigneerde stukken kunnen nog steeds stapelen. Een handtekening is herkomst, geen vergrendeling: gesigneerde goederen worden vrij verhandeld.',
   'guide.profPages.trainingHeading': 'Training',
-  'guide.profPages.trainingBody':
-    'Trainerrecepten komen van de vaste meesters, onderwezen bij hun stations. De regel is een zinnetje: een meester leert een recept zodra je rang in het ambacht de eigen rang van het recept heeft bereikt, en niets anders blokkeert het, niet je niveau, niet je archetype. De trainerladder heeft treden op vaardigheid 0, 25 en 50 vandaag, dus een nieuwe trede opent bij elke rang die je klimt.\n\nVergoedingen zijn eenmalig en vast per trede: de begintrede is gratis, de vaardigheid-25-trede kost {tier1} per recept, en de vaardigheid-50-trede kost {tier2}. Je moet bij het werkelijke station van de meester staan om te trainen, en een mobiel station telt nooit mee. De gewone veldrecepten en de gereedschapsrecepten hebben helemaal geen training nodig; elk personage kent ze al vanaf het begin.',
   'guide.profPages.specializationHeading': 'Specialisatie',
   'guide.profPages.specializationBody':
     'Bij vaardigheid {at} specialiseert dit ambacht je, geen quest vereist: recepten kosten vanaf dan {pct}% minder materialen, en specialisatie voegt zijn eigen bonus toe aan de meesterwerkkans.\n\nGespecialiseerden leren ook de werkplaats mee te nemen: een gespecialiseerde maker kan tien minuten per keer een mobiel station in het veld opzetten, zodat stationsgebonden recepten bij de mijnmond bewerkt kunnen worden in plaats van terug in de stad. De beperkingen zijn bewust: het telt nooit mee voor training bij een meester of voor het ontbinden van een opdrachtstuk, en het verloopt op zijn timer of je het nu gebruikt of niet.',
@@ -231,8 +258,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.ench.meleeWeapons': 'Meleewapens',
   'guide.profPages.ench.timberWeapons': 'Staven, stokken, bogen en kruisbogen',
   'guide.profPages.ench.enchantsHeading': 'Betoveringen',
-  'guide.profPages.ench.enchantsNote':
-    'Betoveringen komen in drie lagen. De basislaag draait op Chimestof (met een beetje Essentie aan het hoge einde) en bestrijkt het wapenslot plus elk wapenrustingslot, met genoeg statistiek-asopties dat elke build iets vindt voor elk slot. De Grotere laag kost één Chimescherf plus Essentie en is het enige waarvoor Scherven zijn: sterkere bonussen op de hoogst-impactsslots.\n\nDaartussenin zitten de vijf Gerunede betoveringen, één verbruiker per getypte secondaire, zodat niets wat je vermaalt ooit een doodlopende weg is: Gerund Snijvlak (wapen, Kracht, verbruikt Resonant Staal), Geruned Focus (wapen, Intellect, Resonant Hout), Runeweefsel (torso, Geest, Resonant Draad), Gerunede Huid (beenstukken, Behendigheid, Resonante Huid), en Geruned Maliën (helm, Uithoudingsvermogen, Resonante Maliën). Elk neemt ook twee Chimessentie en zit qua sterkte tussen zijn basis- en Grotere-broers; de exacte bonussen staan allemaal in de tabel hieronder.',
   'guide.profPages.ench.colEnchant': 'Betovering',
   'guide.profPages.ench.colSlot': 'Slot',
   'guide.profPages.ench.colTier': 'Rang',
@@ -244,42 +269,23 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.ench.salvageNote':
     'Salvagen is de alledaagse neef van onbetoveren: dezelfde wapens en wapenrusting, geen vaardigheid vereist en geen vaardigheid gewonnen, waarbij gewone knutselschroot wordt teruggegeven per kwaliteit in plaats van iets arcaans. Iedereen kan het doen, betoveraar of niet. Wanneer je een stuk vasthoudt dat de moeite waard is te breken, is de keuze eenvoudig: vanaf zeldzaam is onbetoveren strikt de betere deal, terwijl bij gewoon de twee opbrengsten voor ongeveer hetzelfde bij een handelaar verkopen, dus breek naar welk materiaal je daadwerkelijk nodig hebt.',
   'guide.profPages.ench.bonusFmt': '+{value} {stat}',
-  'guide.profPages.gatherIntro.mining':
-    'Mijnbouw haalt erts rechtstreeks uit het gesteente: koper in Oostbeekdal, ijzer in Slijkveenmoeras, en osmium in Doorntop-Hoogten, als voeding voor de smeedambachten. Open voor iedereen vanaf niveau 1: je hebt alleen een mijnhouweel in je tassen nodig, 20 koper bij elke zonehub. Bijgehouden op zijn eigen teller tot een grens van 100.',
-  'guide.profPages.gatherIntro.logging':
-    'Houtkap velt hout uit houtopstanden in alle drie zones: ijzerschors in Oostbeekdal, essenhout in Slijkveenmoeras, en hoogden in Doorntop-Hoogten, de ruwe grondstof voor schachten, staven en de gereedschapsmakerij. Open voor iedereen vanaf niveau 1 met een kapbijl in je tassen (20 koper bij elke zonehub), bijgehouden op zijn eigen teller tot een grens van 100.',
-  'guide.profPages.gatherIntro.herbalism':
-    'Kruidenkunde verzamelt wat wild groeit: glansloofkruid in Oostbeekdal, goudblad in Slijkveenmoeras, en zonnepetaal in Doorntop-Hoogten, het blad en de stengel die de apotheekambachten draaiende houden. Open voor iedereen vanaf niveau 1 met een kruidenkunde-sikkel in je tassen (20 koper bij elke zonehub), bijgehouden op zijn eigen teller tot een grens van 100.',
-  'guide.profPages.gatherIntro.fishing':
-    'Vissen is de vreemde eend onder de verzamelberoepen, en het diepste: een echt aas-en-optrekken-minispel, eigen vangsttabellen in elke zone, en een vaardigheidsgrens van 200, het dubbele van de anderen. Koop een hengel, kijk naar open water, en gooi.',
   'guide.profPages.rhythmHeading': 'Het verzamelritme',
-  'guide.profPages.rhythmBody':
-    'Een oogst is een korte zichtbare cast, geen onmiddellijke greep: {base} seconden basis, nooit onder een vloer van {floor} seconde. Het bezitten van gereedschap boven de rang van het grondstoffenpunt versnelt je met {tool} seconden per rang daarboven, en elke vaardigheidsband die je overschrijdt snoeit nog eens {band} seconden; het grondstoffenpunt precies matchen geeft je toegang, maar het zijn de rangen daarboven die je snel maken.\n\nEen volle tas weigert beleefd de cast voordat die begint, zodat er niets midden in een oogst verspild wordt, en elke oogst betaalt een klein deel personage-XP, geschaald naar het niveau van het grondstoffenpunt ten opzichte van het jouwe, net zoals kill-XP schaalt: een triviaal grijs grondstoffenpunt leert een afgetopte speler niets.',
-  'guide.profPages.gainBody':
-    'Winst is deterministisch, nooit een vaardigheidsrol: een grondstoffenpunt op of boven je winstniveau leert een vol punt per oogst, en elke {step} vaardigheid is een niveau gescoord tegen het grondstoffenpunt. Niveau 1-punten betalen volledig tot 25, half tot 49, een kwart tot 74, en niets vanaf 75; niveau 2-punten betalen volledig tot 49; het ene niveau 3-punt betaalt volledig tot 74 en half helemaal tot de grens van {cap}.\n\nDe bedoelde route is duidelijk: leer op de startpunten van het Dal, ga naar het moeras, en maak de klim af op het hogere terrein van Doorntop-Hoogten. Op de grens stopt het leren, maar de opbrengsten niet: een verzamelaar op de grens blijft voor altijd materialen van maximale kwaliteit binnenhalen.',
   'guide.profPages.nodesHeading': 'Grondstoffenpunten per zone',
   'guide.profPages.nodesNote':
     'Waar de grondstoffenpunten zijn, hun rang, het gereedschap dat ze nodig hebben en wat ze opleveren. Elk grondstoffenpunt hergroeit voor jou {respawn} seconden na je eigen oogst, en die timer is alleen van jou: een andere verzamelaar die hetzelfde grondstoffenpunt bewerkt vertraagt de jouwe nooit, dus er is geen wedloop om grondstoffenpunten en geen kamperen. Elke zone hoger op de ladder brengt een beter materiaal op uit zwaarder terrein.',
   'guide.profPages.toolsHeading': 'Gereedschap',
-  'guide.profPages.toolsNote':
-    'Elk grondstoffenpunt vraagt het gereedschap van zijn ambacht in je tassen, rang 1 inbegrepen: zonder mijnhouweel geen erts, zonder hengel geen vis. De verkoopladder dekt de rangen 1 tot 3 en ligt bij elke zonehub in voorraad; een gereedschapsstuk hoeft alleen in je tassen te zitten, er is geen uitrustslot en geen duurzaamheid, dus elk is een eenmalige aankoop. Alleen de rang telt voor de toegangspoort: de zeldzaamheidskleur van gereedschap is puur cosmetisch.\n\nBoven de verkoopladder staan twee gemaakte gereedschappen, rang 4 en rang 5, gemaakt in de gereedschapsmakerij door knutselaars en nooit verkocht door een NPC. Geen enkel grondstoffenpunt heeft nu meer dan rang 3 nodig, dus hun huidige waarde zit in snelheid: een topgereedschap pinnt de cast op zijn vloer op lagere grondstoffenpunten, en het zal het toegangsticket zijn wanneer hoger terrein arriveert.',
   'guide.profPages.toolCrafted': 'Gemaakt ({craft})',
   'guide.profPages.toolVendor': '{name} ({hub})',
   'guide.profPages.toolUnavailable': 'Niet verkocht',
-  'guide.profPages.priceNone': 'Niet verkocht',
   'guide.profPages.toolTierReq': 'Rang {tier} gereedschap',
   'guide.profPages.yieldsHeading': 'Wat een oogst oplevert',
   'guide.profPages.yieldsBody':
     'Elke oogst rolt een kwaliteit voor wat het oplevert, en je vaardigheid is het hele verhaal van die rol. Een splinternieuwe verzamelaar haalt altijd gewoon materiaal op; elk punt vaardigheid verschuift gewicht gestaag van gewoon naar de hogere kwaliteiten en nooit terug, totdat op de grens van 100 de gewone kwaliteit volledig verdwijnt: 60 procent ongewoon, 30 procent zeldzaam, 8 procent episch en 2 procent legendarisch, elke keer.\n\nKwaliteit betekent ook hoeveelheid: een gewone rol levert 1 eenheid, ongewoon en zeldzaam leveren 2, episch 3, en legendarisch 4. Elke zeldzame, epische of legendarische opbrengst arriveert als een gesigneerde instantie gestempeld Verzameld door jou: op de grens draagt dat vier van de tien oogsten jouw naam, en de herkomstregels op de Ambachtseconomiepagina leggen uit waarom makers extra betalen voor precies die stapels.',
   'guide.profPages.bandsHeading': 'Vaardigheidsbanden',
-  'guide.profPages.bandsBody':
-    'Vaardigheidsbanden zijn de gedeelde 0/100/200-ladder over de teller van een ambacht: elke band die je passeert verkort de verzamelworp, en bij vissen bepalen de banden ook de vangsttabellen (met een bijpassende hengel). De landambachten hebben een limiet van 100, dus band 1 is hun plafond; alleen vissen bereikt band 2.',
   'guide.profPages.bandFmt': 'Band {band}: vanaf vaardigheid {at}',
   'guide.profPages.rareHeading': 'Zeldzame vondsten',
   'guide.profPages.rareBody':
     'Elke oogst, ongeacht je vaardigheid, heeft een kans van 1 op {oneIn} op een zeldzame vondst: een ongerept ertsader in erts, oud kernhout in hout, een maanverlichte bloem tussen de kruiden. De vondst vermenigvuldigt de opbrengst van die oogst {mult} keer, elke eenheid arriveert gesigneerd met jouw naam ongeacht de gerolde kwaliteit, en de hele zone hoort er bij naam over. Elk type legt ook zijn eigen daad zonder Roem vast in je Boek der Daden, een verzamelaarsmerk dat alleen bestaat om te bewijzen dat het jou is overkomen.',
-  'guide.profPages.specimenBody':
-    'Houd wat bagageruimte vrij wanneer je farmt: een buitenkansje heeft open sloten nodig om gesigneerd te landen, en als er niets past arriveert de opbrengst toch maar gaat de handtekening verloren. Lijkoogst heeft ook zijn eigen jackpotarm: ongeveer {pct}% van de lijkoogsten rolt zeldzaam of beter, de opbrengst signerend en, bij specimenfamilies, een gesigneerd perfect exemplaar verlenenend.',
   'guide.profPages.gatherDeedsHeading': 'Daden onderweg',
   'guide.profPages.gatherDeeds.mining':
     'Je eerste grondstoffenpunt van een beroep verdient Vruchten van het Veld, en de grens van 100 in Mijnbouw schrijft Erts in het Bloed in. 100 bereiken in drie van Mijnbouw, Houtkap, Kruidenkunde en Vissen voegt Meesterverzamelaar toe bij 25 Roem, en het kraken van een ongerept ertsader legt zijn eigen verzamelaarsmerk vast. Niets hiervan schenkt macht: daden zijn titels en Roem, een verslag van de wegen die je bewandeld hebt.',
@@ -287,31 +293,19 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Je eerste grondstoffenpunt van een beroep verdient Vruchten van het Veld, en de grens van 100 in Houtkap schrijft Kernhouthakker in. 100 bereiken in drie van Mijnbouw, Houtkap, Kruidenkunde en Vissen voegt Meesterverzamelaar toe bij 25 Roem, en een slag in oud kernhout legt zijn eigen verzamelaarsmerk vast. Daden zijn titels en Roem, nooit macht.',
   'guide.profPages.gatherDeeds.herbalism':
     'Je eerste grondstoffenpunt van een beroep verdient Vruchten van het Veld, en de grens van 100 in Kruidenkunde schrijft Meester van de Weide in. 100 bereiken in drie van Mijnbouw, Houtkap, Kruidenkunde en Vissen voegt Meesterverzamelaar toe bij 25 Roem, en een maanverlichte bloem legt zijn eigen verzamelaarsmerk vast. Daden zijn titels en Roem, nooit macht.',
-  'guide.profPages.gatherDeeds.fishing':
-    'De mijlpaal van 100 schrijft Oude Zout in en 200 schrijft Meesterhengelaar in met zijn titel, het absolute toppunt van de visserskunst; Vissen telt ook mee voor Meesterverzamelaar, verdiend bij 100 in drie verzamelberoepen. Een eerste vis uit het water van elke zone vult zijn eigen pagina, en de Zonglinstering-Koi legt Sprankje Hoop vast, zodat reizigers met een hengel in hun rugzak hun boek sneller vullen dan verwacht.',
   'guide.profPages.fish.startHeading': 'Aan de slag',
-  'guide.profPages.fish.startBody':
-    'Een Eenvoudige Hengel kost 20 koper bij Visser Brandt in Eastbrook (zoek de Oude Zout die vanuit de oostrand van de stad op Spiegelmeer staat te staren); Knutselaar Gizzel, Leverancier Hale in Fenbridge en Kwartiermeester Bree in Highwatch hebben ook hengels in de aanbieding. Gebruik de hengel terwijl je naar water kijkt dat diep genoeg is voor vissen, tot circa 24 meter voor je, en je dobber vliegt eruit.\n\nJe kunt niet gooien terwijl je in gevecht bent, terwijl je zwemt of terwijl je dood bent: gooien vanaf de oever is de bedoelde houding, en elk visbaar water werkt, in iedere zone.',
   'guide.profPages.fish.biteHeading': 'Aanslaan en inhalen',
-  'guide.profPages.fish.biteBody':
-    'Na de worp komt er een beet op een verborgen moment tussen {min} en {max} seconden; de vertraging wordt bepaald wanneer de lijn landt, zodat geen twee worpen hetzelfde aanvoelen. Wanneer de dobber aanslaat, heb je een venster van {reel} seconde om de hengel opnieuw in te drukken en binnen te halen: reel je binnen dat venster in, dan landt de vangst; aarzel je er voorbij, dan ontsnapt de vis zonder iets te tonen. Een hele sessie heeft een maximum van {cap} seconden, zodat zelfs een stille worp snel wordt afgerond.\n\nBetere hengels verscherpen beide uiteinden van het minigame: elke hengelrang boven de eerste snoeit {rod} seconden van de langst mogelijke wachttijd en voegt {reelRod} seconden toe aan het inhalenvenster, zodat de Hengel met ijzeren molen de langste wachttijd terugbrengt naar 6,5 seconden met een venster van 3,75 seconden, en de Zilverbeek-hengel naar 5 en 4,5. De snelste beten veranderen nooit wat je ook vasthoudt, en een hengel hoeft alleen in je tassen te zitten om mee te tellen.',
   'guide.profPages.fish.scheduleHeading': 'Vaardigheidswinst',
-  'guide.profPages.fish.scheduleNote':
-    'Vaardigheidswinst bij vissen verloopt volgens een vast schema zonder kans: een vol punt per vangst tot 50 vaardigheid, een half punt tot 100, een tiende tot 150, en een traag getrickle van 0,02 van 150 tot 200. Dat laatste stuk is expres een reis van duizenden vangsten: 200 is een prestatieverklaring, geen tussenstop op weg naar iets anders.\n\nRommel houdt helemaal op te leren bij {cutoff}: daarna zijn wier en laarzen gewoon wier en laarzen. Elke andere gemaakte vangst levert op het geplande tempo winst op, dus vis waar je toch al zou vissen en laat de teller stijgen.',
   'guide.profPages.fish.colProficiency': 'Vaardigheid',
   'guide.profPages.fish.colGain': 'Winst per vangst',
   'guide.profPages.fish.belowFmt': 'Onder {below}',
   'guide.profPages.fish.tablesHeading': 'Vangsttabellen',
-  'guide.profPages.fish.tablesNote':
-    'Je vaardigheid bepaalt een van drie vangstbanden: band 0 vanaf het begin, band 1 bij 100, band 2 bij 200, waarbij elke band gewicht verschuift van rommel en lege haken naar echte vissen, zone voor zone. Elke band boven de eerste vereist ook een hengel: band 1 wil de rang 2 Hengel met ijzeren molen, band 2 de rang 3 Zilverbeek-hengel. Je effectieve band is de laagste van wat je vaardigheid heeft verdiend en wat je hengel ondersteunt, en het plafond is stil: met een mindere hengel vang je nog steeds, maar van de lagere bandtabel, dus als je vangsten vastgelopen aanvoelen terwijl je vaardigheid stijgt, controleer dan eerst je hengel.\n\nHet water van elke zone herbergt zijn eigen paar voedselvissen die meer genezen naarmate de zone dieper is, allemaal kookingredienten en prima rauwe eetklare vis van de lijn. De rest van de tabel is de belasting van de hengelaar: wier, de occasionele laars en de lege haak, die nooit volledig verdwijnt. De {rare} is dezelfde kleine kans op elke lijn, met vaste kansen die nooit veranderen met vaardigheid, dus de nieuwste hengelaar op de steiger heeft dezelfde kans als een Meesterhengelaar.',
   'guide.profPages.fish.bandHeading': 'Band {band}: vaardigheid {at} en hoger, hengelrang {rod}',
   'guide.profPages.fish.colCatch': 'Vangst',
   'guide.profPages.fish.colOdds': 'Kansen',
   'guide.profPages.fish.pctFmt': '{pct}%',
   'guide.profPages.fish.emptyHook': 'Niets bijt',
   'guide.profPages.fish.koiHeading': 'De Zonglinstering-Koi',
-  'guide.profPages.fish.koiBody':
-    'Elk waterlichaam in het spel verbergt hetzelfde hoofdprijsje: de Zonglinstering-Koi, een ongewone glinstering aan de lijn waard 75 koper bij een handelaar en behoorlijk meer voor je trots. De kansen zijn een vaste 3 procent per geland gevangen exemplaar (4 procent in het koude water van Doorntop) bij elke band, en er een landen registreert Sprankje Hoop in je Boek der Daden, een nul-Roem verzamelaarsdaad. Als het gebeurt, zorg het logboek ervoor dat je het weet.',
   'guide.profPages.econ.title': 'Ambachteconomie',
   'guide.profPages.econ.intro':
     'Hoe munt door de ambachten stroomt: de exacte vergoedingen en afvoerputten, wat er werkelijk verkoopt, de regels van de Wereldmarkt, werkopdrachten, opdrachten, en waarom ambachtskracht stopt onder de raidgrens.',
@@ -327,8 +321,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.feeUnbind': 'Ontbindingsvergoeding',
   'guide.profPages.econ.feeUnbindValue': '{uncommon} ongewoon, {rare} zeldzaam, {epic} episch',
   'guide.profPages.econ.trainingHeading': 'Trainingsvergoedingen',
-  'guide.profPages.econ.trainingNote':
-    'Één vaste vergoeding per recepttrede, eenmalig in rekening gebracht wanneer een meester die onderwijst; de hogere lagen van de tabel wachten op toekomstige inhoud.',
   'guide.profPages.econ.trainingTierFmt': 'Rang {tier}: {fee}',
   'guide.profPages.econ.free': 'Gratis',
   'guide.profPages.econ.sellsHeading': 'Wat verkoopt, en waarom',
@@ -348,14 +340,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.commissionsBody':
     'Een opdracht is een vervaardiging gemaakt voor iemand anders. Wanneer je een wapen, wapenrustingsstuk of gehouden off-hand maakt (een drankje kan geen band dragen), kan de ambachtsman de vervaardiging aanmerken als opdracht: het afgewerkte stuk gedraagt zich normaal in de handen van de maker, maar het moment dat het van eigenaar wisselt in een ruil, bindt het aan de ontvanger. Dat is de Makersbond: de koper krijgt zijn stuk, en het stuk kan niet verder worden doorgegeven of doorverkocht.\n\nBonds zijn niet voor altijd, alleen kostbaar. Elke stationsmeester verbindt een gebonden stuk los terwijl je bij zijn station staat (een mobiel station biedt de dienst nooit aan), voor een bedrag bepaald door de kwaliteit van het voorwerp: 25 zilver ongewoon, 1 goud zeldzaam, 4 goud episch, waarbij een legendarisch het epische tarief betaalt en een gewoon opdrachtsstuk het ongewone.\n\nHet bedrag koopt een schone lei, geen genezing: het stuk is nog steeds een opdracht, dus het bindt opnieuw aan wie het in de volgende ruil ontvangt, en al het andere, handtekening, meesterwerk en betoveringen, blijft ongewijzigd.',
   'guide.profPages.econ.provenanceHeading': 'Ondertekend werk',
-  'guide.profPages.econ.provenanceBody':
-    "Sommige voorwerpen dragen een naam. Beweeg er overheen en de tooltip zegt Verzameld door zus-en-zo op een ruwe grondstof, of Gemaakt door zus-en-zo op een afgewerkt stuk: hetzelfde stempel, anders geformuleerd naar hoe het voorwerp tot stand is gekomen. Een handtekening is onderdeel van het voorwerp zelf, reist mee door ruilen en de bank, en vervaagt nooit.\n\nVerzamelen ondertekent zijn beste werk automatisch: elke oogst die zeldzaam of beter gooit, arriveert ondertekend; zeldzame vondsten ondertekenen hun volledige vijfvoudige windfall, en een lijkoogst's geluksrol ondertekent zijn opbrengst, ongerepte exemplaren inbegrepen. Vervaardiging ondertekent langs dezelfde lijn: een enkelvoudig-exemplaar output van zeldzame of betere kwaliteit wordt ondertekend geslagen, en een meesterwerk ondertekent altijd wat zijn kwaliteit ook is, zodat de fijnste versie van elk stuk altijd zijn maker noemt. Het enige dat je een handtekening kan kosten, is een volle tas: een ondertekende eenheid heeft eigen ruimte nodig, of een overeenkomstige ondertekende stapel, om te landen.\n\nEen stapel voorwerpen deelt één identiteit, dus twee kopieën smelten alleen samen wanneer elk teken exact overeenkomt: zelfde voorwerp, zelfde ondertekenaar, zelfde meesterwerkstatistieken, zelfde betovering, zelfde band. Een ondertekend stuk hout sluit nooit aan bij een gewone stapel in welke richting dan ook (samenvoegen zou iemands naam wissen), maar identieke inhoud smelt graag samen, zodat twintig erts ondertekend door dezelfde verzamelaar in één stapel zit en een windfall je tassen niet kapot maakt.\n\nHandtekeningen betalen ambachtslieden terug: elk ondertekend reagens verbruiken, wie het ook heeft ondertekend, voegt 2 procentpunten meesterwerkskans toe, en het bezitten van een reagens ondertekend door je eigen hand vermindert de vereiste hoeveelheid van dat reagens met één (nooit onder één). Je eigen ondertekende zeldzaam-of-beter werk blijft je zelfs iets leren: wanneer een stuk dat jij hebt ondertekend presteert in je eigen handen, een drankje gedronken op het juiste moment, een dodelijke slag geland, wapenrusting gedragen bij een kill, stroomt er een klein straaltje vaardigheid terug naar het ambacht dat het heeft gemaakt, zolang dat ambacht een van je actieve hoofdambachten is.",
   'guide.profPages.econ.collectorsHeading': 'Verzamelaars, trofees en de prijs van een verhaal',
   'guide.profPages.econ.collectorsBody':
     'Handelaren zijn blind voor herkomst: een gesigneerd voorwerp verkoopt aan een NPC voor precies zijn gewone prijs. De premie op een handtekening bestaat alleen tussen spelers, en dat is precies wat het interessant maakt: een stapel windfall-erts gesigneerd door een beroemde verzamelaar, een Prime Cut van een gelukkige oogst, een meesterwerkling met de naam van een ambachtsman die inmiddels gestopt is, ze kosten wat iemands geheugen zegt dat ze waard zijn.\n\nHet Boek der Daden speelt op hetzelfde instinct in: Ongerept Ader, Oud Hardhout, Maanbloesem, Een Perfect Exemplaar en Glinstering van Hoop zijn nul-Roem verzamelaarsdaden die puur bestaan om te bewijzen dat een moment jou is overkomen. Bewaar het voorwerp dat de daad verdiende en je hebt het bewijs. Niets hiervan is macht; herkomst koopt geen statistieken en wint geen gevechten, het is het papieren spoor van het spel van goede dagen.',
   'guide.profPages.econ.throttleHeading': 'De actiebegrenzing',
-  'guide.profPages.econ.throttleBody':
-    'De output heeft een plafond: vervaardiging, onbetoveren, betoveren en salvagen delen één budget van {actions} geslaagde acties per rollende {seconds} seconden. Een geweigerde poging kost niets en verbruikt geen budget. Je voelt het nooit bij normaal spelen; het bestaat zodat een maxed specialist met een volle bank de Markt niet kan overspoelen, ongeacht zijn vaardigheid of voorraad.',
   'guide.profPages.econ.doctrineHeading': 'Spelers handelen met spelers',
   'guide.profPages.econ.doctrineBody':
     'De ambachteconomie is gebouwd op één idee: spelers beleveren spelers. Verzamelaars voeden ambachtslieden, ambachtslieden voeden questers en raiders, en brekers voeden betoveraars, met handelaren en stationneesters aan de randen om rommel en munt op te nemen in plaats van met je te concurreren. Als je geld wilt verdienen aan een ambacht, is jouw klant een persoon: leer wat andere spelers doorheen branden, prijs je waar ten opzichte van de Wereldmarkt, en behandel de NPC-systemen als een vloer onder je prijzen, niet als de markt zelf.\n\nGevaardigde uitrusting is afgestemd om net onder de raidgrens te zitten: zelfs een meesterwerk is altijd slechts één kwaliteitstrede boven zijn recept, nooit voorbij legendarisch, en zijn statistiekenbudget blijft onder het raidlootband. De smidse maakt je klaar voor de zwaarste inhoud; hij vervangt die niet. Dat houdt ambachtslieden, raiders en de markt in een stabiele driehoek: raid-drops blijven iets om naar te streven, en ambachtswerk blijft de beste uitrusting die geld daadwerkelijk kan kopen.',
@@ -372,20 +360,12 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.a3':
     'Één druk op de knop dekt beide. Alles wat een lijk vasthoudt, munt en buit plus alle oogstbare componenten, opent in hetzelfde venster: looten volgt de normale lootregels, en oogsten is de ambachtenkant, die materialen van het karkas zelf afstript.\n\nOogsten is wie-het-eerst-komt, eenmalig gebruik: elk lijk kan precies eenmaal worden geoogst, door wie het als eerste claimt, ook online. Je Stadsfocus bepaalt wat je krijgt: terwijl je in een stadshub staat, kun je 10 focuspunten spreiden over de componenttypen die je interesseren, en elk gefocust component rolt een betere rang (elke 5 punten verhoogt het een stap, maximaal twee stappen) en levert meer op (10 procent per punt). Ongefocuste componenten worden nooit slechter.',
   'guide.profPages.faq.q4': 'Waarom is mijn IJzerbastblok ondertekend?',
-  'guide.profPages.faq.a4':
-    'Je hebt een windfall getrokken. Ruwweg 1 oogst op 90 activeert een zeldzame verzamelgebeurtenis (oud hardhout bij een boom, een ongerept ader bij erts, een maanbloesem bij kruiden): het vermenigvuldigt de opbrengst vijf keer, ondertekent elke eenheid met je naam, en kondigt de vondst aan aan de hele zone. Een zeldzame of betere kwaliteitsrol op een gewone oogst ondertekent de opbrengst eveneens.\n\nOndertekende materialen zijn het waard te bewaren of duur te verkopen: elk ondertekend reagens verbruiken in een vervaardiging voegt 2 procent toe aan de meesterwerkskans. Onthoud alleen dat ze alleen stapelen met identiek ondertekende kopieën, dus ze houden hun eigen tasvak.',
   'guide.profPages.faq.q5': 'Hoe maak ik een opdrachtsstuk los, en wat kost dat?',
   'guide.profPages.faq.a5':
     'Loop naar een willekeurig ambachtsstation met het stuk in je tassen en betaal de meester. De vergoeding volgt de kwaliteit van het voorwerp: 25 zilver voor een ongewoon stuk, 1 goud voor een zeldzaam, 4 goud voor een episch; een legendarisch betaalt het epische tarief, en een gewoon opdrachtsstuk betaalt het ongewone tarief. Het moet een echt station zijn: een mobiel station biedt de dienst nooit aan.\n\nDe vergoeding koopt een schone lei, geen genezing: het stuk blijft een opdracht, dus het bindt opnieuw aan wie het in de volgende ruil ontvangt. Als verschillende gebonden kopieën een stapel delen, wordt per betaling één kopie afgeschild en losgemaakt.',
   'guide.profPages.faq.q6': 'Waar leer ik recepten, en wat kosten ze?',
-  'guide.profPages.faq.a6':
-    'De negen gewone veldrecepten en de gereedschapsrecepten zijn iedereen vanaf het begin bekend, en dat geldt ook voor drie stationsgebonden hoogtepunten (de Ovenschubben-Mantel, de Wardweef-Kap en de Schemerleer-Wikkelaars), die geen trainer nodig hebben, alleen hun station. Al het andere wordt onderwezen door de resident-meesters bij hun stations in de drie hubsteden: de meeste staan in Oostbeek, de leerlooier houdt de leerlooierij in Fenbridge, en de alchemist houdt de apotheek in Highwatch.\n\nTrainerrecepten komen in treden op vaardigheid 0, 25 en 50, geprijsd als gratis, 25 zilver en 1 goud als eenmalige vergoeding. Een meester onderwijst een recept zodra je band in dat ambacht de band van het recept heeft bereikt, en je moet bij zijn station staan om te leren: een mobiel station telt niet.',
   'guide.profPages.faq.q7': 'Waarom ging mijn verzamelen ineens langzamer?',
-  'guide.profPages.faq.a7':
-    'De verzamelworp begint op 2,5 seconden en wordt op twee manieren ingekort: 0,4 seconden voor elke gereedschapsrang die je bezit boven de eigen rang van het grondstoffenpunt, en 0,15 seconden voor elke vaardigheidsband die je hebt overschreden (bij 100 en 200), met een vloer van 1,5 seconden. Stap over van rang-1-punten naar rang-3-punten en je surplus verdwijnt, zodat dezelfde houweel weer langzamer zwaait. Precies de vereiste rang bezitten levert geen snelheid op; het opent alleen het punt.\n\nVaardigheidswinst vervalt op dezelfde manier als bij vervaardiging: een grondstoffenpunt wordt grijs naarmate je vaardigheid voorbij zijn rang klimt (rang-1-punten leren je niets meer vanaf vaardigheid 75), dus het antwoord op trage winsten zijn hogere-rang-punten, die een gereedschap van ten minste hun rang vereisen (blote handen tellen als rang 1). Vissen volgt zijn eigen afname: volledige winst onder vaardigheid 50, half onder 100, een straaltje van 0,1 onder 150 en 0,02 onder 200, en rommelgevangsten leren je helemaal niets vanaf 100 vaardigheid.',
   'guide.profPages.faq.q8': 'Kan ik buiten de stad ambachten maken?',
-  'guide.profPages.faq.a8':
-    'Deels. De negen gewone veldrecepten (de starterwapen, wapenrusting, voedsel en drankjesstaples) maak je overal, op elk moment. Alles daarboven is gebonden aan een stationstype: smidse, keukens, apotheek, leerlooierij, weefgetouw of gereedschapsmakerij, en je moet binnen 20 meter van het station zijn wil de vervaardiging doorgaan.\n\nOp vaardigheid 75 in een ambacht specialiseer je je, en naast een materiaalkorting van 20 procent krijg je een mobiel station: plaats het in het veld en het staat 10 minuten, en bedient de recepten van dat ambacht alsof je bij het echte station bent. Het mobiele station is alleen voor vervaardiging: recepten leren en opdrachten losmaken vereisen altijd het echte station in de stad.',
   'hud.logs.keptBoundOne': '{count} gebonden kopie behouden.',
   'hud.logs.keptBoundMany': '{count} gebonden kopieën behouden.',
   'hud.pet.waterJet': 'Waterstraal',
@@ -505,7 +485,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Dat is de oude smaak. Alchemie en Koken zijn weer als hoofdvakken op je fornuis. Blijf deze keer wat langer.',
   'entities.quests.q_prof_amends_apothecary.objectives.0.label': 'Wilde Everzwijn gedood',
   'entities.quests.q_prof_amends_apothecary.text':
-    'Wel, kijk wie er terug is bij mijn pot. Geen wrok, {playerName}, een keuken heeft altijd ruimte, maar weet dat de rekening langer wordt elke keer dat je weggaat. Ga de wilde everzwijnen in het oostelijke weide uitdunnen, want eerlijk zweet is het eerste ingrediënt, en het zal je handen herinneren aan het werk.',
+    'Wel, kijk wie er terug is bij mijn pot. Geen wrok, {playerName}, een keuken heeft altijd ruimte, maar weet dat de rekening langer wordt elke keer dat je weggaat. Ga de wilde everzwijnen in het westelijke weide uitdunnen, want eerlijk zweet is het eerste ingrediënt, en het zal je handen herinneren aan het werk.',
   'entities.quests.q_prof_amends_apothecary.title': 'Terug op het Fornuis',
   'entities.quests.q_prof_amends_bombardier.completion':
     'DAT is het, de kriebels zijn terug in je handen. Techniek en Alchemie, weer als hoofdvakken. Vooruit, ga een knal maken. Probeer deze keer te blijven, hm?',
@@ -517,7 +497,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Stabiel weer. Leerbewerking en Kleermakerij keren terug naar je handen als hoofdvakken. Meet twee keer voordat je weer gaat dwalen.',
   'entities.quests.q_prof_amends_outfitter.objectives.0.label': 'Webhout Spin gevangen',
   'entities.quests.q_prof_amends_outfitter.text':
-    'Toch terug bij mijn weefgetouw. Ik koester geen wrok, {playerName}, maar de draad herinnert een hand die hem losliet, en de kosten om hem weer op te pakken worden elke keer gemeten aan een langere maat. Maai de webhoutspin nen die het westelijke woud verdringen, en de inspanning zal je handen kalmeren voordat ze goede zijde aanraken.',
+    'Toch terug bij mijn weefgetouw. Ik koester geen wrok, {playerName}, maar de draad herinnert een hand die hem losliet, en de kosten om hem weer op te pakken worden elke keer gemeten aan een langere maat. Maai de webhoutspin nen die het oostelijke woud verdringen, en de inspanning zal je handen kalmeren voordat ze goede zijde aanraken.',
   'entities.quests.q_prof_amends_outfitter.title': 'Draden Hernomen',
   'entities.quests.q_prof_amends_smith.completion':
     'Het ritme is terug in je handen. Wapensmeden en Pantserbouw zijn opnieuw je hoofdvakken. Maak er geen gewoonte van te vertrekken.',
@@ -559,7 +539,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Zie je? Erts verzameld en eelt op je handen. Ga door met het mijnen, houtkappen en kruidenplukken terwijl je de wegen afloopt, en als je terug in de stad bent, let dan op het Stadsfocusbord bij de markt en de nabijgelegen knutselbank. Er zit een eerlijke handel in dit alles, als je dat wilt.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Ertsslagader geoogst',
   'entities.quests.q_prof_intro.text':
-    'Elke ziel in Oostbeekdal beoefent een ambacht naast het zwaard, {playerName}. Er zijn ertsslagaders in de rotsen rond de Kopergat, ten zuidwesten van de stad. Ga zelf een houweel zwaaien en bewerk er 5; ik zie het verschil.',
+    'Elke ziel in Oostbeekdal beoefent een ambacht naast het zwaard, {playerName}. Er zijn ertsslagaders in de rotsen rond de Kopergat, ten zuidoosten van de stad. Ga zelf een houweel zwaaien en bewerk er 5; ik zie het verschil.',
   'entities.quests.q_prof_workorder_apothecary.completion':
     'Aanvaardbaar. Krachtig en goed behandeld. Je betaling, tot op de muntstuk nauwkeurig. Laat het niet naar je hoofd stijgen, dat is een ander reagens.',
   'entities.quests.q_prof_workorder_apothecary.objectives.0.label': 'Goudblad-Kruid afgeleverd',
@@ -1447,6 +1427,12 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.wildgrowth_leggings.name': 'Wildgroei-Beenstukken',
   'entities.items.wildsoul_maul.name': 'Wildgeest-Knuppel',
   'entities.items.wyrmchoir_handwraps.name': 'Wurmkoor-Handwindsels',
+  'entities.items.basin_stalkers_tunic.name': 'Tuniek van de Bekkensluiper',
+  'entities.items.verdant_heart_vestment.name': 'Gewaad van het Groene Hart',
+  'entities.items.sunbone_ritual_hauberk.name': 'Zonnebeen-Rituele Maliënkolder',
+  'entities.items.greatfang_of_the_basin.name': 'Grootslagtand van het Bekken',
+  'entities.items.sunbone_oracles_crown.name': 'Zonnebeen-Orakelkroon',
+  'entities.items.bloodmane_war_legguards.name': 'Bloedmanen-Oorlogsbeenplaten',
   'entities.items.wyrmcult_spellgrips.name': 'Wurmcultus-Spreukhoudsters',
   'entities.items.yumis_keepsake_locket.name': "Yumi's Aandenken-Medaillon",
   'entities.items.zense_meridian.name': 'Zense-Meridiaan',
@@ -2123,7 +2109,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Eindelijk geveld. Het bergvolk zwoer dat die kat de muur zelf zou overleven. De sluipers houden zich nu bij hun hoge sneeuw, {playerName}, en mijn patrouilles lopen de weg zonder ervoor te bloeden. De hele bergkam is stiller door jouw werk.',
   'entities.quests.q_old_cragmaw.objectives.0.label': 'Oude Cragmaw gedood',
   'entities.quests.q_old_cragmaw.text':
-    'Het bergvolk gaf een naam aan de afdrukken die mijn verkenner vond: Oude Cragmaw, een tiran van een kat met een littekenvacht, die drie generaties van zijn eigen roedel heeft overleefd. Hij is de reden dat de sluipers mijn weg overspoelen, {playerName}. Zijn leger ligt op de westelijke bergkam boven de zuidelijke weg. Neem een vriend mee en leg de oude duivel om.',
+    'Het bergvolk gaf een naam aan de afdrukken die mijn verkenner vond: Oude Cragmaw, een tiran van een kat met een littekenvacht, die drie generaties van zijn eigen roedel heeft overleefd. Hij is de reden dat de sluipers mijn weg overspoelen, {playerName}. Zijn leger ligt op de oostelijke bergkam boven de zuidelijke weg. Neem een vriend mee en leg de oude duivel om.',
   'entities.quests.q_old_cragmaw.title': 'Oude Cragmaw',
   'entities.quests.q_stalker_cloaks.completion':
     'Tien goede pelzen, zo dik als ik er ooit... nee, kijk hier eens naar, {playerName}. De helft gescheurd, en niet door kling of speer. Klauwsporen zo breed als mijn hand, dwars door de wintervacht. Iets op die bergkam verscheurt zijn eigen soort.',
@@ -2235,6 +2221,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Die brief zit niet meer in je brievenbus.',
   'hudChrome.mailbox.result.needRecipient': 'Noem een ontvanger voor je brief.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Je kunt geen opdrachtvoorwerpen versturen.',
+  'hudChrome.mailbox.result.noMailBound': 'Dat voorwerp is gebonden en kan niet worden verstuurd.',
   'hudChrome.mailbox.result.noRecipient': 'Niemand met die naam heeft hier een brievenbus.',
   'hudChrome.mailbox.result.notEnoughItems': 'Zoveel heb je er niet om te versturen.',
   'hudChrome.mailbox.result.recipientBoxFull': 'Hun brievenbus is vol.',
@@ -2430,6 +2417,22 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.fishing': 'Vissen',
   'abilityUi.cast.gathering': 'Verzamelen',
   'abilityUi.cast.thunzharrStormcall': 'Stormroep',
+  'abilityUi.cast.rift_arcane_execution': 'Leegte-Rift',
+  'abilityUi.cast.rift_arcane_strike': 'Arcane Vernietiging',
+  'abilityUi.cast.rift_brute_execution': 'Aardschok',
+  'abilityUi.cast.rift_brute_strike': 'Laatste Oordeel',
+  'abilityUi.cast.rift_ember_execution': 'Magmabron',
+  'abilityUi.cast.rift_ember_strike': 'Kernsmelting',
+  'abilityUi.cast.rift_frost_execution': 'IJzig Graf',
+  'abilityUi.cast.rift_frost_strike': 'Absoluut Nulpunt',
+  'abilityUi.cast.rift_necro_execution': 'Zielengraf',
+  'abilityUi.cast.rift_necro_strike': 'Doodvonnis',
+  'abilityUi.cast.rift_storm_execution': 'Bliksemstaaf',
+  'abilityUi.cast.rift_storm_strike': 'Woede van de Stormroeper',
+  'abilityUi.cast.rift_tide_execution': 'Afgrondmuil',
+  'abilityUi.cast.rift_tide_strike': 'Verpletterende Diepte',
+  'abilityUi.cast.rift_venom_execution': 'Gifpoel',
+  'abilityUi.cast.rift_venom_strike': 'Merkteken van de Broedmoeder',
   'abilityUi.forms.bear': 'Beer',
   'abilityUi.forms.cat': 'Wolf',
   'abilityUi.resources.energy': 'Energie',
@@ -3293,6 +3296,16 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.sunken_bastion.enterText': 'Je waadt naar beneden het Verzonken Bastion in...',
   'entities.dungeons.sunken_bastion.leaveText': 'Je klimt uit de verdrinkende duisternis.',
   'entities.dungeons.sunken_bastion.name': 'Het Verzonken Bastion',
+  'entities.dungeons.the_last_keep.enterText':
+    'Je stapt de koude, stille hallen van de Laatste Burcht binnen.',
+  'entities.dungeons.the_last_keep.leaveText':
+    'Je trekt de burchtdeur dicht en stapt terug de wind van de Drakenlanden in.',
+  'entities.dungeons.the_last_keep.name': 'De Laatste Burcht',
+  'entities.dungeons.wildheart_basin.enterText':
+    'Warme regen sist op oude steen. Het Wildhartbekken opent zich voor je.',
+  'entities.dungeons.wildheart_basin.leaveText':
+    'Je passeert terug onder de stenen slagtanden door, de zon van de Palmreik in.',
+  'entities.dungeons.wildheart_basin.name': 'Het Wildhartbekken',
   'entities.items.acolytes_circlet.name': 'Diadeem van de Acoliet',
   'entities.items.alien_armor_plate.name': 'Uitheemse Pantserplaat',
   'entities.items.amber_crimson_armor_plate.name': 'Amber Karmozijn',
@@ -4098,7 +4111,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Mogger is eindelijk dood. De velden van Eastbrook zijn veiliger, en je verlaat het Dal met nog een verhaal dat het navertellen waard is.',
   'entities.quests.q_mogger.objectives.0.label': 'Mogger gedood',
   'entities.quests.q_mogger.text':
-    'Mogger heeft karren gespleten, hekken platgewalst en genoeg vee gedood om het halve Dal leeg te maken. Sta hem niet alleen tegenover. Neem twee sterke metgezellen mee de oostelijke weide in en leg het beest voorgoed neer.',
+    'Mogger heeft karren gespleten, hekken platgewalst en genoeg vee gedood om het halve Dal leeg te maken. Sta hem niet alleen tegenover. Neem twee sterke metgezellen mee de westelijke weide in en leg het beest voorgoed neer.',
   'entities.quests.q_mogger.title': 'Mogger Moet Vallen',
   'entities.quests.q_murlocs.completion':
     'Hah! Dat leert ze om zich met hun eigen modderpoelen te bemoeien.',
@@ -4142,8 +4155,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Visioen bij het Graf van Hogepriester Malric',
   'entities.quests.q_nythraxis_graves.objectives.2.label':
     'Visioen bij het Graf van Koninklijke Sluipmoordenaar Voss',
-  'entities.quests.q_nythraxis_graves.text':
-    'Ik heb deze tekens eerder gezien, op drie oude graven rond het noordelijke slagveld. Kapitein Aldren ligt op de oostelijke heuvel, Hogepriester Malric bij de centrale gebroken weg, en Koninklijke Sluipmoordenaar Voss bij de westelijke klif. Raak elk graf aan en luister, {playerName}. De doden herinneren zich misschien wat de levenden vergaten.',
   'entities.quests.q_nythraxis_graves.title': 'Graven van de Vergetenen',
   'entities.quests.q_nythraxis_restless_dead.completion':
     'Hetzelfde teken verschijnt op elke scherf... een kroon. Ik heb dit eerder gezien, gekerfd in oude graven die geen enkel verslag uit Eastbrook zich herinnert.',
@@ -4163,7 +4174,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_sealed_crypt.objectives.1.label': 'Crypte-Sluitsteen Onder',
   'entities.quests.q_nythraxis_sealed_crypt.objectives.2.label': 'Oeroud Dagboek',
   'entities.quests.q_nythraxis_sealed_crypt.text':
-    'De visioenen wijzen naar de verlaten crypte in de westelijke klif. Er bestaat een oude legende dat de crypte een koning herbergde. Misschien verzegelde Doorntop hem eronder nadat Malrics ritueel hem in iets dodeloos veranderde. Betreed de crypte en zie wat er binnen overblijft.',
+    'De visioenen wijzen naar de verlaten crypte in de oostelijke klif. Er bestaat een oude legende dat de crypte een koning herbergde. Misschien verzegelde Doorntop hem eronder nadat Malrics ritueel hem in iets dodeloos veranderde. Betreed de crypte en zie wat er binnen overblijft.',
   'entities.quests.q_nythraxis_sealed_crypt.title': 'De Verlaten Crypte',
   'entities.quests.q_ogre_bounty.completion':
     'Premie volledig betaald. De heuvels zijn rustiger - nu pakken we degenen aan die de inkopen doen.',
@@ -4291,7 +4302,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Mijn kratten! Amper een schram erop. Je bent een wonder.',
   'entities.quests.q_supplies.objectives.0.label': 'Gestolen Voorraadkrat',
   'entities.quests.q_supplies.text':
-    'Die bandieten overvielen mijn laatste wagen en gingen ervandoor met vier kratten goederen - gereedschap, zout, goed Eastbrook-linnen. De kratten staan opgestapeld rond hun kamp in de zuidoostelijke heuvels. Steel ze voor me terug, wil je?',
+    'Die bandieten overvielen mijn laatste wagen en gingen ervandoor met vier kratten goederen - gereedschap, zout, goed Eastbrook-linnen. De kratten staan opgestapeld rond hun kamp in de zuidwestelijke heuvels. Steel ze voor me terug, wil je?',
   'entities.quests.q_supplies.title': 'Gestolen Voorraden',
   'entities.quests.q_tarn_waders.completion':
     'Tien terug in het water. Ze voelen geen kou, {playerName}, en geen angst — alleen de trekking van die poort. Wat hen ook toezingt, het zingt luid.',
@@ -4302,8 +4313,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_the_codfather.completion':
     'Bij de vochtige heiligen... De Codfather zelf. Kijk naar die snorharen. Fenbridge zal een jaar lang verhalen smullen van deze vangst, {playerName}.',
   'entities.quests.q_the_codfather.objectives.0.label': 'De Codfather',
-  'entities.quests.q_the_codfather.text':
-    'De Codfather is niet zomaar een vis, {playerName}, hij is een koelbloedige moordenaar. Oudgedienden zweren dat hij Veensluipers als ontbijt eet, en zelfs de Slijkveen-Weduwen weven hun webben niet in de buurt van de Deepfen-Ondiepten uit pure angst. Hij heerst over die wateren. Pak een hengel, sleep die oude duivel uit zijn wateren, en ik zal toegeven dat je bij de familie hoort.',
   'entities.quests.q_the_codfather.title': 'De Codfather',
   'entities.quests.q_troll_fetishes.completion':
     'Dezelfde maker als de banieren in het sektekamp. De trollen zijn ingehuurde scheppen, niets meer. Goed werk, {playerName}.',
@@ -4371,6 +4380,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.zones.eastbrook_vale.pois.7.label': 'Gevallen Kapel',
   'entities.zones.eastbrook_vale.pois.8.label': 'Reliekheuvel',
   'entities.zones.eastbrook_vale.pois.9.label': 'Lichtwoudgaarde',
+  'entities.zones.eastbrook_vale.pois.11.label': 'De Verrekust-Dam',
   'entities.zones.eastbrook_vale.welcome':
     'Zoek Maarschalk Redbrook in de stad, hij heeft werk voor je.',
   'entities.zones.mirefen_marsh.name': 'Slijkveenmoeras',
@@ -4477,6 +4487,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'fiesta.augment.aug_warlords_might.desc': '+25% fysieke schade en +10% crit. Word de dreiging.',
   'fiesta.augment.aug_warlords_might.name': 'Macht van de Krijgsheer',
   'fiesta.augment.choose': 'Kies een Versterking',
+  'fiesta.augment.cardAria': '{name} ({category}), {description}',
   'fiesta.banner.augmentGained': 'Versterking verkregen: {name}!',
   'fiesta.banner.powerup': '{name}!',
   'fiesta.banner.wave': 'GOLF {wave}/{total}, KIES EEN VERSTERKING!',
@@ -5030,6 +5041,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.family.undead.desc':
     'De rusteloze doden, opgewekt door duisterder handen. Ze worden niet moe en ze vluchten niet.',
   'guide.family.undead.name': 'Ondoden',
+  'guide.family.demon.desc':
+    'Indringers van voorbij de rifts, louter vuur en venijn. Waar er een staat, is een breuk nooit ver weg.',
+  'guide.family.demon.name': 'Demonen',
   'guide.faqPage.a1':
     'Ja. Het hele spel is gratis te spelen tot aan de niveaulimiet, en de broncode is openbaar op GitHub.',
   'guide.faqPage.a10':
@@ -5257,6 +5271,21 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Eén aaneengesloten land, drie gebieden, van stille valleien tot bevroren toppen.',
   'guide.home.world.valeBlurb': 'Groene heuvels en oude bossen waar elk avontuur begint.',
   'guide.home.world.valeName': 'Oostbeekdal',
+  'guide.home.world.amberBlurb':
+    'Achter de westelijke kliffen een herfst die nooit eindigt, en lantaarns op een gouden meer.',
+  'guide.home.world.amberName': 'De Amberval',
+  'guide.home.world.duskBlurb':
+    'Een rijk verzegeld onder de bergen, als de fluisteringen over een weg naar binnen kloppen.',
+  'guide.home.world.duskName': 'De Sluierholte',
+  'guide.home.world.emberBlurb':
+    'Voorbij de Bleke Dam maakt het groen plaats voor as, en iets oeroud heerst over de wildernis.',
+  'guide.home.world.emberName': 'De Drakenlanden',
+  'guide.home.world.fenBlurb':
+    'Voorbij de herfstkroon, een helder veen van wilgen en stil water, en een stad achter een slotgracht.',
+  'guide.home.world.fenName': 'Het Wilgenveen',
+  'guide.home.world.frostBlurb':
+    'Een besneeuwde hoogte voorbij elke kaart, enkel zichtbaar in de dansende lichten.',
+  'guide.home.world.frostName': 'De Vorstsluier',
   'guide.howToPlay.basicsHeading': 'De basis',
   'guide.howToPlay.controlsLink': 'Bekijk de volledige besturingsnaslag',
   'guide.howToPlay.deathBody':
@@ -5673,6 +5702,76 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.valeGreeting': 'Houd je kling dichtbij. Het Dal is niet meer wat het was.',
   'guide.worldPage.valePlaceNotes':
     'Oostbeek is je eerste thuisbasis. Wolvenloop en Everweide zijn rustig jachtgebied; Spiegelmeer is fijn viswater, al krioelen modderfinnen in de ondiepten; het Sableweb en de Kopergroeve verbergen spinnen en ertsbeluste delvers; een Bandietenkamp en de Gevallen Kapel bieden ruwer werk; Reliekschrijnheuvel leidt naar het Ingestorte Reliekschrijn, de eerste delve van het rijk; Lichtwoudgaarde is een kalm, zonovergoten bosje in het noorden; en het Zeugveld is Oostbeeks ommuurde zwijnenbalveld, waar De Dalbeker onder een oogstbestand wordt gespeeld.',
+  'guide.worldPage.amberBlurb':
+    'Een eeuwige herfst van gouden en rode bladeren die nooit vallen, verzameld rond het lantaarnverlichte stadje Lantaarnmeer.',
+  'guide.worldPage.amberGreeter': 'De lantaarnmaker, Lantaarnmeer',
+  'guide.worldPage.amberGreeting':
+    'Elk blad hier gloeit goud en rood, en toch valt er nooit een. De lantaarns zijn voor jou ontstoken; let op de Goudsmelt onderweg naar boven.',
+  'guide.worldPage.amberPlaceNotes':
+    'Lantaarnmeer gloeit in het hart van de oogst. De Goudsmelt is de amberglibberige pas naar binnen; de Vergulde Boomgaard en Oogstholte herbergen de zoetste pluk en de vrijpostigste dieven; het Grote Meer weerspiegelt de brandende bladeren; Sintelesdoorn-Heuvel staat het hoogst en het roodst; en de Hellende Monoliet herinnert zich iets ouder dan de herfst.',
+  'guide.worldPage.duskBlurb':
+    'Een vallei van eeuwige schemering onder de grote boom van Ouderglans, waar kristallen ruines gloeien en de lucht zoemt van oude magie.',
+  'guide.worldPage.duskGreeter': 'Hoedster Saelwyn, Ouderglans',
+  'guide.worldPage.duskGreeting':
+    'Weinigen van jouw soort hebben onder deze takken gestaan. Loop zacht, en wees welkom.',
+  'guide.worldPage.duskPlaceNotes':
+    'Ouderglans verzamelt zich onder de grote boom. De Schemerval-Grot en haar uitkijkpunt vormen de weg naar binnen en het eerste zicht op de vallei; het Ouderwoud en het Sterrenvalbekken bewaren de stille zuidkant; het Verzonken Hof herbergt overwoekerde ruines in het oosten; en de Glanzende Diepte en de Kristallen Ondiepten gloeien door het hele noorden.',
+  'guide.worldPage.emberBlurb':
+    'Door onweer verlichte wildernis van as en bloedglas waar draken cirkelen boven de caldera en trollenvuren branden tussen de duinen, in de gaten gehouden vanuit het poortstadje Wurmwacht.',
+  'guide.worldPage.emberGreeter': 'De poortwachter, Wurmwacht',
+  'guide.worldPage.emberGreeting':
+    'Hete wind uit de wildernis, draken boven de Drakenmuil, en trollenvuren in de duinen. Drink iets voor je daar naar buiten loopt.',
+  'guide.worldPage.emberPlaceNotes':
+    'Wurmwacht bewaakt de poort. Het Poortwoud is het laatste groen voor de wildernis; de Sintelduinen waaien met as en erger; de Trollenraad is waar de duintrollen hun vuren verzamelen; de Bloedglasvelden glinsteren met scheermesscherven; en de Drakenmuil-Caldera is de rokende kroon waar de draken omheen cirkelen.',
+  'guide.worldPage.fenBlurb':
+    'Een helder, zoemend moerasland van lelies en traag water, doorkruist over oude vlonderpaden vanuit het brugstadje Brugmeer.',
+  'guide.worldPage.fenGreeter': 'De brugwachter, Brugmeer',
+  'guide.worldPage.fenGreeting':
+    'Het veen zoemt van libellen en bijen. Steek de brug over, rust je voeten even, en blijf op de vlonders voorbij de poelen.',
+  'guide.worldPage.fenPlaceNotes':
+    'Brugmeer ligt schrijlings over het trage water. De Amberveen-Trappen dalen af vanuit het oogstland; de Liliemoerassen en Moerasglans-Poelen glinsteren van dwaallichtjes en libellen; Treurwilg laat zijn takken tot in het meer hangen; en de Sluimervlakte is zo zacht als dit land maar wordt.',
+  'guide.worldPage.frostBlurb':
+    'Een stilte van sneeuw en donkere dennen onder het noorderlicht, waar de kou zelf wakker lijkt en IJsmantel zijn vuren brandend houdt.',
+  'guide.worldPage.frostGreeter': 'De haardwachter, IJsmantel',
+  'guide.worldPage.frostGreeting':
+    'Sneeuw verzwelgt elk geluid voorbij de muur. Als de lichten beginnen te dansen, houd dan je stem laag en je vuur brandend.',
+  'guide.worldPage.frostPlaceNotes':
+    'IJsmantel bewaart de laatste warme haard. De Sneeuwlijn markeert waar de sneeuwjachten het overnemen; het Gletsjermeer is zwart, stil water onder het ijs; de Aurora-Trappen klimmen onder de dansende lichten; het Rilveen is een bevroren moeras dat nooit helemaal slaapt; en de Huilende Terrassen verdienen hun naam elke nacht.',
+  'guide.worldPage.galeBlurb':
+    'Zeekliffen en huilende heuvels waar de wind nooit rust, het Oude Baken nooit dooft, en Wijkhaven zijn deuren stevig sluit.',
+  'guide.worldPage.galeGreeter': 'De bakenwachter, Wijkhaven',
+  'guide.worldPage.galeGreeting':
+    'De wind is hier nog nooit gestopt, en het Oude Baken is nog nooit gedoofd. Doe de herbergdeur achter je dicht.',
+  'guide.worldPage.galePlaceNotes':
+    'Wijkhaven leunt tegen de wind. De Windweg is de klifweg naar binnen; de Huilende Heuvels rollen boomloos onder de storm; het Oude Baken brandt al zolang niemand zich kan herinneren; de Scheur valt loodrecht naar het water; de Wrakvelden houden de kust eerlijk; en de Spiegelplas is het enige stille ding in het hele rijk.',
+  'guide.worldPage.gardenBlurb':
+    'Een doolhoftuinrijk dat nog altijd wordt gesnoeid door geen tuinman die iemand ooit heeft gezien, betreden voorbij Haagwijk en zijn fonteinhoven.',
+  'guide.worldPage.gardenGreeter': 'De poortwachter, Haagwijk',
+  'guide.worldPage.gardenGreeting':
+    'Iemand snoeit nog altijd de heggen, hoewel er al honderd jaar geen tuinman is gezien. Let op met het doolhof: het let op jou terug.',
+  'guide.worldPage.gardenPlaceNotes':
+    'Haagwijk wacht bij de Tuinpoort. De Parterrewandeling bloeit in geknipte kleur; Kasteel Dageraad drilt zijn ridders achter nieuwe muren; de Bloesemvijver drijft het hele jaar door roze; de Oude Molen keert zijn eigen ringbedden om; het Grote Doolhof herschikt zijn gangen voor elke gast, zijn bogen bewaakt door loofvossen; de Noordwacht bewaakt de uitgaande weg; het Lelie-Bekken rust voorbij dat alles; en het Fonteinhof stroomt nog altijd helder in het hart van de tuin.',
+  'guide.worldPage.hauntBlurb':
+    'Een spookbos onder reusachtige bladerdaken, waar de lantaarns van Galgenmeer het enige eerlijke licht op de weg zijn.',
+  'guide.worldPage.hauntGreeter': 'De lantaarnopsteker, Galgenmeer',
+  'guide.worldPage.hauntGreeting':
+    'Blijf bij de lantaarns, reiziger. En als het woud je naam roept van buiten de weg, antwoord dan niet.',
+  'guide.worldPage.hauntPlaceNotes':
+    'Galgenmeer klit samen binnen zijn lantaarns. De Kraaienpoort is de sombere voordeur van het woud; het Weduwenstruweel is dik verweven met web; de Hangende Open Plek en de Rouwsteen-Kapel bewaren het oudste verdriet van het woud; en de Open Plek van de Jager behoort toe aan wat daar nog altijd jaagt.',
+  'guide.worldPage.jungleBlurb':
+    'Een tropische wirwar van palmen, wit zand en luidruchtige vogels, met het strandstadje Drijfhaven dat een vuur brandend houdt op het strand.',
+  'guide.worldPage.jungleGreeter': 'De havenmeesteres, Drijfhaven',
+  'guide.worldPage.jungleGreeting':
+    'Warm zand, luidruchtige vogels, en een jungle die de horizon verslindt. We houden een vuur brandend op het strand; probeer erbij terug te komen.',
+  'guide.worldPage.junglePlaceNotes':
+    'Drijfhaven houdt zijn vuur brandend op het strand. De Warmond is waar de rivier de groene muur ontmoet; het Palmstrand loopt wit en warm langs de branding; de Smaragdwarboel en de Rankval verslinden het binnenland; de Saffieren Lagune gloeit helder en diep; en het Verzonken Afgodsbeeld waakt van onder het water.',
+  'guide.worldPage.nightBlurb':
+    'Een rijk van sterrige middernacht waar bloemen de paden verlichten en Maanrust een stille wake houdt onder een dromende hemel.',
+  'guide.worldPage.nightGreeter': 'De wakewachter, Maanrust',
+  'guide.worldPage.nightGreeting':
+    'Voorbij de Nachtpoort droomt de lucht zelf. Volg het bloemlicht, en let op de slapende wereld die aan de hemel hangt.',
+  'guide.worldPage.nightPlaceNotes':
+    'Maanrust houdt de wake. De Nachtpoort is de weg naar het middernachtland; de Maanbron bewaart sterrenlicht waar je naast kunt staan; Schemerveld bloeit in het duister; de Statige Wacht kijkt toe zonder ooit te bewegen; en de Slapeloze Grafheuvel is de enige plek hier die nooit droomt.',
   'highscores.desc': 'Volg de grootste kampioenen van de wereld en vergelijk je voortgang.',
   'highscores.title': 'Topscores-Ranglijst',
   'hud.arena.close': 'Arena sluiten',
@@ -5741,6 +5840,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingMiss': 'Mis',
   'hud.combat.healOther': 'Je {ability} geneest {target} voor {amount}.',
   'hud.combat.healOtherCrit': 'Je {ability} geneest {target} kritiek voor {amount}.',
+  'hud.combat.healSelfFull': 'Je {ability} landt, maar je gezondheid is al vol.',
+  'hud.combat.healOtherFull':
+    'Je {ability} landt op {target}, maar het doelwit heeft al volle gezondheid.',
   'hud.combat.healSelf': 'Je {ability} geneest je voor {amount}.',
   'hud.combat.healSelfCrit': 'Je {ability} geneest je kritiek voor {amount}.',
   'hud.combat.miss': 'Je {ability} mist {target}.',
@@ -5801,6 +5903,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hud.core.you': 'jij',
   'hud.core.zoomIn': 'Inzoomen',
   'hud.core.zoomOut': 'Uitzoomen',
+  'hud.core.riftLabel': '{name}',
+  'hud.core.riftLabelRanked': '{name} ({rank})',
   'hud.errors.abilityNotReady': 'Die vaardigheid is nog niet gereed.',
   'hud.errors.alreadyInParty': '{name} zit al in een groep.',
   'hud.errors.arenaAlreadyInMatch': 'Je zit al in een arenagevecht.',
@@ -5858,9 +5962,11 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hud.errors.targetTooFar': 'Het doelwit is te ver weg.',
   'hud.errors.tooClose': 'Te dichtbij!',
   'hud.errors.tradeBound': 'Dat voorwerp is gebonden en kan niet worden verhandeld.',
+  'hud.errors.marketListBound': 'Dat voorwerp is gebonden en kan niet te koop worden aangeboden.',
   'hud.errors.tradeExpired': 'Het ruilverzoek is verlopen.',
   'hud.errors.tradeFailed': 'Ruil mislukt: voorwerpen of geld niet langer beschikbaar.',
   'hud.errors.tradeInProgress': 'Er is al een ruil aan de gang.',
+  'hud.errors.tradeAlreadyTrading': 'Die speler is al aan het ruilen.',
   'hud.errors.tradeTooFar': 'Het doelwit is te ver weg om mee te ruilen.',
   'hud.errors.travel': 'Fleet',
   'hud.errors.unknownCommand': 'Onbekende opdracht: {command}. Probeer /s /y /w /p /g.',
@@ -6276,6 +6382,11 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorDisabledMsg': 'Tweestapsverificatie staat uit.',
   'hudChrome.account.twoFactorDone': 'Klaar',
   'hudChrome.account.twoFactorDownloadCodes': 'Codes Downloaden',
+  'hudChrome.account.recoveryCodesFileHeader': '{brand}-herstelcodes',
+  'hudChrome.account.recoveryCodesFileAccount': 'Account: {username}',
+  'hudChrome.account.recoveryCodesFileHint':
+    'Elke code kan één keer worden gebruikt als je geen toegang meer hebt tot je authenticator-app.',
+  'hudChrome.account.recoveryCodesFileWarn': 'Bewaar dit bestand ergens veilig en privé.',
   'hudChrome.account.twoFactorEnabledMsg': 'Tweestapsverificatie staat nu aan.',
   'hudChrome.account.twoFactorOpenApp': 'Openen in authenticator-app',
   'hudChrome.account.twoFactorRecoveryHint':
@@ -6392,10 +6503,21 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Neemt de munten en gevallen voorwerpen. Verbruikt de oogst niet.',
   'hudChrome.loot.unifiedPressHint':
     'De interactietoets berooft en oogst in een keer, op basis van je stadsfocus.',
+  'hudChrome.meters.move': 'Sleep om deze meter te verplaatsen',
+  'hudChrome.meters.resize': 'Sleep om deze meter te vergroten of verkleinen',
+  'hudChrome.meters.dock': 'Deze meter terugzetten in het metervenster',
+  'hudChrome.meters.separate': '{meter} loskoppelen',
+  'hudChrome.meters.regroup': '{meter} weer samenvoegen',
   'hudChrome.meters.minutesSeconds': '{m}m {s}s',
   'hudChrome.meters.perSecond': '{value}/s',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
   'hudChrome.meters.seconds': '{s}s',
+  'hudChrome.meters.breakdownOther': 'Overig ({count})',
+  'hudChrome.meters.breakdownRow': '{value} ({percent})',
+  'hudChrome.meters.breakdownSummary': '{tab}: {value}',
+  'hudChrome.meters.melee': 'Nabijgevecht',
+  'hudChrome.meters.percent': '{value}%',
+  'hudChrome.meters.petAbility': '{pet}: {ability}',
   'hudChrome.mobile.haptics': 'Haptiek',
   'hudChrome.mobile.hapticsOff': 'Haptiek uit',
   'hudChrome.mobile.hotbarPage': 'Vaardigheden',
@@ -6657,6 +6779,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.quest': 'Opdrachtvoorwerp',
   'itemUi.kind.tool': 'Gereedschap',
   'itemUi.kind.weapon': 'Wapen',
+  'itemUi.kind.mount': 'Rijdier',
   'itemUi.logs.boughtBackItem': '{item} teruggekocht voor {money}.',
   'itemUi.logs.boughtItem': '{item} gekocht voor {money}.',
   'itemUi.logs.collectedMoney': 'Je haalt {money} op bij de Koopman.',
@@ -7020,6 +7143,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.incomplete': 'Die quest is niet voltooid.',
   'questUi.errors.notInLog': 'Die quest staat niet in je logboek.',
   'questUi.errors.tooFar': 'Te ver weg.',
+  'questUi.errors.escortAway':
+    'Degene die je moet begeleiden is er nu niet. Die komt binnenkort terug.',
   'questUi.errors.turnInMissing': 'Die questinlevering is niet in de buurt.',
   'questUi.errors.unavailable': 'Die quest is niet beschikbaar.',
   'questUi.log.abandon': 'Quest opgeven',
@@ -7436,6 +7561,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Weerstaan',
+  'hud.combat.floatingHealFull': 'Vol',
   'hud.combat.resisted': '{target} weerstaat je {ability}.',
   'hudChrome.abilityScaling.bonus': '(+{value})',
   'hudChrome.itemArmorType.cloth': 'Stof',
@@ -7979,6 +8105,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Deze herstellink is ongeldig of verlopen. Vraag een nieuwe aan.',
   'apiError.deeds.invalid_input': 'Ongeldige invoer.',
+  'apiError.ota_updates.invalid_input': 'Ongeldige invoer.',
   'apiError.steam.account_taken': 'Dat Steam-account is al aan een ander account gekoppeld.',
   'apiError.steam.already_linked': 'Je account heeft al een gekoppeld Steam-account.',
   'apiError.steam.banned': 'Dat Steam-account kan niet worden gekoppeld.',
@@ -8035,7 +8162,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.rewardsHeading': 'Titels en randen',
   'guide.nav.deeds': 'Boek der Daden',
   'hudChrome.deeds.broadcastLine': '{name} heeft een daad volbracht: {deed}',
-  'hudChrome.deeds.broadcastsLabel': 'Deel behaalde daden met je gilde en vrienden',
   'hudChrome.deeds.catChronicle': 'Kronieken',
   'hudChrome.deeds.catCollection': 'Verzameling',
   'hudChrome.deeds.catCombat': 'Gevecht',
@@ -8113,6 +8239,659 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_stormfeather_griffin.name': 'Teugels van de hemelreikende Stormveder',
   'entities.items.reins_thunderstrut_gobbler.name': 'Teugels van Donderpronker, de Grote Kalkoen',
   'entities.quests.q_prof_intro.title': 'Een ambacht voor iedere hand',
+  'entities.quests.q_ww_bells_of_gallowmere.title': 'De Klokken van Galgenmeer',
+  'entities.quests.q_ww_bells_of_gallowmere.text':
+    'Hoor je dat geluid, {playerName}? Dat is Galgenmeer, de noordweg op, dat haar doden in slaap luidt. Doodgraver Marrow houdt de telling bij van elke ziel onder het bladerdak, levend en begraven. Ga en laat je tellen, voordat het woud jou zelf telt.',
+  'entities.quests.q_ww_bells_of_gallowmere.objectives.0.label': 'Meld je bij Doodgraver Marrow',
+  'entities.quests.q_ww_bells_of_gallowmere.completion':
+    'Cobb stuurde je heel de weg op, he? Goede man. Hij houdt die poortlantaarns al dertig jaar brandend, en het woud is nooit langs hem heen gekomen. Welkom in Galgenmeer, {playerName}. Let op de klokken.',
+  'entities.quests.q_ww_candles_at_the_bounds.title': 'Kaarsen bij de Grenzen',
+  'entities.quests.q_ww_candles_at_the_bounds.text':
+    'Vier grenzenstenen omringen Galgenmeer, {playerName}, een op elke weg naar buiten, en op elke steen brandt een grafkaars. Zolang ze branden, blijven de begravenen begraven. De motregen heeft ze alle vier gedoofd, en ik ben te oud om de grenzen alleen te belopen. Neem mijn kaars en steek ze snel weer aan.',
+  'entities.quests.q_ww_candles_at_the_bounds.objectives.0.label': 'Grafkaars opnieuw ontstoken',
+  'entities.quests.q_ww_candles_at_the_bounds.completion':
+    'Alle vier branden? Adem dan, {playerName}. Jij hoorde het niet, maar het hele dorp wel: de klokken luidden lichter op het moment dat de laatste pit vlam vatte.',
+  'entities.quests.q_ww_horn_of_the_huntsman.title': 'De Hoorn van de Jager',
+  'entities.quests.q_ww_horn_of_the_huntsman.text':
+    'Je hebt de hoorn nu wel gehoord, {playerName}, dun en ver weg, het geluid waarvoor het hele woud zijn adem inhoudt. De Bleke Jager rijdt door zijn open plek ten noorden van hier, en elk graf dat hij passeert wordt ondieper. Hij was ooit een man, en hij is verkeerd begraven, en ik doe niet langer alsof gebed het zal oplossen. Neem een vriend mee, neem er twee, en werp hem uit het zadel.',
+  'entities.quests.q_ww_horn_of_the_huntsman.objectives.0.label':
+    'De Bleke Jager uit het zadel geworpen',
+  'entities.quests.q_ww_horn_of_the_huntsman.completion':
+    'De hoorn stopte halverwege een noot. Elke klok in Galgenmeer luidde eenmaal, uit zichzelf, en toen werd het woud stiller dan ik het in dertig jaar heb gehoord. Je hebt het ritueel voltrokken dat ik niet kon, {playerName}. Draag dit, en loop onbevreesd onder het bladerdak.',
+  'entities.quests.q_ww_silk_in_the_eaves.title': 'Zijde in de Daklijst',
+  'entities.quests.q_ww_silk_in_the_eaves.text':
+    'Kijk omhoog als je de westweg loopt, {playerName}, en je zult ze zien: gewikkelde vormen in het bladerdak, wiegend waar geen wind reikt. De weduwzijde-spinners zijn uit het Struweel gekropen en hebben hun voorraadkamers boven mijn lantaarns opgehangen. Dood er tien, en de weg is weer een weg.',
+  'entities.quests.q_ww_silk_in_the_eaves.objectives.0.label': 'Weduwzijde-Spinner gedood',
+  'entities.quests.q_ww_silk_in_the_eaves.completion':
+    'Tien minder wevers in de daklijst. De lantaarnopstekers zullen vanavond hun ronde lopen zonder omhoog te kijken, en dat is hier meer waard dan je weet.',
+  'entities.quests.q_ww_the_last_vicar.title': 'De Laatste Vicaris',
+  'entities.quests.q_ww_the_last_vicar.text':
+    'Ten zuiden van hier verweert de Rouwsteen-Kapel bij haar zwarte tarn, en een man onderhoudt haar nog altijd: Vicaris Creel, die niet wilde vertrekken toen het dak instortte. Hij kent de oude riten beter dan mijn klokken, {playerName}, en hij heeft in een maand geen bericht gestuurd. Loop de kapelweg en zie hem ademen.',
+  'entities.quests.q_ww_the_last_vicar.objectives.0.label': 'Zoek Vicaris Creel',
+  'entities.quests.q_ww_the_last_vicar.completion':
+    'Marrow maakt zich zorgen om mij? Dat is nieuw. Vertel hem dat de Rouwsteen nog staat, min of meer, en ik ook. Blijf een tijdje, {playerName}. De tarn heeft gefluisterd, en ik zou liever niet alleen luisteren.',
+  'entities.quests.q_ww_walking_mosley_home.title': 'Mosley Naar Huis Brengen',
+  'entities.quests.q_ww_walking_mosley_home.text':
+    'Mijn doodgraver Mosley nam drie dagen geleden de kapelweg om een plek te openen op de oude begraafplaats, en de opgraving stortte boven op hem in. Hij heeft zich naar buiten gekrabbeld, de dwaas leeft nog, maar hij zit ineengedoken bij de kapelgraven en durft niet te bewegen vanwege de spinners op de weg. Breng hem lopend naar huis, {playerName}. Ik kan de klokken niet luiden voor een levende man.',
+  'entities.quests.q_ww_walking_mosley_home.objectives.0.label':
+    'Doodgraver Mosley veilig terug naar Galgenmeer gebracht',
+  'entities.quests.q_ww_walking_mosley_home.completion':
+    'Hij kwam op eigen benen door de poort, en zwoer dat hij van nu af aan niets dieper dan een raapbed meer zal graven. Hij zal zondag alweer op de begraafplaats staan, dat doen ze altijd. Dank je wel, {playerName}. Galgenmeer houdt haar mensen vast, dat is onze hele wet.',
+  'entities.quests.q_ww_what_the_bark_holds.title': 'Wat de Bast Vasthoudt',
+  'entities.quests.q_ww_what_the_bark_holds.text':
+    'In de Hangende Open Plek ten oosten van Galgenmeer hangen de spinners hun in zijde gewikkelde doden aan de takken, en de grafbast-schuifelaars houden er beneden de wacht als geduldige lijkdragers. Dat zijn onze mensen daarboven, {playerName}. Breek vijf schuifelaars, snijd drie van de gewikkelde doden los, en breng ze naar huis, naar de grond.',
+  'entities.quests.q_ww_what_the_bark_holds.objectives.0.label': 'Grafbast-Schuifelaar geveld',
+  'entities.quests.q_ww_what_the_bark_holds.objectives.1.label':
+    'Zijdegebonden Overblijfselen losgesneden',
+  'entities.quests.q_ww_what_the_bark_holds.completion':
+    'Drie zielen terug onder eerlijke grond voor het invallen van de nacht. De schuifelaars zullen weer aangroeien, bast doet dat altijd, maar vanavond hangt de open plek leeg, en dat is genoeg.',
+  'entities.quests.q_ww_widows_skeins.title': 'De Strengen van de Weduwe',
+  'entities.quests.q_ww_widows_skeins.text':
+    'De spinners nemen onze doden voor hun voorraadkamers, {playerName}, dus neem ik hun zijde voor onze lijkwaden. Het brandt schoon en het houdt een zegen beter vast dan linnen ooit deed. Breng me zes strengen weduwzijde, en de volgende ziel die we begraven, gaat gewikkeld en beschermd naar beneden.',
+  'entities.quests.q_ww_widows_skeins.objectives.0.label': 'Weduwzijde-Streng',
+  'entities.quests.q_ww_widows_skeins.completion':
+    'Zes strengen, zacht als een ingehouden adem. De doden zullen hierin makkelijker rusten. Neem deze wikkels, ik naaide ze van de laatste partij, en het woud heeft er nog nooit doorheen gebeten.',
+  'entities.quests.q_ww_wraiths_of_the_tarn.title': 'Schimmen van de Tarn',
+  'entities.quests.q_ww_wraiths_of_the_tarn.text':
+    'De woudschimmen waren ooit de kapelwachters, {playerName}, gegroeid uit bomen die geplant waren over de geeerde doden. Sinds de tarn zwart werd, zijn ze hun taak vergeten, en nu drijven ze door mijn kerkhof en trekken ze aan de aarde. Breek er acht uiteen voordat ze afmaken wat ze zijn begonnen.',
+  'entities.quests.q_ww_wraiths_of_the_tarn.objectives.0.label': 'Woudschim gedood',
+  'entities.quests.q_ww_wraiths_of_the_tarn.completion':
+    'Eindelijk acht wachters neergelegd. Ik zal het bij daglicht geen genade noemen, maar onder ons, {playerName}, was het dat wel.',
+  'entities.quests.q_wf_across_the_fenway.title': 'Over de Veenweg',
+  'entities.quests.q_wf_across_the_fenway.text':
+    'Een zacht land, het Wilgenveen, maar zacht is niet hetzelfde als veilig, {playerName}. Volg de weg noordwaarts naar de Veenweg-dam en steek over naar Brugmeer. Vertel Brugbouwer Alden dat de Trappen open zijn en het wegkampvuur brandt.',
+  'entities.quests.q_wf_across_the_fenway.objectives.0.label': 'Meld je bij Brugbouwer Alden',
+  'entities.quests.q_wf_across_the_fenway.completion':
+    'Pell houdt dat vuur brandend door elke mist die het veen naar haar kan ademen. Als zij zegt dat de Trappen open zijn, zijn ze open. Welkom in Brugmeer, {playerName}. Let op je stap op mijn planken en we zullen het goed met elkaar kunnen vinden.',
+  'entities.quests.q_wf_croakers_hush.title': 'De Stilte van de Kwaker',
+  'entities.quests.q_wf_croakers_hush.text':
+    'Nu ken je de naam van de snurker, {playerName}: de Suffe Kwaker, de oude paddenkoning op de Sluimervlakte. Elk jaar wordt zijn gekwaak zwaarder, en elk jaar vergeet een groter deel van het veen te ontwaken. De charms houden je ogen open, maar zijn omvang is een andere zaak: neem een vriend mee, en bevecht hem niet in het water. Breng de oude koning tot een rustigere slaap.',
+  'entities.quests.q_wf_croakers_hush.objectives.0.label': 'De Suffe Kwaker gedood',
+  'entities.quests.q_wf_croakers_hush.completion':
+    'Luister, {playerName}. Niets. De eerste ware stilte over dit veen in dertig jaar, en de helft van het stadje zal vannacht niet slapen van de vreemdheid ervan. De wilgen zeggen dank je wel, op hun eigen manier. Draag dit, geweven uit zijn eigen leliebed, en het veen zal je overal waar het water reikt als vriend kennen.',
+  'entities.quests.q_wf_eels_for_the_smokehouse.title': 'Palingen voor de Rokerij',
+  'entities.quests.q_wf_eels_for_the_smokehouse.text':
+    'De moeraspadden eten niet alleen mijn touwen op, {playerName}, ze eten ook mijn vangst: ze slokken de palingen in een keer op, rechtstreeks uit de vallen. Bevrijd zes dikke exemplaren van de gulzige beesten voordat het vlees bederft, dan blijven de rokerijvuren branden.',
+  'entities.quests.q_wf_eels_for_the_smokehouse.objectives.0.label': 'Mollige Veenpaling',
+  'entities.quests.q_wf_eels_for_the_smokehouse.completion':
+    'Zes goede palingen, nauwelijks gekneusd. De rokerij zal tegen de ochtend naar geld ruiken. Hier, deze waadlaarzen waren van mij toen ik nog vlugger was: palinghuid keert het water als niets anders.',
+  'entities.quests.q_wf_mind_the_moorings.title': 'Let op de Meertouwen',
+  'entities.quests.q_wf_mind_the_moorings.text':
+    'Goed touw is hier duur, {playerName}: elke lijn die de padden doorbijten is een week aan palinggeld verdwenen. De doorgesneden uiteinden liggen nog langs de gracht waar de boten ze verloren. Loop de vlonderpaden en breng me vier lijnen terug, dan kan ik ze zo goed als nieuw splitsen.',
+  'entities.quests.q_wf_mind_the_moorings.objectives.0.label': 'Doorgesneden Meertouw geborgen',
+  'entities.quests.q_wf_mind_the_moorings.completion':
+    'Kijk eens aan: schone beten, elk ervan, maar er is genoeg touw over om te splitsen. Je hebt me een maand aan geld bespaard en de netvissers een maand aan gemopper, {playerName}.',
+  'entities.quests.q_wf_rope_chewers.title': 'De Touwknagers',
+  'entities.quests.q_wf_rope_chewers.text':
+    "Moeraspadden, {playerName}. Ze klimmen 's nachts uit de gracht en knagen door mijn meertouwen alsof het rietstelen zijn. Drie bootjes dreven vorige week weg, en een ervan had mijn goede lier aan boord. Dun ze uit, tien van die dikke dingen, en de boten blijven waar we ze vastbinden.",
+  'entities.quests.q_wf_rope_chewers.objectives.0.label': 'Moeraspad gedood',
+  'entities.quests.q_wf_rope_chewers.completion':
+    'Tien minder sets tanden in mijn gracht. De bootjes bleven de hele nacht aan hun meertouwen liggen, voor het eerst in een maand, {playerName}. Je hebt de dank van elke netvisser in het stadje.',
+  'entities.quests.q_wf_toll_and_tangle.title': 'Tol en Verwarring',
+  'entities.quests.q_wf_toll_and_tangle.text':
+    'De wilgengeestjes vinden het een leuk spelletje om een veerpont los te snijden, {playerName}, en vorige week sloeg het tolbootje om op de oostelijke route met een seizoen aan brugtol aan boord. De kisten zonken in de ondiepten en de geestjes dansen op de vlonderpaden alsof ze die bezitten. Verjaag er acht en haal drie tolkisten omhoog, dan eet Brugmeer deze winter.',
+  'entities.quests.q_wf_toll_and_tangle.objectives.0.label': 'Wilgengeestje verjaagd',
+  'entities.quests.q_wf_toll_and_tangle.objectives.1.label': 'Tolkist geborgen',
+  'entities.quests.q_wf_toll_and_tangle.completion':
+    'Drie kisten, en de munten er nog droog in. De geestjes zullen een week mokken in de wilgentenen, {playerName}, en het stadje is je zijn winterbrood verschuldigd.',
+  'entities.quests.q_wf_wisplight_charms.title': 'Dwaallicht-Amuletten',
+  'entities.quests.q_wf_wisplight_charms.text':
+    'De dwaallichtjes boven de poelen zijn het veen dat hardop droomt, {playerName}, en hun licht is het enige dat standhoudt tegen het gesuis van de Kwaker. Ik weef het in wilgenamuletten: een om je nek en het gesnurk kan je oogleden niet naar beneden trekken. Breng me zes dwaallicht-bollen. De dwaallichtjes zullen er niet voor vechten, wat het een vriendelijkheid of een diefstal maakt, afhankelijk van hoe je het draagt.',
+  'entities.quests.q_wf_wisplight_charms.objectives.0.label': 'Dwaallicht-Bol',
+  'entities.quests.q_wf_wisplight_charms.completion':
+    'Zes bollen, nog warm van het dromen. Geef me tot maanopgang en ik zal amuletten geweven hebben voor jou en wie er dapper genoeg is om naast je te staan.',
+  'entities.quests.q_wf_witch_of_willowweep.title': 'De Heks van Treurwilg',
+  'entities.quests.q_wf_witch_of_willowweep.text':
+    'Je hebt het nu wel gehoord, {playerName}: het gesnurk. Traag en zwaar, voorbij de Sluimervlakte, alsof het veen zelf zich omdraait in zijn slaap. De padden, de geestjes, de dwaallichtjes die op de middag branden: het begon allemaal toen dat geluid begon. Een ziel weet misschien wat het is. Moeder Zegge houdt een kamp bij Treurwilg, westwaarts om de gracht en de verre oever af. Zoek haar op, en vraag haar wat er slaapt in het midden van mijn veen.',
+  'entities.quests.q_wf_witch_of_willowweep.objectives.0.label': 'Zoek Moeder Zegge',
+  'entities.quests.q_wf_witch_of_willowweep.completion':
+    'Alden stuurde je helemaal hierheen om naar het gesnurk te vragen? Dan luistert het brugvolk eindelijk. Ga zitten, uit de vochtigheid, {playerName}. Dat geluid heeft een naam, en een keel, en ik heb gewacht op iemand dwaas genoeg om me te helpen het tot bedaren te brengen.',
+  'entities.quests.q_pr_boars_in_the_gardens.title': 'Zwijnen in de Tuinen',
+  'entities.quests.q_pr_boars_in_the_gardens.text':
+    'Wat er ook roert in het diepe groen, het drijft de struweel-everzwijnen ons strand op. Ze hebben de tuinterrassen deze week al twee keer omgewoeld, en de droogrekken zijn de volgende. Tien zwijnen, {playerName}, en drijf de rest terug onder de bomen.',
+  'entities.quests.q_pr_boars_in_the_gardens.objectives.0.label': 'Struweel-Everzwijn verjaagd',
+  'entities.quests.q_pr_boars_in_the_gardens.completion':
+    'De rekken staan overeind en de tuinen kunnen opnieuw worden beplant. De zwijnen kozen er niet voor om het zand op te komen, {playerName}. Onthoud dat: iets heeft ze in beweging gezet.',
+  'entities.quests.q_pr_canopy_silk.title': 'Zijde uit het Bladerdak',
+  'entities.quests.q_pr_canopy_silk.text':
+    'Kijk omhoog, {playerName}. Elk bladerdak van hier tot het afgodsbeeld is bespannen als een visnet, en de wevers worden elk seizoen brutaler. Ik span hun eigen zijde over de paden, struikelbellen, zodat de jungle niet ongemerkt op me af kan sluipen. Zes goede strengen van de bladerdakwevers zullen mijn lijnen opnieuw bespannen.',
+  'entities.quests.q_pr_canopy_silk.objectives.0.label': 'Bladerdak-Zijdenstreng',
+  'entities.quests.q_pr_canopy_silk.completion':
+    "Goede, sterke zijde. Mijn bellen zullen nog een tijdje zingen, en niets loopt deze paden 's nachts zonder dat ik het weet, {playerName}. De laatste tijd loopt er iets vaak.",
+  'entities.quests.q_pr_down_to_drifthaven.title': 'Naar Beneden naar Drijfhaven',
+  'entities.quests.q_pr_down_to_drifthaven.text':
+    'Uit de zwarte bomen en de zon in, {playerName}. Volg de kustweg noordwaarts en je zult Drijfhaven bereiken voordat het getij keert. Vraag naar Berger-Baas Ryna, ze heeft werk voor elk paar handen sinds de storm, en vertel haar dat de Warmond-weg nog open is.',
+  'entities.quests.q_pr_down_to_drifthaven.objectives.0.label': 'Meld je bij Berger-Baas Ryna',
+  'entities.quests.q_pr_down_to_drifthaven.completion':
+    'Pell stuurde je? Dan heb je de hele Warmond-weg alleen belopen, en dat is voor mij referentie genoeg. Welkom in Drijfhaven, {playerName}. Pak een touw, we hebben handen tekort.',
+  'entities.quests.q_pr_idol_guardian.title': 'De Afgodswachter',
+  'entities.quests.q_pr_idol_guardian.text':
+    "Het afgodsbeeld is ouder dan het eiland, {playerName}. Ouder dan de trommels, ouder dan de naam Palmreik. Zijn Wachter heeft in die verzonken ring gestaan sinds voordat de palmen groeiden, en nu ontwaakt hij en loopt hij 's nachts langs de zuilen. Wat de offergaven ook voeden, de Wachter is de poortwacht ervan. Neem een vriend mee, en breek hem.",
+  'entities.quests.q_pr_idol_guardian.objectives.0.label': 'De Afgodswachter gebroken',
+  'entities.quests.q_pr_idol_guardian.completion':
+    'Je hebt iets geveld waar de jungle zelf niet aan durfde te komen. Kijk daar, achter het afgodsbeeld: de Wachter bewaakte nooit de zuilen, {playerName}, hij bewaakte de trappen eronder. De trommels zijn vanavond stil geworden. Wat er ook slaapt onder het Wildhartbekken, het kent nu jouw naam.',
+  'entities.quests.q_pr_scuttler_cull.title': 'Schelpruggen-Dieven',
+  'entities.quests.q_pr_scuttler_cull.text':
+    'Elk wrak op deze kust trekt de getijde-scharrelaars aan, en de Pearlwake heeft de halve rif aangetrokken. Mijn bergingsploegen willen geen lijn bewerken met die klauwen in de ondiepten. Kraak er tien, {playerName}, en de wraklijn is weer van ons.',
+  'entities.quests.q_pr_scuttler_cull.objectives.0.label': 'Getijde-Scharrelaar gekraakt',
+  'entities.quests.q_pr_scuttler_cull.completion':
+    'Tien minder klauwen in de branding. Mijn ploegen waden alweer naar buiten, en niet een van hen zei dank je wel, dus zal ik het doen: dank je wel, {playerName}.',
+  'entities.quests.q_pr_the_lost_navigator.title': 'De Verloren Loods',
+  'entities.quests.q_pr_the_lost_navigator.text':
+    'We haalden iedereen van de Pearlwake af, op een na: Loods Suli, die naar het verre strand zwom en nooit is binnengekomen. Een duiker zag haar schuilen in het boegwrak voorbij het Palmstrand, levend, maar te uitgeput om de tocht alleen te wagen. Breng haar lopend naar huis langs de kustweg, {playerName}. De krabben zullen het niet leuk vinden, en de jungle nog minder.',
+  'entities.quests.q_pr_the_lost_navigator.objectives.0.label':
+    'Loods Suli veilig naar Drijfhaven gebracht',
+  'entities.quests.q_pr_the_lost_navigator.completion':
+    'Suli zit bij het vuur, en zweert nog steeds dat ze het had kunnen zwemmen. Je hebt de enige kaartlezer van deze kust teruggebracht, {playerName}. Deze komen uit haar zeekist, met haar zegen.',
+  'entities.quests.q_pr_the_man_who_went_in.title': 'De Man die Naar Binnen Ging',
+  'entities.quests.q_pr_the_man_who_went_in.text':
+    'De duikers zullen de bomengrens niet oversteken, {playerName}, en ik zal het ze niet vragen. Je hebt de trommels inmiddels gehoord: iedereen hoort ze, tegen de tweede nacht. Een man op dit eiland is ooit naar dat geluid toe gelopen en teruggekomen. Okku. Hij kampeert onder de grote banyanbomen bij de Rankval, diep de Warboel-weg op. Zoek hem op, en vraag hem wat het groen verbergt.',
+  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': 'Zoek Okku bij de Rankval',
+  'entities.quests.q_pr_the_man_who_went_in.completion':
+    'Isha stuurde je? De Parelmoeder heeft mijn naam in jaren niet uitgesproken. Ga zitten, buiten het bereik van de ranken, {playerName}, en ik zal je vertellen wat ik weet: de trommels zijn niet het gevaar. Ze zijn de waarschuwing.',
+  'entities.quests.q_pr_what_the_drums_guard.title': 'Wat de Trommels Bewaken',
+  'entities.quests.q_pr_what_the_drums_guard.text':
+    'Ik ben zo dicht bij het Verzonken Afgodsbeeld gekomen als een levende man durft, en ik zag twee dingen: de wevers hebben de afgodswegen met web omgordijnd, en de oude offerschalen erlangs zijn opnieuw gevuld. Vers, {playerName}. Vel acht wevers van de weg en breng me drie van die offergaven. Ik wil weten welke hand nog altijd een dode god voedt.',
+  'entities.quests.q_pr_what_the_drums_guard.objectives.0.label': 'Bladerdakwever geveld',
+  'entities.quests.q_pr_what_the_drums_guard.objectives.1.label':
+    'Bijgevulde Offerschaal verzameld',
+  'entities.quests.q_pr_what_the_drums_guard.completion':
+    'Mos, parelschelp, en zwijnenbloed, vastgepakt door vingers. Iets in die ruine houdt nog altijd zijn riten, {playerName}, en de Wachter houdt al het andere buiten. Het is tijd dat we er eerlijk over spreken.',
+  'entities.quests.q_pr_wreck_line_cargo.title': 'De Wraklijn',
+  'entities.quests.q_pr_wreck_line_cargo.text':
+    'De storm van drie nachten geleden dreef de Pearlwake op het rif, en haar lading ligt verspreid over de hele lengte van de wraklijn tussen hier en het Palmstrand. Drie kisten handelswaar liggen nog in de branding, {playerName}. Breng ze binnen voordat het getij, of de krabben, opeisen wat er nog over is.',
+  'entities.quests.q_pr_wreck_line_cargo.objectives.0.label': 'Pearlwake-Vrachtkist geborgen',
+  'entities.quests.q_pr_wreck_line_cargo.completion':
+    'Zoutbevlekt maar gaaf, alle drie. De duikers eten deze maand dankzij jou, {playerName}.',
+  'entities.quests.q_nb_charts_of_the_stones.title': 'De Kaarten in de Stenen',
+  'entities.quests.q_nb_charts_of_the_stones.text':
+    'De Wake-stenen zijn ouder dan Maanrust, ouder dan het nachtvolk dat ze verzorgt, en hun vlakken zijn gesneden met sterrenkaarten die ik mijn hele leven heb besteed te leren lezen. De hemel is verschoven, {playerName}, en ik moet weten hoe ver. Lees de kaarten op drie van de stenen en breng me hun standen.',
+  'entities.quests.q_nb_charts_of_the_stones.objectives.0.label': 'Sterrenkaart gelezen',
+  'entities.quests.q_nb_charts_of_the_stones.completion':
+    'Er blijft geen twijfel over. Elke stand is naar de Slapeloze Grafheuvel gekropen, alsof de hemel zelf over die heuvel buigt om toe te kijken. De oude koningen werden niet zonder reden onder uitgelijnde sterren begraven, {playerName}.',
+  'entities.quests.q_nb_eyes_on_the_vigil.title': 'Ogen op de Wake',
+  'entities.quests.q_nb_eyes_on_the_vigil.text':
+    'Iets maakt de schrijders brutaal en de kuddes onrustig, {playerName}, en ik kan het niet aflezen in de bloemen. Cassian kan het aflezen in de hemel. Hij houdt zijn observatoriumkamp bij de Statige Wacht ten oosten van hier, waar het nachtvolk tussen de stenen drijft. Zoek hem op, en vraag wat de sterren zeggen.',
+  'entities.quests.q_nb_eyes_on_the_vigil.objectives.0.label':
+    'Zoek Astronoom Cassian bij de Statige Wacht',
+  'entities.quests.q_nb_eyes_on_the_vigil.completion':
+    'Lira stuurde je? Dan voelen de tuinen het ook. Ga even bij de kijker zitten, {playerName}. De sterren zijn al een maand onrustig, en elke kaart die ik teken helt noordwaarts naar de grafheuvel.',
+  'entities.quests.q_nb_night_gardens.title': 'De Nachttuinen',
+  'entities.quests.q_nb_night_gardens.text':
+    'De nachtbloesem opent zich alleen onder deze hemel, en Schemerveld herbergt de oudste bedden in het rijk. Ik heb vier verse bloesems nodig voor de heiligdomsslingers, {playerName}. Snijd ze voorzichtig: een bed onthoudt een ruwe hand een heel seizoen lang.',
+  'entities.quests.q_nb_night_gardens.objectives.0.label': 'Nachtbloesem-Bloem verzameld',
+  'entities.quests.q_nb_night_gardens.completion':
+    'Nog gloeiend, elk bloemblad. Het heiligdom zal een week naar de nacht ruiken, en Maanrust slaapt er makkelijker door.',
+  'entities.quests.q_nb_restless_mounds.title': 'De Onrustige Grafheuvels',
+  'entities.quests.q_nb_restless_mounds.text':
+    'De kaarten waren een waarschuwing, en het grafheuvelveld bewijst het: de heuvels openen van binnenuit. Grafgeesten lopen door de grafrijen, gehuld in de oude eerbewijzen, en de offergaven die hen slapend hielden liggen verspreid in het gras. Leg er acht neer, {playerName}, en verzamel vier van de offergaven en breng ze naar mij terug.',
+  'entities.quests.q_nb_restless_mounds.objectives.0.label': 'Grafheuvelgeest gedood',
+  'entities.quests.q_nb_restless_mounds.objectives.1.label': 'Grafoffer geborgen',
+  'entities.quests.q_nb_restless_mounds.completion':
+    'Grafgoud, nog koud van de aarde. De grafgeesten rijzen niet uit zichzelf op, {playerName}: iets onder de grote heuvel roept hen naar buiten, en ik vrees dat de kaarten ons zijn naam al hebben verteld.',
+  'entities.quests.q_nb_road_of_lanterns.title': 'De Weg van Lantaarns',
+  'entities.quests.q_nb_road_of_lanterns.text':
+    'Hier boven volgt de zon nooit, {playerName}, alleen de lampen die ik brandend houd langs de klim. Maanrust ligt noordwaarts waar het bloemlicht zich verzamelt. Zoek Lira Dauwzang op tussen haar tuinen en vertel haar dat de lampen van de Nachtpoort nog branden.',
+  'entities.quests.q_nb_road_of_lanterns.objectives.0.label': 'Zoek Lira Dauwzang in Maanrust',
+  'entities.quests.q_nb_road_of_lanterns.completion':
+    'De lampen branden nog, en de weg brengt ons nog steeds vreemdelingen. Sorrel bewaakt die poort al langer dan wie dan ook in Maanrust zich kan herinneren. Welkom, {playerName}, in het rijk dat nooit aanbreekt.',
+  'entities.quests.q_nb_striders_in_the_dark.title': 'Schrijders in het Duister',
+  'entities.quests.q_nb_striders_in_the_dark.text':
+    'De schemerschrijders waren altijd al geduldige jagers, {playerName}, maar de laatste tijd glippen ze regelrecht de bloembedden in en nemen ze maanvacht-lammeren onder onze lantaarns vandaan. Ruim er tien op en geef de heuvels hun rust terug.',
+  'entities.quests.q_nb_striders_in_the_dark.objectives.0.label': 'Schemerschrijder gedood',
+  'entities.quests.q_nb_striders_in_the_dark.completion':
+    'Tien schrijders minder, en de kuddes grazen al makkelijker. De tuinen houden hun eigen uren, maar vanavond houden ze die in vrede.',
+  'entities.quests.q_nb_the_barrow_king.title': 'De Grafheuvelkoning Ontwaakt',
+  'entities.quests.q_nb_the_barrow_king.text':
+    'Elke stand, elke onrustige ster, elke geopende heuvel wijst naar een ding: de Grafheuvelkoning ontwaakt onder de grote heuvel, en dit rijk heeft geen dageraad om hem tegen te houden. Hij moet ter ruste worden gelegd voordat hij zich zijn kroon herinnert, {playerName}. Ga niet alleen: neem een vriend mee, en houd het bloemlicht achter je.',
+  'entities.quests.q_nb_the_barrow_king.objectives.0.label': 'De Grafheuvelkoning ter ruste gelegd',
+  'entities.quests.q_nb_the_barrow_king.completion':
+    'De sterren zijn voor het eerst in een seizoen tot rust gekomen, {playerName}. De heuvels zijn gesloten, het nachtvolk is stil geworden bij hun stenen, en de koning slaapt weer beneden. Draag deze mantel: Maanrust sneed hem voor wie de nacht uiteindelijk vertrouwde.',
+  'entities.quests.q_nb_wool_by_moonlight.title': 'Wol bij Maanlicht',
+  'entities.quests.q_nb_wool_by_moonlight.text':
+    'Niets verwarmt zoals maanvacht, {playerName}, en niets spint zo fijn. De grazers dragen hun zilveren wol los in plukken terwijl ze over de heuvels drijven. Breng me zes goede plukken van de kuddes en ik zal je iets weven dat de moeite van het lopen waard is.',
+  'entities.quests.q_nb_wool_by_moonlight.objectives.0.label': 'Maanvacht-Pluk',
+  'entities.quests.q_nb_wool_by_moonlight.completion':
+    'Zilver als sterrenlicht en twee keer zo zacht. Hier, {playerName}: wanten van de laatste partij, gevoerd zoals alleen maanvacht kan voeren.',
+  'entities.quests.q_calming_the_deep.title': 'De Diepte Kalmeren',
+  'entities.quests.q_calming_the_deep.text':
+    'De sporelingen van de Glanzende Diepte waren zachtaardige wezens voordat de scheur hun ringen aanraakte. Wat de verdorvenheid neemt, geeft ze niet terug. Gun de verdorvenen rust, {playerName}: tien van hen, in het noorden van de Diepte.',
+  'entities.quests.q_calming_the_deep.objectives.0.label': 'Verdorven Sporeling ter ruste gelegd',
+  'entities.quests.q_calming_the_deep.completion':
+    'Je deed wat ik niet kon verdragen te doen. De verzamelaars zingen nog steeds in de zuidelijke ringen; dankzij jou zullen ze blijven zingen.',
+  'entities.quests.q_gleaming_antlers.title': 'Glanzende Gewei',
+  'entities.quests.q_gleaming_antlers.text':
+    'De gesluierde herten laten licht achter waar ze grazen, en hun afgeworpen geweien houden het jarenlang vast. Vijf ervan, van de kuddes in de open plek in het hart van de vallei, en mijn lantaarns branden de hele winter zonder olie. De herten hoeven geen kwaad te worden gedaan, maar ze scheiden er niet makkelijk van.',
+  'entities.quests.q_gleaming_antlers.objectives.0.label': 'Glanzend Gewei',
+  'entities.quests.q_gleaming_antlers.completion':
+    'Kijk hoe ze het licht vasthouden! Geen vlam, geen rook, alleen de gloed. De Holte voorziet.',
+  'entities.quests.q_grove_menace.title': 'Dreiging in de Open Plek',
+  'entities.quests.q_grove_menace.text':
+    'Schemerdwaallichtjes zijn na het invallen van het duister tussen mijn kramen beginnen te drijven, {playerName}, en hun kilte bederft alles wat het raakt. Dun ze voor me uit: tien ervan, waar de sluier ook is gescheurd.',
+  'entities.quests.q_grove_menace.objectives.0.label': 'Schemerdwaallicht verdreven',
+  'entities.quests.q_grove_menace.completion':
+    'De nachtmarkt kan weer open. Je hebt een klant voor het leven, of op zijn minst een korting.',
+  'entities.quests.q_hollow_first_of_the_herd.title': 'Eerste van de Kudde',
+  'entities.quests.q_hollow_first_of_the_herd.text':
+    'De tweede naam is lastiger uit te spreken. Aurelhorn leidde deze kuddes toen mijn grootmoeder deze uitkijkpost bemande, en wat er ook in de Holte ontwaakte, het wekte hem verkeerd. Hij vertrapt wat hij ooit beschermde, en de kudde zal zijn waanzin niet overleven. Hij zwerft door de weiden bij de oude hofwegen. Maak een einde aan hem met genade, {playerName}, en neem een vriend mee om het gewicht ervan te delen.',
+  'entities.quests.q_hollow_first_of_the_herd.objectives.0.label': 'Aurelhorn vrede gegeven',
+  'entities.quests.q_hollow_first_of_the_herd.completion':
+    'Dus de Eerste valt voor de laatste. De kudde is al rustiger, voel je het? Je hebt de Holte vandaag een gunst bewezen, ook al ziet het er niet zo uit.',
+  'entities.quests.q_hollow_old_marrowshell.title': 'De Oude Schelp van de Ondiepten',
+  'entities.quests.q_hollow_old_marrowshell.text':
+    'De eerste naam is Oude Mergschelp, een krab zo groot als een kar die de oostelijke ondiepten heeft bejaagd sinds voordat Ouderglans een poort had. Hij zwerft, {playerName}, dus zul je de kustlijn moeten aflopen tot je zijn spoor kruist. Ga niet alleen, en vertrouw zijn stilte niet.',
+  'entities.quests.q_hollow_old_marrowshell.objectives.0.label': 'Oude Mergschelp gedood',
+  'entities.quests.q_hollow_old_marrowshell.completion':
+    'De ondiepten zijn weer gewoon water. Ik heb die schelp betere jagers dan ik zien breken, {playerName}. Jou niet.',
+  'entities.quests.q_hollow_the_huntsman.title': 'De Wachter van de Kuddes',
+  'entities.quests.q_hollow_the_huntsman.text':
+    'Je ziet eruit als iemand die meer aankan dan dwaallichtjes, {playerName}. Jager Deral houdt zijn uitkijk tussen de hertenweiden ten oosten van hier, en hij vraagt al weken naar bekwame handen. Wat hij daar ook opspoort, hij zegt het niet hardop in het dorp.',
+  'entities.quests.q_hollow_the_huntsman.objectives.0.label': 'Zoek Jager Deral',
+  'entities.quests.q_hollow_the_huntsman.completion':
+    'Fenna stuurde je? Goed. Dan vertrouwt ze je, en ik heb twee namen die doorgestreept moeten worden.',
+  'entities.quests.q_monument_tour.title': 'Wat de Stenen Zich Herinneren',
+  'entities.quests.q_monument_tour.text':
+    'Drie monumenten staan nog overeind van voor de verzegeling: een bij het Schemerval-Uitkijkpunt, een in het Verzonken Hof, en een verloren in het verre noordoosten waar niemand loopt. Lees ze voor mij, {playerName}. Mijn knieen begaven het al twee eeuwen aan trappen geleden.',
+  'entities.quests.q_monument_tour.objectives.0.label': 'Het monument bij het Uitkijkpunt gelezen',
+  'entities.quests.q_monument_tour.objectives.1.label': 'Het monument in het Hof gelezen',
+  'entities.quests.q_monument_tour.objectives.2.label': 'Het vergeten monument gelezen',
+  'entities.quests.q_monument_tour.completion':
+    'Een uitkijkpunt, een hof, en een vergeten hoek... en alle drie de verzen van het verzegelingslied, voor het eerst samen sinds het werd gezongen. Je hebt een oude lezer heel gelukkig gemaakt.',
+  'entities.quests.q_seal_restored.title': 'Het Zegel Hersteld',
+  'entities.quests.q_seal_restored.text':
+    'Breng het zegel van de Wachter naar de zegelsteen in het hart van het hof en zet het terug waar het is losgeslagen. Dan kan de Holte beginnen te helen, en jij, {playerName}, zult hebben gedaan wat niemand van jouw soort ooit eerder heeft gedaan.',
+  'entities.quests.q_seal_restored.objectives.0.label': 'Het zegel teruggeplaatst in de zegelsteen',
+  'entities.quests.q_seal_restored.completion':
+    'Ik voelde het van hieruit sluiten, zacht als schemering. De Holte onthoudt haar vrienden, {playerName}. Hoe ver je ook reist, er zal altijd een licht voor je zijn onder de grote boom.',
+  'entities.quests.q_shards_of_starfall.title': 'Scherven van Sterrenval',
+  'entities.quests.q_shards_of_starfall.text':
+    'Wanneer de schemerdwaallichtjes over de kristalvelden trekken, kleven splinters van oud sterrenlicht aan hen als klitten. Zes scherven, {playerName}, en ik kan de verzegeling dateren tot precies het seizoen waarin ze werd gezongen.',
+  'entities.quests.q_shards_of_starfall.objectives.0.label': 'Sterrenval-Scherf',
+  'entities.quests.q_shards_of_starfall.completion':
+    'Kijk naar de strepen! Herfst. De Holte werd verzegeld in de herfst. Tweehonderd jaar discussie, beslecht door zes kleine steentjes.',
+  'entities.quests.q_spore_hearts.title': 'Harten van de Ring',
+  'entities.quests.q_spore_hearts.text':
+    'Wanneer een sporeling ten prooi valt aan het duister, blijft zijn hart kloppen met geleende schaduw. Vier van die harten, gereinigd bij het heiligdom, kunnen ons leren hoe de verdorvenheid zich verspreidt. Het is grimmig werk, {playerName}, maar het is helend werk.',
+  'entities.quests.q_spore_hearts.objectives.0.label': 'Sporenhart',
+  'entities.quests.q_spore_hearts.completion':
+    'Daar. Gereinigd, en stil. Elk ervan toont hetzelfde teken: de schaduw stroomt VANUIT het Verzonken Hof. Vertel het aan Saelwyn.',
+  'entities.quests.q_spore_tide.title': 'Tegen het Sporengetij',
+  'entities.quests.q_spore_tide.text':
+    'De zalf houdt het Woud stand, maar de verdorvenheid drukt met elke schemering harder op de Diepte. Nog twaalf van de verdorvenen moeten ter ruste worden gelegd voordat de verzamelaars hun noordelijke ringen kunnen terugwinnen, {playerName}.',
+  'entities.quests.q_spore_tide.objectives.0.label': 'Verdorven Sporeling ter ruste gelegd',
+  'entities.quests.q_spore_tide.completion':
+    'De ringen in het noorden zingen vanavond weer. Zachtjes, maar ze zingen.',
+  'entities.quests.q_sunken_court.title': 'Het Verzonken Hof',
+  'entities.quests.q_sunken_court.text':
+    'Bryn heeft de harten juist gelezen: de scheur loopt door het oude hof in het oosten, en zijn wachters zijn verkeerd ontwaakt. Ze werden gebouwd om het zegel te beschermen; nu verpletteren ze iedereen die het nadert. Ruim er acht op uit de ruines.',
+  'entities.quests.q_sunken_court.objectives.0.label': 'Oude Wachter tot stilte gebracht',
+  'entities.quests.q_sunken_court.completion':
+    'Acht wachters, tot stilte gebracht. Ik herinner me nog toen ze werden opgericht, {playerName}. Kijk niet zo verbaasd; de Holte houdt haar hoeders lang in leven.',
+  'entities.quests.q_treant_accord.title': 'Het Treant-Akkoord',
+  'entities.quests.q_treant_accord.text':
+    'De oudsten van het Woud werpen hun buitenste schors af terwijl de verdorvenheid aan hun wortels knaagt. Vier stukken ervan, en ik kan een zalf brouwen voor het hele Woud. Ze zullen je niet bedanken terwijl je het losbreekt, {playerName}, maar ze zullen er een eeuw langer om blijven staan.',
+  'entities.quests.q_treant_accord.objectives.0.label': 'Oudsten-Schors',
+  'entities.quests.q_treant_accord.completion':
+    'Dik en gaaf, alle vier. De zalf zal een week nodig hebben om te brouwen en honderd jaar om haar werk af te maken. Bomen meten vriendelijkheid anders.',
+  'entities.quests.q_veil_thinned.title': 'De Verdunde Sluier',
+  'entities.quests.q_veil_thinned.text':
+    'Dus de grot opende zich voor jou. Dan is het zegel zwakker dan ik vreesde, {playerName}. Waar de sluier scheurt, worden de dwaallichtjes donker en koud. Breng me acht essenties van de schemerdwaallichtjes en ik zal lezen hoe diep de wond reikt.',
+  'entities.quests.q_veil_thinned.objectives.0.label': 'Schemerdwaallicht-Essentie',
+  'entities.quests.q_veil_thinned.completion':
+    'Koud, elk van hen. De Holte heeft misschien nog een seizoen voordat de scheur een rift wordt. We hebben werk te doen, jij en ik.',
+  'entities.quests.q_waking_warden.title': 'De Ontwakende Wachter',
+  'entities.quests.q_waking_warden.text':
+    'Het hof is stil, maar zijn meester niet. De Wachter die het zegel bewaakt is verwrongen ontwaakt, en zolang hij standhoudt, kan het zegel niet worden hersteld. Hij zal niet makkelijk vallen; neem een vriend mee als je er een kunt vinden, {playerName}. Neem er twee als je er twee kunt vinden.',
+  'entities.quests.q_waking_warden.objectives.0.label': 'De Ontwakende Wachter verslagen',
+  'entities.quests.q_waking_warden.completion':
+    'De klok van zijn stem is stil. Ik voelde het van hieruit, als een last die van de hele vallei werd getild.',
+  'entities.quests.q_wardens_echoes.title': "Echo's van de Wachter",
+  'entities.quests.q_wardens_echoes.text':
+    'Zelfs nu hun meester tot zwijgen is gebracht, herhalen de hofwachters zijn laatste bevel als een echo die niet wil vervagen. Totdat het zegel is teruggeplaatst, zullen ze blijven ontwaken, {playerName}. Breng nog tien van hen tot stilte zodat de metselaars de zegelsteen kunnen bereiken.',
+  'entities.quests.q_wardens_echoes.objectives.0.label': 'Oude Wachter tot stilte gebracht',
+  'entities.quests.q_wardens_echoes.completion':
+    'De echo wordt elke keer zwakker. Weldra zal het hof niets meer herbergen dan wind en klimop, zoals een ruine hoort te zijn.',
+  'entities.quests.q_wisp_lights.title': 'Lichten van de Ondiepten',
+  'entities.quests.q_wisp_lights.text':
+    'De glinsterdwaallichtjes dragen stofjes van het oude sterrenlicht dat hier viel toen de Holte werd verzegeld. Zes stofjes, en de heiligdomslampen zullen een jaar lang branden. Neem alleen van degenen die vervagen; de Holte geeft genoeg zonder hebzucht.',
+  'entities.quests.q_wisp_lights.objectives.0.label': 'Dwaallicht-Stofje',
+  'entities.quests.q_wisp_lights.completion':
+    'Zacht als de eerste sterren. Zet ze hier bij het altaar; het heiligdom doet de rest.',
+  'entities.quests.q_gc_dead_mens_cargo.title': 'Lading van Dode Mannen',
+  'entities.quests.q_gc_dead_mens_cargo.text':
+    'De bergingswet is simpel, {playerName}: wat de zee aan het strand geeft, is van mij. De verdronken matrozen zijn het daar niet mee eens. Ze rijzen op uit hun rompen en slepen elke kist die ik opstapel terug onder de vloedlijn. Leg er zes voorgoed neer, en sleep, terwijl het strand rustig is, drie drijfgoedkisten binnen voordat het getij zijn tegeneis indient.',
+  'entities.quests.q_gc_dead_mens_cargo.objectives.0.label': 'Verdronken Matroos ter ruste gelegd',
+  'entities.quests.q_gc_dead_mens_cargo.objectives.1.label': 'Drijfgoedkist geborgen',
+  'entities.quests.q_gc_dead_mens_cargo.completion':
+    'Zes bemanningen rustiger en drie kisten veilig en droog. Je bergt met een zwaardere hand dan ik, {playerName}, maar het kasboek maakt dat niet uit. De helft hiervan is van jou volgens de wet, en met de wet bedoel ik dat ik het zeg.',
+  'entities.quests.q_gc_down_the_windway.title': 'De Windweg Af',
+  'entities.quests.q_gc_down_the_windway.text':
+    'Je hebt de klim gemaakt, {playerName}, dus heeft de wind besloten je te houden. Wijkhaven ligt oostwaarts langs de heuvelweg, weggedoken in de luwte van zijn baai. Havenmeester Odile telt elke ziel die over de pas komt, en ze zal jou willen tellen. Vertel haar dat de Windweg nog open is.',
+  'entities.quests.q_gc_down_the_windway.objectives.0.label': 'Meld je bij Havenmeester Odile',
+  'entities.quests.q_gc_down_the_windway.completion':
+    'Te voet over de pas, in dit weer? Maren stuurt me al weinig namen, en nog minder komen zelf hun verhaal doen. Welkom in Wijkhaven, {playerName}. Doe de herbergdeur achter je dicht.',
+  'entities.quests.q_gc_keeper_of_the_flame.title': 'De Hoeder van de Vlam',
+  'entities.quests.q_gc_keeper_of_the_flame.text':
+    'Oude Bram bewaakt het Baken op de hoge landtong ten noordoosten van het stadje, en hij is al twee weken niet naar beneden gekomen voor zijn voorraden. De lamp brandt nog, dus hij leeft, maar een man van zijn leeftijd alleen op die landtong in deze wind, {playerName}. Beklim de bakenweg en kijk of hij nog overeind staat.',
+  'entities.quests.q_gc_keeper_of_the_flame.objectives.0.label': 'Zoek Hoeder Bram',
+  'entities.quests.q_gc_keeper_of_the_flame.completion':
+    'Odile stuurde je helemaal hierheen om te zien of de wind mij had meegenomen? Ha. Vertel haar dat de lamp brandt en ik ook. Maar nu je toch de klim hebt gemaakt, {playerName}, blijf even. Het Baken heeft werk dat alleen een vreemdeling geschikt lijkt te doen.',
+  'entities.quests.q_gc_lanterns_on_the_shear.title': 'Lantaarns op de Scheur',
+  'entities.quests.q_gc_lanterns_on_the_shear.text':
+    'Het Baken is het grote licht, {playerName}, maar het zijn de stormlantaarns die een nachtreiziger de klifweg boven de Scheur af begeleiden. Vannacht doofde de storm ze allemaal, en die weg in het donker is een lange val met een kort einde. Neem mijn vuurslag en steek de vier langs het klif weer aan.',
+  'entities.quests.q_gc_lanterns_on_the_shear.objectives.0.label':
+    'Stormlantaarn opnieuw ontstoken',
+  'entities.quests.q_gc_lanterns_on_the_shear.completion':
+    'Vier lichtpunten op de klifweg, precies waar ze horen. Van hierboven lijkt het alsof de kust weer haar ogen heeft geopend. Je hebt het in je om een hoeder te worden, {playerName}.',
+  'entities.quests.q_gc_scuttlers_in_the_pots.title': 'Scharrelaars in de Potten',
+  'entities.quests.q_gc_scuttlers_in_the_pots.text':
+    'De zandbank-scharrelaars hebben geleerd de klifweg te beklimmen en onze krabpotten open te kraken op de stenen, {playerName}. De helft van de vangst is deze week verdwenen, en een potman heeft een hand die hij een maand niet zal gebruiken. Breek er tien en de rest zal zich herinneren waarom ze zich tot de zandbanken beperkten.',
+  'entities.quests.q_gc_scuttlers_in_the_pots.objectives.0.label': 'Zandbank-Scharrelaar gedood',
+  'entities.quests.q_gc_scuttlers_in_the_pots.completion':
+    'Tien minder schelpen op mijn weg, en de potten kwamen vanochtend vol boven. De potmannen noemen je een goed voorteken, {playerName}. In Wijkhaven is dat het warmste lof dat er is.',
+  'entities.quests.q_gc_the_far_shore.title': 'De Verre Kust',
+  'entities.quests.q_gc_the_far_shore.text':
+    'Vanuit deze lampkamer kan ik de hele kust zien, {playerName}, en wat ik in het noorden zie, bevalt me niet. Groene lichten die bij eb over de Wrakvelden lopen, romp na romp. Een vrouw werkt die kust alleen: Edda, de berger. Volg de klifweg noordwaarts voorbij de Scheur tot de wrakken beginnen, en zie of ze nog ademt.',
+  'entities.quests.q_gc_the_far_shore.objectives.0.label': 'Zoek Berger Edda',
+  'entities.quests.q_gc_the_far_shore.completion':
+    "Bram houdt mijn kust nu vanuit zijn toren in de gaten, is het niet? De oude man heeft gelijk om zich zorgen te maken, {playerName}. De doden lopen 's nachts over hun eigen wrakken, en de laatste tijd kan het ze niet meer schelen of de zon op is.",
+  'entities.quests.q_gc_the_wreck_warden.title': 'De Wrakwachter',
+  'entities.quests.q_gc_the_wreck_warden.text':
+    'Nu weet je waarom de matrozen oprijzen, {playerName}. Iets draagt de met zeepokken bedekte plaat van het eerste wrak dat ooit op deze kust brak, en het bewaakt elke romp op het strand als een kerkhof dat het is aangesteld te bewaken. Het bewaart een schat waar ik al tien jaar naar hunker en een bemanning die ik liever ter ruste zie. Maak een einde aan de Wrakwachter. Neem een vriend mee, de doden houden goede wacht.',
+  'entities.quests.q_gc_the_wreck_warden.objectives.0.label': 'De Wrakwachter geveld',
+  'entities.quests.q_gc_the_wreck_warden.completion':
+    'Het strand viel stil op het moment dat het viel, {playerName}. De eerste stilte die ik in tien jaar werken op deze kust heb gehoord. De bemanningen zijn nu enkel botten, rustende botten. Neem de mantel bovenop de schat, die zou altijd al beter passen op een levende rug.',
+  'entities.quests.q_gc_wind_against_the_wick.title': 'Wind tegen de Wijk',
+  'entities.quests.q_gc_wind_against_the_wick.text':
+    'De windvlaag-dwaallichtjes zijn de wind die venijnig is geworden, {playerName}. Ze verzamelen zich op de hoge heuvels bij de Spiegelplas, en elke vlam die ze vinden, doven ze: een lantaarn, een haard, op een dag deze lamp. Negenendertig jaar heb ik het Baken brandend gehouden, en ik zal het niet verliezen aan weer met een wrok. Verjaag er acht.',
+  'entities.quests.q_gc_wind_against_the_wick.objectives.0.label': 'Windvlaag-Dwaallicht verjaagd',
+  'entities.quests.q_gc_wind_against_the_wick.completion':
+    'De lamp flakkerde vannacht niet eens, voor het eerst in een maand. De wind haat ons nog steeds, {playerName}, maar hij haat ons weer op een eerlijke manier.',
+  'entities.quests.q_gc_wool_off_the_downs.title': 'Wol van de Heuvels',
+  'entities.quests.q_gc_wool_off_the_downs.text':
+    'Mijn bootbemanningen roeien een storm in die door oliejassen snijdt als door papier, {playerName}. Maar een ding keert deze wind: de vettige wol van de heideramen, dik gesponnen op de Wijkhaven-manier. De kuddes grazen op de Huilende Heuvels ten westen van het stadje. Zes goede vachten en elke bemanning roeit dit seizoen warm.',
+  'entities.quests.q_gc_wool_off_the_downs.objectives.0.label': 'Vettige Ramswol',
+  'entities.quests.q_gc_wool_off_the_downs.completion':
+    'Vacht als deze is waarom die ramen daar vet en zelfvoldaan staan in weer dat mensen doodt. De spinsters zullen er bij lamplicht mee aan de slag gaan. Neem deze zolen, {playerName}, ze zijn gevoerd van de laatste scheerbeurt.',
+  'entities.quests.q_fv_aurora_motes.title': 'Stofjes van de Aurora',
+  'entities.quests.q_fv_aurora_motes.text':
+    'De dwaallichtjes die over deze trappen drijven worden door de lichten zelf afgeworpen, en elk draagt een stofje van de aurora in zijn hart. Ik heb er zes nodig om te lezen wat de hemel schrijft, {playerName}. De dwaallichtjes vechten niet terug. Of dat het werk makkelijker of moeilijker maakt is een zaak tussen jou en je geweten.',
+  'entities.quests.q_fv_aurora_motes.objectives.0.label': 'Aurorastofje',
+  'entities.quests.q_fv_aurora_motes.completion':
+    'Zes stofjes, nog gloeiend. Kijk ernaar, {playerName}: ze pulseren in hetzelfde ritme. De lichten zijn geen weer. Het is een signaal.',
+  'entities.quests.q_fv_ember_caches.title': 'Sintels op de Tarnweg',
+  'entities.quests.q_fv_ember_caches.text':
+    'Een slede met sintelvoorraden sloeg vannacht om op de tarnweg: ijzeren ketels die een bedekt vuur een maand lang levend houden. Drie ervan liggen nog in de sneeuw, {playerName}, en de lodge kan niet missen wat ze bevatten. Breng het vuur naar huis.',
+  'entities.quests.q_fv_ember_caches.objectives.0.label': 'Sintelvoorraad geborgen',
+  'entities.quests.q_fv_ember_caches.completion':
+    'Nog warm, elke een. Je hebt de lodge een hele winter aan genade gekocht, {playerName}.',
+  'entities.quests.q_fv_frostmane_tyrant.title': 'De Tiran van de Vorstmanen',
+  'entities.quests.q_fv_frostmane_tyrant.text':
+    'De huilers jaagden niet toen ze de terrassen afkwamen. Ze vluchtten. Een yeti heeft de hoge grond opgeeist, de bergbewoners noemen hem de Vorstmanen, en zelfs de roedels willen geen helling met hem delen. Er moet een einde aan komen, {playerName}, voordat de winter hem naar mijn muren drijft. Neem een vriend mee. Neem er twee.',
+  'entities.quests.q_fv_frostmane_tyrant.objectives.0.label': 'De Vorstmanen gedood',
+  'entities.quests.q_fv_frostmane_tyrant.completion':
+    'Toen de wind vannacht ging liggen, hoorde het hele dorp de stilte waar de Vorstmanen ooit was. De Sluier is je een schuld verschuldigd die ze jaren zal doen om af te betalen, {playerName}. Draag dit, en elke deur in IJsmantel staat voor je open.',
+  'entities.quests.q_fv_howl_above.title': 'Het Gehuil op de Terrassen',
+  'entities.quests.q_fv_howl_above.text':
+    'Je hoort het bij schemering, {playerName}: een gehuil vanaf de Huilende Terrassen dat niet van de sneeuwjacht-roedels komt. Grotere kelen. De terrashuilers zijn van de toppen afgedaald voor het eerst sinds mijn grootmoeder deze post bekleedde, en zij zijn het die de wolven mijn weg op hebben gedreven. Ruim er acht op en drijf ze terug.',
+  'entities.quests.q_fv_howl_above.objectives.0.label': 'Terrashuiler gedood',
+  'entities.quests.q_fv_howl_above.completion':
+    'Acht, en het schemerkoor is er dunner om. Maar huilers verlaten de toppen niet zomaar. Iets daarboven heeft ze in beweging gezet, en ik vrees dat het een naam heeft.',
+  'entities.quests.q_fv_lights_over_steps.title': 'Lichten boven de Trappen',
+  'entities.quests.q_fv_lights_over_steps.text':
+    'De aurora heeft deze maand elke nacht groen gebrand, en de oudjes willen er niet onder lopen. Een vrouw weet misschien waarom: Veyla, de Lichtwichelaar. Ze kampeert alleen op de Aurora-Trappen, ten zuidoosten voorbij de tarn. Zoek haar kamp, {playerName}, en hoor wat de lichten haar hebben verteld.',
+  'entities.quests.q_fv_lights_over_steps.objectives.0.label': 'Zoek Lichtwichelaar Veyla',
+  'entities.quests.q_fv_lights_over_steps.completion':
+    'Kaldra stuurde je? Dan is ze eindelijk bezorgd, en terecht. Ga zitten, {playerName}. Kijk een tijdje met mij naar de hemel.',
+  'entities.quests.q_fv_rime_unbound.title': 'Rijp Ontketend',
+  'entities.quests.q_fv_rime_unbound.text':
+    'Wanneer de aurora zo fel brandt, staat de kou op en loopt: rijp-elementalen, vorst met een eigen wil. Ze verzamelen zich waar de lichten de richels raken, en ze dwalen elke nacht dichter naar mijn kamp toe. Breek er acht uiteen, {playerName}, voordat een van hen mij breekt.',
+  'entities.quests.q_fv_rime_unbound.objectives.0.label': 'Rijp-Elementaal gedood',
+  'entities.quests.q_fv_rime_unbound.completion':
+    'De nacht voelt al ijler aan. Wat hen ook wekt, is nog niet klaar, maar je hebt de Trappen wat rust gekocht.',
+  'entities.quests.q_fv_seeing_wren_home.title': 'Wren Veilig Thuisbrengen',
+  'entities.quests.q_fv_seeing_wren_home.text':
+    "Mijn leerling Wren ging twee dagen geleden de Goudsmelt-lijn lopen en is nooit teruggekomen. Ik vond haar sporen, ze schuilt onder de wegmarkeringen ten noordoosten van de Aurora-Trappen, te bang voor de wolven om te bewegen. Ik kan het veen niet verlaten, {playerName}. Breng haar naar Veyla's kamp op de Trappen. Daar is ze veilig onder de lichten.",
+  'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
+    'Leerling Wren veilig naar de Aurora-Trappen gebracht',
+  'entities.quests.q_fv_seeing_wren_home.completion':
+    'Het meisje is binnen, gewikkeld in de helft van mijn dekens en kletsend de sterren van de hemel. Je hebt vandaag iets goeds gedaan, {playerName}. Dat ziet de Sluier niet vaak.',
+  'entities.quests.q_fv_silent_trapline.title': 'De Stille Vallenlijn',
+  'entities.quests.q_fv_silent_trapline.text':
+    'Oude Brosk werkt de vallenlijn van het Rilveen ten westen van hier, en elke week, al elf jaar lang, stuurt hij een bundel bont mee met de houtslede. Nu al twee weken niets. Hij is te koppig om te bevriezen en te voorzichtig om te verdrinken, {playerName}, dus is er iets anders mis. Zoek zijn kamp bij het veen en zie hem ademen.',
+  'entities.quests.q_fv_silent_trapline.objectives.0.label': 'Zoek Strikkenzetter Brosk',
+  'entities.quests.q_fv_silent_trapline.completion':
+    'Maeve stuurde je? Ha. Elf jaar en die vrouw denkt nog steeds dat het veen mij zal opeten. Nou... dit jaar heeft ze misschien gelijk. Kijk wat het met mijn lijnen heeft gedaan.',
+  'entities.quests.q_fv_snowline_report.title': 'Bericht van de Sneeuwlijn',
+  'entities.quests.q_fv_snowline_report.text':
+    'Elke ziel die uit de Drakenlanden omhoog klimt, passeert mijn vuur, {playerName}, en er klimmen er elke week minder. Wachter Kaldra houdt IJsmantel de noordweg op. Vertel haar dat de pas nog open is, en vertel haar dat een vreemdeling hem alleen heeft belopen.',
+  'entities.quests.q_fv_snowline_report.objectives.0.label': 'Meld je bij Wachter Kaldra',
+  'entities.quests.q_fv_snowline_report.completion':
+    'De pas houdt dus stand. Einna houdt dat wegkamp door stormen die de wegmarkeringen bedelven, en ze heeft me nog nooit loos nieuws gestuurd. Welkom in IJsmantel, {playerName}.',
+  'entities.quests.q_fv_sprung_traps.title': 'Geestjes in de Vallen',
+  'entities.quests.q_fv_sprung_traps.text':
+    'Veengeestjes, {playerName}. De kleine duivels laten mijn vallen voor de lol dichtklappen en verspreiden het ijzer in het riet. Verjaag ze, acht zou de rest moeten leren, en verzamel wat er over is van mijn vallenlijnen terwijl je daar toch bent.',
+  'entities.quests.q_fv_sprung_traps.objectives.0.label': 'Veengeestje verjaagd',
+  'entities.quests.q_fv_sprung_traps.objectives.1.label': 'Val geborgen',
+  'entities.quests.q_fv_sprung_traps.completion':
+    'Vier goede vallen terug en het riet weer stil. Je vangt met een zwaardere hand dan ik, {playerName}, maar ik kan niet tegen de resultaten in gaan.',
+  'entities.quests.q_fv_winter_pelts.title': 'Vachten voor de Lodge',
+  'entities.quests.q_fv_winter_pelts.text':
+    'Brandhout houdt een lichaam levend, {playerName}, maar wol keert deze kou niet, alleen wolvenvacht doet dat. Zes dikke wintervachten van de sneeuwjacht-roedels en ik kan slaaprollen voeren voor iedereen die de lodge herbergt.',
+  'entities.quests.q_fv_winter_pelts.objectives.0.label': 'Dikke Wintervacht',
+  'entities.quests.q_fv_winter_pelts.completion':
+    'Vacht als deze is het enige argument waar de winter naar luistert. Neem deze zolen, ze zijn gevoerd met de laatste partij.',
+  'entities.quests.q_fv_wolves_at_the_door.title': 'Wolven voor de Deur',
+  'entities.quests.q_fv_wolves_at_the_door.text':
+    'De sneeuwjacht-roedels bleven vroeger op de hoge richels. Nu steken ze de tarnweg over bij daglicht en willen mijn houthakkers de muren niet meer verlaten. Dun de roedels uit, {playerName}, tien ervan, en de weg is weer een weg.',
+  'entities.quests.q_fv_wolves_at_the_door.objectives.0.label': 'Sneeuwjacht-Wolf gedood',
+  'entities.quests.q_fv_wolves_at_the_door.completion':
+    'Tien minder schaduwen tussen hier en de tarn. De houthakkers ruzien al over wie er als eerste naar buiten gaat.',
+  'entities.quests.q_eg_bloom_clippings.title': 'Snoeisel van het Levende Groen',
+  'entities.quests.q_eg_bloom_clippings.text':
+    'Je wilt deze tuin begrijpen? Lees hem dan zoals ik dat doe. De herten die op de gazons grazen, laten het meest waarachtige groen groeien: elk blad aan hen is een bladzijde. Breng me zes verse snoeisels van de snoeivorm-herten, {playerName}. Ze zullen je niet bedanken voor het snoeien, maar ze groeien weer aan. Alles hier groeit weer aan.',
+  'entities.quests.q_eg_bloom_clippings.objectives.0.label': 'Gesnoeide Bloesemtak',
+  'entities.quests.q_eg_bloom_clippings.completion':
+    'Kijk hier: de bladeren krullen naar binnen, elk snoeisel hetzelfde. De tuin is bang, {playerName}. In honderd jaar heb ik hem nog nooit bang geweten.',
+  'entities.quests.q_eg_bull_of_the_court.title': 'De Stier van het Fonteinhof',
+  'entities.quests.q_eg_bull_of_the_court.text':
+    'Nu de waarheid, {playerName}. De stier in het hart van het doolhof was mijn meesterwerk: ik vormde hem om het Fonteinhof te bewaken, en honderd jaar lang deed hij dat. Maar de angst in het groen heeft hem bereikt, en hij bewaakt nu niets meer, hij jaagt. Het doolhof voedt hem met wie er ook maar in verdwaalt. Ik ben te oud om hem te ontmaken, en ontmaakt moet hij worden, met wortel en tak. Neem een vriend mee, loop het doolhof naar het hof, en vel mijn stier.',
+  'entities.quests.q_eg_bull_of_the_court.objectives.0.label': 'De Snoeivorm-Stier ontmaakt',
+  'entities.quests.q_eg_bull_of_the_court.completion':
+    'Ik voelde het, hier, toen hij uiteenviel. Honderd jaar werk, en je had gelijk om er een einde aan te maken. Neem deze mantel: ik sneed hem voor wie sterker zou blijken dan mijn beste werk. Het hof is vanavond alleen nog een fontein, {playerName}, en de tuin is alleen nog een tuin. Misschien kunnen de Hoofdtuinman en ik nu allebei slapen.',
+  'entities.quests.q_eg_four_statues.title': 'De Vier Stille Zusters',
+  'entities.quests.q_eg_four_statues.text':
+    'Toen de tuin nog jong was, richtten de eerste tuinlieden vier marmeren zusters op om over haar kwadranten te waken: een boven de Wilde Rozen, een op het vijverpad ten oosten van het doolhof, een op het westelijke gazon waar de kabouters hun konijnenhol houden, en een op het zuidelijke gazon voorbij de heggen. Het doolhof groeide tussen hen op, en de meeste mensen zien nooit alle vier. Loop de kwadranten af, {playerName}, en leg je handpalm tegen elke zuster. Wanneer de tuin je van alle vier de kanten heeft bekeken, zal ze plekken openen die ze voor vreemden verborgen houdt.',
+  'entities.quests.q_eg_four_statues.objectives.0.label': 'Tuinbeeld bezocht',
+  'entities.quests.q_eg_four_statues.completion':
+    'Vier afdrukken, vier zusters, en niet een van hen weende marmer. De tuin heeft je gemeten, {playerName}, en heeft je niet te licht bevonden. Nu kan ik je sturen naar waar de problemen werkelijk huizen.',
+  'entities.quests.q_eg_gate_report.title': 'Bericht door de Poort',
+  'entities.quests.q_eg_gate_report.text':
+    'De gazons voorbij deze poort snoeien zichzelf al honderd jaar, {playerName}, en de laatste tijd zijn ze bezoekers ook gaan snoeien. Hoofdtuinman Amaranth houdt de boeken bij in Haagwijk, de weg op voorbij de poortgazons. Vertel haar dat er weer een reiziger is doorgekomen, en vertel haar dat de heggen bij de poort vannacht bewogen.',
+  'entities.quests.q_eg_gate_report.objectives.0.label': 'Meld je bij Hoofdtuinman Amaranth',
+  'entities.quests.q_eg_gate_report.completion':
+    'Bewogen, zeiden ze. Pell meldt dat elke week, en elke week heeft hij gelijk. Vergeef mijn ogen, {playerName}, ik heb in jaren geen hele nacht geslapen: iemand moet in de gaten houden hoe de tuin ons in de gaten houdt. Welkom in Haagwijk.',
+  'entities.quests.q_eg_gnomes_in_the_green.title': 'De Wrok van de Terreinknechten',
+  'entities.quests.q_eg_gnomes_in_the_green.text':
+    'De scharen waren nog maar het begin, {playerName}. Vannacht kieperden de kabouters onze gereedschapskarren in het groen, een bij hun konijnenhol ten westen van het doolhof, een helemaal aan de andere kant van de tuin op het vijverpad, en verspreidden honderd jaar aan goed ijzer door het gras. Verjaag acht van de kleine duivels en sleep de omgekiepte karren naar huis.',
+  'entities.quests.q_eg_gnomes_in_the_green.objectives.0.label': 'Haagkabouter verjaagd',
+  'entities.quests.q_eg_gnomes_in_the_green.objectives.1.label': 'Gereedschapskar geborgen',
+  'entities.quests.q_eg_gnomes_in_the_green.completion':
+    'Drie karren terug en de pinnen weer vol. Laat de kleine duivels maar mokken in hun heggen: Haagwijk bewerkt deze gazons ook.',
+  'entities.quests.q_eg_hungry_shapes.title': 'Gesnoeid tot Honger',
+  'entities.quests.q_eg_hungry_shapes.text':
+    'Wie deze tuin ook vormt, is achteloos geworden, of wreed. De wolvenvormen in de Wilde Rozen werden voor de show geknipt, maar de laatste tijd jagen ze: groene kaken, geen buiken, en geen enkele reden om ooit te stoppen. Vel tien snoeivorm-wolven, {playerName}, en laat de gazons voor even weer gewoon gazons zijn.',
+  'entities.quests.q_eg_hungry_shapes.objectives.0.label': 'Snoeivorm-Wolf gedood',
+  'entities.quests.q_eg_hungry_shapes.completion':
+    'Tien hopen snoeisel waar tien wolven stonden. Het zou als tuinieren moeten voelen, {playerName}. Waarom voelt het als oorlog?',
+  'entities.quests.q_eg_stolen_shears.title': 'De Gestolen Scharen',
+  'entities.quests.q_eg_stolen_shears.text':
+    'Elke schaar in Haagwijk is in veertien dagen verdwenen, {playerName}: van de haken, uit afgesloten schuren, een paar zelfs uit mijn eigen schort terwijl ik doezelde. Het zijn de haagkabouters, de kleine terreinknechten die het haten dat wij over hun gazons lopen. Haal er zes paar terug voordat het hele gehucht het met keukenmessen moet doen.',
+  'entities.quests.q_eg_stolen_shears.objectives.0.label': 'Gestolen Haagwijk-Schaar',
+  'entities.quests.q_eg_stolen_shears.completion':
+    'Zes paar, en mijn eigen ertussen, ik zou de kerf in het lemmet overal herkennen. Hier, deze handschoenen zijn gebreid voor snoeiwerk. Warme handen maken een vaste schaar.',
+  'entities.quests.q_eg_who_trims_the_hedges.title': 'Wie de Heggen Snoeit',
+  'entities.quests.q_eg_who_trims_the_hedges.text':
+    'Ik houd de boeken al dertig jaar bij, {playerName}, en heb tien daarvan niet goed geslapen, omdat de sommen niet kloppen. Gras wil gemaaid worden en heggen willen gevormd worden, en niemand hier doet een van beide, en toch staat de tuin elke dageraad gesnoeid. De laatste tijd zweren de boslui dat ze een oude man met een kruiwagen zien op de verre zuidelijke gazons, voorbij het doolhof bij het Lelie-Bekken. Zoek hem. Als hij echt is, kan ik eindelijk slapen. Zo niet, dan zal ik het vermoedelijk nooit meer doen.',
+  'entities.quests.q_eg_who_trims_the_hedges.objectives.0.label':
+    'Zoek de tuinman bij het Lelie-Bekken',
+  'entities.quests.q_eg_who_trims_the_hedges.completion':
+    'Dus het huis heeft eindelijk iemand gestuurd. Honderd jaar heb ik over deze gazons gelopen, {playerName}, en de tuin en ik hebben een afspraak: ik snoei wat gesnoeid wil worden. Ga zitten. De heggen kunnen je wel een uurtje missen.',
+  'entities.quests.q_fs_bell_at_the_landing.title': 'De Klok bij de Aanlegplaats',
+  'entities.quests.q_fs_bell_at_the_landing.text':
+    'Je kwam over de Veerloop, {playerName}? Dan ben je de eerste in een week, en de Wachter zal je willen bekijken. Meeuwenhaven ligt de kustweg op, voorbij de droogrekken die niemand meer onderhoudt. Vertel Wachter Coalfast dat de dam nog overeind staat, en dat Tam vandaag nog geen drieslag heeft geluid. Nog niet.',
+  'entities.quests.q_fs_bell_at_the_landing.objectives.0.label': 'Meld je bij Wachter Coalfast',
+  'entities.quests.q_fs_bell_at_the_landing.completion':
+    'De dam houdt stand, en Tam heeft nog genoeg adem om te grappen over de drieslag. Goed. Wij zijn een eiland onder belegering, {playerName}, en elk paar handen dat die zandbank oversteekt, is een paar dat de breuken moeten passeren voordat ze mijn mensen bereiken. Welkom in Meeuwenhaven.',
+  'entities.quests.q_fs_bram_come_home.title': 'Bram Komt Thuis',
+  'entities.quests.q_fs_bram_come_home.text':
+    'Mijn Bram nam de boot mee de ochtend dat de nettenbreuk opende, en de zee wierp hem ergens voorbij de Aanlegpunt terug. Ik hoorde hem drie nachten geleden, {playerName}, roepend over het water, en ik was te bang om te gaan. Ik ben nog steeds te bang. Alsjeblieft. Zijn boot ligt vergaan op de zuidoever. Breng hem lopend naar mij terug.',
+  'entities.quests.q_fs_bram_come_home.objectives.0.label':
+    'Visser Bram veilig naar Meeuwenhaven gebracht',
+  'entities.quests.q_fs_bram_come_home.completion':
+    'Bram! Je hebt hem heel bij me teruggebracht, {playerName}. We hebben allebei gehuild en geen van ons schaamt zich ervoor. Wat de breuken ook hierna van dit eiland nemen, mijn familie krijgen ze niet. Niet meer.',
+  'entities.quests.q_fs_hold_the_riftfields.title': 'Houd de Riftvelden',
+  'entities.quests.q_fs_hold_the_riftfields.text':
+    'Ten oosten van het stadje zijn de graanrijen naar de verdoemenis, en de ellendelingen die door de Riftvelden-breuk kwamen, plukken ze nu kaal. Mijn mensen kunnen geen veld onderhouden waarin ze niet kunnen staan, {playerName}. Ruim tien ellendelingen op en geef de boeren hun grond terug.',
+  'entities.quests.q_fs_hold_the_riftfields.objectives.0.label': 'Breuk-Ellendeling gedood',
+  'entities.quests.q_fs_hold_the_riftfields.completion':
+    'Tien minder, en de veldwerkers ruzien al over wie er als eerste naar buiten mag. Het zal niet lang duren, de breuken rusten nooit lang, maar een stadje dat eet is een stadje dat standhoudt.',
+  'entities.quests.q_fs_moss_and_mending.title': 'Mos en Herstel',
+  'entities.quests.q_fs_moss_and_mending.text':
+    'Het zoutmos dat langs de vloedlijn groeit is de beste wondverpakking die ik ken, en het riftgebroed heeft elk stuk kust waar het groeit opgeeist. Ze dragen, van alle dingen, plukken ervan verstrikt in hun huid. Ruim er zes op van de oostelijke reiken, {playerName}, en pluk me vier goede handenvol mos van wat ze hebben platgetrapt.',
+  'entities.quests.q_fs_moss_and_mending.objectives.0.label': 'Riftgebroed gedood',
+  'entities.quests.q_fs_moss_and_mending.objectives.1.label': 'Verrekust Zoutmos',
+  'entities.quests.q_fs_moss_and_mending.completion':
+    'Mos in de ene hand en een rustiger kustlijn in de andere. Je hebt mijn hele praktijk aangevuld, {playerName}. Doe me de gunst en word niet mijn volgende patient.',
+  'entities.quests.q_fs_song_before_the_break.title': 'Het Lied voor de Breuk',
+  'entities.quests.q_fs_song_before_the_break.text':
+    'Er is een man die de breuken hoort voordat ze opengaan. Riftwacht Ollun: een geleerde, of een dwaas, en de laatste tijd kan ik me het verschil niet veroorloven. Hij houdt zijn wake bij de Wachtweide, de weg op ten zuidoosten van het stadje. Zoek hem op, {playerName}, en vraag hem wat het eiland ons hierna gaat aandoen.',
+  'entities.quests.q_fs_song_before_the_break.objectives.0.label': 'Zoek Riftwacht Ollun',
+  'entities.quests.q_fs_song_before_the_break.completion':
+    'De Wachter stuurde je? Goed. Dat betekent dat het stadje eindelijk is gaan luisteren. Wees nu een moment stil, {playerName}. Daar, onder de wind, hoor je het? De kliffen zingen, en ik hou niet van de melodie.',
+  'entities.quests.q_fs_stalkers_off_the_light.title': 'Sluipers uit het Licht',
+  'entities.quests.q_fs_stalkers_off_the_light.text':
+    'De sluipers jagen in het duister tussen de wachtvuren, en elke nacht cirkelen ze een stukje dichter om mijn weide. Ze zijn niet gedachteloos, {playerName}, ze zijn geduldig, en geduld is het enige waar ik niet tegenop kan. Dood er acht en duw het duister terug naar de kliffen waar het doorheen kwam.',
+  'entities.quests.q_fs_stalkers_off_the_light.objectives.0.label': 'Leegtesluiper gedood',
+  'entities.quests.q_fs_stalkers_off_the_light.completion':
+    'Acht nachten van cirkelen, in een keer beeindigd. De vuren branden al gestager, of misschien zijn dat alleen mijn handen. Hoe dan ook, de weide is weer van mij, en ik kan het eiland horen denken.',
+  'entities.quests.q_fs_steel_for_the_redoubt.title': 'Staal voor het Bolwerk',
+  'entities.quests.q_fs_steel_for_the_redoubt.text':
+    'Elk lemmet dat ik uitdeel is er een die de zee teruggaf of een die ik van de doden heb gewrikt, {playerName}. De ellendelingen dragen schroot door de breuken, scharnieren, haken, gebroken zwaardstaal, ekstergoed, maar het hamert zuiver uit. Breng me zes stukken van hun buitgemaakte staal en de barricadelinie krijgt zijn tanden terug.',
+  'entities.quests.q_fs_steel_for_the_redoubt.objectives.0.label': 'Breukgeschonden Staal',
+  'entities.quests.q_fs_steel_for_the_redoubt.completion':
+    'Zoutgeput en door de breuk getekend, en toch houdt het een snede. Hier, ik heb deze grepen zelf gevoerd. Staal voor staal, {playerName}: het is de enige handel die de Verrekust deze dagen nog drijft.',
+  'entities.quests.q_fs_the_great_break.title': 'De Grote Breuk',
+  'entities.quests.q_fs_the_great_break.text':
+    'Elk lied dat dit eiland zingt eindigt op dezelfde lage toon, en die komt van de Gespleten Kliffen. Er kwam iets door de grote breuk daar, {playerName}, iets waarvoor de kliffen zelf zich openscheurden om het door te laten, en het groeit nog steeds. Als het naar het noorden loopt, doet geen enkele klok er meer toe. Neem een vriend mee, neem er twee, en maak er een einde aan. Vertel Coalfast dan dat de melodie is veranderd.',
+  'entities.quests.q_fs_the_great_break.objectives.0.label': 'De Gespleten Verschrikking gedood',
+  'entities.quests.q_fs_the_great_break.completion':
+    'Ollun stuurde vooraf bericht: het zingen stopte. Mijn hele stadje hoorde de stilte, {playerName}, en de helft van hen huilde bij het geluid van helemaal niets. Draag deze mantel. De Verrekust vergeet niet wie haar kust heeft gehouden.',
+  'entities.quests.q_fs_the_three_bells.title': 'De Drie Klokken',
+  'entities.quests.q_fs_the_three_bells.text':
+    'Drie wachtklokken staan langs de kust voorbij de mijne: een op de Aanlegpunt, een op het zuidelijke strand, een bij de Riftvelden-kust. Als een touw is verrot of een klepel is meegenomen, verneemt het stadje pas van een breuk als die al in de straten is. Loop de kust af, {playerName}, en luid elke klok eenmaal, zodat ik weet dat hij nog een stem heeft.',
+  'entities.quests.q_fs_the_three_bells.objectives.0.label': 'Wachtklok geluid',
+  'entities.quests.q_fs_the_three_bells.completion':
+    'Drie stemmen, drie antwoorden, helder overgedragen over het water. Slaap vannacht in Meeuwenhaven, {playerName}, en weet dat als een klok je wekt, het door mijn hand zal zijn en op tijd.',
+  'entities.quests.q_af_amber_from_the_herd.title': 'Amber van de Kudde',
+  'entities.quests.q_af_amber_from_the_herd.text':
+    'De vergulde herten leggen zich neer onder mijn oudste bomen, en het sap druipt de hele nacht goud in hun vacht. Uitgekamde klonten ervan zijn het zuiverste amber in het woud. Breng me er zes, {playerName}. De herten zullen je niet bedanken, maar ze zullen het ook niet missen.',
+  'entities.quests.q_af_amber_from_the_herd.objectives.0.label': 'Vergulde Sapklonter',
+  'entities.quests.q_af_amber_from_the_herd.completion':
+    'Zes klonten, zuiver als gegoten honing. Deze handschoenen zijn genaaid met de laatste partij, {playerName}: sapverstijfd, en warmer dan ze eruitzien.',
+  'entities.quests.q_af_foxes_in_the_lamplight.title': 'Vossen in het Lantaarnlicht',
+  'entities.quests.q_af_foxes_in_the_lamplight.text':
+    'De schemervossen hebben geleerd wat de lantaarnvoorraden waard zijn, {playerName}. Elke schemering glippen ze over de hekken en dragen ze het talg weg dat we persen voor de veerlantaarns. Zachte poten, een nog zachter geweten. Ruim er tien op en de rest zal onthouden het stadje te vrezen.',
+  'entities.quests.q_af_foxes_in_the_lamplight.objectives.0.label': 'Schemervos gedood',
+  'entities.quests.q_af_foxes_in_the_lamplight.completion':
+    'Tien, en de voorraden bleven vannacht voor het eerst dit seizoen onaangeroerd. De lantaarnopstekers sturen je hun dank, {playerName}.',
+  'entities.quests.q_af_goldmelt_road.title': 'De Gouden Weg Naar Beneden',
+  'entities.quests.q_af_goldmelt_road.text':
+    'Je kwam over de Goudsmelt, {playerName}, nog sneeuw op je laarzen. Ik houd dit heiligdom zodat Lantaarnmeer weet wie er uit de kou binnenkomt, en de laatste tijd had ik weinig te melden. Neem de gouden weg naar beneden naar het stadje, zoek Schout Ottoline bij de put, en vertel haar dat de pas rustig is.',
+  'entities.quests.q_af_goldmelt_road.objectives.0.label': 'Meld je bij Schout Ottoline',
+  'entities.quests.q_af_goldmelt_road.completion':
+    'Rustig op de Goudsmelt, en een reiziger met sneeuw in het haar om het te bewijzen. Sorrel houdt haar wacht te goed om loos bericht te sturen. Wees welkom in Lantaarnmeer, {playerName}. De lantaarns branden voor jou.',
+  'entities.quests.q_af_lanterns_on_the_water.title': 'Lantaarns op het Water',
+  'entities.quests.q_af_lanterns_on_the_water.text':
+    'Elke veerpont op het Meer draagt een achterlantaarn, {playerName}, en drie van mijn boten kwamen bij dageraad terug zonder de hunne. De mist nam ze, of iets in de mist deed dat. Ze spoelen aan langs de oostoever wanneer de wind draait. Loop de kustweg en breng mijn lantaarns thuis.',
+  'entities.quests.q_af_lanterns_on_the_water.objectives.0.label': 'Veerpont-Lantaarn geborgen',
+  'entities.quests.q_af_lanterns_on_the_water.completion':
+    'Alle drie, en nog steeds brandend. Veerlantaarns doven niet in water, {playerName}. Dat is nu juist hun bedoeling. Wat me zorgen baart is wat ze heeft losgerukt.',
+  'entities.quests.q_af_orchard_call.title': 'Een Kar voor de Boomgaard',
+  'entities.quests.q_af_orchard_call.text':
+    'Boomgaardier Pomeline onderhoudt de Vergulde Boomgaard aan de westweg, en haar sapkarren zijn al drie dagen te laat. Het hele stadje draait op dat amberkleurige sap, {playerName}: lamphars, zoetstof, het oogstbier. Loop de westweg en zoek uit wat haar ophoudt.',
+  'entities.quests.q_af_orchard_call.objectives.0.label': 'Zoek Boomgaardier Pomeline',
+  'entities.quests.q_af_orchard_call.completion':
+    'De Schout telt haar karren, hè? Nou, dan kan ze ze nog wel even als vermist blijven tellen. Kijk naar mijn rijen, {playerName}. Ik heb grotere problemen dan een late levering.',
+  'entities.quests.q_af_sprites_and_spigots.title': 'Geestjes en Aftappunten',
+  'entities.quests.q_af_sprites_and_spigots.text':
+    'Oogstgeestjes, {playerName}. Ze wrikken mijn saptappen uit de stammen voor de zoetheid erin en gooien de emmers in het gras. Verjaag acht van de kleine dieven en breng vier van mijn emmers terug, dan rollen de karren weer.',
+  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': 'Oogstgeestje verjaagd',
+  'entities.quests.q_af_sprites_and_spigots.objectives.1.label': 'Sapaftap-Emmer geborgen',
+  'entities.quests.q_af_sprites_and_spigots.completion':
+    'Vier emmers terug aan hun haken en de rijen weer stil. Je hebt een zwaardere hand met geestjes dan ik, {playerName}, en vandaag ben ik daar blij om.',
+  'entities.quests.q_af_the_meredark.title': 'Het Meerduister',
+  'entities.quests.q_af_the_meredark.text':
+    'De oude veerlieden hebben een naam die ze alleen aan wal uitspreken: het Meerduister, de eerste loerder, oud als het meer en twee keer zo geduldig. Het rees eerder al eens op, het jaar dat de verzonken steiger onderging, en het rijst nu weer. Bij schemering zont het zich op de steigerruine voor de zuidoever, {playerName}. Neem een vriend mee, neem er twee, en maak er een einde aan zolang dat nog kan.',
+  'entities.quests.q_af_the_meredark.objectives.0.label': 'Het Meerduister gedood',
+  'entities.quests.q_af_the_meredark.completion':
+    'De mist trok vanochtend op van het Meer, {playerName}, en het hele stadje zag het gebeuren. De veerponten zullen de nachtoversteek weer varen, en elke lantaarn op het water zal branden in jouw naam. Neem dit aan: het is opgebaggerd uit de verzonken steiger, en niemand heeft er meer recht op om het te dragen.',
+  'entities.quests.q_af_what_took_the_moorings.title': 'Wat de Meertouwen Nam',
+  'entities.quests.q_af_what_took_the_moorings.text':
+    'Nu zal ik je vertellen wat ik niet zei waar het stadje bij was. De meertouwen zijn niet losgeraakt, ze zijn doorgebeten. Meerloerders, elke nacht brutaler, die aan de touwen en de roeren trekken. Stuur er acht voorgoed terug onder water, {playerName}, voordat er een veerman mee verdwijnt.',
+  'entities.quests.q_af_what_took_the_moorings.objectives.0.label': 'Meerloerder gedood',
+  'entities.quests.q_af_what_took_the_moorings.completion':
+    'Acht minder gedaanten in de ondiepten, en de oversteek liep vandaag voor het eerst in veertien dagen op tijd. Maar brutale loerders zijn opgejaagde loerders, {playerName}. Iets onder het Meer zet ze in beweging.',
+  'entities.quests.q_dk_ash_on_the_wind.title': 'As op de Wind',
+  'entities.quests.q_dk_ash_on_the_wind.text':
+    'Kijk zuidwaarts vanaf de palissade, {playerName}. Die vuren in de duinen zijn geen trollen-kookvuren, het zijn asbeen-verzamelingen, en elke nacht zijn er meer. De doden komen uit de beenderenvelden met zand nog tussen hun tanden. Vel tien plunderaars voor ze een weg naar mijn poort banen.',
+  'entities.quests.q_dk_ash_on_the_wind.objectives.0.label': 'Asbeen-Plunderaar gedood',
+  'entities.quests.q_dk_ash_on_the_wind.completion':
+    'Tien zwaarden minder in de duinen, en de verzamelvuren brandden vannacht lager. Mijn wachters sliepen, wat ze in geen week hadden gedaan. Goed geveld, {playerName}.',
+  'entities.quests.q_dk_banners_over_the_dunes.title': 'Vaandels boven de Duinen',
+  'entities.quests.q_dk_banners_over_the_dunes.text':
+    'De asbenen verzamelen zich bij de oude beenderengraven, {playerName}, en mijn patrouilles kunnen de duinen niet lezen zoals ze een muur lezen. Dood vijf van hun oorlogsroepers, degenen die de doden schreeuwend overeind krijgen, en plant een waarschuwingsvaandel op elk verzamelterrein zodat mijn wachters het vanaf de kam kunnen markeren.',
+  'entities.quests.q_dk_banners_over_the_dunes.objectives.0.label': 'Asbeen-Oorlogsroeper gedood',
+  'entities.quests.q_dk_banners_over_the_dunes.objectives.1.label': 'Waarschuwingsvaandel geplant',
+  'entities.quests.q_dk_banners_over_the_dunes.completion':
+    'Drie vaandels die klapperen in de hete wind, precies waar mijn verrekijker ze kan vinden. Met vijf oorlogsroepers tot zwijgen gebracht, zal wat er ook op hun roep antwoordt trager komen. Je hebt ons tijd gekocht, {playerName}.',
+  'entities.quests.q_dk_marrow_and_ash.title': 'Merg en As',
+  'entities.quests.q_dk_marrow_and_ash.text':
+    'Elke asbeen-plunderaar draagt een oorlogsmerk, {playerName}: een geschroeide telling van het leger waaronder hij marcheert. Ik heb vier legers geteld vanaf deze kam, maar giswerk is geen inlichting. Breng me zes merken van de plunderaars en hun oorlogsroepers, en ik zal Brannoc de vorm geven van de oorlog die komt.',
+  'entities.quests.q_dk_marrow_and_ash.objectives.0.label': 'Asbeen-Oorlogsmerk',
+  'entities.quests.q_dk_marrow_and_ash.completion':
+    'Zes merken, en in elk ervan hetzelfde teken gebrand. Dit is geen plundertocht, {playerName}. Elk leger in de duinen antwoordt aan de oorlogspoort onder ons, de trollen noemen het Orkadia, en geen vijf soldaten met wie ik ooit heb gediend, konden breken wat er achter die deur trommelt. Misschien vijf zoals jij.',
+  'entities.quests.q_dk_matriarch_of_the_maw.title': 'Matriarch van de Muil',
+  'entities.quests.q_dk_matriarch_of_the_maw.text':
+    'De schubben logen niet, {playerName}. Ik beklom de rand bij dageraad en zag haar op de kraterbodem: Cindraleth, de matriarch onder wie elke sintelvleugel in deze lucht is uitgebroed, goud als een kool die op het punt staat te ontbranden. Terwijl zij broedt, worden de draken brutaler, en Wurmwacht kan geen draken en de asbenen tegelijk bevechten. Maak een einde aan haar in haar krater, en breng dan het woord naar Poortkapitein Brannoc. Ga niet alleen.',
+  'entities.quests.q_dk_matriarch_of_the_maw.objectives.0.label':
+    'Cindraleth de Muilmatriarch gedood',
+  'entities.quests.q_dk_matriarch_of_the_maw.completion':
+    'De lucht boven de Drakenmuil is al twee dagen leeg, en nu loop je door mijn poort met het bloed van een matriarch op je laarzen. Wurmwacht heeft veertig jaar wacht gehouden precies hiervoor, {playerName}. Neem deze schouderstukken, muilschub, gesmeed door onze eigen smid. Draag ze waar de draken ze kunnen zien.',
+  'entities.quests.q_dk_scales_of_the_maw.title': 'Schubben van de Muil',
+  'entities.quests.q_dk_scales_of_the_maw.text':
+    'Wanneer de wind draait vanaf de Drakenmuil, rijden de sintelvleugel-draken erop laag over mijn kamp, laag genoeg om hun tanden te tellen, {playerName}. Ze zwerven elke dag verder, en iets in die krater drijft ze voort. Breng me drie van hun schubben. Schubben onthouden hitte, en ik kan aan de schroeiplek aflezen waar een draak heeft gerust.',
+  'entities.quests.q_dk_scales_of_the_maw.objectives.0.label': 'Sintelvleugel-Schub',
+  'entities.quests.q_dk_scales_of_the_maw.completion':
+    'Kijk naar de onderkant van deze, {playerName}: geschroeid in een spiraal, en er nestelt maar een ding in cirkels. Deze draken zijn broedwachters. Iets in de Drakenmuil is een moeder.',
+  'entities.quests.q_dk_scorched_stores.title': 'Geschroeide Voorraden',
+  'entities.quests.q_dk_scorched_stores.text':
+    'De laatste wagen brandde uit, {playerName}, maar met ijzer omsnoerde kisten branden niet door. Vier ervan liggen nog geschroeid langs de duinenweg, met een seizoen aan zout, spijkers en boogpezen erin. Breng mijn voorraden naar huis voordat de trollen uitvinden hoe ze open te krijgen.',
+  'entities.quests.q_dk_scorched_stores.objectives.0.label': 'Verschroeide Voorraadkist geborgen',
+  'entities.quests.q_dk_scorched_stores.completion':
+    'Zwart geschroeid en elke sluiting nog intact. De smid krijgt zijn spijkers, de pijlenmaakster haar pezen, en jij krijgt de laarzen die ik bewaarde voor wie mijn kisten terug zou brengen, {playerName}.',
+  'entities.quests.q_dk_trolls_on_the_road.title': 'Trollen op de Weg',
+  'entities.quests.q_dk_trolls_on_the_road.text':
+    'De duintrollen hebben het geluid van een bevoorradingswagen leren herkennen, {playerName}. Ze sloegen deze maand al drie keer toe op de weg door de Sintelduinen, en de laatste voerman kwam binnen met niets dan de teugels in zijn handen. Acht trollen van die weg af en mijn wagens rollen weer.',
+  'entities.quests.q_dk_trolls_on_the_road.objectives.0.label': 'Duintrol gedood',
+  'entities.quests.q_dk_trolls_on_the_road.completion':
+    'Acht, en mijn voerlieden schrijven geen afscheidsbrieven meer voor elke rit. Het garnizoen eet dankzij jou, {playerName}.',
+  'entities.quests.q_dk_watcher_at_the_wargate.title': 'De Wachter bij de Oorlogspoort',
+  'entities.quests.q_dk_watcher_at_the_wargate.text':
+    'Iets trekt de asbenen naar het oosten, {playerName}, en ik stuurde mijn beste verkenner om uit te vinden wat. Verkenner Yerrin kampeert al een maand in de verre duinen voorbij de Trollenraad, in het zicht van een poort die niemand tijdens mijn leven heeft gebouwd. Haar berichten stopten tien dagen geleden. Zoek haar kamp en breng me haar waarnemingen.',
+  'entities.quests.q_dk_watcher_at_the_wargate.objectives.0.label': 'Zoek Verkenner Yerrin',
+  'entities.quests.q_dk_watcher_at_the_wargate.completion':
+    'Brannoc stuurde je? Dan heeft mijn laatste boodschapper het niet gehaald. Houd je stem laag en ga zitten, {playerName}. Zie je die poort daar beneden? Tel de oorlogsvaandels ervoor, en je zult begrijpen waarom ik ben opgehouden dingen op te schrijven.',
   'hudChrome.auth.appleChoiceExpired':
     'Deze aanmelding bij Apple is verlopen. Meld je opnieuw aan met Apple.',
   'hudChrome.auth.appleChoiceIntro':
@@ -8129,6 +8908,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petDefensive': 'Huisdier: Verdedigend',
   'hudChrome.keybinds.petStop': 'Huisdier: Stoppen',
   'hudChrome.keybinds.petTaunt': 'Huisdier: Uitdagen',
+  'hudChrome.keybinds.mount': 'Opstijgen / Afstijgen',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Eén {item} minder versturen',
   'hudChrome.mailbox.parcelQtyIncreaseAria': 'Eén {item} meer versturen',
   'hudChrome.mailbox.parcelQtyAria': 'Aantal te versturen {item}',
@@ -8744,8 +9524,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cold_snap.description':
     'Voltooit de afkoeltijd van Flitsstap, Vorstsluier en Grotere onzichtbaarheid. (magiërstalent)',
   'entities.abilities.greater_invisibility.name': 'Grotere onzichtbaarheid',
-  'entities.abilities.greater_invisibility.description':
-    'Verdwijn gedurende 20 sec.: verwijdert 2 effecten met schade over tijd en je loopt 90% minder schade op terwijl je onzichtbaar bent en kort daarna. (magiërstalent)',
   'entities.abilities.hot_streak.name': 'Hete reeks',
   'entities.abilities.hot_streak.description':
     'Passief: twee kritieke treffers achter elkaar met je Vuurspreuken (Sintelbout, Sintelval, Blakeren, Pyrelans of Vlammenslag) maken je volgende Pyrelans of Vlammenslag onmiddellijk en gratis. De verbruikers tellen mee voor de VOLGENDE reeks, inclusief gratis spreuken; Vlammenslag telt één keer, hoeveel vijanden hij ook raakt, en alleen de eerste inslag telt ooit mee. (Vuur)',
@@ -8774,6 +9552,107 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_water_elemental.description':
     'Roep een Waterelementaal op om naast je te vechten, Waterbouten naar je doelwit te slingeren en Waterstraal te kanaliseren. (Vorst)',
   'entities.mobs.water_elemental.name': 'Waterelementaal',
+  'entities.mobs.ancient_guardian.name': 'Oude Wachter',
+  'entities.mobs.apprentice_wren.name': 'Leerling Wren',
+  'entities.mobs.ashbone_raider.name': 'Asbeen-Plunderaar',
+  'entities.mobs.ashbone_warcaller.name': 'Asbeen-Oorlogsroeper',
+  'entities.mobs.aurelhorn.name': 'Aurelhorn, Eerste van de Kudde',
+  'entities.mobs.barrow_king.name': 'De Grafheuvelkoning',
+  'entities.mobs.barrow_wight.name': 'Grafheuvelgeest',
+  'entities.mobs.bogtoad.name': 'Moeraspad',
+  'entities.mobs.breach_wretch.name': 'Breuk-Ellendeling',
+  'entities.mobs.canopy_weaver.name': 'Bladerdakwever',
+  'entities.mobs.castaway_navigator.name': 'Loods Suli',
+  'entities.mobs.cindraleth_maw_matriarch.name': 'Cindraleth de Muilmatriarch',
+  'entities.mobs.corrupted_sporeling.name': 'Verdorven Sporeling',
+  'entities.mobs.downs_bandit.name': 'Heuvelbandiet',
+  'entities.mobs.drowned_deckhand.name': 'Verdronken Matroos',
+  'entities.mobs.drowsy_croaker.name': 'De Suffe Kwaker',
+  'entities.mobs.dune_troll.name': 'Duintrol',
+  'entities.mobs.duskwisp.name': 'Schemerdwaallicht',
+  'entities.mobs.emberwing_drake.name': 'Sintelvleugel-Draak',
+  'entities.mobs.fen_sprite.name': 'Veengeestje',
+  'entities.mobs.fisher_bram.name': 'Visser Bram',
+  'entities.mobs.frostmane_yeti.name': 'Vorstmanen-Yeti',
+  'entities.mobs.gale_wisp.name': 'Windvlaag-Dwaallicht',
+  'entities.mobs.gilded_stag.name': 'Vergulde Hert',
+  'entities.mobs.gleamstag.name': 'De Glanshert',
+  'entities.mobs.glimmerwisp.name': 'Glinsterdwaallicht',
+  'entities.mobs.gloam_fox.name': 'Schemervos',
+  'entities.mobs.gloam_strider.name': 'Schemerschrijder',
+  'entities.mobs.gravedigger_mosley.name': 'Doodgraver Mosley',
+  'entities.mobs.gravenbark_shambler.name': 'Grafbast-Schuifelaar',
+  'entities.mobs.harvest_sprite.name': 'Oogstgeestje',
+  'entities.mobs.hedge_gnome.name': 'Haagkabouter',
+  'entities.mobs.hedge_knight.name': 'Ridder van Dageraad',
+  'entities.mobs.ice_wisp.name': 'IJsdwaallicht',
+  'entities.mobs.idol_guardian.name': 'De Afgodswachter',
+  'entities.mobs.lily_wisp.name': 'Leliedwaallicht',
+  'entities.mobs.mere_lurker.name': 'Meerloerder',
+  'entities.mobs.moonfleece_grazer.name': 'Maanvacht-Grazer',
+  'entities.mobs.moor_ram.name': 'Heideram',
+  'entities.mobs.mushroom_pixie.name': 'Glansvolk-Fee',
+  'entities.mobs.nightkin_stargazer.name': 'Nachtvolk-Sterrenkijker',
+  'entities.mobs.old_marrowshell.name': 'Oude Mergschelp',
+  'entities.mobs.orchard_treant.name': 'Boomgaard-Treant',
+  'entities.mobs.pale_huntsman.name': 'De Bleke Jager',
+  'entities.mobs.rift_boneclad.name': 'Beengeharnaste Krijger',
+  'entities.mobs.rift_bonewalker.name': 'Herrezen Beenloper',
+  'entities.mobs.rift_boss_arcane.name': 'Archont Nyxaris',
+  'entities.mobs.rift_boss_brute.name': 'Krijgsheer Grask',
+  'entities.mobs.rift_boss_ember.name': 'Sintelsmid-Tiran',
+  'entities.mobs.rift_boss_frost.name': 'Rijpvorst-Wachter',
+  'entities.mobs.rift_boss_necro.name': 'Beenheer Xarreth',
+  'entities.mobs.rift_boss_pitlord.name': 'Azgorath, Heer van de Kuil',
+  'entities.mobs.rift_boss_ritualist.name': "Magier Vel'Kor de Verbondene",
+  'entities.mobs.rift_boss_storm.name': 'Storm Vharok',
+  'entities.mobs.rift_boss_tide.name': 'Afgrondmuil',
+  'entities.mobs.rift_boss_venom.name': 'Broedmoeder Vysska',
+  'entities.mobs.rift_deep_lurker.name': 'Diepteloerder',
+  'entities.mobs.rift_dread_stalker.name': 'Angstsluiper',
+  'entities.mobs.rift_ember_fiend.name': 'Sintelduivel',
+  'entities.mobs.rift_frost_revenant.name': 'Vorstgebonden Wederganger',
+  'entities.mobs.rift_hellguard.name': 'Hellewacht',
+  'entities.mobs.rift_magma_brute.name': 'Magmabruut',
+  'entities.mobs.rift_marrow_troll.name': 'Mergtrol',
+  'entities.mobs.rift_pact_acolyte.name': 'Verbondsacoliet',
+  'entities.mobs.rift_rime_elemental.name': 'Rijp-Elementaal',
+  'entities.mobs.rift_spawnling.name': 'Riftbroedsel',
+  'entities.mobs.rift_stone_ogre.name': 'Steenoger',
+  'entities.mobs.rift_storm_caller.name': 'Stormroeper',
+  'entities.mobs.rift_stormscale.name': 'Stormschub-Draak',
+  'entities.mobs.rift_thornback.name': 'Doornrug-Sluiper',
+  'entities.mobs.rift_tide_thrall.name': 'Getijde-Lijfeigene',
+  'entities.mobs.rift_venom_weaver.name': 'Gifwever',
+  'entities.mobs.rift_void_acolyte.name': 'Leegtelitteken-Acoliet',
+  'entities.mobs.riftspawn.name': 'Riftgebroed',
+  'entities.mobs.rime_elemental.name': 'Rijp-Elementaal',
+  'entities.mobs.shoal_scuttler.name': 'Zandbank-Scharrelaar',
+  'entities.mobs.snowdrift_wolf.name': 'Sneeuwjacht-Wolf',
+  'entities.mobs.sporeling_gatherer.name': 'Sporeling-Verzamelaar',
+  'entities.mobs.sundered_horror.name': 'De Gespleten Verschrikking',
+  'entities.mobs.terrace_howler.name': 'Terrashuiler',
+  'entities.mobs.the_meredark.name': 'Het Meerduister',
+  'entities.mobs.the_topiary_bull.name': 'De Snoeivorm-Stier',
+  'entities.mobs.the_wreck_warden.name': 'De Wrakwachter',
+  'entities.mobs.thicket_boar.name': 'Struweel-Everzwijn',
+  'entities.mobs.tide_scuttler.name': 'Getijde-Scharrelaar',
+  'entities.mobs.topiary_stag.name': 'Snoeivorm-Hert',
+  'entities.mobs.topiary_wolf.name': 'Snoeivorm-Wolf',
+  'entities.mobs.treant_elder.name': 'Oudere Treant',
+  'entities.mobs.veiled_doe.name': 'Gesluierde Ree',
+  'entities.mobs.veiled_stag.name': 'Gesluierd Hert',
+  'entities.mobs.void_stalker.name': 'Leegtesluiper',
+  'entities.mobs.waking_warden.name': 'De Ontwakende Wachter',
+  'entities.mobs.widowsilk_spinner.name': 'Weduwzijde-Spinner',
+  'entities.mobs.wildheart_beastmaster.name': 'Slagtandheer Beestenmeester',
+  'entities.mobs.wildheart_hexcaller.name': 'Zonnebeen-Vloekroeper',
+  'entities.mobs.wildheart_high_priest.name': 'Zulgar, Stem van het Bekken',
+  'entities.mobs.wildheart_ravager.name': 'Bloedmanen-Verwoester',
+  'entities.mobs.wildheart_stalker.name': 'Rankklauw-Sluiper',
+  'entities.mobs.willow_sprite.name': 'Wilgengeestje',
+  'entities.mobs.wood_wraith.name': 'Woudschim',
+  'entities.mobs.wreck_thief.name': 'Wrakveld-Dief',
   'entities.items.conjured_bread4.name': 'Getoverd feestbrood',
   'entities.items.conjured_water4.name': 'Getoverd bronwater',
   'devCommand.actions.attune.description': 'Markeer alle afstemmingsvereisten als voltooid.',
@@ -8913,6 +9792,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetTitle': 'Je instanties resetten',
   'guide.dungeonsPage.resetBody':
     'Als je van moeilijkheid wisselt terwijl je groep nog geclaimde runs heeft, blijven de oude claims even staan voordat ze vanzelf verdwijnen. De groepsleider kan ze direct loslaten via Alle instanties resetten in het menu van het eigen portret, of met /dungeon reset. De moeilijkheid moet echt gewijzigd zijn, er mag niemand, levend of gevallen, binnen zijn en tussen resets geldt een korte afkoeltijd. Bij de deur op de verkeerde moeilijkheid waarschuwt het spel voor de start. De raid wordt nooit zo gereset; daarvoor blijven de eigen lockoutregels gelden.',
+  'guide.dungeonsPage.wildheartBody':
+    'Een regennatte junglecaldera waar twee verhoogde jachtpaden om een jaden cenote cirkelen. Doorkruis beestenholen en voorouderruines, en beklim dan de rituele piramide om Zulgar te trotseren.',
   'guide.gear.itemLevelBody':
     'Schakel Itemniveau tonen in de opties in om twee stukken snel te vergelijken. Uitrusting met een bekende bron, van vijanden, quests en ambachten, toont dan een itemniveau: één getal dat de kracht op basis van de herkomst benadert en upgrades zelfs tussen verschillende vakken vergelijkbaar maakt. Stukken zonder zo’n bron, zoals eenvoudige handelswaar en startuitrusting, tonen geen itemniveau; een ontbrekend getal is normaal.',
   'guide.gear.qualityBody':
@@ -8940,6 +9821,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Je kans om een frontale melee-aanval volledig te pareren, zodat je geen schade oploopt. Een klap van achteren kan niet worden gepareerd.',
   'hud.combat.floatingParry': 'Parering',
   'hud.combat.parried': 'Je {ability} wordt gepareerd door {target}.',
+  'hud.combat.floatingEvade': 'Ontlopen',
+  'hud.combat.evaded': '{target} ontloopt je {ability}.',
   'hudChrome.options.mouseoverCast': 'Mouseover-bezwering op groepsframes',
   'hudChrome.options.showTargetOfTarget': 'Doelwit van doelwit tonen',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Doelwit van het doelwit',
@@ -9021,6 +9904,93 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.tanning_agent.name': 'Looimiddel',
   'entities.items.venom_gland.name': 'Gifklier',
   'entities.items.whetted_iron_dirk.name': 'Geslepen ijzeren dolk',
+  'entities.items.abyssal_loop.name': 'Afgrondlus',
+  'entities.items.abysswrought_band.name': 'Afgrondgesmede Band',
+  'entities.items.amberfall_sap_bucket.name': 'Sapaftap-Emmer',
+  'entities.items.ashbone_war_brand.name': 'Asbeen-Oorlogsmerk',
+  'entities.items.aurora_mote.name': 'Aurorastofje',
+  'entities.items.barrow_grave_offering.name': 'Verspreid Grafoffer',
+  'entities.items.barrowshade_mantle.name': 'Grafschaduw-Mantel',
+  'entities.items.bonelord_mantle.name': 'Beenheer-Mantel',
+  'entities.items.breakscarred_steel.name': 'Breukgeschonden Staal',
+  'entities.items.bridgemere_toll_chest.name': 'Verzonken Tolkist',
+  'entities.items.broodmother_carapace.name': 'Broedmoeder-Pantser',
+  'entities.items.canopy_silk_hank.name': 'Bladerdak-Zijdenstreng',
+  'entities.items.cinderwalk_treads.name': 'Sintelloop-Zolen',
+  'entities.items.eelskin_mudwaders.name': 'Palinghuid-Modderlaarzen',
+  'entities.items.emberforge_gauntlets.name': 'Sintelsmid-Handschoenen',
+  'entities.items.emberforged_bulwark.name': 'Sintelgesmeed Bolwerk',
+  'entities.items.emberwing_scale.name': 'Sintelvleugel-Schub',
+  'entities.items.evergarden_bloom_clipping.name': 'Gesnoeide Bloesemtak',
+  'entities.items.evergarden_statue_rubbing.name': 'Standbeeldafdruk',
+  'entities.items.farshore_salt_moss.name': 'Verrekust Zoutmos',
+  'entities.items.fenway_mooring_line.name': 'Doorgesneden Meertouw',
+  'entities.items.fountain_court_mantle.name': 'Mantel van het Fonteinhof',
+  'entities.items.frostmane_mantle.name': 'Mantel van de Vorstmanen',
+  'entities.items.galecrest_ram_wool.name': 'Vettige Ramswol',
+  'entities.items.gallowmere_grave_candle.name': 'Grafkaars',
+  'entities.items.gilded_sap_clot.name': 'Vergulde Sapklonter',
+  'entities.items.gloamfield_nightbloom.name': 'Nachtbloesem-Bloem',
+  'entities.items.graskbreaker_girdle.name': 'Graskbreker-Gordel',
+  'entities.items.gravebound_silk_wraps.name': 'Grafgebonden Zijdewikkels',
+  'entities.items.gullhaven_watchbell.name': 'Kust-Wachtklok',
+  'entities.items.heart_of_the_rift.name': 'Hart van de Rift',
+  'entities.items.hearth_ember_cache.name': 'Sintelvoorraad',
+  'entities.items.hearthlined_treads.name': 'Haardgevoerde Zolen',
+  'entities.items.hedgewick_shears.name': 'Gestolen Haagwijk-Schaar',
+  'entities.items.hedgewick_tool_cart.name': 'Omgevallen Gereedschapskar',
+  'entities.items.hoarfrost_edge.name': 'Rijpvorstkling',
+  'entities.items.last_keep_signet.name': 'Zegel van de Laatste Burcht',
+  'entities.items.lilybed_mantle.name': 'Mantel van het Leliebed',
+  'entities.items.mantle_of_the_meredark.name': 'Mantel van het Meerduister',
+  'entities.items.mantle_of_the_unbroken_shore.name': 'Mantel van de Ongebroken Kust',
+  'entities.items.mantle_of_the_unhorsed.name': 'Mantel van de Gevallen Ruiter',
+  'entities.items.mawscale_pauldrons.name': 'Muilschub-Schouderstukken',
+  'entities.items.mere_ferry_lantern.name': 'Veerpont-Lantaarn',
+  'entities.items.moonfleece_mitts.name': 'Maanvacht-Wanten',
+  'entities.items.moonfleece_tuft.name': 'Maanvacht-Pluk',
+  'entities.items.orchard_sapbinder_grips.name': 'Sapbinder-Grepen',
+  'entities.items.pactbound_vestments.name': 'Verbondsgebonden Gewaden',
+  'entities.items.pearlwake_cargo_crate.name': 'Parelkielzog-Vrachtkist',
+  'entities.items.pitlords_cleaver.name': 'Hakmes van de Kuilvorst',
+  'entities.items.plump_fen_eel.name': 'Mollige Veenpaling',
+  'entities.items.riding_training.name': 'Rijtraining',
+  'entities.items.rift_essence.name': 'Rift-Essentie',
+  'entities.items.rift_gem_azure.name': 'Azuren Riftjuweel',
+  'entities.items.rift_gem_crimson.name': 'Karmozijnen Riftjuweel',
+  'entities.items.rift_gem_verdant.name': 'Loofgroen Riftjuweel',
+  'entities.items.riftbound_band_of_guile.name': 'Riftgebonden Band van Listigheid',
+  'entities.items.riftbound_band_of_insight.name': 'Riftgebonden Band van Inzicht',
+  'entities.items.riftbound_band_of_might.name': 'Riftgebonden Band van Kracht',
+  'entities.items.saltforged_grips.name': 'Zoutgesmede Grepen',
+  'entities.items.saltwalker_sandals.name': 'Zoutloper-Sandalen',
+  'entities.items.scorched_supply_crate.name': 'Verschroeide Voorraadkist',
+  'entities.items.shear_storm_lantern.name': 'Gedoofde Storm-Lantaarn',
+  'entities.items.shearkeeper_gloves.name': 'Scheurwachter-Handschoenen',
+  'entities.items.silkbound_remains.name': 'Zijdegebonden Overblijfselen',
+  'entities.items.sprung_trap.name': 'Afgegane Veenval',
+  'entities.items.stormscale_treads.name': 'Stormschub-Zolen',
+  'entities.items.stormsunder_hood.name': 'Stormsplijter-Kap',
+  'entities.items.sunken_idol_mantle.name': 'Mantel van het Verzonken Afgodsbeeld',
+  'entities.items.sunken_offering_bowl.name': 'Bijgevulde Offerschaal',
+  'entities.items.thick_winter_pelt.name': 'Dikke Wintervacht',
+  'entities.items.vigil_star_chart.name': 'Sterrenkaart van de Wacht',
+  'entities.items.voidscar_handwraps.name': 'Leegtelitteken-Handwikkels',
+  'entities.items.voidsong_dirk.name': 'Leegtelied, Dolk van de Gespleten Sluier',
+  'entities.items.voidweave_mantle.name': 'Leegteweefsel-Mantel',
+  'entities.items.wickspun_treads.name': 'Wijkgesponnen Zolen',
+  'entities.items.widowsilk_skein.name': 'Weduwzijde-Streng',
+  'entities.items.wildheart_fangknife.name': 'Slagtandmes van Zulgar',
+  'entities.items.fanglords_beastspear.name': 'Beestenspeer van de Slagtandheer',
+  'entities.items.bloodmane_warleggings.name': 'Bloedmanen-Oorlogsbeenkappen',
+  'entities.items.vineclaw_stalking_breeches.name': 'Rankklauw-Sluipbroek',
+  'entities.items.sunbone_ritual_sarong.name': 'Zonnebeen-Rituele Sarong',
+  'entities.items.wildheart_hexwood_staff.name': 'Vloekhout-Staf van het Bekken',
+  'entities.items.wildheart_tuskblade.name': 'Wildhart-Slagtandkling',
+  'entities.items.wisplight_globe.name': 'Dwaallicht-Bol',
+  'entities.items.wreck_wardens_mantle.name': 'Mantel van de Wrakwachter',
+  'entities.items.wreckfield_flotsam_crate.name': 'Drijfgoedkist',
+  'entities.items.wyrmwatch_warning_banner.name': 'Wurmwacht Waarschuwingsvaandel',
   'entities.letters.guild_trend_alchemy_cooking.body':
     'Ambachtelijk,\n\nHet nieuws bereikt de gilde van jouw werk in alchemie en koken: dranken staan te pruttelen en de gerechten worden gekruid, waarbij de twee ambachten elkaar voeden. Naburige ambachten die samenwerken, markeren een hand die klaar is voor afstemming. Degenen die dit paar binden, verdienen na verloop van tijd de naam Apotheker. Zoek Smid Haldren, de pantsersmid van Eastbrook: hij spreekt voorlopig namens de meesters. Bewijs hem uw vak met uw eigen handen, en hij zal zien dat uw twee hoofdvakken op elkaar zijn afgestemd.\n\nMet achting,\nHet Ambachtsgilde',
   'entities.letters.guild_trend_alchemy_cooking.sender': 'Het Ambachtsgilde',
@@ -9179,6 +10149,198 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Let op de draden, {className}. Een vaste hand aan het weefgetouw verslaat een sterke.',
   'entities.npcs.weaver_ottilie.name': 'Wever Ottilie',
   'entities.npcs.weaver_ottilie.title': 'Meester van het weefgetouw',
+  'entities.npcs.archivist_tullo.greeting':
+    'De monumenten daarbuiten hebben in geen eeuwigheid tot iemand gesproken. Misschien wachtten ze op verse oren.',
+  'entities.npcs.archivist_tullo.name': 'Archivaris Tullo',
+  'entities.npcs.archivist_tullo.title': 'Lezer van Stenen',
+  'entities.npcs.astronomer_cassian.greeting':
+    'Stil nu. De hemel breekt hier nooit aan, dus hij houdt ook nooit op met praten.',
+  'entities.npcs.astronomer_cassian.name': 'Astronoom Cassian',
+  'entities.npcs.astronomer_cassian.title': 'Wachter bij de Wake',
+  'entities.npcs.aurorist_veyla.greeting':
+    'Stil. De lichten spreken vanavond, en ze herhalen zichzelf niet.',
+  'entities.npcs.aurorist_veyla.name': 'Lichtwichelaar Veyla',
+  'entities.npcs.aurorist_veyla.title': 'Lezer van de Lichten',
+  'entities.npcs.bellkeeper_tam.greeting':
+    'De klok is de enige waarschuwing die de breuken ons geven, {className}. Een slag voor de velden, twee voor de kliffen, drie wanneer het dichtbij genoeg is dat rennen niet meer helpt. Houd er een oor naar, en misschien houdt hij jou heel.',
+  'entities.npcs.bellkeeper_tam.name': 'Klokwachter Tam',
+  'entities.npcs.bellkeeper_tam.title': 'Hoeder van de Wachtklok',
+  'entities.npcs.bridgewright_alden.greeting':
+    'Elke plank in dit stadje is de mijne om te onderhouden, en het veen knaagt aan ze allemaal.',
+  'entities.npcs.bridgewright_alden.name': 'Brugbouwer Alden',
+  'entities.npcs.bridgewright_alden.title': 'Meester van de Veenweg',
+  'entities.npcs.ferrymaster_caddow.greeting':
+    'Er hangt weer mist over het Meer. Als de lantaarns op het water doven, blijven verstandige mensen aan wal.',
+  'entities.npcs.ferrymaster_caddow.name': 'Veermeester Caddow',
+  'entities.npcs.ferrymaster_caddow.title': 'Hoeder van de Lantaarnveren',
+  'entities.npcs.fisher_nell.greeting':
+    'Het opende zich precies waar de netten drogen. Precies daar, waar ik elke ochtend van mijn leven heb gestaan. Ik ga niet meer naar de kust. Ik ga eigenlijk nergens meer heen.',
+  'entities.npcs.fisher_nell.name': 'Doodsbange Nell',
+  'entities.npcs.fisher_nell.title': 'Visser van Meeuwenhaven',
+  'entities.npcs.gardener_yew.greeting':
+    'Geef me die kruiwagen eens aan, wil je? Deze gazons lopen niet vanzelf, wat het gehucht ook denkt.',
+  'entities.npcs.gardener_yew.name': 'Tuinman Yew',
+  'entities.npcs.gardener_yew.title': 'De Laatste Tuinman',
+  'entities.npcs.gatecaptain_brannoc.greeting':
+    'Wurmwacht bewaakt de poort. Doet dat al veertig jaar. Zal dat vannacht ook doen.',
+  'entities.npcs.gatecaptain_brannoc.name': 'Poortkapitein Brannoc',
+  'entities.npcs.gatecaptain_brannoc.title': 'Bevelhebber van Wurmwacht',
+  'entities.npcs.gatewarden_pell.greeting':
+    'Let op waar je loopt op de gazons. De tuin houdt ze gemaaid, en hij houdt ervan als ze netjes zijn.',
+  'entities.npcs.gatewarden_pell.name': 'Poortwachter Pell',
+  'entities.npcs.gatewarden_pell.title': 'Hoeder van de Tuinpoort',
+  'entities.npcs.harbormaster_odile.greeting':
+    'Elke boot in deze baai dankt zijn kiel aan het Oude Baken. Spreek snel, het getij wacht niet.',
+  'entities.npcs.harbormaster_odile.name': 'Havenmeester Odile',
+  'entities.npcs.harbormaster_odile.title': 'Havenmeester van Wijkhaven',
+  'entities.npcs.head_gardener_amaranth.greeting':
+    'Let niet op de schaduwen onder mijn ogen. Iemand moet wakker blijven terwijl de tuin droomt.',
+  'entities.npcs.head_gardener_amaranth.name': 'Hoofdtuinman Amaranth',
+  'entities.npcs.head_gardener_amaranth.title': 'Hoofdtuinman van de Eeuwigtuin',
+  'entities.npcs.hearthkeeper_maeve.greeting':
+    'Kom binnen uit de kou. Het lodgevuur dooft nooit, zolang ik nog adem.',
+  'entities.npcs.hearthkeeper_maeve.name': 'Haardhoeder Maeve',
+  'entities.npcs.hearthkeeper_maeve.title': 'Hoeder van de Haardlodge',
+  'entities.npcs.hermit_okku.greeting':
+    'Stil nu. De trommels tellen alles wat onder de bomen loopt, en ze hebben jou al geteld.',
+  'entities.npcs.hermit_okku.name': 'Okku',
+  'entities.npcs.hermit_okku.title': 'De Man die Naar Binnen Ging',
+  'entities.npcs.huntsman_deral.greeting':
+    'Stil nu. De kudde kent elk geluid dat deze vallei maakt, en ik ook.',
+  'entities.npcs.huntsman_deral.name': 'Jager Deral',
+  'entities.npcs.huntsman_deral.title': 'Wachter van de Kuddes',
+  'entities.npcs.keeper_bram.greeting':
+    'Negenendertig jaar heeft deze lamp gebrand op mijn wacht. Hij zal niet doven op de jouwe.',
+  'entities.npcs.keeper_bram.name': 'Hoeder Bram',
+  'entities.npcs.keeper_bram.title': 'Hoeder van het Oude Baken',
+  'entities.npcs.keeper_saelwyn.greeting':
+    'Weinigen van jouw soort hebben onder deze takken gestaan, {className}. Loop zacht, en wees welkom.',
+  'entities.npcs.keeper_saelwyn.name': 'Hoedster Saelwyn',
+  'entities.npcs.keeper_saelwyn.title': 'Hoedster van de Holte',
+  'entities.npcs.lamplighter_sorrel.greeting':
+    'Let op de lampen, vriend. Voorbij deze poort geeft de zon het op en nemen de bloemen het over.',
+  'entities.npcs.lamplighter_sorrel.name': 'Lantaarnopsteker Sorrel',
+  'entities.npcs.lamplighter_sorrel.title': 'Hoeder van de Nachtpoort',
+  'entities.npcs.lampman_cobb.greeting':
+    'Blijf in het lantaarnlicht, vriend. Het woud telt iedereen die de poort passeert.',
+  'entities.npcs.lampman_cobb.name': 'Lantaarnman Cobb',
+  'entities.npcs.lampman_cobb.title': 'Hoeder van de Kraaienpoort-Lantaarns',
+  'entities.npcs.lira_dewsong.greeting':
+    'Welkom in Maanrust, waar de bloemen onze dageraad voor ons verzorgen.',
+  'entities.npcs.lira_dewsong.name': 'Lira Dauwzang',
+  'entities.npcs.lira_dewsong.title': 'Nachttuinier van Maanrust',
+  'entities.npcs.loremother_bryn.greeting':
+    'Elk licht in deze vallei herinnert zich iets, {playerName}. Help me luisteren.',
+  'entities.npcs.loremother_bryn.name': 'Verhalenmoeder Bryn',
+  'entities.npcs.loremother_bryn.title': 'Stem van het Heiligdom',
+  'entities.npcs.mender_saul.greeting':
+    'Ik heb deze maand meer botten gezet dan in tien jaar visserijvallen verhelpen. De breuken laten weinig heel van wat ze grijpen. Kom heel bij me terug, als het je lukt.',
+  'entities.npcs.mender_saul.name': 'Heelmeester Saul',
+  'entities.npcs.mender_saul.title': 'Veldchirurg',
+  'entities.npcs.mother_sedge.greeting':
+    'De wilgen vertelden me dat je kwam voordat je laarzen de brug verlieten.',
+  'entities.npcs.mother_sedge.name': 'Moeder Zegge',
+  'entities.npcs.mother_sedge.title': 'Veenheks van Treurwilg',
+  'entities.npcs.netter_maris.greeting':
+    'Ruik je dat? Gerookte paling. De halve stad staat op palen die ik ermee heb gekocht.',
+  'entities.npcs.netter_maris.name': 'Netvisser Maris',
+  'entities.npcs.netter_maris.title': 'Palingvisser van Brugmeer',
+  'entities.npcs.orchardist_pomeline.greeting':
+    'Let op waar je stapt. Elke wortel in deze rijen is ouder dan het stadje, en ze onthouden het.',
+  'entities.npcs.orchardist_pomeline.name': 'Boomgaardier Pomeline',
+  'entities.npcs.orchardist_pomeline.title': 'Hoeder van de Vergulde Rijen',
+  'entities.npcs.pearlmother_isha.greeting':
+    'De zee geeft, het zand bewaart, en de jungle neemt. Blijf op het strand, vreemdeling.',
+  'entities.npcs.pearlmother_isha.name': 'Parelmoeder Isha',
+  'entities.npcs.pearlmother_isha.title': 'Oudste van de Duikers',
+  'entities.npcs.provisioner_fenna.greeting':
+    'Brood nog warm, water nog zoet. De Holte voorziet, en ik ook.',
+  'entities.npcs.provisioner_fenna.name': 'Proviandmeester Fenna',
+  'entities.npcs.provisioner_fenna.title': 'Proviandmeester van Ouderglans',
+  'entities.npcs.quartermaster_edda.greeting':
+    'Staal en zout, {className}, dat is alles wat ik nog heb om uit te delen. Neem het en laat de breuken er spijt van krijgen dat ze zich openden waar ik ze kon bereiken.',
+  'entities.npcs.quartermaster_edda.name': 'Kwartiermeester Edda',
+  'entities.npcs.quartermaster_edda.title': 'Wapensmid van het Bolwerk',
+  'entities.npcs.quartermaster_sela.greeting':
+    'Elke kist in deze werf heeft veertig mijl as doorkruist om hier te komen. Behandel ze met zorg.',
+  'entities.npcs.quartermaster_sela.name': 'Kwartiermeester Sela',
+  'entities.npcs.quartermaster_sela.title': 'Hoeder van de Garnizoensvoorraad',
+  'entities.npcs.reeve_ottoline.greeting':
+    'Welkom in Lantaarnmeer, waar de oogst nooit eindigt, en het werk ook niet.',
+  'entities.npcs.reeve_ottoline.name': 'Schout Ottoline',
+  'entities.npcs.reeve_ottoline.title': 'Schout van Lantaarnmeer',
+  'entities.npcs.riftwatch_ollun.greeting':
+    'Elke breuk zingt voor hij opengaat, als je er het oor voor hebt. Ik hoor er nu drie roeren op het eiland, en een ervan is dichtbij.',
+  'entities.npcs.riftwatch_ollun.name': 'Riftwacht Ollun',
+  'entities.npcs.riftwatch_ollun.title': 'Geleerde van de Breuken',
+  'entities.npcs.salvage_boss_ryna.greeting':
+    'Een {className} met werkende armen, goed. De wraklijn betaalt goed, als de krabben je genoeg vingers laten om het te tellen.',
+  'entities.npcs.salvage_boss_ryna.name': 'Berger-Baas Ryna',
+  'entities.npcs.salvage_boss_ryna.title': 'Meesteres van de Wraklijn',
+  'entities.npcs.salvager_edda.greeting':
+    'Wrakhout, touw, en de lading van dode mannen. De zee betaalt mijn loon, als de Wachter het toelaat.',
+  'entities.npcs.salvager_edda.name': 'Berger Edda',
+  'entities.npcs.salvager_edda.title': 'Berger van de Wrakvelden',
+  'entities.npcs.scout_einna.greeting':
+    'Je hebt de pas levend doorlopen. Goed. IJsmantel moet dat horen.',
+  'entities.npcs.scout_einna.name': 'Verkenner Einna',
+  'entities.npcs.scout_einna.title': 'Verkenner van de Sneeuwlijn',
+  'entities.npcs.scout_yerrin.greeting':
+    'Blijf laag. Geluid draagt vreemd over het glas, en de poort beneden heeft oren.',
+  'entities.npcs.scout_yerrin.name': 'Verkenner Yerrin',
+  'entities.npcs.scout_yerrin.title': 'Wachter van de Verre Duinen',
+  'entities.npcs.sexton_marrow.greeting':
+    'We begraven ze hier diep, en we luiden de klokken zodat ze onthouden om te blijven liggen.',
+  'entities.npcs.sexton_marrow.name': 'Doodgraver Marrow',
+  'entities.npcs.sexton_marrow.title': 'Doodgraver van Galgenmeer',
+  'entities.npcs.strandwatcher_pell.greeting':
+    'Eindelijk uit de zwarte bomen. Adem, vreemdeling, de zon houdt stand aan deze kant van de pas.',
+  'entities.npcs.strandwatcher_pell.name': 'Strandwachter Pell',
+  'entities.npcs.strandwatcher_pell.title': 'Wachter van de Warmond',
+  'entities.npcs.trapper_brosk.greeting':
+    'Het veen nam deze week drie van mijn lijnen. Het veen had in twintig jaar nooit een lijn genomen.',
+  'entities.npcs.trapper_brosk.name': 'Strikkenzetter Brosk',
+  'entities.npcs.trapper_brosk.title': 'Strikkenzetter van het Rilveen',
+  'entities.npcs.vicar_creel.greeting':
+    'De kapel is jaren geleden ingestort. De doden eronder merkten het niet, dus ben ik gebleven.',
+  'entities.npcs.vicar_creel.name': 'Vicaris Creel',
+  'entities.npcs.vicar_creel.title': 'Laatste Vicaris van de Rouwsteen',
+  'entities.npcs.warden_coalfast.greeting':
+    'De breuken malen er niet om dat Meeuwenhaven klein is, {className}. Wij houden deze kust, of er is geen kust meer om te houden. Sta bij ons en ik zal het niet vergeten.',
+  'entities.npcs.warden_coalfast.name': 'Wachter Coalfast',
+  'entities.npcs.warden_coalfast.title': 'Bevelhebber van het Bolwerk',
+  'entities.npcs.warden_kaldra.greeting':
+    'Let op de richels, vreemdeling. De sneeuw bewaart wat ze neemt.',
+  'entities.npcs.warden_kaldra.name': 'Wachter Kaldra',
+  'entities.npcs.warden_kaldra.title': 'Wachter van IJsmantel',
+  'entities.npcs.wardsmith_orun.greeting':
+    'Deze smederijen zijn eeuwen geleden afgekoeld, {className}, maar hun werk snijdt nog altijd scherp.',
+  'entities.npcs.wardsmith_orun.name': 'Wachtsmid Orun',
+  'entities.npcs.wardsmith_orun.title': 'Hoeder van de Oude Smederijen',
+  'entities.npcs.watcher_maren.greeting':
+    'Let op je voetstap voorbij de poort. De wind hier boven neemt eerst je hoed en nooit vragen.',
+  'entities.npcs.watcher_maren.name': 'Wachter Maren',
+  'entities.npcs.watcher_maren.title': 'De Wacht van de Windweg',
+  'entities.npcs.waykeeper_pell.greeting':
+    'De Trappen af en het zachte land in. Let op waar je je laarzen neerzet.',
+  'entities.npcs.waykeeper_pell.name': 'Weghoeder Pell',
+  'entities.npcs.waykeeper_pell.title': 'Hoeder van de Amberveen-Trappen',
+  'entities.npcs.waywatcher_sorrel.greeting':
+    'Sneeuw achter je, goud voor je. Weinigen lopen de Goudsmelt twee keer, dus laat de oversteek tellen.',
+  'entities.npcs.waywatcher_sorrel.name': 'Wegwachter Sorrel',
+  'entities.npcs.waywatcher_sorrel.title': 'Wachter van de Goudsmelt',
+  'entities.npcs.weaver_amelle.greeting':
+    'Voel je dat? Maanvacht op het weefgetouw. Warmer dan elk vuur waar je ooit bij hebt gezeten.',
+  'entities.npcs.weaver_amelle.name': 'Wever Amelle',
+  'entities.npcs.weaver_amelle.title': 'Maanvacht-Wever',
+  'entities.npcs.wickmother_sorrel.greeting':
+    'Kom binnen, ga zitten, er staat een likeurtje op het vuur. Houd alleen een hand op alles wat van ijzer is: de kabouters zijn de laatste tijd erg vlug van vinger.',
+  'entities.npcs.wickmother_sorrel.name': 'Wijkmoeder Sorrel',
+  'entities.npcs.wickmother_sorrel.title': 'Hoedster van de Herberg van Haagwijk',
+  'entities.npcs.widow_tansy.greeting':
+    'Een kaars voor elk graf, en niet een mag doven. Niet een, hoor je me?',
+  'entities.npcs.widow_tansy.name': 'Weduwe Tansy',
+  'entities.npcs.widow_tansy.title': 'Kaarsenmaakster van Galgenmeer',
   'gatherEvent.ancientHeartwood': '{finder} heeft een oud kernhout gekapt!',
   'gatherEvent.moonlitBloom': '{finder} ontdekte een maanverlichte bloei!',
   'gatherEvent.pristineVein': '{finder} raakte een ongerepte ader!',
@@ -9236,6 +10398,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.harvestLineQty': 'Je oogst: {name} x{qty}.',
   'hudChrome.gathering.harvestSpecimenLine': 'Je krijgt ook {name}.',
   'hudChrome.mobile.professions': 'Beroepen',
+  'hudChrome.mobile.mounts': 'Rijdieren',
   'hudChrome.options.showThirdActionBar': 'Derde actiebalk tonen',
   'hudChrome.playerMenu.streamerBadgeTitle': 'Geverifieerde streamer',
   'hudChrome.professions.ceilingCommon': 'Gewone begrenzing',
@@ -9314,6 +10477,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.unbound':
     '{name} ontbonden voor {fee}. Het bindt opnieuw bij de volgende ruil.',
   'hud.combat.auraGainOther': '{target} krijgt {name}.',
+  'hud.combat.floatingHealAbsorbed': 'Geabsorbeerd',
+  'hud.combat.healOtherAbsorbed': 'Je {ability} wordt verslonden door het verderf op {target}.',
+  'hud.combat.healSelfAbsorbed': 'Je {ability} wordt verslonden door het verderf op jou.',
   'hudChrome.corpseHarvest.components.cloth': 'Stof',
   'hudChrome.corpseHarvest.components.meat': 'Vlees',
   'hudChrome.crafting.noBagSpace': 'Je hebt geen ruimte voor het vervaardigde voorwerp.',
@@ -9406,6 +10572,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': '{min} tot {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Betoverd',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Betoverd)',
+  'hudChrome.itemTooltip.riftSockets': 'Riftjuwelen {used}/{total}',
+  'hudChrome.itemTooltip.riftTier': '{tier}-rangs Rift-voorwerp',
+  'hudChrome.itemTooltip.riftUpgrade': 'Rift-verbetering {level}/{max}',
   'hudChrome.marketIndicator.aria': 'Wereldmarkt-opbrengst of voorwerpen wachten',
   'hudChrome.marketIndicator.tip':
     'Verkoopopbrengst of teruggekeerde voorwerpen wachten op je bij de Koopman.',
@@ -9458,4 +10627,277 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Makersmerk',
   'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Meesterwerkbonus',
   'hudChrome.enchanting.replaceConfirmKeepsBond': 'Opdrachtbinding',
+  'sim.rift.allUnstable': 'Alle rifts zijn op dit moment onstabiel. Probeer het straks opnieuw.',
+  'sim.rift.alreadyCleared': 'Deze rift is al opgeruimd door {names}.',
+  'sim.rift.deadEntry': 'Je kunt geen rift betreden terwijl je dood bent.',
+  'sim.rift.deadEntryCombat':
+    'Je groep is nog in gevecht. De doden kunnen opnieuw binnengaan zodra het gevecht stopt.',
+  'sim.rift.descendFloor': 'Je daalt dieper af in {name}.',
+  'sim.rift.detonateAbsoluteZero': 'Absoluut Nulpunt barst los!',
+  'sim.rift.detonateAbyssalMaw': 'Afgrondmuil sluit zich!',
+  'sim.rift.detonateArcaneAnnihilation': 'Arcane Vernietiging barst los!',
+  'sim.rift.detonateBloodRite': 'Bloedrite valt!',
+  'sim.rift.detonateBroodmothersMark': 'Merkteken van de Broedmoeder ontploft!',
+  'sim.rift.detonateCoreMeltdown': 'Kernsmelting ontploft!',
+  'sim.rift.detonateCrushingDepth': 'Verpletterende Diepte verplettert!',
+  'sim.rift.detonateDeathSentence': 'Doodvonnis valt!',
+  'sim.rift.detonateEarthshatter': 'Aardschok ontploft!',
+  'sim.rift.detonateFinalJudgment': 'Laatste Oordeel slaat neer!',
+  'sim.rift.detonateGlacialGrave': 'IJzig Graf ontploft!',
+  'sim.rift.detonateHellfireBrand': 'Hellevuurmerk ontploft!',
+  'sim.rift.detonateLightningRod': 'Bliksemstaaf slaat in!',
+  'sim.rift.detonateMagmaWell': 'Magmabron barst los!',
+  'sim.rift.detonatePactSeal': 'Verbondszegel ontploft!',
+  'sim.rift.detonatePitSentence': 'Kuilvonnis ontploft!',
+  'sim.rift.detonateSoulGrave': 'Zielengraf ontploft!',
+  'sim.rift.detonateStormcallersWrath': 'Woede van de Stormroeper barst los!',
+  'sim.rift.detonateVenomPool': 'Gifpoel barst los!',
+  'sim.rift.detonateVoidRift': 'Leegte-Rift ontploft!',
+  'sim.rift.enterFloor': 'Je stapt door de rift naar {name}.',
+  'sim.rift.exitOpens': 'De rift beeft. Een weg naar huis scheurt open achter de gevallenen.',
+  'sim.rift.forgeEnchanted': 'Rift-betovering voltooid voor {name}.',
+  'sim.rift.forgeSocketed': 'Riftjuweel geplaatst voor {name}.',
+  'sim.rift.forgeUpgraded': 'Rift-verbetering voltooid voor {name}.',
+  'sim.rift.gateOpen': 'De poort kraakt open.',
+  'sim.rift.iceGoalLit': 'Het vorstteken vlamt op. De weg beweegt.',
+  'sim.rift.levelGate': 'Alleen avonturiers van niveau {level} of hoger mogen deze rift betreden.',
+  'sim.rift.orbOpensGate': 'De Bloedorb laait op. De poorten van de tempel kraken open.',
+  'sim.rift.orbSealed': 'De orb is verzegeld door het ritueel beneden.',
+  'sim.rift.orbWakes': 'De vlam van het pentagram dooft uit. Iets ontwaakt op het altaar.',
+  'sim.rift.portalCollapses': 'De {tier}-rangs rift in {zone} stort in.',
+  'sim.rift.portalOpens': 'Een {tier}-rangs rift scheurt open in {zone}!',
+  'sim.rift.portalSealed': 'De {tier}-rangs rift in {zone} is verzegeld.',
+  'sim.rift.pylonLit': 'Een runenpyloon ontwaakt tot leven ({lit}/{total}).',
+  'sim.rift.raceLost': 'De rift is al opgeruimd door {names}. Jouw poging eindigt hier.',
+  'sim.rift.raceLostBanner': 'Rift Al Opgeruimd',
+  'sim.rift.raceWinBanner': 'Riftrace Gewonnen - {seconds}s',
+  'sim.rift.raceWorldWin': '{names} wonnen de {tier}-rangs Riftrace in {seconds}s!',
+  'sim.rift.seqProgress': 'De runen antwoorden op hun beurt ({step}/{total}).',
+  'sim.rift.seqReset': 'De runen doven uit. Begin opnieuw.',
+  'sim.rift.socketsShut': 'De sokkels klemmen dicht. De weg beweegt.',
+  'sim.rift.stepBack': 'Je stapt terug door de rift.',
+  'sim.rift.wayDownOpens': 'De weg naar beneden scheurt open.',
+  'hudChrome.mounts.clickManage': 'Klik om je rijdier te kiezen',
+  'hudChrome.mounts.close': 'Sluiten',
+  'hudChrome.mounts.desc_aether_hover_cycle':
+    'Een krachtige magitech-motor, ontworpen voor snelle, laag zwevende verplaatsing tijdens gevechten.',
+  'hudChrome.mounts.desc_grag_bear': 'Een sterke, standvastige beer die extra reissnelheid geeft.',
+  'hudChrome.mounts.desc_shadowjump_toad':
+    'Een enorme, standvastige reuzenpad, getraind in bliksemsnelle schaduwsprongen die elk terrein overbruggen.',
+  'hudChrome.mounts.desc_stalkglider_snail':
+    'Een taaie, langzaam brandende slak die extra reissnelheid geeft.',
+  'hudChrome.mounts.desc_stormfeather_griffin':
+    'Een koninklijke stormgriffioen die met runenbeslagen klauwen over de grond sluipt, vleugels opgevouwen.',
+  'hudChrome.mounts.desc_thunderstrut_gobbler':
+    'Een kolossale, uit de storm geboren kalkoen die vanaf de Ontwakende Piek naar beneden stapt, staart gespreid als een onweerswolk.',
+  'hudChrome.mounts.desc_valorsteed':
+    'Een sterk, standvastig strijdros dat extra reissnelheid geeft.',
+  'hudChrome.mounts.dismount': 'Afstijgen',
+  'hudChrome.mounts.emptyDropHint':
+    'Zeldzamere rijdieren vallen van heroische kerkerbazen en het voltooien van Rifts.',
+  'hudChrome.mounts.emptyStableHint':
+    'Bereik niveau 20 en volg rijlessen bij Stalmeester Marla in de Hoogwacht-stallen, ten westen van Hoogwacht.',
+  'hudChrome.mounts.emptyTitle': 'Geen rijdieren verzameld',
+  'hudChrome.mounts.mount': 'Rijdier',
+  'hudChrome.mounts.name_aether_hover_cycle': 'Aether-Duellist Zweefmotor',
+  'hudChrome.mounts.name_grag_bear': 'Goliath Grag-Beer',
+  'hudChrome.mounts.name_shadowjump_toad': 'Kama-Kage de Schaduwspringpad',
+  'hudChrome.mounts.name_stalkglider_snail': 'Mosschelp-Sluipglijder',
+  'hudChrome.mounts.name_stormfeather_griffin': 'Hemelreik Stormveder',
+  'hudChrome.mounts.name_thunderstrut_gobbler': 'Donderstap de Grote Kalkoen',
+  'hudChrome.mounts.name_valorsteed': 'Moedros',
+  'hudChrome.mounts.rarity_common': 'Gewoon',
+  'hudChrome.mounts.rarity_epic': 'Episch',
+  'hudChrome.mounts.rarity_rare': 'Zeldzaam',
+  'hudChrome.mounts.riding': 'Rijdend',
+  'hudChrome.mounts.select': 'Selecteren',
+  'hudChrome.mounts.selected': 'Geselecteerd',
+  'hudChrome.mounts.spec_speed': '+{pct}% extra mobiliteit',
+  'hudChrome.mounts.title': 'Rijdieren',
+  'hudChrome.mounts.useToRide': 'Gebruik om dit rijdier op te roepen.',
+  'hudChrome.mountRace.cancelButton': 'Race Annuleren',
+  'hudChrome.mountRace.finished': 'Gefinisht in {seconds}s!',
+  'hudChrome.mountRace.go': 'GA!',
+  'hudChrome.mountRace.progress': 'Poort {n} van {total}',
+  'hudChrome.mountRace.start': 'Ga! Neem elke sprong, en rijd dan terug door de boog.',
+  'hudChrome.mountRace.startButton': 'Race Starten',
+  'hudChrome.mountRace.timeLeft': '{seconds}s',
+  'hudChrome.mountRace.timeout': 'Race Mislukt',
+  'hudChrome.mountRace.toFinish': 'Rijd terug door de boog!',
+  'hudChrome.continentMap.levels': 'Niveaus {min} tot {max}',
+  'hudChrome.continentMap.summary': 'Wereldkaart. Kies een gebied om de kaart ervan te openen.',
+  'hudChrome.continentMap.title': 'Wereldkaart',
+  'hudChrome.continentMap.toWorld': 'Wereldkaart',
+  'hudChrome.continentMap.toZone': 'Gebiedskaart',
+  'hudChrome.continentMap.toggleAria': 'Schakel tussen de wereldkaart en de gebiedskaart',
+  'hudChrome.mountTraining.begin': 'Les Beginnen',
+  'hudChrome.mountTraining.mountPrompt': 'Druk op {key} om op de trainings-Moedros te stijgen.',
+  'hudChrome.mountTraining.ownedMountPrompt':
+    'Je teugels zitten in je tassen. Gebruik ze om te rijden.',
+  'hudChrome.mountTraining.returnToMarla':
+    'Keer terug naar Marla bij de stallen om je Moedros-teugels te kopen voor 10 goud.',
+  'hudChrome.mountTraining.ridePrompt':
+    'Volg de gloeiende markering naar de startlijn en druk dan op Race Starten.',
+  'hudChrome.mountTraining.success': 'Je hebt de Moedros getemd.',
+  'entities.zones.amberfall.name': 'De Amberval',
+  'entities.zones.amberfall.pois.0.label': 'Lantaarnmeer',
+  'entities.zones.amberfall.pois.1.label': 'De Goudsmelt',
+  'entities.zones.amberfall.pois.2.label': 'De Vergulde Boomgaard',
+  'entities.zones.amberfall.pois.3.label': 'Oogstholte',
+  'entities.zones.amberfall.pois.4.label': 'Het Grote Meer',
+  'entities.zones.amberfall.pois.5.label': 'Sintelesdoorn-Heuvel',
+  'entities.zones.amberfall.pois.6.label': 'De Hellende Monoliet',
+  'entities.zones.amberfall.welcome':
+    'Elk blad hier gloeit goud en rood, en toch valt er nooit een. De lantaarns van Lantaarnmeer zijn voor jou ontstoken.',
+  'entities.zones.drakelands.name': 'De Drakenlanden',
+  'entities.zones.drakelands.pois.0.label': 'Wurmwacht',
+  'entities.zones.drakelands.pois.1.label': 'Het Poortwoud',
+  'entities.zones.drakelands.pois.2.label': 'Sintelduinen',
+  'entities.zones.drakelands.pois.3.label': 'Trollenraad',
+  'entities.zones.drakelands.pois.4.label': 'De Laatste Burcht',
+  'entities.zones.drakelands.pois.5.label': 'Bloedglasvelden',
+  'entities.zones.drakelands.pois.6.label': 'Drakenmuil-Caldera',
+  'entities.zones.drakelands.welcome':
+    'Hete wind waait van de wildernis vooruit. Draken cirkelen boven de Drakenmuil, en trollenvuren branden in de duinen.',
+  'entities.zones.evergarden.name': 'De Eeuwigtuin',
+  'entities.zones.evergarden.pois.0.label': 'Haagwijk',
+  'entities.zones.evergarden.pois.1.label': 'De Tuinpoort',
+  'entities.zones.evergarden.pois.2.label': 'De Parterrewandeling',
+  'entities.zones.evergarden.pois.3.label': 'Kasteel Dageraad',
+  'entities.zones.evergarden.pois.4.label': 'De Bloesemvijver',
+  'entities.zones.evergarden.pois.5.label': 'Het Grote Doolhof',
+  'entities.zones.evergarden.pois.6.label': 'Het Fonteinhof',
+  'entities.zones.evergarden.pois.7.label': 'De Oude Molen',
+  'entities.zones.evergarden.pois.8.label': 'De Noordwacht',
+  'entities.zones.evergarden.pois.9.label': 'Het Lelie-Bekken',
+  'entities.zones.evergarden.welcome':
+    'Iemand snoeit nog altijd de heggen, hoewel er al honderd jaar geen tuinman is gezien. Let op met het doolhof: het let op jou terug.',
+  'entities.zones.farshore_isle.name': 'De Verrekust',
+  'entities.zones.farshore_isle.pois.0.label': 'Meeuwenhaven',
+  'entities.zones.farshore_isle.pois.1.label': 'De Aanlegplaats',
+  'entities.zones.farshore_isle.pois.2.label': 'De Wachtweide',
+  'entities.zones.farshore_isle.pois.3.label': 'De Gespleten Kliffen',
+  'entities.zones.farshore_isle.pois.4.label': 'De Riftvelden',
+  'entities.zones.farshore_isle.welcome':
+    'Steek de zandbank over en de klok van Meeuwenhaven zal je vinden voordat het stadje dat doet. De scheuren barsten zonder waarschuwing open, en het bolwerk verdedigt zijn kust tegen alles wat naar binnen stroomt. Ze wachten hier al lang op iemand zoals jij.',
+  'entities.zones.frostveil.name': 'De Vorstsluier',
+  'entities.zones.frostveil.pois.0.label': 'IJsmantel',
+  'entities.zones.frostveil.pois.1.label': 'De Sneeuwlijn',
+  'entities.zones.frostveil.pois.2.label': 'Gletsjermeer',
+  'entities.zones.frostveil.pois.3.label': 'De Aurora-Trappen',
+  'entities.zones.frostveil.pois.4.label': 'Het Rilveen',
+  'entities.zones.frostveil.pois.5.label': 'De Huilende Terrassen',
+  'entities.zones.frostveil.welcome':
+    'Sneeuw verzwelgt elk geluid. Onder de dansende lichten voelt de kou zelf wakker aan.',
+  'entities.zones.galecrest.name': 'De Windkam',
+  'entities.zones.galecrest.pois.0.label': 'Wijkhaven',
+  'entities.zones.galecrest.pois.1.label': 'De Windweg',
+  'entities.zones.galecrest.pois.2.label': 'De Huilende Heuvels',
+  'entities.zones.galecrest.pois.3.label': 'Het Oude Baken',
+  'entities.zones.galecrest.pois.4.label': 'De Scheur',
+  'entities.zones.galecrest.pois.5.label': 'De Wrakvelden',
+  'entities.zones.galecrest.pois.6.label': 'De Spiegelplas',
+  'entities.zones.galecrest.pois.7.label': 'De Windkam-Stallen',
+  'entities.zones.galecrest.welcome':
+    'De wind is hier nog nooit gestopt, en het Oude Baken is nog nooit gedoofd. Wijkhaven vraagt alleen dat je de herbergdeur achter je dichtdoet.',
+  'entities.zones.nightbloom.name': 'De Nachtbloesem',
+  'entities.zones.nightbloom.pois.0.label': 'Maanrust',
+  'entities.zones.nightbloom.pois.1.label': 'De Nachtpoort',
+  'entities.zones.nightbloom.pois.2.label': 'De Maanbron',
+  'entities.zones.nightbloom.pois.3.label': 'Schemerveld',
+  'entities.zones.nightbloom.pois.4.label': 'De Statige Wacht',
+  'entities.zones.nightbloom.pois.5.label': 'De Slapeloze Grafheuvel',
+  'entities.zones.nightbloom.welcome':
+    'Voorbij de Nachtpoort droomt de lucht zelf. Volg het bloemlicht naar Maanrust, en let op de slapende wereld die aan de hemel hangt.',
+  'entities.zones.palmreach.name': 'De Palmreik',
+  'entities.zones.palmreach.pois.0.label': 'Drijfhaven',
+  'entities.zones.palmreach.pois.1.label': 'De Warmond',
+  'entities.zones.palmreach.pois.2.label': 'Het Palmstrand',
+  'entities.zones.palmreach.pois.3.label': 'De Smaragdwarboel',
+  'entities.zones.palmreach.pois.4.label': 'De Rankval',
+  'entities.zones.palmreach.pois.5.label': 'De Saffieren Lagune',
+  'entities.zones.palmreach.pois.6.label': 'Het Verzonken Afgodsbeeld',
+  'entities.zones.palmreach.welcome':
+    'Warm zand, luidruchtige vogels, en een jungle die de horizon verslindt. Drijfhaven houdt een vuur voor je brandend op het strand.',
+  'entities.zones.veiled_hollow.name': 'De Sluierholte',
+  'entities.zones.veiled_hollow.pois.0.label': 'Ouderglans',
+  'entities.zones.veiled_hollow.pois.1.label': 'De Schemerval-Grot',
+  'entities.zones.veiled_hollow.pois.2.label': 'Het Schemerval-Uitkijkpunt',
+  'entities.zones.veiled_hollow.pois.3.label': 'Het Ouderwoud',
+  'entities.zones.veiled_hollow.pois.4.label': 'Het Sterrenvalbekken',
+  'entities.zones.veiled_hollow.pois.5.label': 'Het Verzonken Hof',
+  'entities.zones.veiled_hollow.pois.6.label': 'Kristallen Ondiepten',
+  'entities.zones.veiled_hollow.pois.7.label': 'De Glanzende Diepte',
+  'entities.zones.veiled_hollow.welcome':
+    'De lucht zoemt van oude magie. Zoek Hoedster Saelwyn onder de grote boom van Ouderglans.',
+  'entities.zones.willowfen.name': 'Het Wilgenveen',
+  'entities.zones.willowfen.pois.0.label': 'Brugmeer',
+  'entities.zones.willowfen.pois.1.label': 'De Amberveen-Trappen',
+  'entities.zones.willowfen.pois.2.label': 'De Liliemoerassen',
+  'entities.zones.willowfen.pois.3.label': 'Moerasglans-Poelen',
+  'entities.zones.willowfen.pois.4.label': 'Treurwilg',
+  'entities.zones.willowfen.pois.5.label': 'De Sluimervlakte',
+  'entities.zones.willowfen.welcome':
+    'Het veen zoemt van libellen en bijen. Steek de brug over naar Brugmeer en rust je voeten even.',
+  'entities.zones.wraithwood.name': 'Het Schimmenwoud',
+  'entities.zones.wraithwood.pois.0.label': 'Galgenmeer',
+  'entities.zones.wraithwood.pois.1.label': 'De Kraaienpoort',
+  'entities.zones.wraithwood.pois.2.label': 'Het Weduwenstruweel',
+  'entities.zones.wraithwood.pois.3.label': 'De Hangende Open Plek',
+  'entities.zones.wraithwood.pois.4.label': 'De Rouwsteen-Kapel',
+  'entities.zones.wraithwood.pois.5.label': 'De Open Plek van de Jager',
+  'entities.zones.wraithwood.welcome':
+    'Het bladerdak sluit zich als een deksel over de weg. Blijf bij de lantaarns van Galgenmeer, en antwoord niet als het woud je naam roept.',
+  'hudChrome.unstuck.alreadyActive': 'Loskomen telt al af.',
+  'hudChrome.unstuck.alreadySafe': 'Je bevindt je al op een veilige, bereikbare positie.',
+  'hudChrome.unstuck.busy': 'Maak je huidige actie af voordat je Loskomen gebruikt.',
+  'hudChrome.unstuck.cancelledBusy': 'Loskomen geannuleerd omdat je een andere actie begon.',
+  'hudChrome.unstuck.cancelledCombat': 'Loskomen geannuleerd omdat je in gevecht raakte.',
+  'hudChrome.unstuck.cancelledDamaged': 'Loskomen geannuleerd omdat je schade opliep.',
+  'hudChrome.unstuck.cancelledDisconnected':
+    'Loskomen geannuleerd omdat de verbinding werd verbroken.',
+  'hudChrome.unstuck.cancelledMoved': 'Loskomen geannuleerd omdat je bewoog.',
+  'hudChrome.unstuck.cancelledState': 'Loskomen geannuleerd omdat je toestand veranderde.',
+  'hudChrome.unstuck.combat': 'Je kunt Loskomen niet gebruiken tijdens een gevecht.',
+  'hudChrome.unstuck.completed': 'Verplaatst naar de dichtstbijzijnde bereikbare veilige plek.',
+  'hudChrome.unstuck.completedAtGraveyard':
+    'Je geest is teruggekeerd naar het dichtstbijzijnde kerkhof. Spreek met De Bleke Hoeder om de Tol van de Hoeder te accepteren.',
+  'hudChrome.unstuck.controlled':
+    'Je kunt Loskomen niet gebruiken terwijl je beweging is belemmerd.',
+  'hudChrome.unstuck.cooldown': 'Loskomen is over {seconds} seconden weer klaar.',
+  'hudChrome.unstuck.countdown': 'Loskomen: {seconds}',
+  'hudChrome.unstuck.dead':
+    'Je kunt Loskomen niet gebruiken terwijl je dood bent of in geestvorm verkeert.',
+  'hudChrome.unstuck.help':
+    'Herstel: /unstuck start een stilstaande aftelling die je verplaatst naar een nabije bereikbare veilige plek.',
+  'hudChrome.unstuck.helpAtGraveyard':
+    'Herstel: /unstuck start een stilstaande aftelling en stuurt je geest daarna naar het dichtstbijzijnde kerkhof. Terugkeren via De Bleke Hoeder vereist de Tol van de Hoeder.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Herstel: /unstuck start een stilstaande aftelling en verplaatst je daarna naar het dichtstbijzijnde kerkhof, waarbij je herrijst als je was gevallen. De Loskomingsziekte blijft tot 5 minuten op je.',
+  'hudChrome.unstuck.menuButton': 'Loskomen',
+  'hudChrome.unstuck.movedToGraveyard':
+    'Je bent naar het dichtstbijzijnde kerkhof verplaatst. De Loskomingsziekte weegt op je.',
+  'hudChrome.unstuck.noSafePosition':
+    'Er is geen bereikbare veilige plek in de buurt gevonden. Je bent niet verplaatst.',
+  'hudChrome.unstuck.revivedAtGraveyard':
+    'Je bent teruggebracht naar het dichtstbijzijnde kerkhof en herrezen. De Tol van de Hoeder weegt op je.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'Je bent naar het dichtstbijzijnde kerkhof verplaatst en herrezen. De Loskomingsziekte weegt op je.',
+  'hudChrome.unstuck.standStill': 'Sta stil op vaste grond voordat je Loskomen gebruikt.',
+  'hudChrome.unstuck.standStillAnywhere': 'Sta stil voordat je Loskomen gebruikt.',
+  'hudChrome.unstuck.started':
+    'Loskomen over {seconds} seconden. Bewegen, vechten, schade oplopen, of een andere actie beginnen annuleert dit.',
+  'hudChrome.unstuck.unavailable': 'Loskomen is niet beschikbaar in je huidige toestand.',
+  'hudChrome.riftTracker.title': 'Rift',
+  'hudChrome.riftTracker.floor': 'Verdieping {current} van {total}',
+  'hudChrome.riftTracker.closesIn': 'Sluit over {time}',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
+  'hud.prompts.guildInviteCancelled':
+    'Een openstaande uitnodiging voor je gilde is geannuleerd omdat de gilde is hernoemd.',
+  'hud.prompts.guildRenamed': 'Je gilde is door het moderatieteam hernoemd tot {name}.',
+  'hud.core.chatChannels.moveHint':
+    'Tabblad {channel} herschikken: sleep het, of gebruik Alt+Links en Alt+Rechts',
+  'itemUi.vendor.buyStack': 'Koop {count}',
+  'itemUi.vendor.buyStackAria': 'Koop {count} {item} voor {price}',
 };

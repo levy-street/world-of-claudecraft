@@ -1,5 +1,5 @@
 // Every enterable landform must be leavable on foot (the rule the Drakemaw
-// caldera suite enforces, tests/terrain_escape.test.ts). The Frostveil's
+// caldera suite enforces, tests/terrain_escape_walkout.test.ts). The Frostveil's
 // Glacier Tarn broke it: the tarn and its northern finger carve one merged
 // bowl whose sandy pond floor sits 10 to 25yd under a terraced icy rim, and a
 // player who jumped in could not climb back out at any azimuth (the player
@@ -142,7 +142,7 @@ describe('the Glacier Tarn ramp keeps the tarn intact', () => {
 
   it('holds water in both tarn lakes', () => {
     for (const lake of [TARN, TARN_FINGER]) {
-      expect(waterLevelAt(lake.x, lake.z)).toBe(WATER_LEVEL);
+      expect(waterLevelAt(lake.x, lake.z, SEED)).toBe(WATER_LEVEL);
       expect(terrainHeight(lake.x, lake.z, SEED), 'the basin must stay under water').toBeLessThan(
         WATER_LEVEL,
       );
@@ -151,7 +151,9 @@ describe('the Glacier Tarn ramp keeps the tarn intact', () => {
         const rad = (a * Math.PI) / 180;
         const x = lake.x + Math.sin(rad) * lake.radius * 0.6;
         const z = lake.z + Math.cos(rad) * lake.radius * 0.6;
-        expect(waterLevelAt(x, z), `water at ${a}deg of (${lake.x}, ${lake.z})`).toBe(WATER_LEVEL);
+        expect(waterLevelAt(x, z, SEED), `water at ${a}deg of (${lake.x}, ${lake.z})`).toBe(
+          WATER_LEVEL,
+        );
       }
     }
   });

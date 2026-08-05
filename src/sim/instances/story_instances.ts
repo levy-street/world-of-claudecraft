@@ -18,6 +18,7 @@
 
 import { DUNGEONS } from '../data';
 import { LAST_BELL_AREAS } from '../last_bell_field';
+import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import type { SimContext } from '../sim_context';
 import { arenaQueueLeave } from '../social/arena';
 import { resurrectOnInstanceReentry } from '../spirit';
@@ -56,10 +57,12 @@ export function enterStoryInstance(ctx: SimContext, dungeonId: string, pid?: num
   }
   const origin = instanceOriginOf(inst);
   const p = r.e;
+  cancelProfessionSessionOnDisplacement(ctx, p);
   p.pos = ctx.groundPos(origin.x + dungeon.entry.x, origin.z + dungeon.entry.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
   p.facing = 0;
+  p.prevFacing = 0;
   p.targetId = null;
   p.autoAttack = false;
   inst.emptyFor = 0;

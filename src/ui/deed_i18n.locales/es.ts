@@ -817,6 +817,30 @@ export const table: DeedLocaleTable = {
     name: 'El taller del desmontador',
     desc: 'Desguaza 50 piezas de equipo para recuperar sus materiales en bruto.',
   },
+  dgn_wildheart_basin: {
+    name: 'La cuenca contraataca',
+    desc: 'Derrota a Zulgar, Voz de la Cuenca, en la Cuenca del Corazón Salvaje.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Heroico: La Cuenca del Corazón Salvaje',
+    desc: 'Derrota a Zulgar, Voz de la Cuenca, en la Cuenca del Corazón Salvaje en dificultad heroica.',
+  },
+  chr_marsh_rares_ii: {
+    name: 'El Glotón, Contado',
+    desc: 'Mata a Grubjaw el Glotón, un cuarto terror con nombre de la Ciénaga de Mirefen que quedó fuera del primer recuento.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'Más nombres tallados en el risco',
+    desc: 'Mata al Viejo Cragmaw y al Señor de Esquirlas Kazzix, dos terrores con nombre más de las Alturas de Thornpeak que quedaron fuera del primer recuento.',
+  },
+  chr_gleamstag: {
+    name: 'La leyenda que no atacaba primero',
+    desc: 'Mata al Ciervo Fulgurante, un élite raro y esquivo que no ataca a menos que lo acorralen.',
+  },
+  chr_hollow_rares: {
+    name: 'La manada recuerda',
+    desc: 'Mata al Viejo Marrowshell y a Aurelhorn, Primero de la Manada, los dos jefes raros errantes de la Hondonada.',
+  },
 };
 
 // es_ES rides this base table plus the delve-vocabulary override layer

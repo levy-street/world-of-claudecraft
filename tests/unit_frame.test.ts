@@ -14,7 +14,14 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { Aura } from '../src/sim/types';
-import { type UnitFrameDescriptor, unitFrameView, unitResourceClass } from '../src/ui/unit_frame';
+import {
+  newUnitFrameBuffer,
+  type UnitFrameDescriptor,
+  unitFrameView,
+  unitFrameViewInto,
+  unitResourceClass,
+} from '../src/ui/unit_frame';
+import { assertAllocationStable } from './util/alloc_probe';
 
 function shield(value: number): Aura {
   return {
@@ -48,6 +55,17 @@ function playerDescriptor(over: Partial<UnitFrameDescriptor> = {}): UnitFrameDes
     ...over,
   };
 }
+
+describe('unitFrameView: allocation budget', () => {
+  it('fills one caller-owned buffer across hot-frame updates', () => {
+    const descriptor = playerDescriptor();
+    const buffer = newUnitFrameBuffer();
+
+    expect(() =>
+      assertAllocationStable(() => unitFrameViewInto(buffer, descriptor), 64, 'unit frame view'),
+    ).not.toThrow();
+  });
+});
 
 describe('unitResourceClass: the power-type discriminator (folds the inline ternary)', () => {
   it('maps each power type to its class', () => {

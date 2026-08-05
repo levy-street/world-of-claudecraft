@@ -5,7 +5,7 @@ World of ClaudeCraft project code is licensed under the MIT License in
 
 This file records the third-party runtime dependency notices added for the
 wallet-linking feature. It is intentionally scoped to those new dependencies;
-the complete dependency graph remains pinned in `package-lock.json`.
+the complete dependency graph remains pinned in `pnpm-lock.yaml`.
 
 ## Reown AppKit
 

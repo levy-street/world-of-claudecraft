@@ -337,31 +337,34 @@ export const vi_VN: EnTranslations = {
       "healerConfirmCancel": "Hủy bỏ"
     },
     "unstuck": {
-      "menuButton": "Unstuck",
-      "help": "Recovery: /unstuck starts a stationary countdown to move you to a nearby reachable safe spot.",
-      "helpAtGraveyard": "Recovery: /unstuck starts a stationary countdown, then sends your spirit to the nearest graveyard. Returning through the Pale Keeper requires The Keeper's Toll.",
-      "started": "Unstuck in {seconds} seconds. Moving, fighting, taking damage, or starting another action cancels it.",
-      "countdown": "Unstuck: {seconds}",
-      "completed": "Moved to the nearest reachable safe spot.",
-      "completedAtGraveyard": "Your spirit has returned to the nearest graveyard. Speak to the Pale Keeper to accept The Keeper's Toll.",
-      "revivedAtGraveyard": "You have been returned to the nearest graveyard and revived. The Keeper's Toll weighs on you.",
-      "cancelledMoved": "Unstuck cancelled because you moved.",
-      "cancelledDamaged": "Unstuck cancelled because you took damage.",
-      "cancelledCombat": "Unstuck cancelled because you entered combat.",
-      "cancelledBusy": "Unstuck cancelled because you started another action.",
-      "cancelledState": "Unstuck cancelled because your state changed.",
-      "cancelledDisconnected": "Unstuck cancelled because you disconnected.",
-      "noSafePosition": "No reachable safe spot was found nearby. You were not moved.",
-      "alreadyActive": "Unstuck is already counting down.",
-      "alreadySafe": "You are already in a safe, reachable position.",
-      "cooldown": "Unstuck will be ready in {seconds} seconds.",
-      "dead": "You cannot use Unstuck while dead or in spirit form.",
-      "combat": "You cannot use Unstuck during combat.",
-      "controlled": "You cannot use Unstuck while movement is impaired.",
-      "standStill": "Stand still on solid ground before using Unstuck.",
-      "standStillAnywhere": "Stand still before using Unstuck.",
-      "busy": "Finish your current action before using Unstuck.",
-      "unavailable": "Unstuck is unavailable in your current state."
+      "menuButton": "Thoát Kẹt",
+      "help": "Cứu hộ: /unstuck bắt đầu đếm ngược khi đứng yên để đưa bạn đến một vị trí an toàn gần đó có thể tiếp cận được.",
+      "helpAtGraveyard": "Cứu hộ: /unstuck bắt đầu đếm ngược khi đứng yên, sau đó đưa linh hồn của bạn đến nghĩa trang gần nhất. Quay lại qua Người Giữ Nhợt Nhạt yêu cầu Phí Tổn Của Người Giữ.",
+      "helpUnstuckSickness": "Cứu hộ: /unstuck bắt đầu đếm ngược khi đứng yên, sau đó đưa bạn đến nghĩa trang gần nhất và hồi sinh bạn nếu bạn đã ngã xuống. Hội Chứng Thoát Kẹt sẽ đè nặng lên bạn tối đa 5 phút.",
+      "started": "Thoát Kẹt sau {seconds} giây. Di chuyển, chiến đấu, bị gây sát thương, hoặc bắt đầu hành động khác sẽ hủy nó.",
+      "countdown": "Thoát Kẹt: {seconds}",
+      "completed": "Đã di chuyển đến vị trí an toàn gần nhất có thể tiếp cận được.",
+      "completedAtGraveyard": "Linh hồn của bạn đã trở về nghĩa trang gần nhất. Hãy nói chuyện với Người Giữ Nhợt Nhạt để chấp nhận Phí Tổn Của Người Giữ.",
+      "revivedAtGraveyard": "Bạn đã được đưa về nghĩa trang gần nhất và hồi sinh. Phí Tổn Của Người Giữ đang đè nặng lên bạn.",
+      "movedToGraveyard": "Bạn đã được đưa đến nghĩa trang gần nhất. Hội Chứng Thoát Kẹt đang đè nặng lên bạn.",
+      "revivedAtGraveyardUnstuck": "Bạn đã được đưa đến nghĩa trang gần nhất và hồi sinh. Hội Chứng Thoát Kẹt đang đè nặng lên bạn.",
+      "cancelledMoved": "Thoát Kẹt bị hủy vì bạn đã di chuyển.",
+      "cancelledDamaged": "Thoát Kẹt bị hủy vì bạn đã bị gây sát thương.",
+      "cancelledCombat": "Thoát Kẹt bị hủy vì bạn đã vào trạng thái chiến đấu.",
+      "cancelledBusy": "Thoát Kẹt bị hủy vì bạn đã bắt đầu một hành động khác.",
+      "cancelledState": "Thoát Kẹt bị hủy vì trạng thái của bạn đã thay đổi.",
+      "cancelledDisconnected": "Thoát Kẹt bị hủy vì bạn đã mất kết nối.",
+      "noSafePosition": "Không tìm thấy vị trí an toàn nào có thể tiếp cận gần đó. Bạn đã không được di chuyển.",
+      "alreadyActive": "Thoát Kẹt đang đếm ngược rồi.",
+      "alreadySafe": "Bạn đã ở một vị trí an toàn và có thể tiếp cận được.",
+      "cooldown": "Thoát Kẹt sẽ sẵn sàng sau {seconds} giây.",
+      "dead": "Bạn không thể sử dụng Thoát Kẹt khi đã chết hoặc đang ở dạng linh hồn.",
+      "combat": "Bạn không thể sử dụng Thoát Kẹt trong khi chiến đấu.",
+      "controlled": "Bạn không thể sử dụng Thoát Kẹt khi khả năng di chuyển bị suy giảm.",
+      "standStill": "Đứng yên trên mặt đất vững chắc trước khi sử dụng Thoát Kẹt.",
+      "standStillAnywhere": "Đứng yên trước khi sử dụng Thoát Kẹt.",
+      "busy": "Hãy hoàn tất hành động hiện tại trước khi sử dụng Thoát Kẹt.",
+      "unavailable": "Thoát Kẹt không khả dụng trong trạng thái hiện tại của bạn."
     },
     "scene": {
       "skipHint": "Skip scene (Esc)",
@@ -807,6 +810,7 @@ export const vi_VN: EnTranslations = {
       "leaderboard": "Xếp Hạng",
       "dailyRewards": "Cửa hàng",
       "deeds": "Kỳ Công",
+      "mounts": "Thú Cưỡi",
       "professions": "Nghề nghiệp",
       "nameplates": "Tên",
       "haptics": "Phản Hồi Rung",
@@ -889,6 +893,13 @@ export const vi_VN: EnTranslations = {
       "heroicName": "{name} Anh Hùng",
       "heroicLocked": "Bạn đang bị khóa với {name} Anh Hùng."
     },
+    "riftTracker": {
+      "title": "Rạn Nứt",
+      "floor": "Tầng {current}/{total}",
+      "closesIn": "Đóng sau {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "B",
       "NE": "ĐB",
@@ -907,10 +918,32 @@ export const vi_VN: EnTranslations = {
       "autoShowHint": "Các hàng xuất hiện tự động sau khi nhóm của bạn gây sát thương hoặc hồi máu, và phần này đóng lại vài giây sau khi chiến đấu kết thúc.",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
-      "breakdownOther": "Other ({count})",
+      "breakdownOther": "Khác ({count})",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
-      "melee": "Melee"
+      "melee": "Cận Chiến",
+      "move": "Kéo để di chuyển thước đo này",
+      "resize": "Kéo để thay đổi kích thước thước đo này",
+      "dock": "Đưa thước đo này trở lại cửa sổ thước đo",
+      "separate": "Tách {meter}",
+      "regroup": "Ghép lại {meter}"
+    },
+    "targetAuras": {
+      "title": "Hào Quang Mục Tiêu",
+      "keybindLabel": "Buff và Debuff Mục Tiêu",
+      "all": "Tất cả",
+      "debuffs": "Debuff",
+      "buffs": "Buff",
+      "unlock": "Di chuyển cửa sổ hào quang mục tiêu",
+      "lock": "Khóa cửa sổ hào quang mục tiêu",
+      "configureRows": "Cấu hình hào quang mục tiêu",
+      "fewerRows": "Ưu tiên ít hàng hào quang hơn",
+      "moreRows": "Ưu tiên nhiều hàng hào quang hơn",
+      "visibleRows": "Số hàng hào quang mong muốn: {count}",
+      "showSources": "Hiện nguồn hào quang",
+      "hideSources": "Ẩn nguồn hào quang",
+      "ownAura": "Hào quang của bạn",
+      "opacity": "Độ mờ hào quang: {percent}"
     },
     "petFeed": {
       "disabledFullHp": "Thú cưng đang đầy máu",
@@ -929,45 +962,73 @@ export const vi_VN: EnTranslations = {
       "petTaunt": "Thú Cưng: Khiêu Khích",
       "petDefensive": "Thú Cưng: Phòng Thủ",
       "petAggressive": "Thú Cưng: Hung Hăng",
-      "mount": "Mount / Dismount"
+      "mount": "Cưỡi Thú / Xuống Thú"
+    },
+    "actionBar": {
+      "editKeys": "Edit action bar keys",
+      "editKeysHint": "Click a slot on the action bar, then press a key to bind it.",
+      "bannerHint": "Click a slot, then press a key to bind it. Click Done when finished.",
+      "bannerCapturing": "Press a key to bind this slot...",
+      "boundToKey": "Bound to {key}.",
+      "reset": "Reset",
+      "done": "Done",
+      "cancel": "Cancel",
+      "resetConfirmTitle": "Reset action bar keys?",
+      "resetConfirmBody": "The first bar returns to its default keys. The second and third bars become unbound. This cannot be undone."
     },
     "mounts": {
-      "mount": "Mount",
-      "useToRide": "Use to summon this mount.",
-      "spec_speed": "+{pct}% extra mobility",
+      "title": "Thú Cưỡi",
+      "close": "Đóng",
+      "select": "Chọn",
+      "selected": "Đã Chọn",
+      "riding": "Đang Cưỡi",
+      "mount": "Lên Thú Cưỡi",
+      "dismount": "Xuống Thú Cưỡi",
+      "useToRide": "Sử dụng để triệu hồi thú cưỡi này.",
+      "emptyTitle": "Chưa Có Thú Cưỡi Nào",
+      "emptyStableHint": "Đạt cấp độ 20 và học cưỡi ngựa cùng Trưởng Chuồng Ngựa Marla tại Chuồng Ngựa Highwatch, phía tây Highwatch.",
+      "emptyDropHint": "Thú cưỡi hiếm hơn rơi ra từ trùm hầm ngục anh hùng và khi hoàn thành Rạn Nứt.",
+      "clickManage": "Nhấp để chọn thú cưỡi của bạn",
+      "rarity_common": "Phổ Thông",
+      "rarity_rare": "Hiếm",
+      "rarity_epic": "Sử Thi",
+      "spec_speed": "+{pct}% tốc độ di chuyển",
       "name_valorsteed": "Valorsteed",
-      "name_grag_bear": "Goliath Grag-Bear",
-      "name_stalkglider_snail": "Moss-Shell Stalk-Glider",
-      "name_aether_hover_cycle": "Aether-Jouster Hover-Cycle",
-      "name_shadowjump_toad": "Kama-Kage the Shadow-Jump Toad",
-      "name_stormfeather_griffin": "Sky-Reach Stormfeather",
-      "name_thunderstrut_gobbler": "Thunderstrut the Grand Gobbler",
-      "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
-      "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
-      "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
-      "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
-      "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
-      "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled.",
-      "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead."
+      "name_grag_bear": "Gấu Grag Khổng Lồ",
+      "name_stalkglider_snail": "Ốc Sên Lượn Vỏ Rêu",
+      "name_aether_hover_cycle": "Xe Lượn Đấu Sĩ Ê-te",
+      "name_shadowjump_toad": "Kama-Kage, Cóc Nhảy Bóng Tối",
+      "name_stormfeather_griffin": "Stormfeather Vươn Trời",
+      "name_thunderstrut_gobbler": "Thunderstrut, Gà Tây Vĩ Đại",
+      "name_terrorspark_groundshaker": "Tia Kinh Hoàng, Kẻ Rung Chuyển Mặt Đất",
+      "desc_valorsteed": "Một con chiến mã khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
+      "desc_grag_bear": "Một chú gấu khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
+      "desc_stalkglider_snail": "Một chú ốc sên bền bỉ, dẻo dai, giúp tăng tốc độ di chuyển.",
+      "desc_aether_hover_cycle": "Một cỗ xe phép thuật cơ khí mạnh mẽ, được thiết kế để di chuyển nhanh và lướt sát mặt đất trong chiến đấu.",
+      "desc_shadowjump_toad": "Một con cóc khổng lồ, bước chân vững chãi, được huấn luyện những cú nhảy bóng tối nhanh như chớp có thể vượt qua mọi địa hình.",
+      "desc_stormfeather_griffin": "Một con sư tử đầu chim bão uy nghi, rảo bước trên mặt đất bằng những móng vuốt được bọc rune, đôi cánh xếp gọn.",
+      "desc_thunderstrut_gobbler": "Một con gà tây khổng lồ nở ra từ giông bão, sải bước xuống từ Đỉnh Tỉnh Thức, đuôi xòe rộng như đám mây giông.",
+      "desc_terrorspark_groundshaker": "Một cỗ máy bọc giáp nhỏ gọn với bánh xích nặng, pháo nòng lớn và yên ngồi dành cho những người lái gan dạ."
     },
     "mountTraining": {
-      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "mountPrompt": "Nhấn {key} để cưỡi Valorsteed huấn luyện.",
+      "ownedMountPrompt": "Dây cương của bạn đang ở trong túi đồ. Hãy dùng để cưỡi.",
       "buyReinsPrompt": "Riding learned. Buy Valorsteed reins from Marla for 10 gold, then use them to ride.",
-      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
-      "begin": "Begin Lesson",
-      "success": "You have tamed the Valorsteed.",
-      "returnToMarla": "Return to Marla at the stables to buy your Valorsteed reins for 10g."
+      "ridePrompt": "Đi theo điểm đánh dấu phát sáng đến vạch xuất phát, sau đó nhấn Bắt Đầu Đua.",
+      "begin": "Bắt Đầu Bài Học",
+      "success": "Bạn đã thuần hóa được Valorsteed.",
+      "returnToMarla": "Quay lại gặp Marla tại chuồng ngựa để mua dây cương Valorsteed với giá 10 vàng."
     },
     "mountRace": {
-      "startButton": "Start Race",
-      "cancelButton": "Cancel Race",
-      "go": "GO!",
-      "start": "Go! Clear every jump, then ride back through the arch.",
-      "toFinish": "Ride back through the arch!",
-      "finished": "Finished in {seconds}s!",
-      "timeout": "Race Failed",
-      "progress": "Gates {n} of {total}",
-      "timeLeft": "{seconds}s"
+      "startButton": "Bắt Đầu Đua",
+      "cancelButton": "Hủy Đua",
+      "go": "XUẤT PHÁT!",
+      "start": "Xuất phát! Vượt qua mọi cú nhảy, sau đó cưỡi trở lại qua cổng vòm.",
+      "toFinish": "Cưỡi trở lại qua cổng vòm!",
+      "finished": "Hoàn thành trong {seconds} giây!",
+      "timeout": "Đua Thất Bại",
+      "progress": "Cổng {n}/{total}",
+      "timeLeft": "{seconds} giây"
     },
     "vcup": {
       "title": "Cúp Thung Lũng",
@@ -991,6 +1052,7 @@ export const vi_VN: EnTranslations = {
       },
       "awayNote": "Nếu hai bên cùng giương một lá cờ, đội khách sẽ khoác bảng màu đảo ngược.",
       "rolesHeading": "Vai trò thi đấu",
+      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Deeds that call for the 3v3 bracket or larger cannot be earned here.",
       "role": {
         "allrounder": {
           "name": "Toàn Năng",
@@ -1032,6 +1094,7 @@ export const vi_VN: EnTranslations = {
       "guildBoardWl": "{wins} T, {losses} B",
       "practice": "Tập Luyện Với Máy",
       "practiceNote": "Bắt đầu ngay một trận riêng với máy trên sân tập của riêng bạn.",
+      "practiceUnratedNote": "Practice bouts are unrated: standings and Book of Deeds progress do not count.",
       "practicingNow": "Đang tập luyện ({count}):",
       "clock": "{minutes}:{seconds}",
       "indicatorQueued": "Hàng chờ Cúp Thung Lũng: {bracket}, vị trí {position} trên {count}",
@@ -1074,6 +1137,8 @@ export const vi_VN: EnTranslations = {
         "rule5": "Ai cũng có thể tới cổ vũ bạn từ trên khán đài.",
         "kitHeading": "Bộ kỹ năng của bạn",
         "kitNote": "Các chiêu này thay thế kỹ năng lớp nhân vật của bạn trong trận đấu.",
+        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.",
+        "practiceUnratedNote": "This is a practice bout, so it is unrated: standings do not move, and Book of Deeds progress does not count.",
         "rosterHeading": "Danh sách ra sân",
         "you": "Bạn",
         "bot": "Máy",
@@ -1254,6 +1319,51 @@ export const vi_VN: EnTranslations = {
       "badges": {
         "backgrounded": "Chạy Nền",
         "offline": "Ngoại Tuyến"
+      }
+    },
+    "auraOverlay": {
+      "title": "Hào Quang",
+      "currentClass": "Lớp hiện tại: {class}",
+      "previewHint": "Dùng Thiết lập vị trí để di chuyển hào quang mà không che menu.",
+      "noProcs": "Không có proc được hỗ trợ nào khả dụng cho nhân vật này.",
+      "enabled": "Hiện hào quang",
+      "icon": "Biểu tượng phép",
+      "arcs": "Vành trăng bên",
+      "groundRing": "Vòng mặt đất",
+      "groundRingSpellOrder": "Vòng mặt đất: thứ tự phép",
+      "crescentsSpellOrder": "Vành trăng bên: thứ tự phép",
+      "size": "Kích thước",
+      "iconSize": "Kích thước biểu tượng",
+      "crescentBlockSize": "Kích thước khối vành trăng",
+      "groundRingBlockSize": "Kích thước khối vòng mặt đất",
+      "opacity": "Độ mờ",
+      "color": "Màu sắc",
+      "allOn": "Bật tất cả",
+      "allOff": "Tắt tất cả",
+      "reposition": "Thiết lập vị trí",
+      "positioning": "Định vị: {aura}",
+      "selectAura": "Hào quang",
+      "done": "Xong",
+      "moveLeft": "Di chuyển sang trái",
+      "moveUp": "Di chuyển lên",
+      "moveDown": "Di chuyển xuống",
+      "moveRight": "Di chuyển sang phải",
+      "moveEarlier": "Di chuyển phép vào trong",
+      "moveLater": "Di chuyển phép ra ngoài",
+      "screenPosition": "Vị trí trên màn hình",
+      "spellOrder": "Thứ tự phép",
+      "reset": "Đặt Lại Vị Trí",
+      "spellPosition": "Thứ tự phép {position} / {count}",
+      "procs": {
+        "revenge": "Phục Thù!",
+        "battleTrance": "Nhập Định Chiến Đấu",
+        "overpowerCharge": "Tăng Cường Bàn Tay Đẫm Máu",
+        "suddenDeath": "Đột Tử",
+        "victoryRush": "Đà Chiến Thắng",
+        "enrage": "Cuồng Loạn: Phẫn Nộ",
+        "heatingUp": "Đang Nóng Lên",
+        "arcaneCharge": "Điện Tích Bí Thuật",
+        "aetherRush": "Dòng Ê-te"
       }
     },
     "playerCard": {
@@ -1499,6 +1609,10 @@ export const vi_VN: EnTranslations = {
       "twoFactorRecoveryTitle": "Lưu các mã khôi phục của bạn",
       "twoFactorRecoveryHint": "Mỗi mã chỉ dùng được một lần. Cất giữ chúng ở nơi an toàn: chúng là cách duy nhất để vào lại nếu bạn mất ứng dụng xác thực.",
       "twoFactorDownloadCodes": "Tải Mã Xuống",
+      "recoveryCodesFileHeader": "Mã khôi phục {brand}",
+      "recoveryCodesFileAccount": "Tài khoản: {username}",
+      "recoveryCodesFileHint": "Mỗi mã có thể dùng một lần nếu bạn mất quyền truy cập vào ứng dụng xác thực của mình.",
+      "recoveryCodesFileWarn": "Cất giữ tệp này ở nơi an toàn và riêng tư.",
       "twoFactorDone": "Xong",
       "twoFactorDisableHint": "Nhập mật khẩu của bạn để tắt xác thực hai lớp. Các mã khôi phục của bạn sẽ bị loại bỏ.",
       "twoFactorDisableBtn": "Tắt Xác Thực Hai Lớp",
@@ -1632,6 +1746,7 @@ export const vi_VN: EnTranslations = {
       "filterArmor": "Giáp",
       "filterConsumable": "Vật phẩm tiêu hao",
       "filterMaterial": "Nguyên liệu",
+      "filterTool": "Tools",
       "filterQuest": "Nhiệm vụ",
       "filterMount": "Vật cưỡi",
       "sortAria": "Sắp xếp vật phẩm trong túi",
@@ -1851,13 +1966,14 @@ export const vi_VN: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "Yêu cầu Cấp {level}",
-      "riftTier": "{tier}-rank Rift item",
-      "riftUpgrade": "Rift upgrade {level}/{max}",
-      "riftSockets": "Rift gems {used}/{total}",
+      "riftTier": "Vật phẩm Rạn Nứt hạng {tier}",
+      "riftUpgrade": "Nâng cấp Rạn Nứt {level}/{max}",
+      "riftSockets": "Ngọc Rạn Nứt {used}/{total}",
       "statEnchanted": "+{value} {stat} (Đã Pháp Khắc)",
       "enchantedFallback": "Đã Pháp Khắc"
     },
     "materialHint": {
+      "fineGrade": "Fine grade. Gathered from a full-tier vein with a tool ranked above the material, and counts as the ordinary version wherever one is required.",
       "arcaneDust": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trang bị phổ thông và khác thường.",
       "arcaneEssence": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trang bị hiếm.",
       "arcaneShard": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trang bị sử thi và huyền thoại.",
@@ -2055,6 +2171,14 @@ export const vi_VN: EnTranslations = {
       "benefits": "Hãy liên kết tài khoản Steam từ ứng dụng máy tính để các kỳ công bạn lập được đồng bộ thành thành tựu Steam.",
       "noTicket": "Steam không cung cấp vé liên kết. Hãy khởi động Steam rồi thử lại."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Liên kết Epic",
+      "unlink": "Hủy liên kết Epic",
+      "linked": "Đã liên kết với tài khoản Epic {id}",
+      "benefits": "Liên kết tài khoản Epic của bạn từ ứng dụng máy tính Epic để phản chiếu các kỳ công bạn đạt được thành thành tựu Epic.",
+      "noProof": "Epic không cung cấp bằng chứng liên kết. Hãy khởi chạy từ Epic Games Store rồi thử lại."
+    },
     "mailbox": {
       "title": "Hòm Thư",
       "subtitle": "Bưu Quạ",
@@ -2099,6 +2223,7 @@ export const vi_VN: EnTranslations = {
         "noRecipient": "Không ai mang tên đó có hòm thư ở đây.",
         "tooManyParcels": "Một lá thư chở tối đa {count} bưu kiện.",
         "noMailQuestItems": "Bạn không thể gửi vật phẩm nhiệm vụ qua thư.",
+        "noMailBound": "Vật phẩm đó đã bị ràng buộc và không thể gửi qua thư.",
         "notEnoughItems": "Bạn không có đủ số lượng đó để gửi.",
         "cantAffordPostage": "Bạn không đủ tiền trả bưu phí.",
         "recipientBoxFull": "Hòm thư của người nhận đã đầy.",
@@ -2276,7 +2401,8 @@ export const vi_VN: EnTranslations = {
       "toolTierUnmet": {
         "mining": "Bạn cần cuốc khai khoáng bậc {tier} để khai thác mạch này.",
         "logging": "Bạn cần rìu đốn gỗ bậc {tier} để đốn bãi này.",
-        "herbalism": "Bạn cần liềm hái thảo dược bậc {tier} để thu hoạch bụi này."
+        "herbalism": "Bạn cần liềm hái thảo dược bậc {tier} để thu hoạch bụi này.",
+        "fishing": "You need a tier {tier} fishing rod to fish these waters."
       },
       "toolRequired": {
         "mining": "Bạn cần cuốc khai khoáng để khai thác mạch quặng này.",
@@ -2289,6 +2415,12 @@ export const vi_VN: EnTranslations = {
         "logging": "Không có cụm cây gỗ nào trong tầm với.",
         "herbalism": "Không có khóm thảo dược nào trong tầm với."
       },
+      "wieldUnmet": {
+        "mining": "You need Mining {skill} to swing the pick already in your bags.",
+        "logging": "You need Logging {skill} to swing the axe already in your bags.",
+        "herbalism": "You need Herbalism {skill} to work the sickle already in your bags."
+      },
+      "wieldUnmetCorpse": "You need gathering skill {skill} to put your finest tool to work.",
       "toolTierUnmetCorpse": "Bạn cần công cụ thu thập bậc {tier} để lấy được nguyên liệu tốt nhất.",
       "toolTooltip": {
         "kind": {
@@ -2300,7 +2432,8 @@ export const vi_VN: EnTranslations = {
         "unlocks": {
           "mining": "Cần thiết để khai thác các mạch quặng đến bậc {tier}.",
           "logging": "Cần thiết để đốn hạ các cụm cây gỗ đến bậc {tier}.",
-          "herbalism": "Cần thiết để thu hái các khóm thảo dược đến bậc {tier}."
+          "herbalism": "Cần thiết để thu hái các khóm thảo dược đến bậc {tier}.",
+          "fishing": "Required to fish waters up to tier {tier}."
         },
         "use": {
           "mining": "Sử dụng: Khai thác mạch quặng gần đó.",
@@ -2315,8 +2448,12 @@ export const vi_VN: EnTranslations = {
       },
       "downgradeMark": "Túi đầy: phát hiện được lưu mà không có dấu thợ thu thập.",
       "downgradeFind": "Túi đầy: một phát hiện tuyệt vời đã trôi qua.",
+      "emptyHookNote": "Nothing on the hook",
       "stateReady": "Sẵn Sàng",
-      "stateCooldown": "Đang Hồi Sinh"
+      "stateCooldown": "Đang Hồi Sinh",
+      "stateCooldownTimed": "Respawns in {time}",
+      "respawnClock": "{minutes}:{seconds}",
+      "fineGradePreview": "Your tool refines this yield to fine grade."
     },
     "archetypeTitle": {
       "label": "Danh hiệu",
@@ -2406,6 +2543,33 @@ export const vi_VN: EnTranslations = {
       "ceilingRare": "Mũ hiếm",
       "ceilingCommon": "Mũ chung",
       "skillValue": "{skill} / {max}",
+      "toolEffectCharges": "{charges} of {max} charges",
+      "toolEffectSpent": "Spent, needs recharging",
+      "toolEffectDepleted": "Tool effect spent",
+      "toolEffectRechargePrice": "Recharge: {count} x {material}",
+      "toolEffectModeAsk": "Ask each use",
+      "toolEffectModePrompt": "Asks each use",
+      "toolEffectConfirmTitle": "Use {effect}?",
+      "toolEffectConfirmBody": "Spend a charge on this harvest? Declining still gathers, without the bonus. Charges left: {charges}.",
+      "toolEffectConfirmAccept": "Use a Charge",
+      "toolEffectConfirmDecline": "Gather Without",
+      "toolEffectName": {
+        "gatherersCache": "Gatherer's Cache",
+        "artisansEye": "Artisan's Eye",
+        "quickeningCharm": "Springback Charm"
+      },
+      "toolEffectSlotButton": "Slot {effect}",
+      "toolEffectRechargeButton": "Recharge",
+      "toolEffectSlotted": "{effect} slotted on {profession}.",
+      "toolEffectSlotInvalid": "{effect} cannot be slotted there.",
+      "toolEffectNoTool": "You need a real {profession} tool first.",
+      "toolEffectNoCharm": "You need a crafted {effect} charm in your bags.",
+      "toolEffectNoGain": "{effect} is already slotted and fully charged.",
+      "toolEffectRecharged": "{effect} recharged: {material} x{count} consumed.",
+      "toolEffectRechargeNoSlot": "No effect is slotted on {profession}.",
+      "toolEffectRechargeFull": "{effect} is already fully charged.",
+      "toolEffectRechargeToolCapped": "Carry a better {profession} tool to charge {effect} further.",
+      "toolEffectRechargeMaterials": "Recharging {effect} needs {material} x{count}.",
       "tierPipAria": "Cấp {tier}",
       "nextUnlockTier": "{points} chỉ ra cấp độ tiếp theo: tỷ lệ thành công được cải thiện",
       "nextUnlockSpecialized": "{points} chỉ vào Chuyên ngành: giảm chi phí nguyên vật liệu",
@@ -2433,6 +2597,7 @@ export const vi_VN: EnTranslations = {
       "craft": "thủ công",
       "reagentsNeeded": "Yêu cầu:",
       "reagentLine": "{name}: {have}/{required}",
+      "reagentFineSub": "(spends {count} fine-grade)",
       "empty": "Chưa có công thức nấu ăn nào được biết đến.",
       "resultAria": "Thủ công {name}",
       "craftedToast": "Đã chế tác: {name}",
@@ -2474,6 +2639,8 @@ export const vi_VN: EnTranslations = {
         "colSkill": "Kỹ Năng",
         "colRole": "Vai Trò",
         "colCap": "Giới Hạn",
+        "allCrafts": "All crafts",
+        "skillListAria": "Craft skills",
         "tutorial": "Bậc đầu tiên: đạt kỹ năng {skill} trong một kỹ nghệ. Các công thức thành công nâng kỹ nghệ đó mà không xóa kiến thức ở nơi khác.",
         "nearTier": "{craft} còn {points} kỹ năng nữa là đến bậc tiếp theo.",
         "dormantKnowledge": "Kiến thức {craft} được giữ lại nhưng không hoạt động cho đến khi đôi hoặc sở thích của nó được kích hoạt."
@@ -2789,16 +2956,16 @@ export const vi_VN: EnTranslations = {
       "lbSelfAccount": "Tài khoản của bạn: hạng {rank}, top {percent} phần trăm, {renown} Danh Vọng",
       "lbSelfRank": "Tài khoản của bạn: hạng {rank}, top {percent} phần trăm",
       "lbEmpty": "Chưa có sử quan nào được xếp hạng.",
-      "broadcastsLabel": "Chia sẻ kỳ công vừa lập với bang hội và bạn bè",
+      "broadcastsLabel": "Share deed unlocks with guildmates and followers, and deed and masterwork cards with the Discord feed",
       "titledName": "{name} [{title}]"
     },
     "continentMap": {
-      "title": "World Map",
-      "summary": "World map. Choose a zone to open its map.",
-      "toWorld": "World map",
-      "toZone": "Zone map",
-      "toggleAria": "Switch between the world map and the zone map",
-      "levels": "Levels {min} to {max}"
+      "title": "Bản Đồ Thế Giới",
+      "summary": "Bản đồ thế giới. Chọn một vùng để mở bản đồ của vùng đó.",
+      "toWorld": "Bản Đồ Thế Giới",
+      "toZone": "Bản Đồ Vùng",
+      "toggleAria": "Chuyển đổi giữa bản đồ thế giới và bản đồ vùng",
+      "levels": "Cấp {min} đến {max}"
     }
   },
   "lb": {
@@ -2938,8 +3105,29 @@ export const vi_VN: EnTranslations = {
       "account_taken": "Tài khoản Steam đó đã được liên kết với một tài khoản khác.",
       "upstream": "Steam không phản hồi. Hãy thử lại sau giây lát."
     },
+    "epic": {
+      "disabled": "Hiện không thể liên kết Epic.",
+      "invalid_token": "Epic không thể xác minh yêu cầu liên kết này. Hãy thử lại từ ứng dụng máy tính.",
+      "banned": "Không thể liên kết tài khoản Epic đó.",
+      "already_linked": "Tài khoản của bạn đã liên kết với một tài khoản Epic.",
+      "account_taken": "Tài khoản Epic đó đã được liên kết với một tài khoản khác.",
+      "upstream": "Epic không phản hồi. Hãy thử lại sau giây lát."
+    },
     "wallet": {
       "handoff_invalid": "Quyền ủy quyền ví đó đã hết hạn hoặc không thể xác minh. Hãy thử lại."
+    },
+    "ota_updates": {
+      "invalid_input": "Dữ liệu nhập không hợp lệ."
+    },
+    "seeker": {
+      "native_only": "Seeker entitlement is available only in the native app.",
+      "attestation_failed": "Device verification failed. Please try again.",
+      "solana_artifact_required": "Use the Solana Store app to continue.",
+      "wallet_required": "Link and verify a wallet first.",
+      "genesis_token_required": "A verified Seeker Genesis Token is required.",
+      "genesis_token_claimed": "That Seeker Genesis Token has already been claimed.",
+      "entitlement_required": "Verified Seeker entitlement is required.",
+      "current_ownership_required": "Current Seeker Genesis Token ownership is required."
     }
   },
   "guide": {
@@ -3061,16 +3249,16 @@ export const vi_VN: EnTranslations = {
         "marshBlurb": "Những đầm lầy chìm sâu và phế tích bị thủy triều mài mòn, nơi trú ngụ của mudfin và những thứ tệ hơn.",
         "peaksName": "Cao Nguyên Đỉnh Gai",
         "peaksBlurb": "Những rặng núi bị gió bào mòn vươn lên về phía những hiểm nguy lạnh giá nhất của vương quốc.",
-        "duskName": "The Veiled Hollow",
-        "duskBlurb": "A realm sealed beneath the mountains, if the whispers of a way in are true.",
-        "emberName": "The Drakelands",
-        "emberBlurb": "Across the Pale Causeway the green gives way to cinder, and something old rules the wastes.",
-        "frostName": "The Frostveil Reach",
-        "frostBlurb": "A snowbound height beyond every map, glimpsed only in the dancing lights.",
-        "amberName": "The Amberfall",
-        "amberBlurb": "Behind the western cliffs an autumn that never ends, and lanterns on a golden mere.",
-        "fenName": "The Willowfen",
-        "fenBlurb": "Past the autumn crown, a bright fen of willows and still water, and a town behind a moat."
+        "duskName": "Thung Lũng Sương Phủ",
+        "duskBlurb": "Một cõi giới bị niêm phong sâu trong lòng núi, nếu những lời đồn về một lối vào là có thật.",
+        "emberName": "Vùng Đất Rồng",
+        "emberBlurb": "Băng qua Đường Đắp Nhợt Nhạt, sắc xanh nhường chỗ cho tro tàn, và một thứ gì đó cổ xưa đang cai trị vùng đất hoang này.",
+        "frostName": "Đỉnh Sương Giá",
+        "frostBlurb": "Một đỉnh cao phủ tuyết nằm ngoài mọi tấm bản đồ, chỉ thoáng hiện trong ánh sáng nhảy múa trên bầu trời.",
+        "amberName": "Xứ Thu Hổ Phách",
+        "amberBlurb": "Phía sau những vách đá phía tây là một mùa thu bất tận, cùng những ngọn đèn lồng soi bóng trên mặt hồ vàng óng.",
+        "fenName": "Đầm Liễu",
+        "fenBlurb": "Qua khỏi vương miện mùa thu, là một đầm lầy tươi sáng với liễu rủ và mặt nước lặng yên, cùng một thị trấn nép sau con hào."
       },
       "group": {
         "heading": "Hợp sức cho những phần khó nhằn",
@@ -3540,17 +3728,9 @@ export const vi_VN: EnTranslations = {
         "name": "Bò Sát",
         "desc": "Những thợ săn máu lạnh với tiếng rít và cú đớp rất riêng của chúng, khác biệt hoàn toàn so với các dã thú máu nóng."
       },
-      "murloc": {
-        "name": "Croakfins",
-        "desc": "Croaking fish-folk of lake shore and tide pool, quick to swarm anything that wades too close."
-      },
-      "kobold": {
-        "name": "Scamps",
-        "desc": "Skittering scavengers and sprites of glade and hedgerow, more nuisance than menace until they gather in numbers."
-      },
       "demon": {
-        "name": "Demons",
-        "desc": "Invaders from beyond the rifts, all fire and spite. Where one stands, a breach is never far."
+        "name": "Ác Ma",
+        "desc": "Những kẻ xâm lược đến từ bên kia các vết rạn, toàn thân là lửa và ác ý. Nơi nào có một kẻ trong chúng đứng, nơi đó không bao giờ cách xa một vết rạn."
       }
     },
     "worldPage": {
@@ -3564,55 +3744,55 @@ export const vi_VN: EnTranslations = {
       "valeBlurb": "Thung lũng khởi đầu xanh tươi, nơi những anh hùng mới rèn luyện bản lĩnh với lũ sói và đám cướp quanh thị trấn Eastbrook.",
       "marshBlurb": "Một xứ sở chìm trong sương mù và phế tích. Bầy mudfin tràn ngập vùng nước nông và một thứ gì đó cổ xưa hơn đang cựa quậy dưới mặt nước, được canh chừng từ thị trấn cầu Fenbridge.",
       "peaksBlurb": "Những rặng núi bị gió bào mòn và các hầm mỏ cũ vươn tới những hiểm họa lạnh giá, cao nhất của vương quốc, được trấn giữ bởi tiền đồn Highwatch.",
-      "duskBlurb": "A valley of permanent dusk beneath the great tree of Eldergleam, where crystal ruins glow and the air hums with old magic.",
-      "emberBlurb": "Storm-lit wastes of ash and bloodglass where drakes wheel over the caldera and troll fires burn among the dunes, watched from the gate-town of Wyrmwatch.",
-      "frostBlurb": "A hush of snow and dark pines under the aurora, where the cold itself feels awake and Icemantle keeps its fires burning.",
-      "amberBlurb": "An eternal autumn of gold and red leaves that never fall, gathered around the lantern-lit town of Lanternmere.",
-      "fenBlurb": "A bright, humming wetland of lilies and slow water, crossed on old boardwalks from the bridge-town of Bridgemere.",
-      "nightBlurb": "A realm of starry midnight where flowers light the paths and Moonrest keeps a quiet vigil under a dreaming sky.",
-      "hauntBlurb": "A haunted forest under giant canopies, where the lanterns of Gallowmere are the only honest light on the road.",
-      "galeBlurb": "Sea-cliffs and howling downs where the wind never rests, the Old Beacon never goes out, and Wickharbor shuts its doors tight.",
-      "jungleBlurb": "A tropical tangle of palms, white sand, and loud birds, with the beach-town of Drifthaven keeping a fire lit on the strand.",
-      "gardenBlurb": "A hedge-maze garden realm still trimmed by no gardener anyone has seen, entered past Hedgewick and its fountain courts.",
+      "duskBlurb": "Một thung lũng chìm trong hoàng hôn vĩnh cửu dưới tán đại thụ Eldergleam, nơi những phế tích pha lê tỏa sáng và không khí ngân vang phép thuật cổ xưa.",
+      "emberBlurb": "Vùng đất hoang tàn ngập tro tàn và bloodglass, rực sáng dưới ánh bão chớp giật, nơi bầy rồng lượn vòng trên miệng núi lửa và lửa trại của troll cháy rực giữa những cồn cát, tất cả được canh giữ từ thị trấn cổng Wyrmwatch.",
+      "frostBlurb": "Một khoảng lặng phủ tuyết và thông đen dưới ánh cực quang, nơi cái lạnh dường như cũng đang thức tỉnh, còn Icemantle vẫn giữ cho lửa trại không bao giờ tắt.",
+      "amberBlurb": "Một mùa thu vĩnh cửu với những chiếc lá vàng đỏ không bao giờ rụng, quần tụ quanh thị trấn Lanternmere rực sáng ánh đèn lồng.",
+      "fenBlurb": "Một vùng đất ngập nước tươi sáng, rộn ràng tiếng vo ve, phủ đầy hoa súng và dòng nước chảy chậm, được băng qua bằng những lối ván gỗ cũ kỹ từ thị trấn cầu Bridgemere.",
+      "nightBlurb": "Một cõi giới của đêm khuya lấp lánh sao trời, nơi hoa lá thắp sáng những lối đi và Moonrest lặng lẽ canh giữ dưới bầu trời đang say giấc mộng.",
+      "hauntBlurb": "Một khu rừng ma ám dưới những tán cây khổng lồ, nơi những ngọn đèn lồng của Gallowmere là thứ ánh sáng chân thật duy nhất trên con đường.",
+      "galeBlurb": "Những vách đá ven biển và cao nguyên lộng gió nơi cơn gió chẳng bao giờ ngơi nghỉ, Hải Đăng Cổ chẳng bao giờ tắt, và Wickharbor thì luôn đóng chặt cửa nẻo.",
+      "jungleBlurb": "Một mớ bòng bong nhiệt đới của những rặng cọ, cát trắng và tiếng chim ríu rít vang xa, cùng thị trấn ven biển Drifthaven vẫn giữ ngọn lửa cháy sáng trên bãi cát.",
+      "gardenBlurb": "Một cõi giới vườn mê cung hàng rào vẫn được xén tỉa gọn gàng dù chưa ai từng thấy bóng dáng một người làm vườn nào, bước vào qua khỏi Hedgewick và những sân đài phun nước của nó.",
       "valeGreeting": "Hãy giữ lưỡi kiếm bên mình. Thung Lũng không còn như xưa nữa.",
       "valeGreeter": "Cảnh Sát Trưởng Redbrook, Eastbrook",
       "marshGreeting": "Dừng lại ở cổng. Vượt qua đám sậy kia, đầm lầy sẽ giết thay cho chúng ta.",
       "marshGreeter": "Hộ Vệ Fenwick, Fenbridge",
       "peaksGreeting": "Hai trăm năm bức tường này đã đứng vững. Nó sẽ không sụp đổ dưới phiên gác của ta, nhưng nó đang rền rĩ.",
       "peaksGreeter": "Đại Úy Thessaly, Highwatch",
-      "duskGreeting": "Few of your kind have stood beneath these boughs. Walk gently, and be welcome.",
-      "duskGreeter": "Keeper Saelwyn, Eldergleam",
-      "emberGreeting": "Hot wind off the wastes, dragons over the Drakemaw, and troll fires in the dunes. Drink before you walk out there.",
-      "emberGreeter": "The gatewarden, Wyrmwatch",
-      "frostGreeting": "Snow swallows every sound out past the wall. If the lights start dancing, keep your voice down and your fire lit.",
-      "frostGreeter": "The hearthkeeper, Icemantle",
-      "amberGreeting": "Every leaf here burns gold and red, yet none ever fall. The lanterns are lit for you; mind the Goldmelt on your way up.",
-      "amberGreeter": "The lanternwright, Lanternmere",
-      "fenGreeting": "The fen hums with dragonflies and bees. Cross the bridge, rest your feet awhile, and stay on the boards past the pools.",
-      "fenGreeter": "The bridgekeeper, Bridgemere",
-      "nightGreeting": "Past the Nightgate the air itself dreams. Follow the flower-light, and mind the sleeping world that hangs in the sky.",
-      "nightGreeter": "The vigil-warden, Moonrest",
-      "hauntGreeting": "Keep to the lanterns, traveler. And if the wood calls your name from off the road, do not answer it.",
-      "hauntGreeter": "The lamplighter, Gallowmere",
-      "galeGreeting": "The wind has never once stopped here, and the Old Beacon has never once gone out. Close the inn door behind you.",
-      "galeGreeter": "The beacon-keeper, Wickharbor",
-      "jungleGreeting": "Warm sand, loud birds, and a jungle that eats the horizon. We keep a fire lit on the beach; try to come back to it.",
-      "jungleGreeter": "The harbormistress, Drifthaven",
-      "gardenGreeting": "Someone is still trimming the hedges, though no gardener has been seen for a hundred years. Mind the maze: it minds you back.",
-      "gardenGreeter": "The gatekeeper, Hedgewick",
+      "duskGreeting": "Rất ít người như bạn từng đứng dưới những tán cành này. Hãy bước đi nhẹ nhàng, và xin chào đón bạn đến đây.",
+      "duskGreeter": "Người Giữ Saelwyn, Eldergleam",
+      "emberGreeting": "Gió nóng thổi từ vùng đất hoang, rồng bay lượn trên Drakemaw, và lửa trại của troll cháy giữa những cồn cát. Uống nước trước khi bước ra ngoài đó.",
+      "emberGreeter": "Vệ Quan Cổng, Wyrmwatch",
+      "frostGreeting": "Tuyết nuốt trọn mọi âm thanh ngoài kia, sau bức tường. Nếu ánh sáng bắt đầu nhảy múa trên trời, hãy giữ giọng thật khẽ và lửa thì đừng để tắt.",
+      "frostGreeter": "Người Giữ Lửa, Icemantle",
+      "amberGreeting": "Nơi đây mỗi chiếc lá đều rực cháy sắc vàng đỏ, vậy mà chẳng bao giờ rụng xuống. Đèn lồng đã thắp sẵn để đón bạn rồi đấy; hãy cẩn thận với Goldmelt trên đường lên nhé.",
+      "amberGreeter": "Thợ Đèn Lồng, Lanternmere",
+      "fenGreeting": "Đầm lầy này rì rào tiếng chuồn chuồn và ong mật. Hãy qua cầu, nghỉ chân một lát, và cứ đi trên ván gỗ khi qua những vũng nước nhé.",
+      "fenGreeter": "Người Giữ Cầu, Bridgemere",
+      "nightGreeting": "Qua khỏi Nightgate, chính bầu không khí cũng đang chìm trong giấc mộng. Hãy men theo ánh sáng của hoa, và để ý đến thế giới đang say ngủ treo lơ lửng trên bầu trời.",
+      "nightGreeter": "Vệ Quan Canh Thức, Moonrest",
+      "hauntGreeting": "Hãy bám theo ánh đèn lồng, lữ khách à. Và nếu khu rừng gọi tên bạn từ ngoài con đường, đừng bao giờ đáp lại.",
+      "hauntGreeter": "Người Thắp Đèn, Gallowmere",
+      "galeGreeting": "Ở đây gió chưa từng một lần ngừng thổi, và Hải Đăng Cổ chưa từng một lần tắt lửa. Nhớ đóng cửa quán trọ lại sau lưng nhé.",
+      "galeGreeter": "Người Giữ Hải Đăng, Wickharbor",
+      "jungleGreeting": "Cát ấm, tiếng chim ríu rít, và một khu rừng rậm nuốt trọn cả chân trời. Chúng tôi luôn giữ một ngọn lửa cháy trên bãi biển; cố mà quay về với nó nhé.",
+      "jungleGreeter": "Nữ Quản Cảng, Drifthaven",
+      "gardenGreeting": "Vẫn có ai đó đang xén tỉa hàng rào, dù đã cả trăm năm nay chẳng ai thấy bóng dáng người làm vườn. Hãy cẩn thận với mê cung: nó cũng đang để mắt tới bạn đấy.",
+      "gardenGreeter": "Người Giữ Cổng, Hedgewick",
       "valePlaceNotes": "Eastbrook là căn cứ nhà đầu tiên của bạn. Wolf Run và Boar Meadow là vùng săn bắn hiền hòa; Mirror Lake là vùng nước câu cá lý tưởng, dù lũ cá bùn lúc nhúc nơi vùng nước nông của nó; Sableweb và Copper Dig giấu lũ nhện và đám đào mỏ tham quặng; một Bandit Camp và Fallen Chapel chứa những công việc gai góc hơn; Reliquary Hill dẫn xuống Collapsed Reliquary, delve đầu tiên của vương quốc; Brightwood Glade là một khu rừng thưa ngập nắng, tĩnh lặng ở phía bắc; và Sân Heo Nái là sân bóng heo rừng có tường bao của Eastbrook, nơi Cúp Thung Lũng thi đấu dưới một lệnh hưu chiến mùa gặt.",
       "marshPlaceNotes": "Fenbridge canh giữ con đường khô ráo duy nhất. Prowler Reeds và Deepfen Shallows đầy ắp thú đầm lầy và mudfin; Widow Thicket giăng kín mạng nhện dày đặc; Drowned Chapel và Troll Mounds giữ những hiểm họa cổ xưa hơn, với Kinh Cầu Chết Chìm, delve của riêng đầm lầy, mở ra ngay phía bắc các gò mộ; Gravecaller Encampment là nơi giáo phái đào hầm ẩn náu, và Pháo Đài Chìm là trái tim hầm ngục của đầm lầy.",
       "peaksPlaceNotes": "Highwatch giữ vững bức tường. Stalker Ridge và Deeprock Burrows thuộc về mèo núi và lũ đào hang; Ogre Foothills và Drogmar's War-Camp thuộc về lũ côn đồ đánh thuê; Stormcrag lách tách tiếng các nguyên tố, và bên dưới nó Hồ Lung Linh phát sáng, hồ nước trên núi mà bờ của nó giữ cánh cổng ánh sáng nhợt nhạt dẫn xuống Ngôi Đền Chết Chìm; Wyrmcult Tents và Revenant Fields bao quanh vùng đất cao của giáo phái, với Thánh Đường Mộ Long ở đỉnh của nó.",
-      "duskPlaceNotes": "Eldergleam gathers beneath the great tree. The Duskfall Cave and its overlook are the way in and the first sight of the valley; Elder Grove and Starfall Basin keep the quiet south; the Sunken Court holds overgrown ruins in the east; and the Gleaming Deep and Crystalline Shallows glow across the north.",
-      "emberPlaceNotes": "Wyrmwatch holds the gate. The Gatewood is the last green before the waste; the Cinder Dunes drift with ash and worse; the Trollmoot is where the dune trolls gather their fires; the Bloodglass Fields glitter with razor shards; and the Drakemaw Caldera is the smoking crown the drakes circle.",
-      "frostPlaceNotes": "Icemantle keeps the last warm hearth. The Snowline marks where the drifts take over; Glacier Tarn is black, still water under the ice; the Aurora Steps climb beneath the dancing lights; the Shiverfen is a frozen mire that never quite sleeps; and the Howling Terraces earn their name every night.",
-      "amberPlaceNotes": "Lanternmere glows at the heart of the harvest. The Goldmelt is the amber-slick pass in; the Gilded Orchard and Harvest Hollow keep the sweetest pickings and the boldest thieves; the Great Mere mirrors the burning leaves; Cindermaple Rise stands tallest and reddest; and the Leaning Monolith remembers something older than autumn.",
-      "fenPlaceNotes": "Bridgemere sits astride the slow water. The Amberfen Steps come down from the harvest country; the Lilymoors and Bogshine Pools glitter with wisps and dragonflies; Willowweep trails its branches into the mere; and the Drowsy Flats are as gentle as this land gets.",
-      "nightPlaceNotes": "Moonrest keeps the vigil. The Nightgate is the way into the midnight country; the Moonwell holds starlight you can stand beside; Gloamfield blooms in the dark; the Standing Vigil watches without ever moving; and the Sleepless Barrow is the one place here that never dreams.",
-      "hauntPlaceNotes": "Gallowmere huddles inside its lanterns. The Crowgate is the wood's grim front door; Widow's Thicket is spun thick with web; the Hanging Glade and the Mournstone Chapel keep the forest's oldest griefs; and the Huntsman's Clearing belongs to whatever still hunts there.",
-      "galePlaceNotes": "Wickharbor leans into the wind. The Windway is the cliff road in; the Howling Downs roll treeless under the gale; the Old Beacon has burned for as long as anyone can say; the Shear drops sheer to the water; the Wreckfields keep the coast honest; and the Mirror Tarn is the one still thing in the whole realm.",
-      "junglePlaceNotes": "Drifthaven keeps its fire on the beach. The Tanglemouth is where the river meets the green wall; the Palmstrand runs white and warm along the surf; the Emerald Tangle and the Vinefall swallow the interior; the Sapphire Lagoon glows clear and deep; and the Sunken Idol watches from beneath the water.",
-      "gardenPlaceNotes": "Hedgewick waits at the Garden Gate. The Parterre Walk blooms in clipped color; Dawnhold Castle drills its knights behind new walls; the Petal Pond drifts pink the year round; the Old Mill turns over its own ring beds; the Great Maze rearranges its manners for every guest, its arches watched by leafy foxes; the North Watch keeps the exit road; the Lily Basin rests beyond it all; and the Fountain Court still runs clear at the garden heart.",
+      "duskPlaceNotes": "Eldergleam quần tụ dưới tán đại thụ. Hang Duskfall cùng đài quan sát của nó là lối vào và cũng là cảnh tượng đầu tiên của thung lũng; Rừng Cổ Thụ và Bồn Địa Starfall giữ lấy miền nam tĩnh lặng; Sân Chìm ôm những phế tích rậm rạp ở phía đông; còn Vực Sâu Lấp Lánh và Bãi Cạn Pha Lê tỏa sáng khắp miền bắc.",
+      "emberPlaceNotes": "Wyrmwatch trấn giữ cổng vào. Gatewood là mảng xanh cuối cùng trước vùng đất hoang; Cồn Cát Tro Tàn cuộn tro bụi và những thứ còn tệ hơn thế; Trollmoot là nơi lũ troll cồn cát tụ tập quanh lửa trại; Cánh Đồng Bloodglass lấp lánh những mảnh vỡ sắc như dao cạo; còn Miệng Núi Lửa Drakemaw là vương miện bốc khói mà bầy rồng vẫn lượn vòng quanh.",
+      "frostPlaceNotes": "Icemantle giữ ngọn lửa ấm cuối cùng. Snowline đánh dấu nơi tuyết trôi bắt đầu chiếm lĩnh; Hồ Băng Hà là vùng nước đen tĩnh lặng dưới lớp băng; Bậc Thang Cực Quang vươn lên dưới ánh sáng nhảy múa; Shiverfen là đầm lầy đóng băng chẳng bao giờ thực sự ngủ yên; còn Bậc Thềm Gào Thét thì đêm nào cũng xứng với cái tên của mình.",
+      "amberPlaceNotes": "Lanternmere tỏa sáng giữa lòng mùa gặt. Goldmelt là con đèo phủ hổ phách dẫn vào thị trấn; Vườn Cây Dát Vàng và Thung Lũng Mùa Gặt giữ những vụ mùa ngọt nhất cùng những tên trộm liều lĩnh nhất; Đại Hồ phản chiếu những tán lá rực cháy; Đồi Cindermaple sừng sững cao nhất và đỏ nhất; còn Trụ Đá Nghiêng thì lưu giữ ký ức về một điều gì đó cổ xưa hơn cả mùa thu.",
+      "fenPlaceNotes": "Bridgemere nằm vắt ngang dòng nước chảy chậm. Bậc Thang Amberfen đổ xuống từ miền đất mùa gặt; Lilymoors và Vũng Nước Bogshine lấp lánh ma trơi và chuồn chuồn; Willowweep buông cành rủ xuống mặt hồ; còn Vùng Đất Lim Dim là nơi hiền hòa nhất mà vùng đất này có thể có.",
+      "nightPlaceNotes": "Moonrest giữ vững buổi canh thức. Nightgate là lối vào miền đất nửa đêm; Moonwell lưu giữ ánh sao mà bạn có thể đứng cạnh bên; Gloamfield nở hoa trong bóng tối; Đài Canh Thức Bất Động dõi trông mà chẳng bao giờ lay động; còn Gò Mộ Không Ngủ là nơi duy nhất ở đây chẳng bao giờ chìm vào giấc mộng.",
+      "hauntPlaceNotes": "Gallowmere co cụm bên trong vòng đèn lồng của mình. Crowgate là cánh cửa u ám của khu rừng; Bụi Rậm Của Góa Phụ giăng kín tơ nhện dày đặc; Khoảng Rừng Treo và Nhà Nguyện Mournstone giữ lại những nỗi đau cổ xưa nhất của khu rừng; còn Bãi Trống Của Thợ Săn thuộc về bất cứ thứ gì vẫn còn săn đuổi nơi đó.",
+      "galePlaceNotes": "Wickharbor nghiêng mình đón gió. Windway là con đường vách đá dẫn vào; Cao Nguyên Gào Thét trải dài trọc lóc dưới cơn cuồng phong; Hải Đăng Cổ đã cháy sáng lâu đến mức không ai còn nhớ nổi từ bao giờ; Shear đổ dốc thẳng đứng xuống mặt nước; Wreckfields giữ cho bờ biển này luôn thành thật; còn Hồ Gương là thứ duy nhất còn tĩnh lặng trong cả cõi này.",
+      "junglePlaceNotes": "Drifthaven giữ ngọn lửa của mình trên bãi biển. Tanglemouth là nơi dòng sông gặp bức tường xanh thẳm; Palmstrand chạy dài trắng xóa và ấm áp dọc theo sóng biển; Rừng Rậm Ngọc Lục Bảo và Vinefall nuốt trọn vùng nội địa; Đầm Phá Lam Ngọc tỏa sáng trong vắt và sâu thẳm; còn Tượng Thần Chìm dõi theo từ dưới làn nước.",
+      "gardenPlaceNotes": "Hedgewick chờ đợi ngay tại Cổng Vườn. Lối Đi Bồn Hoa nở rộ sắc màu được xén tỉa gọn gàng; Lâu Đài Dawnhold vẫn huấn luyện hiệp sĩ sau những bức tường mới; Ao Cánh Hoa trôi dạt sắc hồng quanh năm; Cối Xay Cũ vẫn tự xoay vòng luống hoa của riêng nó; Đại Mê Cung thay đổi cách cư xử cho từng vị khách, những vòm cổng của nó được canh giữ bởi lũ cáo lá; Trạm Gác Phương Bắc trấn giữ con đường ra; Bồn Hoa Huệ nghỉ ngơi phía sau tất cả; và Sân Đài Phun Nước vẫn chảy trong vắt tại trái tim khu vườn.",
       "gladeTitle": "Một góc tĩnh lặng: Brightwood Glade",
       "gladeBody": "Không phải mọi câu chuyện ở Vale đều về người chết. Ở phía bắc, một khu rừng thưa ngập nắng tên là Brightwood Glade giữ nhịp điệu dịu dàng của riêng nó, toàn những lối đi tĩnh lặng và ánh sáng lốm đốm dưới tán cành. Nó là một nốt nhạc đối lập êm dịu với con đường bạn đang theo, và đáng để ghé thăm khi cung đường cho bạn chỗ để lang thang.",
       "worldBossTitle": "Khi đỉnh núi thức giấc: con trùm thế giới",
@@ -3686,7 +3866,7 @@ export const vi_VN: EnTranslations = {
       "bastionBody": "Một pháo đài ngập nước đã mất vào tay đầm lầy, do những kẻ phòng thủ chết chìm và chính con nước dâng nắm giữ.",
       "templeBody": "Một ngôi đền dưới ánh trăng chìm bên dưới một hồ băng phát sáng cao trên các đỉnh núi, đến được qua một cánh cổng ánh sáng lạnh. Một giáo phái chết chìm vẫn ca hát dưới đó trong những tấm lễ phục mục nát, và những lời cảnh báo khắc trên bờ nói rằng thứ gì đó bên dưới chỉ đang ngủ. Một bí ẩn khép kín, tách biệt khỏi cốt truyện chính, dành cho những kẻ tò mò và chuẩn bị kỹ càng.",
       "sanctumBody": "Trái tim đen tối của Đỉnh Gai, nơi công cuộc lâu dài của giáo phái đạt đến đỉnh điểm khủng khiếp.",
-      "wildheartBody": "A rain-soaked jungle caldera where two raised hunting trails circle a jade cenote. Cross beast dens and ancestor ruins, then climb the ritual pyramid to face Zulgar.",
+      "wildheartBody": "Một miệng núi lửa rừng rậm đẫm mưa, nơi hai lối đi săn bắn trên cao vòng quanh một hố sụt ngọc bích. Băng qua những hang thú và tàn tích tổ tiên, rồi leo lên kim tự tháp nghi lễ để đối mặt với Zulgar.",
       "raidName": "Raid cuối game",
       "raidBody": "Phía sau một cánh cửa hoàng gia niêm phong chờ đợi một thử thách mười người chơi: một trận chiến nhiều giai đoạn và một thế lực bất tử mà cả raid phải cùng nhau ngăn chặn. Hãy giành quyền vào trong, rồi rủ chín người bạn cùng đến.",
       "heroicTitle": "Chế độ Anh Hùng",
@@ -3938,9 +4118,9 @@ export const vi_VN: EnTranslations = {
       "craftMasteryBody": "Kỳ vọng thực tế: hành trình leo lên giới hạn 125 của một nghề thủ công cần ít nhất 125 lần chế tạo thành công, vì mỗi lần chế tạo được điểm đầy đủ chỉ tiến đúng một điểm, và trên thực tế hơi nhiều hơn khi công thức dần mờ giữa các bậc huấn luyện viên. Bản thân việc chế tạo rất nhanh; nguồn cung nguyên liệu mới là hành trình thực sự, vì vậy hãy dành vài buổi tối tập trung thu thập và chế tạo cho mỗi nghề.\n\nCác nghề thu thập đạt giới hạn 100 trong suốt hành trình lên cấp thông thường nếu bạn thu hoạch khi di chuyển, dù đoạn cuối cần các nút tài nguyên bậc cao ở vùng cực bắc. Câu cá là con đường dài theo thiết kế: theo lịch trình tích điểm riêng của nó, 200 thành thạo tương đương hơn ba nghìn lần câu được. Đại Ngư Sư là danh hiệu kiếm được qua một mùa những buổi tối yên tĩnh, không phải một cuối tuần.",
       "archetypeChooseTitle": "Thư của Hội, và việc thay đổi ý định",
       "archetypeChooseBody": "Bạn không cần phải tự đi tìm kiếm bất kỳ điều nào trong số này. Hãy tiếp tục làm nghề, và một khi kỹ năng thủ công của bạn lần đầu thể hiện xu hướng rõ ràng về một cặp, Hội Thủ Công sẽ chú ý và gửi một bức thư Ravenpost nêu tên bậc thầy cần gặp và nhiệm vụ cần nhận. Thư đến một lần mỗi nhân vật, và chỉ khi bạn chưa thề với một cặp nào.",
-      "archetypeSwitchBody": "Một lời tuyên bố cũng không phải án tù chung thân. Một cặp bạn chưa từng nắm giữ chỉ đơn giản là một nhiệm vụ thụ ngộ mới, trong khi quay lại một cặp bạn đã rời bỏ đòi bạn phải chuộc lỗi trước: năm nhiệm vụ lần đầu, và thêm ba nhiệm vụ nữa cho mỗi lần đổi bạn đã thực hiện. Sự lựa chọn vẫn có ý nghĩa mà không bao giờ đóng cửa vĩnh viễn.",
+      "archetypeSwitchBody": "A declaration is not a life sentence, either. A pair you have never held is simply a fresh attunement quest, while returning to a pair you walked away from asks you to make amends first: five tasks the first time, and three more added for every return you have already made (taking up a brand-new pair never raises the count). The choice stays meaningful without ever locking a door for good.",
       "whatHeading": "Một nghề bên cạnh thanh kiếm",
-      "whatBody": "Nghề nghiệp là cuộc sống lao động của thế giới: bốn nghề thu thập kéo nguyên liệu thô thẳng từ đất, và một vòng mười nghề thủ công biến nó thành trang bị, bữa ăn, thuốc, và dụng cụ. Mọi thứ ở đây đều nuôi cái gì đó khác. Quặng bạn khai thác thành lưỡi kiếm, lưỡi kiếm đón nhận một pháp khắc, và pháp khắc cần bụi từ đồ cũ được phân hủy, nên một người thu thập, một thợ chế tạo, và một người tháo dỡ đều là những mắt xích trong một chuỗi.\n\nKhông có giới hạn nghề nghiệp nào cần phải băn khoăn. Mọi nhân vật đều có thể nâng cả tám nghề thủ công có nội dung hôm nay và cả bốn nghề thu thập song song; lựa chọn độc quyền duy nhất là hình mẫu của bạn, danh phận bạn cuối cùng thề nguyện với, dù một khi bạn gắn kết các nghề thủ công rơi vào không hoạt động sau nó sẽ dừng leo. Kỹ năng không bao giờ giảm, và không có gì bạn học được bị lấy đi.",
+      "whatBody": "Professions are the working life of the world: four gathering trades that pull raw material straight out of the land, and a ring of ten crafts that turn it into gear, meals, potions, and tools. Everything feeds something else here. The ore you mine becomes a blade, the blade takes an enchant, and the enchant needs dust broken out of old gear, so a gatherer, a crafter, and a tinkerer are all links in one chain.\n\nThere is no profession limit to agonize over. Every character can raise seven of the eight crafts that have content today and all four gathering professions side by side (Engineering is the one holdout: its recipes all start above the free ceiling, so its ladder waits for the Bombardier's oath); the only exclusive choice is your archetype, the identity you eventually swear to, though once you attune the crafts that fall dormant behind it climb only on their common recipes, and past skill 75 not at all. Skill never goes down, and nothing you learn is ever taken away.",
       "ringHeading": "Vòng nghề thủ công",
       "ringBody": "Mọi nghề thủ công có nội dung hôm nay đều có giới hạn 125 kỹ năng: Rèn Vũ Khí, Rèn Giáp, May Vá, Thuộc Da, Nấu Ăn, Giả Kim, Cơ Khí, và Pháp Khắc. Khi đạt giới hạn nghề thủ công vẫn tiếp tục hoạt động, thu hoạch vẫn cho ra sản phẩm, chế tạo vẫn hoàn thành, và kiệt tác vẫn có thể xảy ra; chỉ con số dừng leo. Chọn một mục dưới đây để xem bảng công thức đầy đủ và các con số của nghề thủ công.",
       "ringWaveNote": "Hai nghề thủ công trên bánh xe, Chế Tác Trang Sức và Khắc Chữ, giữ chỗ nhưng chưa có công thức nào. Đây là có chủ ý chứ không phải sơ sót: nội dung của chúng đến cùng các khu vực trong tương lai, và các giới hạn trên tăng theo cùng cách đó, nên một nghề thủ công đã đạt giới hạn hôm nay là lợi thế cho sự mở rộng đó, không phải đích đến cuối cùng.",
@@ -3949,7 +4129,7 @@ export const vi_VN: EnTranslations = {
       "gatherHubHeading": "Thu thập",
       "gatherHubBody": "Bốn nghề thu thập nuôi vòng từ thực địa: Khai Khoáng, Đốn Gỗ, và Thảo Dược Học kéo quặng, gỗ, và thảo dược ra khỏi đất và đạt giới hạn 100 thành thạo, trong khi Câu Cá chạy theo nhịp cắn câu và giật cần riêng của nó tất cả đường đến 200. Mỗi trang dưới đây có bản đồ điểm tài nguyên, thang dụng cụ, và tỉ lệ chính xác.",
       "archetypesHeading": "Bánh xe và các hình mẫu",
-      "archetypesBody": "Mười nghề thủ công nằm trên một bánh xe cố định, và vị trí địa lý trên bánh xe đó quan trọng. Mỗi hai người hàng xóm tạo thành một cặp được đặt tên: Thợ Rèn cho Rèn Vũ Khí và Rèn Giáp, Thợ May cho Thuộc Da và May Vá, Nhà Bào Chế cho Giả Kim và Nấu Ăn, Pháo Thủ cho Cơ Khí và Giả Kim, và sáu cặp nữa xung quanh vòng.\n\nGắn kết với một cặp là một nhiệm vụ, không phải nhấp menu. Có thể gia nhập bốn cặp hôm nay (Thợ Rèn, Thợ May, Nhà Bào Chế, và Pháo Thủ), mỗi cặp được neo bởi một bậc thầy thường trú ở Eastbrook mà nhiệm vụ chấp nhận của họ nêu rõ toàn bộ thỏa thuận trước khi bạn nhận nó. Cho đến khi bạn tuyên bố, mọi nghề thủ công đều tiến tự do theo công thức qua bậc hiếm, nên bạn có thể thử mọi thứ trước khi chọn.\n\nSau khi bạn gắn kết, hai nghề thủ công trong cặp của bạn trở thành chuyên ngành của bạn, không có trần nào dưới giới hạn. Phần còn lại của bánh xe không tắt ngấm: một nghề thủ công đối diện với chuyên ngành của bạn ở lại như sở thích tiếp tục leo đến bậc hiếm (một nhiệm vụ lặp lại tại lò rèn của Smith Haldren cho phép bạn đổi cái nào), và mọi nghề thủ công khác trở nên không hoạt động. Nghề thủ công không hoạt động giữ kỹ năng và công thức thông thường của nó; nó chỉ đơn giản là dừng leo và không bao giờ ra được kiệt tác khi đang nghỉ.",
+      "archetypesBody": "The ten crafts sit on a fixed wheel, and geography on that wheel matters. Every two neighbors form a named pair: Smith for Weaponcrafting and Armorcrafting, Outfitter for Leatherworking and Tailoring, Apothecary for Alchemy and Cooking, Bombardier for Engineering and Alchemy, and six more around the ring.\n\nAttuning to a pair is a quest, not a menu click. Four pairs can be joined today (Smith, Outfitter, Apothecary, and Bombardier), each anchored by a resident master in Eastbrook whose acceptance quest states the whole bargain up front before you take it. Until you declare, every craft advances freely on recipes up through the rare tier (any recipe asking skill 74 or less), so you can try nearly everything before you choose (Engineering alone has no recipe that low, so its number waits).\n\nOnce you attune, your two pair crafts become your majors, with no ceiling short of the cap. The rest of the wheel does not go dark: one craft opposite your majors stays on as a hobby that keeps climbing through the rare tier (a repeatable quest at Smith Haldren's forge lets you swap which one), and every other craft goes dormant. A dormant craft keeps its skill and its common recipes, which keep teaching it on the normal curve until they gray at 75; everything above common stops paying at once, and a dormant craft never turns out a masterwork while it rests.",
       "pairFmt": "{a} và {b}",
       "curveHeading": "Đường Cong Tinh Thông",
       "curveBody": "Tích lũy kỹ năng tuân theo một quy tắc ở khắp nơi, Đường Cong Tinh Thông bốn trạng thái. Mỗi {step} điểm kỹ năng là một bậc, và mỗi công thức được tính theo vị trí của nó so với bậc của bạn: bằng hoặc cao hơn bậc của bạn thì tích lũy đầy đủ, thấp hơn một bậc thì tích lũy một nửa, thấp hơn hai bậc thì một phần tư, và thấp hơn ba bậc trở lên thì không gì cả.\n\nCửa sổ chế tác vẽ thẳng điều này lên danh sách công thức theo màu sắc cổ điển: cam cho tích lũy đầy đủ, vàng cho đã giảm, xanh lá cho rỉ giọt, xám cho không gì. Điểm tích lũy là tất định, không bao giờ là lần may kỹ năng, nên cùng một lần chế tạo ở cùng bậc luôn di chuyển kỹ năng của bạn đúng cùng một lượng, và công thức chuyển sang vàng là tín hiệu để bạn học bậc tiếp theo.\n\nThu thập chạy theo cùng đường cong với cùng bước bậc, được tính theo điểm tài nguyên thay vì công thức: các điểm tài nguyên dễ mờ dần thành xám khi bạn vượt qua chúng, và các điểm tài nguyên phong phú hơn ở các khu vực sau là thứ hoàn thành hành trình leo lên. Câu Cá giữ lịch riêng của nó: một điểm đầy đủ mỗi lần câu được dưới 50 thành thạo, nửa đến 100, một phần mười đến 150, và đuôi chậm đến tận 200, với lần câu được rác không dạy gì từ 100 trở lên.",
@@ -3960,7 +4140,7 @@ export const vi_VN: EnTranslations = {
       "deedsHeading": "Thành tích ghi nhớ hành trình",
       "deedsBody": "Sách Kỳ Công đồng hành với từng bước của hành trình này. Lần gắn kết đầu tiên của bạn đạt được thành tích Thề Nguyện Thủ Công và kiệt tác đầu tiên của bạn đạt được thành tích Thợ Đại Tài, cả hai đều có thể đeo như danh hiệu. Mỗi trong tám nghề thủ công có thể kiếm được đánh dấu một thành tích cột mốc ở kỹ năng 50 và đăng quang giới hạn của nó bằng danh hiệu Đại Sư, trong khi Câu Cá nhận được Lão Muối ở 100 thành thạo và danh hiệu Ngư Sư Thành Thạo ở 200.\n\nCó những trang lặng lẽ hơn: thành tích cho lần thu hoạch và chế tạo đầu tiên của bạn, cho những phát hiện hiếm may mắn tìm thấy ở thực địa, và cho việc bắt đầu tháo dỡ. Tất cả là trang trí, danh hiệu và Danh Vọng mà thôi. Thành tích không bao giờ ban sức mạnh; nó chỉ chứng minh bạn đã ở đó.",
       "startHeading": "Bắt đầu từ đâu",
-      "startBody": "Vừa đến Eastbrook từ đường cái? Tìm Đốc Công Odell và nhận nhiệm vụ Một Nghề Cho Mỗi Đôi Tay: ông ấy sẽ chỉ bạn đến các mạch quặng xung quanh Hố Đồng phía tây nam thị trấn và trao cho bạn những vết chai đầu tiên. Từ đó trở đi, hãy khai thác mọi mạch quặng, bãi gỗ, và bụi thảo dược bạn đi qua khi làm nhiệm vụ; thành thạo đến tự nhiên với những người lữ hành.\n\nTrở lại thị trấn, nhấn T để mở cửa sổ chế tác và làm các công thức thông thường mà mọi nhân vật đều biết từ đầu. Ghé thăm các bậc thầy tại lò rèn, bếp, khung cửi, và xưởng dụng cụ để xem họ dạy gì, và nhận đơn đặt hàng của họ để kiếm tiền vàng đều đặn. Đến khi thư của Hiệp Hội tìm đến bạn, bạn sẽ đã biết cặp nào cảm thấy như nhà.",
+      "startBody": "Fresh off the road in Eastbrook? Find Foreman Odell and take A Trade for Every Hand: he will point you at the ore veins around the Copper Dig southeast of town and hand you your first calluses. Mind the dig itself: the Deeprock Diggers camped on it stand a few levels above a fresh arrival, so work the outlying veins first and save the camp's heart for when you have leveled a little. From then on, harvest every vein, timber stand, and herb patch you pass while questing; proficiency comes naturally to travelers.\n\nBack in town, press T to open the crafting window and work the common recipes every character knows from the start. Visit the masters at the forge, kitchens, loom, and toolworks to see what they teach, and take their work orders for steady coin. By the time the Guild's letter finds you, you will already know which pair feels like home.",
       "colStation": "Trạm",
       "colHub": "Thị trấn",
       "colMaster": "Bậc thầy",
@@ -4005,27 +4185,27 @@ export const vi_VN: EnTranslations = {
         "leatherworking": "Thuộc Da thuộc trang bị Nhanh Nhẹn và Thể Lực cho những lớp né đòn thay vì đỡ đòn, từ đồ da cơ bản Fenbridge đến bộ mirewarden hiếm, và đây là nghề thủ công sâu duy nhất được đào tạo ngoài đầm lầy.",
         "cooking": "Nấu Ăn biến mẻ câu trong ngày thành những bữa ăn ngồi lại hồi phục máu qua 18 giây nghỉ ngơi, loại hồi phục rẻ nhất trong game, từ Thịt Khô Ướp Muối cho đến Đại Tiệc Grand Roast của Marlow. Ai cũng ăn, nên không nghề nào được hoan nghênh trong nhóm hơn thế.",
         "alchemy": "Giả Kim biến thảo dược, tuyến, và thủy tinh thành những lọ thuốc giúp bạn thắng trận: thuốc hồi máu và hồi phép khi mọi thứ trở nên tồi tệ, và tinh chất thể lực trụ vững trên thanh bùng cường xuyên suốt cả một dungeon.",
-        "engineering": "Cơ Khí chế tạo những công cụ mà mọi người thu thập nghiêm túc đều mong muốn: cuốc, rìu, và liềm bậc 4 và bậc 5 mà không người bán nào bao giờ có hàng, mỗi cái tiêu thụ công cụ bậc dưới nó.",
-        "enchanting": "Pháp Khắc tháo rời trang bị và đưa sức mạnh trở lại: phá vỡ những mảnh không cần thiết thành nguyên liệu huyền bí, rồi dùng chúng cho một điểm chỉ số vĩnh viễn lên mảnh bạn muốn giữ. Không cần trạm, không cần huấn luyện viên, và ai cũng có thể bắt đầu ngay từ ngày đầu."
+        "engineering": "Engineering builds the tools every serious gatherer ends up wanting: the tier 4 and tier 5 picks, axes, sickles, and fishing rods that no counter will ever sell for coin, each one consuming the tool below it.",
+        "enchanting": "Enchanting takes gear apart and puts the power back in: break unwanted pieces into arcane materials, then spend them on a permanent stat bonus for a piece you mean to keep. Breaking and enchanting need no station and no trainer, and anyone can start on day one; only the two charm recipes ask more, taught at the toolworks."
       },
       "craftProse": {
         "weaponcrafting": {
           "identityHeading": "Lưỡi dao mà mọi chiến binh đều tìm mua",
           "identityBody": "Ai đó trong mọi nhóm đều muốn sản phẩm của nghề này, vì bậc hiếm một mình đã bao phủ cả ba sở thích: Osmium Warblade cho cận chiến Sức Mạnh, Glyphsteel War Axe cho chiến binh Nhanh Nhẹn, và Highpine Battle Staff, một cây gậy Trí Tuệ và Tinh Thần cho đám áo choàng.\n\nTrên vòng chế tác nó đứng giữa Rèn Giáp và Chế Tác Đá Quý. Danh tính đang hoạt động của nó là Thợ Rèn, đôi Rèn Vũ Khí và Rèn Giáp, thề trước Thợ Rèn Darva tại lò rèn bằng cách tự tay khai thác ba mạch quặng; đôi Bladewright với Chế Tác Đá Quý cũng được đặt tên trên vòng, nhưng chưa thể thề vì Chế Tác Đá Quý không có công thức cho đến khi mở rộng vùng sau.",
           "materialsHeading": "Những gì lò rèn cần",
-          "materialsBody": "Khai mỏ là xương sống. Quặng đồng đến từ các mạch quặng bậc 1 ở Đông Khê Cốc, quặng sắt từ Đầm Lầy Mirefen, và quặng osmium từ Đỉnh Thornpeak, mỗi nấc thang đều bước lên theo cùng một cách. Đốn gỗ quan trọng hơn bạn nghĩ: gỗ vỏ sắt làm cán giáo lợn, gỗ tần bì gánh đầu búa, và một khúc gỗ highpine tạo nên cây gậy chiến.\n\nPhần còn lại đến từ cuộc đi săn và quầy hàng. Da thô để làm tay cầm được lột thẳng từ xác chó sói và lợn rừng, mảnh xương rơi từ những lần giết quái thường ngày, và bậc thang lò rèn tiêu thụ Smithing Flux, 20 đồng đồng một lọ từ chính tay Darva. Nếu việc khai mỏ của bạn chậm trễ, Darva bán quặng osmium tại lò rèn và Thợ Gizzel có thỏi glyphsteel tại xưởng dụng cụ, với mức giá cao đến mức khiến những người bạn thu hoạch trông thật rẻ.",
+          "materialsBody": "Mining is the backbone. Copper ore comes off the tier 1 veins of Eastbrook Vale, iron ore from Mirefen Marsh, and osmium ore from Thornpeak Heights, and each rung of the ladder steps up the same way. Logging matters more than you might expect: ironbark hafts the boar spear, ashwood shoulders the maul, and a single highpine log forms the battle staff.\n\nThe rest comes from the hunt and the counter. Rough hide for grips is harvested straight off wolf and boar corpses, bone fragments come off the restless dead or out of salvaged common gear, and the forge ladder burns Smithing Flux, 20 copper a jar from Darva herself. If your own mining lags behind, no counter will save you on the ore itself: osmium comes off the Thornpeak veins, off the starter veins of every younger zone but the Farshore (whose veins dig iron), or out of another player's stack, by trade or the World Market. Only the Glyphsteel Bar is bought for coin, from Tinker Gizzel at the toolworks or Quartermaster Bree in Highwatch.",
           "ladderHeading": "Thang công thức, từng bậc một",
           "ladderBody": "Một công thức dã chiến, Kiếm Arming Eastbrook, mọi người đều biết từ đầu và chế tạo bất cứ đâu từ đồ săn bắt (vài nanh sói và mảnh xương) cộng sáu Smithing Flux từ quầy lò rèn. Thang thật sự là chín công thức từ huấn luyện viên theo ba bậc, tất cả gắn với lò rèn: bậc đồng (rìu có râu, chùy có bích, giáo lợn rừng) miễn phí để học ở kỹ năng 0, bậc sắt (kiếm dài, chùy lớn, dao ngắn) mở ở kỹ năng 25 với 25 bạc mỗi công thức, và bậc osmium (warblade, rìu chiến, gậy chiến) mở ở kỹ năng 50 với 1 vàng mỗi cái. Darva dạy công thức ngay khi bậc của bạn trong nghề đạt bậc của nó, nên mỗi bậc mở đúng lúc dải kỹ năng của nó bắt đầu.\n\nMột công thức nữa theo đôi: Găng Tay Gravewyrm, một mảnh kết hợp được dạy bởi huấn luyện viên mà chỉ Thợ Rèn đã thụ ngộ với cả Rèn Vũ Khí và Rèn Giáp ở kỹ năng 25 mới có thể làm, và không cần trạm nào cả.",
           "routeHeading": "Kiệt tác, và lộ trình thực tế tới 125",
-          "routeBody": "Bất kỳ vật phẩm nào có chỉ số thực sự, tức là từ nấc sắt trở lên trên bậc thang này, đều có thể ra lò như một kiệt tác; các đồ phổ thông không chỉ số bằng đồng không bao giờ kích hoạt điều này, vì chẳng có gì trong chúng để cải tiến. Sắt tính là nguyên liệu bậc 1 cho thưởng kiệt tác, highpine và glyphsteel là bậc 2, nên nấc cao nhất kích hoạt thường xuyên hơn một chút.\n\nCưỡi nấc đồng tới 25, học nấc sắt ngay ngày nó mở và cưỡi tới 50, rồi nấc osmium tới 75. Qua 75 chưa có gì cao hơn, nên các công thức osmium dần mờ đi còn một nửa rồi một phần tư điểm kinh nghiệm: tính khoảng 150 lần chế tác nữa để đạt giới hạn 125, và nhớ giới hạn chung mười hành động chế tác mỗi phút khi bạn ngồi xuống sản xuất hàng loạt.\n\nTrang trải chi phí leo thang trong khi đi: đơn hàng lò rèn của Darva nhận tám quặng đồng mỗi 30 phút để đổi lấy ít tiền và kinh nghiệm nhiệm vụ, và các nấc sắt và osmium bán thật sự cho lính cận chiến đang nâng cấp. Sách Kỳ Công đánh dấu Lưỡi và Tôi Luyện ở kỹ năng 50 và phong danh hiệu Đại Sư Rèn Vũ Khí ở 125."
+          "routeBody": "Any piece with a real stat line, which on this ladder means the iron rung and up, can come off the anvil as a masterwork so long as the finer quality fits inside your tier ceiling; the statless copper commons never proc, because there is nothing in them to improve. Iron and osmium count as tier 1 materials for the masterwork bonus, highpine and glyphsteel as tier 2, and skill sitting above a recipe's own tier adds its own point per tier, so among the osmium three it is the war axe and the battle staff that carry the material edge, and a rung keeps proccing better after you have outgrown it.\n\nRide the copper rung to 25, train the iron rung the day it opens and ride it to 50, then the osmium rung to 75. Past 75 nothing higher ships yet, so the osmium recipes fade to half and then quarter gain: budget roughly 150 more crafts to reach the 125 cap, and remember the shared throttle of ten craft actions per minute when you sit down to batch.\n\nFund the climb as you go: Darva's forge work order takes eight copper ore off your hands every 30 minutes for a little coin and XP, and the iron and osmium rungs sell honestly to leveling melee. The Book of Deeds marks Edge and Temper at skill 50 and crowns Grandmaster Weaponcrafting at 125."
         },
         "armorcrafting": {
           "identityHeading": "Giáp xích cho tuyến đầu",
-          "identityBody": "Thang Rèn Giáp đọc như sự nghiệp của một người lính: đai đồng đinh tán đơn giản, ủng và găng tay để bắt đầu, áo giáp lưới sắt, hộ chân và hộ vai với những dòng chỉ số đầu tiên, và mũ giáp vảy osmium hiếm, áo giáp và quần giáp, những mảnh Sức Mạnh và Thể Lực với chỉ số giáp cao nhất người thủ công có thể làm.\n\nNó cũng có một mặt yên tĩnh hơn: Hộ Chân Bảo Vệ Eastbrook, đồ phổ thông dã chiến chỉ số phép thuật, và Áo Choàng Vai Vảy Lò, hộ vai giáp xích Trí Tuệ và Tinh Thần hiếm ở kỹ năng 75, giữ những người mặc giáp xích thiên về phép thuật trong danh sách khách hàng. Trên vòng nó ngồi giữa Rèn Vũ Khí và Cơ Khí; đôi Thợ Rèn với Rèn Vũ Khí được thề trước Thợ Rèn Darva, trong khi đôi Thợ Cơ Khí với Cơ Khí được đặt tên nhưng chưa có nhiệm vụ thề.",
+          "identityBody": "Armorcrafting's ladder reads like a soldier's career: the plain riveted copper girdle, sabatons, and gauntlets to start, the ironlink hauberk, legguards, and spaulders with their first real stat lines, and the rare osmiumscale greathelm, cuirass, and leggings, Strength and Stamina pieces with armor numbers at the very top of a crafter's art.\n\nIt has a quieter side too: the Eastbrook Warded Leggings, a caster-statted field common, and the Kilnscale Mantle, a rare Intellect and Spirit mail shoulder at skill 75, keep the spell-minded mail wearers on the customer list. On the ring it sits between Weaponcrafting and Engineering; the Smith pair with Weaponcrafting is sworn before Forgemistress Darva, while the Gearwright pair with Engineering is named but has no oath quest yet.",
           "materialsHeading": "Quặng theo từng bao",
-          "materialsBody": "Không nghề nào ăn quặng nhanh hơn. Riêng áo giáp lưới sắt đã cần năm quặng sắt, và mỗi mảnh vảy osmium cần ba hoặc bốn osmium cộng một thỏi glyphsteel, nên một thợ rèn giáp nghiêm túc khai thác Mirefen Marsh và Thornpeak Heights hoặc trả tiền cho người làm. Đồng cung cấp cho bậc đầu, thẳng từ mạch quặng gần Hố Đồng.\n\nXung quanh kim loại là các phần mềm: da thô thu hoạch từ xác sói và lợn rừng, mảnh xương và mảnh vải lanh từ việc săn bắt thông thường, và một lọ Smithing Flux (20 đồng tại lò rèn) trong hầu hết mọi công thức. Darva bán quặng osmium trực tiếp cho những ai thiếu kiên nhẫn.",
+          "materialsBody": "No craft eats ore faster. The ironlink hauberk alone takes five iron ore, and every osmiumscale piece wants three or four osmium plus a glyphsteel bar, so a serious armorcrafter mines Mirefen Marsh and Thornpeak Heights or pays someone who does. Copper feeds the first rung, straight from the veins by the Copper Dig.\n\nAround the metal go the soft parts: rough hide harvested off wolf and boar corpses, bone fragments off the restless dead (or salvaged out of common gear), and Smithing Flux jars (20 copper each at the forge) in nearly every recipe. No counter sells osmium: the impatient buy it off other players or mine it themselves, on Thornpeak or the starter veins of ten of the eleven younger zones (the Farshore alone digs iron).",
           "ladderHeading": "Học tại lò rèn của Darva",
-          "ladderBody": "Hai đồ phổ thông dã chiến, Áo Giáp Lưới Chainmail Eastbrook và Hộ Chân Bảo Vệ, được biết từ đầu và có thể chế tạo bất cứ đâu. Thang huấn luyện viên gồm chín công thức theo ba bậc tại lò rèn Eastbrook: bậc đồng miễn phí ở kỹ năng 0, bậc giáp lưới sắt tốn 25 bạc mỗi công thức ở kỹ năng 25, và bậc vảy osmium tốn 1 vàng mỗi cái ở kỹ năng 50, mỗi bậc có thể học ngay khi bậc của bạn đạt đến.\n\nNgoài thang có hai đặc biệt. Mũ Boundstone là công thức kết hợp của Thợ Rèn, được dạy bởi huấn luyện viên, không cần trạm, và chỉ dành cho Thợ Rèn đã thụ ngộ với cả hai nghề ở kỹ năng 25. Áo Choàng Vai Vảy Lò không cần giáo viên: mọi người đều biết, nhưng ở kỹ năng 75 và gắn với lò rèn, đây là đỉnh điểm bậc 3 của nghề.",
+          "ladderBody": "Two field commons, the Eastbrook Chainmail Vest and the Warded Leggings, are known from the start and craft anywhere. The trainer ladder is nine recipes in three rungs at the Eastbrook forge: the copper rung is free at skill 0, the ironlink rung costs 25 silver a recipe at skill 25, and the osmiumscale rung costs 1 gold each at skill 50, with each rung teachable the moment your tier reaches it.\n\nBeyond the ladder sit two specials. The Boundstone Helm is one of the two Smith combination recipes (the Gravewyrm Gauntlets are its sibling on the weaponcrafting side), trainer-taught, station-free, and workable only by an attuned Smith with both crafts at skill 25. The Kilnscale Mantle needs no teacher at all: everyone knows it from the start, and nothing but the forge and the materials gates working it. Its listed skill of 75 is about gain, not permission: with Armorcrafting as a major it pays full skill gain from the very first hammer stroke to 99, so a Smith with osmium to spare can lean on it early. Below a major's ceiling the tier 3 recipe teaches nothing, so an undeclared or hobby armorcrafter works it for the piece, not the points.",
           "routeHeading": "Kiệt tác, và con đường thực tế lên 125",
           "routeBody": "Từ bậc giáp lưới sắt trở lên, mọi sản phẩm đều có cơ hội tạo kiệt tác; đồ phổ thông đồng chỉ giáp không thể tạo kiệt tác, vì kiệt tác cải thiện chỉ số và chúng không có. Sắt tính là nguyên liệu bậc 1 cho cơ chế này và glyphsteel tính là bậc 2.\n\nViệc leo thang là cuộc đi tiêu chuẩn ba bậc: đồng lên 25, giáp lưới sắt lên 50, vảy osmium lên 75, học từng bậc khi nó mở ra. Điểm may mắn của Rèn Giáp là đoạn sau 75: Áo Choàng Vai Vảy Lò là công thức bậc 3, nên nó cho điểm đầy đủ đến 99 và nửa sau, nghĩa là năm mươi điểm cuối mất khoảng 75 lần chế tác thay vì 150 lần không có công thức đỉnh điểm. Mỗi mantle tốn bảy quặng osmium và năm Smithing Flux, vì vậy hãy dự trữ ở Thornpeak và tại quầy lò rèn trước khi bắt đầu.\n\nĐơn hàng của Darva mua tám quặng đồng mỗi 30 phút lấy tiền và kinh nghiệm, một kênh tiêu thụ tốt cho quặng cấp thấp bạn không còn dùng nữa. Sách Kỳ Công đánh dấu Búa và Giáp Tấm ở kỹ năng 50, và Đại Sư Rèn Giáp chờ ở giới hạn 125."
         },
@@ -4043,61 +4223,61 @@ export const vi_VN: EnTranslations = {
           "identityHeading": "Da cho những người nhanh nhẹn",
           "identityBody": "Thang leo từ hộ chân da, ủng và đai Fenbridge đơn giản qua áo giáp da marshstalker, mũ và hộ vai không phổ biến đến bộ mirewarden hiếm, loại da tốt nhất người thủ công có thể cắt. Hai mảnh phép thuật bổ sung cho đủ: đồ phổ thông dã chiến Da Druid Eastbrook và Băng Duskhide ở kỹ năng 75.\n\nTrên vòng nó ngồi giữa Nấu Ăn và May Vá. Đôi đang hoạt động của nó là Thợ Trang Phục, Thuộc Da và May Vá, thề trước Thợ Dệt Ottilie ở Eastbrook; đôi Thợ Bẫy với Nấu Ăn được đặt tên trên vòng nhưng chưa có nhiệm vụ thề.",
           "materialsHeading": "Cuộc săn chính là thu hoạch",
-          "materialsBody": "Thuộc Da là nghề mà tuyến đường lên cấp và dây chuyền cung ứng của bạn là cùng một thứ: da thô được thu hoạch thẳng từ xác thú mang da, sói và lợn rừng trên hết, và mỗi xác chỉ phục vụ một người thu hoạch, ai đến trước được trước. Một mẻ thu hoạch hiếm trở lên cũng cho một Da Nguyên Vẹn, mẫu có chữ ký mà Áo Giáp Da Mirewarden cần, nên hãy cất mọi cái bạn tìm được.\n\nDàn phụ trợ nhỏ: chân nhện và tơ, vải homespun từ người hình người, một quặng osmium trong mỗi mảnh hiếm mirewarden (sáu trong Băng Duskhide đỉnh điểm), và một Chất Thuộc Da giá 16 đồng từ quầy xưởng thuộc da. Thợ Thuộc Da Hesk cũng bán quặng osmium, nếu bạn không muốn khai thác.",
+          "materialsBody": "Leatherworking is the craft where your leveling route and your supply line are the same thing: rough hide is harvested straight off hide-bearing corpses, wolves and boars above all, and each corpse serves one harvester only, first come first served. A rare or better harvest roll also grants a Pristine Hide, a signed specimen the Mirewarden Jerkin calls for, so bank every one you find.\n\nThe supporting cast is small: spider legs and silk, homespun cloth off humanoids, a single osmium ore in each mirewarden rare piece (six in the Duskhide Wraps capstone), and a Tanning Agent at 16 copper from the tannery counter. Osmium itself is never counter-bought: mine it yourself, on Thornpeak or nearly any younger zone's starter veins (the Farshore alone digs iron), or buy it off another player.",
           "ladderHeading": "Được đào tạo ở Fenbridge",
-          "ladderBody": "Đây là điều khác biệt: xưởng thuộc da đứng ở Fenbridge, trên con đường Mirefen Marsh, biến Thuộc Da thành nghề thủ công sâu duy nhất được đào tạo bên ngoài Eastbrook. Thợ Thuộc Da Hesk dạy thang tại các bể của ông: bậc da Fenbridge miễn phí ở kỹ năng 0, bậc marshstalker 25 bạc mỗi công thức từ kỹ năng 25, và bậc mirewarden 1 vàng mỗi cái từ kỹ năng 50, mỗi bậc mở khi bậc của bạn đến.\n\nHai công thức bỏ qua huấn luyện viên: đồ phổ thông dã chiến (Áo Giáp Da Thuộc Đã Thuộc và Da Druid) chế tạo bất cứ đâu từ đầu, và Băng Duskhide được mọi người biết nhưng ở kỹ năng 75, gắn với xưởng thuộc da. Lưu ý rằng bản thân lời thề Thợ Trang Phục được thề lại ở Eastbrook với Ottilie; chỉ việc dạy học xảy ra ở đầm lầy.",
+          "ladderBody": "Here is the wrinkle: the tannery stands in Fenbridge, on the Mirefen Marsh road, making Leatherworking the one deep craft trained out in the marsh. Tanner Hesk teaches the ladder at his vats: the Fenbridge hide rung free at skill 0, the marshstalker rung at 25 silver a recipe from skill 25, and the mirewarden rung at 1 gold each from skill 50, each rung opening as your tier reaches it.\n\nThree recipes skip the trainer: the field commons (the Tanned Leather Jerkin and Eastbrook Druid's Hide) craft anywhere from the start, and the Duskhide Wraps are known to everyone but sit at skill 75, tannery-bound. Note that the Outfitter oath itself is sworn back in Eastbrook with Ottilie; only the teaching happens in the marsh.",
           "routeHeading": "Kiệt tác, và con đường thực tế lên 125",
-          "routeBody": "Từ bậc marshstalker trở lên, mọi sản phẩm đều có cơ hội tạo kiệt tác, và Da Nguyên Vẹn trong Áo Giáp Da Mirewarden tự động cung cấp phần thưởng nguyên liệu có chữ ký; osmium tính là nguyên liệu bậc 1 cho cơ chế này. Đồ phổ thông da không có chỉ số không thể tạo kiệt tác.\n\nHãy leo cấp theo cách tự nhiên: thu hoạch mọi sói và lợn rừng bạn giết từ cấp một, chế tạo bậc da lên 25 ở bất cứ đâu bạn đứng, rồi học ở Fenbridge khi nhiệm vụ kéo bạn vào đầm lầy dù sao. Marshstalker dẫn bạn đến 50 và mirewarden đến 75; sau đó Băng Duskhide, một công thức bậc 3 với sáu quặng osmium, ba Da Nguyên Vẹn, hai da thô và một Chất Thuộc Da, cho điểm đầy đủ đến 99 và nửa sau, khoảng 75 lần chế tác cho năm mươi điểm cuối đến giới hạn 125.\n\nXưởng thuộc da di động quan trọng hơn cho nghề này hơn bất kỳ nghề nào khác: chuyên hóa ở 75 và một túi da trở thành trang bị hoàn chỉnh tại lửa trại thay vì phải đi bộ về Fenbridge. Đơn hàng xưởng thuộc da của Hesk mua tám da thô mỗi 30 phút, một khoản thu hợp lý trên những mảnh da bạn thu thập dù sao, và Sách Kỳ Công đánh dấu Nghề Thợ Thuộc Da ở kỹ năng 50 với Đại Sư Thuộc Da ở giới hạn."
+          "routeBody": "Any piece with real stats rolls the masterwork chance so long as the finer quality fits inside your tier ceiling, the statted Eastbrook Druid's Hide included, and a signed Pristine Hide in a Mirewarden Jerkin provides the signed-reagent bonus automatically; osmium counts as a tier 1 material for the proc. The statless hide commons cannot proc.\n\nLevel it the natural way: harvest every wolf and boar you kill from level one, let the two field commons carry you to 25 wherever you stand, then train the hide rung at the vats when the quests pull you into the marsh anyway. Marshstalker carries you to 50 and mirewarden to 75; past that the Duskhide Wraps, a tier 3 recipe at six osmium ore, three Pristine Hide, two rough hide, and a Tanning Agent, pays an attuned Outfitter full gain to 99 and half after, about 75 crafts for the final fifty points to the 125 cap; below a major's ceiling the tier 3 recipe teaches nothing.\n\nThe mobile tannery matters more for this craft than any other: specialize at 75 and a saddlebag of hides becomes finished gear at the campfire instead of a walk back to Fenbridge. Hesk's tannery work order buys eight rough hides every 30 minutes, a tidy return on skins you were collecting regardless, and the Book of Deeds marks Tanner's Trade at skill 50 with Grandmaster Leatherworking at the cap."
         },
         "cooking": {
           "identityHeading": "Nồi nuôi sống cả đội",
-          "identityBody": "Ăn một bữa ăn nấu chín và nó hồi phục máu cho bạn qua 18 giây nghỉ ngơi, giữa các đợt kéo quái là cách chữa trị rẻ nhất trong game. Thang leo từ Pan-Seared River Perch hồi 90 máu lên Grand Roast của Marlow ở mức 980, lượng hồi khi ngồi lớn nhất hiện có.\n\nTrên vòng Nấu Ăn ngồi giữa Giả Kim và Thuộc Da. Đôi đang hoạt động của nó là Dược Sĩ, Giả Kim và Nấu Ăn, thề trước Đầu Bếp Marlow tại bếp Eastbrook sau khi săn bốn con lợn rừng hoang cho nồi; đôi Thợ Bẫy với Thuộc Da được đặt tên trên vòng nhưng chưa có nhiệm vụ thề.",
+          "identityBody": "Eat a cooked meal and it heals you over 18 seconds of rest, which between pulls is the cheapest healing in the game. The ladder runs from a 90-health Pan-Seared River Perch all the way to Marlow's Grand Roast at 980, a sit-heal nothing in the game beats.\n\nOn the ring Cooking sits between Alchemy and Leatherworking. Its living pair is the Apothecary, Alchemy and Cooking, sworn before Cook Marlow at the Eastbrook kitchens after hunting four wild boars for the pot; the Trapper pair with Leatherworking is named on the ring but has no oath quest yet.",
           "materialsHeading": "Kho thực phẩm được nuôi bằng cần câu và dao",
-          "materialsBody": "Câu cá cung cấp các nguyên liệu đặc trưng, từng vùng một: cá trout gương và cá perch sông từ vùng nước Eastbrook Vale, cá pike đầm và lươn bùn từ Mirefen Marsh, cá trout lạnh và cá chép đá phiến từ Thornpeak Heights. Mỗi bậc trong thang nấu cá của bậc đó, nên người đầu bếp biết câu cá không bao giờ cạn nguyên liệu.\n\nPhần thịt đến từ xác thu hoạch: thịt thú từ lợn rừng và họ hàng, và trong một mẻ thu hoạch hiếm trở lên, một Miếng Thịt Hảo Hạng có chữ ký, trọng tâm của bữa tiệc lớn. Thảo dược nêm các món ngon hơn, một khúc gỗ ashwood xông khói lươn, và Muối Nấu Ăn giá 8 đồng một túi từ quầy của chính Marlow.",
+          "materialsBody": "Fishing stocks the signature ingredients, zone by zone: mirror trout and river perch from the waters of Eastbrook Vale, marsh pike and bog eel from Mirefen Marsh, frostgill trout and slatefin carp from Thornpeak Heights. The rungs mix the zones freely (the free rung already wants marsh pike, the mid rung Thornpeak's frostgill, and the rare supper folds the Vale's mirror trout back in), so a cook who fishes wherever the road goes never runs dry.\n\nThe butcher's side comes off harvested corpses: game meat from boars and their kin, and, on a rare or better harvest roll, a signed Prime Cut, the centerpiece of the grand roast. Herbs season the better dishes, one ashwood log smokes the eel, and Cooking Salt runs 8 copper a pouch from Marlow's own stall.",
           "ladderHeading": "Từ thịt khô đến bữa tiệc lớn",
-          "ladderBody": "Thịt Khô Ướp Muối là công thức dã chiến: biết từ đầu, một chân nhện, có thể chế tạo bất cứ đâu, thức ăn đường dài của mọi phiêu lưu mới. Thang huấn luyện viên nấu tại bếp Eastbrook ở phía tây quảng trường: bậc miễn phí ở kỹ năng 0 (cá perch, Xiên Thịt Thú Săn Của Thợ Săn, Cá Marsh Pike Ướp Thảo Mộc), bậc giữa ở kỹ năng 25 với 25 bạc mỗi công thức (Lươn Xông Khói Ashwood, Hầm Thịt Thú Lá Vàng, Chowder Cá Lạnh), và bậc hiếm ở kỹ năng 50 với 1 vàng mỗi cái (Bữa Tối Cá Chép Bạc, Đĩa Tiệc Của Thợ Câu, Grand Roast Của Marlow).\n\nMón ăn theo mẻ giúp kéo dài nguyên liệu: lươn xông khói và hầm thịt thú phục vụ hai người mỗi lần chế tác, và đĩa tiệc phục vụ ba người. Marlow dạy mỗi bậc ngay khi bậc Nấu Ăn của bạn đến đó.",
+          "ladderBody": "Thịt Khô Ướp Muối là công thức dã chiến: biết từ đầu, một chân nhện, có thể chế tạo bất cứ đâu, thức ăn đường dài của mọi phiêu lưu mới. Thang huấn luyện viên nấu tại bếp Eastbrook ở phía đông quảng trường: bậc miễn phí ở kỹ năng 0 (cá perch, Xiên Thịt Thú Săn Của Thợ Săn, Cá Marsh Pike Ướp Thảo Mộc), bậc giữa ở kỹ năng 25 với 25 bạc mỗi công thức (Lươn Xông Khói Ashwood, Hầm Thịt Thú Lá Vàng, Chowder Cá Lạnh), và bậc hiếm ở kỹ năng 50 với 1 vàng mỗi cái (Bữa Tối Cá Chép Bạc, Đĩa Tiệc Của Thợ Câu, Grand Roast Của Marlow).\n\nMón ăn theo mẻ giúp kéo dài nguyên liệu: lươn xông khói và hầm thịt thú phục vụ hai người mỗi lần chế tác, và đĩa tiệc phục vụ ba người. Marlow dạy mỗi bậc ngay khi bậc Nấu Ăn của bạn đến đó.",
           "routeHeading": "Chuyên hóa, không phải kiệt tác, và con đường lên 125",
           "routeBody": "Nấu Ăn là ngoại lệ thành thật với câu chuyện kiệt tác: bữa ăn không có dòng chỉ số để cải thiện, nên món ăn không bao giờ tạo kiệt tác, và không đầu bếp nào nên theo đuổi điều đó. Sự thành thạo của nghề là chuyên hóa ở 75: ít hơn một phần năm nguyên liệu mỗi lần chế tác, cộng dồn nhanh trên các món theo mẻ, và bếp dã chiến di động để bữa tiệc được nấu ngay ở cổng dungeon.\n\nNấu những gì bạn câu được: kết hợp việc leo thang với buổi câu cá và hai kỹ năng nuôi dưỡng lẫn nhau suốt chặng đường. Thịt khô và bậc miễn phí dẫn bạn đến 25 một điểm mỗi lần chế tác, bậc giữa đến 50, và bậc hiếm đến 75; sau 75 chưa có món nào cao hơn, nên các món hiếm mờ dần thành nửa rồi một phần tư điểm thưởng, khoảng 150 lần chế tác nữa đến giới hạn. Hãy xem đó là việc dự trữ, không phải mài, vì một bang sẽ ăn hết mọi suất.\n\nĐơn hàng bếp của Marlow mua tám thịt thú mỗi 30 phút lấy tiền và kinh nghiệm, và Sách Kỳ Công đánh dấu Đầu Bếp Có Kinh Nghiệm ở kỹ năng 50 trên đường đến danh hiệu Đại Sư Nấu Ăn ở 125."
         },
         "alchemy": {
           "identityHeading": "Những lọ thuốc giúp bạn thắng trận",
-          "identityBody": "Nghề được thực hành tại nhà bào chế ở Highwatch, nơi ở của Nhà Giả Kim Verane, Bậc Thầy Nhà Bào Chế, người dạy thang công thức, bán Lọ Thủy Tinh giá 12 đồng, và chi tiền cho thảo dược qua đơn hàng của cô.\n\nTrên vòng chế tác, Giả Kim ngồi cùng các nghề thử nghiệm và sai lầm, bên cạnh Cơ Khí một bên và Nấu Ăn một bên. Điều đó mang lại cho nó hai danh tính đôi: Chuyên Gia Nổ (Cơ Khí và Giả Kim, kết hợp trước Thợ Máy Gizzel ở Eastbrook) và Dược Sĩ (Giả Kim và Nấu Ăn, thề trước Đầu Bếp Marlow). Thụ ngộ với một trong hai đôi để biến Giả Kim thành chuyên ngành và mở kỹ năng cho đến giới hạn; cho đến lúc đó nó hoạt động đến bậc hiếm như bất kỳ nghề chưa khai báo nào.",
+          "identityBody": "The craft is worked at the apothecary in Highwatch, home of Alchemist Verane, Master of the Apothecary, who teaches the recipe ladder, sells Glass Vials at 12 copper, and pays coin for herbs through her work order.\n\nOn the craft ring, Alchemy sits with the trial-and-error trades, next to Engineering on one side and Cooking on the other. That gives it two pair identities: the Bombardier (Engineering and Alchemy, taken up before Tinker Gizzel in Eastbrook) and the Apothecary (Alchemy and Cooking, sworn before Cook Marlow). Attune to either pair to make Alchemy a major and let your own signed work teach you back; the Bombardier pair also opens its combination brew, the Elixir of the Bear, while the Apothecary pair ships no combination recipe yet. The ladder itself never waits, though, because every Alchemy recipe sits inside the rare tier that undeclared crafts work under, so the whole climb to the cap is open before any oath.",
           "materialsHeading": "Thảo dược, tuyến, và thủy tinh",
           "materialsBody": "Mỗi thuốc muốn một Lọ Thủy Tinh cộng thảo dược tương ứng bậc của nó: sheenleaf mọc ở Eastbrook Vale, goldleaf ở Mirefen Marsh, và sunpetal ở Thornpeak Heights, một loại thảo dược mỗi vùng, nên những lọ thuốc của bạn leo cùng thế giới với bạn. Thảo Dược là kỹ năng bạn đồng hành tự nhiên, dù mua từ người thu thập hoặc chợ cũng được; các vùng sâu hơn có những bụi cây bậc cao hơn đòi liềm tốt hơn, vì vậy hãy giữ công cụ cập nhật nếu bạn tự hái.\n\nDòng tinh chất thêm nguyên liệu của người săn: Tuyến Nọc Độc thu hoạch từ xác thú có nọc, và tinh chất cao nhất cần một Tuyến Nọc Độc Nguyên Vẹn, mẫu hiếm có dấu mà một mẻ xác may mắn tìm thấy. Nếu bạn không tự thu hoạch, đó chính xác là những thứ đáng nhờ một người bạn thợ săn mang về.",
           "ladderHeading": "Thang công thức",
-          "ladderBody": "Mọi người đều biết Thuốc Hồi Máu Nhỏ từ đầu và có thể pha bất cứ đâu, không cần trạm. Thang thật sự là chín công thức do Verane dạy tại nhà bào chế, ba ở mỗi bậc: công thức kỹ năng 0 miễn phí, bậc kỹ năng 25 tốn 25 bạc mỗi công thức, và bậc kỹ năng 50 tốn 1 vàng mỗi công thức. Mỗi bậc là một thuốc hồi máu, một thuốc hồi phép, và một tinh chất thể lực, leo dần từ lọ sheenleaf thông thường (120 máu, 160 phép) qua goldleaf không phổ biến (200 máu, 260 phép) đến sunpetal hiếm (280 máu, 360 phép).\n\nCác tinh chất leo theo cùng cách: Tinh Chất Lợn Rừng tăng 6 Thể Lực trong 10 phút, Tinh Chất Lửa Nọc Độc tăng 9 trong 15 phút, và Tinh Chất Rắn tăng 12 trong 15 phút, pha hai lọ mỗi lần chế tác. Còn một công thức nữa nằm riêng: Tinh Chất Gấu, một loại pha chế kết hợp mà Verane dạy với giá 25 bạc khi Giả Kim của bạn đạt 25, có thể pha bất cứ đâu, nhưng chỉ bởi Chuyên Gia Nổ đã thụ ngộ với cả Giả Kim và Cơ Khí ở mức 25.",
+          "ladderBody": "Everyone knows the Minor Healing Potion from the start and can mix it anywhere, no station needed. The real ladder is nine recipes taught by Verane at the apothecary, three at each rung: the skill 0 recipes are free, the skill 25 rung costs 25 silver per recipe, and the skill 50 rung costs 1 gold per recipe. Each rung is a healing draught, a mana draught, and a stamina elixir, stepping from common sheenleaf bottles (120 health, 160 mana) through uncommon goldleaf (200 health, 260 mana) to rare sunpetal (280 health, 360 mana).\n\nThe elixirs climb the same way: the Elixir of the Boar grants 6 Stamina for 10 minutes, the Vipersear Elixir 9 for 15 minutes, and the Elixir of the Serpent 12 for 15 minutes, the Serpent alone brewing two bottles per craft. One more recipe sits off to the side: the Elixir of the Bear, a combination brew Verane teaches for 25 silver once your Alchemy reaches 25, mixable anywhere, but only by an attuned Bombardier with both Alchemy and Engineering at 25.",
           "routeHeading": "Con đường của nhà pha chế lên 125",
-          "routeBody": "Thuốc và tinh chất không bao giờ tạo ra kiệt tác; cơ chế đó thuộc về trang bị mang chỉ số. Tên bạn vẫn lan truyền dù vậy: những thuốc sunpetal hiếm được pha từng lọ một và đến tay người dùng có dấu thợ, trong khi Tinh Chất Rắn pha hai lọ vẫn bình thường. Ở kỹ năng 75 bạn chuyên hóa, và mọi công thức Giả Kim từ đó tiêu tốn ít hơn 20 phần trăm nguyên liệu.\n\nHãy học Thảo Dược sớm và hái khi lên cấp: sheenleaf có khắp nơi ở Vale, và một khi bạn đến bàn của Verane bậc miễn phí sẽ dẫn bạn đến kỹ năng 25 sạch sẽ trên những thảo dược bạn đã hái dù sao. Học bậc 25 ngay khoảnh khắc nó mở ra, chuyển việc hái sang đầm lầy để lấy goldleaf, và để đơn hàng của Verane (sáu Thảo Dược Lá Vàng lấy 45 đồng, lặp lại mỗi 30 phút) trả lại một ít tiền khi bạn đi.\n\nTừ 50 trở đi, pha thuốc sunpetal và mẻ Rắn từ thảo dược Thornpeak. Chặng cuối từ 100 đến 125 là sự nhỏ giọt có chủ ý, vì vậy hãy pha những gì thực sự bán được thay vì đốt thảo dược lấy con số, và nhớ rằng đồ tiêu thụ là thứ chế tác duy nhất mọi người mua lại mãi mãi. Sách Kỳ Công đánh dấu Những Pha Chế Kỳ Lạ ở kỹ năng 50 và Đại Sư Giả Kim ở giới hạn."
+          "routeBody": "Draughts and elixirs never roll masterworks; that proc belongs to stat-bearing gear. Your name still travels, though: the rare sunpetal draughts arrive signed with a maker's mark, and so does every bottle of the double-batch Elixir of the Serpent, so nothing rare in this craft leaves the bench unsigned. At skill 75 you specialize, and every Alchemy recipe costs 20 percent fewer materials from then on.\n\nTake Herbalism early and pick as you level: sheenleaf is everywhere in the Vale, and once you reach Verane's bench the free rung will carry you cleanly to skill 25 on herbs you would have picked anyway. Learn the 25 rung the moment it turns on, move your picking to the marsh for goldleaf, and let Verane's work order (six Goldleaf Herbs for 45 copper, repeatable every 30 minutes) hand a little coin back as you go.\n\nFrom 50 on, brew sunpetal draughts and Serpent batches out of Thornpeak sunpetal, with a little Vale and marsh greenery still in the mix. The last stretch from 100 to 125 is a deliberate trickle, so brew what actually sells rather than burning herbs for the number, and remember that consumables are the one crafted good everyone re-buys forever. The Book of Deeds marks Strange Brews at skill 50 and Grandmaster Alchemy at the cap."
         },
         "engineering": {
           "identityHeading": "Độc quyền của người chế tạo công cụ",
-          "identityBody": "Nghề được thực hành tại xưởng công cụ ở góc đông nam Quảng Trường Eastbrook, nơi ở của Thợ Máy Gizzel, Bậc Thầy Xưởng Công Cụ. Bậc 1 đến 3 của mọi dòng công cụ là hàng người bán thông thường; bậc 4 và 5 chỉ tồn tại qua kỹ sư.\n\nTrên vòng nó ngồi cùng các nghề thử nghiệm và sai lầm, bên cạnh Giả Kim và Rèn Giáp, cho nó hai danh tính đôi: Chuyên Gia Nổ (Cơ Khí và Giả Kim, kết hợp trước chính Gizzel) và Thợ Cơ Khí (Rèn Giáp và Cơ Khí, được đặt tên nhưng chưa thể thề). Một cảnh báo quan trọng hơn ở đây hơn bất cứ nơi nào: cả hai bậc công thức của Cơ Khí đều nằm trên trần bậc hiếm mà người sở thích và chưa khai báo làm việc dưới, nên con số kỹ năng chỉ tăng với người thủ công mà chuyên ngành bao gồm Cơ Khí, ngày nay có nghĩa là Chuyên Gia Nổ. Ai cũng vẫn có thể chế tạo công cụ; người chưa thụ ngộ chỉ không học được gì từ việc đó.",
+          "identityBody": "The craft is worked at the toolworks in the southwest corner of Eastbrook Square, home of Tinker Gizzel, Master of the Toolworks. Tiers 1 through 3 of every tool line are ordinary vendor stock; tiers 4 and 5 come off an engineer's bench, or out of the Drowned Litany's delve counter for Delve Marks behind its clears gates, and never out of any till for coin.\n\nOn the ring it sits with the trial-and-error trades, next to Alchemy and Armorcrafting, giving it two pair identities: the Bombardier (Engineering and Alchemy, taken up before Gizzel himself) and the Gearwright (Armorcrafting and Engineering, named but not yet swearable). One warning matters more here than anywhere else: every one of Engineering's recipe rungs sits above the rare-tier ceiling that hobbies and undeclared crafters work under, so the skill number only moves for a crafter whose majors include Engineering, which today means the Bombardier. Anyone can still build the land tools; an unattuned crafter just learns nothing from doing it, and the two rod recipes ask for Gizzel's teaching besides.",
           "materialsHeading": "Nguyên liệu và công cụ tiền thân",
-          "materialsBody": "Mỗi công thức công cụ tiêu thụ công cụ bậc dưới nó cộng một nguyên liệu cao cấp: bốn Quặng Osmium và một Cuốc Khai Khoáng Skysilver trở thành Cuốc Khai Khoáng Osmium, rồi hai Thỏi Glyphsteel và cuốc osmium đó trở thành Cuốc Khai Khoáng Glyphsteel, và các dòng rìu và liềm phản chiếu cùng hình dạng với Gỗ Ashwood và Gỗ Highpine, Thảo Dược Goldleaf và Sunpetal.\n\nGizzel dự trữ cả sáu nguyên liệu cao cấp tại xưởng công cụ nếu bạn muốn nhanh hơn là lợi nhuận hơn, nhưng quặng, gỗ, và thảo dược đều có thể thu thập ở Mirefen Marsh và Thornpeak Heights, và hàng thu thập là nơi lợi nhuận nằm. Ngoại lệ duy nhất là Thỏi Glyphsteel, chỉ bán từ người bán, nên mọi công cụ bậc glyphsteel đều có sàn tiền cố định tính vào chi phí của nó.",
+          "materialsBody": "Every land tool recipe consumes the tool one tier below it plus a FINE material, and that pairing is the whole land ladder: four Fine Iron Ore and a Skysilver Mining Pick become the Osmium Mining Pick, then two Glyphsteel Bars, two Fine Osmium Ore and that osmium pick become the Glyphsteel Mining Pick. The axe and sickle lines mirror the fine-plus-prior-tool shape with Fine Ashwood and Fine Highpine Logs, Fine Goldleaf and Fine Sunpetal Herbs, though their tier 5 rungs ask no Glyphsteel Bars: the pick is the one line that gets dearer at the top. The two rod recipes break the pattern on purpose: the Stormreel takes four Sunglint Koi and a Silverstream rod, the Tidewrought two Koi, eight Raw Slatefin Carp and that Stormreel, so the top of the angler's ladder is paid for on the water rather than at a vein.\n\nA fine material is not sold anywhere and does not drop from an ordinary harvest: you get it by working one of a zone's full-grade veins with a tool ranked above the material itself, which in practice means the tool one rung below the one you are trying to build (the easier veins a zone keeps for travellers yield the plain material whatever you swing). That is deliberate. On the craft route, a tier 5 tool comes from actually swinging the tier 4 one, not from a shopping trip; the Delve Marks counter is the one way around it. The single exception is the Glyphsteel Bar, refined and vendor-only, 1 silver 60 copper a bar from Quartermaster Bree in Highwatch or from Gizzel's own counter, so the Glyphsteel Mining Pick alone carries a fixed coin floor built into its cost.",
           "ladderHeading": "Thang công cụ",
-          "ladderBody": "Toàn bộ thang là sáu công thức, tất cả gắn với trạm xưởng công cụ và tất cả được biết tự động, không bao giờ tốn phí huấn luyện: cuốc, rìu và liềm bậc 4 ở kỹ năng 75, và các phiên bản bậc 5 ở kỹ năng 150. Con số thứ hai không phải lỗi đánh máy, và nó nằm trên giới hạn 125 hiện tại một cách có chủ ý: yêu cầu kỹ năng không bao giờ chặn việc chế tạo ở đây, chúng chỉ định hình điểm kỹ năng nhận được, nên bạn có thể chế tạo công cụ bậc 5 ngay ngày bạn có nguyên liệu và công cụ bậc 4 tiền thân.\n\nMỗi công cụ hoàn thành có phẩm cấp hiếm hoặc epic và ra với chữ ký, nên tên bạn theo chân các vùng đất trên thắt lưng công cụ của những người chơi khác. Cơ Khí cũng giữ một nửa của một công thức kết hợp: Tinh Chất Gấu, được pha bởi Chuyên Gia Nổ đã thụ ngộ với cả Cơ Khí và Giả Kim ở 25.",
+          "ladderBody": "The ladder is eight recipes, all bound to the toolworks station. The six land-tool recipes are known automatically, no trainer fee ever: the tier 4 pick, axe, and sickle at skill 75, and the tier 5 versions at skill 150. That second number is not a typo, and it sits above the current 125 cap on purpose: skill requirements never gate a craft here, they only shape skill gain, so you can build a tier 5 tool the day you hold its reagents and its tier 4 predecessor. The two crafted rods are the taught exception: Gizzel teaches the Stormreel at skill 75 for 4 gold and the Tidewrought at skill 125 for 16 gold, each the moment your tier in the craft reaches its own.\n\nEvery finished tool is rare or epic quality and comes out signed, so your name rides the zones on other players' toolbelts. Engineering also holds up half of one combination recipe: the Elixir of the Bear, brewed by an attuned Bombardier with both Engineering and Alchemy at 25.",
           "routeHeading": "Con đường của kỹ sư lên 125",
           "routeBody": "Công cụ không có chỉ số chiến đấu, nên chúng không tạo kiệt tác; cơ chế đó thuộc về trang bị mang chỉ số. Chuyên hóa vẫn đến ở kỹ năng 75: ít hơn 20 phần trăm nguyên liệu mỗi lần chế tác, và xưởng công cụ dã chiến tạm thời biến bất kỳ chuyến thu thập nào thành xưởng làm việc. Toán điểm thưởng hầu như không mờ ở đây: công thức kỹ năng 75 cho điểm đầy đủ đến 100 và nửa sau, và công thức kỹ năng 150 cho điểm đầy đủ suốt đến giới hạn 125, nên ràng buộc thực sự là nguyên liệu và tiền, không bao giờ là công thức bị mờ.\n\nHãy chọn đôi trước, vì không có gì tiến triển nếu không có nó: lấy thụ ngộ Chuyên Gia Nổ từ Thợ Máy Gizzel. Sau đó nuôi thang: lên cấp Khai Khoáng, Đốn Gỗ, hoặc Thảo Dược bản thân hoặc kết bạn với người thu thập, mua công cụ bậc 3 từ người bán, và xem đơn hàng của Gizzel (tám Khúc Gỗ Ironbark lấy 16 đồng, lặp lại mỗi 30 phút) là tiền đi lại.\n\nCơ Khí là nghề uy tín ít khối lượng, khoảng một điểm kỹ năng mỗi công cụ hoàn thành, nên hãy xem mỗi lần chế tác là hàng để bán. Lời chào hàng cho khách hàng tự viết ra: mỗi bậc công cụ trên bậc của điểm tài nguyên rút ngắn 0,4 giây khỏi thời gian niệm thu thập 2,5 giây (xuống sàn 1,5 giây), nên công cụ bậc 5 là nâng cấp tốc độ trên mọi điểm tài nguyên trong thế giới, và chỉ bạn mới có thể làm ra. Sách Kỳ Công đánh dấu Bánh Răng và Lò Xo ở kỹ năng 50 và Đại Sư Cơ Khí ở 125."
         },
         "enchanting": {
           "identityHeading": "Tháo rời trang bị, đưa sức mạnh trở lại",
-          "identityBody": "Không có trạm, không có huấn luyện viên, và không có danh sách công thức cần mua: mọi pháp khắc đều được biết từ đầu, ai cũng có thể hủy pháp khắc từ ngày đầu, và kỹ năng giới hạn ở 125 như mọi nghề.\n\nTrên vòng nó ngồi giữa Khắc Chữ và Chế Tác Đá Quý, nên hai danh tính đôi của nó là Pháp Sư Học Thuật (Khắc Chữ và Pháp Khắc) và Thợ Đá Quý (Pháp Khắc và Chế Tác Đá Quý). Hiện chưa thể thề với đôi nào vì cả hai nghề hàng xóm đều chờ công thức đầu tiên, nên hôm nay Pháp Khắc leo thang là nghề của mọi người: miễn phí đến bậc hiếm trước bất kỳ lời thề nào, và là lựa chọn sở thích tự nhiên cho Chuyên Gia Nổ hay Dược Sĩ. Pháp Khắc sư cũng giữ cho thế giới thu thập vận hành: ba hiệu ứng công cụ có thể gắn vào là công việc của Pháp Khắc, và người thủ công gốc nạp lại hiệu ứng của chính họ với giá ưu đãi, sâu hơn khi đã chuyên hóa.",
+          "identityBody": "Every enchant is known from the start, anyone can disenchant from day one, and neither ever needs a station; the skill caps at 125 like every craft. The one taught corner of the trade is its pair of charm recipes: Tinker Gizzel teaches the Gatherer's Cache and the Artisan's Eye at the toolworks in the southwest corner of Eastbrook Square, for the ordinary tier fee once your Enchanting reaches 25, and the charms themselves are worked at his station.\n\nOn the ring it sits between Inscription and Jewelcrafting, so its two pair identities are the Arcanist (Inscription and Enchanting) and the Gembinder (Enchanting and Jewelcrafting). Neither can be sworn yet, since both neighbors await their first recipes, so today Enchanting climbs as everyone's craft: free to the rare tier before any oath, and a natural hobby pick for a Bombardier or an Apothecary. Enchanters also keep the gathering world running: the two slottable tool effects are Enchanter work, and an original crafter recharges their own effects at a discount, deeper still once specialized.",
           "levelingHeading": "Cách pháp khắc lên cấp",
-          "levelingBody": "Hai hành động tăng kỹ năng: hủy pháp khắc một mảnh, và áp dụng một pháp khắc. Mỗi thành công đáng giá tối đa một điểm, được tính theo độ nghiêm trọng của công việc: phẩm cấp của mảnh bạn phá, hoặc bậc nguyên liệu của pháp khắc bạn áp dụng. Hủy pháp khắc thông thường và pháp khắc chỉ dùng bụi cho điểm như công việc thông thường; hủy pháp khắc không phổ biến và pháp khắc tinh chất như loại không phổ biến; hủy pháp khắc hiếm và mọi pháp khắc Runed hoặc Greater như loại hiếm; hủy pháp khắc epic và legendary cao hơn nữa.\n\nHiệu ứng mờ dần quen thuộc áp dụng theo bậc 25 điểm, nên công việc cấp thông thường mờ ở kỹ năng 75, công việc không phổ biến ở 100, và công việc bậc hiếm đúng ở giới hạn 125. Pháp Khắc cũng có một sự tử tế của riêng nó: đầu vào vượt quá trần kiểu mẫu của bạn được làm tròn xuống trần đó thay vì bằng không, nên trước khi thụ ngộ, hủy pháp khắc epic chỉ đơn giản cho điểm như hiếm thay vì không dạy gì. Nếu Pháp Khắc kết thúc thụ động sau danh tính khác, mọi thứ cho điểm như công việc thông thường và việc leo thang dừng lại ở 75; hãy giữ nó như sở thích và công việc bậc hiếm vẫn cho điểm, chỉ chậm hơn sau 75.",
+          "levelingBody": "Three actions move the skill: disenchanting a piece, applying an enchant, and crafting the two charms, which climb the ordinary crafting curve. Each success is worth up to one point, scaled by how serious the work is: the rarity of the piece you break, or the reagent tier of the enchant you apply. Common disenchants and dust-only enchants score as common work; uncommon disenchants and essence enchants as uncommon; rare disenchants and every Runed or Greater enchant as rare; epic and legendary disenchants rank higher still on the table, though no enchanting identity today reaches past the rare rung, so they pay the same as rare work in practice. One honesty rules the breaking bench: a piece that came off a player bench (crafted, signed, or masterworked) still mills into materials but teaches nothing, so a craft-and-break loop levels no one, and the lessons are in world-found gear.\n\nThe familiar mastery fade applies on 25-point tiers, so common-grade work goes gray at skill 75, uncommon work at 100, and rare-tier work exactly at the 125 cap. Enchanting also has one kindness of its own: input above your archetype ceiling is rounded down to that ceiling instead of zeroed, so before you attune, an epic disenchant simply scores as rare rather than teaching nothing. If Enchanting ends up dormant behind another identity, breaking and applying score as common work and the climb stalls at 75, while the two charms, riding the crafting curve above the common ceiling, teach a dormant enchanter nothing at all; keep it as your hobby and rare-tier work still pays, just slower past 75.",
           "marketHeading": "Bản sao pháp khắc, nguồn gốc, và thị trường",
-          "marketBody": "Áp dụng một pháp khắc tiêu thụ nguyên liệu và đánh dấu một bản sao cụ thể của vật phẩm. Nhắm vào bản sao trong túi, bạn nhận lại một bản sao đã pháp khắc riêng biệt; nhắm vào mảnh đang mặc, mảnh đó được pháp khắc tại chỗ, không cần tháo ra rồi trang bị lại. Dù cách nào phần thưởng cũng theo mảnh mãi mãi, qua các lần tháo trang bị, gửi ngân hàng, và giao dịch. Mỗi mảnh một pháp khắc: áp dụng một pháp khắc khác lên bản sao đã pháp khắc sẽ hỏi xác nhận trước, rồi thay thế thẳng pháp khắc cũ; pháp khắc cũ bị phá hủy mà không hoàn lại nguyên liệu. Việc bán, vứt, và hủy pháp khắc đều ưu tiên các bản sao thường trước, nên mảnh đã hoàn thiện của bạn không bị ăn nhầm. Các bản sao pháp khắc giống hệt nhau còn có thể xếp chồng trong túi của bạn.\n\nTrang bị kiệt tác và pháp khắc là bạn bè: mảnh kiệt tác vẫn có thể pháp khắc đầy đủ, và pháp khắc cộng thêm lên trên phần thưởng kiệt tác mà không ảnh hưởng đến nó hay chữ ký của người thợ. Cộng hết mọi nguồn, một kiệt tác có chữ ký mang pháp khắc Greater là tốt nhất mà mảnh chế tác đạt được, và nó vẫn thấp hơn đồ raid theo thiết kế.\n\nTrên chợ, Chợ Thế Giới chỉ môi giới hàng thường, chưa chỉnh sửa, nên mảnh pháp khắc và có chữ ký đổi tay trực tiếp qua cửa sổ giao dịch. Nguyên liệu là nửa có thể bán được của nghề: Bụi, Tinh Chất, và Mảnh Vỡ đăng tự do, đăng không tốn phí, và Thương Lái chỉ lấy 5 phần trăm khi giao dịch hoàn tất. Điều đó tạo ra hai nguồn thu nhập kinh điển của Pháp Khắc sư: bán nguyên liệu trên chợ, và nhận mảnh của khách hàng qua giao dịch, pháp khắc nó, rồi trả lại."
+          "marketBody": "Applying an enchant spends the reagents and marks one specific copy of the item. Point it at a bagged copy and you get back a distinct enchanted copy; point it at a piece you are already wearing and it is enchanted in place, right where it sits, with no unequip and re-equip dance. Either way the bonus follows that piece forever, through unequips, bank trips, and trades. One enchant per piece: applying a different enchant to an enchanted copy asks for confirmation, then replaces the old enchant outright, destroying it with no refund of its materials. Selling, discarding, and disenchanting all prefer plain copies first, so your finished piece does not get eaten by accident.\n\nMasterwork gear and enchanting are friends: a masterwork piece stays fully enchantable, and the enchant adds on top of the masterwork bonus without disturbing it or the maker's signature. Stacking every source, a signed masterwork carrying a Greater enchant is the best a crafted piece gets, and it still sits below raid loot by design.\n\nOn the market, an enchanted or signed piece lists like anything else: it goes up as its own single-copy listing, the tooltip shows the enchant and the maker's mark, and the Ravenpost carries it just as faithfully. The materials remain the steady half of the craft: Dust, Essence, and Shards list freely, listing costs nothing, and the Merchant takes 5 percent of a completed sale only. That makes the two classic enchanter incomes selling materials, and selling finished work: over the market, by raven, or face to face in a trade window."
         }
       },
       "howHeading": "Cách chế tác hoạt động",
-      "howBody": "Mở cửa sổ chế tác (phím mặc định T) và mọi công thức bạn biết đều được liệt kê cùng nguyên liệu cần và những gì bạn đang có. Công thức gắn trạm yêu cầu bạn đứng trong vòng 20 thước của đúng trạm trong thị trấn, công thức dã chiến chế tạo ở bất kỳ đâu, và Pháp Khắc không bao giờ cần trạm. Không có lần may thất bại: một lần chế tạo với nguyên liệu trong tay luôn thành công.\n\nHai ma sát nhỏ giữ cho kinh tế lành mạnh. Mỗi lần chế tạo thành công trả một phí 2 đồng đồng mỗi điểm ngân sách chỉ số của vật phẩm, và các hành động kiểu chế tạo dùng chung một nhịp: tối đa 10 lần chế tạo, giải pháp thủ công huyền bí, pháp khắc, hoặc tháo dỡ trong bất kỳ 60 giây nào. Cả hai sẽ không gây khó dễ trong một phiên chơi bình thường; cả hai ngăn một chuyên gia đã đạt giới hạn làm ngập thị trường.",
+      "howBody": "Open the crafting window (default key T) and every recipe you know is listed with what it needs and what you have on hand. Station-bound recipes ask you to stand within 20 yards of the right station in town, field recipes craft anywhere, and Enchanting's breaking and enchanting need no station at all (only its two charm recipes are station work, at the toolworks). There is no failure roll: a craft with the materials in hand always succeeds.\n\nTwo small frictions keep the economy honest. Every successful craft pays a fee of 2 copper per point of the item's stat budget, and craft-type actions share one pace: at most 10 crafts, disenchants, enchants, salvages, or tool recharges in each 60-second window. Neither will trouble a normal session; both stop a maxed specialist from flooding the market.",
       "recipesHeading": "Công thức",
       "recipesNote": "Mọi công thức của nghề thủ công: yêu cầu kỹ năng và nguyên liệu chính xác của nó, nơi học được và phí là bao nhiêu, và ba giá trị kỹ năng mà tại đó tích lũy của nó mờ dần thành một nửa, một phần tư, và không gì.",
       "masteryHeading": "Tích lũy kỹ năng",
       "masteryBody": "Mọi công thức trong cửa sổ đều thể hiện trạng thái tích lũy theo màu sắc cổ điển: cam nghĩa là tích lũy đầy đủ, vàng là một nửa, xanh lá là một phần tư, xám là không gì. Ranh giới là chính xác, mỗi {step} kỹ năng là một bậc, và công thức mờ dần một màu cho mỗi bậc nó thấp hơn bậc của bạn.\n\nVì điểm tích lũy là tất định (một lần chế tạo tích lũy đầy đủ luôn di chuyển bạn đúng một điểm), bạn có thể lên kế hoạch toàn bộ hành trình từ danh sách: làm việc ở một bậc khi nó còn cam, học bậc tiếp theo khi nó chuyển sang vàng, và không bao giờ tốn nguyên liệu vào lần chế tạo xám với hy vọng tiến bộ. Ở giới hạn {cap} con số dừng lại, nhưng công thức, tỉ lệ kiệt tác, và lợi nhuận vẫn tiếp tục hoạt động.",
       "masterworkHeading": "Kiệt tác",
-      "masterworkBody": "Mọi lần chế tạo thành công đều cho ra chính xác những gì công thức hứa hẹn, và đôi khi còn hơn thế một chút: một kiệt tác hoàn thiện cùng món đồ ở một bậc phẩm chất cao hơn, với chỉ số thưởng được tích hợp ngay lúc chế tạo. Đây là cộng thêm mà không bao giờ là giảm đi, và nó vẫn dưới mức sàn đột kích, nên trang bị chế tạo có thể xuất sắc mà không thay thế được đồ rơi từ đột kích.\n\nTỉ lệ được công khai, không phải huyền bí: {base}% cơ bản, cộng {perTier}% mỗi bậc kỹ năng của bạn cao hơn công thức, cộng {signed}% khi bất kỳ nguyên liệu có dấu thợ nào được đưa vào, cộng {spec}% khi bạn đã chuyên ngành, với nguyên liệu bậc cao hơn thêm 1 đến 2% nữa, tất cả giới hạn ở {cap}%. Chỉ những món đồ có chỉ số thật mới có thể cải thiện, nên đồ thông thường không chỉ số, dụng cụ, và vật tiêu hao không bao giờ kích hoạt; một lần chế tạo ngủ đông không bao giờ tạo ra kiệt tác, và lần chế tạo sở thích không thể vượt quá trần hiếm của nó.\n\nTác phẩm tinh xảo mang tên người tạo ra nó. Các đầu ra đơn bản chất lượng Hiếm trở lên đều được ký tên (Chế tạo bởi; nguyên liệu thu thập mang Được thu thập bởi), một kiệt tác luôn được ký tên dù phẩm chất là gì, và các món đồ được ký tên giống hệt vẫn chồng được. Chữ ký là xuất xứ, không phải khóa: hàng có dấu thợ trao đổi tự do.",
+      "masterworkBody": "Every successful craft is exactly what the recipe promises, and sometimes a little more: a masterwork finishes the same piece one quality tier finer, with the bonus stats baked in at craft time. It is add-only, never a downgrade, and it stays below the raid floor, so crafted gear can be excellent without replacing a raid drop.\n\nThe chance is published, not mystical: {base}% base, plus {perTier}% per tier your skill sits above the recipe, plus {signed}% when any signed reagent goes in, plus {spec}% once you are specialized, with higher-tier materials adding 1 to 2% more, all capped at {cap}%. Only a piece with real stats can improve, so statless commons, tools, and consumables never proc; a dormant craft never produces one, and a hobby craft cannot masterwork past its rare ceiling.\n\nFine work carries its maker. Rare and better outputs are signed, every copy (Crafted by; gathered materials carry Gathered by), a masterwork is always signed whatever its quality. A signature is provenance, not a lock: signed goods trade, mail, and list on the World Market freely.",
       "trainingHeading": "Học nghề",
-      "trainingBody": "Công thức của huấn luyện viên đến từ các bậc thầy thường trú, được dạy tại các trạm của họ. Quy tắc chỉ có một dòng: một bậc thầy dạy công thức một khi bậc của bạn trong nghề thủ công đó đạt bậc của công thức, và không có gì khác cản trở, không phải cấp độ, không phải hình mẫu. Các bậc thang huấn luyện viên nằm ở kỹ năng 0, 25, và 50 hiện tại, nên một bậc mới mở ra với mỗi bậc bạn leo lên.\n\nPhí là một lần và cố định theo bậc: bậc bắt đầu là miễn phí, bậc kỹ năng 25 tốn {tier1} một công thức, và bậc kỹ năng 50 tốn {tier2}. Bạn phải đứng tại trạm thực sự của bậc thầy để học, và trạm di động không bao giờ tính. Các công thức dã chiến thông thường và công thức dụng cụ không cần học gì cả; mọi nhân vật đều biết chúng từ đầu.",
+      "trainingBody": "Trainer recipes come from the resident masters, taught at their stations. The rule is one line: a master teaches a recipe once your tier in the craft has reached the recipe's own tier, and nothing else gates it, not your level, not your archetype. The gear and consumable ladders run their rungs at skill 0, 25, and 50; Engineering's two rod lessons continue the ladder at 75 and 125, and Enchanting's two charm recipes sit on the 25 rung, so a fresh rung opens as your tiers climb.\n\nFees are one-time and flat by rung: the starting rung is free, the skill 25 rung costs {tier1} a recipe, the skill 50 rung {tier2}, and the rod lessons above them carry their own fees, listed beside each recipe in the table. You must stand at the master's actual station to train, and a mobile station never counts. The common field recipes and the six crafted land-tool recipes need no training at all; every character knows them from the start.",
       "specializationHeading": "Chuyên ngành",
       "specializationBody": "Ở kỹ năng {at} nghề thủ công này chuyên ngành hóa bạn, không cần nhiệm vụ: từ đó trở đi công thức tốn ít hơn {pct}% nguyên liệu, và chuyên ngành hóa thêm vào tỉ lệ kiệt tác của nó.\n\nCác chuyên gia cũng học cách mang xưởng theo mình: một thợ chế tạo đã chuyên ngành có thể thiết lập trạm di động ở thực địa trong mười phút mỗi lần, nên công thức gắn trạm có thể được thực hiện ngay cửa mỏ thay vì quay về thị trấn. Các giới hạn của nó là có chủ ý: nó không bao giờ tính cho việc học với bậc thầy hay để giải trói một món đồ ủy thác, và nó hết hạn theo bộ đếm thời gian dù bạn có dùng nó hay không.",
       "ench": {
@@ -4109,7 +4289,7 @@ export const vi_VN: EnTranslations = {
         "meleeWeapons": "Vũ khí cận chiến",
         "timberWeapons": "Trượng, đũa phép, cung, và nỏ",
         "enchantsHeading": "Pháp khắc",
-        "enchantsNote": "Pháp khắc có ba bậc. Bậc cơ bản dùng Bụi Thanh Âm (có thêm Tinh Chất ở cuối bảng) và bao phủ ô vũ khí cùng mọi ô giáp, với đủ tùy chọn theo trục chỉ số để mọi kiểu xây dựng nhân vật đều tìm được thứ phù hợp cho từng ô. Bậc Cao Cấp tốn một Mảnh Thanh Âm cộng Tinh Chất và là thứ duy nhất Mảnh được dùng cho: thưởng mạnh hơn trên các ô có tác động cao nhất.\n\nGiữa hai bậc đó là năm pháp khắc Phù Văn, mỗi loại dùng một phụ liệu thứ cấp theo loại, nên không có gì bạn nghiền bao giờ là ngõ cụt: Lưỡi Phù Văn (vũ khí, Sức Mạnh, dùng Thép Cộng Hưởng), Tiêu Điểm Phù Văn (vũ khí, Trí Tuệ, Gỗ Cộng Hưởng), Dệt Phù Văn (giáp ngực, Tinh Thần, Sợi Cộng Hưởng), Da Phù Văn (giáp chân, Nhanh Nhẹn, Da Cộng Hưởng), và Xích Phù Văn (mũ, Thể Lực, Xích Cộng Hưởng). Mỗi cái cũng cần hai Tinh Chất Thanh Âm và đứng giữa bậc cơ bản và Cao Cấp về sức mạnh; thưởng chính xác đều có trong bảng bên dưới.",
+        "enchantsNote": "Enchants come in three tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot plus every armor slot except the off hand, with enough stat-axis options that every build finds something for each slot. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed two more sinks besides, the two charm recipes at five apiece and the top rung of tool-effect recharges, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.",
         "colEnchant": "Pháp khắc",
         "colSlot": "Ô trang bị",
         "colTier": "Bậc",
@@ -4124,57 +4304,61 @@ export const vi_VN: EnTranslations = {
         "bonusFmt": "+{value} {stat}"
       },
       "gatherIntro": {
-        "mining": "Khai Khoáng kéo quặng thẳng từ đá của thế giới: đồng ở Thung Lũng Đông Khê, sắt ở Đầm Lầy Bùn Sâu, và osmium trên Cao Nguyên Đỉnh Gai, nuôi sống các nghề rèn đúc. Mở cho mọi người từ cấp 1: chỉ cần một cây cuốc khai khoáng trong túi, giá 20 đồng ở bất kỳ thị trấn trung tâm nào. Theo dõi trên bộ đếm riêng đến giới hạn 100.",
-        "logging": "Đốn Gỗ chặt gỗ từ các rừng cây ở cả ba khu vực: sắt mộc ở Thung Lũng Đông Khê, tro mộc ở Đầm Lầy Bùn Sâu, và thông cao ở Cao Nguyên Đỉnh Gai, nguyên liệu thô cho cán vũ khí, gậy, và bàn thợ cơ khí. Mở cho mọi người từ cấp 1 với một cây rìu đốn gỗ trong túi (20 đồng ở bất kỳ thị trấn trung tâm nào), theo dõi trên bộ đếm riêng đến giới hạn 100.",
-        "herbalism": "Thảo Dược Học thu hái những gì mọc hoang: sheenleaf ở Thung Lũng Đông Khê, goldleaf ở Đầm Lầy Bùn Sâu, và sunpetal ở Cao Nguyên Đỉnh Gai, lá và thân nuôi sống các nghề bào chế. Mở cho mọi người từ cấp 1 với một cái liềm thảo dược trong túi (20 đồng ở bất kỳ thị trấn trung tâm nào), theo dõi trên bộ đếm riêng đến giới hạn 100.",
-        "fishing": "Câu Cá là nghề thu thập khác biệt nhất và sâu sắc nhất: một minigame cắn câu và giật cần thực sự, bảng loại cá riêng ở mỗi khu vực, và giới hạn thành thạo là 200, gấp đôi các nghề khác. Mua cần câu, hướng ra mặt nước rộng, và thả câu."
+        "mining": "Mining pulls ore straight out of the world's rock: copper in Eastbrook Vale, iron in Mirefen Marsh, and osmium up in Thornpeak Heights, with starter veins scattered through every younger zone beyond them, feeding the forge crafts. Open to everyone from level 1: a 20 copper mining pick from an Eastbrook, Fenbridge, or Highwatch counter opens every starter vein, and the higher rungs of the pick ladder wake as your own counter earns them. Tracked on its own counter to a cap of 100.",
+        "logging": "Logging fells timber from stands of trees across the whole world: ironbark in Eastbrook Vale, ashwood in Mirefen Marsh, highpine in Thornpeak Heights, and starter stands in every younger zone, the raw stock for hafts, staves, and the engineer's bench. Open to everyone from level 1 with a logging axe in your bags (20 copper at the Eastbrook, Fenbridge, and Highwatch counters), tracked on its own counter to a cap of 100.",
+        "herbalism": "Herbalism gathers what grows wild: sheenleaf in Eastbrook Vale, goldleaf in Mirefen Marsh, sunpetal in Thornpeak Heights, and starter patches in every younger zone, the leaf and stem that keep the apothecary trades brewing. Open to everyone from level 1 with a herbalism sickle in your bags (20 copper at the Eastbrook, Fenbridge, and Highwatch counters), tracked on its own counter to a cap of 100.",
+        "fishing": "Fishing is the odd one out among the gathering trades, and the deepest: a real bite-and-reel minigame, its own catch tables in each of the three heartland zones (the young waters beyond them all serve the Vale's table for now), and a proficiency cap of 200, twice the others. Buy a pole, face open water, and cast."
       },
       "rhythmHeading": "Nhịp thu hoạch",
-      "rhythmBody": "Thu hoạch là một lần thu thập ngắn có thể thấy được, không phải lấy tức thì: {base} giây cơ bản, không bao giờ dưới sàn {floor} giây. Sở hữu công cụ bậc cao hơn bậc của điểm tài nguyên giúp bạn nhanh hơn {tool} giây mỗi bậc trên nó, và mỗi nhóm thành thạo bạn vượt qua cắt thêm {band} giây nữa; chỉ khớp bậc của điểm tài nguyên cho bạn vào cửa, còn các bậc trên nó mới làm bạn nhanh.\n\nTúi đầy sẽ lịch sự từ chối thu thập trước khi bắt đầu, nên không có gì bị lãng phí giữa chừng, và mỗi lần thu hoạch trả một phần nhỏ XP nhân vật, được tính theo cấp của điểm tài nguyên so với cấp của bạn theo cách XP từ hạ quái được tính: một điểm tài nguyên xám tầm thường không dạy gì cho nhân vật đã đạt giới hạn.",
-      "gainBody": "Điểm tích lũy là tất định, không bao giờ là lần may kỹ năng: một điểm tài nguyên ở bậc tích lũy bằng hoặc cao hơn bậc của bạn dạy một điểm đầy đủ mỗi lần thu hoạch, và mỗi {step} thành thạo là một bậc tính theo điểm tài nguyên. Điểm bậc 1 trả đầy đủ dưới 25, nửa từ 25 đến 49, một phần tư từ 50 đến 74, và không gì từ 75 trở lên; điểm bậc 2 trả đầy đủ đến 49; điểm bậc 3 duy nhất trả đầy đủ đến 74 và nửa đến tận giới hạn {cap}.\n\nCon đường dự kiến thật đơn giản: học tại các điểm khởi đầu của Thung Lũng, chuyển sang đầm lầy, và hoàn thành hành trình ở vùng cao của Thornpeak Heights. Khi đạt giới hạn việc học dừng lại nhưng sản lượng thì không: một người thu thập đã đạt giới hạn tiếp tục khai thác nguyên liệu chất lượng tối đa mãi mãi.",
+      "rhythmBody": "A harvest is a short visible cast, not an instant grab: {base} seconds base, never below a {floor} second floor. Carrying a tool above the node's tier, one your proficiency lets you wield, speeds you up by {tool} seconds per tier above it, and each proficiency band you cross trims another {band} seconds; merely matching the node's tier gets you in the door, it is the tiers above it that make you fast.\n\nA full bag politely refuses the cast before it starts, so nothing is wasted mid-swing, and every harvest pays a small slice of character XP, scaled by the node's level against your own the way kill XP scales: a trivial gray node teaches a capped character nothing.",
+      "gainBody": "Gain is deterministic, never a skill-up roll: a node at or above your gain tier teaches a full point per harvest, and every {step} proficiency is one tier scored against the node. Tier 1 nodes pay in full below 25, half to 49, a quarter to 74, and nothing from 75 on; tier 2 nodes pay in full to 49; the two tier 3 nodes of each trade pay in full to 74 and half right up to the cap of {cap}.\n\nThe intended route is plain: learn on the starter nodes of the Vale, move to the marsh, and finish the climb on the high ground of Thornpeak Heights. At the cap the learning stops but the yields do not: a capped gatherer keeps rolling the best odds the trade offers forever.",
       "nodesHeading": "Điểm tài nguyên theo khu vực",
       "nodesNote": "Vị trí các điểm tài nguyên, bậc của chúng, công cụ cần thiết, và những gì chúng mang lại. Mỗi điểm tài nguyên hồi sinh cho bạn {respawn} giây sau khi bạn tự thu hoạch, và bộ đếm đó là của riêng bạn: người thu thập khác làm việc cùng điểm tài nguyên đó không bao giờ làm chậm bộ đếm của bạn, nên không có tranh giành điểm tài nguyên và không cần canh gác. Mỗi khu vực lên cao hơn mang lại nguyên liệu tốt hơn từ mặt đất khó hơn.",
       "toolsHeading": "Công cụ",
-      "toolsNote": "Mọi điểm tài nguyên đều cần công cụ của nghề tương ứng nằm trong túi, kể cả bậc 1: không có cuốc thì không có quặng, không có cần câu thì không có cá. Thang bán của người bán bao gồm bậc 1 đến 3, luôn có hàng ở mọi thị trấn trung tâm; công cụ chỉ cần có trong túi, không có ô trang bị và không có độ bền, nên mỗi cái chỉ cần mua một lần. Chỉ bậc mới quan trọng cho yêu cầu: màu độ hiếm của công cụ chỉ là trang trí.\n\nCao hơn thang bán của người bán là hai công cụ chế tạo, bậc 4 và bậc 5, được làm tại xưởng dụng cụ bởi các kỹ sư và không bao giờ được bán bởi NPC nào. Không có điểm tài nguyên nào hiện tại cần hơn bậc 3, nên giá trị của chúng hiện tại là tốc độ: công cụ hàng đầu giữ thời gian thu thập ở mức sàn trên các điểm tài nguyên thấp hơn, và nó sẽ là vé vào cửa khi xuất hiện vùng đất bậc cao hơn.",
+      "toolsNote": "Every node needs its trade's tool in your bags, tier 1 included: no pick, no ore, and no pole, no fish. The vendor ladder covers tiers 1 to 3 across the three heartland hubs: the tier-1 tool is sold at all three, the rungs above it where the ground that uses them begins (Fenbridge adds tier 2, Highwatch tier 3), and the younger settlements beyond them stock no tools at all, so kit up before you travel. Every counter sells every rung it stocks freely, and any tool passes by direct trade; every rung also lists on the Market and travels by mail except the three 20-copper land starters: those are bought at a counter or passed hand to hand, and never sold back, mailed, or listed. What is gated is the wielding. A land tool above tier 1 works only once your proficiency in its own trade has earned it, {tier2Prof} for tier 2, {tier3Prof} for tier 3, and 85 and 100 for the two crafted rungs, and the vendor row, the tooltip, and the table below all name the requirement up front. Until then a tool bought ahead simply waits in your bags, opening no ground, buying no speed, and minting no fine grades, then wields the moment your counter touches its number. Fishing rods are the one exception: no rod carries a wield requirement, and Trader Wilkes in Eastbrook deliberately stocks the tier 2 and tier 3 rods for anglers buying ahead. A tool never occupies an equip slot and never wears out, so each is a one-time purchase, and only the tier matters to the gate: a rarer tool of the same tier opens nothing extra. Rarity is not only colour, though. It makes a slotted tool effect last longer, and on a rod it widens the reel window.\n\nA better tool buys three things, not two. It opens higher-tier ground, it shortens the cast, and it improves what comes out: work a vein with a tool ranked ABOVE the zone's own material and the harvest yields the fine grade of it instead of the plain one. The vein has to be one of the zone's full-grade ones, so the easier veins a zone keeps for travellers still yield the ordinary material. Fine materials are what the crafted tool recipes consume, and a fine grade counts as its ordinary version anywhere a recipe or a work order asks for one, so upgrading never strands you: it just means your copper ore arrives as Fine Copper Ore.\n\nAbove the vendor ladder each trade has two crafted tools, tier 4 and tier 5, made at the toolworks (every character knows the land recipes; the skill that climbs for the work is Engineering's), or bought with Delve Marks at the Drowned Litany counter once its clears gates are met: the table below carries the Marks price and the clears each rung asks. No merchant ever sells them for coin. Fishing has its own pair, and they are learned from the toolmaker rather than known from the start. No node and no water today needs more than tier 3, so the top two rungs buy speed, grade and a kinder reel window rather than access, and they will be the entry ticket when higher-tier ground arrives.",
       "toolCrafted": "Chế tạo ({craft})",
+      "toolCraftedOrMarks": "Crafted ({craft}) or {marks} Delve Marks after three Drowned Litany clears",
+      "toolCraftedOrMarksHeroic": "Crafted ({craft}) or {marks} Delve Marks after a Heroic Drowned Litany clear",
       "toolVendor": "{name} ({hub})",
       "toolUnavailable": "Không bán",
-      "priceNone": "Không bán",
+      "priceNone": "Not sold for coin",
       "toolTierReq": "Công cụ bậc {tier}",
+      "colWield": "Use at",
+      "wieldNone": "Any",
       "yieldsHeading": "Một lần thu hoạch mang lại gì",
       "yieldsBody": "Mỗi lần thu hoạch sẽ tung một phẩm chất cho những gì nó mang lại, và thành thạo của bạn là toàn bộ câu chuyện của lần tung đó. Một người mới thu thập hoàn toàn luôn khai thác được nguyên liệu thông thường; mỗi điểm kỹ năng dịch chuyển tỉ trọng đều đặn ra khỏi thông thường vào các bậc cao hơn và không bao giờ ngược lại, cho đến khi ở giới hạn 100 bậc thông thường biến mất hoàn toàn: 60 phần trăm không phổ biến, 30 phần trăm hiếm, 8 phần trăm sử thi, và 2 phần trăm huyền thoại, mỗi lần.\n\nPhẩm chất cũng là số lượng: lần tung thông thường cho 1 đơn vị, không phổ biến và hiếm cho 2, sử thi 3, và huyền thoại 4. Bất kỳ sản phẩm hiếm, sử thi, hoặc huyền thoại nào đều đến như một bản được đóng dấu Được thu thập bởi bạn: ở giới hạn đó là bốn trong mười lần thu hoạch mang tên bạn, và các quy tắc xuất xứ trên trang Kinh Tế Chế Tạo giải thích lý do tại sao các thợ thủ công trả thêm cho chính xác những chồng đó.",
       "bandsHeading": "Các dải thành thạo",
-      "bandsBody": "Các dải thành thạo là thang 0/100/200 chung cho bộ đếm của từng nghề thu thập: mỗi dải bạn vượt qua sẽ rút ngắn thời gian niệm thu thập, và đối với câu cá, các dải còn quyết định bảng mẻ câu (kèm theo cần câu phù hợp). Các nghề trên đất liền giới hạn ở 100, vì vậy dải 1 là trần của chúng; chỉ câu cá mới đạt được dải 2.",
+      "bandsBody": "Proficiency bands are the shared 0/100/200 ladder over a trade's counter. For the land trades the band crossed at 100 shaves the gather cast, and their cap makes band 1 the ceiling. Fishing's bands shave nothing: they select the catch tables (with a rod to match), only fishing reaches band 2, and the climb itself is what pulls an angler to deeper water, where the better tables and the further lessons both live.",
       "bandFmt": "Dải {band}: từ {at} điểm thành thạo",
       "rareHeading": "Phát hiện hiếm",
       "rareBody": "Mỗi lần thu hoạch, dù kỹ năng của bạn như thế nào, đều mang tỉ lệ 1 trên {oneIn} để tìm thấy một phát hiện hiếm: một mạch quặng nguyên sơ trong quặng, gỗ cốt lõi cổ xưa trong gỗ, một bông hoa nở dưới ánh trăng trong thảo dược. Phát hiện này nhân sản lượng thu hoạch đó lên {mult} lần, mọi đơn vị đều đến có dấu thợ của bạn dù phẩm chất được tung nào, và cả khu vực đều nghe tin qua tên bạn. Mỗi loại cũng khắc ghi dấu ấn sưu tập không Danh Vọng của riêng nó vào Sách Kỳ Công của bạn, một dấu ấn sưu tập tồn tại thuần túy để chứng minh điều đó đã xảy ra với bạn.",
-      "specimenBody": "Hãy giữ một chút không gian túi khi bạn đi thu thập: một phát hiện may mắn cần các ô trống để đến có dấu thợ, và nếu không có gì vừa thì sản lượng vẫn đến nhưng chữ ký bị mất. Thu hoạch xác chết cũng có nhánh jackpot riêng: khoảng {pct}% lần thu hoạch xác chết sẽ ra Hiếm hoặc tốt hơn, ký tên sản lượng và, với các dòng mẫu vật, trao một mẫu vật hoàn hảo có dấu thợ.",
+      "specimenBody": "Keep a little bag room spare when you farm: a signed windfall needs room of its own or a matching signed stack to land in, and if nothing fits the yield still arrives but the signature is lost. Corpse harvesting has its own jackpot arm too: about {pct}% of each harvested component comes up rare or better. A family with a perfect specimen to give (hide, silk, venom, meat) keeps its ordinary yield plain and mints the signed specimen beside it; every other family signs the yield itself.",
       "gatherDeedsHeading": "Thành tích trên đường đi",
       "gatherDeeds": {
         "mining": "Lần đầu tiên bạn thu hoạch điểm tài nguyên của bất kỳ nghề nào sẽ đạt được thành tích Hoa Quả Của Đồng Ruộng, và giới hạn 100 trong Khai Khoáng khắc ghi danh hiệu Quặng Trong Máu. Đạt 100 trong bất kỳ ba trong số Khai Khoáng, Đốn Gỗ, Thảo Dược Học, và Câu Cá thêm danh hiệu Thợ Thu Thập Thành Thạo với 25 Danh Vọng, và việc khai phá một mạch quặng nguyên sơ sẽ ghi lại dấu ấn sưu tập riêng của nó. Không có gì trong số này ban sức mạnh: thành tích là danh hiệu và Danh Vọng, bằng chứng về những con đường bạn đã đi qua.",
         "logging": "Lần đầu tiên bạn thu hoạch điểm tài nguyên của bất kỳ nghề nào sẽ đạt được thành tích Hoa Quả Của Đồng Ruộng, và giới hạn 100 trong Đốn Gỗ khắc ghi danh hiệu Thợ Chặt Cốt Lõi. Đạt 100 trong bất kỳ ba trong số Khai Khoáng, Đốn Gỗ, Thảo Dược Học, và Câu Cá thêm danh hiệu Thợ Thu Thập Thành Thạo với 25 Danh Vọng, và một khúc gỗ cốt lõi cổ xưa sẽ ghi lại dấu ấn sưu tập riêng của nó. Thành tích chỉ là danh hiệu và Danh Vọng, không bao giờ là sức mạnh.",
         "herbalism": "Lần đầu tiên bạn thu hoạch điểm tài nguyên của bất kỳ nghề nào sẽ đạt được thành tích Hoa Quả Của Đồng Ruộng, và giới hạn 100 trong Thảo Dược Học khắc ghi danh hiệu Người Thành Thạo Đồng Nội. Đạt 100 trong bất kỳ ba trong số Khai Khoáng, Đốn Gỗ, Thảo Dược Học, và Câu Cá thêm danh hiệu Thợ Thu Thập Thành Thạo với 25 Danh Vọng, và một bông hoa nở dưới ánh trăng sẽ ghi lại dấu ấn sưu tập riêng của nó. Thành tích chỉ là danh hiệu và Danh Vọng, không bao giờ là sức mạnh.",
-        "fishing": "Cột mốc 100 khắc ghi danh hiệu Lão Muối và 200 khắc ghi danh hiệu Ngư Sư Thành Thạo, đỉnh cao của nghệ thuật câu cá; Câu Cá cũng tính vào thành tích Thợ Thu Thập Thành Thạo, đạt được khi đạt 100 trong bất kỳ ba nghề thu thập nào. Lần đầu tiên câu được cá ở vùng nước mỗi khu vực điền một trang riêng, và Cá Koi Ánh Nắng ghi lại Tia Hy Vọng, nên những người du hành mang theo cần câu trong túi điền sách nhanh hơn họ tưởng."
+        "fishing": "The 100 milestone inscribes Old Salt and 200 inscribes Master Angler with its title, the very top of the angler's art; Fishing also counts toward Master Gatherer, earned at 100 in any three gathering trades. A first fish from each of six zones' waters fills its own page, the three heartland zones and the Willowfen, the Galecrest, and the Farshore beyond them, and the Sunglint Koi records Glimmer of Hope, so travelers with a pole in their pack fill their book faster than they expect."
       },
       "fish": {
         "startHeading": "Bắt đầu",
-        "startBody": "Cần Câu Đơn Giản có giá 20 đồng đồng mua từ Ngư Phủ Brandt ở Eastbrook (tìm Lão Muối đang nhìn trừng vào Hồ Gương ở rìa đông thị trấn); Tinker Gizzel, Nhà Tiếp Tế Hale ở Fenbridge, và Quản Nhu Bree ở Highwatch cũng có bán cần câu. Dùng cần câu khi hướng mặt ra mặt nước đủ sâu để có cá, trong khoảng 24 thước phía trước, và phao sẽ bay ra.\n\nBạn không thể giật cần khi đang chiến đấu, khi đang bơi, hoặc khi đã chết: đứng câu từ bờ là tư thế đúng, và mọi vùng nước câu được đều dùng được, ở mọi khu vực.",
+        "startBody": "A Simple Fishing Pole costs 20 copper from Fisherman Brandt in Eastbrook (look for the Old Salt at the town's east edge, by the road to Mirror Lake); Tinker Gizzel, Provisioner Hale in Fenbridge, and Quartermaster Bree in Highwatch stock poles too. Use the pole while facing water deep enough to hold fish, up to about 24 yards ahead of you, and your bobber sails out.\n\nYou cannot cast while in combat, while swimming, or while dead: casting from shore is the intended posture. Water gets harder as the land does, though: the marsh wants at least the tier 2 Ironreel and the peaks the tier 3 Silverstream, and a line cast without the rod that water takes never leaves your hand. Two rods sit above those, the Stormreel and the Tidewrought: engineers craft them at the toolworks out of what a line pulls up, and the Drowned Litany's delve counter sells them for Delve Marks behind its clears gates, though never for coin. No water asks for them, so they buy a shorter wait and a wider reel window instead of access, which at the top rung means a bite in a flat three seconds.",
         "biteHeading": "Cắn mồi và giật cá",
-        "biteBody": "Sau khi thả câu, cá cắn mồi vào một thời điểm ẩn giữa {min} và {max} giây; khoảng chờ được quyết định khi dây câu chạm nước, nên không hai lần câu nào giống nhau. Khi phao cắn mồi, bạn có cửa sổ {reel} giây để nhấn cần lại và giật cá lên: giật trong thời hạn đó và cá vào tay, do dự quá thời hạn và cá thoát không để lại gì. Toàn bộ một lần câu giới hạn ở {cap} giây, nên ngay cả lần câu yên tĩnh cũng giải quyết nhanh.\n\nCần câu tốt hơn làm sắc cả hai đầu của minigame: mỗi bậc cần câu cao hơn bậc đầu giảm {rod} giây khỏi thời gian chờ tối đa và cộng {reelRod} giây vào cửa sổ giật cá, nên Guồng Sắt kéo thời gian chờ tệ nhất xuống 6,5 giây với cửa sổ 3,75 giây, và Suối Bạc xuống 5 và 4,5. Những lần cắn mồi nhanh nhất không bao giờ thay đổi dù bạn cầm gì, và một cần câu chỉ cần ở trong túi là có tác dụng.",
+        "biteBody": "After the cast, a bite comes at a hidden moment between {min} and {max} seconds; the delay is decided when the line lands, so no two casts feel quite alike. When the bobber bites you have a {reel} second window to press the pole again and reel in: reel inside it and the catch lands, hesitate past it and the fish gets away with nothing to show. A whole session caps at {cap} seconds, so even a quiet cast resolves quickly.\n\nBetter rods sharpen both ends of the minigame: each rod tier above the first trims {rod} seconds off the longest possible wait, never below the three-second floor the top rod already grazes, and adds {reelRod} seconds to the reel window, so the Ironreel pulls the worst wait down to 6.5 seconds with a 3.25 second window, and the Silverstream to 5 with a window past 4, its rarity widening the reel a little beyond what the tier alone pays. The quickest bites never change whatever you hold, and a rod only needs to be in your bags to count.",
         "scheduleHeading": "Tích lũy thành thạo",
-        "scheduleNote": "Điểm thành thạo câu cá tăng theo lịch cố định, không có yếu tố ngẫu nhiên: một điểm đầy đủ cho mỗi lần câu được dưới 50 thành thạo, nửa điểm dưới 100, một phần mười dưới 150, và rỏ dần 0,02 từ 150 đến 200. Chặng cuối đó là hành trình hàng nghìn lần câu có chủ ý: 200 là một tuyên bố, không phải một điểm dừng trên đường đến thứ gì khác.\n\nRác ngừng dạy hoàn toàn ở {cutoff}: từ đó trở đi, rong rêu và ủng cũ chỉ là rong rêu và ủng cũ. Mọi lần câu được khác đều tích điểm theo đúng lịch, vì vậy hãy câu ở bất cứ đâu bạn thích và để bộ đếm tự tăng.",
+        "scheduleNote": "Fishing gain follows a fixed schedule with no dice: a full point per catch below 50 proficiency, half a point below 100, a tenth below 150, and a slow 0.02 trickle from 150 to 200. That last stretch is a thousands-of-catches journey on purpose: 200 is a statement, not a stop on the way to something else.\n\nJunk stops teaching entirely at {cutoff}: from there on, weeds and boots are just weeds and boots. The water itself caps the lesson too: the Vale's tier 1 waters (and every young shore beyond the heartland) teach nothing past 100, the marsh's stop at 150, and only Thornpeak's school an angler the whole way to 200. Every landed catch otherwise gains at the scheduled rate, so when the counter stalls, the schedule is telling you to seek deeper water.",
         "colProficiency": "Thành thạo",
         "colGain": "Điểm nhận mỗi lần câu",
         "belowFmt": "Dưới {below}",
         "tablesHeading": "Bảng loại cá câu được",
-        "tablesNote": "Thành thạo của bạn chọn một trong ba nhóm cá câu: nhóm 0 từ đầu, nhóm 1 ở 100, nhóm 2 ở 200, mỗi nhóm dịch chuyển tỉ trọng ra khỏi rác và lưỡi câu không và vào cá thật, theo từng khu vực. Mỗi nhóm trên nhóm đầu cũng đòi hỏi một cây cần: nhóm 1 cần Cần Guồng Sắt bậc 2, nhóm 2 cần Cần Suối Bạc bậc 3. Nhóm hiệu lực của bạn là mức thấp hơn giữa kỹ năng bạn đạt được và cần câu bạn đang dùng, và giới hạn đó im lặng: với cần kém hơn bạn vẫn câu được, chỉ là theo bảng của nhóm thấp hơn, vì vậy nếu cá câu được có vẻ chững lại trong khi kỹ năng vẫn tăng, hãy kiểm tra cần câu trước.\n\nVùng nước mỗi khu vực có cặp cá thực phẩm riêng, hồi máu nhiều hơn ở các khu vực sâu hơn, tất cả đều là nguyên liệu nấu ăn và hoàn toàn có thể ăn ngon ngay khi còn tươi. Phần còn lại của bảng là thuế của người câu cá: rong rêu, đôi khi một chiếc ủng, và lưỡi câu không, thứ không bao giờ biến mất hoàn toàn. {rare} là phần thưởng hiếm như nhau trên mọi dây câu, với tỉ lệ cố định không bao giờ thay đổi theo kỹ năng, nên người câu cá mới nhất trên bến tàu có cùng cơ hội như Ngư Sư Thành Thạo.",
+        "tablesNote": "Your proficiency selects one of three catch bands: band 0 from the start, band 1 at 100, band 2 at 200, each shifting weight out of junk and empty hooks into real fish, zone by zone. Each band above the first also demands a rod: band 1 wants the tier 2 Ironreel, band 2 the tier 3 Silverstream. Your effective band is the lower of what your skill has earned and what your rod supports, and the cap is silent: with a lesser rod you still catch, just off the lower band's table, so if your catches feel stuck while your skill climbs, check your rod first.\n\nEach zone's waters hold their own pair of food fish, healing more the deeper the zone, all of them cooking inputs and perfectly good sit-and-eat food raw off the line. The rest of the table is the angler's tax: weed, the occasional boot, and the empty hook, which never fully disappears. How much you pay depends on the water your bobber lands in, not where you stand: a cast reaches up to 24 yards, and the rod the water demands, the table it draws from, the deed it credits, and how far it teaches all answer to the zone that water belongs to, decided the moment the line lands. Each zone's water is written for a band of its own, the Vale for band 0, the marsh for band 1, the peaks for band 2, and fishing one band under that turns roughly a third of your casts into empty hooks, two bands under it more than half. The rod gets you to the water; the skill is what makes it pay, and the climb is what pulls an angler deeper, because better bands are not just better pay: past the Vale they are the only waters that keep teaching. The {rare} is the one row that answers to your catch band and nothing else: the same odds in every zone, and six times likelier at band 2 than at band 0, so the rarest thing on the dock is the one a Master Angler really is better at.",
         "bandHeading": "Ngưỡng {band}: thành thạo {at} trở lên, cần câu bậc {rod}",
         "colCatch": "Cá câu được",
         "colOdds": "Xác suất",
         "pctFmt": "{pct}%",
         "emptyHook": "Không có gì cắn mồi",
         "koiHeading": "Cá Koi Ánh Nắng",
-        "koiBody": "Mỗi vùng nước trong trò chơi đều ẩn giấu cùng một phần thưởng: Cá Koi Ánh Nắng, một ánh sáng lấp lánh hiếm trên dây câu đáng giá 75 đồng đồng khi bán cho NPC và nhiều hơn thế cho niềm tự hào của bạn. Xác suất của nó là một tỷ lệ cố định 3 phần trăm mỗi lần câu được (4 phần trăm trong vùng nước lạnh của Thornpeak) ở mọi ngưỡng, và câu được một con sẽ ghi Tia Hy Vọng vào Sách Kỳ Công của bạn, một dấu ấn sưu tầm không có Danh Vọng. Khi điều đó xảy ra, nhật ký đảm bảo bạn biết."
+        "koiBody": "Every body of water in the game hides the same prize: the Sunglint Koi, an uncommon gleam on the line worth 75 copper to a vendor and rather more to your pride. Its odds answer to your catch band and to nothing else, the same in every zone: a 1 percent row of the catch table at band 0, 3 at band 1, and 6 at band 2, drawn on every reeled-in cast, so the koi comes to the angler who earned the deep tables. Landing one records Glimmer of Hope in your Book of Deeds, a zero-Renown collector's mark. When it happens, the log makes sure you know."
       },
       "econ": {
         "title": "Kinh Tế Chế Tác",
@@ -4190,7 +4374,7 @@ export const vi_VN: EnTranslations = {
         "feeUnbind": "Phí tháo giao kèo",
         "feeUnbindValue": "{uncommon} khác thường, {rare} hiếm, {epic} sử thi",
         "trainingHeading": "Phí học nghề",
-        "trainingNote": "Một mức phí cố định mỗi nấc công thức, tính một lần khi bậc thầy dạy nó; các bậc cao hơn trong bảng chờ nội dung tương lai.",
+        "trainingNote": "One flat fee per recipe rung, charged once when a master teaches it; every rung of the table below is in live use today, from the free starter recipes to the toolmaker's rod lessons at the top.",
         "trainingTierFmt": "Bậc {tier}: {fee}",
         "free": "Miễn phí",
         "sellsHeading": "Những gì bán được, và tại sao",
@@ -4206,11 +4390,11 @@ export const vi_VN: EnTranslations = {
         "commissionsHeading": "Ủy thác và Giao Kèo Thợ Thủ Công",
         "commissionsBody": "Ủy thác là đồ chế tác cho người khác. Khi chế tác vũ khí, trang phục giáp, hoặc vật phẩm cầm tay phụ (một bình thuốc không thể mang giao kèo), thợ thủ công có thể đánh dấu món đồ là ủy thác: món đồ hoàn thiện hoạt động bình thường trong tay người làm, nhưng ngay khoảnh khắc nó đổi tay trong giao dịch, nó ràng buộc với người nhận. Đó là Giao Kèo Thợ Thủ Công: người mua nhận được món đồ, và món đồ không thể chuyển tiếp hay bán lại.\n\nGiao kèo không phải mãi mãi, chỉ là tốn kém. Bất kỳ chủ bàn nào cũng có thể tháo giao kèo cho một món đồ đã ràng buộc khi bạn đứng tại bàn của họ (bàn di động không bao giờ cung cấp dịch vụ này), với phí theo phẩm chất vật phẩm: 25 bạc cho khác thường, 1 vàng cho hiếm, 4 vàng cho sử thi, huyền thoại trả theo giá sử thi và một đồ phổ thông ủy thác trả theo giá khác thường.\n\nPhí mua lấy tờ giấy trắng, không phải thuốc chữa: món đồ vẫn là ủy thác, nên nó ràng buộc lại với bất kỳ ai nhận nó trong lần giao dịch tiếp theo, và mọi thứ khác về nó, dấu thợ, kiệt tác, và pháp khắc, đều còn nguyên vẹn.",
         "provenanceHeading": "Đồ có dấu thợ",
-        "provenanceBody": "Một số vật phẩm mang theo tên người. Di chuột lên và tooltip ghi Thu hoạch bởi ai đó trên nguyên liệu thô, hoặc Chế tác bởi ai đó trên món đồ hoàn thiện: cùng dấu ấn đó, được diễn đạt theo cách vật phẩm được tạo ra. Dấu thợ là một phần của bản thân vật phẩm, đi theo nó qua các giao dịch và ngân hàng, và không bao giờ mờ đi.\n\nThu hoạch tự động ký những sản phẩm tốt nhất của mình: bất kỳ vụ thu hoạch nào đạt phẩm chất hiếm trở lên đều đến có dấu thợ, những phát hiện hiếm ký toàn bộ vụ thu hoạch gấp năm lần, và lần may mắn khi thu hoạch xác có dấu thợ trên sản lượng của nó, kể cả mẫu vật nguyên vẹn. Chế tác ký theo cùng quy tắc: sản phẩm đầu ra một bản có phẩm chất hiếm trở lên đều ra có dấu, và kiệt tác luôn ký dù phẩm chất nào, nên phiên bản tốt nhất của bất kỳ món đồ nào đều luôn ghi tên thợ làm ra nó. Điều duy nhất có thể làm mất dấu thợ là túi đầy: một đơn vị có dấu cần chỗ riêng của nó, hoặc một ngăn xếp đã ký khớp, để đặt vào.\n\nMột ngăn xếp vật phẩm chia sẻ một danh tính, nên hai bản chỉ gộp lại khi mọi dấu hiệu khớp chính xác: cùng vật phẩm, cùng người ký, cùng chỉ số kiệt tác, cùng pháp khắc, cùng giao kèo. Một khúc gỗ có dấu không bao giờ nhập vào đống thường theo hướng nào (gộp lại sẽ xóa tên của ai đó), nhưng các payload giống hệt nhau gộp lại thoải mái, nên hai mươi quặng do cùng một thợ thu hoạch ký nằm trong một ngăn xếp và một vụ may mắn không làm rách túi của bạn.\n\nDấu thợ mang lại lợi ích cho thợ chế tác: tiêu thụ bất kỳ nguyên liệu có dấu thợ nào, dù ai ký, cộng thêm 2 điểm phần trăm cơ hội kiệt tác, và giữ một nguyên liệu do chính tay bạn ký sẽ giảm số lượng cần dùng của nguyên liệu đó đi một (không bao giờ xuống dưới một). Ngay cả những sản phẩm hiếm trở lên bạn đã ký tiếp tục dạy bạn: khi một món bạn ký hoạt động trong tay bạn, một bình thuốc uống đúng lúc, đòn kết liễu trúng đích, giáp mặc khi hạ quái, một dòng kỹ năng nhỏ chảy về nghề đã tạo ra nó, miễn là nghề đó là một trong những nghề chính bạn đang hoạt động.",
+        "provenanceBody": "Some items carry a name. Hover one and the tooltip says Gathered by so-and-so on a raw material, or Crafted by so-and-so on a finished piece: the same mark, worded for how the item came to be. A signature is part of the item itself, travels with it through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fades.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. The one thing that can cost you a signature is a full bag: a signed unit needs room of its own, or a matching signed stack, to land in.\n\nA stack of items shares one identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. A signed log never joins a plain pile in either direction (merging would erase somebody's name), but identical payloads merge happily, so twenty ore signed by the same gatherer sit in one stack and a windfall does not shred your bags.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through the flask alone: drink a potion you signed and a small trickle of skill flows back to the craft that brewed it, as long as that craft is one of your active majors.",
         "collectorsHeading": "Người sưu tầm, chiến tích, và giá của một câu chuyện",
         "collectorsBody": "Người bán NPC không quan tâm xuất xứ: một vật phẩm có dấu thợ bán cho NPC vẫn đúng giá thông thường. Phần giá trị tăng thêm của dấu thợ chỉ tồn tại giữa các người chơi, và đó chính xác là điều làm nó thú vị: một đống quặng may mắn được ký bởi một thợ thu hoạch nổi tiếng, một Miếng Ngon từ vụ thu hoạch may mắn, một lưỡi kiệt tác ghi tên thợ rèn đã nghỉ hưu từ lâu, tất cả đều có giá là bao nhiêu ký ức của ai đó nói lên.\n\nSách Kỳ Công cũng dựa vào cùng cảm giác đó: Mạch Nguyên Sơ, Lõi Cây Cổ Đại, Bông Trăng, Mẫu Vật Hoàn Hảo, và Tia Hy Vọng là những dấu ấn sưu tầm không có Danh Vọng tồn tại thuần túy để chứng minh một khoảnh khắc đã xảy ra với bạn. Giữ lại vật phẩm đã kiếm được kỳ công và bạn nắm giữ biên lai. Tất cả những thứ này không phải sức mạnh; xuất xứ không mua được chỉ số và không thắng được trận chiến, đó là dấu vết giấy tờ của những ngày tốt lành trong trò chơi.",
         "throttleHeading": "Giới hạn hành động",
-        "throttleBody": "Sản lượng có giới hạn trần: chế tác, hủy pháp khắc, pháp khắc, và tháo dỡ dùng chung một ngân sách {actions} hành động thành công trên mỗi {seconds} giây luân phiên. Một lần thử bị từ chối không tốn gì và không tiêu ngân sách. Bạn sẽ không bao giờ cảm nhận điều này khi chơi bình thường; nó tồn tại để một chuyên gia đã đạt đỉnh với ngân hàng đầy không thể làm ngập Chợ, dù kỹ năng hay kho nguyên liệu của họ thế nào.",
+        "throttleBody": "Output has a ceiling: crafting, disenchanting, enchanting, salvaging, and tool-effect recharges share one budget of {actions} successful actions in each {seconds}-second window. A denied attempt costs nothing and spends no budget. You will never feel it in normal play; it exists so a maxed specialist with a full bank cannot flood the Market, whatever their skill or stockpile.",
         "doctrineHeading": "Người chơi giao dịch với người chơi",
         "doctrineBody": "Nền kinh tế chế tác được xây dựng trên một ý tưởng: người chơi cung cấp cho người chơi. Thợ thu hoạch nuôi thợ chế tác, thợ chế tác nuôi người làm nhiệm vụ và raider, còn thợ phá đồ nuôi thợ pháp khắc, với người bán NPC và chủ bàn đứng ở rìa để hấp thụ đồ rác và tiền vàng thay vì cạnh tranh với bạn. Nếu bạn muốn kiếm tiền từ một nghề, khách hàng của bạn là con người: hãy tìm hiểu những gì người chơi khác tiêu hao, định giá so với Chợ Thế Giới, và xem hệ thống NPC là sàn giá dưới mức giá của bạn, không phải là thị trường thực sự.\n\nTrang bị chế tác được cân bằng để nằm dưới ngưỡng raid: ngay cả kiệt tác cũng chỉ một bậc phẩm chất cao hơn công thức của nó, không bao giờ vượt huyền thoại, và ngân sách chỉ số của nó nằm dưới dải loot raid. Lò rèn giúp bạn sẵn sàng cho nội dung khó nhất; nó không thay thế nội dung đó. Điều này giữ thợ chế tác, raider, và thị trường trong tam giác ổn định: đồ rơi raid vẫn là mục tiêu khát khao, và đồ chế tác vẫn là trang bị tốt nhất tiền có thể mua."
       },
@@ -4224,15 +4408,15 @@ export const vi_VN: EnTranslations = {
         "q3": "Khác biệt giữa nhặt loot và thu hoạch xác là gì?",
         "a3": "Một lần nhấn bao gồm cả hai. Mọi thứ xác mang theo, tiền vàng và đồ rơi cùng với các thành phần có thể thu hoạch, mở ra trong cùng một cửa sổ: loot theo các quy tắc loot thông thường, và thu hoạch là phía nghề nghiệp, tước nguyên liệu từ chính cái xác.\n\nThu hoạch là người đến trước, dùng một lần: mỗi xác chỉ có thể được thu hoạch đúng một lần, bởi người đầu tiên đến nhận, có mặt trực tuyến hay không. Trọng Tâm Thị Trấn của bạn quyết định những gì bạn nhận được: khi đứng trong trung tâm thị trấn, bạn có thể phân bổ 10 điểm trọng tâm cho các loại thành phần bạn quan tâm, và mỗi thành phần được trọng tâm nhận được bậc tốt hơn (cứ 5 điểm tăng một bậc, tối đa hai bậc) và nhiều hơn (10 phần trăm mỗi điểm). Các thành phần không được trọng tâm không bao giờ bị làm tệ đi.",
         "q4": "Tại sao Khúc Gỗ Vỏ Sắt của tôi có dấu thợ?",
-        "a4": "Bạn trúng vận may bội thu. Khoảng 1 lần thu hoạch trong 90 kích hoạt sự kiện thu hoạch hiếm (lõi cây cổ đại trên cây, mạch nguyên sơ trên quặng, bông trăng trên thảo dược): nó nhân sản lượng lên năm lần, ký mỗi đơn vị bằng tên bạn, và thông báo phát hiện cho cả vùng. Một lần lăn phẩm chất hiếm trở lên trong vụ thu hoạch thông thường cũng ký sản lượng.\n\nNguyên liệu có dấu thợ đáng giữ lại hoặc bán giá cao: tiêu thụ bất kỳ nguyên liệu có dấu nào trong chế tác cộng thêm 2 phần trăm cơ hội kiệt tác. Chỉ nhớ là chúng chỉ xếp chồng với các bản ký giống hệt nhau, nên chúng giữ ô túi riêng của mình.",
+        "a4": "You hit a windfall. Roughly 1 harvest in 90 triggers a rare gather event (ancient heartwood on a tree, a pristine vein on ore, a moonlit bloom on herbs): it multiplies the yield five times, signs every unit with your name, and announces the find to the whole zone. A rare or better rarity roll on an ordinary harvest signs the yield too.\n\nSigned materials are worth keeping or selling dear: holding any signed copy of a needed reagent at the bench adds 2 percentage points to the masterwork chance. Just remember they only stack with identically signed copies, so they keep their own bag slot.",
         "q5": "Làm thế nào để tháo giao kèo đồ ủy thác, và tốn bao nhiêu?",
         "a5": "Đến bất kỳ bàn chế tác nào với món đồ trong túi và trả tiền cho chủ bàn. Phí theo phẩm chất vật phẩm: 25 bạc cho đồ khác thường, 1 vàng cho đồ hiếm, 4 vàng cho đồ sử thi; huyền thoại trả theo giá sử thi, và đồ phổ thông ủy thác trả theo giá khác thường. Phải là bàn thật: bàn di động không bao giờ cung cấp dịch vụ này.\n\nPhí mua lấy tờ giấy trắng, không phải thuốc chữa: món đồ vẫn là ủy thác, nên nó ràng buộc lại với bất kỳ ai nhận nó trong lần giao dịch tiếp theo. Nếu nhiều bản đã ràng buộc chia sẻ một ngăn xếp, một bản được bóc ra và tháo giao kèo mỗi lần trả phí.",
         "q6": "Học công thức ở đâu, và tốn bao nhiêu?",
-        "a6": "Chín công thức thực địa phổ thông và các công thức công cụ ai cũng biết từ đầu, cũng như ba công thức đỉnh gắn với bàn (Áo Choàng Vai Vảy Lò, Mũ Wardweave, và Yếm Duskhide), không cần người dạy, chỉ cần bàn của chúng. Mọi thứ còn lại do các bậc thầy thường trú dạy tại các bàn của họ khắp ba thị trấn trung tâm: hầu hết đứng ở Đông Khê, thợ thuộc da giữ xưởng thuộc da ở Fenbridge, và thợ giả kim giữ tiệm bào chế ở Highwatch.\n\nCác công thức từ người dạy có theo nấc ở kỹ năng 0, 25, và 50, giá miễn phí, 25 bạc, và 1 vàng một lần. Bậc thầy dạy công thức khi ngưỡng của bạn trong nghề đó đã đạt ngưỡng của công thức, và bạn phải đứng tại bàn của họ để học: bàn di động không tính.",
+        "a6": "The nine common field recipes and the six crafted land-tool recipes are known to everyone from the start, and so are three station-bound capstones (the Kilnscale Mantle, the Wardweave Cowl, and the Duskhide Wraps), which need no trainer, only their station. Everything else is taught by the resident masters at their stations across the three hub towns: most stand in Eastbrook, the tanner keeps the tannery in Fenbridge, and the alchemist keeps the apothecary in Highwatch.\n\nTrainer recipes run in rungs: skill 0, 25, and 50 for the gear and consumable crafts, priced free, 25 silver, and 1 gold as one-time fees; Enchanting's two charm recipes sit on the 25 rung, and the toolmaker teaches the two crafted fishing rods at 75 and 125 for 4 and 16 gold. A master teaches a recipe once your bracket in that craft has reached the recipe's own bracket, and you must be standing at their station to learn: a mobile station does not count.",
         "q7": "Tại sao việc thu hoạch của tôi đột nhiên chậm lại?",
-        "a7": "Lần đúc bắt đầu ở 2,5 giây và được rút ngắn theo hai cách: 0,4 giây cho mỗi bậc công cụ bạn có cao hơn bậc của điểm tài nguyên, và 0,15 giây cho mỗi ngưỡng thành thạo bạn đã vượt qua (ở 100 và 200), với sàn là 1,5 giây. Chuyển từ điểm tài nguyên bậc 1 lên điểm bậc 3 và lợi thế của bạn biến mất, nên cùng cây cuốc đó đánh chậm hơn lại. Sở hữu đúng bậc yêu cầu không mua tốc độ; nó chỉ mở điểm tài nguyên.\n\nViệc tăng kỹ năng mờ dần theo cách tương tự chế tác: một điểm tài nguyên mờ đi khi thành thạo của bạn leo lên qua bậc của nó (điểm bậc 1 không dạy gì từ thành thạo 75 trở lên), nên câu trả lời cho việc tăng chậm là điểm tài nguyên bậc cao hơn, cần công cụ ít nhất bằng bậc của chúng (tay không tính là bậc 1). Câu cá theo đà giảm riêng: điểm đầy đủ dưới thành thạo 50, nửa điểm dưới 100, một giọt 0,1 dưới 150 và 0,02 dưới 200, và các lần câu được đồ rác không dạy gì cả từ 100 trở lên.",
+        "a7": "The gather cast starts at 2.5 seconds and is shaved down two ways: 0.4 seconds for every tool tier you carry and can wield above the node's own tier, and 0.15 seconds once your trade's counter crosses its 100 band, with a floor of 1.5 seconds. Move from tier 1 nodes up to tier 3 nodes and your surplus vanishes, so the same pick swings slower again. Holding exactly the required tier buys no speed; it only opens the node.\n\nSkill gain fades the same way crafting does: a node grays out as your proficiency climbs past its tier (tier 1 nodes teach nothing from proficiency 75 on), so the answer to slow gains is higher tier nodes. Those need a tool of at least their tier in your bags (no node is ever worked bare-handed, tier 1 included), and a land tool above tier 1 also wants its wield mark first, 40/70/85/100 in its own trade for tiers 2 through 5. Fishing follows its own taper: full gain below 50 proficiency, half below 100, a trickle of 0.1 below 150 and 0.02 below 200, junk catches teach nothing at all from 100 on, and the water itself caps the lesson (tier 1 waters stop teaching at 100, the marsh at 150), so a stalled counter can also mean you have outgrown the water.",
         "q8": "Tôi có thể chế tác khi không ở trong thị trấn không?",
-        "a8": "Một phần. Chín công thức thực địa phổ thông (vũ khí, giáp, thức ăn, và bình thuốc cơ bản) chế tác ở bất cứ đâu, bất cứ lúc nào. Mọi thứ trên chúng đều gắn với loại bàn: lò rèn, bếp nấu, tiệm bào chế, xưởng thuộc da, khung cửi, hoặc xưởng dụng cụ, và bạn phải trong vòng 20 thước của bàn để lần chế tác được thực hiện.\n\nỞ kỹ năng 75 trong một nghề bạn chuyên, và cùng với giảm 20 phần trăm nguyên liệu bạn nhận được bàn di động: đặt nó ngoài thực địa và nó đứng 10 phút, phục vụ các công thức của nghề đó như thể bạn đang ở bàn thật. Bàn di động chỉ để chế tác: học công thức và tháo giao kèo ủy thác luôn đòi hỏi bàn thật trong thị trấn."
+        "a8": "Partly. The nine common field recipes (the starter weapon, armor, food, and potion staples) craft anywhere, any time, and so do the three combination recipes of the sworn pairs. Everything else above them is bound to a station type: forge, kitchens, apothecary, tannery, loom, or toolworks, and you must be within 20 yards of the station for the craft to go through.\n\nAt 75 skill in a craft you specialize, and along with a 20 percent material discount you gain a mobile station: place it in the field and it stands for 10 minutes, serving that craft's recipes as if you were at the real thing. The mobile station is for crafting only: learning recipes and unbinding commissions always require the true station in town."
       }
     },
     "economy": {
@@ -5050,6 +5234,7 @@ export const vi_VN: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "Đặc quyền chủ sở hữu đang hoạt động. Kết nối ứng dụng khi bạn cần ký hoặc chi tiêu.",
     "extensionHelp": "Để thấy ví ở đây, hãy giữ một tiện ích ví trình duyệt như Solflare Wallet đang hoạt động.",
     "mobileAppHelp": "Hãy chọn Phantom hoặc Solflare. Ứng dụng ví của bạn sẽ yêu cầu phê duyệt. Giữ trò chơi này mở và quay lại khi hoàn thành.",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "Kết nối ví chưa có sẵn trong ứng dụng Màn hình chính. Hãy mở World of ClaudeCraft trong Safari hoặc Chrome để sử dụng Phantom hoặc Solflare.",
     "openAppTitle": "Tiếp tục trong {wallet}",
     "openAppHelp": "Hãy mở {wallet} để xem xét yêu cầu này. Giữ tab trò chơi này mở trong khi ứng dụng ví đang hoạt động.",
@@ -5249,55 +5434,55 @@ export const vi_VN: EnTranslations = {
   },
   "sim": {
     "rift": {
-      "allUnstable": "All rifts are unstable right now. Try again soon.",
-      "enterFloor": "You step through the rift into {name}.",
-      "descendFloor": "You descend deeper into {name}.",
-      "stepBack": "You step back through the rift.",
-      "pylonLit": "A rune pylon flares to life ({lit}/{total}).",
-      "wayDownOpens": "The way down tears open.",
-      "exitOpens": "The rift shudders. A way home tears open behind the fallen.",
-      "portalOpens": "A {tier}-rank rift tears open in {zone}!",
-      "portalSealed": "The {tier}-rank rift in {zone} has been sealed.",
-      "portalCollapses": "The {tier}-rank rift in {zone} collapses.",
-      "levelGate": "Only adventurers of level {level} or higher may enter this rift.",
-      "deadEntry": "You cannot enter a rift while dead.",
-      "deadEntryCombat": "Your party is still in combat. The dead may re-enter once the fighting stops.",
-      "iceGoalLit": "The frost sigil blazes. The way stirs.",
-      "socketsShut": "The sockets grind shut. The way stirs.",
-      "seqProgress": "The runes answer in turn ({step}/{total}).",
-      "seqReset": "The runes go dark. Begin again.",
-      "gateOpen": "The gate grinds open.",
-      "orbSealed": "The orb is sealed by the ritual below.",
-      "orbWakes": "The pentagram's flame gutters out. Something wakes on the altar.",
-      "orbOpensGate": "The Blood Orb flares. The gates of the temple grind open.",
-      "alreadyCleared": "This rift has already been cleared by {names}.",
-      "raceLost": "The rift has already been cleared by {names}. Your run ends.",
-      "raceWorldWin": "{names} won the {tier}-rank Rift race in {seconds}s!",
-      "raceWinBanner": "Rift Race Won - {seconds}s",
-      "raceLostBanner": "Rift Already Cleared",
-      "forgeUpgraded": "Rift upgrade completed for {name}.",
-      "forgeEnchanted": "Rift enchant completed for {name}.",
-      "forgeSocketed": "Rift gem socketed for {name}.",
-      "detonateGlacialGrave": "Glacial Grave detonates!",
-      "detonateAbsoluteZero": "Absolute Zero erupts!",
-      "detonateMagmaWell": "Magma Well erupts!",
-      "detonateCoreMeltdown": "Core Meltdown detonates!",
-      "detonateVenomPool": "Venom Pool erupts!",
-      "detonateBroodmothersMark": "Broodmother's Mark detonates!",
-      "detonateSoulGrave": "Soul Grave detonates!",
-      "detonateDeathSentence": "Death Sentence falls!",
-      "detonateEarthshatter": "Earthshatter detonates!",
-      "detonateFinalJudgment": "Final Judgment lands!",
-      "detonateVoidRift": "Void Rift detonates!",
-      "detonateArcaneAnnihilation": "Arcane Annihilation erupts!",
-      "detonateLightningRod": "Lightning Rod strikes!",
-      "detonateStormcallersWrath": "Stormcaller's Wrath erupts!",
-      "detonateAbyssalMaw": "Abyssal Maw closes!",
-      "detonateCrushingDepth": "Crushing Depth crushes!",
-      "detonatePactSeal": "Pact Seal detonates!",
-      "detonateBloodRite": "Blood Rite falls!",
-      "detonatePitSentence": "Pit Sentence detonates!",
-      "detonateHellfireBrand": "Hellfire Brand detonates!"
+      "allUnstable": "Tất cả Rạn Nứt hiện đang không ổn định. Hãy thử lại sau.",
+      "enterFloor": "Bạn bước qua Rạn Nứt vào {name}.",
+      "descendFloor": "Bạn đi sâu hơn vào {name}.",
+      "stepBack": "Bạn bước lùi qua Rạn Nứt.",
+      "pylonLit": "Một trụ rune bùng sáng ({lit}/{total}).",
+      "wayDownOpens": "Lối đi xuống xé toạc mở ra.",
+      "exitOpens": "Rạn Nứt rung chuyển. Một lối về nhà xé toạc mở ra phía sau những kẻ đã ngã xuống.",
+      "portalOpens": "Một Rạn Nứt hạng {tier} xé toạc mở ra tại {zone}!",
+      "portalSealed": "Rạn Nứt hạng {tier} tại {zone} đã bị niêm phong.",
+      "portalCollapses": "Rạn Nứt hạng {tier} tại {zone} sụp đổ.",
+      "levelGate": "Chỉ những nhà thám hiểm cấp độ {level} trở lên mới có thể vào Rạn Nứt này.",
+      "deadEntry": "Bạn không thể vào Rạn Nứt khi đang chết.",
+      "deadEntryCombat": "Nhóm của bạn vẫn đang trong giao tranh. Người đã chết có thể vào lại khi trận chiến kết thúc.",
+      "iceGoalLit": "Ấn băng bùng cháy. Con đường lay động.",
+      "socketsShut": "Các hốc khóa kèn kẹt đóng lại. Con đường lay động.",
+      "seqProgress": "Các rune lần lượt hồi đáp ({step}/{total}).",
+      "seqReset": "Các rune tối sầm lại. Bắt đầu lại.",
+      "gateOpen": "Cánh cổng kèn kẹt mở ra.",
+      "orbSealed": "Quả cầu bị niêm phong bởi nghi lễ bên dưới.",
+      "orbWakes": "Ngọn lửa của ngôi sao ngũ giác tàn lụi. Có thứ gì đó thức giấc trên bàn thờ.",
+      "orbOpensGate": "Quả Cầu Máu bùng sáng. Cánh cổng ngôi đền kèn kẹt mở ra.",
+      "alreadyCleared": "Rạn Nứt này đã bị {names} dọn sạch.",
+      "raceLost": "Rạn Nứt đã bị {names} dọn sạch. Lượt chạy của bạn kết thúc.",
+      "raceWorldWin": "{names} đã chiến thắng đường đua Rạn Nứt hạng {tier} trong {seconds} giây!",
+      "raceWinBanner": "Chiến Thắng Đường Đua Rạn Nứt - {seconds} giây",
+      "raceLostBanner": "Rạn Nứt Đã Được Dọn Sạch",
+      "forgeUpgraded": "Đã hoàn tất nâng cấp Rạn Nứt cho {name}.",
+      "forgeEnchanted": "Đã hoàn tất phù phép Rạn Nứt cho {name}.",
+      "forgeSocketed": "Đã gắn ngọc Rạn Nứt cho {name}.",
+      "detonateGlacialGrave": "Nấm Mồ Băng Hà phát nổ!",
+      "detonateAbsoluteZero": "Độ Không Tuyệt Đối bùng nổ!",
+      "detonateMagmaWell": "Giếng Dung Nham bùng nổ!",
+      "detonateCoreMeltdown": "Lõi Nóng Chảy phát nổ!",
+      "detonateVenomPool": "Vũng Nọc Độc bùng nổ!",
+      "detonateBroodmothersMark": "Dấu Ấn Của Mẹ Bầy phát nổ!",
+      "detonateSoulGrave": "Nấm Mồ Linh Hồn phát nổ!",
+      "detonateDeathSentence": "Án Tử sập xuống!",
+      "detonateEarthshatter": "Đại Địa Chấn phát nổ!",
+      "detonateFinalJudgment": "Phán Quyết Cuối Cùng giáng xuống!",
+      "detonateVoidRift": "Vết Rạn Hư Không phát nổ!",
+      "detonateArcaneAnnihilation": "Hủy Diệt Huyền Thuật bùng nổ!",
+      "detonateLightningRod": "Cột Thu Lôi giáng xuống!",
+      "detonateStormcallersWrath": "Thịnh Nộ Của Kẻ Gọi Bão bùng nổ!",
+      "detonateAbyssalMaw": "Hàm Vực Thẳm khép lại!",
+      "detonateCrushingDepth": "Nghiền Nát Vực Sâu nghiền nát!",
+      "detonatePactSeal": "Ấn Khế Ước phát nổ!",
+      "detonateBloodRite": "Nghi Lễ Máu sập xuống!",
+      "detonatePitSentence": "Án Phạt Vực Ngục phát nổ!",
+      "detonateHellfireBrand": "Ấn Hỏa Ngục phát nổ!"
     },
     "delve": {
       "cannotEnterNow": "Bạn không thể vào hầm thám hiểm lúc này.",
@@ -6170,6 +6355,7 @@ export const vi_VN: EnTranslations = {
         "add": "Thêm kênh trò chuyện",
         "addTitle": "Thêm kênh",
         "close": "Đóng thẻ {channel}",
+        "moveHint": "Sắp xếp lại tab {channel}: kéo nó, hoặc dùng Alt+Trái và Alt+Phải",
         "sendingTo": "Nhắn {channel}",
         "names": {
           "say": "Nói",
@@ -6226,11 +6412,15 @@ export const vi_VN: EnTranslations = {
       "graphicsPresetMedium": "Trung Bình",
       "graphicsPresetHigh": "Cao",
       "graphicsPresetUltra": "Cực Cao",
+      "graphicsPresetInsane": "Cực Đại",
       "graphicsPresetAdvanced": "Nâng Cao",
       "terrainDetail": "Chi Tiết Địa Hình",
       "foliageDensity": "Mật Độ Cây Cỏ",
       "effectsQuality": "Hiệu Ứng & Ánh Sáng",
       "shadowQuality": "Chất Lượng Bóng Đổ",
+      "surfaceDetail": "Chi Tiết Bề Mặt",
+      "surfaceDetailBasic": "Cơ Bản",
+      "surfaceDetailFull": "Đầy Đủ",
       "terrainLow": "Thấp",
       "terrainHigh": "Cao",
       "touchOpacity": "Độ Mờ Điều Khiển Cảm Ứng",
@@ -6394,6 +6584,8 @@ export const vi_VN: EnTranslations = {
       "joinParty": "Gia Nhập Tổ Đội",
       "guildInvite": "{name} mời bạn gia nhập {guild}.",
       "joinGuild": "Gia Nhập Bang Hội",
+      "guildInviteCancelled": "Lời mời gia nhập bang hội đang chờ xử lý đã bị hủy vì bang hội đã đổi tên.",
+      "guildRenamed": "Bang hội của bạn đã được đội kiểm duyệt đổi tên thành {name}.",
       "tradeRequest": "{name} muốn giao dịch với bạn.",
       "openTrade": "Mở Giao Dịch",
       "duelRequest": "{name} đã thách đấu tay đôi với bạn!",
@@ -6407,6 +6599,9 @@ export const vi_VN: EnTranslations = {
       "floatingDodge": "Né",
       "floatingParry": "Gạt Đòn",
       "floatingResist": "Kháng",
+      "floatingEvade": "Lẩn Tránh",
+      "floatingHealFull": "Đầy",
+      "floatingHealAbsorbed": "Hấp Thụ",
       "cannotMove": "Không thể di chuyển!",
       "attack": "tấn công",
       "damageDone": "{ability} của bạn đánh trúng {target} gây {amount}.",
@@ -6417,10 +6612,15 @@ export const vi_VN: EnTranslations = {
       "dodged": "{ability} của bạn bị {target} né.",
       "parried": "{ability} của bạn bị {target} gạt đòn.",
       "resisted": "{target} kháng lại {ability} của bạn.",
+      "evaded": "{target} lẩn tránh {ability} của bạn.",
       "healSelf": "{ability} của bạn hồi {amount} máu cho bạn.",
       "healSelfCrit": "{ability} của bạn chí mạng hồi {amount} máu cho bạn.",
       "healOther": "{ability} của bạn hồi {amount} máu cho {target}.",
       "healOtherCrit": "{ability} của bạn chí mạng hồi {amount} máu cho {target}.",
+      "healSelfFull": "{ability} của bạn đã trúng, nhưng bạn đã đầy máu.",
+      "healOtherFull": "{ability} của bạn đã trúng {target}, nhưng mục tiêu đã đầy máu.",
+      "healSelfAbsorbed": "Ôn dịch trên người bạn nuốt chửng {ability} của bạn.",
+      "healOtherAbsorbed": "Ôn dịch trên {target} nuốt chửng {ability} của bạn.",
       "death": "{name} gục ngã.",
       "auraGain": "Bạn nhận được {name}.",
       "auraFade": "{name} tan biến khỏi bạn.",
@@ -6509,10 +6709,12 @@ export const vi_VN: EnTranslations = {
       "arenaQueueTrading": "Hãy hoàn tất giao dịch trước khi xếp hàng.",
       "arenaQueueInstance": "Bạn không thể xếp hàng khi đang ở trong hầm ngục.",
       "tradeInProgress": "Một giao dịch đang diễn ra.",
+      "tradeAlreadyTrading": "Người chơi đó đang giao dịch.",
       "tradeTooFar": "Mục tiêu ở quá xa để giao dịch.",
       "tradeExpired": "Yêu cầu giao dịch đã hết hạn.",
       "tradeFailed": "Giao dịch thất bại: vật phẩm hoặc tiền không còn khả dụng.",
-      "tradeBound": "Vật phẩm đó đã bị ràng buộc và không thể giao dịch."
+      "tradeBound": "Vật phẩm đó đã bị ràng buộc và không thể giao dịch.",
+      "marketListBound": "Vật phẩm đó đã bị ràng buộc và không thể rao bán."
     },
     "logs": {
       "standUp": "Bạn đứng dậy.",
@@ -6780,22 +6982,22 @@ export const vi_VN: EnTranslations = {
       "gathering": "Thu Thập",
       "demonHeal": "Quỷ Trị Liệu",
       "thunzharrStormcall": "Tiếng Gọi Bão",
-      "rift_frost_execution": "Glacial Grave",
-      "rift_frost_strike": "Absolute Zero",
-      "rift_ember_execution": "Magma Well",
-      "rift_ember_strike": "Core Meltdown",
-      "rift_venom_execution": "Venom Pool",
-      "rift_venom_strike": "Broodmother's Mark",
-      "rift_necro_execution": "Soul Grave",
-      "rift_necro_strike": "Death Sentence",
-      "rift_brute_execution": "Earthshatter",
-      "rift_brute_strike": "Final Judgment",
-      "rift_arcane_execution": "Void Rift",
-      "rift_arcane_strike": "Arcane Annihilation",
-      "rift_storm_execution": "Lightning Rod",
-      "rift_storm_strike": "Stormcaller's Wrath",
-      "rift_tide_execution": "Abyssal Maw",
-      "rift_tide_strike": "Crushing Depth"
+      "rift_frost_execution": "Nấm Mồ Băng Hà",
+      "rift_frost_strike": "Độ Không Tuyệt Đối",
+      "rift_ember_execution": "Giếng Dung Nham",
+      "rift_ember_strike": "Lõi Nóng Chảy",
+      "rift_venom_execution": "Vũng Nọc Độc",
+      "rift_venom_strike": "Dấu Ấn Của Mẹ Bầy",
+      "rift_necro_execution": "Nấm Mồ Linh Hồn",
+      "rift_necro_strike": "Án Tử",
+      "rift_brute_execution": "Đại Địa Chấn",
+      "rift_brute_strike": "Phán Quyết Cuối Cùng",
+      "rift_arcane_execution": "Vết Rạn Hư Không",
+      "rift_arcane_strike": "Hủy Diệt Huyền Thuật",
+      "rift_storm_execution": "Cột Thu Lôi",
+      "rift_storm_strike": "Thịnh Nộ Của Kẻ Gọi Bão",
+      "rift_tide_execution": "Hàm Vực Thẳm",
+      "rift_tide_strike": "Nghiền Nát Vực Sâu"
     }
   },
   "questUi": {
@@ -6803,7 +7005,8 @@ export const vi_VN: EnTranslations = {
       "title": "Nhiệm Vụ",
       "complete": "Hoàn Thành",
       "showOnMap": "Hiện {name} trên bản đồ",
-      "hideFromMap": "Ẩn {name} khỏi bản đồ"
+      "hideFromMap": "Ẩn {name} khỏi bản đồ",
+      "unknownQuest": "Unknown quest ({id})"
     },
     "log": {
       "title": "Nhật Ký Nhiệm Vụ",
@@ -6815,6 +7018,8 @@ export const vi_VN: EnTranslations = {
       "activeStatus": "Đang Hoạt Động",
       "readyStatus": "Hoàn Thành",
       "completedStatus": "Đã Hoàn Thành",
+      "repeatableStatus": "Repeatable",
+      "cooldownStatus": "Available again soon",
       "returnTo": "Quay về {name}",
       "abandon": "Từ Bỏ Nhiệm Vụ",
       "abandonConfirmTitle": "Từ Bỏ Nhiệm Vụ",
@@ -6828,6 +7033,7 @@ export const vi_VN: EnTranslations = {
       "greetingFallback": "Xin chào.",
       "availableQuestAria": "Nhiệm vụ khả dụng: {name}",
       "readyQuestAria": "Nhiệm vụ sẵn sàng nộp: {name}",
+      "repeatableQuestAria": "Repeatable quest: {name}",
       "discussQuest": "Bàn về {name}.",
       "discussQuestAria": "Bàn về nhiệm vụ: {name}",
       "profIntroHint": "Gặp {name} để nhận \"{quest}\".",
@@ -6868,7 +7074,8 @@ export const vi_VN: EnTranslations = {
       "incomplete": "Nhiệm vụ đó chưa hoàn thành.",
       "giverMissing": "Người giao nhiệm vụ không ở gần đây.",
       "turnInMissing": "Nơi nộp nhiệm vụ không ở gần đây.",
-      "tooFar": "Quá xa."
+      "tooFar": "Quá xa.",
+      "escortAway": "Người bạn cần hộ tống hiện không có ở đó. Họ sẽ trở lại sớm."
     }
   },
   "itemUi": {
@@ -6907,13 +7114,14 @@ export const vi_VN: EnTranslations = {
       "armor": "Giáp",
       "quest": "Vật Phẩm Nhiệm Vụ",
       "junk": "Đồ Vụn",
+      "fineMaterial": "Fine Material",
       "food": "Thức Ăn",
       "drink": "Đồ Uống",
       "tool": "Dụng Cụ",
       "potion": "Thuốc",
       "elixir": "Tiên Dược",
       "bag": "Túi",
-      "mount": "Mount"
+      "mount": "Thú Cưỡi"
     },
     "stats": {
       "armor": "Giáp",
@@ -6966,7 +7174,13 @@ export const vi_VN: EnTranslations = {
       "stackCount": "x{count}",
       "destroyTitle": "Tiêu hủy {item}",
       "destroyConfirm": "Tiêu Hủy",
-      "destroyCancel": "Hủy"
+      "destroyCancel": "Hủy",
+      "unknownItem": "Unknown item",
+      "unknownItemAria": "Unknown item {id}, quantity {count}",
+      "unknownItemAriaMasterwork": "Unknown item {id}, quantity {count}, masterwork",
+      "unknownItemAriaEnchanted": "Unknown item {id}, quantity {count}, enchanted copy",
+      "unknownItemAriaBound": "Unknown item {id}, quantity {count}, bound copy",
+      "unknownItemAriaInstanced": "Unknown item {id}, quantity {count}, maker-marked copy"
     },
     "equipment": {
       "empty": "Trống",
@@ -6977,6 +7191,19 @@ export const vi_VN: EnTranslations = {
       "close": "Đóng cửa hàng",
       "hint": "Nhấp vào một vật phẩm trong túi để bán khi cửa sổ này đang mở.",
       "buyAria": "Mua {item} với giá {price}",
+      "buyAriaWithRequirement": "Buy {item} for {price}. {requirement}",
+      "buyStack": "Mua {count}",
+      "buyStackAria": "Mua {count} {item} với giá {price}",
+      "qtyRowAria": "Purchase quantity",
+      "qtyMultiple": "{count}x",
+      "qtyMultipleAria": "Buy {count} at a time",
+      "qtyCustom": "Custom",
+      "qtyCustomAria": "Choose a custom amount to buy",
+      "buyCountAria": "Buy {count} of {item} for {price}",
+      "buyCountAriaWithRequirement": "Buy {count} of {item} for {price}. {requirement}",
+      "buyQuantityTitle": "Buy how many {item}? Up to {max}.",
+      "buyQuantityInput": "Quantity to buy",
+      "buyQuantityConfirm": "Buy",
       "buybackTitle": "Mua Lại",
       "buybackEmpty": "Không có vật phẩm",
       "buybackAria": "Mua lại {item} với giá {price}",
@@ -7256,7 +7483,7 @@ export const vi_VN: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Tàng Hình Cao Cấp",
-        "description": "Biến mất trong 20 giây: xóa 2 hiệu ứng sát thương theo thời gian và bạn nhận ít hơn 90% sát thương khi đang tàng hình và trong chốc lát sau đó. (tài năng pháp sư)"
+        "description": "Biến mất trong 20 giây và gỡ bỏ 2 hiệu ứng gây sát thương theo thời gian. Khi tàng hình kết thúc, bạn nhận ít hơn 90% sát thương trong 2 giây. (tài năng pháp sư)"
       },
       "hot_streak": {
         "name": "Chuỗi Nóng",
@@ -9457,6 +9684,39 @@ export const vi_VN: EnTranslations = {
       "resonant_timber": {
         "name": "Gỗ Cộng Hưởng"
       },
+      "fine_copper_ore": {
+        "name": "Fine Copper Ore"
+      },
+      "fine_iron_ore": {
+        "name": "Fine Iron Ore"
+      },
+      "fine_thorium_ore": {
+        "name": "Fine Osmium Ore"
+      },
+      "fine_ironbark_log": {
+        "name": "Fine Ironbark Log"
+      },
+      "fine_ashwood_log": {
+        "name": "Fine Ashwood Log"
+      },
+      "fine_elderwood_log": {
+        "name": "Fine Highpine Log"
+      },
+      "fine_silverleaf_herb": {
+        "name": "Fine Sheenleaf Herb"
+      },
+      "fine_goldleaf_herb": {
+        "name": "Fine Goldleaf Herb"
+      },
+      "fine_sunpetal_herb": {
+        "name": "Fine Sunpetal Herb"
+      },
+      "stormreel_fishing_rod": {
+        "name": "Stormreel Fishing Rod"
+      },
+      "tidewrought_fishing_rod": {
+        "name": "Tidewrought Fishing Rod"
+      },
       "duskwisp_essence": {
         "name": "Tinh chất ma trơi hoàng hôn"
       },
@@ -9518,250 +9778,271 @@ export const vi_VN: EnTranslations = {
         "name": "Áo choàng vải màn che"
       },
       "rift_essence": {
-        "name": "Rift Essence"
+        "name": "Tinh Chất Rạn Nứt"
       },
       "rift_gem_crimson": {
-        "name": "Crimson Rift Gem"
+        "name": "Đá Quý Rạn Nứt Đỏ Thẫm"
       },
       "rift_gem_azure": {
-        "name": "Azure Rift Gem"
+        "name": "Đá Quý Rạn Nứt Xanh Lam"
       },
       "rift_gem_verdant": {
-        "name": "Verdant Rift Gem"
+        "name": "Đá Quý Rạn Nứt Xanh Lục"
       },
       "riftbound_band_of_might": {
-        "name": "Riftbound Band of Might"
+        "name": "Nhẫn Sức Mạnh Rạn Nứt"
       },
       "riftbound_band_of_insight": {
-        "name": "Riftbound Band of Insight"
+        "name": "Nhẫn Tuệ Giác Rạn Nứt"
       },
       "riftbound_band_of_guile": {
-        "name": "Riftbound Band of Guile"
+        "name": "Nhẫn Mưu Mẹo Rạn Nứt"
       },
       "hoarfrost_edge": {
-        "name": "Hoarfrost Edge"
+        "name": "Lưỡi Sương Giá"
       },
       "emberforge_gauntlets": {
-        "name": "Emberforge Gauntlets"
+        "name": "Găng Tay Lò Than Hồng"
       },
       "broodmother_carapace": {
-        "name": "Broodmother Carapace"
+        "name": "Mai Giáp Mẹ Bầy"
       },
       "bonelord_mantle": {
-        "name": "Bonelord Mantle"
+        "name": "Áo Choàng Lãnh Chúa Xương"
       },
       "graskbreaker_girdle": {
-        "name": "Graskbreaker Girdle"
+        "name": "Đai Lưng Kẻ Diệt Grask"
       },
       "voidscar_handwraps": {
-        "name": "Voidscar Handwraps"
+        "name": "Quấn Tay Voidscar"
       },
       "stormscale_treads": {
-        "name": "Stormscale Treads"
+        "name": "Giày Stormscale"
       },
       "abyssal_loop": {
-        "name": "Abyssal Loop"
+        "name": "Vòng Vực Thẳm"
       },
       "pactbound_vestments": {
-        "name": "Pactbound Vestments"
+        "name": "Áo Lễ Phục Bị Khế Ước Trói Buộc"
       },
       "pitlords_cleaver": {
-        "name": "Pit Lord's Cleaver"
+        "name": "Đại Đao Chặt Của Chúa Tể Vực Ngục"
       },
       "emberforged_bulwark": {
-        "name": "Emberforged Bulwark"
+        "name": "Khiên Lò Than Hồng"
       },
       "stormsunder_hood": {
-        "name": "Stormsunder Hood"
+        "name": "Mũ Trùm Xé Bão"
       },
       "voidweave_mantle": {
-        "name": "Voidweave Mantle"
+        "name": "Áo Choàng Dệt Hư Không"
       },
       "abysswrought_band": {
-        "name": "Abysswrought Band"
+        "name": "Nhẫn Rèn Vực Thẳm"
       },
       "heart_of_the_rift": {
-        "name": "Heart of the Rift"
+        "name": "Trái Tim Của Rạn Nứt"
       },
       "voidsong_dirk": {
-        "name": "Voidsong, Dirk of the Sundered Veil"
+        "name": "Khúc Ca Hư Không, Dao Găm Của Bức Màn Bị Xé Rách"
       },
       "wildheart_tuskblade": {
-        "name": "Wildheart Tuskblade"
+        "name": "Đao Ngà Wildheart"
       },
       "wildheart_hexwood_staff": {
-        "name": "Hexwood Staff of the Basin"
+        "name": "Trượng Gỗ Yểm Bùa Của Vùng Trũng"
       },
       "wildheart_fangknife": {
-        "name": "Fangknife of Zulgar"
+        "name": "Dao Nanh Của Zulgar"
+      },
+      "fanglords_beastspear": {
+        "name": "Thương Săn Thú Của Lãnh Chúa Nanh"
+      },
+      "bloodmane_warleggings": {
+        "name": "Quần Chiến Bờm Máu"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Quần Rình Rập Vuốt Dây Leo"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Xà Rông Nghi Lễ Xương Mặt Trời"
       },
       "thick_winter_pelt": {
-        "name": "Thick Winter Pelt"
+        "name": "Da Lông Mùa Đông Dày"
       },
       "aurora_mote": {
-        "name": "Aurora Mote"
+        "name": "Hạt Cực Quang"
       },
       "hearth_ember_cache": {
-        "name": "Ember Cache"
+        "name": "Kho Than Hồng"
       },
       "sprung_trap": {
-        "name": "Sprung Fen Trap"
+        "name": "Bẫy Đầm Lầy Đã Sập"
       },
       "hearthlined_treads": {
-        "name": "Hearth-Lined Treads"
+        "name": "Giày Lót Lò Sưởi"
       },
       "frostmane_mantle": {
-        "name": "Mantle of the Frostmane"
+        "name": "Áo Choàng Của Bờm Băng Giá"
       },
       "ashbone_war_brand": {
-        "name": "Ashbone War-Brand"
+        "name": "Chiến Đao Xương Tro"
       },
       "emberwing_scale": {
-        "name": "Emberwing Scale"
+        "name": "Vảy Cánh Lửa"
       },
       "scorched_supply_crate": {
-        "name": "Scorched Supply Crate"
+        "name": "Thùng Tiếp Tế Cháy Sém"
       },
       "wyrmwatch_warning_banner": {
-        "name": "Wyrmwatch Warning Banner"
+        "name": "Biểu Ngữ Cảnh Báo Trạm Gác Giao Long"
       },
       "cinderwalk_treads": {
-        "name": "Cinderwalk Treads"
+        "name": "Giày Tro Than"
       },
       "mawscale_pauldrons": {
-        "name": "Mawscale Pauldrons"
+        "name": "Giáp Vai Vảy Hàm"
       },
       "gilded_sap_clot": {
-        "name": "Gilded Sap Clot"
+        "name": "Khối Nhựa Dát Vàng"
       },
       "amberfall_sap_bucket": {
-        "name": "Sap-Tap Bucket"
+        "name": "Xô Hứng Nhựa"
       },
       "mere_ferry_lantern": {
-        "name": "Ferry Lantern"
+        "name": "Đèn Lồng Đò"
       },
       "orchard_sapbinder_grips": {
-        "name": "Sapbinder Grips"
+        "name": "Găng Tay Ràng Nhựa"
       },
       "mantle_of_the_meredark": {
-        "name": "Mantle of the Meredark"
+        "name": "Áo Choàng Của Meredark"
       },
       "plump_fen_eel": {
-        "name": "Plump Fen Eel"
+        "name": "Lươn Đầm Lầy Béo Mập"
       },
       "wisplight_globe": {
-        "name": "Wisplight Globe"
+        "name": "Quả Cầu Đốm Sáng"
       },
       "fenway_mooring_line": {
-        "name": "Cut Mooring Line"
+        "name": "Dây Neo Bị Cắt"
       },
       "bridgemere_toll_chest": {
-        "name": "Sunken Toll-Chest"
+        "name": "Rương Thu Phí Chìm"
       },
       "eelskin_mudwaders": {
-        "name": "Eelskin Mudwaders"
+        "name": "Giày Lội Bùn Da Lươn"
       },
       "lilybed_mantle": {
-        "name": "Mantle of the Lily-Bed"
+        "name": "Áo Choàng Của Luống Hoa Huệ"
       },
       "moonfleece_tuft": {
-        "name": "Moonfleece Tuft"
+        "name": "Búi Lông Trăng"
       },
       "gloamfield_nightbloom": {
-        "name": "Nightbloom Blossom"
+        "name": "Đóa Hoa Nightbloom"
       },
       "vigil_star_chart": {
-        "name": "Vigil Star Chart"
+        "name": "Bản Đồ Sao Canh Thức"
       },
       "barrow_grave_offering": {
-        "name": "Scattered Grave Offering"
+        "name": "Lễ Vật Mộ Vương Vãi"
       },
       "moonfleece_mitts": {
-        "name": "Moonfleece Mitts"
+        "name": "Găng Tay Lông Trăng"
       },
       "barrowshade_mantle": {
-        "name": "Barrowshade Mantle"
+        "name": "Áo Choàng Barrowshade"
       },
       "widowsilk_skein": {
-        "name": "Widowsilk Skein"
+        "name": "Cuộn Tơ Góa Phụ"
       },
       "gallowmere_grave_candle": {
-        "name": "Grave-Candle"
+        "name": "Nến Mộ"
       },
       "silkbound_remains": {
-        "name": "Silkbound Remains"
+        "name": "Di Hài Bọc Lụa"
       },
       "gravebound_silk_wraps": {
-        "name": "Gravebound Silk Wraps"
+        "name": "Quấn Tay Lụa Trói Mộ"
       },
       "mantle_of_the_unhorsed": {
-        "name": "Mantle of the Unhorsed"
+        "name": "Áo Choàng Của Kẻ Ngã Ngựa"
       },
       "pearlwake_cargo_crate": {
-        "name": "Pearlwake Cargo Crate"
+        "name": "Thùng Hàng Vệt Sóng Ngọc Trai"
       },
       "canopy_silk_hank": {
-        "name": "Canopy Silk Hank"
+        "name": "Cuộn Tơ Tán Cây"
       },
       "sunken_offering_bowl": {
-        "name": "Refilled Offering Bowl"
+        "name": "Bát Cúng Được Đổ Đầy Lại"
       },
       "saltwalker_sandals": {
-        "name": "Saltwalker Sandals"
+        "name": "Dép Muối"
       },
       "sunken_idol_mantle": {
-        "name": "Mantle of the Sunken Idol"
+        "name": "Áo Choàng Của Tượng Thần Chìm"
       },
       "hedgewick_shears": {
-        "name": "Stolen Hedgewick Shears"
+        "name": "Kéo Tỉa Hedgewick Bị Đánh Cắp"
       },
       "evergarden_bloom_clipping": {
-        "name": "Pruned Bloom Clipping"
+        "name": "Cành Hoa Bị Cắt Tỉa"
       },
       "hedgewick_tool_cart": {
-        "name": "Spilled Tool Cart"
+        "name": "Xe Đẩy Dụng Cụ Bị Đổ"
       },
       "evergarden_statue_rubbing": {
-        "name": "Statue Rubbing"
+        "name": "Bản Chà Tượng"
       },
       "shearkeeper_gloves": {
-        "name": "Shearkeeper Gloves"
+        "name": "Găng Tay Người Xén Lông"
       },
       "fountain_court_mantle": {
-        "name": "Mantle of the Fountain Court"
+        "name": "Áo Choàng Của Sân Đài Phun Nước"
       },
       "galecrest_ram_wool": {
-        "name": "Greasy Ram Wool"
+        "name": "Lông Cừu Nhờn"
       },
       "shear_storm_lantern": {
-        "name": "Doused Storm-Lantern"
+        "name": "Đèn Bão Bị Dập Tắt"
       },
       "wreckfield_flotsam_crate": {
-        "name": "Flotsam Crate"
+        "name": "Thùng Mảnh Vỡ Trôi Dạt"
       },
       "wickspun_treads": {
-        "name": "Wickspun Treads"
+        "name": "Giày Sợi Bấc"
       },
       "wreck_wardens_mantle": {
-        "name": "Mantle of the Wreck Warden"
+        "name": "Áo Choàng Của Vệ Quan Xác Tàu"
       },
       "breakscarred_steel": {
-        "name": "Break-Scarred Steel"
+        "name": "Thép Sẹo Gãy"
       },
       "farshore_salt_moss": {
-        "name": "Farshore Salt Moss"
+        "name": "Rêu Muối Farshore"
       },
       "gullhaven_watchbell": {
-        "name": "Coastal Watchbell"
+        "name": "Chuông Canh Ven Biển"
       },
       "saltforged_grips": {
-        "name": "Saltforged Grips"
+        "name": "Găng Tay Muối Rèn"
       },
       "mantle_of_the_unbroken_shore": {
-        "name": "Mantle of the Unbroken Shore"
+        "name": "Áo Choàng Của Bờ Biển Nguyên Vẹn"
       },
       "last_keep_signet": {
-        "name": "Signet of the Last Keep"
+        "name": "Nhẫn Ấn Của The Last Keep"
+      },
+      "gatherers_cache": {
+        "name": "Gatherer's Cache"
+      },
+      "artisans_eye": {
+        "name": "Artisan's Eye"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Chìa Khóa Khởi Động: Tia Kinh Hoàng, Kẻ Rung Chuyển Mặt Đất"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
@@ -10339,6 +10620,24 @@ export const vi_VN: EnTranslations = {
       "wyrmchoir_handwraps": {
         "name": "Quấn Tay Hợp Ca Long"
       },
+      "basin_stalkers_tunic": {
+        "name": "Áo Chẽn Kẻ Rình Rập Vùng Trũng"
+      },
+      "verdant_heart_vestment": {
+        "name": "Lễ Phục Trái Tim Xanh Tươi"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Áo Giáp Lưới Nghi Lễ Xương Mặt Trời"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Nanh Lớn Của Vùng Trũng"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Vương Miện Tiên Tri Xương Mặt Trời"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Giáp Chân Chiến Bờm Máu"
+      },
       "deathless_greatblade": {
         "name": "Đại Kiếm Bất Tử"
       },
@@ -10496,7 +10795,7 @@ export const vi_VN: EnTranslations = {
         "name": "Hộ Yêu của Triệu Bão Sư"
       },
       "riding_training": {
-        "name": "Riding Training"
+        "name": "Huấn Luyện Cưỡi Ngựa"
       },
       "reins_valorsteed": {
         "name": "Dây cương Valorsteed"
@@ -10771,280 +11070,280 @@ export const vi_VN: EnTranslations = {
         "name": "Ngựa chuồng"
       },
       "rift_spawnling": {
-        "name": "Rift Spawnling"
+        "name": "Ấu Trùng Rạn Nứt"
       },
       "rift_bonewalker": {
-        "name": "Risen Bonewalker"
+        "name": "Kẻ Đi Xương Hồi Sinh"
       },
       "rift_frost_revenant": {
-        "name": "Frostbound Revenant"
+        "name": "Oán Linh Bị Băng Trói"
       },
       "rift_rime_elemental": {
-        "name": "Rime Elemental"
+        "name": "Nguyên Tố Sương Băng"
       },
       "rift_ember_fiend": {
-        "name": "Ember Fiend"
+        "name": "Ác Quỷ Than Hồng"
       },
       "rift_magma_brute": {
-        "name": "Magma Brute"
+        "name": "Dã Thú Dung Nham"
       },
       "rift_venom_weaver": {
-        "name": "Venom Weaver"
+        "name": "Kẻ Dệt Nọc Độc"
       },
       "rift_thornback": {
-        "name": "Thornback Stalker"
+        "name": "Kẻ Rình Rập Lưng Gai"
       },
       "rift_boneclad": {
-        "name": "Boneclad Warrior"
+        "name": "Chiến Binh Bọc Xương"
       },
       "rift_marrow_troll": {
-        "name": "Marrow Troll"
+        "name": "Troll Tủy"
       },
       "rift_void_acolyte": {
-        "name": "Voidscar Acolyte"
+        "name": "Tu Đồ Sẹo Hư Không"
       },
       "rift_dread_stalker": {
-        "name": "Dread Stalker"
+        "name": "Kẻ Rình Rập Kinh Hoàng"
       },
       "rift_storm_caller": {
-        "name": "Storm Caller"
+        "name": "Kẻ Gọi Bão"
       },
       "rift_stormscale": {
-        "name": "Stormscale Drake"
+        "name": "Rồng Vảy Bão"
       },
       "rift_tide_thrall": {
-        "name": "Tide Thrall"
+        "name": "Nô Lệ Thủy Triều"
       },
       "rift_deep_lurker": {
-        "name": "Deep Lurker"
+        "name": "Kẻ Rình Vực Sâu"
       },
       "rift_stone_ogre": {
-        "name": "Stone Ogre"
+        "name": "Ogre Đá"
       },
       "rift_boss_frost": {
-        "name": "Hoarfrost Warden"
+        "name": "Vệ Quan Sương Giá"
       },
       "rift_boss_ember": {
-        "name": "Emberforge Tyrant"
+        "name": "Bạo Chúa Lò Than Hồng"
       },
       "rift_boss_venom": {
-        "name": "Broodmother Vysska"
+        "name": "Mẹ Bầy Vysska"
       },
       "rift_boss_necro": {
-        "name": "Bonelord Xarreth"
+        "name": "Lãnh Chúa Xương Xarreth"
       },
       "rift_boss_brute": {
-        "name": "Warlord Grask"
+        "name": "Lãnh Chúa Chiến Tranh Grask"
       },
       "rift_boss_arcane": {
-        "name": "Archon Nyxaris"
+        "name": "Đại Pháp Quan Nyxaris"
       },
       "rift_boss_storm": {
-        "name": "Tempest Vharok"
+        "name": "Cuồng Phong Vharok"
       },
       "rift_boss_tide": {
-        "name": "Abyssal Maw"
+        "name": "Hàm Vực Thẳm"
       },
       "glimmerwisp": {
-        "name": "Glimmerwisp"
+        "name": "Tinh Linh Lấp Lánh"
       },
       "duskwisp": {
-        "name": "Duskwisp"
+        "name": "Tinh Linh Hoàng Hôn"
       },
       "veiled_stag": {
-        "name": "Veiled Stag"
+        "name": "Hươu Đực Che Màn"
       },
       "veiled_doe": {
-        "name": "Veiled Doe"
+        "name": "Hươu Cái Che Màn"
       },
       "gleamstag": {
-        "name": "The Gleamstag"
+        "name": "Hươu Lấp Lánh"
       },
       "sporeling_gatherer": {
-        "name": "Sporeling Gatherer"
+        "name": "Kẻ Hái Bào Tử"
       },
       "corrupted_sporeling": {
-        "name": "Corrupted Sporeling"
+        "name": "Bào Tử Tha Hóa"
       },
       "mushroom_pixie": {
-        "name": "Gleamfolk Pixie"
+        "name": "Yêu Tinh Tộc Lấp Lánh"
       },
       "treant_elder": {
-        "name": "Treant Elder"
+        "name": "Mộc Nhân Trưởng Lão"
       },
       "ancient_guardian": {
-        "name": "Ancient Guardian"
+        "name": "Vệ Binh Cổ Đại"
       },
       "waking_warden": {
-        "name": "The Waking Warden"
+        "name": "Vệ Quan Thức Tỉnh"
       },
       "old_marrowshell": {
-        "name": "Old Marrowshell"
+        "name": "Lão Vỏ Tủy"
       },
       "aurelhorn": {
-        "name": "Aurelhorn, First of the Herd"
+        "name": "Aurelhorn, Con Đầu Đàn"
       },
       "snowdrift_wolf": {
-        "name": "Snowdrift Wolf"
+        "name": "Sói Tuyết Trôi Dạt"
       },
       "ice_wisp": {
-        "name": "Ice Wisp"
+        "name": "Tinh Linh Băng"
       },
       "rime_elemental": {
-        "name": "Rime Elemental"
+        "name": "Nguyên Tố Sương Băng"
       },
       "fen_sprite": {
-        "name": "Fen Sprite"
+        "name": "Tinh Linh Đầm Lầy"
       },
       "frostmane_yeti": {
-        "name": "Frostmane Yeti"
+        "name": "Người Tuyết Bờm Băng Giá"
       },
       "terrace_howler": {
-        "name": "Terrace Howler"
+        "name": "Kẻ Gào Thét Bậc Thang"
       },
       "apprentice_wren": {
-        "name": "Apprentice Wren"
+        "name": "Học Việc Wren"
       },
       "emberwing_drake": {
-        "name": "Emberwing Drake"
+        "name": "Rồng Cánh Lửa"
       },
       "ashbone_raider": {
-        "name": "Ashbone Raider"
+        "name": "Kẻ Đột Kích Xương Tro"
       },
       "ashbone_warcaller": {
-        "name": "Ashbone Warcaller"
+        "name": "Kẻ Hô Chiến Xương Tro"
       },
       "dune_troll": {
-        "name": "Dune Troll"
+        "name": "Troll Cồn Cát"
       },
       "cindraleth_maw_matriarch": {
-        "name": "Cindraleth the Maw Matriarch"
+        "name": "Cindraleth Mẫu Chúa Hàm"
       },
       "gilded_stag": {
-        "name": "Gilded Stag"
+        "name": "Hươu Đực Dát Vàng"
       },
       "gloam_fox": {
-        "name": "Gloam Fox"
+        "name": "Cáo Chạng Vạng"
       },
       "orchard_treant": {
-        "name": "Orchard Treant"
+        "name": "Mộc Nhân Vườn Cây"
       },
       "the_meredark": {
-        "name": "The Meredark"
+        "name": "Meredark"
       },
       "harvest_sprite": {
-        "name": "Harvest Sprite"
+        "name": "Tinh Linh Mùa Gặt"
       },
       "mere_lurker": {
-        "name": "Mere Lurker"
+        "name": "Kẻ Rình Đầm Hồ"
       },
       "bogtoad": {
-        "name": "Bogtoad"
+        "name": "Cóc Đầm Lầy"
       },
       "drowsy_croaker": {
-        "name": "The Drowsy Croaker"
+        "name": "Kẻ Ộp Ộp Ngái Ngủ"
       },
       "lily_wisp": {
-        "name": "Lily Wisp"
+        "name": "Tinh Linh Hoa Huệ"
       },
       "willow_sprite": {
-        "name": "Willow Sprite"
+        "name": "Tinh Linh Cây Liễu"
       },
       "moonfleece_grazer": {
-        "name": "Moonfleece Grazer"
+        "name": "Kẻ Gặm Cỏ Lông Trăng"
       },
       "gloam_strider": {
-        "name": "Gloam Strider"
+        "name": "Kẻ Rảo Bước Chạng Vạng"
       },
       "nightkin_stargazer": {
-        "name": "Nightkin Stargazer"
+        "name": "Kẻ Ngắm Sao Tộc Đêm"
       },
       "barrow_king": {
-        "name": "The Barrow King"
+        "name": "Vua Gò Mộ"
       },
       "barrow_wight": {
-        "name": "Barrow Wight"
+        "name": "U Linh Gò Mộ"
       },
       "widowsilk_spinner": {
-        "name": "Widowsilk Spinner"
+        "name": "Kẻ Nhả Tơ Góa Phụ"
       },
       "wood_wraith": {
-        "name": "Wood Wraith"
+        "name": "Oán Linh Gỗ"
       },
       "gravenbark_shambler": {
-        "name": "Gravenbark Shambler"
+        "name": "Kẻ Lê Bước Vỏ Cây Khắc"
       },
       "pale_huntsman": {
-        "name": "The Pale Huntsman"
+        "name": "Thợ Săn Nhợt Nhạt"
       },
       "gravedigger_mosley": {
-        "name": "Gravedigger Mosley"
+        "name": "Người Đào Mộ Mosley"
       },
       "tide_scuttler": {
-        "name": "Tide Scuttler"
+        "name": "Kẻ Bò Thủy Triều"
       },
       "thicket_boar": {
-        "name": "Thicket Boar"
+        "name": "Lợn Rừng Bụi Rậm"
       },
       "canopy_weaver": {
-        "name": "Canopy Weaver"
+        "name": "Kẻ Dệt Tán Cây"
       },
       "idol_guardian": {
-        "name": "The Idol Guardian"
+        "name": "Vệ Binh Tượng Thần"
       },
       "castaway_navigator": {
-        "name": "Navigator Suli"
+        "name": "Hoa Tiêu Suli"
       },
       "topiary_stag": {
-        "name": "Topiary Stag"
+        "name": "Hươu Đực Cây Kiểng"
       },
       "topiary_wolf": {
-        "name": "Topiary Wolf"
+        "name": "Sói Cây Kiểng"
       },
       "hedge_gnome": {
-        "name": "Hedge Gnome"
+        "name": "Yêu Tinh Đất Hàng Rào"
       },
       "hedge_knight": {
-        "name": "Dawnhold Knight"
+        "name": "Hiệp Sĩ Dawnhold"
       },
       "the_topiary_bull": {
-        "name": "The Topiary Bull"
+        "name": "Bò Đực Cây Kiểng"
       },
       "moor_ram": {
-        "name": "Moor Ram"
+        "name": "Cừu Đực Đầm Hoang"
       },
       "gale_wisp": {
-        "name": "Gale Wisp"
+        "name": "Tinh Linh Cuồng Phong"
       },
       "shoal_scuttler": {
-        "name": "Shoal Scuttler"
+        "name": "Kẻ Bò Bãi Cạn"
       },
       "downs_bandit": {
-        "name": "Downs Bandit"
+        "name": "Tên Cướp Vùng Đồi"
       },
       "wreck_thief": {
-        "name": "Wreckfield Thief"
+        "name": "Tên Trộm Bãi Xác Tàu"
       },
       "the_wreck_warden": {
-        "name": "The Wreck Warden"
+        "name": "Vệ Quan Xác Tàu"
       },
       "drowned_deckhand": {
-        "name": "Drowned Deckhand"
+        "name": "Thủy Thủ Chết Đuối"
       },
       "riftspawn": {
-        "name": "Riftspawn"
+        "name": "Quái Sinh Rạn Nứt"
       },
       "breach_wretch": {
-        "name": "Breach Wretch"
+        "name": "Kẻ Khốn Khổ Vết Nứt"
       },
       "void_stalker": {
-        "name": "Void Stalker"
+        "name": "Kẻ Rình Rập Hư Không"
       },
       "sundered_horror": {
-        "name": "The Sundered Horror"
+        "name": "Kẻ Kinh Hoàng Bị Xé Toạc"
       },
       "fisher_bram": {
-        "name": "Fisher Bram"
+        "name": "Ngư Dân Bram"
       },
       "lb_actor_coalfast": {
         "name": "Warden Coalfast"
@@ -11065,31 +11364,31 @@ export const vi_VN: EnTranslations = {
         "name": "The Tidemill Stalker"
       },
       "rift_hellguard": {
-        "name": "Hellguard"
+        "name": "Vệ Binh Địa Ngục"
       },
       "rift_pact_acolyte": {
-        "name": "Pact Acolyte"
+        "name": "Tu Đồ Khế Ước"
       },
       "rift_boss_ritualist": {
-        "name": "Magus Vel'Kor the Pactbound"
+        "name": "Pháp Sư Vel'Kor, Kẻ Bị Khế Ước Trói Buộc"
       },
       "rift_boss_pitlord": {
-        "name": "Azgorath, Lord of the Pit"
+        "name": "Azgorath, Chúa Tể Vực Ngục"
       },
       "wildheart_stalker": {
-        "name": "Vineclaw Stalker"
+        "name": "Kẻ Rình Rập Vuốt Dây Leo"
       },
       "wildheart_ravager": {
-        "name": "Bloodmane Ravager"
+        "name": "Kẻ Tàn Phá Bờm Máu"
       },
       "wildheart_hexcaller": {
-        "name": "Sunbone Hexcaller"
+        "name": "Kẻ Niệm Chú Xương Mặt Trời"
       },
       "wildheart_beastmaster": {
-        "name": "Fanglord Beastmaster"
+        "name": "Thuần Thú Sư Lãnh Chúa Nanh"
       },
       "wildheart_high_priest": {
-        "name": "Zulgar, Voice of the Basin"
+        "name": "Zulgar, Tiếng Nói Của Vùng Trũng"
       },
       "ironvein_foreman": {
         "name": "Quản Đốc Mạch Sắt"
@@ -11380,244 +11679,244 @@ export const vi_VN: EnTranslations = {
         "greeting": "Ngọn núi không quên bất cứ điều gì, {playerName}, và ta cũng vậy. Để xem ngươi đã làm nên những gì nào."
       },
       "keeper_saelwyn": {
-        "name": "Keeper Saelwyn",
-        "title": "Keeper of the Hollow",
-        "greeting": "Few of your kind have stood beneath these boughs, {className}. Walk gently, and be welcome."
+        "name": "Người Giữ Saelwyn",
+        "title": "Người Giữ Hollow",
+        "greeting": "Rất ít người như ngươi từng đứng dưới những tán cây này, {className}. Hãy bước thật nhẹ nhàng, và được chào đón."
       },
       "loremother_bryn": {
-        "name": "Loremother Bryn",
-        "title": "Voice of the Shrine",
-        "greeting": "Every light in this valley remembers something, {playerName}. Help me listen."
+        "name": "Sử Mẫu Bryn",
+        "title": "Tiếng Nói Của Miếu Thờ",
+        "greeting": "Mỗi ánh sáng trong thung lũng này đều ghi nhớ điều gì đó, {playerName}. Hãy giúp ta lắng nghe."
       },
       "provisioner_fenna": {
-        "name": "Provisioner Fenna",
-        "title": "Eldergleam Provisioner",
-        "greeting": "Bread still warm, water still sweet. The Hollow provides, and so do I."
+        "name": "Người Tiếp Tế Fenna",
+        "title": "Người Tiếp Tế Của Eldergleam",
+        "greeting": "Bánh mì vẫn còn ấm, nước vẫn còn ngọt lành. Hollow ban tặng, và ta cũng vậy."
       },
       "wardsmith_orun": {
-        "name": "Wardsmith Orun",
-        "title": "Keeper of the Old Forges",
-        "greeting": "These forges cooled centuries ago, {className}, but their work still holds an edge."
+        "name": "Thợ Rèn Hộ Ấn Orun",
+        "title": "Người Giữ Những Lò Rèn Cổ",
+        "greeting": "Những lò rèn này đã nguội lạnh từ hàng thế kỷ trước, {className}, nhưng thành quả của chúng vẫn còn sắc bén."
       },
       "archivist_tullo": {
-        "name": "Archivist Tullo",
-        "title": "Reader of Stones",
-        "greeting": "The monuments out there have not spoken to anyone in an age. Perhaps they were waiting for fresh ears."
+        "name": "Người Lưu Trữ Tullo",
+        "title": "Người Đọc Đá",
+        "greeting": "Những đài tưởng niệm ngoài kia đã không nói chuyện với ai từ bao đời nay. Có lẽ chúng đang chờ những đôi tai mới."
       },
       "huntsman_deral": {
-        "name": "Huntsman Deral",
-        "title": "Warden of the Herds",
-        "greeting": "Quiet now. The herd knows every sound this valley makes, and so do I."
+        "name": "Thợ Săn Deral",
+        "title": "Vệ Quan Bầy Đàn",
+        "greeting": "Im lặng nào. Bầy thú biết rõ từng âm thanh mà thung lũng này tạo ra, và tôi cũng vậy."
       },
       "warden_kaldra": {
-        "name": "Warden Kaldra",
-        "title": "Warden of Icemantle",
-        "greeting": "Mind the benches, stranger. The snow keeps what it takes."
+        "name": "Vệ Quan Kaldra",
+        "title": "Vệ Quan Của Icemantle",
+        "greeting": "Cẩn thận với những băng ghế, kẻ lạ mặt. Tuyết giữ lại những gì nó đã lấy đi."
       },
       "hearthkeeper_maeve": {
-        "name": "Hearthkeeper Maeve",
-        "title": "Keeper of the Hearth-Lodge",
-        "greeting": "Come in off the cold. The lodge fire never goes out, so long as I draw breath."
+        "name": "Người Giữ Lò Sưởi Maeve",
+        "title": "Người Giữ Lữ Quán Lò Sưởi",
+        "greeting": "Vào trong đi, tránh cái lạnh. Ngọn lửa trong lữ quán này sẽ không bao giờ tắt, chừng nào tôi còn hơi thở."
       },
       "scout_einna": {
-        "name": "Scout Einna",
-        "title": "Snowline Scout",
-        "greeting": "You walked the pass alive. Good. Icemantle should hear of it."
+        "name": "Trinh Sát Einna",
+        "title": "Trinh Sát Ranh Tuyết",
+        "greeting": "Ngươi đã băng qua đèo mà vẫn còn sống. Tốt. Icemantle nên biết về chuyện này."
       },
       "aurorist_veyla": {
-        "name": "Aurorist Veyla",
-        "title": "Reader of the Lights",
-        "greeting": "Hush. The lights are speaking tonight, and they do not repeat themselves."
+        "name": "Nhà Cực Quang Veyla",
+        "title": "Người Đọc Ánh Cực Quang",
+        "greeting": "Suỵt. Đêm nay ánh cực quang đang cất lời, và chúng không bao giờ lặp lại."
       },
       "trapper_brosk": {
-        "name": "Trapper Brosk",
-        "title": "Shiverfen Trapper",
-        "greeting": "Fen took three of my lines this week. Fen never took a line in twenty years."
+        "name": "Người Đặt Bẫy Brosk",
+        "title": "Người Đặt Bẫy Của Shiverfen",
+        "greeting": "Đầm lầy đã lấy mất ba đường bẫy của tôi trong tuần này. Suốt hai mươi năm qua, đầm lầy chưa từng lấy mất đường bẫy nào."
       },
       "gatecaptain_brannoc": {
-        "name": "Gatecaptain Brannoc",
-        "title": "Commander of Wyrmwatch",
-        "greeting": "Wyrmwatch holds the gate. Has held it forty years. It will hold it tonight."
+        "name": "Đội Trưởng Cổng Brannoc",
+        "title": "Chỉ Huy Của Wyrmwatch",
+        "greeting": "Wyrmwatch giữ vững cánh cổng này. Đã giữ suốt bốn mươi năm qua. Đêm nay nó vẫn sẽ giữ vững."
       },
       "quartermaster_sela": {
-        "name": "Quartermaster Sela",
-        "title": "Keeper of the Garrison Stores",
-        "greeting": "Every crate in this yard crossed forty miles of ash to get here. Treat them kindly."
+        "name": "Quân Nhu Trưởng Sela",
+        "title": "Người Giữ Kho Quân Nhu",
+        "greeting": "Mỗi thùng hàng trong sân này đã vượt qua bốn mươi dặm tro tàn để đến được đây. Hãy đối xử tử tế với chúng."
       },
       "scout_yerrin": {
-        "name": "Scout Yerrin",
-        "title": "Far-Dune Watcher",
-        "greeting": "Keep low. Sound carries strangely off the glass, and the gate below has ears."
+        "name": "Trinh Sát Yerrin",
+        "title": "Người Canh Gác Cồn Cát Xa",
+        "greeting": "Cúi thấp xuống. Âm thanh vọng lại kỳ lạ trên mặt kính, và cánh cổng bên dưới có tai đấy."
       },
       "reeve_ottoline": {
-        "name": "Reeve Ottoline",
-        "title": "Reeve of Lanternmere",
-        "greeting": "Welcome to Lanternmere, where the harvest never ends and neither does the work."
+        "name": "Xã Trưởng Ottoline",
+        "title": "Xã Trưởng Của Lanternmere",
+        "greeting": "Chào mừng đến với Lanternmere, nơi mùa gặt chẳng bao giờ kết thúc, và công việc cũng vậy."
       },
       "waywatcher_sorrel": {
-        "name": "Waywatcher Sorrel",
-        "title": "Watcher of the Goldmelt",
-        "greeting": "Snow behind you, gold ahead. Few walk the Goldmelt twice, so make the crossing count."
+        "name": "Người Canh Đường Sorrel",
+        "title": "Người Canh Gác Của Goldmelt",
+        "greeting": "Tuyết ở phía sau, vàng son ở phía trước. Ít ai băng qua Goldmelt đến lần thứ hai, nên hãy khiến chuyến đi này thật đáng giá."
       },
       "ferrymaster_caddow": {
-        "name": "Ferrymaster Caddow",
-        "title": "Keeper of the Lantern Ferries",
-        "greeting": "Fog is on the Mere again. When the lanterns go out on the water, wise folk stay ashore."
+        "name": "Phà Trưởng Caddow",
+        "title": "Người Giữ Những Chuyến Phà Đèn Lồng",
+        "greeting": "Sương mù lại giăng trên mặt đầm nước lần nữa. Khi những ngọn đèn lồng trên mặt nước tắt đi, kẻ khôn ngoan sẽ ở lại trên bờ."
       },
       "orchardist_pomeline": {
-        "name": "Orchardist Pomeline",
-        "title": "Keeper of the Gilded Rows",
-        "greeting": "Mind where you step. Every root in these rows is older than the town, and they remember."
+        "name": "Người Coi Vườn Quả Pomeline",
+        "title": "Người Giữ Những Hàng Cây Dát Vàng",
+        "greeting": "Cẩn thận từng bước chân. Mỗi gốc rễ trong những hàng cây này đều già hơn cả thị trấn, và chúng vẫn còn nhớ."
       },
       "waykeeper_pell": {
-        "name": "Waykeeper Pell",
-        "title": "Keeper of the Amberfen Steps",
-        "greeting": "Down the Steps and into the soft country. Mind where you plant your boots."
+        "name": "Người Giữ Đường Pell",
+        "title": "Người Giữ Bậc Thang Amberfen",
+        "greeting": "Xuống hết bậc thang là đến vùng đất mềm mại. Cẩn thận nơi ngươi đặt chân."
       },
       "bridgewright_alden": {
-        "name": "Bridgewright Alden",
-        "title": "Master of the Fenway",
-        "greeting": "Every plank in this town is mine to keep, and the fen chews on all of them."
+        "name": "Thợ Cầu Alden",
+        "title": "Bậc Thầy Của Fenway",
+        "greeting": "Mỗi tấm ván trong thị trấn này đều do tôi trông coi, và đầm lầy thì gặm nhấm tất cả chúng."
       },
       "netter_maris": {
-        "name": "Netter Maris",
-        "title": "Eel-Netter of Bridgemere",
-        "greeting": "Smell that? Smoked eel. Half this town stands on stilts I bought with it."
+        "name": "Thợ Lưới Maris",
+        "title": "Thợ Lưới Lươn Của Bridgemere",
+        "greeting": "Ngửi thấy không? Lươn hun khói đấy. Nửa cái thị trấn này đứng trên những cây cột mà tôi mua được nhờ nó."
       },
       "mother_sedge": {
-        "name": "Mother Sedge",
-        "title": "Fen-Witch of Willowweep",
-        "greeting": "The willows told me you were coming before your boots left the bridge."
+        "name": "Mẫu Sedge",
+        "title": "Phù Thủy Đầm Lầy Của Willowweep",
+        "greeting": "Những cây liễu đã báo cho ta biết ngươi sẽ đến, từ trước khi đôi ủng của ngươi rời khỏi cây cầu."
       },
       "lamplighter_sorrel": {
-        "name": "Lamplighter Sorrel",
-        "title": "Keeper of the Nightgate",
-        "greeting": "Mind the lamps, friend. Past this gate the sun gives up and the flowers take over."
+        "name": "Người Thắp Đèn Sorrel",
+        "title": "Người Giữ Nightgate",
+        "greeting": "Coi chừng những ngọn đèn, bạn hiền. Qua khỏi cánh cổng này, mặt trời buông xuôi và hoa lá lên ngôi."
       },
       "lira_dewsong": {
         "name": "Lira Dewsong",
-        "title": "Night-Gardener of Moonrest",
-        "greeting": "Welcome to Moonrest, where the flowers do our dawning for us."
+        "title": "Người Làm Vườn Đêm Của Moonrest",
+        "greeting": "Chào mừng đến với Moonrest, nơi những đóa hoa thay chúng ta đón bình minh."
       },
       "weaver_amelle": {
-        "name": "Weaver Amelle",
-        "title": "Moonfleece Weaver",
-        "greeting": "Feel that? Moonfleece on the loom. Warmer than any fire you have sat beside."
+        "name": "Thợ Dệt Amelle",
+        "title": "Thợ Dệt Moonfleece",
+        "greeting": "Cảm nhận được không? Đó là Moonfleece trên khung cửi. Ấm hơn bất kỳ ngọn lửa nào ngươi từng ngồi cạnh."
       },
       "astronomer_cassian": {
-        "name": "Astronomer Cassian",
-        "title": "Watcher at the Vigil",
-        "greeting": "Hush now. The sky never dawns here, so it never stops talking either."
+        "name": "Nhà Thiên Văn Cassian",
+        "title": "Người Canh Gác Đêm Trực",
+        "greeting": "Suỵt, im nào. Bầu trời nơi đây chẳng bao giờ hửng sáng, nên nó cũng chẳng bao giờ ngừng thì thầm."
       },
       "lampman_cobb": {
-        "name": "Lampman Cobb",
-        "title": "Keeper of the Crowgate Lanterns",
-        "greeting": "Stay in the lamplight, friend. The wood counts everyone who passes the gate."
+        "name": "Người Coi Đèn Cobb",
+        "title": "Người Giữ Những Chiếc Đèn Lồng Crowgate",
+        "greeting": "Cứ đứng trong ánh đèn, bạn hiền. Khu rừng đếm từng người đi qua cánh cổng này."
       },
       "sexton_marrow": {
-        "name": "Sexton Marrow",
-        "title": "Sexton of Gallowmere",
-        "greeting": "We bury them deep here, and we ring the bells so they remember to stay down."
+        "name": "Người Giữ Mộ Marrow",
+        "title": "Người Giữ Mộ Của Gallowmere",
+        "greeting": "Chúng tôi chôn họ thật sâu ở đây, và rung chuông để họ nhớ mà nằm yên."
       },
       "widow_tansy": {
-        "name": "Widow Tansy",
-        "title": "Candlewright of Gallowmere",
-        "greeting": "A candle for every grave, and not one may go out. Not one, do you hear me?"
+        "name": "Quả Phụ Tansy",
+        "title": "Thợ Làm Nến Của Gallowmere",
+        "greeting": "Một ngọn nến cho mỗi nấm mộ, và không được để ngọn nào tắt. Không một ngọn nào, ngươi nghe rõ chưa?"
       },
       "vicar_creel": {
-        "name": "Vicar Creel",
-        "title": "Last Vicar of the Mournstone",
-        "greeting": "The chapel fell years ago. The dead beneath it did not notice, and so I stayed."
+        "name": "Cha Xứ Creel",
+        "title": "Cha Xứ Cuối Cùng Của Mournstone",
+        "greeting": "Nhà nguyện đã sụp đổ từ nhiều năm trước. Những người chết bên dưới nó chẳng hề hay biết, nên tôi đã ở lại."
       },
       "strandwatcher_pell": {
-        "name": "Strandwatcher Pell",
-        "title": "Watcher of the Tanglemouth",
-        "greeting": "Out of the black trees at last. Breathe, stranger, the sun holds this side of the pass."
+        "name": "Người Canh Bờ Pell",
+        "title": "Người Canh Gác Của Tanglemouth",
+        "greeting": "Cuối cùng cũng ra khỏi rừng cây đen. Thở đi, kẻ lạ mặt, mặt trời vẫn còn ngự trị ở phía bên này của con đèo."
       },
       "salvage_boss_ryna": {
-        "name": "Salvage-Boss Ryna",
-        "title": "Mistress of the Wreck Line",
-        "greeting": "A {className} with working arms, good. The wreck line pays well, if the crabs leave you enough fingers to count it."
+        "name": "Đầu Lĩnh Trục Vớt Ryna",
+        "title": "Nữ Chủ Của Tuyến Xác Tàu",
+        "greeting": "Một {className} với đôi tay còn lành lặn, tốt. Tuyến xác tàu trả công hậu hĩnh, nếu lũ cua còn chừa lại đủ ngón tay cho ngươi đếm."
       },
       "pearlmother_isha": {
-        "name": "Pearl-Mother Isha",
-        "title": "Elder of the Divers",
-        "greeting": "The sea gives, the sand keeps, and the jungle takes. Stay on the strand, stranger."
+        "name": "Ngọc Mẫu Isha",
+        "title": "Trưởng Lão Của Những Người Lặn",
+        "greeting": "Biển cả cho đi, cát giữ lại, và rừng rậm lấy đi. Hãy ở lại trên bờ cát, kẻ lạ mặt."
       },
       "hermit_okku": {
         "name": "Okku",
-        "title": "The Man Who Went In",
-        "greeting": "Quiet now. The drums count everything that walks under the trees, and they have already counted you."
+        "title": "Người Đã Bước Vào Trong",
+        "greeting": "Im lặng nào. Tiếng trống đếm mọi thứ bước đi dưới tán cây, và chúng đã đếm được ngươi rồi."
       },
       "gatewarden_pell": {
-        "name": "Gatewarden Pell",
-        "title": "Keeper of the Garden Gate",
-        "greeting": "Mind how you go on the lawns. The garden keeps them trimmed, and it likes them tidy."
+        "name": "Vệ Quan Cổng Pell",
+        "title": "Người Giữ Cổng Vườn",
+        "greeting": "Cẩn thận khi bước trên bãi cỏ. Khu vườn tự cắt tỉa chúng, và nó thích mọi thứ gọn gàng."
       },
       "head_gardener_amaranth": {
-        "name": "Head Gardener Amaranth",
-        "title": "Head Gardener of the Evergarden",
-        "greeting": "Do not mind the shadows under my eyes. Someone has to stay awake while the garden dreams."
+        "name": "Người Làm Vườn Trưởng Amaranth",
+        "title": "Người Làm Vườn Trưởng Của The Evergarden",
+        "greeting": "Đừng để ý đến quầng thâm dưới mắt tôi. Ai đó phải thức trong khi khu vườn còn đang say ngủ."
       },
       "wickmother_sorrel": {
-        "name": "Wickmother Sorrel",
-        "title": "Keeper of the Hedgewick Inn",
-        "greeting": "Come in, sit, there is cordial on the fire. Just keep a hand on anything iron: the gnomes are light-fingered of late."
+        "name": "Nến Mẫu Sorrel",
+        "title": "Người Giữ Quán Trọ Hedgewick",
+        "greeting": "Vào đi, ngồi xuống, có rượu ấm đang hâm trên lửa đấy. Chỉ cần để mắt tới bất cứ thứ gì bằng sắt: dạo này lũ gnome tay chân nhanh nhẹn lắm."
       },
       "gardener_yew": {
-        "name": "Gardener Yew",
-        "title": "The Last Gardener",
-        "greeting": "Hand me that barrow, would you? These lawns do not walk themselves, whatever the hamlet thinks."
+        "name": "Người Làm Vườn Yew",
+        "title": "Người Làm Vườn Cuối Cùng",
+        "greeting": "Đưa tôi cái xe cút kít đó được không? Mấy bãi cỏ này chẳng tự đi cắt được đâu, dù cái xóm nhỏ này có nghĩ gì đi nữa."
       },
       "watcher_maren": {
-        "name": "Watcher Maren",
-        "title": "The Windway Watch",
-        "greeting": "Mind your footing past the gate. The wind up here takes hats first and questions never."
+        "name": "Người Canh Gác Maren",
+        "title": "Đội Gác Đường Gió",
+        "greeting": "Cẩn thận bước chân qua khỏi cổng. Gió trên này cuốn mất mũ trước tiên, và chẳng bao giờ thèm hỏi han gì cả."
       },
       "harbormaster_odile": {
-        "name": "Harbormaster Odile",
-        "title": "Harbormaster of Wickharbor",
-        "greeting": "Every boat in this cove owes the Old Beacon its keel. Speak quick, the tide will not wait."
+        "name": "Cảng Trưởng Odile",
+        "title": "Cảng Trưởng Của Wickharbor",
+        "greeting": "Mọi con thuyền trong vịnh này đều nợ Ngọn Hải Đăng Cổ mạng sống của mình. Nói nhanh lên, thủy triều sẽ không chờ đâu."
       },
       "keeper_bram": {
-        "name": "Keeper Bram",
-        "title": "Keeper of the Old Beacon",
-        "greeting": "Nine and thirty years this lamp has burned on my watch. It will not go dark on yours."
+        "name": "Người Giữ Bram",
+        "title": "Người Giữ Ngọn Hải Đăng Cổ",
+        "greeting": "Ba mươi chín năm qua, ngọn đèn này đã cháy sáng dưới sự canh giữ của tôi. Nó sẽ không tắt trong phiên gác của ngươi đâu."
       },
       "salvager_edda": {
-        "name": "Salvager Edda",
-        "title": "Wreckfield Salvager",
-        "greeting": "Wreckwood, rope, and dead men's cargo. The sea pays my wage, when the Warden lets it."
+        "name": "Người Trục Vớt Edda",
+        "title": "Người Trục Vớt Của Wreckfield",
+        "greeting": "Gỗ tàu đắm, dây thừng, và hàng hóa của người chết. Biển cả trả lương cho ta, khi nào Vệ Quan còn cho phép."
       },
       "warden_coalfast": {
-        "name": "Warden Coalfast",
-        "title": "Redoubt Commander",
-        "greeting": "The breaks do not care that Gullhaven is small, {className}. We hold this shore, or there is no shore left to hold. Stand with us and I will not forget it."
+        "name": "Vệ Quan Coalfast",
+        "title": "Chỉ Huy Đồn Lũy",
+        "greeting": "Những vết rạn chẳng quan tâm Gullhaven bé nhỏ đến đâu, {className}. Chúng ta giữ vững bờ biển này, hoặc sẽ chẳng còn bờ biển nào để mà giữ. Hãy sát cánh cùng chúng ta, và ta sẽ không quên điều đó."
       },
       "riftwatch_ollun": {
-        "name": "Riftwatch Ollun",
-        "title": "Breach Scholar",
-        "greeting": "Every break sings before it opens, if you have the ear for it. I can hear three of them stirring on the island right now, and one of them is close."
+        "name": "Người Canh Rạn Nứt Ollun",
+        "title": "Học Giả Vết Rạn",
+        "greeting": "Mỗi vết rạn đều ngân lên trước khi mở ra, nếu ngươi có đôi tai để nghe. Ngay lúc này ta có thể nghe thấy ba vết đang cựa mình trên hòn đảo, và một trong số đó đang đến gần."
       },
       "quartermaster_edda": {
-        "name": "Quartermaster Edda",
-        "title": "Redoubt Armorer",
-        "greeting": "Steel and salt, {className}, it is all I have left to hand out. Take it and make the breaks regret opening where I could reach them."
+        "name": "Quân Nhu Trưởng Edda",
+        "title": "Thợ Giáp Đồn Lũy",
+        "greeting": "Thép và muối, {className}, đó là tất cả những gì ta còn để trao cho ngươi. Hãy nhận lấy và khiến những vết rạn phải hối hận vì đã mở ra trong tầm tay ta."
       },
       "mender_saul": {
-        "name": "Mender Saul",
-        "title": "Field Surgeon",
-        "greeting": "I have set more bones this one month than in ten years of mending fishing falls. The breaks do not leave much of what they take. Come back to me whole, if you can manage it."
+        "name": "Lang Y Saul",
+        "title": "Quân Y Dã Chiến",
+        "greeting": "Tháng này tôi đã nắn xương nhiều hơn cả mười năm chữa trị cho những cú ngã khi đánh cá. Các vết rạn chẳng để lại được bao nhiêu từ những gì chúng lấy đi. Hãy trở về với ta nguyên vẹn, nếu ngươi có thể."
       },
       "bellkeeper_tam": {
-        "name": "Bellkeeper Tam",
-        "title": "Watchbell Keeper",
-        "greeting": "The bell is the only warning the breaks give us, {className}. One toll for the fields, two for the cliffs, three when it is close enough that running will not help. Keep an ear on it, and it may keep you whole."
+        "name": "Người Giữ Chuông Tam",
+        "title": "Người Giữ Chuông Canh",
+        "greeting": "Chiếc chuông là lời cảnh báo duy nhất mà các vết rạn ban cho chúng ta, {className}. Một tiếng cho cánh đồng, hai tiếng cho vách đá, ba tiếng khi nó đã gần đến mức chạy trốn cũng vô ích. Hãy để tai lắng nghe nó, nó có thể giữ cho ngươi được nguyên vẹn."
       },
       "fisher_nell": {
-        "name": "Frightened Nell",
-        "title": "Gullhaven Fisher",
-        "greeting": "It opened right where the nets dry. Right there, where I stood every morning of my life. I do not go down to the shore anymore. I do not go much of anywhere anymore."
+        "name": "Nell Hoảng Sợ",
+        "title": "Ngư Dân Gullhaven",
+        "greeting": "Nó mở ra ngay chỗ phơi lưới. Ngay tại đó, nơi tôi từng đứng mỗi sáng suốt cả cuộc đời mình. Tôi không còn xuống bờ biển nữa. Tôi cũng chẳng còn đi đâu nhiều nữa."
       },
       "ferryman_ewald": {
         "name": "Ferryman Ewald",
@@ -11673,7 +11972,7 @@ export const vi_VN: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Nghề Cho Mọi Đôi Tay",
-        "text": "Mỗi người ở Eastbrook đều làm một nghề ngoài kiếm, {playerName}. Có những mỏ quặng trong các tảng đá quanh Hố Đồng, phía tây nam thị trấn. Hãy cầm cuốc và tự tay khai thác 5 mỏ, nhé; ta sẽ biết sự khác biệt.",
+        "text": "Mỗi người ở Eastbrook đều làm một nghề ngoài kiếm, {playerName}. Có những mỏ quặng trong các tảng đá quanh Hố Đồng, phía đông nam thị trấn. Hãy cầm cuốc và tự tay khai thác 5 mỏ, nhé; ta sẽ biết sự khác biệt.",
         "completion": "Thấy chưa? Quặng đã thu thập và tay đã có vết chai. Tiếp tục khai thác mỏ, chặt gỗ và hái thảo dược khi bạn đi trên đường, và khi trở lại thị trấn, chú ý đến bảng Trọng Tâm Thị Trấn gần chợ và bàn thủ công gần đó. Có một giao dịch công bằng chờ đợi trong tất cả, nếu bạn muốn.",
         "objectives": {
           "0": {
@@ -11756,7 +12055,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_supplies": {
         "title": "Hàng Tiếp Tế Bị Đánh Cắp",
-        "text": "Bọn cướp ấy đã đột kích chiếc xe ngựa cuối cùng của ta và cuỗm đi bốn thùng hàng - dụng cụ, muối, vải lanh Eastbrook hảo hạng. Những thùng hàng được chất đống quanh trại của chúng nơi vùng đồi đông nam. Lấy cắp chúng về cho ta, được chứ?",
+        "text": "Bọn cướp ấy đã đột kích chiếc xe ngựa cuối cùng của ta và cuỗm đi bốn thùng hàng - dụng cụ, muối, vải lanh Eastbrook hảo hạng. Những thùng hàng được chất đống quanh trại của chúng nơi vùng đồi tây nam. Lấy cắp chúng về cho ta, được chứ?",
         "completion": "Những thùng hàng của ta! Gần như chẳng có lấy một vết xước. Ngươi thật phi thường.",
         "objectives": {
           "0": {
@@ -12138,7 +12437,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_old_cragmaw": {
         "title": "Lão Cragmaw",
-        "text": "Dân miền núi đã gọi tên những dấu chân mà trinh sát của ta tìm thấy: Lão Cragmaw, một bạo chúa mèo lông đầy sẹo đã sống lâu hơn ba thế hệ của chính bầy đàn nó. Nó chính là lý do lũ rình mồi tràn xuống con đường của ta, {playerName}. Hang ổ của nó nằm trên sườn núi phía tây, bên trên con đường về nam. Hãy dẫn theo một người bạn, và hạ gục con quỷ già ấy.",
+        "text": "Dân miền núi đã gọi tên những dấu chân mà trinh sát của ta tìm thấy: Lão Cragmaw, một bạo chúa mèo lông đầy sẹo đã sống lâu hơn ba thế hệ của chính bầy đàn nó. Nó chính là lý do lũ rình mồi tràn xuống con đường của ta, {playerName}. Hang ổ của nó nằm trên sườn núi phía đông, bên trên con đường về nam. Hãy dẫn theo một người bạn, và hạ gục con quỷ già ấy.",
         "completion": "Cuối cùng nó cũng gục ngã. Dân miền núi từng thề rằng con mèo ấy sẽ sống lâu hơn cả bức tường. Giờ lũ rình mồi sẽ chịu ở yên trên vùng tuyết cao của chúng, {playerName}, và các đội tuần tra của ta sẽ đi trên đường mà không phải đổ máu. Cả dải sườn núi yên ắng hơn nhờ công của ngươi.",
         "objectives": {
           "0": {
@@ -12377,7 +12676,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_the_codfather": {
         "title": "The Codfather",
-        "text": "The Codfather không chỉ là một con cá, {playerName}, hắn là một sát thủ máu lạnh. Các bậc kỳ cựu thề rằng hắn xơi Mãnh Thú Đầm Lầy cho bữa sáng, và ngay cả lũ Góa Phụ Mirefen cũng không dám giăng tơ gần Vùng Nước Nông Deepfen vì quá khiếp sợ. Hắn ngự trị vùng nước ấy. Hãy vớ lấy cần câu, lôi con quỷ già ấy ra khỏi vùng nước của hắn, và ta sẽ thừa nhận ngươi đã gia nhập gia đình này.",
+        "text": "The Codfather isn't just a fish, {playerName}, he's a cold-blooded killer. Old-timers swear he eats Mire Prowlers for breakfast, and even the Mirefen Widows won't spin their webs near the Deepfen Shallows out of sheer terror. He rules those waters, and marsh water takes an Ironreel Fishing Rod, no less; my counter sells them. Get one in hand, drag that old devil out of his waters, and I will admit you have joined the family.",
         "completion": "Lạy các vị thánh ẩm ướt... Chính là The Codfather. Nhìn bộ râu kia kìa. Fenbridge sẽ kể chuyện về mẻ cá này suốt cả năm cho mà xem, {playerName}.",
         "objectives": {
           "0": {
@@ -12397,7 +12696,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_nythraxis_graves": {
         "title": "Những Ngôi Mộ Của Kẻ Bị Lãng Quên",
-        "text": "Ta đã từng thấy những dấu này, trên ba ngôi mộ cổ quanh chiến trường phía bắc. Đội Trưởng Aldren nằm ở gò đất phía đông, Thượng Tế Malric gần con đường gãy nát ở trung tâm, và Sát Thủ Hoàng Gia Voss bên vách đá phía tây. Hãy chạm vào từng ngôi mộ và lắng nghe, {playerName}. Người chết có thể nhớ những gì người sống đã quên.",
+        "text": "I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the western rise, High Priest Malric further south along the western edge, and Royal Assassin Voss by the eastern cliff. Touch each grave and listen, {playerName}. The dead may remember what the living forgot.",
         "completion": "Aldren vẫn trung thành, Malric chối từ chấp nhận cái chết, và Voss đã thấy hiểm họa trước mọi người. Cả ba đều phụng sự cùng một vị vua đã bị lãng quên.",
         "objectives": {
           "0": {
@@ -12413,7 +12712,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_nythraxis_sealed_crypt": {
         "title": "Hầm Mộ Hoang Phế",
-        "text": "Những linh ảnh chỉ về hầm mộ hoang phế nơi vách đá phía tây. Có một truyền thuyết cổ kể rằng hầm mộ từng là nơi an nghỉ của một vị vua. Có lẽ Đỉnh Gai đã phong ấn hắn bên dưới sau khi nghi lễ của Malric biến hắn thành một thứ bất tử. Hãy vào hầm mộ và xem những gì còn sót lại bên trong.",
+        "text": "Những linh ảnh chỉ về hầm mộ hoang phế nơi vách đá phía đông. Có một truyền thuyết cổ kể rằng hầm mộ từng là nơi an nghỉ của một vị vua. Có lẽ Đỉnh Gai đã phong ấn hắn bên dưới sau khi nghi lễ của Malric biến hắn thành một thứ bất tử. Hãy vào hầm mộ và xem những gì còn sót lại bên trong.",
         "completion": "Hai nửa đá khóa khớp với nhau, và cuốn nhật ký của Voss gọi tên thứ chúng đã phong ấn: ấn tín của Vua Nythraxis. Nếu cuốn nhật ký nói thật, chiếc ấn tín ấy chính là chìa khóa vào lăng mộ của hắn.",
         "objectives": {
           "0": {
@@ -12455,7 +12754,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_mogger": {
         "title": "Mogger Phải Gục Ngã",
-        "text": "Mogger đã phá nát xe kéo, san phẳng hàng rào, và giết đủ gia súc để làm trống một nửa Thung Lũng. Đừng đối đầu hắn một mình. Hãy dẫn hai đồng đội khỏe mạnh vào đồng cỏ phía đông và hạ gục con quái vật ấy một lần dứt điểm.",
+        "text": "Mogger đã phá nát xe kéo, san phẳng hàng rào, và giết đủ gia súc để làm trống một nửa Thung Lũng. Đừng đối đầu hắn một mình. Hãy dẫn hai đồng đội khỏe mạnh vào đồng cỏ phía tây và hạ gục con quái vật ấy một lần dứt điểm.",
         "completion": "Cuối cùng thì Mogger cũng đã chết. Đồng ruộng Eastbrook đã an toàn hơn, và ngươi rời Thung Lũng với thêm một câu chuyện đáng để kể lại.",
         "objectives": {
           "0": {
@@ -12515,7 +12814,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Sợi Chỉ Nối Lại",
-        "text": "Trở lại khung cửi của tôi rốt cuộc rồi. Tôi không giữ oán giận, {playerName}, nhưng sợi chỉ nhớ một bàn tay đã buông nó, và cái giá để lấy lại ngày càng dài hơn mỗi lần. Hãy tỉa đàn nhện gỗ lưới đang chen chúc ở khu rừng phía tây, và lao động sẽ ổn định đôi tay bạn trước khi chúng chạm lại vào tơ tốt.",
+        "text": "Trở lại khung cửi của tôi rốt cuộc rồi. Tôi không giữ oán giận, {playerName}, nhưng sợi chỉ nhớ một bàn tay đã buông nó, và cái giá để lấy lại ngày càng dài hơn mỗi lần. Hãy tỉa đàn nhện gỗ lưới đang chen chúc ở khu rừng phía đông, và lao động sẽ ổn định đôi tay bạn trước khi chúng chạm lại vào tơ tốt.",
         "completion": "Vững tay lại rồi. Thuộc Da và May Vá trở lại tay bạn là chuyên ngành. Hãy đo hai lần trước khi lang thang lần này.",
         "objectives": {
           "0": {
@@ -12525,7 +12824,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "Trở Lại Nồi",
-        "text": "Ồ, nhìn xem ai trở lại nồi của tôi. Không có gì khó chịu đâu, {playerName}, nhà bếp luôn có chỗ, nhưng bạn biết cái hóa đơn cứ dài thêm mỗi lần bạn bước ra ngoài. Hãy đi tỉa đàn lợn rừng hoang ở đồng cỏ phía đông, vì mồ hôi lao động trung thực là thành phần đầu tiên, và nó sẽ nhắc nhở đôi bàn tay bạn về công việc.",
+        "text": "Ồ, nhìn xem ai trở lại nồi của tôi. Không có gì khó chịu đâu, {playerName}, nhà bếp luôn có chỗ, nhưng bạn biết cái hóa đơn cứ dài thêm mỗi lần bạn bước ra ngoài. Hãy đi tỉa đàn lợn rừng hoang ở đồng cỏ phía tây, vì mồ hôi lao động trung thực là thành phần đầu tiên, và nó sẽ nhắc nhở đôi bàn tay bạn về công việc.",
         "completion": "Đây rồi, hương vị quen thuộc. Giả Kim và Nấu Ăn trở lại là chuyên ngành của bạn. Ở lại lâu hơn lần này.",
         "objectives": {
           "0": {
@@ -12614,178 +12913,178 @@ export const vi_VN: EnTranslations = {
         }
       },
       "q_veil_thinned": {
-        "title": "The Thinned Veil",
-        "text": "So the cave opened for you. Then the seal is weaker than I feared, {playerName}. Where the veil tears, the wisps turn dark and cold. Bring me eight essences from the duskwisps and I will read how deep the wound runs.",
-        "completion": "Cold, every one of them. The Hollow has perhaps a season before the tear becomes a rift. We have work to do, you and I.",
+        "title": "Bức Màn Đã Mỏng Đi",
+        "text": "Vậy là hang động đã mở ra cho bạn. Vậy thì phong ấn yếu hơn ta lo sợ, {playerName}. Nơi bức màn bị xé rách, những Duskwisp trở nên tối tăm và lạnh lẽo. Mang cho ta tám tinh chất từ những Duskwisp và ta sẽ đọc được vết thương ăn sâu đến đâu.",
+        "completion": "Lạnh lẽo, tất cả chúng. Hollow có lẽ chỉ còn một mùa trước khi vết rách trở thành một rạn nứt. Chúng ta có việc phải làm, bạn và ta.",
         "objectives": {
           "0": {
-            "label": "Duskwisp Essence"
+            "label": "Tinh chất ma trơi hoàng hôn"
           }
         }
       },
       "q_gleaming_antlers": {
-        "title": "Gleaming Antlers",
-        "text": "The veiled stags shed light where they graze, and their cast antlers hold it for years. Five of them, from the herds in the open glade at the heart of the valley, and my lanterns burn through the winter without oil. The stags need not be harmed, but they do not part with them easily.",
-        "completion": "Look how they hold the light! No flame, no smoke, just the glow. The Hollow provides.",
+        "title": "Gạc Lấp Lánh",
+        "text": "Những chú hươu đực che màn tỏa sáng nơi chúng gặm cỏ, và những chiếc gạc chúng rụng xuống giữ ánh sáng đó suốt nhiều năm. Năm chiếc, từ các đàn hươu trong khoảng trống mở giữa lòng thung lũng, và đèn lồng của ta sẽ cháy suốt mùa đông mà không cần dầu. Đàn hươu không cần phải bị làm hại, nhưng chúng không dễ dàng rời xa chúng đâu.",
+        "completion": "Nhìn xem chúng giữ ánh sáng như thế nào! Không lửa, không khói, chỉ có ánh sáng dịu. Hollow luôn cung cấp đủ.",
         "objectives": {
           "0": {
-            "label": "Gleaming Antler"
+            "label": "Gạc Lấp Lánh"
           }
         }
       },
       "q_wisp_lights": {
-        "title": "Lights of the Shallows",
-        "text": "The glimmerwisps carry motes of the old starlight that fell here when the Hollow was sealed. Six motes, and the shrine lamps will burn for a year. Take only from those that fade; the Hollow gives enough without greed.",
-        "completion": "Soft as the first stars. Set them here by the altar; the shrine will do the rest.",
+        "title": "Ánh Sáng Của Bãi Cạn",
+        "text": "Những Glimmerwisp mang theo những hạt ánh sao cổ xưa đã rơi xuống đây khi Hollow bị phong ấn. Sáu hạt, và đèn miếu thờ sẽ cháy sáng suốt một năm. Chỉ lấy từ những con đang tàn lụi thôi; Hollow cho đi đủ nhiều mà không cần tham lam.",
+        "completion": "Dịu nhẹ như những vì sao đầu tiên. Đặt chúng ở đây cạnh bàn thờ; miếu thờ sẽ lo phần còn lại.",
         "objectives": {
           "0": {
-            "label": "Wisp Mote"
+            "label": "Hạt sáng ma trơi"
           }
         }
       },
       "q_calming_the_deep": {
-        "title": "Calming the Deep",
-        "text": "The sporelings of the Gleaming Deep were gentle folk before the tear touched their rings. What the corruption takes, it does not give back. Grant the corrupted ones rest, {playerName}: ten of them, in the north of the Deep.",
-        "completion": "You did what I could not bear to. The gatherers still sing in the south rings; because of you, they will keep singing.",
+        "title": "Xoa Dịu Vực Sâu",
+        "text": "Những bào tử của Vực Sâu Lấp Lánh từng là những sinh vật hiền lành trước khi vết rách chạm đến vòng tròn của chúng. Những gì sự tha hóa lấy đi, nó không bao giờ trả lại. Ban cho những kẻ tha hóa sự an nghỉ, {playerName}: mười con, ở phía bắc Vực Sâu.",
+        "completion": "Bạn đã làm điều ta không thể chịu đựng để làm. Những người hái lượm vẫn hát ở vòng tròn phía nam; nhờ có bạn, họ sẽ tiếp tục hát.",
         "objectives": {
           "0": {
-            "label": "Corrupted Sporeling laid to rest"
+            "label": "Bào Tử Tha Hóa được an nghỉ"
           }
         }
       },
       "q_spore_hearts": {
-        "title": "Hearts of the Ring",
-        "text": "When a sporeling falls to the dark, its heart keeps beating with borrowed shadow. Four of those hearts, cleansed at the shrine, may teach us how the corruption spreads. It is grim work, {playerName}, but it is mending work.",
-        "completion": "There. Cleansed, and quiet. Each one shows the same mark: the shadow flows FROM the Sunken Court. Tell Saelwyn.",
+        "title": "Những Trái Tim Của Vòng Tròn",
+        "text": "Khi một con bào tử ngã vào bóng tối, trái tim nó vẫn tiếp tục đập bằng bóng tối vay mượn. Bốn trái tim đó, được thanh tẩy tại miếu thờ, có thể dạy chúng ta biết sự tha hóa lan truyền ra sao. Đây là công việc ảm đạm, {playerName}, nhưng đó là công việc hàn gắn.",
+        "completion": "Đó. Đã thanh tẩy, và yên tĩnh. Mỗi cái đều mang cùng một dấu ấn: bóng tối chảy ra TỪ Sân Chìm. Hãy báo cho Saelwyn.",
         "objectives": {
           "0": {
-            "label": "Spore Heart"
+            "label": "Tim Bào Tử"
           }
         }
       },
       "q_monument_tour": {
-        "title": "What the Stones Remember",
-        "text": "Three monuments still stand from before the sealing: one at the Duskfall Overlook, one in the Sunken Court, and one lost in the far northeast where nobody walks. Read them for me, {playerName}. My knees gave out two centuries of stairs ago.",
-        "completion": "An overlook, a court, and a forgotten corner... and all three verses of the sealing song, together for the first time since it was sung. You have made an old reader very happy.",
+        "title": "Những Gì Đá Còn Nhớ",
+        "text": "Ba đài tưởng niệm vẫn còn đứng từ trước khi phong ấn được lập: một tại Đài Quan Sát Duskfall, một trong Sân Chìm, và một bị lãng quên ở tận đông bắc xa xôi nơi không ai bước đến. Đọc chúng giúp ta, {playerName}. Đầu gối của ta đã kiệt sức từ hai thế kỷ bậc thang trước rồi.",
+        "completion": "Một đài quan sát, một sân chìm, và một góc bị lãng quên... và cả ba khổ thơ của bài ca phong ấn, cùng nhau lần đầu tiên kể từ khi nó được ngân lên. Bạn đã khiến một người đọc già nua rất hạnh phúc.",
         "objectives": {
           "0": {
-            "label": "The Overlook monument read"
+            "label": "Đài tưởng niệm ở Đài Quan Sát đã được đọc"
           },
           "1": {
-            "label": "The Court monument read"
+            "label": "Đài tưởng niệm ở Sân Chìm đã được đọc"
           },
           "2": {
-            "label": "The forgotten monument read"
+            "label": "Đài tưởng niệm bị lãng quên đã được đọc"
           }
         }
       },
       "q_grove_menace": {
-        "title": "Menace in the Glade",
-        "text": "Duskwisps have started drifting in among my stalls after dark, {playerName}, and their chill spoils everything it touches. Thin them out for me: ten of them, wherever the veil has torn.",
-        "completion": "The night market can open again. You have a customer for life, or at least a discount.",
+        "title": "Hiểm Họa Trong Khoảng Trống",
+        "text": "Lũ Duskwisp đã bắt đầu lang thang giữa các quầy hàng của ta sau khi trời tối, {playerName}, và cái lạnh của chúng làm hỏng mọi thứ nó chạm vào. Hãy giảm bớt số lượng chúng giúp ta: mười con, ở bất cứ nơi nào bức màn đã bị xé rách.",
+        "completion": "Chợ đêm có thể mở lại rồi. Bạn có một khách hàng trọn đời, hoặc ít nhất là một khoản giảm giá.",
         "objectives": {
           "0": {
-            "label": "Duskwisp dispersed"
+            "label": "Duskwisp bị xua tan"
           }
         }
       },
       "q_shards_of_starfall": {
-        "title": "Shards of Starfall",
-        "text": "When the duskwisps pass over the crystal fields, slivers of old starlight cling to them like burrs. Six shards, {playerName}, and I can date the sealing to the very season it was sung.",
-        "completion": "Look at the striations! Autumn. The Hollow was sealed in autumn. Two hundred years of argument, settled by six little stones.",
+        "title": "Mảnh Vỡ Starfall",
+        "text": "Khi những Duskwisp lướt qua các cánh đồng pha lê, những mảnh ánh sao cổ xưa bám vào chúng như gai dính. Sáu mảnh, {playerName}, và ta có thể xác định thời điểm phong ấn chính xác đến mùa nó được ngân lên.",
+        "completion": "Nhìn những vệt vân này đi! Mùa thu. Hollow đã bị phong ấn vào mùa thu. Hai trăm năm tranh cãi, được giải quyết bởi sáu hòn đá nhỏ.",
         "objectives": {
           "0": {
-            "label": "Starfall Shard"
+            "label": "Mảnh Vỡ Starfall"
           }
         }
       },
       "q_treant_accord": {
-        "title": "The Treant Accord",
-        "text": "The elders of the Grove shed their outer bark as the corruption gnaws at their roots. Four lengths of it, and I can brew a salve for the whole Grove. They will not thank you while you pry it loose, {playerName}, but they will stand a century longer for it.",
-        "completion": "Thick and sound, all four. The salve will take a week to brew and a hundred years to finish its work. Trees measure kindness differently.",
+        "title": "Thỏa Ước Mộc Nhân",
+        "text": "Những trưởng lão của Rừng Cổ Thụ đang bong lớp vỏ ngoài khi sự tha hóa gặm nhấm rễ của chúng. Bốn đoạn vỏ, và ta có thể pha chế một thứ thuốc mỡ cho cả khu rừng. Chúng sẽ không cảm ơn bạn khi bạn cạy nó ra đâu, {playerName}, nhưng chúng sẽ đứng vững thêm cả thế kỷ nhờ vào đó.",
+        "completion": "Dày và chắc chắn, cả bốn đoạn. Thuốc mỡ sẽ mất một tuần để pha chế và cả trăm năm để hoàn thành công việc của nó. Cây cối đo lường lòng tốt theo một cách khác.",
         "objectives": {
           "0": {
-            "label": "Elder Bark"
+            "label": "Vỏ Cây Trưởng Lão"
           }
         }
       },
       "q_spore_tide": {
-        "title": "Against the Spore Tide",
-        "text": "The salve holds the Grove, but the corruption presses harder at the Deep with every dusk. Twelve more of the corrupted must be laid to rest before the gatherers can reclaim their north rings, {playerName}.",
-        "completion": "The rings in the north are singing again tonight. Quietly, but singing.",
+        "title": "Chống Lại Thủy Triều Bào Tử",
+        "text": "Thuốc mỡ đang giữ vững Rừng Cổ Thụ, nhưng sự tha hóa lại càng gây sức ép mạnh hơn tại Vực Sâu Lấp Lánh mỗi khi chạng vạng buông xuống. Mười hai kẻ tha hóa nữa phải được cho an nghỉ trước khi những người hái lượm có thể giành lại vòng tròn phía bắc của họ, {playerName}.",
+        "completion": "Những vòng tròn phía bắc lại đang hát đêm nay. Khe khẽ thôi, nhưng vẫn đang hát.",
         "objectives": {
           "0": {
-            "label": "Corrupted Sporeling laid to rest"
+            "label": "Bào Tử Tha Hóa được an nghỉ"
           }
         }
       },
       "q_sunken_court": {
-        "title": "The Sunken Court",
-        "text": "Bryn read the hearts true: the tear runs through the old court in the east, and its guardians have woken wrong. They were built to protect the seal; now they will crush anyone who nears it. Clear eight of them from the ruins.",
-        "completion": "Eight guardians, stilled. I remember when they were raised, {playerName}. Do not look so surprised; the Hollow keeps its keepers a long time.",
+        "title": "Sân Chìm",
+        "text": "Bryn đọc những trái tim ấy chính xác: vết rách chạy xuyên qua sân đình cổ ở phía đông, và những vệ binh của nó đã thức tỉnh sai cách. Chúng được tạo ra để bảo vệ phong ấn; giờ chúng sẽ nghiền nát bất cứ ai đến gần nó. Dọn sạch tám con khỏi tàn tích này.",
+        "completion": "Tám vệ binh, đã tĩnh lặng. Ta còn nhớ khi chúng được dựng lên, {playerName}. Đừng ngạc nhiên quá vậy; Hollow giữ những người canh giữ của nó rất lâu.",
         "objectives": {
           "0": {
-            "label": "Ancient Guardian stilled"
+            "label": "Vệ Binh Cổ Đại bị làm cho tĩnh lặng"
           }
         }
       },
       "q_wardens_echoes": {
-        "title": "Echoes of the Warden",
-        "text": "Even with their master silenced, the court guardians repeat its last command like an echo that will not fade. Until the seal is set back, they will keep waking, {playerName}. Still ten more of them so the masons can reach the sealstone.",
-        "completion": "The echo grows fainter each time. Soon the court will hold nothing but wind and ivy, the way a ruin should.",
+        "title": "Tiếng Vọng Của Vệ Quan",
+        "text": "Dù chủ nhân của chúng đã bị bịt miệng, những vệ binh sân đình vẫn lặp lại mệnh lệnh cuối cùng của nó như một tiếng vọng không chịu tan biến. Cho đến khi phong ấn được đặt trở lại, chúng sẽ tiếp tục thức tỉnh, {playerName}. Hãy làm tĩnh lặng mười con nữa để những người thợ đá có thể tiếp cận phiến đá ấn.",
+        "completion": "Tiếng vọng mờ dần đi mỗi lần. Chẳng bao lâu nữa sân đình sẽ chỉ còn gió và dây thường xuân, đúng như một tàn tích nên có.",
         "objectives": {
           "0": {
-            "label": "Ancient Guardian stilled"
+            "label": "Vệ Binh Cổ Đại bị làm cho tĩnh lặng"
           }
         }
       },
       "q_waking_warden": {
-        "title": "The Waking Warden",
-        "text": "The court is quiet, but its master is not. The Warden that holds the seal has woken twisted, and while it stands, the seal cannot be mended. It will not fall easily; bring a friend if you can find one, {playerName}. Bring two if you can find two.",
-        "completion": "The bell of its voice is silent. I felt it from here, like a weight lifted off the whole valley.",
+        "title": "Vệ Quan Thức Tỉnh",
+        "text": "Sân đình yên tĩnh, nhưng chủ nhân của nó thì không. Vệ Quan giữ phong ấn đã thức tỉnh một cách méo mó, và khi nó còn đứng vững, phong ấn không thể được hàn gắn. Nó sẽ không ngã xuống dễ dàng đâu; rủ theo một người bạn nếu bạn có thể tìm được, {playerName}. Rủ theo hai người nếu bạn có thể tìm được hai.",
+        "completion": "Tiếng chuông từ giọng nói của nó đã im bặt. Ta cảm nhận được điều đó từ đây, như một gánh nặng được trút khỏi cả thung lũng.",
         "objectives": {
           "0": {
-            "label": "The Waking Warden defeated"
+            "label": "Vệ Quan Thức Tỉnh bị đánh bại"
           }
         }
       },
       "q_seal_restored": {
-        "title": "The Seal Restored",
-        "text": "Take the Warden's seal to the sealstone at the heart of the court and set it back where it was struck loose. Then the Hollow can begin to heal, and you, {playerName}, will have done what no one of your kind has done before.",
-        "completion": "I felt it close from here, gentle as dusk. The Hollow remembers its friends, {playerName}. However far you travel, there will always be a light for you beneath the great tree.",
+        "title": "Phong Ấn Được Phục Hồi",
+        "text": "Mang phong ấn của Vệ Quan đến phiến đá ấn tại trung tâm sân đình và đặt nó trở lại nơi nó từng bị đánh bật ra. Khi đó Hollow có thể bắt đầu chữa lành, và bạn, {playerName}, sẽ đã làm được điều mà chưa ai thuộc giống loài bạn từng làm được.",
+        "completion": "Ta cảm nhận được nó khép lại từ đây, nhẹ nhàng như hoàng hôn. Hollow nhớ đến những người bạn của mình, {playerName}. Dù bạn có đi xa đến đâu, sẽ luôn có một ánh sáng dành cho bạn dưới gốc đại thụ.",
         "objectives": {
           "0": {
-            "label": "The seal set back in the sealstone"
+            "label": "Phong ấn được đặt trở lại phiến đá ấn"
           }
         }
       },
       "q_hollow_the_huntsman": {
-        "title": "The Warden of the Herds",
-        "text": "You look like someone who can handle more than wisps, {playerName}. Huntsman Deral keeps his lookout among the stag meadows east of here, and he has been asking after capable hands for weeks. Whatever he is tracking out there, he will not say it aloud in the village.",
-        "completion": "Fenna sent you? Good. Then she trusts you, and I have two names that need crossing out.",
+        "title": "Vệ Quan Bầy Đàn",
+        "text": "Bạn trông như người có thể xử lý được nhiều hơn là mấy con ma trơi, {playerName}. Thợ Săn Deral giữ trạm gác của mình giữa những đồng cỏ hươu về phía đông nơi này, và ông ấy đã tìm kiếm những bàn tay có năng lực suốt nhiều tuần. Bất cứ thứ gì ông ấy đang truy tìm ngoài đó, ông ấy sẽ không nói to điều đó trong làng.",
+        "completion": "Fenna cử bạn đến? Tốt. Vậy là bà ấy tin tưởng bạn, và ta có hai cái tên cần được gạch bỏ.",
         "objectives": {
           "0": {
-            "label": "Find Huntsman Deral"
+            "label": "Tìm Thợ Săn Deral"
           }
         }
       },
       "q_hollow_old_marrowshell": {
-        "title": "The Old Shell of the Shallows",
-        "text": "The first name is Old Marrowshell, a crab the size of a cart that has hunted the eastern shallows since before Eldergleam had a gate. It wanders, {playerName}, so you will have to walk the shoreline until you cross its track. Do not go alone, and do not trust its stillness.",
-        "completion": "The shallows are just water again. I have watched that shell break better hunters than me, {playerName}. Not you.",
+        "title": "Chiếc Mai Cũ Của Bãi Cạn",
+        "text": "Cái tên đầu tiên là Lão Vỏ Tủy, một con cua to bằng cả chiếc xe đã săn mồi ở bãi cạn phía đông từ trước khi Eldergleam có cổng. Nó lang thang khắp nơi, {playerName}, nên bạn sẽ phải đi dọc bờ biển cho đến khi bắt gặp dấu vết của nó. Đừng đi một mình, và đừng tin vào sự bất động của nó.",
+        "completion": "Bãi cạn giờ lại chỉ còn là nước. Ta đã chứng kiến cái mai đó đánh bại những thợ săn giỏi hơn ta, {playerName}. Nhưng không phải bạn.",
         "objectives": {
           "0": {
-            "label": "Old Marrowshell slain"
+            "label": "Lão Vỏ Tủy bị tiêu diệt"
           }
         }
       },
       "q_hollow_first_of_the_herd": {
-        "title": "First of the Herd",
-        "text": "The second name is harder to say. Aurelhorn led these herds when my grandmother kept this lookout, and whatever woke in the Hollow woke him wrong. He tramples what he once warded, and the herd will not survive his madness. He roams the meadows near the old court roads. End him with mercy, {playerName}, and bring a friend to share the weight of it.",
-        "completion": "So the First falls to the last. The herd is already calmer, do you feel it? You did the Hollow a kindness today, even if it does not look like one.",
+        "title": "Con Đầu Đàn",
+        "text": "Cái tên thứ hai khó nói hơn. Aurelhorn từng dẫn dắt những đàn hươu này khi bà của ta còn giữ trạm gác này, và bất cứ thứ gì đã thức tỉnh trong Hollow đã đánh thức nó sai cách. Nó giẫm nát những gì nó từng bảo vệ, và cả đàn sẽ không sống sót qua cơn điên loạn của nó. Nó lang thang trên những đồng cỏ gần các con đường sân đình cũ. Kết liễu nó bằng lòng thương xót, {playerName}, và rủ theo một người bạn để cùng chia sẻ gánh nặng này.",
+        "completion": "Vậy là Con Đầu Đàn ngã xuống dưới tay người đến sau cùng. Đàn hươu đã bình tĩnh hơn rồi, bạn có cảm nhận được không? Bạn đã làm một việc tốt cho Hollow hôm nay, dù nó không có vẻ như vậy.",
         "objectives": {
           "0": {
-            "label": "Aurelhorn given peace"
+            "label": "Aurelhorn được ban cho sự thanh thản"
           }
         }
       },
@@ -12800,819 +13099,819 @@ export const vi_VN: EnTranslations = {
         }
       },
       "q_fv_snowline_report": {
-        "title": "Word from the Snowline",
-        "text": "Every soul who climbs out of the Drakelands passes my fire, {playerName}, and fewer climb every week. Warden Kaldra holds Icemantle up the north road. Tell her the pass is still open, and tell her a stranger walked it alone.",
-        "completion": "The pass holds, then. Einna sits that waycamp through storms that bury the road markers, and she has never once sent me idle news. Welcome to Icemantle, {playerName}.",
+        "title": "Tin Tức Từ Snowline",
+        "text": "Mọi linh hồn leo ra khỏi Drakelands đều đi qua ngọn lửa của ta, {playerName}, và mỗi tuần lại có ít người leo hơn. Vệ Quan Kaldra trấn giữ Icemantle trên con đường phía bắc. Nói với bà ấy rằng đèo núi vẫn còn mở, và nói với bà ấy rằng một người lạ đã đi qua nó một mình.",
+        "completion": "Vậy là đèo núi vẫn trụ vững. Einna giữ trạm gác đó xuyên qua những cơn bão chôn vùi cả cột mốc đường, và cô ấy chưa từng một lần gửi cho ta tin tức vô ích. Chào mừng đến Icemantle, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Report to Warden Kaldra"
+            "label": "Báo cáo với Vệ Quan Kaldra"
           }
         }
       },
       "q_fv_wolves_at_the_door": {
-        "title": "Wolves at the Door",
-        "text": "The snowdrift packs used to keep to the high benches. Now they cross the tarn road in daylight and my woodcutters will not leave the walls. Thin the packs, {playerName}, ten of them, and the road is a road again.",
-        "completion": "Ten fewer shadows between here and the tarn. The woodcutters are already arguing over who goes out first.",
+        "title": "Sói Trước Cửa",
+        "text": "Các bầy sói tuyết trôi dạt trước đây chỉ ở trên những thềm đá cao. Giờ chúng băng qua đường hồ băng giữa ban ngày và những người đốn củi của ta không dám rời khỏi tường thành. Giảm bớt số lượng bầy sói, {playerName}, mười con, và con đường sẽ lại là con đường.",
+        "completion": "Bớt đi mười bóng đen giữa nơi này và hồ băng. Những người đốn củi đã bắt đầu tranh cãi xem ai sẽ ra ngoài trước.",
         "objectives": {
           "0": {
-            "label": "Snowdrift Wolf slain"
+            "label": "Sói Tuyết Trôi Dạt bị tiêu diệt"
           }
         }
       },
       "q_fv_winter_pelts": {
-        "title": "Pelts for the Lodge",
-        "text": "Firewood keeps a body alive, {playerName}, but wool will not turn this cold, only wolf-fur will. Six thick winter pelts off the snowdrift packs and I can line bedrolls for everyone the lodge shelters.",
-        "completion": "Fur like this is the only argument winter listens to. Take these treads, they are lined with the last batch.",
+        "title": "Da Lông Cho Lữ Quán",
+        "text": "Củi lửa giữ cho cơ thể sống sót, {playerName}, nhưng len sẽ không chống lại được cái lạnh này, chỉ có lông sói mới làm được. Sáu tấm da lông mùa đông dày từ các bầy sói tuyết trôi dạt và ta có thể lót túi ngủ cho tất cả những ai được lữ quán che chở.",
+        "completion": "Lông thú như thế này là lý lẽ duy nhất mà mùa đông chịu lắng nghe. Nhận lấy đôi giày này, chúng được lót từ mẻ lông cuối cùng.",
         "objectives": {
           "0": {
-            "label": "Thick Winter Pelt"
+            "label": "Da Lông Mùa Đông Dày"
           }
         }
       },
       "q_fv_ember_caches": {
-        "title": "Embers on the Tarn Road",
-        "text": "A sledge of ember caches overturned on the tarn road in last night: iron kettles that hold a banked fire alive for a month. Three of them are still lying in the snow, {playerName}, and the lodge cannot spare what they hold. Bring the fire home.",
-        "completion": "Still warm, every one. You have bought the lodge a whole winter of mercy, {playerName}.",
+        "title": "Than Hồng Trên Đường Hồ Băng",
+        "text": "Một chiếc xe trượt chở kho than hồng đã lật nhào trên đường hồ băng đêm qua: những chiếc ấm sắt giữ cho ngọn lửa ủ sống suốt một tháng. Ba chiếc vẫn còn nằm trong tuyết, {playerName}, và lữ quán không thể để mất những gì chúng chứa. Hãy mang ngọn lửa về nhà.",
+        "completion": "Vẫn còn ấm, từng chiếc một. Bạn đã mua cho lữ quán cả một mùa đông khoan dung, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Ember Cache recovered"
+            "label": "Kho Than Hồng được tìm lại"
           }
         }
       },
       "q_fv_lights_over_steps": {
-        "title": "Lights over the Steps",
-        "text": "The aurora has burned green every night this month, and the old folk will not walk under it. One woman might know why: Veyla, the Aurorist. She camps alone on the Aurora Steps, southeast past the tarn. Find her camp, {playerName}, and hear what the lights have told her.",
-        "completion": "Kaldra sent you? Then she is finally worried, and she is right to be. Sit, {playerName}. Watch the sky with me a while.",
+        "title": "Ánh Sáng Trên Bậc Thang",
+        "text": "Cực quang đã cháy màu xanh lục mỗi đêm trong tháng này, và các bậc trưởng lão không chịu đi dưới nó. Có một người phụ nữ có thể biết lý do: Veyla, Nhà Cực Quang. Cô ấy cắm trại một mình trên Bậc Thang Cực Quang, đông nam qua khỏi hồ băng. Tìm trại của cô ấy, {playerName}, và nghe những gì ánh sáng đã nói với cô ấy.",
+        "completion": "Kaldra cử bạn đến? Vậy là cuối cùng bà ấy cũng lo lắng, và bà ấy đúng khi lo lắng. Ngồi xuống đi, {playerName}. Ngắm bầu trời cùng ta một lát.",
         "objectives": {
           "0": {
-            "label": "Find Aurorist Veyla"
+            "label": "Tìm Nhà Cực Quang Veyla"
           }
         }
       },
       "q_fv_silent_trapline": {
-        "title": "The Silent Trapline",
-        "text": "Old Brosk works the Shiverfen trapline west of here, and every week for eleven years he has sent a bundle of furs up with the wood sledge. Two weeks now, nothing. He is too stubborn to freeze and too careful to drown, {playerName}, so something else is wrong. Find his camp at the fen and see him breathing.",
-        "completion": "Maeve sent you? Ha. Eleven years and the woman still thinks the fen will eat me. Well... this year she might be right. Look at what it's done to my lines.",
+        "title": "Tuyến Bẫy Im Lặng",
+        "text": "Brosk Già trông coi tuyến bẫy Shiverfen về phía tây nơi này, và mỗi tuần suốt mười một năm ông ấy đều gửi một bó lông thú lên bằng xe trượt gỗ. Đã hai tuần nay, không có gì cả. Ông ấy quá bướng bỉnh để bị đóng băng và quá thận trọng để bị chết đuối, {playerName}, nên chắc hẳn có chuyện gì khác không ổn. Tìm trại của ông ấy tại đầm lầy và xem ông ấy còn thở không.",
+        "completion": "Maeve cử bạn đến sao? Ha. Mười một năm rồi mà bà ấy vẫn nghĩ đầm lầy sẽ nuốt chửng ta. Chà... năm nay có lẽ bà ấy đúng. Nhìn xem nó đã làm gì với các tuyến bẫy của ta.",
         "objectives": {
           "0": {
-            "label": "Find Trapper Brosk"
+            "label": "Tìm Người Đặt Bẫy Brosk"
           }
         }
       },
       "q_fv_aurora_motes": {
-        "title": "Motes of the Aurora",
-        "text": "The wisps that drift these steps are shed by the lights themselves, and each carries a mote of the aurora in its heart. I need six to read what the sky is writing, {playerName}. The wisps do not fight back. Whether that makes the work easier or harder is between you and your conscience.",
-        "completion": "Six motes, still glowing. Look at them, {playerName}: they pulse in time with each other. The lights are not weather. They are a signal.",
+        "title": "Hạt Của Cực Quang",
+        "text": "Những tinh linh lang thang trên bậc thang này được chính ánh sáng ấy trút ra, và mỗi con mang một hạt cực quang trong tim mình. Ta cần sáu hạt để đọc được những gì bầu trời đang viết, {playerName}. Những tinh linh này không chống trả. Việc đó khiến công việc dễ hơn hay khó hơn là chuyện giữa bạn và lương tâm của bạn.",
+        "completion": "Sáu hạt, vẫn còn phát sáng. Nhìn chúng đi, {playerName}: chúng nhấp nháy cùng nhịp với nhau. Những ánh sáng này không phải là thời tiết. Chúng là một tín hiệu.",
         "objectives": {
           "0": {
-            "label": "Aurora Mote"
+            "label": "Hạt Cực Quang"
           }
         }
       },
       "q_fv_rime_unbound": {
-        "title": "Rime Unbound",
-        "text": "When the aurora burns this bright, the cold stands up and walks: rime elementals, frost given a will. They gather where the lights touch the benches, and they are wandering closer to my camp each night. Break eight of them apart, {playerName}, before one of them breaks me.",
-        "completion": "The night feels thinner already. Whatever wakes them is not done, but you have bought the Steps some quiet.",
+        "title": "Sương Băng Được Giải Phóng",
+        "text": "Khi cực quang cháy sáng đến thế này, cái lạnh đứng dậy và bước đi: những nguyên tố sương băng, sương giá được ban cho ý chí. Chúng tụ tập nơi ánh sáng chạm vào các thềm đá, và chúng đang lang thang gần trại của ta hơn mỗi đêm. Đập tan tám con, {playerName}, trước khi một con đập tan ta.",
+        "completion": "Đêm nay đã cảm thấy mỏng manh hơn rồi. Bất cứ thứ gì đánh thức chúng vẫn chưa xong việc, nhưng bạn đã mua cho Bậc Thang này chút yên tĩnh.",
         "objectives": {
           "0": {
-            "label": "Rime Elemental slain"
+            "label": "Nguyên Tố Sương Băng bị tiêu diệt"
           }
         }
       },
       "q_fv_sprung_traps": {
-        "title": "Sprites in the Traps",
-        "text": "Fen sprites, {playerName}. The little devils spring my traps for sport and scatter the iron in the reeds. Drive them off, eight should teach the rest, and gather up what is left of my traplines while you are out there.",
-        "completion": "Four good traps back and the reeds gone quiet. You trap with a heavier hand than I do, {playerName}, but I cannot argue with the results.",
+        "title": "Tinh Linh Trong Những Chiếc Bẫy",
+        "text": "Tinh linh đầm lầy, {playerName}. Lũ quỷ nhỏ này kích hoạt bẫy của ta để mua vui và làm vương vãi những mảnh sắt vào bụi lau sậy. Hãy đuổi chúng đi, tám con chắc đủ để dạy cho phần còn lại, và thu thập những gì còn sót lại từ tuyến bẫy của ta khi bạn ở ngoài đó.",
+        "completion": "Bốn chiếc bẫy tốt đã về và bụi lau sậy đã yên tĩnh trở lại. Bạn đặt bẫy mạnh tay hơn ta nhiều, {playerName}, nhưng ta không thể tranh cãi với kết quả.",
         "objectives": {
           "0": {
-            "label": "Fen Sprite driven off"
+            "label": "Tinh Linh Đầm Lầy bị đuổi đi"
           },
           "1": {
-            "label": "Trap recovered"
+            "label": "Bẫy được tìm lại"
           }
         }
       },
       "q_fv_howl_above": {
-        "title": "The Howl on the Terraces",
-        "text": "You hear it at dusk, {playerName}: a howl off the Howling Terraces that is not the snowdrift packs. Bigger throats. The terrace howlers have come down from the peaks for the first time since my grandmother held this post, and they are what pushed the wolves onto my road. Cull eight and push them back.",
-        "completion": "Eight, and the dusk chorus is thinner for it. But howlers do not leave the peaks for nothing. Something up there moved them, and I fear it has a name.",
+        "title": "Tiếng Gào Trên Bậc Thềm",
+        "text": "Bạn nghe thấy nó lúc chạng vạng, {playerName}: một tiếng gào từ Bậc Thềm Gào Thét không phải của các bầy sói tuyết trôi dạt. Những cổ họng lớn hơn. Những kẻ gào thét bậc thang đã xuống từ đỉnh núi lần đầu tiên kể từ khi bà của ta giữ vị trí này, và chính chúng đã đẩy đàn sói lên con đường của ta. Diệt tám con và đẩy chúng lùi lại.",
+        "completion": "Tám con, và bản hợp xướng chạng vạng đã thưa hơn vì điều đó. Nhưng những kẻ gào thét không rời đỉnh núi vô cớ. Có thứ gì đó trên đó đã xui khiến chúng, và ta sợ rằng thứ đó có một cái tên.",
         "objectives": {
           "0": {
-            "label": "Terrace Howler slain"
+            "label": "Kẻ Gào Thét Bậc Thang bị tiêu diệt"
           }
         }
       },
       "q_fv_seeing_wren_home": {
-        "title": "Seeing Wren Home",
-        "text": "My apprentice Wren went out to walk the Goldmelt line two days ago and never came back. I found her tracks, she is holed up under the road markers southwest of the Aurora Steps, too scared of the wolves to move. I cannot leave the fen, {playerName}. Walk her to Veyla's camp on the Steps. She will be safe under the lights.",
-        "completion": "The girl is inside, wrapped in half my blankets and talking the stars out of the sky. You did a kind thing today, {playerName}. The Reach doesn't see many of those.",
+        "title": "Đưa Wren Về Nhà",
+        "text": "Học việc Wren của ta đã ra đi dọc theo tuyến Goldmelt hai ngày trước và không bao giờ trở lại. Ta đã tìm thấy dấu chân cô bé, cô bé đang trốn dưới những cột mốc đường đông bắc Bậc Thang Cực Quang, quá sợ đàn sói để di chuyển. Ta không thể rời khỏi đầm lầy này, {playerName}. Hãy dẫn cô bé đến trại của Veyla trên Bậc Thang. Cô bé sẽ an toàn dưới ánh sáng.",
+        "completion": "Cô bé đang ở trong nhà, cuộn mình trong nửa số chăn của ta và huyên thuyên về những vì sao trên trời. Bạn đã làm một việc tốt hôm nay, {playerName}. Vùng Đất này không thường thấy những việc như vậy.",
         "objectives": {
           "0": {
-            "label": "Apprentice Wren seen safely to the Aurora Steps"
+            "label": "Học Việc Wren được đưa an toàn đến Bậc Thang Cực Quang"
           }
         }
       },
       "q_fv_frostmane_tyrant": {
-        "title": "The Frostmane Tyrant",
-        "text": "The howlers were not hunting when they came down the terraces. They were fleeing. A yeti has claimed the high ground, the mountain folk call it the Frostmane, and even the packs will not share a slope with it. It has to end, {playerName}, before winter drives it down to my walls. Bring a friend. Bring two.",
-        "completion": "When the wind dropped last night the whole village heard the silence where the Frostmane used to be. The Reach owes you a debt it will be years in paying, {playerName}. Wear this, and every door in Icemantle is open to you.",
+        "title": "Bạo Chúa Bờm Băng Giá",
+        "text": "Những kẻ gào thét không phải đang săn mồi khi chúng xuống khỏi bậc thềm. Chúng đang chạy trốn. Một con người tuyết đã chiếm lấy vùng đất cao, dân miền núi gọi nó là Bờm Băng Giá, và ngay cả các bầy sói cũng không chịu chia sẻ một sườn núi với nó. Việc này phải chấm dứt, {playerName}, trước khi mùa đông đẩy nó xuống tận tường thành của ta. Rủ theo một người bạn. Rủ theo hai người.",
+        "completion": "Khi gió lặng đêm qua, cả ngôi làng đã nghe thấy sự im lặng nơi Bờm Băng Giá từng ở. Vùng Đất này nợ bạn một món nợ sẽ mất nhiều năm để trả, {playerName}. Hãy khoác lên thứ này, và mọi cánh cửa ở Icemantle sẽ rộng mở với bạn.",
         "objectives": {
           "0": {
-            "label": "The Frostmane slain"
+            "label": "Bờm Băng Giá bị tiêu diệt"
           }
         }
       },
       "q_dk_ash_on_the_wind": {
-        "title": "Ash on the Wind",
-        "text": "Look south off the palisade, {playerName}. Those fires in the dunes are not troll cookfires, they are ashbone musters, and every night there are more. The dead come up out of the bonefields with sand still in their teeth. Cut down ten raiders before they cut a road to my gate.",
-        "completion": "Ten fewer blades in the dunes, and the muster fires burned lower last night. My sentries slept, which they have not done in a week. Well cut, {playerName}.",
+        "title": "Tro Bay Trong Gió",
+        "text": "Nhìn về phía nam khỏi hàng rào cọc này, {playerName}. Những ngọn lửa trên cồn cát kia không phải lửa nấu ăn của troll, đó là những cuộc tập hợp của Xương Tro, và mỗi đêm lại có thêm nhiều hơn. Xác chết trồi lên từ những cánh đồng xương với cát vẫn còn dính trên răng. Hãy chặt hạ mười kẻ đột kích trước khi chúng mở được đường đến cổng của ta.",
+        "completion": "Bớt đi mười lưỡi đao trên cồn cát, và ngọn lửa tập hợp cháy thấp hơn đêm qua. Lính canh của ta đã ngủ được, điều mà họ chưa làm suốt một tuần qua. Ra tay tốt lắm, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Ashbone Raider slain"
+            "label": "Kẻ Đột Kích Xương Tro bị tiêu diệt"
           }
         }
       },
       "q_dk_trolls_on_the_road": {
-        "title": "Trolls on the Road",
-        "text": "The dune trolls have learned the sound of a supply wagon, {playerName}. They hit the Cinder Dunes road three times this month, and the last driver walked in carrying nothing but the reins. Eight trolls off that road and my wagons roll again.",
-        "completion": "Eight, and my drivers have stopped writing farewell letters before every run. The garrison eats because of you, {playerName}.",
+        "title": "Troll Trên Đường",
+        "text": "Đám troll cồn cát đã học được âm thanh của một chiếc xe tiếp tế, {playerName}. Chúng đã tấn công con đường Cồn Cát Tro Tàn ba lần trong tháng này, và người đánh xe cuối cùng bước vào chỉ còn mang theo dây cương. Dẹp tám con troll khỏi con đường đó thì xe của ta sẽ lại lăn bánh.",
+        "completion": "Tám con, và những người đánh xe của ta đã ngừng viết thư từ biệt trước mỗi chuyến đi. Đồn trú này có cái ăn là nhờ bạn, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Dune Troll slain"
+            "label": "Troll Cồn Cát bị tiêu diệt"
           }
         }
       },
       "q_dk_scorched_stores": {
-        "title": "Scorched Stores",
-        "text": "The last wagon burned, {playerName}, but iron-strapped crates do not burn through. Four of them are still lying scorched along the dunes road with a season of salt, nails, and bowstrings inside. Bring my stores home before the trolls work out how to open them.",
-        "completion": "Scorched black and every latch still holding. The smith gets his nails, the fletcher her strings, and you get the boots I was saving for whoever brought my crates back, {playerName}.",
+        "title": "Kho Hàng Cháy Sém",
+        "text": "Chiếc xe hàng cuối cùng đã cháy, {playerName}, nhưng những thùng bọc sắt không cháy xuyên qua được. Bốn thùng vẫn đang nằm cháy sém dọc theo con đường cồn cát, bên trong chứa muối, đinh, và dây cung đủ dùng cả mùa. Mang kho hàng của ta về nhà trước khi đám troll tìm ra cách mở chúng.",
+        "completion": "Cháy đen nhưng mọi cái chốt vẫn còn giữ chặt. Người thợ rèn có đinh của mình, người làm cung có dây của cô ấy, và bạn có đôi ủng ta để dành cho ai mang thùng hàng của ta về, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Scorched supply crate recovered"
+            "label": "Thùng Tiếp Tế Cháy Sém được tìm lại"
           }
         }
       },
       "q_dk_banners_over_the_dunes": {
-        "title": "Banners over the Dunes",
-        "text": "The ashbone muster at the old bonefield graves, {playerName}, and my patrols cannot read the dunes the way they read a wall. Kill five of their warcallers, the ones that scream the dead upright, and plant a warning banner on each muster ground so my sentries can mark it from the ridge.",
-        "completion": "Three banners snapping in the hot wind, right where my glass can find them. With five warcallers silenced, whatever answers their call will come slower. You bought us time, {playerName}.",
+        "title": "Cờ Hiệu Trên Cồn Cát",
+        "text": "Xương Tro tập hợp tại những nấm mộ cánh đồng xương cũ, {playerName}, và đội tuần tra của ta không thể đọc được cồn cát như cách họ đọc một bức tường. Hãy giết năm kẻ hô chiến của chúng, những kẻ hét gào khiến xác chết đứng dậy, và cắm một lá cờ cảnh báo tại mỗi bãi tập hợp để lính canh của ta có thể đánh dấu từ trên sườn núi.",
+        "completion": "Ba lá cờ phần phật trong gió nóng, đúng nơi ống nhòm của ta có thể thấy chúng. Với năm kẻ hô chiến đã bị bịt miệng, bất cứ thứ gì đáp lại tiếng gọi của chúng sẽ đến chậm hơn. Bạn đã mua cho chúng ta thời gian, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Ashbone Warcaller slain"
+            "label": "Kẻ Hô Chiến Xương Tro bị tiêu diệt"
           },
           "1": {
-            "label": "Warning banner planted"
+            "label": "Cờ cảnh báo đã cắm"
           }
         }
       },
       "q_dk_watcher_at_the_wargate": {
-        "title": "The Watcher at the Wargate",
-        "text": "Something is pulling the ashbone east, {playerName}, and I sent my best to learn what. Scout Yerrin has camped a month in the far dunes past Trollmoot, in sight of a gate nobody built in my lifetime. Her reports stopped ten days ago. Find her camp and get me her eyes.",
-        "completion": "Brannoc sent you? Then my last runner never made it. Keep your voice down and sit, {playerName}. You see that gate below? Count the war-banners in front of it, and you will understand why I stopped writing things down.",
+        "title": "Người Canh Gác Tại Cổng Chiến Tranh",
+        "text": "Có thứ gì đó đang kéo Xương Tro về phía đông, {playerName}, và ta đã cử người giỏi nhất của mình đi tìm hiểu. Trinh Sát Yerrin đã cắm trại một tháng ở cồn cát xa xôi qua khỏi Trollmoot, trong tầm nhìn của một cánh cổng mà không ai xây trong đời ta. Báo cáo của cô ấy đã ngừng lại mười ngày trước. Tìm trại của cô ấy và mang về cho ta những gì cô ấy đã thấy.",
+        "completion": "Brannoc cử bạn đến? Vậy thì người đưa tin cuối cùng của ta đã không đến nơi. Hạ giọng xuống và ngồi đi, {playerName}. Bạn thấy cánh cổng bên dưới kia không? Hãy đếm những lá cờ chiến tranh trước nó, và bạn sẽ hiểu tại sao ta đã ngừng ghi chép mọi thứ.",
         "objectives": {
           "0": {
-            "label": "Find Scout Yerrin"
+            "label": "Tìm Trinh Sát Yerrin"
           }
         }
       },
       "q_dk_marrow_and_ash": {
-        "title": "Marrow and Ash",
-        "text": "Every ashbone raider carries a war-brand, {playerName}: a scorched tally of the host it marches under. I have counted four hosts from this ridge, but guesses are not intelligence. Bring me six brands off the raiders and their warcallers, and I will give Brannoc the shape of the war that is coming.",
-        "completion": "Six brands, and one mark burned into every one of them. This is no raid muster, {playerName}. Every host in the dunes answers to the wargate below us, the trolls call it Orkadia, and no five soldiers I ever served with could break what drums behind that door. Perhaps five like you.",
+        "title": "Tủy Và Tro",
+        "text": "Mỗi kẻ đột kích Xương Tro đều mang một chiến đao, {playerName}: một dấu khắc cháy sém của đội quân mà nó phục vụ. Ta đã đếm được bốn đội quân từ sườn núi này, nhưng phỏng đoán không phải là tình báo. Mang cho ta sáu chiến đao từ những kẻ đột kích và kẻ hô chiến của chúng, và ta sẽ cho Brannoc biết hình dạng cuộc chiến sắp tới.",
+        "completion": "Sáu chiến đao, và một dấu ấn cháy khắc trên mỗi cái. Đây không phải cuộc tập hợp đột kích thường, {playerName}. Mọi đội quân trên cồn cát này đều phục tùng cổng chiến tranh bên dưới chúng ta, đám troll gọi nó là Orkadia, và không có năm người lính nào ta từng phục vụ cùng có thể phá vỡ thứ đang rền vang sau cánh cửa đó. Có lẽ năm người như bạn thì được.",
         "objectives": {
           "0": {
-            "label": "Ashbone War-Brand"
+            "label": "Chiến Đao Xương Tro"
           }
         }
       },
       "q_dk_scales_of_the_maw": {
-        "title": "Scales of the Maw",
-        "text": "When the wind turns off the Drakemaw, the emberwing drakes ride it over my camp low enough to count their teeth, {playerName}. They range farther every day, and something in that crater drives them. Bring me three of their scales. Scales remember heat, and I can read where a drake has been roosting by the burn.",
-        "completion": "Look at the underside of this one, {playerName}: scorched in a spiral, and only one thing nests in circles. These drakes are brood-guards. Something in the Drakemaw is a mother.",
+        "title": "Vảy Của Hàm Rồng",
+        "text": "Khi gió đổi hướng từ Drakemaw, đàn rồng cánh lửa lượn qua trại của ta thấp đến mức có thể đếm được răng chúng, {playerName}. Chúng bay xa hơn mỗi ngày, và có thứ gì đó trong miệng núi lửa đó đang thúc đẩy chúng. Mang cho ta ba chiếc vảy của chúng. Vảy ghi nhớ nhiệt độ, và ta có thể đọc được nơi một con rồng từng đậu qua vết cháy.",
+        "completion": "Nhìn mặt dưới của cái này đi, {playerName}: cháy sém thành hình xoắn ốc, và chỉ có một thứ làm tổ theo vòng tròn. Những con rồng này là những kẻ canh giữ trứng. Có thứ gì đó trong Drakemaw là một con mẹ.",
         "objectives": {
           "0": {
-            "label": "Emberwing Scale"
+            "label": "Vảy Cánh Lửa"
           }
         }
       },
       "q_dk_matriarch_of_the_maw": {
-        "title": "Matriarch of the Maw",
-        "text": "The scales told it true, {playerName}. I climbed the rim at dawn and saw her on the crater floor: Cindraleth, the matriarch every emberwing in this sky was hatched under, gold as a coal about to catch. While she broods, the drakes grow bolder, and Wyrmwatch cannot fight dragons and the ashbone both. End her in her crater, then carry the word to Gatecaptain Brannoc. Do not go alone.",
-        "completion": "The sky over the Drakemaw has been empty for two days, and now you walk through my gate with a matriarch's blood on your boots. Wyrmwatch has stood forty years on watch for exactly this, {playerName}. Take these pauldrons, mawscale, worked by our own smith. Wear them where the drakes can see.",
+        "title": "Mẫu Chúa Hàm",
+        "text": "Những chiếc vảy đã nói đúng, {playerName}. Ta trèo lên miệng núi lửa lúc bình minh và thấy nó dưới đáy hố: Cindraleth, mẫu chúa mà mọi rồng cánh lửa trên bầu trời này đã nở ra dưới quyền, vàng óng như than sắp bén lửa. Khi nó ấp trứng, đám rồng con trở nên táo tợn hơn, và Wyrmwatch không thể vừa chiến đấu với rồng vừa chiến đấu với Xương Tro. Kết liễu nó trong hố núi lửa của nó, rồi mang tin đến Đội Trưởng Cổng Brannoc. Đừng đi một mình.",
+        "completion": "Bầu trời trên Drakemaw đã trống rỗng suốt hai ngày, và giờ bạn bước qua cổng của ta với máu của mẫu chúa dính trên ủng. Wyrmwatch đã đứng canh bốn mươi năm chính vì khoảnh khắc này, {playerName}. Nhận lấy đôi giáp vai này, làm từ vảy hàm, được thợ rèn của chúng ta chế tác. Hãy mang chúng ở nơi đám rồng có thể nhìn thấy.",
         "objectives": {
           "0": {
-            "label": "Cindraleth the Maw Matriarch slain"
+            "label": "Cindraleth Mẫu Chúa Hàm bị tiêu diệt"
           }
         }
       },
       "q_af_goldmelt_road": {
-        "title": "The Gold Road Down",
-        "text": "You came over the Goldmelt, {playerName}, snow still on your boots. I keep this shrine so Lanternmere knows who walks in from the cold, and lately I have had little to report. Take the gold road down to the town, find Reeve Ottoline by the well, and tell her the pass is quiet.",
-        "completion": "Quiet on the Goldmelt, and a traveler with snow in their hair to prove it. Sorrel keeps her watch too well to send idle word. Be welcome in Lanternmere, {playerName}. The lanterns burn for you.",
+        "title": "Con Đường Vàng Đi Xuống",
+        "text": "Bạn đã băng qua Goldmelt, {playerName}, tuyết vẫn còn bám trên đôi ủng của bạn. Ta canh giữ miếu thờ này để Lanternmere biết ai bước vào từ giá lạnh, và gần đây ta chẳng có gì để báo cáo. Hãy đi theo con đường vàng xuống thị trấn, tìm Xã Trưởng Ottoline bên giếng nước, và nói với bà ấy rằng đèo núi vẫn yên tĩnh.",
+        "completion": "Yên tĩnh trên Goldmelt, và một lữ khách với tuyết trên tóc để chứng minh điều đó. Sorrel canh gác quá tốt để gửi tin tức vô ích. Chào mừng đến Lanternmere, {playerName}. Những chiếc đèn lồng cháy sáng vì bạn.",
         "objectives": {
           "0": {
-            "label": "Report to Reeve Ottoline"
+            "label": "Báo cáo với Xã Trưởng Ottoline"
           }
         }
       },
       "q_af_foxes_in_the_lamplight": {
-        "title": "Foxes in the Lamplight",
-        "text": "The gloam foxes have learned what the lantern stores are worth, {playerName}. Every dusk they slip the fences and carry off the tallow we press for the ferry lamps. Soft paws, softer conscience. Cull ten of them and the rest will remember to fear the town.",
-        "completion": "Ten, and the stores went untouched last night for the first time this season. The lamplighters send their thanks, {playerName}.",
+        "title": "Cáo Trong Ánh Đèn Lồng",
+        "text": "Đàn cáo chạng vạng đã học được giá trị của kho đèn lồng, {playerName}. Mỗi khi chạng vạng buông xuống, chúng lẻn qua hàng rào và tha đi mỡ động vật mà chúng ta ép để làm đèn phà. Bàn chân mềm mại, lương tâm còn mềm mại hơn. Hãy diệt mười con và số còn lại sẽ nhớ mà sợ thị trấn này.",
+        "completion": "Mười con, và kho đồ đêm qua không bị đụng đến lần đầu tiên trong mùa này. Những người thắp đèn gửi lời cảm ơn đến bạn, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Gloam Fox slain"
+            "label": "Cáo Chạng Vạng bị tiêu diệt"
           }
         }
       },
       "q_af_lanterns_on_the_water": {
-        "title": "Lanterns on the Water",
-        "text": "Every ferry on the Mere carries a stern lantern, {playerName}, and three of my boats came back at dawn without theirs. The fog took them, or something in the fog did. They wash up along the east shore when the wind turns. Walk the shore road and bring my lanterns home.",
-        "completion": "All three, and still burning. Ferry lanterns do not go out in water, {playerName}. That is the point of them. What worries me is what pulled them loose.",
+        "title": "Đèn Lồng Trên Mặt Nước",
+        "text": "Mỗi chiếc phà trên hồ đều mang một chiếc đèn lồng đuôi thuyền, {playerName}, và ba chiếc thuyền của ta trở về lúc bình minh mà không còn đèn. Sương mù đã lấy chúng đi, hoặc thứ gì đó trong sương mù đã làm vậy. Chúng dạt vào bờ đông khi gió đổi chiều. Hãy đi dọc con đường ven bờ và mang những chiếc đèn lồng của ta về.",
+        "completion": "Cả ba chiếc, vẫn còn cháy sáng. Đèn lồng đò không tắt trong nước, {playerName}. Đó chính là mục đích của chúng. Điều khiến ta lo lắng là thứ gì đã kéo chúng rời ra.",
         "objectives": {
           "0": {
-            "label": "Ferry Lantern recovered"
+            "label": "Đèn Lồng Đò được tìm lại"
           }
         }
       },
       "q_af_orchard_call": {
-        "title": "A Cart for the Orchard",
-        "text": "Orchardist Pomeline keeps the Gilded Orchard on the west road, and her sap carts are three days overdue. The whole town runs on that amber sap, {playerName}: lamp resin, sweetening, the harvest ale. Walk the west road and find out what keeps her.",
-        "completion": "The Reeve counts her carts, does she? Well, she can count them missing a while longer. Look at my rows, {playerName}. I have greater troubles than a late delivery.",
+        "title": "Một Chuyến Xe Cho Khu Vườn",
+        "text": "Người Coi Vườn Quả Pomeline giữ Vườn Dát Vàng trên con đường phía tây, và những xe nhựa cây của bà ấy đã trễ ba ngày. Cả thị trấn sống nhờ vào nhựa hổ phách đó, {playerName}: nhựa thông cho đèn, chất làm ngọt, và rượu bia mùa gặt. Hãy đi theo con đường phía tây và tìm hiểu xem điều gì đang giữ chân bà ấy.",
+        "completion": "Xã Trưởng đếm những chuyến xe của bà ta à? Được thôi, bà ta cứ đếm chúng thiếu thêm một thời gian nữa cũng được. Nhìn những hàng cây của ta đi, {playerName}. Ta có những rắc rối lớn hơn một chuyến giao hàng trễ nải nhiều.",
         "objectives": {
           "0": {
-            "label": "Find Orchardist Pomeline"
+            "label": "Tìm Người Coi Vườn Quả Pomeline"
           }
         }
       },
       "q_af_amber_from_the_herd": {
-        "title": "Amber off the Herd",
-        "text": "The gilded stags bed down beneath my oldest trees, and the sap drips gold into their coats all night. Combed clots of it are the purest amber in the weald. Bring me six, {playerName}. The stags will not thank you, but they will not miss it either.",
-        "completion": "Six clots, clean as poured honey. These gloves are stitched with the last batch, {playerName}: sap-stiffened, and warmer than they look.",
+        "title": "Hổ Phách Từ Đàn Hươu",
+        "text": "Những chú hươu đực dát vàng nằm nghỉ dưới những gốc cây cổ thụ nhất của ta, và nhựa cây nhỏ giọt vàng óng lên bộ lông chúng suốt đêm. Những khối nhựa được chải ra là hổ phách tinh khiết nhất trong khu rừng này. Mang cho ta sáu khối, {playerName}. Đàn hươu sẽ không cảm ơn bạn đâu, nhưng chúng cũng sẽ không tiếc gì cả.",
+        "completion": "Sáu khối, sạch như mật ong vừa rót. Đôi găng tay này được khâu từ mẻ nhựa cuối cùng, {playerName}: cứng lại vì nhựa cây, và ấm hơn vẻ ngoài của chúng.",
         "objectives": {
           "0": {
-            "label": "Gilded Sap Clot"
+            "label": "Khối Nhựa Dát Vàng"
           }
         }
       },
       "q_af_what_took_the_moorings": {
-        "title": "What Took the Moorings",
-        "text": "Now I will tell you what I did not say in front of the town. The moorings were not slipped, they were bitten through. Mere lurkers, bolder every night, dragging at the ropes and the rudders. Put eight of them back under the water for good, {playerName}, before a ferryman goes with them.",
-        "completion": "Eight fewer shapes in the shallows, and the crossing ran on time today for the first time in a fortnight. But bold lurkers are driven lurkers, {playerName}. Something beneath the Mere is moving them.",
+        "title": "Điều Gì Đã Lấy Đi Những Sợi Dây Neo",
+        "text": "Giờ ta sẽ nói cho bạn nghe điều ta không dám nói trước mặt cả thị trấn. Những sợi dây neo không tự tuột ra, chúng đã bị cắn đứt. Những kẻ rình đầm hồ, mỗi đêm một táo tợn hơn, kéo giật dây thừng và bánh lái. Hãy đưa tám con trong số chúng xuống dưới nước mãi mãi, {playerName}, trước khi một người lái phà bị kéo theo chúng.",
+        "completion": "Bớt đi tám bóng hình dưới vùng nước cạn, và chuyến qua sông hôm nay chạy đúng giờ lần đầu tiên trong hai tuần qua. Nhưng những kẻ rình rập táo tợn là những kẻ rình rập bị xui khiến, {playerName}. Có thứ gì đó dưới đáy hồ đang điều khiển chúng.",
         "objectives": {
           "0": {
-            "label": "Mere Lurker slain"
+            "label": "Kẻ Rình Đầm Hồ bị tiêu diệt"
           }
         }
       },
       "q_af_sprites_and_spigots": {
-        "title": "Sprites and Spigots",
-        "text": "Harvest sprites, {playerName}. They pry my sap-taps from the trunks for the sweetness inside and fling the buckets into the grass. Drive off eight of the little thieves and bring back four of my buckets, and the carts roll again.",
-        "completion": "Four buckets back on their hooks and the rows gone quiet. You have a heavier hand with sprites than I do, {playerName}, and today I am glad of it.",
+        "title": "Tinh Linh Và Vòi Hứng Nhựa",
+        "text": "Tinh linh mùa gặt, {playerName}. Chúng cạy vòi hứng nhựa của ta ra khỏi thân cây vì vị ngọt bên trong và ném những chiếc xô vào bãi cỏ. Hãy đuổi tám tên trộm nhỏ này đi và mang về bốn chiếc xô của ta, thì những chuyến xe sẽ lại lăn bánh.",
+        "completion": "Bốn chiếc xô đã về lại trên móc treo và những hàng cây đã yên tĩnh trở lại. Bạn ra tay mạnh mẽ với đám tinh linh hơn ta nhiều, {playerName}, và hôm nay ta mừng vì điều đó.",
         "objectives": {
           "0": {
-            "label": "Harvest Sprite driven off"
+            "label": "Tinh Linh Mùa Gặt bị đuổi đi"
           },
           "1": {
-            "label": "Sap-Tap Bucket recovered"
+            "label": "Xô Hứng Nhựa được tìm lại"
           }
         }
       },
       "q_af_the_meredark": {
-        "title": "The Meredark",
-        "text": "The old ferrymen have a name they only say ashore: the Meredark, the first lurker, old as the lake and twice as patient. It rose once before, the year the drowned jetty went under, and it is rising now. At dusk it suns itself on the jetty ruin off the south shore, {playerName}. Take a friend, take two, and end it while it can still be ended.",
-        "completion": "The fog lifted off the Mere this morning, {playerName}, and the whole town saw it. The ferries will run the night crossing again, and every lantern on the water will burn in your name. Take this: it was dredged from the drowned jetty, and no one has better right to wear it.",
+        "title": "Meredark",
+        "text": "Những người lái phà già có một cái tên mà họ chỉ nói khi đã lên bờ: Meredark, kẻ rình rập đầu tiên, già như chính hồ nước này và kiên nhẫn gấp đôi. Nó từng trỗi dậy một lần trước đây, năm mà cầu tàu chìm xuống nước, và giờ nó lại đang trỗi dậy. Lúc chạng vạng, nó phơi mình trên tàn tích cầu tàu ngoài bờ nam, {playerName}. Hãy rủ theo một người bạn, hay hai người, và kết liễu nó trong khi vẫn còn có thể.",
+        "completion": "Sương mù đã tan khỏi mặt hồ sáng nay, {playerName}, và cả thị trấn đều thấy điều đó. Những chiếc phà sẽ lại chạy chuyến đêm, và mọi ngọn đèn lồng trên mặt nước sẽ cháy sáng vì tên bạn. Hãy nhận lấy thứ này: nó được vớt lên từ cầu tàu chìm, và không ai xứng đáng mang nó hơn bạn.",
         "objectives": {
           "0": {
-            "label": "The Meredark slain"
+            "label": "Meredark bị tiêu diệt"
           }
         }
       },
       "q_wf_across_the_fenway": {
-        "title": "Across the Fenway",
-        "text": "A gentle country, the Willowfen, but gentle is not the same as safe, {playerName}. Follow the road north to the Fenway causeway and cross into Bridgemere. Tell Bridgewright Alden the Steps are open and the waycamp fire is lit.",
-        "completion": "Pell keeps that fire burning through every fog the fen can breathe at her. If she says the Steps are open, they are open. Welcome to Bridgemere, {playerName}. Watch your step on my planks and we will get along fine.",
+        "title": "Băng Qua Fenway",
+        "text": "Một vùng đất hiền hòa, Willowfen này, nhưng hiền hòa không có nghĩa là an toàn, {playerName}. Theo con đường phía bắc đến đường đê Fenway và băng qua Bridgemere. Nói với Thợ Cầu Alden rằng Bậc Thang đã mở và ngọn lửa trạm gác đã được thắp lên.",
+        "completion": "Pell giữ ngọn lửa đó cháy sáng xuyên qua mọi lớp sương mù mà đầm lầy có thể phả vào cô ấy. Nếu cô ấy nói Bậc Thang đã mở, thì chúng đã mở. Chào mừng đến Bridgemere, {playerName}. Cẩn thận bước chân trên những tấm ván của tôi và chúng ta sẽ hòa hợp thôi.",
         "objectives": {
           "0": {
-            "label": "Report to Bridgewright Alden"
+            "label": "Báo cáo với Thợ Cầu Alden"
           }
         }
       },
       "q_wf_rope_chewers": {
-        "title": "The Rope-Chewers",
-        "text": "Bogtoads, {playerName}. They haul up out of the moat at night and chew through my mooring ropes like they were reed stems. Three skiffs went drifting last week, and one of them had my good winch aboard. Thin them out, ten of the fat things, and the boats stay where we tie them.",
-        "completion": "Ten fewer sets of teeth in my moat. The skiffs sat their moorings all night for the first time in a month, {playerName}. You have the thanks of every netter in town.",
+        "title": "Những Kẻ Gặm Dây Thừng",
+        "text": "Cóc đầm lầy, {playerName}. Chúng leo lên khỏi hào ban đêm và gặm đứt dây neo của tôi như thể đó chỉ là những cọng lau sậy. Ba chiếc thuyền nhỏ đã trôi dạt tuần trước, và một trong số đó mang theo cả chiếc tời tốt của tôi. Giảm bớt số lượng chúng, mười con béo ị đó, và những chiếc thuyền sẽ ở yên nơi chúng tôi buộc chúng.",
+        "completion": "Bớt đi mười bộ răng trong hào của tôi. Những chiếc thuyền nhỏ đã đậu yên tại chỗ neo suốt đêm lần đầu tiên trong một tháng, {playerName}. Bạn có lời cảm ơn của mọi người đánh lưới trong thị trấn.",
         "objectives": {
           "0": {
-            "label": "Bogtoad slain"
+            "label": "Cóc Đầm Lầy bị tiêu diệt"
           }
         }
       },
       "q_wf_eels_for_the_smokehouse": {
-        "title": "Eels for the Smokehouse",
-        "text": "The bogtoads are not just eating my ropes, {playerName}, they are eating my catch: they gulp the eels down whole, straight out of the traps. Cut six plump ones free of the greedy things before the meat spoils, and the smokehouse fires stay lit.",
-        "completion": "Six good eels, barely bruised. The smokehouse will smell like money by morning. Here, these waders were mine when I was quicker: eelskin turns the wet like nothing else.",
+        "title": "Lươn Cho Nhà Xông Khói",
+        "text": "Lũ cóc đầm lầy không chỉ ăn dây thừng của tôi, {playerName}, chúng còn ăn cả hải sản tôi bắt được: chúng nuốt trọn cả con lươn, ngay từ trong bẫy. Giải thoát sáu con lươn béo mập khỏi lũ tham lam đó trước khi thịt bị hỏng, và lửa nhà xông khói sẽ tiếp tục cháy.",
+        "completion": "Sáu con lươn tốt, hầu như không bị bầm dập. Nhà xông khói sẽ tỏa mùi như tiền bạc vào buổi sáng. Đây, đôi giày lội nước này từng là của tôi khi tôi còn nhanh nhẹn: da lươn chống nước tốt hơn bất cứ thứ gì khác.",
         "objectives": {
           "0": {
-            "label": "Plump Fen Eel"
+            "label": "Lươn Đầm Lầy Béo Mập"
           }
         }
       },
       "q_wf_mind_the_moorings": {
-        "title": "Mind the Moorings",
-        "text": "Good rope is dear out here, {playerName}: every line the toads bite through is a week of eel-money gone. The cut ends are still lying along the moat shore where the boats slipped them. Walk the boardwalks and bring me back four lines, and I can splice them good as new.",
-        "completion": "Look at that: clean bites, every one, but there is rope enough left to splice. You have saved me a month of coin and the netters a month of grumbling, {playerName}.",
+        "title": "Chú Ý Đến Dây Neo",
+        "text": "Dây thừng tốt rất quý giá ở đây, {playerName}: mỗi sợi dây bị lũ cóc cắn đứt là một tuần tiền bán lươn mất trắng. Những đầu dây bị cắt vẫn còn nằm dọc bờ hào nơi những chiếc thuyền tuột khỏi chúng. Đi trên những lối ván gỗ và mang về cho tôi bốn sợi dây, và tôi có thể nối chúng lại tốt như mới.",
+        "completion": "Nhìn xem: những vết cắn gọn gàng, từng sợi một, nhưng vẫn còn đủ dây thừng để nối lại. Bạn đã tiết kiệm cho tôi một tháng tiền bạc và cho những người đánh lưới một tháng cằn nhằn, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Cut Mooring Line recovered"
+            "label": "Dây Neo Bị Cắt được tìm lại"
           }
         }
       },
       "q_wf_witch_of_willowweep": {
-        "title": "The Witch of Willowweep",
-        "text": "You have heard it by now, {playerName}: the snore. Slow and heavy, out past the Drowsy Flats, like the fen itself turning over in its sleep. The toads, the sprites, the wisps burning at noon: it all started when that sound did. One soul might know what it is. Mother Sedge keeps a camp at Willowweep, west around the moat and down the far shore. Find her, and ask her what sleeps at the middle of my fen.",
-        "completion": "Alden sent you all this way to ask about the snoring? Then the bridge-folk are finally listening. Sit down out of the damp, {playerName}. That sound has a name, and a throat, and I have been waiting for someone fool enough to help me quiet it.",
+        "title": "Phù Thủy Của Willowweep",
+        "text": "Chắc giờ bạn đã nghe thấy nó, {playerName}: tiếng ngáy. Chậm rãi và nặng nề, ngoài Bãi Bằng Buồn Ngủ, như thể chính đầm lầy đang trở mình trong giấc ngủ. Lũ cóc, lũ tinh linh, những đốm sáng bừng cháy giữa trưa: tất cả bắt đầu khi âm thanh đó bắt đầu. Có một linh hồn có thể biết đó là gì. Mẫu Sedge cắm trại tại Willowweep, phía tây quanh hào nước và xuống bờ xa. Tìm bà ấy, và hỏi bà ấy xem điều gì đang ngủ giữa đầm lầy của tôi.",
+        "completion": "Alden đã cử bạn đi xa đến đây chỉ để hỏi về tiếng ngáy đó sao? Vậy là dân cầu cuối cùng cũng chịu lắng nghe. Ngồi xuống tránh xa chỗ ẩm ướt đi, {playerName}. Âm thanh đó có một cái tên, và một cổ họng, và tôi đã chờ đợi một kẻ đủ ngốc nghếch để giúp tôi làm nó im lặng.",
         "objectives": {
           "0": {
-            "label": "Find Mother Sedge"
+            "label": "Tìm Mẫu Sedge"
           }
         }
       },
       "q_wf_toll_and_tangle": {
-        "title": "Toll and Tangle",
-        "text": "The willow sprites think it is a fine game to cut a ferry loose, {playerName}, and last week the toll skiff went over on the east track with a season of bridge-toll aboard. The chests went down in the shallows and the sprites dance on the boardwalks like they own them. Drive off eight and haul up three toll-chests, and Bridgemere eats this winter.",
-        "completion": "Three chests, and the coin still dry inside. The sprites will sulk in the withies for a week, {playerName}, and the town owes you its winter bread.",
+        "title": "Phí Cầu Và Mớ Rối",
+        "text": "Tinh linh cây liễu nghĩ rằng cắt đứt một chiếc phà là một trò chơi hay, {playerName}, và tuần trước chiếc thuyền thu phí đã lật trên tuyến phía đông với cả một mùa phí cầu ở trên tàu. Những chiếc rương đã chìm xuống vùng nước cạn và lũ tinh linh nhảy múa trên những lối ván gỗ như thể chúng sở hữu chúng vậy. Đuổi tám con đi và kéo lên ba rương thu phí, và Bridgemere sẽ có cái ăn mùa đông này.",
+        "completion": "Ba chiếc rương, và đồng tiền bên trong vẫn còn khô ráo. Lũ tinh linh sẽ hờn dỗi trong bụi liễu gai suốt một tuần, {playerName}, và thị trấn nợ bạn tấm bánh mùa đông của nó.",
         "objectives": {
           "0": {
-            "label": "Willow Sprite driven off"
+            "label": "Tinh Linh Cây Liễu bị đuổi đi"
           },
           "1": {
-            "label": "Toll-Chest recovered"
+            "label": "Rương Thu Phí Chìm được tìm lại"
           }
         }
       },
       "q_wf_wisplight_charms": {
-        "title": "Wisplight Charms",
-        "text": "The wisps over the pools are the fen dreaming out loud, {playerName}, and their light is the only thing that holds against the Croaker's lull. I weave it into willow charms: one round your neck and the snore cannot drag your eyelids down. Bring me six wisplight globes. The wisps will not fight you for them, which makes it a kindness or a theft, depending on how you carry it.",
-        "completion": "Six globes, still warm with dreaming. Give me till moonrise and I will have charms woven for you and whoever is brave enough to stand beside you.",
+        "title": "Bùa Đốm Sáng",
+        "text": "Những đốm sáng trên các hồ nước là đầm lầy đang mơ thành tiếng, {playerName}, và ánh sáng của chúng là thứ duy nhất chống lại được lời ru ngủ của Kẻ Ộp Ộp. Tôi dệt nó vào những chiếc bùa liễu: một chiếc quanh cổ bạn và tiếng ngáy sẽ không thể kéo sụp mí mắt bạn xuống. Mang cho tôi sáu quả cầu đốm sáng. Những đốm sáng sẽ không chống lại bạn để giữ chúng, điều đó khiến nó trở thành một lòng tốt hoặc một hành vi trộm cắp, tùy vào cách bạn nhìn nhận nó.",
+        "completion": "Sáu quả cầu, vẫn còn ấm với giấc mơ. Cho tôi đến khi trăng lên và tôi sẽ dệt xong bùa cho bạn và bất cứ ai đủ can đảm đứng bên cạnh bạn.",
         "objectives": {
           "0": {
-            "label": "Wisplight Globe"
+            "label": "Quả Cầu Đốm Sáng"
           }
         }
       },
       "q_wf_croakers_hush": {
-        "title": "The Croaker's Hush",
-        "text": "Now you know the snorer's name, {playerName}: the Drowsy Croaker, the old toad-king out on the Drowsy Flats. Every year his croak grows heavier, and every year more of the fen forgets to wake. The charms will keep your eyes open, but his bulk is another matter: bring a friend, and do not fight him in the water. Put the old king to a quieter sleep.",
-        "completion": "Listen, {playerName}. Nothing. The first true silence over this fen in thirty years, and half the town will not sleep tonight for the strangeness of it. The willows say thank you, in their way. Wear this, woven from his own lily-bed, and the fen will know you for a friend wherever the water reaches.",
+        "title": "Sự Im Lặng Của Kẻ Ộp Ộp",
+        "text": "Giờ bạn đã biết tên kẻ ngáy đó, {playerName}: Kẻ Ộp Ộp Ngái Ngủ, vị vua cóc già ngoài Bãi Bằng Buồn Ngủ. Mỗi năm tiếng ộp ộp của nó lại nặng nề hơn, và mỗi năm càng có nhiều phần của đầm lầy quên cách thức tỉnh. Những lá bùa sẽ giữ cho mắt bạn mở, nhưng thân hình đồ sộ của nó lại là chuyện khác: rủ theo một người bạn, và đừng chiến đấu với nó dưới nước. Đưa vị vua già vào một giấc ngủ yên tĩnh hơn.",
+        "completion": "Lắng nghe đi, {playerName}. Không gì cả. Sự im lặng thực sự đầu tiên trên đầm lầy này trong ba mươi năm, và nửa thị trấn sẽ không ngủ được đêm nay vì sự kỳ lạ của nó. Những cây liễu gửi lời cảm ơn, theo cách của chúng. Khoác lên thứ này, được dệt từ chính luống hoa huệ của nó, và đầm lầy sẽ biết bạn là bạn bè ở bất cứ nơi nào nước chạm tới.",
         "objectives": {
           "0": {
-            "label": "The Drowsy Croaker slain"
+            "label": "Kẻ Ộp Ộp Ngái Ngủ bị tiêu diệt"
           }
         }
       },
       "q_nb_road_of_lanterns": {
-        "title": "The Road of Lanterns",
-        "text": "Up here the sun never follows, {playerName}, only the lamps I keep lit along the climb. Moonrest lies north where the flower-light gathers. Find Lira Dewsong among her gardens and tell her the Nightgate lamps still burn.",
-        "completion": "The lamps still burn, and the road still carries strangers to us. Sorrel has kept that gate longer than anyone in Moonrest remembers. Welcome, {playerName}, to the realm that never dawns.",
+        "title": "Con Đường Đèn Lồng",
+        "text": "Trên này mặt trời không bao giờ theo tới, {playerName}, chỉ có những ngọn đèn ta giữ cháy sáng dọc theo đường leo. Moonrest nằm về phía bắc nơi ánh sáng hoa tụ lại. Tìm Lira Dewsong giữa những khu vườn của cô ấy và nói với cô ấy rằng đèn Nightgate vẫn còn cháy.",
+        "completion": "Đèn vẫn còn cháy, và con đường vẫn còn mang những người lạ đến với chúng ta. Sorrel đã giữ cánh cổng đó lâu hơn bất cứ ai ở Moonrest còn nhớ được. Chào mừng, {playerName}, đến với vương quốc không bao giờ có bình minh.",
         "objectives": {
           "0": {
-            "label": "Find Lira Dewsong in Moonrest"
+            "label": "Tìm Lira Dewsong tại Moonrest"
           }
         }
       },
       "q_nb_striders_in_the_dark": {
-        "title": "Striders in the Dark",
-        "text": "The gloam striders were always patient hunters, {playerName}, but of late they slip right into the flower beds and take moonfleece lambs beneath our lanterns. Cull ten of them and give the downs back their quiet.",
-        "completion": "Ten striders fewer, and the herds already graze easier. The gardens keep their own hours, but tonight they keep them in peace.",
+        "title": "Những Kẻ Rảo Bước Trong Bóng Tối",
+        "text": "Những kẻ rảo bước chạng vạng luôn là những thợ săn kiên nhẫn, {playerName}, nhưng gần đây chúng lẻn thẳng vào các luống hoa và bắt đi những chú cừu con lông trăng ngay dưới đèn lồng của chúng ta. Diệt mười con và trả lại sự yên tĩnh cho những ngọn đồi.",
+        "completion": "Bớt đi mười kẻ rảo bước, và đàn hươu đã gặm cỏ thoải mái hơn. Những khu vườn giữ giờ giấc riêng của chúng, nhưng đêm nay chúng giữ trong bình yên.",
         "objectives": {
           "0": {
-            "label": "Gloam Strider slain"
+            "label": "Kẻ Rảo Bước Chạng Vạng bị tiêu diệt"
           }
         }
       },
       "q_nb_wool_by_moonlight": {
-        "title": "Wool by Moonlight",
-        "text": "Nothing warms like moonfleece, {playerName}, and nothing spins so fine. The grazers carry their silver wool loose in tufts as they drift the downs. Bring me six good tufts off the herds and I will weave you something worth the walking.",
-        "completion": "Silver as starlight and twice as soft. Here, {playerName}: mitts from the last batch, lined the way only moonfleece lines.",
+        "title": "Len Dưới Ánh Trăng",
+        "text": "Không gì ấm áp như lông trăng, {playerName}, và không gì có thể kéo sợi tinh xảo đến vậy. Những kẻ gặm cỏ mang theo lớp lông bạc rời rạc thành từng búi khi chúng lang thang trên những ngọn đồi. Mang cho ta sáu búi lông tốt từ đàn hươu và ta sẽ dệt cho bạn thứ gì đó xứng đáng với chuyến đi này.",
+        "completion": "Bạc như ánh sao và mềm gấp đôi. Đây, {playerName}: đôi găng tay từ mẻ cuối cùng, được lót theo cách chỉ có lông trăng mới làm được.",
         "objectives": {
           "0": {
-            "label": "Moonfleece Tuft"
+            "label": "Búi Lông Trăng"
           }
         }
       },
       "q_nb_night_gardens": {
-        "title": "The Night Gardens",
-        "text": "The nightbloom opens only under this sky, and Gloamfield holds the oldest beds in the realm. I need four fresh blossoms for the shrine garlands, {playerName}. Cut them gently: a bed remembers a rough hand for a season.",
-        "completion": "Still glowing, every petal. The shrine will smell of night for a week, and Moonrest sleeps easier for it.",
+        "title": "Những Khu Vườn Đêm",
+        "text": "Hoa nightbloom chỉ nở dưới bầu trời này, và Gloamfield giữ những luống hoa cổ xưa nhất trong cả vương quốc. Ta cần bốn đóa hoa tươi cho vòng hoa miếu thờ, {playerName}. Cắt chúng thật nhẹ nhàng: một luống hoa nhớ một bàn tay thô bạo suốt cả mùa.",
+        "completion": "Vẫn còn phát sáng, từng cánh hoa một. Miếu thờ sẽ thoảng hương đêm suốt một tuần, và Moonrest sẽ ngủ ngon hơn nhờ vậy.",
         "objectives": {
           "0": {
-            "label": "Nightbloom Blossom gathered"
+            "label": "Đóa Hoa Nightbloom được thu thập"
           }
         }
       },
       "q_nb_eyes_on_the_vigil": {
-        "title": "Eyes on the Vigil",
-        "text": "Something has the striders bold and the herds uneasy, {playerName}, and I cannot read it in the flowers. Cassian can read it in the sky. He keeps his observatory camp by the Standing Vigil east of here, where the nightkin drift among the stones. Find him, and ask what the stars are saying.",
-        "completion": "Lira sent you? Then the gardens feel it too. Sit by the glass a moment, {playerName}. The stars have been restless for a month, and every chart I draw leans north toward the barrow.",
+        "title": "Mắt Nhìn Về Canh Thức Vĩnh Cửu",
+        "text": "Có thứ gì đó khiến những kẻ rảo bước trở nên táo bạo và đàn hươu bất an, {playerName}, và ta không thể đọc được điều đó từ những bông hoa. Cassian có thể đọc được từ bầu trời. Ông ấy giữ trại quan sát của mình gần Canh Thức Vĩnh Cửu phía đông nơi này, nơi tộc đêm lang thang giữa những phiến đá. Tìm ông ấy, và hỏi xem các vì sao đang nói gì.",
+        "completion": "Lira cử bạn đến? Vậy là cả những khu vườn cũng cảm nhận được điều đó. Ngồi cạnh ống kính một lát đi, {playerName}. Các vì sao đã bất an suốt một tháng, và mỗi bản đồ ta vẽ đều nghiêng về phía bắc, hướng đến gò mộ.",
         "objectives": {
           "0": {
-            "label": "Find Astronomer Cassian at the Standing Vigil"
+            "label": "Tìm Nhà Thiên Văn Cassian tại Canh Thức Vĩnh Cửu"
           }
         }
       },
       "q_nb_charts_of_the_stones": {
-        "title": "The Charts in the Stones",
-        "text": "The Vigil stones are older than Moonrest, older than the nightkin who tend them, and their faces are cut with star charts I have spent my life learning to read. The sky has shifted, {playerName}, and I must know how far. Read the charts on three of the stones and bring me their bearings.",
-        "completion": "No doubt is left. Every bearing has crept toward the Sleepless Barrow, as if the sky itself leans over that mound to watch. The old kings were buried under aligned stars for a reason, {playerName}.",
+        "title": "Bản Đồ Trong Những Phiến Đá",
+        "text": "Những phiến đá Canh Thức còn cổ xưa hơn cả Moonrest, cổ xưa hơn cả tộc đêm chăm sóc chúng, và bề mặt của chúng được khắc những bản đồ sao mà ta đã dành cả đời để học cách đọc. Bầu trời đã dịch chuyển, {playerName}, và ta phải biết đã dịch chuyển bao xa. Đọc bản đồ trên ba phiến đá và mang về cho ta phương vị của chúng.",
+        "completion": "Không còn nghi ngờ gì nữa. Mọi phương vị đều đã dịch chuyển dần về phía Gò Mộ Không Ngủ, như thể chính bầu trời đang cúi xuống gò đất đó để quan sát. Các vị vua xưa được chôn cất dưới những vì sao thẳng hàng không phải vô cớ, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Star chart read"
+            "label": "Bản đồ sao đã được đọc"
           }
         }
       },
       "q_nb_restless_mounds": {
-        "title": "The Restless Mounds",
-        "text": "The charts were a warning, and the barrow field proves it: the mounds are opening from beneath. Wights walk the grave rows wearing the old honors, and the offerings that kept them sleeping lie scattered in the grass. Put eight of them down, {playerName}, and gather four of the offerings back to me.",
-        "completion": "Grave gold, still cold from the soil. The wights are not rising on their own, {playerName}: something beneath the great mound is calling them out, and I fear the charts have already told us its name.",
+        "title": "Những Gò Mộ Bất An",
+        "text": "Những bản đồ là một lời cảnh báo, và cánh đồng gò mộ chứng minh điều đó: các gò mộ đang mở ra từ bên dưới. Những u linh bước đi trên các hàng mộ khoác lên vinh dự xưa cũ, và những lễ vật từng giữ cho chúng ngủ yên giờ nằm vương vãi trong cỏ. Hạ gục tám con, {playerName}, và thu thập bốn lễ vật mang về cho ta.",
+        "completion": "Vàng mộ, vẫn còn lạnh vì đất. Những u linh không tự mình trỗi dậy đâu, {playerName}: có thứ gì đó dưới gò mộ lớn đang gọi chúng ra, và ta sợ rằng các bản đồ đã tiết lộ cho chúng ta cái tên của nó rồi.",
         "objectives": {
           "0": {
-            "label": "Barrow Wight slain"
+            "label": "U Linh Gò Mộ bị tiêu diệt"
           },
           "1": {
-            "label": "Grave offering recovered"
+            "label": "Lễ vật mộ được tìm lại"
           }
         }
       },
       "q_nb_the_barrow_king": {
-        "title": "The Barrow King Wakes",
-        "text": "Every bearing, every restless star, every opened mound points to one thing: the Barrow King is waking beneath the great mound, and this realm has no dawn to hold him back. He must be put to rest before he remembers his crown, {playerName}. Do not go alone: bring a friend, and keep the flower-light at your back.",
-        "completion": "The stars have settled for the first time in a season, {playerName}. The mounds are closed, the nightkin have gone still at their stones, and the king sleeps below once more. Wear this mantle: Moonrest cut it for whoever the night finally trusted.",
+        "title": "Vua Gò Mộ Thức Tỉnh",
+        "text": "Mọi phương vị, mọi vì sao bất an, mọi gò mộ đang mở ra đều chỉ về một điều: Vua Gò Mộ đang thức tỉnh dưới gò đất lớn, và vương quốc này không có bình minh để ngăn nó lại. Nó phải được cho an nghỉ trước khi nó nhớ lại vương miện của mình, {playerName}. Đừng đi một mình: rủ theo một người bạn, và giữ ánh sáng hoa sau lưng bạn.",
+        "completion": "Các vì sao đã lắng xuống lần đầu tiên trong cả mùa, {playerName}. Các gò mộ đã đóng lại, tộc đêm đã trở nên tĩnh lặng bên những phiến đá của họ, và vị vua lại ngủ yên bên dưới. Hãy khoác lên tấm áo choàng này: Moonrest đã cắt nó cho bất cứ ai màn đêm cuối cùng cũng tin tưởng.",
         "objectives": {
           "0": {
-            "label": "The Barrow King put to rest"
+            "label": "Vua Gò Mộ được cho an nghỉ"
           }
         }
       },
       "q_ww_bells_of_gallowmere": {
-        "title": "The Bells of Gallowmere",
-        "text": "Hear that tolling, {playerName}? That is Gallowmere, up the north road, ringing its dead to sleep. Sexton Marrow keeps the count of every soul under the canopy, living and buried. Go and be counted, before the wood counts you itself.",
-        "completion": "Cobb sent you up the road whole, did he? Good man. He has kept those gate lanterns lit for thirty years, and the wood has never once got past him. Welcome to Gallowmere, {playerName}. Mind the bells.",
+        "title": "Những Chiếc Chuông Của Gallowmere",
+        "text": "Nghe tiếng chuông đó không, {playerName}? Đó là Gallowmere, trên con đường phía bắc, đang rung chuông ru người chết của nó vào giấc ngủ. Người Giữ Mộ Marrow giữ số đếm của mọi linh hồn dưới tán rừng, cả người sống lẫn người đã chôn cất. Đi đến và được đếm, trước khi khu rừng tự đếm bạn.",
+        "completion": "Cobb đã đưa bạn lên con đường này nguyên vẹn à? Người tốt đấy. Ông ấy đã giữ những chiếc đèn lồng cổng đó cháy sáng suốt ba mươi năm, và khu rừng chưa từng một lần vượt qua được ông ấy. Chào mừng đến Gallowmere, {playerName}. Chú ý đến những chiếc chuông.",
         "objectives": {
           "0": {
-            "label": "Report to Sexton Marrow"
+            "label": "Báo cáo với Người Giữ Mộ Marrow"
           }
         }
       },
       "q_ww_silk_in_the_eaves": {
-        "title": "Silk in the Eaves",
-        "text": "Look up when you walk the west road, {playerName}, and you will see them: wrapped shapes in the canopy, swaying where no wind reaches. The widowsilk spinners have crept out of the Thicket and strung their larders over my lanterns. Kill ten, and the road is a road again.",
-        "completion": "Ten fewer weavers in the eaves. The lamplighters will walk their rounds tonight without looking up, and that is worth more here than you know.",
+        "title": "Tơ Trên Mái Hiên",
+        "text": "Nhìn lên khi bạn đi trên con đường phía tây, {playerName}, và bạn sẽ thấy chúng: những hình dạng được bọc kín trên tán cây, đung đưa nơi không làn gió nào chạm tới. Những kẻ nhả tơ góa phụ đã bò ra khỏi Lùm Cây và giăng kho dự trữ của chúng ngay trên đèn lồng của ta. Giết mười con, và con đường sẽ lại là con đường.",
+        "completion": "Bớt đi mười kẻ dệt tơ trên mái hiên. Những người thắp đèn sẽ đi tuần đêm nay mà không cần ngước nhìn lên, và điều đó đáng giá hơn bạn tưởng ở nơi này.",
         "objectives": {
           "0": {
-            "label": "Widowsilk Spinner slain"
+            "label": "Kẻ Nhả Tơ Góa Phụ bị tiêu diệt"
           }
         }
       },
       "q_ww_widows_skeins": {
-        "title": "The Widow's Skeins",
-        "text": "The spinners take our dead for their larders, {playerName}, so I take their silk for our shrouds. It burns clean and it holds a blessing better than linen ever did. Bring me six skeins of widowsilk, and the next soul we bury goes down wrapped and warded.",
-        "completion": "Six skeins, soft as a held breath. The dead will lie easier in this. Take these wraps, I sewed them from the last batch, and the wood has never once bitten through them.",
+        "title": "Những Cuộn Tơ Của Góa Phụ",
+        "text": "Lũ nhả tơ lấy người chết của chúng ta cho kho dự trữ của chúng, {playerName}, nên ta lấy tơ của chúng cho khăn liệm của chúng ta. Nó cháy sạch và giữ được phước lành tốt hơn cả vải lanh từng làm được. Mang cho ta sáu cuộn tơ góa phụ, và linh hồn tiếp theo chúng ta chôn cất sẽ được bọc kín và bảo hộ.",
+        "completion": "Sáu cuộn tơ, mềm như một hơi thở nín lặng. Người chết sẽ nằm yên hơn trong đó. Nhận lấy những tấm bọc này, ta đã khâu chúng từ mẻ cuối cùng, và khu rừng chưa từng một lần cắn thủng chúng.",
         "objectives": {
           "0": {
-            "label": "Widowsilk Skein"
+            "label": "Cuộn Tơ Góa Phụ"
           }
         }
       },
       "q_ww_candles_at_the_bounds": {
-        "title": "Candles at the Bounds",
-        "text": "Four boundary stones ring Gallowmere, {playerName}, one on each road out, and a grave-candle burns on every stone. While they burn, the buried stay buried. The drizzle has drowned them, all four, and I am too old to walk the bounds alone. Take my taper and relight them, quickly.",
-        "completion": "All four burning? Then breathe, {playerName}. You did not hear it, but the whole village did: the bells rang easier the moment the last wick caught.",
+        "title": "Nến Ở Ranh Giới",
+        "text": "Bốn phiến đá ranh giới bao quanh Gallowmere, {playerName}, một trên mỗi con đường ra vào, và một ngọn nến mộ cháy trên mỗi phiến đá. Khi chúng còn cháy, người đã chôn vẫn ở yên dưới mộ. Mưa phùn đã làm tắt chúng, cả bốn ngọn, và ta đã quá già để tự mình đi vòng quanh ranh giới. Cầm lấy cây nến của ta và thắp lại chúng, thật nhanh.",
+        "completion": "Cả bốn ngọn đều cháy sao? Vậy thì hãy thở phào đi, {playerName}. Bạn không nghe thấy, nhưng cả ngôi làng đã nghe: những chiếc chuông rung nhẹ nhõm hơn ngay khoảnh khắc sợi bấc cuối cùng bắt lửa.",
         "objectives": {
           "0": {
-            "label": "Grave-candle relit"
+            "label": "Nến mộ được thắp lại"
           }
         }
       },
       "q_ww_the_last_vicar": {
-        "title": "The Last Vicar",
-        "text": "South of here the Mournstone Chapel moulders by its black tarn, and one man still tends it: Vicar Creel, who would not leave when the roof came down. He knows the old rites better than my bells do, {playerName}, and he has not sent word in a month. Walk the chapel road and see him breathing.",
-        "completion": "Marrow worries after me? That is new. Tell him the Mournstone stands, after a fashion, and so do I. Stay a while, {playerName}. The tarn has been whispering, and I would rather not listen alone.",
+        "title": "Cha Xứ Cuối Cùng",
+        "text": "Phía nam nơi này, Nhà Nguyện Mournstone đang mục nát bên cạnh hồ nước đen của nó, và một người đàn ông vẫn chăm sóc nó: Cha Xứ Creel, người không chịu rời đi khi mái nhà sụp đổ. Ông ấy biết những nghi lễ xưa rõ hơn cả những chiếc chuông của ta, {playerName}, và ông ấy đã không gửi tin tức suốt một tháng nay. Đi trên con đường nhà nguyện và xem ông ấy còn thở không.",
+        "completion": "Marrow lo lắng cho ta à? Đó là điều mới đấy. Nói với ông ấy rằng Mournstone vẫn đứng vững, theo một cách nào đó, và ta cũng vậy. Ở lại một lát đi, {playerName}. Hồ nước đã thì thầm suốt, và ta thà không nghe nó một mình.",
         "objectives": {
           "0": {
-            "label": "Find Vicar Creel"
+            "label": "Tìm Cha Xứ Creel"
           }
         }
       },
       "q_ww_wraiths_of_the_tarn": {
-        "title": "Wraiths of the Tarn",
-        "text": "The wood wraiths were the chapel wardens once, {playerName}, grown from trees planted over the honored dead. Since the tarn turned black they have forgotten their office, and now they drift through my graveyard pulling at the soil. Break eight of them apart before they finish what they have started.",
-        "completion": "Eight wardens laid down at last. I will not call it a mercy in daylight, but between us, {playerName}, it was one.",
+        "title": "Oán Linh Của Hồ Nước",
+        "text": "Những oán linh gỗ từng là các vệ quan nhà nguyện, {playerName}, mọc lên từ những cây được trồng trên người đã khuất được tôn kính. Kể từ khi hồ nước chuyển sang màu đen, chúng đã quên đi nhiệm vụ của mình, và giờ chúng lang thang qua nghĩa trang của ta, kéo giật lớp đất. Đập tan tám con trước khi chúng hoàn thành những gì đã bắt đầu.",
+        "completion": "Cuối cùng tám vệ quan cũng được đặt xuống yên nghỉ. Ta sẽ không gọi đó là lòng thương xót giữa ban ngày, nhưng giữa chúng ta với nhau, {playerName}, đó đúng là một hành động thương xót.",
         "objectives": {
           "0": {
-            "label": "Wood Wraith slain"
+            "label": "Oán Linh Gỗ bị tiêu diệt"
           }
         }
       },
       "q_ww_what_the_bark_holds": {
-        "title": "What the Bark Holds",
-        "text": "In the Hanging Glade east of Gallowmere the spinners hang their silk-wrapped dead from the boughs, and the gravenbark shamblers stand guard beneath like patient pallbearers. Those are our people up there, {playerName}. Break five shamblers, cut down three of the wrapped dead, and bring them home to soil.",
-        "completion": "Three souls back under honest ground before nightfall. The shamblers will grow back, bark always does, but tonight the glade hangs empty, and that is enough.",
+        "title": "Điều Mà Vỏ Cây Nắm Giữ",
+        "text": "Trong Trảng Rừng Treo Cổ phía đông Gallowmere, lũ nhả tơ treo người chết được bọc tơ của chúng từ những cành cây, và những kẻ lê bước vỏ cây khắc đứng canh gác bên dưới như những người khiêng quan tài kiên nhẫn. Đó là người dân của chúng ta ở trên đó, {playerName}. Đập tan năm kẻ lê bước, hạ xuống ba xác chết bị bọc, và đưa họ về với đất.",
+        "completion": "Ba linh hồn trở lại dưới lòng đất chân chính trước khi màn đêm buông xuống. Những kẻ lê bước sẽ mọc lại, vỏ cây luôn như vậy, nhưng đêm nay trảng rừng treo trống không, và như thế là đủ.",
         "objectives": {
           "0": {
-            "label": "Gravenbark Shambler felled"
+            "label": "Kẻ Lê Bước Vỏ Cây Khắc bị hạ gục"
           },
           "1": {
-            "label": "Silkbound remains cut down"
+            "label": "Di Hài Bọc Lụa được hạ xuống"
           }
         }
       },
       "q_ww_walking_mosley_home": {
-        "title": "Walking Mosley Home",
-        "text": "My gravedigger Mosley took the chapel road three days ago to open a plot in the old yard, and the dig came down on top of him. He clawed his way out, the fool is alive, but he is huddled by the chapel graves and will not move for spinners on the road. Walk him home, {playerName}. I cannot ring the bells for a living man.",
-        "completion": "He came through the gate on his own two feet, swearing he will dig nothing deeper than a turnip bed from now on. He will be back at the yard by Sunday, they always are. Thank you, {playerName}. Gallowmere keeps its people, that is the whole of our law.",
+        "title": "Đưa Mosley Về Nhà",
+        "text": "Người đào mộ của ta, Mosley, đã đi trên con đường nhà nguyện ba ngày trước để mở một huyệt mộ trong khu đất cũ, và hố đào đã sập xuống trên người ông ấy. Ông ấy đã cào bới thoát ra, kẻ ngốc đó vẫn còn sống, nhưng ông ấy đang co ro cạnh những ngôi mộ nhà nguyện và không dám di chuyển vì lũ nhả tơ trên đường. Đưa ông ấy về nhà, {playerName}. Ta không thể rung chuông cho một người còn sống.",
+        "completion": "Ông ấy đã bước qua cổng bằng chính đôi chân mình, thề rằng từ giờ sẽ không đào gì sâu hơn một luống củ cải. Ông ấy sẽ trở lại khu đất đó trước ngày Chủ Nhật, họ luôn như vậy. Cảm ơn bạn, {playerName}. Gallowmere giữ gìn người dân của mình, đó là toàn bộ luật lệ của chúng ta.",
         "objectives": {
           "0": {
-            "label": "Gravedigger Mosley walked safely back to Gallowmere"
+            "label": "Người Đào Mộ Mosley được đưa an toàn trở lại Gallowmere"
           }
         }
       },
       "q_ww_horn_of_the_huntsman": {
-        "title": "The Horn of the Huntsman",
-        "text": "You have heard the horn by now, {playerName}, thin and far off, the sound the whole wood holds its breath for. The Pale Huntsman rides his clearing north of here, and every grave he passes grows shallower. He was a man once, and he was buried wrong, and I am done pretending prayer will do it. Take a friend, take two, and unhorse him.",
-        "completion": "The horn stopped mid-note. Every bell in Gallowmere rang once, on its own, and then the wood went quieter than I have heard it in thirty years. You have done the rite I could not, {playerName}. Wear this, and walk under the canopy unafraid.",
+        "title": "Chiếc Tù Và Của Thợ Săn",
+        "text": "Chắc giờ bạn đã nghe thấy tiếng tù và, {playerName}, mỏng manh và xa xăm, âm thanh khiến cả khu rừng nín thở. Thợ Săn Nhợt Nhạt cưỡi ngựa qua khoảng trống của hắn phía bắc nơi này, và mỗi ngôi mộ hắn đi qua đều trở nên nông hơn. Hắn từng là một con người, và hắn đã bị chôn cất sai cách, và ta đã thôi giả vờ rằng lời cầu nguyện có thể giải quyết được điều đó. Rủ theo một người bạn, rủ theo hai người, và hất hắn khỏi lưng ngựa.",
+        "completion": "Tiếng tù và ngừng bặt giữa chừng. Mỗi chiếc chuông ở Gallowmere đã rung một lần, tự nó rung lên, rồi khu rừng trở nên yên tĩnh hơn bất cứ lúc nào ta từng nghe trong ba mươi năm qua. Bạn đã thực hiện nghi lễ mà ta không thể, {playerName}. Khoác lên thứ này, và bước đi dưới tán rừng mà không sợ hãi.",
         "objectives": {
           "0": {
-            "label": "The Pale Huntsman unhorsed"
+            "label": "Thợ Săn Nhợt Nhạt bị hất khỏi lưng ngựa"
           }
         }
       },
       "q_pr_down_to_drifthaven": {
-        "title": "Down to Drifthaven",
-        "text": "Out of the black trees and into the sun, {playerName}. Follow the shore road north and you will strike Drifthaven before the tide turns. Ask for Salvage-Boss Ryna, she has work for any pair of hands since the storm, and tell her the Tanglemouth road is still open.",
-        "completion": "Pell sent you? Then you walked the whole Tanglemouth road alone, and that is reference enough for me. Welcome to Drifthaven, {playerName}. Grab a rope, we are short-handed.",
+        "title": "Xuôi Xuống Drifthaven",
+        "text": "Ra khỏi hàng cây đen và bước vào ánh nắng, {playerName}. Theo con đường ven bờ về phía bắc và bạn sẽ đến Drifthaven trước khi thủy triều đổi chiều. Hỏi tìm Đầu Lĩnh Trục Vớt Ryna, cô ấy có việc cho bất cứ đôi tay nào kể từ sau cơn bão, và nói với cô ấy rằng con đường Tanglemouth vẫn còn mở.",
+        "completion": "Pell cử bạn đến? Vậy là bạn đã đi bộ suốt cả con đường Tanglemouth một mình, và đó là bằng chứng đủ tốt cho ta rồi. Chào mừng đến Drifthaven, {playerName}. Cầm lấy một sợi dây thừng đi, chúng ta đang thiếu người.",
         "objectives": {
           "0": {
-            "label": "Report to Salvage-Boss Ryna"
+            "label": "Báo cáo với Đầu Lĩnh Trục Vớt Ryna"
           }
         }
       },
       "q_pr_wreck_line_cargo": {
-        "title": "The Wreck Line",
-        "text": "The storm three nights back drove the Pearlwake onto the reef, and her cargo is strewn the whole length of the wreck line between here and the Palmstrand. Three crates of trade goods are still lying in the surf, {playerName}. Bring them in before the tide, or the crabs, claim what is left.",
-        "completion": "Salt-stained but sound, all three. The divers eat this month because of you, {playerName}.",
+        "title": "Tuyến Xác Tàu",
+        "text": "Cơn bão ba đêm trước đã đẩy chiếc Pearlwake lên rạn san hô, và hàng hóa của nó rải rác suốt cả tuyến xác tàu giữa đây và Palmstrand. Ba thùng hàng hóa giao thương vẫn còn nằm trong sóng biển, {playerName}. Mang chúng vào trước khi thủy triều, hoặc lũ cua, giành lấy những gì còn sót lại.",
+        "completion": "Nhuốm màu muối nhưng vẫn nguyên vẹn, cả ba thùng. Những người thợ lặn có cái ăn tháng này là nhờ bạn, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Pearlwake Cargo recovered"
+            "label": "Hàng Hóa Pearlwake được tìm lại"
           }
         }
       },
       "q_pr_scuttler_cull": {
-        "title": "Shellbacked Thieves",
-        "text": "Every wreck on this coast draws the tide scuttlers, and the Pearlwake has drawn half the reef. My salvage crews will not work a line with those claws in the shallows. Crack ten of them, {playerName}, and the wreck line is ours again.",
-        "completion": "Ten fewer claws in the surf. My crews are already wading back out, and not one of them said thank you, so I will: thank you, {playerName}.",
+        "title": "Những Tên Trộm Mai Cứng",
+        "text": "Mọi xác tàu trên bờ biển này đều thu hút lũ kẻ bò thủy triều, và chiếc Pearlwake đã thu hút cả nửa rạn san hô. Đội trục vớt của tôi sẽ không làm việc trên tuyến với những chiếc càng đó ở vùng nước cạn. Đập vỡ mười con, {playerName}, và tuyến xác tàu sẽ lại là của chúng tôi.",
+        "completion": "Bớt đi mười chiếc càng trong sóng biển. Đội của tôi đã lội trở ra ngoài rồi, và không ai trong số họ nói lời cảm ơn, vậy nên để tôi nói: cảm ơn bạn, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Tide Scuttler cracked"
+            "label": "Kẻ Bò Thủy Triều bị đập vỡ"
           }
         }
       },
       "q_pr_boars_in_the_gardens": {
-        "title": "Boars in the Gardens",
-        "text": "Whatever stirs in the deep green, it pushes the thicket boars out onto our strand. They have rooted up the garden terraces twice this week, and they will have the drying racks next. Ten boars, {playerName}, and push the rest back under the trees.",
-        "completion": "The racks stand and the gardens can be replanted. The boars did not choose to come onto the sand, {playerName}. Remember that: something moved them.",
+        "title": "Lợn Rừng Trong Những Khu Vườn",
+        "text": "Bất cứ thứ gì đang khuấy động trong màu xanh sâu thẳm đó, nó đẩy đàn lợn rừng bụi rậm ra ngoài bãi biển của chúng ta. Chúng đã đào xới các bậc thềm vườn hai lần tuần này, và tiếp theo chúng sẽ nhắm đến những giá phơi. Mười con lợn rừng, {playerName}, và đẩy số còn lại trở về dưới tán cây.",
+        "completion": "Những giá phơi vẫn đứng vững và các khu vườn có thể trồng lại được. Đàn lợn rừng không tự chọn đến bãi cát này đâu, {playerName}. Hãy nhớ điều đó: có thứ gì đó đã xui khiến chúng.",
         "objectives": {
           "0": {
-            "label": "Thicket Boar driven off"
+            "label": "Lợn Rừng Bụi Rậm bị đuổi đi"
           }
         }
       },
       "q_pr_the_man_who_went_in": {
-        "title": "The Man Who Went In",
-        "text": "The divers will not step past the treeline, {playerName}, and I will not ask them to. You have heard the drums by now: everyone does, by the second night. One man on this island ever walked toward that sound and came back. Okku. He camps under the great banyans at the Vinefall, deep up the Tangle road. Find him, and ask him what the green is hiding.",
-        "completion": "Isha sent you? The Pearl-Mother has not spoken my name in years. Sit out of the vines' reach, {playerName}, and I will tell you what I know: the drums are not the danger. They are the warning.",
+        "title": "Người Đã Bước Vào Trong",
+        "text": "Những người thợ lặn sẽ không bước qua ranh giới cây cối, {playerName}, và tôi sẽ không yêu cầu họ làm vậy. Chắc bạn đã nghe tiếng trống rồi: ai cũng nghe thấy, vào đêm thứ hai. Chỉ có một người trên hòn đảo này từng bước về phía âm thanh đó và trở lại. Okku. Ông ấy cắm trại dưới những cây đa lớn tại Vinefall, sâu trên con đường Tangle. Tìm ông ấy, và hỏi ông ấy xem màu xanh đó đang giấu điều gì.",
+        "completion": "Isha cử bạn đến? Ngọc Mẫu đã không nhắc đến tên tôi suốt nhiều năm rồi. Ngồi ngoài tầm với của dây leo đi, {playerName}, và tôi sẽ kể cho bạn nghe những gì tôi biết: tiếng trống không phải là mối nguy hiểm. Chúng là lời cảnh báo.",
         "objectives": {
           "0": {
-            "label": "Find Okku at the Vinefall"
+            "label": "Tìm Okku tại Vinefall"
           }
         }
       },
       "q_pr_canopy_silk": {
-        "title": "Silk from the Canopy",
-        "text": "Look up, {playerName}. Every canopy from here to the idol is webbed like a fishing net, and the weavers grow bolder each season. I string their own silk across the paths, tripline bells, so the jungle cannot creep up on me. Six good hanks off the canopy weavers will restring my lines.",
-        "completion": "Good, strong silk. My bells will sing a while longer, and nothing walks these paths at night without me knowing, {playerName}. Lately, something has been walking often.",
+        "title": "Tơ Từ Tán Cây",
+        "text": "Nhìn lên trên đi, {playerName}. Mọi tán cây từ đây đến tượng thần đều giăng tơ như lưới đánh cá, và những kẻ dệt tơ ngày càng táo tợn hơn mỗi mùa. Ta căng chính tơ của chúng qua các lối đi, chuông dây vấp, để khu rừng không thể lẻn đến gần ta. Sáu cuộn tơ tốt từ những kẻ dệt tán cây sẽ căng lại dây của ta.",
+        "completion": "Tơ tốt, chắc chắn. Chuông của ta sẽ còn ngân vang thêm một thời gian, và không có gì đi trên những lối này ban đêm mà ta không biết, {playerName}. Gần đây, có thứ gì đó đã đi lại thường xuyên.",
         "objectives": {
           "0": {
-            "label": "Canopy Silk Hank"
+            "label": "Cuộn Tơ Tán Cây"
           }
         }
       },
       "q_pr_the_lost_navigator": {
-        "title": "The Lost Navigator",
-        "text": "We pulled every hand off the Pearlwake but one: Navigator Suli, who swam for the far strand and never walked in. A diver spotted her holed up in the bow wreckage past the Palmstrand, alive, and too spent to run the gauntlet alone. Walk her home along the shore road, {playerName}. The crabs will not like it, and the jungle likes it less.",
-        "completion": "Suli is by the fire, still swearing she could have swum it. You brought back the only chart-reader on this coast, {playerName}. These are from her sea chest, with her blessing.",
+        "title": "Vị Hoa Tiêu Lạc Lối",
+        "text": "Chúng tôi đã cứu mọi người khỏi chiếc Pearlwake trừ một người: Hoa Tiêu Suli, người đã bơi về phía bờ xa và không bao giờ bước vào bờ. Một người thợ lặn phát hiện cô ấy đang trốn trong đống đổ nát mũi tàu qua khỏi Palmstrand, còn sống, nhưng quá kiệt sức để tự mình vượt qua hiểm nguy. Đưa cô ấy về nhà dọc theo con đường ven bờ, {playerName}. Lũ cua sẽ không thích điều đó, và khu rừng còn thích ít hơn.",
+        "completion": "Suli đang ngồi cạnh đống lửa, vẫn khăng khăng rằng cô ấy có thể tự bơi được. Bạn đã mang về người đọc hải đồ duy nhất trên bờ biển này, {playerName}. Đây là đồ từ rương biển của cô ấy, với sự chúc phúc của cô ấy.",
         "objectives": {
           "0": {
-            "label": "Navigator Suli seen safely to Drifthaven"
+            "label": "Hoa Tiêu Suli được đưa an toàn đến Drifthaven"
           }
         }
       },
       "q_pr_what_the_drums_guard": {
-        "title": "What the Drums Guard",
-        "text": "I have walked as near the Sunken Idol as a living man dares, and I saw two things: the weavers have curtained the idol road in web, and the old offering bowls along it have been filled again. Freshly, {playerName}. Cut eight weavers off the road and bring me three of those offerings. I would know what hand still feeds a dead god.",
-        "completion": "Moss, pearl-shell, and boar blood, packed by fingers. Something in that ruin still keeps its rites, {playerName}, and the Guardian keeps everything else out. It is time we spoke of it plainly.",
+        "title": "Điều Mà Tiếng Trống Canh Giữ",
+        "text": "Tôi đã đi đến gần Tượng Thần Chìm nhất mà một người sống dám làm, và tôi thấy hai điều: những kẻ dệt tơ đã giăng màn tơ trên con đường tượng thần, và những bát cúng cũ dọc theo nó đã được đổ đầy trở lại. Còn tươi mới, {playerName}. Chặt hạ tám kẻ dệt tơ khỏi con đường và mang cho tôi ba lễ vật đó. Tôi muốn biết bàn tay nào vẫn đang nuôi dưỡng một vị thần đã chết.",
+        "completion": "Rêu, vỏ trai ngọc, và máu lợn rừng, được nén bằng những ngón tay. Có thứ gì đó trong tàn tích đó vẫn đang giữ nghi lễ của nó, {playerName}, và Vệ Binh ngăn chặn mọi thứ khác. Đã đến lúc chúng ta nói thẳng về điều này.",
         "objectives": {
           "0": {
-            "label": "Canopy Weaver cut down"
+            "label": "Kẻ Dệt Tán Cây bị chặt hạ"
           },
           "1": {
-            "label": "Refilled Offering Bowl gathered"
+            "label": "Bát Cúng Được Đổ Đầy Lại được thu thập"
           }
         }
       },
       "q_pr_idol_guardian": {
-        "title": "The Idol Guardian",
-        "text": "The idol is older than the island, {playerName}. Older than the drums, older than the name Palmreach. Its Guardian has stood in that drowned ring since before the palms grew, and now it wakes and walks the columns at night. Whatever the offerings feed, the Guardian is its door-ward. Bring a friend, and break it.",
-        "completion": "You felled a thing the jungle itself would not touch. Look there, behind the idol: the Guardian was never guarding the columns, {playerName}, it was guarding the steps beneath them. The drums have gone quiet tonight. Whatever sleeps below the Wildheart Basin now knows your name.",
+        "title": "Vệ Binh Tượng Thần",
+        "text": "Bức tượng thần này còn cổ xưa hơn cả hòn đảo, {playerName}. Cổ xưa hơn cả tiếng trống, cổ xưa hơn cả cái tên Palmreach. Vệ Binh của nó đã đứng trong vòng tròn chìm đó từ trước khi những cây cọ mọc lên, và giờ nó thức tỉnh và đi lại giữa các cột đá vào ban đêm. Bất cứ thứ gì được những lễ vật nuôi dưỡng, Vệ Binh chính là kẻ canh cửa của nó. Rủ theo một người bạn, và đập tan nó.",
+        "completion": "Bạn đã hạ gục một thứ mà chính khu rừng cũng không dám chạm vào. Nhìn kia, phía sau tượng thần: Vệ Binh chưa bao giờ canh giữ các cột đá cả, {playerName}, nó canh giữ những bậc thang bên dưới chúng. Tiếng trống đã im bặt đêm nay. Bất cứ thứ gì đang ngủ dưới Wildheart Basin giờ đã biết tên bạn.",
         "objectives": {
           "0": {
-            "label": "The Idol Guardian broken"
+            "label": "Vệ Binh Tượng Thần bị đập tan"
           }
         }
       },
       "q_eg_gate_report": {
-        "title": "Word Through the Gate",
-        "text": "The lawns past this gate have trimmed themselves for a hundred years, {playerName}, and lately they have started trimming visitors. Head Gardener Amaranth keeps the books in Hedgewick, up the road past the gate lawns. Tell her another traveler has come through, and tell her the hedges by the gate moved last night.",
-        "completion": "Moved, did they. Pell reports that every week, and every week he is right. Forgive my eyes, {playerName}, I have not slept a whole night in years: someone has to watch the garden watch us. Welcome to Hedgewick.",
+        "title": "Tin Tức Qua Cổng",
+        "text": "Những bãi cỏ qua khỏi cổng này đã tự cắt tỉa suốt cả trăm năm, {playerName}, và gần đây chúng đã bắt đầu cắt tỉa cả khách viếng thăm. Người Làm Vườn Trưởng Amaranth giữ sổ sách tại Hedgewick, trên con đường qua khỏi bãi cỏ cổng. Nói với bà ấy rằng có thêm một lữ khách đã đi qua, và nói với bà ấy rằng hàng rào cạnh cổng đã di chuyển đêm qua.",
+        "completion": "Di chuyển à. Pell báo cáo điều đó mỗi tuần, và tuần nào cậu ấy cũng đúng. Thứ lỗi cho đôi mắt của ta, {playerName}, ta đã không ngủ trọn một đêm nào suốt nhiều năm: ai đó phải canh chừng khu vườn đang canh chừng chúng ta. Chào mừng đến Hedgewick.",
         "objectives": {
           "0": {
-            "label": "Report to Head Gardener Amaranth"
+            "label": "Báo cáo với Người Làm Vườn Trưởng Amaranth"
           }
         }
       },
       "q_eg_hungry_shapes": {
-        "title": "Pruned into Hunger",
-        "text": "Whoever shapes this garden has grown careless, or cruel. The wolf shapes out in the Rose Wilds were clipped for show, yet lately they hunt: green jaws, no bellies, and no reason ever to stop. Cut down ten topiary wolves, {playerName}, and let the lawns be lawns again for a while.",
-        "completion": "Ten heaps of clippings where ten wolves stood. It should feel like gardening, {playerName}. Why does it feel like war?",
+        "title": "Bị Tỉa Thành Cơn Đói",
+        "text": "Bất cứ ai đang tạo hình khu vườn này đã trở nên bất cẩn, hoặc tàn nhẫn. Những hình sói ngoài Rose Wilds được cắt tỉa để trưng bày, nhưng gần đây chúng lại săn mồi: hàm xanh, không bụng, và không lý do gì để dừng lại. Hãy chặt hạ mười con sói cây kiểng, {playerName}, và để những bãi cỏ trở lại là bãi cỏ trong một thời gian.",
+        "completion": "Mười đống cành lá cắt tỉa nơi mười con sói từng đứng. Việc này đáng lẽ phải giống làm vườn, {playerName}. Sao nó lại giống chiến tranh đến vậy?",
         "objectives": {
           "0": {
-            "label": "Topiary Wolf slain"
+            "label": "Sói Cây Kiểng bị tiêu diệt"
           }
         }
       },
       "q_eg_stolen_shears": {
-        "title": "The Stolen Shears",
-        "text": "Every pair of shears in Hedgewick has walked off in a fortnight, {playerName}: off the pegs, out of locked sheds, one pair out of my own apron while I dozed. It is the hedge gnomes, the little groundskeepers who hate us walking their lawns. Get six pairs back before the whole hamlet is down to kitchen knives.",
-        "completion": "Six pairs, and my own among them, I would know the nick in the blade anywhere. Here, these gloves were knitted for pruning work. Warm hands make steady shears.",
+        "title": "Chiếc Kéo Bị Đánh Cắp",
+        "text": "Mọi cây kéo ở Hedgewick đều đã biến mất trong hai tuần qua, {playerName}: khỏi móc treo, khỏi những nhà kho khóa kín, một cây thậm chí khỏi tạp dề của chính ta trong lúc ta chợp mắt. Đó là lũ yêu tinh đất hàng rào, những kẻ quản sân nhỏ bé căm ghét chúng ta bước lên bãi cỏ của chúng. Lấy lại sáu cây kéo trước khi cả thôn này chỉ còn dùng dao bếp.",
+        "completion": "Sáu cây, và cây của ta cũng ở trong đó, ta có thể nhận ra vết mẻ trên lưỡi kéo ở bất cứ đâu. Đây, đôi găng tay này được đan riêng cho việc tỉa cành. Đôi tay ấm áp làm nên nhát kéo vững vàng.",
         "objectives": {
           "0": {
-            "label": "Stolen Hedgewick Shears"
+            "label": "Kéo Tỉa Hedgewick Bị Đánh Cắp"
           }
         }
       },
       "q_eg_who_trims_the_hedges": {
-        "title": "Who Trims the Hedges",
-        "text": "I have kept the ledgers thirty years, {playerName}, and not slept properly for ten of them, because the sums will not close. Grass wants cutting and hedges want shaping, and nobody here does either, yet every dawn the garden stands trimmed. Lately the woodfolk swear they see an old man with a barrow on the far south lawns, past the maze by the Lily Basin. Find him. If he is real, I can finally sleep. If he is not, I suppose I never will.",
-        "completion": "So the house finally sent someone. A hundred years I have walked these lawns, {playerName}, and the garden and I have an understanding: I trim what asks to be trimmed. Sit. The hedges can spare you an hour.",
+        "title": "Ai Là Người Tỉa Hàng Rào",
+        "text": "Ta đã giữ sổ sách suốt ba mươi năm, {playerName}, và không ngủ ngon suốt mười năm trong số đó, vì những con số không bao giờ khớp. Cỏ cần cắt và hàng rào cần tạo hình, và không ai ở đây làm cả hai việc đó, thế mà mỗi bình minh khu vườn vẫn đứng đó gọn gàng tỉa tót. Gần đây dân rừng thề rằng họ thấy một ông lão với chiếc xe cút kít trên những bãi cỏ xa phía nam, qua khỏi mê cung gần Bồn Địa Hoa Loa Kèn. Tìm ông ta. Nếu ông ta có thật, cuối cùng ta cũng có thể ngủ được. Nếu không, ta cho rằng ta sẽ chẳng bao giờ ngủ được.",
+        "completion": "Vậy là ngôi nhà cuối cùng cũng cử ai đó đến. Cả trăm năm ta đã đi trên những bãi cỏ này, {playerName}, và khu vườn với ta có một sự thấu hiểu ngầm: ta tỉa những gì cần được tỉa. Ngồi xuống đi. Hàng rào có thể nhường bạn một giờ.",
         "objectives": {
           "0": {
-            "label": "Find the gardener by the Lily Basin"
+            "label": "Tìm người làm vườn gần Bồn Địa Hoa Loa Kèn"
           }
         }
       },
       "q_eg_gnomes_in_the_green": {
-        "title": "The Groundskeepers Grudge",
-        "text": "The shears were only the start, {playerName}. Last night the gnomes tipped our tool carts into the green, one out by their warren west of the maze, one clean across the garden on the pond walk, and scattered a hundred years of good iron in the grass. Drive off eight of the little devils and haul the spilled carts home.",
-        "completion": "Three carts back and the pegs full again. Let the little devils sulk in their hedges: Hedgewick works these lawns too.",
+        "title": "Mối Hận Của Người Quản Sân",
+        "text": "Kéo tỉa chỉ mới là bắt đầu, {playerName}. Đêm qua đám yêu tinh đã lật đổ xe đẩy dụng cụ của chúng ta vào mảng xanh, một chiếc gần hang ổ của chúng phía tây mê cung, một chiếc khác băng hẳn qua khu vườn trên lối đi ven ao, và làm vương vãi cả trăm năm sắt tốt ra bãi cỏ. Hãy đuổi tám tên quỷ nhỏ này đi và kéo những chiếc xe đã đổ về nhà.",
+        "completion": "Ba chiếc xe đã về và những chiếc móc đã đầy trở lại. Cứ để đám quỷ nhỏ hờn dỗi trong hàng rào của chúng: Hedgewick cũng chăm sóc những bãi cỏ này.",
         "objectives": {
           "0": {
-            "label": "Hedge Gnome driven off"
+            "label": "Yêu Tinh Đất Hàng Rào bị đuổi đi"
           },
           "1": {
-            "label": "Tool cart recovered"
+            "label": "Xe đẩy dụng cụ được tìm lại"
           }
         }
       },
       "q_eg_bloom_clippings": {
-        "title": "Clippings from the Living Green",
-        "text": "You want to understand this garden? Then read it the way I do. The stags that graze the lawns grow the truest green: every leaf on them is a page. Bring me six fresh clippings from the topiary stags, {playerName}. They will not thank you for the pruning, but they will regrow. Everything here regrows.",
-        "completion": "Look here: the leaves are curling in on themselves, every clipping the same. The garden is afraid, {playerName}. In a hundred years I have never once known it afraid.",
+        "title": "Cành Cắt Từ Mảng Xanh Sống",
+        "text": "Bạn muốn hiểu khu vườn này? Vậy hãy đọc nó theo cách của ta. Những chú hươu gặm cỏ trên bãi cỏ mọc lên màu xanh chân thật nhất: mỗi chiếc lá trên chúng là một trang sách. Mang cho ta sáu cành lá tươi từ những chú hươu cây kiểng, {playerName}. Chúng sẽ không cảm ơn bạn vì việc tỉa cành đâu, nhưng chúng sẽ mọc lại. Mọi thứ ở đây đều mọc lại.",
+        "completion": "Nhìn đây này: những chiếc lá đang quăn lại vào chính mình, mọi cành cắt đều giống nhau. Khu vườn này đang sợ hãi, {playerName}. Trong cả trăm năm, ta chưa từng một lần biết nó sợ hãi.",
         "objectives": {
           "0": {
-            "label": "Pruned Bloom Clipping"
+            "label": "Cành Hoa Bị Cắt Tỉa"
           }
         }
       },
       "q_eg_four_statues": {
-        "title": "The Four Quiet Sisters",
-        "text": "When the garden was young, the first gardeners raised four marble sisters to watch its quarters: one above the Rose Wilds, one on the pond walk east of the maze, one on the west lawn where the gnomes keep their warren, and one on the south lawn past the hedges. The maze grew up between them, and most folk never see all four. Walk the quarters, {playerName}, and press your palm to each sister. When the garden has looked you over from all four sides, it will open places it keeps from strangers.",
-        "completion": "Four rubbings, four sisters, and not one of them wept marble. The garden has taken your measure, {playerName}, and it did not find you wanting. Now I can send you where the trouble truly lives.",
+        "title": "Bốn Người Chị Em Lặng Lẽ",
+        "text": "Khi khu vườn còn non trẻ, những người làm vườn đầu tiên đã dựng bốn bức tượng chị em bằng đá cẩm thạch để canh giữ bốn góc của nó: một ở trên Rose Wilds, một trên lối đi ven ao phía đông mê cung, một trên bãi cỏ phía tây nơi đám yêu tinh giữ hang ổ của chúng, và một trên bãi cỏ phía nam qua khỏi hàng rào. Mê cung mọc lên giữa chúng, và hầu hết mọi người chưa bao giờ thấy đủ cả bốn. Hãy đi qua bốn góc, {playerName}, và áp lòng bàn tay bạn lên mỗi bức tượng chị em. Khi khu vườn đã nhìn kỹ bạn từ cả bốn phía, nó sẽ mở ra những nơi nó vẫn giấu kín khỏi người lạ.",
+        "completion": "Bốn bản chà, bốn chị em, và không tượng nào rơi lệ cẩm thạch. Khu vườn đã đo lường bạn, {playerName}, và nó không thấy bạn thiếu sót. Giờ ta có thể gửi bạn đến nơi rắc rối thực sự đang ẩn náu.",
         "objectives": {
           "0": {
-            "label": "Garden statue visited"
+            "label": "Tượng vườn đã ghé thăm"
           }
         }
       },
       "q_eg_bull_of_the_court": {
-        "title": "The Bull of the Fountain Court",
-        "text": "Now the truth, {playerName}. The bull at the heart of the maze was my masterwork: I shaped him to guard the Fountain Court, and for a hundred years he did. But the fear in the green has reached him, and he guards nothing now, he hunts. The maze feeds him whoever wanders in. I am too old to unmake him, and it must be unmaking, root and branch. Bring a friend, walk the maze to the court, and cut my bull down.",
-        "completion": "I felt it, here, when he came apart. A hundred years of work, and you were right to end it. Take this mantle: I cut it for whoever proved stronger than my best. The court is only a fountain tonight, {playerName}, and the garden is only a garden. Perhaps now the Head Gardener and I can both sleep.",
+        "title": "Con Bò Đực Của Sân Đài Phun Nước",
+        "text": "Giờ là sự thật, {playerName}. Con bò đực ở trung tâm mê cung là kiệt tác của ta: ta đã tạo hình nó để canh giữ Sân Đài Phun Nước, và suốt cả trăm năm nó đã làm vậy. Nhưng nỗi sợ trong mảng xanh này đã lan đến nó, và giờ nó không canh giữ gì nữa, nó săn mồi. Mê cung nuôi nó bằng bất cứ ai lạc vào trong. Ta đã quá già để hóa giải nó, và việc đó phải triệt để, tận gốc rễ lẫn cành lá. Rủ theo một người bạn, đi qua mê cung đến sân đài, và hạ gục con bò đực của ta.",
+        "completion": "Ta đã cảm nhận được điều đó, ngay đây, khi nó tan rã. Cả trăm năm công sức, và bạn đã đúng khi kết liễu nó. Nhận lấy tấm áo choàng này: ta đã cắt nó cho bất cứ ai chứng tỏ mạnh hơn kiệt tác tốt nhất của ta. Sân đài đêm nay chỉ còn là một đài phun nước, {playerName}, và khu vườn chỉ còn là một khu vườn. Có lẽ giờ Người Làm Vườn Trưởng và ta đều có thể ngủ yên.",
         "objectives": {
           "0": {
-            "label": "The Topiary Bull unmade"
+            "label": "Bò Đực Cây Kiểng bị hóa giải"
           }
         }
       },
       "q_fs_bell_at_the_landing": {
-        "title": "The Bell at the Landing",
-        "text": "You came in on the ferry, {playerName}? Then you are the first in a week, and the Warden will want to look you over. Gullhaven sits up from the harbor, past the drying racks nobody tends anymore. Tell Warden Coalfast the crossing still runs, and that Tam has not rung a three-toll today. Yet.",
-        "completion": "The crossing holds, and Tam still has breath enough to joke about the three-toll. Good. We are an island under siege, {playerName}, and every pair of hands the ferry carries over is a pair the breaks must get through before they reach my people. Welcome to Gullhaven.",
+        "title": "Chiếc Chuông Tại Bến Tàu",
+        "text": "Bạn đã đi qua Ferrywalk sao, {playerName}? Vậy bạn là người đầu tiên trong tuần này, và Vệ Quan sẽ muốn xem xét bạn. Gullhaven nằm trên con đường ven bờ, qua khỏi những giá phơi không còn ai chăm sóc nữa. Nói với Vệ Quan Coalfast rằng con đê vẫn còn đứng vững, và rằng Tam vẫn chưa rung ba tiếng chuông hôm nay. Chưa đâu.",
+        "completion": "Con đê vẫn đứng vững, và Tam vẫn còn đủ hơi để đùa về ba tiếng chuông đó. Tốt. Chúng ta là một hòn đảo đang bị vây hãm, {playerName}, và mỗi đôi tay vượt qua doi cát đó là một đôi tay mà những vết rạn phải vượt qua trước khi chạm đến người của ta. Chào mừng đến Gullhaven.",
         "objectives": {
           "0": {
-            "label": "Report to Warden Coalfast"
+            "label": "Báo cáo với Vệ Quan Coalfast"
           }
         }
       },
       "q_fs_hold_the_riftfields": {
-        "title": "Hold the Riftfields",
-        "text": "East of town the grain rows have gone to wrack, and the wretches that came through the Riftfields break now pick them clean. My people cannot tend a field they cannot stand in, {playerName}. Cull ten of the wretches and give the farmers back their ground.",
-        "completion": "Ten fewer, and the field hands are already arguing over who walks out first. It will not last, the breaks never rest long, but a town that eats is a town that holds.",
+        "title": "Giữ Vững Riftfields",
+        "text": "Phía đông thị trấn, những hàng lúa đã bị tàn phá, và những kẻ khốn khổ đến qua vết rạn Riftfields giờ đang gặt sạch chúng. Người của ta không thể chăm sóc một cánh đồng mà họ không thể đứng vào, {playerName}. Diệt mười kẻ khốn khổ đó và trả lại đất cho những người nông dân.",
+        "completion": "Bớt đi mười kẻ, và những người làm ruộng đã bắt đầu tranh cãi xem ai sẽ ra ngoài trước. Việc này sẽ không kéo dài, những vết rạn chẳng bao giờ nghỉ ngơi lâu, nhưng một thị trấn có cái ăn là một thị trấn trụ vững.",
         "objectives": {
           "0": {
-            "label": "Breach Wretch slain"
+            "label": "Kẻ Khốn Khổ Vết Nứt bị tiêu diệt"
           }
         }
       },
       "q_fs_steel_for_the_redoubt": {
-        "title": "Steel for the Redoubt",
-        "text": "Every blade I hand out is one the sea gave back or one I pried off the dead, {playerName}. The wretches carry scrap through the breaks, hinges, hooks, broken sword-steel, magpie stuff, but it hammers out true. Bring me six pieces of their scavenged steel and the barricade line gets its teeth back.",
-        "completion": "Salt-pitted and break-scarred, and it will hold an edge all the same. Here, I lined these grips myself. Steel for steel, {playerName}: it is the only trade the Farshore runs these days.",
+        "title": "Thép Cho Đồn Lũy",
+        "text": "Mỗi lưỡi đao tôi trao đi đều là thứ biển trả lại hoặc thứ tôi cạy từ xác chết, {playerName}. Những kẻ khốn khổ mang phế liệu qua các vết rạn, bản lề, móc câu, thép kiếm gãy, đồ vặt vãnh, nhưng khi rèn ra chúng đều tốt cả. Mang cho tôi sáu mảnh thép chúng nhặt được và tuyến chướng ngại vật sẽ có lại hàm răng của nó.",
+        "completion": "Rỗ muối và sẹo gãy, nhưng nó vẫn sẽ giữ được độ bén như thường. Đây, chính tôi đã lót những chỗ cầm này. Thép đổi thép, {playerName}: đó là thương vụ duy nhất mà Farshore vận hành những ngày này.",
         "objectives": {
           "0": {
-            "label": "Break-Scarred Steel"
+            "label": "Thép Sẹo Gãy"
           }
         }
       },
       "q_fs_the_three_bells": {
-        "title": "The Three Bells",
-        "text": "Three watchbells stand the coast beyond my own: one on the Landing point, one on the south strand, one out by the Riftfields shore. If a rope has rotted or a clapper has been carried off, the town learns of a break when it is already in the streets. Walk the coast, {playerName}, and ring each bell once, so I know it still has a voice.",
-        "completion": "Three voices, three answers, carried clean over the water. Sleep in Gullhaven tonight, {playerName}, and know that if a bell wakes you, it will be by my hand and in good time.",
+        "title": "Ba Chiếc Chuông",
+        "text": "Ba chiếc chuông canh đứng canh bờ biển ngoài chuông của tôi: một ở mũi Bến Tàu, một ở bờ biển phía nam, một nữa ở gần bờ Riftfields. Nếu một sợi dây đã mục hay một quả lắc đã bị cuốn đi, thị trấn sẽ chỉ biết về một vết rạn khi nó đã ở ngay trên đường phố. Hãy đi dọc bờ biển, {playerName}, và rung mỗi chiếc chuông một lần, để tôi biết nó vẫn còn tiếng.",
+        "completion": "Ba tiếng nói, ba câu trả lời, vang vọng rõ ràng qua mặt nước. Hãy ngủ ở Gullhaven đêm nay, {playerName}, và biết rằng nếu một tiếng chuông đánh thức bạn, đó sẽ là do tay tôi và đúng lúc.",
         "objectives": {
           "0": {
-            "label": "Watchbell rung"
+            "label": "Chuông canh đã được rung"
           }
         }
       },
       "q_fs_song_before_the_break": {
-        "title": "The Song Before the Break",
-        "text": "There is a man who hears the breaks before they open. Riftwatch Ollun: a scholar, or a madman, and lately I cannot afford the difference. He keeps his vigil at the Watch Meadow, up the road southeast of town. Find him, {playerName}, and ask him what the island is about to do to us next.",
-        "completion": "The Warden sent you? Good. That means the town has finally started listening. Now be still a moment, {playerName}. There, under the wind, do you hear it? The cliffs are singing, and I do not like the tune.",
+        "title": "Bài Ca Trước Khi Vết Rạn Mở Ra",
+        "text": "Có một người đàn ông nghe được những vết rạn trước khi chúng mở ra. Người Canh Rạn Nứt Ollun: một học giả, hoặc một kẻ điên, và gần đây tôi không thể phân biệt được sự khác nhau. Anh ta giữ phiên gác của mình tại Đồng Cỏ Canh Gác, trên con đường đông nam thị trấn. Tìm anh ta, {playerName}, và hỏi anh ta xem hòn đảo này sắp làm gì với chúng ta tiếp theo.",
+        "completion": "Vệ Quan cử bạn đến? Tốt. Điều đó có nghĩa là thị trấn cuối cùng đã bắt đầu lắng nghe. Giờ hãy đứng yên một lát, {playerName}. Kia, dưới làn gió, bạn có nghe thấy không? Những vách đá đang hát, và tôi không thích giai điệu đó.",
         "objectives": {
           "0": {
-            "label": "Find Riftwatch Ollun"
+            "label": "Tìm Người Canh Rạn Nứt Ollun"
           }
         }
       },
       "q_fs_moss_and_mending": {
-        "title": "Moss and Mending",
-        "text": "The salt moss that grows along the tideline is the best wound-packing I know, and the riftspawn have claimed every stretch of shore it grows on. They carry tufts of it snagged on their hides, of all things. Clear six of them off the east reaches, {playerName}, and pull me four good handfuls of moss from what they have trampled through.",
-        "completion": "Moss in one hand and a quieter shoreline in the other. You have restocked my whole surgery, {playerName}. Do me the kindness of not becoming my next patient.",
+        "title": "Rêu Và Việc Chữa Lành",
+        "text": "Rêu muối mọc dọc theo đường thủy triều là loại băng bó vết thương tốt nhất mà tôi biết, và lũ riftspawn đã chiếm mọi đoạn bờ biển nơi nó mọc. Kỳ lạ thay, chúng mang những búi rêu vướng trên da mình. Dọn sạch sáu con khỏi vùng bờ phía đông, {playerName}, và hái cho tôi bốn nắm rêu tốt từ nơi chúng đã giẫm đạp qua.",
+        "completion": "Rêu trong một tay và một bờ biển yên tĩnh hơn ở tay kia. Bạn đã bổ sung đầy đủ cho cả phòng phẫu thuật của tôi, {playerName}. Hãy làm ơn đừng trở thành bệnh nhân tiếp theo của tôi.",
         "objectives": {
           "0": {
-            "label": "Riftspawn slain"
+            "label": "Riftspawn bị tiêu diệt"
           },
           "1": {
-            "label": "Farshore Salt Moss"
+            "label": "Rêu Muối Farshore"
           }
         }
       },
       "q_fs_bram_come_home": {
-        "title": "Bram Come Home",
-        "text": "My Bram took the boat out the morning the nets-break opened, and the sea threw him back somewhere past the Landing point. I heard him three nights ago, {playerName}, calling over the water, and I was too afraid to go. I am still too afraid. Please. His boat lies wrecked on the north shore. Walk him home to me.",
-        "completion": "Bram! You brought him back to me whole, {playerName}. We both wept and neither of us is ashamed. Whatever the breaks take from this island next, they do not get my family. Not anymore.",
+        "title": "Bram Trở Về Nhà",
+        "text": "Bram của tôi đã đưa thuyền ra khơi vào sáng hôm vết rạn ở khu lưới mở ra, và biển đã ném anh ấy trở lại đâu đó qua khỏi mũi Bến Tàu. Tôi nghe thấy anh ấy ba đêm trước, {playerName}, gọi vọng qua mặt nước, và tôi đã quá sợ hãi để đi. Tôi vẫn còn quá sợ hãi. Làm ơn. Thuyền của anh ấy đang đắm trên bờ nam. Hãy dẫn anh ấy về nhà cho tôi.",
+        "completion": "Bram! Bạn đã mang anh ấy về nguyên vẹn cho tôi, {playerName}. Cả hai chúng tôi đều đã khóc và không ai trong chúng tôi thấy xấu hổ. Dù những vết rạn có lấy đi thứ gì từ hòn đảo này tiếp theo, chúng sẽ không lấy được gia đình tôi. Không còn nữa đâu.",
         "objectives": {
           "0": {
-            "label": "Fisher Bram seen safely home to Gullhaven"
+            "label": "Ngư Dân Bram được đưa về Gullhaven an toàn"
           }
         }
       },
       "q_fs_stalkers_off_the_light": {
-        "title": "Stalkers off the Light",
-        "text": "The stalkers hunt the dark between the watchfires, and every night they circle my meadow a little closer. They are not mindless, {playerName}, they are patient, and patience is the one thing I cannot outlast. Kill eight and push the dark back to the cliffs it came through.",
-        "completion": "Eight nights of circling, ended in one. The fires burn steadier already, or perhaps that is only my hands. Either way the meadow is mine again, and I can hear the island think.",
+        "title": "Đẩy Lùi Những Kẻ Rình Rập Khỏi Ánh Sáng",
+        "text": "Những kẻ rình rập săn mồi trong bóng tối giữa các đống lửa canh gác, và mỗi đêm chúng lại vòng quanh đồng cỏ của tôi gần hơn một chút. Chúng không mù quáng đâu, {playerName}, chúng kiên nhẫn, và kiên nhẫn là thứ duy nhất tôi không thể chịu đựng lâu hơn. Giết tám con và đẩy bóng tối trở lại vách đá nơi nó đã đến.",
+        "completion": "Tám đêm vòng quanh, kết thúc chỉ trong một đêm. Những đống lửa đã cháy ổn định hơn rồi, hoặc có lẽ đó chỉ là đôi tay tôi. Dù thế nào thì đồng cỏ cũng lại là của tôi, và tôi có thể nghe thấy hòn đảo này suy nghĩ.",
         "objectives": {
           "0": {
-            "label": "Void Stalker slain"
+            "label": "Kẻ Rình Rập Hư Không bị tiêu diệt"
           }
         }
       },
       "q_fs_the_great_break": {
-        "title": "The Great Break",
-        "text": "Every song this island sings ends on the same low note, and it comes from the Sundered Cliffs. Something came through the great break there, {playerName}, something the cliffs themselves cracked open to admit, and it is still growing. If it walks north, no bell will matter. Take a friend, take two, and end it. Then tell Coalfast the tune has changed.",
-        "completion": "Ollun sent word ahead: the singing stopped. My whole town heard the quiet, {playerName}, and half of them wept at the sound of nothing at all. Wear this mantle. The Farshore does not forget who held its shore.",
+        "title": "Vết Rạn Vĩ Đại",
+        "text": "Mỗi bài ca hòn đảo này hát đều kết thúc trên cùng một nốt trầm, và nó phát ra từ Vách Đá Vỡ Nát. Có thứ gì đó đã đến qua vết rạn vĩ đại ở đó, {playerName}, thứ mà chính những vách đá đã nứt ra để cho vào, và nó vẫn đang lớn lên. Nếu nó đi về phía bắc, không tiếng chuông nào còn quan trọng nữa. Rủ theo một người bạn, rủ theo hai người, và kết liễu nó. Rồi nói với Coalfast rằng giai điệu đã thay đổi.",
+        "completion": "Ollun đã báo trước: tiếng hát đã ngừng. Cả thị trấn tôi đều nghe thấy sự im lặng đó, {playerName}, và một nửa trong số họ đã khóc trước âm thanh của sự im ắng hoàn toàn. Hãy khoác lên tấm áo choàng này. Farshore không quên ai đã giữ vững bờ biển của nó.",
         "objectives": {
           "0": {
-            "label": "The Sundered Horror slain"
+            "label": "Kẻ Kinh Hoàng Bị Xé Toạc bị tiêu diệt"
           }
         }
       },
@@ -13633,95 +13932,95 @@ export const vi_VN: EnTranslations = {
         }
       },
       "q_gc_down_the_windway": {
-        "title": "Down the Windway",
-        "text": "You made the climb, {playerName}, so the wind has decided to keep you. Wickharbor sits east along the downs road, tucked in the lee of its cove. Harbormaster Odile counts every soul who comes over the pass, and she will want to count you. Tell her the Windway is still open.",
-        "completion": "Over the pass on foot, in this weather? Maren sends me few enough names, and fewer still walk in to answer for themselves. Welcome to Wickharbor, {playerName}. Close the inn door behind you.",
+        "title": "Xuôi Theo Windway",
+        "text": "Bạn đã vượt qua được cuộc leo trèo, {playerName}, nên gió đã quyết định giữ bạn lại. Wickharbor nằm về phía đông dọc theo con đường đồi, nép mình trong chỗ khuất gió của vịnh nhỏ của nó. Cảng Trưởng Odile đếm từng linh hồn vượt qua đèo núi, và bà ấy sẽ muốn đếm bạn. Nói với bà ấy rằng Windway vẫn còn mở.",
+        "completion": "Vượt đèo bằng đôi chân, trong thời tiết này sao? Maren gửi cho tôi rất ít cái tên, và càng ít người tự mình bước vào để trả lời. Chào mừng đến Wickharbor, {playerName}. Đóng cửa quán trọ lại sau lưng bạn nhé.",
         "objectives": {
           "0": {
-            "label": "Report to Harbormaster Odile"
+            "label": "Báo cáo với Cảng Trưởng Odile"
           }
         }
       },
       "q_gc_wool_off_the_downs": {
-        "title": "Wool off the Downs",
-        "text": "My boat crews row into a gale that cuts through oilskin like paper, {playerName}. Only one thing turns this wind: the greasy wool off the moor rams, spun thick the Wickharbor way. The herds graze the Howling Downs west of town. Six good fleeces and every crew rows warm this season.",
-        "completion": "Fleece like this is why the rams stand out there fat and smug in weather that kills men. The spinners will be at it by lamplight. Take these treads, {playerName}, they are lined from the last shearing.",
+        "title": "Len Từ Những Ngọn Đồi",
+        "text": "Những thủy thủ đoàn của tôi chèo thuyền vào trận cuồng phong xuyên thủng cả áo dầu như giấy, {playerName}. Chỉ có một thứ chống lại được làn gió này: len nhờn từ những con cừu đực đầm hoang, được kéo sợi dày theo cách của Wickharbor. Những đàn cừu gặm cỏ trên Đồi Gào Thét phía tây thị trấn. Sáu bộ lông tốt và mọi thủy thủ đoàn sẽ chèo thuyền ấm áp mùa này.",
+        "completion": "Bộ lông như thế này là lý do tại sao những con cừu đực đứng ngoài kia béo tốt và tự mãn trong thời tiết giết chết cả con người. Những người kéo sợi sẽ bắt tay vào việc dưới ánh đèn. Nhận lấy đôi giày này, {playerName}, chúng được lót từ lần xén lông cuối cùng.",
         "objectives": {
           "0": {
-            "label": "Greasy Ram Wool"
+            "label": "Lông Cừu Nhờn"
           }
         }
       },
       "q_gc_scuttlers_in_the_pots": {
-        "title": "Scuttlers in the Pots",
-        "text": "The shoal scuttlers have learned to climb the cliff road and crack our crab pots open on the stones, {playerName}. Half the catch gone this week, and one potman with a hand he will not be using for a month. Break ten of them and the rest will remember why they kept to the shoals.",
-        "completion": "Ten fewer shells on my road, and the pots came up full this morning. The potmen are calling you a good omen, {playerName}. In Wickharbor that is as warm as praise gets.",
+        "title": "Kẻ Bò Trong Những Chiếc Lồng",
+        "text": "Lũ kẻ bò bãi cạn đã học được cách leo lên con đường vách đá và đập vỡ những chiếc lồng bắt cua của chúng ta trên đá, {playerName}. Nửa số hải sản bắt được tuần này đã mất, và một người coi lồng cua sẽ không dùng được một tay trong cả tháng. Đập tan mười con và số còn lại sẽ nhớ tại sao chúng nên ở yên trong bãi cạn.",
+        "completion": "Bớt đi mười chiếc mai trên đường của tôi, và những chiếc lồng đầy ắp sáng nay. Những người coi lồng cua gọi bạn là điềm lành đấy, {playerName}. Ở Wickharbor, đó là lời khen ấm áp nhất có thể có.",
         "objectives": {
           "0": {
-            "label": "Shoal Scuttler slain"
+            "label": "Kẻ Bò Bãi Cạn bị tiêu diệt"
           }
         }
       },
       "q_gc_keeper_of_the_flame": {
-        "title": "The Keeper of the Flame",
-        "text": "Old Bram keeps the Beacon on the high head northeast of town, and he has not come down for his stores in two weeks. The lamp still burns, so he lives, but a man his age alone on that head in this wind, {playerName}. Climb the beacon road and see him standing.",
-        "completion": "Odile sent you all this way to see if the wind had taken me? Ha. Tell her the lamp burns and so do I. But since you have made the climb, {playerName}, stay a moment. The Beacon has work only a stranger seems fit to do.",
+        "title": "Người Giữ Ngọn Lửa",
+        "text": "Bram Già canh giữ Ngọn Hải Đăng trên mũi đất cao đông bắc thị trấn, và ông ấy đã không xuống lấy đồ tiếp tế suốt hai tuần nay. Ngọn đèn vẫn còn cháy, nên ông ấy vẫn sống, nhưng một người ở tuổi ông ấy một mình trên mũi đất đó trong cơn gió này, {playerName}. Hãy leo lên con đường hải đăng và xem ông ấy có còn đứng vững không.",
+        "completion": "Odile cử bạn đi xa đến đây để xem gió đã cuốn ta đi chưa à? Ha. Nói với bà ấy rằng ngọn đèn vẫn cháy và ta cũng vậy. Nhưng vì bạn đã leo lên tới đây, {playerName}, hãy ở lại một lát. Ngọn Hải Đăng có việc mà dường như chỉ người lạ mới thích hợp làm.",
         "objectives": {
           "0": {
-            "label": "Find Keeper Bram"
+            "label": "Tìm Người Giữ Bram"
           }
         }
       },
       "q_gc_lanterns_on_the_shear": {
-        "title": "Lanterns on the Shear",
-        "text": "The Beacon is the great light, {playerName}, but it is the storm-lanterns that walk a night traveler down the cliff road above the Shear. Last night the gale doused every one of them, and that road in the dark is a long fall with a short ending. Take my striker and relight the four along the cliff.",
-        "completion": "Four points of light on the cliff road, right where they belong. From up here it looks like the coast has opened its eyes again. You have the makings of a keeper, {playerName}.",
+        "title": "Đèn Lồng Trên Vách Đứng",
+        "text": "Ngọn Hải Đăng là ánh sáng lớn, {playerName}, nhưng chính những chiếc đèn bão mới dẫn đường cho lữ khách ban đêm xuống con đường vách đá phía trên Vách Đứng. Đêm qua trận cuồng phong đã dập tắt tất cả chúng, và con đường đó trong bóng tối là một cú ngã dài với một kết thúc ngắn ngủi. Cầm lấy đồ đánh lửa của ta và thắp lại bốn chiếc đèn dọc theo vách đá.",
+        "completion": "Bốn điểm sáng trên con đường vách đá, đúng nơi chúng thuộc về. Từ trên này nhìn xuống, có vẻ như bờ biển đã mở mắt trở lại. Bạn có tố chất của một người giữ đèn đấy, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Storm-lantern relit"
+            "label": "Đèn bão được thắp lại"
           }
         }
       },
       "q_gc_wind_against_the_wick": {
-        "title": "Wind Against the Wick",
-        "text": "The gale wisps are the wind gone spiteful, {playerName}. They gather on the high downs by the Mirror Tarn, and every flame they find, they snuff, a lantern, a hearth, one day this lamp. Thirty-nine years I have kept the Beacon lit, and I will not lose it to weather with a grudge. Scatter eight of them.",
-        "completion": "The lamp did not so much as gutter last night, first time in a month. The wind still hates us, {playerName}, but it has gone back to hating us fairly.",
+        "title": "Gió Chống Lại Sợi Bấc",
+        "text": "Tinh linh cuồng phong là làn gió đã trở nên hằn học, {playerName}. Chúng tụ tập trên những ngọn đồi cao gần Hồ Gương, và mỗi ngọn lửa chúng tìm thấy, chúng đều dập tắt, một chiếc đèn lồng, một lò sưởi, một ngày nào đó là ngọn đèn này. Ba mươi chín năm ta đã giữ cho Ngọn Hải Đăng cháy sáng, và ta sẽ không để mất nó vì thời tiết mang lòng thù hận. Xua tan tám con.",
+        "completion": "Ngọn đèn thậm chí không hề lay động đêm qua, lần đầu tiên trong một tháng. Gió vẫn còn ghét chúng ta, {playerName}, nhưng nó đã trở lại ghét chúng ta một cách công bằng.",
         "objectives": {
           "0": {
-            "label": "Gale Wisp scattered"
+            "label": "Tinh Linh Cuồng Phong bị xua tan"
           }
         }
       },
       "q_gc_the_far_shore": {
-        "title": "The Far Shore",
-        "text": "From this lamp room I can see the whole coast, {playerName}, and what I see in the north I do not like. Green lights walking the Wreckfields at low tide, hull by hull. One woman works that shore alone: Edda, the salvager. Follow the cliff road north past the Shear until the wrecks begin, and see that she still draws breath.",
-        "completion": "Bram watches my shore from his tower now, does he? The old man is right to worry, {playerName}. The dead have been walking their own wrecks at night, and lately they have stopped caring whether the sun is up.",
+        "title": "Bờ Biển Xa",
+        "text": "Từ căn phòng đèn này, tôi có thể thấy toàn bộ bờ biển, {playerName}, và những gì tôi thấy ở phía bắc thì tôi không thích. Những ánh đèn xanh di chuyển trên Wreckfields lúc thủy triều xuống, từng thân tàu một. Có một người phụ nữ làm việc một mình ở bờ biển đó: Edda, người trục vớt. Hãy theo con đường vách đá về phía bắc qua khỏi Vách Đứng cho đến khi những xác tàu bắt đầu xuất hiện, và xem cô ấy còn thở không.",
+        "completion": "Bram đang canh bờ biển của tôi từ tháp của ông ấy à? Ông lão đúng khi lo lắng, {playerName}. Người chết đã đi lại trên chính xác tàu của họ vào ban đêm, và gần đây họ đã thôi quan tâm liệu mặt trời có mọc hay không.",
         "objectives": {
           "0": {
-            "label": "Find Salvager Edda"
+            "label": "Tìm Người Trục Vớt Edda"
           }
         }
       },
       "q_gc_dead_mens_cargo": {
-        "title": "Dead Men's Cargo",
-        "text": "Salvage law is simple, {playerName}: what the sea gives the beach is mine. The drowned deckhands disagree. They rise from their hulls and drag every crate I stack back below the tideline. Put six of them down for good, and while the beach is quiet, haul in three flotsam crates before the tide files its counterclaim.",
-        "completion": "Six crews quieter and three crates high and dry. You salvage with a heavier hand than I do, {playerName}, but the ledger does not care. Half of this is yours by law, and by law I mean I say so.",
+        "title": "Hàng Hóa Của Người Chết",
+        "text": "Luật trục vớt rất đơn giản, {playerName}: những gì biển ban cho bãi biển đều là của tôi. Những thủy thủ chết đuối không đồng ý như vậy. Họ trồi lên từ thân tàu của mình và kéo mọi thùng hàng tôi xếp trở lại dưới đường thủy triều. Hạ gục sáu người trong số họ vĩnh viễn, và trong lúc bãi biển yên tĩnh, hãy kéo vào ba thùng mảnh vỡ trôi dạt trước khi thủy triều đưa ra khiếu nại phản đối.",
+        "completion": "Sáu thủy thủ đoàn yên tĩnh hơn và ba thùng hàng khô ráo an toàn. Bạn trục vớt mạnh tay hơn tôi nhiều, {playerName}, nhưng sổ sách không quan tâm điều đó. Một nửa số này là của bạn theo luật, và theo luật ở đây nghĩa là tôi nói vậy.",
         "objectives": {
           "0": {
-            "label": "Drowned Deckhand laid to rest"
+            "label": "Thủy Thủ Chết Đuối được an nghỉ"
           },
           "1": {
-            "label": "Flotsam Crate salvaged"
+            "label": "Thùng Mảnh Vỡ Trôi Dạt được trục vớt"
           }
         }
       },
       "q_gc_the_wreck_warden": {
-        "title": "The Wreck Warden",
-        "text": "Now you know why the deckhands rise, {playerName}. Something wears the barnacled plate of the first wreck ever to break on this shore, and it wardens every hull on the beach like a graveyard it was hired to keep. It holds a hoard I have coveted for ten years and a crew I would rather see resting. End the Wreck Warden. Bring a friend, the dead keep good watch.",
-        "completion": "The beach went silent the moment it fell, {playerName}. First silence I have heard on this shore in ten years of working it. The crews are just bones now, resting bones. Take the mantle off the top of the hoard, it was always going to fit a living back better.",
+        "title": "Vệ Quan Xác Tàu",
+        "text": "Giờ bạn đã biết tại sao những thủy thủ trỗi dậy, {playerName}. Có thứ gì đó khoác lên bộ giáp bám đầy hà của xác tàu đầu tiên từng vỡ tan trên bờ biển này, và nó canh giữ mọi thân tàu trên bãi biển như một nghĩa trang mà nó được thuê để trông coi. Nó nắm giữ một kho báu tôi đã thèm muốn suốt mười năm và một thủy thủ đoàn tôi thà thấy họ yên nghỉ. Kết liễu Vệ Quan Xác Tàu. Rủ theo một người bạn, người chết canh gác rất tốt.",
+        "completion": "Bãi biển im bặt ngay khoảnh khắc nó ngã xuống, {playerName}. Đây là lần đầu tiên tôi nghe thấy sự im lặng trên bờ biển này trong mười năm làm việc ở đây. Những thủy thủ đoàn giờ chỉ còn là xương, những bộ xương yên nghỉ. Lấy tấm áo choàng trên đỉnh kho báu đi, nó vốn dĩ luôn hợp với một tấm lưng còn sống hơn.",
         "objectives": {
           "0": {
-            "label": "The Wreck Warden felled"
+            "label": "Vệ Quan Xác Tàu bị hạ gục"
           }
         }
       },
@@ -13828,7 +14127,7 @@ export const vi_VN: EnTranslations = {
             "label": "Sân Heo Nái"
           },
           "11": {
-            "label": "The Farshore Ferry"
+            "label": "Đường Đê Farshore"
           }
         }
       },
@@ -13899,296 +14198,296 @@ export const vi_VN: EnTranslations = {
         }
       },
       "veiled_hollow": {
-        "name": "The Veiled Hollow",
-        "welcome": "The air hums with old magic. Seek Keeper Saelwyn beneath the great tree of Eldergleam.",
+        "name": "Thung Lũng Sương Phủ",
+        "welcome": "Không khí nơi đây vang vọng phép thuật cổ xưa. Hãy tìm đến Người Canh Giữ Saelwyn dưới gốc đại thụ của Eldergleam.",
         "pois": {
           "0": {
             "label": "Eldergleam"
           },
           "1": {
-            "label": "Duskfall Cave"
+            "label": "Hang Động Duskfall"
           },
           "2": {
-            "label": "Duskfall Overlook"
+            "label": "Đài Quan Sát Duskfall"
           },
           "3": {
-            "label": "Elder Grove"
+            "label": "Rừng Cổ Thụ"
           },
           "4": {
-            "label": "Starfall Basin"
+            "label": "Bồn Địa Starfall"
           },
           "5": {
-            "label": "The Sunken Court"
+            "label": "Sân Chìm"
           },
           "6": {
-            "label": "Crystalline Shallows"
+            "label": "Bãi Cạn Pha Lê"
           },
           "7": {
-            "label": "The Gleaming Deep"
+            "label": "Vực Sâu Lấp Lánh"
           }
         }
       },
       "drakelands": {
-        "name": "The Drakelands",
-        "welcome": "Hot wind rolls off the wastes ahead. Dragons wheel over the Drakemaw, and troll fires burn in the dunes.",
+        "name": "Vùng Đất Rồng",
+        "welcome": "Luồng gió nóng cuộn lên từ vùng đất hoang phía trước. Rồng lượn vòng trên Drakemaw, và lửa troll cháy rực giữa những cồn cát.",
         "pois": {
           "0": {
             "label": "Wyrmwatch"
           },
           "1": {
-            "label": "The Gatewood"
+            "label": "Gatewood"
           },
           "2": {
-            "label": "Cinder Dunes"
+            "label": "Cồn Cát Tro Tàn"
           },
           "3": {
             "label": "Trollmoot"
           },
           "4": {
-            "label": "The Last Keep"
+            "label": "Pháo Đài Cuối Cùng"
           },
           "5": {
-            "label": "Bloodglass Fields"
+            "label": "Cánh Đồng Bloodglass"
           },
           "6": {
-            "label": "Drakemaw Caldera"
+            "label": "Miệng Núi Lửa Drakemaw"
           }
         }
       },
       "frostveil": {
-        "name": "The Frostveil Reach",
-        "welcome": "Snow swallows every sound. Under the dancing lights, the cold itself feels awake.",
+        "name": "Đỉnh Sương Giá",
+        "welcome": "Tuyết nuốt trọn mọi âm thanh. Dưới ánh sáng nhảy múa trên bầu trời, cái lạnh dường như cũng đang thức giấc.",
         "pois": {
           "0": {
             "label": "Icemantle"
           },
           "1": {
-            "label": "The Snowline"
+            "label": "Snowline"
           },
           "2": {
-            "label": "Glacier Tarn"
+            "label": "Hồ Băng Hà"
           },
           "3": {
-            "label": "The Aurora Steps"
+            "label": "Bậc Thang Cực Quang"
           },
           "4": {
-            "label": "The Shiverfen"
+            "label": "Shiverfen"
           },
           "5": {
-            "label": "The Howling Terraces"
+            "label": "Bậc Thềm Gào Thét"
           }
         }
       },
       "amberfall": {
-        "name": "The Amberfall",
-        "welcome": "Every leaf here burns gold and red, yet none ever fall. The lanterns of Lanternmere are lit for you.",
+        "name": "Xứ Thu Hổ Phách",
+        "welcome": "Mỗi chiếc lá nơi đây cháy rực sắc vàng và đỏ, nhưng chẳng bao giờ rụng xuống. Những chiếc đèn lồng của Lanternmere đã thắp sáng chờ đón bạn.",
         "pois": {
           "0": {
             "label": "Lanternmere"
           },
           "1": {
-            "label": "The Goldmelt"
+            "label": "Goldmelt"
           },
           "2": {
-            "label": "The Gilded Orchard"
+            "label": "Vườn Dát Vàng"
           },
           "3": {
-            "label": "Harvest Hollow"
+            "label": "Trũng Thu Hoạch"
           },
           "4": {
-            "label": "The Great Mere"
+            "label": "Hồ Lớn"
           },
           "5": {
-            "label": "Cindermaple Rise"
+            "label": "Đồi Cindermaple"
           },
           "6": {
-            "label": "The Leaning Monolith"
+            "label": "Cự Thạch Nghiêng"
           }
         }
       },
       "willowfen": {
-        "name": "The Willowfen",
-        "welcome": "The fen hums with dragonflies and bees. Cross the bridge into Bridgemere and rest your feet awhile.",
+        "name": "Đầm Liễu",
+        "welcome": "Đầm lầy rộn ràng tiếng chuồn chuồn và ong bay vo ve. Hãy băng qua cây cầu vào Bridgemere và nghỉ chân đôi chút.",
         "pois": {
           "0": {
             "label": "Bridgemere"
           },
           "1": {
-            "label": "The Amberfen Steps"
+            "label": "Bậc Thang Amberfen"
           },
           "2": {
-            "label": "The Lilymoors"
+            "label": "Lilymoors"
           },
           "3": {
-            "label": "Bogshine Pools"
+            "label": "Vũng Bogshine"
           },
           "4": {
             "label": "Willowweep"
           },
           "5": {
-            "label": "The Drowsy Flats"
+            "label": "Bãi Bằng Buồn Ngủ"
           }
         }
       },
       "nightbloom": {
-        "name": "The Nightbloom",
-        "welcome": "Past the Nightgate the air itself dreams. Follow the flower-light to Moonrest, and mind the sleeping world that hangs in the sky.",
+        "name": "Cánh Đồng Dạ Hoa",
+        "welcome": "Qua khỏi Nightgate, chính không khí cũng đang mơ màng. Hãy theo ánh sáng của loài hoa dẫn tới Moonrest, và để ý thế giới đang say ngủ treo lơ lửng trên bầu trời.",
         "pois": {
           "0": {
             "label": "Moonrest"
           },
           "1": {
-            "label": "The Nightgate"
+            "label": "Nightgate"
           },
           "2": {
-            "label": "The Moonwell"
+            "label": "Moonwell"
           },
           "3": {
             "label": "Gloamfield"
           },
           "4": {
-            "label": "The Standing Vigil"
+            "label": "Canh Thức Vĩnh Cửu"
           },
           "5": {
-            "label": "The Sleepless Barrow"
+            "label": "Gò Mộ Không Ngủ"
           }
         }
       },
       "wraithwood": {
-        "name": "The Wraithwood",
-        "welcome": "The canopy closes over the road like a lid. Keep to the lanterns of Gallowmere, and do not answer if the wood calls your name.",
+        "name": "Rừng Oan Hồn",
+        "welcome": "Tán lá khép lại trên con đường như một chiếc nắp đậy. Hãy bám theo ánh đèn lồng của Gallowmere, và đừng đáp lời nếu khu rừng gọi tên bạn.",
         "pois": {
           "0": {
             "label": "Gallowmere"
           },
           "1": {
-            "label": "The Crowgate"
+            "label": "Crowgate"
           },
           "2": {
-            "label": "Widow's Thicket"
+            "label": "Lùm Cây Của Góa Phụ"
           },
           "3": {
-            "label": "The Hanging Glade"
+            "label": "Trảng Rừng Treo Cổ"
           },
           "4": {
-            "label": "The Mournstone Chapel"
+            "label": "Nhà Nguyện Mournstone"
           },
           "5": {
-            "label": "The Huntsman's Clearing"
+            "label": "Khoảng Trống Của Thợ Săn"
           }
         }
       },
       "palmreach": {
-        "name": "The Palmreach",
-        "welcome": "Warm sand, loud birds, and a jungle that eats the horizon. Drifthaven keeps a fire lit on the beach for you.",
+        "name": "Vịnh Cọ",
+        "welcome": "Cát ấm, tiếng chim ríu rít, và một khu rừng nuốt trọn cả chân trời. Drifthaven vẫn giữ một đống lửa cháy sáng trên bãi biển chờ bạn.",
         "pois": {
           "0": {
             "label": "Drifthaven"
           },
           "1": {
-            "label": "The Tanglemouth"
+            "label": "Tanglemouth"
           },
           "2": {
-            "label": "The Palmstrand"
+            "label": "Palmstrand"
           },
           "3": {
-            "label": "The Emerald Tangle"
+            "label": "Bụi Rậm Ngọc Lục Bảo"
           },
           "4": {
-            "label": "The Vinefall"
+            "label": "Vinefall"
           },
           "5": {
-            "label": "The Sapphire Lagoon"
+            "label": "Đầm Phá Lam Ngọc"
           },
           "6": {
-            "label": "The Sunken Idol"
+            "label": "Tượng Thần Chìm"
           }
         }
       },
       "evergarden": {
-        "name": "The Evergarden",
-        "welcome": "Someone is still trimming the hedges, though no gardener has been seen for a hundred years. Mind the maze: it minds you back.",
+        "name": "Khu Vườn Vĩnh Cửu",
+        "welcome": "Vẫn có ai đó đang tỉa những hàng rào cây, dù đã cả trăm năm không ai thấy bóng dáng người làm vườn. Hãy cẩn thận với mê cung: nó cũng đang để mắt đến bạn.",
         "pois": {
           "0": {
             "label": "Hedgewick"
           },
           "1": {
-            "label": "The Garden Gate"
+            "label": "Cổng Vườn"
           },
           "2": {
-            "label": "The Parterre Walk"
+            "label": "Lối Đi Vườn Hoa"
           },
           "3": {
-            "label": "Dawnhold Castle"
+            "label": "Lâu Đài Dawnhold"
           },
           "4": {
-            "label": "The Petal Pond"
+            "label": "Ao Cánh Hoa"
           },
           "5": {
-            "label": "The Great Maze"
+            "label": "Đại Mê Cung"
           },
           "6": {
-            "label": "The Fountain Court"
+            "label": "Sân Đài Phun Nước"
           },
           "7": {
-            "label": "The Old Mill"
+            "label": "Cối Xay Cũ"
           },
           "8": {
-            "label": "The North Watch"
+            "label": "Trạm Canh Bắc"
           },
           "9": {
-            "label": "The Lily Basin"
+            "label": "Bồn Địa Hoa Loa Kèn"
           }
         }
       },
       "galecrest": {
-        "name": "The Galecrest",
-        "welcome": "The wind has never once stopped here, and the Old Beacon has never once gone out. Wickharbor asks only that you close the inn door behind you.",
+        "name": "Đỉnh Gió Lộng",
+        "welcome": "Gió nơi đây chưa từng một lần ngừng thổi, và Ngọn Hải Đăng Cũ chưa từng một lần tắt. Wickharbor chỉ mong bạn khép cửa quán trọ lại sau lưng.",
         "pois": {
           "0": {
             "label": "Wickharbor"
           },
           "1": {
-            "label": "The Windway"
+            "label": "Windway"
           },
           "2": {
-            "label": "The Howling Downs"
+            "label": "Đồi Gào Thét"
           },
           "3": {
-            "label": "The Old Beacon"
+            "label": "Ngọn Hải Đăng Cũ"
           },
           "4": {
-            "label": "The Shear"
+            "label": "Vách Đứng"
           },
           "5": {
-            "label": "The Wreckfields"
+            "label": "Wreckfields"
           },
           "6": {
-            "label": "The Mirror Tarn"
+            "label": "Hồ Gương"
           },
           "7": {
-            "label": "The Galecrest Stables"
+            "label": "Chuồng Ngựa Galecrest"
           }
         }
       },
       "farshore_isle": {
-        "name": "The Farshore",
-        "welcome": "Step off the ferry and Gullhaven's bell will find you before the town does. The breaks tear open without warning, and the redoubt holds its shore against whatever pours through. They have been waiting a long while for someone like you.",
+        "name": "Bờ Biển Xa Xôi",
+        "welcome": "Băng qua doi cát, tiếng chuông của Gullhaven sẽ tìm ra bạn trước cả khi thị trấn kịp hay. Những rạn nứt xé toạc không chút báo trước, và đồn lũy vẫn trấn giữ bờ biển này trước bất cứ thứ gì tràn qua. Họ đã chờ đợi một người như bạn từ rất lâu rồi.",
         "pois": {
           "0": {
             "label": "Gullhaven"
           },
           "1": {
-            "label": "The Landing"
+            "label": "Bến Tàu"
           },
           "2": {
-            "label": "The Watch Meadow"
+            "label": "Đồng Cỏ Canh Gác"
           },
           "3": {
-            "label": "The Sundered Cliffs"
+            "label": "Vách Đá Vỡ Nát"
           },
           "4": {
-            "label": "The Riftfields"
+            "label": "Riftfields"
           },
           "5": {
             "label": "The Breach"
@@ -14226,14 +14525,14 @@ export const vi_VN: EnTranslations = {
         "leaveText": "Bạn trở lại không khí lạnh giá của Đỉnh Gai."
       },
       "wildheart_basin": {
-        "name": "The Wildheart Basin",
-        "enterText": "Warm rain hisses on old stone. The Wildheart Basin opens before you.",
-        "leaveText": "You pass back beneath the stone fangs into the Palmreach sun."
+        "name": "Lòng Chảo Trái Tim Hoang Dã",
+        "enterText": "Mưa ấm rít trên nền đá cổ. The Wildheart Basin mở ra trước mắt bạn.",
+        "leaveText": "Bạn đi ngang qua những nanh đá một lần nữa, trở về dưới ánh nắng Palmreach."
       },
       "the_last_keep": {
-        "name": "The Last Keep",
-        "enterText": "You step into the cold, silent halls of the Last Keep.",
-        "leaveText": "You pull the keep door shut and step back into the Drakelands wind."
+        "name": "Pháo Đài Cuối Cùng",
+        "enterText": "Bạn bước vào những đại sảnh lạnh lẽo, tĩnh lặng của Last Keep.",
+        "leaveText": "Bạn kéo cánh cửa pháo đài đóng sập lại và bước trở về với cơn gió của Drakelands."
       },
       "lb_tidemill": {
         "name": "The Tidemill",

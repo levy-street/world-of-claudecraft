@@ -2,6 +2,7 @@
 // directive-driven movement (follow / hold / station), combat engagement,
 // the healer duty, the scripted 1 hp floor + player relief, group damage
 // scaling, and teardown.
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { LAST_BELL_SQUAD_ACTORS, LAST_BELL_SQUAD_MOBS } from '../src/sim/content/last_bell_squad';
 import { DUNGEONS, MOBS } from '../src/sim/data';
@@ -12,6 +13,7 @@ import {
   setSquadDirective,
   spawnSquad,
   squadActorEntity,
+  updateSquads,
 } from '../src/sim/squad/squad';
 import { addThreat } from '../src/sim/threat';
 import { dist2d, type Entity } from '../src/sim/types';
@@ -55,6 +57,17 @@ describe('squad content integrity', () => {
 });
 
 describe('squad lifecycle', () => {
+  it('uses caller-owned spatial-query buffers on the 20 Hz update path', () => {
+    const source = readFileSync(new URL('../src/sim/squad/squad.ts', import.meta.url), 'utf8');
+    expect(source).not.toContain('for (const m of ctx.entities.values())');
+    expect(source).not.toContain('for (const meta of ctx.players.values())');
+    expect(source).not.toContain('[...run.actorIds.values()]');
+    expect(source).toContain('ctx.grid.collectInRadius(');
+    expect(source).toContain('ctx.playerGrid.collectInRadius(');
+    expect(source).toContain('run.actorEntityIds.has(m.aggroTargetId)');
+    expect(source).toContain('const allies = collectRunAllies(ctx, run);');
+  });
+
   it('spawns actors friendly, rng-free, and despawns them cleanly', () => {
     const sim = new Sim({
       seed: 77,
@@ -108,6 +121,47 @@ describe('squad lifecycle', () => {
     sim.player.prevPos = { ...sim.player.pos };
     tickMany(sim, 80);
     expect(Math.hypot(actor().pos.x - post.x, actor().pos.z - post.z)).toBeLessThan(3);
+  });
+
+  it('keeps the established strict 130-yard ally envelope at its boundary', () => {
+    const { sim, claimId } = setupStorySquad(['coalfast']);
+    const actor = squadActorEntity(sim.ctx, claimId, 'coalfast') as Entity;
+    actor.pos = sim.groundPos(1_000, 0);
+    actor.prevPos = { ...actor.pos };
+    sim.ctx.rebucket(actor);
+    sim.player.pos = sim.groundPos(1_130, 0);
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.ctx.rebucket(sim.player);
+    const before = { ...actor.pos };
+
+    updateSquads(sim.ctx);
+
+    expect(actor.pos).toEqual(before);
+  });
+
+  it('refreshes the run ally snapshot after an earlier actor teleports', () => {
+    const { sim, claimId } = setupStorySquad(['coalfast', 'tam']);
+    const coalfast = squadActorEntity(sim.ctx, claimId, 'coalfast') as Entity;
+    const tam = squadActorEntity(sim.ctx, claimId, 'tam') as Entity;
+    coalfast.pos = sim.groundPos(1_000, 0);
+    coalfast.prevPos = { ...coalfast.pos };
+    sim.ctx.rebucket(coalfast);
+    tam.pos = sim.groundPos(998, 0);
+    tam.prevPos = { ...tam.pos };
+    sim.ctx.rebucket(tam);
+    sim.player.pos = sim.groundPos(1_200, 0);
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.ctx.rebucket(sim.player);
+    setSquadDirective(sim.ctx, claimId, 'coalfast', {
+      kind: 'hold',
+      x: sim.player.pos.x,
+      z: sim.player.pos.z,
+    });
+
+    updateSquads(sim.ctx);
+
+    expect(dist2d(coalfast.pos, sim.player.pos)).toBeLessThan(1);
+    expect(dist2d(tam.pos, sim.player.pos)).toBeLessThan(8);
   });
 
   it('engages a hostile mob pressing the player and brings it down', () => {

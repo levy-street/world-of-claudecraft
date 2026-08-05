@@ -80,6 +80,7 @@ export interface InputCallbacks {
       | 'escape'
       | 'chat'
       | 'meters'
+      | 'targetAuras'
       | 'social'
       | 'arena'
       | 'valecup'
@@ -512,7 +513,11 @@ export class Input {
     this.keyJumpUntil = 0;
   }
 
-  captureNextKey(cb: (code: string | null) => void): void {
+  // Passing null clears an armed capture without invoking a callback, so a
+  // caller that abandons a pending capture (Done / Reset confirm) does not
+  // leave a stale one-shot handler in place to swallow the player's next
+  // real keypress.
+  captureNextKey(cb: ((code: string | null) => void) | null): void {
     this.captureCb = cb;
   }
 
@@ -1037,6 +1042,9 @@ export class Input {
         return;
       case 'meters':
         this.cb.onUiKey('meters');
+        return;
+      case 'targetAuras':
+        this.cb.onUiKey('targetAuras');
         return;
       case 'social':
         this.cb.onUiKey('social');

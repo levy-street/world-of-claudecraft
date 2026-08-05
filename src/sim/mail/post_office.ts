@@ -16,6 +16,8 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/
 // Date.now (enforced by tests/architecture.test.ts). The post draws NO rng.
 
+import { bagCapacity, canGrantCopies, instancedCountCap } from '../bags';
+import { rekeySigner } from '../character_rename';
 import {
   HEROIC_MARK_LETTER,
   type LetterDef,
@@ -23,9 +25,27 @@ import {
   WELCOME_LETTER,
 } from '../content/letters';
 import { ITEMS } from '../data';
+import { boundCraftedRecipeIdOnLoad, warnDroppedInstanceKeys } from '../item_instance_load';
+import { itemInstancePayloadsEqual } from '../item_instance_merge';
+import {
+  countMatchingUnlocked,
+  grantCopies,
+  isTransferLockedInstance,
+  publicInstanceView,
+  removeMatchingInstance,
+  sanitizeEscrowSlot,
+} from '../item_instance_transfer';
+import { removeVendorSellUnits } from '../items';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { dist2d, type Entity, INTERACT_RANGE, type InvSlot, type MailResultCode } from '../types';
+import {
+  cloneInvSlot,
+  dist2d,
+  type Entity,
+  INTERACT_RANGE,
+  type InvSlot,
+  type MailResultCode,
+} from '../types';
 
 const MAIL_RANGE = INTERACT_RANGE + 2; // you must stand at a raven pillar to tend your post
 export const MAIL_POSTAGE = 30; // copper per letter
@@ -214,6 +234,18 @@ export class PostOffice {
     return String(meta.characterId ?? meta.entityId);
   }
 
+  // Whether any letter addressed to this player still carries `itemId` as an
+  // attachment, in-flight letters included (a raven on the wing lands in this
+  // mailbox and nowhere else). The quest re-grant predicate
+  // (quests/quest_item_presence.ts) reads this: an item waiting in the
+  // mailbox is recoverable through mailTake, so a re-accept must not mint a
+  // duplicate. Pure read, no rng, no mutation.
+  mailboxHoldsItem(meta: PlayerMeta, itemId: string): boolean {
+    return this.mail.some(
+      (m) => this.belongsTo(m, meta) && m.items.some((s) => s.itemId === itemId && s.count > 0),
+    );
+  }
+
   // Structured outcome (the lockpick convention: the sim emits data only, the
   // client renders every visible mail string from the code).
   private result(
@@ -378,6 +410,7 @@ export class PostOffice {
       return;
     }
     const wanted = new Map<string, number>();
+    const instancedWanted: { itemId: string; instance: NonNullable<InvSlot['instance']> }[] = [];
     for (const s of items) {
       const def = ITEMS[s.itemId];
       const count = Math.floor(s.count);
@@ -390,14 +423,43 @@ export class PostOffice {
         this.result(meta.entityId, 'noMailQuestItems');
         return;
       }
-      wanted.set(s.itemId, (wanted.get(s.itemId) ?? 0) + count);
+      if (s.instance && typeof s.instance === 'object') {
+        // Instanced parcels (the #1165 completion): single-copy by design (the
+        // qty stepper stays fungible-only), named by payload so a bag reshuffle
+        // can never redirect the escrow. A count other than exactly 1 is a
+        // malformed request and refuses like any other malformed entry, never
+        // silently truncates. Transfer-locked copies (bindOnTrade armed or
+        // boundTo bound, the shared market rule) never ride a raven: a
+        // bind-on-trade windfall must not be mail-launderable.
+        if (count !== 1) return;
+        if (isTransferLockedInstance(s.instance)) {
+          this.result(meta.entityId, 'noMailBound');
+          return;
+        }
+        instancedWanted.push({ itemId: s.itemId, instance: s.instance });
+      } else {
+        wanted.set(s.itemId, (wanted.get(s.itemId) ?? 0) + count);
+      }
     }
     for (const [itemId, count] of wanted) {
-      // Count only the fungible stock (#1165): an instanced copy (signer/charges/
-      // rolled/boundTo) is never swept into a letter, exactly as the World Market
-      // validates against countFungibleItem. A player whose only copies are
-      // instanced gets notEnoughItems, just like on the market.
+      // Count only the fungible stock for plain entries: a plain attachment is
+      // never covered by an instanced copy, exactly as the World Market
+      // validates against countFungibleItem.
       if (this.ctx.countFungibleItem(itemId, meta.entityId) < count) {
+        this.result(meta.entityId, 'notEnoughItems');
+        return;
+      }
+    }
+    // Each instanced entry needs a matching UNLOCKED held copy, counting every
+    // entry that names the same payload (byte-equal copies are interchangeable;
+    // a stripped-lock forgery simply fails to match and lands here too).
+    for (const w of instancedWanted) {
+      let need = 0;
+      for (const other of instancedWanted) {
+        if (other.itemId === w.itemId && itemInstancePayloadsEqual(other.instance, w.instance))
+          need += 1;
+      }
+      if (countMatchingUnlocked(meta, w.itemId, w.instance) < need) {
         this.result(meta.entityId, 'notEnoughItems');
         return;
       }
@@ -410,13 +472,47 @@ export class PostOffice {
       this.result(meta.entityId, 'recipientBoxFull');
       return;
     }
-    // Escrow: coin and goods leave the sender now, ride with the raven. Remove
-    // the fungible stock only (#1165), matching the countFungibleItem check above
-    // so an instanced copy can never be consumed as a plain stack member and come
-    // back later as a generic copy.
+    // Escrow: coin and goods leave the sender now, ride with the raven. An
+    // instanced entry escrows the ACTUAL matching copy, whose payload
+    // (removeMatchingInstance's contract, never the wire needle) is what the
+    // letter carries. A plain entry escrows via removeVendorSellUnits (the
+    // trade/market walk) with a `skip` that spares every instanced copy
+    // (matching the countFungibleItem check above, so an instanced copy is
+    // never consumed as a plain stack member), so the escrow reports each
+    // removed unit's plain-stack craftedRecipeId marker (bags.ts
+    // InvSlot.craftedRecipeId): otherwise a mailed crafted item lands at the
+    // recipient with no marker, laundering the disenchant-gate provenance the
+    // same way the trade/market fix closed. A single plain entry can legitimately
+    // span two provenance buckets (the market's boundstone_helm case), so it
+    // splits into one parcel per bucket rather than merging them.
     meta.copper -= coin + MAIL_POSTAGE;
-    for (const s of items)
-      this.ctx.removeFungibleItem(s.itemId, Math.floor(s.count), meta.entityId);
+    const parcels: InvSlot[] = [];
+    for (const s of items) {
+      if (s.instance && typeof s.instance === 'object') {
+        const escrowed = removeMatchingInstance(this.ctx, s.itemId, s.instance, meta.entityId);
+        if (escrowed) parcels.push({ itemId: s.itemId, count: 1, instance: escrowed });
+      } else {
+        const count = Math.floor(s.count);
+        const consumed = removeVendorSellUnits(
+          this.ctx,
+          s.itemId,
+          count,
+          meta.entityId,
+          () => true,
+        );
+        const byRecipe = new Map<string | undefined, number>();
+        for (const unit of consumed) {
+          byRecipe.set(unit.craftedRecipeId, (byRecipe.get(unit.craftedRecipeId) ?? 0) + 1);
+        }
+        for (const [craftedRecipeId, bucketCount] of byRecipe) {
+          parcels.push({
+            itemId: s.itemId,
+            count: bucketCount,
+            ...(craftedRecipeId === undefined ? {} : { craftedRecipeId }),
+          });
+        }
+      }
+    }
     this.book({
       recipientKey: recipient.key,
       recipientName: recipient.name,
@@ -426,7 +522,7 @@ export class PostOffice {
       subject: cleanSubject,
       body: cleanBody,
       copper: coin,
-      items: items.map((s) => ({ itemId: s.itemId, count: Math.floor(s.count) })),
+      items: parcels,
       delaySeconds: MAIL_DELIVERY_SECONDS,
     });
     this.result(meta.entityId, 'sent', { name: recipient.name, value: MAIL_POSTAGE });
@@ -463,8 +559,22 @@ export class PostOffice {
     // against the live inventory, so cumulative capacity is honoured.
     const kept: InvSlot[] = [];
     for (const s of m.items) {
-      if (this.ctx.canAddItem(s.itemId, s.count, meta.entityId)) {
-        this.ctx.addItem(s.itemId, s.count, meta.entityId);
+      // The shared payload-aware pair (bags.ts canGrantCopies + grantCopies):
+      // an instanced parcel needs instanced room and lands through
+      // addItemInstance so its payload survives delivery; a plain parcel
+      // threads its craftedRecipeId marker through so a mailed crafted item
+      // keeps its provenance on arrival, the same as the market fix.
+      if (
+        canGrantCopies(
+          meta.inventory,
+          bagCapacity(meta.bags),
+          s.itemId,
+          s.count,
+          s.instance,
+          s.craftedRecipeId,
+        )
+      ) {
+        grantCopies(this.ctx, meta.entityId, s.itemId, s.count, s.instance, s.craftedRecipeId);
       } else {
         kept.push(s);
       }
@@ -476,8 +586,12 @@ export class PostOffice {
       m.read = true;
     }
     if (kept.length > 0) {
-      // Attachments remain: the expiry clock stays paused (Infinity) and the
-      // player is told to make room, exactly as the Merchant's collect does.
+      // Attachments remain: expiresAt is untouched here, so the letter's
+      // existing clock keeps running. That is Infinity for system/npc mail
+      // (their by-construction exemption, see the book() comment below), but a
+      // player parcel's real MAIL_ATTACHMENT_EXPIRY_SECONDS deadline still
+      // ticks and can still trip returnToSender. The player is told to make
+      // room, exactly as the Merchant's collect does.
       this.ctx.error(meta.entityId, 'Your bags are full.');
       return;
     }
@@ -632,7 +746,15 @@ export class PostOffice {
         subject: m.subject,
         body: m.body,
         copper: m.copper,
-        items: m.items.map((s) => ({ ...s })),
+        // Display projection (publicInstanceView: signer/enchant/rolled only).
+        // Deliberately ONE projection for the whole inbox surface, the
+        // viewer's own letters included (broader than the other-players
+        // rationale the trim was named for): the chip tooltip needs only the
+        // enchant line and maker's mark, and the full payload stays in the
+        // book and arrives with mailTake.
+        items: m.items.map((s) =>
+          s.instance ? { ...s, instance: publicInstanceView(s.instance) } : { ...s },
+        ),
         read: m.read,
       })),
       totalCount: mine.length,
@@ -650,6 +772,23 @@ export class PostOffice {
     const key = String(characterId);
     let changed = false;
     for (const m of this.mail) {
+      // A rename (or a deactivated-name reclaim, which is a rename in
+      // effect) frees oldName for a stranger, so this character's own
+      // pre-senderKey OUTGOING letters get the stable id and the new
+      // display name: a later return flight must follow the character, not
+      // whoever takes the freed name. Same accepted ambiguity as the purge's
+      // stamp (a pre-senderKey letter from a PRIOR holder of oldName is
+      // stamped with the wrong id), with a sharper consequence here: this
+      // id is LIVE, so a mis-stamped letter is re-attributed and its return
+      // flight DELIVERS to this character, where the purge's dead-id stamp
+      // merely self-destructs. Accepted because a pre-senderKey letter
+      // carries no sender identity to distinguish the two, and the current
+      // holder is by far the likelier author.
+      if (m.kind === 'player' && m.senderKey === undefined && m.senderName === oldName) {
+        m.senderKey = key;
+        m.senderName = newName;
+        changed = true;
+      }
       if (m.recipientKey === key || m.recipientKey === oldName || m.recipientKey === newName) {
         if (m.recipientKey !== key || m.recipientName !== newName) changed = true;
         const oldKey = m.recipientKey;
@@ -663,6 +802,106 @@ export class PostOffice {
         m.recipientKey = key;
         m.recipientName = newName;
       }
+      // The escrowed payloads follow their owner through the rename the same
+      // way the blob sweep's buyback arm does (the fix-round review): a
+      // parcel addressed to this character (incoming holdings and every
+      // return flight, which re-addresses to the sender) hands these exact
+      // copies back, and a stale signer would detach the original-crafter
+      // discount, or after a reclaim name a stranger. Scoped to the
+      // recipient arm on purpose: a copy sitting in a STRANGER's parcel is
+      // foreign-held, the accepted craftedBy limitation.
+      if (m.recipientKey === key) {
+        for (const slot of m.items) {
+          if (rekeySigner(slot.instance, oldName, newName)) changed = true;
+        }
+      }
+    }
+    return changed;
+  }
+
+  // Character deletion (R43): the deleted character's mailbox leaves the book,
+  // matching the SAME dual keys rekeyMailOwner does (stable character-id key plus
+  // a legacy name-keyed letter). Letters addressed here can hold OTHER players'
+  // escrowed coin and goods, so the book's standing invariant still rules: an
+  // unclaimed player parcel flies home through the ordinary return flight rather
+  // than being destroyed, and only letters with nothing at stake are deleted:
+  //  - a bare note (no coin, no items), read or not;
+  //  - a system/npc parcel, whose attachments were minted by the world and have
+  //    no live sender to fly home to (their senderKey is absent by construction);
+  //  - a player parcel whose return flight has ALREADY run (the sweep's one
+  //    sanctioned destruction, the `returned` flag);
+  //  - a player parcel the deleted character sent to themselves, whose home key
+  //    is the key being purged: the escrow was theirs alone and there is nowhere
+  //    left to return it to.
+  // The delete arm mirrors the expiry sweep's exactly, so unreadIndex and the
+  // in-flight set stay consistent. The senderName fallback is NOT a rare
+  // edge at ship time: senderKey landed in this same release (#2450), so
+  // every production letter written before it takes the name path until
+  // those letters age out of the book (the attachment expiry windows). Its
+  // accepted consequences are #2450's own: a sender who renamed since
+  // sending is matched by their stale name, and a pre-senderKey letter TO
+  // this character whose senderName equals this character's name reads as
+  // self-addressed and is deleted (under unique names that sender is the
+  // deleted character or a prior holder of the reclaimed name). While the
+  // walk is here anyway, the deleted character's own pre-senderKey OUTGOING
+  // letters get their stable id stamped, so an eventual return flight lands
+  // on the dead id and self-destructs instead of reaching whoever reclaims
+  // the freed display name. Returns whether anything changed.
+  purgeMailOwner(characterId: number, name: string): boolean {
+    if (!Number.isFinite(characterId)) return false;
+    const key = String(characterId);
+    const now = this.ctx.time;
+    const owns = (k: string): boolean => k === key || (name !== '' && k === name);
+    let changed = false;
+    for (let i = this.mail.length - 1; i >= 0; i--) {
+      const m = this.mail[i];
+      // The outgoing stamp (see the header): pre-senderKey PLAYER mail this
+      // character sent gets the stable id while the book is being walked.
+      // Player-kind only: system/npc mail has no senderKey by construction
+      // and never returns, and an authored sender name that happens to match
+      // a player name must not be re-attributed. A pre-#2450 letter from a
+      // PRIOR holder of this name is stamped with the wrong id, an accepted
+      // ambiguity: its eventual return then self-destructs on the dead id
+      // instead of reaching whoever holds the name next, the lesser wrong.
+      if (
+        m.kind === 'player' &&
+        m.senderKey === undefined &&
+        name !== '' &&
+        m.senderName === name
+      ) {
+        m.senderKey = key;
+        changed = true;
+      }
+      if (!owns(m.recipientKey)) continue;
+      changed = true;
+      const escrowed = m.copper > 0 || m.items.length > 0;
+      // returnToSender's own fallback: the stable sender id, or the display name
+      // for a letter persisted before senderKey existed.
+      const homeKey = m.senderKey ?? m.senderName;
+      if (m.kind === 'player' && escrowed && !m.returned && !owns(homeKey)) {
+        // Normalize a legacy name-keyed address to the stable id BEFORE the
+        // flight: returnToSender records the outgoing address as the new
+        // senderKey, and that field must never hold a reclaimable display
+        // name (its own comment promises stable-id by construction). Move
+        // the letter's delivered-and-unread contribution with the key (the
+        // rekeyMailOwner shape), because returnToSender's own decrement
+        // reads the field this walk just overwrote; without the move the
+        // name bucket keeps a phantom unread the freed name's next holder
+        // reads forever. No CURRENT producer books a name-keyed unreturned
+        // player letter (returns set `returned`, sends key by id), so this
+        // arm serves blobs loadMail preserves verbatim: legacy defense,
+        // same standing as the dual-key purge arms themselves.
+        if (m.recipientKey !== key && !m.read && now >= m.deliverAt) {
+          this.indexDec(m.recipientKey);
+          this.indexInc(key);
+        }
+        m.recipientKey = key;
+        this.returnToSender(m, now);
+        continue;
+      }
+      if (!m.read && now >= m.deliverAt) this.indexDec(m.recipientKey);
+      this.undelivered.delete(m);
+      this.mail.splice(i, 1);
     }
     return changed;
   }
@@ -683,7 +922,9 @@ export class PostOffice {
         subject: m.subject,
         body: m.body,
         copper: m.copper,
-        items: m.items.map((s) => ({ ...s })),
+        // cloneInvSlot, not a shallow spread: an instanced parcel's payload
+        // must not alias between the live book and the serialized blob.
+        items: m.items.map(cloneInvSlot),
         deliverIn: Math.max(0, Math.round(m.deliverAt - now)),
         secondsLeft: Number.isFinite(m.expiresAt) ? Math.max(0, Math.round(m.expiresAt - now)) : -1,
         read: m.read,
@@ -706,13 +947,36 @@ export class PostOffice {
       items: InvSlot[];
       delaySeconds: number;
     }[] = [];
+    // One aggregated dev-channel line per BOOK load (the character-load
+    // idiom): the escrow bound reports what it dropped without logging per
+    // row on a systematically corrupt save.
+    const escrowDrops: string[] = [];
     for (const m of save.mail ?? []) {
       if (!m || typeof m.recipientKey !== 'string') continue;
       // Keep letters whose attached item id is no longer in ITEMS (a content
       // edit): dormant, recoverable data, exactly like market listings.
+      // sanitizeEscrowSlot preserves an instanced parcel's payload and clamps
+      // its count to the identical-payload merge cap (the character-load rule).
+      // A plain parcel's craftedRecipeId marker rides alongside it (dropped by
+      // sanitizeEscrowSlot, which is instance-only), so a mail restart never
+      // strips a crafted item's provenance out of an in-flight attachment.
       const items = (m.items ?? [])
         .filter((s) => s && typeof s.itemId === 'string')
-        .map((s) => ({ itemId: s.itemId, count: Math.max(1, s.count | 0) }));
+        .map((s) => {
+          const slot: InvSlot = {
+            ...sanitizeEscrowSlot(s, instancedCountCap(ITEMS[s.itemId], s.instance), escrowDrops),
+            ...(typeof s.craftedRecipeId === 'string'
+              ? { craftedRecipeId: s.craftedRecipeId }
+              : {}),
+          };
+          // The slot-level marker bound every other persisted marker load
+          // takes (bag/buyback/bank; item_instance_load.ts doctrine): a mail
+          // row can persist forever with no login to self-heal it, so a bare
+          // typeof keep would ride an empty or unbounded marker through every
+          // serializeMail. Drop-only, reported on the book's aggregate line.
+          boundCraftedRecipeIdOnLoad(slot, escrowDrops, 'mailSlot');
+          return slot;
+        });
       const kind: MailKind = m.kind === 'player' || m.kind === 'npc' ? m.kind : 'system';
       const recipientName = String(m.recipientName ?? m.recipientKey);
       const senderName = String(m.senderName ?? '?');
@@ -725,14 +989,17 @@ export class PostOffice {
         if (kind === 'player' && ITEMS[item.itemId]?.soulbound) returnedItems.push(item);
         else retainedItems.push(item);
       }
-      // Migration for player parcels sent before an item became soulbound. The
-      // persisted model has no stable sender key, so return only the newly bound
-      // stacks to the senderName-keyed mailbox. Mark the return as system mail so
-      // a serialize/load round trip never returns it again. Ordinary items and
-      // attached coin remain on the original letter.
+      // Migration for player parcels sent before an item became soulbound.
+      // Keyed by the STABLE sender id whenever the row carries one (#2450);
+      // the display-name fallback serves only rows persisted before ids
+      // existed, and a name key here is reclaim-exposed (system mail with
+      // attachments never expires), so the fallback must stay the exception.
+      // Mark the return as system mail so a serialize/load round trip never
+      // returns it again. Ordinary items and attached coin remain on the
+      // original letter.
       if (returnedItems.length > 0) {
         returnedParcels.push({
-          recipientKey: senderName,
+          recipientKey: senderKey ?? senderName,
           recipientName: senderName,
           senderName: recipientName,
           kind: 'system',
@@ -780,6 +1047,7 @@ export class PostOffice {
         announced: deliverIn <= 0,
       });
     }
+    warnDroppedInstanceKeys('mail book', escrowDrops);
     const maxId = this.mail.reduce((mx, m) => Math.max(mx, m.id + 1), 1);
     this.nextMailId = Math.max(this.nextMailId, save.nextMailId ?? 1, maxId);
     for (const parcel of returnedParcels) this.book(parcel);

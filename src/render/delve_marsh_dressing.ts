@@ -13,8 +13,9 @@ import type { DungeonLayout } from '../sim/dungeon_layout';
 import { polygonXAtZ } from '../sim/geometry2d';
 import { hash2 } from '../sim/rng';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { GFX, surfaceMat } from './gfx';
+import { detailedSurfaceMat } from './worn_stone';
 
 // Stable seed for all hash2 calls in this module (render-only dressing, no sim state).
 const MARSH_SEED = 0x4c69746e; // 'Litn' in ASCII
@@ -80,7 +81,7 @@ const loadedMarshGltf = new Map<MarshGlbAnchorKind, THREE.Group>();
 
 if (typeof window !== 'undefined') {
   for (const [kind, url] of Object.entries(MARSH_ASSET_URL) as [MarshGlbAnchorKind, string][]) {
-    registerPreload(
+    registerDeferredPreload(() =>
       loadGltf(url).then((gltf) => {
         loadedMarshGltf.set(kind, gltf.scene);
       }),
@@ -226,11 +227,14 @@ function addReedCluster(group: THREE.Group, x: number, z: number, rot = 0): void
 }
 
 function addPlankBridge(group: THREE.Group, x: number, z: number, rot = 0): void {
-  const wood = surfaceMat({
-    color: 0x4a3c28,
-    roughness: 0.92,
-    flatShading: !GFX.standardMaterials,
-  });
+  const wood = detailedSurfaceMat(
+    {
+      color: 0x4a3c28,
+      roughness: 0.92,
+      flatShading: !GFX.standardMaterials,
+    },
+    'wood',
+  );
   for (let i = -1; i <= 1; i++) {
     const plank = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.12, 0.45), wood);
     plank.position.set(x + i * 0.55, 0.08, z);
@@ -240,11 +244,14 @@ function addPlankBridge(group: THREE.Group, x: number, z: number, rot = 0): void
 }
 
 function addShrineSlab(group: THREE.Group, x: number, z: number, rot = 0): void {
-  const stone = surfaceMat({
-    color: 0x5a6058,
-    roughness: 0.9,
-    flatShading: !GFX.standardMaterials,
-  });
+  const stone = detailedSurfaceMat(
+    {
+      color: 0x5a6058,
+      roughness: 0.9,
+      flatShading: !GFX.standardMaterials,
+    },
+    'stone',
+  );
   const slab = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.9, 0.35), stone);
   slab.position.set(x, 0.45, z);
   slab.rotation.y = rot;
@@ -296,12 +303,15 @@ function addCorpseCandleFlame(group: THREE.Group, x: number, z: number): void {
 }
 
 function addBellFragment(group: THREE.Group, x: number, z: number, rot = 0): void {
-  const metal = surfaceMat({
-    color: 0x3a4440,
-    metalness: 0.55,
-    roughness: 0.7,
-    flatShading: !GFX.standardMaterials,
-  });
+  const metal = detailedSurfaceMat(
+    {
+      color: 0x3a4440,
+      metalness: 0.55,
+      roughness: 0.7,
+      flatShading: !GFX.standardMaterials,
+    },
+    'metal',
+  );
   const bell = new THREE.Mesh(
     new THREE.SphereGeometry(0.55, 10, 8, 0, Math.PI * 2, 0, Math.PI * 0.72),
     metal,
@@ -313,11 +323,14 @@ function addBellFragment(group: THREE.Group, x: number, z: number, rot = 0): voi
 }
 
 function addDeadTree(group: THREE.Group, x: number, z: number, rot = 0): void {
-  const bark = surfaceMat({
-    color: 0x1e1a14,
-    roughness: 0.97,
-    flatShading: !GFX.standardMaterials,
-  });
+  const bark = detailedSurfaceMat(
+    {
+      color: 0x1e1a14,
+      roughness: 0.97,
+      flatShading: !GFX.standardMaterials,
+    },
+    'bark',
+  );
   // Trunk
   const trunkH = 3.2 + hash2(x, z, MARSH_SEED) * 1.6;
   const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.28, trunkH, 7), bark);
@@ -344,11 +357,14 @@ function addDeadTree(group: THREE.Group, x: number, z: number, rot = 0): void {
 }
 
 function addSluicePost(group: THREE.Group, x: number, z: number, rot = 0): void {
-  const wood = surfaceMat({
-    color: 0x3a3028,
-    roughness: 0.96,
-    flatShading: !GFX.standardMaterials,
-  });
+  const wood = detailedSurfaceMat(
+    {
+      color: 0x3a3028,
+      roughness: 0.96,
+      flatShading: !GFX.standardMaterials,
+    },
+    'wood',
+  );
   // Weathered post, tapered so the waterline base reads thicker than the top.
   const postH = 2.0 + hash2(x, z, MARSH_SEED) * 0.4;
   const post = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.16, postH, 6), wood);
@@ -363,11 +379,14 @@ function addSluicePost(group: THREE.Group, x: number, z: number, rot = 0): void 
   beam.rotation.y = rot + (hash2(z, x * 2.3, MARSH_SEED) - 0.5) * 0.3;
   group.add(beam);
   // Slack rope hint: a thin cylinder angled down from the crossbeam end.
-  const rope = surfaceMat({
-    color: 0x4a4030,
-    roughness: 0.98,
-    flatShading: !GFX.standardMaterials,
-  });
+  const rope = detailedSurfaceMat(
+    {
+      color: 0x4a4030,
+      roughness: 0.98,
+      flatShading: !GFX.standardMaterials,
+    },
+    'fabric',
+  );
   const ropeLen = 0.9 + hash2(z * 1.3, x, MARSH_SEED) * 0.5;
   // Small hashed radian offset for the slack-rope skew (beamLen is a length in
   // world units, not an angle).
@@ -383,11 +402,14 @@ function addSluicePost(group: THREE.Group, x: number, z: number, rot = 0): void 
 }
 
 function addRootWall(group: THREE.Group, x: number, z: number, rot = 0): void {
-  const bark = surfaceMat({
-    color: 0x201a12,
-    roughness: 0.97,
-    flatShading: !GFX.standardMaterials,
-  });
+  const bark = detailedSurfaceMat(
+    {
+      color: 0x201a12,
+      roughness: 0.97,
+      flatShading: !GFX.standardMaterials,
+    },
+    'bark',
+  );
   const mossyBark = surfaceMat({
     color: 0x201a12,
     roughness: 0.95,
@@ -417,11 +439,14 @@ function addRootWall(group: THREE.Group, x: number, z: number, rot = 0): void {
 }
 
 function addBrokenBellFrame(group: THREE.Group, x: number, z: number, rot = 0): void {
-  const wood = surfaceMat({
-    color: 0x3a3028,
-    roughness: 0.95,
-    flatShading: !GFX.standardMaterials,
-  });
+  const wood = detailedSurfaceMat(
+    {
+      color: 0x3a3028,
+      roughness: 0.95,
+      flatShading: !GFX.standardMaterials,
+    },
+    'wood',
+  );
   for (const side of [-1, 1]) {
     const post = new THREE.Mesh(new THREE.BoxGeometry(0.25, 2.8, 0.25), wood);
     post.position.set(x + side * 1.1, 1.4, z);
@@ -535,11 +560,14 @@ export function placeLitanyMarshDressing(
 export function placeMarshDryIslands(group: THREE.Group, moduleId: LitanyModuleId): void {
   const islands = litanyModuleGeometry(moduleId)?.islands ?? [];
   if (!islands.length) return;
-  const stone = surfaceMat({
-    color: 0x574e3e,
-    roughness: 0.96,
-    flatShading: !GFX.standardMaterials,
-  });
+  const stone = detailedSurfaceMat(
+    {
+      color: 0x574e3e,
+      roughness: 0.96,
+      flatShading: !GFX.standardMaterials,
+    },
+    'stone',
+  );
   for (const isle of islands) {
     // Top face at y 0.2: above every pool overlay (max y 0.16) so the platform
     // occludes the water exactly where the sim exempts the player, but low

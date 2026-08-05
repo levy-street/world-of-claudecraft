@@ -29,6 +29,7 @@ import {
   WORLD_MIN_Z,
   worldXBoundsAt,
   ZONES,
+  zoneAt,
 } from './data';
 import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
 import { dungeonFloorLift } from './dungeon_floor';
@@ -44,6 +45,15 @@ import { harborSurfaceHeight } from './harbor_layout';
 import { LAST_BELL_AREAS } from './last_bell_field';
 import { reachDeckClear, reachDeckSurface } from './reach_decks';
 import { fbm2, hash2, noise2 } from './rng';
+import {
+  buildTerrainRegionIndex,
+  TERRAIN_APPLIER,
+  TERRAIN_APPLIER_BOUNDS,
+  type TerrainRegionCell,
+  type TerrainRegionIndex,
+  terrainRegionCellAt,
+  terrainRegionHas,
+} from './terrain_region_index';
 import type { BiomeId, HeightStamp, WorldContent, ZoneDef } from './types';
 import { isInSowfieldShell, SOWFIELD_FLAT, sowfieldStandLift } from './vale_cup_layout';
 import { wildheartFieldHeight } from './wildheart_field';
@@ -95,12 +105,57 @@ export function isInWaterBody(x: number, z: number): boolean {
   return false;
 }
 
+// True where the world's OWN terrain generation (base fields, coasts, lake
+// basins, the world-edge sea shave; custom-map sculpt stamps excluded, #1518)
+// carved the finished ground below the active waterline. This is exactly where
+// the renderer's zone water planes and horizon apron read as open water, so
+// the sim recognizes the same seas, straits, and coves the player can SEE
+// (the old declared-footprint-only rule left every undeclared sea sim-dry:
+// players sank to the seabed, walked under the surface, and wedged on bed
+// slopes no shore rule would release). Instanced interiors sit on their own
+// floors far off-world and never read as sea.
+export function isOpenSeaAt(x: number, z: number, seed: number): boolean {
+  if (x > DUNGEON_X_THRESHOLD) return false;
+  // Per-cell memo: this runs inside the movement gates several times per
+  // entity per tick and the sea test costs a full terrain sample. Sea-ness is
+  // stable per 1-yard cell (the same quantization the movement gates already
+  // accept from the steepness memo), so cache the bit per cell, keyed by the
+  // active content + seed (tests and custom maps swap both). Callers compare
+  // exact ground against the returned surface, so only the yard nearest the
+  // waterline contour ever sees the quantization, where the water is ankle
+  // deep and every consumer no-ops anyway.
+  const content = getActiveWorldContent();
+  if (seed !== seaCellSeed || content !== seaCellContent) {
+    seaCellSeed = seed;
+    seaCellContent = content;
+    seaCellCache.clear();
+  }
+  const cx = Math.floor(x);
+  const cz = Math.floor(z);
+  const key = (cx + 8192) * 65536 + (cz + 8192);
+  let sea = seaCellCache.get(key);
+  if (sea === undefined) {
+    if (seaCellCache.size > 400000) seaCellCache.clear(); // bound the memo
+    sea = terrainHeightSansEdits(cx + 0.5, cz + 0.5, seed) < waterLevel();
+    seaCellCache.set(key, sea);
+  }
+  return sea;
+}
+let seaCellSeed = Number.NaN;
+let seaCellContent: unknown = null;
+const seaCellCache = new Map<number, boolean>();
+
 // The water surface height AT this location: waterLevel() inside a declared
-// lake's footprint, else -Infinity (there is no water surface here, so nothing
-// reads as flooded and no swim-depth floor applies). Callers that need "is there
-// water here at all" should prefer this over a flat global constant.
-export function waterLevelAt(x: number, z: number): number {
-  return isInWaterBody(x, z) ? waterLevel() : -Infinity;
+// lake's footprint OR anywhere the generator itself carved open sea, else
+// -Infinity (there is no water surface here, so nothing reads as flooded and
+// no swim-depth floor applies). The cheap footprint scan answers first so
+// declared water never pays for a terrain sample; an authored sunken stamp
+// outside every footprint stays dry (#1518, isOpenSeaAt ignores the edit
+// layer). Callers that need "is there water here at all" should prefer this
+// over a flat global constant.
+export function waterLevelAt(x: number, z: number, seed: number): number {
+  if (isInWaterBody(x, z)) return waterLevel();
+  return isOpenSeaAt(x, z, seed) ? waterLevel() : -Infinity;
 }
 
 // Every declared lake across the active content's zones, in render/authoring
@@ -372,32 +427,26 @@ interface BlobBounds {
   minZ: number;
   maxZ: number;
 }
-const blobBoundsCache = new WeakMap<readonly CoastBlob[], BlobBounds>();
-function blobBounds(blobs: readonly CoastBlob[]): BlobBounds {
-  let b = blobBoundsCache.get(blobs);
-  if (!b) {
-    b = {
-      minX: Number.POSITIVE_INFINITY,
-      maxX: Number.NEGATIVE_INFINITY,
-      minZ: Number.POSITIVE_INFINITY,
-      maxZ: Number.NEGATIVE_INFINITY,
-    };
-    for (const blob of blobs) {
-      b.minX = Math.min(b.minX, blob.x - blob.r);
-      b.maxX = Math.max(b.maxX, blob.x + blob.r);
-      b.minZ = Math.min(b.minZ, blob.z - blob.r);
-      b.maxZ = Math.max(b.maxZ, blob.z + blob.r);
-    }
-    blobBoundsCache.set(blobs, b);
-  }
-  return b;
+interface BoundedBlobs {
+  blobs: readonly CoastBlob[];
+  bounds: BlobBounds;
 }
-function metaballLandness(
-  lobes: readonly CoastBlob[],
-  bays: readonly CoastBlob[],
-  x: number,
-  z: number,
-): number {
+function boundedBlobs(blobs: readonly CoastBlob[]): BoundedBlobs {
+  const bounds = {
+    minX: Number.POSITIVE_INFINITY,
+    maxX: Number.NEGATIVE_INFINITY,
+    minZ: Number.POSITIVE_INFINITY,
+    maxZ: Number.NEGATIVE_INFINITY,
+  };
+  for (const blob of blobs) {
+    bounds.minX = Math.min(bounds.minX, blob.x - blob.r);
+    bounds.maxX = Math.max(bounds.maxX, blob.x + blob.r);
+    bounds.minZ = Math.min(bounds.minZ, blob.z - blob.r);
+    bounds.maxZ = Math.max(bounds.maxZ, blob.z + blob.r);
+  }
+  return { blobs, bounds };
+}
+function metaballLandness(lobes: BoundedBlobs, bays: BoundedBlobs, x: number, z: number): number {
   // Organic coastlines: the raw metaball union reads as connecting circles,
   // so the sample position is domain-warped by fixed-seed fbm (bending the
   // blobs into peninsulas and coves) and the result gets a higher-frequency
@@ -414,9 +463,11 @@ function metaballLandness(
   const wx = mbMemoWX;
   const wz = mbMemoWZ;
   let land = 0;
-  const lb = blobBounds(lobes);
+  // Bounds are computed once beside each private coast table. Passing them
+  // directly avoids a WeakMap lookup on every terrain landness probe.
+  const lb = lobes.bounds;
   if (wx >= lb.minX && wx <= lb.maxX && wz >= lb.minZ && wz <= lb.maxZ) {
-    for (const b of lobes) {
+    for (const b of lobes.blobs) {
       // |dx| >= r means d2 >= 1 regardless of dz: skip the divisions early
       const dx = wx - b.x;
       if (dx >= b.r || -dx >= b.r) continue;
@@ -424,10 +475,10 @@ function metaballLandness(
       if (d2 < 1) land += (1 - d2) ** 2;
     }
   }
-  if (bays.length > 0) {
-    const bb = blobBounds(bays);
+  if (bays.blobs.length > 0) {
+    const bb = bays.bounds;
     if (wx >= bb.minX && wx <= bb.maxX && wz >= bb.minZ && wz <= bb.maxZ) {
-      for (const b of bays) {
+      for (const b of bays.blobs) {
         const dx = wx - b.x;
         if (dx >= b.r || -dx >= b.r) continue;
         const d2 = (dx / b.r) ** 2 + ((wz - b.z) / b.r) ** 2;
@@ -439,8 +490,10 @@ function metaballLandness(
   return land - 0.06;
 }
 
+const HOLLOW_LAND_FIELD = boundedBlobs(HOLLOW_LAND_LOBES);
+const HOLLOW_BAY_FIELD = boundedBlobs(HOLLOW_BAYS);
 export function hollowLandness(x: number, z: number): number {
-  return metaballLandness(HOLLOW_LAND_LOBES, HOLLOW_BAYS, x, z);
+  return metaballLandness(HOLLOW_LAND_FIELD, HOLLOW_BAY_FIELD, x, z);
 }
 
 // ---------------------------------------------------------------------------
@@ -490,8 +543,10 @@ const EMBER_BAYS = [
   { x: 205, z: 2230, r: 40 }, // a western cove under the spur
 ] as const;
 
+const EMBER_LAND_FIELD = boundedBlobs(EMBER_LAND_LOBES);
+const EMBER_BAY_FIELD = boundedBlobs(EMBER_BAYS);
 export function emberLandness(x: number, z: number): number {
-  return metaballLandness(EMBER_LAND_LOBES, EMBER_BAYS, x, z);
+  return metaballLandness(EMBER_LAND_FIELD, EMBER_BAY_FIELD, x, z);
 }
 
 // ---------------------------------------------------------------------------
@@ -547,8 +602,10 @@ const FROST_BAYS = [
   { x: 24, z: 1976, r: 34 }, // a cove splitting the flat north-center headland
 ] as const;
 
+const FROST_LAND_FIELD = boundedBlobs(FROST_LAND_LOBES);
+const FROST_BAY_FIELD = boundedBlobs(FROST_BAYS);
 export function frostLandness(x: number, z: number): number {
-  return metaballLandness(FROST_LAND_LOBES, FROST_BAYS, x, z);
+  return metaballLandness(FROST_LAND_FIELD, FROST_BAY_FIELD, x, z);
 }
 
 // ---------------------------------------------------------------------------
@@ -588,8 +645,10 @@ const AMBER_BAYS = [
   { x: -320, z: 2375, r: 45 }, // the north cove
 ] as const;
 
+const AMBER_LAND_FIELD = boundedBlobs(AMBER_LAND_LOBES);
+const AMBER_BAY_FIELD = boundedBlobs(AMBER_BAYS);
 export function amberLandness(x: number, z: number): number {
-  return metaballLandness(AMBER_LAND_LOBES, AMBER_BAYS, x, z);
+  return metaballLandness(AMBER_LAND_FIELD, AMBER_BAY_FIELD, x, z);
 }
 
 // ---------------------------------------------------------------------------
@@ -627,8 +686,10 @@ const FEN_BAYS = [
   { x: -330, z: 695, r: 50 }, // the north cove
 ] as const;
 
+const FEN_LAND_FIELD = boundedBlobs(FEN_LAND_LOBES);
+const FEN_BAY_FIELD = boundedBlobs(FEN_BAYS);
 export function fenLandness(x: number, z: number): number {
-  return metaballLandness(FEN_LAND_LOBES, FEN_BAYS, x, z);
+  return metaballLandness(FEN_LAND_FIELD, FEN_BAY_FIELD, x, z);
 }
 
 // Gentle everywhere: the fen's shelf is wider and its floor shallower than
@@ -694,8 +755,10 @@ const NIGHT_BAYS = [
   { x: -420, z: 1770, r: 50 }, // the north bight, open to the starlit sea
 ] as const;
 
+const NIGHT_LAND_FIELD = boundedBlobs(NIGHT_LAND_LOBES);
+const NIGHT_BAY_FIELD = boundedBlobs(NIGHT_BAYS);
 export function nightLandness(x: number, z: number): number {
-  return metaballLandness(NIGHT_LAND_LOBES, NIGHT_BAYS, x, z);
+  return metaballLandness(NIGHT_LAND_FIELD, NIGHT_BAY_FIELD, x, z);
 }
 
 // Gentle everywhere, the fen's recipe: soft downs easing into a dark sea.
@@ -757,8 +820,10 @@ const WOOD_BAYS = [
   { x: 300, z: 1795, r: 50 }, // the north bight, now a basin of the Ashmere
 ] as const;
 
+const WOOD_LAND_FIELD = boundedBlobs(WOOD_LAND_LOBES);
+const WOOD_BAY_FIELD = boundedBlobs(WOOD_BAYS);
 export function woodLandness(x: number, z: number): number {
-  return metaballLandness(WOOD_LAND_LOBES, WOOD_BAYS, x, z);
+  return metaballLandness(WOOD_LAND_FIELD, WOOD_BAY_FIELD, x, z);
 }
 
 // Gentle shores under the murk, the fen recipe again.
@@ -830,8 +895,10 @@ const REACH_BAYS = [
   { x: -390, z: 1252, r: 50 }, // the north bight, open to the warm sea
 ] as const;
 
+const REACH_LAND_FIELD = boundedBlobs(REACH_LAND_LOBES);
+const REACH_BAY_FIELD = boundedBlobs(REACH_BAYS);
 export function reachLandness(x: number, z: number): number {
-  return metaballLandness(REACH_LAND_LOBES, REACH_BAYS, x, z);
+  return metaballLandness(REACH_LAND_FIELD, REACH_BAY_FIELD, x, z);
 }
 
 // The Palmreach strand: the three shipped beach-palm models scattered on a
@@ -942,8 +1009,8 @@ let farshorePalmCache: { seed: number; spots: ReachPalm[] } | null = null;
 export function farshorePalmSpots(seed: number): ReachPalm[] {
   if (farshorePalmCache && farshorePalmCache.seed === seed) return farshorePalmCache.spots;
   const spots: ReachPalm[] = [];
-  for (let gx = 186; gx <= 556; gx += 9) {
-    for (let gz = -170; gz <= 170; gz += 9) {
+  for (let gx = 710; gx <= 1290; gx += 9) {
+    for (let gz = -240; gz <= 280; gz += 9) {
       if (hash2(gx, gz, seed + 5501) > 0.6) continue;
       const x = gx + (hash2(gx, gz, seed + 5511) - 0.5) * 8;
       const z = gz + (hash2(gz, gx, seed + 5521) - 0.5) * 8;
@@ -952,8 +1019,8 @@ export function farshorePalmSpots(seed: number): ReachPalm[] {
       const y = terrainHeight(x, z, seed);
       if (y < WATER_LEVEL + 0.5 || y > 3.8) continue;
       if (roadDistance(x, z) < 4.5) continue;
-      if (Math.hypot(x - 305, z - 70) < 22) continue; // Gullhaven's lanes
-      if (Math.hypot(x - 290, z - 86) < 12) continue; // the graveyard
+      if (Math.hypot(x - 822, z - 118) < 22) continue; // Gullhaven's lanes
+      if (Math.hypot(x - 836, z - 132) < 12) continue; // the graveyard
       const variant = Math.floor(hash2(x, z, seed + 5151) * 3);
       const grand = hash2(x + 3, z, seed + 5531) < 0.08 ? 1.35 : 1;
       const scale =
@@ -1175,8 +1242,10 @@ const GARDEN_BAYS = [
   { x: 522, z: 1105, r: 40 }, // the east bight, mid-coast
 ] as const;
 
+const GARDEN_LAND_FIELD = boundedBlobs(GARDEN_LAND_LOBES);
+const GARDEN_BAY_FIELD = boundedBlobs(GARDEN_BAYS);
 export function gardenLandness(x: number, z: number): number {
-  return metaballLandness(GARDEN_LAND_LOBES, GARDEN_BAYS, x, z);
+  return metaballLandness(GARDEN_LAND_FIELD, GARDEN_BAY_FIELD, x, z);
 }
 
 // The garden coast: the fen recipe over lawn instead of reeds.
@@ -1362,8 +1431,10 @@ const GALE_BAYS = [
   { x: 535, z: 210, r: 45 }, // the northeast water past the beacon
 ] as const;
 
+const GALE_LAND_FIELD = boundedBlobs(GALE_LAND_LOBES);
+const GALE_BAY_FIELD = boundedBlobs(GALE_BAYS);
 export function galeLandness(x: number, z: number): number {
-  return metaballLandness(GALE_LAND_LOBES, GALE_BAYS, x, z);
+  return metaballLandness(GALE_LAND_FIELD, GALE_BAY_FIELD, x, z);
 }
 
 // The headland coast: the fen recipe cut steeper (sea cliffs, not bog), a
@@ -1408,10 +1479,10 @@ const VALE_LAND_LOBES = [
   { x: -100, z: 85, r: 70 }, // the western downs and Mirror Lake's shore
   { x: -95, z: -55, r: 70 }, // the southwest pastures (Grix's tunnel)
   { x: 45, z: -85, r: 84 }, // the south fields (the bandit camp)
-  { x: 108, z: -52, r: 60 }, // the southeast rise (mogger's hollow)
-  { x: 100, z: 70, r: 62 }, // the east meadows
+  { x: 108, z: -52, r: 60 }, // the southwest rise (mogger's hollow)
+  { x: 100, z: 70, r: 62 }, // the west meadows
   { x: 60, z: 138, r: 55 }, // Brightwood Glade's north wood
-  { x: 150, z: -46, r: 44 }, // the east point: the causeway's mainland root
+  { x: 150, z: -46, r: 44 }, // the west point: the causeway's mainland root
 ] as const;
 const VALE_BAYS = [
   { x: -192, z: 25, r: 60 }, // the west bay
@@ -1421,8 +1492,10 @@ const VALE_BAYS = [
   { x: 178, z: -128, r: 42 }, // the south cove, east of the point
 ] as const;
 
+const VALE_LAND_FIELD = boundedBlobs(VALE_LAND_LOBES);
+const VALE_BAY_FIELD = boundedBlobs(VALE_BAYS);
 export function valeLandness(x: number, z: number): number {
-  return metaballLandness(VALE_LAND_LOBES, VALE_BAYS, x, z);
+  return metaballLandness(VALE_LAND_FIELD, VALE_BAY_FIELD, x, z);
 }
 
 // The vale coast: gentle green shores meeting the sea. Runs on the vale's own
@@ -1448,18 +1521,12 @@ function applyValeCoast(x: number, z: number, h: number): number {
   return h + (floor + (h - floor) * t - h) * w;
 }
 
-// Clean open water framing the Farshore: the island touches the mainland
-// only at the causeway, so its shared edges read as sea, with no border
-// ridge or neighbour coast bleeding into the island's map. A channel to the
-// north (the Galecrest, no crossing there) and open sea below its south
-// headland; the causeway's z-window sits between the two, untouched.
+// Keep the starter strait open water. The campaign moved the Farshore far
+// offshore, so this now shapes only the mainland-side channel feeding the
+// ferry harbor; applyFarshoreSea owns the ocean and island farther east.
 function applyStarterMoat(x: number, z: number, h: number): number {
-  // the vale/island border strait (x~177..190): clear any crest sitting on
-  // the border line over the open water on either side of the Ferrywalk, so
-  // the only dry link is the causeway. Skipped on the causeway itself. Every
-  // window edge is a fade, never a cut (the old hard z < 150 and x <= 194
-  // edges left step walls along both lines; the seabed now ramps up onto the
-  // vale's north-corner land instead): tests/terrain_window_seams.test.ts.
+  // Clear any crest sitting on the x~177..190 channel. Every window edge is
+  // a fade, never a cut (tests/terrain_window_seams.test.ts).
   if (x >= 177 && x <= 196 && z < 158 && z > -184) {
     // the north fade starts at z = 148 so the carve keeps FULL depth through
     // every guarded strait row (the deep-water barrier must not shallow),
@@ -1521,8 +1588,10 @@ const ISLE_BAYS = [
   { x: 872, z: -228, r: 60 }, // the north cove west of the breach ground
 ] as const;
 
+const ISLE_LAND_FIELD = boundedBlobs(ISLE_LAND_LOBES);
+const ISLE_BAY_FIELD = boundedBlobs(ISLE_BAYS);
 export function isleLandness(x: number, z: number): number {
-  return metaballLandness(ISLE_LAND_LOBES, ISLE_BAYS, x, z);
+  return metaballLandness(ISLE_LAND_FIELD, ISLE_BAY_FIELD, x, z);
 }
 
 // A soft radial mask: 1 inside rIn, easing to 0 at rOut.
@@ -1802,6 +1871,15 @@ function applyWorldEdgeSea(x: number, z: number, h: number): number {
 // gated to low ground (a lowGate) so it only widens the near-shore into the
 // moat, never cuts a marginal sliver out of interior land or the Tablecrag;
 // the isthmus crossings at z1890 are left as land bridges.
+//
+// The OUTER edge carries a skirt past x=+-180 for the same reason the border
+// ridge carries one past 3 sigma: dEdge is 0 at the boundary, so the carve
+// stood at FULL depth (up to 5yd) on the line the applier returned unchanged
+// past, walling the strip off from the column shore it is supposed to slope
+// into. The skirt factor is exactly 1 for ax <= 180, so every height inside
+// the strip stays bit-identical; only the fade outward is new, and lowGate
+// keeps it on ground already low enough to be shore.
+const STRIP_FLANK_OUTER_SKIRT = 14; // yards; 5yd over 14 is the 0.55 bank slope
 function applyStripFlankCoast(x: number, z: number, h: number): number {
   // The z window fades INSIDE the old hard 940..1925 edges (which left step
   // walls where the carve was still several yards deep at the line): the
@@ -1813,9 +1891,10 @@ function applyStripFlankCoast(x: number, z: number, h: number): number {
   // tests/terrain_window_seams.test.ts pins the lines.
   if (z < 940 || z > 1925) return h;
   const ax = Math.abs(x);
-  if (ax > 180 || ax < 124) return h;
+  if (ax > 180 + STRIP_FLANK_OUTER_SKIRT || ax < 124) return h;
   const zWin = smoothstep(940, 956, z) * (1 - smoothstep(1909, 1925, z));
   const xWin = smoothstep(124, 132, ax);
+  const outerSkirt = 1 - smoothstep(180, 180 + STRIP_FLANK_OUTER_SKIRT, ax);
   const dEdge = 180 - ax;
   const nearPass = 1 - smoothstep(20, 48, Math.abs(z - 1890));
   const wob =
@@ -1823,7 +1902,8 @@ function applyStripFlankCoast(x: number, z: number, h: number): number {
     (fbm2(z * 0.05, Math.sign(x) * 31, 9323, 2) - 0.5) * 12;
   const band = 28 + wob;
   const lowGate = 1 - smoothstep(6, 22, h);
-  const seaT = (1 - smoothstep(band - 22, band, dEdge)) * (1 - nearPass) * lowGate * zWin * xWin;
+  const seaT =
+    (1 - smoothstep(band - 22, band, dEdge)) * (1 - nearPass) * lowGate * zWin * xWin * outerSkirt;
   if (seaT <= 0) return h;
   const floor = Math.min(h, WATER_LEVEL - 5);
   return h + (floor - h) * seaT;
@@ -1833,10 +1913,20 @@ function applyStripFlankCoast(x: number, z: number, h: number): number {
 // strip as dry rolling land (the sketch's land borders). The coast
 // appliers stand down inside the seam band so no shoreline forms there,
 // and the border ridge still rises over it (seaGate reads this too).
+// Its north edge already releases across 870..910; the south one cut hard at
+// 170 with the seam at full strength, so the coast appliers it silences came
+// back on all at once and stepped the shore along the whole line. Fade it in
+// BELOW 170 (bit-identical from 170 north, where the marsh row it serves
+// begins) rather than inside, which would re-carve the seam's own dry border.
+const GREEN_SEAM_SOUTH_SKIRT = 16;
 function greenSeamT(x: number, z: number): number {
-  if (z < 170 || z > 910) return 0;
+  if (z < 170 - GREEN_SEAM_SOUTH_SKIRT || z > 910) return 0;
   const d = Math.abs(Math.abs(x) - STRIP_MAX_X);
-  return (1 - smoothstep(50, 90, d)) * (1 - smoothstep(870, 910, z));
+  return (
+    (1 - smoothstep(50, 90, d)) *
+    (1 - smoothstep(870, 910, z)) *
+    smoothstep(170 - GREEN_SEAM_SOUTH_SKIRT, 170, z)
+  );
 }
 
 // Same coast recipe; holds the sealed wall's footing at the south fringe.
@@ -2001,7 +2091,7 @@ export const EMBER_VOLCANOES = [
 // padK: where the flat melt floor ends, as a fraction of r. The default 0.95
 // keeps the whole model footprint on level ground; the Drakemaw vent keeps
 // the original tight eye (0.55) because its shore is the escape bench's
-// wade-out ramp (DRAKEMAW_ESCAPE), pinned by tests/terrain_escape.test.ts.
+// wade-out ramp (DRAKEMAW_ESCAPE), pinned by tests/terrain_escape_walkout.test.ts.
 export const EMBER_LAVA_POOLS = [
   { x: 390, z: 2320, r: 14, floor: 12, padK: 0.55 }, // the vent inside the Drakemaw crater
   { x: 446, z: 2220, r: 11, floor: -0.5 },
@@ -2014,7 +2104,7 @@ export const EMBER_LAVA_POOLS = [
   // the Moltenmaw: an open lava-lake field east of the caldera. The big eye
   // sits at (423, 2347) so its whole model footprint (r * 1.15) stays clear
   // of the Drakemaw escape bench ring (benchFade 23 from the vent), whose
-  // every-azimuth dry-shore guarantee is pinned by tests/terrain_escape.
+  // every-azimuth dry-shore guarantee is pinned by tests/terrain_escape_walkout.
   { x: 423, z: 2347, r: 16, floor: -1.2 },
   { x: 438, z: 2326, r: 10, floor: -1.2 },
 ] as const;
@@ -2056,7 +2146,7 @@ function emberShapingOffset(x: number, z: number, seed: number): number {
 //   never drains into it.
 // Both pull terrain TO their target (never only downward): a raise-and-cut
 // makes the shore and channel floors deterministic, with no one-way dips
-// where the old lip crossed the mouth. tests/terrain_escape.test.ts walks
+// where the old lip crossed the mouth. tests/terrain_escape_walkout.test.ts walks
 // a real player from the reported stranding spot around the ring and out.
 const DRAKEMAW_ESCAPE = {
   x: 390,
@@ -2803,11 +2893,78 @@ export function mirefenImpactCraterOffset(x: number, z: number): number {
   return bowl + rim;
 }
 
+const TERRAIN_CAMP_BOUNDS = CAMPS.map((camp) => {
+  const reach = camp.radius * 1.8 + 1;
+  return {
+    minX: camp.center.x - reach,
+    maxX: camp.center.x + reach,
+    minZ: camp.center.z - reach,
+    maxZ: camp.center.z + reach,
+  };
+});
+// Hub bounds derive per REBUILD from the ACTIVE content's zones, read RAW
+// with no empty-list fallback (the hub-plateau policy in baseHeight below;
+// pinned by tests/world_active_content.test.ts): unlike the static camp and
+// applier bounds, hubs are the one region-index input the active content
+// owns, so a custom map's hubs index and a zero-zone content indexes none.
+function terrainHubBounds(zones: readonly ZoneDef[]) {
+  return zones.map((zone) => {
+    const reach = zone.hub.radius * 1.6 + 1;
+    return {
+      minX: zone.hub.x - reach,
+      maxX: zone.hub.x + reach,
+      minZ: zone.hub.z - reach,
+      maxZ: zone.hub.z + reach,
+    };
+  });
+}
+
+let terrainRegionGeneration = -1;
+let terrainRegionIndex: TerrainRegionIndex | null = null;
+// The zone snapshot the live index's hubIndices resolve into; rebuilt with
+// the index so the two can never disagree mid-generation.
+let terrainHubZones: readonly ZoneDef[] = [];
+
+function terrainRegionAt(x: number, z: number): TerrainRegionCell {
+  const generation = getContentGeneration();
+  if (terrainRegionIndex === null || terrainRegionGeneration !== generation) {
+    terrainHubZones = getActiveWorldContent().zones;
+    terrainRegionIndex = buildTerrainRegionIndex({
+      applierBounds: TERRAIN_APPLIER_BOUNDS,
+      campBounds: TERRAIN_CAMP_BOUNDS,
+      hubBounds: terrainHubBounds(terrainHubZones),
+    });
+    terrainRegionGeneration = generation;
+  }
+  return terrainRegionCellAt(terrainRegionIndex, x, z);
+}
+
+// Exposed for the performance invariant test. This reads the exact cached
+// cell terrainHeightUnpadded consumes, so a full-scan regression is visible
+// without putting timing assertions in Vitest.
+export function terrainRegionCandidateCountsAt(
+  x: number,
+  z: number,
+): { appliers: number; camps: number; hubs: number } {
+  const region = terrainRegionAt(x, z);
+  let appliers = 0;
+  for (let id = 0; id < TERRAIN_APPLIER_BOUNDS.length; id++) {
+    if (terrainRegionHas(region, id)) appliers++;
+  }
+  return {
+    appliers,
+    camps: region.campIndices.length,
+    hubs: region.hubIndices.length,
+  };
+}
+
 // Blended biome shape at a position. Zone interiors keep their exact shape;
 // blends happen across the same -30/+35yd windows at every border: the
 // strip's band boundaries cascade by z as they always did, and column zones
 // blend in sideways (columnBlendAt), so an east map's hills arrive across
 // its border pass exactly like a northern realm's do.
+const shapeScratch = { hill: 0, base: 0 };
+
 function shapeAt(x: number, z: number): { hill: number; base: number } {
   let hill = BIOME_SHAPE[STRIP_ZONES[0].biome].hill;
   let base = BIOME_SHAPE[STRIP_ZONES[0].biome].base;
@@ -2825,16 +2982,39 @@ function shapeAt(x: number, z: number): { hill: number; base: number } {
     hill = lerp(hill, shape.hill, t);
     base = lerp(base, shape.base, t);
   }
-  return { hill, base };
+  // baseHeight is the only caller and reads both fields before any nested
+  // terrain sample, so the shared result is never retained across a reuse.
+  shapeScratch.hill = hill;
+  shapeScratch.base = base;
+  return shapeScratch;
 }
 
-function baseHeight(x: number, z: number, seed: number): number {
+function baseHeight(
+  x: number,
+  z: number,
+  seed: number,
+  region: TerrainRegionCell = terrainRegionAt(x, z),
+): number {
   const shape = shapeAt(x, z);
   let h =
     (fbm2(x * HILL_SCALE + 100, z * HILL_SCALE + 100, seed, 4) - 0.5) * shape.hill + shape.base;
   h += (fbm2(x * DETAIL_SCALE, z * DETAIL_SCALE, seed + 7, 2) - 0.5) * 2.2;
-  // Flatten each zone's hub settlement into a plateau
-  for (const zone of ZONES) {
+  // Flatten each zone's hub settlement into a plateau. The ACTIVE content's
+  // zones read RAW, exactly like the lake-carve loop below (no empty-list
+  // fallback on either): the hub and lake FEATURES follow the active content
+  // verbatim, so a hand-built zero-zone content flattens no builtin hubs
+  // just as it carves no builtin lakes. (The band-shape cascade in shapeAt
+  // above still reads the static STRIP_ZONES/COLUMN_ZONES, byte-identical on
+  // every shipped host and a known custom-map seam; zoneAt/worldXBoundsAt
+  // keep their builtin fallback because zone RESOLUTION must stay total.
+  // The policy split is pinned by tests/world_active_content.test.ts.)
+  // A hub omitted by the coarse index is outside its complete squared gate
+  // plus a full guard cell, so skipping it is a bit-identical no-op. The
+  // indices resolve into terrainHubZones, the SAME resolved snapshot the
+  // region index was built from (terrainRegionAt rebuilds both together on
+  // a content-generation bump).
+  for (const zoneIndex of region.hubIndices) {
+    const zone = terrainHubZones[zoneIndex];
     const dx = x - zone.hub.x,
       dz = z - zone.hub.z;
     // Conservative squared-distance gate (one spare yard of margin) before
@@ -3344,7 +3524,24 @@ export function groundHeight(x: number, z: number, seed: number): number {
 }
 
 export function terrainHeight(x: number, z: number, seed: number): number {
-  let h = terrainHeightUnpadded(x, z, seed);
+  return applyTerrainPads(x, z, seed, terrainHeightUnpadded(x, z, seed));
+}
+
+// The finished overworld height as the GENERATOR alone authors it: the full
+// unpadded chain and every authored pad, with only the custom-map sculpt-edit
+// layer skipped. This is the ground truth for "did the world's own shaping
+// carve below the waterline here" (isOpenSeaAt), so an author's sunken stamp
+// (#1518) can never read as sea. For the built-in world (no terrainEdits) it
+// equals terrainHeight exactly.
+export function terrainHeightSansEdits(x: number, z: number, seed: number): number {
+  return applyTerrainPads(x, z, seed, terrainHeightUnpadded(x, z, seed, true));
+}
+
+// The authored pad chain over the unpadded height (castle pad, spring bank,
+// pool walkway bed, garden/gale pads): one shared body so terrainHeight and
+// terrainHeightSansEdits can never drift.
+function applyTerrainPads(x: number, z: number, seed: number, h0: number): number {
+  let h = h0;
   // The Last Keep's courtyard pad, over the FINISHED height (the world-edge
   // sea shave runs late in the unpadded chain and was clipping the castle's
   // seaward corner; the castle plateau must win everywhere inside its walls).
@@ -3458,14 +3655,68 @@ const GALE_LEVEL_PADS: { x: number; z: number; r: number; h?: number }[] = [
   { x: 498, z: 308, r: 11 },
 ];
 
-function terrainHeightUnpadded(x: number, z: number, seed: number): number {
-  let h = baseHeight(x, z, seed);
+function borderSeaGate(x: number, z: number): number {
+  if (!Number.isFinite(x) || !Number.isFinite(z)) {
+    // A skipped later field could be NaN for a non-finite coordinate, which
+    // would poison the eager Math.max. Keep that exact invalid-input path.
+    return smoothstep(
+      0.005,
+      0.06,
+      Math.max(
+        greenSeamT(x, z) * 0.2,
+        hollowLandness(x, z),
+        emberLandness(x, z),
+        frostLandness(x, z),
+        amberLandness(x, z),
+        fenLandness(x, z),
+        nightLandness(x, z),
+        woodLandness(x, z),
+        reachLandness(x, z),
+        gardenLandness(x, z),
+        galeLandness(x, z),
+      ),
+    );
+  }
+
+  // smoothstep is exactly 1 at and above 0.06. Once the running maximum
+  // reaches it, later finite fields cannot change the result, so skipping
+  // them is bit-identical. The non-saturating path keeps the original order.
+  let land = greenSeamT(x, z) * 0.2;
+  if (land >= 0.06) return 1;
+  land = Math.max(land, hollowLandness(x, z));
+  if (land >= 0.06) return 1;
+  land = Math.max(land, emberLandness(x, z));
+  if (land >= 0.06) return 1;
+  land = Math.max(land, frostLandness(x, z));
+  if (land >= 0.06) return 1;
+  land = Math.max(land, amberLandness(x, z));
+  if (land >= 0.06) return 1;
+  land = Math.max(land, fenLandness(x, z));
+  if (land >= 0.06) return 1;
+  land = Math.max(land, nightLandness(x, z));
+  if (land >= 0.06) return 1;
+  land = Math.max(land, woodLandness(x, z));
+  if (land >= 0.06) return 1;
+  land = Math.max(land, reachLandness(x, z));
+  if (land >= 0.06) return 1;
+  land = Math.max(land, gardenLandness(x, z));
+  if (land >= 0.06) return 1;
+  land = Math.max(land, galeLandness(x, z));
+  return smoothstep(0.005, 0.06, land);
+}
+
+function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = false): number {
+  const region = terrainRegionAt(x, z);
+  let h = baseHeight(x, z, seed, region);
 
   // Flatten each camp a little so mobs don't stand on cliffs. The squared
   // gate (one spare yard) before the sqrt is bit-identical: a point past it
   // can never pass the d < radius*1.8 test, and this loop runs over all 150
   // camps for EVERY height sample.
-  for (const camp of CAMPS) {
+  // A camp omitted by the coarse index is outside that complete gate plus a
+  // full guard cell, so skipping it is a bit-identical no-op.
+  for (const campIndex of region.campIndices) {
+    const camp = CAMPS[campIndex];
     const dx = x - camp.center.x,
       dz = z - camp.center.z;
     const campGate = camp.radius * 1.8 + 1;
@@ -3556,23 +3807,7 @@ function terrainHeightUnpadded(x: number, z: number, seed: number): number {
       const columnRow = edge.kind === 'h' && (edge.lo >= STRIP_MAX_X || edge.hi <= STRIP_MIN_X);
       const northern = (edge.kind === 'h' ? edge.at >= HOLLOW_ZMAX : true) || columnRow;
       if (!edge.sealed && northern) {
-        seaGate = smoothstep(
-          0.005,
-          0.06,
-          Math.max(
-            greenSeamT(x, z) * 0.2,
-            hollowLandness(x, z),
-            emberLandness(x, z),
-            frostLandness(x, z),
-            amberLandness(x, z),
-            fenLandness(x, z),
-            nightLandness(x, z),
-            woodLandness(x, z),
-            reachLandness(x, z),
-            gardenLandness(x, z),
-            galeLandness(x, z),
-          ),
-        );
+        seaGate = borderSeaGate(x, z);
       }
       // a partial edge (a column border, or a band split by columns) fades
       // out past its span; a full-row edge keeps the classic unbounded wall
@@ -3601,36 +3836,99 @@ function terrainHeightUnpadded(x: number, z: number, seed: number): number {
   }
   h += wallAdd;
 
-  h += mirefenImpactCraterOffset(x, z);
-  h += hollowShapingOffset(x, z, seed);
-  h += emberShapingOffset(x, z, seed);
-  h += frostMassifOffset(x, z);
-  h += amberShelfOffset(x, z);
-  h += nightCalderaOffset(x, z);
-  h += palmConeOffset(x, z);
-  h = applyHollowCoast(x, z, h);
-  h = applyEmberCoast(x, z, h);
-  h = applyFrostCoast(x, z, h);
-  h = applyAmberCoast(x, z, h);
-  h = applyFenCoast(x, z, h);
-  h = applyNightCoast(x, z, h);
-  h = applyWoodCoast(x, z, h);
-  h = applyReachCoast(x, z, h);
-  h = applyGardenCoast(x, z, h);
-  h = applyGaleCoast(x, z, h);
-  h = applyValeCoast(x, z, h);
-  h = applyFarshoreSea(x, z, h);
-  h = applyStarterMoat(x, z, h);
-  h = applyColumnStraits(x, z, h);
-  h = applyStripFlankCoast(x, z, h);
-  h = applyRowMeres(x, z, h);
-  h = applyNorthBay(x, z, h);
-  h = applyEmberLavaNetwork(x, z, h);
-  h = applyEmberLavaBasins(x, z, h);
-  h = applyDrakemawEscape(x, z, h);
-  h = applyEastConeBreach(x, z, h);
-  h = applyFrostTerraces(x, z, h);
-  h = applyFenBraids(x, z, h);
+  // A missing bit means the entire guarded cell is outside the applier's
+  // declared support. That applier would return exact +0 or the unchanged h,
+  // so each skip is bit-identical. Contributing paths keep their old order.
+  if (terrainRegionHas(region, TERRAIN_APPLIER.mirefenImpactCrater)) {
+    h += mirefenImpactCraterOffset(x, z);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.hollowShaping)) {
+    h += hollowShapingOffset(x, z, seed);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.emberShaping)) {
+    h += emberShapingOffset(x, z, seed);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.frostMassif)) {
+    h += frostMassifOffset(x, z);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.amberShelf)) {
+    h += amberShelfOffset(x, z);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.nightCaldera)) {
+    h += nightCalderaOffset(x, z);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.palmCone)) {
+    h += palmConeOffset(x, z);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.hollowCoast)) {
+    h = applyHollowCoast(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.emberCoast)) {
+    h = applyEmberCoast(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.frostCoast)) {
+    h = applyFrostCoast(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.amberCoast)) {
+    h = applyAmberCoast(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.fenCoast)) {
+    h = applyFenCoast(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.nightCoast)) {
+    h = applyNightCoast(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.woodCoast)) {
+    h = applyWoodCoast(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.reachCoast)) {
+    h = applyReachCoast(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.gardenCoast)) {
+    h = applyGardenCoast(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.galeCoast)) {
+    h = applyGaleCoast(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.valeCoast)) {
+    h = applyValeCoast(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.farshoreSea)) {
+    h = applyFarshoreSea(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.starterMoat)) {
+    h = applyStarterMoat(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.columnStraits)) {
+    h = applyColumnStraits(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.stripFlankCoast)) {
+    h = applyStripFlankCoast(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.rowMeres)) {
+    h = applyRowMeres(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.northBay)) {
+    h = applyNorthBay(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.emberLavaNetwork)) {
+    h = applyEmberLavaNetwork(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.emberLavaBasins)) {
+    h = applyEmberLavaBasins(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.drakemawEscape)) {
+    h = applyDrakemawEscape(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.eastConeBreach)) {
+    h = applyEastConeBreach(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.frostTerraces)) {
+    h = applyFrostTerraces(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.fenBraids)) {
+    h = applyFenBraids(x, z, h);
+  }
   // (The Great Maze no longer shapes terrain: its hedge walls are modeled
   // props over flat lawn, blocked by inGardenMazeWall in the movement pass
   // and drawn by garden_features.ts from the same grid.)
@@ -3806,18 +4104,26 @@ function terrainHeightUnpadded(x: number, z: number, seed: number): number {
   // The Glacier Tarn's shore ramp, after that grading: the bowl's one authored
   // way in and out, authored in FINISHED height space so its foot meets the
   // pond and its top meets the road bench with no seam at either end.
-  h = applyGlacierTarnRamp(x, z, h);
-  const sow = sowfieldFlattenWeight(x, z);
+  if (terrainRegionHas(region, TERRAIN_APPLIER.glacierTarnRamp)) {
+    h = applyGlacierTarnRamp(x, z, h);
+  }
+  const sow = terrainRegionHas(region, TERRAIN_APPLIER.sowfieldFlatten)
+    ? sowfieldFlattenWeight(x, z)
+    : 0;
   if (sow > 0) h = lerp(h, SOWFIELD_FLAT.height, sow);
   // The Highwatch paddock is another authored level pull. It sits deep inside
   // Thornpeak, so it does not compete with a realm border or coast.
-  const stable = stableFlattenWeight(x, z);
+  const stable = terrainRegionHas(region, TERRAIN_APPLIER.stableFlatten)
+    ? stableFlattenWeight(x, z)
+    : 0;
   if (stable > 0) h = lerp(h, STABLE_FLAT.height, stable);
   // The custom-map sculpt edits are the LAST word over the finished overworld
   // height (the editor's height stamps; a no-op for the built-in world, which has
   // no terrainEdits). Kept in terrainHeight so the render mesh (which samples
   // terrainHeight) and the sim's groundHeight both see the edited ground.
-  return applyEditLayer(x, z, h);
+  // skipEdits serves terrainHeightSansEdits (the open-sea predicate) alone:
+  // every gameplay and render height keeps the edited ground.
+  return skipEdits ? h : applyEditLayer(x, z, h);
 }
 
 // Steepest local rise/run of the walkable heightfield at (x, z), independent of
@@ -4151,19 +4457,11 @@ function isExcludedDecoration(x: number, z: number): boolean {
 }
 
 export function zoneBiomeAt(x: number, z: number): BiomeId {
-  let fallback: { biome: BiomeId; zMax: number } | null = null;
-  let northmost = ZONES[0];
-  for (const zone of ZONES) {
-    if (zone.zMax > northmost.zMax) northmost = zone;
-    if (z >= zone.zMax) continue;
-    if (fallback === null || zone.zMax < fallback.zMax) {
-      fallback = { biome: zone.biome, zMax: zone.zMax }; // southmost band containing z
-    }
-    const x0 = zone.xMin ?? STRIP_MIN_X;
-    const x1 = zone.xMax ?? STRIP_MAX_X;
-    if (z >= zone.zMin && x >= x0 && x < x1) return zone.biome;
-  }
-  return fallback ? fallback.biome : northmost.biome;
+  // Delegates to zoneAt rather than repeating its rect walk over the static
+  // ZONES const: zoneAt resolves the ACTIVE content's zones (builtin
+  // fallback), and a private copy here was the one place the biome could
+  // disagree with every other zone read on a custom map.
+  return zoneAt(x, z).biome;
 }
 
 // Paint grid id -> biome. APPEND-ONLY: the id is persisted in map documents.

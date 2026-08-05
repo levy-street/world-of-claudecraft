@@ -26,11 +26,17 @@ const CONTINENT_COLOR_TOKENS = [
   '--color-map-label',
   '--color-map-outline',
   '--color-map-player',
+  '--color-map-party-dead',
   '--color-map-region-stroke',
   '--color-map-region-hover-fill',
   '--color-map-region-hover-stroke',
   '--color-map-region-current-stroke',
 ];
+
+// The classColor resolver every ContinentMapPainter call site now takes (issue
+// 2652), mirroring how map_window_painter.test.ts stubs the same seam. Distinct
+// per class so a color assertion is decisive rather than "some string".
+const classColor = (cls: string): string => `color:${cls}`;
 
 interface PaintTrace {
   fillRects: string[]; // fillStyle at each fillRect (ocean flood + hover fill)
@@ -104,6 +110,23 @@ function continentWorld(): IWorld {
   } as unknown as IWorld;
 }
 
+/** continentWorld plus a three-member party: self (pid 1, which must draw no dot
+ *  of its own), an alive mage a zone north, and a dead priest nearby. */
+function continentPartyWorld(): IWorld {
+  const world = continentWorld() as unknown as { partyInfo: unknown };
+  world.partyInfo = {
+    leader: 1,
+    raid: false,
+    master: { enabled: false, looter: 0, threshold: 'uncommon' },
+    members: [
+      { pid: 1, name: 'Painter', cls: 'warrior', level: 20, x: 0, z: 0, dead: 0 },
+      { pid: 2, name: 'Ally', cls: 'mage', level: 20, x: 404, z: 1900, dead: 0 },
+      { pid: 3, name: 'Fallen', cls: 'priest', level: 20, x: -40, z: 60, dead: 1 },
+    ],
+  };
+  return world as unknown as IWorld;
+}
+
 afterEach(() => {
   vi.unstubAllGlobals();
 });
@@ -148,7 +171,7 @@ describe('continent_map_painter: token-driven draw behavior', () => {
     const trace: PaintTrace = { fillRects: [], strokeRects: [], arcFills: [], styleReads: [] };
     installStyleGlobals(trace);
     const ctx = fakeContinentContext(trace);
-    new ContinentMapPainter().paintContinent(ctx, continentWorld(), {
+    new ContinentMapPainter(classColor).paintContinent(ctx, continentWorld(), {
       canvasSize: 560,
       hoveredZoneId: 'frostveil',
     });
@@ -180,13 +203,46 @@ describe('continent_map_painter: token-driven draw behavior', () => {
     const trace: PaintTrace = { fillRects: [], strokeRects: [], arcFills: [], styleReads: [] };
     installStyleGlobals(trace);
     const ctx = fakeContinentContext(trace);
-    new ContinentMapPainter().paintContinent(ctx, continentWorld(), {
+    new ContinentMapPainter(classColor).paintContinent(ctx, continentWorld(), {
       canvasSize: 560,
       hoveredZoneId: null,
     });
     expect(trace.fillRects).toContain('paint:--color-map-continent-ocean');
     expect(trace.fillRects).not.toContain('paint:--color-map-region-hover-fill');
     expect(trace.strokeRects).not.toContain('paint:--color-map-region-hover-stroke');
+  });
+});
+
+describe('continent_map_painter: party markers', () => {
+  it('fills a class color per living member, the dead token for a fallen one, and self last', () => {
+    const trace: PaintTrace = { fillRects: [], strokeRects: [], arcFills: [], styleReads: [] };
+    installStyleGlobals(trace);
+    const ctx = fakeContinentContext(trace);
+    new ContinentMapPainter(classColor).paintContinent(ctx, continentPartyWorld(), {
+      canvasSize: 560,
+      hoveredZoneId: null,
+    });
+
+    // Roster order, then the player's own dot LAST so self draws on top of a
+    // stacked group. Self never mints a party dot, so 'color:warrior' is absent.
+    expect(trace.arcFills).toEqual([
+      'color:mage',
+      'paint:--color-map-party-dead',
+      'paint:--color-map-player',
+    ]);
+  });
+
+  it('draws no party dot for a solo player', () => {
+    const trace: PaintTrace = { fillRects: [], strokeRects: [], arcFills: [], styleReads: [] };
+    installStyleGlobals(trace);
+    const ctx = fakeContinentContext(trace);
+    new ContinentMapPainter(classColor).paintContinent(ctx, continentWorld(), {
+      canvasSize: 560,
+      hoveredZoneId: null,
+    });
+
+    // Only the you-are-here dot: no class color and no dead token anywhere.
+    expect(trace.arcFills).toEqual(['paint:--color-map-player']);
   });
 });
 

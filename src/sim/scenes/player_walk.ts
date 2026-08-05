@@ -12,6 +12,7 @@
 // drop greater than the 12 yard FALL_SAFE_DISTANCE. Fall damage can reach
 // rng-backed damage resolution, while a scripted walk must draw no rng.
 
+import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import type { SimContext } from '../sim_context';
 import { type Entity, emptyMoveInput, type MoveInput, RUN_SPEED } from '../types';
 
@@ -54,6 +55,7 @@ export function placePlayerAtWalkEndpoint(
   player: Entity,
   to: { x: number; z: number },
 ): void {
+  cancelProfessionSessionOnDisplacement(ctx, player);
   player.pos = ctx.groundPos(to.x, to.z);
   player.prevPos = { ...player.pos };
   ctx.rebucket(player);

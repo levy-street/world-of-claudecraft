@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { tryNearbyInteraction } from '../src/game/nearby_interaction';
-import type { Entity, GatherNodeDef } from '../src/sim/types';
+import type { Entity, GatherNodeDef, QuestProgress } from '../src/sim/types';
 
 function entity(overrides: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entity {
   return {
@@ -26,6 +26,13 @@ function rig(targets: Entity[] = [], nodes: GatherNodeDef[] = []) {
       [player.id, player],
       ...targets.map((target): [number, Entity] => [target.id, target]),
     ]),
+    questLog: new Map<string, QuestProgress>(),
+    targetEntity: (id: number | null) => {
+      calls.push(`target:${id}`);
+    },
+    interact: () => {
+      calls.push('interact');
+    },
     lootCorpse: (id: number) => {
       calls.push(`loot:${id}`);
       return true;
@@ -72,7 +79,16 @@ function rig(targets: Entity[] = [], nodes: GatherNodeDef[] = []) {
 function interact(r: ReturnType<typeof rig>) {
   // null nodeToolGateFor: the tier-agnostic legacy shape (the gate arm has its
   // own dedicated test below).
-  return tryNearbyInteraction(r.world, r.hud, r.nodes, null, 'too far', 'not ready', 'nothing');
+  return tryNearbyInteraction(
+    r.world,
+    r.hud,
+    r.nodes,
+    null,
+    'too far',
+    'not ready',
+    'escort away',
+    'nothing',
+  );
 }
 
 describe('tryNearbyInteraction', () => {
@@ -316,7 +332,16 @@ describe('tryNearbyInteraction', () => {
       return { nodeTier: node.tier, viewerToolTier: 1, unmetText: 'needs tier 2' };
     };
     expect(
-      tryNearbyInteraction(r.world, r.hud, r.nodes, gateFor, 'too far', 'not ready', 'nothing'),
+      tryNearbyInteraction(
+        r.world,
+        r.hud,
+        r.nodes,
+        gateFor,
+        'too far',
+        'not ready',
+        'escort away',
+        'nothing',
+      ),
     ).toBe(false);
     // The resolver ran against the PICKED node, and the tool denial won over
     // both harvest and not-ready (the node reads locked, not cooling).
@@ -333,6 +358,7 @@ describe('tryNearbyInteraction', () => {
         (node) => ({ nodeTier: node.tier, viewerToolTier: 2, unmetText: 'needs tier 2' }),
         'too far',
         'not ready',
+        'escort away',
         'nothing',
       ),
     ).toBe(true);

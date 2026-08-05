@@ -46,6 +46,10 @@ export const FARSHORE_ZONE: ZoneDef = {
   graveyard: { x: 836, z: 132 },
   lakes: [
     { x: 1040, z: -60, radius: 9 }, // the Hilltop Spring, under the Watch Meadow
+    // Gull Mere gives the fishing town an inland tier-1 fishing site. Ported
+    // onto the downs east of Gullhaven when the Last Bell campaign moved the
+    // whole island; the release coordinates belong to the retired small isle.
+    { x: 891, z: 115, radius: 10 },
   ],
   pois: [
     { x: 822, z: 118, label: 'Gullhaven', id: 'gullhaven' },
@@ -97,8 +101,7 @@ export const FARSHORE_ROADS: { x: number; z: number }[][] = [
   ], // Gullhaven -> the Wreckfields
 ] as { x: number; z: number }[][];
 
-// No portals: the Farshore is reached on foot, across the Ferrywalk causeway
-// (the sandbar terrain in world.ts) from the vale's east point.
+// No portals: the Last Bell ferry is the only crossing from the mainland.
 export const FARSHORE_PORTALS: PortalDef[] = [];
 
 // The break-spawned. Whatever a rift is, it does not spill fishermen: these
@@ -121,7 +124,10 @@ export const FARSHORE_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 8,
     moveSpeed: 8.5,
     aggroRadius: 12, // it knows only the way it came and the thing in front of it
-    loot: [{ itemId: 'farshore_salt_moss', chance: 0.6, questId: 'q_fs_moss_and_mending' }],
+    loot: [
+      { copper: 20, chance: 1 },
+      { itemId: 'farshore_salt_moss', chance: 0.6, questId: 'q_fs_moss_and_mending' },
+    ],
     scale: 0.85,
     color: 0x7a3fb0,
   },
@@ -130,7 +136,7 @@ export const FARSHORE_MOBS: Record<string, MobTemplate> = {
     name: 'Breach Wretch',
     minLevel: 3,
     maxLevel: 5,
-    family: 'kobold',
+    family: 'burrower',
     hpBase: 30,
     hpPerLevel: 11,
     dmgBase: 6,
@@ -139,7 +145,10 @@ export const FARSHORE_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 7,
     moveSpeed: 9,
     aggroRadius: 11, // the small ones come in numbers, and they come fast
-    loot: [{ itemId: 'breakscarred_steel', chance: 0.6, questId: 'q_fs_steel_for_the_redoubt' }],
+    loot: [
+      { copper: 20, chance: 1 },
+      { itemId: 'breakscarred_steel', chance: 0.6, questId: 'q_fs_steel_for_the_redoubt' },
+    ],
     scale: 0.9,
     color: 0x5a4a78,
   },
@@ -157,9 +166,10 @@ export const FARSHORE_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 11,
     moveSpeed: 9.5,
     aggroRadius: 14, // it hunts the edges of the light the watchfires throw
-    loot: [],
+    loot: [{ copper: 26, chance: 1 }],
     scale: 1.15,
     color: 0x2f2a44,
+    componentTags: ['hide', 'fang'],
   },
   sundered_horror: {
     id: 'sundered_horror',
@@ -176,7 +186,7 @@ export const FARSHORE_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 7,
     aggroRadius: 15, // the biggest thing the cliffs' break ever let through
     elite: true,
-    loot: [],
+    loot: [{ copper: 35, chance: 1 }],
     scale: 1.45,
     color: 0x8a2f6a,
   },
@@ -404,7 +414,7 @@ export const FARSHORE_QUESTS: Record<string, QuestDef> = {
     name: 'Bram Come Home',
     giverNpcId: 'fisher_nell',
     turnInNpcId: 'fisher_nell',
-    text: 'My Bram took the boat out the morning the nets-break opened, and the sea threw him back somewhere past the Landing point. I heard him three nights ago, $N, calling over the water, and I was too afraid to go. I am still too afraid. Please. His boat lies wrecked on the north shore. Walk him home to me.',
+    text: 'My Bram took the boat out the morning the nets-break opened, and the sea threw him back somewhere past the Landing point. I heard him three nights ago, $N, calling over the water, and I was too afraid to go. I am still too afraid. Please. His boat lies wrecked on the south shore. Walk him home to me.',
     completionText:
       'Bram! You brought him back to me whole, $N. We both wept and neither of us is ashamed. Whatever the breaks take from this island next, they do not get my family. Not anymore.',
     objectives: [
@@ -607,10 +617,15 @@ export const FARSHORE_OBJECTS: GroundObjectDef[] = [
 ];
 
 // Bram Come Home (q_fs_bram_come_home): Fisher Bram shelters in his wrecked
-// boat on the north shore past the Landing point and walks the shore road
+// boat on the south shore past the Landing point and walks the shore road
 // home to Gullhaven, through the wretches that comb the wrack and the
 // stalkers that hunt the road at dusk. Waypoints hug the authored shore
 // roads above (the Landing -> Gullhaven leg).
+//
+// Bearings follow the ENGINE convention the map and compass render (+z north,
+// +x WEST, so east is -x). Bram's post at z -8 has open sea 8 yards to the
+// SOUTH and none within 90 yards north of it, so this is the isle's south
+// shore, and it lies 22 yards south of the Landing.
 export const FARSHORE_ESCORTS: Record<string, EscortDef> = {
   esc_fs_bram: {
     id: 'esc_fs_bram',

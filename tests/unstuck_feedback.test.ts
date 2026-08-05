@@ -33,7 +33,7 @@ describe('unstuck feedback', () => {
     const completed = unstuckFeedback({
       type: 'unstuck',
       phase: 'completed',
-      reason: 'nearest_graveyard',
+      reason: 'moved_to_graveyard',
       area,
       origin,
       destination: { ...origin, z: 1, localZ: 1 },
@@ -41,16 +41,20 @@ describe('unstuck feedback', () => {
       distance: 1,
     });
     expect(completed).toEqual({
-      key: 'hudChrome.unstuck.completedAtGraveyard',
+      key: 'hudChrome.unstuck.movedToGraveyard',
       kind: 'success',
       banner: true,
       log: true,
       clearBanner: true,
     });
-    expect(t(completed.key)).toContain('Pale Keeper');
+    // A living player was moved, not killed: nothing may send them to the Pale Keeper,
+    // and the debuff named must be the shorter Unstuck one.
+    expect(t(completed.key)).toContain('Unstuck Sickness');
+    expect(t(completed.key)).not.toContain('Pale Keeper');
+    expect(t(completed.key)).not.toContain("Keeper's Toll");
   });
 
-  it('separates the revive completion from the spirit release so neither text misleads', () => {
+  it('separates the revive completion from the living move so neither text misleads', () => {
     const revived = unstuckFeedback({
       type: 'unstuck',
       phase: 'completed',
@@ -62,16 +66,50 @@ describe('unstuck feedback', () => {
       distance: 1,
     });
     expect(revived).toEqual({
-      key: 'hudChrome.unstuck.revivedAtGraveyard',
+      key: 'hudChrome.unstuck.revivedAtGraveyardUnstuck',
       kind: 'success',
       banner: true,
       log: true,
       clearBanner: true,
     });
-    // A revived player is alive and already carries the toll, so the release
-    // copy telling them to go speak to the Pale Keeper must not be reused.
+    // Only this outcome raised the player, so only it says so; and like the move above
+    // it charges Unstuck Sickness rather than routing anyone to the Pale Keeper.
     expect(t(revived.key)).toContain('revived');
-    expect(t(revived.key)).not.toContain('Speak to the Pale Keeper');
+    expect(t('hudChrome.unstuck.movedToGraveyard')).not.toContain('revived');
+    expect(t(revived.key)).toContain('Unstuck Sickness');
+    expect(t(revived.key)).not.toContain('Pale Keeper');
+  });
+
+  it('keeps the retired safe-spot outcome on its own legacy key', () => {
+    const legacy = unstuckFeedback({
+      type: 'unstuck',
+      phase: 'completed',
+      reason: 'nearest_safe_position',
+      area,
+      origin,
+      destination: { ...origin, z: 1, localZ: 1 },
+      duration: 10,
+      distance: 1,
+    });
+    expect(legacy.key).toBe('hudChrome.unstuck.completed');
+    expect(legacy.key).not.toBe('hudChrome.unstuck.movedToGraveyard');
+  });
+
+  it('renders the pre-0.32.1 kill-and-release reason from a stale server on its shipped key', () => {
+    const legacy = unstuckFeedback({
+      type: 'unstuck',
+      phase: 'completed',
+      reason: 'nearest_graveyard',
+      area,
+      origin,
+      destination: { ...origin, z: 1, localZ: 1 },
+      duration: 10,
+      distance: 1,
+    });
+    // A 0.32.0 server really did kill and release the invoker, so the shipped
+    // release copy (go accept the Toll at the Pale Keeper) is the correct text.
+    expect(legacy.key).toBe('hudChrome.unstuck.completedAtGraveyard');
+    expect(t(legacy.key)).toContain('Pale Keeper');
   });
 
   it('formats visible countdown numbers through the active locale formatter', () => {

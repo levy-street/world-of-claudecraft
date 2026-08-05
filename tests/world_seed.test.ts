@@ -14,7 +14,7 @@ const SURFACE_PINS: readonly SeedSurfacePin[] = [
   {
     name: 'shipping client',
     path: '../src/main.ts',
-    importSource: "import { WORLD_SEED } from './world_seed.mjs';",
+    importSource: "import { WORLD_SEED } from './sim/world_seed';",
     referenceCount: 2,
   },
   {

@@ -19,7 +19,11 @@ export function isUnbreakableControlAura(aura: Pick<Aura, 'unbreakableControl'>)
   return aura.unbreakableControl === true;
 }
 
-const MOVEMENT_LOCK_AURA_KINDS: ReadonlySet<Aura['kind']> = new Set([
+// The hard-CC kinds that pin a target in place. Exactly the set isRooted below
+// reports, so a caller that needs "held still, and by whom" can walk the auras
+// itself against this set instead of re-listing the kinds and drifting from it
+// (frost_mage's frozen check is the one such caller today).
+export const MOVEMENT_LOCK_AURA_KINDS: ReadonlySet<Aura['kind']> = new Set([
   'stun',
   'stasis',
   'root',

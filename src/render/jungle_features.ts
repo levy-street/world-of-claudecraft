@@ -18,9 +18,10 @@ import {
   WATER_LEVEL,
 } from '../sim/world';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { buildDeckWood } from './deck_render';
 import { GFX } from './gfx';
+import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from './worn_stone';
 
 export interface JungleFeaturesView {
   group: THREE.Group;
@@ -36,7 +37,7 @@ const PALM_URLS = [
 ];
 const palmScenes: (THREE.Group | null)[] = [null, null, null];
 PALM_URLS.forEach((url, i) => {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(url).then((gltf) => {
       palmScenes[i] = gltf.scene;
     }),
@@ -88,7 +89,7 @@ function bakePalmParts(scene: THREE.Group): PalmPart[] {
 // lush and hung with vines.
 const GREAT_TREE_URL = '/models/foliage/twisted_1.glb';
 let greatTreeScene: THREE.Group | null = null;
-registerPreload(
+registerDeferredPreload(() =>
   loadGltf(GREAT_TREE_URL).then((gltf) => {
     greatTreeScene = gltf.scene;
   }),
@@ -105,7 +106,7 @@ const REACH_PROP_URLS = {
 type ReachPropKey = keyof typeof REACH_PROP_URLS;
 const propScenes: Partial<Record<ReachPropKey, THREE.Group>> = {};
 for (const key of Object.keys(REACH_PROP_URLS) as ReachPropKey[]) {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(REACH_PROP_URLS[key]).then((gltf) => {
       propScenes[key] = gltf.scene;
     }),
@@ -347,6 +348,9 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
         m2 = source.clone();
         const c = (m2 as THREE.MeshStandardMaterial).color;
         if (c) c.multiply(new THREE.Color(0.75, 1.05, 0.7));
+        // giant banyan trunks take the coarse landmark bark grain
+        if (isBarkMaterialName(source.name))
+          applySurfaceDetail(m2 as THREE.MeshStandardMaterial, 'bark', GREAT_TREE_BARK_DETAIL);
         lushened.set(source.uuid, m2);
       }
       return m2;

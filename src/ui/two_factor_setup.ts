@@ -3,6 +3,8 @@
 // directly (tests/two_factor_setup.test.ts) and the DOM wiring stays a thin
 // consumer (the reference pattern in src/ui/unit_portrait.ts).
 
+import { t } from './i18n';
+
 // The enrolment wizard moves through these visible stages. The DOM layer shows
 // exactly one at a time; this type is the single source of truth for which.
 export type TwoFactorStage = 'idle' | 'begin' | 'setup' | 'recovery' | 'enabled';
@@ -40,13 +42,17 @@ export function classifyAuthCode(raw: string): { code: string; recoveryCode: str
 
 // Plain-text blob for the "Download Codes" button so a user can save recovery
 // codes to a file. No DOM/Blob here: the caller wraps this in a download.
-export function formatRecoveryCodesFile(codes: string[], username: string, brand = 'World of ClaudeCraft'): string {
+export function formatRecoveryCodesFile(
+  codes: string[],
+  username: string,
+  brand = 'World of ClaudeCraft',
+): string {
   return [
-    `${brand} recovery codes`,
-    `Account: ${username}`,
+    t('hudChrome.account.recoveryCodesFileHeader', { brand }),
+    t('hudChrome.account.recoveryCodesFileAccount', { username }),
     '',
-    'Each code can be used once if you lose access to your authenticator app.',
-    'Keep this file somewhere safe and private.',
+    t('hudChrome.account.recoveryCodesFileHint'),
+    t('hudChrome.account.recoveryCodesFileWarn'),
     '',
     ...codes.map((c, i) => `${String(i + 1).padStart(2, '0')}. ${c}`),
     '',

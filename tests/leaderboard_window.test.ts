@@ -72,6 +72,40 @@ describe('leaderboard_window: WCAG chrome (live region + focusable controls + fo
   });
 });
 
+describe('leaderboard_window: guild tag beside the ranked name', () => {
+  it('renders the guild as a tag inside the name cell on both the row and the sticky standing', () => {
+    // Inside .lb-name, not a seventh grid column: the row grid is shared by every
+    // tab, so a column here would misalign all of them (the Renown tab's realm tag
+    // is the same treatment).
+    expect(code).toContain('<span class="lb-guild"');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the painter source literally contains this template expression
+    expect(code).toContain('${esc(r.name)}${this.guildTagHtml(r.guild)}');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the painter source literally contains this template expression
+    expect(code).toContain('${esc(standing.name)}${this.guildTagHtml(standing.guild)}');
+  });
+
+  it('escapes the player-authored guild name and labels the tag from the catalog', () => {
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the painter source literally contains this template expression
+    expect(code).toContain('${esc(guild)}');
+    expect(code).not.toMatch(/\$\{guild\}/);
+    expect(code).toContain("t('hudChrome.leaderboard.guildName')");
+  });
+
+  it('renders no tag at all for an unguilded row', () => {
+    expect(code).toMatch(/if \(!guild\) return '';/);
+  });
+
+  it('feeds the viewer their own guild so the sticky standing can carry the tag', () => {
+    expect(code).toContain('guild: world.player.guild');
+  });
+
+  it('writes the angle brackets as HTML entities, not literal markup', () => {
+    // The classic `<Guild>` nameplate convention; a literal '<' here would open a tag.
+    expect(code).toContain('&lt;');
+    expect(code).toContain('&gt;');
+  });
+});
+
 describe('leaderboard_window: async + page wiring contracts (the painter half)', () => {
   it('maps a rejected / offline fetch to the error input (catch sets the result null)', () => {
     // The view test proves buildLeaderboardView({kind:'error'}) -> error; this pins

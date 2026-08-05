@@ -223,6 +223,10 @@ describe('auto_attack meleeSwing: the white-hit table', () => {
       events.some((e) => e.type === 'damage' && e.kind === 'dodge' && e.sourceId === p.id),
     ).toBe(true);
     expect(p.overpowerUntil).toBeGreaterThan(0); // attacker.overpowerUntil = time + 5
+    expect(sim.reactiveAbilityWindowRemaining('mongoose_bite')).toBeCloseTo(5);
+    expect(sim.reactiveAbilityWindowRemaining('another_ability')).toBe(0);
+    p.overpowerUntil = sim.time - 1;
+    expect(sim.reactiveAbilityWindowRemaining('mongoose_bite')).toBe(0);
   });
 });
 
@@ -516,6 +520,49 @@ describe('auto_attack updatePlayerAutoAttack: ranged-vs-melee dispatch', () => {
     p.swingTimer = 1;
     updatePlayerAutoAttack(sim.ctx, p, meta);
     expect(p.swingTimer).toBeLessThan(1); // the decrement runs before the !autoAttack bail
+  });
+});
+
+describe('auto_attack Vanish (issue #2426): a target that escapes stealth mid-fight', () => {
+  // Vanish grants the target a stealth aura with escape semantics (hasEscapeStealth,
+  // threat.ts): fully undetectable regardless of range, the same gate the mob AI
+  // already honors (mob/targeting.ts mobCanSeeTarget). Continuing an already-engaged
+  // swing against it broke that invisibility (issue #2426).
+  function vanishAura(sourceId: number): Aura {
+    return {
+      id: 'vanish',
+      name: 'Smokestep',
+      kind: 'stealth',
+      remaining: 10,
+      duration: 10,
+      value: 0.5,
+      sourceId,
+      school: 'physical',
+    };
+  }
+
+  it('drops auto-attack (and stops dealing damage) the instant the target vanishes', () => {
+    const { sim, p, meta } = makeSim('warrior', 12);
+    const mob = spawnDummy(sim, p, 5, 2); // within MELEE_RANGE, already engaged
+    p.autoAttack = true;
+    p.swingTimer = 0;
+    mob.auras.push(vanishAura(mob.id));
+    const events = capture(sim);
+    updatePlayerAutoAttack(sim.ctx, p, meta);
+    expect(p.autoAttack).toBe(false);
+    expect(events.some((e) => e.type === 'damage' && e.sourceId === p.id)).toBe(false);
+  });
+
+  it('startAutoAttack refuses to engage a vanished target as a fresh attack', () => {
+    const { sim, p } = makeSim('warrior', 12);
+    const mob = spawnDummy(sim, p, 5, 2);
+    mob.auras.push(vanishAura(mob.id));
+    const events = capture(sim);
+    startAutoAttack(sim.ctx, p.id);
+    expect(p.autoAttack).toBe(false);
+    expect(events.some((e) => e.type === 'error' && e.text === 'Invalid attack target.')).toBe(
+      true,
+    );
   });
 });
 

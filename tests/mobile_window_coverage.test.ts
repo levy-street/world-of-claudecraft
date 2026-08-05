@@ -9,7 +9,8 @@ import { tsFilesUnder } from './helpers/ts_files_under';
 
 // Phase 5 mobile-HUD-parity coverage guard.
 //
-// Every desktop HUD window (an element with class `window` and an id) must have a
+// Every desktop HUD window (an element with class `window` or meter-style
+// `mt-panel`, and an id) must have a
 // deliberate mobile-touch decision: either it is brought into the shared "mobile
 // sheet base" pattern (at least one `body.mobile-touch ... #id ...` rule that also
 // carries a real pin/size/floor property, not merely a cosmetic z-index/border), or
@@ -32,7 +33,7 @@ function read(relPath: string): string {
   return readFileSync(fileURLToPath(new URL(relPath, import.meta.url)), 'utf8');
 }
 
-// The static `.window` ids from a markup entry. Attribute-ORDER-TOLERANT: it scans
+// The static `.window` / `.mt-panel` ids from a markup entry. Attribute-ORDER-TOLERANT: it scans
 // whole opening tags and tests `id=` and a `window` className INDEPENDENTLY per tag,
 // so a future class-first element (class="..." before id="...") is still picked up
 // (the old id-then-class regex would have silently missed it).
@@ -49,7 +50,7 @@ function windowIdsFromHtml(html: string): string[] {
     const attrs = tag[1];
     const idMatch = attrs.match(/\bid="([a-z0-9-]+)"/);
     const classMatch = attrs.match(/\bclass="([^"]*)"/);
-    if (idMatch && classMatch && /\bwindow\b/.test(classMatch[1])) {
+    if (idMatch && classMatch && /\b(?:window|mt-panel)\b/.test(classMatch[1])) {
       ids.push(idMatch[1]);
     }
   }
@@ -99,6 +100,8 @@ function dynamicWindowIds(dir: string = fileURLToPath(new URL(UI_DIR, import.met
 // Windows deliberately NOT brought into the mobile sheet pattern, each with a
 // reason. These pass coverage without a mobile-touch positioning rule.
 const MOBILE_WINDOW_EXCEPTIONS: Record<string, string> = {
+  'heal-window': 'detached desktop meter; mobile intentionally keeps it hidden',
+  'threat-window': 'detached desktop meter; mobile intentionally keeps it hidden',
   'loot-window':
     'cursor-popped by design: the loot roll popup spawns at the drop, not as a docked sheet',
   'confirm-dialog':

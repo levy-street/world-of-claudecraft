@@ -13,6 +13,7 @@
 
 import { createGroundObject } from '../entity';
 import { GULLHAVEN_HARBOR, MAINLAND_HARBOR } from '../harbor_layout';
+import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import { acceptQuest } from '../quests/quest_commands';
 import { startScenario } from '../scenarios/scenarios';
 import { startChoiceForPlayer } from '../scenes/choices';
@@ -134,6 +135,7 @@ function crossFerry(ctx: SimContext, fromMainland: boolean, pid: number): void {
   const firstCrossing = firstCrossingFor(ctx, r.meta.entityId, fromMainland);
   if (firstCrossing) acceptQuest(ctx, Q0_ID, r.meta.entityId);
   const p = r.e;
+  cancelProfessionSessionOnDisplacement(ctx, p);
   p.pos = ctx.groundPos(dest.x, dest.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);

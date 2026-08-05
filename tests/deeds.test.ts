@@ -1515,7 +1515,11 @@ describe('site wiring (real modules, not direct bumps)', () => {
     const clamped = victim.hp - 1;
     dealDamage(sim.ctx, attacker, victim, victim.hp + 500, true, 'physical', null, 'hit');
     expect(victim.hp).toBe(1);
-    expect(sim.ctx.duels.has(a)).toBe(false);
+    // The duel is over the instant the finisher lands, but the map entry
+    // itself lingers until updateDuels() purges it at tick-tail (see
+    // src/sim/social/duel.ts); duelFor() is the purge-order-independent way
+    // to observe "the duel has ended" from outside duel.ts.
+    expect(duelMod.duelFor(sim.ctx, a)).toBeNull();
     expect(metaA.deedStats.counters.damageDealt).toBe(10 + clamped);
     expect(metaA.deedStats.counters.crits).toBe(1);
   });

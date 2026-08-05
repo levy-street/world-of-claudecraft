@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.31.0-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.34.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.sv_SE.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -92,7 +92,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and choose Play Offline
 ```
 
-Namnge din karaktär, välj någon av de nio klasserna, och du börjar i **Eastbrook Vale** (nivå 1-7), en marknadsstad omringad av nav: vargstråk i norr, vildsvinsängar i öster, Sableweb-skogarna i väster, Mirror Lake i nordväst, en burrower-drabbad koppargruva i sydväst och ett förfallet kapell med rastlösa döda i nordöst, med Gorraks banditläger i sydöst. Norra vägen klättrar uppför ett bergspass in i **Mirefen Marsh** (6-13, nav Fenbridge) och vidare upp till **Thornpeak Heights** (13-20, nav Highwatch). Världens seed är fast i `src/main.ts`, så det är samma plats vid varje besök.
+Namnge din karaktär, välj någon av de nio klasserna, och du börjar i **Eastbrook Vale** (nivå 1-7), en marknadsstad omringad av nav: vargstråk i norr, vildsvinsängar i öster, Sableweb-skogarna i väster, Mirror Lake i nordväst, en burrower-drabbad koppargruva i sydväst och ett förfallet kapell med rastlösa döda i nordöst, med Gorraks banditläger i sydöst. Norra vägen klättrar uppför ett bergspass in i **Mirefen Marsh** (6-13, nav Fenbridge) och vidare upp till **Thornpeak Heights** (13-20, nav Highwatch). Världens seed är fast i `src/sim/world_seed.ts`, så det är samma plats vid varje besök.
 
 ### Skrivbordsappar för Windows, Linux och macOS
 

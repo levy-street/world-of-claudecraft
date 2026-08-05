@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 //
 // Pins the picker placement math in BagItemActionMenu.paint,
 // the one fix surface the CSS guard (tests/ctx_menu_picker_sizing.test.ts)

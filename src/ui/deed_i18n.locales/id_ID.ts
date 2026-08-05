@@ -811,4 +811,28 @@ export const table: DeedLocaleTable = {
     name: 'Halaman Pembongkaran',
     desc: 'Salvasi 50 potong perlengkapan kembali menjadi material mentah.',
   },
+  dgn_wildheart_basin: {
+    name: 'Cekungan Membalas',
+    desc: 'Kalahkan Zulgar, Suara Cekungan, di Cekungan Hati Liar.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Heroik: Cekungan Hati Liar',
+    desc: 'Kalahkan Zulgar, Suara Cekungan, di Cekungan Hati Liar pada tingkat kesulitan Heroik.',
+  },
+  chr_marsh_rares_ii: {
+    name: 'Sang Pelahap, Diperhitungkan',
+    desc: 'Bantai Grubjaw sang Pelahap, teror bernama keempat di Rawa Mirefen yang luput dari perhitungan pertama.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'Lebih Banyak Nama Terpahat di Tebing',
+    desc: 'Bantai Cragmaw Tua dan Tuan Serpihan Kazzix, dua teror bernama lagi di Dataran Tinggi Thornpeak yang luput dari perhitungan pertama.',
+  },
+  chr_gleamstag: {
+    name: 'Legenda yang Tak Pernah Menyerang Lebih Dulu',
+    desc: 'Bantai Rusa Kemilau, elite langka dan pemalu yang hanya menyerang bila terdesak.',
+  },
+  chr_hollow_rares: {
+    name: 'Kawanan Itu Ingat',
+    desc: 'Bantai Marrowshell Tua dan Aurelhorn, yang Pertama dari Kawanan, dua bos langka pengembara di Ceruk Terselubung.',
+  },
 };

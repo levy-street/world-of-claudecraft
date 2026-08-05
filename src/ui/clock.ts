@@ -12,7 +12,7 @@ import { formatDateTime, type SupportedLanguage } from './i18n';
 // zero-padded minute and the locale's day-period marker.
 export function formatClockTime(date: Date, use24: boolean, lang?: SupportedLanguage): string {
   const options: Intl.DateTimeFormatOptions = use24
-    ? { hour: '2-digit', minute: '2-digit', hour12: false }
+    ? { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }
     : { hour: 'numeric', minute: '2-digit', hour12: true };
   return formatDateTime(date, options, lang);
 }

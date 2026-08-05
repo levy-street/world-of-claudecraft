@@ -22,5 +22,6 @@ class AppViewController: CAPBridgeViewController {
         bridge?.registerPluginInstance(NativeAttestationPlugin())
         bridge?.registerPluginInstance(NativeAppUpdatePlugin())
         bridge?.registerPluginInstance(NativeAppleAuthPlugin())
+        bridge?.registerPluginInstance(NativeDeviceInfoPlugin())
     }
 }

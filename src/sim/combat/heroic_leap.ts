@@ -49,7 +49,7 @@ export function sweptLanding(ctx: SimContext, entity: Entity, aim: Vec3): Vec3 {
       const nextZ = fromZ + dz * progress;
       const step = Math.hypot(nextX - safeX, nextZ - safeZ);
       const nextGround = groundHeight(nextX, nextZ, ctx.cfg.seed);
-      if (nextGround < waterLevelAt(nextX, nextZ) - PLAYER_SWIM_DEPTH) break;
+      if (nextGround < waterLevelAt(nextX, nextZ, ctx.cfg.seed) - PLAYER_SWIM_DEPTH) break;
       if (
         nextGround > previousGround &&
         step > 1e-6 &&
@@ -80,6 +80,7 @@ export function sweptLanding(ctx: SimContext, entity: Entity, aim: Vec3): Vec3 {
           false,
           undefined,
           { y: crest, lift: 0 },
+          ctx.riftCollisionToken,
         );
         if (Math.hypot(over.x - nextX, over.z - nextZ) > PLAYER_BODY_RADIUS * 0.25) break;
         safeX = nextX;
@@ -125,7 +126,7 @@ export function armHeroicLeap(
   entity: Entity,
   aim: Vec3,
   landingAoe: { min: number; max: number; radius: number },
-  ability: Pick<AbilityDef, 'name' | 'school'>,
+  ability: Pick<AbilityDef, 'id' | 'name' | 'school'>,
 ): void {
   if (hasUnbreakableMovementLock(entity)) return;
   const landing = sweptLanding(ctx, entity, aim);
@@ -139,6 +140,7 @@ export function armHeroicLeap(
     apex: FLIGHT_APEX,
     landingAoe: { ...landingAoe },
     abilityName: ability.name,
+    abilityId: ability.id,
     school: ability.school,
   };
 }
@@ -170,6 +172,7 @@ export function advanceHeroicLeap(ctx: SimContext, entity: Entity): boolean {
     school: flight.school,
     fx: 'nova',
     radius: flight.landingAoe.radius,
+    ability: flight.abilityId,
   });
   for (const target of ctx.hostilesInRadius(entity, entity.pos, flight.landingAoe.radius)) {
     if (!ctx.hasLineOfSight(entity, target)) continue;

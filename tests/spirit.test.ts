@@ -435,6 +435,80 @@ describe('spirit: delve respawn (unchanged bounded rules)', () => {
   });
 });
 
+describe('spirit: forced facing reset also resets prevFacing (camera-follow convention)', () => {
+  // Every other forced-facing site in the sim pairs `facing = 0` with
+  // `prevFacing = 0` (see mob/lifecycle.ts, sim.ts, arena.ts, etc). The
+  // respawn/release-spirit sites force facing to 0 too, but left prevFacing
+  // stale: the render-interpolated facing (prevFacing -> facing over the tick
+  // window) then jumps from the old heading, which the follow camera's rigid
+  // term reads as a huge instantaneous turn (it spins to a wrong yaw and
+  // sticks there if the player does not move right after).
+  it('releasing the spirit resets prevFacing along with facing', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(10);
+    const p = sim.player as AnyEntity;
+    p.facing = Math.PI / 2;
+    p.prevFacing = Math.PI / 2;
+    p.dead = true;
+    sim.releaseSpirit();
+    expect(p.facing).toBe(0);
+    expect(p.prevFacing).toBe(0);
+  });
+
+  it('resurrecting at the corpse resets prevFacing along with facing', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(10);
+    const p = sim.player as AnyEntity;
+    p.dead = true;
+    sim.releaseSpirit();
+    const corpse = { ...(p.corpsePos as { x: number; y: number; z: number }) };
+    p.pos = { x: corpse.x, y: corpse.y, z: corpse.z };
+    p.prevPos = { ...p.pos };
+    p.facing = Math.PI / 2;
+    p.prevFacing = Math.PI / 2;
+    sim.rebucket(p);
+    sim.resurrectAtCorpse();
+    expect(p.facing).toBe(0);
+    expect(p.prevFacing).toBe(0);
+  });
+
+  it('resurrecting at the Spirit Healer resets prevFacing along with facing', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(10);
+    const p = sim.player as AnyEntity;
+    p.dead = true;
+    sim.releaseSpirit();
+    p.facing = Math.PI / 2;
+    p.prevFacing = Math.PI / 2;
+    expect(sim.resurrectAtSpiritHealer()).toBe(true);
+    expect(p.facing).toBe(0);
+    expect(p.prevFacing).toBe(0);
+  });
+
+  it('a delve respawn resets prevFacing along with facing', () => {
+    const sim = makeSim('rogue', 99);
+    const reliquary = DELVES.collapsed_reliquary;
+    sim.setPlayerLevel(reliquary.minLevel);
+    const p = sim.player as AnyEntity;
+    p.pos = { x: reliquary.doorPos.x, y: 0, z: reliquary.doorPos.z };
+    p.prevPos = { ...p.pos };
+    sim.rebucket(p);
+    sim.enterDelve('collapsed_reliquary', 'normal');
+    const run = sim.delveRunForPlayer(sim.playerId) as any;
+    run.modules = ['reliquary_finale'];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+
+    p.facing = Math.PI / 2;
+    p.prevFacing = Math.PI / 2;
+    p.dead = true;
+    sim.releaseSpirit();
+    expect(p.dead).toBe(false);
+    expect(p.facing).toBe(0);
+    expect(p.prevFacing).toBe(0);
+  });
+});
+
 describe('spirit: ghost movement (tick loop)', () => {
   it('a ghost runs on tick and stays a dead, unharmed spirit', () => {
     const sim = makeSim();

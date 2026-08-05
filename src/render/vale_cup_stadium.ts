@@ -43,8 +43,9 @@ import {
 import { terrainHeight } from '../sim/world';
 import type { CupInfo } from '../world_api/vale_cup';
 import { loadGltf, releaseGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
-import { GFX, sharedUniforms } from './gfx';
+import { registerDeferredPreload } from './assets/preload';
+import { EMISSIVE_LIGHT, GFX, sharedUniforms } from './gfx';
+import { casterShadowMayReachCamera, type ScenerySphere } from './resident_scenery_core';
 import { groundSplatMaps } from './textures';
 import { flagTexture } from './vale_cup_flags';
 
@@ -81,13 +82,19 @@ export interface ValeCupStadiumView {
    *  (never inside the cull-toggled group, the impact-site light rule). */
   lights: THREE.PointLight[];
   update(px: number, pz: number, dt: number, cup: CupInfo | null): void;
+  updateShadowVisibility(
+    camera: THREE.PerspectiveCamera,
+    lightDirection: THREE.Vector3,
+    shadowsEnabled: boolean,
+  ): void;
 }
 
 // ---------------------------------------------------------------------------
 // CC0 kit pieces (KayKit Dungeon Remastered), extracted with the dungeon.ts
 // recipe: merged float-attribute geometry + the pack's shared atlas material.
-// registerPreload() folds the fetches into the boot gate so buildValeCupStadium
-// can read the cache synchronously in the renderer ctor.
+// registerDeferredPreload() folds the fetches into the boot gate so
+// buildValeCupStadium can read the cache synchronously in the renderer ctor; the
+// deferred lane keeps them off the launcher until world entry opens it.
 // ---------------------------------------------------------------------------
 
 const KIT_PIECES = [
@@ -167,7 +174,7 @@ export function ensureValeCupAssets(): Promise<void> {
 
 // Boot-gate the kit fetches (tier-INDEPENDENT set, the props.ts preload law);
 // headless/test imports never fetch.
-if (typeof window !== 'undefined') registerPreload(ensureValeCupAssets());
+if (typeof window !== 'undefined') registerDeferredPreload(() => ensureValeCupAssets());
 
 function kitAsset(name: KitPiece): KitAsset {
   const a = kitAssets.get(name);
@@ -1045,7 +1052,7 @@ export function buildValeCupStadium(seed: number): ValeCupStadiumView {
       new THREE.MeshLambertMaterial({
         color: 0xffaa33,
         emissive: 0xff6600,
-        emissiveIntensity: rich ? 2.2 : 1.4,
+        emissiveIntensity: rich ? EMISSIVE_LIGHT : 1.4,
         transparent: true,
         opacity: 0.92,
       }),
@@ -1204,6 +1211,33 @@ export function buildValeCupStadium(seed: number): ValeCupStadiumView {
     practiceGroup.add(pad);
   }
 
+  interface StadiumShadowState {
+    readonly group: THREE.Group;
+    readonly localBounds: THREE.Sphere;
+    readonly casters: THREE.Mesh[];
+    casts: boolean;
+  }
+  const shadowState = (root: THREE.Group): StadiumShadowState => {
+    const casters: THREE.Mesh[] = [];
+    root.traverse((child) => {
+      if (child instanceof THREE.Mesh && child.castShadow) casters.push(child);
+    });
+    return {
+      group: root,
+      localBounds: new THREE.Box3().setFromObject(root).getBoundingSphere(new THREE.Sphere()),
+      casters,
+      casts: true,
+    };
+  };
+  const stadiumShadowStates = [shadowState(group), shadowState(practiceGroup)];
+  const worldSphere = new THREE.Sphere();
+  const cameraForward = new THREE.Vector3();
+  const cameraState = {
+    position: new THREE.Vector3(),
+    forward: cameraForward,
+    near: 0,
+  };
+
   // ---- live-match flag swap + distance cull ---------------------------------
   let matchFlagKey = 'idle';
   return {
@@ -1211,6 +1245,31 @@ export function buildValeCupStadium(seed: number): ValeCupStadiumView {
     practiceGroup,
     flames,
     lights,
+    updateShadowVisibility(
+      camera: THREE.PerspectiveCamera,
+      lightDirection: THREE.Vector3,
+      shadowsEnabled: boolean,
+    ): void {
+      if (!shadowsEnabled) return;
+      camera.getWorldDirection(cameraForward);
+      cameraState.position.copy(camera.position);
+      cameraState.near = camera.near;
+      for (const state of stadiumShadowStates) {
+        if (!state.group.visible) continue;
+        state.group.updateWorldMatrix(true, false);
+        worldSphere.copy(state.localBounds).applyMatrix4(state.group.matrixWorld);
+        const bounds: ScenerySphere = {
+          x: worldSphere.center.x,
+          y: worldSphere.center.y,
+          z: worldSphere.center.z,
+          radius: worldSphere.radius,
+        };
+        const casts = casterShadowMayReachCamera(bounds, cameraState, lightDirection);
+        if (casts === state.casts) continue;
+        state.casts = casts;
+        for (const mesh of state.casters) mesh.castShadow = casts;
+      }
+    },
     update(px2: number, pz2: number, _dt: number, cup: CupInfo | null): void {
       // In a private practice instance: show the shifted copy at the practice
       // pitch, hide the real one. `origin` is {0,0} for the real Sowfield match.

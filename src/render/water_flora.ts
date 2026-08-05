@@ -9,8 +9,9 @@
 import * as THREE from 'three';
 import { hollowWillowSpots } from '../sim/fen_willows';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { type WaterFloraPlacement, waterFloraRegions } from './water_flora_core';
+import { reusePackedOrmSample } from './water_flora_shader_core';
 
 export interface WaterFloraView {
   group: THREE.Group;
@@ -27,7 +28,7 @@ const FLORA_URLS = {
 type FloraKey = keyof typeof FLORA_URLS;
 const floraScenes: Partial<Record<FloraKey, THREE.Group>> = {};
 for (const key of Object.keys(FLORA_URLS) as FloraKey[]) {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(FLORA_URLS[key]).then((gltf) => {
       floraScenes[key] = gltf.scene;
     }),
@@ -43,6 +44,63 @@ export const waterFloraPreloadInternalsForTest = {
 // buffer set for each lake-bearing zone.
 const partsCache = new Map<FloraKey, { geo: THREE.BufferGeometry; mat: THREE.Material }[]>();
 
+function sameTextureSampling(left: THREE.Texture, right: THREE.Texture): boolean {
+  if (left.source !== right.source) return false;
+  if (
+    left.mapping !== right.mapping ||
+    left.channel !== right.channel ||
+    left.wrapS !== right.wrapS ||
+    left.wrapT !== right.wrapT ||
+    left.magFilter !== right.magFilter ||
+    left.minFilter !== right.minFilter ||
+    left.anisotropy !== right.anisotropy ||
+    left.format !== right.format ||
+    left.internalFormat !== right.internalFormat ||
+    left.type !== right.type ||
+    left.generateMipmaps !== right.generateMipmaps ||
+    left.premultiplyAlpha !== right.premultiplyAlpha ||
+    left.flipY !== right.flipY ||
+    left.unpackAlignment !== right.unpackAlignment ||
+    left.colorSpace !== right.colorSpace ||
+    left.matrixAutoUpdate !== right.matrixAutoUpdate
+  ) {
+    return false;
+  }
+  if (left.matrixAutoUpdate) {
+    return (
+      left.offset.equals(right.offset) &&
+      left.repeat.equals(right.repeat) &&
+      left.center.equals(right.center) &&
+      left.rotation === right.rotation
+    );
+  }
+  return left.matrix.elements.every((value, index) => value === right.matrix.elements[index]);
+}
+
+function waterFloraMaterial(source: THREE.Material): THREE.Material {
+  const standard = source as THREE.MeshStandardMaterial;
+  if (!standard.isMeshStandardMaterial) return source;
+  const orm = standard.roughnessMap;
+  const ao = standard.aoMap;
+  if (!orm || !ao || standard.metalnessMap !== orm || !sameTextureSampling(orm, ao)) {
+    return source;
+  }
+
+  // Loader-cache scenes are immutable. Clone the one matching material before
+  // attaching a shader hook, then share that clone across every instance.
+  const material = standard.clone();
+  const previous = material.onBeforeCompile;
+  const previousSource = previous.toString();
+  const previousKey = material.customProgramCacheKey.bind(material);
+  material.onBeforeCompile = (shader, renderer) => {
+    previous.call(material, shader, renderer);
+    shader.fragmentShader = reusePackedOrmSample(shader.fragmentShader);
+  };
+  material.customProgramCacheKey = () =>
+    `water-flora-packed-orm|${previousKey()}|${previousSource}`;
+  return material;
+}
+
 function extractParts(scene: THREE.Group): { geo: THREE.BufferGeometry; mat: THREE.Material }[] {
   scene.updateMatrixWorld(true);
   const parts: { geo: THREE.BufferGeometry; mat: THREE.Material }[] = [];
@@ -51,7 +109,7 @@ function extractParts(scene: THREE.Group): { geo: THREE.BufferGeometry; mat: THR
     if (!mesh.isMesh) return;
     const geo = mesh.geometry.clone();
     geo.applyMatrix4(mesh.matrixWorld);
-    parts.push({ geo, mat: mesh.material as THREE.Material });
+    parts.push({ geo, mat: waterFloraMaterial(mesh.material as THREE.Material) });
   });
   const box = new THREE.Box3();
   for (const p of parts) {
@@ -67,6 +125,11 @@ function extractParts(scene: THREE.Group): { geo: THREE.BufferGeometry; mat: THR
   }
   return parts;
 }
+
+export const waterFloraShaderInternalsForTest = {
+  sameTextureSampling,
+  waterFloraMaterial,
+};
 
 export function buildWaterFlora(seed: number): WaterFloraView {
   const group = new THREE.Group();

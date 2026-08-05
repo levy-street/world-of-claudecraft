@@ -675,6 +675,11 @@ export function harborDeckRiderActive(entity: Entity): boolean {
   );
 }
 
+/** True while any registered harbor ship is following an authored cue. */
+export function harborShipCueActive(): boolean {
+  return SHIP_CUES.hasLiveCue();
+}
+
 /** Resolve one visual's live ship pose without mutating it. */
 export function harborDeckRiderVisualPlan(
   entity: Entity,

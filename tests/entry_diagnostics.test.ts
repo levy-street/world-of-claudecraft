@@ -3,12 +3,15 @@ import {
   checkpointActiveEntryDiagnostics,
   createEntryDiagnosticsController,
   type EntryDiagnosticPersistence,
+  resumeActiveEntryDiagnostics,
   stopActiveEntryDiagnostics,
+  suspendActiveEntryDiagnostics,
 } from '../src/game/entry_diagnostics';
 
 function harness() {
   let wallNow = 1_000;
   const events: string[] = [];
+  const logged: string[] = [];
   const persistence: EntryDiagnosticPersistence = {
     start: vi.fn((preset) => events.push(`start:${preset}`)),
     checkpoint: vi.fn((checkpoint) => events.push(checkpoint)),
@@ -19,11 +22,12 @@ function harness() {
     renderSnapshot: () => ({ phase: 'render' }),
     persistence,
     wallNow: () => wallNow,
-    log: vi.fn(),
+    log: vi.fn((message: string) => logged.push(message)),
   });
   return {
     controller,
     events,
+    logged,
     persistence,
     setWallNow: (value: number) => {
       wallNow = value;
@@ -32,6 +36,34 @@ function harness() {
 }
 
 describe('entry diagnostics controller', () => {
+  it('stamps the repeating checkpoints without echoing them to the console', () => {
+    const { controller, events, logged } = harness();
+    controller.start(2);
+    controller.renderedFrame(0);
+    controller.renderedFrame(10_000);
+    controller.checkpoint('character-open');
+    controller.checkpoint('character-closed');
+    controller.checkpoint('settings-open');
+    controller.checkpoint('settings-closed');
+    // Every one of them still reaches the crash probe, which is what diagnoses
+    // a failed entry after the fact.
+    expect(events).toEqual([
+      'start:2',
+      'scene-build-start',
+      'first-frame',
+      'rendering',
+      'character-open',
+      'character-closed',
+      'settings-open',
+      'settings-closed',
+    ]);
+    // The console only carries the one-shot entry milestones.
+    expect(logged).toEqual([
+      '[entry-diag] checkpoint=scene-build-start',
+      '[entry-diag] checkpoint=first-frame',
+    ]);
+  });
+
   it('arms the probe before writing the initial scene checkpoint', () => {
     const { controller, events } = harness();
     controller.start(2);
@@ -153,6 +185,28 @@ describe('entry diagnostics controller', () => {
     controller.checkpoint('window-error');
     controller.renderedFrame(10_000);
     expect(events).toEqual(['start:2', 'scene-build-start', 'clear']);
+  });
+
+  it('clears while hidden and restores the last entry checkpoint on foreground', () => {
+    const { controller, events } = harness();
+    controller.start(2);
+    controller.checkpoint('assets-await', { phase: 'assets' });
+    suspendActiveEntryDiagnostics();
+    controller.checkpoint('renderer-built');
+    controller.renderedFrame(1_000);
+    controller.markStable();
+    resumeActiveEntryDiagnostics();
+    expect(events).toEqual([
+      'start:2',
+      'scene-build-start',
+      'assets-await',
+      'clear',
+      'start:2',
+      'assets-await',
+      'runtime-stable',
+    ]);
+    controller.markStable();
+    expect(events.at(-1)).toBe('runtime-stable');
   });
 
   it('uses wall time for persisted checkpoints rather than animation time', () => {

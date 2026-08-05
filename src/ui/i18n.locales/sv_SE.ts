@@ -2,6 +2,89 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const sv_SE: Partial<Record<TranslationKey, string>> = {
+  'apiError.epic.account_taken': 'Det Epic-kontot är redan länkat till ett annat konto.',
+  'apiError.epic.already_linked': 'Ditt konto har redan ett länkat Epic-konto.',
+  'apiError.epic.banned': 'Det Epic-kontot kan inte länkas.',
+  'apiError.epic.disabled': 'Epic-länkning är inte tillgänglig just nu.',
+  'apiError.epic.invalid_token':
+    'Epic kunde inte verifiera den här länkningsbegäran. Försök igen från skrivbordsappen.',
+  'apiError.epic.upstream': 'Epic svarade inte. Försök igen om en stund.',
+  'entities.abilities.greater_invisibility.description':
+    'Försvinn i 20 sek och ta bort 2 effekter med skada över tid. När osynligheten upphör tar du 90% mindre skada i 2 sek. (magikertalang)',
+  'entities.items.reins_terrorspark_groundshaker.name':
+    'Tändningsnyckel: Skräckgnista, markskakaren',
+  'hud.options.graphicsPresetInsane': 'Extrem',
+  'hud.options.surfaceDetail': 'Ytdetaljer',
+  'hud.options.surfaceDetailBasic': 'Grundläggande',
+  'hud.options.surfaceDetailFull': 'Fullständig',
+  'hudChrome.auraOverlay.allOff': 'Stäng av alla',
+  'hudChrome.auraOverlay.allOn': 'Slå på alla',
+  'hudChrome.auraOverlay.arcs': 'Sidohalvmånar',
+  'hudChrome.auraOverlay.color': 'Färg',
+  'hudChrome.auraOverlay.crescentBlockSize': 'Blockstorlek för halvmåne',
+  'hudChrome.auraOverlay.crescentsSpellOrder': 'Sidohalvmånar: besvärjelseordning',
+  'hudChrome.auraOverlay.currentClass': 'Nuvarande klass: {class}',
+  'hudChrome.auraOverlay.done': 'Klar',
+  'hudChrome.auraOverlay.enabled': 'Visa aura',
+  'hudChrome.auraOverlay.groundRing': 'Markring',
+  'hudChrome.auraOverlay.groundRingBlockSize': 'Blockstorlek för markring',
+  'hudChrome.auraOverlay.groundRingSpellOrder': 'Markring: besvärjelseordning',
+  'hudChrome.auraOverlay.icon': 'Besvärjelseikon',
+  'hudChrome.auraOverlay.iconSize': 'Ikonstorlek',
+  'hudChrome.auraOverlay.moveDown': 'Flytta ned',
+  'hudChrome.auraOverlay.moveEarlier': 'Flytta besvärjelsen inåt',
+  'hudChrome.auraOverlay.moveLater': 'Flytta besvärjelsen utåt',
+  'hudChrome.auraOverlay.moveLeft': 'Flytta vänster',
+  'hudChrome.auraOverlay.moveRight': 'Flytta höger',
+  'hudChrome.auraOverlay.moveUp': 'Flytta upp',
+  'hudChrome.auraOverlay.noProcs': 'Ingen proc som stöds är tillgänglig för den här karaktären.',
+  'hudChrome.auraOverlay.opacity': 'Opacitet',
+  'hudChrome.auraOverlay.positioning': 'Placering: {aura}',
+  'hudChrome.auraOverlay.previewHint':
+    'Använd Ställ in positioner för att flytta en aura utan att täcka menyn.',
+  'hudChrome.auraOverlay.procs.aetherRush': 'Eterrusning',
+  'hudChrome.auraOverlay.procs.arcaneCharge': 'Arkana laddningar',
+  'hudChrome.auraOverlay.procs.battleTrance': 'Stridstrans',
+  'hudChrome.auraOverlay.procs.enrage': 'Kalabalik: Rasande',
+  'hudChrome.auraOverlay.procs.heatingUp': 'Uppvärmning',
+  'hudChrome.auraOverlay.procs.overpowerCharge': 'Rödhandsförstärkning',
+  'hudChrome.auraOverlay.procs.revenge': 'Hämnd!',
+  'hudChrome.auraOverlay.procs.suddenDeath': 'Plötslig död',
+  'hudChrome.auraOverlay.procs.victoryRush': 'Segerrus',
+  'hudChrome.auraOverlay.reposition': 'Ställ in positioner',
+  'hudChrome.auraOverlay.reset': 'Återställ position',
+  'hudChrome.auraOverlay.screenPosition': 'Skärmposition',
+  'hudChrome.auraOverlay.selectAura': 'Aura',
+  'hudChrome.auraOverlay.size': 'Storlek',
+  'hudChrome.auraOverlay.spellOrder': 'Besvärjelseordning',
+  'hudChrome.auraOverlay.spellPosition': 'Besvärjelseordning {position} / {count}',
+  'hudChrome.auraOverlay.title': 'Auror',
+  'hudChrome.epic.benefits':
+    'Länka ditt Epic-konto från Epics skrivbordsapp för att spegla bedrifterna du tjänar in som Epic-prestationer.',
+  'hudChrome.epic.link': 'Länka Epic',
+  'hudChrome.epic.linked': 'Länkat till Epic-kontot {id}',
+  'hudChrome.epic.noProof':
+    'Epic angav inget länkningsbevis. Starta från Epic Games Store och försök igen.',
+  'hudChrome.epic.title': 'Epic',
+  'hudChrome.epic.unlink': 'Ta bort Epic-länkning',
+  'hudChrome.mounts.desc_terrorspark_groundshaker':
+    'En kompakt bepansrad maskin med tunga larvband, en grovkalibrig kanon och en sadel byggd för orädda förare.',
+  'hudChrome.mounts.name_terrorspark_groundshaker': 'Skräckgnista, markskakaren',
+  'hudChrome.targetAuras.all': 'Alla',
+  'hudChrome.targetAuras.buffs': 'Buffar',
+  'hudChrome.targetAuras.configureRows': 'Konfigurera målets auror',
+  'hudChrome.targetAuras.debuffs': 'Debuffar',
+  'hudChrome.targetAuras.fewerRows': 'Föredra färre aurarader',
+  'hudChrome.targetAuras.hideSources': 'Dölj aurakällor',
+  'hudChrome.targetAuras.keybindLabel': 'Målets buffar och debuffar',
+  'hudChrome.targetAuras.lock': 'Lås fönstret för målets auror',
+  'hudChrome.targetAuras.moreRows': 'Föredra fler aurarader',
+  'hudChrome.targetAuras.opacity': 'Auraopacitet: {percent}',
+  'hudChrome.targetAuras.ownAura': 'Din aura',
+  'hudChrome.targetAuras.showSources': 'Visa aurakällor',
+  'hudChrome.targetAuras.title': 'Målets auror',
+  'hudChrome.targetAuras.unlock': 'Flytta fönstret för målets auror',
+  'hudChrome.targetAuras.visibleRows': 'Önskat antal aurarader: {count}',
   'hudChrome.bags.itemAriaMasterwork': '{item}, antal {count}, mästerverk',
   'hudChrome.archetypePair.tailoring+inscription': 'Bläckvävare',
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Förtrollning Vapen - Runat Sigill',
@@ -15,11 +98,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.professions.archetypeChooseTitle': 'Gillebrevet, och att ändra sig',
   'guide.professions.archetypeChooseBody':
     'Du behöver inte leta upp något av detta. Arbeta med dina hantverk, och när dina hantverksfärdigheter för första gången visar en tydlig lutning mot ett par lägger Hantverksgillet märke till det och skickar ett Korppostbrev som namnger vilken mästare du ska söka upp och vilket uppdrag du ska ta. Det anländer en gång per karaktär, och bara om du inte redan svurit dig till ett par.',
-  'guide.professions.archetypeSwitchBody':
-    'En deklaration är inte ett livslångt åtagande heller. Ett par du aldrig haft är bara ett nytt anpassningsuppdrag, medan att återvända till ett par du lämnat ber dig att gottgöra dig först: fem uppgifter första gången, och tre till läggs till för varje byte du redan gjort. Valet förblir meningsfullt utan att någonsin låsa en dörr för gott.',
   'guide.professions.whatHeading': 'En handel vid sidan om svärdet',
-  'guide.professions.whatBody':
-    'Yrken är världens arbetsliv: fyra insamlingsyrken som bryter råmaterial direkt ur landet, och en ring av tio hantverk som förvandlar det till utrustning, måltider, drycker och verktyg. Allt matar något annat här. Malmen du bryter blir ett blad, bladet tar en förtrollning, och förtrollningen behöver damm bruten ur gamla föremål, så en skördare, en hantverkare och en tinkrare är alla länkar i en kedja.\n\nDet finns ingen yrkeskänsgräns att ångra sig över. Varje karaktär kan höja alla åtta hantverk med innehåll idag och alla fyra insamlingsyrken sida vid sida; det enda exklusiva valet är din arketyp, den identitet du till slut svär till, men när du väl inriktar dig slutar hantverken som faller vilande bakom den att klättra. Skicklighet sjunker aldrig, och ingenting du lärt dig tas någonsin ifrån dig.',
   'guide.professions.ringHeading': 'Hantverksringen',
   'guide.professions.ringBody':
     'Varje hantverk med innehåll idag har ett tak på 125 skicklighet: Vapentillverkning, Rustningssmide, Skrädderi, Läderhantverkeri, Matlagning, Alkemi, Ingenjörskonst och Förtrollning. Vid ett tak fortsätter yrket att fungera, skördar ger fortfarande utbyte, hantverk löser fortfarande av och mästerverk kan fortfarande inträffa; bara siffran slutar klättra. Välj ett kort nedan för ett hantverks fullständiga recepttabeller och siffror.',
@@ -31,8 +110,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.professions.gatherHubBody':
     'Fyra insamlingsyrken matar ringen från fältet: Gruvdrift, Skogsavverkning och Örtkunskap bryter malm, timmer och örter ur landet och har ett tak på 100 skicklighet, medan Fiske följer sin egna napp-och-rulle-rytm ända till 200. Varje sida nedan bär de exakta nodkartorna, verktygsstegarna och oddsen.',
   'guide.professions.archetypesHeading': 'Hjulet och dess arketyper',
-  'guide.professions.archetypesBody':
-    'De tio hantverken sitter på ett fast hjul, och geografin på det hjulet spelar roll. Varje två grannar bildar ett namngivet par: Smed för Vapensmide och Rustningssmide, Utrustare för Läderhantverkeri och Skrädderi, Apotekare för Alkemi och Matlagning, Bombardör för Ingenjörskonst och Alkemi, och sex till runt ringen.\n\nAtt inrikta sig på ett par är ett uppdrag, inte ett menyval. Fyra par kan anslutas idag (Smed, Utrustare, Apotekare och Bombardör), vart och ett förankrat av en stationerad mästare i Östbäck vars acceptansuppdrag anger hela uppgörelsen i förväg innan du tar det. Tills du deklarerar klättrar varje hantverk fritt på recept upp genom sällsynt nivå, så du kan prova allt innan du väljer.\n\nNär du väl inriktar dig blir dina två parhantverk dina ämnen, utan tak kortare än taket. Resten av hjulet mörknar inte: ett hantverk mitt emot dina ämnen fortsätter som en hobby som klättrar förbi sällsynt nivå (ett återkommande uppdrag vid Smed Haldrens smedja låter dig byta vilket det är), och alla andra hantverk går vilande. Ett vilande hantverk behåller sin skicklighet och sina vanliga recept; det slutar helt enkelt klättra och producerar aldrig mästerverk medan det vilar.',
   'guide.professions.pairFmt': '{a} och {b}',
   'guide.professions.curveHeading': 'Masterkurvan',
   'guide.professions.curveBody':
@@ -47,8 +124,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.professions.deedsBody':
     'Bedriftboken vandrar bredvid varje steg av detta. Din första inriktning förtjänar Hantverkssvuren och ditt första mästerverk förtjänar Mästerhantverkaren, båda bärbara som titlar. Var och en av de åtta hantverken med innehåll markerar en milstolpebedrift vid 50 skicklighet och kröner sitt tak med en Stormästare-titel, medan Fiske får Gamla saltet vid 100 skicklighet och titeln Mästarfiskare vid 200.\n\nDet finns tystare sidor också: bedrifter för din första skörd och ditt första hantverk, för de sällsynta fynd som turen bjuder på i fält, och för att ta upp avförtrollning. Allt är kosmetiskt, titlar och Ryktbarhet enbart. En bedrift ger aldrig kraft; den bevisar bara att du var där.',
   'guide.professions.startHeading': 'Var börjar man',
-  'guide.professions.startBody':
-    'Nyss anländ i Östbäck? Hitta Förman Odell och ta En handel för varje hand: han visar dig malmådrorna runt Koppargropen sydväst om staden och ger dig dina första valkar. Från och med då, skörda varje åder, timmerbestånd och örtfläck du passerar under uppdragens gång; skicklighet kommer naturligt för resenärer.\n\nTillbaka i staden, tryck T för att öppna hantverksfönstret och arbeta med de vanliga recept varje karaktär kan från start. Besök mästarna vid smedjan, köket, vävstolen och verkstaden för att se vad de lär ut, och ta deras arbetsorder för stabila mynt. När Gillets brev hittar dig vet du redan vilket par som känns som hemma.',
   'guide.professions.colStation': 'Station',
   'guide.professions.colHub': 'Ort',
   'guide.professions.colMaster': 'Mästare',
@@ -96,32 +171,18 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Matlagning förvandlar dagens fångst till sittmåltider som läker under 18 sekunder av vila, den billigaste läkning i spelet, från Saltat rimkött hela vägen till Marlows Storläckra stek. Alla äter, så inget hantverk är mer välkommet i en grupp.',
   'guide.profPages.craftIntro.alchemy':
     'Alkemi förvandlar örter, körtlar och glas till flaskor som avgör strider: läkande drycker och manadrycker när läget är kritiskt, och uthållighetselixir som sitter kvar i din buffrad under hela fängelsehålan.',
-  'guide.profPages.craftIntro.engineering':
-    'Ingenjörskonst tillverkar de verktyg varje seriös insamlare till slut vill ha: nivå 4- och nivå 5-hackorna, yxorna och skärorna som ingen handlare någonsin säljer, var och en förbrukande verktyget under sig.',
-  'guide.profPages.craftIntro.enchanting':
-    'Förtrollning tar isär utrustning och lägger tillbaka kraften: bryt oönskade pjäser i arkanmaterial och lägg sedan ned dem på en permanent statbonus för en pjäs du tänker behålla. Ingen station, ingen tränare, och vem som helst kan börja dag ett.',
   'guide.profPages.craftProse.weaponcrafting.identityHeading': 'Eggen varje stridande handlar',
   'guide.profPages.craftProse.weaponcrafting.identityBody':
     'Någon i varje grupp vill ha detta hantverks arbete, för det sällsynta steget täcker alla tre smaken ensam: Osmiumkrigsklinga för Styrkamenykampare, Glyfstålskrigsyxa för Rörlighetsstriders och Högtallsstridsstav, en Intelligens- och Andestav för kåpfolket.\n\nPå hantverkshjulet står det mellan Rustningssmide och Juveleringskonst. Dess levande identitet är Smeden, paret Vapensmide och Rustningssmide, svuret inför Smedmästare Darva vid smedjan genom att bearbeta tre malmådror med egna händer; Bladsmeds-paret med Juveleringskonst är också namngivet på hjulet, men det kan inte sväras ännu eftersom Juveleringskonst inte levererar några recept förrän vid en senare zonexpansion.',
   'guide.profPages.craftProse.weaponcrafting.materialsHeading': 'Vad smedjan dricks av',
-  'guide.profPages.craftProse.weaponcrafting.materialsBody':
-    'Gruvdrift är ryggraden. Kopparmalm kommer från nivå 1-ådror i Östbäcksdalen, järnmalm från Mirefen-träsket och osmiummalm från Törntoppens höjder, och varje steg på stegen följer samma mönster. Skogsavverkning spelar större roll än du kanske väntar: järnbarksskaft bärs av galtspar, askvedsskuldra av stridshammare och en enda högtallstock formar stridsklubban.\n\nResten kommer från jakten och disken. Grovt skinn för grepp skördas direkt från ulv- och vildsvinskroppar, benfragment droppar från vardagliga dräp och smedjetrappan bränner Smidesfluss, 20 koppar per burk från Darva själv. Om din egen gruvdrift halkar efter säljer Darva osmiummalm vid smedjan och Mekaniker Gizzel lagerhåller glyfstålsbarrar vid verktygsverkstan, till ett pris som gör insamlingsvänner billiga i jämförelse.',
   'guide.profPages.craftProse.weaponcrafting.ladderHeading': 'Stegen, steg för steg',
   'guide.profPages.craftProse.weaponcrafting.ladderBody':
     'Ett fältrecept, Östbäcks armérsvärd, är känt för alla från start och tillverkas var som helst från jaktbyten (ett par varghuggare och benfragment) plus sex Smidesfluss från smedjadisken. Den riktiga stegen är nio tränarrecept i tre steg, alla smedjebundna: kopparsteget (skäggig yxa, flänsad klubba, vildsvinsspjut) är gratis att lära vid skicklighet 0, järnsteget (långsvärd, stridshammare, dolk) öppnar vid skicklighet 25 för 25 silver per recept och osmiumsteget (krigsklinga, krigsyxa, stridsklubba) öppnar vid skicklighet 50 för 1 guld var. Darva lär ut ett recept i det ögonblick din nivå i hantverket når det egna, så varje steg låses upp exakt när dess skicklighetsband börjar.\n\nYtterligare ett recept rider på paret: Gravmaskvantskar, ett tränarlärt kombinationsstycke som bara en anpassad Smed med både Vapensmide och Rustningssmide på skicklighet 25 kan tillverka, och det kräver ingen station alls.',
   'guide.profPages.craftProse.weaponcrafting.routeHeading':
     'Mästerverk, och en fungerande väg till 125',
-  'guide.profPages.craftProse.weaponcrafting.routeBody':
-    'Alla pjäser med en riktig statrad, vilket på den här stegen betyder järnsteget och uppåt, kan komma från städet som mästerverk; de statslösa kopparvanligheterna processar aldrig, eftersom det inte finns något i dem att förbättra. Järn räknas som ett nivå 1-material för mästerverksbonus, högtall och glyfstål som nivå 2, så det översta steget processar lite oftare.\n\nRid kopparsteget till 25, träna järnsteget den dag det öppnas och rid det till 50, sedan osmiumsteget till 75. Förbi 75 skickas inget högre än, så osmiumrecepten bleknar till halv och sedan kvarts vinst: planera ungefär 150 fler hantverk för att nå taket på 125, och kom ihåg den delade begränsningen på tio hantverksåtgärder per minut när du sätter dig ner för att masshantvera.\n\nFinansiera klättringen allt efter: Darvas smedjearbetsorder tar åtta kopparmalm ur dina händer var 30:e minut mot lite mynt och erfarenhet, och järn- och osmiumstegen säljer ärligt till nivåanpassade närstridare. Bedrifternas bok markerar Egg och Härdning vid skicklighet 50 och kröner Stormästare i Vapensmide vid 125.',
   'guide.profPages.craftProse.armorcrafting.identityHeading': 'Ringbrynja för frontlinjen',
-  'guide.profPages.craftProse.armorcrafting.identityBody':
-    'Rustningssmidet stegen liknar en soldats karriär: de enkla nitade kopparskärpet, sabatonerna och handskarna i början, järnlänkhauberk, benskydd och axelplåtar med sina första riktiga egenskapsrader, och det sällsynta osmiumfjällsstorhjalmet, bröstpansaret och benen, Styrka- och Uthållighetspjäser med de största rustningstalen en hantverkare kan göra.\n\nDet har också en tystare sida: Östbäcks skyddade benskydd, ett kastetableringsfältvanligt, och Ugnsfjällets mantel, en sällsynt Intelligens- och Andebrynjeskuldra vid skicklighet 75, håller de trollsynta ringbrynjebärarna på kundlistan. På hjulet sitter det mellan Vapensmide och Ingenjörskonst; Smith-paret med Vapensmide svurs inför Smedmästare Darva, medan Kugghjulsbyggar-paret med Ingenjörskonst är namngivet men saknar ännu ett löfteuppdrag.',
   'guide.profPages.craftProse.armorcrafting.materialsHeading': 'Malm i säcktals',
-  'guide.profPages.craftProse.armorcrafting.materialsBody':
-    'Inget hantverk förbrukar malm snabbare. Järnlänkhauberken kräver ensam fem järnmalm och varje osmiumfjällpjäs vill ha tre eller fyra osmium plus en glyfstålsbar, så en seriös rustningssmed bryter malm i Mirefen-träsket och Törntoppshöjderna eller betalar någon som gör det. Koppar föder det första steget, direkt från ådrorna vid Koppargropen.\n\nRunt metallen går de mjuka delarna: grovt skinn skördat från varg- och vildsvinskroppar, benfragment och linflikar från vanlig jakt och en burk Smidesfluss (20 koppar vid smedjan) i nästan varje recept. Darva säljer osmiummalm direkt för den otålige.',
   'guide.profPages.craftProse.armorcrafting.ladderHeading': 'Att lära sig vid Darvas smedja',
-  'guide.profPages.craftProse.armorcrafting.ladderBody':
-    'Två fältvanligheter, Östbäcks ringbrynjekolt och de Skyddade benskydden, är kända från start och kan tillverkas var som helst. Tränarstegen är nio recept i tre steg vid Östbäckssmedjan: kopparsteget är gratis vid skicklighet 0, järnlänksteget kostar 25 silver per recept vid skicklighet 25 och osmiumfjällsteget kostar 1 guld var vid skicklighet 50, med varje steg lärobart i det ögonblick din nivå når den.\n\nBortom stegen sitter två specialfall. Gränstenenshjalmen är kombinationsreceptet för Smed, tränarlärt, stationsfritt och möjligt enbart för en anpassad Smed med båda hantverken på skicklighet 25. Ugnsfjällets mantel kräver ingen lärare alls: alla känner den, men vid skicklighet 75 och smedsbunden är den hantverkets nivå 3-toppstycke.',
   'guide.profPages.craftProse.armorcrafting.routeHeading':
     'Mästerverk, och en fungerande väg till 125',
   'guide.profPages.craftProse.armorcrafting.routeBody':
@@ -142,65 +203,35 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.leatherworking.identityBody':
     'Stegen klättrar från de enkla Fenbroskinnbenskydden, stövlarna och bältet via den ovanliga träskjägarstyvkjorteln, huvan och axelplåtarna till det sällsynta myrväktarsetet, det bästa läder en hantverkare kan skära. Två kastestableringsdelar kompletterar det: Östbäcks Druidhid fältvanligt och Skymningshudlindorna vid skicklighet 75.\n\nPå hjulet sitter det mellan Matlagning och Skrädderi. Dess levande par är Utrustaren, Läderhantverkeri och Skrädderi, svuren inför Vävare Ottilie i Östbäck; Jägareparet med Matlagning är namngivet på hjulet men saknar ännu ett löfteuppdrag.',
   'guide.profPages.craftProse.leatherworking.materialsHeading': 'Jakten är skörden',
-  'guide.profPages.craftProse.leatherworking.materialsBody':
-    'Läderhantverkeri är det hantverk där din levlarrutt och din försörjningslinje är samma sak: grovt skinn skördas direkt från skinntransparanta koppor, vargar och vildsvin framför allt, och varje kropp betjänar bara en skördare, först till kvarn. Ett sällsynt eller bättre skördeslag ger också ett Fint skinn, ett signerat exemplar som Myrväktarstyvkjorteln efterfrågar, så lagra varje du hittar.\n\nBistödet är litet: spindelben och silke, hemspunnet tyg från humanoider, en enda osmiummalm i varje myrväktarsällsynt-pjäs (sex i Skymningshudlindornas toppstycke) och ett Garvmedel för 16 koppar från garveridisken. Garvare Hesk säljer också osmiummalm om du hellre slipper bryta den.',
   'guide.profPages.craftProse.leatherworking.ladderHeading': 'Lärd i Fenbridge',
-  'guide.profPages.craftProse.leatherworking.ladderBody':
-    'Här finns krånglet: garveriet ligger i Fenbridge, på vägen till Mirefen-träsket, vilket gör Läderhantverkeri till det enda djupa hantverket tränat utanför Östbäck. Garvare Hesk lär ut stegen vid sina kar: Fenbroskinnssteget gratis vid skicklighet 0, träskjägarsteget för 25 silver per recept från skicklighet 25 och myrväktarsteget för 1 guld var från skicklighet 50, med varje steg som öppnas när din nivå når det.\n\nTvå recept hoppar över tränaren: fältvanligheter (den Garvade läderstyvkjorteln och Druidhiden) tillverkas var som helst från start, och Skymningshudlindorna är kända av alla men sitter vid skicklighet 75, garveribundna. Notera att Utrustar-löftet i sig svurs tillbaka i Östbäck med Ottilie; bara undervisningen sker i träsket.',
   'guide.profPages.craftProse.leatherworking.routeHeading':
     'Mästerverk, och en fungerande väg till 125',
-  'guide.profPages.craftProse.leatherworking.routeBody':
-    'Från träskjägarsteget och uppåt kan varje hantverk ge mästerverk, och det Fina skinnet i en Myrväktarstyvkjortel ger den signerade-reagens-bonusen automatiskt; osmium räknas som ett nivå 1-material för procen. De statslösa skinnvanligheter kan inte procca.\n\nLeva upp det på naturlig väg: skörda varje varg och vildsvin du dödar från nivå ett, tillverka skinnsteget till 25 var du än befinner dig, träna sedan i Fenbridge när uppdragen ändå drar dig in i träsket. Träskjägare bär dig till 50 och myrväktare till 75; efter det ger Skymningshudlindorna, ett nivå 3-recept på sex osmiummalm, tre Fina skinn, två grova skinn och ett Garvmedel, full vinst till 99 och hälften därefter, ungefär 75 tillverkningar för de sista femtio poängen till 125-taket.\n\nDet mobila garveriet spelar större roll för detta hantverk än något annat: specialisera vid 75 och en väskfull skinn förvandlas till färdig utrustning vid lägerelden i stället för en promenad tillbaka till Fenbridge. Hesks garveri-arbetsorder köper åtta grova skinn var 30:e minut, en snygg avkastning på skinn du samlade ändå, och Bedrifternas bok markerar Garvarens handel vid skicklighet 50 med Stormästare i Läderhantverkeri vid taket.',
   'guide.profPages.craftProse.cooking.identityHeading': 'Grytan som mättar sällskapet',
-  'guide.profPages.craftProse.cooking.identityBody':
-    'Ät en tillagad måltid och den läker dig under 18 sekunder av vila, vilket mellan dragningar är den billigaste läkning i spelet. Stegen sträcker sig från en Pannstekt flodabborre med 90 hälsa hela vägen till Marlows Storläckra stek på 980, den största sittläkning som finns.\n\nPå hjulet sitter Matlagning mellan Alkemi och Läderhantverkeri. Dess levande par är Apotekaren, Alkemi och Matlagning, svuren inför Kock Marlow vid Östbäcks kök efter att ha jatat fyra vilda vildsvin till grytan; Jägareparet med Läderhantverkeri är namngivet på hjulet men saknar ännu ett löfteuppdrag.',
   'guide.profPages.craftProse.cooking.materialsHeading': 'Ett skafferi fött av spö och kniv',
-  'guide.profPages.craftProse.cooking.materialsBody':
-    'Fiske förser med signaturitygredrienserna, zon för zon: spegelöring och flodabborre från Östbäcksdalens vatten, träskgädda och sumpål från Mirefen-träsket, frostgälöring och skiferfenadde karpar från Törntoppshöjderna. Varje steg på stegen lagar fisken från sin nivå, så en kock som fiskar tar aldrig slut.\n\nKöttdelen kommer från skördade kroppar: viltkött från vildsvin och deras fränder, och vid ett sällsynt eller bättre skördeslag ett signerat Primärsnitt, mittpunkten i den storläckra steken. Örter kryddar de bättre rätterna, en askträstock röker ålen och Matlagningssalt kostar 8 koppar per påse från Marlows eget stånd.',
   'guide.profPages.craftProse.cooking.ladderHeading': 'Från rimkött till den storläckra steken',
   'guide.profPages.craftProse.cooking.ladderBody':
-    'Saltat rimkött är fältreceptet: känt från start, ett spindelben, tillverkbart var som helst, stigensmaten för varje ny äventyrare. Tränarstegen lagar mat vid Östbäcks kök på västra sidan av torget: det gratis steget vid skicklighet 0 (abborre, Jägarspett, Örtkryddad träskgädda), mellansteget vid skicklighet 25 för 25 silver per recept (Askträrökt ål, Guldbladsviltgryta, Frostgälschowder) och det sällsynta steget vid skicklighet 50 för 1 guld var (Silverkarpmiddag, Fiskarens festfat, Marlows Storläckra stek).\n\nBatchrätterna stretchar ingredienserna: den rökta ålen och viltsoppan ger två portioner per hantverk och festfatet ger tre. Marlow lär ut varje steg i det ögonblick din nivå i Matlagning når det.',
+    'Saltat rimkött är fältreceptet: känt från start, ett spindelben, tillverkbart var som helst, stigensmaten för varje ny äventyrare. Tränarstegen lagar mat vid Östbäcks kök på östra sidan av torget: det gratis steget vid skicklighet 0 (abborre, Jägarspett, Örtkryddad träskgädda), mellansteget vid skicklighet 25 för 25 silver per recept (Askträrökt ål, Guldbladsviltgryta, Frostgälschowder) och det sällsynta steget vid skicklighet 50 för 1 guld var (Silverkarpmiddag, Fiskarens festfat, Marlows Storläckra stek).\n\nBatchrätterna stretchar ingredienserna: den rökta ålen och viltsoppan ger två portioner per hantverk och festfatet ger tre. Marlow lär ut varje steg i det ögonblick din nivå i Matlagning når det.',
   'guide.profPages.craftProse.cooking.routeHeading':
     'Specialisering, inte mästerverk, och vägen till 125',
   'guide.profPages.craftProse.cooking.routeBody':
     'Matlagning är det ärliga undantaget i mästverksberättelsen: en måltid saknar egenskapsrad att förbättra, så rätter ger aldrig mästerverk, och ingen kock bör jaga det. Hantverkets mästerskap är specialisering vid 75: en femtedel färre av varje ingrediens, vilket multipliceras snabbt på batchrätter, och ett mobilt fältkök så att festen tillagas vid fängelsehåledörren.\n\nLaga det du fångar: para klättringen med en fiskesession och de två skickligheterna matar varandra hela vägen upp. Rimkött och det gratis steget bär dig till 25 med ett poäng per hantverk, mellansteget till 50 och det sällsynta steget till 75; efter 75 finns inga högre rätter ännu, så de sällsynta rätterna avtar till halv och sedan kvart vinst, ungefär 150 fler tillverkningar till taket. Behandla det som att lagra, inte slipa: ett gille äter varje portion.\n\nMarlows köks arbetsorder köper åtta viltkött var 30:e minut för mynt och XP, och Bedrifternas bok markerar Kryddad kock vid skicklighet 50 på vägen till titeln Stormästare i Matlagning vid 125.',
   'guide.profPages.craftProse.alchemy.identityHeading': 'Flaskor som avgör strider',
-  'guide.profPages.craftProse.alchemy.identityBody':
-    'Hantverket utövas vid apoteket i Highwatch, hem för Alkemisten Verane, Mästare i apoteket, som lär ut receptstegen, säljer Glasflaskor för 12 koppar och betalar mynt för örter via sin arbetsorder.\n\nPå hantverkshjulet sitter Alkemi med de försök-och-misslyckas-yrkena, bredvid Ingenjörskonst på ena sidan och Matlagning på den andra. Det ger det två paridentiteter: Bombardören (Ingenjörskonst och Alkemi, svuren inför Mekaniker Gizzel i Östbäck) och Apotekaren (Alkemi och Matlagning, svuren inför Kock Marlow). Anpassa dig till något av paren för att göra Alkemi till ett huvudyrke och öppna skickligheten hela vägen till sitt tak; tills dess fungerar det till sällsynt nivå som vilket odeklarerat hantverk som helst.',
   'guide.profPages.craftProse.alchemy.materialsHeading': 'Örter, körtlar och glas',
   'guide.profPages.craftProse.alchemy.materialsBody':
     'Varje dryck kräver en Glasflaska plus örter matchade till sitt steg: skimmerblad växer i Östbäcksdalen, guldblad i Mirefensumparna och solkronblad i Törntoppshöjderna, en ört per zon, så dina flaskor klättrar med världen vid din sida. Örtkunskap är den naturliga partnerfärdigheten, men att köpa från insamlare eller på marknaden fungerar lika bra; djupare zoner innehåller högre nivåfläckar som kräver en bättre skära, så håll verktyget aktuellt om du plockar själv.\n\nElixirlinjen lägger till en jägaringrediens: Giftkörtlar skördade från giftiga kroppar, och topperxiret kräver en Ren giftkortel, det signerade sällsynta exemplaret som en lyckad kroppsskörd kan ge. Har du inte egna skördar är det precis de varor det är värt att be en jägarvän ta med sig tillbaka.',
   'guide.profPages.craftProse.alchemy.ladderHeading': 'Receptstegen',
-  'guide.profPages.craftProse.alchemy.ladderBody':
-    'Alla känner till den Lilla läkedrycken från start och kan blanda den var som helst, ingen station behövs. Den riktiga stegen är nio recept som lärs ut av Verane vid apoteket, tre per steg: skicklighet 0-recepten är gratis, skicklighet 25-steget kostar 25 silver per recept och skicklighet 50-steget kostar 1 guld per recept. Varje steg är en läkedryck, en manadryck och ett uthållighetselixir, som klättrar från vanliga skimmerbladflaskor (120 hälsa, 160 mana) via ovanliga guldbladflaskor (200 hälsa, 260 mana) till sällsynta solkronbladflaskor (280 hälsa, 360 mana).\n\nElixiren klättrar på samma sätt: Vildsvinsens elixir ger 6 Uthållighet i 10 minuter, Gifteldselixiret 9 i 15 minuter och Ormens elixir 12 i 15 minuter, och brygger två flaskor per hantverk. Ytterligare ett recept sitter avsides: Björnens elixir, ett kombinationsbrygg som Verane lär ut för 25 silver när din Alkemi nått 25, blandbart var som helst, men enbart av en anpassad Bombardör med både Alkemi och Ingenjörskonst på 25.',
   'guide.profPages.craftProse.alchemy.routeHeading': 'En bryggares väg till 125',
-  'guide.profPages.craftProse.alchemy.routeBody':
-    'Drycker och elixir får aldrig mästerverk; den procen tillhör utrustning med egenskaper. Ditt namn reser dock med dem: de sällsynta solkronbladdryckerna bryggs en flaska i taget och levereras signerade med ett tillverkarmärke, medan den dubbelbatchade Ormens elixir förblir anonym. Vid skicklighet 75 specialiserar du dig och varje Alkemirecept kostar 20 procent färre material från och med då.\n\nTa Örtkunskap tidigt och plocka allteftersom du levlar: skimmerblad finns överallt i Dalen, och när du väl når Veranes bänk bär den gratis rungan dig smidigt till skicklighet 25 på örter du ändå hade plockat. Lär dig 25-rungan i samma stund den öppnas, flytta ditt plockande till träsket för guldblad och låt Veranes arbetsorder (sex Guldbladörter för 45 koppar, upprepningsbar var 30:e minut) ge lite mynt tillbaka på vägen.\n\nFrån 50 och uppåt, brygger du solkronbladdrycker och Ormbatchar av Törntoppsörter. Den sista sträckan från 100 till 125 är ett avsiktligt droppande, så brygger det som faktiskt säljer i stället för att bränna örter för siffran, och kom ihåg att förbrukningsvaror är den enda tillverkade varan alla köper om och om igen för alltid. Bedrifternas bok markerar Konstiga brygder vid skicklighet 50 och Stormästare i Alkemi vid taket.',
   'guide.profPages.craftProse.engineering.identityHeading': 'Verktygsmakarens monopol',
-  'guide.profPages.craftProse.engineering.identityBody':
-    'Hantverket utövas vid verktygsverkstan i sydöstra hörnet av Östbäckstorget, hem för Mekaniker Gizzel, Mästare i Verktygsverkstan. Nivå 1 till 3 av varje verktygslinje är vanliga handlarstockar; nivå 4 och 5 finns bara via en ingenjör.\n\nPå hjulet sitter det med försök-och-misslyckas-yrkena, bredvid Alkemi och Rustningssmide, vilket ger det två paridentiteter: Bombardören (Ingenjörskonst och Alkemi, svuren inför Gizzel själv) och Kugghjulsbyggaren (Rustningssmide och Ingenjörskonst, namngivet men ännu inte svärbart). En varning är viktigare här än någon annanstans: båda av Ingenjörskonstens receptsteg sitter ovan sällsynt-nivå-taket som hobbyn och odeklarerade hantverkare arbetar under, så skicklighetspoäng rör sig bara för en hantverkare vars huvudyrken inkluderar Ingenjörskonst, vilket idag innebär Bombardören. Vem som helst kan fortfarande bygga verktygen; en icke-anpassad hantverkare lär sig bara ingenting av att göra det.',
   'guide.profPages.craftProse.engineering.materialsHeading': 'Reagenser och tidigare verktyg',
-  'guide.profPages.craftProse.engineering.materialsBody':
-    'Varje verktygrecept förbrukar verktyget en nivå under sig plus ett premiumaterial: fyra Osmiummalm och en Himmelssilver-hacka blir Osmiumhackan, sedan två Glyfstålsbarrar och den osmiumhackan ger Glyfstålshackan, och yxan och skäran speglar samma form med Askträds- och Högtallsstockar, Guldblads- och Solkronbladsörter.\n\nGizzel lagrar alla sex premiumreagenser vid verktygsverkstan om du vill ha fart över marginal, men malmen, stockarna och örterna är alla insamlingsbara i Mirefen-träsket och Törntoppshöjderna, och insamlad lagerstatus är där vinsten finns. Det enda undantaget är Glyfstålsbaren, som bara finns hos handlare, så varje glyfstålsverktyg har ett fast myntgolv inbyggt i sin kostnad.',
   'guide.profPages.craftProse.engineering.ladderHeading': 'Verktygssteget',
-  'guide.profPages.craftProse.engineering.ladderBody':
-    'Hela stegen består av sex recept, alla bundna till verktygsverkstationsstationen och alla kända automatiskt, aldrig någon tränareavgift: nivå 4-hacka, yxa och skära vid skicklighet 75 och nivå 5-versionerna vid skicklighet 150. Det andra numret är inget skrivfel och sitter medvetet ovanför det nuvarande 125-taket: skicklighetspoäng blockerar aldrig ett hantverk här, de formar bara skicklighetsvinsten, så du kan bygga ett nivå 5-verktyg den dag du har dess reagenser och föregångaren.\n\nVarje färdigt verktyg är av sällsynt eller episk kvalitet och levereras signerat, så ditt namn reser med zonerna på andra spelares verktygsremmor. Ingenjörskonst bär också upp halvan av ett kombinationsrecept: Björnens elixir, bryggt av en anpassad Bombardör med både Ingenjörskonst och Alkemi på 25.',
   'guide.profPages.craftProse.engineering.routeHeading': 'En ingenjörs väg till 125',
   'guide.profPages.craftProse.engineering.routeBody':
     'Verktyg bär inga stridegenskaper, så de ger aldrig mästerverk; den procen tillhör utrustning med egenskaper. Specialisering landar fortfarande vid skicklighet 75: 20 procent färre material per hantverk och ett tillfälligt fältverktygsverkstan som förvandlar varje insamlingstur till ett verkstad. Vinst-matematiken avtar knappt här: skicklighet 75-recepten ger full vinst till 100 och hälften därefter, och skicklighet 150-recepten ger full vinst hela vägen till 125-taket, så den verkliga begränsningen är reagenser och mynt, aldrig grå recept.\n\nVälj ditt par först, för ingenting rör sig utan det: ta Bombardörsanpassningen från Mekaniker Gizzel. Mata sedan stegen: leva upp Gruvdrift, Skogsavverkning eller Örtkunskap själv eller befrienda insamlare, köp nivå 3-verktygen hos handlare och behandla Gizzels arbetsorder (åtta Järnbarkstockar för 16 koppar, upprepningsbar var 30:e minut) som fickpengar.\n\nIngenjörskonst är en lågvolym prestigehandel, ungefär en skicklighetspoäng per färdigt verktyg, så behandla varje hantverk som lager för försäljning. Pitchen till dina kunder skriver sig själv: varje verktygsivå ovanför en fyndplats egna nivå trimmar 0,4 sekunder av de 2,5 sekunder långa skördekanaliseringen (ner till ett 1,5 sekunders golv), så ett nivå 5-verktyg är en hastighetsuppgradering vid varje fyndplats i världen och bara du kan tillverka ett. Bedrifternas bok markerar Kugghjul och Fjädrar vid skicklighet 50 och Stormästare i Ingenjörskonst vid 125.',
   'guide.profPages.craftProse.enchanting.identityHeading': 'Utrustning isär, kraften tillbaka',
-  'guide.profPages.craftProse.enchanting.identityBody':
-    'Ingen station, ingen tränare och ingen receptlista att köpa: varje förtrollning är känd från start, vem som helst kan sönderförtolla från dag ett och skickligheten når sitt tak vid 125 som alla andra hantverk.\n\nPå hjulet sitter det mellan Inskription och Juveleringskonst, så dess två paridentiteter är Arkanisten (Inskription och Förtrollning) och Stenbindaren (Förtrollning och Juveleringskonst). Inget av dem kan sväras ännu, eftersom båda grannyrken avvaktar sina första recept, så idag klättrar Förtrollning som allas hantverk: gratis till sällsynt nivå innan något löfte, och ett naturligt hobbyvälj för en Bombardör eller en Apotekare. Förtrollare håller också insamlingsvärlden i gång: de tre slottbara verktygseffekterna är Förtrollningsarbete, och en ursprunglig hantverkare laddar om sina egna effekter till rabatt, djupare ännu vid specialisering.',
   'guide.profPages.craftProse.enchanting.levelingHeading': 'Hur förtrollning levlar',
-  'guide.profPages.craftProse.enchanting.levelingBody':
-    'Två handlingar höjer skickligheten: att sönderförtolla en pjäs och att applicera en förtrollning. Varje framgång är värd upp till ett poäng, skalat efter hur seriöst arbetet är: sällsyntheten på pjäsen du bryter, eller reagensnivån på förtrollningen du applicerar. Vanliga sönderförtrollningar och enbart-stoft-förtrollningar räknas som vanligt arbete; ovanliga sönderförtrollningar och essensförtrollningar som ovanliga; sällsynta sönderförtrollningar och alla Runiska eller Stora förtrollningar som sällsynta; episka och legendariska sönderförtrollningar ännu högre.\n\nDen välkända mästerskapsavmattningen gäller på 25-poängsnivåer, så vanliggradig arbete grå ut vid skicklighet 75, ovanligt arbete vid 100 och sällsyntnivå-arbete exakt vid 125-taket. Förtrollning har också en egen välgärenhet: indata över ditt arketyptak avrundas ner till det taket i stället för att nollsättas, så innan du anpassar dig ger en episk sönderförtrollning bara poäng som sällsynt i stället för att lära ut ingenting. Hamnar Förtrollning vilande bakom en annan identitet räknas allt som vanligt arbete och klättringen stannar vid 75; håll det som din hobby och sällsyntnivå-arbete ger fortfarande utdelning, bara långsammare förbi 75.',
   'guide.profPages.craftProse.enchanting.marketHeading':
     'Förtrollade kopior, ursprung och marknaden',
-  'guide.profPages.craftProse.enchanting.marketBody':
-    'Att applicera en förtrollning förbrukar reagenserna och markerar en specifik kopia av föremålet. Riktar du den mot en kopia i väskan får du tillbaka en distinkt förtrollad kopia; riktar du den mot en pjäs du redan bär förtrollas den på plats, utan att ta av och sätta på igen. Hur som helst följer bonusen pjäsen för evigt, genom avutrustning, bankturer och handlar. En förtrollning per pjäs: att lägga en annan förtrollning på en förtrollad kopia ber först om bekräftelse och ersätter sedan den gamla förtrollningen direkt; den förstörs utan att materialen återbetalas. Att sälja, kassera och sönderförtolla föredrar alla vanliga kopior först, så din färdiga pjäs råkar inte bli äten av misstag. Identiskt förtrollade kopior kan till och med staplas ihop i dina väskor.\n\nMästverksutrusting och förtrollning är vänner: en mästerverkspjäs förblir fullt förtrollningsbar och förtrollningen adderas ovanpå mästverksbonus utan att störa den eller tillverkarens signatur. Staplar man varje källa är ett signerat mästerverk med en Stor förtrollning det bästa en tillverkad pjäs kan bli, och den sitter ändå under raidloot av design.\n\nPå marknaden hanterar Världsmarknadens mäklare bara omodifierat standardlager, så förtrollade och signerade pjäser byter ägare öga mot öga genom handelsfönstret i stället. Materialen är den marknadsmässiga halvan av hantverket: Stoft, Essens och Skärvor listas fritt, listning kostar ingenting och Köpmannen tar 5 procent av en fullföljd försäljning. Det ger de två klassiska förtrollareinkomsterna: att sälja material på marknaden och att ta en kunds pjäs i handel, förtjana den och lämna tillbaka den.',
   'guide.profPages.howHeading': 'Hur hantverkande fungerar',
-  'guide.profPages.howBody':
-    'Öppna hantverksfönstret (standardtangent T) och alla recept du kan listas med vad de kräver och vad du har till hands. Stationsbundna recept kräver att du står inom 20 yard från rätt station i staden, fältrecept hantveras var som helst, och Förtrollning behöver aldrig en station alls. Det finns inget misslyckandekast: ett hantverk med materialen till hands lyckas alltid.\n\nTvå små friktioner håller ekonomin ärlig. Varje lyckat hantverk betalar en avgift på 2 koppar per poäng av föremålets statistikbudget, och hantverkstypsåtgärder delar ett tempo: högst 10 hantverk, avförtrollningar, förtrollningar eller demonteringar under valfria 60 sekunder. Inget av detta stör en normal session; båda stoppar en maximerad specialist från att översvämma marknaden.',
   'guide.profPages.recipesHeading': 'Recept',
   'guide.profPages.recipesNote':
     'Varje recept i hantverket: dess exakta skicklighetskrav och material, var det lärs ut och för vilken avgift, och de tre skicklighetsvärdena där dess vinst bleknar till hälften, en fjärdedel och ingenting.',
@@ -208,11 +239,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.masteryBody':
     'Varje recept i fönstret bär sitt vinsttillstånd i de klassiska färgerna: orange betyder full vinst, gul hälften, grön en fjärdedel, grå ingenting. Gränserna är exakta, var {step}:e skicklighetspoäng är en nivå, och ett recept bleknar en färg för varje nivå det faller under din.\n\nEftersom vinster är deterministiska (ett fullvinsthantverk rör dig alltid exakt en poäng) kan du planera en hel klättring från listan: arbeta ett steg medan det är orange, träna nästa steg när det blir gult, och slösa aldrig material på ett grått hantverk i hopp om framsteg. Vid taket på {cap} stannar siffran, men recepten, mästerverksrisken och vinsterna fortsätter att fungera.',
   'guide.profPages.masterworkHeading': 'Mästerverk',
-  'guide.profPages.masterworkBody':
-    'Varje lyckat hantverk är exakt vad receptet lovar, och ibland lite till: ett mästerverk färdigställer samma föremål en kvalitetsnivå finare, med bonusstatistiken inbakad vid hanteringstillfället. Det är additivt, aldrig en nedgradering, och det håller sig under raidgolvet, så hantverskgods kan vara utmärkt utan att ersätta ett raidrop.\n\nChansen är publicerad, inte mystisk: {base}% bas, plus {perTier}% per nivå din skicklighet sitter över receptet, plus {signed}% när ett signerat reagensämne går in, plus {spec}% när du väl är specialiserad, med material av högre nivå som lägger till 1 till 2% till, allt begränsat till {cap}%. Bara ett föremål med riktig statistik kan förbättras, så statistiklösa vanliga föremål, verktyg och förbrukningsvaror genererar aldrig ett; ett vilande hantverk producerar aldrig ett, och ett hobbyhantverk kan inte skapa mästerverk utöver sitt sällsynttak.\n\nFint arbete bär sin tillverkare. Sällsynta och bättre enkopieresultat är signerade (Tillverkad av; insamlade material bär Samlat av), ett mästerverk är alltid signerat oavsett kvalitet, och identiskt signerade föremål staplas ändå. En signatur är ursprungsbevis, inte ett lås: signerade varor handlas fritt.',
   'guide.profPages.trainingHeading': 'Träning',
-  'guide.profPages.trainingBody':
-    'Tränarrecept kommer från de stationerade mästarna, lärda vid deras stationer. Regeln är en rad: en mästare lär ut ett recept när din nivå i hantverket har nått receptets egna nivå, och ingenting annat spärrar det, varken din nivå eller din arketyp. Tränarstegen sitter vid skicklighet 0, 25 och 50 idag, så ett nytt steg öppnas med varje nivå du klättrar.\n\nAvgifter är engångs och fasta per steg: startsteget är gratis, skicklighet 25-steget kostar {tier1} per recept, och skicklighet 50-steget kostar {tier2}. Du måste stå vid mästarens faktiska station för att träna, och en mobil station räknas aldrig. De vanliga fältrecepten och verktygerecepten behöver ingen träning alls; varje karaktär kan dem från start.',
   'guide.profPages.specializationHeading': 'Specialisering',
   'guide.profPages.specializationBody':
     'Vid skicklighet {at} specialiserar detta hantverk dig, inget uppdrag behövs: recept kostar {pct}% färre material från och med då, och specialiseringen lägger till en egen höjning av mästerverksrisken.\n\nSpecialister lär sig också att ta verkstaden med sig: en specialiserad hantverkare kan sätta upp en mobil station i fält i tio minuter åt gången, så att stationsbundna recept kan utföras vid gruventrén istället för tillbaka i staden. Dess gränser är avsiktliga: den räknas aldrig för träning hos en mästare eller för att lösa upp ett beställt föremål, och den löper ut vid sin timer oavsett om du använde den.',
@@ -226,8 +253,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.ench.meleeWeapons': 'Narstridsvapen',
   'guide.profPages.ench.timberWeapons': 'Stavar, trollstaVar, bagor, och armborstar',
   'guide.profPages.ench.enchantsHeading': 'Förtrollningar',
-  'guide.profPages.ench.enchantsNote':
-    'Förtrollningar finns i tre nivåer. Basnivån körs på Klingdamm (med lite Essens på den höga sidan) och täcker vapensplatsen plus varje rustningsplats, med tillräckligt med stategenskapsalternativ att varje byggnad hittar något för varje plats. Den Högre nivån kostar en Klingskarva plus Essens och är den enda saken Skärvor är till för: starkare bonusar på de mest inflytelserika platserna.\n\nMellan dem sitter de fem Runristade förtrollningarna, en konsument per typad sekundär, så inget du maler är någonsin en återvändsgränd: Runristad Egg (vapen, Styrka, konsumerar Resonant Stål), Runristad Fokus (vapen, Intelligens, Resonant Timmer), Runvävning (bröst, Ande, Resonant Tråd), Runristat Skinn (ben, Rörlighet, Resonant Skinn) och Runristade Länkpjäser (hjälm, Härdighet, Resonant Länkpjäser). Var och en tar också två Klingessens och placerar sig mellan sina bas- och Högre-syskon i styrka; de exakta bonusarna finns alla i tabellen nedan.',
   'guide.profPages.ench.colEnchant': 'Förtrollning',
   'guide.profPages.ench.colSlot': 'Plats',
   'guide.profPages.ench.colTier': 'Nivå',
@@ -239,42 +264,23 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.ench.salvageNote':
     'Bärgning är vanliga människans kusin till avförtrollning: samma vapen och rustning, ingen skicklighet krävs och ingen vinns, och returnerar vanligt hantverksskrot efter kvalitet i stället för något arkaniskt. Vem som helst kan göra det, förtrollare eller ej. När du håller en pjäs värd att bryta är valet enkelt: från sällsynt och uppåt är avförtrollning strikt det bättre alternativet, medan båda avkastningarna vid vanlig säljer för ungefär det samma till handlare, så bryt mot det material du faktiskt behöver.',
   'guide.profPages.ench.bonusFmt': '+{value} {stat}',
-  'guide.profPages.gatherIntro.mining':
-    'Gruvdrift bryter malm direkt ur världens berg: koppar i Östbäcksdalen, järn i Dykärrsträsket och osmium uppe i Törntoppshöjderna, mat till smedjeyrken. Öppet för alla från nivå 1: allt som krävs är en gruvhacka i väskorna, 20 koppar i vilken huvudort som helst. Spårat på en egen räknare till ett tak på 100.',
-  'guide.profPages.gatherIntro.logging':
-    'Skogsavverkning fäller timmer från trädbestånd i alla tre zoner: järnbark i Östbäcksdalen, askved i Dykärrsträsket och högtall i Törntoppshöjderna, råvaran till skaft, stavar och ingenjörsbänken. Öppet för alla från nivå 1 med en skogsavverkningsyxa i väskorna (20 koppar i vilken huvudort som helst), spårat på en egen räknare till ett tak på 100.',
-  'guide.profPages.gatherIntro.herbalism':
-    'Örtkunskap samlar det som växer vilt: skimmerblad i Östbäcksdalen, guldblad i Dykärrsträsket och solkronblad i Törntoppshöjderna, blad och stjälk som håller apotekyrkena bubblande. Öppet för alla från nivå 1 med en örtinsamlingsskära i väskorna (20 koppar i vilken huvudort som helst), spårat på en egen räknare till ett tak på 100.',
-  'guide.profPages.gatherIntro.fishing':
-    'Fiske är det udda av insamlingsyrkena, och det djupaste: ett riktigt napp-och-rulle-minispel, egna fångsttabeller i varje zon, och ett skicklighetstak på 200, dubbelt mot de andra. Köp ett spö, vett mot öppet vatten och kasta.',
   'guide.profPages.rhythmHeading': 'Insamlingsrytmen',
-  'guide.profPages.rhythmBody':
-    'En skörd är ett kort synligt kast, inte ett omedelbart tag: {base} sekunder bas, aldrig under ett {floor} sekunder golv. Att äga ett verktyg över nodens nivå snabbar upp dig med {tool} sekunder per nivå över den, och varje skicklighetsband du passerar klipper ytterligare {band} sekunder; att bara matcha nodens nivå ger dig tillträde, det är nivåerna över den som gör dig snabb.\n\nEn full väska avböjer artigt kastet innan det börjar, så ingenting slösas mitt i svingen, och varje skörd ger en liten skiva av karaktär-XP, skalad av nodens nivå mot din egen på samma sätt som dräp-XP skalas: en trivial grå nod lär en maxad karaktär ingenting.',
-  'guide.profPages.gainBody':
-    'Vinsten är deterministisk, aldrig ett skicklighetsroll: en nod på eller över din vinstnivå ger en hel poäng per skörd, och var {step}:e skicklighetspoäng är en nivå poängsatt mot noden. Nivå 1-noder betalar fullt under 25, hälften till 49, en fjärdedel till 74, och ingenting från 75 och uppåt; nivå 2-noder betalar fullt till 49; den enda nivå 3-noden betalar fullt till 74 och hälften ända upp till taket på {cap}.\n\nDen tänkta vägen är enkel: lär dig på startnoderna i Dalen, flytta till kärret och avsluta klättringen på höglandet i Törntoppens höjder. Vid taket upphör lärandet men skördarna gör det inte: en skördare vid taket fortsätter dra ut material av maximal kvalitet för alltid.',
   'guide.profPages.nodesHeading': 'Noder per zon',
   'guide.profPages.nodesNote':
     'Var noderna finns, deras nivå, vilket verktyg de behöver och vad de ger. Varje nod återspawnar för dig {respawn} sekunder efter din egen skörd, och den timern är din ensam: en annan skördare som arbetar samma nod fördröjer aldrig din, så det finns ingen nodkapplöpning och ingen campning. Varje zon uppåt i stegen ger ett bättre material från tuffare mark.',
   'guide.profPages.toolsHeading': 'Verktyg',
-  'guide.profPages.toolsNote':
-    'Varje nod kräver sitt yrkes verktyg i dina väskor, nivå 1 inräknat: ingen hacka, ingen malm, och inget spö, ingen fisk. Handlarens stege täcker nivå 1 till 3 och finns i lager i varje huvudort; ett verktyg behöver bara vara i dina väskor, det finns ingen utrustningsplats och ingen hållbarhet, så vart och ett är ett engångsköp. Bara nivån spelar roll för spärren: ett verktygs sällsynthetsfärg är kosmetisk.\n\nÖver handlarstegen sitter två tillverkade verktyg, nivå 4 och nivå 5, tillverkade vid verkstaden av ingenjörer och aldrig sålda av någon NPC. Ingen nod idag kräver mer än nivå 3, så deras värde just nu är hastighet: ett toppverktyg låser kastet vid sitt golv på lägre noder, och det blir entrébiljetten när mark av högre nivå anländer.',
   'guide.profPages.toolCrafted': 'Tillverkad ({craft})',
   'guide.profPages.toolVendor': '{name} ({hub})',
   'guide.profPages.toolUnavailable': 'Säljs inte',
-  'guide.profPages.priceNone': 'Säljs inte',
   'guide.profPages.toolTierReq': 'Nivå {tier}-verktyg',
   'guide.profPages.yieldsHeading': 'Vad en skörd ger',
   'guide.profPages.yieldsBody':
     'Varje skörd rullar en kvalitet för det den ger, och din skicklighet är hela historien bakom det rullet. En helt ny skördare drar alltid vanligt material; varje skicklighetspoäng förskjuter stadigt vikt från vanligt till de högre graderna och aldrig bakåt, tills graden vanlig vid 100-taket försvinner helt: 60 procent ovanligt, 30 procent sällsynt, 8 procent episkt och 2 procent legendariskt, varje gång.\n\nKvalitet innebär också kvantitet: ett vanligt resultat ger 1 enhet, ovanligt och sällsynt ger 2, episkt 3 och legendariskt 4. Varje sällsynt, episk eller legendarisk skörd anländer som en signerad kopia stämplad Samlat av dig: vid taket är det fyra av tio skördar som bär ditt namn, och provenansreglerna på sidan Hantverksekonomi förklarar varför hantverkare betalar extra för just de stackarna.',
   'guide.profPages.bandsHeading': 'Skicklighetsband',
-  'guide.profPages.bandsBody':
-    'Skicklighetsband är den gemensamma 0/100/200-stegen för ett yrkes räknare: varje band du passerar kortar insamlingskanaliseringen, och för fiske väljer banden även ut fångstborden (med ett matchande spö). Landyrkena når sitt tak vid 100, så band 1 är deras tak; bara fiske når band 2.',
   'guide.profPages.bandFmt': 'Band {band}: från {at} skicklighet',
   'guide.profPages.rareHeading': 'Sällsynta fynd',
   'guide.profPages.rareBody':
     'Vid varje skörd, oavsett din skicklighet, finns en chans på 1 av {oneIn} att hitta ett sällsynt fynd: en oskadd åder i malm, urgammalt hjärtved i timmer, en månlyst blomma bland örterna. Fyndet multiplicerar den skördens utbyte {mult} gånger, varje enhet anländer signerad med ditt namn oavsett vilken kvalitet som rullas, och hela zonen hör om det vid namn. Varje smak skriver också in sin egen noll-Ryktbarhetsbedrift i din Bedriftbok, en samlarmarkering som enbart existerar för att bevisa att det hände dig.',
-  'guide.profPages.specimenBody':
-    'Ha lite väskutrymme till hands när du farmar: ett oförväntat fynd behöver lediga platser för att landa signerat, och om ingenting ryms anländer utbytet ändå men signaturen går förlorad. Kadaverskörd har också sin egen jackpot: ungefär {pct}% av kadaveruppskördarna rullar sällsynt eller bättre, signerar utbytet och ger, för specimenfamiljer, ett signerat perfekt specimen.',
   'guide.profPages.gatherDeedsHeading': 'Bedrifter längs vägen',
   'guide.profPages.gatherDeeds.mining':
     'Din första nod i vilket yrke som helst förtjänar Markens frukter, och 100-taket i Gruvdrift skriver in Malm i blodet. Att nå 100 i tre av Gruvdrift, Skogsavverkning, Örtplockning och Fiske lägger till Mästarskördare med 25 Ryktbarhet, och att knäcka en oskadd åder registrerar sin egen samlarmarkering. Inget av detta ger kraft: bedrifter är titlar och Ryktbarhet, ett register över de vägar du vandrat.',
@@ -282,23 +288,13 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Din första nod i vilket yrke som helst förtjänar Markens frukter, och 100-taket i Skogsavverkning skriver in Hjärtvedhuggaren. Att nå 100 i tre av Gruvdrift, Skogsavverkning, Örtplockning och Fiske lägger till Mästarskördare med 25 Ryktbarhet, och ett hugg av urgammalt hjärtved registrerar sin egen samlarmarkering. Bedrifter är titlar och Ryktbarhet enbart, aldrig kraft.',
   'guide.profPages.gatherDeeds.herbalism':
     'Din första nod i vilket yrke som helst förtjänar Markens frukter, och 100-taket i Örtkunskap skriver in Ängens mästare. Att nå 100 i tre av Gruvdrift, Skogsavverkning, Örtkunskap och Fiske lägger till Mästarskördare med 25 Ryktbarhet, och en månlyst blomma registrerar sin egen samlarmarkering. Bedrifter är titlar och Ryktbarhet enbart, aldrig kraft.',
-  'guide.profPages.gatherDeeds.fishing':
-    '100-milstolpen skriver in Gamla saltet och 200 skriver in Mästarfiskaren med dess titel, det allra finaste inom fiskarkonsten; Fiske räknas också mot Mästarskördare, förtjänat vid 100 i tre valfria insamlingsyrken. Den första fisken från varje zons vatten fyller en egen sida, och Solglintens koi registrerar Glimmer av hopp, så resenärer med ett spö i packningen fyller sin bok snabbare än de väntar sig.',
   'guide.profPages.fish.startHeading': 'Kom igång',
-  'guide.profPages.fish.startBody':
-    'Ett enkelt metspö kostar 20 koppar hos Fiskare Brandt i Östbäck (leta efter Gamla saltet som stirrar bistert mot Spegelsjön vid stadens östra kant); Tinker Gizzel, Proviantmästare Hale i Fenbron och Kvartersmästare Bree i Högvakt säljer också spön. Använd spöet medan du vetter mot vatten som är djupt nog att hålla fisk, upp till ungefär 24 yard framför dig, och din kork flyger iväg.\n\nDu kan inte kasta medan du är i strid, medan du simmar eller medan du är död: att kasta från stranden är den avsedda ställningen, och allt fiskbart vatten fungerar, i varje zon.',
   'guide.profPages.fish.biteHeading': 'Napp och indragning',
-  'guide.profPages.fish.biteBody':
-    'Efter kastet anländer ett napp vid ett dolt ögonblick mellan {min} och {max} sekunder; fördröjningen bestäms när linan landas, så inga två kast känns riktigt lika. När flötet nappar har du ett {reel} sekunders fönster att trycka på spöet igen och dra in: drar du in det innan fönstret stänger landar fångsten, tvekar du förbi det och fisken tar sig undan med ingenting att visa upp. En hel session kröner vid {cap} sekunder, så även ett tyst kast avgörs snabbt.\n\nBättre spön skärper båda ändarna av minispelet: varje spönivå över den första trimmar {rod} sekunder från den längsta möjliga väntan och lägger till {reelRod} sekunder till indragnigsfönstret, så Järnrulle drar ner den värsta väntan till 6,5 sekunder med ett 3,75 sekunders indragningsfönster, och Silverbäcken till 5 och 4,5. De snabbaste nappen förändras aldrig oavsett vad du håller, och ett spö behöver bara vara i dina väskor för att räknas.',
   'guide.profPages.fish.scheduleHeading': 'Skicklighetsvinst',
-  'guide.profPages.fish.scheduleNote':
-    'Fiskeskicklighetsvinsten följer ett fast schema utan tärningar: en hel poäng per fångst under 50 skicklighet, en halv poäng under 100, en tiondel under 150, och ett långsamt sipprande på 0,02 från 150 till 200. Den sista sträckan är med avsikt en resa av tusentals fångster: 200 är ett uttalande, inte ett stopp på vägen mot något annat.\n\nSkräp slutar undervisa helt vid {cutoff}: därifrån är ogräs och stövlar bara ogräs och stövlar. Varje landad fångst i övrigt ger vinst enligt schemat, så fiska där du ändå skulle fiska och låt räknaren klättra.',
   'guide.profPages.fish.colProficiency': 'Skicklighet',
   'guide.profPages.fish.colGain': 'Vinst per fångst',
   'guide.profPages.fish.belowFmt': 'Under {below}',
   'guide.profPages.fish.tablesHeading': 'Fångsttabeller',
-  'guide.profPages.fish.tablesNote':
-    'Din skicklighet väljer ett av tre fångstband: band 0 från start, band 1 vid 100, band 2 vid 200, vart och ett skiftar vikt från skräp och tomma krokar till riktig fisk, zon för zon. Varje band över det första kräver också ett spö: band 1 vill ha den nivå 2-rullen Järnrulle, band 2 den nivå 3-rullen Silverbäck. Ditt effektiva band är det lägre av vad din skicklighet förtjänat och vad ditt spö stöder, och taket är tyst: med ett sämre spö fiskar du ändå, men från det lägre bandets tabell, så om dina fångster känns fastlåsta medan skickligheten klättrar, kolla spöet först.\n\nVarje zons vatten håller sitt eget par matfiskar, som helar mer ju djupare zonen är, alla som kokingridiens och alldeles utmärkt mat att äta rå direkt från linan. Resten av tabellen är fiskarens skatt: ogräs, den enstaka stöveln och den tomma kroken, som aldrig helt försvinner. Den {rare} är samma långskott på varje lina, med fasta odds som aldrig förändras med skickligheten, så den nyaste fiskaren på bryggan har samma chans som en Mästarfiskare.',
   'guide.profPages.fish.bandHeading':
     'Skicklighetsband {band}: skicklighet {at} och uppåt, spönivå {rod}',
   'guide.profPages.fish.colCatch': 'Fångst',
@@ -306,8 +302,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.fish.pctFmt': '{pct}%',
   'guide.profPages.fish.emptyHook': 'Ingenting nappar',
   'guide.profPages.fish.koiHeading': 'Solglintens koi',
-  'guide.profPages.fish.koiBody':
-    'Varje vattenkälla i spelet gömmer samma pris: Solglintens koi, en ovanlig glans på linan värd 75 koppar till en handlare och ganska mer för din stolthet. Dess odds är en fast 3 procent per landad fångst (4 procent i Törntoppens kalla vatten) vid varje skicklighetsband, och att landa en registrerar Glimmer av hopp i din Bedriftbok, ett noll-ryktbarhetens samlarmärke. När det händer ser loggen till att du vet om det.',
   'guide.profPages.econ.title': 'Hantverksekonomi',
   'guide.profPages.econ.intro':
     'Hur mynt rör sig genom handlarna: de exakta avgifterna och sänkorna, vad som faktiskt säljer, Världsmarknadens regler, arbetsordrar, bestellningar, och varfor tillverkad styrka stannar under raidgolvet.',
@@ -323,8 +317,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.feeUnbind': 'Upplösningsavgift',
   'guide.profPages.econ.feeUnbindValue': '{uncommon} ovanlig, {rare} sällsynt, {epic} episk',
   'guide.profPages.econ.trainingHeading': 'Träningsavgifter',
-  'guide.profPages.econ.trainingNote':
-    'En fast avgift per receptsteg, debiteras en gang nar en mästare lär ut det; de hogre nivaerna i tabellen väntar pa framtida innehall.',
   'guide.profPages.econ.trainingTierFmt': 'Nivå {tier}: {fee}',
   'guide.profPages.econ.free': 'Gratis',
   'guide.profPages.econ.sellsHeading': 'Vad som säljer, och varfor',
@@ -344,14 +336,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.commissionsBody':
     'En beställning är ett hantverk skapat för någon. När ett vapen, en rustningspjäs eller ett hållet off-hand tillverkas (en dryck kan inte bära en band), kan hantverkaren flagga hantverket som en beställning: det färdiga stycket beter sig normalt i tillverkarens egna händer, men det ögonblick det byter händer i en handel binds det till personen som tog emot det. Det är Tillverkarens Band: köparen får sin pjäs, och pjäsen kan inte lämnas vidare eller säljas.\n\nBand är inte för evigt, bara dyra. En stationsmästare kan lösa upp ett bundet stycke när du står vid deras station (en mobil station erbjuder aldrig den tjänsten), mot en avgift satt av föremålets kvalitet: 25 silver ovanlig, 1 guld sällsynt, 4 guld episk, med en legendarisk som betalar den episka taxan och ett beställt vanligt stycke den ovanliga.\n\nAvgiften köper en ren tavla, inte ett botemedel: stycket är fortfarande en beställning, så det binds igen till vem som tar emot det i nästa handel, och allt annat om det, signatur, mästerverk och förtrollningar, förblir orört.',
   'guide.profPages.econ.provenanceHeading': 'Signerat arbete',
-  'guide.profPages.econ.provenanceBody':
-    'Vissa föremål bär ett namn. Hovra över ett så säger verktygstipset Insamlat av den-och-den på ett råmaterial, eller Tillverkat av den-och-den på en färdig pjäs: samma märke, ordnat för hur föremålet kom till. En signatur är en del av föremålet självt, reser med det genom handel och banken, och bleknar aldrig.\n\nInsamling signerar sitt bästa arbete automatiskt: varje skörd som rullar sällsynt eller bättre anländer signerad, sällsynta fynd signerar hela deras femfaldiga vindfallsskörd, och ett kadaverhärds lyckliga rull signerar dess avkastning, inkluderat orörda exemplar. Tillverkning signerar längs samma linje: en enkopieringautput av sällsynt eller bättre kvalitet präglas signerad, och ett mästerverk signerar alltid, oavsett kvalitet, så den finaste versionen av en pjäs alltid namnger sin tillverkare. Det enda som kan kosta dig en signatur är en full väska: en signerad enhet behöver plats för sig själv, eller en matchande signerad stapel, för att landa i.\n\nEn stapel föremål delar en identitet, så två kopior sammanslås bara när varje märke stämmer exakt: samma föremål, samma signatär, samma mästverksegenskaper, samma förtrollning, samma band. En signerad stock ansluter aldrig till en vanlig hög i någondera riktning (sammanslagning skulle radera någons namn), men identiska laster sammanslås gladlynt, så tjugo malm signerade av samma samlare sitter i en stapel och ett vindfall river inte sönder dina väskor.\n\nSignaturer betalar tillbaka hantverkare: att konsumera något signerat reagens, oavsett vem som signerade det, lägger till 2 procentenheter mästerverkschans, och att hålla ett reagens signerat av din egen hand minskar den reagensens krävda mängd med ett (aldrig under ett). Ditt eget signerade sällsynta-eller-bättre arbete fortsätter till och med undervisa dig: när en pjäs du signerade presterar i dina egna händer, en dryck drucken vid rätt tillfälle, ett dräpslag landat, rustning buren vid ett dräp, går en liten ström av skicklighet tillbaka till hantverket som skapade det, så länge det hantverket är ett av dina aktiva ämnen.',
   'guide.profPages.econ.collectorsHeading': 'Samlare, trofeer, och priset pa en historia',
   'guide.profPages.econ.collectorsBody':
     'Handlare är blinda för ursprung: ett signerat föremål säljs till ett NPC för exakt sitt ordinarie pris. Premiumet på en signatur finns bara mellan spelare, vilket är precis vad som gör det intressant: en stapel vindfallsmalm signerad av en berömd samlare, ett Primärsnitt från en lycklig insamling, ett mästerverk-svärd som namnger en hantverkare som sedan gått i pension, alla kostar vad någons minne säger att de är värda.\n\nBedrifternas bok lutar sig mot samma instinkt: Oskadd åder, Urgammalt hjärtved, Månlyst blomma, Ett perfekt exemplar och Glimmer av hopp är noll-ryktbarhetens samlarmärken som finns enbart för att bevisa att ett ögonblick hände dig. Behåll föremålet som förtjänade bedriften och du har kvittot. Inget av detta är styrka; ursprung köper inga egenskaper och vinner inga strider, det är spelets pappersspår av goda dagar.',
   'guide.profPages.econ.throttleHeading': 'Atgärdsbegränsningen',
-  'guide.profPages.econ.throttleBody':
-    'Produktion har ett tak: tillverkning, avförtrollning, förtrollning och bärgning delar en budget pa {actions} lyckade atgärder per rullande {seconds} sekunder. Ett nekat försök kostar ingenting och förbrukar ingen budget. Du kommer aldrig känna det i normalt spel; det finns sa att en maximad specialist med en full bank inte kan översvämma Marknaden, oavsett deras skicklighet eller lager.',
   'guide.profPages.econ.doctrineHeading': 'Spelare handlar med spelare',
   'guide.profPages.econ.doctrineBody':
     'Hantverksekonomin är byggd på en idé: spelare försörjer spelare. Samlare matar hantverkare, hantverkare matar korsfarare och raidare, och avbrytare matar förtrollare, med handlare och stationsmästare på kanterna för att ta in skräp och mynt snarare än att konkurrera med dig. Om du vill tjäna pengar på ett yrke är din kund en person: lär dig vad andra spelare bränner igenom, prissätt mot Världsmarknaden, och behandla NPC-systemen som ett golv under dina priser, inte som marknaden själv.\n\nTillverkad utrustning är inställd för att ligga under raidgolvet: även ett mästerverk är alltid bara en kvalitetsnivå över sitt recept, aldrig förbi legendarisk, och dess statbudget stannar under raidlootbandet. Smedjan gör dig redo för det svåraste innehållet; den ersätter det inte. Det håller hantverkare, raidare och marknaden i en stabil triangel: raidfynd förblir aspirationsbaserade, och tillverkade pjäser förblir den bästa utrustning pengar faktiskt kan köpa.',
@@ -367,20 +355,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.a3':
     'En knapptryckning täcker båda. Allt ett lik innehåller, mynt och fynd plus insamlingsbara komponenter, öppnas i samma fönster: bytet följer normala bytesregler, och insamling är yrkessidan, som lossar material från kroppen själv.\n\nInsamling är först till kvarn, engångsbasis: varje kropp kan skördas exakt en gång, av vem som helst som gör anspråk på det först, inbegripet online-föregångare. Ditt Stadsfokus formar vad du får: när du står i ett stadscentrum kan du fördela 10 fokuspoäng över de komponenttyper du bryr dig om, och varje fokuserad komponent rullar en bättre nivå (var 5:e poäng ökar det ett steg, som mest två steg) och ger mer (10 procent per poäng). Ofokuserade komponenter försämras aldrig.',
   'guide.profPages.faq.q4': 'Varfor är min Ironbark-stock signerad?',
-  'guide.profPages.faq.a4':
-    'Du träffade ett vindfall. Ungefär 1 insamling av 90 utlöser en sällsynt insamlingshändelse (urgammalt hjärtved på ett träd, en oskadd åder på malm, en månlyst blomma på örter): det multiplicerar avkastningen fem gånger, signerar varje enhet med ditt namn, och meddelar fyndet till hela zonen. En sällsynt eller bättre sällsynthetsutrullning på en vanlig skörd signerar avkastningen också.\n\nSignerat material är värt att behålla eller sälja dyrt: att konsumera något signerat reagens i ett hantverk lägger till 2 procent mästerverkschans. Kom bara ihåg att de bara staplas med identiskt signerade kopior, så de håller sin egen väskplats.',
   'guide.profPages.faq.q5': 'Hur löser jag upp ett bestellt stycke, och vad kostar det?',
   'guide.profPages.faq.a5':
     'Gå till valfri hantverksstation med pjäsen i din väska och betala mästaren. Avgiften följer föremålets kvalitet: 25 silver för ett ovanligt stycke, 1 guld för ett sällsynt, 4 guld för ett episkt; ett legendariskt betalar den episka taxan, och ett beställt vanligt stycke betalar den ovanliga. Det måste vara en riktig station: en mobil station erbjuder aldrig tjänsten.\n\nAvgiften köper en ren tavla, inte ett botemedel: pjäsen förblir en beställning, så det binds igen till vem som tar emot det i nästa handel. Om flera bundna kopior delar en stapel lossas en kopia av och löses upp per betalning.',
   'guide.profPages.faq.q6': 'Var lär jag mig recept, och vad kostar de?',
-  'guide.profPages.faq.a6':
-    'De nio vanliga fältrecepten och verktygerecepten är kända av alla från start, och det är också tre stationsbundna toppstycken (Ugnsfjällets mantel, Varpmässkekhuvan och Skymningshudlindorna), som inte behöver något tränarrecept, bara sin station. Allt annat lärs ut av de stationerade mästarna vid deras stationer i de tre stadscentrumen: de flesta står i Östbäck, garvaren håller garveriet i Fenbridge, och alkemisten håller apoteket i Highwatch.\n\nTränarrecept kommer i steg vid skicklighet 0, 25 och 50, prissatta gratis, 25 silver och 1 guld som en engångsavgift. En mästare lär ut ett recept när din nivå i det hantverket har nått receptets egna nivå, och du måste stå vid deras station för att lära: en mobil station räknas inte.',
   'guide.profPages.faq.q7': 'Varfor gick min insamling plötsligt langsamt?',
-  'guide.profPages.faq.a7':
-    'Insamlingskastet börjar vid 2,5 sekunder och trimmas ner på två sätt: 0,4 sekunder för varje verktygsnivå du äger över nodens egna nivå, och 0,15 sekunder för varje skicklighetsband du har passerat (vid 100 och 200), med ett golv på 1,5 sekunder. Flytta från nivå 1-noder upp till nivå 3-noder och ditt överskott försvinner, så samma hacka svingar långsamt igen. Att äga exakt den krävda nivån köper ingen hastighet; den öppnar bara noden.\n\nSkicklighetsvinst bleknar på samma sätt som tillverkning gör: en nod grånär när din skicklighet klättrar förbi dess nivå (nivå 1-noder lär inget från skicklighet 75 och uppåt), så svaret på låga vinster är högre nivånoder, som behöver ett verktyg av minst deras nivå (bara händer räknas som nivå 1). Fiske följer sin egen avtappning: full vinst under 50 skicklighet, halv under 100, ett rännil på 0,1 under 150 och 0,02 under 200, och skräpfångster lär ingenting från 100 och uppåt.',
   'guide.profPages.faq.q8': 'Kan jag tillverka utanfor staden?',
-  'guide.profPages.faq.a8':
-    'Delvis. De nio vanliga fältrecepten (startervapen, rustning, mat och drinkstaplarna) tillverkas var som helst, när som helst. Allt över dem är bundet till en stationstyp: smedja, kök, apotek, garveri, vävstol eller verktygsverkstan, och du måste vara inom 20 meter från stationen för att hantverket ska gå igenom.\n\nVid 75 skicklighet i ett hantverk specialiserar du dig, och tillsammans med 20 procents materialsrabatt får du en mobil station: placera den i fältet och den står i 10 minuter, och betjänar det hantverkets recept som om du var vid det riktiga. Den mobila stationen är bara för tillverkning: att lära recept och lösa upp beställningar kräver alltid den riktiga stationen i staden.',
   'hud.logs.keptBoundOne': 'Behöll {count} bunden kopia.',
   'hud.logs.keptBoundMany': 'Behöll {count} bundna kopior.',
   'hud.pet.waterJet': 'Vattenstråle',
@@ -500,7 +480,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Där är den gamla smaken. Alkemi och Matlagning är tillbaka på din spis som ämnen. Stanna ett tag den här gången.',
   'entities.quests.q_prof_amends_apothecary.objectives.0.label': 'Vildsvin jagat',
   'entities.quests.q_prof_amends_apothecary.text':
-    'Nå, se vem som är tillbaka vid min gryta. Inga hårda känslor, {playerName}, ett kök har alltid plats, men du vet att notan löper längre varje gång du går ut på den. Gå och tunna ut vildsvinsstammen på östängen, för ärlig svett är den första ingrediensen, och det kommer påminna dina händer om arbetet.',
+    'Nå, se vem som är tillbaka vid min gryta. Inga hårda känslor, {playerName}, ett kök har alltid plats, men du vet att notan löper längre varje gång du går ut på den. Gå och tunna ut vildsvinsstammen på västängen, för ärlig svett är den första ingrediensen, och det kommer påminna dina händer om arbetet.',
   'entities.quests.q_prof_amends_apothecary.title': 'Tillbaka på spisen',
   'entities.quests.q_prof_amends_bombardier.completion':
     'DÄR är det, klian är tillbaka i dina händer. Ingenjörskonst och Alkemi, ämnen igen, sätt igång, gör en smäll. Försök stanna den här gången, va?',
@@ -512,7 +492,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Stadigt igen. Läderbearbetning och Skrädderi återvänder till dina händer som ämnen. Mät dubbelt den här gången innan du vandrar.',
   'entities.quests.q_prof_amends_outfitter.objectives.0.label': 'Spindelvävsedderkopp dödad',
   'entities.quests.q_prof_amends_outfitter.text':
-    'Tillbaka vid min vävstol trots allt. Jag bär inget agg, {playerName}, men tråden minns en hand som lät den gå, och kostnaden att ta upp den igen mäts ut längre varje gång. Döda spindelvävsedderkopparna som tränger sig på västra skogen, och arbetet lugnar dina händer innan de rör god siden igen.',
+    'Tillbaka vid min vävstol trots allt. Jag bär inget agg, {playerName}, men tråden minns en hand som lät den gå, och kostnaden att ta upp den igen mäts ut längre varje gång. Döda spindelvävsedderkopparna som tränger sig på östra skogen, och arbetet lugnar dina händer innan de rör god siden igen.',
   'entities.quests.q_prof_amends_outfitter.title': 'Trådar åter sammanfogade',
   'entities.quests.q_prof_amends_smith.completion':
     'Rytmen är tillbaka i dina händer. Vapentillverkning och Rustningssmide är dina ämnen igen. Gör inte en vana av att gå.',
@@ -554,7 +534,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ser du? Malm samlad och valkar på händerna. Håll på med gruvdrift, skogsavverkning och örtskörd när du reser längs vägarna, och när du är tillbaka i staden, håll koll på Stadsanslagstavlan vid marknaden och hantverksbordet i närheten. Det finns en rättvis handel i allt av det, om du vill ha det.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Malmåder skördad',
   'entities.quests.q_prof_intro.text':
-    'Varje själ i Östbäck arbetar ett hantverk utöver svärdet, {playerName}. Det finns malmådrar i klipporna runt Koppargropen, sydväst om staden. Gå och sving en hacka och arbeta 5 av dem själv; jag ska kunna se skillnaden.',
+    'Varje själ i Östbäck arbetar ett hantverk utöver svärdet, {playerName}. Det finns malmådrar i klipporna runt Koppargropen, sydöst om staden. Gå och sving en hacka och arbeta 5 av dem själv; jag ska kunna se skillnaden.',
   'gpuNotice.bodyDesktop':
     'Spelet körs utan GPU-acceleration och kommer att vara långsamt. Uppdatera dina grafikdrivrutiner och starta sedan om spelet. I Windows anger du även spelet till Höga prestanda under Inställningar > System > Skärm > Grafik.',
   'gpuNotice.bodyWeb':
@@ -1296,6 +1276,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.tideworn_warboots.name': 'Tidvattenslitna krigsstövlar',
   'entities.items.tidewoven_trousers.name': 'Tidvattenvävda byxor',
   'entities.items.wyrmchoir_handwraps.name': 'Lindormskörens handlindor',
+  'entities.items.basin_stalkers_tunic.name': 'Bassängsmygarens tunika',
+  'entities.items.verdant_heart_vestment.name': 'Det grönskande hjärtats klädnad',
+  'entities.items.sunbone_ritual_hauberk.name': 'Solbens ritualbrynja',
+  'entities.items.greatfang_of_the_basin.name': 'Bassängens storhuggtand',
+  'entities.items.sunbone_oracles_crown.name': 'Solbens orakelkrona',
+  'entities.items.bloodmane_war_legguards.name': 'Blodmanens krigsbenskydd',
   'entities.items.yumis_keepsake_locket.name': 'Yumis minnesmedaljong',
   'entities.items.zense_meridian.name': 'Zenses meridian',
   'entities.items.zyzzs_deathless_signet.name': 'Zyzz odödliga signetring',
@@ -1888,7 +1874,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Fälld till sist. Bergsfolket svor på att den katten skulle överleva själva muren. Smygarna håller sig till sina höga snöfält nu, {playerName}, och mina patruller kan gå vägen utan att blöda för det. Hela åsen är tystare tack vare ditt verk.',
   'entities.quests.q_old_cragmaw.objectives.0.label': 'Gamle Klippkäft dräpt',
   'entities.quests.q_old_cragmaw.text':
-    'Bergsfolket satte ett namn på spåren min spejare fann: Gamle Klippkäft, en ärrpälsad tyrann till katt som har överlevt tre generationer av sin egen flock. Det är han som är skälet till att smygarna översvämmar min väg, {playerName}. Hans lya ligger på västra åsen ovanför vägen söderut. Ta med en vän och gör slut på den gamle djävulen.',
+    'Bergsfolket satte ett namn på spåren min spejare fann: Gamle Klippkäft, en ärrpälsad tyrann till katt som har överlevt tre generationer av sin egen flock. Det är han som är skälet till att smygarna översvämmar min väg, {playerName}. Hans lya ligger på östra åsen ovanför vägen söderut. Ta med en vän och gör slut på den gamle djävulen.',
   'entities.quests.q_old_cragmaw.title': 'Gamle Klippkäft',
   'entities.quests.q_stalker_cloaks.completion':
     'Tio goda pälsar, tjocka som några jag har... nej, se på de här, {playerName}. Sönderrivna, hälften av dem, och inte av någon klinga eller något spjut. Klomärken breda som min hand, rakt genom vinterpälsen. Något på den där åsen sliter sönder sina egna.',
@@ -2000,6 +1986,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Det brevet finns inte längre i din låda.',
   'hudChrome.mailbox.result.needRecipient': 'Ange en mottagare för ditt brev.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Du kan inte skicka uppdragsföremål med post.',
+  'hudChrome.mailbox.result.noMailBound': 'Det föremålet är bundet och kan inte skickas med post.',
   'hudChrome.mailbox.result.noRecipient': 'Ingen med det namnet har en brevlåda här.',
   'hudChrome.mailbox.result.notEnoughItems': 'Du har inte så många att skicka.',
   'hudChrome.mailbox.result.recipientBoxFull': 'Mottagarens brevlåda är full.',
@@ -2185,6 +2172,22 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.fishing': 'Fiske',
   'abilityUi.cast.gathering': 'Insamling',
   'abilityUi.cast.thunzharrStormcall': 'Stormrop',
+  'abilityUi.cast.rift_arcane_execution': 'Tomrumsrevan',
+  'abilityUi.cast.rift_arcane_strike': 'Arkanförintelse',
+  'abilityUi.cast.rift_brute_execution': 'Jordkrossen',
+  'abilityUi.cast.rift_brute_strike': 'Den slutgiltiga domen',
+  'abilityUi.cast.rift_ember_execution': 'Magmakällan',
+  'abilityUi.cast.rift_ember_strike': 'Kärnsmältan',
+  'abilityUi.cast.rift_frost_execution': 'Glaciärgraven',
+  'abilityUi.cast.rift_frost_strike': 'Absoluta nollpunkten',
+  'abilityUi.cast.rift_necro_execution': 'Själagraven',
+  'abilityUi.cast.rift_necro_strike': 'Dödsdomen',
+  'abilityUi.cast.rift_storm_execution': 'Åskledaren',
+  'abilityUi.cast.rift_storm_strike': 'Stormroparens vrede',
+  'abilityUi.cast.rift_tide_execution': 'Avgrundsgapet',
+  'abilityUi.cast.rift_tide_strike': 'Krossande djup',
+  'abilityUi.cast.rift_venom_execution': 'Giftpölen',
+  'abilityUi.cast.rift_venom_strike': 'Kullmoderns märke',
   'abilityUi.forms.bear': 'Björn',
   'abilityUi.forms.cat': 'Varg',
   'abilityUi.resources.energy': 'Energi',
@@ -3031,6 +3034,16 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.sunken_bastion.enterText': 'Du vadar ner i Den sjunkna bastionen ...',
   'entities.dungeons.sunken_bastion.leaveText': 'Du klättrar ut ur det drunknande mörkret.',
   'entities.dungeons.sunken_bastion.name': 'Den sjunkna bastionen',
+  'entities.dungeons.the_last_keep.enterText':
+    'Du kliver in i de kalla, tysta hallarna i Sista fästet.',
+  'entities.dungeons.the_last_keep.leaveText':
+    'Du drar igen fästningsporten och kliver ut i Drakländernas vind.',
+  'entities.dungeons.the_last_keep.name': 'Sista fästet',
+  'entities.dungeons.wildheart_basin.enterText':
+    'Varmt regn fräser mot gammal sten. Vildhjärtats bassäng öppnar sig framför dig.',
+  'entities.dungeons.wildheart_basin.leaveText':
+    'Du passerar tillbaka under stentänderna in i Palmviddens sol.',
+  'entities.dungeons.wildheart_basin.name': 'Vildhjärtats bassäng',
   'entities.items.acolyte_chain_grips.name': 'Akolytens kedjegrepphandskar',
   'entities.items.acolytes_circlet.name': 'Akolytens diadem',
   'entities.items.alien_armor_plate.name': 'Främmande rustningsplåt',
@@ -3881,7 +3894,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Mogger är äntligen död. Östbäcks fält är tryggare, och du lämnar dalen med ännu en berättelse värd att återberätta.',
   'entities.quests.q_mogger.objectives.0.label': 'Mogger dräpt',
   'entities.quests.q_mogger.text':
-    'Mogger har splittrat kärror, jämnat staket med marken och dödat nog med boskap för att tömma halva dalen. Möt honom inte ensam. Ta med två starka följeslagare till den östra ängen och lägg odjuret för gott.',
+    'Mogger har splittrat kärror, jämnat staket med marken och dödat nog med boskap för att tömma halva dalen. Möt honom inte ensam. Ta med två starka följeslagare till den västra ängen och lägg odjuret för gott.',
   'entities.quests.q_mogger.title': 'Mogger måste falla',
   'entities.quests.q_murlocs.completion': 'Hah! Det ska lära dem att sköta sina egna lerhål.',
   'entities.quests.q_murlocs.objectives.0.label': 'Lerfenslurkare dräpt',
@@ -3921,8 +3934,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_graves.objectives.0.label': 'Syn vid kapten Aldrens grav',
   'entities.quests.q_nythraxis_graves.objectives.1.label': 'Syn vid överstepräst Malrics grav',
   'entities.quests.q_nythraxis_graves.objectives.2.label': 'Syn vid kunglig lönnmördare Voss grav',
-  'entities.quests.q_nythraxis_graves.text':
-    'Jag har sett dessa tecken förut, på tre gamla gravar runt det norra slagfältet. Kapten Aldren ligger på den östra höjden, överstepräst Malric nära den centrala brutna vägen, och kunglig lönnmördare Voss vid den västra klippan. Rör vid varje grav och lyssna, {playerName}. De döda kanske minns vad de levande glömde.',
   'entities.quests.q_nythraxis_graves.title': 'De bortglömdas gravar',
   'entities.quests.q_nythraxis_restless_dead.completion':
     'Samma tecken finns på varje skärva... en krona. Jag har sett detta förut, inristat i gamla gravar som ingen uppteckning i Östbäck minns.',
@@ -3942,7 +3953,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_sealed_crypt.objectives.1.label': 'Kryptans slutsten, nedre',
   'entities.quests.q_nythraxis_sealed_crypt.objectives.2.label': 'Uråldrig dagbok',
   'entities.quests.q_nythraxis_sealed_crypt.text':
-    'Synerna pekar mot den övergivna kryptan i den västra klippan. Det finns en gammal legend om att kryptan hyste en kung. Kanske förseglade Törntopp honom därnere efter att Malrics ritual förvred honom till något odödligt. Träd in i kryptan och se vad som finns kvar därinne.',
+    'Synerna pekar mot den övergivna kryptan i den östra klippan. Det finns en gammal legend om att kryptan hyste en kung. Kanske förseglade Törntopp honom därnere efter att Malrics ritual förvred honom till något odödligt. Träd in i kryptan och se vad som finns kvar därinne.',
   'entities.quests.q_nythraxis_sealed_crypt.title': 'Den övergivna kryptan',
   'entities.quests.q_ogre_bounty.completion':
     'Belöningen betald till fullo. Foten av bergen är tystare nu - härnäst tar vi itu med dem som köper.',
@@ -4069,7 +4080,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_supplies.completion': 'Mina lådor! Knappt en repa på dem. Du är ett under.',
   'entities.quests.q_supplies.objectives.0.label': 'Stulen förrådslåda',
   'entities.quests.q_supplies.text':
-    'De där banditerna slog till mot min senaste vagn och kom undan med fyra lådor varor - verktyg, salt, fint Östbäckslinne. Lådorna är staplade runt deras läger i de sydöstra kullarna. Stjäl tillbaka dem åt mig, är du snäll?',
+    'De där banditerna slog till mot min senaste vagn och kom undan med fyra lådor varor - verktyg, salt, fint Östbäckslinne. Lådorna är staplade runt deras läger i de sydvästra kullarna. Stjäl tillbaka dem åt mig, är du snäll?',
   'entities.quests.q_supplies.title': 'Stulna förråd',
   'entities.quests.q_tarn_waders.completion':
     'Tio tillbaka i vattnet. De känner ingen kyla, {playerName}, och ingen rädsla — bara dragningen från den porten. Vad det än är som sjunger till dem, så sjunger det högt.',
@@ -4080,8 +4091,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_the_codfather.completion':
     'Vid de fuktiga helgonen... Torskfadern själv. Se på de morrhåren. Fenbron kommer att leva på historier om den här fångsten i ett år, {playerName}.',
   'entities.quests.q_the_codfather.objectives.0.label': 'Torskfadern',
-  'entities.quests.q_the_codfather.text':
-    'Torskfadern är inte bara en fisk, {playerName}, han är en kallblodig mördare. Gamlingarna svär på att han äter kärrströvare till frukost, och inte ens Dykärrsänkorna vågar spinna sina nät nära Djupkärrsgrunden av ren skräck. Han härskar över de vattnen. Greppa ett metspö, dra upp den gamle djävulen ur sitt vatten, så ska jag erkänna att du har blivit en del av familjen.',
   'entities.quests.q_the_codfather.title': 'Torskfadern',
   'entities.quests.q_troll_fetishes.completion':
     'Samma tillverkare som banéren i sektlägret. Trollen är inhyrda spadar, inget mer. Bra jobbat, {playerName}.',
@@ -4149,6 +4158,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.zones.eastbrook_vale.pois.7.label': 'Det fallna kapellet',
   'entities.zones.eastbrook_vale.pois.8.label': 'Relikkullen',
   'entities.zones.eastbrook_vale.pois.9.label': 'Ljusskogsgläntan',
+  'entities.zones.eastbrook_vale.pois.11.label': 'Fjärrkustens vägbank',
   'entities.zones.eastbrook_vale.welcome':
     'Hitta marskalk Redbrook i staden - han har arbete åt dig.',
   'entities.zones.mirefen_marsh.name': 'Dykärrsträsket',
@@ -4174,6 +4184,115 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.9.label': 'Gravlindormens helgedom',
   'entities.zones.thornpeak_heights.welcome':
     'Kapten Thessaly håller muren vid Högvakten - knappt.',
+  'entities.zones.amberfall.name': 'Bärnstensfallet',
+  'entities.zones.amberfall.pois.0.label': 'Lyktsjön',
+  'entities.zones.amberfall.pois.1.label': 'Guldsmältan',
+  'entities.zones.amberfall.pois.2.label': 'Den förgyllda fruktlunden',
+  'entities.zones.amberfall.pois.3.label': 'Skördehålan',
+  'entities.zones.amberfall.pois.4.label': 'Den stora sjön',
+  'entities.zones.amberfall.pois.5.label': 'Sotlönnshöjden',
+  'entities.zones.amberfall.pois.6.label': 'Den lutande monoliten',
+  'entities.zones.amberfall.welcome':
+    'Varje löv här brinner guld och rött, men inget faller någonsin. Lyktorna i Lyktsjön är tända för dig.',
+  'entities.zones.drakelands.name': 'Drakländerna',
+  'entities.zones.drakelands.pois.0.label': 'Drakvakten',
+  'entities.zones.drakelands.pois.1.label': 'Portskogen',
+  'entities.zones.drakelands.pois.2.label': 'Sotdynerna',
+  'entities.zones.drakelands.pois.3.label': 'Trollmötet',
+  'entities.zones.drakelands.pois.4.label': 'Sista fästet',
+  'entities.zones.drakelands.pois.5.label': 'Blodglasfälten',
+  'entities.zones.drakelands.pois.6.label': 'Drakgapets kaldera',
+  'entities.zones.drakelands.welcome':
+    'Het vind drar in från ödemarken framför dig. Drakar kretsar över Drakgapet, och trollens eldar brinner i dynerna.',
+  'entities.zones.evergarden.name': 'Evighetsträdgården',
+  'entities.zones.evergarden.pois.0.label': 'Häckby',
+  'entities.zones.evergarden.pois.1.label': 'Trädgårdsporten',
+  'entities.zones.evergarden.pois.2.label': 'Parterrpromenaden',
+  'entities.zones.evergarden.pois.3.label': 'Gryningsborgen',
+  'entities.zones.evergarden.pois.4.label': 'Kronbladsdammen',
+  'entities.zones.evergarden.pois.5.label': 'Den stora labyrinten',
+  'entities.zones.evergarden.pois.6.label': 'Fontängården',
+  'entities.zones.evergarden.pois.7.label': 'Den gamla kvarnen',
+  'entities.zones.evergarden.pois.8.label': 'Nordvakten',
+  'entities.zones.evergarden.pois.9.label': 'Liljebassängen',
+  'entities.zones.evergarden.welcome':
+    'Någon klipper fortfarande häckarna, fast ingen trädgårdsmästare har synts till på hundra år. Se upp med labyrinten: den ser upp med dig också.',
+  'entities.zones.farshore_isle.name': 'Fjärrkusten',
+  'entities.zones.farshore_isle.pois.0.label': 'Måshamn',
+  'entities.zones.farshore_isle.pois.1.label': 'Landningsplatsen',
+  'entities.zones.farshore_isle.pois.2.label': 'Vaktängen',
+  'entities.zones.farshore_isle.pois.3.label': 'De klyvda klipporna',
+  'entities.zones.farshore_isle.pois.4.label': 'Revfälten',
+  'entities.zones.farshore_isle.welcome':
+    'Korsa sandrevlen så hittar Måshamns klocka dig innan staden gör det. Revorna river upp sig utan förvarning, och skansen håller sin kust mot vad som än strömmar igenom. De har väntat länge på någon som du.',
+  'entities.zones.frostveil.name': 'Frostslöjans vidder',
+  'entities.zones.frostveil.pois.0.label': 'Ismanteln',
+  'entities.zones.frostveil.pois.1.label': 'Snölinjen',
+  'entities.zones.frostveil.pois.2.label': 'Glaciärtjärnen',
+  'entities.zones.frostveil.pois.3.label': 'Norrskenstrapporna',
+  'entities.zones.frostveil.pois.4.label': 'Skälvkärret',
+  'entities.zones.frostveil.pois.5.label': 'De tjutande terrasserna',
+  'entities.zones.frostveil.welcome':
+    'Snön sväljer varje ljud. Under de dansande skenen känns kylan själv vaken.',
+  'entities.zones.galecrest.name': 'Stormkammen',
+  'entities.zones.galecrest.pois.0.label': 'Vikhamn',
+  'entities.zones.galecrest.pois.1.label': 'Vindleden',
+  'entities.zones.galecrest.pois.2.label': 'De tjutande kullarna',
+  'entities.zones.galecrest.pois.3.label': 'Den gamla vårdkasen',
+  'entities.zones.galecrest.pois.4.label': 'Branten',
+  'entities.zones.galecrest.pois.5.label': 'Vrakfälten',
+  'entities.zones.galecrest.pois.6.label': 'Spegeltjärnen',
+  'entities.zones.galecrest.pois.7.label': 'Stormkammens stall',
+  'entities.zones.galecrest.welcome':
+    'Vinden har aldrig en enda gång slutat blåsa här, och Den gamla vårdkasen har aldrig en enda gång slocknat. Vikhamn ber bara att du stänger värdshusdörren efter dig.',
+  'entities.zones.nightbloom.name': 'Nattblomstret',
+  'entities.zones.nightbloom.pois.0.label': 'Månvila',
+  'entities.zones.nightbloom.pois.1.label': 'Nattporten',
+  'entities.zones.nightbloom.pois.2.label': 'Månbrunnen',
+  'entities.zones.nightbloom.pois.3.label': 'Skymningsfältet',
+  'entities.zones.nightbloom.pois.4.label': 'Den stående vakan',
+  'entities.zones.nightbloom.pois.5.label': 'Den sömnlösa gravhögen',
+  'entities.zones.nightbloom.welcome':
+    'Bortom Nattporten drömmer själva luften. Följ blomljuset till Månvila, och se upp för den sovande världen som hänger i skyn.',
+  'entities.zones.palmreach.name': 'Palmvidden',
+  'entities.zones.palmreach.pois.0.label': 'Drivhamn',
+  'entities.zones.palmreach.pois.1.label': 'Snårmynningen',
+  'entities.zones.palmreach.pois.2.label': 'Palmstranden',
+  'entities.zones.palmreach.pois.3.label': 'Smaragdsnåret',
+  'entities.zones.palmreach.pois.4.label': 'Rankfallet',
+  'entities.zones.palmreach.pois.5.label': 'Safirlagunen',
+  'entities.zones.palmreach.pois.6.label': 'Den sjunkna avguden',
+  'entities.zones.palmreach.welcome':
+    'Varm sand, högljudda fåglar och en djungel som äter upp horisonten. Drivhamn håller en eld tänd på stranden för dig.',
+  'entities.zones.veiled_hollow.name': 'Slöjhålan',
+  'entities.zones.veiled_hollow.pois.0.label': 'Fornglimmer',
+  'entities.zones.veiled_hollow.pois.1.label': 'Skymningsfallets grotta',
+  'entities.zones.veiled_hollow.pois.2.label': 'Skymningsfallets utsikt',
+  'entities.zones.veiled_hollow.pois.3.label': 'Den forntida lunden',
+  'entities.zones.veiled_hollow.pois.4.label': 'Stjärnfallsbassängen',
+  'entities.zones.veiled_hollow.pois.5.label': 'Den sjunkna gården',
+  'entities.zones.veiled_hollow.pois.6.label': 'De kristallklara grunden',
+  'entities.zones.veiled_hollow.pois.7.label': 'Det glittrande djupet',
+  'entities.zones.veiled_hollow.welcome':
+    'Luften surrar av gammal magi. Sök upp Väktare Saelwyn under det stora trädet i Fornglimmer.',
+  'entities.zones.willowfen.name': 'Pilkärret',
+  'entities.zones.willowfen.pois.0.label': 'Brosjön',
+  'entities.zones.willowfen.pois.1.label': 'Bärnstenskärrets trappor',
+  'entities.zones.willowfen.pois.2.label': 'Liljemyrarna',
+  'entities.zones.willowfen.pois.3.label': 'Myrglansdammarna',
+  'entities.zones.willowfen.pois.4.label': 'Pilgråten',
+  'entities.zones.willowfen.pois.5.label': 'De sömniga slätterna',
+  'entities.zones.willowfen.welcome':
+    'Kärret surrar av trollsländor och bin. Korsa bron in i Brosjön och vila fötterna en stund.',
+  'entities.zones.wraithwood.name': 'Vålnadsskogen',
+  'entities.zones.wraithwood.pois.0.label': 'Galgsjön',
+  'entities.zones.wraithwood.pois.1.label': 'Kråkporten',
+  'entities.zones.wraithwood.pois.2.label': 'Änkans snår',
+  'entities.zones.wraithwood.pois.3.label': 'Den hängande gläntan',
+  'entities.zones.wraithwood.pois.4.label': 'Sorgestenskapellet',
+  'entities.zones.wraithwood.pois.5.label': 'Jägarens glänta',
+  'entities.zones.wraithwood.welcome':
+    'Lövtaket sluter sig över vägen som ett lock. Håll dig till lyktorna i Galgsjön, och svara inte om skogen ropar ditt namn.',
   'errors.api.accountBanned': 'Detta konto har bannlysts.',
   'errors.api.accountSuspended': 'Detta konto är avstängt till {date}.',
   'errors.api.alreadyInWorld': 'Karaktären är redan i världen.',
@@ -4256,6 +4375,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     '+25% fysisk skada och +10% kritisk träff. Bli själva hotet.',
   'fiesta.augment.aug_warlords_might.name': 'Krigsherrens makt',
   'fiesta.augment.choose': 'Välj en förstärkning',
+  'fiesta.augment.cardAria': '{name} ({category}): {description}',
   'fiesta.banner.augmentGained': 'Förstärkning erhållen: {name}!',
   'fiesta.banner.powerup': '{name}!',
   'fiesta.banner.wave': 'VÅG {wave}/{total} - VÄLJ EN FÖRSTÄRKNING!',
@@ -4798,6 +4918,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.family.undead.desc':
     'De rastlösa döda, uppväckta av mörkare händer. De tröttnar inte och de flyr inte.',
   'guide.family.undead.name': 'Odöda',
+  'guide.family.demon.desc':
+    'Inkräktare bortom revorna, idel eld och ondska. Där en står är en bräsch aldrig långt borta.',
+  'guide.family.demon.name': 'Demoner',
   'guide.faqPage.a1':
     'Ja. Hela spelet är gratis att spela ända till nivåtaket, och källkoden är öppen på GitHub.',
   'guide.faqPage.a10':
@@ -5024,6 +5147,21 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ett sammanhängande land, tre zoner, från stilla dalar till frusna toppar.',
   'guide.home.world.valeBlurb': 'Gröna kullar och gamla skogar där varje äventyr börjar.',
   'guide.home.world.valeName': 'Östbäcksdalen',
+  'guide.home.world.amberBlurb':
+    'Bortom de västra klipporna en höst som aldrig tar slut, och lyktor på en gyllene sjö.',
+  'guide.home.world.amberName': 'Bärnstensfallet',
+  'guide.home.world.duskBlurb':
+    'Ett rike förseglat under bergen, om viskningarna om en väg in stämmer.',
+  'guide.home.world.duskName': 'Slöjhålan',
+  'guide.home.world.emberBlurb':
+    'Bortom Den bleka vägbanken viker det gröna för aska, och något urgammalt styr ödemarken.',
+  'guide.home.world.emberName': 'Drakländerna',
+  'guide.home.world.fenBlurb':
+    'Bortom höstens krona, ett ljust kärr av pilar och stilla vatten, och en stad bakom en vallgrav.',
+  'guide.home.world.fenName': 'Pilkärret',
+  'guide.home.world.frostBlurb':
+    'En snöbunden höjd bortom varje karta, skymtad enbart i de dansande skenen.',
+  'guide.home.world.frostName': 'Frostslöjans vidder',
   'guide.howToPlay.basicsHeading': 'Grunderna',
   'guide.howToPlay.controlsLink': 'Se den fullständiga referensen för kontroller',
   'guide.howToPlay.deathBody':
@@ -5508,6 +5646,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingMiss': 'Bom',
   'hud.combat.healOther': 'Din {ability} läker {target} för {amount}.',
   'hud.combat.healOtherCrit': 'Din {ability} läker {target} kritiskt för {amount}.',
+  'hud.combat.healSelfFull': 'Din {ability} landar, men du har redan full hälsa.',
+  'hud.combat.healOtherFull': 'Din {ability} landar på {target}, men målet har redan full hälsa.',
   'hud.combat.healSelf': 'Din {ability} läker dig för {amount}.',
   'hud.combat.healSelfCrit': 'Din {ability} läker dig kritiskt för {amount}.',
   'hud.combat.miss': 'Din {ability} missar {target}.',
@@ -5568,6 +5708,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.core.you': 'du',
   'hud.core.zoomIn': 'Zooma in',
   'hud.core.zoomOut': 'Zooma ut',
+  'hud.core.riftLabel': '{name}',
+  'hud.core.riftLabelRanked': '{name} ({rank})',
   'hud.errors.abilityNotReady': 'Den förmågan är inte redo än.',
   'hud.errors.alreadyInParty': '{name} är redan i en grupp.',
   'hud.errors.arenaAlreadyInMatch': 'Du är redan i en arenamatch.',
@@ -5626,7 +5768,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.errors.tradeFailed':
     'Handeln misslyckades: föremål eller pengar är inte längre tillgängliga.',
   'hud.errors.tradeInProgress': 'En handel pågår redan.',
+  'hud.errors.tradeAlreadyTrading': 'Den spelaren handlar redan.',
   'hud.errors.tradeBound': 'Det föremålet är bundet och kan inte handlas.',
+  'hud.errors.marketListBound': 'Det föremålet är bundet och kan inte säljas.',
   'hud.errors.tradeTooFar': 'Målet är för långt bort för att handla.',
   'hud.errors.travel': 'Fleet',
   'hud.errors.unknownCommand': 'Okänt kommando: {command}. Prova /s /y /w /p /g.',
@@ -5827,6 +5971,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.decline': 'Avböj',
   'hud.prompts.duelRequest': '{name} har utmanat dig på en duell!',
   'hud.prompts.guildInvite': '{name} bjuder in dig att gå med i {guild}.',
+  'hud.prompts.guildInviteCancelled':
+    'En väntande gillesinbjudan avbröts eftersom gillet bytte namn.',
+  'hud.prompts.guildRenamed': 'Ditt gille har bytt namn till {name} av modereringsteamet.',
   'hud.prompts.joinGuild': 'Gå med i gille',
   'hud.prompts.joinParty': 'Gå med i grupp',
   'hud.prompts.openTrade': 'Öppna byteshandel',
@@ -6039,6 +6186,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorDisabledMsg': 'Tvåfaktorsautentisering är av.',
   'hudChrome.account.twoFactorDone': 'Klart',
   'hudChrome.account.twoFactorDownloadCodes': 'Ladda ner koder',
+  'hudChrome.account.recoveryCodesFileHeader': '{brand}-återställningskoder',
+  'hudChrome.account.recoveryCodesFileAccount': 'Konto: {username}',
+  'hudChrome.account.recoveryCodesFileHint':
+    'Varje kod kan användas en gång om du förlorar åtkomsten till din autentiseringsapp.',
+  'hudChrome.account.recoveryCodesFileWarn':
+    'Förvara den här filen på ett säkert och privat ställe.',
   'hudChrome.account.twoFactorEnabledMsg': 'Tvåfaktorsautentisering är nu på.',
   'hudChrome.account.twoFactorOpenApp': 'Öppna i autentiseringsapp',
   'hudChrome.account.twoFactorRecoveryHint':
@@ -6153,10 +6306,21 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Växla bakgrund med hög kontrast: inaktiverar den rörliga trailern så att texten på startskärmen förblir läsbar',
   'hudChrome.leaderboard.close': 'Stäng',
   'hudChrome.loot.chestTitle': 'Kista',
+  'hudChrome.meters.move': 'Dra för att flytta den här mätaren',
+  'hudChrome.meters.resize': 'Dra för att ändra storlek på den här mätaren',
+  'hudChrome.meters.dock': 'Docka tillbaka den här mätaren i mätarfönstret',
+  'hudChrome.meters.separate': 'Separera {meter}',
+  'hudChrome.meters.regroup': 'Gruppera {meter} igen',
   'hudChrome.meters.minutesSeconds': '{m} m {s} s',
   'hudChrome.meters.perSecond': '{value}/s',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
   'hudChrome.meters.seconds': '{s} s',
+  'hudChrome.meters.breakdownOther': 'Övrigt ({count})',
+  'hudChrome.meters.breakdownRow': '{value} ({percent})',
+  'hudChrome.meters.breakdownSummary': '{tab}: {value}',
+  'hudChrome.meters.melee': 'Närstrid',
+  'hudChrome.meters.percent': '{value}%',
+  'hudChrome.meters.petAbility': '{pet}: {ability}',
   'hudChrome.mobile.haptics': 'Haptik',
   'hudChrome.mobile.hapticsOff': 'Haptik av',
   'hudChrome.mobile.jump': 'Hoppa',
@@ -6413,6 +6577,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.quest': 'Uppdragsföremål',
   'itemUi.kind.tool': 'Verktyg',
   'itemUi.kind.weapon': 'Vapen',
+  'itemUi.kind.mount': 'Riddjur',
   'itemUi.logs.boughtBackItem': 'Köpte tillbaka {item} för {money}.',
   'itemUi.logs.boughtItem': 'Köpte {item} för {money}.',
   'itemUi.logs.collectedMoney': 'Du hämtar {money} från Handlaren.',
@@ -6772,6 +6937,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.incomplete': 'Det uppdraget är inte slutfört.',
   'questUi.errors.notInLog': 'Det uppdraget finns inte i din logg.',
   'questUi.errors.tooFar': 'För långt bort.',
+  'questUi.errors.escortAway':
+    'Den du ska eskortera är inte på plats just nu och återvänder snart.',
   'questUi.errors.turnInMissing': 'Den uppdragsmottagaren är inte i närheten.',
   'questUi.errors.unavailable': 'Det uppdraget är inte tillgängligt.',
   'questUi.log.abandon': 'Överge uppdrag',
@@ -6913,6 +7080,56 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'sim.lockpick.tierMedium': 'Medel',
   'sim.lockpick.tierPremium': 'Premium',
   'sim.lockpick.toolSlips': 'Det verktyget glider av det här låset.',
+  'sim.rift.allUnstable': 'Alla revor är instabila just nu. Försök igen snart.',
+  'sim.rift.alreadyCleared': 'Denna reva har redan rensats av {names}.',
+  'sim.rift.deadEntry': 'Du kan inte gå in i en reva medan du är död.',
+  'sim.rift.deadEntryCombat':
+    'Din grupp är fortfarande i strid. De döda kan gå in igen när striden upphör.',
+  'sim.rift.descendFloor': 'Du stiger djupare ner i {name}.',
+  'sim.rift.detonateAbsoluteZero': 'Absoluta nollpunkten bryter ut!',
+  'sim.rift.detonateAbyssalMaw': 'Avgrundsgapet sluts!',
+  'sim.rift.detonateArcaneAnnihilation': 'Arkanförintelse bryter ut!',
+  'sim.rift.detonateBloodRite': 'Blodriten faller!',
+  'sim.rift.detonateBroodmothersMark': 'Kullmoderns märke detonerar!',
+  'sim.rift.detonateCoreMeltdown': 'Kärnsmältan detonerar!',
+  'sim.rift.detonateCrushingDepth': 'Krossande djup krossar!',
+  'sim.rift.detonateDeathSentence': 'Dödsdomen faller!',
+  'sim.rift.detonateEarthshatter': 'Jordkrossen detonerar!',
+  'sim.rift.detonateFinalJudgment': 'Den slutgiltiga domen slår ner!',
+  'sim.rift.detonateGlacialGrave': 'Glaciärgraven detonerar!',
+  'sim.rift.detonateHellfireBrand': 'Helvetesbranden detonerar!',
+  'sim.rift.detonateLightningRod': 'Åskledaren slår till!',
+  'sim.rift.detonateMagmaWell': 'Magmakällan bryter ut!',
+  'sim.rift.detonatePactSeal': 'Paktförseglingen detonerar!',
+  'sim.rift.detonatePitSentence': 'Gropdomen detonerar!',
+  'sim.rift.detonateSoulGrave': 'Själagraven detonerar!',
+  'sim.rift.detonateStormcallersWrath': 'Stormroparens vrede bryter ut!',
+  'sim.rift.detonateVenomPool': 'Giftpölen bryter ut!',
+  'sim.rift.detonateVoidRift': 'Tomrumsrevan detonerar!',
+  'sim.rift.enterFloor': 'Du kliver genom revan in i {name}.',
+  'sim.rift.exitOpens': 'Revan skälver. En väg hem rivs upp bakom de fallna.',
+  'sim.rift.forgeEnchanted': 'Revförtrollning slutförd för {name}.',
+  'sim.rift.forgeSocketed': 'Revsten monterad för {name}.',
+  'sim.rift.forgeUpgraded': 'Revuppgradering slutförd för {name}.',
+  'sim.rift.gateOpen': 'Porten gnisslar upp.',
+  'sim.rift.iceGoalLit': 'Frostsigillet flammar upp. Vägen rör sig.',
+  'sim.rift.levelGate': 'Endast äventyrare på nivå {level} eller högre får gå in i denna reva.',
+  'sim.rift.orbOpensGate': 'Blodorben flammar upp. Templets portar gnisslar upp.',
+  'sim.rift.orbSealed': 'Orben är förseglad av riten därnere.',
+  'sim.rift.orbWakes': 'Pentagrammets låga slocknar. Något vaknar på altaret.',
+  'sim.rift.portalCollapses': 'Revan av grad {tier} i {zone} kollapsar.',
+  'sim.rift.portalOpens': 'En reva av grad {tier} rivs upp i {zone}!',
+  'sim.rift.portalSealed': 'Revan av grad {tier} i {zone} har förseglats.',
+  'sim.rift.pylonLit': 'En runpelare flammar till liv ({lit}/{total}).',
+  'sim.rift.raceLost': 'Revan har redan rensats av {names}. Ditt försök tar slut.',
+  'sim.rift.raceLostBanner': 'Revan redan rensad',
+  'sim.rift.raceWinBanner': 'Revlopp vunnet: {seconds} s',
+  'sim.rift.raceWorldWin': '{names} vann revloppet av grad {tier} på {seconds} s!',
+  'sim.rift.seqProgress': 'Runorna svarar i tur ({step}/{total}).',
+  'sim.rift.seqReset': 'Runorna slocknar. Börja om.',
+  'sim.rift.socketsShut': 'Hållarna gnisslar igen. Vägen rör sig.',
+  'sim.rift.stepBack': 'Du kliver tillbaka genom revan.',
+  'sim.rift.wayDownOpens': 'Vägen ner rivs upp.',
   'skinEvent.close': 'Stäng',
   'skinEvent.lockIn': 'Lås in',
   'skinEvent.locked': 'Låst',
@@ -7183,6 +7400,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Motstod',
+  'hud.combat.floatingHealFull': 'Fullt',
   'hud.combat.resisted': '{target} motstår din {ability}.',
   'hudChrome.abilityScaling.bonus': '(+{value})',
   'hudChrome.itemArmorType.cloth': 'Tyg',
@@ -7725,6 +7943,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Den här återställningslänken är ogiltig eller har gått ut. Begär en ny.',
   'apiError.deeds.invalid_input': 'Ogiltig indata.',
+  'apiError.ota_updates.invalid_input': 'Ogiltig indata.',
   'apiError.steam.account_taken': 'Det Steam-kontot är redan länkat till ett annat konto.',
   'apiError.steam.already_linked': 'Ditt konto har redan ett länkat Steam-konto.',
   'apiError.steam.banned': 'Det Steam-kontot kan inte länkas.',
@@ -7781,7 +8000,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.rewardsHeading': 'Titlar och ramar',
   'guide.nav.deeds': 'Bedrifternas bok',
   'hudChrome.deeds.broadcastLine': '{name} har fullbordat en bedrift: {deed}',
-  'hudChrome.deeds.broadcastsLabel': 'Dela fullbordade bedrifter med gille och vänner',
   'hudChrome.deeds.catChronicle': 'Krönikor',
   'hudChrome.deeds.catCollection': 'Samling',
   'hudChrome.deeds.catCombat': 'Strid',
@@ -7894,6 +8112,659 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_workorder_toolworks.text':
     'Skaftstycken, handtag, kolvar, jag går igenom trä som att det håller på att gå ur mode, vilket det INTE gör, trä är evigt, {playerName}. Köra mig åtta järnbarksstockar och jag betalar dig, mynt, riktiga mynt, inte en tjänst, jag lovar, mestadels.',
   'entities.quests.q_prof_workorder_toolworks.title': 'Verktygsverkstadens arbetsorder',
+  'entities.quests.q_af_amber_from_the_herd.completion':
+    'Sex klumpar, rena som hälld honung. Dessa handskar är sydda av den senaste omgången, {playerName}: savstyvade, och varmare än de ser ut.',
+  'entities.quests.q_af_amber_from_the_herd.objectives.0.label': 'Förgylld savklump',
+  'entities.quests.q_af_amber_from_the_herd.text':
+    'De förgyllda hjortarna lägger sig under mina äldsta träd, och saven droppar guld i deras pälsar hela natten. Kammade klumpar av den är den renaste bärnstenen i skogslandet. Ge mig sex, {playerName}. Hjortarna kommer inte tacka dig, men de kommer inte sakna den heller.',
+  'entities.quests.q_af_amber_from_the_herd.title': 'Bärnsten från hjorden',
+  'entities.quests.q_af_foxes_in_the_lamplight.completion':
+    'Tio, och förråden lämnades orörda i natt för första gången denna säsong. Lykttändarna sänder sitt tack, {playerName}.',
+  'entities.quests.q_af_foxes_in_the_lamplight.objectives.0.label': 'Skymningsräv dräpt',
+  'entities.quests.q_af_foxes_in_the_lamplight.text':
+    'Skymningsrävarna har lärt sig vad lyktförråden är värda, {playerName}. Varje skymning smiter de genom stängslen och släpar iväg med talgen vi pressar till färjelyktorna. Mjuka tassar, mjukare samvete. Gallra tio av dem så minns resten att frukta staden.',
+  'entities.quests.q_af_foxes_in_the_lamplight.title': 'Rävar i lyktskenet',
+  'entities.quests.q_af_goldmelt_road.completion':
+    'Stilla på Guldsmältan, och en resenär med snö i håret som bevis. Sorrel håller sin vakt för väl för att sända lösa ord. Var välkommen i Lyktsjön, {playerName}. Lyktorna brinner för dig.',
+  'entities.quests.q_af_goldmelt_road.objectives.0.label': 'Rapportera till Fogden Ottoline',
+  'entities.quests.q_af_goldmelt_road.text':
+    'Du kom över Guldsmältan, {playerName}, med snö kvar på stövlarna. Jag vårdar detta helgedom så att Lyktsjön vet vem som kommer in från kylan, och på sistone har jag haft lite att rapportera. Ta guldvägen ner till staden, hitta Fogden Ottoline vid brunnen, och berätta för henne att passet är stilla.',
+  'entities.quests.q_af_goldmelt_road.title': 'Guldvägen ner',
+  'entities.quests.q_af_lanterns_on_the_water.completion':
+    'Alla tre, och fortfarande brinnande. Färjelyktor slocknar inte i vatten, {playerName}. Det är själva poängen med dem. Det som oroar mig är vad som slet loss dem.',
+  'entities.quests.q_af_lanterns_on_the_water.objectives.0.label': 'Färjelykta återfunnen',
+  'entities.quests.q_af_lanterns_on_the_water.text':
+    'Varje färja på sjön bär en akterlykta, {playerName}, och tre av mina båtar kom tillbaka i gryningen utan sina. Dimman tog dem, eller något i dimman gjorde det. De spolas upp längs östra stranden när vinden vänder. Gå strandvägen och för mina lyktor hem.',
+  'entities.quests.q_af_lanterns_on_the_water.title': 'Lyktor på vattnet',
+  'entities.quests.q_af_orchard_call.completion':
+    'Fogden räknar sina vagnar, jaså? Nåväl, hon får räkna dem saknade ett tag till. Titta på mina rader, {playerName}. Jag har större bekymmer än en försenad leverans.',
+  'entities.quests.q_af_orchard_call.objectives.0.label': 'Hitta Fruktodlaren Pomeline',
+  'entities.quests.q_af_orchard_call.text':
+    'Fruktodlaren Pomeline sköter Den förgyllda fruktlunden vid västra vägen, och hennes savvagnar är tre dagar försenade. Hela staden går på den bärnstensfärgade saven, {playerName}: lampkåda, sötning, skördeölet. Gå västra vägen och ta reda på vad som håller henne kvar.',
+  'entities.quests.q_af_orchard_call.title': 'En vagn till fruktlunden',
+  'entities.quests.q_af_sprites_and_spigots.completion':
+    'Fyra hinkar tillbaka på sina krokar och raderna har blivit tysta. Du har en tyngre hand med älvor än jag har, {playerName}, och idag är jag glad över det.',
+  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': 'Skördeälva bortjagad',
+  'entities.quests.q_af_sprites_and_spigots.objectives.1.label': 'Savtappshink återfunnen',
+  'entities.quests.q_af_sprites_and_spigots.text':
+    'Skördeälvor, {playerName}. De bänder loss mina savtappar från stammarna för sötman inuti och slänger hinkarna i gräset. Jaga bort åtta av de små tjuvarna och för tillbaka fyra av mina hinkar, så rullar vagnarna igen.',
+  'entities.quests.q_af_sprites_and_spigots.title': 'Älvor och savtappar',
+  'entities.quests.q_af_the_meredark.completion':
+    'Dimman lyfte från sjön i morse, {playerName}, och hela staden såg det. Färjorna kommer köra nattöverfarten igen, och varje lykta på vattnet kommer brinna i ditt namn. Ta detta: det bärgades från den dränkta bryggan, och ingen har bättre rätt att bära det.',
+  'entities.quests.q_af_the_meredark.objectives.0.label': 'Sjömörkret dräpt',
+  'entities.quests.q_af_the_meredark.text':
+    'De gamla färjkarlarna har ett namn de bara säger på land: Sjömörkret, den första lurkaren, gammal som sjön och dubbelt så tålmodig. Den steg upp en gång förut, året den dränkta bryggan sjönk, och den stiger upp nu igen. I skymningen solar den sig på bryggruinen utanför södra stranden, {playerName}. Ta med en vän, ta med två, och gör slut på den medan det fortfarande går.',
+  'entities.quests.q_af_the_meredark.title': 'Sjömörkret',
+  'entities.quests.q_af_what_took_the_moorings.completion':
+    'Åtta färre skepnader i grundvattnet, och överfarten gick i tid idag för första gången på två veckor. Men djärva lurkare är drivna lurkare, {playerName}. Något under sjön rör dem.',
+  'entities.quests.q_af_what_took_the_moorings.objectives.0.label': 'Sjölurkare dräpt',
+  'entities.quests.q_af_what_took_the_moorings.text':
+    'Nu ska jag berätta det jag inte sa inför staden. Förtöjningarna slets inte loss, de tuggades av. Sjölurkare, djärvare för varje natt, som drar i rep och roder. Sänk åtta av dem under vattnet för gott, {playerName}, innan en färjkarl följer med dem.',
+  'entities.quests.q_af_what_took_the_moorings.title': 'Vad som tog förtöjningarna',
+  'entities.quests.q_calming_the_deep.completion':
+    'Du gjorde det jag inte kunde bära att göra. Samlarna sjunger fortfarande i de södra ringarna; tack vare dig kommer de fortsätta sjunga.',
+  'entities.quests.q_calming_the_deep.objectives.0.label': 'Korrumperad sporling lagd till ro',
+  'entities.quests.q_calming_the_deep.text':
+    'Sporlingarna i Det glittrande djupet var ett fridfullt folk innan revan rörde vid deras ringar. Vad korruptionen tar ger den inte tillbaka. Ge de korrumperade ro, {playerName}: tio av dem, i norra delen av djupet.',
+  'entities.quests.q_calming_the_deep.title': 'Lugna djupet',
+  'entities.quests.q_dk_ash_on_the_wind.completion':
+    'Tio färre klingor i dynerna, och samlingens eldar brann lägre i natt. Mina vakter sov, vilket de inte gjort på en vecka. Väl huggit, {playerName}.',
+  'entities.quests.q_dk_ash_on_the_wind.objectives.0.label': 'Askbensplundrare dräpt',
+  'entities.quests.q_dk_ash_on_the_wind.text':
+    'Titta söderut från palissaden, {playerName}. Elderna i dynerna är inga trollkokeldar, de är askbenssamlingar, och varje natt blir det fler. De döda kommer upp ur benfälten med sand fortfarande i tänderna. Fäll tio plundrare innan de hugger sig en väg till min port.',
+  'entities.quests.q_dk_ash_on_the_wind.title': 'Aska i vinden',
+  'entities.quests.q_dk_banners_over_the_dunes.completion':
+    'Tre banér som smäller i den heta vinden, precis där min kikare kan finna dem. Med fem krigsropare tystade kommer vad som än svarar deras kall komma långsammare. Du köpte oss tid, {playerName}.',
+  'entities.quests.q_dk_banners_over_the_dunes.objectives.0.label': 'Askbens krigsropare dräpt',
+  'entities.quests.q_dk_banners_over_the_dunes.objectives.1.label': 'Varningsbanér rest',
+  'entities.quests.q_dk_banners_over_the_dunes.text':
+    'Askbenen samlas vid de gamla benfältsgravarna, {playerName}, och mina patruller kan inte läsa dynerna som de läser en mur. Döda fem av deras krigsropare, de som skriker de döda upprätt, och res ett varningsbanér på varje samlingsplats så att mina vakter kan märka ut den från åsen.',
+  'entities.quests.q_dk_banners_over_the_dunes.title': 'Banér över dynerna',
+  'entities.quests.q_dk_marrow_and_ash.completion':
+    'Sex brännmärken, och ett tecken bränt in i varenda ett. Detta är ingen vanlig plundringssamling, {playerName}. Varje här i dynerna svarar till krigsporten under oss, trollen kallar den Orkadia, och inga fem soldater jag någonsin tjänstgjort med kunde krossa det som trummar bakom den dörren. Kanske fem som du.',
+  'entities.quests.q_dk_marrow_and_ash.objectives.0.label': 'Askbens krigsbrand',
+  'entities.quests.q_dk_marrow_and_ash.text':
+    'Varje askbensplundrare bär en krigsbrand, {playerName}: en sveden räkning av hären den marscherar under. Jag har räknat fyra härar från denna ås, men gissningar är inte underrättelser. Ge mig sex brännmärken från plundrarna och deras krigsropare, så ska jag ge Brannoc formen av kriget som kommer.',
+  'entities.quests.q_dk_marrow_and_ash.title': 'Märg och aska',
+  'entities.quests.q_dk_matriarch_of_the_maw.completion':
+    'Himlen över Drakgapet har varit tom i två dagar, och nu går du genom min port med en matriarks blod på stövlarna. Drakvakten har stått vakt i fyrtio år just för detta, {playerName}. Ta dessa axelplåtar, gapfjäll, smidda av vår egen smed. Bär dem där drakarna kan se dem.',
+  'entities.quests.q_dk_matriarch_of_the_maw.objectives.0.label':
+    'Cindraleth, Gapets matriark, dräpt',
+  'entities.quests.q_dk_matriarch_of_the_maw.text':
+    'Fjällen talade sant, {playerName}. Jag klättrade upp på kanten i gryningen och såg henne på kraterbottnen: Cindraleth, matriarken varje glödvinge på denna himmel kläcktes under, guldfärgad som ett kol på väg att fatta eld. Medan hon ruvar blir drakarna djärvare, och Drakvakten kan inte strida mot både drakar och askben. Gör slut på henne i hennes krater, för sedan budet till Portkaptenen Brannoc. Gå inte ensam.',
+  'entities.quests.q_dk_matriarch_of_the_maw.title': 'Gapets matriark',
+  'entities.quests.q_dk_scales_of_the_maw.completion':
+    'Titta på undersidan av det här, {playerName}: bränt i en spiral, och bara en sak bygger bo i cirklar. Dessa drakar är kullvakter. Något i Drakgapet är en moder.',
+  'entities.quests.q_dk_scales_of_the_maw.objectives.0.label': 'Glödvingefjäll',
+  'entities.quests.q_dk_scales_of_the_maw.text':
+    'När vinden vänder från Drakgapet rider glödvingedrakarna på den över mitt läger, lågt nog att räkna deras tänder, {playerName}. De sträcker sig längre för varje dag, och något i den kratern driver dem. Ge mig tre av deras fjäll. Fjäll minns hetta, och jag kan läsa var en drake har hållit till genom brännskadan.',
+  'entities.quests.q_dk_scales_of_the_maw.title': 'Gapets fjäll',
+  'entities.quests.q_dk_scorched_stores.completion':
+    'Svedda svarta och varenda lås håller fortfarande. Smeden får sin spik, fjäderfästerskan sina strängar, och du får stövlarna jag sparade åt den som förde mina kistor tillbaka, {playerName}.',
+  'entities.quests.q_dk_scorched_stores.objectives.0.label': 'Svedd förrådskista återfunnen',
+  'entities.quests.q_dk_scorched_stores.text':
+    'Den sista vagnen brann upp, {playerName}, men järnbeslagna kistor brinner inte igenom. Fyra av dem ligger fortfarande svedda längs dynvägen med en säsongs salt, spik och bågsträngar inuti. Ta mina förråd hem innan trollen listar ut hur man öppnar dem.',
+  'entities.quests.q_dk_scorched_stores.title': 'Svedda förråd',
+  'entities.quests.q_dk_trolls_on_the_road.completion':
+    'Åtta, och mina körsvenner har slutat skriva avskedsbrev innan varje färd. Garnisonen äter tack vare dig, {playerName}.',
+  'entities.quests.q_dk_trolls_on_the_road.objectives.0.label': 'Dyntroll dräpt',
+  'entities.quests.q_dk_trolls_on_the_road.text':
+    'Dyntrollen har lärt sig ljudet av en förrådsvagn, {playerName}. De har slagit till mot Sotdynernas väg tre gånger denna månad, och den senaste körsvennen kom in bärandes på inget annat än tyglarna. Åtta troll bort från den vägen så rullar mina vagnar igen.',
+  'entities.quests.q_dk_trolls_on_the_road.title': 'Troll på vägen',
+  'entities.quests.q_dk_watcher_at_the_wargate.completion':
+    'Brannoc skickade dig? Då nådde min sista budbärare aldrig fram. Håll rösten låg och sätt dig, {playerName}. Ser du porten där nere? Räkna krigsbanéren framför den, så förstår du varför jag slutade skriva ner saker.',
+  'entities.quests.q_dk_watcher_at_the_wargate.objectives.0.label': 'Hitta Spanaren Yerrin',
+  'entities.quests.q_dk_watcher_at_the_wargate.text':
+    'Något drar askbenen österut, {playerName}, och jag sände min bästa för att ta reda på vad. Spanaren Yerrin har lägrat sig en månad i de bortre dynerna bortom Trollmötet, i sikte av en port ingen byggde under min livstid. Hennes rapporter upphörde för tio dagar sedan. Hitta hennes läger och ge mig hennes ögon.',
+  'entities.quests.q_dk_watcher_at_the_wargate.title': 'Vakten vid krigsporten',
+  'entities.quests.q_eg_bloom_clippings.completion':
+    'Titta här: löven krullar sig inåt, varje stickling likadan. Trädgården är rädd, {playerName}. På hundra år har jag aldrig en enda gång känt den rädd.',
+  'entities.quests.q_eg_bloom_clippings.objectives.0.label': 'Beskuren blomstersticklig',
+  'entities.quests.q_eg_bloom_clippings.text':
+    'Vill du förstå denna trädgård? Läs den då som jag gör. Hjortarna som betar gräsmattorna växer den sannaste grönskan: varje löv på dem är en sida. Ge mig sex färska sticklingar från de formklippta hjortarna, {playerName}. De kommer inte tacka dig för beskärningen, men de växer tillbaka. Allt här växer tillbaka.',
+  'entities.quests.q_eg_bloom_clippings.title': 'Sticklingar från den levande grönskan',
+  'entities.quests.q_eg_bull_of_the_court.completion':
+    'Jag kände det, här, när han föll isär. Hundra års arbete, och du hade rätt att avsluta det. Ta denna mantel: jag skar till den åt den som visade sig starkare än mitt bästa verk. Gården är bara en fontän i natt, {playerName}, och trädgården är bara en trädgård. Kanske kan Överträdgårdsmästaren och jag båda sova nu.',
+  'entities.quests.q_eg_bull_of_the_court.objectives.0.label': 'Den formklippta tjuren avformad',
+  'entities.quests.q_eg_bull_of_the_court.text':
+    'Nu sanningen, {playerName}. Tjuren i labyrintens hjärta var mitt mästerverk: jag formade honom att vakta Fontängården, och i hundra år gjorde han det. Men rädslan i grönskan har nått honom, och han vaktar ingenting nu, han jagar. Labyrinten föder honom med den som vandrar in. Jag är för gammal för att avforma honom, och det måste vara en fullständig avformning, rot och gren. Ta med en vän, gå genom labyrinten till gården, och fäll min tjur.',
+  'entities.quests.q_eg_bull_of_the_court.title': 'Tjuren i Fontängården',
+  'entities.quests.q_eg_four_statues.completion':
+    'Fyra avgnidningar, fyra systrar, och ingen av dem grät marmor. Trädgården har tagit ditt mått, {playerName}, och den fann dig inte bristfällig. Nu kan jag sända dig dit oron verkligen bor.',
+  'entities.quests.q_eg_four_statues.objectives.0.label': 'Trädgårdsstaty besökt',
+  'entities.quests.q_eg_four_statues.text':
+    'När trädgården var ung reste de första trädgårdsmästarna fyra marmorsystrar för att vakta dess kvarter: en ovanför Rosenvildmarken, en vid dammpromenaden öster om labyrinten, en på västra gräsmattan där gnomerna håller sitt bo, och en på södra gräsmattan bortom häckarna. Labyrinten växte upp mellan dem, och de flesta ser aldrig alla fyra. Gå kvarteren runt, {playerName}, och tryck din handflata mot varje syster. När trädgården har synat dig från alla fyra håll, öppnar den platser den håller dolda för främlingar.',
+  'entities.quests.q_eg_four_statues.title': 'De fyra tysta systrarna',
+  'entities.quests.q_eg_gate_report.completion':
+    'Rörde sig, jaså. Pell rapporterar det varje vecka, och varje vecka har han rätt. Förlåt mina ögon, {playerName}, jag har inte sovit en hel natt på år: någon måste vakta trädgården som vaktar oss. Välkommen till Häckby.',
+  'entities.quests.q_eg_gate_report.objectives.0.label':
+    'Rapportera till Överträdgårdsmästaren Amaranth',
+  'entities.quests.q_eg_gate_report.text':
+    'Gräsmattorna bortom denna port har klippt sig själva i hundra år, {playerName}, och på sistone har de börjat klippa besökare också. Överträdgårdsmästaren Amaranth för räkenskaperna i Häckby, uppe vägen bortom portens gräsmattor. Berätta för henne att ännu en resenär kommit igenom, och berätta för henne att häckarna vid porten rörde sig i natt.',
+  'entities.quests.q_eg_gate_report.title': 'Bud genom porten',
+  'entities.quests.q_eg_gnomes_in_the_green.completion':
+    'Tre vagnar tillbaka och pinnarna fulla igen. Låt de små djävlarna sura i sina häckar: Häckby brukar dessa gräsmattor också.',
+  'entities.quests.q_eg_gnomes_in_the_green.objectives.0.label': 'Häckgnom bortjagad',
+  'entities.quests.q_eg_gnomes_in_the_green.objectives.1.label': 'Verktygsvagn återfunnen',
+  'entities.quests.q_eg_gnomes_in_the_green.text':
+    'Saxarna var bara början, {playerName}. Igår natt vräkte gnomerna våra verktygsvagnar ner i grönskan, en ute vid deras bo väster om labyrinten, en tvärs över trädgården vid dammpromenaden, och strödde hundra års gott järn i gräset. Jaga bort åtta av de små djävlarna och släpa hem de vräkta vagnarna.',
+  'entities.quests.q_eg_gnomes_in_the_green.title': 'Trädgårdsvaktarnas groll',
+  'entities.quests.q_eg_hungry_shapes.completion':
+    'Tio högar av avklipp där tio vargar stod. Det borde kännas som trädgårdsarbete, {playerName}. Varför känns det som krig?',
+  'entities.quests.q_eg_hungry_shapes.objectives.0.label': 'Formklippt varg dräpt',
+  'entities.quests.q_eg_hungry_shapes.text':
+    'Vem som än formar denna trädgård har blivit vårdslös, eller grym. Vargformerna ute i Rosenvildmarken klipptes för att synas, men på sistone jagar de: gröna käkar, inga magar, och ingen anledning att någonsin sluta. Fäll tio formklippta vargar, {playerName}, och låt gräsmattorna få vara gräsmattor igen ett tag.',
+  'entities.quests.q_eg_hungry_shapes.title': 'Beskurna till hunger',
+  'entities.quests.q_eg_stolen_shears.completion':
+    'Sex par, och mitt eget bland dem, jag skulle känna igen hacket i bladet var som helst. Här, dessa handskar stickades för beskärningsarbete. Varma händer ger stadiga saxar.',
+  'entities.quests.q_eg_stolen_shears.objectives.0.label': 'Stulen Häckby-sax',
+  'entities.quests.q_eg_stolen_shears.text':
+    'Varenda sax i Häckby har försvunnit på två veckor, {playerName}: från krokarna, ur låsta skjul, ett par ur mitt eget förkläde medan jag slumrade till. Det är häckgnomerna, de små trädgårdsvaktarna som hatar att vi går på deras gräsmattor. Skaffa tillbaka sex par innan hela byn står med bara köksknivar.',
+  'entities.quests.q_eg_stolen_shears.title': 'De stulna saxarna',
+  'entities.quests.q_eg_who_trims_the_hedges.completion':
+    'Så huset skickade äntligen någon. I hundra år har jag vandrat dessa gräsmattor, {playerName}, och trädgården och jag har en överenskommelse: jag klipper det som ber om att klippas. Sätt dig. Häckarna kan avvara dig en timme.',
+  'entities.quests.q_eg_who_trims_the_hedges.objectives.0.label':
+    'Hitta trädgårdsmästaren vid Liljebassängen',
+  'entities.quests.q_eg_who_trims_the_hedges.text':
+    'Jag har fört räkenskaperna i trettio år, {playerName}, och inte sovit ordentligt på tio av dem, för siffrorna vill inte gå ihop. Gräset vill klippas och häckarna vill formas, och ingen här gör något av det, ändå står trädgården klippt varje gryning. På sistone svär skogsfolket att de ser en gammal man med en skottkärra på de bortre södra gräsmattorna, bortom labyrinten vid Liljebassängen. Hitta honom. Om han är verklig kan jag äntligen sova. Om han inte är det antar jag att jag aldrig kommer göra det.',
+  'entities.quests.q_eg_who_trims_the_hedges.title': 'Vem klipper häckarna',
+  'entities.quests.q_fs_bell_at_the_landing.completion':
+    'Vägbanken håller, och Tam har fortfarande andan kvar att skämta om trippelklämtningen. Bra. Vi är en ö under belägring, {playerName}, och varje par händer som korsar den sandrevlen är ett par bräscherna måste ta sig förbi innan de når mitt folk. Välkommen till Måshamn.',
+  'entities.quests.q_fs_bell_at_the_landing.objectives.0.label':
+    'Rapportera till Väktaren Coalfast',
+  'entities.quests.q_fs_bell_at_the_landing.text':
+    'Du kom över Färjeleden, {playerName}? Då är du den första på en vecka, och Väktaren kommer vilja se på dig. Måshamn ligger uppe vid strandvägen, förbi torkställningarna ingen sköter längre. Berätta för Väktaren Coalfast att vägbanken fortfarande står, och att Tam inte har ringt en trippelklämtning idag. Ännu.',
+  'entities.quests.q_fs_bell_at_the_landing.title': 'Klockan vid landningsplatsen',
+  'entities.quests.q_fs_bram_come_home.completion':
+    'Bram! Du förde honom tillbaka till mig hel, {playerName}. Vi grät båda och ingen av oss skäms. Vad bräscherna än tar från denna ö härnäst, de får inte min familj. Inte längre.',
+  'entities.quests.q_fs_bram_come_home.objectives.0.label':
+    'Fiskaren Bram säkert hemförd till Måshamn',
+  'entities.quests.q_fs_bram_come_home.text':
+    'Min Bram tog ut båten morgonen nätbräschen öppnades, och havet kastade tillbaka honom någonstans bortom Landningsudden. Jag hörde honom för tre nätter sedan, {playerName}, ropande över vattnet, och jag var för rädd för att gå. Jag är fortfarande för rädd. Snälla. Hans båt ligger vrakad på södra stranden. För honom hem till mig.',
+  'entities.quests.q_fs_bram_come_home.title': 'Bram kommer hem',
+  'entities.quests.q_fs_hold_the_riftfields.completion':
+    'Tio färre, och fältarbetarna bråkar redan om vem som går ut först. Det kommer inte vara för alltid, bräscherna vilar aldrig länge, men en stad som äter är en stad som håller.',
+  'entities.quests.q_fs_hold_the_riftfields.objectives.0.label': 'Bräschens stackare dräpt',
+  'entities.quests.q_fs_hold_the_riftfields.text':
+    'Öster om staden har sädesraderna gått under, och stackarna som kom genom Revfältens bräsch plockar dem nu rena. Mitt folk kan inte sköta ett fält de inte kan stå i, {playerName}. Gallra tio av stackarna och ge bönderna tillbaka sin mark.',
+  'entities.quests.q_fs_hold_the_riftfields.title': 'Håll Revfälten',
+  'entities.quests.q_fs_moss_and_mending.completion':
+    'Mossa i ena handen och en tystare kustlinje i den andra. Du har fyllt på hela min mottagning, {playerName}. Gör mig tjänsten att inte bli min nästa patient.',
+  'entities.quests.q_fs_moss_and_mending.objectives.0.label': 'Revavkomma dräpt',
+  'entities.quests.q_fs_moss_and_mending.objectives.1.label': 'Fjärrkustens saltmossa',
+  'entities.quests.q_fs_moss_and_mending.text':
+    'Saltmossan som växer längs tidvattenslinjen är den bästa sårpackning jag känner till, och revavkommorna har tagit varje sträcka kust den växer på. De bär tofsar av den fasthakade i sina hudar, av alla saker. Rensa sex av dem från de östra utsträckningarna, {playerName}, och plocka mig fyra bra nävar mossa från det de trampat sönder.',
+  'entities.quests.q_fs_moss_and_mending.title': 'Mossa och läkning',
+  'entities.quests.q_fs_song_before_the_break.completion':
+    'Väktaren skickade dig? Bra. Det betyder att staden äntligen har börjat lyssna. Var stilla ett ögonblick nu, {playerName}. Där, under vinden, hör du det? Klipporna sjunger, och jag gillar inte melodin.',
+  'entities.quests.q_fs_song_before_the_break.objectives.0.label': 'Hitta Revvakten Ollun',
+  'entities.quests.q_fs_song_before_the_break.text':
+    'Det finns en man som hör bräscherna innan de öppnas. Revvakten Ollun: en lärd man, eller en dåre, och på sistone har jag inte råd med skillnaden. Han håller sin vaka vid Vaktängen, uppe vägen sydost om staden. Hitta honom, {playerName}, och fråga honom vad ön tänker göra med oss härnäst.',
+  'entities.quests.q_fs_song_before_the_break.title': 'Sången före bräschen',
+  'entities.quests.q_fs_stalkers_off_the_light.completion':
+    'Åtta nätters kretsande, avslutat på en. Eldarna brinner redan stadigare, eller så är det bara mina händer. Hur som helst är ängen min igen, och jag kan höra ön tänka.',
+  'entities.quests.q_fs_stalkers_off_the_light.objectives.0.label': 'Tomrumssmygare dräpt',
+  'entities.quests.q_fs_stalkers_off_the_light.text':
+    'Smygarna jagar i mörkret mellan vaktbålen, och varje natt kretsar de lite närmare min äng. De är inte tanklösa, {playerName}, de är tålmodiga, och tålamod är det enda jag inte kan hålla ut längre än. Döda åtta och tryck tillbaka mörkret till klipporna det kom igenom.',
+  'entities.quests.q_fs_stalkers_off_the_light.title': 'Smygare bort från ljuset',
+  'entities.quests.q_fs_steel_for_the_redoubt.completion':
+    'Saltgropigt och bräschärrat, men det håller en egg ändå. Här, jag fodrade dessa grepp själv. Stål för stål, {playerName}: det är den enda handel Fjärrkusten driver nuförtiden.',
+  'entities.quests.q_fs_steel_for_the_redoubt.objectives.0.label': 'Brytärrat stål',
+  'entities.quests.q_fs_steel_for_the_redoubt.text':
+    'Varje klinga jag delar ut är en havet gav tillbaka eller en jag bänt loss från de döda, {playerName}. Stackarna bär skrot genom bräscherna, gångjärn, krokar, brutet svärdsstål, skatgods, men det smids ut sant. Ge mig sex bitar av deras plockade stål så får barrikadlinjen tillbaka sina tänder.',
+  'entities.quests.q_fs_steel_for_the_redoubt.title': 'Stål till skansen',
+  'entities.quests.q_fs_the_great_break.completion':
+    'Ollun sände bud i förväg: sången upphörde. Hela min stad hörde tystnaden, {playerName}, och hälften av dem grät åt ljudet av ingenting alls. Bär denna mantel. Fjärrkusten glömmer inte vem som höll dess kust.',
+  'entities.quests.q_fs_the_great_break.objectives.0.label': 'Den splittrade fasan dräpt',
+  'entities.quests.q_fs_the_great_break.text':
+    'Varje sång denna ö sjunger slutar på samma djupa ton, och den kommer från De klyvda klipporna. Något kom igenom den stora bräschen där, {playerName}, något klipporna själva sprack upp för att släppa in, och det växer fortfarande. Om det vandrar norrut spelar ingen klocka roll. Ta med en vän, ta med två, och gör slut på det. Berätta sedan för Coalfast att melodin har ändrats.',
+  'entities.quests.q_fs_the_great_break.title': 'Den stora bräschen',
+  'entities.quests.q_fs_the_three_bells.completion':
+    'Tre röster, tre svar, buret rent över vattnet. Sov i Måshamn i natt, {playerName}, och vet att om en klocka väcker dig så är det av min hand och i god tid.',
+  'entities.quests.q_fs_the_three_bells.objectives.0.label': 'Vaktklocka ringd',
+  'entities.quests.q_fs_the_three_bells.text':
+    'Tre vaktklockor står vid kusten bortom min egen: en vid Landningsudden, en vid södra stranden, en ute vid Revfältens kust. Om ett rep har ruttnat eller en kläpp har försvunnit lär sig staden om en bräsch först när den redan är i gatorna. Gå längs kusten, {playerName}, och ring varje klocka en gång, så jag vet att den fortfarande har en röst.',
+  'entities.quests.q_fs_the_three_bells.title': 'De tre klockorna',
+  'entities.quests.q_fv_aurora_motes.completion':
+    'Sex korn, fortfarande glödande. Titta på dem, {playerName}: de pulserar i takt med varandra. Skenen är inget väder. De är en signal.',
+  'entities.quests.q_fv_aurora_motes.objectives.0.label': 'Norrskenskorn',
+  'entities.quests.q_fv_aurora_motes.text':
+    'Irrbloss som driver längs dessa trappor fälls av skenen själva, och var och en bär ett korn av norrskenet i sitt hjärta. Jag behöver sex för att läsa vad himlen skriver, {playerName}. Irrbloss slår inte tillbaka. Om det gör arbetet lättare eller svårare är en sak mellan dig och ditt samvete.',
+  'entities.quests.q_fv_aurora_motes.title': 'Norrskenets korn',
+  'entities.quests.q_fv_ember_caches.completion':
+    'Fortfarande varma, allihop. Du har köpt stugan en hel vinter av nåd, {playerName}.',
+  'entities.quests.q_fv_ember_caches.objectives.0.label': 'Glödgömma återfunnen',
+  'entities.quests.q_fv_ember_caches.text':
+    'En släde med glödgömmor välte på tjärnvägen inatt: järngrytor som håller en täckt eld levande i en månad. Tre av dem ligger fortfarande i snön, {playerName}, och stugan kan inte avvara vad de rymmer. För elden hem.',
+  'entities.quests.q_fv_ember_caches.title': 'Glöd på tjärnvägen',
+  'entities.quests.q_fv_frostmane_tyrant.completion':
+    'När vinden lade sig i natt hörde hela byn tystnaden där Frostmanen brukade vara. Vidderna är dig skyldiga en skuld som kommer ta år att betala, {playerName}. Bär detta, och varje dörr i Ismanteln står öppen för dig.',
+  'entities.quests.q_fv_frostmane_tyrant.objectives.0.label': 'Frostmanen dräpt',
+  'entities.quests.q_fv_frostmane_tyrant.text':
+    'Tjutarna jagade inte när de kom ner för terrasserna. De flydde. En yeti har tagit högmarken, bergsfolket kallar den Frostmanen, och inte ens flockarna vill dela en sluttning med den. Det måste ta slut, {playerName}, innan vintern driver den ner till mina murar. Ta med en vän. Ta med två.',
+  'entities.quests.q_fv_frostmane_tyrant.title': 'Frostmanens tyrann',
+  'entities.quests.q_fv_howl_above.completion':
+    'Åtta, och skymningskören är tunnare för det. Men tjutare lämnar inte topparna utan anledning. Något däruppe rörde dem, och jag fruktar att det har ett namn.',
+  'entities.quests.q_fv_howl_above.objectives.0.label': 'Terrassernas tjutare dräpt',
+  'entities.quests.q_fv_howl_above.text':
+    'Du hör det i skymningen, {playerName}: ett tjut från De tjutande terrasserna som inte är snödrivsflockarna. Större strupar. Terrasstjutarna har kommit ner från topparna för första gången sedan min mormor höll denna post, och det är de som drev vargarna ut på min väg. Gallra åtta och driv tillbaka dem.',
+  'entities.quests.q_fv_howl_above.title': 'Tjutet på terrasserna',
+  'entities.quests.q_fv_lights_over_steps.completion':
+    'Kaldra skickade dig? Då är hon äntligen orolig, och hon har rätt att vara det. Sätt dig, {playerName}. Titta på himlen med mig en stund.',
+  'entities.quests.q_fv_lights_over_steps.objectives.0.label': 'Hitta Norrskenstydaren Veyla',
+  'entities.quests.q_fv_lights_over_steps.text':
+    'Norrskenet har brunnit grönt varje natt denna månad, och de gamla vill inte vandra under det. En kvinna kanske vet varför: Veyla, Norrskenstydaren. Hon lägrar sig ensam på Norrskenstrapporna, sydost förbi tjärnen. Hitta hennes läger, {playerName}, och hör vad skenen har berättat för henne.',
+  'entities.quests.q_fv_lights_over_steps.title': 'Sken över trapporna',
+  'entities.quests.q_fv_rime_unbound.completion':
+    'Natten känns redan tunnare. Vad som än väcker dem är inte klart, men du har köpt trapporna lite tystnad.',
+  'entities.quests.q_fv_rime_unbound.objectives.0.label': 'Rimfrostelementar dräpt',
+  'entities.quests.q_fv_rime_unbound.text':
+    'När norrskenet brinner så här klart reser sig kylan och går: rimfrostelementarer, frost given en vilja. De samlas där skenen rör vid avsatserna, och de vandrar allt närmare mitt läger varje natt. Slå sönder åtta av dem, {playerName}, innan en av dem slår sönder mig.',
+  'entities.quests.q_fv_rime_unbound.title': 'Rimfrost frigjord',
+  'entities.quests.q_fv_seeing_wren_home.completion':
+    'Flickan är inne, insvept i hälften av mina filtar och pratar stjärnorna ur skyn. Du gjorde något gott idag, {playerName}. Vidderna ser inte många sådana.',
+  'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
+    'Lärling Wren säkert förd till Norrskenstrapporna',
+  'entities.quests.q_fv_seeing_wren_home.text':
+    'Min lärling Wren gick ut för att vandra Guldsmältans linje för två dagar sedan och kom aldrig tillbaka. Jag fann hennes spår, hon gömmer sig under vägmärkena nordost om Norrskenstrapporna, för rädd för vargarna för att röra sig. Jag kan inte lämna kärret, {playerName}. För henne till Veylas läger på trapporna. Hon kommer vara säker under skenen.',
+  'entities.quests.q_fv_seeing_wren_home.title': 'Föra Wren hem',
+  'entities.quests.q_fv_silent_trapline.completion':
+    'Maeve skickade dig? Ha. Elva år och kvinnan tror fortfarande att kärret ska äta upp mig. Nåväl... i år kanske hon har rätt. Titta vad det har gjort med mina linor.',
+  'entities.quests.q_fv_silent_trapline.objectives.0.label': 'Hitta Fångstmannen Brosk',
+  'entities.quests.q_fv_silent_trapline.text':
+    'Gamle Brosk sköter fällinjen i Skälvkärret väster om här, och varje vecka i elva år har han sänt upp ett knippe pälsar med vedsläden. Två veckor nu, inget. Han är för envis för att frysa ihjäl och för försiktig för att drunkna, {playerName}, så något annat är fel. Hitta hans läger vid kärret och se honom andas.',
+  'entities.quests.q_fv_silent_trapline.title': 'Den tysta fällinjen',
+  'entities.quests.q_fv_snowline_report.completion':
+    'Passet håller, alltså. Einna sitter kvar i det väglägret genom stormar som begraver vägmärkena, och hon har aldrig en enda gång sänt mig lösa nyheter. Välkommen till Ismanteln, {playerName}.',
+  'entities.quests.q_fv_snowline_report.objectives.0.label': 'Rapportera till Väktaren Kaldra',
+  'entities.quests.q_fv_snowline_report.text':
+    'Varje själ som klättrar ut ur Drakländerna passerar min eld, {playerName}, och färre klättrar för varje vecka. Väktaren Kaldra håller Ismanteln uppe vid norra vägen. Berätta för henne att passet fortfarande är öppet, och berätta för henne att en främling vandrade det ensam.',
+  'entities.quests.q_fv_snowline_report.title': 'Bud från Snölinjen',
+  'entities.quests.q_fv_sprung_traps.completion':
+    'Fyra bra fällor tillbaka och vassen har blivit tyst. Du fångar med en tyngre hand än jag gör, {playerName}, men jag kan inte klaga på resultaten.',
+  'entities.quests.q_fv_sprung_traps.objectives.0.label': 'Kärrälva bortjagad',
+  'entities.quests.q_fv_sprung_traps.objectives.1.label': 'Fälla återfunnen',
+  'entities.quests.q_fv_sprung_traps.text':
+    'Kärrälvor, {playerName}. De små djävlarna utlöser mina fällor för nöjes skull och strör järnet i vassen. Jaga bort dem, åtta borde lära resten en läxa, och samla ihop det som är kvar av mina fällinjer medan du ändå är ute där.',
+  'entities.quests.q_fv_sprung_traps.title': 'Älvor i fällorna',
+  'entities.quests.q_fv_winter_pelts.completion':
+    'Päls som denna är det enda argument vintern lyssnar på. Ta dessa stövlar, de är fodrade med den senaste omgången.',
+  'entities.quests.q_fv_winter_pelts.objectives.0.label': 'Tjock vinterpäls',
+  'entities.quests.q_fv_winter_pelts.text':
+    'Ved håller en kropp vid liv, {playerName}, men ull avvärjer inte denna kyla, bara vargpäls gör det. Sex tjocka vinterpälsar från snödrivsflockarna så kan jag fodra liggunderlag åt alla stugan härbärgerar.',
+  'entities.quests.q_fv_winter_pelts.title': 'Pälsar till stugan',
+  'entities.quests.q_fv_wolves_at_the_door.completion':
+    'Tio färre skuggor mellan här och tjärnen. Vedhuggarna bråkar redan om vem som ska gå ut först.',
+  'entities.quests.q_fv_wolves_at_the_door.objectives.0.label': 'Snödrivans varg dräpt',
+  'entities.quests.q_fv_wolves_at_the_door.text':
+    'Snödrivsflockarna brukade hålla sig till de höga avsatserna. Nu korsar de tjärnvägen i dagsljus och mina vedhuggare vill inte lämna murarna. Gallra flockarna, {playerName}, tio av dem, så blir vägen en väg igen.',
+  'entities.quests.q_fv_wolves_at_the_door.title': 'Vargar vid dörren',
+  'entities.quests.q_gc_dead_mens_cargo.completion':
+    'Sex besättningar tystare och tre kistor torrlagda. Du bärgar med en tyngre hand än jag gör, {playerName}, men räkenskapen bryr sig inte. Hälften av detta är ditt enligt lag, och med lag menar jag att jag säger det.',
+  'entities.quests.q_gc_dead_mens_cargo.objectives.0.label': 'Drunknad däcksman lagd till ro',
+  'entities.quests.q_gc_dead_mens_cargo.objectives.1.label': 'Vrakgodskista bärgad',
+  'entities.quests.q_gc_dead_mens_cargo.text':
+    'Bärgningslagen är enkel, {playerName}: vad havet ger stranden är mitt. De drunknade däcksmännen håller inte med. De reser sig ur sina skrov och drar varje kista jag staplar tillbaka under tidvattenslinjen. Sänk sex av dem för gott, och medan stranden är tyst, dra in tre vrakgodskistor innan tidvattnet lämnar sin motfordran.',
+  'entities.quests.q_gc_dead_mens_cargo.title': 'Döda mäns last',
+  'entities.quests.q_gc_down_the_windway.completion':
+    'Över passet till fots, i detta väder? Maren skickar mig få nog namn, och ännu färre kommer in för att svara för sig själva. Välkommen till Vikhamn, {playerName}. Stäng värdshusdörren efter dig.',
+  'entities.quests.q_gc_down_the_windway.objectives.0.label': 'Rapportera till Hamnmästaren Odile',
+  'entities.quests.q_gc_down_the_windway.text':
+    'Du klarade klättringen, {playerName}, så vinden har bestämt sig för att behålla dig. Vikhamn ligger österut längs hedvägen, insvept i lä av sin vik. Hamnmästaren Odile räknar varje själ som kommer över passet, och hon kommer vilja räkna dig. Berätta för henne att Vindleden fortfarande är öppen.',
+  'entities.quests.q_gc_down_the_windway.title': 'Ner för Vindleden',
+  'entities.quests.q_gc_keeper_of_the_flame.completion':
+    'Odile skickade dig hela vägen hit för att se om vinden hade tagit mig? Ha. Berätta för henne att lampan brinner och det gör jag också. Men eftersom du har klarat klättringen, {playerName}, stanna ett ögonblick. Vårdkasen har arbete som bara en främling verkar lämpad för.',
+  'entities.quests.q_gc_keeper_of_the_flame.objectives.0.label': 'Hitta Väktaren Bram',
+  'entities.quests.q_gc_keeper_of_the_flame.text':
+    'Gamle Bram sköter Vårdkasen på det höga näset nordost om staden, och han har inte kommit ner för sina förråd på två veckor. Lampan brinner fortfarande, så han lever, men en man i hans ålder ensam på det näset i denna vind, {playerName}. Klättra vårdkasvägen och se honom stå kvar.',
+  'entities.quests.q_gc_keeper_of_the_flame.title': 'Lågans väktare',
+  'entities.quests.q_gc_lanterns_on_the_shear.completion':
+    'Fyra ljuspunkter på klippvägen, precis där de hör hemma. Härifrån ser det ut som om kusten har öppnat sina ögon igen. Du har gryningen till en väktare i dig, {playerName}.',
+  'entities.quests.q_gc_lanterns_on_the_shear.objectives.0.label': 'Stormlykta återtänd',
+  'entities.quests.q_gc_lanterns_on_the_shear.text':
+    'Vårdkasen är det stora ljuset, {playerName}, men det är stormlyktorna som leder en nattresenär ner för klippvägen ovanför Branten. Igår natt släckte stormen varenda en av dem, och den vägen i mörkret är ett långt fall med ett kort slut. Ta min tändare och tänd de fyra utmed klippan igen.',
+  'entities.quests.q_gc_lanterns_on_the_shear.title': 'Lyktor på Branten',
+  'entities.quests.q_gc_scuttlers_in_the_pots.completion':
+    'Tio färre skal på min väg, och tinorna kom upp fulla i morse. Tinvaktarna kallar dig ett gott omen, {playerName}. I Vikhamn är det så varmt beröm blir.',
+  'entities.quests.q_gc_scuttlers_in_the_pots.objectives.0.label': 'Grundskuttlare dräpt',
+  'entities.quests.q_gc_scuttlers_in_the_pots.text':
+    'Grundskuttlarna har lärt sig klättra upp klippvägen och knäcka våra krabbtinor mot stenarna, {playerName}. Halva fångsten borta denna vecka, och en tinvaktare med en hand han inte kommer använda på en månad. Krossa tio av dem så minns resten varför de höll sig till grunden.',
+  'entities.quests.q_gc_scuttlers_in_the_pots.title': 'Skuttlare i tinorna',
+  'entities.quests.q_gc_the_far_shore.completion':
+    'Bram vaktar min kust från sitt torn nu, jaså? Den gamle mannen har rätt att oroa sig, {playerName}. De döda har gått omkring i sina egna vrak om natten, och på sistone har de slutat bry sig om solen är uppe.',
+  'entities.quests.q_gc_the_far_shore.objectives.0.label': 'Hitta Bärgaren Edda',
+  'entities.quests.q_gc_the_far_shore.text':
+    'Från detta lamprum kan jag se hela kusten, {playerName}, och vad jag ser i norr gillar jag inte. Gröna ljus som vandrar över Vrakfälten vid lågvatten, skrov för skrov. En kvinna arbetar den kusten ensam: Edda, bärgaren. Följ klippvägen norrut förbi Branten tills vraken börjar, och se till att hon fortfarande andas.',
+  'entities.quests.q_gc_the_far_shore.title': 'Den bortre kusten',
+  'entities.quests.q_gc_the_wreck_warden.completion':
+    'Stranden blev tyst i samma stund den föll, {playerName}. Första tystnaden jag hört på denna kust på tio år av att arbeta den. Besättningarna är bara ben nu, vilande ben. Ta manteln från toppen av skatten, den skulle alltid passa en levande rygg bättre.',
+  'entities.quests.q_gc_the_wreck_warden.objectives.0.label': 'Vrakväktaren fälld',
+  'entities.quests.q_gc_the_wreck_warden.text':
+    'Nu vet du varför däcksmännen reser sig, {playerName}. Något bär havstulsbeklädda plåten från det första vraket som någonsin slog sönder på denna kust, och det vaktar varje skrov på stranden som en kyrkogård det hyrts att vårda. Det håller en skatt jag har åtrått i tio år och en besättning jag hellre ser vila. Gör slut på Vrakväktaren. Ta med en vän, de döda håller god vakt.',
+  'entities.quests.q_gc_the_wreck_warden.title': 'Vrakväktaren',
+  'entities.quests.q_gc_wind_against_the_wick.completion':
+    'Lampan fladdrade inte ens i natt, första gången på en månad. Vinden hatar oss fortfarande, {playerName}, men den har gått tillbaka till att hata oss rättvist.',
+  'entities.quests.q_gc_wind_against_the_wick.objectives.0.label': 'Stormirrbloss skingrat',
+  'entities.quests.q_gc_wind_against_the_wick.text':
+    'Stormirrblossen är vinden som blivit ondsint, {playerName}. De samlas på de höga hedarna vid Spegeltjärnen, och varje låga de finner släcker de, en lykta, en härd, en dag denna lampa. Trettionio år har jag hållit Vårdkasen tänd, och jag tänker inte förlora den till väder med ett agg. Skingra åtta av dem.',
+  'entities.quests.q_gc_wind_against_the_wick.title': 'Vind mot veken',
+  'entities.quests.q_gc_wool_off_the_downs.completion':
+    'Fäll som denna är varför baggarna står där ute feta och belåtna i väder som dödar män. Spinnerskorna kommer sätta igång vid lampsken. Ta dessa stövlar, {playerName}, de är fodrade från den senaste klippningen.',
+  'entities.quests.q_gc_wool_off_the_downs.objectives.0.label': 'Fettig baggeull',
+  'entities.quests.q_gc_wool_off_the_downs.text':
+    'Mina båtbesättningar ror in i en storm som skär genom oljekläder som papper, {playerName}. Bara en sak avvärjer denna vind: den feta ullen från hedbaggarna, spunnen tjock på Vikhamns vis. Hjordarna betar De tjutande kullarna väster om staden. Sex bra fällar och varje besättning ror varm denna säsong.',
+  'entities.quests.q_gc_wool_off_the_downs.title': 'Ull från hedarna',
+  'entities.quests.q_gleaming_antlers.completion':
+    'Titta hur de håller ljuset! Ingen låga, ingen rök, bara glöden. Hålan förser.',
+  'entities.quests.q_gleaming_antlers.objectives.0.label': 'Glimmrande horn',
+  'entities.quests.q_gleaming_antlers.text':
+    'Slöjhjortarna fäller ljus där de betar, och deras fällda horn håller det i åratal. Fem av dem, från hjordarna i den öppna gläntan i dalens hjärta, och mina lyktor brinner genom vintern utan olja. Hjortarna behöver inte skadas, men de skiljs inte gärna från dem.',
+  'entities.quests.q_gleaming_antlers.title': 'Glimmrande horn',
+  'entities.quests.q_grove_menace.completion':
+    'Nattmarknaden kan öppna igen. Du har en kund för livet, eller åtminstone rabatt.',
+  'entities.quests.q_grove_menace.objectives.0.label': 'Skymningsirrbloss skingrat',
+  'entities.quests.q_grove_menace.text':
+    'Skymningsirrbloss har börjat driva in bland mina stånd efter mörkrets inbrott, {playerName}, och deras köld förstör allt den rör vid. Gallra ut dem åt mig: tio av dem, var slöjan än har rivits upp.',
+  'entities.quests.q_grove_menace.title': 'Hot i gläntan',
+  'entities.quests.q_hollow_first_of_the_herd.completion':
+    'Så den förste faller för den siste. Hjorden är redan lugnare, känner du det? Du gjorde Hålan en tjänst idag, även om det inte ser ut som en.',
+  'entities.quests.q_hollow_first_of_the_herd.objectives.0.label': 'Aurelhorn given frid',
+  'entities.quests.q_hollow_first_of_the_herd.text':
+    'Det andra namnet är svårare att säga. Aurelhorn ledde dessa hjordar när min mormor höll denna utkiksplats, och vad som än vaknade i Hålan väckte honom fel. Han trampar ner det han en gång vaktade, och hjorden överlever inte hans vansinne. Han strövar omkring på ängarna nära de gamla gårdsvägarna. Gör slut på honom med nåd, {playerName}, och ta med en vän att dela bördan med.',
+  'entities.quests.q_hollow_first_of_the_herd.title': 'Hjordens förste',
+  'entities.quests.q_hollow_old_marrowshell.completion':
+    'Grunden är bara vatten igen. Jag har sett det skalet krossa bättre jägare än mig, {playerName}. Inte dig.',
+  'entities.quests.q_hollow_old_marrowshell.objectives.0.label': 'Gamla Märgskalet dräpt',
+  'entities.quests.q_hollow_old_marrowshell.text':
+    'Det första namnet är Gamla Märgskalet, en krabba stor som en vagn som har jagat de östra grunden sedan innan Fornglimmer hade en port. Den vandrar, {playerName}, så du får gå längs strandlinjen tills du korsar dess spår. Gå inte ensam, och lita inte på dess stillhet.',
+  'entities.quests.q_hollow_old_marrowshell.title': 'Det gamla skalet i grunden',
+  'entities.quests.q_hollow_the_huntsman.completion':
+    'Fenna skickade dig? Bra. Då litar hon på dig, och jag har två namn som behöver strykas ut.',
+  'entities.quests.q_hollow_the_huntsman.objectives.0.label': 'Hitta Jägaren Deral',
+  'entities.quests.q_hollow_the_huntsman.text':
+    'Du ser ut som någon som klarar av mer än irrbloss, {playerName}. Jägaren Deral håller sin utkik bland hjortängarna öster om här, och han har frågat efter kapabla händer i veckor. Vad han än spårar där ute vill han inte säga högt i byn.',
+  'entities.quests.q_hollow_the_huntsman.title': 'Hjordarnas väktare',
+  'entities.quests.q_monument_tour.completion':
+    'En utsikt, en gård och ett bortglömt hörn, och alla tre verserna av förseglingssången, tillsammans för första gången sedan den sjöngs. Du har gjort en gammal läsare mycket glad.',
+  'entities.quests.q_monument_tour.objectives.0.label': 'Utsiktens monument läst',
+  'entities.quests.q_monument_tour.objectives.1.label': 'Gårdens monument läst',
+  'entities.quests.q_monument_tour.objectives.2.label': 'Det bortglömda monumentet läst',
+  'entities.quests.q_monument_tour.text':
+    'Tre monument står fortfarande kvar från före förseglingen: ett vid Skymningsfallets utsikt, ett i Den sjunkna gården, och ett förlorat i den fjärran nordost dit ingen går. Läs dem åt mig, {playerName}. Mina knän gav vika för två århundraden av trappor sedan.',
+  'entities.quests.q_monument_tour.title': 'Vad stenarna minns',
+  'entities.quests.q_nb_charts_of_the_stones.completion':
+    'Inget tvivel finns kvar. Varenda bäring har krupit mot Den sömnlösa gravhögen, som om himlen själv lutar sig över den högen för att vaka. De gamla kungarna begravdes under uppradade stjärnor av en anledning, {playerName}.',
+  'entities.quests.q_nb_charts_of_the_stones.objectives.0.label': 'Stjärnkarta läst',
+  'entities.quests.q_nb_charts_of_the_stones.text':
+    'Vakans stenar är äldre än Månvila, äldre än nattsläktet som vårdar dem, och deras ytor är ristade med stjärnkartor jag har ägnat mitt liv åt att lära mig läsa. Himlen har förskjutits, {playerName}, och jag måste veta hur mycket. Läs kartorna på tre av stenarna och ge mig deras bäringar.',
+  'entities.quests.q_nb_charts_of_the_stones.title': 'Kartorna i stenarna',
+  'entities.quests.q_nb_eyes_on_the_vigil.completion':
+    'Lira skickade dig? Då känner trädgårdarna det också. Sätt dig vid kikaren ett ögonblick, {playerName}. Stjärnorna har varit rastlösa i en månad, och varje karta jag ritar lutar norrut mot gravhögen.',
+  'entities.quests.q_nb_eyes_on_the_vigil.objectives.0.label':
+    'Hitta Astronomen Cassian vid Den stående vakan',
+  'entities.quests.q_nb_eyes_on_the_vigil.text':
+    'Något gör vandrarna djärva och hjordarna oroliga, {playerName}, och jag kan inte läsa det i blommorna. Cassian kan läsa det i himlen. Han håller sitt observatorieläger vid Den stående vakan öster om här, där nattsläktet driver bland stenarna. Hitta honom, och fråga vad stjärnorna säger.',
+  'entities.quests.q_nb_eyes_on_the_vigil.title': 'Ögon på vakan',
+  'entities.quests.q_nb_night_gardens.completion':
+    'Fortfarande glödande, varenda kronblad. Helgedomen kommer dofta natt i en vecka, och Månvila sover lättare för det.',
+  'entities.quests.q_nb_night_gardens.objectives.0.label': 'Nattblomstrets blomma insamlad',
+  'entities.quests.q_nb_night_gardens.text':
+    'Nattblomstret öppnar sig bara under denna himmel, och Skymningsfältet håller de äldsta bäddarna i riket. Jag behöver fyra färska blommor till helgedomens girlanger, {playerName}. Skär dem varsamt: en bädd minns en hårdhänt beröring en hel säsong.',
+  'entities.quests.q_nb_night_gardens.title': 'Natt-trädgårdarna',
+  'entities.quests.q_nb_restless_mounds.completion':
+    'Gravguld, fortfarande kallt från jorden. Vättarna reser sig inte av sig själva, {playerName}: något under den stora högen kallar på dem, och jag fruktar att kartorna redan har berättat dess namn för oss.',
+  'entities.quests.q_nb_restless_mounds.objectives.0.label': 'Gravhögsvätte dräpt',
+  'entities.quests.q_nb_restless_mounds.objectives.1.label': 'Gravoffer återfunnet',
+  'entities.quests.q_nb_restless_mounds.text':
+    'Kartorna var en varning, och gravhögsfältet bevisar det: högarna öppnas underifrån. Vättar vandrar gravraderna bärandes de gamla hedersmärkena, och offren som höll dem sovande ligger utströdda i gräset. Sänk åtta av dem, {playerName}, och samla fyra av offren tillbaka till mig.',
+  'entities.quests.q_nb_restless_mounds.title': 'De rastlösa högarna',
+  'entities.quests.q_nb_road_of_lanterns.completion':
+    'Lamporna brinner fortfarande, och vägen för fortfarande främlingar till oss. Sorrel har hållit den porten längre än någon i Månvila minns. Välkommen, {playerName}, till riket som aldrig gryr.',
+  'entities.quests.q_nb_road_of_lanterns.objectives.0.label': 'Hitta Lira Dewsong i Månvila',
+  'entities.quests.q_nb_road_of_lanterns.text':
+    'Här uppe följer solen aldrig med, {playerName}, bara lamporna jag håller tända längs klättringen. Månvila ligger norrut där blomljuset samlas. Hitta Lira Dewsong bland sina trädgårdar och berätta för henne att Nattportens lampor fortfarande brinner.',
+  'entities.quests.q_nb_road_of_lanterns.title': 'Lyktornas väg',
+  'entities.quests.q_nb_striders_in_the_dark.completion':
+    'Tio vandrare färre, och hjordarna betar redan lättare. Trädgårdarna håller sina egna tider, men i natt håller de dem i frid.',
+  'entities.quests.q_nb_striders_in_the_dark.objectives.0.label': 'Skymningsvandrare dräpt',
+  'entities.quests.q_nb_striders_in_the_dark.text':
+    'Skymningsvandrarna var alltid tålmodiga jägare, {playerName}, men på sistone smiter de rakt in i blomsterbäddarna och tar månullslamm under våra lyktor. Gallra tio av dem och ge hedarna tillbaka sin frid.',
+  'entities.quests.q_nb_striders_in_the_dark.title': 'Vandrare i mörkret',
+  'entities.quests.q_nb_the_barrow_king.completion':
+    'Stjärnorna har lugnat sig för första gången på en säsong, {playerName}. Högarna är stängda, nattsläktet har blivit stilla vid sina stenar, och kungen sover därunder än en gång. Bär denna mantel: Månvila skar till den åt den som natten äntligen litade på.',
+  'entities.quests.q_nb_the_barrow_king.objectives.0.label': 'Gravhögskungen lagd till ro',
+  'entities.quests.q_nb_the_barrow_king.text':
+    'Varje bäring, varje rastlös stjärna, varje öppnad hög pekar mot en sak: Gravhögskungen vaknar under den stora högen, och detta rike har ingen gryning som håller honom tillbaka. Han måste läggas till ro innan han minns sin krona, {playerName}. Gå inte ensam: ta med en vän, och håll blomljuset i ryggen.',
+  'entities.quests.q_nb_the_barrow_king.title': 'Gravhögskungen vaknar',
+  'entities.quests.q_nb_wool_by_moonlight.completion':
+    'Silverfärgad som stjärnljus och dubbelt så mjuk. Här, {playerName}: vantar från den senaste omgången, fodrade som bara månull kan fodra.',
+  'entities.quests.q_nb_wool_by_moonlight.objectives.0.label': 'Månullstofs',
+  'entities.quests.q_nb_wool_by_moonlight.text':
+    'Inget värmer som månull, {playerName}, och inget spinns så fint. Betarna bär sin silverull löst i tofsar medan de driver över hedarna. Ge mig sex bra tofsar från hjordarna så väver jag åt dig något värt vandringen.',
+  'entities.quests.q_nb_wool_by_moonlight.title': 'Ull i månsken',
+  'entities.quests.q_pr_boars_in_the_gardens.completion':
+    'Ställningarna står kvar och trädgårdarna kan planteras om. Vildsvinen valde inte att komma ut på sanden, {playerName}. Kom ihåg det: något drev dem.',
+  'entities.quests.q_pr_boars_in_the_gardens.objectives.0.label': 'Snårvildsvin bortjagat',
+  'entities.quests.q_pr_boars_in_the_gardens.text':
+    'Vad som än rör sig i den djupa grönskan, det driver snårvildsvinen ut på vår strand. De har bökat upp trädgårdsterrasserna två gånger denna vecka, och torkställningarna blir nästa. Tio vildsvin, {playerName}, och driv resten tillbaka under träden.',
+  'entities.quests.q_pr_boars_in_the_gardens.title': 'Vildsvin i trädgårdarna',
+  'entities.quests.q_pr_canopy_silk.completion':
+    'Bra, starkt siden. Mina klockor kommer sjunga ett tag till, och inget vandrar dessa stigar om natten utan att jag vet om det, {playerName}. På sistone har något vandrat ofta.',
+  'entities.quests.q_pr_canopy_silk.objectives.0.label': 'Lövtakssidenhärva',
+  'entities.quests.q_pr_canopy_silk.text':
+    'Titta upp, {playerName}. Varje lövtak härifrån till avguden är spunnet som ett fisknät, och vävarna blir djärvare för varje säsong. Jag spänner deras eget siden tvärs över stigarna, snubbeltrådsklockor, så att djungeln inte kan smyga sig på mig. Sex bra härvor från lövtaksvävarna sträcker om mina linor.',
+  'entities.quests.q_pr_canopy_silk.title': 'Siden från lövtaket',
+  'entities.quests.q_pr_down_to_drifthaven.completion':
+    'Pell skickade dig? Då vandrade du hela Snårmynningens väg ensam, och det är referens nog för mig. Välkommen till Drivhamn, {playerName}. Ta tag i ett rep, vi är underbemannade.',
+  'entities.quests.q_pr_down_to_drifthaven.objectives.0.label':
+    'Rapportera till Bärgningsbasen Ryna',
+  'entities.quests.q_pr_down_to_drifthaven.text':
+    'Ut ur de svarta träden och in i solen, {playerName}. Följ strandvägen norrut så når du Drivhamn innan tidvattnet vänder. Fråga efter Bärgningsbasen Ryna, hon har arbete åt vilket par händer som helst sedan stormen, och berätta för henne att Snårmynningens väg fortfarande är öppen.',
+  'entities.quests.q_pr_down_to_drifthaven.title': 'Ner till Drivhamn',
+  'entities.quests.q_pr_idol_guardian.completion':
+    'Du fällde något djungeln själv inte skulle röra. Titta där, bakom avguden: väktaren vaktade aldrig pelarna, {playerName}, den vaktade trapporna under dem. Trummorna har tystnat i natt. Vad som än sover under Vildhjärtats bassäng känner nu ditt namn.',
+  'entities.quests.q_pr_idol_guardian.objectives.0.label': 'Avgudens väktare krossad',
+  'entities.quests.q_pr_idol_guardian.text':
+    'Avguden är äldre än ön, {playerName}. Äldre än trummorna, äldre än namnet Palmvidden. Dess väktare har stått i den dränkta ringen sedan innan palmerna växte, och nu vaknar den och vandrar pelarna om natten. Vad offren än föder, väktaren är dess dörrvakt. Ta med en vän, och krossa den.',
+  'entities.quests.q_pr_idol_guardian.title': 'Avgudens väktare',
+  'entities.quests.q_pr_scuttler_cull.completion':
+    'Tio färre klor i bränningen. Mina besättningar vadar redan tillbaka ut, och ingen av dem sa tack, så jag gör det: tack, {playerName}.',
+  'entities.quests.q_pr_scuttler_cull.objectives.0.label': 'Tidvattenskuttlare knäckt',
+  'entities.quests.q_pr_scuttler_cull.text':
+    'Varje vrak på denna kust drar till sig tidvattenskuttlarna, och Pärlkölvattnet har dragit till sig halva revet. Mina bärgningsbesättningar vill inte arbeta en linje med de klorna i grundvattnet. Knäck tio av dem, {playerName}, så är vrakraden vår igen.',
+  'entities.quests.q_pr_scuttler_cull.title': 'Skalryggade tjuvar',
+  'entities.quests.q_pr_the_lost_navigator.completion':
+    'Suli sitter vid elden, fortfarande övertygad om att hon kunde ha simmat det. Du förde tillbaka den enda kartläsaren på denna kust, {playerName}. Dessa är från hennes sjökista, med hennes välsignelse.',
+  'entities.quests.q_pr_the_lost_navigator.objectives.0.label':
+    'Navigatör Suli säkert förd till Drivhamn',
+  'entities.quests.q_pr_the_lost_navigator.text':
+    'Vi drog upp varenda hand från Pärlkölvattnet utom en: Navigatör Suli, som simmade mot den bortre stranden och aldrig kom in. En dykare siktade henne gömd i bogvraket bortom Palmstranden, vid liv, men för utmattad för att klara sträckan ensam. För henne hem längs strandvägen, {playerName}. Krabborna kommer inte gilla det, och djungeln gillar det mindre.',
+  'entities.quests.q_pr_the_lost_navigator.title': 'Den förlorade navigatören',
+  'entities.quests.q_pr_the_man_who_went_in.completion':
+    'Isha skickade dig? Pärlmodern har inte sagt mitt namn på år. Sätt dig utom räckhåll för rankorna, {playerName}, så ska jag berätta vad jag vet: trummorna är inte faran. De är varningen.',
+  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': 'Hitta Okku vid Rankfallet',
+  'entities.quests.q_pr_the_man_who_went_in.text':
+    'Dykarna vill inte kliva förbi trädlinjen, {playerName}, och jag ber dem inte om det. Du har hört trummorna vid det här laget: alla gör det, senast andra natten. En man på denna ö gick någonsin mot det ljudet och kom tillbaka. Okku. Han lägrar sig under de stora banyanträden vid Rankfallet, djupt uppe på Snårvägen. Hitta honom, och fråga honom vad grönskan döljer.',
+  'entities.quests.q_pr_the_man_who_went_in.title': 'Mannen som gick in',
+  'entities.quests.q_pr_what_the_drums_guard.completion':
+    'Mossa, pärlskal och vildsvinsblod, packat för hand. Något i den ruinen håller fortfarande sina riter, {playerName}, och väktaren håller allt annat ute. Det är dags vi talade klarspråk om det.',
+  'entities.quests.q_pr_what_the_drums_guard.objectives.0.label': 'Lövtaksvävare nerhuggen',
+  'entities.quests.q_pr_what_the_drums_guard.objectives.1.label': 'Återfylld offerskål insamlad',
+  'entities.quests.q_pr_what_the_drums_guard.text':
+    'Jag har vandrat så nära Den sjunkna avguden som en levande man vågar, och jag såg två saker: vävarna har draperat avgudsvägen i väv, och de gamla offerskålarna längs den har fyllts igen. Nyligen, {playerName}. Hugg ner åtta vävare från vägen och ge mig tre av de offren. Jag skulle vilja veta vilken hand som fortfarande föder en död gud.',
+  'entities.quests.q_pr_what_the_drums_guard.title': 'Vad trummorna vaktar',
+  'entities.quests.q_pr_wreck_line_cargo.completion':
+    'Saltfläckade men hela, alla tre. Dykarna äter denna månad tack vare dig, {playerName}.',
+  'entities.quests.q_pr_wreck_line_cargo.objectives.0.label': 'Pärlkölvattnets last återfunnen',
+  'entities.quests.q_pr_wreck_line_cargo.text':
+    'Stormen för tre nätter sedan drev Pärlkölvattnet upp på revet, och hennes last ligger utströdd hela vägen längs vrakraden mellan här och Palmstranden. Tre kistor med handelsvaror ligger fortfarande i bränningen, {playerName}. För dem i land innan tidvattnet, eller krabborna, tar det som är kvar.',
+  'entities.quests.q_pr_wreck_line_cargo.title': 'Vrakraden',
+  'entities.quests.q_seal_restored.completion':
+    'Jag kände det slutas härifrån, milt som skymning. Hålan minns sina vänner, {playerName}. Hur långt du än reser kommer det alltid finnas ett ljus för dig under det stora trädet.',
+  'entities.quests.q_seal_restored.objectives.0.label': 'Sigillet återsatt i sigillstenen',
+  'entities.quests.q_seal_restored.text':
+    'Ta Väktarens sigill till sigillstenen i gårdens hjärta och sätt tillbaka det där det slogs loss. Då kan Hålan börja läka, och du, {playerName}, kommer ha gjort vad ingen av ditt slag har gjort förut.',
+  'entities.quests.q_seal_restored.title': 'Förseglingen återställd',
+  'entities.quests.q_shards_of_starfall.completion':
+    'Titta på strimmorna! Höst. Hålan förseglades på hösten. Tvåhundra års tvist, avgjort av sex små stenar.',
+  'entities.quests.q_shards_of_starfall.objectives.0.label': 'Stjärnfallsskärva',
+  'entities.quests.q_shards_of_starfall.text':
+    'När skymningsirrbloss passerar över kristallfälten fastnar flisor av gammalt stjärnljus vid dem som kardborrar. Sex skärvor, {playerName}, så kan jag datera förseglingen till exakt den säsong den sjöngs.',
+  'entities.quests.q_shards_of_starfall.title': 'Skärvor av stjärnfall',
+  'entities.quests.q_spore_hearts.completion':
+    'Där. Renat, och stilla. Vart och ett visar samma tecken: skuggan flödar FRÅN Den sjunkna gården. Berätta för Saelwyn.',
+  'entities.quests.q_spore_hearts.objectives.0.label': 'Sporhjärta',
+  'entities.quests.q_spore_hearts.text':
+    'När en sporling faller för mörkret fortsätter dess hjärta att slå med lånad skugga. Fyra av dessa hjärtan, renade vid helgedomen, kan lära oss hur korruptionen sprids. Det är dystert arbete, {playerName}, men det är läkande arbete.',
+  'entities.quests.q_spore_hearts.title': 'Ringens hjärtan',
+  'entities.quests.q_spore_tide.completion':
+    'Ringarna i norr sjunger igen i natt. Tyst, men de sjunger.',
+  'entities.quests.q_spore_tide.objectives.0.label': 'Korrumperad sporling lagd till ro',
+  'entities.quests.q_spore_tide.text':
+    'Salvan håller Lunden, men korruptionen pressar hårdare på Djupet för varje skymning. Tolv till av de korrumperade måste läggas till ro innan samlarna kan återta sina norra ringar, {playerName}.',
+  'entities.quests.q_spore_tide.title': 'Mot sportidvattnet',
+  'entities.quests.q_sunken_court.completion':
+    'Åtta väktare, stillade. Jag minns när de restes, {playerName}. Se inte så förvånad ut; Hålan behåller sina väktare länge.',
+  'entities.quests.q_sunken_court.objectives.0.label': 'Uråldrig väktare stillad',
+  'entities.quests.q_sunken_court.text':
+    'Bryn läste hjärtana rätt: revan löper genom den gamla gården i öster, och dess väktare har vaknat fel. De byggdes för att skydda förseglingen; nu krossar de vem som helst som närmar sig den. Rensa åtta av dem från ruinerna.',
+  'entities.quests.q_sunken_court.title': 'Den sjunkna gården',
+  'entities.quests.q_treant_accord.completion':
+    'Tjock och frisk, alla fyra. Salvan kommer ta en vecka att brygga och hundra år att fullborda sitt verk. Träd mäter godhet annorlunda.',
+  'entities.quests.q_treant_accord.objectives.0.label': 'Ålderdomlig bark',
+  'entities.quests.q_treant_accord.text':
+    'De äldsta i Lunden fäller sin yttre bark medan korruptionen gnager på deras rötter. Fyra längder av den, så kan jag brygga en salva för hela Lunden. De kommer inte tacka dig medan du bänder loss den, {playerName}, men de kommer stå ett århundrade längre för det.',
+  'entities.quests.q_treant_accord.title': 'Trädjättarnas överenskommelse',
+  'entities.quests.q_veil_thinned.completion':
+    'Kalla, alla som en. Hålan har kanske en säsong kvar innan revan blir en fullständig reva. Vi har arbete att göra, du och jag.',
+  'entities.quests.q_veil_thinned.objectives.0.label': 'Skymningsirrbloss-essens',
+  'entities.quests.q_veil_thinned.text':
+    'Så grottan öppnade sig för dig. Då är förseglingen svagare än jag fruktade, {playerName}. Där slöjan rivs sönder blir irrblossen mörka och kalla. Ge mig åtta essenser från skymningsirrblossen så läser jag hur djupt såret går.',
+  'entities.quests.q_veil_thinned.title': 'Den uttunnade slöjan',
+  'entities.quests.q_waking_warden.completion':
+    'Klockan i dess röst är tyst. Jag kände det härifrån, som en tyngd lyft från hela dalen.',
+  'entities.quests.q_waking_warden.objectives.0.label': 'Den vaknande väktaren besegrad',
+  'entities.quests.q_waking_warden.text':
+    'Gården är tyst, men dess herre är det inte. Väktaren som håller förseglingen har vaknat förvriden, och medan den står kan förseglingen inte lagas. Den faller inte lätt; ta med en vän om du kan hitta en, {playerName}. Ta med två om du kan hitta två.',
+  'entities.quests.q_waking_warden.title': 'Den vaknande väktaren',
+  'entities.quests.q_wardens_echoes.completion':
+    'Ekot blir svagare för varje gång. Snart kommer gården bara hålla vind och murgröna, som en ruin bör.',
+  'entities.quests.q_wardens_echoes.objectives.0.label': 'Uråldrig väktare stillad',
+  'entities.quests.q_wardens_echoes.text':
+    'Även med sin herre tystad upprepar gårdens väktare dess sista befallning som ett eko som inte vill blekna. Tills förseglingen är återsatt kommer de fortsätta vakna, {playerName}. Stilla tio till av dem så att stenhuggarna kan nå sigillstenen.',
+  'entities.quests.q_wardens_echoes.title': 'Väktarens ekon',
+  'entities.quests.q_wf_across_the_fenway.completion':
+    'Pell håller den elden brinnande genom varenda dimma kärret kan andas mot henne. Om hon säger att Trapporna är öppna så är de öppna. Välkommen till Brosjön, {playerName}. Se var du sätter foten på mina plankor så kommer vi trivas bra ihop.',
+  'entities.quests.q_wf_across_the_fenway.objectives.0.label': 'Rapportera till Brobyggaren Alden',
+  'entities.quests.q_wf_across_the_fenway.text':
+    'Ett milt land, Pilkärret, men milt är inte samma sak som säkert, {playerName}. Följ vägen norrut till Kärrvägens vägbank och korsa in i Brosjön. Berätta för Brobyggaren Alden att Trapporna är öppna och att vägläger-elden är tänd.',
+  'entities.quests.q_wf_across_the_fenway.title': 'Över Kärrvägen',
+  'entities.quests.q_wf_croakers_hush.completion':
+    'Lyssna, {playerName}. Ingenting. Den första sanna tystnaden över detta kärr på trettio år, och halva staden kommer inte sova i natt av det märkliga i det. Pilarna säger tack, på sitt sätt. Bär detta, vävt från hans egen liljebädd, så känner kärret igen dig som en vän vart vattnet än når.',
+  'entities.quests.q_wf_croakers_hush.objectives.0.label': 'Den sömniga kväkaren dräpt',
+  'entities.quests.q_wf_croakers_hush.text':
+    'Nu vet du snarkarens namn, {playerName}: Den sömniga kväkaren, den gamla paddkungen ute på De sömniga slätterna. Varje år blir hans kväkande tyngre, och varje år glömmer mer av kärret att vakna. Amuletterna håller dina ögon öppna, men hans massa är en annan sak: ta med en vän, och strid inte mot honom i vattnet. Sänk den gamle kungen i en tystare sömn.',
+  'entities.quests.q_wf_croakers_hush.title': 'Kväkarens tystnad',
+  'entities.quests.q_wf_eels_for_the_smokehouse.completion':
+    'Sex bra ålar, knappt blåtira. Rökhuset kommer dofta pengar till morgonen. Här, dessa vadarstövlar var mina när jag var snabbare: ålskinn avvärjer vätan som inget annat.',
+  'entities.quests.q_wf_eels_for_the_smokehouse.objectives.0.label': 'Fyllig kärrål',
+  'entities.quests.q_wf_eels_for_the_smokehouse.text':
+    'Kärrpaddorna äter inte bara upp mina rep, {playerName}, de äter upp min fångst: de sväljer ålarna hela, rakt ur fällorna. Skär loss sex feta åt undan de girriga sakerna innan köttet skämts, så förblir rökhusets eldar tända.',
+  'entities.quests.q_wf_eels_for_the_smokehouse.title': 'Ål till rökhuset',
+  'entities.quests.q_wf_mind_the_moorings.completion':
+    'Titta på det: rena bett, varenda ett, men det finns rep nog kvar att splitsa. Du har sparat mig en månads mynt och nätfiskarna en månads grumsande, {playerName}.',
+  'entities.quests.q_wf_mind_the_moorings.objectives.0.label':
+    'Avskuren förtöjningslina återfunnen',
+  'entities.quests.q_wf_mind_the_moorings.text':
+    'Gott rep är dyrt här ute, {playerName}: varje lina paddorna tuggar av är en vecka av ålpengar borta. De avbitna ändarna ligger fortfarande längs vallgravens strand där båtarna slet sig loss. Gå spängerna och för mig tillbaka fyra linor, så kan jag splitsa dem som nya.',
+  'entities.quests.q_wf_mind_the_moorings.title': 'Se upp med förtöjningarna',
+  'entities.quests.q_wf_rope_chewers.completion':
+    'Tio färre uppsättningar tänder i min vallgrav. Ekorna låg still vid sina förtöjningar hela natten för första gången på en månad, {playerName}. Du har tacket från varenda nätfiskare i staden.',
+  'entities.quests.q_wf_rope_chewers.objectives.0.label': 'Kärrpadda dräpt',
+  'entities.quests.q_wf_rope_chewers.text':
+    'Kärrpaddor, {playerName}. De drar sig upp ur vallgraven om natten och tuggar sönder mina förtöjningsrep som vore de vassstrån. Tre eka drev iväg förra veckan, och en av dem hade min goda vinsch ombord. Gallra dem, tio av de feta sakerna, så stannar båtarna där vi binder dem.',
+  'entities.quests.q_wf_rope_chewers.title': 'Repgnagarna',
+  'entities.quests.q_wf_toll_and_tangle.completion':
+    'Tre kistor, och myntet fortfarande torrt inuti. Älvorna kommer sura i videbuskarna en vecka, {playerName}, och staden är dig skyldig sitt vinterbröd.',
+  'entities.quests.q_wf_toll_and_tangle.objectives.0.label': 'Pilälva bortjagad',
+  'entities.quests.q_wf_toll_and_tangle.objectives.1.label': 'Tullkista återfunnen',
+  'entities.quests.q_wf_toll_and_tangle.text':
+    'Pilälvorna tycker det är en fin lek att skära loss en färja, {playerName}, och förra veckan gick tulleka omkull på den östra leden med en säsongs brotull ombord. Kistorna sjönk i grunt vatten och älvorna dansar på spängerna som om de äger dem. Jaga bort åtta och dra upp tre tullkistor, så äter Brosjön denna vinter.',
+  'entities.quests.q_wf_toll_and_tangle.title': 'Tull och trassel',
+  'entities.quests.q_wf_wisplight_charms.completion':
+    'Sex glober, fortfarande varma av drömmande. Ge mig till månuppgång så har jag amuletter vävda åt dig och den som är modig nog att stå bredvid dig.',
+  'entities.quests.q_wf_wisplight_charms.objectives.0.label': 'Irrbloss-ljusglob',
+  'entities.quests.q_wf_wisplight_charms.text':
+    'Irrblossen över dammarna är kärret som drömmer högt, {playerName}, och deras ljus är det enda som håller emot Kväkarens dvala. Jag väver in det i pilamuletter: en runt din hals och snarkningen kan inte dra ner dina ögonlock. Ge mig sex irrbloss-ljusglober. Irrblossen kommer inte slåss om dem, vilket gör det till en godhet eller en stöld, beroende på hur du bär det.',
+  'entities.quests.q_wf_wisplight_charms.title': 'Irrbloss-amuletter',
+  'entities.quests.q_wf_witch_of_willowweep.completion':
+    'Alden skickade dig hela vägen hit för att fråga om snarkandet? Då lyssnar brofolket äntligen. Sätt dig ner utom fukten, {playerName}. Det ljudet har ett namn, och en strupe, och jag har väntat på någon dåraktig nog att hjälpa mig tysta det.',
+  'entities.quests.q_wf_witch_of_willowweep.objectives.0.label': 'Hitta Moder Sedge',
+  'entities.quests.q_wf_witch_of_willowweep.text':
+    'Du har hört det vid det här laget, {playerName}: snarkningen. Långsam och tung, ute bortom De sömniga slätterna, som om kärret själv vänder sig i sömnen. Paddorna, älvorna, irrblossen som brinner vid middagstid: allt började när det ljudet gjorde det. En själ kanske vet vad det är. Moder Sedge håller ett läger vid Pilgråten, väster runt vallgraven och ner för den bortre stranden. Hitta henne, och fråga henne vad som sover mitt i mitt kärr.',
+  'entities.quests.q_wf_witch_of_willowweep.title': 'Häxan i Pilgråten',
+  'entities.quests.q_wisp_lights.completion':
+    'Mjuka som de första stjärnorna. Sätt dem här vid altaret; helgedomen sköter resten.',
+  'entities.quests.q_wisp_lights.objectives.0.label': 'Irrblosskorn',
+  'entities.quests.q_wisp_lights.text':
+    'Glimmerirrblossen bär korn av det gamla stjärnljuset som föll här när Hålan förseglades. Sex korn, så brinner helgedomens lampor i ett år. Ta bara från de som bleknar; Hålan ger nog utan girighet.',
+  'entities.quests.q_wisp_lights.title': 'Ljus i grunden',
+  'entities.quests.q_ww_bells_of_gallowmere.completion':
+    'Cobb skickade dig upp vägen hel, gjorde han? Bra karl. Han har hållit de portlyktorna tända i trettio år, och skogen har aldrig en enda gång kommit förbi honom. Välkommen till Galgsjön, {playerName}. Se upp med klockorna.',
+  'entities.quests.q_ww_bells_of_gallowmere.objectives.0.label': 'Rapportera till Klockaren Marrow',
+  'entities.quests.q_ww_bells_of_gallowmere.text':
+    'Hör du klämtandet, {playerName}? Det är Galgsjön, uppe vid norra vägen, som ringer sina döda till sömns. Klockaren Marrow för räkning över varje själ under lövtaket, levande och begraven. Gå och bli räknad, innan skogen räknar dig själv.',
+  'entities.quests.q_ww_bells_of_gallowmere.title': 'Klockorna i Galgsjön',
+  'entities.quests.q_ww_candles_at_the_bounds.completion':
+    'Alla fyra brinnande? Andas då ut, {playerName}. Du hörde det inte, men hela byn gjorde det: klockorna ringde lättare i samma stund den sista veken fattade.',
+  'entities.quests.q_ww_candles_at_the_bounds.objectives.0.label': 'Gravljus återtänt',
+  'entities.quests.q_ww_candles_at_the_bounds.text':
+    'Fyra gränsstenar ringar in Galgsjön, {playerName}, en på varje väg ut, och ett gravljus brinner på varje sten. Medan de brinner förblir de begravda begravda. Duggregnet har släckt dem, alla fyra, och jag är för gammal för att gå gränserna ensam. Ta mitt stearinljus och tänd dem igen, fort.',
+  'entities.quests.q_ww_candles_at_the_bounds.title': 'Ljus vid gränserna',
+  'entities.quests.q_ww_horn_of_the_huntsman.completion':
+    'Hornet stannade mitt i tonen. Varenda klocka i Galgsjön ringde en gång, av sig själv, och sedan blev skogen tystare än jag hört den på trettio år. Du har utfört riten jag inte kunde, {playerName}. Bär detta, och vandra under lövtaket utan fruktan.',
+  'entities.quests.q_ww_horn_of_the_huntsman.objectives.0.label': 'Den bleka jägaren avriden',
+  'entities.quests.q_ww_horn_of_the_huntsman.text':
+    'Du har hört hornet vid det här laget, {playerName}, tunt och avlägset, ljudet hela skogen håller andan för. Den bleka jägaren rider sin glänta norr om här, och varje grav han passerar blir grundare. Han var en människa en gång, och han begravdes fel, och jag är klar med att låtsas att bön räcker. Ta med en vän, ta med två, och rid av honom.',
+  'entities.quests.q_ww_horn_of_the_huntsman.title': 'Jägarens horn',
+  'entities.quests.q_ww_silk_in_the_eaves.completion':
+    'Tio färre spinnare i takfoten. Lykttändarna kommer gå sina rundor i natt utan att titta upp, och det är värt mer här än du vet.',
+  'entities.quests.q_ww_silk_in_the_eaves.objectives.0.label': 'Änkesidenspinnare dräpt',
+  'entities.quests.q_ww_silk_in_the_eaves.text':
+    'Titta upp när du går västra vägen, {playerName}, och du kommer se dem: insvepta skepnader i lövtaket, som svajar där ingen vind når. Änkesidenspinnarna har smugit sig ut ur Snåret och spänt sina skafferier över mina lyktor. Döda tio, så blir vägen en väg igen.',
+  'entities.quests.q_ww_silk_in_the_eaves.title': 'Siden i takfoten',
+  'entities.quests.q_ww_the_last_vicar.completion':
+    'Marrow oroar sig för mig? Det är nytt. Berätta för honom att Sorgestenen står kvar, på sitt sätt, och det gör jag också. Stanna ett tag, {playerName}. Tjärnen har viskat, och jag vill helst inte lyssna ensam.',
+  'entities.quests.q_ww_the_last_vicar.objectives.0.label': 'Hitta Kaplanen Creel',
+  'entities.quests.q_ww_the_last_vicar.text':
+    'Söder om här multnar Sorgestenskapellet vid sin svarta tjärn, och en man sköter det fortfarande: Kaplanen Creel, som inte ville lämna när taket rasade. Han känner de gamla riterna bättre än mina klockor gör, {playerName}, och han har inte skickat bud på en månad. Gå kapellvägen och se honom andas.',
+  'entities.quests.q_ww_the_last_vicar.title': 'Den siste kaplanen',
+  'entities.quests.q_ww_walking_mosley_home.completion':
+    'Han kom genom porten på egna två fötter, svärandes på att han inte tänker gräva något djupare än en rovsäng från och med nu. Han är tillbaka på gården till söndag, det är de alltid. Tack, {playerName}. Galgsjön behåller sitt folk, det är hela vår lag.',
+  'entities.quests.q_ww_walking_mosley_home.objectives.0.label':
+    'Gravgrävaren Mosley säkert förd tillbaka till Galgsjön',
+  'entities.quests.q_ww_walking_mosley_home.text':
+    'Min gravgrävare Mosley tog kapellvägen för tre dagar sedan för att öppna en grav på den gamla gården, och grävningen rasade över honom. Han klöste sig ut, dåren lever, men han sitter hopkrupen vid kapellets gravar och vägrar röra sig för spindlar på vägen. För honom hem, {playerName}. Jag kan inte ringa klockorna för en levande man.',
+  'entities.quests.q_ww_walking_mosley_home.title': 'Föra Mosley hem',
+  'entities.quests.q_ww_what_the_bark_holds.completion':
+    'Tre själar tillbaka under ärlig jord innan mörkrets inbrott. Raglarna kommer växa tillbaka, bark gör alltid det, men i natt hänger gläntan tom, och det räcker.',
+  'entities.quests.q_ww_what_the_bark_holds.objectives.0.label': 'Ristbarksraglare fälld',
+  'entities.quests.q_ww_what_the_bark_holds.objectives.1.label': 'Sidenbundna kvarlevor nerskurna',
+  'entities.quests.q_ww_what_the_bark_holds.text':
+    'I Den hängande gläntan öster om Galgsjön hänger spinnarna sina sidensvepta döda från grenarna, och ristbarksraglarna står vakt därunder som tålmodiga likbärare. Det är vårt folk däruppe, {playerName}. Slå ner fem raglare, skär ner tre av de svepta döda, och för dem hem till jorden.',
+  'entities.quests.q_ww_what_the_bark_holds.title': 'Vad barken håller',
+  'entities.quests.q_ww_widows_skeins.completion':
+    'Sex härvor, mjuka som en hållen andedräkt. De döda kommer vila lättare i detta. Ta dessa lindor, jag sydde dem av den senaste omgången, och skogen har aldrig en enda gång bitit igenom dem.',
+  'entities.quests.q_ww_widows_skeins.objectives.0.label': 'Änkesidenhärva',
+  'entities.quests.q_ww_widows_skeins.text':
+    'Spinnarna tar våra döda till sina skafferier, {playerName}, så jag tar deras siden till våra svepningar. Det brinner rent och håller en välsignelse bättre än linne någonsin gjorde. Ge mig sex härvor änkesiden, så går nästa själ vi begraver ner insvept och skyddad.',
+  'entities.quests.q_ww_widows_skeins.title': 'Änkans härvor',
+  'entities.quests.q_ww_wraiths_of_the_tarn.completion':
+    'Åtta väktare lagda till vila äntligen. Jag kallar det inte en nåd i dagsljus, men mellan oss, {playerName}, var det en.',
+  'entities.quests.q_ww_wraiths_of_the_tarn.objectives.0.label': 'Skogsvålnad dräpt',
+  'entities.quests.q_ww_wraiths_of_the_tarn.text':
+    'Skogsvålnaderna var kapellets väktare en gång, {playerName}, vuxna från träd planterade över de hedrade döda. Sedan tjärnen blev svart har de glömt sitt ämbete, och nu driver de genom min kyrkogård och drar i jorden. Slå sönder åtta av dem innan de fullbordar vad de har påbörjat.',
+  'entities.quests.q_ww_wraiths_of_the_tarn.title': 'Vålnader vid tjärnen',
   'hudChrome.auth.appleChoiceExpired':
     'Den här Apple-inloggningen har gått ut. Logga in med Apple igen.',
   'hudChrome.auth.appleChoiceIntro':
@@ -7909,6 +8780,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petDefensive': 'Djur: Defensivt',
   'hudChrome.keybinds.petStop': 'Djur: Stanna',
   'hudChrome.keybinds.petTaunt': 'Djur: Provocera',
+  'hudChrome.keybinds.mount': 'Sitt upp / Stig av',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Skicka en {item} mindre',
   'hudChrome.mailbox.parcelQtyIncreaseAria': 'Skicka en till {item}',
   'hudChrome.mailbox.parcelQtyAria': 'Antal {item} att skicka',
@@ -8074,6 +8946,76 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     'Högt uppe på Törntoppen samlar stormen över Stormcrag ibland en skepnad. Thunzharr, det vaknande berget reser sig där i en jämn rytm, en elementar av raidstyrka som bekämpas i den öppna världen av vem som än svarar på uppropet, och han växer sig mäktigare ju fler utmanare som står emot honom. Alla som ansluter till striden förtjänar sin egen kastning på hans byte, hedrad på raidspärrens villkor, och hans fall dröjer kvar länge nog för de fallna att springa tillbaka och kräva sitt. Samla fler svärd än du tror du behöver.',
   'guide.worldPage.worldBossTitle': 'När berget vaknar: världsbossen',
+  'guide.worldPage.amberBlurb':
+    'En evig höst av guld och röda löv som aldrig faller, samlad kring den lyktupplysta staden Lyktsjön.',
+  'guide.worldPage.amberGreeter': 'Lykttillverkaren, Lyktsjön',
+  'guide.worldPage.amberGreeting':
+    'Varje löv här brinner guld och rött, men inget faller någonsin. Lyktorna är tända för dig; se upp med Guldsmältan på vägen upp.',
+  'guide.worldPage.amberPlaceNotes':
+    'Lyktsjön glöder i skördens hjärta. Guldsmältan är det bärnstenshala passet in; Den förgyllda fruktlunden och Skördehålan gömmer de sötaste fynden och de djärvaste tjuvarna; Den stora sjön speglar de brinnande löven; Sotlönnshöjden står högst och rödast; och Den lutande monoliten minns något äldre än hösten.',
+  'guide.worldPage.duskBlurb':
+    'En dal i evig skymning under Fornglimmers stora träd, där kristallruiner glöder och luften surrar av gammal magi.',
+  'guide.worldPage.duskGreeter': 'Väktare Saelwyn, Fornglimmer',
+  'guide.worldPage.duskGreeting':
+    'Få av ditt slag har stått under dessa grenar. Gå varsamt, och var välkommen.',
+  'guide.worldPage.duskPlaceNotes':
+    'Fornglimmer samlas under det stora trädet. Skymningsfallets grotta och dess utsikt är vägen in och den första blicken av dalen; Den forntida lunden och Stjärnfallsbassängen håller den tysta södern; Den sjunkna gården rymmer övervuxna ruiner i öster; och Det glittrande djupet och De kristallklara grunden glöder över norr.',
+  'guide.worldPage.emberBlurb':
+    'Stormbelysta ödemarker av aska och blodglas där drakar kretsar över kaldera, och trollens eldar brinner bland dynerna, vaktade från porten Drakvakten.',
+  'guide.worldPage.emberGreeter': 'Portväktaren, Drakvakten',
+  'guide.worldPage.emberGreeting':
+    'Het vind från ödemarken, drakar över Drakgapet, och trollens eldar i dynerna. Drick något innan du vandrar ut dit.',
+  'guide.worldPage.emberPlaceNotes':
+    'Drakvakten håller porten. Portskogen är det sista gröna innan ödemarken; Sotdynerna drivs av aska och värre saker; Trollmötet är där dyntrollen samlar sina eldar; Blodglasfälten glittrar av rakvassa skärvor; och Drakgapets kaldera är den rykande krona som drakarna kretsar kring.',
+  'guide.worldPage.fenBlurb':
+    'En ljus, surrande våtmark av liljor och lugnt vatten, korsad på gamla spångar från brostaden Brosjön.',
+  'guide.worldPage.fenGreeter': 'Broväktaren, Brosjön',
+  'guide.worldPage.fenGreeting':
+    'Kärret surrar av trollsländor och bin. Korsa bron, vila fötterna en stund, och håll dig på spängerna förbi dammarna.',
+  'guide.worldPage.fenPlaceNotes':
+    'Brosjön ligger tvärs över det lugna vattnet. Bärnstenskärrets trappor kommer ner från skördelandet; Liljemyrarna och Myrglansdammarna glittrar av irrbloss och trollsländor; Pilgråten släpar sina grenar ner i sjön; och De sömniga slätterna är så milda som detta land någonsin blir.',
+  'guide.worldPage.frostBlurb':
+    'En tystnad av snö och mörka granar under norrskenet, där kylan själv känns vaken och Ismanteln håller sina eldar brinnande.',
+  'guide.worldPage.frostGreeter': 'Härdväktaren, Ismanteln',
+  'guide.worldPage.frostGreeting':
+    'Snön sväljer varje ljud bortom muren. Om skenen börjar dansa, håll rösten låg och elden tänd.',
+  'guide.worldPage.frostPlaceNotes':
+    'Ismanteln håller den sista varma härden. Snölinjen markerar var drivorna tar över; Glaciärtjärnen är svart, stilla vatten under isen; Norrskenstrapporna klättrar under de dansande skenen; Skälvkärret är en frusen myr som aldrig riktigt sover; och De tjutande terrasserna förtjänar sitt namn varje natt.',
+  'guide.worldPage.galeBlurb':
+    'Havsklippor och tjutande kullar där vinden aldrig vilar, Den gamla vårdkasen aldrig slocknar, och Vikhamn stänger sina dörrar hårt.',
+  'guide.worldPage.galeGreeter': 'Vårdkasväktaren, Vikhamn',
+  'guide.worldPage.galeGreeting':
+    'Vinden har aldrig en enda gång slutat blåsa här, och Den gamla vårdkasen har aldrig en enda gång slocknat. Stäng värdshusdörren efter dig.',
+  'guide.worldPage.galePlaceNotes':
+    'Vikhamn lutar sig mot vinden. Vindleden är klippvägen in; De tjutande kullarna rullar trädlösa under stormen; Den gamla vårdkasen har brunnit så länge någon kan minnas; Branten faller brant ner mot vattnet; Vrakfälten håller kusten ärlig; och Spegeltjärnen är det enda stillsamma i hela riket.',
+  'guide.worldPage.gardenBlurb':
+    'Ett labyrintträdgårdsrike som fortfarande klipps av ingen trädgårdsmästare någon har sett, du kommer in förbi Häckby och dess fontängårdar.',
+  'guide.worldPage.gardenGreeter': 'Grindvakten, Häckby',
+  'guide.worldPage.gardenGreeting':
+    'Någon klipper fortfarande häckarna, fast ingen trädgårdsmästare har synts till på hundra år. Se upp med labyrinten: den ser upp med dig också.',
+  'guide.worldPage.gardenPlaceNotes':
+    'Häckby väntar vid Trädgårdsporten. Parterrpromenaden blommar i klippt färgprakt; Gryningsborgen drillar sina riddare bakom nya murar; Kronbladsdammen driver rosa året runt; Den gamla kvarnen vänder sina egna rabatter; Den stora labyrinten omarrangerar sina vägar för varje gäst, dess valv vaktade av lövklädda rävar; Nordvakten håller utfartsvägen; Liljebassängen vilar bortom allt detta; och Fontängården rinner fortfarande klar vid trädgårdens hjärta.',
+  'guide.worldPage.hauntBlurb':
+    'En hemsökt skog under jättelika lövtak, där lyktorna i Galgsjön är det enda ärliga ljuset på vägen.',
+  'guide.worldPage.hauntGreeter': 'Lykttändaren, Galgsjön',
+  'guide.worldPage.hauntGreeting':
+    'Håll dig till lyktorna, resenär. Och om skogen ropar ditt namn från sidan av vägen, svara inte.',
+  'guide.worldPage.hauntPlaceNotes':
+    'Galgsjön håller sig tätt inom sina lyktor. Kråkporten är skogens dystra framdörr; Änkans snår är tätt spunnet med spindelväv; Den hängande gläntan och Sorgestenskapellet bär skogens äldsta sorger; och Jägarens glänta tillhör vad det än är som fortfarande jagar där.',
+  'guide.worldPage.jungleBlurb':
+    'Ett tropiskt snår av palmer, vit sand och högljudda fåglar, med strandstaden Drivhamn som håller en eld tänd på stranden.',
+  'guide.worldPage.jungleGreeter': 'Hamnfogden, Drivhamn',
+  'guide.worldPage.jungleGreeting':
+    'Varm sand, högljudda fåglar och en djungel som äter upp horisonten. Vi håller en eld tänd på stranden; försök komma tillbaka till den.',
+  'guide.worldPage.junglePlaceNotes':
+    'Drivhamn håller sin eld på stranden. Snårmynningen är där floden möter den gröna muren; Palmstranden löper vit och varm längs bränningen; Smaragdsnåret och Rankfallet sväljer inlandet; Safirlagunen glöder klar och djup; och Den sjunkna avguden vakar från vattnets djup.',
+  'guide.worldPage.nightBlurb':
+    'Ett rike av stjärnklar midnatt där blommor lyser upp stigarna och Månvila håller en tyst vaka under en drömmande himmel.',
+  'guide.worldPage.nightGreeter': 'Vakväktaren, Månvila',
+  'guide.worldPage.nightGreeting':
+    'Bortom Nattporten drömmer själva luften. Följ blomljuset, och se upp för den sovande världen som hänger i skyn.',
+  'guide.worldPage.nightPlaceNotes':
+    'Månvila håller vakan. Nattporten är vägen in i midnattslandet; Månbrunnen rymmer stjärnljus du kan stå bredvid; Skymningsfältet blommar i mörkret; Den stående vakan vakar utan att någonsin röra sig; och Den sömnlösa gravhögen är den enda platsen här som aldrig drömmer.',
   'entities.abilities.chain_heal.description':
     'Läker ett vänligt mål för en stor mängd och hoppar sedan till upp till 2 ytterligare allierade i närheten. Varje hopp läker för 50% mindre. (Återställningssignatur)',
   'entities.abilities.chain_heal.name': 'Kedjeläkning',
@@ -8516,8 +9458,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cold_snap.description':
     'Avslutar nedkylningen för Flimmersteg, Frostslöja och Förbättrad osynlighet. (magikertalang)',
   'entities.abilities.greater_invisibility.name': 'Förbättrad osynlighet',
-  'entities.abilities.greater_invisibility.description':
-    'Försvinn i 20 sek.: tar bort 2 skadeeffekter över tid och du tar 90% mindre skada medan du är osynlig och en kort stund efteråt. (magikertalang)',
   'entities.abilities.hot_streak.name': 'Het svit',
   'entities.abilities.hot_streak.description':
     'Passiv: två kritiska träffar i rad med dina Eldbesvärjelser (Glödbult, Glödfall, Skålla, Pyrolans eller Flamslag) gör nästa Pyrolans eller Flamslag omedelbar och kostnadsfri. Förbrukarna räknas till NÄSTA svit, även kostnadsfria kast; ett Flamslag räknas en gång oavsett hur många fiender det träffar, och endast den första träffen kan räknas. (Eld)',
@@ -8546,6 +9486,107 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_water_elemental.description':
     'Åkalla en vattenelementar som strider vid din sida, slungar Vattenprojektiler mot ditt mål och kanaliserar Vattenstråle. (Frost)',
   'entities.mobs.water_elemental.name': 'Vattenelementar',
+  'entities.mobs.ancient_guardian.name': 'Uråldrig väktare',
+  'entities.mobs.apprentice_wren.name': 'Lärling Wren',
+  'entities.mobs.ashbone_raider.name': 'Askbensplundrare',
+  'entities.mobs.ashbone_warcaller.name': 'Askbens krigsropare',
+  'entities.mobs.aurelhorn.name': 'Aurelhorn, hjordens förste',
+  'entities.mobs.barrow_king.name': 'Gravhögskungen',
+  'entities.mobs.barrow_wight.name': 'Gravhögsvätte',
+  'entities.mobs.bogtoad.name': 'Kärrpadda',
+  'entities.mobs.breach_wretch.name': 'Bräschens stackare',
+  'entities.mobs.canopy_weaver.name': 'Lövtaksvävare',
+  'entities.mobs.castaway_navigator.name': 'Navigatör Suli',
+  'entities.mobs.cindraleth_maw_matriarch.name': 'Cindraleth, Gapets matriark',
+  'entities.mobs.corrupted_sporeling.name': 'Korrumperad sporling',
+  'entities.mobs.downs_bandit.name': 'Kullbandit',
+  'entities.mobs.drowned_deckhand.name': 'Drunknad däcksman',
+  'entities.mobs.drowsy_croaker.name': 'Den sömniga kväkaren',
+  'entities.mobs.dune_troll.name': 'Dyntroll',
+  'entities.mobs.duskwisp.name': 'Skymningsirrbloss',
+  'entities.mobs.emberwing_drake.name': 'Glödvingedrake',
+  'entities.mobs.fen_sprite.name': 'Kärrälva',
+  'entities.mobs.fisher_bram.name': 'Fiskaren Bram',
+  'entities.mobs.frostmane_yeti.name': 'Frostmanad yeti',
+  'entities.mobs.gale_wisp.name': 'Stormirrbloss',
+  'entities.mobs.gilded_stag.name': 'Förgylld hjort',
+  'entities.mobs.gleamstag.name': 'Glimmerhjorten',
+  'entities.mobs.glimmerwisp.name': 'Glimmerirrbloss',
+  'entities.mobs.gloam_fox.name': 'Skymningsräv',
+  'entities.mobs.gloam_strider.name': 'Skymningsvandrare',
+  'entities.mobs.gravedigger_mosley.name': 'Gravgrävaren Mosley',
+  'entities.mobs.gravenbark_shambler.name': 'Ristbarksraglaren',
+  'entities.mobs.harvest_sprite.name': 'Skördeälva',
+  'entities.mobs.hedge_gnome.name': 'Häckgnom',
+  'entities.mobs.hedge_knight.name': 'Gryningsborgens riddare',
+  'entities.mobs.ice_wisp.name': 'Isirrbloss',
+  'entities.mobs.idol_guardian.name': 'Avgudens väktare',
+  'entities.mobs.lily_wisp.name': 'Liljeirrbloss',
+  'entities.mobs.mere_lurker.name': 'Sjölurkare',
+  'entities.mobs.moonfleece_grazer.name': 'Månullsbetare',
+  'entities.mobs.moor_ram.name': 'Hedbagge',
+  'entities.mobs.mushroom_pixie.name': 'Glimmerfolkets pyssling',
+  'entities.mobs.nightkin_stargazer.name': 'Nattsläktets stjärnskådare',
+  'entities.mobs.old_marrowshell.name': 'Gamla Märgskalet',
+  'entities.mobs.orchard_treant.name': 'Fruktlundens trädjätte',
+  'entities.mobs.pale_huntsman.name': 'Den bleka jägaren',
+  'entities.mobs.rift_boneclad.name': 'Benklädd krigare',
+  'entities.mobs.rift_bonewalker.name': 'Uppstånden benvandrare',
+  'entities.mobs.rift_boss_arcane.name': 'Arkon Nyxaris',
+  'entities.mobs.rift_boss_brute.name': 'Krigsherre Grask',
+  'entities.mobs.rift_boss_ember.name': 'Glödsmidjans tyrann',
+  'entities.mobs.rift_boss_frost.name': 'Rimfrostens väktare',
+  'entities.mobs.rift_boss_necro.name': 'Benherren Xarreth',
+  'entities.mobs.rift_boss_pitlord.name': 'Azgorath, Gropens herre',
+  'entities.mobs.rift_boss_ritualist.name': "Magus Vel'Kor den Paktbundne",
+  'entities.mobs.rift_boss_storm.name': 'Orkanen Vharok',
+  'entities.mobs.rift_boss_tide.name': 'Avgrundsgapet',
+  'entities.mobs.rift_boss_venom.name': 'Kullmodern Vysska',
+  'entities.mobs.rift_deep_lurker.name': 'Djuplurkare',
+  'entities.mobs.rift_dread_stalker.name': 'Skräcksmygare',
+  'entities.mobs.rift_ember_fiend.name': 'Glödvidunder',
+  'entities.mobs.rift_frost_revenant.name': 'Frostbunden gengångare',
+  'entities.mobs.rift_hellguard.name': 'Helvetesvakt',
+  'entities.mobs.rift_magma_brute.name': 'Magmabest',
+  'entities.mobs.rift_marrow_troll.name': 'Märgtroll',
+  'entities.mobs.rift_pact_acolyte.name': 'Paktens akolyt',
+  'entities.mobs.rift_rime_elemental.name': 'Rimfrostelementar',
+  'entities.mobs.rift_spawnling.name': 'Revyngel',
+  'entities.mobs.rift_stone_ogre.name': 'Stenoger',
+  'entities.mobs.rift_storm_caller.name': 'Stormropare',
+  'entities.mobs.rift_stormscale.name': 'Stormfjälldrake',
+  'entities.mobs.rift_thornback.name': 'Törnryggens smygare',
+  'entities.mobs.rift_tide_thrall.name': 'Tidvattnets träl',
+  'entities.mobs.rift_venom_weaver.name': 'Giftvävare',
+  'entities.mobs.rift_void_acolyte.name': 'Tomrumsärrets akolyt',
+  'entities.mobs.riftspawn.name': 'Revavkomma',
+  'entities.mobs.rime_elemental.name': 'Rimfrostelementar',
+  'entities.mobs.shoal_scuttler.name': 'Grundskuttlaren',
+  'entities.mobs.snowdrift_wolf.name': 'Snödrivans varg',
+  'entities.mobs.sporeling_gatherer.name': 'Sporlingssamlare',
+  'entities.mobs.sundered_horror.name': 'Den splittrade fasan',
+  'entities.mobs.terrace_howler.name': 'Terrassernas tjutare',
+  'entities.mobs.the_meredark.name': 'Sjömörkret',
+  'entities.mobs.the_topiary_bull.name': 'Den formklippta tjuren',
+  'entities.mobs.the_wreck_warden.name': 'Vrakväktaren',
+  'entities.mobs.thicket_boar.name': 'Snårvildsvin',
+  'entities.mobs.tide_scuttler.name': 'Tidvattenskuttlaren',
+  'entities.mobs.topiary_stag.name': 'Formklippt hjort',
+  'entities.mobs.topiary_wolf.name': 'Formklippt varg',
+  'entities.mobs.treant_elder.name': 'Äldste trädjätten',
+  'entities.mobs.veiled_doe.name': 'Slöjhind',
+  'entities.mobs.veiled_stag.name': 'Slöjhjort',
+  'entities.mobs.void_stalker.name': 'Tomrumssmygare',
+  'entities.mobs.waking_warden.name': 'Den vaknande väktaren',
+  'entities.mobs.widowsilk_spinner.name': 'Änkesidenspinnare',
+  'entities.mobs.wildheart_beastmaster.name': 'Huggtandsherren, djurens mästare',
+  'entities.mobs.wildheart_hexcaller.name': 'Solbensbesvärjaren',
+  'entities.mobs.wildheart_high_priest.name': 'Zulgar, Bassängens röst',
+  'entities.mobs.wildheart_ravager.name': 'Blodmanens förhärjare',
+  'entities.mobs.wildheart_stalker.name': 'Rankklons smygare',
+  'entities.mobs.willow_sprite.name': 'Pilälva',
+  'entities.mobs.wood_wraith.name': 'Skogsvålnad',
+  'entities.mobs.wreck_thief.name': 'Vrakfältets tjuv',
   'entities.items.conjured_bread4.name': 'Frambesvärjt festbröd',
   'entities.items.conjured_water4.name': 'Frambesvärjt källvatten',
   'devCommand.actions.attune.description': 'Markera alla länkningskrav som slutförda.',
@@ -8681,6 +9722,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetTitle': 'Återställa dina instanser',
   'guide.dungeonsPage.resetBody':
     'Om du byter svårighetsgrad medan gruppen fortfarande har hävdade rundor ligger de gamla anspråken kvar en stund. Gruppledaren kan släppa dem direkt genom att välja Återställ alla instanser i menyn på sitt eget porträtt eller skriva /dungeon reset. Svårighetsgraden måste faktiskt ha ändrats, ingen levande eller fallen får vara kvar inuti och en kort väntetid skiljer återställningarna åt. Vid dörren på fel svårighetsgrad varnar spelet innan starten. Raiden återställs aldrig så här; dess egna låsningsregler gäller.',
+  'guide.dungeonsPage.wildheartBody':
+    'En regnvåt djungelkaldera där två upphöjda jaktstigar cirklar en jadegrön cenot. Korsa bestars lyor och förfädersruiner, klättra sedan upp för ritualpyramiden för att möta Zulgar.',
   'guide.gear.itemLevelBody':
     'Slå på Visa föremålsnivå i alternativen för att snabbt jämföra två delar. Utrustning med känd källa, från fiender, uppdrag och hantverksyrken, visar då en föremålsnivå: ett enda tal som ungefär anger styrkan utifrån ursprunget och gör förbättringar jämförbara även mellan olika platser. Delar utan sådan källa, som enkla handelsvaror och startutrustning, visar ingen nivå; ett saknat tal är normalt.',
   'hudChrome.auraEffect.battleStance': 'Stridsställning: 10% mer raserigenerering',
@@ -8705,6 +9748,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Din chans att helt parera ett närstridsanfall framifrån utan att ta någon skada. Ett slag bakifrån kan inte pareras.',
   'hud.combat.floatingParry': 'Parerade',
   'hud.combat.parried': 'Din {ability} pareras av {target}.',
+  'hud.combat.floatingEvade': 'Undkom',
+  'hud.combat.evaded': '{target} undkommer din {ability}.',
   'hudChrome.options.mouseoverCast': 'Kasta via muspekaren på gruppramarna',
   'hudChrome.options.showTargetOfTarget': 'Visa målets mål',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Målets mål',
@@ -8786,6 +9831,93 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.tanning_agent.name': 'Garvningsmedel',
   'entities.items.venom_gland.name': 'Giftkörtel',
   'entities.items.whetted_iron_dirk.name': 'Brynt järndolk',
+  'entities.items.abyssal_loop.name': 'Avgrundsslinga',
+  'entities.items.abysswrought_band.name': 'Avgrundssmidd ring',
+  'entities.items.amberfall_sap_bucket.name': 'Savtappningshink',
+  'entities.items.ashbone_war_brand.name': 'Askbens krigsbrand',
+  'entities.items.aurora_mote.name': 'Norrskenskorn',
+  'entities.items.barrow_grave_offering.name': 'Spritt gravoffer',
+  'entities.items.barrowshade_mantle.name': 'Gravhögsskuggans mantel',
+  'entities.items.bonelord_mantle.name': 'Benherrens mantel',
+  'entities.items.breakscarred_steel.name': 'Brytärrat stål',
+  'entities.items.bridgemere_toll_chest.name': 'Sjunken tullkista',
+  'entities.items.broodmother_carapace.name': 'Kullmoderns pansar',
+  'entities.items.canopy_silk_hank.name': 'Lövtakssidenhärva',
+  'entities.items.cinderwalk_treads.name': 'Sotvandrarstövlar',
+  'entities.items.eelskin_mudwaders.name': 'Ålskinnsvadarstövlar',
+  'entities.items.emberforge_gauntlets.name': 'Glödsmidjans pansarhandskar',
+  'entities.items.emberforged_bulwark.name': 'Glödsmitt bålverk',
+  'entities.items.emberwing_scale.name': 'Glödvingefjäll',
+  'entities.items.evergarden_bloom_clipping.name': 'Beskuren blomstersticklig',
+  'entities.items.evergarden_statue_rubbing.name': 'Statyavgnidning',
+  'entities.items.farshore_salt_moss.name': 'Fjärrkustens saltmossa',
+  'entities.items.fenway_mooring_line.name': 'Avskuren förtöjningslina',
+  'entities.items.fountain_court_mantle.name': 'Fontängårdens mantel',
+  'entities.items.frostmane_mantle.name': 'Frostmanens mantel',
+  'entities.items.galecrest_ram_wool.name': 'Fettig baggeull',
+  'entities.items.gallowmere_grave_candle.name': 'Gravljus',
+  'entities.items.gilded_sap_clot.name': 'Förgylld savklump',
+  'entities.items.gloamfield_nightbloom.name': 'Nattblomstrets blomma',
+  'entities.items.graskbreaker_girdle.name': 'Graskkrossargördel',
+  'entities.items.gravebound_silk_wraps.name': 'Gravbundna sidenlindor',
+  'entities.items.gullhaven_watchbell.name': 'Kustvaktklocka',
+  'entities.items.heart_of_the_rift.name': 'Revans hjärta',
+  'entities.items.hearth_ember_cache.name': 'Glödgömma',
+  'entities.items.hearthlined_treads.name': 'Härdfodrade stövlar',
+  'entities.items.hedgewick_shears.name': 'Stulen Häckby-sax',
+  'entities.items.hedgewick_tool_cart.name': 'Vält verktygsvagn',
+  'entities.items.hoarfrost_edge.name': 'Rimfrostegg',
+  'entities.items.last_keep_signet.name': 'Sista fästets signetring',
+  'entities.items.lilybed_mantle.name': 'Liljebäddens mantel',
+  'entities.items.mantle_of_the_meredark.name': 'Sjömörkrets mantel',
+  'entities.items.mantle_of_the_unbroken_shore.name': 'Den obrutna kustens mantel',
+  'entities.items.mantle_of_the_unhorsed.name': 'Den avsuttnes mantel',
+  'entities.items.mawscale_pauldrons.name': 'Gapfjällsaxelplåtar',
+  'entities.items.mere_ferry_lantern.name': 'Färjelykta',
+  'entities.items.moonfleece_mitts.name': 'Månullsvantar',
+  'entities.items.moonfleece_tuft.name': 'Månullstofs',
+  'entities.items.orchard_sapbinder_grips.name': 'Savbindarhandskar',
+  'entities.items.pactbound_vestments.name': 'Paktbundna dräkter',
+  'entities.items.pearlwake_cargo_crate.name': 'Pärlkölvattnets lastkista',
+  'entities.items.pitlords_cleaver.name': 'Gropherrens klyva',
+  'entities.items.plump_fen_eel.name': 'Fyllig kärrål',
+  'entities.items.riding_training.name': 'Ridträning',
+  'entities.items.rift_essence.name': 'Revessens',
+  'entities.items.rift_gem_azure.name': 'Azurblå revsten',
+  'entities.items.rift_gem_crimson.name': 'Karmosinröd revsten',
+  'entities.items.rift_gem_verdant.name': 'Grönskande revsten',
+  'entities.items.riftbound_band_of_guile.name': 'Revbunden ring av list',
+  'entities.items.riftbound_band_of_insight.name': 'Revbunden ring av insikt',
+  'entities.items.riftbound_band_of_might.name': 'Revbunden ring av styrka',
+  'entities.items.saltforged_grips.name': 'Saltsmidda handskar',
+  'entities.items.saltwalker_sandals.name': 'Saltvandrarsandaler',
+  'entities.items.scorched_supply_crate.name': 'Svedd förrådskista',
+  'entities.items.shear_storm_lantern.name': 'Släckt stormlykta',
+  'entities.items.shearkeeper_gloves.name': 'Brantväktarens handskar',
+  'entities.items.silkbound_remains.name': 'Sidenbundna kvarlevor',
+  'entities.items.sprung_trap.name': 'Utlöst kärrfälla',
+  'entities.items.stormscale_treads.name': 'Stormfjällsstövlar',
+  'entities.items.stormsunder_hood.name': 'Stormsöndrarhuva',
+  'entities.items.sunken_idol_mantle.name': 'Den sjunkna avgudens mantel',
+  'entities.items.sunken_offering_bowl.name': 'Återfylld offerskål',
+  'entities.items.thick_winter_pelt.name': 'Tjock vinterpäls',
+  'entities.items.vigil_star_chart.name': 'Vakans stjärnkarta',
+  'entities.items.voidscar_handwraps.name': 'Tomrumsärrshandlindor',
+  'entities.items.voidsong_dirk.name': 'Tomrumssång, Den splittrade slöjans dolk',
+  'entities.items.voidweave_mantle.name': 'Tomrumsvävd mantel',
+  'entities.items.wickspun_treads.name': 'Vekspunna stövlar',
+  'entities.items.widowsilk_skein.name': 'Änkesidenhärva',
+  'entities.items.wildheart_fangknife.name': 'Zulgars huggtandskniv',
+  'entities.items.fanglords_beastspear.name': 'Huggtandsherrens bestspjut',
+  'entities.items.bloodmane_warleggings.name': 'Blodmanens krigsbenskenor',
+  'entities.items.vineclaw_stalking_breeches.name': 'Rankklons smygarbyxor',
+  'entities.items.sunbone_ritual_sarong.name': 'Solbens ritualsarong',
+  'entities.items.wildheart_hexwood_staff.name': 'Bassängens förhäxade trästav',
+  'entities.items.wildheart_tuskblade.name': 'Vildhjärtats betklinga',
+  'entities.items.wisplight_globe.name': 'Irrbloss-ljusglob',
+  'entities.items.wreck_wardens_mantle.name': 'Vrakväktarens mantel',
+  'entities.items.wreckfield_flotsam_crate.name': 'Vrakgodskista',
+  'entities.items.wyrmwatch_warning_banner.name': 'Drakvaktens varningsbanér',
   'entities.letters.guild_trend_alchemy_cooking.body':
     'Hantverkare,\n\nBud når gillet av ditt arbete i alkemi och matlagning: brygder puttrade och rätter kryddade, de två hantverken matar varandra. Närliggande hantverk som arbetats tillsammans markerar en hand redo för inställning. De som binder detta par får namnet apotekare i tid. Sök upp Smed Haldren, rustningsmannen i Eastbrook: han talar för mästarna för tillfället. Bevisa ditt hantverk för honom med arbete av dina egna händer, och han kommer att se dina två huvudyrken anpassade.\n\nI god ställning,\nHantverksgillet',
   'entities.letters.guild_trend_alchemy_cooking.sender': 'Hantverksgillet',
@@ -8943,6 +10075,196 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Tänk på trådarna, {className}. En stadig hand vid vävstolen slår en stark.',
   'entities.npcs.weaver_ottilie.name': 'Väver Ottilie',
   'entities.npcs.weaver_ottilie.title': 'Vävstolens mästare',
+  'entities.npcs.archivist_tullo.greeting':
+    'Monumenten där ute har inte talat med någon på en evighet. Kanske väntade de på nya öron.',
+  'entities.npcs.archivist_tullo.name': 'Arkivarien Tullo',
+  'entities.npcs.archivist_tullo.title': 'Uttolkare av stenar',
+  'entities.npcs.astronomer_cassian.greeting':
+    'Tyst nu. Himlen gryr aldrig här, så den slutar heller aldrig tala.',
+  'entities.npcs.astronomer_cassian.name': 'Astronomen Cassian',
+  'entities.npcs.astronomer_cassian.title': 'Vakt vid vakan',
+  'entities.npcs.aurorist_veyla.greeting': 'Tyst. Skenen talar i natt, och de upprepar sig aldrig.',
+  'entities.npcs.aurorist_veyla.name': 'Norrskenstydaren Veyla',
+  'entities.npcs.aurorist_veyla.title': 'Uttolkare av skenen',
+  'entities.npcs.bellkeeper_tam.greeting':
+    'Klockan är den enda varning bräscherna ger oss, {className}. En klämtning för fälten, två för klipporna, tre när det är så nära att springa inte hjälper. Håll ett öra mot den, så kan den hålla dig hel.',
+  'entities.npcs.bellkeeper_tam.name': 'Klockväktaren Tam',
+  'entities.npcs.bellkeeper_tam.title': 'Väktare av vaktklockan',
+  'entities.npcs.bridgewright_alden.greeting':
+    'Varje planka i denna stad är min att vårda, och kärret tuggar på dem alla.',
+  'entities.npcs.bridgewright_alden.name': 'Brobyggaren Alden',
+  'entities.npcs.bridgewright_alden.title': 'Mästare av Kärrvägen',
+  'entities.npcs.ferrymaster_caddow.greeting':
+    'Dimman ligger över sjön igen. När lyktorna slocknar på vattnet håller sig kloka människor på land.',
+  'entities.npcs.ferrymaster_caddow.name': 'Färjmästaren Caddow',
+  'entities.npcs.ferrymaster_caddow.title': 'Väktare av lyktfärjorna',
+  'entities.npcs.fisher_nell.greeting':
+    'Den öppnades precis där näten torkar. Precis där, där jag stod varje morgon i mitt liv. Jag går inte ner till stranden längre. Jag går inte till så mycket alls längre.',
+  'entities.npcs.fisher_nell.name': 'Skräckslagna Nell',
+  'entities.npcs.fisher_nell.title': 'Fiskare i Måshamn',
+  'entities.npcs.gardener_yew.greeting':
+    'Räck mig den skottkärran, är du snäll? Dessa gräsmattor går inte omkring av sig själva, vad byn än tror.',
+  'entities.npcs.gardener_yew.name': 'Trädgårdsmästaren Yew',
+  'entities.npcs.gardener_yew.title': 'Den siste trädgårdsmästaren',
+  'entities.npcs.gatecaptain_brannoc.greeting':
+    'Drakvakten håller porten. Har hållit den i fyrtio år. Den kommer hålla den i natt.',
+  'entities.npcs.gatecaptain_brannoc.name': 'Portkaptenen Brannoc',
+  'entities.npcs.gatecaptain_brannoc.title': 'Befälhavare över Drakvakten',
+  'entities.npcs.gatewarden_pell.greeting':
+    'Se upp med hur du går på gräsmattorna. Trädgården håller dem klippta, och den vill ha dem prydliga.',
+  'entities.npcs.gatewarden_pell.name': 'Portväktaren Pell',
+  'entities.npcs.gatewarden_pell.title': 'Väktare av Trädgårdsporten',
+  'entities.npcs.harbormaster_odile.greeting':
+    'Varje båt i denna vik är skyldig Den gamla vårdkasen sin köl. Tala fort, tidvattnet väntar inte.',
+  'entities.npcs.harbormaster_odile.name': 'Hamnmästaren Odile',
+  'entities.npcs.harbormaster_odile.title': 'Hamnmästare i Vikhamn',
+  'entities.npcs.head_gardener_amaranth.greeting':
+    'Bry dig inte om skuggorna under mina ögon. Någon måste hålla sig vaken medan trädgården drömmer.',
+  'entities.npcs.head_gardener_amaranth.name': 'Överträdgårdsmästaren Amaranth',
+  'entities.npcs.head_gardener_amaranth.title': 'Överträdgårdsmästare i Evighetsträdgården',
+  'entities.npcs.hearthkeeper_maeve.greeting':
+    'Kom in från kylan. Stugans eld slocknar aldrig, så länge jag drar andan.',
+  'entities.npcs.hearthkeeper_maeve.name': 'Härdväktaren Maeve',
+  'entities.npcs.hearthkeeper_maeve.title': 'Väktare av Härdstugan',
+  'entities.npcs.hermit_okku.greeting':
+    'Tyst nu. Trummorna räknar allt som går under träden, och de har redan räknat dig.',
+  'entities.npcs.hermit_okku.name': 'Okku',
+  'entities.npcs.hermit_okku.title': 'Mannen som gick in',
+  'entities.npcs.huntsman_deral.greeting':
+    'Tyst nu. Hjorden känner till varje ljud denna dal gör, och det gör jag också.',
+  'entities.npcs.huntsman_deral.name': 'Jägaren Deral',
+  'entities.npcs.huntsman_deral.title': 'Hjordarnas väktare',
+  'entities.npcs.keeper_bram.greeting':
+    'Nio och trettio år har denna lykta brunnit under min vakt. Den kommer inte slockna under din.',
+  'entities.npcs.keeper_bram.name': 'Väktaren Bram',
+  'entities.npcs.keeper_bram.title': 'Väktare av Den gamla vårdkasen',
+  'entities.npcs.keeper_saelwyn.greeting':
+    'Få av ditt slag har stått under dessa grenar, {className}. Gå varsamt, och var välkommen.',
+  'entities.npcs.keeper_saelwyn.name': 'Väktaren Saelwyn',
+  'entities.npcs.keeper_saelwyn.title': 'Väktare av Hålan',
+  'entities.npcs.lamplighter_sorrel.greeting':
+    'Se upp med lyktorna, vän. Bortom denna port ger solen upp och blommorna tar över.',
+  'entities.npcs.lamplighter_sorrel.name': 'Lykttändaren Sorrel',
+  'entities.npcs.lamplighter_sorrel.title': 'Väktare av Nattporten',
+  'entities.npcs.lampman_cobb.greeting':
+    'Håll dig i lyktskenet, vän. Skogen räknar alla som passerar porten.',
+  'entities.npcs.lampman_cobb.name': 'Lyktkarlen Cobb',
+  'entities.npcs.lampman_cobb.title': 'Väktare av Kråkportens lyktor',
+  'entities.npcs.lira_dewsong.greeting': 'Välkommen till Månvila, där blommorna gryr åt oss.',
+  'entities.npcs.lira_dewsong.name': 'Lira Dewsong',
+  'entities.npcs.lira_dewsong.title': 'Natt-trädgårdsmästare i Månvila',
+  'entities.npcs.loremother_bryn.greeting':
+    'Varje ljus i denna dal minns något, {playerName}. Hjälp mig lyssna.',
+  'entities.npcs.loremother_bryn.name': 'Sagomodern Bryn',
+  'entities.npcs.loremother_bryn.title': 'Helgedomens röst',
+  'entities.npcs.mender_saul.greeting':
+    'Jag har lagt fler ben denna enda månad än under tio år av att laga fiskefall. Bräscherna lämnar inte mycket kvar av det de tar. Kom tillbaka till mig hel, om du kan klara det.',
+  'entities.npcs.mender_saul.name': 'Botaren Saul',
+  'entities.npcs.mender_saul.title': 'Fältkirurg',
+  'entities.npcs.mother_sedge.greeting':
+    'Pilarna berättade att du kom innan dina stövlar lämnade bron.',
+  'entities.npcs.mother_sedge.name': 'Moder Sedge',
+  'entities.npcs.mother_sedge.title': 'Kärrhäxa från Pilgråten',
+  'entities.npcs.netter_maris.greeting':
+    'Känner du det? Rökt ål. Halva denna stad står på pålar jag köpte med den.',
+  'entities.npcs.netter_maris.name': 'Nätfiskaren Maris',
+  'entities.npcs.netter_maris.title': 'Ålfiskare i Brosjön',
+  'entities.npcs.orchardist_pomeline.greeting':
+    'Se upp var du går. Varje rot i dessa rader är äldre än staden, och de minns.',
+  'entities.npcs.orchardist_pomeline.name': 'Fruktodlaren Pomeline',
+  'entities.npcs.orchardist_pomeline.title': 'Väktare av de förgyllda raderna',
+  'entities.npcs.pearlmother_isha.greeting':
+    'Havet ger, sanden behåller, och djungeln tar. Håll dig på stranden, främling.',
+  'entities.npcs.pearlmother_isha.name': 'Pärlmodern Isha',
+  'entities.npcs.pearlmother_isha.title': 'De dykandes äldste',
+  'entities.npcs.provisioner_fenna.greeting':
+    'Bröd fortfarande varmt, vatten fortfarande sött. Hålan förser, och det gör jag också.',
+  'entities.npcs.provisioner_fenna.name': 'Proviantmästaren Fenna',
+  'entities.npcs.provisioner_fenna.title': 'Proviantmästare i Fornglimmer',
+  'entities.npcs.quartermaster_edda.greeting':
+    'Stål och salt, {className}, det är allt jag har kvar att dela ut. Ta det och se till att bräscherna ångrar att de öppnade där jag kunde nå dem.',
+  'entities.npcs.quartermaster_edda.name': 'Kvartermästaren Edda',
+  'entities.npcs.quartermaster_edda.title': 'Skansens vapensmed',
+  'entities.npcs.quartermaster_sela.greeting':
+    'Varje kista på denna gård korsade fyrtio mil aska för att komma hit. Behandla dem varsamt.',
+  'entities.npcs.quartermaster_sela.name': 'Kvartermästaren Sela',
+  'entities.npcs.quartermaster_sela.title': 'Väktare av garnisonsförråden',
+  'entities.npcs.reeve_ottoline.greeting':
+    'Välkommen till Lyktsjön, där skörden aldrig tar slut, och inte heller arbetet.',
+  'entities.npcs.reeve_ottoline.name': 'Fogden Ottoline',
+  'entities.npcs.reeve_ottoline.title': 'Fogde i Lyktsjön',
+  'entities.npcs.riftwatch_ollun.greeting':
+    'Varje bräsch sjunger innan den öppnas, om du har örat för det. Jag kan höra tre av dem röra sig på ön just nu, och en av dem är nära.',
+  'entities.npcs.riftwatch_ollun.name': 'Revvakten Ollun',
+  'entities.npcs.riftwatch_ollun.title': 'Bräschforskare',
+  'entities.npcs.salvage_boss_ryna.greeting':
+    'En {className} med fungerande armar, bra. Vrakraden betalar bra, om krabborna lämnar dig tillräckligt med fingrar för att räkna den.',
+  'entities.npcs.salvage_boss_ryna.name': 'Bärgningsbasen Ryna',
+  'entities.npcs.salvage_boss_ryna.title': 'Härskarinna över vrakraden',
+  'entities.npcs.salvager_edda.greeting':
+    'Vrakvirke, rep och döda mäns last. Havet betalar min lön, när Väktaren tillåter det.',
+  'entities.npcs.salvager_edda.name': 'Bärgaren Edda',
+  'entities.npcs.salvager_edda.title': 'Bärgare från Vrakfälten',
+  'entities.npcs.scout_einna.greeting':
+    'Du gick genom passet levande. Bra. Ismanteln borde få höra om det.',
+  'entities.npcs.scout_einna.name': 'Spanaren Einna',
+  'entities.npcs.scout_einna.title': 'Spanare vid Snölinjen',
+  'entities.npcs.scout_yerrin.greeting':
+    'Håll dig lågt. Ljud bär sig märkligt över glaset, och porten därnere har öron.',
+  'entities.npcs.scout_yerrin.name': 'Spanaren Yerrin',
+  'entities.npcs.scout_yerrin.title': 'Vakt bortom dynerna',
+  'entities.npcs.sexton_marrow.greeting':
+    'Vi begraver dem djupt här, och vi ringer klockorna så att de minns att stanna nere.',
+  'entities.npcs.sexton_marrow.name': 'Klockaren Marrow',
+  'entities.npcs.sexton_marrow.title': 'Klockare i Galgsjön',
+  'entities.npcs.strandwatcher_pell.greeting':
+    'Ute ur de svarta träden äntligen. Andas, främling, solen håller denna sida av passet.',
+  'entities.npcs.strandwatcher_pell.name': 'Strandvakten Pell',
+  'entities.npcs.strandwatcher_pell.title': 'Vakt vid Snårmynningen',
+  'entities.npcs.trapper_brosk.greeting':
+    'Kärret tog tre av mina linor denna vecka. Kärret tog aldrig en lina på tjugo år.',
+  'entities.npcs.trapper_brosk.name': 'Fångstmannen Brosk',
+  'entities.npcs.trapper_brosk.title': 'Fångstman i Skälvkärret',
+  'entities.npcs.vicar_creel.greeting':
+    'Kapellet föll för år sedan. De döda under det märkte det inte, så jag stannade.',
+  'entities.npcs.vicar_creel.name': 'Kaplanen Creel',
+  'entities.npcs.vicar_creel.title': 'Siste kaplanen vid Sorgestenen',
+  'entities.npcs.warden_coalfast.greeting':
+    'Bräscherna bryr sig inte om att Måshamn är litet, {className}. Vi håller denna kust, annars finns ingen kust kvar att hålla. Stå med oss så glömmer jag det inte.',
+  'entities.npcs.warden_coalfast.name': 'Väktaren Coalfast',
+  'entities.npcs.warden_coalfast.title': 'Skansens befälhavare',
+  'entities.npcs.warden_kaldra.greeting':
+    'Se upp med bänkarna, främling. Snön behåller det den tar.',
+  'entities.npcs.warden_kaldra.name': 'Väktaren Kaldra',
+  'entities.npcs.warden_kaldra.title': 'Väktare av Ismanteln',
+  'entities.npcs.wardsmith_orun.greeting':
+    'Dessa smedjor svalnade för århundraden sedan, {className}, men deras verk håller fortfarande en egg.',
+  'entities.npcs.wardsmith_orun.name': 'Runsmeden Orun',
+  'entities.npcs.wardsmith_orun.title': 'Väktare av de gamla smedjorna',
+  'entities.npcs.watcher_maren.greeting':
+    'Se upp med fotfästet bortom porten. Vinden här uppe tar hattar först och frågor aldrig.',
+  'entities.npcs.watcher_maren.name': 'Vakten Maren',
+  'entities.npcs.watcher_maren.title': 'Vakten vid Vindleden',
+  'entities.npcs.waykeeper_pell.greeting':
+    'Ner för trapporna och in i det mjuka landet. Se upp var du sätter dina stövlar.',
+  'entities.npcs.waykeeper_pell.name': 'Vägväktaren Pell',
+  'entities.npcs.waykeeper_pell.title': 'Väktare av Bärnstenskärrets trappor',
+  'entities.npcs.waywatcher_sorrel.greeting':
+    'Snö bakom dig, guld framför. Få vandrar Guldsmältan två gånger, så se till att korsningen räknas.',
+  'entities.npcs.waywatcher_sorrel.name': 'Vägvakten Sorrel',
+  'entities.npcs.waywatcher_sorrel.title': 'Vakt vid Guldsmältan',
+  'entities.npcs.weaver_amelle.greeting':
+    'Känner du det? Månull på vävstolen. Varmare än någon eld du någonsin suttit vid.',
+  'entities.npcs.weaver_amelle.name': 'Väver Amelle',
+  'entities.npcs.weaver_amelle.title': 'Månullsväverska',
+  'entities.npcs.wickmother_sorrel.greeting':
+    'Kom in, sätt dig, det finns saft på elden. Håll bara en hand på allt av järn: gnomerna har lätta fingrar på sistone.',
+  'entities.npcs.wickmother_sorrel.name': 'Värdinnan Sorrel',
+  'entities.npcs.wickmother_sorrel.title': 'Värdinna på Häckby värdshus',
+  'entities.npcs.widow_tansy.greeting':
+    'Ett ljus för varje grav, och inte ett enda får slockna. Inte ett enda, hör du mig?',
+  'entities.npcs.widow_tansy.name': 'Änkan Tansy',
+  'entities.npcs.widow_tansy.title': 'Ljustillverkare i Galgsjön',
   'gatherEvent.ancientHeartwood': '{finder} fällde en gammal kärnved!',
   'gatherEvent.moonlitBloom': '{finder} upptäckte en månbelyst blomning!',
   'gatherEvent.pristineVein': '{finder} träffade en orörd ådra!',
@@ -9010,6 +10332,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.harvestLineQty': 'Du skördar: {name} x{qty}.',
   'hudChrome.gathering.harvestSpecimenLine': 'Du får också {name}.',
   'hudChrome.mobile.professions': 'Yrken',
+  'hudChrome.mobile.mounts': 'Riddjur',
   'hudChrome.options.showThirdActionBar': 'Visa tredje åtgärdsfältet',
   'hudChrome.playerMenu.streamerBadgeTitle': 'Verifierad streamer',
   'hudChrome.professions.ceilingCommon': 'Vanlig gräns',
@@ -9202,6 +10525,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.unbindAria': 'Lös upp {name} för {fee}',
   'hudChrome.unbind.unbound': 'Löste upp {name} för {fee}. Det binds igen vid nästa handel.',
   'hud.combat.auraGainOther': '{target} får {name}.',
+  'hud.combat.floatingHealAbsorbed': 'Absorberad',
+  'hud.combat.healOtherAbsorbed': 'Din {ability} slukas av rötan på {target}.',
+  'hud.combat.healSelfAbsorbed': 'Din {ability} slukas av rötan på dig.',
   'hudChrome.corpseHarvest.components.cloth': 'Tyg',
   'hudChrome.corpseHarvest.components.meat': 'Kött',
   'hudChrome.crafting.noBagSpace': 'Du har inte plats för det tillverkade föremålet.',
@@ -9291,6 +10617,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': '{min} till {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Förtrollad',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Förtrollad)',
+  'hudChrome.itemTooltip.riftSockets': 'Revstenar {used}/{total}',
+  'hudChrome.itemTooltip.riftTier': 'Revföremål av grad {tier}',
+  'hudChrome.itemTooltip.riftUpgrade': 'Revuppgradering {level}/{max}',
   'hudChrome.marketIndicator.aria': 'Världsmarknadsintäkter eller föremål väntar',
   'hudChrome.marketIndicator.tip':
     'Försäljningsintäkter eller returnerade föremål väntar på dig hos Köpmannen.',
@@ -9343,4 +10672,115 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Tillverkarens märke',
   'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Mästerverksbonus',
   'hudChrome.enchanting.replaceConfirmKeepsBond': 'Uppdragsbindning',
+  'hudChrome.continentMap.levels': 'Nivåer {min} till {max}',
+  'hudChrome.continentMap.summary': 'Världskarta. Välj en zon för att öppna dess karta.',
+  'hudChrome.continentMap.title': 'Världskarta',
+  'hudChrome.continentMap.toggleAria': 'Växla mellan världskartan och zonkartan',
+  'hudChrome.continentMap.toWorld': 'Världskarta',
+  'hudChrome.continentMap.toZone': 'Zonkarta',
+  'hudChrome.mountRace.cancelButton': 'Avbryt loppet',
+  'hudChrome.mountRace.finished': 'Klart på {seconds} s!',
+  'hudChrome.mountRace.go': 'KÖR!',
+  'hudChrome.mountRace.progress': 'Portar {n} av {total}',
+  'hudChrome.mountRace.start': 'Kör! Klara varje hopp, rid sedan tillbaka genom bågen.',
+  'hudChrome.mountRace.startButton': 'Starta loppet',
+  'hudChrome.mountRace.timeLeft': '{seconds} s',
+  'hudChrome.mountRace.timeout': 'Loppet misslyckades',
+  'hudChrome.mountRace.toFinish': 'Rid tillbaka genom bågen!',
+  'hudChrome.mounts.clickManage': 'Klicka för att välja ditt riddjur',
+  'hudChrome.mounts.close': 'Stäng',
+  'hudChrome.mounts.desc_aether_hover_cycle':
+    'En kraftfull magitech-cykel designad för snabb, lågsvävande förflyttning i strid.',
+  'hudChrome.mounts.desc_grag_bear': 'En uthållig, säkerfotad björn som ger ökad reshastighet.',
+  'hudChrome.mounts.desc_shadowjump_toad':
+    'En massiv, säkerfotad jättepadda, tränad i blixtsnabba skuggsprång som täcker all terräng.',
+  'hudChrome.mounts.desc_stalkglider_snail':
+    'En robust, långsamt brinnande snigel som ger ökad reshastighet.',
+  'hudChrome.mounts.desc_stormfeather_griffin':
+    'En kunglig stormgrip som smyger fram på runskodda klor, med vingarna hopfällda.',
+  'hudChrome.mounts.desc_thunderstrut_gobbler':
+    'En kolossal stormkläckt kalkon som stoltserar ner från Den vaknande toppen, med stjärten spretande som ett åskmoln.',
+  'hudChrome.mounts.desc_valorsteed':
+    'En uthållig, säkerfotad stridshäst som ger ökad reshastighet.',
+  'hudChrome.mounts.dismount': 'Stig av',
+  'hudChrome.mounts.emptyDropHint':
+    'Sällsyntare riddjur droppar från hjältemodiga fängelsehålebossar och avklarade revor.',
+  'hudChrome.mounts.emptyStableHint':
+    'Nå nivå 20 och ta ridlektioner hos Stallmästare Marla vid Highwatch stall, väster om Highwatch.',
+  'hudChrome.mounts.emptyTitle': 'Inga riddjur insamlade',
+  'hudChrome.mounts.mount': 'Sitt upp',
+  'hudChrome.mounts.name_aether_hover_cycle': 'Etertornerarens svävcykel',
+  'hudChrome.mounts.name_grag_bear': 'Goliat Grag-björnen',
+  'hudChrome.mounts.name_shadowjump_toad': 'Kama-Kage, Skuggsprångspaddan',
+  'hudChrome.mounts.name_stalkglider_snail': 'Mosskal-stjälkglidaren',
+  'hudChrome.mounts.name_stormfeather_griffin': 'Himmelsvidd Stormfjäder',
+  'hudChrome.mounts.name_thunderstrut_gobbler': 'Åskstoltsern, Den stora kalkonen',
+  'hudChrome.mounts.name_valorsteed': 'Tapperhetshästen',
+  'hudChrome.mounts.rarity_common': 'Vanlig',
+  'hudChrome.mounts.rarity_epic': 'Episk',
+  'hudChrome.mounts.rarity_rare': 'Sällsynt',
+  'hudChrome.mounts.riding': 'Ridning',
+  'hudChrome.mounts.select': 'Välj',
+  'hudChrome.mounts.selected': 'Vald',
+  'hudChrome.mounts.spec_speed': '+{pct}% extra rörlighet',
+  'hudChrome.mounts.title': 'Riddjur',
+  'hudChrome.mounts.useToRide': 'Använd för att frammana detta riddjur.',
+  'hudChrome.mountTraining.begin': 'Börja lektionen',
+  'hudChrome.mountTraining.mountPrompt':
+    'Tryck på {key} för att sitta upp på övnings-Tapperhetshästen.',
+  'hudChrome.mountTraining.ownedMountPrompt':
+    'Dina tyglar finns i dina väskor. Använd dem för att rida.',
+  'hudChrome.mountTraining.returnToMarla':
+    'Återvänd till Marla vid stallet för att köpa dina Tapperhetshäst-tyglar för 10g.',
+  'hudChrome.mountTraining.ridePrompt':
+    'Följ den glödande markören till startlinjen, tryck sedan på Starta loppet.',
+  'hudChrome.mountTraining.success': 'Du har tämjt Tapperhetshästen.',
+  'hudChrome.unstuck.alreadyActive': 'Fastna-hjälp räknar redan ner.',
+  'hudChrome.unstuck.alreadySafe': 'Du befinner dig redan på en säker, nåbar plats.',
+  'hudChrome.unstuck.busy': 'Avsluta din nuvarande handling innan du använder Fastna-hjälp.',
+  'hudChrome.unstuck.cancelledBusy':
+    'Fastna-hjälp avbröts eftersom du påbörjade en annan handling.',
+  'hudChrome.unstuck.cancelledCombat': 'Fastna-hjälp avbröts eftersom du gick in i strid.',
+  'hudChrome.unstuck.cancelledDamaged': 'Fastna-hjälp avbröts eftersom du tog skada.',
+  'hudChrome.unstuck.cancelledDisconnected': 'Fastna-hjälp avbröts eftersom du kopplades från.',
+  'hudChrome.unstuck.cancelledMoved': 'Fastna-hjälp avbröts eftersom du rörde dig.',
+  'hudChrome.unstuck.cancelledState': 'Fastna-hjälp avbröts eftersom ditt tillstånd ändrades.',
+  'hudChrome.unstuck.combat': 'Du kan inte använda Fastna-hjälp under strid.',
+  'hudChrome.unstuck.completed': 'Flyttad till närmaste nåbara säkra plats.',
+  'hudChrome.unstuck.completedAtGraveyard':
+    'Din ande har återvänt till närmaste kyrkogård. Tala med Den bleka väktaren för att godta Väktarens tribut.',
+  'hudChrome.unstuck.controlled':
+    'Du kan inte använda Fastna-hjälp medan din rörelseförmåga är nedsatt.',
+  'hudChrome.unstuck.cooldown': 'Fastna-hjälp är redo om {seconds} sekunder.',
+  'hudChrome.unstuck.countdown': 'Fastna-hjälp: {seconds}',
+  'hudChrome.unstuck.dead': 'Du kan inte använda Fastna-hjälp medan du är död eller i andeform.',
+  'hudChrome.unstuck.help':
+    'Räddning: /unstuck startar en stillastående nedräkning som flyttar dig till en närliggande nåbar säker plats.',
+  'hudChrome.unstuck.helpAtGraveyard':
+    'Räddning: /unstuck startar en stillastående nedräkning och skickar sedan din ande till närmaste kyrkogård. Att återvända via Den bleka väktaren kräver Väktarens tribut.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Räddning: /unstuck startar en stillastående nedräkning och flyttar dig sedan till närmaste kyrkogård, och återupplivar dig om du hade fallit. Räddningssjuka stannar på dig i upp till 5 minuter.',
+  'hudChrome.unstuck.menuButton': 'Fastna-hjälp',
+  'hudChrome.unstuck.movedToGraveyard':
+    'Du har flyttats till närmaste kyrkogård. Räddningssjuka vilar tungt på dig.',
+  'hudChrome.unstuck.noSafePosition':
+    'Ingen nåbar säker plats hittades i närheten. Du flyttades inte.',
+  'hudChrome.unstuck.revivedAtGraveyard':
+    'Du har återförts till närmaste kyrkogård och återupplivats. Väktarens tribut vilar tungt på dig.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'Du har flyttats till närmaste kyrkogård och återupplivats. Räddningssjuka vilar tungt på dig.',
+  'hudChrome.unstuck.standStill': 'Stå still på fast mark innan du använder Fastna-hjälp.',
+  'hudChrome.unstuck.standStillAnywhere': 'Stå still innan du använder Fastna-hjälp.',
+  'hudChrome.unstuck.started':
+    'Fastna-hjälp om {seconds} sekunder. Att röra sig, strida, ta skada eller påbörja en annan handling avbryter den.',
+  'hudChrome.unstuck.unavailable': 'Fastna-hjälp är inte tillgänglig i ditt nuvarande tillstånd.',
+  'hudChrome.riftTracker.title': 'Reva',
+  'hudChrome.riftTracker.floor': 'Våning {current} av {total}',
+  'hudChrome.riftTracker.closesIn': 'Stänger om {time}',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
+  'hud.core.chatChannels.moveHint':
+    'Ordna om fliken {channel}: dra den, eller använd Alt+vänster och Alt+höger',
+  'itemUi.vendor.buyStack': 'Köp {count}',
+  'itemUi.vendor.buyStackAria': 'Köp {count} {item} för {price}',
 };

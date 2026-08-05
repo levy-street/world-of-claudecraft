@@ -35,6 +35,7 @@ describe('SceneHudController reconnect convergence', () => {
     const trap = {
       focusFirst: vi.fn(),
       release: vi.fn(),
+      opener: vi.fn(() => null),
     };
     const world = {
       playerId: 7,

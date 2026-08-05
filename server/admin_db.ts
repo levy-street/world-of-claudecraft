@@ -39,22 +39,36 @@ export interface OverviewCounts {
   siteUsersNow: number;
 }
 
-export async function overviewCounts(): Promise<OverviewCounts> {
-  // A big multi-subquery aggregate over accounts / characters / play_sessions,
-  // request-driven through the admin overview cache (server/admin_overview_cache.ts),
-  // which bounds how often the admin Overview poll can re-run it: run it on the
-  // raised allowance so a growing play_sessions table cannot trip the default
-  // statement timeout. peak_online_all_time is GREATEST of the retained sample
-  // window's live max and the folded world_state peak (foldOnlinePeak below), so
-  // a peak inside the retained window stays honest before the next fold and a
-  // pruned-away peak is never lost. Only foldOnlinePeak writes the peak key, but
-  // a tampered or corrupted stored value must degrade to 0 under the guarded
-  // cast, never take down the whole overview read; the digit-count bound in the
-  // regex is part of that guard (a digits-only value wider than int4 would pass
-  // a bare digit match and the ::int cast would then error out the whole read).
-  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
-    query(
-      `
+// world_state key prefix for the folded per-realm all-time online peak.
+// Single-sourced across foldOnlinePeak and the overviewCounts reader SQL (a
+// drifting copy on either side would silently orphan the stored peak); it is a
+// compile-time constant interpolated into SQL text, never user input. Declared
+// ahead of OVERVIEW_COUNTS_SQL below so that template literal can reference it
+// at module-load time.
+export const ONLINE_PEAK_WORLD_STATE_PREFIX = 'admin_online_peak:';
+
+// A big multi-subquery aggregate over accounts / characters / play_sessions,
+// request-driven through the admin overview cache (server/admin_overview_cache.ts),
+// which bounds how often the admin Overview poll can re-run it: run it on the
+// raised allowance so a growing play_sessions table cannot trip the default
+// statement timeout. peak_online_all_time is GREATEST of the retained sample
+// window's live max and the folded world_state peak (foldOnlinePeak below), so
+// a peak inside the retained window stays honest before the next fold and a
+// pruned-away peak is never lost. Only foldOnlinePeak writes the peak key, but
+// a tampered or corrupted stored value must degrade to 0 under the guarded
+// cast, never take down the whole overview read; the digit-count bound in the
+// regex is part of that guard (a digits-only value wider than int4 would pass
+// a bare digit match and the ::int cast would then error out the whole read).
+//
+// The active/returning-account subqueries use the sargable
+// `(ended_at IS NULL OR ended_at > cutoff)` form, never
+// `COALESCE(ended_at, now()) > cutoff`: a volatile function (now()) inside
+// the COALESCE makes the whole expression un-indexable, forcing a sequential
+// scan of play_sessions on every admin Overview refresh. The OR form lets the
+// planner serve both arms (still-open sessions, sessions that ended after the
+// cutoff) from play_sessions_ended_account (ended_at, account_id), the
+// concurrent index built in server/admin_db_indexes.ts.
+export const OVERVIEW_COUNTS_SQL = `
     SELECT
       (SELECT count(*) FROM accounts)::int                                               AS accounts,
       (SELECT count(*) FROM characters)::int                                             AS characters,
@@ -63,16 +77,16 @@ export async function overviewCounts(): Promise<OverviewCounts> {
       (SELECT count(*) FROM accounts WHERE created_at > now() - interval '30 days')::int AS accounts_month,
       (SELECT count(*) FROM play_sessions WHERE started_at > now() - interval '1 day')::int AS sessions_today,
       (SELECT count(DISTINCT account_id) FROM play_sessions
-        WHERE started_at <= now() AND COALESCE(ended_at, now()) > now() - interval '1 day')::int AS active_accounts_today,
+        WHERE started_at <= now() AND (ended_at IS NULL OR ended_at > now() - interval '1 day'))::int AS active_accounts_today,
       (SELECT count(DISTINCT account_id) FROM play_sessions
-        WHERE started_at <= now() AND COALESCE(ended_at, now()) > now() - interval '7 days')::int AS active_accounts_week,
+        WHERE started_at <= now() AND (ended_at IS NULL OR ended_at > now() - interval '7 days'))::int AS active_accounts_week,
       (SELECT count(DISTINCT account_id) FROM play_sessions
-        WHERE started_at <= now() AND COALESCE(ended_at, now()) > now() - interval '30 days')::int AS active_accounts_month,
+        WHERE started_at <= now() AND (ended_at IS NULL OR ended_at > now() - interval '30 days'))::int AS active_accounts_month,
       (SELECT count(DISTINCT ps.account_id) FROM play_sessions ps
         JOIN accounts a ON a.id = ps.account_id
         WHERE a.created_at <= now() - interval '1 day'
           AND ps.started_at <= now()
-          AND COALESCE(ps.ended_at, now()) > now() - interval '1 day')::int AS returning_accounts_today,
+          AND (ps.ended_at IS NULL OR ps.ended_at > now() - interval '1 day'))::int AS returning_accounts_today,
       -- The rollup term keeps the average stable as old sessions fold forward.
       COALESCE(
         ((SELECT COALESCE(sum(EXTRACT(EPOCH FROM (COALESCE(ended_at, now()) - started_at))), 0) FROM play_sessions)
@@ -90,9 +104,11 @@ export async function overviewCounts(): Promise<OverviewCounts> {
       )::int AS peak_online_all_time,
       (SELECT count(*) FROM site_presence_sessions
         WHERE last_seen_at > now() - interval '2 minutes')::int AS site_users_now
-  `,
-      [REALM],
-    ),
+  `;
+
+export async function overviewCounts(): Promise<OverviewCounts> {
+  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
+    query(OVERVIEW_COUNTS_SQL, [REALM]),
   );
   const r = res.rows[0];
   return {
@@ -315,12 +331,7 @@ export async function onlineHistory(rangeInput: string): Promise<OnlineHistory> 
 // sweep for the whole database: it folds each realm's all-time online peak into
 // world_state first, then deletes expired rows in bounded batches. The fold is
 // what makes pruning lossless for the admin Overview's all-time peak.
-
-// world_state key prefix for the folded per-realm all-time online peak.
-// Single-sourced across foldOnlinePeak and the overviewCounts reader SQL (a
-// drifting copy on either side would silently orphan the stored peak); it is a
-// compile-time constant interpolated into SQL text, never user input.
-export const ONLINE_PEAK_WORLD_STATE_PREFIX = 'admin_online_peak:';
+// ONLINE_PEAK_WORLD_STATE_PREFIX is declared above, ahead of OVERVIEW_COUNTS_SQL.
 
 // Every realm with samples in this database, not just this process's REALM: the
 // retention sweep runs in one advisory-locked process on behalf of the whole
@@ -943,6 +954,9 @@ export interface AdminCharacterRow {
   xp: number;
   createdAt: string;
   updatedAt: string;
+  guildId: number | null;
+  guildName: string | null;
+  guildRank: string | null;
 }
 
 const CHARACTER_SORT_COLUMNS: Record<string, string> = {
@@ -963,19 +977,29 @@ export async function listCharacters(
 ): Promise<Paginated<AdminCharacterRow>> {
   const pattern = search ? `%${escapeLike(search)}%` : '%';
   const column = CHARACTER_SORT_COLUMNS[sort] ?? 'c.level';
+  const pageColumn = column.replace('c.', 'page.');
   const direction = dir === 'asc' ? 'ASC' : 'DESC';
   const offset = (page - 1) * limit;
   const [rows, total] = await Promise.all([
     pool.query(
-      `SELECT c.id, c.name, c.class, c.level, c.account_id, a.username,
-              COALESCE((c.state->>'copper')::bigint, 0) AS copper,
-              COALESCE((c.state->>'xp')::bigint, 0) AS xp,
-              c.created_at, c.updated_at
-       FROM characters c
-       JOIN accounts a ON a.id = c.account_id
-       WHERE c.name ILIKE $1
-       ORDER BY ${column} ${direction}, c.id
-       LIMIT $2 OFFSET $3`,
+      `WITH page AS MATERIALIZED (
+         SELECT c.id, c.name, c.class, c.level, c.account_id, c.realm,
+                c.state, c.created_at, c.updated_at
+           FROM characters c
+          WHERE c.name ILIKE $1
+          ORDER BY ${column} ${direction}, c.id
+          LIMIT $2 OFFSET $3
+       )
+       SELECT page.id, page.name, page.class, page.level, page.account_id, a.username,
+              COALESCE((page.state->>'copper')::bigint, 0) AS copper,
+              COALESCE((page.state->>'xp')::bigint, 0) AS xp,
+              page.created_at, page.updated_at,
+              g.id AS guild_id, g.name AS guild_name, gm.rank AS guild_rank
+         FROM page
+         JOIN accounts a ON a.id = page.account_id
+         LEFT JOIN guild_members gm ON gm.character_id = page.id
+         LEFT JOIN guilds g ON g.id = gm.guild_id AND g.realm = page.realm
+        ORDER BY ${pageColumn} ${direction}, page.id`,
       [pattern, limit, offset],
     ),
     pool.query(
@@ -997,10 +1021,64 @@ export async function listCharacters(
       xp: Number(r.xp),
       createdAt: r.created_at,
       updatedAt: r.updated_at,
+      guildId: r.guild_id == null ? null : Number(r.guild_id),
+      guildName: r.guild_name ?? null,
+      guildRank: r.guild_rank ?? null,
     })),
     total: total.rows[0].total,
     page,
     limit,
+  };
+}
+
+// R35 GM professions inspector: one character's identity plus its raw state
+// blob (JSONB, already parsed by pg). The handler overlays a live
+// serializeCharacter snapshot when the character is online, then shapes both
+// through the pure characterProfessionsSheet normalizer. `state` is
+// UNDEFINED when the caller suppressed the fetch (includeState false, the
+// live path) and null/object when fetched: undefined-vs-null is what keeps
+// "not fetched" distinguishable from "never entered" (SQL NULL blob), the
+// distinction characterProfessionsSheetFromRow's emptyBlob derivation rides.
+export interface AdminCharacterProfessionsRow {
+  id: number;
+  name: string;
+  class: string;
+  level: number;
+  accountId: number;
+  username: string;
+  state: unknown;
+  updatedAt: string;
+}
+
+export async function characterProfessionsRow(
+  characterId: number,
+  includeState = true,
+): Promise<AdminCharacterProfessionsRow | null> {
+  // includeState false when the caller holds a LIVE serializeCharacter
+  // snapshot: the stored blob would be discarded, and `state` is the widest
+  // column in the schema (a TOASTed detoast for nothing on the shared box).
+  const res = await pool.query(
+    `SELECT c.id, c.name, c.class, c.level, c.account_id, a.username,
+            CASE WHEN $2::boolean THEN c.state ELSE NULL END AS state,
+            c.updated_at
+     FROM characters c
+     JOIN accounts a ON a.id = c.account_id
+     WHERE c.id = $1`,
+    [characterId, includeState],
+  );
+  const r = res.rows[0];
+  if (!r) return null;
+  return {
+    id: r.id,
+    name: r.name,
+    class: r.class,
+    level: r.level,
+    accountId: r.account_id,
+    username: r.username,
+    // Honest suppression: the CASE arm returns SQL NULL when the fetch was
+    // skipped, which would be indistinguishable from a genuinely NULL blob.
+    state: includeState ? r.state : undefined,
+    updatedAt: r.updated_at,
   };
 }
 
@@ -1037,6 +1115,9 @@ export interface AccountDetail {
     pos: { x: number; z: number } | null;
     createdAt: string;
     updatedAt: string;
+    guildId: number | null;
+    guildName: string | null;
+    guildRank: string | null;
   }[];
   recentSessions: {
     id: number;
@@ -1155,12 +1236,21 @@ export async function dailyRewardPointEvents(
 
 export type ModerationHistoryTab = 'all' | 'mine' | 'notes';
 
+// The one action kind the guild arm can carry. Guild moderation writes exactly one
+// row shape (a rename), so the audit query stamps the discriminator as a literal
+// rather than reading a stored column; a second guild action would add the column
+// and this constant goes away. The dashboard's label table keys off it, and
+// tests/admin_account_db.test.ts pins the SQL literal against it.
+export const GUILD_RENAME_ACTION = 'guild_rename';
+
 export interface ModerationActionHistoryEntry {
-  source: 'account' | 'ip';
+  source: 'account' | 'ip' | 'guild';
   id: number;
   accountId: number | null;
   username: string | null;
   ip: string | null;
+  guildId: number | null;
+  guildName: string | null;
   action: string;
   reason: string;
   createdAt: string;
@@ -1183,17 +1273,27 @@ export async function listModerationActions(
   limit: number,
 ): Promise<ModerationActionHistoryPage> {
   const offset = (page - 1) * limit;
-  const params: unknown[] = [];
+  // $1 is always the realm: only the guild arm is realm-scoped (accounts and
+  // blocked IPs are global), and pinning it first keeps the tab parameter at a
+  // fixed $2 across all three tabs.
+  const params: unknown[] = [REALM];
   let accountWhereSql = '';
   let ipWhereSql = '';
+  let guildWhereSql = 'WHERE guild_action.realm = $1';
   if (tab === 'mine') {
     params.push(adminAccountId);
-    accountWhereSql = 'WHERE action_log.admin_account_id = $1';
-    ipWhereSql = 'WHERE ip_action.admin_account_id = $1';
+    accountWhereSql = 'WHERE action_log.admin_account_id = $2';
+    ipWhereSql = 'WHERE ip_action.admin_account_id = $2';
+    guildWhereSql = 'WHERE guild_action.realm = $1 AND guild_action.admin_account_id = $2';
   } else if (tab === 'notes') {
     params.push(adminAccountId);
-    accountWhereSql = "WHERE action_log.admin_account_id = $1 AND action_log.action = 'note'";
+    accountWhereSql = "WHERE action_log.admin_account_id = $2 AND action_log.action = 'note'";
     ipWhereSql = 'WHERE false';
+    // A guild rename is never a note, so the notes tab excludes the arm outright.
+    // The realm predicate stays in front of the constant: it is the only place
+    // $1 appears, and Postgres refuses to parse a statement carrying a parameter
+    // no arm references ("could not determine data type of parameter $1").
+    guildWhereSql = 'WHERE guild_action.realm = $1 AND false';
   }
   const pageParams = [...params, limit, offset];
   const limitParam = params.length + 1;
@@ -1210,7 +1310,9 @@ export async function listModerationActions(
                 action_log.created_at,
                 action_log.expires_at,
                 action_log.admin_account_id,
-                admin.username AS admin_username
+                admin.username AS admin_username,
+                NULL::int AS guild_id,
+                NULL::text AS guild_name
          FROM account_moderation_actions action_log
          JOIN accounts target ON target.id = action_log.account_id
          LEFT JOIN accounts admin ON admin.id = action_log.admin_account_id
@@ -1226,10 +1328,31 @@ export async function listModerationActions(
                 ip_action.created_at,
                 NULL::timestamptz AS expires_at,
                 ip_action.admin_account_id,
-                admin.username AS admin_username
+                admin.username AS admin_username,
+                NULL::int AS guild_id,
+                NULL::text AS guild_name
          FROM blocked_ip_actions ip_action
          LEFT JOIN accounts admin ON admin.id = ip_action.admin_account_id
          ${ipWhereSql}
+         UNION ALL
+         SELECT 'guild' AS source,
+                guild_action.id,
+                NULL::int AS account_id,
+                NULL::text AS username,
+                NULL::text AS ip,
+                'guild_rename' AS action,
+                guild_action.reason,
+                guild_action.created_at,
+                NULL::timestamptz AS expires_at,
+                guild_action.admin_account_id,
+                admin.username AS admin_username,
+                guild_action.guild_id,
+                COALESCE(guild.name, guild_action.new_name) AS guild_name
+         FROM guild_moderation_actions guild_action
+         LEFT JOIN accounts admin ON admin.id = guild_action.admin_account_id
+         LEFT JOIN guilds guild
+                ON guild.id = guild_action.guild_id AND guild.realm = guild_action.realm
+         ${guildWhereSql}
        ) audit_log`;
   const [rows, total] = await Promise.all([
     pool.query(
@@ -1251,6 +1374,8 @@ export async function listModerationActions(
       accountId: entry.account_id === null ? null : Number(entry.account_id),
       username: entry.username ?? null,
       ip: entry.ip ?? null,
+      guildId: entry.guild_id === null ? null : Number(entry.guild_id),
+      guildName: entry.guild_name ?? null,
       action: entry.action,
       reason: entry.reason,
       createdAt: entry.created_at,
@@ -1300,11 +1425,16 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
       ),
     ),
     pool.query(
-      `SELECT id, name, class, level,
-              COALESCE((state->>'copper')::bigint, 0) AS copper,
-              COALESCE((state->>'xp')::bigint, 0) AS xp,
-              state->'pos' AS pos, created_at, updated_at
-       FROM characters WHERE account_id = $1 ORDER BY level DESC, id`,
+      `SELECT c.id, c.name, c.class, c.level,
+              COALESCE((c.state->>'copper')::bigint, 0) AS copper,
+              COALESCE((c.state->>'xp')::bigint, 0) AS xp,
+              c.state->'pos' AS pos, c.created_at, c.updated_at,
+              g.id AS guild_id, g.name AS guild_name, gm.rank AS guild_rank
+       FROM characters c
+       LEFT JOIN guild_members gm ON gm.character_id = c.id
+       LEFT JOIN guilds g ON g.id = gm.guild_id AND g.realm = c.realm
+       WHERE c.account_id = $1
+       ORDER BY c.level DESC, c.id`,
       [accountId],
     ),
     pool.query(
@@ -1395,6 +1525,9 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
           : null,
       createdAt: c.created_at,
       updatedAt: c.updated_at,
+      guildId: c.guild_id == null ? null : Number(c.guild_id),
+      guildName: c.guild_name ?? null,
+      guildRank: c.guild_rank ?? null,
     })),
     recentSessions: sessions.rows.map((s) => ({
       id: s.id,

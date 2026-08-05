@@ -92,6 +92,15 @@ export interface SimContextPrimitives {
   // first join and on the primary's departure, so it is a LIVE getter, not a snapshot.
   // Stays a Sim field; the moved raid-marker `markerFor` (T1) reads it through the seam.
   readonly primaryId: number;
+  // The mastery-reset notice fast path (phase 16): a LIVE counter of players
+  // whose load-time reset flagged a pending authored notice. The load branch
+  // (Sim.addPlayer) increments; the mail-phase sweep
+  // (professions/mastery_reset.ts) early-returns at zero (one integer read per
+  // tick instead of an O(players) walk), drains on the very next tick
+  // otherwise, and re-zeroes after its walk so a pending player who left
+  // before the sweep cannot leave the fast path armed forever. The backing
+  // object stays on Sim, mutated in place.
+  readonly masteryResetNoticeCounter: { pending: number };
   // Social-invite maps owned by the trade (G2) and duel (A2) slices. The party
   // machine (A1) reads them for hasPendingSocialInvite's cross-system pending check
   // and lazily expires entries in place, so these are LIVE views: the backing fields
@@ -165,9 +174,11 @@ export interface SimContextPrimitives {
   readonly cardDuelQueue: number[];
   readonly cardDuels: Map<number, CardDuelMatch>;
   // `world` stays optional (custom play-test map, else undefined; perfLap is the
-  // temporary host-owned tick profiler probe); the rest defaulted.
-  readonly cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap'>> &
-    Pick<SimConfig, 'world' | 'perfLap'>;
+  // temporary host-owned tick profiler probe), and `respawnSeconds` stays
+  // possibly-undefined so respawn_policy.ts can tell an explicit host-pinned
+  // global base from "fall through to the zone tier"; the rest defaulted.
+  readonly cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds'>> &
+    Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'>;
   // Per-Sim key for the rift collision registry in colliders.ts (rift/runs.ts
   // registers regions under it, rift-aware collision reads pass it). Per INSTANCE,
   // not per seed: two same-seed Sims in one process must stay isolated.
@@ -930,6 +941,12 @@ export interface SimContextCallbacks {
   // consumes it. Binding points at the PostOffice instance on Sim.
   mailAuthoredLetter(meta: PlayerMeta, letter: LetterDef): void;
 
+  // Ravenpost mail, read-only: does this player's mailbox (in-flight letters
+  // included) hold `itemId` as an attachment? The accept-time quest re-grant
+  // predicate (quests/quest_item_presence.ts) is the reader. Binding points at
+  // the PostOffice instance on Sim.
+  mailboxHoldsItem(meta: PlayerMeta, itemId: string): boolean;
+
   // Set proc firing is owned by combat/set_procs.ts.
   applySetProcs(source: Entity, target: Entity | null, trigger: SetProc['trigger']): void;
   // Book of Deeds (deeds.ts owns every body; append-only additions). The
@@ -1004,6 +1021,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get players() {
       return host.players;
+    },
+    get masteryResetNoticeCounter() {
+      return host.masteryResetNoticeCounter;
     },
     get stationPlacements() {
       return host.stationPlacements;
@@ -1467,6 +1487,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     queueQuestLetter: host.queueQuestLetter,
     mailHeroicMarks: host.mailHeroicMarks,
     mailAuthoredLetter: host.mailAuthoredLetter,
+    mailboxHoldsItem: host.mailboxHoldsItem,
     applySetProcs: host.applySetProcs,
     // Book of Deeds seam (points at deeds.ts via the Sim-bound arrows).
     bumpDeedStat: host.bumpDeedStat,

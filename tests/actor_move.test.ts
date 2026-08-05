@@ -15,9 +15,15 @@ function fixture() {
     claimId: 12,
     dungeonId: 'test',
     actorIds: new Map([['tam', actor.id]]),
+    actorEntityIds: new Set([actor.id]),
     directives: new Map(),
     floorEnabled: true,
     damageMult: 1,
+    alliesScratch: [],
+    allyEntityIdsScratch: new Set(),
+    playerQueryScratch: [],
+    targetQueryScratch: [],
+    anchorScratch: { x: 0, z: 0 },
   };
   const rebucket = vi.fn();
   const rngNext = vi.fn();

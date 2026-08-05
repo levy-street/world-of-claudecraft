@@ -2,6 +2,7 @@
 //  - the async state machine: loading / error / empty / ranked discriminators,
 //  - row derivation (rank, me-flag, knownClass, prestige passthrough),
 //  - the off-page "your standing" sticky row,
+//  - the guild tag beside the name (both unguilded wire shapes normalize to null),
 //  - the pager state (hidden on one page, prev/next disabled at the ends),
 //  - server page-clamp passthrough,
 //  - parity: a Sim-shaped page (with extra ignored fields) and a
@@ -23,7 +24,13 @@ import {
 } from '../src/ui/leaderboard_view';
 import type { LeaderboardEntry, LeaderboardPage } from '../src/world_api';
 
-const VIEWER: LeaderboardViewer = { name: 'Me', level: 60, lifetimeXp: 999_999, title: null };
+const VIEWER: LeaderboardViewer = {
+  name: 'Me',
+  level: 60,
+  lifetimeXp: 999_999,
+  title: null,
+  guild: '',
+};
 
 function entry(over: Partial<LeaderboardEntry> = {}): LeaderboardEntry {
   return {
@@ -176,6 +183,7 @@ describe('buildLeaderboardView: off-page "your standing" sticky row', () => {
       virtualLevel: virtualLevel(999_999),
       lifetimeXp: 999_999,
       title: null,
+      guild: null,
     });
   });
 
@@ -210,6 +218,71 @@ describe('buildLeaderboardView: off-page "your standing" sticky row', () => {
       }),
     );
     expect(v.standing?.title).toBeNull();
+  });
+});
+
+describe('buildLeaderboardView: guild tag beside the name', () => {
+  it('carries a ranked player guild name through to the row', () => {
+    const v = ranked(
+      buildLeaderboardView({
+        kind: 'page',
+        page: page('sim', [entry({ name: 'Zyzz', guild: 'Monarchs' })]),
+        viewer: VIEWER,
+      }),
+    );
+    expect(v.rows[0].guild).toBe('Monarchs');
+  });
+
+  it('normalizes both unguilded wire shapes to null (absent, and the empty string)', () => {
+    // The server OMITS the key for an unguilded character (so an unguilded row is
+    // byte-unchanged on the wire) while the offline Sim reads the passive
+    // Entity.guild display field, which is '' until a host stamps it. Both must
+    // land as null so the painter renders no tag at all.
+    const v = ranked(
+      buildLeaderboardView({
+        kind: 'page',
+        page: page('sim', [
+          entry({ rank: 1, name: 'Absent' }),
+          entry({ rank: 2, name: 'Empty', guild: '' }),
+        ]),
+        viewer: VIEWER,
+      }),
+    );
+    expect(v.rows.map((r) => r.guild)).toEqual([null, null]);
+  });
+
+  it("carries the off-page viewer's own guild through to the sticky standing", () => {
+    const v = ranked(
+      buildLeaderboardView({
+        kind: 'page',
+        page: page('sim', [entry({ name: 'Someone' })]),
+        viewer: { ...VIEWER, guild: 'Monarchs' },
+      }),
+    );
+    expect(v.standing?.guild).toBe('Monarchs');
+  });
+
+  it('normalizes an unguilded viewer to null on the sticky standing', () => {
+    const v = ranked(
+      buildLeaderboardView({
+        kind: 'page',
+        page: page('sim', [entry({ name: 'Someone' })]),
+        viewer: { ...VIEWER, guild: null },
+      }),
+    );
+    expect(v.standing?.guild).toBeNull();
+  });
+
+  it('renders identically from a Sim-shaped and a ClientWorld-shaped page', () => {
+    const leaders = [entry({ name: 'Zyzz', guild: 'Monarchs' }), entry({ rank: 2, name: 'Solo' })];
+    const sim = ranked(
+      buildLeaderboardView({ kind: 'page', page: page('sim', leaders), viewer: VIEWER }),
+    );
+    const client = ranked(
+      buildLeaderboardView({ kind: 'page', page: page('client', leaders), viewer: VIEWER }),
+    );
+    expect(sim.rows.map((r) => r.guild)).toEqual(['Monarchs', null]);
+    expect(client.rows).toEqual(sim.rows);
   });
 });
 

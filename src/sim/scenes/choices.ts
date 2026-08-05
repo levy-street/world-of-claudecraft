@@ -299,6 +299,7 @@ export function answerSceneChoice(
 // Per-tick driver: the response window closes on the default choice so a
 // scene never deadlocks on an absent leader.
 export function updateChoices(ctx: SimContext): void {
+  if (ctx.activeChoices.size === 0) return;
   for (const choice of [...ctx.activeChoices.values()]) {
     const def = CHOICES[choice.choiceId];
     if (!def) {

@@ -152,14 +152,22 @@ async function shootSpecific(targets) {
                 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
             });
           }
+          // Anything that has to be in place BEFORE the document loads (a request
+          // stub via evaluateOnNewDocument, a storage seed).
+          await variant.beforeLoad?.(page);
           await page.goto(URL, { waitUntil: 'networkidle0', timeout: 60000 });
           if (variant.mobile)
             await page.evaluate(() => document.body.classList.add('mobile-touch'));
-          await enterOfflineGame(page, {
-            charClass: variant.charClass,
-            charName: variant.charName,
-            settleMs: 3000,
-          });
+          // A `landing: true` variant shoots the pre-game marketing shell (the home
+          // page's own views: High Scores, News, Download), so it must NOT enter the
+          // world: entry replaces that shell with the HUD. Its capture recipe drives
+          // the shell directly instead of window.__game.
+          if (!variant.landing)
+            await enterOfflineGame(page, {
+              charClass: variant.charClass,
+              charName: variant.charName,
+              settleMs: 3000,
+            });
         } else if (!page) {
           page = await browser.newPage();
           sharedPage = page;

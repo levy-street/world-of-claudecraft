@@ -58,6 +58,26 @@ const THUNZHARR_REACH_SCALE = 5;
 export function combatProfileForMob(templateId: string, scale: number): MobCombatProfile {
   if (templateId === 'nythraxis_scourge_of_thornpeak') return NYTHRAXIS_BOSS_COMBAT_PROFILE;
   if (templateId === 'nythraxis_skeleton_warrior') return NYTHRAXIS_ADD_COMBAT_PROFILE;
+  if (templateId === 'wildheart_ravager')
+    return {
+      ...DEFAULT_MOB_COMBAT_PROFILE,
+      // The scale-2 default settles at desiredRange 6.4 and swings out to 9,
+      // so real landed hits read as whiffs into the ether. Keep the scaled
+      // reach but close to visual contact before trading, the Nythraxis
+      // meleeRange 8 / desiredRange 5 pattern.
+      meleeRange: scaledDefaultMobMeleeRange(2),
+      desiredRange: 5,
+    };
+  if (templateId === 'wildheart_beastmaster')
+    return {
+      ...DEFAULT_MOB_COMBAT_PROFILE,
+      // Same whiff geometry as the ravager, one size up (scale 2.35 settles
+      // at 7.24): the pack-leader bruiser also closes to contact. Zulgar is
+      // deliberately left on the scale default, the boss fight is built on
+      // knockback/pulse spacing and his reach reads as boss presence.
+      meleeRange: scaledDefaultMobMeleeRange(2.35),
+      desiredRange: 5.5,
+    };
   if (templateId === 'thunzharr_waking_peak')
     return {
       ...DEFAULT_MOB_COMBAT_PROFILE,

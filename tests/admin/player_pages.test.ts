@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 import './_setup';
 import { fireEvent, render, screen, within } from '@testing-library/svelte';
 import { describe, expect, it, vi } from 'vitest';
@@ -44,6 +44,9 @@ const accountDetail = {
       name: 'Merlin',
       class: 'mage',
       level: 42,
+      guildId: 12,
+      guildName: 'Arcane Circle',
+      guildRank: 'officer',
       copper: 456,
       xp: 123,
       pos: { x: 1, z: 2 },
@@ -85,6 +88,9 @@ const charactersPage = {
       copper: 456,
       accountId: 1,
       username: 'alice',
+      guildId: 12,
+      guildName: 'Arcane Circle',
+      guildRank: 'officer',
       createdAt: '2026-01-01T00:00:00Z',
       updatedAt: '2026-06-01T00:00:00Z',
     },
@@ -92,6 +98,25 @@ const charactersPage = {
   total: 1,
   page: 1,
   limit: 25,
+};
+
+const professionsSheet = {
+  characterId: 7,
+  name: 'Merlin',
+  class: 'mage',
+  level: 42,
+  accountId: 1,
+  username: 'alice',
+  live: false,
+  updatedAt: '2026-06-01T00:00:00Z',
+  preMigration: false,
+  archetype: { activeArchetype: null, pairedMajor: null, hobbyCraft: null },
+  gathering: [{ professionId: 'mining', proficiency: 12 }],
+  crafting: [{ craftId: 'alchemy', skill: 0, tier: 0 }],
+  knownRecipes: 0,
+  slots: [],
+  nodeTimers: [],
+  toolEffectIds: ['gatherers_cache'],
 };
 
 vi.mock('../../src/admin/api', () => ({
@@ -106,6 +131,7 @@ vi.mock('../../src/admin/api', () => ({
     if (path.startsWith('/admin/api/accounts?')) return accountsPage;
     if (path === '/admin/api/accounts/1') return accountDetail;
     if (path.startsWith('/admin/api/characters?')) return charactersPage;
+    if (path === '/admin/api/characters/7/professions') return professionsSheet;
     throw new Error(`unexpected path ${path}`);
   }),
   apiPost: vi.fn(),
@@ -147,10 +173,23 @@ describe('Players pages', () => {
     await vi.waitFor(() => expect(accountLink).toHaveFocus());
   });
 
+  it('opens the professions inspector modal from a character row', async () => {
+    grantPermissions();
+    render(Characters);
+    await screen.findByText('Merlin');
+    await fireEvent.click(screen.getByRole('button', { name: t('characters.professionsButton') }));
+    // The modal fetched the sheet and rendered its title: the row-to-modal
+    // wiring (inspected state -> CharacterProfessionsModal) is live.
+    expect(await screen.findByText(t('profInspect.title', { name: 'Merlin' }))).toBeInTheDocument();
+    expect((await screen.findAllByText('mining')).length).toBeGreaterThan(0);
+  });
+
   it('renders the sortable characters directory', async () => {
     render(Characters);
     expect(await screen.findByText('Merlin')).toBeInTheDocument();
     expect(screen.getByPlaceholderText(t('characters.searchPlaceholder'))).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Arcane Circle' })).toBeInTheDocument();
+    expect(screen.getByText(t('guilds.rank.officer'))).toBeInTheDocument();
     expect(
       screen.getByRole('columnheader', { name: new RegExp(t('characters.colLevel')) }),
     ).toBeInTheDocument();
@@ -181,6 +220,10 @@ describe('Players pages', () => {
     expect(within(summary).getByText(t('accounts.colId'))).toBeInTheDocument();
     expect(within(dialog).getByRole('button', { name: t('detail.forceNameChange') })).toHaveClass(
       'btn-sm',
+    );
+    expect(within(dialog).getByRole('link', { name: 'Arcane Circle' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('page=guilds&guildId=12'),
     );
     expect(screen.getByText(t('moderation.badgeOnline'))).toBeInTheDocument();
     expect(screen.getByText(t('detail.statusActive'))).toBeInTheDocument();

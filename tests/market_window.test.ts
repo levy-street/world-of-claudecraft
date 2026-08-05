@@ -17,6 +17,7 @@ const mobileCss = readFileSync(
   'utf8',
 ).replace(/\r\n/g, '\n');
 const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+const mainSrc = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
 
 describe('market_window: no magic values', () => {
   it('carries no literal color in TS (colors live in the extracted stylesheet/tokens)', () => {
@@ -363,6 +364,111 @@ describe('market_window: stale tooltip on re-filter (#2456)', () => {
     const render = painter.slice(painter.indexOf('render(): void {'));
     expect(render.indexOf('this.deps.hideTooltip();')).toBeLessThan(
       render.indexOf('this.renderContent();'),
+    );
+  });
+
+  it('also guards the Browse-tab pager click, a third `.mkt-row` teardown path', () => {
+    // The pager's Prev/Next button is built inside renderBrowse() and calls pushQuery()
+    // then renderContent() directly: neither the full render() rebuild (which hides the
+    // tooltip unconditionally at its top) nor the guarded refreshIfChanged() path covers
+    // it, so it needs its own hideTooltip() before the rebuild.
+    const pagerStart = painter.indexOf(
+      "pager.querySelectorAll<HTMLButtonElement>('[data-market-page]').forEach((button) => {",
+    );
+    expect(pagerStart, 'pager click wiring must exist').toBeGreaterThan(-1);
+    const pagerHandler = painter.slice(pagerStart, painter.indexOf('list.appendChild(pager);'));
+    const hideIdx = pagerHandler.indexOf('this.deps.hideTooltip();');
+    const renderIdx = pagerHandler.indexOf('this.renderContent();');
+    expect(hideIdx, 'hideTooltip() must run in the pager click handler').toBeGreaterThan(-1);
+    expect(
+      hideIdx,
+      'hideTooltip() must run before renderContent() tears down the row nodes',
+    ).toBeLessThan(renderIdx);
+  });
+});
+
+describe('market_window: reconnect resync (#2416)', () => {
+  // A fresh join (the server's linkdead grace expired before the socket came back)
+  // resets the session-only browse query to default; the window's own filter
+  // controls live in the client and survive the drop untouched. onReconnected must
+  // detect that drift off the echoed query, not blindly re-push on every reconnect
+  // (an ordinary resume keeps the same session, so nothing changed to re-send).
+  // onReconnected() fires synchronously inside the client's `hello` handler,
+  // before the resent world's first snapshot has decoded: at that instant
+  // marketInfo (if present at all) is still the pre-drop echo, which by
+  // construction matches currentQuery(), so comparing right there would never
+  // detect the fresh-join reset. It arms a flag instead; the drift check runs
+  // later, once refreshIfChanged() actually observes a MarketInfo.
+  it('is a no-op when closed, otherwise only arms the deferred resync flag', () => {
+    const method = painter.slice(
+      painter.indexOf('onReconnected(): void {'),
+      painter.indexOf('// Runs the deferred reconnect-drift check'),
+    );
+    expect(method, 'onReconnected must exist').toContain('onReconnected(): void {');
+    expect(method).toContain('if (!this.opened) return;');
+    expect(method).toContain('this.pendingReconnectResync = true;');
+    expect(method, 'must not compare against a possibly-stale echo inline').not.toContain(
+      'queryDiffersFromEcho',
+    );
+  });
+
+  it('resolvePendingReconnectResync compares both filter axes and the settled search box, and re-pushes only on real drift', () => {
+    const method = painter.slice(
+      painter.indexOf('private resolvePendingReconnectResync'),
+      painter.indexOf('refreshIfChanged(): void {'),
+    );
+    expect(method, 'resolvePendingReconnectResync must exist').toContain(
+      'resolvePendingReconnectResync',
+    );
+    expect(method).toContain('if (!this.pendingReconnectResync || !info) return;');
+    expect(method).toContain('this.pendingReconnectResync = false;');
+    expect(method).toContain('queryDiffersFromEcho(query, info)');
+    expect(method).toContain('searchDiffersFromEcho(query, info)');
+    expect(method).toContain('this.pushQuery();');
+  });
+
+  it('refreshIfChanged resolves the pending resync even on the Sell tab (before the sell-tab early return)', () => {
+    const method = painter.slice(
+      painter.indexOf('refreshIfChanged(): void {'),
+      painter.indexOf('render(): void {'),
+    );
+    const resolveIdx = method.indexOf('this.resolvePendingReconnectResync(info);');
+    const sellReturnIdx = method.indexOf("if (this.tab === 'sell') return;");
+    expect(resolveIdx, 'must call resolvePendingReconnectResync').toBeGreaterThan(-1);
+    expect(
+      sellReturnIdx,
+      'must still early-return before the browse/collect signature work',
+    ).toBeGreaterThan(-1);
+    expect(resolveIdx).toBeLessThan(sellReturnIdx);
+  });
+
+  it('imports queryDiffersFromEcho and searchDiffersFromEcho from the world_api seam (the pure drift checks, not re-derived comparisons)', () => {
+    expect(painter).toContain(
+      "import {\n  type IWorld,\n  type MarketInfo,\n  queryDiffersFromEcho,\n  searchDiffersFromEcho,\n} from '../world_api';",
+    );
+  });
+
+  it('wires the window through a hud.ts method, chained onto the ClientWorld reconnect hook in main.ts', () => {
+    const method = hud.slice(
+      hud.indexOf('marketResyncAfterReconnect(): void {'),
+      hud.indexOf('marketResyncAfterReconnect(): void {') + 200,
+    );
+    expect(method, 'Hud.marketResyncAfterReconnect must exist').toContain(
+      'this.marketWindow.onReconnected();',
+    );
+    // hud does not exist yet when enterWorld() first arms world.onReconnected (the
+    // reconnect-overlay teardown), so startGame chains its own handler onto
+    // whatever enterWorld already set, once hud is actually constructed, instead
+    // of replacing it.
+    const chain = mainSrc.slice(
+      mainSrc.indexOf('const priorOnReconnected = online.onReconnected;'),
+      mainSrc.indexOf('const priorOnReconnected = online.onReconnected;') + 300,
+    );
+    expect(chain, 'main.ts must chain onto the prior handler, not replace it').toContain(
+      'priorOnReconnected?.();',
+    );
+    expect(chain, 'main.ts must call the hud resync hook on reconnect').toContain(
+      'hud.marketResyncAfterReconnect();',
     );
   });
 });

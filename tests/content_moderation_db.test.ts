@@ -10,6 +10,9 @@
 import type { PoolClient, QueryResult, QueryResultRow } from 'pg';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  CONTENT_MODERATION_OWNER_CONCURRENT_INDEX_SQL,
+  CONTENT_MODERATION_OWNER_INVALID_INDEX_CHECK_SQL,
+  CONTENT_MODERATION_OWNER_INVALID_INDEX_DROP_SQL,
   CONTENT_MODERATION_SCHEMA,
   cleanContentModerationReason,
   recordContentModerationAction,
@@ -36,9 +39,16 @@ function clientStub() {
 }
 
 describe('CONTENT_MODERATION_SCHEMA', () => {
-  it('indexes the owner foreign key used by account deletion', () => {
-    expect(CONTENT_MODERATION_SCHEMA).toContain(
-      'CREATE INDEX IF NOT EXISTS content_moderation_actions_owner ON content_moderation_actions(owner_account_id);',
+  it('builds the owner foreign-key index through the live-table concurrent seam', () => {
+    expect(CONTENT_MODERATION_SCHEMA).not.toContain('content_moderation_actions_owner');
+    expect(CONTENT_MODERATION_OWNER_CONCURRENT_INDEX_SQL).toBe(
+      'CREATE INDEX CONCURRENTLY IF NOT EXISTS content_moderation_actions_owner ON content_moderation_actions(owner_account_id)',
+    );
+    expect(CONTENT_MODERATION_OWNER_INVALID_INDEX_CHECK_SQL).toContain(
+      "to_regclass('content_moderation_actions_owner')",
+    );
+    expect(CONTENT_MODERATION_OWNER_INVALID_INDEX_DROP_SQL).toBe(
+      'DROP INDEX CONCURRENTLY IF EXISTS content_moderation_actions_owner',
     );
   });
 });

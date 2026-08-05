@@ -24,6 +24,6 @@ export function formatChatTimestamp(d: Date, clock: ChatClock, lang?: SupportedL
   const options: Intl.DateTimeFormatOptions =
     clock === '12h'
       ? { hour: 'numeric', minute: '2-digit', hour12: true }
-      : { hour: '2-digit', minute: '2-digit', hour12: false };
+      : { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' };
   return `[${formatDateTime(d, options, lang)}]`;
 }

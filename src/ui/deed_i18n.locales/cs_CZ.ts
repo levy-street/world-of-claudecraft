@@ -780,4 +780,28 @@ export const table: DeedLocaleTable = {
     name: 'Burza vrakovišť',
     desc: 'Rozeber 50 kusů výstroje zpět na základní materiály.',
   },
+  dgn_wildheart_basin: {
+    name: 'Kotlina udeří zpět',
+    desc: 'Poraz Zulgara, hlas Kotliny, v Kotlině Divokého srdce.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Hrdinská: Kotlina Divokého srdce',
+    desc: 'Poraz Zulgara, hlas Kotliny, v Kotlině Divokého srdce na hrdinské obtížnosti.',
+  },
+  chr_marsh_rares_ii: {
+    name: 'Žrout, dopočítán',
+    desc: 'Zab Hltavou Červočelist, čtvrtou pojmenovanou hrůzu Mirefenského močálu, která zůstala mimo první sčítání.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'Další jména vytesaná do skály',
+    desc: 'Zab Starou Skalotlamu a Pána střepů Kazzixe, další dvě pojmenované hrůzy Thornpeakských výšin, které zůstaly mimo první sčítání.',
+  },
+  chr_gleamstag: {
+    name: 'Legenda, jež nikdy neútočí první',
+    desc: 'Zab Třpytného jelena, vzácného a plachého elitního tvora, který útočí, jen když ho zaženeš do kouta.',
+  },
+  chr_hollow_rares: {
+    name: 'Stádo nezapomíná',
+    desc: 'Zab Starou Morkoskořápku a Aurelhorna, Prvního ze stáda, dva putující vzácné bosse Zahalené kotliny.',
+  },
 };

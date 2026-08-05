@@ -16,7 +16,7 @@ function fishingShoreSpot(): { x: number; z: number; facing: number } {
       const angle = (i / 72) * Math.PI * 2;
       const x = LAKE.x + Math.cos(angle) * r;
       const z = LAKE.z + Math.sin(angle) * r;
-      if (groundHeight(x, z, SEED) < waterLevelAt(x, z)) continue;
+      if (groundHeight(x, z, SEED) < waterLevelAt(x, z, SEED)) continue;
       const facing = Math.atan2(LAKE.x - x, LAKE.z - z);
       const sin = Math.sin(facing);
       const cos = Math.cos(facing);
@@ -24,7 +24,8 @@ function fishingShoreSpot(): { x: number; z: number; facing: number } {
         const sampleX = x + sin * distance;
         const sampleZ = z + cos * distance;
         return (
-          groundHeight(sampleX, sampleZ, SEED) < waterLevelAt(sampleX, sampleZ) - PLAYER_SWIM_DEPTH
+          groundHeight(sampleX, sampleZ, SEED) <
+          waterLevelAt(sampleX, sampleZ, SEED) - PLAYER_SWIM_DEPTH
         );
       });
       if (hasFishableSample) return { x, z, facing };

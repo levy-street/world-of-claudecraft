@@ -52,6 +52,7 @@ export const ENTRY_PRESET_MIN = 1;
 export const ENTRY_PRESET_MAX = 5;
 
 export const ENTRY_CHECKPOINTS = [
+  'assets-await',
   'scene-build-start',
   'renderer-built',
   'hud-built',

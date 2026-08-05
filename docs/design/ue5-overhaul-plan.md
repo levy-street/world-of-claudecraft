@@ -28,7 +28,7 @@ All CC0 except three.js water normals (MIT). Attribution in `CREDITS.md` (courte
 | Quaternius Fantasy Props MegaKit (itch free) | barrels, crates, lanterns, clutter | itch anonymous flow |
 | Kenney Nature Kit / Graveyard 5.0 / Pirate / Fantasy Town 2.0 / Castle kits | modular cliffs, iron fences+crypts, docks/rowboats, stalls/fountains, fortress walls | `curl -LO https://kenney.nl/media/pages/assets/<kit>/<hash>/<file>.zip` (hash can rot → fall back to scraping the asset page) |
 | Poly Haven HDRIs: `kloofendal_48d_partly_cloudy_puresky` (vale day), `belfast_open_field` (marsh overcast), `kiara_1_dawn` (peaks golden hour), `dikhololo_night` (spare) | IBL + sky | `https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/{1k|2k}/{id}_{res}.hdr` (md5 via `api.polyhaven.com/files/{id}`) |
-| ambientCG: Grass001, Ground048 (dirt), Rock051 (cliff), Ground071 (swamp mud), Ground080 (sand), PavingStones046 (cobble), Snow010A | terrain splat PBR (1K) | `https://ambientcg.com/get?file={ID}_1K-JPG.zip` |
+| ambientCG: Grass001, Ground023 (dirt), Rock051 (cliff), Ground071 (swamp mud), Ground080 (sand), PavingStones046 (cobble), Snow010A | terrain splat PBR (1K) | `https://ambientcg.com/get?file={ID}_1K-JPG.zip` |
 | three.js r165 `waternormals.jpg`, `water/Water_1_M_Normal.jpg`, `Water_2_M_Normal.jpg` | water | raw.githubusercontent pinned to r165 tag (MIT) |
 | Kenney Particle Pack | spell/fire/smoke/impact sprites (cherry-pick ~20) | direct zip |
 | npm: `@gltf-transform/cli@4.4.0` (MIT), `n8ao@1.10.1` (ISC) | pipeline + SSAO | npm i; meshopt decoder bundled in three (`three/addons/libs/meshopt_decoder.module.js`) |
