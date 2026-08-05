@@ -1029,7 +1029,7 @@ export const ru_RU: EnTranslations = {
       "timeLeft": "{seconds} сек."
     },
     "pvp": {
-      "launcherTitle": "PvP: Терновая Лощина и арены",
+      "launcherTitle": "PvP",
       "mobileLabel": "PvP",
       "bracket1v1": "1v1",
       "bracket2v2": "2v2"

@@ -1029,7 +1029,7 @@ export const ja_JP: EnTranslations = {
       "timeLeft": "{seconds}秒"
     },
     "pvp": {
-      "launcherTitle": "PvP:ソーンホロウ平原と闘技場",
+      "launcherTitle": "PvP",
       "mobileLabel": "PvP",
       "bracket1v1": "1v1",
       "bracket2v2": "2v2"

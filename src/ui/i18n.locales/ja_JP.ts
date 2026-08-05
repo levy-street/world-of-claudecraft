@@ -859,7 +859,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.floatReasons.assist': 'アシスト',
   'hudChrome.warfare.floatReasons.firstWin': '初勝利',
   'hudChrome.keybinds.bgFlag': '戦場フラッグアクション',
-  'hudChrome.pvp.launcherTitle': 'PvP:ソーンホロウ平原と闘技場',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.bg.title': 'ソーンホロウ平原',
   'hudChrome.bg.blurb':

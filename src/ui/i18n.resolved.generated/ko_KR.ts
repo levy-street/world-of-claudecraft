@@ -1029,7 +1029,7 @@ export const ko_KR: EnTranslations = {
       "timeLeft": "{seconds}초"
     },
     "pvp": {
-      "launcherTitle": "PvP: 쏜할로우 평원과 투기장",
+      "launcherTitle": "PvP",
       "mobileLabel": "PvP",
       "bracket1v1": "1v1",
       "bracket2v2": "2v2"

@@ -1029,7 +1029,7 @@ export const tr_TR: EnTranslations = {
       "timeLeft": "{seconds}sn"
     },
     "pvp": {
-      "launcherTitle": "PvP: Thornhollow Fields and the Arenas",
+      "launcherTitle": "PvP",
       "mobileLabel": "PvP",
       "bracket1v1": "1v1",
       "bracket2v2": "2v2"

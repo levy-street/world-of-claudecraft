@@ -857,7 +857,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.floatReasons.assist': '도움',
   'hudChrome.warfare.floatReasons.firstWin': '첫 승리',
   'hudChrome.keybinds.bgFlag': '전장 깃발 행동',
-  'hudChrome.pvp.launcherTitle': 'PvP: 쏜할로우 평원과 투기장',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.bg.title': '쏜할로우 평원',
   'hudChrome.bg.blurb':

@@ -1029,7 +1029,7 @@ export const en_XA: EnTranslations = {
       "timeLeft": "[{seconds}š]"
     },
     "pvp": {
-      "launcherTitle": "[ÞʋÞ: Ţĥóŕñĥóļļóŵ Ƒíéļðš áñð ţĥé Áŕéñáš]",
+      "launcherTitle": "[ÞʋÞ]",
       "mobileLabel": "[ÞʋÞ]",
       "bracket1v1": "[1ʋ1]",
       "bracket2v2": "[2ʋ2]"

@@ -1029,7 +1029,7 @@ export const zh_CN: EnTranslations = {
       "timeLeft": "{seconds}秒"
     },
     "pvp": {
-      "launcherTitle": "PvP:荆谷原野与竞技场",
+      "launcherTitle": "PvP",
       "mobileLabel": "PvP",
       "bracket1v1": "1v1",
       "bracket2v2": "2v2"

@@ -831,7 +831,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.floatReasons.assist': '助攻',
   'hudChrome.warfare.floatReasons.firstWin': '首胜',
   'hudChrome.keybinds.bgFlag': '战场夺旗动作',
-  'hudChrome.pvp.launcherTitle': 'PvP:荆谷原野与竞技场',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.bg.title': '荆谷原野',
   'hudChrome.bg.blurb':

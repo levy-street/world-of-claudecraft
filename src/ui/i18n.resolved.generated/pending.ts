@@ -722,25 +722,29 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bg.clock",
     "hudChrome.materialHint.usedBy",
     "hudChrome.pvp.bracket1v1",
-    "hudChrome.pvp.bracket2v2"
+    "hudChrome.pvp.bracket2v2",
+    "hudChrome.pvp.launcherTitle"
   ],
   "zh_TW": [
     "hudChrome.bg.clock",
     "hudChrome.materialHint.usedBy",
     "hudChrome.pvp.bracket1v1",
-    "hudChrome.pvp.bracket2v2"
+    "hudChrome.pvp.bracket2v2",
+    "hudChrome.pvp.launcherTitle"
   ],
   "ko_KR": [
     "hudChrome.bg.clock",
     "hudChrome.materialHint.usedBy",
     "hudChrome.pvp.bracket1v1",
-    "hudChrome.pvp.bracket2v2"
+    "hudChrome.pvp.bracket2v2",
+    "hudChrome.pvp.launcherTitle"
   ],
   "ja_JP": [
     "hudChrome.bg.clock",
     "hudChrome.materialHint.usedBy",
     "hudChrome.pvp.bracket1v1",
-    "hudChrome.pvp.bracket2v2"
+    "hudChrome.pvp.bracket2v2",
+    "hudChrome.pvp.launcherTitle"
   ],
   "pt_BR": [
     "guide.nav.thornhollow",
@@ -864,7 +868,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bg.clock",
     "hudChrome.materialHint.usedBy",
     "hudChrome.pvp.bracket1v1",
-    "hudChrome.pvp.bracket2v2"
+    "hudChrome.pvp.bracket2v2",
+    "hudChrome.pvp.launcherTitle"
   ],
   "cs_CZ": [
     "guide.nav.thornhollow",

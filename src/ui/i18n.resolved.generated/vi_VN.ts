@@ -1029,7 +1029,7 @@ export const vi_VN: EnTranslations = {
       "timeLeft": "{seconds} giây"
     },
     "pvp": {
-      "launcherTitle": "PvP: Thornhollow Fields and the Arenas",
+      "launcherTitle": "PvP",
       "mobileLabel": "PvP",
       "bracket1v1": "1v1",
       "bracket2v2": "2v2"

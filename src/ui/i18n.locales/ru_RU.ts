@@ -859,7 +859,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.floatReasons.assist': 'Помощь',
   'hudChrome.warfare.floatReasons.firstWin': 'Первая победа',
   'hudChrome.keybinds.bgFlag': 'Действие с флагом',
-  'hudChrome.pvp.launcherTitle': 'PvP: Терновая Лощина и арены',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.bg.title': 'Терновая Лощина',
   'hudChrome.bg.blurb':
